@@ -2,84 +2,89 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3B85C83000
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:37:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5FB5C83000
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:38:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D7342072A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:37:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A2DB62074A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:38:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XL6HB12A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D7342072A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AzYxoFiV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2DB62074A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUAJJ-0002DC-PI
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 10:37:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33674)
+	id 1jUAKn-0004O1-QV
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 10:38:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33604)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jUAHd-0008Os-9P
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:35:25 -0400
+ (envelope-from <berrange@redhat.com>) id 1jUAH1-0007Vg-Cp
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:34:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jUAHc-0006dL-5m
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:35:25 -0400
-Received: from mail-oi1-x22d.google.com ([2607:f8b0:4864:20::22d]:36121)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jUAHb-0006cp-N3
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:35:23 -0400
-Received: by mail-oi1-x22d.google.com with SMTP id s202so5396996oih.3
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 07:35:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=RYchbCsHS5ydDK77jC/7+dOs+dp/ANIHTH+FLGCQ8FM=;
- b=XL6HB12ACXkVTUF2P1Wrvc8kuoV8JZFXmRNfnypcPWeGRRx70BJXJsAE1cZ4diGkmw
- 1Eer6D8qSxNibggyw2Ae9306blWUZE60e5arXImecsen3g/OWutF2rDVKo2IPK4AroO9
- S6CiyMvvvTIZe6/iOObhrVAcfZCrqpvkBC2tZQv1HE1OgZjeJbk5ucxUbppxyQP+Lu4z
- 684g5KSOkMsJwCJRbZvUIpi9lXt+UeWPsN8ZdWrwjeFRwPUIbS4cgUsNsXYtVnFnCIJg
- yNDV+7TJC24xugr5PcelvQxp/B2ahkcFfH7UIHWagAqJxJ1ksrU1r6cKZ7MwaVB4s7T9
- pJHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=RYchbCsHS5ydDK77jC/7+dOs+dp/ANIHTH+FLGCQ8FM=;
- b=g6U1t5rvfvtQhxh3/PMQqMqcpVJ850MFjJ+L94AVi9yisSnIwVx0L7AQOGpE52L0Eb
- rjdm3alxlMzPSTON2f0RH2bVkWUE7z1j1OcTXcXXYqlqMPIJk+xCDoGSNA/OrA1ERlgO
- uH2e3Vhmjxil5PcQNqumcqdQ0u8xC9vy/bEz9J3FKp074K5ZAvIjPbyZe3IyIXYsVJye
- xGDwtxLQ0QNXpscM/iKLcT1MbC7FV7gDDRVJOz5Q3a0R4P6i052PFSATdNftJHNgIMLD
- N8eZGMyGGiG3BP2KJp+bW4f0/F553amRXPwrSWK19OUvGq7cJUCqIp3GWj/IBvnC6EAt
- PsOQ==
-X-Gm-Message-State: AGi0PubvQd6fHMTSV7sCpV46XvAvCz7sRN5QG4XyLZUTWfx8TyaKyA4y
- qD/6qvSWVCGjbcRBePdktucQMmWg3ZpWHUhU+6ubxTTHAZM=
-X-Google-Smtp-Source: APiQypK1ca5pUBWzUYszNGf6LV1YhJex0dd36jycx4Fh4yLfx1cqyI67SSIlTrnRwcYuGf1Ju36TiJuK/X7+Xjy74fc=
-X-Received: by 2002:aca:4a45:: with SMTP id x66mr1858657oia.48.1588257321611; 
- Thu, 30 Apr 2020 07:35:21 -0700 (PDT)
+ (envelope-from <berrange@redhat.com>) id 1jUAGz-0006VJ-8h
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:34:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37670
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jUAGy-0006V1-S1
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:34:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588257283;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gr9mZHYm1mbvL06H8cfLy/QWvH+yZ284xFyWZ9hXbS4=;
+ b=AzYxoFiVOELguQjFatXAgu4gKjPBPPoNWMKUUiB84Lv5LMC95Ff5XJ0Icegcon1udplHw3
+ vSOX9OgMvF270BltiGuMoI0LlmLmGZt5nnEa5KCRgmqc5O3IVLhqzoQ/gL3CvDxiRIgJrV
+ 1NONcYa0z+NSe0vRvddx8Gh31QEjRR8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-176-WS6IB-f0MCW-QvhnR72ygw-1; Thu, 30 Apr 2020 10:34:37 -0400
+X-MC-Unique: WS6IB-f0MCW-QvhnR72ygw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32C6C80B70C
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 14:34:36 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.44])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E9D4260C87;
+ Thu, 30 Apr 2020 14:34:28 +0000 (UTC)
+Date: Thu, 30 Apr 2020 15:34:25 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH] virtiofsd: Show submounts
+Message-ID: <20200430143425.GD2184629@redhat.com>
+References: <20200424133516.73077-1-mreitz@redhat.com>
+ <20200427175902.GM2923@work-vm> <20200429145720.GA2835@work-vm>
+ <8c73f374-fcc8-1684-b581-84a9ab501aa9@redhat.com>
+ <20200430085812.GC2874@work-vm>
+ <20200430135639.GA260081@redhat.com>
+ <20200430142013.GI2874@work-vm>
 MIME-Version: 1.0
-References: <20200430115142.13430-1-peter.maydell@linaro.org>
- <20200430115142.13430-10-peter.maydell@linaro.org>
-In-Reply-To: <20200430115142.13430-10-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 30 Apr 2020 15:35:10 +0100
-Message-ID: <CAFEAcA-VqU3Z3+cK-AGYQ-xT4vUcQyWUPYGKPpHq69XLwD5KRg@mail.gmail.com>
-Subject: Re: [PULL 09/31] hw/core/clock: introduce clock object
-To: QEMU Developers <qemu-devel@nongnu.org>,
- Damien Hedde <damien.hedde@greensocs.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::22d;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x22d.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::22d
+In-Reply-To: <20200430142013.GI2874@work-vm>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:24:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,56 +96,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: virtio-fs@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>,
+ qemu-devel@nongnu.org, Vivek Goyal <vgoyal@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 30 Apr 2020 at 12:51, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> This object may be used to represent a clock inside a clock tree.
->
-> A clock may be connected to another clock so that it receives update,
-> through a callback, whenever the source/parent clock is updated.
->
-> Although only the root clock of a clock tree controls the values
-> (represented as periods) of all clocks in tree, each clock holds
-> a local state containing the current value so that it can be fetched
-> independently. It will allows us to fullfill migration requirements
-> by migrating each clock independently of others.
+On Thu, Apr 30, 2020 at 03:20:13PM +0100, Dr. David Alan Gilbert wrote:
+> * Vivek Goyal (vgoyal@redhat.com) wrote:
+> > On Thu, Apr 30, 2020 at 09:58:12AM +0100, Dr. David Alan Gilbert wrote:
+> > [..]
+> > > > > Even without this patch, the SLAVE stuff worked so if you start t=
+he
+> > > > > daemon and *then* mount under the shared directory, the guest see=
+s it
+> > > > > with or without this patch.
+> > > >=20
+> > > > Hm, I don=E2=80=99t.  Do you really?
+> > >=20
+> > > Yes! With your patch reverted:
+> > >=20
+> > > Start virtiofsd, mount in the guest:
+> > >=20
+> > > host:
+> > > # ./virtiofsd --socket-path=3D/tmp/vhostqemu -o source=3D/home/dgilbe=
+rt/virtio-fs/fs  -o log_level=3Dwarn -o no_writeback
+> > >=20
+> > > guest:
+> > > # mount -t virtiofs myfs /sysroot
+> > >=20
+> > > host:
+> > > # findmnt -o +PROPAGATION -N 6100
+> > > TARGET SOURCE                                                        =
+      FSTYPE OPTIONS                                                      P=
+ROPAGATION
+> > > /      /dev/mapper/fedora_dgilbert--t580-root[/home/dgilbert/virtio-f=
+s/fs] xfs    rw,relatime,seclabel,attr2,inode64,logbufs=3D8,logbsize=3D32k,=
+no private,slave
+> > > # mount -t tmpfs /dev/null /home/dgilbert/virtio-fs/fs/tmp
+> > > # findmnt -o +PROPAGATION -N 6100
+> > > TARGET SOURCE                                                        =
+      FSTYPE OPTIONS                                                      P=
+ROPAGATION
+> > > /      /dev/mapper/fedora_dgilbert--t580-root[/home/dgilbert/virtio-f=
+s/fs] xfs    rw,relatime,seclabel,attr2,inode64,logbufs=3D8,logbsize=3D32k,=
+no private,slave
+> > > =E2=94=94=E2=94=80/tmp /dev/null                                     =
+                      tmpfs  rw,relatime,seclabel                          =
+               private,slave
+> >=20
+> > Why is it showing a mount point at "/tmp". If mount point propagated, t=
+hen
+> > inside guest we should see a mount point at /sysroot/tmp?
+>=20
+> That findmnt is on the host.
+>=20
+> > So there are two things.
+> >=20
+> > A. Propagation of mount from host to virtiofsd.
+> > B. Visibility of that mount inside guest over fuse protocol (submount
+> >   functionality).
+> >=20
+> > I think A works for me without any patches. But don't think B is workin=
+g
+> > for me. I don't see the submount inside guest.=20
+> >=20
+> > > # touch /home/dgilbert/virtio-fs/fs/tmp/hello
+> > >=20
+> > > guest:
+> > > # ls -l /sysroot/tmp
+> > > total 0
+> > > -rw-r--r-- 1 root root 0 Apr 30 08:50 hello
+> >=20
+> > Do a "findmnt /sysroot/tmp" inside guest and see what do you see.
+> >=20
+> > You will be able to see "hello" as long as virtiofsd sees the new
+> > mount point, I think. And guest does not have to see that mount point
+> > for this simple test to work.
+>=20
+> Right, the guest just sees:
+>=20
+> `-/sysroot                            myfs       virtiof rw,relatime
 
-> +#define CLOCK_SECOND (1000000000llu << 32)
+That is a good thing surely ? If I'm exporting "/sysroot" from the host,
+I want the content in "/sysroot/some/sub/mount" to be visible to the
+guest, but I don't want the guest to see "/sysroot/some/sub/mount"
+as an actual mount point. That would be leaking information about the
+host storage setup into the guest. The host admin should be free to
+re-arrange submounts in the host OS, to bring more storage space online,
+and have this be transparent to the guest OS.
 
-It turns out that FreeBSD's time.h defines a CLOCK_SECOND
-macro, which means this doesn't compile on that platform.
-I'm going to rename it CLOCK_PERIOD_1SEC; it's only used
-in include/hw/clock.h so not a big change:
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
-diff --git a/include/hw/clock.h b/include/hw/clock.h
-index f3e44e9460c..f822a942209 100644
---- a/include/hw/clock.h
-+++ b/include/hw/clock.h
-@@ -32,15 +32,15 @@ typedef void ClockCallback(void *opaque);
-  * + at 1Ghz,   resolution is ~0.2Hz
-  * + at 10Ghz,  resolution is ~20Hz
-  */
--#define CLOCK_SECOND (1000000000llu << 32)
-+#define CLOCK_PERIOD_1SEC (1000000000llu << 32)
-
- /*
-  * macro helpers to convert to hertz / nanosecond
-  */
--#define CLOCK_PERIOD_FROM_NS(ns) ((ns) * (CLOCK_SECOND / 1000000000llu))
--#define CLOCK_PERIOD_TO_NS(per) ((per) / (CLOCK_SECOND / 1000000000llu))
--#define CLOCK_PERIOD_FROM_HZ(hz) (((hz) != 0) ? CLOCK_SECOND / (hz) : 0u)
--#define CLOCK_PERIOD_TO_HZ(per) (((per) != 0) ? CLOCK_SECOND / (per) : 0u)
-+#define CLOCK_PERIOD_FROM_NS(ns) ((ns) * (CLOCK_PERIOD_1SEC / 1000000000llu))
-+#define CLOCK_PERIOD_TO_NS(per) ((per) / (CLOCK_PERIOD_1SEC / 1000000000llu))
-+#define CLOCK_PERIOD_FROM_HZ(hz) (((hz) != 0) ? CLOCK_PERIOD_1SEC / (hz) : 0u)
-+#define CLOCK_PERIOD_TO_HZ(per) (((per) != 0) ? CLOCK_PERIOD_1SEC / (per) : 0u)
-
- /**
-  * Clock:
-
-thanks
--- PMM
 
