@@ -7,90 +7,89 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FF1AC4724C
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 18:52:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 547B8C4724C
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 18:54:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D0022073E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 18:52:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2096F2073E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 18:54:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uyaEiF0J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D0022073E
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BR7SmeG3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2096F2073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUEI4-0002Aq-G1
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 14:52:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40560)
+	id 1jUEKS-0006rH-B8
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 14:54:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39260)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jUEBi-0007Ru-6J
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 14:45:46 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jUE1g-0008E7-KL
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 14:35:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jUEAE-0002FF-19
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 14:45:33 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:40826)
+ (envelope-from <richard.henderson@linaro.org>) id 1jUE1f-00045Y-Uh
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 14:35:12 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:42320)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jUEAD-0002Ez-Ib
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 14:44:01 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id fu13so1123639pjb.5
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 11:44:01 -0700 (PDT)
+ id 1jUE1f-000446-GZ
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 14:35:11 -0400
+Received: by mail-pg1-x541.google.com with SMTP id n11so3181464pgl.9
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 11:35:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:references:from:message-id:date:user-agent:mime-version
  :in-reply-to:content-language:content-transfer-encoding;
- bh=6OOFLUi1SxWtdgBWXWd1AWCvifhTD5to69ewq6+eyP8=;
- b=uyaEiF0JsnWBmkL5w182qFAbEyJemoI0YjZ/TNjSksiGeqQNp9BQUVgYphRgTq01GZ
- mn1JsFeNiwqhFdfcIuNObmZ5VfieHM7d/tAXHDuvR195sq1PSoqY76H4DFSmlnPPsYKO
- iZ63tnnnxOVUsH8nEHh62rmaHSXtt3GphiQC2cD7X1QF3io8nn9CoNTK0eNrcXpkhh/g
- MQ8jZSvuZwlBlWZvTcy0xTYLRL9U+q2kluSYcYWD0oaIuXTWF223H1ZkjbLj/rQY1Ujp
- ARIaoMK2vAPPsdk5fqXWCrW2WYIxGUCiyk4L5inrHY6WhLHde1Ql9MnQQioA7GHMnv1D
- DC0g==
+ bh=+SfNLTHB7OlpSFGRIdIInO8wWUmEfnk2kky7W8E7omI=;
+ b=BR7SmeG38LVLzYoPtvRUMrvrBVKbmmYtT5cHvcJuBDwrLak7vF23K2v4Ep2c6mQ6PP
+ aG6qL/A7lLDUnz76wWUBUJ4YTMe+QHJt1LZt6VZ/Rw0Rxxf1hsVbTAv0bC9RFyhtzdqV
+ /Ambkv/OXy0+xjaZNUqCN/FN/t9MqvF2FbQZCRKQ5/lezWxkMy/n+cipnQDU3RPqkeDE
+ 8mhVDhfiITsxdn2pTdPZfv4TeEGIMwn2iWG+5arwRoYLapq2dVArV4fB8Py8J3fJo+Do
+ rx2hlz/SmZzdgBSii0SuNsUSF8d74OjhRLdWZ9ZMz6phd6Uja+W5JTvT1cTlCQyfAcq8
+ QafQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=6OOFLUi1SxWtdgBWXWd1AWCvifhTD5to69ewq6+eyP8=;
- b=PB/+9L1B+iZcgguAjVLwBO0ATDKrlCjhJqZD8V0mm+8JtYKNI/yiBOqUcjoHVum0d7
- Q1XuFc7stbdNW7w1OEZueqXTK8+j4qT8XkfY3Ao+uZd4MsiCVYYRsNUfz216ax45FjnD
- UkWSDE21TDX4Vmx+P1eB8L/0Z9pVog6/gH1CkZIdlYnoGARPHMPttmj6i/eKAV4q1Nuc
- f65GaZx+ctnBcN+KMf77VHbo4Zy4lzUpgNI9x/3lI96pt88UvWXITYCqBTyiUwV0qqet
- DQX1WaZxmsC+8K+vCWry5/JlqySp+3o8WYKgJrCuEjdf2r1wPSZoHKIY25FkdoaksA9k
- dqCQ==
-X-Gm-Message-State: AGi0PuayUnU/GvLLTQUISnK4JSX7UYfONxPqcB7XQ9vqcd2QMag75bho
- TuRkE+2+BqeS1hKgmdx5dUr8+47F0tk=
-X-Google-Smtp-Source: APiQypJb9H9Rj1KqYYduz8+WDWD1Fpx9UbiZtqyfNN6RmKvZwR2R69AGecMPJf8hXil7wKBflVXxmg==
-X-Received: by 2002:a17:902:d34a:: with SMTP id
- l10mr379388plk.234.1588272239314; 
- Thu, 30 Apr 2020 11:43:59 -0700 (PDT)
+ bh=+SfNLTHB7OlpSFGRIdIInO8wWUmEfnk2kky7W8E7omI=;
+ b=STWodd1PLsMBPClvK4xOgG3JIItmyBCCD7XfubbQNSUbXA63K5r+Mcj0vWH0KyIn97
+ XFkhfqB3ZgeRDmbiiC8szyVhONWZmEpHHQfIU2gQqL1a5yGAzcriIhgSyo90i7Ae474Y
+ aBqA/MF1swMZuWgOvyVqJeunhVmjfhd0QDNONqVzzi4/wfumSw86nWXwjsKFocWJ0By0
+ PJsYjhQiGqVUgdOCdbnZvkIC19exHJP6qDul73QfJS/ol5lc+HfLqgaz/jHVEAqOtlNL
+ WwhoweE/K0XovVEn0Myx4Y9iWtLN/0aT39rYMylL3jl//TSgleptEcBgTK/lMGVR3eJv
+ 87dA==
+X-Gm-Message-State: AGi0Pubbu0WnA/S7F5fToj1zubRlYYssi1cDb2OEH7sT9YY4X3pt4Z/F
+ zr30XE56YSy1x8q9IM5amgMOkX7GIX8=
+X-Google-Smtp-Source: APiQypL5Que9aYRXdrC0Oieigz2HWssnXSuM0vgVvuw+87C10YKTcw0BRvx8W6vOpQazRpBc9Vhznw==
+X-Received: by 2002:a63:1348:: with SMTP id 8mr269239pgt.350.1588271709649;
+ Thu, 30 Apr 2020 11:35:09 -0700 (PDT)
 Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id 184sm422206pfy.144.2020.04.30.11.43.58
+ by smtp.gmail.com with ESMTPSA id 1sm406839pff.180.2020.04.30.11.35.08
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 30 Apr 2020 11:43:58 -0700 (PDT)
-Subject: Re: [PATCH 07/36] target/arm: Convert VFM[AS]L (vector) to decodetree
+ Thu, 30 Apr 2020 11:35:08 -0700 (PDT)
+Subject: Re: [PATCH 05/36] target/arm: Convert VCADD (vector) to decodetree
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
  qemu-devel@nongnu.org
 References: <20200430181003.21682-1-peter.maydell@linaro.org>
- <20200430181003.21682-8-peter.maydell@linaro.org>
+ <20200430181003.21682-6-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <82a9f876-e965-c33e-4f80-1e0f94a0d6f2@linaro.org>
-Date: Thu, 30 Apr 2020 11:43:56 -0700
+Message-ID: <7899c66a-7f4d-48d6-7ddf-43fc81360eed@linaro.org>
+Date: Thu, 30 Apr 2020 11:35:07 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200430181003.21682-8-peter.maydell@linaro.org>
+In-Reply-To: <20200430181003.21682-6-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x541.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::1043
+X-Received-From: 2607:f8b0:4864:20::541
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,21 +106,14 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 4/30/20 11:09 AM, Peter Maydell wrote:
-> Convert the VFM[AS]L (vector) insns to decodetree.  This is the last
-> insn in the legacy decoder for the 3same_ext group, so we can
-> delete the legacy decoder function for the group entirely.
-> 
-> Note that in disas_thumb2_insn() the parts of this encoding space
-> where the decodetree decoder returns false will correctly be directed
-> to illegal_op by the "(insn & (1 << 28))" check so they won't fall
-> into disas_coproc_insn() by mistake.
+> Convert the VCADD (vector) insns to decodetree.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  target/arm/translate-neon.inc.c | 31 +++++++++++
->  target/arm/translate.c          | 92 +--------------------------------
->  target/arm/neon-shared.decode   |  6 +++
->  3 files changed, 38 insertions(+), 91 deletions(-)
+>  target/arm/translate-neon.inc.c | 37 +++++++++++++++++++++++++++++++++
+>  target/arm/translate.c          | 11 +---------
+>  target/arm/neon-shared.decode   |  3 +++
+>  3 files changed, 41 insertions(+), 10 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
