@@ -7,97 +7,99 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBE5FC83001
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 06:42:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 103B3C83001
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 06:44:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8582B20784
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 06:42:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CCCCC214D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 06:44:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c29OW/tI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8582B20784
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DUiOaCzX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCCCC214D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU2ty-0003U8-N4
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 02:42:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57982)
+	id 1jU2vx-00051n-1f
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 02:44:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58660)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jU2pP-0006YT-54
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 02:37:58 -0400
+ (envelope-from <philmd@redhat.com>) id 1jU2uu-0004Q8-9w
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 02:43:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jU2nY-0005pn-Uu
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 02:37:46 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54026
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1jU2ut-0007ry-MB
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 02:43:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34342
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jU2nY-0005pE-HO
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 02:35:52 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jU2ut-0007rS-7d
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 02:43:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588228551;
+ s=mimecast20190719; t=1588229006;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0nMjE+aLRUSJNSYFb39TIbTyyPb6/y9CzNaOGWiHnMU=;
- b=c29OW/tIKxaQ/uq0A88YLMVTQh+oBGUq77ajXWszU4xZ1gI0WUGuk9iZsOQpmgtG33te+t
- SM/x/oQMtY/sETDeTbpAaWYkFoAoHBgCSTUSj0ngeKH/qdd0DAJSTuKl6hlQTz/4iBvihJ
- EyvTvGhlWVJvFEjxbWEwsqXy0b9sa6U=
+ bh=kOqu4sY2dsMHSmzOyiWP1F1FB4sCqGZaOY61/Bkr9yY=;
+ b=DUiOaCzXS7c4lfMLNwRlr9ZHZ/B9juQ612m4u2foYKQpmkxfkw/NzNUMJfLZey/ZnmCv6Y
+ qEKDcXz64FiAsq721MAafyHskbP11HC3ydtJpJZGFpreup50XVHJDcXSl0tpqmdzS5+3ZQ
+ Hk4UaNmTqYbvpQhCRjMheL271SBBATQ=
 Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
  [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-jVERA8jkNXGW0jw4l_Q9cA-1; Thu, 30 Apr 2020 02:35:49 -0400
-X-MC-Unique: jVERA8jkNXGW0jw4l_Q9cA-1
-Received: by mail-wm1-f72.google.com with SMTP id j5so363077wmi.4
- for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 23:35:49 -0700 (PDT)
+ us-mta-309-4OLWS0siMDe_cJGGe6qz5w-1; Thu, 30 Apr 2020 02:43:24 -0400
+X-MC-Unique: 4OLWS0siMDe_cJGGe6qz5w-1
+Received: by mail-wm1-f72.google.com with SMTP id w2so373080wmc.3
+ for <qemu-devel@nongnu.org>; Wed, 29 Apr 2020 23:43:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=pFTQMUW1kZq+dqLHK5AsXBKY8F6IG36S0DL6z98+eZA=;
- b=CIQJDRRg9HBM8Als25gtn+/liMFkIzAlKYoRfX2gNAkyR4dVMNNZUE7M3WY0vCsB1m
- mR2fej5a/Ob6wVaAyFDF28OBkBUAc1JAAy3bgYlM/X4UyIYjxjg3a+ejxMwK+wX9vT9h
- TLbtpln0r8CEEWZ/95EB7LoMWzXsX4XfpMN0Mf4MlRaEvDhJOX5Q2QrmaQQyxtxIa7dE
- G4oCBQ6jQR0YHR0hbrs8+kVqW8cXfIMLNlAxphpe38y1jSOFUeat2rFi21TxvOFfwnE7
- muxZx4fRZL8xov0xZey5Gani6O/UjwU/1Oyc49WHEsYJPSeUk5vafVlD+MhDOKE3+Mhj
- fi1g==
-X-Gm-Message-State: AGi0PuZekVrT/36yMFNLBYeOj7q4puBIxhpcLzkuHmKkq2uJc/VLPUI/
- Yvub4LpsfW5bKFVZu8gzUwBLl5HJ+DOpwP9PKJouL44qdh51WhgWmqhOng5tuChO9xROVXWg64d
- vCbgHHmMthIega9I=
-X-Received: by 2002:a7b:c10d:: with SMTP id w13mr1183409wmi.78.1588228548465; 
- Wed, 29 Apr 2020 23:35:48 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLo7Z4CAFMwInmwsbjCtUwvUCtrexMLvEgOvDE4/BUqDH+opwS4ZMZJWibMju8r3dyumyoh3A==
-X-Received: by 2002:a7b:c10d:: with SMTP id w13mr1183391wmi.78.1588228548269; 
- Wed, 29 Apr 2020 23:35:48 -0700 (PDT)
+ bh=kOqu4sY2dsMHSmzOyiWP1F1FB4sCqGZaOY61/Bkr9yY=;
+ b=Az8NF//TGpA3wmZZZ7FPca+cabyUmW3zAV2GiMG7P7NG6mlDXBr1UqYjdqnMn4jNZl
+ JL+H7voSZdvNMDNZOm4yHpNyXbWLXommHt24P2mCIcdDBIKTBZwN9wFHdj3YcnKP2wqE
+ i4Ji22xi0WkFLegHNUhEC2akml3fhcV8JCk2sVF7IPRG/q/BP6IOfZkP2OMhLI4ESb0M
+ fYckLFlXZdE/Q/iDfahaF9wGiGj/ZIajKX6Thod4jVane2GMiZ16VPDur3Cpq8+Zcvpm
+ bOXDCoWS6izLQ4/rSQA+1dsrDbYaw38S3Tmg9B64kaaGwFnBMPsIqWjNZJitvOD0+g4d
+ OJOg==
+X-Gm-Message-State: AGi0PuYuc8ZvKI89ibev69a6U5zRukfImsGqfIR6YlJSZuuQhriIdYVK
+ sjhOaMT4SDYXomE+7+Lcs0Bwe1/5wVEXVYCF9NymcY0RXO3k7XDkkf0wWysNb11wBL2xR1xzMWH
+ rB1EeASJWpsBtjIU=
+X-Received: by 2002:a05:600c:14d4:: with SMTP id
+ i20mr1265869wmh.118.1588229003648; 
+ Wed, 29 Apr 2020 23:43:23 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKM9sEfeKFwCnRq+r5Rehj2hrFqHwj+imuff7IltHgc4LQBrjSClI90FQXu/g67yJbzyaDzLQ==
+X-Received: by 2002:a05:600c:14d4:: with SMTP id
+ i20mr1265840wmh.118.1588229003417; 
+ Wed, 29 Apr 2020 23:43:23 -0700 (PDT)
 Received: from [192.168.1.39] (137.red-88-21-205.staticip.rima-tde.net.
  [88.21.205.137])
- by smtp.gmail.com with ESMTPSA id x18sm2479606wrv.12.2020.04.29.23.35.46
+ by smtp.gmail.com with ESMTPSA id b22sm11294858wmj.1.2020.04.29.23.43.21
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 29 Apr 2020 23:35:47 -0700 (PDT)
-Subject: Re: [PATCH v3 06/15] rtc: add RTC_ISA_BASE
+ Wed, 29 Apr 2020 23:43:22 -0700 (PDT)
+Subject: Re: [PATCH v3 10/15] acpi: parallel: don't use _STA method
 To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 References: <20200429140003.7336-1-kraxel@redhat.com>
- <20200429140003.7336-7-kraxel@redhat.com>
+ <20200429140003.7336-11-kraxel@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <51047ae4-55ef-8a93-723d-d5a03f83b649@redhat.com>
-Date: Thu, 30 Apr 2020 08:35:46 +0200
+Message-ID: <8b586c32-611d-330c-5d3e-fa595c37eae5@redhat.com>
+Date: Thu, 30 Apr 2020 08:43:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200429140003.7336-7-kraxel@redhat.com>
+In-Reply-To: <20200429140003.7336-11-kraxel@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:04:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 23:34:52
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,62 +123,87 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 4/29/20 3:59 PM, Gerd Hoffmann wrote:
-> Add and use RTC_ISA_BASE define instead of hardcoding 0x70.
->=20
+> The _STA method dates back to the days where we had a static DSDT.  The
+> device is listed in the DSDT table unconditionally and the _STA method
+> checks a bit in the isa bridge pci config space to figure whenever a
+> given is isa device is present or not, then evaluates to 0x0f (present)
+> or 0x00 (absent).
+> 
+> These days the DSDT is generated by qemu anyway, so if a device is not
+> present we can simply drop it from the DSDT instead.
+> 
 > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 > ---
->   include/hw/rtc/mc146818rtc.h | 1 +
->   hw/rtc/mc146818rtc.c         | 5 ++---
->   2 files changed, 3 insertions(+), 3 deletions(-)
->=20
-> diff --git a/include/hw/rtc/mc146818rtc.h b/include/hw/rtc/mc146818rtc.h
-> index 10c93a096a1d..3713181b56fe 100644
-> --- a/include/hw/rtc/mc146818rtc.h
-> +++ b/include/hw/rtc/mc146818rtc.h
-> @@ -47,6 +47,7 @@ typedef struct RTCState {
->   } RTCState;
->  =20
->   #define RTC_ISA_IRQ 8
-> +#define RTC_ISA_BASE 0x70
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
->  =20
->   ISADevice *mc146818_rtc_init(ISABus *bus, int base_year,
->                                qemu_irq intercept_irq);
-> diff --git a/hw/rtc/mc146818rtc.c b/hw/rtc/mc146818rtc.c
-> index dc4269cc55cb..d18c09911be2 100644
-> --- a/hw/rtc/mc146818rtc.c
-> +++ b/hw/rtc/mc146818rtc.c
-> @@ -908,7 +908,6 @@ static void rtc_realizefn(DeviceState *dev, Error **e=
-rrp)
+>   hw/i386/acpi-build.c | 29 ++++++++---------------------
+>   1 file changed, 8 insertions(+), 21 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index fea83352e6ab..e01afbd011d9 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -1167,39 +1167,26 @@ static Aml *build_mouse_device_aml(void)
+>       return dev;
+>   }
+>   
+> -static Aml *build_lpt_device_aml(void)
+> +static void build_lpt_device_aml(Aml *scope)
 >   {
->       ISADevice *isadev =3D ISA_DEVICE(dev);
->       RTCState *s =3D MC146818_RTC(dev);
-> -    int base =3D 0x70;
->  =20
->       s->cmos_data[RTC_REG_A] =3D 0x26;
->       s->cmos_data[RTC_REG_B] =3D 0x02;
-> @@ -951,7 +950,7 @@ static void rtc_realizefn(DeviceState *dev, Error **e=
-rrp)
->       qemu_register_suspend_notifier(&s->suspend_notifier);
->  =20
->       memory_region_init_io(&s->io, OBJECT(s), &cmos_ops, s, "rtc", 2);
-> -    isa_register_ioport(isadev, &s->io, base);
-> +    isa_register_ioport(isadev, &s->io, RTC_ISA_BASE);
->  =20
->       /* register rtc 0x70 port for coalesced_pio */
->       memory_region_set_flush_coalesced(&s->io);
-> @@ -960,7 +959,7 @@ static void rtc_realizefn(DeviceState *dev, Error **e=
-rrp)
->       memory_region_add_subregion(&s->io, 0, &s->coalesced_io);
->       memory_region_add_coalescing(&s->coalesced_io, 0, 1);
->  =20
-> -    qdev_set_legacy_instance_id(dev, base, 3);
-> +    qdev_set_legacy_instance_id(dev, RTC_ISA_BASE, 3);
->       qemu_register_reset(rtc_reset, s);
->  =20
->       object_property_add_tm(OBJECT(s), "date", rtc_get_date, NULL);
->=20
+>       Aml *dev;
+>       Aml *crs;
+> -    Aml *method;
+> -    Aml *if_ctx;
+> -    Aml *else_ctx;
+> -    Aml *zero = aml_int(0);
+> -    Aml *is_present = aml_local(0);
+> +
+> +    if (!memory_region_present(get_system_io(), 0x0378)) {
+> +        return;
+> +    }
+
+Please move this check in a separate patch.
+
+Also, it may be worth a ISA_PARALLEL_IOBASE 0x378 definition cleanup 
+like you did with the RTC.
+
+>   
+>       dev = aml_device("LPT");
+>       aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0400")));
+>   
+> -    method = aml_method("_STA", 0, AML_NOTSERIALIZED);
+> -    aml_append(method, aml_store(aml_name("LPEN"), is_present));
+> -    if_ctx = aml_if(aml_equal(is_present, zero));
+> -    {
+> -        aml_append(if_ctx, aml_return(aml_int(0x00)));
+> -    }
+> -    aml_append(method, if_ctx);
+> -    else_ctx = aml_else();
+> -    {
+> -        aml_append(else_ctx, aml_return(aml_int(0x0f)));
+> -    }
+> -    aml_append(method, else_ctx);
+> -    aml_append(dev, method);
+> +    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
+>   
+>       crs = aml_resource_template();
+>       aml_append(crs, aml_io(AML_DECODE16, 0x0378, 0x0378, 0x08, 0x08));
+>       aml_append(crs, aml_irq_no_flags(7));
+>       aml_append(dev, aml_name_decl("_CRS", crs));
+>   
+> -    return dev;
+> +    aml_append(scope, dev);
+>   }
+>   
+>   static void build_isa_devices_aml(Aml *table)
+> @@ -1215,7 +1202,7 @@ static void build_isa_devices_aml(Aml *table)
+>       if (fdc) {
+>           aml_append(scope, build_fdc_device_aml(fdc));
+>       }
+> -    aml_append(scope, build_lpt_device_aml());
+> +    build_lpt_device_aml(scope);
+>   
+>       if (ambiguous) {
+>           error_report("Multiple ISA busses, unable to define IPMI ACPI data");
+> 
 
 
