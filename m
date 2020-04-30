@@ -8,84 +8,83 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EE30C8300B
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:26:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42716C8300A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:26:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4F2420787
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:26:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0BE0720787
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:26:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LgsUcN3P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4F2420787
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rdXQpXyl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BE0720787
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU6OP-0000kz-Fb
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 06:26:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52454)
+	id 1jU6P8-00022T-4x
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 06:26:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52920)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jU6IY-0008Dd-97
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:20:14 -0400
+ (envelope-from <zltjiangshi@gmail.com>) id 1jU6NF-0000KZ-1B
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:24:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jU6IT-00018b-2u
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:20:06 -0400
-Received: from mail-lf1-x12c.google.com ([2a00:1450:4864:20::12c]:44836)
+ (envelope-from <zltjiangshi@gmail.com>) id 1jU6NE-0003Hi-Ax
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:24:56 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:41956)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jU6IS-00017x-JZ
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:20:00 -0400
-Received: by mail-lf1-x12c.google.com with SMTP id d25so738744lfi.11
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 03:20:00 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1jU6ND-00035S-TE
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:24:55 -0400
+Received: by mail-pg1-x542.google.com with SMTP id h69so2545576pgc.8
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 03:24:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=H+LlnR11EGsPQDlPMcEJH7+ri0Xqw8l/GkcrB28PjIQ=;
- b=LgsUcN3Pi1rFmJAQC4KL0ptX0ErKAdH11Bor9CRVFBxjvIFz+DYtmRxtRyiXF6RN/4
- fCl7MoQtn/HfPEejf3P8RdaIN6T2xinhW5/yAkvtG0kcyexLJY2ShCE/W5SsTeQLwzHf
- mYaM5F+I3plF/j4Ejggb0IL48qR33ZXGzDBRYJdZ+wEUGq2nApa2Y4uT2PxaWBxw8M0h
- VkBJFzq2wzsMuCOYyQc+Rm15sTq0MsGJOPRHOwdnIF9TTvaXkhH1htP2ShcbQsW7a6wo
- 0fXC9I0Qy77+exJmqcXK8PvMWh7jR2j9LkYAp+LEVM4sVNRBDnbebuDbZ/SL6+WO1SiW
- H+WA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=PZw1qikU5QL3z0KwwsBxPolZSBQpYRyX7qlwqGo+OmM=;
+ b=rdXQpXylSJGYZC9P9Myp0KqB4TODGm4GSnKJ2H8cCV/lNGtKD8h+XTaI6xC2F8x6JM
+ Tyxq5qRpJu3mwBil88gz3xwXbE74h9sWPrTPrxU6zNb9+3XwYvHF5f0EDYavFZZmT3Cj
+ KVYaX2ri+Tv3TA8G825zIoHaHG0mwsiWqwoa+Cn6+R43aHMVf9i8cAtKzfU6eiKDAvWA
+ Pq8QVv/6QFPOi8UhuWX2TbazJunl1pi22LwnM5FDEgJipMyGfO9I3vK8WcF0pMANo6KD
+ QnT1UAe3puJ3qOLpVPJnotR+BaB6rPaZNnoq23pKcKdDYDQKXKYmokPYz9QAnddDOCUT
+ KBjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=H+LlnR11EGsPQDlPMcEJH7+ri0Xqw8l/GkcrB28PjIQ=;
- b=kgsdiRK/awGY9LDMGcnG+HWYrln3OjKwYEahtqFaGBi62zeg4SN8HscZXmw+BlnyxV
- TDhptRV6xv899gq0uvDuphteOrcjNH1NdzGPUA4lew9bp9JQ9nV/JbVwQVF48pzbIf7w
- FCjJiW2+SXiNPeH0s/j8tSdvdO7mSfWJtwIc42y0xCY8sZLoG5FhWthsZ12VCttQ+KIV
- 6m7Gv/pR2Cda3CRWn2/XDk6iXL6X98pEyqdJU616cNcMb8qZtg2NwRz3R2y6x/GbdNQc
- VrSE/cTi7nvwPbyWcLEAFjXpK+2CArCObNT6Yci7TcWKXHigr2cVE0WHfdGYjS7mTkQK
- EJpQ==
-X-Gm-Message-State: AGi0PuZUx4Sk2ZUiPlCOo87nhgnR9kvLX8ztM7J8sUm1zaUY8puYnbH/
- amoHjw6mWw1spfNDSlp7+iBf/vCdJ/s=
-X-Google-Smtp-Source: APiQypJhksrB0uY3QYRfNoPf1R3vis4aUiKeL2odqkf8KGjlsuyp8mzo7wKpUpzXA5rDwXTYJ2Fq8w==
-X-Received: by 2002:a05:6512:1109:: with SMTP id
- l9mr1731682lfg.12.1588241998767; 
- Thu, 30 Apr 2020 03:19:58 -0700 (PDT)
-Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id s8sm4534166lfd.61.2020.04.30.03.19.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Apr 2020 03:19:57 -0700 (PDT)
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v1 5/6] target/microblaze: Add the pvr-user1 property
-Date: Thu, 30 Apr 2020 12:19:48 +0200
-Message-Id: <20200430101949.7754-6-edgar.iglesias@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200430101949.7754-1-edgar.iglesias@gmail.com>
-References: <20200430101949.7754-1-edgar.iglesias@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::12c;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lf1-x12c.google.com
+ :references;
+ bh=PZw1qikU5QL3z0KwwsBxPolZSBQpYRyX7qlwqGo+OmM=;
+ b=QoB+Z7IaGvbNljBLFgCKHPQR9f4MvWTUAwUjroZVGJm9ysa08D8ECQX552L77B1RLj
+ /Yjz3hfHxrqprVN3ElonxHt7c9JYLzl+7I7wr7q6kIniugtK4aZFcWGgpvaeMDlTZnMZ
+ YdOBUtxZEWQWdEZJT8hECYSEubjCHz1OjuMN21oW7NQ05DkuttoCuFNMpnAzHX580N1k
+ LVTbhmhKsbC+Niiz1eCGRJ36uQESyPtsL56clnCBAFLhMt5pTNeY+3MocTwHbvdcWoIu
+ Ebh+RYjDGKwuRI3yHE901WW6U4Ng23bJVqxcKz2aj5Xh/KATxE8YsoO6IHholrkQGmr2
+ RWYQ==
+X-Gm-Message-State: AGi0PuYX+uirE0kJDGrVJBI3AbE2wqcdQsCoIca61GYh45ZE5c0hMf44
+ SB0h/cKPj4TiwGC4DAXC+Ys=
+X-Google-Smtp-Source: APiQypI2UdctKLdW5JHWhgMg6++CFb83P/PjUY+Oq+rwfUw23PXP9OOwltujFoQK+4P+bkBRRbfjyw==
+X-Received: by 2002:aa7:8d06:: with SMTP id j6mr2866255pfe.237.1588242294746; 
+ Thu, 30 Apr 2020 03:24:54 -0700 (PDT)
+Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com.
+ [34.92.144.28])
+ by smtp.gmail.com with ESMTPSA id a15sm1397872pju.3.2020.04.30.03.24.52
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 30 Apr 2020 03:24:54 -0700 (PDT)
+From: Huacai Chen <zltjiangshi@gmail.com>
+X-Google-Original-From: Huacai Chen <chenhc@lemote.com>
+To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Subject: [PATCH for-5.1 V2 3/7] hw/mips: Add CPU IRQ3 delivery for KVM
+Date: Thu, 30 Apr 2020 18:22:31 +0800
+Message-Id: <1588242155-23924-4-git-send-email-chenhc@lemote.com>
+X-Mailer: git-send-email 2.7.0
+In-Reply-To: <1588242155-23924-1-git-send-email-chenhc@lemote.com>
+References: <1588242155-23924-1-git-send-email-chenhc@lemote.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=zltjiangshi@gmail.com; helo=mail-pg1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::12c
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,59 +96,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org
+Cc: Huacai Chen <chenhuacai@gmail.com>, Huacai Chen <chenhc@lemote.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>, qemu-devel@nongnu.org,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Currently, KVM/MIPS only deliver I/O interrupt via IP2, this patch add
+IP3 delivery as well, because Loongson-3 based machine use both IRQ2
+(CPU's IP2) and IRQ3 (CPU's IP3).
 
-Add the pvr-user1 property to control the user-defined
-PVR0 User1 field.
-
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: Huacai Chen <chenhc@lemote.com>
+Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- target/microblaze/cpu.h | 1 +
- target/microblaze/cpu.c | 4 +++-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ hw/mips/mips_int.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index ef9081db40..7bb5a3d6c6 100644
---- a/target/microblaze/cpu.h
-+++ b/target/microblaze/cpu.h
-@@ -307,6 +307,7 @@ struct MicroBlazeCPU {
-         bool opcode_0_illegal;
-         bool div_zero_exception;
-         bool unaligned_exceptions;
-+        uint8_t pvr_user1;
-         char *version;
-         uint8_t pvr;
-     } cfg;
-diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-index 585e60e817..df5ee21dd6 100644
---- a/target/microblaze/cpu.c
-+++ b/target/microblaze/cpu.c
-@@ -193,7 +193,8 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
-                         (cpu->cfg.use_mmu ? PVR0_USE_MMU_MASK : 0) |
-                         (cpu->cfg.endi ? PVR0_ENDI_MASK : 0) |
-                         (version_code << PVR0_VERSION_SHIFT) |
--                        (cpu->cfg.pvr == C_PVR_FULL ? PVR0_PVR_FULL_MASK : 0);
-+                        (cpu->cfg.pvr == C_PVR_FULL ? PVR0_PVR_FULL_MASK : 0) |
-+                        cpu->cfg.pvr_user1;
+diff --git a/hw/mips/mips_int.c b/hw/mips/mips_int.c
+index 796730b..5526219 100644
+--- a/hw/mips/mips_int.c
++++ b/hw/mips/mips_int.c
+@@ -48,16 +48,14 @@ static void cpu_mips_irq_request(void *opaque, int irq, int level)
+     if (level) {
+         env->CP0_Cause |= 1 << (irq + CP0Ca_IP);
  
-     env->pvr.regs[2] |= (cpu->cfg.use_fpu ? PVR2_USE_FPU_MASK : 0) |
-                         (cpu->cfg.use_fpu > 1 ? PVR2_USE_FPU2_MASK : 0) |
-@@ -292,6 +293,7 @@ static Property mb_properties[] = {
-                      cfg.opcode_0_illegal, false),
-     DEFINE_PROP_STRING("version", MicroBlazeCPU, cfg.version),
-     DEFINE_PROP_UINT8("pvr", MicroBlazeCPU, cfg.pvr, C_PVR_FULL),
-+    DEFINE_PROP_UINT8("pvr-user1", MicroBlazeCPU, cfg.pvr_user1, 0),
-     DEFINE_PROP_END_OF_LIST(),
- };
+-        if (kvm_enabled() && irq == 2) {
++        if (kvm_enabled() && (irq == 2 || irq == 3))
+             kvm_mips_set_interrupt(cpu, irq, level);
+-        }
  
+     } else {
+         env->CP0_Cause &= ~(1 << (irq + CP0Ca_IP));
+ 
+-        if (kvm_enabled() && irq == 2) {
++        if (kvm_enabled() && (irq == 2 || irq == 3))
+             kvm_mips_set_interrupt(cpu, irq, level);
+-        }
+     }
+ 
+     if (env->CP0_Cause & CP0Ca_IP_mask) {
 -- 
-2.20.1
+2.7.0
 
 
