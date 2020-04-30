@@ -7,84 +7,86 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09A28C8300A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 11:56:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE02DC8300B
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 11:56:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C810B20757
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 11:56:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9864E20757
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 11:56:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E0vWChse"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C810B20757
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZYXIx+do"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9864E20757
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU7ne-0003gb-Uf
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 07:56:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33834)
+	id 1jU7o9-0004Ns-O2
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 07:56:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33738)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jU7jc-00034Z-St
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:52:12 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jU7jT-0002nQ-5n
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:51:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jU7jY-0000OS-Qu
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:52:08 -0400
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:52906)
+ (envelope-from <peter.maydell@linaro.org>) id 1jU7jR-0000Lx-Dh
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:51:58 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37851)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jU7jY-0000NW-Ay
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:52:04 -0400
-Received: by mail-wm1-x32c.google.com with SMTP id 188so1511830wmc.2
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 04:52:03 -0700 (PDT)
+ id 1jU7jQ-0000LP-VD
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:51:57 -0400
+Received: by mail-wm1-x341.google.com with SMTP id z6so1552625wml.2
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 04:51:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=/JOpwnlKiYDdU9XInaBUbtyuT88O8qiGy04kfKAS7w8=;
- b=E0vWChsepRLNXmVk+DI/u6XpCvkKqovYV3OzIm04wE700TTJn2ztqeSv9JBEIWVN7n
- 1bEj9o8JMToKLF0CFB6h00H+rLhZ31INM78IPf7ajMc6A7zU4XAkxirpUDJLuLNH76IJ
- zIkVpNYwSI46VtLramFuk0WDpMwsO9MLZsPGayAue3jQPkDf4lWBYeEWKWlEHXnVJL9u
- yjM+xMP2fapHkuiqcKwOPZpi3Ev5tNTTc/yrfaMHRfkbteXPLkj0Wf0aSgzjkCFcSIci
- z82dEyau9ODMoWUFHhua+Bu9sqFY6AQBK/y4FSlhWZ29eBVhe9KFcmx2gW7OoFAqwwiZ
- Q2iw==
+ bh=Jt6G/iju8uSaFNeIzNPrG1p2vPHbPGysm95I3wdnMB0=;
+ b=ZYXIx+doJ//wjNe0LhPLGhlbk9ZCEQPF4Aid9SHgu3OORkpLidu8TmOvs1yU2d3O63
+ nOy9mNnSb83YRMm/EaevTJswCQx5+P1lgIvGxc1DdseSkwkmu7KYIc2ryKPLD3LyH99f
+ 1utovLxWWVy86R/NLo3aSaofiWtWgOGqLXFPri+zWkdFOhj14R/hnkJdP0psS4paW8FD
+ QbxfJ847Zkw1K2WQmSlkJzEa9weF3SwHvrUYC/Y6s1A83cqMxgcQIgTrbepqRY1a51P0
+ qzxSGXZ5O3tyGwUK4xk5A6Lm7WBNRh4uirQpdEaSPL1+05D5DYm8eRS7dgaGR+ljhXo4
+ 8zYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=/JOpwnlKiYDdU9XInaBUbtyuT88O8qiGy04kfKAS7w8=;
- b=iRelBI2jDhbFpjQJcdcRoiBzIg18zuTNpzEaDNzpybHVnlaFA5P9UzoTo5J2XwjoQz
- 93boUkFfOCFLLQkg2oWmjcmb/MWsp0poBTB7gZOpzxrzNRKEtZnTDIWSe1YyNxO+R5MH
- tPpAEuULuDyXju/IeDexA1ptsNKRr3OgLHZZBVyOXQXiX9URgUQqPDsj9AAR30L46lR2
- Y6+f6/p6KZobszEAY7cZAphbyk4KXTaJ4n3S4UPo79k7YHyp9pc8jP28MbUxkRG6o7nq
- ufKjgURGtRDYZWjNLuaxxa6GeqNs7nnT7cevf/cd1Vw/wxhq+oeeJ8vBA0oczeFGkdSa
- Hosg==
-X-Gm-Message-State: AGi0PuYIXmwdhY7DTvcoF+iPLAZYYAx2dbr15/C3vOVSufHsE6tVr5tK
- 6fIDszc0TiNCDUTCjW6PdeZdnEy/U/vZWA==
-X-Google-Smtp-Source: APiQypJh0KmWp1c2rciu3V86ynqIC8zfkZ5VZ/av87IXFvOoT8EhW8RGcKKMr47CKn0XyGYRfpDaFQ==
-X-Received: by 2002:a1c:2d02:: with SMTP id t2mr2597783wmt.98.1588247522584;
- Thu, 30 Apr 2020 04:52:02 -0700 (PDT)
+ bh=Jt6G/iju8uSaFNeIzNPrG1p2vPHbPGysm95I3wdnMB0=;
+ b=p13XSPzT1l3b4CMBAHEtWYS/3IfxV31VEq/nKGQ5mlLjzyuJvtwlC748CWGXa2n0dM
+ Ghf2mrM2SeDbmw2gbVUiwOcp7sCfPAQ4naWe8nT19BMgXlDFagUmg7bNtdIFN3Lh6erL
+ tYaQkROHIV/R9aJ0oa4STbxmHWMoh946vXUhSuYmt0BCRF476+WLeKMBCa3VKHZ9skZZ
+ nLikPQ7yvJYIhLqDIN2a1kIHaBc+AZacyhwbR6on9I/rIFRg3ohHrcw9Hmg2yI455+vk
+ LXsYn0Vv1Ws0gy6vo9SvvpqN+vMCIbDKqy9xjM7t5B4HwZfdv/BsJBCWfpnYcT/o07PR
+ DEoQ==
+X-Gm-Message-State: AGi0PuYbGQcBAx925pgVxijOS1L5kIkMqi/gfGPD2J0sVYWgsY7gZNWK
+ AfF5DhjyWsR5xuFSxujFJwk3r8Oesjj15w==
+X-Google-Smtp-Source: APiQypKHQ21JansXTdVDtmpHXDcbWPhS3pEkkbz9b2mmwHhexzl31EOSEsxSQ1ybOpfq2qQdHpqN9A==
+X-Received: by 2002:a1c:ba56:: with SMTP id k83mr2538868wmf.1.1588247515236;
+ Thu, 30 Apr 2020 04:51:55 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id j22sm491518wre.84.2020.04.30.04.52.01
+ by smtp.gmail.com with ESMTPSA id j22sm491518wre.84.2020.04.30.04.51.54
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Apr 2020 04:52:01 -0700 (PDT)
+ Thu, 30 Apr 2020 04:51:54 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 16/31] hw/arm/xilinx_zynq: connect uart clocks to slcr
-Date: Thu, 30 Apr 2020 12:51:27 +0100
-Message-Id: <20200430115142.13430-17-peter.maydell@linaro.org>
+Subject: [PULL 10/31] hw/core/clock-vmstate: define a vmstate entry for clock
+ state
+Date: Thu, 30 Apr 2020 12:51:21 +0100
+Message-Id: <20200430115142.13430-11-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200430115142.13430-1-peter.maydell@linaro.org>
 References: <20200430115142.13430-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32c.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::32c
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,132 +104,83 @@ Sender: "Qemu-devel"
 
 From: Damien Hedde <damien.hedde@greensocs.com>
 
-Add the connection between the slcr's output clocks and the uarts inputs.
-
-Also add the main board clock 'ps_clk', which is hard-coded to 33.33MHz
-(the default frequency). This clock is used to feed the slcr's input
-clock.
-
 Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Message-id: 20200406135251.157596-9-damien.hedde@greensocs.com
+Message-id: 20200406135251.157596-3-damien.hedde@greensocs.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/xilinx_zynq.c | 57 +++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 49 insertions(+), 8 deletions(-)
+ hw/core/Makefile.objs   |  1 +
+ include/hw/clock.h      |  9 +++++++++
+ hw/core/clock-vmstate.c | 25 +++++++++++++++++++++++++
+ 3 files changed, 35 insertions(+)
+ create mode 100644 hw/core/clock-vmstate.c
 
-diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
-index 571cdcd599e..91b498dd5d3 100644
---- a/hw/arm/xilinx_zynq.c
-+++ b/hw/arm/xilinx_zynq.c
-@@ -35,6 +35,15 @@
- #include "hw/char/cadence_uart.h"
- #include "hw/net/cadence_gem.h"
- #include "hw/cpu/a9mpcore.h"
-+#include "hw/qdev-clock.h"
-+#include "sysemu/reset.h"
+diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+index 1d9b0aa2057..115df550874 100644
+--- a/hw/core/Makefile.objs
++++ b/hw/core/Makefile.objs
+@@ -21,6 +21,7 @@ common-obj-$(CONFIG_SOFTMMU) += null-machine.o
+ common-obj-$(CONFIG_SOFTMMU) += loader.o
+ common-obj-$(CONFIG_SOFTMMU) += machine-hmp-cmds.o
+ common-obj-$(CONFIG_SOFTMMU) += numa.o
++common-obj-$(CONFIG_SOFTMMU) += clock-vmstate.o
+ obj-$(CONFIG_SOFTMMU) += machine-qmp-cmds.o
+ 
+ common-obj-$(CONFIG_EMPTY_SLOT) += empty_slot.o
+diff --git a/include/hw/clock.h b/include/hw/clock.h
+index 82a7f3c6982..f3e44e9460c 100644
+--- a/include/hw/clock.h
++++ b/include/hw/clock.h
+@@ -74,6 +74,15 @@ struct Clock {
+     QLIST_ENTRY(Clock) sibling;
+ };
+ 
++/*
++ * vmstate description entry to be added in device vmsd.
++ */
++extern const VMStateDescription vmstate_clock;
++#define VMSTATE_CLOCK(field, state) \
++    VMSTATE_CLOCK_V(field, state, 0)
++#define VMSTATE_CLOCK_V(field, state, version) \
++    VMSTATE_STRUCT_POINTER_V(field, state, version, vmstate_clock, Clock)
 +
-+#define TYPE_ZYNQ_MACHINE MACHINE_TYPE_NAME("xilinx-zynq-a9")
-+#define ZYNQ_MACHINE(obj) \
-+    OBJECT_CHECK(ZynqMachineState, (obj), TYPE_ZYNQ_MACHINE)
+ /**
+  * clock_setup_canonical_path:
+  * @clk: clock
+diff --git a/hw/core/clock-vmstate.c b/hw/core/clock-vmstate.c
+new file mode 100644
+index 00000000000..260b13fc2c8
+--- /dev/null
++++ b/hw/core/clock-vmstate.c
+@@ -0,0 +1,25 @@
++/*
++ * Clock migration structure
++ *
++ * Copyright GreenSocs 2019-2020
++ *
++ * Authors:
++ *  Damien Hedde
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +
-+/* board base frequency: 33.333333 MHz */
-+#define PS_CLK_FREQUENCY (100 * 1000 * 1000 / 3)
- 
- #define NUM_SPI_FLASHES 4
- #define NUM_QSPI_FLASHES 2
-@@ -75,6 +84,11 @@ static const int dma_irqs[8] = {
-     0xe3401000 + ARMV7_IMM16(extract32((val), 16, 16)), /* movt r1 ... */ \
-     0xe5801000 + (addr)
- 
-+typedef struct ZynqMachineState {
-+    MachineState parent;
-+    Clock *ps_clk;
-+} ZynqMachineState;
++#include "qemu/osdep.h"
++#include "migration/vmstate.h"
++#include "hw/clock.h"
 +
- static void zynq_write_board_setup(ARMCPU *cpu,
-                                    const struct arm_boot_info *info)
- {
-@@ -159,10 +173,11 @@ static inline void zynq_init_spi_flashes(uint32_t base_addr, qemu_irq irq,
- 
- static void zynq_init(MachineState *machine)
- {
-+    ZynqMachineState *zynq_machine = ZYNQ_MACHINE(machine);
-     ARMCPU *cpu;
-     MemoryRegion *address_space_mem = get_system_memory();
-     MemoryRegion *ocm_ram = g_new(MemoryRegion, 1);
--    DeviceState *dev;
-+    DeviceState *dev, *slcr;
-     SysBusDevice *busdev;
-     qemu_irq pic[64];
-     int n;
-@@ -206,9 +221,18 @@ static void zynq_init(MachineState *machine)
-                           1, 0x0066, 0x0022, 0x0000, 0x0000, 0x0555, 0x2aa,
-                           0);
- 
--    dev = qdev_create(NULL, "xilinx,zynq_slcr");
--    qdev_init_nofail(dev);
--    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xF8000000);
-+    /* Create slcr, keep a pointer to connect clocks */
-+    slcr = qdev_create(NULL, "xilinx,zynq_slcr");
-+    qdev_init_nofail(slcr);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(slcr), 0, 0xF8000000);
-+
-+    /* Create the main clock source, and feed slcr with it */
-+    zynq_machine->ps_clk = CLOCK(object_new(TYPE_CLOCK));
-+    object_property_add_child(OBJECT(zynq_machine), "ps_clk",
-+                              OBJECT(zynq_machine->ps_clk), &error_abort);
-+    object_unref(OBJECT(zynq_machine->ps_clk));
-+    clock_set_hz(zynq_machine->ps_clk, PS_CLK_FREQUENCY);
-+    qdev_connect_clock_in(slcr, "ps_clk", zynq_machine->ps_clk);
- 
-     dev = qdev_create(NULL, TYPE_A9MPCORE_PRIV);
-     qdev_prop_set_uint32(dev, "num-cpu", 1);
-@@ -229,8 +253,12 @@ static void zynq_init(MachineState *machine)
-     sysbus_create_simple(TYPE_CHIPIDEA, 0xE0002000, pic[53 - IRQ_OFFSET]);
-     sysbus_create_simple(TYPE_CHIPIDEA, 0xE0003000, pic[76 - IRQ_OFFSET]);
- 
--    cadence_uart_create(0xE0000000, pic[59 - IRQ_OFFSET], serial_hd(0));
--    cadence_uart_create(0xE0001000, pic[82 - IRQ_OFFSET], serial_hd(1));
-+    dev = cadence_uart_create(0xE0000000, pic[59 - IRQ_OFFSET], serial_hd(0));
-+    qdev_connect_clock_in(dev, "refclk",
-+                          qdev_get_clock_out(slcr, "uart0_ref_clk"));
-+    dev = cadence_uart_create(0xE0001000, pic[82 - IRQ_OFFSET], serial_hd(1));
-+    qdev_connect_clock_in(dev, "refclk",
-+                          qdev_get_clock_out(slcr, "uart1_ref_clk"));
- 
-     sysbus_create_varargs("cadence_ttc", 0xF8001000,
-             pic[42-IRQ_OFFSET], pic[43-IRQ_OFFSET], pic[44-IRQ_OFFSET], NULL);
-@@ -308,8 +336,9 @@ static void zynq_init(MachineState *machine)
-     arm_load_kernel(ARM_CPU(first_cpu), machine, &zynq_binfo);
- }
- 
--static void zynq_machine_init(MachineClass *mc)
-+static void zynq_machine_class_init(ObjectClass *oc, void *data)
- {
-+    MachineClass *mc = MACHINE_CLASS(oc);
-     mc->desc = "Xilinx Zynq Platform Baseboard for Cortex-A9";
-     mc->init = zynq_init;
-     mc->max_cpus = 1;
-@@ -319,4 +348,16 @@ static void zynq_machine_init(MachineClass *mc)
-     mc->default_ram_id = "zynq.ext_ram";
- }
- 
--DEFINE_MACHINE("xilinx-zynq-a9", zynq_machine_init)
-+static const TypeInfo zynq_machine_type = {
-+    .name = TYPE_ZYNQ_MACHINE,
-+    .parent = TYPE_MACHINE,
-+    .class_init = zynq_machine_class_init,
-+    .instance_size = sizeof(ZynqMachineState),
++const VMStateDescription vmstate_clock = {
++    .name = "clock",
++    .version_id = 0,
++    .minimum_version_id = 0,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(period, Clock),
++        VMSTATE_END_OF_LIST()
++    }
 +};
-+
-+static void zynq_machine_register_types(void)
-+{
-+    type_register_static(&zynq_machine_type);
-+}
-+
-+type_init(zynq_machine_register_types)
 -- 
 2.20.1
 
