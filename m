@@ -2,88 +2,91 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32D2AC47247
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:35:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A97DEC47247
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:36:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC4BC2070B
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:35:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 72CC52082E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:36:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XEJKVB+2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC4BC2070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WCIbL0bH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72CC52082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUC9a-0001sM-2g
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 12:35:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48634)
+	id 1jUCAd-0003Ks-Hr
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 12:36:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49292)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jUC07-0004zK-CU
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:26:02 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jUC2v-0001Vh-98
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:28:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jUBza-0002Yd-T3
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:25:27 -0400
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:38556)
+ (envelope-from <richard.henderson@linaro.org>) id 1jUC2u-0006M1-Dc
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:28:21 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:41677)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jUBza-0002SH-GT; Thu, 30 Apr 2020 12:24:54 -0400
-Received: by mail-lj1-x244.google.com with SMTP id e25so7159546ljg.5;
- Thu, 30 Apr 2020 09:24:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jUC2u-0006Lj-10
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:28:20 -0400
+Received: by mail-pl1-x643.google.com with SMTP id d24so2419335pll.8
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 09:28:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=GbdU1HOMrG9CUFlccGTR8R68ycumC+NmUh827HgH404=;
- b=XEJKVB+2wxaGUcKtIi9DiHH5JwRbYS/dTbXLebD4+ZEpBAu+sCEZLqwiIII2FBGo7g
- 7bMNzAcOGc9v/+IRAhvVzQf/UYWaEbGuqwVWyiBSvNkxIiyDeqHXQeUyu8uqHnIbbaX1
- Unmv9E7ECKkKtlr4mhjgmfFxOyrvOJxZ+kFdez1bqOViF0qL4STkNay1P6drdXTcPh7C
- qnRNr/32mVwNQTY1QwOgOW46Z9NyGAa+QstTHePHO3l3X1/MkiRm3v8oAPbFv1qvMJTs
- agK8KT5hchYFLrNVNmOEk7HGvrJjr312xtR0Oczq7URH07BGBjFcrQV3vYaFwl0cm7hL
- t8/Q==
+ bh=NN/QLBosnfSE6MOjBuSmBLZSNupnPgsxwETGi0A5VuM=;
+ b=WCIbL0bHsTglQoIoaV8dyoQZjDmKocpOyvRdoC8SvDDaqqiyH3LxUHNSqbZihRxZuC
+ q0JK8p3wVhQJPrVsX5Pefqmom8aFFecProtRAdi2QBmdB2sZP7ynniCEtXAw26pshi3C
+ TBW8Z01g73qysRU9zW3Wo1rPUirGki9f8KtM2fCHeywQFdrku07uUENIuNPlAEBNmEdO
+ 9VSXNkRaGYD7pxS7y8K2MUrHWcfr2zvB1xH3TmdNl2utAqy76LINo1eqp/nyYsdMg0y+
+ 2AsgpL6aMkVjfnVRFNf75IMDr7y6wihY4yQL2bfK6SaXyF/l7oaOsiay+uPhHa6qSS0W
+ eisA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=GbdU1HOMrG9CUFlccGTR8R68ycumC+NmUh827HgH404=;
- b=AoQkOfP+cTE9JHfBk3cRu2IYJWLHIQTqhBSoNWK4y3cY2UvtHADUYzd0MK6FyhL+Vo
- CvLfGGMBlVkAL9HpmiZoU5kzw0eX4RdOnugIqgB6JRKgw7GxIfZpoKObIgzmNToOY3kz
- vAz3VaD25jk31f8s5mvVPaSSCLCPjHxGdi08Ksa1NNs+OXiPSg5XIdWmo5ILYGnyYY6D
- HKtvH62UY64zA+QJJ64lHGnkzwIYr5k1csFu6B1F6Qo/fviOcZO6HD/7W+ypWLNDBOgZ
- Y1Ah3LloOnD1SBdKjILSBsuRoQXzswgrjPdW4B2zUkX3GLqdXC4zUcEZfYjobONXLfcW
- xJFw==
-X-Gm-Message-State: AGi0PuY3g4oS+epb4aor8P6+pLaUOC9ZpYiTxlNfsAHX3F6aVnr6UrtJ
- SqtpKsW3b3AcIr6JqaJl+4G/65JfVmw=
-X-Google-Smtp-Source: APiQypKLSMFrGewOniEU3e6IIaO1tr+6vwyJ6S6l2F4zpaVeJ488NarXMVbDIOsRNPNqKZLflVGuSg==
-X-Received: by 2002:a2e:7215:: with SMTP id n21mr39538ljc.199.1588263892282;
- Thu, 30 Apr 2020 09:24:52 -0700 (PDT)
-Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id 16sm147275ljr.55.2020.04.30.09.24.51
+ bh=NN/QLBosnfSE6MOjBuSmBLZSNupnPgsxwETGi0A5VuM=;
+ b=XUgCryIH27SnXh0Rdijo/lW8EFQRLvqw4TCg5OCSAhb/wy42BJ4OEYqh+J8gmniARi
+ +OMkEosDwQaFuWpUslp6TAEBV2jEEZKqLtB90/PUBI3tDOYOJoI6OE/5Igbv9zX1J5Uz
+ YiFs9WS4zrNYbimUydJNEWPj5EzHQNDYCQ5qIWGscZq1xvunKxqpvBgnfv/NwTLb79Xl
+ 6Q0DM6XXW/Kf2IZiERaASBIp9zUIblUBj6mDM8e1yisInJo8mWqZ+8lES5XV6tLuoMPu
+ x4bsJ4plmnK1MaIQFwxCGVNnPBi3MajMpVUdEAFVv2n6xweSqkHkJ93iGmQ67pPVaKcW
+ 14tw==
+X-Gm-Message-State: AGi0PubvG3us572knfY3Nk2U3VNtA96WPer4qXsAQfQMuBeB0Zkv1ZDG
+ 0TWPqXraggZtdwwpSAsX6JEpzEwpLqE=
+X-Google-Smtp-Source: APiQypKxTlpcwir3lVQyzL3kUuPn3bbW4QxX3SQFCoNPWkTXBJneR0D8mhIelE2MlQzEpjmEG7WHUA==
+X-Received: by 2002:a17:90a:de8d:: with SMTP id
+ n13mr3686027pjv.173.1588264098026; 
+ Thu, 30 Apr 2020 09:28:18 -0700 (PDT)
+Received: from localhost.localdomain (174-21-149-226.tukw.qwest.net.
+ [174.21.149.226])
+ by smtp.gmail.com with ESMTPSA id j5sm243514pfh.58.2020.04.30.09.28.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Apr 2020 09:24:51 -0700 (PDT)
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+ Thu, 30 Apr 2020 09:28:17 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 9/9] MAINTAINERS: Add myself as streams maintainer
-Date: Thu, 30 Apr 2020 18:24:39 +0200
-Message-Id: <20200430162439.2659-10-edgar.iglesias@gmail.com>
+Subject: [PATCH v4 02/18] exec: Fix cpu_watchpoint_address_matches address
+ length
+Date: Thu, 30 Apr 2020 09:27:57 -0700
+Message-Id: <20200430162813.17671-3-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200430162439.2659-1-edgar.iglesias@gmail.com>
-References: <20200430162439.2659-1-edgar.iglesias@gmail.com>
+In-Reply-To: <20200430162813.17671-1-richard.henderson@linaro.org>
+References: <20200430162813.17671-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::244;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x244.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::244
+X-Received-From: 2607:f8b0:4864:20::643
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,41 +98,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: damien.hedde@greensocs.com, peter.maydell@linaro.org,
- sstabellini@kernel.org, edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
- frasse.iglesias@gmail.com, jasowang@redhat.com, alistair@alistair23.me,
- frederic.konrad@adacore.com, qemu-arm@nongnu.org, philmd@redhat.com,
- luc.michel@greensocs.com, figlesia@xilinx.com
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+The only caller of cpu_watchpoint_address_matches passes
+TARGET_PAGE_SIZE, so the bug is not currently visible.
 
-Since we're missing a maintainer, add myself.
-
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- MAINTAINERS | 6 ++++++
- 1 file changed, 6 insertions(+)
+ exec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 8cbc1fac2b..9f504e32df 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2311,6 +2311,12 @@ F: net/slirp.c
- F: include/net/slirp.h
- T: git https://people.debian.org/~sthibault/qemu.git slirp
+diff --git a/exec.c b/exec.c
+index 2874bb5088..5162f0d12f 100644
+--- a/exec.c
++++ b/exec.c
+@@ -1127,7 +1127,7 @@ int cpu_watchpoint_address_matches(CPUState *cpu, vaddr addr, vaddr len)
+     int ret = 0;
  
-+Streams
-+M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
-+S: Maintained
-+F: hw/core/stream.c
-+F: include/hw/stream.h
-+
- Stubs
- M: Paolo Bonzini <pbonzini@redhat.com>
- S: Maintained
+     QTAILQ_FOREACH(wp, &cpu->watchpoints, entry) {
+-        if (watchpoint_address_matches(wp, addr, TARGET_PAGE_SIZE)) {
++        if (watchpoint_address_matches(wp, addr, len)) {
+             ret |= wp->flags;
+         }
+     }
 -- 
 2.20.1
 
