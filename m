@@ -2,118 +2,137 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA316C8300A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 11:25:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65E1FC8300A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 11:27:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55EDB20774
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 11:25:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F67320774
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 11:27:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="hMrs/UrE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55EDB20774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="ClNBzBWq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F67320774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU7KA-0000EI-Gb
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 07:25:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57844)
+	id 1jU7La-0001da-Ak
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 07:27:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58910)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jU78j-0007FP-Bl
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:14:21 -0400
+ (envelope-from <thanos.makatos@nutanix.com>) id 1jU7IH-0005y1-Dm
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:23:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jU78M-0005Vy-0d
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:14:01 -0400
-Received: from mail-eopbgr70120.outbound.protection.outlook.com
- ([40.107.7.120]:6058 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ (envelope-from <thanos.makatos@nutanix.com>) id 1jU7IA-0003QG-BV
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:23:52 -0400
+Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:22434)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jU762-0003ZE-UI; Thu, 30 Apr 2020 07:11:15 -0400
+ (Exim 4.90_1) (envelope-from <thanos.makatos@nutanix.com>)
+ id 1jU7I9-0003Q5-Lj
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:23:46 -0400
+Received: from pps.filterd (m0127838.ppops.net [127.0.0.1])
+ by mx0a-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 03UBMqSG002904; Thu, 30 Apr 2020 04:23:37 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=proofpoint20171006;
+ bh=oixrk1TaMqYsGftluZDu/Ai1AhbkUComWWhGHuFdkcQ=;
+ b=ClNBzBWqhWG8AtaQHOVPmTtW6h0aKf68xQO8RHJ91ivSTwj6/iUZOpBJW7RiGKQ8sfuq
+ UleravvgqQ7vEpRZi5M2weHsuK3cvX7jyHD0R+0efzCHGDnShxrRCa8KA7rDzsuQugoV
+ bRPhOgWdgZhH0wxjhftqyarOYIvSIshHj47wYJ9b1Dca0mcriwlPu9HYn4PJLSoTaGM+
+ iUxXxslxsdJuKcUBS1DNsmko00MhB66BZWA2jaiJMu+LdrKu/zKa6JxhodZFOjdxgxlT
+ c4JuKmlaTW8k1rAFqdLui2yGvC/OJLon4fRIo78l263R1DPHIVoaIPoyWT7VxEzDjjUz Ag== 
+Received: from nam10-dm6-obe.outbound.protection.outlook.com
+ (mail-dm6nam10lp2109.outbound.protection.outlook.com [104.47.58.109])
+ by mx0a-002c1b01.pphosted.com with ESMTP id 30mmryu908-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 30 Apr 2020 04:23:37 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P53jVKWzBw0UfO1DlkoqPcjCmliQ8tUBKsHuAOCeEt30Q3LIiN1k9tzUXInk+y+upfCHK2r2XvorxAED50AVhNXfiX2CiwabsU5VqICVZjnoiZFJngpPggxW1Cvnrg5G4WL+ud569A2kY1f9bI3/8+x8QxYBLZND01dsbP8C9q8hkW6WPDlWZL84UXJRJCNlWu4HTHPPVqUa4f5DHmnEgupNEYlxhz06L0hRiKvOiH2tDWNY3oG8/i1daIG3rlGhJBg/eEtk5HnDWAWD2OiUsyP8A/pxnMW6ogI24OJ8PiqKT86OM411OXlKP/OnKPCIUXHalJk7tfX8VWetx0yhVw==
+ b=oNDZj/DIR1iuxEjz5AQ3WCm6Xu2hkeBI7dcW/Hv/ZA6zsq1uk6GiDJajX/LyftUikoljjhz86PenWhaypvDkN3LwLYEL/1OM/YYOx0FCswuGPt5IrnjL9d+cG0OgP2a63SkNh0gjrV5CtqVZ0Qs8fNz97GAqQpyp4zS0L5++lvwHZlvsduB//Px36OJZYOErM147y/lBBIshyUNmkV9WZwV9mjg1lRBX4qQAfd7axRke7hglmSYAYI0+Dh0PG4OA2bryxpDNslhdCgsEkxU590zerf20sooJ38tbMZu8BdpkyD5WdWjsvuWAroRI/a35YihQPoKJE/SJllB7MuNohA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/58aRH73IHGHhfUO6Z1+nmWkxa+Uq7D/NJoMhB5eTVw=;
- b=cusP4Tvqop9tkVSo5EAWWEKu6w4V5lEvgzHlzTMfmCzMthTiStNwYtHCs9f7eq5NaRQUcvISRbDsqhrvP9Nr2gDj//M5Kkzmj9ggtteFDi++3AfeIXccAPvaDiHQgWwApm2rEiLkzLR4vFJ8NOi83EmX0jGu5OmtNgAZ5RIsw/RfO/0d8pyKGSRrsTh/0nrE1wSY6FgffnsmLDn/ah5t6RpI4tM09dwl8a0TMO5kMNQ7n3ZIWSH2kb0E0nYNwQkj4AMoyY7tSEKHVbQiwWYwSOnsTg7wyeVWfBVNAtIwDikmpWK6IQCgXxRrGMUnJvV3HUWyC46IgvZnICxg7+TT7w==
+ bh=oixrk1TaMqYsGftluZDu/Ai1AhbkUComWWhGHuFdkcQ=;
+ b=MhXiorxkiBmzwHnhcjJuIDLJ46KAejEF9bNO8HzfE3qQZFnQVbvnNKl2JwN0KOcifEC3tqwBYmGLM2MgHOGnB/fntW6syYTr0L3gQAcIcQaZYQz+DsDut0OZAyk0dJneAifq/0J5bYqOWtcya6M68rlWL0vhCiwf70oGyiPdZh1zldi6hb+e9FVNGYlYdyiEGmJvC4cBc+BmesbBeJCdP8dmy0UbGmyoy5KFI4nfmVpv6AJwkZ98bZEeswzCsScrCmYEKA7SMjzVrplfi3zCe4ODaaQ0e6qG7qB0QGmykBI8ug5d68392MsU9ayw9gn1c/VfEiB80w7Xy5awNAgsjA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/58aRH73IHGHhfUO6Z1+nmWkxa+Uq7D/NJoMhB5eTVw=;
- b=hMrs/UrE079vMtc7nxaWCmAMfib4Daj19lSBEyKNGh4wZTkv9K6ssXWcwoyG7DDVzc2CUTi6RfvX0fWD6yVRIY/zHHdOERj3rNNLX8EuhYyiL4wsVSB6TgPJ8c+aULZqXI+06cCTwwDBwecLinGFzpcpaOeRbzHE4g7ixCFKZUg=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5399.eurprd08.prod.outlook.com (2603:10a6:20b:104::22)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.20; Thu, 30 Apr
- 2020 11:11:12 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2958.020; Thu, 30 Apr 2020
- 11:11:12 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v3 16/17] block: use int64_t instead of int in driver
- write_zeroes handlers
-Date: Thu, 30 Apr 2020 14:10:32 +0300
-Message-Id: <20200430111033.29980-17-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200430111033.29980-1-vsementsov@virtuozzo.com>
-References: <20200430111033.29980-1-vsementsov@virtuozzo.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM0P190CA0021.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:208:190::31) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from kvm.sw.ru (185.215.60.138) by
- AM0P190CA0021.EURP190.PROD.OUTLOOK.COM (2603:10a6:208:190::31) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2958.19 via Frontend Transport; Thu, 30 Apr 2020 11:11:10 +0000
-X-Mailer: git-send-email 2.21.0
-X-Originating-IP: [185.215.60.138]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6c31fb43-9fe2-4f49-c0da-08d7ecf73112
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5399:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5399A04A8C69D062F2B8CB13C1AA0@AM7PR08MB5399.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:626;
-X-Forefront-PRVS: 0389EDA07F
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: VZazNdtzCLZp1p9I1ZJNULw2tbbEQutiAeN8hBTZ1s7KTHtzwP6a/DB5UTgY+iu0LFkYkPuoqMWr7T3gJswwFH/AYTeywm6AuiM3DA0UyztXfn0gY37mvQjTsIMQartBcDkYNrMtd8QIpPkYezgo10arO7rKVqSFm3jo1ojg1HrJE5QL//WCuaSlTpX3O4aUr7Q5nzP57nzH0eABBXmTsIW/y9g+QQscW4k2ag6t7SD5kWN0hqKeiiiVHLpc5d72YshbKoxIk5M8eb+z13mQ2zL+lxlkaruBK1/bU+XaxKfXHx9EQczgtl2JwbJXCjlusoaZQHCXl2wBhUIS/AcoZcyEb93EXXxvzF1PsiMUNERgVtgrO9Hd/OM5Qa4OS2u4Jrf/c5PhFxsBGhnWHHHxUpPPAq2cDYlWDAx4iLix3TCKR4bVncZDxwn6u8aA+Luz
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from MW2PR02MB3723.namprd02.prod.outlook.com (2603:10b6:907:2::32)
+ by MW2PR02MB3787.namprd02.prod.outlook.com (2603:10b6:907:3::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.22; Thu, 30 Apr
+ 2020 11:23:35 +0000
+Received: from MW2PR02MB3723.namprd02.prod.outlook.com
+ ([fe80::b90a:dbb6:2412:266e]) by MW2PR02MB3723.namprd02.prod.outlook.com
+ ([fe80::b90a:dbb6:2412:266e%5]) with mapi id 15.20.2958.020; Thu, 30 Apr 2020
+ 11:23:35 +0000
+From: Thanos Makatos <thanos.makatos@nutanix.com>
+To: Thanos Makatos <thanos.makatos@nutanix.com>, Stefan Hajnoczi
+ <stefanha@gmail.com>, John G Johnson <john.g.johnson@oracle.com>
+Subject: RE: RFC: use VFIO over a UNIX domain socket to implement device
+ offloading
+Thread-Topic: RFC: use VFIO over a UNIX domain socket to implement device
+ offloading
+Thread-Index: AdYDU20BI9Of/G6jR7ONy5zZTB1T9QEsuagAA77zu+AAbiuPAADxCFGgAJikHLA=
+Date: Thu, 30 Apr 2020 11:23:34 +0000
+Message-ID: <MW2PR02MB372319618A59DA06851BBFB48BAA0@MW2PR02MB3723.namprd02.prod.outlook.com>
+References: <MN2PR02MB62052E54C752229C115EAD898BCF0@MN2PR02MB6205.namprd02.prod.outlook.com>
+ <20200401091712.GA221892@stefanha-x1.localdomain>
+ <MW2PR02MB372349E25A0842DE045B95F58BD40@MW2PR02MB3723.namprd02.prod.outlook.com>
+ <20200422152930.GC47385@stefanha-x1.localdomain>
+ <MW2PR02MB372340D8EF74A43D64E67B728BAF0@MW2PR02MB3723.namprd02.prod.outlook.com>
+In-Reply-To: <MW2PR02MB372340D8EF74A43D64E67B728BAF0@MW2PR02MB3723.namprd02.prod.outlook.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: nutanix.com; dkim=none (message not signed)
+ header.d=none;nutanix.com; dmarc=none action=none header.from=nutanix.com;
+x-originating-ip: [92.29.225.29]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: bab32d3d-0a8f-4a7f-fbcd-08d7ecf8ebfd
+x-ms-traffictypediagnostic: MW2PR02MB3787:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MW2PR02MB3787C72DED215E9AFD70F2818BAA0@MW2PR02MB3787.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 0389EDA07F
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:MW2PR02MB3723.namprd02.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(39850400004)(396003)(366004)(346002)(136003)(376002)(1076003)(36756003)(478600001)(8936002)(26005)(6512007)(30864003)(7416002)(5660300002)(107886003)(6486002)(66476007)(66556008)(86362001)(6916009)(6506007)(6666004)(8676002)(316002)(2906002)(186003)(66946007)(16526019)(2616005)(956004)(4326008)(52116002);
+ SFS:(396003)(346002)(39860400002)(136003)(366004)(376002)(71200400001)(316002)(52536014)(8936002)(478600001)(7416002)(8676002)(186003)(7696005)(66946007)(64756008)(9686003)(66556008)(55016002)(66476007)(6506007)(110136005)(26005)(66446008)(76116006)(44832011)(2906002)(4326008)(54906003)(5660300002)(86362001)(966005)(33656002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: ks52jpCHXZYKhDK2poPwn9BC3hLKA5bhyQ+FLa7o2+yCx3B83ixATEPst8pVXfVdFKdaofewhTQtaUy+slRIlDj9oMAEfsNpisH+20LXop9FuMD6klJLgygD9VQrK256wxYymAa6GF0GRyBVhF3Fd1YM9ZS8e1HMMVOLMel447JV2cB0Cwm6BZqPJ/4Pfm9XatxW+gN0XdHb1t3lQL0ky3J6BuGmllULNA80DRjLc5ckI7y9CNB44I+HZyS7hCnqeZqloLAqH40dEDtqtBY46l5Frz64pYKzxeUIec7V5/wB/PWFFxI/OIBqrryDb4wlRfzmzbpe8/gzfkVqj+a0LFbgsvaFQhn62F+raACWDNSoyMWvJsnxgp1QVZ64lFfl8iSrKvd6KYTCQ3uhkwivu6MDgvfVB9PEmSvebmBiI2ozbs63MYMS8SggMCiGtpCW1TDQMz2SmYEppGHqlxh6oNcjwZmnIrXOantUgo2h+LBzX9z04b9SymIAR8uwr54ROSDOHKysHC9hxAAu7JnuJ2LNSBYFxTphAtuXwOvlGlQYeGfFsPYW5b2jwbNh2IpO4DWog0wN2WEm1ZdVWN2zJe6Tj2rMeb6GP0T6nVM2smlt4XGBYRe4Cl3amhuq4UmJiEEdA4q3NBNqhJseAxBZ5yY44JWRzsVahLK0IiAigs3UxItJ9r/i0tOkuR/gGwHcbn44wVzq/r5xSvCJUkpUn+uB0DiOtLIinIpnyacdnLzsCVEwg06kZ8reNzGxRtOlrldiwh93deP7KGFcthtYXbls50fiX32K5aaZktd2DhY=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6c31fb43-9fe2-4f49-c0da-08d7ecf73112
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2020 11:11:12.2914 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: p/hYSPLvsS0cagsx1HUnPCAvndrSpNKXn8IyoGgatbm4KcIo6RvytlelsTVnzYY1mQlt+2KzrVQdkDziuJzAkFIJurJP8kgMa8lBQL+/bxI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5399
-Received-SPF: pass client-ip=40.107.7.120;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 07:11:10
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Received-From: 40.107.7.120
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: a6LRTt581LDBmR4rWUe5VmtLC6PBC9+oUwUlm9wqZ5g/Q+GUVYWSx2nCXXMzASerHLR3iijIqPKlkSrU26kV5VXQ+HEgQ8aXbamNtKZLFDz4/k92buXVuYz+iP+dNgc8TEm2rPXFOBc5XwLMZkzMc/tELs4Gk0bi4cynrHWW28k48IrlSrSaan697S0uDXuf1kFSibNv4yDd3aksKsiic21j1FvF+bg5Zqu4nCrECnDejYnZ6LdD0Ukd2toQXqvv3vgjtA0bHRqrDUneFhCE+PuIlET6T7E1/OE6Tet2kbHwY5fdJyphEvcsXaCdIgvJ8GVVMUQ3Gd8O6qB9yspzfqmwGNO59hQ5HpdYhOVgUy5NSyilJF4JBqqePAZWhvfsBoGMJL7WFAIGgGXgfiSnxsRNZuO/daZnbauc7oZStT7DqjekMkPJbhJjSHRqEPqM1A9taheG2BaceTHRPXFnew+OQKi6xOZSoQauqQCLa+PFH8BUdh7qv6SkyGETIrzXtYuymtgyP/4UQVDeOqxqaQ==
+x-ms-exchange-antispam-messagedata: C1NN6XrrmIaWDgBp0Dq/aEIw0gAmw7rRP0PPdFMMfXw3dPDwxOxc+lP2ljETe9dagPVmHbOaWqT1zhmrhjQIW+quE2IsCla3RhxKN6tCdylB/pR9RKg251YW1P2ZVNN3NfpnXt6MyfLXUSE6iH2F58qE5s3GzOetKMiQWcDCbFBnzezFKQssjzURip5qLsubm0ea7FK1EyfKMzJm6jd0LYymnmMM6nEbabO/k608lEwMuEljtVK6GtcBnYxlIycVRS6jIii544ni88eH0CV0HmJtHPWSaV6nEc3qOxS0Q9Pf+SFGr8GC015kNPJUGkS76RT+dDmPxXggVz8qq0TKUYDpGjL5TcnAkrVO/lbBTPQEwE2gbvEZsbmdoaVUT3aOrAKARGYHIVShdGQZVcdVfoKuRZ7OIGxl2LxVdKxOh7Im8f4YV/wsOaug0UMk7zscSQvoeC6VQKT6c1o3wGG7exxRlSF+0gkPcAyTnocmgdYHxvBWR+C3KXpD//G0gkIF69Nk7cONJ7Rrc4ovUM/QwmPInjzMcxfSNX/3Bo35yQlunbl33QnSjq3RCH6JV/Bgic0kVJMIBil8goU69E0KitsFneeFZ2WExqTE0gE91ftW4+BKrm3aruUdlYkxF8+WLJrMe2Y7YuG444GxmS1i9GD6eruRZsY5QwFE0GJ4IDLJ+n0Om1lLAVp8BfC8sq0kycgvi77mutWuwVzd0oKxrW+ghyFuTj0bBcwO2m4cvbmEeYLlvr4Y7hyV7lcmynO6qb79xgPXDvtcRc9WshaXTwg23R+Syii/umXN2seahYA=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bab32d3d-0a8f-4a7f-fbcd-08d7ecf8ebfd
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Apr 2020 11:23:34.7971 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: nQ4GIvHxdu0OhU/YAYyLT/Zj/yu9AQJWyCJL/8PP68l6bGqATaxbB5yENpvtBVJfAWEqE0eV3Lua9yD+pIifSEMJct6my7GSnQXTDkU0nck=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR02MB3787
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-04-30_07:2020-04-30,
+ 2020-04-30 signatures=0
+X-Proofpoint-Spam-Reason: safe
+Received-SPF: pass client-ip=148.163.151.68;
+ envelope-from=thanos.makatos@nutanix.com; helo=mx0a-002c1b01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 07:23:39
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Received-From: 148.163.151.68
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,409 +144,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, integration@gluster.org, berto@igalia.com,
- pavel.dovgaluk@ispras.ru, dillaman@redhat.com, qemu-devel@nongnu.org,
- sw@weilnetz.de, pl@kamp.de, ronniesahlberg@gmail.com, mreitz@redhat.com,
- den@openvz.org, sheepdog@lists.wpkg.org, vsementsov@virtuozzo.com,
- stefanha@redhat.com, namei.unix@gmail.com, pbonzini@redhat.com,
- jsnow@redhat.com, ari@tuxera.com
+Cc: "Walker, Benjamin" <benjamin.walker@intel.com>,
+ Elena Ufimtseva <elena.ufimtseva@oracle.com>, Jag Raman <jag.raman@oracle.com>,
+ Swapnil Ingle <swapnil.ingle@nutanix.com>, "Harris,
+ James R" <james.r.harris@intel.com>,
+ Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>,
+ Kirti Wankhede <kwankhede@nvidia.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Felipe Franciosi <felipe@nutanix.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@redhat.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Zhang, Tina" <tina.zhang@intel.com>,
+ Kanth Ghatraju <Kanth.Ghatraju@oracle.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We are generally moving to int64_t for both offset and bytes parameters
-on all io paths.
+> > > I've just shared with you the Google doc we've working on with John
+> > where we've
+> > > been drafting the protocol specification, we think it's time for some=
+ first
+> > > comments. Please feel free to comment/edit and suggest more people
+> to
+> > be on the
+> > > reviewers list.
+> > >
+> > > You can also find the Google doc here:
+> > >
+> > >
+> > https://urldefense.proofpoint.com/v2/url?u=3Dhttps-
+> 3A__docs.google.com_document_d_1FspkL0hVEnZqHbdoqGLUpyC38rSk-
+> 5F&d=3DDwIFAw&c=3Ds883GpUCOChKOHiocYtGcg&r=3DXTpYsh5Ps2zJvtw6ogtti46a
+> tk736SI4vgsJiUKIyDE&m=3DlJC7YeMMsAaVsr99tmTYncQdjEfOXiJQkRkJW7NMg
+> Rg&s=3DRyyhgVrLX2bBTqpXZnBmllqkCg_wyalxwZKkfcYt50c&e=3D
+> > 7HhY471TsVwyK8/edit?usp=3Dsharing
+> > >
+> > > If a Google doc doesn't work for you we're open to suggestions.
+> >
+> > I can't add comments to the document so I've inlined them here:
+> >
+> > The spec assumes the reader is already familiar with VFIO and does not
+> > explain concepts like the device lifecycle, regions, interrupts, etc.
+> > We don't need to duplicate detailed VFIO information, but I think the
+> > device model should be explained so that anyone can start from the
+> > VFIO-user spec and begin working on an implementation.  Right now I
+> > think they would have to do some serious investigation of VFIO first in
+> > order to be able to write code.
+>=20
+> I've added a high-level overview of how VFIO is used in this context.
+>=20
+> > "only the source header files are used"
+> > I notice the current <linux/vfio.h> header is licensed "GPL-2.0 WITH
+> > Linux-syscall-note".  I'm not a lawyer but I guess this means there are
+> > some restrictions on using this header file.  The <linux/virtio*.h>
+> > header files were explicitly licensed under the BSD license to make it
+> > easy to use the non __KERNEL__ parts.
+>=20
+> My impression is that this note actually relaxes the licensing requiremen=
+ts, so
+> that proprietary software can use the system call headers and run on Linu=
+x
+> without being considered derived work. In any case I'll double check with=
+ our
+> legal team.
+>=20
+> > VFIO-user Command Types: please indicate for each request type whether
+> > it is client->server, server->client, or both.  Also is it a "command"
+> > or "request"?
+>=20
+> Will do. It's a command.
+>=20
+>=20
+> > vfio_user_req_type <-- is this an extension on top of <linux/vfio.h>?
+> > Please make it clear what is part of the base <linux/vfio.h> protocol
+> > and what is specific to vfio-user.
+>=20
+> Correct, it's an extension over <linux/vfio.h>. I've clarified the two sy=
+mbol
+> namespaces.
+>=20
+>=20
+> > VFIO_USER_READ/WRITE serve completely different purposes depending
+> on
+> > whether they are sent client->server or server->client.  I suggest
+> > defining separate request type constants instead of overloading them.
+>=20
+> Fixed.
+>=20
+> > What is the difference between VFIO_USER_MAP_DMA and
+> > VFIO_USER_REG_MEM?
+> > They both seem to be client->server messages for setting up memory but
+> > I'm not sure why two request types are needed.
+>=20
+> John will provide more information on this.
+>=20
+> > struct vfio_user_req->data.  Is this really a union so that every
+> > message has the same size, regardless of how many parameters are
+> passed
+> > in the data field?
+>=20
+> Correct, it's a union so that every message has the same length.
+>=20
+> > "a framebuffer where the guest does multiple stores to the virtual
+> > device."  Do you mean in SMP guests?  Or even in a single CPU guest?
+>=20
+> @John
+>=20
+> > Also, is there any concurrency requirement on the client and server
+> > side?  Can I implement a client/server that processes requests
+> > sequentially and completes them before moving on to the next request or
+> > would that deadlock for certain message types?
+>=20
+> I believe that this might also depend on the device semantics, will need =
+to
+> think about it in greater detail.
 
-Main motivation is realization of 64-bit write_zeroes operation for
-fast zeroing large disk chunks, up to the whole disk.
+I've looked at this but can't provide a definitive answer yet. I believe th=
+e
+safest thing to do is for the server to process requests in order.
 
-We chose signed type, to be consistent with off_t (which is signed) and
-with possibility for signed return type (where negative value means
-error).
+> More importantly, considering:
+> a) Marc-Andr=E9's comments about data alignment etc., and
+> b) the possibility to run the server on another guest or host,
+> we won't be able to use native VFIO types. If we do want to support that
+> then
+> we'll have to redefine all data formats, similar to
+> https://urldefense.proofpoint.com/v2/url?u=3Dhttps-
+> 3A__github.com_qemu_qemu_blob_master_docs_interop_vhost-
+> 2Duser.rst&d=3DDwIFAw&c=3Ds883GpUCOChKOHiocYtGcg&r=3DXTpYsh5Ps2zJvtw6
+> ogtti46atk736SI4vgsJiUKIyDE&m=3DlJC7YeMMsAaVsr99tmTYncQdjEfOXiJQkRkJ
+> W7NMgRg&s=3D1d_kB7VWQ-8d4t6Ikga5KSVwws4vwiVMvTyWVaS6PRU&e=3D .
+>=20
+> So the protocol will be more like an enhanced version of the Vhost-user
+> protocol
+> than VFIO. I'm fine with either direction (VFIO vs. enhanced Vhost-user),
+> so we need to decide before proceeding as the request format is
+> substantially
+> different.
 
-So, convert driver write_zeroes handlers bytes parameter to int64_t.
+Regarding the ability to use the protocol on non-AF_UNIX sockets, we can=20
+support this future use case without unnecessarily complicating the protoco=
+l by
+defining the C structs and stating that data alignment and endianness for t=
+he=20
+non AF_UNIX case must be the one used by GCC on a x86_64 bit machine, or ca=
+n=20
+be overridden as required.
 
-This patch just converts handlers where it is obvious that bytes
-parameter is passed further to 64bit interfaces, and add simple
-wrappers where it is not obvious.
+We've polished the document a bit more with the help of Marc-Andr=E9,
+Raphael, and Swapnil.
 
-Series: 64bit-block-status
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- include/block/block_int.h |  2 +-
- block/backup-top.c        |  2 +-
- block/blkdebug.c          |  2 +-
- block/blklogwrites.c      |  4 ++--
- block/blkreplay.c         |  2 +-
- block/copy-on-read.c      |  2 +-
- block/file-posix.c        |  6 +++---
- block/filter-compress.c   |  2 +-
- block/gluster.c           |  8 +++++---
- block/iscsi.c             | 12 ++++++++++--
- block/mirror.c            |  2 +-
- block/nbd.c               |  4 +++-
- block/nvme.c              | 16 ++++++++++++----
- block/qcow2.c             |  9 ++++++++-
- block/qed.c               | 17 +++++++++++++----
- block/raw-format.c        |  2 +-
- block/throttle.c          |  2 +-
- block/vmdk.c              |  2 +-
- 18 files changed, 66 insertions(+), 30 deletions(-)
-
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 3f08baeff0..c98d591a56 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -246,7 +246,7 @@ struct BlockDriver {
-      * will be called instead.
-      */
-     int coroutine_fn (*bdrv_co_pwrite_zeroes)(BlockDriverState *bs,
--        int64_t offset, int bytes, BdrvRequestFlags flags);
-+        int64_t offset, int64_t bytes, BdrvRequestFlags flags);
-     int coroutine_fn (*bdrv_co_pdiscard)(BlockDriverState *bs,
-         int64_t offset, int bytes);
- 
-diff --git a/block/backup-top.c b/block/backup-top.c
-index 519c7ea5ad..2484293fb0 100644
---- a/block/backup-top.c
-+++ b/block/backup-top.c
-@@ -76,7 +76,7 @@ static int coroutine_fn backup_top_co_pdiscard(BlockDriverState *bs,
- }
- 
- static int coroutine_fn backup_top_co_pwrite_zeroes(BlockDriverState *bs,
--        int64_t offset, int bytes, BdrvRequestFlags flags)
-+        int64_t offset, int64_t bytes, BdrvRequestFlags flags)
- {
-     int ret = backup_top_cbw(bs, offset, bytes, flags);
-     if (ret < 0) {
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index e47a686628..d593d6c85d 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -672,7 +672,7 @@ static int blkdebug_co_flush(BlockDriverState *bs)
- }
- 
- static int coroutine_fn blkdebug_co_pwrite_zeroes(BlockDriverState *bs,
--                                                  int64_t offset, int bytes,
-+                                                  int64_t offset, int64_t bytes,
-                                                   BdrvRequestFlags flags)
- {
-     uint32_t align = MAX(bs->bl.request_alignment,
-diff --git a/block/blklogwrites.c b/block/blklogwrites.c
-index f9697aaa75..8ca41d09cd 100644
---- a/block/blklogwrites.c
-+++ b/block/blklogwrites.c
-@@ -474,8 +474,8 @@ blk_log_writes_co_pwritev(BlockDriverState *bs, int64_t offset, int64_t bytes,
- }
- 
- static int coroutine_fn
--blk_log_writes_co_pwrite_zeroes(BlockDriverState *bs, int64_t offset, int bytes,
--                                BdrvRequestFlags flags)
-+blk_log_writes_co_pwrite_zeroes(BlockDriverState *bs, int64_t offset,
-+                                int64_t bytes, BdrvRequestFlags flags)
- {
-     return blk_log_writes_co_log(bs, offset, bytes, NULL, flags,
-                                  blk_log_writes_co_do_file_pwrite_zeroes, 0,
-diff --git a/block/blkreplay.c b/block/blkreplay.c
-index 98b8dff860..186d28cc6a 100644
---- a/block/blkreplay.c
-+++ b/block/blkreplay.c
-@@ -95,7 +95,7 @@ static int coroutine_fn blkreplay_co_pwritev(BlockDriverState *bs,
- }
- 
- static int coroutine_fn blkreplay_co_pwrite_zeroes(BlockDriverState *bs,
--    int64_t offset, int bytes, BdrvRequestFlags flags)
-+    int64_t offset, int64_t bytes, BdrvRequestFlags flags)
- {
-     uint64_t reqid = blkreplay_next_id();
-     int ret = bdrv_co_pwrite_zeroes(bs->file, offset, bytes, flags);
-diff --git a/block/copy-on-read.c b/block/copy-on-read.c
-index 174e711393..d99e07e99f 100644
---- a/block/copy-on-read.c
-+++ b/block/copy-on-read.c
-@@ -94,7 +94,7 @@ static int coroutine_fn cor_co_pwritev(BlockDriverState *bs,
- 
- 
- static int coroutine_fn cor_co_pwrite_zeroes(BlockDriverState *bs,
--                                             int64_t offset, int bytes,
-+                                             int64_t offset, int64_t bytes,
-                                              BdrvRequestFlags flags)
- {
-     return bdrv_co_pwrite_zeroes(bs->file, offset, bytes, flags);
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 38c1398494..fa9ac5b13e 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -2797,7 +2797,7 @@ raw_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
- }
- 
- static int coroutine_fn
--raw_do_pwrite_zeroes(BlockDriverState *bs, int64_t offset, int bytes,
-+raw_do_pwrite_zeroes(BlockDriverState *bs, int64_t offset, int64_t bytes,
-                      BdrvRequestFlags flags, bool blkdev)
- {
-     BDRVRawState *s = bs->opaque;
-@@ -2866,7 +2866,7 @@ raw_do_pwrite_zeroes(BlockDriverState *bs, int64_t offset, int bytes,
- 
- static int coroutine_fn raw_co_pwrite_zeroes(
-     BlockDriverState *bs, int64_t offset,
--    int bytes, BdrvRequestFlags flags)
-+    int64_t bytes, BdrvRequestFlags flags)
- {
-     return raw_do_pwrite_zeroes(bs, offset, bytes, flags, false);
- }
-@@ -3489,7 +3489,7 @@ hdev_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
- }
- 
- static coroutine_fn int hdev_co_pwrite_zeroes(BlockDriverState *bs,
--    int64_t offset, int bytes, BdrvRequestFlags flags)
-+    int64_t offset, int64_t bytes, BdrvRequestFlags flags)
- {
-     int rc;
- 
-diff --git a/block/filter-compress.c b/block/filter-compress.c
-index 09c0201c51..7cf47608b5 100644
---- a/block/filter-compress.c
-+++ b/block/filter-compress.c
-@@ -85,7 +85,7 @@ static int coroutine_fn compress_co_pwritev_part(BlockDriverState *bs,
- 
- 
- static int coroutine_fn compress_co_pwrite_zeroes(BlockDriverState *bs,
--                                                  int64_t offset, int bytes,
-+                                                  int64_t offset, int64_t bytes,
-                                                   BdrvRequestFlags flags)
- {
-     return bdrv_co_pwrite_zeroes(bs->file, offset, bytes, flags);
-diff --git a/block/gluster.c b/block/gluster.c
-index 0aa1f2cda4..88130c3d2d 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -1017,19 +1017,21 @@ static void qemu_gluster_reopen_abort(BDRVReopenState *state)
- #ifdef CONFIG_GLUSTERFS_ZEROFILL
- static coroutine_fn int qemu_gluster_co_pwrite_zeroes(BlockDriverState *bs,
-                                                       int64_t offset,
--                                                      int size,
-+                                                      int64_t bytes,
-                                                       BdrvRequestFlags flags)
- {
-     int ret;
-     GlusterAIOCB acb;
-     BDRVGlusterState *s = bs->opaque;
- 
--    acb.size = size;
-+    assert(bytes < INT_MAX);
-+
-+    acb.size = bytes;
-     acb.ret = 0;
-     acb.coroutine = qemu_coroutine_self();
-     acb.aio_context = bdrv_get_aio_context(bs);
- 
--    ret = glfs_zerofill_async(s->fd, offset, size, gluster_finish_aiocb, &acb);
-+    ret = glfs_zerofill_async(s->fd, offset, bytes, gluster_finish_aiocb, &acb);
-     if (ret < 0) {
-         return -errno;
-     }
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 861a70c823..c4183ef12f 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -1204,8 +1204,8 @@ out_unlock:
- }
- 
- static int
--coroutine_fn iscsi_co_pwrite_zeroes(BlockDriverState *bs, int64_t offset,
--                                    int bytes, BdrvRequestFlags flags)
-+coroutine_fn iscsi_co_pwrite_zeroes_old(BlockDriverState *bs, int64_t offset,
-+                                        int bytes, BdrvRequestFlags flags)
- {
-     IscsiLun *iscsilun = bs->opaque;
-     struct IscsiTask iTask;
-@@ -1308,6 +1308,14 @@ out_unlock:
-     return r;
- }
- 
-+static int
-+coroutine_fn iscsi_co_pwrite_zeroes(BlockDriverState *bs, int64_t offset,
-+                                    int64_t bytes, BdrvRequestFlags flags)
-+{
-+    assert(bytes < INT_MAX);
-+    return iscsi_co_pwrite_zeroes_old(bs, offset, bytes, flags);
-+}
-+
- static void apply_chap(struct iscsi_context *iscsi, QemuOpts *opts,
-                        Error **errp)
- {
-diff --git a/block/mirror.c b/block/mirror.c
-index ac3d4bc8c5..7f4fdfb470 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1464,7 +1464,7 @@ static int coroutine_fn bdrv_mirror_top_flush(BlockDriverState *bs)
- }
- 
- static int coroutine_fn bdrv_mirror_top_pwrite_zeroes(BlockDriverState *bs,
--    int64_t offset, int bytes, BdrvRequestFlags flags)
-+    int64_t offset, int64_t bytes, BdrvRequestFlags flags)
- {
-     return bdrv_mirror_top_do_write(bs, MIRROR_METHOD_ZERO, offset, bytes, NULL,
-                                     flags);
-diff --git a/block/nbd.c b/block/nbd.c
-index 8cd417f018..0e52b76d72 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -1245,7 +1245,7 @@ static int nbd_client_co_pwritev(BlockDriverState *bs, int64_t offset,
- }
- 
- static int nbd_client_co_pwrite_zeroes(BlockDriverState *bs, int64_t offset,
--                                       int bytes, BdrvRequestFlags flags)
-+                                       int64_t bytes, BdrvRequestFlags flags)
- {
-     BDRVNBDState *s = (BDRVNBDState *)bs->opaque;
-     NBDRequest request = {
-@@ -1254,6 +1254,8 @@ static int nbd_client_co_pwrite_zeroes(BlockDriverState *bs, int64_t offset,
-         .len = bytes,
-     };
- 
-+    assert(bytes < INT_MAX);
-+
-     assert(!(s->info.flags & NBD_FLAG_READ_ONLY));
-     if (!(s->info.flags & NBD_FLAG_SEND_WRITE_ZEROES)) {
-         return -ENOTSUP;
-diff --git a/block/nvme.c b/block/nvme.c
-index d91bbe60bf..724f894b00 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -1104,10 +1104,10 @@ static coroutine_fn int nvme_co_flush(BlockDriverState *bs)
- }
- 
- 
--static coroutine_fn int nvme_co_pwrite_zeroes(BlockDriverState *bs,
--                                              int64_t offset,
--                                              int bytes,
--                                              BdrvRequestFlags flags)
-+static coroutine_fn int nvme_co_pwrite_zeroes_old(BlockDriverState *bs,
-+                                                  int64_t offset,
-+                                                  int bytes,
-+                                                  BdrvRequestFlags flags)
- {
-     BDRVNVMeState *s = bs->opaque;
-     NVMeQueuePair *ioq = s->queues[1];
-@@ -1157,6 +1157,14 @@ static coroutine_fn int nvme_co_pwrite_zeroes(BlockDriverState *bs,
-     return data.ret;
- }
- 
-+static coroutine_fn int nvme_co_pwrite_zeroes(BlockDriverState *bs,
-+                                              int64_t offset,
-+                                              int64_t bytes,
-+                                              BdrvRequestFlags flags)
-+{
-+    assert(bytes <= INT_MAX);
-+    return nvme_co_pwrite_zeroes_old(bs, offset, bytes, flags);
-+}
- 
- static int coroutine_fn nvme_co_pdiscard(BlockDriverState *bs,
-                                          int64_t offset,
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 15a6d3c6ef..0800d0378a 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3727,7 +3727,7 @@ static bool is_zero(BlockDriverState *bs, int64_t offset, int64_t bytes)
-     return res >= 0 && (res & BDRV_BLOCK_ZERO) && nr == bytes;
- }
- 
--static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
-+static coroutine_fn int qcow2_co_pwrite_zeroes_old(BlockDriverState *bs,
-     int64_t offset, int bytes, BdrvRequestFlags flags)
- {
-     int ret;
-@@ -3779,6 +3779,13 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
-     return ret;
- }
- 
-+static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
-+    int64_t offset, int64_t bytes, BdrvRequestFlags flags)
-+{
-+    assert(bytes < INT_MAX);
-+    return qcow2_co_pwrite_zeroes_old(bs, offset, bytes, flags);
-+}
-+
- static coroutine_fn int qcow2_co_pdiscard(BlockDriverState *bs,
-                                           int64_t offset, int bytes)
- {
-diff --git a/block/qed.c b/block/qed.c
-index 1af9b3cb1d..fe00dbbff5 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -1439,10 +1439,10 @@ static int coroutine_fn bdrv_qed_co_writev(BlockDriverState *bs,
-     return qed_co_request(bs, sector_num, qiov, nb_sectors, QED_AIOCB_WRITE);
- }
- 
--static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
--                                                  int64_t offset,
--                                                  int bytes,
--                                                  BdrvRequestFlags flags)
-+static int coroutine_fn bdrv_qed_co_pwrite_zeroes_old(BlockDriverState *bs,
-+                                                      int64_t offset,
-+                                                      int bytes,
-+                                                      BdrvRequestFlags flags)
- {
-     BDRVQEDState *s = bs->opaque;
- 
-@@ -1463,6 +1463,15 @@ static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
-                           QED_AIOCB_WRITE | QED_AIOCB_ZERO);
- }
- 
-+static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
-+                                                  int64_t offset,
-+                                                  int64_t bytes,
-+                                                  BdrvRequestFlags flags)
-+{
-+    assert(bytes <= INT_MAX);
-+    return bdrv_qed_co_pwrite_zeroes_old(bs, offset, bytes, flags);
-+}
-+
- static int coroutine_fn bdrv_qed_co_truncate(BlockDriverState *bs,
-                                              int64_t offset,
-                                              bool exact,
-diff --git a/block/raw-format.c b/block/raw-format.c
-index fdf024705b..0996741056 100644
---- a/block/raw-format.c
-+++ b/block/raw-format.c
-@@ -279,7 +279,7 @@ static int coroutine_fn raw_co_block_status(BlockDriverState *bs,
- }
- 
- static int coroutine_fn raw_co_pwrite_zeroes(BlockDriverState *bs,
--                                             int64_t offset, int bytes,
-+                                             int64_t offset, int64_t bytes,
-                                              BdrvRequestFlags flags)
- {
-     int ret;
-diff --git a/block/throttle.c b/block/throttle.c
-index af8cc3b2dd..c97da1d6a7 100644
---- a/block/throttle.c
-+++ b/block/throttle.c
-@@ -137,7 +137,7 @@ static int coroutine_fn throttle_co_pwritev(BlockDriverState *bs,
- }
- 
- static int coroutine_fn throttle_co_pwrite_zeroes(BlockDriverState *bs,
--                                                  int64_t offset, int bytes,
-+                                                  int64_t offset, int64_t bytes,
-                                                   BdrvRequestFlags flags)
- {
-     ThrottleGroupMember *tgm = bs->opaque;
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 61b409ebc7..9611bb191e 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -2089,7 +2089,7 @@ vmdk_co_pwritev_compressed(BlockDriverState *bs, int64_t offset, int64_t bytes,
- 
- static int coroutine_fn vmdk_co_pwrite_zeroes(BlockDriverState *bs,
-                                               int64_t offset,
--                                              int bytes,
-+                                              int64_t bytes,
-                                               BdrvRequestFlags flags)
- {
-     int ret;
--- 
-2.21.0
+The major outstanding issue is agreeing on the having a pair of commands fo=
+r
+registering/unregistering guest memory and another pair of commands to map/=
+unmap
+DMA regions, similar to QEMU.
 
 
