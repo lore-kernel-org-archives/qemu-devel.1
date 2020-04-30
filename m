@@ -2,88 +2,91 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96A32C47247
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:46:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25994C4724C
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:48:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F8BA20774
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:46:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E2EB82074A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:47:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vOw32oAE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F8BA20774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M8wFaY96"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2EB82074A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUAS6-0007IG-IQ
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 10:46:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35530)
+	id 1jUATn-0000GY-1z
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 10:47:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35810)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jUAQy-0006Io-8p
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:45:04 -0400
+ (envelope-from <berrange@redhat.com>) id 1jUATA-0007tC-7L
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:47:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jUAQx-0002zJ-0o
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:45:03 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:44876)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jUAQw-0002tM-GZ
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:45:02 -0400
-Received: by mail-wr1-x435.google.com with SMTP id d17so7222947wrg.11
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 07:45:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=o03GEJHAEin06hy2s0mzQS70eb/2rkMMYtrKlM7rZzI=;
- b=vOw32oAE0aFanKF8xqvm6sieGWrGi/MBmktqeOZMk/7VuQucDM5IzA5SMpPFn6k0SK
- sAn/EAjmgyU/1CB/5ypjHxoXgPxMo+2BN8HVYzgu72qjMNfRFXQxxle2fq7k+WSYw1RB
- aWZtbrDQRB0Pc+dcuAOxibKhSycEEJSfh3DAQNZBcmODiRKNQQ5jGsr3mFPUcQVXB2ZA
- Fkx9p9i917oVYbDFEd9PwlVmlFr8OMWeYI02eSPAMWJW8WfXo1tTeGnYb35bumOu3l3d
- kRHWXmEZHG3sTrnQ3C5NBRbenSOXATaOTqCDL85zw4J5PccvGvcP/8lzt/IsFo8IMNy4
- oyoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=o03GEJHAEin06hy2s0mzQS70eb/2rkMMYtrKlM7rZzI=;
- b=S76s/3LmjNBnL1UVJ6/jVR32CZm1ZOfsk8gm5p8BJRZFWERm02DK/mslY/Mzde/ib8
- 7NoIbJeISmRZMpNyJZTUtgFZftl+Vpi7/C2h7Qa78OyUOGLL1bKhkHSubu6t/TgFff6j
- rANdy35ch50k8uF30GXdh4pIaWjKK4ZeEhPY8vnpdvyND5rNBxViRV9THxyoW/8rwPdX
- Lt98RvScgb0/67ZPYhHjybL/y65nExlvaOnlkDR3rcym/AFaojIkqlQMXLXSIEbMYWaZ
- n5JWJwsrl5frOEXd9TsF01F1zKpaZGpCT/KqmwEaGag/q/gxr66bevCpiR97N0GwTBhw
- sA1g==
-X-Gm-Message-State: AGi0PuaIcmTfkvWW/44tJ22DXdbS1fzgjfic/aVfwdZDMb8JH23iByHd
- om293DBIblvko0UVnMDklhrXVWR2DVzwBQ==
-X-Google-Smtp-Source: APiQypIEtazXesUL9lDVSSwdTMCz033/TcXIs1/GdFm8DzCC5kpylxxKEcZy95CpAJ75UZMZknglnA==
-X-Received: by 2002:adf:df8d:: with SMTP id z13mr4325479wrl.304.1588257900352; 
- Thu, 30 Apr 2020 07:45:00 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id u3sm4186435wrt.93.2020.04.30.07.44.59
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Apr 2020 07:44:59 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 00/30] target-arm queue
-Date: Thu, 30 Apr 2020 15:44:58 +0100
-Message-Id: <20200430144458.17324-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <berrange@redhat.com>) id 1jUAT9-0008Ex-8c
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:47:20 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48653
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jUAT8-0008ES-Lv
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:47:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588258037;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=wq4//QI0qMmliWJMyWnbmlRpH7+MoNuzMvvMeZ91itY=;
+ b=M8wFaY96HVqT6Qk3QwxmFRvUBqUrb8MVXNDv9DFwLsIzzqvukJiUMV5ebVLcnbrJ8UcRFV
+ AtnS/JtUh9dQ+ruPSkSPBFdy14DdAnGo49S+0HWsC+B+9NQuRaskOCmvESSgB3kZZNCAtu
+ 3KjEDzMkprfzdbQfNWHRrhTmJVU2XCE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-240-rY6jKvHlPgutXiCwqb1a_w-1; Thu, 30 Apr 2020 10:47:15 -0400
+X-MC-Unique: rY6jKvHlPgutXiCwqb1a_w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D3140107ACCD
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 14:47:14 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.44])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 80FD02B4A5;
+ Thu, 30 Apr 2020 14:47:07 +0000 (UTC)
+Date: Thu, 30 Apr 2020 15:47:04 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Vivek Goyal <vgoyal@redhat.com>
+Subject: Re: [PATCH] virtiofsd: Show submounts
+Message-ID: <20200430144704.GG2184629@redhat.com>
+References: <20200424133516.73077-1-mreitz@redhat.com>
+ <20200427175902.GM2923@work-vm> <20200429145720.GA2835@work-vm>
+ <8c73f374-fcc8-1684-b581-84a9ab501aa9@redhat.com>
+ <20200430085812.GC2874@work-vm>
+ <20200430135639.GA260081@redhat.com>
+ <20200430142013.GI2874@work-vm>
+ <20200430143425.GD2184629@redhat.com>
+ <20200430144116.GD260081@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::435;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x435.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::435
+In-Reply-To: <20200430144116.GD260081@redhat.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:04:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,146 +98,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: virtio-fs@redhat.com, Max Reitz <mreitz@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v2:
- * dropped target/arm/cpu: Use ARRAY_SIZE() to iterate over ARMCPUInfo[]
- * renamed CLOCK_SECOND to CLOCK_PERIOD_1SEC
+On Thu, Apr 30, 2020 at 10:41:16AM -0400, Vivek Goyal wrote:
+> On Thu, Apr 30, 2020 at 03:34:25PM +0100, Daniel P. Berrang=C3=A9 wrote:
+> > On Thu, Apr 30, 2020 at 03:20:13PM +0100, Dr. David Alan Gilbert wrote:
+> > > * Vivek Goyal (vgoyal@redhat.com) wrote:
+> > > > On Thu, Apr 30, 2020 at 09:58:12AM +0100, Dr. David Alan Gilbert wr=
+ote:
+> > > > [..]
+> > > > > > > Even without this patch, the SLAVE stuff worked so if you sta=
+rt the
+> > > > > > > daemon and *then* mount under the shared directory, the guest=
+ sees it
+> > > > > > > with or without this patch.
+> > > > > >=20
+> > > > > > Hm, I don=E2=80=99t.  Do you really?
+> > > > >=20
+> > > > > Yes! With your patch reverted:
+> > > > >=20
+> > > > > Start virtiofsd, mount in the guest:
+> > > > >=20
+> > > > > host:
+> > > > > # ./virtiofsd --socket-path=3D/tmp/vhostqemu -o source=3D/home/dg=
+ilbert/virtio-fs/fs  -o log_level=3Dwarn -o no_writeback
+> > > > >=20
+> > > > > guest:
+> > > > > # mount -t virtiofs myfs /sysroot
+> > > > >=20
+> > > > > host:
+> > > > > # findmnt -o +PROPAGATION -N 6100
+> > > > > TARGET SOURCE                                                    =
+          FSTYPE OPTIONS                                                   =
+   PROPAGATION
+> > > > > /      /dev/mapper/fedora_dgilbert--t580-root[/home/dgilbert/virt=
+io-fs/fs] xfs    rw,relatime,seclabel,attr2,inode64,logbufs=3D8,logbsize=3D=
+32k,no private,slave
+> > > > > # mount -t tmpfs /dev/null /home/dgilbert/virtio-fs/fs/tmp
+> > > > > # findmnt -o +PROPAGATION -N 6100
+> > > > > TARGET SOURCE                                                    =
+          FSTYPE OPTIONS                                                   =
+   PROPAGATION
+> > > > > /      /dev/mapper/fedora_dgilbert--t580-root[/home/dgilbert/virt=
+io-fs/fs] xfs    rw,relatime,seclabel,attr2,inode64,logbufs=3D8,logbsize=3D=
+32k,no private,slave
+> > > > > =E2=94=94=E2=94=80/tmp /dev/null                                 =
+                          tmpfs  rw,relatime,seclabel                      =
+                   private,slave
+> > > >=20
+> > > > Why is it showing a mount point at "/tmp". If mount point propagate=
+d, then
+> > > > inside guest we should see a mount point at /sysroot/tmp?
+> > >=20
+> > > That findmnt is on the host.
+> > >=20
+> > > > So there are two things.
+> > > >=20
+> > > > A. Propagation of mount from host to virtiofsd.
+> > > > B. Visibility of that mount inside guest over fuse protocol (submou=
+nt
+> > > >   functionality).
+> > > >=20
+> > > > I think A works for me without any patches. But don't think B is wo=
+rking
+> > > > for me. I don't see the submount inside guest.=20
+> > > >=20
+> > > > > # touch /home/dgilbert/virtio-fs/fs/tmp/hello
+> > > > >=20
+> > > > > guest:
+> > > > > # ls -l /sysroot/tmp
+> > > > > total 0
+> > > > > -rw-r--r-- 1 root root 0 Apr 30 08:50 hello
+> > > >=20
+> > > > Do a "findmnt /sysroot/tmp" inside guest and see what do you see.
+> > > >=20
+> > > > You will be able to see "hello" as long as virtiofsd sees the new
+> > > > mount point, I think. And guest does not have to see that mount poi=
+nt
+> > > > for this simple test to work.
+> > >=20
+> > > Right, the guest just sees:
+> > >=20
+> > > `-/sysroot                            myfs       virtiof rw,relatime
+> >=20
+> > That is a good thing surely ? If I'm exporting "/sysroot" from the host=
+,
+> > I want the content in "/sysroot/some/sub/mount" to be visible to the
+> > guest, but I don't want the guest to see "/sysroot/some/sub/mount"
+> > as an actual mount point. That would be leaking information about the
+> > host storage setup into the guest. The host admin should be free to
+> > re-arrange submounts in the host OS, to bring more storage space online=
+,
+> > and have this be transparent to the guest OS.
+>=20
+> If we don't see mount inside guest, we run into the possibility of inode
+> number collision. On host two files in shared dir can have same inode
+> number (if they are on two different filesystem with different device
+> numbers). But inside guest, we will show device number of virtiofs,
+> and it will look as if two files in this filesystem have same inode
+> number, breaking some workloads.
+>=20
+> By propagating mounts (submounts), we can assign a unique device number
+> to these submounts and hence <dev,inode> number pair will become unique.
+
+Ah, yes, that's true.  In 9pfs there was recent changes precisely
+because of this clash possibility:
+
+commit 1a6ed33cc56997479bbe5b48337ff8da44585bd4
+Author: Antonios Motakis <antonios.motakis@huawei.com>
+Date:   Thu Oct 10 11:36:05 2019 +0200
+
+    9p: Added virtfs option 'multidevs=3Dremap|forbid|warn'
+   =20
+    'warn' (default): Only log an error message (once) on host if more than=
+ one
+    device is shared by same export, except of that just ignore this config
+    error though. This is the default behaviour for not breaking existing
+    installations implying that they really know what they are doing.
+   =20
+    'forbid': Like 'warn', but except of just logging an error this
+    also denies access of guest to additional devices.
+   =20
+    'remap': Allows to share more than one device per export by remapping
+    inodes from host to guest appropriately. To support multiple devices on=
+ the
+    9p share, and avoid qid path collisions we take the device id as input =
+to
+    generate a unique QID path. The lowest 48 bits of the path will be set
+    equal to the file inode, and the top bits will be uniquely assigned bas=
+ed
+    on the top 16 bits of the inode and the device id.
 
 
-The following changes since commit 648db19685b7030aa558a4ddbd3a8e53d8c9a062:
+Perhaps we should try to support the same options in virtio-fs. At least
+the "forbid" and "remap" options make sense I think. "warn" was only
+really there for backcompat.  If we can expose it to the guest, then a
+further "expose" option would be viable.
 
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-misc-2020-04-29' into staging (2020-04-29 15:07:33 +0100)
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
-are available in the Git repository at:
-
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200430-1
-
-for you to fetch changes up to 6f7b6947a6639fff15c6a0956adf0f5ec004b789:
-
-  hw/arm: xlnx-zcu102: Disable unsupported FDT firmware nodes (2020-04-30 15:35:41 +0100)
-
-----------------------------------------------------------------
-target-arm queue:
- * xlnx-zdma: Fix endianness handling of descriptor loading
- * nrf51: Fix last GPIO CNF address
- * gicv3: Use gicr_typer in arm_gicv3_icc_reset
- * msf2: Add EMAC block to SmartFusion2 SoC
- * New clock modelling framework
- * hw/arm: versal: Setup the ADMA with 128bit bus-width
- * Cadence: gem: fix wraparound in 64bit descriptors
- * cadence_gem: clear RX control descriptor
- * target/arm: Vectorize integer comparison vs zero
- * hw/arm/virt: dt: add kaslr-seed property
- * hw/arm: xlnx-zcu102: Disable unsupported FDT firmware nodes
-
-----------------------------------------------------------------
-Cameron Esfahani (1):
-      nrf51: Fix last GPIO CNF address
-
-Damien Hedde (7):
-      hw/core/clock-vmstate: define a vmstate entry for clock state
-      qdev: add clock input&output support to devices.
-      qdev-clock: introduce an init array to ease the device construction
-      hw/misc/zynq_slcr: add clock generation for uarts
-      hw/char/cadence_uart: add clock support
-      hw/arm/xilinx_zynq: connect uart clocks to slcr
-      qdev-monitor: print the device's clock with info qtree
-
-Edgar E. Iglesias (7):
-      dma/xlnx-zdma: Fix descriptor loading (MEM) wrt endianness
-      dma/xlnx-zdma: Fix descriptor loading (REG) wrt endianness
-      hw/arm: versal: Setup the ADMA with 128bit bus-width
-      device_tree: Allow name wildcards in qemu_fdt_node_path()
-      device_tree: Constify compat in qemu_fdt_node_path()
-      hw/arm: xlnx-zcu102: Move arm_boot_info into XlnxZCU102
-      hw/arm: xlnx-zcu102: Disable unsupported FDT firmware nodes
-
-Jerome Forissier (2):
-      hw/arm/virt: dt: move creation of /secure-chosen to create_fdt()
-      hw/arm/virt: dt: add kaslr-seed property
-
-Keqian Zhu (2):
-      bugfix: Use gicr_typer in arm_gicv3_icc_reset
-      Typo: Correct the name of CPU hotplug memory region
-
-Peter Maydell (2):
-      hw/core/clock: introduce clock object
-      docs/clocks: add device's clock documentation
-
-Philippe Mathieu-Daudé (2):
-      target/arm: Restrict the Address Translate write operation to TCG accel
-      target/arm/cpu: Update coding style to make checkpatch.pl happy
-
-Ramon Fried (2):
-      Cadence: gem: fix wraparound in 64bit descriptors
-      net: cadence_gem: clear RX control descriptor
-
-Richard Henderson (1):
-      target/arm: Vectorize integer comparison vs zero
-
-Subbaraya Sundeep (3):
-      hw/net: Add Smartfusion2 emac block
-      msf2: Add EMAC block to SmartFusion2 SoC
-      tests/boot_linux_console: Add ethernet test to SmartFusion2
-
-Thomas Huth (1):
-      target/arm: Make cpu_register() available for other files
-
- hw/core/Makefile.objs                  |   2 +
- hw/net/Makefile.objs                   |   1 +
- tests/Makefile.include                 |   1 +
- include/hw/arm/msf2-soc.h              |   2 +
- include/hw/char/cadence_uart.h         |   1 +
- include/hw/clock.h                     | 225 +++++++++++++
- include/hw/gpio/nrf51_gpio.h           |   2 +-
- include/hw/net/msf2-emac.h             |  53 +++
- include/hw/qdev-clock.h                | 159 +++++++++
- include/hw/qdev-core.h                 |  12 +
- include/sysemu/device_tree.h           |   5 +-
- target/arm/cpu-qom.h                   |   9 +-
- target/arm/helper.h                    |  27 +-
- target/arm/translate.h                 |   5 +
- device_tree.c                          |   4 +-
- hw/acpi/cpu.c                          |   2 +-
- hw/arm/msf2-soc.c                      |  26 +-
- hw/arm/virt.c                          |  20 +-
- hw/arm/xilinx_zynq.c                   |  57 +++-
- hw/arm/xlnx-versal.c                   |   2 +
- hw/arm/xlnx-zcu102.c                   |  39 ++-
- hw/char/cadence_uart.c                 |  73 +++-
- hw/core/clock-vmstate.c                |  25 ++
- hw/core/clock.c                        | 130 ++++++++
- hw/core/qdev-clock.c                   | 185 +++++++++++
- hw/core/qdev.c                         |  12 +
- hw/dma/xlnx-zdma.c                     |  25 +-
- hw/intc/arm_gicv3_kvm.c                |   4 +-
- hw/misc/zynq_slcr.c                    | 172 +++++++++-
- hw/net/cadence_gem.c                   |  16 +-
- hw/net/msf2-emac.c                     | 589 +++++++++++++++++++++++++++++++++
- qdev-monitor.c                         |   9 +
- target/arm/cpu.c                       |  19 +-
- target/arm/cpu64.c                     |   8 +-
- target/arm/helper.c                    |  17 +
- target/arm/neon_helper.c               |  24 --
- target/arm/translate-a64.c             |  64 +---
- target/arm/translate.c                 | 256 ++++++++++++--
- target/arm/vec_helper.c                |  25 ++
- MAINTAINERS                            |   2 +
- docs/devel/clocks.rst                  | 391 ++++++++++++++++++++++
- docs/devel/index.rst                   |   1 +
- hw/char/trace-events                   |   3 +
- hw/core/trace-events                   |   7 +
- tests/acceptance/boot_linux_console.py |  15 +-
- 45 files changed, 2533 insertions(+), 193 deletions(-)
- create mode 100644 include/hw/clock.h
- create mode 100644 include/hw/net/msf2-emac.h
- create mode 100644 include/hw/qdev-clock.h
- create mode 100644 hw/core/clock-vmstate.c
- create mode 100644 hw/core/clock.c
- create mode 100644 hw/core/qdev-clock.c
- create mode 100644 hw/net/msf2-emac.c
- create mode 100644 docs/devel/clocks.rst
 
