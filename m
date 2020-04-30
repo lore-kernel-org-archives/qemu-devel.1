@@ -2,102 +2,86 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91D3BC8300A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 09:32:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C32D0C8300A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 09:41:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BB2B20838
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 09:32:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7782E20838
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 09:41:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h1JBSD8d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BB2B20838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ali/EIo0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7782E20838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU5Yr-0002YS-Hr
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 05:32:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47586)
+	id 1jU5hG-0004f5-GW
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 05:41:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48446)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jU5Wn-0001IN-JB
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 05:31:58 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jU5gM-00048w-RH
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 05:40:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jU5WX-00010p-3r
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 05:30:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56166
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jU5WW-00010W-Ko
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 05:30:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588239027;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=F3fCZktjjq2rMu9TA7upBfpDadKn5I1vKVOUdj2w/Io=;
- b=h1JBSD8dlSQYYnsxmaiwEPFjttGLDMqrcWdOsIbP+ngF7cKhgxrUQHep06FN2x+aH9ShH4
- 4uppaGj75EftWUQMzV39EretbuuUK2iCmeg4AWPIEK7yl0BavWSq1ervqlne/FxvB6lLr6
- erfDcVAMFggXap3mRqA9miAkixgIay8=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-23-YMe9dNEkPNOCKi19KI-vVg-1; Thu, 30 Apr 2020 05:30:25 -0400
-X-MC-Unique: YMe9dNEkPNOCKi19KI-vVg-1
-Received: by mail-wm1-f69.google.com with SMTP id n17so358478wmi.3
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 02:30:24 -0700 (PDT)
+ (envelope-from <peter.maydell@linaro.org>) id 1jU5gL-0003UF-SY
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 05:40:38 -0400
+Received: from mail-oo1-xc42.google.com ([2607:f8b0:4864:20::c42]:33638)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jU5gL-0003N9-Dw
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 05:40:37 -0400
+Received: by mail-oo1-xc42.google.com with SMTP id b17so1139740ooa.0
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 02:40:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Gc9fJgMRaRVWJ8uv/8iHoa5RbPsoflBZLifGxhv3u/0=;
+ b=ali/EIo0mKJzIF8MhEYPoL9oahVDJEEwnKMUMOoUMmelqn+2Ul5j8CTHauKw0OlsNk
+ 6+6R/78T1iEXln2913KDOvB/X2jGKefhX86/4m/vtTQaYX/SbDp9lKxF2GeBUuUlV0ta
+ Bi2pBCJ1NGNieG77hA1+Uq5s1aCwArCdlR3YctbJtYTNvn9AxwOYBN8zvBTzCB6C6K6d
+ 9EOkOMEqZdJRD3XRyN7TCuAymzXiCKVlT3PalrDbKnG108GntogYglsIMt21QqFewrjZ
+ tkldcGZHc0L+oVW0gNztIVXJPTQZj/njEKg7yUOgJCS4wovX8OEZDXcV/ANyKz2amSzl
+ 0cNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=F3fCZktjjq2rMu9TA7upBfpDadKn5I1vKVOUdj2w/Io=;
- b=QtU2RfiufPhyOEGwfNVeI1NYWZsKsrkBBGG6T0kvYkJTNPi26rSalex6egP3MBAMN/
- UZGzzJDigwj5Do0e2G/Qlro0YtraC8L8rZU6Iqz0RqZhfsMXOj1haH7gXao9Rj/4dpT0
- ZACwVsjFShO/mPgrdiiu+tgKgs0QXsJpqiQC3MDO6oWud6ZD25rlfNTcZC7in6G+pFwX
- SwvuuzqjYd2s2HDfPkqpOm4Qo3stEEqO/VJM1FOZq+KAtYzWCZ0kSsntK0SgExf+V5yv
- T/hLbIRDBbIzQB63rM+XLxrEDXVrenhjApAch3JO98gm513F1+FqWNPkJ+g74uSG4t6c
- iy9Q==
-X-Gm-Message-State: AGi0PubfuCGN6CctkytngwcQGaaq9c6hDKJEvaj3wS9iGL6m3SuckX98
- jshooEYMGPhkb/NSLVs+RRsImaHgHyb9CYCQw6hpexLWfXuAvgb7UvcHqYqm9Hn65l+Hoiv2cK9
- StzJ/R3Ri3RkJxmo=
-X-Received: by 2002:a5d:498b:: with SMTP id r11mr2839991wrq.368.1588239023824; 
- Thu, 30 Apr 2020 02:30:23 -0700 (PDT)
-X-Google-Smtp-Source: APiQypL2N9tDEy9dhXg7MPseIQivY/WyNsIAG9915zwR6aWZ4uY5YI7TRwJSH+vgMsx6Rz8YFklzUA==
-X-Received: by 2002:a5d:498b:: with SMTP id r11mr2839969wrq.368.1588239023571; 
- Thu, 30 Apr 2020 02:30:23 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ac19:d1fb:3f5f:d54f?
- ([2001:b07:6468:f312:ac19:d1fb:3f5f:d54f])
- by smtp.gmail.com with ESMTPSA id b2sm3592217wrn.6.2020.04.30.02.30.22
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 30 Apr 2020 02:30:23 -0700 (PDT)
-Subject: Re: [PATCH] replay: implement fair mutex
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>, qemu-devel@nongnu.org
-References: <158823802979.28101.9340462887738957616.stgit@pasha-ThinkPad-X280>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <564674ea-77a8-2ca9-2874-3210c3ea87b2@redhat.com>
-Date: Thu, 30 Apr 2020 11:30:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Gc9fJgMRaRVWJ8uv/8iHoa5RbPsoflBZLifGxhv3u/0=;
+ b=dj/YBvPi5GHJvwe5PhZ34fbhdTDCWkgrurN9JidwHLgGtGB2GnbnAGJJKr7vT6n/w0
+ VAfV3zP984Jnm+Wz/YN/elMwTl377WS8TibSjR071z2ZtV5kzcNySMpy3YCWCv6NW2DI
+ i76HMz5zo7qDDqpAmZgF2Q3wny3bo9u8KQ1wzAD/tw/J+ujHhQNruK42zVbv2T1md8s4
+ WiJZ04Ia/oe+mSV6I2hogp7ivH5xmjXalq+oPBlhmzyBOCtawMvV4zpO8tzG2NeXEEzi
+ 6FJo8UxWHbfDuv4s1DiwELK4DBVrw2HBJLd/9KE9HUBYenwOXu1zWBMNbRJtg01mED1q
+ PoqA==
+X-Gm-Message-State: AGi0Pua+dLR/2eg33P2H/5IecrzXPLCUHg6TevyfD+JfUc0PwxPVa2IP
+ GIKS9uzuVrOXYJC9Qm2/KGWjt+biSKytXrQLO+T+Mg==
+X-Google-Smtp-Source: APiQypKkbxcPL1BlT0m+QqbOH3pnRAP9GInjhWfgYmIrQaYE3/s0HeCs8ZgeLFJRGWBPvOsbgVW4p8z28tY3T8z2zQA=
+X-Received: by 2002:a4a:3113:: with SMTP id k19mr2061292ooa.20.1588239636086; 
+ Thu, 30 Apr 2020 02:40:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <158823802979.28101.9340462887738957616.stgit@pasha-ThinkPad-X280>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 23:34:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20200430080744.31232-1-yan.y.zhao@intel.com>
+ <20200430080946.31286-1-yan.y.zhao@intel.com>
+In-Reply-To: <20200430080946.31286-1-yan.y.zhao@intel.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 30 Apr 2020 10:40:25 +0100
+Message-ID: <CAFEAcA-8NH_4ZV0J9urBZdQWmqOe-Nyy4y2gLAjTJ08MpfFY0g@mail.gmail.com>
+Subject: Re: [PATCH v6 1/3] memory: drop guest writes to read-only ram device
+ regions
+To: Yan Zhao <yan.y.zhao@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c42;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc42.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::c42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,86 +93,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: dovgaluk@ispras.ru, pavel.dovgaluk@ispras.ru
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>, xin.zeng@intel.com,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 30/04/20 11:13, Pavel Dovgalyuk wrote:
-> In record/replay icount mode main loop thread and vCPU thread
-> do not perform simultaneously. They take replay mutex to synchronize
-> the actions. Sometimes vCPU thread waits for locking the mutex for
-> very long time, because main loop releases the mutex and takes it
-> back again. Standard qemu mutex do not provide the ordering
-> capabilities.
-> 
-> This patch adds a "queue" for replay mutex. Therefore thread ordering
-> becomes more "fair". Threads are executed in the same order as
-> they are trying to take the mutex.
-> 
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+On Thu, 30 Apr 2020 at 09:20, Yan Zhao <yan.y.zhao@intel.com> wrote:
+>
+> for ram device regions, drop guest writes if the region is read-only.
+>
+> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> Signed-off-by: Xin Zeng <xin.zeng@intel.com>
 > ---
->  replay/replay-internal.c |   15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
-> 
-> diff --git a/replay/replay-internal.c b/replay/replay-internal.c
-> index eba8246aae..2e8a3e947a 100644
-> --- a/replay/replay-internal.c
-> +++ b/replay/replay-internal.c
-> @@ -22,6 +22,9 @@
->     It also protects replay events queue which stores events to be
->     written or read to the log. */
->  static QemuMutex lock;
-> +/* Condition and queue for fair ordering of mutex lock requests. */
-> +static QemuCond mutex_cond;
-> +static unsigned long mutex_head, mutex_tail;
->  
->  /* File for replay writing */
->  static bool write_error;
-> @@ -197,9 +200,10 @@ static __thread bool replay_locked;
->  void replay_mutex_init(void)
->  {
->      qemu_mutex_init(&lock);
-> +    qemu_cond_init(&mutex_cond);
->      /* Hold the mutex while we start-up */
-> -    qemu_mutex_lock(&lock);
->      replay_locked = true;
-> +    ++mutex_tail;
+>  memory.c | 15 ++++++++++++---
+>  1 file changed, 12 insertions(+), 3 deletions(-)
+>
+> diff --git a/memory.c b/memory.c
+> index 601b749906..a1bba985b9 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -34,6 +34,7 @@
+>  #include "sysemu/accel.h"
+>  #include "hw/boards.h"
+>  #include "migration/vmstate.h"
+> +#include "qemu/log.h"
+>
+>  //#define DEBUG_UNASSIGNED
+>
+> @@ -1307,12 +1308,19 @@ static uint64_t memory_region_ram_device_read(voi=
+d *opaque,
+>      return data;
 >  }
->  
->  bool replay_mutex_locked(void)
-> @@ -211,10 +215,16 @@ bool replay_mutex_locked(void)
->  void replay_mutex_lock(void)
+>
+> -static void memory_region_ram_device_write(void *opaque, hwaddr addr,
+> -                                           uint64_t data, unsigned size)
+> +static MemTxResult memory_region_ram_device_write(void *opaque, hwaddr a=
+ddr,
+> +                                                  uint64_t data, unsigne=
+d size,
+> +                                                  MemTxAttrs attrs)
 >  {
->      if (replay_mode != REPLAY_MODE_NONE) {
-> +        unsigned long id;
->          g_assert(!qemu_mutex_iothread_locked());
->          g_assert(!replay_mutex_locked());
->          qemu_mutex_lock(&lock);
-> +        id = mutex_tail++;
-> +        while (id != mutex_head) {
-> +            qemu_cond_wait(&mutex_cond, &lock);
-> +        }
->          replay_locked = true;
-> +        qemu_mutex_unlock(&lock);
->      }
->  }
->  
-> @@ -222,7 +232,10 @@ void replay_mutex_unlock(void)
->  {
->      if (replay_mode != REPLAY_MODE_NONE) {
->          g_assert(replay_mutex_locked());
-> +        qemu_mutex_lock(&lock);
-> +        ++mutex_head;
->          replay_locked = false;
-> +        qemu_cond_broadcast(&mutex_cond);
->          qemu_mutex_unlock(&lock);
->      }
->  }
-> 
+>      MemoryRegion *mr =3D opaque;
+>
+>      trace_memory_region_ram_device_write(get_cpu_index(), mr, addr, data=
+, size);
+> +    if (mr->readonly) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "Invalid write to read-only ram device region addr=
+ 0x%"
+> +                      HWADDR_PRIx" size %u\n", addr, size);
+> +        return MEMTX_ERROR;
+> +    }
 
-Queued, thanks.
+This does not "drop" a write to a r/o region -- it causes it to generate
+whatever the guest architecture's equivalent of a bus error is (eg data
+abort on Arm).
 
-Paolo
+More generally, this change seems a bit odd: currently we do not
+check the mr->readonly flag here, but in general guests don't get
+to write to ROM areas. Where is that check currently done, and
+should the vfio case you're trying to fix do its check in whatever
+the equivalent of that place is? Alternatively, if we want to make
+memory_region_ram_device_write() do the check, does that mean we
+now have unnecessary checks elsewhere.
 
+My guess is that memory_region_ram_device_write() isn't the
+right place to check for read-only-ness, because it only applies
+to RAM-backed MRs, not to any other kind of MR which might equally
+be readonly.
+
+thanks
+-- PMM
 
