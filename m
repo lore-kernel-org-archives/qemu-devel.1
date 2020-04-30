@@ -2,83 +2,85 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8E3AC8300A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 08:39:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B77E1C8300A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 08:53:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8956E20838
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 08:39:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8383820787
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 08:53:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RrXJZi6c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8956E20838
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RUau32fo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8383820787
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU4jO-0008QH-Pn
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 04:39:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42360)
+	id 1jU4wK-0005NT-M9
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 04:53:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43910)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1jU4hL-0007ai-TZ
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 04:39:04 -0400
+ (envelope-from <berrange@redhat.com>) id 1jU4vh-0004ph-JA
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 04:52:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1jU4fh-0001qu-Rm
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 04:37:35 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60913
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <berrange@redhat.com>) id 1jU4vg-0002il-M2
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 04:52:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30186
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jU4fh-0001qh-CO
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 04:35:53 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jU4vg-0002ib-9A
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 04:52:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588235751;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1588236743;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=w1K8EJQLnnMbCMYinyZFYkcTDxf+nNkahZ+YlemEzAw=;
- b=RrXJZi6c4qkyRbup8R/xuuOzy6X+XN1lCCBZczBVFcK2LjkLNeTDqEwGQ1eDL86vvuFGrB
- qMyH2DXYR5Hid2btCLD8IUgWG9mVjM1Ze2QTanA8LLDTYgaIEud5dRWVk56R0GzEjqEHhn
- 9qg/aAwZCo/pdT/QJL1xXyLeUbOjb5Y=
+ bh=Qk6r9Y/aagQuOGqM+LEtEGsMmjoTQjxQPAS9SsvqYAE=;
+ b=RUau32fo4bGg35cyryyViZQ3McIk9KHxiibD9CLV3og8F5JGw9cnPQ4MokR3T8w5Hd/n5q
+ I1B6fjVgo6mKgTJB/IuV57sx6SGyUdfv4MK9I8z06ZpW7kkiQC5WKHaTdFI2Ed37CGXa7J
+ kC3UM46faobOFVeWx1i9poLQVDx1MF0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-172-fPxB_E2iPCaRiy5Dto5TSg-1; Thu, 30 Apr 2020 04:35:49 -0400
-X-MC-Unique: fPxB_E2iPCaRiy5Dto5TSg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-161-KJ73o3E3MXiWUtkAiG8d_Q-1; Thu, 30 Apr 2020 04:52:21 -0400
+X-MC-Unique: KJ73o3E3MXiWUtkAiG8d_Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 331DD800D24;
- Thu, 30 Apr 2020 08:35:48 +0000 (UTC)
-Received: from localhost (ovpn-114-71.ams2.redhat.com [10.36.114.71])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DD09E66083;
- Thu, 30 Apr 2020 08:35:44 +0000 (UTC)
-Date: Thu, 30 Apr 2020 09:35:43 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Catherine Ho <catherine.hecx@gmail.com>
-Subject: Re: [PATCH v2] virtiofsd/passthrough_ll: don't remove O_DIRECT when
- cache=none
-Message-ID: <20200430083543.GB160930@stefanha-x1.localdomain>
-References: <1586585997-24446-1-git-send-email-catherine.hecx@gmail.com>
- <1586594144-24605-1-git-send-email-catherine.hecx@gmail.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28DA01054F9F;
+ Thu, 30 Apr 2020 08:52:20 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.44])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1BD2C5C1BE;
+ Thu, 30 Apr 2020 08:52:18 +0000 (UTC)
+Date: Thu, 30 Apr 2020 09:52:15 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Manuel Hohmann <mhohmann@physnet.uni-hamburg.de>
+Subject: Re: Error "cannot bind memory to host NUMA nodes: Operation not
+ permitted" running inside docker
+Message-ID: <20200430085215.GD2084570@redhat.com>
+References: <76d8eb61-e89e-0465-974b-6901a5fb848e@physnet.uni-hamburg.de>
 MIME-Version: 1.0
-In-Reply-To: <1586594144-24605-1-git-send-email-catherine.hecx@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <76d8eb61-e89e-0465-974b-6901a5fb848e@physnet.uni-hamburg.de>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="p4qYPpj5QlsIQJ0K"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:04:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 23:34:52
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,74 +92,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- qemu-devel@nongnu.org
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: imammedo@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---p4qYPpj5QlsIQJ0K
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Wed, Apr 29, 2020 at 11:40:32PM +0300, Manuel Hohmann wrote:
+> Hi,
+>=20
+> I encountered the following error message on the QEMU 5.0.0 release, comp=
+iled and run inside a docker image:
+>=20
+> "cannot bind memory to host NUMA nodes: Operation not permitted"
 
-On Sat, Apr 11, 2020 at 04:35:44AM -0400, Catherine Ho wrote:
-> @@ -1702,10 +1703,11 @@ static void update_open_flags(int writeback, stru=
-ct fuse_file_info *fi)
-> =20
->      /*
->       * O_DIRECT in guest should not necessarily mean bypassing page
-> -     * cache on host as well. If somebody needs that behavior, it
-> -     * probably should be a configuration knob in daemon.
-> +     * cache on host as well. If cache=3Dnone, keep the flag unchanged
->       */
-> -    fi->flags &=3D ~O_DIRECT;
-> +    if (cache_mode !=3D CACHE_NONE) {
-> +        fi->flags &=3D ~O_DIRECT;
-> +    }
->  }
-> =20
+The error is reporting that mbind() failed.
 
-Thanks for the patch!  I have CCed the virtio-fs mailing list so more
-people see it.
+mbind() man page says it gives EPERM when
 
-Please add a new command-line option to control O_DIRECT behavior.
+  "The  flags argument included the MPOL_MF_MOVE_ALL flag and
+   the caller does not have the CAP_SYS_NICE privilege."
 
-There are two cases:
+QEMU always uses the MPOL_MF_MOVE flag though.
 
-1. O_DIRECT bypasses the guest page cache but not the host page cache.
-   This makes sense when the DAX feature is enabled.
+Looking at the kernel source,  mbind can also return EPERM if the
+process is not permitted to access the requested nodes which seems
+more plausible as a cause.
 
-2. O_DIRECT bypasses both the guest and host page cache.  This make
-   sense for non-DAX and for I/O performance benchmarking.
+I guess the container the bound to some sub-set of nodes and QEMU is
+trying to place the VM on different nodes that the container isn't
+allowed to accesss.
 
-Today only #1 is supported.
+>=20
+> The QEMU command line to reproduce this behavior (it happens also on -x86=
+_64, -arm, -aarch64 with similar command line):
+>=20
+> qemu-system-i386 -m 64 -M pc -smp 1 -display none -monitor stdio -drive f=
+ile=3Dmp-acpi/NOS.iso,media=3Dcdrom,id=3Dd -boot order=3Dd -d cpu_reset
 
-Your patch makes the behavior dependent on the cache mode option, but
-the cache mode doesn't necessarily determine how O_DIRECT should be
-handled.  For example, in the DAX case the guest page cache is bypassed
-and cache=3Dnone can be used, but we do want to use the host page cache.
+There is no reference to host mem backend or NUMA binding, so I'm
+puzzled why QEMU would be doing an mbind() at all. That seems bad.
 
-You can add a new option so that O_DIRECT handling is configurable for
-all cases.
 
-Stefan
-
---p4qYPpj5QlsIQJ0K
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6qjd8ACgkQnKSrs4Gr
-c8i7Nwf+MMH9Ye5CS+QppXcXKW3UqQpB3DUj2lrsJk0j2qZ31AVSnEXw2MSrXwvr
-6ApcGNGTQS6g5t8plZFruCbKnQvS19xsbW7J4uHGviTLqQ4X0L+vks/Z9meGmBPr
-3C1FZRdIy68dXhxrK8xeqNxqIPoK8N8aB6fQjMoiue/wXnoNl9euLvnDBrV0pjs0
-DdS6O0mc6A3ZlNeUBExtbzrxwwdti6NxUa4FdIZFZVHthKVpUP8XFGUbqlFjNkwl
-eZeK7kZWycQWjm5TIbDNchyegs1mxtQayQF38gpIkMOxTlJQFdmRknnGVCgPJ6qz
-I3s8kGoGy7kWrE/YPKYlnp2jkw+5Wg==
-=h2l4
------END PGP SIGNATURE-----
-
---p4qYPpj5QlsIQJ0K--
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
