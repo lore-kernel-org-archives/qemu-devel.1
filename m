@@ -2,90 +2,82 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C70BFC4724C
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:29:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63083C47247
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:32:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90B802082E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:29:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C6EA2070B
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:32:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S7Qa15wI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90B802082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YbM8lpTl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C6EA2070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUC4L-0002xT-MC
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 12:29:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48614)
+	id 1jUC72-0006Jl-7c
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 12:32:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48736)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jUC05-0004yX-MG
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:26:00 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jUC0n-00060T-07
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:26:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jUBzX-0002Nd-7H
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:25:25 -0400
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:34862)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jUBzW-0002NE-Qa; Thu, 30 Apr 2020 12:24:50 -0400
-Received: by mail-lf1-x143.google.com with SMTP id b20so1461331lff.2;
- Thu, 30 Apr 2020 09:24:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=wvXL5mLVIBBifFNgTFevsT1UgUPVMwQaWjtBSTMHn+U=;
- b=S7Qa15wIOG6p7A3F6cUy+ruXNFvVZ5qCti526dN2ejbSDtFukUD6pZ6dwbgw+L0AjV
- 2YxtrN152sf4KsiTjRPWoqEWInMDtconAF/MApr3R7e56Au9sbsyrP5PQTmBuHK72Pr/
- Tt6Z8sg+a8X8FYHqNSqvN02UbrjGcRtoGvIqwBeepkQySn4ZkXK1S95AAH3N4zd3g+3U
- LwxqUf/XRX7jIIeNlGPE7o7Zu8bCO9T2tP/pbQdblJOX8MTnWujOe5Mxox6HdpVmQopL
- d+YAhLyn1Bzuu95CpD5TsnGDdp0KQhlqQ8zjAYchzb3jEslC51vEwub5LqOf7sH++eMC
- lsnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=wvXL5mLVIBBifFNgTFevsT1UgUPVMwQaWjtBSTMHn+U=;
- b=Rmo7xBf27cO7pGIujiMlWZyfJhLHNMENG5LFVp1dubowid0FYiyDpu+Qt86soGc1pC
- mhSTWL9bUihqDemwpXL4O+hqQJH1SQ9EdMNBWypg51KKMblXWAPGuYe0oM4+4qB/kqvk
- 83KNaZt3hJGBLJ4QfkZ9zxHIVdSy7uC15Rfy2ebQwCV2nmcFEV5Dr1Gjs3le9jVc+oll
- m95LyOYajsq1qm03lG69rDYGG7EexwZGpLWbFq4FNPqKAp+CMzZATcC52WbNZA3toUFt
- RFPsLZHP1nglnJja3v5wY9k+vAUw3EoGXr5jMy/6Y0Zznaf8tZU/fyeqtix54a0RyVN8
- iLiQ==
-X-Gm-Message-State: AGi0PuZhZCzcO85ry+PRbVZ0+BmHetddqsQF/8smwOnrM00MkCekt79P
- 0mjYewJAD9pMoolw5+spd4jprmY5G68=
-X-Google-Smtp-Source: APiQypJIQ3c/UNyxN5APBrdErRYW0QsLWtz6KdMaA4b3da4UewBgvJStEt1cZUa8UdEyuKzb64EZ9g==
-X-Received: by 2002:a05:6512:695:: with SMTP id
- t21mr2758984lfe.158.1588263888678; 
- Thu, 30 Apr 2020 09:24:48 -0700 (PDT)
-Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id 4sm142773ljf.79.2020.04.30.09.24.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Apr 2020 09:24:48 -0700 (PDT)
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v1 6/9] hw/net/xilinx_axienet: Handle fragmented packets from
- DMA
-Date: Thu, 30 Apr 2020 18:24:36 +0200
-Message-Id: <20200430162439.2659-7-edgar.iglesias@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200430162439.2659-1-edgar.iglesias@gmail.com>
-References: <20200430162439.2659-1-edgar.iglesias@gmail.com>
+ (envelope-from <imammedo@redhat.com>) id 1jUC0O-0003uD-SB
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:26:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52584
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jUC0O-0003tp-AR
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:25:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588263942;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=V82U2sYGinmEIVY+2iCP4flRXqmo7UGXvPo7A9OlMS4=;
+ b=YbM8lpTlvYdHS95c4WiTxp0PXOlZGLhEFYDjcdgAqgDsCF9RQc3c5Zbo5s/DTDrfTsnTUA
+ dyATpaCaXtYdfAdcqhYwepI2FURQ42wzPcwRZ06Z84U365fB/SbWrmW4WThk2pls7g8P2D
+ zZS5qhc4rvUSDKFNMJ2oC34gFAQ1FQk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-482-wJjc0NMCP0GpOfr1FAo0nA-1; Thu, 30 Apr 2020 12:25:40 -0400
+X-MC-Unique: wJjc0NMCP0GpOfr1FAo0nA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EEB99872FE0;
+ Thu, 30 Apr 2020 16:25:39 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.71])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DBA1310013BD;
+ Thu, 30 Apr 2020 16:25:26 +0000 (UTC)
+Date: Thu, 30 Apr 2020 18:25:24 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH v3 10/15] acpi: parallel: don't use _STA method
+Message-ID: <20200430182524.5e6fd311@redhat.com>
+In-Reply-To: <20200429140003.7336-11-kraxel@redhat.com>
+References: <20200429140003.7336-1-kraxel@redhat.com>
+ <20200429140003.7336-11-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::143;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lf1-x143.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::143
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:24:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,113 +89,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: damien.hedde@greensocs.com, peter.maydell@linaro.org,
- sstabellini@kernel.org, edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
- frasse.iglesias@gmail.com, jasowang@redhat.com, alistair@alistair23.me,
- frederic.konrad@adacore.com, qemu-arm@nongnu.org, philmd@redhat.com,
- luc.michel@greensocs.com, figlesia@xilinx.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+On Wed, 29 Apr 2020 15:59:58 +0200
+Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-Add support for fragmented packets from the DMA.
+> The _STA method dates back to the days where we had a static DSDT.  The
+> device is listed in the DSDT table unconditionally and the _STA method
+> checks a bit in the isa bridge pci config space to figure whenever a
+> given is isa device is present or not, then evaluates to 0x0f (present)
+> or 0x00 (absent).
+> 
+> These days the DSDT is generated by qemu anyway, so if a device is not
+> present we can simply drop it from the DSDT instead.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
----
- hw/net/xilinx_axienet.c | 31 ++++++++++++++++++++++++-------
- 1 file changed, 24 insertions(+), 7 deletions(-)
+looking more at it, we should also cleanup no longer used LPEN field
+the same applies to similar fields for serial and ... 
 
-diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
-index bd48305577..e3826cf3fc 100644
---- a/hw/net/xilinx_axienet.c
-+++ b/hw/net/xilinx_axienet.c
-@@ -402,6 +402,9 @@ struct XilinxAXIEnet {
- 
-     uint32_t hdr[CONTROL_PAYLOAD_WORDS];
- 
-+    uint8_t *txmem;
-+    uint32_t txpos;
-+
-     uint8_t *rxmem;
-     uint32_t rxsize;
-     uint32_t rxpos;
-@@ -421,6 +424,7 @@ static void axienet_rx_reset(XilinxAXIEnet *s)
- static void axienet_tx_reset(XilinxAXIEnet *s)
- {
-     s->tc = TC_JUM | TC_TX | TC_VLAN;
-+    s->txpos = 0;
- }
- 
- static inline int axienet_rx_resetting(XilinxAXIEnet *s)
-@@ -902,17 +906,28 @@ xilinx_axienet_data_stream_push(StreamSlave *obj, uint8_t *buf, size_t size,
-     XilinxAXIEnetStreamSlave *ds = XILINX_AXI_ENET_DATA_STREAM(obj);
-     XilinxAXIEnet *s = ds->enet;
- 
--    /* We don't support fragmented packets yet.  */
--    assert(eop);
--
-     /* TX enable ?  */
-     if (!(s->tc & TC_TX)) {
-         return size;
-     }
- 
-+    if (s->txpos == 0 && eop) {
-+        /* Fast path single fragment.  */
-+        s->txpos = size;
-+    } else {
-+        memcpy(s->txmem + s->txpos, buf, size);
-+        buf = s->txmem;
-+        s->txpos += size;
-+
-+        if (!eop) {
-+            return size;
-+        }
-+    }
-+
-     /* Jumbo or vlan sizes ?  */
-     if (!(s->tc & TC_JUM)) {
--        if (size > 1518 && size <= 1522 && !(s->tc & TC_VLAN)) {
-+        if (s->txpos > 1518 && s->txpos <= 1522 && !(s->tc & TC_VLAN)) {
-+            s->txpos = 0;
-             return size;
-         }
-     }
-@@ -923,7 +938,7 @@ xilinx_axienet_data_stream_push(StreamSlave *obj, uint8_t *buf, size_t size,
-         uint32_t tmp_csum;
-         uint16_t csum;
- 
--        tmp_csum = net_checksum_add(size - start_off,
-+        tmp_csum = net_checksum_add(s->txpos - start_off,
-                                     buf + start_off);
-         /* Accumulate the seed.  */
-         tmp_csum += s->hdr[2] & 0xffff;
-@@ -936,12 +951,13 @@ xilinx_axienet_data_stream_push(StreamSlave *obj, uint8_t *buf, size_t size,
-         buf[write_off + 1] = csum & 0xff;
-     }
- 
--    qemu_send_packet(qemu_get_queue(s->nic), buf, size);
-+    qemu_send_packet(qemu_get_queue(s->nic), buf, s->txpos);
- 
--    s->stats.tx_bytes += size;
-+    s->stats.tx_bytes += s->txpos;
-     s->regs[R_IS] |= IS_TX_COMPLETE;
-     enet_update_irq(s);
- 
-+    s->txpos = 0;
-     return size;
- }
- 
-@@ -989,6 +1005,7 @@ static void xilinx_enet_realize(DeviceState *dev, Error **errp)
-     s->TEMAC.parent = s;
- 
-     s->rxmem = g_malloc(s->c_rxmem);
-+    s->txmem = g_malloc(s->c_txmem);
-     return;
- 
- xilinx_enet_realize_fail:
--- 
-2.20.1
+
+> ---
+>  hw/i386/acpi-build.c | 29 ++++++++---------------------
+>  1 file changed, 8 insertions(+), 21 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index fea83352e6ab..e01afbd011d9 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -1167,39 +1167,26 @@ static Aml *build_mouse_device_aml(void)
+>      return dev;
+>  }
+>  
+> -static Aml *build_lpt_device_aml(void)
+> +static void build_lpt_device_aml(Aml *scope)
+>  {
+>      Aml *dev;
+>      Aml *crs;
+> -    Aml *method;
+> -    Aml *if_ctx;
+> -    Aml *else_ctx;
+> -    Aml *zero = aml_int(0);
+> -    Aml *is_present = aml_local(0);
+> +
+> +    if (!memory_region_present(get_system_io(), 0x0378)) {
+> +        return;
+> +    }
+>  
+>      dev = aml_device("LPT");
+>      aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0400")));
+>  
+> -    method = aml_method("_STA", 0, AML_NOTSERIALIZED);
+> -    aml_append(method, aml_store(aml_name("LPEN"), is_present));
+> -    if_ctx = aml_if(aml_equal(is_present, zero));
+> -    {
+> -        aml_append(if_ctx, aml_return(aml_int(0x00)));
+> -    }
+> -    aml_append(method, if_ctx);
+> -    else_ctx = aml_else();
+> -    {
+> -        aml_append(else_ctx, aml_return(aml_int(0x0f)));
+> -    }
+> -    aml_append(method, else_ctx);
+> -    aml_append(dev, method);
+> +    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
+>  
+>      crs = aml_resource_template();
+>      aml_append(crs, aml_io(AML_DECODE16, 0x0378, 0x0378, 0x08, 0x08));
+>      aml_append(crs, aml_irq_no_flags(7));
+>      aml_append(dev, aml_name_decl("_CRS", crs));
+>  
+> -    return dev;
+> +    aml_append(scope, dev);
+>  }
+>  
+>  static void build_isa_devices_aml(Aml *table)
+> @@ -1215,7 +1202,7 @@ static void build_isa_devices_aml(Aml *table)
+>      if (fdc) {
+>          aml_append(scope, build_fdc_device_aml(fdc));
+>      }
+> -    aml_append(scope, build_lpt_device_aml());
+> +    build_lpt_device_aml(scope);
+>  
+>      if (ambiguous) {
+>          error_report("Multiple ISA busses, unable to define IPMI ACPI data");
 
 
