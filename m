@@ -2,90 +2,121 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB393C4724C
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 18:40:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04402C4724C
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 18:40:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B39C82070B
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 18:40:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B29252070B
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 18:40:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Yx7J/pNY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B39C82070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="IVGg+x7O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B29252070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUE6f-0007b3-QR
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 14:40:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36520)
+	id 1jUE6s-0007xy-SH
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 14:40:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37716)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jUDej-0002yn-EV
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 14:12:02 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jUDoI-0000QG-Bo
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 14:21:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jUDe9-0001ZM-O1
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 14:11:29 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:46981)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jUDe9-0001V5-8r
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 14:10:53 -0400
-Received: by mail-wr1-x442.google.com with SMTP id f13so8126881wrm.13
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 11:10:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=nI78GZPyk+B5QIwTZamednLfdRTLzLuYILS3epMYRRg=;
- b=Yx7J/pNYYw5oB3lhfRlCkKjj2GX1FzQd+hwsKmxk5lOu0ISbVsI1bJa17rDO/Xtgnv
- xdcCDiFJexrB9DghMiGbMirwAjyoUp064glXlZPvIwxRrOs9OrIgx0js9KdbhEFExeyK
- v8b8C+KFrQF5oVisW6LfqIxI+sUEEVagDjFoh46Q0+PrAyU6PNIth+SwzbO1NejJMOdx
- Em/EmJa/LzTCg0xPwAST7qDVATHfmALNT+Li8Ekg0sBajUAHfL9702GBWQMrMo5KoXue
- YWkwpioZa8w3sDJa6RB7rktjjiArFi2Q8RA8cQCsPBOtIEhGA86B1salq93UqZKa0Rz2
- CDZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=nI78GZPyk+B5QIwTZamednLfdRTLzLuYILS3epMYRRg=;
- b=Sbfg9Jt5MHZhffqazKln8XD+6AYUI+UB27vqaA7ytL7E7CbAlQTG/2z8r/s3NoDWE1
- b3zcLWOPrfQ7k0dfBJerU50cz2OuhoSnwqeguOqK+guhy9PjGHd3swMBmX30etHyfcCB
- 69wMT8O9DkvvM9htfG8LUpxqw/vWeQY3EjOLigpy8nh+6OR3zw/WhaoLi8FnKtTb58Nq
- DrMDRViTxLukPOn4YJeGCfzszQA3RDNT+SB9Lk4TPJz9Dx2ildEoxSt1C2hoa412X646
- bLTTpJrdTghmS5Dfr8Zdy4yq77IZ0oSuW09oFbITSNhg3KbhG5SvoY/4IcI+cg+K4DdE
- KfUA==
-X-Gm-Message-State: AGi0PubE5RyJNoMxzEVCKd89ddLglRYl2LKpR5dMC5tBnsk9AIPUScjc
- /IrVWHsv9rXgEUULfpICCyTb1A==
-X-Google-Smtp-Source: APiQypKFZJSWRHk4s9BPFOuG8wcCw9dthG9oqSAoraIiphnULXnvPEOfX4h/+6fr/2bHn8c0C/T6vQ==
-X-Received: by 2002:adf:a309:: with SMTP id c9mr4973668wrb.97.1588270251823;
- Thu, 30 Apr 2020 11:10:51 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id t8sm652421wrq.88.2020.04.30.11.10.50
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Apr 2020 11:10:51 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH 36/36] target/arm: Convert NEON VFMA,
- VFMS 3-reg-same insns to decodetree
-Date: Thu, 30 Apr 2020 19:10:03 +0100
-Message-Id: <20200430181003.21682-37-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200430181003.21682-1-peter.maydell@linaro.org>
-References: <20200430181003.21682-1-peter.maydell@linaro.org>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jUDoG-0002ZE-PQ
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 14:21:21 -0400
+Received: from mail-db8eur05on2101.outbound.protection.outlook.com
+ ([40.107.20.101]:3488 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jUDoF-0002Z5-Uq; Thu, 30 Apr 2020 14:21:20 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VGqi0AAMaz5uCSymzWtbPonEZTtxiXSKj7ZdfFwKUIPKC31qUC+lGYTweTpeW2seufdon1Omw+B+D7bCohqxMD5zVDgxw4+roBcdUSlXEpASa/nGkmP9qVS4vQx1WGAeJbmQ9JbWtwC7b/UMfXrQugjzUOq3hGHp8zNWlDlawZvMDph1ykg+jFkWb93Mhluh2UdbcI3D/1Aevg+Q/Pfl21pgifUJ7MWros8+FjAhZyEN8/oQKmrOU6fVOAoSD5LnvPPrDCseMVwvG6+eGsmfYgj2S5iLWat4HRnSZPQarwDVQtutRfzXzboP0LELQP8vUYMwyXUEs41FO+z/8R7upA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hlN3E3PkxKTW+Hk17hVtrJC7MFt/C+39dNW+7DH28bM=;
+ b=MKdx1VdrOIjY4HnN0RPmDtp72Izsv8TVJ32WtUQed5Kuk5wNjI3jnD7VoF5f5NxpquNzLblF3DhrRxb7Vx07wKvE0hMZqf40Y44r65oKR4Xe7Eu7YWc4UK9RHyuEjPXpyAzsWBcuDBOHXMX64o98kRqC6FDg0eOWdPkFIS25kgSgepjlff024tNfhs+gxCncPf7o39esNhnLRhvkUryexelv+PwnZZY9VmaqgYlDRzBH3hItfCCwUheTkBFXh2l/6pHUWSdJlB3bTtWmdeeg5QZqoSX6AV90oKAxi7ggDS6JGV0/rVZGt15vLEc+6NCcZqwnywFUTryGpS+TTeROGQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hlN3E3PkxKTW+Hk17hVtrJC7MFt/C+39dNW+7DH28bM=;
+ b=IVGg+x7Oabs8tyRdYTzKEYdZ8H5yKkhGEHo75qtAZUXYiR6hYQivSFE17xjXsvIrrwjKPn514F0wWhxFidQGlbFDB9jegZqKnH5eQMhM5nVcyflFiILLqKyMl6fmcr1wGhYQoTtXEzsnOFE+KUR9JpTkVLIdCsrzLRF1iP6W+14=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5509.eurprd08.prod.outlook.com (2603:10a6:20b:10c::7)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.20; Thu, 30 Apr
+ 2020 18:21:16 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2958.020; Thu, 30 Apr 2020
+ 18:21:16 +0000
+Subject: Re: [PATCH v2 3/4] backup: Make sure that source and target size match
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200430142755.315494-1-kwolf@redhat.com>
+ <20200430142755.315494-4-kwolf@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200430212112906
+Message-ID: <d5de1915-523b-fbdb-2ebe-8c31cf0e0cdf@virtuozzo.com>
+Date: Thu, 30 Apr 2020 21:21:12 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <20200430142755.315494-4-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM4PR0202CA0006.eurprd02.prod.outlook.com
+ (2603:10a6:200:89::16) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::442
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.138) by
+ AM4PR0202CA0006.eurprd02.prod.outlook.com (2603:10a6:200:89::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.19 via Frontend
+ Transport; Thu, 30 Apr 2020 18:21:15 +0000
+X-Tagtoolbar-Keys: D20200430212112906
+X-Originating-IP: [185.215.60.138]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 80704c28-dcef-451a-87ee-08d7ed33456c
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5509:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB550956594F594EA09C6C2B16C1AA0@AM7PR08MB5509.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 0389EDA07F
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: R/rifIY1s1WpkjHT23ZCPqTleO0yyKnvf7bHb+5tlgqo2rmHrOAWxoCg9mU0nfW5W3Miyb/x97qc/qrzHOcutEkgCpfdWG30u8JToFLev9vNo5/dptTNFRpbe0p/Gd+ePi//Gg2L/nDrbm8mTUsl6CxSOkXjQFQmOachf3Z+P37R7lsjQoScRV5t4sKIqIU2Ku6+O/qfbLJmLyIcMitialtFBlanEyst8xZJkVHkZlr4xNyqpM3OGLbxPjVAAmn+ERfzyG1k9ixuaobxs6548iqyXth4h1LxN84c8g0kogqYpugzo5sMnyZi5CfUZl62xwhZBNICjSW0cr3YOugabJL/wtSJ/nao8vM/tpmTOH2kiGT/8CIr0NU5hQ57r4m+taUtYsFdeZodNYXTW90N+MEzWVkKLiN+05OE+ThcqKHtZRI2Tkelnv3fN1juZayvadferbcJWV7TMrNtlp9BoVcMMJxArJ7/B+Jdy1gDdZ+rH1l0+5/ncPTsvQdQiyX/nAcRpzeGRXAwbBZaiIjOyg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(366004)(346002)(39850400004)(396003)(136003)(376002)(6486002)(16526019)(26005)(52116002)(8936002)(5660300002)(4326008)(31686004)(2616005)(956004)(2906002)(36756003)(316002)(186003)(86362001)(966005)(66556008)(66476007)(478600001)(66946007)(31696002)(8676002)(16576012)(6666004);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: NfLmhL5MIl5xFwyTSyvr/ORBclcaFX1D8bQTQ3WRKod2V0VmCoGCkorn9QEyA9LmiQVQr+XWCrjzmBfNIveefYaB7BjRnIHeZw0Zh+MFcxOR7U9+InFScJoUSa2gD1XwKpnFxF9rnvyKEdks5XzNdE/hZ++qHd6ToR88FomO4xViy8IDBbCdQotJHmbSwxdRHYq6q+btfy8hpb/F9WGeEJ4jh4Sj/QF9fjaP4pqO71+TOK309LuWNnyUlX9j3J42ZztwFgPnQ9vRbGPZImUZva6i0VZQ5JJMDaRPozZCGyEYQIK0VVH80hNTtbmMXBaxwdDnlUwkHdvd4C97sxDdXB2PkoYl4bcwVaF9Yah0Nk3IcvK19W+MCxXule5981KGsfy6DPv+6eLLvK5sKKIy4JmncoTs0L1sWaZvnKMQ7EsnMqemEmLGwypXzAQyZHolTM5r5i0qg/HOWT6vUmRNjNBSGAyA7v1TCDan1AE4cAEdDTmvWTra0fFrA4DbVpZz/YVfGlnU1PJitHFkOiRMC+/0gk+B7Xmcs2TAbJAPvQAzc2Fa/2uGDzjNetTqQvi/es0Y+MzFe7hqUIbfPGIVRAgzbNosucappVoxey68sU4HgfmNdi+SH1I78hxqeCyNzPETr6w0U78RTDc9W4MzQ+uGsUigmSmfNWZ657DhmQ/k2Rhzem1D0jclGrJG4uw64Zfe5AcaSIKv0Gy8tk93wcJrmgiFND1+Q7ypLJJMdAyrN0EiaXx8DOo3Augtj1ts+YPPcj4xJ5il/kW8/tRvtyUmXm6T2zS7J3IQgxzYAQE=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 80704c28-dcef-451a-87ee-08d7ed33456c
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2020 18:21:16.1105 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: hJ38bkiR7fd5oGy9lEphrGNJlFhpc6OgV5Cy2X0mlnQ9eBOT2MW9f0u8b7nakV62TOxAM+oKF2McUZCplUjFU/2mUk65Il/vlwqqnpMgZxY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5509
+Received-SPF: pass client-ip=40.107.20.101;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-DB8-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 14:21:17
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Received-From: 40.107.20.101
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,283 +128,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: jsnow@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the Neon floating point VFMA and VFMS insn to decodetree.
-These are the last insns in the 3-reg-same group so we can
-remove all the support/loop code from the old decoder.
+30.04.2020 17:27, Kevin Wolf wrote:
+> Since the introduction of a backup filter node in commit 00e30f05d, the
+> backup block job crashes when the target image is smaller than the
+> source image because it will try to write after the end of the target
+> node without having BLK_PERM_RESIZE. (Previously, the BlockBackend layer
+> would have caught this and errored out gracefully.)
+> 
+> We can fix this and even do better than the old behaviour: Check that
+> source and target have the same image size at the start of the block job
+> and unshare BLK_PERM_RESIZE. (This permission was already unshared
+> before the same commit 00e30f05d, but the BlockBackend that was used to
+> make the restriction was removed without a replacement.) This will
+> immediately error out when starting the job instead of only when writing
+> to a block that doesn't exist in the target.
+> 
+> Longer target than source would technically work because we would never
+> write to blocks that don't exist, but semantically these are invalid,
+> too, because a backup is supposed to create a copy, not just an image
+> that starts with a copy.
+> 
+> Fixes: 00e30f05de1d19586345ec373970ef4c192c6270
+> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1778593
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/translate-neon.inc.c |  41 ++++++++
- target/arm/translate.c          | 176 +-------------------------------
- target/arm/neon-dp.decode       |   3 +
- 3 files changed, 46 insertions(+), 174 deletions(-)
+I'm OK with it as is, as it fixes bug:
 
-diff --git a/target/arm/translate-neon.inc.c b/target/arm/translate-neon.inc.c
-index 00b0b252e13..1a4c718b6e4 100644
---- a/target/arm/translate-neon.inc.c
-+++ b/target/arm/translate-neon.inc.c
-@@ -1472,6 +1472,47 @@ static bool trans_VRSQRTS_fp_3s(DisasContext *s, arg_3same *a)
-     return do_3same_32(s, a, gen_VRSQRTS_fp_3s);
- }
- 
-+static void gen_VFMA_fp_3s(TCGv_i32 vd, TCGv_i32 vn, TCGv_i32 vm,
-+                            TCGv_ptr fpstatus)
-+{
-+    gen_helper_vfp_muladds(vd, vn, vm, vd, fpstatus);
-+}
-+
-+static bool trans_VFMA_fp_3s(DisasContext *s, arg_3same *a)
-+{
-+    if (!dc_isar_feature(aa32_simdfmac, s)) {
-+        return false;
-+    }
-+
-+    if (a->size != 0) {
-+        /* TODO fp16 support */
-+        return false;
-+    }
-+
-+    return do_3same_fp(s, a, gen_VFMA_fp_3s, true);
-+}
-+
-+static void gen_VFMS_fp_3s(TCGv_i32 vd, TCGv_i32 vn, TCGv_i32 vm,
-+                            TCGv_ptr fpstatus)
-+{
-+    gen_helper_vfp_negs(vn, vn);
-+    gen_helper_vfp_muladds(vd, vn, vm, vd, fpstatus);
-+}
-+
-+static bool trans_VFMS_fp_3s(DisasContext *s, arg_3same *a)
-+{
-+    if (!dc_isar_feature(aa32_simdfmac, s)) {
-+        return false;
-+    }
-+
-+    if (a->size != 0) {
-+        /* TODO fp16 support */
-+        return false;
-+    }
-+
-+    return do_3same_fp(s, a, gen_VFMS_fp_3s, true);
-+}
-+
- static bool do_3same_fp_pair(DisasContext *s, arg_3same *a, VFPGen3OpSPFn *fn)
- {
-     /* FP operations handled pairwise 32 bits at a time */
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index d34a96e9018..f392a15ffbf 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -3391,78 +3391,6 @@ static void gen_neon_narrow_op(int op, int u, int size,
-     }
- }
- 
--/* Symbolic constants for op fields for Neon 3-register same-length.
-- * The values correspond to bits [11:8,4]; see the ARM ARM DDI0406B
-- * table A7-9.
-- */
--#define NEON_3R_VHADD 0
--#define NEON_3R_VQADD 1
--#define NEON_3R_VRHADD 2
--#define NEON_3R_LOGIC 3 /* VAND,VBIC,VORR,VMOV,VORN,VEOR,VBIF,VBIT,VBSL */
--#define NEON_3R_VHSUB 4
--#define NEON_3R_VQSUB 5
--#define NEON_3R_VCGT 6
--#define NEON_3R_VCGE 7
--#define NEON_3R_VSHL 8
--#define NEON_3R_VQSHL 9
--#define NEON_3R_VRSHL 10
--#define NEON_3R_VQRSHL 11
--#define NEON_3R_VMAX 12
--#define NEON_3R_VMIN 13
--#define NEON_3R_VABD 14
--#define NEON_3R_VABA 15
--#define NEON_3R_VADD_VSUB 16
--#define NEON_3R_VTST_VCEQ 17
--#define NEON_3R_VML 18 /* VMLA, VMLS */
--#define NEON_3R_VMUL 19
--#define NEON_3R_VPMAX 20
--#define NEON_3R_VPMIN 21
--#define NEON_3R_VQDMULH_VQRDMULH 22
--#define NEON_3R_VPADD_VQRDMLAH 23
--#define NEON_3R_SHA 24 /* SHA1C,SHA1P,SHA1M,SHA1SU0,SHA256H{2},SHA256SU1 */
--#define NEON_3R_VFM_VQRDMLSH 25 /* VFMA, VFMS, VQRDMLSH */
--#define NEON_3R_FLOAT_ARITH 26 /* float VADD, VSUB, VPADD, VABD */
--#define NEON_3R_FLOAT_MULTIPLY 27 /* float VMLA, VMLS, VMUL */
--#define NEON_3R_FLOAT_CMP 28 /* float VCEQ, VCGE, VCGT */
--#define NEON_3R_FLOAT_ACMP 29 /* float VACGE, VACGT, VACLE, VACLT */
--#define NEON_3R_FLOAT_MINMAX 30 /* float VMIN, VMAX */
--#define NEON_3R_FLOAT_MISC 31 /* float VRECPS, VRSQRTS, VMAXNM/MINNM */
--
--static const uint8_t neon_3r_sizes[] = {
--    [NEON_3R_VHADD] = 0x7,
--    [NEON_3R_VQADD] = 0xf,
--    [NEON_3R_VRHADD] = 0x7,
--    [NEON_3R_LOGIC] = 0xf, /* size field encodes op type */
--    [NEON_3R_VHSUB] = 0x7,
--    [NEON_3R_VQSUB] = 0xf,
--    [NEON_3R_VCGT] = 0x7,
--    [NEON_3R_VCGE] = 0x7,
--    [NEON_3R_VSHL] = 0xf,
--    [NEON_3R_VQSHL] = 0xf,
--    [NEON_3R_VRSHL] = 0xf,
--    [NEON_3R_VQRSHL] = 0xf,
--    [NEON_3R_VMAX] = 0x7,
--    [NEON_3R_VMIN] = 0x7,
--    [NEON_3R_VABD] = 0x7,
--    [NEON_3R_VABA] = 0x7,
--    [NEON_3R_VADD_VSUB] = 0xf,
--    [NEON_3R_VTST_VCEQ] = 0x7,
--    [NEON_3R_VML] = 0x7,
--    [NEON_3R_VMUL] = 0x7,
--    [NEON_3R_VPMAX] = 0x7,
--    [NEON_3R_VPMIN] = 0x7,
--    [NEON_3R_VQDMULH_VQRDMULH] = 0x6,
--    [NEON_3R_VPADD_VQRDMLAH] = 0x7,
--    [NEON_3R_SHA] = 0xf, /* size field encodes op type */
--    [NEON_3R_VFM_VQRDMLSH] = 0x7, /* For VFM, size bit 1 encodes op */
--    [NEON_3R_FLOAT_ARITH] = 0x5, /* size bit 1 encodes op */
--    [NEON_3R_FLOAT_MULTIPLY] = 0x5, /* size bit 1 encodes op */
--    [NEON_3R_FLOAT_CMP] = 0x5, /* size bit 1 encodes op */
--    [NEON_3R_FLOAT_ACMP] = 0x5, /* size bit 1 encodes op */
--    [NEON_3R_FLOAT_MINMAX] = 0x5, /* size bit 1 encodes op */
--    [NEON_3R_FLOAT_MISC] = 0x5, /* size bit 1 encodes op */
--};
--
- /* Symbolic constants for op fields for Neon 2-register miscellaneous.
-  * The values correspond to bits [17:16,10:7]; see the ARM ARM DDI0406B
-  * table A7-13.
-@@ -4735,108 +4663,8 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-     rm_ofs = neon_reg_offset(rm, 0);
- 
-     if ((insn & (1 << 23)) == 0) {
--        /* Three register same length.  */
--        op = ((insn >> 7) & 0x1e) | ((insn >> 4) & 1);
--        /* Catch invalid op and bad size combinations: UNDEF */
--        if ((neon_3r_sizes[op] & (1 << size)) == 0) {
--            return 1;
--        }
--        /* All insns of this form UNDEF for either this condition or the
--         * superset of cases "Q==1"; we catch the latter later.
--         */
--        if (q && ((rd | rn | rm) & 1)) {
--            return 1;
--        }
--        switch (op) {
--        case NEON_3R_VFM_VQRDMLSH:
--            if (!u) {
--                /* VFM, VFMS */
--                if (size == 1) {
--                    return 1;
--                }
--                break;
--            }
--            /* VQRDMLSH : handled by decodetree */
--            return 1;
--
--        case NEON_3R_VADD_VSUB:
--        case NEON_3R_LOGIC:
--        case NEON_3R_VMAX:
--        case NEON_3R_VMIN:
--        case NEON_3R_VTST_VCEQ:
--        case NEON_3R_VCGT:
--        case NEON_3R_VCGE:
--        case NEON_3R_VQADD:
--        case NEON_3R_VQSUB:
--        case NEON_3R_VMUL:
--        case NEON_3R_VML:
--        case NEON_3R_VSHL:
--        case NEON_3R_SHA:
--        case NEON_3R_VHADD:
--        case NEON_3R_VRHADD:
--        case NEON_3R_VHSUB:
--        case NEON_3R_VABD:
--        case NEON_3R_VQSHL:
--        case NEON_3R_VRSHL:
--        case NEON_3R_VQRSHL:
--        case NEON_3R_VABA:
--        case NEON_3R_VPMAX:
--        case NEON_3R_VPMIN:
--        case NEON_3R_VPADD_VQRDMLAH:
--        case NEON_3R_VQDMULH_VQRDMULH:
--        case NEON_3R_FLOAT_ARITH:
--        case NEON_3R_FLOAT_MULTIPLY:
--        case NEON_3R_FLOAT_CMP:
--        case NEON_3R_FLOAT_ACMP:
--        case NEON_3R_FLOAT_MINMAX:
--        case NEON_3R_FLOAT_MISC:
--            /* Already handled by decodetree */
--            return 1;
--        }
--
--        if (size == 3) {
--            /* 64-bit element instructions: handled by decodetree */
--            return 1;
--        }
--        switch (op) {
--        case NEON_3R_VFM_VQRDMLSH:
--            if (!dc_isar_feature(aa32_simdfmac, s)) {
--                return 1;
--            }
--            break;
--        default:
--            break;
--        }
--
--        for (pass = 0; pass < (q ? 4 : 2); pass++) {
--
--        /* Elementwise.  */
--        tmp = neon_load_reg(rn, pass);
--        tmp2 = neon_load_reg(rm, pass);
--        switch (op) {
--        case NEON_3R_VFM_VQRDMLSH:
--        {
--            /* VFMA, VFMS: fused multiply-add */
--            TCGv_ptr fpstatus = get_fpstatus_ptr(1);
--            TCGv_i32 tmp3 = neon_load_reg(rd, pass);
--            if (size) {
--                /* VFMS */
--                gen_helper_vfp_negs(tmp, tmp);
--            }
--            gen_helper_vfp_muladds(tmp, tmp, tmp2, tmp3, fpstatus);
--            tcg_temp_free_i32(tmp3);
--            tcg_temp_free_ptr(fpstatus);
--            break;
--        }
--        default:
--            abort();
--        }
--        tcg_temp_free_i32(tmp2);
--
--        neon_store_reg(rd, pass, tmp);
--
--        } /* for pass */
--        /* End of 3 register same size operations.  */
-+        /* Three register same length: handled by decodetree */
-+        return 1;
-     } else if (insn & (1 << 4)) {
-         if ((insn & 0x00380080) != 0) {
-             /* Two registers and shift.  */
-diff --git a/target/arm/neon-dp.decode b/target/arm/neon-dp.decode
-index c4a90e70753..3c5a9f0d0e0 100644
---- a/target/arm/neon-dp.decode
-+++ b/target/arm/neon-dp.decode
-@@ -159,6 +159,9 @@ SHA256H2_3s      1111 001 1 0 . 01 .... .... 1100 . 1 . 0 .... \
- SHA256SU1_3s     1111 001 1 0 . 10 .... .... 1100 . 1 . 0 .... \
-                  vm=%vm_dp vn=%vn_dp vd=%vd_dp
- 
-+VFMA_fp_3s       1111 001 0 0 . 0 . .... .... 1100 ... 1 .... @3same_fp
-+VFMS_fp_3s       1111 001 0 0 . 1 . .... .... 1100 ... 1 .... @3same_fp
-+
- VQRDMLSH_3s      1111 001 1 0 . .. .... .... 1100 ... 1 .... @3same
- 
- VADD_fp_3s       1111 001 0 0 . 0 . .... .... 1101 ... 0 .... @3same_fp
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+still, some notes below
+
+
+> ---
+>   block/backup-top.c | 14 +++++++++-----
+>   block/backup.c     | 14 +++++++++++++-
+>   2 files changed, 22 insertions(+), 6 deletions(-)
+> 
+> diff --git a/block/backup-top.c b/block/backup-top.c
+> index 3b50c06e2c..79b268e6dc 100644
+> --- a/block/backup-top.c
+> +++ b/block/backup-top.c
+> @@ -148,8 +148,10 @@ static void backup_top_child_perm(BlockDriverState *bs, BdrvChild *c,
+>            *
+>            * Share write to target (child_file), to not interfere
+>            * with guest writes to its disk which may be in target backing chain.
+> +         * Can't resize during a backup block job because we check the size
+> +         * only upfront.
+>            */
+> -        *nshared = BLK_PERM_ALL;
+> +        *nshared = BLK_PERM_ALL & ~BLK_PERM_RESIZE;
+>           *nperm = BLK_PERM_WRITE;
+>       } else {
+>           /* Source child */
+> @@ -159,7 +161,7 @@ static void backup_top_child_perm(BlockDriverState *bs, BdrvChild *c,
+>           if (perm & BLK_PERM_WRITE) {
+>               *nperm = *nperm | BLK_PERM_CONSISTENT_READ;
+>           }
+> -        *nshared &= ~BLK_PERM_WRITE;
+> +        *nshared &= ~(BLK_PERM_WRITE | BLK_PERM_RESIZE);
+>       }
+>   }
+>   
+> @@ -192,11 +194,13 @@ BlockDriverState *bdrv_backup_top_append(BlockDriverState *source,
+>   {
+>       Error *local_err = NULL;
+>       BDRVBackupTopState *state;
+> -    BlockDriverState *top = bdrv_new_open_driver(&bdrv_backup_top_filter,
+> -                                                 filter_node_name,
+> -                                                 BDRV_O_RDWR, errp);
+> +    BlockDriverState *top;
+>       bool appended = false;
+>   
+> +    assert(source->total_sectors == target->total_sectors);
+
+May be better to error-out, just to keep backup-top independent. Still, now it's not
+really needed, as we have only one caller. And this function have to be refactored
+anyway, when publishing this filter (open() and close() should appear, so this code
+will be rewritten anyway.)
+
+And the other thought: the permissions we declared above, will be activated only after
+successful bdrv_child_refresh_perms(). I think some kind of race is possible, so that
+size is changed actual permission activation. So, may be good to double check sizes after
+bdrv_child_refresh_perms().. But it's a kind of paranoia.
+
+Also, third thought: the restricted permissions doesn't save us from resizing
+of the source through exactly this node, does it? Hmm, but your test works somehow. But
+(I assume) it worked in a previous patch version without unsharing on source..
+
+Ha, but bdrv_co_truncate just can't work on backup-top, because it doesn't have file child.
+But, if we fix bdrv_co_truncate to skip filters, we'll need to define .bdrv_co_truncate in
+backup_top, which will return something like -EBUSY.. Or just -ENOTSUP, doesn't matter.
+
+> +
+> +    top = bdrv_new_open_driver(&bdrv_backup_top_filter, filter_node_name,
+> +                               BDRV_O_RDWR, errp);
+>       if (!top) {
+>           return NULL;
+>       }
+> diff --git a/block/backup.c b/block/backup.c
+> index c4c3b8cd46..4f13bb20a5 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -340,7 +340,7 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+>                     BlockCompletionFunc *cb, void *opaque,
+>                     JobTxn *txn, Error **errp)
+>   {
+> -    int64_t len;
+> +    int64_t len, target_len;
+>       BackupBlockJob *job = NULL;
+>       int64_t cluster_size;
+>       BdrvRequestFlags write_flags;
+> @@ -405,6 +405,18 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+>           goto error;
+>       }
+>   
+> +    target_len = bdrv_getlength(target);
+> +    if (target_len < 0) {
+> +        error_setg_errno(errp, -target_len, "Unable to get length for '%s'",
+> +                         bdrv_get_device_or_node_name(bs));
+> +        goto error;
+> +    }
+> +
+> +    if (target_len != len) {
+> +        error_setg(errp, "Source and target image have different sizes");
+> +        goto error;
+> +    }
+> +
+>       cluster_size = backup_calculate_cluster_size(target, errp);
+>       if (cluster_size < 0) {
+>           goto error;
+> 
+
+
 -- 
-2.20.1
-
+Best regards,
+Vladimir
 
