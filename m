@@ -2,54 +2,111 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AB75C8300A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 09:14:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14ED3C8300A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 09:24:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F0A32137B
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 09:14:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F0A32137B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D37862137B
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 09:24:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V0egPq9d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D37862137B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU5H4-0008Ak-H3
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 05:14:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46098)
+	id 1jU5Qh-0003nR-2n
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 05:24:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46752)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Pavel.Dovgaluk@gmail.com>) id 1jU5GT-0007lD-NO
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 05:13:54 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jU5Pf-0002mi-Ua
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 05:23:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <Pavel.Dovgaluk@gmail.com>) id 1jU5GS-0003kH-Vp
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 05:13:53 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:48140)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Pavel.Dovgaluk@gmail.com>) id 1jU5GS-0003k6-Eo
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 05:13:52 -0400
-Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 19F08CD467;
- Thu, 30 Apr 2020 12:13:50 +0300 (MSK)
-Subject: [PATCH] replay: implement fair mutex
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 30 Apr 2020 12:13:49 +0300
-Message-ID: <158823802979.28101.9340462887738957616.stgit@pasha-ThinkPad-X280>
-User-Agent: StGit/0.17.1-dirty
+ (envelope-from <mreitz@redhat.com>) id 1jU5OO-0000Te-AW
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 05:23:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57528
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jU5ON-0000TW-Mz
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 05:22:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588238521;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=XkUoXClEVl58JBgSQKNej7Q6g0mP78x1gSAc0Brlc5g=;
+ b=V0egPq9dJ07tjTSCAkBgH20yNjmGN+CLdgEagyNxwOtE/9eWnxEQLADaZmhU0GU49TthsC
+ DM6NZC35gfxx7vnoAZ4w1wTAbAlL8oAQ6ErADA31uWg36abxKCINSvA8KfUO3s6B9vzIIf
+ HyZhE9yRdT2ZpSvbPL7VEVxQqob5xxY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-395-6ehl63agPaWBgyHqZX35cA-1; Thu, 30 Apr 2020 05:21:58 -0400
+X-MC-Unique: 6ehl63agPaWBgyHqZX35cA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E25688005B7
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 09:21:57 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-112-177.ams2.redhat.com
+ [10.36.112.177])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8E383605DD;
+ Thu, 30 Apr 2020 09:21:49 +0000 (UTC)
+Subject: Re: [PATCH] virtiofsd: Show submounts
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <20200424133516.73077-1-mreitz@redhat.com>
+ <20200427175902.GM2923@work-vm> <20200429145720.GA2835@work-vm>
+ <8c73f374-fcc8-1684-b581-84a9ab501aa9@redhat.com>
+ <20200430085812.GC2874@work-vm>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <94924861-d934-0151-aca5-19ea9eb211e1@redhat.com>
+Date: Thu, 30 Apr 2020 11:21:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: softfail client-ip=83.149.199.45;
- envelope-from=Pavel.Dovgaluk@gmail.com; helo=mail.ispras.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 05:02:52
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Received-From: 83.149.199.45
+In-Reply-To: <20200430085812.GC2874@work-vm>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="QfIUrViZs5Euqaf87kfYpcqVjvFsO1FSh"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 23:34:52
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,80 +118,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, dovgaluk@ispras.ru, pavel.dovgaluk@ispras.ru
+Cc: virtio-fs@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>,
+ qemu-devel@nongnu.org, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In record/replay icount mode main loop thread and vCPU thread
-do not perform simultaneously. They take replay mutex to synchronize
-the actions. Sometimes vCPU thread waits for locking the mutex for
-very long time, because main loop releases the mutex and takes it
-back again. Standard qemu mutex do not provide the ordering
-capabilities.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--QfIUrViZs5Euqaf87kfYpcqVjvFsO1FSh
+Content-Type: multipart/mixed; boundary="54ZYs4vew8w0glUUsJpzbmIWuUUfoegiz"
 
-This patch adds a "queue" for replay mutex. Therefore thread ordering
-becomes more "fair". Threads are executed in the same order as
-they are trying to take the mutex.
+--54ZYs4vew8w0glUUsJpzbmIWuUUfoegiz
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
----
- replay/replay-internal.c |   15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+On 30.04.20 10:58, Dr. David Alan Gilbert wrote:
+> * Max Reitz (mreitz@redhat.com) wrote:
+>> On 29.04.20 16:57, Dr. David Alan Gilbert wrote:
+>>> * Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
+>>>> * Max Reitz (mreitz@redhat.com) wrote:
+>>>>> Currently, setup_mounts() bind-mounts the shared directory without
+>>>>> MS_REC.  This makes all submounts disappear.
+>>>>>
+>>>>> Pass MS_REC so that the guest can see submounts again.
+>>>>
+>>>> Thanks!
+>>>>
+>>>>> Fixes: 3ca8a2b1c83eb185c232a4e87abbb65495263756
+>>>>
+>>>> Should this actually be 5baa3b8e95064c2434bd9e2f312edd5e9ae275dc ?
+>>>>
+>>>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>>>> ---
+>>>>>  tools/virtiofsd/passthrough_ll.c | 2 +-
+>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passt=
+hrough_ll.c
+>>>>> index 4c35c95b25..9d7f863e66 100644
+>>>>> --- a/tools/virtiofsd/passthrough_ll.c
+>>>>> +++ b/tools/virtiofsd/passthrough_ll.c
+>>>>> @@ -2643,7 +2643,7 @@ static void setup_mounts(const char *source)
+>>>>>      int oldroot;
+>>>>>      int newroot;
+>>>>> =20
+>>>>> -    if (mount(source, source, NULL, MS_BIND, NULL) < 0) {
+>>>>> +    if (mount(source, source, NULL, MS_BIND | MS_REC, NULL) < 0) {
+>>>>>          fuse_log(FUSE_LOG_ERR, "mount(%s, %s, MS_BIND): %m\n", sourc=
+e, source);
+>>>>>          exit(1);
+>>>>>      }
+>>>>
+>>>> Do we want MS_SLAVE to pick up future mounts that might happenf rom th=
+e
+>>>> host?
+>>>> What's the interaction between this and the MS_REC|MS_SLAVE that we ha=
+ve
+>>>> a few lines above for / ?
+>>>
+>>> Just to confirm something from vgoyal, and what had confused me about
+>>> why we hadn't spotted this earlier.
+>>>
+>>> Even without this patch, the SLAVE stuff worked so if you start the
+>>> daemon and *then* mount under the shared directory, the guest sees it
+>>> with or without this patch.
+>>
+>> Hm, I don=E2=80=99t.  Do you really?
+>=20
+> Yes! With your patch reverted:
+>=20
+> Start virtiofsd, mount in the guest:
+>=20
+> host:
+> # ./virtiofsd --socket-path=3D/tmp/vhostqemu -o source=3D/home/dgilbert/v=
+irtio-fs/fs  -o log_level=3Dwarn -o no_writeback
+>=20
+> guest:
+> # mount -t virtiofs myfs /sysroot
 
-diff --git a/replay/replay-internal.c b/replay/replay-internal.c
-index eba8246aae..2e8a3e947a 100644
---- a/replay/replay-internal.c
-+++ b/replay/replay-internal.c
-@@ -22,6 +22,9 @@
-    It also protects replay events queue which stores events to be
-    written or read to the log. */
- static QemuMutex lock;
-+/* Condition and queue for fair ordering of mutex lock requests. */
-+static QemuCond mutex_cond;
-+static unsigned long mutex_head, mutex_tail;
- 
- /* File for replay writing */
- static bool write_error;
-@@ -197,9 +200,10 @@ static __thread bool replay_locked;
- void replay_mutex_init(void)
- {
-     qemu_mutex_init(&lock);
-+    qemu_cond_init(&mutex_cond);
-     /* Hold the mutex while we start-up */
--    qemu_mutex_lock(&lock);
-     replay_locked = true;
-+    ++mutex_tail;
- }
- 
- bool replay_mutex_locked(void)
-@@ -211,10 +215,16 @@ bool replay_mutex_locked(void)
- void replay_mutex_lock(void)
- {
-     if (replay_mode != REPLAY_MODE_NONE) {
-+        unsigned long id;
-         g_assert(!qemu_mutex_iothread_locked());
-         g_assert(!replay_mutex_locked());
-         qemu_mutex_lock(&lock);
-+        id = mutex_tail++;
-+        while (id != mutex_head) {
-+            qemu_cond_wait(&mutex_cond, &lock);
-+        }
-         replay_locked = true;
-+        qemu_mutex_unlock(&lock);
-     }
- }
- 
-@@ -222,7 +232,10 @@ void replay_mutex_unlock(void)
- {
-     if (replay_mode != REPLAY_MODE_NONE) {
-         g_assert(replay_mutex_locked());
-+        qemu_mutex_lock(&lock);
-+        ++mutex_head;
-         replay_locked = false;
-+        qemu_cond_broadcast(&mutex_cond);
-         qemu_mutex_unlock(&lock);
-     }
- }
+OK, for some reason I didn=E2=80=99t try to mount in the guest first, but d=
+id
+the host mount after starting virtiofsd.
+
+My mount test uses multiple mounts, and two of them I see mounted, but
+three I still don=E2=80=99t see mounted.
+
+Let me see whether I can come up with something reproducible that isn=E2=80=
+=99t
+a script.
+
+[...]
+
+> Maybe this is related to what Vivek said about default behaviours on
+> systemd's, what does:
+>=20
+> # findmnt -o +PROPAGATION
+> TARGET    SOURCE         FSTYPE     OPTIONS                              =
+                                                    PROPAGATION
+> /         /dev/mapper/fedora_dgilbert--t580-root
+> =E2=94=82                        xfs        rw,relatime,seclabel,attr2,in=
+ode64,logbufs=3D8,logbsize=3D32k,noquota                        shared
+>=20
+> say for your source=3D directory?
+
+I have Fedora, too, so pretty much the same.
+
+Max
+
+
+--54ZYs4vew8w0glUUsJpzbmIWuUUfoegiz--
+
+--QfIUrViZs5Euqaf87kfYpcqVjvFsO1FSh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6qmKsACgkQ9AfbAGHV
+z0Db1wf/aIFXWLNFxAHC+g0QoZDUd6nlDlqu3qi7Sf1sJNv0r8mlCEXWMcPn1IN8
+jl/vrGskXH6tEM0KuzpQI/H9NEwIQ/nLfnJvNR/taEfFCAx+/PH+QTxh6GA25Xzy
+YzUEbeO6+P9wrO/YSeaT/CGVn88U20gA4e/Gyjq7YBxACq/bF7uGvwmCyPoDOqm0
+1A9TZkyy54WGSqyzbPrxBtUa2ULMiEwwvjVnTXamOvikVL+oCiopxi/30i1/aRsP
+bUNZuJP/1tGFIMazN5R0YnXbTFuvUISe+bFKhkXR7OUEvsJON+lHejJVL1XfZg3Z
+AB7ZVxdNAGQKhFhs2vUAvHj0JFS/cg==
+=UzY4
+-----END PGP SIGNATURE-----
+
+--QfIUrViZs5Euqaf87kfYpcqVjvFsO1FSh--
 
 
