@@ -2,110 +2,71 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1B50C8300A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 12:53:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAAE5C8300A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 12:53:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B35D2074A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 12:53:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 96A1C2074A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 12:53:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VlT/9WDO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B35D2074A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="tjM4II46"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96A1C2074A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU8hE-0007PM-PL
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 08:53:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41106)
+	id 1jU8hM-0007gt-OD
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 08:53:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41082)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jU8gE-0005hx-Mj
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 08:52:47 -0400
+ (envelope-from <qemu_oss@crudebyte.com>) id 1jU8gC-0005fy-GJ
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 08:52:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jU8ez-000738-QQ
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 08:52:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21312
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jU8ez-00072h-6A
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 08:51:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588251083;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=KTmNVA2on6joSnRL1I8+NKkigaNbjEC1ARnddiXjKMM=;
- b=VlT/9WDO1lz6hQGBTgbUq0YiLBE7hOKDLylhR7tMZd0lOJHqXCPud9e4tpUVhZwjrZSupe
- eiVGyp32MNuTEB/5Zks+SbiNe5+zz7/v8CnfS+GmDxameGn58qOymeVZeDrGZte5OMScli
- fhSBDSm8bkDkuI08IE+7cVJmnX7qF4A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-141-2ZXwpuPvN5mpQikqe8-vJQ-1; Thu, 30 Apr 2020 08:51:21 -0400
-X-MC-Unique: 2ZXwpuPvN5mpQikqe8-vJQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7E34D89052B;
- Thu, 30 Apr 2020 12:51:06 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-112-177.ams2.redhat.com
- [10.36.112.177])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3932D1053B1C;
- Thu, 30 Apr 2020 12:50:51 +0000 (UTC)
-Subject: Re: [PATCH v2 1/6] docs: Sort sections on qemu-img subcommand
- parameters
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200421212019.170707-1-eblake@redhat.com>
- <20200421212019.170707-2-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <ba22a63a-1573-20cb-f4d9-eb49033037c9@redhat.com>
-Date: Thu, 30 Apr 2020 14:50:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <qemu_oss@crudebyte.com>) id 1jU8eO-00070P-7H
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 08:52:40 -0400
+Received: from kylie.crudebyte.com ([5.189.157.229]:49489)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1jU8eN-0006yi-0v
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 08:50:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=ds1lrRqmSx903DpdqZMJVhfBBA+/t3UoZ/Qn/oYL7cM=; b=tjM4II46SuAzRBxTgRjaiEiUS7
+ 2ya04B2EHtETAunCdGAC8LfK1vDld++a+0JJ3fTXlbQYvLq19EbATwvtv6SbVUIQVmhyzmZTylbUR
+ pAdOEM/r2P4X6pTgXYAFWl6KraePSHbtI0RoFY88pXxqIUgzaPQFRecYtYxCJ0ygON/purkd/EZXp
+ czg6FQfrg3xhTJ5KWMs4xP1TTMcukXXhMP1L6CI1//PkPqlod/I0KI8iCNCR1Xl9nvx+wUNL26hcS
+ UEHZsyg//pIpym197e7vu72slKk9FgJ7XbONBw4tEFPOGhcTQ9vF94YghFf6URz3hcdpF4UO60z2/
+ 4vDyQqQXkt72jMxmqJBL7OoPeOV5bP5voSJ92/J+HvMSSxSMO7uj75MqxkCK5ejh9sog9NmB/Kti0
+ B3l4Vrnh1XmwI88O+cFQO5K+TNmpLeHnJA7WvtE8BB8OIntSedOmzC5h7QNd1/TQNlmYldDL+lhB0
+ l5bumT7PTfNliuGvNGkzTbxPEA/kcmy3pvUNrHT55m+NsnSl53AIvg6CSoUgdFpJ6I+KkAJO9R/Y6
+ gnRSUjJQzN4xMMHV+mCmUopKucUyMQ4qGjt7yYDtRlix+S6JY9yNwZg/GZjUlr/MfRfRPh9PWDFRW
+ oABKYJWMkdc2IIi8BZ7PD+DW6XBbYT/11resSBPz4=;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH v6 3/5] 9pfs: add new function v9fs_co_readdir_many()
+Date: Thu, 30 Apr 2020 14:50:31 +0200
+Message-ID: <5059845.6LZZmIoT5M@silver>
+In-Reply-To: <20200430134235.524df46e@bahia.lan>
+References: <cover.1587309014.git.qemu_oss@crudebyte.com>
+ <fdb0e29a86d1df6005021a08078d7e69ed0de1a2.1587309014.git.qemu_oss@crudebyte.com>
+ <20200430134235.524df46e@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20200421212019.170707-2-eblake@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="8hUcTxDBdzUzfqlL2KmzcWCfXdchpXdu4"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 23:34:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+Received-SPF: pass client-ip=5.189.157.229;
+ envelope-from=qemu_oss@crudebyte.com; helo=kylie.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 08:50:42
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Received-From: 5.189.157.229
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,53 +78,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---8hUcTxDBdzUzfqlL2KmzcWCfXdchpXdu4
-Content-Type: multipart/mixed; boundary="eB6LaE5dqaYp9kEJ5oJytLAd5oRiPlrUs"
+On Donnerstag, 30. April 2020 13:42:35 CEST Greg Kurz wrote:
+> > +/*
+> > + * This is solely executed on a background IO thread.
+> > + *
+> > + * See v9fs_co_readdir_many() (as its only user) below for details.
+> > + */
+> > +static int do_readdir_many(V9fsPDU *pdu, V9fsFidState *fidp,
+> > +                             struct V9fsDirEnt **entries,
+> > +                             int32_t maxsize, bool dostat)
+> > +{
+> > +    V9fsState *s = pdu->s;
+> > +    V9fsString name;
+> > +    int len, err = 0;
+> > +    int32_t size = 0;
+> > +    off_t saved_dir_pos;
+> > +    struct dirent *dent;
+> > +    struct V9fsDirEnt *e = NULL;
+> > +    V9fsPath path;
+> > +    struct stat stbuf;
+> > 
+> > -            errno = 0;
+> > -            entry = s->ops->readdir(&s->ctx, &fidp->fs);
+> > -            if (!entry && errno) {
+> > +    *entries = NULL;
+> > +    v9fs_path_init(&path);
+> > +
+> > +    /*
+> > +     * TODO: Here should be a warn_report_once() if lock failed.
+> > +     *
+> > +     * With a good 9p client we should not get into concurrency here,
+> > +     * because a good client would not use the same fid for concurrent
+> > +     * requests. We do the lock here for safety reasons though. However
+> > +     * the client would then suffer performance issues, so better log
+> > that
+> > +     * issue here.
+> > +     */
+> > +    v9fs_readdir_lock(&fidp->fs.dir);
+> 
+> I agree that a client that issues concurrent readdir requests on the
+> same fid is probably asking for troubles, but this permitted by the
+> spec. Whether we should detect such conditions and warn or even fail
+> is discussion for another thread.
+> 
+> The locking is only needed to avoid concurrent accesses to the dirent
+> structure returned by readdir(), otherwise we could return partially
+> overwritten file names to the client. It must be done for each individual
+> call to readdir(), but certainly not for multiple calls.
 
---eB6LaE5dqaYp9kEJ5oJytLAd5oRiPlrUs
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Yeah, that would resolve this issue more appropriately for 9p2000.L, since 
+Treaddir specifies an offset, but for 9p2000.u the result of a concurrent read 
+on a directory (9p2000.u) would still be undefined.
 
-On 21.04.20 23:20, Eric Blake wrote:
-> We already list the subcommand summaries alphabetically, we should do
-> the same for the documentation related to subcommand-specific
-> parameters.
->=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  docs/tools/qemu-img.rst | 48 ++++++++++++++++++++---------------------
->  1 file changed, 24 insertions(+), 24 deletions(-)
+> As discussed privately, I'm working on a patch to better address the
+> locking and I'd really prefer to merge this before your series. Sorry
+> for the delay again. I'll try to post ASAP.
+> 
+> Anyway, I have some more remarks.
+> 
+> > +
+> > +    /* save the directory position */
+> > +    saved_dir_pos = s->ops->telldir(&s->ctx, &fidp->fs);
+> > +    if (saved_dir_pos < 0) {
+> > +        err = saved_dir_pos;
+> > +        goto out;
+> > +    }
+> > +
+> > +    while (true) {
+> > +        /* get directory entry from fs driver */
+> > +        err = do_readdir(pdu, fidp, &dent);
+> > +        if (err || !dent) {
+> > +            break;
+> > +        }
+> > +
+> > +        /*
+> > +         * stop this loop as soon as it would exceed the allowed maximum
+> > +         * response message size for the directory entries collected so
+> > far, +         * because anything beyond that size would need to be
+> > discarded by +         * 9p controller (main thread / top half) anyway
+> > +         */
+> > +        v9fs_string_init(&name);
+> > +        v9fs_string_sprintf(&name, "%s", dent->d_name);
+> > +        len = v9fs_readdir_response_size(&name);
+> > +        v9fs_string_free(&name);
+> > +        if (size + len > maxsize) {
+> > +            /* this is not an error case actually */
+> > +            break;
+> > +        }
+> > +
+> > +        /* append next node to result chain */
+> > +        if (!e) {
+> > +            *entries = e = g_malloc0(sizeof(V9fsDirEnt));
+> > +        } else {
+> > +            e = e->next = g_malloc0(sizeof(V9fsDirEnt));
+> > +        }
+> > +        e->dent = g_malloc0(sizeof(struct dirent));
+> 
+> So we're allocating a bunch of stuff here...
+> 
+> > +        memcpy(e->dent, dent, sizeof(struct dirent));
+> > +
+> > +        /* perform a full stat() for directory entry if requested by
+> > caller */ +        if (dostat) {
+> > +            err = s->ops->name_to_path(
+> > +                &s->ctx, &fidp->path, dent->d_name, &path
+> > +            );
+> > +            if (err < 0) {
+> > 
+> >                  err = -errno;
+> > 
+> > -            } else {
+> > -                *dent = entry;
+> > -                err = 0;
+> > +                break;
+> 
+> ... but we're erroring out there and it seems that we're leaking
+> all the entries that have been allocated so far.
 
+No, they are not leaking actually.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+You are right that they are not deallocated in do_readdir_many(), but that's 
+intentional: in the new implementation of v9fs_do_readdir() you see that 
+v9fs_free_dirents(entries) is *always* called at the very end of the function, 
+no matter if success or any error. That's one of the measures to simplify 
+overall code as much as possible.
 
+As you might have noticed, the previous/current v9fs_do_readdir() 
+implementation had quite a bunch of individual error pathes, which is quite 
+error prone or at least makes it difficult to maintain. So I think it makes 
+sense to strip unnecessary branches as much as possible.
 
---eB6LaE5dqaYp9kEJ5oJytLAd5oRiPlrUs--
+> Also I have the impression that all the if (dostat) { } block could
+> be done before chaining a new entry.
 
---8hUcTxDBdzUzfqlL2KmzcWCfXdchpXdu4
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Yes, you could move it forward, but what would you buy from that?
 
------BEGIN PGP SIGNATURE-----
+I think you mean the case when there's an error inside the if (dostat) {} 
+block: The comments on struct V9fsDirEnt already suggest that the "st" member 
+is optional and may be NULL. So if there's an error inside if (dostat) {}
+then caller still has a valid "dent" field at least and it's up to caller 
+whether or not it's a problem for its purpose that "st" is empty. For that 
+reason I would not move the block forward.
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6qyakACgkQ9AfbAGHV
-z0CUUwgAsAKAz+JIqF1XbsR2mUp+V4gaYOngD/M23OKozOAanROKZhFHN++tusEZ
-lA+DnjSGObEnz6/l6NUIOZgOxQsP7bfOz+Os1fWzQA79V8p+G4f5STBbOHo5hrPb
-Y57MzOWTvRECr0gq7axA0/ZOlYejZJnVzpgV8QA/1YUYdKGUVvZs24+IZWmJtCvg
-nfuhidgOkrev2g8/Fm3Md3Q54n29hWYxPTbEoRHTr/t8k2hdvAA68HyQmE04Py2G
-to9EPlPPegtfSXll1bqYQ3a7GoOPPbDc+9t963aq7h0XFi2H6BzgYYHy/hCFeWeV
-bclLXe0qC8i43dut0D94rpZBLJlYBA==
-=mb7S
------END PGP SIGNATURE-----
+Best regards,
+Christian Schoenebeck
 
---8hUcTxDBdzUzfqlL2KmzcWCfXdchpXdu4--
 
 
