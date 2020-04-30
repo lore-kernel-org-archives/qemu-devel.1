@@ -2,127 +2,89 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45DA6C47247
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:40:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB36AC4724C
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:40:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D1B12070B
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:40:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71C122070B
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:40:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=msn.com header.i=@msn.com header.b="aTBHLSUi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D1B12070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=msn.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JLix+IVu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71C122070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUCEV-0001ci-65
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 12:40:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50450)
+	id 1jUCEd-0001ns-J5
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 12:40:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49370)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <skizzato73@msn.com>) id 1jUCAy-0004kq-Sl
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:38:59 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jUC3A-0001pl-2r
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:28:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <skizzato73@msn.com>) id 1jUC9M-00030a-PC
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:36:40 -0400
-Received: from mail-vi1eur05olkn2043.outbound.protection.outlook.com
- ([40.92.90.43]:6497 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <skizzato73@msn.com>)
- id 1jUC9M-0002zW-8J; Thu, 30 Apr 2020 12:35:00 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=V0LKN0H6uUYEhFybWvR7o4Poa9vAumL1f+Hi4AH2zkVKOwbH5y55lgP2Ho644Fwr2gkl6k5WIiV1zWCmjY9qTFekt+W3GxiqBqUhnW7u1OxgTGJu20LI84vKeiv0/2t2vxIfGT0lW+14WdcepgR8H2nWxCAbxUAmfRlmFThio/RczNnmg64ZuzhW3Gju7v94mFUjYbkeNsXTMHY2XkM6TFLVZC9RUnK4gdfsCTZ4pu8/8I4vWAvNjOXPTz/gSKtD+ve8taC8qhGT154iYtfHp0xUyHp1vW7qExboTdhqVZxeEN9CaZRD1MVQ7w2+YXM0jnzSzNf060ioWWSXs6k7Zw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q0aYuuHWmUeOw6JoSmV6Tm98QwqeAIp46q1HS6tOWdU=;
- b=IuODv2J98Ueuz81k0AQBhFpyyr2SKkV1PzqAbydYUUv2nx8eeQerp911vjP/dtMGwRYYjVVwvSTbL2omUDmuoajohXVODQA1g9GWi4UQAMzV648pmoIQkXy20RZbKdnfYwdj0MAxjRpqRtSkAKwpU/C5EPag31Jg7Myf3Av4+URFSAj2Ze0h+Q2+ic++Oi44Xm1oBzsvozRA86q6kxX1uMIpCkTSRKTtQBFhhHOaju8grc8T2EqS5oR76Ulqi7VYQRjPqeBQ+wfjmJsFszHU5BHLY1+H3QIBgsUt51T2uTUezpi9B+api6kgOdilUU8U84LooZtsJdtiA7nLzUk9zA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=msn.com; s=selector1; 
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q0aYuuHWmUeOw6JoSmV6Tm98QwqeAIp46q1HS6tOWdU=;
- b=aTBHLSUiMN8dg4Ah8E7Ig6oenw+2iLiuqRjRn1KEE+3ZyLO4HDGmcYC1w5024QD24Vtb9Q+xf0T8WEYKKiN9FPWip87kNAd5M1QaXNcgG+tJndOPF72nvrVKrtAZNm8dvM+xAUlpxj542eH3CEpOLf57iQIwoGxzi8j6luYTVj3R2QyeWRV0MFVGWFq5G0OezZbY2spyxwY7P6LMNYRA+KPc32gcvUync4+4N7TYTKZ1qTnOrQ4CktWZmnLSdqrWIDgaO5h7PFMDKjAHTBeuGaCa/CbTUqXCD0umIjmKm7bKw/aysQJaiarufGwMSSYtncKnfpy2XaDMgE32V+MWHA==
-Received: from VI1EUR05FT029.eop-eur05.prod.protection.outlook.com
- (2a01:111:e400:fc12::47) by
- VI1EUR05HT066.eop-eur05.prod.protection.outlook.com (2a01:111:e400:fc12::206)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.15; Thu, 30 Apr
- 2020 16:34:55 +0000
-Received: from AM4PR07MB3506.eurprd07.prod.outlook.com
- (2a01:111:e400:fc12::51) by VI1EUR05FT029.mail.protection.outlook.com
- (2a01:111:e400:fc12::382) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.24 via Frontend
- Transport; Thu, 30 Apr 2020 16:34:55 +0000
-Received: from AM4PR07MB3506.eurprd07.prod.outlook.com
- ([fe80::718e:de40:dfe9:9319]) by AM4PR07MB3506.eurprd07.prod.outlook.com
- ([fe80::718e:de40:dfe9:9319%5]) with mapi id 15.20.2937.028; Thu, 30 Apr 2020
- 16:34:55 +0000
-From: Dino Papararo <skizzato73@msn.com>
-To: BALATON Zoltan <balaton@eik.bme.hu>,
- =?utf-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Subject: R: R: R: About hardfloat in ppc
-Thread-Topic: R: R: About hardfloat in ppc
-Thread-Index: AQHWHF7rwxop5oOlnUWWPH3hEGvks6iMt6WAgAAOeACAAAodAIAAqceAgAC9g4CAAau9MIAAHqMAgAApAWCAAEN9AIAAY0iAgAAg+QCAAGMZgIAAe5mAgAANuNA=
-Date: Thu, 30 Apr 2020 16:34:55 +0000
-Message-ID: <AM4PR07MB3506C091776962655FCE11E9CAAA0@AM4PR07MB3506.eurprd07.prod.outlook.com>
-References: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
- <87lfmhl0xa.fsf@linaro.org>
- <alpine.BSF.2.22.395.2004271212520.94232@zero.eik.bme.hu>
- <87imhlkwun.fsf@linaro.org>
- <CAE2XoE9hiw-ri66_xp3qNa5_Wx8ZfsQB9mqJdYR8VRm-KW830g@mail.gmail.com>
- <87ftcoknvu.fsf@linaro.org>
- <AM4PR07MB350653D5961DFCE441646131CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
- <871ro6ld2f.fsf@linaro.org>
- <AM4PR07MB350673696C7DE2CA16C9C685CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
- <87sggmjgit.fsf@linaro.org>
- <CAE2XoE8wFK1nOq3YXhB=iqTvqSDQk7Zzd35Tjzdd==v8ouMijA@mail.gmail.com>
- <43ac337c-752a-7151-1e88-de01949571de@linaro.org>
- <CAE2XoE-f_rkcnpQO1cHPUgdaWNAOvBRyUX1aj27UePd0Hkr=KQ@mail.gmail.com>
- <alpine.BSF.2.22.395.2004301721420.29315@zero.eik.bme.hu>
-In-Reply-To: <alpine.BSF.2.22.395.2004301721420.29315@zero.eik.bme.hu>
-Accept-Language: it-IT, en-US
-Content-Language: it-IT
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-incomingtopheadermarker: OriginalChecksum:EF2543F715208A4956F99FAA337978BCB1757D24CE5803A27DE10F9C44424B51;
- UpperCasedChecksum:2D3619CCDD451D98D4F2856DF2239F9F40C5EB648D8509606AF58316CCA6CCF5;
- SizeAsReceived:7966; Count:45
-x-tmn: [WcpTGwDqrRF9mOJwy9ObW5vXEChASOhY]
-x-ms-publictraffictype: Email
-x-incomingheadercount: 45
-x-eopattributedmessage: 0
-x-ms-office365-filtering-correlation-id: c20c4261-1c87-4981-c314-08d7ed246a4a
-x-ms-traffictypediagnostic: VI1EUR05HT066:
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: c3oCcZfu+0ovYC8GwzCPOtHwRRZyBnHV8AloXUbykM+MQIoyh5gBak7eRIU5JtY6yqzwgEii0Vp+dptCs/ahzsc1VRiYH0ofm48UClRRE0H3MykVdpK07j8YOwcB1gHVH5w9dKDogbe5zouuG7hbxRtxnNXT+makngMoTNoDOYVO/fjFG6fonIEll5FfnDuCWJ/qDkG6T4nBp9UyQLYM/P+HDxieXwz9W8IDmps4coHATA/weJs/njwv7dWIh4ti
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:0; SRV:;
- IPV:NLI; SFV:NSPM; H:AM4PR07MB3506.eurprd07.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:; SFS:; DIR:OUT; SFP:1901; 
-x-ms-exchange-antispam-messagedata: Qi14MO4oW4q388aQWZRHSvG4UYpMjdmcm4ZXHsHKBlBZIjuWq/SKhsekktAb53+r4Hq5JvbIxv6piSAQR6R7CTkNPIg6pEiBer4HGd/ow5vr+ewWP9ITh1VVtOW/m9ku7smFoiemt4XThPwiPLh1EQ==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (envelope-from <richard.henderson@linaro.org>) id 1jUC34-0006Xj-Bn
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:28:35 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:38207)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jUC33-0006TW-TS
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:28:29 -0400
+Received: by mail-pg1-x541.google.com with SMTP id l25so645641pgc.5
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 09:28:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=suwrl9RFQOuVoDr4Q1KFh+iDEpTs3nZzUnaA8dPRNoc=;
+ b=JLix+IVuTMnjIs/ulxnD9IEp6TfTl7q2sFcBbtsQ6EI4sTOScilDE5oiA/PfGnXBZl
+ 0OYCW9aBvlRPS2EZV3hYYSIotA6VdchjVUtdMOSvDi1Lz0t1QFZy2azsBx/2EORt4Btq
+ CVBXKhjlnxHqiuGMvNQf5lDlq+P+qo8e6ZQKuDIpD8qCpZPARvXRk3noaBZ80Fp/T346
+ wvHo2QGf7peF9AqKZ2AgNM2Fbc2O9B+r1zsBQRhXWsF/ZtkQbswe7R77sWiKWY0QtS6j
+ RGMKKG7zMORZbt14FYthbfFrCym97Oqqqis2Yg8cT6jPnxZOFU3jvu2sUuk2n1Oz8E6t
+ VdjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=suwrl9RFQOuVoDr4Q1KFh+iDEpTs3nZzUnaA8dPRNoc=;
+ b=a71DDDcg7KRO6vqlFtQgiFLOH4Bf+FPJYOmw3eyTIhEjKKEa+YTVjDik9XfaoHB3PZ
+ 7LI/bgmEZnIIuEhn7JwzRfehw0F63mi2CHRxLC5CAA/Jqdp7C2Im9dKmHy7kz/Pf1fxQ
+ Z5u0SelVnSh63MRTreeHONpidJ+G1N/x3IoUcys7pSNdYK256d0hsTG6pSpiaV9aGIP0
+ jUNxhkRk5Lm9A5B3dm0WWEqC2S1KS6+SCph1vn/KOKJmnY6/vhMlNa7moZX5iT9h4GMi
+ VYFqprg/apUWeIAZrWlkdXOCMAYHZsOVncTSdP3soDhuROLpS7VdIc0klzbydyXwAuOH
+ LIfw==
+X-Gm-Message-State: AGi0PuaN8bsHFudFkTqF/SLBP/gSwe2P2O08vJf2aWg/w6EKEu+nrs9z
+ Nxc8IrebzjLk2ZcNtZz1jllNgEar1RU=
+X-Google-Smtp-Source: APiQypI1fybAuARIEMORrUQpBtSDe4fxXSFf1LArZ2qxE4+Yx6isEnzCRhtfOVq5JiWifxItYLjXuQ==
+X-Received: by 2002:a63:4665:: with SMTP id v37mr3780795pgk.297.1588264107940; 
+ Thu, 30 Apr 2020 09:28:27 -0700 (PDT)
+Received: from localhost.localdomain (174-21-149-226.tukw.qwest.net.
+ [174.21.149.226])
+ by smtp.gmail.com with ESMTPSA id j5sm243514pfh.58.2020.04.30.09.28.27
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 30 Apr 2020 09:28:27 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 09/18] target/arm: Adjust interface of sve_ld1_host_fn
+Date: Thu, 30 Apr 2020 09:28:04 -0700
+Message-Id: <20200430162813.17671-10-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200430162813.17671-1-richard.henderson@linaro.org>
+References: <20200430162813.17671-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: c20c4261-1c87-4981-c314-08d7ed246a4a
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Apr 2020 16:34:55.3365 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Internet
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1EUR05HT066
-Received-SPF: pass client-ip=40.92.90.43; envelope-from=skizzato73@msn.com;
- helo=EUR05-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 12:34:56
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Received-From: 40.92.90.43
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x541.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::541
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -134,72 +96,260 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Programmingkid <programmingkidx@gmail.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Howard Spoelstra <hsp.cat7@gmail.com>,
- =?utf-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-TWF5YmUgdGhlIGZhc3Rlc3Qgd2F5IHRvIGltcGxlbWVudCBoYXJkZmxvYXRzIGZvciBwcGMgY291
-bGQgYmUgcnVuIHRoZW0gYnkgZGVmYXVsdCBhbmQgdW50aWwgc29tZSBmcHUgaW5zdHJ1Y3Rpb24g
-cmVxdWVzdCBmb3IgRlBTQ1IgcmVnaXN0ZXIuDQpBdCB0aGlzIHRpbWUgcHJvYmFibHkgd2Ugd2Fu
-dCB0byBjaGVjayBmb3Igc29tZSBleGNlcHRpb24uLiBzbyBRRU1VIGNvdWxkIGNvbWUgYmFjayB0
-byBsYXN0IGZwdSBpbnN0cnVjdGlvbiBleGVjdXRlZCBhbmQgcmUtZXhlY3V0ZSBpdCBpbiBzb2Z0
-ZmxvYXQgdGFraW5nIGNhcmUgdGhpcyB0aW1lIG9mIEZQU0NSIGZsYWdzLCB0aGVuIGNvbnRpbnVl
-IGluIGhhcmRmbG9hdHMgdW5pdGwgYW5vdGhlciBpbnN0cnVjdGlvbiBsb29raW5nIGZvciBGUFND
-UiByZWdpc3RlciBhbmQgc28gb24uLg0KDQpEaW5vDQoNCi0tLS0tTWVzc2FnZ2lvIG9yaWdpbmFs
-ZS0tLS0tDQpEYTogQkFMQVRPTiBab2x0YW4gPGJhbGF0b25AZWlrLmJtZS5odT4gDQpJbnZpYXRv
-OiBnaW92ZWTDrCAzMCBhcHJpbGUgMjAyMCAxNzozNg0KQTog572X5YuH5YiaKFlvbmdnYW5nIEx1
-bykgPGx1b3lvbmdnYW5nQGdtYWlsLmNvbT4NCkNjOiBSaWNoYXJkIEhlbmRlcnNvbiA8cmljaGFy
-ZC5oZW5kZXJzb25AbGluYXJvLm9yZz47IERpbm8gUGFwYXJhcm8gPHNraXp6YXRvNzNAbXNuLmNv
-bT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsgUHJvZ3JhbW1pbmdraWQgPHByb2dyYW1taW5na2lk
-eEBnbWFpbC5jb20+OyBxZW11LXBwY0Bub25nbnUub3JnOyBIb3dhcmQgU3BvZWxzdHJhIDxoc3Au
-Y2F0N0BnbWFpbC5jb20+OyBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+DQpP
-Z2dldHRvOiBSZTogUjogUjogQWJvdXQgaGFyZGZsb2F0IGluIHBwYw0KDQpPbiBUaHUsIDMwIEFw
-ciAyMDIwLCDnvZfli4fliJooWW9uZ2dhbmcgTHVvKSB3cm90ZToNCj4gSSBwcm9wb3NlIGEgbmV3
-IHdheSB0byBjb21wdXRpbmcgdGhlIGZsb2F0IGZsYWdzLCBXZSBwcmVzZXJ2ZSBhICBmbG9hdCAN
-Cj4gY29tcHV0aW5nIGNhc2ggdHlwZWRlZiBzdHJ1Y3QgRnBSZWNvcmQgeyAgdWludDhfdCBvcDsN
-Cj4gIGZsb2F0MzIgQTsNCj4gIGZsb2F0MzIgQjsNCj4gfSAgRnBSZWNvcmQ7DQo+IEZwUmVjb3Jk
-IGZwX2NhY2hlWzEwMjRdOw0KPiBpbnQgZnBfY2FjaGVfbGVuZ3RoOw0KPiB1aW50MzJfdCBmcF9l
-eGNlcHRpb25zOw0KPg0KPiAxLiBGb3IgZWFjaCBuZXcgZnAgb3BlcmF0aW9uIHdlIHB1c2ggaXQg
-dG8gdGhlICBmcF9jYWNoZSwgMi4gT25jZSB3ZSANCj4gcmVhZCB0aGUgZnBfZXhjZXB0aW9ucyAs
-IHRoZW4gd2UgcmUtY29tcHV0ZSB0aGUgZnBfZXhjZXB0aW9ucyBieSANCj4gcmUtcnVubmluZyB0
-aGUgZnAgRnBSZWNvcmQgc2VxdWVuY2UuDQo+IGFuZCBjbGVhciAgZnBfY2FjaGVfbGVuZ3RoLg0K
-PiAzLiBJZiB3ZSBjbGVhciB0aGUgZnBfZXhjZXB0aW9ucyAsIHRoZW4gd2Ugc2V0IGZwX2NhY2hl
-X2xlbmd0aCB0byAwIA0KPiBhbmQgY2xlYXIgIGZwX2V4Y2VwdGlvbnMuDQo+IDQuIElmIHRoZSAg
-ZnBfY2FjaGUgYXJlIGZ1bGwsIHRoZW4gd2UgcmUtY29tcHV0ZSB0aGUgZnBfZXhjZXB0aW9ucyBi
-eSANCj4gcmUtcnVubmluZyB0aGUgZnAgRnBSZWNvcmQgc2VxdWVuY2UuDQo+DQo+IFdvdWxkIHRo
-aXMgYmUgYSBnZW5lcmFsIG1ldGhvZCB0byB1c2UgaGFyZC1mbG9hdD8NCj4gVGhlIGNvbnN1ZWQg
-dGltZSBzaG91bGQgYmUgIDIqaGFyZF9mbG9hdC4NCj4gQ29uc2lkZXJhdGluZyByZWFkIGZwX2V4
-Y2VwdGlvbnMgYXJlIHJhcmUsIHRoZW4gdGhlIGFtb3J0aXplZCB0aW1lIA0KPiBjb21wbGV4aXR5
-IHdvdWxkIGJlIDEgKiBoYXJkX2Zsb2F0Lg0KDQpJdCdzIGhhcmQgdG8gZ3Vlc3Mgd2hhdCB0aGUg
-aGl0IHJhdGUgb2Ygc3VjaCBjYWNoZSB3b3VsZCBiZSBhbmQgaWYgaXQncyBsb3cgdGhlbiBtYW5h
-Z2luZyB0aGUgY2FjaGUgaXMgcHJvYmFibHkgbW9yZSBleHBlbnNpdmUgdGhhbiBydW5uaW5nIHdp
-dGggc29mdGZsb2F0LiBTbyB0byBldmFsdWF0ZSBhbnkgcHJvcG9zZWQgcGF0Y2ggd2UgYWxzbyBu
-ZWVkIHNvbWUgYmVuY2htYXJrcyB3aGljaCB3ZSBjYW4gZXhwZXJpbWVudCB3aXRoIHRvIHRlbGwg
-aWYgdGhlIHJlc3VsdHMgYXJlIGdvb2Qgb3Igbm90IG90aGVyd2lzZSB3ZSdyZSBqdXN0IGd1ZXNz
-aW5nLiBBcmUgdGhlcmUgc29tZSBleGlzdGluZyB0ZXN0cyBhbmQgYmVuY2htYXJrcyB0aGF0IHdl
-IGNhbiB1c2U/IEFsZXggbWVudGlvbmVkIGZwLWJlbmNoIEkgdGhpbmsgYW5kIHRvIGV2YWx1YXRl
-IHRoZSBjb3JyZWN0bmVzcyBvZiB0aGUgRlAgaW1wbGVtZW50YXRpb24gSSd2ZSBzZWVuIHRoaXMg
-b3RoZXINCmNvbnZlcnNhdGlvbjoNCg0KaHR0cHM6Ly9saXN0cy5ub25nbnUub3JnL2FyY2hpdmUv
-aHRtbC9xZW11LWRldmVsLzIwMjAtMDQvbXNnMDUxMDcuaHRtbA0KaHR0cHM6Ly9saXN0cy5ub25n
-bnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMjAtMDQvbXNnMDUxMjYuaHRtbA0KDQpJ
-cyB0aGF0IHNvbWV0aGluZyB3ZSBjYW4gdXNlIGZvciBQUEMgYXMgd2VsbCB0byBjaGVjayB0aGUg
-Y29ycmVjdG5lc3M/DQoNClNvIEkgdGhpbmsgYmVmb3JlIGltcGxlbWVudGluZyBhbnkgcG90ZW50
-aWFsIHNvbHV0aW9uIHRoYXQgY2FtZSB1cCBpbiB0aGlzIGJyYWluc3Rvcm1pbmcgdGhlIGZpcnN0
-IHN0ZXAgd291bGQgYmUgdG8gZ2V0IGFuZCBjb21waWxlIChvciB3cml0ZSBpZiBub3QNCmF2YWls
-YWJsZSkgc29tZSB0ZXN0cyBhbmQgYmVuY2htYXJrczoNCg0KMS4gdGVzdGluZyBob3N0IGJlaGF2
-aW91ciBmb3IgaW5leGFjdCBhbmQgY29tcGFyZSB0aGF0IGZvciBkaWZmZXJlbnQgYXJjaHMgMi4g
-c29tZSBGUCB0ZXN0cyB0aGF0IGNhbiBiZSB1c2VkIHRvIGNvbXBhcmUgcmVzdWx0cyB3aXRoIFFF
-TVUgYW5kIHJlYWwgQ1BVIHRvIGNoZWNrIGNvcnJlY3RuZXNzIG9mIGVtdWxhdGlvbiAoaWYgdGhl
-c2UgY2hlY2sgZm9yIGluZXhhY3QgZGlmZmVyZW5jZXMgdGhlbiBjb3VsZCBiZSB1c2VkIGluc3Rl
-YWQgb2YgMS4pIDMuIHNvbWUgYmVuY2htYXJrcyB0byBldmFsdWF0ZSBRRU1VIHBlcmZvcm1hbmNl
-ICh0aGVzZSBjb3VsZCBiZSBzYW1lIGFzIEZQIHRlc3RzIG9yIHNvbWUgcmVhbCB3b3JsZCBGUCBo
-ZWF2eSBhcHBsaWNhdGlvbnMpLg0KDQpUaGVuIHdlIGNhbiBzZWUgaWYgdGhlIHByb3Bvc2VkIHNv
-bHV0aW9uIGlzIGZhc3RlciBhbmQgc3RpbGwgY29ycmVjdC4NCg0KUmVnYXJkcywNCkJBTEFUT04g
-Wm9sdGFuDQo=
+The current interface includes a loop; change it to load a
+single element.  We will then be able to use the function
+for ld{2,3,4} where individual vector elements are not adjacent.
+
+Replace each call with the simplest possible loop over active
+elements.
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/sve_helper.c | 124 ++++++++++++++++++++--------------------
+ 1 file changed, 63 insertions(+), 61 deletions(-)
+
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index 2f053a9152..d007137735 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -3972,20 +3972,10 @@ void HELPER(sve_fcmla_zpzzz_d)(CPUARMState *env, void *vg, uint32_t desc)
+  */
+ 
+ /*
+- * Load elements into @vd, controlled by @vg, from @host + @mem_ofs.
+- * Memory is valid through @host + @mem_max.  The register element
+- * indices are inferred from @mem_ofs, as modified by the types for
+- * which the helper is built.  Return the @mem_ofs of the first element
+- * not loaded (which is @mem_max if they are all loaded).
+- *
+- * For softmmu, we have fully validated the guest page.  For user-only,
+- * we cannot fully validate without taking the mmap lock, but since we
+- * know the access is within one host page, if any access is valid they
+- * all must be valid.  However, when @vg is all false, it may be that
+- * no access is valid.
++ * Load one element into @vd + @reg_off from @host.
++ * The controlling predicate is known to be true.
+  */
+-typedef intptr_t sve_ld1_host_fn(void *vd, void *vg, void *host,
+-                                 intptr_t mem_ofs, intptr_t mem_max);
++typedef void sve_ldst1_host_fn(void *vd, intptr_t reg_off, void *host);
+ 
+ /*
+  * Load one element into @vd + @reg_off from (@env, @vaddr, @ra).
+@@ -3999,20 +3989,10 @@ typedef void sve_ldst1_tlb_fn(CPUARMState *env, void *vd, intptr_t reg_off,
+  */
+ 
+ #define DO_LD_HOST(NAME, H, TYPEE, TYPEM, HOST) \
+-static intptr_t sve_##NAME##_host(void *vd, void *vg, void *host,           \
+-                                  intptr_t mem_off, const intptr_t mem_max) \
+-{                                                                           \
+-    intptr_t reg_off = mem_off * (sizeof(TYPEE) / sizeof(TYPEM));           \
+-    uint64_t *pg = vg;                                                      \
+-    while (mem_off + sizeof(TYPEM) <= mem_max) {                            \
+-        TYPEM val = 0;                                                      \
+-        if (likely((pg[reg_off >> 6] >> (reg_off & 63)) & 1)) {             \
+-            val = HOST(host + mem_off);                                     \
+-        }                                                                   \
+-        *(TYPEE *)(vd + H(reg_off)) = val;                                  \
+-        mem_off += sizeof(TYPEM), reg_off += sizeof(TYPEE);                 \
+-    }                                                                       \
+-    return mem_off;                                                         \
++static void sve_##NAME##_host(void *vd, intptr_t reg_off, void *host)  \
++{                                                                      \
++    TYPEM val = HOST(host);                                            \
++    *(TYPEE *)(vd + H(reg_off)) = val;                                 \
+ }
+ 
+ #define DO_LD_TLB(NAME, H, TYPEE, TYPEM, TLB) \
+@@ -4411,7 +4391,7 @@ static inline bool test_host_page(void *host)
+ static void sve_ld1_r(CPUARMState *env, void *vg, const target_ulong addr,
+                       uint32_t desc, const uintptr_t retaddr,
+                       const int esz, const int msz,
+-                      sve_ld1_host_fn *host_fn,
++                      sve_ldst1_host_fn *host_fn,
+                       sve_ldst1_tlb_fn *tlb_fn)
+ {
+     const TCGMemOpIdx oi = extract32(desc, SIMD_DATA_SHIFT, MEMOPIDX_SHIFT);
+@@ -4445,8 +4425,12 @@ static void sve_ld1_r(CPUARMState *env, void *vg, const target_ulong addr,
+     if (likely(split == mem_max)) {
+         host = tlb_vaddr_to_host(env, addr + mem_off, MMU_DATA_LOAD, mmu_idx);
+         if (test_host_page(host)) {
+-            mem_off = host_fn(vd, vg, host - mem_off, mem_off, mem_max);
+-            tcg_debug_assert(mem_off == mem_max);
++            intptr_t i = reg_off;
++            host -= mem_off;
++            do {
++                host_fn(vd, i, host + (i >> diffsz));
++                i = find_next_active(vg, i + (1 << esz), reg_max, esz);
++            } while (i < reg_max);
+             /* After having taken any fault, zero leading inactive elements. */
+             swap_memzero(vd, reg_off);
+             return;
+@@ -4459,7 +4443,12 @@ static void sve_ld1_r(CPUARMState *env, void *vg, const target_ulong addr,
+      */
+ #ifdef CONFIG_USER_ONLY
+     swap_memzero(&scratch, reg_off);
+-    host_fn(&scratch, vg, g2h(addr), mem_off, mem_max);
++    host = g2h(addr);
++    do {
++        host_fn(&scratch, reg_off, host + (reg_off >> diffsz));
++        reg_off += 1 << esz;
++        reg_off = find_next_active(vg, reg_off, reg_max, esz);
++    } while (reg_off < reg_max);
+ #else
+     memset(&scratch, 0, reg_max);
+     goto start;
+@@ -4477,9 +4466,13 @@ static void sve_ld1_r(CPUARMState *env, void *vg, const target_ulong addr,
+             host = tlb_vaddr_to_host(env, addr + mem_off,
+                                      MMU_DATA_LOAD, mmu_idx);
+             if (host) {
+-                mem_off = host_fn(&scratch, vg, host - mem_off,
+-                                  mem_off, split);
+-                reg_off = mem_off << diffsz;
++                host -= mem_off;
++                do {
++                    host_fn(&scratch, reg_off, host + mem_off);
++                    reg_off += 1 << esz;
++                    reg_off = find_next_active(vg, reg_off, reg_max, esz);
++                    mem_off = reg_off >> diffsz;
++                } while (split - mem_off >= (1 << msz));
+                 continue;
+             }
+         }
+@@ -4706,7 +4699,7 @@ static void record_fault(CPUARMState *env, uintptr_t i, uintptr_t oprsz)
+ static void sve_ldff1_r(CPUARMState *env, void *vg, const target_ulong addr,
+                         uint32_t desc, const uintptr_t retaddr,
+                         const int esz, const int msz,
+-                        sve_ld1_host_fn *host_fn,
++                        sve_ldst1_host_fn *host_fn,
+                         sve_ldst1_tlb_fn *tlb_fn)
+ {
+     const TCGMemOpIdx oi = extract32(desc, SIMD_DATA_SHIFT, MEMOPIDX_SHIFT);
+@@ -4716,7 +4709,7 @@ static void sve_ldff1_r(CPUARMState *env, void *vg, const target_ulong addr,
+     const int diffsz = esz - msz;
+     const intptr_t reg_max = simd_oprsz(desc);
+     const intptr_t mem_max = reg_max >> diffsz;
+-    intptr_t split, reg_off, mem_off;
++    intptr_t split, reg_off, mem_off, i;
+     void *host;
+ 
+     /* Skip to the first active element.  */
+@@ -4739,28 +4732,18 @@ static void sve_ldff1_r(CPUARMState *env, void *vg, const target_ulong addr,
+     if (likely(split == mem_max)) {
+         host = tlb_vaddr_to_host(env, addr + mem_off, MMU_DATA_LOAD, mmu_idx);
+         if (test_host_page(host)) {
+-            mem_off = host_fn(vd, vg, host - mem_off, mem_off, mem_max);
+-            tcg_debug_assert(mem_off == mem_max);
++            i = reg_off;
++            host -= mem_off;
++            do {
++                host_fn(vd, i, host + (i >> diffsz));
++                i = find_next_active(vg, i + (1 << esz), reg_max, esz);
++            } while (i < reg_max);
+             /* After any fault, zero any leading inactive elements.  */
+             swap_memzero(vd, reg_off);
+             return;
+         }
+     }
+ 
+-#ifdef CONFIG_USER_ONLY
+-    /*
+-     * The page(s) containing this first element at ADDR+MEM_OFF must
+-     * be valid.  Considering that this first element may be misaligned
+-     * and cross a page boundary itself, take the rest of the page from
+-     * the last byte of the element.
+-     */
+-    split = max_for_page(addr, mem_off + (1 << msz) - 1, mem_max);
+-    mem_off = host_fn(vd, vg, g2h(addr), mem_off, split);
+-
+-    /* After any fault, zero any leading inactive elements.  */
+-    swap_memzero(vd, reg_off);
+-    reg_off = mem_off << diffsz;
+-#else
+     /*
+      * Perform one normal read, which will fault or not.
+      * But it is likely to bring the page into the tlb.
+@@ -4777,11 +4760,15 @@ static void sve_ldff1_r(CPUARMState *env, void *vg, const target_ulong addr,
+     if (split >= (1 << msz)) {
+         host = tlb_vaddr_to_host(env, addr + mem_off, MMU_DATA_LOAD, mmu_idx);
+         if (host) {
+-            mem_off = host_fn(vd, vg, host - mem_off, mem_off, split);
+-            reg_off = mem_off << diffsz;
++            host -= mem_off;
++            do {
++                host_fn(vd, reg_off, host + mem_off);
++                reg_off += 1 << esz;
++                reg_off = find_next_active(vg, reg_off, reg_max, esz);
++                mem_off = reg_off >> diffsz;
++            } while (split - mem_off >= (1 << msz));
+         }
+     }
+-#endif
+ 
+     record_fault(env, reg_off, reg_max);
+ }
+@@ -4791,7 +4778,7 @@ static void sve_ldff1_r(CPUARMState *env, void *vg, const target_ulong addr,
+  */
+ static void sve_ldnf1_r(CPUARMState *env, void *vg, const target_ulong addr,
+                         uint32_t desc, const int esz, const int msz,
+-                        sve_ld1_host_fn *host_fn)
++                        sve_ldst1_host_fn *host_fn)
+ {
+     const unsigned rd = extract32(desc, SIMD_DATA_SHIFT + MEMOPIDX_SHIFT, 5);
+     void *vd = &env->vfp.zregs[rd];
+@@ -4806,7 +4793,13 @@ static void sve_ldnf1_r(CPUARMState *env, void *vg, const target_ulong addr,
+     host = tlb_vaddr_to_host(env, addr, MMU_DATA_LOAD, mmu_idx);
+     if (likely(page_check_range(addr, mem_max, PAGE_READ) == 0)) {
+         /* The entire operation is valid and will not fault.  */
+-        host_fn(vd, vg, host, 0, mem_max);
++        reg_off = 0;
++        do {
++            mem_off = reg_off >> diffsz;
++            host_fn(vd, reg_off, host + mem_off);
++            reg_off += 1 << esz;
++            reg_off = find_next_active(vg, reg_off, reg_max, esz);
++        } while (reg_off < reg_max);
+         return;
+     }
+ #endif
+@@ -4826,8 +4819,12 @@ static void sve_ldnf1_r(CPUARMState *env, void *vg, const target_ulong addr,
+     if (page_check_range(addr + mem_off, 1 << msz, PAGE_READ) == 0) {
+         /* At least one load is valid; take the rest of the page.  */
+         split = max_for_page(addr, mem_off + (1 << msz) - 1, mem_max);
+-        mem_off = host_fn(vd, vg, host, mem_off, split);
+-        reg_off = mem_off << diffsz;
++        do {
++            host_fn(vd, reg_off, host + mem_off);
++            reg_off += 1 << esz;
++            reg_off = find_next_active(vg, reg_off, reg_max, esz);
++            mem_off = reg_off >> diffsz;
++        } while (split - mem_off >= (1 << msz));
+     }
+ #else
+     /*
+@@ -4848,8 +4845,13 @@ static void sve_ldnf1_r(CPUARMState *env, void *vg, const target_ulong addr,
+     host = tlb_vaddr_to_host(env, addr + mem_off, MMU_DATA_LOAD, mmu_idx);
+     split = max_for_page(addr, mem_off, mem_max);
+     if (host && split >= (1 << msz)) {
+-        mem_off = host_fn(vd, vg, host - mem_off, mem_off, split);
+-        reg_off = mem_off << diffsz;
++        host -= mem_off;
++        do {
++            host_fn(vd, reg_off, host + mem_off);
++            reg_off += 1 << esz;
++            reg_off = find_next_active(vg, reg_off, reg_max, esz);
++            mem_off = reg_off >> diffsz;
++        } while (split - mem_off >= (1 << msz));
+     }
+ #endif
+ 
+-- 
+2.20.1
+
 
