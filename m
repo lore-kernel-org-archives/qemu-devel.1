@@ -2,89 +2,91 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67753C8300A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:36:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66201C8300A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:37:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 281FF20838
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:36:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 157FA20838
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:37:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BggxQBNP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 281FF20838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UrZiK6XZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 157FA20838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU6YF-0006yy-61
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 06:36:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54120)
+	id 1jU6ZA-00082v-9r
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 06:37:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53148)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jU6Wv-0005nO-O2
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:34:58 -0400
+ (envelope-from <zltjiangshi@gmail.com>) id 1jU6ON-0001Kq-2m
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:26:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1jU6Wu-0005br-1K
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:34:57 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20868
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jU6Wt-0005bk-Iw
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:34:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588242894;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=aezKVauiUB33eCn1QG7NpnGTzrOUwf3IA3Rp0Jxx93Q=;
- b=BggxQBNP67F8xl7SA7YURNjD0PeMDWot0NnVwkhjIFR9hUDBoxw3jot/4hjibs6fJ5YJPI
- TiXn5CZCapq7jlsjor+Ny0ugQMlyV1dnVkPw0KeJCHFbxwMLa6rQh1kpcXqC2MFFVfy+4a
- v6/um/vwWiS3SIxvxKlb9+z5QAObK7E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-455-w7JcFPQ8OZ6XLgvEC2K5Hw-1; Thu, 30 Apr 2020 06:34:47 -0400
-X-MC-Unique: w7JcFPQ8OZ6XLgvEC2K5Hw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D9931005510;
- Thu, 30 Apr 2020 10:34:46 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.44])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E2D0D60BF4;
- Thu, 30 Apr 2020 10:34:40 +0000 (UTC)
-Date: Thu, 30 Apr 2020 11:34:37 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: Configuring onboard devices (was: Failing property setters +
- hardwired devices + -global = a bad day)
-Message-ID: <20200430103437.GI2084570@redhat.com>
-References: <87mu6uia5i.fsf@dusky.pond.sub.org>
- <20200429155719.GL1495129@redhat.com>
- <87k11xh2kq.fsf@dusky.pond.sub.org>
- <CAFEAcA9-oxkMD-kJ1z12d4K1S_Jaz7Wj6_38Ah7ChSaBfQNkkA@mail.gmail.com>
- <87tv11e1en.fsf_-_@dusky.pond.sub.org>
-MIME-Version: 1.0
-In-Reply-To: <87tv11e1en.fsf_-_@dusky.pond.sub.org>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:31:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+ (envelope-from <zltjiangshi@gmail.com>) id 1jU6OD-0007No-03
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:26:06 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:38909)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1jU6OC-00076g-53
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:25:56 -0400
+Received: by mail-pl1-x644.google.com with SMTP id w3so2089472plz.5
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 03:25:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=hH+WJS7P2vdGj2kP2clpp5p3F7ykGj330Lsee1IC1yw=;
+ b=UrZiK6XZoX7pDl3FsHfiB9RSuDLkn5rh/mmpDf14WCHuTfiqcsIWt6iepwATRSlLCa
+ TMYQFRu09L1SZr4PfIs7JdbC+TurldhOLsgjWUIZ75T2YDVZh/+57vHni1TatCteh91o
+ sqhZbKp+Of4IoQ4QTwscfRm4wKj6NjuUxJ2ELgQuUZG+2ZgSBNRViYOJwKw5a0KblpoL
+ IjdJU8JVqUoiE4PIA+C7WDyDcG/8Hf1HapT8I/R5vIlOnRLH6ErzJEjRXDztojsSbsn3
+ WGqjfUlyFSVbKN4SuUGftQWg5cIGJ46bRGvTdTa34E5YbkIBCd1SaHUzOhWSq1ck52tM
+ L7IA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=hH+WJS7P2vdGj2kP2clpp5p3F7ykGj330Lsee1IC1yw=;
+ b=CxUDrXifeUo4eEXOmBhNiwZdDcL29iQ+2SnhUL9LOFOaSh5cQdRKMN1BxZdxjr/5jz
+ 51mZIz1PGbkAcTkBXj4VB8QUCLX35mGuKKIZpYO+0gAbSEWA4OhP46iJWXtxIPqdGd+v
+ wKIR+8DgZo2rDGqGmhqkvFd6USReh5HIQ2Yr1FFoDPCbwc65ZQsxoWlOvSHPfz31x8Ij
+ 9IX+FViNJ/7oMF7MtZxmhxxQ1iiaWkQ5IgxyIjWSsqC5tFI1ptjtf86idPxrEWH/pA8k
+ LPVxj4whvgQws9BOO3ssJmRwfOULbEyCDpF0mm79mDYKrB48to7/tuffH1rLpmbNuUbV
+ yNDQ==
+X-Gm-Message-State: AGi0Pub8e0+gbS1RqxJuTt14HSbivudSs2nWrADzUXXROY1J56basfsG
+ GD47vJBzHzGrdFjbiEdOK9k=
+X-Google-Smtp-Source: APiQypKnyTPlrlIT6DMG7keQdTgwLD/yhG+syhYNalt+WghzbSTuSKGZi5cNM+7IOFvk8nWWyuMhjg==
+X-Received: by 2002:a17:902:e989:: with SMTP id
+ f9mr3079844plb.321.1588242351085; 
+ Thu, 30 Apr 2020 03:25:51 -0700 (PDT)
+Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com.
+ [34.92.144.28])
+ by smtp.gmail.com with ESMTPSA id a15sm1397872pju.3.2020.04.30.03.25.48
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 30 Apr 2020 03:25:50 -0700 (PDT)
+From: Huacai Chen <zltjiangshi@gmail.com>
+X-Google-Original-From: Huacai Chen <chenhc@lemote.com>
+To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Subject: [PATCH for-5.1 V2 5/7] target/mips: Add more CP0 register for
+ save/restore
+Date: Thu, 30 Apr 2020 18:22:33 +0800
+Message-Id: <1588242155-23924-6-git-send-email-chenhc@lemote.com>
+X-Mailer: git-send-email 2.7.0
+In-Reply-To: <1588242155-23924-1-git-send-email-chenhc@lemote.com>
+References: <1588242155-23924-1-git-send-email-chenhc@lemote.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=zltjiangshi@gmail.com; helo=mail-pl1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::644
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,170 +98,374 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Jason Wang <jasowang@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Huacai Chen <chenhuacai@gmail.com>, Huacai Chen <chenhc@lemote.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>, qemu-devel@nongnu.org,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Apr 30, 2020 at 12:03:12PM +0200, Markus Armbruster wrote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
->=20
-> > On Thu, 30 Apr 2020 at 08:09, Markus Armbruster <armbru@redhat.com> wro=
-te:
-> >> Our means to configure onboard devices are weak.  We sidestepped this
-> >> for isa-fdc by taking it off the board, and thus make -device work.
-> >
-> > This seems to be a general dynamic: the x86 pc machine works
-> > via -device options (or is changed so it can work that way);
-> > and then people propose dropping/deprecating/etc the config
-> > options that work with onboard devices, without providing
-> > clear solutions/instructions on how the command line needs
-> > to change/etc for the mass of boards which are not the x86
-> > pc machine and which do have a lot of onboard devices which
-> > can't be handled via -device.
-> >
-> > So my gut reaction to the "we should deprecate -global"
-> > suggestions in this thread was a bit "here we go again"...
-> > What works for x86 or even "what is sufficient for libvirt"
-> > doesn't necessarily cover all the cases.
->=20
-> Such shortsighted proposals have been made, but don't think it's what
-> we're doing here.
->=20
-> You're 100% right in that we do need to configure onboard devices.
-> -global is a terrible way to do it, though: it applies to *all* devices
-> of a kind.  What if the board has more than one?  What if the can add
-> more?
+Add more CP0 register for save/restore, including: EBase, XContext,
+PageGrain, PWBase, PWSize, PWField, PWCtl, Config*, KScratch1~KScratch6.
 
+Signed-off-by: Huacai Chen <chenhc@lemote.com>
+Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+---
+ target/mips/kvm.c     | 212 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ target/mips/machine.c |   6 +-
+ 2 files changed, 216 insertions(+), 2 deletions(-)
 
-> Any better ideas for letting users configure onboard devices?
-
-All the devices in QEMU form a tree, as reported by "info qtree".
-So, IIUC, the challenge is to provide a way to uniquely identify
-any node in the tree.
-
-Devices configured by the user/mgmt app will have an "id" property
-but most built-in devices will not have any "id". In addition even
-user configured devices may create multiple sub-nodes in the tree
-without "id" parameters.
-
-Uniquely referencing nodes in a tee is a solved problem though,
-even without "id" parameters. The XPath query languages shows
-this for XML.
-
--global defines a query language based on the object type, and
-property name which is insufficiently flexible
-
--set defines a query language based on the object type and ID
-value and property name(s) which is again insufficiently flexible.
-
-
-We "merely" need a new query language targetted to QEMU's qtree
-structure, which we can expose in the CLI that gives unique access
-to every possible property.
-
-Here is the truncated 'info qtree' for a running guest of mine:
-
-bus: main-system-bus
-  type System
-  dev: kvm-ioapic, id ""
-    gpio-in "" 24
-    gsi_base =3D 0 (0x0)
-    mmio 00000000fec00000/0000000000001000
-  dev: i440FX-pcihost, id ""
-    pci-hole64-size =3D 2147483648 (2 GiB)
-    short_root_bus =3D 0 (0x0)
-    x-pci-hole64-fix =3D false
-    bus: pci.0
-      type PCI
-      dev: virtio-balloon-pci, id "balloon0"
-        disable-legacy =3D "off"
-        disable-modern =3D true
-        class =3D 255 (0xff)
-        virtio-pci-bus-master-bug-migration =3D false
-        migrate-extra =3D false
-        modern-pio-notify =3D false
-        x-disable-pcie =3D true
-        page-per-vq =3D true
-        x-ignore-backend-features =3D true
-        ats =3D false
-        x-pcie-deverr-init =3D false
-        x-pcie-lnkctl-init =3D false
-        x-pcie-pm-init =3D false
-        addr =3D 08.0
-        romfile =3D ""
-        rombar =3D 1 (0x1)
-        multifunction =3D false
-        command_serr_enable =3D true
-        x-pcie-lnksta-dllla =3D true
-        x-pcie-extcap-init =3D false
-        class Class 00ff, addr 00:08.0, pci id 1af4:1002 (sub 1af4:0005)
-        bar 0: i/o at 0xc100 [0xc11f]
-        bus: virtio-bus
-          type virtio-pci-bus
-          dev: virtio-balloon-device, id ""
-            deflate-on-oom =3D false
-            free-page-hint =3D false
-            qemu-4-0-config-size =3D false
-            iothread =3D ""
-            indirect_desc =3D true
-            event_idx =3D true
-            notify_on_empty =3D true
-            any_layout =3D true
-            iommu_platform =3D false
-            use-started =3D false
-
-
-Consider the problem is to set the "deflate-on-oom" property on
-the balloon device.
-
-To uniquely identify this we can have a string:
-
- /dev[1]/bus[pci/0]/dev[id=3Dballoon0]/bus[virtio-bus]/dev[0]/deflate-on-oo=
-m=3Dtrue
-
-If we consider that "id" values are unique, we can allow a simplication
-by omitting everything before that part of the match - "//" could indicate
-an omitted part like XPath allows, so we'd get
-
- //dev[id=3Dballoon0]/bus[virtio-bus]/dev[0]/deflate-on-oom=3Dtrue
-
-There's only one bus, and one dev on that bus, so knowing this we can
-simplify a bit more and still be a unique query, to get this:
-
- //dev[id=3Dballoon0]/bus/dev/deflate-on-oom=3Dtrue
-
-Or even allow use of "//" in the middle too:
-
- //dev[id=3Dballoon0]//deflate-on-oom=3Dtrue
-
-Which conceptually says
-
-   "find the device with id balloon0 and set the property 'deflate-on-oom'
-   on the first child node in the qtree that hsa such a property name"
-
-I didn't say this would be pretty, and of course no one would seriously
-use this syntax for the virtio-balloon device, as you'd just set the
-property with -device. It should work for the many built-in devices
-though.
-
-Now just provide a new CLI arg
-
- $QEMU -qtree //dev[id=3Dballoon0]//deflate-on-oom=3Dtrue
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+diff --git a/target/mips/kvm.c b/target/mips/kvm.c
+index de3e26e..96cfa10 100644
+--- a/target/mips/kvm.c
++++ b/target/mips/kvm.c
+@@ -245,10 +245,16 @@ int kvm_mips_set_ipi_interrupt(MIPSCPU *cpu, int irq, int level)
+     (KVM_REG_MIPS_CP0 | KVM_REG_SIZE_U64 | (8 * (_R) + (_S)))
+ 
+ #define KVM_REG_MIPS_CP0_INDEX          MIPS_CP0_32(0, 0)
++#define KVM_REG_MIPS_CP0_RANDOM         MIPS_CP0_32(1, 0)
+ #define KVM_REG_MIPS_CP0_CONTEXT        MIPS_CP0_64(4, 0)
+ #define KVM_REG_MIPS_CP0_USERLOCAL      MIPS_CP0_64(4, 2)
+ #define KVM_REG_MIPS_CP0_PAGEMASK       MIPS_CP0_32(5, 0)
++#define KVM_REG_MIPS_CP0_PAGEGRAIN      MIPS_CP0_32(5, 1)
++#define KVM_REG_MIPS_CP0_PWBASE         MIPS_CP0_64(5, 5)
++#define KVM_REG_MIPS_CP0_PWFIELD        MIPS_CP0_64(5, 6)
++#define KVM_REG_MIPS_CP0_PWSIZE         MIPS_CP0_64(5, 7)
+ #define KVM_REG_MIPS_CP0_WIRED          MIPS_CP0_32(6, 0)
++#define KVM_REG_MIPS_CP0_PWCTL          MIPS_CP0_32(6, 6)
+ #define KVM_REG_MIPS_CP0_HWRENA         MIPS_CP0_32(7, 0)
+ #define KVM_REG_MIPS_CP0_BADVADDR       MIPS_CP0_64(8, 0)
+ #define KVM_REG_MIPS_CP0_COUNT          MIPS_CP0_32(9, 0)
+@@ -258,13 +264,22 @@ int kvm_mips_set_ipi_interrupt(MIPSCPU *cpu, int irq, int level)
+ #define KVM_REG_MIPS_CP0_CAUSE          MIPS_CP0_32(13, 0)
+ #define KVM_REG_MIPS_CP0_EPC            MIPS_CP0_64(14, 0)
+ #define KVM_REG_MIPS_CP0_PRID           MIPS_CP0_32(15, 0)
++#define KVM_REG_MIPS_CP0_EBASE          MIPS_CP0_64(15, 1)
+ #define KVM_REG_MIPS_CP0_CONFIG         MIPS_CP0_32(16, 0)
+ #define KVM_REG_MIPS_CP0_CONFIG1        MIPS_CP0_32(16, 1)
+ #define KVM_REG_MIPS_CP0_CONFIG2        MIPS_CP0_32(16, 2)
+ #define KVM_REG_MIPS_CP0_CONFIG3        MIPS_CP0_32(16, 3)
+ #define KVM_REG_MIPS_CP0_CONFIG4        MIPS_CP0_32(16, 4)
+ #define KVM_REG_MIPS_CP0_CONFIG5        MIPS_CP0_32(16, 5)
++#define KVM_REG_MIPS_CP0_CONFIG6        MIPS_CP0_32(16, 6)
++#define KVM_REG_MIPS_CP0_XCONTEXT       MIPS_CP0_64(20, 0)
+ #define KVM_REG_MIPS_CP0_ERROREPC       MIPS_CP0_64(30, 0)
++#define KVM_REG_MIPS_CP0_KSCRATCH1      MIPS_CP0_64(31, 2)
++#define KVM_REG_MIPS_CP0_KSCRATCH2      MIPS_CP0_64(31, 3)
++#define KVM_REG_MIPS_CP0_KSCRATCH3      MIPS_CP0_64(31, 4)
++#define KVM_REG_MIPS_CP0_KSCRATCH4      MIPS_CP0_64(31, 5)
++#define KVM_REG_MIPS_CP0_KSCRATCH5      MIPS_CP0_64(31, 6)
++#define KVM_REG_MIPS_CP0_KSCRATCH6      MIPS_CP0_64(31, 7)
+ 
+ static inline int kvm_mips_put_one_reg(CPUState *cs, uint64_t reg_id,
+                                        int32_t *addr)
+@@ -394,6 +409,29 @@ static inline int kvm_mips_get_one_ureg64(CPUState *cs, uint64_t reg_id,
+                                          (1U << CP0C5_UFE) | \
+                                          (1U << CP0C5_FRE) | \
+                                          (1U << CP0C5_UFR))
++#define KVM_REG_MIPS_CP0_CONFIG6_MASK   ((1U << CP0C6_BPPASS) | \
++                                         (0x3fU << CP0C6_KPOS) | \
++                                         (1U << CP0C6_KE) | \
++                                         (1U << CP0C6_VTLBONLY) | \
++                                         (1U << CP0C6_LASX) | \
++                                         (1U << CP0C6_SSEN) | \
++                                         (1U << CP0C6_DISDRTIME) | \
++                                         (1U << CP0C6_PIXNUEN) | \
++                                         (1U << CP0C6_SCRAND) | \
++                                         (1U << CP0C6_LLEXCEN) | \
++                                         (1U << CP0C6_DISVC) | \
++                                         (1U << CP0C6_VCLRU) | \
++                                         (1U << CP0C6_DCLRU) | \
++                                         (1U << CP0C6_PIXUEN) | \
++                                         (1U << CP0C6_DISBLKLYEN) | \
++                                         (1U << CP0C6_UMEMUALEN) | \
++                                         (1U << CP0C6_SFBEN) | \
++                                         (1U << CP0C6_FLTINT) | \
++                                         (1U << CP0C6_VLTINT) | \
++                                         (1U << CP0C6_DISBTB) | \
++                                         (3U << CP0C6_STPREFCTL) | \
++                                         (1U << CP0C6_INSTPREF) | \
++                                         (1U << CP0C6_DATAPREF))
+ 
+ static inline int kvm_mips_change_one_reg(CPUState *cs, uint64_t reg_id,
+                                           int32_t *addr, int32_t mask)
+@@ -729,6 +767,11 @@ static int kvm_mips_put_cp0_registers(CPUState *cs, int level)
+         DPRINTF("%s: Failed to put CP0_INDEX (%d)\n", __func__, err);
+         ret = err;
+     }
++    err = kvm_mips_put_one_reg(cs, KVM_REG_MIPS_CP0_RANDOM, &env->CP0_Random);
++    if (err < 0) {
++        DPRINTF("%s: Failed to put CP0_RANDOM (%d)\n", __func__, err);
++        ret = err;
++    }
+     err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_CONTEXT,
+                                  &env->CP0_Context);
+     if (err < 0) {
+@@ -747,11 +790,40 @@ static int kvm_mips_put_cp0_registers(CPUState *cs, int level)
+         DPRINTF("%s: Failed to put CP0_PAGEMASK (%d)\n", __func__, err);
+         ret = err;
+     }
++    err = kvm_mips_put_one_reg(cs, KVM_REG_MIPS_CP0_PAGEGRAIN,
++                               &env->CP0_PageGrain);
++    if (err < 0) {
++        DPRINTF("%s: Failed to put CP0_PAGEGRAIN (%d)\n", __func__, err);
++        ret = err;
++    }
++    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_PWBASE,
++                               &env->CP0_PWBase);
++    if (err < 0) {
++        DPRINTF("%s: Failed to put CP0_PWBASE (%d)\n", __func__, err);
++        ret = err;
++    }
++    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_PWFIELD,
++                               &env->CP0_PWField);
++    if (err < 0) {
++        DPRINTF("%s: Failed to put CP0_PWField (%d)\n", __func__, err);
++        ret = err;
++    }
++    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_PWSIZE,
++                               &env->CP0_PWSize);
++    if (err < 0) {
++        DPRINTF("%s: Failed to put CP0_PWSIZE (%d)\n", __func__, err);
++        ret = err;
++    }
+     err = kvm_mips_put_one_reg(cs, KVM_REG_MIPS_CP0_WIRED, &env->CP0_Wired);
+     if (err < 0) {
+         DPRINTF("%s: Failed to put CP0_WIRED (%d)\n", __func__, err);
+         ret = err;
+     }
++    err = kvm_mips_put_one_reg(cs, KVM_REG_MIPS_CP0_PWCTL, &env->CP0_PWCtl);
++    if (err < 0) {
++        DPRINTF("%s: Failed to put CP0_PWCTL (%d)\n", __func__, err);
++        ret = err;
++    }
+     err = kvm_mips_put_one_reg(cs, KVM_REG_MIPS_CP0_HWRENA, &env->CP0_HWREna);
+     if (err < 0) {
+         DPRINTF("%s: Failed to put CP0_HWRENA (%d)\n", __func__, err);
+@@ -799,6 +871,11 @@ static int kvm_mips_put_cp0_registers(CPUState *cs, int level)
+         DPRINTF("%s: Failed to put CP0_PRID (%d)\n", __func__, err);
+         ret = err;
+     }
++    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_EBASE, &env->CP0_EBase);
++    if (err < 0) {
++        DPRINTF("%s: Failed to put CP0_EBASE (%d)\n", __func__, err);
++        ret = err;
++    }
+     err = kvm_mips_change_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG,
+                                   &env->CP0_Config0,
+                                   KVM_REG_MIPS_CP0_CONFIG_MASK);
+@@ -841,12 +918,61 @@ static int kvm_mips_put_cp0_registers(CPUState *cs, int level)
+         DPRINTF("%s: Failed to change CP0_CONFIG5 (%d)\n", __func__, err);
+         ret = err;
+     }
++    err = kvm_mips_change_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG6,
++                                  &env->CP0_Config6,
++                                  KVM_REG_MIPS_CP0_CONFIG6_MASK);
++    if (err < 0) {
++        DPRINTF("%s: Failed to change CP0_CONFIG6 (%d)\n", __func__, err);
++        ret = err;
++    }
++    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_XCONTEXT,
++                                 &env->CP0_XContext);
++    if (err < 0) {
++        DPRINTF("%s: Failed to put CP0_XCONTEXT (%d)\n", __func__, err);
++        ret = err;
++    }
+     err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_ERROREPC,
+                                  &env->CP0_ErrorEPC);
+     if (err < 0) {
+         DPRINTF("%s: Failed to put CP0_ERROREPC (%d)\n", __func__, err);
+         ret = err;
+     }
++    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH1,
++                                 &env->CP0_KScratch[0]);
++    if (err < 0) {
++        DPRINTF("%s: Failed to put CP0_KSCRATCH1 (%d)\n", __func__, err);
++        ret = err;
++    }
++    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH2,
++                                 &env->CP0_KScratch[1]);
++    if (err < 0) {
++        DPRINTF("%s: Failed to put CP0_KSCRATCH2 (%d)\n", __func__, err);
++        ret = err;
++    }
++    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH3,
++                                 &env->CP0_KScratch[2]);
++    if (err < 0) {
++        DPRINTF("%s: Failed to put CP0_KSCRATCH3 (%d)\n", __func__, err);
++        ret = err;
++    }
++    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH4,
++                                 &env->CP0_KScratch[3]);
++    if (err < 0) {
++        DPRINTF("%s: Failed to put CP0_KSCRATCH4 (%d)\n", __func__, err);
++        ret = err;
++    }
++    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH5,
++                                 &env->CP0_KScratch[4]);
++    if (err < 0) {
++        DPRINTF("%s: Failed to put CP0_KSCRATCH5 (%d)\n", __func__, err);
++        ret = err;
++    }
++    err = kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH6,
++                                 &env->CP0_KScratch[5]);
++    if (err < 0) {
++        DPRINTF("%s: Failed to put CP0_KSCRATCH6 (%d)\n", __func__, err);
++        ret = err;
++    }
+ 
+     return ret;
+ }
+@@ -862,6 +988,11 @@ static int kvm_mips_get_cp0_registers(CPUState *cs)
+         DPRINTF("%s: Failed to get CP0_INDEX (%d)\n", __func__, err);
+         ret = err;
+     }
++    err = kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_RANDOM, &env->CP0_Random);
++    if (err < 0) {
++        DPRINTF("%s: Failed to get CP0_RANDOM (%d)\n", __func__, err);
++        ret = err;
++    }
+     err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_CONTEXT,
+                                  &env->CP0_Context);
+     if (err < 0) {
+@@ -880,11 +1011,40 @@ static int kvm_mips_get_cp0_registers(CPUState *cs)
+         DPRINTF("%s: Failed to get CP0_PAGEMASK (%d)\n", __func__, err);
+         ret = err;
+     }
++    err = kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_PAGEGRAIN,
++                               &env->CP0_PageGrain);
++    if (err < 0) {
++        DPRINTF("%s: Failed to get CP0_PAGEGRAIN (%d)\n", __func__, err);
++        ret = err;
++    }
++    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_PWBASE,
++                               &env->CP0_PWBase);
++    if (err < 0) {
++        DPRINTF("%s: Failed to get CP0_PWBASE (%d)\n", __func__, err);
++        ret = err;
++    }
++    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_PWFIELD,
++                               &env->CP0_PWField);
++    if (err < 0) {
++        DPRINTF("%s: Failed to get CP0_PWFIELD (%d)\n", __func__, err);
++        ret = err;
++    }
++    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_PWSIZE,
++                               &env->CP0_PWSize);
++    if (err < 0) {
++        DPRINTF("%s: Failed to get CP0_PWSIZE (%d)\n", __func__, err);
++        ret = err;
++    }
+     err = kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_WIRED, &env->CP0_Wired);
+     if (err < 0) {
+         DPRINTF("%s: Failed to get CP0_WIRED (%d)\n", __func__, err);
+         ret = err;
+     }
++    err = kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_PWCTL, &env->CP0_PWCtl);
++    if (err < 0) {
++        DPRINTF("%s: Failed to get CP0_PWCtl (%d)\n", __func__, err);
++        ret = err;
++    }
+     err = kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_HWRENA, &env->CP0_HWREna);
+     if (err < 0) {
+         DPRINTF("%s: Failed to get CP0_HWRENA (%d)\n", __func__, err);
+@@ -932,6 +1092,11 @@ static int kvm_mips_get_cp0_registers(CPUState *cs)
+         DPRINTF("%s: Failed to get CP0_PRID (%d)\n", __func__, err);
+         ret = err;
+     }
++    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_EBASE, &env->CP0_EBase);
++    if (err < 0) {
++        DPRINTF("%s: Failed to get CP0_EBASE (%d)\n", __func__, err);
++        ret = err;
++    }
+     err = kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG, &env->CP0_Config0);
+     if (err < 0) {
+         DPRINTF("%s: Failed to get CP0_CONFIG (%d)\n", __func__, err);
+@@ -962,12 +1127,59 @@ static int kvm_mips_get_cp0_registers(CPUState *cs)
+         DPRINTF("%s: Failed to get CP0_CONFIG5 (%d)\n", __func__, err);
+         ret = err;
+     }
++    err = kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG6, &env->CP0_Config6);
++    if (err < 0) {
++        DPRINTF("%s: Failed to get CP0_CONFIG6 (%d)\n", __func__, err);
++        ret = err;
++    }
++    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_XCONTEXT,
++                                 &env->CP0_XContext);
++    if (err < 0) {
++        DPRINTF("%s: Failed to get CP0_XCONTEXT (%d)\n", __func__, err);
++        ret = err;
++    }
+     err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_ERROREPC,
+                                  &env->CP0_ErrorEPC);
+     if (err < 0) {
+         DPRINTF("%s: Failed to get CP0_ERROREPC (%d)\n", __func__, err);
+         ret = err;
+     }
++    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH1,
++                                 &env->CP0_KScratch[0]);
++    if (err < 0) {
++        DPRINTF("%s: Failed to get CP0_KSCRATCH1 (%d)\n", __func__, err);
++        ret = err;
++    }
++    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH2,
++                                 &env->CP0_KScratch[1]);
++    if (err < 0) {
++        DPRINTF("%s: Failed to get CP0_KSCRATCH2 (%d)\n", __func__, err);
++        ret = err;
++    }
++    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH3,
++                                 &env->CP0_KScratch[2]);
++    if (err < 0) {
++        DPRINTF("%s: Failed to get CP0_KSCRATCH3 (%d)\n", __func__, err);
++        ret = err;
++    }
++    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH4,
++                                 &env->CP0_KScratch[3]);
++    if (err < 0) {
++        DPRINTF("%s: Failed to get CP0_KSCRATCH4 (%d)\n", __func__, err);
++        ret = err;
++    }
++    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH5,
++                                 &env->CP0_KScratch[4]);
++    if (err < 0) {
++        DPRINTF("%s: Failed to get CP0_KSCRATCH5 (%d)\n", __func__, err);
++        ret = err;
++    }
++    err = kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH6,
++                                 &env->CP0_KScratch[5]);
++    if (err < 0) {
++        DPRINTF("%s: Failed to get CP0_KSCRATCH6 (%d)\n", __func__, err);
++        ret = err;
++    }
+ 
+     return ret;
+ }
+diff --git a/target/mips/machine.c b/target/mips/machine.c
+index 8d5b18b..5b23e3e 100644
+--- a/target/mips/machine.c
++++ b/target/mips/machine.c
+@@ -212,8 +212,8 @@ const VMStateDescription vmstate_tlb = {
+ 
+ const VMStateDescription vmstate_mips_cpu = {
+     .name = "cpu",
+-    .version_id = 19,
+-    .minimum_version_id = 19,
++    .version_id = 20,
++    .minimum_version_id = 20,
+     .post_load = cpu_post_load,
+     .fields = (VMStateField[]) {
+         /* Active TC */
+@@ -289,6 +289,8 @@ const VMStateDescription vmstate_mips_cpu = {
+         VMSTATE_INT32(env.CP0_Config1, MIPSCPU),
+         VMSTATE_INT32(env.CP0_Config2, MIPSCPU),
+         VMSTATE_INT32(env.CP0_Config3, MIPSCPU),
++        VMSTATE_INT32(env.CP0_Config4, MIPSCPU),
++        VMSTATE_INT32(env.CP0_Config5, MIPSCPU),
+         VMSTATE_INT32(env.CP0_Config6, MIPSCPU),
+         VMSTATE_INT32(env.CP0_Config7, MIPSCPU),
+         VMSTATE_UINT64(env.CP0_LLAddr, MIPSCPU),
+-- 
+2.7.0
 
 
