@@ -8,83 +8,83 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42716C8300A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:26:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2CFBC8300A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:27:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BE0720787
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:26:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A825720787
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:27:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rdXQpXyl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BE0720787
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d5RJhWQd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A825720787
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU6P8-00022T-4x
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 06:26:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52920)
+	id 1jU6Py-0002zB-Pm
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 06:27:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52794)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zltjiangshi@gmail.com>) id 1jU6NF-0000KZ-1B
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:24:57 -0400
+ (envelope-from <zltjiangshi@gmail.com>) id 1jU6Lm-00067C-M4
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:23:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <zltjiangshi@gmail.com>) id 1jU6NE-0003Hi-Ax
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:24:56 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:41956)
+ (envelope-from <zltjiangshi@gmail.com>) id 1jU6Lm-0004f8-3v
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:23:26 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:42401)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1jU6ND-00035S-TE
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:24:55 -0400
-Received: by mail-pg1-x542.google.com with SMTP id h69so2545576pgc.8
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 03:24:55 -0700 (PDT)
+ id 1jU6Ll-0004ey-NY
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:23:25 -0400
+Received: by mail-pg1-x544.google.com with SMTP id n11so2536237pgl.9
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 03:23:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=PZw1qikU5QL3z0KwwsBxPolZSBQpYRyX7qlwqGo+OmM=;
- b=rdXQpXylSJGYZC9P9Myp0KqB4TODGm4GSnKJ2H8cCV/lNGtKD8h+XTaI6xC2F8x6JM
- Tyxq5qRpJu3mwBil88gz3xwXbE74h9sWPrTPrxU6zNb9+3XwYvHF5f0EDYavFZZmT3Cj
- KVYaX2ri+Tv3TA8G825zIoHaHG0mwsiWqwoa+Cn6+R43aHMVf9i8cAtKzfU6eiKDAvWA
- Pq8QVv/6QFPOi8UhuWX2TbazJunl1pi22LwnM5FDEgJipMyGfO9I3vK8WcF0pMANo6KD
- QnT1UAe3puJ3qOLpVPJnotR+BaB6rPaZNnoq23pKcKdDYDQKXKYmokPYz9QAnddDOCUT
- KBjA==
+ bh=u4m6+vzCc96Nl5shiNMOZfZokMTmk6NsaXZkY+++sic=;
+ b=d5RJhWQdl9VZdQN1bKV7r0TNSwm9C+PPjymWbohpU1a7duM4xtHjALdP3npVifxFle
+ JpfgJSgPqf9jL5mTXCOd4VLjKW4IrVJ//ty/17JNPzNcW0DM6kU0k+vf9FK6IsM2ZZoA
+ vmZ2+gRUWOVt6CTSnyohfHWfWNWZllR9G45af2iUVgOpYFaMPzFei1bywvsOEAkCb4/K
+ gz8sJoJwUY2QEJ7KOo73A89vjLw4ztI7n+rGPb5bFUzd2qAQrAgPboooGqPEGPrgCF0N
+ YzFf3LSrP8frD4QnF6KOCqqtnxJIcspugTaU/weVc55pReIUUTsHeSvn0LZuPqDUhHzq
+ 4kaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=PZw1qikU5QL3z0KwwsBxPolZSBQpYRyX7qlwqGo+OmM=;
- b=QoB+Z7IaGvbNljBLFgCKHPQR9f4MvWTUAwUjroZVGJm9ysa08D8ECQX552L77B1RLj
- /Yjz3hfHxrqprVN3ElonxHt7c9JYLzl+7I7wr7q6kIniugtK4aZFcWGgpvaeMDlTZnMZ
- YdOBUtxZEWQWdEZJT8hECYSEubjCHz1OjuMN21oW7NQ05DkuttoCuFNMpnAzHX580N1k
- LVTbhmhKsbC+Niiz1eCGRJ36uQESyPtsL56clnCBAFLhMt5pTNeY+3MocTwHbvdcWoIu
- Ebh+RYjDGKwuRI3yHE901WW6U4Ng23bJVqxcKz2aj5Xh/KATxE8YsoO6IHholrkQGmr2
- RWYQ==
-X-Gm-Message-State: AGi0PuYX+uirE0kJDGrVJBI3AbE2wqcdQsCoIca61GYh45ZE5c0hMf44
- SB0h/cKPj4TiwGC4DAXC+Ys=
-X-Google-Smtp-Source: APiQypI2UdctKLdW5JHWhgMg6++CFb83P/PjUY+Oq+rwfUw23PXP9OOwltujFoQK+4P+bkBRRbfjyw==
-X-Received: by 2002:aa7:8d06:: with SMTP id j6mr2866255pfe.237.1588242294746; 
- Thu, 30 Apr 2020 03:24:54 -0700 (PDT)
+ bh=u4m6+vzCc96Nl5shiNMOZfZokMTmk6NsaXZkY+++sic=;
+ b=N7s37y3mDiDc4B/02usvz9iO+8O0shTS99Ae4nOoNoXws+mWaUmau57psspEoCu+9m
+ o9gj6RwfqZad1yJn3sBmzo48SbRBa0ng6bsegk1ChkrKOaG4x83+N14gu65kqYuc08EK
+ ybxKW+MPtedue9qnQ5Nyos99ATIgBQLAc+DnmG3L7tZbQw0f9I1fgTUcpe4ynmY6J64+
+ 2udeJ9XEGut0oQV4G8bajSzndV0uz4GENLgev2tBWvQ4km4SKK1HrOMTm9/dQpAX+39B
+ +ycvvl7yamJr3UIPYrQY2ybB3NoDeuMW7mMQnkM2MkFNgWOaEpIMpbo6MGbd5cVV5hYm
+ Qcaw==
+X-Gm-Message-State: AGi0Pub1N2Pcs0YbeL3+v40qbiUrIFcyrVI4rsm8I53CuRGQwcsM5l9w
+ X1Fin13mBW6j7ey/sg5+iZtLxFlGd6k=
+X-Google-Smtp-Source: APiQypLW2XkW2ABN83GCbbcrJ2x3+Tq4l7AfQxzQebqSwRmOHteAEIBMNTIod/h3ODbvS/+bTFE0cA==
+X-Received: by 2002:a63:dc56:: with SMTP id f22mr2679770pgj.284.1588242204391; 
+ Thu, 30 Apr 2020 03:23:24 -0700 (PDT)
 Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com.
  [34.92.144.28])
- by smtp.gmail.com with ESMTPSA id a15sm1397872pju.3.2020.04.30.03.24.52
+ by smtp.gmail.com with ESMTPSA id a15sm1397872pju.3.2020.04.30.03.23.22
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 30 Apr 2020 03:24:54 -0700 (PDT)
+ Thu, 30 Apr 2020 03:23:23 -0700 (PDT)
 From: Huacai Chen <zltjiangshi@gmail.com>
 X-Google-Original-From: Huacai Chen <chenhc@lemote.com>
 To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Subject: [PATCH for-5.1 V2 3/7] hw/mips: Add CPU IRQ3 delivery for KVM
-Date: Thu, 30 Apr 2020 18:22:31 +0800
-Message-Id: <1588242155-23924-4-git-send-email-chenhc@lemote.com>
+Subject: [PATCH for-5.1 V2 1/7] configure: Add KVM target support for MIPS64
+Date: Thu, 30 Apr 2020 18:22:29 +0800
+Message-Id: <1588242155-23924-2-git-send-email-chenhc@lemote.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1588242155-23924-1-git-send-email-chenhc@lemote.com>
 References: <1588242155-23924-1-git-send-email-chenhc@lemote.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=zltjiangshi@gmail.com; helo=mail-pg1-x542.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
+ envelope-from=zltjiangshi@gmail.com; helo=mail-pg1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,39 +103,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently, KVM/MIPS only deliver I/O interrupt via IP2, this patch add
-IP3 delivery as well, because Loongson-3 based machine use both IRQ2
-(CPU's IP2) and IRQ3 (CPU's IP3).
+Preparing for Loongson-3 virtualization, add KVM target support for
+MIPS64 in configure script.
 
 Signed-off-by: Huacai Chen <chenhc@lemote.com>
 Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- hw/mips/mips_int.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/mips/mips_int.c b/hw/mips/mips_int.c
-index 796730b..5526219 100644
---- a/hw/mips/mips_int.c
-+++ b/hw/mips/mips_int.c
-@@ -48,16 +48,14 @@ static void cpu_mips_irq_request(void *opaque, int irq, int level)
-     if (level) {
-         env->CP0_Cause |= 1 << (irq + CP0Ca_IP);
- 
--        if (kvm_enabled() && irq == 2) {
-+        if (kvm_enabled() && (irq == 2 || irq == 3))
-             kvm_mips_set_interrupt(cpu, irq, level);
--        }
- 
-     } else {
-         env->CP0_Cause &= ~(1 << (irq + CP0Ca_IP));
- 
--        if (kvm_enabled() && irq == 2) {
-+        if (kvm_enabled() && (irq == 2 || irq == 3))
-             kvm_mips_set_interrupt(cpu, irq, level);
--        }
-     }
- 
-     if (env->CP0_Cause & CP0Ca_IP_mask) {
+diff --git a/configure b/configure
+index 23b5e93..7581e65 100755
+--- a/configure
++++ b/configure
+@@ -198,7 +198,7 @@ supported_kvm_target() {
+         arm:arm | aarch64:aarch64 | \
+         i386:i386 | i386:x86_64 | i386:x32 | \
+         x86_64:i386 | x86_64:x86_64 | x86_64:x32 | \
+-        mips:mips | mipsel:mips | \
++        mips:mips | mipsel:mips | mips64:mips | mips64el:mips | \
+         ppc:ppc | ppc64:ppc | ppc:ppc64 | ppc64:ppc64 | ppc64:ppc64le | \
+         s390x:s390x)
+             return 0
 -- 
 2.7.0
 
