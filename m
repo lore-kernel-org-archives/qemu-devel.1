@@ -2,89 +2,127 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4F0CC47247
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:39:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45DA6C47247
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:40:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E62B2070B
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:39:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D1B12070B
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:40:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QqLoaaVU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E62B2070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=msn.com header.i=@msn.com header.b="aTBHLSUi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D1B12070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=msn.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUCDW-0008FG-9m
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 12:39:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49316)
+	id 1jUCEV-0001ci-65
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 12:40:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50450)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jUC30-0001c9-EI
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:28:29 -0400
+ (envelope-from <skizzato73@msn.com>) id 1jUCAy-0004kq-Sl
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:38:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jUC2y-0006Mk-OC
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:28:26 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:37367)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jUC2y-0006MY-6v
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:28:24 -0400
-Received: by mail-pg1-x541.google.com with SMTP id r4so2982787pgg.4
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 09:28:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=+P5jItpXz/tjAGeO3l2qriIEmglug+qlPtimhug8Qps=;
- b=QqLoaaVUMy2cSVLKmUb4I9iCoxjlYAtLhE5BQaqqAEDb3jbshH0LupHQCZpiRxHBmy
- kBKhEAi1LqFcsZ3WVzOquH2nHxdiJXDDNrDkjnJrMOW8qwWymzEK5dHzPBgnbWAaYfJK
- 7JBIpyv2Xg4NktqZUGxryi68R+3gOws6x/zwvoXMl6qL6nShFGLTjjRh2mVx5rj/oVod
- naB6tPrGCAydaZzttteIYGHaO+jrtr0Do1O2QZETETw2Cq3aRvm2fcqdS1gHgvx8SVYt
- /Us/dUaGcUetpvvlCDZI59ihNWAwnr4tf/LdAJfdm8WyXS/tXMSZuDSmE0mLig1gUO44
- KIew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=+P5jItpXz/tjAGeO3l2qriIEmglug+qlPtimhug8Qps=;
- b=Whne35I6bBj1jmYw1/dGyd6yyXl3QsMZMrC7yAfDzwq6xPzfxkm3IueU5T0xuSUnmM
- EDZi5rCyHlqNbeBIV/3E2IfcHjPq2Iorf4cqkBvT2yRT9xxvoHNGFzbvwXdmx5FmL/+5
- vxmz6Shjb0LplEc1MSGQXyr+Va8+93L1MvJuCv1CFY2ZDq0dTBOWi9oqv6amb1VpZavV
- uJCXupWMNPZzQsx/zf/sAGLvJZxHrC+kK0e0D8jA0wNs8OMuVlpjr5Q9TvXi1lBLWmCX
- MOw9U6OCOkcKqP6qZlQj/yDGN1klPlhOnaFWrtqIvqTs/zZEDW0m6H2jDbl3R6gJPh9L
- keKg==
-X-Gm-Message-State: AGi0PuZiPfKruBKyqaycOjW0eQ/Vv+YswBSdLjBUmkb7mwzNtAZAMIat
- w3SEO5NBUkvr/QqRbq7Z6O8DiP8kaJI=
-X-Google-Smtp-Source: APiQypL0xYxEQe29BI5+j18L0eYDU/OIIAPPyOELt/EYy7DYQ9a5CQkUD1+wppwbFNmoTMMaCrkthg==
-X-Received: by 2002:aa7:9ab3:: with SMTP id x19mr92961pfi.141.1588264101037;
- Thu, 30 Apr 2020 09:28:21 -0700 (PDT)
-Received: from localhost.localdomain (174-21-149-226.tukw.qwest.net.
- [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id j5sm243514pfh.58.2020.04.30.09.28.19
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Apr 2020 09:28:20 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 04/18] accel/tcg: Add probe_access_flags
-Date: Thu, 30 Apr 2020 09:27:59 -0700
-Message-Id: <20200430162813.17671-5-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200430162813.17671-1-richard.henderson@linaro.org>
-References: <20200430162813.17671-1-richard.henderson@linaro.org>
+ (envelope-from <skizzato73@msn.com>) id 1jUC9M-00030a-PC
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:36:40 -0400
+Received: from mail-vi1eur05olkn2043.outbound.protection.outlook.com
+ ([40.92.90.43]:6497 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <skizzato73@msn.com>)
+ id 1jUC9M-0002zW-8J; Thu, 30 Apr 2020 12:35:00 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=V0LKN0H6uUYEhFybWvR7o4Poa9vAumL1f+Hi4AH2zkVKOwbH5y55lgP2Ho644Fwr2gkl6k5WIiV1zWCmjY9qTFekt+W3GxiqBqUhnW7u1OxgTGJu20LI84vKeiv0/2t2vxIfGT0lW+14WdcepgR8H2nWxCAbxUAmfRlmFThio/RczNnmg64ZuzhW3Gju7v94mFUjYbkeNsXTMHY2XkM6TFLVZC9RUnK4gdfsCTZ4pu8/8I4vWAvNjOXPTz/gSKtD+ve8taC8qhGT154iYtfHp0xUyHp1vW7qExboTdhqVZxeEN9CaZRD1MVQ7w2+YXM0jnzSzNf060ioWWSXs6k7Zw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=q0aYuuHWmUeOw6JoSmV6Tm98QwqeAIp46q1HS6tOWdU=;
+ b=IuODv2J98Ueuz81k0AQBhFpyyr2SKkV1PzqAbydYUUv2nx8eeQerp911vjP/dtMGwRYYjVVwvSTbL2omUDmuoajohXVODQA1g9GWi4UQAMzV648pmoIQkXy20RZbKdnfYwdj0MAxjRpqRtSkAKwpU/C5EPag31Jg7Myf3Av4+URFSAj2Ze0h+Q2+ic++Oi44Xm1oBzsvozRA86q6kxX1uMIpCkTSRKTtQBFhhHOaju8grc8T2EqS5oR76Ulqi7VYQRjPqeBQ+wfjmJsFszHU5BHLY1+H3QIBgsUt51T2uTUezpi9B+api6kgOdilUU8U84LooZtsJdtiA7nLzUk9zA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=msn.com; s=selector1; 
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=q0aYuuHWmUeOw6JoSmV6Tm98QwqeAIp46q1HS6tOWdU=;
+ b=aTBHLSUiMN8dg4Ah8E7Ig6oenw+2iLiuqRjRn1KEE+3ZyLO4HDGmcYC1w5024QD24Vtb9Q+xf0T8WEYKKiN9FPWip87kNAd5M1QaXNcgG+tJndOPF72nvrVKrtAZNm8dvM+xAUlpxj542eH3CEpOLf57iQIwoGxzi8j6luYTVj3R2QyeWRV0MFVGWFq5G0OezZbY2spyxwY7P6LMNYRA+KPc32gcvUync4+4N7TYTKZ1qTnOrQ4CktWZmnLSdqrWIDgaO5h7PFMDKjAHTBeuGaCa/CbTUqXCD0umIjmKm7bKw/aysQJaiarufGwMSSYtncKnfpy2XaDMgE32V+MWHA==
+Received: from VI1EUR05FT029.eop-eur05.prod.protection.outlook.com
+ (2a01:111:e400:fc12::47) by
+ VI1EUR05HT066.eop-eur05.prod.protection.outlook.com (2a01:111:e400:fc12::206)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.15; Thu, 30 Apr
+ 2020 16:34:55 +0000
+Received: from AM4PR07MB3506.eurprd07.prod.outlook.com
+ (2a01:111:e400:fc12::51) by VI1EUR05FT029.mail.protection.outlook.com
+ (2a01:111:e400:fc12::382) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.24 via Frontend
+ Transport; Thu, 30 Apr 2020 16:34:55 +0000
+Received: from AM4PR07MB3506.eurprd07.prod.outlook.com
+ ([fe80::718e:de40:dfe9:9319]) by AM4PR07MB3506.eurprd07.prod.outlook.com
+ ([fe80::718e:de40:dfe9:9319%5]) with mapi id 15.20.2937.028; Thu, 30 Apr 2020
+ 16:34:55 +0000
+From: Dino Papararo <skizzato73@msn.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>,
+ =?utf-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Subject: R: R: R: About hardfloat in ppc
+Thread-Topic: R: R: About hardfloat in ppc
+Thread-Index: AQHWHF7rwxop5oOlnUWWPH3hEGvks6iMt6WAgAAOeACAAAodAIAAqceAgAC9g4CAAau9MIAAHqMAgAApAWCAAEN9AIAAY0iAgAAg+QCAAGMZgIAAe5mAgAANuNA=
+Date: Thu, 30 Apr 2020 16:34:55 +0000
+Message-ID: <AM4PR07MB3506C091776962655FCE11E9CAAA0@AM4PR07MB3506.eurprd07.prod.outlook.com>
+References: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
+ <87lfmhl0xa.fsf@linaro.org>
+ <alpine.BSF.2.22.395.2004271212520.94232@zero.eik.bme.hu>
+ <87imhlkwun.fsf@linaro.org>
+ <CAE2XoE9hiw-ri66_xp3qNa5_Wx8ZfsQB9mqJdYR8VRm-KW830g@mail.gmail.com>
+ <87ftcoknvu.fsf@linaro.org>
+ <AM4PR07MB350653D5961DFCE441646131CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
+ <871ro6ld2f.fsf@linaro.org>
+ <AM4PR07MB350673696C7DE2CA16C9C685CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
+ <87sggmjgit.fsf@linaro.org>
+ <CAE2XoE8wFK1nOq3YXhB=iqTvqSDQk7Zzd35Tjzdd==v8ouMijA@mail.gmail.com>
+ <43ac337c-752a-7151-1e88-de01949571de@linaro.org>
+ <CAE2XoE-f_rkcnpQO1cHPUgdaWNAOvBRyUX1aj27UePd0Hkr=KQ@mail.gmail.com>
+ <alpine.BSF.2.22.395.2004301721420.29315@zero.eik.bme.hu>
+In-Reply-To: <alpine.BSF.2.22.395.2004301721420.29315@zero.eik.bme.hu>
+Accept-Language: it-IT, en-US
+Content-Language: it-IT
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-incomingtopheadermarker: OriginalChecksum:EF2543F715208A4956F99FAA337978BCB1757D24CE5803A27DE10F9C44424B51;
+ UpperCasedChecksum:2D3619CCDD451D98D4F2856DF2239F9F40C5EB648D8509606AF58316CCA6CCF5;
+ SizeAsReceived:7966; Count:45
+x-tmn: [WcpTGwDqrRF9mOJwy9ObW5vXEChASOhY]
+x-ms-publictraffictype: Email
+x-incomingheadercount: 45
+x-eopattributedmessage: 0
+x-ms-office365-filtering-correlation-id: c20c4261-1c87-4981-c314-08d7ed246a4a
+x-ms-traffictypediagnostic: VI1EUR05HT066:
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: c3oCcZfu+0ovYC8GwzCPOtHwRRZyBnHV8AloXUbykM+MQIoyh5gBak7eRIU5JtY6yqzwgEii0Vp+dptCs/ahzsc1VRiYH0ofm48UClRRE0H3MykVdpK07j8YOwcB1gHVH5w9dKDogbe5zouuG7hbxRtxnNXT+makngMoTNoDOYVO/fjFG6fonIEll5FfnDuCWJ/qDkG6T4nBp9UyQLYM/P+HDxieXwz9W8IDmps4coHATA/weJs/njwv7dWIh4ti
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:0; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM4PR07MB3506.eurprd07.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:; SFS:; DIR:OUT; SFP:1901; 
+x-ms-exchange-antispam-messagedata: Qi14MO4oW4q388aQWZRHSvG4UYpMjdmcm4ZXHsHKBlBZIjuWq/SKhsekktAb53+r4Hq5JvbIxv6piSAQR6R7CTkNPIg6pEiBer4HGd/ow5vr+ewWP9ITh1VVtOW/m9ku7smFoiemt4XThPwiPLh1EQ==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x541.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::541
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: c20c4261-1c87-4981-c314-08d7ed246a4a
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Apr 2020 16:34:55.3365 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Internet
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1EUR05HT066
+Received-SPF: pass client-ip=40.92.90.43; envelope-from=skizzato73@msn.com;
+ helo=EUR05-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 12:34:56
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Received-From: 40.92.90.43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,371 +134,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Programmingkid <programmingkidx@gmail.com>,
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ Howard Spoelstra <hsp.cat7@gmail.com>,
+ =?utf-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This new interface will allow targets to probe for a page
-and then handle watchpoints themselves.  This will be most
-useful for vector predicated memory operations, where one
-page lookup can be used for many operations, and one test
-can avoid many watchpoint checks.
-
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
-v2: Fix return of host pointer in softmmu probe_access_flags.
-v4: Match user-only version closer to softmmu version.
----
- include/exec/cpu-all.h  |  13 ++-
- include/exec/exec-all.h |  22 +++++
- accel/tcg/cputlb.c      | 177 ++++++++++++++++++++--------------------
- accel/tcg/user-exec.c   |  45 +++++++---
- 4 files changed, 159 insertions(+), 98 deletions(-)
-
-diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-index 49384bb66a..43ddcf024c 100644
---- a/include/exec/cpu-all.h
-+++ b/include/exec/cpu-all.h
-@@ -328,7 +328,18 @@ CPUArchState *cpu_copy(CPUArchState *env);
-      | CPU_INTERRUPT_TGT_EXT_3   \
-      | CPU_INTERRUPT_TGT_EXT_4)
- 
--#if !defined(CONFIG_USER_ONLY)
-+#ifdef CONFIG_USER_ONLY
-+
-+/*
-+ * Allow some level of source compatibility with softmmu.  We do not
-+ * support any of the more exotic features, so only invalid pages may
-+ * be signaled by probe_access_flags().
-+ */
-+#define TLB_INVALID_MASK    (1 << (TARGET_PAGE_BITS_MIN - 1))
-+#define TLB_MMIO            0
-+#define TLB_WATCHPOINT      0
-+
-+#else
- 
- /*
-  * Flags stored in the low bits of the TLB virtual address.
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index d656a1f05c..8792bea07a 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -362,6 +362,28 @@ static inline void *probe_read(CPUArchState *env, target_ulong addr, int size,
-     return probe_access(env, addr, size, MMU_DATA_LOAD, mmu_idx, retaddr);
- }
- 
-+/**
-+ * probe_access_flags:
-+ * @env: CPUArchState
-+ * @addr: guest virtual address to look up
-+ * @access_type: read, write or execute permission
-+ * @mmu_idx: MMU index to use for lookup
-+ * @nonfault: suppress the fault
-+ * @phost: return value for host address
-+ * @retaddr: return address for unwinding
-+ *
-+ * Similar to probe_access, loosely returning the TLB_FLAGS_MASK for
-+ * the page, and storing the host address for RAM in @phost.
-+ *
-+ * If @nonfault is set, do not raise an exception but return TLB_INVALID_MASK.
-+ * Do not handle watchpoints, but include TLB_WATCHPOINT in the returned flags.
-+ * Do handle clean pages, so exclude TLB_NOTDIRY from the returned flags.
-+ * For simplicity, all "mmio-like" flags are folded to TLB_MMIO.
-+ */
-+int probe_access_flags(CPUArchState *env, target_ulong addr,
-+                       MMUAccessType access_type, int mmu_idx,
-+                       bool nonfault, void **phost, uintptr_t retaddr);
-+
- #define CODE_GEN_ALIGN           16 /* must be >= of the size of a icache line */
- 
- /* Estimated block size for TB allocation.  */
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index e3b5750c3b..c708e9785f 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -1231,86 +1231,16 @@ static void notdirty_write(CPUState *cpu, vaddr mem_vaddr, unsigned size,
-     }
- }
- 
--/*
-- * Probe for whether the specified guest access is permitted. If it is not
-- * permitted then an exception will be taken in the same way as if this
-- * were a real access (and we will not return).
-- * If the size is 0 or the page requires I/O access, returns NULL; otherwise,
-- * returns the address of the host page similar to tlb_vaddr_to_host().
-- */
--void *probe_access(CPUArchState *env, target_ulong addr, int size,
--                   MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
-+static int probe_access_internal(CPUArchState *env, target_ulong addr,
-+                                 int fault_size, MMUAccessType access_type,
-+                                 int mmu_idx, bool nonfault,
-+                                 void **phost, uintptr_t retaddr)
- {
-     uintptr_t index = tlb_index(env, mmu_idx, addr);
-     CPUTLBEntry *entry = tlb_entry(env, mmu_idx, addr);
--    target_ulong tlb_addr;
--    size_t elt_ofs;
--    int wp_access;
--
--    g_assert(-(addr | TARGET_PAGE_MASK) >= size);
--
--    switch (access_type) {
--    case MMU_DATA_LOAD:
--        elt_ofs = offsetof(CPUTLBEntry, addr_read);
--        wp_access = BP_MEM_READ;
--        break;
--    case MMU_DATA_STORE:
--        elt_ofs = offsetof(CPUTLBEntry, addr_write);
--        wp_access = BP_MEM_WRITE;
--        break;
--    case MMU_INST_FETCH:
--        elt_ofs = offsetof(CPUTLBEntry, addr_code);
--        wp_access = BP_MEM_READ;
--        break;
--    default:
--        g_assert_not_reached();
--    }
--    tlb_addr = tlb_read_ofs(entry, elt_ofs);
--
--    if (unlikely(!tlb_hit(tlb_addr, addr))) {
--        if (!victim_tlb_hit(env, mmu_idx, index, elt_ofs,
--                            addr & TARGET_PAGE_MASK)) {
--            tlb_fill(env_cpu(env), addr, size, access_type, mmu_idx, retaddr);
--            /* TLB resize via tlb_fill may have moved the entry. */
--            index = tlb_index(env, mmu_idx, addr);
--            entry = tlb_entry(env, mmu_idx, addr);
--        }
--        tlb_addr = tlb_read_ofs(entry, elt_ofs);
--    }
--
--    if (!size) {
--        return NULL;
--    }
--
--    if (unlikely(tlb_addr & TLB_FLAGS_MASK)) {
--        CPUIOTLBEntry *iotlbentry = &env_tlb(env)->d[mmu_idx].iotlb[index];
--
--        /* Reject I/O access, or other required slow-path.  */
--        if (tlb_addr & (TLB_MMIO | TLB_BSWAP | TLB_DISCARD_WRITE)) {
--            return NULL;
--        }
--
--        /* Handle watchpoints.  */
--        if (tlb_addr & TLB_WATCHPOINT) {
--            cpu_check_watchpoint(env_cpu(env), addr, size,
--                                 iotlbentry->attrs, wp_access, retaddr);
--        }
--
--        /* Handle clean RAM pages.  */
--        if (tlb_addr & TLB_NOTDIRTY) {
--            notdirty_write(env_cpu(env), addr, size, iotlbentry, retaddr);
--        }
--    }
--
--    return (void *)((uintptr_t)addr + entry->addend);
--}
--
--void *tlb_vaddr_to_host(CPUArchState *env, abi_ptr addr,
--                        MMUAccessType access_type, int mmu_idx)
--{
--    CPUTLBEntry *entry = tlb_entry(env, mmu_idx, addr);
--    target_ulong tlb_addr, page;
-+    target_ulong tlb_addr, page_addr;
-     size_t elt_ofs;
-+    int flags;
- 
-     switch (access_type) {
-     case MMU_DATA_LOAD:
-@@ -1325,20 +1255,19 @@ void *tlb_vaddr_to_host(CPUArchState *env, abi_ptr addr,
-     default:
-         g_assert_not_reached();
-     }
--
--    page = addr & TARGET_PAGE_MASK;
-     tlb_addr = tlb_read_ofs(entry, elt_ofs);
- 
--    if (!tlb_hit_page(tlb_addr, page)) {
--        uintptr_t index = tlb_index(env, mmu_idx, addr);
--
--        if (!victim_tlb_hit(env, mmu_idx, index, elt_ofs, page)) {
-+    page_addr = addr & TARGET_PAGE_MASK;
-+    if (!tlb_hit_page(tlb_addr, page_addr)) {
-+        if (!victim_tlb_hit(env, mmu_idx, index, elt_ofs, page_addr)) {
-             CPUState *cs = env_cpu(env);
-             CPUClass *cc = CPU_GET_CLASS(cs);
- 
--            if (!cc->tlb_fill(cs, addr, 0, access_type, mmu_idx, true, 0)) {
-+            if (!cc->tlb_fill(cs, addr, fault_size, access_type,
-+                              mmu_idx, nonfault, retaddr)) {
-                 /* Non-faulting page table read failed.  */
--                return NULL;
-+                *phost = NULL;
-+                return TLB_INVALID_MASK;
-             }
- 
-             /* TLB resize via tlb_fill may have moved the entry.  */
-@@ -1346,15 +1275,89 @@ void *tlb_vaddr_to_host(CPUArchState *env, abi_ptr addr,
-         }
-         tlb_addr = tlb_read_ofs(entry, elt_ofs);
-     }
-+    flags = tlb_addr & TLB_FLAGS_MASK;
- 
--    if (tlb_addr & ~TARGET_PAGE_MASK) {
--        /* IO access */
-+    /* Fold all "mmio-like" bits into TLB_MMIO.  This is not RAM.  */
-+    if (unlikely(flags & ~(TLB_WATCHPOINT | TLB_NOTDIRTY))) {
-+        *phost = NULL;
-+        return TLB_MMIO;
-+    }
-+
-+    /* Everything else is RAM. */
-+    *phost = (void *)((uintptr_t)addr + entry->addend);
-+    return flags;
-+}
-+
-+int probe_access_flags(CPUArchState *env, target_ulong addr,
-+                       MMUAccessType access_type, int mmu_idx,
-+                       bool nonfault, void **phost, uintptr_t retaddr)
-+{
-+    int flags;
-+
-+    flags = probe_access_internal(env, addr, 0, access_type, mmu_idx,
-+                                  nonfault, phost, retaddr);
-+
-+    /* Handle clean RAM pages.  */
-+    if (unlikely(flags & TLB_NOTDIRTY)) {
-+        uintptr_t index = tlb_index(env, mmu_idx, addr);
-+        CPUIOTLBEntry *iotlbentry = &env_tlb(env)->d[mmu_idx].iotlb[index];
-+
-+        notdirty_write(env_cpu(env), addr, 1, iotlbentry, retaddr);
-+        flags &= ~TLB_NOTDIRTY;
-+    }
-+
-+    return flags;
-+}
-+
-+void *probe_access(CPUArchState *env, target_ulong addr, int size,
-+                   MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
-+{
-+    void *host;
-+    int flags;
-+
-+    g_assert(-(addr | TARGET_PAGE_MASK) >= size);
-+
-+    flags = probe_access_internal(env, addr, size, access_type, mmu_idx,
-+                                  false, &host, retaddr);
-+
-+    /* Per the interface, size == 0 merely faults the access. */
-+    if (size == 0) {
-         return NULL;
-     }
- 
--    return (void *)((uintptr_t)addr + entry->addend);
-+    if (unlikely(flags & (TLB_NOTDIRTY | TLB_WATCHPOINT))) {
-+        uintptr_t index = tlb_index(env, mmu_idx, addr);
-+        CPUIOTLBEntry *iotlbentry = &env_tlb(env)->d[mmu_idx].iotlb[index];
-+
-+        /* Handle watchpoints.  */
-+        if (flags & TLB_WATCHPOINT) {
-+            int wp_access = (access_type == MMU_DATA_STORE
-+                             ? BP_MEM_WRITE : BP_MEM_READ);
-+            cpu_check_watchpoint(env_cpu(env), addr, size,
-+                                 iotlbentry->attrs, wp_access, retaddr);
-+        }
-+
-+        /* Handle clean RAM pages.  */
-+        if (flags & TLB_NOTDIRTY) {
-+            notdirty_write(env_cpu(env), addr, 1, iotlbentry, retaddr);
-+        }
-+    }
-+
-+    return host;
- }
- 
-+void *tlb_vaddr_to_host(CPUArchState *env, abi_ptr addr,
-+                        MMUAccessType access_type, int mmu_idx)
-+{
-+    void *host;
-+    int flags;
-+
-+    flags = probe_access_internal(env, addr, 0, access_type,
-+                                  mmu_idx, true, &host, 0);
-+
-+    /* No combination of flags are expected by the caller. */
-+    return flags ? NULL : host;
-+}
- 
- #ifdef CONFIG_PLUGIN
- /*
-diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
-index 4be78eb9b3..987342c50c 100644
---- a/accel/tcg/user-exec.c
-+++ b/accel/tcg/user-exec.c
-@@ -190,13 +190,12 @@ static inline int handle_cpu_signal(uintptr_t pc, siginfo_t *info,
-     g_assert_not_reached();
- }
- 
--void *probe_access(CPUArchState *env, target_ulong addr, int size,
--                   MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
-+static int probe_access_internal(CPUArchState *env, target_ulong addr,
-+                                 int fault_size, MMUAccessType access_type,
-+                                 bool nonfault, uintptr_t ra)
- {
-     int flags;
- 
--    g_assert(-(addr | TARGET_PAGE_MASK) >= size);
--
-     switch (access_type) {
-     case MMU_DATA_STORE:
-         flags = PAGE_WRITE;
-@@ -211,13 +210,39 @@ void *probe_access(CPUArchState *env, target_ulong addr, int size,
-         g_assert_not_reached();
-     }
- 
--    if (!guest_addr_valid(addr) || page_check_range(addr, size, flags) < 0) {
--        CPUState *cpu = env_cpu(env);
--        CPUClass *cc = CPU_GET_CLASS(cpu);
--        cc->tlb_fill(cpu, addr, size, access_type, MMU_USER_IDX, false,
--                     retaddr);
--        g_assert_not_reached();
-+    if (!guest_addr_valid(addr) || page_check_range(addr, 1, flags) < 0) {
-+        if (nonfault) {
-+            return TLB_INVALID_MASK;
-+        } else {
-+            CPUState *cpu = env_cpu(env);
-+            CPUClass *cc = CPU_GET_CLASS(cpu);
-+            cc->tlb_fill(cpu, addr, fault_size, access_type,
-+                         MMU_USER_IDX, false, ra);
-+            g_assert_not_reached();
-+        }
-     }
-+    return 0;
-+}
-+
-+int probe_access_flags(CPUArchState *env, target_ulong addr,
-+                       MMUAccessType access_type, int mmu_idx,
-+                       bool nonfault, void **phost, uintptr_t ra)
-+{
-+    int flags;
-+
-+    flags = probe_access_internal(env, addr, 0, access_type, nonfault, ra);
-+    *phost = flags ? NULL : g2h(addr);
-+    return flags;
-+}
-+
-+void *probe_access(CPUArchState *env, target_ulong addr, int size,
-+                   MMUAccessType access_type, int mmu_idx, uintptr_t ra)
-+{
-+    int flags;
-+
-+    g_assert(-(addr | TARGET_PAGE_MASK) >= size);
-+    flags = probe_access_internal(env, addr, size, access_type, false, ra);
-+    g_assert(flags == 0);
- 
-     return size ? g2h(addr) : NULL;
- }
--- 
-2.20.1
-
+TWF5YmUgdGhlIGZhc3Rlc3Qgd2F5IHRvIGltcGxlbWVudCBoYXJkZmxvYXRzIGZvciBwcGMgY291
+bGQgYmUgcnVuIHRoZW0gYnkgZGVmYXVsdCBhbmQgdW50aWwgc29tZSBmcHUgaW5zdHJ1Y3Rpb24g
+cmVxdWVzdCBmb3IgRlBTQ1IgcmVnaXN0ZXIuDQpBdCB0aGlzIHRpbWUgcHJvYmFibHkgd2Ugd2Fu
+dCB0byBjaGVjayBmb3Igc29tZSBleGNlcHRpb24uLiBzbyBRRU1VIGNvdWxkIGNvbWUgYmFjayB0
+byBsYXN0IGZwdSBpbnN0cnVjdGlvbiBleGVjdXRlZCBhbmQgcmUtZXhlY3V0ZSBpdCBpbiBzb2Z0
+ZmxvYXQgdGFraW5nIGNhcmUgdGhpcyB0aW1lIG9mIEZQU0NSIGZsYWdzLCB0aGVuIGNvbnRpbnVl
+IGluIGhhcmRmbG9hdHMgdW5pdGwgYW5vdGhlciBpbnN0cnVjdGlvbiBsb29raW5nIGZvciBGUFND
+UiByZWdpc3RlciBhbmQgc28gb24uLg0KDQpEaW5vDQoNCi0tLS0tTWVzc2FnZ2lvIG9yaWdpbmFs
+ZS0tLS0tDQpEYTogQkFMQVRPTiBab2x0YW4gPGJhbGF0b25AZWlrLmJtZS5odT4gDQpJbnZpYXRv
+OiBnaW92ZWTDrCAzMCBhcHJpbGUgMjAyMCAxNzozNg0KQTog572X5YuH5YiaKFlvbmdnYW5nIEx1
+bykgPGx1b3lvbmdnYW5nQGdtYWlsLmNvbT4NCkNjOiBSaWNoYXJkIEhlbmRlcnNvbiA8cmljaGFy
+ZC5oZW5kZXJzb25AbGluYXJvLm9yZz47IERpbm8gUGFwYXJhcm8gPHNraXp6YXRvNzNAbXNuLmNv
+bT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsgUHJvZ3JhbW1pbmdraWQgPHByb2dyYW1taW5na2lk
+eEBnbWFpbC5jb20+OyBxZW11LXBwY0Bub25nbnUub3JnOyBIb3dhcmQgU3BvZWxzdHJhIDxoc3Au
+Y2F0N0BnbWFpbC5jb20+OyBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+DQpP
+Z2dldHRvOiBSZTogUjogUjogQWJvdXQgaGFyZGZsb2F0IGluIHBwYw0KDQpPbiBUaHUsIDMwIEFw
+ciAyMDIwLCDnvZfli4fliJooWW9uZ2dhbmcgTHVvKSB3cm90ZToNCj4gSSBwcm9wb3NlIGEgbmV3
+IHdheSB0byBjb21wdXRpbmcgdGhlIGZsb2F0IGZsYWdzLCBXZSBwcmVzZXJ2ZSBhICBmbG9hdCAN
+Cj4gY29tcHV0aW5nIGNhc2ggdHlwZWRlZiBzdHJ1Y3QgRnBSZWNvcmQgeyAgdWludDhfdCBvcDsN
+Cj4gIGZsb2F0MzIgQTsNCj4gIGZsb2F0MzIgQjsNCj4gfSAgRnBSZWNvcmQ7DQo+IEZwUmVjb3Jk
+IGZwX2NhY2hlWzEwMjRdOw0KPiBpbnQgZnBfY2FjaGVfbGVuZ3RoOw0KPiB1aW50MzJfdCBmcF9l
+eGNlcHRpb25zOw0KPg0KPiAxLiBGb3IgZWFjaCBuZXcgZnAgb3BlcmF0aW9uIHdlIHB1c2ggaXQg
+dG8gdGhlICBmcF9jYWNoZSwgMi4gT25jZSB3ZSANCj4gcmVhZCB0aGUgZnBfZXhjZXB0aW9ucyAs
+IHRoZW4gd2UgcmUtY29tcHV0ZSB0aGUgZnBfZXhjZXB0aW9ucyBieSANCj4gcmUtcnVubmluZyB0
+aGUgZnAgRnBSZWNvcmQgc2VxdWVuY2UuDQo+IGFuZCBjbGVhciAgZnBfY2FjaGVfbGVuZ3RoLg0K
+PiAzLiBJZiB3ZSBjbGVhciB0aGUgZnBfZXhjZXB0aW9ucyAsIHRoZW4gd2Ugc2V0IGZwX2NhY2hl
+X2xlbmd0aCB0byAwIA0KPiBhbmQgY2xlYXIgIGZwX2V4Y2VwdGlvbnMuDQo+IDQuIElmIHRoZSAg
+ZnBfY2FjaGUgYXJlIGZ1bGwsIHRoZW4gd2UgcmUtY29tcHV0ZSB0aGUgZnBfZXhjZXB0aW9ucyBi
+eSANCj4gcmUtcnVubmluZyB0aGUgZnAgRnBSZWNvcmQgc2VxdWVuY2UuDQo+DQo+IFdvdWxkIHRo
+aXMgYmUgYSBnZW5lcmFsIG1ldGhvZCB0byB1c2UgaGFyZC1mbG9hdD8NCj4gVGhlIGNvbnN1ZWQg
+dGltZSBzaG91bGQgYmUgIDIqaGFyZF9mbG9hdC4NCj4gQ29uc2lkZXJhdGluZyByZWFkIGZwX2V4
+Y2VwdGlvbnMgYXJlIHJhcmUsIHRoZW4gdGhlIGFtb3J0aXplZCB0aW1lIA0KPiBjb21wbGV4aXR5
+IHdvdWxkIGJlIDEgKiBoYXJkX2Zsb2F0Lg0KDQpJdCdzIGhhcmQgdG8gZ3Vlc3Mgd2hhdCB0aGUg
+aGl0IHJhdGUgb2Ygc3VjaCBjYWNoZSB3b3VsZCBiZSBhbmQgaWYgaXQncyBsb3cgdGhlbiBtYW5h
+Z2luZyB0aGUgY2FjaGUgaXMgcHJvYmFibHkgbW9yZSBleHBlbnNpdmUgdGhhbiBydW5uaW5nIHdp
+dGggc29mdGZsb2F0LiBTbyB0byBldmFsdWF0ZSBhbnkgcHJvcG9zZWQgcGF0Y2ggd2UgYWxzbyBu
+ZWVkIHNvbWUgYmVuY2htYXJrcyB3aGljaCB3ZSBjYW4gZXhwZXJpbWVudCB3aXRoIHRvIHRlbGwg
+aWYgdGhlIHJlc3VsdHMgYXJlIGdvb2Qgb3Igbm90IG90aGVyd2lzZSB3ZSdyZSBqdXN0IGd1ZXNz
+aW5nLiBBcmUgdGhlcmUgc29tZSBleGlzdGluZyB0ZXN0cyBhbmQgYmVuY2htYXJrcyB0aGF0IHdl
+IGNhbiB1c2U/IEFsZXggbWVudGlvbmVkIGZwLWJlbmNoIEkgdGhpbmsgYW5kIHRvIGV2YWx1YXRl
+IHRoZSBjb3JyZWN0bmVzcyBvZiB0aGUgRlAgaW1wbGVtZW50YXRpb24gSSd2ZSBzZWVuIHRoaXMg
+b3RoZXINCmNvbnZlcnNhdGlvbjoNCg0KaHR0cHM6Ly9saXN0cy5ub25nbnUub3JnL2FyY2hpdmUv
+aHRtbC9xZW11LWRldmVsLzIwMjAtMDQvbXNnMDUxMDcuaHRtbA0KaHR0cHM6Ly9saXN0cy5ub25n
+bnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMjAtMDQvbXNnMDUxMjYuaHRtbA0KDQpJ
+cyB0aGF0IHNvbWV0aGluZyB3ZSBjYW4gdXNlIGZvciBQUEMgYXMgd2VsbCB0byBjaGVjayB0aGUg
+Y29ycmVjdG5lc3M/DQoNClNvIEkgdGhpbmsgYmVmb3JlIGltcGxlbWVudGluZyBhbnkgcG90ZW50
+aWFsIHNvbHV0aW9uIHRoYXQgY2FtZSB1cCBpbiB0aGlzIGJyYWluc3Rvcm1pbmcgdGhlIGZpcnN0
+IHN0ZXAgd291bGQgYmUgdG8gZ2V0IGFuZCBjb21waWxlIChvciB3cml0ZSBpZiBub3QNCmF2YWls
+YWJsZSkgc29tZSB0ZXN0cyBhbmQgYmVuY2htYXJrczoNCg0KMS4gdGVzdGluZyBob3N0IGJlaGF2
+aW91ciBmb3IgaW5leGFjdCBhbmQgY29tcGFyZSB0aGF0IGZvciBkaWZmZXJlbnQgYXJjaHMgMi4g
+c29tZSBGUCB0ZXN0cyB0aGF0IGNhbiBiZSB1c2VkIHRvIGNvbXBhcmUgcmVzdWx0cyB3aXRoIFFF
+TVUgYW5kIHJlYWwgQ1BVIHRvIGNoZWNrIGNvcnJlY3RuZXNzIG9mIGVtdWxhdGlvbiAoaWYgdGhl
+c2UgY2hlY2sgZm9yIGluZXhhY3QgZGlmZmVyZW5jZXMgdGhlbiBjb3VsZCBiZSB1c2VkIGluc3Rl
+YWQgb2YgMS4pIDMuIHNvbWUgYmVuY2htYXJrcyB0byBldmFsdWF0ZSBRRU1VIHBlcmZvcm1hbmNl
+ICh0aGVzZSBjb3VsZCBiZSBzYW1lIGFzIEZQIHRlc3RzIG9yIHNvbWUgcmVhbCB3b3JsZCBGUCBo
+ZWF2eSBhcHBsaWNhdGlvbnMpLg0KDQpUaGVuIHdlIGNhbiBzZWUgaWYgdGhlIHByb3Bvc2VkIHNv
+bHV0aW9uIGlzIGZhc3RlciBhbmQgc3RpbGwgY29ycmVjdC4NCg0KUmVnYXJkcywNCkJBTEFUT04g
+Wm9sdGFuDQo=
 
