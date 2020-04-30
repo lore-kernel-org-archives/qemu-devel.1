@@ -6,69 +6,69 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0008AC83001
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 05:43:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 639CEC83001
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 05:43:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABBB320757
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 05:43:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F00F20757
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 05:43:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YxJm21rH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABBB320757
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IZx0QfAG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F00F20757
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU1z5-0001EA-SL
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 01:43:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53400)
+	id 1jU1zH-0001YG-Aj
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 01:43:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53428)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jU1n7-00056N-0c
+ (envelope-from <armbru@redhat.com>) id 1jU1nA-0005ER-CP
  for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:31:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jU1n0-0002fE-Gx
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:31:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57962
+ (envelope-from <armbru@redhat.com>) id 1jU1n3-0002gA-1Z
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:31:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31759
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jU1mz-0002dY-QQ
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:31:14 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jU1n2-0002fk-J8
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:31:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588224672;
+ s=mimecast20190719; t=1588224675;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pu0MSdX7P2WqHHj+3nT7QXXUz8OzE43CabF+3BsRBuc=;
- b=YxJm21rHajfa4TmIoeEAXD+ExhURXoe305osUennJnUtL5XG6CcXq/zTBLOYT8lt3FXB4f
- e21vD1BDeXlgrSaPLDPVAX68ocWUvrDVP4vEgzaW+mDHMcCl2hUmL5JECd1mDVaoy91RtL
- ZevAyZQ2BCg0Z4qpz++hSEslvL5Czf4=
+ bh=n41y0JJrdYtVcCl3tR5Sc8bxqm+qCW60yeKjXWZrljw=;
+ b=IZx0QfAG7q7zQwpYMxCNBwjeC9AKtr2Wr4iLY4aeSNKINRiAC1nI2SQktkMAUkWOBm7Jzx
+ PsNHh8iI1Q2cDqmhZh6NS5xQKdswBzJMPgewPkwHQTXMgz75lS80Qo2g3MjdAO2Strl4kB
+ 5tddjNxAuzBYPpgvXP72t2YjhwDU3HE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-308-tzMprTQoPKeshjzhb7jc8Q-1; Thu, 30 Apr 2020 01:31:10 -0400
-X-MC-Unique: tzMprTQoPKeshjzhb7jc8Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-504-pUYfSU2pMUe7ipsuCqvcYg-1; Thu, 30 Apr 2020 01:31:10 -0400
+X-MC-Unique: pUYfSU2pMUe7ipsuCqvcYg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6F42107B266
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D40D835B46
  for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 05:31:09 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3BDD11000079;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3E0E05C1BE;
  Thu, 30 Apr 2020 05:31:09 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 12F7E11358CE; Thu, 30 Apr 2020 07:31:05 +0200 (CEST)
+ id 162F411358CF; Thu, 30 Apr 2020 07:31:05 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 17/20] qapi: Only input visitors can actually fail
-Date: Thu, 30 Apr 2020 07:31:01 +0200
-Message-Id: <20200430053104.32204-18-armbru@redhat.com>
+Subject: [PULL 18/20] qom: Simplify object_property_get_enum()
+Date: Thu, 30 Apr 2020 07:31:02 +0200
+Message-Id: <20200430053104.32204-19-armbru@redhat.com>
 In-Reply-To: <20200430053104.32204-1-armbru@redhat.com>
 References: <20200430053104.32204-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -93,334 +93,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The previous few commits have made this more obvious, and removed the
-one exception.  Time to clarify the documentation, and drop dead error
-checking.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20200424084338.26803-13-armbru@redhat.com>
+Message-Id: <20200424084338.26803-14-armbru@redhat.com>
 ---
- include/qapi/visitor-impl.h |  4 ++++
- include/qapi/visitor.h      | 40 ++++++++++++++++++++++---------------
- block.c                     |  9 +--------
- block/sheepdog.c            |  9 +--------
- blockdev.c                  | 16 ++-------------
- hw/core/machine-hmp-cmds.c  |  2 +-
- monitor/hmp-cmds.c          |  3 ++-
- 7 files changed, 35 insertions(+), 48 deletions(-)
+ qom/object.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/include/qapi/visitor-impl.h b/include/qapi/visitor-impl.h
-index 252206dc0d..98dc533d39 100644
---- a/include/qapi/visitor-impl.h
-+++ b/include/qapi/visitor-impl.h
-@@ -43,6 +43,10 @@ typedef enum VisitorType {
-=20
- struct Visitor
- {
-+    /*
-+     * Only input visitors may fail!
-+     */
-+
-     /* Must be set to visit structs */
-     void (*start_struct)(Visitor *v, const char *name, void **obj,
-                          size_t size, Error **errp);
-diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
-index 2d40d2fe0f..5573906966 100644
---- a/include/qapi/visitor.h
-+++ b/include/qapi/visitor.h
-@@ -82,7 +82,7 @@
-  * Each function also takes the customary @errp argument (see
-  * qapi/error.h for details), for reporting any errors (such as if a
-  * member @name is not present, or is present but not the specified
-- * type).
-+ * type).  Only input visitors can fail.
-  *
-  * If an error is detected during visit_type_FOO() with an input
-  * visitor, then *@obj will be set to NULL for pointer types, and left
-@@ -164,19 +164,14 @@
-  *
-  * <example>
-  *  Foo *f =3D ...obtain populated object...
-- *  Error *err =3D NULL;
-  *  Visitor *v;
-  *  Type *result;
-  *
-  *  v =3D FOO_visitor_new(..., &result);
-- *  visit_type_Foo(v, NULL, &f, &err);
-- *  if (err) {
-- *      ...handle error...
-- *  } else {
-- *      visit_complete(v, &result);
-- *      ...use result...
-- *  }
-+ *  visit_type_Foo(v, NULL, &f, &error_abort);
-+ *  visit_complete(v, &result);
-  *  visit_free(v);
-+ *  ...use result...
-  * </example>
-  *
-  * It is also possible to use the visitors to do a virtual walk, where
-@@ -289,6 +284,7 @@ void visit_free(Visitor *v);
-  * case @size is ignored.
-  *
-  * On failure, set *@obj to NULL and store an error through @errp.
-+ * Can happen only when @v is an input visitor.
-  *
-  * After visit_start_struct() succeeds, the caller may visit its
-  * members one after the other, passing the member's name and address
-@@ -305,7 +301,8 @@ void visit_start_struct(Visitor *v, const char *name, v=
-oid **obj,
- /*
-  * Prepare for completing an object visit.
-  *
-- * On failure, store an error through @errp.
-+ * On failure, store an error through @errp.  Can happen only when @v
-+ * is an input visitor.
-  *
-  * Should be called prior to visit_end_struct() if all other
-  * intermediate visit steps were successful, to allow the visitor one
-@@ -342,6 +339,7 @@ void visit_end_struct(Visitor *v, void **obj);
-  * ignored.
-  *
-  * On failure, set *@list to NULL and store an error through @errp.
-+ * Can happen only when @v is an input visitor.
-  *
-  * After visit_start_list() succeeds, the caller may visit its members
-  * one after the other.  A real visit (where @list is non-NULL) uses
-@@ -375,7 +373,8 @@ GenericList *visit_next_list(Visitor *v, GenericList *t=
-ail, size_t size);
- /*
-  * Prepare for completing a list visit.
-  *
-- * On failure, store an error through @errp.
-+ * On failure, store an error through @errp.  Can happen only when @v
-+ * is an input visitor.
-  *
-  * Should be called prior to visit_end_list() if all other
-  * intermediate visit steps were successful, to allow the visitor one
-@@ -411,6 +410,7 @@ void visit_end_list(Visitor *v, void **list);
-  * (*@obj)->type.  Other visitors leave @obj unchanged.
-  *
-  * On failure, set *@obj to NULL and store an error through @errp.
-+ * Can happen only when @v is an input visitor.
-  *
-  * If successful, this must be paired with visit_end_alternate() with
-  * the same @obj to clean up, even if visiting the contents of the
-@@ -465,11 +465,13 @@ bool visit_optional(Visitor *v, const char *name, boo=
-l *present);
-  * visitors produce text output.  The mapping between enumeration
-  * values and strings is done by the visitor core, using @lookup.
-  *
-- * On failure, store an error through @errp.
-+ * On failure, store an error through @errp.  Can happen only when @v
-+ * is an input visitor.
-  *
-  * May call visit_type_str() under the hood, and the enum visit may
-  * fail even if the corresponding string visit succeeded; this implies
-- * that visit_type_str() must have no unwelcome side effects.
-+ * that an input visitor's visit_type_str() must have no unwelcome
-+ * side effects.
-  */
- void visit_type_enum(Visitor *v, const char *name, int *obj,
-                      const QEnumLookup *lookup, Error **errp);
-@@ -495,7 +497,8 @@ bool visit_is_dealloc(Visitor *v);
-  * @obj must be non-NULL.  Input visitors set *@obj to the value;
-  * other visitors will leave *@obj unchanged.
-  *
-- * On failure, store an error through @errp.
-+ * On failure, store an error through @errp.  Can happen only when @v
-+ * is an input visitor.
-  */
- void visit_type_int(Visitor *v, const char *name, int64_t *obj, Error **er=
-rp);
-=20
-@@ -573,7 +576,8 @@ void visit_type_size(Visitor *v, const char *name, uint=
-64_t *obj,
-  * @obj must be non-NULL.  Input visitors set *@obj to the value;
-  * other visitors will leave *@obj unchanged.
-  *
-- * On failure, store an error through @errp.
-+ * On failure, store an error through @errp.  Can happen only when @v
-+ * is an input visitor.
-  */
- void visit_type_bool(Visitor *v, const char *name, bool *obj, Error **errp=
-);
-=20
-@@ -592,6 +596,7 @@ void visit_type_bool(Visitor *v, const char *name, bool=
- *obj, Error **errp);
-  * into @obj for use by an output visitor.
-  *
-  * On failure, set *@obj to NULL and store an error through @errp.
-+ * Can happen only when @v is an input visitor.
-  *
-  * FIXME: Callers that try to output NULL *obj should not be allowed.
-  */
-@@ -607,7 +612,8 @@ void visit_type_str(Visitor *v, const char *name, char =
-**obj, Error **errp);
-  * other visitors will leave *@obj unchanged.  Visitors should
-  * document if infinity or NaN are not permitted.
-  *
-- * On failure, store an error through @errp.
-+ * On failure, store an error through @errp.  Can happen only when @v
-+ * is an input visitor.
-  */
- void visit_type_number(Visitor *v, const char *name, double *obj,
-                        Error **errp);
-@@ -623,6 +629,7 @@ void visit_type_number(Visitor *v, const char *name, do=
-uble *obj,
-  * for output visitors.
-  *
-  * On failure, set *@obj to NULL and store an error through @errp.
-+ * Can happen only when @v is an input visitor.
-  *
-  * Note that some kinds of input can't express arbitrary QObject.
-  * E.g. the visitor returned by qobject_input_visitor_new_keyval()
-@@ -640,6 +647,7 @@ void visit_type_any(Visitor *v, const char *name, QObje=
-ct **obj, Error **errp);
-  * other visitors ignore *@obj.
-  *
-  * On failure, set *@obj to NULL and store an error through @errp.
-+ * Can happen only when @v is an input visitor.
-  */
- void visit_type_null(Visitor *v, const char *name, QNull **obj,
-                      Error **errp);
-diff --git a/block.c b/block.c
-index 2e3905c99e..c11385ae05 100644
---- a/block.c
-+++ b/block.c
-@@ -2982,7 +2982,6 @@ BdrvChild *bdrv_open_child(const char *filename,
- BlockDriverState *bdrv_open_blockdev_ref(BlockdevRef *ref, Error **errp)
- {
-     BlockDriverState *bs =3D NULL;
--    Error *local_err =3D NULL;
-     QObject *obj =3D NULL;
-     QDict *qdict =3D NULL;
-     const char *reference =3D NULL;
-@@ -2995,11 +2994,7 @@ BlockDriverState *bdrv_open_blockdev_ref(BlockdevRef=
- *ref, Error **errp)
-         assert(ref->type =3D=3D QTYPE_QDICT);
-=20
-         v =3D qobject_output_visitor_new(&obj);
--        visit_type_BlockdevOptions(v, NULL, &options, &local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
--            goto fail;
--        }
-+        visit_type_BlockdevOptions(v, NULL, &options, &error_abort);
-         visit_complete(v, &obj);
-=20
-         qdict =3D qobject_to(QDict, obj);
-@@ -3017,8 +3012,6 @@ BlockDriverState *bdrv_open_blockdev_ref(BlockdevRef =
-*ref, Error **errp)
-=20
-     bs =3D bdrv_open_inherit(NULL, reference, qdict, 0, NULL, NULL, errp);
-     obj =3D NULL;
--
--fail:
-     qobject_unref(obj);
-     visit_free(v);
-     return bs;
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 59f7ebb171..5f3aead038 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -1854,19 +1854,12 @@ static int sd_create_prealloc(BlockdevOptionsSheepd=
-og *location, int64_t size,
-     Visitor *v;
-     QObject *obj =3D NULL;
-     QDict *qdict;
--    Error *local_err =3D NULL;
-     int ret;
-=20
-     v =3D qobject_output_visitor_new(&obj);
--    visit_type_BlockdevOptionsSheepdog(v, NULL, &location, &local_err);
-+    visit_type_BlockdevOptionsSheepdog(v, NULL, &location, &error_abort);
-     visit_free(v);
-=20
--    if (local_err) {
--        error_propagate(errp, local_err);
--        qobject_unref(obj);
--        return -EINVAL;
--    }
--
-     qdict =3D qobject_to(QDict, obj);
-     qdict_flatten(qdict);
-=20
-diff --git a/blockdev.c b/blockdev.c
-index 5faddaa705..9da960b1e7 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3725,14 +3725,8 @@ void qmp_blockdev_add(BlockdevOptions *options, Erro=
-r **errp)
-     QObject *obj;
-     Visitor *v =3D qobject_output_visitor_new(&obj);
-     QDict *qdict;
--    Error *local_err =3D NULL;
--
--    visit_type_BlockdevOptions(v, NULL, &options, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        goto fail;
--    }
-=20
-+    visit_type_BlockdevOptions(v, NULL, &options, &error_abort);
-     visit_complete(v, &obj);
-     qdict =3D qobject_to(QDict, obj);
-=20
-@@ -3760,7 +3754,6 @@ void qmp_x_blockdev_reopen(BlockdevOptions *options, =
-Error **errp)
-     AioContext *ctx;
-     QObject *obj;
-     Visitor *v =3D qobject_output_visitor_new(&obj);
--    Error *local_err =3D NULL;
-     BlockReopenQueue *queue;
-     QDict *qdict;
-=20
-@@ -3777,12 +3770,7 @@ void qmp_x_blockdev_reopen(BlockdevOptions *options,=
- Error **errp)
+diff --git a/qom/object.c b/qom/object.c
+index 1812f79224..be700e831f 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -1550,11 +1550,9 @@ int object_property_get_enum(Object *obj, const char=
+ *name,
      }
+     visit_complete(v, &str);
+     visit_free(v);
+-    v =3D string_input_visitor_new(str);
+-    visit_type_enum(v, name, &ret, enumprop->lookup, errp);
 =20
-     /* Put all options in a QDict and flatten it */
--    visit_type_BlockdevOptions(v, NULL, &options, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        goto fail;
--    }
--
-+    visit_type_BlockdevOptions(v, NULL, &options, &error_abort);
-     visit_complete(v, &obj);
-     qdict =3D qobject_to(QDict, obj);
++    ret =3D qapi_enum_parse(enumprop->lookup, str, -1, errp);
+     g_free(str);
+-    visit_free(v);
 =20
-diff --git a/hw/core/machine-hmp-cmds.c b/hw/core/machine-hmp-cmds.c
-index b76f7223af..39999c47c5 100644
---- a/hw/core/machine-hmp-cmds.c
-+++ b/hw/core/machine-hmp-cmds.c
-@@ -113,7 +113,7 @@ void hmp_info_memdev(Monitor *mon, const QDict *qdict)
-=20
-     while (m) {
-         v =3D string_output_visitor_new(false, &str);
--        visit_type_uint16List(v, NULL, &m->value->host_nodes, NULL);
-+        visit_type_uint16List(v, NULL, &m->value->host_nodes, &error_abort=
-);
-         monitor_printf(mon, "memory backend: %s\n", m->value->id);
-         monitor_printf(mon, "  size:  %" PRId64 "\n", m->value->size);
-         monitor_printf(mon, "  merge: %s\n",
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index 9b94e67879..7f6e982dc8 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -334,7 +334,8 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
-         Visitor *v;
-         char *str;
-         v =3D string_output_visitor_new(false, &str);
--        visit_type_uint32List(v, NULL, &info->postcopy_vcpu_blocktime, NUL=
-L);
-+        visit_type_uint32List(v, NULL, &info->postcopy_vcpu_blocktime,
-+                              &error_abort);
-         visit_complete(v, &str);
-         monitor_printf(mon, "postcopy vcpu blocktime: %s\n", str);
-         g_free(str);
+     return ret;
+ }
 --=20
 2.21.1
 
