@@ -2,85 +2,78 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD67CC47247
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 13:59:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA68C28CBC
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:00:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A8D420873
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 13:59:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f7DGR4Xq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A8D420873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2EBFD2076D
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:00:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EBFD2076D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU9j0-0003Fh-It
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 09:59:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50610)
+	id 1jU9jX-0003rj-5O
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 10:00:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51746)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jU9Vq-0005FQ-N3
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:49:24 -0400
+ (envelope-from <bounces@canonical.com>) id 1jU9aw-0003SY-9M
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jU9UG-0004CL-L2
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:46:02 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55119
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jU9UG-00047s-65
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:44:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588254263;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=PB8PGZNazuzWv04eGiBbEFj5KKQho95FLI+pXJuyqu8=;
- b=f7DGR4Xq0Kf/zOyJN7urF2OrSbn32JUmZvXUkfFwXclgPY3nBJUZ9MQI6gYgt1/tusaTS3
- pOr/D4uA228O0+fxRTpqX4DI8ZT9sjTBmUtSxJB7rL7UkEhSDu8c4y9rz8UYmK4GR20ylK
- 27QfNgO5zZR7an3Aqjn9tovaXnYz2lk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-IM70VVzSOquj42vhfJLMkQ-1; Thu, 30 Apr 2020 09:44:19 -0400
-X-MC-Unique: IM70VVzSOquj42vhfJLMkQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D06DA107ACCA;
- Thu, 30 Apr 2020 13:44:18 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.71])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 876095C1B0;
- Thu, 30 Apr 2020 13:43:59 +0000 (UTC)
-Date: Thu, 30 Apr 2020 15:43:58 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH v3 11/15] acpi: move aml builder code for parallel device
-Message-ID: <20200430154358.3e7f9468@redhat.com>
-In-Reply-To: <20200429140003.7336-12-kraxel@redhat.com>
-References: <20200429140003.7336-1-kraxel@redhat.com>
- <20200429140003.7336-12-kraxel@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1jU9an-0000ir-8k
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:17 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36336)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jU9am-0000et-PQ
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:08 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jU9al-0007ih-8M
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 13:51:07 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 3BF842E8104
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 13:51:07 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:04:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 30 Apr 2020 13:41:49 -0000
+From: Laurent Vivier <Laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: audio dos games gus sb16 timed timer
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: laurent-vivier zezuspam
+X-Launchpad-Bug-Reporter: David Miller (zezuspam)
+X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
+References: <157833854539.28173.10729724748625497755.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158825411029.11959.14691651805460123144.launchpad@wampee.canonical.com>
+Subject: [Bug 1858488] Re: qemu git && 4.2:  timed audio issues with sb16,
+ gus not working?
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: e9de73d8695247f3acadd64dbeecc1161736b03d
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 09:35:36
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,131 +82,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1858488 <1858488@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 29 Apr 2020 15:59:59 +0200
-Gerd Hoffmann <kraxel@redhat.com> wrote:
+** Changed in: qemu
+       Status: Fix Committed =3D> Fix Released
 
-> Also adds support for multiple LPT devices.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+-- =
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1858488
 
-> ---
->  hw/char/parallel.c   | 32 ++++++++++++++++++++++++++++++++
->  hw/i386/acpi-build.c | 23 -----------------------
->  2 files changed, 32 insertions(+), 23 deletions(-)
-> 
-> diff --git a/hw/char/parallel.c b/hw/char/parallel.c
-> index 8dd67d13759b..bc6b55b3b910 100644
-> --- a/hw/char/parallel.c
-> +++ b/hw/char/parallel.c
-> @@ -28,6 +28,7 @@
->  #include "qemu/module.h"
->  #include "chardev/char-parallel.h"
->  #include "chardev/char-fe.h"
-> +#include "hw/acpi/aml-build.h"
->  #include "hw/irq.h"
->  #include "hw/isa/isa.h"
->  #include "hw/qdev-properties.h"
-> @@ -568,6 +569,35 @@ static void parallel_isa_realizefn(DeviceState *dev, Error **errp)
->                               s, "parallel");
->  }
->  
-> +static void parallel_isa_build_aml(ISADevice *isadev, Aml *scope)
-> +{
-> +    ISAParallelState *isa = ISA_PARALLEL(isadev);
-> +    int i, uid = 0;
-> +    Aml *dev;
-> +    Aml *crs;
-> +
-> +    for (i = 0; i < ARRAY_SIZE(isa_parallel_io); i++) {
-> +        if (isa->iobase == isa_parallel_io[i]) {
-> +            uid = i + 1;
-> +        }
-> +    }
-> +    if (!uid) {
-> +        return;
-> +    }
-> +
-> +    crs = aml_resource_template();
-> +    aml_append(crs, aml_io(AML_DECODE16, isa->iobase, isa->iobase, 0x08, 0x08));
-> +    aml_append(crs, aml_irq_no_flags(isa->isairq));
-> +
-> +    dev = aml_device("LPT%d", uid);
-> +    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0400")));
-> +    aml_append(dev, aml_name_decl("_UID", aml_int(uid)));
-> +    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
-> +    aml_append(dev, aml_name_decl("_CRS", crs));
-> +
-> +    aml_append(scope, dev);
-> +}
-> +
->  /* Memory mapped interface */
->  static uint64_t parallel_mm_readfn(void *opaque, hwaddr addr, unsigned size)
->  {
-> @@ -624,9 +654,11 @@ static Property parallel_isa_properties[] = {
->  static void parallel_isa_class_initfn(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
-> +    ISADeviceClass *isa = ISA_DEVICE_CLASS(klass);
->  
->      dc->realize = parallel_isa_realizefn;
->      dc->vmsd = &vmstate_parallel_isa;
-> +    isa->build_aml = parallel_isa_build_aml;
->      device_class_set_props(dc, parallel_isa_properties);
->      set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
->  }
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index e01afbd011d9..12a017e1f45b 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -1167,28 +1167,6 @@ static Aml *build_mouse_device_aml(void)
->      return dev;
->  }
->  
-> -static void build_lpt_device_aml(Aml *scope)
-> -{
-> -    Aml *dev;
-> -    Aml *crs;
-> -
-> -    if (!memory_region_present(get_system_io(), 0x0378)) {
-> -        return;
-> -    }
-> -
-> -    dev = aml_device("LPT");
-> -    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0400")));
-> -
-> -    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
-> -
-> -    crs = aml_resource_template();
-> -    aml_append(crs, aml_io(AML_DECODE16, 0x0378, 0x0378, 0x08, 0x08));
-> -    aml_append(crs, aml_irq_no_flags(7));
-> -    aml_append(dev, aml_name_decl("_CRS", crs));
-> -
-> -    aml_append(scope, dev);
-> -}
-> -
->  static void build_isa_devices_aml(Aml *table)
->  {
->      ISADevice *fdc = pc_find_fdc0();
-> @@ -1202,7 +1180,6 @@ static void build_isa_devices_aml(Aml *table)
->      if (fdc) {
->          aml_append(scope, build_fdc_device_aml(fdc));
->      }
-> -    build_lpt_device_aml(scope);
->  
->      if (ambiguous) {
->          error_report("Multiple ISA busses, unable to define IPMI ACPI data");
+Title:
+  qemu git && 4.2:  timed audio issues with sb16,  gus not working?
 
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  =
+
+  I have built [both] current git, and 4.2.0, there are issues with audio/s=
+oundhw for both.
+
+  Specifics:
+
+  Linux nullrig 5.3.0-24-generic #26-Ubuntu SMP Thu Nov 14 01:33:18 UTC
+  2019 x86_64 x86_64 x86_64 GNU/Linux
+
+  Out of source build, successful for both:
+
+  ../configure --prefix=3D/opt/qemu --target-list=3Di386-softmmu,mips64el-
+  softmmu ---enable-sdl --enable-sdl-image --enable-lzo --enable-bzip2
+  --enable-avx2 --enable-kvm --enable-membarrier --enable-plugin
+
+  Call:
+
+  ./qemu -machine pc,accel=3Dkvm,usb=3Doff -cpu pentium -m 64 -rtc
+  base=3Dlocaltime -parallel none -soundhw sb16,adlib,pcspk -device
+  cirrus-vga,bus=3Dpci.0 -drive
+  id=3Ddisk1,file=3Ddoom.cow,format=3Dqcow2,if=3Dvirtio -audiodev pa,id=3Dpa
+
+  Audio for sb16 sounds ok,  however if i switch to a timer based audio:
+  -audiodev wav
+
+  The output is wrong..  I had assumed it was all timer based audio,
+  however it seems to be limited to sb16.
+
+  So I then tried the next popular/compatible audio device for dos
+  games:  gravis ultrasound [gus].
+
+  I get no output at all for it.
+  I have tried more than one piece of software,  DOOM shareware is any easy=
+ example.
+
+  I realize there are better solutions for playing DOS games, however I
+  am interested in snapshot support which many of them lack.
+
+  I am willing to put the work into fixing it myself if need be,
+  however i'm not very familiar with the audio backend.   Specifically,
+  it is already mixed into a single buffer,  if 'adlib' driver is
+  already working: (audio_pcm_ops.write() output is correct on timer
+  based output) I failed to see how it affects emulation of the sound
+  blaster.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1858488/+subscriptions
 
