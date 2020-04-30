@@ -2,122 +2,92 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B015BC4724C
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 17:44:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72464C4724C
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 17:46:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C4A020836
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 17:44:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4129E20870
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 17:46:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="fb/uhFBb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C4A020836
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Y0vGAns1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4129E20870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUDEv-0003iW-KE
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 13:44:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32816)
+	id 1jUDGX-0005Kc-A9
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 13:46:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32902)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jUDDQ-0002o0-AV
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 13:43:17 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jUDE2-0003If-7Z
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 13:43:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jUDDO-0001Jb-Ea
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 13:43:15 -0400
-Received: from mail-eopbgr00101.outbound.protection.outlook.com
- ([40.107.0.101]:5377 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jUDDN-0001JP-JW; Thu, 30 Apr 2020 13:43:14 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oCylT2iTzkp60iQjKgXPZ7ZLGWWV7pvu64OLPdm7Qq5oTdeQIYrEbBzBKFuDj61OHsJhJ6Hm1hkLG6q/F93IOexSH72DnMmWnebwGsZTLuxm/knGH9lWaqhpOtgS4Esa3P1Dzp5sfp8B8zU1geZKUw80KziYe9RTaaZSOeTPyiujB5ah+CGEB+GietEE5XItE04w7Fq66Tdoms4A5gGhgTBzaDqP9lKEHw+vaGjbnlZ+Kn7wonaCdjPjIbNWW52Nou5tV5nQNeS5qdm56L7OBlAQy5fE0MXexaMwoLUxoggVgCMna4CaMzArrJJTdz+KaA3MnEq3KNmTH9sNz4w3Yg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J5Hb3WTP8J5v447dY1H+u+CPFTK833D1TZ4MJbxpUvk=;
- b=muCdkgBQZPx7bUHXPVZdsRkd+LbJHQIKuUIIgbTFYh/zJorytCTaaMW+IUp4TW8VwUfrvV2p9Zd3dPMamiqW/1zR7B+vpeolobPUcJdw2XDrR+U4FfKq19UcIrRycIUcukQ2hpZ5xlWhbP61gBRNg+sPic8t6AeXhF8aVW3KCt1UkXhsfrb2fb2nBOdX44RZm8EjKl7tpp/4XkzGLlUV1n+sbI6d49fKDeoWfDA5VOA3KenxCm6XuvPWihmFdQp1OIzT2gefQa3GZ7J+nN8DfdJFZHKzMuTNBA+PdxhpveAn97iOORCrxQzjxPeTt1Wx+canzsi0HnKgcurYzJVrNQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J5Hb3WTP8J5v447dY1H+u+CPFTK833D1TZ4MJbxpUvk=;
- b=fb/uhFBbW8r911EQUdFfcdHmGQ/bpP37cDgmX4KS+at3uH0Ei5jYMN2kVqKErYlCNELb3IW78XCZSNp4TxUlUxR5sJ4CQ8lNWe8X16WJ+AR5pWwilVUAt5DEAJor9fmItpf9qkQcyXLnhOSx+aIEEU9DvNzJZJyCPQURAJkY8Fc=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5493.eurprd08.prod.outlook.com (2603:10a6:20b:102::11)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.20; Thu, 30 Apr
- 2020 17:43:10 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2958.020; Thu, 30 Apr 2020
- 17:43:10 +0000
-Subject: Re: [PATCH v2 1/4] iotests/283: Use consistent size for source and
- target
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200430142755.315494-1-kwolf@redhat.com>
- <20200430142755.315494-2-kwolf@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200430204308953
-Message-ID: <d77f5e36-5567-f638-9ce9-348432d8ce67@virtuozzo.com>
-Date: Thu, 30 Apr 2020 20:43:09 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <20200430142755.315494-2-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR10CA0045.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:20b:150::25) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <richard.henderson@linaro.org>) id 1jUDDx-0001yt-5M
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 13:43:53 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:51491)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jUDDw-0001yg-O4
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 13:43:48 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id mq3so1001988pjb.1
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 10:43:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=I2U3wHVE5lkKMOVtyo3V9KEuLLw9EuJ+JZ1crcPLWn4=;
+ b=Y0vGAns1oh+bK+XgJ6GbYGq4dke0zfMwXYclbtW+srabBmyeu5MVCEaG3w8r8m4Gpd
+ Qqy2SZt29cMb/LHBZ/TLkbG3sJsX5j+YFf4QLbaXJKs9QWO6aYrTnXBv5tvBa28GDUOX
+ 3Wp+LBLw1m/rDxQCceELbDuPHA28/iNLqWpQ7K6k750lGeZFQ+ffzvXnp11GfnWh1QTu
+ y5MJxagYBrVnXi2X+sqDocSXW3igo8OkYlH0gGLTU4PLkZ5sfMedrnH2Y6+qZbbMq0dE
+ KibAYVpKHBPPkPiszq4mp0EDFkDkcrhjcxh+HTgluVdzRarRMjmTwmtuzUC0T60cw+cD
+ 2K9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=I2U3wHVE5lkKMOVtyo3V9KEuLLw9EuJ+JZ1crcPLWn4=;
+ b=XQR1Nbbk2wle6usF4DRaoKXeMMUaZSWUGPzqgC87k9cuVgKn/GDn7+aBVL4zknxoVt
+ KmQjgiYxPKXPdt1F5q6nDTXjopJkmdNU1cQN/ZOPiaqQ3hLuaXdhFmkwpRjJOSoGJcXm
+ tdnUGPzV2G+kIC2L0g3WEa77g0bO3bD6gqNqvLOUiIq2BykXru6USokk73f0JKHy3yrD
+ fIUXmn5Uvoy+t1XCoi5t1DUaMxZMEExsS36vGmWrWC/YLUpsfqyEQYSdzMEajUp4dWMa
+ 6wQd8hj9NiNoBIOv49btRLFKwyJpWGVAnGO9NQBzJ8A9GuLuimM776Leor+AhjyL/2fY
+ fPcg==
+X-Gm-Message-State: AGi0Pua2xNuGNahnEzEufwvGy+EnPML6gxVSz3+HzQhbWTMrbMBIFodT
+ UosyMCKDKqUhCpoU6uXbqwbh0A==
+X-Google-Smtp-Source: APiQypJyWYtIwTGeR/0L52EgicomBYkRk37Mox/i436IldAl0a8r0swtlgGMH5bLsAfehjFNWxgs9w==
+X-Received: by 2002:a17:90a:290f:: with SMTP id
+ g15mr4269535pjd.93.1588268626909; 
+ Thu, 30 Apr 2020 10:43:46 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
+ by smtp.gmail.com with ESMTPSA id g10sm347782pfk.103.2020.04.30.10.43.45
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 30 Apr 2020 10:43:46 -0700 (PDT)
+Subject: Re: [PATCH RFC] target/arm: Implement SVE2 FLOGB
+To: Stephen Long <steplong@quicinc.com>, qemu-devel@nongnu.org
+References: <20200430172022.14886-1-steplong@quicinc.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <b2e2f389-163c-e117-1b3e-aa57820e9e0a@linaro.org>
+Date: Thu, 30 Apr 2020 10:43:44 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.138) by
- AM0PR10CA0045.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:150::25) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.20 via Frontend
- Transport; Thu, 30 Apr 2020 17:43:09 +0000
-X-Tagtoolbar-Keys: D20200430204308953
-X-Originating-IP: [185.215.60.138]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 0a85513d-a4f8-44a7-b34c-08d7ed2df30d
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5493:
-X-Microsoft-Antispam-PRVS: <AM7PR08MB54934D70E9B842485A0C4895C1AA0@AM7PR08MB5493.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
-X-Forefront-PRVS: 0389EDA07F
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: CjBgWB6NuSaLti6Hml+/Ktt/ubQFhrixRs1KSiBpsHNsfVhofhu4XOG24cavHqKCLWQ+nlVBJ7NxFQmNi75GTUJOnaa1OUb0/L6xl8nezSRrsMt2KPw4Ela56sX0OO/7t4ypqCyXO2ruYTI+lhp24whFBzvIbDQ+O367Bs5rcbSgQRQ6M1Ny/8UsG8Q+B4wei2+O/yS4IBcE15xWt7Ov2if3tyDHrIzNs4olFfmewKXE92muxywgwrhmucle8dsTuomKYVNKuHTWE+L5ScZvGjsIqEal0VST/5tG82dK/mYorpIuO1ax3d4HV2+tNq5oZuBXRb/mCSXyJO3AR/5vKh8/2MOWkZk6tUI5mme3HxU05emwbPxqLNAvop61ClMdGpa2H319SpgJztUl+/1Ma7sDyMrNZqvAnrhMXA/xKnunil3Qls/elXdTAon661PV
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(346002)(136003)(376002)(366004)(396003)(39850400004)(316002)(16576012)(8936002)(26005)(8676002)(31686004)(478600001)(36756003)(186003)(66946007)(66556008)(31696002)(2906002)(16526019)(66476007)(86362001)(52116002)(4744005)(5660300002)(6486002)(4326008)(956004)(2616005);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 0nhhTvwYpDSKsTByeFxqLw/eTQbFgdNzzZdi56AGKpSnEePCp0Tfj1Ibo3GhJ++c2dXqHT1XyegQz/8ZDFjgtMWopd1vTbFNH4ajtOSL7WO09YjcXlW4lX+3drMosZO6EczScXx9JD2VZi4bGYsoc+vs9Yr0eBSgoXtTvs/8aLoSBouBivylaBaTCMn0L82CkeK5f1SEDYQII1cpE8tPyaUhyUSM+snpH3Nt2cL46oJAkDpOYhTANB6+MVou6TnaohPSsqTxEPePP9Csy0igeCSFOVCIGGjK8Rq1RhkA/WUl64d/PkH3fXWsr9xS3dUPMO3WWPGVE3kPu4BUIqV0CwhVa7bhd30s4e3nnSqchqh7zcYtcanSJ5UEIASLu2/TCTDhweSuvDwpHcumd04+IvVVkM+fEOX1Ly2JUmdBS6Xba/TEOlipIKAt5z08CWGuAyub3a2/Ao/otzsfqPKoxYpNIIzavkVpkwf7d7l/0+Cw2VwTrXi5EuoAIQSeSG5vzLMi7PZtPuJQFfw949Blj3LitFMGY59BDVosy84zu5ehOMcZ3ZrATx/jMlR9kpmptB9uB94l+borj7yeE9EiJ9eCo2Rq81S2ccb0UgncahOcKM1GLYqb+t5pFWPnHzBKfVTSdKC/7MHdoCaKhwnXYfhc7N10bHhEjZp5A0oangmWkEWNqF8KxhMRnY2I/4660543hFX85rKeJQztfOM6lBIKceZQU/1Pz+s6vCrxg3u7qeyAbTLokdX+bW6tLsaJruOWQQDjUXvAT9TBetcIHrnKpdJeG0y80Bj9mhtqeH8=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0a85513d-a4f8-44a7-b34c-08d7ed2df30d
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2020 17:43:10.4282 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fBrrTRzFqJVO0FFrf8K6L/q74T/z4p8yc0xIAVmnwEpLMNKWUvsx5B3lWm+QzcfgEBSKTUc+bJPgrh7uw/bFjZHEGkbQtPPD/o5y6LwOLNk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5493
-Received-SPF: pass client-ip=40.107.0.101;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR02-AM5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 13:43:11
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Received-From: 40.107.0.101
+In-Reply-To: <20200430172022.14886-1-steplong@quicinc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::1041
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -129,23 +99,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jsnow@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: qemu-arm@nongnu.org, apazos@quicinc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-30.04.2020 17:27, Kevin Wolf wrote:
-> The test case forgot to specify the null-co size for the target node.
-> When adding a check to backup that both sizes match, this would fail
-> because of the size mismatch and not the behaviour that the test really
-> wanted to test.
-> 
-> Fixes: a541fcc27c98b96da187c7d4573f3270f3ddd283
-> Signed-off-by: Kevin Wolf<kwolf@redhat.com>
+On 4/30/20 10:20 AM, Stephen Long wrote:
+> +DO_ZPZ_FP(flogb_s, float32, H1_4, float32_log2)
+> +DO_ZPZ_FP(flogb_d, float64,     , float64_log2)
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Please read the instruction description more carefully.  The result is not the
+full log2 of the input:
 
--- 
-Best regards,
-Vladimir
+
+> This instruction returns the signed integer base 2 logarithm of each floating-point input element | X | after normalization.  This is the unbiased exponent of X used in the representation of the floating-point value, such that, for positive X , X = significand × 2 exponent.
+
+Please look at Library pseudocode for aarch64/functions/sve/FPLogB in the manual.
+
+You then use the helpers from softfloat.h like so
+
+    if (float32_is_normal(x)) {
+        // extract exponent and remove bias
+        return extract32(x, 23, 8) - 127;
+    } else if (float32_is_infinity(x)) {
+        return INT32_MAX;
+    } else if (float32_is_any_nan(x) || float32_is_zero(x)) {
+        return INT32_MIN;
+    } else {
+        // denormal
+        // extract fraction, normalize vs 2**-127.
+        int shift = 9 - clz32(extract32(0, 23));
+        return -127 - shift + 1;
+    }
+
+
+r~
 
