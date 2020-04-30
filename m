@@ -2,81 +2,91 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFBD0C47247
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:50:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CB7DC47247
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:50:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A0B52073E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:50:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D6B522070B
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:50:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bo61YCHp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A0B52073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wGfEHdJi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6B522070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUCO8-0005FC-O9
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 12:50:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49956)
+	id 1jUCOS-0005jy-0t
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 12:50:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49438)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jUC7V-0007dR-2J
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:33:54 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jUC3K-0001x0-Fl
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:28:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jUC6W-0001KG-5U
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:33:04 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55287)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jUC6V-0001Hl-Mu
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:32:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588264322;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Lm01oWShkBDXnGbfwV19JsB1g2JkYLJo9A3Gm8eb74c=;
- b=bo61YCHpQDBMkbnpt8y/s+YxntvBEIvUiTvxSiq3y+zXaBTsuHN+k6RrfLiLxuGq1TjYGg
- IGPFzBaLbqSG/jXEXfU8HskjkaEGBTy7bXmOaamobC4sAqTkcxVxYHIFFTup615lt6jBZb
- b/Qh+PyG215SRo7jvkdGZQTMVvennxg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-21-qR8B3hT-OJ-jSDdr5EaSIg-1; Thu, 30 Apr 2020 12:31:58 -0400
-X-MC-Unique: qR8B3hT-OJ-jSDdr5EaSIg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D64C61030983;
- Thu, 30 Apr 2020 16:31:56 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.71])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B2E3F512E4;
- Thu, 30 Apr 2020 16:31:45 +0000 (UTC)
-Date: Thu, 30 Apr 2020 18:31:44 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH v3 14/15] acpi: factor out fw_cfg_add_acpi_dsdt()
-Message-ID: <20200430183144.1eca20ea@redhat.com>
-In-Reply-To: <20200429140003.7336-15-kraxel@redhat.com>
-References: <20200429140003.7336-1-kraxel@redhat.com>
- <20200429140003.7336-15-kraxel@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1jUC3C-0006lM-MN
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:28:46 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:43671)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jUC3C-0006gr-7U
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:28:38 -0400
+Received: by mail-pl1-x641.google.com with SMTP id z6so2416214plk.10
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 09:28:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=NJ7tcpWJHZVF+lqFFr3iSzkxO+gqeqH9eerAkzbMBl4=;
+ b=wGfEHdJiGfQSHZsbE7ku6KqcU4DJum1Sw2mEKLkTe8+xJT0zw4CG8YrhoI/9dC1/dM
+ UcyUafQSe6CkP71BlbiURtQsN1+un/YGfxJcF98Fmq3nuvqI7OTNUb2L7633RLE0LFV9
+ IOIATteyph15TJ7/iVrRIXIvvJdCUwwV4szzkd1vt+/6flM/r07kHmj3YXp+wKajc//d
+ JC6SJmFUJyB/k4JGVlhp5XshhIRpYwww4y/w+g9d0GWa0GvKau+dueVw5uZavTCADXK9
+ l8eoaTGX4q1TXSvvo22zyuBqPa/RhUoMvKZ71rMKrXBYv+4Th79R03ZpmtNnHIrvRX46
+ f+0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=NJ7tcpWJHZVF+lqFFr3iSzkxO+gqeqH9eerAkzbMBl4=;
+ b=ffXp77EonADs3QqkZ+u6zh3FwKGXnVF9z+ersvttF2v4lYknqQK4Vs8jyWynz0iVvX
+ CHINkruYRbvBUazZPEGEJkeJkBJD9L/+mVxevlV+khMCXnl4nsJ+Zo80bFhsa//c6Nts
+ Aenj8jyqBDRdDQjFQag3RWd1/a1bY+4ln1nkoHSDC6C9VdF4fhSsRr6jQ4xWKQsIvTws
+ FZ9WDpikZvuRcyk3bJ7ZgfywAXgefCjtw3Qjon5og//lsLi6CDC0uzJ7VxPPWck3k9mu
+ W7CWQ4p4zjAWTBSRR9nuUR/W9fd0FW8yVGX9MYR78CCtKhfVeW61TGCF76BU2XphrC+x
+ vBCw==
+X-Gm-Message-State: AGi0PuZwKIDzHMnREzAfAUNLNKKXosSWbAlWI3GhJ5bk87ryppkpu3Kl
+ gD84ArbQnOIYZ2lS3F3RcjLrYWzxTcs=
+X-Google-Smtp-Source: APiQypK6pJQLpnq1gZfqXa089P5G7d3lSESza9Ja5izyF0zZyCzddWirfnimQN1G18D+qh7pFvoHvA==
+X-Received: by 2002:a17:90a:1b67:: with SMTP id
+ q94mr3993063pjq.84.1588264116092; 
+ Thu, 30 Apr 2020 09:28:36 -0700 (PDT)
+Received: from localhost.localdomain (174-21-149-226.tukw.qwest.net.
+ [174.21.149.226])
+ by smtp.gmail.com with ESMTPSA id j5sm243514pfh.58.2020.04.30.09.28.34
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 30 Apr 2020 09:28:35 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 15/18] target/arm: Reuse sve_probe_page for gather
+ first-fault loads
+Date: Thu, 30 Apr 2020 09:28:10 -0700
+Message-Id: <20200430162813.17671-16-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200430162813.17671-1-richard.henderson@linaro.org>
+References: <20200430162813.17671-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=imammedo@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:31:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x641.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::641
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,134 +98,384 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 29 Apr 2020 16:00:02 +0200
-Gerd Hoffmann <kraxel@redhat.com> wrote:
+This avoids the need for a separate set of helpers to implement
+no-fault semantics, and will enable MTE in the future.
 
-> Add helper function to add fw_cfg device,
-> also move code to hw/i386/fw_cfg.c.
->=20
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/sve_helper.c | 323 ++++++++++++++++------------------------
+ 1 file changed, 127 insertions(+), 196 deletions(-)
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
->  hw/i386/fw_cfg.h     |  1 +
->  hw/i386/acpi-build.c | 24 +-----------------------
->  hw/i386/fw_cfg.c     | 28 ++++++++++++++++++++++++++++
->  3 files changed, 30 insertions(+), 23 deletions(-)
->=20
-> diff --git a/hw/i386/fw_cfg.h b/hw/i386/fw_cfg.h
-> index 9e742787792b..275f15c1c5e8 100644
-> --- a/hw/i386/fw_cfg.h
-> +++ b/hw/i386/fw_cfg.h
-> @@ -25,5 +25,6 @@ FWCfgState *fw_cfg_arch_create(MachineState *ms,
->                                 uint16_t apic_id_limit);
->  void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg);
->  void fw_cfg_build_feature_control(MachineState *ms, FWCfgState *fw_cfg);
-> +void fw_cfg_add_acpi_dsdt(Aml *scope, FWCfgState *fw_cfg);
-> =20
->  #endif
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 643e875c05a5..a8b790021974 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -1874,30 +1874,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-> =20
->      /* create fw_cfg node, unconditionally */
->      {
-> -        /* when using port i/o, the 8-bit data register *always* overlap=
-s
-> -         * with half of the 16-bit control register. Hence, the total si=
-ze
-> -         * of the i/o region used is FW_CFG_CTL_SIZE; when using DMA, th=
-e
-> -         * DMA control register is located at FW_CFG_DMA_IO_BASE + 4 */
-> -        uint8_t io_size =3D object_property_get_bool(OBJECT(x86ms->fw_cf=
-g),
-> -                                                   "dma_enabled", NULL) =
-?
-> -                          ROUND_UP(FW_CFG_CTL_SIZE, 4) + sizeof(dma_addr=
-_t) :
-> -                          FW_CFG_CTL_SIZE;
-> -
->          scope =3D aml_scope("\\_SB.PCI0");
-> -        dev =3D aml_device("FWCF");
-> -
-> -        aml_append(dev, aml_name_decl("_HID", aml_string("QEMU0002")));
-> -
-> -        /* device present, functioning, decoding, not shown in UI */
-> -        aml_append(dev, aml_name_decl("_STA", aml_int(0xB)));
-> -
-> -        crs =3D aml_resource_template();
-> -        aml_append(crs,
-> -            aml_io(AML_DECODE16, FW_CFG_IO_BASE, FW_CFG_IO_BASE, 0x01, i=
-o_size)
-> -        );
-> -        aml_append(dev, aml_name_decl("_CRS", crs));
-> -
-> -        aml_append(scope, dev);
-> +        fw_cfg_add_acpi_dsdt(scope, x86ms->fw_cfg);
->          aml_append(dsdt, scope);
->      }
-> =20
-> diff --git a/hw/i386/fw_cfg.c b/hw/i386/fw_cfg.c
-> index da60ada59462..c55abfb01abb 100644
-> --- a/hw/i386/fw_cfg.c
-> +++ b/hw/i386/fw_cfg.c
-> @@ -15,6 +15,7 @@
->  #include "qemu/osdep.h"
->  #include "sysemu/numa.h"
->  #include "hw/acpi/acpi.h"
-> +#include "hw/acpi/aml-build.h"
->  #include "hw/firmware/smbios.h"
->  #include "hw/i386/fw_cfg.h"
->  #include "hw/timer/hpet.h"
-> @@ -179,3 +180,30 @@ void fw_cfg_build_feature_control(MachineState *ms, =
-FWCfgState *fw_cfg)
->      *val =3D cpu_to_le64(feature_control_bits | FEATURE_CONTROL_LOCKED);
->      fw_cfg_add_file(fw_cfg, "etc/msr_feature_control", val, sizeof(*val)=
-);
->  }
-> +
-> +void fw_cfg_add_acpi_dsdt(Aml *scope, FWCfgState *fw_cfg)
-> +{
-> +    /*
-> +     * when using port i/o, the 8-bit data register *always* overlaps
-> +     * with half of the 16-bit control register. Hence, the total size
-> +     * of the i/o region used is FW_CFG_CTL_SIZE; when using DMA, the
-> +     * DMA control register is located at FW_CFG_DMA_IO_BASE + 4
-> +     */
-> +    Object *obj =3D OBJECT(fw_cfg);
-> +    uint8_t io_size =3D object_property_get_bool(obj, "dma_enabled", NUL=
-L) ?
-> +        ROUND_UP(FW_CFG_CTL_SIZE, 4) + sizeof(dma_addr_t) :
-> +        FW_CFG_CTL_SIZE;
-> +    Aml *dev =3D aml_device("FWCF");
-> +    Aml *crs =3D aml_resource_template();
-> +
-> +    aml_append(dev, aml_name_decl("_HID", aml_string("QEMU0002")));
-> +
-> +    /* device present, functioning, decoding, not shown in UI */
-> +    aml_append(dev, aml_name_decl("_STA", aml_int(0xB)));
-> +
-> +    aml_append(crs,
-> +        aml_io(AML_DECODE16, FW_CFG_IO_BASE, FW_CFG_IO_BASE, 0x01, io_si=
-ze));
-> +
-> +    aml_append(dev, aml_name_decl("_CRS", crs));
-> +    aml_append(scope, dev);
-> +}
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index 4ed9bbe1ee..1560129b08 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -5254,231 +5254,162 @@ DO_LD1_ZPZ_D(dd_be, zd)
+ 
+ /* First fault loads with a vector index.  */
+ 
+-/* Load one element into VD+REG_OFF from (ENV,VADDR) without faulting.
+- * The controlling predicate is known to be true.  Return true if the
+- * load was successful.
+- */
+-typedef bool sve_ld1_nf_fn(CPUARMState *env, void *vd, intptr_t reg_off,
+-                           target_ulong vaddr, int mmu_idx);
+-
+-#ifdef CONFIG_SOFTMMU
+-#define DO_LD_NF(NAME, H, TYPEE, TYPEM, HOST) \
+-static bool sve_ld##NAME##_nf(CPUARMState *env, void *vd, intptr_t reg_off, \
+-                              target_ulong addr, int mmu_idx)               \
+-{                                                                           \
+-    target_ulong next_page = -(addr | TARGET_PAGE_MASK);                    \
+-    if (likely(next_page - addr >= sizeof(TYPEM))) {                        \
+-        void *host = tlb_vaddr_to_host(env, addr, MMU_DATA_LOAD, mmu_idx);  \
+-        if (likely(host)) {                                                 \
+-            TYPEM val = HOST(host);                                         \
+-            *(TYPEE *)(vd + H(reg_off)) = val;                              \
+-            return true;                                                    \
+-        }                                                                   \
+-    }                                                                       \
+-    return false;                                                           \
+-}
+-#else
+-#define DO_LD_NF(NAME, H, TYPEE, TYPEM, HOST) \
+-static bool sve_ld##NAME##_nf(CPUARMState *env, void *vd, intptr_t reg_off, \
+-                            target_ulong addr, int mmu_idx)                 \
+-{                                                                           \
+-    if (likely(page_check_range(addr, sizeof(TYPEM), PAGE_READ))) {         \
+-        TYPEM val = HOST(g2h(addr));                                        \
+-        *(TYPEE *)(vd + H(reg_off)) = val;                                  \
+-        return true;                                                        \
+-    }                                                                       \
+-    return false;                                                           \
+-}
+-#endif
+-
+-DO_LD_NF(bsu, H1_4, uint32_t, uint8_t, ldub_p)
+-DO_LD_NF(bss, H1_4, uint32_t,  int8_t, ldsb_p)
+-DO_LD_NF(bdu,     , uint64_t, uint8_t, ldub_p)
+-DO_LD_NF(bds,     , uint64_t,  int8_t, ldsb_p)
+-
+-DO_LD_NF(hsu_le, H1_4, uint32_t, uint16_t, lduw_le_p)
+-DO_LD_NF(hss_le, H1_4, uint32_t,  int16_t, ldsw_le_p)
+-DO_LD_NF(hsu_be, H1_4, uint32_t, uint16_t, lduw_be_p)
+-DO_LD_NF(hss_be, H1_4, uint32_t,  int16_t, ldsw_be_p)
+-DO_LD_NF(hdu_le,     , uint64_t, uint16_t, lduw_le_p)
+-DO_LD_NF(hds_le,     , uint64_t,  int16_t, ldsw_le_p)
+-DO_LD_NF(hdu_be,     , uint64_t, uint16_t, lduw_be_p)
+-DO_LD_NF(hds_be,     , uint64_t,  int16_t, ldsw_be_p)
+-
+-DO_LD_NF(ss_le,  H1_4, uint32_t, uint32_t, ldl_le_p)
+-DO_LD_NF(ss_be,  H1_4, uint32_t, uint32_t, ldl_be_p)
+-DO_LD_NF(sdu_le,     , uint64_t, uint32_t, ldl_le_p)
+-DO_LD_NF(sds_le,     , uint64_t,  int32_t, ldl_le_p)
+-DO_LD_NF(sdu_be,     , uint64_t, uint32_t, ldl_be_p)
+-DO_LD_NF(sds_be,     , uint64_t,  int32_t, ldl_be_p)
+-
+-DO_LD_NF(dd_le,      , uint64_t, uint64_t, ldq_le_p)
+-DO_LD_NF(dd_be,      , uint64_t, uint64_t, ldq_be_p)
+-
+ /*
+- * Common helper for all gather first-faulting loads.
++ * Common helpers for all gather first-faulting loads.
+  */
+-static inline void sve_ldff1_zs(CPUARMState *env, void *vd, void *vg, void *vm,
+-                                target_ulong base, uint32_t desc, uintptr_t ra,
+-                                zreg_off_fn *off_fn, sve_ldst1_tlb_fn *tlb_fn,
+-                                sve_ld1_nf_fn *nonfault_fn)
++
++static inline QEMU_ALWAYS_INLINE
++void sve_ldff1_z(CPUARMState *env, void *vd, uint64_t *vg, void *vm,
++                 target_ulong base, uint32_t desc, uintptr_t retaddr,
++                 const int esz, const int msz, zreg_off_fn *off_fn,
++                 sve_ldst1_host_fn *host_fn,
++                 sve_ldst1_tlb_fn *tlb_fn)
+ {
+-    const TCGMemOpIdx oi = extract32(desc, SIMD_DATA_SHIFT, MEMOPIDX_SHIFT);
+-    const int mmu_idx = get_mmuidx(oi);
++    const int mmu_idx = cpu_mmu_index(env, false);
+     const int scale = extract32(desc, SIMD_DATA_SHIFT + MEMOPIDX_SHIFT, 2);
+-    intptr_t reg_off, reg_max = simd_oprsz(desc);
+-    target_ulong addr;
++    const int esize = 1 << esz;
++    const int msize = 1 << msz;
++    const intptr_t reg_max = simd_oprsz(desc);
++    intptr_t reg_off;
++    SVEHostPage info;
++    target_ulong addr, in_page;
+ 
+     /* Skip to the first true predicate.  */
+-    reg_off = find_next_active(vg, 0, reg_max, MO_32);
+-    if (likely(reg_off < reg_max)) {
+-        /* Perform one normal read, which will fault or not.  */
+-        addr = off_fn(vm, reg_off);
+-        addr = base + (addr << scale);
+-        tlb_fn(env, vd, reg_off, addr, ra);
+-
+-        /* The rest of the reads will be non-faulting.  */
++    reg_off = find_next_active(vg, 0, reg_max, esz);
++    if (unlikely(reg_off >= reg_max)) {
++        /* The entire predicate was false; no load occurs.  */
++        memset(vd, 0, reg_max);
++        return;
+     }
+ 
+-    /* After any fault, zero the leading predicated false elements.  */
++    /*
++     * Probe the first element, allowing faults.
++     */
++    addr = base + (off_fn(vm, reg_off) << scale);
++    tlb_fn(env, vd, reg_off, addr, retaddr);
++
++    /* After any fault, zero the other elements. */
+     swap_memzero(vd, reg_off);
++    reg_off += esize;
++    swap_memzero(vd + reg_off, reg_max - reg_off);
+ 
+-    while (likely((reg_off += 4) < reg_max)) {
+-        uint64_t pg = *(uint64_t *)(vg + (reg_off >> 6) * 8);
+-        if (likely((pg >> (reg_off & 63)) & 1)) {
+-            addr = off_fn(vm, reg_off);
+-            addr = base + (addr << scale);
+-            if (!nonfault_fn(env, vd, reg_off, addr, mmu_idx)) {
+-                record_fault(env, reg_off, reg_max);
+-                break;
++    /*
++     * Probe the remaining elements, not allowing faults.
++     */
++    while (reg_off < reg_max) {
++        uint64_t pg = vg[reg_off >> 6];
++        do {
++            if (likely((pg >> (reg_off & 63)) & 1)) {
++                addr = base + (off_fn(vm, reg_off) << scale);
++                in_page = -(addr | TARGET_PAGE_MASK);
++
++                if (unlikely(in_page < msize)) {
++                    /* Stop if the element crosses a page boundary. */
++                    goto fault;
++                }
++
++                sve_probe_page(&info, true, env, addr, 0, MMU_DATA_LOAD,
++                               mmu_idx, retaddr);
++                if (unlikely(info.flags & (TLB_INVALID_MASK | TLB_MMIO))) {
++                    goto fault;
++                }
++                if (unlikely(info.flags & TLB_WATCHPOINT) &&
++                    (cpu_watchpoint_address_matches
++                     (env_cpu(env), addr, msize) & BP_MEM_READ)) {
++                    goto fault;
++                }
++                /* TODO: MTE check. */
++
++                host_fn(vd, reg_off, info.host);
+             }
+-        } else {
+-            *(uint32_t *)(vd + H1_4(reg_off)) = 0;
+-        }
++            reg_off += esize;
++        } while (reg_off & 63);
+     }
++    return;
++
++ fault:
++    record_fault(env, reg_off, reg_max);
+ }
+ 
+-static inline void sve_ldff1_zd(CPUARMState *env, void *vd, void *vg, void *vm,
+-                                target_ulong base, uint32_t desc, uintptr_t ra,
+-                                zreg_off_fn *off_fn, sve_ldst1_tlb_fn *tlb_fn,
+-                                sve_ld1_nf_fn *nonfault_fn)
+-{
+-    const TCGMemOpIdx oi = extract32(desc, SIMD_DATA_SHIFT, MEMOPIDX_SHIFT);
+-    const int mmu_idx = get_mmuidx(oi);
+-    const int scale = extract32(desc, SIMD_DATA_SHIFT + MEMOPIDX_SHIFT, 2);
+-    intptr_t reg_off, reg_max = simd_oprsz(desc);
+-    target_ulong addr;
+-
+-    /* Skip to the first true predicate.  */
+-    reg_off = find_next_active(vg, 0, reg_max, MO_64);
+-    if (likely(reg_off < reg_max)) {
+-        /* Perform one normal read, which will fault or not.  */
+-        addr = off_fn(vm, reg_off);
+-        addr = base + (addr << scale);
+-        tlb_fn(env, vd, reg_off, addr, ra);
+-
+-        /* The rest of the reads will be non-faulting.  */
+-    }
+-
+-    /* After any fault, zero the leading predicated false elements.  */
+-    swap_memzero(vd, reg_off);
+-
+-    while (likely((reg_off += 8) < reg_max)) {
+-        uint8_t pg = *(uint8_t *)(vg + H1(reg_off >> 3));
+-        if (likely(pg & 1)) {
+-            addr = off_fn(vm, reg_off);
+-            addr = base + (addr << scale);
+-            if (!nonfault_fn(env, vd, reg_off, addr, mmu_idx)) {
+-                record_fault(env, reg_off, reg_max);
+-                break;
+-            }
+-        } else {
+-            *(uint64_t *)(vd + reg_off) = 0;
+-        }
+-    }
++#define DO_LDFF1_ZPZ_S(MEM, OFS, MSZ) \
++void HELPER(sve_ldff##MEM##_##OFS)(CPUARMState *env, void *vd, void *vg,       \
++                                   void *vm, target_ulong base, uint32_t desc) \
++{                                                                              \
++    sve_ldff1_z(env, vd, vg, vm, base, desc, GETPC(), MO_32, MSZ,              \
++                off_##OFS##_s, sve_ld1##MEM##_host, sve_ld1##MEM##_tlb);       \
+ }
+ 
+-#define DO_LDFF1_ZPZ_S(MEM, OFS) \
+-void HELPER(sve_ldff##MEM##_##OFS)                                      \
+-    (CPUARMState *env, void *vd, void *vg, void *vm,                    \
+-     target_ulong base, uint32_t desc)                                  \
+-{                                                                       \
+-    sve_ldff1_zs(env, vd, vg, vm, base, desc, GETPC(),                  \
+-                 off_##OFS##_s, sve_ld1##MEM##_tlb, sve_ld##MEM##_nf);  \
++#define DO_LDFF1_ZPZ_D(MEM, OFS, MSZ) \
++void HELPER(sve_ldff##MEM##_##OFS)(CPUARMState *env, void *vd, void *vg,       \
++                                   void *vm, target_ulong base, uint32_t desc) \
++{                                                                              \
++    sve_ldff1_z(env, vd, vg, vm, base, desc, GETPC(), MO_64, MSZ,              \
++                off_##OFS##_d, sve_ld1##MEM##_host, sve_ld1##MEM##_tlb);       \
+ }
+ 
+-#define DO_LDFF1_ZPZ_D(MEM, OFS) \
+-void HELPER(sve_ldff##MEM##_##OFS)                                      \
+-    (CPUARMState *env, void *vd, void *vg, void *vm,                    \
+-     target_ulong base, uint32_t desc)                                  \
+-{                                                                       \
+-    sve_ldff1_zd(env, vd, vg, vm, base, desc, GETPC(),                  \
+-                 off_##OFS##_d, sve_ld1##MEM##_tlb, sve_ld##MEM##_nf);  \
+-}
++DO_LDFF1_ZPZ_S(bsu, zsu, MO_8)
++DO_LDFF1_ZPZ_S(bsu, zss, MO_8)
++DO_LDFF1_ZPZ_D(bdu, zsu, MO_8)
++DO_LDFF1_ZPZ_D(bdu, zss, MO_8)
++DO_LDFF1_ZPZ_D(bdu, zd, MO_8)
+ 
+-DO_LDFF1_ZPZ_S(bsu, zsu)
+-DO_LDFF1_ZPZ_S(bsu, zss)
+-DO_LDFF1_ZPZ_D(bdu, zsu)
+-DO_LDFF1_ZPZ_D(bdu, zss)
+-DO_LDFF1_ZPZ_D(bdu, zd)
++DO_LDFF1_ZPZ_S(bss, zsu, MO_8)
++DO_LDFF1_ZPZ_S(bss, zss, MO_8)
++DO_LDFF1_ZPZ_D(bds, zsu, MO_8)
++DO_LDFF1_ZPZ_D(bds, zss, MO_8)
++DO_LDFF1_ZPZ_D(bds, zd, MO_8)
+ 
+-DO_LDFF1_ZPZ_S(bss, zsu)
+-DO_LDFF1_ZPZ_S(bss, zss)
+-DO_LDFF1_ZPZ_D(bds, zsu)
+-DO_LDFF1_ZPZ_D(bds, zss)
+-DO_LDFF1_ZPZ_D(bds, zd)
++DO_LDFF1_ZPZ_S(hsu_le, zsu, MO_16)
++DO_LDFF1_ZPZ_S(hsu_le, zss, MO_16)
++DO_LDFF1_ZPZ_D(hdu_le, zsu, MO_16)
++DO_LDFF1_ZPZ_D(hdu_le, zss, MO_16)
++DO_LDFF1_ZPZ_D(hdu_le, zd, MO_16)
+ 
+-DO_LDFF1_ZPZ_S(hsu_le, zsu)
+-DO_LDFF1_ZPZ_S(hsu_le, zss)
+-DO_LDFF1_ZPZ_D(hdu_le, zsu)
+-DO_LDFF1_ZPZ_D(hdu_le, zss)
+-DO_LDFF1_ZPZ_D(hdu_le, zd)
++DO_LDFF1_ZPZ_S(hsu_be, zsu, MO_16)
++DO_LDFF1_ZPZ_S(hsu_be, zss, MO_16)
++DO_LDFF1_ZPZ_D(hdu_be, zsu, MO_16)
++DO_LDFF1_ZPZ_D(hdu_be, zss, MO_16)
++DO_LDFF1_ZPZ_D(hdu_be, zd, MO_16)
+ 
+-DO_LDFF1_ZPZ_S(hsu_be, zsu)
+-DO_LDFF1_ZPZ_S(hsu_be, zss)
+-DO_LDFF1_ZPZ_D(hdu_be, zsu)
+-DO_LDFF1_ZPZ_D(hdu_be, zss)
+-DO_LDFF1_ZPZ_D(hdu_be, zd)
++DO_LDFF1_ZPZ_S(hss_le, zsu, MO_16)
++DO_LDFF1_ZPZ_S(hss_le, zss, MO_16)
++DO_LDFF1_ZPZ_D(hds_le, zsu, MO_16)
++DO_LDFF1_ZPZ_D(hds_le, zss, MO_16)
++DO_LDFF1_ZPZ_D(hds_le, zd, MO_16)
+ 
+-DO_LDFF1_ZPZ_S(hss_le, zsu)
+-DO_LDFF1_ZPZ_S(hss_le, zss)
+-DO_LDFF1_ZPZ_D(hds_le, zsu)
+-DO_LDFF1_ZPZ_D(hds_le, zss)
+-DO_LDFF1_ZPZ_D(hds_le, zd)
++DO_LDFF1_ZPZ_S(hss_be, zsu, MO_16)
++DO_LDFF1_ZPZ_S(hss_be, zss, MO_16)
++DO_LDFF1_ZPZ_D(hds_be, zsu, MO_16)
++DO_LDFF1_ZPZ_D(hds_be, zss, MO_16)
++DO_LDFF1_ZPZ_D(hds_be, zd, MO_16)
+ 
+-DO_LDFF1_ZPZ_S(hss_be, zsu)
+-DO_LDFF1_ZPZ_S(hss_be, zss)
+-DO_LDFF1_ZPZ_D(hds_be, zsu)
+-DO_LDFF1_ZPZ_D(hds_be, zss)
+-DO_LDFF1_ZPZ_D(hds_be, zd)
++DO_LDFF1_ZPZ_S(ss_le,  zsu, MO_32)
++DO_LDFF1_ZPZ_S(ss_le,  zss, MO_32)
++DO_LDFF1_ZPZ_D(sdu_le, zsu, MO_32)
++DO_LDFF1_ZPZ_D(sdu_le, zss, MO_32)
++DO_LDFF1_ZPZ_D(sdu_le, zd, MO_32)
+ 
+-DO_LDFF1_ZPZ_S(ss_le,  zsu)
+-DO_LDFF1_ZPZ_S(ss_le,  zss)
+-DO_LDFF1_ZPZ_D(sdu_le, zsu)
+-DO_LDFF1_ZPZ_D(sdu_le, zss)
+-DO_LDFF1_ZPZ_D(sdu_le, zd)
++DO_LDFF1_ZPZ_S(ss_be,  zsu, MO_32)
++DO_LDFF1_ZPZ_S(ss_be,  zss, MO_32)
++DO_LDFF1_ZPZ_D(sdu_be, zsu, MO_32)
++DO_LDFF1_ZPZ_D(sdu_be, zss, MO_32)
++DO_LDFF1_ZPZ_D(sdu_be, zd, MO_32)
+ 
+-DO_LDFF1_ZPZ_S(ss_be,  zsu)
+-DO_LDFF1_ZPZ_S(ss_be,  zss)
+-DO_LDFF1_ZPZ_D(sdu_be, zsu)
+-DO_LDFF1_ZPZ_D(sdu_be, zss)
+-DO_LDFF1_ZPZ_D(sdu_be, zd)
++DO_LDFF1_ZPZ_D(sds_le, zsu, MO_32)
++DO_LDFF1_ZPZ_D(sds_le, zss, MO_32)
++DO_LDFF1_ZPZ_D(sds_le, zd, MO_32)
+ 
+-DO_LDFF1_ZPZ_D(sds_le, zsu)
+-DO_LDFF1_ZPZ_D(sds_le, zss)
+-DO_LDFF1_ZPZ_D(sds_le, zd)
++DO_LDFF1_ZPZ_D(sds_be, zsu, MO_32)
++DO_LDFF1_ZPZ_D(sds_be, zss, MO_32)
++DO_LDFF1_ZPZ_D(sds_be, zd, MO_32)
+ 
+-DO_LDFF1_ZPZ_D(sds_be, zsu)
+-DO_LDFF1_ZPZ_D(sds_be, zss)
+-DO_LDFF1_ZPZ_D(sds_be, zd)
++DO_LDFF1_ZPZ_D(dd_le, zsu, MO_64)
++DO_LDFF1_ZPZ_D(dd_le, zss, MO_64)
++DO_LDFF1_ZPZ_D(dd_le, zd, MO_64)
+ 
+-DO_LDFF1_ZPZ_D(dd_le, zsu)
+-DO_LDFF1_ZPZ_D(dd_le, zss)
+-DO_LDFF1_ZPZ_D(dd_le, zd)
+-
+-DO_LDFF1_ZPZ_D(dd_be, zsu)
+-DO_LDFF1_ZPZ_D(dd_be, zss)
+-DO_LDFF1_ZPZ_D(dd_be, zd)
++DO_LDFF1_ZPZ_D(dd_be, zsu, MO_64)
++DO_LDFF1_ZPZ_D(dd_be, zss, MO_64)
++DO_LDFF1_ZPZ_D(dd_be, zd, MO_64)
+ 
+ /* Stores with a vector index.  */
+ 
+-- 
+2.20.1
 
 
