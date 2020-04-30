@@ -2,87 +2,123 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B6FCC83001
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 05:25:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A9F2C83001
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 05:26:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 561DC2082E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 05:25:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F8D52083B
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 05:26:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BIGoAHy2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 561DC2082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="PpQ7gtD5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F8D52083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58756 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU1hA-0000bs-H4
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 01:25:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52946)
+	id 1jU1iB-0001ra-DA
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 01:26:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53002)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jU1g9-00087S-1y
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:24:09 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jU1hS-000129-PH
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:25:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jU1g7-00080t-HB
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:24:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49290
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jU1g7-00080m-0c
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:24:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588224245;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=r/BKD0960XC6fuFEqELxBNPuGW8kyO3sjtKE1V8cuDU=;
- b=BIGoAHy2Ckf5Ww4Q9A2SaDGgTaGba4Lo35DuWpSE1UtL9NyRWhZz5xNPPK9zJEhZYnYEsX
- GJm4+TKI9CSGzlDABQTbulrSQUPNLEw4U9h3/OQL06IsEA2R0nLFX7k084lBeaL75RISxs
- IZSQFN/QXofKutrWvPOCI85KBXiB0Bo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-PQeYnLjgNna01BKCNfXeuQ-1; Thu, 30 Apr 2020 01:24:01 -0400
-X-MC-Unique: PQeYnLjgNna01BKCNfXeuQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F123F1054F8B;
- Thu, 30 Apr 2020 05:24:00 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7DEA75D9F1;
- Thu, 30 Apr 2020 05:24:00 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0DE8A11358BC; Thu, 30 Apr 2020 07:23:59 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
-Subject: Re: [PATCH] tests: add a "check-flake8" test for validating python
- code style
-References: <20200429153621.1694266-1-berrange@redhat.com>
-Date: Thu, 30 Apr 2020 07:23:59 +0200
-In-Reply-To: <20200429153621.1694266-1-berrange@redhat.com> ("Daniel
- P. =?utf-8?Q?Berrang=C3=A9=22's?= message of "Wed, 29 Apr 2020 16:36:21
- +0100")
-Message-ID: <874kt1im1c.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jU1hS-0000zx-9Z
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:25:30 -0400
+Received: from mail-eopbgr70120.outbound.protection.outlook.com
+ ([40.107.7.120]:17998 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jU1hQ-0000xx-Bz; Thu, 30 Apr 2020 01:25:28 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SCnwjydqFfonbw6Zb5OelOyG9aa5dGwuZcpSOek0XAVt8lNebhlGrvxyaX5K5HGuUyXFVdWtLgy63lD5RSoaKwHr++yIYUuTTE0K48nzhpIJhZ0wjKSDM7BOPf8TUvc4OEWJeM2ueSb4xNQ4X2TqRDcwXeZhjwIHBCuWCzz1oqvPSilc4oTnYT3pK64jIt/tiZ6PNYW7S+Zsj+YmhbPh+CSVuLWZVXw2EDCONg62vGkP2T9+Mpo/zqKTZt0w8RLeLGix7+hrUSbSSsrRsIoCUrYPL7kc9o00pT0ozjs0yXt/QzwoIkSRV/UNUsX0pwPrmg9AkouFJfPt3Vpz2M15Og==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1CdC+XIqCdlrnEytMyvWyL3XqjxIKMyyiEcHeF2NMFE=;
+ b=f+77plMjao+gAiW1kjjVO8l9v+84z0OpHv47W33uaeZyPFtKcCA+BKeq3zJXe7/d7D1iSo0/UUQzgDCaKhIdr7Kk+xNhTzHuz1mqovE6JljoL2njTYTcWawOQPIb8+XVZd2dvkRQTUK/FzXLbAzfztJRprnnUltxNCC5w3MCwAo/7rLFdUderpROTduTYbz0ov4QaKNfTKHSNSX4EM6eEyL4WNg86iOVwZAb54o5QKrXrQU7NJnzzINIhha+mH6n1qNxMPRbygwxIqkFT3h7LfEmLykjpVuV4Sf49qDrY86Y8KENZrdScG+q3Ni+yq7oLnp2MC69X5V8qCHKxzs7+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1CdC+XIqCdlrnEytMyvWyL3XqjxIKMyyiEcHeF2NMFE=;
+ b=PpQ7gtD5gV80WAfDfKMLQ12gJ03Oc7Dt3CIFzR0/1cb1Z1TGV13dYdg2d6E8Mm+Yh0SLUEV2azTeCUpEkDs0SX2rGVb7RWNz04gCbvOZfZgJFg7pi9WBL7EahOCilIJAAVJw7+ExEaBgIubvDSIBgQR5p8EkbC/5iJvBWm44ULw=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5301.eurprd08.prod.outlook.com (2603:10a6:20b:dd::14)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.19; Thu, 30 Apr
+ 2020 05:25:25 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2958.020; Thu, 30 Apr 2020
+ 05:25:24 +0000
+Subject: Re: [PATCH v2 06/17] block/io: support int64_t bytes in
+ bdrv_aligned_pwritev()
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+References: <20200427082325.10414-1-vsementsov@virtuozzo.com>
+ <20200427082325.10414-7-vsementsov@virtuozzo.com>
+ <f45f380b-8e7b-1483-d685-4e7d4729562a@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200430082522694
+Message-ID: <7d64fb96-87b3-f0d8-144b-68e3775ed9d0@virtuozzo.com>
+Date: Thu, 30 Apr 2020 08:25:22 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <f45f380b-8e7b-1483-d685-4e7d4729562a@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM3PR05CA0144.eurprd05.prod.outlook.com
+ (2603:10a6:207:3::22) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:24:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.138) by
+ AM3PR05CA0144.eurprd05.prod.outlook.com (2603:10a6:207:3::22) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2958.20 via Frontend Transport; Thu, 30 Apr 2020 05:25:23 +0000
+X-Tagtoolbar-Keys: D20200430082522694
+X-Originating-IP: [185.215.60.138]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: eca6f89a-044f-477a-75a4-08d7ecc6e2b0
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5301:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB530167FD52E65F88B0AD8A8FC1AA0@AM7PR08MB5301.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-Forefront-PRVS: 0389EDA07F
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 9gxKNkr1BzA1o7enJAd/Z3TuQuR1AXPrHMsIewUvNV9IM08l5PQAa1dmS5jdOkbY1bm8b+4KhD4ArRfZmWuYD8TfRVQbjydx16ziLPPdigI1wkwZRe9iKWDtMEnRO/vEiSarUvb8006+JyXNTUeMKz2pVhEL6OIkEsQL4xqBaGV11EOnkkdPYzx6ysycv1O5L5JIXotr3y5Ohmjw+cdLm+a084GTPjPSwLNV5DjMSK4gNivelqO62FkxjzYix424/mlz7dSIwRQ32VrG+mS9USSp29GS0RkEU/zHs6d0CEJqOp78Mm/SY5WxAmDU85YpxFjLY1jHqMk2DXPRCD+FLQKPFojxgu1Tvyc1Joi356LUo/8CKBf6ofdItJEJkm88VkFae+2LzYjUT2ZnVG4MyK5KWMy+JGUwyxPqR/EI6S0KkY+1U1YuWpu5pu4ElOC+
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(39840400004)(346002)(376002)(366004)(136003)(396003)(2906002)(31686004)(36756003)(186003)(5660300002)(6486002)(26005)(53546011)(956004)(52116002)(2616005)(16526019)(4326008)(86362001)(107886003)(31696002)(316002)(16576012)(7416002)(478600001)(8676002)(66556008)(66946007)(8936002)(66476007);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: rPut1iHhoj89xAJ+w06xHn5MqOYA186Zf1IBBPlE3W1H9dGTCuhNkrM4U1yUuL/O0eglUybdbdYUPQ5mn1IFZvwPiw5IygQrHoQFDzYTtDVwBKRfyrTflH5erpqnQd+NDxIB61a23zOIERVLYxYRAdliVR/sBDXAqQik5R9zh6/gbIQLd1B6wMcyinvx14PLDJK9cYPorpEpede6oJzL0rWpjFLORAdx/n08s+v//zgdYTpcPM9YF4cH6OOByD+3HBdrv81R+qLVlFpoVR+IjpdN77j5RYZMupA/C0xvUrTF3f/kgvdXDSFhHHxYQb2/tn0oEsqQsS4O5tVlmWlm+gy+YDOHSTSPLl99RXXMLVcA5wTEOAxqs5o3uZNTzlumdC3jjKSPNhvlPIYZ56orJ7urbXOPLrWyPBmELh74p9rSxqPjXl05p/sVeQMkfmmVd6gT+L5b8lvKgypUo6E8dUPp8MWow3WXELna1q8ZGucxIhPsiNCOVEs2qwBRZo19VdlLHaxAj6BDuNFR+ROFQd5mqkot2DNwE5eZMy+CB7zcalIh7xCPjC/RZkjtOgLnZ1uiLC4m0R+thazLUQzD+N/LxlBB22bFz/DQw612TQ4BIwuc1prvt2I9Pr9sjD5/h4Yt/vx8zF5uSOqRI3IA0pJe9Xj4vVLGP2GxjJyikiR7H+UKghmpjJys1ANTA4OhFodzdJfYaRV0x8gpEdhL/GS+obGs9STqgjuBPaePfrfV0t0Yx7uGP7tbzz+sY8NeX0CB12bYkCZtA1susZ9+O2/8iBpYi7F+aXA1oJK4zLM=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: eca6f89a-044f-477a-75a4-08d7ecc6e2b0
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2020 05:25:24.8473 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +LRwRB3dJ/AMLTBEr9Q2m3n2JPNrgTwb8BbU7vIFIAf52MN03M31rFwynJyy5ZRYHTT3UgWhBHnBpp8ORNb9+piuO+TgjK783No4UyIXZhQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5301
+Received-SPF: pass client-ip=40.107.7.120;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:25:26
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Received-From: 40.107.7.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,235 +130,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: kwolf@redhat.com, fam@euphon.net, integration@gluster.org, berto@igalia.com,
+ pavel.dovgaluk@ispras.ru, qemu-devel@nongnu.org, dillaman@redhat.com,
+ pl@kamp.de, ronniesahlberg@gmail.com, mreitz@redhat.com, den@openvz.org,
+ sheepdog@lists.wpkg.org, stefanha@redhat.com, namei.unix@gmail.com,
+ pbonzini@redhat.com, sw@weilnetz.de, jsnow@redhat.com, ari@tuxera.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+30.04.2020 1:04, Eric Blake wrote:
+> On 4/27/20 3:23 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> We are generally moving to int64_t for both offset and bytes parameters
+>> on all io paths. Prepare bdrv_aligned_pwritev() now (and convert the
+>> dependencies: bdrv_co_write_req_prepare() and
+>> bdrv_co_write_req_finish() to signed type bytes)
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   block/io.c | 12 +++++++-----
+>>   1 file changed, 7 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/block/io.c b/block/io.c
+>> index c8c30e3699..fe19e09034 100644
+>> --- a/block/io.c
+>> +++ b/block/io.c
+>> @@ -1854,7 +1854,7 @@ fail:
+>>   }
+>>   static inline int coroutine_fn
+>> -bdrv_co_write_req_prepare(BdrvChild *child, int64_t offset, uint64_t bytes,
+>> +bdrv_co_write_req_prepare(BdrvChild *child, int64_t offset, int64_t bytes,
+>>                             BdrvTrackedRequest *req, int flags)
+>>   {
+> 
+> No change in size.  First, check usage within function:
+>      int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
+> Changes computation from uint64_t to int64_t.  This causes a borderline bug on images between INT64_MAX-511 and INT64_MAX (nbdkit can produce such images over NBD, although they are atypical on disk), where DIV_ROUND_UP() would give the right answer as uint64_t but a negative answer with int64_t.  As those images are not sector-aligned, maybe we don't need to care?
+> all other uses appear to be within asserts related to offset+bytes being positive, so that's what we should check for.
+> 
+> Callers:
+> bdrv_aligned_pwritev() - changed in this patch to 'int64_t', analyzed below [1]
+> bdrv_co_pdiscard() - already passes 'int64_t', also checks for offset+bytes overflow - safe
+> bdrv_co_copy_range_internal() - 'uint64_t', but already analyzed for 3/17 how it was capped < 2M - safe
+> bdrv_co_truncate() - already passes 'int64_t', passes new_bytes computed by subtracting from a positive 'int64_t offset' - safe
+> 
+> 
+> [1] except I hit the end of my work day, so my analysis will have to continue tomorrow...
+> 
 
-> The flake8 program is a standard tool used by Python projects for
-> validating many commonly recommended style rules. It would be desirable
-> for QEMU to come into alignment with normal Python coding style best
-> practices.
->
-> QEMU currently violates a huge number of the style rules, so we can't
-> blindly turn it on. Instead this patch introduces use of flake8 with
-> a huge ignore list to turn off everything that is currently violated.
->
-> The following descriptions are mostly taken from:
->
->   https://www.flake8rules.com/
->
-> Indentation:
->
->  E111 =09Indentation is not a multiple of four
->  E114 =09Indentation is not a multiple of four (comment)
->  E115   Expected an indented block (comment)
->  E116 =09Unexpected indentation (comment)
->  E117   Over-indented
->  E121   Continuation line under-indented for hanging indent
->  E122 =09Continuation line missing indentation or outdented
->  E123 =09Closing bracket does not match indentation of opening bracket's =
-line
->  E124 =09Closing bracket does not match visual indentation
->  E125 =09Continuation line with same indent as next logical line
->  E126 =09Continuation line over-indented for hanging indent
->  E127 =09Continuation line over-indented for visual indent
->  E128 =09Continuation line under-indented for visual indent
->  E129 =09Visually indented line with same indent as next logical line
->  E131 =09Continuation line unaligned for hanging indent
->
-> Whitespace:
->
->  E201 =09Whitespace after '('
->  E202 =09Whitespace before ')'
->  E203 =09Whitespace before ':'
->  E211 =09Whitespace before '('
->  E221 =09Multiple spaces before operator
->  E222 =09Multiple spaces after operator
->  E225 =09Missing whitespace around operator
->  E226 =09Missing whitespace around arithmetic operator
->  E228 =09Missing whitespace around modulo operator
->  E231 =09Missing whitespace after ',', ';', or ':'
->  E241 =09Multiple spaces after ','
->  E251 =09Unexpected spaces around keyword / parameter equals
->  E261 =09At least two spaces before inline comment
->  E265 =09Block comment should start with '# '
->  E266 =09Too many leading '#' for block comment
->
-> Blank lines:
->
->  E301 =09Expected 1 blank line, found 0
->  E302 =09Expected 2 blank lines, found 0
->  E303 =09Too many blank lines (3)
->  E305 =09Expected 2 blank lines after end of function or class
->  E306 =09Expected 1 blank line before a nested definition
->
-> Imports:
->
->  E401 =09Multiple imports on one line
->  E402 =09Module level import not at top of file
->
-> Line length:
->
->  E501 =09Line too long (82 > 79 characters)
->  E502 =09The backslash is redundant between brackets
->
-> Statements:
->
->  E701 =09Multiple statements on one line (colon)
->  E702 =09Multiple statements on one line (semicolon)
->  E703 =09Statement ends with a semicolon
->  E711 =09Comparison to none should be 'if cond is none:'
->  E712 =09Comparison to true should be 'if cond is true:' or 'if cond:'
->  E713 =09Test for membership should be 'not in'
->  E714 =09Test for object identity should be 'is not'
->  E722   Do not use bare 'except'
->  E731 =09Do not assign a lambda expression, use a def
->  E741 =09Do not use variables named 'I', 'O', or 'l'
->
-> Errors:
->
->  F401 =09Module imported but unused
->  F403 =09'from module import *' used; unable to detect undefined names
->  F405 =09Name may be undefined, or defined from star imports: module
->  F811 =09Redefinition of unused name from line n
->  F821 =09Undefined name name
->  F841 =09Local variable name is assigned to but never used
->
-> Warnings:
->
->  W391 =09Blank line at end of file
->  W503 =09Line break occurred before a binary operator
->  W504 =09Line break occurred after a binary operator
->  W605 =09Invalid escape sequence 'x'
->
-> Over time code should be fixed and rules removed from the ignore list.
-> A handful of style rules may not warrant fixing as the cure is arguably
-> worse and very subjective. e.g.
->
->  E501: Force breaking lines at < 80 characters results in
->        some really unnatural code formatting which harms
->        readability.
->
->  W504: Knuth code style requires the operators "or" and "and" etc
->        to be at the start of line in a multi-line conditional.
+Thanks for reviewing!
 
-Ah, a bikeshed!  I really dislike long lines, and I really like Knuth
-style ;-P
+I'm very sorry, I just need to say once again: the series should be rebased on "[PATCH for-5.0? 0/9] block/io: safer inc/dec in_flight sections", as it is already mostly reviewed by Stefan. Seems, that your analysis will be still valid after it, although patches will change. I'll do it now to see, can I keep your r-b's.
 
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
->
-> On its own this patch doesn't really do much of use except try to stop th=
-e
-> situation getting worse. To be valuable some motivated contributor(s)
-> would need to go through fixing the code, and re-enabling each excluded
-> warning category one at a time.
->
-> I'm mostly proposing this patch as a starting point for discussion, to
-> see if anyone is indeed motivated to take on the code cleanup challenge,
-> and feed the fixes in through the various maintainers trees.
->
->  tests/Makefile.include | 38 ++++++++++++++++++++++++++++++++++++--
->  1 file changed, 36 insertions(+), 2 deletions(-)
->
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 51de676298..f08e99b09c 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -4,7 +4,7 @@
->  check-help:
->  =09@echo "Regression testing targets:"
->  =09@echo
-> -=09@echo " $(MAKE) check                Run unit, qapi-schema, qtest and=
- decodetree"
-> +=09@echo " $(MAKE) check                Run unit, qapi-schema, qtest and=
- decodetree flake8"
 
-Shouldn't this be "qtest, decodetree, and flake8"?
-
-Would it make sense to subsume flake8 under a general check-style
-target?
-
->  =09@echo
->  =09@echo " $(MAKE) check-qtest-TARGET   Run qtest tests for given target=
-"
->  =09@echo " $(MAKE) check-qtest          Run qtest tests"
-> @@ -19,6 +19,7 @@ check-help:
->  =09@echo " $(MAKE) check-report.tap     Generates an aggregated TAP test=
- report"
->  =09@echo " $(MAKE) check-venv           Creates a Python venv for tests"
->  =09@echo " $(MAKE) check-clean          Clean the tests and related data=
-"
-> +=09@echo " $(MAKE) check-flake8         Clean the tests and related data=
-"
->  =09@echo
->  =09@echo " $(MAKE) get-vm-images        Downloads all images used by acc=
-eptance tests, according to configured targets (~350 MB each, 1.5 GB max)"
->  =09@echo
-> @@ -923,7 +924,40 @@ check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TAR=
-GETS))
->  ifeq ($(CONFIG_TOOLS),y)
->  check-block: $(patsubst %,check-%, $(check-block-y))
->  endif
-> -check: check-block check-qapi-schema check-unit check-softfloat check-qt=
-est check-decodetree
-> +
-> +is_git :=3D $(shell test -d $(SRC_PATH)/.git && echo 1 || echo 0)
-> +
-> +ifeq (1, $(is_git))
-> +PYTHON_FILES =3D $(shell git ls-tree -r HEAD: --name-only | grep '.py$$'=
-)
-> +PYTHON_FILES +=3D $(shell git ls-tree -r HEAD: --name-only tests/qemu-io=
-tests/??? | xargs grep -l '/usr/bin/env python')
-> +
-> +# Validate many python style rules
-
-"Validate"?  Those are the style rules we *don't* check...
-
-> +FLAKE8_INDENTATION =3D E111,E114,E115,E116,E117,E121,E122,E123,E124,E125=
-,E126,E127,E128,E129,E131
-> +FLAKE8_WHITESPACE =3D E201,E202,E203,E211,E221,E222,E225,E226,E228,E231,=
-E241,E251,E261,E265,E266
-> +FLAKE8_BLANK_LINES =3D E301,E302,E303,E305,E306
-> +FLAKE8_IMPORTS =3D E401,E402
-> +FLAKE8_LINE_LENGTH =3D E501,E502
-> +FLAKE8_STATEMENTS =3D E701,E702,E703,E711,E712,E713,E714,E722,E731,E741
-> +FLAKE8_ERRORS =3D F401,F403,F405,F811,F821,F841
-> +FLAKE8_WARNINGS =3D W391,W503,W504,W605
-> +
-> +FLAKE8_IGNORE =3D $(FLAKE8_INDENTATION),$\
-> +               $(FLAKE8_WHITESPACE),$\
-> +               $(FLAKE8_BLANK_LINES),$\
-> +               $(FLAKE8_IMPORTS),$\
-> +               $(FLAKE8_LINE_LENGTH),$\
-> +               $(FLAKE8_STATEMENTS),$\
-> +               $(FLAKE8_ERRORS),$\
-> +               $(FLAKE8_WARNINGS) \
-> +               $(NULL)
-> +
-> +check-flake8:
-> +=09$(call quiet-command,flake8 --ignore=3D$(FLAKE8_IGNORE) $(PYTHON_FILE=
-S))
-> +else
-> +check-flake8:
-> +endif
-> +
-> +check: check-block check-qapi-schema check-unit check-softfloat check-qt=
-est check-decodetree check-flake8
->  check-clean:
->  =09rm -rf $(check-unit-y) tests/*.o tests/*/*.o $(QEMU_IOTESTS_HELPERS-y=
-)
->  =09rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$=
-(target)-y:%=3Dtests/qtest/%$(EXESUF))) $(check-qtest-generic-y:%=3Dtests/q=
-test/%$(EXESUF)))
-
-The QAPI generator is already clean except for
-F403,F405,E241,W503,W504,E226,E501,E261.  The new automated cleanliness
-test is next to useless for keeping it that way.  How could we tailor it
-to solve that?
-
+-- 
+Best regards,
+Vladimir
 
