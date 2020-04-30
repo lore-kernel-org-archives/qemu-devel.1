@@ -2,117 +2,110 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47BB5C8300A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 12:53:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1B50C8300A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 12:53:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0792B2074A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 12:53:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B35D2074A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 12:53:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="DNlFRpkb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0792B2074A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VlT/9WDO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B35D2074A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU8gl-0006EG-5h
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 08:53:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40588)
+	id 1jU8hE-0007PM-PL
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 08:53:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41106)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jU8bL-0004NH-U6
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 08:47:40 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jU8gE-0005hx-Mj
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 08:52:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jU8bL-0005ml-5F
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 08:47:39 -0400
-Received: from mail-vi1eur05on2137.outbound.protection.outlook.com
- ([40.107.21.137]:53184 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jU8bI-0005iG-9g; Thu, 30 Apr 2020 08:47:36 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dNHvDCu/zCYnoNsKFN+0WVbUV+c590YE05TraiLRHU3ELhEHkLls92WKmVnk9M+9/OdjEC872L3hcoXwwLtKeOTf057E/egoHEJToojiYjW8NlweQpqAZFhesslz4lDyKE2PUC0WsZSjrjKMAjs2KaU9iRtBOtfb9loK+9+W9F7D7HgHijOwBWVtxhvNSh+j2rX1VzI6ZWser9qwyvq9v9iIC338hlTWKGX3Abs2R+SzkGp0xFgGOlaY8sYs9KYLb1fGOyKwJ2u9abcaHB+7kkj77aAtgrrEJ1RGKHkIh/vk31IEO5z7iRX41XatPQdZQ295mLOw3dn3G6eEeokAZg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vBhz97nABv2kplr8qWIHn+3bvbgZHECLMBp3seKMIrI=;
- b=EC/Dtyb8TwGOeMzAIacyUuw5DRjSLJDGd/C5rFNGYRl6cRe4E6Ifsbep4VWbU6F5WAN6yMRQQCx4VhHbn5ay/3x3UUA0GVLSFZZYpzVMsoaS0sJY7U+38pAdedgh3yCzCvR31nQj3kLFeEUcp7RVhKBYizh3yUaCSMB1UvywyiN2EtsUm9683goiSVWolJawbzyHHOrHgV0jtR/D83gKCu8V/gDf6oKX6JlHBRKByz4H2N0ncU55XMW0gxRI0umFPDsWyD5834JQXmw1MVhf/9zrWjyBC9WukO4c64QEsKak1/bxnChhBF5ibp8EgC8CfiA0/hC2aV5k7khI7C1NLg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vBhz97nABv2kplr8qWIHn+3bvbgZHECLMBp3seKMIrI=;
- b=DNlFRpkbPJrUNjURs/HFWfOosjxGVjSEIHfkBiCf0y82eMGszd13y6ZSto1/TqEQxsQ1uF7oo6ZyQ8xtRLRxS/OEjPSzmBja/p4CcyOjYzGYYkAN7CVArxfKxUahD/GhA5tdmlQ6orOMJUt7pvVQ9nWf12ooaD9hIrsXpVTrlgA=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5478.eurprd08.prod.outlook.com (2603:10a6:20b:107::14)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.20; Thu, 30 Apr
- 2020 12:47:32 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2958.020; Thu, 30 Apr 2020
- 12:47:32 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH 4/8] iotests/041: drop self.assert_no_active_block_jobs()
-Date: Thu, 30 Apr 2020 15:47:09 +0300
-Message-Id: <20200430124713.3067-5-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200430124713.3067-1-vsementsov@virtuozzo.com>
-References: <20200430124713.3067-1-vsementsov@virtuozzo.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: FRYP281CA0001.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::11)
- To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (envelope-from <mreitz@redhat.com>) id 1jU8ez-000738-QQ
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 08:52:42 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21312
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jU8ez-00072h-6A
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 08:51:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588251083;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=KTmNVA2on6joSnRL1I8+NKkigaNbjEC1ARnddiXjKMM=;
+ b=VlT/9WDO1lz6hQGBTgbUq0YiLBE7hOKDLylhR7tMZd0lOJHqXCPud9e4tpUVhZwjrZSupe
+ eiVGyp32MNuTEB/5Zks+SbiNe5+zz7/v8CnfS+GmDxameGn58qOymeVZeDrGZte5OMScli
+ fhSBDSm8bkDkuI08IE+7cVJmnX7qF4A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-141-2ZXwpuPvN5mpQikqe8-vJQ-1; Thu, 30 Apr 2020 08:51:21 -0400
+X-MC-Unique: 2ZXwpuPvN5mpQikqe8-vJQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7E34D89052B;
+ Thu, 30 Apr 2020 12:51:06 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-112-177.ams2.redhat.com
+ [10.36.112.177])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3932D1053B1C;
+ Thu, 30 Apr 2020 12:50:51 +0000 (UTC)
+Subject: Re: [PATCH v2 1/6] docs: Sort sections on qemu-img subcommand
+ parameters
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200421212019.170707-1-eblake@redhat.com>
+ <20200421212019.170707-2-eblake@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <ba22a63a-1573-20cb-f4d9-eb49033037c9@redhat.com>
+Date: Thu, 30 Apr 2020 14:50:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from kvm.sw.ru (185.215.60.138) by
- FRYP281CA0001.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::11) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2958.20 via Frontend Transport; Thu, 30 Apr 2020 12:47:31 +0000
-X-Mailer: git-send-email 2.21.0
-X-Originating-IP: [185.215.60.138]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 60128a57-822a-4e64-8d7b-08d7ed04a646
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5478:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB54781BA42F518C55FC8791F7C1AA0@AM7PR08MB5478.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3513;
-X-Forefront-PRVS: 0389EDA07F
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: xxuC24a3NWxn+qh1XI2paCjGjGx5Nn1euwSjsM906cLPvBaaWto5VVa+sCRBRzP5UAviQIe6+e6i1hcN/P6TZ1QNc0RLOEJtNijktuD2ayfVpR8VhAW5xZVxzgWJIgKw6ntcm6y3wsV7kwv7u/I+vrwNtTnt3HT0H1i7IhAoqKJXS4P8dL8aey3HG260XWsCr1yosScPloNTY3TCc1V6rKKLO/TcE2qkWhntvMPpcFyJLuLi1N8ijC2YUk6ZTbD6JGIr5EfzyCvzGz7sQAiYEQLkFEKW8MyymOxzQgfm36wZZGOVivqR9eyl1PiUZCJi2kFIlwE/TXVZn87245p6g519CgnU5be3HeoQbvaTCxQAqzwQMAhBUoFegh6sJEFJoo1/MHnC5hj27jAN+DRhIcfk07q/VV+M2dNYgXfOK2mjNEzcVoxoQxbomSme9OHT
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(396003)(39850400004)(376002)(366004)(136003)(346002)(316002)(2616005)(6666004)(956004)(2906002)(478600001)(107886003)(4326008)(6486002)(66476007)(66556008)(66946007)(86362001)(36756003)(6512007)(16526019)(186003)(26005)(8936002)(52116002)(8676002)(6506007)(1076003)(6916009)(5660300002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: +vBgm4ap8PKTNweY0Hw7psoRstwWCsPWORDB0EkNYAchmWb/kxuq/87lKpoqCzeIyjgVr6oUJPAB5XkavHTXnp6e0B1Z8bKs3sVEIPR5WVyFlA7qPPHgJTEeJ/gt6oA7IVF6Fdpag7b+sKywYQySRi3qQCpkkcdmYhM9tEISqPXo60bIutozKHMO5SCMJ1LpKICFyTnGdzq8TfdGUApm6mKvijK2+LbomQBuqoKQ33Tb+fWdjl72iopucWyDJNs43J95k/zo9N9taBYcvk/pO7r4BaoWMGPRrXHDhEa4iX6ukWLeTUdOjyyxD5/OKQ8EeCicczYGI9zGU6Xobdc0+9WYaFPNtq46KNDfDnWEqbcNMZy4NTsQe/iL8YV2oBuTROm764ntDRlJckv0kD99NwJJnH2j/sr4oJlB48LuYmZz+xgraUHvt338X71JyMk3HcpeXxaejvgGwEp9FNhudnar6GspEEkuYx5mrhzXTlfozgKIv6EVGpQiNxRa683w4osMnUrf5GN78HnzuOAN9OUHppSHuaBNbBuPfYEjijicBA0QvHRKOFIkhwCZTKcqAmLiee8TWa6utmkbULgdaWKSELWV/ah4+XUaRuJpE772HXFiBoe3bSK6Z9mOWrDkX9sMuWumBeB/ellof+IGU5th9cO7DBqg2BixrvmnUqw6cjq/3S+EdROsGtkJBCmgqGhLdDF5NKbocZkNjjloF/sguf9ri2N1qmHhjc9kFjigA9Pb9KUMHHNa9g5xN4LGJanWxt7iWSsiGOHL97PWYZhbkccB54vDlJkmJeihX9Q=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 60128a57-822a-4e64-8d7b-08d7ed04a646
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2020 12:47:32.3250 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uAhraOW5ga4b+Xyg41cc0+HMQGriuJ1tnVdtYVxF9qNVsef37mIzWWyO5CSJW8szYzDyWnIVwwoUBibcsj01U+twcqBsDFDkffUHQc+mYII=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5478
-Received-SPF: pass client-ip=40.107.21.137;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 08:47:30
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Received-From: 40.107.21.137
+In-Reply-To: <20200421212019.170707-2-eblake@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="8hUcTxDBdzUzfqlL2KmzcWCfXdchpXdu4"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 23:34:52
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,61 +117,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
- mreitz@redhat.com
+Cc: kwolf@redhat.com, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Drop check for no block-jobs: it's obvious that there no jobs
-immediately after vm.launch().
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--8hUcTxDBdzUzfqlL2KmzcWCfXdchpXdu4
+Content-Type: multipart/mixed; boundary="eB6LaE5dqaYp9kEJ5oJytLAd5oRiPlrUs"
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- tests/qemu-iotests/041 | 8 --------
- 1 file changed, 8 deletions(-)
+--eB6LaE5dqaYp9kEJ5oJytLAd5oRiPlrUs
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
-index 5d67bf14bf..0b8cbb889e 100755
---- a/tests/qemu-iotests/041
-+++ b/tests/qemu-iotests/041
-@@ -904,8 +904,6 @@ class TestRepairQuorum(iotests.QMPTestCase):
-                 pass
- 
-     def test_complete(self):
--        self.assert_no_active_block_jobs()
--
-         result = self.vm.qmp('drive-mirror', job_id='job0', device='quorum0',
-                              sync='full', node_name="repair0", replaces="img1",
-                              target=quorum_repair_img, format=iotests.imgfmt)
-@@ -919,8 +917,6 @@ class TestRepairQuorum(iotests.QMPTestCase):
-                         'target image does not match source after mirroring')
- 
-     def test_cancel(self):
--        self.assert_no_active_block_jobs()
--
-         result = self.vm.qmp('drive-mirror', job_id='job0', device='quorum0',
-                              sync='full', node_name="repair0", replaces="img1",
-                              target=quorum_repair_img, format=iotests.imgfmt)
-@@ -932,8 +928,6 @@ class TestRepairQuorum(iotests.QMPTestCase):
-         self.assert_has_block_node(None, quorum_img3)
- 
-     def test_cancel_after_ready(self):
--        self.assert_no_active_block_jobs()
--
-         result = self.vm.qmp('drive-mirror', job_id='job0', device='quorum0',
-                              sync='full', node_name="repair0", replaces="img1",
-                              target=quorum_repair_img, format=iotests.imgfmt)
-@@ -948,8 +942,6 @@ class TestRepairQuorum(iotests.QMPTestCase):
-                         'target image does not match source after mirroring')
- 
-     def test_pause(self):
--        self.assert_no_active_block_jobs()
--
-         result = self.vm.qmp('drive-mirror', job_id='job0', device='quorum0',
-                              sync='full', node_name="repair0", replaces="img1",
-                              target=quorum_repair_img, format=iotests.imgfmt)
--- 
-2.21.0
+On 21.04.20 23:20, Eric Blake wrote:
+> We already list the subcommand summaries alphabetically, we should do
+> the same for the documentation related to subcommand-specific
+> parameters.
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  docs/tools/qemu-img.rst | 48 ++++++++++++++++++++---------------------
+>  1 file changed, 24 insertions(+), 24 deletions(-)
+
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--eB6LaE5dqaYp9kEJ5oJytLAd5oRiPlrUs--
+
+--8hUcTxDBdzUzfqlL2KmzcWCfXdchpXdu4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6qyakACgkQ9AfbAGHV
+z0CUUwgAsAKAz+JIqF1XbsR2mUp+V4gaYOngD/M23OKozOAanROKZhFHN++tusEZ
+lA+DnjSGObEnz6/l6NUIOZgOxQsP7bfOz+Os1fWzQA79V8p+G4f5STBbOHo5hrPb
+Y57MzOWTvRECr0gq7axA0/ZOlYejZJnVzpgV8QA/1YUYdKGUVvZs24+IZWmJtCvg
+nfuhidgOkrev2g8/Fm3Md3Q54n29hWYxPTbEoRHTr/t8k2hdvAA68HyQmE04Py2G
+to9EPlPPegtfSXll1bqYQ3a7GoOPPbDc+9t963aq7h0XFi2H6BzgYYHy/hCFeWeV
+bclLXe0qC8i43dut0D94rpZBLJlYBA==
+=mb7S
+-----END PGP SIGNATURE-----
+
+--8hUcTxDBdzUzfqlL2KmzcWCfXdchpXdu4--
 
 
