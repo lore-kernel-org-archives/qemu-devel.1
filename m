@@ -1,61 +1,94 @@
 Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B871CC83001
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 07:28:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90F4DC83002
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 07:29:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EB50214D8
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 07:28:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EB50214D8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5B5C720757
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 07:29:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UtLxSEa/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B5C720757
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU3cC-0005C7-PP
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 03:28:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34282)
+	id 1jU3dN-0006tX-IP
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 03:29:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34698)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jU3Xa-0004ea-FS
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 03:23:50 -0400
+ (envelope-from <luoyonggang@gmail.com>) id 1jU3aV-0001vR-Tz
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 03:26:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jU3W7-0006Yl-Ue
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 03:23:26 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:33340)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jU3W7-0006Wl-8B; Thu, 30 Apr 2020 03:21:55 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436297|-1; CH=green;
- DM=|CONTINUE|false|;
- DS=CONTINUE|ham_system_inform|0.00411137-0.00097916-0.994909;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03308; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=10; RT=10; SR=0; TI=SMTPD_---.HQfovas_1588231302; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.HQfovas_1588231302) by smtp.aliyun-inc.com(10.147.40.7);
- Thu, 30 Apr 2020 15:21:46 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: peter.maydell@linaro.org
-Subject: [RFC PATCH 8/8] riscv: Add RV64F instructions description
-Date: Thu, 30 Apr 2020 15:21:39 +0800
-Message-Id: <20200430072139.4602-9-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200430072139.4602-1-zhiwei_liu@c-sky.com>
-References: <20200430072139.4602-1-zhiwei_liu@c-sky.com>
+ (envelope-from <luoyonggang@gmail.com>) id 1jU3aU-0003cF-N2
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 03:26:27 -0400
+Received: from mail-lj1-x235.google.com ([2a00:1450:4864:20::235]:35806)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1jU3aU-0003bd-7d; Thu, 30 Apr 2020 03:26:26 -0400
+Received: by mail-lj1-x235.google.com with SMTP id g4so5379677ljl.2;
+ Thu, 30 Apr 2020 00:26:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=Blh+bXYzCm61tiI/O9Zciaud0yS5iEonxC4HBJB49kE=;
+ b=UtLxSEa/W1kQ7XfiMiJuXGEmgV+KuwoDENH0SiqG/xBOn1fluhJxak0TVBAD/U/Vth
+ +chnO8mG22gxerzn52lxH5eJybFvzgclu7lWrvUlWwWiYut8/TE7WvNK4ElSAEaotbNE
+ GoXZHL9zdmBmyu1b4rMIx34kQBGeg5Vj1LRYSToD3cAvKgqKzSUjfY+oRkceO4siXn6f
+ md7jAt7H4LblVd83mkjs5R9MNwjt1hz3WWv+dC0SMePlxRa4JMutejQAR7DOU5qL0wm5
+ oYmrpC1yi6MWTKnPFhOY0csGgvfnEQRAxwnevk7wZRRhIhRPC3kkhO/rAdoz0xmtb5mc
+ gWNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=Blh+bXYzCm61tiI/O9Zciaud0yS5iEonxC4HBJB49kE=;
+ b=BMTORN7/avW0ZeMMwRX5K+j7duViZvuMBTFZihbcfZl36L9d0mV4g3aE0EryHNj16k
+ 7bMSximo9Mye+3I0dNTcYgx+Ryc/TZ9RoVPdC8gUPj36vxPaveVrEI7upEDS5iinrkDp
+ wDi3MTd3sYIIPMtku2fCXh1waLslqn2jM8pc2cjMhx7nxGZTMa93VORPuIw1u+sEr86v
+ wYaFeAacfbstdfFMMSoFyHssLy+K61Fd62TPgduJBq9wajKGOI9jBfUjOczoq2ltfj3y
+ 4AzkdZqHWlsoPF8QY5hGJRV00i8pJQ7p1i8kxCacgJzEKSWPALJF+bDtjwf7wRLy9M0j
+ sqCA==
+X-Gm-Message-State: AGi0Pua3hhtp4lvtna4Fp3tq8ngT103maUnQQSh2OCMSpLQCQ+0yyg5v
+ Oxj2nWxw7l/uTpe2rXcF2AICTeDWxyRBulupInA=
+X-Google-Smtp-Source: APiQypI5bjsy9CG+9krEu+yPM53Fh6bAT5A7WvMJnz//U8TFTb1f/g2jXrAlM0PrmR0Jq2z8Wq9e5tFHYfSoql1DU9w=
+X-Received: by 2002:a2e:a0cf:: with SMTP id f15mr1225753ljm.165.1588231583877; 
+ Thu, 30 Apr 2020 00:26:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 03:21:44
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+References: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
+ <87lfmhl0xa.fsf@linaro.org>
+ <alpine.BSF.2.22.395.2004271212520.94232@zero.eik.bme.hu>
+ <87imhlkwun.fsf@linaro.org>
+ <CAE2XoE9hiw-ri66_xp3qNa5_Wx8ZfsQB9mqJdYR8VRm-KW830g@mail.gmail.com>
+ <87ftcoknvu.fsf@linaro.org>
+ <AM4PR07MB350653D5961DFCE441646131CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
+ <871ro6ld2f.fsf@linaro.org>
+ <AM4PR07MB350673696C7DE2CA16C9C685CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
+ <87sggmjgit.fsf@linaro.org>
+ <CAE2XoE8wFK1nOq3YXhB=iqTvqSDQk7Zzd35Tjzdd==v8ouMijA@mail.gmail.com>
+ <43ac337c-752a-7151-1e88-de01949571de@linaro.org>
+In-Reply-To: <43ac337c-752a-7151-1e88-de01949571de@linaro.org>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Thu, 30 Apr 2020 15:26:11 +0800
+Message-ID: <CAE2XoE-MM6AR8fmExnst7o9wL4Q_nZkw=gyemMJmZSdPd_ydmg@mail.gmail.com>
+Subject: Re: R: R: About hardfloat in ppc
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: multipart/alternative; boundary="00000000000060cf7e05a47cfb68"
+Received-SPF: pass client-ip=2a00:1450:4864:20::235;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x235.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::235
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,107 +100,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, richard.henderson@linaro.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com, palmer@dabbelt.com,
- alistair23@gmail.com, alex.bennee@linaro.org,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reply-To: luoyonggang@gmail.com
+Cc: Dino Papararo <skizzato73@msn.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Programmingkid <programmingkidx@gmail.com>,
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ Howard Spoelstra <hsp.cat7@gmail.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
----
- riscv64.risu | 78 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 78 insertions(+)
+--00000000000060cf7e05a47cfb68
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/riscv64.risu b/riscv64.risu
-index f006dc8..0b81dfb 100644
---- a/riscv64.risu
-+++ b/riscv64.risu
-@@ -181,4 +181,82 @@ REMW RISCV 0000001 rs2:5 rs1:5 110 rd:5 0111011 \
- REMUW RISCV 0000001 rs2:5 rs1:5 111 rd:5 0111011 \
- !constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 && $rs2 != 2 }
- 
-+@RV64F
- 
-+FLW RISCV imm:12 rs1:5 010 rd:5 0000111 \
-+!constraints { $rs1 != 0 && $rs1 != 2 && $rs1 !=3 && $rs1 != 4 } \
-+!memory { align(4); reg_plus_imm($rs1, sextract($imm, 12)); }
-+
-+FSW RISCV imm5:7 rs2:5 rs1:5 010 imm:5 0000111 \
-+!constraints { $rs1 != 0 && $rs1 != 2 && $rs1 !=3 && $rs1 != 4 && $rs2 != 2} \
-+!memory { align(4); reg_plus_imm($rs1, sextract($imm5 << 5 | $imm, 12)); }
-+
-+FMADD_S RISCV rs3:5 00 rs2:5 rs1:5 rm:3 rd:5 1000011
-+
-+FMSUB_S RISCV rs3:5 00 rs2:5 rs1:5 rm:3 rd:5 1000111
-+
-+FNMSUB_S RISCV rs3:5 00 rs2:5 rs1:5 rm:3 rd:5 1001011
-+
-+FNMADD_S RISCV rs3:5 00 rs2:5 rs1:5 rm:3 rd:5 1001111
-+
-+FADD_S RISCV 0000000 rs2:5 rs1:5 rm:3 rd:5 1010011
-+
-+FSUB_S RISCV 0000100 rs2:5 rs1:5 rm:3 rd:5 1010011
-+
-+FMUL_S RISCV 0001000 rs2:5 rs1:5 rm:3 rd:5 1010011
-+
-+FDIV_S RISCV 0001100 rs2:5 rs1:5 rm:3 rd:5 1010011
-+
-+FSQRT_S RISCV 0101100 00000  rs1:5 rm:3 rd:5 1010011
-+
-+FSGNJ_S RISCV 0010000 rs2:5  rs1:5 000 rd:5 1010011
-+
-+FSGNJN_S RISCV 0010000 rs2:5  rs1:5 001 rd:5 1010011
-+
-+FSGNJX_S RISCV 0010000 rs2:5  rs1:5 010 rd:5 1010011
-+
-+FMIN_S RISCV 0010100 rs2:5  rs1:5 000 rd:5 1010011
-+
-+FMAX_S RISCV 0010100 rs2:5  rs1:5 001 rd:5 1010011
-+
-+FCVT_W_S RISCV 1100000 00000 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 }
-+
-+FCVT_WU_S RISCV 1100000 00001 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 }
-+
-+FMV_X_W RISCV 1110000 00000 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 }
-+
-+FEQ_S RISCV 1010000 rs2:5 rs1:5 010 rd:5 1010011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 }
-+
-+FLT_S RISCV 1010000 rs2:5 rs1:5 001 rd:5 1010011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 }
-+
-+FLE_S RISCV 1010000 rs2:5 rs1:5 000 rd:5 1010011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 }
-+
-+FCLASS_S RISCV 1110000 00000 rs1:5 001 rd:5 1010011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 }
-+
-+FCVT_S_W RISCV 1101000 00000 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { $rs1 != 2 }
-+
-+FCVT_S_WU RISCV 1101000 00001 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { $rs1 != 2 }
-+
-+FMV_W_X RISCV 1111000 00000 rs1:5 000 rd:5 1010011 \
-+!constraints { $rs1 != 2 }
-+
-+FCVT_L_S RISCV 1100000 00010 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rm != 6 && $rm != 5 }
-+
-+FCVT_LU_S RISCV 1100000 00011 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rm != 6 && $rm != 5 }
-+
-+FCVT_S_L RISCV 1101000 00010 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { $rs1 != 2 && $rm != 6 && $rm != 5 }
-+
-+FCVT_S_LU RISCV 1101000 00011 rs1:5 rm:3 rd:5 1010011 \
-+!constraints { $rs1 != 2 && $rm != 6 && $rm != 5 }
--- 
-2.23.0
+On Thu, Apr 30, 2020 at 10:18 AM Richard Henderson <
+richard.henderson@linaro.org> wrote:
 
+> On 4/29/20 5:20 PM, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
+> > Question, in hard-float, if we don't want to read the fp register.
+> > for example: If we wanna compute c =3D a + b in fp32
+> > if c =3D a + b In hard float
+> > and if b1 =3D c - a in hard float
+> > if b1 !=3D b at bitwise level, the we se the inexat to 1, otherwsie
+> > we set inexat bit to 0? are this valid?
+> >
+> > we can also do it for a * b, a - b, a / b.
+> >
+>
+> That does seem plausible, for all of the normal values for which we would
+> apply
+> the hard-float optimization anyway.  But we already check for the
+> exceptional
+> cases:
+>
+>     if (unlikely(f32_is_inf(ur))) {
+>         s->float_exception_flags |=3D float_flag_overflow;
+>     } else if (unlikely(fabsf(ur.h) <=3D FLT_MIN)) {
+>         if (post =3D=3D NULL || post(ua, ub)) {
+>             goto soft;
+>         }
+>     }
+>
+> I means remove of all thse  exceptional cases, and detecting float
+exception by hard float operation.
+
+>
+> r~
+>
+
+
+--=20
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
+
+--00000000000060cf7e05a47cfb68
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Apr 30, 2020 at 10:18 AM Rich=
+ard Henderson &lt;<a href=3D"mailto:richard.henderson@linaro.org">richard.h=
+enderson@linaro.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quot=
+e" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204)=
+;padding-left:1ex">On 4/29/20 5:20 PM, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang=
+ Luo) wrote:<br>
+&gt; Question, in hard-float, if we don&#39;t want to read the fp register.=
+<br>
+&gt; for example: If we wanna compute c =3D a=C2=A0+ b in fp32<br>
+&gt; if c =3D a=C2=A0+ b In hard float<br>
+&gt; and if b1 =3D c - a in hard float<br>
+&gt; if b1 !=3D b at bitwise level, the we se the=C2=A0inexat=C2=A0to 1, ot=
+herwsie=C2=A0<br>
+&gt; we set inexat=C2=A0bit to 0? are this valid?<br>
+&gt; <br>
+&gt; we can also do it for a * b, a - b, a / b.=C2=A0<br>
+&gt; <br>
+<br>
+That does seem plausible, for all of the normal values for which we would a=
+pply<br>
+the hard-float optimization anyway.=C2=A0 But we already check for the exce=
+ptional<br>
+cases:<br>
+<br>
+=C2=A0 =C2=A0 if (unlikely(f32_is_inf(ur))) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 s-&gt;float_exception_flags |=3D float_flag_ove=
+rflow;<br>
+=C2=A0 =C2=A0 } else if (unlikely(fabsf(ur.h) &lt;=3D FLT_MIN)) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (post =3D=3D NULL || post(ua, ub)) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto soft;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+=C2=A0 =C2=A0 }<br>
+<br></blockquote><div>I means remove of all thse=C2=A0 exceptional cases, a=
+nd detecting float exception by hard float operation.=C2=A0=C2=A0</div><blo=
+ckquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left=
+:1px solid rgb(204,204,204);padding-left:1ex">
+<br>
+r~<br>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+ class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
+=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
+=A0 sincerely,<br>Yonggang Luo<br></div></div>
+
+--00000000000060cf7e05a47cfb68--
 
