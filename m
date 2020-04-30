@@ -2,69 +2,91 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E847C47247
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 15:40:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9525AC4724C
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 15:44:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 336A420661
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 15:40:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 336A420661
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5C8D22076D
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 15:44:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JvT42Msu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C8D22076D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUBIc-0006hw-Cy
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 11:40:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42492)
+	id 1jUBM3-0000ly-Hu
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 11:44:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43176)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jUBFU-0003S1-Vy
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:37:19 -0400
+ (envelope-from <vgoyal@redhat.com>) id 1jUBKw-00084w-3D
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:43:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jUBFR-0000TL-Mx
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:37:16 -0400
-Resent-Date: Thu, 30 Apr 2020 11:37:16 -0400
-Resent-Message-Id: <E1jUBFR-0000TL-Mx@eggs.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21733)
+ (envelope-from <vgoyal@redhat.com>) id 1jUBJS-0005m9-5R
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:42:53 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27077
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jUBFN-0000NL-7t; Thu, 30 Apr 2020 11:37:09 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1588261014; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=VebjYx6VzXQGgijKZN8cKCohK8DmYNmz9GnFTLq6Bs6kG3agXWMF89Fu5DA66NR2swFQA8MLJnbpYKo+GIFyBRLKoQzJPgXV1TAzm+C7ky43CW5CJEGK0rux33Q/OGgnUzvwroQbBqJBY5pchqeHZFbJQALOWuDRErK1sH4ujn4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1588261014;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=KkwcN/JIwGAewU4UfdPVv6uCwpy5U6iEpRkJfsnUXEU=; 
- b=PhLqdfwBQx4ppL94b9Yiw3+v0TgMxm8ls8J1wtpE6Cdyr/hrHavODZwXL+saqf28g0veDYuLqO0MSheW/B1GnVzvN5rdbqVJ8z67o7SQ8M3auDEHvTUfDYBlzKuOltkt7VlHimrlhkW/19CikqTvazg3/htUPTbAJUEo+jeBUR4=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1588261012874692.813701282524;
- Thu, 30 Apr 2020 08:36:52 -0700 (PDT)
-Message-ID: <158826101162.4471.10050692361584574228@45ef0f9c86ae>
-In-Reply-To: <20200430094445.25943-1-cohuck@redhat.com>
-Subject: Re: [PULL 00/20] first set of s390x patches for 5.1
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1jUBJR-0005m2-Ng
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:41:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588261280;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=WISaus3baP4Zrt/Oh57RNx8CavHVOv3Qte68zDNz+Kk=;
+ b=JvT42MsujA1QTWBgdEGuLgDDmcXXeGuCmUK1HYHCjHyNc81T/50eM9veTcRm+hI8mVA6zk
+ Lu6R8kKbHG2rip73IW5eV3A8HKoeq+2D5mXS4OabZg7Gq2nVM3WU5xH1ejHwDfSNT9/BOA
+ cubeJ0H4SMOavrbgnaslZbL8wiMyru4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-142-HuaSpBEbPZykGepF3R4dIQ-1; Thu, 30 Apr 2020 11:41:17 -0400
+X-MC-Unique: HuaSpBEbPZykGepF3R4dIQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7441846269
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 15:41:16 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-115-229.rdu2.redhat.com [10.10.115.229])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6DB4F6116F;
+ Thu, 30 Apr 2020 15:41:06 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+ id C3B83223620; Thu, 30 Apr 2020 11:41:05 -0400 (EDT)
+Date: Thu, 30 Apr 2020 11:41:05 -0400
+From: Vivek Goyal <vgoyal@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [PATCH] virtiofsd: Show submounts
+Message-ID: <20200430154105.GE260081@redhat.com>
+References: <20200424133516.73077-1-mreitz@redhat.com>
+ <20200427175902.GM2923@work-vm> <20200429145720.GA2835@work-vm>
+ <8c73f374-fcc8-1684-b581-84a9ab501aa9@redhat.com>
+ <20200430085812.GC2874@work-vm>
+ <20200430135639.GA260081@redhat.com>
+ <20200430142013.GI2874@work-vm>
+ <20200430143425.GD2184629@redhat.com>
+ <20200430144116.GD260081@redhat.com>
+ <20200430144704.GG2184629@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: cohuck@redhat.com
-Date: Thu, 30 Apr 2020 08:36:52 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 11:37:02
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Received-From: 136.143.188.57
+In-Reply-To: <20200430144704.GG2184629@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=vgoyal@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:24:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,105 +98,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-s390x@nongnu.org, cohuck@redhat.com,
- qemu-devel@nongnu.org
+Cc: virtio-fs@redhat.com, Max Reitz <mreitz@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQzMDA5NDQ0NS4yNTk0
-My0xLWNvaHVja0ByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDIwMDQzMDA5NDQ0NS4yNTk0My0xLWNvaHVja0ByZWRo
-YXQuY29tClN1YmplY3Q6IFtQVUxMIDAwLzIwXSBmaXJzdCBzZXQgb2YgczM5MHggcGF0Y2hlcyBm
-b3IgNS4xClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
-aApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBU
-cnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRz
-L2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
-ClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBo
-dHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIC0gW3RhZyB1cGRhdGVdICAg
-ICAgcGF0Y2hldy8yMDIwMDMyNDE1MDg0Ny4xMDQ3Ni0xLWZyYW5ramFAbGludXguaWJtLmNvbSAt
-PiBwYXRjaGV3LzIwMjAwMzI0MTUwODQ3LjEwNDc2LTEtZnJhbmtqYUBsaW51eC5pYm0uY29tClN3
-aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZmNhYmI2YSBzMzkweC9zMzkwLXZpcnRpby1j
-Y3c6IEZpeCBidWlsZCBvbiBzeXN0ZW1zIHdpdGhvdXQgS1ZNCmZkMTNhYzEgczM5MHgvcHY6IFJl
-dHJ5IGlvY3RscyBvbiAtRUlOVFIKYzk4ZmUyOSBzMzkweDogcHJvdHZpcnQ6IEZpeCBzdHJheSBl
-cnJvcl9yZXBvcnRfZXJyIGluIHMzOTBfbWFjaGluZV9wcm90ZWN0CmMyMjFlMDkgczM5MHg6IEFk
-ZCB1bnBhY2sgZmFjaWxpdHkgZmVhdHVyZSB0byBHQTEKYTA4ZGQ3NiBkb2NzOiBzeXN0ZW06IEFk
-ZCBwcm90dmlydCBkb2NzCmZmNzlhMmMgczM5MHg6IHByb3R2aXJ0OiBIYW5kbGUgU0lHUCBzdG9y
-ZSBzdGF0dXMgY29ycmVjdGx5CjIyM2M3ODQgczM5MHg6IHByb3R2aXJ0OiBNb3ZlIElPIGNvbnRy
-b2wgc3RydWN0dXJlcyBvdmVyIFNJREEKMTAzNjgxOSBzMzkweDogcHJvdHZpcnQ6IERpc2FibGUg
-YWRkcmVzcyBjaGVja3MgZm9yIFBWIGd1ZXN0IElPIGVtdWxhdGlvbgo1NmI3NDUxIHMzOTB4OiBw
-cm90dmlydDogTW92ZSBkaWFnIDMwOCBkYXRhIG92ZXIgU0lEQQo5MjFiNDAxIHMzOTB4OiBwcm90
-dmlydDogU2V0IGd1ZXN0IElQTCBQU1cKMDlmN2Q4YSBzMzkweDogcHJvdHZpcnQ6IFNDTFAgaW50
-ZXJwcmV0YXRpb24KYjI1ODE3NiBzMzkweDogcHJvdHZpcnQ6IE1vdmUgU1RTSSBkYXRhIG92ZXIg
-U0lEQUQKZjYyYjAzOSBzMzkweDogQWRkIFNJREEgbWVtb3J5IG9wcwoyN2Y5ZDU1IHMzOTB4OiBw
-cm90dmlydDogS1ZNIGludGVyY2VwdCBjaGFuZ2VzCmRlMDEyMGYgczM5MHg6IHByb3R2aXJ0OiBJ
-bmhpYml0IGJhbGxvb24gd2hlbiBzd2l0Y2hpbmcgdG8gcHJvdGVjdGVkIG1vZGUKZDQ1ZGUxOSBz
-MzkweDogcHJvdHZpcnQ6IEFkZCBtaWdyYXRpb24gYmxvY2tlcgo1NWU4NTcwIHMzOTB4OiBwcm90
-dmlydDogU3VwcG9ydCB1bnBhY2sgZmFjaWxpdHkKOWY0NDdlYiBzMzkweDogTW92ZSBkaWFnbm9z
-ZSAzMDggc3ViY29kZXMgYW5kIHJjcyBpbnRvIGlwbC5oCjJlMzIzNzAgbGludXgtaGVhZGVyczog
-dXBkYXRlIGFnYWluc3QgTGludXggNS43LXJjMwo2ZjIyYTE4IHZpcnRpby1uZXQ6IGZpeCByc2Nf
-ZXh0IGNvbXBhdCBoYW5kbGluZwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8yMCBDaGVja2luZyBj
-b21taXQgNmYyMmExODk5M2ZmICh2aXJ0aW8tbmV0OiBmaXggcnNjX2V4dCBjb21wYXQgaGFuZGxp
-bmcpCjIvMjAgQ2hlY2tpbmcgY29tbWl0IDJlMzIzNzA0MWQ4YyAobGludXgtaGVhZGVyczogdXBk
-YXRlIGFnYWluc3QgTGludXggNS43LXJjMykKMy8yMCBDaGVja2luZyBjb21taXQgOWY0NDdlYmMw
-NTBiIChzMzkweDogTW92ZSBkaWFnbm9zZSAzMDggc3ViY29kZXMgYW5kIHJjcyBpbnRvIGlwbC5o
-KQo0LzIwIENoZWNraW5nIGNvbW1pdCA1NWU4NTcwN2MyZjkgKHMzOTB4OiBwcm90dmlydDogU3Vw
-cG9ydCB1bnBhY2sgZmFjaWxpdHkpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
-bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzMyOTogCm5ldyBmaWxlIG1v
-ZGUgMTAwNjQ0CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNjY3OiBGSUxFOiBp
-bmNsdWRlL2h3L3MzOTB4L3B2Lmg6NDg6CitzdGF0aWMgaW5saW5lIGludCBzMzkwX3B2X3NldF9z
-ZWNfcGFybXModWludDY0X3Qgb3JpZ2luLCB1aW50NjRfdCBsZW5ndGgpIHsgcmV0dXJuIDA7IH0K
-CkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNjY4OiBGSUxFOiBpbmNsdWRlL2h3L3Mz
-OTB4L3B2Lmg6NDk6CitzdGF0aWMgaW5saW5lIGludCBzMzkwX3B2X3VucGFjayh1aW50NjRfdCBh
-ZGRyLCB1aW50NjRfdCBzaXplLCB1aW50NjRfdCB0d2VhaykgeyByZXR1cm4gMDsgfQoKV0FSTklO
-RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc2ODogRklMRTogdGFyZ2V0L3MzOTB4L2RpYWcu
-YzoxMjI6CisgICAgICAgIHZhbGlkID0gc3ViY29kZSA9PSBESUFHMzA4X1BWX1NFVCA/IGlwbGJf
-dmFsaWRfcHYoaXBsYikgOiBpcGxiX3ZhbGlkKGlwbGIpOwoKdG90YWw6IDEgZXJyb3JzLCAzIHdh
-cm5pbmdzLCA3MzEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNC8yMCBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoKNS8yMCBDaGVja2luZyBjb21taXQgZDQ1ZGUxOTVmZjU4IChzMzkweDogcHJvdHZp
-cnQ6IEFkZCBtaWdyYXRpb24gYmxvY2tlcikKNi8yMCBDaGVja2luZyBjb21taXQgZGUwMTIwZmFj
-OWY0IChzMzkweDogcHJvdHZpcnQ6IEluaGliaXQgYmFsbG9vbiB3aGVuIHN3aXRjaGluZyB0byBw
-cm90ZWN0ZWQgbW9kZSkKNy8yMCBDaGVja2luZyBjb21taXQgMjdmOWQ1NWQxODk5IChzMzkweDog
-cHJvdHZpcnQ6IEtWTSBpbnRlcmNlcHQgY2hhbmdlcykKRVJST1I6IHN3aXRjaCBhbmQgY2FzZSBz
-aG91bGQgYmUgYXQgdGhlIHNhbWUgaW5kZW50CiM1MjogRklMRTogdGFyZ2V0L3MzOTB4L2t2bS5j
-OjE3MDE6CiAgICAgc3dpdGNoIChpY3B0X2NvZGUpIHsKWy4uLl0KKyAgICAgICAgY2FzZSBJQ1BU
-X1BWX0lOU1RSOgorICAgICAgICBjYXNlIElDUFRfUFZfSU5TVFJfTk9USUZJQ0FUSU9OOgoKdG90
-YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNiBsaW5lcyBjaGVja2VkCgpQYXRjaCA3LzIwIGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo4LzIwIENoZWNraW5nIGNvbW1pdCBmNjJiMDM5NmE0
-NzMgKHMzOTB4OiBBZGQgU0lEQSBtZW1vcnkgb3BzKQo5LzIwIENoZWNraW5nIGNvbW1pdCBiMjU4
-MTc2OWUwZmEgKHMzOTB4OiBwcm90dmlydDogTW92ZSBTVFNJIGRhdGEgb3ZlciBTSURBRCkKMTAv
-MjAgQ2hlY2tpbmcgY29tbWl0IDA5ZjdkOGFhYWJhNyAoczM5MHg6IHByb3R2aXJ0OiBTQ0xQIGlu
-dGVycHJldGF0aW9uKQoxMS8yMCBDaGVja2luZyBjb21taXQgOTIxYjQwMTExM2Y1IChzMzkweDog
-cHJvdHZpcnQ6IFNldCBndWVzdCBJUEwgUFNXKQoxMi8yMCBDaGVja2luZyBjb21taXQgNTZiNzQ1
-MWMyODY4IChzMzkweDogcHJvdHZpcnQ6IE1vdmUgZGlhZyAzMDggZGF0YSBvdmVyIFNJREEpCjEz
-LzIwIENoZWNraW5nIGNvbW1pdCAxMDM2ODE5OWEzYmUgKHMzOTB4OiBwcm90dmlydDogRGlzYWJs
-ZSBhZGRyZXNzIGNoZWNrcyBmb3IgUFYgZ3Vlc3QgSU8gZW11bGF0aW9uKQoxNC8yMCBDaGVja2lu
-ZyBjb21taXQgMjIzYzc4NDg0OGJjIChzMzkweDogcHJvdHZpcnQ6IE1vdmUgSU8gY29udHJvbCBz
-dHJ1Y3R1cmVzIG92ZXIgU0lEQSkKMTUvMjAgQ2hlY2tpbmcgY29tbWl0IGZmNzlhMmMzZTE5OSAo
-czM5MHg6IHByb3R2aXJ0OiBIYW5kbGUgU0lHUCBzdG9yZSBzdGF0dXMgY29ycmVjdGx5KQoxNi8y
-MCBDaGVja2luZyBjb21taXQgYTA4ZGQ3NmU2NmE5IChkb2NzOiBzeXN0ZW06IEFkZCBwcm90dmly
-dCBkb2NzKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
-SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxOTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3Rh
-bDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDY4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE2LzIwIGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE3LzIwIENoZWNraW5nIGNvbW1pdCBjMjIxZTA5M2Qx
-MjIgKHMzOTB4OiBBZGQgdW5wYWNrIGZhY2lsaXR5IGZlYXR1cmUgdG8gR0ExKQoxOC8yMCBDaGVj
-a2luZyBjb21taXQgYzk4ZmUyOTE3MjVjIChzMzkweDogcHJvdHZpcnQ6IEZpeCBzdHJheSBlcnJv
-cl9yZXBvcnRfZXJyIGluIHMzOTBfbWFjaGluZV9wcm90ZWN0KQoxOS8yMCBDaGVja2luZyBjb21t
-aXQgZmQxM2FjMTQ5ODBlIChzMzkweC9wdjogUmV0cnkgaW9jdGxzIG9uIC1FSU5UUikKMjAvMjAg
-Q2hlY2tpbmcgY29tbWl0IGZjYWJiNmEwZjZkZCAoczM5MHgvczM5MC12aXJ0aW8tY2N3OiBGaXgg
-YnVpbGQgb24gc3lzdGVtcyB3aXRob3V0IEtWTSkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNv
-bW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQK
-aHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA0MzAwOTQ0NDUuMjU5NDMtMS1jb2h1Y2tAcmVk
-aGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
-YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxl
-YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Thu, Apr 30, 2020 at 03:47:04PM +0100, Daniel P. Berrang=C3=A9 wrote:
+> On Thu, Apr 30, 2020 at 10:41:16AM -0400, Vivek Goyal wrote:
+> > On Thu, Apr 30, 2020 at 03:34:25PM +0100, Daniel P. Berrang=C3=A9 wrote=
+:
+> > > On Thu, Apr 30, 2020 at 03:20:13PM +0100, Dr. David Alan Gilbert wrot=
+e:
+> > > > * Vivek Goyal (vgoyal@redhat.com) wrote:
+> > > > > On Thu, Apr 30, 2020 at 09:58:12AM +0100, Dr. David Alan Gilbert =
+wrote:
+> > > > > [..]
+> > > > > > > > Even without this patch, the SLAVE stuff worked so if you s=
+tart the
+> > > > > > > > daemon and *then* mount under the shared directory, the gue=
+st sees it
+> > > > > > > > with or without this patch.
+> > > > > > >=20
+> > > > > > > Hm, I don=E2=80=99t.  Do you really?
+> > > > > >=20
+> > > > > > Yes! With your patch reverted:
+> > > > > >=20
+> > > > > > Start virtiofsd, mount in the guest:
+> > > > > >=20
+> > > > > > host:
+> > > > > > # ./virtiofsd --socket-path=3D/tmp/vhostqemu -o source=3D/home/=
+dgilbert/virtio-fs/fs  -o log_level=3Dwarn -o no_writeback
+> > > > > >=20
+> > > > > > guest:
+> > > > > > # mount -t virtiofs myfs /sysroot
+> > > > > >=20
+> > > > > > host:
+> > > > > > # findmnt -o +PROPAGATION -N 6100
+> > > > > > TARGET SOURCE                                                  =
+            FSTYPE OPTIONS                                                 =
+     PROPAGATION
+> > > > > > /      /dev/mapper/fedora_dgilbert--t580-root[/home/dgilbert/vi=
+rtio-fs/fs] xfs    rw,relatime,seclabel,attr2,inode64,logbufs=3D8,logbsize=
+=3D32k,no private,slave
+> > > > > > # mount -t tmpfs /dev/null /home/dgilbert/virtio-fs/fs/tmp
+> > > > > > # findmnt -o +PROPAGATION -N 6100
+> > > > > > TARGET SOURCE                                                  =
+            FSTYPE OPTIONS                                                 =
+     PROPAGATION
+> > > > > > /      /dev/mapper/fedora_dgilbert--t580-root[/home/dgilbert/vi=
+rtio-fs/fs] xfs    rw,relatime,seclabel,attr2,inode64,logbufs=3D8,logbsize=
+=3D32k,no private,slave
+> > > > > > =E2=94=94=E2=94=80/tmp /dev/null                               =
+                            tmpfs  rw,relatime,seclabel                    =
+                     private,slave
+> > > > >=20
+> > > > > Why is it showing a mount point at "/tmp". If mount point propaga=
+ted, then
+> > > > > inside guest we should see a mount point at /sysroot/tmp?
+> > > >=20
+> > > > That findmnt is on the host.
+> > > >=20
+> > > > > So there are two things.
+> > > > >=20
+> > > > > A. Propagation of mount from host to virtiofsd.
+> > > > > B. Visibility of that mount inside guest over fuse protocol (subm=
+ount
+> > > > >   functionality).
+> > > > >=20
+> > > > > I think A works for me without any patches. But don't think B is =
+working
+> > > > > for me. I don't see the submount inside guest.=20
+> > > > >=20
+> > > > > > # touch /home/dgilbert/virtio-fs/fs/tmp/hello
+> > > > > >=20
+> > > > > > guest:
+> > > > > > # ls -l /sysroot/tmp
+> > > > > > total 0
+> > > > > > -rw-r--r-- 1 root root 0 Apr 30 08:50 hello
+> > > > >=20
+> > > > > Do a "findmnt /sysroot/tmp" inside guest and see what do you see.
+> > > > >=20
+> > > > > You will be able to see "hello" as long as virtiofsd sees the new
+> > > > > mount point, I think. And guest does not have to see that mount p=
+oint
+> > > > > for this simple test to work.
+> > > >=20
+> > > > Right, the guest just sees:
+> > > >=20
+> > > > `-/sysroot                            myfs       virtiof rw,relatim=
+e
+> > >=20
+> > > That is a good thing surely ? If I'm exporting "/sysroot" from the ho=
+st,
+> > > I want the content in "/sysroot/some/sub/mount" to be visible to the
+> > > guest, but I don't want the guest to see "/sysroot/some/sub/mount"
+> > > as an actual mount point. That would be leaking information about the
+> > > host storage setup into the guest. The host admin should be free to
+> > > re-arrange submounts in the host OS, to bring more storage space onli=
+ne,
+> > > and have this be transparent to the guest OS.
+> >=20
+> > If we don't see mount inside guest, we run into the possibility of inod=
+e
+> > number collision. On host two files in shared dir can have same inode
+> > number (if they are on two different filesystem with different device
+> > numbers). But inside guest, we will show device number of virtiofs,
+> > and it will look as if two files in this filesystem have same inode
+> > number, breaking some workloads.
+> >=20
+> > By propagating mounts (submounts), we can assign a unique device number
+> > to these submounts and hence <dev,inode> number pair will become unique=
+.
+>=20
+> Ah, yes, that's true.  In 9pfs there was recent changes precisely
+> because of this clash possibility:
+>=20
+> commit 1a6ed33cc56997479bbe5b48337ff8da44585bd4
+> Author: Antonios Motakis <antonios.motakis@huawei.com>
+> Date:   Thu Oct 10 11:36:05 2019 +0200
+>=20
+>     9p: Added virtfs option 'multidevs=3Dremap|forbid|warn'
+>    =20
+>     'warn' (default): Only log an error message (once) on host if more th=
+an one
+>     device is shared by same export, except of that just ignore this conf=
+ig
+>     error though. This is the default behaviour for not breaking existing
+>     installations implying that they really know what they are doing.
+>    =20
+>     'forbid': Like 'warn', but except of just logging an error this
+>     also denies access of guest to additional devices.
+>    =20
+>     'remap': Allows to share more than one device per export by remapping
+>     inodes from host to guest appropriately. To support multiple devices =
+on the
+>     9p share, and avoid qid path collisions we take the device id as inpu=
+t to
+>     generate a unique QID path. The lowest 48 bits of the path will be se=
+t
+>     equal to the file inode, and the top bits will be uniquely assigned b=
+ased
+>     on the top 16 bits of the inode and the device id.
+>=20
+>=20
+> Perhaps we should try to support the same options in virtio-fs. At least
+> the "forbid" and "remap" options make sense I think. "warn" was only
+> really there for backcompat.  If we can expose it to the guest, then a
+> further "expose" option would be viable.
+
+Providing options in virtiofsd daemon so that use can tweak these settings
+makes sense.
+
+Given we are already allowing accessing multiple device inside guest, we
+also probably need a mode to continue to allow that so that not to break
+existing setups.
+
+"forbid", "remap" make sense. And I like the option "expose" too.
+
+"remap" will require little thought that how do we do that. We briefly
+discussed encoding device number in higher inode bits and Miklos was
+not too keen on it. What if filesystem is using all 64bits of inode. We
+also need to do encoding in such a way so that inode number is persistent.
+
+Thanks
+Vivek
+
 
