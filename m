@@ -7,86 +7,87 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE02DC8300B
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 11:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31DF5C8300A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 11:58:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9864E20757
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 11:56:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F15AD20757
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 11:58:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZYXIx+do"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9864E20757
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GW855yhi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F15AD20757
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU7o9-0004Ns-O2
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 07:56:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33738)
+	id 1jU7pW-0006zf-3f
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 07:58:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33720)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jU7jT-0002nQ-5n
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:51:59 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jU7jQ-0002ir-Ku
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:51:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jU7jR-0000Lx-Dh
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:51:58 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37851)
+ (envelope-from <peter.maydell@linaro.org>) id 1jU7jP-0000L2-61
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:51:56 -0400
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:35182)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jU7jQ-0000LP-VD
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:51:57 -0400
-Received: by mail-wm1-x341.google.com with SMTP id z6so1552625wml.2
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 04:51:56 -0700 (PDT)
+ id 1jU7jO-0000KR-MW
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 07:51:54 -0400
+Received: by mail-wm1-x32b.google.com with SMTP id r26so1551548wmh.0
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 04:51:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=Jt6G/iju8uSaFNeIzNPrG1p2vPHbPGysm95I3wdnMB0=;
- b=ZYXIx+doJ//wjNe0LhPLGhlbk9ZCEQPF4Aid9SHgu3OORkpLidu8TmOvs1yU2d3O63
- nOy9mNnSb83YRMm/EaevTJswCQx5+P1lgIvGxc1DdseSkwkmu7KYIc2ryKPLD3LyH99f
- 1utovLxWWVy86R/NLo3aSaofiWtWgOGqLXFPri+zWkdFOhj14R/hnkJdP0psS4paW8FD
- QbxfJ847Zkw1K2WQmSlkJzEa9weF3SwHvrUYC/Y6s1A83cqMxgcQIgTrbepqRY1a51P0
- qzxSGXZ5O3tyGwUK4xk5A6Lm7WBNRh4uirQpdEaSPL1+05D5DYm8eRS7dgaGR+ljhXo4
- 8zYQ==
+ bh=ZY3oMjv55jr/fCB1Ius33wty91gBP4lyCC8NXchsQCk=;
+ b=GW855yhiQ/G+Tgqu1ge2CJ73AllYTqSh1GYGxr993CJUpbw0FWIeqD/MfTNbB3OF5l
+ JQyTYIf0MlRxGTc1X0exRDrHusKswylZap2YGlgUgEUto1NBxjXNRlZCotwuaeXLeoi3
+ wU5TRdsjqx7AOm6VN3WL6vQoLi58QrurOQapHAyv7KdE86F7jTGDBTuE2zh0qD6WIDlD
+ 3ZrhhgdClmKZDr+jBgd/YSTA3Smy7wMLBaK72ZXNmVtM+sU5Jw2MVzzgC/2zn5FCXkzh
+ 00Rsj/ELGFHTC3/Bjs2asADnOHFCPcFWFAKbsArht7nGoOTP+Icfw+k1Pg5VDsj6XoSi
+ tEEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Jt6G/iju8uSaFNeIzNPrG1p2vPHbPGysm95I3wdnMB0=;
- b=p13XSPzT1l3b4CMBAHEtWYS/3IfxV31VEq/nKGQ5mlLjzyuJvtwlC748CWGXa2n0dM
- Ghf2mrM2SeDbmw2gbVUiwOcp7sCfPAQ4naWe8nT19BMgXlDFagUmg7bNtdIFN3Lh6erL
- tYaQkROHIV/R9aJ0oa4STbxmHWMoh946vXUhSuYmt0BCRF476+WLeKMBCa3VKHZ9skZZ
- nLikPQ7yvJYIhLqDIN2a1kIHaBc+AZacyhwbR6on9I/rIFRg3ohHrcw9Hmg2yI455+vk
- LXsYn0Vv1Ws0gy6vo9SvvpqN+vMCIbDKqy9xjM7t5B4HwZfdv/BsJBCWfpnYcT/o07PR
- DEoQ==
-X-Gm-Message-State: AGi0PuYbGQcBAx925pgVxijOS1L5kIkMqi/gfGPD2J0sVYWgsY7gZNWK
- AfF5DhjyWsR5xuFSxujFJwk3r8Oesjj15w==
-X-Google-Smtp-Source: APiQypKHQ21JansXTdVDtmpHXDcbWPhS3pEkkbz9b2mmwHhexzl31EOSEsxSQ1ybOpfq2qQdHpqN9A==
-X-Received: by 2002:a1c:ba56:: with SMTP id k83mr2538868wmf.1.1588247515236;
- Thu, 30 Apr 2020 04:51:55 -0700 (PDT)
+ bh=ZY3oMjv55jr/fCB1Ius33wty91gBP4lyCC8NXchsQCk=;
+ b=RBonOXnktXZik9+lysyStykfrIvQaLQ0mQJsLLWJzhKpEzquDzw7YtEJhDgEftK6jm
+ GtdE3SsUxZimVhcCnuhQSz/tGWh2Qz8PEy+R9FXnaF9uGkEV+mDryfPKsDNeLsnlF1w6
+ MKoycj1sbHPr6oc7UuqsKBKWVcB0A/cRyHvpDHQsWuMKkzUmmFQsT+QDvW7Gvqljnk+5
+ lKYwhtM2P7xEyd1BJwZQT85DfpJL9ge3UOKiSuq03zuXu1m4GuiNWNpIUrK7y4EgWUGZ
+ LR93J6sj3DsOACO2zIaG4k77Iac9EYsrO85SFBiTPZ3lzqqu+DID6Y5NZAJCmH/tsqRo
+ HXZA==
+X-Gm-Message-State: AGi0Publdqm1LB7ihoeY0J6rS4mj1LhxUpbxM12lslt1gwZtCLYaWuY2
+ 0MCboYYkp3aWcgbg/3R1m6fBJLu5Tf8/pQ==
+X-Google-Smtp-Source: APiQypIeF+WPRpvp5YyzXH2HwHUR2z6tjjiOoxFbD4x8xGODbW8YakA9zLroOpJNey5C5/tRE1VgCA==
+X-Received: by 2002:a05:600c:21ca:: with SMTP id
+ x10mr2459382wmj.113.1588247513016; 
+ Thu, 30 Apr 2020 04:51:53 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id j22sm491518wre.84.2020.04.30.04.51.54
+ by smtp.gmail.com with ESMTPSA id j22sm491518wre.84.2020.04.30.04.51.52
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Apr 2020 04:51:54 -0700 (PDT)
+ Thu, 30 Apr 2020 04:51:52 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 10/31] hw/core/clock-vmstate: define a vmstate entry for clock
- state
-Date: Thu, 30 Apr 2020 12:51:21 +0100
-Message-Id: <20200430115142.13430-11-peter.maydell@linaro.org>
+Subject: [PULL 08/31] tests/boot_linux_console: Add ethernet test to
+ SmartFusion2
+Date: Thu, 30 Apr 2020 12:51:19 +0100
+Message-Id: <20200430115142.13430-9-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200430115142.13430-1-peter.maydell@linaro.org>
 References: <20200430115142.13430-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32b;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32b.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::32b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,85 +103,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Damien Hedde <damien.hedde@greensocs.com>
+From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
 
-Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Message-id: 20200406135251.157596-3-damien.hedde@greensocs.com
+In addition to simple serial test this patch uses ping
+to test the ethernet block modelled in SmartFusion2 SoC.
+
+Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 1587048891-30493-4-git-send-email-sundeep.lkml@gmail.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/core/Makefile.objs   |  1 +
- include/hw/clock.h      |  9 +++++++++
- hw/core/clock-vmstate.c | 25 +++++++++++++++++++++++++
- 3 files changed, 35 insertions(+)
- create mode 100644 hw/core/clock-vmstate.c
+ tests/acceptance/boot_linux_console.py | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-index 1d9b0aa2057..115df550874 100644
---- a/hw/core/Makefile.objs
-+++ b/hw/core/Makefile.objs
-@@ -21,6 +21,7 @@ common-obj-$(CONFIG_SOFTMMU) += null-machine.o
- common-obj-$(CONFIG_SOFTMMU) += loader.o
- common-obj-$(CONFIG_SOFTMMU) += machine-hmp-cmds.o
- common-obj-$(CONFIG_SOFTMMU) += numa.o
-+common-obj-$(CONFIG_SOFTMMU) += clock-vmstate.o
- obj-$(CONFIG_SOFTMMU) += machine-qmp-cmds.o
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+index f825cd9ef55..c6b06a1a138 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -336,13 +336,13 @@ class BootLinuxConsole(Test):
+         """
+         uboot_url = ('https://raw.githubusercontent.com/'
+                      'Subbaraya-Sundeep/qemu-test-binaries/'
+-                     'fa030bd77a014a0b8e360d3b7011df89283a2f0b/u-boot')
+-        uboot_hash = 'abba5d9c24cdd2d49cdc2a8aa92976cf20737eff'
++                     'fe371d32e50ca682391e1e70ab98c2942aeffb01/u-boot')
++        uboot_hash = 'cbb8cbab970f594bf6523b9855be209c08374ae2'
+         uboot_path = self.fetch_asset(uboot_url, asset_hash=uboot_hash)
+         spi_url = ('https://raw.githubusercontent.com/'
+                    'Subbaraya-Sundeep/qemu-test-binaries/'
+-                   'fa030bd77a014a0b8e360d3b7011df89283a2f0b/spi.bin')
+-        spi_hash = '85f698329d38de63aea6e884a86fbde70890a78a'
++                   'fe371d32e50ca682391e1e70ab98c2942aeffb01/spi.bin')
++        spi_hash = '65523a1835949b6f4553be96dec1b6a38fb05501'
+         spi_path = self.fetch_asset(spi_url, asset_hash=spi_hash)
  
- common-obj-$(CONFIG_EMPTY_SLOT) += empty_slot.o
-diff --git a/include/hw/clock.h b/include/hw/clock.h
-index 82a7f3c6982..f3e44e9460c 100644
---- a/include/hw/clock.h
-+++ b/include/hw/clock.h
-@@ -74,6 +74,15 @@ struct Clock {
-     QLIST_ENTRY(Clock) sibling;
- };
+         self.vm.set_console()
+@@ -352,7 +352,12 @@ class BootLinuxConsole(Test):
+                          '-drive', 'file=' + spi_path + ',if=mtd,format=raw',
+                          '-no-reboot')
+         self.vm.launch()
+-        self.wait_for_console_pattern('init started: BusyBox')
++        self.wait_for_console_pattern('Enter \'help\' for a list')
++
++        exec_command_and_wait_for_pattern(self, 'ifconfig eth0 10.0.2.15',
++                                                 'eth0: link becomes ready')
++        exec_command_and_wait_for_pattern(self, 'ping -c 3 10.0.2.2',
++            '3 packets transmitted, 3 packets received, 0% packet loss')
  
-+/*
-+ * vmstate description entry to be added in device vmsd.
-+ */
-+extern const VMStateDescription vmstate_clock;
-+#define VMSTATE_CLOCK(field, state) \
-+    VMSTATE_CLOCK_V(field, state, 0)
-+#define VMSTATE_CLOCK_V(field, state, version) \
-+    VMSTATE_STRUCT_POINTER_V(field, state, version, vmstate_clock, Clock)
-+
- /**
-  * clock_setup_canonical_path:
-  * @clk: clock
-diff --git a/hw/core/clock-vmstate.c b/hw/core/clock-vmstate.c
-new file mode 100644
-index 00000000000..260b13fc2c8
---- /dev/null
-+++ b/hw/core/clock-vmstate.c
-@@ -0,0 +1,25 @@
-+/*
-+ * Clock migration structure
-+ *
-+ * Copyright GreenSocs 2019-2020
-+ *
-+ * Authors:
-+ *  Damien Hedde
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "migration/vmstate.h"
-+#include "hw/clock.h"
-+
-+const VMStateDescription vmstate_clock = {
-+    .name = "clock",
-+    .version_id = 0,
-+    .minimum_version_id = 0,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(period, Clock),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
+     def do_test_arm_raspi2(self, uart_id):
+         """
 -- 
 2.20.1
 
