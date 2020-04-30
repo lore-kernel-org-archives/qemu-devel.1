@@ -2,82 +2,86 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 786F0C47247
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 21:37:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38E4EC47247
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 21:49:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CE9D2071C
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 21:37:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 016CC20731
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 21:49:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d7zweM9u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CE9D2071C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yee5QKs9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 016CC20731
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUGsJ-0001Q3-CU
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 17:37:43 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49136)
+	id 1jUH44-0006zL-T2
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 17:49:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54862)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jUGrR-0000t8-H1
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 17:36:49 -0400
+ (envelope-from <josemartins90@gmail.com>) id 1jUH2X-0006E0-St
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 17:48:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jUGrR-0001NK-1o
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 17:36:49 -0400
-Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:40577)
+ (envelope-from <josemartins90@gmail.com>) id 1jUH2V-00087o-5d
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 17:48:16 -0400
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:41489)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jUGrH-0000sA-QB; Thu, 30 Apr 2020 17:36:39 -0400
-Received: by mail-il1-x144.google.com with SMTP id e8so2830128ilm.7;
- Thu, 30 Apr 2020 14:36:37 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <josemartins90@gmail.com>)
+ id 1jUH2O-0007rd-1N; Thu, 30 Apr 2020 17:48:08 -0400
+Received: by mail-io1-xd41.google.com with SMTP id b12so3121933ion.8;
+ Thu, 30 Apr 2020 14:48:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=UyLTuFayAbRQrUMDIYQwwzsYELaOLZE/QXiaMBIfEwU=;
- b=d7zweM9uuufN+GetVWltArvZC6J2rd/Rlw+FuoZpY4CUVw4Fzd5LQKofpjx37d4OaO
- nHLP6u9W4rGjgvwIDQ1DsFKMl8Lp/lH/SNFxPjf7MMfAHqFI7v88Z9aM2d6YwvcsRWRI
- 4+h1f3z5tfD5+dVLrxPgJoerw1g30hvrs9InApZg/4vi7UE+/yIw8zeCajti+eTZYFrd
- itU6Od8jVVp4y3RWdZJrumyIyh0YHgDqKf6yHkaspbAIWxWPJvQtiiiLcIEl1Nv2SLmY
- FjHOIiDD0iPEJoFygeVF+DKldMmArLCxZzt0sUl1eT1Xu0nQQCWFdNPs6FmZ5bdTqyd6
- Xr5Q==
+ :cc; bh=R7CYPxPrtqSpJXFUByK/VjZUUxaG6Orno5eFE4pEZZs=;
+ b=Yee5QKs9kgC2BARvckJuYcdfUsuxEtrpbdsuyCPLzv+Z7N1VhIETxV5ili/xtJNa7z
+ SVHU1e/RvEdlkzSc55/bpUtA8DoNyL0dp/yKTogdr7IEbUuykRAVhuS3pk7hy2jV3hcG
+ jn+O5EmsePUxvlDKf/aocAN2AECK//8gpAzQ7WoSainK5m3aqLeXUoaWyk9jJm9CT6zb
+ zSi0zteeFG7y3yLlH95X1AghC+v/HqVq3D9Ew4xCtH/1bbZaz2ClIKYT6Pr2qPWcXI1C
+ WLEctSzGHuIYOMwo76+3QTOsKwVcfdopvQwR7AAHOcHDg0oPuWqvAqa1JTt1PhEydaAt
+ c/cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=UyLTuFayAbRQrUMDIYQwwzsYELaOLZE/QXiaMBIfEwU=;
- b=NpM7Y0ytzupNpdYFgllIAWplHgVDjxKs0GLXhzjCWdFyzCe1AbDiDk4q8wFb05unGl
- bom4xjTj6mv818BLw8C3syIfaleTjy2rKl02LwaQiJljJzvSLRV3Jmg8wW4125bUntky
- Lh9iaVWiFHZWq4klY6xrwGuYPDp7pzB7PKyJxJ0Dcn2DxcFz7KmRG1vI5bkiounOY3Fc
- 8nNygfuqEmJ3s+pvjxed03ZhCHzvr/VIRqUcn3inxkLp9AcYk0InZ38ixyq+kk4ebA/E
- 5qELjp3DdDFTGTSOYA4Fg1kuDurXaZSJWQ7Vu/ANgd7ZzRzum8UQg0z9szgCyougeE61
- mt8w==
-X-Gm-Message-State: AGi0PuYyxb5gLCWBxF6363AOw2vc9EB3ImvTPVx4MCiE9a6nw9UlXdEB
- PC2+j7kaINvxNjXj6ElulMbNyUtSaBXKSU64JTc=
-X-Google-Smtp-Source: APiQypIDXevnY2BbG+fgFOffSxVvPvGjSVBUc/pGvNVeJghJpDaGkWNu1W3Fx66PObmkaY12aa9MVcbhPH0WG/VpLSQ=
-X-Received: by 2002:a92:d0c6:: with SMTP id y6mr464988ila.227.1588282597089;
- Thu, 30 Apr 2020 14:36:37 -0700 (PDT)
+ bh=R7CYPxPrtqSpJXFUByK/VjZUUxaG6Orno5eFE4pEZZs=;
+ b=gEa3H+AzzFBr7IzNvaJqXMsRvebhbbugFWNNeYoloXPaFssS0EGH8gXdBGInFIBnGp
+ jetlbAo1UOBdRiwa8heuQ8dX3XvpffRZVbqIL+84IYJouieWCke7or+f1vuLR3FT6gu0
+ dMsALPQeJdWAG9g+4NNox7f2fnUiCKCQFILOOkav6bQLznxOhZ6D2v8U5vMwPAhKvBjL
+ cYi2yS00Lx09MU7u5s5T/B2O2h6CrwgFcCChFP4JXL6jzwcc5L8vb1/7mMvQNPbUPY/5
+ bvtkmwpvQq/SkcS5Zz+3bbLJF7wps48mGrLQuV99/R5xDsmfTxqBiKv7mBJyG2GZZtex
+ tmYg==
+X-Gm-Message-State: AGi0PuZSSY1Hlj4vg+p9GLgWnvdjd0xDiivZdSYl84inXLLnQPwWQ9TK
+ njsNUX3QPBsRL7Aow0XfKn27lsuJEMjGWLIgQzQ=
+X-Google-Smtp-Source: APiQypJ4mCpUO8IhdLrK30WoeCt6rN/HBe4BA+6R2XV5bp1ZQH8CRiuj+09nIzr/Q5usLo3qhpYk8zkUkFhFbluwTEQ=
+X-Received: by 2002:a02:c7c2:: with SMTP id s2mr480881jao.130.1588283284434;
+ Thu, 30 Apr 2020 14:48:04 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAC41xo2LfTQZnor5haAgBg=h34qv50xf8Bs1bgSeGESfr-E2ng@mail.gmail.com>
- <CAKmqyKNMiD6VJ1D-ty-q_HMyiZ7oj7F0XraKTaYy78-xjhAN4A@mail.gmail.com>
-In-Reply-To: <CAKmqyKNMiD6VJ1D-ty-q_HMyiZ7oj7F0XraKTaYy78-xjhAN4A@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 30 Apr 2020 14:28:02 -0700
-Message-ID: <CAKmqyKO=edmrotcVa_tMO-VcTpdWEq7=0=EYiQquVhqwkS2F=g@mail.gmail.com>
-Subject: Re: [PATCH] target/riscv: fix check of guest pa top bits
-To: Jose Martins <josemartins90@gmail.com>
+References: <CAC41xo2O1k+cn7EO3Zu3U70qefFwGa5B1iNRNgRwLk7SGX=-Aw@mail.gmail.com>
+ <CAKmqyKPDzusVqzCFwCJ+2gY0qchguhR57zHNkE-0MTeffKs_OA@mail.gmail.com>
+ <CAC41xo3qeQZ+i8XoQq3j80_JDEoL2yMA__arpmE+GXyjX4c1sg@mail.gmail.com>
+ <CAKmqyKPJ6QqUULrDj9NX_bLdnjsjzPOGcCBH5q23fG=ScT_NzA@mail.gmail.com>
+ <CAC41xo32aWNZteKP-95AtFXQo3w_Ey-7MA0-dL_uJmEMScAuhg@mail.gmail.com>
+ <CAKmqyKOnpJQUHVnzGVBjPkib-Z1vfdWqLx1HmfbGascFFG4DVQ@mail.gmail.com>
+In-Reply-To: <CAKmqyKOnpJQUHVnzGVBjPkib-Z1vfdWqLx1HmfbGascFFG4DVQ@mail.gmail.com>
+From: Jose Martins <josemartins90@gmail.com>
+Date: Thu, 30 Apr 2020 22:47:53 +0100
+Message-ID: <CAC41xo2-knUMRVALdftzu4cNz5u5UmBf1aK=mAt9YKzvOcCjpg@mail.gmail.com>
+Subject: Re: [PATCH 1/1] target/riscv: fix VS interrupts forwarding to HS
+To: Alistair Francis <alistair23@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x144.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
+ envelope-from=josemartins90@gmail.com; helo=mail-io1-xd41.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::144
+X-Received-From: 2607:f8b0:4864:20::d41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,80 +100,14 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Apr 30, 2020 at 12:45 PM Alistair Francis <alistair23@gmail.com> wrote:
+> I'm not sure HS is a higher privilege mode.
 >
-> On Fri, Apr 24, 2020 at 8:10 AM Jose Martins <josemartins90@gmail.com> wrote:
-> >
-> > The spec states that on sv39x4 guest physical  "address bits 63:41
-> > must all be zeros, or else a guest-page-fault exception occurs.".
-> > However, the check performed for these top bits of the virtual address
-> > on the second stage is the same as the one performed for virtual
-> > addresses on the first stage except with the 2-bit extension,
-> > effectively creating the same kind of "hole" in the guest's physical
-> > address space. I believe the following patch fixes this issue:
-> >
-> > Signed-off-by: Jose Martins <josemartins90@gmail.com>
->
-> Thanks for the patch.
->
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
->
-> > ---
-> >  target/riscv/cpu_helper.c | 20 +++++++++++++-------
-> >  1 file changed, 13 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> > index d3ba9efb02..da879f5656 100644
-> > --- a/target/riscv/cpu_helper.c
-> > +++ b/target/riscv/cpu_helper.c
-> > @@ -421,15 +421,21 @@ static int get_physical_address(CPURISCVState
-> > *env, hwaddr *physical,
->
-> There seems to be a strange wrapping here, that corrupts the patch.
-> For future patches can you please check your git send-email setup?
->
-> Applied to the RISC-V tree with the above line fixed up.
+> HS is privilege encoding 1, which is the same as VS (VU is obviously lower).
 
-This patch also fails checkpatch.
+I just checked the spec and it doesn't actually, explicitly state that
+HS is a higher-privilege mode than VS. I thought this was something
+implicit, but you might be right. I'll try to reach out to the spec
+authors to clarify this.
 
-Do you mind resending a v2 with the check patch issues fixed?
-
-Alistair
-
->
-> Alistair
->
-> >      int va_bits = PGSHIFT + levels * ptidxbits + widened;
-> >      target_ulong mask, masked_msbs;
-> >
-> > -    if (TARGET_LONG_BITS > (va_bits - 1)) {
-> > -        mask = (1L << (TARGET_LONG_BITS - (va_bits - 1))) - 1;
-> > +    if(!first_stage){
-> > +        if ((addr >> va_bits) != 0) {
-> > +            return TRANSLATE_FAIL;
-> > +        }
-> >      } else {
-> > -        mask = 0;
-> > -    }
-> > -    masked_msbs = (addr >> (va_bits - 1)) & mask;
-> > +        if (TARGET_LONG_BITS > (va_bits - 1)) {
-> > +            mask = (1L << (TARGET_LONG_BITS - (va_bits - 1))) - 1;
-> > +        } else {
-> > +            mask = 0;
-> > +        }
-> > +        masked_msbs = (addr >> (va_bits - 1)) & mask;
-> >
-> > -    if (masked_msbs != 0 && masked_msbs != mask) {
-> > -        return TRANSLATE_FAIL;
-> > +        if (masked_msbs != 0 && masked_msbs != mask) {
-> > +            return TRANSLATE_FAIL;
-> > +        }
-> >      }
-> >
-> >      int ptshift = (levels - 1) * ptidxbits;
-> > --
-> > 2.17.1
-> >
-> > Jose
-> >
+Jose
 
