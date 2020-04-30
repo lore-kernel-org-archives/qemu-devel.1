@@ -2,54 +2,86 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.7 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DA82C8300A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:24:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B4CDC8300A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:24:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E528B20787
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:24:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E528B20787
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id E973820787
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:24:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XpIXhx4m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E973820787
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU6Md-0006pk-WB
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 06:24:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52492)
+	id 1jU6Mj-0006yR-3G
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 06:24:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52760)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1jU6Ie-0008MS-3a
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:20:17 -0400
+ (envelope-from <zltjiangshi@gmail.com>) id 1jU6L6-0004QT-5O
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:22:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1jU6IW-0001Hh-0J
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:20:11 -0400
-Received: from relay.sw.ru ([185.231.240.75]:35822)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1jU6IV-00018F-AX; Thu, 30 Apr 2020 06:20:03 -0400
-Received: from dptest2.qa.sw.ru ([10.94.4.71])
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <dplotnikov@virtuozzo.com>)
- id 1jU6II-0003TP-AU; Thu, 30 Apr 2020 13:19:50 +0300
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v23 3/4] qcow2: add zstd cluster compression
-Date: Thu, 30 Apr 2020 13:19:17 +0300
-Message-Id: <20200430101918.30351-4-dplotnikov@virtuozzo.com>
-X-Mailer: git-send-email 2.17.0
-In-Reply-To: <20200430101918.30351-1-dplotnikov@virtuozzo.com>
-References: <20200430101918.30351-1-dplotnikov@virtuozzo.com>
-Received-SPF: pass client-ip=185.231.240.75;
- envelope-from=dplotnikov@virtuozzo.com; helo=relay.sw.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 06:20:00
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Received-From: 185.231.240.75
+ (envelope-from <zltjiangshi@gmail.com>) id 1jU6L4-0004Se-D7
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:22:43 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:43343)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1jU6L3-0004KA-Vd
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:22:42 -0400
+Received: by mail-pg1-x542.google.com with SMTP id x26so2538029pgc.10
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 03:22:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id;
+ bh=ycV03Qb2e/TJ4HXNBuZlVu4R7xxQNf7srsAUMZ0wHq8=;
+ b=XpIXhx4mPxU5+1qJMS/MVh0/f/M4jKEk4LZRQ3JG3xNDraH+HqnwGiR1hwtv3EnpZw
+ 4zjZs544+0QWx/O3UHd9JVmNAs0Db/bq5TToGlW+cLlcnepj1uJw/e7nmhvmpB/z2SvC
+ NyYqqzPkIeqO36Pv7mOIZdeKyCqYDVsGGWD67/7F5xtOdLann+Z7QzxSWDGxUTAYX/Dq
+ 0GoiAFPJOw+rmdd4VC4kA2juAuRF25PwMS2q6sCIuPbf9ges+ACp2Hm9cJwKE9R3zDYC
+ JnYhbxW7bOLsm4lYilm3Yq8LY/Mo+nWwVP+HrdV4YY/rX6SchHVbYQ3//nUhmEh0KYeB
+ ClkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=ycV03Qb2e/TJ4HXNBuZlVu4R7xxQNf7srsAUMZ0wHq8=;
+ b=KIQ5w2kdOpb9zNoHkDlrTJH9/Ef/KA19rkTuHh3oolXlae1H4WQAnSscaYz5ESABig
+ J8jQu4KiihgNzgv0AGaCwraypIWzPYBrM5akjfJY0pNBIe2AIq+/LeXG3cvgRYViLsLn
+ F+NBZq+E9cVVk7gd2Djk5VQ/Sd9RvrTK7uyZ2f79ElN8a0raPeiNJDXQL6v4BYDjLkfl
+ 5O8YXr11tn3a9esSFQ6xEZ5dO33tj8z4Z71Yh3n227wa9V6/mc4cqoH8fOSEkwiiPp6A
+ lmgZMRWmkPGlzdry5m62POopgtJ34AQ0QbtozXAMLcstg2wiaL4rQc3OkLVfgsWlBaOL
+ BPvQ==
+X-Gm-Message-State: AGi0PubY8rOC1Pn2VxpfihqQ0+oZ1CU/qZAd92+ExGFNHErJJMv1vbsa
+ CLNLBEaM7qR/anYWo73rnQg=
+X-Google-Smtp-Source: APiQypIbIawzw27CxRXIxX9jCHF/aaOIs7jZeeJ8/SaHQRFV4fA7JZHcNC9M6fw4dO2zh1N4r4T4NA==
+X-Received: by 2002:a63:af51:: with SMTP id s17mr2743031pgo.305.1588242159646; 
+ Thu, 30 Apr 2020 03:22:39 -0700 (PDT)
+Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com.
+ [34.92.144.28])
+ by smtp.gmail.com with ESMTPSA id a15sm1397872pju.3.2020.04.30.03.22.37
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 30 Apr 2020 03:22:38 -0700 (PDT)
+From: Huacai Chen <zltjiangshi@gmail.com>
+X-Google-Original-From: Huacai Chen <chenhc@lemote.com>
+To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Subject: [PATCH for-5.1 V2 0/7] mips: Add Loongson-3 machine support (with KVM)
+Date: Thu, 30 Apr 2020 18:22:28 +0800
+Message-Id: <1588242155-23924-1-git-send-email-chenhc@lemote.com>
+X-Mailer: git-send-email 2.7.0
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=zltjiangshi@gmail.com; helo=mail-pg1-x542.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,325 +93,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
- qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+Cc: Huacai Chen <chenhuacai@gmail.com>, Huacai Chen <chenhc@lemote.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>, qemu-devel@nongnu.org,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-zstd significantly reduces cluster compression time.
-It provides better compression performance maintaining
-the same level of the compression ratio in comparison with
-zlib, which, at the moment, is the only compression
-method available.
+Loongson-3 CPU family include Loongson-3A R1/R2/R3/R4 and Loongson-3B
+R1/R2. Loongson-3A R1 is the oldest and its ISA is the smallest, while
+Loongson-3A R4 is the newest and its ISA is almost the superset of all
+others. To reduce complexity, in QEMU we just define two CPU types:
 
-The performance test results:
-Test compresses and decompresses qemu qcow2 image with just
-installed rhel-7.6 guest.
-Image cluster size: 64K. Image on disk size: 2.2G
+1, "Loongson-3A1000" CPU which is corresponding to Loongson-3A R1. It is
+   suitable for TCG because Loongson-3A R1 has fewest ASE.
+2, "Loongson-3A4000" CPU which is corresponding to Loongson-3A R4. It is
+   suitable for KVM because Loongson-3A R4 has the VZ ASE.
 
-The test was conducted with brd disk to reduce the influence
-of disk subsystem to the test results.
-The results is given in seconds.
+Loongson-3 lacks English documents. I've tried to translated them with
+translate.google.com, and the machine translated documents (together
+with their original Chinese versions) are available here.
 
-compress cmd:
-  time ./qemu-img convert -O qcow2 -c -o compression_type=[zlib|zstd]
-                  src.img [zlib|zstd]_compressed.img
-decompress cmd
-  time ./qemu-img convert -O qcow2
-                  [zlib|zstd]_compressed.img uncompressed.img
+Loongson-3A R1 (Loongson-3A1000)
+User Manual Part 1:
+http://ftp.godson.ac.cn/lemote/3A1000_p1.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A1000_processor_user_manual_P1.pdf (Chinese Version)
+User Manual Part 2:
+http://ftp.godson.ac.cn/lemote/3A1000_p2.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A1000_processor_user_manual_P2.pdf (Chinese Version)
 
-           compression               decompression
-         zlib       zstd           zlib         zstd
-------------------------------------------------------------
-real     65.5       16.3 (-75 %)    1.9          1.6 (-16 %)
-user     65.0       15.8            5.3          2.5
-sys       3.3        0.2            2.0          2.0
+Loongson-3A R2 (Loongson-3A2000)
+User Manual Part 1:
+http://ftp.godson.ac.cn/lemote/3A2000_p1.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A2000_user1.pdf (Chinese Version)
+User Manual Part 2:
+http://ftp.godson.ac.cn/lemote/3A2000_p2.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A2000_user2.pdf (Chinese Version)
 
-Both ZLIB and ZSTD gave the same compression ratio: 1.57
-compressed image size in both cases: 1.4G
+Loongson-3A R3 (Loongson-3A3000)
+User Manual Part 1:
+http://ftp.godson.ac.cn/lemote/3A3000_p1.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A3000_3B3000usermanual1.pdf (Chinese Version)
+User Manual Part 2:
+http://ftp.godson.ac.cn/lemote/3A3000_p2.pdf
+http://ftp.godson.ac.cn/lemote/Loongson3A3000_3B3000usermanual2.pdf (Chinese Version)
 
-Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-QAPI part:
-Acked-by: Markus Armbruster <armbru@redhat.com>
+Loongson-3A R4 (Loongson-3A4000)
+User Manual Part 1:
+http://ftp.godson.ac.cn/lemote/3A4000_p1.pdf
+http://ftp.godson.ac.cn/lemote/3A4000user.pdf (Chinese Version)
+User Manual Part 2:
+I'm sorry that it is unavailable now.
+
+We are preparing to add QEMU's Loongson-3 support. MIPS VZ extension is
+fully supported in Loongson-3A R4+, so we at first add QEMU/KVM support
+in this series. And the next series will add QEMU/TCG support (it will
+emulate Loongson-3A R1).
+
+We already have a full functional Linux kernel (based on Linux-5.4.x LTS
+but not upstream yet) here:
+
+https://github.com/chenhuacai/linux
+
+How to use QEMU/Loongson-3?
+1, Download kernel source from the above URL;
+2, Build a kernel with arch/mips/configs/loongson3_{def,hpc}config;
+3, Boot a Loongson-3A4000 host with this kernel;
+4, Build QEMU-5.0.0 with this patchset;
+5, modprobe kvm;
+6, Use QEMU with TCG (available in future):
+       qemu-system-mips64el -M loongson3,accel=tcg -cpu Loongson-3A1000 -kernel <path_to_kernel> -append ... 
+   Use QEMU with KVM (available at present): 
+       qemu-system-mips64el -M loongson3,accel=kvm -cpu Loongson-3A4000 -kernel <path_to_kernel> -append ... 
+
+   The "-cpu" parameter can be omitted here and QEMU will use the correct type for TCG/KVM automatically.
+
+Huacai Chen(7):
+ configure: Add KVM target support for MIPS64
+ hw/mips: Implement the kvm_type() hook in MachineClass
+ hw/mips: Add CPU IRQ3 delivery for KVM
+ target/mips: Add Loongson-3 CPU definition
+ target/mips: Add more CP0 register for save/restor
+ hw/mips: Add Loongson-3 machine support (with KVM)
+ MAINTAINERS: Add myself as Loongson-3 maintainer
+
+Signed-off-by: Huacai Chen <chenhc@lemote.com>
 ---
- docs/interop/qcow2.txt |   1 +
- configure              |   2 +-
- qapi/block-core.json   |   3 +-
- block/qcow2-threads.c  | 169 +++++++++++++++++++++++++++++++++++++++++
- block/qcow2.c          |   7 ++
- 5 files changed, 180 insertions(+), 2 deletions(-)
-
-diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index 640e0eca40..18a77f737e 100644
---- a/docs/interop/qcow2.txt
-+++ b/docs/interop/qcow2.txt
-@@ -209,6 +209,7 @@ version 2.
- 
-                     Available compression type values:
-                         0: zlib <https://www.zlib.net/>
-+                        1: zstd <http://github.com/facebook/zstd>
- 
- 
- === Header padding ===
-diff --git a/configure b/configure
-index 23b5e93752..4e3a1690ea 100755
---- a/configure
-+++ b/configure
-@@ -1861,7 +1861,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   lzfse           support of lzfse compression library
-                   (for reading lzfse-compressed dmg images)
-   zstd            support for zstd compression library
--                  (for migration compression)
-+                  (for migration compression and qcow2 cluster compression)
-   seccomp         seccomp support
-   coroutine-pool  coroutine freelist (better performance)
-   glusterfs       GlusterFS backend
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 1522e2983f..6fbacddab2 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -4293,11 +4293,12 @@
- # Compression type used in qcow2 image file
- #
- # @zlib: zlib compression, see <http://zlib.net/>
-+# @zstd: zstd compression, see <http://github.com/facebook/zstd>
- #
- # Since: 5.1
- ##
- { 'enum': 'Qcow2CompressionType',
--  'data': [ 'zlib' ] }
-+  'data': [ 'zlib', { 'name': 'zstd', 'if': 'defined(CONFIG_ZSTD)' } ] }
- 
- ##
- # @BlockdevCreateOptionsQcow2:
-diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
-index 7dbaf53489..1914baf456 100644
---- a/block/qcow2-threads.c
-+++ b/block/qcow2-threads.c
-@@ -28,6 +28,11 @@
- #define ZLIB_CONST
- #include <zlib.h>
- 
-+#ifdef CONFIG_ZSTD
-+#include <zstd.h>
-+#include <zstd_errors.h>
-+#endif
-+
- #include "qcow2.h"
- #include "block/thread-pool.h"
- #include "crypto.h"
-@@ -166,6 +171,160 @@ static ssize_t qcow2_zlib_decompress(void *dest, size_t dest_size,
-     return ret;
- }
- 
-+#ifdef CONFIG_ZSTD
-+
-+/*
-+ * qcow2_zstd_compress()
-+ *
-+ * Compress @src_size bytes of data using zstd compression method
-+ *
-+ * @dest - destination buffer, @dest_size bytes
-+ * @src - source buffer, @src_size bytes
-+ *
-+ * Returns: compressed size on success
-+ *          -ENOMEM destination buffer is not enough to store compressed data
-+ *          -EIO    on any other error
-+ */
-+static ssize_t qcow2_zstd_compress(void *dest, size_t dest_size,
-+                                   const void *src, size_t src_size)
-+{
-+    ssize_t ret;
-+    size_t zstd_ret;
-+    ZSTD_outBuffer output = {
-+        .dst = dest,
-+        .size = dest_size,
-+        .pos = 0
-+    };
-+    ZSTD_inBuffer input = {
-+        .src = src,
-+        .size = src_size,
-+        .pos = 0
-+    };
-+    ZSTD_CCtx *cctx = ZSTD_createCCtx();
-+
-+    if (!cctx) {
-+        return -EIO;
-+    }
-+    /*
-+     * Use the zstd streamed interface for symmetry with decompression,
-+     * where streaming is essential since we don't record the exact
-+     * compressed size.
-+     *
-+     * ZSTD_compressStream2() tries to compress everything it could
-+     * with a single call. Although, ZSTD docs says that:
-+     * "You must continue calling ZSTD_compressStream2() with ZSTD_e_end
-+     * until it returns 0, at which point you are free to start a new frame",
-+     * in out tests we saw the only case when it returned with >0 -
-+     * when the output buffer was too small. In that case,
-+     * ZSTD_compressStream2() expects a bigger buffer on the next call.
-+     * We can't provide a bigger buffer because we are limited with dest_size
-+     * which we pass to the ZSTD_compressStream2() at once.
-+     * So, we don't need any loops and just abort the compression when we
-+     * don't get 0 result on the first call.
-+     */
-+    zstd_ret = ZSTD_compressStream2(cctx, &output, &input, ZSTD_e_end);
-+
-+    if (zstd_ret) {
-+        if (zstd_ret > output.size - output.pos) {
-+            ret = -ENOMEM;
-+        } else {
-+            ret = -EIO;
-+        }
-+        goto out;
-+    }
-+
-+    /* make sure that zstd didn't overflow the dest buffer */
-+    assert(output.pos <= dest_size);
-+    ret = output.pos;
-+out:
-+    ZSTD_freeCCtx(cctx);
-+    return ret;
-+}
-+
-+/*
-+ * qcow2_zstd_decompress()
-+ *
-+ * Decompress some data (not more than @src_size bytes) to produce exactly
-+ * @dest_size bytes using zstd compression method
-+ *
-+ * @dest - destination buffer, @dest_size bytes
-+ * @src - source buffer, @src_size bytes
-+ *
-+ * Returns: 0 on success
-+ *          -EIO on any error
-+ */
-+static ssize_t qcow2_zstd_decompress(void *dest, size_t dest_size,
-+                                     const void *src, size_t src_size)
-+{
-+    size_t zstd_ret = 0;
-+    ssize_t ret = 0;
-+    ZSTD_outBuffer output = {
-+        .dst = dest,
-+        .size = dest_size,
-+        .pos = 0
-+    };
-+    ZSTD_inBuffer input = {
-+        .src = src,
-+        .size = src_size,
-+        .pos = 0
-+    };
-+    ZSTD_DCtx *dctx = ZSTD_createDCtx();
-+
-+    if (!dctx) {
-+        return -EIO;
-+    }
-+
-+    /*
-+     * The compressed stream from the input buffer may consist of more
-+     * than one zstd frame. So we iterate until we get a fully
-+     * uncompressed cluster.
-+     * From zstd docs related to ZSTD_decompressStream:
-+     * "return : 0 when a frame is completely decoded and fully flushed"
-+     * We suppose that this means: each time ZSTD_decompressStream reads
-+     * only ONE full frame and returns 0 if and only if that frame
-+     * is completely decoded and flushed. Only after returning 0,
-+     * ZSTD_decompressStream reads another ONE full frame.
-+     */
-+    while (output.pos < output.size) {
-+        size_t last_in_pos = input.pos;
-+        size_t last_out_pos = output.pos;
-+        zstd_ret = ZSTD_decompressStream(dctx, &output, &input);
-+
-+        if (ZSTD_isError(zstd_ret)) {
-+            ret = -EIO;
-+            break;
-+        }
-+
-+        /*
-+         * The ZSTD manual is vague about what to do if it reads
-+         * the buffer partially, and we don't want to get stuck
-+         * in an infinite loop where ZSTD_decompressStream
-+         * returns > 0 waiting for another input chunk. So, we add
-+         * a check which ensures that the loop makes some progress
-+         * on each step.
-+         */
-+        if (last_in_pos >= input.pos &&
-+            last_out_pos >= output.pos) {
-+            ret = -EIO;
-+            break;
-+        }
-+    }
-+    /*
-+     * Make sure that we have the frame fully flushed here
-+     * if not, we somehow managed to get uncompressed cluster
-+     * greater then the cluster size, possibly because of its
-+     * damage.
-+     */
-+    if (zstd_ret > 0) {
-+        ret = -EIO;
-+    }
-+
-+    ZSTD_freeDCtx(dctx);
-+    assert(ret == 0 || ret == -EIO);
-+    return ret;
-+}
-+#endif
-+
- static int qcow2_compress_pool_func(void *opaque)
- {
-     Qcow2CompressData *data = opaque;
-@@ -217,6 +376,11 @@ qcow2_co_compress(BlockDriverState *bs, void *dest, size_t dest_size,
-         fn = qcow2_zlib_compress;
-         break;
- 
-+#ifdef CONFIG_ZSTD
-+    case QCOW2_COMPRESSION_TYPE_ZSTD:
-+        fn = qcow2_zstd_compress;
-+        break;
-+#endif
-     default:
-         abort();
-     }
-@@ -249,6 +413,11 @@ qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
-         fn = qcow2_zlib_decompress;
-         break;
- 
-+#ifdef CONFIG_ZSTD
-+    case QCOW2_COMPRESSION_TYPE_ZSTD:
-+        fn = qcow2_zstd_decompress;
-+        break;
-+#endif
-     default:
-         abort();
-     }
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 9c0b20c912..21f281b7f8 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1246,6 +1246,9 @@ static int validate_compression_type(BDRVQcow2State *s, Error **errp)
- {
-     switch (s->compression_type) {
-     case QCOW2_COMPRESSION_TYPE_ZLIB:
-+#ifdef CONFIG_ZSTD
-+    case QCOW2_COMPRESSION_TYPE_ZSTD:
-+#endif
-         break;
- 
-     default:
-@@ -3478,6 +3481,10 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
-         }
- 
-         switch (qcow2_opts->compression_type) {
-+#ifdef CONFIG_ZSTD
-+        case QCOW2_COMPRESSION_TYPE_ZSTD:
-+            break;
-+#endif
-         default:
-             error_setg(errp, "Unknown compression type");
-             goto out;
--- 
-2.17.0
-
+ MAINTAINERS                          |   5 +
+ configure                            |   2 +-
+ default-configs/mips64el-softmmu.mak |   1 +
+ hw/core/Makefile.objs                |   2 +-
+ hw/core/null-machine.c               |   4 +
+ hw/mips/Kconfig                      |  10 +
+ hw/mips/Makefile.objs                |   3 +-
+ hw/mips/common.c                     |  29 ++
+ hw/mips/mips_int.c                   |   6 +-
+ hw/mips/mips_loongson3.c             | 886 +++++++++++++++++++++++++++++++++++
+ include/hw/mips/mips.h               |   3 +
+ target/mips/cpu.h                    |  28 ++
+ target/mips/internal.h               |   2 +
+ target/mips/kvm.c                    | 212 +++++++++
+ target/mips/machine.c                |   6 +-
+ target/mips/mips-defs.h              |   7 +-
+ target/mips/translate.c              |   2 +
+ target/mips/translate_init.inc.c     |  84 ++++
+ 18 files changed, 1281 insertions(+), 11 deletions(-)
+ create mode 100644 hw/mips/common.c
+ create mode 100644 hw/mips/mips_loongson3.c
+--
+2.7.0
 
