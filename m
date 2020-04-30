@@ -2,67 +2,95 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39418C47247
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 20:22:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1C1AC4724C
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 20:31:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D8352076D
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 20:22:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D8352076D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id A4FC220731
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 20:31:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Wmfnq2wP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4FC220731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUFhT-00016B-2F
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 16:22:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47850)
+	id 1jUFqd-0007Ku-MO
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 16:31:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43620)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jUFdG-0006TS-CI
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 16:19:12 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jUFoH-0005SQ-RG
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 16:29:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jUFd4-0003d3-67
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 16:18:05 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:24657)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jUFd0-0003Sy-Fx; Thu, 30 Apr 2020 16:17:53 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id A9329746351;
- Thu, 30 Apr 2020 22:17:45 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 77B29746344; Thu, 30 Apr 2020 22:17:45 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 7628774633E;
- Thu, 30 Apr 2020 22:17:45 +0200 (CEST)
-Date: Thu, 30 Apr 2020 22:17:45 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: =?ISO-8859-15?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>
-Subject: Re: About hardfloat in ppc
-In-Reply-To: <87d07okdfh.fsf@linaro.org>
-Message-ID: <alpine.BSF.2.22.395.2004302158330.13881@zero.eik.bme.hu>
-References: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
- <87lfmhl0xa.fsf@linaro.org>
- <alpine.BSF.2.22.395.2004271212520.94232@zero.eik.bme.hu>
- <87imhlkwun.fsf@linaro.org>
- <CAE2XoE9hiw-ri66_xp3qNa5_Wx8ZfsQB9mqJdYR8VRm-KW830g@mail.gmail.com>
- <87ftcoknvu.fsf@linaro.org>
- <alpine.BSF.2.22.395.2004301648440.29315@zero.eik.bme.hu>
- <87d07okdfh.fsf@linaro.org>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (envelope-from <richard.henderson@linaro.org>) id 1jUFnI-0007D7-FP
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 16:29:29 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:34732)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jUFnH-00078w-CL
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 16:28:27 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id h12so3921431pjz.1
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 13:28:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=A7+ZVS0TOmcdhqvub3gm3KVAHgp6kudxQV8JsTnJ9XI=;
+ b=Wmfnq2wPdEbkQp/jzzBAk10/Z+jFw7VxtTpiBaKcb64g7chuXSmdPNXL+JL0TlAAdf
+ pCtXLbflEintzNspNhspHxfBOUd5PHVv8N1M6OI4ACQpFjDRl2L5JzrBFEl8dxZ7T/V+
+ eifG2434/cWGlkQgkXRT1VUnUT6t56O4FI5SMZ1FNHZBPjWG5BZFkfpdDCj7ZhVhKE8E
+ KmufgMEzbWUW6B04ewL4hr+coFK3pK2G8o7v1vI04l/gCDmo/mIwD/hDCSLPAgzRIrS3
+ nFUyzWTHs3yHcgzHKO6TMDk4BoRcKwzugJcvaUivcVpOjO7iaWJlcelxb86qDGsIXOSi
+ b4kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=A7+ZVS0TOmcdhqvub3gm3KVAHgp6kudxQV8JsTnJ9XI=;
+ b=bskxafzse+PgaZwBhClrEts/OfdmlO9WN9SnHkeWj+TqbnKzktVQt+GLIEftp5Mfd+
+ AZcpnN0eoarg6ofFSPfAHNnbeiki/NBsCrfi8pDFm0dPHVg4xYgCpb35drPGJAL64Url
+ bJ2/0jvgOiTLaI/qYmkHJ+H6jc6A+wZBF35hztQrxyHOMbzD/1FaiEsUCZORKbFpB3EK
+ TN3pOCX2lVQ8S22cs/JQl82lrrV2qcp8BFmczBj42Gfz1GalaoFI0vtNcn1BHa3KsH2E
+ AEZo00JGrkidG52Zvk7SvUi16w9l+1IcKHmmCqH9ZByT8Np5hw/vuVjV0nAdBCfqXTPN
+ ODFg==
+X-Gm-Message-State: AGi0PubFNL/GBevUKK3Eg6EcZ0H/az075snJ+Gn/p4c6aYf5Q9G7AT10
+ OOGIvOIYkhXlN/vmgLezkbG4sNgQhmo=
+X-Google-Smtp-Source: APiQypI4t6tzq7y8P1kkLEbRTwoTCvAaq7t5aEuJ7VRGWNy3EtZRUr9i/TWiyMVUTZ63mcT+WZsqMg==
+X-Received: by 2002:a17:90a:24e6:: with SMTP id
+ i93mr698545pje.13.1588278505094; 
+ Thu, 30 Apr 2020 13:28:25 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
+ by smtp.gmail.com with ESMTPSA id l1sm507127pgn.66.2020.04.30.13.28.23
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 30 Apr 2020 13:28:24 -0700 (PDT)
+Subject: Re: [PATCH 20/36] target/arm: Convert Neon 3-reg-same
+ VQRDMLAH/VQRDMLSH to decodetree
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200430181003.21682-1-peter.maydell@linaro.org>
+ <20200430181003.21682-21-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7c8d148d-8980-ad8b-da32-008a0e6f81be@linaro.org>
+Date: Thu, 30 Apr 2020 13:28:22 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="3866299591-968743997-1588277865=:13881"
-Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
- helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 16:17:46
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Received-From: 152.66.115.2
+In-Reply-To: <20200430181003.21682-21-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::1041
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,131 +102,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: luoyonggang@gmail.com, "Emilio G . Cota" <cota@braap.org>,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On 4/30/20 11:09 AM, Peter Maydell wrote:
+> These don't use do_3same() because they want to
+> operate on VFP double registers, whose offsets are different from the
+> neon_reg_offset() calculations do_3same does.
 
---3866299591-968743997-1588277865=:13881
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8BIT
+Actually, no, it's an around the bush way of computing the same register offset.
 
-On Thu, 30 Apr 2020, Alex Bennée wrote:
-> BALATON Zoltan <balaton@eik.bme.hu> writes:
->> On Tue, 28 Apr 2020, Alex Bennée wrote:
->>> 罗勇刚(Yonggang Luo) <luoyonggang@gmail.com> writes:
->>>> I am confusing why only  inexact  are set then we can use hard-float.
->>>
->>> The inexact behaviour of the host hardware may be different from the
->>> guest architecture we are trying to emulate and the host hardware may
->>> not be configurable to emulate the guest mode.
->>>
->>> Have a look in softfloat.c and see all the places where
->>> float_flag_inexact is set. Can you convince yourself that the host
->>> hardware will do the same?
->>
->> Can you convince me that it won't? This all seems to be guessing
->> without evidence so I think what we need first is some tests to prove
->> it either way. Such tests could then also be used at runtime to decide
->> if the host and guest FPU are compatible enough to enable hardfloat.
->> Are such tests available somewhere or what would need to be done to
->> implement them?
->
-> I seem to recall it comes down to the various approaches that FPUs can
-> take when dealing with tiny numbers when rounding. Emilio did the
-> original work so I've CC'd him. The original paper is referenced in the
-> hardfloat commentary:
->
-> Guo, Yu-Chuan, et al. "Translating the ARM Neon and VFP instructions in a
-> binary translator." Software: Practice and Experience 46.12 (2016):1591-1615.
->
-> which is worth a read if you can get hold of it.
->
-> Running tests on start up is not without precedent. We have a
-> softfloat_init which checks for a broken FMA implementation. However I'd
-> caution about adding too many checks in there.
+vfp_reg_offset(true, reg)
 
-Sure the runtime check should be quick so likely the approach would be to 
-write detailed tests to profile different FPU implementations then only 
-include one quick check to tell at runtime if we're running on a known 
-good host. Maybe if someone knows the different FPUs can tell this without 
-tests but I don't know and finding out from docs seems more work than 
-determining it empirically by testing. Does someone have some hints on 
-what operations should be tested to check for different inexact handling 
-in different FPUs?
+->  vfp.zregs[reg >> 1].d[reg & 1];
 
->> This may not solve the problem with PPC target with non-cumulative
->> status bits but could improve hardfloat performance at least for some
->> host-guest combinations. To see if it worth the effort we should run
->> such test on common combinations (say x86_64. ARM and PPC hosts with
->> at least these guests).
->
-> We already enable hardfloat for all hosts apart from PPC and FAST_MATHS.
+neon_reg_offset(reg, 0)
 
-Only if inexact is set which may be common but still not using softfloat 
-ar all if host's implementation is good for guest could be even faster.
+->  vfp_reg_offset(false, 2 * reg + 0)
+->  vfp.zregs[(2 * reg) >> 2].d[((2 * reg) >> 1) & 1]
+    + ((2 * reg) & 1) * offsetof(lower/upper)
+->  vfp.zregs[reg >> 1].d[reg & 1] + 0
 
->>>> And PPC always clearing inexact  flag before calling to soft-float
->>>> funcitons. so we can not
->>>> optimize it with hard-float.
->>>> I need some resouces about ineact flag and why always clearing inexcat in
->>>> PPC FP simualtion.
->>>
->>> Because that is the behaviour of the PPC floating point unit. The
->>> inexact flag will represent the last operation done.
->>
->> More precisely additional to the usual cumulative (or sticky) bits
->> there are two non-sticky bits for inexact and rounded (latter of which
->> is not emulated) that currently need clearing FP status before every
->> FP op.
->
-> Thanks for the clarification.
->
->> I wonder if we can know when the guest reads these and rerun
->> the last FP op in softfloat to compute them only if these are read,
->> then it's enough to remember the last FP op. This could be relatively
->> simple and may be used even if we don't detect accessing the bits
->> within FPSCR just accessing the FPSCR as likely most guest code does
->> not check that and any cross-platform code won't check PPC specific
->> non-sticky bits so I'd exepect most guest code to be fine with
->> hardfloat.
->
-> You could go further if you know nothing in a block can fault you can
-> skip the calculation overhead of the per-op flags for all but the last
-> op in the block.
 
-I think that's an additional optimisation that could be done once the 
-simple case of just rerunning last op if flags are accessed works. Just to 
-keep complexity low first then try more complex solution. (Although I'm 
-not planning to try to do this so whatever complexity can be handled by 
-whom will implement it is fine but less complexity means less bugs so I'd 
-go for simple first.)
-
->> Although what about FP exceptions? We also need to revert
->> to softfloat it FP exceptions are enabled so maybe using host FP
->> exception for managing status bits could be the way to go to let
->> hardware manage this and we don't need to implement everything in
->> software.
->
-> Well for all apart from inexact handling (which would fault as soon as
-> set) all other exception types are detected before we pass them to
-> hardfloat anyway. Given the range of NaN types we would have to post
-> process and hardfloat operation anyway to give the right NaN.
-
-Is checking for those exceptions beforehand really needed? Wouldn't it be 
-easier to install an exception handler and let the hardware do those 
-checks? It this is again done because of FPU implemenation differences but 
-inexact is determined by looking at the FP status (that's why it's cleared 
-on PPC) then that means that we always use the hosts inexact semantics and 
-don't emulate guest correctly anyway, so we can skip the tests above. Then 
-why can't we install an exception handler and set guest bits whenever 
-that's raised?
-
-Regards,
-BALATON Zoltan
---3866299591-968743997-1588277865=:13881--
+r~
 
