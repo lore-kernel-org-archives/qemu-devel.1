@@ -1,94 +1,136 @@
 Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A7CEC47247
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 17:14:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FB8EC47247
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 17:26:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F7B52064A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 17:14:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B22520787
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 17:26:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="eIvM22Xt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F7B52064A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="xubuCtWA";
+	dkim=pass (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="UEllvYfG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B22520787
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUCl5-0007As-83
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 13:13:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55536)
+	id 1jUCwr-0001ck-8q
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 13:26:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56844)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ani@anisinha.ca>) id 1jUCk1-0006dz-7w
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 13:13:17 -0400
+ (envelope-from <steplong@quicinc.com>) id 1jUCtr-0000V2-5G
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 13:25:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <ani@anisinha.ca>) id 1jUCjq-0005Sh-Od
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 13:12:52 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:39323)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1jUCjq-0005RE-6u
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 13:12:42 -0400
-Received: by mail-wm1-x342.google.com with SMTP id y24so2845486wma.4
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 10:12:41 -0700 (PDT)
+ (envelope-from <steplong@quicinc.com>) id 1jUCra-00044g-I1
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 13:23:01 -0400
+Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:33033)
+ by eggs.gnu.org with esmtps (TLS1.2:RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <steplong@quicinc.com>)
+ id 1jUCrZ-00044K-Ph; Thu, 30 Apr 2020 13:20:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1588267241; x=1619803241;
+ h=from:to:cc:subject:date:message-id:mime-version;
+ bh=qJ0GeMmzwM/vss84ujr6XTDfPkq1AClSikuCcLAWEqU=;
+ b=xubuCtWAdJ6zltbO9qQiluAwaPgKxY87KeNY633rOVQD1m1FQDEUnqrA
+ QXqBP+k6tDPiLo27clz0c8eglHTjBv/SnUaftXXFqAE99TbH7XzTDHYdU
+ THMwqvykBXruf6jwEXWMUNRYu96DYhyhJBJkE5tQSQ6Xmu+TTEZD5Od9o 0=;
+Received: from unknown (HELO ironmsg02-sd.qualcomm.com) ([10.53.140.142])
+ by alexa-out-sd-01.qualcomm.com with ESMTP; 30 Apr 2020 10:20:39 -0700
+Received: from nasanexm01c.na.qualcomm.com ([10.85.0.83])
+ by ironmsg02-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
+ 30 Apr 2020 10:20:40 -0700
+Received: from APSANEXR01E.ap.qualcomm.com (10.85.0.38) by
+ NASANEXM01C.na.qualcomm.com (10.85.0.83) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Thu, 30 Apr 2020 10:20:38 -0700
+Received: from nasanexm03g.na.qualcomm.com (10.85.0.49) by
+ APSANEXR01E.ap.qualcomm.com (10.85.0.38) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Thu, 30 Apr 2020 10:20:35 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (199.106.107.6)
+ by nasanexm03g.na.qualcomm.com (10.85.0.49) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2 via Frontend Transport; Thu, 30 Apr 2020 10:20:35 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XAqmvqh9ocM7GzojzloGfjq4SMzDAlz5b8uF/aDM2pseleZxYnjdAQbxuo42Quc64AZNPGUdRxnFR9VpMZIZvXhf8DidovtV4PUGQw6JA9ks+lr3cEruQ9/Twhc2/41oKRa6FtMG3bi4DPctRFEX/OmlioaAlLvy+yS1OVqwrsBM94YUArsztwisxIJp4Rc2XNt2WzDLyg4mSAL2WH9IVIzR1jzNROYlU11W/ys4k2VxV92IYo+kA8guF+MYa58XfFipBJgJxEYpPZq4ZyxgOiiFpQb4LCs8JZyCmPozlRC8aXM2Eajeywqu7QEqAiH6qrONcaZc5WJXwFmtwkoCtg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PFnUtkfFOBhzKsn03X8+Qx955CJDyM5Gu7K35ojpcvQ=;
+ b=L9MWjAQrm8hROiJ58rqB55Z2WrTcDKzWb+ZhADdJcdGCpI1LLR/9If7n3YwqpMolcjaBqhf2OAWPrRA+CQYUl7B0JBPCOn4panDJ05+7Hji9Rmxbt7eL2z9fGlZHrw35tBNyUpFRnrOGpzBd49y5glo50WoZCicaV1ewnt3uDZWh6njb0ucsVdwiRZqmMb+xKtZ/VhhGZ+cExodOs832BZfJrIhnH26vgQZMvwVDuRLjuvlaqiF5G0QdaLt30uFXHoSOoCZ0ZSeMBZNsd0nn7cYe7kcw80BaUqIKXH4moiyAjeMtbyGVhvQrMqaqrA3VxCMO4rBV+aozqVeqJOsQRg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
+ dkim=pass header.d=quicinc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=dyCi02HU4lMw6Td9Z3vxrZdwP6ujsprSmHgD5oNTtyY=;
- b=eIvM22XtuP4qiHr+ZUt16YUfJZLh71OCm8fC5KSjMH/2dms0noCPX2tYdVHe+E7dZc
- NfWp7yfhSxnbi11I1J97sCziPX0FdbHBpLugYD3WM8UlW8Tvgsf/Wl+lcTY83RoSYh4H
- alnBncjtw8ENJb1ItI5dnzEfO/fx/ndM82B3BF8hfbqF7SyWEQdeYxa9ZhqDpY6m9wDi
- qEBoAweakiGWMDlUSBJ7MddPyM4HfPIdeJFQMEDAxk+oYYOxjR21WI1bJ0ufYJre/vkP
- 7j2SFBgrRgUZZIAbFfK0hcOcEFi2yueYDqTIb9azCXg67EV7ookpL2uHDdaWgjGdJaX8
- M4Hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=dyCi02HU4lMw6Td9Z3vxrZdwP6ujsprSmHgD5oNTtyY=;
- b=t6q/VR2mnb7ps8IejrLaonUAWo7n8n8tCDBVCx5zaKbmRizw7LztaGlnU8cMOwck/B
- xHIqQ3R7Pn3MvCwTwdVHozChoREszizk8GaIgkV2oBZltPBx4LnqtoKa9MEXYc+UGcv9
- EjdW93pnE9ujqbtbuV9zhHpuL1TI6h93J3+cxV545v3grlE9+oAbJk9X3f1IaoW6ycnM
- BPyPcLNeaPVzdUYselBlkBZiwMCW8Wc0Z8EYxnH7pnJpUI7+YQj9pQBUcVxmkVTIGWT5
- wBfvXn4FtS65nIQIq+ouBeoSx5/KGqS4Xa1kXNfpDIe4n18LMdE+W9v/je/Q3CZ3UM2C
- sBKA==
-X-Gm-Message-State: AGi0PuZ7MxvVj4yF3i9LIvjBA+2gfRzBia6fNN/JqtIWsyPOmVdeWjuX
- 9+UfR+4AM8hmMwJRG0zR0yEbyo5k0LzQYT2EeizTQg==
-X-Google-Smtp-Source: APiQypLd+I1/by+2meugdJr+4X6TbCpaTy0cmrvlhnq0QHXKHmJmiChN4p4WLXxHcL33WAs2POc5XVpX5ignNwumcuk=
-X-Received: by 2002:a7b:c959:: with SMTP id i25mr4036875wml.20.1588266759048; 
- Thu, 30 Apr 2020 10:12:39 -0700 (PDT)
+ d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PFnUtkfFOBhzKsn03X8+Qx955CJDyM5Gu7K35ojpcvQ=;
+ b=UEllvYfGlk2tLdxap7gJkcWVHnFV+0eBgK1Vl0Cc8vnhqh3AMdLlwdWkan49+3phvIDAxG/HbkKNqCJqz7JMZAAbZQWBJaIRGYrQCeNZ2HWo9rvHnuZFInUTTCkLAElIHio1UjuM/geGnfs/cgsXxag7wompGhqz33sAQDuztz4=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=quicinc.com;
+Received: from MWHPR0201MB3547.namprd02.prod.outlook.com
+ (2603:10b6:301:7b::24) by MWHPR0201MB3482.namprd02.prod.outlook.com
+ (2603:10b6:301:76::31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13; Thu, 30 Apr
+ 2020 17:20:34 +0000
+Received: from MWHPR0201MB3547.namprd02.prod.outlook.com
+ ([fe80::10ad:5df5:d575:1f37]) by MWHPR0201MB3547.namprd02.prod.outlook.com
+ ([fe80::10ad:5df5:d575:1f37%3]) with mapi id 15.20.2937.028; Thu, 30 Apr 2020
+ 17:20:34 +0000
+From: Stephen Long <steplong@quicinc.com>
+To: <qemu-devel@nongnu.org>
+Subject: [PATCH RFC] target/arm: Implement SVE2 FLOGB
+Date: Thu, 30 Apr 2020 10:20:22 -0700
+Message-ID: <20200430172022.14886-1-steplong@quicinc.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain
+X-ClientProxiedBy: CH2PR07CA0018.namprd07.prod.outlook.com
+ (2603:10b6:610:20::31) To MWHPR0201MB3547.namprd02.prod.outlook.com
+ (2603:10b6:301:7b::24)
 MIME-Version: 1.0
-References: <20200428121837-mutt-send-email-mst@kernel.org>
- <CAARzgwwTo+r9xFge_XL_eu8-nsRFBFXEaQmTOhT1YHJifzfCJA@mail.gmail.com>
- <20200428164428-mutt-send-email-mst@kernel.org>
- <CAARzgwznhCPhGmwOxUBf_6bnFX7-Za7TxFMd999CARM+hDm8bA@mail.gmail.com>
- <20200429011228-mutt-send-email-mst@kernel.org>
- <544B4749-9A1C-44BB-BD89-C37A7E8D86F4@nutanix.com>
- <20200429025200-mutt-send-email-mst@kernel.org>
- <A69272ED-DDFF-4CC7-B12C-2994B004C013@nutanix.com>
- <20200429025535-mutt-send-email-mst@kernel.org>
- <B5DF1405-B261-4CE4-8484-F3738BE83E14@nutanix.com>
- <20200429033657-mutt-send-email-mst@kernel.org>
- <D4141715-B662-407A-8B4D-0EB64B41F6A1@nutanix.com>
-In-Reply-To: <D4141715-B662-407A-8B4D-0EB64B41F6A1@nutanix.com>
-From: Ani Sinha <ani@anisinha.ca>
-Date: Thu, 30 Apr 2020 22:42:27 +0530
-Message-ID: <CAARzgwyUd=k7FPJBjznJpzfKZu_0aqZUEK1rg77tnTNbcewe8A@mail.gmail.com>
-Subject: Re: [PATCH V2] Add a new PIIX option to control PCI hot unplugging of
- devices on non-root buses
-To: Ani Sinha <ani.sinha@nutanix.com>
-Content-Type: multipart/alternative; boundary="000000000000fb636a05a4852bb8"
-Received-SPF: none client-ip=2a00:1450:4864:20::342;
- envelope-from=ani@anisinha.ca; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::342
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from STEPLONG.na.qualcomm.com (108.176.222.2) by
+ CH2PR07CA0018.namprd07.prod.outlook.com (2603:10b6:610:20::31) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2958.20 via Frontend Transport; Thu, 30 Apr 2020 17:20:33 +0000
+X-Mailer: git-send-email 2.17.1
+X-Originating-IP: [108.176.222.2]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 686606f6-cb5e-4939-0a95-08d7ed2aca94
+X-MS-TrafficTypeDiagnostic: MWHPR0201MB3482:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <MWHPR0201MB348216DDCDD580BE007ED0F5C7AA0@MWHPR0201MB3482.namprd02.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:89;
+X-Forefront-PRVS: 0389EDA07F
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:MWHPR0201MB3547.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(346002)(396003)(366004)(376002)(136003)(39860400002)(86362001)(107886003)(6512007)(2906002)(6666004)(26005)(478600001)(66946007)(2616005)(52116002)(4326008)(66556008)(8936002)(16526019)(66476007)(8676002)(956004)(6506007)(316002)(6486002)(36756003)(6916009)(186003)(1076003)(5660300002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: V875X01MMVXfNGY99FfaVAtG4q+uhuloKU4QSNKq2U5GBYDfTMzrohlsGDv//QylVxGjYg0A9lL3tybHt/HVtpkM35R92hvKjqEeWAdKTDVfSxvj9mkp9uXiVMPWq6Qwv94xi+OE+h9UAOgCTkOof82fzwEK52ngT71X01H46S0xG2E6f9oDWJyoIhEOpLgSMzi2fm2CxNHos/FBXbr3EMC+0BaakpjrIx7OPiDixrJAGsnKW43NB/IPapfdxLOnb+dwBF1E4OntJ3K1vUe0uVdqQLKs5aOWM4gI0C/f3paI6IRnk2z6STX3OOpWYXGcXAvsCvlHOa55CZDXFYYKPSkSyobxO7Ger1E3Qwo0+vlfVB7ppA/3zFDS/iGuwiH3Vyu5L1RDdQRYYx6+RfV+HBUpWa0WByMjkRIkl6r25iJndIX9ovOAd0UZhJdoBcUr
+X-MS-Exchange-AntiSpam-MessageData: QknRsZDtnfW+Fgoy7RD2CdoI3HLKy7sPR14fnfW9B2hIjOLF+q/tN14A5PhZYU+D9XRlWkaY8ZTssLvSS7F/fC9+i5FwxivIdVw3wTwvxKiH2+gl8YetCnLyRJ/ZBxM+Dv0371MXZb/pHULBtUNChp2z7R0WTYfKCqgp8lqydV9SMeghnBADzi5Z1QzRwX5EJz9nclQMZSIEutNnaXIu+z8LLFwl09E2ebe6qUJuNDFz3xlaunm7b9/HqtpjQhi6WSCQVGXmVkz3TzhU+mUhqX/83Qe5ki6SXN6NHyQHQZTbscRlu44S6cRvVnb6eCL2HJgxfW9+cC42pmwwtgcoGj9DON93bZmHBawffIAVLRpvj6Senb6Kevi85rd5YtaFC9RfP0WJmy0reVsN2fj+a0l7dNWoYrJwVvmbAI3w3YQ5KlC2BoZgH7dYnma/mJLCBryHNtkRmyJpkx1x7msCzr7Ap9ntzzXPktc5Yc3C6tcViePSVlbhgZKuTi8PLLuQhbm0doreNgLPvXYZoZPi7Q8oIpupCfML6TocM9A4sJdDLKMNGNsH3RNkVjO5YEl0PzNG7EjlSI0QXH86x0rHjoSzE4F6YF1tBza4vuLuxauNiQyGBXXe/DPTHbGnIXsUuCwQvgibu9lpXGF5tyCCAzNhs2dXlvD+WKprBOrE32tjH4F3sBxSdbv1uOVctx0xG8gDZXh7GUnHCry2bOVtY0XUaB/VHxsZTR2NeRLUDQMrpxsTlPEjLB7tv/MzzdPVsB+oTaGPt7jRF3SWzuMBTjI3AVUnOYa6s7Os8+iMEGQ=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 686606f6-cb5e-4939-0a95-08d7ed2aca94
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2020 17:20:34.1472 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YK8Ye+DXFWmsx9zMMNWUtx9Xjq3VasMsm5o0+jHQ7nt8JaI7mEJ9CDHN58s1slHJ2fj23e/kEPuVavGyMzlXoQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR0201MB3482
+X-OriginatorOrg: quicinc.com
+Received-SPF: pass client-ip=199.106.114.38; envelope-from=steplong@quicinc.com;
+ helo=alexa-out-sd-01.qualcomm.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 12:28:45
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Received-From: 199.106.114.38
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,100 +142,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-arm@nongnu.org, richard.henderson@linaro.org, apazos@quicinc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000fb636a05a4852bb8
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Stephen Long <steplong@quicinc.com>
+---
 
-.
+Right now, there is no log2 function for half precision floats, so I'm
+not sure how to proceed. Currently, I just added a TODO comment.
 
+ target/arm/helper-sve.h    |  3 +++
+ target/arm/sve.decode      |  4 ++++
+ target/arm/sve_helper.c    |  3 +++
+ target/arm/translate-sve.c | 17 +++++++++++++++++
+ 4 files changed, 27 insertions(+)
 
-Accidental? So maybe what you need is actually something else then -
+diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
+index 0a62eef94e..aaa5fc33f9 100644
+--- a/target/arm/helper-sve.h
++++ b/target/arm/helper-sve.h
+@@ -2731,3 +2731,6 @@ DEF_HELPER_FLAGS_5(sve2_sqrdcmlah_idx_h, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_5(sve2_sqrdcmlah_idx_s, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_5(flogb_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(flogb_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+diff --git a/target/arm/sve.decode b/target/arm/sve.decode
+index 3cf824bac5..dcb095bb5d 100644
+--- a/target/arm/sve.decode
++++ b/target/arm/sve.decode
+@@ -1568,3 +1568,7 @@ SM4E            01000101 00 10001 1 11100 0 ..... .....  @rdn_rm_e0
+ # SVE2 crypto constructive binary operations
+ SM4EKEY         01000101 00 1 ..... 11110 0 ..... .....  @rd_rn_rm_e0
+ RAX1            01000101 00 1 ..... 11110 1 ..... .....  @rd_rn_rm_e0
++
++### SVE2 floating-point convert to integer
++
++FLOGB           01100101 00 011 esz:2 0101 pg:3 rn:5 rd:5  &rpr_esz
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index aa94df302a..aba9c064fb 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -4624,6 +4624,9 @@ DO_ZPZ_FP(sve_ucvt_dh, uint64_t,     , uint64_to_float16)
+ DO_ZPZ_FP(sve_ucvt_ds, uint64_t,     , uint64_to_float32)
+ DO_ZPZ_FP(sve_ucvt_dd, uint64_t,     , uint64_to_float64)
+ 
++DO_ZPZ_FP(flogb_s, float32, H1_4, float32_log2)
++DO_ZPZ_FP(flogb_d, float64,     , float64_log2)
++
+ #undef DO_ZPZ_FP
+ 
+ static void do_fmla_zpzzz_h(void *vd, void *vn, void *vm, void *va, void *vg,
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index a8e57ea5f4..9176b18bc9 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -8253,3 +8253,20 @@ static bool trans_RAX1(DisasContext *s, arg_rrr_esz *a)
+     }
+     return true;
+ }
++
++static bool trans_FLOGB(DisasContext *s, arg_rpr_esz *a)
++{
++    /* TODO: There is no support for log base 2 for half-precision floats */
++    static gen_helper_gvec_3_ptr * const fns[] = {
++        NULL,
++        gen_helper_flogb_s,
++        gen_helper_flogb_d,
++    };
++    if (a->esz == 0 || !dc_isar_feature(aa64_sve2, s)) {
++        return false;
++    }
++    if (sve_access_check(s)) {
++        do_ppz_fp(s, a, fns[a->esz - 1]);
++    }
++    return true;
++}
+-- 
+2.17.1
 
-avoid *removing* the device when it's powered down.
-
-
-You don=E2=80=99t get it. It is not hypervisor admins who are unplugging it=
-. It is
-the end users. Even RedHat customers want this feature. See following
-resources:
-https://www.redhat.com/archives/libvir-list/2020-February/msg00110.html
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1802592
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1790899
-
-My approach is much more fine grained than just disable everything approach
-that we have for q35. For i440fx we can do better than that
-
-
-By the way, here's another glaring feature disparity between i440fx and q35
-which we perhaps did not debate with as much fervour and push back as we
-debated here. When we implemented per slot hotplug disable for PCIE, we
-ignored to implement the same per slot capability for conventional PCI. Why
-was feature disparity across two machine types wasn't so much of an issue
-then?
-
-
-
-
-
-
---=20
-
-MST
-
---000000000000fb636a05a4852bb8
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div><div dir=3D"auto"></div></div><div><div dir=3D"ltr"><br></div><div dir=
-=3D"ltr">.</div><blockquote type=3D"cite"><div dir=3D"ltr"><blockquote type=
-=3D"cite"><span></span><br></blockquote><blockquote type=3D"cite"><span>Acc=
-idental? So maybe what you need is actually something else then -</span><br=
-></blockquote><blockquote type=3D"cite"><span>avoid *removing* the device w=
-hen it&#39;s powered down.</span><br></blockquote><span></span><br><span>Yo=
-u don=E2=80=99t get it. It is not hypervisor admins who are unplugging it. =
-It is the end users. Even RedHat customers want this feature. See following=
- resources: </span><br><span><a href=3D"https://www.redhat.com/archives/lib=
-vir-list/2020-February/msg00110.html" target=3D"_blank">https://www.redhat.=
-com/archives/libvir-list/2020-February/msg00110.html</a></span><br><span><a=
- href=3D"https://bugzilla.redhat.com/show_bug.cgi?id=3D1802592" target=3D"_=
-blank">https://bugzilla.redhat.com/show_bug.cgi?id=3D1802592</a></span><br>=
-<span><a href=3D"https://bugzilla.redhat.com/show_bug.cgi?id=3D1790899" tar=
-get=3D"_blank">https://bugzilla.redhat.com/show_bug.cgi?id=3D1790899</a></s=
-pan><br><span></span><br><span>My approach is much more fine grained than j=
-ust disable everything approach that we have for q35. For i440fx we can do =
-better than that</span><br></div></blockquote><div><br></div></div><div><di=
-v>By the way, here&#39;s another glaring feature disparity between i440fx a=
-nd q35 which we perhaps did not debate with as much fervour and push back a=
-s we debated here. When we implemented per slot hotplug disable for PCIE, w=
-e ignored to implement the same per slot capability for conventional PCI. W=
-hy was feature disparity across two machine types wasn&#39;t so much of an =
-issue then?=C2=A0</div><blockquote type=3D"cite"><div dir=3D"ltr"><span></s=
-pan><br><blockquote type=3D"cite"><span></span><br></blockquote><blockquote=
- type=3D"cite"><blockquote type=3D"cite"><blockquote type=3D"cite"><span></=
-span><br></blockquote></blockquote></blockquote><blockquote type=3D"cite"><=
-blockquote type=3D"cite"><blockquote type=3D"cite"><span></span><br></block=
-quote></blockquote></blockquote></div></blockquote></div><div><div dir=3D"a=
-uto"><blockquote type=3D"cite"><div dir=3D"ltr"><blockquote type=3D"cite"><=
-blockquote type=3D"cite"><blockquote type=3D"cite"><blockquote type=3D"cite=
-"><span></span><br></blockquote></blockquote></blockquote></blockquote><blo=
-ckquote type=3D"cite"><blockquote type=3D"cite"><blockquote type=3D"cite"><=
-blockquote type=3D"cite"><blockquote type=3D"cite"><span>-- </span><br></bl=
-ockquote></blockquote></blockquote></blockquote></blockquote><blockquote ty=
-pe=3D"cite"><blockquote type=3D"cite"><blockquote type=3D"cite"><blockquote=
- type=3D"cite"><blockquote type=3D"cite"><span>MST</span><br></blockquote><=
-/blockquote></blockquote></blockquote></blockquote><span></span><br></div><=
-/blockquote></div></div>
-
---000000000000fb636a05a4852bb8--
 
