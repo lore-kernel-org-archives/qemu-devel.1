@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88308C83001
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 05:37:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACCECC83001
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 05:38:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51FE62082E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 05:37:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 52D772082E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 05:38:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XuqWranx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51FE62082E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EmRS+yIw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52D772082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU1tT-0001Pu-Cj
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 01:37:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53396)
+	id 1jU1to-0001p2-Es
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 01:38:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53388)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jU1n6-000569-Os
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:31:27 -0400
+ (envelope-from <armbru@redhat.com>) id 1jU1n5-000554-SN
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:31:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jU1n0-0002f8-HL
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:31:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58243
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1jU1n0-0002ez-GY
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:31:19 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27589
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jU1mz-0002e2-VE
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:31:14 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jU1mz-0002dP-3e
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 01:31:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588224673;
+ s=mimecast20190719; t=1588224672;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QhFDFCVlXf2fynHvudzXt99A5jd5y61ssmROnXO7FA0=;
- b=XuqWranxCJGSg36QfjEY9nr5NNFIl8v70g+ed1qI2/6J44vVjCBIYcVm4PoxbcqQebuy7M
- stn2dsByVDhurZV2q8QUzJ67Tp4O9y1EAduuqV7f3m247hcJEAqWDkCMSrNf6Atdp2edZG
- 9z3Rgh4EPfbvE2eOoBGKSjg4zmwISdg=
+ bh=VhvFVi1XXgtR0UyjeDgG7qFZxWmVQcz/9VcWjv99jIw=;
+ b=EmRS+yIwOiKJEdB/lNFctD8jv5BoV5N11o3J8t9sNYEV5pRuJtjr6Z1s8z3xIcpGbvzyyW
+ F8NhBx+2XZ4C7ZOGuIznMhzsWZio7lFeOAXnMDksHrYcjhNSnh8Q1rPFeQL+En9HglFusb
+ CM9OAEbp5WtnPjhWjc/KoJRddvUoeW4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-141-l1WyHnspNV-bAODqC4Xj9A-1; Thu, 30 Apr 2020 01:31:10 -0400
-X-MC-Unique: l1WyHnspNV-bAODqC4Xj9A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-64-CivKsT7xOtC3hHxfjzq2gA-1; Thu, 30 Apr 2020 01:31:10 -0400
+X-MC-Unique: CivKsT7xOtC3hHxfjzq2gA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 699E61005510
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6AAE746B
  for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 05:31:09 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3710E5D787;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 39F601001920;
  Thu, 30 Apr 2020 05:31:09 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0C88311358CC; Thu, 30 Apr 2020 07:31:05 +0200 (CEST)
+ id 0FAFE11358CD; Thu, 30 Apr 2020 07:31:05 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 15/20] qapi: Clean up visitor's recovery from input with
- invalid type
-Date: Thu, 30 Apr 2020 07:30:59 +0200
-Message-Id: <20200430053104.32204-16-armbru@redhat.com>
+Subject: [PULL 16/20] qapi: Assert non-input visitors see only valid alternate
+ tags
+Date: Thu, 30 Apr 2020 07:31:00 +0200
+Message-Id: <20200430053104.32204-17-armbru@redhat.com>
 In-Reply-To: <20200430053104.32204-1-armbru@redhat.com>
 References: <20200430053104.32204-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 23:34:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:04:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,40 +96,37 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 An alternate type's visit_type_FOO() fails when it runs into an
-invalid ->type.  If it's an input visit, we then need to free the the
-object we got from visit_start_alternate().  We do that with
-qapi_free_FOO(), which uses the dealloc visitor.
+invalid ->type.
 
-Trouble is that object is in a bad state: its ->type is invalid.  So
-the dealloc visitor will run into the same error again, and the error
-recovery skips deallocating the alternate's (invalid) alternative.
-Works, because qapi_free_FOO() ignores the error.
+This is appropriate with an input visitor: visit_start_alternate()
+sets ->type according to the input, and bad input can lead to bad
+->type.
 
-Avoid it instead: free the messed up object with by g_free().
+It should never happen with an output, clone or dealloc visitor: if it
+did, the alternate being output, cloned or deallocated would be messed
+up beyond repair.  Assert that.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20200424084338.26803-11-armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20200424084338.26803-12-armbru@redhat.com>
 ---
- scripts/qapi/visit.py | 3 +++
- 1 file changed, 3 insertions(+)
+ scripts/qapi/visit.py | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
-index e3467b770b..678109dfb5 100644
+index 678109dfb5..d5d7a1031f 100644
 --- a/scripts/qapi/visit.py
 +++ b/scripts/qapi/visit.py
-@@ -234,6 +234,9 @@ void visit_type_%(c_name)s(Visitor *v, const char *name=
+@@ -232,6 +232,7 @@ void visit_type_%(c_name)s(Visitor *v, const char *name=
 , %(c_name)s **obj, Error
+     case QTYPE_NONE:
+         abort();
      default:
++        assert(visit_is_input(v));
          error_setg(&err, QERR_INVALID_PARAMETER_TYPE, name ? name : "null"=
 ,
                     "%(name)s");
-+        /* Avoid passing invalid *obj to qapi_free_%(c_name)s() */
-+        g_free(*obj);
-+        *obj =3D NULL;
-     }
- out_obj:
-     visit_end_alternate(v, (void **)obj);
+         /* Avoid passing invalid *obj to qapi_free_%(c_name)s() */
 --=20
 2.21.1
 
