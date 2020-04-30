@@ -2,71 +2,89 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1BE8C8300B
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:35:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67753C8300A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:36:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73AC7214D8
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:35:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73AC7214D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 281FF20838
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 10:36:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BggxQBNP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 281FF20838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU6Xb-000667-BD
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 06:35:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52582)
+	id 1jU6YF-0006yy-61
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 06:36:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54120)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1jU6JO-0001Ii-MP
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:20:59 -0400
+ (envelope-from <berrange@redhat.com>) id 1jU6Wv-0005nO-O2
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:34:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1jU6JN-00034E-7U
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:20:57 -0400
-Received: from mga17.intel.com ([192.55.52.151]:9548)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1jU6JM-00033n-Ll
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:20:56 -0400
-IronPort-SDR: GBCzgmAWUhkcRP+RVo38UxCHK0z+jjygNpzv4VjVmiOvaQcWZTT1sj8vpI40tNuLKk2BasdHz/
- KvfYeeYTHV0A==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 30 Apr 2020 03:20:54 -0700
-IronPort-SDR: zJusH0GJhBdNXadHmGH5cgeAI09T5lIOzQ0XCm/MlicRs7d8+ukVSmlGav1AVBUk5jKhUTNqm0
- GRsaAXhoaksw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,334,1583222400"; d="scan'208";a="282814909"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.16])
- by fmsmga004.fm.intel.com with ESMTP; 30 Apr 2020 03:20:52 -0700
-Date: Thu, 30 Apr 2020 06:11:09 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v6 1/3] memory: drop guest writes to read-only ram device
- regions
-Message-ID: <20200430101108.GR12879@joy-OptiPlex-7040>
-References: <20200430080744.31232-1-yan.y.zhao@intel.com>
- <20200430080946.31286-1-yan.y.zhao@intel.com>
- <CAFEAcA-8NH_4ZV0J9urBZdQWmqOe-Nyy4y2gLAjTJ08MpfFY0g@mail.gmail.com>
+ (envelope-from <berrange@redhat.com>) id 1jU6Wu-0005br-1K
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:34:57 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20868
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jU6Wt-0005bk-Iw
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 06:34:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588242894;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=aezKVauiUB33eCn1QG7NpnGTzrOUwf3IA3Rp0Jxx93Q=;
+ b=BggxQBNP67F8xl7SA7YURNjD0PeMDWot0NnVwkhjIFR9hUDBoxw3jot/4hjibs6fJ5YJPI
+ TiXn5CZCapq7jlsjor+Ny0ugQMlyV1dnVkPw0KeJCHFbxwMLa6rQh1kpcXqC2MFFVfy+4a
+ v6/um/vwWiS3SIxvxKlb9+z5QAObK7E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-455-w7JcFPQ8OZ6XLgvEC2K5Hw-1; Thu, 30 Apr 2020 06:34:47 -0400
+X-MC-Unique: w7JcFPQ8OZ6XLgvEC2K5Hw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D9931005510;
+ Thu, 30 Apr 2020 10:34:46 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.44])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E2D0D60BF4;
+ Thu, 30 Apr 2020 10:34:40 +0000 (UTC)
+Date: Thu, 30 Apr 2020 11:34:37 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: Configuring onboard devices (was: Failing property setters +
+ hardwired devices + -global = a bad day)
+Message-ID: <20200430103437.GI2084570@redhat.com>
+References: <87mu6uia5i.fsf@dusky.pond.sub.org>
+ <20200429155719.GL1495129@redhat.com>
+ <87k11xh2kq.fsf@dusky.pond.sub.org>
+ <CAFEAcA9-oxkMD-kJ1z12d4K1S_Jaz7Wj6_38Ah7ChSaBfQNkkA@mail.gmail.com>
+ <87tv11e1en.fsf_-_@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <87tv11e1en.fsf_-_@dusky.pond.sub.org>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAFEAcA-8NH_4ZV0J9urBZdQWmqOe-Nyy4y2gLAjTJ08MpfFY0g@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-Received-SPF: pass client-ip=192.55.52.151; envelope-from=yan.y.zhao@intel.com;
- helo=mga17.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 06:20:54
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Received-From: 192.55.52.151
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:31:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,105 +96,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>, "Zeng, Xin" <xin.zeng@intel.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Apr 30, 2020 at 05:40:25PM +0800, Peter Maydell wrote:
-> On Thu, 30 Apr 2020 at 09:20, Yan Zhao <yan.y.zhao@intel.com> wrote:
+On Thu, Apr 30, 2020 at 12:03:12PM +0200, Markus Armbruster wrote:
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>=20
+> > On Thu, 30 Apr 2020 at 08:09, Markus Armbruster <armbru@redhat.com> wro=
+te:
+> >> Our means to configure onboard devices are weak.  We sidestepped this
+> >> for isa-fdc by taking it off the board, and thus make -device work.
 > >
-> > for ram device regions, drop guest writes if the region is read-only.
+> > This seems to be a general dynamic: the x86 pc machine works
+> > via -device options (or is changed so it can work that way);
+> > and then people propose dropping/deprecating/etc the config
+> > options that work with onboard devices, without providing
+> > clear solutions/instructions on how the command line needs
+> > to change/etc for the mass of boards which are not the x86
+> > pc machine and which do have a lot of onboard devices which
+> > can't be handled via -device.
 > >
-> > Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
-> > Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > Signed-off-by: Xin Zeng <xin.zeng@intel.com>
-> > ---
-> >  memory.c | 15 ++++++++++++---
-> >  1 file changed, 12 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/memory.c b/memory.c
-> > index 601b749906..a1bba985b9 100644
-> > --- a/memory.c
-> > +++ b/memory.c
-> > @@ -34,6 +34,7 @@
-> >  #include "sysemu/accel.h"
-> >  #include "hw/boards.h"
-> >  #include "migration/vmstate.h"
-> > +#include "qemu/log.h"
-> >
-> >  //#define DEBUG_UNASSIGNED
-> >
-> > @@ -1307,12 +1308,19 @@ static uint64_t memory_region_ram_device_read(void *opaque,
-> >      return data;
-> >  }
-> >
-> > -static void memory_region_ram_device_write(void *opaque, hwaddr addr,
-> > -                                           uint64_t data, unsigned size)
-> > +static MemTxResult memory_region_ram_device_write(void *opaque, hwaddr addr,
-> > +                                                  uint64_t data, unsigned size,
-> > +                                                  MemTxAttrs attrs)
-> >  {
-> >      MemoryRegion *mr = opaque;
-> >
-> >      trace_memory_region_ram_device_write(get_cpu_index(), mr, addr, data, size);
-> > +    if (mr->readonly) {
-> > +        qemu_log_mask(LOG_GUEST_ERROR,
-> > +                      "Invalid write to read-only ram device region addr 0x%"
-> > +                      HWADDR_PRIx" size %u\n", addr, size);
-> > +        return MEMTX_ERROR;
-> > +    }
-> 
-> This does not "drop" a write to a r/o region -- it causes it to generate
-> whatever the guest architecture's equivalent of a bus error is (eg data
-> abort on Arm).
->
-hmm, I'm not sure. so your expectation is silently dropping guest writes
-without any bus error, right?
-
-> More generally, this change seems a bit odd: currently we do not
-> check the mr->readonly flag here, but in general guests don't get
-> to write to ROM areas. Where is that check currently done, and
-it's not a ROM, but a ram region backed by a device. we wish this region
-to be read-only sometimes, in order to implement some useful features.
-It can be a virtual BAR region in a virtual mdev device.
-
-> should the vfio case you're trying to fix do its check in whatever
-> the equivalent of that place is? Alternatively, if we want to make
-> memory_region_ram_device_write() do the check, does that mean we
-> now have unnecessary checks elsewhere.
-currently, vfio implements the BAR regions in two types:
-1. non-mmap'd,  meaning this region will not be added into kvm memory
-slots, and whenever guest accesses it, it will be trapped into a host
-handler. we do the read-only check in patch 2 of this series.
-2. mmap'd, meaning this region will be added into kvm memory slots, and
-guest could access it without any hypervisor intervening.
-so without patch 3 in the series, there's no write protection to guest
-writes.
-after setting this mmap'd region to read-only in patch 3, the
-corresponding memory slot in kvm is set to read-only, so only guest
-writes would be trapped into host, i.e. into the
-memory_region_ram_device_write(). guest reads is still within the guest
-without hypervisor intervening.
+> > So my gut reaction to the "we should deprecate -global"
+> > suggestions in this thread was a bit "here we go again"...
+> > What works for x86 or even "what is sufficient for libvirt"
+> > doesn't necessarily cover all the cases.
+>=20
+> Such shortsighted proposals have been made, but don't think it's what
+> we're doing here.
+>=20
+> You're 100% right in that we do need to configure onboard devices.
+> -global is a terrible way to do it, though: it applies to *all* devices
+> of a kind.  What if the board has more than one?  What if the can add
+> more?
 
 
-> 
-> My guess is that memory_region_ram_device_write() isn't the
-> right place to check for read-only-ness, because it only applies
-> to RAM-backed MRs, not to any other kind of MR which might equally
-> be readonly.
->
-there might be other MRs that require checking of read-only-ness.
-but their handlers have the right to be called to know it has happened,
-and they might want to do some special handling of it. That's why I did
-not put the check in general dispatcher.
+> Any better ideas for letting users configure onboard devices?
 
-Thanks
-Yan
+All the devices in QEMU form a tree, as reported by "info qtree".
+So, IIUC, the challenge is to provide a way to uniquely identify
+any node in the tree.
+
+Devices configured by the user/mgmt app will have an "id" property
+but most built-in devices will not have any "id". In addition even
+user configured devices may create multiple sub-nodes in the tree
+without "id" parameters.
+
+Uniquely referencing nodes in a tee is a solved problem though,
+even without "id" parameters. The XPath query languages shows
+this for XML.
+
+-global defines a query language based on the object type, and
+property name which is insufficiently flexible
+
+-set defines a query language based on the object type and ID
+value and property name(s) which is again insufficiently flexible.
+
+
+We "merely" need a new query language targetted to QEMU's qtree
+structure, which we can expose in the CLI that gives unique access
+to every possible property.
+
+Here is the truncated 'info qtree' for a running guest of mine:
+
+bus: main-system-bus
+  type System
+  dev: kvm-ioapic, id ""
+    gpio-in "" 24
+    gsi_base =3D 0 (0x0)
+    mmio 00000000fec00000/0000000000001000
+  dev: i440FX-pcihost, id ""
+    pci-hole64-size =3D 2147483648 (2 GiB)
+    short_root_bus =3D 0 (0x0)
+    x-pci-hole64-fix =3D false
+    bus: pci.0
+      type PCI
+      dev: virtio-balloon-pci, id "balloon0"
+        disable-legacy =3D "off"
+        disable-modern =3D true
+        class =3D 255 (0xff)
+        virtio-pci-bus-master-bug-migration =3D false
+        migrate-extra =3D false
+        modern-pio-notify =3D false
+        x-disable-pcie =3D true
+        page-per-vq =3D true
+        x-ignore-backend-features =3D true
+        ats =3D false
+        x-pcie-deverr-init =3D false
+        x-pcie-lnkctl-init =3D false
+        x-pcie-pm-init =3D false
+        addr =3D 08.0
+        romfile =3D ""
+        rombar =3D 1 (0x1)
+        multifunction =3D false
+        command_serr_enable =3D true
+        x-pcie-lnksta-dllla =3D true
+        x-pcie-extcap-init =3D false
+        class Class 00ff, addr 00:08.0, pci id 1af4:1002 (sub 1af4:0005)
+        bar 0: i/o at 0xc100 [0xc11f]
+        bus: virtio-bus
+          type virtio-pci-bus
+          dev: virtio-balloon-device, id ""
+            deflate-on-oom =3D false
+            free-page-hint =3D false
+            qemu-4-0-config-size =3D false
+            iothread =3D ""
+            indirect_desc =3D true
+            event_idx =3D true
+            notify_on_empty =3D true
+            any_layout =3D true
+            iommu_platform =3D false
+            use-started =3D false
+
+
+Consider the problem is to set the "deflate-on-oom" property on
+the balloon device.
+
+To uniquely identify this we can have a string:
+
+ /dev[1]/bus[pci/0]/dev[id=3Dballoon0]/bus[virtio-bus]/dev[0]/deflate-on-oo=
+m=3Dtrue
+
+If we consider that "id" values are unique, we can allow a simplication
+by omitting everything before that part of the match - "//" could indicate
+an omitted part like XPath allows, so we'd get
+
+ //dev[id=3Dballoon0]/bus[virtio-bus]/dev[0]/deflate-on-oom=3Dtrue
+
+There's only one bus, and one dev on that bus, so knowing this we can
+simplify a bit more and still be a unique query, to get this:
+
+ //dev[id=3Dballoon0]/bus/dev/deflate-on-oom=3Dtrue
+
+Or even allow use of "//" in the middle too:
+
+ //dev[id=3Dballoon0]//deflate-on-oom=3Dtrue
+
+Which conceptually says
+
+   "find the device with id balloon0 and set the property 'deflate-on-oom'
+   on the first child node in the qtree that hsa such a property name"
+
+I didn't say this would be pretty, and of course no one would seriously
+use this syntax for the virtio-balloon device, as you'd just set the
+property with -device. It should work for the many built-in devices
+though.
+
+Now just provide a new CLI arg
+
+ $QEMU -qtree //dev[id=3Dballoon0]//deflate-on-oom=3Dtrue
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
