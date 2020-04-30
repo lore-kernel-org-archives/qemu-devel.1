@@ -2,81 +2,86 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A0C6C83000
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:34:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88867C83000
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:35:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06B2D2074A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:34:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 527F82072A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:35:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FO/YRiAV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06B2D2074A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fP1tOKRY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 527F82072A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUAGf-0006Y7-4a
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 10:34:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:32782)
+	id 1jUAHQ-0007l1-EM
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 10:35:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32998)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jUAAn-0007SU-8Y
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:28:21 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jUADO-0002V3-Bj
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:31:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jUAAm-000280-GC
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:28:21 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31602
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jUAAm-00027P-2Q
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:28:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588256899;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=D3NDqY9iYUwSNrMxhEPHeLXcS2HUK/obqcYknF5lCng=;
- b=FO/YRiAVoIHjgoksn/z2QYB7o5Z6Zy3jZi6b36zCKDc2dJdeabDIeZYSlGQjLq30lffEYs
- 1qWkpLZfPOmaDon/0h2kF1a76uDZBBoRYeW1+gX71RkeMFoHBBHQt5A8njMRTSsDOUx4Ur
- x/lsTFjSuUUa5ggNZr/8P5PGt0J7pYw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-1-Zx88ScFCNLuU_ug8aPUkrQ-1; Thu, 30 Apr 2020 10:28:15 -0400
-X-MC-Unique: Zx88ScFCNLuU_ug8aPUkrQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 503E21054F97;
- Thu, 30 Apr 2020 14:28:13 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-114-60.ams2.redhat.com [10.36.114.60])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D17CD610AF;
- Thu, 30 Apr 2020 14:28:11 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2 3/4] backup: Make sure that source and target size match
-Date: Thu, 30 Apr 2020 16:27:54 +0200
-Message-Id: <20200430142755.315494-4-kwolf@redhat.com>
-In-Reply-To: <20200430142755.315494-1-kwolf@redhat.com>
-References: <20200430142755.315494-1-kwolf@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jUADN-0004VZ-DJ
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:31:01 -0400
+Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:38910)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jUADM-0004VG-Rw
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:31:00 -0400
+Received: by mail-oi1-x236.google.com with SMTP id r66so5376984oie.5
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 07:31:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=NHD91EekjA4FnySoclVbZTrHcjjYTAnxnQgllmLVEnU=;
+ b=fP1tOKRYahbWS9fZACLPwrXVVJ1KY6bNz2m9S1AXzgkpn7VjPW5Hc/TogU08d17OiD
+ LaqzziRFD3NPocDa+dGigaK6Xks7wSXkbup6NaCTPkh37M85pfC/9vw7qS1gGzc8mFHS
+ CQikFxb4UMdHBoWgocUE3/1IhGU9xSlPwO5W5ykN+8zJPi++Fj7YKZmZoW3WKbU1kGN6
+ 2Swgtwf+VDm5RMai7suRWbSFeGQdskYLpzWK9iMgkLE88MZoOn7ibpvaVHM7n1Txck1s
+ d/QymLc0BCYPVSH9+15F203IqKyO5lcAJKryVFJ7zAtRkLqVldDssHgd+u63L+QjmjcY
+ A05w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=NHD91EekjA4FnySoclVbZTrHcjjYTAnxnQgllmLVEnU=;
+ b=pZ/ZY3tkulLu0TQX792fxMw2c8+TytANs3hgTzQVHJ0ywaulpfOLkNUBPfKMPltL7b
+ QLdu37RASrom60hwUTBNUPaiJKHFQRtsB4dhvEhvAMAhI6qgWWbJEkhrmPaEEUak0UvD
+ /PVl7JNgVCuM2XF23r5t3lFlOBZ4MqdjxpJ9g3PENBYi0c93+9Aelix4c86Xx1DRHyFY
+ xUle54HpneF3AfsXPg2StbifQmvvb1UG9BCJ48aFNbloGA9mrMnR0UcEzL6QL2UJT6G/
+ Fu+7yjNezF8c8tM4RLoUqIXuND5tRXjyB/MoSI8CP0XEpn5EqiLUsVi9+ECqQJOGNABY
+ 9qMA==
+X-Gm-Message-State: AGi0Pua42yNhTZ2ng5hnKkxr7YYyHqLYegE3CYoI+LQTUBG3Loidja+j
+ ZUh5xbcdDQ5CS1EombSYidTFpy+Cr8Oro6PE8sOnUzpZHKw=
+X-Google-Smtp-Source: APiQypL2+j6sW0ZB+kHDpnJ9pH2fuggc1HennsDQSM1YfWaawKRGrSZd+7t0sfddWgwvoMYrj8w+QQwzopFa4aKXhzk=
+X-Received: by 2002:aca:4a45:: with SMTP id x66mr1840680oia.48.1588257058293; 
+ Thu, 30 Apr 2020 07:30:58 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+References: <20200430115142.13430-1-peter.maydell@linaro.org>
+ <20200430115142.13430-27-peter.maydell@linaro.org>
+In-Reply-To: <20200430115142.13430-27-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 30 Apr 2020 15:30:47 +0100
+Message-ID: <CAFEAcA-q3dbGkrYF8CqZzjwX00oFkpUcXHHYwSwgBXMvQA35XQ@mail.gmail.com>
+Subject: Re: [PULL 26/31] target/arm/cpu: Use ARRAY_SIZE() to iterate over
+ ARMCPUInfo[]
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:31:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+Received-SPF: pass client-ip=2607:f8b0:4864:20::236;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x236.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::236
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,125 +93,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com,
- qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since the introduction of a backup filter node in commit 00e30f05d, the
-backup block job crashes when the target image is smaller than the
-source image because it will try to write after the end of the target
-node without having BLK_PERM_RESIZE. (Previously, the BlockBackend layer
-would have caught this and errored out gracefully.)
+On Thu, 30 Apr 2020 at 12:52, Peter Maydell <peter.maydell@linaro.org> wrot=
+e:
+>
+> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>
+> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Message-id: 20200423073358.27155-4-philmd@redhat.com
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-We can fix this and even do better than the old behaviour: Check that
-source and target have the same image size at the start of the block job
-and unshare BLK_PERM_RESIZE. (This permission was already unshared
-before the same commit 00e30f05d, but the BlockBackend that was used to
-make the restriction was removed without a replacement.) This will
-immediately error out when starting the job instead of only when writing
-to a block that doesn't exist in the target.
+This causes compile errors on configs where the array
+ends up empty:
 
-Longer target than source would technically work because we would never
-write to blocks that don't exist, but semantically these are invalid,
-too, because a backup is supposed to create a copy, not just an image
-that starts with a copy.
+/home/pm/qemu/target/arm/cpu.c: In function =E2=80=98arm_cpu_register_types=
+=E2=80=99:
+/home/pm/qemu/target/arm/cpu.c:2903:19: error: comparison of unsigned
+expression < 0 is always false [-Werror=3Dtype-limits]
+     for (i =3D 0; i < ARRAY_SIZE(arm_cpus); ++i) {
+                   ^
 
-Fixes: 00e30f05de1d19586345ec373970ef4c192c6270
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1778593
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/backup-top.c | 14 +++++++++-----
- block/backup.c     | 14 +++++++++++++-
- 2 files changed, 22 insertions(+), 6 deletions(-)
+I've dropped the patch from the pullreq.
 
-diff --git a/block/backup-top.c b/block/backup-top.c
-index 3b50c06e2c..79b268e6dc 100644
---- a/block/backup-top.c
-+++ b/block/backup-top.c
-@@ -148,8 +148,10 @@ static void backup_top_child_perm(BlockDriverState *bs=
-, BdrvChild *c,
-          *
-          * Share write to target (child_file), to not interfere
-          * with guest writes to its disk which may be in target backing ch=
-ain.
-+         * Can't resize during a backup block job because we check the siz=
-e
-+         * only upfront.
-          */
--        *nshared =3D BLK_PERM_ALL;
-+        *nshared =3D BLK_PERM_ALL & ~BLK_PERM_RESIZE;
-         *nperm =3D BLK_PERM_WRITE;
-     } else {
-         /* Source child */
-@@ -159,7 +161,7 @@ static void backup_top_child_perm(BlockDriverState *bs,=
- BdrvChild *c,
-         if (perm & BLK_PERM_WRITE) {
-             *nperm =3D *nperm | BLK_PERM_CONSISTENT_READ;
-         }
--        *nshared &=3D ~BLK_PERM_WRITE;
-+        *nshared &=3D ~(BLK_PERM_WRITE | BLK_PERM_RESIZE);
-     }
- }
-=20
-@@ -192,11 +194,13 @@ BlockDriverState *bdrv_backup_top_append(BlockDriverS=
-tate *source,
- {
-     Error *local_err =3D NULL;
-     BDRVBackupTopState *state;
--    BlockDriverState *top =3D bdrv_new_open_driver(&bdrv_backup_top_filter=
-,
--                                                 filter_node_name,
--                                                 BDRV_O_RDWR, errp);
-+    BlockDriverState *top;
-     bool appended =3D false;
-=20
-+    assert(source->total_sectors =3D=3D target->total_sectors);
-+
-+    top =3D bdrv_new_open_driver(&bdrv_backup_top_filter, filter_node_name=
-,
-+                               BDRV_O_RDWR, errp);
-     if (!top) {
-         return NULL;
-     }
-diff --git a/block/backup.c b/block/backup.c
-index c4c3b8cd46..4f13bb20a5 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -340,7 +340,7 @@ BlockJob *backup_job_create(const char *job_id, BlockDr=
-iverState *bs,
-                   BlockCompletionFunc *cb, void *opaque,
-                   JobTxn *txn, Error **errp)
- {
--    int64_t len;
-+    int64_t len, target_len;
-     BackupBlockJob *job =3D NULL;
-     int64_t cluster_size;
-     BdrvRequestFlags write_flags;
-@@ -405,6 +405,18 @@ BlockJob *backup_job_create(const char *job_id, BlockD=
-riverState *bs,
-         goto error;
-     }
-=20
-+    target_len =3D bdrv_getlength(target);
-+    if (target_len < 0) {
-+        error_setg_errno(errp, -target_len, "Unable to get length for '%s'=
-",
-+                         bdrv_get_device_or_node_name(bs));
-+        goto error;
-+    }
-+
-+    if (target_len !=3D len) {
-+        error_setg(errp, "Source and target image have different sizes");
-+        goto error;
-+    }
-+
-     cluster_size =3D backup_calculate_cluster_size(target, errp);
-     if (cluster_size < 0) {
-         goto error;
---=20
-2.25.3
-
+thanks
+-- PMM
 
