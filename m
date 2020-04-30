@@ -2,87 +2,81 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38E24C47247
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:14:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34DA0C47247
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:14:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0142B208C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:14:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F262220873
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:14:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TLFacWtW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0142B208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EsRL+lfD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F262220873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUBp7-0004KO-60
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 12:14:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45396)
+	id 1jUBpD-0004WQ-6W
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 12:14:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44798)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <robert.foley@linaro.org>) id 1jUBdD-00008m-R9
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:03:09 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jUBX2-0007q0-Bq
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:58:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <robert.foley@linaro.org>) id 1jUBZv-000358-9L
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:01:47 -0400
-Received: from mail-qv1-xf41.google.com ([2607:f8b0:4864:20::f41]:36017)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1jUBZu-00034r-0u
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:58:22 -0400
-Received: by mail-qv1-xf41.google.com with SMTP id w18so3258270qvs.3
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 08:58:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=M/HVPJJsarEjIjVx4H78Iqo7kCS5rt82H++LHRaHDJU=;
- b=TLFacWtWa1DrBh1fkALLRqkqNoJAYQa45Wt4IZLzxN9fpv/T3BdPfsvsPJvkV72H9l
- JqxdCWv1/Iqloa1QBEty/kkTJ+N6z/6CdkwVxrTboATRfEgiBAsm1NJPy6BaTSU5eRwv
- YskAxAbuf+UFapSW0PO3cLhrOGG0i3GX3mc/V4qIr6IHIq0PwNn8TCsVnhYubkWltDhn
- KRrSMbaRWyaTOcTzDHserKk+M/tlxq03pwu1V5PBzWdPpPyWJOIuE3ol28LYfsBdmZrr
- Wl7n9ZZ5qlmHeKW9tFAiGHhk1XJrRBZ84umnjUxCb5073DeyUIeXyvZdrCgXI+GvwdGE
- NwJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=M/HVPJJsarEjIjVx4H78Iqo7kCS5rt82H++LHRaHDJU=;
- b=CViV1FULxQZYy2de/c/xeeNomGVCx2LliUYTsRRblp9E12VyArRBKBlVtyw0AAGRwG
- iZKPbDbfoZq/IIPBncpxBf/wSFJHVsJIa12MBCB3j+naXQnBY8qALnPCxOWplGRXa4SA
- l4Js14V9ucR3f1j4OS0LkLPTsTGlyx6eOxpZ69xJhBi+LFugSd8/Cchodj4XGhmJLAWK
- D36dUIjExxUybNCEPOmT1eLiCKzd31X0gDLn2NlBZy2f3qrdQFNN9AEu3i8fzkzDguZZ
- ICq2npqj8/ENjAzBVnbQi40kwZS8/cPQ3JWvzUe4RqI457+E4DahoVEGnTIhAHSgBqfl
- t8IQ==
-X-Gm-Message-State: AGi0PuYVxX6sPa/FUuFl0IqHb+eyeYmRr8JrJD2aYrQh+2eNnWFPqT1W
- /sS4lgNvNjo7nWw1ZvJTp9gLvyH6j1T8YA==
-X-Google-Smtp-Source: APiQypJrScLC4ti9F1XL/xs9u8X+zVO11U1xzxM5ASC2IWCmQdVsJVsRFpVxabskQq4cGN3KKGDnSg==
-X-Received: by 2002:a0c:da87:: with SMTP id z7mr3635295qvj.141.1588262300075; 
- Thu, 30 Apr 2020 08:58:20 -0700 (PDT)
-Received: from Rfoley-MA01.hsd1.ma.comcast.net
- ([2601:199:4480:60c0:7489:3328:3806:7c3])
- by smtp.gmail.com with ESMTPSA id v16sm305254qkf.80.2020.04.30.08.58.18
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Apr 2020 08:58:19 -0700 (PDT)
-From: Robert Foley <robert.foley@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v5 0/9] tests/vm: Add support for aarch64 VMs
-Date: Thu, 30 Apr 2020 11:57:09 -0400
-Message-Id: <20200430155718.212-1-robert.foley@linaro.org>
-X-Mailer: git-send-email 2.17.1
+ (envelope-from <kwolf@redhat.com>) id 1jUBV3-0004FQ-Gd
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:55:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30829
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jUBV3-0004Cw-2z
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 11:53:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588262000;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=jjf7hPbI7KdA+lLE8XE56+2q4XG1FvMCPO0SQLAxrxk=;
+ b=EsRL+lfD3eD5SiT0c/itMQF/mvORmM2g2sLRWTFZHpRMN4Hwpw1D63WJXXbzUHxZPgeIOC
+ 4Rw+Q3JQ2t594WQb78sld11k+vNOAvISM70TcaA9+Hck6l8rdC0yBu87BB3FRnLE3FuNl8
+ vkJjKp0WA+1b+LFSTbqbiOBtMr9ySKg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-407-WUP2--XMPFGqi6bPlBEajg-1; Thu, 30 Apr 2020 11:53:18 -0400
+X-MC-Unique: WUP2--XMPFGqi6bPlBEajg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 828371B18BC0;
+ Thu, 30 Apr 2020 15:53:17 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-114-60.ams2.redhat.com [10.36.114.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8549160C84;
+ Thu, 30 Apr 2020 15:53:16 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PULL 15/15] qemu-storage-daemon: Fix non-string --object properties
+Date: Thu, 30 Apr 2020 17:52:31 +0200
+Message-Id: <20200430155231.473156-16-kwolf@redhat.com>
+In-Reply-To: <20200430155231.473156-1-kwolf@redhat.com>
+References: <20200430155231.473156-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::f41;
- envelope-from=robert.foley@linaro.org; helo=mail-qv1-xf41.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::f41
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 23:34:52
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,63 +88,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, alex.bennee@linaro.org, robert.foley@linaro.org,
- peter.puhov@linaro.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is version 5 of the patch series to 
-add support for aarch64 VMs in the vm-build infrastructure.
- - Ubuntu 20.04 aarch64 VM
- - CentOS 8 aarch64 VM
+After processing the option string with the keyval parser, we get a
+QDict that contains only strings. This QDict must be fed to a keyval
+visitor which converts the strings into the right data types.
 
-v4: https://lists.nongnu.org/archive/html/qemu-devel/2020-03/msg03558.html
+qmp_object_add(), however, uses the normal QObject input visitor, which
+expects a QDict where all properties already have the QType that matches
+the data type required by the QOM object type.
 
-Changes in v5
-- Updated the Ubuntu aarch64 VM from 18.04 to 20.04.
-- Changed the creation of the flash drives to be silent to stdout.
-- Changed handling of qemu_args from yaml file to preserve quoted strings.  
-  This allows us to put something like this in the yaml as part of the 
-  qemu_args, and preserve the quotes: -append "root=/dev/vda1 console=ttyAMA0"
-- Fix issue in CentOS aarch64 VM where python was not set up.
+Change the --object implementation in qemu-storage-daemon so that it
+doesn't call qmp_object_add(), but calls user_creatable_add_dict()
+directly instead and pass it a new keyval boolean that decides which
+visitor must be used.
 
-Robert Foley (9):
-  tests/vm: Add configuration to basevm.py
-  tests/vm: Added configuration file support
-  tests/vm: add --boot-console switch
-  tests/vm: Add ability to select QEMU from current build.
-  tests/vm: allow wait_ssh() to specify command
-  tests/vm: Added a new script for ubuntu.aarch64.
-  tests/vm: Added a new script for centos.aarch64.
-  tests/vm: change scripts to use self._config
-  tests/vm: Add workaround to consume console
+Reported-by: Coiby Xu <coiby.xu@gmail.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ include/qom/object_interfaces.h | 6 +++++-
+ qemu-storage-daemon.c           | 4 +---
+ qom/object_interfaces.c         | 8 ++++++--
+ qom/qom-qmp-cmds.c              | 2 +-
+ 4 files changed, 13 insertions(+), 7 deletions(-)
 
- configure                         |  25 +++
- python/qemu/console_socket.py     | 162 +++++++++++++++++
- python/qemu/machine.py            |  23 ++-
- tests/vm/Makefile.include         |  27 +++
- tests/vm/aarch64vm.py             | 105 +++++++++++
- tests/vm/basevm.py                | 282 ++++++++++++++++++++++++------
- tests/vm/centos-8-aarch64.ks      |  51 ++++++
- tests/vm/centos.aarch64           | 227 ++++++++++++++++++++++++
- tests/vm/conf_example_aarch64.yml |  51 ++++++
- tests/vm/conf_example_x86.yml     |  50 ++++++
- tests/vm/fedora                   |  17 +-
- tests/vm/freebsd                  |  16 +-
- tests/vm/netbsd                   |  19 +-
- tests/vm/openbsd                  |  17 +-
- tests/vm/ubuntu.aarch64           | 117 +++++++++++++
- 15 files changed, 1098 insertions(+), 91 deletions(-)
- create mode 100644 python/qemu/console_socket.py
- create mode 100644 tests/vm/aarch64vm.py
- create mode 100644 tests/vm/centos-8-aarch64.ks
- create mode 100755 tests/vm/centos.aarch64
- create mode 100644 tests/vm/conf_example_aarch64.yml
- create mode 100644 tests/vm/conf_example_x86.yml
- create mode 100755 tests/vm/ubuntu.aarch64
-
--- 
-2.17.1
+diff --git a/include/qom/object_interfaces.h b/include/qom/object_interface=
+s.h
+index a0037968a4..65172120fa 100644
+--- a/include/qom/object_interfaces.h
++++ b/include/qom/object_interfaces.h
+@@ -90,6 +90,10 @@ Object *user_creatable_add_type(const char *type, const =
+char *id,
+ /**
+  * user_creatable_add_dict:
+  * @qdict: the object definition
++ * @keyval: if true, use a keyval visitor for processing @qdict (i.e.
++ *          assume that all @qdict values are strings); otherwise, use
++ *          the normal QObject visitor (i.e. assume all @qdict values
++ *          have the QType expected by the QOM object type)
+  * @errp: if an error occurs, a pointer to an area to store the error
+  *
+  * Create an instance of the user creatable object that is defined by
+@@ -97,7 +101,7 @@ Object *user_creatable_add_type(const char *type, const =
+char *id,
+  * ID from the key 'id'. The remaining entries in @qdict are used to
+  * initialize the object properties.
+  */
+-void user_creatable_add_dict(QDict *qdict, Error **errp);
++void user_creatable_add_dict(QDict *qdict, bool keyval, Error **errp);
+=20
+ /**
+  * user_creatable_add_opts:
+diff --git a/qemu-storage-daemon.c b/qemu-storage-daemon.c
+index dd128978cc..9e7adfe3a6 100644
+--- a/qemu-storage-daemon.c
++++ b/qemu-storage-daemon.c
+@@ -278,7 +278,6 @@ static void process_options(int argc, char *argv[])
+                 QemuOpts *opts;
+                 const char *type;
+                 QDict *args;
+-                QObject *ret_data =3D NULL;
+=20
+                 /* FIXME The keyval parser rejects 'help' arguments, so we=
+ must
+                  * unconditionall try QemuOpts first. */
+@@ -291,9 +290,8 @@ static void process_options(int argc, char *argv[])
+                 qemu_opts_del(opts);
+=20
+                 args =3D keyval_parse(optarg, "qom-type", &error_fatal);
+-                qmp_object_add(args, &ret_data, &error_fatal);
++                user_creatable_add_dict(args, true, &error_fatal);
+                 qobject_unref(args);
+-                qobject_unref(ret_data);
+                 break;
+             }
+         default:
+diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
+index 739e3e5172..bc36f96e47 100644
+--- a/qom/object_interfaces.c
++++ b/qom/object_interfaces.c
+@@ -106,7 +106,7 @@ out:
+     return obj;
+ }
+=20
+-void user_creatable_add_dict(QDict *qdict, Error **errp)
++void user_creatable_add_dict(QDict *qdict, bool keyval, Error **errp)
+ {
+     Visitor *v;
+     Object *obj;
+@@ -127,7 +127,11 @@ void user_creatable_add_dict(QDict *qdict, Error **err=
+p)
+     }
+     qdict_del(qdict, "id");
+=20
+-    v =3D qobject_input_visitor_new(QOBJECT(qdict));
++    if (keyval) {
++        v =3D qobject_input_visitor_new_keyval(QOBJECT(qdict));
++    } else {
++        v =3D qobject_input_visitor_new(QOBJECT(qdict));
++    }
+     obj =3D user_creatable_add_type(type, id, qdict, v, errp);
+     visit_free(v);
+     object_unref(obj);
+diff --git a/qom/qom-qmp-cmds.c b/qom/qom-qmp-cmds.c
+index 35db44b50e..c5249e44d0 100644
+--- a/qom/qom-qmp-cmds.c
++++ b/qom/qom-qmp-cmds.c
+@@ -263,7 +263,7 @@ void qmp_object_add(QDict *qdict, QObject **ret_data, E=
+rror **errp)
+         qobject_unref(pdict);
+     }
+=20
+-    user_creatable_add_dict(qdict, errp);
++    user_creatable_add_dict(qdict, false, errp);
+ }
+=20
+ void qmp_object_del(const char *id, Error **errp)
+--=20
+2.25.3
 
 
