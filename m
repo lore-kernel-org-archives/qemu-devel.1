@@ -1,94 +1,66 @@
 Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74A9AC83001
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 08:14:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4073C83001
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 08:19:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F0A62073E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 08:14:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gt4y9kVk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F0A62073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 790682073E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 08:19:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 790682073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU4LK-0002Jc-Fl
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 04:14:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39976)
+	id 1jU4PO-0004ML-MR
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 04:19:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40476)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <luoyonggang@gmail.com>) id 1jU4KL-0001gc-UW
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 04:13:50 -0400
+ (envelope-from <yan.y.zhao@intel.com>) id 1jU4On-0003w0-Gm
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 04:18:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <luoyonggang@gmail.com>) id 1jU4KK-0004NL-LM
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 04:13:49 -0400
-Received: from mail-lf1-x131.google.com ([2a00:1450:4864:20::131]:44922)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1jU4KK-0004HH-5p; Thu, 30 Apr 2020 04:13:48 -0400
-Received: by mail-lf1-x131.google.com with SMTP id d25so446913lfi.11;
- Thu, 30 Apr 2020 01:13:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=AnNn1Bqlm/DOgFmSH5FiHbVy71H2eedKWrlRue9i1Xk=;
- b=Gt4y9kVkmw7gUNT4BOqjqa8sOAKUBxHpV0dOzWltjPSCo6CCNJCiRZGS0ScL7H4CQ3
- zSKBTbX0MapCtS7FISnsT7sk7iWEJhNjNgLHfDAPBUpoliYNOjLA2yOiM4Ns5ADdYYtk
- xaCf7IllmEHcZtGvGr++DJWRx4w4xpMaVVoyfju8PHr5Hg9BlHQ1K/NI43KzWnidyOCk
- jjj2et9cF+w637LbI495W6vMjH/u+aM7NNLGcxzEzpbfOEzQ/9xL6eSZW1htXByFFsMI
- JDjfXrHJA2qAb8vbcuLc8iiDbJnboePoqF7hcMOeOgmKGVXPhnfKMaL/8PDLyNCFnvQg
- 02ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=AnNn1Bqlm/DOgFmSH5FiHbVy71H2eedKWrlRue9i1Xk=;
- b=RAJJ86Um2a4lBGQuTEPfchNpVSFS8Kmh+MQRysf0uPr99bo7bXsrel5ec5Z/+goy9U
- fO2sIExm3kbd3jKwsF+b6bz9dfwf6EhiscSOzryhNKweoJ0CKqyIWfSd6FWgByly0QLZ
- 4bvQp+GVaDn9ftF/HRT6aFSV3Hr//+iXmHnYOW651mpuFYw6WSWKWLt73tbHtJva5UqS
- 8JvdK6oD5f6da9ZN0OMjDvwVnbqfy5XC2q9fstq2sg6XnywOvlK1nUG9DRxcDKDXQY7W
- aY+a5n15yIqnDl+y5fFKNuYhLsL2rNsWNH5xat7k+pV3SwY48KkgXQelvD/lvweSSMoM
- Tckg==
-X-Gm-Message-State: AGi0PuYMpBsZNpP3WOpSYtJawhXdx2xfxgXMY5NrqxziKnIlV7pvh2Da
- by7V0DWe3o94D/WlavwbkNGe7zYM1mmAOShRyQ8=
-X-Google-Smtp-Source: APiQypKuN4Bv4pYUaXuF0qqb/FgFg2QgpwTBtEti/UygVd31aNXlL30YF7UV/cCql2Z+ZOj0Mheh8nEgKmpz/uD0Crk=
-X-Received: by 2002:a19:5206:: with SMTP id m6mr1328687lfb.33.1588234425799;
- Thu, 30 Apr 2020 01:13:45 -0700 (PDT)
+ (envelope-from <yan.y.zhao@intel.com>) id 1jU4Om-0006jf-02
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 04:18:24 -0400
+Received: from mga17.intel.com ([192.55.52.151]:2409)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1jU4Ol-0006iA-FD
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 04:18:23 -0400
+IronPort-SDR: ENyHBCnp0cooRykrS/vYeV2r8AaZa73jdP35+WDcgtrzOliktiGOu6zek6sAhTSBF+OZEP57vT
+ Wwb56QTj/JlA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 30 Apr 2020 01:18:14 -0700
+IronPort-SDR: mj4d2BIA84W1EU+ae7H3AOaj4+crsPJ/xHEVaxNb0fJ62+dt9d/jduBltQL5Cibr9GgIBaNAsx
+ AW2s5Hzbuxqw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,334,1583222400"; d="scan'208";a="432876687"
+Received: from joy-optiplex-7040.sh.intel.com ([10.239.13.16])
+ by orsmga005.jf.intel.com with ESMTP; 30 Apr 2020 01:18:10 -0700
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: pbonzini@redhat.com,
+	alex.williamson@redhat.com
+Subject: [PATCH v6 0/3] drop writes to read-only ram device & vfio regions
+Date: Thu, 30 Apr 2020 04:07:44 -0400
+Message-Id: <20200430080744.31232-1-yan.y.zhao@intel.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-References: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
- <87lfmhl0xa.fsf@linaro.org>
- <alpine.BSF.2.22.395.2004271212520.94232@zero.eik.bme.hu>
- <87imhlkwun.fsf@linaro.org>
- <CAE2XoE9hiw-ri66_xp3qNa5_Wx8ZfsQB9mqJdYR8VRm-KW830g@mail.gmail.com>
- <87ftcoknvu.fsf@linaro.org>
- <AM4PR07MB350653D5961DFCE441646131CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
- <871ro6ld2f.fsf@linaro.org>
- <AM4PR07MB350673696C7DE2CA16C9C685CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
- <87sggmjgit.fsf@linaro.org>
- <CAE2XoE8wFK1nOq3YXhB=iqTvqSDQk7Zzd35Tjzdd==v8ouMijA@mail.gmail.com>
- <43ac337c-752a-7151-1e88-de01949571de@linaro.org>
-In-Reply-To: <43ac337c-752a-7151-1e88-de01949571de@linaro.org>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Thu, 30 Apr 2020 16:13:33 +0800
-Message-ID: <CAE2XoE-f_rkcnpQO1cHPUgdaWNAOvBRyUX1aj27UePd0Hkr=KQ@mail.gmail.com>
-Subject: Re: R: R: About hardfloat in ppc
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000c5176905a47da433"
-Received-SPF: pass client-ip=2a00:1450:4864:20::131;
- envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x131.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::131
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=192.55.52.151; envelope-from=yan.y.zhao@intel.com;
+ helo=mga17.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 04:18:13
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Received-From: 192.55.52.151
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,171 +72,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: Dino Papararo <skizzato73@msn.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Programmingkid <programmingkidx@gmail.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Howard Spoelstra <hsp.cat7@gmail.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Yan Zhao <yan.y.zhao@intel.com>, xin.zeng@intel.com, philmd@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000c5176905a47da433
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+guest writes to read-only memory regions need to be dropped.
 
-I propose a new way to computing the float flags,
-We preserve a  float computing cash
-typedef struct FpRecord {
-  uint8_t op;
-  float32 A;
-  float32 B;
-}  FpRecord;
-FpRecord fp_cache[1024];
-int fp_cache_length;
-uint32_t fp_exceptions;
+patch 1 modifies handler of ram device memory regions to drop guest writes
+to read-only ram device memory regions
 
-1. For each new fp operation we push it to the  fp_cache,
-2. Once we read the fp_exceptions , then we re-compute
-the fp_exceptions by re-running the fp FpRecord sequence.
- and clear  fp_cache_length.
-3. If we clear the fp_exceptions , then we set fp_cache_length to 0 and
- clear  fp_exceptions.
-4. If the  fp_cache are full, then we re-compute
-the fp_exceptions by re-running the fp FpRecord sequence.
+patch 2 modifies handler of non-mmap'd read-only vfio regions to drop guest
+writes to those regions 
 
-Would this be a general method to use hard-float?
-The consued time should be  2*hard_float.
-Considerating read fp_exceptions are rare, then the amortized time
-complexity
-would be 1 * hard_float.
+patch 3 set read-only flag to mmap'd read-only vfio regions, so that guest
+writes to those regions would be trapped.
+without patch 1, host qemu would then crash on guest write to those
+read-only regions.
+with patch 1, host qemu would drop the writes.
 
+Changelog:
+v6:
+-fixed two style alignment problems in patch 1. (Philippe)
 
+v5:
+-changed write handler of ram device memory region from .write to
+.write_with_attrs in patch 1 (Paolo)
+(for vfio region in patch 2, I still keep the operations as .read & .write.
+the reasons are:
+1. vfio_region_ops are for mmio/pio regions. the top level read/write
+dispatcher in kvm just ignores their return values. (the return value of
+address_space_rw() is just ignored)
+2. there are a lot of callers to vfio_region_read() and
+vfio_region_write(), who actually do not care about the return values
+)
+-minor changes on text format in error logs.
 
-On Thu, Apr 30, 2020 at 10:18 AM Richard Henderson <
-richard.henderson@linaro.org> wrote:
+v4:
+-instead of modifying tracing log, added qemu_log_mask(LOG_GUEST_ERROR...)
+to log guest writes to read-only regions (Philippe)
 
-> On 4/29/20 5:20 PM, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
-> > Question, in hard-float, if we don't want to read the fp register.
-> > for example: If we wanna compute c =3D a + b in fp32
-> > if c =3D a + b In hard float
-> > and if b1 =3D c - a in hard float
-> > if b1 !=3D b at bitwise level, the we se the inexat to 1, otherwsie
-> > we set inexat bit to 0? are this valid?
-> >
-> > we can also do it for a * b, a - b, a / b.
-> >
->
-> That does seem plausible, for all of the normal values for which we would
-> apply
-> the hard-float optimization anyway.  But we already check for the
-> exceptional
-> cases:
->
->     if (unlikely(f32_is_inf(ur))) {
->         s->float_exception_flags |=3D float_flag_overflow;
->     } else if (unlikely(fabsf(ur.h) <=3D FLT_MIN)) {
->         if (post =3D=3D NULL || post(ua, ub)) {
->             goto soft;
->         }
->     }
->
->
-> r~
->
+for
+v3:
+-refreshed and Cc Stefan for reviewing of tracing part
+
+v2:
+-split one big patches into smaller ones (Philippe)
+-modify existing trace to record guest writes to read-only memory (Alex)
+-modify vfio_region_write() to drop guest writes to non-mmap'd read-only
+ region (Alex)
 
 
---=20
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
 
---000000000000c5176905a47da433
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Yan Zhao (3):
+  memory: drop guest writes to read-only ram device regions
+  hw/vfio: drop guest writes to ro regions
+  hw/vfio: let read-only flag take effect for mmap'd regions
 
-<div dir=3D"ltr"><div dir=3D"ltr">I propose=C2=A0a new way to computing the=
- float flags,<div>We preserve a=C2=A0 float computing cash</div><div>typede=
-f struct FpRecord {</div><div>=C2=A0 uint8_t op;</div><div>=C2=A0 float32 A=
-;</div><div>=C2=A0=20
+ hw/vfio/common.c | 17 +++++++++++++++--
+ memory.c         | 15 ++++++++++++---
+ 2 files changed, 27 insertions(+), 5 deletions(-)
 
-float32 B;</div><div>}=C2=A0
+-- 
+2.17.1
 
-FpRecord;</div><div>FpRecord fp_cache[1024];<br></div><div>int fp_cache_len=
-gth;</div><div>uint32_t fp_exceptions;</div><div><br></div><div>1. For each=
- new fp operation we push it to the=C2=A0
-
-fp_cache,</div><div>2. Once we read the=20
-
-fp_exceptions
-
-, then we re-compute</div><div>the fp_exceptions by re-running the fp=20
-
-FpRecord=20
-
- sequence.</div><div>=C2=A0and clear=C2=A0
-
-fp_cache_length.</div><div>3. If we clear the=20
-
-fp_exceptions , then we set=C2=A0fp_cache_length to 0 and</div><div>=C2=A0c=
-lear=C2=A0
-
-fp_exceptions.</div><div>4. If the=C2=A0
-
-fp_cache are full, then we re-compute</div><div>the fp_exceptions by re-run=
-ning the fp=20
-
-FpRecord=20
-
- sequence.</div><div><br></div><div>Would this be a general method to use h=
-ard-float?</div><div>The consued time should be=C2=A0 2*hard_float.</div><d=
-iv>Considerating=C2=A0read fp_exceptions are rare, then the amortized time =
-complexity</div><div>would be 1 * hard_float.=C2=A0</div><div><br></div><di=
-v><br></div></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"=
-gmail_attr">On Thu, Apr 30, 2020 at 10:18 AM Richard Henderson &lt;<a href=
-=3D"mailto:richard.henderson@linaro.org">richard.henderson@linaro.org</a>&g=
-t; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0p=
-x 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On 4/2=
-9/20 5:20 PM, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:<br>
-&gt; Question, in hard-float, if we don&#39;t want to read the fp register.=
-<br>
-&gt; for example: If we wanna compute c =3D a=C2=A0+ b in fp32<br>
-&gt; if c =3D a=C2=A0+ b In hard float<br>
-&gt; and if b1 =3D c - a in hard float<br>
-&gt; if b1 !=3D b at bitwise level, the we se the=C2=A0inexat=C2=A0to 1, ot=
-herwsie=C2=A0<br>
-&gt; we set inexat=C2=A0bit to 0? are this valid?<br>
-&gt; <br>
-&gt; we can also do it for a * b, a - b, a / b.=C2=A0<br>
-&gt; <br>
-<br>
-That does seem plausible, for all of the normal values for which we would a=
-pply<br>
-the hard-float optimization anyway.=C2=A0 But we already check for the exce=
-ptional<br>
-cases:<br>
-<br>
-=C2=A0 =C2=A0 if (unlikely(f32_is_inf(ur))) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 s-&gt;float_exception_flags |=3D float_flag_ove=
-rflow;<br>
-=C2=A0 =C2=A0 } else if (unlikely(fabsf(ur.h) &lt;=3D FLT_MIN)) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (post =3D=3D NULL || post(ua, ub)) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto soft;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-=C2=A0 =C2=A0 }<br>
-<br>
-<br>
-r~<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
- class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
-=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
-=A0 sincerely,<br>Yonggang Luo<br></div></div>
-
---000000000000c5176905a47da433--
 
