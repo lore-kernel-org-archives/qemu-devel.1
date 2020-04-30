@@ -6,66 +6,65 @@ X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCE91C28CBC
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:04:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33ECDC47247
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:06:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4E062063A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:04:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4E062063A
+	by mail.kernel.org (Postfix) with ESMTPS id 08DE72063A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:06:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08DE72063A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU9o6-0001MP-RI
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 10:04:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51704)
+	id 1jU9pC-0002u2-5a
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 10:06:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51662)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jU9al-0003OI-7g
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:11 -0400
+ (envelope-from <bounces@canonical.com>) id 1jU9af-0003Kx-T9
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jU9aj-0000Ug-Dp
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36138)
+ (envelope-from <bounces@canonical.com>) id 1jU9af-0000Ps-74
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:01 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35918)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jU9ai-0000Qc-SB
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:04 -0400
+ id 1jU9ae-0000Pi-Oh
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:51:00 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jU9ag-0007Z1-UL
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 13:51:02 +0000
+ id 1jU9ad-0007Vb-FY
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 13:50:59 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E401E2E802D
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 13:51:02 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 6342B2E8104
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 13:50:59 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Apr 2020 13:42:57 -0000
+Date: Thu, 30 Apr 2020 13:43:56 -0000
 From: Laurent Vivier <Laurent@vivier.eu>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
+ assignee=rth@twiddle.net; 
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: arichardson th-huth
-X-Launchpad-Bug-Reporter: Alexander Richardson (arichardson)
+X-Launchpad-Bug-Commenters: laurent-vivier pcc-goog rth
+X-Launchpad-Bug-Reporter: Peter Collingbourne (pcc-goog)
 X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
-References: <158064672776.8396.11527564563260103475.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158825417865.5113.1710634802010058449.launchpad@soybean.canonical.com>
-Subject: [Bug 1861605] Re: LL/SC broken for MIPS after
- 7dd547e5ab6b31e7a0cfc182d3ad131dd55a948f
+References: <158397461074.11691.9165479040998830806.malonedeb@soybean.canonical.com>
+Message-Id: <158825423694.11824.15388430528403491901.malone@wampee.canonical.com>
+Subject: [Bug 1867072] Re: ARM: tag bits cleared in FAR_EL1
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 2401a29d4780d0fe490348071fb14a1251daa035
+X-Launchpad-Hash: 008532c6094508aa03752e5d889678244bda6726
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 09:35:36
@@ -81,10 +80,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1861605 <1861605@bugs.launchpad.net>
+Reply-To: Bug 1867072 <1867072@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+
+Fixed here:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D38d931687fa1
+
 
 ** Changed in: qemu
        Status: Fix Committed =3D> Fix Released
@@ -93,47 +96,28 @@ Sender: "Qemu-devel"
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1861605
+https://bugs.launchpad.net/bugs/1867072
 
 Title:
-  LL/SC broken for MIPS after 7dd547e5ab6b31e7a0cfc182d3ad131dd55a948f
+  ARM: tag bits cleared in FAR_EL1
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  In that commit the env->llval value is loaded as an unsigned value
-  (instead of sign-extended as before and therefore the CMPXCHG in
-  gen_st_cond() in translate.c fails.
+  The ARM Architecture Reference Manual provides the following for
+  FAR_EL1:
 
-  I have committed a fix for this issue as
-  https://github.com/qemu/qemu/commit/6ff8dec97f1a105d0da96c67ee24c75e437df=
-162
+  "For a Data Abort or Watchpoint exception, if address tagging is
+  enabled for the address accessed by the data access that caused the
+  exception, then this field includes the tag."
 
-  An alternative solution would be to change the cmpxchg line to perform a =
-non-sign-extended compare, i.e. replace
-  =C2=A0=C2=A0=C2=A0=C2=A0tcg_gen_atomic_cmpxchg_tl(t0, cpu_lladdr, cpu_llv=
-al, val,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0eva ? MIPS_HFLAG_UM : ctx->mem_idx, tcg_mo=
-);
-  with
-  =C2=A0=C2=A0=C2=A0=C2=A0tcg_gen_atomic_cmpxchg_tl(t0, cpu_lladdr, cpu_llv=
-al, val,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0eva ? MIPS_HFLAG_UM : ctx->mem_idx, tcg_mo=
- & ~MO_SIGN);
+  However, I have found that the tag bits in FAR_EL1 are always clear,
+  even if the tag bits were set in the original access.
 
-  However, that change does not fix the fact that the result of ll is no
-  longer sign-extended, therefore I think adding a cast in the helpers
-  is better.
-
-  I cannot send this patch to the QEMU mailing list as I am not able to set=
-up git-send-email.
-  Feel free to apply this commit or the alternative solution.
+  I can reproduce the problem on both 4.1.1 and master
+  (6e8a73e911f066527e775e04b98f31ebd19db600).
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1861605/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1867072/+subscriptions
 
