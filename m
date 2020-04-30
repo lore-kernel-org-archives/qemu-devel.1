@@ -2,75 +2,81 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99EA3C28CBC
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 13:55:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA4C0C47253
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 13:56:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71B0420661
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 13:55:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71B0420661
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 86D432063A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 13:56:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="Qi+NXMT6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86D432063A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU9fD-0004Xi-IO
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 09:55:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49956)
+	id 1jU9g2-0006Po-LM
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 09:56:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49836)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jU9TZ-0001oX-63
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:45:30 -0400
+ (envelope-from <dimastep@yandex-team.ru>) id 1jU9TM-0001BU-Qb
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:45:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jU9R2-0000Ph-NU
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:43:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33454)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jU9R2-0000P1-6j
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:41:04 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jU9R1-00063o-1q
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 13:41:03 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 0BDE92E80E7
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 13:41:03 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Apr 2020 13:31:22 -0000
-From: Laurent Vivier <Laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=rth@twiddle.net; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: helmutsch laurent-vivier rth
-X-Launchpad-Bug-Reporter: Helmut (helmutsch)
-X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
-References: <158188126194.31124.5348536044519461550.malonedeb@wampee.canonical.com>
-Message-Id: <158825348211.3631.1019948753267804369.malone@chaenomeles.canonical.com>
-Subject: [Bug 1863508] Re: qemu-system-arm stops with SIGSEGV in
- helper_gvec_eq16
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
+ (envelope-from <dimastep@yandex-team.ru>) id 1jU9Qd-0008Fi-E8
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:43:28 -0400
+Received: from forwardcorp1p.mail.yandex.net
+ ([2a02:6b8:0:1472:2741:0:8b6:217]:60108)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
+ id 1jU9NM-0001jK-CA; Thu, 30 Apr 2020 09:37:16 -0400
+Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
+ [IPv6:2a02:6b8:0:1619::119])
+ by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 45D5D2E151A;
+ Thu, 30 Apr 2020 16:37:12 +0300 (MSK)
+Received: from myt4-18a966dbd9be.qloud-c.yandex.net
+ (myt4-18a966dbd9be.qloud-c.yandex.net [2a02:6b8:c00:12ad:0:640:18a9:66db])
+ by mxbackcorp2j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ SUWv4Mec3s-b7X4UTL4; Thu, 30 Apr 2020 16:37:12 +0300
 Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 5ed851a02cce2f423948ee73a5601f222acdf356
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 09:35:36
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Received-From: 91.189.90.7
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1588253832; bh=kUkFhpkmkerAUcEO23m978mFXGVV+mbiJpdw3pimI38=;
+ h=In-Reply-To:In-Reply-To:Message-Id:References:References:Date:
+ Subject:To:From:Cc;
+ b=Qi+NXMT6Ijxlj0zDe0PAUGxzXOWda3qxv7gQmA+ZoORjIW3HqEiIYEnUoqlD4tBPI
+ gHfE4/nmIUufy+22SeuwA1PkVA7JXHZZcphUSW4Zh+95uWDEMjSLvNNi219uV8mOCv
+ ADGOrjjqNJk6TK2hZvdvNiJoh6loNHp9n0nL/yoQ=
+Authentication-Results: mxbackcorp2j.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
+ [2a02:6b8:b080:7108::1:9])
+ by myt4-18a966dbd9be.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ tZ29y7t6r8-b7WKL4mb; Thu, 30 Apr 2020 16:37:07 +0300
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+ (Client certificate not present)
+From: Dima Stepanov <dimastep@yandex-team.ru>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 3/5] vhost-user-blk: add mechanism to track the guest
+ notifiers init state
+Date: Thu, 30 Apr 2020 16:36:18 +0300
+Message-Id: <d20d6de600837aebbf644666be064f761f764832.1588252862.git.dimastep@yandex-team.ru>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <cover.1588252861.git.dimastep@yandex-team.ru>
+References: <cover.1588252861.git.dimastep@yandex-team.ru>
+In-Reply-To: <cover.1588252861.git.dimastep@yandex-team.ru>
+References: <cover.1588252861.git.dimastep@yandex-team.ru>
+Received-SPF: pass client-ip=2a02:6b8:0:1472:2741:0:8b6:217;
+ envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1p.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 09:37:12
+X-ACL-Warn: Detected OS   = ???
+X-Received-From: 2a02:6b8:0:1472:2741:0:8b6:217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -81,64 +87,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1863508 <1863508@bugs.launchpad.net>
+Cc: fam@euphon.net, kwolf@redhat.com, yc-core@yandex-team.ru,
+ qemu-block@nongnu.org, mst@redhat.com, jasowang@redhat.com,
+ dgilbert@redhat.com, mreitz@redhat.com, arei.gonglei@huawei.com,
+ fengli@smartx.com, stefanha@redhat.com, marcandre.lureau@redhat.com,
+ pbonzini@redhat.com, raphael.norwitz@nutanix.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fixed here:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D43d1ccd2a02f
+In case of the vhost-user devices the daemon can be killed at any
+moment. Since QEMU supports the reconnet functionality the guest
+notifiers should be reset and disabled after "disconnect" event. The
+most issues were found if the "disconnect" event happened during vhost
+device initialization step.
+The disconnect event leads to the call of the vhost_dev_cleanup()
+routine. Which memset to 0 a vhost device structure. Because of this, if
+device was not started (dev.started == false) and the connection is
+broken, then the set_guest_notifier method will produce assertion error.
+Also connection can be broken after the dev.started field is set to
+true.
+A new notifiers_set field is added to the vhost_dev structure to track
+the state of the guest notifiers during the initialization process.
 
+Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+---
+ hw/block/vhost-user-blk.c |  8 ++++----
+ hw/virtio/vhost.c         | 11 +++++++++++
+ include/hw/virtio/vhost.h |  1 +
+ 3 files changed, 16 insertions(+), 4 deletions(-)
 
-** Changed in: qemu
-       Status: In Progress =3D> Fix Released
+diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+index 70d7842..5a3de0f 100644
+--- a/hw/block/vhost-user-blk.c
++++ b/hw/block/vhost-user-blk.c
+@@ -175,7 +175,9 @@ static void vhost_user_blk_stop(VirtIODevice *vdev)
+         return;
+     }
+ 
+-    vhost_dev_stop(&s->dev, vdev);
++    if (s->dev.started) {
++        vhost_dev_stop(&s->dev, vdev);
++    }
+ 
+     ret = vhost_dev_drop_guest_notifiers(&s->dev, vdev, s->dev.nvqs);
+     if (ret < 0) {
+@@ -337,9 +339,7 @@ static void vhost_user_blk_disconnect(DeviceState *dev)
+     }
+     s->connected = false;
+ 
+-    if (s->dev.started) {
+-        vhost_user_blk_stop(vdev);
+-    }
++    vhost_user_blk_stop(vdev);
+ 
+     vhost_dev_cleanup(&s->dev);
+ }
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index fa3da9c..ddbdc53 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -1380,6 +1380,7 @@ int vhost_dev_enable_notifiers(struct vhost_dev *hdev, VirtIODevice *vdev)
+             goto fail_vq;
+         }
+     }
++    hdev->notifiers_set = true;
+ 
+     return 0;
+ fail_vq:
+@@ -1407,6 +1408,10 @@ void vhost_dev_disable_notifiers(struct vhost_dev *hdev, VirtIODevice *vdev)
+     BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
+     int i, r;
+ 
++    if (!hdev->notifiers_set) {
++        return;
++    }
++
+     for (i = 0; i < hdev->nvqs; ++i) {
+         r = virtio_bus_set_host_notifier(VIRTIO_BUS(qbus), hdev->vq_index + i,
+                                          false);
+@@ -1417,6 +1422,8 @@ void vhost_dev_disable_notifiers(struct vhost_dev *hdev, VirtIODevice *vdev)
+         virtio_bus_cleanup_host_notifier(VIRTIO_BUS(qbus), hdev->vq_index + i);
+     }
+     virtio_device_release_ioeventfd(vdev);
++
++    hdev->notifiers_set = false;
+ }
+ 
+ /*
+@@ -1449,6 +1456,10 @@ int vhost_dev_drop_guest_notifiers(struct vhost_dev *hdev,
+     VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
+     int ret;
+ 
++    if (!hdev->notifiers_set) {
++        return 0;
++    }
++
+     ret = k->set_guest_notifiers(qbus->parent, nvqs, false);
+     if (ret < 0) {
+         error_report("Error reset guest notifier: %d", -ret);
+diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
+index 4d0d2e2..e3711a7 100644
+--- a/include/hw/virtio/vhost.h
++++ b/include/hw/virtio/vhost.h
+@@ -90,6 +90,7 @@ struct vhost_dev {
+     QLIST_HEAD(, vhost_iommu) iommu_list;
+     IOMMUNotifier n;
+     const VhostDevConfigOps *config_ops;
++    bool notifiers_set;
+ };
+ 
+ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
+-- 
+2.7.4
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1863508
-
-Title:
-  qemu-system-arm stops with SIGSEGV in helper_gvec_eq16
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  Segmentation fault when trying to start FreeBSD-arm system with qemu-
-  system-arm (version 4.1.1 on Fedora 31)
-
-  Commandline:
-  gdb -q --args /bin/qemu-system-arm \
-   -name FreeBSD12,debug-threads=3Don \
-   -m 1536 -machine virt -smp 2 \
-   -M virt,highmem=3Doff -serial mon:stdio -monitor telnet::45452,server,no=
-wait \
-   -machine virt,accel=3Dtcg,usb=3Doff,dump-guest-core=3Doff,gic-version=3D=
-2 \
-   -overcommit mem-lock=3Doff -no-reboot -device virtio-rng-device \
-   -bios u-boot-qemu.bin \
-   -drive file=3DFreeBSD-12.1-RELEASE-arm-armv7-CUBIEBOARD2.img,if=3Dnone,i=
-d=3Ddrive0,format=3Draw \
-   -device ich9-ahci,id=3Dahci -device ide-drive,drive=3Ddrive0,bus=3Dahci.=
-0 =
-
-
-  Results:
-  ....
-  Mounting local filesystems:.
-
-  Thread 4 "CPU 1/TCG" received signal SIGSEGV, Segmentation fault.
-  [Switching to Thread 0x7fffcedfe700 (LWP 53608)]
-  0x00005555558d9332 in helper_gvec_eq16 (d=3D0x5555566748d8, a=3D0x5555566=
-748e0, b=3D0x5555566748d0, desc=3D0) at /usr/src/debug/qemu-4.1.1-1.fc31.x8=
-6_64/accel/tcg/tcg-runtime-gvec.c:948
-  948     DO_CMP2(16)
-
-  Tested different versions of qemu. qemu-3.0.1 worked, but qemu-3.1.1
-  failed with the same error.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1863508/+subscriptions
 
