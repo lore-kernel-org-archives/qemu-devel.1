@@ -2,85 +2,89 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28E8CC4724C
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:27:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BCABC47253
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:27:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5FE420873
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:27:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2965220873
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 16:27:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mGbak7jq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5FE420873
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FezdsRUH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2965220873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUC1w-0007LR-0m
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 12:27:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48570)
+	id 1jUC1x-0007Rz-Aa
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 12:27:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48582)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jUC00-0004tb-2i
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:25:56 -0400
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jUC01-0004uL-0K
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:25:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1jUBzP-0002Gb-RQ
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:25:19 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:43002)
+ (envelope-from <edgar.iglesias@gmail.com>) id 1jUBzS-0002MC-Kp
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 12:25:20 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:43042)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jUBzP-0002Bh-EL; Thu, 30 Apr 2020 12:24:43 -0400
-Received: by mail-lj1-x242.google.com with SMTP id a21so7127547ljb.9;
- Thu, 30 Apr 2020 09:24:42 -0700 (PDT)
+ id 1jUBzS-0002HC-75; Thu, 30 Apr 2020 12:24:46 -0400
+Received: by mail-lf1-x141.google.com with SMTP id 188so1729495lfa.10;
+ Thu, 30 Apr 2020 09:24:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=AjpYghyNqmUax0+ufzqkeCRlXZXVmlpA7XromECBQGI=;
- b=mGbak7jqnfbHDXFv5lgjGr85HKqA2Vr4yi4NIMvsin3yyprfFiY90YNbCP85gtxdv5
- klkXw9jOlJGa0okJ7FZdOSdFDt6XjxO0Z8u5j6korc6B/tZ+1EHskjUyotcKHMtjfFi3
- t3oBewqEvLFSVUcr26RR8vE6RM+m/aamB7HcQBclGzTiYTwgxFQCbLdcwdep4bkzBbN0
- TDOvhtavHJjccHGke0PTR/990nXUN7Xzn5UdHRKFyJyUobDdVAQwK3lI5znLJ/+CJ5Q9
- ruw4NMcNajwkjR5ggP7TqnWKsQrH4O7EtkjkGqYqffqcYpUG0pF5WmWUBUvwy7xx5UF1
- KDIA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=ZNzziBInvAuKeSzUBcGAhMLGYBRMfB9xg0LXI8OI7Wc=;
+ b=FezdsRUH4YCAofm4n35odfxKHFSEAcG9OlZAhUb8KLYd4atHEEIYGK3gWwW2I/5pKD
+ AycwVPXOzZzqeRnOTPopzbUSyV5bc/ExkqbtNqCSs5N9BL2U7jXouHBJaS2DREN0ICv8
+ eqeIxDx8fNOX3m1f3mneW9ZeBeMsySherHOBP9HtC1FqiAitLJtSm/qFjpMLEh9heqMD
+ AyIbc4FPAALuAN7J5MCE3SgTL5Jr2i5mHz7Eta/EOdzvt1KuqzGVpm4hb4CRf1SQ2Y0p
+ HfoQvYiVQjZBSY2wismb3XmG6au8jM0ia3t5cn8iXEJ6T0W0UIm8BfN6dGaT7K7RWmD5
+ fV+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=AjpYghyNqmUax0+ufzqkeCRlXZXVmlpA7XromECBQGI=;
- b=IWtVEB0ipxiQzSrFvSlBnY/rWlbZ4829L+MQZoY+lIvnIJUvwKcpi/PQJmAc13ZdFX
- MY+Jrqr2T5/+GFV7coFlEHAGK/0iIZjuuEOrPvEj+Blqlt52Eho4XlHmeorL5uFSKLWs
- 3NcAcEJXLLnfdwptkTPDO4UICIcSm7hQeGqCUI8J9coSmMOAG9sCrgaJLEAhH8er2QpY
- XRR0MCkz04nUSGEEYHuIp579jBNmglPe/0E53PhS5ySAQJaoRgdjwzwD2Ji5MwayB9HB
- OszwWp3z63oTuYuiCmy04sMiB0gX3GqIZPJx2FiFBsfbSJglgSeYklLXeBRHgsztlytC
- 3n+Q==
-X-Gm-Message-State: AGi0PuYCbzPI+y4/676bkxKl2Ov8gpgRnPfXYMeg3d+V55/QLp0P3ivt
- o+V41zO6QKFP6U8kMoUwIkkC5Wq1XYw=
-X-Google-Smtp-Source: APiQypJGvlx2RF4Qxo2E7DEjGSszwwM504lyJX5M7fuSMa1+oONRLCtuek0UtHIs+2mMpId6e7mzRg==
-X-Received: by 2002:a2e:6c08:: with SMTP id h8mr83830ljc.48.1588263880943;
- Thu, 30 Apr 2020 09:24:40 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ZNzziBInvAuKeSzUBcGAhMLGYBRMfB9xg0LXI8OI7Wc=;
+ b=n8izKTMfsa4SFv9Mdhz1ky90KslN86cK4YEOpGTSUWUK12CpXBP4EBrsrvJ02FxD8L
+ +yn1AMigP5ohWvl0OjT3h84eXpq8mRiswfT+7brOqZ3qxY1joi77HxeZkCGfKJHnURIA
+ jvep2RGk1MxXnnJeWIIKg/tO/+YpoxuMHR+sSBmE+EZ0/Z/bWRThYEo2UV2t7o+/1t3/
+ WW7IdkgmaJR06TbcebUGQPSct6inXickUcTqyWKqzr3QUu4hYKeaHwGgoUqpxVyX0kO2
+ qKq1dxXVJxMZNvYQKDa/mSkye7Ock6gQDY2MnKyFq+J4U7bbLjRPiiN7SCqnGZZ0s/uB
+ yshw==
+X-Gm-Message-State: AGi0PuaaREUUCPVWaxa2l/bSCs1WQuBlpiTP7EHYGSlwqTCZLk3M7pV/
+ AkefXR4o9PNBc8+wPGhryZ8UgHcD8T0=
+X-Google-Smtp-Source: APiQypJlcOhXBzi210JI6xZWbnIBeH3xKrRLWgDT+ihar8xJbL5crZR+kI5PdaSR4Ze5vBETxi8UwQ==
+X-Received: by 2002:a05:6512:308c:: with SMTP id
+ z12mr2639019lfd.195.1588263883589; 
+ Thu, 30 Apr 2020 09:24:43 -0700 (PDT)
 Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id g3sm160825ljj.13.2020.04.30.09.24.40
+ by smtp.gmail.com with ESMTPSA id j24sm147542ljg.60.2020.04.30.09.24.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Apr 2020 09:24:40 -0700 (PDT)
+ Thu, 30 Apr 2020 09:24:42 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 0/9] hw/core: stream: Add end-of-packet flag
-Date: Thu, 30 Apr 2020 18:24:30 +0200
-Message-Id: <20200430162439.2659-1-edgar.iglesias@gmail.com>
+Subject: [PATCH v1 2/9] hw/net/xilinx_axienet: Cleanup stream->push assignment
+Date: Thu, 30 Apr 2020 18:24:32 +0200
+Message-Id: <20200430162439.2659-3-edgar.iglesias@gmail.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200430162439.2659-1-edgar.iglesias@gmail.com>
+References: <20200430162439.2659-1-edgar.iglesias@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::242;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x242.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::141;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lf1-x141.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::242
+X-Received-From: 2a00:1450:4864:20::141
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,41 +107,60 @@ Sender: "Qemu-devel"
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Hi,
+Split the shared stream_class_init function to assign
+stream->push with better type-safety.
 
-When modeling pipelines of processing nodes that communicate
-through streaming interfaces (e.g AXI-Stream), some of these
-nodes send packets while others may just stream unpacketized data.
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
+ hw/net/xilinx_axienet.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
-The purpose of this series is to add an end-of-packet flag, e.g
-what AXI-Stream calls tlast. This is in preparation for modeling
-future nodes that may use huge packets that we wouldn't be able
-to buffer and also to handle nodes that don't use packets.
-
-Along the way I fixed a few things in the petalinux-ml605 eth setup.
-
-Cheers,
-Edgar
-
-Edgar E. Iglesias (9):
-  hw/net/xilinx_axienet: Auto-clear PHY Autoneg
-  hw/net/xilinx_axienet: Cleanup stream->push assignment
-  hw/net/xilinx_axienet: Remove unncessary cast
-  hw/dma/xilinx_axidma: Add DMA memory-region property
-  hw/core: stream: Add an end-of-packet flag
-  hw/net/xilinx_axienet: Handle fragmented packets from DMA
-  hw/dma/xilinx_axidma: mm2s: Stream descriptor by descriptor
-  hw/dma/xilinx_axidma: s2mm: Support stream fragments
-  MAINTAINERS: Add myself as streams maintainer
-
- include/hw/stream.h     |  5 +--
- hw/core/stream.c        |  4 +--
- hw/dma/xilinx_axidma.c  | 75 ++++++++++++++++++++++++++---------------
- hw/net/xilinx_axienet.c | 63 ++++++++++++++++++++++++----------
- hw/ssi/xilinx_spips.c   |  2 +-
- MAINTAINERS             |  6 ++++
- 6 files changed, 106 insertions(+), 49 deletions(-)
-
+diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
+index 0f97510d8a..84073753d7 100644
+--- a/hw/net/xilinx_axienet.c
++++ b/hw/net/xilinx_axienet.c
+@@ -1029,11 +1029,19 @@ static void xilinx_enet_class_init(ObjectClass *klass, void *data)
+     dc->reset = xilinx_axienet_reset;
+ }
+ 
+-static void xilinx_enet_stream_class_init(ObjectClass *klass, void *data)
++static void xilinx_enet_control_stream_class_init(ObjectClass *klass,
++                                                  void *data)
+ {
+     StreamSlaveClass *ssc = STREAM_SLAVE_CLASS(klass);
+ 
+-    ssc->push = data;
++    ssc->push = xilinx_axienet_control_stream_push;
++}
++
++static void xilinx_enet_data_stream_class_init(ObjectClass *klass, void *data)
++{
++    StreamSlaveClass *ssc = STREAM_SLAVE_CLASS(klass);
++
++    ssc->push = xilinx_axienet_data_stream_push;
+ }
+ 
+ static const TypeInfo xilinx_enet_info = {
+@@ -1048,8 +1056,7 @@ static const TypeInfo xilinx_enet_data_stream_info = {
+     .name          = TYPE_XILINX_AXI_ENET_DATA_STREAM,
+     .parent        = TYPE_OBJECT,
+     .instance_size = sizeof(struct XilinxAXIEnetStreamSlave),
+-    .class_init    = xilinx_enet_stream_class_init,
+-    .class_data    = xilinx_axienet_data_stream_push,
++    .class_init    = xilinx_enet_data_stream_class_init,
+     .interfaces = (InterfaceInfo[]) {
+             { TYPE_STREAM_SLAVE },
+             { }
+@@ -1060,8 +1067,7 @@ static const TypeInfo xilinx_enet_control_stream_info = {
+     .name          = TYPE_XILINX_AXI_ENET_CONTROL_STREAM,
+     .parent        = TYPE_OBJECT,
+     .instance_size = sizeof(struct XilinxAXIEnetStreamSlave),
+-    .class_init    = xilinx_enet_stream_class_init,
+-    .class_data    = xilinx_axienet_control_stream_push,
++    .class_init    = xilinx_enet_control_stream_class_init,
+     .interfaces = (InterfaceInfo[]) {
+             { TYPE_STREAM_SLAVE },
+             { }
 -- 
 2.20.1
 
