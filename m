@@ -2,71 +2,82 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAAE5C8300A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 12:53:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8768AC8300C
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 13:03:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96A1C2074A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 12:53:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5647020838
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 13:03:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="tjM4II46"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96A1C2074A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Dm9hOo6i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5647020838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU8hM-0007gt-OD
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 08:53:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41082)
+	id 1jU8qa-00047S-DL
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 09:03:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42756)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <qemu_oss@crudebyte.com>) id 1jU8gC-0005fy-GJ
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 08:52:46 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jU8o5-00031I-Qa
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:02:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <qemu_oss@crudebyte.com>) id 1jU8eO-00070P-7H
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 08:52:40 -0400
-Received: from kylie.crudebyte.com ([5.189.157.229]:49489)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1jU8eN-0006yi-0v
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 08:50:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=ds1lrRqmSx903DpdqZMJVhfBBA+/t3UoZ/Qn/oYL7cM=; b=tjM4II46SuAzRBxTgRjaiEiUS7
- 2ya04B2EHtETAunCdGAC8LfK1vDld++a+0JJ3fTXlbQYvLq19EbATwvtv6SbVUIQVmhyzmZTylbUR
- pAdOEM/r2P4X6pTgXYAFWl6KraePSHbtI0RoFY88pXxqIUgzaPQFRecYtYxCJ0ygON/purkd/EZXp
- czg6FQfrg3xhTJ5KWMs4xP1TTMcukXXhMP1L6CI1//PkPqlod/I0KI8iCNCR1Xl9nvx+wUNL26hcS
- UEHZsyg//pIpym197e7vu72slKk9FgJ7XbONBw4tEFPOGhcTQ9vF94YghFf6URz3hcdpF4UO60z2/
- 4vDyQqQXkt72jMxmqJBL7OoPeOV5bP5voSJ92/J+HvMSSxSMO7uj75MqxkCK5ejh9sog9NmB/Kti0
- B3l4Vrnh1XmwI88O+cFQO5K+TNmpLeHnJA7WvtE8BB8OIntSedOmzC5h7QNd1/TQNlmYldDL+lhB0
- l5bumT7PTfNliuGvNGkzTbxPEA/kcmy3pvUNrHT55m+NsnSl53AIvg6CSoUgdFpJ6I+KkAJO9R/Y6
- gnRSUjJQzN4xMMHV+mCmUopKucUyMQ4qGjt7yYDtRlix+S6JY9yNwZg/GZjUlr/MfRfRPh9PWDFRW
- oABKYJWMkdc2IIi8BZ7PD+DW6XBbYT/11resSBPz4=;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v6 3/5] 9pfs: add new function v9fs_co_readdir_many()
-Date: Thu, 30 Apr 2020 14:50:31 +0200
-Message-ID: <5059845.6LZZmIoT5M@silver>
-In-Reply-To: <20200430134235.524df46e@bahia.lan>
-References: <cover.1587309014.git.qemu_oss@crudebyte.com>
- <fdb0e29a86d1df6005021a08078d7e69ed0de1a2.1587309014.git.qemu_oss@crudebyte.com>
- <20200430134235.524df46e@bahia.lan>
+ (envelope-from <peter.maydell@linaro.org>) id 1jU8ng-0008AI-K6
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:00:49 -0400
+Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:40323)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jU8ng-00087Q-1O
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:00:24 -0400
+Received: by mail-oi1-x232.google.com with SMTP id t199so5118774oif.7
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 06:00:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=GAQpBHnSdfuHsWdp9pq+gZ9nRzw75HOaXMW+xo/DyFQ=;
+ b=Dm9hOo6iq4M8sI06wXCVOzyXPIuJoyqOtteE5n/RMgHUYfpE4UxL+JX1hqAhMPs9gs
+ FlirTxpasfq0nFCtxjE5ndOJzCl2DdMVCIYGWx6hfckx/QO1aSCYkcW1r28or9AL8XBs
+ AoikxGWC8YGC4kdeBUrCoFkj3XCC1sn4fGntsRhDTqWTVbu53jUdkHxr0yQHtvIRXp2W
+ /uBJ/BBZ0P0Sa5OHb+Vsq2fku5xul8bjr0ncNzK1JRbWxnp1OD8jUQq/DSmeY/ayaoyg
+ bAjYCca9Mc1Jn6nYVvFbDv2Sbml3k6v0DVuSGbKmdeFgwZTT4mKneNfSXIGMejGtq/9/
+ +OIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=GAQpBHnSdfuHsWdp9pq+gZ9nRzw75HOaXMW+xo/DyFQ=;
+ b=bOlOpwx5T+4pbBgZVN0hofBO07wqU8JYAWlmirYZBkIHLWe29yzp0UamMxXz50SlIV
+ rpaehUw8Ry3bnOdEBXud1MeTHbH8xzzrK3s3QdvPHyTzsADDRgYGv3halIYBEyNEznx+
+ vYOlnuao1fMHU27W8y4QtRKX1S2vAqJViS1Ksi418A0FhgZw+BjNL3pcK+vslLGhA4Ur
+ fCz1lfci/6JAGLvrJgSigA6jzCu5D6/aXbunoCpHI+mlFKlP+/FIxx+DdP5VymeyPWY6
+ 5lEC0yFP/GUMF7jUQ6eueRKJCZ9cyFPDERuvoU4fMqbEyJ4m0HAEsSdtRREgJOVx9xAv
+ VFBA==
+X-Gm-Message-State: AGi0Pub0QeA4bDoV5nHI4QTHwG4+u/e2LyQBN1jX5giIAs+FIxgtg47p
+ on3Cx7+ZkjBSwzRISLmDSYTRWpsvFKmBviDwFaAx1Q==
+X-Google-Smtp-Source: APiQypJd7DghqTkFpLrNDkRrrDhByYOpChsgBFeDHHpnVHmKreVlFrlRKeU7gNlPIjUTyxwjQpkXxR8AhW2bi6hL/Zo=
+X-Received: by 2002:aca:4a45:: with SMTP id x66mr1515256oia.48.1588251622588; 
+ Thu, 30 Apr 2020 06:00:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Received-SPF: pass client-ip=5.189.157.229;
- envelope-from=qemu_oss@crudebyte.com; helo=kylie.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 08:50:42
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Received-From: 5.189.157.229
+References: <20200430053104.32204-1-armbru@redhat.com>
+In-Reply-To: <20200430053104.32204-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 30 Apr 2020 14:00:11 +0100
+Message-ID: <CAFEAcA9nQ4CRDHndV3qd7L5P9yzKDzmh4Kc17u_=bVRxHgmiUA@mail.gmail.com>
+Subject: Re: [PULL 00/20] QAPI patches for 2020-04-30
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::232;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x232.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::232
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,154 +89,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Donnerstag, 30. April 2020 13:42:35 CEST Greg Kurz wrote:
-> > +/*
-> > + * This is solely executed on a background IO thread.
-> > + *
-> > + * See v9fs_co_readdir_many() (as its only user) below for details.
-> > + */
-> > +static int do_readdir_many(V9fsPDU *pdu, V9fsFidState *fidp,
-> > +                             struct V9fsDirEnt **entries,
-> > +                             int32_t maxsize, bool dostat)
-> > +{
-> > +    V9fsState *s = pdu->s;
-> > +    V9fsString name;
-> > +    int len, err = 0;
-> > +    int32_t size = 0;
-> > +    off_t saved_dir_pos;
-> > +    struct dirent *dent;
-> > +    struct V9fsDirEnt *e = NULL;
-> > +    V9fsPath path;
-> > +    struct stat stbuf;
-> > 
-> > -            errno = 0;
-> > -            entry = s->ops->readdir(&s->ctx, &fidp->fs);
-> > -            if (!entry && errno) {
-> > +    *entries = NULL;
-> > +    v9fs_path_init(&path);
-> > +
-> > +    /*
-> > +     * TODO: Here should be a warn_report_once() if lock failed.
-> > +     *
-> > +     * With a good 9p client we should not get into concurrency here,
-> > +     * because a good client would not use the same fid for concurrent
-> > +     * requests. We do the lock here for safety reasons though. However
-> > +     * the client would then suffer performance issues, so better log
-> > that
-> > +     * issue here.
-> > +     */
-> > +    v9fs_readdir_lock(&fidp->fs.dir);
-> 
-> I agree that a client that issues concurrent readdir requests on the
-> same fid is probably asking for troubles, but this permitted by the
-> spec. Whether we should detect such conditions and warn or even fail
-> is discussion for another thread.
-> 
-> The locking is only needed to avoid concurrent accesses to the dirent
-> structure returned by readdir(), otherwise we could return partially
-> overwritten file names to the client. It must be done for each individual
-> call to readdir(), but certainly not for multiple calls.
-
-Yeah, that would resolve this issue more appropriately for 9p2000.L, since 
-Treaddir specifies an offset, but for 9p2000.u the result of a concurrent read 
-on a directory (9p2000.u) would still be undefined.
-
-> As discussed privately, I'm working on a patch to better address the
-> locking and I'd really prefer to merge this before your series. Sorry
-> for the delay again. I'll try to post ASAP.
-> 
-> Anyway, I have some more remarks.
-> 
-> > +
-> > +    /* save the directory position */
-> > +    saved_dir_pos = s->ops->telldir(&s->ctx, &fidp->fs);
-> > +    if (saved_dir_pos < 0) {
-> > +        err = saved_dir_pos;
-> > +        goto out;
-> > +    }
-> > +
-> > +    while (true) {
-> > +        /* get directory entry from fs driver */
-> > +        err = do_readdir(pdu, fidp, &dent);
-> > +        if (err || !dent) {
-> > +            break;
-> > +        }
-> > +
-> > +        /*
-> > +         * stop this loop as soon as it would exceed the allowed maximum
-> > +         * response message size for the directory entries collected so
-> > far, +         * because anything beyond that size would need to be
-> > discarded by +         * 9p controller (main thread / top half) anyway
-> > +         */
-> > +        v9fs_string_init(&name);
-> > +        v9fs_string_sprintf(&name, "%s", dent->d_name);
-> > +        len = v9fs_readdir_response_size(&name);
-> > +        v9fs_string_free(&name);
-> > +        if (size + len > maxsize) {
-> > +            /* this is not an error case actually */
-> > +            break;
-> > +        }
-> > +
-> > +        /* append next node to result chain */
-> > +        if (!e) {
-> > +            *entries = e = g_malloc0(sizeof(V9fsDirEnt));
-> > +        } else {
-> > +            e = e->next = g_malloc0(sizeof(V9fsDirEnt));
-> > +        }
-> > +        e->dent = g_malloc0(sizeof(struct dirent));
-> 
-> So we're allocating a bunch of stuff here...
-> 
-> > +        memcpy(e->dent, dent, sizeof(struct dirent));
-> > +
-> > +        /* perform a full stat() for directory entry if requested by
-> > caller */ +        if (dostat) {
-> > +            err = s->ops->name_to_path(
-> > +                &s->ctx, &fidp->path, dent->d_name, &path
-> > +            );
-> > +            if (err < 0) {
-> > 
-> >                  err = -errno;
-> > 
-> > -            } else {
-> > -                *dent = entry;
-> > -                err = 0;
-> > +                break;
-> 
-> ... but we're erroring out there and it seems that we're leaking
-> all the entries that have been allocated so far.
-
-No, they are not leaking actually.
-
-You are right that they are not deallocated in do_readdir_many(), but that's 
-intentional: in the new implementation of v9fs_do_readdir() you see that 
-v9fs_free_dirents(entries) is *always* called at the very end of the function, 
-no matter if success or any error. That's one of the measures to simplify 
-overall code as much as possible.
-
-As you might have noticed, the previous/current v9fs_do_readdir() 
-implementation had quite a bunch of individual error pathes, which is quite 
-error prone or at least makes it difficult to maintain. So I think it makes 
-sense to strip unnecessary branches as much as possible.
-
-> Also I have the impression that all the if (dostat) { } block could
-> be done before chaining a new entry.
-
-Yes, you could move it forward, but what would you buy from that?
-
-I think you mean the case when there's an error inside the if (dostat) {} 
-block: The comments on struct V9fsDirEnt already suggest that the "st" member 
-is optional and may be NULL. So if there's an error inside if (dostat) {}
-then caller still has a valid "dent" field at least and it's up to caller 
-whether or not it's a problem for its purpose that "st" is empty. For that 
-reason I would not move the block forward.
-
-Best regards,
-Christian Schoenebeck
+On Thu, 30 Apr 2020 at 06:32, Markus Armbruster <armbru@redhat.com> wrote:
+>
+> The following changes since commit 648db19685b7030aa558a4ddbd3a8e53d8c9a062:
+>
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-misc-2020-04-29' into staging (2020-04-29 15:07:33 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2020-04-30
+>
+> for you to fetch changes up to 89bf68f933393a1bc0de4d07b59ffa8920da130f:
+>
+>   qapi: Generate simpler marshalling code when no arguments (2020-04-30 07:26:41 +0200)
+>
+> ----------------------------------------------------------------
+> QAPI patches for 2020-04-30
+>
 
 
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
+
+-- PMM
 
