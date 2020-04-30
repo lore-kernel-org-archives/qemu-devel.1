@@ -2,128 +2,88 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53DC9C4724C
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:45:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96A32C47247
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:46:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 191582063A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:45:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5F8BA20774
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:46:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jMxtW1AI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 191582063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vOw32oAE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F8BA20774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUAR4-000682-1P
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 10:45:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35280)
+	id 1jUAS6-0007IG-IQ
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 10:46:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35530)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jUAQ5-0004U4-B8
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:44:10 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jUAQy-0006Io-8p
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:45:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jUAQ4-0008A6-Ij
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:44:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53387
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jUAQ4-00085X-3o
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:44:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588257846;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=eA+k6+vAsTZasYOnLJglldWMpSTrMVlE7crlNvkt1dY=;
- b=jMxtW1AIeILDO2i0ogg5+g+Ub6TMD7mxXJMxZvkg27E8Rz9htBxrTMEgqKSrglzJSaqAQG
- Lb9YEMDFhGFSxjihV5L23qLLXsbGaADsjRvvip5w6LqCGohBr6h/seDSO0NIt93oC0O1Oc
- 7m2fv9BitB7mPbB4omks0iL3l1hN5DY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-209-souUdeQ2NeqKir48Pp6c1A-1; Thu, 30 Apr 2020 10:44:01 -0400
-X-MC-Unique: souUdeQ2NeqKir48Pp6c1A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A635C801503;
- Thu, 30 Apr 2020 14:43:59 +0000 (UTC)
-Received: from [10.36.113.172] (ovpn-113-172.ams2.redhat.com [10.36.113.172])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4599A5EDE2;
- Thu, 30 Apr 2020 14:43:45 +0000 (UTC)
-Subject: Re: [PATCH v4 00/13] migrate/ram: Fix resizing RAM blocks while
- migrating
+ (envelope-from <peter.maydell@linaro.org>) id 1jUAQx-0002zJ-0o
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:45:03 -0400
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:44876)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jUAQw-0002tM-GZ
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:45:02 -0400
+Received: by mail-wr1-x435.google.com with SMTP id d17so7222947wrg.11
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 07:45:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=o03GEJHAEin06hy2s0mzQS70eb/2rkMMYtrKlM7rZzI=;
+ b=vOw32oAE0aFanKF8xqvm6sieGWrGi/MBmktqeOZMk/7VuQucDM5IzA5SMpPFn6k0SK
+ sAn/EAjmgyU/1CB/5ypjHxoXgPxMo+2BN8HVYzgu72qjMNfRFXQxxle2fq7k+WSYw1RB
+ aWZtbrDQRB0Pc+dcuAOxibKhSycEEJSfh3DAQNZBcmODiRKNQQ5jGsr3mFPUcQVXB2ZA
+ Fkx9p9i917oVYbDFEd9PwlVmlFr8OMWeYI02eSPAMWJW8WfXo1tTeGnYb35bumOu3l3d
+ kRHWXmEZHG3sTrnQ3C5NBRbenSOXATaOTqCDL85zw4J5PccvGvcP/8lzt/IsFo8IMNy4
+ oyoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=o03GEJHAEin06hy2s0mzQS70eb/2rkMMYtrKlM7rZzI=;
+ b=S76s/3LmjNBnL1UVJ6/jVR32CZm1ZOfsk8gm5p8BJRZFWERm02DK/mslY/Mzde/ib8
+ 7NoIbJeISmRZMpNyJZTUtgFZftl+Vpi7/C2h7Qa78OyUOGLL1bKhkHSubu6t/TgFff6j
+ rANdy35ch50k8uF30GXdh4pIaWjKK4ZeEhPY8vnpdvyND5rNBxViRV9THxyoW/8rwPdX
+ Lt98RvScgb0/67ZPYhHjybL/y65nExlvaOnlkDR3rcym/AFaojIkqlQMXLXSIEbMYWaZ
+ n5JWJwsrl5frOEXd9TsF01F1zKpaZGpCT/KqmwEaGag/q/gxr66bevCpiR97N0GwTBhw
+ sA1g==
+X-Gm-Message-State: AGi0PuaIcmTfkvWW/44tJ22DXdbS1fzgjfic/aVfwdZDMb8JH23iByHd
+ om293DBIblvko0UVnMDklhrXVWR2DVzwBQ==
+X-Google-Smtp-Source: APiQypIEtazXesUL9lDVSSwdTMCz033/TcXIs1/GdFm8DzCC5kpylxxKEcZy95CpAJ75UZMZknglnA==
+X-Received: by 2002:adf:df8d:: with SMTP id z13mr4325479wrl.304.1588257900352; 
+ Thu, 30 Apr 2020 07:45:00 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id u3sm4186435wrt.93.2020.04.30.07.44.59
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 30 Apr 2020 07:44:59 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-References: <20200421085300.7734-1-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <99edb2b8-fa80-ed91-6947-eb6e4243de39@redhat.com>
-Date: Thu, 30 Apr 2020 16:43:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+Subject: [PULL v2 00/30] target-arm queue
+Date: Thu, 30 Apr 2020 15:44:58 +0100
+Message-Id: <20200430144458.17324-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200421085300.7734-1-david@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 23:34:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::435;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x435.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::435
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -135,127 +95,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrea Arcangeli <aarcange@redhat.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
- Paul Durrant <paul@xen.org>, Alex Williamson <alex.williamson@redhat.com>,
- Shannon Zhao <shannon.zhao@linaro.org>, Igor Mammedov <imammedo@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21.04.20 10:52, David Hildenbrand wrote:
-> Basically a resend. Who's the lucky winner to pick this up for 5.1? :)
-> 
-
-Gentle ping, I have loads of patches in my backlog, and it does not seem
-to get any shorter.
-
-> ---
-> 
-> This is the follow up of
->     "[PATCH RFC] memory: Don't allow to resize RAM while migrating" [1]
-> 
-> This series contains some (slightly modified) patches also contained in:
->     "[PATCH v2 fixed 00/16] Ram blocks with resizable anonymous allocations
->      under POSIX" [2]
-> That series will be based on this series. The last patch (#13) in this
-> series could be moved to the other series, but I decided to include it in
-> here for now (similar context).
-> 
-> I realized that resizing RAM blocks while the guest is being migrated
-> (precopy: resize while still running on the source, postcopy: resize
->  while already running on the target) is buggy. In case of precopy, we
-> can simply cancel migration. Postcopy handling is more involved. Resizing
-> can currently happen during a guest reboot, triggered by ACPI rebuilds.
-> 
-> Along with the fixes, some cleanups.
-> 
-> [1] https://lkml.kernel.org/r/20200213172016.196609-1-david@redhat.com
-> [2] https://lkml.kernel.org/r/20200212134254.11073-1-david@redhat.com
-> 
-> v3 -> v4:
-> - Rebased and retested
-> - Added RBs
-> 
-> v2 -> v3:
-> - Rebased on current master
-> - Added RBs
-> - "migration/ram: Tolerate partially changed mappings in postcopy code"
-> -- Extended the comment for the uffdio unregister part.
-> 
-> v1 -> v2:
-> - "util: vfio-helpers: Factor out and fix processing of existing ram
->    blocks"
-> -- Stringify error
-> - "migraton/ram: Handle RAM block resizes during precopy"
-> -- Simplified check if we're migrating on the source
-> - "exec: Relax range check in ram_block_discard_range()"
-> -- Added to make discard during resizes actually work
-> - "migration/ram: Discard new RAM when growing RAM blocks after
->    ram_postcopy_incoming_init()"
-> -- Better checks if in the right postcopy mode.
-> -- Better patch subject/description/comments
-> - "migration/ram: Handle RAM block resizes during postcopy"
-> -- Better comments
-> -- Adapt to changed postcopy checks
-> - "migrate/ram: Get rid of "place_source" in ram_load_postcopy()"
-> -- Dropped, as broken
-> - "migration/ram: Tolerate partially changed mappings in postcopy code"
-> -- Better comment / description. Clarify that no implicit wakeup will
->    happen
-> -- Warn on EINVAL (older kernels)
-> -- Wake up any waiter explicitly
-> 
-> David Hildenbrand (13):
->   util: vfio-helpers: Factor out and fix processing of existing ram
->     blocks
->   stubs/ram-block: Remove stubs that are no longer needed
->   numa: Teach ram block notifiers about resizeable ram blocks
->   numa: Make all callbacks of ram block notifiers optional
->   migration/ram: Handle RAM block resizes during precopy
->   exec: Relax range check in ram_block_discard_range()
->   migration/ram: Discard RAM when growing RAM blocks after
->     ram_postcopy_incoming_init()
->   migration/ram: Simplify host page handling in ram_load_postcopy()
->   migration/ram: Consolidate variable reset after placement in
->     ram_load_postcopy()
->   migration/ram: Handle RAM block resizes during postcopy
->   migration/multifd: Print used_length of memory block
->   migration/ram: Use offset_in_ramblock() in range checks
->   migration/ram: Tolerate partially changed mappings in postcopy code
-> 
->  exec.c                     |  25 +++++--
->  hw/core/numa.c             |  41 +++++++++--
->  hw/i386/xen/xen-mapcache.c |   7 +-
->  include/exec/cpu-common.h  |   1 +
->  include/exec/memory.h      |  10 +--
->  include/exec/ramblock.h    |  10 +++
->  include/exec/ramlist.h     |  13 ++--
->  migration/migration.c      |   9 ++-
->  migration/migration.h      |   1 +
->  migration/multifd.c        |   2 +-
->  migration/postcopy-ram.c   |  54 +++++++++++++-
->  migration/ram.c            | 144 ++++++++++++++++++++++++++++---------
->  stubs/ram-block.c          |  20 ------
->  target/i386/hax-mem.c      |   5 +-
->  target/i386/sev.c          |  18 ++---
->  util/vfio-helpers.c        |  41 ++++-------
->  16 files changed, 283 insertions(+), 118 deletions(-)
-> 
+v2:
+ * dropped target/arm/cpu: Use ARRAY_SIZE() to iterate over ARMCPUInfo[]
+ * renamed CLOCK_SECOND to CLOCK_PERIOD_1SEC
 
 
--- 
-Thanks,
+The following changes since commit 648db19685b7030aa558a4ddbd3a8e53d8c9a062:
 
-David / dhildenb
+  Merge remote-tracking branch 'remotes/armbru/tags/pull-misc-2020-04-29' into staging (2020-04-29 15:07:33 +0100)
 
+are available in the Git repository at:
+
+  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200430-1
+
+for you to fetch changes up to 6f7b6947a6639fff15c6a0956adf0f5ec004b789:
+
+  hw/arm: xlnx-zcu102: Disable unsupported FDT firmware nodes (2020-04-30 15:35:41 +0100)
+
+----------------------------------------------------------------
+target-arm queue:
+ * xlnx-zdma: Fix endianness handling of descriptor loading
+ * nrf51: Fix last GPIO CNF address
+ * gicv3: Use gicr_typer in arm_gicv3_icc_reset
+ * msf2: Add EMAC block to SmartFusion2 SoC
+ * New clock modelling framework
+ * hw/arm: versal: Setup the ADMA with 128bit bus-width
+ * Cadence: gem: fix wraparound in 64bit descriptors
+ * cadence_gem: clear RX control descriptor
+ * target/arm: Vectorize integer comparison vs zero
+ * hw/arm/virt: dt: add kaslr-seed property
+ * hw/arm: xlnx-zcu102: Disable unsupported FDT firmware nodes
+
+----------------------------------------------------------------
+Cameron Esfahani (1):
+      nrf51: Fix last GPIO CNF address
+
+Damien Hedde (7):
+      hw/core/clock-vmstate: define a vmstate entry for clock state
+      qdev: add clock input&output support to devices.
+      qdev-clock: introduce an init array to ease the device construction
+      hw/misc/zynq_slcr: add clock generation for uarts
+      hw/char/cadence_uart: add clock support
+      hw/arm/xilinx_zynq: connect uart clocks to slcr
+      qdev-monitor: print the device's clock with info qtree
+
+Edgar E. Iglesias (7):
+      dma/xlnx-zdma: Fix descriptor loading (MEM) wrt endianness
+      dma/xlnx-zdma: Fix descriptor loading (REG) wrt endianness
+      hw/arm: versal: Setup the ADMA with 128bit bus-width
+      device_tree: Allow name wildcards in qemu_fdt_node_path()
+      device_tree: Constify compat in qemu_fdt_node_path()
+      hw/arm: xlnx-zcu102: Move arm_boot_info into XlnxZCU102
+      hw/arm: xlnx-zcu102: Disable unsupported FDT firmware nodes
+
+Jerome Forissier (2):
+      hw/arm/virt: dt: move creation of /secure-chosen to create_fdt()
+      hw/arm/virt: dt: add kaslr-seed property
+
+Keqian Zhu (2):
+      bugfix: Use gicr_typer in arm_gicv3_icc_reset
+      Typo: Correct the name of CPU hotplug memory region
+
+Peter Maydell (2):
+      hw/core/clock: introduce clock object
+      docs/clocks: add device's clock documentation
+
+Philippe Mathieu-Daudé (2):
+      target/arm: Restrict the Address Translate write operation to TCG accel
+      target/arm/cpu: Update coding style to make checkpatch.pl happy
+
+Ramon Fried (2):
+      Cadence: gem: fix wraparound in 64bit descriptors
+      net: cadence_gem: clear RX control descriptor
+
+Richard Henderson (1):
+      target/arm: Vectorize integer comparison vs zero
+
+Subbaraya Sundeep (3):
+      hw/net: Add Smartfusion2 emac block
+      msf2: Add EMAC block to SmartFusion2 SoC
+      tests/boot_linux_console: Add ethernet test to SmartFusion2
+
+Thomas Huth (1):
+      target/arm: Make cpu_register() available for other files
+
+ hw/core/Makefile.objs                  |   2 +
+ hw/net/Makefile.objs                   |   1 +
+ tests/Makefile.include                 |   1 +
+ include/hw/arm/msf2-soc.h              |   2 +
+ include/hw/char/cadence_uart.h         |   1 +
+ include/hw/clock.h                     | 225 +++++++++++++
+ include/hw/gpio/nrf51_gpio.h           |   2 +-
+ include/hw/net/msf2-emac.h             |  53 +++
+ include/hw/qdev-clock.h                | 159 +++++++++
+ include/hw/qdev-core.h                 |  12 +
+ include/sysemu/device_tree.h           |   5 +-
+ target/arm/cpu-qom.h                   |   9 +-
+ target/arm/helper.h                    |  27 +-
+ target/arm/translate.h                 |   5 +
+ device_tree.c                          |   4 +-
+ hw/acpi/cpu.c                          |   2 +-
+ hw/arm/msf2-soc.c                      |  26 +-
+ hw/arm/virt.c                          |  20 +-
+ hw/arm/xilinx_zynq.c                   |  57 +++-
+ hw/arm/xlnx-versal.c                   |   2 +
+ hw/arm/xlnx-zcu102.c                   |  39 ++-
+ hw/char/cadence_uart.c                 |  73 +++-
+ hw/core/clock-vmstate.c                |  25 ++
+ hw/core/clock.c                        | 130 ++++++++
+ hw/core/qdev-clock.c                   | 185 +++++++++++
+ hw/core/qdev.c                         |  12 +
+ hw/dma/xlnx-zdma.c                     |  25 +-
+ hw/intc/arm_gicv3_kvm.c                |   4 +-
+ hw/misc/zynq_slcr.c                    | 172 +++++++++-
+ hw/net/cadence_gem.c                   |  16 +-
+ hw/net/msf2-emac.c                     | 589 +++++++++++++++++++++++++++++++++
+ qdev-monitor.c                         |   9 +
+ target/arm/cpu.c                       |  19 +-
+ target/arm/cpu64.c                     |   8 +-
+ target/arm/helper.c                    |  17 +
+ target/arm/neon_helper.c               |  24 --
+ target/arm/translate-a64.c             |  64 +---
+ target/arm/translate.c                 | 256 ++++++++++++--
+ target/arm/vec_helper.c                |  25 ++
+ MAINTAINERS                            |   2 +
+ docs/devel/clocks.rst                  | 391 ++++++++++++++++++++++
+ docs/devel/index.rst                   |   1 +
+ hw/char/trace-events                   |   3 +
+ hw/core/trace-events                   |   7 +
+ tests/acceptance/boot_linux_console.py |  15 +-
+ 45 files changed, 2533 insertions(+), 193 deletions(-)
+ create mode 100644 include/hw/clock.h
+ create mode 100644 include/hw/net/msf2-emac.h
+ create mode 100644 include/hw/qdev-clock.h
+ create mode 100644 hw/core/clock-vmstate.c
+ create mode 100644 hw/core/clock.c
+ create mode 100644 hw/core/qdev-clock.c
+ create mode 100644 hw/net/msf2-emac.c
+ create mode 100644 docs/devel/clocks.rst
 
