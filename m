@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4BC7C83006
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C11EC83001
 	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 07:26:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F43220838
+	by mail.kernel.org (Postfix) with ESMTPS id 3D3F720838
 	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 07:26:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F43220838
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D3F720838
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU3ai-0001tE-Ki
+	id 1jU3ai-0001tf-8h
 	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 03:26:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34278)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34268)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jU3XZ-0004ct-QN
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jU3XY-0004b0-Ev
  for qemu-devel@nongnu.org; Thu, 30 Apr 2020 03:23:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jU3W7-0006Yg-T2
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 03:23:25 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:42105)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jU3W7-0006YN-G7
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 03:23:24 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:46144)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jU3W6-0006WV-Tx; Thu, 30 Apr 2020 03:21:55 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436398|-1; CH=green;
+ id 1jU3W6-0006WW-Pu; Thu, 30 Apr 2020 03:21:55 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436282|-1; CH=green;
  DM=|CONTINUE|false|;
- DS=CONTINUE|ham_system_inform|0.0951211-0.00075412-0.904125;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03295; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ DS=CONTINUE|ham_system_inform|0.704462-0.000721421-0.294816;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e01l07447; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
  RN=10; RT=10; SR=0; TI=SMTPD_---.HQfovas_1588231302; 
 Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
  fp:SMTPD_---.HQfovas_1588231302) by smtp.aliyun-inc.com(10.147.40.7);
- Thu, 30 Apr 2020 15:21:45 +0800
+ Thu, 30 Apr 2020 15:21:43 +0800
 From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 To: peter.maydell@linaro.org
-Subject: [RFC PATCH 4/8] riscv: Implement payload load interfaces
-Date: Thu, 30 Apr 2020 15:21:35 +0800
-Message-Id: <20200430072139.4602-5-zhiwei_liu@c-sky.com>
+Subject: [RFC PATCH 1/8] riscv: Add RV64I instructions description
+Date: Thu, 30 Apr 2020 15:21:32 +0800
+Message-Id: <20200430072139.4602-2-zhiwei_liu@c-sky.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20200430072139.4602-1-zhiwei_liu@c-sky.com>
 References: <20200430072139.4602-1-zhiwei_liu@c-sky.com>
@@ -77,205 +77,157 @@ Sender: "Qemu-devel"
 
 Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 ---
- risu_reginfo_riscv64.c | 134 +++++++++++++++++++++++++++++++++++++++++
- risu_riscv64.c         |  47 +++++++++++++++
- 2 files changed, 181 insertions(+)
- create mode 100644 risu_reginfo_riscv64.c
- create mode 100644 risu_riscv64.c
+ riscv64.risu | 141 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 141 insertions(+)
+ create mode 100644 riscv64.risu
 
-diff --git a/risu_reginfo_riscv64.c b/risu_reginfo_riscv64.c
+diff --git a/riscv64.risu b/riscv64.risu
 new file mode 100644
-index 0000000..cfa9889
+index 0000000..98141ab
 --- /dev/null
-+++ b/risu_reginfo_riscv64.c
-@@ -0,0 +1,134 @@
-+/******************************************************************************
-+ * Copyright (c) 2020 PingTouGe Semiconductor
-+ * All rights reserved. This program and the accompanying materials
-+ * are made available under the terms of the Eclipse Public License v1.0
-+ * which accompanies this distribution, and is available at
-+ * http://www.eclipse.org/legal/epl-v10.html
-+ *
-+ * Contributors:
-+ *     LIU Zhiwei (PingTouGe) - initial implementation
-+ *     based on Peter Maydell's risu_arm.c
-+ *****************************************************************************/
++++ b/riscv64.risu
+@@ -0,0 +1,141 @@
++# Input file for risugen defining RISC-V instructions
++.mode riscv
++@RV64I
 +
-+#include <stdio.h>
-+#include <ucontext.h>
-+#include <string.h>
-+#include <signal.h> /* for FPSIMD_MAGIC */
-+#include <stdlib.h>
-+#include <stddef.h>
-+#include <stdbool.h>
-+#include <inttypes.h>
-+#include <assert.h>
-+#include <sys/prctl.h>
++# x2 stack pointer, x3 global pointer, x4 thread pointer
++# These registers should be reserved for signal handler.
 +
-+#include "risu.h"
-+#include "risu_reginfo_riscv64.h"
++LUI RISCV imm:20 rd:5 0110111 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 }
 +
-+const struct option * const arch_long_opts;
-+const char * const arch_extra_help;
++AUIPC RISCV imm:20 rd:5 0110111 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 }
 +
-+void process_arch_opt(int opt, const char *arg)
-+{
-+    abort();
-+}
++# Limit to current implementation, the base address register will be overide
++LB RISCV imm:12 rs1:5 000 rd:5 0000011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 0 && $rs1 != 2 && $rs1 != 3 && $rs1 != 4 } \
++!memory { align(1); reg_plus_imm($rs1, sextract($imm, 12)); }
 +
-+const int reginfo_size(void)
-+{
-+    return sizeof(struct reginfo);
-+}
++LH RISCV imm:12 rs1:5 001 rd:5 0000011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 0 && $rs1 != 2 && $rs1 != 3 && $rs1 != 4 } \
++!memory { align(2); reg_plus_imm($rs1, sextract($imm, 12)); }
 +
-+/* reginfo_init: initialize with a ucontext */
-+void reginfo_init(struct reginfo *ri, ucontext_t *uc)
-+{
-+    int i;
-+    union __riscv_mc_fp_state *fp;
-+    /* necessary to be able to compare with memcmp later */
-+    memset(ri, 0, sizeof(*ri));
++LW RISCV imm:12 rs1:5 010 rd:5 0000011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 0 && $rs1 != 2 && $rs1 != 3 && $rs1 != 4 } \
++!memory { align(4); reg_plus_imm($rs1, sextract($imm, 12)); }
 +
-+    for (i = 0; i < 32; i++) {
-+        ri->regs[i] = uc->uc_mcontext.__gregs[i];
-+    }
++LBU RISCV imm:12 rs1:5 100 rd:5 0000011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 0 && $rs1 != 2 && $rs1 != 3 && $rs1 != 4 } \
++!memory { align(1); reg_plus_imm($rs1, sextract($imm, 12)); }
 +
-+    ri->sp = 0xdeadbeefdeadbeef;
-+    ri->regs[2] = 0xdeadbeefdeadbeef;
-+    ri->regs[3] = 0xdeadbeefdeadbeef;
-+    ri->regs[4] = 0xdeadbeefdeadbeef;
-+    ri->pc = uc->uc_mcontext.__gregs[0] - image_start_address;
-+    ri->faulting_insn = *((uint32_t *) uc->uc_mcontext.__gregs[0]);
-+    fp = &uc->uc_mcontext.__fpregs;
-+    ri->fcsr = fp->__d.__fcsr;
++LHU RISCV imm:12 rs1:5 101 rd:5 0000011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 0 && $rs1 != 2 && $rs1 != 3 && $rs1 != 4 } \
++!memory { align(2); reg_plus_imm($rs1, sextract($imm, 12)); }
 +
-+    for (i = 0; i < 32; i++) {
-+        ri->fregs[i] = fp->__d.__f[i];
-+    }
-+}
++SB RISCV imm5:7 rs2:5 rs1:5 000 imm:5 0100011 \
++!constraints { $rs1 != 0 && $rs1 != 2 && $rs1 !=3 && $rs1 != 4 && $rs2 != 2 } \
++!memory { align(1); reg_plus_imm($rs1, sextract($imm5 << 5 | $imm, 12)); }
 +
-+/* reginfo_is_eq: compare the reginfo structs, returns nonzero if equal */
-+int reginfo_is_eq(struct reginfo *r1, struct reginfo *r2)
-+{
-+    return memcmp(r1, r2, reginfo_size()) == 0;
-+}
++SH RISCV imm5:7 rs2:5 rs1:5 001 imm:5 0100011 \
++!constraints { $rs1 != 0 && $rs1 != 2 && $rs1 !=3 && $rs1 != 4 && $rs2 != 2 } \
++!memory { align(2); reg_plus_imm($rs1, sextract($imm5 << 5 | $imm, 12)); }
 +
-+/* reginfo_dump: print state to a stream, returns nonzero on success */
-+int reginfo_dump(struct reginfo *ri, FILE * f)
-+{
-+    int i;
-+    fprintf(f, "  faulting insn %08x\n", ri->faulting_insn);
++SW RISCV imm5:7 rs2:5 rs1:5 010 imm:5 0100011 \
++!constraints { $rs1 != 0 && $rs1 != 2 && $rs1 !=3 && $rs1 != 4 && $rs2 != 2 } \
++!memory { align(4); reg_plus_imm($rs1, sextract($imm5 << 5 | $imm, 12)); }
 +
-+    for (i = 1; i < 32; i++) {
-+        fprintf(f, "  X%-2d    : %016" PRIx64 "\n", i, ri->regs[i]);
-+    }
++ADDI RISCV imm:12 rs1:5 000 rd:5 0010011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
 +
-+    fprintf(f, "  sp     : %016" PRIx64 "\n", ri->sp);
-+    fprintf(f, "  pc     : %016" PRIx64 "\n", ri->pc);
-+    fprintf(f, "  fcsr   : %08x\n", ri->fcsr);
++SLTI RISCV imm:12 rs1:5 010 rd:5 0010011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
 +
-+    for (i = 0; i < 32; i++) {
-+        fprintf(f, "  F%-2d    : %016" PRIx64 "\n", i, ri->fregs[i]);
-+    }
++SLTIU RISCV imm:12 rs1:5 011 rd:5 0010011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
 +
-+    return !ferror(f);
-+}
++XORI RISCV imm:12 rs1:5 100 rd:5 0010011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
 +
-+/* reginfo_dump_mismatch: print mismatch details to a stream, ret nonzero=ok */
-+int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
-+{
-+    int i;
-+    fprintf(f, "mismatch detail (master : apprentice):\n");
-+    if (m->faulting_insn != a->faulting_insn) {
-+        fprintf(f, "  faulting insn mismatch %08x vs %08x\n",
-+                m->faulting_insn, a->faulting_insn);
-+    }
-+    for (i = 1; i < 32; i++) {
-+        if (m->regs[i] != a->regs[i]) {
-+            fprintf(f, "  X%-2d    : %016" PRIx64 " vs %016" PRIx64 "\n",
-+                    i, m->regs[i], a->regs[i]);
-+        }
-+    }
++ORI RISCV imm:12 rs1:5 110 rd:5 0010011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
 +
-+    if (m->sp != a->sp) {
-+        fprintf(f, "  sp     : %016" PRIx64 " vs %016" PRIx64 "\n",
-+                m->sp, a->sp);
-+    }
++ANDI RISCV imm:12 rs1:5 111 rd:5 0010011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
 +
-+    if (m->pc != a->pc) {
-+        fprintf(f, "  pc     : %016" PRIx64 " vs %016" PRIx64 "\n",
-+                m->pc, a->pc);
-+    }
++ADD RISCV 0000000 rs2:5 rs1:5 000 rd:5 0110011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 && $rs2 != 2 }
 +
-+    if (m->fcsr != a->fcsr) {
-+        fprintf(f, "  fcsr   : %08x vs %08x\n", m->fcsr, a->fcsr);
-+    }
++SUB RISCV 0100000 rs2:5 rs1:5 000 rd:5 0110011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 && $rs2 != 2 }
 +
-+    for (i = 0; i < 32; i++) {
-+        if (m->fregs[i] != a->fregs[i]) {
-+            fprintf(f, "  F%-2d    : "
-+                    "%016" PRIx64 " vs "
-+                    "%016" PRIx64 "\n", i,
-+                    (uint64_t) m->fregs[i],
-+                    (uint64_t) a->fregs[i]);
-+        }
-+    }
++SLL RISCV 0000000 rs2:5 rs1:5 001 rd:5 0110011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 && $rs2 != 2 }
 +
-+    return !ferror(f);
-+}
-diff --git a/risu_riscv64.c b/risu_riscv64.c
-new file mode 100644
-index 0000000..f742a40
---- /dev/null
-+++ b/risu_riscv64.c
-@@ -0,0 +1,47 @@
-+/******************************************************************************
-+ * Copyright (c) 2020 PingTouGe Semiconductor
-+ * All rights reserved. This program and the accompanying materials
-+ * are made available under the terms of the Eclipse Public License v1.0
-+ * which accompanies this distribution, and is available at
-+ * http://www.eclipse.org/legal/epl-v10.html
-+ *
-+ * Contributors:
-+ *     LIU Zhiwei(Linaro) - initial implementation
-+ *     based on Peter Maydell's risu_arm.c
-+ *****************************************************************************/
++SLT RISCV 0000000 rs2:5 rs1:5 010 rd:5 0110011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 && $rs2 != 2 }
 +
-+#include "risu.h"
++SLTU  RISCV 0000000 rs2:5 rs1:5 011 rd:5 0110011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 && $rs2 != 2 }
 +
-+void advance_pc(void *vuc)
-+{
-+    ucontext_t *uc = vuc;
-+    uc->uc_mcontext.__gregs[0] += 4;
-+}
++XOR RISCV 0000000 rs2:5 rs1:5 100 rd:5 0110011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 && $rs2 != 2 }
 +
-+void set_ucontext_paramreg(void *vuc, uint64_t value)
-+{
-+    ucontext_t *uc = vuc;
-+    uc->uc_mcontext.__gregs[10] = value;
-+}
++SRL RISCV 0000000 rs2:5 rs1:5 101 rd:5 0110011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 && $rs2 != 2 }
 +
-+uint64_t get_reginfo_paramreg(struct reginfo *ri)
-+{
-+    return ri->regs[10];
-+}
++SRA RISCV 0100000 rs2:5 rs1:5 101 rd:5 0110011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 && $rs2 != 2 }
 +
-+int get_risuop(struct reginfo *ri)
-+{
-+    /* Return the risuop we have been asked to do
-+     * (or -1 if this was a SIGILL for a non-risuop insn)
-+     */
-+    uint32_t insn = ri->faulting_insn;
-+    uint32_t op = (insn & 0xf00) >> 8;
-+    uint32_t key = insn & ~0xf00;
-+    uint32_t risukey = 0x0000006b;
-+    return (key != risukey) ? -1 : op;
-+}
++OR RISCV 0000000 rs2:5 rs1:5 110 rd:5 0110011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 && $rs2 != 2 }
 +
-+uintptr_t get_pc(struct reginfo *ri)
-+{
-+   return ri->pc;
-+}
++AND RISCV 0000000 rs2:5 rs1:5 111 rd:5 0110011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 && $rs2 != 2 }
++
++LWU RISCV imm:12 rs1:5 110 rd:5 0000011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 0 && $rs1 != 2 && $rs1 != 3 && $rs1 != 4 } \
++!memory { align(4); reg_plus_imm($rs1, sextract($imm, 12)); }
++
++LD RISCV imm:12 rs1:5 011 rd:5 0000011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 0 && $rs1 != 2 && $rs1 != 3 && $rs1 != 4 } \
++!memory { align(8); reg_plus_imm($rs1, sextract($imm, 12)); }
++
++SD RISCV imm5:7 rs2:5 rs1:5 011 imm:5 0100011 \
++!constraints { $rs1 != 0 && $rs1 != 2 && $rs1 !=3 && $rs1 != 4 && $rs2 != 2} \
++!memory { align(8); reg_plus_imm($rs1, sextract($imm5 << 5 | $imm, 12)); }
++
++SLLI RISCV 00000 sham5:7 rs1:5 001 rd:5 0010011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
++
++SRLI RISCV 00000 sham5:7 rs1:5 101 rd:5 0010011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
++
++SRAI RISCV 01000 sham5:7 rs1:5 101 rd:5 0010011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
++
++ADDIW RISCV imm:12 rs1:5 000 rd:5 0011011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
++
++SLLIW RISCV 0000000 shamt:5 rs1:5 001 rd:5 0011011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
++
++SRLIW RISCV 0000000 shamt:5 rs1:5 101 rd:5 0011011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
++
++SRAIW RISCV 0100000 shamt:5 rs1:5 101 rd:5 0011011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
++
++ADDW RISCV 0000000 rs2:5 rs1:5 000 rd:5 0011011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
++
++SUBW RISCV 0100000 rs2:5 rs1:5 000 rd:5 0011011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
++
++SLLW RISCV 0000000 rs2:5 rs1:5 001 rd:5 0011011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
++
++SRLW RISCV 0000000 rs2:5 rs1:5 101 rd:5 0011011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
++
++SRAW RISCV 0100000 rs2:5 rs1:5 101 rd:5 0011011 \
++!constraints { $rd != 2 && $rd != 3 && $rd != 4 && $rs1 != 2 }
 -- 
 2.23.0
 
