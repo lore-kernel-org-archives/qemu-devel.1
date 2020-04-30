@@ -2,110 +2,128 @@ Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92922C47247
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:10:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01245C4724C
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:12:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 625C62063A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:10:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1F0E2063A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 14:12:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MWfNGNs1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 625C62063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Gg099Zxy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1F0E2063A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jU9tj-0000j5-IN
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 10:10:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53300)
+	id 1jU9vE-0003Gp-Ql
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 10:12:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52852)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jU9jM-0004IQ-JC
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:00:05 -0400
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jU9gf-0008Cv-Io
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:57:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jU9jE-0002Ld-Mt
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 10:00:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59965
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jU9jD-0002IY-Lr
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:59:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588255190;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=pmDosqE1Oirsf6ocNAOrftzvMqS58bUxRPXD6Qj3q6c=;
- b=MWfNGNs1nAOUTYqabNBeGirQ/xdaTZ2PG/76J5wM04P1bGwQFUQnpNFFpA80fwPrnUuLeg
- bo6hQLTY2F0U/chCJI0xLqzWbPvBgc9r8LalYV6Qgp6nay9iOvSmSIfS8CracNgu9+KVbO
- QQQwSUXNRAFpIEBpShekmF1vhXMAOyc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-186-6LqEr2qLM4mhIKFK9sYVgQ-1; Thu, 30 Apr 2020 09:59:45 -0400
-X-MC-Unique: 6LqEr2qLM4mhIKFK9sYVgQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 479B1EC1C3;
- Thu, 30 Apr 2020 13:59:44 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-112-177.ams2.redhat.com
- [10.36.112.177])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 602E75C1B0;
- Thu, 30 Apr 2020 13:59:42 +0000 (UTC)
-Subject: Re: [PATCH v2 2/6] blockdev: Split off basic bitmap operations for
- qemu-img
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200421212019.170707-1-eblake@redhat.com>
- <20200421212019.170707-3-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <6ce69bac-9bbc-05fd-e658-89a2ad63a322@redhat.com>
-Date: Thu, 30 Apr 2020 15:59:40 +0200
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1jU9gd-00006a-4n
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 09:57:13 -0400
+Received: from mail-eopbgr70103.outbound.protection.outlook.com
+ ([40.107.7.103]:10127 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1jU9fz-0007wr-AG; Thu, 30 Apr 2020 09:56:31 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=K9WqzH7SY0oX6GT2GPMdk7zECGKwGxBUjDG33eIjHP0oZYzqNMIZoVdSK6Olq4Kotbxv6EpX/XgyUlL2bYZ+LDCO8ze7GX+IH6fdVB0V6V89/skb1e6E1MucDLM+AdQ9PcJW9V8E0SdpaWlF1pw36vZibty+JRHVTQEHRk4aUkm/sSGY1vKMiujwA6fut9uHH3ImV5tOml5+ene4AFZlpZfetqW0lo8uaoI51QqM76iJ6g95m1wF2s6IVnA+6jg36DY1GlxU6TTcX4GGAS7mR4QFrEz5YW2F1xpD6/Mm/MrK2FaqGUttiE6lBYJlb5K1BW5rOC36YQPBVGUKZhkxoQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NH5DoVla1I0qZChYY91i/M6LjjIO9KcTsCDpAeL2BSA=;
+ b=OK/eJK7O+6ZdBr5rZK4K+yo9Xm+L6gPIOCfle052D1X1WJa43vKPNtorJwnrJ0QnVXg0NAMs7bqKsvBU/uemCLQmX6yLwY2zC+8fHMzKXVUAhAc4Yijc4dqLZ4iz0agXZLxRADzJ7oqeuyMwwJMNxLM9u/M6tuZ+QI+ICK7vKoVozg9d8hrqXbDBdH5YSOiWfDj0RQ2TFN0LLs1q8NQ/nP7mqV+enbPlPa1GXvB3+70QTzRvEofO5Cep1N2wDHLBvUPrRGjdzPkuXfOQejLfberY/efwIvNnb3rWb5bhRnlzA4lctTU74SCLYuk42099BfPNHdlrvkuAYdoBH3yDbw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NH5DoVla1I0qZChYY91i/M6LjjIO9KcTsCDpAeL2BSA=;
+ b=Gg099Zxy5/RTgi316nbmlXglsjqlBGygAtgf5kyOidlsHWS0U5z/YCUwBiH2/cMo31De7UvZPVvCSFdMsaL8sFnwSUtDVh3pRigu/0qo3Ug6Kakd+d4SHDblFRieSNngnRKwS0IeYoWRStK2Rvkq9zpjayGgz+578TZ2thiwy0Q=
+Authentication-Results: igalia.com; dkim=none (message not signed)
+ header.d=none;igalia.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (2603:10a6:208:ff::27)
+ by AM0PR08MB4370.eurprd08.prod.outlook.com (2603:10a6:208:148::20)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.19; Thu, 30 Apr
+ 2020 13:56:26 +0000
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::95e6:1da8:1244:d16f]) by AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::95e6:1da8:1244:d16f%4]) with mapi id 15.20.2958.019; Thu, 30 Apr 2020
+ 13:56:26 +0000
+Subject: Re: [PATCH v22 3/4] qcow2: add zstd cluster compression
+To: Max Reitz <mreitz@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20200428200013.24474-1-dplotnikov@virtuozzo.com>
+ <20200428200013.24474-4-dplotnikov@virtuozzo.com>
+ <daf5a573-56a3-62b0-4387-1db73978463e@redhat.com>
+ <feeec7a1-6987-18a1-1352-1512dc42824e@virtuozzo.com>
+ <be6f57c0-23d9-6a6c-3a39-3a7132f23a42@redhat.com>
+ <23f0a79a-6e8d-3702-3d82-9db54a442a5f@virtuozzo.com>
+ <73ebc101-7148-2b38-492f-538d4bf8c8a4@redhat.com>
+ <477e76fd-ff73-ac34-c636-c8d9ae6be30d@virtuozzo.com>
+ <22b2918b-3bdd-6627-a378-baddb342dacc@redhat.com>
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Message-ID: <7444cb5f-acda-6354-ea9f-81e998185f0f@virtuozzo.com>
+Date: Thu, 30 Apr 2020 16:56:23 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ Thunderbird/68.4.1
+In-Reply-To: <22b2918b-3bdd-6627-a378-baddb342dacc@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-ClientProxiedBy: AM0P190CA0015.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:208:190::25) To AM0PR08MB3745.eurprd08.prod.outlook.com
+ (2603:10a6:208:ff::27)
 MIME-Version: 1.0
-In-Reply-To: <20200421212019.170707-3-eblake@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="6YgsGtQx2dCQBE5ldcbMONKKCaf4d8WSL"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 01:24:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.1.64] (178.34.151.204) by
+ AM0P190CA0015.EURP190.PROD.OUTLOOK.COM (2603:10a6:208:190::25) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2958.20 via Frontend Transport; Thu, 30 Apr 2020 13:56:25 +0000
+X-Originating-IP: [178.34.151.204]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 5519bb13-43d2-444a-f55f-08d7ed0e4671
+X-MS-TrafficTypeDiagnostic: AM0PR08MB4370:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM0PR08MB4370AEEB3878F351D7FBE2F9CFAA0@AM0PR08MB4370.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Forefront-PRVS: 0389EDA07F
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: DcPdqWx7ZdPoOpqFdE2pMGC7u0Cay+ruXWUGsvAxOEAaTYaN8KkUs+b+cQqlnWR/cvMolOsR+5+Kv5z0hUHmDtQLavWgtap9jtw51sHXeVQe+wbtYA6p/dmSnm9uDM+YSNs2fJAjSsYCH3UZ6r1ScZOD+Dh0PPMXazvL2XaMd8zmuMzuNqGncWi2inCskSfgyPr8775sYD8dGp+FFElNID5ivZ/tN+9npiQu2gBed/6f/ndIJ4yFwRDUhWlcgkwpqOfqLA9OTpT9UAAgw6K9DlEKESZ8vUX0JLuyzbUPW3+BkuJ2pxIqiY/2ym+4ovOHXJuqC7sSg2sYNSIAMybx2J/Rj1GDeNNJCkfAGC7FtCDniDxOecV2PuVd7+QwqVPjP/TOAqpESyREOceLF/E3WfQGP2M83tGxFPXJ6D1iq77UcVmbffjJxPEdISxObVB4
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM0PR08MB3745.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(136003)(366004)(376002)(346002)(39850400004)(396003)(31696002)(66556008)(31686004)(86362001)(66476007)(4326008)(8676002)(66946007)(66574012)(53546011)(2906002)(36756003)(186003)(52116002)(5660300002)(16526019)(478600001)(26005)(6486002)(110136005)(16576012)(316002)(8936002)(956004)(2616005);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: IYzox/antm3Q7wM0lQOpPFLVCSZ2aKiZdTCIy5JRFCRpIKJGPzCmKWPAWgi0wT51wx0EMew+1VvH7VZrcvUiC6QQLfEb/KXOwUB/x+Vt4Plo3AM1kjdTcPwMvYqIHjabRQmKWhm8NS3XyZrosXE23DuKmlquFUdO5UpSaR683xhuMdWitChrM9TWSYpe8N2O/bMQ+QwUa8DKuOnHFNuSIroF946MeG21f/ldkqA+xffYIjuPN+cVCqMkuUjexzl2cOTsz0Y7NsOCqBJ9X2v8M3Bx7YcTML22lS+4faHmD+g79RmWAv1qPXtUFaDVv60ncNO7abPJWJxOjgL4HlLP9gMRwaygSylz0z+0UUCFzeP1zhZVfYCH/XAamjX3rO/Wv5F4l6+DHCUdKAA/7cJ4IcSA/JXz2M0OyFqrFLyYg7FzoGuadautXGUl6IV2/FdMIx07OMrc1nBW4qjlMP/yyNbFd5irUIBGvxdgylsjQCf5R7ib98L+BImMGSsq6acd0Rz5dJ32RQ/gSA4sk7pkLGvuMuEspsgFUCtgPBcQKMXOFb5LDdJ3BjvQzpm8Ny0m2K8vz9fbimy10UM1jQaRiHW7Q4uyoCx4OMb4zGSMoR8IZ4IlmMxPf6xCJfZ6ASzLKmQi/sNQk7JM6LHIcqXGvcEdPBULx75ffSo5gTG0s+tHw8DJcsbhgCS4QwaezwX9dF5MJg8F3TXZRahJhSwOCOrdYyNzGFYWHwWQd9PZkrlYe2JxIKz23VEReF6wgxB5B5RHkGKA6omQJWWc/LUmhKH5GtJVACxkdofEMz0Q79I=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5519bb13-43d2-444a-f55f-08d7ed0e4671
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2020 13:56:26.5681 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lxVUeti7yYb2pz5+irowfkbTWG+0wjT9mnyn7VA6nzKlofwm0h/eKe9NOzzM46ldR7I6i+n2+4PwFbWZTPJq2eQSsXibZtZc+Dv/dcrgh0E=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB4370
+Received-SPF: pass client-ip=40.107.7.103;
+ envelope-from=dplotnikov@virtuozzo.com;
+ helo=EUR04-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 09:56:27
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Received-From: 40.107.7.103
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,124 +135,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>,
- qemu-block@nongnu.org
+Cc: kwolf@redhat.com, berto@igalia.com, qemu-block@nongnu.org,
+ armbru@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6YgsGtQx2dCQBE5ldcbMONKKCaf4d8WSL
-Content-Type: multipart/mixed; boundary="ZvNzlU4f2MjYhIOpn4bQcJSXbbRZV0jYC"
-
---ZvNzlU4f2MjYhIOpn4bQcJSXbbRZV0jYC
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 21.04.20 23:20, Eric Blake wrote:
-> Upcoming patches want to add some basic bitmap manipulation abilities
-> to qemu-img.  But blockdev.o is too heavyweight to link into qemu-img
-> (among other things, it would drag in block jobs and transaction
-> support - qemu-img does offline manipulation, where atomicity is less
-> important because there are no concurrent modifications to compete
-> with), so it's time to split off the bare bones of what we will need
-> into a new file blockbitmaps.o.
->=20
-> In addition to exposing 6 QMP commands for use by qemu-img (add,
-> remove, clear, enable, disable, merge), this also has to export three
-> previously-static functions for use by blockdev.c transactions.
->=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  Makefile.objs             |   2 +-
->  include/sysemu/blockdev.h |  14 ++
->  blockbitmaps.c            | 324 ++++++++++++++++++++++++++++++++++++++
-
-Hm.  Can we get a better name?  blockdev-bitmaps.c, for example?
-
->  blockdev.c                | 293 ----------------------------------
->  MAINTAINERS               |   1 +
->  5 files changed, 340 insertions(+), 294 deletions(-)
->  create mode 100644 blockbitmaps.c
-
-[...]
-
-> diff --git a/include/sysemu/blockdev.h b/include/sysemu/blockdev.h
-> index a86d99b3d875..523b7493b1cd 100644
-> --- a/include/sysemu/blockdev.h
-> +++ b/include/sysemu/blockdev.h
-> @@ -57,4 +57,18 @@ QemuOpts *drive_add(BlockInterfaceType type, int index=
-, const char *file,
->  DriveInfo *drive_new(QemuOpts *arg, BlockInterfaceType block_default_typ=
-e,
->                       Error **errp);
->=20
-> +BdrvDirtyBitmap *block_dirty_bitmap_lookup(const char *node,
-> +                                           const char *name,
-> +                                           BlockDriverState **pbs,
-> +                                           Error **errp);
-> +BdrvDirtyBitmap *do_block_dirty_bitmap_remove(const char *node,
-> +                                              const char *name, bool rel=
-ease,
-> +                                              BlockDriverState **bitmap_=
-bs,
-> +                                              Error **errp);
-> +BdrvDirtyBitmap *do_block_dirty_bitmap_merge(const char *node,
-> +                                             const char *target,
-> +                                             BlockDirtyBitmapMergeSource=
-List *bitmaps,
-> +                                             HBitmap **backup, Error **e=
-rrp);
-
-Putting do_* functions into a normal header seems a bit weird.  Would
-these fit better into block_int.h?
-
-> +
->  #endif
-
-[...]
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 8cbc1fac2bfc..769cd357d281 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1989,6 +1989,7 @@ T: git https://github.com/jnsnow/qemu.git jobs
->  Block QAPI, monitor, command line
->  M: Markus Armbruster <armbru@redhat.com>
->  S: Supported
-> +F: blockbitmaps.c
-
-The natural choice for something split off of blockdev.c, but I wonder
-if the Dirty Bitmaps section wouldn=E2=80=99t be a better fit.
-
-Max
-
->  F: blockdev.c
->  F: blockdev-hmp-cmds.c
->  F: block/qapi.c
->=20
 
 
+On 30.04.2020 14:47, Max Reitz wrote:
+> On 30.04.20 11:48, Denis Plotnikov wrote:
+>>
+>> On 30.04.2020 11:26, Max Reitz wrote:
+>>> On 29.04.20 15:02, Vladimir Sementsov-Ogievskiy wrote:
+>>>> 29.04.2020 15:17, Max Reitz wrote:
+>>>>> On 29.04.20 12:37, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>> 29.04.2020 13:24, Max Reitz wrote:
+>>>>>>> On 28.04.20 22:00, Denis Plotnikov wrote:
+>>>>>>>> zstd significantly reduces cluster compression time.
+>>>>>>>> It provides better compression performance maintaining
+>>>>>>>> the same level of the compression ratio in comparison with
+>>>>>>>> zlib, which, at the moment, is the only compression
+>>>>>>>> method available.
+>>>>>>>>
+>>>>>>>> The performance test results:
+>>>>>>>> Test compresses and decompresses qemu qcow2 image with just
+>>>>>>>> installed rhel-7.6 guest.
+>>>>>>>> Image cluster size: 64K. Image on disk size: 2.2G
+>>>>>>>>
+>>>>>>>> The test was conducted with brd disk to reduce the influence
+>>>>>>>> of disk subsystem to the test results.
+>>>>>>>> The results is given in seconds.
+>>>>>>>>
+>>>>>>>> compress cmd:
+>>>>>>>>       time ./qemu-img convert -O qcow2 -c -o
+>>>>>>>> compression_type=[zlib|zstd]
+>>>>>>>>                       src.img [zlib|zstd]_compressed.img
+>>>>>>>> decompress cmd
+>>>>>>>>       time ./qemu-img convert -O qcow2
+>>>>>>>>                       [zlib|zstd]_compressed.img uncompressed.img
+>>>>>>>>
+>>>>>>>>                compression               decompression
+>>>>>>>>              zlib       zstd           zlib         zstd
+>>>>>>>> ------------------------------------------------------------
+>>>>>>>> real     65.5       16.3 (-75 %)    1.9          1.6 (-16 %)
+>>>>>>>> user     65.0       15.8            5.3          2.5
+>>>>>>>> sys       3.3        0.2            2.0          2.0
+>>>>>>>>
+>>>>>>>> Both ZLIB and ZSTD gave the same compression ratio: 1.57
+>>>>>>>> compressed image size in both cases: 1.4G
+>>>>>>>>
+>>>>>>>> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+>>>>>>>> QAPI part:
+>>>>>>>> Acked-by: Markus Armbruster <armbru@redhat.com>
+>>>>>>>> ---
+>>>>>>>>      docs/interop/qcow2.txt |   1 +
+>>>>>>>>      configure              |   2 +-
+>>>>>>>>      qapi/block-core.json   |   3 +-
+>>>>>>>>      block/qcow2-threads.c  | 169
+>>>>>>>> +++++++++++++++++++++++++++++++++++++++++
+>>>>>>>>      block/qcow2.c          |   7 ++
+>>>>>>>>      slirp                  |   2 +-
+>>>>>>>>      6 files changed, 181 insertions(+), 3 deletions(-)
+>>>>>>> [...]
+>>>>>>>
+>>>>>>>> diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
+>>>>>>>> index 7dbaf53489..a0b12e1b15 100644
+>>>>>>>> --- a/block/qcow2-threads.c
+>>>>>>>> +++ b/block/qcow2-threads.c
+>>>>>>> [...]
+>>>>>>>
+>>>>>>>> +static ssize_t qcow2_zstd_decompress(void *dest, size_t dest_size,
+>>>>>>>> +                                     const void *src, size_t
+>>>>>>>> src_size)
+>>>>>>>> +{
+>>>>>>> [...]
+>>>>>>>
+>>>>>>>> +    /*
+>>>>>>>> +     * The compressed stream from the input buffer may consist of
+>>>>>>>> more
+>>>>>>>> +     * than one zstd frame.
+>>>>>>> Can it?
+>>>>>> If not, we must require it in the specification.
+>>>>> Actually, now that you mention it, it would make sense anyway to add
+>>>>> some note to the specification on what exactly compressed with zstd
+>>>>> means.
+>>>>>
+>>>>>> Hmm. If at some point
+>>>>>> we'll want multi-threaded compression of one big (2M) cluster.. Could
+>>>>>> this be implemented with zstd lib, if multiple frames are allowed,
+>>>>>> will
+>>>>>> allowing multiple frames help? I don't know actually, but I think
+>>>>>> better
+>>>>>> not to forbid it. On the other hand, I don't see any benefit in large
+>>>>>> compressed clusters. At least, in our scenarios (for compressed
+>>>>>> backups)
+>>>>>> we use 64k compressed clusters, for good granularity of incremental
+>>>>>> backups (when for running vm we use 1M clusters).
+>>>>> Is it really that important?  Naïvely, it sounds rather complicated to
+>>>>> introduce multithreading into block drivers.
+>>>> It is already here: compression and encryption already multithreaded.
+>>>> But of course, one cluster is handled in one thread.
+>>> Ah, good.  I forgot.
+>>>
+>>>>> (Also, as for compression, it can only be used in backup scenarios
+>>>>> anyway, where you write many clusters at once.  So parallelism on the
+>>>>> cluster level should sufficient to get high usage, and it would benefit
+>>>>> all compression types and cluster sizes.)
+>>>>>
+>>>> Yes it works in this way already :)
+>>> Well, OK then.
+>>>
+>>>> So, we don't know do we want one frame restriction or not. Do you have a
+>>>> preference?
+>>> *shrug*
+>>>
+>>> Seems like it would be preferential to allow multiple frames still.  A
+>>> note in the spec would be nice (i.e., streaming format, multiple frames
+>>> per cluster possible).
+>> We don't mention anything about zlib compressing details in the spec.
+> Yep.  Which is bad enough.
+>
+>> If we mention anything about ZSTD compressing details we'll have to do
+>> it for
+>> zlib as well.
+> I personally don’t like “If you can’t make it perfect, you shouldn’t do
+> it at all”.  Mentioning it for zstd would still be an improvement.
 
---ZvNzlU4f2MjYhIOpn4bQcJSXbbRZV0jYC--
+Good approach. I like it. But I'm trying to be cautious.
+>
+> Also, I believe that “zlib compression” is pretty much unambiguous,
+> considering all the code does is call deflate()/inflate().
+>
+> I’m not saying we need to amend the spec in this series, but I don’t see
+> a good argument against doing so at some point.
+>
+>> So, I think we have two possibilities for the spec:
+>> 1. mention for both
+>> 2. don't mention at all
+>>
+>> I think the 2nd is better. It gives more degree of freedom for the
+>> future improvements.
+> No, it absolutely doesn’t.  There is a de-facto format, namely what qemu
+> accepts.  Changing that would be an incompatible change.  Just because
+> we don’t write what’s allowed into the spec doesn’t change that fact.
+>
+>> and we've already covered both cases (one frame, may frames) in the code.
+> There are still different zstd formats, namely streaming or not
+> streaming.  That’s what should be mentioned.
 
---6YgsGtQx2dCQBE5ldcbMONKKCaf4d8WSL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+It looks like the ZSTD format is always the same.
+The ZSTD interface is different: for some reason the simple 
+zstd_decompress()
+wants to know the size of data to decompress
 
------BEGIN PGP SIGNATURE-----
+ From zstd doc:
+*size_t ZSTD_decompress( void* dst, size_t dstCapacity, const void* src, 
+size_t compressedSize); *
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6q2cwACgkQ9AfbAGHV
-z0DYlAgAgnwMILd/tMvGQyksAM37mw5sfSTeTj4t98tKZZiLns0W5pwo1AQXcCJG
-Coa1u3SuOqF+Kp93dNutTULH6UWiegLdp4471EXfVAHBYPNps/hYvz66JiZM0sf2
-CgmHVUqL6kM4qy7kmOxJrrZT2z/RV+Sm9dkyvuaK9zFEfht01UzEUAhWB9OFd8I4
-robC3LovqaJTUrEHuzps9auqaemZWtZWv2YEwOsGXzUEyZeBoXhwWKjDQk90g0HX
-oFD4Gsoud5wTZxDcV86ZRrP35p7PnnGb5Uds2JIo/JoqJOuphmMjFodUZxWkTdBV
-AgBClruSPnVfQ29A3mRjbQuoNgbscQ==
-=NP8N
------END PGP SIGNATURE-----
+`compressedSize` : must be the _exact_ size of some number of compressed 
+and/or skippable frames.
 
---6YgsGtQx2dCQBE5ldcbMONKKCaf4d8WSL--
+I made a test (based on Vladimir's code) to check it:
+
+// compile with gcc -lzstd -g test_zstd.c -o test_zstd
+
+#include <stdio.h> #include <assert.h> #include <zstd.h> #include 
+<zstd_errors.h> int main() { char buf1[] = "erbebewbwe"; char buf2[100]; 
+char buf3[100]; int ret; ZSTD_outBuffer output; ZSTD_inBuffer input; ret 
+= ZSTD_compress(buf2, sizeof(buf2), buf1, sizeof(buf1), 5); printf("ret: 
+%d\n", ret); ZSTD_DCtx *dctx = ZSTD_createDCtx(); input = 
+(ZSTD_inBuffer){buf2, ret, 0}; output = (ZSTD_outBuffer){buf3, 
+sizeof(buf3), 0}; ret = ZSTD_decompressStream(dctx, &output, &input); 
+printf("ret: %d, input.pos: %ld, output.pos: %ld\n", ret, input.pos, 
+output.pos); printf("To compress: %s\n", buf1); buf3[output.pos] = 0; 
+printf("Uncompressed: %s\n", buf3); return 0; }
+
+And it works fine.
+
+We use streaming semantics just to be consistent with the interfaces 
+(stream_compress/stream_decompress), otherwise
+
+we could use simple_compress/stream_decompress
+
+Denis
+>
+> Max
+>
 
 
