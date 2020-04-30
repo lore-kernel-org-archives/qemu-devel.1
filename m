@@ -1,71 +1,92 @@
-Return-Path: <SRS0=Qmby=6N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=D5YA=6O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69F59C83000
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 23:42:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDA08C83000
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 00:22:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EA332072A
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Apr 2020 23:42:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EA332072A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id A76B220731
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Apr 2020 00:22:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wsw4LSQ1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A76B220731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jTwLg-0006js-Bc
-	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 19:42:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46450)
+	id 1jTwxt-0002hW-P6
+	for qemu-devel@archiver.kernel.org; Wed, 29 Apr 2020 20:22:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49658)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jTwKv-0006Fe-MQ
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 19:41:54 -0400
+ (envelope-from <luoyonggang@gmail.com>) id 1jTwwv-00029N-7l
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 20:21:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jTwKv-0005Wp-7Q
- for qemu-devel@nongnu.org; Wed, 29 Apr 2020 19:41:53 -0400
-Resent-Date: Wed, 29 Apr 2020 19:41:53 -0400
-Resent-Message-Id: <E1jTwKv-0005Wp-7Q@eggs.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21766)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jTwKq-0005WN-A8; Wed, 29 Apr 2020 19:41:49 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1588203701; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=allN+gRpT9uiJ+KvylKw/lq/lOx7n2K0ggw5/mlCuAOpuywFfYcacfEdHoCuYaky/3TwtVhFrma/Tu1HT9Ol/qIfspgizmq1s/Xxn0YXA5Fe03RvGZaA2Jz7/llaEOYewiV7/piiDFNrc/rlqydr5laiTvRyEo+8k6rTTZVcdQE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1588203701;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=oyFlTthy4NhVins/CIbeVN7jXnEUVSBA2MF2IXZ4M1U=; 
- b=nn6xw8Xj47LvLD5r9wP8A+VgmpFHK15yWnnaXgXFjvborwwqmQ2vvj3U9I7zuVjLN1G7/wy3ZWl0O6UJPpwHLukXHTIiFCfeuhaT3k+cUceC20T5Rw195p01cTpDaw8L642Pt2o6qFHBGOjwqg0AM87O5nh/d2wnJnr3MyCqxnE=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1588203699307779.9078130320851;
- Wed, 29 Apr 2020 16:41:39 -0700 (PDT)
-Message-ID: <158820369810.4471.18342264613010125476@45ef0f9c86ae>
-In-Reply-To: <20200429141126.85159-1-mreitz@redhat.com>
-Subject: Re: [PATCH v2 0/4] block: Do not call BlockDriver.bdrv_make_empty()
- directly
+ (envelope-from <luoyonggang@gmail.com>) id 1jTwwu-0005yJ-Pc
+ for qemu-devel@nongnu.org; Wed, 29 Apr 2020 20:21:09 -0400
+Received: from mail-lj1-x22b.google.com ([2a00:1450:4864:20::22b]:46113)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1jTwwr-0005xd-Pk; Wed, 29 Apr 2020 20:21:05 -0400
+Received: by mail-lj1-x22b.google.com with SMTP id f18so4553902lja.13;
+ Wed, 29 Apr 2020 17:21:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=bvvY2WvMHHhD+5v+vYgSFdhu8XC9ne08tdFPDGrIpW4=;
+ b=Wsw4LSQ1wookR3ONbxFwWFtFk9fgrEXj1EVGmiUmdL+5OTOW1Cm074PVNYB5Q1dO6i
+ QYBP7TvR6gqiadvLVfAs0aKJwkq9R2Xg9LDiNP7y9QW82hzM7jmaEfKkB8wGuOSswCR0
+ N2bF601gETfCtjMvJBUrC52Eei7zsNvIyu4sUhNVrXLDo8I3ReA4I2r7TEiX8tcuH+AM
+ Dfr2kGZP4LcpjsBlYsbsIXnQ48G/Sji5ULiLnrKvnpUbiiJAPJF8p+wxlgUWruchntOW
+ GOeclkGB2X7qj2+EIW54NiIAivwbBxE1X6nQ3nQ1UwGPlCb/cr8skspehb5TFn5ECQi1
+ rTiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=bvvY2WvMHHhD+5v+vYgSFdhu8XC9ne08tdFPDGrIpW4=;
+ b=WkekbCM4tAEoFQyGnqSKLdxt+4X6ObHE7ORTeQ4BX4sM0hM1usWY9eEhXorAbJOMAA
+ X3ShymlOkYHulx5rvR9I7Ud2pTwWt1DyFUS0x8EIAcZJomYqd7D9pDlWBcGVBULHi0WS
+ Jbckyl/VclNZxDK/MFnHsKZ3kF19oyZLzEF3gTREyU6Fq36e5+JkI9zFonV0M/54uLHs
+ oljs7WHBJ+zEabBY/fH/PgXVbWwGlUKprt7cUjvf29WOUxuTpuYtRW4My0ZwwqsaeYDh
+ r+4eGPFRDYtWqJEJJNXyLcGiV5tZuRhfcNaU1sHiyFb7q/zrlktiAM6AZLFgdhQ8Ahp0
+ jtvg==
+X-Gm-Message-State: AGi0PuZAkSOsS5FZVoxOzEGg19UtWBvR7bA2IRL/EoRPYmBFo0Z/VOq+
+ 4IEC0ptq9oSNrVjw5PYl7zdvs5ySEMeTdpXtinc=
+X-Google-Smtp-Source: APiQypLLf90Q0I+QLOsIgbdHfOAzsLjP2SWQUnVff5609ydPWWfL2cLJGZTyxRqnqIjLPdJTIRASQCZBj3xccC0vVu0=
+X-Received: by 2002:a2e:9117:: with SMTP id m23mr440435ljg.43.1588206063345;
+ Wed, 29 Apr 2020 17:21:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: mreitz@redhat.com
-Date: Wed, 29 Apr 2020 16:41:39 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/29 19:37:55
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Received-From: 136.143.188.57
+References: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
+ <87lfmhl0xa.fsf@linaro.org>
+ <alpine.BSF.2.22.395.2004271212520.94232@zero.eik.bme.hu>
+ <87imhlkwun.fsf@linaro.org>
+ <CAE2XoE9hiw-ri66_xp3qNa5_Wx8ZfsQB9mqJdYR8VRm-KW830g@mail.gmail.com>
+ <87ftcoknvu.fsf@linaro.org>
+ <AM4PR07MB350653D5961DFCE441646131CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
+ <871ro6ld2f.fsf@linaro.org>
+ <AM4PR07MB350673696C7DE2CA16C9C685CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
+ <87sggmjgit.fsf@linaro.org>
+In-Reply-To: <87sggmjgit.fsf@linaro.org>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Thu, 30 Apr 2020 08:20:51 +0800
+Message-ID: <CAE2XoE8wFK1nOq3YXhB=iqTvqSDQk7Zzd35Tjzdd==v8ouMijA@mail.gmail.com>
+Subject: Re: R: R: About hardfloat in ppc
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: multipart/alternative; boundary="0000000000003c65ba05a4770aef"
+Received-SPF: pass client-ip=2a00:1450:4864:20::22b;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x22b.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::22b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,58 +98,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- mreitz@redhat.com
+Reply-To: luoyonggang@gmail.com
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Programmingkid <programmingkidx@gmail.com>,
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ Howard Spoelstra <hsp.cat7@gmail.com>, Dino Papararo <skizzato73@msn.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQyOTE0MTEyNi44NTE1
-OS0xLW1yZWl0ekByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgYXNh
-biBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIg
-b3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2Jh
-Ymx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
-aW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBO
-RVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9yYSBUQVJHRVRfTElTVD14
-ODZfNjQtc29mdG1tdSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBM
-SU5LICAgIHFlbXUtbmJkCiAgTElOSyAgICBxZW11LXN0b3JhZ2UtZGFlbW9uCiAgTElOSyAgICBx
-ZW11LWlvCi90bXAvcWVtdS10ZXN0L3NyYy9xZW11LWltZy5jOjEwNzE6Mjc6IGVycm9yOiBpbXBs
-aWNpdCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiAnYmxrX25ld193aXRoX2JzJyBpcyBpbnZhbGlk
-IGluIEM5OSBbLVdlcnJvciwtV2ltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQogICAgICAg
-IG9sZF9iYWNraW5nX2JsayA9IGJsa19uZXdfd2l0aF9icyhicywgQkxLX1BFUk1fV1JJVEUsIEJM
-S19QRVJNX0FMTCwKICAgICAgICAgICAgICAgICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3Ny
-Yy9xZW11LWltZy5jOjEwNzE6Mjc6IGVycm9yOiB0aGlzIGZ1bmN0aW9uIGRlY2xhcmF0aW9uIGlz
-IG5vdCBhIHByb3RvdHlwZSBbLVdlcnJvciwtV3N0cmljdC1wcm90b3R5cGVzXQovdG1wL3FlbXUt
-dGVzdC9zcmMvcWVtdS1pbWcuYzoxMDcxOjI1OiBlcnJvcjogaW5jb21wYXRpYmxlIGludGVnZXIg
-dG8gcG9pbnRlciBjb252ZXJzaW9uIGFzc2lnbmluZyB0byAnQmxvY2tCYWNrZW5kIConIChha2Eg
-J3N0cnVjdCBCbG9ja0JhY2tlbmQgKicpIGZyb20gJ2ludCcgWy1XZXJyb3IsLVdpbnQtY29udmVy
-c2lvbl0KICAgICAgICBvbGRfYmFja2luZ19ibGsgPSBibGtfbmV3X3dpdGhfYnMoYnMsIEJMS19Q
-RVJNX1dSSVRFLCBCTEtfUEVSTV9BTEwsCiAgICAgICAgICAgICAgICAgICAgICAgIF4gfn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgozIGVycm9ycyBnZW5l
-cmF0ZWQuCm1ha2U6ICoqKiBbL3RtcC9xZW11LXRlc3Qvc3JjL3J1bGVzLm1hazo2OTogcWVtdS1p
-bWcub10gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgpU
-cmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIv
-ZG9ja2VyLnB5IiwgbGluZSA2NjQsIGluIDxtb2R1bGU+Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJv
-Y2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENv
-bW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFl
-bXUuaW5zdGFuY2UudXVpZD0wYzMxN2JjMDM3MmU0NmJhYTVlNTMwY2I1YmZmYWQwNScsICctdScs
-ICcxMDAzJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywg
-Jy1lJywgJ1RBUkdFVF9MSVNUPXg4Nl82NC1zb2Z0bW11JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VS
-RV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScs
-ICdTSE9XX0VOVj0nLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAn
-L2hvbWUvcGF0Y2hldzIvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6
-eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtbWh6a2p1eDQvc3JjL2RvY2tl
-ci1zcmMuMjAyMC0wNC0yOS0xOS4zOC4xOC4xNDI5ODovdmFyL3RtcC9xZW11Onoscm8nLCAncWVt
-dTpmZWRvcmEnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1kZWJ1ZyddJyByZXR1cm5lZCBu
-b24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5z
-dGFuY2UudXVpZD0wYzMxN2JjMDM3MmU0NmJhYTVlNTMwY2I1YmZmYWQwNQptYWtlWzFdOiAqKiog
-W2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1w
-L3BhdGNoZXctdGVzdGVyLXRtcC1taHpranV4NC9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10
-ZXN0LWRlYnVnQGZlZG9yYV0gRXJyb3IgMgoKcmVhbCAgICAzbTE5LjkyN3MKdXNlciAgICAwbTgu
-MTIycwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xv
-Z3MvMjAyMDA0MjkxNDExMjYuODUxNTktMS1tcmVpdHpAcmVkaGF0LmNvbS90ZXN0aW5nLmFzYW4v
-P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+--0000000000003c65ba05a4770aef
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Question, in hard-float, if we don't want to read the fp register.
+for example: If we wanna compute c =3D a + b in fp32
+if c =3D a + b In hard float
+and if b1 =3D c - a in hard float
+if b1 !=3D b at bitwise level, the we se the inexat to 1, otherwsie
+we set inexat bit to 0? are this valid?
+
+we can also do it for a * b, a - b, a / b.
+
+
+On Thu, Apr 30, 2020 at 2:25 AM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+
+>
+> Dino Papararo <skizzato73@msn.com> writes:
+>
+> > Hi Alex,
+> <snip>
+> >
+> > I leave to you TCG's experts how it works and how to implement it, I'm
+> > only tryng to explain a possible fast way to go (if ever possible) =F0=
+=9F=98=8A
+>
+> This is all a theoretical discussion unless someone cares enough to
+> improve the situation. While I have an interest in improving TCG
+> performance I'm afraid there are many more easier wins before tackling a
+> target specific hack for which I'm not familiar. No doubt this thread
+> will be referred to next time someone wants something done about it.
+>
+> > ..Large majority of software don't check for exceptions at all and if
+> > I really want to pursue max precision I'll go for a software
+> > multiprecision library like GMP or MPFR Libraries.
+>
+> However for QEMU we regard failure to correctly emulate the architecture
+> as a bug - we don't code to common software patterns because there is
+> plenty of software out there that doesn't follow it.
+>
+> > So the hardfloats 'should' be set as first choice and only if
+> > instruction requires precision/error check process it in softfloats.
+>
+> Sure but someone will have to do the work to support that.
+>
+> --
+> Alex Benn=C3=A9e
+>
+
+
+--=20
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
+
+--0000000000003c65ba05a4770aef
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Question, in hard-float, if we don&#39;t want to read the =
+fp register.<div>for example: If we wanna compute c =3D a=C2=A0+ b in fp32<=
+/div><div>if c =3D a=C2=A0+ b In hard float</div><div>and if b1 =3D c - a i=
+n hard float</div><div>if b1 !=3D b at bitwise level, the we se the=C2=A0in=
+exat=C2=A0to 1, otherwsie=C2=A0</div><div>we set inexat=C2=A0bit to 0? are =
+this valid?</div><div><br></div><div>we can also do it for a * b, a - b, a =
+/ b.=C2=A0</div><div><br></div></div><br><div class=3D"gmail_quote"><div di=
+r=3D"ltr" class=3D"gmail_attr">On Thu, Apr 30, 2020 at 2:25 AM Alex Benn=C3=
+=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.org">alex.bennee@linaro.org</=
+a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0p=
+x 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><b=
+r>
+Dino Papararo &lt;<a href=3D"mailto:skizzato73@msn.com" target=3D"_blank">s=
+kizzato73@msn.com</a>&gt; writes:<br>
+<br>
+&gt; Hi Alex,<br>
+&lt;snip&gt;<br>
+&gt;<br>
+&gt; I leave to you TCG&#39;s experts how it works and how to implement it,=
+ I&#39;m<br>
+&gt; only tryng to explain a possible fast way to go (if ever possible) =F0=
+=9F=98=8A<br>
+<br>
+This is all a theoretical discussion unless someone cares enough to<br>
+improve the situation. While I have an interest in improving TCG<br>
+performance I&#39;m afraid there are many more easier wins before tackling =
+a<br>
+target specific hack for which I&#39;m not familiar. No doubt this thread<b=
+r>
+will be referred to next time someone wants something done about it.<br>
+<br>
+&gt; ..Large majority of software don&#39;t check for exceptions at all and=
+ if<br>
+&gt; I really want to pursue max precision I&#39;ll go for a software<br>
+&gt; multiprecision library like GMP or MPFR Libraries.<br>
+<br>
+However for QEMU we regard failure to correctly emulate the architecture<br=
+>
+as a bug - we don&#39;t code to common software patterns because there is<b=
+r>
+plenty of software out there that doesn&#39;t follow it.<br>
+<br>
+&gt; So the hardfloats &#39;should&#39; be set as first choice and only if<=
+br>
+&gt; instruction requires precision/error check process it in softfloats.<b=
+r>
+<br>
+Sure but someone will have to do the work to support that.<br>
+<br>
+-- <br>
+Alex Benn=C3=A9e<br>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+ class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
+=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
+=A0 sincerely,<br>Yonggang Luo<br></div>
+
+--0000000000003c65ba05a4770aef--
 
