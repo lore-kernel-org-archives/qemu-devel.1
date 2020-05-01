@@ -2,85 +2,94 @@ Return-Path: <SRS0=uuMl=6P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C6AEC4724C
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 14:25:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D534BC47253
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 14:26:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D525D20836
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 14:25:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A2E3E208C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 14:26:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yYZIB20K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D525D20836
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DGAz51s/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2E3E208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUWc1-0004at-Uq
-	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 10:25:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43442)
+	id 1jUWcy-000628-QZ
+	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 10:26:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43906)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jUWb4-0003lW-EV
- for qemu-devel@nongnu.org; Fri, 01 May 2020 10:25:09 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jUWbw-0004f4-7X
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 10:25:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jUWZv-00088k-PF
- for qemu-devel@nongnu.org; Fri, 01 May 2020 10:24:58 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:46808)
+ (envelope-from <richard.henderson@linaro.org>) id 1jUWbv-0004W9-9O
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 10:25:52 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:43598)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jUWZv-00085d-DN
- for qemu-devel@nongnu.org; Fri, 01 May 2020 10:23:47 -0400
-Received: by mail-ot1-x341.google.com with SMTP id z25so2617431otq.13
- for <qemu-devel@nongnu.org>; Fri, 01 May 2020 07:23:47 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jUWbu-0004S9-SB
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 10:25:50 -0400
+Received: by mail-pg1-x542.google.com with SMTP id l12so1761875pgr.10
+ for <qemu-devel@nongnu.org>; Fri, 01 May 2020 07:25:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=kthQaBAqwyqn4UX9Xg4B95+4pb5naLZASIAFDxXig8o=;
- b=yYZIB20KtdDL/dhOnYyBRoSAutM1jX4gUZ36g3IqyCUPKnoyeuooNPSfu+Gtu3kqtK
- sSeo9WmoP90F2R3bkK2/AyCeSQj/PYO9wYCLba54TPp34fbGVZTNUDNfMca2njHLqWgS
- BBCs85KkqjqbcmgwytzCDckzN29rKZxu7/ukS8ZR254w1BHaixjkI0gZAz7c7vtGFRkU
- jQ2NL5MbUTYqMiVcy9+3idRO5Vy6YZKcoUzhY9Uczss6TGeMOTFZHrj4s2YOwVqlYC4L
- VsnNBD9TCfTS7DHT71UWjBKcRs+Kcc99nqhsNPHyNa5s5QFUwJuk4CtHsqsg4TLirVXg
- b3yw==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=iR8JMy0SyhUT7oKtYkCN2YhQ6eaJ14Q10CYb7jrvKpQ=;
+ b=DGAz51s/R1vAoqiTrJo6OQS7Aw6ov+sGp9Qw4SOexDo27y9QOj9S5WdMg40eQlspLH
+ dJd/NznbHeah1e4fTtB4alx//kYExZ/wP+fR/zAJe0D+Z0RXoH0TPxFs5+d8TbrzAGtY
+ lEtfI9F9aRLQT3hDEqyL5kFPpmDKS8zfOV/bFE4uH85ZRcNJAhokemncL/zLRt/lldNL
+ JwsKADtvOhB7ngQA87NvutMdnC+chq/f9LLpOA1y9LCfsng/vGW8DwoFP2waQ+/sAM7F
+ bvmgwvD5yvczE51pY5cSgPpZBrBIVA/g43OVlOfHIHlZzc/OdNZz3NxOyLwLmnKM5SSj
+ c3dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=kthQaBAqwyqn4UX9Xg4B95+4pb5naLZASIAFDxXig8o=;
- b=jVAZP7HBtMObsqVzJigM3I1j2uZH5ZSF99WyC2P2TP9o24kyedalyLQ8leICmYa5CT
- aTDwyiT3+LnqAhsKY6p1JM2GzddCiX/q9hIRXlQd47iPuCTST2gpE5IwHTzjAXGbsbI1
- hqdBG7DwKi/EH4F0Ob+m0KmPl1Acnjnxx9vjZEujU8MugCon6JVvvM6KLiFv4rQ/fVgj
- wN67j0dvNT/0RZmkg2C9uGu9U+T8Da3JtRwJuphNt8xIyUhGOgEQlgHEsWeJcAnfsq/0
- H8UM0k+ro+/nwqAFdxTWwGoWHFIGUzLlR/KaWHbRCFWzhqJSUWVUE+iKXxRKp+5d81xb
- N3eQ==
-X-Gm-Message-State: AGi0PuacN/DFzMO9A4xI0D+gsNHgZdgiF7Ed9VfjfwBLGrtKP2wsB8Dx
- CM+3F93J2cqrFIfXGsIOr1UYsHkKNs413zwNBgs3ug==
-X-Google-Smtp-Source: APiQypK5OkugpZclIzZNZask9knvkAqcCdrJZxPp1MwEYw2muPp/9BuURNogAy1zaxGGmWlVe55E07mvzoxxO0tb/fU=
-X-Received: by 2002:a05:6830:22dc:: with SMTP id
- q28mr3585617otc.221.1588343026033; 
- Fri, 01 May 2020 07:23:46 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=iR8JMy0SyhUT7oKtYkCN2YhQ6eaJ14Q10CYb7jrvKpQ=;
+ b=tL7q6U3cDP7x5qjbPIK61HD5Y5Rr5bpLiyGxHd6wyZWITk5XV1etDKE3oPbnlM+u2X
+ rd1ImeJOa7OMmhdGuNcQbe9ONy2IWxhWDm7MH0ynv9KXTyC9vSxl9YzuJuqHtOFhwvJz
+ HrDCmEz7caewrrUYb2gPjXrBxjhwPfe4dAWbklVS0stECeKB79aV8HRmxEdOdJpRh/9B
+ d+oz2K+cj+JktRn3m9z2NaVOY11NqL1Vop63XM8iwt+dXkoCcsTKIl8ip8wTpHofw6lh
+ 7FoNpwm9mN0d5aelu//ATMIkH9Zn9EPWy8ybyxizLpOc9ztac57kqg1Hgu7NYKOTCL6h
+ 7wKA==
+X-Gm-Message-State: AGi0PuZFuompiT1ViGfvxJStLQ1g7tWOshA3mBUTtsjdge9gXKiCqHWQ
+ qkEA8yTouV0DaAoH7gCOfzV4/w==
+X-Google-Smtp-Source: APiQypKFv+EIaab9bfnIOkXfaaXDdupD7VAi2xgvnauTk/nY0kGaJpWKsHNq5mSg8nQkjaG+z8rZKQ==
+X-Received: by 2002:a63:1a58:: with SMTP id a24mr4465637pgm.419.1588343149476; 
+ Fri, 01 May 2020 07:25:49 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
+ by smtp.gmail.com with ESMTPSA id s123sm2423177pfs.170.2020.05.01.07.25.48
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 01 May 2020 07:25:48 -0700 (PDT)
+Subject: Re: [PATCH v1 2/4] .travis.yml: drop MacOSX
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200501111505.4225-1-alex.bennee@linaro.org>
+ <20200501111505.4225-3-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <15bf2169-1bfa-3987-4a67-a2b1fdf50cba@linaro.org>
+Date: Fri, 1 May 2020 07:25:46 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-References: <20200430181003.21682-1-peter.maydell@linaro.org>
- <20200430181003.21682-21-peter.maydell@linaro.org>
- <7c8d148d-8980-ad8b-da32-008a0e6f81be@linaro.org>
-In-Reply-To: <7c8d148d-8980-ad8b-da32-008a0e6f81be@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 1 May 2020 15:23:35 +0100
-Message-ID: <CAFEAcA_7fxa2WtwNgAMC1jGf030sQ_wX=s9_Oj=t=QqW232vfg@mail.gmail.com>
-Subject: Re: [PATCH 20/36] target/arm: Convert Neon 3-reg-same
- VQRDMLAH/VQRDMLSH to decodetree
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
+In-Reply-To: <20200501111505.4225-3-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::341
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,26 +101,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 30 Apr 2020 at 21:28, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 4/30/20 11:09 AM, Peter Maydell wrote:
-> > These don't use do_3same() because they want to
-> > operate on VFP double registers, whose offsets are different from the
-> > neon_reg_offset() calculations do_3same does.
->
-> Actually, no, it's an around the bush way of computing the same register offset.
+On 5/1/20 4:15 AM, Alex Bennée wrote:
+> This keeps breaking on Travis so lets just fall back to the Cirrus CI
+> builds which seem to be better maintained. Fix up the comments while
+> we are doing this as we never had a windows build.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  .travis.yml | 28 +---------------------------
+>  1 file changed, 1 insertion(+), 27 deletions(-)
 
-So it is. I could have sworn I'd written this using
-do_3same first time around and found it didn't work,
-but maybe I'm misremembering a change I had to make to
-some other patch.
+Acked-by: Richard Henderson <richard.henderson@linaro.org>
 
-thanks
--- PMM
+I haven't had a single green run on Travis for at least a month because of
+macos failures.
+
+
+r~
 
