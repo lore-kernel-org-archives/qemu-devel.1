@@ -1,111 +1,83 @@
 Return-Path: <SRS0=uuMl=6P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9178DC35280
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 19:39:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7878CC35280
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 20:05:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59E83206F0
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 19:39:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 107B220787
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 20:05:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IcFj7h3y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59E83206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KOzE/Gpw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 107B220787
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUbVn-0001dt-Im
-	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 15:39:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38608)
+	id 1jUbuf-0003oM-7B
+	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 16:05:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45874)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jUbUf-00008b-RC
- for qemu-devel@nongnu.org; Fri, 01 May 2020 15:38:54 -0400
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1jUbtv-0003AQ-Od
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 16:04:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jUbQA-00014I-LW
- for qemu-devel@nongnu.org; Fri, 01 May 2020 15:38:41 -0400
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:41574)
+ (envelope-from <luoyonggang@gmail.com>) id 1jUbtt-0007ux-V1
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 16:04:47 -0400
+Received: from mail-lj1-x22f.google.com ([2a00:1450:4864:20::22f]:33534)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jUbQA-00012k-4X
- for qemu-devel@nongnu.org; Fri, 01 May 2020 15:34:02 -0400
-Received: by mail-wr1-x42d.google.com with SMTP id g13so12627508wrb.8
- for <qemu-devel@nongnu.org>; Fri, 01 May 2020 12:34:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=iI8uNwoxupS2UdWEUpXgZmj3PzGoIzxWPdUtyV5DeXE=;
- b=IcFj7h3yllFXf0RJONPsIv2IV6Bh5XJGGR4z9N6xKHwyzFmNPX+fmJYOiDjV7JMYlD
- 5QgxHl2h1S56fo/cuB+Fi4VPWj9j+g+n8TZiKUJMu7E+zxKzqCUeNnccqWeU7Ccb3V0F
- Cj5nycOmdOFjH0b9AqQwOGZFRRV+6SpWXw7Pj3gibA0AfB2Kw01ew/ZV4uwBQhp4075s
- AG1FcG62ayWmo1PHS/3VB9OX2aBhcRGtj0dSYp6Ao543PmWEBEIUIIjlyBcbWkVndvqb
- 6Z3kwk8eexYEVMdgzcL+can/6Mr14n1d76g8WjOfVGGKRcUPOVCiHL/IwSRg7DYtB906
- M2OA==
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1jUbtt-0007tw-Eu; Fri, 01 May 2020 16:04:45 -0400
+Received: by mail-lj1-x22f.google.com with SMTP id w20so3693203ljj.0;
+ Fri, 01 May 2020 13:04:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:reply-to:from:date:message-id:subject:to;
+ bh=pMDUZeL2DuE4m6cxdwuT9MuIBihApgkhsT8Iy7tvB48=;
+ b=KOzE/GpwzkPGBLYCnlln4D9wsdPc82DKuEAD36nHMdnAB+Py6YkpLHuIJM23u7qDiu
+ vtVdfekEIEzeAUlgR1sZOjmNLvlbtv8qqeu7F0D4aL+WrgXqsQM0LgORCMctGA+zaYFs
+ XgeVZeh6qbQx3eA7SqZpAcTDJVbG2iKS4e2UQkIO3s4fGyN4FHLSHgbJKJJ1KbYdhLHv
+ CE39eGfRX7eN8erIPLtIdLlfqSQ2EPffi1WOanDQXltV7p/MP+RIavhjthUsD6FIFE5N
+ Mk01xZldgdC7dQZTjGJxK8Vdn0FQJ5sozpZQMjY5aBHrvA1EBIvqNqv+VjwGoTyLCKxF
+ alfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=iI8uNwoxupS2UdWEUpXgZmj3PzGoIzxWPdUtyV5DeXE=;
- b=N2gzhpd4HrZeFQQBZGaAD0Wtpq/Ygyh/fhco697MucuQlerxCh1+aHDCecl5nWxGhy
- +7B6J8NO3oW+S0ABqC5GqPqHDUgsgn3maTl5E57ZYQg2QG7pl8CxlV528ny4SgTtt6Sz
- pTZvj0KNBFUVkiZlk2Lf7NSy7H1MqTviRIHBr0WlkYGLgrPHlweyqhoBQAVvTdBaXE+6
- +RF+hQ8Rdxn5cl5m1vC24x8lHaYQ+yPZKX2wqLt6hpFbJzBF5UAOwY+VWFx5Zy/ez6gf
- Eln3GqPstjCTyIKaMxT1wxzUAep1WN1h5jRWUery16AKxz5AYaCu+Y2YYgKjm7lwcCYo
- M4dg==
-X-Gm-Message-State: AGi0PuZqHuPaiajrpy8zpFtsWJctiOCO1a2J46A1+6+y4Tl3PsTTH/hP
- cTOszxyX666T905pFGQ3bNRBlA==
-X-Google-Smtp-Source: APiQypJg/bphgreX2vnXa/qOQWnxW4VD6Fy3kMLL3lUPYl+ZhNwAh6FhG/EIcP5ITJmnH4ClG88NfQ==
-X-Received: by 2002:a5d:6582:: with SMTP id q2mr5681826wru.343.1588361640271; 
- Fri, 01 May 2020 12:34:00 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id y11sm4288641wrh.59.2020.05.01.12.33.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 01 May 2020 12:33:59 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 534C81FF7E;
- Fri,  1 May 2020 20:33:58 +0100 (BST)
-References: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
- <CAE2XoE9hiw-ri66_xp3qNa5_Wx8ZfsQB9mqJdYR8VRm-KW830g@mail.gmail.com>
- <87ftcoknvu.fsf@linaro.org>
- <AM4PR07MB350653D5961DFCE441646131CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
- <871ro6ld2f.fsf@linaro.org>
- <AM4PR07MB350673696C7DE2CA16C9C685CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
- <87sggmjgit.fsf@linaro.org>
- <CAE2XoE8wFK1nOq3YXhB=iqTvqSDQk7Zzd35Tjzdd==v8ouMijA@mail.gmail.com>
- <43ac337c-752a-7151-1e88-de01949571de@linaro.org>
- <CAE2XoE-f_rkcnpQO1cHPUgdaWNAOvBRyUX1aj27UePd0Hkr=KQ@mail.gmail.com>
- <alpine.BSF.2.22.395.2004301721420.29315@zero.eik.bme.hu>
- <AM4PR07MB3506C091776962655FCE11E9CAAA0@AM4PR07MB3506.eurprd07.prod.outlook.com>
- <FEA0FBA9-F5B7-4995-A2F3-5D8053637379@gmail.com>
- <CAE2XoE_N_oWJwwGVfh+9mOh3dYR6JXk5XJKzv8fr2A4iE9h1OA@mail.gmail.com>
- <alpine.BSF.2.22.395.2005011347390.29385@zero.eik.bme.hu>
- <CAE2XoE-0=SgjeXddZXDOYPeUC1xsD5V=A5xBoa1yHS8gL2=MQg@mail.gmail.com>
- <874kszkdhm.fsf@linaro.org>
- <d84e50f5-493e-7c8a-bf39-c94c18875171@linaro.org>
- <CAE2XoE9Q-0S_SDA-vV7desU8or_D8wPAkz30xQ_4TGfpXO=D3w@mail.gmail.com>
-User-agent: mu4e 1.4.1; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: luoyonggang@gmail.com
-Subject: Re: About hardfloat in ppc
-In-reply-to: <CAE2XoE9Q-0S_SDA-vV7desU8or_D8wPAkz30xQ_4TGfpXO=D3w@mail.gmail.com>
-Date: Fri, 01 May 2020 20:33:58 +0100
-Message-ID: <877dxvih5l.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+ :subject:to;
+ bh=pMDUZeL2DuE4m6cxdwuT9MuIBihApgkhsT8Iy7tvB48=;
+ b=Qfr0QoXYtgBgy+5QlimVS569Qr0pI4goq7vgJxZfw5U+Npjp5zlsOGWt9+41H9biI5
+ rjY5vnf43j9TeXOWx18kSM3WcdRQb0JvtR6CNmG48e6t9eTVJiQffRUuu7BVwTe/WTqp
+ FDOSRbso08a+fkxY3F3eWWkMDkiPSpN0PbQQVDyUx+lPif6REu1PwQcI/aEcuqO9o615
+ P0eptYdEV6HkFTwb6Q71qMw87c6iVQGUWBuqn5BI/KgYaLeLOceifeDJIu0P0L1lcNFu
+ C6waKUuiYfpMaY7Ha3ImyC++8j9nCnJ1sXeb4XUkbbV6ITmcYi9jU0uScaLmeyVbQNB4
+ v6Ww==
+X-Gm-Message-State: AGi0Puad5jY58LXGHid+OjeZCnlA/NN15c0ONfO4Leq728Ja+EbG7zx2
+ QGaBeAoElP43EOF4Vannq+LNJdnTt2D0T6GAuSm4AomQ5XvaWw==
+X-Google-Smtp-Source: APiQypJEuulSaViSQloox1jV3A2GTWftZ4rnPo+8MkRGntqznInzZLQLt4k0nvVUhainvPZnGUpx75ty15rLmzQfknE=
+X-Received: by 2002:a2e:800f:: with SMTP id j15mr3367153ljg.27.1588363482366; 
+ Fri, 01 May 2020 13:04:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::42d;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42d.google.com
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Sat, 2 May 2020 04:04:31 +0800
+Message-ID: <CAE2XoE-XFG8r85yPOhuNS2YUMqhp70q1RXCy+KLT79doW8qHMg@mail.gmail.com>
+Subject: An first try to improve PPC float simulation, not even compiled. Just
+ ask question.
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, 
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: multipart/alternative; boundary="0000000000002409c605a49bb1d5"
+Received-SPF: pass client-ip=2a00:1450:4864:20::22f;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x22f.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::42d
+X-Received-From: 2a00:1450:4864:20::22f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,211 +89,677 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Programmingkid <programmingkidx@gmail.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Howard Spoelstra <hsp.cat7@gmail.com>, Dino Papararo <skizzato73@msn.com>
+Reply-To: luoyonggang@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--0000000000002409c605a49bb1d5
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-=E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) <luoyonggang@gmail.com> writes:
+/*
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| Bits  | Name   | Description
+                                                             |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 32    | FE     | Floating-point exception summary. Every floating-point
+instruction, except mtfsfi and mtfsf, implicitly sets FX      |
+|       |        |  if that instruction causes any of the floating-point
+exception bits in the FPSCR to change from 0 to 1. mcrfs,      |
+|       |        |  mtfsfi, mtfsf, mtfsb0, and mtfsb1 can alter FPSCR[FX]
+explicitly.                                                   |
+|       |        |  Note: (Programming) FPSCR[FX] is defined not to be
+altered implicitly by mtfsfi and mtfsf because                   |
+|       |        |  permitting these instructions to alter FPSCR[FX]
+implicitly could cause a paradox. An example is an                 |
+|       |        |  mtfsfi or mtfsf that supplies 0 for FPSCR[FX] and 1 for
+FPSCR[OX] and executes when FPSCR[OX] =3D 0.                  |
+|       |        |  See also the programming notes with the definition of
+these two instructions.                                       |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 33    | FEX    | Floating-point enabled exception summary. FEX is the OR
+of all the floating-point exception bits masked by           |
+|       |        |  their respective enable bits. mcrfs, mtfsfi, mtfsf,
+mtfsb0, and mtfsb1 cannot alter FPSCR[FEX] explicitly.          |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 34    | VX     | Floating-point invalid operation exception summary. VX
+is the OR of all the invalid operation exception bits.        |
+|       |        |  mcrfs, mtfsfi, mtfsf, mtfsb0, and mtfsb1 cannot alter
+FPSCR[VX] explicitly.                                         |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 35    | OX     | Floating-point overflow exception. See Section
+5.6.1.7.3, =E2=80=9COverflow Exception.=E2=80=9D                           =
+           |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 36    | UX     | Floating-point underflow exception. See Section
+5.6.1.7.4, =E2=80=9CUnderflow Exception.=E2=80=9D                          =
+          |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 37    | ZX     | Floating-Point zero divide exception. See Section
+5.6.1.7.2, =E2=80=9CZero Divide Exception.=E2=80=9D                        =
+        |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 38    | XX     | Floating-point inexact exception. See Section 5.6.1.7.5,
+=E2=80=9CInexact Exception.=E2=80=9D                                       =
+ |
+|       |        |  FPSCR[XX] is a sticky version of FPSCR[FI] (see below).
+Thus the following rules completely describe how            |
+|       |        |  FPSCR[XX] is set by a given instruction:
+                                                             |
+|       |        |  =E2=80=A2 If the instruction affects FPSCR[FI], the new
+FPSCR[XX] value is obtained by ORing the old value of               |
+|       |        |  FPSCR[XX] with the new value of FPSCR[FI].
+                                                             |
+|       |        |  =E2=80=A2 If the instruction does not affect FPSCR[FI],=
+ the
+value of FPSCR[XX] is unchanged                                 |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 39    | VXSNAN | Floating-point invalid operation exception (SNAN). See
+Section 5.6.1.7.1, =E2=80=9CInvalid Operation Exception.=E2=80=9D          =
+   |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 40    | VXISI  | floating-point invalid operation exception (=E2=88=9E =
+=E2=88=92 =E2=88=9E). See
+Section 5.6.1.7.1, =E2=80=9CInvalid Operation Exception.=E2=80=9D.         =
+  |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 41    | VXIDI  | Floating-point invalid operation exception ( =E2=88=9E =
+=C3=B7 =E2=88=9E).See
+Section 5.6.1.7.1, =E2=80=9CInvalid Operation Exception.=E2=80=9D.         =
+  |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 42    | VXZDZ  | Floating-point invalid operation exception (0 =C3=B7 0) =
+See
+Section 5.6.1.7.1, =E2=80=9CInvalid Operation Exception.=E2=80=9D.         =
+   |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 43    | VXIMZ  | Floating-point invalid operation exception (=E2=88=9E =
+=C3=970). See
+Section 5.6.1.7.1, =E2=80=9CInvalid Operation Exception.=E2=80=9D.         =
+   |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 44    | VXVC   | Floating-point invalid operation exception (invalid
+compare). See Section 5.6.1.7.1, =E2=80=9CInvalid Operation Exception.=E2=
+=80=9D. |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 45    | FR     | Floating-point fraction rounded. The last arithmetic or
+rounding and conversion instruction incremented the          |
+|       |        |  fraction during rounding. See Section 4.4.3.6,
+=E2=80=9CRounding.=E2=80=9D This bit is not sticky.                        =
+          |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 46    | FI     | Floating-point fraction inexact. The last arithmetic or
+rounding and conversion instruction either produced an       |
+|       |        |  inexact result during rounding or caused a disabled
+overflow exception. See Section 4.4.3.6, =E2=80=9CRounding.=E2=80=9D FI is =
+     |
+|       |        |  not sticky. See the definition of FPSCR[XX], above,
+regarding the relationship between FI and XX.                   |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 47-51 | FPRF   | Floating-point result flags. Arithmetic, rounding, and
+convert from integer instructions set FPRF based on the       |
+|       |        |  result placed into the target register and on the
+target precision, except that if any portion of the result is     |
+|       |        |  undefined, the value placed into FPRF is undefined.
+Floating-point compare instructions set FPRF based on           |
+|       |        |  the relative values of the operands compared. For
+convert to integer instructions, the value placed into FPRF       |
+|       |        |  is undefined. See Table 4-9.
+                                                             |
+|       |        |  Note: (Programming) A single-precision operation that
+produces a denormalized result sets FPRF to indicate          |
+|       |        |  a denormalized number. When possible, single-precision
+denormalized numbers are represented in                      |
+|       |        |  normalized double format in the target register.
+                                                             |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 47    | C      | Floating-point result class descriptor. Arithmetic,
+rounding, and conversion instructions may set this bit with      |
+|       |        |  the FPCC bits, to indicate the class of the result as
+shown in Figure 4-9.                                          |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 48-51 | FPCC   | Floating-point condition code. Floating-point Compare
+instructions set one of the FPCC bits and clear the            |
+|       |        |  other three FPCC bits. Arithmetic, rounding, and
+conversion instructions may set the FPCC bits with the C bit       |
+|       |        |  to indicate the class of the result. In this case, the
+three high-order FPCC bits retain their relational           |
+|       |        |  significance indicating that the value is less than,
+greater than, or equal to zero.                                |
+|       |        |  48 Floating-point less than or negative (FL or <)
+                                                            |
+|       |        |  49 Floating-point greater than or positive (FG or >)
+                                                             |
+|       |        |  50 Floating-point equal or zero (FE or =3D)
+                                                            |
+|       |        |  51 Floating-point unordered or NaN (FU or ?)
+                                                             |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 52    | =E2=80=94      | Reserved, should be cleared.
+                                                            |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 53    | VXSOFT | Floating-point invalid operation exception (software
+request). Can be altered only by mcrfs, mtfsfi, mtfsf,          |
+|       |        |  mtfsb0, or mtfsb1
+                                                            |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 54    | VXSQRT | Floating-point invalid operation exception (invalid
+square root).                                                    |
+|       |        |  Note that VXSQRT is defined even for implementations
+that do not support either of the two optional                 |
+|       |        |  instructions that set it, fsqrt[.] and frsqrte[.].
+Defining it for all implementations gives software a standard    |
+|       |        |  interface for handling square root exceptions. If an
+implementation does not support fsqrt[.] or frsqrte[.],        |
+|       |        |  software can simulate the instruction and set VXSQRT to
+reflect the exception.                                      |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 55    | VXCVI  | Floating-point invalid operation exception (invalid
+integer convert)                                                 |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 56    | VE     | Floating-point invalid operation exception enable
+                                                             |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 57    | OE     | Floating-point overflow exception enable
+                                                            |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 58    | UE     | Floating-point underflow exception enable
+                                                             |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 59    | ZE     | Floating-point zero divide exception enable
+                                                             |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 60    | XE     | Floating-point inexact exception enable
+                                                             |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 61    | NI     | Floating-point non-IEEE mode. If NI =3D 1, the remaining
+FPSCR bits may have meanings other than those given           |
+|       |        |  in this document and results of floating-point
+operations need not conform to IEEE 754. If the                      |
+|       |        |  IEEE-754-conforming result of a floating-point
+operation would be a denormalized number, the result of that         |
+|       |        |  operation is 0 (with the same sign as the denormalized
+number) if FPSCR[NI] =3D 1 and other requirements              |
+|       |        |  specified in the user=E2=80=99s manual for the implemen=
+tation
+are met. The other effects of setting NI may differ among     |
+|       |        |  implementations.
+                                                             |
+|       |        | Setting NI is intended to permit results to be
+approximate and to cause performance to be more predictable           |
+|       |        |  and less data-dependent than when NI =3D 0. For example=
+,
+in non-IEEE mode, an implementation returns 0                |
+|       |        |  instead of a denormalized number and may return a large
+number instead of an infinity. In non-IEEE mode an          |
+|       |        |  implementation should provide a means for ensuring that
+all results are produced without software assistance        |
+|       |        |  (that is, without causing an enabled exception type
+program interrupt or a floating-point unimplemented             |
+|       |        |  instruction exception type program interrupt and
+without invoking an emulation assist). The means may be            |
+|       |        |  controlled by one or more other FPSCR bits (recall that
+the other FPSCR bits have implementation-dependent          |
+|       |        |  meanings if NI =3D 1).
+                                                             |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+| 62-63 | RN     | Floating-point rounding control (RN).
+                                                             |
+|       |        |  00 Round to nearest
+                                                            |
+|       |        |  01 Round toward zero
+                                                             |
+|       |        |  10 Round toward +infinity
+                                                            |
+|       |        |  11 Round toward =E2=80=93infinity
+                                                            |
++-------+--------+---------------------------------------------------------=
+-------------------------------------------------------------+
+*/
 
-> On Fri, May 1, 2020 at 10:18 PM Richard Henderson <
-> richard.henderson@linaro.org> wrote:
->
->> On 5/1/20 6:10 AM, Alex Benn=C3=A9e wrote:
->> >
->> > =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) <luoyonggang@gmail.com> writ=
-es:
->> >
->> >> On Fri, May 1, 2020 at 7:58 PM BALATON Zoltan <balaton@eik.bme.hu>
->> wrote:
->> >>
->> >>> On Fri, 1 May 2020, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
->> >>>> That's what I suggested,
->> >>>> We preserve a  float computing cache
->> >>>> typedef struct FpRecord {
->> >>>>  uint8_t op;
->> >>>>  float32 A;
->> >>>>  float32 B;
->> >>>> }  FpRecord;
->> >>>> FpRecord fp_cache[1024];
->> >>>> int fp_cache_length;
->> >>>> uint32_t fp_exceptions;
->> >>>>
->> >>>> 1. For each new fp operation we push it to the  fp_cache,
->> >>>> 2. Once we read the fp_exceptions , then we re-compute
->> >>>> the fp_exceptions by re-running the fp FpRecord sequence.
->> >>>> and clear  fp_cache_length.
->> >>>
->> >>> Why do you need to store more than the last fp op? The cumulative bi=
-ts
->> can
->> >>> be tracked like it's done for other targets by not clearing fp_status
->> then
->> >>> you can read it from there. Only the non-sticky FI bit needs to be
->> >>> computed but that's only determined by the last op so it's enough to
->> >>> remember that and run that with softfloat (or even hardfloat after
->> >>> clearing status but softfloat may be faster for this) to get the bits
->> for
->> >>> last op when status is read.
->> >>>
->> >> Yeap, store only the last fp op is also an option. Do you means that
->> store
->> >> the last fp op,
->> >> and calculate it when necessary?  I am thinking about a general fp
->> >> optmize method that suite
->> >> for all target.
->> >
->> > I think that's getting a little ahead of yourself. Let's prove the
->> > technique is valuable for PPC (given it has the most to gain). We can
->> > always generalise later if it's worthwhile.
->>
->> Indeed.
->>
->> > Rather than creating a new structure I would suggest creating 3 new tcg
->> > globals (op, inA, inB) and re-factor the front-end code so each FP op
->> > loaded the TCG globals. The TCG optimizer should pick up aliased loads
->> > and automatically eliminate the dead ones. We might need some new
->> > machinery for the TCG to avoid spilling the values over potentially
->> > faulting loads/stores but that is likely a phase 2 problem.
->>
->> There's no point in new tcg globals.
->>
->> Every fp operation can raise an exception, and therefore every fp operat=
-ion
->> will flush tcg globals to memory.  Therefore there is no optimization to=
- be
->> done at the tcg opcode level.
->>
->> However, every fp operation calls a helper function, and the quickest
->> thing to
->> do is store the inputs to env->(op, inA, inB, inC) in the helper before
->> performing the operation.
->>
-> I thinks there is a possibility to add the tcg ops to optimize the floati=
-ng
-> point; For example
-> WebAssembly doesn't support for float point exception and fp round mode at
-> all, I suppose most fp execution are no need care about
->  round mode  and fp expcetion, and for this path we can use tcg-op to
-> abstract it,
-> and for all other condition we can downgrading to soft-float. As a final
-> path to optmize to fp accel of
-> QEMU, we can split the tcg-op into two path. one is hard-float with result
-> cache for lazy fp flags calculating
-> And one is pure soft-float path.
+static int ieee_ex_to_ppc(int fexcp)
+{
+    int ret =3D 0;
 
-We have talked about adding support for floating point TCG ops in the
-past but I think we would need to be a fair bit farther down the road
-before we can attempt that. The overhead of the helper call is
-relatively minimal compared to that of the executing the operation
-itself. As you can see from all the various front end wrappings around
-the softfloat code there is a fair amount of implementation details
-you'd need to abstract away into the TCG generation code to make it
-useful for all our guests.
+    /* Question? TODO: How to handling Invalid Operation Exception. */
+    if (fexcp & float_flag_invalid) {
+        ret |=3D VX;
+    }
 
-> For lazy fp flags calculating, cause we have stick flags
-> ```
->     float_flag_invalid   =3D  1,
->     float_flag_divbyzero =3D  4,
->     float_flag_overflow  =3D  8,
->     float_flag_underflow =3D 16,
->     float_flag_inexact   =3D 32,
-> ```
-> We can skip the calculation of these flags when these flags are already
-> marked to 1.
-> For these five flags, we can split to 5 calculating function, One function
-> only check one of the flags.
-> And once the flags are set to 1, then we won't call the functon any more,
-> unless the flag are cleared.
-> We will reduce a lot of branch prediction. And the function would only be
-> called when the
-> fp flags are requested.
-> This is my final goal to optimize fp in QEMU, before that, we can do
-> simpler things to optimize fp in QEMU
->
-> And besides these type of optimization, we can also offloading the fp
-> exception calculating to other CPU core, so
-> we can making single threading performance be better, cause single core
-> performance are hard to improve, but multiple core
-> system are more and more used in these days, for Ryzen 2/ Threadripper we
-> even have 64-core /128 threads.
+    if (fexcp & float_flag_overflow) {
+        ret |=3D FP_OX;
+    }
+    if (fexcp & float_flag_underflow) {
+        ret |=3D FP_UX;
+    }
+    if (fexcp & float_flag_divbyzero) {
+        ret |=3D FP_ZX;
+    }
+    if (fexcp & float_flag_inexact) {
+        ret |=3D FP_XX;
+        ret |=3D FP_FI;
+    }
+    return ret;
+}
 
-I would take some convincing that offloading exception calculation to
-another thread would make a difference - surely there would be
-inter-thread syncing required? Our main approach to threading has been
-trying to improve scalability for softmmu so we can emulate more vCPUs
-in the system.
-
->
->
->
->>
->> > Next you will want to find places that care about the per-op bits of
->> > cpu_fpscr and call a helper with the new globals to re-run the
->> > computation and feed the values in.
->>
->> Before we even get to this deferred fp operation thing, there are several
->> giant
->> improvements to ppc emulation that can be made:
->>
->> Step 1 is to rearrange the fp helpers to eliminate helper_reset_fpstatus=
-().
->> I've mentioned this before, that it's possible to leave the steady-state=
- of
->> env->fp_status.exception_flags =3D=3D 0, so there's no need for a separa=
-te
->> function
->> call.  I suspect this is worth a decent speedup by itself.
->>
-> I would like to start the fp optimize from here.
->
->
->>
->> Step 2 is to notice when all fp exceptions are masked, so that no
->> exception can
->> be raised, and set a tb_flags bit.  This is the default fp environment t=
-hat
->> libc enables and therefore extremely common.
->>
->> Currently, ppc has 3 helpers called per fp operation.  If step 1 is hand=
-led
->> correctly, then we're down to 2 fp helpers per fp operation.  If no
->> exceptions
->> need raising, then we can perform the entire operation with a single
->> function call.
->>
->> We would require a parallel set of fp helpers that (1) performs the
->> operation
->> and (2) does any post-processing of the exception bits straight away, but
->> (3)
->> without raising any exceptions.  Sort of like helper_fadd +
->> do_float_check_status, but less.  IIRC the only real extra work is
->> categorizing
->> invalid exceptions.  We could even plausibly extend softfloat to do that
->> while
->> it is recording the invalid exception.
->>
->> Step 3 is to improve softfloat.c with Yonggang Luo's idea to compute
->> inexact
->> from the inverse hardfloat operation.  This would let us relax the
->> restriction
->> of only using hardfloat when we have already have an accrued inexact
->> exception.
->>
->> Only after all of these are done is it worth experimenting with caching =
-the
->> last fp operation.
->>
->>
->> r~
->>
-
+void helper_update_fpscr(CPUPPCState *env, int op, uintptr_t retaddr)
+{
+    int tmp =3D get_float_exception_flags(&env->fp_status);
+    if (tmp) {
+        tmp =3D ieee_ex_to_ppc(tmp);
+        set_float_exception_flags(0, &env->fp_status);
+        if (tmp) {
+            env->fpscr |=3D tmp;
+            if (fp_exceptions_enabled(env) && (env->fpscr & FP_FEX)) {
+                if (env->fpscr & FP_VE) {
+                    raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
+                                        POWERPC_EXCP_FP | op, retaddr);
+                }
+            }
+        }
+    }
+}
+I found the fpscr  are really complicated, especially abount  Invalid
+Operation Exception.
+And  fp_status can not represent all the  Invalid Operation Exception flags=
+.
+What I need to do to represent all the  Invalid Operation Exception
 
 --=20
-Alex Benn=C3=A9e
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
+
+--0000000000002409c605a49bb1d5
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: base64
+
+PGRpdiBkaXI9Imx0ciI+PGRpdj48YnI+Lyo8YnI+Ky0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSs8YnI+
+fCBCaXRzIMKgfCBOYW1lIMKgIHwgRGVzY3JpcHRpb24gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqB8PGJyPistLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rPGJyPnwgMzIg
+wqAgwqB8IEZFIMKgIMKgIHwgRmxvYXRpbmctcG9pbnQgZXhjZXB0aW9uIHN1bW1hcnkuIEV2ZXJ5
+IGZsb2F0aW5nLXBvaW50IGluc3RydWN0aW9uLCBleGNlcHQgbXRmc2ZpIGFuZCBtdGZzZiwgaW1w
+bGljaXRseSBzZXRzIEZYIMKgIMKgIMKgfDxicj58IMKgIMKgIMKgIHwgwqAgwqAgwqAgwqB8IMKg
+aWYgdGhhdCBpbnN0cnVjdGlvbiBjYXVzZXMgYW55IG9mIHRoZSBmbG9hdGluZy1wb2ludCBleGNl
+cHRpb24gYml0cyBpbiB0aGUgRlBTQ1IgdG8gY2hhbmdlIGZyb20gMCB0byAxLiBtY3JmcywgwqAg
+wqAgwqB8PGJyPnwgwqAgwqAgwqAgfCDCoCDCoCDCoCDCoHwgwqBtdGZzZmksIG10ZnNmLCBtdGZz
+YjAsIGFuZCBtdGZzYjEgY2FuIGFsdGVyIEZQU0NSW0ZYXSBleHBsaWNpdGx5LiDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCB8PGJyPnwgwqAgwqAgwqAgfCDCoCDCoCDCoCDCoHwgwqBOb3RlOiAoUHJvZ3JhbW1p
+bmcpIEZQU0NSW0ZYXSBpcyBkZWZpbmVkIG5vdCB0byBiZSBhbHRlcmVkIGltcGxpY2l0bHkgYnkg
+bXRmc2ZpIGFuZCBtdGZzZiBiZWNhdXNlIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHw8YnI+
+fCDCoCDCoCDCoCB8IMKgIMKgIMKgIMKgfCDCoHBlcm1pdHRpbmcgdGhlc2UgaW5zdHJ1Y3Rpb25z
+IHRvIGFsdGVyIEZQU0NSW0ZYXSBpbXBsaWNpdGx5IGNvdWxkIGNhdXNlIGEgcGFyYWRveC4gQW4g
+ZXhhbXBsZSBpcyBhbiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCB8PGJyPnwgwqAgwqAgwqAgfCDC
+oCDCoCDCoCDCoHwgwqBtdGZzZmkgb3IgbXRmc2YgdGhhdCBzdXBwbGllcyAwIGZvciBGUFNDUltG
+WF0gYW5kIDEgZm9yIEZQU0NSW09YXSBhbmQgZXhlY3V0ZXMgd2hlbiBGUFNDUltPWF0gPSAwLiDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoHw8YnI+fCDCoCDCoCDCoCB8IMKgIMKgIMKgIMKgfCDC
+oFNlZSBhbHNvIHRoZSBwcm9ncmFtbWluZyBub3RlcyB3aXRoIHRoZSBkZWZpbml0aW9uIG9mIHRo
+ZXNlIHR3byBpbnN0cnVjdGlvbnMuIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIHw8YnI+Ky0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSs8YnI+fCAz
+MyDCoCDCoHwgRkVYIMKgIMKgfCBGbG9hdGluZy1wb2ludCBlbmFibGVkIGV4Y2VwdGlvbiBzdW1t
+YXJ5LiBGRVggaXMgdGhlIE9SIG9mIGFsbCB0aGUgZmxvYXRpbmctcG9pbnQgZXhjZXB0aW9uIGJp
+dHMgbWFza2VkIGJ5IMKgIMKgIMKgIMKgIMKgIHw8YnI+fCDCoCDCoCDCoCB8IMKgIMKgIMKgIMKg
+fCDCoHRoZWlyIHJlc3BlY3RpdmUgZW5hYmxlIGJpdHMuIG1jcmZzLCBtdGZzZmksIG10ZnNmLCBt
+dGZzYjAsIGFuZCBtdGZzYjEgY2Fubm90IGFsdGVyIEZQU0NSW0ZFWF0gZXhwbGljaXRseS4gwqAg
+wqAgwqAgwqAgwqB8PGJyPistLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rPGJyPnwgMzQgwqAgwqB8IFZY
+IMKgIMKgIHwgRmxvYXRpbmctcG9pbnQgaW52YWxpZCBvcGVyYXRpb24gZXhjZXB0aW9uIHN1bW1h
+cnkuIFZYIGlzIHRoZSBPUiBvZiBhbGwgdGhlIGludmFsaWQgb3BlcmF0aW9uIGV4Y2VwdGlvbiBi
+aXRzLiDCoCDCoCDCoCDCoHw8YnI+fCDCoCDCoCDCoCB8IMKgIMKgIMKgIMKgfCDCoG1jcmZzLCBt
+dGZzZmksIG10ZnNmLCBtdGZzYjAsIGFuZCBtdGZzYjEgY2Fubm90IGFsdGVyIEZQU0NSW1ZYXSBl
+eHBsaWNpdGx5LiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCB8PGJyPistLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rPGJyPnwgMzUgwqAgwqB8
+IE9YIMKgIMKgIHwgRmxvYXRpbmctcG9pbnQgb3ZlcmZsb3cgZXhjZXB0aW9uLiBTZWUgU2VjdGlv
+biA1LjYuMS43LjMsIOKAnE92ZXJmbG93IEV4Y2VwdGlvbi7igJ0gwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqB8PGJyPistLS0tLS0tKy0tLS0t
+LS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0rPGJyPnwgMzYgwqAgwqB8IFVYIMKgIMKgIHwgRmxvYXRpbmctcG9pbnQgdW5kZXJm
+bG93IGV4Y2VwdGlvbi4gU2VlIFNlY3Rpb24gNS42LjEuNy40LCDigJxVbmRlcmZsb3cgRXhjZXB0
+aW9uLuKAnSDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoHw8YnI+Ky0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSs8YnI+fCAzNyDCoCDCoHwgWlggwqAgwqAg
+fCBGbG9hdGluZy1Qb2ludCB6ZXJvIGRpdmlkZSBleGNlcHRpb24uIFNlZSBTZWN0aW9uIDUuNi4x
+LjcuMiwg4oCcWmVybyBEaXZpZGUgRXhjZXB0aW9uLuKAnSDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoHw8YnI+Ky0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSs8YnI+
+fCAzOCDCoCDCoHwgWFggwqAgwqAgfCBGbG9hdGluZy1wb2ludCBpbmV4YWN0IGV4Y2VwdGlvbi4g
+U2VlIFNlY3Rpb24gNS42LjEuNy41LCDigJxJbmV4YWN0IEV4Y2VwdGlvbi7igJ0gwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqB8PGJyPnwg
+wqAgwqAgwqAgfCDCoCDCoCDCoCDCoHwgwqBGUFNDUltYWF0gaXMgYSBzdGlja3kgdmVyc2lvbiBv
+ZiBGUFNDUltGSV0gKHNlZSBiZWxvdykuIFRodXMgdGhlIGZvbGxvd2luZyBydWxlcyBjb21wbGV0
+ZWx5IGRlc2NyaWJlIGhvdyDCoCDCoCDCoCDCoCDCoCDCoHw8YnI+fCDCoCDCoCDCoCB8IMKgIMKg
+IMKgIMKgfCDCoEZQU0NSW1hYXSBpcyBzZXQgYnkgYSBnaXZlbiBpbnN0cnVjdGlvbjogwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqB8PGJyPnwg
+wqAgwqAgwqAgfCDCoCDCoCDCoCDCoHwgwqDigKIgSWYgdGhlIGluc3RydWN0aW9uIGFmZmVjdHMg
+RlBTQ1JbRkldLCB0aGUgbmV3IEZQU0NSW1hYXSB2YWx1ZSBpcyBvYnRhaW5lZCBieSBPUmluZyB0
+aGUgb2xkIHZhbHVlIG9mIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHw8YnI+fCDCoCDCoCDCoCB8IMKg
+IMKgIMKgIMKgfCDCoEZQU0NSW1hYXSB3aXRoIHRoZSBuZXcgdmFsdWUgb2YgRlBTQ1JbRkldLiDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoHw8YnI+
+fCDCoCDCoCDCoCB8IMKgIMKgIMKgIMKgfCDCoOKAoiBJZiB0aGUgaW5zdHJ1Y3Rpb24gZG9lcyBu
+b3QgYWZmZWN0IEZQU0NSW0ZJXSwgdGhlIHZhbHVlIG9mIEZQU0NSW1hYXSBpcyB1bmNoYW5nZWQg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgfDxicj4rLS0t
+LS0tLSstLS0tLS0tLSstLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tKzxicj58IDM5IMKgIMKgfCBWWFNOQU4gfCBGbG9hdGluZy1wb2lu
+dCBpbnZhbGlkIG9wZXJhdGlvbiBleGNlcHRpb24gKFNOQU4pLiBTZWUgU2VjdGlvbiA1LjYuMS43
+LjEsIOKAnEludmFsaWQgT3BlcmF0aW9uIEV4Y2VwdGlvbi7igJ0gwqAgwqAgwqAgwqAgwqAgwqAg
+fDxicj4rLS0tLS0tLSstLS0tLS0tLSstLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tKzxicj58IDQwIMKgIMKgfCBWWElTSSDCoHwgZmxv
+YXRpbmctcG9pbnQgaW52YWxpZCBvcGVyYXRpb24gZXhjZXB0aW9uICjiiJ4g4oiSIOKInikuIFNl
+ZSBTZWN0aW9uIDUuNi4xLjcuMSwg4oCcSW52YWxpZCBPcGVyYXRpb24gRXhjZXB0aW9uLuKAnS4g
+wqAgwqAgwqAgwqAgwqAgfDxicj4rLS0tLS0tLSstLS0tLS0tLSstLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tKzxicj58IDQxIMKgIMKg
+fCBWWElESSDCoHwgRmxvYXRpbmctcG9pbnQgaW52YWxpZCBvcGVyYXRpb24gZXhjZXB0aW9uICgg
+4oieIMO3IOKInikuU2VlIFNlY3Rpb24gNS42LjEuNy4xLCDigJxJbnZhbGlkIE9wZXJhdGlvbiBF
+eGNlcHRpb24u4oCdLiDCoCDCoCDCoCDCoCDCoCB8PGJyPistLS0tLS0tKy0tLS0tLS0tKy0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0r
+PGJyPnwgNDIgwqAgwqB8IFZYWkRaIMKgfCBGbG9hdGluZy1wb2ludCBpbnZhbGlkIG9wZXJhdGlv
+biBleGNlcHRpb24gKDAgw7cgMCkgU2VlIFNlY3Rpb24gNS42LjEuNy4xLCDigJxJbnZhbGlkIE9w
+ZXJhdGlvbiBFeGNlcHRpb24u4oCdLiDCoCDCoCDCoCDCoCDCoCDCoHw8YnI+Ky0tLS0tLS0rLS0t
+LS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLSs8YnI+fCA0MyDCoCDCoHwgVlhJTVogwqB8IEZsb2F0aW5nLXBvaW50IGludmFs
+aWQgb3BlcmF0aW9uIGV4Y2VwdGlvbiAo4oieIMOXMCkuIFNlZSBTZWN0aW9uIDUuNi4xLjcuMSwg
+4oCcSW52YWxpZCBPcGVyYXRpb24gRXhjZXB0aW9uLuKAnS4gwqAgwqAgwqAgwqAgwqAgwqB8PGJy
+PistLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rPGJyPnwgNDQgwqAgwqB8IFZYVkMgwqAgfCBGbG9hdGlu
+Zy1wb2ludCBpbnZhbGlkIG9wZXJhdGlvbiBleGNlcHRpb24gKGludmFsaWQgY29tcGFyZSkuIFNl
+ZSBTZWN0aW9uIDUuNi4xLjcuMSwg4oCcSW52YWxpZCBPcGVyYXRpb24gRXhjZXB0aW9uLuKAnS4g
+fDxicj4rLS0tLS0tLSstLS0tLS0tLSstLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tKzxicj58IDQ1IMKgIMKgfCBGUiDCoCDCoCB8IEZs
+b2F0aW5nLXBvaW50IGZyYWN0aW9uIHJvdW5kZWQuIFRoZSBsYXN0IGFyaXRobWV0aWMgb3Igcm91
+bmRpbmcgYW5kIGNvbnZlcnNpb24gaW5zdHJ1Y3Rpb24gaW5jcmVtZW50ZWQgdGhlIMKgIMKgIMKg
+IMKgIMKgfDxicj58IMKgIMKgIMKgIHwgwqAgwqAgwqAgwqB8IMKgZnJhY3Rpb24gZHVyaW5nIHJv
+dW5kaW5nLiBTZWUgU2VjdGlvbiA0LjQuMy42LCDigJxSb3VuZGluZy7igJ0gVGhpcyBiaXQgaXMg
+bm90IHN0aWNreS4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqB8PGJyPistLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rPGJyPnwgNDYgwqAgwqB8IEZJIMKgIMKg
+IHwgRmxvYXRpbmctcG9pbnQgZnJhY3Rpb24gaW5leGFjdC4gVGhlIGxhc3QgYXJpdGhtZXRpYyBv
+ciByb3VuZGluZyBhbmQgY29udmVyc2lvbiBpbnN0cnVjdGlvbiBlaXRoZXIgcHJvZHVjZWQgYW4g
+wqAgwqAgwqAgfDxicj58IMKgIMKgIMKgIHwgwqAgwqAgwqAgwqB8IMKgaW5leGFjdCByZXN1bHQg
+ZHVyaW5nIHJvdW5kaW5nIG9yIGNhdXNlZCBhIGRpc2FibGVkIG92ZXJmbG93IGV4Y2VwdGlvbi4g
+U2VlIFNlY3Rpb24gNC40LjMuNiwg4oCcUm91bmRpbmcu4oCdIEZJIGlzIMKgIMKgIMKgfDxicj58
+IMKgIMKgIMKgIHwgwqAgwqAgwqAgwqB8IMKgbm90IHN0aWNreS4gU2VlIHRoZSBkZWZpbml0aW9u
+IG9mIEZQU0NSW1hYXSwgYWJvdmUsIHJlZ2FyZGluZyB0aGUgcmVsYXRpb25zaGlwIGJldHdlZW4g
+RkkgYW5kIFhYLiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCB8PGJyPistLS0tLS0tKy0tLS0t
+LS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0rPGJyPnwgNDctNTEgfCBGUFJGIMKgIHwgRmxvYXRpbmctcG9pbnQgcmVzdWx0IGZs
+YWdzLiBBcml0aG1ldGljLCByb3VuZGluZywgYW5kIGNvbnZlcnQgZnJvbSBpbnRlZ2VyIGluc3Ry
+dWN0aW9ucyBzZXQgRlBSRiBiYXNlZCBvbiB0aGUgwqAgwqAgwqAgfDxicj58IMKgIMKgIMKgIHwg
+wqAgwqAgwqAgwqB8IMKgcmVzdWx0IHBsYWNlZCBpbnRvIHRoZSB0YXJnZXQgcmVnaXN0ZXIgYW5k
+IG9uIHRoZSB0YXJnZXQgcHJlY2lzaW9uLCBleGNlcHQgdGhhdCBpZiBhbnkgcG9ydGlvbiBvZiB0
+aGUgcmVzdWx0IGlzIMKgIMKgIHw8YnI+fCDCoCDCoCDCoCB8IMKgIMKgIMKgIMKgfCDCoHVuZGVm
+aW5lZCwgdGhlIHZhbHVlIHBsYWNlZCBpbnRvIEZQUkYgaXMgdW5kZWZpbmVkLiBGbG9hdGluZy1w
+b2ludCBjb21wYXJlIGluc3RydWN0aW9ucyBzZXQgRlBSRiBiYXNlZCBvbiDCoCDCoCDCoCDCoCDC
+oCB8PGJyPnwgwqAgwqAgwqAgfCDCoCDCoCDCoCDCoHwgwqB0aGUgcmVsYXRpdmUgdmFsdWVzIG9m
+IHRoZSBvcGVyYW5kcyBjb21wYXJlZC4gRm9yIGNvbnZlcnQgdG8gaW50ZWdlciBpbnN0cnVjdGlv
+bnMsIHRoZSB2YWx1ZSBwbGFjZWQgaW50byBGUFJGIMKgIMKgIMKgIHw8YnI+fCDCoCDCoCDCoCB8
+IMKgIMKgIMKgIMKgfCDCoGlzIHVuZGVmaW5lZC4gU2VlIFRhYmxlIDQtOS4gwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqB8PGJyPnwgwqAgwqAgwqAgfCDCoCDCoCDCoCDCoHwgwqBOb3RlOiAoUHJvZ3JhbW1pbmcp
+IEEgc2luZ2xlLXByZWNpc2lvbiBvcGVyYXRpb24gdGhhdCBwcm9kdWNlcyBhIGRlbm9ybWFsaXpl
+ZCByZXN1bHQgc2V0cyBGUFJGIHRvIGluZGljYXRlIMKgIMKgIMKgIMKgIMKgfDxicj58IMKgIMKg
+IMKgIHwgwqAgwqAgwqAgwqB8IMKgYSBkZW5vcm1hbGl6ZWQgbnVtYmVyLiBXaGVuIHBvc3NpYmxl
+LCBzaW5nbGUtcHJlY2lzaW9uIGRlbm9ybWFsaXplZCBudW1iZXJzIGFyZSByZXByZXNlbnRlZCBp
+biDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoHw8YnI+fCDCoCDCoCDCoCB8IMKgIMKg
+IMKgIMKgfCDCoG5vcm1hbGl6ZWQgZG91YmxlIGZvcm1hdCBpbiB0aGUgdGFyZ2V0IHJlZ2lzdGVy
+LiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoHw8YnI+Ky0tLS0t
+LS0rLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLSs8YnI+fCA0NyDCoCDCoHwgQyDCoCDCoCDCoHwgRmxvYXRpbmctcG9p
+bnQgcmVzdWx0IGNsYXNzIGRlc2NyaXB0b3IuIEFyaXRobWV0aWMsIHJvdW5kaW5nLCBhbmQgY29u
+dmVyc2lvbiBpbnN0cnVjdGlvbnMgbWF5IHNldCB0aGlzIGJpdCB3aXRoIMKgIMKgIMKgfDxicj58
+IMKgIMKgIMKgIHwgwqAgwqAgwqAgwqB8IMKgdGhlIEZQQ0MgYml0cywgdG8gaW5kaWNhdGUgdGhl
+IGNsYXNzIG9mIHRoZSByZXN1bHQgYXMgc2hvd24gaW4gRmlndXJlIDQtOS4gwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqB8PGJyPist
+LS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0rPGJyPnwgNDgtNTEgfCBGUENDIMKgIHwgRmxvYXRpbmctcG9p
+bnQgY29uZGl0aW9uIGNvZGUuIEZsb2F0aW5nLXBvaW50IENvbXBhcmUgaW5zdHJ1Y3Rpb25zIHNl
+dCBvbmUgb2YgdGhlIEZQQ0MgYml0cyBhbmQgY2xlYXIgdGhlIMKgIMKgIMKgIMKgIMKgIMKgfDxi
+cj58IMKgIMKgIMKgIHwgwqAgwqAgwqAgwqB8IMKgb3RoZXIgdGhyZWUgRlBDQyBiaXRzLiBBcml0
+aG1ldGljLCByb3VuZGluZywgYW5kIGNvbnZlcnNpb24gaW5zdHJ1Y3Rpb25zIG1heSBzZXQgdGhl
+IEZQQ0MgYml0cyB3aXRoIHRoZSBDIGJpdCDCoCDCoCDCoCB8PGJyPnwgwqAgwqAgwqAgfCDCoCDC
+oCDCoCDCoHwgwqB0byBpbmRpY2F0ZSB0aGUgY2xhc3Mgb2YgdGhlIHJlc3VsdC4gSW4gdGhpcyBj
+YXNlLCB0aGUgdGhyZWUgaGlnaC1vcmRlciBGUENDIGJpdHMgcmV0YWluIHRoZWlyIHJlbGF0aW9u
+YWwgwqAgwqAgwqAgwqAgwqAgfDxicj58IMKgIMKgIMKgIHwgwqAgwqAgwqAgwqB8IMKgc2lnbmlm
+aWNhbmNlIGluZGljYXRpbmcgdGhhdCB0aGUgdmFsdWUgaXMgbGVzcyB0aGFuLCBncmVhdGVyIHRo
+YW4sIG9yIGVxdWFsIHRvIHplcm8uIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgfDxicj58IMKgIMKgIMKgIHwgwqAgwqAgwqAgwqB8IMKgNDggRmxvYXRpbmct
+cG9pbnQgbGVzcyB0aGFuIG9yIG5lZ2F0aXZlIChGTCBvciAmbHQ7KSDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCB8PGJyPnwgwqAgwqAgwqAgfCDCoCDCoCDCoCDCoHwg
+wqA0OSBGbG9hdGluZy1wb2ludCBncmVhdGVyIHRoYW4gb3IgcG9zaXRpdmUgKEZHIG9yICZndDsp
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgfDxicj58IMKgIMKgIMKgIHwg
+wqAgwqAgwqAgwqB8IMKgNTAgRmxvYXRpbmctcG9pbnQgZXF1YWwgb3IgemVybyAoRkUgb3IgPSkg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgfDxi
+cj58IMKgIMKgIMKgIHwgwqAgwqAgwqAgwqB8IMKgNTEgRmxvYXRpbmctcG9pbnQgdW5vcmRlcmVk
+IG9yIE5hTiAoRlUgb3IgPykgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqB8PGJyPistLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rPGJyPnwgNTIgwqAgwqB8IOKA
+lCDCoCDCoCDCoHwgUmVzZXJ2ZWQsIHNob3VsZCBiZSBjbGVhcmVkLiDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCB8PGJyPistLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rPGJyPnwgNTMgwqAgwqB8IFZYU09GVCB8IEZs
+b2F0aW5nLXBvaW50IGludmFsaWQgb3BlcmF0aW9uIGV4Y2VwdGlvbiAoc29mdHdhcmUgcmVxdWVz
+dCkuIENhbiBiZSBhbHRlcmVkIG9ubHkgYnkgbWNyZnMsIG10ZnNmaSwgbXRmc2YsIMKgIMKgIMKg
+IMKgIMKgfDxicj58IMKgIMKgIMKgIHwgwqAgwqAgwqAgwqB8IMKgbXRmc2IwLCBvciBtdGZzYjEg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgfDxicj4rLS0tLS0tLSstLS0tLS0tLSst
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tKzxicj58IDU0IMKgIMKgfCBWWFNRUlQgfCBGbG9hdGluZy1wb2ludCBpbnZhbGlkIG9wZXJh
+dGlvbiBleGNlcHRpb24gKGludmFsaWQgc3F1YXJlIHJvb3QpLiDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oHw8YnI+fCDCoCDCoCDCoCB8IMKgIMKgIMKgIMKgfCDCoE5vdGUgdGhhdCBWWFNRUlQgaXMgZGVm
+aW5lZCBldmVuIGZvciBpbXBsZW1lbnRhdGlvbnMgdGhhdCBkbyBub3Qgc3VwcG9ydCBlaXRoZXIg
+b2YgdGhlIHR3byBvcHRpb25hbCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCB8PGJyPnwgwqAgwqAg
+wqAgfCDCoCDCoCDCoCDCoHwgwqBpbnN0cnVjdGlvbnMgdGhhdCBzZXQgaXQsIGZzcXJ0Wy5dIGFu
+ZCBmcnNxcnRlWy5dLiBEZWZpbmluZyBpdCBmb3IgYWxsIGltcGxlbWVudGF0aW9ucyBnaXZlcyBz
+b2Z0d2FyZSBhIHN0YW5kYXJkIMKgIMKgfDxicj58IMKgIMKgIMKgIHwgwqAgwqAgwqAgwqB8IMKg
+aW50ZXJmYWNlIGZvciBoYW5kbGluZyBzcXVhcmUgcm9vdCBleGNlcHRpb25zLiBJZiBhbiBpbXBs
+ZW1lbnRhdGlvbiBkb2VzIG5vdCBzdXBwb3J0IGZzcXJ0Wy5dIG9yIGZyc3FydGVbLl0sIMKgIMKg
+IMKgIMKgfDxicj58IMKgIMKgIMKgIHwgwqAgwqAgwqAgwqB8IMKgc29mdHdhcmUgY2FuIHNpbXVs
+YXRlIHRoZSBpbnN0cnVjdGlvbiBhbmQgc2V0IFZYU1FSVCB0byByZWZsZWN0IHRoZSBleGNlcHRp
+b24uIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgfDxicj4rLS0tLS0tLSstLS0tLS0tLSstLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tKzxicj58IDU1IMKgIMKgfCBWWENWSSDCoHwg
+RmxvYXRpbmctcG9pbnQgaW52YWxpZCBvcGVyYXRpb24gZXhjZXB0aW9uIChpbnZhbGlkIGludGVn
+ZXIgY29udmVydCkgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgfDxicj4rLS0tLS0tLSstLS0tLS0tLSstLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tKzxi
+cj58IDU2IMKgIMKgfCBWRSDCoCDCoCB8IEZsb2F0aW5nLXBvaW50IGludmFsaWQgb3BlcmF0aW9u
+IGV4Y2VwdGlvbiBlbmFibGUgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqB8PGJyPistLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rPGJyPnwgNTcgwqAgwqB8IE9FIMKgIMKg
+IHwgRmxvYXRpbmctcG9pbnQgb3ZlcmZsb3cgZXhjZXB0aW9uIGVuYWJsZSDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCB8PGJyPistLS0tLS0t
+Ky0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0rPGJyPnwgNTggwqAgwqB8IFVFIMKgIMKgIHwgRmxvYXRpbmctcG9pbnQg
+dW5kZXJmbG93IGV4Y2VwdGlvbiBlbmFibGUgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqB8PGJyPistLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rPGJy
+PnwgNTkgwqAgwqB8IFpFIMKgIMKgIHwgRmxvYXRpbmctcG9pbnQgemVybyBkaXZpZGUgZXhjZXB0
+aW9uIGVuYWJsZSDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoHw8YnI+Ky0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSs8YnI+fCA2MCDCoCDCoHwgWEUgwqAg
+wqAgfCBGbG9hdGluZy1wb2ludCBpbmV4YWN0IGV4Y2VwdGlvbiBlbmFibGUgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqB8PGJyPistLS0t
+LS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0rPGJyPnwgNjEgwqAgwqB8IE5JIMKgIMKgIHwgRmxvYXRpbmctcG9p
+bnQgbm9uLUlFRUUgbW9kZS4gSWYgTkkgPSAxLCB0aGUgcmVtYWluaW5nIEZQU0NSIGJpdHMgbWF5
+IGhhdmUgbWVhbmluZ3Mgb3RoZXIgdGhhbiB0aG9zZSBnaXZlbiDCoCDCoCDCoCDCoCDCoCB8PGJy
+PnwgwqAgwqAgwqAgfCDCoCDCoCDCoCDCoHwgwqBpbiB0aGlzIGRvY3VtZW50IGFuZCByZXN1bHRz
+IG9mIGZsb2F0aW5nLXBvaW50IG9wZXJhdGlvbnMgbmVlZCBub3QgY29uZm9ybSB0byBJRUVFIDc1
+NC4gSWYgdGhlIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgfDxicj58IMKgIMKgIMKg
+IHwgwqAgwqAgwqAgwqB8IMKgSUVFRS03NTQtY29uZm9ybWluZyByZXN1bHQgb2YgYSBmbG9hdGlu
+Zy1wb2ludCBvcGVyYXRpb24gd291bGQgYmUgYSBkZW5vcm1hbGl6ZWQgbnVtYmVyLCB0aGUgcmVz
+dWx0IG9mIHRoYXQgwqAgwqAgwqAgwqAgfDxicj58IMKgIMKgIMKgIHwgwqAgwqAgwqAgwqB8IMKg
+b3BlcmF0aW9uIGlzIDAgKHdpdGggdGhlIHNhbWUgc2lnbiBhcyB0aGUgZGVub3JtYWxpemVkIG51
+bWJlcikgaWYgRlBTQ1JbTkldID0gMSBhbmQgb3RoZXIgcmVxdWlyZW1lbnRzIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgfDxicj58IMKgIMKgIMKgIHwgwqAgwqAgwqAgwqB8IMKgc3BlY2lmaWVkIGluIHRo
+ZSB1c2Vy4oCZcyBtYW51YWwgZm9yIHRoZSBpbXBsZW1lbnRhdGlvbiBhcmUgbWV0LiBUaGUgb3Ro
+ZXIgZWZmZWN0cyBvZiBzZXR0aW5nIE5JIG1heSBkaWZmZXIgYW1vbmcgwqAgwqAgfDxicj58IMKg
+IMKgIMKgIHwgwqAgwqAgwqAgwqB8IMKgaW1wbGVtZW50YXRpb25zLiDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoHw8YnI+fCDCoCDCoCDCoCB8IMKgIMKgIMKgIMKgfCBTZXR0aW5n
+IE5JIGlzIGludGVuZGVkIHRvIHBlcm1pdCByZXN1bHRzIHRvIGJlIGFwcHJveGltYXRlIGFuZCB0
+byBjYXVzZSBwZXJmb3JtYW5jZSB0byBiZSBtb3JlIHByZWRpY3RhYmxlIMKgIMKgIMKgIMKgIMKg
+IHw8YnI+fCDCoCDCoCDCoCB8IMKgIMKgIMKgIMKgfCDCoGFuZCBsZXNzIGRhdGEtZGVwZW5kZW50
+IHRoYW4gd2hlbiBOSSA9IDAuIEZvciBleGFtcGxlLCBpbiBub24tSUVFRSBtb2RlLCBhbiBpbXBs
+ZW1lbnRhdGlvbiByZXR1cm5zIDAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqB8PGJyPnwgwqAgwqAg
+wqAgfCDCoCDCoCDCoCDCoHwgwqBpbnN0ZWFkIG9mIGEgZGVub3JtYWxpemVkIG51bWJlciBhbmQg
+bWF5IHJldHVybiBhIGxhcmdlIG51bWJlciBpbnN0ZWFkIG9mIGFuIGluZmluaXR5LiBJbiBub24t
+SUVFRSBtb2RlIGFuIMKgIMKgIMKgIMKgIMKgfDxicj58IMKgIMKgIMKgIHwgwqAgwqAgwqAgwqB8
+IMKgaW1wbGVtZW50YXRpb24gc2hvdWxkIHByb3ZpZGUgYSBtZWFucyBmb3IgZW5zdXJpbmcgdGhh
+dCBhbGwgcmVzdWx0cyBhcmUgcHJvZHVjZWQgd2l0aG91dCBzb2Z0d2FyZSBhc3Npc3RhbmNlIMKg
+IMKgIMKgIMKgfDxicj58IMKgIMKgIMKgIHwgwqAgwqAgwqAgwqB8IMKgKHRoYXQgaXMsIHdpdGhv
+dXQgY2F1c2luZyBhbiBlbmFibGVkIGV4Y2VwdGlvbiB0eXBlIHByb2dyYW0gaW50ZXJydXB0IG9y
+IGEgZmxvYXRpbmctcG9pbnQgdW5pbXBsZW1lbnRlZCDCoCDCoCDCoCDCoCDCoCDCoCB8PGJyPnwg
+wqAgwqAgwqAgfCDCoCDCoCDCoCDCoHwgwqBpbnN0cnVjdGlvbiBleGNlcHRpb24gdHlwZSBwcm9n
+cmFtIGludGVycnVwdCBhbmQgd2l0aG91dCBpbnZva2luZyBhbiBlbXVsYXRpb24gYXNzaXN0KS4g
+VGhlIG1lYW5zIG1heSBiZSDCoCDCoCDCoCDCoCDCoCDCoHw8YnI+fCDCoCDCoCDCoCB8IMKgIMKg
+IMKgIMKgfCDCoGNvbnRyb2xsZWQgYnkgb25lIG9yIG1vcmUgb3RoZXIgRlBTQ1IgYml0cyAocmVj
+YWxsIHRoYXQgdGhlIG90aGVyIEZQU0NSIGJpdHMgaGF2ZSBpbXBsZW1lbnRhdGlvbi1kZXBlbmRl
+bnQgwqAgwqAgwqAgwqAgwqB8PGJyPnwgwqAgwqAgwqAgfCDCoCDCoCDCoCDCoHwgwqBtZWFuaW5n
+cyBpZiBOSSA9IDEpLiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoHw8YnI+Ky0tLS0tLS0r
+LS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLSs8YnI+fCA2Mi02MyB8IFJOIMKgIMKgIHwgRmxvYXRpbmctcG9pbnQgcm91
+bmRpbmcgY29udHJvbCAoUk4pLiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoHw8YnI+fCDCoCDCoCDCoCB8IMKgIMKgIMKgIMKgfCDC
+oDAwIFJvdW5kIHRvIG5lYXJlc3QgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgfDxicj58
+IMKgIMKgIMKgIHwgwqAgwqAgwqAgwqB8IMKgMDEgUm91bmQgdG93YXJkIHplcm8gwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqB8PGJyPnwgwqAgwqAgwqAgfCDCoCDCoCDCoCDCoHwgwqAxMCBS
+b3VuZCB0b3dhcmQgK2luZmluaXR5IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHw8YnI+fCDCoCDCoCDC
+oCB8IMKgIMKgIMKgIMKgfCDCoDExIFJvdW5kIHRvd2FyZCDigJNpbmZpbml0eSDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCB8PGJyPistLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rPGJyPiovPGJyPjxicj5zdGF0
+aWMgaW50IGllZWVfZXhfdG9fcHBjKGludCBmZXhjcCk8YnI+ezxicj7CoCDCoCBpbnQgcmV0ID0g
+MDs8YnI+PGJyPsKgIMKgIC8qIFF1ZXN0aW9uPyBUT0RPOiBIb3cgdG8gaGFuZGxpbmcgSW52YWxp
+ZCBPcGVyYXRpb24gRXhjZXB0aW9uLiAqLzxicj7CoCDCoCBpZiAoZmV4Y3AgJmFtcDsgZmxvYXRf
+ZmxhZ19pbnZhbGlkKSB7PGJyPsKgIMKgIMKgIMKgIHJldCB8PSBWWDs8YnI+wqAgwqAgfTxicj48
+YnI+wqAgwqAgaWYgKGZleGNwICZhbXA7IGZsb2F0X2ZsYWdfb3ZlcmZsb3cpIHs8YnI+wqAgwqAg
+wqAgwqAgcmV0IHw9IEZQX09YOzxicj7CoCDCoCB9PGJyPsKgIMKgIGlmIChmZXhjcCAmYW1wOyBm
+bG9hdF9mbGFnX3VuZGVyZmxvdykgezxicj7CoCDCoCDCoCDCoCByZXQgfD0gRlBfVVg7PGJyPsKg
+IMKgIH08YnI+wqAgwqAgaWYgKGZleGNwICZhbXA7IGZsb2F0X2ZsYWdfZGl2Ynl6ZXJvKSB7PGJy
+PsKgIMKgIMKgIMKgIHJldCB8PSBGUF9aWDs8YnI+wqAgwqAgfTxicj7CoCDCoCBpZiAoZmV4Y3Ag
+JmFtcDsgZmxvYXRfZmxhZ19pbmV4YWN0KSB7PGJyPsKgIMKgIMKgIMKgIHJldCB8PSBGUF9YWDs8
+YnI+wqAgwqAgwqAgwqAgcmV0IHw9IEZQX0ZJOzxicj7CoCDCoCB9PGJyPsKgIMKgIHJldHVybiBy
+ZXQ7PGJyPn08YnI+PGJyPnZvaWQgaGVscGVyX3VwZGF0ZV9mcHNjcihDUFVQUENTdGF0ZSAqZW52
+LCBpbnQgb3AsIHVpbnRwdHJfdCByZXRhZGRyKTxicj57PGJyPsKgIMKgIGludCB0bXAgPSBnZXRf
+ZmxvYXRfZXhjZXB0aW9uX2ZsYWdzKCZhbXA7ZW52LSZndDtmcF9zdGF0dXMpOzxicj7CoCDCoCBp
+ZiAodG1wKSB7PGJyPsKgIMKgIMKgIMKgIHRtcCA9IGllZWVfZXhfdG9fcHBjKHRtcCk7PGJyPsKg
+IMKgIMKgIMKgIHNldF9mbG9hdF9leGNlcHRpb25fZmxhZ3MoMCwgJmFtcDtlbnYtJmd0O2ZwX3N0
+YXR1cyk7PGJyPsKgIMKgIMKgIMKgIGlmICh0bXApIHs8YnI+wqAgwqAgwqAgwqAgwqAgwqAgZW52
+LSZndDtmcHNjciB8PSB0bXA7PGJyPsKgIMKgIMKgIMKgIMKgIMKgIGlmIChmcF9leGNlcHRpb25z
+X2VuYWJsZWQoZW52KSAmYW1wOyZhbXA7IChlbnYtJmd0O2Zwc2NyICZhbXA7IEZQX0ZFWCkpIHs8
+YnI+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgaWYgKGVudi0mZ3Q7ZnBzY3IgJmFtcDsgRlBfVkUp
+IHs8YnI+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgcmFpc2VfZXhjZXB0aW9uX2Vycl9y
+YShlbnYsIFBPV0VSUENfRVhDUF9QUk9HUkFNLDxicj7CoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBQT1dFUlBDX0VYQ1BfRlAgfCBvcCwg
+cmV0YWRkcik7PGJyPsKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIH08YnI+wqAgwqAgwqAgwqAgwqAg
+wqAgfTxicj7CoCDCoCDCoCDCoCB9PGJyPsKgIMKgIH08YnI+fTxicj48L2Rpdj48ZGl2PkkgZm91
+bmQgdGhlIA0KDQpmcHNjcsKgIGFyZSByZWFsbHkgY29tcGxpY2F0ZWQsIGVzcGVjaWFsbHkgYWJv
+dW50wqANCg0KSW52YWxpZCBPcGVyYXRpb24gRXhjZXB0aW9uLg0KDQo8L2Rpdj48ZGl2PkFuZMKg
+DQoNCmZwX3N0YXR1cyBjYW4gbm90IHJlcHJlc2VudCBhbGwgdGhlwqANCg0KSW52YWxpZCBPcGVy
+YXRpb24gRXhjZXB0aW9uIGZsYWdzLjwvZGl2PjxkaXY+V2hhdCBJIG5lZWQgdG8gZG8gdG8gcmVw
+cmVzZW50IGFsbCB0aGXCoA0KDQoNCg0KSW52YWxpZCBPcGVyYXRpb24gRXhjZXB0aW9uDQoNCjwv
+ZGl2PjxkaXY+PGJyPjwvZGl2Pi0tIDxicj48ZGl2IGRpcj0ibHRyIiBjbGFzcz0iZ21haWxfc2ln
+bmF0dXJlIiBkYXRhLXNtYXJ0bWFpbD0iZ21haWxfc2lnbmF0dXJlIj7CoCDCoCDCoCDCoMKgIOat
+pOiHtDxicj7npLw8YnI+572X5YuH5YiaPGJyPllvdXJzPGJyPsKgIMKgIHNpbmNlcmVseSw8YnI+
+WW9uZ2dhbmcgTHVvPGJyPjwvZGl2PjwvZGl2Pg0K
+--0000000000002409c605a49bb1d5--
 
