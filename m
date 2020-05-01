@@ -2,91 +2,79 @@ Return-Path: <SRS0=uuMl=6P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLACK,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48855C47259
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 08:14:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3240DC47254
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 08:30:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17B592166E
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 08:14:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EDB8D20787
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 08:30:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SIsV0dRY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17B592166E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eH+jMcE5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDB8D20787
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUQos-0001Ee-6d
-	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 04:14:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49914)
+	id 1jUR3a-0001dp-QJ
+	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 04:30:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38226)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <leobras.c@gmail.com>) id 1jUQoH-0000lG-Bt
- for qemu-devel@nongnu.org; Fri, 01 May 2020 04:14:13 -0400
+ (envelope-from <stefanha@redhat.com>) id 1jUR2H-0008TY-Mq
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 04:29:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <leobras.c@gmail.com>) id 1jUQoG-0004q5-5i
- for qemu-devel@nongnu.org; Fri, 01 May 2020 04:14:13 -0400
-Received: from mail-qv1-xf44.google.com ([2607:f8b0:4864:20::f44]:38339)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <leobras.c@gmail.com>)
- id 1jUQoF-0004mP-Om
- for qemu-devel@nongnu.org; Fri, 01 May 2020 04:14:11 -0400
-Received: by mail-qv1-xf44.google.com with SMTP id t8so4413966qvw.5
- for <qemu-devel@nongnu.org>; Fri, 01 May 2020 01:14:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=yqdQSm5HKFMcNAbMy3ZH3ZLdi0ilQskpltu3/v0pGdo=;
- b=SIsV0dRYibhlVMxHxtV2tdFckFHDsr8ZwAGHcpkM0Pd5+m/MDw3e0Oi0ZzR94lBraw
- SS5uuBUTUZ7lEmuthfQJRXByRSdgLL9jl3fQgTgk0uTtlUvYdnY2zc5Z3p35P/dfDBmM
- 2Hd+C/Qih4pGnktebMiFF3OFD0w6p/OV2p7fHljLp/KIYuG0fBG8wQzJCQXgZ64xBQhl
- PwKaWyYTkEzqsv2KhuJxIFl5jV7ETVJHEsq1kjAKIjTdUntvs13UMOLA5fgXPLgtuInd
- qwQ/0MaZ8c5vBc9knMMxMFIOWZtJVfHEU4H09PDPrf5YgF6f6tTUP1QZAX2np1ElMmNH
- TLNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=yqdQSm5HKFMcNAbMy3ZH3ZLdi0ilQskpltu3/v0pGdo=;
- b=e1QGi+zFbHl7WTmLqexRGM4kE7nuLhcdOHw99qpzf8tscLWZnYCZQ0uImANgPnukGD
- 0tp8It66LfsR1smCOo6ch10V/uU+WCbjGJryah7CmyCBcR8zTwDyqPOmc9xfYZxr0mjF
- yXJZadEErLg1X9MQdinFWyG33DsbwiJtNM0bWjZX3MMNRRC91CTMe8XZQc2AKFLM+4DP
- bQ7f9crBAUzommgV9IJgV9p9ZDSg2+DFbpNWO7eRg8mmHaVIhwB6HgxwtIgSdTBSv5O1
- xucFBZdMx4tILHz2ebsCtNgFqu35ml0NnP80Kk88QVYSQDcByDPkpaur+n5bZVFBP6xK
- IruQ==
-X-Gm-Message-State: AGi0PubaGzgvS8NA7SDdg+NQDguGH3LM3OZ/vP06q6EdgpKZ6q64SkKu
- 1Opo/zZTklWyOf9enc7JsNI=
-X-Google-Smtp-Source: APiQypJmcT8bMJRL56txtCLAw0rmD12iBPV5x1ESqwsuQTfZ5YMihaDH3t1zkF8suWtalPovt1MyNA==
-X-Received: by 2002:a05:6214:493:: with SMTP id
- ay19mr2738626qvb.152.1588320850885; 
- Fri, 01 May 2020 01:14:10 -0700 (PDT)
-Received: from localhost.localdomain (179-125-207-208.dynamic.desktop.com.br.
- [179.125.207.208])
- by smtp.gmail.com with ESMTPSA id j90sm2067405qte.20.2020.05.01.01.14.08
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 01 May 2020 01:14:10 -0700 (PDT)
-From: Leonardo Bras <leobras.c@gmail.com>
-To: Alex Williamson <alex.williamson@redhat.com>,
- Alexey Kardashevskiy <aik@ozlabs.ru>
-Subject: [RESEND PATCH 1/1] vfio/nvlink: Remove exec permission to avoid
- SELinux AVCs
-Date: Fri,  1 May 2020 05:11:24 -0300
-Message-Id: <20200501081123.290414-1-leobras.c@gmail.com>
-X-Mailer: git-send-email 2.25.4
+ (envelope-from <stefanha@redhat.com>) id 1jUR0l-00073U-5N
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 04:28:40 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33274
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jUR0k-0006ud-Ly
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 04:27:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588321623;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=Np9JwoZcuyR82WFm2+emGQGHQ4XnnaarXMT9R8vwarc=;
+ b=eH+jMcE5Gez0qKy3yTlvYrK7CAHNxdzRpFkD4boTGoQ/Qi+caJwgUWCbZHmGJQ+4TXfTIW
+ anbFVn98SKhy54QCbOenUujQ3H5HD3IL8mMaIKMuLYZQ09UeTrqGtzBAuza57MMZpOqgEM
+ mrd3lv6fK4HhjjOgB1yA+NgEPqzzPy0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-391-UmqT1Vz-OBqFOtL8Lbh1bA-1; Fri, 01 May 2020 04:26:59 -0400
+X-MC-Unique: UmqT1Vz-OBqFOtL8Lbh1bA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CD439835BB7;
+ Fri,  1 May 2020 08:26:56 +0000 (UTC)
+Received: from localhost (ovpn-112-199.ams2.redhat.com [10.36.112.199])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 92CFA5D9CA;
+ Fri,  1 May 2020 08:26:44 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL for-5.0 0/4] Block patches
+Date: Fri,  1 May 2020 09:26:39 +0100
+Message-Id: <20200501082643.205362-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::f44;
- envelope-from=leobras.c@gmail.com; helo=mail-qv1-xf44.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::f44
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/01 03:09:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,63 +86,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Leonardo Bras <leobras.c@gmail.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Thomas Huth <thuth@redhat.com>, Alex Williamson <alex.williamson@redhat.com>,
+ qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+ Laurent Vivier <lvivier@redhat.com>, Stefan Weil <sw@weilnetz.de>,
+ Juan Quintela <quintela@redhat.com>, Peter Lieven <pl@kamp.de>,
+ Yuval Shaia <yuval.shaia.ml@gmail.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Alexander Bulekov <alxndr@bu.edu>, Bandan Das <bsd@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If SELinux is setup without 'execmem' permission for qemu, all mmap
-with (PROT_WRITE | PROT_EXEC) will fail and print a warning in
-SELinux log.
-
-If "nvlink2-mr" memory allocation fails (fist diff), it will cause
-guest NUMA nodes to not be correctly configured (V100 memory will
-not be visible for guest, nor its NUMA nodes).
-
-Not having 'execmem' permission is intesting for virtual machines to
-avoid buffer-overflow based attacks, and it's adopted in distros
-like RHEL.
-
-So, removing the PROT_EXEC flag seems the right thing to do.
-
-Browsing some other code that mmaps memory for usage with
-memory_region_init_ram_device_ptr, I could notice it's usual to
-not have PROT_EXEC (only PROT_READ | PROT_WRITE), so it should be
-no problem around this.
-
-Signed-off-by: Leonardo Bras <leobras.c@gmail.com>
-Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-
----
-- Resend because it, for some reason, did not hit the list.
-- Alexey's review is here: https://lists.nongnu.org/archive/html/qemu-devel/2020-05/msg00006.html
-
- hw/vfio/pci-quirks.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-index 2d348f8237..124d4f57e1 100644
---- a/hw/vfio/pci-quirks.c
-+++ b/hw/vfio/pci-quirks.c
-@@ -1620,7 +1620,7 @@ int vfio_pci_nvidia_v100_ram_init(VFIOPCIDevice *vdev, Error **errp)
-     }
-     cap = (void *) hdr;
- 
--    p = mmap(NULL, nv2reg->size, PROT_READ | PROT_WRITE | PROT_EXEC,
-+    p = mmap(NULL, nv2reg->size, PROT_READ | PROT_WRITE,
-              MAP_SHARED, vdev->vbasedev.fd, nv2reg->offset);
-     if (p == MAP_FAILED) {
-         ret = -errno;
-@@ -1680,7 +1680,7 @@ int vfio_pci_nvlink2_init(VFIOPCIDevice *vdev, Error **errp)
- 
-     /* Some NVLink bridges may not have assigned ATSD */
-     if (atsdreg->size) {
--        p = mmap(NULL, atsdreg->size, PROT_READ | PROT_WRITE | PROT_EXEC,
-+        p = mmap(NULL, atsdreg->size, PROT_READ | PROT_WRITE,
-                  MAP_SHARED, vdev->vbasedev.fd, atsdreg->offset);
-         if (p == MAP_FAILED) {
-             ret = -errno;
--- 
-2.25.4
+VGhlIGZvbGxvd2luZyBjaGFuZ2VzIHNpbmNlIGNvbW1pdCAyN2M5NDU2NjM3OTA2OWZiODkzMGJi
+MTQzM2RjZmZiZjdkZjMyMDNkOg0KDQogIE1lcmdlIHJlbW90ZS10cmFja2luZyBicmFuY2ggJ3Jl
+bW90ZXMvZWRnYXIvdGFncy9lZGdhci94aWxpbngtbmV4dC0yMDIwLTA0LTMwLmZvci11cHN0cmVh
+bScgaW50byBzdGFnaW5nICgyMDIwLTA0LTMwIDE2OjQ3OjIzICswMTAwKQ0KDQphcmUgYXZhaWxh
+YmxlIGluIHRoZSBHaXQgcmVwb3NpdG9yeSBhdDoNCg0KICBodHRwczovL2dpdGh1Yi5jb20vc3Rl
+ZmFuaGEvcWVtdS5naXQgdGFncy9ibG9jay1wdWxsLXJlcXVlc3QNCg0KZm9yIHlvdSB0byBmZXRj
+aCBjaGFuZ2VzIHVwIHRvIGNjMWFkYzQ0ODgwNTlhYzE2ZDRkMjc3MmE3YWE3Y2QxMzIzZGVlY2E6
+DQoNCiAgbG9ja2FibGU6IFJlcGxhY2UgbG9ja3Mgd2l0aCBsb2NrIGd1YXJkIG1hY3JvcyAoMjAy
+MC0wNS0wMSAwOToxOToyNSArMDEwMCkNCg0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KUHVsbCByZXF1ZXN0DQoNCkZpeCB0
+aGUgUUVNVV9MT0NLX0dVQVJEKCkgbWFjcm9zLCB1c2UgdGhlbSBtb3JlIHdpZGVseSwgYW5kIGFs
+bG93IGZ1enplcg0KdGFyZ2V0cyB0byBiZSBpbnZva2VkIGRlcGVuZGluZyBvbiBhcmd2WzBdLg0K
+DQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tDQoNCkFsZXhhbmRlciBCdWxla292ICgxKToNCiAgZnV6ejogc2VsZWN0IGZ1enog
+dGFyZ2V0IHVzaW5nIGV4ZWN1dGFibGUgbmFtZQ0KDQpEYW5pZWwgQnJvZHNreSAoMik6DQogIGxv
+Y2thYmxlOiBmaXggX19DT1VOVEVSX18gbWFjcm8gdG8gYmUgcmVmZXJlbmNlZCBwcm9wZXJseQ0K
+ICBsb2NrYWJsZTogcmVwbGFjZWQgbG9ja3Mgd2l0aCBsb2NrIGd1YXJkIG1hY3JvcyB3aGVyZSBh
+cHByb3ByaWF0ZQ0KDQpTaW1yYW4gU2luZ2hhbCAoMSk6DQogIGxvY2thYmxlOiBSZXBsYWNlIGxv
+Y2tzIHdpdGggbG9jayBndWFyZCBtYWNyb3MNCg0KIGluY2x1ZGUvcWVtdS9sb2NrYWJsZS5oIHwg
+IDcgKysrLS0tDQogaW5jbHVkZS9xZW11L3JjdS5oICAgICAgfCAgMiArLQ0KIGJsb2NrL2lzY3Np
+LmMgICAgICAgICAgIHwgIDcgKystLS0tDQogYmxvY2svbmZzLmMgICAgICAgICAgICAgfCA1MSAr
+KysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KIGNwdXMtY29tbW9uLmMg
+ICAgICAgICAgIHwgMTQgKysrKy0tLS0tLS0NCiBody9kaXNwbGF5L3F4bC5jICAgICAgICB8IDQz
+ICsrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0NCiBody9oeXBlcnYvaHlwZXJ2LmMg
+ICAgICB8IDE1ICsrKysrKy0tLS0tLQ0KIGh3L3JkbWEvcmRtYV9iYWNrZW5kLmMgIHwgNTAgKysr
+KysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tLQ0KIGh3L3JkbWEvcmRtYV9ybS5j
+ICAgICAgIHwgIDMgKy0tDQogaHcvdmZpby9wbGF0Zm9ybS5jICAgICAgfCAgNSArKy0tDQogbWln
+cmF0aW9uL21pZ3JhdGlvbi5jICAgfCAgMyArLS0NCiBtaWdyYXRpb24vbXVsdGlmZC5jICAgICB8
+ICA4ICsrKy0tLS0NCiBtaWdyYXRpb24vcmFtLmMgICAgICAgICB8ICAzICstLQ0KIG1vbml0b3Iv
+bWlzYy5jICAgICAgICAgIHwgIDQgKy0tLQ0KIHRlc3RzL3F0ZXN0L2Z1enovZnV6ei5jIHwgMTkg
+KysrKysrKystLS0tLS0tDQogdWkvc3BpY2UtZGlzcGxheS5jICAgICAgfCAxNCArKysrKy0tLS0t
+LQ0KIHV0aWwvbG9nLmMgICAgICAgICAgICAgIHwgIDQgKystLQ0KIHV0aWwvcWVtdS10aW1lci5j
+ICAgICAgIHwgMTcgKysrKysrKy0tLS0tLS0NCiB1dGlsL3JjdS5jICAgICAgICAgICAgICB8ICA4
+ICsrKy0tLS0NCiB1dGlsL3RocmVhZC1wb29sLmMgICAgICB8ICAzICstLQ0KIHV0aWwvdmZpby1o
+ZWxwZXJzLmMgICAgIHwgIDUgKystLQ0KIHNsaXJwICAgICAgICAgICAgICAgICAgIHwgIDIgKy0N
+CiAyMiBmaWxlcyBjaGFuZ2VkLCAxMzMgaW5zZXJ0aW9ucygrKSwgMTU0IGRlbGV0aW9ucygtKQ0K
+DQotLSANCjIuMjUuMw0KDQo=
 
 
