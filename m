@@ -2,99 +2,97 @@ Return-Path: <SRS0=uuMl=6P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C70FC47253
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 13:46:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA4FAC47254
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 13:48:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43E07205C9
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 13:46:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43E07205C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9926820757
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 13:48:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=stwcx.xyz header.i=@stwcx.xyz header.b="jE/9KC7a";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="abLfsEQp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9926820757
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=stwcx.xyz
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUVzr-0008KC-Cb
-	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 09:46:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41390)
+	id 1jUW1f-0002FT-Pl
+	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 09:48:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53964)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <leobras.c@gmail.com>) id 1jUO9l-0004CB-QX
- for qemu-devel@nongnu.org; Fri, 01 May 2020 01:24:14 -0400
+ (envelope-from <patrick@stwcx.xyz>) id 1jUTzo-0003UM-MU
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 07:40:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <leobras.c@gmail.com>) id 1jUO9l-0007yo-8n
- for qemu-devel@nongnu.org; Fri, 01 May 2020 01:24:13 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47980)
+ (envelope-from <patrick@stwcx.xyz>) id 1jUTzk-0003Gy-1I
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 07:38:20 -0400
+Received: from wnew4-smtp.messagingengine.com ([64.147.123.18]:35277)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <leobras.c@gmail.com>)
- id 1jUO9k-0007pv-Mn
- for qemu-devel@nongnu.org; Fri, 01 May 2020 01:24:12 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 04153Kq7070700; Fri, 1 May 2020 01:24:09 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 30r7mmr0ts-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 01 May 2020 01:24:09 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04153RSj070955;
- Fri, 1 May 2020 01:24:09 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0a-001b2d01.pphosted.com with ESMTP id 30r7mmr0th-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 01 May 2020 01:24:09 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 0415Jour027119;
- Fri, 1 May 2020 05:24:08 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
- [9.57.198.24]) by ppma03dal.us.ibm.com with ESMTP id 30mcu87ybr-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 01 May 2020 05:24:08 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
- [9.57.199.111])
- by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 0415O7Bu46727606
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 1 May 2020 05:24:07 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 63D0CAC05B;
- Fri,  1 May 2020 05:24:07 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id BAB1CAC059;
- Fri,  1 May 2020 05:24:03 +0000 (GMT)
-Received: from LeoBras.aus.stglabs.ibm.com (unknown [9.85.160.132])
- by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
- Fri,  1 May 2020 05:24:03 +0000 (GMT)
-From: Leonardo Bras <leobras.c@gmail.com>
-To: Alex Williamson <alex.williamson@redhat.com>,
- Alexey Kardashevskiy <aik@ozlabs.ru>
-Subject: [PATCH 1/1] vfio/nvlink: Remove exec permission to avoid SELinux AVCs
-Date: Fri,  1 May 2020 02:23:23 -0300
-Message-Id: <20200501052322.285566-1-leobras.c@gmail.com>
-X-Mailer: git-send-email 2.25.4
+ (Exim 4.90_1) (envelope-from <patrick@stwcx.xyz>)
+ id 1jUTyk-0001UQ-IE; Fri, 01 May 2020 07:37:15 -0400
+Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
+ by mailnew.west.internal (Postfix) with ESMTP id 76C2D6D6;
+ Fri,  1 May 2020 07:37:10 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+ by compute7.internal (MEProxy); Fri, 01 May 2020 07:37:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=stwcx.xyz; h=
+ from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding; s=fm1; bh=RlHubz0soz6mBe1C41cTHUPwnq
+ sH7XDvs32vgUJG6/E=; b=jE/9KC7amNuAVDe0zk95Si4Ew9ZPQ2aLpGTrAOm32C
+ USMk2+KIczYYQya7HXqViv7FypdTmHZbC3yX8mFYNIGe546+Wu1Yxm1syVtfpgj4
+ 6KUCN5x5oevmL/kD9Q/TzxbjsFbZXL5jvIXrI+ZRSzsFFWbhQYPHQDqBVNVziTx5
+ ziL56LXngGPKmEk6UYENeyOxDzXQqiDo9eujzsSyytZbUc335bMwGKGSqqKBU0bd
+ 8dvKEGHXLVOV4wjVLMKbCIzuzEBk6aK1s/1LPzWKnWgy6vK3U411EeaHGoXA+YiY
+ cpvKMjMUCkrcgS8JF1CJXw81UR+kh5HStGGqDLxTPfvg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-transfer-encoding:date:from
+ :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
+ :x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=RlHubz0soz6mBe1C4
+ 1cTHUPwnqsH7XDvs32vgUJG6/E=; b=abLfsEQpabKPtSz4B54+Mx1zIu1G2wtY8
+ SE2VZYirB7dScFuquErVXY9OTC2lxbzYJ+e6BXoMGmF4e0NJohd3UyGwq4gl4zAg
+ 67+t22BRLa+Bdl98/L9zwr4Wlfd4Qo4E976fmgb9YrRo01aOND28XPsFKGjKV6gN
+ +Wnye5oS87Al1oT4z4bRx4tt1kcEOgjjbuPyV01OSh8/2OzkgUVGFskp/oEJY+/E
+ i6KEUyEyXg9ohX0PslefiaDcYu+yOzKCop6U7oC/Hur+TYMeyFEzTpmItmvGhEoF
+ 5X9U9aqUQBR4/dLPsAa+f0JKWMr1Lf4LGmX9BonSawZN1kjTCqcJg==
+X-ME-Sender: <xms:5QmsXsqDGL0dVn48sXAl_JAVmpG5uwb-rNFxo_IvIfBDWRrnDiz9Uw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedrieejgdegtdcutefuodetggdotefrodftvf
+ curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+ uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenmh
+ hishhsihhnghcuvffquchfihgvlhguucdlfedtmdenfghrlhcuvffnffculdefhedmnego
+ vehorghsthgrlhdqhfeguddvqddtvdculdduhedtmdenucfjughrpefhvffufffkofgggf
+ estdekredtredttdenucfhrhhomheprfgrthhrihgtkhcuhghilhhlihgrmhhsuceophgr
+ thhrihgtkhesshhtfigtgidrgiihiieqnecuggftrfgrthhtvghrnheptdeggeefteejje
+ eltdefvedttdfhieffvedvteefvdeljedvheeufeeggfetleffnecuffhomhgrihhnpehg
+ ihhthhhusgdrtghomhenucfkphepjeeirddvhedtrdekgedrvdefieenucevlhhushhtvg
+ hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehprghtrhhitghksehsthif
+ tgigrdighiii
+X-ME-Proxy: <xmx:5QmsXvyuhD5g_nJ8oi7mYk1jtgySUqgpfd0bKxu96-LxcAM5-nJoBg>
+ <xmx:5QmsXhrRdUopnJnCZWETtgZpgOQvWpm1zkRcAdn0JtBu6bPDUCpe9g>
+ <xmx:5QmsXk7l2Hn9XTXOr2FwWCmbgPASVLTGXBEQnBt9YxuXSCPPYtSDjg>
+ <xmx:5gmsXoKKdDmOssFKeTaBTWJn42KMb8Nj-mXf0m-k4vyFsrQc5oAAeO1AO7o>
+Received: from localhost (76-250-84-236.lightspeed.austtx.sbcglobal.net
+ [76.250.84.236])
+ by mail.messagingengine.com (Postfix) with ESMTPA id CA9003280060;
+ Fri,  1 May 2020 07:37:08 -0400 (EDT)
+From: Patrick Williams <patrick@stwcx.xyz>
+To: 
+Subject: [PATCH] aspeed: Add support for the sonorapass-bmc board
+Date: Fri,  1 May 2020 06:37:04 -0500
+Message-Id: <20200501113704.2240698-1-patrick@stwcx.xyz>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-05-01_01:2020-04-30,
- 2020-05-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 phishscore=0
- clxscore=1034 mlxscore=0 adultscore=0 impostorscore=0 mlxlogscore=999
- priorityscore=1501 lowpriorityscore=0 spamscore=0 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2005010035
-Received-SPF: softfail client-ip=148.163.156.1;
- envelope-from=leobras.c@gmail.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/01 01:24:10
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+Received-SPF: pass client-ip=64.147.123.18; envelope-from=patrick@stwcx.xyz;
+ helo=wnew4-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/01 07:37:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 64.147.123.18
 X-Mailman-Approved-At: Fri, 01 May 2020 09:45:19 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,58 +105,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Leonardo Bras <leobras.c@gmail.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ Amithash Prasad <amithash@fb.com>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ Patrick Williams <patrick@stwcx.xyz>,
+ "open list:ASPEED BMCs" <qemu-arm@nongnu.org>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Vijay Khemka <vijaykhemka@fb.com>, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If SELinux is setup without 'execmem' permission for qemu, all mmap
-with (PROT_WRITE | PROT_EXEC) will fail and print a warning in
-SELinux log.
+Sonora Pass is a 2 socket x86 motherboard designed by Facebook
+and supported by OpenBMC.  Strapping configuration was obtained
+from hardware and i2c configuration is based on dts found at:
 
-If "nvlink2-mr" memory allocation fails (fist diff), it will cause
-guest NUMA nodes to not be correctly configured (V100 memory will
-not be visible for guest, nor its NUMA nodes).
+https://github.com/facebook/openbmc-linux/blob/1633c87b8ba7c162095787c988979b748ba65dc8/arch/arm/boot/dts/aspeed-bmc-facebook-sonorapass.dts
 
-Not having 'execmem' permission is intesting for virtual machines to
-avoid buffer-overflow based attacks, and it's adopted in distros
-like RHEL.
+Booted a test image of http://github.com/facebook/openbmc to login
+prompt.
 
-So, removing the PROT_EXEC flag seems the right thing to do.
-
-Browsing some other code that mmaps memory for usage with
-memory_region_init_ram_device_ptr, I could notice it's usual to
-not have PROT_EXEC (only PROT_READ | PROT_WRITE), so it should be
-no problem around this.
-
-Signed-off-by: Leonardo Bras <leobras.c@gmail.com>
+Signed-off-by: Patrick Williams <patrick@stwcx.xyz>
 ---
- hw/vfio/pci-quirks.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/arm/aspeed.c | 76 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 76 insertions(+)
 
-diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-index 2d348f8237..124d4f57e1 100644
---- a/hw/vfio/pci-quirks.c
-+++ b/hw/vfio/pci-quirks.c
-@@ -1620,7 +1620,7 @@ int vfio_pci_nvidia_v100_ram_init(VFIOPCIDevice *vdev, Error **errp)
-     }
-     cap = (void *) hdr;
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index a6a2102a93..09b3277d56 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -84,6 +84,21 @@ struct AspeedBoardState {
+         SCU_AST2500_HW_STRAP_ACPI_ENABLE |                              \
+         SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER))
  
--    p = mmap(NULL, nv2reg->size, PROT_READ | PROT_WRITE | PROT_EXEC,
-+    p = mmap(NULL, nv2reg->size, PROT_READ | PROT_WRITE,
-              MAP_SHARED, vdev->vbasedev.fd, nv2reg->offset);
-     if (p == MAP_FAILED) {
-         ret = -errno;
-@@ -1680,7 +1680,7 @@ int vfio_pci_nvlink2_init(VFIOPCIDevice *vdev, Error **errp)
++/* Sonorapass hardware value: 0xF100D216 */
++#define SONORAPASS_BMC_HW_STRAP1 (                                      \
++        SCU_AST2500_HW_STRAP_SPI_AUTOFETCH_ENABLE |                     \
++        SCU_AST2500_HW_STRAP_GPIO_STRAP_ENABLE |                        \
++        SCU_AST2500_HW_STRAP_UART_DEBUG |                               \
++        SCU_AST2500_HW_STRAP_RESERVED28 |                               \
++        SCU_AST2500_HW_STRAP_DDR4_ENABLE |                              \
++        SCU_HW_STRAP_VGA_CLASS_CODE |                                   \
++        SCU_HW_STRAP_LPC_RESET_PIN |                                    \
++        SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER) |                \
++        SCU_AST2500_HW_STRAP_SET_AXI_AHB_RATIO(AXI_AHB_RATIO_2_1) |     \
++        SCU_HW_STRAP_VGA_BIOS_ROM |                                     \
++        SCU_HW_STRAP_VGA_SIZE_SET(VGA_16M_DRAM) |                       \
++        SCU_AST2500_HW_STRAP_RESERVED1)
++
+ /* Witherspoon hardware value: 0xF10AD216 (but use romulus definition) */
+ #define WITHERSPOON_BMC_HW_STRAP1 ROMULUS_BMC_HW_STRAP1
  
-     /* Some NVLink bridges may not have assigned ATSD */
-     if (atsdreg->size) {
--        p = mmap(NULL, atsdreg->size, PROT_READ | PROT_WRITE | PROT_EXEC,
-+        p = mmap(NULL, atsdreg->size, PROT_READ | PROT_WRITE,
-                  MAP_SHARED, vdev->vbasedev.fd, atsdreg->offset);
-         if (p == MAP_FAILED) {
-             ret = -errno;
+@@ -372,6 +387,48 @@ static void swift_bmc_i2c_init(AspeedBoardState *bmc)
+     i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 12), "tmp105", 0x4a);
+ }
+ 
++static void sonorapass_bmc_i2c_init(AspeedBoardState *bmc)
++{
++    AspeedSoCState *soc = &bmc->soc;
++
++    // bus 2 :
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 2), "tmp105", 0x48);
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 2), "tmp105", 0x49);
++    // bus 2 : pca9546 @ 0x73
++
++    // bus 3 : pca9548 @ 0x70
++
++    // bus 4 :
++    uint8_t *eeprom4_54 = g_malloc0( 8 * 1024 );
++    smbus_eeprom_init_one(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), 0x54,
++                          eeprom4_54);
++    /* PCA9539 @ 0x76, but PCA9552 is compatible */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), "pca9552", 0x76);
++    /* PCA9539 @ 0x77, but PCA9552 is compatible */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), "pca9552", 0x77);
++
++    // bus 6 :
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 6), "tmp105", 0x48);
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 6), "tmp105", 0x49);
++    // bus 6 : pca9546 @ 0x73
++
++    // bus 8 :
++    uint8_t *eeprom8_56 = g_malloc0( 8 * 1024 );
++    smbus_eeprom_init_one(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 8), 0x56,
++                          eeprom8_56);
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 8), "pca9552", 0x60);
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 8), "pca9552", 0x61);
++    // bus 8 : adc128d818 @ 0x1d
++    // bus 8 : adc128d818 @ 0x1f
++
++    // bus 13 : pca9548 @ 0x71
++    //      - channel 3:
++    //          - tmm421 @ 0x4c
++    //          - tmp421 @ 0x4e
++    //          - tmp421 @ 0x4f
++
++}
++
+ static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
+ {
+     AspeedSoCState *soc = &bmc->soc;
+@@ -499,6 +556,21 @@ static void aspeed_machine_swift_class_init(ObjectClass *oc, void *data)
+     mc->default_ram_size       = 512 * MiB;
+ };
+ 
++static void aspeed_machine_sonorapass_class_init(ObjectClass *oc, void *data)
++{
++    MachineClass *mc = MACHINE_CLASS(oc);
++    AspeedMachineClass *amc = ASPEED_MACHINE_CLASS(oc);
++
++    mc->desc       = "OpenPOWER SonoraPass BMC (ARM1176)";
++    amc->soc_name  = "ast2500-a1";
++    amc->hw_strap1 = SONORAPASS_BMC_HW_STRAP1;
++    amc->fmc_model = "mx66l1g45g";
++    amc->spi_model = "mx66l1g45g";
++    amc->num_cs    = 2;
++    amc->i2c_init  = sonorapass_bmc_i2c_init;
++    mc->default_ram_size       = 512 * MiB;
++};
++
+ static void aspeed_machine_witherspoon_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -563,6 +635,10 @@ static const TypeInfo aspeed_machine_types[] = {
+         .name          = MACHINE_TYPE_NAME("swift-bmc"),
+         .parent        = TYPE_ASPEED_MACHINE,
+         .class_init    = aspeed_machine_swift_class_init,
++    }, {
++        .name          = MACHINE_TYPE_NAME("sonorapass-bmc"),
++        .parent        = TYPE_ASPEED_MACHINE,
++        .class_init    = aspeed_machine_sonorapass_class_init,
+     }, {
+         .name          = MACHINE_TYPE_NAME("witherspoon-bmc"),
+         .parent        = TYPE_ASPEED_MACHINE,
 -- 
-2.25.4
+2.26.2
 
 
