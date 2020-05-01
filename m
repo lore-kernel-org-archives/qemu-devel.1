@@ -2,98 +2,107 @@ Return-Path: <SRS0=uuMl=6P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA4FAC47254
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 13:48:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CDE0C4724C
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 14:02:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9926820757
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 13:48:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB4D32051A
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 14:02:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=stwcx.xyz header.i=@stwcx.xyz header.b="jE/9KC7a";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="abLfsEQp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9926820757
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=stwcx.xyz
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HsZTYga7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB4D32051A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUW1f-0002FT-Pl
-	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 09:48:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53964)
+	id 1jUWFP-0006xx-UB
+	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 10:02:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34706)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <patrick@stwcx.xyz>) id 1jUTzo-0003UM-MU
- for qemu-devel@nongnu.org; Fri, 01 May 2020 07:40:02 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jUWEN-0006Qt-NB
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 10:01:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <patrick@stwcx.xyz>) id 1jUTzk-0003Gy-1I
- for qemu-devel@nongnu.org; Fri, 01 May 2020 07:38:20 -0400
-Received: from wnew4-smtp.messagingengine.com ([64.147.123.18]:35277)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <patrick@stwcx.xyz>)
- id 1jUTyk-0001UQ-IE; Fri, 01 May 2020 07:37:15 -0400
-Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
- by mailnew.west.internal (Postfix) with ESMTP id 76C2D6D6;
- Fri,  1 May 2020 07:37:10 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
- by compute7.internal (MEProxy); Fri, 01 May 2020 07:37:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=stwcx.xyz; h=
- from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding; s=fm1; bh=RlHubz0soz6mBe1C41cTHUPwnq
- sH7XDvs32vgUJG6/E=; b=jE/9KC7amNuAVDe0zk95Si4Ew9ZPQ2aLpGTrAOm32C
- USMk2+KIczYYQya7HXqViv7FypdTmHZbC3yX8mFYNIGe546+Wu1Yxm1syVtfpgj4
- 6KUCN5x5oevmL/kD9Q/TzxbjsFbZXL5jvIXrI+ZRSzsFFWbhQYPHQDqBVNVziTx5
- ziL56LXngGPKmEk6UYENeyOxDzXQqiDo9eujzsSyytZbUc335bMwGKGSqqKBU0bd
- 8dvKEGHXLVOV4wjVLMKbCIzuzEBk6aK1s/1LPzWKnWgy6vK3U411EeaHGoXA+YiY
- cpvKMjMUCkrcgS8JF1CJXw81UR+kh5HStGGqDLxTPfvg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-transfer-encoding:date:from
- :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
- :x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=RlHubz0soz6mBe1C4
- 1cTHUPwnqsH7XDvs32vgUJG6/E=; b=abLfsEQpabKPtSz4B54+Mx1zIu1G2wtY8
- SE2VZYirB7dScFuquErVXY9OTC2lxbzYJ+e6BXoMGmF4e0NJohd3UyGwq4gl4zAg
- 67+t22BRLa+Bdl98/L9zwr4Wlfd4Qo4E976fmgb9YrRo01aOND28XPsFKGjKV6gN
- +Wnye5oS87Al1oT4z4bRx4tt1kcEOgjjbuPyV01OSh8/2OzkgUVGFskp/oEJY+/E
- i6KEUyEyXg9ohX0PslefiaDcYu+yOzKCop6U7oC/Hur+TYMeyFEzTpmItmvGhEoF
- 5X9U9aqUQBR4/dLPsAa+f0JKWMr1Lf4LGmX9BonSawZN1kjTCqcJg==
-X-ME-Sender: <xms:5QmsXsqDGL0dVn48sXAl_JAVmpG5uwb-rNFxo_IvIfBDWRrnDiz9Uw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedrieejgdegtdcutefuodetggdotefrodftvf
- curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
- uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenmh
- hishhsihhnghcuvffquchfihgvlhguucdlfedtmdenfghrlhcuvffnffculdefhedmnego
- vehorghsthgrlhdqhfeguddvqddtvdculdduhedtmdenucfjughrpefhvffufffkofgggf
- estdekredtredttdenucfhrhhomheprfgrthhrihgtkhcuhghilhhlihgrmhhsuceophgr
- thhrihgtkhesshhtfigtgidrgiihiieqnecuggftrfgrthhtvghrnheptdeggeefteejje
- eltdefvedttdfhieffvedvteefvdeljedvheeufeeggfetleffnecuffhomhgrihhnpehg
- ihhthhhusgdrtghomhenucfkphepjeeirddvhedtrdekgedrvdefieenucevlhhushhtvg
- hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehprghtrhhitghksehsthif
- tgigrdighiii
-X-ME-Proxy: <xmx:5QmsXvyuhD5g_nJ8oi7mYk1jtgySUqgpfd0bKxu96-LxcAM5-nJoBg>
- <xmx:5QmsXhrRdUopnJnCZWETtgZpgOQvWpm1zkRcAdn0JtBu6bPDUCpe9g>
- <xmx:5QmsXk7l2Hn9XTXOr2FwWCmbgPASVLTGXBEQnBt9YxuXSCPPYtSDjg>
- <xmx:5gmsXoKKdDmOssFKeTaBTWJn42KMb8Nj-mXf0m-k4vyFsrQc5oAAeO1AO7o>
-Received: from localhost (76-250-84-236.lightspeed.austtx.sbcglobal.net
- [76.250.84.236])
- by mail.messagingengine.com (Postfix) with ESMTPA id CA9003280060;
- Fri,  1 May 2020 07:37:08 -0400 (EDT)
-From: Patrick Williams <patrick@stwcx.xyz>
-To: 
-Subject: [PATCH] aspeed: Add support for the sonorapass-bmc board
-Date: Fri,  1 May 2020 06:37:04 -0500
-Message-Id: <20200501113704.2240698-1-patrick@stwcx.xyz>
-X-Mailer: git-send-email 2.26.2
+ (envelope-from <alex.bennee@linaro.org>) id 1jUWEL-0008DL-47
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 10:01:31 -0400
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:45154)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jUWEK-0008Cy-LI
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 10:01:28 -0400
+Received: by mail-wr1-x430.google.com with SMTP id o27so6311739wra.12
+ for <qemu-devel@nongnu.org>; Fri, 01 May 2020 07:01:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=l+kcpKtlztBDbGK3L4+JLi4cdQecEZhFWk1zzgKYxeM=;
+ b=HsZTYga7DCNOdgMryz58eIusM6q+b5dCifdaBwjh5nZAd4EZvrZmN7cUrsedlgerdM
+ 8QZQsqwM9JSscITSO63oZrttvv1kqqfV9ZxQbGhc+Tb+vhmuVY/k4qUqTmjSTwtTYg9W
+ GlUnxLUmX1wg3l9BSMN1YVEdVQcfNUTAsDKs8P2DbMy+iWnSo+ISW7Hn+eWB9FH0e1Ak
+ 1PiN2mqIOG0Jp2NbmkSX65/QabMg96ynTJohzh09c6HXnlFAhyKE4Y4v09Erq0q05ZOU
+ wKUoEGVdp5wKlWTrGgqmCMbdQaLKiToS1M/AgwfawnX0T75hrzj9MqJx1YUdMktIvjuZ
+ v7tQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=l+kcpKtlztBDbGK3L4+JLi4cdQecEZhFWk1zzgKYxeM=;
+ b=QMxZDhbGqNTWqZ2C4HKBYewjsv4iF804dfHPrDbZSRHFs3/vB7lpmJLwRDj3a2q56/
+ A16HSBrRE+BzGBderYI4YQEjwZSdwVHhWMLfBRU0ekhfCOX8yj8wlkkPNCLiS7NLeNDk
+ BQSrlQAMfFTsoZ/g7ITjLG9QS8oPCh0vSZnsPXy72J+Ia75IPJBySvuJip/CEuD2JRtq
+ +7OnJOA4HGRW1YP43TZzi+HsRtgV4pLJtd71XeftsoW0RZUPZqWK45BX+CIYEZtxaAkk
+ 32qpoRVr3c8K0mR5Ofl3Nj0Jp4E5tlivAxcc1AudgJff7/A8a8ZGuY4FZUzNaCfOSwGC
+ miBQ==
+X-Gm-Message-State: AGi0PuanWP7wuHyFau7Qse/49LdRe2ldqQmGm2Rqi/SMbdWqCQ+LxWJb
+ XY0igWR2YwM1vFNDWm1G98M7ng==
+X-Google-Smtp-Source: APiQypKYRfoJKcIlzreoWVj4QFNsiKCDWQppm2bith1zx4NRE6AH1YWjDKLwwuWfWliQ7sK+bUf06g==
+X-Received: by 2002:adf:f24c:: with SMTP id b12mr4333675wrp.359.1588341686848; 
+ Fri, 01 May 2020 07:01:26 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id 5sm3983200wmg.34.2020.05.01.07.01.25
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 01 May 2020 07:01:25 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 681CF1FF7E;
+ Fri,  1 May 2020 15:01:24 +0100 (BST)
+References: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
+ <87ftcoknvu.fsf@linaro.org>
+ <AM4PR07MB350653D5961DFCE441646131CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
+ <871ro6ld2f.fsf@linaro.org>
+ <AM4PR07MB350673696C7DE2CA16C9C685CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
+ <87sggmjgit.fsf@linaro.org>
+ <CAE2XoE8wFK1nOq3YXhB=iqTvqSDQk7Zzd35Tjzdd==v8ouMijA@mail.gmail.com>
+ <43ac337c-752a-7151-1e88-de01949571de@linaro.org>
+ <CAE2XoE-f_rkcnpQO1cHPUgdaWNAOvBRyUX1aj27UePd0Hkr=KQ@mail.gmail.com>
+ <alpine.BSF.2.22.395.2004301721420.29315@zero.eik.bme.hu>
+ <AM4PR07MB3506C091776962655FCE11E9CAAA0@AM4PR07MB3506.eurprd07.prod.outlook.com>
+ <FEA0FBA9-F5B7-4995-A2F3-5D8053637379@gmail.com>
+ <CAE2XoE_N_oWJwwGVfh+9mOh3dYR6JXk5XJKzv8fr2A4iE9h1OA@mail.gmail.com>
+ <alpine.BSF.2.22.395.2005011347390.29385@zero.eik.bme.hu>
+ <CAE2XoE-0=SgjeXddZXDOYPeUC1xsD5V=A5xBoa1yHS8gL2=MQg@mail.gmail.com>
+ <874kszkdhm.fsf@linaro.org>
+ <alpine.BSF.2.22.395.2005011517360.62443@zero.eik.bme.hu>
+User-agent: mu4e 1.4.1; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Subject: Re: About hardfloat in ppc
+In-reply-to: <alpine.BSF.2.22.395.2005011517360.62443@zero.eik.bme.hu>
+Date: Fri, 01 May 2020 15:01:24 +0100
+Message-ID: <87y2qbiwjv.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=64.147.123.18; envelope-from=patrick@stwcx.xyz;
- helo=wnew4-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/01 07:37:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 64.147.123.18
-X-Mailman-Approved-At: Fri, 01 May 2020 09:45:19 -0400
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::430;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x430.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::430
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,140 +114,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- Amithash Prasad <amithash@fb.com>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- Patrick Williams <patrick@stwcx.xyz>,
- "open list:ASPEED BMCs" <qemu-arm@nongnu.org>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Vijay Khemka <vijaykhemka@fb.com>, Joel Stanley <joel@jms.id.au>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Programmingkid <programmingkidx@gmail.com>, luoyonggang@gmail.com,
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ Howard Spoelstra <hsp.cat7@gmail.com>, Dino Papararo <skizzato73@msn.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Sonora Pass is a 2 socket x86 motherboard designed by Facebook
-and supported by OpenBMC.  Strapping configuration was obtained
-from hardware and i2c configuration is based on dts found at:
 
-https://github.com/facebook/openbmc-linux/blob/1633c87b8ba7c162095787c988979b748ba65dc8/arch/arm/boot/dts/aspeed-bmc-facebook-sonorapass.dts
+BALATON Zoltan <balaton@eik.bme.hu> writes:
 
-Booted a test image of http://github.com/facebook/openbmc to login
-prompt.
+> On Fri, 1 May 2020, Alex Benn=C3=A9e wrote:
+>> =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) <luoyonggang@gmail.com> writes:
+>>> On Fri, May 1, 2020 at 7:58 PM BALATON Zoltan <balaton@eik.bme.hu> wrot=
+e:
+>>>> On Fri, 1 May 2020, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
+>>>>> That's what I suggested,
+>>>>> We preserve a  float computing cache
+>>>>> typedef struct FpRecord {
+>>>>>  uint8_t op;
+>>>>>  float32 A;
+>>>>>  float32 B;
+>>>>> }  FpRecord;
+>>>>> FpRecord fp_cache[1024];
+>>>>> int fp_cache_length;
+>>>>> uint32_t fp_exceptions;
+>>>>>
+>>>>> 1. For each new fp operation we push it to the  fp_cache,
+>>>>> 2. Once we read the fp_exceptions , then we re-compute
+>>>>> the fp_exceptions by re-running the fp FpRecord sequence.
+>>>>> and clear  fp_cache_length.
+>>>>
+>>>> Why do you need to store more than the last fp op? The cumulative bits=
+ can
+>>>> be tracked like it's done for other targets by not clearing fp_status =
+then
+>>>> you can read it from there. Only the non-sticky FI bit needs to be
+>>>> computed but that's only determined by the last op so it's enough to
+>>>> remember that and run that with softfloat (or even hardfloat after
+>>>> clearing status but softfloat may be faster for this) to get the bits =
+for
+>>>> last op when status is read.
+>>>>
+>>> Yeap, store only the last fp op is also an option. Do you means that st=
+ore
+>>> the last fp op,
+>>> and calculate it when necessary?  I am thinking about a general fp
+>>> optmize method that suite
+>>> for all target.
+>>
+>> I think that's getting a little ahead of yourself. Let's prove the
+>> technique is valuable for PPC (given it has the most to gain). We can
+>> always generalise later if it's worthwhile.
+>>
+>> Rather than creating a new structure I would suggest creating 3 new tcg
+>> globals (op, inA, inB) and re-factor the front-end code so each FP op
+>> loaded the TCG globals.
+>
+> So that's basically wherever you see helper_reset_fpstatus() in
+> target/ppc we would need to replace it with saving op and args to
+> globals? Or just repurpose this helper to do that. This is called
+> before every fp op but not before sub ops within vector ops. Is that
+> correct? Probably it is, as vector ops are a single op but how do we
+> detect changes in flags by sub ops for those? These might have some
+> existing bugs I think.
 
-Signed-off-by: Patrick Williams <patrick@stwcx.xyz>
----
- hw/arm/aspeed.c | 76 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 76 insertions(+)
+I'll defer to the PPC front end experts on this. I'm not familiar with
+how it all goes together at all.
 
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index a6a2102a93..09b3277d56 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -84,6 +84,21 @@ struct AspeedBoardState {
-         SCU_AST2500_HW_STRAP_ACPI_ENABLE |                              \
-         SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER))
- 
-+/* Sonorapass hardware value: 0xF100D216 */
-+#define SONORAPASS_BMC_HW_STRAP1 (                                      \
-+        SCU_AST2500_HW_STRAP_SPI_AUTOFETCH_ENABLE |                     \
-+        SCU_AST2500_HW_STRAP_GPIO_STRAP_ENABLE |                        \
-+        SCU_AST2500_HW_STRAP_UART_DEBUG |                               \
-+        SCU_AST2500_HW_STRAP_RESERVED28 |                               \
-+        SCU_AST2500_HW_STRAP_DDR4_ENABLE |                              \
-+        SCU_HW_STRAP_VGA_CLASS_CODE |                                   \
-+        SCU_HW_STRAP_LPC_RESET_PIN |                                    \
-+        SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER) |                \
-+        SCU_AST2500_HW_STRAP_SET_AXI_AHB_RATIO(AXI_AHB_RATIO_2_1) |     \
-+        SCU_HW_STRAP_VGA_BIOS_ROM |                                     \
-+        SCU_HW_STRAP_VGA_SIZE_SET(VGA_16M_DRAM) |                       \
-+        SCU_AST2500_HW_STRAP_RESERVED1)
-+
- /* Witherspoon hardware value: 0xF10AD216 (but use romulus definition) */
- #define WITHERSPOON_BMC_HW_STRAP1 ROMULUS_BMC_HW_STRAP1
- 
-@@ -372,6 +387,48 @@ static void swift_bmc_i2c_init(AspeedBoardState *bmc)
-     i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 12), "tmp105", 0x4a);
- }
- 
-+static void sonorapass_bmc_i2c_init(AspeedBoardState *bmc)
-+{
-+    AspeedSoCState *soc = &bmc->soc;
-+
-+    // bus 2 :
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 2), "tmp105", 0x48);
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 2), "tmp105", 0x49);
-+    // bus 2 : pca9546 @ 0x73
-+
-+    // bus 3 : pca9548 @ 0x70
-+
-+    // bus 4 :
-+    uint8_t *eeprom4_54 = g_malloc0( 8 * 1024 );
-+    smbus_eeprom_init_one(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), 0x54,
-+                          eeprom4_54);
-+    /* PCA9539 @ 0x76, but PCA9552 is compatible */
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), "pca9552", 0x76);
-+    /* PCA9539 @ 0x77, but PCA9552 is compatible */
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), "pca9552", 0x77);
-+
-+    // bus 6 :
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 6), "tmp105", 0x48);
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 6), "tmp105", 0x49);
-+    // bus 6 : pca9546 @ 0x73
-+
-+    // bus 8 :
-+    uint8_t *eeprom8_56 = g_malloc0( 8 * 1024 );
-+    smbus_eeprom_init_one(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 8), 0x56,
-+                          eeprom8_56);
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 8), "pca9552", 0x60);
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 8), "pca9552", 0x61);
-+    // bus 8 : adc128d818 @ 0x1d
-+    // bus 8 : adc128d818 @ 0x1f
-+
-+    // bus 13 : pca9548 @ 0x71
-+    //      - channel 3:
-+    //          - tmm421 @ 0x4c
-+    //          - tmp421 @ 0x4e
-+    //          - tmp421 @ 0x4f
-+
-+}
-+
- static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
- {
-     AspeedSoCState *soc = &bmc->soc;
-@@ -499,6 +556,21 @@ static void aspeed_machine_swift_class_init(ObjectClass *oc, void *data)
-     mc->default_ram_size       = 512 * MiB;
- };
- 
-+static void aspeed_machine_sonorapass_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+    AspeedMachineClass *amc = ASPEED_MACHINE_CLASS(oc);
-+
-+    mc->desc       = "OpenPOWER SonoraPass BMC (ARM1176)";
-+    amc->soc_name  = "ast2500-a1";
-+    amc->hw_strap1 = SONORAPASS_BMC_HW_STRAP1;
-+    amc->fmc_model = "mx66l1g45g";
-+    amc->spi_model = "mx66l1g45g";
-+    amc->num_cs    = 2;
-+    amc->i2c_init  = sonorapass_bmc_i2c_init;
-+    mc->default_ram_size       = 512 * MiB;
-+};
-+
- static void aspeed_machine_witherspoon_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc = MACHINE_CLASS(oc);
-@@ -563,6 +635,10 @@ static const TypeInfo aspeed_machine_types[] = {
-         .name          = MACHINE_TYPE_NAME("swift-bmc"),
-         .parent        = TYPE_ASPEED_MACHINE,
-         .class_init    = aspeed_machine_swift_class_init,
-+    }, {
-+        .name          = MACHINE_TYPE_NAME("sonorapass-bmc"),
-+        .parent        = TYPE_ASPEED_MACHINE,
-+        .class_init    = aspeed_machine_sonorapass_class_init,
-     }, {
-         .name          = MACHINE_TYPE_NAME("witherspoon-bmc"),
-         .parent        = TYPE_ASPEED_MACHINE,
--- 
-2.26.2
+>
+>> The TCG optimizer should pick up aliased loads
+>> and automatically eliminate the dead ones. We might need some new
+>> machinery for the TCG to avoid spilling the values over potentially
+>> faulting loads/stores but that is likely a phase 2 problem.
+>
+> I have no idea how to do this or even where to look. Some more
+> detailed explanation may be needed here.
 
+Don't worry about it now. Let's worry about it when we see how often
+faulting instructions are interleaved with fp ops.
+
+>
+>> Next you will want to find places that care about the per-op bits of
+>> cpu_fpscr and call a helper with the new globals to re-run the
+>> computation and feed the values in.
+>
+> So the code that cares about these bits are in guest thus we would
+> need to compute it if we detect the guest accessing these. Detecting
+> when the individual bits are accessed might be difficult so at first
+> we could go for checking if the fpscr is read and recompute FI bit
+> then before returning value. You previously said these might be when
+> fpscr is read or when generating exceptions but not sure where exactly
+> are these done for ppc. (I'd expect to have mffpscr but there seem to
+> be different other ops instead accessing parts of fpscr which are
+> found in target/ppc/fp-impl.inc.c:567 so this would need studying the
+> PPC docs to understand how the guest can access the FI bit of fpscr
+> reg.)
+>
+>> That would give you a reasonable working prototype to start doing some
+>> measurements of overhead and if it makes a difference.
+>>
+>>>
+>>>>
+>>>>> 3. If we clear the fp_exceptions , then we set fp_cache_length to 0 a=
+nd
+>>>>> clear  fp_exceptions.
+>>>>> 4. If the  fp_cache are full, then we re-compute
+>>>>> the fp_exceptions by re-running the fp FpRecord sequence.
+>>>>
+>>>> All this cache management and more than one element seems unnecessary =
+to
+>>>> me although I may be missing something.
+>>>>
+>>>>> Now the keypoint is how to tracking the read and write of FPSCR regis=
+ter,
+>>>>> The current code are
+>>>>>    cpu_fpscr =3D tcg_global_mem_new(cpu_env,
+>>>>>                                   offsetof(CPUPPCState, fpscr), "fpsc=
+r");
+>>>>
+>>>> Maybe you could search where the value is read which should be the pla=
+ces
+>>>> where we need to handle it but changes may be needed to make a clear A=
+PI
+>>>> for this between target/ppc, TCG and softfloat which likely does not
+>>>> exist yet.
+>>
+>> Once the per-op calculation is fixed in the PPC front-end I thing the
+>> only change needed is to remove the #if defined(TARGET_PPC) in
+>> softfloat.c - it's only really there because it avoids the overhead of
+>> checking flags which we always know to be clear in it's case.
+>
+> That's the theory but I've found that removing that define currently
+> makes general fp ops slower but vector ops faster so I think there may
+> be some bugs that would need to be found and fixed. So testing with
+> some proper test suite might be needed.
+
+You might want to do what Laurent did and hack up a testfloat with
+"system" implementations:
+
+  https://github.com/vivier/m68k-testfloat/blob/master/testfloat/M68K-Linux=
+-GCC/systfloat.c
+
+I would be nice to plumb that sort of support into our existing
+testfloat fork in the code base (tests/fp) but I suspect getting an
+out-of-tree fork building and running first would be the quickest way
+forward.=20
+
+>
+> Regards,
+> BALATON Zoltan
+
+
+--=20
+Alex Benn=C3=A9e
 
