@@ -2,97 +2,84 @@ Return-Path: <SRS0=uuMl=6P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C57D5C47253
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 15:17:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6653DC47257
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 15:27:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9194120708
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 15:17:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33921206D9
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 15:27:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RQbGWN+f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9194120708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WQ7bDIvX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33921206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUXPy-0002ZO-J0
-	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 11:17:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43192)
- by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jUXNN-0007xS-Nn
- for qemu-devel@nongnu.org; Fri, 01 May 2020 11:15:51 -0400
+	id 1jUXZk-0001p1-CE
+	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 11:27:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49976)
+ by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jUXYc-0000OD-06
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 11:26:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jUXFU-0001lo-8Z
- for qemu-devel@nongnu.org; Fri, 01 May 2020 11:09:53 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39997)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jUXFT-0001gA-QF
- for qemu-devel@nongnu.org; Fri, 01 May 2020 11:06:43 -0400
-Received: by mail-wr1-x442.google.com with SMTP id e16so6710537wra.7
- for <qemu-devel@nongnu.org>; Fri, 01 May 2020 08:06:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=iAIqMU9LmID+cSHS0iUuzYTqB9gHpn79/fvbxh9e0dA=;
- b=RQbGWN+f8xELUQ1mastSVuakh8lBg3lgAAFaGT2XZeVC2l/JYzdhNaeQ2cnM/Rucq6
- 7qVnQR6t/C3P9Dz0QqH61+2r8SKxHaKpEe+MyKhzh/RsSeStYm/kN6lRiM/PZPQs21kZ
- VPw3sOONJK3kmQTNxTeMUyqonk7/GdgpcBhz1adkqMWT3TuDD+/cIou2ZYvT+TBzJ15j
- QqX25ABD4/OF7YREhMrxL0QJtd05+Jo8ftdZugbBIlQAFOcR4m7919mW8aAvrCSRiqK6
- FNdOy/f1RqK8W7RJeUeCV2mNI976CrTI+eXLk6ePE+YiYpKD774WAJhzPCm5Czw6Yw7i
- AMcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=iAIqMU9LmID+cSHS0iUuzYTqB9gHpn79/fvbxh9e0dA=;
- b=DroBcwgTJt/g0L+1kcDNAMFy1G/FXJtZJQVNxhZNIl26aXVUlX7Tj0aS1rOoWb8fBS
- Jh90LeS80CqWIvGjAcRmRWS67CKEIRymhgypZGN2/l0maG5cEA1hNX1t3qRRV9PsDbzZ
- uv8S1QHiLA/UKggfu6OgvzikxI9LMQ904DRkXJsoBld1S4RD59apTFn5LyNBXYa57Cl9
- t4UXNOZAB0uni8ZWJlnhJTK3X1mJGZGPadWa7SrKa42J2pl3cb4KJcURDxjKF0HmstKK
- uYqvabyQ9C/40XSsj7YRT5WA05rPI4pbMzPPpyjGYifE/vFxW80UvoZkchcxIje9CDvi
- hfgA==
-X-Gm-Message-State: AGi0PuZb6N2aQLUQ8yX1qGxYC30xPgOks431mk9BCB77Be7YOssrarGx
- sR9IMnlSrzmH+fjvPo2r4Ik=
-X-Google-Smtp-Source: APiQypInwwzdTKf0928oaI5fBUEvT5cQjqF8bCmp/pdlEL0Tusl6TKns8BGimrQfARZ1w3zLXwusmA==
-X-Received: by 2002:adf:f5ce:: with SMTP id k14mr4975974wrp.39.1588345602033; 
- Fri, 01 May 2020 08:06:42 -0700 (PDT)
-Received: from [192.168.1.39] (137.red-88-21-205.staticip.rima-tde.net.
- [88.21.205.137])
- by smtp.gmail.com with ESMTPSA id r17sm4749078wrn.43.2020.05.01.08.06.40
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 01 May 2020 08:06:41 -0700 (PDT)
-Subject: Re: [PATCH] linux-user/strace.list: fix epoll_create{,1} -strace
- output
-To: Sergei Trofimovich <slyfox@gentoo.org>, qemu-devel@nongnu.org
-References: <20200416175957.1274882-1-slyfox@gentoo.org>
- <20200430235934.210904e7@sf>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <073e188a-8911-6c32-d0a3-d3f4f78c2208@amsat.org>
-Date: Fri, 1 May 2020 17:06:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <stefanha@redhat.com>) id 1jUXWZ-00009e-6Z
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 11:26:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27668
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jUXWY-0008WR-LW
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 11:24:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588346660;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=RWhnE6mzYV1+Cdmb5gjnoKOOuuJr41RbuVLQah/yROg=;
+ b=WQ7bDIvX7WNygVpu9JKg/BEjzP5q1R749V0XTFlGdioLKjm13jgzLJCDs7Vk5B45N9zCQ3
+ rjBmTeEm2Qm/MN8mlV8V2m6JMcbTQUidxoA0Bl9oXtWZPxx08BsGUrwpM52nw3oa7e32BG
+ XPmywrJ02BfphoO0ciYsJhmXDttHqIE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-265-t3NcmVaYOpOFQJAowaD51A-1; Fri, 01 May 2020 11:24:08 -0400
+X-MC-Unique: t3NcmVaYOpOFQJAowaD51A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 995291800D42;
+ Fri,  1 May 2020 15:24:06 +0000 (UTC)
+Received: from localhost (ovpn-112-36.ams2.redhat.com [10.36.112.36])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BD7A6196AE;
+ Fri,  1 May 2020 15:23:57 +0000 (UTC)
+Date: Fri, 1 May 2020 16:23:56 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PULL 0/4] Block patches
+Message-ID: <20200501152356.GC221440@stefanha-x1.localdomain>
+References: <20200501082806.205696-1-stefanha@redhat.com>
+ <CAFEAcA_VnBL8P4-UUgN9jGSTUCqvWpG2uaEYejjtJrEaFerRzw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200430235934.210904e7@sf>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::442
+In-Reply-To: <CAFEAcA_VnBL8P4-UUgN9jGSTUCqvWpG2uaEYejjtJrEaFerRzw@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="f+W+jCU1fRNres8c"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/01 07:23:28
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,81 +91,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Helge Deller <deller@gmx.de>, Riku Voipio <riku.voipio@iki.fi>,
- Laurent Vivier <laurent@vivier.eu>,
- Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
+ Juan Quintela <quintela@redhat.com>, Bandan Das <bsd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Peter Lieven <pl@kamp.de>,
+ QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Alexander Bulekov <alxndr@bu.edu>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Yuval Shaia <yuval.shaia.ml@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-+ Helge & Aleksandar.
+--f+W+jCU1fRNres8c
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 5/1/20 12:59 AM, Sergei Trofimovich wrote:
-> On Thu, 16 Apr 2020 18:59:57 +0100
-> Sergei Trofimovich <slyfox@gentoo.org> wrote:
-> 
->> Fix syscall name and parameters priinter.
->>
->> Before the change:
->>
->> ```
->> $ alpha-linux-user/qemu-alpha -strace -L /usr/alpha-unknown-linux-gnu/ /tmp/a
->> ...
->> 1274697 %s(%d)(2097152,274903156744,274903156760,274905840712,274877908880,274903235616) = 3
+On Fri, May 01, 2020 at 10:32:02AM +0100, Peter Maydell wrote:
+> On Fri, 1 May 2020 at 09:28, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> >
+> > The following changes since commit 27c94566379069fb8930bb1433dcffbf7df3=
+203d:
+> >
+> >   Merge remote-tracking branch 'remotes/edgar/tags/edgar/xilinx-next-20=
+20-04-30.for-upstream' into staging (2020-04-30 16:47:23 +0100)
+> >
+> > are available in the Git repository at:
+> >
+> >   https://github.com/stefanha/qemu.git tags/block-pull-request
+> >
+> > for you to fetch changes up to cc1adc4488059ac16d4d2772a7aa7cd1323deeca=
+:
+> >
+> >   lockable: Replace locks with lock guard macros (2020-05-01 09:19:25 +=
+0100)
+> >
+> > ----------------------------------------------------------------
+> > Pull request
+> >
+> > Fix the QEMU_LOCK_GUARD() macros, use them more widely, and allow the f=
+uzzer
+> > target to be selected from argv[0].
+> >
+> > ----------------------------------------------------------------
+>=20
+> Hi; this pullreq seems to include a stray change to the slirp
+> submodule in the "fuzz: select fuzz target using executable name"
+> commit. Could you fix that and resend, please?
+>=20
+> (You might like to include a molly-guard in your pullreq
+> creation scripts; on my end I catch this sort of thing
+> when applying with a test like
+> if git diff master..staging | grep -q 'Subproject commit'; then
+>     # complain and exit unless I used an explicit command
+>     # line option to say I intended to include a submodule update
+> fi
+>=20
+> though I haven't yet put the same test in the script I use
+> to send pullreqs, for some reason. I guess my workflow now
+> means I don't tend to accidentally commit submodule changes.)
 
-Oops...
+Sorry for the spurious change.  Will send a v2!
 
->> 1274697 exit_group(0)
->> ```
->>
->> After the change:
->>
->> ```
->> $ alpha-linux-user/qemu-alpha -strace -L /usr/alpha-unknown-linux-gnu/ /tmp/a
->> ...
->> 1273719 epoll_create1(2097152) = 3
->> 1273719 exit_group(0)
->> ```
->>
+Stefan
 
-Cc: qemu-stable@nongnu.org
-Fixes: 9cbc0578cb6 ("Improve output of various syscalls")
+--f+W+jCU1fRNres8c
+Content-Type: application/pgp-signature; name="signature.asc"
 
->> Signed-off-by: Sergei Trofimovich <slyfox@gentoo.org>
->> CC: Riku Voipio <riku.voipio@iki.fi>
->> CC: Laurent Vivier <laurent@vivier.eu>
->> ---
->>   linux-user/strace.list | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/linux-user/strace.list b/linux-user/strace.list
->> index d49a1e92a8..9281c0a758 100644
->> --- a/linux-user/strace.list
->> +++ b/linux-user/strace.list
->> @@ -125,10 +125,10 @@
->>   { TARGET_NR_dup3, "dup3" , "%s(%d,%d,%d)", NULL, NULL },
->>   #endif
->>   #ifdef TARGET_NR_epoll_create
->> -{ TARGET_NR_epoll_create, "%s(%d)", NULL, NULL, NULL },
->> +{ TARGET_NR_epoll_create, "epoll_create", "%s(%d)", NULL, NULL },
->>   #endif
->>   #ifdef TARGET_NR_epoll_create1
->> -{ TARGET_NR_epoll_create1, "%s(%d)", NULL, NULL, NULL },
->> +{ TARGET_NR_epoll_create1, "epoll_create1", "%s(%d)", NULL, NULL },
->>   #endif
->>   #ifdef TARGET_NR_epoll_ctl
->>   { TARGET_NR_epoll_ctl, "epoll_ctl" , NULL, NULL, NULL },
->> -- 
->> 2.26.1
->>
-> 
-> Should it be handled differently?
+-----BEGIN PGP SIGNATURE-----
 
-No, you are correct, we missed this when reviewing commit 9cbc0578cb6.
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6sPwwACgkQnKSrs4Gr
+c8jOLwgAhCQsrwmTzZxP2oezs9wZv/Cw4Gq879xQEiJcPslJQdOGZTTNrz84znAn
+lfSjybB9NMl8Un7ee9PkWP1nH/8ZAfHrf/oI5UmXG7hjSV1fRyHRbx/l/sGMdo13
+bcoPUozlicQeto0mcHxcZ2Kw++/3TfWKeFjL/0/bYHGwohyF54h7Bs+5AvI7++gt
+wET4cDaEkKP5myUhpqAgVouehExu2YZ6DdI0bP6zL9e6dixCdmtsp7bhMskkG/LW
+OPyFFZyivHwGCsH062hVWqXCQ6vZT1UgPwjnqt6cSYIvhXb31NOcLsNwfwuf9JDm
+4rlrFvFzJAV6Xs5TcBqJDYSO2/dAGQ==
+=lr5q
+-----END PGP SIGNATURE-----
 
-Thanks for your patch!
+--f+W+jCU1fRNres8c--
 
-Too bad it missed the 5.0 release :/
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
