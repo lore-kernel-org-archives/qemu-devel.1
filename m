@@ -7,87 +7,87 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23E5BC47254
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F2BC4724C
 	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 11:16:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6F8820787
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 11:16:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8E81320787
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 11:16:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="trjUVAjj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6F8820787
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="URGkCxa8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E81320787
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUTee-0007BU-UG
-	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 07:16:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36144)
+	id 1jUTef-0007Cw-It
+	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 07:16:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36124)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jUTdR-0004bc-Bu
- for qemu-devel@nongnu.org; Fri, 01 May 2020 07:15:13 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jUTdQ-0004ao-GR
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 07:15:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jUTdQ-0002bQ-PC
- for qemu-devel@nongnu.org; Fri, 01 May 2020 07:15:13 -0400
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:36405)
+ (envelope-from <alex.bennee@linaro.org>) id 1jUTdP-0002XN-GS
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 07:15:12 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44332)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jUTdQ-0002WF-Bq
- for qemu-devel@nongnu.org; Fri, 01 May 2020 07:15:12 -0400
-Received: by mail-wm1-x329.google.com with SMTP id u127so6008508wmg.1
- for <qemu-devel@nongnu.org>; Fri, 01 May 2020 04:15:11 -0700 (PDT)
+ id 1jUTdP-0002TI-3l
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 07:15:11 -0400
+Received: by mail-wr1-x442.google.com with SMTP id d17so11139873wrg.11
+ for <qemu-devel@nongnu.org>; Fri, 01 May 2020 04:15:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=dbl7vz/2JDzRYFnfm6XKsckDvoap7FMNqmtKMQ9jX5c=;
- b=trjUVAjjS3qcjwZAyKeBh9VILeR6xgRHdVzPBrRIBGCJm/nZbc+ATp4MhFhulCrbDo
- h+kqVTFVnOGUqzSmsTBqMajGiA97TkFx2X6GGYQVb+af2laWb9sZ/bWtqjL4+59nGw06
- zFUf9XB95JF+9V9gwLSG3hwuhJETxfidwytyoyCpCIYmK9C4jjNTLwzo/OTucqWQFgFw
- 2YiZ8BEIqeBeESTPzZ5596UcdTvDoEhlY+j9l0kENz90RFjrAyTc+bWIX/V2LfLW8AvY
- 80EvGtYG/3biicDQAYOJo+fdNiQEVmoig3E2CBrg5/o4l9Eq5okfrjhE8dlHTET2Hikz
- Bvqg==
+ bh=xB/6g29U0lIw7XIVVknV4zmtNvmvoQ9kAzWGVa2HK7o=;
+ b=URGkCxa8QmpbCmE/sZBFWxGMTTUEqJ+jWb1QyapCTQmrWtpCCeIv9IvZAlpX+vNTt7
+ JOj3AWsa3s0Y/CzsZIucW9Ff1O8AJWkXfKf0AfTwQd5OVCeTPl67GaoDLLhRclvu0dXM
+ ziwiARzdA8alzxpHHpbOFaCAEkSnmyY5KKmW/jcdI2Sf/kLfPa+JO5T8eHRP4llpvfjS
+ Kd2cL1hurakQJuco2PhZ+pC4y4FbKSOhQaBTLjKKAzgcsTpNFcXL4fVu8ZF+vLhtzjUc
+ wdyep7LdHKYFFSki3sH29bLimSBErB/eW9JP9YF4cpjUYsNaLAbLN2+o3bC+7aAyGAMx
+ 3OPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=dbl7vz/2JDzRYFnfm6XKsckDvoap7FMNqmtKMQ9jX5c=;
- b=ql55xyVWjI1LUUjyPCNQ+dNySYWVGpsSicdLi5V6vIqpQwPBeh+80w6EZHHqSw8pzH
- 2y99XGTFX+Lp8ksqdYcoxa7zmR6O+4eRCYZ6CVEPuEtFhObLe1+HqNK7LaJw0jktf/Yc
- 1Z+gyQI1GR8a66CxMZJ+5w/bxXGLvPHEKl2vQnY4YDW8d30V8O7kJipghMAngH3N62F5
- wLybQD/+2jCZ9k8D/t+nM4z0fCtH+gH8uzq6tdx9a1K0AJc51IDNplod+PnIgKq9sw6I
- qWJ1CVN9El1hD8IIAUYtBULikwuGGNojSUT3/XzPFa0/ymew81u/pcVG94WA63ja4u/M
- 1VMg==
-X-Gm-Message-State: AGi0PuYfi3AcH/O/uvEwNDdgw6FOcjwWJ+4KB/zKYkck4TMSMYDI8+IX
- 8uUzoaM5mMluEp6MUAakRLjVeetsE68=
-X-Google-Smtp-Source: APiQypJ0H6ovfA/wZ9pDuxoy/1BelI8139tlSRbM67j58onUvZFlK88F8HqHN2vgOzx74A6iACfCvQ==
-X-Received: by 2002:a1c:7905:: with SMTP id l5mr3755391wme.5.1588331710803;
- Fri, 01 May 2020 04:15:10 -0700 (PDT)
+ bh=xB/6g29U0lIw7XIVVknV4zmtNvmvoQ9kAzWGVa2HK7o=;
+ b=kf63DGoho/eJiynKrb4VEpebDYKDWJmwtinRvkAiHd9OTKA2UJn36pSfy7rL+OeF5C
+ 4Gja+v5VwkjWUN/TBGTilHZzBqgkaGu+XeMOQ8Dxk0T63i35Himn/t/yOTddi9orHu6i
+ 02Jys2iKloHSxEIYb+4u4Ke1Rn4+vksuuTClb8W33OLR19dvn5ztID9W3WUQBu2DLHIi
+ 8CVY2CycHlmkPVeHdNah41vNeeiSHIPB54jNhsBVzCiwwEFC8wMOyYwwisGaF+yYdIb3
+ 36DdBcZyvqEJVHIYECdBteeQ0jGIMAhOiXfx8nq/GV6eUeYxKGP+0MZBdjDG7oKgmf4v
+ 1N2g==
+X-Gm-Message-State: AGi0PubKknoPBp5kk/FA0EyWWz/t93TSuKQ11tyrzu2naBXe1rO1lPLC
+ XG/0pzDS6NqhZ+cpy8IDFVqXxcg077c=
+X-Google-Smtp-Source: APiQypL1oWViv7EVy+a1otc6dqzN6LVRG4BG37MTkly8prSpXS4auoECJTXMBIxX0lpcGQlRkEcw1A==
+X-Received: by 2002:adf:df01:: with SMTP id y1mr3607024wrl.401.1588331709695; 
+ Fri, 01 May 2020 04:15:09 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id e11sm3840434wrn.87.2020.05.01.04.15.06
+ by smtp.gmail.com with ESMTPSA id i17sm3491992wml.23.2020.05.01.04.15.06
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Fri, 01 May 2020 04:15:06 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id A5BF61FF8C;
+ by zen.linaroharston (Postfix) with ESMTP id BB3E41FF8F;
  Fri,  1 May 2020 12:15:05 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 2/4] .travis.yml: drop MacOSX
-Date: Fri,  1 May 2020 12:15:03 +0100
-Message-Id: <20200501111505.4225-3-alex.bennee@linaro.org>
+Subject: [PATCH v1 3/4] .cirrus.yml: bump FreeBSD to the current stable release
+Date: Fri,  1 May 2020 12:15:04 +0100
+Message-Id: <20200501111505.4225-4-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200501111505.4225-1-alex.bennee@linaro.org>
 References: <20200501111505.4225-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::329;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x329.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::329
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,69 +99,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Ed Maste <emaste@freebsd.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Li-Wen Hsu <lwhsu@freebsd.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This keeps breaking on Travis so lets just fall back to the Cirrus CI
-builds which seem to be better maintained. Fix up the comments while
-we are doing this as we never had a windows build.
+Hopefully this will un-stick the test which has been broken for a long
+time.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- .travis.yml | 28 +---------------------------
- 1 file changed, 1 insertion(+), 27 deletions(-)
+ .cirrus.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/.travis.yml b/.travis.yml
-index a4c3c6c805..49267b73b3 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -9,9 +9,8 @@ compiler:
- cache:
-   # There is one cache per branch and compiler version.
-   # characteristics of each job are used to identify the cache:
--  # - OS name (currently, linux, osx, or windows)
-+  # - OS name (currently only linux)
-   # - OS distribution (for Linux, xenial, trusty, or precise)
--  # - macOS image name (e.g., xcode7.2)
-   # - Names and values of visible environment variables set in .travis.yml or Settings panel
-   timeout: 1200
-   ccache: true
-@@ -271,31 +270,6 @@ jobs:
-         - TEST_CMD=""
+diff --git a/.cirrus.yml b/.cirrus.yml
+index 90645fede6..f06f5af2b9 100644
+--- a/.cirrus.yml
++++ b/.cirrus.yml
+@@ -3,7 +3,7 @@ env:
  
- 
--    # MacOSX builds - cirrus.yml also tests some MacOS builds including latest Xcode
--
--    - name: "OSX Xcode 10.3"
--      env:
--        - BASE_CONFIG="--disable-docs --enable-tools"
--        - CONFIG="--target-list=i386-softmmu,ppc-softmmu,ppc64-softmmu,m68k-softmmu,x86_64-softmmu"
--      os: osx
--      osx_image: xcode10.3
--      compiler: clang
--      addons:
--        homebrew:
--          packages:
--            - ccache
--            - glib
--            - pixman
--            - gnu-sed
--            - python
--          update: true
--      before_script:
--        - brew link --overwrite python
--        - export PATH="/usr/local/opt/ccache/libexec:$PATH"
--        - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
--        - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log && exit 1; }
--
--
-     # Python builds
-     - name: "GCC Python 3.5 (x86_64-softmmu)"
-       env:
+ freebsd_12_task:
+   freebsd_instance:
+-    image: freebsd-12-0-release-amd64
++    image_family: freebsd-12-1
+     cpu: 8
+     memory: 8G
+   install_script: pkg install -y
 -- 
 2.20.1
 
