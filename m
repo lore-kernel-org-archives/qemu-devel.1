@@ -7,64 +7,63 @@ X-Spam-Status: No, score=2.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E6EC4724C
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 16:29:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 455CBC47253
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 16:31:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11B9720836
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 16:29:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED02A20836
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 16:31:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bBmw1iTM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11B9720836
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NhpkBe5C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED02A20836
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUYXQ-0005c9-8P
-	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 12:29:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44860)
+	id 1jUYZC-0007St-4h
+	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 12:31:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45988)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1jUYW4-0004Fj-WB
- for qemu-devel@nongnu.org; Fri, 01 May 2020 12:28:15 -0400
+ id 1jUYXt-0006KH-KF
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 12:29:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <luoyonggang@gmail.com>) id 1jUYTs-0007q1-BI
- for qemu-devel@nongnu.org; Fri, 01 May 2020 12:27:56 -0400
-Received: from mail-lf1-x135.google.com ([2a00:1450:4864:20::135]:44407)
+ (envelope-from <luoyonggang@gmail.com>) id 1jUYXs-0006bN-AA
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 12:29:49 -0400
+Received: from mail-lj1-x232.google.com ([2a00:1450:4864:20::232]:44077)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1jUYTr-0007nd-Pw; Fri, 01 May 2020 12:25:39 -0400
-Received: by mail-lf1-x135.google.com with SMTP id d25so4244670lfi.11;
- Fri, 01 May 2020 09:25:38 -0700 (PDT)
+ id 1jUYXr-0006Wu-T1; Fri, 01 May 2020 12:29:47 -0400
+Received: by mail-lj1-x232.google.com with SMTP id a21so3056444ljj.11;
+ Fri, 01 May 2020 09:29:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:reply-to:from:date:message-id
  :subject:to:cc;
- bh=14M/n5kIEVWNhXVbjGOKSuVpWjlgm+LV55VGErAok9Q=;
- b=bBmw1iTMR2LGOQOBsoOg4tPd5EdFEeTRBl057JFuC8wUFZ2J5CtyWfTPunmTPDyvJg
- ht4yeAh2/scUVZb8b2U82/tNjOCqHMF6BWH4t8yYoFryzS+/cmoDZzGeGSBn2buTUIUv
- AFoH5rgDqbsSbh81MgQ7QEukZq952ELQHysm+cw/iAg05vZRoXank7mrJwbU6DjXWMDj
- qkaYyRMb8GbhR5MhBGIOXUjEYNUQNxmn79rMYs80XhmrPkJeVJuNmVBa8XDB/Z85s2vw
- dn8aTUWwvK5XGLTTpj6zRqaIHZxtyrjwWJ+SO2DIvE9lLdMUKbC5wjY0oTXx2W4Z0euO
- 0Wyg==
+ bh=FoQYJ2DkJfhvLezTbgCOOb3XRTDlhYslVQkhultewgY=;
+ b=NhpkBe5C++Rm/u+OkOOpQLPt7CL2TK9kVlM7DU2HTdbqSW0THPxlF8f3vqIssQCafI
+ hxKFX1CIVOXCtakpKCtqr+AVC3fvbvnDanmAF0ZbphkXO8Lw8GlBt1WcH0p1MhlY0YQ1
+ b0Jr73IItCVmGDVnTe1kcUQKKlsAfsNZH4ilWfM0W+1jakuDLz3JsTvKXy554cZhJ6qH
+ CE+nIcKyDR8kTF4YH2BXrXs9hK5hnr2wif65GbisDNLKBa2W/7C8vosHuKw/ifaig3o8
+ ieG655buepkIvWQtpkxzhjIXQR9XOijTu1/hPyjTGRAYpoYJ/btkRCg3GJlakeWT/fPJ
+ gfgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
  :from:date:message-id:subject:to:cc;
- bh=14M/n5kIEVWNhXVbjGOKSuVpWjlgm+LV55VGErAok9Q=;
- b=L/uZthL6LzougTsPXj2ALB0hNvfqxx2ndpw3w22sjeJTG/KwC6SXxtphBjB+6KYubg
- 5MQpvAUuzQlFd86uzM32AyljBHYlwsz5BJ7NoZMQ4qBoAP6LES/NxeXVfvTb+VBM9+sP
- OCmZYQ/W0ITGfbtZWXyWLqXwc/G2EDYidcrMwzJ+Z4TenyxPfBZgPmxSzcL0JbTbIiP0
- 0MQtsHBhxdlqvTEWrclApfAMg7fNWqHLDkX70mjzop18hvOzNsxvS0lxKm/6Iuif0zkn
- oc9v8dC0HbGG7zI11VY+TLDvaUTdUfcSDRzjS4bMJPv6V1lh6d/Infrn/dA7B3T/ZWuC
- 3YKg==
-X-Gm-Message-State: AGi0PuYjitY5S+zTGKuJ0Wfpg3p63ZLcbN1bRJI/Alk7heNlmkXWLg1n
- mFQSj2XBy3COGTlRhUmi4M0UKzzGe0o7Koywsbg=
-X-Google-Smtp-Source: APiQypJ5wG3FBml+8cD9aNjY2xMqiKXsB7DyI9mbc1uiAoWBaBS0IB5IgSD4AdSWedsq6dizHUm5Q0SFIaZTiBrnxk4=
-X-Received: by 2002:a05:6512:3049:: with SMTP id
- b9mr3149625lfb.176.1588350337247; 
- Fri, 01 May 2020 09:25:37 -0700 (PDT)
+ bh=FoQYJ2DkJfhvLezTbgCOOb3XRTDlhYslVQkhultewgY=;
+ b=JjPEt/++6EL7vWQ/zh1PYRYsuTKVCmViRpWT1uuGJhcg7I9MCZ6lmIqoIdQQfCKlOo
+ K7Lbxgow1KE+lhE21jQhRpNClIH4crLUIixITbuAHSSSJT02b31yjjEskRJIgAS4HBVQ
+ lMIBBq4NKfet0zK6cf5mn+oceTpkpAbS2bSXx1ZpvbFIkeLmAw7UnlHjg1PASTOE99sF
+ Xgzs1/UYzMvnf5bp1ZAzrZiO1Era0zr1fkWF3memqhaBnG8R+eBGv9FFk9odV73oA11U
+ rTeMcdbMzH+eg8c096Gug/GEyHzo3YqkV5h6xItlQ1RQh6Jqf4kYg5XEjgiic29m3iik
+ CpGQ==
+X-Gm-Message-State: AGi0PuZvyJP/QGbyEgGwu91BfmKLjYxHy54VzHYlFj49/1ITXUyr+bFg
+ s4ajG8EJCp37Li1ar5mlHDt8gKjxHHym+ZjYgtI=
+X-Google-Smtp-Source: APiQypIW8qtT0Kt7jSodMERJLXAwUrieV0Z7awcRKJHAzIhHNsBV+gw2pKHQYQIl7c8hLnuCu2Q3/rmNMGWXCP/HDV4=
+X-Received: by 2002:a2e:b17a:: with SMTP id a26mr2662205ljm.215.1588350585594; 
+ Fri, 01 May 2020 09:29:45 -0700 (PDT)
 MIME-Version: 1.0
 References: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
  <CAE2XoE9hiw-ri66_xp3qNa5_Wx8ZfsQB9mqJdYR8VRm-KW830g@mail.gmail.com>
@@ -85,17 +84,17 @@ References: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
  <874kszkdhm.fsf@linaro.org> <d84e50f5-493e-7c8a-bf39-c94c18875171@linaro.org>
 In-Reply-To: <d84e50f5-493e-7c8a-bf39-c94c18875171@linaro.org>
 From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Sat, 2 May 2020 00:25:24 +0800
-Message-ID: <CAE2XoE9Q-0S_SDA-vV7desU8or_D8wPAkz30xQ_4TGfpXO=D3w@mail.gmail.com>
+Date: Sat, 2 May 2020 00:29:33 +0800
+Message-ID: <CAE2XoE-W=v5ifho_ze3Xg2Fx1v+VtQ_KvWSf7AuXns5ZYoRoTg@mail.gmail.com>
 Subject: Re: About hardfloat in ppc
 To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000a16ea705a498a130"
-Received-SPF: pass client-ip=2a00:1450:4864:20::135;
- envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x135.google.com
+Content-Type: multipart/alternative; boundary="0000000000006ee9a105a498b0bb"
+Received-SPF: pass client-ip=2a00:1450:4864:20::232;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x232.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::135
+X-Received-From: 2a00:1450:4864:20::232
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,7 +117,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000a16ea705a498a130
+--0000000000006ee9a105a498b0bb
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -195,46 +194,6 @@ be
 > do is store the inputs to env->(op, inA, inB, inC) in the helper before
 > performing the operation.
 >
-I thinks there is a possibility to add the tcg ops to optimize the floating
-point; For example
-WebAssembly doesn't support for float point exception and fp round mode at
-all, I suppose most fp execution are no need care about
- round mode  and fp expcetion, and for this path we can use tcg-op to
-abstract it,
-and for all other condition we can downgrading to soft-float. As a final
-path to optmize to fp accel of
-QEMU, we can split the tcg-op into two path. one is hard-float with result
-cache for lazy fp flags calculating
-And one is pure soft-float path.
-For lazy fp flags calculating, cause we have stick flags
-```
-    float_flag_invalid   =3D  1,
-    float_flag_divbyzero =3D  4,
-    float_flag_overflow  =3D  8,
-    float_flag_underflow =3D 16,
-    float_flag_inexact   =3D 32,
-```
-We can skip the calculation of these flags when these flags are already
-marked to 1.
-For these five flags, we can split to 5 calculating function, One function
-only check one of the flags.
-And once the flags are set to 1, then we won't call the functon any more,
-unless the flag are cleared.
-We will reduce a lot of branch prediction. And the function would only be
-called when the
-fp flags are requested.
-This is my final goal to optimize fp in QEMU, before that, we can do
-simpler things to optimize fp in QEMU
-
-And besides these type of optimization, we can also offloading the fp
-exception calculating to other CPU core, so
-we can making single threading performance be better, cause single core
-performance are hard to improve, but multiple core
-system are more and more used in these days, for Ryzen 2/ Threadripper we
-even have 64-core /128 threads.
-
-
-
 >
 > > Next you will want to find places that care about the per-op bits of
 > > cpu_fpscr and call a helper with the new globals to re-run the
@@ -253,8 +212,9 @@ e
 > function
 > call.  I suspect this is worth a decent speedup by itself.
 >
-I would like to start the fp optimize from here.
-
+Hi Richard, what kinds of rearrange the fp need to be done? Can you give me
+a more detailed
+example? I am still not get the idea.
 
 >
 > Step 2 is to notice when all fp exceptions are masked, so that no
@@ -305,7 +265,7 @@ Yours
     sincerely,
 Yonggang Luo
 
---000000000000a16ea705a498a130
+--0000000000006ee9a105a498b0bb
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -397,36 +357,7 @@ However, every fp operation calls a helper function, and the quickest thing=
  to<br>
 do is store the inputs to env-&gt;(op, inA, inB, inC) in the helper before<=
 br>
-performing the operation.<br></blockquote><div>I thinks there is a possibil=
-ity to add the tcg ops to optimize the floating point; For example</div><di=
-v>WebAssembly doesn&#39;t support for float point exception and fp round mo=
-de at all, I suppose most fp execution are no need care about</div><div>=C2=
-=A0round mode=C2=A0 and=C2=A0fp expcetion, and for this path we can use tcg=
--op to abstract it,</div><div>and for all other condition we can downgradin=
-g to soft-float. As a final path to optmize=C2=A0to fp accel of</div><div>Q=
-EMU, we can split the tcg-op into two path. one is hard-float with result c=
-ache for lazy fp flags calculating</div><div>And one is pure soft-float pat=
-h.</div><div>For lazy fp flags calculating, cause we have stick flags</div>=
-<div>```</div>=C2=A0 =C2=A0 float_flag_invalid =C2=A0 =3D =C2=A01,<br>=C2=
-=A0 =C2=A0 float_flag_divbyzero =3D =C2=A04,<br>=C2=A0 =C2=A0 float_flag_ov=
-erflow =C2=A0=3D =C2=A08,<br>=C2=A0 =C2=A0 float_flag_underflow =3D 16,<br>=
-=C2=A0 =C2=A0 float_flag_inexact =C2=A0 =3D 32,<div>```=C2=A0=C2=A0</div><d=
-iv>We can skip the calculation of these flags when these flags are already =
-marked to 1.=C2=A0</div><div>For these five flags, we can split to 5 calcul=
-ating function, One function only check one of the flags.</div><div>And onc=
-e the flags are set to 1, then we won&#39;t call the functon any more, unle=
-ss the flag are cleared.</div><div>We will reduce a lot of branch predictio=
-n. And the function would only be called when the=C2=A0</div><div>fp flags =
-are requested.</div><div>This is my final goal to optimize fp in QEMU, befo=
-re that, we can do simpler things to optimize fp in QEMU</div><div><br></di=
-v><div>And besides these type of optimization, we can also offloading the f=
-p exception calculating to other CPU core, so=C2=A0</div><div>we can making=
- single threading performance be better, cause single core performance are =
-hard to improve, but multiple core</div><div>system are more and more used =
-in these days, for Ryzen 2/ Threadripper we even have 64-core /128 threads.=
-</div><div><br></div><div><br></div><blockquote class=3D"gmail_quote" style=
-=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding=
--left:1ex">
+performing the operation.<br>
 <br>
 <br>
 &gt; Next you will want to find places that care about the per-op bits of<b=
@@ -445,9 +376,10 @@ state of<br>
 env-&gt;fp_status.exception_flags =3D=3D 0, so there&#39;s no need for a se=
 parate function<br>
 call.=C2=A0 I suspect this is worth a decent speedup by itself.<br></blockq=
-uote><div>I would like to start the fp optimize from here.</div><div>=C2=A0=
-</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;b=
-order-left:1px solid rgb(204,204,204);padding-left:1ex">
+uote><div>Hi Richard, what kinds of rearrange the fp need to be done? Can y=
+ou give me a more detailed</div><div>example? I am still not get the idea.<=
+/div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;bo=
+rder-left:1px solid rgb(204,204,204);padding-left:1ex">
 <br>
 Step 2 is to notice when all fp exceptions are masked, so that no exception=
  can<br>
@@ -491,5 +423,5 @@ r~<br>
 =87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
 =A0 sincerely,<br>Yonggang Luo<br></div></div>
 
---000000000000a16ea705a498a130--
+--0000000000006ee9a105a498b0bb--
 
