@@ -2,89 +2,92 @@ Return-Path: <SRS0=uuMl=6P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E902C4724C
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 15:01:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E2BEC4724C
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 15:01:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D973720836
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 15:01:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 11F1120836
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 15:01:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GIVGmYkT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D973720836
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QCBzWTKI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11F1120836
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUXAR-0007ec-TY
-	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 11:01:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34236)
+	id 1jUXAp-00005G-0B
+	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 11:01:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34244)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jUX7L-0004rt-Sh
- for qemu-devel@nongnu.org; Fri, 01 May 2020 10:59:10 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jUX7M-0004rv-1A
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 10:59:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jUX6L-0007pS-Ga
+ (envelope-from <alex.bennee@linaro.org>) id 1jUX6M-0007qX-7Q
  for qemu-devel@nongnu.org; Fri, 01 May 2020 10:58:19 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39221)
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40392)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jUX6L-0007nD-2F
+ id 1jUX6L-0007nv-Pl
  for qemu-devel@nongnu.org; Fri, 01 May 2020 10:57:17 -0400
-Received: by mail-wr1-x441.google.com with SMTP id l18so1065247wrn.6
- for <qemu-devel@nongnu.org>; Fri, 01 May 2020 07:57:16 -0700 (PDT)
+Received: by mail-wm1-x343.google.com with SMTP id u16so6573200wmc.5
+ for <qemu-devel@nongnu.org>; Fri, 01 May 2020 07:57:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=XJxwSUmKd2TGeue0/o+1IkVE9FKAt3LbQlUrmLYvhJ4=;
- b=GIVGmYkT9vzLin1gX7nE4Iv21HGul3dRcWIPqW3xN1l3iGAhu1Dji/eB1yGBRdUiUN
- L/zfN1KftB8GLc0jIvjidIlrwgkkgAoS9K9houyfFba4k+PQoQ0XAO0Dgt3x6uK4rhaA
- JujZYa6ptXqrmtAnvxn9uheRWQvxyaSJr6OTHPG+NcMIBGfBWTyl7vvvMlZzP/NmpoOS
- O3DwKhyBnC4/jZDWVI7WC0KM7MiFOvh8QC/DatV/UJ5ogb15swHTMF5u9jKtrRSXPklV
- NFPfczPQLOFwjA+h/skIxgjxXr3LSJflffv6rdaXplGxU3tO9ILe2bvJ/G4gUpCE6dgs
- LpOg==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=Rec4lCI7C2I9ftVXhw3jnhwwniJ/OyIiNlpjw4I33hQ=;
+ b=QCBzWTKIZ6i1bqEUk+0sAgo+cfTpLNxKV3RzrG+1hwaJXmxcirgXUoE+RwsLgTHHgw
+ jEKvHtZPIbyFLMXu2Wgdm5pAJPLvp8CuAS51BI4OWqcECJEI7ab50iriC5iBaM5IQVxi
+ oLQvvaxh4xcNKgEhFUghRmSZUUkezF7Rfv9EK+4IujEWt8yFy93eY/EPvt5ZY8qrJpL5
+ A12BmGdnRoA/3xmzTwkb/NHWdpRPUnEbcF4UEky+cayhthHayWGraIYAhuW+eC1JBTqR
+ rurZ5RW7VmXApbl/+KjnrrDnICO1FT0tge8XueNq95J0SKitSHZN8Rc3MgpYydikvdrf
+ NX2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=XJxwSUmKd2TGeue0/o+1IkVE9FKAt3LbQlUrmLYvhJ4=;
- b=qvfGXRNA1KIE7FbObaEgWCuKe21CaNQmzuhOL6OAHYruQ/iZbrTPYzV9fEX/yNwJKq
- yT1aPV34qqa8hoPPqhRq7NiGV2456Ybtyng6ud2vQib6kbs5ZYNCpQfypxZnstGnpdPh
- fP1+k68OwdbsbssEbsHd0q3+P4mmC6SLma7nTP4rVTwOgLX8i6F8T7X1zjTqKGPcK6PM
- X5uPzM7ygTOfGXatL7m2FF0oM5DQEJOiwtH5bDniurOIWTEV3zKbn3WcDaGE1YWPxQc9
- gX1CDx0fcwM3gJvB1RsLYAcCElKn6UL1G/g4skpt+ChlikoboPHHu72KaTmSpojv81On
- Cj1Q==
-X-Gm-Message-State: AGi0PuY66GIU+ioBX816lwVRx9Jq2mDm4dbrzIb7gJZeX+xv2V8OIkd5
- fm5pvvpJdgzsglax48zrEAzUkA==
-X-Google-Smtp-Source: APiQypKIusW447Pm51VeWMJ6jYQZvOi0zbqJGaJsNWHt9ZGhaR8KsTBgGgVC3B51bs3yErfFVrwSjA==
-X-Received: by 2002:a5d:4dcd:: with SMTP id f13mr4389002wru.417.1588345035107; 
- Fri, 01 May 2020 07:57:15 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=Rec4lCI7C2I9ftVXhw3jnhwwniJ/OyIiNlpjw4I33hQ=;
+ b=XwaX8y6XWKsYQm+gQceT5qj/b2GYdL/4vuGlMZ0PufOhc/GkBjeTyam9fK19czEWsj
+ LHTS9ONOxinQ5JjernsUiehWFNzFI9cQTAcSZlb4Dx8XVkGaxCQaSux1tEDsaPPAS3wx
+ lzMryblT13h/G4suZ9PNm07tdqnGhLpG1Ji/Sp9CGizLA2JoBJpPGsOOKMhrVTLkjBgz
+ JwKfF/lhX38jDbNv015ykFjl0tc4xGGJVLouHReDp073axGrA9x1q+xD/CdwMZFCUk6g
+ LL+GTtltC7HY5tpnnKzaCtKBodN1ssXh8Aaj864TPbT+pPgqOFT7pqPeZ/e7n/1SnEHJ
+ S1uA==
+X-Gm-Message-State: AGi0PuYNBzSZPqYKoGPpME9Py1hP0rcvSqqPNbA7GZrYjRa/dXUBR6De
+ LK06cdTgY5V9EWXFhkzFRthkaQ==
+X-Google-Smtp-Source: APiQypKiOZjO2OZxQQ0eX+zopzygmB7gNx/d7cXGxg5GN6KkiOT5GXmEjaoOiunsl6k+tp2zZ3qDsw==
+X-Received: by 2002:a1c:2392:: with SMTP id j140mr4339640wmj.136.1588345036002; 
+ Fri, 01 May 2020 07:57:16 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id r20sm4091112wmh.26.2020.05.01.07.57.13
+ by smtp.gmail.com with ESMTPSA id s24sm4421887wmj.28.2020.05.01.07.57.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Fri, 01 May 2020 07:57:13 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 0D8901FF7E;
+ by zen.linaroharston (Postfix) with ESMTP id 41F371FF8C;
  Fri,  1 May 2020 15:57:13 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 0/7] various tcg and linux-user updates
-Date: Fri,  1 May 2020 15:57:05 +0100
-Message-Id: <20200501145713.19822-1-alex.bennee@linaro.org>
+Subject: [PATCH  v1 2/7] exec/cpu-all: Use bool for have_guest_base
+Date: Fri,  1 May 2020 15:57:07 +0100
+Message-Id: <20200501145713.19822-3-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200501145713.19822-1-alex.bennee@linaro.org>
+References: <20200501145713.19822-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
  Malformed IPv6 address (bad octet value).
  Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,56 +99,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, riku.voipio@iki.fi,
- richard.henderson@linaro.org, laurent@vivier.eu
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ riku.voipio@iki.fi, richard.henderson@linaro.org, laurent@vivier.eu,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Cleaning up my queues into more focused trees these are all tweaks to
-TCG related stuff. The guest_base changes where posted before but
-where a little radical for 5.0 but I think are worth getting in early
-as it enables the sanitizer builds for a range of linux-user targets
-we couldn't run before. Finally there is a little tweak made to the
-out_asm handling which makes it a bit easier to see which guest
-instructions are being emulated by which host code.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ include/exec/cpu-all.h | 2 +-
+ bsd-user/main.c        | 4 ++--
+ linux-user/main.c      | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-The following need review:
-
- - translate-all: include guest address in out_asm output
- - disas: add optional note support to cap_disas
- - disas: include an optional note for the start of disassembly
- - accel/tcg: don't disable exec_tb trace events
- - linux-user: completely re-write init_guest_space
-
-Alex Bennée (5):
-  linux-user: completely re-write init_guest_space
-  accel/tcg: don't disable exec_tb trace events
-  disas: include an optional note for the start of disassembly
-  disas: add optional note support to cap_disas
-  translate-all: include guest address in out_asm output
-
-Richard Henderson (2):
-  exec/cpu-all: Use bool for have_guest_base
-  accel/tcg: Relax va restrictions on 64-bit guests
-
- include/disas/disas.h     |   2 +-
- include/exec/cpu-all.h    |  25 +-
- include/exec/log.h        |   4 +-
- linux-user/qemu.h         |  31 ++-
- target/alpha/cpu-param.h  |  15 +-
- accel/tcg/translate-all.c |  55 ++++-
- bsd-user/main.c           |   4 +-
- disas.c                   |  35 ++-
- linux-user/elfload.c      | 503 +++++++++++++++++++-------------------
- linux-user/flatload.c     |   6 +
- linux-user/main.c         |  27 +-
- tcg/tcg.c                 |   5 +-
- accel/tcg/trace-events    |   8 +-
- 13 files changed, 379 insertions(+), 341 deletions(-)
-
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index 49384bb66a..b4fb5832c4 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -159,7 +159,7 @@ static inline void tswap64s(uint64_t *s)
+  * This allows the guest address space to be offset to a convenient location.
+  */
+ extern unsigned long guest_base;
+-extern int have_guest_base;
++extern bool have_guest_base;
+ extern unsigned long reserved_va;
+ 
+ #if HOST_LONG_BITS <= TARGET_VIRT_ADDR_SPACE_BITS
+diff --git a/bsd-user/main.c b/bsd-user/main.c
+index 770c2b267a..aef5531628 100644
+--- a/bsd-user/main.c
++++ b/bsd-user/main.c
+@@ -42,7 +42,7 @@
+ int singlestep;
+ unsigned long mmap_min_addr;
+ unsigned long guest_base;
+-int have_guest_base;
++bool have_guest_base;
+ unsigned long reserved_va;
+ 
+ static const char *interp_prefix = CONFIG_QEMU_INTERP_PREFIX;
+@@ -828,7 +828,7 @@ int main(int argc, char **argv)
+             }
+         } else if (!strcmp(r, "B")) {
+            guest_base = strtol(argv[optind++], NULL, 0);
+-           have_guest_base = 1;
++           have_guest_base = true;
+         } else if (!strcmp(r, "drop-ld-preload")) {
+             (void) envlist_unsetenv(envlist, "LD_PRELOAD");
+         } else if (!strcmp(r, "bsd")) {
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 1d20a83d4e..90ad365b43 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -59,7 +59,7 @@ static const char *cpu_type;
+ static const char *seed_optarg;
+ unsigned long mmap_min_addr;
+ unsigned long guest_base;
+-int have_guest_base;
++bool have_guest_base;
+ 
+ /*
+  * Used to implement backwards-compatibility for the `-strace`, and
+@@ -334,7 +334,7 @@ static void handle_arg_cpu(const char *arg)
+ static void handle_arg_guest_base(const char *arg)
+ {
+     guest_base = strtol(arg, NULL, 0);
+-    have_guest_base = 1;
++    have_guest_base = true;
+ }
+ 
+ static void handle_arg_reserved_va(const char *arg)
 -- 
 2.20.1
 
