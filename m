@@ -7,68 +7,67 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B71F8C4724C
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 19:18:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33945C47253
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 19:18:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E8072166E
+	by mail.kernel.org (Postfix) with ESMTPS id F16392173E
 	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 19:18:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XXMrURoR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E8072166E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="caXAjSV9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F16392173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUbBS-0002yB-Hs
-	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 15:18:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33404)
+	id 1jUbBT-0002yT-3i
+	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 15:18:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33400)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jUb87-0006eZ-T5
+ id 1jUb87-0006eB-MU
  for qemu-devel@nongnu.org; Fri, 01 May 2020 15:15:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jUb86-00007s-3T
+ (envelope-from <dgilbert@redhat.com>) id 1jUb85-00007b-Ol
  for qemu-devel@nongnu.org; Fri, 01 May 2020 15:15:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44819
- helo=us-smtp-1.mimecast.com)
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27216
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jUb85-00005h-LZ
+ id 1jUb85-000052-9h
  for qemu-devel@nongnu.org; Fri, 01 May 2020 15:15:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588360520;
+ s=mimecast20190719; t=1588360519;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=a7tlgW/RV4oirjcdS6rirP8fOn1hpnptskhP1fFJ9kE=;
- b=XXMrURoRGSKNJwXcx+zg1qEPQVwsXD2lDMC/8NMuwHp2f42eai3EiHpfRCVhFk4t58Trdd
- Bz33EirmjXXivNaNq+5mFH/Uhn/Lfb0sHBO67x+DNW9PnJy9ZsqUW+KXqFloIOQjGSugVT
- h7rdegeUYiAfKMA1SCLNNCoQCkSbSgo=
+ bh=zteTfA7zZtn3nnO6RlPjKvIiRXQcvA5/CVIFdyzVXno=;
+ b=caXAjSV9x6NYWN7ALD4iwU8hsqmvmX8KCYth+sJi/34VEB+M0dH9pSM8xMQ2Kb23k/56RO
+ pvSLXtyosQB8/vksyAJUrruzVtKUXouz+D2IApns1hVRc6xt/8Y/GqXgCjFM/SgbcaMMpE
+ sfzsAvFDx0DzksMR8Yh3YaiGWJkpSYc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-460-7GzpNJYTNVys9wAnzSwwLA-1; Fri, 01 May 2020 15:15:15 -0400
-X-MC-Unique: 7GzpNJYTNVys9wAnzSwwLA-1
+ us-mta-328-u0gqWlE6N6yBmIxjBT_JoA-1; Fri, 01 May 2020 15:15:17 -0400
+X-MC-Unique: u0gqWlE6N6yBmIxjBT_JoA-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3BBBA0C06;
- Fri,  1 May 2020 19:15:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 81A5D18FE870;
+ Fri,  1 May 2020 19:15:16 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-112-191.ams2.redhat.com
  [10.36.112.191])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BE2641002382;
- Fri,  1 May 2020 19:15:13 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 486E31001B2C;
+ Fri,  1 May 2020 19:15:15 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, stefanha@redhat.com, yavrahami@paloaltonetworks.com,
  mszeredi@redhat.com, mreitz@redhat.com
-Subject: [PULL 2/6] virtiofsd: stay below fs.file-max sysctl value
- (CVE-2020-10717)
-Date: Fri,  1 May 2020 20:14:56 +0100
-Message-Id: <20200501191500.126432-3-dgilbert@redhat.com>
+Subject: [PULL 3/6] virtiofsd: jail lo->proc_self_fd
+Date: Fri,  1 May 2020 20:14:57 +0100
+Message-Id: <20200501191500.126432-4-dgilbert@redhat.com>
 In-Reply-To: <20200501191500.126432-1-dgilbert@redhat.com>
 References: <20200501191500.126432-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -77,11 +76,11 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/01 08:22:51
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/01 12:40:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,80 +96,74 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+From: Miklos Szeredi <mszeredi@redhat.com>
 
-The system-wide fs.file-max sysctl value determines how many files can
-be open.  It defaults to a value calculated based on the machine's RAM
-size.  Previously virtiofsd would try to set RLIMIT_NOFILE to 1,000,000
-and this allowed the FUSE client to exhaust the number of open files
-system-wide on Linux hosts with less than 10 GB of RAM!
+While it's not possible to escape the proc filesystem through
+lo->proc_self_fd, it is possible to escape to the root of the proc
+filesystem itself through "../..".
 
-Take fs.file-max into account when choosing the default RLIMIT_NOFILE
-value.
+Use a temporary mount for opening lo->proc_self_fd, that has it's root at
+/proc/self/fd/, preventing access to the ancestor directories.
 
-Fixes: CVE-2020-10717
-Reported-by: Yuval Avrahami <yavrahami@paloaltonetworks.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20200501140644.220940-3-stefanha@redhat.com>
+Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
+Message-Id: <20200429124733.22488-1-mszeredi@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tools/virtiofsd/helper.c | 26 +++++++++++++++++++++++++-
- 1 file changed, 25 insertions(+), 1 deletion(-)
+ tools/virtiofsd/passthrough_ll.c | 27 +++++++++++++++++++++++++--
+ 1 file changed, 25 insertions(+), 2 deletions(-)
 
-diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
-index dc59f38af0..00a1ef666a 100644
---- a/tools/virtiofsd/helper.c
-+++ b/tools/virtiofsd/helper.c
-@@ -176,7 +176,8 @@ void fuse_cmdline_help(void)
-            "                               default: no_xattr\n"
-            "    --rlimit-nofile=3D<num>      set maximum number of file de=
-scriptors\n"
-            "                               (0 leaves rlimit unchanged)\n"
--           "                               default: 1,000,000 if the curre=
-nt rlimit is lower\n"
-+           "                               default: min(1000000, fs.file-m=
-ax - 16384)\n"
-+           "                                        if the current rlimit =
-is lower\n"
-            );
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
+_ll.c
+index f7b9c1d20c..d7a6474b6e 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -2536,6 +2536,8 @@ static void print_capabilities(void)
+ static void setup_namespaces(struct lo_data *lo, struct fuse_session *se)
+ {
+     pid_t child;
++    char template[] =3D "virtiofsd-XXXXXX";
++    char *tmpdir;
+=20
+     /*
+      * Create a new pid namespace for *child* processes.  We'll have to
+@@ -2597,12 +2599,33 @@ static void setup_namespaces(struct lo_data *lo, st=
+ruct fuse_session *se)
+         exit(1);
+     }
+=20
++    tmpdir =3D mkdtemp(template);
++    if (!tmpdir) {
++        fuse_log(FUSE_LOG_ERR, "tmpdir(%s): %m\n", template);
++        exit(1);
++    }
++
++    if (mount("/proc/self/fd", tmpdir, NULL, MS_BIND, NULL) < 0) {
++        fuse_log(FUSE_LOG_ERR, "mount(/proc/self/fd, %s, MS_BIND): %m\n",
++                 tmpdir);
++        exit(1);
++    }
++
+     /* Now we can get our /proc/self/fd directory file descriptor */
+-    lo->proc_self_fd =3D open("/proc/self/fd", O_PATH);
++    lo->proc_self_fd =3D open(tmpdir, O_PATH);
+     if (lo->proc_self_fd =3D=3D -1) {
+-        fuse_log(FUSE_LOG_ERR, "open(/proc/self/fd, O_PATH): %m\n");
++        fuse_log(FUSE_LOG_ERR, "open(%s, O_PATH): %m\n", tmpdir);
+         exit(1);
+     }
++
++    if (umount2(tmpdir, MNT_DETACH) < 0) {
++        fuse_log(FUSE_LOG_ERR, "umount2(%s, MNT_DETACH): %m\n", tmpdir);
++        exit(1);
++    }
++
++    if (rmdir(tmpdir) < 0) {
++        fuse_log(FUSE_LOG_ERR, "rmdir(%s): %m\n", tmpdir);
++    }
  }
 =20
-@@ -199,9 +200,32 @@ static int fuse_helper_opt_proc(void *data, const char=
- *arg, int key,
-=20
- static unsigned long get_default_rlimit_nofile(void)
- {
-+    g_autofree gchar *file_max_str =3D NULL;
-+    const rlim_t reserved_fds =3D 16384; /* leave at least this many fds f=
-ree */
-     rlim_t max_fds =3D 1000000; /* our default RLIMIT_NOFILE target */
-+    rlim_t file_max;
-     struct rlimit rlim;
-=20
-+    /*
-+     * Reduce max_fds below the system-wide maximum, if necessary.  This
-+     * ensures there are fds available for other processes so we don't
-+     * cause resource exhaustion.
-+     */
-+    if (!g_file_get_contents("/proc/sys/fs/file-max", &file_max_str,
-+                             NULL, NULL)) {
-+        fuse_log(FUSE_LOG_ERR, "can't read /proc/sys/fs/file-max\n");
-+        exit(1);
-+    }
-+    file_max =3D g_ascii_strtoull(file_max_str, NULL, 10);
-+    if (file_max < 2 * reserved_fds) {
-+        fuse_log(FUSE_LOG_ERR,
-+                 "The fs.file-max sysctl is too low (%lu) to allow a "
-+                 "reasonable number of open files.\n",
-+                 (unsigned long)file_max);
-+        exit(1);
-+    }
-+    max_fds =3D MIN(file_max - reserved_fds, max_fds);
-+
-     if (getrlimit(RLIMIT_NOFILE, &rlim) < 0) {
-         fuse_log(FUSE_LOG_ERR, "getrlimit(RLIMIT_NOFILE): %m\n");
-         exit(1);
+ /*
 --=20
 2.26.2
 
