@@ -2,67 +2,95 @@ Return-Path: <SRS0=uuMl=6P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01A2CC4724C
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 00:42:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41CA0C4724C
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 01:56:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C862C20757
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 00:42:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C862C20757
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codesourcery.com
+	by mail.kernel.org (Postfix) with ESMTPS id 07B672074A
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 01:56:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cUBJ/Jxn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07B672074A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUJl5-0001sN-Vd
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 20:42:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44812)
+	id 1jUKum-0006tE-6F
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 21:56:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57280)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <joseph_myers@mentor.com>) id 1jUJj7-0000TD-Ad
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 20:40:32 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jUKtx-0006K7-KS
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 21:55:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <joseph_myers@mentor.com>) id 1jUJij-0004BV-8G
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 20:40:22 -0400
-Received: from esa1.mentor.iphmx.com ([68.232.129.153]:64093)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <joseph_myers@mentor.com>)
- id 1jUJie-0003sN-JL
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 20:39:57 -0400
-IronPort-SDR: M5EV7SYg60fP9Ef37em9bQLxf97grpwBTJ1Lmjhw5/yxOd+1G5hLOR/GnWrip0o2c1HsHvOgoU
- bqLAp7vUFRUcVx1ouK1q3//6THtq+Vjl4ATV9jsHPeLvBacnlN2I0YcXvW0T91Xi4bK7zO4z+c
- se/104EqNjq60H6FzpB1wFWSoDYGBJAMub/fp0jTirfPBCPeeMhKKBNJivSW/SSDUenu/rbggB
- ba3hO4s1VyA73r6Kxq9RYoDVS39lNlSk9yhkq4MC0hEBmm4nFdaNi4acZukseRpgluJCDFsWbn
- yJw=
-X-IronPort-AV: E=Sophos;i="5.73,337,1583222400"; d="scan'208";a="50425318"
-Received: from orw-gwy-02-in.mentorg.com ([192.94.38.167])
- by esa1.mentor.iphmx.com with ESMTP; 30 Apr 2020 16:39:53 -0800
-IronPort-SDR: SdFsOwrAIhY1otDszQsp5ZO2F12gB4UdYlCvQ9IWKrsptf7AihP2wRaSo/K+2xSU75jrZMmjDE
- 5ApwaGRAo3DaLIuHfmYPjWkXf2MI066qXPd17nZVo8JyYnbUnP46x8tItjejPkGfzmFMfXJFBv
- q9+T3UYpOKbZaNARYyV5CYOwo86BAhkWwPN4mHR+bUFE54AnigkdVlLUCZC9bnfk8rMJgSWFRa
- yqaef+AwhsNrPUPge45wpUa+lVolFnmjLVCulLrfZWkaa1msDFBkApY7Jpz2QLrCDaiztQq8r4
- +TE=
-Date: Fri, 1 May 2020 00:39:47 +0000
-From: Joseph Myers <joseph@codesourcery.com>
-X-X-Sender: jsm28@digraph.polyomino.org.uk
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH 4/4] softfloat: fix floatx80 pseudo-denormal round to integer
-Message-ID: <alpine.DEB.2.21.2005010039120.30535@digraph.polyomino.org.uk>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+ (envelope-from <richard.henderson@linaro.org>) id 1jUKtw-0003hX-0S
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 21:55:41 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:36599)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jUKtv-0003UQ-Bk
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 21:55:39 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id a31so1816871pje.1
+ for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 18:55:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=g2I1azfbI5WiGRBzpvn83X0zELe2rRj3Vky+Ncm+dUI=;
+ b=cUBJ/Jxng6lhC+IC//eI2KMQD8zeM6Z650Dhsg015mAAQH3XnQUc3WjsTBgOKPCfzv
+ ujV3qgqOxXWIclZTeO0XVxutnz4kBTkeSKGo4PpDKinDg7hf/D/GHM0QLSfh/kHRAuOQ
+ f58/eOQ5jmdQl695+8+8H4HvUMMy5+nA3WMfZ9tQ+SZW3ABQbJyn4TmdDCPKMMBkfLdB
+ 0OBfySFHf+FTI7uScVkCwxDKFcjI8keWYVxCM8+Kurm3Hx7cE7y7VSKBZomcyiZjiJB+
+ aAvdNoREzi2zkWPk8OWDltbj5pD5bxCCjvsDv9lopiLt9xrtxEEc6eDTPFShUG0nsaXr
+ 4sIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=g2I1azfbI5WiGRBzpvn83X0zELe2rRj3Vky+Ncm+dUI=;
+ b=O/WT2KDEGZVmAj7hUEZbUAegNFzQbSkWUpoX7Q3GARaizuzmBZKyODIIMOexFeQnEQ
+ jVv+OdxBpXJrrHkOCQWee8wAHlG2wb9IJmamu7DArz1JgxQJsrRQct4nXNXl4qWqPQvs
+ GJKqASvz7saBADd2wfTZOGarOX/W/6E1A3EFnY41G03eE2gx10n/aLTt4Q0yqRifyLfF
+ g9gbdBJq7y/QErSeNGy3ZmxpxlUNsP+wSlBWXyrgIfDFpa///Am1XHa7CZfnYKTYUIk1
+ wB6jw4sPHg4qq3LCibP/0HhXSNUIW51gbfPILvdfqY9Kxk9RYGs34kJ+780XbRDXFNwD
+ Z6Kg==
+X-Gm-Message-State: AGi0PuZi3Bx9lIO5tk0dBjrXw4Ke2auYqRAr83kpHld1cP0ljpUS+g9i
+ C5/kkJs3Cj/Jy/pYpON5yxvdFNgLVV8=
+X-Google-Smtp-Source: APiQypJHUHURkvxUUJI/JIPDM7rkGVetM3j1mskPN1wvlWabIIrPOqCynqorBMKyXQNq2yzU8b4Ruw==
+X-Received: by 2002:a17:90b:3444:: with SMTP id
+ lj4mr1905259pjb.37.1588298136677; 
+ Thu, 30 Apr 2020 18:55:36 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
+ by smtp.gmail.com with ESMTPSA id w125sm814368pgw.22.2020.04.30.18.55.35
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 30 Apr 2020 18:55:36 -0700 (PDT)
+Subject: Re: [PATCH 26/36] target/arm: Convert Neon VQSHL, VRSHL, VQRSHL
+ 3-reg-same insns to decodetree
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200430181003.21682-1-peter.maydell@linaro.org>
+ <20200430181003.21682-27-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <b1d8a9ec-a1ef-47af-f07f-3761a51945f1@linaro.org>
+Date: Thu, 30 Apr 2020 18:55:33 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-X-Originating-IP: [137.202.0.90]
-X-ClientProxiedBy: SVR-IES-MBX-03.mgc.mentorg.com (139.181.222.3) To
- svr-ies-mbx-01.mgc.mentorg.com (139.181.222.1)
-Received-SPF: pass client-ip=68.232.129.153;
- envelope-from=joseph_myers@mentor.com; helo=esa1.mentor.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 20:38:23
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Received-From: 68.232.129.153
+In-Reply-To: <20200430181003.21682-27-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2607:f8b0:4864:20::1043
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,37 +106,59 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The softfloat function floatx80_round_to_int incorrectly handles the
-case of a pseudo-denormal where only the high bit of the significand
-is set, ignoring that bit (treating the number as an exact zero)
-rather than treating the number as an alternative representation of
-+/- 2^-16382 (which may round to +/- 1 depending on the rounding mode)
-as hardware does.  Fix this check (simplifying the code in the
-process).
+On 4/30/20 11:09 AM, Peter Maydell wrote:
+> +static bool do_3same_qs32(DisasContext *s, arg_3same *a, NeonGenTwoOpEnvFn *fn)
+> +{
+> +    /*
+> +     * Saturating shift operations handled elementwise 32 bits at a
+> +     * time which need to pass cpu_env to the helper and where the rn
+> +     * and rm operands are reversed from the usual do_3same() order.
+> +     */
 
-Signed-off-by: Joseph Myers <joseph@codesourcery.com>
----
- fpu/softfloat.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Perhaps better to handle this as you did in "Convert Neon 64-bit element
+3-reg-same insns", by adding a shim expander that adds env?
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 8e9c714e6f..e29b07542a 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -5741,7 +5741,7 @@ floatx80 floatx80_round_to_int(floatx80 a, float_status *status)
-     }
-     if ( aExp < 0x3FFF ) {
-         if (    ( aExp == 0 )
--             && ( (uint64_t) ( extractFloatx80Frac( a )<<1 ) == 0 ) ) {
-+             && ( (uint64_t) ( extractFloatx80Frac( a ) ) == 0 ) ) {
-             return a;
-         }
-         status->float_exception_flags |= float_flag_inexact;
--- 
-2.17.1
+It would appear we can then merge
+
+> +{
+> +  VQSHL_S64_3s   1111 001 0 0 . .. .... .... 0100 . . . 1 .... @3same_64
+> +  VQSHL_S_3s     1111 001 0 0 . .. .... .... 0100 . . . 1 .... @3same
+> +}
+
+back into a single pattern:
+
+void gen_gvec_srshl(unsigned vece, uint32_t rd_ofs,
+                    uint32_t rn_ofs, uint32_t rm_ofs,
+                    uint32_t oprsz, uint32_t maxsz)
+{
+    static const GVecGen3 ops[4] = {
+        { .fni4 = gen_helper_neon_rshl_s8 },
+        { .fni4 = gen_helper_neon_rshl_s16 },
+        { .fni4 = gen_helper_neon_rshl_s32 },
+        { .fni8 = gen_helper_neon_rshl_s64 }
+    };
+    tcg_gen_gvec_3(rd_ofs, rn_ofs, rm_ofs,
+                   oprsz, maxsz, &ops[vece]);
+}
+
+I'm not 100% sure how best to handle the swapped operands issue.  I don't think
+we want to do it here in gen_gvec_srshl, because we don't have the same reverse
+operand problem in the aarch64 encoding, and I'm looking forward to re-using
+this generator function in aa64 and sve2.
+
+Maybe it would be better to have
+
+@3same     .... ... . . . size:2 .... .... .... . q:1 . . .... \
+           &3same vm=%vm_dp vn=%vn_dp vd=%vd_dp
+@3same_rev .... ... . . . size:2 .... .... .... . q:1 . . .... \
+           &3same vn=%vm_dp vm=%vn_dp vd=%vd_dp
+
+and swap the operands to "normal" during decode.
+
+FWIW, over in sve.decode, I prepared for reversed operands from the start (to
+handle things like SUBR), so the formats have the register names in order:
+@rd_rn_rm vs @rd_rm_rn.
 
 
--- 
-Joseph S. Myers
-joseph@codesourcery.com
+r~
 
