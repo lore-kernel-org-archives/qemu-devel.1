@@ -1,71 +1,98 @@
 Return-Path: <SRS0=uuMl=6P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A68C4724C
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 02:06:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F5FAC28CBC
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 02:22:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 185A32073E
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 02:06:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 185A32073E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id CCA56208CA
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 02:22:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ccyXmpAG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCA56208CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUL4A-0002fw-9f
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 22:06:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58178)
+	id 1jULJh-0001Z3-Bw
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 22:22:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34120)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jUL3W-000295-2v
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 22:05:35 -0400
+ (envelope-from <luoyonggang@gmail.com>) id 1jULIs-0008VO-AP
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 22:21:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jUL3T-0007e3-QE
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 22:05:33 -0400
-Resent-Date: Thu, 30 Apr 2020 22:05:33 -0400
-Resent-Message-Id: <E1jUL3T-0007e3-QE@eggs.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21357)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jUL3T-0006vC-6Q
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 22:05:31 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1588298722; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=MyEVYfbOg02o/qEYrcFb4tuapbsAx7imhmJ4+QRXds51qpTiXkiJrdA4rVzpiKjUed4J9YjOa596RCvyvTbUMrNVme+A1miXL4bBiGcn9fWnFMlabkLEsQ5SrM+oWNsDlm1XaxJbEjBKb8dn94lKGFNCibkNZvRtzR/HtVp2Qo0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1588298722;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=sxJFTfk3M0+RynB8lwSPdYz4ilUl95BMBw+AmPjnJV4=; 
- b=KPsggVx1EZ2HMb9XDs29Nw2qvWhO5xCaxrlkZVhwvut+inmvvoIrnkunEmTPQEG1YUcp56/UNEHC1l5invflEEPrOzrR0AIMB39Mg6pE+JO+4KmcJek7wW6O5ZV9Jknedikt46FgJo5I3xIbjIHRU+tLhAN5VekMoJVV0GNDAgM=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1588298721037137.4620251925072;
- Thu, 30 Apr 2020 19:05:21 -0700 (PDT)
-Message-ID: <158829872019.4471.16017123568901929407@45ef0f9c86ae>
-In-Reply-To: <20200430115142.13430-1-peter.maydell@linaro.org>
-Subject: Re: [PULL 00/31] target-arm queue
+ (envelope-from <luoyonggang@gmail.com>) id 1jULIq-0001Ow-Ow
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 22:21:26 -0400
+Received: from mail-lj1-x235.google.com ([2a00:1450:4864:20::235]:47038)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1jULIq-0001Gb-BG; Thu, 30 Apr 2020 22:21:24 -0400
+Received: by mail-lj1-x235.google.com with SMTP id f18so1417382lja.13;
+ Thu, 30 Apr 2020 19:21:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=jLBqpnV/nFdEIHBCIQmfwD32wi0ER+MY1f49On94ml0=;
+ b=ccyXmpAGVH+NMHTkkGBQ3WESlnH3u04NIEqbXa/fQm3cO9Fw04S4+YGut5PeWJT4/0
+ jk+aHM7DdA8gFgjhOw133yH9ASh0I5xb8OwFdtL8Ucy3mSA2TWU0xtgY5n7buk1IIzf8
+ 365LU5QNDPe5DORe9IVv4E0SyLWjvrhLIlERnn1/rHEiz2P1xao3UixQ6XGtlblvN+CV
+ 49v4NBH9Y1ODEZPJbf+bAablI2KEV5ZhI6nE/WyCVZj90rr1F9znrXjErAzEGaY/xwcs
+ LitD+YWLgDcJ9O9D0WZJ922GYOqcCocqFWD8Jrsqwfd/7aK6FBykg2LCRhGtEqRTCXfz
+ Kzew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=jLBqpnV/nFdEIHBCIQmfwD32wi0ER+MY1f49On94ml0=;
+ b=S0rzXuQBfc3+iH/zfTNsYAvuFkyyu1hId/0u958Tnn30ZYsGPY9EyX7ydeyYfgPb09
+ K/LzUVZjgkajRhlpkCvpj8vPDNVRlIEczrlfQE9SeyQq2F210D496fuQsKZ6A1zWX06c
+ whjWhrg+OMGlXGnkPg2piOfrEutfDHGY150sNRrh/FGl/SjAZ+rLMEGWUY6KovMGuU/k
+ WXuiWiBRpiFA13CMls15noLK826NsX0oq1R3LyYj9/K9hAic5+/kXicYh3J7wZuH4Law
+ vSY3Zw8DVSL1whXE//y6u5OzHp0cDEiyRn153O4GCpn9ehEHGthKBmNTkzzsEmnOO5+7
+ 3Vog==
+X-Gm-Message-State: AGi0PubJeEojQ4rhYOtk7jAm7PRguZlNH/L3bLwUU4aTev6GVohdRv7R
+ qxTwZ1RbZCofYz9p0dz0hYpYRywyS6xbEbevH6I=
+X-Google-Smtp-Source: APiQypJSsi+LTP8pJe/eQlF//ZARcozFgPGzgncfch2pYRGM9Ri8z/v8TABCk2ZAPm1mIkFuzIt2aDH6MPBC7S5ulp0=
+X-Received: by 2002:a2e:9117:: with SMTP id m23mr1026326ljg.43.1588299681547; 
+ Thu, 30 Apr 2020 19:21:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: peter.maydell@linaro.org
-Date: Thu, 30 Apr 2020 19:05:21 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 22:05:25
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Received-From: 136.143.188.53
+References: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
+ <87lfmhl0xa.fsf@linaro.org>
+ <alpine.BSF.2.22.395.2004271212520.94232@zero.eik.bme.hu>
+ <87imhlkwun.fsf@linaro.org>
+ <CAE2XoE9hiw-ri66_xp3qNa5_Wx8ZfsQB9mqJdYR8VRm-KW830g@mail.gmail.com>
+ <87ftcoknvu.fsf@linaro.org>
+ <AM4PR07MB350653D5961DFCE441646131CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
+ <871ro6ld2f.fsf@linaro.org>
+ <AM4PR07MB350673696C7DE2CA16C9C685CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
+ <87sggmjgit.fsf@linaro.org>
+ <CAE2XoE8wFK1nOq3YXhB=iqTvqSDQk7Zzd35Tjzdd==v8ouMijA@mail.gmail.com>
+ <43ac337c-752a-7151-1e88-de01949571de@linaro.org>
+ <CAE2XoE-f_rkcnpQO1cHPUgdaWNAOvBRyUX1aj27UePd0Hkr=KQ@mail.gmail.com>
+ <alpine.BSF.2.22.395.2004301721420.29315@zero.eik.bme.hu>
+ <AM4PR07MB3506C091776962655FCE11E9CAAA0@AM4PR07MB3506.eurprd07.prod.outlook.com>
+ <FEA0FBA9-F5B7-4995-A2F3-5D8053637379@gmail.com>
+In-Reply-To: <FEA0FBA9-F5B7-4995-A2F3-5D8053637379@gmail.com>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Fri, 1 May 2020 10:21:10 +0800
+Message-ID: <CAE2XoE_N_oWJwwGVfh+9mOh3dYR6JXk5XJKzv8fr2A4iE9h1OA@mail.gmail.com>
+Subject: Re: About hardfloat in ppc
+To: Programmingkid <programmingkidx@gmail.com>
+Content-Type: multipart/alternative; boundary="00000000000050cc8005a48cd6e9"
+Received-SPF: pass client-ip=2a00:1450:4864:20::235;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x235.google.com
+X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
+ Malformed IPv6 address (bad octet value).
+ Location : parse_addr6(), p0f-client.c:67
+X-Received-From: 2a00:1450:4864:20::235
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,167 +104,276 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org
+Reply-To: luoyonggang@gmail.com
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ Howard Spoelstra <hsp.cat7@gmail.com>, Dino Papararo <skizzato73@msn.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQzMDExNTE0Mi4xMzQz
-MC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAyMDA0MzAxMTUxNDIuMTM0MzAtMS1wZXRl
-ci5tYXlkZWxsQGxpbmFyby5vcmcKU3ViamVjdDogW1BVTEwgMDAvMzFdIHRhcmdldC1hcm0gcXVl
-dWUKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdp
-dCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hl
-Y2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
-YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0
-byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmNjNmM5M2EgaHcvYXJtOiB4bG54LXpjdTEwMjogRGlzYWJs
-ZSB1bnN1cHBvcnRlZCBGRFQgZmlybXdhcmUgbm9kZXMKODUxYTc3NCBody9hcm06IHhsbngtemN1
-MTAyOiBNb3ZlIGFybV9ib290X2luZm8gaW50byBYbG54WkNVMTAyCmNiNDc3MGEgZGV2aWNlX3Ry
-ZWU6IENvbnN0aWZ5IGNvbXBhdCBpbiBxZW11X2ZkdF9ub2RlX3BhdGgoKQphMjZlZDM2IGRldmlj
-ZV90cmVlOiBBbGxvdyBuYW1lIHdpbGRjYXJkcyBpbiBxZW11X2ZkdF9ub2RlX3BhdGgoKQowYzdi
-MjQ1IHRhcmdldC9hcm0vY3B1OiBVcGRhdGUgY29kaW5nIHN0eWxlIHRvIG1ha2UgY2hlY2twYXRj
-aC5wbCBoYXBweQo2ZTg3MTE2IHRhcmdldC9hcm0vY3B1OiBVc2UgQVJSQVlfU0laRSgpIHRvIGl0
-ZXJhdGUgb3ZlciBBUk1DUFVJbmZvW10KYWM1ZDlmMiB0YXJnZXQvYXJtOiBNYWtlIGNwdV9yZWdp
-c3RlcigpIGF2YWlsYWJsZSBmb3Igb3RoZXIgZmlsZXMKMWY4ZGJkMSB0YXJnZXQvYXJtOiBSZXN0
-cmljdCB0aGUgQWRkcmVzcyBUcmFuc2xhdGUgd3JpdGUgb3BlcmF0aW9uIHRvIFRDRyBhY2NlbAoy
-NmM1YWEyIGh3L2FybS92aXJ0OiBkdDogYWRkIGthc2xyLXNlZWQgcHJvcGVydHkKMjU2ZDg4YyBo
-dy9hcm0vdmlydDogZHQ6IG1vdmUgY3JlYXRpb24gb2YgL3NlY3VyZS1jaG9zZW4gdG8gY3JlYXRl
-X2ZkdCgpCjI4MWJhMGEgdGFyZ2V0L2FybTogVmVjdG9yaXplIGludGVnZXIgY29tcGFyaXNvbiB2
-cyB6ZXJvCmQzMzU1NTEgbmV0OiBjYWRlbmNlX2dlbTogY2xlYXIgUlggY29udHJvbCBkZXNjcmlw
-dG9yCjg4NmQxMDQgQ2FkZW5jZTogZ2VtOiBmaXggd3JhcGFyb3VuZCBpbiA2NGJpdCBkZXNjcmlw
-dG9ycwphZGFiM2ZmIGh3L2FybTogdmVyc2FsOiBTZXR1cCB0aGUgQURNQSB3aXRoIDEyOGJpdCBi
-dXMtd2lkdGgKOWZmNjVmMyBxZGV2LW1vbml0b3I6IHByaW50IHRoZSBkZXZpY2UncyBjbG9jayB3
-aXRoIGluZm8gcXRyZWUKZWE1MDdmYiBody9hcm0veGlsaW54X3p5bnE6IGNvbm5lY3QgdWFydCBj
-bG9ja3MgdG8gc2xjcgphYmQ0YjM5IGh3L2NoYXIvY2FkZW5jZV91YXJ0OiBhZGQgY2xvY2sgc3Vw
-cG9ydAowMmE3ZDg3IGh3L21pc2MvenlucV9zbGNyOiBhZGQgY2xvY2sgZ2VuZXJhdGlvbiBmb3Ig
-dWFydHMKOTQ3YmMyMiBkb2NzL2Nsb2NrczogYWRkIGRldmljZSdzIGNsb2NrIGRvY3VtZW50YXRp
-b24KNDlmOTQwOSBxZGV2LWNsb2NrOiBpbnRyb2R1Y2UgYW4gaW5pdCBhcnJheSB0byBlYXNlIHRo
-ZSBkZXZpY2UgY29uc3RydWN0aW9uCjZiN2I5N2MgcWRldjogYWRkIGNsb2NrIGlucHV0Jm91dHB1
-dCBzdXBwb3J0IHRvIGRldmljZXMuCjYyNjQzYTYgaHcvY29yZS9jbG9jay12bXN0YXRlOiBkZWZp
-bmUgYSB2bXN0YXRlIGVudHJ5IGZvciBjbG9jayBzdGF0ZQpkNzE1OGJlIGh3L2NvcmUvY2xvY2s6
-IGludHJvZHVjZSBjbG9jayBvYmplY3QKZGU3YzFhZiB0ZXN0cy9ib290X2xpbnV4X2NvbnNvbGU6
-IEFkZCBldGhlcm5ldCB0ZXN0IHRvIFNtYXJ0RnVzaW9uMgoyZGQ3NmI0IG1zZjI6IEFkZCBFTUFD
-IGJsb2NrIHRvIFNtYXJ0RnVzaW9uMiBTb0MKYmY0Njk3MSBody9uZXQ6IEFkZCBTbWFydGZ1c2lv
-bjIgZW1hYyBibG9jawowYWY0MDUxIFR5cG86IENvcnJlY3QgdGhlIG5hbWUgb2YgQ1BVIGhvdHBs
-dWcgbWVtb3J5IHJlZ2lvbgpmYjdmNmIwIGJ1Z2ZpeDogVXNlIGdpY3JfdHlwZXIgaW4gYXJtX2dp
-Y3YzX2ljY19yZXNldAo5NWE1OTJhIG5yZjUxOiBGaXggbGFzdCBHUElPIENORiBhZGRyZXNzCjAw
-NDc4ZTIgZG1hL3hsbngtemRtYTogRml4IGRlc2NyaXB0b3IgbG9hZGluZyAoUkVHKSB3cnQgZW5k
-aWFubmVzcwo3ZmVjMzg3IGRtYS94bG54LXpkbWE6IEZpeCBkZXNjcmlwdG9yIGxvYWRpbmcgKE1F
-TSkgd3J0IGVuZGlhbm5lc3MKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMzEgQ2hlY2tpbmcgY29t
-bWl0IDdmZWMzODc2OGY0YSAoZG1hL3hsbngtemRtYTogRml4IGRlc2NyaXB0b3IgbG9hZGluZyAo
-TUVNKSB3cnQgZW5kaWFubmVzcykKMi8zMSBDaGVja2luZyBjb21taXQgMDA0NzhlMjFlNTU2IChk
-bWEveGxueC16ZG1hOiBGaXggZGVzY3JpcHRvciBsb2FkaW5nIChSRUcpIHdydCBlbmRpYW5uZXNz
-KQozLzMxIENoZWNraW5nIGNvbW1pdCA5NWE1OTJhOWNhMDEgKG5yZjUxOiBGaXggbGFzdCBHUElP
-IENORiBhZGRyZXNzKQo0LzMxIENoZWNraW5nIGNvbW1pdCBmYjdmNmIwM2IzYmQgKGJ1Z2ZpeDog
-VXNlIGdpY3JfdHlwZXIgaW4gYXJtX2dpY3YzX2ljY19yZXNldCkKNS8zMSBDaGVja2luZyBjb21t
-aXQgMGFmNDA1MWVkZDViIChUeXBvOiBDb3JyZWN0IHRoZSBuYW1lIG9mIENQVSBob3RwbHVnIG1l
-bW9yeSByZWdpb24pCjYvMzEgQ2hlY2tpbmcgY29tbWl0IGJmNDY5NzFiYTZmOCAoaHcvbmV0OiBB
-ZGQgU21hcnRmdXNpb24yIGVtYWMgYmxvY2spCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxl
-dGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQxOiAKbmV3IGZp
-bGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNjU0IGxpbmVzIGNo
-ZWNrZWQKClBhdGNoIDYvMzEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNy8zMSBDaGVja2lu
-ZyBjb21taXQgMmRkNzZiNGE1MzBkIChtc2YyOiBBZGQgRU1BQyBibG9jayB0byBTbWFydEZ1c2lv
-bjIgU29DKQo4LzMxIENoZWNraW5nIGNvbW1pdCBkZTdjMWFmNmM1ZmEgKHRlc3RzL2Jvb3RfbGlu
-dXhfY29uc29sZTogQWRkIGV0aGVybmV0IHRlc3QgdG8gU21hcnRGdXNpb24yKQo5LzMxIENoZWNr
-aW5nIGNvbW1pdCBkNzE1OGJlMWE0YjYgKGh3L2NvcmUvY2xvY2s6IGludHJvZHVjZSBjbG9jayBv
-YmplY3QpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJ
-TlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQyOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFs
-OiAwIGVycm9ycywgMSB3YXJuaW5ncywgMzYzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvMzEgaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTAvMzEgQ2hlY2tpbmcgY29tbWl0IDYyNjQzYTZlNDVl
-ZSAoaHcvY29yZS9jbG9jay12bXN0YXRlOiBkZWZpbmUgYSB2bXN0YXRlIGVudHJ5IGZvciBjbG9j
-ayBzdGF0ZSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBN
-QUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjk6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90
-YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0NyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMC8zMSBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxMS8zMSBDaGVja2luZyBjb21taXQgNmI3Yjk3YzA2
-ZmM0IChxZGV2OiBhZGQgY2xvY2sgaW5wdXQmb3V0cHV0IHN1cHBvcnQgdG8gZGV2aWNlcy4pCldB
-Uk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMg
-bmVlZCB1cGRhdGluZz8KIzM1OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9y
-cywgMSB3YXJuaW5ncywgMzUzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDExLzMxIGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCjEyLzMxIENoZWNraW5nIGNvbW1pdCA0OWY5NDA5ZTZhYmEgKHFkZXYt
-Y2xvY2s6IGludHJvZHVjZSBhbiBpbml0IGFycmF5IHRvIGVhc2UgdGhlIGRldmljZSBjb25zdHJ1
-Y3Rpb24pCjEzLzMxIENoZWNraW5nIGNvbW1pdCA5NDdiYzIyOTUzMjAgKGRvY3MvY2xvY2tzOiBh
-ZGQgZGV2aWNlJ3MgY2xvY2sgZG9jdW1lbnRhdGlvbikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9y
-IGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjI6IApu
-ZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAzOTUgbGlu
-ZXMgY2hlY2tlZAoKUGF0Y2ggMTMvMzEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTQvMzEg
-Q2hlY2tpbmcgY29tbWl0IDAyYTdkODc1MzE3YiAoaHcvbWlzYy96eW5xX3NsY3I6IGFkZCBjbG9j
-ayBnZW5lcmF0aW9uIGZvciB1YXJ0cykKMTUvMzEgQ2hlY2tpbmcgY29tbWl0IGFiZDRiMzllNDVj
-YyAoaHcvY2hhci9jYWRlbmNlX3VhcnQ6IGFkZCBjbG9jayBzdXBwb3J0KQoxNi8zMSBDaGVja2lu
-ZyBjb21taXQgZWE1MDdmYjgyYTY5IChody9hcm0veGlsaW54X3p5bnE6IGNvbm5lY3QgdWFydCBj
-bG9ja3MgdG8gc2xjcikKMTcvMzEgQ2hlY2tpbmcgY29tbWl0IDlmZjY1ZjM5ZmMyOSAocWRldi1t
-b25pdG9yOiBwcmludCB0aGUgZGV2aWNlJ3MgY2xvY2sgd2l0aCBpbmZvIHF0cmVlKQoxOC8zMSBD
-aGVja2luZyBjb21taXQgYWRhYjNmZjhkMjczIChody9hcm06IHZlcnNhbDogU2V0dXAgdGhlIEFE
-TUEgd2l0aCAxMjhiaXQgYnVzLXdpZHRoKQoxOS8zMSBDaGVja2luZyBjb21taXQgODg2ZDEwNGRk
-OTcxIChDYWRlbmNlOiBnZW06IGZpeCB3cmFwYXJvdW5kIGluIDY0Yml0IGRlc2NyaXB0b3JzKQoy
-MC8zMSBDaGVja2luZyBjb21taXQgZDMzNTU1MWRjY2M1IChuZXQ6IGNhZGVuY2VfZ2VtOiBjbGVh
-ciBSWCBjb250cm9sIGRlc2NyaXB0b3IpCjIxLzMxIENoZWNraW5nIGNvbW1pdCAyODFiYTBhNGU4
-MjkgKHRhcmdldC9hcm06IFZlY3Rvcml6ZSBpbnRlZ2VyIGNvbXBhcmlzb24gdnMgemVybykKRVJS
-T1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnPT0nIChjdHg6V3hCKQojNTI5OiBGSUxF
-OiB0YXJnZXQvYXJtL3ZlY19oZWxwZXIuYzoxMjcyOgorRE9fQ01QMChndmVjX2NlcTBfYiwgaW50
-OF90LCA9PSkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyBy
-ZXF1aXJlZCBhcm91bmQgdGhhdCAnPCcgKGN0eDpXeEIpCiM1MzA6IEZJTEU6IHRhcmdldC9hcm0v
-dmVjX2hlbHBlci5jOjEyNzM6CitET19DTVAwKGd2ZWNfY2x0MF9iLCBpbnQ4X3QsIDwpCiAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5k
-IHRoYXQgJzw9JyAoY3R4Old4QikKIzUzMTogRklMRTogdGFyZ2V0L2FybS92ZWNfaGVscGVyLmM6
-MTI3NDoKK0RPX0NNUDAoZ3ZlY19jbGUwX2IsIGludDhfdCwgPD0pCiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJz4nIChj
-dHg6V3hCKQojNTMyOiBGSUxFOiB0YXJnZXQvYXJtL3ZlY19oZWxwZXIuYzoxMjc1OgorRE9fQ01Q
-MChndmVjX2NndDBfYiwgaW50OF90LCA+KQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICBe
-CgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc+PScgKGN0eDpXeEIpCiM1MzM6
-IEZJTEU6IHRhcmdldC9hcm0vdmVjX2hlbHBlci5jOjEyNzY6CitET19DTVAwKGd2ZWNfY2dlMF9i
-LCBpbnQ4X3QsID49KQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3Bh
-Y2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc9PScgKGN0eDpXeEIpCiM1MzU6IEZJTEU6IHRhcmdl
-dC9hcm0vdmVjX2hlbHBlci5jOjEyNzg6CitET19DTVAwKGd2ZWNfY2VxMF9oLCBpbnQxNl90LCA9
-PSkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWly
-ZWQgYXJvdW5kIHRoYXQgJzwnIChjdHg6V3hCKQojNTM2OiBGSUxFOiB0YXJnZXQvYXJtL3ZlY19o
-ZWxwZXIuYzoxMjc5OgorRE9fQ01QMChndmVjX2NsdDBfaCwgaW50MTZfdCwgPCkKICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRo
-YXQgJzw9JyAoY3R4Old4QikKIzUzNzogRklMRTogdGFyZ2V0L2FybS92ZWNfaGVscGVyLmM6MTI4
-MDoKK0RPX0NNUDAoZ3ZlY19jbGUwX2gsIGludDE2X3QsIDw9KQogICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnPicgKGN0
-eDpXeEIpCiM1Mzg6IEZJTEU6IHRhcmdldC9hcm0vdmVjX2hlbHBlci5jOjEyODE6CitET19DTVAw
-KGd2ZWNfY2d0MF9oLCBpbnQxNl90LCA+KQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-XgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnPj0nIChjdHg6V3hCKQojNTM5
-OiBGSUxFOiB0YXJnZXQvYXJtL3ZlY19oZWxwZXIuYzoxMjgyOgorRE9fQ01QMChndmVjX2NnZTBf
-aCwgaW50MTZfdCwgPj0pCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDog
-MTAgZXJyb3JzLCAwIHdhcm5pbmdzLCA0ODggbGluZXMgY2hlY2tlZAoKUGF0Y2ggMjEvMzEgaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjIyLzMxIENoZWNraW5nIGNvbW1pdCAyNTZkODhjOGVj
-NTAgKGh3L2FybS92aXJ0OiBkdDogbW92ZSBjcmVhdGlvbiBvZiAvc2VjdXJlLWNob3NlbiB0byBj
-cmVhdGVfZmR0KCkpCjIzLzMxIENoZWNraW5nIGNvbW1pdCAyNmM1YWEyZTgwMzMgKGh3L2FybS92
-aXJ0OiBkdDogYWRkIGthc2xyLXNlZWQgcHJvcGVydHkpCjI0LzMxIENoZWNraW5nIGNvbW1pdCAx
-ZjhkYmQxMjA1MGYgKHRhcmdldC9hcm06IFJlc3RyaWN0IHRoZSBBZGRyZXNzIFRyYW5zbGF0ZSB3
-cml0ZSBvcGVyYXRpb24gdG8gVENHIGFjY2VsKQoyNS8zMSBDaGVja2luZyBjb21taXQgYWM1ZDlm
-MmIwZWFiICh0YXJnZXQvYXJtOiBNYWtlIGNwdV9yZWdpc3RlcigpIGF2YWlsYWJsZSBmb3Igb3Ro
-ZXIgZmlsZXMpCjI2LzMxIENoZWNraW5nIGNvbW1pdCA2ZTg3MTE2YWQ3NmQgKHRhcmdldC9hcm0v
-Y3B1OiBVc2UgQVJSQVlfU0laRSgpIHRvIGl0ZXJhdGUgb3ZlciBBUk1DUFVJbmZvW10pCjI3LzMx
-IENoZWNraW5nIGNvbW1pdCAwYzdiMjQ1OTg4ZDkgKHRhcmdldC9hcm0vY3B1OiBVcGRhdGUgY29k
-aW5nIHN0eWxlIHRvIG1ha2UgY2hlY2twYXRjaC5wbCBoYXBweSkKMjgvMzEgQ2hlY2tpbmcgY29t
-bWl0IGEyNmVkMzY2MTVlMSAoZGV2aWNlX3RyZWU6IEFsbG93IG5hbWUgd2lsZGNhcmRzIGluIHFl
-bXVfZmR0X25vZGVfcGF0aCgpKQoyOS8zMSBDaGVja2luZyBjb21taXQgY2I0NzcwYTg2YzFkIChk
-ZXZpY2VfdHJlZTogQ29uc3RpZnkgY29tcGF0IGluIHFlbXVfZmR0X25vZGVfcGF0aCgpKQozMC8z
-MSBDaGVja2luZyBjb21taXQgODUxYTc3NDdlYWQyIChody9hcm06IHhsbngtemN1MTAyOiBNb3Zl
-IGFybV9ib290X2luZm8gaW50byBYbG54WkNVMTAyKQozMS8zMSBDaGVja2luZyBjb21taXQgY2M2
-YzkzYTRiODg2IChody9hcm06IHhsbngtemN1MTAyOiBEaXNhYmxlIHVuc3VwcG9ydGVkIEZEVCBm
-aXJtd2FyZSBub2RlcykKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdp
-dGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcu
-b3JnL2xvZ3MvMjAyMDA0MzAxMTUxNDIuMTM0MzAtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcv
-dGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
-b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
-IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+--00000000000050cc8005a48cd6e9
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+That's what I suggested,
+We preserve a  float computing cache
+typedef struct FpRecord {
+  uint8_t op;
+  float32 A;
+  float32 B;
+}  FpRecord;
+FpRecord fp_cache[1024];
+int fp_cache_length;
+uint32_t fp_exceptions;
+
+1. For each new fp operation we push it to the  fp_cache,
+2. Once we read the fp_exceptions , then we re-compute
+the fp_exceptions by re-running the fp FpRecord sequence.
+ and clear  fp_cache_length.
+3. If we clear the fp_exceptions , then we set fp_cache_length to 0 and
+ clear  fp_exceptions.
+4. If the  fp_cache are full, then we re-compute
+the fp_exceptions by re-running the fp FpRecord sequence.
+
+Now the keypoint is how to tracking the read and write of FPSCR register,
+The current code are
+    cpu_fpscr =3D tcg_global_mem_new(cpu_env,
+                                   offsetof(CPUPPCState, fpscr), "fpscr");
+
+On Fri, May 1, 2020 at 9:59 AM Programmingkid <programmingkidx@gmail.com>
+wrote:
+
+>
+> > On Apr 30, 2020, at 12:34 PM, Dino Papararo <skizzato73@msn.com> wrote:
+> >
+> > Maybe the fastest way to implement hardfloats for ppc could be run them
+> by default and until some fpu instruction request for FPSCR register.
+> > At this time probably we want to check for some exception.. so QEMU
+> could come back to last fpu instruction executed and re-execute it in
+> softfloat taking care this time of FPSCR flags, then continue in hardfloa=
+ts
+> unitl another instruction looking for FPSCR register and so on..
+> >
+> > Dino
+>
+> That sounds like a good idea.
+>
+> > -----Messaggio originale-----
+> > Da: BALATON Zoltan <balaton@eik.bme.hu>
+> > Inviato: gioved=C3=AC 30 aprile 2020 17:36
+> > A: =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) <luoyonggang@gmail.com>
+> > Cc: Richard Henderson <richard.henderson@linaro.org>; Dino Papararo <
+> skizzato73@msn.com>; qemu-devel@nongnu.org; Programmingkid <
+> programmingkidx@gmail.com>; qemu-ppc@nongnu.org; Howard Spoelstra <
+> hsp.cat7@gmail.com>; Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> > Oggetto: Re: R: R: About hardfloat in ppc
+> >
+> > On Thu, 30 Apr 2020, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
+> >> I propose a new way to computing the float flags, We preserve a  float
+> >> computing cash typedef struct FpRecord {  uint8_t op;
+> >> float32 A;
+> >> float32 B;
+> >> }  FpRecord;
+> >> FpRecord fp_cache[1024];
+> >> int fp_cache_length;
+> >> uint32_t fp_exceptions;
+> >>
+> >> 1. For each new fp operation we push it to the  fp_cache, 2. Once we
+> >> read the fp_exceptions , then we re-compute the fp_exceptions by
+> >> re-running the fp FpRecord sequence.
+> >> and clear  fp_cache_length.
+> >> 3. If we clear the fp_exceptions , then we set fp_cache_length to 0
+> >> and clear  fp_exceptions.
+> >> 4. If the  fp_cache are full, then we re-compute the fp_exceptions by
+> >> re-running the fp FpRecord sequence.
+> >>
+> >> Would this be a general method to use hard-float?
+> >> The consued time should be  2*hard_float.
+> >> Considerating read fp_exceptions are rare, then the amortized time
+> >> complexity would be 1 * hard_float.
+> >
+> > It's hard to guess what the hit rate of such cache would be and if it's
+> low then managing the cache is probably more expensive than running with
+> softfloat. So to evaluate any proposed patch we also need some benchmarks
+> which we can experiment with to tell if the results are good or not
+> otherwise we're just guessing. Are there some existing tests and benchmar=
+ks
+> that we can use? Alex mentioned fp-bench I think and to evaluate the
+> correctness of the FP implementation I've seen this other
+> > conversation:
+> >
+> > https://lists.nongnu.org/archive/html/qemu-devel/2020-04/msg05107.html
+> > https://lists.nongnu.org/archive/html/qemu-devel/2020-04/msg05126.html
+> >
+> > Is that something we can use for PPC as well to check the correctness?
+> >
+> > So I think before implementing any potential solution that came up in
+> this brainstorming the first step would be to get and compile (or write i=
+f
+> not
+> > available) some tests and benchmarks:
+> >
+> > 1. testing host behaviour for inexact and compare that for different
+> archs 2. some FP tests that can be used to compare results with QEMU and
+> real CPU to check correctness of emulation (if these check for inexact
+> differences then could be used instead of 1.) 3. some benchmarks to
+> evaluate QEMU performance (these could be same as FP tests or some real
+> world FP heavy applications).
+> >
+> > Then we can see if the proposed solution is faster and still correct.
+> >
+> > Regards,
+> > BALATON Zoltan
+>
+>
+
+--=20
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
+
+--00000000000050cc8005a48cd6e9
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>That&#39;s what I suggested,</div><div><div>We preser=
+ve a=C2=A0 float computing cache</div><div>typedef struct FpRecord {</div><=
+div>=C2=A0 uint8_t op;</div><div>=C2=A0 float32 A;</div><div>=C2=A0 float32=
+ B;</div><div>}=C2=A0 FpRecord;</div><div>FpRecord fp_cache[1024];<br></div=
+><div>int fp_cache_length;</div><div>uint32_t fp_exceptions;</div><div><br>=
+</div><div>1. For each new fp operation we push it to the=C2=A0 fp_cache,</=
+div><div>2. Once we read the fp_exceptions , then we re-compute</div><div>t=
+he fp_exceptions by re-running the fp FpRecord sequence.</div><div>=C2=A0an=
+d clear=C2=A0 fp_cache_length.</div><div>3. If we clear the fp_exceptions ,=
+ then we set=C2=A0fp_cache_length to 0 and</div><div>=C2=A0clear=C2=A0 fp_e=
+xceptions.</div><div>4. If the=C2=A0 fp_cache are full, then we re-compute<=
+/div><div>the fp_exceptions by re-running the fp FpRecord sequence.</div><d=
+iv><br></div>Now the keypoint is how to tracking the read and write of FPSC=
+R register,<br>The current code are <div><div style=3D"color:rgb(212,212,21=
+2);background-color:rgb(30,30,30);font-family:Consolas,&quot;Courier New&qu=
+ot;,monospace;font-size:14px;line-height:19px;white-space:pre"><div>=C2=A0=
+=C2=A0=C2=A0=C2=A0cpu_fpscr=C2=A0=3D=C2=A0<span style=3D"color:rgb(220,220,=
+170)">tcg_global_mem_new</span>(cpu_env,</div><div>=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0<span style=3D"color:rgb(220,220,170)">=
+offsetof</span>(CPUPPCState,=C2=A0fpscr),=C2=A0<span style=3D"color:rgb(206=
+,145,120)">&quot;fpscr&quot;</span>);</div></div></div></div><br><div class=
+=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Fri, May 1, 2020 =
+at 9:59 AM Programmingkid &lt;<a href=3D"mailto:programmingkidx@gmail.com">=
+programmingkidx@gmail.com</a>&gt; wrote:<br></div><blockquote class=3D"gmai=
+l_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,20=
+4,204);padding-left:1ex"><br>
+&gt; On Apr 30, 2020, at 12:34 PM, Dino Papararo &lt;<a href=3D"mailto:skiz=
+zato73@msn.com" target=3D"_blank">skizzato73@msn.com</a>&gt; wrote:<br>
+&gt; <br>
+&gt; Maybe the fastest way to implement hardfloats for ppc could be run the=
+m by default and until some fpu instruction request for FPSCR register.<br>
+&gt; At this time probably we want to check for some exception.. so QEMU co=
+uld come back to last fpu instruction executed and re-execute it in softflo=
+at taking care this time of FPSCR flags, then continue in hardfloats unitl =
+another instruction looking for FPSCR register and so on..<br>
+&gt; <br>
+&gt; Dino<br>
+<br>
+That sounds like a good idea.<br>
+<br>
+&gt; -----Messaggio originale-----<br>
+&gt; Da: BALATON Zoltan &lt;<a href=3D"mailto:balaton@eik.bme.hu" target=3D=
+"_blank">balaton@eik.bme.hu</a>&gt; <br>
+&gt; Inviato: gioved=C3=AC 30 aprile 2020 17:36<br>
+&gt; A: =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) &lt;<a href=3D"mailto:luo=
+yonggang@gmail.com" target=3D"_blank">luoyonggang@gmail.com</a>&gt;<br>
+&gt; Cc: Richard Henderson &lt;<a href=3D"mailto:richard.henderson@linaro.o=
+rg" target=3D"_blank">richard.henderson@linaro.org</a>&gt;; Dino Papararo &=
+lt;<a href=3D"mailto:skizzato73@msn.com" target=3D"_blank">skizzato73@msn.c=
+om</a>&gt;; <a href=3D"mailto:qemu-devel@nongnu.org" target=3D"_blank">qemu=
+-devel@nongnu.org</a>; Programmingkid &lt;<a href=3D"mailto:programmingkidx=
+@gmail.com" target=3D"_blank">programmingkidx@gmail.com</a>&gt;; <a href=3D=
+"mailto:qemu-ppc@nongnu.org" target=3D"_blank">qemu-ppc@nongnu.org</a>; How=
+ard Spoelstra &lt;<a href=3D"mailto:hsp.cat7@gmail.com" target=3D"_blank">h=
+sp.cat7@gmail.com</a>&gt;; Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.benn=
+ee@linaro.org" target=3D"_blank">alex.bennee@linaro.org</a>&gt;<br>
+&gt; Oggetto: Re: R: R: About hardfloat in ppc<br>
+&gt; <br>
+&gt; On Thu, 30 Apr 2020, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:<=
+br>
+&gt;&gt; I propose a new way to computing the float flags, We preserve a=C2=
+=A0 float <br>
+&gt;&gt; computing cash typedef struct FpRecord {=C2=A0 uint8_t op;<br>
+&gt;&gt; float32 A;<br>
+&gt;&gt; float32 B;<br>
+&gt;&gt; }=C2=A0 FpRecord;<br>
+&gt;&gt; FpRecord fp_cache[1024];<br>
+&gt;&gt; int fp_cache_length;<br>
+&gt;&gt; uint32_t fp_exceptions;<br>
+&gt;&gt; <br>
+&gt;&gt; 1. For each new fp operation we push it to the=C2=A0 fp_cache, 2. =
+Once we <br>
+&gt;&gt; read the fp_exceptions , then we re-compute the fp_exceptions by <=
+br>
+&gt;&gt; re-running the fp FpRecord sequence.<br>
+&gt;&gt; and clear=C2=A0 fp_cache_length.<br>
+&gt;&gt; 3. If we clear the fp_exceptions , then we set fp_cache_length to =
+0 <br>
+&gt;&gt; and clear=C2=A0 fp_exceptions.<br>
+&gt;&gt; 4. If the=C2=A0 fp_cache are full, then we re-compute the fp_excep=
+tions by <br>
+&gt;&gt; re-running the fp FpRecord sequence.<br>
+&gt;&gt; <br>
+&gt;&gt; Would this be a general method to use hard-float?<br>
+&gt;&gt; The consued time should be=C2=A0 2*hard_float.<br>
+&gt;&gt; Considerating read fp_exceptions are rare, then the amortized time=
+ <br>
+&gt;&gt; complexity would be 1 * hard_float.<br>
+&gt; <br>
+&gt; It&#39;s hard to guess what the hit rate of such cache would be and if=
+ it&#39;s low then managing the cache is probably more expensive than runni=
+ng with softfloat. So to evaluate any proposed patch we also need some benc=
+hmarks which we can experiment with to tell if the results are good or not =
+otherwise we&#39;re just guessing. Are there some existing tests and benchm=
+arks that we can use? Alex mentioned fp-bench I think and to evaluate the c=
+orrectness of the FP implementation I&#39;ve seen this other<br>
+&gt; conversation:<br>
+&gt; <br>
+&gt; <a href=3D"https://lists.nongnu.org/archive/html/qemu-devel/2020-04/ms=
+g05107.html" rel=3D"noreferrer" target=3D"_blank">https://lists.nongnu.org/=
+archive/html/qemu-devel/2020-04/msg05107.html</a><br>
+&gt; <a href=3D"https://lists.nongnu.org/archive/html/qemu-devel/2020-04/ms=
+g05126.html" rel=3D"noreferrer" target=3D"_blank">https://lists.nongnu.org/=
+archive/html/qemu-devel/2020-04/msg05126.html</a><br>
+&gt; <br>
+&gt; Is that something we can use for PPC as well to check the correctness?=
+<br>
+&gt; <br>
+&gt; So I think before implementing any potential solution that came up in =
+this brainstorming the first step would be to get and compile (or write if =
+not<br>
+&gt; available) some tests and benchmarks:<br>
+&gt; <br>
+&gt; 1. testing host behaviour for inexact and compare that for different a=
+rchs 2. some FP tests that can be used to compare results with QEMU and rea=
+l CPU to check correctness of emulation (if these check for inexact differe=
+nces then could be used instead of 1.) 3. some benchmarks to evaluate QEMU =
+performance (these could be same as FP tests or some real world FP heavy ap=
+plications).<br>
+&gt; <br>
+&gt; Then we can see if the proposed solution is faster and still correct.<=
+br>
+&gt; <br>
+&gt; Regards,<br>
+&gt; BALATON Zoltan<br>
+<br>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+ class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
+=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
+=A0 sincerely,<br>Yonggang Luo<br></div></div>
+
+--00000000000050cc8005a48cd6e9--
 
