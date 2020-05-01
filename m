@@ -1,100 +1,104 @@
 Return-Path: <SRS0=uuMl=6P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA18EC4724C
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 12:07:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 655F6C4724C
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 12:19:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84FB721582
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 12:07:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2BE4E2051A
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 12:19:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d1Y/WXpI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84FB721582
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H3plIFcS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BE4E2051A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUUSG-0000ry-MT
-	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 08:07:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47888)
+	id 1jUUdq-0003nh-5C
+	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 08:19:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55376)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <luoyonggang@gmail.com>) id 1jUURL-00007t-FB
- for qemu-devel@nongnu.org; Fri, 01 May 2020 08:07:05 -0400
+ (envelope-from <philmd@redhat.com>) id 1jUUd5-0003Bk-Ff
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 08:18:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <luoyonggang@gmail.com>) id 1jUUPq-0008U4-DV
- for qemu-devel@nongnu.org; Fri, 01 May 2020 08:06:47 -0400
-Received: from mail-lf1-x129.google.com ([2a00:1450:4864:20::129]:39326)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1jUUPp-0008Ln-SE; Fri, 01 May 2020 08:05:13 -0400
-Received: by mail-lf1-x129.google.com with SMTP id h26so742542lfg.6;
- Fri, 01 May 2020 05:05:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=F9OVaBWgvDEElS4jdWBGWlE94CgvOfqai2bAGMzO3lw=;
- b=d1Y/WXpIswvH5z60JivHROzDq13Ch1xI6wEeD2/FV8E/eN/c6NpapJ9I+1ftbHXNYK
- qEEJEa3YsQBIiJ2EPP1t27wKQbND/jl5nFxc+s4VEn743gNMruxm5xEA9wDzRWPeqVfm
- /w/iZ83h/CSHXX5Ae4hfNfi8FJSTWHwTKOLw1W5hbaMjX6cAmptW3WfZYIzmC4IhqYbY
- z4yo81nf4JfDGK40V0lrqf15BEOsH/2OuT1hevNrttWa1+Og+faF727kr1kkzXRDX59D
- 4t5+oFFpU80qyl3Yn27FwQzRQ6cIO1MumfKfeFeY0CAQ7yIeTqStnPM+7vzUInfvkOwb
- PygQ==
+ (envelope-from <philmd@redhat.com>) id 1jUUd3-0001Cp-Vw
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 08:18:54 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35023
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jUUd3-00017X-FS
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 08:18:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588335531;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=E+mZ9AqPrrVunWNOjxXjmV0VoqxHBUxkv1IUrcPz8Bw=;
+ b=H3plIFcSZVsYsJg1BqcM/ik0DI90hL27LYIMF0u7XzlH3kT3K+RsPUHIXi3U3QN6gPVrvG
+ A0aWrJvvC8FXd7Ic/agxmKFQ+MOTpvA84oHXecYxRepxP0ZPp4XEbGfzX6vAZfmHSUGTKp
+ 5o2nODtIItNCc86q6aDTQa5L83fWzpw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-472-Is_CC28EMTWwOV7BzCTUUA-1; Fri, 01 May 2020 08:18:47 -0400
+X-MC-Unique: Is_CC28EMTWwOV7BzCTUUA-1
+Received: by mail-wm1-f71.google.com with SMTP id j5so2598495wmi.4
+ for <qemu-devel@nongnu.org>; Fri, 01 May 2020 05:18:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=F9OVaBWgvDEElS4jdWBGWlE94CgvOfqai2bAGMzO3lw=;
- b=c0qD68FBZlhjPISPxSC1XmvOmH8RurdZXQEdWTXigA3ok1aM8r2eO7pLGJuXVdlYON
- iE/Z8hpCN8Rk8v5G5tAYbybnKqf6UO6ijbQKNy8JbaZfhsg00qqgnYFDbrfG+KyKqNL8
- 4thKsQeVApDcl+h0EpggbvqYl6zapxat6ILwctWZYFdEAPN7awy0ZJ8FeCMUVEFmbvw7
- doSZopay5TX5FT0NiDEzvpchXF5e2XHn1VK5vYy/tp68l8nJ3sfWAg9e+LPvYBZDlCxC
- Ah7OsoQrW6KR4Cgyazj67f9rwzrj9hjws1mh3EyvujudW/gA6LvkXPA0cqSLcorqNHtx
- DvtQ==
-X-Gm-Message-State: AGi0PuZ8n932zBB8Zuf0bi+dkyQ0zMBv+efL6q7Q0mhtWecK+zo/+6BG
- SPu6rTi6TfEv0XlQV+arut9ex8jVozVBVJtLBSI=
-X-Google-Smtp-Source: APiQypKshPjpVIF2oJe/hkNxKxNDWmJ2MU9DgWp36yKHj9LGjfzk04u5xPsd3moSgVnKJn6tsWpge77bFU/Xg1sxAkE=
-X-Received: by 2002:a19:5206:: with SMTP id m6mr2329343lfb.33.1588334711436;
- Fri, 01 May 2020 05:05:11 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=amdxJJPHoEm7JjAVfwGFyTz//iiZ8LXBERaohBiRMaU=;
+ b=Rx6B5I9lLgYHlnxMgxcey190No6fcoJBRTyM6OgRZyXNDrUu61omkN28+joPUB5urm
+ KW1vkXwpdxaUoy431batTTIypiNtcgchkQV1grJezMyIiuLcc+WqCQnXB1NDTkx7Iqt9
+ zx9XNH073G4MYHgIAiZWNT6/2Ng4AjxM7+9jqcq8dBfsecH5AuSO0/Pefg89OLzBmCgl
+ AbGtM9bOMDCxw+HmNS/ir5I5P6sYbizkXr5BLrl6KoNW0SVQhlTrviBv5+j2d3dUqrL0
+ acCX5BqVY4vXsR8NJngJLaq4oSJCU/m2qXTCVr8hG4o7Ht5qzxZOROc/I5+7oqIZRaKE
+ icKA==
+X-Gm-Message-State: AGi0PubUzNUT9HOcwF3sVRAjAuZvXnKucC4RUfaolFAo2O0i7ZnHqbzg
+ UNd5SjgAZWmRAsN/FFnC9vRYVyY1fZ3Mj3/UwwrWeesv7lzFAozxpgK5hO9/ePGj5DRNf3eTGUF
+ yLLsNDobcrXP6Yq4=
+X-Received: by 2002:a1c:f312:: with SMTP id q18mr3716271wmq.175.1588335526295; 
+ Fri, 01 May 2020 05:18:46 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIc8gZRnEcUXSfePAasG4fkZOYI6AltclwmB+RH2X5i0aJtgCH0wB39E/iKloCnKZMQ4gQ+Ew==
+X-Received: by 2002:a1c:f312:: with SMTP id q18mr3716253wmq.175.1588335526056; 
+ Fri, 01 May 2020 05:18:46 -0700 (PDT)
+Received: from [192.168.1.39] (137.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.137])
+ by smtp.gmail.com with ESMTPSA id n2sm3987345wrt.33.2020.05.01.05.18.44
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 01 May 2020 05:18:45 -0700 (PDT)
+Subject: Re: [PATCH v1 1/4] .travis.yml: show free disk space at end of run
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200501111505.4225-1-alex.bennee@linaro.org>
+ <20200501111505.4225-2-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <690326b3-552e-af65-fbad-ff6ad52fef73@redhat.com>
+Date: Fri, 1 May 2020 14:18:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
- <87lfmhl0xa.fsf@linaro.org>
- <alpine.BSF.2.22.395.2004271212520.94232@zero.eik.bme.hu>
- <87imhlkwun.fsf@linaro.org>
- <CAE2XoE9hiw-ri66_xp3qNa5_Wx8ZfsQB9mqJdYR8VRm-KW830g@mail.gmail.com>
- <87ftcoknvu.fsf@linaro.org>
- <AM4PR07MB350653D5961DFCE441646131CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
- <871ro6ld2f.fsf@linaro.org>
- <AM4PR07MB350673696C7DE2CA16C9C685CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
- <87sggmjgit.fsf@linaro.org>
- <CAE2XoE8wFK1nOq3YXhB=iqTvqSDQk7Zzd35Tjzdd==v8ouMijA@mail.gmail.com>
- <43ac337c-752a-7151-1e88-de01949571de@linaro.org>
- <CAE2XoE-f_rkcnpQO1cHPUgdaWNAOvBRyUX1aj27UePd0Hkr=KQ@mail.gmail.com>
- <alpine.BSF.2.22.395.2004301721420.29315@zero.eik.bme.hu>
- <AM4PR07MB3506C091776962655FCE11E9CAAA0@AM4PR07MB3506.eurprd07.prod.outlook.com>
- <FEA0FBA9-F5B7-4995-A2F3-5D8053637379@gmail.com>
- <CAE2XoE_N_oWJwwGVfh+9mOh3dYR6JXk5XJKzv8fr2A4iE9h1OA@mail.gmail.com>
- <alpine.BSF.2.22.395.2005011347390.29385@zero.eik.bme.hu>
-In-Reply-To: <alpine.BSF.2.22.395.2005011347390.29385@zero.eik.bme.hu>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Fri, 1 May 2020 20:04:59 +0800
-Message-ID: <CAE2XoE-0=SgjeXddZXDOYPeUC1xsD5V=A5xBoa1yHS8gL2=MQg@mail.gmail.com>
-Subject: Re: About hardfloat in ppc
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Content-Type: multipart/alternative; boundary="000000000000427b5205a494fe83"
-Received-SPF: pass client-ip=2a00:1450:4864:20::129;
- envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x129.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::129
+In-Reply-To: <20200501111505.4225-2-alex.bennee@linaro.org>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/01 08:18:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,164 +110,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: Dino Papararo <skizzato73@msn.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Programmingkid <programmingkidx@gmail.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Howard Spoelstra <hsp.cat7@gmail.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Fam Zheng <fam@euphon.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000427b5205a494fe83
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 5/1/20 1:15 PM, Alex Benn=C3=A9e wrote:
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>   .travis.yml | 1 +
+>   1 file changed, 1 insertion(+)
+>=20
+> diff --git a/.travis.yml b/.travis.yml
+> index 2fd63eceaa..a4c3c6c805 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -113,6 +113,7 @@ script:
+>           $(exit $BUILD_RC);
+>       fi
+>   after_script:
+> +  - df -h
+>     - if command -v ccache ; then ccache --show-stats ; fi
+>  =20
+>  =20
+>=20
 
-On Fri, May 1, 2020 at 7:58 PM BALATON Zoltan <balaton@eik.bme.hu> wrote:
+Already reviewed:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg697747.html
 
-> On Fri, 1 May 2020, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
-> > That's what I suggested,
-> > We preserve a  float computing cache
-> > typedef struct FpRecord {
-> >  uint8_t op;
-> >  float32 A;
-> >  float32 B;
-> > }  FpRecord;
-> > FpRecord fp_cache[1024];
-> > int fp_cache_length;
-> > uint32_t fp_exceptions;
-> >
-> > 1. For each new fp operation we push it to the  fp_cache,
-> > 2. Once we read the fp_exceptions , then we re-compute
-> > the fp_exceptions by re-running the fp FpRecord sequence.
-> > and clear  fp_cache_length.
->
-> Why do you need to store more than the last fp op? The cumulative bits ca=
-n
-> be tracked like it's done for other targets by not clearing fp_status the=
-n
-> you can read it from there. Only the non-sticky FI bit needs to be
-> computed but that's only determined by the last op so it's enough to
-> remember that and run that with softfloat (or even hardfloat after
-> clearing status but softfloat may be faster for this) to get the bits for
-> last op when status is read.
->
-Yeap, store only the last fp op is also an option. Do you means that store
-the last fp op,
-and calculate it when necessary?  I am thinking about a general fp
-optmize method that suite
-for all target.
+Again:
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
->
-> > 3. If we clear the fp_exceptions , then we set fp_cache_length to 0 and
-> > clear  fp_exceptions.
-> > 4. If the  fp_cache are full, then we re-compute
-> > the fp_exceptions by re-running the fp FpRecord sequence.
->
-> All this cache management and more than one element seems unnecessary to
-> me although I may be missing something.
->
-> > Now the keypoint is how to tracking the read and write of FPSCR registe=
-r,
-> > The current code are
-> >    cpu_fpscr =3D tcg_global_mem_new(cpu_env,
-> >                                   offsetof(CPUPPCState, fpscr), "fpscr"=
-);
->
-> Maybe you could search where the value is read which should be the places
-> where we need to handle it but changes may be needed to make a clear API
-> for this between target/ppc, TCG and softfloat which likely does not
-> exist yet.
->
-> Regards,
-> BALATON Zoltan
-
-
-
---=20
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---000000000000427b5205a494fe83
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Fri, May 1, 2020 at 7:58 PM BALATO=
-N Zoltan &lt;<a href=3D"mailto:balaton@eik.bme.hu">balaton@eik.bme.hu</a>&g=
-t; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0p=
-x 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On Fri=
-, 1 May 2020, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:<br>
-&gt; That&#39;s what I suggested,<br>
-&gt; We preserve a=C2=A0 float computing cache<br>
-&gt; typedef struct FpRecord {<br>
-&gt;=C2=A0 uint8_t op;<br>
-&gt;=C2=A0 float32 A;<br>
-&gt;=C2=A0 float32 B;<br>
-&gt; }=C2=A0 FpRecord;<br>
-&gt; FpRecord fp_cache[1024];<br>
-&gt; int fp_cache_length;<br>
-&gt; uint32_t fp_exceptions;<br>
-&gt;<br>
-&gt; 1. For each new fp operation we push it to the=C2=A0 fp_cache,<br>
-&gt; 2. Once we read the fp_exceptions , then we re-compute<br>
-&gt; the fp_exceptions by re-running the fp FpRecord sequence.<br>
-&gt; and clear=C2=A0 fp_cache_length.<br>
-<br>
-Why do you need to store more than the last fp op? The cumulative bits can =
-<br>
-be tracked like it&#39;s done for other targets by not clearing fp_status t=
-hen <br>
-you can read it from there. Only the non-sticky FI bit needs to be <br>
-computed but that&#39;s only determined by the last op so it&#39;s enough t=
-o <br>
-remember that and run that with softfloat (or even hardfloat after <br>
-clearing status but softfloat may be faster for this) to get the bits for <=
-br>
-last op when status is read.<br></blockquote><div>Yeap, store only the last=
- fp op is also an option. Do you means that store the last fp op,</div><div=
->and calculate it when necessary?=C2=A0 I am thinking about a general fp op=
-tmize=C2=A0method that suite=C2=A0</div><div>for all target.</div><blockquo=
-te class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px =
-solid rgb(204,204,204);padding-left:1ex">
-<br>
-&gt; 3. If we clear the fp_exceptions , then we set fp_cache_length to 0 an=
-d<br>
-&gt; clear=C2=A0 fp_exceptions.<br>
-&gt; 4. If the=C2=A0 fp_cache are full, then we re-compute<br>
-&gt; the fp_exceptions by re-running the fp FpRecord sequence.<br>
-<br>
-All this cache management and more than one element seems unnecessary to <b=
-r>
-me although I may be missing something.<br>
-<br>
-&gt; Now the keypoint is how to tracking the read and write of FPSCR regist=
-er,<br>
-&gt; The current code are<br>
-&gt;=C2=A0 =C2=A0 cpu_fpscr =3D tcg_global_mem_new(cpu_env,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0offsetof(CPUPPCState=
-, fpscr), &quot;fpscr&quot;);<br>
-<br>
-Maybe you could search where the value is read which should be the places <=
-br>
-where we need to handle it but changes may be needed to make a clear API <b=
-r>
-for this between target/ppc, TCG and softfloat which likely does not <br>
-exist yet.<br>
-<br>
-Regards,<br>
-BALATON Zoltan</blockquote></div><br clear=3D"all"><div><br></div>-- <br><d=
-iv dir=3D"ltr" class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =
-=E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=
-=C2=A0 =C2=A0 sincerely,<br>Yonggang Luo<br></div></div>
-
---000000000000427b5205a494fe83--
 
