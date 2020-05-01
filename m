@@ -2,85 +2,86 @@ Return-Path: <SRS0=uuMl=6P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 491E8C47257
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 18:11:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30636C47253
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 18:29:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19BE220787
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 18:11:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EDA1F2073E
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 18:29:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sd43+k5T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19BE220787
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ELvzdSMm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDA1F2073E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=verbum.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUa88-0001yG-5T
-	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 14:11:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47900)
+	id 1jUaQ9-0007QZ-2G
+	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 14:29:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51176)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jUa7G-0000n8-6U
- for qemu-devel@nongnu.org; Fri, 01 May 2020 14:10:26 -0400
+ (Exim 4.90_1) (envelope-from <walters@verbum.org>)
+ id 1jUaPK-0006rB-B5
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 14:29:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jUa7F-0004jg-4c
- for qemu-devel@nongnu.org; Fri, 01 May 2020 14:10:25 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:42808)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jUa7E-0004fj-M9
- for qemu-devel@nongnu.org; Fri, 01 May 2020 14:10:24 -0400
-Received: by mail-oi1-x243.google.com with SMTP id i13so444030oie.9
- for <qemu-devel@nongnu.org>; Fri, 01 May 2020 11:10:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=6epJaaRgm8vNjSQ5FfAD77JCMjWkCXvpZktB1GowDJA=;
- b=sd43+k5ThjW5bgvNxuv2YZmPBOXmaWiSMDiIVajiox2DDQ9KvrD7obOSh+/PVkzklS
- lyBwlJgWIdC4un4b7WeT3YYVhxJ41LDaM0vcdC/P+hs1pX1freVeQ5Wjt45+2cUalcUM
- XsihIEcF3LwFGc700dtaBQPCO5l7P0G4mU5qw8hROOGre2r0xmFpWjpDwosY57kYHdDr
- YAMxo0fLGgFTCurxlj35DBXuHNWFGKEsGGwfoRnBFsMcUwhDRAE3IdDoHBRJz52VYRFX
- Iv727ZZ+/WYNyZIM0sHhLkbyay8gSMLzFqvoZhGaQRZ0LsGtYtJCBUW3CEvrDGunCMVX
- Jp+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=6epJaaRgm8vNjSQ5FfAD77JCMjWkCXvpZktB1GowDJA=;
- b=peLS5z+17FhmQy5v8wvjsSs/JWjAjJJDkCZm+dbXOLEmrPfZg+lGt7fRr7oF+VeHoJ
- 8dvdot9CemJxOxA+B3aaN+spnNwz5l3V/O+cLF34scHdZs5eoduPMtHe7Xtw9xxS4BDt
- Tt8nlo0WiX6zRJxiyj7Ic6yBEG4UdJHkBX+DJytLK+KwaxgQG0z6A1yLJ+k4Cvl3BDQB
- FuyVF8jEXQe+1svONkSFoE2EHbJWnuNsfCtFZpRdGEKyLTPdK7uGRFa2ljvwrByrf3dU
- Nw0FsfzGpMl3tijRBrBSh3m9MhfoiPHsujOvcTb18RHwsDb2SnLFlsxPu9acaxtvdsYe
- b8lQ==
-X-Gm-Message-State: AGi0PuZmvPJiHAFnr2wDLWRTwsZW5KHt3gy9RArh+hzUN5yVxZjDVKuR
- jyXeqSO6SUnj4xQCXiQn5J4lH9KS+QvbVyFeNzTUtA==
-X-Google-Smtp-Source: APiQypKRhDYjr/poi5ztySW6mpcJBIissU/wJRRT4EOyzvRbI3XE4momZLPkrWA3+wcJxk6bGAKshEhR0wXj6iBmfbU=
-X-Received: by 2002:aca:3441:: with SMTP id b62mr616818oia.146.1588356623277; 
- Fri, 01 May 2020 11:10:23 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200430181003.21682-1-peter.maydell@linaro.org>
- <20200430181003.21682-27-peter.maydell@linaro.org>
- <b1d8a9ec-a1ef-47af-f07f-3761a51945f1@linaro.org>
-In-Reply-To: <b1d8a9ec-a1ef-47af-f07f-3761a51945f1@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 1 May 2020 19:10:12 +0100
-Message-ID: <CAFEAcA8Jv096T6gFPutS0DjFxi7UCDQPv2FMJZ5RjLTEVXmbwA@mail.gmail.com>
-Subject: Re: [PATCH 26/36] target/arm: Convert Neon VQSHL, VRSHL, VQRSHL
- 3-reg-same insns to decodetree
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x243.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::243
+ (envelope-from <walters@verbum.org>) id 1jUaMY-00038G-Rn
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 14:29:06 -0400
+Received: from wout5-smtp.messagingengine.com ([64.147.123.21]:33285)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <walters@verbum.org>)
+ id 1jUaMY-0002wj-6I
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 14:26:14 -0400
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+ by mailout.west.internal (Postfix) with ESMTP id A5A6B7BD;
+ Fri,  1 May 2020 14:26:10 -0400 (EDT)
+Received: from imap21 ([10.202.2.71])
+ by compute1.internal (MEProxy); Fri, 01 May 2020 14:26:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:message-id
+ :mime-version:subject:to:x-me-proxy:x-me-proxy:x-me-sender
+ :x-me-sender:x-sasl-enc; s=fm2; bh=qjPhLL07ti+2rtfeUC9T1YrxMEKHn
+ 3t7IxDxXG4FVss=; b=ELvzdSMmVygnRICQTEldK8HDDx+gRyZGo+4Nhb/U3YH8q
+ 9hlCm0+sYPqEqwrC8z77AovdLCDq8KRIIoeHNgCvBnjW/EcWmaPQWb8c9UxwHRRW
+ fI7epvkidYXKCpGRzWEh53MwTZo0uBixgsNZ6W7BvXdiKWwoETcs3n/3wPVgfGWD
+ 1bArr0ZQq852yJsTje/smc6j5YyKhYSnL4WficTPEauISf8U052uIPFmpJW9KNJm
+ TGNf0YEUI0v0gDkWJF/JxDgHvAAsBn2eBtMWHF5JNoLYjpy9kXGeSZ7/d8WB0qY/
+ A+jIzsb1HonAEWwlpwCE/iE7hHfF9wR5h+C3P7P4A==
+X-ME-Sender: <xms:wWmsXrX2XlR89YTiX0hBAz5DVq6Y58bKCoq4E4gby1M5GXipO5UJfQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedrieejgdduvddvucetufdoteggodetrfdotf
+ fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+ uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+ cujfgurhepofgfggfkfffhvffutgesthdtredtreertdenucfhrhhomhepfdevohhlihhn
+ ucghrghlthgvrhhsfdcuoeifrghlthgvrhhssehvvghrsghumhdrohhrgheqnecuggftrf
+ grthhtvghrnhepueefhfeiudelffefveefgfeiheffvdeujeekheejleetfeefhfettdeh
+ udelffegnecuffhomhgrihhnpehgihhthhhusgdrtghomhenucevlhhushhtvghrufhiii
+ gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpeifrghlthgvrhhssehvvghrsghumhdr
+ ohhrgh
+X-ME-Proxy: <xmx:wWmsXs4Y34bXe4W3k1Ag8o1lZKGE2G0A5TSNd1JrMpwqR3hOn8RK5w>
+ <xmx:wWmsXupypMWVxjjIPhRKyYC2BiClZiie_kFD098ju4u7yiQUlfVJfQ>
+ <xmx:wWmsXnlIK1GAxXwr9fAECJj7BQk1PxkOikFqo2M6lQjwE1nHivWc_w>
+ <xmx:wmmsXpSZPUniAcHDRDgotBZZA_NvcPZ3qUlOrzTjVSHYKF91nWpWkw>
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+ id C57A5660081; Fri,  1 May 2020 14:26:09 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.3.0-dev0-351-g9981f4f-fmstable-20200421v1
+Mime-Version: 1.0
+Message-Id: <348d4774-bd5f-4832-bd7e-a21491fdac8d@www.fastmail.com>
+Date: Fri, 01 May 2020 14:25:48 -0400
+From: "Colin Walters" <walters@verbum.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] virtiofsd: Use clone() and not unshare(), support non-root
+Content-Type: text/plain
+Received-SPF: none client-ip=64.147.123.21; envelope-from=walters@verbum.org;
+ helo=wout5-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/01 14:26:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Received-From: 64.147.123.21
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,40 +93,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 1 May 2020 at 02:55, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> I'm not 100% sure how best to handle the swapped operands issue.  I don't think
-> we want to do it here in gen_gvec_srshl, because we don't have the same reverse
-> operand problem in the aarch64 encoding, and I'm looking forward to re-using
-> this generator function in aa64 and sve2.
->
-> Maybe it would be better to have
->
-> @3same     .... ... . . . size:2 .... .... .... . q:1 . . .... \
->            &3same vm=%vm_dp vn=%vn_dp vd=%vd_dp
-> @3same_rev .... ... . . . size:2 .... .... .... . q:1 . . .... \
->            &3same vn=%vm_dp vm=%vn_dp vd=%vd_dp
->
-> and swap the operands to "normal" during decode.
+I'd like to make use of virtiofs as part of our tooling in
+https://github.com/coreos/coreos-assembler
+Most of the code runs as non-root today; qemu also runs as non-root.
+We use 9p right now.
 
-Yeah, I guess so. It's a little confusing because the operands
-are going to appear with the "wrong" names in the trans_ functions,
-but we can hopefully deflect some of that with a suitable comment
-by the @3same_rev format definition.
+virtiofsd's builtin sandboxing effectively assumes it runs as
+root.
 
-I think that all the affected insns have asm formats like
- VSHL <Dd>, <Dm>, <Dn>
-in contrast to eg
- VSUB <Dd>, <Dn>, <Dm>
+First, change the code to use `clone()` and not `unshare()+fork()`.
 
-so it's effectively just that the field names in the official
-insn definition are backwards from what you'd expect.
+Next, automatically use `CLONE_NEWUSER` if we're running as non root.
 
-thanks
--- PMM
+This is similar logic to that in https://github.com/containers/bubblewrap
+(Which...BTW, it could make sense for virtiofs to depend on bubblewrap
+ and re-exec itself rather than re-implementing the containerization
+ itself)
+
+Signed-off-by: Colin Walters <walters@verbum.org>
+---
+ tools/virtiofsd/passthrough_ll.c | 26 +++++++++++++++++++++-----
+ 1 file changed, 21 insertions(+), 5 deletions(-)
+
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+index 4c35c95b25..468617f6d6 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -2530,6 +2530,21 @@ static void print_capabilities(void)
+     printf("}\n");
+ }
+ 
++/* Copied from bubblewrap */
++static int
++raw_clone(unsigned long flags, void *child_stack)
++{
++#if defined(__s390__) || defined(__CRIS__)
++  /*
++   * On s390 and cris the order of the first and second arguments
++   * of the raw clone() system call is reversed.
++   */
++    return (int) syscall(__NR_clone, child_stack, flags);
++#else
++    return (int) syscall(__NR_clone, flags, child_stack);
++#endif
++}
++
+ /*
+  * Move to a new mount, net, and pid namespaces to isolate this process.
+  */
+@@ -2547,14 +2562,15 @@ static void setup_namespaces(struct lo_data *lo, struct fuse_session *se)
+      * an empty network namespace to prevent TCP/IP and other network
+      * activity in case this process is compromised.
+      */
+-    if (unshare(CLONE_NEWPID | CLONE_NEWNS | CLONE_NEWNET) != 0) {
+-        fuse_log(FUSE_LOG_ERR, "unshare(CLONE_NEWPID | CLONE_NEWNS): %m\n");
+-        exit(1);
++    int clone_flags = SIGCHLD | CLONE_NEWPID | CLONE_NEWNS | CLONE_NEWNET;
++    /* If we're non root, we need a new user namespace */
++    if (getuid() != 0) {
++        clone_flags |= CLONE_NEWUSER;
+     }
+ 
+-    child = fork();
++    child = raw_clone(clone_flags, NULL);
+     if (child < 0) {
+-        fuse_log(FUSE_LOG_ERR, "fork() failed: %m\n");
++        fuse_log(FUSE_LOG_ERR, "clone() failed: %m\n");
+         exit(1);
+     }
+     if (child > 0) {
+-- 
+2.24.1
+
 
