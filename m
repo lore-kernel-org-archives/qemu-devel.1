@@ -2,82 +2,114 @@ Return-Path: <SRS0=uuMl=6P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22736C47253
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 14:09:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2030C47253
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 14:12:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E183F206D6
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 14:09:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AB373206D6
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 14:12:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gI99JH0n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E183F206D6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="MvXHv5AO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB373206D6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUWMF-0006Zn-1U
-	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 10:09:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37260)
+	id 1jUWOt-00007t-Q2
+	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 10:12:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38850)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1jUWK2-0002e8-1s
- for qemu-devel@nongnu.org; Fri, 01 May 2020 10:07:25 -0400
+ (envelope-from <alxndr@bu.edu>) id 1jUWO8-0007tA-TJ
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 10:11:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1jUWJu-00060W-NY
- for qemu-devel@nongnu.org; Fri, 01 May 2020 10:07:21 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58228
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jUWJu-00060I-5w
- for qemu-devel@nongnu.org; Fri, 01 May 2020 10:07:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588342032;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kbG/ivlaYfH0BCJK951opl/KBNJa3i2O840z7dUnfdo=;
- b=gI99JH0nJaddgsNG2Z1w9OyrBB+nif1grv/RGV1cyui8czAfjUMf/LQEm+g5YQ0a6PNwIj
- OFia/KlX0KW5M9VYwNEl/CZzj4OCM2GlTk59rZwpyZi8Kd4xCOR7X8QTGx4vzb2/B+bdPy
- fna2NxKZnT5MrN8kYIMWUv+HNDiiLIY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-383-1OitSWMcMraLIyp0Aczm1Q-1; Fri, 01 May 2020 10:07:10 -0400
-X-MC-Unique: 1OitSWMcMraLIyp0Aczm1Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E23C31899527
- for <qemu-devel@nongnu.org>; Fri,  1 May 2020 14:07:09 +0000 (UTC)
-Received: from localhost (ovpn-112-36.ams2.redhat.com [10.36.112.36])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2BD865EDF1;
- Fri,  1 May 2020 14:07:02 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH v2 1/2] virtiofsd: add --rlimit-nofile=NUM option
-Date: Fri,  1 May 2020 15:06:43 +0100
-Message-Id: <20200501140644.220940-2-stefanha@redhat.com>
-In-Reply-To: <20200501140644.220940-1-stefanha@redhat.com>
-References: <20200501140644.220940-1-stefanha@redhat.com>
+ (envelope-from <alxndr@bu.edu>) id 1jUWO3-0003AR-0F
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 10:11:36 -0400
+Received: from mail-mw2nam10on2103.outbound.protection.outlook.com
+ ([40.107.94.103]:2177 helo=NAM10-MW2-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jUWO2-00033u-Fo
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 10:11:30 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=X55IpdSgdL+g55misuC3/EX5YFsvhpKdLqaTbmVOcdpo9HJsO80hwW2FhTmjhMUiOe1TkaBtQln2JEQFyI+UpriZ0rDIOoztoYFczm4y2ihOEBcV8b9yx+gKqziUFonfdJ2Qm2sexOwTNt25N8rJHMOrCxAGjax/hsNr7SEe/ZeQE2lWa6MfIB6C2A6UuSDEJT15O7PbKQUBKijT7/oCrnY4PLdbme3H+dkm0p2XnBCV/oaoKfFuWEMzvUOQFxg7SORABn/cQiycaa2Yfle/jvYIORLiO6yocLmuzUyynihGO1ZC/ZpFZFGgsc9ZHJGrceXEBfTtQKzqCUZi6jVppw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hXLyKHp/EhiDt+ZJtK+kzqrKg4nIB7VoH5CFXpI3p14=;
+ b=lIC7ff+QoyBSHGiajmRJ0XTyfqgvSH6546dFhklDSmFDQGx/tQ7VOYgErbL06Tl/+bfuJs07FUoRtI6/vfagv21QKkH/8OYteKFw8K6XGqMjRrJf8vJvRUWaIa+r4gkvN/EuSKEpalktZlHd3W7ecMC3gIZNF5LVioK95f81qHWKZg7gZDM1djscSXs/G/+1r2uh4NpglCXweo/alWyOvlcS9r8l1Lhzix97nxjwAqPtypRa8ihlUrZ00RqkyFNzItk/eQtAz9Jm8NYUVza9wblBVuGtrMV2yS9M8o4UXMa9/N+6bMEk2xHCODyjECxAAsg/GloLhUw/9pKY9QJMiw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
+ header.d=bu.edu; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hXLyKHp/EhiDt+ZJtK+kzqrKg4nIB7VoH5CFXpI3p14=;
+ b=MvXHv5AOtrI+ZjvbXdy8LSORy4l1EVhk464IqTU+Q/CpLa2HaJt3f5uWBtYuqiLjdy1mALSl3QA9bfuJtNRMrXnglujktyv+3d5w6A49nOu/ebHEPvjXQ6nFQ4uh2kzO4qFnnRHQhpF46rMIn7JRp0g9Rq9Nb9sHEfzR35uDgH4=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=bu.edu;
+Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
+ by SN6PR03MB4157.namprd03.prod.outlook.com (2603:10b6:805:b9::15)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.19; Fri, 1 May
+ 2020 13:56:23 +0000
+Received: from SN6PR03MB3871.namprd03.prod.outlook.com
+ ([fe80::640a:1123:37c1:42db]) by SN6PR03MB3871.namprd03.prod.outlook.com
+ ([fe80::640a:1123:37c1:42db%3]) with mapi id 15.20.2958.020; Fri, 1 May 2020
+ 13:56:23 +0000
+From: Alexander Bulekov <alxndr@bu.edu>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] fuzz: select fuzz target using executable name
+Date: Fri,  1 May 2020 09:56:12 -0400
+Message-Id: <20200501135612.32249-1-alxndr@bu.edu>
+X-Mailer: git-send-email 2.26.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BL0PR0102CA0022.prod.exchangelabs.com
+ (2603:10b6:207:18::35) To SN6PR03MB3871.namprd03.prod.outlook.com
+ (2603:10b6:805:6d::32)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/01 03:09:43
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.81
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mozz.bu.edu (128.197.127.33) by
+ BL0PR0102CA0022.prod.exchangelabs.com (2603:10b6:207:18::35) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2958.20 via Frontend Transport; Fri, 1 May 2020 13:56:22 +0000
+X-Mailer: git-send-email 2.26.2
+X-Originating-IP: [128.197.127.33]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 4b85dc2c-aece-4845-a388-08d7edd76ef4
+X-MS-TrafficTypeDiagnostic: SN6PR03MB4157:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SN6PR03MB4157ACFF28A91202FCCCCAA0BAAB0@SN6PR03MB4157.namprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:175;
+X-Forefront-PRVS: 0390DB4BDA
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: nzli2R1ASBtPbDmWDAFBgVc9zI6LttKjpk9ik4SDYxEu3CHelQldpMGe4uk4eVGraxtBHUlrvZallDGvim80WRwtzda5KQpU8Z9ximjw45HbTWWAAaw2cBKUNMaJDKia6Ns909WLUyZSqkJPB3zmu+mNDWwL47pp4V4qctqPAkXfPgBKcS8ZTz7WzrtvoNekUkKG/xZQq8QNp/2KSEsl4DOL7gQ6TBAkcpVsLRJtWCgMXMOwcmvp/x6mBWr9laXE+rAcvZMkxehgYMopiEv/Pzqt1KIMfD1KM+3KhVfD5tsh2JCZS3w+fBrhfEr8ZWNbxEHaBH2StMeMFuI2oK9rfqv0B6BB74Ic+is4kIrownWGf3CNVye++H2xgAHVaRCoWkn8SjUORohsxeSBq8+0iX3Xitskqme3w4J9hJHnDVSInVHs8hpU4zGnSfoGpxig
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(346002)(39860400002)(366004)(376002)(136003)(396003)(54906003)(66946007)(786003)(8676002)(316002)(8936002)(6666004)(4326008)(6916009)(36756003)(75432002)(66556008)(66476007)(52116002)(7696005)(2616005)(956004)(86362001)(1076003)(5660300002)(2906002)(186003)(16526019)(26005)(478600001)(6486002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: l/a3Jpw8olRnc/0edKZiA/De1DN/6+WCwaPUGQKeM/i5Q17e6W5R2UGROyVIjahh7+g2LgF+MnN3nrorjMSX8GhDXLPbHH7/mSSAO/sKKl7ABen1ScJaUn6tZqzPiOubfx3y5KFyECN8jUnV/obtvHT+aCxGc8P4Sv7Aj6Oaqhv/qs5CNmP5/tDiS8+97pBO05smLxTgzq+PYzs/1N4rTbgPpG6DnXABbsEncJWyp3W+1xW9rNr9rFSXERX8m2Yv/F2YIiKoVEisSV9KEzquh9M6iX/P3H/B8uSJBHWTRvJJT1KHVzGoLo/E2hkQEWljftiuVsWzjdcdKEmy8NGbtqGgBt9V5Syq+VXgrstviJU7cUWI0eMkrl7URgZF84ARvcCcmm7TmvlGs6P6v+Ww6bVIKqHSamoTc0jRcPrZk2GtSds+joq16eVFWOc/vLniKr4brQmuWBERyX28MAc3g36//1H7SmM6++oTg5o5PJhvVL7ZYDN6RFoTEYpAWMtzssfnt3YOK5QQXTuFBXvJ1vBRXeclg1vtbeGSpWjO9l26hiuHkw1b5uWzlx11X0fCfWd8xgNt8hkhn3JdlGSUgunOdcJ19ET/fXAwUlstVT5hhndd3OO+l3g0zTsWmvkX8bOwStOVOaCoAaWc90K6+Nk+mSJGBADBCCkSs2CiDumkJEz9Ibp6W0xK2YirHguBkR7GDglQ5JSWFvxWpvSXIojaK8ik/7ryoM6P3b+X4br0srGKaJdou5gHjP+Yfh9DwrWOsrNxvSASIZD8Lajgo0zBHBehYZDKFDpCN0+LNKo=
+X-OriginatorOrg: bu.edu
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4b85dc2c-aece-4845-a388-08d7edd76ef4
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 May 2020 13:56:23.4510 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NUhGvzC2I03jtC38GkfeuUPCpL9mbIFYaPQ0bivdoUEXW3nOVTe2WCYR/XkmfyID
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR03MB4157
+Received-SPF: pass client-ip=40.107.94.103; envelope-from=alxndr@bu.edu;
+ helo=NAM10-MW2-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/01 10:11:27
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Received-From: 40.107.94.103
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,98 +121,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, vgoyal@redhat.com,
- pjp@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>, peter.maydell@linaro.org,
+ Thomas Huth <thuth@redhat.com>, Alexander Bulekov <alxndr@bu.edu>,
+ Bandan Das <bsd@redhat.com>, stefanha@redhat.com,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-TWFrZSBpdCBwb3NzaWJsZSB0byBzcGVjaWZ5IHRoZSBSTElNSVRfTk9GSUxFIG9uIHRoZSBjb21t
-YW5kLWxpbmUuClVzZXJzIHJ1bm5pbmcgbXVsdGlwbGUgdmlydGlvZnNkIHByb2Nlc3NlcyBzaG91
-bGQgYWxsb2NhdGUgYSBjZXJ0YWluCm51bWJlciB0byBlYWNoIHByb2Nlc3Mgc28gdGhhdCB0aGUg
-c3lzdGVtLXdpZGUgbGltaXQgY2FuIG5ldmVyIGJlCmV4aGF1c3RlZC4KCldoZW4gdGhpcyBvcHRp
-b24gaXMgc2V0IHRvIDAgdGhlIHJsaW1pdCBpcyBsZWZ0IGF0IGl0cyBjdXJyZW50IHZhbHVlLgpU
-aGlzIGlzIHVzZWZ1bCB3aGVuIGEgbWFuYWdlbWVudCB0b29sIHdhbnRzIHRvIGNvbmZpZ3VyZSB0
-aGUgcmxpbWl0Cml0c2VsZi4KClRoZSBkZWZhdWx0IGJlaGF2aW9yIHJlbWFpbnMgdW5jaGFuZ2Vk
-OiB0cnkgdG8gc2V0IHRoZSBsaW1pdCB0bwoxLDAwMCwwMDAgZmlsZSBkZXNjcmlwdG9ycyBpZiB0
-aGUgY3VycmVudCBybGltaXQgaXMgbG93ZXIuCgpTaWduZWQtb2ZmLWJ5OiBTdGVmYW4gSGFqbm9j
-emkgPHN0ZWZhbmhhQHJlZGhhdC5jb20+ClJldmlld2VkLWJ5OiBEci4gRGF2aWQgQWxhbiBHaWxi
-ZXJ0IDxkZ2lsYmVydEByZWRoYXQuY29tPgotLS0KIHRvb2xzL3ZpcnRpb2ZzZC9mdXNlX2xvd2xl
-dmVsLmggIHwgIDEgKwogdG9vbHMvdmlydGlvZnNkL2hlbHBlci5jICAgICAgICAgfCAyMyArKysr
-KysrKysrKysrKysrKysrKysrKwogdG9vbHMvdmlydGlvZnNkL3Bhc3N0aHJvdWdoX2xsLmMgfCAy
-MiArKysrKysrKy0tLS0tLS0tLS0tLS0tCiAzIGZpbGVzIGNoYW5nZWQsIDMyIGluc2VydGlvbnMo
-KyksIDE0IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3Rvb2xzL3ZpcnRpb2ZzZC9mdXNlX2xv
-d2xldmVsLmggYi90b29scy92aXJ0aW9mc2QvZnVzZV9sb3dsZXZlbC5oCmluZGV4IDhmNmQ3MDVi
-NWMuLjU2MmZkNTI0MWUgMTAwNjQ0Ci0tLSBhL3Rvb2xzL3ZpcnRpb2ZzZC9mdXNlX2xvd2xldmVs
-LmgKKysrIGIvdG9vbHMvdmlydGlvZnNkL2Z1c2VfbG93bGV2ZWwuaApAQCAtMTc3Nyw2ICsxNzc3
-LDcgQEAgc3RydWN0IGZ1c2VfY21kbGluZV9vcHRzIHsKICAgICBpbnQgc3lzbG9nOwogICAgIGlu
-dCBsb2dfbGV2ZWw7CiAgICAgdW5zaWduZWQgaW50IG1heF9pZGxlX3RocmVhZHM7CisgICAgdW5z
-aWduZWQgbG9uZyBybGltaXRfbm9maWxlOwogfTsKIAogLyoqCmRpZmYgLS1naXQgYS90b29scy92
-aXJ0aW9mc2QvaGVscGVyLmMgYi90b29scy92aXJ0aW9mc2QvaGVscGVyLmMKaW5kZXggODE5YzJi
-YzEzYy4uZGM1OWYzOGFmMCAxMDA2NDQKLS0tIGEvdG9vbHMvdmlydGlvZnNkL2hlbHBlci5jCisr
-KyBiL3Rvb2xzL3ZpcnRpb2ZzZC9oZWxwZXIuYwpAQCAtMjMsNiArMjMsOCBAQAogI2luY2x1ZGUg
-PHN0ZGxpYi5oPgogI2luY2x1ZGUgPHN0cmluZy5oPgogI2luY2x1ZGUgPHN5cy9wYXJhbS5oPgor
-I2luY2x1ZGUgPHN5cy90aW1lLmg+CisjaW5jbHVkZSA8c3lzL3Jlc291cmNlLmg+CiAjaW5jbHVk
-ZSA8dW5pc3RkLmg+CiAKICNkZWZpbmUgRlVTRV9IRUxQRVJfT1BUKHQsIHApICAgICAgICAgICAg
-ICAgICAgICAgICBcCkBAIC01Myw2ICs1NSw3IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgZnVzZV9v
-cHQgZnVzZV9oZWxwZXJfb3B0c1tdID0gewogICAgIEZVU0VfSEVMUEVSX09QVCgic3VidHlwZT0i
-LCBub2RlZmF1bHRfc3VidHlwZSksCiAgICAgRlVTRV9PUFRfS0VZKCJzdWJ0eXBlPSIsIEZVU0Vf
-T1BUX0tFWV9LRUVQKSwKICAgICBGVVNFX0hFTFBFUl9PUFQoIm1heF9pZGxlX3RocmVhZHM9JXUi
-LCBtYXhfaWRsZV90aHJlYWRzKSwKKyAgICBGVVNFX0hFTFBFUl9PUFQoIi0tcmxpbWl0LW5vZmls
-ZT0lbHUiLCBybGltaXRfbm9maWxlKSwKICAgICBGVVNFX0hFTFBFUl9PUFQoIi0tc3lzbG9nIiwg
-c3lzbG9nKSwKICAgICBGVVNFX0hFTFBFUl9PUFRfVkFMVUUoImxvZ19sZXZlbD1kZWJ1ZyIsIGxv
-Z19sZXZlbCwgRlVTRV9MT0dfREVCVUcpLAogICAgIEZVU0VfSEVMUEVSX09QVF9WQUxVRSgibG9n
-X2xldmVsPWluZm8iLCBsb2dfbGV2ZWwsIEZVU0VfTE9HX0lORk8pLApAQCAtMTcxLDYgKzE3NCw5
-IEBAIHZvaWQgZnVzZV9jbWRsaW5lX2hlbHAodm9pZCkKICAgICAgICAgICAgIiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBkZWZhdWx0OiBub193cml0ZWJhY2tcbiIKICAgICAgICAgICAg
-IiAgICAtbyB4YXR0cnxub194YXR0ciAgICAgICAgICBlbmFibGUvZGlzYWJsZSB4YXR0clxuIgog
-ICAgICAgICAgICAiICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRlZmF1bHQ6IG5vX3hh
-dHRyXG4iCisgICAgICAgICAgICIgICAgLS1ybGltaXQtbm9maWxlPTxudW0+ICAgICAgc2V0IG1h
-eGltdW0gbnVtYmVyIG9mIGZpbGUgZGVzY3JpcHRvcnNcbiIKKyAgICAgICAgICAgIiAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAoMCBsZWF2ZXMgcmxpbWl0IHVuY2hhbmdlZClcbiIKKyAg
-ICAgICAgICAgIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBkZWZhdWx0OiAxLDAwMCww
-MDAgaWYgdGhlIGN1cnJlbnQgcmxpbWl0IGlzIGxvd2VyXG4iCiAgICAgICAgICAgICk7CiB9CiAK
-QEAgLTE5MSwxMSArMTk3LDI4IEBAIHN0YXRpYyBpbnQgZnVzZV9oZWxwZXJfb3B0X3Byb2Modm9p
-ZCAqZGF0YSwgY29uc3QgY2hhciAqYXJnLCBpbnQga2V5LAogICAgIH0KIH0KIAorc3RhdGljIHVu
-c2lnbmVkIGxvbmcgZ2V0X2RlZmF1bHRfcmxpbWl0X25vZmlsZSh2b2lkKQoreworICAgIHJsaW1f
-dCBtYXhfZmRzID0gMTAwMDAwMDsgLyogb3VyIGRlZmF1bHQgUkxJTUlUX05PRklMRSB0YXJnZXQg
-Ki8KKyAgICBzdHJ1Y3QgcmxpbWl0IHJsaW07CisKKyAgICBpZiAoZ2V0cmxpbWl0KFJMSU1JVF9O
-T0ZJTEUsICZybGltKSA8IDApIHsKKyAgICAgICAgZnVzZV9sb2coRlVTRV9MT0dfRVJSLCAiZ2V0
-cmxpbWl0KFJMSU1JVF9OT0ZJTEUpOiAlbVxuIik7CisgICAgICAgIGV4aXQoMSk7CisgICAgfQor
-CisgICAgaWYgKHJsaW0ucmxpbV9jdXIgPj0gbWF4X2ZkcykgeworICAgICAgICByZXR1cm4gMDsg
-Lyogd2UgaGF2ZSBtb3JlIGZkcyBhdmFpbGFibGUgdGhhbiByZXF1aXJlZCEgKi8KKyAgICB9Cisg
-ICAgcmV0dXJuIG1heF9mZHM7Cit9CisKIGludCBmdXNlX3BhcnNlX2NtZGxpbmUoc3RydWN0IGZ1
-c2VfYXJncyAqYXJncywgc3RydWN0IGZ1c2VfY21kbGluZV9vcHRzICpvcHRzKQogewogICAgIG1l
-bXNldChvcHRzLCAwLCBzaXplb2Yoc3RydWN0IGZ1c2VfY21kbGluZV9vcHRzKSk7CiAKICAgICBv
-cHRzLT5tYXhfaWRsZV90aHJlYWRzID0gMTA7CisgICAgb3B0cy0+cmxpbWl0X25vZmlsZSA9IGdl
-dF9kZWZhdWx0X3JsaW1pdF9ub2ZpbGUoKTsKICAgICBvcHRzLT5mb3JlZ3JvdW5kID0gMTsKIAog
-ICAgIGlmIChmdXNlX29wdF9wYXJzZShhcmdzLCBvcHRzLCBmdXNlX2hlbHBlcl9vcHRzLCBmdXNl
-X2hlbHBlcl9vcHRfcHJvYykgPT0KZGlmZiAtLWdpdCBhL3Rvb2xzL3ZpcnRpb2ZzZC9wYXNzdGhy
-b3VnaF9sbC5jIGIvdG9vbHMvdmlydGlvZnNkL3Bhc3N0aHJvdWdoX2xsLmMKaW5kZXggNGMzNWM5
-NWIyNS4uZjdiOWMxZDIwYyAxMDA2NDQKLS0tIGEvdG9vbHMvdmlydGlvZnNkL3Bhc3N0aHJvdWdo
-X2xsLmMKKysrIGIvdG9vbHMvdmlydGlvZnNkL3Bhc3N0aHJvdWdoX2xsLmMKQEAgLTI3MDcsMjQg
-KzI3MDcsMTggQEAgc3RhdGljIHZvaWQgc2V0dXBfc2FuZGJveChzdHJ1Y3QgbG9fZGF0YSAqbG8s
-IHN0cnVjdCBmdXNlX3Nlc3Npb24gKnNlLAogICAgIHNldHVwX3NlY2NvbXAoZW5hYmxlX3N5c2xv
-Zyk7CiB9CiAKLS8qIFJhaXNlIHRoZSBtYXhpbXVtIG51bWJlciBvZiBvcGVuIGZpbGUgZGVzY3Jp
-cHRvcnMgKi8KLXN0YXRpYyB2b2lkIHNldHVwX25vZmlsZV9ybGltaXQodm9pZCkKKy8qIFNldCB0
-aGUgbWF4aW11bSBudW1iZXIgb2Ygb3BlbiBmaWxlIGRlc2NyaXB0b3JzICovCitzdGF0aWMgdm9p
-ZCBzZXR1cF9ub2ZpbGVfcmxpbWl0KHVuc2lnbmVkIGxvbmcgcmxpbWl0X25vZmlsZSkKIHsKLSAg
-ICBjb25zdCBybGltX3QgbWF4X2ZkcyA9IDEwMDAwMDA7Ci0gICAgc3RydWN0IHJsaW1pdCBybGlt
-OworICAgIHN0cnVjdCBybGltaXQgcmxpbSA9IHsKKyAgICAgICAgLnJsaW1fY3VyID0gcmxpbWl0
-X25vZmlsZSwKKyAgICAgICAgLnJsaW1fbWF4ID0gcmxpbWl0X25vZmlsZSwKKyAgICB9OwogCi0g
-ICAgaWYgKGdldHJsaW1pdChSTElNSVRfTk9GSUxFLCAmcmxpbSkgPCAwKSB7Ci0gICAgICAgIGZ1
-c2VfbG9nKEZVU0VfTE9HX0VSUiwgImdldHJsaW1pdChSTElNSVRfTk9GSUxFKTogJW1cbiIpOwot
-ICAgICAgICBleGl0KDEpOwotICAgIH0KLQotICAgIGlmIChybGltLnJsaW1fY3VyID49IG1heF9m
-ZHMpIHsKKyAgICBpZiAocmxpbWl0X25vZmlsZSA9PSAwKSB7CiAgICAgICAgIHJldHVybjsgLyog
-bm90aGluZyB0byBkbyAqLwogICAgIH0KIAotICAgIHJsaW0ucmxpbV9jdXIgPSBtYXhfZmRzOwot
-ICAgIHJsaW0ucmxpbV9tYXggPSBtYXhfZmRzOwotCiAgICAgaWYgKHNldHJsaW1pdChSTElNSVRf
-Tk9GSUxFLCAmcmxpbSkgPCAwKSB7CiAgICAgICAgIC8qIElnbm9yZSBTRUxpbnV4IGRlbmlhbHMg
-Ki8KICAgICAgICAgaWYgKGVycm5vID09IEVQRVJNKSB7CkBAIC0yOTc3LDcgKzI5NzEsNyBAQCBp
-bnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQogCiAgICAgZnVzZV9kYWVtb25pemUob3B0
-cy5mb3JlZ3JvdW5kKTsKIAotICAgIHNldHVwX25vZmlsZV9ybGltaXQoKTsKKyAgICBzZXR1cF9u
-b2ZpbGVfcmxpbWl0KG9wdHMucmxpbWl0X25vZmlsZSk7CiAKICAgICAvKiBNdXN0IGJlIGJlZm9y
-ZSBzYW5kYm94IHNpbmNlIGl0IHdhbnRzIC9wcm9jICovCiAgICAgc2V0dXBfY2FwbmcoKTsKLS0g
-CjIuMjUuMwoK
+The fuzzers are built into a binary (e.g. qemu-fuzz-i386). To select the
+device to fuzz/fuzz target, we usually use the --fuzz-target= argument.
+This commit allows the fuzz-target to be specified using the name of the
+executable. If the executable name ends with -target-FUZZ_TARGET, then
+we select the fuzz target based on this name, rather than the
+--fuzz-target argument. This is useful for systems such as oss-fuzz
+where we don't have control of the arguments passed to the fuzzer.
+
+Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+---
+ tests/qtest/fuzz/fuzz.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
+
+This patch should be free of any changes to the slirp submodule.
+
+diff --git a/tests/qtest/fuzz/fuzz.c b/tests/qtest/fuzz/fuzz.c
+index 0d78ac8d36..c6932cec4a 100644
+--- a/tests/qtest/fuzz/fuzz.c
++++ b/tests/qtest/fuzz/fuzz.c
+@@ -91,6 +91,7 @@ static void usage(char *path)
+         printf(" * %s  : %s\n", tmp->target->name,
+                 tmp->target->description);
+     }
++    printf("Alternatively, add -target-FUZZ_TARGET to the executable name\n");
+     exit(0);
+ }
+ 
+@@ -143,18 +144,20 @@ int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp)
+     module_call_init(MODULE_INIT_QOM);
+     module_call_init(MODULE_INIT_LIBQOS);
+ 
+-    if (*argc <= 1) {
++    target_name = strstr(**argv, "-target-");
++    if (target_name) {        /* The binary name specifies the target */
++                target_name += strlen("-target-");
++    } else if (*argc > 1) {  /* The target is specified as an argument */
++        target_name = (*argv)[1];
++        if (!strstr(target_name, "--fuzz-target=")) {
++            usage(**argv);
++        }
++        target_name += strlen("--fuzz-target=");
++    } else {
+         usage(**argv);
+     }
+ 
+     /* Identify the fuzz target */
+-    target_name = (*argv)[1];
+-    if (!strstr(target_name, "--fuzz-target=")) {
+-        usage(**argv);
+-    }
+-
+-    target_name += strlen("--fuzz-target=");
+-
+     fuzz_target = fuzz_get_target(target_name);
+     if (!fuzz_target) {
+         usage(**argv);
+-- 
+2.26.2
 
 
