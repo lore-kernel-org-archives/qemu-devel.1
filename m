@@ -1,100 +1,102 @@
 Return-Path: <SRS0=uuMl=6P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 455CBC47253
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 16:31:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA53CC47253
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 16:46:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED02A20836
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 16:31:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B325E206D6
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 16:46:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NhpkBe5C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED02A20836
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y+CWxXcM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B325E206D6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUYZC-0007St-4h
-	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 12:31:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45988)
+	id 1jUYoL-0007Qg-TL
+	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 12:46:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50426)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1jUYXt-0006KH-KF
- for qemu-devel@nongnu.org; Fri, 01 May 2020 12:29:50 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jUYl0-0004yM-2t
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 12:45:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <luoyonggang@gmail.com>) id 1jUYXs-0006bN-AA
- for qemu-devel@nongnu.org; Fri, 01 May 2020 12:29:49 -0400
-Received: from mail-lj1-x232.google.com ([2a00:1450:4864:20::232]:44077)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1jUYXr-0006Wu-T1; Fri, 01 May 2020 12:29:47 -0400
-Received: by mail-lj1-x232.google.com with SMTP id a21so3056444ljj.11;
- Fri, 01 May 2020 09:29:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=FoQYJ2DkJfhvLezTbgCOOb3XRTDlhYslVQkhultewgY=;
- b=NhpkBe5C++Rm/u+OkOOpQLPt7CL2TK9kVlM7DU2HTdbqSW0THPxlF8f3vqIssQCafI
- hxKFX1CIVOXCtakpKCtqr+AVC3fvbvnDanmAF0ZbphkXO8Lw8GlBt1WcH0p1MhlY0YQ1
- b0Jr73IItCVmGDVnTe1kcUQKKlsAfsNZH4ilWfM0W+1jakuDLz3JsTvKXy554cZhJ6qH
- CE+nIcKyDR8kTF4YH2BXrXs9hK5hnr2wif65GbisDNLKBa2W/7C8vosHuKw/ifaig3o8
- ieG655buepkIvWQtpkxzhjIXQR9XOijTu1/hPyjTGRAYpoYJ/btkRCg3GJlakeWT/fPJ
- gfgg==
+ (envelope-from <mst@redhat.com>) id 1jUYi2-000234-8B
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 12:43:21 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30509
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jUYi1-00022E-MY
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 12:40:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588351215;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Lqa5/Hx93Kw/D1M5A4Wy1qx7l3BKhql7h3DSB1mtSco=;
+ b=Y+CWxXcM20hw/zmqzahcTNBQScVbAIYji/6nSHnnu0hIRhwcxLftk+ZXowme5wPjko7ZlJ
+ uyz3L3l8wn1FRggzUC4CXe+QD1wwHU0i5x9ySzX3mkxJpFCL+2Q4f8ePU5qnpy/llWqsPU
+ 8O5Y6OOL6Orr6xPY0SB1ceASoklIJdE=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-400-x8WuzWcGPmir6lmkTJ3SAw-1; Fri, 01 May 2020 12:40:14 -0400
+X-MC-Unique: x8WuzWcGPmir6lmkTJ3SAw-1
+Received: by mail-wm1-f69.google.com with SMTP id h22so123232wml.1
+ for <qemu-devel@nongnu.org>; Fri, 01 May 2020 09:40:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=FoQYJ2DkJfhvLezTbgCOOb3XRTDlhYslVQkhultewgY=;
- b=JjPEt/++6EL7vWQ/zh1PYRYsuTKVCmViRpWT1uuGJhcg7I9MCZ6lmIqoIdQQfCKlOo
- K7Lbxgow1KE+lhE21jQhRpNClIH4crLUIixITbuAHSSSJT02b31yjjEskRJIgAS4HBVQ
- lMIBBq4NKfet0zK6cf5mn+oceTpkpAbS2bSXx1ZpvbFIkeLmAw7UnlHjg1PASTOE99sF
- Xgzs1/UYzMvnf5bp1ZAzrZiO1Era0zr1fkWF3memqhaBnG8R+eBGv9FFk9odV73oA11U
- rTeMcdbMzH+eg8c096Gug/GEyHzo3YqkV5h6xItlQ1RQh6Jqf4kYg5XEjgiic29m3iik
- CpGQ==
-X-Gm-Message-State: AGi0PuZvyJP/QGbyEgGwu91BfmKLjYxHy54VzHYlFj49/1ITXUyr+bFg
- s4ajG8EJCp37Li1ar5mlHDt8gKjxHHym+ZjYgtI=
-X-Google-Smtp-Source: APiQypIW8qtT0Kt7jSodMERJLXAwUrieV0Z7awcRKJHAzIhHNsBV+gw2pKHQYQIl7c8hLnuCu2Q3/rmNMGWXCP/HDV4=
-X-Received: by 2002:a2e:b17a:: with SMTP id a26mr2662205ljm.215.1588350585594; 
- Fri, 01 May 2020 09:29:45 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=nMGzYXXlt91nC35gLaccwBBOsZy+woR7AfDs4Zim8QY=;
+ b=Yrxr3aqakWpRAr3B3hP8R+TpOwaAU4I101eMtLrwM+BRgjCmFedVXV0TxABsA9df+/
+ GIIu4N9F0Om/65hrFCSoXqff02WqaOlf4taQ9KczEk0t1MAq5Rxn0hVrZZg+qXQC3zDM
+ 2Mm+Sy10Xyv5FTQ36uf+yF8/dVc5oH22He2oYH6d68bMv9AWVLJVUaWO/YYXv2iTsuvp
+ 6lD0pX4XZQ3KcQ2Cxt6wTmw1uttz6ujWrvd43T/0yP+NKVA6qWPDD5q5Mat2XDBLfiYQ
+ LQDyW396Cqs0seUD1ay0pw9yeXkJ1BnMJPkeDliMMdUk1bKA1r4J/3vs7ydJW7tq+Vxs
+ Nx5g==
+X-Gm-Message-State: AGi0PuYPK0Zuje3W/ATQIZTM+4jdUTth4tH/9gluuLwXzkuHA3thF/AU
+ kava7n1XtBw/GD9+R4+y1+cBkOk1nFLwXpL827QjxQ7Ry8KVN2iDkg9Vc889++SV2UiTU8ow5Jn
+ ZJ+wunbK01oINIqQ=
+X-Received: by 2002:a5d:4905:: with SMTP id x5mr5538083wrq.158.1588351212936; 
+ Fri, 01 May 2020 09:40:12 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIRCGHwTccvJsAvicP8A0DpZq/du41x9SwaPrD3qakmQGh7aIbIbaxJj7zM2mLNA07i6S569w==
+X-Received: by 2002:a5d:4905:: with SMTP id x5mr5538051wrq.158.1588351212669; 
+ Fri, 01 May 2020 09:40:12 -0700 (PDT)
+Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
+ by smtp.gmail.com with ESMTPSA id
+ z16sm5485411wrl.0.2020.05.01.09.40.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 01 May 2020 09:40:11 -0700 (PDT)
+Date: Fri, 1 May 2020 12:40:09 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Yuri Benditovich <yuri.benditovich@daynix.com>
+Subject: Re: [PATCH v7 0/7] reference implementation of RSS and hash report
+Message-ID: <20200501123927-mutt-send-email-mst@kernel.org>
+References: <20200329150953.23812-1-yuri.benditovich@daynix.com>
+ <20200331102004-mutt-send-email-mst@kernel.org>
+ <CAOEp5OeOcTZM_b254LxX5=jRiiAkGSoLsbMeiMjPs2OoF1MxNA@mail.gmail.com>
+ <20200501104325-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-References: <CAE2XoE-ZSgtceSe5wYDm3cXf8+hTvJhD5PqZSrrFW5625LcSWg@mail.gmail.com>
- <CAE2XoE9hiw-ri66_xp3qNa5_Wx8ZfsQB9mqJdYR8VRm-KW830g@mail.gmail.com>
- <87ftcoknvu.fsf@linaro.org>
- <AM4PR07MB350653D5961DFCE441646131CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
- <871ro6ld2f.fsf@linaro.org>
- <AM4PR07MB350673696C7DE2CA16C9C685CAAD0@AM4PR07MB3506.eurprd07.prod.outlook.com>
- <87sggmjgit.fsf@linaro.org>
- <CAE2XoE8wFK1nOq3YXhB=iqTvqSDQk7Zzd35Tjzdd==v8ouMijA@mail.gmail.com>
- <43ac337c-752a-7151-1e88-de01949571de@linaro.org>
- <CAE2XoE-f_rkcnpQO1cHPUgdaWNAOvBRyUX1aj27UePd0Hkr=KQ@mail.gmail.com>
- <alpine.BSF.2.22.395.2004301721420.29315@zero.eik.bme.hu>
- <AM4PR07MB3506C091776962655FCE11E9CAAA0@AM4PR07MB3506.eurprd07.prod.outlook.com>
- <FEA0FBA9-F5B7-4995-A2F3-5D8053637379@gmail.com>
- <CAE2XoE_N_oWJwwGVfh+9mOh3dYR6JXk5XJKzv8fr2A4iE9h1OA@mail.gmail.com>
- <alpine.BSF.2.22.395.2005011347390.29385@zero.eik.bme.hu>
- <CAE2XoE-0=SgjeXddZXDOYPeUC1xsD5V=A5xBoa1yHS8gL2=MQg@mail.gmail.com>
- <874kszkdhm.fsf@linaro.org> <d84e50f5-493e-7c8a-bf39-c94c18875171@linaro.org>
-In-Reply-To: <d84e50f5-493e-7c8a-bf39-c94c18875171@linaro.org>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Sat, 2 May 2020 00:29:33 +0800
-Message-ID: <CAE2XoE-W=v5ifho_ze3Xg2Fx1v+VtQ_KvWSf7AuXns5ZYoRoTg@mail.gmail.com>
-Subject: Re: About hardfloat in ppc
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: multipart/alternative; boundary="0000000000006ee9a105a498b0bb"
-Received-SPF: pass client-ip=2a00:1450:4864:20::232;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x232.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::232
+In-Reply-To: <20200501104325-mutt-send-email-mst@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/01 12:40:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,322 +108,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: Dino Papararo <skizzato73@msn.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Programmingkid <programmingkidx@gmail.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Howard Spoelstra <hsp.cat7@gmail.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000006ee9a105a498b0bb
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, May 1, 2020 at 10:18 PM Richard Henderson <
-richard.henderson@linaro.org> wrote:
-
-> On 5/1/20 6:10 AM, Alex Benn=C3=A9e wrote:
-> >
-> > =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) <luoyonggang@gmail.com> write=
-s:
-> >
-> >> On Fri, May 1, 2020 at 7:58 PM BALATON Zoltan <balaton@eik.bme.hu>
-> wrote:
-> >>
-> >>> On Fri, 1 May 2020, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
-> >>>> That's what I suggested,
-> >>>> We preserve a  float computing cache
-> >>>> typedef struct FpRecord {
-> >>>>  uint8_t op;
-> >>>>  float32 A;
-> >>>>  float32 B;
-> >>>> }  FpRecord;
-> >>>> FpRecord fp_cache[1024];
-> >>>> int fp_cache_length;
-> >>>> uint32_t fp_exceptions;
-> >>>>
-> >>>> 1. For each new fp operation we push it to the  fp_cache,
-> >>>> 2. Once we read the fp_exceptions , then we re-compute
-> >>>> the fp_exceptions by re-running the fp FpRecord sequence.
-> >>>> and clear  fp_cache_length.
-> >>>
-> >>> Why do you need to store more than the last fp op? The cumulative bit=
-s
-> can
-> >>> be tracked like it's done for other targets by not clearing fp_status
-> then
-> >>> you can read it from there. Only the non-sticky FI bit needs to be
-> >>> computed but that's only determined by the last op so it's enough to
-> >>> remember that and run that with softfloat (or even hardfloat after
-> >>> clearing status but softfloat may be faster for this) to get the bits
-> for
-> >>> last op when status is read.
-> >>>
-> >> Yeap, store only the last fp op is also an option. Do you means that
-> store
-> >> the last fp op,
-> >> and calculate it when necessary?  I am thinking about a general fp
-> >> optmize method that suite
-> >> for all target.
-> >
-> > I think that's getting a little ahead of yourself. Let's prove the
-> > technique is valuable for PPC (given it has the most to gain). We can
-> > always generalise later if it's worthwhile.
->
-> Indeed.
->
-> > Rather than creating a new structure I would suggest creating 3 new tcg
-> > globals (op, inA, inB) and re-factor the front-end code so each FP op
-> > loaded the TCG globals. The TCG optimizer should pick up aliased loads
-> > and automatically eliminate the dead ones. We might need some new
-> > machinery for the TCG to avoid spilling the values over potentially
-> > faulting loads/stores but that is likely a phase 2 problem.
->
-> There's no point in new tcg globals.
->
-> Every fp operation can raise an exception, and therefore every fp operati=
-on
-> will flush tcg globals to memory.  Therefore there is no optimization to =
-be
-> done at the tcg opcode level.
->
-> However, every fp operation calls a helper function, and the quickest
-> thing to
-> do is store the inputs to env->(op, inA, inB, inC) in the helper before
-> performing the operation.
->
->
-> > Next you will want to find places that care about the per-op bits of
-> > cpu_fpscr and call a helper with the new globals to re-run the
-> > computation and feed the values in.
->
-> Before we even get to this deferred fp operation thing, there are several
-> giant
-> improvements to ppc emulation that can be made:
->
-> Step 1 is to rearrange the fp helpers to eliminate helper_reset_fpstatus(=
-).
-> I've mentioned this before, that it's possible to leave the steady-state =
-of
-> env->fp_status.exception_flags =3D=3D 0, so there's no need for a separat=
-e
-> function
-> call.  I suspect this is worth a decent speedup by itself.
->
-Hi Richard, what kinds of rearrange the fp need to be done? Can you give me
-a more detailed
-example? I am still not get the idea.
-
->
-> Step 2 is to notice when all fp exceptions are masked, so that no
-> exception can
-> be raised, and set a tb_flags bit.  This is the default fp environment th=
-at
-> libc enables and therefore extremely common.
->
-> Currently, ppc has 3 helpers called per fp operation.  If step 1 is handl=
-ed
-> correctly, then we're down to 2 fp helpers per fp operation.  If no
-> exceptions
-> need raising, then we can perform the entire operation with a single
-> function call.
->
-> We would require a parallel set of fp helpers that (1) performs the
-> operation
-> and (2) does any post-processing of the exception bits straight away, but
-> (3)
-> without raising any exceptions.  Sort of like helper_fadd +
-> do_float_check_status, but less.  IIRC the only real extra work is
-> categorizing
-> invalid exceptions.  We could even plausibly extend softfloat to do that
-> while
-> it is recording the invalid exception.
->
-> Step 3 is to improve softfloat.c with Yonggang Luo's idea to compute
-> inexact
-> from the inverse hardfloat operation.  This would let us relax the
-> restriction
-> of only using hardfloat when we have already have an accrued inexact
-> exception.
->
-> Only after all of these are done is it worth experimenting with caching t=
-he
-> last fp operation.
->
->
-> r~
->
+OK so now 5.0's out, I think it's easier if you just send v8,
+but it's up to Jason.
 
 
---=20
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
+On Fri, May 01, 2020 at 10:44:06AM -0400, Michael S. Tsirkin wrote:
+> We are in freeze so nothing's applied right now.
+> v8 which has all the bits will be a good step so we
+> are ready for after freeze.
+>=20
+> On Fri, May 01, 2020 at 07:01:58AM +0300, Yuri Benditovich wrote:
+> > Michael/Jason,
+> >=20
+> > As Linux headers was updated in qemu and now include RSC/RSS/Hash defin=
+itions,
+> > please let me know what you prefer:
+> > 1. You apply this series as is, then I submit clean-up series that will=
+ remove
+> > all the redundant defines from virtio-net.c
+> > 2. I post v8 of this series with cleanup of all the redundant defines a=
+nd also
+> > RSC ones
+> > 3. Something other
+> >=20
+> > Thanks,
+> > Yuri Benditovich
+> >=20
+> > On Tue, Mar 31, 2020 at 5:26 PM Michael S. Tsirkin <mst@redhat.com> wro=
+te:
+> >=20
+> >     On Sun, Mar 29, 2020 at 06:09:46PM +0300, Yuri Benditovich wrote:
+> >     > Support for VIRTIO_NET_F_RSS and VIRTIO_NET_F_HASH_REPORT
+> >     > features in QEMU for reference purpose.
+> >     > Implements Toeplitz hash calculation for incoming
+> >     > packets according to configuration provided by driver.
+> >     > Uses calculated hash for decision on receive virtqueue
+> >     > and/or reports the hash in the virtio header
+> >=20
+> >=20
+> >     Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> >=20
+> >     Probably post 5.0 material.
+> >=20
+> >     > Changes from v6:
+> >     > Fixed a bug in patch 5 "reference implementation of hash report"
+> >     > that caused the ASAN test to fail
+> >     > was: n->rss_data.populate_hash =3D true;
+> >     > fixed: n->rss_data.populate_hash =3D !!hash_report;
+> >     >
+> >     > Yuri Benditovich (7):
+> >     >=A0 =A0virtio-net: introduce RSS and hash report features
+> >     >=A0 =A0virtio-net: implement RSS configuration command
+> >     >=A0 =A0virtio-net: implement RX RSS processing
+> >     >=A0 =A0tap: allow extended virtio header with hash info
+> >     >=A0 =A0virtio-net: reference implementation of hash report
+> >     >=A0 =A0vmstate.h: provide VMSTATE_VARRAY_UINT16_ALLOC macro
+> >     >=A0 =A0virtio-net: add migration support for RSS and hash report
+> >     >
+> >     >=A0 hw/net/trace-events=A0 =A0 =A0 =A0 =A0 =A0 |=A0 =A03 +
+> >     >=A0 hw/net/virtio-net.c=A0 =A0 =A0 =A0 =A0 =A0 | 448 +++++++++++++=
+++++++++++++++++++--
+> >     >=A0 include/hw/virtio/virtio-net.h |=A0 16 ++
+> >     >=A0 include/migration/vmstate.h=A0 =A0 |=A0 10 +
+> >     >=A0 net/tap.c=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 |=A0 11 +=
+-
+> >     >=A0 5 files changed, 460 insertions(+), 28 deletions(-)
+> >     >
+> >     > --
+> >     > 2.17.1
+> >=20
+> >=20
 
---0000000000006ee9a105a498b0bb
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Fri, May 1, 2020 at 10:18 PM Richa=
-rd Henderson &lt;<a href=3D"mailto:richard.henderson@linaro.org">richard.he=
-nderson@linaro.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote=
-" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);=
-padding-left:1ex">On 5/1/20 6:10 AM, Alex Benn=C3=A9e wrote:<br>
-&gt; <br>
-&gt; =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) &lt;<a href=3D"mailto:luoyon=
-ggang@gmail.com" target=3D"_blank">luoyonggang@gmail.com</a>&gt; writes:<br=
->
-&gt; <br>
-&gt;&gt; On Fri, May 1, 2020 at 7:58 PM BALATON Zoltan &lt;<a href=3D"mailt=
-o:balaton@eik.bme.hu" target=3D"_blank">balaton@eik.bme.hu</a>&gt; wrote:<b=
-r>
-&gt;&gt;<br>
-&gt;&gt;&gt; On Fri, 1 May 2020, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) =
-wrote:<br>
-&gt;&gt;&gt;&gt; That&#39;s what I suggested,<br>
-&gt;&gt;&gt;&gt; We preserve a=C2=A0 float computing cache<br>
-&gt;&gt;&gt;&gt; typedef struct FpRecord {<br>
-&gt;&gt;&gt;&gt;=C2=A0 uint8_t op;<br>
-&gt;&gt;&gt;&gt;=C2=A0 float32 A;<br>
-&gt;&gt;&gt;&gt;=C2=A0 float32 B;<br>
-&gt;&gt;&gt;&gt; }=C2=A0 FpRecord;<br>
-&gt;&gt;&gt;&gt; FpRecord fp_cache[1024];<br>
-&gt;&gt;&gt;&gt; int fp_cache_length;<br>
-&gt;&gt;&gt;&gt; uint32_t fp_exceptions;<br>
-&gt;&gt;&gt;&gt;<br>
-&gt;&gt;&gt;&gt; 1. For each new fp operation we push it to the=C2=A0 fp_ca=
-che,<br>
-&gt;&gt;&gt;&gt; 2. Once we read the fp_exceptions , then we re-compute<br>
-&gt;&gt;&gt;&gt; the fp_exceptions by re-running the fp FpRecord sequence.<=
-br>
-&gt;&gt;&gt;&gt; and clear=C2=A0 fp_cache_length.<br>
-&gt;&gt;&gt;<br>
-&gt;&gt;&gt; Why do you need to store more than the last fp op? The cumulat=
-ive bits can<br>
-&gt;&gt;&gt; be tracked like it&#39;s done for other targets by not clearin=
-g fp_status then<br>
-&gt;&gt;&gt; you can read it from there. Only the non-sticky FI bit needs t=
-o be<br>
-&gt;&gt;&gt; computed but that&#39;s only determined by the last op so it&#=
-39;s enough to<br>
-&gt;&gt;&gt; remember that and run that with softfloat (or even hardfloat a=
-fter<br>
-&gt;&gt;&gt; clearing status but softfloat may be faster for this) to get t=
-he bits for<br>
-&gt;&gt;&gt; last op when status is read.<br>
-&gt;&gt;&gt;<br>
-&gt;&gt; Yeap, store only the last fp op is also an option. Do you means th=
-at store<br>
-&gt;&gt; the last fp op,<br>
-&gt;&gt; and calculate it when necessary?=C2=A0 I am thinking about a gener=
-al fp<br>
-&gt;&gt; optmize method that suite<br>
-&gt;&gt; for all target.<br>
-&gt; <br>
-&gt; I think that&#39;s getting a little ahead of yourself. Let&#39;s prove=
- the<br>
-&gt; technique is valuable for PPC (given it has the most to gain). We can<=
-br>
-&gt; always generalise later if it&#39;s worthwhile.<br>
-<br>
-Indeed.<br>
-<br>
-&gt; Rather than creating a new structure I would suggest creating 3 new tc=
-g<br>
-&gt; globals (op, inA, inB) and re-factor the front-end code so each FP op<=
-br>
-&gt; loaded the TCG globals. The TCG optimizer should pick up aliased loads=
-<br>
-&gt; and automatically eliminate the dead ones. We might need some new<br>
-&gt; machinery for the TCG to avoid spilling the values over potentially<br=
->
-&gt; faulting loads/stores but that is likely a phase 2 problem. <br>
-<br>
-There&#39;s no point in new tcg globals.<br>
-<br>
-Every fp operation can raise an exception, and therefore every fp operation=
-<br>
-will flush tcg globals to memory.=C2=A0 Therefore there is no optimization =
-to be<br>
-done at the tcg opcode level.<br>
-<br>
-However, every fp operation calls a helper function, and the quickest thing=
- to<br>
-do is store the inputs to env-&gt;(op, inA, inB, inC) in the helper before<=
-br>
-performing the operation.<br>
-<br>
-<br>
-&gt; Next you will want to find places that care about the per-op bits of<b=
-r>
-&gt; cpu_fpscr and call a helper with the new globals to re-run the<br>
-&gt; computation and feed the values in.<br>
-<br>
-Before we even get to this deferred fp operation thing, there are several g=
-iant<br>
-improvements to ppc emulation that can be made:<br>
-<br>
-Step 1 is to rearrange the fp helpers to eliminate helper_reset_fpstatus().=
-<br>
-I&#39;ve mentioned this before, that it&#39;s possible to leave the steady-=
-state of<br>
-env-&gt;fp_status.exception_flags =3D=3D 0, so there&#39;s no need for a se=
-parate function<br>
-call.=C2=A0 I suspect this is worth a decent speedup by itself.<br></blockq=
-uote><div>Hi Richard, what kinds of rearrange the fp need to be done? Can y=
-ou give me a more detailed</div><div>example? I am still not get the idea.<=
-/div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;bo=
-rder-left:1px solid rgb(204,204,204);padding-left:1ex">
-<br>
-Step 2 is to notice when all fp exceptions are masked, so that no exception=
- can<br>
-be raised, and set a tb_flags bit.=C2=A0 This is the default fp environment=
- that<br>
-libc enables and therefore extremely common.<br>
-<br>
-Currently, ppc has 3 helpers called per fp operation.=C2=A0 If step 1 is ha=
-ndled<br>
-correctly, then we&#39;re down to 2 fp helpers per fp operation.=C2=A0 If n=
-o exceptions<br>
-need raising, then we can perform the entire operation with a single functi=
-on call.<br>
-<br>
-We would require a parallel set of fp helpers that (1) performs the operati=
-on<br>
-and (2) does any post-processing of the exception bits straight away, but (=
-3)<br>
-without raising any exceptions.=C2=A0 Sort of like helper_fadd +<br>
-do_float_check_status, but less.=C2=A0 IIRC the only real extra work is cat=
-egorizing<br>
-invalid exceptions.=C2=A0 We could even plausibly extend softfloat to do th=
-at while<br>
-it is recording the invalid exception.<br>
-<br>
-Step 3 is to improve softfloat.c with Yonggang Luo&#39;s idea to compute in=
-exact<br>
-from the inverse hardfloat operation.=C2=A0 This would let us relax the res=
-triction<br>
-of only using hardfloat when we have already have an accrued inexact except=
-ion.<br>
-<br>
-Only after all of these are done is it worth experimenting with caching the=
-<br>
-last fp operation.<br>
-<br>
-<br>
-r~<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
- class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
-=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
-=A0 sincerely,<br>Yonggang Luo<br></div></div>
-
---0000000000006ee9a105a498b0bb--
 
