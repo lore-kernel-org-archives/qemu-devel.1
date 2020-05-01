@@ -1,96 +1,119 @@
 Return-Path: <SRS0=uuMl=6P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28D1DC28CBC
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 02:30:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECC60C28CBC
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 03:05:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5F382071C
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 02:30:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B6D3B207DD
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 03:05:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Kd19CRyW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5F382071C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="LFM26Eme"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6D3B207DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jULRr-000678-3x
-	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 22:30:43 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35990)
+	id 1jULza-0006KK-RT
+	for qemu-devel@archiver.kernel.org; Thu, 30 Apr 2020 23:05:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38914)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jULR0-0005UD-R8
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 22:29:51 -0400
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1jULyq-0005bm-AL
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 23:04:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jULQz-0006Oz-GS
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 22:29:50 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:43707)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jULQy-0006H6-W8
- for qemu-devel@nongnu.org; Thu, 30 Apr 2020 22:29:49 -0400
-Received: by mail-pl1-x641.google.com with SMTP id z6so3167711plk.10
- for <qemu-devel@nongnu.org>; Thu, 30 Apr 2020 19:29:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=f4reCtjNzjsXTu75I8NY9VQ9DL2EU8/6lJqM14J8sS8=;
- b=Kd19CRyWXihC/EwF9Kqz4bjaCvR8esjyJhCrjBBPdxyr2MXWKpyO3woYa5WFSJjb6U
- zpe8u4oX7WD32xxqI49OKC90VVqpgu3Gs6ytfn5Ml/l3/uIoAKBmLI2tbGD2jTfSMr1P
- RnqeE64z39Slj7FtwoMl2BBd6+FzEKk2Qv5cdN+GvIVgs/Y0CwLM+eMEiu0A8pe1Q+Rq
- w91AOJ9SdPcdBRNapYHLylW1s8i7bgyj4LA6HFfH3d6NHdMTlf5/+WjG4pFk1F2ANPvQ
- u+G2dXfWqwDhQ++g8y6p5CkVN12oC3kmAS1wsRFgoAYnYDR+B5mAOtoWgDN/0LSTm6OU
- ed8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=f4reCtjNzjsXTu75I8NY9VQ9DL2EU8/6lJqM14J8sS8=;
- b=pb/t7Qp8sO2FnCwWtm1krBLi5fDb/dPAliOKqrDGBd0jI4Rm5pfyrsdIyFo6IYIw96
- 8iVp0GQqvlvrWBFASj9AWmyflgXvaCaYGo/HbGEqkvYrCGU96cwTvLEOlJQrWAg/cPxc
- BAw27drA6OHc+/quSxbBA/VWooBJyYvf55k+fSq28JRBeg4LfFkuOpcxFRcQk92dymnL
- SKYanpMVzdsnSIQLx2aTKwALsQHTN6Q8KPluvxfP2cDDTeHihxptsCXHIHHaIMyteJOM
- dSQMJrQ42yWXKQR2GpBmTdYO1FVgzrJ2d52DUeeS0PljJFv8VLK5DSzQiJ9PzP5K6vhh
- Z4kw==
-X-Gm-Message-State: AGi0Pua5rh28MSNIq+68KhvAjRF12vWFqnlks2/FVwCvFb6ykIPsJQfT
- cvF1yRTsdkPighBJQYCOqBXjjiNAa7Q=
-X-Google-Smtp-Source: APiQypKw7VikJhCXSnQ3QTwZSV/0xH1u4QW/wvh6EKmuWljwv4IdrcyeiaAVXpu0O4cyu9Vs+RjbnA==
-X-Received: by 2002:a17:90a:8a09:: with SMTP id
- w9mr2091719pjn.95.1588300186727; 
- Thu, 30 Apr 2020 19:29:46 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id u5sm831482pgi.70.2020.04.30.19.29.45
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 30 Apr 2020 19:29:46 -0700 (PDT)
-Subject: Re: [PATCH 27/36] target/arm: Convert Neon VABA 3-reg-same to
- decodetree
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200430181003.21682-1-peter.maydell@linaro.org>
- <20200430181003.21682-28-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <a60a2de1-b46a-a13b-8a60-4006c9d70ff5@linaro.org>
-Date: Thu, 30 Apr 2020 19:29:43 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <20200430181003.21682-28-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1jULyp-0007PF-PD
+ for qemu-devel@nongnu.org; Thu, 30 Apr 2020 23:04:48 -0400
+Received: from mail-eopbgr80111.outbound.protection.outlook.com
+ ([40.107.8.111]:15219 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jULym-00075z-Mj; Thu, 30 Apr 2020 23:04:45 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=B8cox28/Mq0m5DpsqLJ8qrTgmJcNR7s/PibddCM15sdYxpfP7NTw30dyWZY94CcidiH39Oqixvnwoh6WxAxNmgevCzfWOSFLD3LrRMaKIWjDr3at0C3EFMV3sB7KkamhimmjxfMKuF9FIyy1ogbXCT6S9iiaEddo8JLHIy8kDTUtCJuV6dXRBPsL/hdQiVxE6+g9Cq9LsPyn8+wXr3XTutDdTOAaZKZOTiUkHlBIfxQOO9utrAiXQQNGS58SF2+iCXTvUhbcTMxDz3MeBPuBZwbYj+kK6P4b42tuHhcXT4lhmbUUPuVVEh2Zh48VVf7qXKVHKff1yqUHu9+O7mYvKQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4/OkhOpPVcZHbpyUvwIPzheBTGIM5XIiSCFJzj/uKJo=;
+ b=NSmNe4K/LUQt7BUgMpT1XwriTDMzTHkLiGbYLmShWhoA9c1zjjB88jdosNHmDoY9mLCRdzjZoBvFY4J4PIS0Js1k3Z6NpSk7ZT10UKfsqQd3KxDPKEfNii6XsXygqGX3rf/t5ByPtu8re89tb/qhWl3XGs9DGizmYQJeSl0ew2uTnuzpl4ZWqwq6ew3kSOplGwzgESYgdfX32rrjYlB0Ombl1bAcvNw/d0PW7Sc5ZPaJE3EAjQL5PxQuyDepaZEz0MavzB0TObHbJFcT424lb8VhWyvQ5v95eZj72wouwnm/C5f96yj1y+lvYKeX7sU847DO3TEzLcEhcGEUr2m0Xw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4/OkhOpPVcZHbpyUvwIPzheBTGIM5XIiSCFJzj/uKJo=;
+ b=LFM26EmejidZeHvscCj5pPeBe/aLaCNBRvXDkKZoVeiE1QkkNWA1n4r6ubQug7CHiR3dd1j3KS/9N/9mfbnKlVWFdksED1iW1f0yvsO+oSLPMCgWlQaU/WvnZ8oKAZChfj1RR1kPxB5DthWBUtnVEy9C9HHXQCnPW61Ewm6dwn0=
+Received: from VI1PR0802MB2206.eurprd08.prod.outlook.com
+ (2603:10a6:800:9b::14) by VI1PR0802MB2461.eurprd08.prod.outlook.com
+ (2603:10a6:800:af::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.20; Fri, 1 May
+ 2020 03:04:39 +0000
+Received: from VI1PR0802MB2206.eurprd08.prod.outlook.com
+ ([fe80::5143:32f:9e92:487e]) by VI1PR0802MB2206.eurprd08.prod.outlook.com
+ ([fe80::5143:32f:9e92:487e%6]) with mapi id 15.20.2958.027; Fri, 1 May 2020
+ 03:04:38 +0000
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Max Reitz
+ <mreitz@redhat.com>, qemu block <qemu-block@nongnu.org>
+Subject: Re: backing chain & block status & filters
+Thread-Topic: backing chain & block status & filters
+Thread-Index: AQHWHTrKF3m4/lh9KUS1BIAvNkbR0aiOYCaAgAA+V4CAA222AIAAf+aM
+Date: Fri, 1 May 2020 03:04:38 +0000
+Message-ID: <VI1PR0802MB22061BC34FBEC5953ADBD50DF4AB0@VI1PR0802MB2206.eurprd08.prod.outlook.com>
+References: <a1c1b734-34dc-f8d3-b6a0-43b136e237e2@virtuozzo.com>
+ <20e6c43f-c1a7-57db-58b9-3cb70f0e637f@redhat.com>
+ <c00f089e-44f6-32ee-97ea-0414b552bdae@virtuozzo.com>,
+ <f1220430-1d37-3cc4-0484-3e26fb7e4b84@virtuozzo.com>
+In-Reply-To: <f1220430-1d37-3cc4-0484-3e26fb7e4b84@virtuozzo.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x641.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::641
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: virtuozzo.com; dkim=none (message not signed)
+ header.d=none;virtuozzo.com; dmarc=none action=none
+ header.from=virtuozzo.com;
+x-originating-ip: [176.59.46.65]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 72f07fdf-b64a-4edf-ac38-08d7ed7c62f6
+x-ms-traffictypediagnostic: VI1PR0802MB2461:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <VI1PR0802MB2461C26E894A3EDAFD7AD783F4AB0@VI1PR0802MB2461.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:595;
+x-forefront-prvs: 0390DB4BDA
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 3AWOkaUdVBMWnyckzMeu8GEwvZ1eywi0YAec3oj+O9OeIWRLqKYM3zIzBs3mfC/pfnt4gcyHCvMtVu21guzhYI+MbTKoaT7B99uL9E8CwPfQaQhoVXI0R1F7+COSwFqgaus1V+cVwB47lrNmVNRnb9kJ8k3Wz1cTEZTLPFSJSNuzzmxKIMpDTgKuGo7+LZOsYAVfzT6Uo4jQRJ+plwIM1xSET4j44APMf9BC8GjNHrvi5hQNZ/jynnrqkqmsupf890arZzN0/Mv9BbttF7B9FGI1HkUUyLS/jtrb2Smp3dZ7rGJ0ucs5pQNNy1r+Zn/INsPBwXgkyIzh9BwwztZOGtYgiFY2kzYOCX/IY0RGCn+/vmyYAVm+NpaSaOZCF/B/jzIExrxQ8F4LWMrPmJoQnFC1Vdx1zI1Yau2foRXhuDGTeP9hV98qIJIqh99ngDXg
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:VI1PR0802MB2206.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(376002)(346002)(39850400004)(366004)(396003)(136003)(54906003)(316002)(478600001)(76116006)(86362001)(6506007)(2906002)(66446008)(110136005)(53546011)(64756008)(66556008)(71200400001)(66946007)(4326008)(66476007)(33656002)(44832011)(52536014)(8676002)(5660300002)(8936002)(186003)(26005)(9686003)(55016002)(7696005);
+ DIR:OUT; SFP:1102; 
+x-ms-exchange-antispam-messagedata: ZOYOH2DCO4osYdCcIqUXPeBY7BLOlACH5oVrnbxUbczy7Ebf2YndRM8Qetvr9l2MP4vS9CPHQ9JTQvl5rG55jYnzfVfrVL5fgC3Cj+wKUiP3gc43i+DV6germ/3UX/2v7Q2knpDCltYw9WhZWRvUIaj1j3XOq1gnTGk+JOmmyHaN/bsQgq0NnONboKNkTtjkklJI2Yl1LthhBhiqFJJx1SMndGtaq94JxIPnHoM0orGSMfBW4+AuQyjFQ76+WtW8AT8b+q9bpyluGkV2PN+0xdZHM/5I2Bnq6GVi5K3IChpOLYQ3BSMYiWRDpcMFVjsuwJ8GzgK/HC8hr6hAqpkZDIHuUKXRkcqnrkiZVMcwuyydzTt5PtiID5xBOI3tA9ML594sMR7stMRIPHyKVRSypHWmoiF352KYIo46Bkbxz2/PxaJ0OBjc27lUhe71L424PzKZiQSAlfqlKcj5uGLLLyxEJooSwNFFRoxovzKMVwWFfppdGiId4N5/qcc2pb4nwOdktE8dkEYzv0lET3/6S/m0h6XLDWF+Eecs/ye5r+geBR1eV3moRWnkPdOptjWh0n0XwrYMcydLYz9/mJUrojF8GZUFs3apWXZu3oMXSwP/1Dxehb8Z+LCy9Q1ikgx3L999vk/Iuw4UjyldPKNfZ8xLGaa5g09SfbvKYlVL6E76U2SSqbIO82rLGcpbv32P5KtpcZX3zfNJKVczhFQ2YbBFfUFMm+od/5ZjcEjYznzNMz4BSBlJprzF5kBg4Wf+ShSJoLVQGvCD5e6l5mhz04/HggTWwKCakVvFrfO9KLk=
+Content-Type: multipart/alternative;
+ boundary="_000_VI1PR0802MB22061BC34FBEC5953ADBD50DF4AB0VI1PR0802MB2206_"
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 72f07fdf-b64a-4edf-ac38-08d7ed7c62f6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 May 2020 03:04:38.4886 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: fbBSGkoHA5EVzNNByukrv52W8OXRQLQLUYl5k6O3Buydl5JMBMTuT4diMcTptM9A0YVkCvawup7yaef4H16vbEKOoRVb3NDPoM3rt3Wsjsw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0802MB2461
+Received-SPF: pass client-ip=40.107.8.111;
+ envelope-from=andrey.shinkevich@virtuozzo.com;
+ helo=EUR04-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/04/30 23:04:40
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Received-From: 40.107.8.111
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,59 +125,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/30/20 11:09 AM, Peter Maydell wrote:
-> +    for (pass = 0; pass < (a->q ? 4 : 2); pass++) {
-> +        tmp = neon_load_reg(a->vn, pass);
-> +        tmp2 = neon_load_reg(a->vm, pass);
-> +        abd_fn(tmp, tmp, tmp2);
-> +        tcg_temp_free_i32(tmp2);
-> +        tmp2 = neon_load_reg(a->vd, pass);
-> +        add_fn(tmp, tmp, tmp2);
-> +        tcg_temp_free_i32(tmp2);
-> +        neon_store_reg(a->vd, pass, tmp);
-> +    }
-> +    return true;
-> +}
-> +
-> +static bool trans_VABA_S_3s(DisasContext *s, arg_3same *a)
-> +{
-> +    static NeonGenTwoOpFn * const abd_fns[] = {
-> +        gen_helper_neon_abd_s8,
-> +        gen_helper_neon_abd_s16,
-> +        gen_helper_neon_abd_s32,
-> +    };
-> +    static NeonGenTwoOpFn * const add_fns[] = {
-> +        gen_helper_neon_add_u8,
-> +        gen_helper_neon_add_u16,
-> +        tcg_gen_add_i32,
-> +    };
+--_000_VI1PR0802MB22061BC34FBEC5953ADBD50DF4AB0VI1PR0802MB2206_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-This can be packaged into one operation.  E.g.
+Sounds good to me generally.
+Also, we need to identify the filter by its node name when the file names o=
+f a node and of the filter above it are the same. And what about automatica=
+lly generated node name for the filter? We will want to pass it to the stre=
+am routine.
 
-static void gen_aba_s8(TCGv_i32 d, TCGv_i32 n, TCGv_i32 m)
-{
-    TCGv_i32 t = tcg_temp_new_i32();
+Andrey
 
-    gen_helper_neon_abd_s8(t, n, m);
-    gen_helper_neon_add_u8(d, d, t);
-    tcg_temp_free_i32(t);gen_aba_s8
-}
-
-static const GVecGen3 op = {
-    .fni4 = gen_aba_s8,
-    .load_dest = true
-};
-
-etc.
-
-FWIW, this is one that I've fully converted on my sve2 branch.  aba(n,m,a) =
-max(n,m) - min(n,m) + a -- four fully vectorized operations.  So anything that
-allows a drop-in replacement would be nice.  But whatever is easiest for you.
+________________________________
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Sent: Thursday, April 30, 2020 10:12 PM
+To: Max Reitz <mreitz@redhat.com>; qemu block <qemu-block@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>; qemu-devel <qemu-devel@nongnu.org>; Andr=
+ey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Subject: Re: backing chain & block status & filters
 
 
-r~
+>
+> .... The only difference is that if you use file-child-based filters, you=
+ can't do stream/commit around them. I just think, that binding the concept=
+ to the "backing" link of the node is simpler and more generic. In blockdev=
+ era, when all nodes will be named and libvirt will take care of all nodes =
+including filters, we will not need any filter-skipping magic, libvirt will=
+ directly point to exact nodes it means. And we can deprecate "file" childr=
+en of existing filters, to finally reach simple architecture with simple ba=
+cking chain of nodes (any nodes). And after deprecating old filename-based =
+interfaces, we'll drop all filter-skipping magic..
+
+What do you think?
+
+--
+Best regards,
+Vladimir
+
+--_000_VI1PR0802MB22061BC34FBEC5953ADBD50DF4AB0VI1PR0802MB2206_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
+1">
+</head>
+<body>
+<div>Sounds good to me generally.</div>
+<div>Also, we need to identify the filter by its node name when the file na=
+mes of a node and of the filter above it are the same.&nbsp;<span style=3D"=
+font-family: &quot;Segoe UI WestEuropean&quot;, &quot;Segoe UI&quot;, Helve=
+tica, Arial, sans-serif; font-size: 16px; font-style: normal; font-variant-=
+ligatures: normal; font-variant-caps: normal; font-weight: 400;">And
+ what about automatically generated node name for the filter?</span><span s=
+tyle=3D"font-family: &quot;Segoe UI WestEuropean&quot;, &quot;Segoe UI&quot=
+;, Helvetica, Arial, sans-serif; font-size: 16px; font-style: normal; font-=
+variant-ligatures: normal; font-variant-caps: normal; font-weight: 400;">&n=
+bsp;We
+ will want to pass it to the stream routine.</span></div>
+<div><br>
+</div>
+<div>Andrey</div>
+<div><br>
+</div>
+<hr style=3D"display:inline-block;width:98%" tabindex=3D"-1">
+<div id=3D"divRplyFwdMsg" dir=3D"ltr"><font face=3D"Calibri, sans-serif" st=
+yle=3D"font-size:11pt" color=3D"#000000"><b>From:</b> Vladimir Sementsov-Og=
+ievskiy &lt;vsementsov@virtuozzo.com&gt;<br>
+<b>Sent:</b> Thursday, April 30, 2020 10:12 PM<br>
+<b>To:</b> Max Reitz &lt;mreitz@redhat.com&gt;; qemu block &lt;qemu-block@n=
+ongnu.org&gt;<br>
+<b>Cc:</b> Kevin Wolf &lt;kwolf@redhat.com&gt;; qemu-devel &lt;qemu-devel@n=
+ongnu.org&gt;; Andrey Shinkevich &lt;andrey.shinkevich@virtuozzo.com&gt;<br=
+>
+<b>Subject:</b> Re: backing chain &amp; block status &amp; filters</font>
+<div>&nbsp;</div>
+</div>
+<div class=3D"BodyFragment"><font size=3D"2"><span style=3D"font-size:11pt;=
+">
+<div class=3D"PlainText"><br>
+&gt; <br>
+&gt; .... The only difference is that if you use file-child-based filters, =
+you can't do stream/commit around them. I just think, that binding the conc=
+ept to the &quot;backing&quot; link of the node is simpler and more generic=
+. In blockdev era, when all nodes will be named
+ and libvirt will take care of all nodes including filters, we will not nee=
+d any filter-skipping magic, libvirt will directly point to exact nodes it =
+means. And we can deprecate &quot;file&quot; children of existing filters, =
+to finally reach simple architecture with
+ simple backing chain of nodes (any nodes). And after deprecating old filen=
+ame-based interfaces, we'll drop all filter-skipping magic..<br>
+<br>
+What do you think?<br>
+<br>
+-- <br>
+Best regards,<br>
+Vladimir<br>
+</div>
+</span></font></div>
+</body>
+</html>
+
+--_000_VI1PR0802MB22061BC34FBEC5953ADBD50DF4AB0VI1PR0802MB2206_--
 
