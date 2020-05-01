@@ -2,70 +2,88 @@ Return-Path: <SRS0=uuMl=6P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7055EC4724C
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 07:02:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7CBAC47254
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 07:29:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3AB2020787
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 07:02:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AB2020787
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8AD282071C
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 07:29:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AD282071C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=physnet.uni-hamburg.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUPh1-0001xP-7R
-	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 03:02:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55440)
+	id 1jUQ6t-0005Qz-KO
+	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 03:29:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56614)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jUPfn-0000Vj-Je
- for qemu-devel@nongnu.org; Fri, 01 May 2020 03:01:24 -0400
+ (envelope-from <mhohmann@physnet.uni-hamburg.de>) id 1jUQ6D-0004io-A4
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 03:28:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jUPfl-0008Nz-7D
- for qemu-devel@nongnu.org; Fri, 01 May 2020 03:01:23 -0400
-Resent-Date: Fri, 01 May 2020 03:01:23 -0400
-Resent-Message-Id: <E1jUPfl-0008Nz-7D@eggs.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21315)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jUPfk-0008GQ-LQ
- for qemu-devel@nongnu.org; Fri, 01 May 2020 03:01:20 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1588316475; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=U2xlpRw2dAHno61hmDxz8Nhu6kN6pJ/vX7S1fKg1cN34xGOMDH25Qp0hxoOnX+PotlNlHN9d3L38shjdBJhZpnC6DdRaSgkVL6YFdMULl6gB6WJN2IMwmMCnqjLPbzbAeaoc1bAVjlGFNvPtDvfrwtloZBeQPgU2/s7+505hNv0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1588316475;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=IH38GOTP+RGXh84C8MdnWy2KnJhK7yjW2o/LMvwGiGM=; 
- b=hO0s6Ls3mNMHCM107erqpxCfAUpCv9pEqwCIv9LHuUIV0In92OVBkFqt14MMEQHJyJBgXwqQejRNiCxBRnPOoBFndCdYVvfW3NgTACQ7hLaNvfvsdV8ek7DcBr2JwyEakA0szEbVrIu9ExYDgmoP071ApkdDE05u7UVD8LwVFUk=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 158831647327383.35725997228269;
- Fri, 1 May 2020 00:01:13 -0700 (PDT)
-Message-ID: <158831647220.4471.4518162164537347990@45ef0f9c86ae>
-In-Reply-To: <20200430190122.4592-1-alex.bennee@linaro.org>
-Subject: Re: [PATCH  v1 0/9] gdbstub/next
+ (envelope-from <mhohmann@physnet.uni-hamburg.de>) id 1jUQ6C-00061G-Pz
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 03:28:41 -0400
+Received: from mail.physnet.uni-hamburg.de ([134.100.106.230]:41092)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mhohmann@physnet.uni-hamburg.de>)
+ id 1jUQ6A-0005T0-0C; Fri, 01 May 2020 03:28:38 -0400
+Received: from 227-98-191-90.dyn.estpak.ee ([90.191.98.227]
+ helo=[192.168.1.129]) by mail.physnet.uni-hamburg.de with esmtpsa
+ (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16) (Exim 4.72)
+ (envelope-from <mhohmann@physnet.uni-hamburg.de>)
+ id 1jUQ5z-00013n-4b; Fri, 01 May 2020 09:28:28 +0200
+Subject: Re: [PATCH] hostmem: don't use mbind() if host-nodes is epmty
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+References: <20200430154606.6421-1-imammedo@redhat.com>
+ <949872a1-1d5c-0e44-cab8-02d2e30202a7@redhat.com>
+From: Manuel Hohmann <mhohmann@physnet.uni-hamburg.de>
+Autocrypt: addr=mhohmann@physnet.uni-hamburg.de; prefer-encrypt=mutual;
+ keydata=
+ mQENBEzzkJ0BCACoFEyKwRypWgc6Bbl/t5CRmCq+wnrLqGTji2iB9gHhP/dFisO3bdPjX2bT
+ bZSG48rR7Q999M5NjCX7juQbAKQm5vv3NDBNqq35Q7nSALsEEazy1awbx56EBXPn/5VbH4JT
+ c3sZiQR/MZY81WcWANPxZr3XWOl71netiVNzO5OBZSTxRV7dnB2meYBlhgD7dDzZTfJ8tpqu
+ XlzlaZ+H2QDDt2TH0LYm6rhK2OXDqTCs09BiZi48Ev6YI/DC/RpLNGlVtACV1RB1i+GAKIZJ
+ /E+E1A5wQTG+/wHblFq9PcFJKTJOQvMh3kV/4S4GuQbXoAMVn+6FGIF7mat4Oo+mNjchABEB
+ AAG0ME1hbnVlbCBIb2htYW5uIDxtaG9obWFubkBwaHlzbmV0LnVuaS1oYW1idXJnLmRlPokB
+ OAQTAQIAIgUCTPOQnQIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQ+9/1Gux6RLIN
+ fgf+MHuA2VcJxo/xAvTjfrvmDFgTsepHFlWPKkEdEQY2FSG1dqhAHtEIlEJ0M/6Y0r5cSn+L
+ E8yqW8OWP0aCsd0BTcp+h1t8lIZhx33ZGmOFDxLVcnIq/zyEloRbVZPG05yvKgmc3N3opaw4
+ 8WrdnQ7Q6+iQhY9v+S+BcRyJNDL6cWXZF2uLOvXDAq2Y1lihZSwBXvcQOgQ7nfgJYAveA140
+ fqRmg5e7usL2xq1kaWDvRrxBk/D6kWqLBkvYQrxxflTfsbM4IJP4lmCIfyr0BxY0VOzjZ8Wu
+ SYl9ETJcHSc4zR+s94PnDAlFsZbZHGoXK6YxD6SlyaisT00bqvZXmY8gHbkBDQRM85CdAQgA
+ l90YtA7ak5BUEHw4WPY9AIpfP0IWSI3lQbudSdTcJ2GPx5fE01dd/W1V+7K7VBiDw7m1CjT7
+ qnv5ZPFWIhGCBzxGhi/81NXhnEsHoElJEzea0XY64/7hf+CeM4rrx7CaXjByHDbVfFPQqUEZ
+ yhZhxYChmpCi/5CAvs5sJKFNqTqF6AXFCNdam0iWu1pT2MVhl2RqYQq0rUNVDhlh/v/fPKsM
+ tUqyfXbiXVaG9zcozC7AS6U+0jly9oMsGrz9eCE6uDc3YceTnhUqRvuBzj3wB6hFNXj82T/+
+ 4r60s9zAc2VMi3F0jKBr0+7b+5JOjeraPlvNB0ftCfnFNDGeC0pZAQARAQABiQEfBBgBAgAJ
+ BQJM85CdAhsMAAoJEPvf9RrsekSyMAMH/2gVwokA0EEeF00AO6K9uTukidAflrXYFS+KLKC2
+ oa8uAb2Or6y2OOZeaLmYhbOdRapFCElqjGSMYlBHPFmu10KDUYzNuaVmSULw84e0KzNPCeJG
+ zOF4bGvLY9bv4cp2tMeUNDIvQHsmZ0PE+O9i9cVtuITEjsXxa/62SE1TSnLg3QUUZEvTIIKN
+ ZEoxKIHrxiLVsa5Rd21YDVyShLjK4sa4Tc0PUPpe5yWkET6hVBIw2g15hAO8+qkShbRYg9CH
+ pZQlUIv2wMJqzXV4UaHYzRJcgZZ0YEvNHE/Vstl7GLHk/QtaCxqva6novYYXWK/rMGrK19gw
+ 3dYtCkCgf6rLwTE=
+Organization: University of Tartu
+Message-ID: <dfa7be0a-ded6-4526-9041-d04a699acfd0@physnet.uni-hamburg.de>
+Date: Fri, 1 May 2020 10:28:25 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: alex.bennee@linaro.org
-Date: Fri, 1 May 2020 00:01:13 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/01 02:18:39
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Received-From: 136.143.188.53
+In-Reply-To: <949872a1-1d5c-0e44-cab8-02d2e30202a7@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+ protocol="application/pgp-signature";
+ boundary="wJjZ1bGKfA4EEJRdunlbuRfBkh0BiOcuC"
+Received-SPF: none client-ip=134.100.106.230;
+ envelope-from=mhohmann@physnet.uni-hamburg.de;
+ helo=mail.physnet.uni-hamburg.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/01 03:28:28
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Received-From: 134.100.106.230
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,76 +95,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+ qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDQzMDE5MDEyMi40NTky
-LTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
-YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
-IGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAyMDA0MzAxOTAxMjIuNDU5Mi0xLWFsZXguYmVu
-bmVlQGxpbmFyby5vcmcKU3ViamVjdDogW1BBVENIICB2MSAwLzldIGdkYnN0dWIvbmV4dApUeXBl
-OiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1w
-YXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
-ZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNo
-LnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpGcm9tIGh0dHBz
-Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBw
-YXRjaGV3LzIwMjAwNDMwMTkwMTIyLjQ1OTItMS1hbGV4LmJlbm5lZUBsaW5hcm8ub3JnIC0+IHBh
-dGNoZXcvMjAyMDA0MzAxOTAxMjIuNDU5Mi0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcKU3dpdGNo
-ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpjYmVhYTAxIHRhcmdldC9tNjhrOiBmaXggZ2RiIGZv
-ciBtNjh4eHgKMGVmOWZjNCB0ZXN0cy90Y2c6IGFkZCBhIG11bHRpYXJjaCBsaW51eC11c2VyIGdk
-YiB0ZXN0CjJlYWVmNTkgdGVzdHMvZ3Vlc3QtZGVidWc6IHVzZSB0aGUgdW5peCBzb2NrZXQgZm9y
-IGxpbnV4LXVzZXIgdGVzdHMKYzA2MzViYyBnZGJzdHViL2xpbnV4LXVzZXI6IHN1cHBvcnQgZGVi
-dWdnaW5nIG92ZXIgYSB1bml4IHNvY2tldApiYzdmYmRhIGdkYnN0dWI6IGVsaW1pbmF0ZSBnZGJz
-ZXJ2ZXJfZmQgZ2xvYmFsCjlmYzViMWYgdGVzdHMvdGNnOiBkcm9wIGluZmVyaW9yLndhc19hdHRh
-Y2hlZCgpIHRlc3QKZDVhYmMxYSB0ZXN0cy90Y2c6IGJldHRlciB0cmFwIGdkYiBmYWlsdXJlcwo0
-M2FiMTAxIGdkYnN0dWI6IEludHJvZHVjZSBnZGJfZ2V0X2Zsb2F0NjQoKSB0byBnZXQgNjQtYml0
-IGZsb2F0IHJlZ2lzdGVycwpiMjA4NWIzIGNvbmZpZ3VyZTogZmF2b3VyIGdkYi1tdWx0aWFyY2gg
-aWYgd2UgaGF2ZSBpdAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS85IENoZWNraW5nIGNvbW1pdCBi
-MjA4NWIzMzYzNzIgKGNvbmZpZ3VyZTogZmF2b3VyIGdkYi1tdWx0aWFyY2ggaWYgd2UgaGF2ZSBp
-dCkKMi85IENoZWNraW5nIGNvbW1pdCA0M2FiMTAxYWUwNTcgKGdkYnN0dWI6IEludHJvZHVjZSBn
-ZGJfZ2V0X2Zsb2F0NjQoKSB0byBnZXQgNjQtYml0IGZsb2F0IHJlZ2lzdGVycykKMy85IENoZWNr
-aW5nIGNvbW1pdCBkNWFiYzFhMTAyMTEgKHRlc3RzL3RjZzogYmV0dGVyIHRyYXAgZ2RiIGZhaWx1
-cmVzKQo0LzkgQ2hlY2tpbmcgY29tbWl0IDlmYzViMWY1NmZiZCAodGVzdHMvdGNnOiBkcm9wIGlu
-ZmVyaW9yLndhc19hdHRhY2hlZCgpIHRlc3QpCjUvOSBDaGVja2luZyBjb21taXQgYmM3ZmJkYTlm
-N2U0IChnZGJzdHViOiBlbGltaW5hdGUgZ2Ric2VydmVyX2ZkIGdsb2JhbCkKRVJST1I6IHN1c3Bl
-Y3QgY29kZSBpbmRlbnQgZm9yIGNvbmRpdGlvbmFsIHN0YXRlbWVudHMgKDIsIDYpCiMzNDogRklM
-RTogZ2Ric3R1Yi5jOjI5NjU6CisgIGlmIChnZGJzZXJ2ZXJfc3RhdGUuZmQgPCAwKSB7CiAgICAg
-ICByZXR1cm47Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDc0IGxpbmVzIGNoZWNrZWQK
-ClBhdGNoIDUvOSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNi85IENoZWNraW5nIGNvbW1p
-dCBjMDYzNWJjM2IwZTAgKGdkYnN0dWIvbGludXgtdXNlcjogc3VwcG9ydCBkZWJ1Z2dpbmcgb3Zl
-ciBhIHVuaXggc29ja2V0KQpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9u
-YWwgc3RhdGVtZW50cyAoMiwgNikKIzY3OiBGSUxFOiBnZGJzdHViLmM6Mjk2NjoKKyAgaWYgKGdk
-YnNlcnZlcl9zdGF0ZS5zb2NrZXRfcGF0aCkgeworICAgICAgdW5saW5rKGdkYnNlcnZlcl9zdGF0
-ZS5zb2NrZXRfcGF0aCk7CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoZSBvcGVuIHBh
-cmVudGhlc2lzICcoJwojOTM6IEZJTEU6IGdkYnN0dWIuYzozMDg4OgorICAgIGZvcig7OykgewoK
-dG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAyMjAgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNi85
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo3LzkgQ2hlY2tpbmcgY29tbWl0IDJlYWVmNTk0
-M2NhNiAodGVzdHMvZ3Vlc3QtZGVidWc6IHVzZSB0aGUgdW5peCBzb2NrZXQgZm9yIGxpbnV4LXVz
-ZXIgdGVzdHMpCjgvOSBDaGVja2luZyBjb21taXQgMGVmOWZjNGU0N2E5ICh0ZXN0cy90Y2c6IGFk
-ZCBhIG11bHRpYXJjaCBsaW51eC11c2VyIGdkYiB0ZXN0KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQg
-b3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM3NTog
-Cm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDEyNCBs
-aW5lcyBjaGVja2VkCgpQYXRjaCA4LzkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOS85IENo
-ZWNraW5nIGNvbW1pdCBjYmVhYTAxNDUyMGIgKHRhcmdldC9tNjhrOiBmaXggZ2RiIGZvciBtNjh4
-eHgpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRB
-SU5FUlMgbmVlZCB1cGRhdGluZz8KIzUxOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAw
-IGVycm9ycywgMSB3YXJuaW5ncywgMTA1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDkvOSBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0
-ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0
-Y2hldy5vcmcvbG9ncy8yMDIwMDQzMDE5MDEyMi40NTkyLTEtYWxleC5iZW5uZWVAbGluYXJvLm9y
-Zy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
-dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
-bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wJjZ1bGKfA4EEJRdunlbuRfBkh0BiOcuC
+Content-Type: multipart/mixed; boundary="QSTfVxnx1TY7zSZbwdE6wqxeVtPHp1EuO"
+
+--QSTfVxnx1TY7zSZbwdE6wqxeVtPHp1EuO
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+Thanks! I applied the patch, and now it works also inside the docker cont=
+ainer, for all architectures (i386, x86_64, arm, aarch64) for which I hav=
+e test cases at hand.
+
+Indeed, since the container is configured by a public cloud service, ther=
+e is no possibility to change any security settings. Disabling mbind unle=
+ss explicitly requested seems to be the best way to go here.
+
+On 30.04.20 19:42, Philippe Mathieu-Daud=C3=A9 wrote:
+> Typo "empty" in patch subject.
+>=20
+> On 4/30/20 5:46 PM, Igor Mammedov wrote:
+>> Since 5.0 QEMU uses hostmem backend for allocating main guest RAM.
+>> The backend however calls mbind() which is typically NOP
+>> in case of default policy/absent host-nodes bitmap.
+>> However when runing in container with black-listed mbind()
+>> syscall, QEMU fails to start with error
+>> =C2=A0 "cannot bind memory to host NUMA nodes: Operation not permitted=
+"
+>> even when user hasn't provided host-nodes to pin to explictly
+>> (which is the case with -m option)
+>>
+>> To fix issue, call mbind() only in case when user has provided
+>> host-nodes explicitly (i.e. host_nodes bitmap is not empty).
+>> That should allow to run QEMU in containers with black-listed
+>> mbind() without memory pinning. If QEMU provided memory-pinning
+>> is required user still has to white-list mbind() in container
+>> configuration.
+>>
+>> Reported-by: Manuel Hohmann <mhohmann@physnet.uni-hamburg.de>
+>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>> ---
+>> CC: berrange@redhat.com
+>> CC: ehabkost@redhat.com
+>> CC: pbonzini@redhat.com
+>> CC: mhohmann@physnet.uni-hamburg.de
+>> CC: qemu-stable@nongnu.org
+>> ---
+>> =C2=A0 backends/hostmem.c | 6 ++++--
+>> =C2=A0 1 file changed, 4 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/backends/hostmem.c b/backends/hostmem.c
+>> index 327f9eebc3..0efd7b7bd6 100644
+>> --- a/backends/hostmem.c
+>> +++ b/backends/hostmem.c
+>> @@ -383,8 +383,10 @@ host_memory_backend_memory_complete(UserCreatable=
+ *uc, Error **errp)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(sizeof(b=
+ackend->host_nodes) >=3D
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 BITS_TO_LONGS(MAX_NODES + 1) * sizeof(unsigned l=
+ong));
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(maxnode =
+<=3D MAX_NODES);
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (mbind(ptr, sz, backend=
+->policy,
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 maxnode ? backend->host_nodes : NULL, m=
+axnode + 1, flags)) {
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (maxnode &&
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mb=
+ind(ptr, sz, backend->policy, backend->host_nodes, maxnode + 1,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 flags)) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 if (backend->policy !=3D MPOL_DEFAULT || errno !=3D ENOSYS) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg_errno(errp, errno,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "cannot bind me=
+mory to host NUMA nodes");
+>>
+>=20
+
+
+--QSTfVxnx1TY7zSZbwdE6wqxeVtPHp1EuO--
+
+--wJjZ1bGKfA4EEJRdunlbuRfBkh0BiOcuC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEGQ1wnDd/ca3CjRdj+9/1Gux6RLIFAl6rz5kACgkQ+9/1Gux6
+RLJwfQgAprfTtTMCxTfwVd1WqThZFb6jXknn1Wp5eQWN0C+thxRLGUhzTGaOIs6f
+GV8fuw2Tt1NqlWzAKAV+V5gIDH8y8mE06Je9woXOOq6VfOurMvMyq2sdEFJtdKIk
+rMxf5YrU+BsShDRYP3GBl/NWHOo5fqLTcizeVsWW3pLYLs18O8UdzsGtVTxlypkb
+2Jo2PCgq5r/4Keo2olF5H0WqArQ9m7ivPqkF4UxveDdZinagkWta395LJYtKbk+m
+ngpVGmuJsdnJ9J+pptQ+2CFZiflpcevX5k8UufClVqkbA4iC6lW+e6fbGrSLAcoG
+B4q0ls5s+D0T5T6PTlBVz/oboo40og==
+=HlMq
+-----END PGP SIGNATURE-----
+
+--wJjZ1bGKfA4EEJRdunlbuRfBkh0BiOcuC--
 
