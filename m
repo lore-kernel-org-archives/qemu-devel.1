@@ -2,93 +2,94 @@ Return-Path: <SRS0=uuMl=6P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 668A0C47258
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 19:08:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98C37C4724C
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 19:10:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E21732173E
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 19:08:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gOqhIg9m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E21732173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6BBD0216FD
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 19:10:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BBD0216FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUb14-0006hL-Sn
-	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 15:08:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59320)
+	id 1jUb3N-00008T-LC
+	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 15:10:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59776)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jUb0T-0006Hx-UH
- for qemu-devel@nongnu.org; Fri, 01 May 2020 15:07:30 -0400
+ (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
+ id 1jUb2a-0007i9-37
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 15:09:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jUb0T-0004kP-12
- for qemu-devel@nongnu.org; Fri, 01 May 2020 15:07:29 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33345)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jUb0S-0004kF-Fk
- for qemu-devel@nongnu.org; Fri, 01 May 2020 15:07:28 -0400
-Received: by mail-wr1-x442.google.com with SMTP id h9so2247770wrt.0
- for <qemu-devel@nongnu.org>; Fri, 01 May 2020 12:07:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=fdYMQH8BUcdxvJui/Hnkz67KcK+wlHxC+ZKj7VwyVi0=;
- b=gOqhIg9mwh6J2mM8T7JYNHIf1akMWQeVaYhUva08ffVKeDhPxAOs3TUDDskb1mtXVo
- /LTr9c6Yv8VFlhFmJPwqemf/7Spk051BevS/JPO0+lqu7Zd4ogQN116yZFIPuUm/l7Av
- NZOm7bols39ZP7H8duYfkw+3mR7907049IQPCHXhAf0lcDgYWvofKqCpDtZfe5PE8k+k
- NdiGXS7qmFBOsd9bWq66f6B+z3j0QRYpcj5xBBwKtpaTNB1SmFPzNgeJ/wBIYLnGAtyB
- XCZ4ZFqohPXSKxT0yHE0FfTTQTxUcv2KgII+qgRTUaJfaFu8nWiqNGS0+ywL6r37rCdL
- FgYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=fdYMQH8BUcdxvJui/Hnkz67KcK+wlHxC+ZKj7VwyVi0=;
- b=BV1KI6aslA8a8uyZFdSobmP09FCXyON6I/UfIfIeYOueK7SrX5hEeyURF/2fXBeEv1
- Kq4qKn7DZ/e37cWaZBtmuPnYZ6S73j5VfVzrXQOLyQ6WlCImY3KqvV8IOzYndFDDtY4e
- jwgpHsidNkSSa0C+jdTD65Mgw9Y/AZg0w6UfH9uVElYvgoneVJmYfbMj75kCPsAcumgq
- vzVVp7UM2JyIPUCXEXhDljTW1jIyRm3RiHE/NvQyKqKnW4dDXOSm2FdaMwiPelEKHDNV
- K6PobjGaum+TNYPKJK3+M+WSLd0+F12tIQA4VDtV169ozzZ7faeVinTbDi1BU3rYBvHq
- rhXg==
-X-Gm-Message-State: AGi0PubOQ4p4frBKFZivcw7O8kyXR02sMxQKJbu9EoYhiZl6Wi/JHPdX
- nA2P3tf3OXlWz/S9USdy2UM1nqX+C5s=
-X-Google-Smtp-Source: APiQypIH1MUm/yZGORi7Yanhr8UqIQw+yGKFRRmVDvOkjjyU/PntxcLsnXV/wCpeVPnyRQ5dgpRbtQ==
-X-Received: by 2002:adf:ab09:: with SMTP id q9mr5375920wrc.240.1588360045658; 
- Fri, 01 May 2020 12:07:25 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id g69sm820041wmg.17.2020.05.01.12.07.24
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 01 May 2020 12:07:24 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 92EE11FF7E;
- Fri,  1 May 2020 20:07:23 +0100 (BST)
-References: <alpine.DEB.2.21.2005010038260.30535@digraph.polyomino.org.uk>
-User-agent: mu4e 1.4.1; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Joseph Myers <joseph@codesourcery.com>
-Subject: Re: [PATCH 3/4] softfloat: fix floatx80 pseudo-denormal comparisons
-In-reply-to: <alpine.DEB.2.21.2005010038260.30535@digraph.polyomino.org.uk>
-Date: Fri, 01 May 2020 20:07:23 +0100
-Message-ID: <87d07niidw.fsf@linaro.org>
+ (envelope-from <dbuono@linux.vnet.ibm.com>) id 1jUb2Z-0007GY-GF
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 15:09:39 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:18396
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
+ id 1jUb2X-0007DH-Sk; Fri, 01 May 2020 15:09:37 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 041J26JF136832; Fri, 1 May 2020 15:09:32 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 30r5cn6k05-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 01 May 2020 15:09:32 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 041J0buY018795;
+ Fri, 1 May 2020 19:09:31 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com
+ (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+ by ppma03dal.us.ibm.com with ESMTP id 30mcu8d7x1-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 01 May 2020 19:09:31 +0000
+Received: from b03ledav003.gho.boulder.ibm.com
+ (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+ by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 041J9UHZ52887848
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 1 May 2020 19:09:30 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A4D9C6A051;
+ Fri,  1 May 2020 19:09:30 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 0721A6A04F;
+ Fri,  1 May 2020 19:09:29 +0000 (GMT)
+Received: from Buonos-Thinkpad-X1.ibm.com (unknown [9.160.6.38])
+ by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Fri,  1 May 2020 19:09:29 +0000 (GMT)
+From: Daniele Buono <dbuono@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/1] target-ppc: fix rlwimi, rlwinm, rlwnm for Clang-9
+Date: Fri,  1 May 2020 15:09:13 -0400
+Message-Id: <20200501190913.25008-2-dbuono@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200501190913.25008-1-dbuono@linux.vnet.ibm.com>
+References: <20200501190913.25008-1-dbuono@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::442
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-05-01_11:2020-05-01,
+ 2020-05-01 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 clxscore=1015
+ impostorscore=0 lowpriorityscore=0 mlxscore=0 suspectscore=3 bulkscore=0
+ priorityscore=1501 mlxlogscore=818 malwarescore=0 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2005010140
+Received-SPF: none client-ip=148.163.158.5;
+ envelope-from=dbuono@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/01 15:09:36
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,102 +101,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, dbuono@us.ibm.com,
+ Daniele Buono <dbuono@linux.vnet.ibm.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Starting with Clang v9, -Wtype-limits is implemented and triggers a
+few "result of comparison is always true" errors when compiling PPC32
+targets.
 
-Joseph Myers <joseph@codesourcery.com> writes:
+The comparisons seem to be necessary only on PPC64, since the
+else branch in PPC32 only has a "g_assert_not_reached();" in all cases.
 
-> The softfloat floatx80 comparisons fail to allow for pseudo-denormals,
-> which should compare equal to corresponding values with biased
-> exponent 1 rather than 0.  Add an adjustment for that case when
-> comparing numbers with the same sign.
->
-> Note that this fix only changes floatx80_compare_internal, not the
-> other more specific comparison operations.  That is the only
-> comparison function for floatx80 used in the i386 port, which is the
-> only supported port with these pseudo-denormal semantics.
+This patch restructures the code so that PPC32 does not execute the
+check, while PPC64 works like before
 
-Again I can't see anything that triggers this although I noticed
-le_quiet has been fixed in the meantime. lt_quiet still fails with:
+Signed-off-by: Daniele Buono <dbuono@linux.vnet.ibm.com>
+---
+ target/ppc/translate.c | 34 +++++++++++++++++++---------------
+ 1 file changed, 19 insertions(+), 15 deletions(-)
 
-  ./fp-test -s -l 2 -r all  extF80_lt_quiet
-  >> Testing extF80_lt_quiet
-  59535872 tests total.
-  Errors found in extF80_lt_quiet:
-  +0000.0000000000000000  +0000.0000000000000000  =3D> 1 .....  expected 0 =
-.....
-  +0000.0000000000000000  -0000.0000000000000000  =3D> 1 .....  expected 0 =
-.....
-  +0000.0000000000000001  +0000.0000000000000001  =3D> 1 .....  expected 0 =
-.....
-  +0000.0000000000000002  +0000.0000000000000002  =3D> 1 .....  expected 0 =
-.....
-  +0000.0000000000000004  +0000.0000000000000004  =3D> 1 .....  expected 0 =
-.....
-  +0000.0000000000000008  +0000.0000000000000008  =3D> 1 .....  expected 0 =
-.....
-  +0000.0000000000000010  +0000.0000000000000010  =3D> 1 .....  expected 0 =
-.....
-  +0000.0000000000000020  +0000.0000000000000020  =3D> 1 .....  expected 0 =
-.....
-  +0000.0000000000000040  +0000.0000000000000040  =3D> 1 .....  expected 0 =
-.....
-  +0000.0000000000000080  +0000.0000000000000080  =3D> 1 .....  expected 0 =
-.....
-  +0000.0000000000000100  +0000.0000000000000100  =3D> 1 .....  expected 0 =
-.....
-  +0000.0000000000000200  +0000.0000000000000200  =3D> 1 .....  expected 0 =
-.....
-  +0000.0000000000000400  +0000.0000000000000400  =3D> 1 .....  expected 0 =
-.....
-  +0000.0000000000000800  +0000.0000000000000800  =3D> 1 .....  expected 0 =
-.....
-  +0000.0000000000001000  +0000.0000000000001000  =3D> 1 .....  expected 0 =
-.....
-  +0000.0000000000002000  +0000.0000000000002000  =3D> 1 .....  expected 0 =
-.....
-  +0000.0000000000004000  +0000.0000000000004000  =3D> 1 .....  expected 0 =
-.....
-  +0000.0000000000008000  +0000.0000000000008000  =3D> 1 .....  expected 0 =
-.....
-  +0000.0000000000010000  +0000.0000000000010000  =3D> 1 .....  expected 0 =
-.....
-  +0000.0000000000020000  +0000.0000000000020000  =3D> 1 .....  expected 0 =
-.....
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 807d14faaa..9400fa2c7c 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -1882,6 +1882,7 @@ static void gen_rlwimi(DisasContext *ctx)
+         tcg_gen_deposit_tl(t_ra, t_ra, t_rs, sh, me - mb + 1);
+     } else {
+         target_ulong mask;
++        TCGv_i32 t0;
+         TCGv t1;
+ 
+ #if defined(TARGET_PPC64)
+@@ -1891,20 +1892,20 @@ static void gen_rlwimi(DisasContext *ctx)
+         mask = MASK(mb, me);
+ 
+         t1 = tcg_temp_new();
++#if defined(TARGET_PPC64)
+         if (mask <= 0xffffffffu) {
+-            TCGv_i32 t0 = tcg_temp_new_i32();
++#endif
++            t0 = tcg_temp_new_i32();
+             tcg_gen_trunc_tl_i32(t0, t_rs);
+             tcg_gen_rotli_i32(t0, t0, sh);
+             tcg_gen_extu_i32_tl(t1, t0);
+             tcg_temp_free_i32(t0);
+-        } else {
+ #if defined(TARGET_PPC64)
++        } else {
+             tcg_gen_deposit_i64(t1, t_rs, t_rs, 32, 32);
+             tcg_gen_rotli_i64(t1, t1, sh);
+-#else
+-            g_assert_not_reached();
+-#endif
+         }
++#endif
+ 
+         tcg_gen_andi_tl(t1, t1, mask);
+         tcg_gen_andi_tl(t_ra, t_ra, ~mask);
+@@ -1938,7 +1939,9 @@ static void gen_rlwinm(DisasContext *ctx)
+         me += 32;
+ #endif
+         mask = MASK(mb, me);
++#if defined(TARGET_PPC64)
+         if (mask <= 0xffffffffu) {
++#endif
+             if (sh == 0) {
+                 tcg_gen_andi_tl(t_ra, t_rs, mask);
+             } else {
+@@ -1949,15 +1952,13 @@ static void gen_rlwinm(DisasContext *ctx)
+                 tcg_gen_extu_i32_tl(t_ra, t0);
+                 tcg_temp_free_i32(t0);
+             }
+-        } else {
+ #if defined(TARGET_PPC64)
++        } else {
+             tcg_gen_deposit_i64(t_ra, t_rs, t_rs, 32, 32);
+             tcg_gen_rotli_i64(t_ra, t_ra, sh);
+             tcg_gen_andi_i64(t_ra, t_ra, mask);
+-#else
+-            g_assert_not_reached();
+-#endif
+         }
++#endif
+     }
+     if (unlikely(Rc(ctx->opcode) != 0)) {
+         gen_set_Rc0(ctx, t_ra);
+@@ -1972,6 +1973,9 @@ static void gen_rlwnm(DisasContext *ctx)
+     TCGv t_rb = cpu_gpr[rB(ctx->opcode)];
+     uint32_t mb = MB(ctx->opcode);
+     uint32_t me = ME(ctx->opcode);
++    TCGv_i32 t0;
++    TCGv_i32 t1;
++
+     target_ulong mask;
+ 
+ #if defined(TARGET_PPC64)
+@@ -1980,9 +1984,11 @@ static void gen_rlwnm(DisasContext *ctx)
+ #endif
+     mask = MASK(mb, me);
+ 
++#if defined(TARGET_PPC64)
+     if (mask <= 0xffffffffu) {
+-        TCGv_i32 t0 = tcg_temp_new_i32();
+-        TCGv_i32 t1 = tcg_temp_new_i32();
++#endif
++        t0 = tcg_temp_new_i32();
++        t1 = tcg_temp_new_i32();
+         tcg_gen_trunc_tl_i32(t0, t_rb);
+         tcg_gen_trunc_tl_i32(t1, t_rs);
+         tcg_gen_andi_i32(t0, t0, 0x1f);
+@@ -1990,17 +1996,15 @@ static void gen_rlwnm(DisasContext *ctx)
+         tcg_gen_extu_i32_tl(t_ra, t1);
+         tcg_temp_free_i32(t0);
+         tcg_temp_free_i32(t1);
+-    } else {
+ #if defined(TARGET_PPC64)
++    } else {
+         TCGv_i64 t0 = tcg_temp_new_i64();
+         tcg_gen_andi_i64(t0, t_rb, 0x1f);
+         tcg_gen_deposit_i64(t_ra, t_rs, t_rs, 32, 32);
+         tcg_gen_rotl_i64(t_ra, t_ra, t0);
+         tcg_temp_free_i64(t0);
+-#else
+-        g_assert_not_reached();
+-#endif
+     }
++#endif
+ 
+     tcg_gen_andi_tl(t_ra, t_ra, mask);
+ 
+-- 
+2.26.2
 
-
->
-> Signed-off-by: Joseph Myers <joseph@codesourcery.com>
-> ---
->  fpu/softfloat.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-> index 6094d267b5..8e9c714e6f 100644
-> --- a/fpu/softfloat.c
-> +++ b/fpu/softfloat.c
-> @@ -7966,6 +7966,11 @@ static inline int floatx80_compare_internal(floatx=
-80 a, floatx80 b,
->              return 1 - (2 * aSign);
->          }
->      } else {
-> +        /* Normalize pseudo-denormals before comparison.  */
-> +        if ((a.high & 0x7fff) =3D=3D 0 && a.low & UINT64_C(0x80000000000=
-00000))
-> +            ++a.high;
-> +        if ((b.high & 0x7fff) =3D=3D 0 && b.low & UINT64_C(0x80000000000=
-00000))
-> +            ++b.high;
->          if (a.low =3D=3D b.low && a.high =3D=3D b.high) {
->              return float_relation_equal;
->          } else {
-> --=20
-> 2.17.1
-
-
---=20
-Alex Benn=C3=A9e
 
