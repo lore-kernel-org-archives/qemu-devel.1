@@ -2,95 +2,75 @@ Return-Path: <SRS0=uuMl=6P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7AC0C35280
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 20:50:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78C01C35280
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 21:03:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1776208DB
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 20:50:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qhYZaDc0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1776208DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 49010208C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 May 2020 21:03:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49010208C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codesourcery.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUcc4-0007tU-Pp
-	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 16:50:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60110)
+	id 1jUcoV-00011j-DA
+	for qemu-devel@archiver.kernel.org; Fri, 01 May 2020 17:03:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35724)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jUcbL-0007IT-FB
- for qemu-devel@nongnu.org; Fri, 01 May 2020 16:49:40 -0400
+ (Exim 4.90_1) (envelope-from <joseph_myers@mentor.com>)
+ id 1jUcn6-0000B3-LN
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 17:01:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jUcbK-00013R-FC
- for qemu-devel@nongnu.org; Fri, 01 May 2020 16:49:39 -0400
-Received: from mail-pj1-x1030.google.com ([2607:f8b0:4864:20::1030]:40454)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jUcbJ-0000yk-4J
- for qemu-devel@nongnu.org; Fri, 01 May 2020 16:49:37 -0400
-Received: by mail-pj1-x1030.google.com with SMTP id fu13so364289pjb.5
- for <qemu-devel@nongnu.org>; Fri, 01 May 2020 13:49:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=bqA2N5qHSaN/96S8uEIJQDu9eWAHmE6V0JwP/OcECjY=;
- b=qhYZaDc0/BmUe4vt7UgMVEx8CPh1C76witNeOIjjSQ1jIWvJHw0U1jlNAqPQewc7h/
- AkE4AMoQev7x/IM4CG2fZSZ22aZdIwcsa39KTAduqyAG9mHKRCm0nkG8Ds6YjeQRS8Rm
- rMwQbFvtw5bPWAuWBzspQVzJdiyGrcDseh8tU5i5DYGwZFLeVATAEpvE1crt8RkxrY+j
- j3jC1We04itQDobFjcPDwIfwZYtpCGlKEruJy8tU+ixqFaqB4wfuTu4PNge2ZI37ImPz
- KDVP9L2lmzegOgcWjitUMUZYlV8Z4s4rbqjTA18z6PEIroknGWhm3Viz0EEm35KaNJS6
- 8pJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=bqA2N5qHSaN/96S8uEIJQDu9eWAHmE6V0JwP/OcECjY=;
- b=Pk6jaZLz4u+lAYeRJBY1+m7dHAKpmIwpLL6r7ARhJbNNCgbzlfHpl9UqkfMLhF6T51
- ZcRWTwWuTGgQmkJRNUfN++6CKjXPnroTH/4dIpKc/sBKCNRB49JYEO2uqIFalG5Ju1Tx
- u15KhKgQQRo/Mx/7hoi3BYrtp1Dq3HQ//HELorOK8ECUrvShjrNZtvgfnPjJ+9psT41g
- sO1V+Qt3U5CXmg21bWnFbkq1L5Vl7SBmsRR3lJZt7nDHnMF00mJdMAVIaQ9y012KMTYe
- ZqzeCxdi8DMk/MHaxfsRnforhNWA85WMuGkiX1f8GEkbllNiJbxGMtJb1JmuQ6PeP9uz
- MhcQ==
-X-Gm-Message-State: AGi0PuZG3AOjGFmq/wzQ3QyvyVTlXUVwbL6L2WufizgSJr1mv0uncQpy
- Z+AKJVMWP5lYCJNLyjNu0jiYpg==
-X-Google-Smtp-Source: APiQypKCAQYZie/ubHR94HCJbq0Wpo7UA+ZDl6GgXc8s8A8blQm54SInWNVl9oXbP//MjmBYrRD7oA==
-X-Received: by 2002:a17:902:bd87:: with SMTP id
- q7mr6255497pls.92.1588366175112; 
- Fri, 01 May 2020 13:49:35 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id s44sm442145pjc.28.2020.05.01.13.49.33
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 01 May 2020 13:49:34 -0700 (PDT)
-Subject: Re: An first try to improve PPC float simulation, not even compiled.
- Just ask question.
-To: luoyonggang@gmail.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <CAE2XoE-XFG8r85yPOhuNS2YUMqhp70q1RXCy+KLT79doW8qHMg@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <87605674-1cd8-2074-6730-355e20fbf7d0@linaro.org>
-Date: Fri, 1 May 2020 13:49:32 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (envelope-from <joseph_myers@mentor.com>) id 1jUcn5-00083c-5K
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 17:01:47 -0400
+Received: from esa1.mentor.iphmx.com ([68.232.129.153]:30978)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <joseph_myers@mentor.com>)
+ id 1jUcn4-00080j-CZ
+ for qemu-devel@nongnu.org; Fri, 01 May 2020 17:01:46 -0400
+IronPort-SDR: 04s/GsWxUiZvJ3CrA6iy18EQPiZmuDQx2Nb8o/FnstpmaHzL+hPpnRNgbok20P7fz2zS6YtRtp
+ LXpGmVzhVu8lfhS293FSHZw4hssKJRxCrDdfHWubbCJGBp199GlSSkTSbHiGWJadAbIXh2XlSM
+ K50YMnBZOxTkSWHz/zL7CGHZO0DBE+SaPDUwT7wDKvIj9kLr3ZhTRQIu6Q9BhAO3T/C7mryWtr
+ ZMrglX5u0F+nXPNAIhvK1F9jv5/jpkMAWifqFpytrJYIp9u+5Y/NkCfy9xpCsMVbHG7rUrC5Kr
+ yO4=
+X-IronPort-AV: E=Sophos;i="5.73,341,1583222400"; d="scan'208";a="50452113"
+Received: from orw-gwy-02-in.mentorg.com ([192.94.38.167])
+ by esa1.mentor.iphmx.com with ESMTP; 01 May 2020 13:01:43 -0800
+IronPort-SDR: 97nCcGhWd+6LdvBBN+e5F5t7tbE4XzmEzbGtN6J/uWCUJuGyAeaF47v1OeIt3hN2GGHkA96HS9
+ KE0Cv4NFaqBPcTI/R7y5Jo0lJ/l5uQi4ux6CB1dnKCoc4IcWMZb0W69fGVUBD3TF0T2io3MFNt
+ 6yxsUhF5pZNh0MSpC0Fn7xU+6V2imPLXxJ8IRHydIq5i/39R6uQR9LATlfZgyKF72NDeaIGDdm
+ x1CrE8tCtBu4tWPX4rRxhQp4ZnWqNGnNeqz8N1CsWtUCPHquIJtc9D4OKaoohKcEHm5mehU8Il
+ s+E=
+Date: Fri, 1 May 2020 21:01:37 +0000
+From: Joseph Myers <joseph@codesourcery.com>
+X-X-Sender: jsm28@digraph.polyomino.org.uk
+To: =?ISO-8859-15?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH 3/4] softfloat: fix floatx80 pseudo-denormal
+ comparisons
+In-Reply-To: <87a72rih9x.fsf@linaro.org>
+Message-ID: <alpine.DEB.2.21.2005012046280.26026@digraph.polyomino.org.uk>
+References: <alpine.DEB.2.21.2005010038260.30535@digraph.polyomino.org.uk>
+ <87d07niidw.fsf@linaro.org>
+ <alpine.DEB.2.21.2005011911420.26026@digraph.polyomino.org.uk>
+ <87a72rih9x.fsf@linaro.org>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-In-Reply-To: <CAE2XoE-XFG8r85yPOhuNS2YUMqhp70q1RXCy+KLT79doW8qHMg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1030;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1030.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2607:f8b0:4864:20::1030
+Content-Type: multipart/mixed;
+ boundary="-1152306461-208732417-1588366897=:26026"
+X-Originating-IP: [137.202.0.90]
+X-ClientProxiedBy: svr-ies-mbx-02.mgc.mentorg.com (139.181.222.2) To
+ svr-ies-mbx-01.mgc.mentorg.com (139.181.222.1)
+Received-SPF: pass client-ip=68.232.129.153;
+ envelope-from=joseph_myers@mentor.com; helo=esa1.mentor.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/01 15:12:59
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Received-From: 68.232.129.153
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,20 +82,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/1/20 1:04 PM, 罗勇刚(Yonggang Luo) wrote:
-> And  fp_status can not represent all the  Invalid Operation Exception flags.
-> What I need to do to represent all the  Invalid Operation Exception
+---1152306461-208732417-1588366897=:26026
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8BIT
 
-Ideally, we add them to include/fpu/softfloat-types.h, expand the
-float_exception_flags field in float_status to match, and generate the new
-flags in fpu/softfloat.c.
+On Fri, 1 May 2020, Alex Bennée wrote:
 
-This would actually help target/tricore as well.
+> OK - so these only turn up in i386?
 
+Patch 1, silencing sNaN, is about generic semantics of IEEE floating-point 
+conversions (which are implemented correctly in various other cases in 
+QEMU), and would be equally applicable to m68k (I believe, without having 
+m68k hardware to test).
 
-r~
+Patches 2 and 3 are i386-specific (just like everything in the existing 
+softfloat code relating to floatx80 subnormals), because m68k interprets 
+biased exponent zero differently.
+
+Patch 4 would apply equally to m68k, because all that matters there is 
+that a certain representation is a small nonzero value, not exactly what 
+value it is.
+
+None of these apply to any other architectures supported by QEMU.
+
+> We have two tests currently (float_convs and float_madds) which
+> currently exercise the various combinations of limits and NaN types
+> using some common float_helpers.c support. Maybe extend it for have a
+> table of the various ext80 types and write a i386 only test case to
+> exercise the functions you fixed?
+
+It seems to me that appropriate tests would be entirely i386-specific (in 
+tests/tcg/i386?).  How are such tests supposed to signal success or 
+failure, since all the tests currently there seem to exit with status 0 
+unconditionally?
+
+I do have a test I'm using to check these fixes (in C code for convenience 
+of implementation, with only a little inline asm), but it's not suitable 
+for inclusion as-is, since it includes many tests that currently fail 
+(e.g. for exceptions generated, since the i386 floating-point support in 
+QEMU currently discards exceptions from the softfloat code; one of the 
+things I intend to fix but haven't yet).  It also doesn't yet cover all 
+the problems I think I've found so far in the floating-point support in 
+the i386 port (at least ten such bugs beyond the ones fixed in the present 
+patch series).  And it might well depend on details of compiler code 
+generation to test some of the bugs effectively.
+
+-- 
+Joseph S. Myers
+joseph@codesourcery.com
+---1152306461-208732417-1588366897=:26026--
 
