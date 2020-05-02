@@ -6,76 +6,80 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A6B5C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Sat,  2 May 2020 05:19:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F6C2C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Sat,  2 May 2020 05:48:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CECA20787
-	for <qemu-devel@archiver.kernel.org>; Sat,  2 May 2020 05:19:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3604E21775
+	for <qemu-devel@archiver.kernel.org>; Sat,  2 May 2020 05:48:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F61lgG5K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CECA20787
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BxBS12N3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3604E21775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUkZ9-0000vV-5X
-	for qemu-devel@archiver.kernel.org; Sat, 02 May 2020 01:19:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60504)
+	id 1jUl0V-0005Vg-At
+	for qemu-devel@archiver.kernel.org; Sat, 02 May 2020 01:48:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38080)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jUkYW-00088x-M3
- for qemu-devel@nongnu.org; Sat, 02 May 2020 01:19:17 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jUkzn-0003Nw-R8
+ for qemu-devel@nongnu.org; Sat, 02 May 2020 01:47:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jUkVJ-00080B-9L
- for qemu-devel@nongnu.org; Sat, 02 May 2020 01:19:15 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25140
+ (envelope-from <armbru@redhat.com>) id 1jUkzm-0004Et-DR
+ for qemu-devel@nongnu.org; Sat, 02 May 2020 01:47:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59755
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jUkVI-0007zW-My
- for qemu-devel@nongnu.org; Sat, 02 May 2020 01:15:56 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jUkzl-0004EZ-TL
+ for qemu-devel@nongnu.org; Sat, 02 May 2020 01:47:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588396554;
+ s=mimecast20190719; t=1588398444;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=dGsy1sMgRtjbWdFSz4jj96jZ5CccIUHPBlycQV5XQHs=;
- b=F61lgG5K37Hu7HGcUi5U5B0pIW2+F+y3itoEdDH6uxj2l91avDQ/fBdaqjLI8YZCXU7uYH
- m3c5PKVPplKy0KJzGDzleyyMvgb8pntThuQXPcNgy8PZCk58/kk8wCX4Ywr5jNsLxMBg+y
- 0gzshWZhVZ4FoMYyoQhFqLZx76jXH5E=
+ bh=0YmqIadLU7xFa40KlmxmvWlPqbfaLd1zR64KZ1eZE5Q=;
+ b=BxBS12N3vcaPWRVRRMUZ7lXGVbLaPqgUdoN2X0T9eJHIClharAsSAsXC9QYIMxO/dBP5e6
+ dxSoMX9tPvysfyBHD+SpSO+Nreaf53lGvXBXJbPI+u18+7jiUGcCgOAxqsmYjGizwmMrZS
+ z+kVwnUr4F9XaftxmscKrXvPNOQbZRY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-11-PilJGHq7Oae5SA4km8J4oA-1; Sat, 02 May 2020 01:15:52 -0400
-X-MC-Unique: PilJGHq7Oae5SA4km8J4oA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-253-ML5WbolXNMOO3D8Nrbm5GA-1; Sat, 02 May 2020 01:47:22 -0400
+X-MC-Unique: ML5WbolXNMOO3D8Nrbm5GA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BDF56800685;
- Sat,  2 May 2020 05:15:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 76D4C107ACCD;
+ Sat,  2 May 2020 05:47:21 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E86550F6D;
- Sat,  2 May 2020 05:15:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7FA632B4D7;
+ Sat,  2 May 2020 05:47:18 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 1075D11358BC; Sat,  2 May 2020 07:15:46 +0200 (CEST)
+ id D91CF11358BC; Sat,  2 May 2020 07:47:16 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: Re: [PATCH 08/17] s390x/cpumodel: Fix UI to CPU features
- pcc-cmac-{aes, eaes}-256
-References: <20200428163419.4483-1-armbru@redhat.com>
- <20200428163419.4483-9-armbru@redhat.com>
- <7ed42e2f-e437-3d06-e46b-5416e4d2a6d3@redhat.com>
- <29392c1a-ec17-b846-b842-5bc2f07382e6@de.ibm.com>
- <ac471bdd-675a-e620-d34a-56eabaa8c9af@de.ibm.com>
-Date: Sat, 02 May 2020 07:15:46 +0200
-In-Reply-To: <ac471bdd-675a-e620-d34a-56eabaa8c9af@de.ibm.com> (Christian
- Borntraeger's message of "Thu, 30 Apr 2020 20:47:08 +0200")
-Message-ID: <87sggi6hod.fsf@dusky.pond.sub.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Subject: Re: Configuring onboard devices
+References: <87mu6uia5i.fsf@dusky.pond.sub.org>
+ <20200429155719.GL1495129@redhat.com>
+ <87k11xh2kq.fsf@dusky.pond.sub.org>
+ <CAFEAcA9-oxkMD-kJ1z12d4K1S_Jaz7Wj6_38Ah7ChSaBfQNkkA@mail.gmail.com>
+ <87tv11e1en.fsf_-_@dusky.pond.sub.org>
+ <51a4e9ea-eca3-6c1d-a753-86c5810ac094@ilande.co.uk>
+ <874kt1dpw7.fsf@dusky.pond.sub.org>
+ <c1fa0770-a07f-e5bc-9db8-6af0576c365f@ilande.co.uk>
+ <877dxxc862.fsf@dusky.pond.sub.org>
+ <0b745eed-841e-8879-c320-3166e2a46953@ilande.co.uk>
+Date: Sat, 02 May 2020 07:47:16 +0200
+In-Reply-To: <0b745eed-841e-8879-c320-3166e2a46953@ilande.co.uk> (Mark
+ Cave-Ayland's message of "Thu, 30 Apr 2020 17:56:04 +0100")
+Message-ID: <87imhe6g7v.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain
@@ -96,75 +100,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, ehabkost@redhat.com,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- qemu-s390x@nongnu.org, pbonzini@redhat.com,
- Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Christian Borntraeger <borntraeger@de.ibm.com> writes:
+Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
 
-> On 29.04.20 10:54, Christian Borntraeger wrote:
->>=20
->>=20
->> On 28.04.20 19:13, David Hildenbrand wrote:
->>> On 28.04.20 18:34, Markus Armbruster wrote:
->>>> Both s390_features[S390_FEAT_PCC_CMAC_AES_256].name and
->>>> s390_features[S390_FEAT_PCC_CMAC_EAES_256].name is
->>>> "pcc-cmac-eaes-256".  The former is obviously a pasto.
->>>>
->>>> Impact:
->>>>
->>>> * s390_feat_bitmap_to_ascii() misidentifies S390_FEAT_PCC_CMAC_AES_256
->>>>   as "pcc-cmac-eaes-256".  Affects QMP commands query-cpu-definitions,
->>>>   query-cpu-model-expansion, query-cpu-model-baseline,
->>>>   query-cpu-model-comparison, and the error message when
->>>>   s390_realize_cpu_model() fails in check_compatibility().
->>>>
->>>> * s390_realize_cpu_model() misidentifies it in check_consistency()
->>>>   warnings.
->>>>
->>>> * s390_cpu_list() likewise.  Affects -cpu help.
->>>>
->>>> * s390_cpu_model_register_props() creates CPU property
->>>>   "pcc-cmac-eaes-256" twice.  The second one fails, but the error is
->>>>   ignored (a later commit will change that).  Results in a single
->>>>   property "pcc-cmac-eaes-256" with the description for
->>>>   S390_FEAT_PCC_CMAC_AES_256, and no property for
->>>>   S390_FEAT_PCC_CMAC_EAES_256.  CPU properties are visible in CLI -cpu
->>>>   and -device, QMP & HMP device_add, QMP device-list-properties, and
->>>>   QOM introspection.
->>>>
->>>> Fix by deleting the wayward 'e'.
->>>
->>> Very nice catch - thanks!
->>>
->>> While this sounds very bad, it's luckily not that bad in practice
->>> (currently).
->>>
->>> The feature (or rather, both features) is part of the feature group
->>> "msa4". As long as we have all sub-features part of that group (which i=
-s
->>> usually the case), we will always indicate "msa4" to the user, instead
->>> of all the separate sub-features. So, expansion, baseline, comparison
->>> will usually only work with "msa4".
->>>
->>> (in addition, current KVM is not capable of actually masking off these
->>> sub-features, so it will still, always see the feature, even if not
->>> explicitly specified via "-cpu X,pcc-cmac-aes-256=3Don)
->>>
->>> I think we should do stable backports.
->>=20
->> makes sense, but I would like to do some testing upfront (old QEMU <-> n=
-ew QEMU
+> On 30/04/2020 16:20, Markus Armbruster wrote:
 >
-> So migration does work between a qemu with and without the patch for host=
--model and
-> custom model=3Dz14.=20
+>>> Ah I see now, these aliases are for individual properties rather than o=
+bjects. What I
+>>> was trying to ask was if it were possible to have something like this:
+>>>
+>>> /machine (SS-5-machine)
+>>>   /builtin
+>>>     /nic0 -> link to "lance" device
+>>>
+>>> Here nic0 is an alias "published" by the maintainer of the SS-5 machine=
+ which is
+>>> configured in the machine init() function using object_property_add_lin=
+k() or a
+>>> suitable wrapper. Users can then configure these builtin devices from t=
+he command
+>>> line using your -machine nic0.netdev=3Dmy-netdev-id syntax or similar.
+>>=20
+>> Got it now, thanks!
+>>=20
+>>> Having the default devices under /builtin or other known QOM path would=
+ enable
+>>> builtin devices to be easily enumerated programatically and/or from the=
+ command line
+>>> as required.
+>>=20
+>> There are three standard containers under /machine/:
+>>=20
+>> * /machine/peripheral/
+>>=20
+>>   Devices with a user-specified ID go here, as /machine/peripheral/ID.
+>>   User-specified means -device or device_add.
+>>=20
+>>   /machine/peripheral/ID is effectively a stable interface.  It's just
+>>   underdocumented (undocumented?).
+>>=20
+>>   To be useful, the stuff below ID/ needed to be stable and documented,
+>>   too.
+>>=20
+>> * /machine/peripheral-anon/
+>>=20
+>>   Same, but user elected not to give an ID.
+>>   /machine/peripheral-anon/device[N], where N counts up from zero in
+>>   creation order.
+>>=20
+>>   N is obviously not stable, but this is a problem of the user's making.
+>>   If you want to refer to a device, give it an ID.
+>>=20
+>> * /machine/unattached/
+>>=20
+>>   The orphanage.  When a device has no parent when its realized, it gets
+>>   put here, as /machine/unattached/device[N], where N counts up from
+>>   zero in realization order.
+>>=20
+>>   N is obviously not stable, and this time we can't blame the
+>>   victim^Wuser.  You can search for devices of a certain type.
+>>   Sometimes that's good enough.
+>>=20
+>>   All the onboard devices are here, and much more.  We've fathered a lot
+>>   of unloved red-headed children, it seems...
+>>=20
+>>   Some of the "much more" is due to sloppy modelling, i.e. neglecting to
+>>   set the proper parent.
+>>=20
+>>   I figure we could put onboard devices in a nicer place, with nicer
+>>   names.  Need a convention for the place and the names, then make board
+>>   code conform to it.
+>
+> That's good, it seems that this is already fairly close to how it works f=
+or -device
+> at the moment.
+>
+> I don't think that it is possible to come up a single place for on-board =
+devices to
+> live directly though. Going back to one of my first examples: wiring up a=
+ chardev to
+> a serial port on the macio device. To me it makes sense for that to exist=
+ in QOM
+> under /machine/pci-bus/mac-io/escc. In contrast an in-built NIC could liv=
+e under
+> /machine/pci-bus/in-built/nic, and placing one or both of these devices d=
+irectly
+> under /machine/foo doesn't feel intuitive.
 
-Is this a Tested-by?
+I'm not familiar with this machine.  You make me suspect the serial
+thingy is a component of a larger device.
+
+Properly modelled, a composite device has its components as children.
+These appear below their parent in the QOM composition tree.
+
+Example: a "serial-isa" device has a "serial" component.  When the
+former is at /machine/unattached/device[28]/, the latter is at
+/machine/unattached/device[28]/serial/.
+
+I guess that's what you want for macio's serial port.
+
+Counter-example: a "isa-super-io" device has compoenents of type
+"isa-parallel", "isa-serial", "isa-fdc", "i8042", "isa-ide".
+Nevertheless, these appear next to their parent in /machine/unattached/.
+I'm still too much of a QOM ignoramus to explain why that's so.  Paolo,
+can you?
+
+> AFAIK as per your ARM virt example I believe it is only possible to regis=
+ter an alias
+> for a property rather than for an Object? The ultimate aim would be for
+> object_resolve_path("/machine/builtin/nic0") and
+> object_resolve_path("/machine/pci-bus/in-built/nic") to return the same O=
+bject, and
+> for the aliases on built-in devices to be children of /machine/builtin to=
+ allow easy
+> iteration and introspection.
+
+Paolo, could link properties achieve that?
+
+Mark, I guess you want the alias / link from builtin/nic0 to the actual
+place to simplify configuration: the user then needs to know less about
+the board.  Correct?
 
 
