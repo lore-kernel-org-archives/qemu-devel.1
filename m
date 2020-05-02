@@ -2,89 +2,117 @@ Return-Path: <SRS0=t3yw=6Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA635C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Sat,  2 May 2020 06:28:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E63BC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Sat,  2 May 2020 08:39:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E4B721775
-	for <qemu-devel@archiver.kernel.org>; Sat,  2 May 2020 06:28:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VgjBKDyl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E4B721775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 093F9208DB
+	for <qemu-devel@archiver.kernel.org>; Sat,  2 May 2020 08:39:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 093F9208DB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUldH-0003F4-Hy
-	for qemu-devel@archiver.kernel.org; Sat, 02 May 2020 02:28:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45566)
+	id 1jUngE-0002bu-5h
+	for qemu-devel@archiver.kernel.org; Sat, 02 May 2020 04:39:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45170)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jUlcd-0001KV-0N
- for qemu-devel@nongnu.org; Sat, 02 May 2020 02:27:35 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jUnfQ-00024P-Hd
+ for qemu-devel@nongnu.org; Sat, 02 May 2020 04:38:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jUlbq-00063m-47
- for qemu-devel@nongnu.org; Sat, 02 May 2020 02:27:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33871
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jUlbp-0005zk-Kg
- for qemu-devel@nongnu.org; Sat, 02 May 2020 02:26:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588400804;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=icbzzeJgFpzjqBnzqfwNArE0/TauMADlli3cEM92VVY=;
- b=VgjBKDylNGwI7XKYAw4y2/m0J4W2g3wOxTxHGlpLyHZMIrhBd8F17cKyDQG9XHZ5mGB+9F
- sj9dggAWTosvyAC/PIBmH3BB2zUq3Hy0E90GtFlNK46R233k5m5EAhSKDeettrvv7wf2RK
- qVSFytkn9rZo+e1DPth6abSG0gtV/q8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-149-AII0NWlUMtaB6vLnmtvnMg-1; Sat, 02 May 2020 02:26:40 -0400
-X-MC-Unique: AII0NWlUMtaB6vLnmtvnMg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B970C80572D;
- Sat,  2 May 2020 06:26:38 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E33865C1BE;
- Sat,  2 May 2020 06:26:35 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 74CEF11358BC; Sat,  2 May 2020 08:26:34 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH 08/17] s390x/cpumodel: Fix UI to CPU features
- pcc-cmac-{aes, eaes}-256
-References: <20200428163419.4483-1-armbru@redhat.com>
- <20200428163419.4483-9-armbru@redhat.com>
- <7ed42e2f-e437-3d06-e46b-5416e4d2a6d3@redhat.com>
- <874kt0bzq8.fsf@dusky.pond.sub.org>
- <83638290-f00e-7d50-225b-efee0179ff9c@redhat.com>
-Date: Sat, 02 May 2020 08:26:34 +0200
-In-Reply-To: <83638290-f00e-7d50-225b-efee0179ff9c@redhat.com> (David
- Hildenbrand's message of "Fri, 1 May 2020 11:06:14 +0200")
-Message-ID: <87368i6eed.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <laurent@vivier.eu>) id 1jUnfQ-0001mE-5l
+ for qemu-devel@nongnu.org; Sat, 02 May 2020 04:38:36 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:38087)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1jUnfO-0001kl-E5; Sat, 02 May 2020 04:38:34 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MK3BO-1jjjWC3bBe-00LU67; Sat, 02 May 2020 10:38:31 +0200
+Subject: Re: [PATCH] linux-user/mmap.c: fix integer underflow in target_mremap
+To: Jonathan Marler <johnnymarler@gmail.com>, qemu-trivial@nongnu.org,
+ QEMU Developers <qemu-devel@nongnu.org>
+References: <20200502074901.30784-1-johnnymarler@gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <fb7daa98-f403-6388-0958-c0d821efe835@vivier.eu>
+Date: Sat, 2 May 2020 10:38:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/02 01:06:45
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Received-From: 207.211.31.120
+In-Reply-To: <20200502074901.30784-1-johnnymarler@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:m4CHxuDOrUAY8mmcev/SsSRZArRlLKHd5Hc9by4ZaCVgYdi+Ytm
+ M3Q8xBuX2Xg3rrSbeGlvdlpA4gHC4yv6wsabMmd41AGTnjiOKPqExBt7pBzQ0TYcmWJlhPf
+ C7oSu2BWzTSA94zR+3qCsLasGJvC4oLtMqNQ4dL9xSH9omKxVkTSHL48hAJ5Calzp0jsr+z
+ JvHnIASCCDgzSnNqWUoiw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:oSj/Cz+bL5I=:kNLMpyUwKvejmVNeSnuOQH
+ Bzct+Qb6ogAGyUgcxTFVVI8r0F5NQ/MGnwI+04qNCI5zpMkKhFfCKIT2xtqC9q6mxl9ReWrFH
+ I6Ckf6nYer8s5SfZS4uUSwsZgiznaDm9wcCv8163yLlPGhSghJPvP9EvGcnfYQZzmEr7lDOgM
+ p4GAabkgfiH7L26vMlt8ZH3IOugQX6QrRow9H0L+pQ5Hte3Dp06Q+HNWSSYVnikp+zeHPsgBh
+ RZw6NxgmkH5yUcUSrGJD1GuZnqaiS3TQjmSoqPuBY7yTccHBVnRaf51KyuOeTdjNOQGz/kp5C
+ il2uemWUOp2WHg2+gGo8S4oX1papWqV1qqaOWwRiT3DoFSn3rVEQI0NesfxFfCK7Jc7AZX8dM
+ kEU8YPRZ4x73aWdkbHl94E+LeezAjNTyhY5arCLLXdmB1a6u081PCtaXBuZQQPda+smKGcGXv
+ QCarrczyE8YrWgnHDRF6xbiU5JPbgOmelChKrvPLq2xe+njvWR/PZREcQv5vLHgkZfEo3aUd2
+ yOWRkQa05y7St7LH0EINswKRGZAYL+eTxmd4ZN8HDP0vWbjG814+5h1bmdr1r3EfgQArIZmhL
+ DyUgOtiNNOK7OgLuHkQvA6JLJUWOTlK3wvSayTi3qvrHgkpQYiJaUBE5JRITEb4PBq2ZZko7v
+ 6bBCACasBjy983oo6lKD4jmUQvxwd1AdHC14tRKiNj3qMiZ61K7InrenNVRdEWoR3e6lxAlgk
+ Z6uwD/YIkBT7USigtgX/g++KcKmkx9X71zTi4TdtCb5SVDwkZblB04yMwktlb6YSeo81GOf5F
+ nMyXfHRifJwM7HUWzUp7lJEsE5KNIwA0Cx1gjbJCc46OqeYr/a56exx0Yvkb8KmwQzxynPQ
+Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/02 04:38:32
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Received-From: 212.227.126.133
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,91 +124,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, ehabkost@redhat.com, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-David Hildenbrand <david@redhat.com> writes:
+Hi,
 
-> On 30.04.20 20:22, Markus Armbruster wrote:
->> David Hildenbrand <david@redhat.com> writes:
->>=20
->>> On 28.04.20 18:34, Markus Armbruster wrote:
->>>> Both s390_features[S390_FEAT_PCC_CMAC_AES_256].name and
->>>> s390_features[S390_FEAT_PCC_CMAC_EAES_256].name is
->>>> "pcc-cmac-eaes-256".  The former is obviously a pasto.
->>>>
->>>> Impact:
->>>>
->>>> * s390_feat_bitmap_to_ascii() misidentifies S390_FEAT_PCC_CMAC_AES_256
->>>>   as "pcc-cmac-eaes-256".  Affects QMP commands query-cpu-definitions,
->>>>   query-cpu-model-expansion, query-cpu-model-baseline,
->>>>   query-cpu-model-comparison, and the error message when
->>>>   s390_realize_cpu_model() fails in check_compatibility().
->>>>
->>>> * s390_realize_cpu_model() misidentifies it in check_consistency()
->>>>   warnings.
->>>>
->>>> * s390_cpu_list() likewise.  Affects -cpu help.
->>>>
->>>> * s390_cpu_model_register_props() creates CPU property
->>>>   "pcc-cmac-eaes-256" twice.  The second one fails, but the error is
->>>>   ignored (a later commit will change that).  Results in a single
->>>>   property "pcc-cmac-eaes-256" with the description for
->>>>   S390_FEAT_PCC_CMAC_AES_256, and no property for
->>>>   S390_FEAT_PCC_CMAC_EAES_256.  CPU properties are visible in CLI -cpu
->>>>   and -device, QMP & HMP device_add, QMP device-list-properties, and
->>>>   QOM introspection.
->>>>
->>>> Fix by deleting the wayward 'e'.
->>>
->>> Very nice catch - thanks!
->>=20
->> :)
->>=20
->>> While this sounds very bad, it's luckily not that bad in practice
->>> (currently).
->>>
->>> The feature (or rather, both features) is part of the feature group
->>> "msa4". As long as we have all sub-features part of that group (which i=
-s
->>> usually the case), we will always indicate "msa4" to the user, instead
->>> of all the separate sub-features. So, expansion, baseline, comparison
->>> will usually only work with "msa4".
->>>
->>> (in addition, current KVM is not capable of actually masking off these
->>> sub-features, so it will still, always see the feature, even if not
->>> explicitly specified via "-cpu X,pcc-cmac-aes-256=3Don)
->>=20
->> Would you like to propose an commit message improvements?
->
-> Maybe something like
->
-> "Both affected features are part of the feature group msa4. In current
-> setups, we will always see the msa4 feature instead of the separate
-> contained sub-features (because all sub-features are around). Therefore,
-> both features are currently never passed from/to the user explicitly
-> (e.g., via cpu model expansion, comparison, baseline and '-cpu' setup)."
->
-> Thanks!
+does this patch replace your previous one?
 
-I think I can guess how this could work for reporting features (I
-haven't checked my guess against the code), which is what the
-query-cpu-model-* do: suppress individual features when their group is
-complete.
+Please add more details in the description, as you did in the launchpad bug.
 
-But "'-cpu' setup" doesn't seem to be about reporting features.  Am I
-confused?
+You can also add:
+Fixes: https://bugs.launchpad.net/bugs/1876373
 
-While testing, I noticed that
+You must also send the patch to qemu-devel@nongnu.org
 
-    $ s390x-softmmu/qemu-system-s390x
+Thanks,
+Laurent
 
-flashes a window at me, then terminates successfully, without printing
-anything.  With -S, it behaves like other targets.  Bug?
+Le 02/05/2020 à 09:49, Jonathan Marler a écrit :
+> Signed-off-by: Jonathan Marler <johnnymarler@gmail.com>
+> ---
+>  linux-user/mmap.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+> index e378033797..caab62909e 100644
+> --- a/linux-user/mmap.c
+> +++ b/linux-user/mmap.c
+> @@ -708,7 +708,7 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
+>          if (prot == 0) {
+>              host_addr = mremap(g2h(old_addr), old_size, new_size, flags);
+>              if (host_addr != MAP_FAILED && reserved_va && old_size > new_size) {
+> -                mmap_reserve(old_addr + old_size, new_size - old_size);
+> +                mmap_reserve(old_addr + old_size, old_size - new_size);
+>              }
+>          } else {
+>              errno = ENOMEM;
+> 
 
 
