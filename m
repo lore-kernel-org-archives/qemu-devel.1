@@ -2,89 +2,85 @@ Return-Path: <SRS0=t3yw=6Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50233C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Sat,  2 May 2020 05:55:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A4F9C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Sat,  2 May 2020 06:07:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 166E1208DB
-	for <qemu-devel@archiver.kernel.org>; Sat,  2 May 2020 05:55:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ECF172137B
+	for <qemu-devel@archiver.kernel.org>; Sat,  2 May 2020 06:07:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IxfmHZkV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 166E1208DB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hlI8qw3+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECF172137B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUl7u-0001Ox-75
-	for qemu-devel@archiver.kernel.org; Sat, 02 May 2020 01:55:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40226)
+	id 1jUlJ4-0007Mn-0l
+	for qemu-devel@archiver.kernel.org; Sat, 02 May 2020 02:07:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41600)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jUl73-0000Ju-K1
- for qemu-devel@nongnu.org; Sat, 02 May 2020 01:54:58 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jUlIO-0006N6-Gu
+ for qemu-devel@nongnu.org; Sat, 02 May 2020 02:06:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jUl72-0003vm-TA
- for qemu-devel@nongnu.org; Sat, 02 May 2020 01:54:57 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44031
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1jUlEv-0005DT-3U
+ for qemu-devel@nongnu.org; Sat, 02 May 2020 02:06:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21794
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jUl72-0003o2-G4
- for qemu-devel@nongnu.org; Sat, 02 May 2020 01:54:56 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jUlEu-0005DM-M1
+ for qemu-devel@nongnu.org; Sat, 02 May 2020 02:03:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588398895;
+ s=mimecast20190719; t=1588399383;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Lxd5LKupkRTW85DpH9u8F/CYKFOkTjPf9t3lyAR6r9w=;
- b=IxfmHZkVU25JtNjZitair9ZUUPjkZvgiXo5T7Dx0c/yV5zcTQdtT/DhOeplFLiMcgt7svH
- pzXvDAUB20d+GVfkF/Ch1Pw5aIzCyV47FgvmWPmW3YbKOR+Xt+jeJLgxo6csAco/N8j4KK
- HiRrQlK6hiKiRsUlI49XKkj/AK/wuWg=
+ bh=/xoTNJ3k/HqkTYQk7gJBN/zKC/e3kYW2nnY5/KQcPaY=;
+ b=hlI8qw3+O+ZPcBXAZYGpXUsst5MWhgmYHZmGC8MqYXWJZdvDO2dg6tOXXZpoSgtCY0sJE3
+ Ji/aqMw0A++JXflqxRxDqiUqR2CTPdHcsy0QVdoGmPEair+gihRQzaf5wQPMwst5NwDjX+
+ thXiJnSVoewHAzZnsLo7Wngpbcr3Dqg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-PrudPX7mOQeYqc6tYmhhxw-1; Sat, 02 May 2020 01:54:48 -0400
-X-MC-Unique: PrudPX7mOQeYqc6tYmhhxw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-198-zZVFs2zbNYa6TU58QXJL1A-1; Sat, 02 May 2020 02:02:46 -0400
+X-MC-Unique: zZVFs2zbNYa6TU58QXJL1A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 79478107ACF3;
- Sat,  2 May 2020 05:54:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40C9F19200C0;
+ Sat,  2 May 2020 06:02:45 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3257C600E5;
- Sat,  2 May 2020 05:54:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B52405C1BE;
+ Sat,  2 May 2020 06:02:44 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id AFF4311358BC; Sat,  2 May 2020 07:54:42 +0200 (CEST)
+ id 2F40F11358BC; Sat,  2 May 2020 08:02:43 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH 4/4] scripts/qmp: Fix QEMU Python scripts path
-References: <20200421094216.24927-1-f4bug@amsat.org>
- <20200421094216.24927-5-f4bug@amsat.org>
- <395d7263-c4f0-7422-0355-7e082135f6cd@redhat.com>
- <878sidimxu.fsf@dusky.pond.sub.org>
- <21ffc136-7905-e0aa-bad2-8d980fd15349@redhat.com>
-Date: Sat, 02 May 2020 07:54:42 +0200
-In-Reply-To: <21ffc136-7905-e0aa-bad2-8d980fd15349@redhat.com> (John Snow's
- message of "Thu, 30 Apr 2020 13:56:11 -0400")
-Message-ID: <87ees26fvh.fsf@dusky.pond.sub.org>
+To: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [RFC PATCH] qom: Implement qom-get HMP command
+References: <20200407114449.482532-1-clg@kaod.org>
+Date: Sat, 02 May 2020 08:02:43 +0200
+In-Reply-To: <20200407114449.482532-1-clg@kaod.org> (=?utf-8?Q?=22C=C3=A9d?=
+ =?utf-8?Q?ric?= Le Goater"'s
+ message of "Tue, 7 Apr 2020 13:44:49 +0200")
+Message-ID: <87a72q6fi4.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/02 01:54:53
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/02 02:03:03
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,127 +92,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org,
- Alex =?utf-8?Q?B?= =?utf-8?Q?enn=C3=A9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: "Daniel P . =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-John Snow <jsnow@redhat.com> writes:
+C=C3=A9dric Le Goater <clg@kaod.org> writes:
 
-> On 4/30/20 1:04 AM, Markus Armbruster wrote:
->> John Snow <jsnow@redhat.com> writes:
->>=20
->>> On 4/21/20 5:42 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->>>> QEMU Python scripts have been moved in commit 8f8fd9edba4 ("Introduce
->>>> Python module structure"). Use the same sys.path modification used
->>>> in the referenced commit to be able to use these scripts again.
->>>>
->>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>>> ---
->>>>  scripts/qmp/qmp      | 4 +++-
->>>>  scripts/qmp/qom-fuse | 4 +++-
->>>>  scripts/qmp/qom-get  | 4 +++-
->>>>  scripts/qmp/qom-list | 4 +++-
->>>>  scripts/qmp/qom-set  | 4 +++-
->>>>  scripts/qmp/qom-tree | 4 +++-
->>>>  6 files changed, 18 insertions(+), 6 deletions(-)
->>>>
->>>> diff --git a/scripts/qmp/qmp b/scripts/qmp/qmp
->>>> index 0625fc2aba..8e52e4a54d 100755
->>>> --- a/scripts/qmp/qmp
->>>> +++ b/scripts/qmp/qmp
->>>> @@ -11,7 +11,9 @@
->>>>  # See the COPYING file in the top-level directory.
->>>> =20
->>>>  import sys, os
->>>> -from qmp import QEMUMonitorProtocol
->>>> +
->>>> +sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', '=
-python'))
->>>> +from qemu.qmp import QEMUMonitorProtocol
->>>> =20
->>>
->>> Try to avoid using sys.path hacks; they don't work in pylint or mypy an=
-d
->>> it provides an active barrier to CQA work here.
->>> (They also tend to be quite fragile.)
->>>
->>> We can discuss the right way to do this; one of those ways is to create
->>> an installable package that we can install locally in a virtual environ=
-ment.
->>>
->>> Another way is perhaps to set PYTHONPATH in the calling environment so
->>> that standard "import" directives will work.
->>>
->>> Both ultimately involve changing the environment of the user to
->>> accommodate the script.
->>=20
->> For what it's worth, tests/Makefile.involve does the latter for
->> tests/qapi-schema/test-qapi.py.  Simple enough, but makes manual
->> invocation inconvenient.
->>=20
->> Not necessary for scripts/qapi-gen.py, because its "import qmp.FOO"
->> finds qmp right in scripts/qmp/.
->>=20
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >
-> Yes, using "proper" package hierarchies often means the loss of being
-> able to invoke the scripts directly, unless you are careful to organize
-> the package such that the scripts can run both in an "unpackaged" and a
-> "packaged" mode.
+> Reimplement it based on qmp_qom_get() to avoid converting QObjects back
+> to strings.
 >
-> It can be done, but it's tricky and can be prone to error. Let's take a
-> look at how to do it!
+> Inspired-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Andreas F=C3=A4rber <afaerber@suse.de>
 >
-> Let's imagine we have an honest-to-goodness QAPI parser module. In
-> isolation, the layout for such a package would probably look like this:
+> Slight fix for bit-rot:
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> [clg: updates for QEMU 5.0 ]
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
 >
-> qapi.git/
->   setup.py
->   qapi-gen.py
->   README.rst
->   qapi/
->     __init__.py
->     parser.py
->     schema.py
->     ...etc
->
->
-> Now, anything inside of qapi/ is considered the "qapi module" and you
-> will be unable to directly execute anything inside of this folder,
-> unless it does not depend on anything else in the "qapi module".
->
-> i.e. "import qapi.x" will work, but only from the executing context of a
-> thread that understands how to find "qapi". If you are IN this
-> directory, you do not have that context, so those directives will not wor=
-k.
->
-> Python imports are always handled relative to the importing file, not
-> the imported file.
->
-> qapi-gen in the parent directory, however, can use "from qapi import
-> parser" without any problem, because if you are executing it directly,
-> it will be able to see the "qapi module" as a folder.
+>  I would like to restart the discussion on qom-get command to understand
+>  what was the conclusion and see if things have changed since.
 
-Hmm...
+I've since learned more about QOM.  I believe we should do HMP qom-get,
+but not quite like this patch does.  Let me explain.
 
-    $ git-grep '^from.*schema' scripts/
-    scripts/qapi-gen.py:from qapi.schema import QAPIError, QAPISchema
-    scripts/qapi/events.py:from qapi.schema import QAPISchemaEnumMember
-    scripts/qapi/gen.py:from qapi.schema import QAPISchemaVisitor
-    scripts/qapi/introspect.py:from qapi.schema import (QAPISchemaArrayType=
-, QAPISchemaBuiltinType,
-    scripts/qapi/types.py:from qapi.schema import QAPISchemaEnumMember, QAP=
-ISchemaObjectType
-    scripts/qapi/visit.py:from qapi.schema import QAPISchemaObjectType
+A QOM property has ->get() and ->set() methods to expose the property
+via the Visitor interface.
 
-How come importing from qapi. works in scripts/qapi/*.py, too?
+->get() works with an output visitor.  With the QObject output visitor,
+you can get the property value as a QObject.  QMP qom-get uses this.
+With the string output visitor, you can get it as a string.  Your
+proposed HMP qom-get uses this.
 
-[...]
+->set() works with an input visitor.  With the QObject input visitor,
+you can set the property value from a QObject.  QMP qom-set uses this.
+With the string input visitor, you can set it from a string.  HMP
+qom-set uses this.  With the options visitor, you can set it from a
+QemuOpts.  CLI -object uses this.
+
+The Visitor interface supports arbitrary QAPI types.  The ->get() and
+->set() methods can use them all.
+
+Some visitors, howerver, carry restrictions:
+
+ * The string output visitor does not implement support for visiting
+ * QAPI structs, alternates, null, or arbitrary QTypes.  It also
+ * requires a non-null list argument to visit_start_list().
+
+ * The string input visitor does not implement support for visiting
+ * QAPI structs, alternates, null, or arbitrary QTypes. Only flat lists
+ * of integers (except type "size") are supported.
+
+ * The Opts input visitor does not implement support for visiting QAPI
+ * alternates, numbers (other than integers), null, or arbitrary
+ * QTypes.  It also requires a non-null list argument to
+ * visit_start_list().
+
+If you try to qom-set a property whose ->set() uses something the string
+input visitor doesn't support, QEMU crashes.  Same for -object, and your
+proposed qom-get.
+
+I'm not aware of such a ->set(), but this is a death trap all the same.
+
+The obvious way to disarm it is removing the restrictions.
+
+One small step we took towards that goal is visible in the comments
+above: support for flat lists of integers.  The code for that will make
+your eyes bleed.  It's been a thorn in my side ever since I inherited
+QAPI.  Perhaps it could be done better.  But there's a reason why it
+should not be done at all: it's language design.
+
+The QObject visitors translate between QAPI types and our internal
+representation of JSON.  The JSON parser and formatter complete the
+translation to and from JSON.  Sensible enough.
+
+The string visitors translate between QAPI and ...  well, a barely
+documented language of our own "design".  Tolerable when the language it
+limited to numbers, booleans and strings.  Foolish when it grows into
+something isomorphic to JSON.
+
+This is a dead end.
+
+Can we still implement a safe and tolerably useful HMP qom-get and
+qom-set?  I think we can.  Remember the basic rule of HMP command
+implementation: wrap around the QMP command.  So let's try that.
+
+hmp_qom_get() calls qmp_qom_get() and formats the resulting QObject with
+qobject_to_json_pretty().
+
+hmp_qom_get() parses the value with qobject_from_json(), and feeds the
+resulting QObject to qmp_qom_set().  To avoid interference with the HMP
+parser, we probably want argument type 'S'.
+
+The two commands then parse / print JSON instead of the string visitors'
+language.  Is that bad?
+
+* Integers: qom-set loses support for hexadecimal and octal.
+
+* Bools: qom-set loses alternate spellings of true and false.
+
+* Floating-point numbers: no change
+
+* Strings: gain enclosing quotes.
+
+* List of integers: gain enclosing square brackets.  qom-set loses
+  support for ranges.
+
+  The only use of lists I can find is memory-backend property
+  host-nodes.
+
+* Everything else: lose support for crashing QEMU.
+
+  Again, I'm not aware of properties that crash now.
+
+I think these changes are just fine.  If you disagree, you could try to
+mitigate with convenience magic like "if it doesn't parse as JSON, and
+it looks hexadecimal, convert to decimal and try again", or "looks kind
+of stringy, enclose in double-quotes and try again".  Bad idea if you
+ask me, but I'm not the HMP maintainer anymore.
+
+Here's an idea I hate less.  Remember, since the opts visitor also has
+restrictions, -object is also prone to crashing.  But that's an instance
+of a problem we've thought about at some depth, and where we have a
+plan: we intend to replace QemuOpts with QObject (which means we can
+switch to the QObject visitors), and have CLI options take either JSON
+or a relatively simple KEY=3DVALUE,... language similar to what QemuOpts
+accepts now.
+
+Yes, that's also a language of our own design, but it comes with a few
+excuses:
+
+0. It lets us avoid radical change of QEMU's CLI.
+
+1. It's fairly simple.  It does not try to be isomorphic to JSON.  It
+doesn't have to, because you can always fall back to JSON when things
+get wonky.
+
+2. It's documented.  So far only in util/keyval.c.  No good for users
+there, but at least it demonstrates we know what language we're parsing
+(modulo parser bugs).  More than what can be said for many ad hoc
+languages...
+
+We could use this for a friendlier qom-set.  I'm not sure it's worth the
+trouble at this time.
 
 
