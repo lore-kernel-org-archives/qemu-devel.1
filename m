@@ -2,85 +2,69 @@ Return-Path: <SRS0=t3yw=6Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB96EC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Sat,  2 May 2020 19:21:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4A58C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Sat,  2 May 2020 19:47:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84293206F1
-	for <qemu-devel@archiver.kernel.org>; Sat,  2 May 2020 19:21:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eMg7VBZG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84293206F1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8593D20731
+	for <qemu-devel@archiver.kernel.org>; Sat,  2 May 2020 19:47:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8593D20731
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jUxhj-0000Bd-Je
-	for qemu-devel@archiver.kernel.org; Sat, 02 May 2020 15:21:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40620)
+	id 1jUy6z-0005dQ-O5
+	for qemu-devel@archiver.kernel.org; Sat, 02 May 2020 15:47:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48224)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcel.apfelbaum@gmail.com>)
- id 1jUxf0-0005N6-Cl
- for qemu-devel@nongnu.org; Sat, 02 May 2020 15:18:51 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jUy6H-0005AE-Cb
+ for qemu-devel@nongnu.org; Sat, 02 May 2020 15:47:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <marcel.apfelbaum@gmail.com>) id 1jUxez-00075i-Nx
- for qemu-devel@nongnu.org; Sat, 02 May 2020 15:18:50 -0400
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:34962)
+ (envelope-from <laurent@vivier.eu>) id 1jUy6G-0006ZD-NY
+ for qemu-devel@nongnu.org; Sat, 02 May 2020 15:47:01 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:39607)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marcel.apfelbaum@gmail.com>)
- id 1jUxez-00072I-BX
- for qemu-devel@nongnu.org; Sat, 02 May 2020 15:18:49 -0400
-Received: by mail-wm1-x332.google.com with SMTP id r26so4058226wmh.0
- for <qemu-devel@nongnu.org>; Sat, 02 May 2020 12:18:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id;
- bh=HUD0SuMNa88xB0dJSQbDHE1GElfranAIV2uPm//UqC4=;
- b=eMg7VBZG7+/OuFPTjkIGVoWOTDxUis75YQW9O7BvkrNt8HgFzB3aC4o+6XdLEe5Ql0
- jPIY6VYr1rxY39vO3jXf3j+0z1nIgz26dCgTTEfheHiDe4QZ4ilOIfDnDZFcUzTczXtv
- upMRWsSbOXL8fOcdRtI0Yr4avWPBEwCe6tCUe4maeD4+KMWscsIYIqiMUUZLL1ldIjE0
- BoJ8qzcW+jJdfLtlS+pFdxdWLBi0Ovq0JW7N161FVV74/ujRMGSNz00eMUTLD7TCsR1N
- 9Qk0ONXMtspd4tRgytPUb/RcsdtC56Ds8eMxu3XNAWJitBWb+KrNMJ6ixe2jhHTQ84Ld
- s5Ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=HUD0SuMNa88xB0dJSQbDHE1GElfranAIV2uPm//UqC4=;
- b=qoZwCsPxFA37jNdnBKVt7cIxQrMIkZ+u8GBsg9cdjm2DaHlcJQcq2deE5s5iWu5yQT
- OMCITBFMgrxj+IwBkvF+vo+HMIDKvWf+RNtNlsyIQRMkhPsltOUFjgMXhprwb6bB5W1A
- 2p2T9os/BjqTTQWZ+4QuFh1eBxiHZ4fKBN+dHPVjTEmexUJCoGBH1zzSRl8tSfE76rxM
- W7hzBkhRScq3BKaxN5eAh+pu02vOWxL5XmhzoMB8euhvtkPn5QZsa4PGZGCLK2BqIiQF
- 89eIYPoSBtv6GQaxkdJ7irooItdOPhfFuZ/FNNxUvJ9YghU8N2hySMceKNpdBLaQhE34
- u0yQ==
-X-Gm-Message-State: AGi0PubVVTttntYjMF6DnAmQkgsM4oKffakzPiYB1kmLPjper3t21+8J
- VgP7SL2QuK6GXT33yyf9d5uQV7mhYc4=
-X-Google-Smtp-Source: APiQypK7HiAL7Jsq38dcHjVqaSoLnRWXlVuAdg7xdnHDG9KSwLgsHtPMkq2ixAKPxUkIQlwFS3LCEQ==
-X-Received: by 2002:a1c:c345:: with SMTP id t66mr6239056wmf.189.1588447125728; 
- Sat, 02 May 2020 12:18:45 -0700 (PDT)
-Received: from localhost.localdomain ([37.142.144.12])
- by smtp.gmail.com with ESMTPSA id k23sm5378441wmi.46.2020.05.02.12.18.44
- (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Sat, 02 May 2020 12:18:45 -0700 (PDT)
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-To: qemu-devel@nongnu.org,
-	peter.maydell@linaro.org
-Subject: [Qemu-devel] [PULL 0/1] RDMA queue
-Date: Sat,  2 May 2020 22:18:41 +0300
-Message-Id: <20200502191842.27250-1-marcel.apfelbaum@gmail.com>
-X-Mailer: git-send-email 2.17.2
-Received-SPF: pass client-ip=2a00:1450:4864:20::332;
- envelope-from=marcel.apfelbaum@gmail.com; helo=mail-wm1-x332.google.com
-X-detected-operating-system: by eggs.gnu.org: Error: [-] PROGRAM ABORT :
- Malformed IPv6 address (bad octet value).
- Location : parse_addr6(), p0f-client.c:67
-X-Received-From: 2a00:1450:4864:20::332
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jUy6G-0006Yn-2Q
+ for qemu-devel@nongnu.org; Sat, 02 May 2020 15:47:00 -0400
+Received: from localhost.localdomain ([82.252.135.106]) by
+ mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
+ id 1MOiYD-1jnsQj3BLr-00Q9b8; Sat, 02 May 2020 21:46:46 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] linux-user, alpha: fix oldumount syscall
+Date: Sat,  2 May 2020 21:46:42 +0200
+Message-Id: <20200502194642.32823-1-laurent@vivier.eu>
+X-Mailer: git-send-email 2.26.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:kM4Dnn/42aBkwf8laoK2Sls1BBvzfHO7+ow+oVAVPYToiRviT9o
+ 7CCteD4rJ0SSix3R1fQh6f/9SRgnTfEHb5p8jx6nYqmeAChamlkwCBl5IEVG5WckZRET3A2
+ Cxiadyow5G+iFiG5ZXJ3CbTHlQbw1XxKnOt3fqoSL4B4ItWPvVWyeq7cOu26420oPvJCEqL
+ gl+ZQn/g7N5OLkPz6DAlg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:u397iiZ2WEM=:kezUHaLhPY417HT5gJGzEz
+ 9v5TDiPJw9I+o4Ki20E41xGNmCOLkrG9/8cQ3/pIPzFdKhQe/O91C3PgR2ns475lOgbXp93EQ
+ oAXEcLF9BwDafGGLmSzcmTwZN5PLzcEDwf1UF6LaSHMd2S7ux0yFe/aZZu+FVntuSS5745W3e
+ Y7LE5lIWxz6RWqEiwTYKY6rIafTvHufbQLCQoCxGSEa4c83ZtHX19bmVwFLapRSKoZFP66MkC
+ 2wgD1XpLYYVFD5OIVvuY3xU3ZvfKdZ3/ciAhLvnv20XFEAAuEFkqsHo/vRccZkCav6uLA9Zgq
+ 1rRC1tgQchVO2SBl0kyohqz3JALC2C7+i7uzcB33dfqe/26bU7oaaSVAivclpPztxZmNkSQ2u
+ ZdGEbt4/TAH616oCYpraTV824EgOd+8IFIyY28nk3bsNB5KswZKs6CPpiJ7MXVK+wnfBqBziD
+ iLc2AskKQWwfzRXwtdw2TScRLd3Z6WWaQHprmOBPrqT9r4a81hbZt7/Otqu2R6InrwfN6Rc6M
+ 62mtQ/w3uW4gggEqHa4nCRaZIk/ESx3m5zPLkPsgECMQb9ydPOR0h/RR7tD/0Ivy0nenrCTIt
+ 8H2Scx07f2CIbI6dMksRsBcpx84bVjPXGlZXSZnX803kEVaiLNlyi+79Orpd20oUbMtHQqJ3p
+ czxBR1nd7PbULQc4VmtI6zfnx0Dfyk1EDWPL4nGEQiOCbU4qTD4H2o1emADwS//U4iDS3D+MF
+ 7mSJZL+XRf+y+n6eWFTRqZLWl/PplVuLbHHqi6QvSl+6fYxw+i7Ob7nHpY9DCnIH/56+MpJ3y
+ kqqEPK7HWEeUS679zMHshQzAsWRDfz8WUqfAWxkG89wl/YOLmDvz2rSbygQYrbGBngMzOD3
+Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/02 15:46:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Received-From: 217.72.192.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,36 +76,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yuval.shaia.ml@gmail.com
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 1c47613588ccff44422d4bdeea0dc36a0a308ec7:
+When we try to bootstrap debian/lenny for alpha, it fails because
+it cannot umount /.root directory:
 
-  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2020-04-30 19:25:41 +0100)
+  ...
+  Setting up initscripts (2.86.ds1-61) ...
+  umount: /.root: Function not implemented
+  dpkg: error processing initscripts (--configure):
+   subprocess post-installation script returned error exit status 1
+  dpkg: sysvinit: dependency problems, but configuring anyway as you request:
+   sysvinit depends on initscripts; however:
+    Package initscripts is not configured yet.
 
-are available in the Git repository at:
+This is because, when we switched from syscall_nr.h to syscall.tbl,
+the syscall #321 has been renamed from umount to oldumount and
+syscall.c has not been updated to manage the new name.
 
-  https://github.com/marcel-apf/qemu tags/rdma-pull-request
+oldumount has been introduced in linux 2.1.116pre1 by:
+  7d32756b2 ("Import 2.1.116pre1")
+...
+ * We now support a flag for forced unmount like the other 'big iron'
+ * unixes. Our API is identical to OSF/1 to avoid making a mess of AMD
+...
 
-for you to fetch changes up to a5cde048e865da81fdc9077f3af28a43bff78d35:
+Fixes: 6116aea994 ("linux-user, alpha: add syscall table generation support")
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/syscall.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-  hw/rdma: Destroy list mutex when list is destroyed (2020-05-02 21:31:17 +0300)
-
-----------------------------------------------------------------
-RDMA queue
-
-* hw/rdma: Destroy list mutex when list is destroyed
-
-----------------------------------------------------------------
-Yuval Shaia (1):
-      hw/rdma: Destroy list mutex when list is destroyed
-
- hw/rdma/rdma_utils.c | 1 +
- 1 file changed, 1 insertion(+)
-
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 05f03919ff07..e89b815ce983 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -8028,8 +8028,13 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+             }
+         }
+         return ret;
+-#ifdef TARGET_NR_umount
++#if defined(TARGET_NR_umount) || defined(TARGET_NR_oldumount)
++#if defined(TARGET_NR_umount)
+     case TARGET_NR_umount:
++#endif
++#if defined(TARGET_NR_oldumount)
++    case TARGET_NR_oldumount:
++#endif
+         if (!(p = lock_user_string(arg1)))
+             return -TARGET_EFAULT;
+         ret = get_errno(umount(p));
 -- 
-2.17.2
+2.26.2
 
 
