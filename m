@@ -2,81 +2,98 @@ Return-Path: <SRS0=KEGy=6R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E30FC28CBC
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 16:50:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34913C28CBC
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 17:13:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7B52206D7
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 16:50:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB33E206CD
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 17:13:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bj/UOBV7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7B52206D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xqYZjtAU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB33E206CD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVHpA-0002y2-VA
-	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 12:50:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42152)
+	id 1jVIBc-0000n7-2L
+	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 13:13:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45210)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jVHoQ-0002Ta-1f
- for qemu-devel@nongnu.org; Sun, 03 May 2020 12:49:54 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22684
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jVHoO-0001Wu-GF
- for qemu-devel@nongnu.org; Sun, 03 May 2020 12:49:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588524590;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=l/syZovk2iMl/EmIsQX1A/bHGAy/LxDdgGBUmHwsqaU=;
- b=bj/UOBV7d+89LVpdpL04tR4XnsElFH42LHOwZULD2fkDTwjFY+WJPeMVVPsQBjE6sRMqSY
- zJpNOSyp0NgaQZqoH64Q/qYGaLifTC79ERfc7qX8eBkm/2DUMyxRwdpK6iQ/6Ck/pNqXNO
- Qn/k+16Upmi2gJ7V6xdww9rLS/nXSek=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-500-cNqqT8ekO6m56evs8XF-cg-1; Sun, 03 May 2020 12:49:48 -0400
-X-MC-Unique: cNqqT8ekO6m56evs8XF-cg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E54B68014D6;
- Sun,  3 May 2020 16:49:47 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.195])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2C6B710016DA;
- Sun,  3 May 2020 16:49:45 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] Fix iotest 153
-Date: Sun,  3 May 2020 19:49:43 +0300
-Message-Id: <20200503164943.27215-1-mlevitsk@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mlevitsk@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/03 12:49:50
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jVIAq-0008UE-Qr
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 13:13:04 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:37981)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jVIAp-0002tv-FY
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 13:13:04 -0400
+Received: by mail-pl1-x643.google.com with SMTP id w3so5839448plz.5
+ for <qemu-devel@nongnu.org>; Sun, 03 May 2020 10:13:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=osQ7iZFKf5dm9x5QhlN6zbt/yUus595FFcS0GaIK+7M=;
+ b=xqYZjtAU0iCKJ2vk5weXX+8qpG5S0SSUBe8gjWLOcrIAMsmrZ7YWh/dniA8gwPhigq
+ ocAamQ0L+GFDjY3TAPAd+zzVY7Cz/yZMyt+nmgR8lpv0iDvnJ6mxatz6YVyk+LDIvUEY
+ ZxaTxmv1Abag8LNv4AeZivoNYagYVgjC/3XUFjRIF6jYizNd7gDC4W1Gle33IDycp4yH
+ 9WvH7SgDnLHgW9Qx+ZuTMxPq+rlHo/B1bXVxvIS+qgunapA5K7ChDc6q4ii6XygZnkWx
+ 6OY9C+XrbhO+t8NWuoCPtl70LMoCHUeD2S+mp+Ou0/69s6GDw9qd14RIU5Cl/r07MJY7
+ NM4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=osQ7iZFKf5dm9x5QhlN6zbt/yUus595FFcS0GaIK+7M=;
+ b=ckrBgRruBR/I7PKUPI9ZjQzJM5AnF71GPq34ZC59oqTL49wpkYorgQ26owZbrxVNCW
+ vr9rYSWTR8SWBhJYzD8PFzLtC3xECWkC0e5KENUp35hyLu6UcBHJsCkte0lN0wr6ezrW
+ L2LROiDt2TZquN6maHy1tIhDJh96vqU4nTIGv8T3aNTEXNPP+ytZm//PGZSga9MppJEp
+ kpMyIOsPZje93zzYbAmoBAGhpH0YeV+GKG8obim/Zjuq4HNDMhl80D8aytKjXm7p2x3H
+ SaSo6Eds467FKlUdZBkL/se2+7ZFRphEmkMIHY9P2hcu4Mzr8y/ODs1ZIuOrQeif9+Kg
+ yV0g==
+X-Gm-Message-State: AGi0PuYEjPSrGdPjuVQQVZSo6+TlLLpmGCJhSA7ywA2YXaYzFtVUFRiR
+ JwQRyuxg/9shQffmTLJKlvS5aw==
+X-Google-Smtp-Source: APiQypLo9r+yb3PR0sJOjv4my0wOAyY+88CGmcO4+fyfAiZBwqS+k7tIu8oI/CGA+kdgC+j9mv7qHA==
+X-Received: by 2002:a17:90a:8c9:: with SMTP id
+ 9mr11698979pjn.183.1588525981941; 
+ Sun, 03 May 2020 10:13:01 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
+ by smtp.gmail.com with ESMTPSA id x132sm6884890pfc.57.2020.05.03.10.13.00
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 03 May 2020 10:13:01 -0700 (PDT)
+Subject: Re: [RFC PATCH 1/2] audio/mixeng: Fix Clang 'int-conversion' warning
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200503113220.30808-1-f4bug@amsat.org>
+ <20200503113220.30808-2-f4bug@amsat.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <89882847-509d-098e-3379-ad4391ccccb2@linaro.org>
+Date: Sun, 3 May 2020 10:12:58 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
+MIME-Version: 1.0
+In-Reply-To: <20200503113220.30808-2-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,109 +106,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: qemu-trivial@nongnu.org, Riku Voipio <riku.voipio@iki.fi>,
+ Laurent Vivier <laurent@vivier.eu>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Commit f62514b3def5fb2acbef64d0e053c0c31fa45aff made qemu-img reject -o "" =
-but this test uses it
+On 5/3/20 4:32 AM, Philippe Mathieu-Daudé wrote:
+> When building with Clang 10 on Fedora 32, we get:
+> 
+>     CC      audio/mixeng.o
+>   audio/mixeng.c:274:34: error: implicit conversion from 'unsigned int' to 'float' changes value from 4294967295 to 4294967296 [-Werror,-Wimplicit-int-float-conversion]
+>   static const float float_scale = UINT_MAX / 2.f;
+>                                    ^~~~~~~~ ~
+>   /usr/lib64/clang/10.0.0/include/limits.h:56:37: note: expanded from macro 'UINT_MAX'
+>   #define UINT_MAX  (__INT_MAX__  *2U +1U)
+>                      ~~~~~~~~~~~~~~~~~^~~
+> 
+> Fix by using a 64-bit float for the conversion, before casting
+> back to 32-bit float.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  audio/mixeng.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Since this test only tries to do a dry-run run of qemu-img amend, replace t=
-he -o "" with
-dummy -o "size=3D0" since due to the nature of the test, it is not going
-to reach the actual amend operation anyway
+No, this should be fixed properly.
 
-Fixes: f62514b3def5fb2acbef64d0e053c0c31fa45aff
+First, the warning is in the !FLOAT_MIXENG branch.  IMO that means we should
+not be using floating point at all, and this should be a simple integral
+multiply/shift.
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- tests/qemu-iotests/153     |  2 +-
- tests/qemu-iotests/153.out | 12 ++++++------
- 2 files changed, 7 insertions(+), 7 deletions(-)
+I had a brief look at this before the 5.0 release.  The arithmetic all through
+audio looks confused to me.  There's a combination of shifting and masking
+(implying a scale by 1<<32), and multiplication and division by UINT32_MAX.
 
-diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
-index 2b13111768..3f5029dd8f 100755
---- a/tests/qemu-iotests/153
-+++ b/tests/qemu-iotests/153
-@@ -122,7 +122,7 @@ for opts1 in "" "read-only=3Don" "read-only=3Don,force-=
-share=3Don"; do
-         _run_cmd $QEMU_IMG check       $L "${TEST_IMG}"
-         _run_cmd $QEMU_IMG compare     $L "${TEST_IMG}" "${TEST_IMG}"
-         _run_cmd $QEMU_IMG map         $L "${TEST_IMG}"
--        _run_cmd $QEMU_IMG amend -o "" $L "${TEST_IMG}"
-+        _run_cmd $QEMU_IMG amend -o "size=3D0" $L "${TEST_IMG}"
-         _run_cmd $QEMU_IMG commit      $L "${TEST_IMG}"
-         _run_cmd $QEMU_IMG resize      $L "${TEST_IMG}" $size
-         _run_cmd $QEMU_IMG rebase      $L "${TEST_IMG}" -b "${TEST_IMG}.ba=
-se"
-diff --git a/tests/qemu-iotests/153.out b/tests/qemu-iotests/153.out
-index f7464dd8d3..9c01b750e0 100644
---- a/tests/qemu-iotests/153.out
-+++ b/tests/qemu-iotests/153.out
-@@ -56,7 +56,7 @@ _qemu_img_wrapper map TEST_DIR/t.qcow2
- qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to get shared "write" =
-lock
- Is another process using the image [TEST_DIR/t.qcow2]?
-=20
--_qemu_img_wrapper amend -o  TEST_DIR/t.qcow2
-+_qemu_img_wrapper amend -o size=3D0 TEST_DIR/t.qcow2
- qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to get "write" lock
- Is another process using the image [TEST_DIR/t.qcow2]?
-=20
-@@ -118,7 +118,7 @@ _qemu_img_wrapper compare -U TEST_DIR/t.qcow2 TEST_DIR/=
-t.qcow2
-=20
- _qemu_img_wrapper map -U TEST_DIR/t.qcow2
-=20
--_qemu_img_wrapper amend -o  -U TEST_DIR/t.qcow2
-+_qemu_img_wrapper amend -o size=3D0 -U TEST_DIR/t.qcow2
- qemu-img: unrecognized option '-U'
- Try 'qemu-img --help' for more information
-=20
-@@ -187,7 +187,7 @@ _qemu_img_wrapper compare TEST_DIR/t.qcow2 TEST_DIR/t.q=
-cow2
-=20
- _qemu_img_wrapper map TEST_DIR/t.qcow2
-=20
--_qemu_img_wrapper amend -o  TEST_DIR/t.qcow2
-+_qemu_img_wrapper amend -o size=3D0 TEST_DIR/t.qcow2
- qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to get "write" lock
- Is another process using the image [TEST_DIR/t.qcow2]?
-=20
-@@ -241,7 +241,7 @@ _qemu_img_wrapper compare -U TEST_DIR/t.qcow2 TEST_DIR/=
-t.qcow2
-=20
- _qemu_img_wrapper map -U TEST_DIR/t.qcow2
-=20
--_qemu_img_wrapper amend -o  -U TEST_DIR/t.qcow2
-+_qemu_img_wrapper amend -o size=3D0 -U TEST_DIR/t.qcow2
- qemu-img: unrecognized option '-U'
- Try 'qemu-img --help' for more information
-=20
-@@ -303,7 +303,7 @@ _qemu_img_wrapper compare TEST_DIR/t.qcow2 TEST_DIR/t.q=
-cow2
-=20
- _qemu_img_wrapper map TEST_DIR/t.qcow2
-=20
--_qemu_img_wrapper amend -o  TEST_DIR/t.qcow2
-+_qemu_img_wrapper amend -o size=3D0 TEST_DIR/t.qcow2
-=20
- _qemu_img_wrapper commit TEST_DIR/t.qcow2
-=20
-@@ -345,7 +345,7 @@ _qemu_img_wrapper compare -U TEST_DIR/t.qcow2 TEST_DIR/=
-t.qcow2
-=20
- _qemu_img_wrapper map -U TEST_DIR/t.qcow2
-=20
--_qemu_img_wrapper amend -o  -U TEST_DIR/t.qcow2
-+_qemu_img_wrapper amend -o size=3D0 -U TEST_DIR/t.qcow2
- qemu-img: unrecognized option '-U'
- Try 'qemu-img --help' for more information
-=20
---=20
-2.17.2
+I'm reasonably certain that every appearance of UINT32_MAX in this code is an
+off-by-one bug, or a misuse of the constant.
 
+
+r~
 
