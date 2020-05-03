@@ -2,102 +2,65 @@ Return-Path: <SRS0=KEGy=6R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 996F5C28CBC
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 22:14:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0685C28CBC
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 23:41:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6417B20661
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 22:14:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6417B20661
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 63B89206EB
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 23:41:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63B89206EB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVMsj-00030n-If
-	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 18:14:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41676)
+	id 1jVOF8-0001xc-Hf
+	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 19:41:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53804)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jVMrw-0002aE-M9
- for qemu-devel@nongnu.org; Sun, 03 May 2020 18:13:52 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:34102
- helo=mail.default.ilande.uk0.bigv.io)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jVOEP-0001XN-E1; Sun, 03 May 2020 19:41:09 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:43738)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jVMrv-0002cB-7v
- for qemu-devel@nongnu.org; Sun, 03 May 2020 18:13:52 -0400
-Received: from host86-172-152-64.range86-172.btcentralplus.com
- ([86.172.152.64] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jVMrq-0006nK-9j; Sun, 03 May 2020 23:13:51 +0100
-To: Markus Armbruster <armbru@redhat.com>
-References: <87mu6uia5i.fsf@dusky.pond.sub.org>
- <20200429155719.GL1495129@redhat.com> <87k11xh2kq.fsf@dusky.pond.sub.org>
- <CAFEAcA9-oxkMD-kJ1z12d4K1S_Jaz7Wj6_38Ah7ChSaBfQNkkA@mail.gmail.com>
- <87tv11e1en.fsf_-_@dusky.pond.sub.org>
- <51a4e9ea-eca3-6c1d-a753-86c5810ac094@ilande.co.uk>
- <874kt1dpw7.fsf@dusky.pond.sub.org>
- <c1fa0770-a07f-e5bc-9db8-6af0576c365f@ilande.co.uk>
- <877dxxc862.fsf@dusky.pond.sub.org>
- <0b745eed-841e-8879-c320-3166e2a46953@ilande.co.uk>
- <87imhe6g7v.fsf@dusky.pond.sub.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <a0167fcc-b213-25e2-6ea2-62f2a0237a2f@ilande.co.uk>
-Date: Sun, 3 May 2020 23:13:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1jVOEG-00074X-Vs; Sun, 03 May 2020 19:41:08 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 427E1746353;
+ Mon,  4 May 2020 01:40:44 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 077AB746351; Mon,  4 May 2020 01:40:44 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 05E9A746324;
+ Mon,  4 May 2020 01:40:44 +0200 (CEST)
+Date: Mon, 4 May 2020 01:40:43 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: =?GB2312?Q?=C2=DE=D3=C2=B8=D5=28Yonggang_Luo=29?= <luoyonggang@gmail.com>
+Subject: Re: An first try to improve PPC float simulation, not even compiled.
+ Just ask question.
+In-Reply-To: <CAE2XoE8LO-4Ordhxf1-eNZK1taSGnaU4zxQ944-XLvwzmd9rJg@mail.gmail.com>
+Message-ID: <alpine.BSF.2.22.395.2005040128330.7227@zero.eik.bme.hu>
+References: <CAE2XoE-XFG8r85yPOhuNS2YUMqhp70q1RXCy+KLT79doW8qHMg@mail.gmail.com>
+ <87605674-1cd8-2074-6730-355e20fbf7d0@linaro.org>
+ <CAE2XoE8LO-4Ordhxf1-eNZK1taSGnaU4zxQ944-XLvwzmd9rJg@mail.gmail.com>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-In-Reply-To: <87imhe6g7v.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.172.152.64
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: Configuring onboard devices
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
+Content-Type: multipart/mixed;
+ BOUNDARY="3866299591-1000107849-1588548640=:7227"
+Content-ID: <alpine.BSF.2.22.395.2005040133090.7227@zero.eik.bme.hu>
+Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
+ helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/03 19:40:44
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -17
+X-Spam_score: -1.8
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, MIME_CHARSET_FARAWAY=2.45,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,139 +73,552 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Jason Wang <jasowang@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-ppc@nongnu.org,
+ =?ISO-8859-15?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/05/2020 06:47, Markus Armbruster wrote:
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
-> 
->> On 30/04/2020 16:20, Markus Armbruster wrote:
->>
->>>> Ah I see now, these aliases are for individual properties rather than objects. What I
->>>> was trying to ask was if it were possible to have something like this:
->>>>
->>>> /machine (SS-5-machine)
->>>>   /builtin
->>>>     /nic0 -> link to "lance" device
->>>>
->>>> Here nic0 is an alias "published" by the maintainer of the SS-5 machine which is
->>>> configured in the machine init() function using object_property_add_link() or a
->>>> suitable wrapper. Users can then configure these builtin devices from the command
->>>> line using your -machine nic0.netdev=my-netdev-id syntax or similar.
->>>
->>> Got it now, thanks!
->>>
->>>> Having the default devices under /builtin or other known QOM path would enable
->>>> builtin devices to be easily enumerated programatically and/or from the command line
->>>> as required.
->>>
->>> There are three standard containers under /machine/:
->>>
->>> * /machine/peripheral/
->>>
->>>   Devices with a user-specified ID go here, as /machine/peripheral/ID.
->>>   User-specified means -device or device_add.
->>>
->>>   /machine/peripheral/ID is effectively a stable interface.  It's just
->>>   underdocumented (undocumented?).
->>>
->>>   To be useful, the stuff below ID/ needed to be stable and documented,
->>>   too.
->>>
->>> * /machine/peripheral-anon/
->>>
->>>   Same, but user elected not to give an ID.
->>>   /machine/peripheral-anon/device[N], where N counts up from zero in
->>>   creation order.
->>>
->>>   N is obviously not stable, but this is a problem of the user's making.
->>>   If you want to refer to a device, give it an ID.
->>>
->>> * /machine/unattached/
->>>
->>>   The orphanage.  When a device has no parent when its realized, it gets
->>>   put here, as /machine/unattached/device[N], where N counts up from
->>>   zero in realization order.
->>>
->>>   N is obviously not stable, and this time we can't blame the
->>>   victim^Wuser.  You can search for devices of a certain type.
->>>   Sometimes that's good enough.
->>>
->>>   All the onboard devices are here, and much more.  We've fathered a lot
->>>   of unloved red-headed children, it seems...
->>>
->>>   Some of the "much more" is due to sloppy modelling, i.e. neglecting to
->>>   set the proper parent.
->>>
->>>   I figure we could put onboard devices in a nicer place, with nicer
->>>   names.  Need a convention for the place and the names, then make board
->>>   code conform to it.
->>
->> That's good, it seems that this is already fairly close to how it works for -device
->> at the moment.
->>
->> I don't think that it is possible to come up a single place for on-board devices to
->> live directly though. Going back to one of my first examples: wiring up a chardev to
->> a serial port on the macio device. To me it makes sense for that to exist in QOM
->> under /machine/pci-bus/mac-io/escc. In contrast an in-built NIC could live under
->> /machine/pci-bus/in-built/nic, and placing one or both of these devices directly
->> under /machine/foo doesn't feel intuitive.
-> 
-> I'm not familiar with this machine.  You make me suspect the serial
-> thingy is a component of a larger device.
-> 
-> Properly modelled, a composite device has its components as children.
-> These appear below their parent in the QOM composition tree.
-> 
-> Example: a "serial-isa" device has a "serial" component.  When the
-> former is at /machine/unattached/device[28]/, the latter is at
-> /machine/unattached/device[28]/serial/.
-> 
-> I guess that's what you want for macio's serial port.
-> 
-> Counter-example: a "isa-super-io" device has compoenents of type
-> "isa-parallel", "isa-serial", "isa-fdc", "i8042", "isa-ide".
-> Nevertheless, these appear next to their parent in /machine/unattached/.
-> I'm still too much of a QOM ignoramus to explain why that's so.  Paolo,
-> can you?
+--3866299591-1000107849-1588548640=:7227
+Content-Type: text/plain; CHARSET=GB2312; format=flowed
+Content-Transfer-Encoding: 8BIT
+Content-ID: <alpine.BSF.2.22.395.2005040133091.7227@zero.eik.bme.hu>
 
-FWIW the older machines have a lot of calls to qdev_create(NULL, TYPE_FOO) for
-devices that are part of the machine because they live within the machine address
-space but are not specifically attached to a qbus.
+Hello,
 
->> AFAIK as per your ARM virt example I believe it is only possible to register an alias
->> for a property rather than for an Object? The ultimate aim would be for
->> object_resolve_path("/machine/builtin/nic0") and
->> object_resolve_path("/machine/pci-bus/in-built/nic") to return the same Object, and
->> for the aliases on built-in devices to be children of /machine/builtin to allow easy
->> iteration and introspection.
-> 
-> Paolo, could link properties achieve that?
-> 
-> Mark, I guess you want the alias / link from builtin/nic0 to the actual
-> place to simplify configuration: the user then needs to know less about
-> the board.  Correct?
+On Mon, 4 May 2020, ÂÞÓÂ¸Õ(Yonggang Luo) wrote:
+> Hello Richard, Can you have a look at the following patch, and was that are
+> the right direction?
 
-Correct. In a perfect world I'd love to say that Daniel's suggestion to use QOM paths
-would work, however from my experience they change far too much. This is one of the
-reasons that the TYPE_FW_PATH_PROVIDER interface exists so that the generation of
-(boot) paths for the firmware is separate from the QOM/qdev paths.
+Formatting of the patch is broken by your mailer, try sending it with 
+something that does not change it otherwise it's a bit hard to read.
 
-I don't feel too strongly whether it's a link property, some kind of alias, or
-perhaps like OpenFirmware just a string property containing the QOM path to the
-device, since ultimately I imagine there would be wrapper functions for machine
-init() to call which hide away the implementation details.
+Richard suggested to add an assert to check the fp_status is correctly 
+cleared in place of helper_reset_fpstatus first for debugging so you could 
+change the helper accordingly before deleting it and run a few tests to 
+verify it still works. You'll need get some tests and benchmarks working 
+to be able to verify your changes that's why I've said that would be step 
+0. If you checked that it still produces the same results and the assert 
+does not trigger then you can remove the helper.
 
+Regards,
+BALATON Zoltan
 
-ATB,
-
-Mark.
+> From b4d6ca1d6376fab1f1be06eb472e10b908887c2b Mon Sep 17 00:00:00 2001
+> From: Yonggang Luo <luoyonggang@gmail.com>
+> Date: Sat, 2 May 2020 05:59:25 +0800
+> Subject: [PATCH] [ppc fp] Step 1. Rearrange the fp helpers to eliminate
+> helper_reset_fpstatus(). I've mentioned this before, that it's possible to
+> leave the steady-state of env->fp_status.exception_flags == 0, so there's
+> no
+> need for a separate function call.  I suspect this is worth a decent
+> speedup
+> by itself.
+>
+> ---
+> target/ppc/fpu_helper.c            | 53 ++----------------------------
+> target/ppc/helper.h                |  1 -
+> target/ppc/translate/fp-impl.inc.c | 23 -------------
+> 3 files changed, 3 insertions(+), 74 deletions(-)
+>
+> diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+> index d9a8773ee1..4fc5a7ff1c 100644
+> --- a/target/ppc/fpu_helper.c
+> +++ b/target/ppc/fpu_helper.c
+> @@ -821,6 +821,9 @@ static void do_float_check_status(CPUPPCState *env,
+> uintptr_t raddr)
+>                                    env->error_code, raddr);
+>         }
+>     }
+> +    if (status) {
+> +        set_float_exception_flags(0, &env->fp_status);
+> +    }
+> }
+>
+> void helper_float_check_status(CPUPPCState *env)
+> @@ -828,11 +831,6 @@ void helper_float_check_status(CPUPPCState *env)
+>     do_float_check_status(env, GETPC());
+> }
+>
+> -void helper_reset_fpstatus(CPUPPCState *env)
+> -{
+> -    set_float_exception_flags(0, &env->fp_status);
+> -}
+> -
+> static void float_invalid_op_addsub(CPUPPCState *env, bool set_fpcc,
+>                                     uintptr_t retaddr, int classes)
+> {
+> @@ -2110,9 +2108,6 @@ void helper_##name(CPUPPCState *env, ppc_vsr_t *xt,
+>                       \
+> {
+>   \
+>     ppc_vsr_t t = *xt;
+>  \
+>     int i;
+>  \
+> -
+>  \
+> -    helper_reset_fpstatus(env);
+>   \
+> -
+>  \
+>     for (i = 0; i < nels; i++) {
+>  \
+>         float_status tstat = env->fp_status;
+>  \
+>         set_float_exception_flags(0, &tstat);
+>   \
+> @@ -2152,8 +2147,6 @@ void helper_xsaddqp(CPUPPCState *env, uint32_t opcode,
+>     ppc_vsr_t t = *xt;
+>     float_status tstat;
+>
+> -    helper_reset_fpstatus(env);
+> -
+>     tstat = env->fp_status;
+>     if (unlikely(Rc(opcode) != 0)) {
+>         tstat.float_rounding_mode = float_round_to_odd;
+> @@ -2189,9 +2182,6 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,
+>                       \
+> {
+>   \
+>     ppc_vsr_t t = *xt;
+>  \
+>     int i;
+>  \
+> -
+>  \
+> -    helper_reset_fpstatus(env);
+>   \
+> -
+>  \
+>     for (i = 0; i < nels; i++) {
+>  \
+>         float_status tstat = env->fp_status;
+>  \
+>         set_float_exception_flags(0, &tstat);
+>   \
+> @@ -2228,13 +2218,11 @@ void helper_xsmulqp(CPUPPCState *env, uint32_t
+> opcode,
+>     ppc_vsr_t t = *xt;
+>     float_status tstat;
+>
+> -    helper_reset_fpstatus(env);
+>     tstat = env->fp_status;
+>     if (unlikely(Rc(opcode) != 0)) {
+>         tstat.float_rounding_mode = float_round_to_odd;
+>     }
+>
+> -    set_float_exception_flags(0, &tstat);
+>     t.f128 = float128_mul(xa->f128, xb->f128, &tstat);
+>     env->fp_status.float_exception_flags |= tstat.float_exception_flags;
+>
+> @@ -2263,9 +2251,6 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,
+>                        \
+> {
+>    \
+>     ppc_vsr_t t = *xt;
+>   \
+>     int i;
+>   \
+> -
+>   \
+> -    helper_reset_fpstatus(env);
+>    \
+> -
+>   \
+>     for (i = 0; i < nels; i++) {
+>   \
+>         float_status tstat = env->fp_status;
+>   \
+>         set_float_exception_flags(0, &tstat);
+>    \
+> @@ -2305,7 +2290,6 @@ void helper_xsdivqp(CPUPPCState *env, uint32_t opcode,
+>     ppc_vsr_t t = *xt;
+>     float_status tstat;
+>
+> -    helper_reset_fpstatus(env);
+>     tstat = env->fp_status;
+>     if (unlikely(Rc(opcode) != 0)) {
+>         tstat.float_rounding_mode = float_round_to_odd;
+> @@ -2342,9 +2326,6 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,
+> ppc_vsr_t *xb)              \
+> {
+>    \
+>     ppc_vsr_t t = *xt;
+>   \
+>     int i;
+>   \
+> -
+>   \
+> -    helper_reset_fpstatus(env);
+>    \
+> -
+>   \
+>     for (i = 0; i < nels; i++) {
+>   \
+>         if (unlikely(tp##_is_signaling_nan(xb->fld, &env->fp_status))) {
+>   \
+>             float_invalid_op_vxsnan(env, GETPC());
+>   \
+> @@ -2382,9 +2363,6 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,
+> ppc_vsr_t *xb)             \
+> {
+>   \
+>     ppc_vsr_t t = *xt;
+>  \
+>     int i;
+>  \
+> -
+>  \
+> -    helper_reset_fpstatus(env);
+>   \
+> -
+>  \
+>     for (i = 0; i < nels; i++) {
+>  \
+>         float_status tstat = env->fp_status;
+>  \
+>         set_float_exception_flags(0, &tstat);
+>   \
+> @@ -2430,9 +2408,6 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,
+> ppc_vsr_t *xb)             \
+> {
+>   \
+>     ppc_vsr_t t = *xt;
+>  \
+>     int i;
+>  \
+> -
+>  \
+> -    helper_reset_fpstatus(env);
+>   \
+> -
+>  \
+>     for (i = 0; i < nels; i++) {
+>  \
+>         float_status tstat = env->fp_status;
+>  \
+>         set_float_exception_flags(0, &tstat);
+>   \
+> @@ -2592,9 +2567,6 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,
+>                        \
+> {
+>    \
+>     ppc_vsr_t t = *xt;
+>   \
+>     int i;
+>   \
+> -
+>   \
+> -    helper_reset_fpstatus(env);
+>    \
+> -
+>   \
+>     for (i = 0; i < nels; i++) {
+>   \
+>         float_status tstat = env->fp_status;
+>   \
+>         set_float_exception_flags(0, &tstat);
+>    \
+> @@ -2765,9 +2737,6 @@ void helper_##op(CPUPPCState *env, uint32_t opcode,
+>                   \
+> {                                                                        \
+>     uint32_t cc = 0;                                                     \
+>     bool vxsnan_flag = false, vxvc_flag = false;                         \
+> -                                                                         \
+> -    helper_reset_fpstatus(env);                                          \
+> -                                                                         \
+>     if (float64_is_signaling_nan(xa->VsrD(0), &env->fp_status) ||        \
+>         float64_is_signaling_nan(xb->VsrD(0), &env->fp_status)) {        \
+>         vxsnan_flag = true;                                              \
+> @@ -2813,9 +2782,6 @@ void helper_##op(CPUPPCState *env, uint32_t opcode,
+>                  \
+> {                                                                       \
+>     uint32_t cc = 0;                                                    \
+>     bool vxsnan_flag = false, vxvc_flag = false;                        \
+> -                                                                        \
+> -    helper_reset_fpstatus(env);                                         \
+> -                                                                        \
+>     if (float128_is_signaling_nan(xa->f128, &env->fp_status) ||         \
+>         float128_is_signaling_nan(xb->f128, &env->fp_status)) {         \
+>         vxsnan_flag = true;                                             \
+> @@ -3177,9 +3143,6 @@ uint64_t helper_xscvdpspn(CPUPPCState *env, uint64_t
+> xb)
+> {
+>     uint64_t result, sign, exp, frac;
+>
+> -    float_status tstat = env->fp_status;
+> -    set_float_exception_flags(0, &tstat);
+> -
+>     sign = extract64(xb, 63,  1);
+>     exp  = extract64(xb, 52, 11);
+>     frac = extract64(xb,  0, 52) | 0x10000000000000ULL;
+> @@ -3446,8 +3409,6 @@ VSX_ROUND(xvrspiz, 4, float32, VsrW(i),
+> float_round_to_zero, 0)
+>
+> uint64_t helper_xsrsp(CPUPPCState *env, uint64_t xb)
+> {
+> -    helper_reset_fpstatus(env);
+> -
+>     uint64_t xt = helper_frsp(env, xb);
+>
+>     helper_compute_fprf_float64(env, xt);
+> @@ -3593,8 +3554,6 @@ void helper_xsrqpi(CPUPPCState *env, uint32_t opcode,
+>     uint8_t rmode = 0;
+>     float_status tstat;
+>
+> -    helper_reset_fpstatus(env);
+> -
+>     if (r == 0 && rmc == 0) {
+>         rmode = float_round_ties_away;
+>     } else if (r == 0 && rmc == 0x3) {
+> @@ -3650,8 +3609,6 @@ void helper_xsrqpxp(CPUPPCState *env, uint32_t opcode,
+>     floatx80 round_res;
+>     float_status tstat;
+>
+> -    helper_reset_fpstatus(env);
+> -
+>     if (r == 0 && rmc == 0) {
+>         rmode = float_round_ties_away;
+>     } else if (r == 0 && rmc == 0x3) {
+> @@ -3700,8 +3657,6 @@ void helper_xssqrtqp(CPUPPCState *env, uint32_t
+> opcode,
+>     ppc_vsr_t t = { };
+>     float_status tstat;
+>
+> -    helper_reset_fpstatus(env);
+> -
+>     tstat = env->fp_status;
+>     if (unlikely(Rc(opcode) != 0)) {
+>         tstat.float_rounding_mode = float_round_to_odd;
+> @@ -3734,8 +3689,6 @@ void helper_xssubqp(CPUPPCState *env, uint32_t opcode,
+>     ppc_vsr_t t = *xt;
+>     float_status tstat;
+>
+> -    helper_reset_fpstatus(env);
+> -
+>     tstat = env->fp_status;
+>     if (unlikely(Rc(opcode) != 0)) {
+>         tstat.float_rounding_mode = float_round_to_odd;
+> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+> index 4e192de97b..b486c9991f 100644
+> --- a/target/ppc/helper.h
+> +++ b/target/ppc/helper.h
+> @@ -58,7 +58,6 @@ DEF_HELPER_FLAGS_1(cntlzw32, TCG_CALL_NO_RWG_SE, i32, i32)
+> DEF_HELPER_FLAGS_2(brinc, TCG_CALL_NO_RWG_SE, tl, tl, tl)
+>
+> DEF_HELPER_1(float_check_status, void, env)
+> -DEF_HELPER_1(reset_fpstatus, void, env)
+> DEF_HELPER_2(compute_fprf_float64, void, env, i64)
+> DEF_HELPER_3(store_fpscr, void, env, i64, i32)
+> DEF_HELPER_2(fpscr_clrbit, void, env, i32)
+> diff --git a/target/ppc/translate/fp-impl.inc.c
+> b/target/ppc/translate/fp-impl.inc.c
+> index e18e268fe5..5e8cd9970e 100644
+> --- a/target/ppc/translate/fp-impl.inc.c
+> +++ b/target/ppc/translate/fp-impl.inc.c
+> @@ -4,11 +4,6 @@
+>  * Standard FPU translation
+>  */
+>
+> -static inline void gen_reset_fpstatus(void)
+> -{
+> -    gen_helper_reset_fpstatus(cpu_env);
+> -}
+> -
+> static inline void gen_compute_fprf_float64(TCGv_i64 arg)
+> {
+>     gen_helper_compute_fprf_float64(cpu_env, arg);
+> @@ -48,7 +43,6 @@ static void gen_f##name(DisasContext *ctx)
+>                     \
+>     t3 = tcg_temp_new_i64();
+>   \
+>     /* NIP cannot be restored if the memory exception comes from an helper
+> */ \
+>     gen_update_nip(ctx, ctx->base.pc_next - 4);
+>    \
+> -    gen_reset_fpstatus();
+>    \
+>     get_fpr(t0, rA(ctx->opcode));
+>    \
+>     get_fpr(t1, rC(ctx->opcode));
+>    \
+>     get_fpr(t2, rB(ctx->opcode));
+>    \
+> @@ -88,7 +82,6 @@ static void gen_f##name(DisasContext *ctx)
+>                     \
+>     t2 = tcg_temp_new_i64();
+>   \
+>     /* NIP cannot be restored if the memory exception comes from an helper
+> */ \
+>     gen_update_nip(ctx, ctx->base.pc_next - 4);
+>    \
+> -    gen_reset_fpstatus();
+>    \
+>     get_fpr(t0, rA(ctx->opcode));
+>    \
+>     get_fpr(t1, rB(ctx->opcode));
+>    \
+>     gen_helper_f##op(t2, cpu_env, t0, t1);
+>   \
+> @@ -123,7 +116,6 @@ static void gen_f##name(DisasContext *ctx)
+>                       \
+>     t0 = tcg_temp_new_i64();
+>   \
+>     t1 = tcg_temp_new_i64();
+>   \
+>     t2 = tcg_temp_new_i64();
+>   \
+> -    gen_reset_fpstatus();
+>    \
+>     get_fpr(t0, rA(ctx->opcode));
+>    \
+>     get_fpr(t1, rC(ctx->opcode));
+>    \
+>     gen_helper_f##op(t2, cpu_env, t0, t1);
+>   \
+> @@ -156,7 +148,6 @@ static void gen_f##name(DisasContext *ctx)
+>                       \
+>     }
+>    \
+>     t0 = tcg_temp_new_i64();
+>   \
+>     t1 = tcg_temp_new_i64();
+>   \
+> -    gen_reset_fpstatus();
+>    \
+>     get_fpr(t0, rB(ctx->opcode));
+>    \
+>     gen_helper_f##name(t1, cpu_env, t0);
+>   \
+>     set_fpr(rD(ctx->opcode), t1);
+>    \
+> @@ -181,7 +172,6 @@ static void gen_f##name(DisasContext *ctx)
+>                       \
+>     }
+>    \
+>     t0 = tcg_temp_new_i64();
+>   \
+>     t1 = tcg_temp_new_i64();
+>   \
+> -    gen_reset_fpstatus();
+>    \
+>     get_fpr(t0, rB(ctx->opcode));
+>    \
+>     gen_helper_f##name(t1, cpu_env, t0);
+>   \
+>     set_fpr(rD(ctx->opcode), t1);
+>    \
+> @@ -222,7 +212,6 @@ static void gen_frsqrtes(DisasContext *ctx)
+>     }
+>     t0 = tcg_temp_new_i64();
+>     t1 = tcg_temp_new_i64();
+> -    gen_reset_fpstatus();
+>     get_fpr(t0, rB(ctx->opcode));
+>     gen_helper_frsqrte(t1, cpu_env, t0);
+>     gen_helper_frsp(t1, cpu_env, t1);
+> @@ -252,7 +241,6 @@ static void gen_fsqrt(DisasContext *ctx)
+>     }
+>     t0 = tcg_temp_new_i64();
+>     t1 = tcg_temp_new_i64();
+> -    gen_reset_fpstatus();
+>     get_fpr(t0, rB(ctx->opcode));
+>     gen_helper_fsqrt(t1, cpu_env, t0);
+>     set_fpr(rD(ctx->opcode), t1);
+> @@ -274,7 +262,6 @@ static void gen_fsqrts(DisasContext *ctx)
+>     }
+>     t0 = tcg_temp_new_i64();
+>     t1 = tcg_temp_new_i64();
+> -    gen_reset_fpstatus();
+>     get_fpr(t0, rB(ctx->opcode));
+>     gen_helper_fsqrt(t1, cpu_env, t0);
+>     gen_helper_frsp(t1, cpu_env, t1);
+> @@ -380,7 +367,6 @@ static void gen_fcmpo(DisasContext *ctx)
+>     }
+>     t0 = tcg_temp_new_i64();
+>     t1 = tcg_temp_new_i64();
+> -    gen_reset_fpstatus();
+>     crf = tcg_const_i32(crfD(ctx->opcode));
+>     get_fpr(t0, rA(ctx->opcode));
+>     get_fpr(t1, rB(ctx->opcode));
+> @@ -403,7 +389,6 @@ static void gen_fcmpu(DisasContext *ctx)
+>     }
+>     t0 = tcg_temp_new_i64();
+>     t1 = tcg_temp_new_i64();
+> -    gen_reset_fpstatus();
+>     crf = tcg_const_i32(crfD(ctx->opcode));
+>     get_fpr(t0, rA(ctx->opcode));
+>     get_fpr(t1, rB(ctx->opcode));
+> @@ -612,7 +597,6 @@ static void gen_mffs(DisasContext *ctx)
+>         return;
+>     }
+>     t0 = tcg_temp_new_i64();
+> -    gen_reset_fpstatus();
+>     tcg_gen_extu_tl_i64(t0, cpu_fpscr);
+>     set_fpr(rD(ctx->opcode), t0);
+>     if (unlikely(Rc(ctx->opcode))) {
+> @@ -635,7 +619,6 @@ static void gen_mffsl(DisasContext *ctx)
+>         return;
+>     }
+>     t0 = tcg_temp_new_i64();
+> -    gen_reset_fpstatus();
+>     tcg_gen_extu_tl_i64(t0, cpu_fpscr);
+>     /* Mask everything except mode, status, and enables.  */
+>     tcg_gen_andi_i64(t0, t0, FP_DRN | FP_STATUS | FP_ENABLES | FP_RN);
+> @@ -660,7 +643,6 @@ static void gen_mffsce(DisasContext *ctx)
+>
+>     t0 = tcg_temp_new_i64();
+>
+> -    gen_reset_fpstatus();
+>     tcg_gen_extu_tl_i64(t0, cpu_fpscr);
+>     set_fpr(rD(ctx->opcode), t0);
+>
+> @@ -678,7 +660,6 @@ static void gen_helper_mffscrn(DisasContext *ctx,
+> TCGv_i64 t1)
+>     TCGv_i64 t0 = tcg_temp_new_i64();
+>     TCGv_i32 mask = tcg_const_i32(0x0001);
+>
+> -    gen_reset_fpstatus();
+>     tcg_gen_extu_tl_i64(t0, cpu_fpscr);
+>     tcg_gen_andi_i64(t0, t0, FP_DRN | FP_ENABLES | FP_RN);
+>     set_fpr(rD(ctx->opcode), t0);
+> @@ -750,7 +731,6 @@ static void gen_mtfsb0(DisasContext *ctx)
+>         return;
+>     }
+>     crb = 31 - crbD(ctx->opcode);
+> -    gen_reset_fpstatus();
+>     if (likely(crb != FPSCR_FEX && crb != FPSCR_VX)) {
+>         TCGv_i32 t0;
+>         t0 = tcg_const_i32(crb);
+> @@ -773,7 +753,6 @@ static void gen_mtfsb1(DisasContext *ctx)
+>         return;
+>     }
+>     crb = 31 - crbD(ctx->opcode);
+> -    gen_reset_fpstatus();
+>     /* XXX: we pretend we can only do IEEE floating-point computations */
+>     if (likely(crb != FPSCR_FEX && crb != FPSCR_VX && crb != FPSCR_NI)) {
+>         TCGv_i32 t0;
+> @@ -807,7 +786,6 @@ static void gen_mtfsf(DisasContext *ctx)
+>         gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);
+>         return;
+>     }
+> -    gen_reset_fpstatus();
+>     if (l) {
+>         t0 = tcg_const_i32((ctx->insns_flags2 & PPC2_ISA205) ? 0xffff :
+> 0xff);
+>     } else {
+> @@ -844,7 +822,6 @@ static void gen_mtfsfi(DisasContext *ctx)
+>         return;
+>     }
+>     sh = (8 * w) + 7 - bf;
+> -    gen_reset_fpstatus();
+>     t0 = tcg_const_i64(((uint64_t)FPIMM(ctx->opcode)) << (4 * sh));
+>     t1 = tcg_const_i32(1 << sh);
+>     gen_helper_store_fpscr(cpu_env, t0, t1);
+>
+--3866299591-1000107849-1588548640=:7227--
 
