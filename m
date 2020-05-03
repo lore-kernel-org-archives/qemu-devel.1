@@ -2,66 +2,68 @@ Return-Path: <SRS0=KEGy=6R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DFB4C28CBC
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 18:45:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFBF5C28CBC
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 18:45:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 063B6206E9
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 18:45:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 77F2E206E9
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 18:45:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J8Pl2dzt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 063B6206E9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gashF7b/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77F2E206E9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVJc0-0005SA-11
-	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 14:45:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59628)
+	id 1jVJc7-0005nN-Jm
+	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 14:45:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59650)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jVJaS-0003CC-EN
- for qemu-devel@nongnu.org; Sun, 03 May 2020 14:43:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27304
+ id 1jVJaY-0003Hj-3i
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 14:43:42 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37987
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jVJaQ-0000E4-Pb
- for qemu-devel@nongnu.org; Sun, 03 May 2020 14:43:35 -0400
+ id 1jVJaX-0000FA-7V
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 14:43:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588531414;
+ s=mimecast20190719; t=1588531420;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=C2UZP4Y+Vv0jqXPuYxk242q6bPKuBi9bvdLNHpN7gFE=;
- b=J8Pl2dztp5iXETIP9OM6BWUTUX1F+RqbyA+SH8LFzDvGyG0lgggs9gOLY/TYcYmJaV5Gxb
- JihV8lGkxG1P0TyP14PzrcBo2E/zUHkJdLb0n2WLnOzueOFzElQpTgrl3KpF/YyPA48kbr
- Fd3rL+1luNB38kIA/JgwnHlWhF8eQZo=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/TO8u682QsRwRdaYtSFM5YjgOIDD4b/mZaLCtUEKxWg=;
+ b=gashF7b/50GPkjTY48aCk5/bEn166micKt8vpcVDyQTKpX/px7DACJLnsysI95LHPpECTv
+ v/YAHuau4+O3PDNTS/m6ecKcQrr6YZP8UZhskn5hb0qgatYCC3c+sapWa2dBUvANj8eIvq
+ 2604gG92VEzD5C6TSkiX3LJguxJNWiw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-493-2XbdRXvXN6uOLwoSmcrTsQ-1; Sun, 03 May 2020 14:43:30 -0400
-X-MC-Unique: 2XbdRXvXN6uOLwoSmcrTsQ-1
+ us-mta-391-snzx3C0KP1WUUCFNBKcflA-1; Sun, 03 May 2020 14:43:38 -0400
+X-MC-Unique: snzx3C0KP1WUUCFNBKcflA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 840871800D4A;
- Sun,  3 May 2020 18:43:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ACD9B45F;
+ Sun,  3 May 2020 18:43:37 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.195])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3FC165C1B2;
- Sun,  3 May 2020 18:43:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6BC9B5C1B2;
+ Sun,  3 May 2020 18:43:35 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 00/14] LUKS: encryption slot management using amend
- interface
-Date: Sun,  3 May 2020 21:43:10 +0300
-Message-Id: <20200503184324.12506-1-mlevitsk@redhat.com>
+Subject: [PATCH v3 03/14] block/amend: add 'force' option
+Date: Sun,  3 May 2020 21:43:13 +0300
+Message-Id: <20200503184324.12506-4-mlevitsk@redhat.com>
+In-Reply-To: <20200503184324.12506-1-mlevitsk@redhat.com>
+References: <20200503184324.12506-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
@@ -99,131 +101,185 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi!
-Here is the updated series of my patches, incorporating all the feedback I =
-received.
+'force' option will be used for some unsafe amend operations.
 
-This implements the API interface that we agreed upon except that I merged =
-the
-LUKSKeyslotActive/LUKSKeyslotInactive union into a struct because otherwise
-I need nested unions which are not supported currently by QAPI parser.
-This didn't change the API and thus once support for nested unions is there=
-,
-it can always be implemented in backward compatible way.
+This includes things like erasing last keyslot in luks based formats
+(which destroys the data, unless the master key is backed up
+by external means), but that _might_ be desired result.
 
-I hope that this series will finally be considered for merging, since I am =
-somewhat running
-out of time to finish this task.
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
+ block.c                   | 4 +++-
+ block/qcow2.c             | 1 +
+ docs/tools/qemu-img.rst   | 5 ++++-
+ include/block/block.h     | 1 +
+ include/block/block_int.h | 1 +
+ qemu-img-cmds.hx          | 4 ++--
+ qemu-img.c                | 8 +++++++-
+ 7 files changed, 19 insertions(+), 5 deletions(-)
 
-Patches are strictly divided by topic to 3 groups, and each group depends o=
-n former groups.
-
-* Patches 1,2 implement qcrypto generic amend interface, including definiti=
-on
-  of structs used in crypto.json and implement this in luks crypto driver
-  Nothing is exposed to the user at this stage
-
-* Patches 3-9 use the code from patches 1,2 to implement qemu-img amend bas=
-ed encryption slot management
-  for luks and for qcow2, and add a bunch of iotests to cover that.
-
-* Patches 10-13 add x-blockdev-amend (I'll drop the -x prefix if you like),=
- and wire it
-  to luks and qcow2 driver to implement qmp based encryption slot managemen=
-t also using
-  the code from patches 1,2, and also add a bunch of iotests to cover this.
-
-Tested with -raw,-qcow2 and -luks iotests and 'make check'
-
-V3: rebased, addressed most of the review feedback.
-For now I kept the slot bitmap code since I am not sure that replacing it w=
-ill be better.
-
-Best regards,
-        Maxim Levitsky
-
-clone of "luks-keymgmnt-v2"
-
-Maxim Levitsky (14):
-  qcrypto/core: add generic infrastructure for crypto options amendment
-  qcrypto/luks: implement encryption key management
-  block/amend: add 'force' option
-  block/amend: separate amend and create options for qemu-img
-  block/amend: refactor qcow2 amend options
-  block/crypto: rename two functions
-  block/crypto: implement the encryption key management
-  block/qcow2: extend qemu-img amend interface with crypto options
-  iotests: filter few more luks specific create options
-  iotests: qemu-img tests for luks key management
-  block/core: add generic infrastructure for x-blockdev-amend qmp
-    command
-  block/crypto: implement blockdev-amend
-  block/qcow2: implement blockdev-amend
-  iotests: add tests for blockdev-amend
-
- block.c                          |   4 +-
- block/Makefile.objs              |   2 +-
- block/amend.c                    | 108 ++++++++
- block/crypto.c                   | 203 ++++++++++++++--
- block/crypto.h                   |  37 +++
- block/qcow2.c                    | 306 +++++++++++++----------
- crypto/block-luks.c              | 406 ++++++++++++++++++++++++++++++-
- crypto/block.c                   |  29 +++
- crypto/blockpriv.h               |   8 +
- docs/tools/qemu-img.rst          |   5 +-
- include/block/block.h            |   1 +
- include/block/block_int.h        |  24 +-
- include/crypto/block.h           |  22 ++
- qapi/block-core.json             |  68 ++++++
- qapi/crypto.json                 |  75 +++++-
- qapi/job.json                    |   4 +-
- qemu-img-cmds.hx                 |   4 +-
- qemu-img.c                       |  44 +++-
- tests/qemu-iotests/049.out       | 102 ++++----
- tests/qemu-iotests/061.out       |  12 +-
- tests/qemu-iotests/079.out       |  18 +-
- tests/qemu-iotests/082.out       | 176 ++++----------
- tests/qemu-iotests/085.out       |  38 +--
- tests/qemu-iotests/087.out       |   6 +-
- tests/qemu-iotests/115.out       |   2 +-
- tests/qemu-iotests/121.out       |   4 +-
- tests/qemu-iotests/125.out       | 192 +++++++--------
- tests/qemu-iotests/134.out       |   2 +-
- tests/qemu-iotests/144.out       |   4 +-
- tests/qemu-iotests/158.out       |   4 +-
- tests/qemu-iotests/182.out       |   2 +-
- tests/qemu-iotests/185.out       |   8 +-
- tests/qemu-iotests/188.out       |   2 +-
- tests/qemu-iotests/189.out       |   4 +-
- tests/qemu-iotests/198.out       |   4 +-
- tests/qemu-iotests/243.out       |  16 +-
- tests/qemu-iotests/250.out       |   2 +-
- tests/qemu-iotests/255.out       |   8 +-
- tests/qemu-iotests/263.out       |   4 +-
- tests/qemu-iotests/274.out       |  46 ++--
- tests/qemu-iotests/280.out       |   2 +-
- tests/qemu-iotests/284.out       |   6 +-
- tests/qemu-iotests/300           | 207 ++++++++++++++++
- tests/qemu-iotests/300.out       |  99 ++++++++
- tests/qemu-iotests/301           |  90 +++++++
- tests/qemu-iotests/301.out       |  30 +++
- tests/qemu-iotests/302           | 278 +++++++++++++++++++++
- tests/qemu-iotests/302.out       |  40 +++
- tests/qemu-iotests/303           | 233 ++++++++++++++++++
- tests/qemu-iotests/303.out       |  33 +++
- tests/qemu-iotests/common.filter |   6 +-
- tests/qemu-iotests/group         |   5 +
- 52 files changed, 2503 insertions(+), 532 deletions(-)
- create mode 100644 block/amend.c
- create mode 100755 tests/qemu-iotests/300
- create mode 100644 tests/qemu-iotests/300.out
- create mode 100755 tests/qemu-iotests/301
- create mode 100644 tests/qemu-iotests/301.out
- create mode 100755 tests/qemu-iotests/302
- create mode 100644 tests/qemu-iotests/302.out
- create mode 100755 tests/qemu-iotests/303
- create mode 100644 tests/qemu-iotests/303.out
-
+diff --git a/block.c b/block.c
+index 301ec588bd..fe692202a9 100644
+--- a/block.c
++++ b/block.c
+@@ -6377,6 +6377,7 @@ void bdrv_remove_aio_context_notifier(BlockDriverStat=
+e *bs,
+=20
+ int bdrv_amend_options(BlockDriverState *bs, QemuOpts *opts,
+                        BlockDriverAmendStatusCB *status_cb, void *cb_opaqu=
+e,
++                       bool force,
+                        Error **errp)
+ {
+     if (!bs->drv) {
+@@ -6388,7 +6389,8 @@ int bdrv_amend_options(BlockDriverState *bs, QemuOpts=
+ *opts,
+                    bs->drv->format_name);
+         return -ENOTSUP;
+     }
+-    return bs->drv->bdrv_amend_options(bs, opts, status_cb, cb_opaque, err=
+p);
++    return bs->drv->bdrv_amend_options(bs, opts, status_cb,
++                                       cb_opaque, force, errp);
+ }
+=20
+ /*
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 2ba0b17c39..ffb6b22e2d 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -5200,6 +5200,7 @@ static void qcow2_amend_helper_cb(BlockDriverState *b=
+s,
+ static int qcow2_amend_options(BlockDriverState *bs, QemuOpts *opts,
+                                BlockDriverAmendStatusCB *status_cb,
+                                void *cb_opaque,
++                               bool force,
+                                Error **errp)
+ {
+     BDRVQcow2State *s =3D bs->opaque;
+diff --git a/docs/tools/qemu-img.rst b/docs/tools/qemu-img.rst
+index 0080f83a76..fc2dca6649 100644
+--- a/docs/tools/qemu-img.rst
++++ b/docs/tools/qemu-img.rst
+@@ -249,11 +249,14 @@ Command description:
+=20
+ .. program:: qemu-img-commands
+=20
+-.. option:: amend [--object OBJECTDEF] [--image-opts] [-p] [-q] [-f FMT] [=
+-t CACHE] -o OPTIONS FILENAME
++.. option:: amend [--object OBJECTDEF] [--image-opts] [-p] [-q] [-f FMT] [=
+-t CACHE] [--force] -o OPTIONS FILENAME
+=20
+   Amends the image format specific *OPTIONS* for the image file
+   *FILENAME*. Not all file formats support this operation.
+=20
++  --force allows some unsafe operations. Currently for -f luks, it allows =
+to
++  erase last encryption key, and to overwrite an active encryption key.
++
+ .. option:: bench [-c COUNT] [-d DEPTH] [-f FMT] [--flush-interval=3DFLUSH=
+_INTERVAL] [-i AIO] [-n] [--no-drain] [-o OFFSET] [--pattern=3DPATTERN] [-q=
+] [-s BUFFER_SIZE] [-S STEP_SIZE] [-t CACHE] [-w] [-U] FILENAME
+=20
+   Run a simple sequential I/O benchmark on the specified image. If ``-w`` =
+is
+diff --git a/include/block/block.h b/include/block/block.h
+index 8b62429aa4..0ca53b5598 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -392,6 +392,7 @@ typedef void BlockDriverAmendStatusCB(BlockDriverState =
+*bs, int64_t offset,
+                                       int64_t total_work_size, void *opaqu=
+e);
+ int bdrv_amend_options(BlockDriverState *bs_new, QemuOpts *opts,
+                        BlockDriverAmendStatusCB *status_cb, void *cb_opaqu=
+e,
++                       bool force,
+                        Error **errp);
+=20
+ /* check if a named node can be replaced when doing drive-mirror */
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 92335f33c7..98671ecdf6 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -432,6 +432,7 @@ struct BlockDriver {
+     int (*bdrv_amend_options)(BlockDriverState *bs, QemuOpts *opts,
+                               BlockDriverAmendStatusCB *status_cb,
+                               void *cb_opaque,
++                              bool force,
+                               Error **errp);
+=20
+     void (*bdrv_debug_event)(BlockDriverState *bs, BlkdebugEvent event);
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index c9c54de1df..9920f1f9d4 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -10,9 +10,9 @@ HXCOMM When amending the rST sections, please remember to=
+ copy the usage
+ HXCOMM over to the per-command sections in qemu-img.texi.
+=20
+ DEF("amend", img_amend,
+-    "amend [--object objectdef] [--image-opts] [-p] [-q] [-f fmt] [-t cach=
+e] -o options filename")
++    "amend [--object objectdef] [--image-opts] [-p] [-q] [-f fmt] [-t cach=
+e] [--force] -o options filename")
+ SRST
+-.. option:: amend [--object OBJECTDEF] [--image-opts] [-p] [-q] [-f FMT] [=
+-t CACHE] -o OPTIONS FILENAME
++.. option:: amend [--object OBJECTDEF] [--image-opts] [-p] [-q] [-f FMT] [=
+-t CACHE] [--force] -o OPTIONS FILENAME
+ ERST
+=20
+ DEF("bench", img_bench,
+diff --git a/qemu-img.c b/qemu-img.c
+index 6a4327aaba..ef422d5471 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -71,6 +71,7 @@ enum {
+     OPTION_SHRINK =3D 266,
+     OPTION_SALVAGE =3D 267,
+     OPTION_TARGET_IS_ZERO =3D 268,
++    OPTION_FORCE =3D 269,
+ };
+=20
+ typedef enum OutputFormat {
+@@ -3958,6 +3959,7 @@ static int img_amend(int argc, char **argv)
+     BlockBackend *blk =3D NULL;
+     BlockDriverState *bs =3D NULL;
+     bool image_opts =3D false;
++    bool force =3D false;
+=20
+     cache =3D BDRV_DEFAULT_CACHE;
+     for (;;) {
+@@ -3965,6 +3967,7 @@ static int img_amend(int argc, char **argv)
+             {"help", no_argument, 0, 'h'},
+             {"object", required_argument, 0, OPTION_OBJECT},
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
++            {"force", no_argument, 0, OPTION_FORCE},
+             {0, 0, 0, 0}
+         };
+         c =3D getopt_long(argc, argv, ":ho:f:t:pq",
+@@ -4012,6 +4015,9 @@ static int img_amend(int argc, char **argv)
+         case OPTION_IMAGE_OPTS:
+             image_opts =3D true;
+             break;
++        case OPTION_FORCE:
++            force =3D true;
++            break;
+         }
+     }
+=20
+@@ -4089,7 +4095,7 @@ static int img_amend(int argc, char **argv)
+=20
+     /* In case the driver does not call amend_status_cb() */
+     qemu_progress_print(0.f, 0);
+-    ret =3D bdrv_amend_options(bs, opts, &amend_status_cb, NULL, &err);
++    ret =3D bdrv_amend_options(bs, opts, &amend_status_cb, NULL, force, &e=
+rr);
+     qemu_progress_print(100.f, 0);
+     if (ret < 0) {
+         error_report_err(err);
 --=20
 2.17.2
 
