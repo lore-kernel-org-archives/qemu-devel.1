@@ -2,76 +2,74 @@ Return-Path: <SRS0=KEGy=6R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 438EFC28CBC
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 18:11:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09796C28CBC
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 18:41:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10D08206E9
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 18:11:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10D08206E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id C05E9206F0
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 18:41:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C05E9206F0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVJ5L-0005xj-9T
-	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 14:11:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56250)
+	id 1jVJYn-0002Rb-UT
+	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 14:41:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59396)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jVJ4m-0005RS-PY
- for qemu-devel@nongnu.org; Sun, 03 May 2020 14:10:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53054)
+ id 1jVJY1-0001kl-Qc
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 14:41:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54496)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jVJ4l-0003ns-RE
- for qemu-devel@nongnu.org; Sun, 03 May 2020 14:10:52 -0400
+ id 1jVJY0-00088Z-K7
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 14:41:05 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jVJ4j-0001RR-Sg
- for <qemu-devel@nongnu.org>; Sun, 03 May 2020 18:10:49 +0000
+ id 1jVJXy-0002i9-6B
+ for <qemu-devel@nongnu.org>; Sun, 03 May 2020 18:41:02 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D0E322E80E7
- for <qemu-devel@nongnu.org>; Sun,  3 May 2020 18:10:49 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id E4D242E810C
+ for <qemu-devel@nongnu.org>; Sun,  3 May 2020 18:41:01 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 03 May 2020 17:58:27 -0000
-From: Marco <jermy.07@gmail.com>
+Date: Sun, 03 May 2020 18:32:19 -0000
+From: Heiko Sieger <1856335@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: janitor jermy-07 laurent-vivier rth
-X-Launchpad-Bug-Reporter: Marco (jermy-07)
-X-Launchpad-Bug-Modifier: Marco (jermy-07)
-References: <158152698766.24807.871332888169155245.malonedeb@gac.canonical.com>
-Message-Id: <158852870736.11461.1968302270519322293.malone@wampee.canonical.com>
-Subject: [Bug 1862986] Re: qemu-s390x segfaults
+X-Launchpad-Bug-Commenters: babumoger djdatte h-sieger
+X-Launchpad-Bug-Reporter: Damir (djdatte)
+X-Launchpad-Bug-Modifier: Heiko Sieger (h-sieger)
+References: <157625616239.22064.10423897892496347105.malonedeb@gac.canonical.com>
+Message-Id: <158853073981.4932.1299728933981092236.malone@soybean.canonical.com>
+Subject: [Bug 1856335] Re: Cache Layout wrong on many Zen Arch CPUs
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 610408ac691690ff824f007e27b7dca62a57417a
+X-Launchpad-Hash: 10cb95f287c130c88f7fb534ac527bf9e1556e2f
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/03 14:10:50
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -55
-X-Spam_score: -5.6
-X-Spam_bar: -----
-X-Spam_report: (-5.6 / 5.0 requ) BAYES_00=-1.9, DKIM_ADSP_CUSTOM_MED=0.001,
- FORGED_GMAIL_RCVD=1, FREEMAIL_FORGED_FROMDOMAIN=0.001, FREEMAIL_FROM=0.001,
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
  HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
  RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
@@ -86,126 +84,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1862986 <1862986@bugs.launchpad.net>
+Reply-To: Bug 1856335 <1856335@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This still happens on qemu 5.0
-
-Steps to reproduce:
-
-# install packages
-dpkg --add-architecture s390x
-apt update
-apt install qemu-user libc6:s390x libstdc++6:s390x libfontconfig1:s390x lib=
-xcb1:s390x
-apt install g++-s390x-linux-gnu
-
-# create dummy binary
-echo 'int main(){}'| s390x-linux-gnu-g++ -x c++ -
-
-# run dummy binary
-qemu-s390x ./a.out
-Segmentation fault (core dumped)
-
-** Summary changed:
-
-- qemu-s390x crashes when run on aarch64
-+ qemu-s390x segfaults
-
-** Changed in: qemu
-       Status: Expired =3D> New
+Finally installed QEMU 5.0.0.154 - still the same. QEMU doesn't
+recognize the L3 caches and still lists 3 L3 caches instead of 4 with 3
+cores/6 threads.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1862986
+https://bugs.launchpad.net/bugs/1856335
 
 Title:
-  qemu-s390x segfaults
+  Cache Layout wrong on many Zen Arch CPUs
 
 Status in QEMU:
   New
 
 Bug description:
-  All tested versions (2.11 and 4.2) qemu-s390x crashes with a segfault
-  when run on an aarch64 odroid Ubuntu.
+  AMD CPUs have L3 cache per 2, 3 or 4 cores. Currently, TOPOEXT seems
+  to always map Cache ass if it was an 4-Core per CCX CPU, which is
+  incorrect, and costs upwards 30% performance (more realistically 10%)
+  in L3 Cache Layout aware applications.
 
+  Example on a 4-CCX CPU (1950X /w 8 Cores and no SMT):
 
-  Steps to reproduce:
+  =C2=A0=C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
+  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
+  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
+  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'8' threads=3D'1'=
+/>
 
-  root@odroid:~/workspace/bitcoin-core# /usr/local/bin/qemu-s390x "/root/wo=
-rkspace/bitcoin-core/build/bitcoin-s390x-linux-gnu/src/test/test_bitcoin_or=
-ig"
-  Segmentation fault (core dumped)
-  root@odroid:~/workspace/bitcoin-core# /usr/local/bin/qemu-s390x --version
-  qemu-s390x version 4.2.0
-  Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
-  root@odroid:~/workspace/bitcoin-core# /usr/bin/qemu-s390x "/root/workspac=
-e/bitcoin-core/build/bitcoin-s390x-linux-gnu/src/test/test_bitcoin_orig"
-  Segmentation fault (core dumped)
-  root@odroid:~/workspace/bitcoin-core# /usr/bin/qemu-s390x --version
-  qemu-s390x version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.22)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+  In windows, coreinfo reports correctly:
 
-  qemu-arm does work on the same machine:
+  ****----  Unified Cache 1, Level 3,    8 MB, Assoc  16, LineSize  64
+  ----****  Unified Cache 6, Level 3,    8 MB, Assoc  16, LineSize  64
 
-  root@odroid:~/workspace/bitcoin-core# /usr/bin/qemu-arm bitcoin-0.19.0.1-=
-armhf/bin/test_bitcoin -t amount_tests
-  Running 4 test cases...
+  On a 3-CCX CPU (3960X /w 6 cores and no SMT):
 
-  *** No errors detected
-  root@odroid:~/workspace/bitcoin-core# /usr/local/bin/qemu-arm bitcoin-0.1=
-9.0.1-armhf/bin/test_bitcoin -t amount_tests
-  Running 4 test cases...
+  =C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
+  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
+  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
+  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'6' threads=3D'1'=
+/>
 
-  *** No errors detected
+  in windows, coreinfo reports incorrectly:
 
+  ****--  Unified Cache  1, Level 3,    8 MB, Assoc  16, LineSize  64
+  ----**  Unified Cache  6, Level 3,    8 MB, Assoc  16, LineSize  64
 
-  =
+  Validated against 3.0, 3.1, 4.1 and 4.2 versions of qemu-kvm.
 
-  What kind of debug information would be helpful for this issue report?
-  GDB for the self-compiled latest release is not particularly helpful:
+  With newer Qemu there is a fix (that does behave correctly) in using the =
+dies parameter:
+  =C2=A0<qemu:arg value=3D'cores=3D3,threads=3D1,dies=3D2,sockets=3D1'/>
 
-  (gdb) run
-  Starting program: /usr/local/bin/qemu-s390x /root/workspace/bitcoin-core/=
-build/bitcoin-s390x-linux-gnu/src/test/test_bitcoin_orig
-  [Thread debugging using libthread_db enabled]
-  Using host libthread_db library "/lib/aarch64-linux-gnu/libthread_db.so.1=
-".
-  [New Thread 0x7fb7a2a140 (LWP 28264)]
-
-  Thread 1 "qemu-s390x" received signal SIGSEGV, Segmentation fault.
-  0x000000555596b218 in __bss_start__ ()
-  (gdb) bt
-  #0  0x000000555596b218 in __bss_start__ ()
-  #1  0x00000055556120a8 in ?? ()
-  #2  0x00000055579904b0 in ?? ()
-  Backtrace stopped: previous frame inner to this frame (corrupt stack?)
-
-
-  =
-
-  A bit more information is available in the version shipped by Ubuntu:
-
-  (gdb) run
-  Starting program: /usr/bin/qemu-s390x /root/workspace/bitcoin-core/build/=
-bitcoin-s390x-linux-gnu/src/test/test_bitcoin_orig
-  [Thread debugging using libthread_db enabled]
-  Using host libthread_db library "/lib/aarch64-linux-gnu/libthread_db.so.1=
-".
-  [New Thread 0x7fb7a01180 (LWP 28271)]
-
-  Thread 1 "qemu-s390x" received signal SIGSEGV, Segmentation fault.
-  0x0000005555738f98 in code_gen_buffer ()
-  (gdb) bt
-  #0  0x0000005555738f98 in code_gen_buffer ()
-  #1  0x00000055555e96c8 in cpu_exec ()
-  #2  0x00000055555ee430 in cpu_loop ()
-  #3  0x00000055555c3328 in main ()
+  The problem is that the dies are exposed differently than how AMD does
+  it natively, they are exposed to Windows as sockets, which means, that
+  if you are nto a business user, you can't ever have a machine with
+  more than two CCX (6 cores) as consumer versions of Windows only
+  supports two sockets. (Should this be reported as a separate bug?)
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1862986/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1856335/+subscriptions
 
