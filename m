@@ -2,106 +2,80 @@ Return-Path: <SRS0=KEGy=6R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48250C28CBC
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 14:20:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E30FC28CBC
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 16:50:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 136852073E
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 14:20:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 136852073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id E7B52206D7
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 16:50:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bj/UOBV7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7B52206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVFTu-0001xY-81
-	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 10:20:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36244)
+	id 1jVHpA-0002y2-VA
+	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 12:50:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42152)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jVFSU-0007z7-Iw; Sun, 03 May 2020 10:19:06 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28740
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jVFST-00015o-FQ; Sun, 03 May 2020 10:19:06 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 043E2RPj133906; Sun, 3 May 2020 10:19:02 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 30s50ep90r-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Sun, 03 May 2020 10:19:02 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 043EDAGb153748;
- Sun, 3 May 2020 10:19:02 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
- [169.63.121.186])
- by mx0b-001b2d01.pphosted.com with ESMTP id 30s50ep90j-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Sun, 03 May 2020 10:19:02 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
- by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 043EFmQA012093;
- Sun, 3 May 2020 14:19:01 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
- [9.57.198.24]) by ppma03wdc.us.ibm.com with ESMTP id 30s0g6a22q-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Sun, 03 May 2020 14:19:01 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
- [9.57.199.111])
- by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 043EJ1D948300516
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Sun, 3 May 2020 14:19:01 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 27C54AC05F;
- Sun,  3 May 2020 14:19:01 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 152F9AC05B;
- Sun,  3 May 2020 14:19:01 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
- Sun,  3 May 2020 14:19:01 +0000 (GMT)
-Subject: Re: [PATCH 2/2] arm/acpi: Add the TPM2.0 device under the DSDT
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
- peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- imammedo@redhat.com, shannon.zhaosl@gmail.com, mst@redhat.com
-References: <20200502203536.15011-1-eric.auger@redhat.com>
- <20200502203536.15011-3-eric.auger@redhat.com>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <1d961c0b-7176-2d9e-04d8-5839a16ec889@linux.ibm.com>
-Date: Sun, 3 May 2020 10:19:00 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <20200502203536.15011-3-eric.auger@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-05-03_09:2020-05-01,
- 2020-05-03 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- clxscore=1015 impostorscore=0 adultscore=0 priorityscore=1501
- malwarescore=0 phishscore=0 mlxscore=0 spamscore=0 mlxlogscore=999
- bulkscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2005030127
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=stefanb@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/03 10:19:04
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1jVHoQ-0002Ta-1f
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 12:49:54 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22684
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1jVHoO-0001Wu-GF
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 12:49:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588524590;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=l/syZovk2iMl/EmIsQX1A/bHGAy/LxDdgGBUmHwsqaU=;
+ b=bj/UOBV7d+89LVpdpL04tR4XnsElFH42LHOwZULD2fkDTwjFY+WJPeMVVPsQBjE6sRMqSY
+ zJpNOSyp0NgaQZqoH64Q/qYGaLifTC79ERfc7qX8eBkm/2DUMyxRwdpK6iQ/6Ck/pNqXNO
+ Qn/k+16Upmi2gJ7V6xdww9rLS/nXSek=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-500-cNqqT8ekO6m56evs8XF-cg-1; Sun, 03 May 2020 12:49:48 -0400
+X-MC-Unique: cNqqT8ekO6m56evs8XF-cg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E54B68014D6;
+ Sun,  3 May 2020 16:49:47 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2C6B710016DA;
+ Sun,  3 May 2020 16:49:45 +0000 (UTC)
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] Fix iotest 153
+Date: Sun,  3 May 2020 19:49:43 +0300
+Message-Id: <20200503164943.27215-1-mlevitsk@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/03 12:49:50
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -115,84 +89,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, drjones@redhat.com, gshan@redhat.com,
- lersek@redhat.com, ardb@kernel.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/2/20 4:35 PM, Eric Auger wrote:
-> In case it is dynamically instantiated, add the TPM 2.0 device object
-> under the DSDT table in the ACPI namespace. Its HID is MSFT0101
-> while its current resource settings (CRS) property is initialized
-> with the guest physical address and MMIO size of the device.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->   hw/arm/virt-acpi-build.c | 34 ++++++++++++++++++++++++++++++++++
->   1 file changed, 34 insertions(+)
->
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index cc5863eaf2..0cb9cdb2ce 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -45,6 +45,7 @@
->   #include "hw/pci/pcie_host.h"
->   #include "hw/pci/pci.h"
->   #include "hw/arm/virt.h"
-> +#include "hw/platform-bus.h"
->   #include "sysemu/numa.h"
->   #include "sysemu/reset.h"
->   #include "sysemu/tpm.h"
-> @@ -362,6 +363,38 @@ static void acpi_dsdt_add_power_button(Aml *scope)
->       aml_append(scope, dev);
->   }
->   
-> +static void acpi_dsdt_add_tpm(Aml *scope, VirtMachineState *vms)
-> +{
-> +    hwaddr pbus_base = vms->memmap[VIRT_PLATFORM_BUS].base;
-> +    PlatformBusDevice *pbus = PLATFORM_BUS_DEVICE(vms->platform_bus_dev);
-> +    MemoryRegion *sbdev_mr;
-> +    SysBusDevice *sbdev;
-> +    hwaddr tpm_base;
-> +
-> +    sbdev = (SysBusDevice *)object_dynamic_cast(OBJECT(tpm_find()),
-> +                                                TYPE_SYS_BUS_DEVICE);
-> +    if (!sbdev) {
-> +        return;
-> +    }
-> +
-> +    tpm_base = platform_bus_get_mmio_addr(pbus, sbdev, 0);
-> +    assert(tpm_base != -1);
-> +
-> +    tpm_base += pbus_base;
-> +
-> +    sbdev_mr = sysbus_mmio_get_region(sbdev, 0);
-> +
-> +    Aml *dev = aml_device("TPM0");
-> +    aml_append(dev, aml_name_decl("_HID", aml_string("MSFT0101")));
-> +    aml_append(dev, aml_name_decl("_UID", aml_int(0)));
-> +
-> +    Aml *crs = aml_resource_template();
-> +    aml_append(crs,
-> +               aml_memory32_fixed(tpm_base, sbdev_mr->size, AML_READ_WRITE));
-> +    aml_append(dev, aml_name_decl("_CRS", crs));
-> +    aml_append(scope, dev);
-> +}
-> +
->   static void
->   build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->   {
-> @@ -785,6 +818,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->       }
->   
->       acpi_dsdt_add_power_button(scope);
-> +    acpi_dsdt_add_tpm(scope, vms);
->   
->       aml_append(dsdt, scope);
->   
+Commit f62514b3def5fb2acbef64d0e053c0c31fa45aff made qemu-img reject -o "" =
+but this test uses it
 
-Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
+Since this test only tries to do a dry-run run of qemu-img amend, replace t=
+he -o "" with
+dummy -o "size=3D0" since due to the nature of the test, it is not going
+to reach the actual amend operation anyway
 
+Fixes: f62514b3def5fb2acbef64d0e053c0c31fa45aff
+
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+---
+ tests/qemu-iotests/153     |  2 +-
+ tests/qemu-iotests/153.out | 12 ++++++------
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
+index 2b13111768..3f5029dd8f 100755
+--- a/tests/qemu-iotests/153
++++ b/tests/qemu-iotests/153
+@@ -122,7 +122,7 @@ for opts1 in "" "read-only=3Don" "read-only=3Don,force-=
+share=3Don"; do
+         _run_cmd $QEMU_IMG check       $L "${TEST_IMG}"
+         _run_cmd $QEMU_IMG compare     $L "${TEST_IMG}" "${TEST_IMG}"
+         _run_cmd $QEMU_IMG map         $L "${TEST_IMG}"
+-        _run_cmd $QEMU_IMG amend -o "" $L "${TEST_IMG}"
++        _run_cmd $QEMU_IMG amend -o "size=3D0" $L "${TEST_IMG}"
+         _run_cmd $QEMU_IMG commit      $L "${TEST_IMG}"
+         _run_cmd $QEMU_IMG resize      $L "${TEST_IMG}" $size
+         _run_cmd $QEMU_IMG rebase      $L "${TEST_IMG}" -b "${TEST_IMG}.ba=
+se"
+diff --git a/tests/qemu-iotests/153.out b/tests/qemu-iotests/153.out
+index f7464dd8d3..9c01b750e0 100644
+--- a/tests/qemu-iotests/153.out
++++ b/tests/qemu-iotests/153.out
+@@ -56,7 +56,7 @@ _qemu_img_wrapper map TEST_DIR/t.qcow2
+ qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to get shared "write" =
+lock
+ Is another process using the image [TEST_DIR/t.qcow2]?
+=20
+-_qemu_img_wrapper amend -o  TEST_DIR/t.qcow2
++_qemu_img_wrapper amend -o size=3D0 TEST_DIR/t.qcow2
+ qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to get "write" lock
+ Is another process using the image [TEST_DIR/t.qcow2]?
+=20
+@@ -118,7 +118,7 @@ _qemu_img_wrapper compare -U TEST_DIR/t.qcow2 TEST_DIR/=
+t.qcow2
+=20
+ _qemu_img_wrapper map -U TEST_DIR/t.qcow2
+=20
+-_qemu_img_wrapper amend -o  -U TEST_DIR/t.qcow2
++_qemu_img_wrapper amend -o size=3D0 -U TEST_DIR/t.qcow2
+ qemu-img: unrecognized option '-U'
+ Try 'qemu-img --help' for more information
+=20
+@@ -187,7 +187,7 @@ _qemu_img_wrapper compare TEST_DIR/t.qcow2 TEST_DIR/t.q=
+cow2
+=20
+ _qemu_img_wrapper map TEST_DIR/t.qcow2
+=20
+-_qemu_img_wrapper amend -o  TEST_DIR/t.qcow2
++_qemu_img_wrapper amend -o size=3D0 TEST_DIR/t.qcow2
+ qemu-img: Could not open 'TEST_DIR/t.qcow2': Failed to get "write" lock
+ Is another process using the image [TEST_DIR/t.qcow2]?
+=20
+@@ -241,7 +241,7 @@ _qemu_img_wrapper compare -U TEST_DIR/t.qcow2 TEST_DIR/=
+t.qcow2
+=20
+ _qemu_img_wrapper map -U TEST_DIR/t.qcow2
+=20
+-_qemu_img_wrapper amend -o  -U TEST_DIR/t.qcow2
++_qemu_img_wrapper amend -o size=3D0 -U TEST_DIR/t.qcow2
+ qemu-img: unrecognized option '-U'
+ Try 'qemu-img --help' for more information
+=20
+@@ -303,7 +303,7 @@ _qemu_img_wrapper compare TEST_DIR/t.qcow2 TEST_DIR/t.q=
+cow2
+=20
+ _qemu_img_wrapper map TEST_DIR/t.qcow2
+=20
+-_qemu_img_wrapper amend -o  TEST_DIR/t.qcow2
++_qemu_img_wrapper amend -o size=3D0 TEST_DIR/t.qcow2
+=20
+ _qemu_img_wrapper commit TEST_DIR/t.qcow2
+=20
+@@ -345,7 +345,7 @@ _qemu_img_wrapper compare -U TEST_DIR/t.qcow2 TEST_DIR/=
+t.qcow2
+=20
+ _qemu_img_wrapper map -U TEST_DIR/t.qcow2
+=20
+-_qemu_img_wrapper amend -o  -U TEST_DIR/t.qcow2
++_qemu_img_wrapper amend -o size=3D0 -U TEST_DIR/t.qcow2
+ qemu-img: unrecognized option '-U'
+ Try 'qemu-img --help' for more information
+=20
+--=20
+2.17.2
 
 
