@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0116CC28CBC
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 04:41:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C5FEC28CBC
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 04:42:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFB122073E
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 04:41:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 664F82073E
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 04:42:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=brainfault-org.20150623.gappssmtp.com header.i=@brainfault-org.20150623.gappssmtp.com header.b="ebDrmoyv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFB122073E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=brainfault-org.20150623.gappssmtp.com header.i=@brainfault-org.20150623.gappssmtp.com header.b="T50JLXcx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 664F82073E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jV6Rl-0007vn-Ty
-	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 00:41:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48752)
+	id 1jV6Se-0000OW-LC
+	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 00:42:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48974)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <anup@brainfault.org>)
- id 1jV6R1-0007Rh-Nk
- for qemu-devel@nongnu.org; Sun, 03 May 2020 00:40:59 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52897)
+ id 1jV6S7-0008Oc-0A
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 00:42:07 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37466)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <anup@brainfault.org>)
- id 1jV6R0-0006sZ-T7
- for qemu-devel@nongnu.org; Sun, 03 May 2020 00:40:59 -0400
-Received: by mail-wm1-x344.google.com with SMTP id 188so4592563wmc.2
- for <qemu-devel@nongnu.org>; Sat, 02 May 2020 21:40:58 -0700 (PDT)
+ id 1jV6S5-0000Db-Qr
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 00:42:06 -0400
+Received: by mail-wm1-x343.google.com with SMTP id z6so4923243wml.2
+ for <qemu-devel@nongnu.org>; Sat, 02 May 2020 21:42:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=brainfault-org.20150623.gappssmtp.com; s=20150623;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=RimjZ7WkFfKRUws7pVSN5jCnQogAheTvnqGcbUpcMD8=;
- b=ebDrmoyvEDObS8rmCedj/G+r7Wfc9AGGy2Bbo3lQlthh5YqsFXptNK7UgmQwpOl0rX
- BrOvTJVnX7GTs3veu27kdoaeSYRaALeb6to8CZ76/1q9V3XqelU16o29mTXJQZKYSSns
- RdLjBsLUx40v29nd2fpQPLEChIdUyNNWFLw5CDXU/zo+eaHVtg4NU0ZDVunF85ADIQok
- RNyX7q+O+mFV8GB30BxYWYrNxz66ik4uk4LamH5jKyV6AE59aHvBo/Mh4fWzvDmvnC+l
- LYv/rWOp7Z2aw/1niSquUmhyhiRa3wzz+qaOk2BwQ3Wyh90G2tnGoTTZgMTQwWdu8DvL
- NLwQ==
+ :cc; bh=vF8VFq5Qsbt5WQdDilLmnB4xmsmF+yCtyKsS/XLhhkU=;
+ b=T50JLXcxGwNnDsKbtrfHZeqKE9qtWPTj/ZvaUsGiLsYp00jqQ8VKfd1PT+LfdseQKa
+ rEXtg0U18gOlKUhlYZVhG4VnWWp56n40/EsZldfWqdBSbKe0++v0l3RpKLpUAZo0HT4P
+ eah7eRYIFjJJV7pPORJYyNZKX9f4kA/Zj5l17dXNNEjMcNy/x0vt4fpb0Yjkx3vCITCM
+ /U3GlXxhT0/o0j3erF+A/tq/8dkXIWbJS6jv1B1gIsanYFcAE1oL6IQe0d6jwxnVCmNj
+ 5f7lsEDxcMNE2cNmGNyWoOGMi9dJWCr6fxqYaFFQM+yNhm8B5Nrn7kvBae4vXT+r2j1x
+ HaaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=RimjZ7WkFfKRUws7pVSN5jCnQogAheTvnqGcbUpcMD8=;
- b=Pde/Eb9QJzayjMppgniVd8VmFlYaTxEyrbBOTGbTVmJ2C4D4fHVKzpp798eIb0HKQf
- KQMsonFKFbTjRjR95knntU423A/cUvLQlR4hue+RVobdrDDa1td1F4k0JgbtSyKjg/Se
- wf7TTOsipWKww0/Uzce3VXrx973l1R5gOayYO4e4KYTVkjbz84ZDICrWt7/BliPcRb2i
- sqebaOFY8Nat+6vAAewEClp1NxKurRkLroD4NVUYyJDOM9Miv/dI9FMK+rbP6H3n9Ex0
- uFjJUNQqQWVnl/cwOa6ETcLK1PVeHUGROtvX/Qfr4HVZa7ODyWucE1+hTB9flBkUS+Oo
- Nb0w==
-X-Gm-Message-State: AGi0Puaid/6Kc2y/W2hZdM9/TJIdnR00nqH4Ypf9XdjyfrZWJ1+LklyT
- CfvSa6LOmVOBDp+3K38Q2dV4p4UswbZ4U55C10bZLKYQXzs=
-X-Google-Smtp-Source: APiQypK7QI5xRIXqLKxTvAFX6S4zUSPFRjZlcu3CA23SQFqVxI0HgK7fVnTnYxSqWlaquYG10ALjUJg+Rn7C3aB21kQ=
-X-Received: by 2002:a7b:cc92:: with SMTP id p18mr8115154wma.26.1588480857385; 
- Sat, 02 May 2020 21:40:57 -0700 (PDT)
+ bh=vF8VFq5Qsbt5WQdDilLmnB4xmsmF+yCtyKsS/XLhhkU=;
+ b=JEimEasKeypTcQjRjO4ce/C6TTWJK3vRonspgI9RvODMhGFnSJFRHEs2PRjB5PWY5z
+ gf/wqMxYERpH7h7MyVS6ZVfjOKth2FZk2v9M/AivLqvRsW/LFFQgBrlEhNxR3O/id6OH
+ TU6aNgozHrYeNRQ0yH4m4SGLHDWVZe8z5V+xqCvmxpOPGBp1SM0HoVNyHLxtMkZU3POd
+ d1xh7r0PDe60vrQsqMMlB6jJPxDGuuuzKlCTEG3ZtVS0Ylm94SR5MHLiuwf0AZn3CGr5
+ GI6psNExM509T690KZaIQtmUBmWk1drT4q4xss8pfJdcu/+n6NyXldMfxu1UNOTnnnqm
+ SWtw==
+X-Gm-Message-State: AGi0PuawRAnT9Eh3pMk8SJv1t1gUYTyVdg63ccNgwb4KZELzOsgPkXQQ
+ CEtzTCmWoHHr3soXy6LJ3ut3E1mNUqj2VFZNOqtspA==
+X-Google-Smtp-Source: APiQypL7aDOQPD6rYKPBuM+O/gupsel4rX1e8pOKNCAo3NLGbju02VgLLqkuZ25x9rNhEwjlm/wQI42se+rngzzXsrA=
+X-Received: by 2002:a1c:4144:: with SMTP id o65mr8044675wma.78.1588480924523; 
+ Sat, 02 May 2020 21:42:04 -0700 (PDT)
 MIME-Version: 1.0
 References: <1588348254-7241-1-git-send-email-bmeng.cn@gmail.com>
- <1588348254-7241-3-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1588348254-7241-3-git-send-email-bmeng.cn@gmail.com>
+ <1588348254-7241-5-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1588348254-7241-5-git-send-email-bmeng.cn@gmail.com>
 From: Anup Patel <anup@brainfault.org>
-Date: Sun, 3 May 2020 10:10:44 +0530
-Message-ID: <CAAhSdy3z8ezUx+ozdupR5c5AKLhsfonSFHgrk_Yco2ZH4JubFQ@mail.gmail.com>
-Subject: Re: [PATCH 2/5] gitlab-ci/opensbi: Update GitLab CI to build generic
- platform
+Date: Sun, 3 May 2020 10:11:53 +0530
+Message-ID: <CAAhSdy3hfktuhOg36=8dOM06VLURefcf1gVxw_bKrWzmAwpGnA@mail.gmail.com>
+Subject: Re: [PATCH 4/5] riscv/spike: Change the default bios to use generic
+ platform image
 To: Bin Meng <bmeng.cn@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: none client-ip=2a00:1450:4864:20::344;
- envelope-from=anup@brainfault.org; helo=mail-wm1-x344.google.com
+Received-SPF: none client-ip=2a00:1450:4864:20::343;
+ envelope-from=anup@brainfault.org; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -18
@@ -105,72 +105,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 1, 2020 at 9:24 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+On Fri, May 1, 2020 at 9:25 PM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
 > From: Bin Meng <bin.meng@windriver.com>
 >
-> This updates the GitLab CI opensbi job to build opensbi bios images
-> for the generic platform.
+> To keep sync with other RISC-V machines, change the default bios
+> to use generic platform image.
+>
+> While we are here, add some comments to mention that keeping ELF
+> files here was intentional.
 >
 > Signed-off-by: Bin Meng <bin.meng@windriver.com>
 > ---
 >
->  .gitlab-ci-opensbi.yml | 26 ++++++++------------------
->  1 file changed, 8 insertions(+), 18 deletions(-)
+>  hw/riscv/spike.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 >
-> diff --git a/.gitlab-ci-opensbi.yml b/.gitlab-ci-opensbi.yml
-> index dd051c0..26092bb 100644
-> --- a/.gitlab-ci-opensbi.yml
-> +++ b/.gitlab-ci-opensbi.yml
-> @@ -34,18 +34,12 @@ build-opensbi:
->     when: always
->   artifacts:
->     paths: # 'artifacts.zip' will contains the following files:
-> -   - pc-bios/opensbi-riscv32-sifive_u-fw_jump.bin
-> -   - pc-bios/opensbi-riscv32-virt-fw_jump.bin
-> -   - pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin
-> -   - pc-bios/opensbi-riscv64-virt-fw_jump.bin
-> -   - opensbi32-virt-stdout.log
-> -   - opensbi32-virt-stderr.log
-> -   - opensbi64-virt-stdout.log
-> -   - opensbi64-virt-stderr.log
-> -   - opensbi32-sifive_u-stdout.log
-> -   - opensbi32-sifive_u-stderr.log
-> -   - opensbi64-sifive_u-stdout.log
-> -   - opensbi64-sifive_u-stderr.log
-> +   - pc-bios/opensbi-riscv32-generic-fw_jump.bin
-> +   - pc-bios/opensbi-riscv64-generic-fw_jump.bin
-
-Same comment as PATCH1
-
-We should add generic-fw_jump.elf here as well.
-
-> +   - opensbi32-generic-stdout.log
-> +   - opensbi32-generic-stderr.log
-> +   - opensbi64-generic-stdout.log
-> +   - opensbi64-generic-stderr.log
->   image: $CI_REGISTRY_IMAGE:opensbi-cross-build
->   variables:
->     GIT_DEPTH: 3
-> @@ -54,10 +48,6 @@ build-opensbi:
->   - export JOBS=$(($(getconf _NPROCESSORS_ONLN) + 1))
->   - echo "=== Using ${JOBS} simultaneous jobs ==="
->   - make -j${JOBS} -C roms/opensbi clean
-> - - make -j${JOBS} -C roms opensbi32-virt 2>&1 1>opensbi32-virt-stdout.log | tee -a opensbi32-virt-stderr.log >&2
-> + - make -j${JOBS} -C roms opensbi32-generic 2>&1 1>opensbi32-generic-stdout.log | tee -a opensbi32-generic-stderr.log >&2
->   - make -j${JOBS} -C roms/opensbi clean
-> - - make -j${JOBS} -C roms opensbi64-virt 2>&1 1>opensbi64-virt-stdout.log | tee -a opensbi64-virt-stderr.log >&2
-> - - make -j${JOBS} -C roms/opensbi clean
-> - - make -j${JOBS} -C roms opensbi32-sifive_u 2>&1 1>opensbi32-sifive_u-stdout.log | tee -a opensbi32-sifive_u-stderr.log >&2
-> - - make -j${JOBS} -C roms/opensbi clean
-> - - make -j${JOBS} -C roms opensbi64-sifive_u 2>&1 1>opensbi64-sifive_u-stdout.log | tee -a opensbi64-sifive_u-stderr.log >&2
-> + - make -j${JOBS} -C roms opensbi64-generic 2>&1 1>opensbi64-generic-stdout.log | tee -a opensbi64-generic-stderr.log >&2
+> diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+> index d0c4843..6f26fcf 100644
+> --- a/hw/riscv/spike.c
+> +++ b/hw/riscv/spike.c
+> @@ -45,10 +45,15 @@
+>
+>  #include <libfdt.h>
+>
+> +/*
+> + * Not like other RISC-V machines that use plain binary bios images,
+> + * keeping ELF files here was intentional because BIN files don't work
+> + * for the Spike machine as HTIF emulation depends on ELF parsing.
+> + */
+>  #if defined(TARGET_RISCV32)
+> -# define BIOS_FILENAME "opensbi-riscv32-spike-fw_jump.elf"
+> +# define BIOS_FILENAME "opensbi-riscv32-generic-fw_jump.elf"
+>  #else
+> -# define BIOS_FILENAME "opensbi-riscv64-spike-fw_jump.elf"
+> +# define BIOS_FILENAME "opensbi-riscv64-generic-fw_jump.elf"
+>  #endif
+>
+>  static const struct MemmapEntry {
 > --
 > 2.7.4
 >
 >
 
-Otherwise looks good to me.
+Looks good to me.
 
 Reviewed-by: Anup Patel <anup@brainfault.org>
 
