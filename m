@@ -2,83 +2,82 @@ Return-Path: <SRS0=KEGy=6R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89128C28CBC
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 10:08:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F00FC28CBC
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 10:09:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54A68206A5
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 10:08:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 199B1206A5
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 10:09:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VTYiLf8K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54A68206A5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xks75GZf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 199B1206A5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lemote.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVBYQ-0005eP-Ie
-	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 06:08:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56316)
+	id 1jVBZA-0006x1-BV
+	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 06:09:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56724)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
- id 1jVBWQ-0002oy-Bt
- for qemu-devel@nongnu.org; Sun, 03 May 2020 06:06:54 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:36852)
+ id 1jVBY1-00057L-4K
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 06:08:33 -0400
+Received: from mail-pg1-x52e.google.com ([2607:f8b0:4864:20::52e]:41430)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
- id 1jVBWO-0005LW-DX
- for qemu-devel@nongnu.org; Sun, 03 May 2020 06:06:54 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id a31so2338915pje.1
- for <qemu-devel@nongnu.org>; Sun, 03 May 2020 03:06:52 -0700 (PDT)
+ id 1jVBY0-0007iu-Fa
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 06:08:32 -0400
+Received: by mail-pg1-x52e.google.com with SMTP id o18so1851804pgg.8
+ for <qemu-devel@nongnu.org>; Sun, 03 May 2020 03:08:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=PbRSEAf2iP4s0AdgPIwTBI8UU6TRpGo2RmWTv12T7ho=;
- b=VTYiLf8K3ZXQ03QVxYhF/9uO0E/tOu+kPQwoAc93b3BEAgcVSLQpBRqF2Tf/oUnNLT
- 5MfOCVNkyIxmfW6rqRAG/KDOGfJ90qSCOYkyLVyp0kCgfho/WbXvhYjmWOk0cHJ5XATU
- DT0r+nBcu/TmiBtudt7o8B42SrS5xlGZch/1pUGsPFXcIVqwxqDNtPmHwMfsxvoFXZ1A
- 7UIBtWfNo9LYAGZPY0CkpTT/Cb9i6S0Nln245se2dLDSKKL+IHXw45JcsEkqVcmoO5VM
- mVffHeh9xVjeJYazs9MkBbMnBRM3I7qierSyZc936jKsNujp4nP3aLs9jchzfKN8CZ1c
- LRVw==
+ bh=Apq9sucfBmwOGXvj0V67gdzCLVL91nlJK5leKBoTGWw=;
+ b=Xks75GZfQ0X6QBtjXLWiC70RvNKvpA7JjnKscIdVbrnnx6Yjrs4aV+D1ELgi9JfsIh
+ M4nLVDw9slUZGMEL8mA9ym2MLviKXQVGK5xbme2G1ke+DVNspIX5ZCAX8bCb/dnPJpRO
+ 4ZLmcRjgJITfgV4d0XXPSFtLDrztQ8f8R/i9Rmgk8eVhcv9kMbc0FSG440Zqlw2WD2rn
+ HKYqgfKLsLTotPkPbJJDsCRUOE6kqpUflXNH3SSWtJXoGw0A0j461pWMgBRIu+UKNm1P
+ In0k8V8jvXwvnKMjo78NyStMzPZ6N+ERx/qKnGJx7xtpZn1jmS35pGAvvhiFoZWzpJXI
+ oe2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=PbRSEAf2iP4s0AdgPIwTBI8UU6TRpGo2RmWTv12T7ho=;
- b=sD+fOWakkAgXlN6H+C9G8Nu0OTSNpzD9UTECkBpYTDAN+15qDVMl4owd7qTuKSpx2y
- dJ2r5kIGmDDst3g/eQbWTEx8FXy7si766IhcWnC6wvdl9rl/MgWJ9R3ljL5Uw5aht5t8
- JpPOhEmRzJK1oYbbjO2mdmIleMSYWICBXIRx4WveAaFFrEkdauwLLvFiiPUvLo/oozGW
- LALQeNpCRs8KGFah/SI07etZ/KSCH3Ael21lrK+eUfNKipCvNdfLnTor63UYOoiyEYFl
- okD+PkUNM2tJRhIU5DZir6r9Gu7I/H0uCUwGbDe8M/CzgiF1F1mY26yL/QykrFN/6Y5H
- JofA==
-X-Gm-Message-State: AGi0PuZH9AAu+KA5ZLBCN3zeUVf6GO/agqPZ2t4+Inoy0GEC9N3611eR
- u97M3SoFnsMZtm+LyLL86K0=
-X-Google-Smtp-Source: APiQypIMzb4fvmZ2zpKo8dEGVhfSuz5hlvqkKdlygX14KjFPoy1s9T1BV1mrn7vMVcueySXbmeQTHw==
-X-Received: by 2002:a17:902:7045:: with SMTP id
- h5mr212211plt.108.1588500411150; 
- Sun, 03 May 2020 03:06:51 -0700 (PDT)
+ bh=Apq9sucfBmwOGXvj0V67gdzCLVL91nlJK5leKBoTGWw=;
+ b=LP/QSipbWhEk1xgLu8zHMBfJ/JnBuKay6nYj0245GnsSpYK6I5+2mlTeY6l3TSraGF
+ R8ZY/eBa7SNG0DtyhPaRnBXC5Hiq4cA8zYBgqd98NHo/jsFmdMRxFBGF/aO0etW/Rgf0
+ y8guQSY7OESnURSWMTC528n707efzF0iQt75nuAOJZEgUGZvlNaqWuR8qK3z6FO3XvOT
+ BT5eUEBYib0COxBpWAoo+i618F2A8mrhfQTy59ER8DeTXZtVSFlFzoARLUoUUxvTnTKO
+ 7msZF0d4TDySJlgTKgv1Bemrl6w9sEHOTqbwm7DxkSy2mWLuMQQXT6RJkPWV7SauxFt/
+ e3+g==
+X-Gm-Message-State: AGi0PuYJTXlkOvk2bUg0vfpLF2zbhF6HxZNbuQM+D03+D3eOC9q6R7cW
+ EN90P+0cBwaAAuel+6Amhco=
+X-Google-Smtp-Source: APiQypI2CbwfAI9/oWf5WDwYq3eUe5P+QBD7gAlrAddN5Qjv2hJyYr/2z5tfeFRn4cKRK5JWcYOEbg==
+X-Received: by 2002:a65:6417:: with SMTP id a23mr13042369pgv.204.1588500511198; 
+ Sun, 03 May 2020 03:08:31 -0700 (PDT)
 Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com.
  [34.92.144.28])
- by smtp.gmail.com with ESMTPSA id r26sm6329902pfq.75.2020.05.03.03.06.47
+ by smtp.gmail.com with ESMTPSA id r26sm6329902pfq.75.2020.05.03.03.08.28
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 03 May 2020 03:06:50 -0700 (PDT)
+ Sun, 03 May 2020 03:08:30 -0700 (PDT)
 From: Huacai Chen <chenhc@lemote.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
  Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-Subject: [PATCH V3 01/14] KVM: MIPS: Define KVM_ENTRYHI_ASID to
- cpu_asid_mask(&boot_cpu_data)
-Date: Sun,  3 May 2020 18:05:54 +0800
-Message-Id: <1588500367-1056-2-git-send-email-chenhc@lemote.com>
+Subject: [PATCH V3 03/14] KVM: MIPS: Increase KVM_MAX_VCPUS and
+ KVM_USER_MEM_SLOTS to 16
+Date: Sun,  3 May 2020 18:05:56 +0800
+Message-Id: <1588500367-1056-4-git-send-email-chenhc@lemote.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1588500367-1056-1-git-send-email-chenhc@lemote.com>
 References: <1588500367-1056-1-git-send-email-chenhc@lemote.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=chenhuacai@gmail.com; helo=mail-pj1-x1044.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52e;
+ envelope-from=chenhuacai@gmail.com; helo=mail-pg1-x52e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -104,48 +103,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: kvm@vger.kernel.org, Huacai Chen <chenhuacai@gmail.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Jiaxun Yang <jiaxun.yang@flygoat.com>, qemu-devel@nongnu.org,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, stable@vger.kernel.org,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
  Fuxin Zhang <zhangfx@lemote.com>, Huacai Chen <chenhc@lemote.com>,
- linux-mips@vger.kernel.org, Xing Li <lixing@loongson.cn>
+ linux-mips@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Xing Li <lixing@loongson.cn>
+Loongson-3 based machines can have as many as 16 CPUs, and so does
+memory slots, so increase KVM_MAX_VCPUS and KVM_USER_MEM_SLOTS to 16.
 
-The code in decode_config4() of arch/mips/kernel/cpu-probe.c
-
-        asid_mask = MIPS_ENTRYHI_ASID;
-        if (config4 & MIPS_CONF4_AE)
-                asid_mask |= MIPS_ENTRYHI_ASIDX;
-        set_cpu_asid_mask(c, asid_mask);
-
-set asid_mask to cpuinfo->asid_mask.
-
-So in order to support variable ASID_MASK, KVM_ENTRYHI_ASID should also
-be changed to cpu_asid_mask(&boot_cpu_data).
-
-Cc: stable@vger.kernel.org
-Signed-off-by: Xing Li <lixing@loongson.cn>
-[Huacai: Change current_cpu_data to boot_cpu_data for optimization]
 Signed-off-by: Huacai Chen <chenhc@lemote.com>
+Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- arch/mips/include/asm/kvm_host.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/mips/include/asm/kvm_host.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-index 2c343c3..a01cee9 100644
+index caa2b936..a7758c0 100644
 --- a/arch/mips/include/asm/kvm_host.h
 +++ b/arch/mips/include/asm/kvm_host.h
-@@ -275,7 +275,7 @@ enum emulation_result {
- #define MIPS3_PG_FRAME		0x3fffffc0
+@@ -78,8 +78,8 @@
+ #define KVM_REG_MIPS_CP0_KSCRATCH6	MIPS_CP0_64(31, 7)
  
- #define VPN2_MASK		0xffffe000
--#define KVM_ENTRYHI_ASID	MIPS_ENTRYHI_ASID
-+#define KVM_ENTRYHI_ASID	cpu_asid_mask(&boot_cpu_data)
- #define TLB_IS_GLOBAL(x)	((x).tlb_lo[0] & (x).tlb_lo[1] & ENTRYLO_G)
- #define TLB_VPN2(x)		((x).tlb_hi & VPN2_MASK)
- #define TLB_ASID(x)		((x).tlb_hi & KVM_ENTRYHI_ASID)
+ 
+-#define KVM_MAX_VCPUS		8
+-#define KVM_USER_MEM_SLOTS	8
++#define KVM_MAX_VCPUS		16
++#define KVM_USER_MEM_SLOTS	16
+ /* memory slots that does not exposed to userspace */
+ #define KVM_PRIVATE_MEM_SLOTS	0
+ 
 -- 
 2.7.0
 
