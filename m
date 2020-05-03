@@ -6,62 +6,62 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67195C28CBC
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 18:51:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0E04C28CBC
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 18:53:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FDBF206E9
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 18:51:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95FF0206E9
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 18:53:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MYeV8wgm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FDBF206E9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W/tM6ofQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95FF0206E9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVJhx-00074v-1a
-	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 14:51:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59724)
+	id 1jVJjY-0000ee-QY
+	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 14:53:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59700)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jVJap-0003Uh-Ma
- for qemu-devel@nongnu.org; Sun, 03 May 2020 14:43:59 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54575
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1jVJak-0003Q9-UM
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 14:43:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44137
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jVJao-0000J1-3Q
- for qemu-devel@nongnu.org; Sun, 03 May 2020 14:43:59 -0400
+ id 1jVJaf-0000Hf-Jo
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 14:43:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588531437;
+ s=mimecast20190719; t=1588531428;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wl53Ohgpnc6YVJxhVrZR8d3WIyUnPbwngJQ6DuOWX+w=;
- b=MYeV8wgm1O3W0M8qJIunti2MDQap8DRGtW1Xhw2geEY4xEAcXNHRYQqMieYW4+RpwW5MkU
- 86nvnU314/ZWl7eoVUNkn3hBi6iaZG3PD0iiP0oMNzKu/s7djcVSdseX9yBVXvuTInQeyT
- Ni5DSE+sJeq9SL0IoJLBwMTaTUdvgtY=
+ bh=j124Tl+q8lQmXNlSfb3ZcKxH4XMp9Ve/uFN0OvvrIb4=;
+ b=W/tM6ofQ3I6SHRakoC6QLGEZRFbT7QjYYawLDz+rmbQR9katNJwks7ibuTvENbD5yEaFxy
+ 4JI+42KqTz3L6orLv8TX8AnMPyeQXSaVzET8lO7HixU9ci/hqgSZGyNVtR0zzwdjg6DaC1
+ 9LvJ/xgEmZ3PLsmRkC8mN++rKEsJOOI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-428-Pj3D-nnHPDuJRTpKo-uihg-1; Sun, 03 May 2020 14:43:55 -0400
-X-MC-Unique: Pj3D-nnHPDuJRTpKo-uihg-1
+ us-mta-239-7EQmdUI2NWWUpRC9SWIa9g-1; Sun, 03 May 2020 14:43:47 -0400
+X-MC-Unique: 7EQmdUI2NWWUpRC9SWIa9g-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 176EC800687;
- Sun,  3 May 2020 18:43:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1FD3D80183C;
+ Sun,  3 May 2020 18:43:46 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.195])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C55195C1B2;
- Sun,  3 May 2020 18:43:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D1A1F5C1B2;
+ Sun,  3 May 2020 18:43:43 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 09/14] iotests: filter few more luks specific create options
-Date: Sun,  3 May 2020 21:43:19 +0300
-Message-Id: <20200503184324.12506-10-mlevitsk@redhat.com>
+Subject: [PATCH v3 06/14] block/crypto: rename two functions
+Date: Sun,  3 May 2020 21:43:16 +0300
+Message-Id: <20200503184324.12506-7-mlevitsk@redhat.com>
 In-Reply-To: <20200503184324.12506-1-mlevitsk@redhat.com>
 References: <20200503184324.12506-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -70,17 +70,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mlevitsk@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/03 12:49:50
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/03 14:43:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,443 +101,70 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This allows more tests to be able to have same output on both qcow2 luks en=
-crypted images
-and raw luks images
+rename the write_func to create_write_func, and init_func to create_init_fu=
+nc.
+This is preparation for other write_func that will be used to update the en=
+cryption keys.
+
+No functional changes
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- tests/qemu-iotests/087.out       |  6 ++---
- tests/qemu-iotests/134.out       |  2 +-
- tests/qemu-iotests/158.out       |  4 +--
- tests/qemu-iotests/188.out       |  2 +-
- tests/qemu-iotests/189.out       |  4 +--
- tests/qemu-iotests/198.out       |  4 +--
- tests/qemu-iotests/263.out       |  4 +--
- tests/qemu-iotests/274.out       | 46 ++++++++++++++++----------------
- tests/qemu-iotests/284.out       |  6 ++---
- tests/qemu-iotests/common.filter |  6 +++--
- 10 files changed, 43 insertions(+), 41 deletions(-)
+ block/crypto.c | 25 ++++++++++++-------------
+ 1 file changed, 12 insertions(+), 13 deletions(-)
 
-diff --git a/tests/qemu-iotests/087.out b/tests/qemu-iotests/087.out
-index f23bffbbf1..d5ff53302e 100644
---- a/tests/qemu-iotests/087.out
-+++ b/tests/qemu-iotests/087.out
-@@ -34,7 +34,7 @@ QMP_VERSION
+diff --git a/block/crypto.c b/block/crypto.c
+index d379e39efb..13ca1ad891 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -79,12 +79,12 @@ struct BlockCryptoCreateData {
+ };
 =20
- =3D=3D=3D Encrypted image QCow =3D=3D=3D
 =20
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encryption=3Don encrypt.key-s=
-ecret=3Dsec0 size=3D134217728
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encryption=3Don size=3D134217=
-728
- Testing:
- QMP_VERSION
- {"return": {}}
-@@ -46,7 +46,7 @@ QMP_VERSION
-=20
- =3D=3D=3D Encrypted image LUKS =3D=3D=3D
-=20
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encrypt.format=3Dluks encrypt=
-.key-secret=3Dsec0 size=3D134217728
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728
- Testing:
- QMP_VERSION
- {"return": {}}
-@@ -58,7 +58,7 @@ QMP_VERSION
-=20
- =3D=3D=3D Missing driver =3D=3D=3D
-=20
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encryption=3Don encrypt.key-s=
-ecret=3Dsec0 size=3D134217728
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encryption=3Don size=3D134217=
-728
- Testing: -S
- QMP_VERSION
- {"return": {}}
-diff --git a/tests/qemu-iotests/134.out b/tests/qemu-iotests/134.out
-index f2878f5f3a..e4733c0b81 100644
---- a/tests/qemu-iotests/134.out
-+++ b/tests/qemu-iotests/134.out
-@@ -1,5 +1,5 @@
- QA output created by 134
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encryption=3Don encrypt.key-s=
-ecret=3Dsec0 size=3D134217728
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encryption=3Don size=3D134217=
-728
-=20
- =3D=3D reading whole image =3D=3D
- read 134217728/134217728 bytes at offset 0
-diff --git a/tests/qemu-iotests/158.out b/tests/qemu-iotests/158.out
-index fa2294bb85..52ea9a488f 100644
---- a/tests/qemu-iotests/158.out
-+++ b/tests/qemu-iotests/158.out
-@@ -1,6 +1,6 @@
- QA output created by 158
- =3D=3D create base =3D=3D
--Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT encryption=3Don encrypt.=
-key-secret=3Dsec0 size=3D134217728
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT encryption=3Don size=3D1=
-34217728
-=20
- =3D=3D writing whole image =3D=3D
- wrote 134217728/134217728 bytes at offset 0
-@@ -10,7 +10,7 @@ wrote 134217728/134217728 bytes at offset 0
- read 134217728/134217728 bytes at offset 0
- 128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- =3D=3D create overlay =3D=3D
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encryption=3Don encrypt.key-s=
-ecret=3Dsec0 size=3D134217728 backing_file=3DTEST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encryption=3Don size=3D134217=
-728 backing_file=3DTEST_DIR/t.IMGFMT.base
-=20
- =3D=3D writing part of a cluster =3D=3D
- wrote 1024/1024 bytes at offset 0
-diff --git a/tests/qemu-iotests/188.out b/tests/qemu-iotests/188.out
-index 4b9aadd51c..5426861b18 100644
---- a/tests/qemu-iotests/188.out
-+++ b/tests/qemu-iotests/188.out
-@@ -1,5 +1,5 @@
- QA output created by 188
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encrypt.format=3Dluks encrypt=
-.key-secret=3Dsec0 encrypt.iter-time=3D10 size=3D16777216
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D16777216
-=20
- =3D=3D reading whole image =3D=3D
- read 16777216/16777216 bytes at offset 0
-diff --git a/tests/qemu-iotests/189.out b/tests/qemu-iotests/189.out
-index e536d95d53..bc213cbe14 100644
---- a/tests/qemu-iotests/189.out
-+++ b/tests/qemu-iotests/189.out
-@@ -1,6 +1,6 @@
- QA output created by 189
- =3D=3D create base =3D=3D
--Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT encrypt.format=3Dluks en=
-crypt.key-secret=3Dsec0 encrypt.iter-time=3D10 size=3D16777216
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT size=3D16777216
-=20
- =3D=3D writing whole image =3D=3D
- wrote 16777216/16777216 bytes at offset 0
-@@ -10,7 +10,7 @@ wrote 16777216/16777216 bytes at offset 0
- read 16777216/16777216 bytes at offset 0
- 16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- =3D=3D create overlay =3D=3D
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encrypt.format=3Dluks encrypt=
-.key-secret=3Dsec1 encrypt.iter-time=3D10 size=3D16777216 backing_file=3DTE=
-ST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D16777216 backing_file=
-=3DTEST_DIR/t.IMGFMT.base
-=20
- =3D=3D writing part of a cluster =3D=3D
- wrote 1024/1024 bytes at offset 0
-diff --git a/tests/qemu-iotests/198.out b/tests/qemu-iotests/198.out
-index b0f2d417af..acfdf96b0c 100644
---- a/tests/qemu-iotests/198.out
-+++ b/tests/qemu-iotests/198.out
-@@ -1,12 +1,12 @@
- QA output created by 198
- =3D=3D create base =3D=3D
--Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT encrypt.format=3Dluks en=
-crypt.key-secret=3Dsec0 encrypt.iter-time=3D10 size=3D16777216
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT size=3D16777216
-=20
- =3D=3D writing whole image base =3D=3D
- wrote 16777216/16777216 bytes at offset 0
- 16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- =3D=3D create overlay =3D=3D
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encrypt.format=3Dluks encrypt=
-.key-secret=3Dsec1 encrypt.iter-time=3D10 size=3D16777216 backing_file=3DTE=
-ST_DIR/t.IMGFMT.base
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D16777216 backing_file=
-=3DTEST_DIR/t.IMGFMT.base
-=20
- =3D=3D writing whole image layer =3D=3D
- wrote 16777216/16777216 bytes at offset 0
-diff --git a/tests/qemu-iotests/263.out b/tests/qemu-iotests/263.out
-index 4cf5c79ed8..54bfbeeff8 100644
---- a/tests/qemu-iotests/263.out
-+++ b/tests/qemu-iotests/263.out
-@@ -2,7 +2,7 @@ QA output created by 263
-=20
- testing LUKS qcow2 encryption
-=20
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encrypt.format=3Dluks encrypt=
-.key-secret=3Dsec0 encrypt.iter-time=3D10 size=3D1048576
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576
- =3D=3D reading the whole image =3D=3D
- read 1048576/1048576 bytes at offset 0
- 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-@@ -21,7 +21,7 @@ read 982528/982528 bytes at offset 66048
-=20
- testing legacy AES qcow2 encryption
-=20
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encrypt.format=3Daes encrypt.=
-key-secret=3Dsec0 size=3D1048576
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576
- =3D=3D reading the whole image =3D=3D
- read 1048576/1048576 bytes at offset 0
- 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-diff --git a/tests/qemu-iotests/274.out b/tests/qemu-iotests/274.out
-index 9d6fdeb1f7..59de176b99 100644
---- a/tests/qemu-iotests/274.out
-+++ b/tests/qemu-iotests/274.out
-@@ -1,9 +1,9 @@
- =3D=3D Commit tests =3D=3D
--Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D2097152 cluster_size=3D=
-65536 lazy_refcounts=3Doff refcount_bits=3D16
-+Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 cluster_size=3D65536 size=3D20=
-97152 lazy_refcounts=3Doff refcount_bits=3D16
-=20
--Formatting 'TEST_DIR/PID-mid', fmt=3Dqcow2 size=3D1048576 backing_file=3DT=
-EST_DIR/PID-base cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D=
-16
-+Formatting 'TEST_DIR/PID-mid', fmt=3Dqcow2 cluster_size=3D65536 size=3D104=
-8576 backing_file=3DTEST_DIR/PID-base lazy_refcounts=3Doff refcount_bits=3D=
-16
-=20
--Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 size=3D2097152 backing_file=3DT=
-EST_DIR/PID-mid cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D1=
-6
-+Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 cluster_size=3D65536 size=3D209=
-7152 backing_file=3DTEST_DIR/PID-mid lazy_refcounts=3Doff refcount_bits=3D1=
-6
-=20
- wrote 2097152/2097152 bytes at offset 0
- 2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-@@ -63,11 +63,11 @@ read 1048576/1048576 bytes at offset 1048576
- 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-=20
- =3D=3D=3D Testing HMP commit (top -> mid) =3D=3D=3D
--Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D2097152 cluster_size=3D=
-65536 lazy_refcounts=3Doff refcount_bits=3D16
-+Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 cluster_size=3D65536 size=3D20=
-97152 lazy_refcounts=3Doff refcount_bits=3D16
-=20
--Formatting 'TEST_DIR/PID-mid', fmt=3Dqcow2 size=3D1048576 backing_file=3DT=
-EST_DIR/PID-base cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D=
-16
-+Formatting 'TEST_DIR/PID-mid', fmt=3Dqcow2 cluster_size=3D65536 size=3D104=
-8576 backing_file=3DTEST_DIR/PID-base lazy_refcounts=3Doff refcount_bits=3D=
-16
-=20
--Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 size=3D2097152 backing_file=3DT=
-EST_DIR/PID-mid cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D1=
-6
-+Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 cluster_size=3D65536 size=3D209=
-7152 backing_file=3DTEST_DIR/PID-mid lazy_refcounts=3Doff refcount_bits=3D1=
-6
-=20
- wrote 2097152/2097152 bytes at offset 0
- 2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-@@ -92,11 +92,11 @@ read 1048576/1048576 bytes at offset 1048576
- 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-=20
- =3D=3D=3D Testing QMP active commit (top -> mid) =3D=3D=3D
--Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D2097152 cluster_size=3D=
-65536 lazy_refcounts=3Doff refcount_bits=3D16
-+Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 cluster_size=3D65536 size=3D20=
-97152 lazy_refcounts=3Doff refcount_bits=3D16
-=20
--Formatting 'TEST_DIR/PID-mid', fmt=3Dqcow2 size=3D1048576 backing_file=3DT=
-EST_DIR/PID-base cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D=
-16
-+Formatting 'TEST_DIR/PID-mid', fmt=3Dqcow2 cluster_size=3D65536 size=3D104=
-8576 backing_file=3DTEST_DIR/PID-base lazy_refcounts=3Doff refcount_bits=3D=
-16
-=20
--Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 size=3D2097152 backing_file=3DT=
-EST_DIR/PID-mid cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D1=
-6
-+Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 cluster_size=3D65536 size=3D209=
-7152 backing_file=3DTEST_DIR/PID-mid lazy_refcounts=3Doff refcount_bits=3D1=
-6
-=20
- wrote 2097152/2097152 bytes at offset 0
- 2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-@@ -128,9 +128,9 @@ read 1048576/1048576 bytes at offset 1048576
-=20
- =3D=3D Resize tests =3D=3D
- =3D=3D=3D preallocation=3Doff =3D=3D=3D
--Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D6442450944 cluster_size=
-=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-+Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 cluster_size=3D65536 size=3D64=
-42450944 lazy_refcounts=3Doff refcount_bits=3D16
-=20
--Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 size=3D1073741824 backing_file=
-=3DTEST_DIR/PID-base cluster_size=3D65536 lazy_refcounts=3Doff refcount_bit=
-s=3D16
-+Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 cluster_size=3D65536 size=3D107=
-3741824 backing_file=3DTEST_DIR/PID-base lazy_refcounts=3Doff refcount_bits=
-=3D16
-=20
- wrote 65536/65536 bytes at offset 5368709120
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-@@ -147,9 +147,9 @@ read 65536/65536 bytes at offset 5368709120
- { "start": 1073741824, "length": 7516192768, "depth": 0, "zero": true, "da=
-ta": false}]
-=20
- =3D=3D=3D preallocation=3Dmetadata =3D=3D=3D
--Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D34359738368 cluster_siz=
-e=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-+Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 cluster_size=3D65536 size=3D34=
-359738368 lazy_refcounts=3Doff refcount_bits=3D16
-=20
--Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 size=3D32212254720 backing_file=
-=3DTEST_DIR/PID-base cluster_size=3D65536 lazy_refcounts=3Doff refcount_bit=
-s=3D16
-+Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 cluster_size=3D65536 size=3D322=
-12254720 backing_file=3DTEST_DIR/PID-base lazy_refcounts=3Doff refcount_bit=
-s=3D16
-=20
- wrote 65536/65536 bytes at offset 33285996544
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-@@ -171,9 +171,9 @@ read 65536/65536 bytes at offset 33285996544
- { "start": 34896609280, "length": 536870912, "depth": 0, "zero": true, "da=
-ta": false, "offset": 2685075456}]
-=20
- =3D=3D=3D preallocation=3Dfalloc =3D=3D=3D
--Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D10485760 cluster_size=
-=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-+Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 cluster_size=3D65536 size=3D10=
-485760 lazy_refcounts=3Doff refcount_bits=3D16
-=20
--Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 size=3D5242880 backing_file=3DT=
-EST_DIR/PID-base cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D=
-16
-+Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 cluster_size=3D65536 size=3D524=
-2880 backing_file=3DTEST_DIR/PID-base lazy_refcounts=3Doff refcount_bits=3D=
-16
-=20
- wrote 65536/65536 bytes at offset 9437184
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-@@ -190,9 +190,9 @@ read 65536/65536 bytes at offset 9437184
- { "start": 5242880, "length": 10485760, "depth": 0, "zero": false, "data":=
- true, "offset": 327680}]
-=20
- =3D=3D=3D preallocation=3Dfull =3D=3D=3D
--Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D16777216 cluster_size=
-=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-+Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 cluster_size=3D65536 size=3D16=
-777216 lazy_refcounts=3Doff refcount_bits=3D16
-=20
--Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 size=3D8388608 backing_file=3DT=
-EST_DIR/PID-base cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D=
-16
-+Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 cluster_size=3D65536 size=3D838=
-8608 backing_file=3DTEST_DIR/PID-base lazy_refcounts=3Doff refcount_bits=3D=
-16
-=20
- wrote 65536/65536 bytes at offset 11534336
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-@@ -209,9 +209,9 @@ read 65536/65536 bytes at offset 11534336
- { "start": 8388608, "length": 4194304, "depth": 0, "zero": false, "data": =
-true, "offset": 327680}]
-=20
- =3D=3D=3D preallocation=3Doff =3D=3D=3D
--Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D393216 cluster_size=3D6=
-5536 lazy_refcounts=3Doff refcount_bits=3D16
-+Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 cluster_size=3D65536 size=3D39=
-3216 lazy_refcounts=3Doff refcount_bits=3D16
-=20
--Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 size=3D259072 backing_file=3DTE=
-ST_DIR/PID-base cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D1=
-6
-+Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 cluster_size=3D65536 size=3D259=
-072 backing_file=3DTEST_DIR/PID-base lazy_refcounts=3Doff refcount_bits=3D1=
-6
-=20
- wrote 65536/65536 bytes at offset 259072
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-@@ -229,9 +229,9 @@ read 65536/65536 bytes at offset 259072
- { "start": 262144, "length": 262144, "depth": 0, "zero": true, "data": fal=
-se}]
-=20
- =3D=3D=3D preallocation=3Doff =3D=3D=3D
--Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D409600 cluster_size=3D6=
-5536 lazy_refcounts=3Doff refcount_bits=3D16
-+Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 cluster_size=3D65536 size=3D40=
-9600 lazy_refcounts=3Doff refcount_bits=3D16
-=20
--Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 size=3D262144 backing_file=3DTE=
-ST_DIR/PID-base cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D1=
-6
-+Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 cluster_size=3D65536 size=3D262=
-144 backing_file=3DTEST_DIR/PID-base lazy_refcounts=3Doff refcount_bits=3D1=
-6
-=20
- wrote 65536/65536 bytes at offset 344064
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-@@ -248,9 +248,9 @@ read 65536/65536 bytes at offset 344064
- { "start": 262144, "length": 262144, "depth": 0, "zero": true, "data": fal=
-se}]
-=20
- =3D=3D=3D preallocation=3Doff =3D=3D=3D
--Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D524288 cluster_size=3D6=
-5536 lazy_refcounts=3Doff refcount_bits=3D16
-+Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 cluster_size=3D65536 size=3D52=
-4288 lazy_refcounts=3Doff refcount_bits=3D16
-=20
--Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 size=3D262144 backing_file=3DTE=
-ST_DIR/PID-base cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D1=
-6
-+Formatting 'TEST_DIR/PID-top', fmt=3Dqcow2 cluster_size=3D65536 size=3D262=
-144 backing_file=3DTEST_DIR/PID-base lazy_refcounts=3Doff refcount_bits=3D1=
-6
-=20
- wrote 65536/65536 bytes at offset 446464
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-diff --git a/tests/qemu-iotests/284.out b/tests/qemu-iotests/284.out
-index 48216f5742..a929239302 100644
---- a/tests/qemu-iotests/284.out
-+++ b/tests/qemu-iotests/284.out
-@@ -2,7 +2,7 @@ QA output created by 284
-=20
- testing LUKS qcow2 encryption
-=20
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576 encrypt.format=
-=3Dluks encrypt.key-secret=3Dsec0 encrypt.iter-time=3D10
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576
-=20
- =3D=3D cluster size 512
- =3D=3D checking image refcounts =3D=3D
-@@ -21,7 +21,7 @@ wrote 1/1 bytes at offset 512
-=20
- =3D=3D rechecking image refcounts =3D=3D
- No errors were found on the image.
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576 encrypt.format=
-=3Dluks encrypt.key-secret=3Dsec0 encrypt.iter-time=3D10
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576
-=20
- =3D=3D cluster size 2048
- =3D=3D checking image refcounts =3D=3D
-@@ -40,7 +40,7 @@ wrote 1/1 bytes at offset 2048
-=20
- =3D=3D rechecking image refcounts =3D=3D
- No errors were found on the image.
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576 encrypt.format=
-=3Dluks encrypt.key-secret=3Dsec0 encrypt.iter-time=3D10
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576
-=20
- =3D=3D cluster size 32768
- =3D=3D checking image refcounts =3D=3D
-diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.f=
-ilter
-index 3f8ee3e5f7..bcc4495d52 100644
---- a/tests/qemu-iotests/common.filter
-+++ b/tests/qemu-iotests/common.filter
-@@ -150,8 +150,10 @@ _filter_img_create()
-         -e "s# block_state_zero=3D\\(on\\|off\\)##g" \
-         -e "s# log_size=3D[0-9]\\+##g" \
-         -e "s# refcount_bits=3D[0-9]\\+##g" \
--        -e "s# key-secret=3D[a-zA-Z0-9]\\+##g" \
--        -e "s# iter-time=3D[0-9]\\+##g" \
-+        -e "s# \\(encrypt\\.\\)\\?key-secret=3D[a-zA-Z0-9]\\+##g" \
-+        -e "s# \\(encrypt\\.\\)\\?slot=3D[0-9]\\+##g" \
-+        -e "s# \\(encrypt\\.\\)\\?iter-time=3D[0-9]\\+##g" \
-+        -e "s# encrypt\\.format=3D[a-zA-Z0-9]\\+##g" \
-         -e "s# force_size=3D\\(on\\|off\\)##g"
+-static ssize_t block_crypto_write_func(QCryptoBlock *block,
+-                                       size_t offset,
+-                                       const uint8_t *buf,
+-                                       size_t buflen,
+-                                       void *opaque,
+-                                       Error **errp)
++static ssize_t block_crypto_create_write_func(QCryptoBlock *block,
++                                              size_t offset,
++                                              const uint8_t *buf,
++                                              size_t buflen,
++                                              void *opaque,
++                                              Error **errp)
+ {
+     struct BlockCryptoCreateData *data =3D opaque;
+     ssize_t ret;
+@@ -97,11 +97,10 @@ static ssize_t block_crypto_write_func(QCryptoBlock *bl=
+ock,
+     return ret;
  }
+=20
+-
+-static ssize_t block_crypto_init_func(QCryptoBlock *block,
+-                                      size_t headerlen,
+-                                      void *opaque,
+-                                      Error **errp)
++static ssize_t block_crypto_create_init_func(QCryptoBlock *block,
++                                             size_t headerlen,
++                                             void *opaque,
++                                             Error **errp)
+ {
+     struct BlockCryptoCreateData *data =3D opaque;
+=20
+@@ -297,8 +296,8 @@ static int block_crypto_co_create_generic(BlockDriverSt=
+ate *bs,
+     };
+=20
+     crypto =3D qcrypto_block_create(opts, NULL,
+-                                  block_crypto_init_func,
+-                                  block_crypto_write_func,
++                                  block_crypto_create_init_func,
++                                  block_crypto_create_write_func,
+                                   &data,
+                                   errp);
 =20
 --=20
 2.17.2
