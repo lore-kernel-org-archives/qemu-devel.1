@@ -4,81 +4,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5751C28CBC
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 10:10:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38FAFC28CBC
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 10:11:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A08A8206A5
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 10:10:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 02004206A5
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 10:11:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tmvji8xy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A08A8206A5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jZIYgEC7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02004206A5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lemote.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVBZp-0007rr-Re
-	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 06:10:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56900)
+	id 1jVBbA-0000i6-7D
+	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 06:11:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57058)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
- id 1jVBZB-00079q-Qd
- for qemu-devel@nongnu.org; Sun, 03 May 2020 06:09:45 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:37716)
+ id 1jVBaQ-00006U-Uk
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 06:11:02 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:35840)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
- id 1jVBZA-0008O6-U5
- for qemu-devel@nongnu.org; Sun, 03 May 2020 06:09:45 -0400
-Received: by mail-pl1-x644.google.com with SMTP id a21so2026834pls.4
- for <qemu-devel@nongnu.org>; Sun, 03 May 2020 03:09:44 -0700 (PDT)
+ id 1jVBaQ-00014B-7N
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 06:11:02 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id a31so2341311pje.1
+ for <qemu-devel@nongnu.org>; Sun, 03 May 2020 03:11:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=oXmStsagWliYLkyg0XA1gqk4mbLGloO7btJZBgB6zp0=;
- b=tmvji8xyRdqsUB+mJaeyiIe7c4z0UB7U8rXiPb2bKbGmPdMhrnasUqxi90hmQpFHdx
- ruXEq6E7s3FrcYF+ISN5c77wEr9RBYzYTmP1RD0xIaGlPht/HHovqxEmDuoDqBgJiOIt
- K6dA4KGRbluVamiZ3dIot1sTu8x1ClLGwy7FzMXJlz/vQfTunKIQHMr+Xgh9mXTawD12
- +ErNrPUwLIpFnmjaioKv1oXoaVIM/5PPySIy/dzMI6V2TJN/j/gkmMC0VJezv8yg/+sb
- I4LUv45ywoLmhAcXymKOjLb/NOa9Z6M7x7Df3h7YyHL3790lUWizZzZ73D16oGS92CMD
- iyqA==
+ bh=gyT3JhnhdKIwjs4eYU6gfUngC8pztPgbzgNj2PrTZlY=;
+ b=jZIYgEC7kr/51giyb8xCI/mSLGApQvDdOqMOGD5gsnjT+mENC7dMJId9flHPxE4s4o
+ kJRhXXOipkoeQj0VWhTV81qN5bFvRucnlwMUbXwb6wwQ+tPrajZraP6fXIxcAuswNpxb
+ ZATykodV49+rovoEuYWYL7VobgARIeckZizZ8BbyDhc3ci92WBDf8BuyzqHkBDHMwRFF
+ VMP8QwRjkePHI1KdWJiPtCEZquGNstADNd6SmE61Z+1uRzoVxwJd/0tD6VeJ2DBFEj5M
+ 3emKiNU6qnT41JHNVTV3SxEUw7TP61WqHIQS63oDUzM8gz1LI7eWd/hF+DF8KbCmIlIA
+ 8r2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=oXmStsagWliYLkyg0XA1gqk4mbLGloO7btJZBgB6zp0=;
- b=QnXuaunFBhwORo+ItPGkgGrExh52LsiUYntWAyGYkhac85dQumsWlLhUX3sm1iYZMn
- YrWg5fjU9a20hv0tGsfX9RYvcR6Yr6lSFk2stoxfv/ZmJeK4Jg1XeumAf3owf3XkhFy0
- AysPf59h018tgBvr78CswIdN87HDRR1CWxx85aPDKrS9eRPbfXpicUrCFwt67XQ8+/9Y
- lESxuhAM+BuPwN1WAeje3UKrP01v7PK/SP+4de1sAILP+MH2faE7zlUAU4/yURyKA8+/
- 0YPmIWcTVdipEQ40DB6KW7wJpNng4u2auJaKC/hgLzzO1vyL3e1rtHcRb//EB6+sousl
- UgoQ==
-X-Gm-Message-State: AGi0PubnDUPtT57PIqCAakME3Xk+q9hZ382d7Zcv/7WaSKYUHFDk0h0p
- HfzGHMrIEjFqUfMaZjAfMwE=
-X-Google-Smtp-Source: APiQypLHfD0TtiMXhXxN0eKY+t8XWTg7Jg8VyjEMHD9kmgl9RZx16BaBjW9teT007N/oQXqBBejFFg==
-X-Received: by 2002:a17:902:7203:: with SMTP id
- ba3mr12506149plb.202.1588500583620; 
- Sun, 03 May 2020 03:09:43 -0700 (PDT)
+ bh=gyT3JhnhdKIwjs4eYU6gfUngC8pztPgbzgNj2PrTZlY=;
+ b=BJPs9JBBhV9CSYzettVUtRjYE+mkkTyefPpNro0aDbTAsUv2roQ79zG6TNZkcgmlN0
+ q9pOaY9Qa6fd3y1rVOAZWgZaxTKsV216Q5XpncwiREyULWqNXjwYxiYANdPlDC6QLbJo
+ x+ZHEH1tCZSjJcag1SIrb9y0k4YBNKTPTKsF3Z5wzA6wImwXoFq8cUZbH1gL3lvnomzr
+ Q8BqigQqL7HX/qYImbyghVS3Q6U2MX9TGvk+YPUxQes4suu1f2uIe5na2xLwwvJfshV6
+ mvn3ZrbUJaYT8YIM2g723a0YAz0eEw7pEouououx8gKupMLOdhQFslZIVKslkYzeFESZ
+ pLrQ==
+X-Gm-Message-State: AGi0PuZKwFOSExZirwx5GZPHwyf6xT+oo7FWtdlXOsstagJ/Shd4BTli
+ uS1BaEpeDJllfZ1rwebyPEM=
+X-Google-Smtp-Source: APiQypKxPXXZvoHV52Oia9QLEogfOAw/k6eKuH+DgiGfNz1tSiPiyunzoqLR9ttUryaTqlw2R6EcHw==
+X-Received: by 2002:a17:90a:a893:: with SMTP id
+ h19mr10517185pjq.138.1588500660783; 
+ Sun, 03 May 2020 03:11:00 -0700 (PDT)
 Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com.
  [34.92.144.28])
- by smtp.gmail.com with ESMTPSA id r26sm6329902pfq.75.2020.05.03.03.09.40
+ by smtp.gmail.com with ESMTPSA id r26sm6329902pfq.75.2020.05.03.03.10.58
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 03 May 2020 03:09:43 -0700 (PDT)
+ Sun, 03 May 2020 03:11:00 -0700 (PDT)
 From: Huacai Chen <chenhc@lemote.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
  Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-Subject: [PATCH V3 04/14] KVM: MIPS: Add EVENTFD support which is needed by
- VHOST
-Date: Sun,  3 May 2020 18:05:57 +0800
-Message-Id: <1588500367-1056-5-git-send-email-chenhc@lemote.com>
+Subject: [PATCH V3 05/14] KVM: MIPS: Use lddir/ldpte instructions to lookup
+ gpa_mm.pgd
+Date: Sun,  3 May 2020 18:05:58 +0800
+Message-Id: <1588500367-1056-6-git-send-email-chenhc@lemote.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1588500367-1056-1-git-send-email-chenhc@lemote.com>
 References: <1588500367-1056-1-git-send-email-chenhc@lemote.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
- envelope-from=chenhuacai@gmail.com; helo=mail-pl1-x644.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
+ envelope-from=chenhuacai@gmail.com; helo=mail-pj1-x1043.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -111,71 +111,75 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add EVENTFD support for KVM/MIPS, which is needed by VHOST. Tested on
-Loongson-3 platform.
+Loongson-3 can use lddir/ldpte instuctions to accelerate page table
+walking, so use them to lookup gpa_mm.pgd.
 
 Signed-off-by: Huacai Chen <chenhc@lemote.com>
 Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- arch/mips/kvm/Kconfig     | 1 +
- arch/mips/kvm/Makefile    | 2 +-
- arch/mips/kvm/trap_emul.c | 3 +++
- arch/mips/kvm/vz.c        | 3 +++
- 4 files changed, 8 insertions(+), 1 deletion(-)
+ arch/mips/kvm/entry.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/arch/mips/kvm/Kconfig b/arch/mips/kvm/Kconfig
-index b91d145..d697752 100644
---- a/arch/mips/kvm/Kconfig
-+++ b/arch/mips/kvm/Kconfig
-@@ -22,6 +22,7 @@ config KVM
- 	select EXPORT_UASM
- 	select PREEMPT_NOTIFIERS
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
-+	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_VCPU_ASYNC_IOCTL
- 	select KVM_MMIO
- 	select MMU_NOTIFIER
-diff --git a/arch/mips/kvm/Makefile b/arch/mips/kvm/Makefile
-index 01affc1..0a3cef6 100644
---- a/arch/mips/kvm/Makefile
-+++ b/arch/mips/kvm/Makefile
-@@ -2,7 +2,7 @@
- # Makefile for KVM support for MIPS
- #
+diff --git a/arch/mips/kvm/entry.c b/arch/mips/kvm/entry.c
+index 16e1c93..fd71694 100644
+--- a/arch/mips/kvm/entry.c
++++ b/arch/mips/kvm/entry.c
+@@ -56,6 +56,7 @@
+ #define C0_BADVADDR	8, 0
+ #define C0_BADINSTR	8, 1
+ #define C0_BADINSTRP	8, 2
++#define C0_PGD		9, 7
+ #define C0_ENTRYHI	10, 0
+ #define C0_GUESTCTL1	10, 4
+ #define C0_STATUS	12, 0
+@@ -307,7 +308,10 @@ static void *kvm_mips_build_enter_guest(void *addr)
  
--common-objs-y = $(addprefix ../../../virt/kvm/, kvm_main.o coalesced_mmio.o)
-+common-objs-y = $(addprefix ../../../virt/kvm/, kvm_main.o coalesced_mmio.o eventfd.o)
+ #ifdef CONFIG_KVM_MIPS_VZ
+ 	/* Save normal linux process pgd (VZ guarantees pgd_reg is set) */
+-	UASM_i_MFC0(&p, K0, c0_kscratch(), pgd_reg);
++	if (cpu_has_ldpte)
++		UASM_i_MFC0(&p, K0, C0_PWBASE);
++	else
++		UASM_i_MFC0(&p, K0, c0_kscratch(), pgd_reg);
+ 	UASM_i_SW(&p, K0, offsetof(struct kvm_vcpu_arch, host_pgd), K1);
  
- EXTRA_CFLAGS += -Ivirt/kvm -Iarch/mips/kvm
+ 	/*
+@@ -469,8 +473,10 @@ void *kvm_mips_build_tlb_refill_exception(void *addr, void *handler)
+ 	u32 *p = addr;
+ 	struct uasm_label labels[2];
+ 	struct uasm_reloc relocs[2];
++#ifndef CONFIG_CPU_LOONGSON64
+ 	struct uasm_label *l = labels;
+ 	struct uasm_reloc *r = relocs;
++#endif
  
-diff --git a/arch/mips/kvm/trap_emul.c b/arch/mips/kvm/trap_emul.c
-index 5a11e83..f464506b 100644
---- a/arch/mips/kvm/trap_emul.c
-+++ b/arch/mips/kvm/trap_emul.c
-@@ -529,6 +529,9 @@ static int kvm_trap_emul_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_MIPS_TE:
- 		r = 1;
- 		break;
-+	case KVM_CAP_IOEVENTFD:
-+		r = 1;
-+		break;
- 	default:
- 		r = 0;
- 		break;
-diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
-index dde2088..17932ab 100644
---- a/arch/mips/kvm/vz.c
-+++ b/arch/mips/kvm/vz.c
-@@ -2927,6 +2927,9 @@ static int kvm_vz_check_extension(struct kvm *kvm, long ext)
- 		r = 2;
- 		break;
- #endif
-+	case KVM_CAP_IOEVENTFD:
-+		r = 1;
-+		break;
- 	default:
- 		r = 0;
- 		break;
+ 	memset(labels, 0, sizeof(labels));
+ 	memset(relocs, 0, sizeof(relocs));
+@@ -490,6 +496,16 @@ void *kvm_mips_build_tlb_refill_exception(void *addr, void *handler)
+ 	 */
+ 	preempt_disable();
+ 
++#ifdef CONFIG_CPU_LOONGSON64
++	UASM_i_MFC0(&p, K1, C0_PGD);
++	uasm_i_lddir(&p, K0, K1, 3);  /* global page dir */
++#ifndef __PAGETABLE_PMD_FOLDED
++	uasm_i_lddir(&p, K1, K0, 1);  /* middle page dir */
++#endif
++	uasm_i_ldpte(&p, K1, 0);      /* even */
++	uasm_i_ldpte(&p, K1, 1);      /* odd */
++	uasm_i_tlbwr(&p);
++#else
+ 	/*
+ 	 * Now for the actual refill bit. A lot of this can be common with the
+ 	 * Linux TLB refill handler, however we don't need to handle so many
+@@ -512,6 +528,7 @@ void *kvm_mips_build_tlb_refill_exception(void *addr, void *handler)
+ 	build_get_ptep(&p, K0, K1);
+ 	build_update_entries(&p, K0, K1);
+ 	build_tlb_write_entry(&p, &l, &r, tlb_random);
++#endif
+ 
+ 	preempt_enable();
+ 
 -- 
 2.7.0
 
