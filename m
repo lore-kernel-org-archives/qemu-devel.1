@@ -4,80 +4,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C87C28CBC
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 10:16:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29448C28CBC
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 10:16:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29B1B20721
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 10:16:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E49C620721
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 10:16:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AAr5F3SN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29B1B20721
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TahyT0RJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E49C620721
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lemote.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVBfT-00008D-BP
-	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 06:16:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57604)
+	id 1jVBfu-0000c9-1R
+	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 06:16:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57996)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
- id 1jVBdJ-0004y0-In
- for qemu-devel@nongnu.org; Sun, 03 May 2020 06:14:01 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:37728)
+ id 1jVBec-0007HB-Ji
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 06:15:22 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:34380)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
- id 1jVBdI-0003LU-HU
- for qemu-devel@nongnu.org; Sun, 03 May 2020 06:14:01 -0400
-Received: by mail-pl1-x642.google.com with SMTP id a21so2029182pls.4
- for <qemu-devel@nongnu.org>; Sun, 03 May 2020 03:14:00 -0700 (PDT)
+ id 1jVBeb-0004uh-Ot
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 06:15:22 -0400
+Received: by mail-pf1-x443.google.com with SMTP id x15so4071217pfa.1
+ for <qemu-devel@nongnu.org>; Sun, 03 May 2020 03:15:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=2HreKVDkgb2ZEZpEWOQgsvmgO+r8H3ubfnJned6T7sc=;
- b=AAr5F3SNw7C4Q98wwrX7yhWFpCO/ZfidNmcxUMu4jK2yVOQVdTQjIhW3Szkrkk6SiG
- 6QDGQcVwk914VwvovEyf9ZUH6cHrWfy4OHbkUd0NlQn8d2ocf4z5in7/NS3aoOJu3T5h
- 4cfvw3K3Da3/9dTpsiK0Ohc2qrhrpk1uv10cfvuK/M9HD9qfsWB2l5Kbbi+tQlgu7kRe
- vW81u+6LPKeL2b7ZbllbdiC7LglmQTDOp6+MppXn+efisvHbJQACdNn9G0bbDumjIEfr
- KvIS9TEx7y49vWE8JAN7CeLAa6iaUH2z/TRZVkg9tFOUep7uiWkxb1K/AVm8LDqVCoh9
- M5NA==
+ bh=irVmhvtEPr1kCt/3TMdgPsfS/t5ii77gdB+p7HRY6Cw=;
+ b=TahyT0RJZ9eooeUVSavNED0naTITC852lMmSIMuXaULkAnV1Z2vFhqOvKRIftcYbwX
+ q/W5mYIwu8VK4kyNhFd1i86ydce0kYCKKDR5uM6kwRITzVketp7yxcAiK6vYpI0Sxm/3
+ HubRharQvgHDyEnHwTehUVf5xrKMDoItngANVD0hJkiqNK7r6oS2op0PvzMioZzpiEAQ
+ AFGXxSex+JvKhL1AdnwPneKVPmcWVSBzkqTbgGX4GZhdS09JQ13kjjYHnqPjaO3Ado9X
+ D1fUC36EM7A6yniZKMGHRXhHljYhfaXxXFFHjrrwcmYyM/p56s0ZaSg/RKiLay1D6pyS
+ z+/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=2HreKVDkgb2ZEZpEWOQgsvmgO+r8H3ubfnJned6T7sc=;
- b=IproqX/bILZy53EijQwTlJUteFez4yzJ8oqiU6ZNXsZ7/gNZ2dmBoFrW3qeKDihPmj
- H0glckFkFcTy42rX2Bac0lxr+CTbnMVE2KjjmfqEPlND5F6KCgN2iTgQyR41VuKKelY3
- kCUytbAhjRighQPPK1hoz/Ep53VS8empn2483kWSQwE8UKRgku7jERNyLvTeRXJTzmfU
- nSQRZe222WaVVBjRNlNgznoBpiEmfgwo3aPGSzLOwElwIrTRrHi8am/lUUIamIh0gToO
- Xxu7VN8rJCRVVqVKXYfTHXwRomHJRUYpMqTVxBjLisyVJlswojQmPbwx3ynFGPF1ehRO
- Yt8Q==
-X-Gm-Message-State: AGi0PuYe4S3anGFiDIRl21P+uNBFlZyjLwSp9WH38lP8W7iCt2kTSLJ0
- KDkOb+rh6cBRIkKWP8vAJZY=
-X-Google-Smtp-Source: APiQypJHEnlSEN+OhJ7jC3XTecKnYZTetY/oc3lMJap6djnlR2vYYHLnzme4VNkULv6rLt/UoOlIPA==
-X-Received: by 2002:a17:90a:a893:: with SMTP id
- h19mr10530005pjq.138.1588500839087; 
- Sun, 03 May 2020 03:13:59 -0700 (PDT)
+ bh=irVmhvtEPr1kCt/3TMdgPsfS/t5ii77gdB+p7HRY6Cw=;
+ b=WmdBubnRfdFu1LTUuyTpBd/Atq2XuqO3Ic6fhOEGrb/8yCi7+f6RsARkugfo8vG8SF
+ uN2ajG4oAdoziXtbKkdytvUCphh2O8fKPIZluXXUVZ9ooIyFWE4QrqGg+cVFNqq1Z/5e
+ Wu6ky8aS/4ePEKW7ZbeES7XKHhJ2xWU27QEdK5PBEt0Un6dr6W6Voi873WFdU9gsDNHt
+ TFnGWovxxBxml9rMXBQaacF6mr0HYn21b3HkyJbPBFfonpEWgrWaCv6uU+CAxnEy8det
+ rrIQ2ePbds9ZMXjfx1iWHYc97rPEpwEJ9HYi0Byk6unrWSUHHQIBwmJNfZQ2pfYpDg5D
+ h1Yg==
+X-Gm-Message-State: AGi0PuaIyTWMXwMSHqcSJVpMojN26jKg+NqUoDRa/P4ESX6nv1VSL45B
+ E5d6Bhy4k0mpe+GCZBf6/1g=
+X-Google-Smtp-Source: APiQypJS5n7Ty/4gS/PPY7UiwzoovPQDWcs5RMjKbJr67aHDFHzbfGgOP7rc5mYvwKg7F3M2fwzXiA==
+X-Received: by 2002:aa7:9d90:: with SMTP id f16mr12993751pfq.48.1588500919442; 
+ Sun, 03 May 2020 03:15:19 -0700 (PDT)
 Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com.
  [34.92.144.28])
- by smtp.gmail.com with ESMTPSA id r26sm6329902pfq.75.2020.05.03.03.13.56
+ by smtp.gmail.com with ESMTPSA id r26sm6329902pfq.75.2020.05.03.03.15.16
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 03 May 2020 03:13:58 -0700 (PDT)
+ Sun, 03 May 2020 03:15:18 -0700 (PDT)
 From: Huacai Chen <chenhc@lemote.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
  Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-Subject: [PATCH V3 09/14] KVM: MIPS: Add more types of virtual interrupts
-Date: Sun,  3 May 2020 18:06:02 +0800
-Message-Id: <1588500367-1056-10-git-send-email-chenhc@lemote.com>
+Subject: [PATCH V3 11/14] KVM: MIPS: Add CPUCFG emulation for Loongson-3
+Date: Sun,  3 May 2020 18:06:04 +0800
+Message-Id: <1588500367-1056-12-git-send-email-chenhc@lemote.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1588500367-1056-1-git-send-email-chenhc@lemote.com>
 References: <1588500367-1056-1-git-send-email-chenhc@lemote.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
- envelope-from=chenhuacai@gmail.com; helo=mail-pl1-x642.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=chenhuacai@gmail.com; helo=mail-pf1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -110,350 +109,179 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In current implementation, MIPS KVM uses IP2, IP3, IP4 and IP7 for
-external interrupt, two kinds of IPIs and timer interrupt respectively,
-but Loongson-3 based machines prefer to use IP2, IP3, IP6 and IP7 for
-two kinds of external interrupts, IPI and timer interrupt. So we define
-two priority-irq mapping tables: kvm_loongson3_priority_to_irq[] for
-Loongson-3, and kvm_default_priority_to_irq[] for others. The virtual
-interrupt infrastructure is updated to deliver all types of interrupts
-from IP2, IP3, IP4, IP6 and IP7.
+Loongson-3 overrides lwc2 instructions to implement CPUCFG and CSR
+read/write functions. These instructions all cause guest exit so CSR
+doesn't benifit KVM guest (and there are always legacy methods to
+provide the same functions as CSR). So, we only emulate CPUCFG and let
+it return a reduced feature list (which means the virtual CPU doesn't
+have any other advanced features, including CSR) in KVM.
 
 Signed-off-by: Huacai Chen <chenhc@lemote.com>
 Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- arch/mips/kvm/interrupt.c | 93 +++++++----------------------------------------
- arch/mips/kvm/interrupt.h | 14 ++++---
- arch/mips/kvm/mips.c      | 40 ++++++++++++++++++--
- arch/mips/kvm/vz.c        | 53 ++++-----------------------
- 4 files changed, 67 insertions(+), 133 deletions(-)
+ arch/mips/include/asm/kvm_host.h  |  3 ++
+ arch/mips/include/uapi/asm/inst.h | 11 ++++++
+ arch/mips/kvm/mips.c              |  3 ++
+ arch/mips/kvm/vz.c                | 75 +++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 92 insertions(+)
 
-diff --git a/arch/mips/kvm/interrupt.c b/arch/mips/kvm/interrupt.c
-index 7257e8b6..d28c2c9c 100644
---- a/arch/mips/kvm/interrupt.c
-+++ b/arch/mips/kvm/interrupt.c
-@@ -61,27 +61,8 @@ void kvm_mips_queue_io_int_cb(struct kvm_vcpu *vcpu,
- 	 * the EXC code will be set when we are actually
- 	 * delivering the interrupt:
- 	 */
--	switch (intr) {
--	case 2:
--		kvm_set_c0_guest_cause(vcpu->arch.cop0, (C_IRQ0));
--		/* Queue up an INT exception for the core */
--		kvm_mips_queue_irq(vcpu, MIPS_EXC_INT_IO);
--		break;
--
--	case 3:
--		kvm_set_c0_guest_cause(vcpu->arch.cop0, (C_IRQ1));
--		kvm_mips_queue_irq(vcpu, MIPS_EXC_INT_IPI_1);
--		break;
--
--	case 4:
--		kvm_set_c0_guest_cause(vcpu->arch.cop0, (C_IRQ2));
--		kvm_mips_queue_irq(vcpu, MIPS_EXC_INT_IPI_2);
--		break;
--
--	default:
--		break;
--	}
--
-+	kvm_set_c0_guest_cause(vcpu->arch.cop0, 1 << (intr + 8));
-+	kvm_mips_queue_irq(vcpu, kvm_irq_to_priority(intr));
- }
- 
- void kvm_mips_dequeue_io_int_cb(struct kvm_vcpu *vcpu,
-@@ -89,26 +70,8 @@ void kvm_mips_dequeue_io_int_cb(struct kvm_vcpu *vcpu,
- {
- 	int intr = (int)irq->irq;
- 
--	switch (intr) {
--	case -2:
--		kvm_clear_c0_guest_cause(vcpu->arch.cop0, (C_IRQ0));
--		kvm_mips_dequeue_irq(vcpu, MIPS_EXC_INT_IO);
--		break;
--
--	case -3:
--		kvm_clear_c0_guest_cause(vcpu->arch.cop0, (C_IRQ1));
--		kvm_mips_dequeue_irq(vcpu, MIPS_EXC_INT_IPI_1);
--		break;
--
--	case -4:
--		kvm_clear_c0_guest_cause(vcpu->arch.cop0, (C_IRQ2));
--		kvm_mips_dequeue_irq(vcpu, MIPS_EXC_INT_IPI_2);
--		break;
--
--	default:
--		break;
--	}
--
-+	kvm_clear_c0_guest_cause(vcpu->arch.cop0, 1 << (-intr + 8));
-+	kvm_mips_dequeue_irq(vcpu, kvm_irq_to_priority(-intr));
- }
- 
- /* Deliver the interrupt of the corresponding priority, if possible. */
-@@ -116,50 +79,20 @@ int kvm_mips_irq_deliver_cb(struct kvm_vcpu *vcpu, unsigned int priority,
- 			    u32 cause)
- {
- 	int allowed = 0;
--	u32 exccode;
-+	u32 exccode, ie;
- 
- 	struct kvm_vcpu_arch *arch = &vcpu->arch;
- 	struct mips_coproc *cop0 = vcpu->arch.cop0;
- 
--	switch (priority) {
--	case MIPS_EXC_INT_TIMER:
--		if ((kvm_read_c0_guest_status(cop0) & ST0_IE)
--		    && (!(kvm_read_c0_guest_status(cop0) & (ST0_EXL | ST0_ERL)))
--		    && (kvm_read_c0_guest_status(cop0) & IE_IRQ5)) {
--			allowed = 1;
--			exccode = EXCCODE_INT;
--		}
--		break;
--
--	case MIPS_EXC_INT_IO:
--		if ((kvm_read_c0_guest_status(cop0) & ST0_IE)
--		    && (!(kvm_read_c0_guest_status(cop0) & (ST0_EXL | ST0_ERL)))
--		    && (kvm_read_c0_guest_status(cop0) & IE_IRQ0)) {
--			allowed = 1;
--			exccode = EXCCODE_INT;
--		}
--		break;
--
--	case MIPS_EXC_INT_IPI_1:
--		if ((kvm_read_c0_guest_status(cop0) & ST0_IE)
--		    && (!(kvm_read_c0_guest_status(cop0) & (ST0_EXL | ST0_ERL)))
--		    && (kvm_read_c0_guest_status(cop0) & IE_IRQ1)) {
--			allowed = 1;
--			exccode = EXCCODE_INT;
--		}
--		break;
--
--	case MIPS_EXC_INT_IPI_2:
--		if ((kvm_read_c0_guest_status(cop0) & ST0_IE)
--		    && (!(kvm_read_c0_guest_status(cop0) & (ST0_EXL | ST0_ERL)))
--		    && (kvm_read_c0_guest_status(cop0) & IE_IRQ2)) {
--			allowed = 1;
--			exccode = EXCCODE_INT;
--		}
--		break;
-+	if (priority == MIPS_EXC_MAX)
-+		return 0;
- 
--	default:
--		break;
-+	ie = 1 << (kvm_priority_to_irq[priority] + 8);
-+	if ((kvm_read_c0_guest_status(cop0) & ST0_IE)
-+	    && (!(kvm_read_c0_guest_status(cop0) & (ST0_EXL | ST0_ERL)))
-+	    && (kvm_read_c0_guest_status(cop0) & ie)) {
-+		allowed = 1;
-+		exccode = EXCCODE_INT;
- 	}
- 
- 	/* Are we allowed to deliver the interrupt ??? */
-diff --git a/arch/mips/kvm/interrupt.h b/arch/mips/kvm/interrupt.h
-index 3bf0a49..c3e878c 100644
---- a/arch/mips/kvm/interrupt.h
-+++ b/arch/mips/kvm/interrupt.h
-@@ -21,11 +21,12 @@
- #define MIPS_EXC_NMI                5
- #define MIPS_EXC_MCHK               6
- #define MIPS_EXC_INT_TIMER          7
--#define MIPS_EXC_INT_IO             8
--#define MIPS_EXC_EXECUTE            9
--#define MIPS_EXC_INT_IPI_1          10
--#define MIPS_EXC_INT_IPI_2          11
--#define MIPS_EXC_MAX                12
-+#define MIPS_EXC_INT_IO_1           8
-+#define MIPS_EXC_INT_IO_2           9
-+#define MIPS_EXC_EXECUTE            10
-+#define MIPS_EXC_INT_IPI_1          11
-+#define MIPS_EXC_INT_IPI_2          12
-+#define MIPS_EXC_MAX                13
- /* XXXSL More to follow */
- 
- #define C_TI        (_ULCAST_(1) << 30)
-@@ -38,6 +39,9 @@
- #define KVM_MIPS_IRQ_CLEAR_ALL_AT_ONCE   (0)
+diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
+index f165902..3fd2f1c 100644
+--- a/arch/mips/include/asm/kvm_host.h
++++ b/arch/mips/include/asm/kvm_host.h
+@@ -173,6 +173,9 @@ struct kvm_vcpu_stat {
+ 	u64 vz_ghfc_exits;
+ 	u64 vz_gpa_exits;
+ 	u64 vz_resvd_exits;
++#ifdef CONFIG_CPU_LOONGSON64
++	u64 vz_cpucfg_exits;
++#endif
  #endif
- 
-+extern u32 *kvm_priority_to_irq;
-+u32 kvm_irq_to_priority(u32 irq);
-+
- void kvm_mips_queue_irq(struct kvm_vcpu *vcpu, unsigned int priority);
- void kvm_mips_dequeue_irq(struct kvm_vcpu *vcpu, unsigned int priority);
- int kvm_mips_pending_timer(struct kvm_vcpu *vcpu);
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index 8f05dd0..5ca122c 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -489,7 +489,10 @@ int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
- 	int intr = (int)irq->irq;
- 	struct kvm_vcpu *dvcpu = NULL;
- 
--	if (intr == 3 || intr == -3 || intr == 4 || intr == -4)
-+	if (intr == kvm_priority_to_irq[MIPS_EXC_INT_IPI_1] ||
-+	    intr == kvm_priority_to_irq[MIPS_EXC_INT_IPI_2] ||
-+	    intr == (-kvm_priority_to_irq[MIPS_EXC_INT_IPI_1]) ||
-+	    intr == (-kvm_priority_to_irq[MIPS_EXC_INT_IPI_2]))
- 		kvm_debug("%s: CPU: %d, INTR: %d\n", __func__, irq->cpu,
- 			  (int)intr);
- 
-@@ -498,10 +501,10 @@ int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
- 	else
- 		dvcpu = vcpu->kvm->vcpus[irq->cpu];
- 
--	if (intr == 2 || intr == 3 || intr == 4) {
-+	if (intr == 2 || intr == 3 || intr == 4 || intr == 6) {
- 		kvm_mips_callbacks->queue_io_int(dvcpu, irq);
- 
--	} else if (intr == -2 || intr == -3 || intr == -4) {
-+	} else if (intr == -2 || intr == -3 || intr == -4 || intr == -6) {
- 		kvm_mips_callbacks->dequeue_io_int(dvcpu, irq);
- 	} else {
- 		kvm_err("%s: invalid interrupt ioctl (%d:%d)\n", __func__,
-@@ -1620,6 +1623,34 @@ static struct notifier_block kvm_mips_csr_die_notifier = {
- 	.notifier_call = kvm_mips_csr_die_notify,
+ 	u64 halt_successful_poll;
+ 	u64 halt_attempted_poll;
+diff --git a/arch/mips/include/uapi/asm/inst.h b/arch/mips/include/uapi/asm/inst.h
+index 98f97c8..43d1faa 100644
+--- a/arch/mips/include/uapi/asm/inst.h
++++ b/arch/mips/include/uapi/asm/inst.h
+@@ -1012,6 +1012,16 @@ struct loongson3_lsdc2_format {	/* Loongson-3 overridden ldc2/sdc2 Load/Store fo
+ 	;))))))
  };
  
-+static u32 kvm_default_priority_to_irq[MIPS_EXC_MAX] = {
-+	[MIPS_EXC_INT_TIMER] = C_IRQ5,
-+	[MIPS_EXC_INT_IO_1]  = C_IRQ0,
-+	[MIPS_EXC_INT_IPI_1] = C_IRQ1,
-+	[MIPS_EXC_INT_IPI_2] = C_IRQ2,
++struct loongson3_lscsr_format {	/* Loongson-3 CPUCFG&CSR read/write format */
++	__BITFIELD_FIELD(unsigned int opcode : 6,
++	__BITFIELD_FIELD(unsigned int rs : 5,
++	__BITFIELD_FIELD(unsigned int fr : 5,
++	__BITFIELD_FIELD(unsigned int rd : 5,
++	__BITFIELD_FIELD(unsigned int fd : 5,
++	__BITFIELD_FIELD(unsigned int func : 6,
++	;))))))
 +};
 +
-+static u32 kvm_loongson3_priority_to_irq[MIPS_EXC_MAX] = {
-+	[MIPS_EXC_INT_TIMER] = C_IRQ5,
-+	[MIPS_EXC_INT_IO_1]  = C_IRQ0,
-+	[MIPS_EXC_INT_IO_2]  = C_IRQ1,
-+	[MIPS_EXC_INT_IPI_1] = C_IRQ4,
-+};
-+
-+u32 *kvm_priority_to_irq = kvm_default_priority_to_irq;
-+
-+u32 kvm_irq_to_priority(u32 irq)
-+{
-+	int i;
-+
-+	for (i = MIPS_EXC_INT_TIMER; i < MIPS_EXC_MAX; i++) {
-+		if (kvm_priority_to_irq[i] == (1 << (irq + 8)))
-+			return i;
-+	}
-+
-+	return MIPS_EXC_MAX;
-+}
-+
- static int __init kvm_mips_init(void)
- {
- 	int ret;
-@@ -1638,6 +1669,9 @@ static int __init kvm_mips_init(void)
- 	if (ret)
- 		return ret;
+ /*
+  * MIPS16e instruction formats (16-bit length)
+  */
+@@ -1114,6 +1124,7 @@ union mips_instruction {
+ 	struct mm16_r5_format mm16_r5_format;
+ 	struct loongson3_lswc2_format loongson3_lswc2_format;
+ 	struct loongson3_lsdc2_format loongson3_lsdc2_format;
++	struct loongson3_lscsr_format loongson3_lscsr_format;
+ };
  
-+	if (boot_cpu_type() == CPU_LOONGSON64)
-+		kvm_priority_to_irq = kvm_loongson3_priority_to_irq;
-+
- 	register_die_notifier(&kvm_mips_csr_die_notifier);
- 
- 	return 0;
+ union mips16e_instruction {
+diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+index ed989ef..9362769 100644
+--- a/arch/mips/kvm/mips.c
++++ b/arch/mips/kvm/mips.c
+@@ -68,6 +68,9 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
+ 	{ "vz_ghfc",	  VCPU_STAT(vz_ghfc_exits),	 KVM_STAT_VCPU },
+ 	{ "vz_gpa",	  VCPU_STAT(vz_gpa_exits),	 KVM_STAT_VCPU },
+ 	{ "vz_resvd",	  VCPU_STAT(vz_resvd_exits),	 KVM_STAT_VCPU },
++#ifdef CONFIG_CPU_LOONGSON64
++	{ "vz_cpucfg",	  VCPU_STAT(vz_cpucfg_exits),	 KVM_STAT_VCPU },
++#endif
+ #endif
+ 	{ "halt_successful_poll", VCPU_STAT(halt_successful_poll), KVM_STAT_VCPU },
+ 	{ "halt_attempted_poll", VCPU_STAT(halt_attempted_poll), KVM_STAT_VCPU },
 diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
-index ab320f0..63d5b35 100644
+index 63d5b35..e5c751b 100644
 --- a/arch/mips/kvm/vz.c
 +++ b/arch/mips/kvm/vz.c
-@@ -225,23 +225,7 @@ static void kvm_vz_queue_io_int_cb(struct kvm_vcpu *vcpu,
- 	 * interrupts are asynchronous to vcpu execution therefore defer guest
- 	 * cp0 accesses
- 	 */
--	switch (intr) {
--	case 2:
--		kvm_vz_queue_irq(vcpu, MIPS_EXC_INT_IO);
--		break;
--
--	case 3:
--		kvm_vz_queue_irq(vcpu, MIPS_EXC_INT_IPI_1);
--		break;
--
--	case 4:
--		kvm_vz_queue_irq(vcpu, MIPS_EXC_INT_IPI_2);
--		break;
--
--	default:
--		break;
--	}
--
-+	kvm_vz_queue_irq(vcpu, kvm_irq_to_priority(intr));
+@@ -29,6 +29,7 @@
+ #include <linux/kvm_host.h>
+ 
+ #include "interrupt.h"
++#include "loongson_regs.h"
+ 
+ #include "trace.h"
+ 
+@@ -1092,6 +1093,75 @@ static enum emulation_result kvm_vz_gpsi_cache(union mips_instruction inst,
+ 	return EMULATE_FAIL;
  }
  
- static void kvm_vz_dequeue_io_int_cb(struct kvm_vcpu *vcpu,
-@@ -253,44 +237,22 @@ static void kvm_vz_dequeue_io_int_cb(struct kvm_vcpu *vcpu,
- 	 * interrupts are asynchronous to vcpu execution therefore defer guest
- 	 * cp0 accesses
- 	 */
--	switch (intr) {
--	case -2:
--		kvm_vz_dequeue_irq(vcpu, MIPS_EXC_INT_IO);
--		break;
--
--	case -3:
--		kvm_vz_dequeue_irq(vcpu, MIPS_EXC_INT_IPI_1);
--		break;
--
--	case -4:
--		kvm_vz_dequeue_irq(vcpu, MIPS_EXC_INT_IPI_2);
--		break;
--
--	default:
--		break;
--	}
--
-+	kvm_vz_dequeue_irq(vcpu, kvm_irq_to_priority(-intr));
- }
- 
--static u32 kvm_vz_priority_to_irq[MIPS_EXC_MAX] = {
--	[MIPS_EXC_INT_TIMER] = C_IRQ5,
--	[MIPS_EXC_INT_IO]    = C_IRQ0,
--	[MIPS_EXC_INT_IPI_1] = C_IRQ1,
--	[MIPS_EXC_INT_IPI_2] = C_IRQ2,
--};
--
- static int kvm_vz_irq_deliver_cb(struct kvm_vcpu *vcpu, unsigned int priority,
- 				 u32 cause)
++#ifdef CONFIG_CPU_LOONGSON64
++static enum emulation_result kvm_vz_gpsi_lwc2(union mips_instruction inst,
++					      u32 *opc, u32 cause,
++					      struct kvm_run *run,
++					      struct kvm_vcpu *vcpu)
++{
++	unsigned int rs, rd;
++	unsigned int hostcfg;
++	unsigned long curr_pc;
++	enum emulation_result er = EMULATE_DONE;
++
++	/*
++	 * Update PC and hold onto current PC in case there is
++	 * an error and we want to rollback the PC
++	 */
++	curr_pc = vcpu->arch.pc;
++	er = update_pc(vcpu, cause);
++	if (er == EMULATE_FAIL)
++		return er;
++
++	rs = inst.loongson3_lscsr_format.rs;
++	rd = inst.loongson3_lscsr_format.rd;
++	switch (inst.loongson3_lscsr_format.fr) {
++	case 0x8:  /* Read CPUCFG */
++		++vcpu->stat.vz_cpucfg_exits;
++		hostcfg = read_cpucfg(vcpu->arch.gprs[rs]);
++
++		switch (vcpu->arch.gprs[rs]) {
++		case LOONGSON_CFG1:
++			hostcfg &= (LOONGSON_CFG1_FP | LOONGSON_CFG1_MMI |
++				    LOONGSON_CFG1_MSA1 | LOONGSON_CFG1_MSA2 |
++				    LOONGSON_CFG1_SFBP);
++			vcpu->arch.gprs[rd] = hostcfg;
++			break;
++		case LOONGSON_CFG2:
++			hostcfg &= (LOONGSON_CFG2_LEXT1 | LOONGSON_CFG2_LEXT2 |
++				    LOONGSON_CFG2_LEXT3 | LOONGSON_CFG2_LSPW);
++			vcpu->arch.gprs[rd] = hostcfg;
++			break;
++		case LOONGSON_CFG3:
++			hostcfg &= LOONGSON_CFG3_LCAMP;
++			vcpu->arch.gprs[rd] = hostcfg;
++			break;
++		default:
++			/* Don't export any other advanced features to guest */
++			vcpu->arch.gprs[rd] = 0;
++			break;
++		}
++
++		break;
++	default:
++		kvm_err("lwc2 emulate not impl %d rs %lx @%lx\n",
++			inst.loongson3_lscsr_format.fr, vcpu->arch.gprs[rs], curr_pc);
++		er = EMULATE_FAIL;
++		break;
++	}
++
++	/* Rollback PC only if emulation was unsuccessful */
++	if (er == EMULATE_FAIL) {
++		kvm_err("[%#lx]%s: unsupported lwc2 instruction 0x%08x 0x%08x\n",
++			curr_pc, __func__, inst.word, inst.loongson3_lscsr_format.fr);
++
++		vcpu->arch.pc = curr_pc;
++	}
++
++	return er;
++}
++#endif
++
+ static enum emulation_result kvm_trap_vz_handle_gpsi(u32 cause, u32 *opc,
+ 						     struct kvm_vcpu *vcpu)
  {
- 	u32 irq = (priority < MIPS_EXC_MAX) ?
--		kvm_vz_priority_to_irq[priority] : 0;
-+		kvm_priority_to_irq[priority] : 0;
- 
- 	switch (priority) {
- 	case MIPS_EXC_INT_TIMER:
- 		set_gc0_cause(C_TI);
+@@ -1121,6 +1191,11 @@ static enum emulation_result kvm_trap_vz_handle_gpsi(u32 cause, u32 *opc,
+ 		er = kvm_vz_gpsi_cache(inst, opc, cause, run, vcpu);
  		break;
- 
--	case MIPS_EXC_INT_IO:
-+	case MIPS_EXC_INT_IO_1:
-+	case MIPS_EXC_INT_IO_2:
- 	case MIPS_EXC_INT_IPI_1:
- 	case MIPS_EXC_INT_IPI_2:
- 		if (cpu_has_guestctl2)
-@@ -311,7 +273,7 @@ static int kvm_vz_irq_clear_cb(struct kvm_vcpu *vcpu, unsigned int priority,
- 			       u32 cause)
- {
- 	u32 irq = (priority < MIPS_EXC_MAX) ?
--		kvm_vz_priority_to_irq[priority] : 0;
-+		kvm_priority_to_irq[priority] : 0;
- 
- 	switch (priority) {
- 	case MIPS_EXC_INT_TIMER:
-@@ -329,7 +291,8 @@ static int kvm_vz_irq_clear_cb(struct kvm_vcpu *vcpu, unsigned int priority,
- 		}
- 		break;
- 
--	case MIPS_EXC_INT_IO:
-+	case MIPS_EXC_INT_IO_1:
-+	case MIPS_EXC_INT_IO_2:
- 	case MIPS_EXC_INT_IPI_1:
- 	case MIPS_EXC_INT_IPI_2:
- 		/* Clear GuestCtl2.VIP irq if not using Hardware Clear */
+ #endif
++#ifdef CONFIG_CPU_LOONGSON64
++	case lwc2_op:
++		er = kvm_vz_gpsi_lwc2(inst, opc, cause, run, vcpu);
++		break;
++#endif
+ 	case spec3_op:
+ 		switch (inst.spec3_format.func) {
+ #ifdef CONFIG_CPU_MIPSR6
 -- 
 2.7.0
 
