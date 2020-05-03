@@ -4,76 +4,77 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8660C28CBC
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 04:44:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA21EC28CBC
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 04:45:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0F4A20752
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 04:44:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B546720752
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 04:45:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=brainfault-org.20150623.gappssmtp.com header.i=@brainfault-org.20150623.gappssmtp.com header.b="v+fTyClQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0F4A20752
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=brainfault-org.20150623.gappssmtp.com header.i=@brainfault-org.20150623.gappssmtp.com header.b="qc9TM5Lc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B546720752
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jV6Up-0002Z3-U6
-	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 00:44:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49164)
+	id 1jV6Vi-0003jo-Qt
+	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 00:45:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49444)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <anup@brainfault.org>)
- id 1jV6Tr-000258-47
- for qemu-devel@nongnu.org; Sun, 03 May 2020 00:43:55 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37479)
+ id 1jV6Uh-0002jE-UK
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 00:44:47 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36287)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <anup@brainfault.org>)
- id 1jV6Tq-0001H0-00
- for qemu-devel@nongnu.org; Sun, 03 May 2020 00:43:54 -0400
-Received: by mail-wm1-x343.google.com with SMTP id z6so4924809wml.2
- for <qemu-devel@nongnu.org>; Sat, 02 May 2020 21:43:53 -0700 (PDT)
+ id 1jV6Ug-0002Yj-Mt
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 00:44:47 -0400
+Received: by mail-wr1-x443.google.com with SMTP id d15so16843813wrx.3
+ for <qemu-devel@nongnu.org>; Sat, 02 May 2020 21:44:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=brainfault-org.20150623.gappssmtp.com; s=20150623;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=8g/hGzvlBm3Ink4tOyCpTbcpfTtcsIqfNael318WTmQ=;
- b=v+fTyClQR1ZvpqF5YAhgXTPDRmf3JrAdzQYjKMlXZq61ilVPM/DcI7nKwbal63qZe8
- HHlGInpdtJVT6svmhv+FmYkrkpLGB8qOSWXBsfsg+hS8wbg+MJn0s0F7yb+lS1kWPoie
- ZER6aVGr1il9Worr00ogi48yJdr19OTqaPrhYrMMefhsfRQTNoRYLZJ6fcZEYOxuJ9hk
- rPFaIImbfSA3qqDNFMImup4S6wi9jlx0D7MDvomghc0ojesplCAkD9B0TyYRrvHCzrxC
- +yFabnr5P2t5lBipcbJepBXQItQ3R97ebPWQsVC7Dm7jFdDtddT4NQGBa5T7AQ+PKOWC
- 0Adw==
+ :cc; bh=5oeafdwpi27OG4NG2IUa3kDa3FFg+iOMNPG5+RbDK40=;
+ b=qc9TM5LcJ3pMFBDPl8gugv+Hu82LjQqlKdOGTBxiHMBP57RcAr3UarMNf5ENGjsgUU
+ T/TedmcdOazCAuermaRpzSJuj+McTDvAPLYzc+zOF8XDuWsukv7239qt0Uoo+qfu7WEc
+ fgMcw7SiOSBhxiwYVezv7gus1weiqineEdJmkgnId0F422gkG7wEbdcIicogVF5/7cT6
+ /mQpky9nxQ6e+4PpV3HtRsqDWddEGRUGFpq+joseDPbu3jSHG6jZQAEyUk7KdP+NuOaG
+ s2uvjnttvanO3F8NlkLqYmNSZ5kYm+WrZwEyIH8M4ovrKYqr/JvsmJIzhMUURdRtfWVE
+ Uj9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=8g/hGzvlBm3Ink4tOyCpTbcpfTtcsIqfNael318WTmQ=;
- b=Tw7Csb2yRfOu3r0uwUGcmyBaGcCnzsRaBTfCFF7XX09RN95YA0gZsuIZYpOJsmJRz0
- awo3xvmCDdO4DIEvDVA5tQsFsV7TxIfSHNHzrsJJ5MoBcXXphrzJ/MF8Xa/G0y7akYqR
- Kr1H+/gpkqr9tmoXpf1KwzGRz/7Y2L/uipfP982S0xD0vcgHymjBBS4UZVAIpEt3bMPB
- PqvJZrN/Nw0RYV1f89BopSBsr/fbV47MQcKP5Gy/T1EwesVsDuhuJP7MKA0N48WCNAvV
- iPmMIleq8nWn2Pc5uWhB0uWdD3HLANKtz/zbD04/ZsI56VW5MoXhwfs/nJx5JOJwJQm6
- foEA==
-X-Gm-Message-State: AGi0PuYfCevrD0ebZTRXP29FuhMRquAYfBangCnLqpY3TxYjuwsvSeob
- 75iGQ5EHw0n0msNKyOG32Xpwgb/ZTwtmN1hPdH5Dow==
-X-Google-Smtp-Source: APiQypKWejg2b7B7Jq1yHnzWzEPTyXMR3zhonF90pazMEGrUmeLlLR4ZpDwDfCoyt8ExQ84ytWalB688+iVYlE3nNj4=
-X-Received: by 2002:a1c:bd54:: with SMTP id n81mr7325560wmf.141.1588481032645; 
- Sat, 02 May 2020 21:43:52 -0700 (PDT)
+ bh=5oeafdwpi27OG4NG2IUa3kDa3FFg+iOMNPG5+RbDK40=;
+ b=S/kXw/8R38h7uhqAihYD8UQIRC3BrS4V2mMzfFiO7wbEU7oWsg0OgNFYU24CnFwOMF
+ 0WGXprhItGWsBem2PZiNq5BXVsF4RSpPepn+phDO+vAekl3eUXLzYe04i1XiAtveQ0qp
+ I80sn9NJtIxlng5xPAI7wnJWzDDqtl2ne9aYhfFUut3plcewcFVRHooKJqdm9iPk8TX3
+ TA91OBzn427kZ4GAuxXrp1aMKokeXgwUo9OrSZnUh8OHthKF5k4ep3NuHkZoB/6iNITZ
+ Ig5vjcM0P9DVo1MnsiPKvAl4G6vu1aIveGoaycl0FONuac3CsphYlDjhNwqEgMAbRAzr
+ aR5w==
+X-Gm-Message-State: AGi0PuaKUCSNi3eshn/zc5AnjwCJPz6ttOlhL+f6XAsW/LL5GQ/HVU6Y
+ TyFmuvIM2166coYhIUMOZ5w86qMDgfTxW2VIxLgpGA==
+X-Google-Smtp-Source: APiQypJ9miBbD2/jF0ixGhtuvEYYv2ENN4XCJeqAU6BOfOmHVKOy/3mR5EcqUnjf0+B9QclXvwf4gbChENNa0cpqWLk=
+X-Received: by 2002:a5d:414f:: with SMTP id c15mr3345909wrq.61.1588481085075; 
+ Sat, 02 May 2020 21:44:45 -0700 (PDT)
 MIME-Version: 1.0
 References: <1588348254-7241-1-git-send-email-bmeng.cn@gmail.com>
- <1588348254-7241-4-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1588348254-7241-4-git-send-email-bmeng.cn@gmail.com>
+ <1588348254-7241-6-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1588348254-7241-6-git-send-email-bmeng.cn@gmail.com>
 From: Anup Patel <anup@brainfault.org>
-Date: Sun, 3 May 2020 10:13:40 +0530
-Message-ID: <CAAhSdy1Bap+6v6jfKCKCbeqKaUms0bXNrk-aFB1JAJCKa9v90g@mail.gmail.com>
-Subject: Re: [PATCH 3/5] riscv: Use pre-built bios image of generic platform
- for virt & sifive_u
+Date: Sun, 3 May 2020 10:14:33 +0530
+Message-ID: <CAAhSdy2uH-Dhj5wTWkxmqHHcXB0PGBDw-TXS4w0cdpf3K74A5Q@mail.gmail.com>
+Subject: Re: [PATCH 5/5] riscv: Suppress the error report for QEMU testing
+ with riscv_find_firmware()
 To: Bin Meng <bmeng.cn@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: none client-ip=2a00:1450:4864:20::343;
- envelope-from=anup@brainfault.org; helo=mail-wm1-x343.google.com
+Received-SPF: none client-ip=2a00:1450:4864:20::443;
+ envelope-from=anup@brainfault.org; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -18
@@ -105,90 +106,46 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 1, 2020 at 9:26 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+On Fri, May 1, 2020 at 9:25 PM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
 > From: Bin Meng <bin.meng@windriver.com>
 >
-> Update virt and sifive_u machines to use the opensbi bios image
-> built for the generic FDT platform.
->
-> Remove the out-of-date no longer used bios images.
+> We only ship plain binary bios images in the QEMU source. With Spike
+> machine that uses ELF images as the default bios, running QEMU test
+> will complain hence let's suppress the error report for QEMU testing.
 >
 > Signed-off-by: Bin Meng <bin.meng@windriver.com>
+>
 > ---
 >
->  hw/riscv/sifive_u.c                          |   4 ++--
->  hw/riscv/virt.c                              |   4 ++--
->  pc-bios/opensbi-riscv32-generic-fw_jump.bin  | Bin 0 -> 58032 bytes
->  pc-bios/opensbi-riscv32-sifive_u-fw_jump.bin | Bin 49520 -> 0 bytes
->  pc-bios/opensbi-riscv32-virt-fw_jump.bin     | Bin 49504 -> 0 bytes
->  pc-bios/opensbi-riscv64-generic-fw_jump.bin  | Bin 0 -> 66680 bytes
->  pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin | Bin 57936 -> 0 bytes
->  pc-bios/opensbi-riscv64-virt-fw_jump.bin     | Bin 57920 -> 0 bytes
->  8 files changed, 4 insertions(+), 4 deletions(-)
->  create mode 100644 pc-bios/opensbi-riscv32-generic-fw_jump.bin
->  delete mode 100644 pc-bios/opensbi-riscv32-sifive_u-fw_jump.bin
->  delete mode 100644 pc-bios/opensbi-riscv32-virt-fw_jump.bin
->  create mode 100644 pc-bios/opensbi-riscv64-generic-fw_jump.bin
->  delete mode 100644 pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin
->  delete mode 100644 pc-bios/opensbi-riscv64-virt-fw_jump.bin
+>  hw/riscv/boot.c | 14 +++++++++++---
+>  1 file changed, 11 insertions(+), 3 deletions(-)
 >
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index bed10fc..cf015cc 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -58,9 +58,9 @@
->  #include <libfdt.h>
+> diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
+> index b76b2f3..adb421b 100644
+> --- a/hw/riscv/boot.c
+> +++ b/hw/riscv/boot.c
+> @@ -65,9 +65,17 @@ char *riscv_find_firmware(const char *firmware_filename)
 >
->  #if defined(TARGET_RISCV32)
-> -# define BIOS_FILENAME "opensbi-riscv32-sifive_u-fw_jump.bin"
-> +# define BIOS_FILENAME "opensbi-riscv32-generic-fw_jump.bin"
->  #else
-> -# define BIOS_FILENAME "opensbi-riscv64-sifive_u-fw_jump.bin"
-> +# define BIOS_FILENAME "opensbi-riscv64-generic-fw_jump.bin"
->  #endif
+>      filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, firmware_filename);
+>      if (filename == NULL) {
+> -        error_report("Unable to load the RISC-V firmware \"%s\"",
+> -                     firmware_filename);
+> -        exit(1);
+> +        if (!qtest_enabled()) {
+> +            /*
+> +             * We only ship plain binary bios images in the QEMU source.
+> +             * With Spike machine that uses ELF images as the default bios,
+> +             * running QEMU test will complain hence let's suppress the error
+> +             * report for QEMU testing.
+> +             */
+> +            error_report("Unable to load the RISC-V firmware \"%s\"",
+> +                         firmware_filename);
+> +            exit(1);
+> +        }
+>      }
 >
->  static const struct MemmapEntry {
-> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> index daae3eb..0c00d93 100644
-> --- a/hw/riscv/virt.c
-> +++ b/hw/riscv/virt.c
-> @@ -46,9 +46,9 @@
->  #include <libfdt.h>
->
->  #if defined(TARGET_RISCV32)
-> -# define BIOS_FILENAME "opensbi-riscv32-virt-fw_jump.bin"
-> +# define BIOS_FILENAME "opensbi-riscv32-generic-fw_jump.bin"
->  #else
-> -# define BIOS_FILENAME "opensbi-riscv64-virt-fw_jump.bin"
-> +# define BIOS_FILENAME "opensbi-riscv64-generic-fw_jump.bin"
->  #endif
->
->  static const struct MemmapEntry {
-> diff --git a/pc-bios/opensbi-riscv32-generic-fw_jump.bin b/pc-bios/opensbi-riscv32-generic-fw_jump.bin
-> new file mode 100644
-> index 0000000..dc39398
-> Binary files /dev/null and b/pc-bios/opensbi-riscv32-generic-fw_jump.bin differ
-> diff --git a/pc-bios/opensbi-riscv32-sifive_u-fw_jump.bin b/pc-bios/opensbi-riscv32-sifive_u-fw_jump.bin
-> deleted file mode 100644
-> index 3e0da54..0000000
-> Binary files a/pc-bios/opensbi-riscv32-sifive_u-fw_jump.bin and /dev/null differ
-> diff --git a/pc-bios/opensbi-riscv32-virt-fw_jump.bin b/pc-bios/opensbi-riscv32-virt-fw_jump.bin
-> deleted file mode 100644
-> index bc56ed6..0000000
-> Binary files a/pc-bios/opensbi-riscv32-virt-fw_jump.bin and /dev/null differ
-> diff --git a/pc-bios/opensbi-riscv64-generic-fw_jump.bin b/pc-bios/opensbi-riscv64-generic-fw_jump.bin
-> new file mode 100644
-> index 0000000..c8f209a
-> Binary files /dev/null and b/pc-bios/opensbi-riscv64-generic-fw_jump.bin differ
-> diff --git a/pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin b/pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin
-> deleted file mode 100644
-> index 1acee86..0000000
-> Binary files a/pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin and /dev/null differ
-> diff --git a/pc-bios/opensbi-riscv64-virt-fw_jump.bin b/pc-bios/opensbi-riscv64-virt-fw_jump.bin
-> deleted file mode 100644
-> index c62f2b4..0000000
-> Binary files a/pc-bios/opensbi-riscv64-virt-fw_jump.bin and /dev/null differ
+>      return filename;
 > --
 > 2.7.4
 >
