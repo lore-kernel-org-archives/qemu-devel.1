@@ -6,62 +6,62 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0E04C28CBC
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 18:53:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4BF3C28CBC
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 18:53:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95FF0206E9
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 18:53:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9DFD02063A
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 18:53:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W/tM6ofQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95FF0206E9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YgPdFLK4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DFD02063A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVJjY-0000ee-QY
-	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 14:53:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59700)
+	id 1jVJk5-0001JB-PJ
+	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 14:53:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59752)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jVJak-0003Q9-UM
- for qemu-devel@nongnu.org; Sun, 03 May 2020 14:43:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44137
+ id 1jVJaw-0003oA-Hx
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 14:44:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27181
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jVJaf-0000Hf-Jo
- for qemu-devel@nongnu.org; Sun, 03 May 2020 14:43:54 -0400
+ id 1jVJav-0000K5-FM
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 14:44:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588531428;
+ s=mimecast20190719; t=1588531444;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=j124Tl+q8lQmXNlSfb3ZcKxH4XMp9Ve/uFN0OvvrIb4=;
- b=W/tM6ofQ3I6SHRakoC6QLGEZRFbT7QjYYawLDz+rmbQR9katNJwks7ibuTvENbD5yEaFxy
- 4JI+42KqTz3L6orLv8TX8AnMPyeQXSaVzET8lO7HixU9ci/hqgSZGyNVtR0zzwdjg6DaC1
- 9LvJ/xgEmZ3PLsmRkC8mN++rKEsJOOI=
+ bh=aiMabNuCutKQJgfNczJBp7C3ojbmOKIEcHMLOhpTu4M=;
+ b=YgPdFLK4xT7pO0uy4pIEK6/SdydaX1zWwRxCtUL1zOnCnk0sSnDf0LZlEh/AND8tbK+RGA
+ aHQiVXtYkdSgfVwpUz9IgSf8d1bxbGUVsetbqbFZSsnvOqG4F60muaQSJikLqgaNAm8Rpu
+ ucWsNPjUoREiq8dxhjg3HHPU5Zy3G0c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-239-7EQmdUI2NWWUpRC9SWIa9g-1; Sun, 03 May 2020 14:43:47 -0400
-X-MC-Unique: 7EQmdUI2NWWUpRC9SWIa9g-1
+ us-mta-498-D-DQ3vOqN-ybfmqufMn6qA-1; Sun, 03 May 2020 14:44:02 -0400
+X-MC-Unique: D-DQ3vOqN-ybfmqufMn6qA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1FD3D80183C;
- Sun,  3 May 2020 18:43:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 108671009441;
+ Sun,  3 May 2020 18:44:02 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.195])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D1A1F5C1B2;
- Sun,  3 May 2020 18:43:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BDA895C1B2;
+ Sun,  3 May 2020 18:43:59 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 06/14] block/crypto: rename two functions
-Date: Sun,  3 May 2020 21:43:16 +0300
-Message-Id: <20200503184324.12506-7-mlevitsk@redhat.com>
+Subject: [PATCH v3 12/14] block/crypto: implement blockdev-amend
+Date: Sun,  3 May 2020 21:43:22 +0300
+Message-Id: <20200503184324.12506-13-mlevitsk@redhat.com>
 In-Reply-To: <20200503184324.12506-1-mlevitsk@redhat.com>
 References: <20200503184324.12506-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -70,10 +70,10 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mlevitsk@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mlevitsk@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/03 14:43:32
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/03 12:49:52
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -101,71 +101,158 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-rename the write_func to create_write_func, and init_func to create_init_fu=
-nc.
-This is preparation for other write_func that will be used to update the en=
-cryption keys.
-
-No functional changes
-
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- block/crypto.c | 25 ++++++++++++-------------
- 1 file changed, 12 insertions(+), 13 deletions(-)
+ block/crypto.c       | 72 ++++++++++++++++++++++++++++++++------------
+ qapi/block-core.json | 14 ++++++++-
+ 2 files changed, 66 insertions(+), 20 deletions(-)
 
 diff --git a/block/crypto.c b/block/crypto.c
-index d379e39efb..13ca1ad891 100644
+index b71e57f777..d7725df79e 100644
 --- a/block/crypto.c
 +++ b/block/crypto.c
-@@ -79,12 +79,12 @@ struct BlockCryptoCreateData {
- };
+@@ -775,32 +775,21 @@ block_crypto_get_specific_info_luks(BlockDriverState =
+*bs, Error **errp)
+ }
 =20
-=20
--static ssize_t block_crypto_write_func(QCryptoBlock *block,
--                                       size_t offset,
--                                       const uint8_t *buf,
--                                       size_t buflen,
--                                       void *opaque,
--                                       Error **errp)
-+static ssize_t block_crypto_create_write_func(QCryptoBlock *block,
-+                                              size_t offset,
-+                                              const uint8_t *buf,
-+                                              size_t buflen,
-+                                              void *opaque,
-+                                              Error **errp)
+ static int
+-block_crypto_amend_options_luks(BlockDriverState *bs,
+-                                QemuOpts *opts,
+-                                BlockDriverAmendStatusCB *status_cb,
+-                                void *cb_opaque,
+-                                bool force,
+-                                Error **errp)
++block_crypto_amend_options_generic_luks(BlockDriverState *bs,
++                                        QCryptoBlockAmendOptions *amend_op=
+tions,
++                                        bool force,
++                                        Error **errp)
  {
-     struct BlockCryptoCreateData *data =3D opaque;
-     ssize_t ret;
-@@ -97,11 +97,10 @@ static ssize_t block_crypto_write_func(QCryptoBlock *bl=
-ock,
+     BlockCrypto *crypto =3D bs->opaque;
+-    QDict *cryptoopts =3D NULL;
+-    QCryptoBlockAmendOptions *amend_options =3D NULL;
+     int ret;
+=20
+     assert(crypto);
+     assert(crypto->block);
+-    crypto->updating_keys =3D true;
+=20
++    /* apply for exclusive read/write permissions to the underlying file*/
++    crypto->updating_keys =3D true;
+     ret =3D bdrv_child_refresh_perms(bs, bs->file, errp);
+-    if (ret < 0) {
+-        goto cleanup;
+-    }
+-
+-    cryptoopts =3D qemu_opts_to_qdict(opts, NULL);
+-    qdict_put_str(cryptoopts, "format", "luks");
+-    amend_options =3D block_crypto_amend_opts_init(cryptoopts, errp);
+-    if (!amend_options) {
+-        ret =3D -EINVAL;
++    if (ret) {
+         goto cleanup;
+     }
+=20
+@@ -812,13 +801,57 @@ block_crypto_amend_options_luks(BlockDriverState *bs,
+                                       force,
+                                       errp);
+ cleanup:
++    /* release exclusive read/write permissions to the underlying file*/
+     crypto->updating_keys =3D false;
+     bdrv_child_refresh_perms(bs, bs->file, errp);
+-    qapi_free_QCryptoBlockAmendOptions(amend_options);
++    return ret;
++}
++
++static int
++block_crypto_amend_options_luks(BlockDriverState *bs,
++                                QemuOpts *opts,
++                                BlockDriverAmendStatusCB *status_cb,
++                                void *cb_opaque,
++                                bool force,
++                                Error **errp)
++{
++    BlockCrypto *crypto =3D bs->opaque;
++    QDict *cryptoopts =3D NULL;
++    QCryptoBlockAmendOptions *amend_options =3D NULL;
++    int ret =3D -EINVAL;
++
++    assert(crypto);
++    assert(crypto->block);
++
++    cryptoopts =3D qemu_opts_to_qdict(opts, NULL);
++    qdict_put_str(cryptoopts, "format", "luks");
++    amend_options =3D block_crypto_amend_opts_init(cryptoopts, errp);
+     qobject_unref(cryptoopts);
++    if (!amend_options) {
++        goto cleanup;
++    }
++    ret =3D block_crypto_amend_options_generic_luks(bs, amend_options,
++                                                  force, errp);
++cleanup:
++    qapi_free_QCryptoBlockAmendOptions(amend_options);
      return ret;
  }
 =20
--
--static ssize_t block_crypto_init_func(QCryptoBlock *block,
--                                      size_t headerlen,
--                                      void *opaque,
--                                      Error **errp)
-+static ssize_t block_crypto_create_init_func(QCryptoBlock *block,
-+                                             size_t headerlen,
-+                                             void *opaque,
-+                                             Error **errp)
- {
-     struct BlockCryptoCreateData *data =3D opaque;
++static int
++coroutine_fn block_crypto_co_amend_luks(BlockDriverState *bs,
++                                        BlockdevAmendOptions *opts,
++                                        bool force,
++                                        Error **errp)
++{
++    QCryptoBlockAmendOptions amend_opts;
++
++    amend_opts =3D (QCryptoBlockAmendOptions) {
++        .format =3D Q_CRYPTO_BLOCK_FORMAT_LUKS,
++        .u.luks =3D *qapi_BlockdevAmendOptionsLUKS_base(&opts->u.luks),
++    };
++    return block_crypto_amend_options_generic_luks(bs, &amend_opts,
++                                                   force, errp);
++}
 =20
-@@ -297,8 +296,8 @@ static int block_crypto_co_create_generic(BlockDriverSt=
-ate *bs,
-     };
+ static void
+ block_crypto_child_perms(BlockDriverState *bs, BdrvChild *c,
+@@ -891,6 +924,7 @@ static BlockDriver bdrv_crypto_luks =3D {
+     .bdrv_get_info      =3D block_crypto_get_info_luks,
+     .bdrv_get_specific_info =3D block_crypto_get_specific_info_luks,
+     .bdrv_amend_options =3D block_crypto_amend_options_luks,
++    .bdrv_co_amend      =3D block_crypto_co_amend_luks,
 =20
-     crypto =3D qcrypto_block_create(opts, NULL,
--                                  block_crypto_init_func,
--                                  block_crypto_write_func,
-+                                  block_crypto_create_init_func,
-+                                  block_crypto_create_write_func,
-                                   &data,
-                                   errp);
+     .strong_runtime_opts =3D block_crypto_strong_runtime_opts,
+ };
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 5b9123c15f..a5f679ac17 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -4649,6 +4649,18 @@
+   'data': { 'job-id': 'str',
+             'options': 'BlockdevCreateOptions' } }
 =20
++##
++# @BlockdevAmendOptionsLUKS:
++#
++# Driver specific image amend options for LUKS.
++#
++# Since: 5.0
++##
++{ 'struct': 'BlockdevAmendOptionsLUKS',
++  'base': 'QCryptoBlockAmendOptionsLUKS',
++  'data': { }
++}
++
+ ##
+ # @BlockdevAmendOptions:
+ #
+@@ -4663,7 +4675,7 @@
+       'driver':         'BlockdevDriver' },
+   'discriminator': 'driver',
+   'data': {
+-  } }
++      'luks':           'BlockdevAmendOptionsLUKS' } }
+=20
+ ##
+ # @x-blockdev-amend:
 --=20
 2.17.2
 
