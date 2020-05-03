@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F00FC28CBC
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 10:09:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5751C28CBC
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 10:10:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 199B1206A5
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 10:09:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A08A8206A5
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 10:10:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xks75GZf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 199B1206A5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tmvji8xy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A08A8206A5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lemote.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVBZA-0006x1-BV
-	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 06:09:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56724)
+	id 1jVBZp-0007rr-Re
+	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 06:10:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56900)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
- id 1jVBY1-00057L-4K
- for qemu-devel@nongnu.org; Sun, 03 May 2020 06:08:33 -0400
-Received: from mail-pg1-x52e.google.com ([2607:f8b0:4864:20::52e]:41430)
+ id 1jVBZB-00079q-Qd
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 06:09:45 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:37716)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
- id 1jVBY0-0007iu-Fa
- for qemu-devel@nongnu.org; Sun, 03 May 2020 06:08:32 -0400
-Received: by mail-pg1-x52e.google.com with SMTP id o18so1851804pgg.8
- for <qemu-devel@nongnu.org>; Sun, 03 May 2020 03:08:32 -0700 (PDT)
+ id 1jVBZA-0008O6-U5
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 06:09:45 -0400
+Received: by mail-pl1-x644.google.com with SMTP id a21so2026834pls.4
+ for <qemu-devel@nongnu.org>; Sun, 03 May 2020 03:09:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=Apq9sucfBmwOGXvj0V67gdzCLVL91nlJK5leKBoTGWw=;
- b=Xks75GZfQ0X6QBtjXLWiC70RvNKvpA7JjnKscIdVbrnnx6Yjrs4aV+D1ELgi9JfsIh
- M4nLVDw9slUZGMEL8mA9ym2MLviKXQVGK5xbme2G1ke+DVNspIX5ZCAX8bCb/dnPJpRO
- 4ZLmcRjgJITfgV4d0XXPSFtLDrztQ8f8R/i9Rmgk8eVhcv9kMbc0FSG440Zqlw2WD2rn
- HKYqgfKLsLTotPkPbJJDsCRUOE6kqpUflXNH3SSWtJXoGw0A0j461pWMgBRIu+UKNm1P
- In0k8V8jvXwvnKMjo78NyStMzPZ6N+ERx/qKnGJx7xtpZn1jmS35pGAvvhiFoZWzpJXI
- oe2w==
+ bh=oXmStsagWliYLkyg0XA1gqk4mbLGloO7btJZBgB6zp0=;
+ b=tmvji8xyRdqsUB+mJaeyiIe7c4z0UB7U8rXiPb2bKbGmPdMhrnasUqxi90hmQpFHdx
+ ruXEq6E7s3FrcYF+ISN5c77wEr9RBYzYTmP1RD0xIaGlPht/HHovqxEmDuoDqBgJiOIt
+ K6dA4KGRbluVamiZ3dIot1sTu8x1ClLGwy7FzMXJlz/vQfTunKIQHMr+Xgh9mXTawD12
+ +ErNrPUwLIpFnmjaioKv1oXoaVIM/5PPySIy/dzMI6V2TJN/j/gkmMC0VJezv8yg/+sb
+ I4LUv45ywoLmhAcXymKOjLb/NOa9Z6M7x7Df3h7YyHL3790lUWizZzZ73D16oGS92CMD
+ iyqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=Apq9sucfBmwOGXvj0V67gdzCLVL91nlJK5leKBoTGWw=;
- b=LP/QSipbWhEk1xgLu8zHMBfJ/JnBuKay6nYj0245GnsSpYK6I5+2mlTeY6l3TSraGF
- R8ZY/eBa7SNG0DtyhPaRnBXC5Hiq4cA8zYBgqd98NHo/jsFmdMRxFBGF/aO0etW/Rgf0
- y8guQSY7OESnURSWMTC528n707efzF0iQt75nuAOJZEgUGZvlNaqWuR8qK3z6FO3XvOT
- BT5eUEBYib0COxBpWAoo+i618F2A8mrhfQTy59ER8DeTXZtVSFlFzoARLUoUUxvTnTKO
- 7msZF0d4TDySJlgTKgv1Bemrl6w9sEHOTqbwm7DxkSy2mWLuMQQXT6RJkPWV7SauxFt/
- e3+g==
-X-Gm-Message-State: AGi0PuYJTXlkOvk2bUg0vfpLF2zbhF6HxZNbuQM+D03+D3eOC9q6R7cW
- EN90P+0cBwaAAuel+6Amhco=
-X-Google-Smtp-Source: APiQypI2CbwfAI9/oWf5WDwYq3eUe5P+QBD7gAlrAddN5Qjv2hJyYr/2z5tfeFRn4cKRK5JWcYOEbg==
-X-Received: by 2002:a65:6417:: with SMTP id a23mr13042369pgv.204.1588500511198; 
- Sun, 03 May 2020 03:08:31 -0700 (PDT)
+ bh=oXmStsagWliYLkyg0XA1gqk4mbLGloO7btJZBgB6zp0=;
+ b=QnXuaunFBhwORo+ItPGkgGrExh52LsiUYntWAyGYkhac85dQumsWlLhUX3sm1iYZMn
+ YrWg5fjU9a20hv0tGsfX9RYvcR6Yr6lSFk2stoxfv/ZmJeK4Jg1XeumAf3owf3XkhFy0
+ AysPf59h018tgBvr78CswIdN87HDRR1CWxx85aPDKrS9eRPbfXpicUrCFwt67XQ8+/9Y
+ lESxuhAM+BuPwN1WAeje3UKrP01v7PK/SP+4de1sAILP+MH2faE7zlUAU4/yURyKA8+/
+ 0YPmIWcTVdipEQ40DB6KW7wJpNng4u2auJaKC/hgLzzO1vyL3e1rtHcRb//EB6+sousl
+ UgoQ==
+X-Gm-Message-State: AGi0PubnDUPtT57PIqCAakME3Xk+q9hZ382d7Zcv/7WaSKYUHFDk0h0p
+ HfzGHMrIEjFqUfMaZjAfMwE=
+X-Google-Smtp-Source: APiQypLHfD0TtiMXhXxN0eKY+t8XWTg7Jg8VyjEMHD9kmgl9RZx16BaBjW9teT007N/oQXqBBejFFg==
+X-Received: by 2002:a17:902:7203:: with SMTP id
+ ba3mr12506149plb.202.1588500583620; 
+ Sun, 03 May 2020 03:09:43 -0700 (PDT)
 Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com.
  [34.92.144.28])
- by smtp.gmail.com with ESMTPSA id r26sm6329902pfq.75.2020.05.03.03.08.28
+ by smtp.gmail.com with ESMTPSA id r26sm6329902pfq.75.2020.05.03.03.09.40
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 03 May 2020 03:08:30 -0700 (PDT)
+ Sun, 03 May 2020 03:09:43 -0700 (PDT)
 From: Huacai Chen <chenhc@lemote.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
  Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-Subject: [PATCH V3 03/14] KVM: MIPS: Increase KVM_MAX_VCPUS and
- KVM_USER_MEM_SLOTS to 16
-Date: Sun,  3 May 2020 18:05:56 +0800
-Message-Id: <1588500367-1056-4-git-send-email-chenhc@lemote.com>
+Subject: [PATCH V3 04/14] KVM: MIPS: Add EVENTFD support which is needed by
+ VHOST
+Date: Sun,  3 May 2020 18:05:57 +0800
+Message-Id: <1588500367-1056-5-git-send-email-chenhc@lemote.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1588500367-1056-1-git-send-email-chenhc@lemote.com>
 References: <1588500367-1056-1-git-send-email-chenhc@lemote.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::52e;
- envelope-from=chenhuacai@gmail.com; helo=mail-pg1-x52e.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=chenhuacai@gmail.com; helo=mail-pl1-x644.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -110,30 +111,71 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Loongson-3 based machines can have as many as 16 CPUs, and so does
-memory slots, so increase KVM_MAX_VCPUS and KVM_USER_MEM_SLOTS to 16.
+Add EVENTFD support for KVM/MIPS, which is needed by VHOST. Tested on
+Loongson-3 platform.
 
 Signed-off-by: Huacai Chen <chenhc@lemote.com>
 Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- arch/mips/include/asm/kvm_host.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/mips/kvm/Kconfig     | 1 +
+ arch/mips/kvm/Makefile    | 2 +-
+ arch/mips/kvm/trap_emul.c | 3 +++
+ arch/mips/kvm/vz.c        | 3 +++
+ 4 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-index caa2b936..a7758c0 100644
---- a/arch/mips/include/asm/kvm_host.h
-+++ b/arch/mips/include/asm/kvm_host.h
-@@ -78,8 +78,8 @@
- #define KVM_REG_MIPS_CP0_KSCRATCH6	MIPS_CP0_64(31, 7)
+diff --git a/arch/mips/kvm/Kconfig b/arch/mips/kvm/Kconfig
+index b91d145..d697752 100644
+--- a/arch/mips/kvm/Kconfig
++++ b/arch/mips/kvm/Kconfig
+@@ -22,6 +22,7 @@ config KVM
+ 	select EXPORT_UASM
+ 	select PREEMPT_NOTIFIERS
+ 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
++	select HAVE_KVM_EVENTFD
+ 	select HAVE_KVM_VCPU_ASYNC_IOCTL
+ 	select KVM_MMIO
+ 	select MMU_NOTIFIER
+diff --git a/arch/mips/kvm/Makefile b/arch/mips/kvm/Makefile
+index 01affc1..0a3cef6 100644
+--- a/arch/mips/kvm/Makefile
++++ b/arch/mips/kvm/Makefile
+@@ -2,7 +2,7 @@
+ # Makefile for KVM support for MIPS
+ #
  
+-common-objs-y = $(addprefix ../../../virt/kvm/, kvm_main.o coalesced_mmio.o)
++common-objs-y = $(addprefix ../../../virt/kvm/, kvm_main.o coalesced_mmio.o eventfd.o)
  
--#define KVM_MAX_VCPUS		8
--#define KVM_USER_MEM_SLOTS	8
-+#define KVM_MAX_VCPUS		16
-+#define KVM_USER_MEM_SLOTS	16
- /* memory slots that does not exposed to userspace */
- #define KVM_PRIVATE_MEM_SLOTS	0
+ EXTRA_CFLAGS += -Ivirt/kvm -Iarch/mips/kvm
  
+diff --git a/arch/mips/kvm/trap_emul.c b/arch/mips/kvm/trap_emul.c
+index 5a11e83..f464506b 100644
+--- a/arch/mips/kvm/trap_emul.c
++++ b/arch/mips/kvm/trap_emul.c
+@@ -529,6 +529,9 @@ static int kvm_trap_emul_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_MIPS_TE:
+ 		r = 1;
+ 		break;
++	case KVM_CAP_IOEVENTFD:
++		r = 1;
++		break;
+ 	default:
+ 		r = 0;
+ 		break;
+diff --git a/arch/mips/kvm/vz.c b/arch/mips/kvm/vz.c
+index dde2088..17932ab 100644
+--- a/arch/mips/kvm/vz.c
++++ b/arch/mips/kvm/vz.c
+@@ -2927,6 +2927,9 @@ static int kvm_vz_check_extension(struct kvm *kvm, long ext)
+ 		r = 2;
+ 		break;
+ #endif
++	case KVM_CAP_IOEVENTFD:
++		r = 1;
++		break;
+ 	default:
+ 		r = 0;
+ 		break;
 -- 
 2.7.0
 
