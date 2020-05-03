@@ -1,77 +1,91 @@
-Return-Path: <SRS0=t3yw=6Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=KEGy=6R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0269FC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Sat,  2 May 2020 23:51:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FF04C28CBC
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 04:39:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBB692072E
-	for <qemu-devel@archiver.kernel.org>; Sat,  2 May 2020 23:51:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBB692072E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 102C62073E
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 May 2020 04:39:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=brainfault-org.20150623.gappssmtp.com header.i=@brainfault-org.20150623.gappssmtp.com header.b="YyAN4NJa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 102C62073E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jV1vK-0003TQ-VF
-	for qemu-devel@archiver.kernel.org; Sat, 02 May 2020 19:51:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42598)
+	id 1jV6Pl-0006Nh-5Q
+	for qemu-devel@archiver.kernel.org; Sun, 03 May 2020 00:39:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48466)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jV1uk-0002rZ-JG
- for qemu-devel@nongnu.org; Sat, 02 May 2020 19:51:23 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jV1u8-0005Rn-5I
- for qemu-devel@nongnu.org; Sat, 02 May 2020 19:51:22 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47946)
+ (Exim 4.90_1) (envelope-from <anup@brainfault.org>)
+ id 1jV6P6-0005Pi-KL
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 00:39:00 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34788)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jV1u7-0005Pr-MD
- for qemu-devel@nongnu.org; Sat, 02 May 2020 19:50:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jV1u5-0003ad-KF
- for <qemu-devel@nongnu.org>; Sat, 02 May 2020 23:50:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 95A622E806B
- for <qemu-devel@nongnu.org>; Sat,  2 May 2020 23:50:41 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <anup@brainfault.org>)
+ id 1jV6P5-0003pC-At
+ for qemu-devel@nongnu.org; Sun, 03 May 2020 00:39:00 -0400
+Received: by mail-wm1-x341.google.com with SMTP id v4so12802892wme.1
+ for <qemu-devel@nongnu.org>; Sat, 02 May 2020 21:38:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=brainfault-org.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=J7dhoF+USGP5XyNnyjDmxKjt2P5W3J9UKjTaRpyy924=;
+ b=YyAN4NJa40ncja/DhPH1n7hR/DkW9Y9rxL1bVEzdrON50v42vC3v4kN6bffAfolbRP
+ eNkwt7g0VWN0/5P4bKdLUGyJgK1fpLOO3sQNY1nA9EXM/fOdF1MxGHiNSkcsJNGmFV08
+ liudGgh3sSQspGvCd+kvLZRxU+yi4eqgiRJXDJwGILeKWS7Y+wo0EayRt0P02UJrNTa7
+ aLI0rlsD5QvCNVh/y6EzCBP/7/zkdEXr7DmKJnL9PNRVFxkQKSUlvJHhMxSXA56UXgAu
+ twWpcfxvR4939JJiygUAJ4NF+rkEIXPag2HOeYbWfnVfpX0FirN3bS7uHEwzNW7TCVIQ
+ qHpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=J7dhoF+USGP5XyNnyjDmxKjt2P5W3J9UKjTaRpyy924=;
+ b=EHLmc7h/AVkXQRf4eFkW6llawteTDIAftceuVZdD4iC0YbF6AI2YE7Wk+LvIY2fxXX
+ 477Z+4+2IJ06isO/WxBd/g/p5AMlINJ9wDhvYMCEjmPCGv/HPEGz7wk+RpHPX1Y590aO
+ ZF8XNg0CBpfN7o5nbznOd9Sg+TGlvrMf0PiR6G+iKvmeoakrwgIxqXbLk8KwR/Xdzrzz
+ HU2zJh5vsBi+o8PLKlNrWDnR+QILtPQKMGJlM2XfNt0sk30yqBMRmTxxmARksEnyBS1/
+ 6lnbDQC9QISX/UqOkM/E9eifvTY7T8GO9cRLhcEeS9M7ipR8eKnvY8vs3A7aUCcc0bZ6
+ RRSg==
+X-Gm-Message-State: AGi0PubOlYiD9DBXVklRm5L/IdNlqKQaOFW9p8+IeA0oru0rw5cbhWCe
+ yDvJM0AdpvD60kjj2huMeiHJBlAm+qIkuZA8Puw3tg==
+X-Google-Smtp-Source: APiQypIILzYJJDnIeqgZww69ISi4Iv658b/v982xMXz3llFs3irV2TSeHaWAbgB72ZnOFsEGGme2pfDjksNOD/GDsnM=
+X-Received: by 2002:a1c:9d0d:: with SMTP id g13mr7945183wme.102.1588480737232; 
+ Sat, 02 May 2020 21:38:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 02 May 2020 23:45:07 -0000
-From: Jonathan Marler <1876373@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: marler8997
-X-Launchpad-Bug-Reporter: Jonathan Marler (marler8997)
-X-Launchpad-Bug-Modifier: Jonathan Marler (marler8997)
-References: <158836364215.11388.17303335808881708822.malonedeb@wampee.canonical.com>
-Message-Id: <158846310753.14142.7319369658640095028.malone@gac.canonical.com>
-Subject: [Bug 1876373] Re: segfault mremap 4096
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 4acfb9cd926fffb64073e0b8482fbdc289b51626
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/02 19:50:41
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Received-From: 91.189.90.7
+References: <1588348254-7241-1-git-send-email-bmeng.cn@gmail.com>
+ <1588348254-7241-2-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1588348254-7241-2-git-send-email-bmeng.cn@gmail.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Sun, 3 May 2020 10:08:44 +0530
+Message-ID: <CAAhSdy06i1zb6_aedLn41rWDzrjyTcJ_T954DcwX7k2bM_VcVw@mail.gmail.com>
+Subject: Re: [PATCH 1/5] roms/opensbi: Update to support building bios images
+ for generic platform
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: none client-ip=2a00:1450:4864:20::341;
+ envelope-from=anup@brainfault.org; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,93 +94,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1876373 <1876373@bugs.launchpad.net>
+Cc: Bin Meng <bin.meng@windriver.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Anup Patel <Anup.Patel@wdc.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-FYI, first patch in the previous comment was wrong.  This new patch is
-the correct one: https://lists.gnu.org/archive/html/qemu-
-devel/2020-05/msg00183.html
+On Fri, May 1, 2020 at 9:26 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> From: Bin Meng <bin.meng@windriver.com>
+>
+> The RISC-V generic platform is a flattened device tree (FDT) based
+> platform where all platform specific functionality is provided based
+> on FDT passed by previous booting stage. The support was added in
+> upstream opensbi recently.
+>
+> Bring the QEMU roms/opensbi submodule to the upstream opensbi commit:
+> commit 4f18c6e55049 ("platform: generic: Add Sifive FU540 TLB flush range limit override")
+> with the following changes since v0.7 release:
+>
+>   1bb00ab lib: No need to provide default PMP region using platform callbacks
+>   a9eac67 include: sbi_platform: Combine reboot and shutdown into one callback
+>   6585fab lib: utils: Add SiFive test device
+>   4781545 platform: Add Nuclei UX600 platform
+>   3a326af scripts: adapt binary archive script for Nuclei UX600
+>   5bdf022 firmware: fw_base: Remove CSR_MTVEC update check
+>   e6c1345 lib: utils/serial: Skip baudrate config if input frequency is zero
+>   01a8c8e lib: utils: Improve fdt_parse_uart8250() API
+>   0a0093b lib: utils: Add fdt_parse_uart8250_node() function
+>   243b0d0 lib: utils: Remove redundant clint_ipi_sync() declaration
+>   e3ad7c1 lib: utils: Rename fdt_parse_clint() to fdt_parse_compat_addr()
+>   a39cd6f lib: utils: Add FDT match table based node lookup
+>   dd33b9e lib: utils: Make fdt_get_node_addr_size() public function
+>   66185b3 lib: utils: Add fdt_parse_sifive_uart_node() function
+>   19e966b lib: utils: Add fdt_parse_hart_id() function
+>   44dd7be lib: utils: Add fdt_parse_max_hart_id() API
+>   f0eb503 lib: utils: Add fdt_parse_plic_node() function
+>   1ac794c include: Add array_size() macro
+>   8ff2b94 lib: utils: Add simple FDT timer framework
+>   76f0f81 lib: utils: Add simple FDT ipi framework
+>   75322a6 lib: utils: Add simple FDT irqchip framework
+>   76a8940 lib: utils: Add simple FDT serial framework
+>   7cc6fa4 lib: utils: Add simple FDT reset framework
+>   4d06353 firmware: fw_base: Introduce optional fw_platform_init()
+>   f1aa9e5 platform: Add generic FDT based platform support
+>   1f21b99 lib: sbi: Print platform hart count at boot time
+>   2ba7087 scripts: Add generic platform to create-binary-archive.sh
+>   4f18c6e platform: generic: Add Sifive FU540 TLB flush range limit override
+>
+> Update our Makefile to build the generic platform instead of building
+> virt and sifive_u separately.
+>
+> Signed-off-by: Bin Meng <bin.meng@windriver.com>
+> ---
+>
+>  roms/Makefile | 30 ++++++++----------------------
+>  roms/opensbi  |  2 +-
+>  2 files changed, 9 insertions(+), 23 deletions(-)
+>
+> diff --git a/roms/Makefile b/roms/Makefile
+> index f9acf39..cb00628 100644
+> --- a/roms/Makefile
+> +++ b/roms/Makefile
+> @@ -64,10 +64,8 @@ default help:
+>         @echo "  u-boot.e500        -- update u-boot.e500"
+>         @echo "  u-boot.sam460      -- update u-boot.sam460"
+>         @echo "  efi                -- update UEFI (edk2) platform firmware"
+> -       @echo "  opensbi32-virt     -- update OpenSBI for 32-bit virt machine"
+> -       @echo "  opensbi64-virt     -- update OpenSBI for 64-bit virt machine"
+> -       @echo "  opensbi32-sifive_u -- update OpenSBI for 32-bit sifive_u machine"
+> -       @echo "  opensbi64-sifive_u -- update OpenSBI for 64-bit sifive_u machine"
+> +       @echo "  opensbi32-generic  -- update OpenSBI for 32-bit generic machine"
+> +       @echo "  opensbi64-generic  -- update OpenSBI for 64-bit generic machine"
+>         @echo "  bios-microvm       -- update bios-microvm.bin (qboot)"
+>         @echo "  clean              -- delete the files generated by the previous" \
+>                                       "build targets"
+> @@ -170,29 +168,17 @@ skiboot:
+>  efi: edk2-basetools
+>         $(MAKE) -f Makefile.edk2
+>
+> -opensbi32-virt:
+> +opensbi32-generic:
+>         $(MAKE) -C opensbi \
+>                 CROSS_COMPILE=$(riscv32_cross_prefix) \
+> -               PLATFORM="qemu/virt"
+> -       cp opensbi/build/platform/qemu/virt/firmware/fw_jump.bin ../pc-bios/opensbi-riscv32-virt-fw_jump.bin
+> +               PLATFORM="generic"
+> +       cp opensbi/build/platform/generic/firmware/fw_jump.bin ../pc-bios/opensbi-riscv32-generic-fw_jump.bin
 
--- =
+I think you should copy fw_jump.elf as well because QEMU Spike
+platform needs it.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1876373
+>
+> -opensbi64-virt:
+> +opensbi64-generic:
+>         $(MAKE) -C opensbi \
+>                 CROSS_COMPILE=$(riscv64_cross_prefix) \
+> -               PLATFORM="qemu/virt"
+> -       cp opensbi/build/platform/qemu/virt/firmware/fw_jump.bin ../pc-bios/opensbi-riscv64-virt-fw_jump.bin
+> -
+> -opensbi32-sifive_u:
+> -       $(MAKE) -C opensbi \
+> -               CROSS_COMPILE=$(riscv32_cross_prefix) \
+> -               PLATFORM="sifive/fu540"
+> -       cp opensbi/build/platform/sifive/fu540/firmware/fw_jump.bin ../pc-bios/opensbi-riscv32-sifive_u-fw_jump.bin
+> -
+> -opensbi64-sifive_u:
+> -       $(MAKE) -C opensbi \
+> -               CROSS_COMPILE=$(riscv64_cross_prefix) \
+> -               PLATFORM="sifive/fu540"
+> -       cp opensbi/build/platform/sifive/fu540/firmware/fw_jump.bin ../pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin
+> +               PLATFORM="generic"
+> +       cp opensbi/build/platform/generic/firmware/fw_jump.bin ../pc-bios/opensbi-riscv64-generic-fw_jump.bin
 
-Title:
-  segfault mremap 4096
+Same as above.
 
-Status in QEMU:
-  New
+>
+>  bios-microvm:
+>         $(MAKE) -C qboot
+> diff --git a/roms/opensbi b/roms/opensbi
+> index 9f1b72c..4f18c6e 160000
+> --- a/roms/opensbi
+> +++ b/roms/opensbi
+> @@ -1 +1 @@
+> -Subproject commit 9f1b72ce66d659e91013b358939e832fb27223f5
+> +Subproject commit 4f18c6e55049d858c62e87d2605dd41c06956e4e
+> --
+> 2.7.4
+>
+>
 
-Bug description:
-  a qemu-hosted process segfaults when the program calls mremap to
-  shrink the size of a buffer to 4096 that was allocated with mmap. See
-  below for a C program to reproduce this issue.  I was able to compile
-  this program for both i386 and 32-bit arm, and use qemu-i386 and qemu-
-  arm to reproduce the segfault.  If I run the i386 program natively on
-  my x86_64 system, no segfault occurs.  Also note that if I change the
-  mremap size to something else such as 12288, no segfault occurs.  I
-  also confirmed using qemu's -singlestep debug option that the segfault
-  occurs during the mremap syscall.
+Otherwise looks good to me.
 
-  If you save the source below to mremapbug.c, the following should
-  reproduce the issue given you have gcc-multilib:
+Reviewed-by: Anup Patel <anup@brainfault.org>
 
-  gcc -m32 mremapbug.c
-  # works
-  ./a.out
-  # segfault
-  qemu-i386 a.out
-
-  If you can also compile to arm, the same thing happens when running
-  "qemu-arm a.out".  I also tried compiling natively and running "qemu-
-  x86_64 a.out" but no segfault in that case, not sure if it's because
-  it is 64-bits or if it was because it was my native target.
-
-  =
-
-  #define _GNU_SOURCE
-  #include <stdlib.h>
-  #include <stdio.h>
-  #include <sys/mman.h>
-
-  int main(int argc, char *argv[])
-  {
-    const size_t initial_size =3D 8192;
-
-    printf("calling mmap, size=3D%llu\n", (unsigned long long)initial_size);
-    void *mmap_ptr =3D mmap(NULL, initial_size,
-                     PROT_READ | PROT_WRITE ,
-                     MAP_PRIVATE | MAP_ANONYMOUS,
-                     -1, 0);
-    printf("mmap returned  : %p\n", mmap_ptr);
-    if (mmap_ptr =3D=3D MAP_FAILED) {
-      perror("mmap");
-      exit(1);
-    }
-
-    const size_t new_size =3D 4096;
-    printf("calling mremap, size=3D%llu\n", (unsigned long long)new_size);
-    void *remap_ptr =3D mremap(mmap_ptr, initial_size, new_size, 0);
-    printf("mremap returned: %p\n", remap_ptr);
-    if (remap_ptr !=3D mmap_ptr) {
-      perror("mreamap");
-      exit(1);
-    }
-    printf("Success: pointers match\n");
-  }
-
-  =
-
-  This issue was found while I was pushing code that calls "mremap" to the =
-Zig compiler repository, it's CI testing uses qemu-i386 and qemu-arm to run=
- tests for non-native hosts.  I've filed an issue in that repository as wel=
-l with details on how to reproduce this issue with the Zig compiler as well=
-: https://github.com/ziglang/zig/issues/5245
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1876373/+subscriptions
+Regards,
+Anup
 
