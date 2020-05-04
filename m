@@ -2,73 +2,92 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF1F5C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:02:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C40A3C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:02:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3F842073B
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:02:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3F842073B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 8C22A2073B
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:02:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GvkFTPWl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C22A2073B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVZnZ-00087f-Qe
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 08:02:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52028)
+	id 1jVZnh-0008NS-NL
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 08:02:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51888)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jVZjq-00031r-L2; Mon, 04 May 2020 07:58:22 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:60045)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jVZie-0001rD-GW; Mon, 04 May 2020 07:57:08 -0400
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:37285)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jVZjo-0001yc-Rt; Mon, 04 May 2020 07:58:22 -0400
-Received: from localhost.localdomain ([82.252.135.106]) by
- mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1Mg6qO-1ivzfO3x3G-00hgP6; Mon, 04 May 2020 13:58:05 +0200
-From: Laurent Vivier <laurent@vivier.eu>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jVZid-0001Fr-ES; Mon, 04 May 2020 07:57:08 -0400
+Received: by mail-wr1-x436.google.com with SMTP id k1so20572753wrx.4;
+ Mon, 04 May 2020 04:57:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=SkzVF0IAQenJ+vuaRxVd2feGaJRdUO/UKBkIdIBtTMo=;
+ b=GvkFTPWlo9th21HoDj9u0RN32gvbPgLDzGaL4aAOI944ux9Nfi0xmD2ExWRUEQreaq
+ 4aEcbSEnqy3D76vFVJ30KHcuDu1e1s2jAaJdHrKqzIafH722ZZGWhUJ9OJ3DPx8DlxdS
+ iGVIAs1AUBCBOIL5wReot7rcYesswRVUa+aUJsCU3J559CdHVRuZT76ebu3O8ymIdlcj
+ 2eFwvzf1nghft+SyeISgxfV174LNcqNNnBmG1O6pyKj0NxgxAUAEWfID0GUzlSQiT/Au
+ 2g3e+xL9HD5vKTXadE3fYVSwAQNV3kyM5Uia+dttYoQ/0opgfn6LrEtXBmtl+gNVP4CH
+ zWqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=SkzVF0IAQenJ+vuaRxVd2feGaJRdUO/UKBkIdIBtTMo=;
+ b=QH1lNkygYGuuLnnlvRKQ5gtGIu0Si16H68C4wrAVf8nYr0lQoM8DmcITh+kPgJl7bm
+ okmkUMdC7im2z8ezXkz2dv9AFLdHEgKEJt1SvGRaNzv2oHylglKOdU/Mwy23i9ZExpjr
+ nBkEUp6AWz6DzjPKiqICCnY8U9z2IiKoLg+n89FkzjUhbIs3Gp68OoV2O7/ebM23xBi2
+ F4/WSHSlvqFEjym66m80Jmns3B76vX5bH4icA9WvdHQoloJ4hI0m1c1yfarhO6A8gqkO
+ kJLf2dX5uL4xiYyJznW6GFV2YZNbKEzcHIRHDf6qdKeoMUtgxALpXfFmeE6NNkGZM27h
+ GtFw==
+X-Gm-Message-State: AGi0PuZLs23XXJ6tptbyJstT4dzz+V27fmMg7mLs95VuHy9OLLCDTFkT
+ mcCyJKQajPDwKhPK7tFGIgV9jLaF
+X-Google-Smtp-Source: APiQypKjfVvmr9Jb1ZL6HMB7lWwFglrCR/bgs8OQGIlB0pPhwuIYKnhsaTL2sZHuWaSnDFBejpAxdQ==
+X-Received: by 2002:a5d:68c7:: with SMTP id p7mr3200590wrw.29.1588593420030;
+ Mon, 04 May 2020 04:57:00 -0700 (PDT)
+Received: from x1w.redhat.com (26.red-88-21-207.staticip.rima-tde.net.
+ [88.21.207.26])
+ by smtp.gmail.com with ESMTPSA id n12sm5660984wrj.95.2020.05.04.04.56.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 04 May 2020 04:56:59 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 04/20] crypto: Redundant type conversion for AES_KEY pointer
-Date: Mon,  4 May 2020 13:57:42 +0200
-Message-Id: <20200504115758.283914-5-laurent@vivier.eu>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200504115758.283914-1-laurent@vivier.eu>
-References: <20200504115758.283914-1-laurent@vivier.eu>
+Subject: [PATCH v2 1/3] qom/object: Move Object typedef to 'qemu/typedefs.h'
+Date: Mon,  4 May 2020 13:56:54 +0200
+Message-Id: <20200504115656.6045-2-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200504115656.6045-1-f4bug@amsat.org>
+References: <20200504115656.6045-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ij71dasd6aUUvAuk8Gmh4BUmqjgTzMBaXMzWHHUi5ztnC+Py9+5
- BsP46QK/FpKMNIeA9KHKsKPJ/Wn3cZXiqgntgON/NaLqeR+XqSweKl8egrzQbHvPJ/ONnSH
- zyxoeiyVMxPuFEsMS6F8eXF5PMO7jU3ooAdMQ96HasjhJ9aOtx9XIr+p4zzfRKAW7BnYoGr
- ugXPmJfBmTOpIfWBCMazg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:z8Cj/S1lsNk=:OSal1EPwiLQ1ysdDI0m4Fy
- bdPOi134lpFET8LIMJ7Q4K/9tB5la0AfyEJLstH2F4w+0TW2Rq8OHzuA5Qoyp3W94/1QZH2T/
- RMrLaOsFurnVSFWawXtMY7o0j4H7FasP2ocOx5pZC4nCnoeQ+d0Jy4bXVN5IjWMSubuiFOSwb
- ZMB+ma4+0tVchG1/Hn6/O2RByqB8qy5sJLfxN851gASBV8dh7nVqgqBwy1+YmniIGc/kBvRVM
- FopFBauITjurxGXVTc3OzoKfrFo8WN3ehjy9aVK3C2z47+WRWIsxUFx7x4WqNBtbtKGaiTXBl
- YDbqIu0K81XKRTLkdVFgi4Mk2rCXa9Ry1ElhzW6Wm8lQ2sx+zAiN2kG6i6OxzPUn750vxy0+N
- MMPMWUcXEUOPrsurnV0v+w19AvEtQ+AxX8ziWOwwNrL9AFEywLYywEtygWpc2nrQWgBWvxNNe
- lyk6f2fJE60Zlf9UkNeWhcdsTwetj0F3eZxwTgYHITIdX8HeyTUWrdzoJ+lC30hJ0McYBlB88
- qdLQNL5ryIRl+B7ZSMdFFY0uDL1xMy8U9PBlpYracMzDcEz68Jw6fnZ+nFx+1Aon7FaoHE7LD
- oiD+iuE0DOzxOAPrOSNzfZEuaILSl1pF4EEJHf6kPQywBTDwYg7f5ds3PFHWXCr13M/giso+Z
- tjVjLla3mK34GbTLMJMaRS4Az+r7KE0QlktC+1HoInQzaP2YbWyCpdHaLxJAV9zErNI/DNLax
- t1kvxe+h+g7esON7H+GCHVFLQZ+HzsYP8Afa/DJhAlqIp7RGlT+frvoC5INmPz1q1PO5bBbA5
- ASJ7BvA0mCOcgbB81xmHBfHEfnpCp8+uStOImgK9YhgkItEdeB9jfjPDm0wcTsfSz6/5nji
-Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 07:58:12
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
+Received-SPF: pass client-ip=2a00:1450:4864:20::436;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x436.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,53 +101,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
- Laurent Vivier <laurent@vivier.eu>, Euler Robot <euler.robot@huawei.com>,
- Chen Qun <kuhn.chenqun@huawei.com>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org,
+ Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Chen Qun <kuhn.chenqun@huawei.com>
+We use the Object type all over the place.
+Forward declare it in "qemu/typedefs.h".
 
-Fix: eaec903c5b8
-
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-Acked-by: Daniel P. Berrangé <berrange@redhat.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200325092137.24020-4-kuhn.chenqun@huawei.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- crypto/cipher-builtin.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ include/qemu/typedefs.h   | 1 +
+ include/qom/object.h      | 2 --
+ include/qom/qom-qobject.h | 2 --
+ include/sysemu/sysemu.h   | 1 -
+ 4 files changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/crypto/cipher-builtin.c b/crypto/cipher-builtin.c
-index bf8413e71a6e..99d6280a1669 100644
---- a/crypto/cipher-builtin.c
-+++ b/crypto/cipher-builtin.c
-@@ -133,8 +133,7 @@ static void qcrypto_cipher_aes_xts_encrypt(const void *ctx,
- {
-     const QCryptoCipherBuiltinAESContext *aesctx = ctx;
+diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+index 375770a80f..b03ec9f40a 100644
+--- a/include/qemu/typedefs.h
++++ b/include/qemu/typedefs.h
+@@ -75,6 +75,7 @@ typedef struct NetFilterState NetFilterState;
+ typedef struct NICInfo NICInfo;
+ typedef struct NodeInfo NodeInfo;
+ typedef struct NumaNodeMem NumaNodeMem;
++typedef struct Object Object;
+ typedef struct ObjectClass ObjectClass;
+ typedef struct PCIBridge PCIBridge;
+ typedef struct PCIBus PCIBus;
+diff --git a/include/qom/object.h b/include/qom/object.h
+index 784c97c0e1..1edc12e64c 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -20,8 +20,6 @@
+ struct TypeImpl;
+ typedef struct TypeImpl *Type;
  
--    qcrypto_cipher_aes_ecb_encrypt((AES_KEY *)&aesctx->enc,
--                                   src, dst, length);
-+    qcrypto_cipher_aes_ecb_encrypt(&aesctx->enc, src, dst, length);
- }
+-typedef struct Object Object;
+-
+ typedef struct TypeInfo TypeInfo;
  
+ typedef struct InterfaceClass InterfaceClass;
+diff --git a/include/qom/qom-qobject.h b/include/qom/qom-qobject.h
+index 77cd717e3f..82136e6e80 100644
+--- a/include/qom/qom-qobject.h
++++ b/include/qom/qom-qobject.h
+@@ -13,8 +13,6 @@
+ #ifndef QEMU_QOM_QOBJECT_H
+ #define QEMU_QOM_QOBJECT_H
  
-@@ -145,8 +144,7 @@ static void qcrypto_cipher_aes_xts_decrypt(const void *ctx,
- {
-     const QCryptoCipherBuiltinAESContext *aesctx = ctx;
+-#include "qom/object.h"
+-
+ /*
+  * object_property_get_qobject:
+  * @obj: the object
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index ef81302e1a..ca4458e451 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -5,7 +5,6 @@
+ #include "qemu/timer.h"
+ #include "qemu/notify.h"
+ #include "qemu/uuid.h"
+-#include "qom/object.h"
  
--    qcrypto_cipher_aes_ecb_decrypt((AES_KEY *)&aesctx->dec,
--                                   src, dst, length);
-+    qcrypto_cipher_aes_ecb_decrypt(&aesctx->dec, src, dst, length);
- }
- 
+ /* vl.c */
  
 -- 
-2.26.2
+2.21.3
 
 
