@@ -2,85 +2,92 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C419C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 15:46:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ADCAC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 15:47:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 267342063A
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 15:46:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 539BA2063A
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 15:47:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H+JsoJTO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 267342063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HuVtTNzu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 539BA2063A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVdIK-00013h-6y
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 11:46:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34988)
+	id 1jVdK1-0003wQ-DL
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 11:47:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60998)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jVdH8-0007km-3v
- for qemu-devel@nongnu.org; Mon, 04 May 2020 11:44:58 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40081
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jVdH6-0008Lv-KK
- for qemu-devel@nongnu.org; Mon, 04 May 2020 11:44:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588607094;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Ks4ptpeKfPoz4LZEmpjuCiZs5YXStm1Qc7IxbkJ0+Hw=;
- b=H+JsoJTOmDvGbD1X3RxvV4hrFe6WN5k1LKb8FzA3wMZOtVuugUeT9J6LNT5ilPY2/RztU2
- 5+jqEZjs3wdk81lJj8s+mM4gyGK1PrC+xAaXJIt5iMkGHj6IaeFWwjGLRCmG8Lz6VVTnqR
- jEgH8ERF7OYxRuodzAZEpDhew8uGrJE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-213-hN6nJ15vOo-hacErbv-NzQ-1; Mon, 04 May 2020 11:44:53 -0400
-X-MC-Unique: hN6nJ15vOo-hacErbv-NzQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2CD7835B51;
- Mon,  4 May 2020 15:44:51 +0000 (UTC)
-Received: from localhost (ovpn-115-57.phx2.redhat.com [10.3.115.57])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6D4525C1B2;
- Mon,  4 May 2020 15:44:51 +0000 (UTC)
-Date: Mon, 4 May 2020 11:44:50 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH] hostmem: don't use mbind() if host-nodes is epmty
-Message-ID: <20200504154450.GM5244@habkost.net>
-References: <20200430154606.6421-1-imammedo@redhat.com>
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jVd6D-0002XK-Dc; Mon, 04 May 2020 11:33:41 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:45132)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jVd6C-0000NY-AT; Mon, 04 May 2020 11:33:41 -0400
+Received: by mail-lj1-x242.google.com with SMTP id h4so10093906ljg.12;
+ Mon, 04 May 2020 08:33:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=Mmsxnx3sLFnb7ifma6tJvRbX0iKMzwxA9neai4apcBM=;
+ b=HuVtTNzulah/SOU4QPIK5hJ+V0rvpzd/oBi3KlmJ7CgAM4cCFeOClla2AgdfDmM5Ry
+ jYFRIsPOSh4jgH14vYKqJLDG4PBK3UW5DnzYmqzkQetrs2uWZp70XgYndEqhwyyRwnic
+ pE6/WJeXpiE2ngGdjdYH4mCdf1WHVUfl6m/aHLa6Y5LLr0Gt2FV3K5T20OFqel3NEJiN
+ LCQi2PiPX07XP35V+RR4cwOLT+upOSu6cZHEQyBYHwZEqa9Emgrjb+0DP306qsEyezMz
+ 23pHx2YwYLwQ/XM2XF5YnLZkV7ZfE3JITQxvkwDLhJXHaKRGgPMkU9T/yB0+JK/dVUCv
+ JZ1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=Mmsxnx3sLFnb7ifma6tJvRbX0iKMzwxA9neai4apcBM=;
+ b=sDWNDuc0C8I0YERnbs3Oe3NVb6fpxHynyorrK+FmLDLHtn9zO66IdVzZI6R5T4UhRM
+ zgjpIJo3ZLq7i8aLxpKX0kg9nhouzr9YA3Mzq+R2FE5B3Lz5m+TWcifz5GfM7+Kol9mH
+ UWtovv7k/cDMTCeqime6tI+/6GGQyzC/+Cm++4iFINB4447F3Sawu5/svzop7rsO1exG
+ +NJqRgXb43U+8p8Gkb1S/sQTLvY51dZ0A5wByP8uPPmGIULkv2xlxc7IYNNq4ey2wEh9
+ utEiEUwBG88B1ui71hJr6s40MSQnWFx5rIfiXmaCo4l8Z5n0FYPMjgnzFRonrTKC3yDX
+ zkoA==
+X-Gm-Message-State: AGi0PuZEr96w43gFV0DvuBv36INPLXcCgoxcTEJOW+aDudQcoVefYZ84
+ 5A1BdmR+93scrPKpX7VsXKGqJVUR+sc=
+X-Google-Smtp-Source: APiQypJit61ZkB86QI/bRvGwV9WjqqVKHYmgKmDXb/nEjgPmAhnnxirOKmM3tHNRuI7uaqTYkeO6/Q==
+X-Received: by 2002:a05:651c:1104:: with SMTP id
+ d4mr10561276ljo.128.1588606416986; 
+ Mon, 04 May 2020 08:33:36 -0700 (PDT)
+Received: from localhost (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id q6sm8640679ljg.67.2020.05.04.08.33.35
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 04 May 2020 08:33:35 -0700 (PDT)
+Date: Mon, 4 May 2020 17:33:34 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Subject: Re: [PATCH v2 10/10] net: cadence_gem: Fix RX address filtering
+Message-ID: <20200504153334.GJ5519@toto>
+References: <1588601168-27576-1-git-send-email-sai.pavan.boddu@xilinx.com>
+ <1588601168-27576-11-git-send-email-sai.pavan.boddu@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <20200430154606.6421-1-imammedo@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 08:14:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+In-Reply-To: <1588601168-27576-11-git-send-email-sai.pavan.boddu@xilinx.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Received-SPF: pass client-ip=2a00:1450:4864:20::242;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x242.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,35 +101,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, mhohmann@physnet.uni-hamburg.de, berrange@redhat.com,
- qemu-devel@nongnu.org, qemu-stable@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, Tong Ho <tong.ho@xilinx.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Ramon Fried <rfried.dev@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Apr 30, 2020 at 11:46:06AM -0400, Igor Mammedov wrote:
-> Since 5.0 QEMU uses hostmem backend for allocating main guest RAM.
-> The backend however calls mbind() which is typically NOP
-> in case of default policy/absent host-nodes bitmap.
-> However when runing in container with black-listed mbind()
-> syscall, QEMU fails to start with error
->  "cannot bind memory to host NUMA nodes: Operation not permitted"
-> even when user hasn't provided host-nodes to pin to explictly
-> (which is the case with -m option)
->=20
-> To fix issue, call mbind() only in case when user has provided
-> host-nodes explicitly (i.e. host_nodes bitmap is not empty).
-> That should allow to run QEMU in containers with black-listed
-> mbind() without memory pinning. If QEMU provided memory-pinning
-> is required user still has to white-list mbind() in container
-> configuration.
->=20
-> Reported-by: Manuel Hohmann <mhohmann@physnet.uni-hamburg.de>
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+On Mon, May 04, 2020 at 07:36:08PM +0530, Sai Pavan Boddu wrote:
+> From: Tong Ho <tong.ho@xilinx.com>
+> 
+> Two defects are fixed:
+> 
+> 1/ Detection of multicast frames
+> 2/ Treating drop of mis-addressed frames as non-error
 
-Queued on machine-next, thanks!
 
---=20
-Eduardo
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
+
+> 
+> Signed-off-by: Tong Ho <tong.ho@xilinx.com>
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+> ---
+>  hw/net/cadence_gem.c | 26 +++++++++++---------------
+>  1 file changed, 11 insertions(+), 15 deletions(-)
+> 
+> diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
+> index f0bf2e7..112794a 100644
+> --- a/hw/net/cadence_gem.c
+> +++ b/hw/net/cadence_gem.c
+> @@ -34,6 +34,7 @@
+>  #include "qemu/module.h"
+>  #include "sysemu/dma.h"
+>  #include "net/checksum.h"
+> +#include "net/eth.h"
+>  
+>  #define CADENCE_GEM_ERR_DEBUG 0
+>  #define DB_PRINT(...) do {\
+> @@ -669,7 +670,7 @@ static unsigned calc_mac_hash(const uint8_t *mac)
+>  static int gem_mac_address_filter(CadenceGEMState *s, const uint8_t *packet)
+>  {
+>      uint8_t *gem_spaddr;
+> -    int i;
+> +    int i, is_mc;
+>  
+>      /* Promiscuous mode? */
+>      if (s->regs[GEM_NWCFG] & GEM_NWCFG_PROMISC) {
+> @@ -685,22 +686,17 @@ static int gem_mac_address_filter(CadenceGEMState *s, const uint8_t *packet)
+>      }
+>  
+>      /* Accept packets -w- hash match? */
+> -    if ((packet[0] == 0x01 && (s->regs[GEM_NWCFG] & GEM_NWCFG_MCAST_HASH)) ||
+> -        (packet[0] != 0x01 && (s->regs[GEM_NWCFG] & GEM_NWCFG_UCAST_HASH))) {
+> +    is_mc = is_multicast_ether_addr(packet);
+> +    if ((is_mc && (s->regs[GEM_NWCFG] & GEM_NWCFG_MCAST_HASH)) ||
+> +        (!is_mc && (s->regs[GEM_NWCFG] & GEM_NWCFG_UCAST_HASH))) {
+> +        uint64_t buckets;
+>          unsigned hash_index;
+>  
+>          hash_index = calc_mac_hash(packet);
+> -        if (hash_index < 32) {
+> -            if (s->regs[GEM_HASHLO] & (1<<hash_index)) {
+> -                return packet[0] == 0x01 ? GEM_RX_MULTICAST_HASH_ACCEPT :
+> -                                           GEM_RX_UNICAST_HASH_ACCEPT;
+> -            }
+> -        } else {
+> -            hash_index -= 32;
+> -            if (s->regs[GEM_HASHHI] & (1<<hash_index)) {
+> -                return packet[0] == 0x01 ? GEM_RX_MULTICAST_HASH_ACCEPT :
+> -                                           GEM_RX_UNICAST_HASH_ACCEPT;
+> -            }
+> +        buckets = ((uint64_t)s->regs[GEM_HASHHI] << 32) | s->regs[GEM_HASHLO];
+> +        if ((buckets >> hash_index) & 1) {
+> +            return is_mc ? GEM_RX_MULTICAST_HASH_ACCEPT
+> +                         : GEM_RX_UNICAST_HASH_ACCEPT;
+>          }
+>      }
+>  
+> @@ -924,7 +920,7 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
+>      /* Is this destination MAC address "for us" ? */
+>      maf = gem_mac_address_filter(s, buf);
+>      if (maf == GEM_RX_REJECT) {
+> -        return -1;
+> +        return size;  /* no, drop siliently b/c it's not an error */
+>      }
+>  
+>      /* Discard packets with receive length error enabled ? */
+> -- 
+> 2.7.4
+> 
 
