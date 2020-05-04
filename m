@@ -8,78 +8,77 @@ X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E06A8C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:51:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6C76C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:52:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE041206D9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:51:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AEDAB206B9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:52:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q15pqy9N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE041206D9
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oEug5XuW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEDAB206B9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVcRT-0002Fg-Ie
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 10:51:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49030)
+	id 1jVcSW-0004R3-3g
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 10:52:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48020)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jVcFi-00071F-Qc; Mon, 04 May 2020 10:39:26 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:40957)
+ id 1jVc98-0002hf-IF; Mon, 04 May 2020 10:32:39 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:42856)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jVcFh-0003ab-Qu; Mon, 04 May 2020 10:39:26 -0400
-Received: by mail-lj1-x242.google.com with SMTP id y4so9888488ljn.7;
- Mon, 04 May 2020 07:39:25 -0700 (PDT)
+ id 1jVc96-0008K3-9H; Mon, 04 May 2020 10:32:38 -0400
+Received: by mail-lj1-x243.google.com with SMTP id a21so9845294ljb.9;
+ Mon, 04 May 2020 07:32:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to:user-agent;
- bh=rKeNqQ2d2ObLs/zCVsCYYGZ7H33qapCedtGJaSloaCA=;
- b=Q15pqy9NQFvF7fKPq5pgCvmbyxV8h7Af+MCej8OaNJuKmbGx9rEhRu62o1bygHcaBP
- tgOjLFznphtB/QkbHadwW+6ecYqfRs5d/j4E9ruiini8zTh8sy3XeluID7PmoXvyLno/
- YJHWsLeWJRknIovy0m5PyBWNgw2bOvu9zs4AUA1b7GYqKDv1YBG1AXZEzLnJZlOrr6Ap
- iev7Yp3o7u0gDDhaTxnwdJB553RW2841jb8e7NqHonWhytRmWcZXoAmLKpKlkWp9hcdU
- lfdwcsN0wWBb9zqiGR2ulR6tapjbJ7TH/OvKO+PQm9zL6KuAJhC/Bmp9xUL7FHITWFDN
- asEQ==
+ bh=lgE9Ulxxtdf3kth7r5oCrNYZHgo7jqyXNAQuogxxTJ8=;
+ b=oEug5XuW0C7yWbAyBqvFgEJFWiaPg8jLgEQHdolBnR1p3RvKd7JeTdjB4+acF+Viwu
+ pghzziz5U9lY6b7rmJpvGSuKqWrWJS7jim5tFpDqvj84Af0WTDpF1LRtfQq+QUP8A7H7
+ Jk5gztflFnV7C7i6bHg6rkaf12qZV7AsbgxEnVYA3lq2Uvfgtco1R9Vm89qrsPgHHL0K
+ gg4ZLRIe3LcE121u+lYzAwBzpy07Inuvzqmg4oMzyTd9ne+2Kj3wUP1CQxff8cyy7SIS
+ Zt3DlRH/pxIm/Lxw7d/yGW9II0AVV80mJITXf2ARlfj3ES7Ti3qBgkD9Yh9i30j3oq+I
+ WIYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to:user-agent;
- bh=rKeNqQ2d2ObLs/zCVsCYYGZ7H33qapCedtGJaSloaCA=;
- b=W/RtWW/qk5yBuxyLSe31+gqnNhDJVclGXztNJ/0Ii1ePCFdPRop55DwomFyiUK45Kr
- oI8xED8+1fQojn6hQv+JkXVe2eR5BzorjfbJSDsqPRhhsobSNEZuCZQFw6VwUGjMg8v+
- wDSufWKP3wiMoJhnSvMe+hSBQOPVOuXv/Ted1hZI78gQ1FA5b4YGHRo3zg4+C+QhgHp5
- HbwhMiqEk8xQ1u2KJAxLMJ84V9zmRHE9rGN5/J+vTMu5o36jlEvCGanlOkfDyBJcYejj
- 2lhaiX/eHepP0EVFWEBC1xF/xZ7acw4wMF1TaR1ZfhCkLoPSoQsHn4SyoqvgghOMAc3G
- Px2Q==
-X-Gm-Message-State: AGi0PuZ/OcgBVpDhUXwBF8MuvVoY7fCj4+EvDSRdOuA5Vc4mqwqtfM3D
- jdeHXgoBxlLj21OCmpF+vdQ=
-X-Google-Smtp-Source: APiQypJLN8DS6CGjU753Woexe7ffKkjgGTfB6j5twIme7KTBsV6CE3jnXEw8Yk5OL1h3dvG8+mRrCQ==
-X-Received: by 2002:a05:651c:549:: with SMTP id
- q9mr10768660ljp.236.1588603163597; 
- Mon, 04 May 2020 07:39:23 -0700 (PDT)
+ bh=lgE9Ulxxtdf3kth7r5oCrNYZHgo7jqyXNAQuogxxTJ8=;
+ b=RH/pxGo4Bauiw3X/pJqbTowVmqgZ3Dqa4CQtF1IBUOlPgrle2ZSH7SY2tLT3AR15qi
+ 93aBvXs4MARQ5/Ljx1R8D0jKz+GZ1EpYID8JMyr1NAgxu0aRCWx9TMco+ZTTm2Ynh4xH
+ M4NvPUB7R1pdQ0xfa9JBlVvFfzTyBMdYGv/MLbSAHvMgRhdKBzipjLvFDhix0olK+TrI
+ sNW8y7gThCyE5UK5GwsMqPcBNjd5bqNaKvma68J+/8SELT4qv2yYFrrvnJvUAvYM7Re2
+ 8ETphlp9AD5v0Y0Rjoj5Ywk06X/nG8fbsiSNn5sbqt14EQ6YSurQhH7gTe0lShA7NvV0
+ jNuw==
+X-Gm-Message-State: AGi0PuYMR6gJEmqWlgw0jK/ec5PJgbWGmDyIRuu+MENgQUWfOfGo1pS4
+ jBJzd+4isaNpX1bg17QBQ5k=
+X-Google-Smtp-Source: APiQypIW5QuHFOnzXPjmNuubLusre6mX4yekPhrnCbupZ8GtR2RyXdHbujyLDj0FfEcCQBtfgWr2ZQ==
+X-Received: by 2002:a2e:9055:: with SMTP id n21mr10678833ljg.46.1588602753918; 
+ Mon, 04 May 2020 07:32:33 -0700 (PDT)
 Received: from localhost (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id j22sm8389941ljh.107.2020.05.04.07.39.22
+ by smtp.gmail.com with ESMTPSA id h28sm9950916lfe.80.2020.05.04.07.32.33
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 May 2020 07:39:22 -0700 (PDT)
-Date: Mon, 4 May 2020 16:39:22 +0200
+ Mon, 04 May 2020 07:32:33 -0700 (PDT)
+Date: Mon, 4 May 2020 16:32:32 +0200
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Subject: Re: [PATCH v2 01/10] net: cadence_gem: Fix debug statements
-Message-ID: <20200504143922.GB5519@toto>
+Subject: Re: [PATCH v2 03/10] net: cadence_gem: Fix irq update w.r.t queue
+Message-ID: <20200504143232.GA5519@toto>
 References: <1588601168-27576-1-git-send-email-sai.pavan.boddu@xilinx.com>
- <1588601168-27576-2-git-send-email-sai.pavan.boddu@xilinx.com>
+ <1588601168-27576-4-git-send-email-sai.pavan.boddu@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1588601168-27576-2-git-send-email-sai.pavan.boddu@xilinx.com>
+In-Reply-To: <1588601168-27576-4-git-send-email-sai.pavan.boddu@xilinx.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
-Received-SPF: pass client-ip=2a00:1450:4864:20::242;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x242.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::243;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -111,83 +110,57 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 04, 2020 at 07:35:59PM +0530, Sai Pavan Boddu wrote:
-> Enabling debug breaks the build, Fix them and make debug statements
-> always compilable. Fix few statements to use sized integer casting.
+On Mon, May 04, 2020 at 07:36:01PM +0530, Sai Pavan Boddu wrote:
+> Set irq's specific to a queue, present implementation is setting q1 irq
+> based on q0 status.
+
+
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+
+
+
 > 
 > Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
 > ---
->  hw/net/cadence_gem.c | 28 ++++++++++++++--------------
->  1 file changed, 14 insertions(+), 14 deletions(-)
+>  hw/net/cadence_gem.c | 25 +++----------------------
+>  1 file changed, 3 insertions(+), 22 deletions(-)
 > 
 > diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-> index 22a0b1b..2f244eb 100644
+> index 6cb2f64..a930bf1 100644
 > --- a/hw/net/cadence_gem.c
 > +++ b/hw/net/cadence_gem.c
-> @@ -35,14 +35,13 @@
->  #include "sysemu/dma.h"
->  #include "net/checksum.h"
+> @@ -554,29 +554,10 @@ static void gem_update_int_status(CadenceGEMState *s)
+>  {
+>      int i;
 >  
-> -#ifdef CADENCE_GEM_ERR_DEBUG
-> -#define DB_PRINT(...) do { \
-> -    fprintf(stderr,  ": %s: ", __func__); \
-> -    fprintf(stderr, ## __VA_ARGS__); \
-> -    } while (0)
-> -#else
-> -    #define DB_PRINT(...)
-> -#endif
-> +#define CADENCE_GEM_ERR_DEBUG 0
-> +#define DB_PRINT(...) do {\
-> +    if (CADENCE_GEM_ERR_DEBUG) {   \
-> +        qemu_log(": %s: ", __func__); \
-> +        qemu_log(__VA_ARGS__); \
-> +    } \
-> +} while (0)
+> -    if (!s->regs[GEM_ISR]) {
+> -        /* ISR isn't set, clear all the interrupts */
+> -        for (i = 0; i < s->num_priority_queues; ++i) {
+> -            qemu_set_irq(s->irq[i], 0);
+> -        }
+> -        return;
+> -    }
+> +    qemu_set_irq(s->irq[0], !!s->regs[GEM_ISR]);
 >  
->  #define GEM_NWCTRL        (0x00000000/4) /* Network Control reg */
->  #define GEM_NWCFG         (0x00000004/4) /* Network Config reg */
-> @@ -979,7 +978,8 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
->          size += 4;
+> -    /* If we get here we know s->regs[GEM_ISR] is set, so we don't need to
+> -     * check it again.
+> -     */
+> -    if (s->num_priority_queues == 1) {
+> -        /* No priority queues, just trigger the interrupt */
+> -        DB_PRINT("asserting int.\n");
+> -        qemu_set_irq(s->irq[0], 1);
+> -        return;
+> -    }
+> -
+> -    for (i = 0; i < s->num_priority_queues; ++i) {
+> -        if (s->regs[GEM_INT_Q1_STATUS + i]) {
+> -            DB_PRINT("asserting int. (q=%d)\n", i);
+> -            qemu_set_irq(s->irq[i], 1);
+> -        }
+> +    for (i = 1; i < s->num_priority_queues; ++i) {
+> +        qemu_set_irq(s->irq[i], !!s->regs[GEM_INT_Q1_STATUS + i - 1]);
 >      }
->  
-> -    DB_PRINT("config bufsize: %d packet size: %ld\n", rxbufsize, size);
-> +    DB_PRINT("config bufsize: %" PRIu64 " packet size: %" PRIu64 "\n",
-> +             (uint64_t) rxbufsize, (uint64_t) size);
-
-Shouldn't these be %u and %zd rather than casting to uint64_t?
-
-
->  
->      /* Find which queue we are targeting */
->      q = get_queue_from_screen(s, rxbuf_ptr, rxbufsize);
-> @@ -992,9 +992,9 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
->              return -1;
->          }
->  
-> -        DB_PRINT("copy %u bytes to 0x%" PRIx64 "\n",
-> -                 MIN(bytes_to_copy, rxbufsize),
-> -                 rx_desc_get_buffer(s, s->rx_desc[q]));
-> +        DB_PRINT("copy %" PRIu32 " bytes to 0x%" PRIx64 "\n",
-> +                MIN(bytes_to_copy, rxbufsize),
-> +                rx_desc_get_buffer(s, s->rx_desc[q] + rxbuf_offset));
-
-Looks like this is changing what we print (+ rxbuf_offset), was
-that intentional? (it was not mentioned in the commit message)
-
-
->  
->          /* Copy packet data to emulated DMA buffer */
->          address_space_write(&s->dma_as, rx_desc_get_buffer(s, s->rx_desc[q]) +
-> @@ -1160,8 +1160,8 @@ static void gem_transmit(CadenceGEMState *s)
->               */
->              if ((tx_desc_get_buffer(s, desc) == 0) ||
->                  (tx_desc_get_length(desc) == 0)) {
-> -                DB_PRINT("Invalid TX descriptor @ 0x%x\n",
-> -                         (unsigned)packet_desc_addr);
-> +                DB_PRINT("Invalid TX descriptor @ 0x%" HWADDR_PRIx "\n",
-> +                         packet_desc_addr);
->                  break;
->              }
+>  }
 >  
 > -- 
 > 2.7.4
