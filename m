@@ -2,90 +2,88 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3B66C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 17:19:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B618C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 17:21:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79C1820721
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 17:19:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C262620721
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 17:21:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I5z/4XsF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79C1820721
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Fk+l2J9M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C262620721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVekS-0002bb-Hc
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 13:19:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54050)
+	id 1jVemZ-0005nh-V1
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 13:21:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54654)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jVehZ-0007dX-F9
- for qemu-devel@nongnu.org; Mon, 04 May 2020 13:16:22 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:37084)
+ id 1jVel7-00041r-EJ
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 13:20:02 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:38356)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jVehX-0002eo-7z
- for qemu-devel@nongnu.org; Mon, 04 May 2020 13:16:21 -0400
-Received: by mail-pl1-x642.google.com with SMTP id x10so1355647plr.4
- for <qemu-devel@nongnu.org>; Mon, 04 May 2020 10:16:18 -0700 (PDT)
+ id 1jVel6-0003bu-GZ
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 13:20:01 -0400
+Received: by mail-pf1-x442.google.com with SMTP id y25so5844059pfn.5
+ for <qemu-devel@nongnu.org>; Mon, 04 May 2020 10:20:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ZAgT/N6VdVa2gcUEHlc67rQXtKYTDUFcbF1qLY4/QxY=;
- b=I5z/4XsF7Xcb6+MFqLEvp9BfhJ2xKkrPkV8mUvHLei/aSMS2Y0ip5cfr4p8Mj7zRc9
- zhhW3BEf21Kq9bA9WPGS+gowESI6cIOatbnOWjet2yVpUcY3bAcGnzab8e+iJMDL1iOv
- FlMlG61aktw8Lg+ngkpTNLOjqa35aS0ukTQoZoV2VJGdZHgl9FLKore0wRRndyPWxO6N
- 0ae5mPRMNAqI+B7Z+m0gQEhugM1hcEQOfmxLloWdw6uRd7ZCbz0zjakOw6ddWvcWlNbq
- E3+mSGeWCytH4TrXAkdAI95HN3dV7+mQin+3w2loRExdSSYCDaxizLOxOsomv5gyPW52
- RewA==
+ bh=zZVm1hsjJOS2dQ7dW9OoeOwkjogB/hb3t0l+Bm65tww=;
+ b=Fk+l2J9Mh1hmrDmclYjn054qX72sK8aMp/F7IAEOcQtXIjRCiqQl0Hh3O/Wkn7xuuv
+ ys3+QsA3+gMGp1JjRZELYsevpWycniQQQRg/WB1yoZ0CavoiFFBkxTtv99OYWNBkxM32
+ Lqrn+DRMr7lzL6OXOU2wW+/MXdsaB4EFWzwgphpjMyM9/k50Y7gcfEEvgcyosA6GpIDR
+ NP0dEHx0+5cuI4SLHURjQFlNPkcxYNz1jAv0ePmcH3if1fn6duX500lH9yRGswtNnvdh
+ sQAmcBicho5fLrrJeSDFuGhdQswZGKTLLdXLSl77yuQ8cmQTcqVYCdsCl4DXYA2krtlg
+ Bpcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=ZAgT/N6VdVa2gcUEHlc67rQXtKYTDUFcbF1qLY4/QxY=;
- b=cQ+iS9yo2e1zPYFuqdi3x+N6/C2H6nyf2Uq7WALYd269S1PcHcwv1fpT7Xl+BV3rIC
- F4YKn9jBh1SK8Uv/Ntk6uRYcOxXf/gEG0nK6j46NYvf8UpA8wz6vNxzED97kWSrfoXCO
- A/bXoupZ3OBNdxejuXFQRJnIF87q5RIEwDeN8gOnF6Xy+vSLiZh6xDSd2w2r/Zx9YYgC
- 2/sRgXTNzHrNXIQdQQKYOLAkUU2xgg7tCjAsdvlOqXG4PrQXfTYL4+Nxh0y1keVUoEwo
- Lf0DnTvUkoiuC+a/IF4nL8ZC/bW189uvx7wu9cJF/WH7G4CoikiXpFTMxKlDXaFCUOgB
- K+YQ==
-X-Gm-Message-State: AGi0PuZIpuTvGwZDR0PtrDnc8Nxhi6lHaKCC18ioQdPdwTAgB3Dx8q70
- g+CJaiI/BYZp6UjAzdiqZduxkw==
-X-Google-Smtp-Source: APiQypJg3m2dY58QHJp2xl7Iu3TTOgHMqG8n+Pd3vfXVTp7nBXCkai1epY1+gzu1loKjaywzi/lI4Q==
-X-Received: by 2002:a17:902:b48f:: with SMTP id
- y15mr232447plr.114.1588612577533; 
- Mon, 04 May 2020 10:16:17 -0700 (PDT)
+ bh=zZVm1hsjJOS2dQ7dW9OoeOwkjogB/hb3t0l+Bm65tww=;
+ b=kGwd34Esh5Rgo9JE4aUIOgWMEc/aToaTApoXxu7iel3Bkx/+broEfuzWnXTTBISayq
+ Al88QXjmYyU0pLXEDTBCKpD12dOZxpOAMDGrtr6jeWE7vkG+w0vUVtMdWno44cT5PT71
+ y/V6FOvuWFCefV35Ya56lFuXz30drokSA0RzeV7hIxms4kEAVYJ0I0LekOEX+nsn2hLD
+ w5qbLt/nT7tt/ryiAIjwBaksI43+JC+r4ohLRs9fYD/ivJ2e6u9xiexSO0UYTgd8Ifen
+ 94X/oBdNhdFym0X/KxiZWXbWJjZ/pzikPyKR5Lw6n/R6mUeR++gKj8Ic224h1JcZ9p8D
+ FdYg==
+X-Gm-Message-State: AGi0Puawv9zMJfwNscxejgHAT/QCGLqvYp5xN/Ftoio35aS4r5b24W0L
+ ZJgNnh5JasNcD4LOqZCDfJFp5g==
+X-Google-Smtp-Source: APiQypJtK6ZbyvcZHHYS2rPDtF+Za+aUjBzuVzWqoMBgQl8H5jWo9waeYtCBpHG8A8zjpaqt81uF9Q==
+X-Received: by 2002:a62:2cd7:: with SMTP id
+ s206mr17912726pfs.183.1588612798895; 
+ Mon, 04 May 2020 10:19:58 -0700 (PDT)
 Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id i190sm9277842pfe.114.2020.05.04.10.16.16
+ by smtp.gmail.com with ESMTPSA id a23sm9286109pfo.145.2020.05.04.10.19.57
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 04 May 2020 10:16:16 -0700 (PDT)
-Subject: Re: [PATCH 4/4] hw/timer/nrf51_timer: Add trace event of counter
- value update
+ Mon, 04 May 2020 10:19:58 -0700 (PDT)
+Subject: Re: [PATCH 1/3] hw/sh4: Use MemoryRegion typedef
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
-References: <20200504072822.18799-1-f4bug@amsat.org>
- <20200504072822.18799-5-f4bug@amsat.org>
+References: <20200504081653.14841-1-f4bug@amsat.org>
+ <20200504081653.14841-2-f4bug@amsat.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d24fa27c-f311-080b-bf9d-7150b23cfa41@linaro.org>
-Date: Mon, 4 May 2020 10:16:14 -0700
+Message-ID: <1fda6a7c-3b29-3a71-5143-a61b879477c5@linaro.org>
+Date: Mon, 4 May 2020 10:19:56 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200504072822.18799-5-f4bug@amsat.org>
+In-Reply-To: <20200504081653.14841-2-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,21 +105,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Steffen_G=c3=b6rtz?= <contrib@steffen-goertz.de>,
- qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>
+Cc: qemu-trivial@nongnu.org, Magnus Damm <magnus.damm@gmail.com>,
+ Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/4/20 12:28 AM, Philippe Mathieu-Daudé wrote:
-> Add trace event to display timer's counter value updates.
+On 5/4/20 1:16 AM, Philippe Mathieu-Daudé wrote:
+> Use the MemoryRegion type defined in "qemu/typedefs.h",
+> to keep the repository style consistent.
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  hw/timer/nrf51_timer.c | 1 +
->  hw/timer/trace-events  | 1 +
->  2 files changed, 2 insertions(+)
+>  include/hw/sh4/sh.h | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
