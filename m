@@ -7,78 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7233C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 15:43:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFDB4C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 15:45:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 710E2206D7
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 15:43:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 89BE02063A
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 15:45:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GpkUxqkk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 710E2206D7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YDWZk6EG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89BE02063A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVdFa-0003dj-JQ
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 11:43:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60336)
+	id 1jVdHH-0007ft-K8
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 11:45:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60370)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVd2r-00050Q-2i
- for qemu-devel@nongnu.org; Mon, 04 May 2020 11:30:14 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50087
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVd31-00057F-5u
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 11:30:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52851
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVd2q-00047C-3w
- for qemu-devel@nongnu.org; Mon, 04 May 2020 11:30:12 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVd2w-0004Ah-3P
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 11:30:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588606211;
+ s=mimecast20190719; t=1588606217;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=g8CkVk2pIsA5qUp0zix2BjSa/yukK7tJBsycJrJlL6k=;
- b=GpkUxqkk1BEAj0ytg56Jxd2G7+m2/hUSSb+iT9NXUSZB4v7NebnWam87hObCLy60Cpf0ht
- fBdJj4gxWDLv/hg1FMNSThwy7XGQkjBlJDm7DK33yEJotoeHPTrsJ5XzLAD40G6TdJT2cx
- za4c+icKD9kxMVYBH/WowrKFmNqa1YE=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-272-cYAe6a1KOROa2gD_fr1vtA-1; Mon, 04 May 2020 11:30:10 -0400
-X-MC-Unique: cYAe6a1KOROa2gD_fr1vtA-1
-Received: by mail-wr1-f70.google.com with SMTP id 30so474702wrp.22
- for <qemu-devel@nongnu.org>; Mon, 04 May 2020 08:30:09 -0700 (PDT)
+ bh=lHPd6DRGT3/QfAQv+8lMnqMpzhHq6WqmC6OekczJuuE=;
+ b=YDWZk6EGVNZjBd8U5bz9Etz+Tz6vNcdyESJCWo2h65JPAakO/3jdR7weo4datuuY+HWJ0f
+ De+M4jtT0TEZ371k4nVxrpa3ucKYbaUtF1APuEBqzAIBZw1y/ROm/Jfncbp84kskvY3zcO
+ 3PpSm3tVtEi1V1K+MW90yRLDL//cRa4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-103-5iqUCI8LOIyPy9WLMOp_mA-1; Mon, 04 May 2020 11:30:15 -0400
+X-MC-Unique: 5iqUCI8LOIyPy9WLMOp_mA-1
+Received: by mail-wr1-f69.google.com with SMTP id g10so2199466wrr.10
+ for <qemu-devel@nongnu.org>; Mon, 04 May 2020 08:30:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Loi2SqFjSui4Z2kBKxGGjw07sOKKiVmfF0icDHu39aI=;
- b=Jeo35db6rLeu7N3Gz/wOUM8c2q2iR63NF/SYI3HYXNx9m75M/XfFQJRBYJ/2HCbihS
- AoYzW7/RgqTO97i23BMs7owjsatLBhq89/UqkqkwXAtk5f2x3jYbH6VCMBpp7G3fFJLs
- M12zgKFLMifX68UcF4hCZ5exK6rnNMNDAqorCO6s4NWcMvZLHr6EfDBL7ZC26q4PajQj
- U6mY6gBgROV6mbbk4uCS2gEBhds+MAdME+6Iys2v/yca2f9zqUBXqFiLdDCaZq5QL05w
- pfa8Uz4r9Bk+g1b0ByPy2VY6msHrRoUcdVD5RyH3dXhVZlGaJ9o+bWOL+2fB+SkbPf6J
- S+1Q==
-X-Gm-Message-State: AGi0PuZlaL1Bdx3i8i6raOlUuwCANTVas/KeX6LIiGX6/ZgrGeS53AFm
- 8d2mHqJ14DnIce49CVRfkoD9ClRe9/+BDDgB9CSeqKrgQFTa4nMYBKKJKb93nITHYsuq+SRF+HI
- hrScv9ctSgnizu2o=
-X-Received: by 2002:adf:fac4:: with SMTP id a4mr15444356wrs.134.1588606208432; 
- Mon, 04 May 2020 08:30:08 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJm0cfJlbqPAJwYrwFKRafzCoYVnnGzHPxQFg4t8os1gRI2OP5f3Fz//NjR/oYIdxM+SAh86g==
-X-Received: by 2002:adf:fac4:: with SMTP id a4mr15444325wrs.134.1588606208276; 
- Mon, 04 May 2020 08:30:08 -0700 (PDT)
+ bh=m6+xvd3mxJRnG7uL+iwXoaJtRFRM8ce9ioU3VRg64KY=;
+ b=h6gBXCusBslPlqXxBm6t9w4Izx6Bw+QSIQTbWyEPn2hGPY4hErFiC6EGQW+VKqK9NU
+ TYNTNflId3N3Hsn28RJXVHTfRInkDkH8Y3hnrlSItmbRmG7rN/3wMYD21ZuwEU8py3QY
+ n4R2a6Pt3CgWjaOkbVMrPx1q8LVD8mMxAmKruHBNwikrlK3wnxW92pbJmmGmCzrjiL2Q
+ FTJMvBu76/65pOHy+mtOE/qAX+5rnkEKA1z5x0NbcDAYQlT5og+93YgqhxSs/QDx7K2p
+ 2hKdm18t9/XnUBRzECHYt7UWezv4R5F8aE5UhNkY7vi99bvTcgxHCAWoSQ9aEYZvt0M7
+ HcSg==
+X-Gm-Message-State: AGi0PuaS6m5H6Arth05bJqNvh30KgYZyC4pVVM2w/01kvnuNWTh5w5nt
+ YD9w3ukP0sF2LI40d/FZq9l0fX9W2lOz96mVcwZP6P+YVUFARkoti3OlIgv8fV+fCYCHbZAxGST
+ SiGMc5Cb+j1wEfUg=
+X-Received: by 2002:a1c:9a81:: with SMTP id
+ c123mr14483186wme.115.1588606213756; 
+ Mon, 04 May 2020 08:30:13 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKKhIo4R9drORflRphaERuyEWB3jMraFT2J2xJgoK941gxMvAR6QyLJQsGX+UXNYqtQ/lF/nw==
+X-Received: by 2002:a1c:9a81:: with SMTP id
+ c123mr14483150wme.115.1588606213381; 
+ Mon, 04 May 2020 08:30:13 -0700 (PDT)
 Received: from x1w.redhat.com (26.red-88-21-207.staticip.rima-tde.net.
  [88.21.207.26])
- by smtp.gmail.com with ESMTPSA id b66sm15039450wmh.12.2020.05.04.08.30.06
+ by smtp.gmail.com with ESMTPSA id s24sm14363792wmj.28.2020.05.04.08.30.12
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 May 2020 08:30:07 -0700 (PDT)
+ Mon, 04 May 2020 08:30:12 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 09/12] arch_init: Remove unused 'qapi-commands-misc.h'
- include
-Date: Mon,  4 May 2020 17:29:19 +0200
-Message-Id: <20200504152922.21365-10-philmd@redhat.com>
+Subject: [PATCH v3 10/12] target/i386: Restrict CpuClass::get_crash_info() to
+ system-mode
+Date: Mon,  4 May 2020 17:29:20 +0200
+Message-Id: <20200504152922.21365-11-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200504152922.21365-1-philmd@redhat.com>
 References: <20200504152922.21365-1-philmd@redhat.com>
@@ -88,16 +90,16 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 01:21:32
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 05:09:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -111,7 +113,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>, qemu-riscv@nongnu.org,
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org,
  Eduardo Habkost <ehabkost@redhat.com>,
  Sagar Karandikar <sagark@eecs.berkeley.edu>,
  David Hildenbrand <david@redhat.com>,
@@ -125,28 +127,64 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Commit ffaee83bcb2 moved qmp_query_target but forgot to remove
-this include.
-
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- arch_init.c | 1 -
- 1 file changed, 1 deletion(-)
+ target/i386/cpu.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/arch_init.c b/arch_init.c
-index d9eb0ec1dd..8afea4748b 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -27,7 +27,6 @@
- #include "sysemu/arch_init.h"
- #include "hw/pci/pci.h"
- #include "hw/audio/soundhw.h"
--#include "qapi/qapi-commands-misc.h"
- #include "qapi/error.h"
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 9c256ab159..eec1ac7cea 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -6848,6 +6848,7 @@ static void x86_cpu_register_feature_bit_props(X86CPU=
+ *cpu,
+     x86_cpu_register_bit_prop(cpu, name, w, bitnr);
+ }
+=20
++#if !defined(CONFIG_USER_ONLY)
+ static GuestPanicInformation *x86_cpu_get_crash_info(CPUState *cs)
+ {
+     X86CPU *cpu =3D X86_CPU(cs);
+@@ -6891,6 +6892,7 @@ static void x86_cpu_get_crash_info_qom(Object *obj, V=
+isitor *v,
+                                      errp);
+     qapi_free_GuestPanicInformation(panic_info);
+ }
++#endif /* !CONFIG_USER_ONLY */
+=20
+ static void x86_cpu_initfn(Object *obj)
+ {
+@@ -6937,8 +6939,10 @@ static void x86_cpu_initfn(Object *obj)
+                         x86_cpu_get_unavailable_features,
+                         NULL, NULL, NULL, &error_abort);
+=20
++#if !defined(CONFIG_USER_ONLY)
+     object_property_add(obj, "crash-information", "GuestPanicInformation",
+                         x86_cpu_get_crash_info_qom, NULL, NULL, NULL, NULL=
+);
++#endif
+=20
+     for (w =3D 0; w < FEATURE_WORDS; w++) {
+         int bitnr;
+@@ -7251,7 +7255,6 @@ static void x86_cpu_common_class_init(ObjectClass *oc=
+, void *data)
+     cc->cpu_exec_interrupt =3D x86_cpu_exec_interrupt;
+ #endif
+     cc->dump_state =3D x86_cpu_dump_state;
+-    cc->get_crash_info =3D x86_cpu_get_crash_info;
+     cc->set_pc =3D x86_cpu_set_pc;
+     cc->synchronize_from_tb =3D x86_cpu_synchronize_from_tb;
+     cc->gdb_read_register =3D x86_cpu_gdb_read_register;
+@@ -7262,6 +7265,7 @@ static void x86_cpu_common_class_init(ObjectClass *oc=
+, void *data)
+     cc->asidx_from_attrs =3D x86_asidx_from_attrs;
+     cc->get_memory_mapping =3D x86_cpu_get_memory_mapping;
+     cc->get_phys_page_attrs_debug =3D x86_cpu_get_phys_page_attrs_debug;
++    cc->get_crash_info =3D x86_cpu_get_crash_info;
+     cc->write_elf64_note =3D x86_cpu_write_elf64_note;
+     cc->write_elf64_qemunote =3D x86_cpu_write_elf64_qemunote;
+     cc->write_elf32_note =3D x86_cpu_write_elf32_note;
 --=20
 2.21.3
 
