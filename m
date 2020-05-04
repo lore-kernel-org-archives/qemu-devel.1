@@ -2,71 +2,64 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLACK,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50A12C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 11:31:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9300C47258
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 11:32:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2494F2073E
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 11:31:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2494F2073E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 908CF2073E
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 11:32:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 908CF2073E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVZKC-0005KC-6w
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 07:31:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48932)
+	id 1jVZL8-0006NZ-QU
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 07:32:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48982)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jVZIw-0004T1-14; Mon, 04 May 2020 07:30:34 -0400
-Resent-Date: Mon, 04 May 2020 07:30:34 -0400
-Resent-Message-Id: <E1jVZIw-0004T1-14@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21341)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jVZIt-0000UT-4q; Mon, 04 May 2020 07:30:33 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1588591819; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=go5r4P9LZwDbZr0b7lmL4IfRSc7rNjhWgCRNl8LxPAUCH4R/fWnFE02skiBUOv6Exk81B2RsP9+KCDzEsQ/aszPhZQpNrzit0jGKFFG04+UXilraVlOZTmQzqGamYAvbKrCDkb3FrO032P7aE4J5WKPaAeBKYwWzQhygwbEmvJE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1588591819;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=wQWUwwPDDtdFY0hx5bDzp4WMnTIDf4kL3szjrLqaQgk=; 
- b=WoUl5NZTqUJEwS1WP5WrbhbdVimmPk7y0MJtbYOfBDyKlyzs/rlQoRLxKGu0cTsp5WkVRVoTOqRfJQyNYpq3zXbQIHqfVr8hwfBSbBdW4qYfFbcFwgpW5bxWWQOghZDkL4zS9nzn4Fpr2p5baq1hL+Kib4rVYzK2aD9wYmTEBD4=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1588591817447636.6528667593511;
- Mon, 4 May 2020 04:30:17 -0700 (PDT)
-Message-ID: <158859181578.12603.10599051888631974156@45ef0f9c86ae>
-In-Reply-To: <20200504084615.27642-1-f4bug@amsat.org>
-Subject: Re: [PATCH 0/3] qom: Few trivial patches
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jVZJ7-0004fq-Ta
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 07:30:46 -0400
+Received: from 5.mo69.mail-out.ovh.net ([46.105.43.105]:54153)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jVZJ4-0000nC-VO
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 07:30:45 -0400
+Received: from player761.ha.ovh.net (unknown [10.108.35.124])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id 325C58D931
+ for <qemu-devel@nongnu.org>; Mon,  4 May 2020 13:30:40 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player761.ha.ovh.net (Postfix) with ESMTPSA id E3C4D1201243F;
+ Mon,  4 May 2020 11:30:29 +0000 (UTC)
+Date: Mon, 4 May 2020 13:30:27 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Subject: Re: [PATCH qemu] spapr: Add PVR setting capability
+Message-ID: <20200504133027.4f5a18f8@bahia.lan>
+In-Reply-To: <20200417041105.63563-1-aik@ozlabs.ru>
+References: <20200417041105.63563-1-aik@ozlabs.ru>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: f4bug@amsat.org
-Date: Mon, 4 May 2020 04:30:17 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 07:30:27
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 18221282617894738421
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrjeeggdefkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeehkefhtdehgeehheejledufeekhfdvleefvdeihefhkefhudffhfeuuedvffdthfenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeeiuddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=46.105.43.105; envelope-from=groug@kaod.org;
+ helo=5.mo69.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 07:30:41
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,124 +72,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, ehabkost@redhat.com, qemu-trivial@nongnu.org,
- f4bug@amsat.org, mjt@tls.msk.ru, qemu-devel@nongnu.org, armbru@redhat.com,
- pbonzini@redhat.com, laurent@vivier.eu
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUwNDA4NDYxNS4yNzY0
-Mi0xLWY0YnVnQGFtc2F0Lm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRvY2tl
-ci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1h
-bmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQs
-IHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQg
-QkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0xIE5FVFdP
-Uks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0xIEo9MTQg
-TkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgdGVzdHMvdGVzdC1p
-by1jaGFubmVsLXNvY2tldC5vCiAgQ0MgICAgICB0ZXN0cy9pby1jaGFubmVsLWhlbHBlcnMubwog
-IENDICAgICAgdGVzdHMvdGVzdC1pby1jaGFubmVsLWZpbGUubwovdG1wL3FlbXUtdGVzdC9zcmMv
-dGVzdHMvdGVzdC1pby10YXNrLmM6MzM6MTI6IGVycm9yOiBmaWVsZCAncGFyZW50JyBoYXMgaW5j
-b21wbGV0ZSB0eXBlCiAgICAgT2JqZWN0IHBhcmVudDsKICAgICAgICAgICAgXgovdG1wL3FlbXUt
-dGVzdC9zcmMvdGVzdHMvdGVzdC1pby10YXNrLmM6Mzc6MTc6IGVycm9yOiBmaWVsZCAncGFyZW50
-JyBoYXMgaW5jb21wbGV0ZSB0eXBlCiAgICAgT2JqZWN0Q2xhc3MgcGFyZW50OwogICAgICAgICAg
-ICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtaW8tdGFzay5jOjQwOjE6IGVy
-cm9yOiB1bmtub3duIHR5cGUgbmFtZSAnVHlwZUluZm8nCiBzdGF0aWMgY29uc3QgVHlwZUluZm8g
-ZHVtbXlfaW5mbyA9IHsKIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtaW8tdGFzay5j
-OjQxOjU6IGVycm9yOiBmaWVsZCBuYW1lIG5vdCBpbiByZWNvcmQgb3IgdW5pb24gaW5pdGlhbGl6
-ZXIKICAgICAucGFyZW50ID0gVFlQRV9PQkpFQ1QsCiAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMv
-dGVzdHMvdGVzdC1pby10YXNrLmM6NDE6NTogZXJyb3I6IChuZWFyIGluaXRpYWxpemF0aW9uIGZv
-ciAnZHVtbXlfaW5mbycpCi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LWlvLXRhc2suYzo0
-MToxNTogZXJyb3I6ICdUWVBFX09CSkVDVCcgdW5kZWNsYXJlZCBoZXJlIChub3QgaW4gYSBmdW5j
-dGlvbikKICAgICAucGFyZW50ID0gVFlQRV9PQkpFQ1QsCiAgICAgICAgICAgICAgIF4KL3RtcC9x
-ZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtaW8tdGFzay5jOjQyOjU6IGVycm9yOiBmaWVsZCBuYW1l
-IG5vdCBpbiByZWNvcmQgb3IgdW5pb24gaW5pdGlhbGl6ZXIKICAgICAubmFtZSA9IFRZUEVfRFVN
-TVksCiAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvdGVzdC1pby10YXNrLmM6NDI6NTog
-ZXJyb3I6IChuZWFyIGluaXRpYWxpemF0aW9uIGZvciAnZHVtbXlfaW5mbycpCi90bXAvcWVtdS10
-ZXN0L3NyYy90ZXN0cy90ZXN0LWlvLXRhc2suYzo0Mjo1OiBlcnJvcjogZXhjZXNzIGVsZW1lbnRz
-IGluIHNjYWxhciBpbml0aWFsaXplciBbLVdlcnJvcl0KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3Rz
-L3Rlc3QtaW8tdGFzay5jOjQyOjU6IGVycm9yOiAobmVhciBpbml0aWFsaXphdGlvbiBmb3IgJ2R1
-bW15X2luZm8nKSBbLVdlcnJvcl0KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtaW8tdGFz
-ay5jOjQzOjU6IGVycm9yOiBmaWVsZCBuYW1lIG5vdCBpbiByZWNvcmQgb3IgdW5pb24gaW5pdGlh
-bGl6ZXIKICAgICAuaW5zdGFuY2Vfc2l6ZSA9IHNpemVvZihEdW1teU9iamVjdCksCiAgICAgXgov
-dG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvdGVzdC1pby10YXNrLmM6NDM6NTogZXJyb3I6IChuZWFy
-IGluaXRpYWxpemF0aW9uIGZvciAnZHVtbXlfaW5mbycpCi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0
-cy90ZXN0LWlvLXRhc2suYzo0Mzo1OiBlcnJvcjogZXhjZXNzIGVsZW1lbnRzIGluIHNjYWxhciBp
-bml0aWFsaXplciBbLVdlcnJvcl0KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtaW8tdGFz
-ay5jOjQzOjU6IGVycm9yOiAobmVhciBpbml0aWFsaXphdGlvbiBmb3IgJ2R1bW15X2luZm8nKSBb
-LVdlcnJvcl0KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtaW8tdGFzay5jOjQ0OjU6IGVy
-cm9yOiBmaWVsZCBuYW1lIG5vdCBpbiByZWNvcmQgb3IgdW5pb24gaW5pdGlhbGl6ZXIKICAgICAu
-Y2xhc3Nfc2l6ZSA9IHNpemVvZihEdW1teU9iamVjdENsYXNzKSwKICAgICBeCi90bXAvcWVtdS10
-ZXN0L3NyYy90ZXN0cy90ZXN0LWlvLXRhc2suYzo0NDo1OiBlcnJvcjogKG5lYXIgaW5pdGlhbGl6
-YXRpb24gZm9yICdkdW1teV9pbmZvJykKL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtaW8t
-dGFzay5jOjQ0OjU6IGVycm9yOiBleGNlc3MgZWxlbWVudHMgaW4gc2NhbGFyIGluaXRpYWxpemVy
-IFstV2Vycm9yXQovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvdGVzdC1pby10YXNrLmM6NDQ6NTog
-ZXJyb3I6IChuZWFyIGluaXRpYWxpemF0aW9uIGZvciAnZHVtbXlfaW5mbycpIFstV2Vycm9yXQov
-dG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvdGVzdC1pby10YXNrLmM6IEluIGZ1bmN0aW9uICd0ZXN0
-X3Rhc2tfY29tcGxldGUnOgovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvdGVzdC1pby10YXNrLmM6
-Njc6NTogZXJyb3I6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uICdvYmplY3RfbmV3
-JyBbLVdlcnJvcj1pbXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlvbl0KICAgICBPYmplY3QgKm9i
-aiA9IG9iamVjdF9uZXcoVFlQRV9EVU1NWSk7CiAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvdGVz
-dHMvdGVzdC1pby10YXNrLmM6Njc6NTogZXJyb3I6IG5lc3RlZCBleHRlcm4gZGVjbGFyYXRpb24g
-b2YgJ29iamVjdF9uZXcnIFstV2Vycm9yPW5lc3RlZC1leHRlcm5zXQovdG1wL3FlbXUtdGVzdC9z
-cmMvdGVzdHMvdGVzdC1pby10YXNrLmM6Njc6MTk6IGVycm9yOiBpbml0aWFsaXphdGlvbiBtYWtl
-cyBwb2ludGVyIGZyb20gaW50ZWdlciB3aXRob3V0IGEgY2FzdCBbLVdlcnJvcl0KICAgICBPYmpl
-Y3QgKm9iaiA9IG9iamVjdF9uZXcoVFlQRV9EVU1NWSk7CiAgICAgICAgICAgICAgICAgICBeCi90
-bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LWlvLXRhc2suYzo3ODo1OiBlcnJvcjogaW1wbGlj
-aXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ29iamVjdF91bnJlZicgWy1XZXJyb3I9aW1wbGlj
-aXQtZnVuY3Rpb24tZGVjbGFyYXRpb25dCiAgICAgb2JqZWN0X3VucmVmKG9iaik7CiAgICAgXgov
-dG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvdGVzdC1pby10YXNrLmM6Nzg6NTogZXJyb3I6IG5lc3Rl
-ZCBleHRlcm4gZGVjbGFyYXRpb24gb2YgJ29iamVjdF91bnJlZicgWy1XZXJyb3I9bmVzdGVkLWV4
-dGVybnNdCi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LWlvLXRhc2suYzogSW4gZnVuY3Rp
-b24gJ3Rlc3RfdGFza19kYXRhX2ZyZWUnOgovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvdGVzdC1p
-by10YXNrLmM6OTc6MTk6IGVycm9yOiBpbml0aWFsaXphdGlvbiBtYWtlcyBwb2ludGVyIGZyb20g
-aW50ZWdlciB3aXRob3V0IGEgY2FzdCBbLVdlcnJvcl0KICAgICBPYmplY3QgKm9iaiA9IG9iamVj
-dF9uZXcoVFlQRV9EVU1NWSk7CiAgICAgICAgICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3Ny
-Yy90ZXN0cy90ZXN0LWlvLXRhc2suYzogSW4gZnVuY3Rpb24gJ3Rlc3RfdGFza19mYWlsdXJlJzoK
-L3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtaW8tdGFzay5jOjExNToxOTogZXJyb3I6IGlu
-aXRpYWxpemF0aW9uIG1ha2VzIHBvaW50ZXIgZnJvbSBpbnRlZ2VyIHdpdGhvdXQgYSBjYXN0IFst
-V2Vycm9yXQogICAgIE9iamVjdCAqb2JqID0gb2JqZWN0X25ldyhUWVBFX0RVTU1ZKTsKICAgICAg
-ICAgICAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtaW8tdGFzay5jOiBJ
-biBmdW5jdGlvbiAndGVzdF90YXNrX3RocmVhZF9jb21wbGV0ZSc6Ci90bXAvcWVtdS10ZXN0L3Ny
-Yy90ZXN0cy90ZXN0LWlvLXRhc2suYzoxNzY6MTk6IGVycm9yOiBpbml0aWFsaXphdGlvbiBtYWtl
-cyBwb2ludGVyIGZyb20gaW50ZWdlciB3aXRob3V0IGEgY2FzdCBbLVdlcnJvcl0KICAgICBPYmpl
-Y3QgKm9iaiA9IG9iamVjdF9uZXcoVFlQRV9EVU1NWSk7CiAgICAgICAgICAgICAgICAgICBeCi90
-bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LWlvLXRhc2suYzogSW4gZnVuY3Rpb24gJ3Rlc3Rf
-dGFza190aHJlYWRfZmFpbHVyZSc6Ci90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LWlvLXRh
-c2suYzoyMTc6MTk6IGVycm9yOiBpbml0aWFsaXphdGlvbiBtYWtlcyBwb2ludGVyIGZyb20gaW50
-ZWdlciB3aXRob3V0IGEgY2FzdCBbLVdlcnJvcl0KICAgICBPYmplY3QgKm9iaiA9IG9iamVjdF9u
-ZXcoVFlQRV9EVU1NWSk7CiAgICAgICAgICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy90
-ZXN0cy90ZXN0LWlvLXRhc2suYzogSW4gZnVuY3Rpb24gJ21haW4nOgovdG1wL3FlbXUtdGVzdC9z
-cmMvdGVzdHMvdGVzdC1pby10YXNrLmM6MjYyOjU6IGVycm9yOiBpbXBsaWNpdCBkZWNsYXJhdGlv
-biBvZiBmdW5jdGlvbiAndHlwZV9yZWdpc3Rlcl9zdGF0aWMnIFstV2Vycm9yPWltcGxpY2l0LWZ1
-bmN0aW9uLWRlY2xhcmF0aW9uXQogICAgIHR5cGVfcmVnaXN0ZXJfc3RhdGljKCZkdW1teV9pbmZv
-KTsKICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LWlvLXRhc2suYzoyNjI6NTog
-ZXJyb3I6IG5lc3RlZCBleHRlcm4gZGVjbGFyYXRpb24gb2YgJ3R5cGVfcmVnaXN0ZXJfc3RhdGlj
-JyBbLVdlcnJvcj1uZXN0ZWQtZXh0ZXJuc10KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRl
-ZCBhcyBlcnJvcnMKbWFrZTogKioqIFt0ZXN0cy90ZXN0LWlvLXRhc2sub10gRXJyb3IgMQptYWtl
-OiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgpUcmFjZWJhY2sgKG1vc3QgcmVj
-ZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2
-NjQsIGluIDxtb2R1bGU+Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUs
-IGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICct
-bicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD1l
-NjJlMDAxZTk3YmI0NWI1YmFkMjAzYjZjZGYwZTA1MCcsICctdScsICcxMDAzJywgJy0tc2VjdXJp
-dHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNU
-PScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0x
-NCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICctZScsICdDQ0FDSEVfRElS
-PS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Mi8uY2FjaGUvcWVtdS1kb2Nr
-ZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVz
-dGVyLXRtcC14NDFzcjdtMy9zcmMvZG9ja2VyLXNyYy4yMDIwLTA1LTA0LTA3LjI1LjQ2LjE0ODg3
-Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmNlbnRvczcnLCAnL3Zhci90bXAvcWVtdS9ydW4n
-LCAndGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9
-LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD1lNjJlMDAxZTk3YmI0NWI1YmFk
-MjAzYjZjZGYwZTA1MAptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTog
-TGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC14NDFzcjdtMy9z
-cmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRvczddIEVycm9yIDIKCnJl
-YWwgICAgNG0zMC4wMTBzCnVzZXIgICAgMG04LjE5OXMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxh
-YmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNTA0MDg0NjE1LjI3NjQyLTEtZjRi
-dWdAYW1zYXQub3JnL3Rlc3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcvP3R5cGU9bWVzc2FnZS4K
-LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0
-Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
-ZGhhdC5jb20=
+On Fri, 17 Apr 2020 14:11:05 +1000
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+
+> At the moment the VCPU init sequence includes setting PVR which in case of
+> KVM-HV only checks if it matches the hardware PVR mask as PVR cannot be
+> virtualized by the hardware. In order to cope with various CPU revisions
+> only top 16bit of PVR are checked which works for minor revision updates.
+> 
+> However in every CPU generation starting POWER7 (at least) there were CPUs
+> supporting the (almost) same POWER ISA level but having different top
+> 16bits of PVR - POWER7+, POWER8E, POWER8NVL; this time we got POWER9+
+> with a new PVR family. We would normally add the PVR mask for the new one
+> too, the problem with it is that although the physical machines exist,
+> P9+ is not going to be released as a product, and this situation is likely
+> to repeat in the future.
+> 
+> Instead of adding every new CPU family in QEMU, this adds a new sPAPR
+> machine capability to force PVR setting/checking. It is "on" by default
+> to preserve the existing behavior. When "off", it is the user's
+> responsibility to specify the correct CPU.
+> 
+
+I don't quite understand the motivation for this... what does this
+buy us ?
+
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+>  include/hw/ppc/spapr.h |  5 ++++-
+>  hw/ppc/spapr.c         |  1 +
+>  hw/ppc/spapr_caps.c    | 18 ++++++++++++++++++
+>  target/ppc/kvm.c       | 16 ++++++++++++++--
+>  4 files changed, 37 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index e579eaf28c05..5ccac4d56871 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -81,8 +81,10 @@ typedef enum {
+>  #define SPAPR_CAP_CCF_ASSIST            0x09
+>  /* Implements PAPR FWNMI option */
+>  #define SPAPR_CAP_FWNMI                 0x0A
+> +/* Implements PAPR PVR option */
+> +#define SPAPR_CAP_PVR                   0x0B
+>  /* Num Caps */
+> -#define SPAPR_CAP_NUM                   (SPAPR_CAP_FWNMI + 1)
+> +#define SPAPR_CAP_NUM                   (SPAPR_CAP_PVR + 1)
+>  
+>  /*
+>   * Capability Values
+> @@ -912,6 +914,7 @@ extern const VMStateDescription vmstate_spapr_cap_nested_kvm_hv;
+>  extern const VMStateDescription vmstate_spapr_cap_large_decr;
+>  extern const VMStateDescription vmstate_spapr_cap_ccf_assist;
+>  extern const VMStateDescription vmstate_spapr_cap_fwnmi;
+> +extern const VMStateDescription vmstate_spapr_cap_pvr;
+>  
+>  static inline uint8_t spapr_get_cap(SpaprMachineState *spapr, int cap)
+>  {
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 841b5ec59b12..ecc74c182b9f 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -4535,6 +4535,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+>      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_ON;
+>      smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] = SPAPR_CAP_ON;
+>      smc->default_caps.caps[SPAPR_CAP_FWNMI] = SPAPR_CAP_ON;
+> +    smc->default_caps.caps[SPAPR_CAP_PVR] = SPAPR_CAP_ON;
+>      spapr_caps_add_properties(smc, &error_abort);
+>      smc->irq = &spapr_irq_dual;
+>      smc->dr_phb_enabled = true;
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index eb54f9422722..398b72b77f9f 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -525,6 +525,14 @@ static void cap_fwnmi_apply(SpaprMachineState *spapr, uint8_t val,
+>      }
+>  }
+>  
+> +static void cap_pvr_apply(SpaprMachineState *spapr, uint8_t val, Error **errp)
+> +{
+> +    if (val) {
+> +        return;
+> +    }
+> +    warn_report("If you're uing kvm-hv.ko, only \"-cpu host\" is supported");
+> +}
+> +
+>  SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+>      [SPAPR_CAP_HTM] = {
+>          .name = "htm",
+> @@ -633,6 +641,15 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+>          .type = "bool",
+>          .apply = cap_fwnmi_apply,
+>      },
+> +    [SPAPR_CAP_PVR] = {
+> +        .name = "pvr",
+> +        .description = "Enforce PVR in KVM",
+> +        .index = SPAPR_CAP_PVR,
+> +        .get = spapr_cap_get_bool,
+> +        .set = spapr_cap_set_bool,
+> +        .type = "bool",
+> +        .apply = cap_pvr_apply,
+> +    },
+>  };
+>  
+>  static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *spapr,
+> @@ -773,6 +790,7 @@ SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
+>  SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
+>  SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
+>  SPAPR_CAP_MIG_STATE(fwnmi, SPAPR_CAP_FWNMI);
+> +SPAPR_CAP_MIG_STATE(pvr, SPAPR_CAP_PVR);
+>  
+>  void spapr_caps_init(SpaprMachineState *spapr)
+>  {
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 03d0667e8f94..a4adc29b6522 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -466,15 +466,27 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>      PowerPCCPU *cpu = POWERPC_CPU(cs);
+>      CPUPPCState *cenv = &cpu->env;
+>      int ret;
+> +    SpaprMachineState *spapr;
+>  
+
+We generally try to avoid adding such explicit dependencies to the
+machine code within the target directory... A virtual hypervisor
+hook could possibly do the trick but this would require to set
+PowerPCCPU::vhyp before kvm_arch_init_vcpu() gets called, eg.
+when the vCPU is created in spapr_create_vcpu() rather than
+when it gets realized.
+
+>      /* Synchronize sregs with kvm */
+>      ret = kvm_arch_sync_sregs(cpu);
+>      if (ret) {
+>          if (ret == -EINVAL) {
+>              error_report("Register sync failed... If you're using kvm-hv.ko,"
+> -                         " only \"-cpu host\" is possible");
+> +                         " only \"-cpu host\" is supported");
+> +        }
+> +        /*
+> +         * The user chose not to set PVR which makes sense if we are running
+> +         * on a CPU with known ISA level but unknown PVR.
+> +         */
+> +        spapr = (SpaprMachineState *)
+> +            object_dynamic_cast(OBJECT(qdev_get_machine()), TYPE_SPAPR_MACHINE);
+> +
+> +        if (spapr && spapr->eff.caps[SPAPR_CAP_PVR] == SPAPR_CAP_OFF) {
+> +            ret = 0;
+> +        } else {
+> +            return ret;
+>          }
+> -        return ret;
+>      }
+>  
+>      switch (cenv->mmu_model) {
+
 
