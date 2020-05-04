@@ -2,150 +2,99 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9B83C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 06:47:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24800C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 06:51:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD151206D9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 06:47:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD151206D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id E0C3220735
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 06:51:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R/CIoW2U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0C3220735
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVUtP-0003L1-TF
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 02:47:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56454)
+	id 1jVUwz-0004pr-1R
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 02:51:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56824)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
- id 1jVUsW-0002sa-9l; Mon, 04 May 2020 02:47:00 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37560
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
- id 1jVUsV-0008UA-A7; Mon, 04 May 2020 02:46:59 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 0446WK1P002973; Mon, 4 May 2020 02:46:56 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 30s2g1abx8-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 04 May 2020 02:46:55 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0446WhJk004678;
- Mon, 4 May 2020 02:46:55 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com
- [159.122.73.70])
- by mx0b-001b2d01.pphosted.com with ESMTP id 30s2g1abwe-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 04 May 2020 02:46:55 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
- by ppma01fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 0446j5vg001447;
- Mon, 4 May 2020 06:46:53 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com
- (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
- by ppma01fra.de.ibm.com with ESMTP id 30s0g59ny5-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 04 May 2020 06:46:53 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 0446kp1t51511322
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 4 May 2020 06:46:51 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EB4E6A4040;
- Mon,  4 May 2020 06:46:50 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A3DFFA4053;
- Mon,  4 May 2020 06:46:50 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.73.126])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon,  4 May 2020 06:46:50 +0000 (GMT)
-Subject: Re: [PATCH 5/8] pc-bios: s390x: Move panic() into header and add
- infinite loop
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20200324150847.10476-1-frankja@linux.ibm.com>
- <20200324150847.10476-6-frankja@linux.ibm.com>
- <072d57ce-bf5e-3b8c-0bc3-5340579697fc@redhat.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <43dd814a-9088-e7e4-d88b-c6390d45b2f7@linux.ibm.com>
-Date: Mon, 4 May 2020 08:46:49 +0200
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jVUwG-0004H9-BJ; Mon, 04 May 2020 02:50:52 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:34490)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jVUwD-0004B9-Qv; Mon, 04 May 2020 02:50:51 -0400
+Received: by mail-wm1-x342.google.com with SMTP id v4so14736991wme.1;
+ Sun, 03 May 2020 23:50:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=0Sgl2Qoozw9sNyqLejt9h7wTdbWGWJdZpZVOb/oFPgY=;
+ b=R/CIoW2U+lCHRRPctPqJBaQ0L0jxMRRuUNBMKCntC0Rd6I8BX68a2DdSGqZfDoaPdu
+ mhvqxCPBGtSmUgJ9PzqkfWHH7f+UWOJv0YXDuxEcvr8ZN0bERhZb2V+z3bAsv95prqWZ
+ M7VbXJevuzQjXlEH2SesvhZZCqcc+TR/GRlX7AypgJ9gZfVMfQ4c0FEB0PwcgdLh3PRR
+ o0KpIV7Dc07j4Pa3kO5haD6ONmvvzBL7zRpMT421tnrbRl/NCElLVPDeFgZkUL6Xz1MK
+ 77EZ5hTCk2a8pK9ra5j5hEMq/zfvcs7kCjvQFTGa/o+EYxoQCCscqrfPIqH28nnrH95d
+ 42NA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=0Sgl2Qoozw9sNyqLejt9h7wTdbWGWJdZpZVOb/oFPgY=;
+ b=DOCXPH9ENcpmx/7RGERMNCBTVvJH+bhhoCF5LjvHlu+8a1fUSY0QCAcW3sr8sHkkOt
+ ODCuU1y1Yu0SRWaD587X34gMoZS2jbKNbaiYV4KAbhLm3yj/BpoY0lJe+RTZkyHurITP
+ DeSIbzdf3cijg1OOG/dVdZL6ygPlZOipJj0VN3D3n2BqnKQDiIlpuRt8jMzw88BHXBRQ
+ xXhxgLmO9nrY4SWo67l/BGQqEl4KRqWX76SJNC7B/LRWbyHaoH8Nu/cgx54sKDXyHblo
+ oDuXnmFMk046RQM5wQsbuPEV4SOD6AM30gU1hlx+cs8wPV9PsMmsLawKnhU1R6LMDndf
+ P8IQ==
+X-Gm-Message-State: AGi0PuaJOFBs9W/i5vwW9k0/yQIewIVpTSH9AU3aXQcoJj/Nrw+E+Dwb
+ cct1dGoi7PGcE4vMcz3m7qk=
+X-Google-Smtp-Source: APiQypItDzF11D3siu1GF8iZEtgOX9/hIs+A4CTeEJOhZ1DCh86h8Wo048a4JREeHcB2GGd27c5Hhw==
+X-Received: by 2002:a05:600c:148:: with SMTP id
+ w8mr13487016wmm.144.1588575048109; 
+ Sun, 03 May 2020 23:50:48 -0700 (PDT)
+Received: from [192.168.1.39] (26.red-88-21-207.staticip.rima-tde.net.
+ [88.21.207.26])
+ by smtp.gmail.com with ESMTPSA id a125sm11435208wme.3.2020.05.03.23.50.46
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 03 May 2020 23:50:47 -0700 (PDT)
+Subject: Re: [RFC PATCH 1/2] audio/mixeng: Fix Clang 'int-conversion' warning
+To: =?UTF-8?Q?Volker_R=c3=bcmelin?= <vr_qemu@t-online.de>,
+ qemu-devel@nongnu.org
+References: <20200503113220.30808-1-f4bug@amsat.org>
+ <20200503113220.30808-2-f4bug@amsat.org>
+ <06aef378-80cf-e24c-d271-58a7670d975d@t-online.de>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d646a579-0317-c062-4672-0fe3229cc56a@amsat.org>
+Date: Mon, 4 May 2020 08:50:46 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <072d57ce-bf5e-3b8c-0bc3-5340579697fc@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="1jizhltgKClFK3KfPAyrKasQYQJIdS7rj"
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-05-04_02:2020-05-01,
- 2020-05-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 malwarescore=0
- suspectscore=0 bulkscore=0 priorityscore=1501 spamscore=0
- lowpriorityscore=0 adultscore=0 phishscore=0 mlxlogscore=999 clxscore=1015
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2005040053
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=frankja@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 02:46:56
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <06aef378-80cf-e24c-d271-58a7670d975d@t-online.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -158,100 +107,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
+Cc: qemu-trivial@nongnu.org, Riku Voipio <riku.voipio@iki.fi>,
+ Laurent Vivier <laurent@vivier.eu>, Alexander Bulekov <alxndr@bu.edu>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1jizhltgKClFK3KfPAyrKasQYQJIdS7rj
-Content-Type: multipart/mixed; boundary="aanZQL34TbVCFsSccLKMSzTV1lzmgbP2h"
-
---aanZQL34TbVCFsSccLKMSzTV1lzmgbP2h
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 4/30/20 5:42 PM, David Hildenbrand wrote:
-> On 24.03.20 16:08, Janosch Frank wrote:
->> panic() was defined for the ccw and net bios, i.e. twice, so it's
->> cleaner to rather put it into the header.
+On 5/4/20 7:49 AM, Volker Rümelin wrote:
+> 
+>> Fix by using a 64-bit float for the conversion, before casting
+>> back to 32-bit float.
 >>
->> Also let's add an infinite loop into the assembly of disabled_wait() s=
-o
->> the caller doesn't need to take care of it.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 >> ---
->>  pc-bios/s390-ccw/main.c     | 7 -------
->>  pc-bios/s390-ccw/netmain.c  | 8 --------
->>  pc-bios/s390-ccw/s390-ccw.h | 7 ++++++-
->>  pc-bios/s390-ccw/start.S    | 5 +++--
->>  4 files changed, 9 insertions(+), 18 deletions(-)
+>>   audio/mixeng.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
 >>
->> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
->> index 8b912454c940a390..146a50760bc70af7 100644
->> --- a/pc-bios/s390-ccw/main.c
->> +++ b/pc-bios/s390-ccw/main.c
->> @@ -46,13 +46,6 @@ void write_iplb_location(void)
->>      lowcore->ptr_iplb =3D ptr2u32(&iplb);
->>  }
->> =20
->> -void panic(const char *string)
->> -{
->> -    sclp_print(string);
->> -    disabled_wait();
->> -    while (1) { }
->> -}
->=20
-> I remember there was a reason why to add the endless loop afterwards.
-> Maybe because some special machine checks can actually wake it up? Or
-> buggy hypervisor?
->=20
-> Anyhow, the kernel also does
->=20
-> __load_psw(psw);
-> while (1);
->=20
-> so it's best we keep that.
->=20
->=20
-> With the endless loop re-added
+>> diff --git a/audio/mixeng.c b/audio/mixeng.c
+>> index 739a500449..9946bfeaec 100644
+>> --- a/audio/mixeng.c
+>> +++ b/audio/mixeng.c
+>> @@ -271,7 +271,7 @@ f_sample *mixeng_clip[2][2][2][3] = {
+>>   #define CONV_NATURAL_FLOAT(x) (x)
+>>   #define CLIP_NATURAL_FLOAT(x) (x)
+>>   #else
+>> -static const float float_scale = UINT_MAX / 2.f;
+>> +static const float float_scale = UINT_MAX / 2.;
+> 
+> I would prefer an explicit cast of UINT_MAX to float. This is what we already have in audio/mixeng_template.h in the conf_* and clip_* functions with FLOAT_MIXENG defined. I think similar functions should look similar.
+> 
+>>   #define CONV_NATURAL_FLOAT(x) ((x) * float_scale)
+>>   
+>>   #ifdef RECIPROCAL
+> 
+> Please don't forget to fix the RECIPROCAL case.
+> 
+> 
+> Btw. the problem was reported here:
+> https://lists.nongnu.org/archive/html/qemu-devel/2020-03/msg02270.html
 
-Well, I added a loop into the disabled_wait assembly and removed it from
-the C code. It's even in the commit message.
+Ah I missed that, I now feel safer knowing developers who understand 
+this code are already trying to fix it, thanks Volker!
 
->=20
-> Reviewed-by: David Hildenbrand <david@redhat.com>
->=20
-
-
-
---aanZQL34TbVCFsSccLKMSzTV1lzmgbP2h--
-
---1jizhltgKClFK3KfPAyrKasQYQJIdS7rj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl6vuloACgkQ41TmuOI4
-ufgx3Q//VfGSv1+fgbXkBI+p2Z2g4c34raObwmx50G8JSS/DMom0k1zN7RzFwai+
-hHW2EZwSP/w6l0CRa+eCAbRzQ6WdxGZ/Sk40dsqxA0kFheS+kdNVebvuzF3GSTye
-i2fa9LzWWFnOhRGXo62Z7PCfUSgtGpGXf1s1f3sUUZSZLW185xc06mgBYP+4kmfy
-p8dyFb8/+oOSmBRJXN4EK9QXOIq4Htn+bW4idsWSx5RYYlEwpxkkqmt6qTOCvDbZ
-Oq2OHLCK/EbQt8hPwk4/a6xb8xkXnn+xJ6urGUus8anDG0o8A2TkKKWLrmKbz0IQ
-8ajqnRGmqFnsCzkOPX0cTnsxllOYbvwL+jSWlUqExKTGxUHr8HsGbceWOzDmDNSo
-nOtDeoUkxL2UC3BAO2teaxD5+XB7SZuXjhnF0T33Ioci2Uaz9DWVKvAsdMBY+vQp
-x5c2p9q840KHlhHkap5xAmlhysXc0mmQYQevmRPkULryY0jABfiIKrF6HfzJoY2S
-9KR1htm3abbGCFVHYRIBBbfneRdv2Y5VqUZrP7ZJ+VNvFPnMlFZfWoB2WIzDu3Ka
-2b0A8K6SCGMxfafH2MgC3c5OZm5Uq7ZfmN5z4XuDWKJpjdBLSM3+ISUS/9DSRW6G
-isq/M9B9lVp5UosHlvFJTAaeAAL4kV2cHPYSY9uoUPGD2QHOzfU=
-=3N/h
------END PGP SIGNATURE-----
-
---1jizhltgKClFK3KfPAyrKasQYQJIdS7rj--
-
+> 
+> With best regards,
+> Volker
+> 
+> 
 
