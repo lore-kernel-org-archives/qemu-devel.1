@@ -2,83 +2,83 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D74A8C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:45:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8A20C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:46:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 947EA206D9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:45:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9BF53206D9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:46:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dWgnCDlh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 947EA206D9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FTHTSQ7L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BF53206D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVcL8-0007E3-KK
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 10:45:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47620)
+	id 1jVcMi-0001TS-Lp
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 10:46:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47578)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jVc76-000782-NV
- for qemu-devel@nongnu.org; Mon, 04 May 2020 10:30:32 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42516
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jVc6w-0006pb-Iq
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 10:30:22 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30500
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jVc75-0006tb-KF
- for qemu-devel@nongnu.org; Mon, 04 May 2020 10:30:32 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jVc6v-0006mw-Ki
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 10:30:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588602630;
+ s=mimecast20190719; t=1588602620;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=L2IEAQ+0EQH/fG7yIDUY2FKAPmMX0mmGOTISpiAaTt4=;
- b=dWgnCDlhVly8YuRhod17Qy9k6swlr4Pb6F2AJo2LfgC0ld/lD0nFUvhG2Jq2Z0pHSVAaed
- 9qHjOJahisuN0OSHI5jC8C5gb9GvkVUDMbMNtvya/0G+i9NfTcRtyC9YrnBNHnzOC/e/h+
- HZVFVpXp8gq2J01T+jl/YJEEOOC4GUY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-505-mRp4laPVOMuBC-OXVdpCXA-1; Mon, 04 May 2020 10:30:27 -0400
-X-MC-Unique: mRp4laPVOMuBC-OXVdpCXA-1
-Received: by mail-wr1-f71.google.com with SMTP id y4so5804854wrt.4
- for <qemu-devel@nongnu.org>; Mon, 04 May 2020 07:30:26 -0700 (PDT)
+ bh=lAfJ5/3TbHF/8WjmWYvb2QAzYmCal5x9QNrXZKyAwD8=;
+ b=FTHTSQ7LRw3LKCJwFfBDgf+2uaTpe//f/4dqJf1sZ1aCEAdWPDx8SvSnau74sKEUHhIvVL
+ OboO1VLNyIYmuTotpvxCjQVdYLzGKShagdpJIYR1chV+KNfMQRuqGY6ZhtDDFwNy66qBCI
+ 5O9G9Hfa+3559ZM9GahxI+v+8cdWY5U=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-207-5krrOh1WMzmg3LZC7fOK0g-1; Mon, 04 May 2020 10:30:18 -0400
+X-MC-Unique: 5krrOh1WMzmg3LZC7fOK0g-1
+Received: by mail-wm1-f69.google.com with SMTP id h22so4991223wml.1
+ for <qemu-devel@nongnu.org>; Mon, 04 May 2020 07:30:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:content-transfer-encoding
  :in-reply-to;
- bh=iRZZD2N2OQSu+hWDfRiZjbT+riutHWRlj7teaB4WBBY=;
- b=hgcyPfIdDVfSdJpqVuBOpLbssRCGYyCESv6EwtSYngkIFDzTBhZFoJNcFuyK/d67SS
- EeZWjKAK0qPzDLPAyP8NDLgyyz4N3rYvSb1zBBDeSgHadoecrhsgvYiYQEhoN4bHKw6Y
- 6jSu4tPqKqK8+MsSINcqGeDoUeszO+HcAyqyg/CP0bNLjhCiXzSN5z0HswYyDuqTQpgk
- 59any2lfnanTIQ6RRhcU4y4sLkXbAYk3tD2ElRRcvASc2fZsPpGn3nXxjgV8PaVICF/w
- vTFGbl1tjmjU5mxMQRXPOvBMkdyUX3YXxkIA8mn7v+vLhr3bFXUVeLRXR/bII0joENS1
- cq8Q==
-X-Gm-Message-State: AGi0PuZOvkdvVjC8QRF0OoFerHAsjYtCNsfg7/VezOIycOd5HuX828oQ
- jDYWs3qHhVHudMNdhRq7ek4imWfRWb6zK2rC3vi1FOuAfGwDDE6Bb3XpCsUWdVCFUbdZDdQGNGZ
- V9+tYlsjjF7IHtGk=
-X-Received: by 2002:adf:dfcf:: with SMTP id q15mr5633238wrn.137.1588602625708; 
- Mon, 04 May 2020 07:30:25 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKjJ/b1Q+SZbPlR95AFFlbRwkHssNVaYtt23eKWoX73RyqQVc/dJEkkQxmn2V+hTwQJZ4wbaQ==
-X-Received: by 2002:adf:dfcf:: with SMTP id q15mr5633195wrn.137.1588602625294; 
- Mon, 04 May 2020 07:30:25 -0700 (PDT)
+ bh=9VtA+lfLhyvx9BGaosLru1/AAtx+gXAahmsNpkaZs5I=;
+ b=TuBiMuRPw4K7GYMTSCndf84Ko+wZuS23GJSm1mJKrng0LkkMz4GN5v6plOBy1NSeuy
+ 28Bm4poV9kUUrObQ3MZ9LLeJr78tG8MbnrtQs1X0NOygzVBXR2G1ZdLhkHWdrk0+MldZ
+ 5TWOXrcR2M2bO6BbwOE7sUbZt15O9KbaEg7EuLdpwlY6sxUSh4E4gYw73pSIei4eKu4E
+ C5720ECEe2w0mfuEzSqfJW5F3vAB7RTi+FTiq4cX+5CM+SYZWnmsEZPL/Iyz/6Zu6I5r
+ H0ZRmu1RbBnsG++vNMzeU3e7lqJL9vJFGb/LNlbnhcebbd1wcxcSPxmqxyYweGYc/eLy
+ +06g==
+X-Gm-Message-State: AGi0PuZIC+kScUmzf/bCQ0V+FjkDudpKyAFB898oXK1FWVmUaku1mDu8
+ /swE2FZdN6bzOLxUaJd5FRiQQVUAZov5js8tjmWgMYhWuMDT6aS5c30NHMMDjIXQ27+3t7vA5VY
+ d2zlx9XIOicNi+yM=
+X-Received: by 2002:adf:e582:: with SMTP id l2mr5949048wrm.392.1588602617587; 
+ Mon, 04 May 2020 07:30:17 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJt819Ha7ezsa30jzyl8gPBeY6EarOlgRO9Y52hho646cF735I+z+caggyygowvOgKUDGaLiQ==
+X-Received: by 2002:adf:e582:: with SMTP id l2mr5949032wrm.392.1588602617435; 
+ Mon, 04 May 2020 07:30:17 -0700 (PDT)
 Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
  by smtp.gmail.com with ESMTPSA id
- q17sm13422759wmj.45.2020.05.04.07.30.24
+ w12sm18914535wrk.56.2020.05.04.07.30.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 May 2020 07:30:24 -0700 (PDT)
-Date: Mon, 4 May 2020 10:30:23 -0400
+ Mon, 04 May 2020 07:30:17 -0700 (PDT)
+Date: Mon, 4 May 2020 10:30:15 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 29/29] hw/i386: Make vmmouse helpers static
-Message-ID: <20200504142814.157589-30-mst@redhat.com>
+Subject: [PULL 26/29] hw/i386/pc: Create 'vmport' device in place
+Message-ID: <20200504142814.157589-27-mst@redhat.com>
 References: <20200504142814.157589-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200504142814.157589-1-mst@redhat.com>
@@ -122,123 +122,48 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-The vmmouse helpers are only used in hw/i386/vmmouse.c,
-make them static.
-
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <20200504083342.24273-5-f4bug@amsat.org>
+Message-Id: <20200504083342.24273-2-f4bug@amsat.org>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/i386/pc.h |  4 ----
- hw/i386/vmmouse.c    | 22 +++++++++++++++++++++-
- hw/i386/vmport.c     | 23 +----------------------
- 3 files changed, 22 insertions(+), 27 deletions(-)
+ include/hw/i386/pc.h | 6 ------
+ hw/i386/pc.c         | 2 +-
+ 2 files changed, 1 insertion(+), 7 deletions(-)
 
 diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index de49a57506..05e19455bb 100644
+index 6ab6eda046..26e2a3d92b 100644
 --- a/include/hw/i386/pc.h
 +++ b/include/hw/i386/pc.h
-@@ -129,10 +129,6 @@ typedef struct PCMachineClass {
-=20
- GSIState *pc_gsi_create(qemu_irq **irqs, bool pci_enabled);
-=20
--/* vmport.c */
--void vmmouse_get_data(uint32_t *data);
--void vmmouse_set_data(const uint32_t *data);
+@@ -132,12 +132,6 @@ GSIState *pc_gsi_create(qemu_irq **irqs, bool pci_enab=
+led);
+ /* vmport.c */
+ #define TYPE_VMPORT "vmport"
+ typedef uint32_t (VMPortReadFunc)(void *opaque, uint32_t address);
 -
- /* pc.c */
- extern int fd_bootchk;
-=20
-diff --git a/hw/i386/vmmouse.c b/hw/i386/vmmouse.c
-index 78b36f6f5d..b3aef41327 100644
---- a/hw/i386/vmmouse.c
-+++ b/hw/i386/vmmouse.c
-@@ -25,11 +25,11 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "ui/console.h"
--#include "hw/i386/pc.h"
- #include "hw/input/i8042.h"
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
- #include "vmport.h"
-+#include "cpu.h"
-=20
- /* debug only vmmouse */
- //#define DEBUG_VMMOUSE
-@@ -71,6 +71,26 @@ typedef struct VMMouseState
-     ISAKBDState *i8042;
- } VMMouseState;
-=20
-+static void vmmouse_get_data(uint32_t *data)
-+{
-+    X86CPU *cpu =3D X86_CPU(current_cpu);
-+    CPUX86State *env =3D &cpu->env;
-+
-+    data[0] =3D env->regs[R_EAX]; data[1] =3D env->regs[R_EBX];
-+    data[2] =3D env->regs[R_ECX]; data[3] =3D env->regs[R_EDX];
-+    data[4] =3D env->regs[R_ESI]; data[5] =3D env->regs[R_EDI];
-+}
-+
-+static void vmmouse_set_data(const uint32_t *data)
-+{
-+    X86CPU *cpu =3D X86_CPU(current_cpu);
-+    CPUX86State *env =3D &cpu->env;
-+
-+    env->regs[R_EAX] =3D data[0]; env->regs[R_EBX] =3D data[1];
-+    env->regs[R_ECX] =3D data[2]; env->regs[R_EDX] =3D data[3];
-+    env->regs[R_ESI] =3D data[4]; env->regs[R_EDI] =3D data[5];
-+}
-+
- static uint32_t vmmouse_get_status(VMMouseState *s)
- {
-     DPRINTF("vmmouse_get_status()\n");
-diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
-index 00d47e0c4c..1aaaab691a 100644
---- a/hw/i386/vmport.c
-+++ b/hw/i386/vmport.c
-@@ -23,10 +23,10 @@
-  */
- #include "qemu/osdep.h"
- #include "hw/isa/isa.h"
--#include "hw/i386/pc.h"
- #include "sysemu/hw_accel.h"
- #include "qemu/log.h"
- #include "vmport.h"
-+#include "cpu.h"
- #include "trace.h"
-=20
- #define VMPORT_CMD_GETVERSION 0x0a
-@@ -109,27 +109,6 @@ static uint32_t vmport_cmd_ram_size(void *opaque, uint=
-32_t addr)
-     return ram_size;
- }
-=20
--/* vmmouse helpers */
--void vmmouse_get_data(uint32_t *data)
+-static inline void vmport_init(ISABus *bus)
 -{
--    X86CPU *cpu =3D X86_CPU(current_cpu);
--    CPUX86State *env =3D &cpu->env;
--
--    data[0] =3D env->regs[R_EAX]; data[1] =3D env->regs[R_EBX];
--    data[2] =3D env->regs[R_ECX]; data[3] =3D env->regs[R_EDX];
--    data[4] =3D env->regs[R_ESI]; data[5] =3D env->regs[R_EDI];
+-    isa_create_simple(bus, TYPE_VMPORT);
 -}
 -
--void vmmouse_set_data(const uint32_t *data)
--{
--    X86CPU *cpu =3D X86_CPU(current_cpu);
--    CPUX86State *env =3D &cpu->env;
--
--    env->regs[R_EAX] =3D data[0]; env->regs[R_EBX] =3D data[1];
--    env->regs[R_ECX] =3D data[2]; env->regs[R_EDX] =3D data[3];
--    env->regs[R_ESI] =3D data[4]; env->regs[R_EDI] =3D data[5];
--}
--
- static const MemoryRegionOps vmport_ops =3D {
-     .read =3D vmport_ioport_read,
-     .write =3D vmport_ioport_write,
+ void vmport_register(unsigned char command, VMPortReadFunc *func, void *op=
+aque);
+ void vmmouse_get_data(uint32_t *data);
+ void vmmouse_set_data(const uint32_t *data);
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 5143c51653..84669ddc84 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1152,7 +1152,7 @@ static void pc_superio_init(ISABus *isa_bus, bool cre=
+ate_fdctrl, bool no_vmport)
+=20
+     i8042 =3D isa_create_simple(isa_bus, "i8042");
+     if (!no_vmport) {
+-        vmport_init(isa_bus);
++        isa_create_simple(isa_bus, TYPE_VMPORT);
+         vmmouse =3D isa_try_create(isa_bus, "vmmouse");
+     } else {
+         vmmouse =3D NULL;
 --=20
 MST
 
