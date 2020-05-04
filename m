@@ -2,134 +2,88 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16DF2C4724C
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 07:38:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3350DC4724C
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 07:52:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D85D021973
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 07:38:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F22B220746
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 07:52:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SFkCOin3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D85D021973
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=brainfault-org.20150623.gappssmtp.com header.i=@brainfault-org.20150623.gappssmtp.com header.b="TbT3v8TH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F22B220746
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVVg0-0005wl-0x
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 03:38:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33040)
+	id 1jVVuD-0003hs-3u
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 03:52:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34604)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jVVfC-0005Mr-CL
- for qemu-devel@nongnu.org; Mon, 04 May 2020 03:37:18 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46495
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jVVfA-0003Yx-N2
- for qemu-devel@nongnu.org; Mon, 04 May 2020 03:37:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588577834;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=snH/e9LcgOToFuSYWLV6xQsfG2kxBqI5rlg4VrEDDMo=;
- b=SFkCOin3v+rUEujyE4LsIqumohXgGRQjBJrJjd/EzrNsgQytz85dko+OGIRj4FeP65paxE
- XsC2xqHbYjZNWdf1na7nY6HUsTVFWMsO6/SIYSzEvOxJqD0SRxRFvY1n2xDHi1Cbw+jzyt
- lOKYCLNvlpiZ3FBU/CbO28Vy5Ko05I4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-VD-k5dGAM_K8YmwF2zyYwQ-1; Mon, 04 May 2020 03:37:12 -0400
-X-MC-Unique: VD-k5dGAM_K8YmwF2zyYwQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BFB30108C309;
- Mon,  4 May 2020 07:37:11 +0000 (UTC)
-Received: from [10.36.114.74] (ovpn-114-74.ams2.redhat.com [10.36.114.74])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5662846;
- Mon,  4 May 2020 07:37:10 +0000 (UTC)
-Subject: Re: [PATCH 5/8] pc-bios: s390x: Move panic() into header and add
- infinite loop
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200324150847.10476-1-frankja@linux.ibm.com>
- <20200324150847.10476-6-frankja@linux.ibm.com>
- <072d57ce-bf5e-3b8c-0bc3-5340579697fc@redhat.com>
- <43dd814a-9088-e7e4-d88b-c6390d45b2f7@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <ad57b10d-caa3-5873-93cb-2e28a7351352@redhat.com>
-Date: Mon, 4 May 2020 09:37:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <anup@brainfault.org>)
+ id 1jVVtX-00039x-Hz
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 03:52:07 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55720)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <anup@brainfault.org>)
+ id 1jVVtU-00087h-Ey
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 03:52:07 -0400
+Received: by mail-wm1-x343.google.com with SMTP id e26so7313351wmk.5
+ for <qemu-devel@nongnu.org>; Mon, 04 May 2020 00:52:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=brainfault-org.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Wo+dQR9tfFxRk/cLvdGpQZsi0vmzZ1euz/1uZifdHg8=;
+ b=TbT3v8THdLMnuP2lINA9znEhCkeeWr6QNKcs08lp2j5xGThWizUZVqw14Mp6mttfox
+ 5773ecSi9rTT6qkH+69Tazh4JqnhWTrPf19WGOE2w9v1Qnn7etq73y+mW0RNQG0lLvS+
+ myEmnwivXLxqWe6PvOpYVOX2MBCEibVTK0TJg69Z5xprWfw6erp/jXVCNkVloroHO6Fd
+ w7coAIqN43nHvDZmmmTm3vdacXaBSSru0yygWsgMZMTZGdQYUPHaNeLsbaXly29t5VFe
+ TQDaIL/uHupao5vASiLGF1ZwoPYSGlWNiSv45V9iBr1KINjOkmnlu1ruhzKABgNLpzNN
+ gSIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Wo+dQR9tfFxRk/cLvdGpQZsi0vmzZ1euz/1uZifdHg8=;
+ b=riJmYocu+4OjavOcXikJYjA4kxVyrkbaH3/0JWNHOIGJw5vDkyoCS2YmSQNdppzYaR
+ XtI0vJ0Et2znDVIwVvAkuoOJtNFdcL30WYwDUo99APXA22bwN+cfqxxhdzXKsWwyu1U+
+ /w4dxWL5dj3aOQnH2x+p4Xk3ZCmjrJmOdKOwm7pJ7xcB4cNSQRopyXcXLTl7fvxK7nzm
+ OyFVlJJGRa+OKuYjc3ccYJ43bDQAX3s4JNAnOoD69Eq/PabVEsldRxjj0ggJDrwvcM/l
+ 4x30Z5IM0l1sktPDmUe80JHzJR537YzVPsTDbHhLoXlMBvMj3BqzR8SCdzJO1mHmmKcc
+ n/yw==
+X-Gm-Message-State: AGi0PuZndduGFc0ZKnQSTrfo+bDaACH5bSFDzRj9YhYk7dvOoiUONg41
+ NuTNuEgwLthTV1Q9zfE7VZS48zGbBHjNlQ8sEW02fw==
+X-Google-Smtp-Source: APiQypIKReiBYVl5YQMLWbSgD72L752H+mGGdWj1zfAmU9JqzWSSZuRCwhquS3JY6TMDRQr6J9E9N60s9rJGHqqUV3o=
+X-Received: by 2002:a1c:4144:: with SMTP id o65mr13970157wma.78.1588578722225; 
+ Mon, 04 May 2020 00:52:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <43dd814a-9088-e7e4-d88b-c6390d45b2f7@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 01:14:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <1588348254-7241-1-git-send-email-bmeng.cn@gmail.com>
+ <1588348254-7241-2-git-send-email-bmeng.cn@gmail.com>
+ <CAAhSdy06i1zb6_aedLn41rWDzrjyTcJ_T954DcwX7k2bM_VcVw@mail.gmail.com>
+ <CAEUhbmXMcxZqk4RUjcWMG-5MCd-Z3wPn=ktQnHLA3Rvn01iq+g@mail.gmail.com>
+In-Reply-To: <CAEUhbmXMcxZqk4RUjcWMG-5MCd-Z3wPn=ktQnHLA3Rvn01iq+g@mail.gmail.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Mon, 4 May 2020 13:21:50 +0530
+Message-ID: <CAAhSdy1kWxW6kyQiMd+-9ZkwMr9xFcZurU7HHoRTE0ST9rnq0Q@mail.gmail.com>
+Subject: Re: [PATCH 1/5] roms/opensbi: Update to support building bios images
+ for generic platform
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: none client-ip=2a00:1450:4864:20::343;
+ envelope-from=anup@brainfault.org; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -142,67 +96,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
+Cc: Bin Meng <bin.meng@windriver.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Anup Patel <Anup.Patel@wdc.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04.05.20 08:46, Janosch Frank wrote:
-> On 4/30/20 5:42 PM, David Hildenbrand wrote:
->> On 24.03.20 16:08, Janosch Frank wrote:
->>> panic() was defined for the ccw and net bios, i.e. twice, so it's
->>> cleaner to rather put it into the header.
->>>
->>> Also let's add an infinite loop into the assembly of disabled_wait() so
->>> the caller doesn't need to take care of it.
->>>
->>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
->>> ---
->>>  pc-bios/s390-ccw/main.c     | 7 -------
->>>  pc-bios/s390-ccw/netmain.c  | 8 --------
->>>  pc-bios/s390-ccw/s390-ccw.h | 7 ++++++-
->>>  pc-bios/s390-ccw/start.S    | 5 +++--
->>>  4 files changed, 9 insertions(+), 18 deletions(-)
->>>
->>> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
->>> index 8b912454c940a390..146a50760bc70af7 100644
->>> --- a/pc-bios/s390-ccw/main.c
->>> +++ b/pc-bios/s390-ccw/main.c
->>> @@ -46,13 +46,6 @@ void write_iplb_location(void)
->>>      lowcore->ptr_iplb = ptr2u32(&iplb);
->>>  }
->>>  
->>> -void panic(const char *string)
->>> -{
->>> -    sclp_print(string);
->>> -    disabled_wait();
->>> -    while (1) { }
->>> -}
->>
->> I remember there was a reason why to add the endless loop afterwards.
->> Maybe because some special machine checks can actually wake it up? Or
->> buggy hypervisor?
->>
->> Anyhow, the kernel also does
->>
->> __load_psw(psw);
->> while (1);
->>
->> so it's best we keep that.
->>
->>
->> With the endless loop re-added
-> 
-> Well, I added a loop into the disabled_wait assembly and removed it from
-> the C code. It's even in the commit message.
+On Mon, May 4, 2020 at 12:46 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> Hi Anup,
+>
+> On Sun, May 3, 2020 at 12:38 PM Anup Patel <anup@brainfault.org> wrote:
+> >
+> > On Fri, May 1, 2020 at 9:26 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+> > >
+> > > From: Bin Meng <bin.meng@windriver.com>
+> > >
+> > > The RISC-V generic platform is a flattened device tree (FDT) based
+> > > platform where all platform specific functionality is provided based
+> > > on FDT passed by previous booting stage. The support was added in
+> > > upstream opensbi recently.
+> > >
+> > > Bring the QEMU roms/opensbi submodule to the upstream opensbi commit:
+> > > commit 4f18c6e55049 ("platform: generic: Add Sifive FU540 TLB flush range limit override")
+> > > with the following changes since v0.7 release:
+> > >
+> > >   1bb00ab lib: No need to provide default PMP region using platform callbacks
+> > >   a9eac67 include: sbi_platform: Combine reboot and shutdown into one callback
+> > >   6585fab lib: utils: Add SiFive test device
+> > >   4781545 platform: Add Nuclei UX600 platform
+> > >   3a326af scripts: adapt binary archive script for Nuclei UX600
+> > >   5bdf022 firmware: fw_base: Remove CSR_MTVEC update check
+> > >   e6c1345 lib: utils/serial: Skip baudrate config if input frequency is zero
+> > >   01a8c8e lib: utils: Improve fdt_parse_uart8250() API
+> > >   0a0093b lib: utils: Add fdt_parse_uart8250_node() function
+> > >   243b0d0 lib: utils: Remove redundant clint_ipi_sync() declaration
+> > >   e3ad7c1 lib: utils: Rename fdt_parse_clint() to fdt_parse_compat_addr()
+> > >   a39cd6f lib: utils: Add FDT match table based node lookup
+> > >   dd33b9e lib: utils: Make fdt_get_node_addr_size() public function
+> > >   66185b3 lib: utils: Add fdt_parse_sifive_uart_node() function
+> > >   19e966b lib: utils: Add fdt_parse_hart_id() function
+> > >   44dd7be lib: utils: Add fdt_parse_max_hart_id() API
+> > >   f0eb503 lib: utils: Add fdt_parse_plic_node() function
+> > >   1ac794c include: Add array_size() macro
+> > >   8ff2b94 lib: utils: Add simple FDT timer framework
+> > >   76f0f81 lib: utils: Add simple FDT ipi framework
+> > >   75322a6 lib: utils: Add simple FDT irqchip framework
+> > >   76a8940 lib: utils: Add simple FDT serial framework
+> > >   7cc6fa4 lib: utils: Add simple FDT reset framework
+> > >   4d06353 firmware: fw_base: Introduce optional fw_platform_init()
+> > >   f1aa9e5 platform: Add generic FDT based platform support
+> > >   1f21b99 lib: sbi: Print platform hart count at boot time
+> > >   2ba7087 scripts: Add generic platform to create-binary-archive.sh
+> > >   4f18c6e platform: generic: Add Sifive FU540 TLB flush range limit override
+> > >
+> > > Update our Makefile to build the generic platform instead of building
+> > > virt and sifive_u separately.
+> > >
+> > > Signed-off-by: Bin Meng <bin.meng@windriver.com>
+> > > ---
+> > >
+> > >  roms/Makefile | 30 ++++++++----------------------
+> > >  roms/opensbi  |  2 +-
+> > >  2 files changed, 9 insertions(+), 23 deletions(-)
+> > >
+> > > diff --git a/roms/Makefile b/roms/Makefile
+> > > index f9acf39..cb00628 100644
+> > > --- a/roms/Makefile
+> > > +++ b/roms/Makefile
+> > > @@ -64,10 +64,8 @@ default help:
+> > >         @echo "  u-boot.e500        -- update u-boot.e500"
+> > >         @echo "  u-boot.sam460      -- update u-boot.sam460"
+> > >         @echo "  efi                -- update UEFI (edk2) platform firmware"
+> > > -       @echo "  opensbi32-virt     -- update OpenSBI for 32-bit virt machine"
+> > > -       @echo "  opensbi64-virt     -- update OpenSBI for 64-bit virt machine"
+> > > -       @echo "  opensbi32-sifive_u -- update OpenSBI for 32-bit sifive_u machine"
+> > > -       @echo "  opensbi64-sifive_u -- update OpenSBI for 64-bit sifive_u machine"
+> > > +       @echo "  opensbi32-generic  -- update OpenSBI for 32-bit generic machine"
+> > > +       @echo "  opensbi64-generic  -- update OpenSBI for 64-bit generic machine"
+> > >         @echo "  bios-microvm       -- update bios-microvm.bin (qboot)"
+> > >         @echo "  clean              -- delete the files generated by the previous" \
+> > >                                       "build targets"
+> > > @@ -170,29 +168,17 @@ skiboot:
+> > >  efi: edk2-basetools
+> > >         $(MAKE) -f Makefile.edk2
+> > >
+> > > -opensbi32-virt:
+> > > +opensbi32-generic:
+> > >         $(MAKE) -C opensbi \
+> > >                 CROSS_COMPILE=$(riscv32_cross_prefix) \
+> > > -               PLATFORM="qemu/virt"
+> > > -       cp opensbi/build/platform/qemu/virt/firmware/fw_jump.bin ../pc-bios/opensbi-riscv32-virt-fw_jump.bin
+> > > +               PLATFORM="generic"
+> > > +       cp opensbi/build/platform/generic/firmware/fw_jump.bin ../pc-bios/opensbi-riscv32-generic-fw_jump.bin
+> >
+> > I think you should copy fw_jump.elf as well because QEMU Spike
+> > platform needs it.
+> >
+>
+> I believe we intended only to ship default bios images for virt and
+> sifive_u. Spike bios image was not shipped in previous QEMU version
+> too.
 
-Whops, missed that, looks good to me then!
+Is there a specific reason for not shipping bios image for Spike machine ?
 
+There were issues booting Linux on QEMU spike machine which are
+now fixed and available in QEMU master. I think we should certainly
+ship fw_jump.elf for Spike machine. This way we have OpenSBI generic
+firmware available as a bios image for three QEMU machines(virt, sifive_u,
+and spike).
 
--- 
-Thanks,
+Regards,
+Anup
 
-David / dhildenb
-
+>
+> > >
+> > > -opensbi64-virt:
+> > > +opensbi64-generic:
+> > >         $(MAKE) -C opensbi \
+> > >                 CROSS_COMPILE=$(riscv64_cross_prefix) \
+> > > -               PLATFORM="qemu/virt"
+> > > -       cp opensbi/build/platform/qemu/virt/firmware/fw_jump.bin ../pc-bios/opensbi-riscv64-virt-fw_jump.bin
+> > > -
+> > > -opensbi32-sifive_u:
+> > > -       $(MAKE) -C opensbi \
+> > > -               CROSS_COMPILE=$(riscv32_cross_prefix) \
+> > > -               PLATFORM="sifive/fu540"
+> > > -       cp opensbi/build/platform/sifive/fu540/firmware/fw_jump.bin ../pc-bios/opensbi-riscv32-sifive_u-fw_jump.bin
+> > > -
+> > > -opensbi64-sifive_u:
+> > > -       $(MAKE) -C opensbi \
+> > > -               CROSS_COMPILE=$(riscv64_cross_prefix) \
+> > > -               PLATFORM="sifive/fu540"
+> > > -       cp opensbi/build/platform/sifive/fu540/firmware/fw_jump.bin ../pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin
+> > > +               PLATFORM="generic"
+> > > +       cp opensbi/build/platform/generic/firmware/fw_jump.bin ../pc-bios/opensbi-riscv64-generic-fw_jump.bin
+> >
+> > Same as above.
+> >
+> > >
+> > >  bios-microvm:
+> > >         $(MAKE) -C qboot
+> > > diff --git a/roms/opensbi b/roms/opensbi
+> > > index 9f1b72c..4f18c6e 160000
+> > > --- a/roms/opensbi
+> > > +++ b/roms/opensbi
+> > > @@ -1 +1 @@
+> > > -Subproject commit 9f1b72ce66d659e91013b358939e832fb27223f5
+> > > +Subproject commit 4f18c6e55049d858c62e87d2605dd41c06956e4e
+> > > --
+> > > 2.7.4
+> > >
+> > >
+> >
+> > Otherwise looks good to me.
+> >
+> > Reviewed-by: Anup Patel <anup@brainfault.org>
+>
+> Regards,
+> Bin
 
