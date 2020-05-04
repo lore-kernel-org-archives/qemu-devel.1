@@ -6,70 +6,69 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20728C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:09:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F57FC47258
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:09:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7E47206A4
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:09:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7E47206A4
+	by mail.kernel.org (Postfix) with ESMTPS id 089A82073B
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:09:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 089A82073B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVZuM-0001Yk-2e
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 08:09:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52044)
+	id 1jVZux-0002Mk-5v
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 08:09:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52026)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jVZjr-00034M-H8; Mon, 04 May 2020 07:58:23 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:57893)
+ id 1jVZjq-00031X-I8; Mon, 04 May 2020 07:58:22 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:43835)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jVZjo-0001ye-Mx; Mon, 04 May 2020 07:58:23 -0400
+ id 1jVZjo-0001zs-RL; Mon, 04 May 2020 07:58:22 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MwPjf-1jFYr103BF-00sJdn; Mon, 04 May 2020 13:58:10 +0200
+ id 1MUGRh-1jfIdL30tf-00RG4v; Mon, 04 May 2020 13:58:12 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/20] MAINTAINERS: Mark the LatticeMico32 target as orphan
-Date: Mon,  4 May 2020 13:57:43 +0200
-Message-Id: <20200504115758.283914-6-laurent@vivier.eu>
+Subject: [PULL 09/20] MAINTAINERS: Update Keith Busch's email address
+Date: Mon,  4 May 2020 13:57:47 +0200
+Message-Id: <20200504115758.283914-10-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200504115758.283914-1-laurent@vivier.eu>
 References: <20200504115758.283914-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:hi4ZlP8k5hKSLyW93PzeAzjqJe7XRZDKE3QUbZJxRddbZ0QtWkK
- bVT5faEL9/nfqe6W5s0oAEPHhkS7yQLTIWeqaeOpNp1Nabf4FtufvCxcnIFsGk2jczIYj3s
- eGuH1PWZ6ATYKIss8VmC5lU0zquPKHNhIWMfqQ3XmMiK3ZZDxSPjkKvYXPAoSzFN70AjxKZ
- 5D/GMNs6xYaoMV7eADNFQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:xchtK2hLMPU=:mTpDgH15Fmum6Aeypk48KQ
- cbP9u2PgvmOPCBawOU7I0CitFqGORSTF9fJautdXkhq0IMHXTApODc8h1v9rIpN/uXzHj2Pb1
- D4SgxcwwNrLsv28aHYHmKgb8Xcf0qJPzgbLYyeSFj0hVEIm80vgnCrRDPxOVjxt4vHhRZvwVN
- aTOIAWxB6MO2yQ+5wpOU3mQu7yV6vJMFUUgLj/66E7gSJzuU+uBV66AyyFzuXZ3oPS7rGR0FW
- mICwAZ1w8DDhu/HyCVX5MByeRAhZ44yE7oxBMz55NOREKfJo2szXFNokg9/7xdAhjbyX7n7r0
- war8ie8OZhojCgMDU42Eo1SUuN5gDXoo0s4/8wbqgD/a9EnOgrsDTylgOftCcdNg4LvS62zzM
- Z9smX4/ii7XltmU2BqWALIL1xI0GD4dZI+bQM3AdHFN3jEaqoxRtmLTY4PzfQL02fyq+m5KYv
- SNW7XEvQ3pMU4Oi+3ZVRsDXl+Hcykv728JgY/rlqTS/g8Xo2nrpWWSVzC45T+4+zNZUc13A+K
- PvK7mgVuyCfbv6tvcT8My1mXJoCfLQKYRsLeF/t7zvEs7d1O3vGUbIYIaV2MPTWKJeq37aiUW
- d9Ws/X0IzHotkdJ7sMQUsQLwZTbDmXLVNvlTCzTolxBVQzh+xmjA2Rejas+h/DppqPtT5XvEc
- P3j8+VXX4IofbVqJQ87vgyw8OGf84mOlrE68qpEdk3YEhnzMw21McXfDVMfx/jZ9nEsXar7+a
- DStnPN12FWw48aq1TTqDjOtRB2GdEh+grrwmgBm4w1u7rMfwoV8R7LS8kYRfq+hV/0y9/B3wd
- jlnWWUhOh4sXbG+AmKld2q//rWZ2rNNhqIftUu2EfJFvM7rdD8UTK3WAkg3JH365NEf1YGd
-Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:Kw1W33UiramJN05FkDK+uqteuGHK9DNSy0wNvsi6LhGV1x1aGnK
+ LUzQcOejjGsZP8hegmDlZtxy/WJHzFVeplRBnfiE+may1hT1i3TYmt0DKw8pDd790Upp4g0
+ bagpdJbyQyUtgn5S3bbhZGIEaaqDQcJtg+A4gdbB+e9Z8ccpAu0J3xcpw2jPMRpx7l9i2+u
+ LaVXz/fZoJj+ZcA6HV2lw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:6r08Tl0UI+g=:Le3/aX/SokAIznQ7lezQ2c
+ GOdJTRwsZnAmcF9EGHEHa7vPmwImBhsgpBwSo0sY4n8xqtetbj0eZBV0i9RNrhHCp0C3twkHb
+ fxJuAo28jyZLf7NEejuQoDyJ1W6RKdtD9kXXLmy2/Ru02EKxnfsOZ8wrWylzqT7sIs4dRTM+r
+ HAXHiovfQvoiGV6RmG6vhxKtD4Qod2NtunWsLnrOsxflfx2TzX+MJGKH8dKzFA5dH9t2MZUA7
+ YQfJjtWYBIeY1HiR3POJ9Q5I+XL9bJJYzCwoOFf/CM1qthCRNvg5wA8ikYBw5JaGwbKi6iF/s
+ im/a+O7vaFI9/2Ctx9wRVH0Lw/Fb6OfBVlJcX3dwFWFMFPnvv+bxILY2s4J7ns/8m7R9Wcg80
+ PouONWzD21nN2LKgLWLv0d51EnkgUTi6aMrc+5Rz+pHZA+ycbFax5ymM8BVk7KMryqNpJNb8r
+ J5wuVsDthUt0oXlk27skkpn4wv3eB8w7kzGtMEpboM9X4GzzyTqZ0wIi7/xgjT8JJkgu+jAYg
+ S8uq2M8XAx6yRP+GSbK/02+/PleHseG+CTjQDOSSwF4GF9BTpcG6fWWG/On8Lo6RuqBhDEjqS
+ bbXKGdQpjigzps4QjwvsPlOmpiY50c48jAWJwW+NvhMMcWEq+o3lIQ4CfxEycCmj+FqxX43st
+ whFid3Wd/WPFgyrmGmPgmo2+suxxtX3m20r4QP1oJfAlvzv2BfLlgdDtyrOtuY3HM4xJ4f5fb
+ tG7jib9kg89fQY2cay/kmhLyQknrKOZsi3V20DWo+Jg2xjTQMAj13URMSm8OpxHdFWnpr90xz
+ Y0YJ6iEWxnEwdXbqkBFV1JSH2imIBC052Gz0ddsa+bksEsQtNsmT9ZPk8msxoi0yP7AFqNc
+Received-SPF: none client-ip=212.227.17.13; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 07:58:13
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 07:58:14
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_MSPIKE_H2=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,79 +81,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
- Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>, Michael Walle <michael@walle.cc>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-trivial@nongnu.org, Keith Busch <kbusch@kernel.org>,
+ Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Michael Walle expressed his desire to orphan the lm32 target [*]:
+keith.busch@intel.com address is being rejected.
+Replace by the email address Keith is actively using.
 
-  I guess it is time to pull the plug. Mainly, because I have
-  no time for this anymore. I've always worked on this on my
-  spare time and life changed. And secondly, I guess RISC-V is
-  taking over ;) It has a far better ecosystem. Also, to my
-  knowledge the only (public) user of LM32 is milkymist and this
-  project is dead for years now..
-
-  So time to say goodbye. It was fun and I've learned a lot -
-  technically and also how a huge open source project works.
-  Thank you everyone for that :)
-
-  Basically everything still works and there are even TCG test
-  cases which covers all instructions the processor has.
-
-Many thanks to Michael for his substantial contributions to QEMU,
-and for maintaining the LM32 target for various years!
-
-[*] https://www.mail-archive.com/qemu-devel@nongnu.org/msg605024.html
-
-Acked-by: Michael Walle <michael@walle.cc>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200316142827.20867-1-philmd@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Acked-by: Keith Busch <kbusch@kernel.org>
+Message-Id: <20200421122236.24867-1-f4bug@amsat.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- MAINTAINERS | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 8aa8efaf1d7f..d6886be13159 100644
+index d6886be13159..1f84e3ae2c6a 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -184,8 +184,8 @@ F: hw/net/*i82596*
- F: include/hw/net/lasi_82596.h
+@@ -1735,7 +1735,7 @@ F: hw/virtio/virtio-crypto-pci.c
+ F: include/hw/virtio/virtio-crypto.h
  
- LM32 TCG CPUs
--M: Michael Walle <michael@walle.cc>
--S: Maintained
-+R: Michael Walle <michael@walle.cc>
-+S: Orphan
- F: target/lm32/
- F: disas/lm32.c
- F: hw/lm32/
-@@ -977,13 +977,13 @@ F: pc-bios/hppa-firmware.img
- LM32 Machines
- -------------
- EVR32 and uclinux BSP
--M: Michael Walle <michael@walle.cc>
--S: Maintained
-+R: Michael Walle <michael@walle.cc>
-+S: Orphan
- F: hw/lm32/lm32_boards.c
- 
- milkymist
--M: Michael Walle <michael@walle.cc>
--S: Maintained
-+R: Michael Walle <michael@walle.cc>
-+S: Orphan
- F: hw/lm32/milkymist.c
- 
- M68K Machines
+ nvme
+-M: Keith Busch <keith.busch@intel.com>
++M: Keith Busch <kbusch@kernel.org>
+ L: qemu-block@nongnu.org
+ S: Supported
+ F: hw/block/nvme*
 -- 
 2.26.2
 
