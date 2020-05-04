@@ -2,101 +2,113 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32487C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:00:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6E22C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:02:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE0DA2073E
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:00:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7342B206D9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:02:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VyinOb/k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE0DA2073E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AUt0fXWa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7342B206D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVXtq-0006Dd-10
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 06:00:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33928)
+	id 1jVXvp-0007mZ-J4
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 06:02:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35534)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jVXrK-0004Hc-UI
- for qemu-devel@nongnu.org; Mon, 04 May 2020 05:57:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50540
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jVXv6-0007G8-Lm
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 06:01:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29329
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jVXrI-0004rB-Q1
- for qemu-devel@nongnu.org; Mon, 04 May 2020 05:57:58 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jVXv5-0000DO-Ib
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 06:01:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588586275;
+ s=mimecast20190719; t=1588586510;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=J0xKETUStHR0oHcaZ8b8i0N2V+4c29jyY/QLJMgk8WM=;
- b=VyinOb/k8GNsTJFdhfXBjELFbAUh6rdCMjQ8dP3t2A/meowSLUF2O5TCOtcNhdBQLfeXI2
- sF6xetxJEeOMuwz9Bm5bzcm4VHCV+g8yi3b7rrO4Hn/v+gS5lAAZqczS6lBEAo4XlGbxaN
- yuHoS1VUsKl4DNUcntUsNHXlM+j7l94=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97-VTIZdy22MMSBh4V8pdIPoQ-1; Mon, 04 May 2020 05:57:46 -0400
-X-MC-Unique: VTIZdy22MMSBh4V8pdIPoQ-1
-Received: by mail-wr1-f72.google.com with SMTP id q13so1617948wrn.14
- for <qemu-devel@nongnu.org>; Mon, 04 May 2020 02:57:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=tLxYcMunStH4/7QnTzXZ2d6AI0SLOIk5asIV7RnMEP4=;
- b=pyZ2ZyyLwSy4gEsmMAzxQts446Cra+o5sfs6Uk4DXWGfLe5qSrYMtGjWvcDBCvJHH6
- o8DdA6E9v3NE0UlbpaAnTa+b5FN2RNTx/1YieJ6moBvHsluVyehgdiLRCTfJ6EzzNDes
- 82XlcdtsIase78kkT9hBu/zM5N0+gpDfaieiciUn+Pzov7yrKohKiVi4hLS+mUNyLhpJ
- 53wK3bw/7UyFPKxX4SSBrseQrq3j+Dm8Fxum6DiUxgJyqaQSchhcNZ1thbl3fKnW8WR9
- /0h1FxL7L+krmtAQzvavchuYt9FuBiYtkFlgSAl7nkuR2HLvcmw2OH9db1dJzVFVJSfp
- CIlg==
-X-Gm-Message-State: AGi0PuaXkFdOQdudAILdbgMQlZjLGXEi4+ZgPWWvymZrzCyBSWrXbixB
- zxErqUCJnsqhKzyYBgrTUr2vFRzdqIU6yElI0mk1AjhaTT97BjAN0q0FY3QPOmXf0LUDZi41G80
- aoci59KVLQOb1ecs=
-X-Received: by 2002:a1c:4d17:: with SMTP id o23mr13459218wmh.120.1588586264612; 
- Mon, 04 May 2020 02:57:44 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLcFwrOvtxXwbjs0RCyFyECrzwnf7RPWvFwmwMfTqeYESF/wyLxhokn+dsrwse73ZorAU+znA==
-X-Received: by 2002:a1c:4d17:: with SMTP id o23mr13459185wmh.120.1588586264238; 
- Mon, 04 May 2020 02:57:44 -0700 (PDT)
-Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
- by smtp.gmail.com with ESMTPSA id
- a9sm12065008wmm.38.2020.05.04.02.57.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 May 2020 02:57:43 -0700 (PDT)
-Date: Mon, 4 May 2020 05:57:40 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH v4 0/7] ARM virt: Add NVDIMM support
-Message-ID: <20200504055608-mutt-send-email-mst@kernel.org>
-References: <20200421125934.14952-1-shameerali.kolothum.thodi@huawei.com>
- <158748197516.25490.13137194821077838492@39012742ff91>
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=sHmLjvJiTLBXV5DlDOiqzShlGysf7d/xSfzgDXVPQog=;
+ b=AUt0fXWa9HEqCqPBwNM0i0eRwC+zl/VtTCCbNHG5KnrBM0xww+wB/FJEFTu2AqAwEgQpSj
+ b+l6tsYZb18OTT3THNSrjfAJZJawk2G5Aex+lcC7pqWmWKBE+hNxSdtl24R1I+6x6v7/uK
+ fTsUhLfpzU0Lu7ZnvmXFyGGgrAxvKHU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-248-cf8JeDeFPdmBh7d8ASjhBw-1; Mon, 04 May 2020 06:01:46 -0400
+X-MC-Unique: cf8JeDeFPdmBh7d8ASjhBw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D654A107ACF2;
+ Mon,  4 May 2020 10:01:45 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-219.ams2.redhat.com
+ [10.36.113.219])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2C85E605D1;
+ Mon,  4 May 2020 10:01:43 +0000 (UTC)
+Subject: Re: [PATCH v2 3/6] qemu-img: Add bitmap sub-command
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200421212019.170707-1-eblake@redhat.com>
+ <20200421212019.170707-4-eblake@redhat.com>
+ <1dcf85b6-d9e6-b952-537c-791daec34ad9@redhat.com>
+ <9d4769d4-09ea-dced-d4bd-9ceb33044202@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <d7c63e6a-a4a8-5b75-5dec-e4f392b3035d@redhat.com>
+Date: Mon, 4 May 2020 12:01:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <158748197516.25490.13137194821077838492@39012742ff91>
+In-Reply-To: <9d4769d4-09ea-dced-d4bd-9ceb33044202@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="H18So8ArpdNj5kUmaFyLbi6FAt7zj7PeY"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 05:09:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 04:24:57
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,306 +121,329 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, xiaoguangrong.eric@gmail.com,
- shannon.zhaosl@gmail.com, linuxarm@huawei.com,
- shameerali.kolothum.thodi@huawei.com, eric.auger@redhat.com,
- qemu-arm@nongnu.org, xuwei5@hisilicon.com, prime.zeng@hisilicon.com,
- imammedo@redhat.com, lersek@redhat.com
+Cc: kwolf@redhat.com, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Apr 21, 2020 at 08:12:57AM -0700, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20200421125934.14952-1-shameerali.k=
-olothum.thodi@huawei.com/
->=20
->=20
->=20
-> Hi,
->=20
-> This series seems to have some coding style problems. See output below fo=
-r
-> more information:
->=20
-> Subject: [PATCH v4 0/7] ARM virt: Add NVDIMM support
-> Message-id: 20200421125934.14952-1-shameerali.kolothum.thodi@huawei.com
-> Type: series
->=20
-> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
-> #!/bin/bash
-> git rev-parse base > /dev/null || exit 0
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
-> git config --local diff.algorithm histogram
-> ./scripts/checkpatch.pl --mailback base..
-> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
->=20
-> Switched to a new branch 'test'
-> c4f3ad1 tests/acpi: add expected tables for bios-tables-test
-> 5b55be7 bios-tables-test: test pc-dimm and nvdimm coldplug for arm/virt
-> f0c9bb6 tests: Update ACPI tables list for upcoming arm/virt test changes
-> c2dd728 hw/arm/virt: Add nvdimm hotplug support
-> f7dad84 hw/arm/virt: Add nvdimm hot-plug infrastructure
-> 5554e78 nvdimm: Use configurable ACPI IO base and size
-> 8058b6f hw/acpi/nvdimm: Fix for NVDIMM incorrect DSM output buffer length
->=20
-> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
-> 1/7 Checking commit 8058b6f6d753 (hw/acpi/nvdimm: Fix for NVDIMM incorrec=
-t DSM output buffer length)
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/acpi/nvdimm.c found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/acpi/nvdimm.c found
->=20
-> total: 2 errors, 0 warnings, 59 lines checked
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--H18So8ArpdNj5kUmaFyLbi6FAt7zj7PeY
+Content-Type: multipart/mixed; boundary="DfyB2JLC08r6FZEeBjWgldlJtCiaMbRJk"
 
-OK so this is a false positive in the script. I will fix it.
+--DfyB2JLC08r6FZEeBjWgldlJtCiaMbRJk
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> Patch 1/7 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
+On 30.04.20 17:21, Eric Blake wrote:
+> On 4/30/20 9:55 AM, Max Reitz wrote:
+>> On 21.04.20 23:20, Eric Blake wrote:
+>>> Include actions for --add, --remove, --clear, --enable, --disable, and
+>>> --merge (note that --clear is a bit of fluff, because the same can be
+>>> accomplished by removing a bitmap and then adding a new one in its
+>>> place,
+>>
+>> Well, ideally, all of qemu-img is just fluff because =E2=80=9Cthe same c=
+an be
+>> accomplished by launching qemu and issuing the equivalent QMP
+>> commands=E2=80=9D. :)
+>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 but it matches what QMP comm=
+ands exist).=C2=A0 Listing is omitted,
+>>> because it does not require a bitmap name and because it was already
+>>> possible with 'qemu-img info'.
+>>
+>> Fair enough, although it can be said that qemu-img info=E2=80=99s output=
+ is
+>> qcow2-specific.=C2=A0 It might be nice to have some definitely
+>> format-independent output.=C2=A0 (But we don=E2=80=99t have persistent b=
+itmaps in
+>> anything but qcow2 yet (or do we in NBD?), so I don=E2=80=99t expect any=
+one to
+>> care much.)
 >=20
-> 2/7 Checking commit 5554e78b18ea (nvdimm: Use configurable ACPI IO base a=
-nd size)
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/acpi/nvdimm.c found
+> We can add a list subcommand later if it is still desired.=C2=A0 I agree =
+that
+> a tabular format:
+>=20
+> name=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 enabled=C2=A0=
+=C2=A0 granularity
+> bitmap1=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 false=C2=A0=C2=A0=C2=A0=C2=A0=
+ 65536
+> bitmap2=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 true=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 512
+>=20
+> in isolation is easier to read than:
+>=20
+> =C2=A0=C2=A0=C2=A0 bitmaps:
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [0]:
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 flags:
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name: =
+bitmap1
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 granul=
+arity: 65536
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [1]:
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 flags:
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 [0]: auto
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name: =
+bitmap2
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 granul=
+arity: 512
+>=20
+> embedded inside even more information.
+>=20
+>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Merge can work either from=
+ another
+>>> bitmap in the same image, or from a bitmap in a distinct image.
+>>>
+>>> While this supports --image-opts for the file being modified, I did
+>>> not think it worth the extra complexity to support that for the source
+>>> file in a cross-file bitmap merge.=C2=A0 Likewise, I chose to have --me=
+rge
+>>> only take a single source rather than following the QMP support for
+>>> multiple merges in one go; in part to simplify the command line, and
+>>> in part because an offline image can achieve the same effect by
+>>> multiple qemu-img bitmap --merge calls.=C2=A0 We can enhance that if ne=
+eded
+>>> in the future (the same way that 'qemu-img convert' has a mode that
+>>> concatenates multiple sources into one destination).
+>>>
+>>> Upcoming patches will add iotest coverage of these commands while
+>>> also testing other features.
+>>>
+>>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>> ---
+>>> =C2=A0 docs/tools/qemu-img.rst |=C2=A0 24 +++++
+>>> =C2=A0 qemu-img.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 | 198 ++++++++++++++++++++++++++++++++++++++++
+>>> =C2=A0 qemu-img-cmds.hx=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=
+=A0=C2=A0 7 ++
+>>> =C2=A0 3 files changed, 229 insertions(+)
+>>>
+>>> diff --git a/docs/tools/qemu-img.rst b/docs/tools/qemu-img.rst
+>>> index 7d08c48d308f..4f3b0e2c9ace 100644
+>>> --- a/docs/tools/qemu-img.rst
+>>> +++ b/docs/tools/qemu-img.rst
+>>> @@ -281,6 +281,30 @@ Command description:
+>>> =C2=A0=C2=A0=C2=A0 For write tests, by default a buffer filled with zer=
+os is
+>>> written. This can be
+>>> =C2=A0=C2=A0=C2=A0 overridden with a pattern byte specified by *PATTERN=
+*.
+>>>
+>>> +.. option:: bitmap {--add [-g GRANULARITY] [--disabled] | --remove |
+>>> --clear | --enable | --disable | --merge SOURCE_BITMAP [-b
+>>> SOURCE_FILE [-F SOURCE_FMT]]} [--object OBJECTDEF] [--image-opts] [-f
+>>> FMT] FILENAME BITMAP
+>>
+>> So I can do multiple operations in one roll, but they all use the same
+>> BITMAP?=C2=A0 Sounds a bit weird.=C2=A0 It actually took me a while to u=
+nderstands
+>> this, because I thought for sure that each command would take a bitmap
+>> name.=C2=A0 (And was ready to complain that it looked like they don=E2=
+=80=99t, but,
+>> well, that=E2=80=99s because they don=E2=80=99t.)
+>=20
+> All of the operations take one bitmap name (the final BITMAP).
+> Additionally, the --merge operation takes a second bitmap name
+> (SOURCE_BITMAP).=C2=A0 None of the other operations need a second bitmap
+> name, so only --merge requires an option argument.=C2=A0 As written, the =
+{ a
+> | b | c } implies that operations are mutually exclusive: you can only
+> request one operation per qemu-img invocation.
 
-This beats me. Where did we get
-tests/qtest/bios-tables-test-allowed-diff.h from?
-It's a different patch, isn't it?
+Well, as I found out later it=E2=80=99s supposed to imply that.  I always e=
+xpect
+{} to mean repetition.
 
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/acpi/nvdimm.c found
+>> Although I suppose some practical example like
+>>
+>> $ qemu-img bitmap --add --merge sbmap --disable foo.qcow2 nbmap
+>>
+>> does make sense.[1]
+>>
+>>
+>> Would
+>>
+>> $ qemu-img bitmap --add nbmap --merge nbmap sbmap --enable nbmap \
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 foo.qcow2
+>>
+>> make more sense?
 >=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/i386/acpi-build.c found
+> That would be more transactional, and more effort to implement.
+
+As a user, I wouldn=E2=80=99t expect it to be a transaction, but just execu=
+ted
+in order.
+
+> My argument is that you should instead write:
 >=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/i386/acpi-build.c found
+> $ qemu-img bitmap --add foo.qcow2 nbmap
+> $ qemu-img bitmap --merge sbmap foo.qcow2 nbmap
+> $ qemu-img bitmap --enable foo.qcow2 nbmap
 >=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/i386/acpi-build.h found
+> where I only have to implement one operation per qemu-img.
+
+I don=E2=80=99t know about the =E2=80=9Chave to=E2=80=9D, because from an a=
+lgorithm standpoint,
+doing so would be trivial.  (That is, collecting the operations into a
+list, along with their specific arguments, and then execute the list in
+a loop.)
+
+I can see that doing this in C is more difficult than it would be in
+nicer languages, and so not actually trivial.
+
+But allowing all switches at most once without mutual exclusion still
+seems simple.  The question is mostly whether the implementation would
+match what we can expect users to expect.
+
+[...]
+>> So if --disable and --disabled are exactly the same, I really don=E2=80=
+=99t know
+>> why --disabled even exists.
 >=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/i386/acpi-build.h found
+> Logically, '--add --disabled' matches the name of the QMP command with
+> its optional 'disabled' parameter, while --disable matches the name of
+> the QMP command.=C2=A0 We don't have to have the alias; and in fact, if y=
+ou
+> agree that supporting '--add --disabled' is too much sugar (since we
+> don't care about atomicity the way QMP did), then life gets simpler to
+> drop --disabled altogether.
+
+I find it makes the interface unnecessarily complex, as does requiring
+mutual exclusion.
+
+If we want mutual exclusion, I can see that a separate --disabled for
+--add makes sense.
+
+>>> +=C2=A0=C2=A0=C2=A0 if (add && disable) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 disable =3D false;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 add_disabled =3D true;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +=C2=A0=C2=A0=C2=A0 if (add + remove + clear + enable + disable + !!mer=
+ge !=3D 1) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("Need exactly =
+one mode of --add, --remove,
+>>> --clear, "
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "--enable, --disable, o=
+r --merge");
+>>
+>> Aha.=C2=A0 So you can actually only do a single operation.
+>>
+>> That means the doc shouldn=E2=80=99t use {}, in my opinion, because that=
+ to me
+>> means repetition (thanks to EBNF).=C2=A0 It definitely served to confuse=
+ me
+>> greatly until this point.
 >=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/i386/pc_piix.c found
+> In command line syntax, I'm most used to seeing repetition as '...',
+> optional as [], and mutually-exclusive choice as {|}.=C2=A0 Yes, that's
+> different than EBNF.
+
+It=E2=80=99s confusing is what it is, and unnecessarily so.  The | already
+signifies exclusion: Say there are -a and -b, if they=E2=80=99re not mutual=
+ly
+exclusive, then the doc describe them as =E2=80=9C[-a] [-b]=E2=80=9D; if th=
+ey are, it=E2=80=99d
+be =E2=80=9C-a | -b=E2=80=9D.  Maybe =E2=80=9C(-a | -b)=E2=80=9D.
+
+I can=E2=80=99t remember having seen {|} for mutual exclusivity before, but=
+ then
+again, it doesn=E2=80=99t happen often, I suppose.  git for one thing seems=
+ to
+use (|).
+
+(Regex also uses {} for repetition, even if in a different way from EBNF.)
+
+I=E2=80=99ve never seen =E2=80=9C...=E2=80=9D used for switches, only for f=
+ree-form arguments
+like filenames.  (Because normally, a switch can be specified only once,
+or it wouldn=E2=80=99t be a =E2=80=9Cswitch=E2=80=9D.)
+
+>> I also don=E2=80=99t see why we would disallow multiple operations in on=
+e go.
+>> The --add --merge combination seems useful to me, and I don=E2=80=99t se=
+e a
+>> problem in implementing it.
+>>
+>> I don=E2=80=99t know why we don=E2=80=99t just create a list of operatio=
+ns to execute,
+>> based on the order given in the argument list, and then execute them in
+>> order.=C2=A0 That would even allow multiple --merge operations.
 >=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/i386/pc_piix.c found
+> If I understand, you're asking why we can't do:
 >=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/i386/pc_q35.c found
+> qemu-img bitmap foo.qcow2 --add b1 --merge sb b1
 >=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/i386/pc_q35.c found
+> in one operation.
 >=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and include/hw/mem/nvdimm.h found
+> That changes the syntax entirely, compared to what I implemented.=C2=A0 Y=
+ou'd
+> have to have an argument to every option, AND figure out how to specify
+> TWO arguments to the --merge option.=C2=A0 Might be doable, but seems hai=
+ry.
+
+Just =E2=80=9Cqemu-img bitmap --add --merge sb foo.qcow2 b1=E2=80=9D would =
+be enough.
+
+>> If we don=E2=80=99t want that (because we don=E2=80=99t want argument or=
+der to matter),
+>> we could still allow all operations to be done at least once and always
+>> execute them in the same order, e.g.:
+>> (1) add
+>> (2) clear
+>> (3) merge
+>> (4) disable
+>> (5) enable
+>> (6) remove
 >=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and include/hw/mem/nvdimm.h found
->=20
-> total: 12 errors, 0 warnings, 158 lines checked
->=20
-> Patch 2/7 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
->=20
-> 3/7 Checking commit f7dad84068ce (hw/arm/virt: Add nvdimm hot-plug infras=
-tructure)
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/arm/Kconfig found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/arm/Kconfig found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/arm/virt-acpi-build.c found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/arm/virt-acpi-build.c found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/arm/virt.c found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/arm/virt.c found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/mem/Kconfig found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/mem/Kconfig found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and include/hw/arm/virt.h found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and include/hw/arm/virt.h found
->=20
-> total: 10 errors, 0 warnings, 80 lines checked
->=20
-> Patch 3/7 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
->=20
-> 4/7 Checking commit c2dd7289fec4 (hw/arm/virt: Add nvdimm hotplug support=
-)
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and docs/specs/acpi_hw_reduced_hotplug.rst found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and docs/specs/acpi_hw_reduced_hotplug.rst found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/acpi/generic_event_device.c found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/acpi/generic_event_device.c found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/arm/virt.c found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and hw/arm/virt.c found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and include/hw/acpi/generic_event_device.h found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and include/hw/acpi/generic_event_device.h found
->=20
-> total: 8 errors, 0 warnings, 103 lines checked
->=20
-> Patch 4/7 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
->=20
-> 5/7 Checking commit f0c9bb65828f (tests: Update ACPI tables list for upco=
-ming arm/virt test changes)
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/data/acpi/virt/NFIT.memhp an=
-d include/hw/acpi/generic_event_device.h found
->=20
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #17:=20
-> new file mode 100644
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/data/acpi/virt/SSDT.memhp an=
-d include/hw/acpi/generic_event_device.h found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and include/hw/acpi/generic_event_device.h found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and include/hw/acpi/generic_event_device.h found
->=20
-> total: 4 errors, 1 warnings, 6 lines checked
->=20
-> Patch 5/7 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
->=20
-> 6/7 Checking commit 5b55be7a85b5 (bios-tables-test: test pc-dimm and nvdi=
-mm coldplug for arm/virt)
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and tests/qtest/bios-tables-test.c found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and tests/qtest/bios-tables-test.c found
->=20
-> total: 2 errors, 0 warnings, 19 lines checked
->=20
-> Patch 6/7 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
->=20
-> 7/7 Checking commit c4f3ad1b593c (tests/acpi: add expected tables for bio=
-s-tables-test)
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/data/acpi/pc/SSDT.dimmpxm an=
-d tests/qtest/bios-tables-test.c found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/data/acpi/q35/SSDT.dimmpxm a=
-nd tests/qtest/bios-tables-test.c found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/data/acpi/virt/DSDT.memhp an=
-d tests/qtest/bios-tables-test.c found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/data/acpi/virt/NFIT.memhp an=
-d tests/qtest/bios-tables-test.c found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/data/acpi/virt/SSDT.memhp an=
-d tests/qtest/bios-tables-test.c found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and tests/qtest/bios-tables-test.c found
->=20
-> ERROR: Do not add expected files together with tests, follow instructions=
- in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
-ed-diff.h and tests/qtest/bios-tables-test.c found
->=20
-> total: 7 errors, 0 warnings, 1 lines checked
->=20
-> Patch 7/7 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
->=20
-> =3D=3D=3D OUTPUT END =3D=3D=3D
->=20
-> Test command exited with code: 1
->=20
->=20
-> The full log is available at
-> http://patchew.org/logs/20200421125934.14952-1-shameerali.kolothum.thodi@=
-huawei.com/testing.checkpatch/?type=3Dmessage.
-> ---
-> Email generated automatically by Patchew [https://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
+> I still find it simpler to do exactly one operation per invocation.
+
+I feel like that=E2=80=99s mostly because of our coding style allowing an =
+=E2=80=9Celse
+if=E2=80=9D to end and start a block on the same line.
+
+(That is, I feel like if we allowed multiple operations in a single go,
+the only difference would be that we wouldn=E2=80=99t have to check for mut=
+ual
+exclusivity, and that all =E2=80=9C} else if (cond) {=E2=80=9Ds would have =
+to be turned
+into =E2=80=9C} if (cond) {=E2=80=9Ds.  And reordered.)
+
+It=E2=80=99s possible that I mostly feel compelled to vote for non-exclusiv=
+ity
+because it would be clear then how to document the interface (i.e.,
+=E2=80=9C[--add] [--clear] [...]=E2=80=9D) and I wouldn=E2=80=99t have to e=
+xplain my utter
+confusion at the sight of {}.
+
+Max
+
+
+--DfyB2JLC08r6FZEeBjWgldlJtCiaMbRJk--
+
+--H18So8ArpdNj5kUmaFyLbi6FAt7zj7PeY
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6v6AUACgkQ9AfbAGHV
+z0A6Rgf+PLU59oyvtawqhPn9FSTR38fI8NmkXq6c3e+Z86zzyogNXUoEy4xviZd+
+EyayPR3c3MYmm5pXFR6P2BgrK7OwpCzY0fjtyD9vjdzr5Iw1W5Z6sRojqrCvaUD0
+AY7VUR3CuBrn5Q4NR/7WbJu+HpBdHQ9GRWDx5hH6+iPM9/joAAEVesY2hFL0z1Kv
+4lV8huAJpyLZMpSaz62emqq6ntUgg0b8VRhIJ+BY0h58aUsFDfa/LaATNtstuIp8
+P/2nyenaB594Kubaf16p10+E5CreZowsPeS5AWFHHNdHwlV+ljcZZYYoLeUy9coW
+d8xSKWAmNUrPIhz2knvKTgMNoS+Uwg==
+=x4bI
+-----END PGP SIGNATURE-----
+
+--H18So8ArpdNj5kUmaFyLbi6FAt7zj7PeY--
 
 
