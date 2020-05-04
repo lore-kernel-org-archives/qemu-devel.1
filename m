@@ -6,60 +6,60 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F57FC47258
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:09:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83CA7C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:10:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 089A82073B
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:09:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 089A82073B
+	by mail.kernel.org (Postfix) with ESMTPS id 54169206A5
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:10:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54169206A5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVZux-0002Mk-5v
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 08:09:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52026)
+	id 1jVZvA-0002Xu-Gu
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 08:10:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52062)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jVZjq-00031X-I8; Mon, 04 May 2020 07:58:22 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:43835)
+ id 1jVZjt-000393-37; Mon, 04 May 2020 07:58:25 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:38807)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jVZjo-0001zs-RL; Mon, 04 May 2020 07:58:22 -0400
+ id 1jVZjp-00027i-02; Mon, 04 May 2020 07:58:24 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MUGRh-1jfIdL30tf-00RG4v; Mon, 04 May 2020 13:58:12 +0200
+ id 1Mn1mb-1ipg1502hr-00kARR; Mon, 04 May 2020 13:58:12 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 09/20] MAINTAINERS: Update Keith Busch's email address
-Date: Mon,  4 May 2020 13:57:47 +0200
-Message-Id: <20200504115758.283914-10-laurent@vivier.eu>
+Subject: [PULL 08/20] elf_ops: Don't try to g_mapped_file_unref(NULL)
+Date: Mon,  4 May 2020 13:57:46 +0200
+Message-Id: <20200504115758.283914-9-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200504115758.283914-1-laurent@vivier.eu>
 References: <20200504115758.283914-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:Kw1W33UiramJN05FkDK+uqteuGHK9DNSy0wNvsi6LhGV1x1aGnK
- LUzQcOejjGsZP8hegmDlZtxy/WJHzFVeplRBnfiE+may1hT1i3TYmt0DKw8pDd790Upp4g0
- bagpdJbyQyUtgn5S3bbhZGIEaaqDQcJtg+A4gdbB+e9Z8ccpAu0J3xcpw2jPMRpx7l9i2+u
- LaVXz/fZoJj+ZcA6HV2lw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:6r08Tl0UI+g=:Le3/aX/SokAIznQ7lezQ2c
- GOdJTRwsZnAmcF9EGHEHa7vPmwImBhsgpBwSo0sY4n8xqtetbj0eZBV0i9RNrhHCp0C3twkHb
- fxJuAo28jyZLf7NEejuQoDyJ1W6RKdtD9kXXLmy2/Ru02EKxnfsOZ8wrWylzqT7sIs4dRTM+r
- HAXHiovfQvoiGV6RmG6vhxKtD4Qod2NtunWsLnrOsxflfx2TzX+MJGKH8dKzFA5dH9t2MZUA7
- YQfJjtWYBIeY1HiR3POJ9Q5I+XL9bJJYzCwoOFf/CM1qthCRNvg5wA8ikYBw5JaGwbKi6iF/s
- im/a+O7vaFI9/2Ctx9wRVH0Lw/Fb6OfBVlJcX3dwFWFMFPnvv+bxILY2s4J7ns/8m7R9Wcg80
- PouONWzD21nN2LKgLWLv0d51EnkgUTi6aMrc+5Rz+pHZA+ycbFax5ymM8BVk7KMryqNpJNb8r
- J5wuVsDthUt0oXlk27skkpn4wv3eB8w7kzGtMEpboM9X4GzzyTqZ0wIi7/xgjT8JJkgu+jAYg
- S8uq2M8XAx6yRP+GSbK/02+/PleHseG+CTjQDOSSwF4GF9BTpcG6fWWG/On8Lo6RuqBhDEjqS
- bbXKGdQpjigzps4QjwvsPlOmpiY50c48jAWJwW+NvhMMcWEq+o3lIQ4CfxEycCmj+FqxX43st
- whFid3Wd/WPFgyrmGmPgmo2+suxxtX3m20r4QP1oJfAlvzv2BfLlgdDtyrOtuY3HM4xJ4f5fb
- tG7jib9kg89fQY2cay/kmhLyQknrKOZsi3V20DWo+Jg2xjTQMAj13URMSm8OpxHdFWnpr90xz
- Y0YJ6iEWxnEwdXbqkBFV1JSH2imIBC052Gz0ddsa+bksEsQtNsmT9ZPk8msxoi0yP7AFqNc
+X-Provags-ID: V03:K1:BQ5r9yph8+G/Az6IX8fW6EIIjsM+kUd3mF51aPquBfwZdBe78HQ
+ eJny12BmQEzKP8RuUE9iCi84G9lQkzH84XG1tI0BSjC4quvIP1FWMvd5pHl8s1dMCMQcmMq
+ HQ/ZxSNvlyXyh1WBdViEbgdbjsSe4iTbQPZQC/nZ0qrsH/WQ5FI3bVxbct72uEReOO+FK2o
+ 8PG5uPIteltoGpTuG3VQQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:XJXUFm27smw=:7Iahaa0JmqSlE5YatvC0bp
+ 6dutlD/QcvXKvsQesDZwrOqnOx2bgnQgs2kE2tjaUEt4pqrUr4hhvfv39aviY2DJIIe9CAJ4W
+ 4dLdNRocSko0IUkiOFLyNLZ+f7EmktNNPRAoAlaoMIQ4vXqRWpuY2bgyW7C0qIkffQvK8r4HF
+ Sz5f1OP1QfMbrnoiLprwcRt1bnbr4E+uTJMYxTKDkRMn0FFgLIaN5PQzMmYxfoLmZuvxEoX+L
+ vEhOHJiJMZOZ/rbzEMZN++Nz03/jO8Xvhre069TkTwfOCAPI3+YKpKiAitq0ict5J3+jYHqJE
+ YoH1O78NYE6fBnw98wvxqpDgmEJ2tRrqrMZCYeCueOw5CZu82fhPBZctFOb16ajAGfwqsHqq/
+ RXF5HOF9c8OuZuTbzeYZeZTBSsFPdzQFHe2roUdntS30VfNcRxEVfKBCFlH1/pAhtUNtRnR9/
+ JqSSzlEHhYYS3A/mKOXqibmtBvjWdvs72zdgVDClXvDizo5nCnZ3x8b37wTWUSGnfyyHXZKkt
+ 02mF77bMEosg/WCYQfxqB2P+VF3dSktHaWPNvo1qxqTICMevNLvo0wiuwS9yZhB7hDeDh1apY
+ Q9HY/6dKQZyAGC0kNRm4Qfh/H57BxpKXm97/0gPFLqhf0/ODnTxQiEv4uibzfd4WcZaszuPV4
+ AAFFoWLzyHdQlLrC6oheP5UU7AwyBWQYZHkhQOS3ZLnoHkV59Rf1/f3IFn6c1Cew+9sOuZOch
+ kLc9mRWuqphz92qXxtNVPe7uFKs4K16kkCjR+pOQojIVp1RqaZlAirT3gBMEJ9bXvijOxagSP
+ lBRiOWlL2GF4INTR0VwQJjJAA0JU0c+GxMxvJS/N+pLw4C45JMpac3WpyjunCJTPIuvCMUF
 Received-SPF: none client-ip=212.227.17.13; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 07:58:14
@@ -81,39 +81,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Keith Busch <kbusch@kernel.org>,
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org,
  Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ Randy Yates <yates@ieee.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
 
-keith.busch@intel.com address is being rejected.
-Replace by the email address Keith is actively using.
+Calling g_mapped_file_unref() on a NULL pointer is not valid, and
+glib will assert if you try it.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Acked-by: Keith Busch <kbusch@kernel.org>
-Message-Id: <20200421122236.24867-1-f4bug@amsat.org>
+$ qemu-system-arm -M virt -display none -device loader,file=/tmp/bad.elf
+qemu-system-arm: -device loader,file=/tmp/bad.elf: GLib: g_mapped_file_unref: assertion 'file != NULL' failed
+
+(One way to produce an ELF file that fails like this is to copy just
+the first 16 bytes of a valid ELF file; this is sufficient to fool
+the code in load_elf_ram_sym() into thinking it's an ELF file and
+calling load_elf32() or load_elf64().)
+
+The failure-exit path in load_elf can be reached from various points
+in execution, and for some of those we haven't yet called
+g_mapped_file_new_from_fd().  Add a condition to the unref call so we
+only call it if we successfully created the GMappedFile to start with.
+
+This will fix the assertion; for the specific case of the generic
+loader it will then fall back from "guess this is an ELF file" to
+"maybe it's a uImage or a hex file" and eventually to "just load as
+a raw data file".
+
+Reported-by: Randy Yates <yates@ieee.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Message-Id: <20200423202011.32686-1-peter.maydell@linaro.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/hw/elf_ops.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index d6886be13159..1f84e3ae2c6a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1735,7 +1735,7 @@ F: hw/virtio/virtio-crypto-pci.c
- F: include/hw/virtio/virtio-crypto.h
- 
- nvme
--M: Keith Busch <keith.busch@intel.com>
-+M: Keith Busch <kbusch@kernel.org>
- L: qemu-block@nongnu.org
- S: Supported
- F: hw/block/nvme*
+diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+index e0bb47bb678d..398a4a2c85bb 100644
+--- a/include/hw/elf_ops.h
++++ b/include/hw/elf_ops.h
+@@ -606,7 +606,9 @@ static int glue(load_elf, SZ)(const char *name, int fd,
+         *highaddr = (uint64_t)(elf_sword)high;
+     ret = total_size;
+  fail:
+-    g_mapped_file_unref(mapped_file);
++    if (mapped_file) {
++        g_mapped_file_unref(mapped_file);
++    }
+     g_free(phdr);
+     return ret;
+ }
 -- 
 2.26.2
 
