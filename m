@@ -2,94 +2,85 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C754C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:51:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18DADC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:53:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3742420643
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:51:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D71EE206A5
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:53:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="KsUAtStR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3742420643
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nlgXE82f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D71EE206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVYgy-00057V-Br
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 06:51:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41316)
+	id 1jVYjL-0006RO-04
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 06:53:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42270)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jVYKt-0007IB-L1
- for qemu-devel@nongnu.org; Mon, 04 May 2020 06:28:31 -0400
-Received: from mout.web.de ([212.227.17.11]:54321)
+ (Exim 4.90_1) (envelope-from <xadimgnik@gmail.com>)
+ id 1jVYT1-000404-U0
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 06:36:55 -0400
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:39366)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jVYKs-0002X7-Pt
- for qemu-devel@nongnu.org; Mon, 04 May 2020 06:28:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1588588095;
- bh=Wy1r8kXVFQEJD4feg9AKnhcEY54oyF5+k98OBFiC6Js=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=KsUAtStR7Heztved51D7oS4i0+LVCSCdpmq3fsvkki7/O0a7dLPNdRtdTKGezbzSh
- snNLeIqceAMxwEZiSnHvAMMUnqcZamTuiNJajEu14aDM60AhwqqH/aPm53IK0YGL0T
- IW08y9Xd/kTbiAbLldeADPMxF0py/lhAvCjHg9vw=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([87.123.206.27]) by smtp.web.de (mrweb101
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0M25FH-1jAiKC0rf9-00u5w2; Mon, 04
- May 2020 12:28:15 +0200
-Date: Mon, 4 May 2020 12:28:14 +0200
-From: Lukas Straub <lukasstraub2@web.de>
-To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH v4 4/6] net/colo-compare.c: Only hexdump packets if tracing
- is enabled
-Message-ID: <8a940c893b26ec19d741d2efe929b85df559d850.1588587700.git.lukasstraub2@web.de>
-In-Reply-To: <cover.1588587700.git.lukasstraub2@web.de>
-References: <cover.1588587700.git.lukasstraub2@web.de>
+ (Exim 4.90_1) (envelope-from <xadimgnik@gmail.com>)
+ id 1jVYT0-00023o-CI
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 06:36:55 -0400
+Received: by mail-io1-xd41.google.com with SMTP id w4so11712503ioc.6
+ for <qemu-devel@nongnu.org>; Mon, 04 May 2020 03:36:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Z7DhdbVuTWBeX+O4IPd0jTsuX2yd4sCb6clmYEE1/2Y=;
+ b=nlgXE82f7j9kP+WX8XVKFvYdi+Bei6QtLD/bGWYqOs5xa2gOK2qYedOb4kwpYNNIWe
+ UjDj+GHbPtqITCCjqm8/YBHYjrP1wksZ6GA3Uh9xNyaKVUWMRxC4gfMq1P5ja5YtOKFy
+ oP9DpIlltRjra1LN6yaHicfgA5DA0HVDMwnpy8qUGoHTW5gWkVloupdNQWY6aTh5R3YD
+ lZwrapJiwQQFv4wsMcY2GNByeymiyohY6ki6OJE/RZahpahMhdZiepk3j1YSb2x8XiQu
+ 5vzehZR+PV6Lpwj/uVoxEAM6bDqRyJKUF7GAxWlOGqFCAAM3D6AxRCirX/4gK6/ZatvO
+ wMEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Z7DhdbVuTWBeX+O4IPd0jTsuX2yd4sCb6clmYEE1/2Y=;
+ b=a8hUJuuSp51VbkvPjlvBg6MRZ+wNEAJU0FoEPPpJPy9MsunvTTH6MAnfesS0g+xbL4
+ yhD+eh4ZqTkJx94t6IBcgsFMEORENyVExVh6EUpfgis3Z/NNLmJt7FZQb5SjvwwcP18a
+ 1Nx0yL/0RL2EEI20Vtc+tNPXfpetokz3GDKQAMtfitbFGd6Y021AXMoNHeofpckPxwYu
+ K5hVBtX1+itaFq2i8MW40ugSK7R+CLFz5eSfjJgbh8c4pFBrnjWzTXawQeFIDbbnO/V0
+ swc3zHjRvx5T0TthTNAFyLo+LG4Lx/OYvTvyml0BA/GDP2EZs7pZ8BQa29oIXiEG1d29
+ nJ9Q==
+X-Gm-Message-State: AGi0PubfBFFpn4jHNEZJmM5LYybZY+Wn2VO6Pj1iABCU4dl9Cd8NdrF6
+ bCB9oE+PeIJmxnPqG16kbFtrV7PBGkBzw0wiCdA=
+X-Google-Smtp-Source: APiQypI/2x+ooVsvfmTtWvfpWFQmLFmEX7KN3UuIFQbZR1+rjq/Nb+KNsXHA+PPOQK++HABjNmHkTp/zrsL9NPwFC9s=
+X-Received: by 2002:a5e:d918:: with SMTP id n24mr14699845iop.28.1588588612306; 
+ Mon, 04 May 2020 03:36:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_//Qvfqfq1Fx.LzDNMryf_ydZ";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:844YZtcyHbd/8rlSWnpMwk+baWA1JwxJd7vG9+vZtdeD38ey620
- 7FwYDNNpqmpXqTNeCZlUXRoCBnwQXMh+/VLKykODvuLjl3zt4ueQLtAWjw7+jJQJ+7ne/4l
- tK5qWuZhUl1TrCGKZRUq4VEvUjEdST6RFhdfl2/LuLuZJz6VZuksD7/K9SG2dLEG5o8GjcQ
- 1cwGHriEf/CzFiPg35jjQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:3oxcVJG3SDM=:ZKx5DcNrDrqmbDzGi4aH/c
- cFXHuFPLm0oSKR/lnHm1kJuTOPr+VCOkw1BCTazY8ghasejfWdp01BqkzhFS2hyVQK5GPgu+p
- 7k9mUVPsvRak6p39KlGRzT2uidcAfzlcHs0C6yfuvbHW2OFn596W7fnBB2XKbd7s6jvjHNSYF
- s2OBz3UEuwA1SawNLjbLAmidX1M4yg1L6smLT/ja3h82c8Zdk6STWAMdcjKkKzdfj+eLQnSm4
- h6re2TeeApyc54po/GsehPjD0svlDfzFngTWkX3cW+PLC2JThvtayLyFefSNyalMnr5Ducp8Y
- +uc/4UZm9lMjKY1yttzZitz95aESV96hwHoV4kINfxeOmr2LiuEWlVyJMf34MUOA2o10kPVdq
- 7YNJsI64o37aUNqQSu9Buc2KXBUnpyuHM8NsvEbaj8QNWNwFPnoBdWhgrdIxLmb7jW3NXrc/A
- Ime0gjhLCUQlh3LIxNzo+jZzBebcvqwQm02FrgocToe3gjHw7/oBe2e8/z9jMRvjJZEsKuHMU
- NY4U4UWc8kDGFfguvgvwTv4Rje1qROeS/ftKKdO07bO/NMV+wcvp/08jQFguULytjvCfBN0fA
- 4Rr4Kzf4aFfybllDkX03KbP1KiQ0rsBQcbuX7lPgjptx3mV0s3G5boCSWs57bgJ9nCUvukAJr
- 4z/6POlnE90wwM5SOk9c885/SHnwF4hqCCHeAATOO/Wdihw2+zpwY3j6TNkndTtWLsO2ptBIg
- /rF506MHrPocq0kJLtW2KIOqyYxTfxiPnGsMZGHxqhamZD4fFjieefaBSudyIHX3VYEKIcx9m
- FCrYA5oo3X+A10A4iE18m7+8Z2PaLbrty69941S7v2biRigyjjGQtF4DXiJrFRqlMcbhJ6/6i
- S7K+3dNPm3kKLuaalrYknL5IyV+WBc12emKBkgINzXwBv7mVTYCEgDiV2NkmEEjiRfPJdTieW
- /ecOT2oLcYzedCIaS71lu1sUEE3P+6we0Fy0hjf8pqVIkz/7rBBvVT331c7LLFJxJWm/otQPB
- sq/oInFVsOkTosodqvICNgF6SmCudfVmFgE4u0QvTpotgrTaRmSh4nzUfzrVRJGGnF2qvAIjW
- M44DPs1sU0ZRzjZlynln3H0gtBKIXAbcdcyOKXOVk+Rp74cjkT2hYzxzNSeHzGBaa8a6aFRYl
- e3e7zicy/ZIIQbr517bf1sTVk8Q0nwYSwfEOBvnWBNd14A5h8Cx/YYT9THR0eJN9rsZokQ2u1
- tG6J28TPSe4sKrdIZ
-Received-SPF: pass client-ip=212.227.17.11; envelope-from=lukasstraub2@web.de;
- helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 06:28:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -24
-X-Spam_score: -2.5
+References: <20200429030409.9406-1-gorbak25@gmail.com>
+ <20200429030409.9406-3-gorbak25@gmail.com>
+In-Reply-To: <20200429030409.9406-3-gorbak25@gmail.com>
+From: Paul Durrant <xadimgnik@gmail.com>
+Date: Mon, 4 May 2020 11:36:41 +0100
+Message-ID: <CAAgS=SmOQqJco70uK5Ept=ex5nf6WsB2YO0EAnC7S=3ocnJ=6Q@mail.gmail.com>
+Subject: RE: [PATCH v2 2/2] Improve legacy vbios handling
+To: Grzegorz Uriasz <gorbak25@gmail.com>, qemu-devel@nongnu.org
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
+ envelope-from=xadimgnik@gmail.com; helo=mail-io1-xd41.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,72 +94,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: Artur Puzio <artur@puzio.waw.pl>,
+ Stefano Stabellini <sstabellini@kernel.org>, jakub@bartmin.ski,
+ marmarek@invisiblethingslab.com, Anthony Perard <anthony.perard@citrix.com>,
+ Jakub Nowak <j.nowak26@student.uw.edu.pl>,
+ Xen-devel <xen-devel@lists.xenproject.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_//Qvfqfq1Fx.LzDNMryf_ydZ
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+> -----Original Message-----
+> From: Grzegorz Uriasz <gorbak25@gmail.com>
+> Sent: 29 April 2020 04:04
+> To: qemu-devel@nongnu.org
+> Cc: Grzegorz Uriasz <gorbak25@gmail.com>;
+marmarek@invisiblethingslab.com; artur@puzio.waw.pl;
+> jakub@bartmin.ski; j.nowak26@student.uw.edu.pl; Stefano Stabellini
+<sstabellini@kernel.org>; Anthony
+> Perard <anthony.perard@citrix.com>; Paul Durrant <paul@xen.org>;
+xen-devel@lists.xenproject.org
+> Subject: [PATCH v2 2/2] Improve legacy vbios handling
+>
+> The current method of getting the vbios is broken - it just isn't
+working on any device I've tested -
+> the reason
+> for this is explained in the previous patch. The vbios is polymorphic
+and getting a proper unmodified
+> copy is
+> often not possible without reverse engineering the firmware. We don't
+need an unmodified copy for most
+> purposes -
+> an unmodified copy is only needed for initializing the bios framebuffer
+and providing the bios with a
+> corrupted
+> copy of the rom won't do any damage as the bios will just ignore the
+rom.
+>
+> After the i915 driver takes over the vbios is only needed for reading
+some metadata/configuration
+> stuff etc...
+> I've tested that not having any kind of vbios in the guest actually
+works fine but on older
+> generations of IGD
+> there are some slight hiccups. To maximize compatibility the best
+approach is to just copy the results
+> of the vbios
+> execution directly to the guest. It turns out the vbios is always
+present on an hardcoded memory range
+> in a reserved
+> memory range from real mode - all we need to do is to memcpy it into the
+guest.
+>
+> The following patch does 2 things:
+> 1) When pci_assign_dev_load_option_rom fails to read the vbios from
+sysfs(this works only when the igd
+> is not the
+> boot gpu - this is unlikely to happen) it falls back to using /dev/mem
+to copy the vbios directly to
+> the guest.
+> Using /dev/mem should be fine as there is more xen specific pci code
+which also relies on /dev/mem.
 
-Else the log will be flooded if there is a lot of network
-traffic.
+Why bother with sysfs at all if it is unlikely to work?
 
-Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-Reviewed-by: Zhang Chen <chen.zhang@intel.com>
----
- net/colo-compare.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+> 2) When dealing with IGD in the more generic code we skip the allocation
+of the rom resource - the
+> reason for this is to prevent
+> a malicious guest from modifying the vbios in the host -> this is needed
+as someone might try to pwn
+> the i915 driver in the host by doing so
+> (attach igd to guest, guest modifies vbios, the guest is terminated and
+the idg is reattached to the
+> host, i915 driver in the host uses data from the modified vbios).
+> This is also needed to not overwrite the proper shadow copy made before.
+>
+> I've tested this patch and it works fine - the guest isn't complaining
+about the missing vbios tables
+> and the pci config
+> space in the guest looks fine.
+>
+> Signed-off-by: Grzegorz Uriasz <gorbak25@gmail.com>
+> ---
+>  hw/xen/xen_pt.c          |  8 +++++--
+>  hw/xen/xen_pt_graphics.c | 48 +++++++++++++++++++++++++++++++++++++---
+>  hw/xen/xen_pt_load_rom.c |  2 +-
+>  3 files changed, 52 insertions(+), 6 deletions(-)
+>
+> diff --git a/hw/xen/xen_pt.c b/hw/xen/xen_pt.c
+> index b91082cb8b..ffc3559dd4 100644
+> --- a/hw/xen/xen_pt.c
+> +++ b/hw/xen/xen_pt.c
+> @@ -483,8 +483,12 @@ static int
+xen_pt_register_regions(XenPCIPassthroughState *s, uint16_t *cmd)
+>                     i, r->size, r->base_addr, type);
+>      }
+>
+> -    /* Register expansion ROM address */
+> -    if (d->rom.base_addr && d->rom.size) {
+> +    /*
+> +     * Register expansion ROM address. If we are dealing with a ROM
+> +     * shadow copy for legacy vga devices then don't bother to map it
+> +     * as previous code creates a proper shadow copy
+> +     */
+> +    if (d->rom.base_addr && d->rom.size &&
+!(is_igd_vga_passthrough(d))) {
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 2a4e7f7c4e..56db3d3bfc 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -483,10 +483,12 @@ sec:
-         g_queue_push_head(&conn->primary_list, ppkt);
-         g_queue_push_head(&conn->secondary_list, spkt);
-=20
--        qemu_hexdump((char *)ppkt->data, stderr,
--                     "colo-compare ppkt", ppkt->size);
--        qemu_hexdump((char *)spkt->data, stderr,
--                     "colo-compare spkt", spkt->size);
-+        if (trace_event_get_state_backends(TRACE_COLO_COMPARE_MISCOMPARE))=
- {
-+            qemu_hexdump((char *)ppkt->data, stderr,
-+                        "colo-compare ppkt", ppkt->size);
-+            qemu_hexdump((char *)spkt->data, stderr,
-+                        "colo-compare spkt", spkt->size);
-+        }
-=20
-         colo_compare_inconsistency_notify(s);
-     }
---=20
-2.20.1
+You don't need the brackets around is_igd_vga_passthrough()
+
+  Paul
 
 
---Sig_//Qvfqfq1Fx.LzDNMryf_ydZ
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl6v7j4ACgkQNasLKJxd
-sljOWg//aVeBiX99IhSqslQajyP2VO8odorq9lmVbX893KZ369KF0q/2pgjK4DDc
-JowiEsDiM5PEzHueq97ai221rxFM6AvhrqmOdYFovrezx5DSSTKLIv+6mXvZ594S
-hWBZ20DuCNf3DAQ/zwVB4h3R2ObmCav2Co4qQZgYwYo3jyhXvOHi7XM1Pz3FF97C
-5dfUJu0qsF25RBEzl/1uwmIGX1nwuRPacFcZV1hTBwQAicNtz5qiTP7e4IUZ88CN
-NSOvxWPpgMy4QS1kG9EhdjmZxX2fAwmQ756EZBp84pnqhnj4Iu66ctftyS0iouxW
-ZE5EN2VSm8iXDhd/v8DCDffWgaXJi9/jraPgThwFIzbKYH6jA7UmX1EYf2SckjwO
-th0Jjy5lLvlF6PkkD/+ZemgFlrnraAJ5Cg2i0IpOkv1qlBiMh2x+MhH6uvLmLOy0
-a2cB5zEoyP99i5PBKJPWlipqQ9cB5WUin5cJGfBYJuFzwspsbFjNzY1cDp/4yCj5
-XWFB1TiWpKax9p7blbOidPC3sNubWdxQ4+iVhls5WpDPbUY+QHNnfzUJ5QZOdaJR
-yhJJB7qzxBGsK0XDDqVGmfjhZ/JFk0C5ZTl+XDlnw2hu0EQUEZRDkYX7AETDoqLX
-uIMhJfrbtkTVZ5ytfqXT+p3GX32EbPN3FemevuX7tSTvtz09ceU=
-=LRQr
------END PGP SIGNATURE-----
-
---Sig_//Qvfqfq1Fx.LzDNMryf_ydZ--
+>          uint32_t bar_data = 0;
+>
+>          /* Re-set BAR reported by OS, otherwise ROM can't be read. */
+> diff --git a/hw/xen/xen_pt_graphics.c b/hw/xen/xen_pt_graphics.c
+> index a3bc7e3921..fe0ef2685c 100644
+> --- a/hw/xen/xen_pt_graphics.c
+> +++ b/hw/xen/xen_pt_graphics.c
+> @@ -129,7 +129,7 @@ int xen_pt_unregister_vga_regions(XenHostPCIDevice
+*dev)
+>      return 0;
+>  }
+>
+> -static void *get_vgabios(XenPCIPassthroughState *s, int *size,
+> +static void *get_sysfs_vgabios(XenPCIPassthroughState *s, int *size,
+>                         XenHostPCIDevice *dev)
+>  {
+>      return pci_assign_dev_load_option_rom(&s->dev, size,
+> @@ -137,6 +137,45 @@ static void *get_vgabios(XenPCIPassthroughState *s,
+int *size,
+>                                            dev->dev, dev->func);
+>  }
+>
+> +static void xen_pt_direct_vbios_copy(XenPCIPassthroughState *s, Error
+**errp)
+> +{
+> +    int fd = -1;
+> +    void *guest_bios = NULL;
+> +    void *host_vbios = NULL;
+> +    /* This is always 32 pages in the real mode reserved region */
+> +    int bios_size = 32 << XC_PAGE_SHIFT;
+> +    int vbios_addr = 0xc0000;
+> +
+> +    fd = open("/dev/mem", O_RDONLY);
+> +    if (fd == -1) {
+> +        error_setg(errp, "Can't open /dev/mem: %s", strerror(errno));
+> +        return;
+> +    }
+> +    host_vbios = mmap(NULL, bios_size,
+> +            PROT_READ, MAP_ANONYMOUS | MAP_PRIVATE, fd, vbios_addr);
+> +    close(fd);
+> +
+> +    if (host_vbios == MAP_FAILED) {
+> +        error_setg(errp, "Failed to mmap host vbios: %s",
+strerror(errno));
+> +        return;
+> +    }
+> +
+> +    memory_region_init_ram(&s->dev.rom, OBJECT(&s->dev),
+> +            "legacy_vbios.rom", bios_size, &error_abort);
+> +    guest_bios = memory_region_get_ram_ptr(&s->dev.rom);
+> +    memcpy(guest_bios, host_vbios, bios_size);
+> +
+> +    if (munmap(host_vbios, bios_size) == -1) {
+> +        XEN_PT_LOG(&s->dev, "Failed to unmap host vbios: %s\n",
+strerror(errno));
+> +    }
+> +
+> +    cpu_physical_memory_write(vbios_addr, guest_bios, bios_size);
+> +    memory_region_set_address(&s->dev.rom, vbios_addr);
+> +    pci_register_bar(&s->dev, PCI_ROM_SLOT,
+PCI_BASE_ADDRESS_SPACE_MEMORY, &s->dev.rom);
+> +    s->dev.has_rom = true;
+> +    XEN_PT_LOG(&s->dev, "Legacy VBIOS registered\n");
+> +}
+> +
+>  /* Refer to Seabios. */
+>  struct rom_header {
+>      uint16_t signature;
+> @@ -179,9 +218,11 @@ void xen_pt_setup_vga(XenPCIPassthroughState *s,
+XenHostPCIDevice *dev,
+>          return;
+>      }
+>
+> -    bios = get_vgabios(s, &bios_size, dev);
+> +    bios = get_sysfs_vgabios(s, &bios_size, dev);
+>      if (!bios) {
+> -        error_setg(errp, "VGA: Can't get VBIOS");
+> +        XEN_PT_LOG(&s->dev, "Unable to get host VBIOS from sysfs - "
+> +                            "falling back to a direct copy of memory
+ranges\n");
+> +        xen_pt_direct_vbios_copy(s, errp);
+>          return;
+>      }
+>
+> @@ -223,6 +264,7 @@ void xen_pt_setup_vga(XenPCIPassthroughState *s,
+XenHostPCIDevice *dev,
+>
+>      /* Currently we fixed this address as a primary for legacy BIOS. */
+>      cpu_physical_memory_write(0xc0000, bios, bios_size);
+> +    XEN_PT_LOG(&s->dev, "Legacy VBIOS registered\n");
+>  }
+>
+>  uint32_t igd_read_opregion(XenPCIPassthroughState *s)
+> diff --git a/hw/xen/xen_pt_load_rom.c b/hw/xen/xen_pt_load_rom.c
+> index 9f100dc159..8cd9aa84dc 100644
+> --- a/hw/xen/xen_pt_load_rom.c
+> +++ b/hw/xen/xen_pt_load_rom.c
+> @@ -65,7 +65,7 @@ void *pci_assign_dev_load_option_rom(PCIDevice *dev,
+>          goto close_rom;
+>      }
+>
+> -    pci_register_bar(dev, PCI_ROM_SLOT, 0, &dev->rom);
+> +    pci_register_bar(dev, PCI_ROM_SLOT, PCI_BASE_ADDRESS_SPACE_MEMORY,
+&dev->rom);
+>      dev->has_rom = true;
+>      *size = st.st_size;
+>  close_rom:
+> --
+> 2.26.1
 
