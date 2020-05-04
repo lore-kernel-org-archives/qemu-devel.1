@@ -2,74 +2,75 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57ED3C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 07:29:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 600BDC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 07:32:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2565820757
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 07:29:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 29D6420735
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 07:32:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ku9XwNvP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2565820757
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cTflwZCz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29D6420735
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVVXi-0007qo-5P
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 03:29:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60252)
+	id 1jVVac-0001iD-EE
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 03:32:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60260)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jVVWg-00060Q-Eu; Mon, 04 May 2020 03:28:30 -0400
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:51542)
+ id 1jVVWi-00065O-G7; Mon, 04 May 2020 03:28:32 -0400
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:40709)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jVVWf-00063m-ND; Mon, 04 May 2020 03:28:30 -0400
-Received: by mail-wm1-x32b.google.com with SMTP id x4so7250813wmj.1;
- Mon, 04 May 2020 00:28:29 -0700 (PDT)
+ id 1jVVWh-00064H-RQ; Mon, 04 May 2020 03:28:32 -0400
+Received: by mail-wm1-x32d.google.com with SMTP id u16so7760211wmc.5;
+ Mon, 04 May 2020 00:28:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=T3XR2g8kj7VSDhrVTdQeVBycX1aQdfydS7sgJhSrjvA=;
- b=ku9XwNvP29vPvuuAGB9FzL/m4KyHcgoTpSkoqMKmWhiBQrZ7X6kqqOKZO2kuajrKXB
- hAEY2/ZCDfZwQMLfr1VilUhXZg31PZaRflptct3ffFyvNuAVwWPMA7RIdVZCpy24Eel6
- lLyTBxjY45BUhzmcjg+SWVPti3Rh4MMi37KiI2CNwbpoAtbGtoeXq6wzbLWvXWxbFxO4
- Q3d1imwxlawJOVD/eRV3vY4mFUBj7/ujSeif/6DhzpCmINHHViBq9HeZXTMHLb7BzIwr
- 7x0p+F91MYWnnKNf+4E9hoUxPYfuuBjlHUtOhBmzLzas/0DruByrDwc34VUrA806tm7H
- HGeA==
+ bh=lNnVPTok0KuGhI7WlF3rtisA4RGSH6dUX5yCMf1ZDmM=;
+ b=cTflwZCzKRKiU4Lmyl6EZYrYM9DmjJJAK6cQfuTgXJHqKXTl8dhMrKemOtI2vvGpF0
+ e6/8JvmmK7sD0+1y57LP12cNRtw6Cgg1jYv/eog6377XJuSwaiRicCs/RzjP6LZOkTda
+ dvYYpHPEQhwdEBRrBg2w/7JeQsRWBL7d4+hcDHxVtVQNOgeppX12mKesAXiTa0qTnGup
+ /VnyNOERebsAc5uKpmYXBs0wJ9cOElhc+BHZIwALplCy/WdVNWc7XlaNm5OdoidlgVQI
+ jOIDW+dW2EiUzrrko66cwhTjK2XHUFilAEIGtP8jeOzjrkeDhyD9nKeEM64t9uA2lmTI
+ qr8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=T3XR2g8kj7VSDhrVTdQeVBycX1aQdfydS7sgJhSrjvA=;
- b=OQA2XdhRJxfcfSi91qMG87KD3qgXl0mowzgc0gM4PipDD/yNO3FfFvQQh9vLYFNSFb
- PteVkyAMKk/M+MN3uvE+oIAkvfyUKQhUYp4ZMm+cdU0Un91KgwhljI85//oxWQJ/MrRl
- mXEV2dfZCgBVjXMJhPqflttAMT6GeG6TSP0hAcmeqIhb46cXqPNXMtex/urAGpKi6ALv
- oImzSEbuMiIeEmkiYSHouNffQyckd8XJTN5dRWLv9KP69wbYBtdyt/svMB7n1cVNuw0V
- IhuhwovHLHtPyVOp3fimS1bD/Jh8K7TNo7z2lkw1jOgY+395m55tP6WsHDCfjgFXfy7X
- 1H3A==
-X-Gm-Message-State: AGi0PuZ8m56o4PLbMDkhwqIcWpZNuJW9jwpgk3hUXa/JjhxbSjEuUWZ8
- HmhfBQeuZ8GoFvbkklqwxXHmNYaf
-X-Google-Smtp-Source: APiQypKYm89TBeuic6ZrT0cNKSRbUdh6FXuK3YfQ0ipEnPZt34AHLXknm7/p5MN/1SKv3/Az1AFikg==
-X-Received: by 2002:a1c:384:: with SMTP id 126mr13274392wmd.58.1588577307844; 
- Mon, 04 May 2020 00:28:27 -0700 (PDT)
+ bh=lNnVPTok0KuGhI7WlF3rtisA4RGSH6dUX5yCMf1ZDmM=;
+ b=PCf22RDpYDi2WvjLHngUatfUrYrbSzbMl/5SsTNcJjBw4ug/Z1sdUCZnAzvOSdY+jS
+ 2VJogfldP5Z6ebekA6DCQcm8Oj9UyJPLWfONrR/0cIwVOow+6iGhR0qkoQn3JX1aw3Ba
+ ZBaLwgk/9TuNc0V7uGHwXbbxHKQRc7kOXrzaf3dnurFzI7sAgYOuj8GoAhseVcG3U2Pz
+ rxtWL2hulK5tSSNuwgK0sNuN7ST3AljSOnLAZDDgu6wcOt1rzd9GSdLJR4g4AYwHn5gY
+ cQCzgdPOYqhYWJgAKE/sgyR9CThtkkMkMXodTrvByjg9vg9V18JzfQCUytcEuCx8ygYF
+ lsWQ==
+X-Gm-Message-State: AGi0PubRCzBT2AA0CFkmLJe330gxRuplOptjPGrBclONwT1EZDtJrvSN
+ MoBQKJd6JCW1K/cQfCx7Xc5INoXM
+X-Google-Smtp-Source: APiQypLEM+7UTXeD/OPUoPdHQsT0mWIOS3SNZwEIMtixgKg8xMPakLTwRJFF4fAwZXGdPoV4NfExTg==
+X-Received: by 2002:a7b:c459:: with SMTP id l25mr12760238wmi.52.1588577310044; 
+ Mon, 04 May 2020 00:28:30 -0700 (PDT)
 Received: from x1w.redhat.com (26.red-88-21-207.staticip.rima-tde.net.
  [88.21.207.26])
- by smtp.gmail.com with ESMTPSA id w83sm12590159wmb.37.2020.05.04.00.28.26
+ by smtp.gmail.com with ESMTPSA id w83sm12590159wmb.37.2020.05.04.00.28.29
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 May 2020 00:28:27 -0700 (PDT)
+ Mon, 04 May 2020 00:28:29 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/4] hw/arm/nrf51_soc: Mark some peripherals as unimplemented
-Date: Mon,  4 May 2020 09:28:20 +0200
-Message-Id: <20200504072822.18799-3-f4bug@amsat.org>
+Subject: [PATCH 4/4] hw/timer/nrf51_timer: Add trace event of counter value
+ update
+Date: Mon,  4 May 2020 09:28:22 +0200
+Message-Id: <20200504072822.18799-5-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200504072822.18799-1-f4bug@amsat.org>
 References: <20200504072822.18799-1-f4bug@amsat.org>
@@ -77,8 +78,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32b;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32b.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32d;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -109,58 +110,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Map some peripherals used by Zephyr Project:
-
-https://github.com/zephyrproject-rtos/zephyr/blob/zephyr-v2.2.0/dts/arm/nordic/nrf51822.dtsi
+Add trace event to display timer's counter value updates.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/arm/nrf51.h |  4 ++++
- hw/arm/nrf51_soc.c     | 11 +++++++++++
- 2 files changed, 15 insertions(+)
+ hw/timer/nrf51_timer.c | 1 +
+ hw/timer/trace-events  | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/include/hw/arm/nrf51.h b/include/hw/arm/nrf51.h
-index de836beaa4..46d0cfc7a1 100644
---- a/include/hw/arm/nrf51.h
-+++ b/include/hw/arm/nrf51.h
-@@ -25,11 +25,15 @@
- #define NRF51_IOMEM_SIZE      0x20000000
+diff --git a/hw/timer/nrf51_timer.c b/hw/timer/nrf51_timer.c
+index 38cea0542e..42be79c736 100644
+--- a/hw/timer/nrf51_timer.c
++++ b/hw/timer/nrf51_timer.c
+@@ -240,6 +240,7 @@ static void nrf51_timer_write(void *opaque, hwaddr offset,
  
- #define NRF51_PERIPHERAL_SIZE 0x00001000
-+#define NRF51_RADIO_BASE      0x40001000
- #define NRF51_UART_BASE       0x40002000
- #define NRF51_TWI_BASE        0x40003000
-+#define NRF51_GPIOTE_BASE     0x40006000
- #define NRF51_TIMER_BASE      0x40008000
-+#define NRF51_TEMP_BASE       0x4000c000
- #define NRF51_RNG_BASE        0x4000D000
- #define NRF51_NVMC_BASE       0x4001E000
-+#define NRF51_PPI_BASE        0x4001f000
- #define NRF51_GPIO_BASE       0x50000000
+             idx = (offset - NRF51_TIMER_TASK_CAPTURE_0) / 4;
+             s->cc[idx] = s->counter;
++            trace_nrf51_timer_set_count(s->id, idx, s->counter);
+         }
+         break;
+     case NRF51_TIMER_EVENT_COMPARE_0 ... NRF51_TIMER_EVENT_COMPARE_3:
+diff --git a/hw/timer/trace-events b/hw/timer/trace-events
+index 43b605cc75..80ea197594 100644
+--- a/hw/timer/trace-events
++++ b/hw/timer/trace-events
+@@ -69,6 +69,7 @@ cmsdk_apb_dualtimer_reset(void) "CMSDK APB dualtimer: reset"
+ # nrf51_timer.c
+ nrf51_timer_read(uint8_t timer_id, uint64_t addr, uint32_t value, unsigned size) "timer %u read addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
+ nrf51_timer_write(uint8_t timer_id, uint64_t addr, uint32_t value, unsigned size) "timer %u write addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
++nrf51_timer_set_count(uint8_t timer_id, uint8_t counter_id, uint32_t value) "timer %u counter %u count 0x%" PRIx32
  
- #define NRF51_PRIVATE_BASE    0xF0000000
-diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
-index e50473fd19..6212c5cb53 100644
---- a/hw/arm/nrf51_soc.c
-+++ b/hw/arm/nrf51_soc.c
-@@ -170,6 +170,17 @@ static void nrf51_soc_realize(DeviceState *dev_soc, Error **errp)
-     memory_region_add_subregion_overlap(&s->container,
-                                         NRF51_IOMEM_BASE, &s->clock, -1);
- 
-+    create_unimplemented_device("nrf51_soc.radio", NRF51_RADIO_BASE,
-+                                NRF51_PERIPHERAL_SIZE);
-+    create_unimplemented_device("nrf51_soc.uarte", NRF51_UART_BASE,
-+                                NRF51_PERIPHERAL_SIZE);
-+    create_unimplemented_device("nrf51_soc.gpiote", NRF51_GPIOTE_BASE,
-+                                NRF51_PERIPHERAL_SIZE);
-+    create_unimplemented_device("nrf51_soc.temp", NRF51_TEMP_BASE,
-+                                NRF51_PERIPHERAL_SIZE);
-+    create_unimplemented_device("nrf51_soc.ppi", NRF51_PPI_BASE,
-+                                NRF51_PERIPHERAL_SIZE);
-+
-     create_unimplemented_device("nrf51_soc.io", NRF51_IOMEM_BASE,
-                                 NRF51_IOMEM_SIZE);
-     create_unimplemented_device("nrf51_soc.private",
+ # bcm2835_systmr.c
+ bcm2835_systmr_irq(bool enable) "timer irq state %u"
 -- 
 2.21.3
 
