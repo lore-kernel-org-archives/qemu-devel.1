@@ -2,86 +2,89 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A713C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 07:17:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C314C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 07:29:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2238D20721
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 07:17:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3567120735
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 07:29:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tRNifiiY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2238D20721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KK4n3KdS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3567120735
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVVMU-0004Aq-BE
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 03:17:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59372)
+	id 1jVVXW-0007ST-8I
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 03:29:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60234)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jVVLa-0003L4-1o; Mon, 04 May 2020 03:17:02 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:39543)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jVVWe-0005yt-K1; Mon, 04 May 2020 03:28:28 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:40129)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jVVLY-0007Ji-Im; Mon, 04 May 2020 03:17:01 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id d197so8700457ybh.6;
- Mon, 04 May 2020 00:16:59 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jVVWd-00063I-3e; Mon, 04 May 2020 03:28:28 -0400
+Received: by mail-wr1-x42c.google.com with SMTP id e16so14504685wra.7;
+ Mon, 04 May 2020 00:28:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=G4aZq8HfR7AdD238baEAff+cTqXCGBmkjxmNbF13RhM=;
- b=tRNifiiY11j2qjQ6p1FEcqqbPWNjbRHwldS7ltFASVQ0I8olAFdlcd1yxx+kXF73pe
- hyiBHkEBTRkbvxm6B3hnHHiYJv/T7YQZ8elxX0xPzIiv9277teOsllFFGmeL5OqBLPSA
- Iuv2CxS86XbliAEFkFGiz6JtmbLN5jDrsddHeG5mWHZYXaXAWkYzZslocXNbvB67dHOi
- 2+uqm3C68LdPGlkwUviYU/LTgmlCZ1CnjlFH8QOkXwDkyt8H5Mx2ENydzGwkT08daZts
- eRqpxjA3a1UNTJd9RArm8aaJDl7QIipN0y/OkgRiQHpQnfHIJgM5geN18zmr7g8K+Qj9
- 9+Aw==
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=96iBzta4O9kSIgAh9Y5rJmFbm049HKou78PdDPCrlZs=;
+ b=KK4n3KdSiRBhzMyGrF7B5DqOwpI3ssvm4mTqX+C4IxIwWAoCDdGiyptc2V0CSeQcve
+ Z1Qy0ScxwxuSQ0LoIBUn7UuW2eqd7a9XrMcsO0VvPQTDJ3GEWZwfHvp4BB2hi7kgKf6J
+ 4282JKXZsrqFPkwKLEXtQ3n2SedjBN8w6Vh4rsdEYerZZu+4zc7w9XIUis5YC/A6ZXXY
+ 0WM9vzvB3a9Qyd/BrDw8xl+KdB3GXwkRt23nslI5WWtmKmZgMkbPDteyHrnWkVqxt27p
+ rbjQm2yWdSocXzxVcv9KkuKMVfxpPz0CHn8gO/JoWwg/0TD20hRJogmbU6kvOdnF1HsL
+ RRug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=G4aZq8HfR7AdD238baEAff+cTqXCGBmkjxmNbF13RhM=;
- b=pQBjJIH8mhnvIB9VeTYWkGnBA9wvueQrVS0Q+VOhaNubpR3JDmJHg94/TMOUAfCKsj
- lL0gzRpxhs31cqr56QPhEkLP2AGkVvao1EfENPHdWq7whm/t9NKZYeUjyXXx+GrZbRt0
- /ff9szOqk3C9GOIsEae8snU70JNnXzJR6uVMacHbPg+8cXnBUuxAe0IlzsF+W5no4o2G
- Up/bR9Su6vnD46fD1D/GIeHKt52fXcxXv2Gborc5lySTyPNVEfR7CQD1Nd7zTsTmfgGH
- /LdfgSHZHEi1P6hab/tZe/mMMwkBl2Q8RmUIULs6V/+xGvnpWW6kAmKn+JEjzd1QHfpO
- C+jQ==
-X-Gm-Message-State: AGi0PuZ68cJOUt8WhY7+sqgUgaeiLmZqElVFWKWSy6N7i4WrWRAPQmcB
- dHD+hzw5ef32A2+2YKWzA341kXXHrfsIYQk6Hr0=
-X-Google-Smtp-Source: APiQypJO5JcWE/vwoZb0ArAD3mZ0qqrTbe0cKr2x+DrkpSvjsdhi0kNV6ni/1S/oS+kxnKo1q/0HMBQ1Zr0qmfi9PcE=
-X-Received: by 2002:a5b:383:: with SMTP id k3mr25003740ybp.332.1588576618737; 
- Mon, 04 May 2020 00:16:58 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=96iBzta4O9kSIgAh9Y5rJmFbm049HKou78PdDPCrlZs=;
+ b=BebqYPKBjVZ1Mhq25Dnl4CJ3YbdnsapvlolmCXdFElnU/d5f3cuOlSVC+IOYchDk0g
+ j6T/OLBC/wB++zrVnpU71aAPWW6HK28zSGWfYlMzXWPZWbfdRs9hg6c2t12ALvu0L79l
+ SM6TTsgN3oIWYU8rFLvmViRNT9AGhQeI1YligNtJlw1vbpIebk1NJnWVQP2CbEqYAQwR
+ NqqstaEdr8Tr7XNuLue/kasPE6MUlf0B3oxD6cvm9MmnqGJlE77QZ94BGp7O8OYBmWzD
+ g4fcfK0hB07F3pMK4broi1w+o5OL6mkqX8OvVG3VQkqb8xAJb0/EuyBfvhUV9LUOm25y
+ GiVw==
+X-Gm-Message-State: AGi0PubBUytPRHDJrcCp5hZm21J5JpfhzLQ6KVpULvXeiYYRLJmPaieK
+ qdQAWbkYLxkMC5owlcmZOZsdPXoo
+X-Google-Smtp-Source: APiQypIb9DMBOhnWpKATi6A7i/dgS6pb2betkvmCpomSQjdnRRozfeDUmFgm768PQ74XHA8DXin/2Q==
+X-Received: by 2002:a5d:6582:: with SMTP id q2mr17729016wru.343.1588577304812; 
+ Mon, 04 May 2020 00:28:24 -0700 (PDT)
+Received: from x1w.redhat.com (26.red-88-21-207.staticip.rima-tde.net.
+ [88.21.207.26])
+ by smtp.gmail.com with ESMTPSA id w83sm12590159wmb.37.2020.05.04.00.28.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 04 May 2020 00:28:23 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/4] hw/arm/nrf51: Extend tracing
+Date: Mon,  4 May 2020 09:28:18 +0200
+Message-Id: <20200504072822.18799-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-References: <1588348254-7241-1-git-send-email-bmeng.cn@gmail.com>
- <1588348254-7241-2-git-send-email-bmeng.cn@gmail.com>
- <CAAhSdy06i1zb6_aedLn41rWDzrjyTcJ_T954DcwX7k2bM_VcVw@mail.gmail.com>
-In-Reply-To: <CAAhSdy06i1zb6_aedLn41rWDzrjyTcJ_T954DcwX7k2bM_VcVw@mail.gmail.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Mon, 4 May 2020 15:16:47 +0800
-Message-ID: <CAEUhbmXMcxZqk4RUjcWMG-5MCd-Z3wPn=ktQnHLA3Rvn01iq+g@mail.gmail.com>
-Subject: Re: [PATCH 1/5] roms/opensbi: Update to support building bios images
- for generic platform
-To: Anup Patel <anup@brainfault.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b41;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb41.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x42c.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,154 +97,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Anup Patel <Anup.Patel@wdc.com>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>,
+ qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Anup,
+Few patches while playing with the Zephyr Project.
 
-On Sun, May 3, 2020 at 12:38 PM Anup Patel <anup@brainfault.org> wrote:
->
-> On Fri, May 1, 2020 at 9:26 PM Bin Meng <bmeng.cn@gmail.com> wrote:
-> >
-> > From: Bin Meng <bin.meng@windriver.com>
-> >
-> > The RISC-V generic platform is a flattened device tree (FDT) based
-> > platform where all platform specific functionality is provided based
-> > on FDT passed by previous booting stage. The support was added in
-> > upstream opensbi recently.
-> >
-> > Bring the QEMU roms/opensbi submodule to the upstream opensbi commit:
-> > commit 4f18c6e55049 ("platform: generic: Add Sifive FU540 TLB flush range limit override")
-> > with the following changes since v0.7 release:
-> >
-> >   1bb00ab lib: No need to provide default PMP region using platform callbacks
-> >   a9eac67 include: sbi_platform: Combine reboot and shutdown into one callback
-> >   6585fab lib: utils: Add SiFive test device
-> >   4781545 platform: Add Nuclei UX600 platform
-> >   3a326af scripts: adapt binary archive script for Nuclei UX600
-> >   5bdf022 firmware: fw_base: Remove CSR_MTVEC update check
-> >   e6c1345 lib: utils/serial: Skip baudrate config if input frequency is zero
-> >   01a8c8e lib: utils: Improve fdt_parse_uart8250() API
-> >   0a0093b lib: utils: Add fdt_parse_uart8250_node() function
-> >   243b0d0 lib: utils: Remove redundant clint_ipi_sync() declaration
-> >   e3ad7c1 lib: utils: Rename fdt_parse_clint() to fdt_parse_compat_addr()
-> >   a39cd6f lib: utils: Add FDT match table based node lookup
-> >   dd33b9e lib: utils: Make fdt_get_node_addr_size() public function
-> >   66185b3 lib: utils: Add fdt_parse_sifive_uart_node() function
-> >   19e966b lib: utils: Add fdt_parse_hart_id() function
-> >   44dd7be lib: utils: Add fdt_parse_max_hart_id() API
-> >   f0eb503 lib: utils: Add fdt_parse_plic_node() function
-> >   1ac794c include: Add array_size() macro
-> >   8ff2b94 lib: utils: Add simple FDT timer framework
-> >   76f0f81 lib: utils: Add simple FDT ipi framework
-> >   75322a6 lib: utils: Add simple FDT irqchip framework
-> >   76a8940 lib: utils: Add simple FDT serial framework
-> >   7cc6fa4 lib: utils: Add simple FDT reset framework
-> >   4d06353 firmware: fw_base: Introduce optional fw_platform_init()
-> >   f1aa9e5 platform: Add generic FDT based platform support
-> >   1f21b99 lib: sbi: Print platform hart count at boot time
-> >   2ba7087 scripts: Add generic platform to create-binary-archive.sh
-> >   4f18c6e platform: generic: Add Sifive FU540 TLB flush range limit override
-> >
-> > Update our Makefile to build the generic platform instead of building
-> > virt and sifive_u separately.
-> >
-> > Signed-off-by: Bin Meng <bin.meng@windriver.com>
-> > ---
-> >
-> >  roms/Makefile | 30 ++++++++----------------------
-> >  roms/opensbi  |  2 +-
-> >  2 files changed, 9 insertions(+), 23 deletions(-)
-> >
-> > diff --git a/roms/Makefile b/roms/Makefile
-> > index f9acf39..cb00628 100644
-> > --- a/roms/Makefile
-> > +++ b/roms/Makefile
-> > @@ -64,10 +64,8 @@ default help:
-> >         @echo "  u-boot.e500        -- update u-boot.e500"
-> >         @echo "  u-boot.sam460      -- update u-boot.sam460"
-> >         @echo "  efi                -- update UEFI (edk2) platform firmware"
-> > -       @echo "  opensbi32-virt     -- update OpenSBI for 32-bit virt machine"
-> > -       @echo "  opensbi64-virt     -- update OpenSBI for 64-bit virt machine"
-> > -       @echo "  opensbi32-sifive_u -- update OpenSBI for 32-bit sifive_u machine"
-> > -       @echo "  opensbi64-sifive_u -- update OpenSBI for 64-bit sifive_u machine"
-> > +       @echo "  opensbi32-generic  -- update OpenSBI for 32-bit generic machine"
-> > +       @echo "  opensbi64-generic  -- update OpenSBI for 64-bit generic machine"
-> >         @echo "  bios-microvm       -- update bios-microvm.bin (qboot)"
-> >         @echo "  clean              -- delete the files generated by the previous" \
-> >                                       "build targets"
-> > @@ -170,29 +168,17 @@ skiboot:
-> >  efi: edk2-basetools
-> >         $(MAKE) -f Makefile.edk2
-> >
-> > -opensbi32-virt:
-> > +opensbi32-generic:
-> >         $(MAKE) -C opensbi \
-> >                 CROSS_COMPILE=$(riscv32_cross_prefix) \
-> > -               PLATFORM="qemu/virt"
-> > -       cp opensbi/build/platform/qemu/virt/firmware/fw_jump.bin ../pc-bios/opensbi-riscv32-virt-fw_jump.bin
-> > +               PLATFORM="generic"
-> > +       cp opensbi/build/platform/generic/firmware/fw_jump.bin ../pc-bios/opensbi-riscv32-generic-fw_jump.bin
->
-> I think you should copy fw_jump.elf as well because QEMU Spike
-> platform needs it.
->
+- better display of unimplemented peripheral accesses,
+- better display of timers use.
 
-I believe we intended only to ship default bios images for virt and
-sifive_u. Spike bios image was not shipped in previous QEMU version
-too.
+Philippe Mathieu-Daudé (4):
+  hw/arm/nrf51: Add NRF51_PERIPHERAL_SIZE definition
+  hw/arm/nrf51_soc: Mark some peripherals as unimplemented
+  hw/timer/nrf51_timer: Display timer ID in trace events
+  hw/timer/nrf51_timer: Add trace event of counter value update
 
-> >
-> > -opensbi64-virt:
-> > +opensbi64-generic:
-> >         $(MAKE) -C opensbi \
-> >                 CROSS_COMPILE=$(riscv64_cross_prefix) \
-> > -               PLATFORM="qemu/virt"
-> > -       cp opensbi/build/platform/qemu/virt/firmware/fw_jump.bin ../pc-bios/opensbi-riscv64-virt-fw_jump.bin
-> > -
-> > -opensbi32-sifive_u:
-> > -       $(MAKE) -C opensbi \
-> > -               CROSS_COMPILE=$(riscv32_cross_prefix) \
-> > -               PLATFORM="sifive/fu540"
-> > -       cp opensbi/build/platform/sifive/fu540/firmware/fw_jump.bin ../pc-bios/opensbi-riscv32-sifive_u-fw_jump.bin
-> > -
-> > -opensbi64-sifive_u:
-> > -       $(MAKE) -C opensbi \
-> > -               CROSS_COMPILE=$(riscv64_cross_prefix) \
-> > -               PLATFORM="sifive/fu540"
-> > -       cp opensbi/build/platform/sifive/fu540/firmware/fw_jump.bin ../pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin
-> > +               PLATFORM="generic"
-> > +       cp opensbi/build/platform/generic/firmware/fw_jump.bin ../pc-bios/opensbi-riscv64-generic-fw_jump.bin
->
-> Same as above.
->
-> >
-> >  bios-microvm:
-> >         $(MAKE) -C qboot
-> > diff --git a/roms/opensbi b/roms/opensbi
-> > index 9f1b72c..4f18c6e 160000
-> > --- a/roms/opensbi
-> > +++ b/roms/opensbi
-> > @@ -1 +1 @@
-> > -Subproject commit 9f1b72ce66d659e91013b358939e832fb27223f5
-> > +Subproject commit 4f18c6e55049d858c62e87d2605dd41c06956e4e
-> > --
-> > 2.7.4
-> >
-> >
->
-> Otherwise looks good to me.
->
-> Reviewed-by: Anup Patel <anup@brainfault.org>
+ include/hw/arm/nrf51.h         |  7 +++++--
+ include/hw/i2c/microbit_i2c.h  |  2 +-
+ include/hw/timer/nrf51_timer.h |  1 +
+ hw/arm/nrf51_soc.c             | 20 ++++++++++++++++++--
+ hw/i2c/microbit_i2c.c          |  2 +-
+ hw/timer/nrf51_timer.c         | 14 +++++++++++---
+ hw/timer/trace-events          |  5 +++--
+ 7 files changed, 40 insertions(+), 11 deletions(-)
 
-Regards,
-Bin
+-- 
+2.21.3
+
 
