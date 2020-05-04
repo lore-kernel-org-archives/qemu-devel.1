@@ -2,89 +2,154 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA2DAC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 08:26:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BF34C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 08:34:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B439320746
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 08:26:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e8oKQMaU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B439320746
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 020E2206B9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 08:34:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 020E2206B9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVWRB-0001rd-Tb
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 04:26:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39176)
+	id 1jVWYm-0004lv-4P
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 04:34:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40222)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pkrempa@redhat.com>)
- id 1jVWPM-0000Ff-F1
- for qemu-devel@nongnu.org; Mon, 04 May 2020 04:25:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42261
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pkrempa@redhat.com>)
- id 1jVWPK-0007v1-V1
- for qemu-devel@nongnu.org; Mon, 04 May 2020 04:24:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588580697;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qorGcxSAjOIgJk/59eG7n1rtibQF5qfTSUT7p+Fnl2o=;
- b=e8oKQMaUYCT841O4dW9hNciR6XXyZpz/lT5QkaMtG/aFvtTM+10fVipMG1QgEWny99uhX8
- keam9m6mT2ptaqIZiheynccGlGR19w45hD6Wru0kY9QvM7CCpad59F/rPsfYSnGi1OjIU/
- QchFEVvZs5hm28XG3lmpM4PFunw/h+A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-362-48Sa7pq_MU6EwgkEL84gbQ-1; Mon, 04 May 2020 04:24:56 -0400
-X-MC-Unique: 48Sa7pq_MU6EwgkEL84gbQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 50E808014C0;
- Mon,  4 May 2020 08:24:55 +0000 (UTC)
-Received: from angien.pipo.sk (unknown [10.40.208.39])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A0045C1BD;
- Mon,  4 May 2020 08:24:42 +0000 (UTC)
-Date: Mon, 4 May 2020 10:24:39 +0200
-From: Peter Krempa <pkrempa@redhat.com>
+ (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
+ id 1jVWXd-0003ES-Kg; Mon, 04 May 2020 04:33:33 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54316
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
+ id 1jVWXc-0007NR-Dj; Mon, 04 May 2020 04:33:33 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 04482YCj094724; Mon, 4 May 2020 04:33:12 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 30s50fa8v0-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 04 May 2020 04:33:12 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04482j3o095794;
+ Mon, 4 May 2020 04:33:12 -0400
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com
+ [159.122.73.70])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 30s50fa8u4-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 04 May 2020 04:33:12 -0400
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+ by ppma01fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 0448TsH0005181;
+ Mon, 4 May 2020 08:33:10 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com
+ (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+ by ppma01fra.de.ibm.com with ESMTP id 30s0g59rrc-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 04 May 2020 08:33:10 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
+ [9.149.105.61])
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 0448X7KR53084360
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 4 May 2020 08:33:07 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C3FA411C064;
+ Mon,  4 May 2020 08:33:07 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3BF7611C050;
+ Mon,  4 May 2020 08:33:07 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.161.129])
+ by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon,  4 May 2020 08:33:07 +0000 (GMT)
+Subject: Re: [PATCH 08/17] s390x/cpumodel: Fix UI to CPU features
+ pcc-cmac-{aes,eaes}-256
 To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v4 00/34] Configurable policy for handling deprecated
- interfaces
-Message-ID: <20200504082439.GC2102825@angien.pipo.sk>
-References: <20200317115459.31821-1-armbru@redhat.com>
+References: <20200428163419.4483-1-armbru@redhat.com>
+ <20200428163419.4483-9-armbru@redhat.com>
+ <7ed42e2f-e437-3d06-e46b-5416e4d2a6d3@redhat.com>
+ <29392c1a-ec17-b846-b842-5bc2f07382e6@de.ibm.com>
+ <ac471bdd-675a-e620-d34a-56eabaa8c9af@de.ibm.com>
+ <87sggi6hod.fsf@dusky.pond.sub.org>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
+ J34pLNJDmDVEdeb+brtpwC9JEZOLVE0nb+SR83CsAINJYKG3V1b3Kfs0hydseYKsBYqJTN2j
+ CmUXDYq9J7uOyQQ7TNVoQejmpp5ifR4EzwIFfmYDekxRVZDJygD0wL/EzUr8Je3/j548NLyL
+ 4Uhv6CIPf3TY3/aLVKXdxz/ntbLgMcfZsDoHgDk3lY3r1iwbWwEM2+eYRdSZaR4VD+JRD7p8
+ 0FBadNwWnBce1fmQp3EklodGi5y7TNZ/CKdJ+jRPAAnw7SINhSd7PhJMruDAJaUlbYaIm23A
+ +82g+IGe4z9tRGQ9TAflezVMhT5J3ccu6cpIjjvwDlbxucSmtVi5VtPAMTLmfjYp7VY2Tgr+
+ T92v7+V96jAfE3Zy2nq52e8RDdUo/F6faxcumdl+aLhhKLXgrozpoe2nL0Nyc2uqFjkjwXXI
+ OBQiaqGeWtxeKJP+O8MIpjyGuHUGzvjNx5S/592TQO3phpT5IFWfMgbu4OreZ9yekDhf7Cvn
+ /fkYsiLDz9W6Clihd/xlpm79+jlhm4E3xBPiQOPCZowmHjx57mXVAypOP2Eu+i2nyQrkapaY
+ IdisDQfWPdNeHNOiPnPS3+GhVlPcqSJAIWnuO7Ofw1ZVOyg/jwARAQABzUNDaHJpc3RpYW4g
+ Qm9ybnRyYWVnZXIgKDJuZCBJQk0gYWRkcmVzcykgPGJvcm50cmFlZ2VyQGxpbnV4LmlibS5j
+ b20+wsF5BBMBAgAjBQJdP/hMAhsDBwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQEXu8
+ gLWmHHy/pA/+JHjpEnd01A0CCyfVnb5fmcOlQ0LdmoKWLWPvU840q65HycCBFTt6V62cDljB
+ kXFFxMNA4y/2wqU0H5/CiL963y3gWIiJsZa4ent+KrHl5GK1nIgbbesfJyA7JqlB0w/E/SuY
+ NRQwIWOo/uEvOgXnk/7+rtvBzNaPGoGiiV1LZzeaxBVWrqLtmdi1iulW/0X/AlQPuF9dD1Px
+ hx+0mPjZ8ClLpdSp5d0yfpwgHtM1B7KMuQPQZGFKMXXTUd3ceBUGGczsgIMipZWJukqMJiJj
+ QIMH0IN7XYErEnhf0GCxJ3xAn/J7iFpPFv8sFZTvukntJXSUssONnwiKuld6ttUaFhSuSoQg
+ OFYR5v7pOfinM0FcScPKTkrRsB5iUvpdthLq5qgwdQjmyINt3cb+5aSvBX2nNN135oGOtlb5
+ tf4dh00kUR8XFHRrFxXx4Dbaw4PKgV3QLIHKEENlqnthH5t0tahDygQPnSucuXbVQEcDZaL9
+ WgJqlRAAj0pG8M6JNU5+2ftTFXoTcoIUbb0KTOibaO9zHVeGegwAvPLLNlKHiHXcgLX1tkjC
+ DrvE2Z0e2/4q7wgZgn1kbvz7ZHQZB76OM2mjkFu7QNHlRJ2VXJA8tMXyTgBX6kq1cYMmd/Hl
+ OhFrAU3QO1SjCsXA2CDk9MM1471mYB3CTXQuKzXckJnxHkHOwU0ETpw8+AEQAJjyNXvMQdJN
+ t07BIPDtbAQk15FfB0hKuyZVs+0lsjPKBZCamAAexNRk11eVGXK/YrqwjChkk60rt3q5i42u
+ PpNMO9aS8cLPOfVft89Y654Qd3Rs1WRFIQq9xLjdLfHh0i0jMq5Ty+aiddSXpZ7oU6E+ud+X
+ Czs3k5RAnOdW6eV3+v10sUjEGiFNZwzN9Udd6PfKET0J70qjnpY3NuWn5Sp1ZEn6lkq2Zm+G
+ 9G3FlBRVClT30OWeiRHCYB6e6j1x1u/rSU4JiNYjPwSJA8EPKnt1s/Eeq37qXXvk+9DYiHdT
+ PcOa3aNCSbIygD3jyjkg6EV9ZLHibE2R/PMMid9FrqhKh/cwcYn9FrT0FE48/2IBW5mfDpAd
+ YvpawQlRz3XJr2rYZJwMUm1y+49+1ZmDclaF3s9dcz2JvuywNq78z/VsUfGz4Sbxy4ShpNpG
+ REojRcz/xOK+FqNuBk+HoWKw6OxgRzfNleDvScVmbY6cQQZfGx/T7xlgZjl5Mu/2z+ofeoxb
+ vWWM1YCJAT91GFvj29Wvm8OAPN/+SJj8LQazd9uGzVMTz6lFjVtH7YkeW/NZrP6znAwv5P1a
+ DdQfiB5F63AX++NlTiyA+GD/ggfRl68LheSskOcxDwgI5TqmaKtX1/8RkrLpnzO3evzkfJb1
+ D5qh3wM1t7PZ+JWTluSX8W25ABEBAAHCwV8EGAECAAkFAk6cPPgCGwwACgkQEXu8gLWmHHz8
+ 2w//VjRlX+tKF3szc0lQi4X0t+pf88uIsvR/a1GRZpppQbn1jgE44hgF559K6/yYemcvTR7r
+ 6Xt7cjWGS4wfaR0+pkWV+2dbw8Xi4DI07/fN00NoVEpYUUnOnupBgychtVpxkGqsplJZQpng
+ v6fauZtyEcUK3dLJH3TdVQDLbUcL4qZpzHbsuUnTWsmNmG4Vi0NsEt1xyd/Wuw+0kM/oFEH1
+ 4BN6X9xZcG8GYUbVUd8+bmio8ao8m0tzo4pseDZFo4ncDmlFWU6hHnAVfkAs4tqA6/fl7RLN
+ JuWBiOL/mP5B6HDQT9JsnaRdzqF73FnU2+WrZPjinHPLeE74istVgjbowvsgUqtzjPIG5pOj
+ cAsKoR0M1womzJVRfYauWhYiW/KeECklci4TPBDNx7YhahSUlexfoftltJA8swRshNA/M90/
+ i9zDo9ySSZHwsGxG06ZOH5/MzG6HpLja7g8NTgA0TD5YaFm/oOnsQVsf2DeAGPS2xNirmknD
+ jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
+ ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Message-ID: <1d77a725-0b2a-24df-5616-ddfe553c5242@de.ibm.com>
+Date: Mon, 4 May 2020 10:33:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200317115459.31821-1-armbru@redhat.com>
-X-PGP-Key-ID: 0xD018682B
-X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
-User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pkrempa@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 04:24:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <87sggi6hod.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-05-04_04:2020-05-01,
+ 2020-05-04 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0
+ clxscore=1015 impostorscore=0 adultscore=0 priorityscore=1501
+ malwarescore=0 phishscore=0 mlxscore=0 spamscore=0 mlxlogscore=999
+ bulkscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2005040064
+Received-SPF: pass client-ip=148.163.158.5;
+ envelope-from=borntraeger@de.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 02:46:56
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,78 +162,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>,
- libvir-list@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com,
- marcandre.lureau@gmail.com, libguestfs@redhat.com
+Cc: berrange@redhat.com, ehabkost@redhat.com,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+ qemu-s390x@nongnu.org, pbonzini@redhat.com,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 17, 2020 at 12:54:25 +0100, Markus Armbruster wrote:
-> This series extends QMP introspection to cover deprecation.
-> Additionally, new option -compat lets you configure what to do when
-> deprecated interfaces get used.  This is intended for testing users of
-> the management interfaces.  It is experimental.
->=20
-> -compat deprecated-input=3D<in-policy> configures what to do when
-> deprecated input is received.  Available policies:
->=20
-> * accept: Accept deprecated commands and arguments (default)
-> * reject: Reject them
-> * crash: Crash
 
-I've noticed that the 'crash' option doesn't manage to log the reason to
-stderr. Relevant section of libvirt's log file which agregates the
-stderr/out
 
-2020-04-30 13:24:22.006+0000: 2072883: debug : virCommandHandshakeChild:418=
- : Handshake with parent is done
-char device redirected to /dev/pts/0 (label charserial0)
-2020-04-30 13:24:31.879+0000: Domain id=3D4 is tainted: custom-monitor
-2020-04-30 13:24:32.330+0000: shutting down, reason=3Dcrashed
+On 02.05.20 07:15, Markus Armbruster wrote:
+> Christian Borntraeger <borntraeger@de.ibm.com> writes:
+> 
+>> On 29.04.20 10:54, Christian Borntraeger wrote:
+>>>
+>>>
+>>> On 28.04.20 19:13, David Hildenbrand wrote:
+>>>> On 28.04.20 18:34, Markus Armbruster wrote:
+>>>>> Both s390_features[S390_FEAT_PCC_CMAC_AES_256].name and
+>>>>> s390_features[S390_FEAT_PCC_CMAC_EAES_256].name is
+>>>>> "pcc-cmac-eaes-256".  The former is obviously a pasto.
+>>>>>
+>>>>> Impact:
+>>>>>
+>>>>> * s390_feat_bitmap_to_ascii() misidentifies S390_FEAT_PCC_CMAC_AES_256
+>>>>>   as "pcc-cmac-eaes-256".  Affects QMP commands query-cpu-definitions,
+>>>>>   query-cpu-model-expansion, query-cpu-model-baseline,
+>>>>>   query-cpu-model-comparison, and the error message when
+>>>>>   s390_realize_cpu_model() fails in check_compatibility().
+>>>>>
+>>>>> * s390_realize_cpu_model() misidentifies it in check_consistency()
+>>>>>   warnings.
+>>>>>
+>>>>> * s390_cpu_list() likewise.  Affects -cpu help.
+>>>>>
+>>>>> * s390_cpu_model_register_props() creates CPU property
+>>>>>   "pcc-cmac-eaes-256" twice.  The second one fails, but the error is
+>>>>>   ignored (a later commit will change that).  Results in a single
+>>>>>   property "pcc-cmac-eaes-256" with the description for
+>>>>>   S390_FEAT_PCC_CMAC_AES_256, and no property for
+>>>>>   S390_FEAT_PCC_CMAC_EAES_256.  CPU properties are visible in CLI -cpu
+>>>>>   and -device, QMP & HMP device_add, QMP device-list-properties, and
+>>>>>   QOM introspection.
+>>>>>
+>>>>> Fix by deleting the wayward 'e'.
+>>>>
+>>>> Very nice catch - thanks!
+>>>>
+>>>> While this sounds very bad, it's luckily not that bad in practice
+>>>> (currently).
+>>>>
+>>>> The feature (or rather, both features) is part of the feature group
+>>>> "msa4". As long as we have all sub-features part of that group (which is
+>>>> usually the case), we will always indicate "msa4" to the user, instead
+>>>> of all the separate sub-features. So, expansion, baseline, comparison
+>>>> will usually only work with "msa4".
+>>>>
+>>>> (in addition, current KVM is not capable of actually masking off these
+>>>> sub-features, so it will still, always see the feature, even if not
+>>>> explicitly specified via "-cpu X,pcc-cmac-aes-256=on)
+>>>>
+>>>> I think we should do stable backports.
+>>>
+>>> makes sense, but I would like to do some testing upfront (old QEMU <-> new QEMU
+>>
+>> So migration does work between a qemu with and without the patch for host-model and
+>> custom model=z14. 
+> 
+> Is this a Tested-by?
 
-'handshake' line is last of libvirt's messages pre-start of the qemu
-process. 'char device redirected' is reported by qemu. 'domain is
-tainted' is added by libvirt when I've issued the deprecated API via
-virsh qemu-monitor-command. 'reason=3Dcrashed' is added by libvirts VM
-shutdown hanlder.
-
->=20
-> -compat deprecated-output=3D<out-policy> configures what to do when
-> deprecated output is sent.  Available output policies:
->=20
-> * accept: Emit deprecated command results and events (default)
-> * hide: Suppress them
->=20
-> For now, -compat covers only deprecated syntactic aspects of QMP.  We
-> may want to extend it to cover semantic aspects, CLI, and experimental
-> features.
->=20
-> PATCH 01-04: Documentation fixes
-> PATCH 05-10: Test improvements
-> PATCH 11-24: Add feature flags to remaining user-defined types and to
->       =09     struct members
-> PATCH 25-26: New special feature 'deprecated', visible in
->       =09     introspection
-
-These are cool. I've added support for verifying that any command
-excercised by the libvirt unit test suite is not deprecated, or we at
-least know that it is and have a replacement.
-
-https://www.redhat.com/archives/libvir-list/2020-April/msg01444.html
-
-> PATCH 27-34: New -compat to set policy for handling stuff marked with
->       =09     feature 'deprecated'
-
-While implementing support for this feature I noticed that it's
-impossible for libvirt to detect that it's available. The idea is to
-make a developer-centred setting in our config which will enable the
-compat setting if available and ignore it if not available to prevent us
-having to fiddle with the settings when testing various qemu versions.
-
-Thanks!
-
-Peter
-
+Yes. As David pointed out when a user really starts to pick manual things in MSA4 then we
+can have a non-migrateable guests. But this is still the right thing I guess.
 
