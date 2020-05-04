@@ -2,113 +2,99 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6E22C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:02:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4CF4C47257
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:05:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7342B206D9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:02:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C34220721
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:05:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AUt0fXWa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7342B206D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AaZNrW8f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C34220721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVXvp-0007mZ-J4
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 06:02:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35534)
+	id 1jVXyV-00013V-Hz
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 06:05:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36062)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jVXv6-0007G8-Lm
- for qemu-devel@nongnu.org; Mon, 04 May 2020 06:01:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29329
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jVXv5-0000DO-Ib
- for qemu-devel@nongnu.org; Mon, 04 May 2020 06:01:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588586510;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=sHmLjvJiTLBXV5DlDOiqzShlGysf7d/xSfzgDXVPQog=;
- b=AUt0fXWa9HEqCqPBwNM0i0eRwC+zl/VtTCCbNHG5KnrBM0xww+wB/FJEFTu2AqAwEgQpSj
- b+l6tsYZb18OTT3THNSrjfAJZJawk2G5Aex+lcC7pqWmWKBE+hNxSdtl24R1I+6x6v7/uK
- fTsUhLfpzU0Lu7ZnvmXFyGGgrAxvKHU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-248-cf8JeDeFPdmBh7d8ASjhBw-1; Mon, 04 May 2020 06:01:46 -0400
-X-MC-Unique: cf8JeDeFPdmBh7d8ASjhBw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D654A107ACF2;
- Mon,  4 May 2020 10:01:45 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-219.ams2.redhat.com
- [10.36.113.219])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2C85E605D1;
- Mon,  4 May 2020 10:01:43 +0000 (UTC)
-Subject: Re: [PATCH v2 3/6] qemu-img: Add bitmap sub-command
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200421212019.170707-1-eblake@redhat.com>
- <20200421212019.170707-4-eblake@redhat.com>
- <1dcf85b6-d9e6-b952-537c-791daec34ad9@redhat.com>
- <9d4769d4-09ea-dced-d4bd-9ceb33044202@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <d7c63e6a-a4a8-5b75-5dec-e4f392b3035d@redhat.com>
-Date: Mon, 4 May 2020 12:01:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jVXxN-000068-0S
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 06:04:13 -0400
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:38491)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jVXxK-0001Sf-Ov
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 06:04:12 -0400
+Received: by mail-wm1-x335.google.com with SMTP id g12so8317914wmh.3
+ for <qemu-devel@nongnu.org>; Mon, 04 May 2020 03:04:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:message-id
+ :date:mime-version:content-transfer-encoding;
+ bh=RYxKIwn0G/aWlhAhk8evwDKbORQN+7I7j2SlpuDqiEM=;
+ b=AaZNrW8fxTmM8jLY5KhtgbzSwMIWRzDy9djxeQFnTQKQH3nVBZXB1igeZ/vWuHs3Nf
+ kszqWJdmMusv7DR4BPTu7hci/1yFGaFzSp1NtwBdJYJtRD+tpQXHAjZ1q/k6V4fOV/9h
+ ZStBsBVSnZc+wikoeop4QJDM9VrRsaaLHMV+Tzz3kjL/gfwmWW1LBPWo2cI+nI5ysx4C
+ wkFELls8iuHKNs2ZY9w8HwzTd3nJpbeZl1Vats15t/SYS3vqoL5mnoFa7m5mUXuuhp4W
+ LJXx+kdD4vOrQgjMroDfkijoFQdcCAa2LHfhWuqUFmF+FGINoqExncnBxuUyd7MMarbw
+ T/+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:message-id:date:mime-version:content-transfer-encoding;
+ bh=RYxKIwn0G/aWlhAhk8evwDKbORQN+7I7j2SlpuDqiEM=;
+ b=QpI5jsm+00S58/TTNK5KPtn+Kk1RXc2YEmQeQjgDgtPh8VjN6Y5oBrDAWsJu+7X5vM
+ erWqgi+OOw9lYjMec87VBM0rbjhIKJ3TKwsSFqueoH/sFVadf9ZTJ9VcNYRfVvu4Y4WW
+ puX2CKYWrL6pW9eblUOJdglhsxKbRzEJOuY/Z8inIi2Dkdv5ADXSWkk2jEmgh5IuCCDw
+ thJn4ghAc+EBk6GxYkvGIKSwZa/rTbtP3SraJ5xo5Ygru3aWWPVIGLDC1GKid5N+LC+Z
+ BtCpbD8rMQN2wXnyfo2iM4JzJtcF9VWXo58IFEKd3fJiX+3502hqS/TVfrsiaohMQXI3
+ iibA==
+X-Gm-Message-State: AGi0PubDoEPZTxw5ZRF2+mElovpqto3faWFHTaHMNS+wJJ67WNyKu+Rd
+ obzcGdcRA+0IXwwe+DxtFCStcg==
+X-Google-Smtp-Source: APiQypJgBPyMJBuX63AhUbvzYUnvyNR9jvsHkN78DSnB9dld4lhGQ7oegDje/IQreckrZmvHOTGfhg==
+X-Received: by 2002:a1c:9e43:: with SMTP id h64mr13501019wme.0.1588586647998; 
+ Mon, 04 May 2020 03:04:07 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id 1sm13133134wmz.13.2020.05.04.03.04.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 04 May 2020 03:04:06 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id D9B221FF7E;
+ Mon,  4 May 2020 11:04:05 +0100 (BST)
+References: <CAE2XoE-XFG8r85yPOhuNS2YUMqhp70q1RXCy+KLT79doW8qHMg@mail.gmail.com>
+ <87605674-1cd8-2074-6730-355e20fbf7d0@linaro.org>
+ <CAE2XoE8LO-4Ordhxf1-eNZK1taSGnaU4zxQ944-XLvwzmd9rJg@mail.gmail.com>
+ <alpine.BSF.2.22.395.2005040128330.7227@zero.eik.bme.hu>
+ <CAE2XoE93HqZVvFkZzfuC1VsF-Vw88ggSYMU2t7QjPUPWSU-4-Q@mail.gmail.com>
+User-agent: mu4e 1.4.4; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: luoyonggang@gmail.com
+Subject: Re: An first try to improve PPC float simulation, not even
+ compiled. Just ask question.
+In-reply-to: <CAE2XoE93HqZVvFkZzfuC1VsF-Vw88ggSYMU2t7QjPUPWSU-4-Q@mail.gmail.com>
+Message-ID: <87v9lc584q.fsf@linaro.org>
+Date: Mon, 04 May 2020 11:04:05 +0100
 MIME-Version: 1.0
-In-Reply-To: <9d4769d4-09ea-dced-d4bd-9ceb33044202@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="H18So8ArpdNj5kUmaFyLbi6FAt7zj7PeY"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 04:24:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::335;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x335.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -121,329 +107,611 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
+Cc: qemu-ppc@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---H18So8ArpdNj5kUmaFyLbi6FAt7zj7PeY
-Content-Type: multipart/mixed; boundary="DfyB2JLC08r6FZEeBjWgldlJtCiaMbRJk"
 
---DfyB2JLC08r6FZEeBjWgldlJtCiaMbRJk
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+=E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) <luoyonggang@gmail.com> writes:
 
-On 30.04.20 17:21, Eric Blake wrote:
-> On 4/30/20 9:55 AM, Max Reitz wrote:
->> On 21.04.20 23:20, Eric Blake wrote:
->>> Include actions for --add, --remove, --clear, --enable, --disable, and
->>> --merge (note that --clear is a bit of fluff, because the same can be
->>> accomplished by removing a bitmap and then adding a new one in its
->>> place,
+> On Mon, May 4, 2020 at 7:40 AM BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>
+>> Hello,
 >>
->> Well, ideally, all of qemu-img is just fluff because =E2=80=9Cthe same c=
-an be
->> accomplished by launching qemu and issuing the equivalent QMP
->> commands=E2=80=9D. :)
+>> On Mon, 4 May 2020, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
+>> > Hello Richard, Can you have a look at the following patch, and was that
+>> are
+>> > the right direction?
 >>
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 but it matches what QMP comm=
-ands exist).=C2=A0 Listing is omitted,
->>> because it does not require a bitmap name and because it was already
->>> possible with 'qemu-img info'.
+>> Formatting of the patch is broken by your mailer, try sending it with
+>> something that does not change it otherwise it's a bit hard to read.
 >>
->> Fair enough, although it can be said that qemu-img info=E2=80=99s output=
- is
->> qcow2-specific.=C2=A0 It might be nice to have some definitely
->> format-independent output.=C2=A0 (But we don=E2=80=99t have persistent b=
-itmaps in
->> anything but qcow2 yet (or do we in NBD?), so I don=E2=80=99t expect any=
-one to
->> care much.)
->=20
-> We can add a list subcommand later if it is still desired.=C2=A0 I agree =
-that
-> a tabular format:
->=20
-> name=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 enabled=C2=A0=
-=C2=A0 granularity
-> bitmap1=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 false=C2=A0=C2=A0=C2=A0=C2=A0=
- 65536
-> bitmap2=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 true=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 512
->=20
-> in isolation is easier to read than:
->=20
-> =C2=A0=C2=A0=C2=A0 bitmaps:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [0]:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 flags:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name: =
-bitmap1
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 granul=
-arity: 65536
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [1]:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 flags:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 [0]: auto
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name: =
-bitmap2
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 granul=
-arity: 512
->=20
-> embedded inside even more information.
->=20
+>> Richard suggested to add an assert to check the fp_status is correctly
+>> cleared in place of helper_reset_fpstatus first for debugging so you cou=
+ld
+>> change the helper accordingly before deleting it and run a few tests to
+>> verify it still works. You'll need get some tests and benchmarks working
+>> to be able to verify your changes that's why I've said that would be step
+>> 0. If you checked that it still produces the same results and the assert
+>> does not trigger then you can remove the helper.
 >>
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Merge can work either from=
- another
->>> bitmap in the same image, or from a bitmap in a distinct image.
->>>
->>> While this supports --image-opts for the file being modified, I did
->>> not think it worth the extra complexity to support that for the source
->>> file in a cross-file bitmap merge.=C2=A0 Likewise, I chose to have --me=
-rge
->>> only take a single source rather than following the QMP support for
->>> multiple merges in one go; in part to simplify the command line, and
->>> in part because an offline image can achieve the same effect by
->>> multiple qemu-img bitmap --merge calls.=C2=A0 We can enhance that if ne=
-eded
->>> in the future (the same way that 'qemu-img convert' has a mode that
->>> concatenates multiple sources into one destination).
->>>
->>> Upcoming patches will add iotest coverage of these commands while
->>> also testing other features.
->>>
->>> Signed-off-by: Eric Blake <eblake@redhat.com>
->>> ---
->>> =C2=A0 docs/tools/qemu-img.rst |=C2=A0 24 +++++
->>> =C2=A0 qemu-img.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 | 198 ++++++++++++++++++++++++++++++++++++++++
->>> =C2=A0 qemu-img-cmds.hx=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=
-=A0=C2=A0 7 ++
->>> =C2=A0 3 files changed, 229 insertions(+)
->>>
->>> diff --git a/docs/tools/qemu-img.rst b/docs/tools/qemu-img.rst
->>> index 7d08c48d308f..4f3b0e2c9ace 100644
->>> --- a/docs/tools/qemu-img.rst
->>> +++ b/docs/tools/qemu-img.rst
->>> @@ -281,6 +281,30 @@ Command description:
->>> =C2=A0=C2=A0=C2=A0 For write tests, by default a buffer filled with zer=
-os is
->>> written. This can be
->>> =C2=A0=C2=A0=C2=A0 overridden with a pattern byte specified by *PATTERN=
-*.
->>>
->>> +.. option:: bitmap {--add [-g GRANULARITY] [--disabled] | --remove |
->>> --clear | --enable | --disable | --merge SOURCE_BITMAP [-b
->>> SOURCE_FILE [-F SOURCE_FMT]]} [--object OBJECTDEF] [--image-opts] [-f
->>> FMT] FILENAME BITMAP
+> That's what I need help,
+> 1. How to write a assert to replace helper_reset_fpstatus .
+>   just directly assert? or something else
+> 2.  a few tests to run
+>  How to running these tests, and where are these tests.
+
+All the softfloat testing is currently done in tests/fp. I think you
+need to make a new version of fp-test.c (fp-test-native.c?) that instead
+of comparing the qemu softfloat functions with TestFloats runs the
+native functions (as emitted by the compiler). That should pass when run
+on real hardware and we can compare when run under emulation.=20
+
+> Do I need to add new tests? Where to start
+> 3.  Benchmarks
+
+fp-bench is the raw benchmarking app which again can be built for a
+guest architecture to measure throughput under emulation.
+
+> Same as 2
+>
 >>
->> So I can do multiple operations in one roll, but they all use the same
->> BITMAP?=C2=A0 Sounds a bit weird.=C2=A0 It actually took me a while to u=
-nderstands
->> this, because I thought for sure that each command would take a bitmap
->> name.=C2=A0 (And was ready to complain that it looked like they don=E2=
-=80=99t, but,
->> well, that=E2=80=99s because they don=E2=80=99t.)
->=20
-> All of the operations take one bitmap name (the final BITMAP).
-> Additionally, the --merge operation takes a second bitmap name
-> (SOURCE_BITMAP).=C2=A0 None of the other operations need a second bitmap
-> name, so only --merge requires an option argument.=C2=A0 As written, the =
-{ a
-> | b | c } implies that operations are mutually exclusive: you can only
-> request one operation per qemu-img invocation.
-
-Well, as I found out later it=E2=80=99s supposed to imply that.  I always e=
-xpect
-{} to mean repetition.
-
->> Although I suppose some practical example like
+>> Regards,
+>> BALATON Zoltan
 >>
->> $ qemu-img bitmap --add --merge sbmap --disable foo.qcow2 nbmap
->>
->> does make sense.[1]
->>
->>
->> Would
->>
->> $ qemu-img bitmap --add nbmap --merge nbmap sbmap --enable nbmap \
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 foo.qcow2
->>
->> make more sense?
->=20
-> That would be more transactional, and more effort to implement.
+>> > From b4d6ca1d6376fab1f1be06eb472e10b908887c2b Mon Sep 17 00:00:00 2001
+>> > From: Yonggang Luo <luoyonggang@gmail.com>
+>> > Date: Sat, 2 May 2020 05:59:25 +0800
+>> > Subject: [PATCH] [ppc fp] Step 1. Rearrange the fp helpers to eliminate
+>> > helper_reset_fpstatus(). I've mentioned this before, that it's possible
+>> to
+>> > leave the steady-state of env->fp_status.exception_flags =3D=3D 0, so =
+there's
+>> > no
+>> > need for a separate function call.  I suspect this is worth a decent
+>> > speedup
+>> > by itself.
+>> >
+>> > ---
+>> > target/ppc/fpu_helper.c            | 53 ++----------------------------
+>> > target/ppc/helper.h                |  1 -
+>> > target/ppc/translate/fp-impl.inc.c | 23 -------------
+>> > 3 files changed, 3 insertions(+), 74 deletions(-)
+>> >
+>> > diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+>> > index d9a8773ee1..4fc5a7ff1c 100644
+>> > --- a/target/ppc/fpu_helper.c
+>> > +++ b/target/ppc/fpu_helper.c
+>> > @@ -821,6 +821,9 @@ static void do_float_check_status(CPUPPCState *env,
+>> > uintptr_t raddr)
+>> >                                    env->error_code, raddr);
+>> >         }
+>> >     }
+>> > +    if (status) {
+>> > +        set_float_exception_flags(0, &env->fp_status);
+>> > +    }
+>> > }
+>> >
+>> > void helper_float_check_status(CPUPPCState *env)
+>> > @@ -828,11 +831,6 @@ void helper_float_check_status(CPUPPCState *env)
+>> >     do_float_check_status(env, GETPC());
+>> > }
+>> >
+>> > -void helper_reset_fpstatus(CPUPPCState *env)
+>> > -{
+>> > -    set_float_exception_flags(0, &env->fp_status);
+>> > -}
+>> > -
+>> > static void float_invalid_op_addsub(CPUPPCState *env, bool set_fpcc,
+>> >                                     uintptr_t retaddr, int classes)
+>> > {
+>> > @@ -2110,9 +2108,6 @@ void helper_##name(CPUPPCState *env, ppc_vsr_t *=
+xt,
+>> >                       \
+>> > {
+>> >   \
+>> >     ppc_vsr_t t =3D *xt;
+>> >  \
+>> >     int i;
+>> >  \
+>> > -
+>> >  \
+>> > -    helper_reset_fpstatus(env);
+>> >   \
+>> > -
+>> >  \
+>> >     for (i =3D 0; i < nels; i++) {
+>> >  \
+>> >         float_status tstat =3D env->fp_status;
+>> >  \
+>> >         set_float_exception_flags(0, &tstat);
+>> >   \
+>> > @@ -2152,8 +2147,6 @@ void helper_xsaddqp(CPUPPCState *env, uint32_t
+>> opcode,
+>> >     ppc_vsr_t t =3D *xt;
+>> >     float_status tstat;
+>> >
+>> > -    helper_reset_fpstatus(env);
+>> > -
+>> >     tstat =3D env->fp_status;
+>> >     if (unlikely(Rc(opcode) !=3D 0)) {
+>> >         tstat.float_rounding_mode =3D float_round_to_odd;
+>> > @@ -2189,9 +2182,6 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,
+>> >                       \
+>> > {
+>> >   \
+>> >     ppc_vsr_t t =3D *xt;
+>> >  \
+>> >     int i;
+>> >  \
+>> > -
+>> >  \
+>> > -    helper_reset_fpstatus(env);
+>> >   \
+>> > -
+>> >  \
+>> >     for (i =3D 0; i < nels; i++) {
+>> >  \
+>> >         float_status tstat =3D env->fp_status;
+>> >  \
+>> >         set_float_exception_flags(0, &tstat);
+>> >   \
+>> > @@ -2228,13 +2218,11 @@ void helper_xsmulqp(CPUPPCState *env, uint32_t
+>> > opcode,
+>> >     ppc_vsr_t t =3D *xt;
+>> >     float_status tstat;
+>> >
+>> > -    helper_reset_fpstatus(env);
+>> >     tstat =3D env->fp_status;
+>> >     if (unlikely(Rc(opcode) !=3D 0)) {
+>> >         tstat.float_rounding_mode =3D float_round_to_odd;
+>> >     }
+>> >
+>> > -    set_float_exception_flags(0, &tstat);
+>> >     t.f128 =3D float128_mul(xa->f128, xb->f128, &tstat);
+>> >     env->fp_status.float_exception_flags |=3D tstat.float_exception_fl=
+ags;
+>> >
+>> > @@ -2263,9 +2251,6 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,
+>> >                        \
+>> > {
+>> >    \
+>> >     ppc_vsr_t t =3D *xt;
+>> >   \
+>> >     int i;
+>> >   \
+>> > -
+>> >   \
+>> > -    helper_reset_fpstatus(env);
+>> >    \
+>> > -
+>> >   \
+>> >     for (i =3D 0; i < nels; i++) {
+>> >   \
+>> >         float_status tstat =3D env->fp_status;
+>> >   \
+>> >         set_float_exception_flags(0, &tstat);
+>> >    \
+>> > @@ -2305,7 +2290,6 @@ void helper_xsdivqp(CPUPPCState *env, uint32_t
+>> opcode,
+>> >     ppc_vsr_t t =3D *xt;
+>> >     float_status tstat;
+>> >
+>> > -    helper_reset_fpstatus(env);
+>> >     tstat =3D env->fp_status;
+>> >     if (unlikely(Rc(opcode) !=3D 0)) {
+>> >         tstat.float_rounding_mode =3D float_round_to_odd;
+>> > @@ -2342,9 +2326,6 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,
+>> > ppc_vsr_t *xb)              \
+>> > {
+>> >    \
+>> >     ppc_vsr_t t =3D *xt;
+>> >   \
+>> >     int i;
+>> >   \
+>> > -
+>> >   \
+>> > -    helper_reset_fpstatus(env);
+>> >    \
+>> > -
+>> >   \
+>> >     for (i =3D 0; i < nels; i++) {
+>> >   \
+>> >         if (unlikely(tp##_is_signaling_nan(xb->fld, &env->fp_status)))=
+ {
+>> >   \
+>> >             float_invalid_op_vxsnan(env, GETPC());
+>> >   \
+>> > @@ -2382,9 +2363,6 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,
+>> > ppc_vsr_t *xb)             \
+>> > {
+>> >   \
+>> >     ppc_vsr_t t =3D *xt;
+>> >  \
+>> >     int i;
+>> >  \
+>> > -
+>> >  \
+>> > -    helper_reset_fpstatus(env);
+>> >   \
+>> > -
+>> >  \
+>> >     for (i =3D 0; i < nels; i++) {
+>> >  \
+>> >         float_status tstat =3D env->fp_status;
+>> >  \
+>> >         set_float_exception_flags(0, &tstat);
+>> >   \
+>> > @@ -2430,9 +2408,6 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,
+>> > ppc_vsr_t *xb)             \
+>> > {
+>> >   \
+>> >     ppc_vsr_t t =3D *xt;
+>> >  \
+>> >     int i;
+>> >  \
+>> > -
+>> >  \
+>> > -    helper_reset_fpstatus(env);
+>> >   \
+>> > -
+>> >  \
+>> >     for (i =3D 0; i < nels; i++) {
+>> >  \
+>> >         float_status tstat =3D env->fp_status;
+>> >  \
+>> >         set_float_exception_flags(0, &tstat);
+>> >   \
+>> > @@ -2592,9 +2567,6 @@ void helper_##op(CPUPPCState *env, ppc_vsr_t *xt,
+>> >                        \
+>> > {
+>> >    \
+>> >     ppc_vsr_t t =3D *xt;
+>> >   \
+>> >     int i;
+>> >   \
+>> > -
+>> >   \
+>> > -    helper_reset_fpstatus(env);
+>> >    \
+>> > -
+>> >   \
+>> >     for (i =3D 0; i < nels; i++) {
+>> >   \
+>> >         float_status tstat =3D env->fp_status;
+>> >   \
+>> >         set_float_exception_flags(0, &tstat);
+>> >    \
+>> > @@ -2765,9 +2737,6 @@ void helper_##op(CPUPPCState *env, uint32_t opco=
+de,
+>> >                   \
+>> > {
+>> \
+>> >     uint32_t cc =3D 0;
+>>  \
+>> >     bool vxsnan_flag =3D false, vxvc_flag =3D false;
+>>  \
+>> > -
+>>  \
+>> > -    helper_reset_fpstatus(env);
+>>   \
+>> > -
+>>  \
+>> >     if (float64_is_signaling_nan(xa->VsrD(0), &env->fp_status) ||
+>> \
+>> >         float64_is_signaling_nan(xb->VsrD(0), &env->fp_status)) {
+>> \
+>> >         vxsnan_flag =3D true;
+>> \
+>> > @@ -2813,9 +2782,6 @@ void helper_##op(CPUPPCState *env, uint32_t opco=
+de,
+>> >                  \
+>> > {                                                                     =
+  \
+>> >     uint32_t cc =3D 0;                                                =
+    \
+>> >     bool vxsnan_flag =3D false, vxvc_flag =3D false;                  =
+      \
+>> > -
+>> \
+>> > -    helper_reset_fpstatus(env);
+>>  \
+>> > -
+>> \
+>> >     if (float128_is_signaling_nan(xa->f128, &env->fp_status) ||       =
+  \
+>> >         float128_is_signaling_nan(xb->f128, &env->fp_status)) {       =
+  \
+>> >         vxsnan_flag =3D true;                                         =
+    \
+>> > @@ -3177,9 +3143,6 @@ uint64_t helper_xscvdpspn(CPUPPCState *env,
+>> uint64_t
+>> > xb)
+>> > {
+>> >     uint64_t result, sign, exp, frac;
+>> >
+>> > -    float_status tstat =3D env->fp_status;
+>> > -    set_float_exception_flags(0, &tstat);
+>> > -
+>> >     sign =3D extract64(xb, 63,  1);
+>> >     exp  =3D extract64(xb, 52, 11);
+>> >     frac =3D extract64(xb,  0, 52) | 0x10000000000000ULL;
+>> > @@ -3446,8 +3409,6 @@ VSX_ROUND(xvrspiz, 4, float32, VsrW(i),
+>> > float_round_to_zero, 0)
+>> >
+>> > uint64_t helper_xsrsp(CPUPPCState *env, uint64_t xb)
+>> > {
+>> > -    helper_reset_fpstatus(env);
+>> > -
+>> >     uint64_t xt =3D helper_frsp(env, xb);
+>> >
+>> >     helper_compute_fprf_float64(env, xt);
+>> > @@ -3593,8 +3554,6 @@ void helper_xsrqpi(CPUPPCState *env, uint32_t
+>> opcode,
+>> >     uint8_t rmode =3D 0;
+>> >     float_status tstat;
+>> >
+>> > -    helper_reset_fpstatus(env);
+>> > -
+>> >     if (r =3D=3D 0 && rmc =3D=3D 0) {
+>> >         rmode =3D float_round_ties_away;
+>> >     } else if (r =3D=3D 0 && rmc =3D=3D 0x3) {
+>> > @@ -3650,8 +3609,6 @@ void helper_xsrqpxp(CPUPPCState *env, uint32_t
+>> opcode,
+>> >     floatx80 round_res;
+>> >     float_status tstat;
+>> >
+>> > -    helper_reset_fpstatus(env);
+>> > -
+>> >     if (r =3D=3D 0 && rmc =3D=3D 0) {
+>> >         rmode =3D float_round_ties_away;
+>> >     } else if (r =3D=3D 0 && rmc =3D=3D 0x3) {
+>> > @@ -3700,8 +3657,6 @@ void helper_xssqrtqp(CPUPPCState *env, uint32_t
+>> > opcode,
+>> >     ppc_vsr_t t =3D { };
+>> >     float_status tstat;
+>> >
+>> > -    helper_reset_fpstatus(env);
+>> > -
+>> >     tstat =3D env->fp_status;
+>> >     if (unlikely(Rc(opcode) !=3D 0)) {
+>> >         tstat.float_rounding_mode =3D float_round_to_odd;
+>> > @@ -3734,8 +3689,6 @@ void helper_xssubqp(CPUPPCState *env, uint32_t
+>> opcode,
+>> >     ppc_vsr_t t =3D *xt;
+>> >     float_status tstat;
+>> >
+>> > -    helper_reset_fpstatus(env);
+>> > -
+>> >     tstat =3D env->fp_status;
+>> >     if (unlikely(Rc(opcode) !=3D 0)) {
+>> >         tstat.float_rounding_mode =3D float_round_to_odd;
+>> > diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+>> > index 4e192de97b..b486c9991f 100644
+>> > --- a/target/ppc/helper.h
+>> > +++ b/target/ppc/helper.h
+>> > @@ -58,7 +58,6 @@ DEF_HELPER_FLAGS_1(cntlzw32, TCG_CALL_NO_RWG_SE, i32,
+>> i32)
+>> > DEF_HELPER_FLAGS_2(brinc, TCG_CALL_NO_RWG_SE, tl, tl, tl)
+>> >
+>> > DEF_HELPER_1(float_check_status, void, env)
+>> > -DEF_HELPER_1(reset_fpstatus, void, env)
+>> > DEF_HELPER_2(compute_fprf_float64, void, env, i64)
+>> > DEF_HELPER_3(store_fpscr, void, env, i64, i32)
+>> > DEF_HELPER_2(fpscr_clrbit, void, env, i32)
+>> > diff --git a/target/ppc/translate/fp-impl.inc.c
+>> > b/target/ppc/translate/fp-impl.inc.c
+>> > index e18e268fe5..5e8cd9970e 100644
+>> > --- a/target/ppc/translate/fp-impl.inc.c
+>> > +++ b/target/ppc/translate/fp-impl.inc.c
+>> > @@ -4,11 +4,6 @@
+>> >  * Standard FPU translation
+>> >  */
+>> >
+>> > -static inline void gen_reset_fpstatus(void)
+>> > -{
+>> > -    gen_helper_reset_fpstatus(cpu_env);
+>> > -}
+>> > -
+>> > static inline void gen_compute_fprf_float64(TCGv_i64 arg)
+>> > {
+>> >     gen_helper_compute_fprf_float64(cpu_env, arg);
+>> > @@ -48,7 +43,6 @@ static void gen_f##name(DisasContext *ctx)
+>> >                     \
+>> >     t3 =3D tcg_temp_new_i64();
+>> >   \
+>> >     /* NIP cannot be restored if the memory exception comes from an
+>> helper
+>> > */ \
+>> >     gen_update_nip(ctx, ctx->base.pc_next - 4);
+>> >    \
+>> > -    gen_reset_fpstatus();
+>> >    \
+>> >     get_fpr(t0, rA(ctx->opcode));
+>> >    \
+>> >     get_fpr(t1, rC(ctx->opcode));
+>> >    \
+>> >     get_fpr(t2, rB(ctx->opcode));
+>> >    \
+>> > @@ -88,7 +82,6 @@ static void gen_f##name(DisasContext *ctx)
+>> >                     \
+>> >     t2 =3D tcg_temp_new_i64();
+>> >   \
+>> >     /* NIP cannot be restored if the memory exception comes from an
+>> helper
+>> > */ \
+>> >     gen_update_nip(ctx, ctx->base.pc_next - 4);
+>> >    \
+>> > -    gen_reset_fpstatus();
+>> >    \
+>> >     get_fpr(t0, rA(ctx->opcode));
+>> >    \
+>> >     get_fpr(t1, rB(ctx->opcode));
+>> >    \
+>> >     gen_helper_f##op(t2, cpu_env, t0, t1);
+>> >   \
+>> > @@ -123,7 +116,6 @@ static void gen_f##name(DisasContext *ctx)
+>> >                       \
+>> >     t0 =3D tcg_temp_new_i64();
+>> >   \
+>> >     t1 =3D tcg_temp_new_i64();
+>> >   \
+>> >     t2 =3D tcg_temp_new_i64();
+>> >   \
+>> > -    gen_reset_fpstatus();
+>> >    \
+>> >     get_fpr(t0, rA(ctx->opcode));
+>> >    \
+>> >     get_fpr(t1, rC(ctx->opcode));
+>> >    \
+>> >     gen_helper_f##op(t2, cpu_env, t0, t1);
+>> >   \
+>> > @@ -156,7 +148,6 @@ static void gen_f##name(DisasContext *ctx)
+>> >                       \
+>> >     }
+>> >    \
+>> >     t0 =3D tcg_temp_new_i64();
+>> >   \
+>> >     t1 =3D tcg_temp_new_i64();
+>> >   \
+>> > -    gen_reset_fpstatus();
+>> >    \
+>> >     get_fpr(t0, rB(ctx->opcode));
+>> >    \
+>> >     gen_helper_f##name(t1, cpu_env, t0);
+>> >   \
+>> >     set_fpr(rD(ctx->opcode), t1);
+>> >    \
+>> > @@ -181,7 +172,6 @@ static void gen_f##name(DisasContext *ctx)
+>> >                       \
+>> >     }
+>> >    \
+>> >     t0 =3D tcg_temp_new_i64();
+>> >   \
+>> >     t1 =3D tcg_temp_new_i64();
+>> >   \
+>> > -    gen_reset_fpstatus();
+>> >    \
+>> >     get_fpr(t0, rB(ctx->opcode));
+>> >    \
+>> >     gen_helper_f##name(t1, cpu_env, t0);
+>> >   \
+>> >     set_fpr(rD(ctx->opcode), t1);
+>> >    \
+>> > @@ -222,7 +212,6 @@ static void gen_frsqrtes(DisasContext *ctx)
+>> >     }
+>> >     t0 =3D tcg_temp_new_i64();
+>> >     t1 =3D tcg_temp_new_i64();
+>> > -    gen_reset_fpstatus();
+>> >     get_fpr(t0, rB(ctx->opcode));
+>> >     gen_helper_frsqrte(t1, cpu_env, t0);
+>> >     gen_helper_frsp(t1, cpu_env, t1);
+>> > @@ -252,7 +241,6 @@ static void gen_fsqrt(DisasContext *ctx)
+>> >     }
+>> >     t0 =3D tcg_temp_new_i64();
+>> >     t1 =3D tcg_temp_new_i64();
+>> > -    gen_reset_fpstatus();
+>> >     get_fpr(t0, rB(ctx->opcode));
+>> >     gen_helper_fsqrt(t1, cpu_env, t0);
+>> >     set_fpr(rD(ctx->opcode), t1);
+>> > @@ -274,7 +262,6 @@ static void gen_fsqrts(DisasContext *ctx)
+>> >     }
+>> >     t0 =3D tcg_temp_new_i64();
+>> >     t1 =3D tcg_temp_new_i64();
+>> > -    gen_reset_fpstatus();
+>> >     get_fpr(t0, rB(ctx->opcode));
+>> >     gen_helper_fsqrt(t1, cpu_env, t0);
+>> >     gen_helper_frsp(t1, cpu_env, t1);
+>> > @@ -380,7 +367,6 @@ static void gen_fcmpo(DisasContext *ctx)
+>> >     }
+>> >     t0 =3D tcg_temp_new_i64();
+>> >     t1 =3D tcg_temp_new_i64();
+>> > -    gen_reset_fpstatus();
+>> >     crf =3D tcg_const_i32(crfD(ctx->opcode));
+>> >     get_fpr(t0, rA(ctx->opcode));
+>> >     get_fpr(t1, rB(ctx->opcode));
+>> > @@ -403,7 +389,6 @@ static void gen_fcmpu(DisasContext *ctx)
+>> >     }
+>> >     t0 =3D tcg_temp_new_i64();
+>> >     t1 =3D tcg_temp_new_i64();
+>> > -    gen_reset_fpstatus();
+>> >     crf =3D tcg_const_i32(crfD(ctx->opcode));
+>> >     get_fpr(t0, rA(ctx->opcode));
+>> >     get_fpr(t1, rB(ctx->opcode));
+>> > @@ -612,7 +597,6 @@ static void gen_mffs(DisasContext *ctx)
+>> >         return;
+>> >     }
+>> >     t0 =3D tcg_temp_new_i64();
+>> > -    gen_reset_fpstatus();
+>> >     tcg_gen_extu_tl_i64(t0, cpu_fpscr);
+>> >     set_fpr(rD(ctx->opcode), t0);
+>> >     if (unlikely(Rc(ctx->opcode))) {
+>> > @@ -635,7 +619,6 @@ static void gen_mffsl(DisasContext *ctx)
+>> >         return;
+>> >     }
+>> >     t0 =3D tcg_temp_new_i64();
+>> > -    gen_reset_fpstatus();
+>> >     tcg_gen_extu_tl_i64(t0, cpu_fpscr);
+>> >     /* Mask everything except mode, status, and enables.  */
+>> >     tcg_gen_andi_i64(t0, t0, FP_DRN | FP_STATUS | FP_ENABLES | FP_RN);
+>> > @@ -660,7 +643,6 @@ static void gen_mffsce(DisasContext *ctx)
+>> >
+>> >     t0 =3D tcg_temp_new_i64();
+>> >
+>> > -    gen_reset_fpstatus();
+>> >     tcg_gen_extu_tl_i64(t0, cpu_fpscr);
+>> >     set_fpr(rD(ctx->opcode), t0);
+>> >
+>> > @@ -678,7 +660,6 @@ static void gen_helper_mffscrn(DisasContext *ctx,
+>> > TCGv_i64 t1)
+>> >     TCGv_i64 t0 =3D tcg_temp_new_i64();
+>> >     TCGv_i32 mask =3D tcg_const_i32(0x0001);
+>> >
+>> > -    gen_reset_fpstatus();
+>> >     tcg_gen_extu_tl_i64(t0, cpu_fpscr);
+>> >     tcg_gen_andi_i64(t0, t0, FP_DRN | FP_ENABLES | FP_RN);
+>> >     set_fpr(rD(ctx->opcode), t0);
+>> > @@ -750,7 +731,6 @@ static void gen_mtfsb0(DisasContext *ctx)
+>> >         return;
+>> >     }
+>> >     crb =3D 31 - crbD(ctx->opcode);
+>> > -    gen_reset_fpstatus();
+>> >     if (likely(crb !=3D FPSCR_FEX && crb !=3D FPSCR_VX)) {
+>> >         TCGv_i32 t0;
+>> >         t0 =3D tcg_const_i32(crb);
+>> > @@ -773,7 +753,6 @@ static void gen_mtfsb1(DisasContext *ctx)
+>> >         return;
+>> >     }
+>> >     crb =3D 31 - crbD(ctx->opcode);
+>> > -    gen_reset_fpstatus();
+>> >     /* XXX: we pretend we can only do IEEE floating-point computations=
+ */
+>> >     if (likely(crb !=3D FPSCR_FEX && crb !=3D FPSCR_VX && crb !=3D FPS=
+CR_NI)) {
+>> >         TCGv_i32 t0;
+>> > @@ -807,7 +786,6 @@ static void gen_mtfsf(DisasContext *ctx)
+>> >         gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);
+>> >         return;
+>> >     }
+>> > -    gen_reset_fpstatus();
+>> >     if (l) {
+>> >         t0 =3D tcg_const_i32((ctx->insns_flags2 & PPC2_ISA205) ? 0xfff=
+f :
+>> > 0xff);
+>> >     } else {
+>> > @@ -844,7 +822,6 @@ static void gen_mtfsfi(DisasContext *ctx)
+>> >         return;
+>> >     }
+>> >     sh =3D (8 * w) + 7 - bf;
+>> > -    gen_reset_fpstatus();
+>> >     t0 =3D tcg_const_i64(((uint64_t)FPIMM(ctx->opcode)) << (4 * sh));
+>> >     t1 =3D tcg_const_i32(1 << sh);
+>> >     gen_helper_store_fpscr(cpu_env, t0, t1);
+>> >
 
-As a user, I wouldn=E2=80=99t expect it to be a transaction, but just execu=
-ted
-in order.
 
-> My argument is that you should instead write:
->=20
-> $ qemu-img bitmap --add foo.qcow2 nbmap
-> $ qemu-img bitmap --merge sbmap foo.qcow2 nbmap
-> $ qemu-img bitmap --enable foo.qcow2 nbmap
->=20
-> where I only have to implement one operation per qemu-img.
-
-I don=E2=80=99t know about the =E2=80=9Chave to=E2=80=9D, because from an a=
-lgorithm standpoint,
-doing so would be trivial.  (That is, collecting the operations into a
-list, along with their specific arguments, and then execute the list in
-a loop.)
-
-I can see that doing this in C is more difficult than it would be in
-nicer languages, and so not actually trivial.
-
-But allowing all switches at most once without mutual exclusion still
-seems simple.  The question is mostly whether the implementation would
-match what we can expect users to expect.
-
-[...]
->> So if --disable and --disabled are exactly the same, I really don=E2=80=
-=99t know
->> why --disabled even exists.
->=20
-> Logically, '--add --disabled' matches the name of the QMP command with
-> its optional 'disabled' parameter, while --disable matches the name of
-> the QMP command.=C2=A0 We don't have to have the alias; and in fact, if y=
-ou
-> agree that supporting '--add --disabled' is too much sugar (since we
-> don't care about atomicity the way QMP did), then life gets simpler to
-> drop --disabled altogether.
-
-I find it makes the interface unnecessarily complex, as does requiring
-mutual exclusion.
-
-If we want mutual exclusion, I can see that a separate --disabled for
---add makes sense.
-
->>> +=C2=A0=C2=A0=C2=A0 if (add && disable) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 disable =3D false;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 add_disabled =3D true;
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0 if (add + remove + clear + enable + disable + !!mer=
-ge !=3D 1) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("Need exactly =
-one mode of --add, --remove,
->>> --clear, "
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "--enable, --disable, o=
-r --merge");
->>
->> Aha.=C2=A0 So you can actually only do a single operation.
->>
->> That means the doc shouldn=E2=80=99t use {}, in my opinion, because that=
- to me
->> means repetition (thanks to EBNF).=C2=A0 It definitely served to confuse=
- me
->> greatly until this point.
->=20
-> In command line syntax, I'm most used to seeing repetition as '...',
-> optional as [], and mutually-exclusive choice as {|}.=C2=A0 Yes, that's
-> different than EBNF.
-
-It=E2=80=99s confusing is what it is, and unnecessarily so.  The | already
-signifies exclusion: Say there are -a and -b, if they=E2=80=99re not mutual=
-ly
-exclusive, then the doc describe them as =E2=80=9C[-a] [-b]=E2=80=9D; if th=
-ey are, it=E2=80=99d
-be =E2=80=9C-a | -b=E2=80=9D.  Maybe =E2=80=9C(-a | -b)=E2=80=9D.
-
-I can=E2=80=99t remember having seen {|} for mutual exclusivity before, but=
- then
-again, it doesn=E2=80=99t happen often, I suppose.  git for one thing seems=
- to
-use (|).
-
-(Regex also uses {} for repetition, even if in a different way from EBNF.)
-
-I=E2=80=99ve never seen =E2=80=9C...=E2=80=9D used for switches, only for f=
-ree-form arguments
-like filenames.  (Because normally, a switch can be specified only once,
-or it wouldn=E2=80=99t be a =E2=80=9Cswitch=E2=80=9D.)
-
->> I also don=E2=80=99t see why we would disallow multiple operations in on=
-e go.
->> The --add --merge combination seems useful to me, and I don=E2=80=99t se=
-e a
->> problem in implementing it.
->>
->> I don=E2=80=99t know why we don=E2=80=99t just create a list of operatio=
-ns to execute,
->> based on the order given in the argument list, and then execute them in
->> order.=C2=A0 That would even allow multiple --merge operations.
->=20
-> If I understand, you're asking why we can't do:
->=20
-> qemu-img bitmap foo.qcow2 --add b1 --merge sb b1
->=20
-> in one operation.
->=20
-> That changes the syntax entirely, compared to what I implemented.=C2=A0 Y=
-ou'd
-> have to have an argument to every option, AND figure out how to specify
-> TWO arguments to the --merge option.=C2=A0 Might be doable, but seems hai=
-ry.
-
-Just =E2=80=9Cqemu-img bitmap --add --merge sb foo.qcow2 b1=E2=80=9D would =
-be enough.
-
->> If we don=E2=80=99t want that (because we don=E2=80=99t want argument or=
-der to matter),
->> we could still allow all operations to be done at least once and always
->> execute them in the same order, e.g.:
->> (1) add
->> (2) clear
->> (3) merge
->> (4) disable
->> (5) enable
->> (6) remove
->=20
-> I still find it simpler to do exactly one operation per invocation.
-
-I feel like that=E2=80=99s mostly because of our coding style allowing an =
-=E2=80=9Celse
-if=E2=80=9D to end and start a block on the same line.
-
-(That is, I feel like if we allowed multiple operations in a single go,
-the only difference would be that we wouldn=E2=80=99t have to check for mut=
-ual
-exclusivity, and that all =E2=80=9C} else if (cond) {=E2=80=9Ds would have =
-to be turned
-into =E2=80=9C} if (cond) {=E2=80=9Ds.  And reordered.)
-
-It=E2=80=99s possible that I mostly feel compelled to vote for non-exclusiv=
-ity
-because it would be clear then how to document the interface (i.e.,
-=E2=80=9C[--add] [--clear] [...]=E2=80=9D) and I wouldn=E2=80=99t have to e=
-xplain my utter
-confusion at the sight of {}.
-
-Max
-
-
---DfyB2JLC08r6FZEeBjWgldlJtCiaMbRJk--
-
---H18So8ArpdNj5kUmaFyLbi6FAt7zj7PeY
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6v6AUACgkQ9AfbAGHV
-z0A6Rgf+PLU59oyvtawqhPn9FSTR38fI8NmkXq6c3e+Z86zzyogNXUoEy4xviZd+
-EyayPR3c3MYmm5pXFR6P2BgrK7OwpCzY0fjtyD9vjdzr5Iw1W5Z6sRojqrCvaUD0
-AY7VUR3CuBrn5Q4NR/7WbJu+HpBdHQ9GRWDx5hH6+iPM9/joAAEVesY2hFL0z1Kv
-4lV8huAJpyLZMpSaz62emqq6ntUgg0b8VRhIJ+BY0h58aUsFDfa/LaATNtstuIp8
-P/2nyenaB594Kubaf16p10+E5CreZowsPeS5AWFHHNdHwlV+ljcZZYYoLeUy9coW
-d8xSKWAmNUrPIhz2knvKTgMNoS+Uwg==
-=x4bI
------END PGP SIGNATURE-----
-
---H18So8ArpdNj5kUmaFyLbi6FAt7zj7PeY--
-
+--=20
+Alex Benn=C3=A9e
 
