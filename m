@@ -2,140 +2,86 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 028CCC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:22:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A43BC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:23:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C087020721
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:22:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2422F206D7
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:23:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="f057PTeF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C087020721
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bW0I/tJi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2422F206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53756 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVbzG-0002wb-U1
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 10:22:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45126)
+	id 1jVc0U-0005ls-9U
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 10:23:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46142)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1jVbrS-0007CJ-8K; Mon, 04 May 2020 10:14:22 -0400
-Received: from mail-dm6nam12on2071.outbound.protection.outlook.com
- ([40.107.243.71]:52449 helo=NAM12-DM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1jVbrP-0005dG-VD; Mon, 04 May 2020 10:14:21 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mL/M2EgGbG5QjYyO/6fAdHafU8YR6GxbDSWO5IUo0VmVKiMp3eU19VQcjZFSUwfLMy9h3nICAegiyyLNkAanDgaWykKOpOuVuSWyjUY4vGBduU1NtUKbG5U7N8BGNZRXkTWbRRgUNTJhakDiZ5q6vtXIsRBc34YFrADfqIG9kU5iJhIYlEDsCGTJKyreP3gwO7wYdYLdusmPDyENiJD56gF2SZhPj5XjDib1DGg7hxVE8FPp/RGsLg+RbS0KaO1rHZlxHdRyiTwxaDyVyEDzm4rGOOri30RPkmfTLNrxzeg4nOvwEPdT0EBPCIwsYgHOQy0R8JY4QY/5DfHVOis3Ow==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WJPoZj1jwk82kYAZvdgPn3Oj+p95NBJnd5p5MgU1IVA=;
- b=c5bYgecE6grcZqvggE7YeiQbwW85+ZASPpKbjwYEJX62ZE548n7Nc+AqUa2qsaDu2MK8dsidVnAUcvH57dUKZbIy6X1N+f8u8vSQcAJm3FnWIjDD+6hkXjmUF8XZnocC8bYVJ+W7L9csxoVbgbcdzC7IhVO0Oyfc7rb+fSDiiniwv9DjFFL2XtqGBNUWnHyE8FWfb7N4Ih9cfHEQFD9lEU5vJdTYCyc117SMdjkCxoHwKT8kEHnRAnOMrRdu7END2aRSQjY1JpIUcBv7C5aQhWNg8N6+B9d9P0+Rn+KMrK+EnLW9K17FOJKRZUnYvrf6sIO6DUjrh4tJdoesgQEbjg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.60.83) smtp.rcpttodomain=gmail.com smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WJPoZj1jwk82kYAZvdgPn3Oj+p95NBJnd5p5MgU1IVA=;
- b=f057PTeFFypCINTRO7uR03PVxtYQKE2CxD7rHKn68O/QmWcVqVsYHapU4SzmZRmKQ3cEFpO+rTwx+aBTExAcD3Q8C07YPPzpa0+kgwqXCxk0jAOTdUaam/gaDlzZJ1k9qxFDrrRlavpdJSingdEs72j1C9WTCp1hQe3ij07Xihk=
-Received: from SN4PR0501CA0151.namprd05.prod.outlook.com
- (2603:10b6:803:2c::29) by CY4PR02MB2296.namprd02.prod.outlook.com
- (2603:10b6:903:b::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.19; Mon, 4 May
- 2020 14:14:16 +0000
-Received: from SN1NAM02FT052.eop-nam02.prod.protection.outlook.com
- (2603:10b6:803:2c:cafe::ec) by SN4PR0501CA0151.outlook.office365.com
- (2603:10b6:803:2c::29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.16 via Frontend
- Transport; Mon, 4 May 2020 14:14:16 +0000
-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
- smtp.mailfrom=xilinx.com; gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
-Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- SN1NAM02FT052.mail.protection.outlook.com (10.152.72.146) with Microsoft SMTP
- Server id 15.20.2958.27 via Frontend Transport; Mon, 4 May 2020 14:14:16
- +0000
-Received: from [149.199.38.66] (port=43039 helo=xsj-pvapsmtp01)
- by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
- (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1jVbrG-0000Gn-53; Mon, 04 May 2020 07:14:10 -0700
-Received: from localhost ([127.0.0.1] helo=xsj-pvapsmtp01)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1jVbrL-0000wX-Pz; Mon, 04 May 2020 07:14:15 -0700
-Received: from [10.140.6.35] (helo=xhdsaipava40.xilinx.com)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <saipava@xhdsaipava40.xilinx.com>)
- id 1jVbrL-0000wO-0u; Mon, 04 May 2020 07:14:15 -0700
-Received: by xhdsaipava40.xilinx.com (Postfix, from userid 14131)
- id BA12613C304C; Mon,  4 May 2020 19:36:33 +0530 (IST)
-From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Tong Ho <tong.ho@xilinx.com>, Ramon Fried <rfried.dev@gmail.com>
-Subject: [PATCH v2 06/10] net: cadence_gem: Add support for jumbo frames
-Date: Mon,  4 May 2020 19:36:04 +0530
-Message-Id: <1588601168-27576-7-git-send-email-sai.pavan.boddu@xilinx.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1588601168-27576-1-git-send-email-sai.pavan.boddu@xilinx.com>
-References: <1588601168-27576-1-git-send-email-sai.pavan.boddu@xilinx.com>
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
- SFTY:;
- SFS:(46966005)(186003)(6266002)(5660300002)(8936002)(4326008)(2906002)(26005)(6666004)(8676002)(70586007)(70206006)(36756003)(42186006)(110136005)(81166007)(47076004)(336012)(2616005)(356005)(426003)(82310400002)(498600001);
- DIR:OUT; SFP:1101; 
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jVbyO-0001hu-AE; Mon, 04 May 2020 10:21:32 -0400
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:37863)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jVbyN-00039Y-JX; Mon, 04 May 2020 10:21:31 -0400
+Received: by mail-lf1-x144.google.com with SMTP id t11so9879677lfe.4;
+ Mon, 04 May 2020 07:21:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=75cONDOaQkbsVh6jRzCDmz9QdfFPLVRVK63225nho3c=;
+ b=bW0I/tJi8uI7YFhQ4NrmvKV499My143g0sTDo6aNFAC6I3YwDD3vG1EYzH/DMhQD1I
+ Fx5p26rpCS7NGHyYL4QHwjGm6QDebaSn/v/85bqaksSIjh+fcmGHpoZa0/1Nt4nEtdqe
+ mF4cBjLC5M28GFRLuRwWhmdE5Tx1A5y+QUOy7gnLhgofyqeTewxg8bBu4ZgJi6IyaFbW
+ Kt9qRGbD/NZ047PIyLFuY17eUj3ZbT8QqL6IW4BmEYJf4AHumgwWl/pmYT3iErfKdFgi
+ HANkVtzog15EceqW8vGisYj76iNhYL3KCd5gzFx4c9vVG2wS8gjo6hZCqX2zxEudZZ9e
+ PU1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=75cONDOaQkbsVh6jRzCDmz9QdfFPLVRVK63225nho3c=;
+ b=kgLjO/pry2APxktFOJTD4kvf7+Q/2UbTQM1zQPdKQc7l9hIgWqqPsRAV4fHH9b88qI
+ eRfR0v9D1ngVx5euQpoQ3YQVTe+gcYBED7ON7pPrHvb+XrqcZZ7B5Mv5FL79E6FfE7S0
+ VxKJY+suVTS8FsmLyFHBQF3kPeP2LPUti1TXbqJjKQ5OQNBKXLZJuEyCFFkCHIQRpREs
+ JbnWJDW7sDluQqr/x4SP3k3k+z7DxubtBy9Eof/b2FBf0SkBotG9ABz0khEaBSbu35L3
+ 2dbF2wnFeoDzWP+b/NGdzt+9UV65+QrURw+FDllfGr7CJpf7OufmW4yDdD5mn3pRD9Qd
+ 9QbA==
+X-Gm-Message-State: AGi0PubjwPFAy7eYR0CfSmvjOOO/be0pTngqgI2P6Ww6OCxMiz1dn8q5
+ hjOFQeQco49dz6fq9WM5uPg77GOol8I=
+X-Google-Smtp-Source: APiQypIJjUr2Fv5COIoxuqEIBxSrYrBfjZdfjV+xKJj8S7ZwbIPvJs841mW4NJV7Ua01XvB0ti3s3A==
+X-Received: by 2002:a19:ee19:: with SMTP id g25mr8072898lfb.124.1588602087897; 
+ Mon, 04 May 2020 07:21:27 -0700 (PDT)
+Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id p3sm6578241lfj.48.2020.05.04.07.21.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 04 May 2020 07:21:26 -0700 (PDT)
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 0/1] target/arm: Remove access_el3_aa32ns()
+Date: Mon,  4 May 2020 16:21:24 +0200
+Message-Id: <20200504142125.31180-1-edgar.iglesias@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: eebaf62c-bbbe-4bcc-69af-08d7f0356dc2
-X-MS-TrafficTypeDiagnostic: CY4PR02MB2296:
-X-Microsoft-Antispam-PRVS: <CY4PR02MB2296A706E29142A11883E35CCAA60@CY4PR02MB2296.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:68;
-X-Forefront-PRVS: 03932714EB
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 89Rfra+WyNFMuLHVRE9ateI8tVeMdg8WPPBawq2Xcu+ckEtFJQyvtLxsGhE6P21c1Ur4fis9mSkIsgqPXTNoGTCzs1LB8y2dtiRw4cH9YbpOzSbD+6iNxd4OYkXjrusvqCOpvsOB4EYaXdrGGOSquHJD8kCGTs1pQuvKz8zcEIfId5vs6xCPXpmg2Za/gguhBrHvJLpBVDAwuaq0Mq7neCiyTouetYRhK4uwAM51I8GNoJzTEMhjGCr0HfzaGxLfexfJ+qDSr7qNRVs92+DLpA/HLjfUI6BMGRnipatlHT6gBLk2mJL31R3rBIhG92jMdoUQZB3rzz6Q1PMf0RhdFKSIpmxQCA7Ob2Z2i8N6slSGCQa3XOnoJXSFDPaJKZYdWgo5yILBCv1hYgWq6+z0noAEemkaUrW8l0nEbkWPPhcSO1FpEuWQOAOPIFe0hn4szLajZCD6G58m0FpGRAaeKCF2shFfaIjmX5F9oT/X4aDANoUNfwqdlBWEkNGi4cuEB4oqCkiT3eV42sgb1UILEg==
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2020 14:14:16.1475 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: eebaf62c-bbbe-4bcc-69af-08d7f0356dc2
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
- Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR02MB2296
-Received-SPF: pass client-ip=40.107.243.71; envelope-from=saipava@xilinx.com;
- helo=NAM12-DM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 10:14:18
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::144;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lf1-x144.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 13
+X-Spam_score: 1.3
+X-Spam_bar: +
+X-Spam_report: (1.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ FSL_HELO_FAKE=3.399, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -149,49 +95,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: laurent.desnogues@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org,
+ richard.henderson@linaro.org, edgar.iglesias@xilinx.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Jumbo frames of size 10240 bytes is added.
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
----
- hw/net/cadence_gem.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Hi,
 
-diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-index beb38ec..848be3f 100644
---- a/hw/net/cadence_gem.c
-+++ b/hw/net/cadence_gem.c
-@@ -313,6 +313,7 @@
- #define DESC_1_RX_EOF 0x00008000
- 
- #define GEM_MODID_VALUE 0x00020118
-+#define MAX_TX_FRAME_SIZE 10240
- 
- static inline uint64_t tx_desc_get_buffer(CadenceGEMState *s, uint32_t *desc)
- {
-@@ -1143,7 +1144,7 @@ static void gem_transmit(CadenceGEMState *s)
- {
-     uint32_t desc[DESC_MAX_NUM_WORDS];
-     hwaddr packet_desc_addr;
--    uint8_t     tx_packet[2048];
-+    uint8_t     tx_packet[MAX_TX_FRAME_SIZE];
-     uint8_t     *p;
-     unsigned    total_bytes;
-     int q = 0;
-@@ -1344,7 +1345,7 @@ static void gem_reset(DeviceState *d)
-     s->regs[GEM_RXPARTIALSF] = 0x000003ff;
-     s->regs[GEM_MODID] = s->revision;
-     s->regs[GEM_DESCONF] = 0x02500111;
--    s->regs[GEM_DESCONF2] = 0x2ab13fff;
-+    s->regs[GEM_DESCONF2] = 0x2ab12800;
-     s->regs[GEM_DESCONF5] = 0x002f2045;
-     s->regs[GEM_DESCONF6] = GEM_DESCONF6_64B_MASK;
- 
+Laurent reported hitting the assert in access_el3_aa32ns()
+when accessing 32-bit versions of some of the virtualization
+regs when EL3 is 64-bit.
+
+I think we got this wrong back then and it seems to me like
+we should remove direct usage of access_el3_aa32ns() and
+always call access_el3_aa32ns_aa64_any() to handle both
+the aa32-only cases and the mixed aa32/aa64.
+
+Cheers,
+Edgar
+
+ChangeLog:
+
+v1 -> v2:
+* Keep access_el3_aa32ns in favor of access_el3_aa32ns_aa64any
+* Simplify description of access_el3_aa32ns
+* Tweak secure aa32-el3 check in access_el3_aa32ns as suggested by Peter
+
+
+Edgar E. Iglesias (1):
+  target/arm: Drop access_el3_aa32ns()
+
+ target/arm/helper.c | 30 +++++++-----------------------
+ 1 file changed, 7 insertions(+), 23 deletions(-)
+
 -- 
-2.7.4
+2.20.1
 
 
