@@ -6,64 +6,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A34CC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:07:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13ADAC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:07:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E9B0206A4
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:07:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E9B0206A4
+	by mail.kernel.org (Postfix) with ESMTPS id DC7B6206A4
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:07:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC7B6206A4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVdd0-0005TN-35
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 12:07:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38038)
+	id 1jVddI-0005z6-UH
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 12:07:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38050)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jVdVw-0001Lp-8z; Mon, 04 May 2020 12:00:16 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:56981)
+ id 1jVdVx-0001Nc-Hk; Mon, 04 May 2020 12:00:17 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:54491)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jVdVu-0005mW-P4; Mon, 04 May 2020 12:00:15 -0400
+ id 1jVdVu-0005mC-KA; Mon, 04 May 2020 12:00:17 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MvKL3-1jEWKe0HpZ-00rG6w; Mon, 04 May 2020 18:00:01 +0200
+ id 1MYvoW-1ja3O40YzY-00UpXT; Mon, 04 May 2020 18:00:00 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 03/19] timer/exynos4210_mct: Remove redundant statement in
- exynos4210_mct_write()
-Date: Mon,  4 May 2020 17:59:40 +0200
-Message-Id: <20200504155956.380695-4-laurent@vivier.eu>
+Subject: [PULL v2 02/19] display/blizzard: use extract16() for fix clang
+ analyzer warning in blizzard_draw_line16_32()
+Date: Mon,  4 May 2020 17:59:39 +0200
+Message-Id: <20200504155956.380695-3-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200504155956.380695-1-laurent@vivier.eu>
 References: <20200504155956.380695-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:paz9/bvncpBWsqHW9t2TuKD0ps6SneGJH8nwahoV+3Ri8q/Im0R
- wlkELu5ph6nHShm40akaOzorNnURt5WjuImtbVtLDW8l6wkJwSukYKQsJdj28mFOQ/kCkCy
- XQpw2PS5bx2j93h31Pa63eXA9oIj0UozsCQbdYoAoQBQ/59NtwHerKRDCrSG6Ee9EwyOt6a
- Uk8lOLTEK0DHmTR30T9ZA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:U1WhiSg4V3c=:fJ4/U+5NyAqn5h0JCB8Nj5
- XnNRLs3TS1OZ3B2kDchY6fOH/+V8oRJeDA9JoQzfjKiB46d9HlztumtuSTaeeDKdzDK5ATsX6
- +izdejLL7sN9RWLUlXe6wyes/Ujxel9lu9cSsRn/w3TwoSImRKVQTlUDjew3VzMwsChBqr03I
- mwNYz7Iphyim+6vtoGQ5fjWLppHdzYg2mmXuwFA6FaboDCHSnnfAr8IEdYjurhHy+IXUo1Se4
- y6fQv0jY3GDUuqfiHdZ2MVvkxIthYgih04yh9tJd4U1qzDV8mAF2wdAEGGmBPVoqaljvm2it4
- h2AI5JlVBAQjoEDkmRKb49jyLKiRINAdmDMc9S64kw/H2KzmnTuNFafAUHhXxYZ+mQLctcZld
- yAiy3qNhGAiobRf8/yPYCDCqtFg8hOYeO1MChLfxqMEM5jw8z74zdvtmLu+YaZj6c5ryDcD35
- 3mJ6Nj0lMqinSSytR/csgy9sRsqWkuG1L0macXVo8O4lhcIEL81lX6CVx3bAPH1XZQpOZrok2
- F8RFUdDxO/R9zRXZ/KSXYZv2wRCPSkzZEzd0MOv5wtmjqVDf8bKa6JheCpGiDoL0B8FjXurXd
- oQ2tmYrPYbMkwIgJQGWMtwzQiuAwd1sgbSOtw0SK8ZcAojTDYk/ps/qBnsqImIQS42vQR7Lza
- XziOpj1GpHh9siS1rhGqOTbYnmQ51cU+JokXTg+QMwe3ZB8OMaW5vqSBdlsRbdXwDsZRwY0oC
- E7rsvaIczGNQcgcLyEvIqZGKmO6E+ppwiMbpqy3Z5iDuIAZjfJPfpfJ0Da9t8YpLwt+BKpjcz
- AK9SZ2Exp/WzjVdhX7TkGZVJ0G1hPTAlW2ihd083ALCkw/LD8UkFge6JMH1v9/PKFnm15jz
-Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:C4Bu8a/krPIoq9y/FOF4tSxvMpaOkr1nID8+jsE3cCLyOe7/GfS
+ 8bL9BvXbqA2/YdCniElhEUEYlZgvpyMOEhgGwusD1bal7OQZJGSJODms3PdsI/6BPwTqA3V
+ mUzA+E1a98aiSWFEQipW7cHrC4r1eb3+jobVQXXBJp82sGfIKwZskg/KJHXNO/HDkYp76J6
+ IilYDiBWUs9eH4Hgpu0YA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:06UROSzpzgI=:MtR1W0RDxQy0GEUzp10D4X
+ 09yGpidYwYTnMWOJdKpUtC3Dq8RVwxIVGovF/0MZPVOSjx9jeI3ZmxoQitEkFCswY9hbOnhQL
+ ThGrzqJxC/avlGSOHF+b8JobZ9fBkuoLymeWEgNCupG8ofT/xP/pH5YFVM3IMH2rRFmueNYft
+ kAlOH9B5c3GaSRE3DSIVsKbUg2qEiLrFTxnXNRm3XLWzuORENoUwMeBit5+OqBHGrPAYm4Y6D
+ +e1Vjby/RLp0bV/zV2+GOTgHwvxLBwhHL1KXeaDHtWfE5jgvvAwrfbMlYcA+HB7XK/5b1wksY
+ 2ZTGp2YdZNJf396oxZ8zHkpMT6b9+gz/W4B7jXcBjHdA7TfK4gTxfC3PJtueZOch/pptOg8nA
+ aAg7EfQMkmZccktkG9DcaOocpHmPz8CiUC3jmKIS7yBl+K/s2yzX7xi+PLrvxD9oOnynKhxnL
+ 3EGE2NaD8YYlNILaGr6vNlpgdvi7RlheoLq9xZDTnlR1LOyxC/oJqEz1N+BnOVGxCXcX2kNci
+ SqBDJOvnOZbUAMUA0r/XtPbmMgn4B/JYR9c3mB3rnlhMIdj+DAMiYfFIDtV7KU6K09s0+Nhw/
+ wW/KRf5dHLMmhzYQBmpVEbybuxfra5mkBl8wu17dgMdqntn6t7iN4oiOpDBMkfSfKPzhVLXDP
+ GtDpS8QJtOXb6LeNyuGta+5lMkJTDQA/cOO/wgjBxTyZ9K82mpKJrQXNgKhzA2TPHEvpDP3S6
+ 9BM5mT5P8MiW4EPlio4DbNgTqwmKHkz1Dcg0mcsqc+uoSPWazEMldjWczp87n12yXe8pEl7f1
+ bt9CFzIsvqA3v1gp9ziRs0SqJIUXSRxVisnChq433u4wPe6npo3YZOKRECWYOgp5UlAzTJ7
+Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 12:00:07
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 11:59:59
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -82,11 +81,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
- Laurent Vivier <laurent@vivier.eu>,
- Alistair Francis <alistair.francis@wdc.com>,
- Euler Robot <euler.robot@huawei.com>, Chen Qun <kuhn.chenqun@huawei.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-trivial@nongnu.org, Chen Qun <kuhn.chenqun@huawei.com>,
+ Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
+ Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -94,56 +91,46 @@ Sender: "Qemu-devel"
 From: Chen Qun <kuhn.chenqun@huawei.com>
 
 Clang static code analyzer show warning:
-hw/timer/exynos4210_mct.c:1370:9: warning: Value stored to 'index' is never read
-        index = GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
-        ^       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-hw/timer/exynos4210_mct.c:1399:9: warning: Value stored to 'index' is never read
-        index = GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
-        ^       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-hw/timer/exynos4210_mct.c:1441:9: warning: Value stored to 'index' is never read
-        index = GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
-        ^       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+  hw/display/blizzard.c:940:9: warning: Value stored to 'data' is never read
+        data >>= 5;
+        ^        ~
 Reported-by: Euler Robot <euler.robot@huawei.com>
 Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200325025919.21316-4-kuhn.chenqun@huawei.com>
+Message-Id: <20200325025919.21316-3-kuhn.chenqun@huawei.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/timer/exynos4210_mct.c | 4 ----
- 1 file changed, 4 deletions(-)
+ hw/display/blizzard.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/hw/timer/exynos4210_mct.c b/hw/timer/exynos4210_mct.c
-index 944120aea59c..570cf7075bc5 100644
---- a/hw/timer/exynos4210_mct.c
-+++ b/hw/timer/exynos4210_mct.c
-@@ -1367,7 +1367,6 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
+diff --git a/hw/display/blizzard.c b/hw/display/blizzard.c
+index 359e399c2a0b..105241577de1 100644
+--- a/hw/display/blizzard.c
++++ b/hw/display/blizzard.c
+@@ -19,6 +19,7 @@
+  */
  
-     case L0_TCNTB: case L1_TCNTB:
-         lt_i = GET_L_TIMER_IDX(offset);
--        index = GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
- 
-         /*
-          * TCNTB is updated to internal register only after CNT expired.
-@@ -1396,7 +1395,6 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
- 
-     case L0_ICNTB: case L1_ICNTB:
-         lt_i = GET_L_TIMER_IDX(offset);
--        index = GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
- 
-         s->l_timer[lt_i].reg.wstat |= L_WSTAT_ICNTB_WRITE;
-         s->l_timer[lt_i].reg.cnt[L_REG_CNT_ICNTB] = value &
-@@ -1438,8 +1436,6 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
- 
-     case L0_FRCNTB: case L1_FRCNTB:
-         lt_i = GET_L_TIMER_IDX(offset);
--        index = GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
--
-         DPRINTF("local timer[%d] FRCNTB write %llx\n", lt_i, value);
- 
-         s->l_timer[lt_i].reg.wstat |= L_WSTAT_FRCCNTB_WRITE;
+ #include "qemu/osdep.h"
++#include "qemu/bitops.h"
+ #include "ui/console.h"
+ #include "hw/display/blizzard.h"
+ #include "ui/pixel_ops.h"
+@@ -932,12 +933,9 @@ static void blizzard_draw_line16_32(uint32_t *dest,
+     const uint16_t *end = (const void *) src + width;
+     while (src < end) {
+         data = *src ++;
+-        b = (data & 0x1f) << 3;
+-        data >>= 5;
+-        g = (data & 0x3f) << 2;
+-        data >>= 6;
+-        r = (data & 0x1f) << 3;
+-        data >>= 5;
++        b = extract16(data, 0, 5) << 3;
++        g = extract16(data, 5, 6) << 2;
++        r = extract16(data, 11, 5) << 3;
+         *dest++ = rgb_to_pixel32(r, g, b);
+     }
+ }
 -- 
 2.26.2
 
