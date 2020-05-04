@@ -2,99 +2,78 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1A64C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:49:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05B06C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:49:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 884B9206B9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:49:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C836D206B9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:49:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EOTgtTWg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 884B9206B9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VV9u6wqH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C836D206B9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVcPB-00065g-Ks
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 10:49:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47776)
+	id 1jVcPE-0006Dt-PQ
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 10:49:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50006)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVc7m-00009f-Vq
- for qemu-devel@nongnu.org; Mon, 04 May 2020 10:31:15 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45804
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jVcLa-0000Jw-1c
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 10:45:30 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26615
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVc7l-0007Um-HT
- for qemu-devel@nongnu.org; Mon, 04 May 2020 10:31:14 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jVcLY-0008Gr-2f
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 10:45:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588602672;
+ s=mimecast20190719; t=1588603526;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Eu9htyrJv2NAWcCAcdInUX/MuthC+9eSfuWwdLPoWOA=;
- b=EOTgtTWgpJaQ8xHpc71Hyk8pdekD+tiUHlFTU5OJOkCES/juRPBLe7sSmVSdYq1ESFNrXe
- l2AFf4xyklqMQuVFisub7TuFy9n9LyYriww4+JK1efD8rU21OLC35qwSG3cZv2xv+CX8Vp
- ogEXaxMaKFnRIJbhTS9yvVGWzi0bu+k=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-175-qm9dzRLNP1y9zcJ__JhLdw-1; Mon, 04 May 2020 10:31:11 -0400
-X-MC-Unique: qm9dzRLNP1y9zcJ__JhLdw-1
-Received: by mail-wr1-f69.google.com with SMTP id y4so5806285wrt.4
- for <qemu-devel@nongnu.org>; Mon, 04 May 2020 07:31:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=aKs8Xfgzaqa1KeQHto6nIWvDT/l0FTKC+EnAyTmz1lo=;
- b=geA2FQbK9M1qPDc8cy2/BO1Cfe5byt0dpbCfca5EVSGIAGY+uHPes80I9TZ+8JqPjD
- TpyWvMXxLOc+tsK3K/3/06O8BuiIaT4BQE/j5sqAkmFiYalwSTHVOFqtcvmwbHMi8yI+
- HTTBjr0R32OYr5SKzvozxuRRzEMFBKvHpGmkTeZHrDRQMfIUIlKBgeoocHE4yV/H9PhP
- /Lx9FwtQSMnQQQ6G+eN7iTxr+KXDrFdyxf5adLqua5cwq0rTjbS6CjavJWqN6XLNjj8k
- qFLV1zhiwhxE1hamGXEJrPAaB/U+yLsH+40hdmlsGdMI87tycukS0J2x1Sou91rviUX5
- ghqA==
-X-Gm-Message-State: AGi0PuaFxsgZuqnZAVZb6roSKmLy+DazFZELDXY8bR5zCB+kDukCR7R5
- tgvyvQJ0uTHddJEyZXCFelCX5H3a84QW6CLpHaa0rahFHeKCu29363lGVrTB/Iucl5cUT3bBt87
- 1MDskegZ0zHvQVnE=
-X-Received: by 2002:a1c:e444:: with SMTP id b65mr15796761wmh.6.1588602669637; 
- Mon, 04 May 2020 07:31:09 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJ6n5p5Q1M4KALplm0OooJKabwclL2JhtPLkz/0NiYT2q9RWpD/3+Qp4v007/MAI8i38fsGyQ==
-X-Received: by 2002:a1c:e444:: with SMTP id b65mr15796744wmh.6.1588602669423; 
- Mon, 04 May 2020 07:31:09 -0700 (PDT)
-Received: from [192.168.1.39] (26.red-88-21-207.staticip.rima-tde.net.
- [88.21.207.26])
- by smtp.gmail.com with ESMTPSA id p190sm14089130wmp.38.2020.05.04.07.31.08
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 04 May 2020 07:31:08 -0700 (PDT)
-Subject: Re: [PATCH] hostmem: don't use mbind() if host-nodes is epmty
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>
-References: <20200430154606.6421-1-imammedo@redhat.com>
- <20200501085708.GA2203114@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <1e8aabda-9dd0-3300-04e6-81761ef3a837@redhat.com>
-Date: Mon, 4 May 2020 16:31:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ bh=JpmhCMHGevMhcKBEo/HSirwf/Ddc7V/B1y41sLvuMM0=;
+ b=VV9u6wqHi/Cd9AzNh+SKtHsILTyTEthxcWzLa3tDjFuJxMkWsn+ujvmvoq1K6dVKwdRfrI
+ sspPebeCz272sGoL7VfU4Xq3SFPlV8Gsrl1IcK3FSM1IHXDdM2yZ5/Q5NDUnURiwbCczVI
+ gUr9BCiN9b2llqZ+X+I0T06fkCRu+VI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-238-FXSnFq2QMs2yGzbaALCGnA-1; Mon, 04 May 2020 10:45:24 -0400
+X-MC-Unique: FXSnFq2QMs2yGzbaALCGnA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20AF118FE860;
+ Mon,  4 May 2020 14:45:23 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-56.ams2.redhat.com [10.36.114.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EED065C1B2;
+ Mon,  4 May 2020 14:45:20 +0000 (UTC)
+Date: Mon, 4 May 2020 16:45:19 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Subject: Re: [PATCH v2] qcow2: Avoid integer wraparound in qcow2_co_truncate()
+Message-ID: <20200504144519.GC6129@linux.fritz.box>
+References: <20200504142308.10446-1-berto@igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20200501085708.GA2203114@redhat.com>
-Content-Language: en-US
+In-Reply-To: <20200504142308.10446-1-berto@igalia.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 08:14:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 01:21:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -114,90 +93,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, mhohmann@physnet.uni-hamburg.de,
- qemu-stable@nongnu.org, ehabkost@redhat.com, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/1/20 10:57 AM, Daniel P. Berrang=C3=A9 wrote:
-> On Thu, Apr 30, 2020 at 11:46:06AM -0400, Igor Mammedov wrote:
->> Since 5.0 QEMU uses hostmem backend for allocating main guest RAM.
->> The backend however calls mbind() which is typically NOP
->> in case of default policy/absent host-nodes bitmap.
->> However when runing in container with black-listed mbind()
->> syscall, QEMU fails to start with error
->>   "cannot bind memory to host NUMA nodes: Operation not permitted"
->> even when user hasn't provided host-nodes to pin to explictly
->> (which is the case with -m option)
->>
->> To fix issue, call mbind() only in case when user has provided
->> host-nodes explicitly (i.e. host_nodes bitmap is not empty).
->> That should allow to run QEMU in containers with black-listed
->> mbind() without memory pinning. If QEMU provided memory-pinning
->> is required user still has to white-list mbind() in container
->> configuration.
->>
->> Reported-by: Manuel Hohmann <mhohmann@physnet.uni-hamburg.de>
->> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->> ---
->> CC: berrange@redhat.com
->> CC: ehabkost@redhat.com
->> CC: pbonzini@redhat.com
->> CC: mhohmann@physnet.uni-hamburg.de
->> CC: qemu-stable@nongnu.org
->> ---
->>   backends/hostmem.c | 6 ++++--
->>   1 file changed, 4 insertions(+), 2 deletions(-)
->>
->> diff --git a/backends/hostmem.c b/backends/hostmem.c
->> index 327f9eebc3..0efd7b7bd6 100644
->> --- a/backends/hostmem.c
->> +++ b/backends/hostmem.c
->> @@ -383,8 +383,10 @@ host_memory_backend_memory_complete(UserCreatable *=
-uc, Error **errp)
->>           assert(sizeof(backend->host_nodes) >=3D
->>                  BITS_TO_LONGS(MAX_NODES + 1) * sizeof(unsigned long));
->>           assert(maxnode <=3D MAX_NODES);
->> -        if (mbind(ptr, sz, backend->policy,
->> -                  maxnode ? backend->host_nodes : NULL, maxnode + 1, fl=
-ags)) {
->> +
->> +        if (maxnode &&
->> +            mbind(ptr, sz, backend->policy, backend->host_nodes, maxnod=
-e + 1,
->> +                  flags)) {
->>               if (backend->policy !=3D MPOL_DEFAULT || errno !=3D ENOSYS=
-) {
->>                   error_setg_errno(errp, errno,
->>                                    "cannot bind memory to host NUMA node=
-s");
+Am 04.05.2020 um 16:23 hat Alberto Garcia geschrieben:
+> After commit f01643fb8b47e8a70c04bbf45e0f12a9e5bc54de when an image is
+> extended and BDRV_REQ_ZERO_WRITE is set then the new clusters are
+> zeroized.
 >=20
-> personally I would have found this code clearer if the
-> check had been  "if (backend->policy !=3D MPOL_DEFAULT && ..."
-> as I had to read quite a few lines to understand that the
-> 'maxnode' is zero if-and-only-if  policy =3D=3D MPOL_DEFAULT
+> The code however does not detect correctly situations when the old and
+> the new end of the image are within the same cluster. The problem can
+> be reproduced with these steps:
 >=20
-> Regardless though, this is functionally correct so
+>    qemu-img create -f qcow2 backing.qcow2 1M
+>    qemu-img create -f qcow2 -F qcow2 -b backing.qcow2 top.qcow2
+>    qemu-img resize --shrink top.qcow2 520k
+>    qemu-img resize top.qcow2 567k
 >=20
->     Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> In the last step offset - zero_start causes an integer wraparound.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 
-I could reproduce running 'make check-qtest-hppa' on the qemu:fedora image:
+Can you add the reproducer to qemu-iotests?
 
-   TEST    check-qtest-hppa: tests/qtest/boot-serial-test
-qemu-system-hppa: cannot bind memory to host NUMA nodes: Operation not=20
-permitted
-Broken pipe
-tests/qtest/libqtest.c:166: kill_qemu() tried to terminate QEMU process=20
-but encountered exit status 1 (expected 0)
-ERROR - too few tests run (expected 1, got 0)
-make: *** [tests/Makefile.include:637: check-qtest-hppa] Error 1
-
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
+>  block/qcow2.c | 13 +++++++++----
+>  1 file changed, 9 insertions(+), 4 deletions(-)
 >=20
-> Regards,
-> Daniel
+> v2:
+> - Don't call qcow2_cluster_zeroize() if offset =3D=3D zero_start
 >=20
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 2ba0b17c39..7ca0327995 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -4234,15 +4234,20 @@ static int coroutine_fn qcow2_co_truncate(BlockDr=
+iverState *bs, int64_t offset,
+>      if ((flags & BDRV_REQ_ZERO_WRITE) && offset > old_length) {
+>          uint64_t zero_start =3D QEMU_ALIGN_UP(old_length, s->cluster_siz=
+e);
+> =20
+> +        /* zero_start should not be after the new end of the image */
+> +        zero_start =3D MIN(zero_start, offset);
+
+I think this is a bit confusing because zero_start implies that this is
+the aligned offset where qcow2_cluster_zeroize() would start. At first I
+though this wasn't needed at all any more because you already check
+offset > zero_start below. So if MIN() makes a difference, the if block
+won't be executed anyway.
+
+It would, however, make a difference for calculating the explicit zero
+write for the unaligned head:
+
+    uint64_t len =3D zero_start - old_length;
+
+Maybe it would be easier to understand if we changed only that line?
+
+    uint64_t len =3D MIN(zero_start, offset) - old_length;
+
+Kevin
 
 
