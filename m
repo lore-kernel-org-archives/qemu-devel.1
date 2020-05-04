@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AD91C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 23:36:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B600C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 23:36:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1E99206A4
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 23:36:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E968D206D7
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 23:36:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="EEJzDYK4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1E99206A4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="DMaJHGg4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E968D206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48564 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVkdS-0008HT-1H
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 19:36:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34086)
+	id 1jVkdd-0000DJ-1G
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 19:36:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37618)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jVkNJ-0002Xp-MU
- for qemu-devel@nongnu.org; Mon, 04 May 2020 19:19:49 -0400
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:19383)
+ id 1jVkOO-00047Q-Ei
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 19:20:56 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:19432)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jVkNI-0008IB-69
- for qemu-devel@nongnu.org; Mon, 04 May 2020 19:19:49 -0400
+ id 1jVkNh-00008v-Lr
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 19:20:56 -0400
 Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
  hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5eb0a2cd0000>; Mon, 04 May 2020 16:18:37 -0700
+ id <B5eb0a2e10004>; Mon, 04 May 2020 16:18:57 -0700
 Received: from hqmail.nvidia.com ([172.20.161.6])
  by hqpgpgate101.nvidia.com (PGP Universal service);
- Mon, 04 May 2020 16:19:46 -0700
+ Mon, 04 May 2020 16:20:07 -0700
 X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Mon, 04 May 2020 16:19:46 -0700
-Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 4 May
- 2020 23:19:46 +0000
+ by hqpgpgate101.nvidia.com on Mon, 04 May 2020 16:20:07 -0700
+Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 4 May
+ 2020 23:20:07 +0000
 Received: from [10.40.101.152] (10.124.1.5) by DRHQMAIL107.nvidia.com
  (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 4 May 2020
- 23:19:36 +0000
-Subject: Re: [PATCH v16 QEMU 04/16] vfio: Add save and load functions for VFIO
- PCI devices
+ 23:19:58 +0000
+Subject: Re: [PATCH v16 QEMU 05/16] vfio: Add migration region initialization
+ and finalize function
 To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 References: <1585084154-29461-1-git-send-email-kwankhede@nvidia.com>
- <1585084154-29461-5-git-send-email-kwankhede@nvidia.com>
- <20200326174616.GG2713@work-vm>
+ <1585084154-29461-6-git-send-email-kwankhede@nvidia.com>
+ <20200326175202.GH2713@work-vm>
 X-Nvconfidentiality: public
 From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <fc4a2500-a6bf-b4d8-1576-22763078dc5c@nvidia.com>
-Date: Tue, 5 May 2020 04:49:32 +0530
+Message-ID: <d0347049-59d9-87d5-acb1-e56b56acc6b9@nvidia.com>
+Date: Tue, 5 May 2020 04:49:54 +0530
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200326174616.GG2713@work-vm>
+In-Reply-To: <20200326175202.GH2713@work-vm>
 X-Originating-IP: [10.124.1.5]
 X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
  DRHQMAIL107.nvidia.com (10.27.9.16)
@@ -69,17 +69,17 @@ Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1588634317; bh=arTFC3Be4Le86FvPx33zvKRap/q4Ddm3qjFFVCb3jSA=;
+ t=1588634337; bh=iHFtNtbWw7MkD3Xe/3m6QvA8rMIRllCP/BvTR/i7YI4=;
  h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
  Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
  X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
  Content-Transfer-Encoding;
- b=EEJzDYK4AtqoDn+xkvSrjquUjFy3nYCEpphXXs4old2S52VUe2+TnGoLi6HePd0Uu
- ruIsrZ8E0tYMDGN/LEkeJE4JAzUK1JLE8fwVVpmLxELzcHe9vwAqS3teT+tbkl8Dzr
- 7xgYprK2yldCbno95Q7R/xeClTgA73Q3e3mdsHqqXGH6ae9MHirOesLuniJCSa/pEO
- kJByfnVRqCo/vlD/nkcqofbg4Jd6CrBNawh1z3dD2G7OiBWhmcNZ7JYlnJL8c7ucKZ
- BnyJe/LSYptTFM+LUqXMog3VGwNYginmjd/xVL/dS38Lu9Emv0TT0U4FPIxVCpNmar
- bEOmw/Qu4nt5A==
+ b=DMaJHGg4+e2lSx5BUJRJ66W1BaDG1YWWxB47yKaIYLZQFAVjSdjC+ySGt8ZTM1Wgb
+ e0Sk+4VAjTdSWWadSTGDLSZE73inBjp6wBKZUsY8E3MD9Dc66UbSJe6h/cC8Z8jVDO
+ p/CdFeL+9CPjSG6xaAu0hBrPyR9FUajXn114PJ5xtcufFydh/38j2zxH8cu95lOOsn
+ vaY8GbdSmPE/4FN9oouKCpPiiZqpKE26a1Bk3wtt4kjI/MpIKoUi6nc3Cu/Iso1WnZ
+ fwYEvhiwHlkGC46FQ12Gsgp27NL5zw0m0lq5zHAgXI32ZkiTmNbwv72kpWdJez2JVC
+ /BoOG2VnL7OXA==
 Received-SPF: pass client-ip=216.228.121.64; envelope-from=kwankhede@nvidia.com;
  helo=hqnvemgate25.nvidia.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 19:18:33
@@ -115,259 +115,237 @@ Sender: "Qemu-devel"
 
 
 
-On 3/26/2020 11:16 PM, Dr. David Alan Gilbert wrote:
+On 3/26/2020 11:22 PM, Dr. David Alan Gilbert wrote:
 > * Kirti Wankhede (kwankhede@nvidia.com) wrote:
->> These functions save and restore PCI device specific data - config
->> space of PCI device.
->> Tested save and restore with MSI and MSIX type.
+>> - Migration functions are implemented for VFIO_DEVICE_TYPE_PCI device in this
+>>    patch series.
+>> - VFIO device supports migration or not is decided based of migration region
+>>    query. If migration region query is successful and migration region
+>>    initialization is successful then migration is supported else migration is
+>>    blocked.
 >>
 >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 >> Reviewed-by: Neo Jia <cjia@nvidia.com>
 >> ---
->>   hw/vfio/pci.c                 | 163 ++++++++++++++++++++++++++++++++++++++++++
->>   include/hw/vfio/vfio-common.h |   2 +
->>   2 files changed, 165 insertions(+)
+>>   hw/vfio/Makefile.objs         |   2 +-
+>>   hw/vfio/migration.c           | 138 ++++++++++++++++++++++++++++++++++++++++++
+>>   hw/vfio/trace-events          |   3 +
+>>   include/hw/vfio/vfio-common.h |   9 +++
+>>   4 files changed, 151 insertions(+), 1 deletion(-)
+>>   create mode 100644 hw/vfio/migration.c
 >>
->> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
->> index 6c77c12e44b9..8deb11e87ef7 100644
->> --- a/hw/vfio/pci.c
->> +++ b/hw/vfio/pci.c
->> @@ -41,6 +41,7 @@
->>   #include "trace.h"
->>   #include "qapi/error.h"
->>   #include "migration/blocker.h"
->> +#include "migration/qemu-file.h"
->>   
->>   #define TYPE_VFIO_PCI "vfio-pci"
->>   #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
->> @@ -1632,6 +1633,50 @@ static void vfio_bars_prepare(VFIOPCIDevice *vdev)
->>       }
->>   }
->>   
->> +static int vfio_bar_validate(VFIOPCIDevice *vdev, int nr)
->> +{
->> +    PCIDevice *pdev = &vdev->pdev;
->> +    VFIOBAR *bar = &vdev->bars[nr];
->> +    uint64_t addr;
->> +    uint32_t addr_lo, addr_hi = 0;
->> +
->> +    /* Skip unimplemented BARs and the upper half of 64bit BARS. */
->> +    if (!bar->size) {
->> +        return 0;
->> +    }
->> +
->> +    addr_lo = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + nr * 4, 4);
->> +
->> +    addr_lo = addr_lo & (bar->ioport ? PCI_BASE_ADDRESS_IO_MASK :
->> +                                       PCI_BASE_ADDRESS_MEM_MASK);
->> +    if (bar->type == PCI_BASE_ADDRESS_MEM_TYPE_64) {
->> +        addr_hi = pci_default_read_config(pdev,
->> +                                         PCI_BASE_ADDRESS_0 + (nr + 1) * 4, 4);
->> +    }
->> +
->> +    addr = ((uint64_t)addr_hi << 32) | addr_lo;
->> +
->> +    if (!QEMU_IS_ALIGNED(addr, bar->size)) {
->> +        return -EINVAL;
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->> +static int vfio_bars_validate(VFIOPCIDevice *vdev)
->> +{
->> +    int i, ret;
->> +
->> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
->> +        ret = vfio_bar_validate(vdev, i);
->> +        if (ret) {
->> +            error_report("vfio: BAR address %d validation failed", i);
->> +            return ret;
->> +        }
->> +    }
->> +    return 0;
->> +}
->> +
->>   static void vfio_bar_register(VFIOPCIDevice *vdev, int nr)
->>   {
->>       VFIOBAR *bar = &vdev->bars[nr];
->> @@ -2414,11 +2459,129 @@ static Object *vfio_pci_get_object(VFIODevice *vbasedev)
->>       return OBJECT(vdev);
->>   }
->>   
->> +static void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
->> +{
->> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
->> +    PCIDevice *pdev = &vdev->pdev;
->> +    uint16_t pci_cmd;
->> +    int i;
->> +
->> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
->> +        uint32_t bar;
->> +
->> +        bar = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, 4);
->> +        qemu_put_be32(f, bar);
->> +    }
->> +
->> +    qemu_put_be32(f, vdev->interrupt);
->> +    if (vdev->interrupt == VFIO_INT_MSI) {
->> +        uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
->> +        bool msi_64bit;
->> +
->> +        msi_flags = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
->> +                                            2);
->> +        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
->> +
->> +        msi_addr_lo = pci_default_read_config(pdev,
->> +                                         pdev->msi_cap + PCI_MSI_ADDRESS_LO, 4);
->> +        qemu_put_be32(f, msi_addr_lo);
->> +
->> +        if (msi_64bit) {
->> +            msi_addr_hi = pci_default_read_config(pdev,
->> +                                             pdev->msi_cap + PCI_MSI_ADDRESS_HI,
->> +                                             4);
->> +        }
->> +        qemu_put_be32(f, msi_addr_hi);
->> +
->> +        msi_data = pci_default_read_config(pdev,
->> +                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
->> +                2);
->> +        qemu_put_be32(f, msi_data);
->> +    } else if (vdev->interrupt == VFIO_INT_MSIX) {
->> +        uint16_t offset;
->> +
->> +        /* save enable bit and maskall bit */
->> +        offset = pci_default_read_config(pdev,
->> +                                       pdev->msix_cap + PCI_MSIX_FLAGS + 1, 2);
->> +        qemu_put_be16(f, offset);
->> +        msix_save(pdev, f);
->> +    }
->> +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
->> +    qemu_put_be16(f, pci_cmd);
->> +}
->> +
->> +static int vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
->> +{
->> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
->> +    PCIDevice *pdev = &vdev->pdev;
->> +    uint32_t interrupt_type;
->> +    uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
->> +    uint16_t pci_cmd;
->> +    bool msi_64bit;
->> +    int i, ret;
->> +
->> +    /* retore pci bar configuration */
->> +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
->> +    vfio_pci_write_config(pdev, PCI_COMMAND,
->> +                        pci_cmd & (!(PCI_COMMAND_IO | PCI_COMMAND_MEMORY)), 2);
->> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
->> +        uint32_t bar = qemu_get_be32(f);
->> +
->> +        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, bar, 4);
->> +    }
->> +
->> +    ret = vfio_bars_validate(vdev);
+>> diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
+>> index 9bb1c09e8477..8b296c889ed9 100644
+>> --- a/hw/vfio/Makefile.objs
+>> +++ b/hw/vfio/Makefile.objs
+>> @@ -1,4 +1,4 @@
+>> -obj-y += common.o spapr.o
+>> +obj-y += common.o spapr.o migration.o
+>>   obj-$(CONFIG_VFIO_PCI) += pci.o pci-quirks.o display.o
+>>   obj-$(CONFIG_VFIO_CCW) += ccw.o
+>>   obj-$(CONFIG_VFIO_PLATFORM) += platform.o
+>> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+>> new file mode 100644
+>> index 000000000000..a078dcf1dd8f
+>> --- /dev/null
+>> +++ b/hw/vfio/migration.c
+>> @@ -0,0 +1,138 @@
+>> +/*
+>> + * Migration support for VFIO devices
+>> + *
+>> + * Copyright NVIDIA, Inc. 2019
 > 
-> This isn't quite what I'd expected, since that validate is reading what
-> you read back; I'd have thought you'd validate the bar value before
-> writing it to the device.
-> (I'm also surprised you're only reading 32bit here?)
+> Time flies by...
+> 
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2. See
+>> + * the COPYING file in the top-level directory.
+> 
+> Are you sure you want this to be V2 only? Most code added to qemu now is
+> v2 or later.
 > 
 
-Sorry, then I didn't understood what exactly validation need to done here.
+I kept it same as in files vfio-pci and hw/vfio/common.c
 
-Reading 32-bit here because all PCI_BASE_ADDRESS_* are 32-bit registers. 
-When BARs are 64-bit, adjacent bar addresses are clubbed to use hi and 
-low. For example if BAR0 is 32-bit and BAR1 is 64 bit, 
-PCI_BASE_ADDRESS_0 is used for BAR0. PCI_BASE_ADDRESS_1 is BAR1_lo and 
-PCI_BASE_ADDRESS_2 is BAR1_hi address, then PCI_BASE_ADDRESS_3 will have 
-  BAR2 address.This is according to PCIe specs.
-
-
->> +    if (ret) {
->> +        return ret;
->> +    }
->> +
->> +    interrupt_type = qemu_get_be32(f);
->> +
->> +    if (interrupt_type == VFIO_INT_MSI) {
->> +        /* restore msi configuration */
->> +        msi_flags = pci_default_read_config(pdev,
->> +                                            pdev->msi_cap + PCI_MSI_FLAGS, 2);
->> +        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
->> +
->> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
->> +                              msi_flags & (!PCI_MSI_FLAGS_ENABLE), 2);
->> +
->> +        msi_addr_lo = qemu_get_be32(f);
->> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_LO,
->> +                              msi_addr_lo, 4);
->> +
->> +        msi_addr_hi = qemu_get_be32(f);
->> +        if (msi_64bit) {
->> +            vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_HI,
->> +                                  msi_addr_hi, 4);
->> +        }
->> +        msi_data = qemu_get_be32(f);
->> +        vfio_pci_write_config(pdev,
->> +                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
->> +                msi_data, 2);
->> +
->> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
->> +                              msi_flags | PCI_MSI_FLAGS_ENABLE, 2);
->> +    } else if (interrupt_type == VFIO_INT_MSIX) {
->> +        uint16_t offset = qemu_get_be16(f);
->> +
->> +        /* load enable bit and maskall bit */
->> +        vfio_pci_write_config(pdev, pdev->msix_cap + PCI_MSIX_FLAGS + 1,
->> +                              offset, 2);
->> +        msix_load(pdev, f);
->> +    }
->> +    pci_cmd = qemu_get_be16(f);
->> +    vfio_pci_write_config(pdev, PCI_COMMAND, pci_cmd, 2);
->> +    return 0;
->> +}
->> +
-> 
-> While I don't know PCI as well as Alex, I share the worry about what
-> happens when you decide to want to save more information about the
-> device; you've not got any place holders where you can add anything; and
-> since it's all hand-coded (rather than using vmstate) it's only going to
-> get hairier.
-> 
-
-These are very basic registers of PCI config space. When there are more, 
-which are generally vendor specific, vendor driver should take care of 
-saving and restoring rest of the data in config space.
+Should it be different? Can you give some reference what it should be?
 
 Thanks,
 Kirti
 
-> Dave
-> 
->>   static VFIODeviceOps vfio_pci_ops = {
->>       .vfio_compute_needs_reset = vfio_pci_compute_needs_reset,
->>       .vfio_hot_reset_multi = vfio_pci_hot_reset_multi,
->>       .vfio_eoi = vfio_intx_eoi,
->>       .vfio_get_object = vfio_pci_get_object,
->> +    .vfio_save_config = vfio_pci_save_config,
->> +    .vfio_load_config = vfio_pci_load_config,
->>   };
->>   
->>   int vfio_populate_vga(VFIOPCIDevice *vdev, Error **errp)
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include <linux/vfio.h>
+>> +
+>> +#include "hw/vfio/vfio-common.h"
+>> +#include "cpu.h"
+>> +#include "migration/migration.h"
+>> +#include "migration/qemu-file.h"
+>> +#include "migration/register.h"
+>> +#include "migration/blocker.h"
+>> +#include "migration/misc.h"
+>> +#include "qapi/error.h"
+>> +#include "exec/ramlist.h"
+>> +#include "exec/ram_addr.h"
+>> +#include "pci.h"
+>> +#include "trace.h"
+>> +
+>> +static void vfio_migration_region_exit(VFIODevice *vbasedev)
+>> +{
+>> +    VFIOMigration *migration = vbasedev->migration;
+>> +
+>> +    if (!migration) {
+>> +        return;
+>> +    }
+>> +
+>> +    if (migration->region.size) {
+>> +        vfio_region_exit(&migration->region);
+>> +        vfio_region_finalize(&migration->region);
+>> +    }
+>> +}
+>> +
+>> +static int vfio_migration_region_init(VFIODevice *vbasedev, int index)
+>> +{
+>> +    VFIOMigration *migration = vbasedev->migration;
+>> +    Object *obj = NULL;
+>> +    int ret = -EINVAL;
+>> +
+>> +    if (!vbasedev->ops->vfio_get_object) {
+>> +        return ret;
+>> +    }
+>> +
+>> +    obj = vbasedev->ops->vfio_get_object(vbasedev);
+>> +    if (!obj) {
+>> +        return ret;
+>> +    }
+>> +
+>> +    ret = vfio_region_setup(obj, vbasedev, &migration->region, index,
+>> +                            "migration");
+>> +    if (ret) {
+>> +        error_report("%s: Failed to setup VFIO migration region %d: %s",
+>> +                     vbasedev->name, index, strerror(-ret));
+>> +        goto err;
+>> +    }
+>> +
+>> +    if (!migration->region.size) {
+>> +        ret = -EINVAL;
+>> +        error_report("%s: Invalid region size of VFIO migration region %d: %s",
+>> +                     vbasedev->name, index, strerror(-ret));
+>> +        goto err;
+>> +    }
+>> +
+>> +    return 0;
+>> +
+>> +err:
+>> +    vfio_migration_region_exit(vbasedev);
+>> +    return ret;
+>> +}
+>> +
+>> +static int vfio_migration_init(VFIODevice *vbasedev,
+>> +                               struct vfio_region_info *info)
+>> +{
+>> +    int ret;
+>> +
+>> +    vbasedev->migration = g_new0(VFIOMigration, 1);
+>> +
+>> +    ret = vfio_migration_region_init(vbasedev, info->index);
+>> +    if (ret) {
+>> +        error_report("%s: Failed to initialise migration region",
+>> +                     vbasedev->name);
+>> +        g_free(vbasedev->migration);
+>> +        vbasedev->migration = NULL;
+>> +        return ret;
+>> +    }
+>> +
+>> +    return 0;
+>> +}
+>> +
+>> +/* ---------------------------------------------------------------------- */
+>> +
+>> +int vfio_migration_probe(VFIODevice *vbasedev, Error **errp)
+>> +{
+>> +    struct vfio_region_info *info;
+>> +    Error *local_err = NULL;
+>> +    int ret;
+>> +
+>> +    ret = vfio_get_dev_region_info(vbasedev, VFIO_REGION_TYPE_MIGRATION,
+>> +                                   VFIO_REGION_SUBTYPE_MIGRATION, &info);
+>> +    if (ret) {
+>> +        goto add_blocker;
+>> +    }
+>> +
+>> +    ret = vfio_migration_init(vbasedev, info);
+>> +    if (ret) {
+>> +        goto add_blocker;
+>> +    }
+>> +
+>> +    trace_vfio_migration_probe(vbasedev->name, info->index);
+>> +    return 0;
+>> +
+>> +add_blocker:
+>> +    error_setg(&vbasedev->migration_blocker,
+>> +               "VFIO device doesn't support migration");
+>> +    ret = migrate_add_blocker(vbasedev->migration_blocker, &local_err);
+>> +    if (local_err) {
+>> +        error_propagate(errp, local_err);
+>> +        error_free(vbasedev->migration_blocker);
+>> +    }
+>> +    return ret;
+>> +}
+>> +
+>> +void vfio_migration_finalize(VFIODevice *vbasedev)
+>> +{
+>> +    if (vbasedev->migration_blocker) {
+>> +        migrate_del_blocker(vbasedev->migration_blocker);
+>> +        error_free(vbasedev->migration_blocker);
+>> +    }
+>> +
+>> +    vfio_migration_region_exit(vbasedev);
+>> +    g_free(vbasedev->migration);
+>> +}
+>> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+>> index 8cdc27946cb8..191a726a1312 100644
+>> --- a/hw/vfio/trace-events
+>> +++ b/hw/vfio/trace-events
+>> @@ -143,3 +143,6 @@ vfio_display_edid_link_up(void) ""
+>>   vfio_display_edid_link_down(void) ""
+>>   vfio_display_edid_update(uint32_t prefx, uint32_t prefy) "%ux%u"
+>>   vfio_display_edid_write_error(void) ""
+>> +
+>> +# migration.c
+>> +vfio_migration_probe(char *name, uint32_t index) " (%s) Region %d"
 >> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
->> index 74261feaeac9..d69a7f3ae31e 100644
+>> index d69a7f3ae31e..d4b268641173 100644
 >> --- a/include/hw/vfio/vfio-common.h
 >> +++ b/include/hw/vfio/vfio-common.h
->> @@ -120,6 +120,8 @@ struct VFIODeviceOps {
->>       int (*vfio_hot_reset_multi)(VFIODevice *vdev);
->>       void (*vfio_eoi)(VFIODevice *vdev);
->>       Object *(*vfio_get_object)(VFIODevice *vdev);
->> +    void (*vfio_save_config)(VFIODevice *vdev, QEMUFile *f);
->> +    int (*vfio_load_config)(VFIODevice *vdev, QEMUFile *f);
->>   };
+>> @@ -57,6 +57,10 @@ typedef struct VFIORegion {
+>>       uint8_t nr; /* cache the region number for debug */
+>>   } VFIORegion;
 >>   
->>   typedef struct VFIOGroup {
+>> +typedef struct VFIOMigration {
+>> +    VFIORegion region;
+>> +} VFIOMigration;
+>> +
+>>   typedef struct VFIOAddressSpace {
+>>       AddressSpace *as;
+>>       QLIST_HEAD(, VFIOContainer) containers;
+>> @@ -113,6 +117,8 @@ typedef struct VFIODevice {
+>>       unsigned int num_irqs;
+>>       unsigned int num_regions;
+>>       unsigned int flags;
+>> +    VFIOMigration *migration;
+>> +    Error *migration_blocker;
+>>   } VFIODevice;
+>>   
+>>   struct VFIODeviceOps {
+>> @@ -204,4 +210,7 @@ int vfio_spapr_create_window(VFIOContainer *container,
+>>   int vfio_spapr_remove_window(VFIOContainer *container,
+>>                                hwaddr offset_within_address_space);
+>>   
+>> +int vfio_migration_probe(VFIODevice *vbasedev, Error **errp);
+>> +void vfio_migration_finalize(VFIODevice *vbasedev);
+>> +
+>>   #endif /* HW_VFIO_VFIO_COMMON_H */
 >> -- 
 >> 2.7.0
 >>
