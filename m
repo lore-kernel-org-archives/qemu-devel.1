@@ -2,119 +2,102 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2C20C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 09:49:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C716EC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 09:51:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9900C20658
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 09:49:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9900C20658
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 8EFC520658
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 09:51:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NEkiEZCN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EFC520658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVXix-0007wd-OH
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 05:49:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57130)
+	id 1jVXkc-0002LF-Nb
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 05:51:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jVXgJ-0004Fx-8R; Mon, 04 May 2020 05:46:35 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:39521)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jVXgH-0003gA-TU; Mon, 04 May 2020 05:46:34 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1Mtfa5-1j9cVu3VxX-00v8YD; Mon, 04 May 2020 11:46:30 +0200
-Subject: Re: [PATCH] elf_ops: Don't try to g_mapped_file_unref(NULL)
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- qemu-trivial@nongnu.org
-References: <20200423202011.32686-1-peter.maydell@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <c44d6231-1b11-1d4e-8885-dd4e81745acf@vivier.eu>
-Date: Mon, 4 May 2020 11:46:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVXgb-0004rG-IR
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 05:46:53 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22363
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVXgZ-00044C-Ud
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 05:46:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588585611;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=KhOlEPdV1MPRa1bhWdiFiaKD4sTZExgyZBrWdNh/d4I=;
+ b=NEkiEZCNWrxelnDujwEvNL+zpD9zUy8jqNZt8iKL1PshQ5I3subJPw1D6A8kFxhCm0nPk+
+ KZFHunVtFfYhbLEaB278D0hGkTIsD4A1uo+d8zUVw77Twm4bBvUTDeK+46CldwcTI6NxmV
+ DhWa5YJhniRj3lB717uVcr+uK7daBBk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-360-PKpxtiWPOCC29jxLKp6yRQ-1; Mon, 04 May 2020 05:46:50 -0400
+X-MC-Unique: PKpxtiWPOCC29jxLKp6yRQ-1
+Received: by mail-wm1-f71.google.com with SMTP id b203so3212760wmd.6
+ for <qemu-devel@nongnu.org>; Mon, 04 May 2020 02:46:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=fe9XuSKHStEMPdZ3hwHFEgn1Ge5bLQXbUaYotgjFj4E=;
+ b=KKBDczEK2dNGaqNM49J+v/GZ3r9KHDWnZbaUmx/owa+hJWPkP+X9CI8v2ygB+Gb/K/
+ seFj3PZ8EyPQUAi3v72sEpeIQ8vRqs21cgAk5kCydyxHfrNRHxuFKx0LcQ6VB4D6GK1E
+ UtLzR9SxWcgFWoF0K1ABxlHPBsmuxQoQ7ZrZN7v3KoLtDi7uN9GXrNc7u0YdUNR4VC16
+ y+/yHhclypYfeuZGXgJs/dZ8m1uOL8/rS7mL65YaI3u0xGlI855S/7JSRs2jCeW9IEgI
+ Ghbh2p7ADPiwmhxgR2giuxcRdWIj8IiHenBS4W0Zwmno7NBQ/RHKXXM+1/Istk7sy0+b
+ cGDg==
+X-Gm-Message-State: AGi0PuY1+0zwz65bz2HwmrnjB4pmku9VNPnrHid8MWv25IEWxJeb///a
+ 747ZjVANQ2IRcAALPWs+p8F8p2NK2egdntb6+6GiomlDEcs/Y1j4VcadecEsEto1EScTeqTLyWs
+ R4myBVXnJBXP5pIA=
+X-Received: by 2002:a1c:dfc2:: with SMTP id w185mr13126525wmg.1.1588585608433; 
+ Mon, 04 May 2020 02:46:48 -0700 (PDT)
+X-Google-Smtp-Source: APiQypL1J0dxwdFdpgEDg8RfuSauWRqWbXCT2JLum/eK1/uv9/8nuQGi696XSk/esqWqO1+WztmEdw==
+X-Received: by 2002:a1c:dfc2:: with SMTP id w185mr13126493wmg.1.1588585608190; 
+ Mon, 04 May 2020 02:46:48 -0700 (PDT)
+Received: from x1w.redhat.com (26.red-88-21-207.staticip.rima-tde.net.
+ [88.21.207.26])
+ by smtp.gmail.com with ESMTPSA id q4sm11501353wrx.9.2020.05.04.02.46.47
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 04 May 2020 02:46:47 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/6] qemu/osdep: Document qemu_memalign() and friends
+Date: Mon,  4 May 2020 11:46:36 +0200
+Message-Id: <20200504094641.4963-2-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200504094641.4963-1-philmd@redhat.com>
+References: <20200504094641.4963-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200423202011.32686-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:78WMLJn5tnIOJ0XzIeaJ9HFq5dYXhc/VvqhcNZ7z0tXiOIP9OxW
- zL/cFlWjLi52nNXucYOM65uDdR4rh7+BMjVXD0qoKzDUxprYvSIJchb1H+DuXZkcSLtoE4e
- JW97Jya6ShVSRjLGVFHINUu5luPzjEi5LhpsNaEuN/6SDuFvfy3iXJo0gxvQqH/nMAic4lx
- ggz/g1Z8OXdifTYplM9MQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:T3VCYg3yp2w=:qbBhRE0DYWT5YWOOPoXt6d
- +c4V2mv7XZLwc4DHxgy3kjPP+3E3T4cIM33nSsbwYxo5+bWUPNi6RGms+9GAHJdnCQ+dmjDOK
- yKUjNt6tVLjk1+xFuY0Zs2HmrPF3mp3qybo4oQY9mhIFRy9qiiGtpYK3lQgLRHOhp6LIpEY68
- pFDjE/i+N6iuuJLr7IE6t4S1Y7WpQ1gf2nzXku7OC1CSIQQBwJpmswzH2DooCSRI2XumZ6Agl
- Gf58PQgac5Zv70i0bjReJuGhV/TouSbeBLppzhdiFqPzK6ePoZ73awe3XmYWp2ibP2ISMOWeR
- XcR1+9EuCX/98ZAf03YiOMU+6s6OdDTjc2rpSnso+HOjAPGhQ0DKc/hq+pQwYY/7CU3hcztql
- OI6/2XrwWlECrbi0ljmS1FHiURHP79w44xQ1xHHdRR9vwDOG6S3tuB7cvz6Eqgn39F78pP/nD
- ED731rimoqttKHrB2GgO/zVn1/5AUvlOxrH7UyLlCEKNWtFQZIdMOzs4h0s4L13CLI5I5Bs4r
- fVmBM7lbEHTsf2YsCFbYiKfNhz1oI37pZQcIf3uzcKD707vv9g1SghKEG9U4ofDTUCz4N7KvE
- YkKw0UBgdwtOck8sgVCkfW1dYp3NKRY0N4Rqvi5mLdt4qzFvwD0ZXGjtCy/rp32xYZuZf2tRq
- m8AyzcNAdskX7jh7rDL7rqpjSALc69EmZkeJsmbyZHLXW5moskEDjsL1kEKLTS7NI865Ljr2n
- tfNRJnN8c45CBgB1jO0Zv81nRYpngjKVacxqIMBsbtUl49gBQuw6S0NMjPYxx0RelVv6ao3Uw
- fvKndeIMHK/SA5XYIR7OmOdymW4GolbwjZDy19CE/dmfMkYQy6qjEoqlcRvkYsIBBsfYUVn
-Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 05:45:54
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 01:21:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,59 +110,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Randy Yates <yates@ieee.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
+ Keith Busch <keith.busch@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 23/04/2020 à 22:20, Peter Maydell a écrit :
-> Calling g_mapped_file_unref() on a NULL pointer is not valid, and
-> glib will assert if you try it.
-> 
-> $ qemu-system-arm -M virt -display none -device loader,file=/tmp/bad.elf
-> qemu-system-arm: -device loader,file=/tmp/bad.elf: GLib: g_mapped_file_unref: assertion 'file != NULL' failed
-> 
-> (One way to produce an ELF file that fails like this is to copy just
-> the first 16 bytes of a valid ELF file; this is sufficient to fool
-> the code in load_elf_ram_sym() into thinking it's an ELF file and
-> calling load_elf32() or load_elf64().)
-> 
-> The failure-exit path in load_elf can be reached from various points
-> in execution, and for some of those we haven't yet called
-> g_mapped_file_new_from_fd().  Add a condition to the unref call so we
-> only call it if we successfully created the GMappedFile to start with.
-> 
-> This will fix the assertion; for the specific case of the generic
-> loader it will then fall back from "guess this is an ELF file" to
-> "maybe it's a uImage or a hex file" and eventually to "just load as
-> a raw data file".
-> 
-> Reported-by: Randy Yates <yates@ieee.org>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  include/hw/elf_ops.h | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
-> index e0bb47bb678..398a4a2c85b 100644
-> --- a/include/hw/elf_ops.h
-> +++ b/include/hw/elf_ops.h
-> @@ -606,7 +606,9 @@ static int glue(load_elf, SZ)(const char *name, int fd,
->          *highaddr = (uint64_t)(elf_sword)high;
->      ret = total_size;
->   fail:
-> -    g_mapped_file_unref(mapped_file);
-> +    if (mapped_file) {
-> +        g_mapped_file_unref(mapped_file);
-> +    }
->      g_free(phdr);
->      return ret;
->  }
-> 
+Document allocator functions that require a specific
+de-allocator call.
 
-Applied to my trivial-patches branch.
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ include/block/block.h          | 4 ++++
+ include/qemu/osdep.h           | 3 +++
+ include/sysemu/block-backend.h | 2 ++
+ 3 files changed, 9 insertions(+)
 
-Thanks,
-Laurent
+diff --git a/include/block/block.h b/include/block/block.h
+index 8b62429aa4..c57fdecf9a 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -526,9 +526,13 @@ void bdrv_img_create(const char *filename, const char =
+*fmt,
+ size_t bdrv_min_mem_align(BlockDriverState *bs);
+ /* Returns optimal alignment in bytes for bounce buffer */
+ size_t bdrv_opt_mem_align(BlockDriverState *bs);
++/* callers must free the returned pointer with qemu_vfree() */
+ void *qemu_blockalign(BlockDriverState *bs, size_t size);
++/* callers must free the returned pointer with qemu_vfree() */
+ void *qemu_blockalign0(BlockDriverState *bs, size_t size);
++/* callers must free the returned pointer with qemu_vfree() */
+ void *qemu_try_blockalign(BlockDriverState *bs, size_t size);
++/* callers must free the returned pointer with qemu_vfree() */
+ void *qemu_try_blockalign0(BlockDriverState *bs, size_t size);
+ bool bdrv_qiov_is_aligned(BlockDriverState *bs, QEMUIOVector *qiov);
+=20
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 20f5c5f197..778c459c22 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -294,8 +294,11 @@ extern int daemon(int, int);
+ #endif
+=20
+ int qemu_daemon(int nochdir, int noclose);
++/* callers must free the returned pointer with qemu_vfree() */
+ void *qemu_try_memalign(size_t alignment, size_t size);
++/* callers must free the returned pointer with qemu_vfree() */
+ void *qemu_memalign(size_t alignment, size_t size);
++/* callers must free the returned pointer with qemu_anon_ram_free() */
+ void *qemu_anon_ram_alloc(size_t size, uint64_t *align, bool shared);
+ void qemu_vfree(void *ptr);
+ void qemu_anon_ram_free(void *ptr, size_t size);
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.=
+h
+index 34de7faa81..f2dcf63ae3 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -203,7 +203,9 @@ uint32_t blk_get_request_alignment(BlockBackend *blk);
+ uint32_t blk_get_max_transfer(BlockBackend *blk);
+ int blk_get_max_iov(BlockBackend *blk);
+ void blk_set_guest_block_size(BlockBackend *blk, int align);
++/* callers must free the returned pointer with qemu_vfree() */
+ void *blk_try_blockalign(BlockBackend *blk, size_t size);
++/* callers must free the returned pointer with qemu_vfree() */
+ void *blk_blockalign(BlockBackend *blk, size_t size);
+ bool blk_op_is_blocked(BlockBackend *blk, BlockOpType op, Error **errp);
+ void blk_op_unblock(BlockBackend *blk, BlockOpType op, Error *reason);
+--=20
+2.21.3
 
 
