@@ -2,102 +2,92 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87DA3C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:47:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30436C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:47:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 507AC206D9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:47:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F0A4F206D9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:47:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BLmeD/hh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 507AC206D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fMa0qpfa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0A4F206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVcNO-0002UD-8m
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 10:47:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47680)
+	id 1jVcNQ-0002aV-PK
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 10:47:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49638)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jVc7M-0007cH-Q2
- for qemu-devel@nongnu.org; Mon, 04 May 2020 10:30:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52501
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jVc7L-0007BT-42
- for qemu-devel@nongnu.org; Mon, 04 May 2020 10:30:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588602646;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=K14BES+WMFIbn9g8gN8psPne12nk195ussOGSNV/KSs=;
- b=BLmeD/hhazn0h1daFvgH7NrBVdTpq/6zYgxpYFPgY2n+wT9KDVVzXMfkU0CRg5eM3E+1D7
- 8FP3EaCA3iFfkXWKjw/AdA6vAEcDiID42FxEeGJ5JUTydzkFTQUEIhdfFbSjSpUA3bxE56
- m/pcEmfDfqHH1m+uAI7+WM6ma3qR1Ho=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-6rNV01IwNXmtjoii3MQVgQ-1; Mon, 04 May 2020 10:30:14 -0400
-X-MC-Unique: 6rNV01IwNXmtjoii3MQVgQ-1
-Received: by mail-wr1-f69.google.com with SMTP id 30so365194wrp.22
- for <qemu-devel@nongnu.org>; Mon, 04 May 2020 07:30:14 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jVcJr-0005S6-1z; Mon, 04 May 2020 10:43:43 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:35400)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jVcJn-0006rw-Jd; Mon, 04 May 2020 10:43:41 -0400
+Received: by mail-lj1-x242.google.com with SMTP id g4so9940008ljl.2;
+ Mon, 04 May 2020 07:43:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=OfKvkccqu1FZg1raEspi36fatxXhkuXGlT7Uesj0f10=;
+ b=fMa0qpfappe7P5ER0d5byeF0JkfoGvmgtcaHZXsvvHVBjGESnmvI3fyiVFQbvd+5SU
+ AsuMojNIws33PhExnkPDocWy5V2011hcMEuWhBOfImZA2FsWkckBMPF+NvswYY/2Vq/F
+ xhAECbArZm4N8MWYcsihWIWeFkgRsSKbE0zNkU5yTaH4Nk84mwImAUYFIRscig6H63lY
+ VocoNWry4UnrePezv8HRYVKx6A38Y/1SjHj1e97w21fr2fH6WSmpdv0XvjnNq5s9dvq6
+ dvKLrxMxyfHNMJLwv2itNIwry2levx2se9cix9BMwHo2wemUmMK3oC9TqHNhIMg+y1i7
+ ymSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=SvK/mML0hz5y1ob99KnJXcmnCwrQAmI3Al2Kedz9fuQ=;
- b=RcLBIEabmJ1qDjSGmMSqFFeTRAk/an2Sjz/h5jvPM9bL8q1qsdvARV7XF/yRRjJLON
- AwdqJ2Rktl5JJdxolp93Fx9Sbl69YMhveuljNRdNm4ETrxHnn4w+zJc3XcvhqZNaTeoA
- 9kWFdAxLfh3V0TcU749Vu54g4vzhOKgBMMVgiHMIGQHMfEhQBqxn8L/wMzWi0VRg47aU
- ggKTeklZo9kH/5daLFBcVoqPJBoWdx7tHMPkYp/BQhpSxa6OQgkMxcXlCh6NXxpisFoM
- hNVbHbz2TW0E7EoSStnCEYgJnOHTX8Svwp4005nds78zoEFe8JEfJTDZwZuafEk9FLTl
- pxgw==
-X-Gm-Message-State: AGi0PuaX+gIJT2wmR65hB3N5JEx+QkQ/6/uwxYiWQOzUyRYHqV6fHDHR
- V8PtCI9LDKKTm+qePZWTe+95m+w6QgDuxXKKbOxbwYKLHmH2ZGtutfR6pETeUsp95JaXGhrUmTF
- tUzW8C9+OrdI9NKE=
-X-Received: by 2002:a1c:1b0b:: with SMTP id b11mr15741597wmb.182.1588602613290; 
- Mon, 04 May 2020 07:30:13 -0700 (PDT)
-X-Google-Smtp-Source: APiQypL5/gC6OcLO6h+1lQ7Gh9SSFJ70lKElmnKKcHPTPeKmjofiV0X6uJ/caoKIyA2OF6b8tFrvRg==
-X-Received: by 2002:a1c:1b0b:: with SMTP id b11mr15741564wmb.182.1588602613044; 
- Mon, 04 May 2020 07:30:13 -0700 (PDT)
-Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
- by smtp.gmail.com with ESMTPSA id
- x16sm12527456wrn.76.2020.05.04.07.30.11
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=OfKvkccqu1FZg1raEspi36fatxXhkuXGlT7Uesj0f10=;
+ b=iFPREr0GakYKtvYgi+GtBvVYvyvYb/A0nckSQ/KVcCOrwOZdx6EsiqVazzn2sggtYd
+ tAQp3AG6HX4JiDuk7d7Lq84hobBk+l+QrGojJ3UZUen3D6ZrbhvOoSxNk9Cx8TUAzOLf
+ TT3jpdzrVZwQJC2A5R/XuA+iJcTzJJF97VAPuPEtYy+a+7nVyJY78DIqHx+QyhJ248oF
+ bTcjFAZrBVYrfVMrFRG5JwWs5sDUsiikZdvATOHtCr2awcKBi2wggEqk7jxn+utp294R
+ pWjozEhtCtTtYMMbiFm3Ep1rZEdfZkFZqjdvUGrr5x32MUUxhYsKb8adwMB1m7aT+ql9
+ cDHg==
+X-Gm-Message-State: AGi0PuZYqyUGTWqLXzWTZwmlcryZ9zEC8Ja0v5V8da7V0Z8bHQ8BxjYu
+ s7X3qjixipkl2X5PSweH81M=
+X-Google-Smtp-Source: APiQypIAFExYSaIFGwQaycYJ3k3RUxTQauyAVerT4m9uD0Yrn2hB+C8VKnE65u1uFEmSnfSZc3YKzA==
+X-Received: by 2002:a2e:7815:: with SMTP id t21mr10691773ljc.146.1588603417346; 
+ Mon, 04 May 2020 07:43:37 -0700 (PDT)
+Received: from localhost (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id l25sm9927746lfh.71.2020.05.04.07.43.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 May 2020 07:30:12 -0700 (PDT)
-Date: Mon, 4 May 2020 10:30:10 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 24/29] acpi: Add Windows ACPI Emulated Device Table (WAET)
-Message-ID: <20200504142814.157589-25-mst@redhat.com>
-References: <20200504142814.157589-1-mst@redhat.com>
+ Mon, 04 May 2020 07:43:36 -0700 (PDT)
+Date: Mon, 4 May 2020 16:43:35 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Subject: Re: [PATCH v2 02/10] net: cadence_gem: Fix the queue address update
+ during wrap around
+Message-ID: <20200504144335.GC5519@toto>
+References: <1588601168-27576-1-git-send-email-sai.pavan.boddu@xilinx.com>
+ <1588601168-27576-3-git-send-email-sai.pavan.boddu@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <20200504142814.157589-1-mst@redhat.com>
-X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
-X-Mutt-Fcc: =sent
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 04:24:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+In-Reply-To: <1588601168-27576-3-git-send-email-sai.pavan.boddu@xilinx.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Received-SPF: pass client-ip=2a00:1450:4864:20::242;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x242.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -111,103 +101,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Liran Alon <liran.alon@oracle.com>,
- Igor Mammedov <imammedo@redhat.com>, Elad Gabay <elad.gabay@oracle.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, Tong Ho <tong.ho@xilinx.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Ramon Fried <rfried.dev@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liran Alon <liran.alon@oracle.com>
+On Mon, May 04, 2020 at 07:36:00PM +0530, Sai Pavan Boddu wrote:
+> During wrap around and reset, queues are pointing to initial base
+> address of queue 0, irrespective of what queue we are dealing with.
+> Fix it by assigning proper base address every time.
 
-Microsoft introduced this ACPI table to avoid Windows guests performing
-various workarounds for device erratas. As the virtual device emulated
-by VMM may not have the errata.
+Might want to add wrappers e.g:
+static inline uint32_t gem_get_rx_queue_base_addr(CadenceGEMState *s, int q) {
+    gem_get_queue_base_addr(s, false, q); 
+}
 
-Currently, WAET allows hypervisor to inform guest about two
-specific behaviors: One for RTC and the other for ACPI PM timer.
+static inline uint32_t gem_get_tx_queue_base_addr(CadenceGEMState *s, int q) {
+    gem_get_queue_base_addr(s, true, q); 
+}
 
-Support for WAET have been introduced since Windows Vista. This ACPI
-table is also exposed by other common hypervisors by default, including:
-VMware, GCP and AWS.
+It makes the packet processing logic a little easier to read, e.g:
 
-This patch adds WAET ACPI Table to QEMU.
+s->rx_desc_addr[q] = gem_get_rx_queue_base_addr(s, q);
+vs
+s->rx_desc_addr[q] = gem_get_queue_base_addr(s, false, q);
 
-We set "ACPI PM timer good" bit in "Emualted Device Flags" field to
-indicate that the ACPI PM timer has been enhanced to not require
-multiple reads to obtain a reliable value.
-This results in improving the performance of Windows guests that use
-ACPI PM timer by avoiding unnecessary VMExits caused by these multiple
-reads.
+Anyway, this looks good to me:
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-Co-developed-by: Elad Gabay <elad.gabay@oracle.com>
-Signed-off-by: Liran Alon <liran.alon@oracle.com>
-Message-Id: <20200313145009.144820-3-liran.alon@oracle.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
----
- hw/i386/acpi-build.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 7d880bec4a..2e15f6848e 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2512,6 +2512,34 @@ build_dmar_q35(GArray *table_data, BIOSLinker *linke=
-r)
-     build_header(linker, table_data, (void *)(table_data->data + dmar_star=
-t),
-                  "DMAR", table_data->len - dmar_start, 1, NULL, NULL);
- }
-+
-+/*
-+ * Windows ACPI Emulated Devices Table
-+ * (Version 1.0 - April 6, 2009)
-+ * Spec: http://download.microsoft.com/download/7/E/7/7E7662CF-CBEA-470B-A=
-97E-CE7CE0D98DC2/WAET.docx
-+ *
-+ * Helpful to speedup Windows guests and ignored by others.
-+ */
-+static void
-+build_waet(GArray *table_data, BIOSLinker *linker)
-+{
-+    int waet_start =3D table_data->len;
-+
-+    /* WAET header */
-+    acpi_data_push(table_data, sizeof(AcpiTableHeader));
-+    /*
-+     * Set "ACPI PM timer good" flag.
-+     *
-+     * Tells Windows guests that our ACPI PM timer is reliable in the
-+     * sense that guest can read it only once to obtain a reliable value.
-+     * Which avoids costly VMExits caused by guest re-reading it unnecessa=
-rily.
-+     */
-+    build_append_int_noprefix(table_data, 1 << 1 /* ACPI PM timer good */,=
- 4);
-+
-+    build_header(linker, table_data, (void *)(table_data->data + waet_star=
-t),
-+                 "WAET", table_data->len - waet_start, 1, NULL, NULL);
-+}
-+
- /*
-  *   IVRS table as specified in AMD IOMMU Specification v2.62, Section 5.2
-  *   accessible here http://support.amd.com/TechDocs/48882_IOMMU.pdf
-@@ -2859,6 +2887,9 @@ void acpi_build(AcpiBuildTables *tables, MachineState=
- *machine)
-                           machine->nvdimms_state, machine->ram_slots);
-     }
-=20
-+    acpi_add_table(table_offsets, tables_blob);
-+    build_waet(tables_blob, tables->linker);
-+
-     /* Add tables supplied by user (if any) */
-     for (u =3D acpi_table_first(); u; u =3D acpi_table_next(u)) {
-         unsigned len =3D acpi_table_len(u);
---=20
-MST
 
+> 
+> Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+> ---
+>  hw/net/cadence_gem.c | 29 +++++++++++++++++++++++++----
+>  1 file changed, 25 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
+> index 2f244eb..6cb2f64 100644
+> --- a/hw/net/cadence_gem.c
+> +++ b/hw/net/cadence_gem.c
+> @@ -845,6 +845,25 @@ static int get_queue_from_screen(CadenceGEMState *s, uint8_t *rxbuf_ptr,
+>      return 0;
+>  }
+>  
+> +static uint32_t gem_get_queue_base_addr(CadenceGEMState *s, bool tx, int q)
+> +{
+> +    uint32_t base_addr = 0;
+> +
+> +    switch (q) {
+> +    case 0:
+> +        base_addr = s->regs[tx ? GEM_TXQBASE : GEM_RXQBASE];
+> +        break;
+> +    case 1 ... (MAX_PRIORITY_QUEUES - 1):
+> +        base_addr = s->regs[(tx ? GEM_TRANSMIT_Q1_PTR :
+> +                                 GEM_RECEIVE_Q1_PTR) + q - 1];
+> +        break;
+> +    default:
+> +        g_assert_not_reached();
+> +    };
+> +
+> +    return base_addr;
+> +}
+> +
+>  static hwaddr gem_get_desc_addr(CadenceGEMState *s, bool tx, int q)
+>  {
+>      hwaddr desc_addr = 0;
+> @@ -1044,7 +1063,7 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
+>          /* Next descriptor */
+>          if (rx_desc_get_wrap(s->rx_desc[q])) {
+>              DB_PRINT("wrapping RX descriptor list\n");
+> -            s->rx_desc_addr[q] = s->regs[GEM_RXQBASE];
+> +            s->rx_desc_addr[q] = gem_get_queue_base_addr(s, false, q);
+>          } else {
+>              DB_PRINT("incrementing RX descriptor list\n");
+>              s->rx_desc_addr[q] += 4 * gem_get_desc_len(s, true);
+> @@ -1200,7 +1219,8 @@ static void gem_transmit(CadenceGEMState *s)
+>                                      sizeof(desc_first));
+>                  /* Advance the hardware current descriptor past this packet */
+>                  if (tx_desc_get_wrap(desc)) {
+> -                    s->tx_desc_addr[q] = s->regs[GEM_TXQBASE];
+> +                    s->tx_desc_addr[q] = gem_get_queue_base_addr(s,
+> +                                         true, q);
+>                  } else {
+>                      s->tx_desc_addr[q] = packet_desc_addr +
+>                                           4 * gem_get_desc_len(s, false);
+> @@ -1252,7 +1272,8 @@ static void gem_transmit(CadenceGEMState *s)
+>                  } else {
+>                      packet_desc_addr = 0;
+>                  }
+> -                packet_desc_addr |= s->regs[GEM_TXQBASE];
+> +                packet_desc_addr |= gem_get_queue_base_addr(s,
+> +                                    true, q);
+>              } else {
+>                  packet_desc_addr += 4 * gem_get_desc_len(s, false);
+>              }
+> @@ -1458,7 +1479,7 @@ static void gem_write(void *opaque, hwaddr offset, uint64_t val,
+>          if (!(val & GEM_NWCTRL_TXENA)) {
+>              /* Reset to start of Q when transmit disabled. */
+>              for (i = 0; i < s->num_priority_queues; i++) {
+> -                s->tx_desc_addr[i] = s->regs[GEM_TXQBASE];
+> +                s->tx_desc_addr[i] = gem_get_queue_base_addr(s, true, i);
+>              }
+>          }
+>          if (gem_can_receive(qemu_get_queue(s->nic))) {
+> -- 
+> 2.7.4
+> 
 
