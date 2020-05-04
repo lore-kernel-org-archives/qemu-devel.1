@@ -4,64 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D0ADC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:03:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE267C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:05:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D8E220721
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:03:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D8E220721
+	by mail.kernel.org (Postfix) with ESMTPS id AAC3D20721
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:05:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAC3D20721
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVdYp-0004oI-Ck
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 12:03:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37996)
+	id 1jVdaz-0000my-DA
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 12:05:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38016)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jVdVr-0001F1-3I; Mon, 04 May 2020 12:00:11 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:52715)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ id 1jVdVt-0001J4-F6; Mon, 04 May 2020 12:00:14 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:55581)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jVdVq-0005kK-3B; Mon, 04 May 2020 12:00:10 -0400
+ id 1jVdVq-0005kX-Nj; Mon, 04 May 2020 12:00:13 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MofPt-1ilnFk1Wwr-00p6Ni; Mon, 04 May 2020 18:00:05 +0200
+ id 1Ml6Vg-1ir1uS0yyq-00lVLH; Mon, 04 May 2020 18:00:04 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 06/19] hw/mem/pc-dimm: Fix line over 80 characters warning
-Date: Mon,  4 May 2020 17:59:43 +0200
-Message-Id: <20200504155956.380695-7-laurent@vivier.eu>
+Subject: [PULL v2 04/19] MAINTAINERS: Mark the LatticeMico32 target as orphan
+Date: Mon,  4 May 2020 17:59:41 +0200
+Message-Id: <20200504155956.380695-5-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200504155956.380695-1-laurent@vivier.eu>
 References: <20200504155956.380695-1-laurent@vivier.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:em8Ro7Bxb76UX+NhBZVrhfAo2IY158fF8IAqTyytP9VC0EvtNvj
- VnN3b3aL++yj4gdmMyTg9Mn5sUN+Ve+Zqh51S5Ux6UUME1Es4TkFuAFj4yo/4RrlT4OPAZw
- us95WJ7qwU+ipeYIVpJLwiS5gA0SIAKt6sHaBS3xFws2vxn/Ezb1D5sZg4qm3OjTxVSVEHt
- qsrF1QLItJdFcJ7dHtnXg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:EsG4avR42vE=:8iY838rOaAJiXcAfwcAo6O
- wUGkOvzha7fDgU7ARzJeN6er9b/9p14U1PxuXhTpHeFntFsF9KCOqAKLgWM7difDayPoRD19T
- NT/SJREm7vSaT8UmNuTPMMDHvoiOoTkJvcou6av2/fKxA3cdwlGeD04Tqlftwa0EkDVUbprLh
- z+EJNF2DQUxm4jacL52bos0/YwRRB9EZI8AI5pj8Lr43+GqzCiIf9wjXmH6c8nvra5qpvUeY1
- jgoXe1iTZ9K1B1CtTh1GZL0gpYm5i2F04BK9JuHkAN9Tc+mQ+1/+52jIeTvEM8Ee0YKfwM42Q
- 4K6JM8EbYQ9JMYxCHNg+wUS29MvgTkxFVYMbBhh/vnzWhaIlDiatWM8ek5oWBT5pFvcMA1pcS
- 8a58vo2FYmKuSnW/3QpVT3tEqNQySqUZHpSQKq02tpiFkVZyipqteZMHKRuCo5q3RcSPF264/
- r6XedbzwX0olTai/e8LIco5B1Qtdtuf1evv5ozGDNjObgnFm4+ART4Owujhr7BK0WlM6Cb2Ov
- qwCDsyE110jA7XlHPmhipoQ5vCPjzhFK7fqSGi4RXOz7ffG5KlL1BhWr9bFwdeV9yUwn7mOKf
- U6VMicYQt1Pk0R2pr4KEkCSAkOcloW+rxL9lYnNGWE/NeHNl0PYkp7+yJXeC4Cu0eBzaBxm2D
- PSF/A7oz1WPcRGrokPG0dKnggHX0xvn6J45XlsPFaLplT2abQp5wjgglE6brJVid1e9NFDO7w
- zWJA3dmJZPS25d6fc7mM9l/Fqnt2tN1/d+5PYCZKVzK0duycezkdTkxeDYTk+BKKhYLfobfZr
- DPsu1C5L8qJn6xnKddBlqoe07iPcmk6hNN/qXxYoNHa9nK+Pq/oa4qVQSCXcKMq/XwmWK6o
-Received-SPF: none client-ip=212.227.126.130; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:uL5p/nsB0SL9v6+OlrXPk88iIW/lceEcRXqq1kPFLlsqck5NLVq
+ qnFfxx8gneiX7DlS8ylUgCy2qulqQehChjELnmOQXYixnBG7nOp4AghGJOb/tAK1D06M6G/
+ Z8pFWlTnTdcQ4gAX/7CZ2mnfgDf72ibAURP/yAMWP6yyK2x43ItDp4rh3C6N8g170jV8cdW
+ jS+bAfM6/MaXgsxwv95uQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:gJBEcdtFzpU=:TZ5Wxr+iLpdkhvFv8jb4ak
+ +v+UkQmcrkGliVcfy/3JCiGWiKAn93usySCSvwP9e6Q9AqB4HpueODQKp+gIJiuFCQeGW6RGV
+ jzcqLT8SvngEias602hhuQMRRU5nJLYOXDg4jUkvxvSszaCTjM7zD6TKSU/Ob7TNKNDh6apxv
+ kUpVnXCeGtbj3JDNIKUu1zigaUxRE1si5f8JFnHc3YJZTN2uANIdapqYBZbw9BjlVVUb22h4m
+ ffOsP1R++6UOqUtETM/9aX2x29QFZh6UdXiw7NaRW8s7YH7mGgRWPR5durE3kSRWOmFC4hAUl
+ VesIAUVvAzCtT1N+i7I887ExLHA76PSsYzMdkeOVL5NPPFy22pInsxC1ZmVD8n+2BZnv4uyQo
+ AMPd0dcLHGl98hybsVsU6AYQvuvfOBzF6+loGt6nB7sun6rZu07paSjg4p7Al9vJvUubV+gvp
+ PQH2ATcg6JHwZY+KZ3gXlefO+1OnolW9Ouxa7OBvEMJYlNPRlEtuVDkrADM/d4nPn6lo9Io/I
+ Nv9O3vJYk+l6lowYjMP00wKpbsgkxgNMI/v/F5ThYh3BmloAsEHVGJZcZoFiPCB9JTl/G0evW
+ IBhUwghYj6wNjWFBKiHsJfTMhnhKzBvdSse5QMAUa/kNQHcgX/iSlUBPYrNHAgXm5U4VwPdV6
+ d8M8P3cNznFNdKzSd1rcQdmD2sVbe/Cl+nmiZrzQ6S7MhHzMt8EumloGLzf+VlGYD22lcguBd
+ vsheW8FU9FbryDuUq4GfzJAoHA6HKCjg2xCQDbpT21+W6swWk5xwnGi2ah7wkDKMGnjd+2wFx
+ uAaG02ouXsLQbBwEseVmyvGt7rOvt5Y68fjxc24GIJZjv52p7q1ZpFMnUSsk3KJXLBGySep
+Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 12:00:08
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 12:00:09
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -81,35 +82,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
- Laurent Vivier <laurent@vivier.eu>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>, Michael Walle <michael@walle.cc>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-Id: <20200310180510.19489-3-wainersm@redhat.com>
+Michael Walle expressed his desire to orphan the lm32 target [*]:
+
+  I guess it is time to pull the plug. Mainly, because I have
+  no time for this anymore. I've always worked on this on my
+  spare time and life changed. And secondly, I guess RISC-V is
+  taking over ;) It has a far better ecosystem. Also, to my
+  knowledge the only (public) user of LM32 is milkymist and this
+  project is dead for years now..
+
+  So time to say goodbye. It was fun and I've learned a lot -
+  technically and also how a huge open source project works.
+  Thank you everyone for that :)
+
+  Basically everything still works and there are even TCG test
+  cases which covers all instructions the processor has.
+
+Many thanks to Michael for his substantial contributions to QEMU,
+and for maintaining the LM32 target for various years!
+
+[*] https://www.mail-archive.com/qemu-devel@nongnu.org/msg605024.html
+
+Acked-by: Michael Walle <michael@walle.cc>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200316142827.20867-1-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/mem/pc-dimm.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ MAINTAINERS | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 36edfcf46799..6d62588fea8c 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -218,7 +218,8 @@ static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 8aa8efaf1d7f..d6886be13159 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -184,8 +184,8 @@ F: hw/net/*i82596*
+ F: include/hw/net/lasi_82596.h
  
- static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
- {
--    return object_property_get_uint(OBJECT(md), PC_DIMM_ADDR_PROP, &error_abort);
-+    return object_property_get_uint(OBJECT(md), PC_DIMM_ADDR_PROP,
-+                                    &error_abort);
- }
+ LM32 TCG CPUs
+-M: Michael Walle <michael@walle.cc>
+-S: Maintained
++R: Michael Walle <michael@walle.cc>
++S: Orphan
+ F: target/lm32/
+ F: disas/lm32.c
+ F: hw/lm32/
+@@ -977,13 +977,13 @@ F: pc-bios/hppa-firmware.img
+ LM32 Machines
+ -------------
+ EVR32 and uclinux BSP
+-M: Michael Walle <michael@walle.cc>
+-S: Maintained
++R: Michael Walle <michael@walle.cc>
++S: Orphan
+ F: hw/lm32/lm32_boards.c
  
- static void pc_dimm_md_set_addr(MemoryDeviceState *md, uint64_t addr,
+ milkymist
+-M: Michael Walle <michael@walle.cc>
+-S: Maintained
++R: Michael Walle <michael@walle.cc>
++S: Orphan
+ F: hw/lm32/milkymist.c
+ 
+ M68K Machines
 -- 
 2.26.2
 
