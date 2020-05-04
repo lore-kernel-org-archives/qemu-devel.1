@@ -6,60 +6,61 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D74D1C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:07:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A34CC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:07:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8DA3206A4
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:07:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8DA3206A4
+	by mail.kernel.org (Postfix) with ESMTPS id 0E9B0206A4
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:07:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E9B0206A4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVdcl-0004wx-Ly
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 12:07:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37990)
+	id 1jVdd0-0005TN-35
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 12:07:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38038)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jVdVq-0001Dj-1i; Mon, 04 May 2020 12:00:10 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:54233)
+ id 1jVdVw-0001Lp-8z; Mon, 04 May 2020 12:00:16 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:56981)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jVdVp-0005kG-3H; Mon, 04 May 2020 12:00:09 -0400
+ id 1jVdVu-0005mW-P4; Mon, 04 May 2020 12:00:15 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1Mr8vG-1ikyR83KUw-00oHIX; Mon, 04 May 2020 18:00:05 +0200
+ id 1MvKL3-1jEWKe0HpZ-00rG6w; Mon, 04 May 2020 18:00:01 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 05/19] hw/mem/pc-dimm: Print slot number on error at
- pc_dimm_pre_plug()
-Date: Mon,  4 May 2020 17:59:42 +0200
-Message-Id: <20200504155956.380695-6-laurent@vivier.eu>
+Subject: [PULL v2 03/19] timer/exynos4210_mct: Remove redundant statement in
+ exynos4210_mct_write()
+Date: Mon,  4 May 2020 17:59:40 +0200
+Message-Id: <20200504155956.380695-4-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200504155956.380695-1-laurent@vivier.eu>
 References: <20200504155956.380695-1-laurent@vivier.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ENPdAA29+zp3lVMUvxu80YJ8Ojw2ObQTjp6eS5nqnTAZiXMr8PL
- 8017I3ybDAr5rqXD5VSiGdieseTxwSupG/lzj8zYKp+E7PJvAv8Fgmgflh2zyk4SHU4j3S9
- S4Ik8Ht5w+83x3jpxBb8B5FW1K6oZWU+vklaw+GjbLnIRct7mBjLKn5rIKV8DGlnZopxqgs
- e0hPsIsce0IcKH0kEAKOA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:LwBAzQSgGuw=:PIHfKXJj341vsl2wfh5GMs
- 6IAoBvMhHUO1IQ6RWnj3hvFCtOsqSzgiBVrxww70CyRQy5auFBwsDcN5tbGpVk+Aow41ouRsz
- fgzv0uLDDWILlpv/p1iIF4dDKCXCN4E+wPhTAI3XfWJ+9h8aE+pV1retfSVQSLR6zVf0pElIt
- XhbBhWfxKt6yK4E3zesBpjfW9IqzTPx38WoPJw6ARvqcWtWSGJZclnRAjU33RQ6KioWbxoYQ4
- HbQRwODYBc/6+jcM+iJLPkwZcpiIVhv/rok28+W1eiTuziZ50aH7DWHNP9cvQlP1qbSq1E/jx
- 1WrmAPOGRTLHG1+DntFwFfAiW/7eTQBUbMYAwuA616/xUgEQhSSq8XIklVBA08i1b0XrKHfZ6
- Vpnv2QZ6GOVIGV8Jn/8uR8rScyj5ll4LylCPPWwZWjGiFE/XAXSeHRYZ6LO70ax5TI8gUwvAr
- uyA3EzlOIUH3+VQ2K+hyuyeWeMXoSNvUkALLZeHDnlZVVwLXip9znCBsp62bvoBf8V+UQAEhI
- pk4Cd8DhR7tHVcMN5Q/S+didc/nVdQqL8sKQdtzVWd0vQWW6N3Zu/vrEamcF7+HJ+P9GsnoA3
- sVhk3Q6n+mk1tnuRnRJtpBl95xWofT4G+M9u/mKiV/3WTZKkOTR4J8nT8JbTKZavyEzmYAv3b
- VewdN5AhwHDPM96fYxT7k9Lccngf7p1PLfUCYG9FNOPSNv6wHZrXmSVz58qljNw9EWFkbBV2A
- 7XAGr7UbDbGpOsvolemahh6mf+O/eFjh5OCDMytYz6mK1VHjgvBjIxa3o90dPgpVtGZ7aC3iw
- awbS0y4vNMNXJUBZpD3mRzH5nAkxgULltVF+nCBF0kXY4KBIyDkmyJSYzYchguByLqxskkD
+X-Provags-ID: V03:K1:paz9/bvncpBWsqHW9t2TuKD0ps6SneGJH8nwahoV+3Ri8q/Im0R
+ wlkELu5ph6nHShm40akaOzorNnURt5WjuImtbVtLDW8l6wkJwSukYKQsJdj28mFOQ/kCkCy
+ XQpw2PS5bx2j93h31Pa63eXA9oIj0UozsCQbdYoAoQBQ/59NtwHerKRDCrSG6Ee9EwyOt6a
+ Uk8lOLTEK0DHmTR30T9ZA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:U1WhiSg4V3c=:fJ4/U+5NyAqn5h0JCB8Nj5
+ XnNRLs3TS1OZ3B2kDchY6fOH/+V8oRJeDA9JoQzfjKiB46d9HlztumtuSTaeeDKdzDK5ATsX6
+ +izdejLL7sN9RWLUlXe6wyes/Ujxel9lu9cSsRn/w3TwoSImRKVQTlUDjew3VzMwsChBqr03I
+ mwNYz7Iphyim+6vtoGQ5fjWLppHdzYg2mmXuwFA6FaboDCHSnnfAr8IEdYjurhHy+IXUo1Se4
+ y6fQv0jY3GDUuqfiHdZ2MVvkxIthYgih04yh9tJd4U1qzDV8mAF2wdAEGGmBPVoqaljvm2it4
+ h2AI5JlVBAQjoEDkmRKb49jyLKiRINAdmDMc9S64kw/H2KzmnTuNFafAUHhXxYZ+mQLctcZld
+ yAiy3qNhGAiobRf8/yPYCDCqtFg8hOYeO1MChLfxqMEM5jw8z74zdvtmLu+YaZj6c5ryDcD35
+ 3mJ6Nj0lMqinSSytR/csgy9sRsqWkuG1L0macXVo8O4lhcIEL81lX6CVx3bAPH1XZQpOZrok2
+ F8RFUdDxO/R9zRXZ/KSXYZv2wRCPSkzZEzd0MOv5wtmjqVDf8bKa6JheCpGiDoL0B8FjXurXd
+ oQ2tmYrPYbMkwIgJQGWMtwzQiuAwd1sgbSOtw0SK8ZcAojTDYk/ps/qBnsqImIQS42vQR7Lza
+ XziOpj1GpHh9siS1rhGqOTbYnmQ51cU+JokXTg+QMwe3ZB8OMaW5vqSBdlsRbdXwDsZRwY0oC
+ E7rsvaIczGNQcgcLyEvIqZGKmO6E+ppwiMbpqy3Z5iDuIAZjfJPfpfJ0Da9t8YpLwt+BKpjcz
+ AK9SZ2Exp/WzjVdhX7TkGZVJ0G1hPTAlW2ihd083ALCkw/LD8UkFge6JMH1v9/PKFnm15jz
 Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 12:00:07
@@ -83,38 +84,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
  Laurent Vivier <laurent@vivier.eu>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
+ Alistair Francis <alistair.francis@wdc.com>,
+ Euler Robot <euler.robot@huawei.com>, Chen Qun <kuhn.chenqun@huawei.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+From: Chen Qun <kuhn.chenqun@huawei.com>
 
-The error report in pc_dimm_pre_plug() now has the slot
-number printed.
+Clang static code analyzer show warning:
+hw/timer/exynos4210_mct.c:1370:9: warning: Value stored to 'index' is never read
+        index = GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
+        ^       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+hw/timer/exynos4210_mct.c:1399:9: warning: Value stored to 'index' is never read
+        index = GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
+        ^       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+hw/timer/exynos4210_mct.c:1441:9: warning: Value stored to 'index' is never read
+        index = GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
+        ^       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-Id: <20200310180510.19489-2-wainersm@redhat.com>
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200325025919.21316-4-kuhn.chenqun@huawei.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/mem/pc-dimm.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/timer/exynos4210_mct.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 8f50b8afea3c..36edfcf46799 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -44,8 +44,8 @@ void pc_dimm_pre_plug(PCDIMMDevice *dimm, MachineState *machine,
-                                    &error_abort);
-     if ((slot < 0 || slot >= machine->ram_slots) &&
-          slot != PC_DIMM_UNASSIGNED_SLOT) {
--        error_setg(&local_err, "invalid slot number, valid range is [0-%"
--                   PRIu64 "]", machine->ram_slots - 1);
-+        error_setg(&local_err, "invalid slot number %d, valid range is [0-%"
-+                   PRIu64 "]", slot, machine->ram_slots - 1);
-         goto out;
-     }
+diff --git a/hw/timer/exynos4210_mct.c b/hw/timer/exynos4210_mct.c
+index 944120aea59c..570cf7075bc5 100644
+--- a/hw/timer/exynos4210_mct.c
++++ b/hw/timer/exynos4210_mct.c
+@@ -1367,7 +1367,6 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
  
+     case L0_TCNTB: case L1_TCNTB:
+         lt_i = GET_L_TIMER_IDX(offset);
+-        index = GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
+ 
+         /*
+          * TCNTB is updated to internal register only after CNT expired.
+@@ -1396,7 +1395,6 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
+ 
+     case L0_ICNTB: case L1_ICNTB:
+         lt_i = GET_L_TIMER_IDX(offset);
+-        index = GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
+ 
+         s->l_timer[lt_i].reg.wstat |= L_WSTAT_ICNTB_WRITE;
+         s->l_timer[lt_i].reg.cnt[L_REG_CNT_ICNTB] = value &
+@@ -1438,8 +1436,6 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
+ 
+     case L0_FRCNTB: case L1_FRCNTB:
+         lt_i = GET_L_TIMER_IDX(offset);
+-        index = GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
+-
+         DPRINTF("local timer[%d] FRCNTB write %llx\n", lt_i, value);
+ 
+         s->l_timer[lt_i].reg.wstat |= L_WSTAT_FRCCNTB_WRITE;
 -- 
 2.26.2
 
