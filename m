@@ -6,84 +6,83 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 076A3C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 17:25:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 791A5C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 17:25:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0C3B20721
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 17:24:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3944A20721
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 17:25:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DSRbHW8q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0C3B20721
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U/c+YBk6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3944A20721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVepu-0001K8-Lc
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 13:24:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55314)
+	id 1jVeqC-0001yM-B2
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 13:25:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55300)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jVeon-0008Py-Nv
- for qemu-devel@nongnu.org; Mon, 04 May 2020 13:23:49 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:35696)
+ id 1jVeof-0008CM-Ii
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 13:23:41 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:38377)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jVeom-0004op-Vt
- for qemu-devel@nongnu.org; Mon, 04 May 2020 13:23:49 -0400
-Received: by mail-pg1-x544.google.com with SMTP id t11so81266pgg.2
- for <qemu-devel@nongnu.org>; Mon, 04 May 2020 10:23:48 -0700 (PDT)
+ id 1jVeoe-0004mh-N9
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 13:23:41 -0400
+Received: by mail-pf1-x442.google.com with SMTP id y25so5852574pfn.5
+ for <qemu-devel@nongnu.org>; Mon, 04 May 2020 10:23:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Wxqc2SAa5+CaPyLhJ554cWTqJmn6G7ojwYg+/JVjCDc=;
- b=DSRbHW8qbs7S0u/p5GieryAJMI6M/tYi5aSsB/U4rQRH91BN1+qGECGvK2X1ED4htQ
- zFYoqihm2x/vOkAOIHC819qdjJH1sxWtsOU8ovK6E7WrPkmuU6yObQ26lwDjwqbTA+L+
- 1cYbqyTN1URymkMChFxnMyL6CIlxGyAgr7SVir1MaPf5iLFT+/SHi74jWD5smqowmM3N
- 3bGk/+IP+0c6ps3JVbOyzbf3YQrYWYibEgxakPTv5yMFhjlxnekBsrybDkaW78SRvtG6
- +3luFdmZ2fsAxjB/53TWhToOGi8Xw1KlYIw9knwzgu3a+ec00/SOkYcfaZptxF3QXjZ2
- B4ZA==
+ bh=NGvAWxkqCIyyAwGZQ7SL2t/jWme3fwef6fP8pgEOidQ=;
+ b=U/c+YBk6klsDXgt2Js6oAdP10/9wxGV/0vrK/G6Z1UnnxZZAz85o6KsGJpzBIM9OmM
+ l/z5fbxIio3SxLEqAsUF6vCvIUEaUtCskRLiLU92AQf25zMeDHMw6+ZPTHM1JukRpsi5
+ BDRGdsMp5YsMaa3Kvc0RX1FTL3ZuPQURQevdXY/e5qahP/Twj0FLngLJ2KNjvsSoniBp
+ bXSU5oDgOYv+5QqWhDlDYfGBfYy6QzOrTr2xAVTS7IRIW6E3cICKHP10mhrLwx5Ez1hp
+ He2HYahT9yRX6IoBUbXBHZ+OjgLzyWibvANyxQMTa/4ztfBd9RA+XIkgLdNLbdObGjrF
+ 6gHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=Wxqc2SAa5+CaPyLhJ554cWTqJmn6G7ojwYg+/JVjCDc=;
- b=aOt+FKfFx/o03UIqi1HYoGDZWa0BnwoJwqminLGutyy3MlEPumzl27jWQzSGbD2aGc
- zpm3A1wLjuKfL+X7YjllJkKMjiOLpE8mJHR6L0pvP8aXaLw+hnZKiZ+QEOM/0AWjMSBR
- Qjm8Mdb/fWa5xJCZWVqJkwV13Qp/1Nk3LDILvJBK9iQ8FL/R8vpegvGRaBfscYARf4Tf
- ZCDSxPWZm84JM7FcsD8Eo6PmkmgFuR8mpqb+jNzE6I+vNtLyB/rnchZ8KxbSUUa8fUGc
- WnxFLoH6XIX9jb58nvyW9Ua5B5Sqxl6aSzU0ni8paG6Baz/T2PorDvncn8bvDUgAxSfx
- tmnQ==
-X-Gm-Message-State: AGi0Pubggbd2LXIp6hYSnn9kudsE3XFgLQ+UQOPHV91MRMmgF0Wy//eK
- 2BidtOZan0jD67rho5a++CarRg==
-X-Google-Smtp-Source: APiQypLZJJUTTAkcNcttHY8rOt5sc82ZsMBvbo+0qQwbZfpxbAwyqpwOFlhrHZzwlNZKJV5MQbWGhA==
-X-Received: by 2002:aa7:864e:: with SMTP id a14mr18728692pfo.67.1588613027731; 
- Mon, 04 May 2020 10:23:47 -0700 (PDT)
+ bh=NGvAWxkqCIyyAwGZQ7SL2t/jWme3fwef6fP8pgEOidQ=;
+ b=jsnTdZSvwxhlobIUqflPXZ+jJ60ZJcEgWmt29t2gLbTBrEFy52ITvJ6x4Ul9BdQB7Z
+ Nzpm7FNioRn243PTlF5ZzRP0TfJga+Ivsn0wAVPeSDL2M/WKLsoNG0x9Vg5G29SUhxHb
+ IDyAJMYW2o2hxtbhBh3vbbyHeTRSkj+EJ/IE2sOf5fz+3w4lq1wEJi5CgasDYrbyHh8Y
+ 7xMqC9JoaH8eIqxa5q3SZ5gkX6ycKDuN7dnw6X7zj0syJmNpx0dsdAp8NLK4rxJaroEg
+ iZqGrk9ruNYv2lYSzLd22nHyVl9ielYj55csyD2pdULkLHoNg3qH57VRJlB/xRp2kg8a
+ GAaQ==
+X-Gm-Message-State: AGi0PuagTWYMkDKYllQX6QKHTMk+6/h0/Dx7Hj9bwtbfnvILfmhzwIMD
+ 0pNtnHoa7aMdLalFkJG/nB2Ludi1Vyk=
+X-Google-Smtp-Source: APiQypLsPZFO+6xYCzOzMSsCw0iAA21vb3PufceTO5yfi/jpmfEJu2130mq8TeWw7JVHaBNDntGY1A==
+X-Received: by 2002:a65:5805:: with SMTP id g5mr45313pgr.110.1588613016914;
+ Mon, 04 May 2020 10:23:36 -0700 (PDT)
 Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id 6sm6414031pgw.47.2020.05.04.10.23.46
+ by smtp.gmail.com with ESMTPSA id f26sm9294985pfn.183.2020.05.04.10.23.35
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 04 May 2020 10:23:47 -0700 (PDT)
-Subject: Re: [PATCH 2/4] hw/i386/vmport: Remove unused 'hw/input/i8042.h'
- include
+ Mon, 04 May 2020 10:23:35 -0700 (PDT)
+Subject: Re: [PATCH 1/4] hw/i386/pc: Create 'vmport' device in place
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
 References: <20200504083342.24273-1-f4bug@amsat.org>
- <20200504083342.24273-3-f4bug@amsat.org>
+ <20200504083342.24273-2-f4bug@amsat.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <ac758adf-33c0-dc70-05af-b1389ec997cc@linaro.org>
-Date: Mon, 4 May 2020 10:23:45 -0700
+Message-ID: <73ed450c-9a23-f05d-fd3b-1d163e1137c0@linaro.org>
+Date: Mon, 4 May 2020 10:23:33 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200504083342.24273-3-f4bug@amsat.org>
+In-Reply-To: <20200504083342.24273-2-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -112,12 +111,11 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 5/4/20 1:33 AM, Philippe Mathieu-Daudé wrote:
-> Remove unused "hw/input/i8042.h" include.
-> 
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  hw/i386/vmport.c | 1 -
->  1 file changed, 1 deletion(-)
+>  include/hw/i386/pc.h | 6 ------
+>  hw/i386/pc.c         | 2 +-
+>  2 files changed, 1 insertion(+), 7 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
