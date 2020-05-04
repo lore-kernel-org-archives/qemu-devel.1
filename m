@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B602C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 08:36:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FCBAC47257
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 08:36:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64BAC206B9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 08:36:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D63C206B9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 08:36:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iMM7CErr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64BAC206B9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hMxoSTjf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D63C206B9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVWa9-0007sr-Ib
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 04:36:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40250)
+	id 1jVWaA-0007tl-En
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 04:36:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40244)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jVWXt-0003NQ-VU
- for qemu-devel@nongnu.org; Mon, 04 May 2020 04:33:50 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35197)
+ id 1jVWXs-0003Kp-2I
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 04:33:48 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:38160)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jVWXt-0007S9-8n
- for qemu-devel@nongnu.org; Mon, 04 May 2020 04:33:49 -0400
-Received: by mail-wr1-x442.google.com with SMTP id x18so19872183wrq.2
- for <qemu-devel@nongnu.org>; Mon, 04 May 2020 01:33:48 -0700 (PDT)
+ id 1jVWXq-0007Rn-Lm
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 04:33:47 -0400
+Received: by mail-wr1-x429.google.com with SMTP id x17so19850060wrt.5
+ for <qemu-devel@nongnu.org>; Mon, 04 May 2020 01:33:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=TyhBVROPRuzO0rWk+Br8uL9KdUxWrVxwNNY4fpfIogg=;
- b=iMM7CErrzcQJI5kDg/k4pIk3TcjArB+JXv/OksqsXoEuBScblFzt0lwZHglDZ3o/LP
- cAb31cXqwouMJWRm2vZJalE2RLtJdWXz++Xp4qoWiD9tG4zEcop78fp7vksKmOGKhxDo
- UyE/Zp2gNVbo7kS+BwPeC68bgL9HMwv6l6rabJAnhpERFw2Qu5bY7wz7jleyskLlaVhg
- EEaIlT4OZTumCRXBRmpCGsHFFCZ0/nTUpnk+vEp8vbe7fI5AJoJM0rDhPX2YUdCwBKBg
- WCfqsP/ZJTaxtBuqzqlA3uSNcn8ARR/oDOhZMsNjb80o+7RuQCyleVvohnpJvtLPjXS7
- 6TRQ==
+ bh=fHSKVhvgJ0/ZOfFaf+BP/P6hX2XQjwkZB5BoXLgjiYk=;
+ b=hMxoSTjfJ80sQfPeIaXs98wQXEsQbyGvMOoag6M9eMCmfwFah4SbUvlGvFO9v9RSzk
+ kfxrQscyzsG4RU81fIHbMfP9NAKhsMzJKz/Ve5fqsjlgUJL+1xYM9ysrENiZ5FdhxnYV
+ L6qK8z7Xx28VZjOFawqtxWsY3myems5bXyBwXrbM8ao3nUCpwDcWU6EUUEVqKYPHgQCi
+ 3dEbczUGignSEM458OHUZABs4pFdAUhbqzKGr0Radyn7on25LY9YnuQHvpgAuBkBezRV
+ 5XYThjHzWRX3A3Q8hxc6DyFd/pFasJw+non4fU4Y5Og1ST51S0tXidn67fYgNNCfL21w
+ jhsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=TyhBVROPRuzO0rWk+Br8uL9KdUxWrVxwNNY4fpfIogg=;
- b=CplFUVseNnKeQRc7eSNPWkA96DxvVV3gTpp0jlEBTV1icD7iTyJREdlBj7Xfr+F6a5
- s3qwDnwqqc6SBUr3yxQztSzPWLIu/kXZkm9kgh6zg/XoI6/7/QZlO3UggSrosW32EBqM
- PeZzgdjCWxTZ1fKb3ghRTGJQYR9fPhDoli+RfqtciWUehRvSDdRaul3seGpdWT/4rqOd
- +MOZvKHS4tu54yOU01yBqsQyvQ+AH3VOeNrWgxpmtnnv2H4DwhHMlfAfvHRTIhOe9EbP
- FGqNcw0uyse60t0UN4oJcqnTuTqTebGkxvso3Xc8zpWf1Uz20mAgPIwVOV6vSXwvusZv
- CusA==
-X-Gm-Message-State: AGi0PuZXQmPdmZoyLbcc4DNbKvrFhuBjSOo1KeOZqWkgF1gaqTYVL4ym
- BpUjyqSlNHZTdUA4dCc1q+Y4I09U
-X-Google-Smtp-Source: APiQypI6vm72sLG7ql+eMbqbz7C8x7LYmJeBq0OGpDLjiFM736DJzczI7388DZgnekTHyoSrj2dtCg==
-X-Received: by 2002:adf:fac5:: with SMTP id a5mr14328474wrs.210.1588581227454; 
- Mon, 04 May 2020 01:33:47 -0700 (PDT)
+ bh=fHSKVhvgJ0/ZOfFaf+BP/P6hX2XQjwkZB5BoXLgjiYk=;
+ b=QOMIkMgkpiSUqs78vTCnl8yVB64jZCo5wUK2+lHM81lRzFOZfaeQrqm/wmiXWb/l0l
+ Vhzg/k3G2edqKI+znL2wx3Kz6kt4mIa3C1D9BmIOr/cmasRkpss6ilSecNu8cR8NcLjE
+ Of9yeZHvQr7sDUqhdcr434pDXZ9fVZKt5VcOl3ExZjT+J2FIoh9S5P4cpO08puymga9F
+ oS6tN6BD2rFF6E+3YUQk7B+XL+esZbkO5V2TGhIMppxPY/tqIB1YEwgFy3zzJhqWgTuP
+ krC7Qwax6epucYSojmCdjWNxVKWAIvYnw5rT5/sC35zf610XBH52+VhYjfBr28zdHjOo
+ uA9A==
+X-Gm-Message-State: AGi0Pub5CDeGOP9Y7AWJEotBzPw8mAVrFm47IhDor16PbJH72cMe8Nqu
+ ESz78ArWTsJ3WgHkLW2H6iLB7T/I
+X-Google-Smtp-Source: APiQypJd8ySdOwLgwomQkWryWn5gCaTMV526JzY+aSlDmQQbBEIz1vpjUCET/mExAr6C231y8aiA+Q==
+X-Received: by 2002:a5d:6a04:: with SMTP id m4mr19216874wru.326.1588581225080; 
+ Mon, 04 May 2020 01:33:45 -0700 (PDT)
 Received: from x1w.redhat.com (26.red-88-21-207.staticip.rima-tde.net.
  [88.21.207.26])
- by smtp.gmail.com with ESMTPSA id 2sm13048053wre.25.2020.05.04.01.33.46
+ by smtp.gmail.com with ESMTPSA id 2sm13048053wre.25.2020.05.04.01.33.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 May 2020 01:33:46 -0700 (PDT)
+ Mon, 04 May 2020 01:33:44 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 3/4] hw/i386: Add 'vmport.h' local header
-Date: Mon,  4 May 2020 10:33:41 +0200
-Message-Id: <20200504083342.24273-4-f4bug@amsat.org>
+Subject: [PATCH 1/4] hw/i386/pc: Create 'vmport' device in place
+Date: Mon,  4 May 2020 10:33:39 +0200
+Message-Id: <20200504083342.24273-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200504083342.24273-1-f4bug@amsat.org>
 References: <20200504083342.24273-1-f4bug@amsat.org>
@@ -79,8 +79,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::429;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x429.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -111,108 +111,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move 'vmport' related declarations in a target-specific header.
-
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/i386/vmport.h     | 34 ++++++++++++++++++++++++++++++++++
- include/hw/i386/pc.h |  3 ---
- hw/i386/pc.c         |  1 +
- hw/i386/vmmouse.c    |  1 +
- hw/i386/vmport.c     |  1 +
- 5 files changed, 37 insertions(+), 3 deletions(-)
- create mode 100644 hw/i386/vmport.h
+ include/hw/i386/pc.h | 6 ------
+ hw/i386/pc.c         | 2 +-
+ 2 files changed, 1 insertion(+), 7 deletions(-)
 
-diff --git a/hw/i386/vmport.h b/hw/i386/vmport.h
-new file mode 100644
-index 0000000000..47eda7a22b
---- /dev/null
-+++ b/hw/i386/vmport.h
-@@ -0,0 +1,34 @@
-+/*
-+ * QEMU VMPort emulation
-+ *
-+ * Copyright (C) 2007 Hervé Poussineau
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#ifndef HW_I386_VMPORT_H
-+#define HW_I386_VMPORT_H
-+
-+#define TYPE_VMPORT "vmport"
-+
-+typedef uint32_t (VMPortReadFunc)(void *opaque, uint32_t address);
-+
-+void vmport_register(unsigned char command, VMPortReadFunc *func, void *opaque);
-+
-+#endif
 diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 26e2a3d92b..de49a57506 100644
+index 6ab6eda046..26e2a3d92b 100644
 --- a/include/hw/i386/pc.h
 +++ b/include/hw/i386/pc.h
-@@ -130,9 +130,6 @@ typedef struct PCMachineClass {
- GSIState *pc_gsi_create(qemu_irq **irqs, bool pci_enabled);
- 
+@@ -132,12 +132,6 @@ GSIState *pc_gsi_create(qemu_irq **irqs, bool pci_enabled);
  /* vmport.c */
--#define TYPE_VMPORT "vmport"
--typedef uint32_t (VMPortReadFunc)(void *opaque, uint32_t address);
--void vmport_register(unsigned char command, VMPortReadFunc *func, void *opaque);
+ #define TYPE_VMPORT "vmport"
+ typedef uint32_t (VMPortReadFunc)(void *opaque, uint32_t address);
+-
+-static inline void vmport_init(ISABus *bus)
+-{
+-    isa_create_simple(bus, TYPE_VMPORT);
+-}
+-
+ void vmport_register(unsigned char command, VMPortReadFunc *func, void *opaque);
  void vmmouse_get_data(uint32_t *data);
  void vmmouse_set_data(const uint32_t *data);
- 
 diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 84669ddc84..f6b8431c8b 100644
+index 5143c51653..84669ddc84 100644
 --- a/hw/i386/pc.c
 +++ b/hw/i386/pc.c
-@@ -91,6 +91,7 @@
- #include "qapi/qmp/qerror.h"
- #include "config-devices.h"
- #include "e820_memory_layout.h"
-+#include "vmport.h"
- #include "fw_cfg.h"
- #include "trace.h"
+@@ -1152,7 +1152,7 @@ static void pc_superio_init(ISABus *isa_bus, bool create_fdctrl, bool no_vmport)
  
-diff --git a/hw/i386/vmmouse.c b/hw/i386/vmmouse.c
-index e8e62bd96b..78b36f6f5d 100644
---- a/hw/i386/vmmouse.c
-+++ b/hw/i386/vmmouse.c
-@@ -29,6 +29,7 @@
- #include "hw/input/i8042.h"
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
-+#include "vmport.h"
- 
- /* debug only vmmouse */
- //#define DEBUG_VMMOUSE
-diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
-index 114141c6f3..00d47e0c4c 100644
---- a/hw/i386/vmport.c
-+++ b/hw/i386/vmport.c
-@@ -26,6 +26,7 @@
- #include "hw/i386/pc.h"
- #include "sysemu/hw_accel.h"
- #include "qemu/log.h"
-+#include "vmport.h"
- #include "trace.h"
- 
- #define VMPORT_CMD_GETVERSION 0x0a
+     i8042 = isa_create_simple(isa_bus, "i8042");
+     if (!no_vmport) {
+-        vmport_init(isa_bus);
++        isa_create_simple(isa_bus, TYPE_VMPORT);
+         vmmouse = isa_try_create(isa_bus, "vmmouse");
+     } else {
+         vmmouse = NULL;
 -- 
 2.21.3
 
