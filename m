@@ -2,84 +2,106 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D406C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 15:56:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E58E1C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 15:58:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 270F120721
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 15:56:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B0A5C20721
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 15:58:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fOzpes19"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 270F120721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WoqQWaIJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0A5C20721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVdRq-0006bl-9X
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 11:56:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36054)
+	id 1jVdTy-0000JS-Q6
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 11:58:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37632)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <rfried.dev@gmail.com>)
- id 1jVdMQ-0007sc-QV; Mon, 04 May 2020 11:50:26 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:42656)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <rfried.dev@gmail.com>)
- id 1jVdMP-00025x-PW; Mon, 04 May 2020 11:50:26 -0400
-Received: by mail-oi1-x244.google.com with SMTP id i13so7012416oie.9;
- Mon, 04 May 2020 08:50:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=JIh8z3QAzvbB4CILHgFMNjVxM/n1GO0KshndEAuLqR8=;
- b=fOzpes19COakcNB8fza+ZETZe5NTKu1m3jB19czHRTMwltuF/wi0X5aK8ij4UoS1kI
- MVlF/RibITq7n6vZgDpR0IN0nQXT3iiqflJHsZTiDv77SIv9tySUQjn3ZwTvZowtRjZZ
- 0oQwGJuQ2AWza2sis+Lrubok3UDQEpE/kXnSKiDHICkWH/8xotWE08d1keuNPRG2sAIb
- WxTxIcF6JFzcz37AVaCSg1GTg8EJs0JPxTvEIfU6sa7+19yp3o1T8Wz1ZjCpKGAirr6L
- 9zwA3tbOLsw2tl4rH7Uk+KUF+Qb4PszmwogRqgm/vKytPeUQX/1TBegoZTn6314H6/MH
- 4d9w==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jVdTG-0007zx-CP
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 11:57:30 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56473
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jVdTF-0005HG-7f
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 11:57:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588607847;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=d1OJbH4UpV1OJFyLIFWajC85ubtEmf1EXcRqvU/IOCg=;
+ b=WoqQWaIJHJxdZh/iBb4cqQedfOKRQEfyBnOb4iGaxCu78tgPh5fPgcClCre50aIbVu3Ssc
+ IDyQNT5+BZkRSMq8cW5NfWA4q5tYNE8hbNv7K5NMCN8QhkwAhDn7erCXSF6Bl1+Bxz2bg7
+ YD5zI/ASOEtDV+jn3I1CXvnHuvKQ5no=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-496-Jhyfy6QyPQ2J9L8cEHR3Wg-1; Mon, 04 May 2020 11:57:24 -0400
+X-MC-Unique: Jhyfy6QyPQ2J9L8cEHR3Wg-1
+Received: by mail-wm1-f71.google.com with SMTP id 71so1505wmb.8
+ for <qemu-devel@nongnu.org>; Mon, 04 May 2020 08:57:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=JIh8z3QAzvbB4CILHgFMNjVxM/n1GO0KshndEAuLqR8=;
- b=N067llqx3RP8K2pqlOO57mpMRah/bStKfPrFJ9LYmHay1VoxPxRrrVDF3RFgaTG0Za
- Z2icQx+CA/LuwE9e4tKCdob/L6TQCNdrGTbawfd+gL7rPdwor7+bhqgNbD0Ucu3xtRjr
- aG+hieggU/B3iZq6BVcQmKGoXv5M6qqtv0xm/nJhooWvdGjFOVhOgHB28YlODSqBVUSN
- KCjHPipD1JEHsDIMKNvjgmZ9USJIT1FGXMEao2hVtve8IIsNyXSPcqvzvPpQOca9KENM
- SPUGxuA3sPPcWadU74PsxlNcteM8rB9xSOf6qOg5tpPb+w1pilueIeWNimLHsykdv+pF
- 5lKA==
-X-Gm-Message-State: AGi0PubmTrronWQ1fKTwqLyiBI44PrvjXDY7K2TeTiapHr2Vl3AR6Z/H
- 9IBWXBBpO7CsNPg06stlfnynJ4LODfkZoNx71xk=
-X-Google-Smtp-Source: APiQypJWvYW7twScEubWsj6PxfVd7W/D2kfzDy5ret84yUEOcPteeH9oYMZ3il0XGoEPEuTjV0XV3OfEKALIrA/k0QA=
-X-Received: by 2002:a05:6808:356:: with SMTP id
- j22mr9645720oie.147.1588607423937; 
- Mon, 04 May 2020 08:50:23 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=d1OJbH4UpV1OJFyLIFWajC85ubtEmf1EXcRqvU/IOCg=;
+ b=EeYi7GvMHYfyi/VsBO6xcbcw3G17AGFiZg0yjWer1cdjW8hn/Obk2gjMM2SDFbiOMR
+ P5eQSReJHkPg31sxXahZft6ER01ZD1rzu/Eg0vrb1vXSoopgITc61EDpPrUyS3AwP+JX
+ wxvXKdATNFlP70/XAH8gHZnnwmEfvzDVpgvFEd/Zt+Bhqec8bHPnXPHNXWNBCacpWCHs
+ fHxA0HHRaUlgEayr1JMCtFq2a//p9+AIIaowAuwX1qWclcjRW8f5qRmySs6sGdPYAfgs
+ pH63ICYG8dNqm2cVbtHY5rF+0UWMdKn6mmPn8q+Pd0pJfoCqCJ0br0neO9rB20tSqBQm
+ TAow==
+X-Gm-Message-State: AGi0PuYw3D5aB/aym/3ZA6G8vdi0OFOpmnJUf+EPblGOcFd7p5/A8VQY
+ p5478ocj3zZLACpqkBzQf4olno3yj+63yI9B2K8c3FWFJQPR9BmMw1iqToMLEM9OqUUPUJs3B27
+ UOYrzF1gt0ZPXdyU=
+X-Received: by 2002:adf:f784:: with SMTP id q4mr19815023wrp.102.1588607842726; 
+ Mon, 04 May 2020 08:57:22 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJlFbydeyvgRQVtIl4L/FXYswtFGIgcSeRelCajS4lenTr0cx5p9WcMHwgksOrILCaBQhi+8Q==
+X-Received: by 2002:adf:f784:: with SMTP id q4mr19815004wrp.102.1588607842562; 
+ Mon, 04 May 2020 08:57:22 -0700 (PDT)
+Received: from [192.168.178.58] ([151.20.132.175])
+ by smtp.gmail.com with ESMTPSA id k9sm20120247wrd.17.2020.05.04.08.57.21
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 04 May 2020 08:57:21 -0700 (PDT)
+Subject: Re: [PATCH 00/17] qom: Spring cleaning
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200428163419.4483-1-armbru@redhat.com>
+ <80ff76e3-3e59-df8f-d943-9429d4cc1d57@redhat.com>
+ <87h7wvzpm0.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <265637b7-25c8-1af1-46b9-046d153df30a@redhat.com>
+Date: Mon, 4 May 2020 17:57:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <1588601168-27576-1-git-send-email-sai.pavan.boddu@xilinx.com>
-In-Reply-To: <1588601168-27576-1-git-send-email-sai.pavan.boddu@xilinx.com>
-From: Ramon Fried <rfried.dev@gmail.com>
-Date: Mon, 4 May 2020 18:50:12 +0300
-Message-ID: <CAGi-RUKfonE6S+1nmFdjhT_OrQ-+E7EMCOmsXZ-zdGttF9JFbw@mail.gmail.com>
-Subject: Re: [PATCH v2 00/10] Cadence GEM Fixes
-To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
- envelope-from=rfried.dev@gmail.com; helo=mail-oi1-x244.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <87h7wvzpm0.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 04:24:57
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,52 +114,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- "open list:Xilinx Zynq" <qemu-arm@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Tong Ho <tong.ho@xilinx.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: berrange@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 4, 2020 at 5:14 PM Sai Pavan Boddu
-<sai.pavan.boddu@xilinx.com> wrote:
->
-> Hi,
->
-> Following patch series fixes issues with priority queues,
-> Adds JUMBO Frame support,
-> Makes Debug statements compilable &
-> Fixes related to multicast frames.
->
-> Changes for V2:
->         Fixed build failure on fedora docker machine
->         Fix buggy debug print to use sized integer casting
->
-> Sai Pavan Boddu (9):
->   net: cadence_gem: Fix debug statements
->   net: cadence_gem: Fix the queue address update during wrap around
->   net: cadence_gem: Fix irq update w.r.t queue
->   net: cadence_gem: Define access permission for interrupt registers
->   net: cadence_gem: Set ISR according to queue in use
->   net: cadence_gem: Add support for jumbo frames
->   net: cadnece_gem: Update irq_read_clear field of designcfg_debug1 reg
->   net: cadence_gem: Update the reset value for interrupt mask register
->   net: cadence_gem: TX_LAST bit should be set by guest
->
-> Tong Ho (1):
->   net: cadence_gem: Fix RX address filtering
->
->  hw/net/cadence_gem.c | 167 +++++++++++++++++++++++++++++----------------------
->  1 file changed, 94 insertions(+), 73 deletions(-)
->
-> --
-> 2.7.4
->
-Hey. did you test these with 64 descriptor addressing ?
-I can test it for you if you need.
-Thanks,
-Ramon.
+On 04/05/20 17:28, Markus Armbruster wrote:
+>> I reviewed everything except patch 8 and it looks good.  Thanks very much!
+> May I add Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>?
+> 
+
+For those 16 yes.
+
+Paolo
+
 
