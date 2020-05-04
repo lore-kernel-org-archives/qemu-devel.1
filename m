@@ -2,90 +2,88 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4215C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:50:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E85CFC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 17:02:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 939B7206D9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:50:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF0FC206D7
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 17:02:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zddWt1OV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 939B7206D9
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GueWZSNv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF0FC206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVeIh-0003Zc-BK
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 12:50:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49604)
+	id 1jVeUX-0003U4-Pf
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 13:02:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51218)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jVeHs-0002xu-3a
- for qemu-devel@nongnu.org; Mon, 04 May 2020 12:49:48 -0400
-Received: from mail-pg1-x529.google.com ([2607:f8b0:4864:20::529]:40615)
+ id 1jVeTs-0002xW-Nr
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 13:02:12 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:35551)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jVeHn-0000Lh-6D
- for qemu-devel@nongnu.org; Mon, 04 May 2020 12:49:44 -0400
-Received: by mail-pg1-x529.google.com with SMTP id j21so731978pgb.7
- for <qemu-devel@nongnu.org>; Mon, 04 May 2020 09:49:42 -0700 (PDT)
+ id 1jVeTr-0005R0-P3
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 13:02:12 -0400
+Received: by mail-pg1-x542.google.com with SMTP id t11so37586pgg.2
+ for <qemu-devel@nongnu.org>; Mon, 04 May 2020 10:02:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=TgBcXjHmfVhw9jMss0cD1aMd51iRW9OjOtY38S0j19M=;
- b=zddWt1OVO1veH1rn7M+f4jgmXxDSAycB7O4kCDNnwjwxsrPcg4E9dmfKcZOr393CRn
- oQkY69WNWn5m6Zk99orn1DTyHB7pbKeNloQokXwFJtgUX/fORe3L3rWdvNegtRF8eL0z
- GcKgPC4/uEzMi10IQ6HFKGxXZSk5bParXTw42Q/FEmodXP/VZPwIjT8235I0vIdxof8b
- n/4bbfIRfGDcwATyGKuxOvc4xdmwdFmBK/NV0aFBCqCHEkp22y2jhE+dh9o2fqopIATX
- PLT3CFHWWGgwPOW1Tifvd4dRKGi4Eb3saQZfS3sonFhX+bk6foYT9VjTv1sUgwyPrHHB
- Jq5A==
+ bh=06JBLAVZa5sN96JGmqVGlCxc3EcQhU2HIrajLol3cnI=;
+ b=GueWZSNvXgKljp72Rdj2Cduw51RH2riNP6KVRc3jekEMECH9UifUTQ5dWeKJB4n7i9
+ LCWwG5snx6FjY4u7FCSEXhfFAFMb/ornqDu37sxbECKrJgbJmqHPmQ0EcRzZ2u2Jsn7a
+ 0jWGa1+fYftqPIIU7JHztVdXStldwTk+uE3A1hIZNyXWoYVlnvjdC0G7DUrXFhm2HBzc
+ NNhDN0t9qS/B+lF25qkRKA5aR24iovm3EyIdYgX2DaPxm5+dEucOqWBYGSlOwRc2jjNO
+ JX1ZvJmx5jPLxHgppa/rwi+ao+QvTxEaICLfRa0qmaRAQi9IWHBqju+BdajJ+PwBwK+2
+ yimQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=TgBcXjHmfVhw9jMss0cD1aMd51iRW9OjOtY38S0j19M=;
- b=ivxPz/cM4kYLqLKOR39LLXw+Zb/ZwTV4m3ZpLwohIKdc1vR7DK7xq31tSETgGyA36m
- JBrGdBRFFQMOCSRPmW4XBHCmGmfBXRFD1OjHUNodGmSyvsr9WD15ZBvrg2EdsZ6mv6Xr
- GcopGeeeEn7eG2nA0IQ5ns14YlBES2Z8bS5yQd6GK3UgiDM3yral2nJw3DnOEgmUTJKV
- zrJuL/kb+ceK/1T9WM/t2fhYMe4pqYbOi+C8tIiqhphz0TrREvsuh7Y0TjhizfLqImuU
- xuab2XCmCWY5IycHvKc6NL2Dw3gTQeyS4svAnbfAY0S4MRILlM9POIjwhdDD4Eq+J0AU
- 7cbA==
-X-Gm-Message-State: AGi0PuZvyLo2CIsTbavZ1FmU5luCe7I/6USnkZAFxLUmzI4Rlv9VZdIX
- es+STRpZ/jNvTgytMFebZFGgag4KP6g=
-X-Google-Smtp-Source: APiQypL2wzoA4AlUmRNUVdymzFR45Sh4IV2Bg4GIDJoqkmxqgfUrUVdp2SHIEfOcqHXaeA2Hcj8UhA==
-X-Received: by 2002:a63:34c:: with SMTP id 73mr7900776pgd.108.1588610981342;
- Mon, 04 May 2020 09:49:41 -0700 (PDT)
+ bh=06JBLAVZa5sN96JGmqVGlCxc3EcQhU2HIrajLol3cnI=;
+ b=bLzmQUDWM2EmVKpoIoOa6+5In8Od13E0vPA6BHOLfKVrfeY8ryUxizWSRbzUifMR4W
+ yo65COgxp+FO1wqxQVqYSt6cS4pjE8ySm6jthrBGVTG19Up6T8Bv1CN40+uWPzvAovV6
+ siqOQHgXYYL0JFc96/LbVaJ1MpryRVWEwwCdWXXXnZdGRVJ8fRinRrmyFdflcWzS9+l0
+ BWbtzjDQeFxUYMu/XB3Z49j9qDp9k62UWRHPnAVD3VF09ArNv2sjuTuglGNh6gBT3fVZ
+ CRH/ZgGMwJDa9NNHBCAo7s661vZ3XYB0Ktqkq8g9/N27hA60NJCSOB315Zx8ArN1EO5z
+ C5Ag==
+X-Gm-Message-State: AGi0PubCorUUTKJFSyC+p40txOLQRrViDrY8z9hoWePUXWjxgJQ0Lxrz
+ eKYkDqnXogsyG/RQyq0++FLUog==
+X-Google-Smtp-Source: APiQypJ9Kii30AryFj2zDvLcmHXDdDFekf1yCja4wfImSdpVvExA2jP3yYJDtiRfc0xsU939OCASGw==
+X-Received: by 2002:a62:a504:: with SMTP id v4mr18095681pfm.117.1588611729960; 
+ Mon, 04 May 2020 10:02:09 -0700 (PDT)
 Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id h9sm9152175pfo.129.2020.05.04.09.49.40
+ by smtp.gmail.com with ESMTPSA id kb10sm40776pjb.6.2020.05.04.10.02.08
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 04 May 2020 09:49:40 -0700 (PDT)
-Subject: Re: An first try to improve PPC float simulation, not even compiled.
- Just ask question.
-To: luoyonggang@gmail.com, BALATON Zoltan <balaton@eik.bme.hu>
-References: <CAE2XoE-XFG8r85yPOhuNS2YUMqhp70q1RXCy+KLT79doW8qHMg@mail.gmail.com>
- <87605674-1cd8-2074-6730-355e20fbf7d0@linaro.org>
- <CAE2XoE8LO-4Ordhxf1-eNZK1taSGnaU4zxQ944-XLvwzmd9rJg@mail.gmail.com>
- <alpine.BSF.2.22.395.2005040128330.7227@zero.eik.bme.hu>
- <CAE2XoE93HqZVvFkZzfuC1VsF-Vw88ggSYMU2t7QjPUPWSU-4-Q@mail.gmail.com>
+ Mon, 04 May 2020 10:02:09 -0700 (PDT)
+Subject: Re: [PATCH 1/4] hw/arm/nrf51: Add NRF51_PERIPHERAL_SIZE definition
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200504072822.18799-1-f4bug@amsat.org>
+ <20200504072822.18799-2-f4bug@amsat.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <e93bda1e-ae5f-00f9-0655-f4bb72597ab5@linaro.org>
-Date: Mon, 4 May 2020 09:49:38 -0700
+Message-ID: <48f917e3-69a4-1f2f-caaa-959a1d67acde@linaro.org>
+Date: Mon, 4 May 2020 10:02:07 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <CAE2XoE93HqZVvFkZzfuC1VsF-Vw88ggSYMU2t7QjPUPWSU-4-Q@mail.gmail.com>
+In-Reply-To: <20200504072822.18799-2-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::529;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x529.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,64 +105,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Steffen_G=c3=b6rtz?= <contrib@steffen-goertz.de>,
+ qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/3/20 5:41 PM, 罗勇刚(Yonggang Luo) wrote:
+On 5/4/20 12:28 AM, Philippe Mathieu-Daudé wrote:
+> On the NRF51 series, all peripherals have a fixed I/O size
+> of 4KiB. Define NRF51_PERIPHERAL_SIZE and use it.
 > 
-> 
-> On Mon, May 4, 2020 at 7:40 AM BALATON Zoltan <balaton@eik.bme.hu
-> <mailto:balaton@eik.bme.hu>> wrote:
-> 
->     Hello,
-> 
->     On Mon, 4 May 2020, 罗勇刚(Yonggang Luo) wrote:
->     > Hello Richard, Can you have a look at the following patch, and was that are
->     > the right direction?
-> 
->     Formatting of the patch is broken by your mailer, try sending it with
->     something that does not change it otherwise it's a bit hard to read.
-> 
->     Richard suggested to add an assert to check the fp_status is correctly
->     cleared in place of helper_reset_fpstatus first for debugging so you could
->     change the helper accordingly before deleting it and run a few tests to
->     verify it still works. You'll need get some tests and benchmarks working
->     to be able to verify your changes that's why I've said that would be step
->     0. If you checked that it still produces the same results and the assert
->     does not trigger then you can remove the helper.
-> 
-> That's what I need help,
-> 1. How to write a assert to replace helper_reset_fpstatus .
->   just directly assert? or something else
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  include/hw/arm/nrf51.h        | 3 +--
+>  include/hw/i2c/microbit_i2c.h | 2 +-
+>  hw/arm/nrf51_soc.c            | 4 ++--
+>  hw/i2c/microbit_i2c.c         | 2 +-
+>  hw/timer/nrf51_timer.c        | 2 +-
+>  5 files changed, 6 insertions(+), 7 deletions(-)
 
-You can't place the assert where helper_reset_fpstatus was.  You need to place
-it in each of the helpers, like helper_fadd, that previously has a call to
-helper_reset_fpstatus preceeding it.
-
-The assert should be placed before the first floatN_op call that uses
-env->fp_status.  E.g.
-
-float64 helper_fadd(CPUPPCState *env, float64 arg1, float64 arg2)
-{
-    float64 ret;
-    int status;
-
-    status = get_float_exception_flags(&env->fp_status);
-    assert(status == 0);
-    ret = float64_add(arg1, arg2, &env->fp_status);
-    status = get_float_exception_flags(&env->fp_status);
-
-    if (unlikely(status & float_flag_invalid)) {
-        float_invalid_op_addsub(env, 1, GETPC(),
-                                float64_classify(arg1) |
-                                float64_classify(arg2));
-    }
-
-    return ret;
-}
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
