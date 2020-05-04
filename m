@@ -6,63 +6,64 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1902C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:12:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E275C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:13:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5A9D206A4
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:12:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5A9D206A4
+	by mail.kernel.org (Postfix) with ESMTPS id 4C448206A4
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:13:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C448206A4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVZxR-0005L6-QX
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 08:12:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52050)
+	id 1jVZyY-0006sD-CY
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 08:13:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52078)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jVZjr-00035e-UQ; Mon, 04 May 2020 07:58:23 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:46785)
+ id 1jVZju-0003Dy-Sb; Mon, 04 May 2020 07:58:26 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:49795)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jVZjo-00028z-TH; Mon, 04 May 2020 07:58:23 -0400
+ id 1jVZjt-0002Kb-TK; Mon, 04 May 2020 07:58:26 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1N8XDT-1j1JFE44Kf-014Si3; Mon, 04 May 2020 13:58:14 +0200
+ id 1Mw8cU-1jFHsE3x3s-00s2Wc; Mon, 04 May 2020 13:58:19 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 11/20] Compress lines for immediate return
-Date: Mon,  4 May 2020 13:57:49 +0200
-Message-Id: <20200504115758.283914-12-laurent@vivier.eu>
+Subject: [PULL 17/20] hw/isa/i82378: Remove dead assignment
+Date: Mon,  4 May 2020 13:57:55 +0200
+Message-Id: <20200504115758.283914-18-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200504115758.283914-1-laurent@vivier.eu>
 References: <20200504115758.283914-1-laurent@vivier.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:wYnk4vWOlgTtlHnIFo0rRCQ8QcF1UrGGnMVNrzZXwL2/Q4XJ14P
- v3QnL+h1N9163JYXJdFWgin7dPF9X6BQYgkLRA8KQCNZIs3HkgQM8e1caBI2hs9pzbyHAAP
- w17ghkS/+7oPHI1m2WnbwZAHccuUVMvXigMmgxnotFicqfdRQizJSeYh0JYfxgyA6xjOvX6
- LY3Vs8WGWiIm5Hg0eZ6Dw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:t/7b+5QkGpg=:EDaEgGyQI8ThhafOVj5yiQ
- pkzUWbPCVHIbIKXXReH8yH/YuxK2dGkAH6gKnk1rdITyHb/tSED++QIY9igYA4LGxS8PTn1JO
- gvTePLgAhUlod+l7q/TT9I//y+pPf0PtTFvubQBY1O3IjgbSlW65/vSIvAB6GEG0WZqILuCRW
- Ud/xIN+6smb1Q97Hqj2OlE3uA4nvTbdymxHPe5Lju8Gzc/dkyCmvtOfZKyAsN8eA80Oysmm8Z
- IkPPFcFIaNhoAq4SdOE2X0aPh/2gpAB+jihhmTXSlIduWRE4NMnUMRrKoYqjNXVmAMSFIM6N5
- r1PU/m89fbM3UnXgkexpj+Oo7ocPLfoAvf1s+bEVLUEHdDM0HSIgadGQ9YoAEqYUQ0qkScDgf
- RSh7Q7oy8EJ6zWTYNetxElpvkqmFaLMX/ePsuBglDq6DqFn7CiBbVOsQDR77bKWCECBWsF3Ew
- W+0cCail8Ai+Ils4kc2PkeJxXUTWelmP/7dBBG4iMwA70sieUaQf1ayexpjsN5cYT5+AUr1m7
- x4A4H4mpjsiJd2c+PG9GH279XeRNZ1JVZxiZdjSEJwEONaBJgXrTHFxG2LtVJTM3NxjcNU3OB
- EiiVmlRw7DsabczrXKs2unfzlvFclxl5CQvd8bCwCHmWR2fi4zRqe8MYXDZCCEZK344UqLbXJ
- YMSlP8JzocE97vbTEgub+Rs0G4dI6Sn9y3jpiG+/OIzk+HRiqcs7EvRMC2Y5ry/5XxmsFOZ5C
- ne96HEwdL4OCzxlA7fv61gguT2dsCjHSm3tJdczyVilTgQSUi2Y4y2DldwcnOrfI7cJ8n3m8h
- ryXeLHikwcCyLCxuGSHPXi8Lu8vuD7G76vjU3sO6PofldkGSp4G18rPB4mdAZMfdDJuOUrV
-Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:1189xm37UdNK1k0GFY7Kwh9INa2C9dyqIqZiJ5nteJeW9dspCI6
+ Ug7k66AL0LbDoAPNB6xnInFIcmqEDpBgA/UC7IPzNn/bYYmMk9y3LosMRt0BqLIXj5853wI
+ oqZARO+O+YgaSlAOJx2QNEAQJeysHN/JvTo9v6NJwZSOswaIeqhLPuyofZ3MKdvGGQjnBg9
+ bkzn49cZCgScE55dOp6BQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:zao/5C13Mrw=:Blt4HTwKetOwahNbNu+5JW
+ T73tXpk52G/jNRHQ4l2zcd5YyEersTe+ifNss8wVOJuHDdK+0mugrjvoQTdS63x0/0rtiAiFf
+ 3fdbiDZHhKtiiDedqcw53DSc2zeU7UNl2jw2Ri6dyCaVe+2xSWzjO/sxB4j7Gb/BLR2eEXbBm
+ fTU6n/rEj1Q90JJukEOJMTE1+yda8Bo99w7wuWAVqpCESo7D1amuZsyg0CnKElRSaxw1ArrK2
+ RSG3BWkctGcwi+A+a4vMJUUAfRSRMZR+RFcYz5X966eXPArNd+GCuEBZYyQfPpff5g2j36jEd
+ TAENBZXVJfH4kmU0e70gZiL/l6TXzyXCRP6jTdfs3dyzlwR7OPXEGlayaBZPxgvjbbSMpzMvM
+ oZE4qyuAYM72X7nPFdIaz/zN6PdGVzvB3zXlmwA6QUVTS4KSSpWzHU0rVgWc9WnRAR+W5nyGU
+ PLaWnrCkbfBkvjQBlQrjBSY6o1pIe4YG+qiOwczG7HctTGdP5Egnk8ZHbh4vxZ1c0Lbf6adys
+ 79gIK4qzeaaH7bYpPsAqxSKdph4fYPSJ+Wq+HUDJpny+6mMqPNBVfjfPi9hgN7Sj915QOlx/G
+ DMVmbKBAMIF1iPKREKivdrEb8AUc1rHWtcTSnZOH2XynYXmi14zTbBS3KsjJgSw8QmNDlrgG9
+ CO6a/eYB0zqmcoIS0nw/mX23yz3SuI9gBaPHCOm2LTFniS/6WhhIyrGEjSnrpy8/ZfCY3Erp7
+ qrS8GUkCNNQ6zZNAufVS0yp/oel2HhO23eEOCDsj7W91LIOOyEhdIe/5s6qA9WEpacKXuK/d3
+ 6zHTqA8aN3jS53lFIVFMDqmTbR/ohuyBNiOsjgXjRP8rAkiC0zTe6xxd1StO12IRifq8/mY
+Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 07:58:08
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 07:58:12
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
@@ -81,215 +82,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Simran Singhal <singhalsimran0@gmail.com>,
- Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>, Michael Tokarev <mjt@tls.msk.ru>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Simran Singhal <singhalsimran0@gmail.com>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Compress two lines into a single line if immediate return statement is found.
+Rename the unique variable assigned as 'pit' which better
+represents what it holds, to fix a warning reported by the
+Clang static code analyzer:
 
-It also remove variables progress, val, data, ret and sock
-as they are no longer needed.
+    CC      hw/isa/i82378.o
+  hw/isa/i82378.c:108:5: warning: Value stored to 'isa' is never read
+      isa = isa_create_simple(isabus, "i82374");
+      ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Remove space between function "mixer_load" and '(' to fix the
-checkpatch.pl error:-
-ERROR: space prohibited between function name and open parenthesis '('
-
-Done using following coccinelle script:
-@@
-local idexpression ret;
-expression e;
-@@
-
--ret =
-+return
-     e;
--return ret;
-
-Signed-off-by: Simran Singhal <singhalsimran0@gmail.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20200401165314.GA3213@simran-Inspiron-5558>
+Reported-by: Clang Static Analyzer
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200422133152.16770-7-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- block/file-posix.c      | 3 +--
- block/nfs.c             | 3 +--
- block/nvme.c            | 4 +---
- block/vhdx.c            | 3 +--
- hw/audio/ac97.c         | 4 +---
- hw/audio/adlib.c        | 5 +----
- hw/display/cirrus_vga.c | 4 +---
- migration/ram.c         | 4 +---
- ui/gtk.c                | 3 +--
- util/qemu-sockets.c     | 5 +----
- 10 files changed, 10 insertions(+), 28 deletions(-)
+ hw/isa/i82378.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index bf09ad8bc0d0..8fd8c27305cc 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1631,8 +1631,7 @@ static int handle_aiocb_write_zeroes_unmap(void *opaque)
+diff --git a/hw/isa/i82378.c b/hw/isa/i82378.c
+index dcb6b479ea0d..d9e6c7fa0096 100644
+--- a/hw/isa/i82378.c
++++ b/hw/isa/i82378.c
+@@ -67,7 +67,7 @@ static void i82378_realize(PCIDevice *pci, Error **errp)
+     I82378State *s = I82378(dev);
+     uint8_t *pci_conf;
+     ISABus *isabus;
+-    ISADevice *isa;
++    ISADevice *pit;
  
-     /* If we couldn't manage to unmap while guaranteed that the area reads as
-      * all-zero afterwards, just write zeroes without unmapping */
--    ret = handle_aiocb_write_zeroes(aiocb);
--    return ret;
-+    return handle_aiocb_write_zeroes(aiocb);
+     pci_conf = pci->config;
+     pci_set_word(pci_conf + PCI_COMMAND,
+@@ -99,13 +99,13 @@ static void i82378_realize(PCIDevice *pci, Error **errp)
+     isa_bus_irqs(isabus, s->i8259);
+ 
+     /* 1 82C54 (pit) */
+-    isa = i8254_pit_init(isabus, 0x40, 0, NULL);
++    pit = i8254_pit_init(isabus, 0x40, 0, NULL);
+ 
+     /* speaker */
+-    pcspk_init(isabus, isa);
++    pcspk_init(isabus, pit);
+ 
+     /* 2 82C37 (dma) */
+-    isa = isa_create_simple(isabus, "i82374");
++    isa_create_simple(isabus, "i82374");
  }
  
- #ifndef HAVE_COPY_FILE_RANGE
-diff --git a/block/nfs.c b/block/nfs.c
-index 2393fbfe6bcc..18c0a7369454 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -623,8 +623,7 @@ static int nfs_file_open(BlockDriverState *bs, QDict *options, int flags,
-     }
- 
-     bs->total_sectors = ret;
--    ret = 0;
--    return ret;
-+    return 0;
- }
- 
- static QemuOptsList nfs_create_opts = {
-diff --git a/block/nvme.c b/block/nvme.c
-index 7b7c0cc5d673..eb2f54dd9dc9 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -575,11 +575,9 @@ static bool nvme_poll_cb(void *opaque)
- {
-     EventNotifier *e = opaque;
-     BDRVNVMeState *s = container_of(e, BDRVNVMeState, irq_notifier);
--    bool progress = false;
- 
-     trace_nvme_poll_cb(s);
--    progress = nvme_poll_queues(s);
--    return progress;
-+    return nvme_poll_queues(s);
- }
- 
- static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
-diff --git a/block/vhdx.c b/block/vhdx.c
-index 45be0a43218c..aedd78260455 100644
---- a/block/vhdx.c
-+++ b/block/vhdx.c
-@@ -411,8 +411,7 @@ int vhdx_update_headers(BlockDriverState *bs, BDRVVHDXState *s,
-     if (ret < 0) {
-         return ret;
-     }
--    ret = vhdx_update_header(bs, s, generate_data_write_guid, log_guid);
--    return ret;
-+    return vhdx_update_header(bs, s, generate_data_write_guid, log_guid);
- }
- 
- /* opens the specified header block from the VHDX file header section */
-diff --git a/hw/audio/ac97.c b/hw/audio/ac97.c
-index 1ec87feec0cb..8a9b9924c495 100644
---- a/hw/audio/ac97.c
-+++ b/hw/audio/ac97.c
-@@ -573,11 +573,9 @@ static uint32_t nam_readb (void *opaque, uint32_t addr)
- static uint32_t nam_readw (void *opaque, uint32_t addr)
- {
-     AC97LinkState *s = opaque;
--    uint32_t val = ~0U;
-     uint32_t index = addr;
-     s->cas = 0;
--    val = mixer_load (s, index);
--    return val;
-+    return mixer_load(s, index);
- }
- 
- static uint32_t nam_readl (void *opaque, uint32_t addr)
-diff --git a/hw/audio/adlib.c b/hw/audio/adlib.c
-index d6c1fb0586c6..7c3b67dcfb8c 100644
---- a/hw/audio/adlib.c
-+++ b/hw/audio/adlib.c
-@@ -120,13 +120,10 @@ static void adlib_write(void *opaque, uint32_t nport, uint32_t val)
- static uint32_t adlib_read(void *opaque, uint32_t nport)
- {
-     AdlibState *s = opaque;
--    uint8_t data;
-     int a = nport & 3;
- 
-     adlib_kill_timers (s);
--    data = OPLRead (s->opl, a);
--
--    return data;
-+    return OPLRead (s->opl, a);
- }
- 
- static void timer_handler (void *opaque, int c, double interval_Sec)
-diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-index 0d391e1300aa..1f29731ffe11 100644
---- a/hw/display/cirrus_vga.c
-+++ b/hw/display/cirrus_vga.c
-@@ -2411,12 +2411,10 @@ static uint64_t cirrus_linear_bitblt_read(void *opaque,
-                                           unsigned size)
- {
-     CirrusVGAState *s = opaque;
--    uint32_t ret;
- 
-     /* XXX handle bitblt */
-     (void)s;
--    ret = 0xff;
--    return ret;
-+    return 0xff;
- }
- 
- static void cirrus_linear_bitblt_write(void *opaque,
-diff --git a/migration/ram.c b/migration/ram.c
-index 04f13feb2e77..06cba8863280 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2135,9 +2135,7 @@ int ram_postcopy_send_discard_bitmap(MigrationState *ms)
-     }
-     trace_ram_postcopy_send_discard_bitmap();
- 
--    ret = postcopy_each_ram_send_discard(ms);
--
--    return ret;
-+    return postcopy_each_ram_send_discard(ms);
- }
- 
- /**
-diff --git a/ui/gtk.c b/ui/gtk.c
-index 030b251c6109..83f2f5d49b2a 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -1650,8 +1650,7 @@ static GSList *gd_vc_menu_init(GtkDisplayState *s, VirtualConsole *vc,
-                      G_CALLBACK(gd_menu_switch_vc), s);
-     gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), vc->menu_item);
- 
--    group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(vc->menu_item));
--    return group;
-+    return gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(vc->menu_item));
- }
- 
- #if defined(CONFIG_VTE)
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index bcc06d0e01c7..86c48b9fa5de 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -765,15 +765,12 @@ static int vsock_connect_addr(const struct sockaddr_vm *svm, Error **errp)
- static int vsock_connect_saddr(VsockSocketAddress *vaddr, Error **errp)
- {
-     struct sockaddr_vm svm;
--    int sock = -1;
- 
-     if (!vsock_parse_vaddr_to_sockaddr(vaddr, &svm, errp)) {
-         return -1;
-     }
- 
--    sock = vsock_connect_addr(&svm, errp);
--
--    return sock;
-+    return vsock_connect_addr(&svm, errp);
- }
- 
- static int vsock_listen_saddr(VsockSocketAddress *vaddr,
+ static void i82378_init(Object *obj)
 -- 
 2.26.2
 
