@@ -2,90 +2,89 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 664BDC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 08:06:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C67AFC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 08:14:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1F8320643
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 08:06:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8E644206B9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 08:14:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uDgjTA/F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1F8320643
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BAYXKB9E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E644206B9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVW6z-0001bh-NI
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 04:06:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36466)
+	id 1jVWFT-0003vu-NY
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 04:14:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37456)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jVW6B-00013E-5h; Mon, 04 May 2020 04:05:11 -0400
-Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:42594)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jVW69-0005lL-5Y; Mon, 04 May 2020 04:05:10 -0400
-Received: by mail-yb1-xb43.google.com with SMTP id i16so8739541ybq.9;
- Mon, 04 May 2020 01:05:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=HVNOQuq5NG4XxXcCbNf8SU3FlXx9fUfhO0RXrzDrn1k=;
- b=uDgjTA/FmgCsfNs9erJsOWljeGbPeb6EiFPNCiViUgraZwrrENlb2ZcIHOZYnDum9B
- vdrKuXw31NK0UhPEd/GM8yKIgQy8kBDWKOgCrZqq5p8zVb33LqsIfHYy8Z3r5iazSQjz
- LIB9xuxXAx0pyjes+xmmtL3qllBi4lFEKSw8X58uwmd0MdJ77KPbK22PgCZwCiuSVFDN
- 5oS++rPOztbT95U8P6jLusLPocdn1e9+pQ8qHxy77X+gOWkvmMFdXPJ/yPyWJhtb/Nt2
- SnqGlb5OVommJm3WkGHJ644WWzc9c6sBp4Rqa3KlWDBecNZIP45XLY+uEskJGoji1UWj
- 37nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=HVNOQuq5NG4XxXcCbNf8SU3FlXx9fUfhO0RXrzDrn1k=;
- b=uci7Mq6cW7I5DfBe6uaXe0+8Joc0ixA0mDvIW1rrt5o3muQ0JqgNJ57GLwevPViXgu
- WFUMdDAjPeb8n6GdSPsnJObNn0RqHd+Ikvq+i39LpQyHw/upFyfONxFn2U2VkT4Xz0uf
- WjaBpZUk4j2cOuxULeCJYvkI3ZYzWieMRgnYmtvowMXJuqGU5QwvV4IRhFCZxv98iOVO
- MtvyegKqv0j2XlFhixDxrTRg8jNoPbZxM9KvGWcLGjQ1nkyx3ZJBBxv2ZIEsANqy7+Xo
- ycYHfSTodOEtppUQGVDtKMuxq2kofrUiHFzrx17CbNetp41wlbbuaiScKwjxMTisOmbh
- 0SVw==
-X-Gm-Message-State: AGi0Pub1R7oRP2q1ACXYJnVwzCXYE0FwUUgxNT+D+rkFqt6DFV7Khr3R
- G/2lZ6PKs7Xbc/mYq/nIrlQrs76F0y5/6Rx7hEo=
-X-Google-Smtp-Source: APiQypJmzYPJGB6+vbbo1f436e2X91a7+qRLH449vrBmzYDRw45lOF/9dUgPXEf3p1SzaAcI3LZJRF4a3cZmTM2LRvg=
-X-Received: by 2002:a25:cace:: with SMTP id
- a197mr25792880ybg.387.1588579507786; 
- Mon, 04 May 2020 01:05:07 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jVWEt-0003Vu-9M
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 04:14:11 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24251
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jVWEr-00009x-KY
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 04:14:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588580046;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ZGjbBi4ueXhodwLV25CNAoVKGSnLqFLBG0E6oo9gojY=;
+ b=BAYXKB9EaXNOHu/XZS+6YwonbKoLAhj2+VX6yxDWA1+SIdRJSMFhmCpo4KRu4lDdJrbass
+ leY3Ma0kE9OvwMDPJ9xl9rN8V7JuQ2v+haVkzio3Q3UKHhcsWjsijVO6F+qIOaqBX3CadM
+ A/veibR+WTI3pd2wJr94UwO1Vo0aoxI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-76-oxTqxdOdNvGAktccUt81PQ-1; Mon, 04 May 2020 04:14:01 -0400
+X-MC-Unique: oxTqxdOdNvGAktccUt81PQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7C811005510;
+ Mon,  4 May 2020 08:14:00 +0000 (UTC)
+Received: from work-vm (ovpn-114-147.ams2.redhat.com [10.36.114.147])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A5370648D1;
+ Mon,  4 May 2020 08:13:56 +0000 (UTC)
+Date: Mon, 4 May 2020 09:13:54 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PULL 0/6] virtiofs queue
+Message-ID: <20200504081354.GB3112@work-vm>
+References: <20200501191500.126432-1-dgilbert@redhat.com>
+ <CAFEAcA8W3kreu2s_4wjvP4mNgPpVHpv8A4T-D+etUORg18Rtew@mail.gmail.com>
 MIME-Version: 1.0
-References: <1588348254-7241-1-git-send-email-bmeng.cn@gmail.com>
- <1588348254-7241-2-git-send-email-bmeng.cn@gmail.com>
- <CAAhSdy06i1zb6_aedLn41rWDzrjyTcJ_T954DcwX7k2bM_VcVw@mail.gmail.com>
- <CAEUhbmXMcxZqk4RUjcWMG-5MCd-Z3wPn=ktQnHLA3Rvn01iq+g@mail.gmail.com>
- <CAAhSdy1kWxW6kyQiMd+-9ZkwMr9xFcZurU7HHoRTE0ST9rnq0Q@mail.gmail.com>
- <CAEUhbmUzPNxHXgNU=nM3C3AdyqwNh4sS9pq02F9vLwipRRWwDA@mail.gmail.com>
-In-Reply-To: <CAEUhbmUzPNxHXgNU=nM3C3AdyqwNh4sS9pq02F9vLwipRRWwDA@mail.gmail.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Mon, 4 May 2020 16:04:56 +0800
-Message-ID: <CAEUhbmWD_L_dJZ3hVZrw08ycCaLr3UDTRRA9JreJfqZHpPntmQ@mail.gmail.com>
-Subject: Re: [PATCH 1/5] roms/opensbi: Update to support building bios images
- for generic platform
-To: Anup Patel <anup@brainfault.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b43;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb43.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <CAFEAcA8W3kreu2s_4wjvP4mNgPpVHpv8A4T-D+etUORg18Rtew@mail.gmail.com>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 01:21:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ T_HK_NAME_DR=0.01, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,148 +97,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Anup Patel <Anup.Patel@wdc.com>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: mszeredi@redhat.com, yavrahami@paloaltonetworks.com,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 4, 2020 at 4:00 PM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> Hi Anup,
->
-> On Mon, May 4, 2020 at 3:52 PM Anup Patel <anup@brainfault.org> wrote:
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> On Fri, 1 May 2020 at 20:16, Dr. David Alan Gilbert (git)
+> <dgilbert@redhat.com> wrote:
 > >
-> > On Mon, May 4, 2020 at 12:46 PM Bin Meng <bmeng.cn@gmail.com> wrote:
-> > >
-> > > Hi Anup,
-> > >
-> > > On Sun, May 3, 2020 at 12:38 PM Anup Patel <anup@brainfault.org> wrote:
-> > > >
-> > > > On Fri, May 1, 2020 at 9:26 PM Bin Meng <bmeng.cn@gmail.com> wrote:
-> > > > >
-> > > > > From: Bin Meng <bin.meng@windriver.com>
-> > > > >
-> > > > > The RISC-V generic platform is a flattened device tree (FDT) based
-> > > > > platform where all platform specific functionality is provided based
-> > > > > on FDT passed by previous booting stage. The support was added in
-> > > > > upstream opensbi recently.
-> > > > >
-> > > > > Bring the QEMU roms/opensbi submodule to the upstream opensbi commit:
-> > > > > commit 4f18c6e55049 ("platform: generic: Add Sifive FU540 TLB flush range limit override")
-> > > > > with the following changes since v0.7 release:
-> > > > >
-> > > > >   1bb00ab lib: No need to provide default PMP region using platform callbacks
-> > > > >   a9eac67 include: sbi_platform: Combine reboot and shutdown into one callback
-> > > > >   6585fab lib: utils: Add SiFive test device
-> > > > >   4781545 platform: Add Nuclei UX600 platform
-> > > > >   3a326af scripts: adapt binary archive script for Nuclei UX600
-> > > > >   5bdf022 firmware: fw_base: Remove CSR_MTVEC update check
-> > > > >   e6c1345 lib: utils/serial: Skip baudrate config if input frequency is zero
-> > > > >   01a8c8e lib: utils: Improve fdt_parse_uart8250() API
-> > > > >   0a0093b lib: utils: Add fdt_parse_uart8250_node() function
-> > > > >   243b0d0 lib: utils: Remove redundant clint_ipi_sync() declaration
-> > > > >   e3ad7c1 lib: utils: Rename fdt_parse_clint() to fdt_parse_compat_addr()
-> > > > >   a39cd6f lib: utils: Add FDT match table based node lookup
-> > > > >   dd33b9e lib: utils: Make fdt_get_node_addr_size() public function
-> > > > >   66185b3 lib: utils: Add fdt_parse_sifive_uart_node() function
-> > > > >   19e966b lib: utils: Add fdt_parse_hart_id() function
-> > > > >   44dd7be lib: utils: Add fdt_parse_max_hart_id() API
-> > > > >   f0eb503 lib: utils: Add fdt_parse_plic_node() function
-> > > > >   1ac794c include: Add array_size() macro
-> > > > >   8ff2b94 lib: utils: Add simple FDT timer framework
-> > > > >   76f0f81 lib: utils: Add simple FDT ipi framework
-> > > > >   75322a6 lib: utils: Add simple FDT irqchip framework
-> > > > >   76a8940 lib: utils: Add simple FDT serial framework
-> > > > >   7cc6fa4 lib: utils: Add simple FDT reset framework
-> > > > >   4d06353 firmware: fw_base: Introduce optional fw_platform_init()
-> > > > >   f1aa9e5 platform: Add generic FDT based platform support
-> > > > >   1f21b99 lib: sbi: Print platform hart count at boot time
-> > > > >   2ba7087 scripts: Add generic platform to create-binary-archive.sh
-> > > > >   4f18c6e platform: generic: Add Sifive FU540 TLB flush range limit override
-> > > > >
-> > > > > Update our Makefile to build the generic platform instead of building
-> > > > > virt and sifive_u separately.
-> > > > >
-> > > > > Signed-off-by: Bin Meng <bin.meng@windriver.com>
-> > > > > ---
-> > > > >
-> > > > >  roms/Makefile | 30 ++++++++----------------------
-> > > > >  roms/opensbi  |  2 +-
-> > > > >  2 files changed, 9 insertions(+), 23 deletions(-)
-> > > > >
-> > > > > diff --git a/roms/Makefile b/roms/Makefile
-> > > > > index f9acf39..cb00628 100644
-> > > > > --- a/roms/Makefile
-> > > > > +++ b/roms/Makefile
-> > > > > @@ -64,10 +64,8 @@ default help:
-> > > > >         @echo "  u-boot.e500        -- update u-boot.e500"
-> > > > >         @echo "  u-boot.sam460      -- update u-boot.sam460"
-> > > > >         @echo "  efi                -- update UEFI (edk2) platform firmware"
-> > > > > -       @echo "  opensbi32-virt     -- update OpenSBI for 32-bit virt machine"
-> > > > > -       @echo "  opensbi64-virt     -- update OpenSBI for 64-bit virt machine"
-> > > > > -       @echo "  opensbi32-sifive_u -- update OpenSBI for 32-bit sifive_u machine"
-> > > > > -       @echo "  opensbi64-sifive_u -- update OpenSBI for 64-bit sifive_u machine"
-> > > > > +       @echo "  opensbi32-generic  -- update OpenSBI for 32-bit generic machine"
-> > > > > +       @echo "  opensbi64-generic  -- update OpenSBI for 64-bit generic machine"
-> > > > >         @echo "  bios-microvm       -- update bios-microvm.bin (qboot)"
-> > > > >         @echo "  clean              -- delete the files generated by the previous" \
-> > > > >                                       "build targets"
-> > > > > @@ -170,29 +168,17 @@ skiboot:
-> > > > >  efi: edk2-basetools
-> > > > >         $(MAKE) -f Makefile.edk2
-> > > > >
-> > > > > -opensbi32-virt:
-> > > > > +opensbi32-generic:
-> > > > >         $(MAKE) -C opensbi \
-> > > > >                 CROSS_COMPILE=$(riscv32_cross_prefix) \
-> > > > > -               PLATFORM="qemu/virt"
-> > > > > -       cp opensbi/build/platform/qemu/virt/firmware/fw_jump.bin ../pc-bios/opensbi-riscv32-virt-fw_jump.bin
-> > > > > +               PLATFORM="generic"
-> > > > > +       cp opensbi/build/platform/generic/firmware/fw_jump.bin ../pc-bios/opensbi-riscv32-generic-fw_jump.bin
-> > > >
-> > > > I think you should copy fw_jump.elf as well because QEMU Spike
-> > > > platform needs it.
-> > > >
-> > >
-> > > I believe we intended only to ship default bios images for virt and
-> > > sifive_u. Spike bios image was not shipped in previous QEMU version
-> > > too.
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > >
-> > Is there a specific reason for not shipping bios image for Spike machine ?
+> > The following changes since commit 1c47613588ccff44422d4bdeea0dc36a0a30=
+8ec7:
 > >
->
-> That's only my guess.  Based on what I see from git history, adding
-> "-bios" support was added via:
->
-> commit 5b8a986350a9 ("hw/riscv/spike: Allow loading firmware
-> separately using -bios option")
->
-> with bios image as opensbi-riscv{32,64}-spike-fw_jump.elf, but the
-> images were not added to QEMU repo.
->
-> > There were issues booting Linux on QEMU spike machine which are
-> > now fixed and available in QEMU master. I think we should certainly
-> > ship fw_jump.elf for Spike machine. This way we have OpenSBI generic
-> > firmware available as a bios image for three QEMU machines(virt, sifive_u,
-> > and spike).
+> >   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into s=
+taging (2020-04-30 19:25:41 +0100)
 > >
->
-> If everyone thinks shipping the ELF image is OK, I can do that in v2.
+> > are available in the Git repository at:
+> >
+> >   https://gitlab.com/dagrh/qemu.git tags/pull-virtiofs-20200501
+> >
+> > for you to fetch changes up to 66502bbca37ca7a3bfa57e82cfc03b89a7a11eae=
+:
+> >
+> >   virtiofsd: drop all capabilities in the wait parent process (2020-05-=
+01 20:05:37 +0100)
+> >
+> > ----------------------------------------------------------------
+> > virtiofsd: Pull 2020-05-01 (includes CVE fix)
+> >
+> > This set includes a security fix, other fixes and improvements.
+> >
+> > Security fix:
+> > The security fix is for CVE-2020-10717 where, on low RAM hosts,
+> > the guest can potentially exceed the maximum fd limit.
+> > This fix adds some more configuration so that the user
+> > can explicitly set the limit.
+> > Thank you to Yuval Avrahami for reporting this.
+> >
+> > Fixes:
+> >
+> > Recursive mounting of the exported directory is now used in
+> > the sandbox, such that if there was a mount underneath present at
+> > the time the virtiofsd was started, that mount is also
+> > visible to the guest; in the existing code, only mounts that
+> > happened after startup were visible.
+> >
+> > Security improvements:
+> >
+> > The jailing for /proc/self/fd is improved - but it's something
+> > that shouldn't be accessible anyway.
+> >
+> > Most capabilities are now dropped at startup; again this shouldn't
+> > change any behaviour but is extra protection.
+> >
+> > ----------------------------------------------------------------
+>=20
+>=20
+> Applied, thanks.
+>=20
+> Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
+> for any user-visible changes.
+>=20
+> I notice you didn't include the usual Cc: qemu-stable@nongnu.org
+> lines in the commits to be backported, but I think the stable
+> branch maintainers can deal with the occasional manual notification.
 
-One additional note, that's why patch 5 in this series for. Without
-the default bios image being shipped in QEMU, QEMU testing will
-complain.
+Thanks, yes I sent a mail to qemu-stable as a reply to the series
+saying which patches I thought should be for stable.
 
-So in the future, when we have more QEMU RISC-V machines added, if
-they are not using the generic firmware, do we want to ship all of
-these different firmware images in QEMU?
+Dave
 
-Regards,
-Bin
+> thanks
+> -- PMM
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
