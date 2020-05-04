@@ -2,106 +2,88 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2DC5C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:15:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53C1FC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:20:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E20B206B8
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:15:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2205E206E6
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:20:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="IHa/k63U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E20B206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=citrix.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i4LIp5MJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2205E206E6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVY8b-0006xG-IA
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 06:15:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38774)
+	id 1jVYCx-0000yQ-7x
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 06:20:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39884)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <roger.pau@citrix.com>)
- id 1jVY7j-0006TF-Kt
- for qemu-devel@nongnu.org; Mon, 04 May 2020 06:14:55 -0400
-Received: from esa3.hc3370-68.iphmx.com ([216.71.145.155]:2440)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <roger.pau@citrix.com>)
- id 1jVY7i-0006yx-BO
- for qemu-devel@nongnu.org; Mon, 04 May 2020 06:14:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=citrix.com; s=securemail; t=1588587295;
- h=from:to:cc:subject:date:message-id:mime-version:
- content-transfer-encoding;
- bh=hHXsCBHhwytgii8wsjHMhAMeO4nlwNzTdfKVVjJT9fA=;
- b=IHa/k63UgTtgrqLxVJE3kYWH0RWpztK/L/FTKdHtL8v4gxmC9U5+SVk9
- YUO3JYE0g3sl5xcE6ge8tm9iSIfSxSLBFS2fii6WS9CHw/P5Ni2RpB+m4
- E8ajRykZdz3BMdtoBYQvcdWr8hAdQZBKY72pz50mG5H0olZkomXt1Eg/c c=;
-Authentication-Results: esa3.hc3370-68.iphmx.com;
- dkim=none (message not signed) header.i=none;
- spf=None smtp.pra=roger.pau@citrix.com;
- spf=Pass smtp.mailfrom=roger.pau@citrix.com;
- spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- roger.pau@citrix.com) identity=pra; client-ip=162.221.158.21;
- receiver=esa3.hc3370-68.iphmx.com;
- envelope-from="roger.pau@citrix.com";
- x-sender="roger.pau@citrix.com"; x-conformance=sidf_compatible
-Received-SPF: Pass (esa3.hc3370-68.iphmx.com: domain of
- roger.pau@citrix.com designates 162.221.158.21 as permitted
- sender) identity=mailfrom; client-ip=162.221.158.21;
- receiver=esa3.hc3370-68.iphmx.com;
- envelope-from="roger.pau@citrix.com";
- x-sender="roger.pau@citrix.com";
- x-conformance=sidf_compatible; x-record-type="v=spf1";
- x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
- ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
- ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
- ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83
- ip4:168.245.78.127 ~all"
-Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- postmaster@mail.citrix.com) identity=helo;
- client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
- envelope-from="roger.pau@citrix.com";
- x-sender="postmaster@mail.citrix.com";
- x-conformance=sidf_compatible
-IronPort-SDR: SNtEGKj6AHmTYc1l6JrCrcHWXNdLdYXwAC1CtnPp4dmehEJWK3fBd2Xza3kfcnGTxgV56NFaA1
- Kc8LHSQYGhmdyxy6LD2wFNzeLN36b7J8L3kG/eOIhnarqEJX7u7HVjO5petW2YZQkTLEsbV8kP
- B1vm/YrHLfl603JqJWfP/cU/NXyzqn40Po7JbLg7drX853N3o4zhZCGUZ534GJbZxG+5VN/3YB
- EKFVMWyvShwsmJxBS3dkC4p36OfFsu59+b1lrLmk8dtOtzY7cbeQLXKemE+WTm8yKakgOT88Qd
- clQ=
-X-SBRS: 2.7
-X-MesageID: 16644716
-X-Ironport-Server: esa3.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.73,351,1583211600"; d="scan'208";a="16644716"
-From: Roger Pau Monne <roger.pau@citrix.com>
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH] xen: fix build without pci passthrough
-Date: Mon, 4 May 2020 12:14:43 +0200
-Message-ID: <20200504101443.3165-1-roger.pau@citrix.com>
-X-Mailer: git-send-email 2.26.2
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jVYCK-0000Xm-TL
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 06:19:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47318
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jVYCK-0001fn-3b
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 06:19:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588587579;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=yfmnRLjHMZPruqAUKbzhEiqZID/6kyZVYXfhOdAkLNE=;
+ b=i4LIp5MJL8FP04tBK/ng2p91CjoTdU4hevyblRyqY8qy6Qxmy6OJe8Suid+MN6UwBMkfnV
+ /KEv74XBBtaIk2qF8VzaO0QlBHRlVX7C8Q9k8Xv++QdQq2uFxG8AZ7M64olTeUEJ2rOPwe
+ 0AzbpzSMBhTj9uyVEC/jhsyjRljRvXo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-58-U5FEqviNPqWUtX2jd7IAnw-1; Mon, 04 May 2020 06:19:35 -0400
+X-MC-Unique: U5FEqviNPqWUtX2jd7IAnw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B9314100CCC3;
+ Mon,  4 May 2020 10:19:34 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.51])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C580819C58;
+ Mon,  4 May 2020 10:19:28 +0000 (UTC)
+Date: Mon, 4 May 2020 11:19:25 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH v3 00/14] LUKS: encryption slot management using amend
+ interface
+Message-ID: <20200504101925.GH115875@redhat.com>
+References: <20200503184324.12506-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.145.155; envelope-from=roger.pau@citrix.com;
- helo=esa3.hc3370-68.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 06:14:50
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+In-Reply-To: <20200503184324.12506-1-mlevitsk@redhat.com>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 04:24:57
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -10
+X-Spam_score: -1.1
+X-Spam_bar: -
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- KHOP_DYNAMIC=0.001, RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
+ FROM_EXCESS_BASE64=0.979, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -115,90 +97,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Stefano Stabellini <sstabellini@kernel.org>, Paul
- Durrant <paul@xen.org>, Roger Pau Monne <roger.pau@citrix.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-has_igd_gfx_passthru is only available when QEMU is built with
-CONFIG_XEN_PCI_PASSTHROUGH, and hence shouldn't be used in common
-code without checking if it's available.
+On Sun, May 03, 2020 at 09:43:10PM +0300, Maxim Levitsky wrote:
+> Hi!
+> Here is the updated series of my patches, incorporating all the feedback =
+I received.
+>=20
+> This implements the API interface that we agreed upon except that I merge=
+d the
+> LUKSKeyslotActive/LUKSKeyslotInactive union into a struct because otherwi=
+se
+> I need nested unions which are not supported currently by QAPI parser.
+> This didn't change the API and thus once support for nested unions is the=
+re,
+> it can always be implemented in backward compatible way.
+>=20
+> I hope that this series will finally be considered for merging, since I a=
+m somewhat running
+> out of time to finish this task.
+>=20
+> Patches are strictly divided by topic to 3 groups, and each group depends=
+ on former groups.
+>=20
+> * Patches 1,2 implement qcrypto generic amend interface, including defini=
+tion
+>   of structs used in crypto.json and implement this in luks crypto driver
+>   Nothing is exposed to the user at this stage
+>=20
+> * Patches 3-9 use the code from patches 1,2 to implement qemu-img amend b=
+ased encryption slot management
+>   for luks and for qcow2, and add a bunch of iotests to cover that.
+>=20
+> * Patches 10-13 add x-blockdev-amend (I'll drop the -x prefix if you like=
+), and wire it
+>   to luks and qcow2 driver to implement qmp based encryption slot managem=
+ent also using
+>   the code from patches 1,2, and also add a bunch of iotests to cover thi=
+s.
+>=20
+> Tested with -raw,-qcow2 and -luks iotests and 'make check'
+>=20
+> V3: rebased, addressed most of the review feedback.
+> For now I kept the slot bitmap code since I am not sure that replacing it=
+ will be better.
 
-Fixes: 46472d82322d0 ('xen: convert "-machine igd-passthru" to an accelerator property')
-Signed-off-by: Roger Pau Monné <roger.pau@citrix.com>
----
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
-Cc: Paul Durrant <paul@xen.org>
-Cc: xen-devel@lists.xenproject.org
----
- hw/xen/xen-common.c | 4 ++++
- hw/xen/xen_pt.h     | 7 +++++++
- 2 files changed, 11 insertions(+)
+I'm still of the opinion that the bitmaps code should be replaced.
+With this current design we are iterating over the slot of keys slots
+4 times, doing different checks/logic in each iteration. This is really
+not nice for understanding how the code works. IMHO we should be iterating
+at most twice - once to validate the requested configuration, and once
+to apply the requested configuration.   Even if there si duplication of
+logic in between the delete/add key codepaths, I think it will be better
+as the logic for each operation will be in one place.
 
-diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
-index a15070f7f6..c800862419 100644
---- a/hw/xen/xen-common.c
-+++ b/hw/xen/xen-common.c
-@@ -127,6 +127,7 @@ static void xen_change_state_handler(void *opaque, int running,
-     }
- }
- 
-+#ifdef CONFIG_XEN_PCI_PASSTHROUGH
- static bool xen_get_igd_gfx_passthru(Object *obj, Error **errp)
- {
-     return has_igd_gfx_passthru;
-@@ -136,6 +137,7 @@ static void xen_set_igd_gfx_passthru(Object *obj, bool value, Error **errp)
- {
-     has_igd_gfx_passthru = value;
- }
-+#endif
- 
- static void xen_setup_post(MachineState *ms, AccelState *accel)
- {
-@@ -197,11 +199,13 @@ static void xen_accel_class_init(ObjectClass *oc, void *data)
- 
-     compat_props_add(ac->compat_props, compat, G_N_ELEMENTS(compat));
- 
-+#ifdef CONFIG_XEN_PCI_PASSTHROUGH
-     object_class_property_add_bool(oc, "igd-passthru",
-         xen_get_igd_gfx_passthru, xen_set_igd_gfx_passthru,
-         &error_abort);
-     object_class_property_set_description(oc, "igd-passthru",
-         "Set on/off to enable/disable igd passthrou", &error_abort);
-+#endif
- }
- 
- #define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")
-diff --git a/hw/xen/xen_pt.h b/hw/xen/xen_pt.h
-index 179775db7b..660dd8a008 100644
---- a/hw/xen/xen_pt.h
-+++ b/hw/xen/xen_pt.h
-@@ -1,6 +1,7 @@
- #ifndef XEN_PT_H
- #define XEN_PT_H
- 
-+#include "qemu/osdep.h"
- #include "hw/xen/xen_common.h"
- #include "hw/pci/pci.h"
- #include "xen-host-pci-device.h"
-@@ -322,7 +323,13 @@ extern void *pci_assign_dev_load_option_rom(PCIDevice *dev,
-                                             unsigned int domain,
-                                             unsigned int bus, unsigned int slot,
-                                             unsigned int function);
-+
-+#ifdef CONFIG_XEN_PCI_PASSTHROUGH
- extern bool has_igd_gfx_passthru;
-+#else
-+# define has_igd_gfx_passthru false
-+#endif
-+
- static inline bool is_igd_vga_passthrough(XenHostPCIDevice *dev)
- {
-     return (has_igd_gfx_passthru
--- 
-2.26.2
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
