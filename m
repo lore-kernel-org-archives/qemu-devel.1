@@ -6,85 +6,91 @@ X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53C1FC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:20:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B30E8C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:22:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2205E206E6
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:20:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7DF78206E6
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:22:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i4LIp5MJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2205E206E6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P5PvWZok"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DF78206E6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVYCx-0000yQ-7x
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 06:20:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39884)
+	id 1jVYEk-000344-J5
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 06:22:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40310)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jVYCK-0000Xm-TL
- for qemu-devel@nongnu.org; Mon, 04 May 2020 06:19:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47318
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jVYCK-0001fn-3b
- for qemu-devel@nongnu.org; Mon, 04 May 2020 06:19:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588587579;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=yfmnRLjHMZPruqAUKbzhEiqZID/6kyZVYXfhOdAkLNE=;
- b=i4LIp5MJL8FP04tBK/ng2p91CjoTdU4hevyblRyqY8qy6Qxmy6OJe8Suid+MN6UwBMkfnV
- /KEv74XBBtaIk2qF8VzaO0QlBHRlVX7C8Q9k8Xv++QdQq2uFxG8AZ7M64olTeUEJ2rOPwe
- 0AzbpzSMBhTj9uyVEC/jhsyjRljRvXo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-58-U5FEqviNPqWUtX2jd7IAnw-1; Mon, 04 May 2020 06:19:35 -0400
-X-MC-Unique: U5FEqviNPqWUtX2jd7IAnw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B9314100CCC3;
- Mon,  4 May 2020 10:19:34 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.51])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C580819C58;
- Mon,  4 May 2020 10:19:28 +0000 (UTC)
-Date: Mon, 4 May 2020 11:19:25 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH v3 00/14] LUKS: encryption slot management using amend
- interface
-Message-ID: <20200504101925.GH115875@redhat.com>
-References: <20200503184324.12506-1-mlevitsk@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jVYE1-0002A7-Tt; Mon, 04 May 2020 06:21:25 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40813)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jVYE1-00039D-88; Mon, 04 May 2020 06:21:25 -0400
+Received: by mail-wm1-x341.google.com with SMTP id u16so8380979wmc.5;
+ Mon, 04 May 2020 03:21:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:from:to:cc:references:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=bAay7sHF5UAuLC5K3PGUp3iLEXMVE/Vr87IM8AUWwC4=;
+ b=P5PvWZoksifcRarY1/qYOt2Rte/DxXJYwem5h8yr/OEelyXIB+UN8plufsDUTj0yIk
+ Hqrs5zMz2g1vZDJtwQjN9unM2ma5jlBiu4wyaLRzMTpJYfgehaDg3K7aX9qAvs7hVSUG
+ ywJ7vyZkLrkGAIPicQmYtBmV1shqAV102pW30i7ox48WUcsNJrvqXRBvcQKsfmOCBfWO
+ 7u9UYldlNPP35PZyVprWIswBOM1QlUbuTzWElTdX6Cw74skrcS4B5U3mJKBRaGjTlhjm
+ cQJSyEQABM6PO3ivDSM9f5wXEW8Q9/DZxMJ11bjU/ph6DmQy9UK4FFai5Enx8Xp9USd7
+ RYUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:from:to:cc:references:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=bAay7sHF5UAuLC5K3PGUp3iLEXMVE/Vr87IM8AUWwC4=;
+ b=gFOvZLCH4ouq5GrhZze0M7ZkXO13AsHLRs1Ls8Y+idGJAB9lOX/AY+Fbs5ibuI0U+s
+ 4/oxuo8y/qBmLct2i7oJfrJ3SIMapKZXJVV1ADMCPt9cgA/9oNBJvASfytp1ql0GSONi
+ 1n3Fq8aiSQt1q9dScrA4KGvedIjBQYZSHTzpuhrpTQEJpDLClxAxKlQLDyYZsG/WXL4J
+ 0PD2xd0104DI5eJinvaSsDN+mGyELHNH5/+j8eMoSZFCBlBlWDheNvBb38xDTd3ctiDg
+ +kkjFqppLde/SUyHLyT+bP46B0KKbnKpWQEU2gOCbhKFQdttHDWQVHGGVcwUGhvr/zUD
+ ovDA==
+X-Gm-Message-State: AGi0PuZpQEbyfGtfgfTV7FkkmOMczqPo35TSS8u0/28G+1BC8ytVi75d
+ QrEFBXjX2d/kEBLTkwIJliI=
+X-Google-Smtp-Source: APiQypKwE29coJzDx/DvE2mi7+aO95YAF5ZlP6zWvsF42kGDWUpuMahBhlZC5l5WVQi+a0zjITQmvg==
+X-Received: by 2002:a1c:35c3:: with SMTP id c186mr14683203wma.66.1588587682879; 
+ Mon, 04 May 2020 03:21:22 -0700 (PDT)
+Received: from [192.168.1.39] (26.red-88-21-207.staticip.rima-tde.net.
+ [88.21.207.26])
+ by smtp.gmail.com with ESMTPSA id 17sm12247523wmo.2.2020.05.04.03.21.21
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 04 May 2020 03:21:22 -0700 (PDT)
+Subject: Re: [PATCH] hw/usb: Make "hcd-ehci.h" header public
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+References: <20200504082238.16655-1-f4bug@amsat.org>
+ <alpine.BSF.2.22.395.2005041044550.59496@zero.eik.bme.hu>
+ <0de65ed7-37b0-8916-2ccb-bbb524934351@amsat.org>
+Message-ID: <0ffd398d-5585-e7f4-85f7-20e9c001428e@amsat.org>
+Date: Mon, 4 May 2020 12:21:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200503184324.12506-1-mlevitsk@redhat.com>
-User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 04:24:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -10
-X-Spam_score: -1.1
+In-Reply-To: <0de65ed7-37b0-8916-2ccb-bbb524934351@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
 X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FROM_EXCESS_BASE64=0.979, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,75 +103,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-devel@nongnu.org,
+ Beniamino Galvani <b.galvani@gmail.com>, Andrew Jeffery <andrew@aj.id.au>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, Joel Stanley <joel@jms.id.au>,
+ David Gibson <david@gibson.dropbear.id.au>, qemu-trivial@nongnu.org,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, May 03, 2020 at 09:43:10PM +0300, Maxim Levitsky wrote:
-> Hi!
-> Here is the updated series of my patches, incorporating all the feedback =
-I received.
->=20
-> This implements the API interface that we agreed upon except that I merge=
-d the
-> LUKSKeyslotActive/LUKSKeyslotInactive union into a struct because otherwi=
-se
-> I need nested unions which are not supported currently by QAPI parser.
-> This didn't change the API and thus once support for nested unions is the=
-re,
-> it can always be implemented in backward compatible way.
->=20
-> I hope that this series will finally be considered for merging, since I a=
-m somewhat running
-> out of time to finish this task.
->=20
-> Patches are strictly divided by topic to 3 groups, and each group depends=
- on former groups.
->=20
-> * Patches 1,2 implement qcrypto generic amend interface, including defini=
-tion
->   of structs used in crypto.json and implement this in luks crypto driver
->   Nothing is exposed to the user at this stage
->=20
-> * Patches 3-9 use the code from patches 1,2 to implement qemu-img amend b=
-ased encryption slot management
->   for luks and for qcow2, and add a bunch of iotests to cover that.
->=20
-> * Patches 10-13 add x-blockdev-amend (I'll drop the -x prefix if you like=
-), and wire it
->   to luks and qcow2 driver to implement qmp based encryption slot managem=
-ent also using
->   the code from patches 1,2, and also add a bunch of iotests to cover thi=
-s.
->=20
-> Tested with -raw,-qcow2 and -luks iotests and 'make check'
->=20
-> V3: rebased, addressed most of the review feedback.
-> For now I kept the slot bitmap code since I am not sure that replacing it=
- will be better.
+On 5/4/20 12:12 PM, Philippe Mathieu-Daudé wrote:
+> On 5/4/20 10:48 AM, BALATON Zoltan wrote:
+>> On Mon, 4 May 2020, Philippe Mathieu-Daudé wrote:
+>>> As target-specific code use this header, move it to the publicly
+>>> accessible include/ folder.
+>>>
+>>>  $ git grep hw/usb/hcd-ehci.h
+>>>  hw/arm/allwinner-h3.c:31:#include "hw/usb/hcd-ehci.h"
+>>>  hw/arm/exynos4210.c:38:#include "hw/usb/hcd-ehci.h"
+>>>  hw/ppc/sam460ex.c:38:#include "hw/usb/hcd-ehci.h"
+>>>  include/hw/arm/allwinner-a10.h:13:#include "hw/usb/hcd-ehci.h"
+>>>  include/hw/arm/aspeed_soc.h:29:#include "hw/usb/hcd-ehci.h"
+>>
+>> All of these only need either the type #define or EHCISysBusState so 
+>> splitting only those off to a public header should be enough and 
+>> better than making public all of ehci's internal header.
+> 
+> Ah you mean forward-declare EHCISysBusState in "qemu/typedefs.h", OK.
 
-I'm still of the opinion that the bitmaps code should be replaced.
-With this current design we are iterating over the slot of keys slots
-4 times, doing different checks/logic in each iteration. This is really
-not nice for understanding how the code works. IMHO we should be iterating
-at most twice - once to validate the requested configuration, and once
-to apply the requested configuration.   Even if there si duplication of
-logic in between the delete/add key codepaths, I think it will be better
-as the logic for each operation will be in one place.
+It won't work because AspeedSoCState and AwA10State use the full 
+structure (not a pointer to it).
 
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+>>
+>> Regards,
+>> BALATON Zoltan
+> 
 
