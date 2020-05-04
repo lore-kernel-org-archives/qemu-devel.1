@@ -7,80 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 122D3C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 15:40:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2F1AC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 15:40:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD8C2206D7
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 15:40:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B0385206D7
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 15:40:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cmU3t9Aq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD8C2206D7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ce5K1beN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0385206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVdCb-0004Pc-RF
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 11:40:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60284)
+	id 1jVdCf-0004ZU-Rb
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 11:40:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60396)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVd2h-0004k6-AK
- for qemu-devel@nongnu.org; Mon, 04 May 2020 11:30:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44073
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVd35-000589-Kx
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 11:30:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44181
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVd2g-00041v-50
- for qemu-devel@nongnu.org; Mon, 04 May 2020 11:30:02 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVd32-0004Bd-8u
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 11:30:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588606201;
+ s=mimecast20190719; t=1588606222;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pJEUowLb7RvCQfJQiY10vUGrOBr7KqqEEqIh+hFxUmw=;
- b=cmU3t9AqtA26hy+4rPk9vvxbOgOTNOehkU6Fw2z9q1tzoGItAcZxcH+uWvx3bMccU9xBX4
- Ykk1H372ix6t6782h6up8Y1YYN4RtMgh2+8C8xEkmpJ8+b2LvavdkA5HBfj0UdC7ZbC+Km
- MXGBYrbs872vg2jdKdGcdpIp5D3VSj0=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-3-zsKZxagAPVO1STLB9BvTFA-1; Mon, 04 May 2020 11:30:00 -0400
-X-MC-Unique: zsKZxagAPVO1STLB9BvTFA-1
-Received: by mail-wm1-f69.google.com with SMTP id t62so5116091wma.0
- for <qemu-devel@nongnu.org>; Mon, 04 May 2020 08:29:59 -0700 (PDT)
+ bh=P9+8reP7GTE78L5B1VZBQQawvTQY6zlLXYckga6u98s=;
+ b=Ce5K1beN5zEWmie/58t8XnpkFmJYb/17ZeFkdKtklSA6g5xHjZc/9nK5CDzYq9K5htTtjt
+ tKf6D8W0sS31MM/SvFH3e4xyLHBx1FEUJpOJcX8nY8nhtW6ve2VqeeGH98z/Fkyh5z8sOU
+ adBuU60d88CDL6CW/0RkVcK5WibTXPU=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-447-Ed_rJc2FO8iYUvlztz0Kng-1; Mon, 04 May 2020 11:30:20 -0400
+X-MC-Unique: Ed_rJc2FO8iYUvlztz0Kng-1
+Received: by mail-wm1-f72.google.com with SMTP id l21so5118821wmh.2
+ for <qemu-devel@nongnu.org>; Mon, 04 May 2020 08:30:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=vOETN6PdLHy6NVEAy7zvorEiCPF47jtqFdmHbXoOmUs=;
- b=MRReYBRNVSJ72OfQkNKPPEgYYez+S1CpkoV7EHIArYL3lLUMef9PPWlglFKJQnIoya
- bKO0ba47WDs+KwC251PTEzfaxhOuBKj3eroVYSpmaw3zIxRT/mJ7GjFn+bRsrkmgL9Jw
- Po0tV5BWpHNHrlrFMWqLYycyW80YgjjTnCQLGDR9SAMtMcY7tnpOSVqnBwoyOqZhzYNk
- ze0HzHwA7jsQmQHuQlr6LY0b/bDaA4iEU+c2z6tWPejak7oxVYI7LFvYjQBxzgZ5Hmqt
- 7DTHUxnu0KlrpbzhP7N3xpRcoXbZLulLPm5d5v/clAdIIQ8JSgE3M9NoiFmJ0NsdhVnv
- Q2Ew==
-X-Gm-Message-State: AGi0PuZjuCRZJk9aMRep4bN6ZpqsCdUT7EIbI/e3wgtFtt2kA6SSPwcz
- 2nL8H4BtM1e7VlP8NqXoA2VQURrocVkTjLZi8/eRiDfMXEw1lsRalGUEHI6TT/WlUrYz44WFqox
- oftljDkBhzmhs+oU=
-X-Received: by 2002:a05:600c:2f88:: with SMTP id
- t8mr14763546wmn.46.1588606198544; 
- Mon, 04 May 2020 08:29:58 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJpmk7YsxPrFWLliPrb8nTsxnanKnLEiwl5Wj5AHzpYnXRew0sOBcZ9G57iAgM8zv2R1wCVEg==
-X-Received: by 2002:a05:600c:2f88:: with SMTP id
- t8mr14763507wmn.46.1588606198355; 
- Mon, 04 May 2020 08:29:58 -0700 (PDT)
+ bh=Ixj4deVVyRuMLRIFisfgQ9WKiYbhKMCAbBHOhTT1TTc=;
+ b=eSsmTezLTUNsFLgFIO6bfIAm13hdOf6SrI8dAmzald5IIknEKvg6faruuvpAnW5iEx
+ WFL2G4R5yqmBC1BnAZEPoLQ5waH76JeogqDXFdokRvRex0Mjfv1D9x84UPi5+tzVJl8h
+ BvxV8IiOY1mkKaMBF+bblU0jhUs8UtiITMTFQz23OeHmvgESrBdPZTZwW3Bj1qV7bdyL
+ pnaGUFc98KvV86cYI64a0XGrP123EQqrsSVsmkRN6rrizAofqhC/V3koXJH+hjtYw2J2
+ qE+qBe1TbfSnP9Ep5JgpsY2uGFybzu6mfnA1MSa+gZBFbb/Zx8vxw0ui6RUX1g7rPMC0
+ k+tA==
+X-Gm-Message-State: AGi0PuaATo881qXd/RWf7DiHlnJ1uOFn9f8ulInroWDjCiBQntqMhqX4
+ 5B79PnTFpkbYIUlen/3hwoC+u2n7IOluB7t7H12xw3onLwsnk+PmWRhaNMadC5rYbvEKdkwk+fe
+ yeNS4Kab91WvLWTc=
+X-Received: by 2002:adf:ecc5:: with SMTP id s5mr18314268wro.261.1588606218414; 
+ Mon, 04 May 2020 08:30:18 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJwx30iPwgvBiLbJZBtHnXIYgfy9/mTXK9iJRYZVNTAVVbjQcxhCJrJ+JdH4KjLpXk8VWAT6A==
+X-Received: by 2002:adf:ecc5:: with SMTP id s5mr18314229wro.261.1588606218190; 
+ Mon, 04 May 2020 08:30:18 -0700 (PDT)
 Received: from x1w.redhat.com (26.red-88-21-207.staticip.rima-tde.net.
  [88.21.207.26])
- by smtp.gmail.com with ESMTPSA id t4sm13373338wri.54.2020.05.04.08.29.57
+ by smtp.gmail.com with ESMTPSA id a9sm13422818wmm.38.2020.05.04.08.30.17
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 May 2020 08:29:57 -0700 (PDT)
+ Mon, 04 May 2020 08:30:17 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 07/12] target/riscv/cpu: Restrict CPU migration to
+Subject: [PATCH v3 11/12] target/s390x: Restrict CpuClass::get_crash_info() to
  system-mode
-Date: Mon,  4 May 2020 17:29:17 +0200
-Message-Id: <20200504152922.21365-8-philmd@redhat.com>
+Date: Mon,  4 May 2020 17:29:21 +0200
+Message-Id: <20200504152922.21365-12-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200504152922.21365-1-philmd@redhat.com>
 References: <20200504152922.21365-1-philmd@redhat.com>
@@ -113,7 +111,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>, qemu-riscv@nongnu.org,
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org,
  Eduardo Habkost <ehabkost@redhat.com>,
  Sagar Karandikar <sagark@eecs.berkeley.edu>,
  David Hildenbrand <david@redhat.com>,
@@ -127,47 +125,83 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- target/riscv/cpu.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ target/s390x/cpu.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 059d71f2c7..6c78337858 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -485,10 +485,12 @@ static void riscv_cpu_init(Object *obj)
-     cpu_set_cpustate_pointers(cpu);
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index f2ccf0a06a..afb82206c7 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -247,6 +247,7 @@ out:
+     error_propagate(errp, err);
  }
 =20
-+#ifndef CONFIG_USER_ONLY
- static const VMStateDescription vmstate_riscv_cpu =3D {
-     .name =3D "cpu",
-     .unmigratable =3D 1,
- };
++#if !defined(CONFIG_USER_ONLY)
+ static GuestPanicInformation *s390_cpu_get_crash_info(CPUState *cs)
+ {
+     GuestPanicInformation *panic_info;
+@@ -256,11 +257,7 @@ static GuestPanicInformation *s390_cpu_get_crash_info(=
+CPUState *cs)
+     panic_info =3D g_malloc0(sizeof(GuestPanicInformation));
+=20
+     panic_info->type =3D GUEST_PANIC_INFORMATION_TYPE_S390;
+-#if !defined(CONFIG_USER_ONLY)
+     panic_info->u.s390.core =3D cpu->env.core_id;
+-#else
+-    panic_info->u.s390.core =3D 0; /* sane default for non system emulatio=
+n */
+-#endif
+     panic_info->u.s390.psw_mask =3D cpu->env.psw.mask;
+     panic_info->u.s390.psw_addr =3D cpu->env.psw.addr;
+     panic_info->u.s390.reason =3D cpu->env.crash_reason;
+@@ -286,6 +283,7 @@ static void s390_cpu_get_crash_info_qom(Object *obj, Vi=
+sitor *v,
+                                      errp);
+     qapi_free_GuestPanicInformation(panic_info);
+ }
 +#endif
 =20
- static Property riscv_cpu_properties[] =3D {
-     DEFINE_PROP_BOOL("i", RISCVCPU, cfg.ext_i, true),
-@@ -544,13 +546,13 @@ static void riscv_cpu_class_init(ObjectClass *c, void=
- *data)
-     cc->do_transaction_failed =3D riscv_cpu_do_transaction_failed;
-     cc->do_unaligned_access =3D riscv_cpu_do_unaligned_access;
-     cc->get_phys_page_debug =3D riscv_cpu_get_phys_page_debug;
-+    /* For now, mark unmigratable: */
-+    cc->vmsd =3D &vmstate_riscv_cpu;
+ static void s390_cpu_initfn(Object *obj)
+ {
+@@ -295,16 +293,16 @@ static void s390_cpu_initfn(Object *obj)
+     cpu_set_cpustate_pointers(cpu);
+     cs->halted =3D 1;
+     cs->exception_index =3D EXCP_HLT;
++#if !defined(CONFIG_USER_ONLY)
+     object_property_add(obj, "crash-information", "GuestPanicInformation",
+                         s390_cpu_get_crash_info_qom, NULL, NULL, NULL, NUL=
+L);
+-    s390_cpu_model_register_props(obj);
+-#if !defined(CONFIG_USER_ONLY)
+     cpu->env.tod_timer =3D
+         timer_new_ns(QEMU_CLOCK_VIRTUAL, s390x_tod_timer, cpu);
+     cpu->env.cpu_timer =3D
+         timer_new_ns(QEMU_CLOCK_VIRTUAL, s390x_cpu_timer, cpu);
+     s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
  #endif
- #ifdef CONFIG_TCG
-     cc->tcg_initialize =3D riscv_translate_init;
-     cc->tlb_fill =3D riscv_cpu_tlb_fill;
- #endif
--    /* For now, mark unmigratable: */
--    cc->vmsd =3D &vmstate_riscv_cpu;
-     device_class_set_props(dc, riscv_cpu_properties);
++    s390_cpu_model_register_props(obj);
  }
 =20
+ static void s390_cpu_finalize(Object *obj)
+@@ -488,13 +486,13 @@ static void s390_cpu_class_init(ObjectClass *oc, void=
+ *data)
+     cc->do_interrupt =3D s390_cpu_do_interrupt;
+ #endif
+     cc->dump_state =3D s390_cpu_dump_state;
+-    cc->get_crash_info =3D s390_cpu_get_crash_info;
+     cc->set_pc =3D s390_cpu_set_pc;
+     cc->gdb_read_register =3D s390_cpu_gdb_read_register;
+     cc->gdb_write_register =3D s390_cpu_gdb_write_register;
+ #ifndef CONFIG_USER_ONLY
+     cc->get_phys_page_debug =3D s390_cpu_get_phys_page_debug;
+     cc->vmsd =3D &vmstate_s390_cpu;
++    cc->get_crash_info =3D s390_cpu_get_crash_info;
+     cc->write_elf64_note =3D s390_cpu_write_elf64_note;
+ #ifdef CONFIG_TCG
+     cc->cpu_exec_interrupt =3D s390_cpu_exec_interrupt;
 --=20
 2.21.3
 
