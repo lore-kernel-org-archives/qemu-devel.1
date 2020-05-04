@@ -6,64 +6,64 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9371AC47257
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 11:59:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8614DC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:02:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A7892073B
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 11:59:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A7892073B
+	by mail.kernel.org (Postfix) with ESMTPS id 5ABA32073B
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:02:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5ABA32073B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVZlK-00051o-J3
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 07:59:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51978)
+	id 1jVZnS-0007qd-Cr
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 08:02:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52022)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jVZje-0002oU-QJ; Mon, 04 May 2020 07:58:10 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:51679)
+ id 1jVZjq-00030D-3B; Mon, 04 May 2020 07:58:22 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:33173)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jVZjd-0001mg-Pa; Mon, 04 May 2020 07:58:10 -0400
+ id 1jVZjo-0002Cl-RB; Mon, 04 May 2020 07:58:21 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MUog3-1jekfK0kJF-00Qi79; Mon, 04 May 2020 13:58:03 +0200
+ id 1MCJvA-1jNMH71Nv0-009S6y; Mon, 04 May 2020 13:58:15 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/20] display/blizzard: use extract16() for fix clang analyzer
- warning in blizzard_draw_line16_32()
-Date: Mon,  4 May 2020 13:57:40 +0200
-Message-Id: <20200504115758.283914-3-laurent@vivier.eu>
+Subject: [PULL 13/20] blockdev: Remove dead assignment
+Date: Mon,  4 May 2020 13:57:51 +0200
+Message-Id: <20200504115758.283914-14-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200504115758.283914-1-laurent@vivier.eu>
 References: <20200504115758.283914-1-laurent@vivier.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:foyPSr7xsSevWh/8RpltGSGoNnpQUkoxfNoJfKzpLy2pDhFRZuw
- 9i6AvXlNwaFpIy1fjQxKlCdAVkUL26S6pnRB71Nk2rgbTGocd8DGvBKV7RkCEiE4ECIJIr4
- x4wiNs3C8Qom709dEcQIQzv9kgoVSfbAGAyddGEn4qI0XZq9Hos2fHqxAzwml1FyMiKa54g
- mX/4fC/PsP9hUovG9ACfg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:IlICTlhBH4Y=:bw3P7mCJcpuQH/5fL1qitb
- gbDpr8+IgvYTMmc8TsQc6EFp04kmgnpCXb7DR1sMti7TNQETDgM6UtY8DhNZTVN04vF5goCjk
- 7+Yve4GOo45Q/JdoMvI9YRUBDX+8IFbYeDBuMZLlv9NeXkDUJa7nXundwO1EGt6VaPNVjOzlk
- bEVCIlLHGyoW+X9lrBnk/Q3CBqJJSGHk2mExGX49zrdHxuKd46z5bkJXWuTyLzFviFwrBhb8W
- mKn4wg+wbF06sppNavdLetoiNoMFUl30WxOTHQ93wEJvdqUxPcZsQvsD9i8nUrNN5CSGn2Yf/
- qg+3qt38Amm7KVyN20A1n5Vi5lmIQlJIvmt7qQIXyWEJqbNoMOWWRK2f5GYEgRGCe8IWBTT/g
- VZC7keXet0s/shpKNpwk1toe+SDEH2Rn3982PXxABBNiuKM4aCa8SNzb2yyEnenVXOv/1NlV7
- 0s6JCndZ1RsdOteKV+Q5dISgaO0bcU14B9qRwIBxeHSV4YZvCkqYdhmPuo3Nl+gxbif9oFmKl
- 3SC80hahz9LL4rr2HnDQfVCtw1YyPqMUa4LTrWI26/IbRYkWlIhc6oFPxtNfUskvANHLgMDED
- HeAyEWBbmUC76VtT2pTGvQ2+0pUMxvtYZqcq9o7KE3gR849WIys+NAcX9Ux/isGPx8A3rGxkW
- G+K6s/8/r0e7wMzT3bv4xOMrSK9O+DbQvbs0qlQCyhXaFvvkKOgimP7xSd1u7xX+M9fqcV6EP
- THPe30z4+g84vuBZZw5GCzwoN0FrLFVoKtc0mFceeFauIvFILApA6yvEF/zb5ck1Wjb0sk0vR
- TPFJL7Py31FxvlqB+pPq6Ya3ehpg2XP1JA24qUzCnXkOudEgU7AB2eeGT0w8c7gQPIP3IOi
-Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:IrQCQUvJnCBMuzwPerB6rAw1jQmYN+bT1Cvx+93KqSD86XtX9sQ
+ O5tJv1kjfJE1EIvQLnqXJR4MeUnxKk7fuFM8qhXnZJ9I43ZqkMf70Wh2GI4ECjxtJxpI49H
+ VBCfemjnhy0G9v1VPjRA3b+yClFsawGAizCZXY10edquG5mJB0uYHxrWUuipNDPz3gdCJ1n
+ z3F9cUQh3S2RtXsMRAvGQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Y2mFQFLM/B0=:lwMeXtxT+sVjvIhZR3sI3D
+ 7dy3wEAM/yRCtRw3vAjQZldLC4OQ4Og4qiR7201APxQoPyfd50e5qPD3iyp81E9OxpRG2cdpx
+ I1fAGYBRQWU1aieUdWJBLrBeE6wEMe8D/CHJWPhhxEHWyA2ijyqrin20ZazdHbgH8youlignk
+ xP+G/s/3D82tE9EsNWH15oIgmHmYiivIISYzvNDe0cEWIs9SFhWrqKJAj5KYDA2CxXgaPHdoF
+ oHUFQYNQdUw56M5XSSkrb+h24qXZb7j3gYp9OIkcBQJ7N+U3Ky5TnNZ9fr3nYKw8IOoH9Wjs0
+ eVD+EQm6UdFsP6U7mY8DYHpp40JgOpb+a+sqxbGtk3XMXMRX0sjSGIbdnvhLtOd8zme8h8nuk
+ +ybK0sNdOvpXYvGTvP128vL8t2CXNLoMLFwzJnOaFTBLVG6Ry77MZjXlzbfpOAhkbvoOJu406
+ SAp7hMyTk4YwV9cxKXPCQxmYsEhm6nO9Czxith1U7vE2uXXrse4X8K3mmGxwPcN4B9kFpRGaq
+ OLSlFM4tQWP8pjX+nEc5DKOPeK7VTKJZLJ0K5jgcIqf/fryVIoNlg3U7AOg3Yk8YrBgSYg7oB
+ wBmL4+Bc3NvKFgHu1G0LhGr3xfZM0iesCG0rRyQseussc3GDIF/MrKC0QmXGd1Sr+TMdsvqob
+ 1dCoHCwmDZzi+rNwjD4ovhhUVSWEKCsuNlpe9npLWBKkOpVzyEn96E8qUN0alxjuOpBi9KtTA
+ oXmx2oCCkaym/dQNgocSTTr4jbCyLrOpF4teIUX8uUybUsdfPlEPsA5zCNUxBuSgMXFwffKxZ
+ O3S9BUWG/G+Kc8zStUgj3rIzGcuanmb18jbbGbAbu7mcPbVX0erLCedxreDSM+gVBLJPMEc
+Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 07:58:08
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 07:58:12
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
@@ -82,56 +82,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Chen Qun <kuhn.chenqun@huawei.com>,
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
- Euler Robot <euler.robot@huawei.com>
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Chen Qun <kuhn.chenqun@huawei.com>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Clang static code analyzer show warning:
-  hw/display/blizzard.c:940:9: warning: Value stored to 'data' is never read
-        data >>= 5;
-        ^        ~
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200325025919.21316-3-kuhn.chenqun@huawei.com>
+Fix warning reported by Clang static code analyzer:
+
+    CC      blockdev.o
+  blockdev.c:2744:5: warning: Value stored to 'ret' is never read
+      ret = blk_truncate(blk, size, false, PREALLOC_MODE_OFF, errp);
+      ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Reported-by: Clang Static Analyzer
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Message-Id: <20200422133152.16770-3-philmd@redhat.com>
+[lv: fix conflict because of "Add flags to blk_truncate()"]
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/display/blizzard.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ blockdev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/display/blizzard.c b/hw/display/blizzard.c
-index 359e399c2a0b..105241577de1 100644
---- a/hw/display/blizzard.c
-+++ b/hw/display/blizzard.c
-@@ -19,6 +19,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/bitops.h"
- #include "ui/console.h"
- #include "hw/display/blizzard.h"
- #include "ui/pixel_ops.h"
-@@ -932,12 +933,9 @@ static void blizzard_draw_line16_32(uint32_t *dest,
-     const uint16_t *end = (const void *) src + width;
-     while (src < end) {
-         data = *src ++;
--        b = (data & 0x1f) << 3;
--        data >>= 5;
--        g = (data & 0x3f) << 2;
--        data >>= 6;
--        r = (data & 0x1f) << 3;
--        data >>= 5;
-+        b = extract16(data, 0, 5) << 3;
-+        g = extract16(data, 5, 6) << 2;
-+        r = extract16(data, 11, 5) << 3;
-         *dest++ = rgb_to_pixel32(r, g, b);
+diff --git a/blockdev.c b/blockdev.c
+index dc1a0c7c2fd4..708d0c323fd2 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -2741,7 +2741,7 @@ void qmp_block_resize(bool has_device, const char *device,
      }
- }
+ 
+     bdrv_drained_begin(bs);
+-    ret = blk_truncate(blk, size, false, PREALLOC_MODE_OFF, 0, errp);
++    blk_truncate(blk, size, false, PREALLOC_MODE_OFF, 0, errp);
+     bdrv_drained_end(bs);
+ 
+ out:
 -- 
 2.26.2
 
