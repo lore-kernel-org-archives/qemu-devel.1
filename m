@@ -2,85 +2,95 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFFE5C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:31:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26A08C47257
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:34:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A68D20705
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:31:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E4B71206D9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:34:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R0eMngF0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A68D20705
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eKhk69E+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4B71206D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVe0O-00076Y-L8
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 12:31:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45840)
+	id 1jVe31-0001xs-So
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 12:34:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42502)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jVdz6-000599-TV
- for qemu-devel@nongnu.org; Mon, 04 May 2020 12:30:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54010
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVdqw-0004q7-PI
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 12:21:58 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51386
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jVdz5-0006CL-5O
- for qemu-devel@nongnu.org; Mon, 04 May 2020 12:30:24 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVdqr-0002Ir-8j
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 12:21:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588609821;
+ s=mimecast20190719; t=1588609311;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Yc5krUnhJZepkd1Df4HEmtDb27H4TpHMPEuTHYyKtpM=;
- b=R0eMngF0xCtT0GTEHpV1flgRHPNv4OJfChItnXdMeGjGTpXdCkQbwXrobsk/TWQP/ZVKPV
- ZRxK0qqqsVMBlVyRgb+uppos705Oipy2p92378DQVn9fVdemabcbUa9IzPRrEWrmtukU15
- YJNxec78Al74nYz9XrgChA4bQWdAoZQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-57-p7HNtdxqPyeV97NWXuAkNg-1; Mon, 04 May 2020 12:30:19 -0400
-X-MC-Unique: p7HNtdxqPyeV97NWXuAkNg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58CB4800D24;
- Mon,  4 May 2020 16:30:18 +0000 (UTC)
-Received: from localhost (ovpn-115-57.phx2.redhat.com [10.3.115.57])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C7C8F63BBA;
- Mon,  4 May 2020 16:30:13 +0000 (UTC)
-Date: Mon, 4 May 2020 12:30:12 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Subject: Re: Configuring onboard devices
-Message-ID: <20200504163012.GO5244@habkost.net>
-References: <87k11xh2kq.fsf@dusky.pond.sub.org>
- <CAFEAcA9-oxkMD-kJ1z12d4K1S_Jaz7Wj6_38Ah7ChSaBfQNkkA@mail.gmail.com>
- <87tv11e1en.fsf_-_@dusky.pond.sub.org>
- <51a4e9ea-eca3-6c1d-a753-86c5810ac094@ilande.co.uk>
- <874kt1dpw7.fsf@dusky.pond.sub.org>
- <c1fa0770-a07f-e5bc-9db8-6af0576c365f@ilande.co.uk>
- <877dxxc862.fsf@dusky.pond.sub.org>
- <0b745eed-841e-8879-c320-3166e2a46953@ilande.co.uk>
- <87imhe6g7v.fsf@dusky.pond.sub.org>
- <a0167fcc-b213-25e2-6ea2-62f2a0237a2f@ilande.co.uk>
+ bh=Ofivu/rWjmknTFuw8Nli670UpcYUwi1z7tVuD6CxAFQ=;
+ b=eKhk69E+TLjIVMUXp7pPcjSfm/TKHP5+UDFlVsI3A68Sw3/ycXLWN37R6UW1wZ3TCB0Qzy
+ 0eOzMvnQM428di11eGYHDnQ0/8ENRNB96notOcSt1V61JTze4sN1cGT7joRpELewJgJgN5
+ tJt4tL05JeKTtmPgoPXmo/1UWSmmjKo=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-177-9gFuU33PNdmxehLC5MdiIg-1; Mon, 04 May 2020 12:21:49 -0400
+X-MC-Unique: 9gFuU33PNdmxehLC5MdiIg-1
+Received: by mail-wr1-f71.google.com with SMTP id m5so11028380wru.15
+ for <qemu-devel@nongnu.org>; Mon, 04 May 2020 09:21:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=pUXPgn1Sb0MkD1TzeIdrOKynPChb8LBhEDyhbAJWCyM=;
+ b=nsNYCONk3hriZqenNzaF9SNPlsyWWZrfUmoZuNsYpTFibGRGpEMXuu6X72yH6DVBzx
+ VIvrUOPBJ510XRBmC078iIVnSLVopgd1GRWnRt9jWic26RTlvB2WKARuVzlhLfKMExWU
+ Rpvn+4BuvnKJFTJVY4B5IF89Uqy5Zk4MXMYKrZ50lUSRCsuq2vVxlI1zedjoevyjO26+
+ KMQkcp2dQ1kLurQhrKW3PrN5B4K4Lyk4zHgrK60SGRK9M3AGDuKoeGZoTCSHd3gu/N6j
+ sWj207hvqM+WaRUI+qvku482GxkaviaNrKJy4Ug0VPk0RsPiLmoDMaAL8ojkxJawmRHG
+ 2vFw==
+X-Gm-Message-State: AGi0PuZZ1u8c6QUMxZ2Z60XWtlEQjyFPtf9joKBW+h6eBJsFghBshUmX
+ qHQBo0O9NE/YzHMEOklt+kHqmvKKLxS++mmmO2AMh5QndUvKKwjUAhVYltLL/6cdCJkwdMvszjU
+ RwcYZc+uW0BIQkMk=
+X-Received: by 2002:a1c:5403:: with SMTP id i3mr16643078wmb.10.1588609308318; 
+ Mon, 04 May 2020 09:21:48 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKB8Bzkkr24p67YfTFMkre8NbsMfChLwxhCJFfLpUXWUPt/z79t8wDSOHk1k0+suSzd5v4uqA==
+X-Received: by 2002:a1c:5403:: with SMTP id i3mr16643058wmb.10.1588609308062; 
+ Mon, 04 May 2020 09:21:48 -0700 (PDT)
+Received: from [192.168.1.39] (26.red-88-21-207.staticip.rima-tde.net.
+ [88.21.207.26])
+ by smtp.gmail.com with ESMTPSA id n18sm10934847wrw.90.2020.05.04.09.21.47
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 04 May 2020 09:21:47 -0700 (PDT)
+Subject: Re: [PATCH 09/17] hw/isa/superio: Make the components QOM children
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200428163419.4483-1-armbru@redhat.com>
+ <20200428163419.4483-10-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <82086712-2652-30e8-7818-1ee26fd36822@redhat.com>
+Date: Mon, 4 May 2020 18:21:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <a0167fcc-b213-25e2-6ea2-62f2a0237a2f@ilande.co.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200428163419.4483-10-armbru@redhat.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 05:09:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -89,8 +99,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,184 +113,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, May 03, 2020 at 11:13:41PM +0100, Mark Cave-Ayland wrote:
-> On 02/05/2020 06:47, Markus Armbruster wrote:
+On 4/28/20 6:34 PM, Markus Armbruster wrote:
+> isa_superio_realize() attempts to make isa-parallel and isa-serial QOM
+> children, but this does not work, because it calls
+> object_property_add_child() after realizing with qdev_init_nofail().
+> Realizing a device without a parent gives it one: it gets put into the
+> "/machine/unattached/" orphanage.  The extra
+> object_property_add_child() fails, and isa_superio_realize() ignores
+> the error.
 >=20
-> > Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
-> >=20
-> >> On 30/04/2020 16:20, Markus Armbruster wrote:
-> >>
-> >>>> Ah I see now, these aliases are for individual properties rather tha=
-n objects. What I
-> >>>> was trying to ask was if it were possible to have something like thi=
-s:
-> >>>>
-> >>>> /machine (SS-5-machine)
-> >>>>   /builtin
-> >>>>     /nic0 -> link to "lance" device
-> >>>>
-> >>>> Here nic0 is an alias "published" by the maintainer of the SS-5 mach=
-ine which is
-> >>>> configured in the machine init() function using object_property_add_=
-link() or a
-> >>>> suitable wrapper. Users can then configure these builtin devices fro=
-m the command
-> >>>> line using your -machine nic0.netdev=3Dmy-netdev-id syntax or simila=
-r.
-> >>>
-> >>> Got it now, thanks!
-> >>>
-> >>>> Having the default devices under /builtin or other known QOM path wo=
-uld enable
-> >>>> builtin devices to be easily enumerated programatically and/or from =
-the command line
-> >>>> as required.
-> >>>
-> >>> There are three standard containers under /machine/:
-> >>>
-> >>> * /machine/peripheral/
-> >>>
-> >>>   Devices with a user-specified ID go here, as /machine/peripheral/ID=
-.
-> >>>   User-specified means -device or device_add.
-> >>>
-> >>>   /machine/peripheral/ID is effectively a stable interface.  It's jus=
-t
-> >>>   underdocumented (undocumented?).
-> >>>
-> >>>   To be useful, the stuff below ID/ needed to be stable and documente=
-d,
-> >>>   too.
-> >>>
-> >>> * /machine/peripheral-anon/
-> >>>
-> >>>   Same, but user elected not to give an ID.
-> >>>   /machine/peripheral-anon/device[N], where N counts up from zero in
-> >>>   creation order.
-> >>>
-> >>>   N is obviously not stable, but this is a problem of the user's maki=
-ng.
-> >>>   If you want to refer to a device, give it an ID.
-> >>>
-> >>> * /machine/unattached/
-> >>>
-> >>>   The orphanage.  When a device has no parent when its realized, it g=
-ets
-> >>>   put here, as /machine/unattached/device[N], where N counts up from
-> >>>   zero in realization order.
-> >>>
-> >>>   N is obviously not stable, and this time we can't blame the
-> >>>   victim^Wuser.  You can search for devices of a certain type.
-> >>>   Sometimes that's good enough.
-> >>>
-> >>>   All the onboard devices are here, and much more.  We've fathered a =
-lot
-> >>>   of unloved red-headed children, it seems...
-> >>>
-> >>>   Some of the "much more" is due to sloppy modelling, i.e. neglecting=
- to
-> >>>   set the proper parent.
-> >>>
-> >>>   I figure we could put onboard devices in a nicer place, with nicer
-> >>>   names.  Need a convention for the place and the names, then make bo=
-ard
-> >>>   code conform to it.
-> >>
-> >> That's good, it seems that this is already fairly close to how it work=
-s for -device
-> >> at the moment.
-> >>
-> >> I don't think that it is possible to come up a single place for on-boa=
-rd devices to
-> >> live directly though. Going back to one of my first examples: wiring u=
-p a chardev to
-> >> a serial port on the macio device. To me it makes sense for that to ex=
-ist in QOM
-> >> under /machine/pci-bus/mac-io/escc. In contrast an in-built NIC could =
-live under
-> >> /machine/pci-bus/in-built/nic, and placing one or both of these device=
-s directly
-> >> under /machine/foo doesn't feel intuitive.
-> >=20
-> > I'm not familiar with this machine.  You make me suspect the serial
-> > thingy is a component of a larger device.
-> >=20
-> > Properly modelled, a composite device has its components as children.
-> > These appear below their parent in the QOM composition tree.
-> >=20
-> > Example: a "serial-isa" device has a "serial" component.  When the
-> > former is at /machine/unattached/device[28]/, the latter is at
-> > /machine/unattached/device[28]/serial/.
-> >=20
-> > I guess that's what you want for macio's serial port.
-> >=20
-> > Counter-example: a "isa-super-io" device has compoenents of type
-> > "isa-parallel", "isa-serial", "isa-fdc", "i8042", "isa-ide".
-> > Nevertheless, these appear next to their parent in /machine/unattached/=
-.
-> > I'm still too much of a QOM ignoramus to explain why that's so.  Paolo,
-> > can you?
+> Move the object_property_add_child() before qdev_init_nofail(), and
+> pass &error_abort.
 >=20
-> FWIW the older machines have a lot of calls to qdev_create(NULL, TYPE_FOO=
-) for
-> devices that are part of the machine because they live within the machine=
- address
-> space but are not specifically attached to a qbus.
+> For the other components, isa_superio_realize() doesn't even try.  Add
+> object_property_add_child() there.
 >=20
-> >> AFAIK as per your ARM virt example I believe it is only possible to re=
-gister an alias
-> >> for a property rather than for an Object? The ultimate aim would be fo=
-r
-> >> object_resolve_path("/machine/builtin/nic0") and
-> >> object_resolve_path("/machine/pci-bus/in-built/nic") to return the sam=
-e Object, and
-> >> for the aliases on built-in devices to be children of /machine/builtin=
- to allow easy
-> >> iteration and introspection.
-> >=20
-> > Paolo, could link properties achieve that?
-> >=20
-> > Mark, I guess you want the alias / link from builtin/nic0 to the actual
-> > place to simplify configuration: the user then needs to know less about
-> > the board.  Correct?
+> This affects machines 40p, clipper and fulong2e.
 >=20
-> Correct. In a perfect world I'd love to say that Daniel's suggestion to u=
-se QOM paths
-> would work, however from my experience they change far too much. This is =
-one of the
-> reasons that the TYPE_FW_PATH_PROVIDER interface exists so that the gener=
-ation of
-> (boot) paths for the firmware is separate from the QOM/qdev paths.
+> For instance, fulong2e has its vt82c686b-superio (which is an
+> isa-superio) at /machine/unattached/device[9].  Before the patch, its
+> components are at /machine/unattached/device[10] .. [14].  Afterwards,
+> they are at
+> /machine/unattached/device[9]/{parallel0,serial0,serial1,isa-fdc,i8042}.
 >=20
-> I don't feel too strongly whether it's a link property, some kind of alia=
-s, or
-> perhaps like OpenFirmware just a string property containing the QOM path =
-to the
-> device, since ultimately I imagine there would be wrapper functions for m=
-achine
-> init() to call which hide away the implementation details.
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   hw/isa/isa-superio.c | 18 +++++++++++++-----
+>   1 file changed, 13 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
+> index 180a8b9625..0d9d848280 100644
+> --- a/hw/isa/isa-superio.c
+> +++ b/hw/isa/isa-superio.c
+> @@ -62,6 +62,8 @@ static void isa_superio_realize(DeviceState *dev, Error=
+ **errp)
+>                   qdev_prop_set_uint32(d, "irq", k->parallel.get_irq(sio,=
+ i));
+>               }
+>               qdev_prop_set_chr(d, "chardev", chr);
+> +            object_property_add_child(OBJECT(sio), name, OBJECT(isa),
+> +                                      &error_abort);
 
-Whatever solution we use to make sure a new interface is stable,
-we must have automated test cases to ensure we don't break it in
-the future.  Otherwise we will be creating yet another
-compatibility-keeping ritual that we fail to follow because
-nobody notices when we break it.
+I have a WiP series where I resolved that by adding an 'Object *parent'=20
+to isa_create*() (and pci equiv), but the conversion touch many things=20
+and not trivial to order for bisectability. I suppose rebasing won't be=20
+a problem, so meanwhile:
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-I wouldn't like to move from "2 different object paths that can't
-be trusted to be stable" to "3 different object paths that can't
-be trusted to be stable".
-
---=20
-Eduardo
+>               qdev_init_nofail(d);
+>               sio->parallel[i] =3D isa;
+>               trace_superio_create_parallel(i,
+> @@ -69,8 +71,6 @@ static void isa_superio_realize(DeviceState *dev, Error=
+ **errp)
+>                                             k->parallel.get_iobase(sio, i=
+) : -1,
+>                                             k->parallel.get_irq ?
+>                                             k->parallel.get_irq(sio, i) :=
+ -1);
+> -            object_property_add_child(OBJECT(dev), name,
+> -                                      OBJECT(sio->parallel[i]), NULL);
+>               g_free(name);
+>           }
+>       }
+> @@ -102,6 +102,8 @@ static void isa_superio_realize(DeviceState *dev, Err=
+or **errp)
+>                   qdev_prop_set_uint32(d, "irq", k->serial.get_irq(sio, i=
+));
+>               }
+>               qdev_prop_set_chr(d, "chardev", chr);
+> +            object_property_add_child(OBJECT(sio), name, OBJECT(isa),
+> +                                      &error_abort);
+>               qdev_init_nofail(d);
+>               sio->serial[i] =3D isa;
+>               trace_superio_create_serial(i,
+> @@ -109,8 +111,6 @@ static void isa_superio_realize(DeviceState *dev, Err=
+or **errp)
+>                                           k->serial.get_iobase(sio, i) : =
+-1,
+>                                           k->serial.get_irq ?
+>                                           k->serial.get_irq(sio, i) : -1)=
+;
+> -            object_property_add_child(OBJECT(dev), name,
+> -                                      OBJECT(sio->serial[0]), NULL);
+>               g_free(name);
+>           }
+>       }
+> @@ -137,6 +137,8 @@ static void isa_superio_realize(DeviceState *dev, Err=
+or **errp)
+>               qdev_prop_set_drive(d, "driveB", blk_by_legacy_dinfo(drive)=
+,
+>                                   &error_fatal);
+>           }
+> +        object_property_add_child(OBJECT(sio), "isa-fdc", OBJECT(isa),
+> +                                  &error_abort);
+>           qdev_init_nofail(d);
+>           sio->floppy =3D isa;
+>           trace_superio_create_floppy(0,
+> @@ -147,7 +149,11 @@ static void isa_superio_realize(DeviceState *dev, Er=
+ror **errp)
+>       }
+>  =20
+>       /* Keyboard, mouse */
+> -    sio->kbc =3D isa_create_simple(bus, TYPE_I8042);
+> +    isa =3D isa_create(bus, TYPE_I8042);
+> +    object_property_add_child(OBJECT(sio), TYPE_I8042, OBJECT(isa),
+> +                              &error_abort);
+> +    qdev_init_nofail(DEVICE(isa));
+> +    sio->kbc =3D isa;
+>  =20
+>       /* IDE */
+>       if (k->ide.count && (!k->ide.is_enabled || k->ide.is_enabled(sio, 0=
+))) {
+> @@ -163,6 +169,8 @@ static void isa_superio_realize(DeviceState *dev, Err=
+or **errp)
+>               qdev_prop_set_uint32(d, "irq", k->ide.get_irq(sio, 0));
+>           }
+>           qdev_init_nofail(d);
+> +        object_property_add_child(OBJECT(sio), "isa-ide", OBJECT(isa),
+> +                                  &error_abort);
+>           sio->ide =3D isa;
+>           trace_superio_create_ide(0,
+>                                    k->ide.get_iobase ?
+>=20
 
 
