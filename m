@@ -2,85 +2,95 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB9BC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 19:36:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31309C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 19:44:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D98B20705
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 19:36:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F34C320658
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 19:44:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SMGTjNo9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D98B20705
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CAPZIwhF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F34C320658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVgtI-0000jr-My
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 15:36:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47926)
+	id 1jVh0T-0004ZF-4n
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 15:44:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49162)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jVgsi-0000CR-GC
- for qemu-devel@nongnu.org; Mon, 04 May 2020 15:36:00 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:40957)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jVgzm-00042D-2j; Mon, 04 May 2020 15:43:18 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:34703)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jVgsg-0004HF-4d
- for qemu-devel@nongnu.org; Mon, 04 May 2020 15:35:59 -0400
-Received: by mail-ot1-x341.google.com with SMTP id i27so9960770ota.7
- for <qemu-devel@nongnu.org>; Mon, 04 May 2020 12:35:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=0UORFelBMexE2azhcMjpjSrXLvcgyC1tcAG30ql6g2Q=;
- b=SMGTjNo9mbJgMnWYrATtkk9afCrRkpM85WxsbvECPY9+DBsg9EUYF/Bx0MeYtdecNC
- mBTqRJ25mxjjs1GZfpguSSok73LKtfSeSe98zTrcNHuu4YEdKV4iuqxtlgDJhk4HW0bN
- PyTxMNxRKhRzxDpCsNC2pE+7wBinOc3s8KypaIllo8rVShdKqoyOtPZLc5WeUhmdcymv
- sgaaJgNrFrADader6nha6jD3BiZCCPshrPfah6GI3XJnRseP0kgvqakgEBpciAbr9dvK
- fuTS1gGPyhQicu2xtngUnO8NnrZRVS3a6zOtvVvjsMhYfy8QE+ZWgBHpD1a7UodQ7T3G
- cKkw==
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jVgzl-0006wt-Ed; Mon, 04 May 2020 15:43:17 -0400
+Received: by mail-wm1-x342.google.com with SMTP id v4so778096wme.1;
+ Mon, 04 May 2020 12:43:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=KtlccjpCc3cTSA86pPoexRbefD9KvD3tNDzKPg80V/4=;
+ b=CAPZIwhF9qSuFvyBuABfwRDczNcLtY/nbHdWF0/dgAMMRlRxWd78K34FbnfaOLg0ke
+ d1RFlq8M8pbsmAEbdvjp/eelXUHBY4T825uYTT4Hk1jKRfVBOT0yEGI6zrWXeFMWd8vz
+ FG1JbmxT6c6sF2/N3a513LHwHWqTikqNygpRvxY4eIHWdn8yOxBkIz6pC3L6/HSjY96u
+ JHIqMRoVF5qzrwKFHgKCOWw5pDrteTRmsrJ9cbjgIVC8jdCQEPdrgL/Z1czswz/JcbQ+
+ 57rTNLcdWl/Q4p1Zn88+gBcXf58eU0At0NQ5lQrlY5izEqh64LQaQXg2940IcAyoI9n1
+ /OoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=0UORFelBMexE2azhcMjpjSrXLvcgyC1tcAG30ql6g2Q=;
- b=SnVQ15JflQLbqdYph3hbQJYCg+SEqx+KR20nisCrnlyR590S/QB50E3h/nHVNN9pt5
- rfJM4K7eva9/KmvcoiqM+A8xXWYiHn5J6zyLKBdcBEMJ1nqCZa4J7On5uLt4aniJLpof
- tODvg8zd1G0GuDe/3mf2gYmTJWvPk22lSc/3kD4dbGUD1Ga2tTZmJ3/cLV8iiuAT3ouJ
- 1NXtGuosoEgSLBW2VwEEAY24L2XN0w3mc94/kKjjbXYF7AlTaqicq6AZuwGdAG2Tef7N
- O4VmysJuV9gRNn/5PAUnkP9a4hlBarx7a4xPTmio0nLEuSEy9t5wqHA22s2zib4IPVzl
- 6DnQ==
-X-Gm-Message-State: AGi0Pua3OZkSaRTy0AGvmufKqX2gYCVARqIyaaxZJqQ10x3x+omOVuQq
- FcNlFl8LRKsB7kZzsZ8SFIGtz4+0wqydUGWhqWDvdg==
-X-Google-Smtp-Source: APiQypKYp6iNboB3iKBWPRT7yZYyedfhmQ1F0aNvNYQJHP8B3PFyWSxRyJEZ9lbL7Lcdc/zJurUOjyPJUy1533q973o=
-X-Received: by 2002:a9d:2c08:: with SMTP id f8mr15832220otb.135.1588620956526; 
- Mon, 04 May 2020 12:35:56 -0700 (PDT)
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=KtlccjpCc3cTSA86pPoexRbefD9KvD3tNDzKPg80V/4=;
+ b=p9puTdwrziMfCdizEClWftwZxQnwuQpx5nHkp+MPNEw/TBjL2z915/AAwP6SIdODWd
+ GBamrlQJi3Eunv0rbjCOQ0jgvhRZeiFBupe2JKSsU5Zlht1x3/qwuu6eRYeuH3SVUD9U
+ 1lyzM+pdRAtEfU3qeJePMHzUyQIgAZoE0tY0tKdYJWH8elwZ60KmJQodIcFkTekqVg4p
+ pfjlLUEslEJRXOiYaNa4b/VCabdTu2L89FIngFuP9Ty48Ka0/PAnyO+DFU5zjs8Xc7+0
+ 5gjXo1IPIjImiHFjyq/8F+4awpgFT/8cgDR/hwxbg6uMYFCRyKGnHftHTDdb6bwF+C7p
+ TdGg==
+X-Gm-Message-State: AGi0PuYQP9PFhkHAGR/N7ccfm1n8frWFuxWe1eI814iDUMhqnf0BaQsc
+ L4IveH92gWo5sKojJdlMwLw=
+X-Google-Smtp-Source: APiQypLNWMEjCWzpTTqRlNQ5fM43DasBthqPDNGNs3dvQ9EgTcvJOMNXBfjnILMttnezy+7yq4bt+g==
+X-Received: by 2002:a1c:f606:: with SMTP id w6mr15993457wmc.59.1588621395641; 
+ Mon, 04 May 2020 12:43:15 -0700 (PDT)
+Received: from [192.168.1.39] (26.red-88-21-207.staticip.rima-tde.net.
+ [88.21.207.26])
+ by smtp.gmail.com with ESMTPSA id y11sm19530695wrh.59.2020.05.04.12.43.13
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 04 May 2020 12:43:14 -0700 (PDT)
+Subject: Re: [PATCH 2/3] io/task: Move 'qom/object.h' header to source
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200504084615.27642-1-f4bug@amsat.org>
+ <20200504084615.27642-3-f4bug@amsat.org>
+ <799fe603-906c-c00b-07ce-0e7619c444f5@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c28f6af0-4a41-3f01-6bac-db87f40fd5fc@amsat.org>
+Date: Mon, 4 May 2020 21:43:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200504142814.157589-1-mst@redhat.com>
-In-Reply-To: <20200504142814.157589-1-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 4 May 2020 20:35:45 +0100
-Message-ID: <CAFEAcA8VTz1P9kd2BD6H546umduqnMdXC8G35LSyjzshxWb2Gg@mail.gmail.com>
-Subject: Re: [PULL 00/29] virtio,acpi,pci,pc: backlog from pre-5.0
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
+In-Reply-To: <799fe603-906c-c00b-07ce-0e7619c444f5@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,38 +103,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org,
+ Michael Tokarev <mjt@tls.msk.ru>, Markus Armbruster <armbru@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 4 May 2020 at 15:29, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> The following changes since commit 9af638cc1f665712522608c5d6b8c03d8fa67666:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200504' into staging (2020-05-04 13:37:17 +0100)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->
-> for you to fetch changes up to d8a05995bd64117bf5219d3ba7956277e608e3ca:
->
->   hw/i386: Make vmmouse helpers static (2020-05-04 10:25:03 -0400)
->
-> ----------------------------------------------------------------
-> virtio,acpi,pci,pc: backlog from pre-5.0
->
-> Mostly fixes, cleanups, but also new features for arm/virt and pc acpi.
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->
+On 5/4/20 7:42 PM, Richard Henderson wrote:
+> On 5/4/20 1:46 AM, Philippe Mathieu-Daudé wrote:
+>> We need "qom/object.h" to call object_ref()/object_unref().
+> 
+> This description doesn't seem to match
+> 
+>> +++ b/include/io/task.h
+>> @@ -21,8 +21,6 @@
+>>   #ifndef QIO_TASK_H
+>>   #define QIO_TASK_H
+>>   
+>> -#include "qom/object.h"
+>> -
+>>   typedef struct QIOTask QIOTask;
+>>   
+>>   typedef void (*QIOTaskFunc)(QIOTask *task,
+>> diff --git a/io/task.c b/io/task.c
+>> index 1ae7b86488..53c0bed686 100644
+>> --- a/io/task.c
+>> +++ b/io/task.c
+>> @@ -22,6 +22,7 @@
+>>   #include "io/task.h"
+>>   #include "qapi/error.h"
+>>   #include "qemu/thread.h"
+>> +#include "qom/object.h"
+> 
+> the change.  Since io/task.c includes io/tash.h, what are you actually doing?
 
+Sorry to not document clearly on the cover.
 
-Applied, thanks.
+The original goal was to stop using $SRC_PATH as include directory, but 
+as it is huge I believe it will never get fully accepted, so I simply 
+kept the few maybe worthwhile patches...
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
-for any user-visible changes.
+The final patch is:
 
--- PMM
+-- >8 --
+--- a/configure
++++ b/configure
+@@ -601,7 +601,7 @@ QEMU_CFLAGS="-fno-strict-aliasing -fno-common 
+-fwrapv -std=gnu99 $QEMU_CFLAGS"
+  QEMU_CFLAGS="-Wall -Wundef -Wwrite-strings -Wmissing-prototypes 
+$QEMU_CFLAGS"
+  QEMU_CFLAGS="-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
+  QEMU_CFLAGS="-D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE 
+$QEMU_CFLAGS"
+-QEMU_INCLUDES="-iquote . -iquote \$(SRC_PATH) -iquote 
+\$(SRC_PATH)/accel/tcg -iquote \$(SRC_PATH)/include"
++QEMU_INCLUDES="-iquote . -iquote \$(SRC_PATH)/accel/tcg -iquote 
+\$(SRC_PATH)/include"
+  QEMU_INCLUDES="$QEMU_INCLUDES -iquote \$(SRC_PATH)/disas/libvixl"
+  if test "$debug_info" = "yes"; then
+      CFLAGS="-g $CFLAGS"
+---
 
