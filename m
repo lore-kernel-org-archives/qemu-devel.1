@@ -6,90 +6,90 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F13ADC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:04:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D842FC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:05:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC59A20705
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:04:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A2C2420705
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:05:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N/mWTA8C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC59A20705
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CalK1gRK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2C2420705
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVbhy-0001Kd-Su
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 10:04:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43430)
+	id 1jVbiR-00026S-NY
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 10:05:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43574)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jVbgH-0007Ny-Hy
- for qemu-devel@nongnu.org; Mon, 04 May 2020 10:02:49 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26904
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jVbh6-0000eu-S9
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 10:03:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25204
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jVbgG-0006IN-Ke
- for qemu-devel@nongnu.org; Mon, 04 May 2020 10:02:49 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jVbh5-0006fa-PG
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 10:03:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588600967;
+ s=mimecast20190719; t=1588601018;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=X2zvL/m0upHD3M3uIFvfVJE3iUisfia4c6lGbRcMKBI=;
- b=N/mWTA8CbLbrbHUB+n57DmFfXDoTgrNjRS7kfjJEAvFeqqC6viLXz6W+wFUv0ArhNzW8Vy
- GEeE7OejTu+0ieOG30L/2/RBlwmg+502ngCUc6hb8hjXqiX3iphYjgqiWRPx60fXob2AwE
- AP2/6tBSbDOXc0GRZigohpZU40ztS5k=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-420-M37_rEWEPXG3CvAAfKF0NA-1; Mon, 04 May 2020 10:02:36 -0400
-X-MC-Unique: M37_rEWEPXG3CvAAfKF0NA-1
-Received: by mail-wm1-f70.google.com with SMTP id b203so3535180wmd.6
- for <qemu-devel@nongnu.org>; Mon, 04 May 2020 07:02:36 -0700 (PDT)
+ bh=b07kBqn65IFgXikBqRmbtRU7fYg1q3hiw3ti+bkfZPA=;
+ b=CalK1gRKqiobcvVgiggDMT4XFr/aeeG9eyx8L4tGIdgJSzyhR8YO1rTytkkxGA/9Z/o0pW
+ VqQGJjA0341qENNnTQGfDHQTNHTDliRpI2aF3nCy7Oz1+vkN6tHQctwF8Bs6aeREW32CbZ
+ CjNMbwWuN0g7qAWgPpWoOkTNFMc6cos=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-225-IgNFd9_VP9edAtBoZJWTjg-1; Mon, 04 May 2020 10:03:37 -0400
+X-MC-Unique: IgNFd9_VP9edAtBoZJWTjg-1
+Received: by mail-wm1-f71.google.com with SMTP id w2so4942773wmc.3
+ for <qemu-devel@nongnu.org>; Mon, 04 May 2020 07:03:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=1ud3LEA0R6Fmmcf+jn9FDHF/7TgcxqnsbsXbon6TAKw=;
- b=HWVQd3CXnoIHWKLMSikw0tyoGo2TZe9MWHWE1cYUXQ+OUWBI8Rlcu0tcQWoDsDxhkE
- +HIduaRkZBPLSTY8odmSQzyKchJAd4xv/GJifwD2xjjTAe5mKbLEF7U0PkwmBVUE6Ouw
- YpGFOSybFl06er7VMU3f0FbftcOObXmgupMJTmuV3v4ct+wlqiTZeX3vSCFkHOfEOwV6
- DzPQpgAmhC5tUNyAcJUnQKtAA/xTVldLQEPAdOv+7pagK85qZ8jSVT+I8bJMWJ/1LxJc
- BTFrZFngFR95I7smdQhxyrMlXbix6BCObJP5nGjsnNgztPQmWWZXBRKFlFFjmXXaB0hV
- ja0Q==
-X-Gm-Message-State: AGi0PuZS7EJcwuU73czQT7J/VMrfxTJLusiKdi1mPu6jWsu5cW8xDJjw
- PbKaanV+7c8uUKXuT9s4vZKzGzsbPRRXfC/pd2j8HLbJmsqnXQXMFrv2ueV6LUf3DE6ndoJGjxr
- vhHhbg8HTL2Ge51Q=
-X-Received: by 2002:a5d:494a:: with SMTP id r10mr18268367wrs.136.1588600955506; 
- Mon, 04 May 2020 07:02:35 -0700 (PDT)
-X-Google-Smtp-Source: APiQypI++jIMyizyHqSkUFbrUwRzRkm5ha0thIMIpbBwx0s173sqjPFyN/heqsT7vnpTUthQlnPbmg==
-X-Received: by 2002:a5d:494a:: with SMTP id r10mr18268351wrs.136.1588600955333; 
- Mon, 04 May 2020 07:02:35 -0700 (PDT)
+ bh=1ngUXtI4hGh3c4dAqDF6Rg89JFHqGpuVo8IeLr5r4Cw=;
+ b=SdWn9vDlnp6I0DNbExN444weLNX1wPg2qB+72XnXHMW64MaqyuXNzFKW+ycZ7nnBiA
+ 0NbtzrH31jwXFxxxdf5/SctxJgwAR3OMKGZO94fX6HVkQFLAchqt8uz17p38ixayypTe
+ xQpFtNcXV8b2p2/1uuun2X+Nr9AD3nPip1RUUVAb1sCykIuMNgBSuINv56DKGgr66GRM
+ SFDAWL27uts89RSt7+ytB4Ez1Y6Pi4c5+dZA8tXZPrrGbpVxDlAJHpbGulibAopTb+Ey
+ hazOfdaX4dV+yTbdiXqpTKYpBS2KzdZJh1UHuQFbqVcBz+PaO1WZCkrqlJ6Ep9tCOEop
+ srsQ==
+X-Gm-Message-State: AGi0PuZyNKiCIx2K5b4nBvy6mxKHndq/HIblAVibBmGQExXy8llAXvSN
+ 6zWuMaB7ChZtQROan5jIAwNO6BHNslxpiHnDwL9K3e7s1mYmV942iC+XJnrReVlDqgGxbxk69dK
+ 19Ci/hPYgrS7UCyk=
+X-Received: by 2002:a1c:1f09:: with SMTP id f9mr15745871wmf.31.1588601013141; 
+ Mon, 04 May 2020 07:03:33 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJYWNa9VJWHtrOUiDfBu4O+gpp+6JkTUyNCSWe77KSg1REaVkNEONyeY1LraRRiA6iLbg4Rwg==
+X-Received: by 2002:a1c:1f09:: with SMTP id f9mr15745848wmf.31.1588601012933; 
+ Mon, 04 May 2020 07:03:32 -0700 (PDT)
 Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
  by smtp.gmail.com with ESMTPSA id
- d7sm18795097wrn.78.2020.05.04.07.02.34
+ e21sm20013578wrc.1.2020.05.04.07.03.31
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 May 2020 07:02:34 -0700 (PDT)
-Date: Mon, 4 May 2020 10:02:32 -0400
+ Mon, 04 May 2020 07:03:32 -0700 (PDT)
+Date: Mon, 4 May 2020 10:03:29 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: Yubo Miao <miaoyubo@huawei.com>
-Subject: Re: [PATCH v6 2/8] fw_cfg: Write the extra roots into the fw_cfg
-Message-ID: <20200504100057-mutt-send-email-mst@kernel.org>
+Subject: Re: [PATCH v6 5/8] acpi: Align the size to 128k
+Message-ID: <20200504100317-mutt-send-email-mst@kernel.org>
 References: <20200408125816.955-1-miaoyubo@huawei.com>
- <20200408125816.955-3-miaoyubo@huawei.com>
+ <20200408125816.955-6-miaoyubo@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200408125816.955-3-miaoyubo@huawei.com>
+In-Reply-To: <20200408125816.955-6-miaoyubo@huawei.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 01:21:32
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 05:09:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -116,75 +116,74 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Apr 08, 2020 at 08:58:10PM +0800, Yubo Miao wrote:
+On Wed, Apr 08, 2020 at 08:58:13PM +0800, Yubo Miao wrote:
 > From: miaoyubo <miaoyubo@huawei.com>
 >=20
-> Write the extra roots into the fw_cfg therefore the uefi could
-> get the extra roots. Only if the uefi know there are extra roots,
-> the config space of devices behind the root could be obtained.
+> If table size is changed between virt_acpi_build and
+> virt_acpi_build_update, the table size would not be updated to
+> UEFI, therefore, just align the size to 128kb, which is enough
+> and same with x86. It would warn if 64k is not enough and the
+> align size should be updated.
 >=20
 > Signed-off-by: miaoyubo <miaoyubo@huawei.com>
+
+does this affect migration in any way?
+
 > ---
->  hw/arm/virt.c | 23 +++++++++++++++++++++++
->  1 file changed, 23 insertions(+)
+>  hw/arm/virt-acpi-build.c | 25 +++++++++++++++++++++++++
+>  1 file changed, 25 insertions(+)
 >=20
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 7dc96abf72..0fdfe4129c 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -77,6 +77,7 @@
->  #include "hw/acpi/generic_event_device.h"
->  #include "hw/virtio/virtio-iommu.h"
->  #include "hw/char/pl011.h"
-> +#include "hw/pci/pci_bus.h"
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 7bcd04dfb7..89bb768b0c 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -54,6 +54,8 @@
+>  #include "hw/pci/pci_bridge.h"
+>  #define ARM_SPI_BASE 32
 > =20
->  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
->      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-> @@ -1435,6 +1436,12 @@ void virt_machine_done(Notifier *notifier, void *d=
-ata)
->      ARMCPU *cpu =3D ARM_CPU(first_cpu);
->      struct arm_boot_info *info =3D &vms->bootinfo;
->      AddressSpace *as =3D arm_boot_address_space(cpu, info);
-> +    PCIHostState *s =3D OBJECT_CHECK(PCIHostState,
-> +                                   object_resolve_path_type("",
-> +                                   "pcie-host-bridge", NULL),
-> +                                   TYPE_PCI_HOST_BRIDGE);
+> +#define ACPI_BUILD_TABLE_SIZE             0x20000
 > +
-> +    PCIBus *bus =3D s->bus;
+>  static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
+>  {
+>      uint16_t i;
+> @@ -883,6 +885,15 @@ struct AcpiBuildState {
+>      bool patched;
+>  } AcpiBuildState;
 > =20
->      /*
->       * If the user provided a dtb, we assume the dynamic sysbus nodes
-
-
-Seems duplicated all over the place. Add an API for that?
-
-> @@ -1453,6 +1460,22 @@ void virt_machine_done(Notifier *notifier, void *d=
-ata)
->          exit(1);
+> +static void acpi_align_size(GArray *blob, unsigned align)
+> +{
+> +    /*
+> +     * Align size to multiple of given size. This reduces the chance
+> +     * we need to change size in the future (breaking cross version migr=
+ation).
+> +     */
+> +    g_array_set_size(blob, ROUND_UP(acpi_data_len(blob), align));
+> +}
+> +
+>  static
+>  void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+>  {
+> @@ -953,6 +964,20 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuil=
+dTables *tables)
+>          build_rsdp(tables->rsdp, tables->linker, &rsdp_data);
 >      }
 > =20
-> +    if (bus) {
-> +        int extra_hosts =3D 0;
-> +        QLIST_FOREACH(bus, &bus->child, sibling) {
-> +            /* look for expander root buses */
-> +            if (pci_bus_is_root(bus)) {
-> +                extra_hosts++;
-> +            }
-> +        }
-> +        if (extra_hosts && vms->fw_cfg) {
-> +            uint64_t *val =3D g_malloc(sizeof(*val));
-> +            *val =3D cpu_to_le64(extra_hosts);
-> +            fw_cfg_add_file(vms->fw_cfg,
-> +                   "etc/extra-pci-roots", val, sizeof(*val));
-> +        }
+> +    /*
+> +     * The align size is 128, warn if 64k is not enough therefore
+> +     * the align size could be resized.
+> +     */
+> +    if (tables_blob->len > ACPI_BUILD_TABLE_SIZE / 2) {
+> +        warn_report("ACPI table size %u exceeds %d bytes,"
+> +                    " migration may not work",
+> +                    tables_blob->len, ACPI_BUILD_TABLE_SIZE / 2);
+> +        error_printf("Try removing CPUs, NUMA nodes, memory slots"
+> +                     " or PCI bridges.");
 > +    }
+> +    acpi_align_size(tables_blob, ACPI_BUILD_TABLE_SIZE);
 > +
->      virt_acpi_setup(vms);
->      virt_build_smbios(vms);
-
-
-Duplicated from pc. Pls refactor.
-
+> +
+>      /* Cleanup memory that's no longer used. */
+>      g_array_free(table_offsets, true);
 >  }
 > --=20
 > 2.19.1
