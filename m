@@ -2,92 +2,104 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30436C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:47:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16D59C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:47:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0A4F206D9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:47:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D1E03206D9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:47:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fMa0qpfa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0A4F206D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J7fn/ih1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1E03206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVcNQ-0002aV-PK
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 10:47:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49638)
+	id 1jVcNT-0002iw-VW
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 10:47:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48096)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jVcJr-0005S6-1z; Mon, 04 May 2020 10:43:43 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:35400)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jVcJn-0006rw-Jd; Mon, 04 May 2020 10:43:41 -0400
-Received: by mail-lj1-x242.google.com with SMTP id g4so9940008ljl.2;
- Mon, 04 May 2020 07:43:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=OfKvkccqu1FZg1raEspi36fatxXhkuXGlT7Uesj0f10=;
- b=fMa0qpfappe7P5ER0d5byeF0JkfoGvmgtcaHZXsvvHVBjGESnmvI3fyiVFQbvd+5SU
- AsuMojNIws33PhExnkPDocWy5V2011hcMEuWhBOfImZA2FsWkckBMPF+NvswYY/2Vq/F
- xhAECbArZm4N8MWYcsihWIWeFkgRsSKbE0zNkU5yTaH4Nk84mwImAUYFIRscig6H63lY
- VocoNWry4UnrePezv8HRYVKx6A38Y/1SjHj1e97w21fr2fH6WSmpdv0XvjnNq5s9dvq6
- dvKLrxMxyfHNMJLwv2itNIwry2levx2se9cix9BMwHo2wemUmMK3oC9TqHNhIMg+y1i7
- ymSQ==
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jVc9a-0003Lp-8L
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 10:33:06 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46109
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jVc9X-0008OT-8q
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 10:33:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588602782;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=AOdWrTDlgPPkMHeJucHbghgUuY8aAHcAGANlC4mF4bs=;
+ b=J7fn/ih1nH9/dkPQwBkvaDlrUpIyfh13Q1nfiIf40dMagpHQYJHVpqkoE+4NDtEp0dmMbM
+ B+XfK4hJ+Th1OnI/RHdnPwqQtUbEIoDAfvySRjL4q9UtyegKpBDIWr+K7jIukCiDwVuthM
+ Yf7aTqzBBnZw7VyZSwVLGkiDWou/JmM=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-231-OXYJzj6EOOSr5f1GXvIZoQ-1; Mon, 04 May 2020 10:29:59 -0400
+X-MC-Unique: OXYJzj6EOOSr5f1GXvIZoQ-1
+Received: by mail-wm1-f70.google.com with SMTP id u11so3585431wmc.7
+ for <qemu-devel@nongnu.org>; Mon, 04 May 2020 07:29:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=OfKvkccqu1FZg1raEspi36fatxXhkuXGlT7Uesj0f10=;
- b=iFPREr0GakYKtvYgi+GtBvVYvyvYb/A0nckSQ/KVcCOrwOZdx6EsiqVazzn2sggtYd
- tAQp3AG6HX4JiDuk7d7Lq84hobBk+l+QrGojJ3UZUen3D6ZrbhvOoSxNk9Cx8TUAzOLf
- TT3jpdzrVZwQJC2A5R/XuA+iJcTzJJF97VAPuPEtYy+a+7nVyJY78DIqHx+QyhJ248oF
- bTcjFAZrBVYrfVMrFRG5JwWs5sDUsiikZdvATOHtCr2awcKBi2wggEqk7jxn+utp294R
- pWjozEhtCtTtYMMbiFm3Ep1rZEdfZkFZqjdvUGrr5x32MUUxhYsKb8adwMB1m7aT+ql9
- cDHg==
-X-Gm-Message-State: AGi0PuZYqyUGTWqLXzWTZwmlcryZ9zEC8Ja0v5V8da7V0Z8bHQ8BxjYu
- s7X3qjixipkl2X5PSweH81M=
-X-Google-Smtp-Source: APiQypIAFExYSaIFGwQaycYJ3k3RUxTQauyAVerT4m9uD0Yrn2hB+C8VKnE65u1uFEmSnfSZc3YKzA==
-X-Received: by 2002:a2e:7815:: with SMTP id t21mr10691773ljc.146.1588603417346; 
- Mon, 04 May 2020 07:43:37 -0700 (PDT)
-Received: from localhost (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id l25sm9927746lfh.71.2020.05.04.07.43.36
+ :mime-version:content-disposition:in-reply-to;
+ bh=vk5zcT78ttafQi3FbOHb+B7bkLDdTDjQjWP7o7Og/l0=;
+ b=aR+sFK+H2HIqb7LwHn6q4W5MjYT/S/ICmJc7iqlKqRMEDzV4su9oIBY62sAL/BoiaS
+ x5XdxDaAdQYtATDjmwL+kyE1+ZPJhnGXaa/df9OgfQdPlOruZtzznzu+gI7sAHSsIZPs
+ GQA76M05/wnD4jBFwE08ePbulVZ05uqkIW9aqaRdIhRM3aO85gPANNV+D0u/ngf8Hl1h
+ D4VKvdOZXd5O+I/yIDBA+FRq2ZT7D7m6gZ9ogG1K93vUz6bq5COPBTGb4Yo7H+tN8kSN
+ LhDav5J3yogIHsUxkmU7oyMEWbYq8eUy3pcwepumfUjHW/IBq8zZwlVuZef8cx8Nzd8x
+ Yj9A==
+X-Gm-Message-State: AGi0PuakEDlVdvwM34L4adFNzEMxb9lFQk+ggeY4gvS3x7bkY3iTaj5S
+ X+rQqDWnQZ8wmRmmer9Jg48/Z9oMe1Rh8UhHfIq/VwlgOsDxXBMTv1LsB26/A/6WTKkxTxES2sT
+ /7/NH8fPDZuh4kn0=
+X-Received: by 2002:a1c:9a81:: with SMTP id
+ c123mr14208675wme.115.1588602598667; 
+ Mon, 04 May 2020 07:29:58 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLuIEh7/IC/hxiyMfl3Y5UBTEdFqY0OIhqmJFZYRfabUp9B5YmiSAjoskGkNPsgsJ93k8MbDA==
+X-Received: by 2002:a1c:9a81:: with SMTP id
+ c123mr14208656wme.115.1588602598453; 
+ Mon, 04 May 2020 07:29:58 -0700 (PDT)
+Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
+ by smtp.gmail.com with ESMTPSA id
+ w4sm19316679wro.28.2020.05.04.07.29.57
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 May 2020 07:43:36 -0700 (PDT)
-Date: Mon, 4 May 2020 16:43:35 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Subject: Re: [PATCH v2 02/10] net: cadence_gem: Fix the queue address update
- during wrap around
-Message-ID: <20200504144335.GC5519@toto>
-References: <1588601168-27576-1-git-send-email-sai.pavan.boddu@xilinx.com>
- <1588601168-27576-3-git-send-email-sai.pavan.boddu@xilinx.com>
+ Mon, 04 May 2020 07:29:58 -0700 (PDT)
+Date: Mon, 4 May 2020 10:29:56 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 18/29] hw/arm/virt: Add nvdimm hotplug support
+Message-ID: <20200504142814.157589-19-mst@redhat.com>
+References: <20200504142814.157589-1-mst@redhat.com>
 MIME-Version: 1.0
+In-Reply-To: <20200504142814.157589-1-mst@redhat.com>
+X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
+X-Mutt-Fcc: =sent
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-In-Reply-To: <1588601168-27576-3-git-send-email-sai.pavan.boddu@xilinx.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Received-SPF: pass client-ip=2a00:1450:4864:20::242;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x242.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 08:14:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,116 +113,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, Tong Ho <tong.ho@xilinx.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Ramon Fried <rfried.dev@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ Eric Auger <eric.auger@redhat.com>,
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 04, 2020 at 07:36:00PM +0530, Sai Pavan Boddu wrote:
-> During wrap around and reset, queues are pointing to initial base
-> address of queue 0, irrespective of what queue we are dealing with.
-> Fix it by assigning proper base address every time.
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-Might want to add wrappers e.g:
-static inline uint32_t gem_get_rx_queue_base_addr(CadenceGEMState *s, int q) {
-    gem_get_queue_base_addr(s, false, q); 
-}
+This adds support for nvdimm hotplug events through GED
+and enables nvdimm for the arm/virt. Now Guests with ACPI
+can have both cold and hot plug of nvdimms.
 
-static inline uint32_t gem_get_tx_queue_base_addr(CadenceGEMState *s, int q) {
-    gem_get_queue_base_addr(s, true, q); 
-}
+Hot removal functionality is not yet supported.
 
-It makes the packet processing logic a little easier to read, e.g:
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Message-Id: <20200421125934.14952-5-shameerali.kolothum.thodi@huawei.com>
+Acked-by: Peter Maydell <peter.maydell@linaro.org>
+Tested-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ include/hw/acpi/generic_event_device.h |  1 +
+ hw/acpi/generic_event_device.c         | 15 ++++++++++++++-
+ hw/arm/virt.c                          | 16 +++++++++++-----
+ docs/specs/acpi_hw_reduced_hotplug.rst |  3 ++-
+ 4 files changed, 28 insertions(+), 7 deletions(-)
 
-s->rx_desc_addr[q] = gem_get_rx_queue_base_addr(s, q);
-vs
-s->rx_desc_addr[q] = gem_get_queue_base_addr(s, false, q);
+diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/gener=
+ic_event_device.h
+index d157eac088..9eb86ca4fd 100644
+--- a/include/hw/acpi/generic_event_device.h
++++ b/include/hw/acpi/generic_event_device.h
+@@ -82,6 +82,7 @@
+  */
+ #define ACPI_GED_MEM_HOTPLUG_EVT   0x1
+ #define ACPI_GED_PWR_DOWN_EVT      0x2
++#define ACPI_GED_NVDIMM_HOTPLUG_EVT 0x4
+=20
+ typedef struct GEDState {
+     MemoryRegion io;
+diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.=
+c
+index 021ed2bf23..5d17f78a1e 100644
+--- a/hw/acpi/generic_event_device.c
++++ b/hw/acpi/generic_event_device.c
+@@ -16,6 +16,7 @@
+ #include "hw/acpi/generic_event_device.h"
+ #include "hw/irq.h"
+ #include "hw/mem/pc-dimm.h"
++#include "hw/mem/nvdimm.h"
+ #include "hw/qdev-properties.h"
+ #include "migration/vmstate.h"
+ #include "qemu/error-report.h"
+@@ -23,6 +24,7 @@
+ static const uint32_t ged_supported_events[] =3D {
+     ACPI_GED_MEM_HOTPLUG_EVT,
+     ACPI_GED_PWR_DOWN_EVT,
++    ACPI_GED_NVDIMM_HOTPLUG_EVT,
+ };
+=20
+ /*
+@@ -110,6 +112,11 @@ void build_ged_aml(Aml *table, const char *name, Hotpl=
+ugHandler *hotplug_dev,
+                            aml_notify(aml_name(ACPI_POWER_BUTTON_DEVICE),
+                                       aml_int(0x80)));
+                 break;
++            case ACPI_GED_NVDIMM_HOTPLUG_EVT:
++                aml_append(if_ctx,
++                           aml_notify(aml_name("\\_SB.NVDR"),
++                                      aml_int(0x80)));
++                break;
+             default:
+                 /*
+                  * Please make sure all the events in ged_supported_events=
+[]
+@@ -175,7 +182,11 @@ static void acpi_ged_device_plug_cb(HotplugHandler *ho=
+tplug_dev,
+     AcpiGedState *s =3D ACPI_GED(hotplug_dev);
+=20
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+-        acpi_memory_plug_cb(hotplug_dev, &s->memhp_state, dev, errp);
++        if (object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)) {
++            nvdimm_acpi_plug_cb(hotplug_dev, dev);
++        } else {
++            acpi_memory_plug_cb(hotplug_dev, &s->memhp_state, dev, errp);
++        }
+     } else {
+         error_setg(errp, "virt: device plug request for unsupported device=
+"
+                    " type: %s", object_get_typename(OBJECT(dev)));
+@@ -192,6 +203,8 @@ static void acpi_ged_send_event(AcpiDeviceIf *adev, Acp=
+iEventStatusBits ev)
+         sel =3D ACPI_GED_MEM_HOTPLUG_EVT;
+     } else if (ev & ACPI_POWER_DOWN_STATUS) {
+         sel =3D ACPI_GED_PWR_DOWN_EVT;
++    } else if (ev & ACPI_NVDIMM_HOTPLUG_STATUS) {
++        sel =3D ACPI_GED_NVDIMM_HOTPLUG_EVT;
+     } else {
+         /* Unknown event. Return without generating interrupt. */
+         warn_report("GED: Unsupported event %d. No irq injected", ev);
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 87f29953c4..171e6908ec 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -568,6 +568,10 @@ static inline DeviceState *create_acpi_ged(VirtMachine=
+State *vms)
+         event |=3D ACPI_GED_MEM_HOTPLUG_EVT;
+     }
+=20
++    if (ms->nvdimms_state->is_enabled) {
++        event |=3D ACPI_GED_NVDIMM_HOTPLUG_EVT;
++    }
++
+     dev =3D qdev_create(NULL, TYPE_ACPI_GED);
+     qdev_prop_set_uint32(dev, "ged-event", event);
+=20
+@@ -2088,19 +2092,20 @@ static void virt_memory_pre_plug(HotplugHandler *ho=
+tplug_dev, DeviceState *dev,
+                                  Error **errp)
+ {
+     VirtMachineState *vms =3D VIRT_MACHINE(hotplug_dev);
++    const MachineState *ms =3D MACHINE(hotplug_dev);
+     const bool is_nvdimm =3D object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM)=
+;
+=20
+-    if (is_nvdimm) {
+-        error_setg(errp, "nvdimm is not yet supported");
+-        return;
+-    }
+-
+     if (!vms->acpi_dev) {
+         error_setg(errp,
+                    "memory hotplug is not enabled: missing acpi-ged device=
+");
+         return;
+     }
+=20
++    if (is_nvdimm && !ms->nvdimms_state->is_enabled) {
++        error_setg(errp, "nvdimm is not enabled: add 'nvdimm=3Don' to '-M'=
+");
++        return;
++    }
++
+     pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL, errp);
+ }
+=20
+@@ -2245,6 +2250,7 @@ static void virt_machine_class_init(ObjectClass *oc, =
+void *data)
+     hc->plug =3D virt_machine_device_plug_cb;
+     hc->unplug_request =3D virt_machine_device_unplug_request_cb;
+     mc->numa_mem_supported =3D true;
++    mc->nvdimm_supported =3D true;
+     mc->auto_enable_numa_with_memhp =3D true;
+     mc->default_ram_id =3D "mach-virt.ram";
+=20
+diff --git a/docs/specs/acpi_hw_reduced_hotplug.rst b/docs/specs/acpi_hw_re=
+duced_hotplug.rst
+index 911a98255b..0bd3f9399f 100644
+--- a/docs/specs/acpi_hw_reduced_hotplug.rst
++++ b/docs/specs/acpi_hw_reduced_hotplug.rst
+@@ -63,7 +63,8 @@ GED IO interface (4 byte access)
+     bits:
+        0: Memory hotplug event
+        1: System power down event
+-    2-31: Reserved
++       2: NVDIMM hotplug event
++    3-31: Reserved
+=20
+ **write_access:**
+=20
+--=20
+MST
 
-Anyway, this looks good to me:
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-
-
-> 
-> Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-> ---
->  hw/net/cadence_gem.c | 29 +++++++++++++++++++++++++----
->  1 file changed, 25 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-> index 2f244eb..6cb2f64 100644
-> --- a/hw/net/cadence_gem.c
-> +++ b/hw/net/cadence_gem.c
-> @@ -845,6 +845,25 @@ static int get_queue_from_screen(CadenceGEMState *s, uint8_t *rxbuf_ptr,
->      return 0;
->  }
->  
-> +static uint32_t gem_get_queue_base_addr(CadenceGEMState *s, bool tx, int q)
-> +{
-> +    uint32_t base_addr = 0;
-> +
-> +    switch (q) {
-> +    case 0:
-> +        base_addr = s->regs[tx ? GEM_TXQBASE : GEM_RXQBASE];
-> +        break;
-> +    case 1 ... (MAX_PRIORITY_QUEUES - 1):
-> +        base_addr = s->regs[(tx ? GEM_TRANSMIT_Q1_PTR :
-> +                                 GEM_RECEIVE_Q1_PTR) + q - 1];
-> +        break;
-> +    default:
-> +        g_assert_not_reached();
-> +    };
-> +
-> +    return base_addr;
-> +}
-> +
->  static hwaddr gem_get_desc_addr(CadenceGEMState *s, bool tx, int q)
->  {
->      hwaddr desc_addr = 0;
-> @@ -1044,7 +1063,7 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
->          /* Next descriptor */
->          if (rx_desc_get_wrap(s->rx_desc[q])) {
->              DB_PRINT("wrapping RX descriptor list\n");
-> -            s->rx_desc_addr[q] = s->regs[GEM_RXQBASE];
-> +            s->rx_desc_addr[q] = gem_get_queue_base_addr(s, false, q);
->          } else {
->              DB_PRINT("incrementing RX descriptor list\n");
->              s->rx_desc_addr[q] += 4 * gem_get_desc_len(s, true);
-> @@ -1200,7 +1219,8 @@ static void gem_transmit(CadenceGEMState *s)
->                                      sizeof(desc_first));
->                  /* Advance the hardware current descriptor past this packet */
->                  if (tx_desc_get_wrap(desc)) {
-> -                    s->tx_desc_addr[q] = s->regs[GEM_TXQBASE];
-> +                    s->tx_desc_addr[q] = gem_get_queue_base_addr(s,
-> +                                         true, q);
->                  } else {
->                      s->tx_desc_addr[q] = packet_desc_addr +
->                                           4 * gem_get_desc_len(s, false);
-> @@ -1252,7 +1272,8 @@ static void gem_transmit(CadenceGEMState *s)
->                  } else {
->                      packet_desc_addr = 0;
->                  }
-> -                packet_desc_addr |= s->regs[GEM_TXQBASE];
-> +                packet_desc_addr |= gem_get_queue_base_addr(s,
-> +                                    true, q);
->              } else {
->                  packet_desc_addr += 4 * gem_get_desc_len(s, false);
->              }
-> @@ -1458,7 +1479,7 @@ static void gem_write(void *opaque, hwaddr offset, uint64_t val,
->          if (!(val & GEM_NWCTRL_TXENA)) {
->              /* Reset to start of Q when transmit disabled. */
->              for (i = 0; i < s->num_priority_queues; i++) {
-> -                s->tx_desc_addr[i] = s->regs[GEM_TXQBASE];
-> +                s->tx_desc_addr[i] = gem_get_queue_base_addr(s, true, i);
->              }
->          }
->          if (gem_can_receive(qemu_get_queue(s->nic))) {
-> -- 
-> 2.7.4
-> 
 
