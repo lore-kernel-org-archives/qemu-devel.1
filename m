@@ -2,73 +2,87 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E65CC47257
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:23:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6EB7C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:27:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DF3F206E6
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:23:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B146120721
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:27:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="IapsD0gE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DF3F206E6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LGk45Zev"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B146120721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVYFm-00040e-C6
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 06:23:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40466)
+	id 1jVYJm-0005ul-Ru
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 06:27:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41032)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1jVYFE-0003ZR-1H
- for qemu-devel@nongnu.org; Mon, 04 May 2020 06:22:40 -0400
-Received: from kylie.crudebyte.com ([5.189.157.229]:34299)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1jVYFC-000457-BB
- for qemu-devel@nongnu.org; Mon, 04 May 2020 06:22:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=1OSsI/S5Z0Bd9kcM7tLl4HLQAftxPPOps+hzLT6ZmnQ=; b=IapsD0gEqPshc/tvl8CPHH1ZiF
- mapSMBjbIXsdxMmoDKtD3+OEreT52HYyVzQ8wRblX2vKuB/YL+ZvFU89hmblJ3Fj4Xi3HmEAt8S6f
- tNO4Qo+O8E22s1o7Tyo8W+pDYFMGh31ZLXVSkfeDDD2nWQzdRnyqybTjvIN1iA/58oGr/8TGEIpl6
- fnjfNTAlj2C9MnhhNzR/zH6YsI87iikL/9ZMe3qveoY0GY9GqwAeqEwGoxkLua3OJ5XdxkmLSyxVy
- 3J5lCfTefsF/sHZ9FRsUyiAxLdb7kwUpwBy0C4g/hm0hQnKy8HHMKMMl2984D/nFniLaCutj3PtuG
- o8X3W9pWyrA/RDL2r0o29uIBGeWR5ycJX9v6miqTKlWeDMAi81B6nChM0RFyUA7f1TqjyqkYe9lYh
- 2ePq1CIn/k3iFq3iS88MjD8H3NzFystAXckEbOaxm+rNBdhgrlR7vQfQKZEJAn3rD8vGTjPWGMb5m
- 5MBODiIQOAjVSzHVBwEQ56u1REmetNTaW3xE9Ko+qmHHpUFJeDfJYmkFPKCSL1F4XH5+fswKHvBDM
- /1cmcP7Wa+oojiGLPteUg79FCTrNJ24fj0YitwpgbS/86b4En0qY+bNR4ccrvc+phDEv5lma+bGDK
- WpHtMx5kKNNTUZlVP/lt77uH+/0WoeSI3jGFZNvkw=;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v6 3/5] 9pfs: add new function v9fs_co_readdir_many()
-Date: Mon, 04 May 2020 12:08:07 +0200
-Message-ID: <8025053.zxIBI3vFlk@silver>
-In-Reply-To: <20200504111834.117c98d9@bahia.lan>
-References: <cover.1587309014.git.qemu_oss@crudebyte.com>
- <5819799.mbObChnQ2B@silver> <20200504111834.117c98d9@bahia.lan>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Received-SPF: pass client-ip=5.189.157.229;
- envelope-from=qemu_oss@crudebyte.com; helo=kylie.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 06:22:25
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1jVYIv-00056J-Vm
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 06:26:29 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41678
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1jVYIu-0001A1-89
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 06:26:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588587986;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=5QW7XtodOHUNpl2659rcQBuJs1zjkixKe/FSSUqBKT4=;
+ b=LGk45Zevgo1yxY+M1jk5QibcYq9UFl9npS3jN2qmrSgsoRSddrT4Igx5Xl/AIJAjm1DqBR
+ Vtrp7JMjSBE0gSxqWKXfkZ7KVFn7jBZifL8yh6Ns7WZzqKPnMHpOxF/CPsp9DTd1FZ+mQh
+ 4tLEnvn4sXTgcWzYg3ErF3LoE8Mu1lA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-438-BxdgTI7VNMWhXepLEzTgLQ-1; Mon, 04 May 2020 06:26:25 -0400
+X-MC-Unique: BxdgTI7VNMWhXepLEzTgLQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 63127100CCC7;
+ Mon,  4 May 2020 10:26:24 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.43])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2074419C58;
+ Mon,  4 May 2020 10:26:21 +0000 (UTC)
+Message-ID: <65da8db487fb0e0a5f1001a55477af47246c3206.camel@redhat.com>
+Subject: Re: [PATCH v3 00/14] LUKS: encryption slot management using amend
+ interface
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: "Daniel P." =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>
+Date: Mon, 04 May 2020 13:26:20 +0300
+In-Reply-To: <20200504101925.GH115875@redhat.com>
+References: <20200503184324.12506-1-mlevitsk@redhat.com>
+ <20200504101925.GH115875@redhat.com>
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 01:21:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,77 +95,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Montag, 4. Mai 2020 11:18:34 CEST Greg Kurz wrote:
-> > > > > > +        memcpy(e->dent, dent, sizeof(struct dirent));
-> > > > > > +
-> > > > > > +        /* perform a full stat() for directory entry if requested
-> > > > > > by
-> > > > > > caller */ +        if (dostat) {
-> > > > > > +            err = s->ops->name_to_path(
-> > > > > > +                &s->ctx, &fidp->path, dent->d_name, &path
-> > > > > > +            );
-> > > > > > +            if (err < 0) {
-> > > > > > 
-> > > > > >                  err = -errno;
-> > > > > > 
-> > > > > > -            } else {
-> > > > > > -                *dent = entry;
-> > > > > > -                err = 0;
-> > > > > > +                break;
-> > > > > 
-> > > > > ... but we're erroring out there and it seems that we're leaking
-> > > > > all the entries that have been allocated so far.
-> > > > 
-> > > > No, they are not leaking actually.
-> > > > 
-> > > > You are right that they are not deallocated in do_readdir_many(), but
-> > > > that's intentional: in the new implementation of v9fs_do_readdir() you
-> > > > see that v9fs_free_dirents(entries) is *always* called at the very end
-> > > > of
-> > > > the function, no matter if success or any error. That's one of the
-> > > > measures to simplify overall code as much as possible.
-> > > 
-> > > Hmm... I still don't quite like the idea of having an erroring function
-> > > asking for extra cleanup. I suggest you come up with an idem-potent
-> > > version
-> > > of v9fs_free_dirents(), move it to codir.c (I also prefer locality of
-> > > calls
-> > > to g_malloc and g_free in the same unit), make it extern and call it
-> > > both on the error path of v9fs_co_readdir_many() and in
-> > > v9fs_do_readdir().
-> > 
-> > I understand your position of course, but I still won't find that to be a
-> > good move.
-> > 
-> > My veto here has a reason: your requested change would prevent an
-> > application that I had in mind for future purpose actually: Allowing
-> > "greedy" fetching
-> Are you telling that this series has some kind of hidden agenda related to
-> a possible future change ?!?
+On Mon, 2020-05-04 at 11:19 +0100, Daniel P. Berrang=C3=A9 wrote:
+> On Sun, May 03, 2020 at 09:43:10PM +0300, Maxim Levitsky wrote:
+> > Hi!
+> > Here is the updated series of my patches, incorporating all the feedbac=
+k I received.
+> >=20
+> > This implements the API interface that we agreed upon except that I mer=
+ged the
+> > LUKSKeyslotActive/LUKSKeyslotInactive union into a struct because other=
+wise
+> > I need nested unions which are not supported currently by QAPI parser.
+> > This didn't change the API and thus once support for nested unions is t=
+here,
+> > it can always be implemented in backward compatible way.
+> >=20
+> > I hope that this series will finally be considered for merging, since I=
+ am somewhat running
+> > out of time to finish this task.
+> >=20
+> > Patches are strictly divided by topic to 3 groups, and each group depen=
+ds on former groups.
+> >=20
+> > * Patches 1,2 implement qcrypto generic amend interface, including defi=
+nition
+> >   of structs used in crypto.json and implement this in luks crypto driv=
+er
+> >   Nothing is exposed to the user at this stage
+> >=20
+> > * Patches 3-9 use the code from patches 1,2 to implement qemu-img amend=
+ based encryption slot management
+> >   for luks and for qcow2, and add a bunch of iotests to cover that.
+> >=20
+> > * Patches 10-13 add x-blockdev-amend (I'll drop the -x prefix if you li=
+ke), and wire it
+> >   to luks and qcow2 driver to implement qmp based encryption slot manag=
+ement also using
+> >   the code from patches 1,2, and also add a bunch of iotests to cover t=
+his.
+> >=20
+> > Tested with -raw,-qcow2 and -luks iotests and 'make check'
+> >=20
+> > V3: rebased, addressed most of the review feedback.
+> > For now I kept the slot bitmap code since I am not sure that replacing =
+it will be better.
+>=20
+> I'm still of the opinion that the bitmaps code should be replaced.
+> With this current design we are iterating over the slot of keys slots
+> 4 times, doing different checks/logic in each iteration. This is really
+> not nice for understanding how the code works. IMHO we should be iteratin=
+g
+> at most twice - once to validate the requested configuration, and once
+> to apply the requested configuration.   Even if there si duplication of
+> logic in between the delete/add key codepaths, I think it will be better
+> as the logic for each operation will be in one place.
+>=20
+>=20
+> Regards,
+> Daniel
 
-readdir_many() is written intended as general purpose directory retrieval 
-function, that is for other purposes in future in mind, yes.
+All right then, I also agree kind of that these iterations aren't
+that nice. I just wanted to do this in the same way the spec defines it,
+which is currently kind of independent of how key add/remove operation.
 
-What I don't do is adding code which is not explicitly needed right now of 
-course. That would not make sense and would make code unnecessarily bloated 
-and of course too complicated (e.g. readdir_many() is currently simply 
-directly calling v9fs_readdir_response_size() to decide whether to terminate 
-the loop instead of taking some complicated general-purpose loop end 
-"predicate" structure or callback as function argument).
-
-But when it comes to the structure of the code that I have to add NOW, then I 
-indeed take potential future changes into account, yes! And this applies 
-specifically to the two changes you requested here inside readdir_many(). 
-Because I already know, I would need to revert those 2 changes that you 
-requested later on. And I don't see any issue whatsover retaining the current 
-version concerning those 2.
+I'll send updated code soon.
 
 Best regards,
-Christian Schoenebeck
-
+=09Maxim Levitsky
 
 
