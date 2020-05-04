@@ -2,88 +2,88 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 552DCC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 08:54:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7596DC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 08:56:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E25120735
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 08:54:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 40E0520735
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 08:56:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bUUNa7n3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E25120735
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NXtZmBGg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40E0520735
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVWs0-0003dN-AR
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 04:54:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43952)
+	id 1jVWtM-00057t-Ea
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 04:56:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44334)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVWr7-0002mr-8z
- for qemu-devel@nongnu.org; Mon, 04 May 2020 04:53:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38601
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVWsj-0004T5-MJ
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 04:55:21 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51500
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVWr5-0005zI-TG
- for qemu-devel@nongnu.org; Mon, 04 May 2020 04:53:40 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVWsj-0007Em-3L
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 04:55:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588582418;
+ s=mimecast20190719; t=1588582519;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=AiV45Drb4vmdOfyZO+CBNsIVr4o8z1r0gqK1jwwJD3A=;
- b=bUUNa7n3A3vdEDkJb8OEWqti7FJjK2G4Pe7qSGSd4wvwRuA5z3BCg7RRlvkZPfx0pJHtvN
- hX8yPYUGTqbXb8ygQJvrBE65Bc+KwODfCKxCj7BCLdOvMV46UhcxNJJyN7iIg2nxWMRKQN
- Du/9vqSeZeDYYLovuI7IGoOipfSDFQ8=
+ bh=h8P3tGI3kiqYUeeflyHBGusrWXC5jLElipyiQHqcMGU=;
+ b=NXtZmBGgrQKnJoSOBCq3tQadFfWUf1UofAQDRiXnT9U4y4a04/QkcAmWLWuFOqqfr13JUR
+ Pdm3WQYcRvs5NjLJwt0egYu07SZFKO8/709eXq9Z0IqK/8t4Ti+Mql+I95zKgWcan9XIST
+ IQ7HmZXppwWJsWUydnGCl0CgAl/OvYw=
 Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
  [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-242-7OEJE8ppPzOjX4GIQxayOg-1; Mon, 04 May 2020 04:53:36 -0400
-X-MC-Unique: 7OEJE8ppPzOjX4GIQxayOg-1
-Received: by mail-wm1-f69.google.com with SMTP id n17so3157503wmi.3
- for <qemu-devel@nongnu.org>; Mon, 04 May 2020 01:53:36 -0700 (PDT)
+ us-mta-384-MsFiFhuSNIiEKmTzCBy0XQ-1; Mon, 04 May 2020 04:55:14 -0400
+X-MC-Unique: MsFiFhuSNIiEKmTzCBy0XQ-1
+Received: by mail-wm1-f69.google.com with SMTP id w2so4531942wmc.3
+ for <qemu-devel@nongnu.org>; Mon, 04 May 2020 01:55:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=ZTIWm+4rGoQj9HloUe/4gXvUmWQl/GhrBvhEeMdtrKA=;
- b=UkcOctZOyawtpnZG6QH/ZjZGEvcM5J88EwARylNw6mY3MBhMooykT+byezJofRQl8a
- jwZn3zxAx/Iv9xNOb6vdUgZe9/ErvhNBAy7HKMWx/l6j3XIKJP9MVXuwjykZeNYe0Woi
- C2NgzYIqqg8vFW0MJJGZOOWOCE4JgtQeAdmBDFeNs9nh93baqf7sgO8pCKI52/+jYZFz
- MA18vPGzy19xjkQktx8JitaUK8CtzPOmFE7YvlQ/0Jt+SZ5byKxs5aKMA5s9RM1OEaiI
- CGGzVrolUOdcHjQ3z8VrcsU6w1Ome9EsXAZeWEbzvJYFqVZGliEhzqoTvzs99jOpt92H
- a5HQ==
-X-Gm-Message-State: AGi0PubgJTMg5S4pczGtVM40vkf79PBmabyaiAAF5mM1658MhupSR4gN
- CdxOd9d9JaYtbhlGVAt7iMjdpfm0FskL6BWqnHcNrrzeMSn/hSYH9uCr6lm4jQcJ257w1xYnivS
- gsdgDt7r3U39wBf0=
-X-Received: by 2002:adf:bb4e:: with SMTP id x14mr17608047wrg.63.1588582415621; 
- Mon, 04 May 2020 01:53:35 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKenlG4d6hygxmXmx0dGjck2qMd6hulX2xnqmb+X6P3xT56biw35tddc683PJorYjQSZoZzHg==
-X-Received: by 2002:adf:bb4e:: with SMTP id x14mr17608029wrg.63.1588582415382; 
- Mon, 04 May 2020 01:53:35 -0700 (PDT)
+ bh=ZlBmAYZeLeMHKY+ebeItpklGAIY7YH9L3NjRuRuI7vM=;
+ b=k01r/tNYIQPBe7lwar0c0KAQkCu4j99dza7xsP/eFBQCQ3NST0fcBIhip1SMsBEcUj
+ +KkpsykcdF+m/o0jQN1R+4kAGQFs0TPzAtv6FAUelBf8dhaHn8cTxIT3YwRvda/ZQqhU
+ m3c70cPH2DKE3DNtFquRUDaqIJ+LeM4mt1J/fHfpanafNBsmW2EmA3NcHdndbgPHg7ld
+ GVWF1Em7JOY7JOPJw3nBEOuP0PW1zqEovH8ebZh2BBgcXF4tmRSggemv1pXWN13gBdHn
+ PUn5xbbGN07PqaeFDcR6vxnul6suoxQubJNL07OSeYC8Jts9mmuZ1WazUY+l2T8ZPL5I
+ Rh1Q==
+X-Gm-Message-State: AGi0PuYBZzmRg2Jnc4WJ8g7JJZcdYR4BslmM/RysXPjDZB8f6+9AN+/6
+ 5jHGIUydO79VqUmxgzc0rG+UwMxTwT/mRsOuT8p6SZjIloXiDBZQ5NgxazRtngef/2mCYkfRhJi
+ 6loC2NUBjha/s9y0=
+X-Received: by 2002:a1c:ba56:: with SMTP id k83mr13124305wmf.1.1588582512839; 
+ Mon, 04 May 2020 01:55:12 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJYqTN90joqgOWn8X8YJQh01c+IieSQAPCFyq/a896rjv7yEFt06EYmm7WyncXUBDbRKS+Jog==
+X-Received: by 2002:a1c:ba56:: with SMTP id k83mr13124290wmf.1.1588582512657; 
+ Mon, 04 May 2020 01:55:12 -0700 (PDT)
 Received: from [192.168.1.39] (26.red-88-21-207.staticip.rima-tde.net.
  [88.21.207.26])
- by smtp.gmail.com with ESMTPSA id y70sm13102943wmc.36.2020.05.04.01.53.34
+ by smtp.gmail.com with ESMTPSA id b191sm13184709wmd.39.2020.05.04.01.55.11
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 04 May 2020 01:53:34 -0700 (PDT)
-Subject: Re: [PATCH] Makefile: Let the 'help' target list the helper targets
+ Mon, 04 May 2020 01:55:12 -0700 (PDT)
+Subject: Re: [PATCH v3 0/9] misc: Trivial static code analyzer fixes
 To: qemu-devel@nongnu.org
-References: <20200423104345.5092-1-philmd@redhat.com>
+References: <20200422133152.16770-1-philmd@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <62f0ddc4-cd26-91e2-e588-20a4b9813e0f@redhat.com>
-Date: Mon, 4 May 2020 10:53:34 +0200
+Message-ID: <59cb7a72-9411-48d7-062d-539b46c3221c@redhat.com>
+Date: Mon, 4 May 2020 10:55:11 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200423104345.5092-1-philmd@redhat.com>
+In-Reply-To: <20200422133152.16770-1-philmd@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -98,7 +98,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,106 +112,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping?
+On 4/22/20 3:31 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Fix trivial warnings reported by the Clang static code analyzer.
+>=20
+> Only patch #2 'blockdev: Remove dead assignment' misses review.
 
-On 4/23/20 12:43 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> List the name of the helper targets when calling 'make help',
-> along with the tool targets:
+Thanks to Max this series is now fully reviewed, so... ping?
+
 >=20
->    $ make help
->    [...]
+> The official Clang static code analyzer documentation is on:
+> https://clang-analyzer.llvm.org/
 >=20
->    Helper targets:
->      fsdev/virtfs-proxy-helper      - Build virtfs-proxy-helper
->      scsi/qemu-pr-helper            - Build qemu-pr-helper
->      qemu-bridge-helper             - Build qemu-bridge-helper
->      vhost-user-gpu                 - Build vhost-user-gpu
->      virtiofsd                      - Build virtiofsd
+> On Fedora I simply used it as:
 >=20
->    Tools targets:
->      qemu-ga                        - Build qemu-ga tool
->      qemu-keymap                    - Build qemu-keymap tool
->      elf2dmp                        - Build elf2dmp tool
->      ivshmem-client                 - Build ivshmem-client tool
->      ivshmem-server                 - Build ivshmem-server tool
->      qemu-nbd                       - Build qemu-nbd tool
->      qemu-storage-daemon            - Build qemu-storage-daemon tool
->      qemu-img                       - Build qemu-img tool
->      qemu-io                        - Build qemu-io tool
->      qemu-edid                      - Build qemu-edid tool
+>    $ sudo dnf install clang-analyzer
+>    $ ../configure
+>    $ scan-build make
 >=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->   configure | 5 +++--
->   Makefile  | 9 +++++++--
->   2 files changed, 10 insertions(+), 4 deletions(-)
+> Since v2:
+> - Based on lvivier/trivial-patches-for-5.1
+> - Removed dup patches from Kuhn Chenqun
+> Since v1:
+> - Addressed Markus/Zoltan/Aleksandar review comments
 >=20
-> diff --git a/configure b/configure
-> index 23b5e93752..caf880c38e 100755
-> --- a/configure
-> +++ b/configure
-> @@ -6374,7 +6374,7 @@ if test "$softmmu" =3D yes ; then
->     if test "$linux" =3D yes; then
->       if test "$virtfs" !=3D no && test "$cap_ng" =3D yes && test "$attr"=
- =3D yes ; then
->         virtfs=3Dyes
-> -      tools=3D"$tools fsdev/virtfs-proxy-helper\$(EXESUF)"
-> +      helpers=3D"$helpers fsdev/virtfs-proxy-helper\$(EXESUF)"
->       else
->         if test "$virtfs" =3D yes; then
->           error_exit "VirtFS requires libcap-ng devel and libattr devel"
-> @@ -6389,7 +6389,7 @@ if test "$softmmu" =3D yes ; then
->         fi
->         mpath=3Dno
->       fi
-> -    tools=3D"$tools scsi/qemu-pr-helper\$(EXESUF)"
-> +    helpers=3D"$helpers scsi/qemu-pr-helper\$(EXESUF)"
->     else
->       if test "$virtfs" =3D yes; then
->         error_exit "VirtFS is supported only on Linux"
-> @@ -7630,6 +7630,7 @@ else
->     QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/\$(ARCH) $QEMU_INCLUDES"
->   fi
->  =20
-> +echo "HELPERS=3D$helpers" >> $config_host_mak
->   echo "TOOLS=3D$tools" >> $config_host_mak
->   echo "ROMS=3D$roms" >> $config_host_mak
->   echo "MAKE=3D$make" >> $config_host_mak
-> diff --git a/Makefile b/Makefile
-> index 8a9113e666..021a0cd491 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -336,9 +336,9 @@ $(call set-vpath, $(SRC_PATH))
->   LIBS+=3D-lz $(LIBS_TOOLS)
->  =20
->   vhost-user-json-y =3D
-> -HELPERS-y =3D
-> +HELPERS-y =3D $(HELPERS)
->  =20
-> -HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) =3D qemu-bridge-h=
-elper$(EXESUF)
-> +HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) +=3D qemu-bridge-=
-helper$(EXESUF)
->  =20
->   ifeq ($(CONFIG_LINUX)$(CONFIG_VIRGL)$(CONFIG_GBM)$(CONFIG_TOOLS),yyyy)
->   HELPERS-y +=3D vhost-user-gpu$(EXESUF)
-> @@ -1255,6 +1255,11 @@ endif
->   =09=09$(foreach t, $(TARGET_DIRS), \
->   =09=09$(call print-help-run,$(t)/all,Build for $(t));) \
->   =09=09echo '')
-> +=09@$(if $(HELPERS-y), \
-> +=09=09echo 'Helper targets:'; \
-> +=09=09$(foreach t, $(HELPERS-y), \
-> +=09=09$(call print-help-run,$(t),Build $(shell basename $(t)));) \
-> +=09=09echo '')
->   =09@$(if $(TOOLS), \
->   =09=09echo 'Tools targets:'; \
->   =09=09$(foreach t, $(TOOLS), \
+> Philippe Mathieu-Daud=C3=A9 (9):
+>    block: Avoid dead assignment
+>    blockdev: Remove dead assignment
+>    hw/i2c/pm_smbus: Remove dead assignment
+>    hw/input/adb-kbd: Remove dead assignment
+>    hw/ide/sii3112: Remove dead assignment
+>    hw/isa/i82378: Remove dead assignment
+>    hw/gpio/aspeed_gpio: Remove dead assignment
+>    hw/timer/stm32f2xx_timer: Remove dead assignment
+>    hw/timer/pxa2xx_timer: Add assertion to silent static analyzer warning
+>=20
+>   block.c                    | 2 +-
+>   blockdev.c                 | 2 +-
+>   hw/gpio/aspeed_gpio.c      | 2 +-
+>   hw/i2c/pm_smbus.c          | 1 -
+>   hw/ide/sii3112.c           | 5 +++--
+>   hw/input/adb-kbd.c         | 6 +-----
+>   hw/isa/i82378.c            | 8 ++++----
+>   hw/timer/pxa2xx_timer.c    | 1 +
+>   hw/timer/stm32f2xx_timer.c | 1 -
+>   9 files changed, 12 insertions(+), 16 deletions(-)
 >=20
 
 
