@@ -2,85 +2,84 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0202BC47254
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:37:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49A0AC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:37:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB528206B9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:37:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A688206B9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:37:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fpH4/8wr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB528206B9
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YMzU5nyV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A688206B9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVaLw-0000GZ-TN
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 08:37:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56476)
+	id 1jVaM0-0000MH-Mb
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 08:37:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jVaHr-0000Dm-C3
- for qemu-devel@nongnu.org; Mon, 04 May 2020 08:33:31 -0400
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:37748)
+ id 1jVaHs-0000GV-Fd
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 08:33:32 -0400
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:46000)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jVaHq-0000uc-AJ
- for qemu-devel@nongnu.org; Mon, 04 May 2020 08:33:31 -0400
-Received: by mail-wm1-x32c.google.com with SMTP id z6so8835694wml.2
- for <qemu-devel@nongnu.org>; Mon, 04 May 2020 05:33:28 -0700 (PDT)
+ id 1jVaHr-0000wR-A4
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 08:33:32 -0400
+Received: by mail-wr1-x42f.google.com with SMTP id k1so1831448wro.12
+ for <qemu-devel@nongnu.org>; Mon, 04 May 2020 05:33:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=lnazISB2ygbNrgd87WVV5yJxpAw+zHWve8ESC0KSKAo=;
- b=fpH4/8wrT2HxZ8OE1UECJttT28a8aPIoBb+PUUTZLCvhQxM0DFEa4DdEiX12aX8AHu
- sEQv0VqLAvQnwxVKjygNJpJeYAu+gqcSGhtNkC4OxY257FMTieLpowDdC8t/YKfBJ0kU
- 6kvK7l2k2M+LrLT9t2q4+69xAucbZLeWKAKolk4zKs6Qv0MKqv8QIwd7D9kfmh2KZxAo
- JUDDihNK8wul5TQK/EPr53gu1TUgTS+j3K4bajERaw/OHIrXJ8QYkIFZY9/3tKYphEKF
- fWnq9gyPZeAIE7GZxrNA6U+H4/yGlXdxeJ4pZTRyXsgIMhMWyQLCdgCdNScPQz58BDgn
- svpQ==
+ bh=CGmRWhipF2RqadKcryx2/fZJUAv/8mJO7ibJMjfeHzI=;
+ b=YMzU5nyVt8LUwmb9y9u84vPNjLLR9lxe0fmi7YW+NfdUMXkjPPSrXRNYHQc+eKBlnA
+ 5jflxMMmsQadH7G4d4i1SckC4lIecZXh0shYcRypVnuulnLBzukDwyNof+sSEW1zmmaD
+ 3QCYXZqxre7lKgLUzxbyOCaepyTV20jY15iesZsJl4MSyk6+eS/BVazMx/c5pRR6kJnF
+ PfS/w3ISDE4HK2OZME9cT5WJCc8mAPBM+i+BRsmKOgBFxlZe8hEblo4/d+QWiDZ+Rnn0
+ ywmPA2qdrzQgddKN2OWinc+HruwKehWUiTDqU9tNKGaRXxfT+6TBrGyZxs8/pVlOr/kp
+ vsoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=lnazISB2ygbNrgd87WVV5yJxpAw+zHWve8ESC0KSKAo=;
- b=kP3XBUECOVFZuvWDEudGj0d7VhiyAdrGg9QCBmUr4ZBFofE/keHbcN066rNQMZvrB+
- v0H0mfQvrZxHFjw7Za4ZzOrkofKmX39Z+thN/fXa090y+f4JmTBfII5UdhS8yeBGs1oO
- g1d2J7BE5wuqpnrBSkbdMEpqVJqbzQ98Ccu8v7fHSHcaTMOKN1eDrSeK9tOfqK8eGlnT
- pmOw9vo3HlYGTC2bwMqgMAb69xE6zS9D4UYJ24LUG6KS4QgzXH4o5Ck+aS+qxdJ/7Co6
- 6OmaLOidigituugIu8IflYvLLDjVyuWf2F5w2z8n7YIxdy2xts9cjfOnuApmIGVWVTjc
- SmCA==
-X-Gm-Message-State: AGi0PuYYYIMR22GrWlb+a7DDs9mMWtAZK/foPaJGPOq75D6COqcMiqMl
- uysmwfMljaV5R1wFX+327NumuKbAp1m8LQ==
-X-Google-Smtp-Source: APiQypJlUj0hYCrDgyBaOJFJvYch1Gqd8Whu6HVhsB0hY3WNz5OGbW3Y8yr/faiYrpN7nkacprSZBw==
-X-Received: by 2002:a05:600c:2316:: with SMTP id
- 22mr14033755wmo.164.1588595607587; 
- Mon, 04 May 2020 05:33:27 -0700 (PDT)
+ bh=CGmRWhipF2RqadKcryx2/fZJUAv/8mJO7ibJMjfeHzI=;
+ b=QCyXnNMMymm4hxS2MMgahm0WLmsBFx9U0sP+rsw9p5WhTTjBAt/O46C+GPuOagmwal
+ qWeobfNYJlsjZfj6JEvTgjqY7wdvafJ+9Kfe8COFuxqIwDFJ1veFeyB0MBHgTn7qzQpx
+ PZhc2HOKZT0TTx9RXk5hztsJAsh218wXMTIj6hYZHIQo0cnJCNsbhGGCCLbc0Fd/4BdL
+ g2pJXuSHsn4xGKC5Dn4q/WnDPbeTr+EsQ1ueJ6Vnt7pAPw1d+UJEVyuK6++FJJLxIfta
+ BtrDFXFlxgpP/cC4pRGLDHHh4L5qnM9jf7mPTrYTJmcvoZseHlL4YNdlbwFSJNZwxMdB
+ WsCQ==
+X-Gm-Message-State: AGi0PubWDPUQhaavs8yv6Xca5/TTcbfHmaLAaYoriUFEAMqwkVyThxKV
+ ra0mQ+NbOFoG5nBT99ltxb5W+Fal75y1lw==
+X-Google-Smtp-Source: APiQypI4eeqft5vB5M8x7+Y43uTZ2NeQTWTrjW+ElKOssa4dylKMHl9mVPhgQn49ew6cr4Y1V3SKpQ==
+X-Received: by 2002:a5d:4e06:: with SMTP id p6mr18577775wrt.35.1588595609652; 
+ Mon, 04 May 2020 05:33:29 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id q4sm12253608wrx.9.2020.05.04.05.33.26
+ by smtp.gmail.com with ESMTPSA id q4sm12253608wrx.9.2020.05.04.05.33.28
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 May 2020 05:33:27 -0700 (PDT)
+ Mon, 04 May 2020 05:33:29 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/39] hw/arm: versal: Embed the ADMAs into the SoC type
-Date: Mon,  4 May 2020 13:32:44 +0100
-Message-Id: <20200504123309.3808-15-peter.maydell@linaro.org>
+Subject: [PULL 16/39] hw/arm: versal: Add support for SD
+Date: Mon,  4 May 2020 13:32:46 +0100
+Message-Id: <20200504123309.3808-17-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200504123309.3808-1-peter.maydell@linaro.org>
 References: <20200504123309.3808-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32c.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42f;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42f.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -108,71 +107,119 @@ Sender: "Qemu-devel"
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Embed the ADMAs into the SoC type.
+Add support for SD.
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Luc Michel <luc.michel@greensocs.com>
-Message-id: 20200427181649.26851-7-edgar.iglesias@gmail.com
+Message-id: 20200427181649.26851-9-edgar.iglesias@gmail.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/xlnx-versal.h |  3 ++-
- hw/arm/xlnx-versal.c         | 14 +++++++-------
- 2 files changed, 9 insertions(+), 8 deletions(-)
+ include/hw/arm/xlnx-versal.h | 12 ++++++++++++
+ hw/arm/xlnx-versal.c         | 31 +++++++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+)
 
 diff --git a/include/hw/arm/xlnx-versal.h b/include/hw/arm/xlnx-versal.h
-index 01da736a5b2..94b7826fd49 100644
+index 426b66449de..e11693e29d3 100644
 --- a/include/hw/arm/xlnx-versal.h
 +++ b/include/hw/arm/xlnx-versal.h
-@@ -16,6 +16,7 @@
+@@ -14,6 +14,7 @@
+ 
+ #include "hw/sysbus.h"
  #include "hw/arm/boot.h"
++#include "hw/sd/sdhci.h"
  #include "hw/intc/arm_gicv3.h"
  #include "hw/char/pl011.h"
-+#include "hw/dma/xlnx-zdma.h"
- #include "hw/net/cadence_gem.h"
+ #include "hw/dma/xlnx-zdma.h"
+@@ -26,6 +27,7 @@
+ #define XLNX_VERSAL_NR_UARTS   2
+ #define XLNX_VERSAL_NR_GEMS    2
+ #define XLNX_VERSAL_NR_ADMAS   8
++#define XLNX_VERSAL_NR_SDS     2
+ #define XLNX_VERSAL_NR_IRQS    192
  
- #define TYPE_XLNX_VERSAL "xlnx-versal"
-@@ -53,7 +54,7 @@ typedef struct Versal {
-         struct {
-             PL011State uart[XLNX_VERSAL_NR_UARTS];
-             CadenceGEMState gem[XLNX_VERSAL_NR_GEMS];
--            SysBusDevice *adma[XLNX_VERSAL_NR_ADMAS];
-+            XlnxZDMA adma[XLNX_VERSAL_NR_ADMAS];
+ typedef struct Versal {
+@@ -58,6 +60,13 @@ typedef struct Versal {
          } iou;
      } lpd;
  
++    /* The Platform Management Controller subsystem.  */
++    struct {
++        struct {
++            SDHCIState sd[XLNX_VERSAL_NR_SDS];
++        } iou;
++    } pmc;
++
+     struct {
+         MemoryRegion *mr_ddr;
+         uint32_t psci_conduit;
+@@ -80,6 +89,7 @@ typedef struct Versal {
+ #define VERSAL_GEM1_IRQ_0          58
+ #define VERSAL_GEM1_WAKE_IRQ_0     59
+ #define VERSAL_ADMA_IRQ_0          60
++#define VERSAL_SD0_IRQ_0           126
+ 
+ /* Architecturally reserved IRQs suitable for virtualization.  */
+ #define VERSAL_RSVD_IRQ_FIRST 111
+@@ -129,6 +139,8 @@ typedef struct Versal {
+ #define MM_FPD_CRF                  0xfd1a0000U
+ #define MM_FPD_CRF_SIZE             0x140000
+ 
++#define MM_PMC_SD0                  0xf1040000U
++#define MM_PMC_SD0_SIZE             0x10000
+ #define MM_PMC_CRP                  0xf1260000U
+ #define MM_PMC_CRP_SIZE             0x10000
+ #endif
 diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
-index e424aa789e3..ebd2dc51beb 100644
+index c8a296e2e05..e263bdf77a9 100644
 --- a/hw/arm/xlnx-versal.c
 +++ b/hw/arm/xlnx-versal.c
-@@ -203,18 +203,18 @@ static void versal_create_admas(Versal *s, qemu_irq *pic)
-         DeviceState *dev;
-         MemoryRegion *mr;
- 
--        dev = qdev_create(NULL, "xlnx.zdma");
--        s->lpd.iou.adma[i] = SYS_BUS_DEVICE(dev);
--        object_property_set_int(OBJECT(s->lpd.iou.adma[i]), 128, "bus-width",
--                                &error_abort);
--        object_property_add_child(OBJECT(s), name, OBJECT(dev), &error_fatal);
-+        sysbus_init_child_obj(OBJECT(s), name,
-+                              &s->lpd.iou.adma[i], sizeof(s->lpd.iou.adma[i]),
-+                              TYPE_XLNX_ZDMA);
-+        dev = DEVICE(&s->lpd.iou.adma[i]);
-+        object_property_set_int(OBJECT(dev), 128, "bus-width", &error_abort);
-         qdev_init_nofail(dev);
- 
--        mr = sysbus_mmio_get_region(s->lpd.iou.adma[i], 0);
-+        mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
-         memory_region_add_subregion(&s->mr_ps,
-                                     MM_ADMA_CH0 + i * MM_ADMA_CH0_SIZE, mr);
- 
--        sysbus_connect_irq(s->lpd.iou.adma[i], 0, pic[VERSAL_ADMA_IRQ_0 + i]);
-+        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[VERSAL_ADMA_IRQ_0 + i]);
-         g_free(name);
+@@ -210,6 +210,36 @@ static void versal_create_admas(Versal *s, qemu_irq *pic)
      }
  }
+ 
++#define SDHCI_CAPABILITIES  0x280737ec6481 /* Same as on ZynqMP.  */
++static void versal_create_sds(Versal *s, qemu_irq *pic)
++{
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(s->pmc.iou.sd); i++) {
++        DeviceState *dev;
++        MemoryRegion *mr;
++
++        sysbus_init_child_obj(OBJECT(s), "sd[*]",
++                              &s->pmc.iou.sd[i], sizeof(s->pmc.iou.sd[i]),
++                              TYPE_SYSBUS_SDHCI);
++        dev = DEVICE(&s->pmc.iou.sd[i]);
++
++        object_property_set_uint(OBJECT(dev),
++                                 3, "sd-spec-version", &error_fatal);
++        object_property_set_uint(OBJECT(dev), SDHCI_CAPABILITIES, "capareg",
++                                 &error_fatal);
++        object_property_set_uint(OBJECT(dev), UHS_I, "uhs", &error_fatal);
++        qdev_init_nofail(dev);
++
++        mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
++        memory_region_add_subregion(&s->mr_ps,
++                                    MM_PMC_SD0 + i * MM_PMC_SD0_SIZE, mr);
++
++        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0,
++                           pic[VERSAL_SD0_IRQ_0 + i * 2]);
++    }
++}
++
+ /* This takes the board allocated linear DDR memory and creates aliases
+  * for each split DDR range/aperture on the Versal address map.
+  */
+@@ -292,6 +322,7 @@ static void versal_realize(DeviceState *dev, Error **errp)
+     versal_create_uarts(s, pic);
+     versal_create_gems(s, pic);
+     versal_create_admas(s, pic);
++    versal_create_sds(s, pic);
+     versal_map_ddr(s);
+     versal_unimp(s);
+ 
 -- 
 2.20.1
 
