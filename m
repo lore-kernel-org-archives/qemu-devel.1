@@ -7,81 +7,79 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D432C47247
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:34:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09542C47247
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:34:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BEAE206B9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:34:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CC4382073E
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 12:34:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bqq0lQ1m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BEAE206B9
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lSIh2YkE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC4382073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVaIY-0001Xz-4u
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 08:34:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56376)
+	id 1jVaIa-0001gA-Uh
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 08:34:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56406)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jVaHd-0008Fb-PI
- for qemu-devel@nongnu.org; Mon, 04 May 2020 08:33:17 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:45997)
+ id 1jVaHi-0008Ih-DU
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 08:33:22 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35045)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jVaHc-0000j9-Uh
- for qemu-devel@nongnu.org; Mon, 04 May 2020 08:33:17 -0400
-Received: by mail-wr1-x430.google.com with SMTP id k1so1830269wro.12
- for <qemu-devel@nongnu.org>; Mon, 04 May 2020 05:33:16 -0700 (PDT)
+ id 1jVaHh-0000nc-JS
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 08:33:22 -0400
+Received: by mail-wm1-x344.google.com with SMTP id r26so8850494wmh.0
+ for <qemu-devel@nongnu.org>; Mon, 04 May 2020 05:33:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=xmwQJ59ebHjR9ouwlTnSfL4Ky/fRkTGEraev7ufNxkA=;
- b=bqq0lQ1mpxvsAss8rbAXbX8FeEcQpXvVe3PMKyD2nWCO4AJtCOgTUv/wSDbCkrXf9w
- QbkkxcdIpHt8uPHYvl3clIBMdRHi94tODCvqMD2/A1Szi1MJXjsls7Px4W7LkESp13Wt
- WSZdB1iOxKns0tAzo3P3H2VELiL2AVGmUc3PF82eggJM5Iv2cOSZ4AwSPmrQi6nHUvy8
- AofDml1U10p7BPwOP4zgkJC73RjNXHNKwGD49TzPO/QyWCN/i/8/TMmS/MKo6PS7iHFR
- Ws9ZBQFCeyOJtwk8qXZRZEy/iZTN4Kb6CRLVtpwBC4jviEWQF2yCV1t3rP3ySZ4V8j+f
- c4BQ==
+ bh=SAclrjD7SOitws2kvsSrHFg+/NkOvMynkRjg1fJ44t4=;
+ b=lSIh2YkES7Tjad8wSCzD08Wh3D7ZSQDHUGEn/0/YgmteKbFhzy5cjBvWlHpSRJtxLG
+ 3c5pKnohdxKIKeDFmyIHL6cvYKazUOAOQ7QqmIrqygxRCBm/O32TpRYP4E0UD+glgg0K
+ 0WMUjle+C/FEHPRu+nUXS22PVOc3qGeb8jh4YgPDPcxk7MZIxa3g5nzRZhmql461ckOc
+ EdOW1r43L38UrtK017CHHgx01orYKdo2GH2riaffdcKmfpMZRq2p5CSqCB6Q8tuIh2C4
+ Pj9Um+2jxMTdEg75jvS2FueOcSylmfrstgty6lHiWsDaZjt/4SubjOQCLomES42EHdZH
+ Asqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=xmwQJ59ebHjR9ouwlTnSfL4Ky/fRkTGEraev7ufNxkA=;
- b=sC8i7JHrCRCT2VK/8OVWcPSrAktHQ4kflnf/Eg9O0aYQRA2PdnSFVD4OzpOuXKP4VK
- /NSowIbXQ2IfH1IN89UAE9aX5hB+84EBLOOyZff7PJPzIw5dN5k5uO6AWuvuZ/IR0a55
- vH+nmzB5o3OJw9MuMjCvK/4FSj9BZz+jbzgijC38N9vvg7Wx9gcb9cXagXbRzitlxxKW
- zxt63y8D04a3H5HsKUi+0ZSiiDahNwEoJmkCZxwdocalHsLgRT24FmmnBhdWHoJ5kvY0
- WkjD26iHG0ihwbweyQJRropSfyA86sp1J+aw+C8McrmT5Yq5vqLtdg3ezGEykXjWtklQ
- nl7Q==
-X-Gm-Message-State: AGi0PuYo/nkcbCV9ZAtwH2XnQHzXibJyb4DH6ibVk3UJcni/XZcTmi45
- zwpzDWxp3EpsbSTC1vG2SqkMQtrT6FIJKQ==
-X-Google-Smtp-Source: APiQypJXLgCp8D34gCB1ADz+2Pz+OnKYSOb3Y27CEEQR36qEs+CfGyUUHJc3coMteXhQBUtCWZL7yg==
-X-Received: by 2002:a05:6000:1146:: with SMTP id
- d6mr7078593wrx.289.1588595594518; 
- Mon, 04 May 2020 05:33:14 -0700 (PDT)
+ bh=SAclrjD7SOitws2kvsSrHFg+/NkOvMynkRjg1fJ44t4=;
+ b=azSPikVshbK4b4Cdp2lsYrzMO+JhhFG4RuFM2EtXK3nGD1EicY93CnxyNQc5WKpR5y
+ WpOAQ52CPYyE9fN3bjLWo63mRQKMBN02wssSt18enFbi5d9hFilYSXwm/Z+yaDwNLyEb
+ SQz3K1Pai0VB1iAcWUFQgadR5kJLtIpnnv4HbYBLL7QWjD5gBJW1DI9KkP6FsLUM/ix3
+ VNS9RXp1G5B+o4kEWRidNApHcvZy/kYJmBW8nd6HhkpJorMhfsgBoEZ7KQ0RKPaX89bC
+ KaBIsHbK86nwOLc0Ffs8mmErZwC6ZToFTHc2oi5QQYzJxpHwaWqXVYuS62uae14qCwUs
+ YLlg==
+X-Gm-Message-State: AGi0PuaBbBw3QoyHUUiHsf8Y3boohxSU6aBFuKCwGD5uesVGMP15Y+C0
+ zoshhaDuRX4sOIQZkdh9dSV3RM19BADeTw==
+X-Google-Smtp-Source: APiQypLQSx/m6ioaRhNNweRjciS+tS4cf1Y/PJzmyUqZ8C2FskcRHmJJalAKIVPb8mwYJ2fgkmMxHQ==
+X-Received: by 2002:a1c:9a16:: with SMTP id c22mr13926654wme.38.1588595596534; 
+ Mon, 04 May 2020 05:33:16 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id q4sm12253608wrx.9.2020.05.04.05.33.13
+ by smtp.gmail.com with ESMTPSA id q4sm12253608wrx.9.2020.05.04.05.33.15
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 May 2020 05:33:13 -0700 (PDT)
+ Mon, 04 May 2020 05:33:16 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/39] hw/arm/mps2-tz: Use TYPE_IOTKIT instead of hardcoded
- string
-Date: Mon,  4 May 2020 13:32:32 +0100
-Message-Id: <20200504123309.3808-3-peter.maydell@linaro.org>
+Subject: [PULL 04/39] target/arm: Use enum constant in get_phys_addr_lpae()
+ call
+Date: Mon,  4 May 2020 13:32:34 +0100
+Message-Id: <20200504123309.3808-5-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200504123309.3808-1-peter.maydell@linaro.org>
 References: <20200504123309.3808-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::430;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x430.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,33 +105,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+The access_type argument to get_phys_addr_lpae() is an MMUAccessType;
+use the enum constant MMU_DATA_LOAD rather than a literal 0 when we
+call it in S1_ptw_translate().
 
-By using the TYPE_* definitions for devices, we can:
- - quickly find where devices are used with 'git-grep'
- - easily rename a device (one-line change).
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20200428154650.21991-1-f4bug@amsat.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200330210400.11724-3-peter.maydell@linaro.org
 ---
- hw/arm/mps2-tz.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/arm/helper.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
-index a8dea7dde1c..2c43041564c 100644
---- a/hw/arm/mps2-tz.c
-+++ b/hw/arm/mps2-tz.c
-@@ -395,7 +395,7 @@ static void mps2tz_common_init(MachineState *machine)
-         exit(EXIT_FAILURE);
-     }
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index f785e012cde..f17841ec24e 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -10052,8 +10052,9 @@ static hwaddr S1_ptw_translate(CPUARMState *env, ARMMMUIdx mmu_idx,
+             pcacheattrs = &cacheattrs;
+         }
  
--    sysbus_init_child_obj(OBJECT(machine), "iotkit", &mms->iotkit,
-+    sysbus_init_child_obj(OBJECT(machine), TYPE_IOTKIT, &mms->iotkit,
-                           sizeof(mms->iotkit), mmc->armsse_type);
-     iotkitdev = DEVICE(&mms->iotkit);
-     object_property_set_link(OBJECT(&mms->iotkit), OBJECT(system_memory),
+-        ret = get_phys_addr_lpae(env, addr, 0, ARMMMUIdx_Stage2, &s2pa,
+-                                 &txattrs, &s2prot, &s2size, fi, pcacheattrs);
++        ret = get_phys_addr_lpae(env, addr, MMU_DATA_LOAD, ARMMMUIdx_Stage2,
++                                 &s2pa, &txattrs, &s2prot, &s2size, fi,
++                                 pcacheattrs);
+         if (ret) {
+             assert(fi->type != ARMFault_None);
+             fi->s2addr = addr;
 -- 
 2.20.1
 
