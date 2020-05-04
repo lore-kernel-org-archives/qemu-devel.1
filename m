@@ -2,92 +2,85 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD7FCC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 19:31:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB9BC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 19:36:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9748220705
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 19:31:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D98B20705
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 19:36:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nOdI6x7S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9748220705
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SMGTjNo9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D98B20705
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVgo3-0006vf-Mf
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 15:31:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47126)
+	id 1jVgtI-0000jr-My
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 15:36:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47926)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1jVgn8-0006AD-Co; Mon, 04 May 2020 15:30:14 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:39875)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jVgsi-0000CR-GC
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 15:36:00 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:40957)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1jVgn7-0000wm-Fm; Mon, 04 May 2020 15:30:14 -0400
-Received: by mail-pf1-x441.google.com with SMTP id 18so6037203pfx.6;
- Mon, 04 May 2020 12:30:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=4MNjzkbAJCWvqiKh2DZRO4y4MY5dOBDH4eK8eltsp9I=;
- b=nOdI6x7SUBh+voS9Yx6N1ersUOM/JIk2sokBKxfVTzONvTGZy2TJ7ZexT7K2giesrn
- 3uA7ikOF1X2HFEg2W3txDmz3WQcfJddj4wWI+5N260vZN3KzlNZGjPQL4phy61ANzfQn
- DI7scojw2UlNZdtNA77haBkJEtyHS3qwwpC52LAIP32PAEbIT4HioZv7awQuI02d9ycN
- xf1We5eQvFUzX/3aEVKd9PzrXnwb6IhB0l15p/CEULKdMGUFmUXEHJJHZnEbJmfGNrKB
- kFFahM/fQ71h7fGA53f94/wrSIYUVHobFY3Db42JERLJneoOsxwRSQKuk7yxGr2hTYbY
- QoFQ==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jVgsg-0004HF-4d
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 15:35:59 -0400
+Received: by mail-ot1-x341.google.com with SMTP id i27so9960770ota.7
+ for <qemu-devel@nongnu.org>; Mon, 04 May 2020 12:35:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=0UORFelBMexE2azhcMjpjSrXLvcgyC1tcAG30ql6g2Q=;
+ b=SMGTjNo9mbJgMnWYrATtkk9afCrRkpM85WxsbvECPY9+DBsg9EUYF/Bx0MeYtdecNC
+ mBTqRJ25mxjjs1GZfpguSSok73LKtfSeSe98zTrcNHuu4YEdKV4iuqxtlgDJhk4HW0bN
+ PyTxMNxRKhRzxDpCsNC2pE+7wBinOc3s8KypaIllo8rVShdKqoyOtPZLc5WeUhmdcymv
+ sgaaJgNrFrADader6nha6jD3BiZCCPshrPfah6GI3XJnRseP0kgvqakgEBpciAbr9dvK
+ fuTS1gGPyhQicu2xtngUnO8NnrZRVS3a6zOtvVvjsMhYfy8QE+ZWgBHpD1a7UodQ7T3G
+ cKkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=4MNjzkbAJCWvqiKh2DZRO4y4MY5dOBDH4eK8eltsp9I=;
- b=IUyb4VQN2aNCESXH9CIo/rUMJ7ukUFY4w5J7BIpMOpyl9bI75+4GI1PcMbix7ElSWH
- D/spGMW+CGMzMMN8KwXV8ihxH0ZQYiZIkAx4F6XDFzT/MK4lK8HdSzGBMIgfY8isbTSX
- BOmj0WoQqyFZCj9G4xn7G1elw5xtqhIlobIQmrVI9jQnsVKYF0MdPBfo32p9eWIFjHrE
- 0mzWTloe/gTCV4rsM/gFu6L3+2tQffr1jAzvnDEwhgT5mU/jvNmNJsn7610PjW3l/3A6
- yCLnRSTeNG9UPpqSJzV+JGC2omRczM+a1W0MxKngluT7XeGniVeCb3am3PVTWkPy6r/a
- +I9A==
-X-Gm-Message-State: AGi0PuaatVNbJIj27Zuzd9ZRYAyAM+3hznpRVxYX5VLfLVRZiXND7YzO
- W8lCVMHS6LrNKS1f3nf3QdYa8jiCnlpGdQ==
-X-Google-Smtp-Source: APiQypKqmOjPNfsRcHkH0xiaq+6BL67uZ6FlcgZipnLT27eNdqU9hZqenaDDPu/bARrpQ/mpBXI5fg==
-X-Received: by 2002:a63:f30a:: with SMTP id l10mr499003pgh.372.1588620610121; 
- Mon, 04 May 2020 12:30:10 -0700 (PDT)
-Received: from localhost.localdomain ([117.62.175.86])
- by smtp.googlemail.com with ESMTPSA id y78sm9527842pfb.127.2020.05.04.12.30.07
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 04 May 2020 12:30:09 -0700 (PDT)
-From: luoyonggang@gmail.com
-To: qemu-devel@nongnu.org
-Subject: [PATCH] ppc: Use hard-float in ppc fp_hlper as early as possible.
- This would increase the performance better than enable hard-float it in
- soft-float.c;
- Just using fadd fsub fmul fdiv as a simple bench demo. With this patch,
- performance are increased 2x. and 1.3x than the one enable hard-float in
- soft-float.c Both version are not considerate inexact fp exception yet.
-Date: Tue,  5 May 2020 03:29:54 +0800
-Message-Id: <20200504192954.1387-1-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.23.0.windows.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=0UORFelBMexE2azhcMjpjSrXLvcgyC1tcAG30ql6g2Q=;
+ b=SnVQ15JflQLbqdYph3hbQJYCg+SEqx+KR20nisCrnlyR590S/QB50E3h/nHVNN9pt5
+ rfJM4K7eva9/KmvcoiqM+A8xXWYiHn5J6zyLKBdcBEMJ1nqCZa4J7On5uLt4aniJLpof
+ tODvg8zd1G0GuDe/3mf2gYmTJWvPk22lSc/3kD4dbGUD1Ga2tTZmJ3/cLV8iiuAT3ouJ
+ 1NXtGuosoEgSLBW2VwEEAY24L2XN0w3mc94/kKjjbXYF7AlTaqicq6AZuwGdAG2Tef7N
+ O4VmysJuV9gRNn/5PAUnkP9a4hlBarx7a4xPTmio0nLEuSEy9t5wqHA22s2zib4IPVzl
+ 6DnQ==
+X-Gm-Message-State: AGi0Pua3OZkSaRTy0AGvmufKqX2gYCVARqIyaaxZJqQ10x3x+omOVuQq
+ FcNlFl8LRKsB7kZzsZ8SFIGtz4+0wqydUGWhqWDvdg==
+X-Google-Smtp-Source: APiQypKYp6iNboB3iKBWPRT7yZYyedfhmQ1F0aNvNYQJHP8B3PFyWSxRyJEZ9lbL7Lcdc/zJurUOjyPJUy1533q973o=
+X-Received: by 2002:a9d:2c08:: with SMTP id f8mr15832220otb.135.1588620956526; 
+ Mon, 04 May 2020 12:35:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
- envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x441.google.com
+References: <20200504142814.157589-1-mst@redhat.com>
+In-Reply-To: <20200504142814.157589-1-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 4 May 2020 20:35:45 +0100
+Message-ID: <CAFEAcA8VTz1P9kd2BD6H546umduqnMdXC8G35LSyjzshxWb2Gg@mail.gmail.com>
+Subject: Re: [PULL 00/29] virtio,acpi,pci,pc: backlog from pre-5.0
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,99 +93,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, Yonggang Luo <luoyonggang@gmail.com>,
- qemu-ppc@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yonggang Luo <luoyonggang@gmail.com>
+On Mon, 4 May 2020 at 15:29, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> The following changes since commit 9af638cc1f665712522608c5d6b8c03d8fa67666:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200504' into staging (2020-05-04 13:37:17 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to d8a05995bd64117bf5219d3ba7956277e608e3ca:
+>
+>   hw/i386: Make vmmouse helpers static (2020-05-04 10:25:03 -0400)
+>
+> ----------------------------------------------------------------
+> virtio,acpi,pci,pc: backlog from pre-5.0
+>
+> Mostly fixes, cleanups, but also new features for arm/virt and pc acpi.
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
 
-Just post as an idea to improve PPC fp performance.
-With this idea, we have no need to adjust the helper orders.
 
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
----
- target/ppc/fpu_helper.c | 44 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+Applied, thanks.
 
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index 2bd49a2cdf..79051e4540 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -926,6 +926,17 @@ static void float_invalid_op_addsub(CPUPPCState *env, bool set_fpcc,
- /* fadd - fadd. */
- float64 helper_fadd(CPUPPCState *env, float64 arg1, float64 arg2)
- {
-+    CPU_DoubleU u1, u2;
-+
-+    u1.d = arg1;
-+    u2.d = arg2;
-+    CPU_DoubleU retDouble;
-+    retDouble.nd = u1.nd + u2.nd;
-+    if (likely(float64_is_zero_or_normal(retDouble.d)))
-+    {
-+        /* TODO: Handling inexact */
-+        return retDouble.d;
-+    }
-     float64 ret = float64_add(arg1, arg2, &env->fp_status);
-     int status = get_float_exception_flags(&env->fp_status);
- 
-@@ -941,6 +952,17 @@ float64 helper_fadd(CPUPPCState *env, float64 arg1, float64 arg2)
- /* fsub - fsub. */
- float64 helper_fsub(CPUPPCState *env, float64 arg1, float64 arg2)
- {
-+    CPU_DoubleU u1, u2;
-+
-+    u1.d = arg1;
-+    u2.d = arg2;
-+    CPU_DoubleU retDouble;
-+    retDouble.nd = u1.nd - u2.nd;
-+    if (likely(float64_is_zero_or_normal(retDouble.d)))
-+    {
-+        /* TODO: Handling inexact */
-+        return retDouble.d;
-+    }
-     float64 ret = float64_sub(arg1, arg2, &env->fp_status);
-     int status = get_float_exception_flags(&env->fp_status);
- 
-@@ -967,6 +989,17 @@ static void float_invalid_op_mul(CPUPPCState *env, bool set_fprc,
- /* fmul - fmul. */
- float64 helper_fmul(CPUPPCState *env, float64 arg1, float64 arg2)
- {
-+    CPU_DoubleU u1, u2;
-+
-+    u1.d = arg1;
-+    u2.d = arg2;
-+    CPU_DoubleU retDouble;
-+    retDouble.nd = u1.nd * u2.nd;
-+    if (likely(float64_is_zero_or_normal(retDouble.d)))
-+    {
-+        /* TODO: Handling inexact */
-+        return retDouble.d;
-+    }
-     float64 ret = float64_mul(arg1, arg2, &env->fp_status);
-     int status = get_float_exception_flags(&env->fp_status);
- 
-@@ -997,6 +1030,17 @@ static void float_invalid_op_div(CPUPPCState *env, bool set_fprc,
- /* fdiv - fdiv. */
- float64 helper_fdiv(CPUPPCState *env, float64 arg1, float64 arg2)
- {
-+    CPU_DoubleU u1, u2;
-+
-+    u1.d = arg1;
-+    u2.d = arg2;
-+    CPU_DoubleU retDouble;
-+    retDouble.nd = u1.nd / u2.nd;
-+    if (likely(float64_is_zero_or_normal(retDouble.d)))
-+    {
-+        /* TODO: Handling inexact */
-+        return retDouble.d;
-+    }
-     float64 ret = float64_div(arg1, arg2, &env->fp_status);
-     int status = get_float_exception_flags(&env->fp_status);
- 
--- 
-2.23.0.windows.1
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
+for any user-visible changes.
 
+-- PMM
 
