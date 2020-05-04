@@ -2,92 +2,95 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 234D7C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:42:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4D3AC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:44:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E277A20721
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:42:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E4DB2071C
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:44:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MbLdek4h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E277A20721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="WCrzG1z9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E4DB2071C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVYYW-0007SK-3j
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 06:42:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42800)
+	id 1jVYaO-0008EG-Bc
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 06:44:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41314)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jVYXF-0006A9-87
- for qemu-devel@nongnu.org; Mon, 04 May 2020 06:41:17 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36847)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1jVYXE-0004xX-8Z
- for qemu-devel@nongnu.org; Mon, 04 May 2020 06:41:16 -0400
-Received: by mail-wr1-x444.google.com with SMTP id d15so20321363wrx.3
- for <qemu-devel@nongnu.org>; Mon, 04 May 2020 03:41:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=NGnT3NUWy8fgy8AhJnTXjj15j5ReSdGSgxmfl07V1HU=;
- b=MbLdek4hen9MfBxFeiwzgXeF7cvEJBHBS9csHaM3ffiCYmAHiFzX6AbjSJR+ZvTEBp
- uKTmJzZoN2oNl/zKxjBZnEvdQGfpM8IgBL11h5mfL3gKB10EqSotcerzbl3tsf5ObL5k
- CYtGMQqGTgObXV/ALWynKrgSgZD8nZdJPF0gO72c6rbKpqMYb4PQq+P43KAXeY2Rsggw
- bYjvxJsBquLcFaLBlfIBjjkwHHO9MNJHBc8zIeRWd1tFOO1AIualkrelkREna8Guom9J
- Q+ppKRbWG2X/KpMSKd+bH3WcyJbbKPNp3dQ3/L+OfllMQzFqGwCLruyoBdgiGQ/IEIzf
- 0kng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=NGnT3NUWy8fgy8AhJnTXjj15j5ReSdGSgxmfl07V1HU=;
- b=jlbTOFiKP+BXP0CIuNpgLuy7gXneEZ0l/zdEbLbaGi7E76sns1H4m7c/scSM8HxOoy
- 2Y3ZDb603A64mXRbudfJF5sm00Dpxj1QSUIkEsCnI7vCOxTP3TXv3Y8/f+GNbLNaXc4o
- w4LGwWl4ThlhJvCsS6C4Dg3XNFW6rcj9Muj/c1rIDqcDAYa/W8lODoZQpKfGgtm8Wd34
- Fv4PRHvzWEZmcGidlXi9UEmFeMB+/7xCurrmZyBHkgGocEtaCdQ+H7+v8fSFOavr8pjn
- lzF9lCLfUEWyDeWV8Pl4oF6OL7y5KqU/6t5F5g2q5lcKpj6jLIs8QIwY9Gn23mP4lP/t
- jGvA==
-X-Gm-Message-State: AGi0PubjJtvrrliFAS13S4o+Tat3M/ArA06U2pghBJzNKiFfsB92wRB/
- xuN8JLgxrjXWNX9YqIgpEHg=
-X-Google-Smtp-Source: APiQypJFWLFRiyYOL2cRL4enM0H/nPyBu3Ub3fxpvy0/oOkwwn4RxutJej7KAbecRko81oa6E3g49w==
-X-Received: by 2002:a5d:65ce:: with SMTP id e14mr2392578wrw.314.1588588874527; 
- Mon, 04 May 2020 03:41:14 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id s12sm12250022wmc.7.2020.05.04.03.41.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 May 2020 03:41:13 -0700 (PDT)
-Date: Mon, 4 May 2020 11:41:11 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH 2/4] device-core: use RCU for list of childs of a bus
-Message-ID: <20200504104111.GB354891@stefanha-x1.localdomain>
-References: <20200416203624.32366-1-mlevitsk@redhat.com>
- <20200416203624.32366-3-mlevitsk@redhat.com>
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1jVYKt-0007I8-Gx
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 06:28:31 -0400
+Received: from mout.web.de ([212.227.15.3]:51939)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1jVYKs-0002X5-Go
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 06:28:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1588588099;
+ bh=A7ojLWn10Hrpm+MPOTgTEQeuCwTcirRJrsoWi+s+fb4=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=WCrzG1z9slB1jqq7zy3XrRs9gOl6UPfNXXFugvn3J7l1KLhNOJ3UOVeEMx4sdO/fS
+ sVL3IjdqvE2EbKGQCUeD503yFjHufMA3bODyNIKWXyJ55R5m5HmpWhi790ob/pqyyn
+ 3uanN/ItOUTsTCHiWNgtOhqNBlwrOuZTRQFFqWI0=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([87.123.206.27]) by smtp.web.de (mrweb003
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0LnS3i-1iwlor2SHW-00hgB5; Mon, 04
+ May 2020 12:28:19 +0200
+Date: Mon, 4 May 2020 12:28:17 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: qemu-devel <qemu-devel@nongnu.org>
+Subject: [PATCH v4 5/6] net/colo-compare.c, softmmu/vl.c: Check that
+ colo-compare is active
+Message-ID: <f6cbde747d78ff080f680c710e2793867a3cf1fa.1588587700.git.lukasstraub2@web.de>
+In-Reply-To: <cover.1588587700.git.lukasstraub2@web.de>
+References: <cover.1588587700.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="p4qYPpj5QlsIQJ0K"
-Content-Disposition: inline
-In-Reply-To: <20200416203624.32366-3-mlevitsk@redhat.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=stefanha@gmail.com; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Type: multipart/signed; boundary="Sig_/pMkx1WRJZ_dYznR/h6v_uZm";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Provags-ID: V03:K1:jTM2WAIulLNVOo40uROClZA04O16ay2zQ8BjQ30GDXNwM95yCk7
+ 1LDK6GCe879q7NPD/pNiFziNOXKk0uc+sezd294oDYGchJNeaTSTSPKAPJm4ocU1aJIDph6
+ OPsQ5EZaAU9nvOUNHBCP6Dy2kCurgnSBCBJrjTVYP0t30zbDq8rnxLMsAOZ5hqfdNikUZXk
+ CZgqtOf6+CzgBXUdboAmQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:SID8jsBaW+8=:xKvzcXKOlNTO0U8Db43fEJ
+ Ndugb3QbBWsXgfVAGow5C9ibTVEYkgvNw+q+BZQrJP3cf8Df+JZBqEf+57Baggn85IsMbjPHv
+ 6v/K0nK88XGDzB3m5vjq2XVst5HeIdEvbeF8hZuzrToXFKICxal12uj2O0pkN7aYenJ2ev2be
+ gWtsc5ir774LxKmXiY7WhEzApoCpgyvppaihrQ9yEEYqH+w48OgR8Devgdj5fDa6CL2VF7sl0
+ SvglBWTisqRPQrP5R91cCjqv4icssEQn+3XQPLsdbD3CyAiHSTC1+URUmxAZwEo+qacVIjiBX
+ 0Rnt8iu50H+xCFpcaN2J4NqDYUBtJWa0hYZLBsaEPS/4HoDASEbIIVS5XtmGal0zl7x/Gcbpm
+ kXgIjR6B3nnk1LKjVvp69Qq/NaBNCRGlzfGuGGQ7Py9aUakJsIIj+9qANAXWykAWRKjyqoI52
+ pVntXJG2DFHWtNNin3xMvvUrIZ6lw49tSfMx6TSPQCBzOirSD/9sW6tolO4dfEWff32Xhkz7k
+ KFPpMvIDq9mVErm/2X8hbggIqdGdbqsx8UPePvJhDoJE0JH1EvVrwUXTkInVaig7DjuxpYTpg
+ 5HTD77elSevr8oQPDLTncKdZjyrHk61DnVJl8mdquaTt7rpZfq4r8Ai1E1DaU4gRhizhZFZQ+
+ C0VryJQNEqH7MampSj38DWneHbAO6uGPkjgHqhQZ1EHMeM76MiQTHxV0hV/Xwgu0vB3QBaUJG
+ eL3cmovFD5tSQCSocEBQEcupLvgoLE+ryz2Xz08e05nywoXMUSr+yNUZ5STbxaEtjftiXXP2s
+ vYa/dhpXwzqJSQEOMuR596o82E/cnWcEGT+5fpyNoxYzbSDYcHxJ4KfFTWzZ5ZUOMvKH/nT/E
+ gBWWF9ESZzQ+2GxDQBGABjMntsmfNWwLIq+A1S9uU3R/ifdDN5FQU2Qmn+05C2GV7RklSB06t
+ 0/1yWKb+f7rfL5udnDmpD8mBHls7dr1yiiknuQlu0WsZ3PAemu8z1oNJa0AMWJe3xUj9chznd
+ ceS5k1y4VWwbRhlOos52H98sPz6AEnyirnB1IP4mOyWIh6mHBawkiLQFQXdlz41VB1tdK4gie
+ Lj/zp+C2sptbtcRdUDEvXTdbZ8tMQnP+hb7HNrBoi815gHPHu0sL2CiNeYJ9JnJ1r7Vgj4KGU
+ GlBHrvTDWBnwy07y5zhlLjDjnmtSdbHp3CxVMpO1Nf95ugN6QiHmEcTno+YA8H/y0/s3HTDw8
+ v8gxiq+5LwtgC9ZcH
+Received-SPF: pass client-ip=212.227.15.3; envelope-from=lukasstraub2@web.de;
+ helo=mout.web.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 06:28:29
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -24
+X-Spam_score: -2.5
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,156 +103,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---p4qYPpj5QlsIQJ0K
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--Sig_/pMkx1WRJZ_dYznR/h6v_uZm
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 16, 2020 at 11:36:22PM +0300, Maxim Levitsky wrote:
-> @@ -90,9 +92,13 @@ static void bus_reset_child_foreach(Object *obj, Reset=
-tableChildCallback cb,
->      BusState *bus =3D BUS(obj);
->      BusChild *kid;
-> =20
-> -    QTAILQ_FOREACH(kid, &bus->children, sibling) {
-> +    rcu_read_lock();
-> +
-> +    QTAILQ_FOREACH_RCU(kid, &bus->children, sibling) {
->          cb(OBJECT(kid->child), opaque, type);
->      }
-> +
-> +    rcu_read_unlock();
->  }
-> =20
->  static void qbus_realize(BusState *bus, DeviceState *parent, const char =
-*name)
-> @@ -138,10 +144,15 @@ static void bus_unparent(Object *obj)
->      /* Only the main system bus has no parent, and that bus is never fre=
-ed */
->      assert(bus->parent);
-> =20
-> -    while ((kid =3D QTAILQ_FIRST(&bus->children)) !=3D NULL) {
-> +    rcu_read_lock();
-> +
-> +    while ((kid =3D QTAILQ_FIRST_RCU(&bus->children)) !=3D NULL) {
->          DeviceState *dev =3D kid->child;
->          object_unparent(OBJECT(dev));
->      }
-> +
-> +    rcu_read_unlock();
+If the colo-compare object is removed before failover and a
+checkpoint happens, qemu crashes because it tries to lock
+the destroyed event_mtx in colo_notify_compares_event.
 
-rcu_read_lock() is called but this looks like a list write operation.
-If I understand correctly bus->children list writes can only be called
-with the QEMU global mutex and therefore rcu_read_lock() is not required
-here?
+Fix this by checking if everything is initialized by
+introducing a new variable colo_compare_active which
+is protected by a new mutex colo_compare_mutex. The new mutex
+also protects against concurrent access of the net_compares
+list and makes sure that colo_notify_compares_event isn't
+active while we destroy event_mtx and event_complete_cond.
 
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 85f062def7..f0c87e582e 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -50,26 +50,37 @@ const VMStateDescription *qdev_get_vmsd(DeviceState *=
-dev)
->      return dc->vmsd;
->  }
-> =20
-> +static void bus_free_bus_child(BusChild *kid)
-> +{
-> +    object_unref(OBJECT(kid->child));
+With this it also is again possible to use colo without
+colo-compare (periodic mode) and to use multiple colo-compare
+for multiple network interfaces.
 
-Users like scsi_device_find() do not take a refcount on the child.  If
-the device is removed then bus_free_bus_child may call object_unref()
-while another thread is still accessing the child.
+Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+---
+ net/colo-compare.c | 35 +++++++++++++++++++++++++++++------
+ net/colo-compare.h |  1 +
+ softmmu/vl.c       |  2 ++
+ 3 files changed, 32 insertions(+), 6 deletions(-)
 
-Maybe I'm missing something that prevents this scenario?
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 56db3d3bfc..c7572d75e9 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -54,6 +54,8 @@ static NotifierList colo_compare_notifiers =3D
+ #define REGULAR_PACKET_CHECK_MS 3000
+ #define DEFAULT_TIME_OUT_MS 3000
+=20
++static QemuMutex colo_compare_mutex;
++static bool colo_compare_active;
+ static QemuMutex event_mtx;
+ static QemuCond event_complete_cond;
+ static int event_unhandled_count;
+@@ -906,6 +908,12 @@ static void check_old_packet_regular(void *opaque)
+ void colo_notify_compares_event(void *opaque, int event, Error **errp)
+ {
+     CompareState *s;
++    qemu_mutex_lock(&colo_compare_mutex);
++
++    if (!colo_compare_active) {
++        qemu_mutex_unlock(&colo_compare_mutex);
++        return;
++    }
+=20
+     qemu_mutex_lock(&event_mtx);
+     QTAILQ_FOREACH(s, &net_compares, next) {
+@@ -919,6 +927,7 @@ void colo_notify_compares_event(void *opaque, int event=
+, Error **errp)
+     }
+=20
+     qemu_mutex_unlock(&event_mtx);
++    qemu_mutex_unlock(&colo_compare_mutex);
+ }
+=20
+ static void colo_compare_timer_init(CompareState *s)
+@@ -1274,7 +1283,14 @@ static void colo_compare_complete(UserCreatable *uc,=
+ Error **errp)
+                            s->vnet_hdr);
+     }
+=20
++    qemu_mutex_lock(&colo_compare_mutex);
++    if (!colo_compare_active) {
++        qemu_mutex_init(&event_mtx);
++        qemu_cond_init(&event_complete_cond);
++        colo_compare_active =3D true;
++    }
+     QTAILQ_INSERT_TAIL(&net_compares, s, next);
++    qemu_mutex_unlock(&colo_compare_mutex);
+=20
+     s->out_sendco.s =3D s;
+     s->out_sendco.chr =3D &s->chr_out;
+@@ -1290,9 +1306,6 @@ static void colo_compare_complete(UserCreatable *uc, =
+Error **errp)
+=20
+     g_queue_init(&s->conn_list);
+=20
+-    qemu_mutex_init(&event_mtx);
+-    qemu_cond_init(&event_complete_cond);
+-
+     s->connection_track_table =3D g_hash_table_new_full(connection_key_has=
+h,
+                                                       connection_key_equal,
+                                                       g_free,
+@@ -1384,12 +1397,19 @@ static void colo_compare_finalize(Object *obj)
+=20
+     qemu_bh_delete(s->event_bh);
+=20
++    qemu_mutex_lock(&colo_compare_mutex);
+     QTAILQ_FOREACH(tmp, &net_compares, next) {
+         if (tmp =3D=3D s) {
+             QTAILQ_REMOVE(&net_compares, s, next);
+             break;
+         }
+     }
++    if (QTAILQ_EMPTY(&net_compares)) {
++        colo_compare_active =3D false;
++        qemu_mutex_destroy(&event_mtx);
++        qemu_cond_destroy(&event_complete_cond);
++    }
++    qemu_mutex_unlock(&colo_compare_mutex);
+=20
+     AioContext *ctx =3D iothread_get_aio_context(s->iothread);
+     aio_context_acquire(ctx);
+@@ -1413,15 +1433,18 @@ static void colo_compare_finalize(Object *obj)
+         object_unref(OBJECT(s->iothread));
+     }
+=20
+-    qemu_mutex_destroy(&event_mtx);
+-    qemu_cond_destroy(&event_complete_cond);
+-
+     g_free(s->pri_indev);
+     g_free(s->sec_indev);
+     g_free(s->outdev);
+     g_free(s->notify_dev);
+ }
+=20
++void colo_compare_init_globals(void)
++{
++    colo_compare_active =3D false;
++    qemu_mutex_init(&colo_compare_mutex);
++}
++
+ static const TypeInfo colo_compare_info =3D {
+     .name =3D TYPE_COLO_COMPARE,
+     .parent =3D TYPE_OBJECT,
+diff --git a/net/colo-compare.h b/net/colo-compare.h
+index 22ddd512e2..eb483ac586 100644
+--- a/net/colo-compare.h
++++ b/net/colo-compare.h
+@@ -17,6 +17,7 @@
+ #ifndef QEMU_COLO_COMPARE_H
+ #define QEMU_COLO_COMPARE_H
+=20
++void colo_compare_init_globals(void);
+ void colo_notify_compares_event(void *opaque, int event, Error **errp);
+ void colo_compare_register_notifier(Notifier *notify);
+ void colo_compare_unregister_notifier(Notifier *notify);
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index 32c0047889..a913ed5469 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -112,6 +112,7 @@
+ #include "qapi/qmp/qerror.h"
+ #include "sysemu/iothread.h"
+ #include "qemu/guest-random.h"
++#include "net/colo-compare.h"
+=20
+ #define MAX_VIRTIO_CONSOLES 1
+=20
+@@ -2906,6 +2907,7 @@ void qemu_init(int argc, char **argv, char **envp)
+     precopy_infrastructure_init();
+     postcopy_infrastructure_init();
+     monitor_init_globals();
++    colo_compare_init_globals();
+=20
+     if (qcrypto_init(&err) < 0) {
+         error_reportf_err(err, "cannot initialize crypto: ");
+--=20
+2.20.1
 
-If not, then another patch is necessary first that introduces stricter
-refcount discipline across the codebase. This applies both to users who
-directly access bus->children as well as to those who call walk() and
-stash child pointers in their callback function.
 
-> +    g_free(kid);
-> +}
-> +
->  static void bus_remove_child(BusState *bus, DeviceState *child)
->  {
->      BusChild *kid;
-> =20
-> -    QTAILQ_FOREACH(kid, &bus->children, sibling) {
-> +    rcu_read_lock();
-
-List write under rcu_read_lock().
-
-> @@ -82,7 +93,9 @@ static void bus_add_child(BusState *bus, DeviceState *c=
-hild)
->      kid->child =3D child;
->      object_ref(OBJECT(kid->child));
-> =20
-> -    QTAILQ_INSERT_HEAD(&bus->children, kid, sibling);
-> +    rcu_read_lock();
-> +    QTAILQ_INSERT_HEAD_RCU(&bus->children, kid, sibling);
-> +    rcu_read_unlock();
-
-List write under rcu_read_lock().
-
-> diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-> index 472bbd233b..b0f4a35f81 100644
-> --- a/hw/scsi/virtio-scsi.c
-> +++ b/hw/scsi/virtio-scsi.c
-> @@ -367,12 +367,16 @@ static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIO=
-SCSIReq *req)
->      case VIRTIO_SCSI_T_TMF_I_T_NEXUS_RESET:
->          target =3D req->req.tmf.lun[1];
->          s->resetting++;
-> -        QTAILQ_FOREACH(kid, &s->bus.qbus.children, sibling) {
-> +
-> +        rcu_read_lock();
-> +        QTAILQ_FOREACH_RCU(kid, &s->bus.qbus.children, sibling) {
-
-We need a QTAILQ_FOREACH_WITH_RCU_READ_LOCK() macro that combines
-WITH_RCU_READ_LOCK() and QTAILQ_FOREACH_RCU(). :-)
-
-> diff --git a/include/hw/virtio/virtio-bus.h b/include/hw/virtio/virtio-bu=
-s.h
-> index 38c9399cd4..58733f28e2 100644
-> --- a/include/hw/virtio/virtio-bus.h
-> +++ b/include/hw/virtio/virtio-bus.h
-> @@ -128,8 +128,11 @@ void virtio_bus_set_vdev_config(VirtioBusState *bus,=
- uint8_t *config);
->  static inline VirtIODevice *virtio_bus_get_device(VirtioBusState *bus)
->  {
->      BusState *qbus =3D &bus->parent_obj;
-> -    BusChild *kid =3D QTAILQ_FIRST(&qbus->children);
-> -    DeviceState *qdev =3D kid ? kid->child : NULL;
-> +    BusChild *kid;
-> +    DeviceState *qdev;
-> +
-> +    kid =3D QTAILQ_FIRST(&qbus->children);
-
-QTAILQ_FIRST_RCU()
-
---p4qYPpj5QlsIQJ0K
-Content-Type: application/pgp-signature; name="signature.asc"
+--Sig_/pMkx1WRJZ_dYznR/h6v_uZm
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl6v8UcACgkQnKSrs4Gr
-c8jAZAgAhINpLkvsHYvbt4UylQC19LpFX936/CALQ4CcOMzPxEaKn3Om0Wa10hAG
-jxeFyQBlhCmrjmXPngRJVVeIPn5vwsn4jwS0zoCV60olvZWmKuWU9XyJmZJ4H/tc
-HNHluZBqIf3zUYVip8n2PvYJYc+ecoaszIvVXE5VN0EuyPjYveLWqHYcG41H9AV9
-jzTf7muebFHVfqm2CERhwih2J/jM2ngfVg2tOhKlhGCrE7o/e5ut69yg39e5+qf7
-sZW3vRxoDaz6lh8MJ3emAzlN6Lne5nIOgsTtB6SpOdr2Jn+9Y07GjYpT/20W2/RJ
-ZBYfC8dY+C8LZYb7sA1aC7aOtjuzhA==
-=2pVu
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl6v7kEACgkQNasLKJxd
+sliwrRAAlOf+UpLhnXH/otpn21duRbhjM6YIU5pfWxYd+11XBjmRCMs/L43s3lZ0
+wvbfgGPAZhGCdiSj6zxW9dVS+ZaZkbtJAKYqDmoMkVnW1UaG2SIu7c8VGbnkICXP
+Pg9eUC2DDzsAblQPsIZToxY/kloi2X1B806nqHNBaJLbRdq3EXmeaO7WacJZKWK8
+vmzFaUfYEyZQC+tSW7bV8XLC+AHnLoJz6BE71ALLDTZ1G/BVbjYq2o8xKd6bdbkJ
+njVwKaACsOXtHArjiUU1gyVUwmpyGU7PeFHihIeYE9HfjWoMhW6MQjMB66tPWgfA
+lZpWz3lGTGKU57F5qmbccVXbyqLxTWq1Ubn4qVP1Im5ksDz4O6ARwCOLDs+pSvlW
+dcAqLk9MvSoXftdD+LNfou7QSJLFVakAUlUH7o8+jVvafy4yb3sdrtF2JTQjTn5N
+XTBmuZoG/jo+VODo2uf1uqN1cwFKS+WRgLmktXnOOQdPbxuYy8p85CRo1bTIXB13
+aSvYEsbchRn7dUw2dcyobMMt73eTnrwZ/BTRQUYcuWuC5OhPzgqRMczGLf72bWRU
+ErNTq4yJgQMKTWHnPCUmmNU8FthC1PHwzOjYXAro6QC/SRr3SUN3Vvq6l7hSIQBB
+THrjmTGq5BaYjn7k4B2Ix3+QKOYmg5WjImd2uPJp8+XzTOQjKQs=
+=VzIN
 -----END PGP SIGNATURE-----
 
---p4qYPpj5QlsIQJ0K--
+--Sig_/pMkx1WRJZ_dYznR/h6v_uZm--
 
