@@ -2,89 +2,93 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C67AFC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 08:14:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF48DC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 08:18:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E644206B9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 08:14:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 98BA320735
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 08:18:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BAYXKB9E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E644206B9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c6oiI683"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98BA320735
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVWFT-0003vu-NY
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 04:14:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37456)
+	id 1jVWIa-0006oj-Jr
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 04:18:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37734)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jVWEt-0003Vu-9M
- for qemu-devel@nongnu.org; Mon, 04 May 2020 04:14:11 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24251
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jVWEr-00009x-KY
- for qemu-devel@nongnu.org; Mon, 04 May 2020 04:14:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588580046;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZGjbBi4ueXhodwLV25CNAoVKGSnLqFLBG0E6oo9gojY=;
- b=BAYXKB9EaXNOHu/XZS+6YwonbKoLAhj2+VX6yxDWA1+SIdRJSMFhmCpo4KRu4lDdJrbass
- leY3Ma0kE9OvwMDPJ9xl9rN8V7JuQ2v+haVkzio3Q3UKHhcsWjsijVO6F+qIOaqBX3CadM
- A/veibR+WTI3pd2wJr94UwO1Vo0aoxI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-76-oxTqxdOdNvGAktccUt81PQ-1; Mon, 04 May 2020 04:14:01 -0400
-X-MC-Unique: oxTqxdOdNvGAktccUt81PQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7C811005510;
- Mon,  4 May 2020 08:14:00 +0000 (UTC)
-Received: from work-vm (ovpn-114-147.ams2.redhat.com [10.36.114.147])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A5370648D1;
- Mon,  4 May 2020 08:13:56 +0000 (UTC)
-Date: Mon, 4 May 2020 09:13:54 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PULL 0/6] virtiofs queue
-Message-ID: <20200504081354.GB3112@work-vm>
-References: <20200501191500.126432-1-dgilbert@redhat.com>
- <CAFEAcA8W3kreu2s_4wjvP4mNgPpVHpv8A4T-D+etUORg18Rtew@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jVWHb-00050g-9R; Mon, 04 May 2020 04:16:59 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:33913)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jVWHa-000113-Lh; Mon, 04 May 2020 04:16:59 -0400
+Received: by mail-wm1-x341.google.com with SMTP id v4so14904378wme.1;
+ Mon, 04 May 2020 01:16:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=GveMK/FOfLu+JK3BfCWLXw/TcwXbl1ACRiMVo4kAufk=;
+ b=c6oiI683Lc/iaCqO8DCw6bacQIb1LFvxsB5jHon4f/9XEacnaTvfecuO05U0tmK9c9
+ 5gtuGe7Ia1+jzwmFUyt+uHiK+tc4/W/cbmxNxB37c5Z8ZS4YmweNZORoRWO1Bsc77ZC1
+ HoNDoPYvt/hUMgaQZHfU/rCHNL7Obv+Nm/prunlcfd4zwWi06q63uPfiPvAPAh3Suye6
+ +qyGq368V1p0FhT6XGCSWXfoDQeJZUCudTKIUsH8JsY7N0bZlLVLFNsnjIVPafZc4tU8
+ cfB1XM5wu0XAr2zTGlWJsY56brWr0D+Tx+frTC7R9Yxx/BAilusfjK+DW2q24tGIj+kR
+ VjEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=GveMK/FOfLu+JK3BfCWLXw/TcwXbl1ACRiMVo4kAufk=;
+ b=Puf/SeufjK1uYFmpx+MZG+7aSEsBdw1kvDTCkJkuLo2CEP0RAnhi2nY8WgWSeKbjrS
+ VOdSImE8BgRdal+e4hOJLtvDzlygMJfFAwXeg1Visji/J+CPLhjno2tIHMFEbE6EqYCd
+ YcpWaUWTs+rXo5jq4ZkZVJ2jKco/YbKw75EI5E7nzTa5TZNaK/+pb6dD3Wvya/n9yABM
+ CmDciFf0we/FI08YS8I6BHcTGJJ6xqEiaTKEiB9dkw3hBwyhAVKejcLAMtSTSVOVMStV
+ 8s9Zfs8Gala7f18S6Kb9lOkTv775mcGChUBdT2eWbh5iikcsmaEzJrsJncmamozY2JSR
+ qLHA==
+X-Gm-Message-State: AGi0PuZr5ms8OD9+ukMIDcBZco+NKZrzRgys0R2M4R9y3JjOn4gMli5J
+ szcaK2M+O01ULdZup4G2Sxyami+7
+X-Google-Smtp-Source: APiQypIplVu2uSzA0Hedb8XYQ7x6qDN6xjb5iqUbWM64qWvdNrxZp7FR4Ey/lPIpRfHApO+g2rdK9A==
+X-Received: by 2002:a1c:4c10:: with SMTP id z16mr13358806wmf.77.1588580216863; 
+ Mon, 04 May 2020 01:16:56 -0700 (PDT)
+Received: from x1w.redhat.com (26.red-88-21-207.staticip.rima-tde.net.
+ [88.21.207.26])
+ by smtp.gmail.com with ESMTPSA id r15sm5092972wrq.93.2020.05.04.01.16.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 04 May 2020 01:16:56 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/3] hw/sh4: Use MemoryRegion typedef
+Date: Mon,  4 May 2020 10:16:51 +0200
+Message-Id: <20200504081653.14841-2-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200504081653.14841-1-f4bug@amsat.org>
+References: <20200504081653.14841-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8W3kreu2s_4wjvP4mNgPpVHpv8A4T-D+etUORg18Rtew@mail.gmail.com>
-User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 01:21:32
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- T_HK_NAME_DR=0.01, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,84 +101,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mszeredi@redhat.com, yavrahami@paloaltonetworks.com,
- QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
+ Magnus Damm <magnus.damm@gmail.com>, Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On Fri, 1 May 2020 at 20:16, Dr. David Alan Gilbert (git)
-> <dgilbert@redhat.com> wrote:
-> >
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >
-> > The following changes since commit 1c47613588ccff44422d4bdeea0dc36a0a30=
-8ec7:
-> >
-> >   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into s=
-taging (2020-04-30 19:25:41 +0100)
-> >
-> > are available in the Git repository at:
-> >
-> >   https://gitlab.com/dagrh/qemu.git tags/pull-virtiofs-20200501
-> >
-> > for you to fetch changes up to 66502bbca37ca7a3bfa57e82cfc03b89a7a11eae=
-:
-> >
-> >   virtiofsd: drop all capabilities in the wait parent process (2020-05-=
-01 20:05:37 +0100)
-> >
-> > ----------------------------------------------------------------
-> > virtiofsd: Pull 2020-05-01 (includes CVE fix)
-> >
-> > This set includes a security fix, other fixes and improvements.
-> >
-> > Security fix:
-> > The security fix is for CVE-2020-10717 where, on low RAM hosts,
-> > the guest can potentially exceed the maximum fd limit.
-> > This fix adds some more configuration so that the user
-> > can explicitly set the limit.
-> > Thank you to Yuval Avrahami for reporting this.
-> >
-> > Fixes:
-> >
-> > Recursive mounting of the exported directory is now used in
-> > the sandbox, such that if there was a mount underneath present at
-> > the time the virtiofsd was started, that mount is also
-> > visible to the guest; in the existing code, only mounts that
-> > happened after startup were visible.
-> >
-> > Security improvements:
-> >
-> > The jailing for /proc/self/fd is improved - but it's something
-> > that shouldn't be accessible anyway.
-> >
-> > Most capabilities are now dropped at startup; again this shouldn't
-> > change any behaviour but is extra protection.
-> >
-> > ----------------------------------------------------------------
->=20
->=20
-> Applied, thanks.
->=20
-> Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
-> for any user-visible changes.
->=20
-> I notice you didn't include the usual Cc: qemu-stable@nongnu.org
-> lines in the commits to be backported, but I think the stable
-> branch maintainers can deal with the occasional manual notification.
+Use the MemoryRegion type defined in "qemu/typedefs.h",
+to keep the repository style consistent.
 
-Thanks, yes I sent a mail to qemu-stable as a reply to the series
-saying which patches I thought should be for stable.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ include/hw/sh4/sh.h | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-Dave
-
-> thanks
-> -- PMM
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/include/hw/sh4/sh.h b/include/hw/sh4/sh.h
+index 767a2df7e2..fe773cb01d 100644
+--- a/include/hw/sh4/sh.h
++++ b/include/hw/sh4/sh.h
+@@ -10,9 +10,8 @@
+ 
+ /* sh7750.c */
+ struct SH7750State;
+-struct MemoryRegion;
+ 
+-struct SH7750State *sh7750_init(SuperHCPU *cpu, struct MemoryRegion *sysmem);
++struct SH7750State *sh7750_init(SuperHCPU *cpu, MemoryRegion *sysmem);
+ 
+ typedef struct {
+     /* The callback will be triggered if any of the designated lines change */
+@@ -32,7 +31,7 @@ int sh7750_register_io_device(struct SH7750State *s,
+ #define TMU012_FEAT_TOCR   (1 << 0)
+ #define TMU012_FEAT_3CHAN  (1 << 1)
+ #define TMU012_FEAT_EXTCLK (1 << 2)
+-void tmu012_init(struct MemoryRegion *sysmem, hwaddr base,
++void tmu012_init(MemoryRegion *sysmem, hwaddr base,
+                  int feat, uint32_t freq,
+ 		 qemu_irq ch0_irq, qemu_irq ch1_irq,
+ 		 qemu_irq ch2_irq0, qemu_irq ch2_irq1);
+-- 
+2.21.3
 
 
