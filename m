@@ -2,98 +2,89 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2700EC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:27:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF8EAC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:29:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA6FC20721
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:27:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 78CB0206D7
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:29:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y+qowDjs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA6FC20721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O7R5+EzH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78CB0206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVc4N-00025s-06
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 10:27:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46948)
+	id 1jVc5e-0003wh-I4
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 10:29:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46144)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVc3P-0000sV-Va
- for qemu-devel@nongnu.org; Mon, 04 May 2020 10:26:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33933
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVc3M-0005Ei-Es
- for qemu-devel@nongnu.org; Mon, 04 May 2020 10:26:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588602398;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=6KssWYDWKmX2bACLCXDvYL5R7uQ9ktgUSddYGO3LWEc=;
- b=Y+qowDjs1g+uX24UWLWMrguxiTU7atOcGFLwsPRxcE4pC47l7YxTi3LJPCFq3GD3x30r1B
- +pHQ29wGFIaVasf9j6tKx3S/JcRpZVyFN3VTnl9GL4eP9CG8FU1gPDUD7KnK9H30EmOxbd
- oigt90dbyPY3ouYawuvUXafp+Yn+znE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-353-fTbOWmVPNkGaWeOGmNxZ1Q-1; Mon, 04 May 2020 10:26:34 -0400
-X-MC-Unique: fTbOWmVPNkGaWeOGmNxZ1Q-1
-Received: by mail-wr1-f72.google.com with SMTP id g10so2082822wrr.10
- for <qemu-devel@nongnu.org>; Mon, 04 May 2020 07:26:34 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jVbyO-0001hv-DA; Mon, 04 May 2020 10:21:32 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:41972)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jVbyN-00039e-KO; Mon, 04 May 2020 10:21:32 -0400
+Received: by mail-lf1-x141.google.com with SMTP id a9so4499080lfb.8;
+ Mon, 04 May 2020 07:21:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=D+s9RocNcIFxp3NrHvqCZUbCbQZq5W1Nleeta/NdFEs=;
+ b=O7R5+EzHI7/ZxweVNZcHBLLER6nbyukao6ZKvVm4yYCWJAjXMQsA8npcogXPSF7JXs
+ IqzdOSAFeNSlcb1oa2D40v17WahUapRWS0qnI1ZvrjfNZHZ3Ob3EFvwgrhy8PcWIu1s7
+ AkE8Ubw5ZTbSkAzsFq+SlPEccyoiltYM1SrdjdoNP35ExkxUkAai/uvzk9IwfbBR9uVP
+ qa/7/aX+sb0S30t5LRMmoF0RvopdvJMBFxOESZWi5tc6mMuL4hWX6DoGiez4nUYby4Kd
+ WGpHWZQoRanVypZbe+dWinI+u4jAy6lsKeMGZ7bWd/1+ZJ5WmMAtTEQl/xdpmpIywrhd
+ dWDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=xuMjaNYxipgB8albhPc6Ph80ZynRbvJlRqsT2hfDicc=;
- b=a2WCnTEkr3qdV1WmZ93KO6oBD9CQC/gEYj1bOJis7UaMMT46kO2wX15w/WwIz6SRzC
- l4EEP4ZbJAkL1+BKJdZF8jv0gWojFjEnh1IswEyUqLS3ES03aMhdhL2KbE6zPTFfSlOM
- RSUGF6d+u392cEy7JkvpxiwTR1KRYlDzN5rW9zB8wXcgp+KSRin6rZTIjkLeAbgZqXhb
- x7dnkjIpfGGxkLzM3Zv7Z1MsvpAs5RFfyfW5ydHtmAGT81v3t37osbhXK3QNC+BQQViu
- 5UcO/T/wDr939wIKOuAbMp8JZdrg04mUDknzN+fUocM7PKLAqgxHnLH39HhTmoRExCtj
- rmFg==
-X-Gm-Message-State: AGi0PuYscR1v/H5BsBZH1E+Syq9ciVMfENyim28ERVvCBYXiGgB7aOfM
- ajZY7GkprPVYzPa63uCX00MOcYUdtqUn0EYajWFS+HwTNnXOqmeesVnD5Jg1fj2E1pZMCfvhssa
- d3KZrR9ncjad5dTw=
-X-Received: by 2002:a5d:650b:: with SMTP id x11mr19094441wru.405.1588602393117; 
- Mon, 04 May 2020 07:26:33 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJVO+8+jDCxGemtvWiUST40IreBT7h+uUr5YMU2tz1NUVpt2k0Ua08mhJG5n6zjqJbnEvUJKg==
-X-Received: by 2002:a5d:650b:: with SMTP id x11mr19094362wru.405.1588602392066; 
- Mon, 04 May 2020 07:26:32 -0700 (PDT)
-Received: from x1w.redhat.com (26.red-88-21-207.staticip.rima-tde.net.
- [88.21.207.26])
- by smtp.gmail.com with ESMTPSA id s18sm20559545wra.94.2020.05.04.07.26.31
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=D+s9RocNcIFxp3NrHvqCZUbCbQZq5W1Nleeta/NdFEs=;
+ b=fR2IirK8VkDbj6htOkD0qdom0/WApUYW3sYYoSNGRyC333Ha4f6nUeIIOojyyiNtgI
+ ZmCuuvRBMt2+wsWDY88qNKo7CFVvcTLTV1TkTLyZajsGLf5UJ9nBWjVg0vdmBNnSmeGo
+ gTym1Yro+paYCuUJPwozqWLf9j4Xrd6fbl9nKwxMJ0xUIoY1CQ7+jJeythiNfdh2YBzF
+ MDLzSKBwTkWTKM4nW7OO/j89mlaOZVcTK1EOPi84nKZQ3CrQDFw0K9mIFXUJhqK3cFsQ
+ jovXFzuPfZ0+ctsj2VD8PeAEUYR/sKWndN+Lhw+l5PFJfQLC1l4b5Okojhz3/1dVURAF
+ OQZQ==
+X-Gm-Message-State: AGi0PuYoWnn2XYtTcmKe+3QVOYqjGMdGXgGCtxkB66NyGeay3P+5iWcE
+ BAM7rR6rf7ON4POpkCZ4p0LfV/ifXB4=
+X-Google-Smtp-Source: APiQypLhSuCqI8WhUNFl678Pe4PJiUgn9OCDpOyCUkK0kTOa1LG76ElKWc0CsrTO1k0e3pO38MkT5g==
+X-Received: by 2002:a19:ee19:: with SMTP id g25mr8072963lfb.124.1588602089242; 
+ Mon, 04 May 2020 07:21:29 -0700 (PDT)
+Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id c10sm9726871lfc.7.2020.05.04.07.21.28
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 May 2020 07:26:31 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ Mon, 04 May 2020 07:21:28 -0700 (PDT)
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] tests/qht-bench: Fix Clang 'int-conversion' warning
-Date: Mon,  4 May 2020 16:26:30 +0200
-Message-Id: <20200504142630.12842-1-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
+Subject: [PATCH v2 1/1] target/arm: Drop access_el3_aa32ns()
+Date: Mon,  4 May 2020 16:21:25 +0200
+Message-Id: <20200504142125.31180-2-edgar.iglesias@gmail.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200504142125.31180-1-edgar.iglesias@gmail.com>
+References: <20200504142125.31180-1-edgar.iglesias@gmail.com>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 05:09:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::141;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lf1-x141.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 13
+X-Spam_score: 1.3
+X-Spam_bar: +
+X-Spam_report: (1.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ FSL_HELO_FAKE=3.399, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -107,72 +98,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- "Emilio G . Cota" <cota@braap.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Alexander Bulekov <alxndr@bu.edu>
+Cc: laurent.desnogues@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org,
+ richard.henderson@linaro.org, edgar.iglesias@xilinx.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When building with Clang 10 on Fedora 32, we get:
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-  tests/qht-bench.c:287:29: error: implicit conversion from 'unsigned long'=
- to 'double' changes value from 18446744073709551615 to 1844674407370955161=
-6 [-Werror,-Wimplicit-int-float-conversion]
-          *threshold =3D rate * UINT64_MAX;
-                            ~ ^~~~~~~~~~
-  /usr/include/stdint.h:130:23: note: expanded from macro 'UINT64_MAX'
-  # define UINT64_MAX             (__UINT64_C(18446744073709551615))
-                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  /usr/include/stdint.h:107:25: note: expanded from macro '__UINT64_C'
-  #  define __UINT64_C(c) c ## UL
-                          ^~~~~~~
-  <scratch space>:14:1: note: expanded from here
-  18446744073709551615UL
-  ^~~~~~~~~~~~~~~~~~~~~~
+Calling access_el3_aa32ns() works for AArch32 only cores
+but it does not handle 32-bit EL2 on top of 64-bit EL3
+for mixed 32/64-bit cores.
 
-Fix by using nextafter() from <math.h>:
+Merge access_el3_aa32ns_aa64any() into access_el3_aa32ns()
+and only use the latter.
 
-  float nextafterf( float from, float to );
-
-      Returns the next representable value of 'from'
-      in the direction of 'to'.
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Fixes: 68e9c2fe65 ("target-arm: Add VTCR_EL2")
+Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
-Cc: Emilio G. Cota <cota@braap.org>
-Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>
-Cc: Alexander Bulekov <alxndr@bu.edu>
----
- tests/qht-bench.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ target/arm/helper.c | 30 +++++++-----------------------
+ 1 file changed, 7 insertions(+), 23 deletions(-)
 
-diff --git a/tests/qht-bench.c b/tests/qht-bench.c
-index e3b512f26f..f93f8e0fe2 100644
---- a/tests/qht-bench.c
-+++ b/tests/qht-bench.c
-@@ -10,6 +10,7 @@
- #include "qemu/qht.h"
- #include "qemu/rcu.h"
- #include "qemu/xxhash.h"
-+#include <math.h>
-=20
- struct thread_stats {
-     size_t rd;
-@@ -284,7 +285,7 @@ static void do_threshold(double rate, uint64_t *thresho=
-ld)
-     if (rate =3D=3D 1.0) {
-         *threshold =3D UINT64_MAX;
-     } else {
--        *threshold =3D rate * UINT64_MAX;
-+        *threshold =3D rate * nextafterf(0x1p64, 0.0);
-     }
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index dfefb9b3d9..7d21bf1cc7 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -502,35 +502,19 @@ void init_cpreg_list(ARMCPU *cpu)
  }
-=20
---=20
-2.21.3
+ 
+ /*
+- * Some registers are not accessible if EL3.NS=0 and EL3 is using AArch32 but
+- * they are accessible when EL3 is using AArch64 regardless of EL3.NS.
+- *
+- * access_el3_aa32ns: Used to check AArch32 register views.
+- * access_el3_aa32ns_aa64any: Used to check both AArch32/64 register views.
++ * Some registers are not accessible from AArch32 EL3 if SCR.NS == 0.
+  */
+ static CPAccessResult access_el3_aa32ns(CPUARMState *env,
+                                         const ARMCPRegInfo *ri,
+                                         bool isread)
+ {
+-    bool secure = arm_is_secure_below_el3(env);
+-
+-    assert(!arm_el_is_aa64(env, 3));
+-    if (secure) {
++    if (!is_a64(env) && arm_current_el(env) == 3 &&
++        arm_is_secure_below_el3(env)) {
+         return CP_ACCESS_TRAP_UNCATEGORIZED;
+     }
+     return CP_ACCESS_OK;
+ }
+ 
+-static CPAccessResult access_el3_aa32ns_aa64any(CPUARMState *env,
+-                                                const ARMCPRegInfo *ri,
+-                                                bool isread)
+-{
+-    if (!arm_el_is_aa64(env, 3)) {
+-        return access_el3_aa32ns(env, ri, isread);
+-    }
+-    return CP_ACCESS_OK;
+-}
+-
+ /* Some secure-only AArch32 registers trap to EL3 if used from
+  * Secure EL1 (but are just ordinary UNDEF in other non-EL3 contexts).
+  * Note that an access from Secure EL1 can only happen if EL3 is AArch64.
+@@ -5236,7 +5220,7 @@ static const ARMCPRegInfo el3_no_el2_cp_reginfo[] = {
+       .access = PL2_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
+     { .name = "VTCR_EL2", .state = ARM_CP_STATE_BOTH,
+       .opc0 = 3, .opc1 = 4, .crn = 2, .crm = 1, .opc2 = 2,
+-      .access = PL2_RW, .accessfn = access_el3_aa32ns_aa64any,
++      .access = PL2_RW, .accessfn = access_el3_aa32ns,
+       .type = ARM_CP_CONST, .resetvalue = 0 },
+     { .name = "VTTBR", .state = ARM_CP_STATE_AA32,
+       .cp = 15, .opc1 = 6, .crm = 2,
+@@ -5284,7 +5268,7 @@ static const ARMCPRegInfo el3_no_el2_cp_reginfo[] = {
+       .type = ARM_CP_CONST, .resetvalue = 0 },
+     { .name = "HPFAR_EL2", .state = ARM_CP_STATE_BOTH,
+       .opc0 = 3, .opc1 = 4, .crn = 6, .crm = 0, .opc2 = 4,
+-      .access = PL2_RW, .accessfn = access_el3_aa32ns_aa64any,
++      .access = PL2_RW, .accessfn = access_el3_aa32ns,
+       .type = ARM_CP_CONST, .resetvalue = 0 },
+     { .name = "HSTR_EL2", .state = ARM_CP_STATE_BOTH,
+       .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 1, .opc2 = 3,
+@@ -7626,12 +7610,12 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+             ARMCPRegInfo vpidr_regs[] = {
+                 { .name = "VPIDR_EL2", .state = ARM_CP_STATE_BOTH,
+                   .opc0 = 3, .opc1 = 4, .crn = 0, .crm = 0, .opc2 = 0,
+-                  .access = PL2_RW, .accessfn = access_el3_aa32ns_aa64any,
++                  .access = PL2_RW, .accessfn = access_el3_aa32ns,
+                   .type = ARM_CP_CONST, .resetvalue = cpu->midr,
+                   .fieldoffset = offsetof(CPUARMState, cp15.vpidr_el2) },
+                 { .name = "VMPIDR_EL2", .state = ARM_CP_STATE_BOTH,
+                   .opc0 = 3, .opc1 = 4, .crn = 0, .crm = 0, .opc2 = 5,
+-                  .access = PL2_RW, .accessfn = access_el3_aa32ns_aa64any,
++                  .access = PL2_RW, .accessfn = access_el3_aa32ns,
+                   .type = ARM_CP_NO_RAW,
+                   .writefn = arm_cp_write_ignore, .readfn = mpidr_read },
+                 REGINFO_SENTINEL
+-- 
+2.20.1
 
 
