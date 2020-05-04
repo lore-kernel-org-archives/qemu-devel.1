@@ -2,105 +2,95 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24EB7C47257
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:29:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFFE5C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:31:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D35432075A
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:29:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A68D20705
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 16:31:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FxOWAti6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D35432075A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R0eMngF0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A68D20705
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVdxj-0002pA-V1
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 12:28:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44868)
+	id 1jVe0O-00076Y-L8
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 12:31:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45840)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVdx0-0002Dd-0f
- for qemu-devel@nongnu.org; Mon, 04 May 2020 12:28:14 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:23223
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1jVdz6-000599-TV
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 12:30:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54010
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVdwy-00051Z-7Z
- for qemu-devel@nongnu.org; Mon, 04 May 2020 12:28:13 -0400
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1jVdz5-0006CL-5O
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 12:30:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588609690;
+ s=mimecast20190719; t=1588609821;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rQg95Xb8HRfUR/0S1jrh8PBCStCCg6pkceXCSP7bfcI=;
- b=FxOWAti6CaX3Lgy7QdLSsJwGS0Lxi/7CErkvTQSXQbUfiSd/9HaZXSm+XXo7sWdd0tYQuD
- ocRbQ4NLhhfAWA5AY716OzU1fFuTU2FdKKjxGxfm3v+VcruJ1kmwGc+BMJPe7Q92zdeisM
- qbKLOH9/1SvOF2xjEUqztRM6yydUxNo=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-299-wH1Bz6S0POuSYf6DHMD1sg-1; Mon, 04 May 2020 12:28:09 -0400
-X-MC-Unique: wH1Bz6S0POuSYf6DHMD1sg-1
-Received: by mail-wm1-f72.google.com with SMTP id 72so229037wmb.1
- for <qemu-devel@nongnu.org>; Mon, 04 May 2020 09:28:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=u1NUL82EPz99lTpfYev3U8JxUh+sTrGeoGPzRGrO3Rg=;
- b=DP2r5wg43XRixFh8N13ccb94PnuoHZsv9rcMpMydfakweAbOb5445aVlXHFwRrL6iY
- hXOg840CyvaXpV8SVPYyDiWSHfqmAARCVTBMU3nnsGWakmOhsT2BhWz0nQNIAw1XN6QD
- 2wEnsL5QQDuSJjKzCrgWpqqSrvN+Nth7gSc+mF5/8lHs1V7HAkNpABhJ4xb0IQcHV82l
- 4WRVjpcgYIN4Q2332w/lGB755bU+WtnO6n/HV2QfgBUZJLI/IRpaj9iTBSc2nRa43rVJ
- L3roQ7YbU8HNyde9lKcmN04Q2dM8KPWN77PtCkpHRkPRhMH52rQO7AWV99OfUefs+QGT
- xkHQ==
-X-Gm-Message-State: AGi0PuaxMetqNvTCKLjjvm/BgjDtUREIkVvGRWv94YVoTVpFgy+gYjUT
- C+ien3u+HnB9OEcQe60KiBSFh0fUjXVzOGbr1FF34MiOYWgjNJSMe/okDeSOowdv6m14x7W//+b
- DeyaNsmU1LxV4tFE=
-X-Received: by 2002:adf:e2c2:: with SMTP id d2mr101891wrj.55.1588609687985;
- Mon, 04 May 2020 09:28:07 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKDvcjMuuooaA4Az7vIsuzwHepEXZ3mJiurS3XCun1XAdyYDb22UQKbFvL6eXRcTY6qDGqFjQ==
-X-Received: by 2002:adf:e2c2:: with SMTP id d2mr101861wrj.55.1588609687647;
- Mon, 04 May 2020 09:28:07 -0700 (PDT)
-Received: from [192.168.1.39] (26.red-88-21-207.staticip.rima-tde.net.
- [88.21.207.26])
- by smtp.gmail.com with ESMTPSA id q8sm21016946wrp.58.2020.05.04.09.28.06
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 04 May 2020 09:28:07 -0700 (PDT)
-Subject: Re: [PATCH 15/17] qdev: Unrealize must not fail
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200428163419.4483-1-armbru@redhat.com>
- <20200428163419.4483-16-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <19959f15-8f2a-7e23-4123-5dee9102250d@redhat.com>
-Date: Mon, 4 May 2020 18:28:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ bh=Yc5krUnhJZepkd1Df4HEmtDb27H4TpHMPEuTHYyKtpM=;
+ b=R0eMngF0xCtT0GTEHpV1flgRHPNv4OJfChItnXdMeGjGTpXdCkQbwXrobsk/TWQP/ZVKPV
+ ZRxK0qqqsVMBlVyRgb+uppos705Oipy2p92378DQVn9fVdemabcbUa9IzPRrEWrmtukU15
+ YJNxec78Al74nYz9XrgChA4bQWdAoZQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-57-p7HNtdxqPyeV97NWXuAkNg-1; Mon, 04 May 2020 12:30:19 -0400
+X-MC-Unique: p7HNtdxqPyeV97NWXuAkNg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58CB4800D24;
+ Mon,  4 May 2020 16:30:18 +0000 (UTC)
+Received: from localhost (ovpn-115-57.phx2.redhat.com [10.3.115.57])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C7C8F63BBA;
+ Mon,  4 May 2020 16:30:13 +0000 (UTC)
+Date: Mon, 4 May 2020 12:30:12 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Subject: Re: Configuring onboard devices
+Message-ID: <20200504163012.GO5244@habkost.net>
+References: <87k11xh2kq.fsf@dusky.pond.sub.org>
+ <CAFEAcA9-oxkMD-kJ1z12d4K1S_Jaz7Wj6_38Ah7ChSaBfQNkkA@mail.gmail.com>
+ <87tv11e1en.fsf_-_@dusky.pond.sub.org>
+ <51a4e9ea-eca3-6c1d-a753-86c5810ac094@ilande.co.uk>
+ <874kt1dpw7.fsf@dusky.pond.sub.org>
+ <c1fa0770-a07f-e5bc-9db8-6af0576c365f@ilande.co.uk>
+ <877dxxc862.fsf@dusky.pond.sub.org>
+ <0b745eed-841e-8879-c320-3166e2a46953@ilande.co.uk>
+ <87imhe6g7v.fsf@dusky.pond.sub.org>
+ <a0167fcc-b213-25e2-6ea2-62f2a0237a2f@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <20200428163419.4483-16-armbru@redhat.com>
-Content-Language: en-US
+In-Reply-To: <a0167fcc-b213-25e2-6ea2-62f2a0237a2f@ilande.co.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 08:14:53
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 05:09:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -113,241 +103,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/28/20 6:34 PM, Markus Armbruster wrote:
-> Devices may have component devices and buses.
+On Sun, May 03, 2020 at 11:13:41PM +0100, Mark Cave-Ayland wrote:
+> On 02/05/2020 06:47, Markus Armbruster wrote:
 >=20
-> Device realization may fail.  Realization is recursive: a device's
-> realize() method realizes its components, and device_set_realized()
-> realizes its buses (which should in turn realize the devices on that
-> bus, except bus_set_realized() doesn't implement that, yet).
+> > Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
+> >=20
+> >> On 30/04/2020 16:20, Markus Armbruster wrote:
+> >>
+> >>>> Ah I see now, these aliases are for individual properties rather tha=
+n objects. What I
+> >>>> was trying to ask was if it were possible to have something like thi=
+s:
+> >>>>
+> >>>> /machine (SS-5-machine)
+> >>>>   /builtin
+> >>>>     /nic0 -> link to "lance" device
+> >>>>
+> >>>> Here nic0 is an alias "published" by the maintainer of the SS-5 mach=
+ine which is
+> >>>> configured in the machine init() function using object_property_add_=
+link() or a
+> >>>> suitable wrapper. Users can then configure these builtin devices fro=
+m the command
+> >>>> line using your -machine nic0.netdev=3Dmy-netdev-id syntax or simila=
+r.
+> >>>
+> >>> Got it now, thanks!
+> >>>
+> >>>> Having the default devices under /builtin or other known QOM path wo=
+uld enable
+> >>>> builtin devices to be easily enumerated programatically and/or from =
+the command line
+> >>>> as required.
+> >>>
+> >>> There are three standard containers under /machine/:
+> >>>
+> >>> * /machine/peripheral/
+> >>>
+> >>>   Devices with a user-specified ID go here, as /machine/peripheral/ID=
+.
+> >>>   User-specified means -device or device_add.
+> >>>
+> >>>   /machine/peripheral/ID is effectively a stable interface.  It's jus=
+t
+> >>>   underdocumented (undocumented?).
+> >>>
+> >>>   To be useful, the stuff below ID/ needed to be stable and documente=
+d,
+> >>>   too.
+> >>>
+> >>> * /machine/peripheral-anon/
+> >>>
+> >>>   Same, but user elected not to give an ID.
+> >>>   /machine/peripheral-anon/device[N], where N counts up from zero in
+> >>>   creation order.
+> >>>
+> >>>   N is obviously not stable, but this is a problem of the user's maki=
+ng.
+> >>>   If you want to refer to a device, give it an ID.
+> >>>
+> >>> * /machine/unattached/
+> >>>
+> >>>   The orphanage.  When a device has no parent when its realized, it g=
+ets
+> >>>   put here, as /machine/unattached/device[N], where N counts up from
+> >>>   zero in realization order.
+> >>>
+> >>>   N is obviously not stable, and this time we can't blame the
+> >>>   victim^Wuser.  You can search for devices of a certain type.
+> >>>   Sometimes that's good enough.
+> >>>
+> >>>   All the onboard devices are here, and much more.  We've fathered a =
+lot
+> >>>   of unloved red-headed children, it seems...
+> >>>
+> >>>   Some of the "much more" is due to sloppy modelling, i.e. neglecting=
+ to
+> >>>   set the proper parent.
+> >>>
+> >>>   I figure we could put onboard devices in a nicer place, with nicer
+> >>>   names.  Need a convention for the place and the names, then make bo=
+ard
+> >>>   code conform to it.
+> >>
+> >> That's good, it seems that this is already fairly close to how it work=
+s for -device
+> >> at the moment.
+> >>
+> >> I don't think that it is possible to come up a single place for on-boa=
+rd devices to
+> >> live directly though. Going back to one of my first examples: wiring u=
+p a chardev to
+> >> a serial port on the macio device. To me it makes sense for that to ex=
+ist in QOM
+> >> under /machine/pci-bus/mac-io/escc. In contrast an in-built NIC could =
+live under
+> >> /machine/pci-bus/in-built/nic, and placing one or both of these device=
+s directly
+> >> under /machine/foo doesn't feel intuitive.
+> >=20
+> > I'm not familiar with this machine.  You make me suspect the serial
+> > thingy is a component of a larger device.
+> >=20
+> > Properly modelled, a composite device has its components as children.
+> > These appear below their parent in the QOM composition tree.
+> >=20
+> > Example: a "serial-isa" device has a "serial" component.  When the
+> > former is at /machine/unattached/device[28]/, the latter is at
+> > /machine/unattached/device[28]/serial/.
+> >=20
+> > I guess that's what you want for macio's serial port.
+> >=20
+> > Counter-example: a "isa-super-io" device has compoenents of type
+> > "isa-parallel", "isa-serial", "isa-fdc", "i8042", "isa-ide".
+> > Nevertheless, these appear next to their parent in /machine/unattached/=
+.
+> > I'm still too much of a QOM ignoramus to explain why that's so.  Paolo,
+> > can you?
 >=20
-> When realization of a component or bus fails, we need to roll back:
-> unrealize everything we realized so far.  If any of these unrealizes
-> failed, the device would be left in an inconsistent state.  Must not
-> happen.
+> FWIW the older machines have a lot of calls to qdev_create(NULL, TYPE_FOO=
+) for
+> devices that are part of the machine because they live within the machine=
+ address
+> space but are not specifically attached to a qbus.
 >=20
-> device_set_realized() lets it happen: it ignores errors in the roll
-> back code starting at label child_realize_fail.
+> >> AFAIK as per your ARM virt example I believe it is only possible to re=
+gister an alias
+> >> for a property rather than for an Object? The ultimate aim would be fo=
+r
+> >> object_resolve_path("/machine/builtin/nic0") and
+> >> object_resolve_path("/machine/pci-bus/in-built/nic") to return the sam=
+e Object, and
+> >> for the aliases on built-in devices to be children of /machine/builtin=
+ to allow easy
+> >> iteration and introspection.
+> >=20
+> > Paolo, could link properties achieve that?
+> >=20
+> > Mark, I guess you want the alias / link from builtin/nic0 to the actual
+> > place to simplify configuration: the user then needs to know less about
+> > the board.  Correct?
 >=20
-> Since realization is recursive, unrealization must be recursive, too.
-> But how could a partly failed unrealize be rolled back?  We'd have to
-> re-realize, which can fail.  This design is fundamentally broken.
+> Correct. In a perfect world I'd love to say that Daniel's suggestion to u=
+se QOM paths
+> would work, however from my experience they change far too much. This is =
+one of the
+> reasons that the TYPE_FW_PATH_PROVIDER interface exists so that the gener=
+ation of
+> (boot) paths for the firmware is separate from the QOM/qdev paths.
 >=20
-> device_set_realized() does not roll back at all.  Instead, it keeps
-> unrealizing, ignoring further errors.
->=20
-> It can screw up even for a device with no buses: if the lone
-> dc->unrealize() fails, it still unregisters vmstate, and calls
-> listeners' unrealize() callback.
->=20
-> bus_set_realized() does not roll back either.  Instead, it stops
-> unrealizing.
->=20
-> Fortunately, no unrealize method can fail, as we'll see below.
->=20
-> To fix the design error, drop parameter @errp from all the unrealize
-> methods.
->=20
-> Any unrealize method that uses @errp now needs an update.  This leads
-> us to unrealize() methods that can fail.  Merely passing it to another
-> unrealize method cannot cause failure, though.  Here are the ones that
-> do other things with @errp:
->=20
-> * virtio_serial_device_unrealize()
->=20
->    Fails when qbus_set_hotplug_handler() fails, but still does all the
->    other work.  On failure, the device would stay realized with its
->    resources completely gone.  Oops.  Can't happen, because
->    qbus_set_hotplug_handler() can't actually fail here.  Pass
->    &error_abort to qbus_set_hotplug_handler() instead.
->=20
-> * hw/ppc/spapr_drc.c's unrealize()
->=20
->    Fails when object_property_del() fails, but all the other work is
->    already done.  On failure, the device would stay realized with its
->    vmstate registration gone.  Oops.  Can't happen, because
->    object_property_del() can't actually fail here.  Pass &error_abort
->    to object_property_del() instead.
->=20
-> * spapr_phb_unrealize()
->=20
->    Fails and bails out when remove_drcs() fails, but other work is
->    already done.  On failure, the device would stay realized with some
->    of its resources gone.  Oops.  remove_drcs() fails only when
->    chassis_from_bus()'s object_property_get_uint() fails, and it can't
->    here.  Pass &error_abort to remove_drcs() instead.
->=20
-> Therefore, no unrealize method can fail before this patch.
->=20
-> device_set_realized()'s recursive unrealization via bus uses
-> object_property_set_bool().  Can't drop @errp there, so pass
-> &error_abort.
->=20
-> We similarly unrealize with object_property_set_bool() elsewhere,
-> always ignoring errors.  Pass &error_abort instead.
->=20
-> Several unrealize methods no longer handle errors from other unrealize
-> methods: virtio_9p_device_unrealize(),
-> virtio_input_device_unrealize(), scsi_qdev_unrealize(), ...
-> Much of the deleted error handling looks wrong anyway.
->=20
-> One unrealize methods no longer ignore such errors:
-> usb_ehci_pci_exit().
->=20
-> Several realize methods no longer ignore errors when rolling back:
-> v9fs_device_realize_common(), pci_qdev_unrealize(),
-> spapr_phb_realize(), usb_qdev_realize(), vfio_ccw_realize(),
-> virtio_device_realize().
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   hw/9pfs/9p.h                    |  2 +-
->   hw/s390x/virtio-ccw.h           |  2 +-
->   hw/sd/sdhci-internal.h          |  2 +-
->   hw/usb/ccid.h                   |  2 +-
->   hw/usb/hcd-ehci.h               |  2 +-
->   include/hw/qdev-core.h          |  4 ++--
->   include/hw/s390x/s390-ccw.h     |  2 +-
->   include/hw/scsi/scsi.h          |  2 +-
->   include/hw/usb.h                |  2 +-
->   include/hw/xen/xen-block.h      |  2 +-
->   include/hw/xen/xen-bus.h        |  2 +-
->   hw/9pfs/9p.c                    |  4 ++--
->   hw/9pfs/virtio-9p-device.c      |  4 ++--
->   hw/acpi/pcihp.c                 |  2 +-
->   hw/audio/intel-hda.c            |  2 +-
->   hw/block/pflash_cfi02.c         |  2 +-
->   hw/block/vhost-user-blk.c       |  2 +-
->   hw/block/virtio-blk.c           |  2 +-
->   hw/block/xen-block.c            |  8 ++++----
->   hw/char/serial-pci-multi.c      |  2 +-
->   hw/char/serial-pci.c            |  2 +-
->   hw/char/serial.c                |  2 +-
->   hw/char/virtio-console.c        |  2 +-
->   hw/char/virtio-serial-bus.c     |  8 ++++----
->   hw/core/bus.c                   | 17 ++++-------------
->   hw/core/cpu.c                   |  2 +-
->   hw/core/generic-loader.c        |  2 +-
->   hw/core/qdev.c                  | 17 ++++++-----------
->   hw/display/virtio-gpu-base.c    |  2 +-
->   hw/dma/rc4030.c                 |  2 +-
->   hw/i386/kvm/apic.c              |  2 +-
->   hw/i386/pc.c                    |  4 ++--
->   hw/ide/qdev.c                   |  4 ++--
->   hw/input/virtio-input-hid.c     |  2 +-
->   hw/input/virtio-input-host.c    |  2 +-
->   hw/input/virtio-input.c         |  9 ++-------
->   hw/intc/apic.c                  |  2 +-
->   hw/intc/apic_common.c           |  4 ++--
->   hw/intc/ioapic.c                |  2 +-
->   hw/intc/xics.c                  |  2 +-
->   hw/ipack/ipack.c                |  6 ++----
->   hw/mem/pc-dimm.c                |  2 +-
->   hw/net/virtio-net.c             |  2 +-
->   hw/nvram/mac_nvram.c            |  2 +-
->   hw/pci/pci.c                    | 14 +++++++-------
->   hw/pci/pcie.c                   |  2 +-
->   hw/pci/shpc.c                   |  2 +-
->   hw/ppc/pnv_core.c               |  2 +-
->   hw/ppc/spapr.c                  |  8 ++++----
->   hw/ppc/spapr_cpu_core.c         |  2 +-
->   hw/ppc/spapr_drc.c              | 14 ++++----------
->   hw/ppc/spapr_iommu.c            |  2 +-
->   hw/ppc/spapr_pci.c              | 14 +++++---------
->   hw/ppc/spapr_tpm_proxy.c        |  2 +-
->   hw/s390x/css-bridge.c           |  2 +-
->   hw/s390x/s390-ccw.c             |  2 +-
->   hw/s390x/s390-pci-bus.c         |  4 ++--
->   hw/s390x/virtio-ccw.c           |  8 ++++----
->   hw/scsi/lsi53c895a.c            |  2 +-
->   hw/scsi/scsi-bus.c              | 13 ++++---------
->   hw/scsi/scsi-disk.c             |  2 +-
->   hw/scsi/vhost-scsi.c            |  2 +-
->   hw/scsi/vhost-user-scsi.c       |  2 +-
->   hw/scsi/virtio-scsi.c           |  2 +-
->   hw/sd/sdhci-pci.c               |  2 +-
->   hw/sd/sdhci.c                   |  6 +++---
->   hw/usb/bus.c                    | 12 ++++++------
->   hw/usb/ccid-card-emulated.c     |  2 +-
->   hw/usb/dev-audio.c              |  2 +-
->   hw/usb/dev-hid.c                |  2 +-
->   hw/usb/dev-hub.c                |  2 +-
->   hw/usb/dev-network.c            |  2 +-
->   hw/usb/dev-smartcard-reader.c   | 11 +++--------
->   hw/usb/dev-uas.c                |  2 +-
->   hw/usb/dev-wacom.c              |  2 +-
->   hw/usb/hcd-ehci-pci.c           |  2 +-
->   hw/usb/hcd-ehci.c               |  2 +-
->   hw/usb/host-libusb.c            |  2 +-
->   hw/usb/redirect.c               |  2 +-
->   hw/vfio/ap.c                    |  2 +-
->   hw/vfio/ccw.c                   |  6 +++---
->   hw/virtio/vhost-user-fs.c       |  2 +-
->   hw/virtio/vhost-vsock.c         |  2 +-
->   hw/virtio/virtio-balloon.c      |  2 +-
->   hw/virtio/virtio-crypto.c       |  2 +-
->   hw/virtio/virtio-iommu.c        |  2 +-
->   hw/virtio/virtio-pmem.c         |  2 +-
->   hw/virtio/virtio-rng.c          |  2 +-
->   hw/virtio/virtio.c              | 11 +++--------
->   hw/watchdog/wdt_diag288.c       |  2 +-
->   hw/xen/xen-bus.c                | 12 ++++++------
->   target/i386/cpu.c               |  9 ++-------
->   target/ppc/translate_init.inc.c |  9 ++-------
->   93 files changed, 158 insertions(+), 214 deletions(-)
-[...]
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index b6c8ef5bc0..850fcce5e7 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -3622,7 +3622,7 @@ static void virtio_device_realize(DeviceState *dev,=
- Error **errp)
->       virtio_bus_device_plugged(vdev, &err);
->       if (err !=3D NULL) {
->           error_propagate(errp, err);
-> -        vdc->unrealize(dev, NULL);
-> +        vdc->unrealize(dev);
+> I don't feel too strongly whether it's a link property, some kind of alia=
+s, or
+> perhaps like OpenFirmware just a string property containing the QOM path =
+to the
+> device, since ultimately I imagine there would be wrapper functions for m=
+achine
+> init() to call which hide away the implementation details.
 
-Not related to this patch, but I'm surprise we are not checking for=20
-vdc->unrealize non-NULL here ...
+Whatever solution we use to make sure a new interface is stable,
+we must have automated test cases to ensure we don't break it in
+the future.  Otherwise we will be creating yet another
+compatibility-keeping ritual that we fail to follow because
+nobody notices when we break it.
 
->           return;
->       }
->  =20
-> @@ -3630,20 +3630,15 @@ static void virtio_device_realize(DeviceState *de=
-v, Error **errp)
->       memory_listener_register(&vdev->listener, vdev->dma_as);
->   }
->  =20
-> -static void virtio_device_unrealize(DeviceState *dev, Error **errp)
-> +static void virtio_device_unrealize(DeviceState *dev)
->   {
->       VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
->       VirtioDeviceClass *vdc =3D VIRTIO_DEVICE_GET_CLASS(dev);
-> -    Error *err =3D NULL;
->  =20
->       virtio_bus_device_unplugged(vdev);
->  =20
->       if (vdc->unrealize !=3D NULL) {
+I wouldn't like to move from "2 different object paths that can't
+be trusted to be stable" to "3 different object paths that can't
+be trusted to be stable".
 
-... while here we do.
-
-> -        vdc->unrealize(dev, &err);
-> -        if (err !=3D NULL) {
-> -            error_propagate(errp, err);
-> -            return;
-> -        }
-> +        vdc->unrealize(dev);
->       }
->  =20
->       g_free(vdev->bus_name);
-[...]
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+--=20
+Eduardo
 
 
