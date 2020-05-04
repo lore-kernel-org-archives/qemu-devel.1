@@ -2,93 +2,75 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDD2EC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 23:39:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15FC8C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 23:41:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A38B7206A4
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 23:39:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="aAUYroSi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A38B7206A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	by mail.kernel.org (Postfix) with ESMTPS id D28C1206A4
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 23:41:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D28C1206A4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codesourcery.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVkgf-00045s-TP
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 19:39:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37734)
+	id 1jVkiR-0006R7-TE
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 19:41:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37998)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jVkOQ-0004AV-3T
- for qemu-devel@nongnu.org; Mon, 04 May 2020 19:20:58 -0400
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:4515)
+ (Exim 4.90_1) (envelope-from <joseph_myers@mentor.com>)
+ id 1jVkfv-0003lm-IC
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 19:39:03 -0400
+Received: from esa1.mentor.iphmx.com ([68.232.129.153]:20501)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jVkOM-0001TH-Ug
- for qemu-devel@nongnu.org; Mon, 04 May 2020 19:20:57 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5eb0a2d50001>; Mon, 04 May 2020 16:18:45 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate101.nvidia.com (PGP Universal service);
- Mon, 04 May 2020 16:20:53 -0700
-X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Mon, 04 May 2020 16:20:53 -0700
-Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 4 May
- 2020 23:20:53 +0000
-Received: from [10.40.101.152] (10.124.1.5) by DRHQMAIL107.nvidia.com
- (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 4 May 2020
- 23:20:44 +0000
-Subject: Re: [PATCH v16 QEMU 07/16] vfio: Add migration state change notifier
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <1585084154-29461-1-git-send-email-kwankhede@nvidia.com>
- <1585084154-29461-8-git-send-email-kwankhede@nvidia.com>
- <20200401112720.GB3258@work-vm>
-X-Nvconfidentiality: public
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <42407b19-4e1a-5fc5-2066-8c4e1bee14aa@nvidia.com>
-Date: Tue, 5 May 2020 04:50:39 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <joseph_myers@mentor.com>)
+ id 1jVkfn-000324-BC
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 19:39:03 -0400
+IronPort-SDR: sU5Xav6K+YF3Ftch3aBOSo6n8UJFKcJ0uadN9LiwqlfG4Tnw5KDYTW+qwbvHFTSLPULjEYCHn+
+ 9bYvhvBkkBbMPTp3EreGopwhuiMT9qqyvns2mHDnWd3a2zEWzw2W6RHNIEH/QH0/IF6QztTEPW
+ SNFhwC3cLCw0MHRnZg/HPysj7q7m4s2+tJ+FdqViMlPDEJSsJiDpIrPztAibITu4STQU3xhdnd
+ bciXTrRNF/FAjEy2UYG9bBighCGitSf7w760wRevbhqUq8NxFuGaByGdVHc1l9MS0tayVc2p9o
+ 8v4=
+X-IronPort-AV: E=Sophos;i="5.73,353,1583222400"; d="scan'208";a="50530968"
+Received: from orw-gwy-02-in.mentorg.com ([192.94.38.167])
+ by esa1.mentor.iphmx.com with ESMTP; 04 May 2020 15:38:50 -0800
+IronPort-SDR: r736D0AQBFRcBlWteS2D8ILqvW3m1g6/1TovYKeOEz914osYYhnptdI3hyS+qGpVbqxEeCLVyX
+ dL3r/9CcHFhjqip9ZGikRritSx4vxDEvBqY0KKe2a8hH9b5TYR74/B+E8nxUGzii+vKuP81tWm
+ HV/2MOXU46d6UVCv7qsQgAhjrbU4yKeot3d+SiaQONW7svcrgPtlBHSwMpiza7CBE1uPEOl+Hp
+ BOdz3OFL/ewp5ZP01g+/IujqO1zqiIRBbhNFRpNxdbpRtE7ykBXx1Epud4nOzlmYAqwe+fs/CN
+ 94k=
+Date: Mon, 4 May 2020 23:38:44 +0000
+From: Joseph Myers <joseph@codesourcery.com>
+X-X-Sender: jsm28@digraph.polyomino.org.uk
+To: <qemu-devel@nongnu.org>, <aurelien@aurel32.net>,
+ <peter.maydell@linaro.org>, <alex.bennee@linaro.org>, <pbonzini@redhat.com>,
+ <rth@twiddle.net>, <ehabkost@redhat.com>
+Subject: [PATCH v2 2/4] softfloat: fix floatx80 pseudo-denormal addition /
+ subtraction
+In-Reply-To: <alpine.DEB.2.21.2005042332380.22972@digraph.polyomino.org.uk>
+Message-ID: <alpine.DEB.2.21.2005042337570.22972@digraph.polyomino.org.uk>
+References: <alpine.DEB.2.21.2005042332380.22972@digraph.polyomino.org.uk>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-In-Reply-To: <20200401112720.GB3258@work-vm>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- DRHQMAIL107.nvidia.com (10.27.9.16)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1588634325; bh=kd/HAkfyJHnVQFgdHNJ8EUM8rOHU5ijlV+iZB5EU2SY=;
- h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
- Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
- X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
- Content-Transfer-Encoding;
- b=aAUYroSirUzXiQMkCuCY6CRpD6Ag3Pl38YyXSO2DBgVAKvknp8IHfT3pxJYYvd+HV
- Rk2u21+qXNFDOLArswIXcDCDwoa6IKas+uclMnxL4NhNSjb292614BhGNPqmss+OEe
- yNzBD+r1zan4LReZW/ShaCgWtk7qXQCopg8V9pq2nK+I+snsA+EWTMG10pTmRfLhUW
- Qjth7hVWdM+5XEeHIKE9LXROaHJLMwmThhIDWRPvFsOOMFI69WNC93cNgG5rBuBTUo
- PxAYFrQj8gDBEeu+68urTUwUlr63DkEYLutGbKF1XoZ3rxrRXp7UQXoW1LrQXSn0Be
- 3+svrLeJYKunA==
-Received-SPF: pass client-ip=216.228.121.143;
- envelope-from=kwankhede@nvidia.com; helo=hqnvemgate24.nvidia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 19:18:10
-X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
-X-Spam_score_int: -70
-X-Spam_score: -7.1
-X-Spam_bar: -------
-X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="US-ASCII"
+X-Originating-IP: [137.202.0.90]
+X-ClientProxiedBy: SVR-IES-MBX-04.mgc.mentorg.com (139.181.222.4) To
+ svr-ies-mbx-01.mgc.mentorg.com (139.181.222.1)
+Received-SPF: pass client-ip=68.232.129.153;
+ envelope-from=joseph_myers@mentor.com; helo=esa1.mentor.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 19:38:51
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -39
+X-Spam_score: -4.0
+X-Spam_bar: ----
+X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,146 +83,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, eskultet@redhat.com, ziye.yang@intel.com, cohuck@redhat.com,
- shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, zhi.a.wang@intel.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
- alex.williamson@redhat.com, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The softfloat function addFloatx80Sigs, used for addition of values
+with the same sign and subtraction of values with opposite sign, fails
+to handle the case where the two values both have biased exponent zero
+and there is a carry resulting from adding the significands, which can
+occur if one or both values are pseudo-denormals (biased exponent
+zero, explicit integer bit 1).  Add a check for that case, so making
+the results match those seen on x86 hardware for pseudo-denormals.
+
+Signed-off-by: Joseph Myers <joseph@codesourcery.com>
+---
+ fpu/softfloat.c                            |  6 ++++++
+ tests/tcg/i386/test-i386-pseudo-denormal.c | 24 ++++++++++++++++++++++
+ 2 files changed, 30 insertions(+)
+ create mode 100644 tests/tcg/i386/test-i386-pseudo-denormal.c
+
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index ac116c70b8..6094d267b5 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -5866,6 +5866,12 @@ static floatx80 addFloatx80Sigs(floatx80 a, floatx80 b, flag zSign,
+         zSig1 = 0;
+         zSig0 = aSig + bSig;
+         if ( aExp == 0 ) {
++            if ((aSig | bSig) & UINT64_C(0x8000000000000000) && zSig0 < aSig) {
++                /* At least one of the values is a pseudo-denormal,
++                 * and there is a carry out of the result.  */
++                zExp = 1;
++                goto shiftRight1;
++            }
+             if (zSig0 == 0) {
+                 return packFloatx80(zSign, 0, 0);
+             }
+diff --git a/tests/tcg/i386/test-i386-pseudo-denormal.c b/tests/tcg/i386/test-i386-pseudo-denormal.c
+new file mode 100644
+index 0000000000..cfa2a500b0
+--- /dev/null
++++ b/tests/tcg/i386/test-i386-pseudo-denormal.c
+@@ -0,0 +1,24 @@
++/* Test pseudo-denormal operations.  */
++
++#include <stdint.h>
++#include <stdio.h>
++
++union u {
++    struct { uint64_t sig; uint16_t sign_exp; } s;
++    long double ld;
++};
++
++volatile union u ld_pseudo_m16382 = { .s = { UINT64_C(1) << 63, 0 } };
++
++volatile long double ld_res;
++
++int main(void)
++{
++    int ret = 0;
++    ld_res = ld_pseudo_m16382.ld + ld_pseudo_m16382.ld;
++    if (ld_res != 0x1p-16381L) {
++        printf("FAIL: pseudo-denormal add\n");
++        ret = 1;
++    }
++    return ret;
++}
+-- 
+2.17.1
 
 
-On 4/1/2020 4:57 PM, Dr. David Alan Gilbert wrote:
-> * Kirti Wankhede (kwankhede@nvidia.com) wrote:
->> Added migration state change notifier to get notification on migration state
->> change. These states are translated to VFIO device state and conveyed to vendor
->> driver.
->>
->> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->> Reviewed-by: Neo Jia <cjia@nvidia.com>
->> ---
->>   hw/vfio/migration.c           | 29 +++++++++++++++++++++++++++++
->>   hw/vfio/trace-events          |  1 +
->>   include/hw/vfio/vfio-common.h |  1 +
->>   3 files changed, 31 insertions(+)
->>
->> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
->> index af9443c275fb..22ded9d28cf3 100644
->> --- a/hw/vfio/migration.c
->> +++ b/hw/vfio/migration.c
->> @@ -154,6 +154,27 @@ static void vfio_vmstate_change(void *opaque, int running, RunState state)
->>       }
->>   }
->>   
->> +static void vfio_migration_state_notifier(Notifier *notifier, void *data)
->> +{
->> +    MigrationState *s = data;
->> +    VFIODevice *vbasedev = container_of(notifier, VFIODevice, migration_state);
->> +    int ret;
->> +
->> +    trace_vfio_migration_state_notifier(vbasedev->name, s->state);
-> 
-> You might want to use MigrationStatus_str(s->status) to make that
-> readable.
-> 
-
-Yes.
-
->> +    switch (s->state) {
->> +    case MIGRATION_STATUS_CANCELLING:
->> +    case MIGRATION_STATUS_CANCELLED:
->> +    case MIGRATION_STATUS_FAILED:
->> +        ret = vfio_migration_set_state(vbasedev,
->> +                      ~(VFIO_DEVICE_STATE_SAVING | VFIO_DEVICE_STATE_RESUMING),
->> +                      VFIO_DEVICE_STATE_RUNNING);
->> +        if (ret) {
->> +            error_report("%s: Failed to set state RUNNING", vbasedev->name);
->> +        }
-> 
-> In the migration code we check to see if the VM was running prior to the
-> start of the migration before we start the CPUs going again (see
-> migration_iteration_finish):
->      case MIGRATION_STATUS_FAILED:
->      case MIGRATION_STATUS_CANCELLED:
->      case MIGRATION_STATUS_CANCELLING:
->          if (s->vm_was_running) {
->              vm_start();
->          } else {
->              if (runstate_check(RUN_STATE_FINISH_MIGRATE)) {
->                  runstate_set(RUN_STATE_POSTMIGRATE);
->              }
-> 
-> so if the guest was paused before a migration we don't falsely restart
-> it.  Maybe you need something similar?
-> 
-
-Guest paused means vCPUs are paused, but that doesn't pause device. Init 
-state of VFIO device is also RUNNING and device will not get any 
-instructions until vCPUs are running. So I think putting device in 
-RUNNING is still fine.
-
-Thanks,
-Kirti
-
-> Dave
-> 
->> +    }
->> +}
->> +
->>   static int vfio_migration_init(VFIODevice *vbasedev,
->>                                  struct vfio_region_info *info)
->>   {
->> @@ -173,6 +194,9 @@ static int vfio_migration_init(VFIODevice *vbasedev,
->>       vbasedev->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
->>                                                             vbasedev);
->>   
->> +    vbasedev->migration_state.notify = vfio_migration_state_notifier;
->> +    add_migration_state_change_notifier(&vbasedev->migration_state);
->> +
->>       return 0;
->>   }
->>   
->> @@ -211,6 +235,11 @@ add_blocker:
->>   
->>   void vfio_migration_finalize(VFIODevice *vbasedev)
->>   {
->> +
->> +    if (vbasedev->migration_state.notify) {
->> +        remove_migration_state_change_notifier(&vbasedev->migration_state);
->> +    }
->> +
->>       if (vbasedev->vm_state) {
->>           qemu_del_vm_change_state_handler(vbasedev->vm_state);
->>       }
->> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
->> index 3d15bacd031a..69503228f20e 100644
->> --- a/hw/vfio/trace-events
->> +++ b/hw/vfio/trace-events
->> @@ -148,3 +148,4 @@ vfio_display_edid_write_error(void) ""
->>   vfio_migration_probe(char *name, uint32_t index) " (%s) Region %d"
->>   vfio_migration_set_state(char *name, uint32_t state) " (%s) state %d"
->>   vfio_vmstate_change(char *name, int running, const char *reason, uint32_t dev_state) " (%s) running %d reason %s device state %d"
->> +vfio_migration_state_notifier(char *name, int state) " (%s) state %d"
->> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
->> index 3d18eb146b33..28f55f66d019 100644
->> --- a/include/hw/vfio/vfio-common.h
->> +++ b/include/hw/vfio/vfio-common.h
->> @@ -123,6 +123,7 @@ typedef struct VFIODevice {
->>       VMChangeStateEntry *vm_state;
->>       uint32_t device_state;
->>       int vm_running;
->> +    Notifier migration_state;
->>   } VFIODevice;
->>   
->>   struct VFIODeviceOps {
->> -- 
->> 2.7.0
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+-- 
+Joseph S. Myers
+joseph@codesourcery.com
 
