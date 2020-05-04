@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19527C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:32:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F0DBC3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:32:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D63B020757
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:32:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 47EBC20757
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 14:32:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aa9W0n47"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D63B020757
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hFmjOFc3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47EBC20757
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVc8j-0001Ti-Tl
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 10:32:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47268)
+	id 1jVc90-0001pe-6T
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 10:32:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jVc5z-0004ZH-83
- for qemu-devel@nongnu.org; Mon, 04 May 2020 10:29:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47909
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jVc6G-0005F2-1M
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 10:29:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42749
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jVc5y-0005nx-AR
- for qemu-devel@nongnu.org; Mon, 04 May 2020 10:29:22 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jVc6E-0005wg-GK
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 10:29:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588602561;
+ s=mimecast20190719; t=1588602577;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iNQ9lS7EsKMnaq4ojaGLEYxIauihn/k1pWhlz/tga24=;
- b=aa9W0n47REg0q8OHy7sG+52xfRdz1Jq0Atyy2Zq/v+e91bvjwui1272olFLOg+/OBB4xAR
- f81/t2c9GCRVN8gLN6rfBlx6TJrE2WLsPbnPgjKR/WSML8zf+5KFBm8qj7VwWKHpCJYNnX
- +WIbI53cUAlzuAje+G8b09AbJtPoAI0=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-24--2tbKlS8NA-MkG3Gr7m4BA-1; Mon, 04 May 2020 10:29:19 -0400
-X-MC-Unique: -2tbKlS8NA-MkG3Gr7m4BA-1
-Received: by mail-wm1-f72.google.com with SMTP id o26so3595534wmh.1
- for <qemu-devel@nongnu.org>; Mon, 04 May 2020 07:29:18 -0700 (PDT)
+ bh=5qBFLHcdRaQMUsQlFXqV2eHnPlF70mfC9NFWokqhExU=;
+ b=hFmjOFc3Bx5XuC5zeofTmcVFr43ViI2jTaUBFQ7gEyVyzGILyMBpNw4gCY6dEyIpLKYUPW
+ KMszKqLWJrKhYuvsHU6LaeF6nU8G3s8dXqR2XgKI2CpXzR7JVop8Xrt9t+CP5cDhmAC6it
+ WsCDnhNbeQCnIKTwuEdp5uRUQHgMujw=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-283-9TCcWZ9SPXuXRrJG9mm7WA-1; Mon, 04 May 2020 10:29:35 -0400
+X-MC-Unique: 9TCcWZ9SPXuXRrJG9mm7WA-1
+Received: by mail-wr1-f72.google.com with SMTP id j16so10828298wrw.20
+ for <qemu-devel@nongnu.org>; Mon, 04 May 2020 07:29:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=2TfSO6YI3NjUeMo8pj4D4ib48WZ7vfY2z5+JNtWiNow=;
- b=ijF4hmPGCeoJIAfYn9vZ/ZpCcWOnZ3pJPu9r0QKpUPvXuyJ+dKwh2tg6PzI8xQyLnC
- 2ozMbVHJMGNBNF9StdXWM2MdVJVkrXNqf9O4y2g7Y7wJm2MA4/T84k3ARtXpEJHNagpw
- lgIBlXiOGt4UchVlOfvpSva28S0ijhau4f1eNd3/Su8McJkQHOo/5isG/cP8s48ztece
- Wpxvgyu3hEazQCvfDpfqeK2OoZX5bTno+6qF2vhmPSsyOIhgcpcEc2HZwrN+6R5yq+ck
- 0uUKfV1nWjLmLm9/5l+hWgJla5YPe6JsP3f2pI9fEKM1HdKcVinrbS+m14ihM/gjUvwq
- s8Wg==
-X-Gm-Message-State: AGi0PuaLC3YGcr+XHpPZG25bOTjuDT7X2PM+rm+QGKZRyX/3f6PVbnkb
- noA/l/WAMItm5sd/gemOFhqn8hQvC8sQGoi/zxx6PNQToPzqkF5tK42BKMnOPRn3Jm2KQ33soKs
- MxWDDqOAENh3tZrw=
-X-Received: by 2002:adf:eec3:: with SMTP id a3mr14292602wrp.164.1588602557754; 
- Mon, 04 May 2020 07:29:17 -0700 (PDT)
-X-Google-Smtp-Source: APiQypI75pTeHi0Vq96RhfuCymuKTdrHh8JAMSoeXkncHs9sLO/cOObQueXlsWrRveiPhfE2LE0MpA==
-X-Received: by 2002:adf:eec3:: with SMTP id a3mr14292510wrp.164.1588602556517; 
- Mon, 04 May 2020 07:29:16 -0700 (PDT)
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=feEST3pElJnPhKM8FHSB9qNteiPsUjugC8IYA15rGhw=;
+ b=AkmNuNgeY7NgSyTayyQuTL79b/lkql4Pr/Tf1y8NTt6yOLwwpldDpc4A9FOOZXKi82
+ ASSDj+stWIOe8ASVfY4IlFecPYH7V/Ve4fCtXOSK3FZTW0qeW1iN3Z0bFUf2AB1BzOuY
+ o2cmUmTMBsDywPpYTYOGF1OdeHZawtiEjYlPYcjaGPdWRh8AumOTE6LpABAZqXS+iLru
+ kUwWtlHljKsudY6VnRb84wttF78onuLYvl+2uGdFElTLALj/lKe7IUbGl1OJ5Hflimor
+ m4wjLFmCW03aqFQvyFaaFDl50Zk3drU8n4GJqZGAacp47EvaEHu0DQtv12obismq/vTF
+ pGug==
+X-Gm-Message-State: AGi0PuaVURiQ7LdnldjRt36wythnbZyJST6lnd1ur2jph/qGN4ks+LEe
+ Kv83grHXied0uPZXlO4wGyqCJBNa4AUYUKYA9zlAY49PACx4T1AQMPpoOAEPpde+dTR5AA2PLH0
+ xQh2PKzGKjp7Ukek=
+X-Received: by 2002:adf:dcca:: with SMTP id x10mr19222681wrm.212.1588602574569; 
+ Mon, 04 May 2020 07:29:34 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLz+U3uacPzJanbbi8OHGeShEmUSgGA/AFr8iP38JVRfxbvGX4nCouwU5+hKxuBdvp1MA/sYQ==
+X-Received: by 2002:adf:dcca:: with SMTP id x10mr19222666wrm.212.1588602574359; 
+ Mon, 04 May 2020 07:29:34 -0700 (PDT)
 Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
  by smtp.gmail.com with ESMTPSA id
- z6sm6412504wrt.57.2020.05.04.07.29.15
+ u127sm14472815wme.8.2020.05.04.07.29.33
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 May 2020 07:29:16 -0700 (PDT)
-Date: Mon, 4 May 2020 10:29:14 -0400
+ Mon, 04 May 2020 07:29:33 -0700 (PDT)
+Date: Mon, 4 May 2020 10:29:32 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 01/29] hw/pci/pcie: Forbid hot-plug if it's disabled on the slot
-Message-ID: <20200504142814.157589-2-mst@redhat.com>
+Subject: [PULL 08/29] rtc: add RTC_ISA_BASE
+Message-ID: <20200504142814.157589-9-mst@redhat.com>
 References: <20200504142814.157589-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200504142814.157589-1-mst@redhat.com>
@@ -85,13 +86,13 @@ X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 04:24:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 05:09:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -112,77 +113,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Julia Suvorova <jusual@redhat.com>
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Julia Suvorova <jusual@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
 
-Raise an error when trying to hot-plug/unplug a device through QMP to a dev=
-ice
-with disabled hot-plug capability. This makes the device behaviour more
-consistent and provides an explanation of the failure in the case of
-asynchronous unplug.
+Add and use RTC_ISA_BASE define instead of hardcoding 0x70.
 
-Signed-off-by: Julia Suvorova <jusual@redhat.com>
-Message-Id: <20200427182440.92433-2-jusual@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-Id: <20200429140003.7336-7-kraxel@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/pci/pcie.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ include/hw/rtc/mc146818rtc.h | 1 +
+ hw/rtc/mc146818rtc.c         | 5 ++---
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-index 0eb3a2a5d2..6b48d04d2c 100644
---- a/hw/pci/pcie.c
-+++ b/hw/pci/pcie.c
-@@ -415,6 +415,7 @@ void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev,=
- DeviceState *dev,
+diff --git a/include/hw/rtc/mc146818rtc.h b/include/hw/rtc/mc146818rtc.h
+index 10c93a096a..3713181b56 100644
+--- a/include/hw/rtc/mc146818rtc.h
++++ b/include/hw/rtc/mc146818rtc.h
+@@ -47,6 +47,7 @@ typedef struct RTCState {
+ } RTCState;
+=20
+ #define RTC_ISA_IRQ 8
++#define RTC_ISA_BASE 0x70
+=20
+ ISADevice *mc146818_rtc_init(ISABus *bus, int base_year,
+                              qemu_irq intercept_irq);
+diff --git a/hw/rtc/mc146818rtc.c b/hw/rtc/mc146818rtc.c
+index dc4269cc55..d18c09911b 100644
+--- a/hw/rtc/mc146818rtc.c
++++ b/hw/rtc/mc146818rtc.c
+@@ -908,7 +908,6 @@ static void rtc_realizefn(DeviceState *dev, Error **err=
+p)
  {
-     PCIDevice *hotplug_pdev =3D PCI_DEVICE(hotplug_dev);
-     uint8_t *exp_cap =3D hotplug_pdev->config + hotplug_pdev->exp.exp_cap;
-+    uint32_t sltcap =3D pci_get_word(exp_cap + PCI_EXP_SLTCAP);
-     PCIDevice *pci_dev =3D PCI_DEVICE(dev);
+     ISADevice *isadev =3D ISA_DEVICE(dev);
+     RTCState *s =3D MC146818_RTC(dev);
+-    int base =3D 0x70;
 =20
-     /* Don't send event when device is enabled during qemu machine creatio=
-n:
-@@ -430,6 +431,13 @@ void pcie_cap_slot_plug_cb(HotplugHandler *hotplug_dev=
-, DeviceState *dev,
-         return;
-     }
+     s->cmos_data[RTC_REG_A] =3D 0x26;
+     s->cmos_data[RTC_REG_B] =3D 0x02;
+@@ -951,7 +950,7 @@ static void rtc_realizefn(DeviceState *dev, Error **err=
+p)
+     qemu_register_suspend_notifier(&s->suspend_notifier);
 =20
-+    /* Check if hot-plug is disabled on the slot */
-+    if ((sltcap & PCI_EXP_SLTCAP_HPC) =3D=3D 0) {
-+        error_setg(errp, "Hot-plug failed: unsupported by the port device =
-'%s'",
-+                         DEVICE(hotplug_pdev)->id);
-+        return;
-+    }
-+
-     /* To enable multifunction hot-plug, we just ensure the function
-      * 0 added last. When function 0 is added, we set the sltsta and
-      * inform OS via event notification.
-@@ -470,6 +478,17 @@ void pcie_cap_slot_unplug_request_cb(HotplugHandler *h=
-otplug_dev,
-     Error *local_err =3D NULL;
-     PCIDevice *pci_dev =3D PCI_DEVICE(dev);
-     PCIBus *bus =3D pci_get_bus(pci_dev);
-+    PCIDevice *hotplug_pdev =3D PCI_DEVICE(hotplug_dev);
-+    uint8_t *exp_cap =3D hotplug_pdev->config + hotplug_pdev->exp.exp_cap;
-+    uint32_t sltcap =3D pci_get_word(exp_cap + PCI_EXP_SLTCAP);
-+
-+    /* Check if hot-unplug is disabled on the slot */
-+    if ((sltcap & PCI_EXP_SLTCAP_HPC) =3D=3D 0) {
-+        error_setg(errp, "Hot-unplug failed: "
-+                         "unsupported by the port device '%s'",
-+                         DEVICE(hotplug_pdev)->id);
-+        return;
-+    }
+     memory_region_init_io(&s->io, OBJECT(s), &cmos_ops, s, "rtc", 2);
+-    isa_register_ioport(isadev, &s->io, base);
++    isa_register_ioport(isadev, &s->io, RTC_ISA_BASE);
 =20
-     pcie_cap_slot_plug_common(PCI_DEVICE(hotplug_dev), dev, &local_err);
-     if (local_err) {
+     /* register rtc 0x70 port for coalesced_pio */
+     memory_region_set_flush_coalesced(&s->io);
+@@ -960,7 +959,7 @@ static void rtc_realizefn(DeviceState *dev, Error **err=
+p)
+     memory_region_add_subregion(&s->io, 0, &s->coalesced_io);
+     memory_region_add_coalescing(&s->coalesced_io, 0, 1);
+=20
+-    qdev_set_legacy_instance_id(dev, base, 3);
++    qdev_set_legacy_instance_id(dev, RTC_ISA_BASE, 3);
+     qemu_register_reset(rtc_reset, s);
+=20
+     object_property_add_tm(OBJECT(s), "date", rtc_get_date, NULL);
 --=20
 MST
 
