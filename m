@@ -6,81 +6,95 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9109BC3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 09:58:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32487C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:00:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55D8D2071C
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 09:58:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DE0DA2073E
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 10:00:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CGfqypKO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55D8D2071C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VyinOb/k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE0DA2073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVXra-0004RG-ED
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 05:58:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33784)
+	id 1jVXtq-0006Dd-10
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 06:00:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33928)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jVXqn-0003c9-4d
- for qemu-devel@nongnu.org; Mon, 04 May 2020 05:57:26 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:43126)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jVXqk-0004Xg-4l
- for qemu-devel@nongnu.org; Mon, 04 May 2020 05:57:24 -0400
-Received: by mail-oi1-x242.google.com with SMTP id j16so6100299oih.10
- for <qemu-devel@nongnu.org>; Mon, 04 May 2020 02:57:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=e7GPO9m+Xws7zd9Wbw5Vjgi7NBvbZy+zDZil+YAQUN8=;
- b=CGfqypKO3lw7EhHUZAzjWPCJo7ZC6gRtfn/hP7Wp2q+S6olFmSTXlAIU42kCdRLAn6
- zipZRL1VZVB7UGsc1MhONPK/1+HeRf1vncxLoZhjZ2rPl6N9UT42iWFqBFECnooeUWwt
- 8QqUgKf2y9mYuFJsU1fKVbVMP21rVv2rJj4MTDSKlSsZEKXTV5eTIDEzk0ggFaZcicPf
- wc4BtDCbft7W/cSI7w06l4b7xllhG3myIMw3pyxG8W5a7/C48ygMzJYwN9RYVu0j8u4B
- OEaTbIxQhhxhHm1wr1zgxh3Cpc1AIbFk9oxP+XInOPLZFJL0h3Wfz987OjQe1G8Yrnul
- 6uVg==
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jVXrK-0004Hc-UI
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 05:57:58 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50540
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jVXrI-0004rB-Q1
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 05:57:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588586275;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=J0xKETUStHR0oHcaZ8b8i0N2V+4c29jyY/QLJMgk8WM=;
+ b=VyinOb/k8GNsTJFdhfXBjELFbAUh6rdCMjQ8dP3t2A/meowSLUF2O5TCOtcNhdBQLfeXI2
+ sF6xetxJEeOMuwz9Bm5bzcm4VHCV+g8yi3b7rrO4Hn/v+gS5lAAZqczS6lBEAo4XlGbxaN
+ yuHoS1VUsKl4DNUcntUsNHXlM+j7l94=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-97-VTIZdy22MMSBh4V8pdIPoQ-1; Mon, 04 May 2020 05:57:46 -0400
+X-MC-Unique: VTIZdy22MMSBh4V8pdIPoQ-1
+Received: by mail-wr1-f72.google.com with SMTP id q13so1617948wrn.14
+ for <qemu-devel@nongnu.org>; Mon, 04 May 2020 02:57:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=e7GPO9m+Xws7zd9Wbw5Vjgi7NBvbZy+zDZil+YAQUN8=;
- b=CeBgzpIbWg5wJBYxSC0vbLJQ7lwsMFVNTZvM3nJukTzT0ids+RAk+CG5xK2iNajnGA
- qBTvFnx1ZPo9O9xQCf5bTz1hb/9p059EpXMjjI99ETr5HV4TC3zCNRBhhsz1a0oGW57X
- NGlfdvmDeqJJeS6W+7aIcW4X7bkQDB0a/GiqTjG9W6ML8t+Hky60dg423P5O1bMZa+1K
- tqja8QW+1uuobIbKvsKWe5uePYw4KQ1ybwG5Hisw+DHw6Qz260o1hql5J119sHmHeUd4
- sd5V2wrtMUzISuUPH0e1ABdO7dYowk0MnQ959KGK4iaeRsnLKCLPdrlddCe3KDX5aNlI
- /9tw==
-X-Gm-Message-State: AGi0PuY2HzHrH36VMnP7ok3qfa/gh4wFgrQ/lHItltQwtKfN3XcvT+Lq
- rEmZTtNR7CH/POQXvweA6aVdWDU2p3WSvaG60QSA6A==
-X-Google-Smtp-Source: APiQypLgtoELo1NAvW4cw+EmGA9JyuGe5cO35y47UJBqHsU9+D119jpB31tvCzmN1D8pdYTc/8FVICxIIcqXKH+V5Z8=
-X-Received: by 2002:aca:4a45:: with SMTP id x66mr7721046oia.48.1588586240909; 
- Mon, 04 May 2020 02:57:20 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200421125934.14952-1-shameerali.kolothum.thodi@huawei.com>
- <20200504011252-mutt-send-email-mst@kernel.org>
- <CAFEAcA-nkbCZNj0dbVgcN4ajRVx-N0Yvy5OEFuRewJyRGWfjxg@mail.gmail.com>
- <20200504054547-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200504054547-mutt-send-email-mst@kernel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 4 May 2020 10:57:09 +0100
-Message-ID: <CAFEAcA86RCf7eWxGAaONjATBuR5qQ=eTpdf74U1ELUFnScYFtg@mail.gmail.com>
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=tLxYcMunStH4/7QnTzXZ2d6AI0SLOIk5asIV7RnMEP4=;
+ b=pyZ2ZyyLwSy4gEsmMAzxQts446Cra+o5sfs6Uk4DXWGfLe5qSrYMtGjWvcDBCvJHH6
+ o8DdA6E9v3NE0UlbpaAnTa+b5FN2RNTx/1YieJ6moBvHsluVyehgdiLRCTfJ6EzzNDes
+ 82XlcdtsIase78kkT9hBu/zM5N0+gpDfaieiciUn+Pzov7yrKohKiVi4hLS+mUNyLhpJ
+ 53wK3bw/7UyFPKxX4SSBrseQrq3j+Dm8Fxum6DiUxgJyqaQSchhcNZ1thbl3fKnW8WR9
+ /0h1FxL7L+krmtAQzvavchuYt9FuBiYtkFlgSAl7nkuR2HLvcmw2OH9db1dJzVFVJSfp
+ CIlg==
+X-Gm-Message-State: AGi0PuaXkFdOQdudAILdbgMQlZjLGXEi4+ZgPWWvymZrzCyBSWrXbixB
+ zxErqUCJnsqhKzyYBgrTUr2vFRzdqIU6yElI0mk1AjhaTT97BjAN0q0FY3QPOmXf0LUDZi41G80
+ aoci59KVLQOb1ecs=
+X-Received: by 2002:a1c:4d17:: with SMTP id o23mr13459218wmh.120.1588586264612; 
+ Mon, 04 May 2020 02:57:44 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLcFwrOvtxXwbjs0RCyFyECrzwnf7RPWvFwmwMfTqeYESF/wyLxhokn+dsrwse73ZorAU+znA==
+X-Received: by 2002:a1c:4d17:: with SMTP id o23mr13459185wmh.120.1588586264238; 
+ Mon, 04 May 2020 02:57:44 -0700 (PDT)
+Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
+ by smtp.gmail.com with ESMTPSA id
+ a9sm12065008wmm.38.2020.05.04.02.57.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 04 May 2020 02:57:43 -0700 (PDT)
+Date: Mon, 4 May 2020 05:57:40 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
 Subject: Re: [PATCH v4 0/7] ARM virt: Add NVDIMM support
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x242.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Message-ID: <20200504055608-mutt-send-email-mst@kernel.org>
+References: <20200421125934.14952-1-shameerali.kolothum.thodi@huawei.com>
+ <158748197516.25490.13137194821077838492@39012742ff91>
+MIME-Version: 1.0
+In-Reply-To: <158748197516.25490.13137194821077838492@39012742ff91>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 05:09:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -95,61 +109,306 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- Shannon Zhao <shannon.zhaosl@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- Linuxarm <linuxarm@huawei.com>, Eric Auger <eric.auger@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>, Xu Wei <xuwei5@hisilicon.com>,
- prime.zeng@hisilicon.com, Igor Mammedov <imammedo@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>
+Cc: peter.maydell@linaro.org, xiaoguangrong.eric@gmail.com,
+ shannon.zhaosl@gmail.com, linuxarm@huawei.com,
+ shameerali.kolothum.thodi@huawei.com, eric.auger@redhat.com,
+ qemu-arm@nongnu.org, xuwei5@hisilicon.com, prime.zeng@hisilicon.com,
+ imammedo@redhat.com, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 4 May 2020 at 10:46, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Mon, May 04, 2020 at 10:29:18AM +0100, Peter Maydell wrote:
-> > I notice that checkpatch complains a lot about
-> >
-> > ERROR: Do not add expected files together with tests, follow
-> > instructions in tests/qtest/bios-tables-test.c: both
-> > tests/qtest/bios-tables-test-allowed-diff.h and
-> > tests/qtest/bios-tables-test.c found
-> >
-> > Does that need fixing, or is the checkpatch test wrong?
+On Tue, Apr 21, 2020 at 08:12:57AM -0700, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20200421125934.14952-1-shameerali.k=
+olothum.thodi@huawei.com/
+>=20
+>=20
+>=20
+> Hi,
+>=20
+> This series seems to have some coding style problems. See output below fo=
+r
+> more information:
+>=20
+> Subject: [PATCH v4 0/7] ARM virt: Add NVDIMM support
+> Message-id: 20200421125934.14952-1-shameerali.kolothum.thodi@huawei.com
+> Type: series
+>=20
+> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+> #!/bin/bash
+> git rev-parse base > /dev/null || exit 0
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> git config --local diff.algorithm histogram
+> ./scripts/checkpatch.pl --mailback base..
+> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
+>=20
+> Switched to a new branch 'test'
+> c4f3ad1 tests/acpi: add expected tables for bios-tables-test
+> 5b55be7 bios-tables-test: test pc-dimm and nvdimm coldplug for arm/virt
+> f0c9bb6 tests: Update ACPI tables list for upcoming arm/virt test changes
+> c2dd728 hw/arm/virt: Add nvdimm hotplug support
+> f7dad84 hw/arm/virt: Add nvdimm hot-plug infrastructure
+> 5554e78 nvdimm: Use configurable ACPI IO base and size
+> 8058b6f hw/acpi/nvdimm: Fix for NVDIMM incorrect DSM output buffer length
+>=20
+> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
+> 1/7 Checking commit 8058b6f6d753 (hw/acpi/nvdimm: Fix for NVDIMM incorrec=
+t DSM output buffer length)
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/acpi/nvdimm.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/acpi/nvdimm.c found
+>=20
+> total: 2 errors, 0 warnings, 59 lines checked
 
-> Hmm I don't see a patch in this series that changes both
-> tests/qtest/bios-tables-test-allowed-diff.h and
-> tests/qtest/bios-tables-test.c. Do you?
+OK so this is a false positive in the script. I will fix it.
 
-No, but that's not the pair of files that checkpatch is
-complaining about. It warns about:
+> Patch 1/7 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+>=20
+> 2/7 Checking commit 5554e78b18ea (nvdimm: Use configurable ACPI IO base a=
+nd size)
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/acpi/nvdimm.c found
 
-patch 1:
- tests/qtest/bios-tables-test-allowed-diff.h and hw/acpi/nvdimm.c
+This beats me. Where did we get
+tests/qtest/bios-tables-test-allowed-diff.h from?
+It's a different patch, isn't it?
 
-patch 2:
- tests/qtest/bios-tables-test-allowed-diff.h and hw/acpi/nvdimm.c
- tests/qtest/bios-tables-test-allowed-diff.h and hw/i386/acpi-build.c
- tests/qtest/bios-tables-test-allowed-diff.h and hw/i386/acpi-build.h
- tests/qtest/bios-tables-test-allowed-diff.h and hw/i386/pc_piix.c
- tests/qtest/bios-tables-test-allowed-diff.h and hw/i386/pc_q35.c
- tests/qtest/bios-tables-test-allowed-diff.h and include/hw/mem/nvdimm.h
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/acpi/nvdimm.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/i386/acpi-build.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/i386/acpi-build.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/i386/acpi-build.h found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/i386/acpi-build.h found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/i386/pc_piix.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/i386/pc_piix.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/i386/pc_q35.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/i386/pc_q35.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and include/hw/mem/nvdimm.h found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and include/hw/mem/nvdimm.h found
+>=20
+> total: 12 errors, 0 warnings, 158 lines checked
+>=20
+> Patch 2/7 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+>=20
+> 3/7 Checking commit f7dad84068ce (hw/arm/virt: Add nvdimm hot-plug infras=
+tructure)
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/arm/Kconfig found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/arm/Kconfig found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/arm/virt-acpi-build.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/arm/virt-acpi-build.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/arm/virt.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/arm/virt.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/mem/Kconfig found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/mem/Kconfig found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and include/hw/arm/virt.h found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and include/hw/arm/virt.h found
+>=20
+> total: 10 errors, 0 warnings, 80 lines checked
+>=20
+> Patch 3/7 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+>=20
+> 4/7 Checking commit c2dd7289fec4 (hw/arm/virt: Add nvdimm hotplug support=
+)
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and docs/specs/acpi_hw_reduced_hotplug.rst found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and docs/specs/acpi_hw_reduced_hotplug.rst found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/acpi/generic_event_device.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/acpi/generic_event_device.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/arm/virt.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and hw/arm/virt.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and include/hw/acpi/generic_event_device.h found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and include/hw/acpi/generic_event_device.h found
+>=20
+> total: 8 errors, 0 warnings, 103 lines checked
+>=20
+> Patch 4/7 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+>=20
+> 5/7 Checking commit f0c9bb65828f (tests: Update ACPI tables list for upco=
+ming arm/virt test changes)
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/data/acpi/virt/NFIT.memhp an=
+d include/hw/acpi/generic_event_device.h found
+>=20
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> #17:=20
+> new file mode 100644
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/data/acpi/virt/SSDT.memhp an=
+d include/hw/acpi/generic_event_device.h found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and include/hw/acpi/generic_event_device.h found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and include/hw/acpi/generic_event_device.h found
+>=20
+> total: 4 errors, 1 warnings, 6 lines checked
+>=20
+> Patch 5/7 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+>=20
+> 6/7 Checking commit 5b55be7a85b5 (bios-tables-test: test pc-dimm and nvdi=
+mm coldplug for arm/virt)
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and tests/qtest/bios-tables-test.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and tests/qtest/bios-tables-test.c found
+>=20
+> total: 2 errors, 0 warnings, 19 lines checked
+>=20
+> Patch 6/7 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+>=20
+> 7/7 Checking commit c4f3ad1b593c (tests/acpi: add expected tables for bio=
+s-tables-test)
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/data/acpi/pc/SSDT.dimmpxm an=
+d tests/qtest/bios-tables-test.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/data/acpi/q35/SSDT.dimmpxm a=
+nd tests/qtest/bios-tables-test.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/data/acpi/virt/DSDT.memhp an=
+d tests/qtest/bios-tables-test.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/data/acpi/virt/NFIT.memhp an=
+d tests/qtest/bios-tables-test.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/data/acpi/virt/SSDT.memhp an=
+d tests/qtest/bios-tables-test.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and tests/qtest/bios-tables-test.c found
+>=20
+> ERROR: Do not add expected files together with tests, follow instructions=
+ in tests/qtest/bios-tables-test.c: both tests/qtest/bios-tables-test-allow=
+ed-diff.h and tests/qtest/bios-tables-test.c found
+>=20
+> total: 7 errors, 0 warnings, 1 lines checked
+>=20
+> Patch 7/7 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+>=20
+> =3D=3D=3D OUTPUT END =3D=3D=3D
+>=20
+> Test command exited with code: 1
+>=20
+>=20
+> The full log is available at
+> http://patchew.org/logs/20200421125934.14952-1-shameerali.kolothum.thodi@=
+huawei.com/testing.checkpatch/?type=3Dmessage.
+> ---
+> Email generated automatically by Patchew [https://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
 
-patch 3:
- tests/qtest/bios-tables-test-allowed-diff.h and hw/arm/Kconfig
- tests/qtest/bios-tables-test-allowed-diff.h and hw/arm/virt-acpi-build.c
- tests/qtest/bios-tables-test-allowed-diff.h and hw/arm/virt.c
- tests/qtest/bios-tables-test-allowed-diff.h and hw/mem/Kconfig
- tests/qtest/bios-tables-test-allowed-diff.h and include/hw/arm/virt.h
-
-etc, and the patches really do touch the pairs of files listed.
-(It also seems to warn about each file combination multiple times.)
-
-Are these false positives (if so, we should change the checkpatch test,
-since it's clearly misfiring a lot) or problems with the patches?
-
-thanks
--- PMM
 
