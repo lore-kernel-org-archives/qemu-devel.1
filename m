@@ -2,132 +2,138 @@ Return-Path: <SRS0=Vgkn=6S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFA18C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 17:09:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1ACDC47257
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 17:15:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D292206D9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 17:09:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7C8BE2068E
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 May 2020 17:15:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="IiVbmqiO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D292206D9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="w6l7HfM/";
+	dkim=pass (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="XLiLX5eT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C8BE2068E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVeaV-0008Iy-J1
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 13:09:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52194)
+	id 1jVegX-0005lI-FP
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 13:15:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53514)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar@xilinx.com>)
- id 1jVeZ0-0005np-E7; Mon, 04 May 2020 13:07:30 -0400
-Received: from mail-dm6nam12on2051.outbound.protection.outlook.com
- ([40.107.243.51]:56443 helo=NAM12-DM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar@xilinx.com>)
- id 1jVeYy-0007DI-Bs; Mon, 04 May 2020 13:07:29 -0400
+ (Exim 4.90_1) (envelope-from <steplong@quicinc.com>)
+ id 1jVeeP-0003zU-OS; Mon, 04 May 2020 13:13:05 -0400
+Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:49721)
+ by eggs.gnu.org with esmtps (TLS1.2:RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <steplong@quicinc.com>)
+ id 1jVeeM-0001gz-Sm; Mon, 04 May 2020 13:13:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1588612382; x=1620148382;
+ h=from:to:cc:subject:date:message-id:mime-version;
+ bh=RgAGH3haK9UPB88zqGDUU8Fx2h6e0OWVeCTs/04UnLk=;
+ b=w6l7HfM/U4N37f+3ffl74VStGtveXA7iGRU0xKQYmWuT6pzh2Lc+hqjW
+ z6933ZKWH4sbrA3Z/l/hhET8CGQckSSHPGPnSPjy3nBw34WqDk3aGz8ye
+ eM3HC8mpXK//bTFSiOhyEF3J25sDJ7I19pojc6ku47UcIRzPK5eDNUdya Y=;
+Received: from unknown (HELO ironmsg02-sd.qualcomm.com) ([10.53.140.142])
+ by alexa-out-sd-02.qualcomm.com with ESMTP; 04 May 2020 10:13:00 -0700
+Received: from nasanexm03c.na.qualcomm.com ([10.85.0.106])
+ by ironmsg02-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
+ 04 May 2020 10:13:00 -0700
+Received: from APSANEXR01A.ap.qualcomm.com (10.85.0.36) by
+ nasanexm03c.na.qualcomm.com (10.85.0.106) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Mon, 4 May 2020 10:12:59 -0700
+Received: from nasanexm03e.na.qualcomm.com (10.85.0.48) by
+ APSANEXR01A.ap.qualcomm.com (10.85.0.36) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Mon, 4 May 2020 10:12:56 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (199.106.107.6)
+ by nasanexm03e.na.qualcomm.com (10.85.0.48) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2 via Frontend Transport; Mon, 4 May 2020 10:12:56 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AbPxUInqkl2dy+jYtkn002IXeh6SECZ3qom7wi7GDm7+s1f2SdKpo5MmmAH1MScp+YF76AQER4GtbMfjxxfaoWb3gbI0BKBWR6+ase1b1aFPMojbPKVPKXI4lhXi+u6X3l4U5VOPVr927kwcQ/+HxLDjONPyAT2esPvcktcsAWshkEdRseTzxb02JFlDdaA64qBbaxvXAm6+3KEOQzJqK2GzuLVJABJ6PKx+YMgsgQPOITHl5nOD09QV+XCpL3ij2CW53utG6xTvSnDnuC3wwcpRTnZe/pxsIHxkK4u51NdvtJ7BoQj6wNs9bEeLe8imZZOQjwJ6xob5OBkjeH37AQ==
+ b=dd0Jzt4NxCzSW7Hjzk3CHFlUQ+9kxIwQkS8qpHtv1QWdl0AXq10zLhlPgUSor0jv5eWsBXr5LEBkw6I5W8vFsJ1i29q18UGJPtNiGkEwDhXSrWmeC+oWYN2WAJWgz/au9SO0KVqCX7rFYIpZcfpXNQbPvgIxQVw2IAgDh+q0c6XQuTNIHUCg3S5405SRWvj5aEmrMj2k6VKi57RKn2LlH7oZV2QWfhVkiMzFryqUaA+nffRby4k4u8tbkNNXD4LAnL4GUvRXwKzGP2UdaxzkyZzP+sFoKhLs9jYDZ/xDFDAEEBKXAF3fmqdCTGY78rjwXaZOYIdrjAf+6rS80zQUlQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J+dJI79+49gXPv4D5pA/poLwgdT98YjCUTE9NUsnHlg=;
- b=nZTLPAVXqKRWz6Mrd3jVCRSGURty1RzkJUkpA5cobcWEJaE0StHDffeoulJVQgQnkogITAt/9pdMqUwOrFhpF7cQVwI3Fc1OR+ycVHcay2r9Dd+lVlUxdkZDyNDL2JP33UOY06cqD4WKkQkt0g6C/VtzPQ4Z7a8xP93SKDD5yk5TQpWzDSLsgZ5s3SbukE1tUHG5lI1V7zDFxfIR8YiGHUWAozzV5W0AlN8hNyhdAT+IclQXasrH3kE6lDx2d5laXXknholcjUAN7BjlE51PKATEB7zi0N6AjjDf7LAfI4NC5MBaX2OUDKDWtfvFk2pB2faS3H9D7wn41ERKeEy6Nw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.80.198) smtp.rcpttodomain=gmail.com smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
+ bh=Dfui14MQ1pc9/PghXrBC+29CxM37rqIHLDCr9sOl+Qw=;
+ b=YT1r2T5SXfofyui74/IiZYbmmRP7onKdSjaMnNALAixf/yNkQDSnY+/ICOwygEYG73NVJMA11d2rqQW35nt+iP1ft141GSsj664voyfmu/ZSGqhlLYE30GXglylRf9tBrQAkbf3z7+Fa4QSLDYmdwZPoM1eDqfU5+VUWTA6K2PcoLnQBrxftwqHvGPiRJo8FurmlAzM9MlWEPcc7/MDkDf9sjs2guZ1oCFkCqbYVev7SAUKDVUJKmhrGara/utA1nboICq1CefsIaKkR8+hA+NV8L7SFWom5h+gpqnyhJDdj152e9OwmEWU6dN3GtGwKGc1e9l9kgyCx6NGP3QqmaA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
+ dkim=pass header.d=quicinc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J+dJI79+49gXPv4D5pA/poLwgdT98YjCUTE9NUsnHlg=;
- b=IiVbmqiO+a1FupTWN8nvKhLa051+2/aVeBc5mheocPLrJpaySVrs56k2qTyhCPfCr8VeaHJHskNm3vyYVA1Wb2wko8Z0B1f3p/QSTgC+7n4SgKESMakiZxx7MJt4H3BPdaZ82uZ8De5YZKaLFMdptTjuf8js53oQw6AEVNgvXYM=
-Received: from SN1PR12CA0097.namprd12.prod.outlook.com (2603:10b6:802:21::32)
- by BL0PR02MB4787.namprd02.prod.outlook.com (2603:10b6:208:2a::32)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.21; Mon, 4 May
- 2020 17:07:24 +0000
-Received: from SN1NAM02FT012.eop-nam02.prod.protection.outlook.com
- (2603:10b6:802:21:cafe::85) by SN1PR12CA0097.outlook.office365.com
- (2603:10b6:802:21::32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.20 via Frontend
- Transport; Mon, 4 May 2020 17:07:24 +0000
-Authentication-Results: spf=pass (sender IP is 149.199.80.198)
- smtp.mailfrom=xilinx.com; gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.80.198 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.80.198; helo=xir-pvapexch02.xlnx.xilinx.com;
-Received: from xir-pvapexch02.xlnx.xilinx.com (149.199.80.198) by
- SN1NAM02FT012.mail.protection.outlook.com (10.152.72.95) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.2958.27 via Frontend Transport; Mon, 4 May 2020 17:07:23 +0000
-Received: from xir-pvapexch01.xlnx.xilinx.com (172.21.17.15) by
- xir-pvapexch02.xlnx.xilinx.com (172.21.17.17) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1913.5; Mon, 4 May 2020 18:07:21 +0100
-Received: from smtp.xilinx.com (172.21.105.197) by
- xir-pvapexch01.xlnx.xilinx.com (172.21.17.15) with Microsoft SMTP Server id
- 15.1.1913.5 via Frontend Transport; Mon, 4 May 2020 18:07:21 +0100
-Received: from [10.71.116.176] (port=54645 helo=localhost)
- by smtp.xilinx.com with esmtp (Exim 4.90)
- (envelope-from <edgar@xilinx.com>)
- id 1jVeYr-0004Px-Ew; Mon, 04 May 2020 18:07:21 +0100
-Date: Mon, 4 May 2020 19:07:21 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Subject: Re: [PATCH v2 1/1] target/arm: Drop access_el3_aa32ns()
-Message-ID: <20200504170721.GB2945@toto>
-References: <20200504142125.31180-1-edgar.iglesias@gmail.com>
- <20200504142125.31180-2-edgar.iglesias@gmail.com>
+ bh=Dfui14MQ1pc9/PghXrBC+29CxM37rqIHLDCr9sOl+Qw=;
+ b=XLiLX5eTVeiSh67SvjfNNUvWHTBvV9uqQeePmmrDfkNg9xldIbJHUqT9NvwYagATjw1G9WUtLyEe/tvt++9hrIa9XQv2d5D/7iMmhHeY/IcLQZFw3Gq85xpJFPdfIHUmBeQG9jLoyS5B4Rqw0Dx85PpbiBd3/VrrRbYwmZ9BGM8=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=quicinc.com;
+Received: from MWHPR0201MB3547.namprd02.prod.outlook.com
+ (2603:10b6:301:7b::24) by MWHPR0201MB3498.namprd02.prod.outlook.com
+ (2603:10b6:301:76::36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.20; Mon, 4 May
+ 2020 17:12:55 +0000
+Received: from MWHPR0201MB3547.namprd02.prod.outlook.com
+ ([fe80::10ad:5df5:d575:1f37]) by MWHPR0201MB3547.namprd02.prod.outlook.com
+ ([fe80::10ad:5df5:d575:1f37%3]) with mapi id 15.20.2958.030; Mon, 4 May 2020
+ 17:12:55 +0000
+From: Stephen Long <steplong@quicinc.com>
+To: <qemu-devel@nongnu.org>
+Subject: [PATCH] target/arm: Implement SVE2 fp multiply-add long
+Date: Mon,  4 May 2020 10:12:40 -0700
+Message-ID: <20200504171240.11220-1-steplong@quicinc.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain
+X-ClientProxiedBy: BL0PR1501CA0024.namprd15.prod.outlook.com
+ (2603:10b6:207:17::37) To MWHPR0201MB3547.namprd02.prod.outlook.com
+ (2603:10b6:301:7b::24)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20200504142125.31180-2-edgar.iglesias@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-Forefront-Antispam-Report: CIP:149.199.80.198; CTRY:IE; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:xir-pvapexch02.xlnx.xilinx.com;
- PTR:unknown-80-198.xilinx.com; CAT:NONE; SFTY:;
- SFS:(7916004)(376002)(39860400002)(396003)(346002)(136003)(46966005)(4326008)(478600001)(336012)(9786002)(426003)(26005)(186003)(47076004)(36906005)(8936002)(33656002)(2906002)(82740400003)(8676002)(54906003)(316002)(33716001)(5660300002)(7636003)(1076003)(82310400002)(356005)(70206006)(6916009)(9686003)(70586007);
- DIR:OUT; SFP:1101; 
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from STEPLONG.qualcomm.com (24.102.122.190) by
+ BL0PR1501CA0024.namprd15.prod.outlook.com (2603:10b6:207:17::37) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.20 via Frontend
+ Transport; Mon, 4 May 2020 17:12:54 +0000
+X-Mailer: git-send-email 2.17.1
+X-Originating-IP: [24.102.122.190]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 124efbec-f850-4cb8-8c69-08d7f04d9d3a
-X-MS-TrafficTypeDiagnostic: BL0PR02MB4787:
-X-Microsoft-Antispam-PRVS: <BL0PR02MB47878CBAEC91A0130A3583B2C2A60@BL0PR02MB4787.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Office365-Filtering-Correlation-Id: 2380ef09-6494-4799-1b94-08d7f04e62bc
+X-MS-TrafficTypeDiagnostic: MWHPR0201MB3498:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <MWHPR0201MB34989E5D00049E27A00FD471C7A60@MWHPR0201MB3498.namprd02.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:34;
 X-Forefront-PRVS: 03932714EB
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ksfg3cjiPrB0JZn8r2/I5ZrOEQTjsqnBXUW/H3b6+u2UlOW4gWAAOBKqrXNy5QzQZKJINUsIli+p82Mn2v9Hjh3NlYYWQhBgHsEzRU42WFCV0uFFYSVY71rj0AzGIXVxjmPnf/hOfjzCmoes5d6TUY2kHz52vNESWCN5NbdKAmRcxyO20/R2H3zXGsfJR2sC2nTU+1h5A5Wdm1/IXnID8MYhW0ZXPAvXP+pHSf62gGpc99wQDfvMo0btz2CDOwvAnO+Ypt0cKDWmgL4pRpUi4uO+81OiZ6nOU9ua5ReiAepUIJNjBEOev02vN4BMkb4zaDRLOB6TQW97TGLvyMR2b79EqtC0lUHQw380rI4bTjm5asRNQ5zG3E8KPI1bdYVcx4X/dWWVdsD8y0b3HFEXGJMe9afPZuW7gEURw3XbMHrEnZtk0COEKSkHxnZQis18Pvs9Fpwe+ROgwzsq1M12xxK9aIlmUGW9/4H/5CHc/IBs09OZGc/BhHT1uC8d2EEX34CpVldlsIkJoCX8qW/IfQ==
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2020 17:07:23.4513 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 124efbec-f850-4cb8-8c69-08d7f04d9d3a
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.80.198];
- Helo=[xir-pvapexch02.xlnx.xilinx.com]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR02MB4787
-Received-SPF: pass client-ip=40.107.243.51; envelope-from=edgar@xilinx.com;
- helo=NAM12-DM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 13:07:26
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+X-Microsoft-Antispam-Message-Info: Eh1KfWZjhHcqPZr13++w4e95KiMFDsxzfV0UU509qtbJdKRZ0rtXfOo8uTk1QKMdm9XEEGahaA2DNO8a0DSBE0n/3Up7sNAx4a0qoQsxa3zs15h3aicjnrotMZ9ju1qWQMnQh2XUtO7VIhZZCgbH6DoFzV39Rs+Vvy5P80ywmsjP0nlGQExnq+QMkkqKx1TssvxB7Kb0uUUTolPwcz77SBmyDK6iJy9WoMfmJPd8KF/7kZB104Kc/sUjdkb/pO2fj48ArptWSldIRfjppYdp5nLTYgPMfUF0myl4VH/HX0hL0w7FosvU6ZKJW0N5rH/AhHcDyP/Gh8qrSP8UxT5efHcMtVIq4rLEs5aPhgsmoAZDfcNSNjfdJ+q9VUHRmkZMCxe88kNfUcU3PQXHrk9YSRzZsoQWkIfQaj9zYFo60NmYlQi+gXRC8WFKcx8gBcF2
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:MWHPR0201MB3547.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(376002)(396003)(136003)(346002)(39860400002)(366004)(956004)(478600001)(1076003)(107886003)(86362001)(4326008)(2616005)(6916009)(5660300002)(6486002)(2906002)(6506007)(52116002)(186003)(6512007)(16526019)(66556008)(66946007)(66476007)(6666004)(8676002)(26005)(316002)(36756003)(8936002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: Ftxm6OuxXHlqx4VWZuC5ZOGC7lBl+vmCrdUrC9FxhdOo6Cun83SzLAjL8AbImNmKpbEqmBV9dgUWHLuT4HT45ZpP8rJaBsiJtSzk9qi4XXjT7G4p7EjzF/1PAIHrwIeqFaIGhLL3GVJdhIovOjGRPodCmcIPQZ+W1yF2zBxRI1v8+aaSZU/nKiJkG25m8d8Z6N+KH4Q1CCqu553Dg06RJp3ds9jONzdnD6l0NRDWDnnGkkFSyh/rvqzfggDD+WeHEP33wUrMXo0hoCx1Rcrdn+J/jY1MHr/WioVilsM7tbEN1HoKqbuKq+YAjbPxK+8fsbC44dVGVO4ZD2+fbA3Jjz3iSSc9DaRptksRYPWJLhbkC9wEPX2gq5fQnG8+OriY/qNmIn1WjGDlE6d1E6E1yETibEK1YTEiRMnlOnVAB8LzYlqyeUAQxhbLnv52BbwAk0PBxNzzrxdtnNlyEi330pmO68/PXqorCDxufj8ye5CI2ozg7wAtRZ4PkSgyYdMRx5meQWr/Qr23ouo4+mfnEqO+M6EmDeEi/Y0rSBMDce1ee/veCzwr0sS7/C829uN+be9KcpJRQnwHt4RnSneDiaoOMOFRl+cFntWy7krEq8JT8n0gftkrze2hzXGP+sGkzJsOXVq82BRe6vxls2BPzIeIKIVGW2kn1Toq70+gDPvw8iCtc3/S/DeTnvoA7LwMRrfltuirlELfpDuGvZwWEtvWZd2cpSeysSdvl/xaI2+Yoq8mOco2J31X/69Bw1AUMMZa1PQxFuqxGuStf6dBp1EldnqiLNUUBLYfh31bPHo=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2380ef09-6494-4799-1b94-08d7f04e62bc
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2020 17:12:55.4013 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: E6BnwVI2uNUVE9kbk2e8CoWoaQxQqTbMiLy93v21wadfUmFU+zpnyjNQcifQUi+Ii5jDNyF0PZHZmT3XZQBuFA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR0201MB3498
+X-OriginatorOrg: quicinc.com
+Received-SPF: pass client-ip=199.106.114.39; envelope-from=steplong@quicinc.com;
+ helo=alexa-out-sd-02.qualcomm.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 13:13:00
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -141,116 +147,238 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: laurent.desnogues@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org,
- richard.henderson@linaro.org, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, richard.henderson@linaro.org, apazos@quicinc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 04, 2020 at 04:21:25PM +0200, Edgar E. Iglesias wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> 
-> Calling access_el3_aa32ns() works for AArch32 only cores
-> but it does not handle 32-bit EL2 on top of 64-bit EL3
-> for mixed 32/64-bit cores.
-> 
-> Merge access_el3_aa32ns_aa64any() into access_el3_aa32ns()
-> and only use the latter.
+Implements both vectored and indexed FMLALB, FMLALT, FMLSLB, FMLSLT
 
+Signed-off-by: Stephen Long <steplong@quicinc.com>
+---
+ target/arm/helper-sve.h    | 10 +++++
+ target/arm/sve.decode      | 12 ++++++
+ target/arm/sve_helper.c    | 76 +++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c | 86 ++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 184 insertions(+)
 
-Forgot to update the Subject/Summary to reflect that
-access_el3_aa32ns_aa64any() is now being removed.
+diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
+index 0a62eef94e..2e5f1d810e 100644
+--- a/target/arm/helper-sve.h
++++ b/target/arm/helper-sve.h
+@@ -2731,3 +2731,13 @@ DEF_HELPER_FLAGS_5(sve2_sqrdcmlah_idx_h, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_5(sve2_sqrdcmlah_idx_s, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_6(sve2_fmlal_zzzw_s, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_6(sve2_fmlsl_zzzw_s, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_6(sve2_fmlal_zzxw_s, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_6(sve2_fmlsl_zzxw_s, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
+diff --git a/target/arm/sve.decode b/target/arm/sve.decode
+index 3cf824bac5..7602ba4e3f 100644
+--- a/target/arm/sve.decode
++++ b/target/arm/sve.decode
+@@ -1568,3 +1568,15 @@ SM4E            01000101 00 10001 1 11100 0 ..... .....  @rdn_rm_e0
+ # SVE2 crypto constructive binary operations
+ SM4EKEY         01000101 00 1 ..... 11110 0 ..... .....  @rd_rn_rm_e0
+ RAX1            01000101 00 1 ..... 11110 1 ..... .....  @rd_rn_rm_e0
++
++### SVE2 floating-point multiply-add long (vectors)
++FMLALB_zzzw     01100100 .. 1 ..... 10 0 00 0 ..... .....  @rda_rn_rm
++FMLALT_zzzw     01100100 .. 1 ..... 10 0 00 1 ..... .....  @rda_rn_rm
++FMLSLB_zzzw     01100100 .. 1 ..... 10 1 00 0 ..... .....  @rda_rn_rm
++FMLSLT_zzzw     01100100 .. 1 ..... 10 1 00 1 ..... .....  @rda_rn_rm
++
++### SVE2 floating-point multiply-add long (indexed)
++FMLALB_zzxw     01100100 .. 1 ..... 0100.0 ..... .....          @rrxw_s
++FMLALT_zzxw     01100100 .. 1 ..... 0100.1 ..... .....          @rrxw_s
++FMLSLB_zzxw     01100100 .. 1 ..... 0110.0 ..... .....          @rrxw_s
++FMLSLT_zzxw     01100100 .. 1 ..... 0110.1 ..... .....          @rrxw_s
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index aa94df302a..ae1321225a 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -7622,3 +7622,79 @@ void HELPER(fmmla_d)(void *vd, void *va, void *vn, void *vm,
+         d[3] = float64_add(a[3], float64_add(p0, p1, status), status);
+     }
+ }
++
++/* SVE2 Floating Point Multiply-Add (Vectors) Helpers */
++
++void HELPER(sve2_fmlal_zzzw_s)(void *vd, void *vn, void *vm, void *va,
++                               void *status, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc);
++    intptr_t sel1 = simd_data(desc) * sizeof(float16);
++    for (i = 0; i < opr_sz; i += sizeof(float32)) {
++        float16 nn_16 = *(float16 *)(vn + H1_2(i + sel1));
++        float16 mm_16 = *(float16 *)(vm + H1_2(i + sel1));
++
++        float32 nn = float16_to_float32(nn_16, true, status);
++        float32 mm = float16_to_float32(mm_16, true, status);
++        float32 aa = *(float32 *)(va + H1_4(i));
++        *(float32 *)(vd + H1_4(i)) = float32_muladd(nn, mm, aa, 0, status);
++    }
++}
++
++void HELPER(sve2_fmlsl_zzzw_s)(void *vd, void *vn, void *vm, void *va,
++                               void *status, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc);
++    intptr_t sel1 = simd_data(desc) * sizeof(float16);
++    for (i = 0; i < opr_sz; i += sizeof(float32)) {
++        float16 nn_16 = *(float16 *)(vn + H1_2(i + sel1));
++        float16 mm_16 = *(float16 *)(vm + H1_2(i + sel1));
++
++        float32 nn = float16_to_float32(nn_16, true, status);
++        float32 mm = float16_to_float32(mm_16, true, status);
++        float32 aa = *(float32 *)(va + H1_4(i));
++        nn = float32_set_sign(nn, float32_is_neg(nn) ^ 1);
++        *(float32 *)(vd + H1_4(i)) = float32_muladd(nn, mm, aa, 0, status);
++    }
++}
++
++/* SVE2 Floating Point Multiply-Add (Indexed) Helpers */
++
++void HELPER(sve2_fmlal_zzxw_s)(void *vd, void *vn, void *vm, void *va,
++                               void *status, uint32_t desc)
++{
++    intptr_t i, j, oprsz = simd_oprsz(desc);
++    intptr_t sel = extract32(desc, SIMD_DATA_SHIFT, 1) * sizeof(float16);
++    intptr_t idx = extract32(desc, SIMD_DATA_SHIFT + 1, 3);
++    for (i = 0; i < oprsz; i += 16) {
++        float16 mm_16 = *(float16 *)(vm + i + idx);
++        float32 mm = float16_to_float32(mm_16, true, status);
++        for (j = 0; j < 16; j += sizeof(float32)) {
++            float16 nn_16 = *(float16 *)(vn + H1_2(i + j + sel));
++            float32 nn = float16_to_float32(nn_16, true, status);
++            float32 aa = *(float32 *)(va + H1_4(i + j));
++            *(float32 *)(vd + H1_4(i + j)) =
++                float32_muladd(nn, mm, aa, 0, status);
++        }
++    }
++}
++
++void HELPER(sve2_fmlsl_zzxw_s)(void *vd, void *vn, void *vm, void *va,
++                               void *status, uint32_t desc)
++{
++    intptr_t i, j, oprsz = simd_oprsz(desc);
++    intptr_t sel = extract32(desc, SIMD_DATA_SHIFT, 1) * sizeof(float16);
++    intptr_t idx = extract32(desc, SIMD_DATA_SHIFT + 1, 3);
++    for (i = 0; i < oprsz; i += 16) {
++        float16 mm_16 = *(float16 *)(vm + i + idx);
++        float32 mm = float16_to_float32(mm_16, true, status);
++        for (j = 0; j < 16; j += sizeof(float32)) {
++            float16 nn_16 = *(float16 *)(vn + H1_2(i + j + sel));
++            float32 nn = float16_to_float32(nn_16, true, status);
++            float32 aa = *(float32 *)(va + H1_4(i + j));
++            nn = float32_set_sign(nn, float32_is_neg(nn) ^ 1);
++            *(float32 *)(vd + H1_4(i + j)) =
++                float32_muladd(nn, mm, aa, 0, status);
++        }
++    }
++}
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index a8e57ea5f4..3d7382a7de 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -8253,3 +8253,89 @@ static bool trans_RAX1(DisasContext *s, arg_rrr_esz *a)
+     }
+     return true;
+ }
++
++static bool do_zzzz_fp(DisasContext *s, arg_rrrr_esz *a,
++                       gen_helper_gvec_4_ptr *fn, int data)
++{
++    if (fn == NULL) {
++        return false;
++    }
++    if (sve_access_check(s)) {
++        unsigned vsz = vec_full_reg_size(s);
++        TCGv_ptr status = get_fpstatus_ptr(a->esz == MO_16);
++        tcg_gen_gvec_4_ptr(vec_full_reg_offset(s, a->rd),
++                           vec_full_reg_offset(s, a->rn),
++                           vec_full_reg_offset(s, a->rm),
++                           vec_full_reg_offset(s, a->ra),
++                           status, vsz, vsz, data, fn);
++        tcg_temp_free_ptr(status);
++    }
++    return true;
++}
++
++static bool do_zzxz_fp(DisasContext *s, arg_rrxr_esz *a,
++                       gen_helper_gvec_4_ptr *fn, int data)
++{
++    if (fn == NULL) {
++        return false;
++    }
++    if (sve_access_check(s)) {
++        unsigned vsz = vec_full_reg_size(s);
++        TCGv_ptr status = get_fpstatus_ptr(a->esz == MO_16);
++        tcg_gen_gvec_4_ptr(vec_full_reg_offset(s, a->rd),
++                           vec_full_reg_offset(s, a->rn),
++                           vec_full_reg_offset(s, a->rm),
++                           vec_full_reg_offset(s, a->ra),
++                           status, vsz, vsz, data, fn);
++        tcg_temp_free_ptr(status);
++    }
++    return true;
++}
++
++static bool do_sve2_zzzz_fp(DisasContext *s, arg_rrrr_esz *a,
++                            gen_helper_gvec_4_ptr *fn, int data)
++{
++    if (!dc_isar_feature(aa64_sve2, s) || a->esz != 2) {
++        return false;
++    }
++    return do_zzzz_fp(s, a, fn, data);
++}
++
++static bool do_sve2_zzxz_fp(DisasContext *s, arg_rrxr_esz *a,
++                            gen_helper_gvec_4_ptr *fn, int data)
++{
++    if (!dc_isar_feature(aa64_sve2, s) || a->esz != 2) {
++        return false;
++    }
++    return do_zzxz_fp(s, a, fn, data);
++}
++
++#define DO_SVE2_FP_MULADD_VEC(NAME, FUNC, TOP)                            \
++static bool trans_##NAME(DisasContext *s, arg_rrrr_esz *a)                \
++{                                                                         \
++    return do_sve2_zzzz_fp(s, a, FUNC, TOP);                              \
++}
++
++#define DO_SVE2_FP_MULADD_IDX(NAME, FUNC, TOP)                            \
++static bool trans_##NAME(DisasContext *s, arg_rrxr_esz *a)                \
++{                                                                         \
++    return do_sve2_zzxz_fp(s, a, FUNC, (a->index << 1) | TOP);            \
++}
++
++/*
++ * SVE2 Floating Point Multiply-Add Vector Group
++ */
++
++DO_SVE2_FP_MULADD_VEC(FMLALB_zzzw, gen_helper_sve2_fmlal_zzzw_s, false)
++DO_SVE2_FP_MULADD_VEC(FMLALT_zzzw, gen_helper_sve2_fmlal_zzzw_s, true)
++DO_SVE2_FP_MULADD_VEC(FMLSLB_zzzw, gen_helper_sve2_fmlsl_zzzw_s, false)
++DO_SVE2_FP_MULADD_VEC(FMLSLT_zzzw, gen_helper_sve2_fmlsl_zzzw_s, true)
++
++/*
++ * SVE2 Floating Point Multiply-Add Indexed Group
++ */
++
++DO_SVE2_FP_MULADD_IDX(FMLALB_zzxw, gen_helper_sve2_fmlal_zzxw_s, false)
++DO_SVE2_FP_MULADD_IDX(FMLALT_zzxw, gen_helper_sve2_fmlal_zzxw_s, true)
++DO_SVE2_FP_MULADD_IDX(FMLSLB_zzxw, gen_helper_sve2_fmlsl_zzxw_s, false)
++DO_SVE2_FP_MULADD_IDX(FMLSLT_zzxw, gen_helper_sve2_fmlsl_zzxw_s, true)
+-- 
+2.17.1
 
-Will fix in v3...
-
-
-
-
-> 
-> Fixes: 68e9c2fe65 ("target-arm: Add VTCR_EL2")
-> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> ---
->  target/arm/helper.c | 30 +++++++-----------------------
->  1 file changed, 7 insertions(+), 23 deletions(-)
-> 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index dfefb9b3d9..7d21bf1cc7 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -502,35 +502,19 @@ void init_cpreg_list(ARMCPU *cpu)
->  }
->  
->  /*
-> - * Some registers are not accessible if EL3.NS=0 and EL3 is using AArch32 but
-> - * they are accessible when EL3 is using AArch64 regardless of EL3.NS.
-> - *
-> - * access_el3_aa32ns: Used to check AArch32 register views.
-> - * access_el3_aa32ns_aa64any: Used to check both AArch32/64 register views.
-> + * Some registers are not accessible from AArch32 EL3 if SCR.NS == 0.
->   */
->  static CPAccessResult access_el3_aa32ns(CPUARMState *env,
->                                          const ARMCPRegInfo *ri,
->                                          bool isread)
->  {
-> -    bool secure = arm_is_secure_below_el3(env);
-> -
-> -    assert(!arm_el_is_aa64(env, 3));
-> -    if (secure) {
-> +    if (!is_a64(env) && arm_current_el(env) == 3 &&
-> +        arm_is_secure_below_el3(env)) {
->          return CP_ACCESS_TRAP_UNCATEGORIZED;
->      }
->      return CP_ACCESS_OK;
->  }
->  
-> -static CPAccessResult access_el3_aa32ns_aa64any(CPUARMState *env,
-> -                                                const ARMCPRegInfo *ri,
-> -                                                bool isread)
-> -{
-> -    if (!arm_el_is_aa64(env, 3)) {
-> -        return access_el3_aa32ns(env, ri, isread);
-> -    }
-> -    return CP_ACCESS_OK;
-> -}
-> -
->  /* Some secure-only AArch32 registers trap to EL3 if used from
->   * Secure EL1 (but are just ordinary UNDEF in other non-EL3 contexts).
->   * Note that an access from Secure EL1 can only happen if EL3 is AArch64.
-> @@ -5236,7 +5220,7 @@ static const ARMCPRegInfo el3_no_el2_cp_reginfo[] = {
->        .access = PL2_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
->      { .name = "VTCR_EL2", .state = ARM_CP_STATE_BOTH,
->        .opc0 = 3, .opc1 = 4, .crn = 2, .crm = 1, .opc2 = 2,
-> -      .access = PL2_RW, .accessfn = access_el3_aa32ns_aa64any,
-> +      .access = PL2_RW, .accessfn = access_el3_aa32ns,
->        .type = ARM_CP_CONST, .resetvalue = 0 },
->      { .name = "VTTBR", .state = ARM_CP_STATE_AA32,
->        .cp = 15, .opc1 = 6, .crm = 2,
-> @@ -5284,7 +5268,7 @@ static const ARMCPRegInfo el3_no_el2_cp_reginfo[] = {
->        .type = ARM_CP_CONST, .resetvalue = 0 },
->      { .name = "HPFAR_EL2", .state = ARM_CP_STATE_BOTH,
->        .opc0 = 3, .opc1 = 4, .crn = 6, .crm = 0, .opc2 = 4,
-> -      .access = PL2_RW, .accessfn = access_el3_aa32ns_aa64any,
-> +      .access = PL2_RW, .accessfn = access_el3_aa32ns,
->        .type = ARM_CP_CONST, .resetvalue = 0 },
->      { .name = "HSTR_EL2", .state = ARM_CP_STATE_BOTH,
->        .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 1, .opc2 = 3,
-> @@ -7626,12 +7610,12 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->              ARMCPRegInfo vpidr_regs[] = {
->                  { .name = "VPIDR_EL2", .state = ARM_CP_STATE_BOTH,
->                    .opc0 = 3, .opc1 = 4, .crn = 0, .crm = 0, .opc2 = 0,
-> -                  .access = PL2_RW, .accessfn = access_el3_aa32ns_aa64any,
-> +                  .access = PL2_RW, .accessfn = access_el3_aa32ns,
->                    .type = ARM_CP_CONST, .resetvalue = cpu->midr,
->                    .fieldoffset = offsetof(CPUARMState, cp15.vpidr_el2) },
->                  { .name = "VMPIDR_EL2", .state = ARM_CP_STATE_BOTH,
->                    .opc0 = 3, .opc1 = 4, .crn = 0, .crm = 0, .opc2 = 5,
-> -                  .access = PL2_RW, .accessfn = access_el3_aa32ns_aa64any,
-> +                  .access = PL2_RW, .accessfn = access_el3_aa32ns,
->                    .type = ARM_CP_NO_RAW,
->                    .writefn = arm_cp_write_ignore, .readfn = mpidr_read },
->                  REGINFO_SENTINEL
-> -- 
-> 2.20.1
-> 
 
