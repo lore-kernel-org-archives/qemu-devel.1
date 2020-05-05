@@ -2,93 +2,80 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7499C47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:22:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47764C47254
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:22:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9206520838
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:22:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 162D020675
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:22:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mtQkwWP7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9206520838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S1g9p+2r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 162D020675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVySx-0007TR-NT
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 10:22:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58340)
+	id 1jVyTA-0007w3-82
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 10:22:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57636)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frasse.iglesias@gmail.com>)
- id 1jVyR4-0004gm-Fw; Tue, 05 May 2020 10:20:38 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:45424)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <frasse.iglesias@gmail.com>)
- id 1jVyR3-0008QX-C3; Tue, 05 May 2020 10:20:38 -0400
-Received: by mail-lj1-x243.google.com with SMTP id h4so1785495ljg.12;
- Tue, 05 May 2020 07:20:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=O5IYLb/GECU4jv4t9QZ3dvCDGBJ13r9xQkJk3e4hnmc=;
- b=mtQkwWP7m9TMTU67FUq0CiqUA+Lb875Dm4R1nmPEPz5J+XsE0Y1/KVP28I+0fcLPEV
- YOX61Qu6PzvOlcJo6KnciMDYXCO7SLs2n5mz45bJMtf/evmjoGrvyCuCRqnQKiZmMTHH
- NyKUKSCuwHifkn9tD5Z721OSOJK0jZ94XxdMT42LKlTp/+xI+cxeaGMtKMN1a34msKjB
- goy3q2AalYQoYEWW4NzmcFC4+/6NzqlWSffNCGEqKbUbT8D7oe9Ql0JjUphrC7kypU/x
- yE13mATcsnt7f+YwzHK6ORps6sl9nTrRjM2Ws9aTRFZSTboKu98saXo3HbBLZLTgra7i
- ePEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=O5IYLb/GECU4jv4t9QZ3dvCDGBJ13r9xQkJk3e4hnmc=;
- b=TpHrpc5QL6YnllEwyIExK7/LdqGtoIvGBLeu6KlGqgEYbFTucSn6sAz5CQpC/1wCA4
- uMMBZcYZq2+vzP9xE/7GnbMMa/Yt9HYIWSnNhFIJqHBEBUovkcCjLxFRCtnm8yoWiVvT
- WIzVfBlChWb98qKbRMDtMWpBLcZDI8y3/gs2hPUB992ovdMMp32fFwLY8jO0yIKr5Im2
- oxC0w9HMJNA2bAzJJw13cOejkTdpDXUSx/R/roXocyWLme+EhfKmaLs1y2H+tIHnjTMD
- Vl/bkxh18HRSprh42KguaEAMCb2MRci9HmolieGv5LKbcpuuudn0biYZjtk0SElSKtkw
- eH3Q==
-X-Gm-Message-State: AGi0PuY8/SQLY0GtY7jTkcBTA0wMbgi9zm491lSzN5QqJoAk4X8C32BW
- oMpG0EEhZB6vjXJ3kiwfr/b2Bcl72PE=
-X-Google-Smtp-Source: APiQypLIWbwecxM5LTfaWcZ0vXqhg+e0MtGM480b3wjw9EIyG1MWLHyleoIj5ZP0frpAdYy1cQfCwg==
-X-Received: by 2002:a2e:9d83:: with SMTP id c3mr1986243ljj.90.1588688435163;
- Tue, 05 May 2020 07:20:35 -0700 (PDT)
-Received: from fralle-msi (31-208-27-151.cust.bredband2.com. [31.208.27.151])
- by smtp.gmail.com with ESMTPSA id
- 125sm1994112lfc.75.2020.05.05.07.20.34
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 05 May 2020 07:20:34 -0700 (PDT)
-Date: Tue, 5 May 2020 16:20:32 +0200
-From: Francisco Iglesias <frasse.iglesias@gmail.com>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Subject: Re: [PATCH v1 5/9] hw/core: stream: Add an end-of-packet flag
-Message-ID: <20200505142032.n2gvierijhuppkxy@fralle-msi>
-References: <20200430162439.2659-1-edgar.iglesias@gmail.com>
- <20200430162439.2659-6-edgar.iglesias@gmail.com>
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jVyOd-00010z-JB
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 10:18:07 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34000
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jVyOc-00063b-GK
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 10:18:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588688285;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=hH03BKYFA32+IuJAFdD5wimyl3JSc0sP2Sl7UDkkxEw=;
+ b=S1g9p+2rixusiGgM9uTRSvF9+BlhaIeLcGmMFD8l0U0l6/VWmGqh/0YoOhJ8y0Q+o9QvlX
+ f5oQqiLv0WLhRqSJFTIUHh7+e7PoXuRf82iAtOkQYACeVKzxszggCs0IcDf7uEOMkCTgzk
+ r4+wL7Z/2bLKzKDQPKSoz9Se+Unfwu0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-230-nJOh9PsUMPafUOv7U2NrIg-1; Tue, 05 May 2020 10:18:04 -0400
+X-MC-Unique: nJOh9PsUMPafUOv7U2NrIg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2095B460;
+ Tue,  5 May 2020 14:18:03 +0000 (UTC)
+Received: from localhost (ovpn-113-206.ams2.redhat.com [10.36.113.206])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B569D10013D9;
+ Tue,  5 May 2020 14:18:02 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH] qcow2: Fix preallocation on block devices
+Date: Tue,  5 May 2020 16:18:01 +0200
+Message-Id: <20200505141801.1096763-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200430162439.2659-6-edgar.iglesias@gmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
-Received-SPF: pass client-ip=2a00:1450:4864:20::243;
- envelope-from=frasse.iglesias@gmail.com; helo=mail-lj1-x243.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -1020
-X-Spam_score: -102.1
-X-Spam_bar: ---------------------------------------------------
-X-Spam_report: (-102.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001,
- USER_IN_WHITELIST=-100 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,190 +88,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: damien.hedde@greensocs.com, peter.maydell@linaro.org,
- sstabellini@kernel.org, edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
- jasowang@redhat.com, alistair@alistair23.me, qemu-devel@nongnu.org,
- frederic.konrad@adacore.com, qemu-arm@nongnu.org, philmd@redhat.com,
- luc.michel@greensocs.com, figlesia@xilinx.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On [2020 Apr 30] Thu 18:24:35, Edgar E. Iglesias wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> 
-> Some stream clients stream an endless stream of data while
-> other clients stream data in packets. Stream interfaces
-> usually have a way to signal the end of a packet or the
-> last beat of a transfer.
-> 
-> This adds an end-of-packet flag to the push interface.
-> 
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Calling bdrv_getlength() to get the pre-truncate file size will not
+really work on block devices, because they have always the same length,
+and trying to write beyond it will fail with a rather cryptic error
+message.
 
-Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+Instead, we should use qcow2_get_last_cluster() and bdrv_getlength()
+only as a fallback.
 
-> ---
->  include/hw/stream.h     |  5 +++--
->  hw/core/stream.c        |  4 ++--
->  hw/dma/xilinx_axidma.c  | 10 ++++++----
->  hw/net/xilinx_axienet.c | 14 ++++++++++----
->  hw/ssi/xilinx_spips.c   |  2 +-
->  5 files changed, 22 insertions(+), 13 deletions(-)
-> 
-> diff --git a/include/hw/stream.h b/include/hw/stream.h
-> index d02f62ca89..ed09e83683 100644
-> --- a/include/hw/stream.h
-> +++ b/include/hw/stream.h
-> @@ -39,12 +39,13 @@ typedef struct StreamSlaveClass {
->       * @obj: Stream slave to push to
->       * @buf: Data to write
->       * @len: Maximum number of bytes to write
-> +     * @eop: End of packet flag
->       */
-> -    size_t (*push)(StreamSlave *obj, unsigned char *buf, size_t len);
-> +    size_t (*push)(StreamSlave *obj, unsigned char *buf, size_t len, bool eop);
->  } StreamSlaveClass;
->  
->  size_t
-> -stream_push(StreamSlave *sink, uint8_t *buf, size_t len);
-> +stream_push(StreamSlave *sink, uint8_t *buf, size_t len, bool eop);
->  
->  bool
->  stream_can_push(StreamSlave *sink, StreamCanPushNotifyFn notify,
-> diff --git a/hw/core/stream.c b/hw/core/stream.c
-> index 39b1e595cd..a65ad1208d 100644
-> --- a/hw/core/stream.c
-> +++ b/hw/core/stream.c
-> @@ -3,11 +3,11 @@
->  #include "qemu/module.h"
->  
->  size_t
-> -stream_push(StreamSlave *sink, uint8_t *buf, size_t len)
-> +stream_push(StreamSlave *sink, uint8_t *buf, size_t len, bool eop)
->  {
->      StreamSlaveClass *k =  STREAM_SLAVE_GET_CLASS(sink);
->  
-> -    return k->push(sink, buf, len);
-> +    return k->push(sink, buf, len, eop);
->  }
->  
->  bool
-> diff --git a/hw/dma/xilinx_axidma.c b/hw/dma/xilinx_axidma.c
-> index 4540051448..a770e12c96 100644
-> --- a/hw/dma/xilinx_axidma.c
-> +++ b/hw/dma/xilinx_axidma.c
-> @@ -283,7 +283,7 @@ static void stream_process_mem2s(struct Stream *s, StreamSlave *tx_data_dev,
->  
->          if (stream_desc_sof(&s->desc)) {
->              s->pos = 0;
-> -            stream_push(tx_control_dev, s->desc.app, sizeof(s->desc.app));
-> +            stream_push(tx_control_dev, s->desc.app, sizeof(s->desc.app), true);
->          }
->  
->          txlen = s->desc.control & SDESC_CTRL_LEN_MASK;
-> @@ -298,7 +298,7 @@ static void stream_process_mem2s(struct Stream *s, StreamSlave *tx_data_dev,
->          s->pos += txlen;
->  
->          if (stream_desc_eof(&s->desc)) {
-> -            stream_push(tx_data_dev, s->txbuf, s->pos);
-> +            stream_push(tx_data_dev, s->txbuf, s->pos, true);
->              s->pos = 0;
->              stream_complete(s);
->          }
-> @@ -384,7 +384,7 @@ static void xilinx_axidma_reset(DeviceState *dev)
->  
->  static size_t
->  xilinx_axidma_control_stream_push(StreamSlave *obj, unsigned char *buf,
-> -                                  size_t len)
-> +                                  size_t len, bool eop)
->  {
->      XilinxAXIDMAStreamSlave *cs = XILINX_AXI_DMA_CONTROL_STREAM(obj);
->      struct Stream *s = &cs->dma->streams[1];
-> @@ -416,12 +416,14 @@ xilinx_axidma_data_stream_can_push(StreamSlave *obj,
->  }
->  
->  static size_t
-> -xilinx_axidma_data_stream_push(StreamSlave *obj, unsigned char *buf, size_t len)
-> +xilinx_axidma_data_stream_push(StreamSlave *obj, unsigned char *buf, size_t len,
-> +                               bool eop)
->  {
->      XilinxAXIDMAStreamSlave *ds = XILINX_AXI_DMA_DATA_STREAM(obj);
->      struct Stream *s = &ds->dma->streams[1];
->      size_t ret;
->  
-> +    assert(eop);
->      ret = stream_process_s2mem(s, buf, len);
->      stream_update_irq(s);
->      return ret;
-> diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
-> index c8dfcda3ee..bd48305577 100644
-> --- a/hw/net/xilinx_axienet.c
-> +++ b/hw/net/xilinx_axienet.c
-> @@ -697,14 +697,14 @@ static void axienet_eth_rx_notify(void *opaque)
->                                             axienet_eth_rx_notify, s)) {
->          size_t ret = stream_push(s->tx_control_dev,
->                                   (void *)s->rxapp + CONTROL_PAYLOAD_SIZE
-> -                                 - s->rxappsize, s->rxappsize);
-> +                                 - s->rxappsize, s->rxappsize, true);
->          s->rxappsize -= ret;
->      }
->  
->      while (s->rxsize && stream_can_push(s->tx_data_dev,
->                                          axienet_eth_rx_notify, s)) {
->          size_t ret = stream_push(s->tx_data_dev, (void *)s->rxmem + s->rxpos,
-> -                                 s->rxsize);
-> +                                 s->rxsize, true);
->          s->rxsize -= ret;
->          s->rxpos += ret;
->          if (!s->rxsize) {
-> @@ -874,12 +874,14 @@ static ssize_t eth_rx(NetClientState *nc, const uint8_t *buf, size_t size)
->  }
->  
->  static size_t
-> -xilinx_axienet_control_stream_push(StreamSlave *obj, uint8_t *buf, size_t len)
-> +xilinx_axienet_control_stream_push(StreamSlave *obj, uint8_t *buf, size_t len,
-> +                                   bool eop)
->  {
->      int i;
->      XilinxAXIEnetStreamSlave *cs = XILINX_AXI_ENET_CONTROL_STREAM(obj);
->      XilinxAXIEnet *s = cs->enet;
->  
-> +    assert(eop);
->      if (len != CONTROL_PAYLOAD_SIZE) {
->          hw_error("AXI Enet requires %d byte control stream payload\n",
->                   (int)CONTROL_PAYLOAD_SIZE);
-> @@ -894,11 +896,15 @@ xilinx_axienet_control_stream_push(StreamSlave *obj, uint8_t *buf, size_t len)
->  }
->  
->  static size_t
-> -xilinx_axienet_data_stream_push(StreamSlave *obj, uint8_t *buf, size_t size)
-> +xilinx_axienet_data_stream_push(StreamSlave *obj, uint8_t *buf, size_t size,
-> +                                bool eop)
->  {
->      XilinxAXIEnetStreamSlave *ds = XILINX_AXI_ENET_DATA_STREAM(obj);
->      XilinxAXIEnet *s = ds->enet;
->  
-> +    /* We don't support fragmented packets yet.  */
-> +    assert(eop);
-> +
->      /* TX enable ?  */
->      if (!(s->tc & TC_TX)) {
->          return size;
-> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-> index c57850a505..4cfce882ab 100644
-> --- a/hw/ssi/xilinx_spips.c
-> +++ b/hw/ssi/xilinx_spips.c
-> @@ -868,7 +868,7 @@ static void xlnx_zynqmp_qspips_notify(void *opaque)
->  
->          memcpy(rq->dma_buf, rxd, num);
->  
-> -        ret = stream_push(rq->dma, rq->dma_buf, num);
-> +        ret = stream_push(rq->dma, rq->dma_buf, num, false);
->          assert(ret == num);
->          xlnx_zynqmp_qspips_check_flush(rq);
->      }
-> -- 
-> 2.20.1
-> 
+Before this patch:
+$ truncate -s 1G test.img
+$ sudo losetup -f --show test.img
+/dev/loop0
+$ sudo qemu-img create -f qcow2 -o preallocation=3Dfull /dev/loop0 64M
+Formatting '/dev/loop0', fmt=3Dqcow2 size=3D67108864 cluster_size=3D65536
+preallocation=3Dfull lazy_refcounts=3Doff refcount_bits=3D16
+qemu-img: /dev/loop0: Could not resize image: Failed to resize refcount
+structures: No space left on device
+
+With this patch:
+$ sudo qemu-img create -f qcow2 -o preallocation=3Dfull /dev/loop0 64M
+Formatting '/dev/loop0', fmt=3Dqcow2 size=3D67108864 cluster_size=3D65536
+preallocation=3Dfull lazy_refcounts=3Doff refcount_bits=3D16
+qemu-img: /dev/loop0: Could not resize image: Failed to resize
+underlying file: Preallocation mode 'full' unsupported for this
+non-regular file
+
+So as you can see, it still fails, but now the problem is missing
+support on the block device level, so we at least get a better error
+message.
+
+Note that we cannot preallocate block devices on truncate by design,
+because we do not know what area to preallocate.  Their length is always
+the same, the truncate operation does not change it.
+
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block/qcow2.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/block/qcow2.c b/block/qcow2.c
+index ad934109a8..c1a9edd6dc 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -4107,7 +4107,7 @@ static int coroutine_fn qcow2_co_truncate(BlockDriver=
+State *bs, int64_t offset,
+     {
+         int64_t allocation_start, host_offset, guest_offset;
+         int64_t clusters_allocated;
+-        int64_t old_file_size, new_file_size;
++        int64_t old_file_size, last_cluster, new_file_size;
+         uint64_t nb_new_data_clusters, nb_new_l2_tables;
+=20
+         /* With a data file, preallocation means just allocating the metad=
+ata
+@@ -4127,7 +4127,13 @@ static int coroutine_fn qcow2_co_truncate(BlockDrive=
+rState *bs, int64_t offset,
+             ret =3D old_file_size;
+             goto fail;
+         }
+-        old_file_size =3D ROUND_UP(old_file_size, s->cluster_size);
++
++        last_cluster =3D qcow2_get_last_cluster(bs, old_file_size);
++        if (last_cluster >=3D 0) {
++            old_file_size =3D (last_cluster + 1) * s->cluster_size;
++        } else {
++            old_file_size =3D ROUND_UP(old_file_size, s->cluster_size);
++        }
+=20
+         nb_new_data_clusters =3D DIV_ROUND_UP(offset - old_length,
+                                             s->cluster_size);
+--=20
+2.26.2
+
 
