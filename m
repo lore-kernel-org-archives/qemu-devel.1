@@ -2,86 +2,85 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFFD9C47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:17:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D33E6C47254
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:19:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DC1E206CC
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:17:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 994F7206CC
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:19:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uh0mg/F5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DC1E206CC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XyZ7lFju"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 994F7206CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVue4-0001yq-J7
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 06:17:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57298)
+	id 1jVufG-0002zk-P2
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 06:19:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57388)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jVuXG-0005w3-Th
- for qemu-devel@nongnu.org; Tue, 05 May 2020 06:10:47 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40665)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jVuXE-0001wa-OH
- for qemu-devel@nongnu.org; Tue, 05 May 2020 06:10:46 -0400
-Received: by mail-ot1-x344.google.com with SMTP id i27so1149608ota.7
- for <qemu-devel@nongnu.org>; Tue, 05 May 2020 03:10:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=k2E1BANozowIuRLwzQhWAkc5j3kkcoUCFJeH+kJb5Uc=;
- b=uh0mg/F57LfyLKGl4gKQ3i0zq5ozIDmsn8qKb11GOhDcpbjfHr6hB/rEzY3yh2CGKb
- +Md45jf9/FnbjvrtBj7/rM+nf2v0VpJlYDBqpaSJ9qo8tNTfiwQuLKmxTQ4XRzb7G/ZK
- 9iqO0kHqLIMJLVs1WW2HrWEqlkwYay64rQ7uxgN2q/Y0a98WvVmA99YdQc8EYYoHymic
- srIq5b5/XodbyjHh/f92tScv2wjQiO3QG+YKAx8REtKosdjTNoNcTAVJlxl1a+1mgfDF
- yfQx6aZvM+q4lWvHt8VrBOsGFHL8fLVh0CIVSTcBnbaTdpwvk7I81fbPbe1UMNWRRArK
- 1XHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=k2E1BANozowIuRLwzQhWAkc5j3kkcoUCFJeH+kJb5Uc=;
- b=MaizxJPxt6/TsMex29qd49rgUyX9I3a8cT9s957Xn97vtJCAVimUrOM633Hlk8fUGy
- ipuxDFn6n9jDKxwp8V61bWjixWjcHKIqNkGZqsymggPaP1mfkPYCZ65rVYbsk0wTnkUJ
- UmqvRgyV2gxLfAOYq+XSfrczv/eBn2YYqZw/zydnDRqWsEZxOwkUVoWMdwV5YwgNpOOJ
- K88uIPTrcvICm9LOsA79rRblLBhZYGrvMuogAgiuFR/uL93ISAWMh19q0509ls1ENI0J
- SHmovfwp9mz6gp9iYn+P3bm9roiHIlISnXY35/mMBC7XmuXbdjtEQbcI1ADre0l4sebe
- uwdQ==
-X-Gm-Message-State: AGi0Pub0Acp8QajbsQvTfGIT2JI4LAFPSrT0z385WiG3RBy6Bh5WP4GL
- DxFW9S+0NYOxOCrzZp0hsm/u9ktwPkiBGOW7a0ru/A==
-X-Google-Smtp-Source: APiQypKIz+/6r5BxIdWv5d82lj7PFK3reoqhsmCv0YU0m63wT+DpqE4O3aogEg86yuPuswJQAerbSq21v+PJ6qTwjRY=
-X-Received: by 2002:a9d:2c08:: with SMTP id f8mr1591546otb.135.1588673443251; 
- Tue, 05 May 2020 03:10:43 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jVuYE-0006rd-Ig
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 06:11:46 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23309
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jVuYD-0002Vu-LY
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 06:11:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588673504;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7qYP5hei+9dAbu2tuMU3HQ8iEsG+EM8TI+IlS3ed1D4=;
+ b=XyZ7lFjugHGNJaWsvlezFu5vrWw2lucUn/1xMcjbzyyxipQDUSEZdzUTVEgdyAjQN+tEMb
+ HxY4/DbgktkgLTafe9wXGGgTw54Kx6OQpivraiqvk/kKfpnS184qo6VuCD/tKyOAkLwAB1
+ fJ5Uw2nYQL1pfo8YqpTdmWzygjC7j8k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-407-frAgqNjsO9CPVTogwMk7Gg-1; Tue, 05 May 2020 06:11:41 -0400
+X-MC-Unique: frAgqNjsO9CPVTogwMk7Gg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E91C64AE8;
+ Tue,  5 May 2020 10:11:36 +0000 (UTC)
+Received: from gondolin (ovpn-112-219.ams2.redhat.com [10.36.112.219])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E8CFA5D9D3;
+ Tue,  5 May 2020 10:11:04 +0000 (UTC)
+Date: Tue, 5 May 2020 12:11:02 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v18 QEMU 06/18] vfio: Add VM state change handler to
+ know state of VM
+Message-ID: <20200505120459.62bd0b16.cohuck@redhat.com>
+In-Reply-To: <1588632293-18932-7-git-send-email-kwankhede@nvidia.com>
+References: <1588632293-18932-1-git-send-email-kwankhede@nvidia.com>
+ <1588632293-18932-7-git-send-email-kwankhede@nvidia.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <20200505095945.23146-1-f4bug@amsat.org>
- <bc8d1213-5578-52f2-7a86-f45dfa8b33be@web.de>
-In-Reply-To: <bc8d1213-5578-52f2-7a86-f45dfa8b33be@web.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 5 May 2020 11:10:32 +0100
-Message-ID: <CAFEAcA_Ci7ymqWV2tvnJX-Me5D0QQhaKaBkJVaL7KxeixCZJ_Q@mail.gmail.com>
-Subject: Re: [RFC PATCH] hw/arm/musicpal: Map the UART devices unconditionally
-To: Jan Kiszka <jan.kiszka@web.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,23 +94,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: cjia@nvidia.com, aik@ozlabs.ru, Zhengxiao.zx@Alibaba-inc.com,
+ shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ eauger@redhat.com, yi.l.liu@intel.com, quintela@redhat.com,
+ ziye.yang@intel.com, armbru@redhat.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, felipe@nutanix.com, zhi.a.wang@intel.com,
+ kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
+ alex.williamson@redhat.com, changpeng.liu@intel.com, eskultet@redhat.com,
+ Ken.Xue@amd.com, jonathan.davies@nutanix.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 5 May 2020 at 11:09, Jan Kiszka <jan.kiszka@web.de> wrote:
->
-> On 05.05.20 11:59, Philippe Mathieu-Daud=C3=A9 wrote:
-> I don't recall details anymore either (more than 10 year ago now...),
-> but this looks reasonable.
+On Tue, 5 May 2020 04:14:41 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-My guess is that it dates back to when the serial code would
-crash if passed a NULL pointer for the backend rather than
-treating it as "same as if connected to a /dev/null backend".
+> VM state change handler gets called on change in VM's state. This is used to set
+> VFIO device state to _RUNNING.
+> 
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> ---
+>  hw/vfio/migration.c           | 87 +++++++++++++++++++++++++++++++++++++++++++
+>  hw/vfio/trace-events          |  2 +
+>  include/hw/vfio/vfio-common.h |  4 ++
+>  3 files changed, 93 insertions(+)
+> 
+> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> index bf9384907ec0..e79b34003079 100644
+> --- a/hw/vfio/migration.c
+> +++ b/hw/vfio/migration.c
+> @@ -10,6 +10,7 @@
+>  #include "qemu/osdep.h"
+>  #include <linux/vfio.h>
+>  
+> +#include "sysemu/runstate.h"
+>  #include "hw/vfio/vfio-common.h"
+>  #include "cpu.h"
+>  #include "migration/migration.h"
+> @@ -74,6 +75,85 @@ err:
+>      return ret;
+>  }
+>  
+> +static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t mask,
+> +                                    uint32_t value)
 
-thanks
--- PMM
+I find 'mask' and 'value' a bit confusing. 'mask' seems to be all the
+bits you want to keep, and 'value' the bits you want to add?
+
+> +{
+> +    VFIOMigration *migration = vbasedev->migration;
+> +    VFIORegion *region = &migration->region;
+> +    uint32_t device_state;
+> +    int ret;
+> +
+> +    ret = pread(vbasedev->fd, &device_state, sizeof(device_state),
+> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
+> +                                              device_state));
+> +    if (ret < 0) {
+> +        error_report("%s: Failed to read device state %d %s",
+> +                     vbasedev->name, ret, strerror(errno));
+> +        return ret;
+> +    }
+> +
+> +    device_state = (device_state & mask) | value;
+> +
+> +    if (!VFIO_DEVICE_STATE_VALID(device_state)) {
+> +        return -EINVAL;
+> +    }
+> +
+> +    ret = pwrite(vbasedev->fd, &device_state, sizeof(device_state),
+> +                 region->fd_offset + offsetof(struct vfio_device_migration_info,
+> +                                              device_state));
+> +    if (ret < 0) {
+> +        error_report("%s: Failed to set device state %d %s",
+> +                     vbasedev->name, ret, strerror(errno));
+> +
+> +        ret = pread(vbasedev->fd, &device_state, sizeof(device_state),
+> +                region->fd_offset + offsetof(struct vfio_device_migration_info,
+> +                device_state));
+> +        if (ret < 0) {
+> +            error_report("%s: On failure, failed to read device state %d %s",
+> +                    vbasedev->name, ret, strerror(errno));
+> +            return ret;
+> +        }
+> +
+> +        if (VFIO_DEVICE_STATE_IS_ERROR(device_state)) {
+> +            error_report("%s: Device is in error state 0x%x",
+> +                         vbasedev->name, device_state);
+> +            return -EFAULT;
+
+Why -EFAULT?
+
+Also, if the device is in an error state, don't you want to propagate
+that state into the vbasedev as well? It does not look usable in that
+state, but that information is only available in the migration region.
+
+> +        }
+> +    }
+> +
+> +    vbasedev->device_state = device_state;
+> +    trace_vfio_migration_set_state(vbasedev->name, device_state);
+> +    return 0;
+> +}
+> +
+> +static void vfio_vmstate_change(void *opaque, int running, RunState state)
+> +{
+> +    VFIODevice *vbasedev = opaque;
+> +
+> +    if ((vbasedev->vm_running != running)) {
+> +        int ret;
+> +        uint32_t value = 0, mask = 0;
+> +
+> +        if (running) {
+> +            value = VFIO_DEVICE_STATE_RUNNING;
+> +            if (vbasedev->device_state & VFIO_DEVICE_STATE_RESUMING) {
+> +                mask = ~VFIO_DEVICE_STATE_RESUMING;
+> +            }
+> +        } else {
+> +            mask = ~VFIO_DEVICE_STATE_RUNNING;
+> +        }
+
+I think the issue might be that you are starting to fiddle with the
+target state before you know what the actual device state is (you only
+know the state in the vbasedev, which might be out of sync.) But you do
+know what the transition is supposed to look like depending on the
+vmstate change, so what about the following:
+
+- read the state from the region
+- figure out the transition that is supposed to be happening
+- write the target state
+
+> +
+> +        ret = vfio_migration_set_state(vbasedev, mask, value);
+> +        if (ret) {
+> +            error_report("%s: Failed to set device state 0x%x",
+> +                         vbasedev->name, value & mask);
+
+If the transition failed, what does that mean? I assume that the device
+might actually be in an unusable state (like the error state referenced
+above)? Does it make sense to continue, or should the device rather be
+flagged broken in some way?
+
+> +        }
+> +        vbasedev->vm_running = running;
+> +        trace_vfio_vmstate_change(vbasedev->name, running, RunState_str(state),
+> +                                  value & mask);
+> +    }
+> +}
+
 
