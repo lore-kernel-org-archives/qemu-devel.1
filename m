@@ -2,43 +2,45 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BBBBC47257
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 05:52:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB0FC47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 05:53:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 644FD2075E
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 05:52:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 644FD2075E
+	by mail.kernel.org (Postfix) with ESMTPS id 02B38206E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 05:53:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02B38206E6
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVqVV-0005eg-J6
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 01:52:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53576)
+	id 1jVqWR-00081S-1L
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 01:53:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53644)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jVqS8-00076I-PG; Tue, 05 May 2020 01:49:12 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:56226)
+ id 1jVqST-0007ke-Ak; Tue, 05 May 2020 01:49:34 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:56380)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jVqS1-0005CB-VQ; Tue, 05 May 2020 01:49:12 -0400
+ id 1jVqSS-0005Kt-Hq; Tue, 05 May 2020 01:49:33 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id B184EBF5DC;
- Tue,  5 May 2020 05:49:02 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 74967BFD79;
+ Tue,  5 May 2020 05:49:07 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v5 00/18] nvme: refactoring and cleanups
-Date: Tue,  5 May 2020 07:48:22 +0200
-Message-Id: <20200505054840.186586-1-its@irrelevant.dk>
+Subject: [PATCH v5 09/18] nvme: factor out property/constraint checks
+Date: Tue,  5 May 2020 07:48:31 +0200
+Message-Id: <20200505054840.186586-10-its@irrelevant.dk>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200505054840.186586-1-its@irrelevant.dk>
+References: <20200505054840.186586-1-its@irrelevant.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -75,48 +77,94 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Changes since v5
-~~~~~~~~~~~~~~~~
-No functional changes, just updated Reviewed-by tags. Also, I screwed up
-the CC list when sending v4.
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Keith Busch <kbusch@kernel.org>
+---
+ hw/block/nvme.c | 48 ++++++++++++++++++++++++++++++------------------
+ 1 file changed, 30 insertions(+), 18 deletions(-)
 
-Philippe and Keith, please add a Reviewed-by to
-
-  * "nvme: factor out pmr setup" and
-  * "do cmb/pmr init as part of pci init"
-
-since the first one was added and the second one was changed in v4 when
-rebasing on Kevins block-next tree which had the PMR work that was not
-in master at the time.
-
-With those in place, it should be ready for Kevin to merge.
-
-Klaus Jensen (18):
-  nvme: fix pci doorbell size calculation
-  nvme: rename trace events to pci_nvme
-  nvme: remove superfluous breaks
-  nvme: move device parameters to separate struct
-  nvme: use constants in identify
-  nvme: refactor nvme_addr_read
-  nvme: add max_ioqpairs device parameter
-  nvme: remove redundant cmbloc/cmbsz members
-  nvme: factor out property/constraint checks
-  nvme: factor out device state setup
-  nvme: factor out block backend setup
-  nvme: add namespace helpers
-  nvme: factor out namespace setup
-  nvme: factor out pci setup
-  nvme: factor out cmb setup
-  nvme: factor out pmr setup
-  nvme: do cmb/pmr init as part of pci init
-  nvme: factor out controller identify setup
-
- hw/block/nvme.c       | 543 ++++++++++++++++++++++++------------------
- hw/block/nvme.h       |  31 ++-
- hw/block/trace-events | 180 +++++++-------
- include/block/nvme.h  |   8 +
- 4 files changed, 429 insertions(+), 333 deletions(-)
-
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index cc6d3059ff7f..13fb90c77e90 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -1352,24 +1352,19 @@ static const MemoryRegionOps nvme_cmb_ops = {
+     },
+ };
+ 
+-static void nvme_realize(PCIDevice *pci_dev, Error **errp)
++static void nvme_check_constraints(NvmeCtrl *n, Error **errp)
+ {
+-    NvmeCtrl *n = NVME(pci_dev);
+-    NvmeIdCtrl *id = &n->id_ctrl;
++    NvmeParams *params = &n->params;
+ 
+-    int i;
+-    int64_t bs_size;
+-    uint8_t *pci_conf;
+-
+-    if (n->params.num_queues) {
++    if (params->num_queues) {
+         warn_report("num_queues is deprecated; please use max_ioqpairs "
+                     "instead");
+ 
+-        n->params.max_ioqpairs = n->params.num_queues - 1;
++        params->max_ioqpairs = params->num_queues - 1;
+     }
+ 
+-    if (n->params.max_ioqpairs < 1 ||
+-        n->params.max_ioqpairs > PCI_MSIX_FLAGS_QSIZE) {
++    if (params->max_ioqpairs < 1 ||
++        params->max_ioqpairs > PCI_MSIX_FLAGS_QSIZE) {
+         error_setg(errp, "max_ioqpairs must be between 1 and %d",
+                    PCI_MSIX_FLAGS_QSIZE);
+         return;
+@@ -1380,13 +1375,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+         return;
+     }
+ 
+-    bs_size = blk_getlength(n->conf.blk);
+-    if (bs_size < 0) {
+-        error_setg(errp, "could not get backing file size");
+-        return;
+-    }
+-
+-    if (!n->params.serial) {
++    if (!params->serial) {
+         error_setg(errp, "serial property not set");
+         return;
+     }
+@@ -1406,6 +1395,29 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+ 
+         host_memory_backend_set_mapped(n->pmrdev, true);
+     }
++}
++
++static void nvme_realize(PCIDevice *pci_dev, Error **errp)
++{
++    NvmeCtrl *n = NVME(pci_dev);
++    NvmeIdCtrl *id = &n->id_ctrl;
++    Error *local_err = NULL;
++
++    int i;
++    int64_t bs_size;
++    uint8_t *pci_conf;
++
++    nvme_check_constraints(n, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    bs_size = blk_getlength(n->conf.blk);
++    if (bs_size < 0) {
++        error_setg(errp, "could not get backing file size");
++        return;
++    }
+ 
+     blkconf_blocksizes(&n->conf);
+     if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->conf.blk),
 -- 
 2.26.2
 
