@@ -2,87 +2,98 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29236C47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 12:11:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D6F7C47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 12:29:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0AE8206A4
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 12:11:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HIlo4hpK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0AE8206A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 40E88206B8
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 12:29:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40E88206B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVwPo-00075I-2Y
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 08:11:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55826)
+	id 1jVwh5-00035N-CO
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 08:29:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59638)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jVwP5-0006b8-KG
- for qemu-devel@nongnu.org; Tue, 05 May 2020 08:10:27 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42521
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jVwP4-00050I-NR
- for qemu-devel@nongnu.org; Tue, 05 May 2020 08:10:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588680625;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4rvkycHLd0dtr2wb2Q8NmoVQu+pDZL75e9l/4dBiiWc=;
- b=HIlo4hpKa1cWgROoJrrRhdQw0y1bW0beH5ab/p/wy7Pb+4pgkAnkmajStq2QDEkBV789Kk
- AqSS0SyIv+hJJYuUQySvJornusPMBHB7/H4JmWh1UmJ0hEGk3ls+Lk+Op1J61dSP8crI1u
- JMEnOQpeE6xoT2OzkVeFoPZ9xAnRLLA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-253-cbA3BEwpPJ20cAUxCi9HlQ-1; Tue, 05 May 2020 08:10:24 -0400
-X-MC-Unique: cbA3BEwpPJ20cAUxCi9HlQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A914107ACF5;
- Tue,  5 May 2020 12:10:22 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.34])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C021760C80;
- Tue,  5 May 2020 12:10:16 +0000 (UTC)
-Message-ID: <9b2ebceafa7a5c6598cfcb32120569b656f21fad.camel@redhat.com>
-Subject: Re: [PATCH v5 06/18] nvme: refactor nvme_addr_read
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
-Date: Tue, 05 May 2020 15:10:15 +0300
-In-Reply-To: <20200505055252.dtk3w355nrcfmszs@apples.localdomain>
-References: <20200505054840.186586-1-its@irrelevant.dk>
- <20200505054840.186586-7-its@irrelevant.dk>
- <20200505055252.dtk3w355nrcfmszs@apples.localdomain>
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mlevitsk@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+ (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
+ id 1jVwfv-0002JZ-5l; Tue, 05 May 2020 08:27:51 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:20428)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
+ id 1jVwft-0001An-RJ; Tue, 05 May 2020 08:27:50 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 045CLchl193660; Tue, 5 May 2020 08:26:56 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.27])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 30sp8jrnt1-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 05 May 2020 08:26:55 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+ by ppma05wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 045CQ5O7028145;
+ Tue, 5 May 2020 12:26:52 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com
+ (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+ by ppma05wdc.us.ibm.com with ESMTP id 30s0g6gkwf-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 05 May 2020 12:26:52 +0000
+Received: from b03ledav003.gho.boulder.ibm.com
+ (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+ by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 045CQpqw24052166
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 5 May 2020 12:26:51 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id E50D36A047;
+ Tue,  5 May 2020 12:26:50 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5D19E6A054;
+ Tue,  5 May 2020 12:26:50 +0000 (GMT)
+Received: from [9.160.119.241] (unknown [9.160.119.241])
+ by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Tue,  5 May 2020 12:26:50 +0000 (GMT)
+Subject: Re: [PATCH 1/1] target-ppc: fix rlwimi, rlwinm, rlwnm for Clang-9
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20200501190913.25008-1-dbuono@linux.vnet.ibm.com>
+ <20200501190913.25008-2-dbuono@linux.vnet.ibm.com>
+ <20200505050815.GC218517@umbus.fritz.box>
+From: Daniele Buono <dbuono@linux.vnet.ibm.com>
+Message-ID: <6bce4a90-21c8-0533-e9c2-22fd770da3ee@linux.vnet.ibm.com>
+Date: Tue, 5 May 2020 08:26:48 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
+MIME-Version: 1.0
+In-Reply-To: <20200505050815.GC218517@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-05-05_06:2020-05-04,
+ 2020-05-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 phishscore=0
+ malwarescore=0 suspectscore=2 priorityscore=1501 spamscore=0 clxscore=1015
+ mlxscore=0 lowpriorityscore=0 mlxlogscore=999 impostorscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2005050093
+Received-SPF: none client-ip=148.163.158.5;
+ envelope-from=dbuono@linux.vnet.ibm.com; helo=mx0b-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 08:27:02
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Spam_score_int: -25
+X-Spam_score: -2.6
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,47 +106,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
- Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Javier Gonzalez <javier.gonz@samsung.com>,
- Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, dbuono@us.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 2020-05-05 at 07:52 +0200, Klaus Jensen wrote:
-> On May  5 07:48, Klaus Jensen wrote:
-> > From: Klaus Jensen <k.jensen@samsung.com>
-> >=20
-> > Pull the controller memory buffer check to its own function. The check
-> > will be used on its own in later patches.
-> >=20
-> > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > Reviewed-by: Maxim Levitsky <mlevitsky@redhat.com>
-> > Reviewed-by: Keith Busch <kbusch@kernel.org>
-> > ---
-> >  hw/block/nvme.c | 16 ++++++++++++----
-> >  1 file changed, 12 insertions(+), 4 deletions(-)
-> >=20
->=20
-> Woops, noticed that Maxim's R-b is wrong here, please update it to
->=20
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
->=20
-> (without the 'y') when merging.
->=20
-Well. When I worked for Intel, my email used to be mlevtsky@intel.com,
-because I misspelled my private email (maximlevitsky@gmail.com) in my CV, a=
-nd somehow this got
-propagated to my username there.
+On 5/5/2020 1:08 AM, David Gibson wrote:
+> On Fri, May 01, 2020 at 03:09:13PM -0400, Daniele Buono wrote:
+>> Starting with Clang v9, -Wtype-limits is implemented and triggers a
+>> few "result of comparison is always true" errors when compiling PPC32
+>> targets.
+>>
+>> The comparisons seem to be necessary only on PPC64, since the
+>> else branch in PPC32 only has a "g_assert_not_reached();" in all cases.
+>>
+>> This patch restructures the code so that PPC32 does not execute the
+>> check, while PPC64 works like before
+>>
+>> Signed-off-by: Daniele Buono <dbuono@linux.vnet.ibm.com>
+> 
+> Urgh.  #ifdefs intertangled with if statements gets pretty ugly.  But,
+> then, it's already pretty ugly, so, applied.
+> 
+Agreed, it's very ugly. After I sent the patch I thought of an 
+alternative that looks like this:
 
-Sure enough when I applied to work for Red Hat, I triple checked this to av=
-oid such a mistake.
-Well.... our usernames are limited to 8 characters.
+bool mask_in_32b = true;
 
-Best regards,
-=09Maxim Levitsky
+#if defined(TARGET_PPC64)
+if (mask > 0xffffffffu)
+   mask_in_32b = false;
+#endif
 
+if (mask_in_32b) {
+/* Original if-else untouched using mask_in_32b instead of mask*/
+
+It does have an additional if, but with a bit of luck the compiler may 
+optimize it out (at least for the 32bit case).
+If you think the final outcome may be better, let me know and I'll send 
+a patch v2 like that.
+
+>> ---
+>>   target/ppc/translate.c | 34 +++++++++++++++++++---------------
+>>   1 file changed, 19 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+>> index 807d14faaa..9400fa2c7c 100644
+>> --- a/target/ppc/translate.c
+>> +++ b/target/ppc/translate.c
+>> @@ -1882,6 +1882,7 @@ static void gen_rlwimi(DisasContext *ctx)
+>>           tcg_gen_deposit_tl(t_ra, t_ra, t_rs, sh, me - mb + 1);
+>>       } else {
+>>           target_ulong mask;
+>> +        TCGv_i32 t0;
+>>           TCGv t1;
+>>   
+>>   #if defined(TARGET_PPC64)
+>> @@ -1891,20 +1892,20 @@ static void gen_rlwimi(DisasContext *ctx)
+>>           mask = MASK(mb, me);
+>>   
+>>           t1 = tcg_temp_new();
+>> +#if defined(TARGET_PPC64)
+>>           if (mask <= 0xffffffffu) {
+>> -            TCGv_i32 t0 = tcg_temp_new_i32();
+>> +#endif
+>> +            t0 = tcg_temp_new_i32();
+>>               tcg_gen_trunc_tl_i32(t0, t_rs);
+>>               tcg_gen_rotli_i32(t0, t0, sh);
+>>               tcg_gen_extu_i32_tl(t1, t0);
+>>               tcg_temp_free_i32(t0);
+>> -        } else {
+>>   #if defined(TARGET_PPC64)
+>> +        } else {
+>>               tcg_gen_deposit_i64(t1, t_rs, t_rs, 32, 32);
+>>               tcg_gen_rotli_i64(t1, t1, sh);
+>> -#else
+>> -            g_assert_not_reached();
+>> -#endif
+>>           }
+>> +#endif
+>>   
+>>           tcg_gen_andi_tl(t1, t1, mask);
+>>           tcg_gen_andi_tl(t_ra, t_ra, ~mask);
+>> @@ -1938,7 +1939,9 @@ static void gen_rlwinm(DisasContext *ctx)
+>>           me += 32;
+>>   #endif
+>>           mask = MASK(mb, me);
+>> +#if defined(TARGET_PPC64)
+>>           if (mask <= 0xffffffffu) {
+>> +#endif
+>>               if (sh == 0) {
+>>                   tcg_gen_andi_tl(t_ra, t_rs, mask);
+>>               } else {
+>> @@ -1949,15 +1952,13 @@ static void gen_rlwinm(DisasContext *ctx)
+>>                   tcg_gen_extu_i32_tl(t_ra, t0);
+>>                   tcg_temp_free_i32(t0);
+>>               }
+>> -        } else {
+>>   #if defined(TARGET_PPC64)
+>> +        } else {
+>>               tcg_gen_deposit_i64(t_ra, t_rs, t_rs, 32, 32);
+>>               tcg_gen_rotli_i64(t_ra, t_ra, sh);
+>>               tcg_gen_andi_i64(t_ra, t_ra, mask);
+>> -#else
+>> -            g_assert_not_reached();
+>> -#endif
+>>           }
+>> +#endif
+>>       }
+>>       if (unlikely(Rc(ctx->opcode) != 0)) {
+>>           gen_set_Rc0(ctx, t_ra);
+>> @@ -1972,6 +1973,9 @@ static void gen_rlwnm(DisasContext *ctx)
+>>       TCGv t_rb = cpu_gpr[rB(ctx->opcode)];
+>>       uint32_t mb = MB(ctx->opcode);
+>>       uint32_t me = ME(ctx->opcode);
+>> +    TCGv_i32 t0;
+>> +    TCGv_i32 t1;
+>> +
+>>       target_ulong mask;
+>>   
+>>   #if defined(TARGET_PPC64)
+>> @@ -1980,9 +1984,11 @@ static void gen_rlwnm(DisasContext *ctx)
+>>   #endif
+>>       mask = MASK(mb, me);
+>>   
+>> +#if defined(TARGET_PPC64)
+>>       if (mask <= 0xffffffffu) {
+>> -        TCGv_i32 t0 = tcg_temp_new_i32();
+>> -        TCGv_i32 t1 = tcg_temp_new_i32();
+>> +#endif
+>> +        t0 = tcg_temp_new_i32();
+>> +        t1 = tcg_temp_new_i32();
+>>           tcg_gen_trunc_tl_i32(t0, t_rb);
+>>           tcg_gen_trunc_tl_i32(t1, t_rs);
+>>           tcg_gen_andi_i32(t0, t0, 0x1f);
+>> @@ -1990,17 +1996,15 @@ static void gen_rlwnm(DisasContext *ctx)
+>>           tcg_gen_extu_i32_tl(t_ra, t1);
+>>           tcg_temp_free_i32(t0);
+>>           tcg_temp_free_i32(t1);
+>> -    } else {
+>>   #if defined(TARGET_PPC64)
+>> +    } else {
+>>           TCGv_i64 t0 = tcg_temp_new_i64();
+>>           tcg_gen_andi_i64(t0, t_rb, 0x1f);
+>>           tcg_gen_deposit_i64(t_ra, t_rs, t_rs, 32, 32);
+>>           tcg_gen_rotl_i64(t_ra, t_ra, t0);
+>>           tcg_temp_free_i64(t0);
+>> -#else
+>> -        g_assert_not_reached();
+>> -#endif
+>>       }
+>> +#endif
+>>   
+>>       tcg_gen_andi_tl(t_ra, t_ra, mask);
+>>   
+> 
 
