@@ -2,85 +2,87 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23F3CC47258
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 20:10:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3237C47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 20:10:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E381520721
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 20:10:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D88320721
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 20:10:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cPr/fAFD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E381520721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EE7e5wIk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D88320721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jW3tk-0006V8-2N
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 16:10:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42098)
+	id 1jW3tr-0006mG-Ii
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 16:10:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41910)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jW3rq-0003Yz-3T
- for qemu-devel@nongnu.org; Tue, 05 May 2020 16:08:38 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21614
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jW3rn-0000kn-B7
- for qemu-devel@nongnu.org; Tue, 05 May 2020 16:08:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588709314;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qtd2Q8s2mKBUdBX8mSvzyqEMN65iue+mzpxLUAdsETg=;
- b=cPr/fAFDZhzn093oAeJBvh/eWEXeMIB/gstL/+DWADdhWPSwjPV0iWDXlWaJLwQH7k2VN+
- R6XnjJ8/vDsMSaAdZtT/9Nq3wwBxr3Y4IK4IB2/0ZgDe4r7c5CUUVayZlDLlEzCPUfUC1x
- j0qFPCoeCQW43WBxeyPhG1zEbdHXdII=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-155-s7ChkaReMg2TzU11cOBR7Q-1; Tue, 05 May 2020 16:08:32 -0400
-X-MC-Unique: s7ChkaReMg2TzU11cOBR7Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E6D22461;
- Tue,  5 May 2020 20:08:31 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.34])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A26E360621;
- Tue,  5 May 2020 20:08:29 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 03/14] block/amend: add 'force' option
-Date: Tue,  5 May 2020 23:08:08 +0300
-Message-Id: <20200505200819.5662-4-mlevitsk@redhat.com>
-In-Reply-To: <20200505200819.5662-1-mlevitsk@redhat.com>
-References: <20200505200819.5662-1-mlevitsk@redhat.com>
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jW3rN-0002Ur-Q8; Tue, 05 May 2020 16:08:09 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:40783)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jW3rM-0000Qu-TI; Tue, 05 May 2020 16:08:09 -0400
+Received: by mail-io1-xd43.google.com with SMTP id c2so3353419iow.7;
+ Tue, 05 May 2020 13:08:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=RoOEeV0Az4OaTUF+aerwT3MsNeW3h+6uK+DB1VeoGGg=;
+ b=EE7e5wIkmmi1uZshOHH3VfIVM+e3jMtLPK0mXQYJhQnAz2ii/FHuXgQzqImCkrl0Ku
+ aiIx9Zn7P2EunIUkvsw+i2I/ASx2HbiLSIGQeBY5vLcbxk/HdIO9dScqhlhupN1bYC2I
+ nO6HTgkfYsjdBjt+FVVga5zDjTxHkSdFuTvkFdahjhhyist4Fw2BucnKm4IEcXOGMRYZ
+ 7s2c/7TMhrRO6FgjzV0/HKfQzKK6Q4iYCUzyid2+dgDL7MyFnTfjuQyWF54rT66C26sa
+ /Ux+SoCS/EeqFZoWIVyckMleW5DJBwPGL2FoEqk1eMaxJGFn51t3/WeOvkTvwPDmVoE1
+ BRGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=RoOEeV0Az4OaTUF+aerwT3MsNeW3h+6uK+DB1VeoGGg=;
+ b=BML9Ad8b+f4W+OBWqFGs7OerSfSXfv6pqKagpDNWfA/pd0eZsiBvF8Hj5v/B3PZ9r/
+ dk+AoMmrj4wxgP6bdMKUEoLhKHss7FNFBQfnPvmFfLcboG2S3jVtj853llyyMZ6DaM4E
+ Ek/lldm+srtKJLOJsG7gOgd7TsdJaOW0LhsYOkBvEETnswLiytpDY4OAGfVqUPzITyQo
+ /Esox3yP8Uv4oZ5J0dFwPUzYIqdFCk69SzHHYLpByGlJJNo4ephBK6jEnUHdjnveSgDH
+ sZeYPaYm7Cn2nEUDNBgysNI9BoaEac0h0A0ZntvaRqyG/7TsCnGLwL7iptI2wniuELpK
+ knAA==
+X-Gm-Message-State: AGi0PuYY7Wp/KfMOrmWi/72Y95qNa+o2dWQqZaOjprfPFxJXCtotXLqy
+ t9iDEl5voXAL1VNnzeZXAF4FFiiU+7hJ6X11L3I=
+X-Google-Smtp-Source: APiQypIZzWbvRzuJ13zGQ5i3pbqi1UAsFCluOeprFNffSsBg5xvCNIo6XdSImVSI93AAg9L9XwvL42mWC794E86eYBQ=
+X-Received: by 2002:a02:966a:: with SMTP id c97mr5339403jai.106.1588709287343; 
+ Tue, 05 May 2020 13:08:07 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mlevitsk@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 15:23:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+References: <20200430162439.2659-1-edgar.iglesias@gmail.com>
+ <20200430162439.2659-9-edgar.iglesias@gmail.com>
+In-Reply-To: <20200430162439.2659-9-edgar.iglesias@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 5 May 2020 12:59:15 -0700
+Message-ID: <CAKmqyKOA8k5dOMCJC4KOteYJWDoT4w9J8VHNDHDkjcNmgPRefg@mail.gmail.com>
+Subject: Re: [PATCH v1 8/9] hw/dma/xilinx_axidma: s2mm: Support stream
+ fragments
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd43.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,195 +95,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, John Snow <jsnow@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Damien Hedde <damien.hedde@greensocs.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Edgar Iglesias <edgar.iglesias@xilinx.com>,
+ Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
+ Francisco Iglesias <frasse.iglesias@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, Alistair Francis <alistair@alistair23.me>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Luc Michel <luc.michel@greensocs.com>, figlesia@xilinx.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-'force' option will be used for some unsafe amend operations.
+On Thu, Apr 30, 2020 at 9:31 AM Edgar E. Iglesias
+<edgar.iglesias@gmail.com> wrote:
+>
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+>
+> Add support for stream fragments.
+>
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-This includes things like erasing last keyslot in luks based formats
-(which destroys the data, unless the master key is backed up
-by external means), but that _might_ be desired result.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- block.c                   | 4 +++-
- block/qcow2.c             | 1 +
- docs/tools/qemu-img.rst   | 5 ++++-
- include/block/block.h     | 1 +
- include/block/block_int.h | 1 +
- qemu-img-cmds.hx          | 4 ++--
- qemu-img.c                | 8 +++++++-
- 7 files changed, 19 insertions(+), 5 deletions(-)
+Alistair
 
-diff --git a/block.c b/block.c
-index cf5c19b1db..de2e41b361 100644
---- a/block.c
-+++ b/block.c
-@@ -6377,6 +6377,7 @@ void bdrv_remove_aio_context_notifier(BlockDriverStat=
-e *bs,
-=20
- int bdrv_amend_options(BlockDriverState *bs, QemuOpts *opts,
-                        BlockDriverAmendStatusCB *status_cb, void *cb_opaqu=
-e,
-+                       bool force,
-                        Error **errp)
- {
-     if (!bs->drv) {
-@@ -6388,7 +6389,8 @@ int bdrv_amend_options(BlockDriverState *bs, QemuOpts=
- *opts,
-                    bs->drv->format_name);
-         return -ENOTSUP;
-     }
--    return bs->drv->bdrv_amend_options(bs, opts, status_cb, cb_opaque, err=
-p);
-+    return bs->drv->bdrv_amend_options(bs, opts, status_cb,
-+                                       cb_opaque, force, errp);
- }
-=20
- /*
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 2ba0b17c39..ffb6b22e2d 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -5200,6 +5200,7 @@ static void qcow2_amend_helper_cb(BlockDriverState *b=
-s,
- static int qcow2_amend_options(BlockDriverState *bs, QemuOpts *opts,
-                                BlockDriverAmendStatusCB *status_cb,
-                                void *cb_opaque,
-+                               bool force,
-                                Error **errp)
- {
-     BDRVQcow2State *s =3D bs->opaque;
-diff --git a/docs/tools/qemu-img.rst b/docs/tools/qemu-img.rst
-index 0080f83a76..fc2dca6649 100644
---- a/docs/tools/qemu-img.rst
-+++ b/docs/tools/qemu-img.rst
-@@ -249,11 +249,14 @@ Command description:
-=20
- .. program:: qemu-img-commands
-=20
--.. option:: amend [--object OBJECTDEF] [--image-opts] [-p] [-q] [-f FMT] [=
--t CACHE] -o OPTIONS FILENAME
-+.. option:: amend [--object OBJECTDEF] [--image-opts] [-p] [-q] [-f FMT] [=
--t CACHE] [--force] -o OPTIONS FILENAME
-=20
-   Amends the image format specific *OPTIONS* for the image file
-   *FILENAME*. Not all file formats support this operation.
-=20
-+  --force allows some unsafe operations. Currently for -f luks, it allows =
-to
-+  erase last encryption key, and to overwrite an active encryption key.
-+
- .. option:: bench [-c COUNT] [-d DEPTH] [-f FMT] [--flush-interval=3DFLUSH=
-_INTERVAL] [-i AIO] [-n] [--no-drain] [-o OFFSET] [--pattern=3DPATTERN] [-q=
-] [-s BUFFER_SIZE] [-S STEP_SIZE] [-t CACHE] [-w] [-U] FILENAME
-=20
-   Run a simple sequential I/O benchmark on the specified image. If ``-w`` =
-is
-diff --git a/include/block/block.h b/include/block/block.h
-index 8b62429aa4..0ca53b5598 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -392,6 +392,7 @@ typedef void BlockDriverAmendStatusCB(BlockDriverState =
-*bs, int64_t offset,
-                                       int64_t total_work_size, void *opaqu=
-e);
- int bdrv_amend_options(BlockDriverState *bs_new, QemuOpts *opts,
-                        BlockDriverAmendStatusCB *status_cb, void *cb_opaqu=
-e,
-+                       bool force,
-                        Error **errp);
-=20
- /* check if a named node can be replaced when doing drive-mirror */
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 92335f33c7..98671ecdf6 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -432,6 +432,7 @@ struct BlockDriver {
-     int (*bdrv_amend_options)(BlockDriverState *bs, QemuOpts *opts,
-                               BlockDriverAmendStatusCB *status_cb,
-                               void *cb_opaque,
-+                              bool force,
-                               Error **errp);
-=20
-     void (*bdrv_debug_event)(BlockDriverState *bs, BlkdebugEvent event);
-diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-index c9c54de1df..9920f1f9d4 100644
---- a/qemu-img-cmds.hx
-+++ b/qemu-img-cmds.hx
-@@ -10,9 +10,9 @@ HXCOMM When amending the rST sections, please remember to=
- copy the usage
- HXCOMM over to the per-command sections in qemu-img.texi.
-=20
- DEF("amend", img_amend,
--    "amend [--object objectdef] [--image-opts] [-p] [-q] [-f fmt] [-t cach=
-e] -o options filename")
-+    "amend [--object objectdef] [--image-opts] [-p] [-q] [-f fmt] [-t cach=
-e] [--force] -o options filename")
- SRST
--.. option:: amend [--object OBJECTDEF] [--image-opts] [-p] [-q] [-f FMT] [=
--t CACHE] -o OPTIONS FILENAME
-+.. option:: amend [--object OBJECTDEF] [--image-opts] [-p] [-q] [-f FMT] [=
--t CACHE] [--force] -o OPTIONS FILENAME
- ERST
-=20
- DEF("bench", img_bench,
-diff --git a/qemu-img.c b/qemu-img.c
-index 6a4327aaba..ef422d5471 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -71,6 +71,7 @@ enum {
-     OPTION_SHRINK =3D 266,
-     OPTION_SALVAGE =3D 267,
-     OPTION_TARGET_IS_ZERO =3D 268,
-+    OPTION_FORCE =3D 269,
- };
-=20
- typedef enum OutputFormat {
-@@ -3958,6 +3959,7 @@ static int img_amend(int argc, char **argv)
-     BlockBackend *blk =3D NULL;
-     BlockDriverState *bs =3D NULL;
-     bool image_opts =3D false;
-+    bool force =3D false;
-=20
-     cache =3D BDRV_DEFAULT_CACHE;
-     for (;;) {
-@@ -3965,6 +3967,7 @@ static int img_amend(int argc, char **argv)
-             {"help", no_argument, 0, 'h'},
-             {"object", required_argument, 0, OPTION_OBJECT},
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-+            {"force", no_argument, 0, OPTION_FORCE},
-             {0, 0, 0, 0}
-         };
-         c =3D getopt_long(argc, argv, ":ho:f:t:pq",
-@@ -4012,6 +4015,9 @@ static int img_amend(int argc, char **argv)
-         case OPTION_IMAGE_OPTS:
-             image_opts =3D true;
-             break;
-+        case OPTION_FORCE:
-+            force =3D true;
-+            break;
-         }
-     }
-=20
-@@ -4089,7 +4095,7 @@ static int img_amend(int argc, char **argv)
-=20
-     /* In case the driver does not call amend_status_cb() */
-     qemu_progress_print(0.f, 0);
--    ret =3D bdrv_amend_options(bs, opts, &amend_status_cb, NULL, &err);
-+    ret =3D bdrv_amend_options(bs, opts, &amend_status_cb, NULL, force, &e=
-rr);
-     qemu_progress_print(100.f, 0);
-     if (ret < 0) {
-         error_report_err(err);
---=20
-2.17.2
-
+> ---
+>  hw/dma/xilinx_axidma.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+>
+> diff --git a/hw/dma/xilinx_axidma.c b/hw/dma/xilinx_axidma.c
+> index 101d32a965..87be9cade7 100644
+> --- a/hw/dma/xilinx_axidma.c
+> +++ b/hw/dma/xilinx_axidma.c
+> @@ -110,6 +110,7 @@ struct Stream {
+>
+>      int nr;
+>
+> +    bool sof;
+>      struct SDesc desc;
+>      unsigned int complete_cnt;
+>      uint32_t regs[R_MAX];
+> @@ -174,6 +175,7 @@ static void stream_reset(struct Stream *s)
+>  {
+>      s->regs[R_DMASR] = DMASR_HALTED;  /* starts up halted.  */
+>      s->regs[R_DMACR] = 1 << 16; /* Starts with one in compl threshold.  */
+> +    s->sof = true;
+>  }
+>
+>  /* Map an offset addr into a channel index.  */
+> @@ -321,12 +323,11 @@ static void stream_process_mem2s(struct Stream *s, StreamSlave *tx_data_dev,
+>  }
+>
+>  static size_t stream_process_s2mem(struct Stream *s, unsigned char *buf,
+> -                                   size_t len)
+> +                                   size_t len, bool eop)
+>  {
+>      uint32_t prev_d;
+>      unsigned int rxlen;
+>      size_t pos = 0;
+> -    int sof = 1;
+>
+>      if (!stream_running(s) || stream_idle(s)) {
+>          return 0;
+> @@ -352,16 +353,16 @@ static size_t stream_process_s2mem(struct Stream *s, unsigned char *buf,
+>          pos += rxlen;
+>
+>          /* Update the descriptor.  */
+> -        if (!len) {
+> +        if (eop) {
+>              stream_complete(s);
+>              memcpy(s->desc.app, s->app, sizeof(s->desc.app));
+>              s->desc.status |= SDESC_STATUS_EOF;
+>          }
+>
+> -        s->desc.status |= sof << SDESC_STATUS_SOF_BIT;
+> +        s->desc.status |= s->sof << SDESC_STATUS_SOF_BIT;
+>          s->desc.status |= SDESC_STATUS_COMPLETE;
+>          stream_desc_store(s, s->regs[R_CURDESC]);
+> -        sof = 0;
+> +        s->sof = eop;
+>
+>          /* Advance.  */
+>          prev_d = s->regs[R_CURDESC];
+> @@ -426,8 +427,7 @@ xilinx_axidma_data_stream_push(StreamSlave *obj, unsigned char *buf, size_t len,
+>      struct Stream *s = &ds->dma->streams[1];
+>      size_t ret;
+>
+> -    assert(eop);
+> -    ret = stream_process_s2mem(s, buf, len);
+> +    ret = stream_process_s2mem(s, buf, len, eop);
+>      stream_update_irq(s);
+>      return ret;
+>  }
+> --
+> 2.20.1
+>
+>
 
