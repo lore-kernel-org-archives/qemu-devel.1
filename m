@@ -2,82 +2,100 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D016DC47258
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 12:58:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE53C47258
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 12:59:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BE51206D7
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 12:58:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z5CN3KFK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BE51206D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 43810206B9
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 12:59:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43810206B9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVx9C-0007n2-QL
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 08:58:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38388)
+	id 1jVxAB-0001EB-6h
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 08:59:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38544)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jVx8V-0007Mm-GU
- for qemu-devel@nongnu.org; Tue, 05 May 2020 08:57:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22642
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jVx8U-0000Gs-PY
- for qemu-devel@nongnu.org; Tue, 05 May 2020 08:57:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588683442;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=zQMuWS7zjD4d6JnwVgxUv5Po5zlQzm4gphgS9LFkmto=;
- b=Z5CN3KFKH7Ay8xZpjURehB9w0KOJHa4qs5MMz21NNuT5bXX+TKHF4X6E7Q/jtrsMwbyJXB
- AlO182qIL7Gd36skPSQfbDd77juM+Lvalk5iTbACYjSxdYhFAquVa3p1ndfytQTwzvJ0+6
- daisoEi3lGfENfTWZ3oaAtzB0+ZTeJg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-2gvkTlJ_P6uNquGUxuQscQ-1; Tue, 05 May 2020 08:57:20 -0400
-X-MC-Unique: 2gvkTlJ_P6uNquGUxuQscQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BBFF7100CCC0
- for <qemu-devel@nongnu.org>; Tue,  5 May 2020 12:57:19 +0000 (UTC)
-Received: from localhost.localdomain.com (unknown [10.36.110.63])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 020BE5C1B2;
- Tue,  5 May 2020 12:57:17 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] ui: update keycodemapdb submodule commit
-Date: Tue,  5 May 2020 13:57:13 +0100
-Message-Id: <20200505125713.940953-1-berrange@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+ (Exim 4.90_1) (envelope-from <farman@linux.ibm.com>)
+ id 1jVx9F-0007zN-FG; Tue, 05 May 2020 08:58:09 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49604)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <farman@linux.ibm.com>)
+ id 1jVx9E-0000bm-A8; Tue, 05 May 2020 08:58:09 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 045CZkwO018224; Tue, 5 May 2020 08:58:04 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 30s45tu07m-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 05 May 2020 08:58:04 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 045CaDCI021149;
+ Tue, 5 May 2020 08:58:03 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.99])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 30s45tu06a-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 05 May 2020 08:58:03 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+ by ppma04ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 045Cu1Fc011489;
+ Tue, 5 May 2020 12:58:01 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com
+ (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+ by ppma04ams.nl.ibm.com with ESMTP id 30s0g5pya8-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 05 May 2020 12:58:01 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
+ [9.149.105.61])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 045Cum0q64487910
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 5 May 2020 12:56:48 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id CD4FA11C066;
+ Tue,  5 May 2020 12:57:57 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B930211C052;
+ Tue,  5 May 2020 12:57:57 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+ by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+ Tue,  5 May 2020 12:57:57 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
+ id 20AA7E0897; Tue,  5 May 2020 14:57:57 +0200 (CEST)
+From: Eric Farman <farman@linux.ibm.com>
+To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+Subject: [PATCH v4 5/6] s390x/css: Refactor the css_queue_crw() routine
+Date: Tue,  5 May 2020 14:57:56 +0200
+Message-Id: <20200505125757.98209-6-farman@linux.ibm.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200505125757.98209-1-farman@linux.ibm.com>
+References: <20200505125757.98209-1-farman@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
+ definitions=2020-05-05_08:2020-05-04,
+ 2020-05-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxlogscore=999 adultscore=0
+ phishscore=0 clxscore=1015 suspectscore=0 impostorscore=0 mlxscore=0
+ lowpriorityscore=0 bulkscore=0 spamscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2005050100
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=farman@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 08:42:20
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -91,66 +109,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>,
+ Eric Farman <farman@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ Jared Rossi <jrossi@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Primarily this is to pull in a fix for Win32 keycodes. The other useful
-change is the removal of build timestamp from generated files which is
-desirable for reproducable builds.
+We have a use case (vfio-ccw) where a CRW is already built and
+ready to use.  Rather than teasing out the components just to
+reassemble it later, let's rework this code so we can queue a
+fully-qualified CRW directly.
 
-The make rules need updating due to slightly changed CLI syntax - more
-args must now come after the command name.
-
-27acf0ef828bf719b2053ba398b195829413dbdd Fix win32 keycode for VK_OEM_102
-317d3eeb963a515e15a63fa356d8ebcda7041a51 Add support for generating RST for=
-matted docs pages
-7381b9bfadd31c4c9e9a10b5bb5032f9189d4352 Introduce separate args for title =
-& subtitle with docs generator
-6280c94f306df6a20bbc100ba15a5a81af0366e6 keymap-gen: Name sections in pod o=
-utput
-df4e56f8fab65ba714ec18f4e7338a966a1620ad Add an empty meson project
-16e5b0787687d8904dad2c026107409eb9bfcb95 remove buildtime from generated fi=
-les
-044f21dd0d4f62519aae9f1d53a026407a0b664f add header file generators
-7779876a6b06755e3bb2c94ee3ded50635bcb0fa c++: add extern declaration to the=
- generated file
-0e0a317889464397d6f1ae03aad0d2ca593aab04 move CLanguageGenerator closer to =
-CLanguageGenerator itself
-
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Eric Farman <farman@linux.ibm.com>
 ---
- Makefile        | 4 ++--
- ui/keycodemapdb | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 34275f57c9..5f2b63b1cd 100644
---- a/Makefile
-+++ b/Makefile
-@@ -310,10 +310,10 @@ ui/input-keymap-%.c: $(KEYCODEMAP_GEN) $(KEYCODEMAP_C=
-SV) $(SRC_PATH)/ui/Makefile
- =09$(call quiet-command,\
- =09    stem=3D$* && src=3D$${stem%-to-*} dst=3D$${stem#*-to-} && \
- =09    test -e $(KEYCODEMAP_GEN) && \
--=09    $(PYTHON) $(KEYCODEMAP_GEN) \
-+=09    $(PYTHON) $(KEYCODEMAP_GEN) code-map \
- =09          --lang glib2 \
- =09          --varname qemu_input_map_$${src}_to_$${dst} \
--=09          code-map $(KEYCODEMAP_CSV) $${src} $${dst} \
-+=09          $(KEYCODEMAP_CSV) $${src} $${dst} \
- =09        > $@ || rm -f $@, "GEN", "$@")
-=20
- $(KEYCODEMAP_GEN): .git-submodule-status
-diff --git a/ui/keycodemapdb b/ui/keycodemapdb
-index 6b3d716e2b..27acf0ef82 160000
---- a/ui/keycodemapdb
-+++ b/ui/keycodemapdb
-@@ -1 +1 @@
--Subproject commit 6b3d716e2b6472eb7189d3220552280ef3d832ce
-+Subproject commit 27acf0ef828bf719b2053ba398b195829413dbdd
---=20
-2.26.2
+Notes:
+    v3->v4:
+     - s/css_queue_crw_cont/css_crw_add_to_queue/ [CH]
+
+ hw/s390x/css.c         | 44 ++++++++++++++++++++++++++++--------------
+ include/hw/s390x/css.h |  1 +
+ 2 files changed, 30 insertions(+), 15 deletions(-)
+
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index a44faa3549..d1e365e3e6 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -2170,30 +2170,23 @@ void css_subch_assign(uint8_t cssid, uint8_t ssid, uint16_t schid,
+     }
+ }
+ 
+-void css_queue_crw(uint8_t rsc, uint8_t erc, int solicited,
+-                   int chain, uint16_t rsid)
++void css_crw_add_to_queue(CRW crw)
+ {
+     CrwContainer *crw_cont;
+ 
+-    trace_css_crw(rsc, erc, rsid, chain ? "(chained)" : "");
++    trace_css_crw((crw.flags & CRW_FLAGS_MASK_RSC) >> 8,
++                  crw.flags & CRW_FLAGS_MASK_ERC,
++                  crw.rsid,
++                  (crw.flags & CRW_FLAGS_MASK_C) ? "(chained)" : "");
++
+     /* TODO: Maybe use a static crw pool? */
+     crw_cont = g_try_new0(CrwContainer, 1);
+     if (!crw_cont) {
+         channel_subsys.crws_lost = true;
+         return;
+     }
+-    crw_cont->crw.flags = (rsc << 8) | erc;
+-    if (solicited) {
+-        crw_cont->crw.flags |= CRW_FLAGS_MASK_S;
+-    }
+-    if (chain) {
+-        crw_cont->crw.flags |= CRW_FLAGS_MASK_C;
+-    }
+-    crw_cont->crw.rsid = rsid;
+-    if (channel_subsys.crws_lost) {
+-        crw_cont->crw.flags |= CRW_FLAGS_MASK_R;
+-        channel_subsys.crws_lost = false;
+-    }
++
++    crw_cont->crw = crw;
+ 
+     QTAILQ_INSERT_TAIL(&channel_subsys.pending_crws, crw_cont, sibling);
+ 
+@@ -2204,6 +2197,27 @@ void css_queue_crw(uint8_t rsc, uint8_t erc, int solicited,
+     }
+ }
+ 
++void css_queue_crw(uint8_t rsc, uint8_t erc, int solicited,
++                   int chain, uint16_t rsid)
++{
++    CRW crw;
++
++    crw.flags = (rsc << 8) | erc;
++    if (solicited) {
++        crw.flags |= CRW_FLAGS_MASK_S;
++    }
++    if (chain) {
++        crw.flags |= CRW_FLAGS_MASK_C;
++    }
++    crw.rsid = rsid;
++    if (channel_subsys.crws_lost) {
++        crw.flags |= CRW_FLAGS_MASK_R;
++        channel_subsys.crws_lost = false;
++    }
++
++    css_crw_add_to_queue(crw);
++}
++
+ void css_generate_sch_crws(uint8_t cssid, uint8_t ssid, uint16_t schid,
+                            int hotplugged, int add)
+ {
+diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+index 7e3a5e7433..08c869ab0a 100644
+--- a/include/hw/s390x/css.h
++++ b/include/hw/s390x/css.h
+@@ -205,6 +205,7 @@ void copy_scsw_to_guest(SCSW *dest, const SCSW *src);
+ void css_inject_io_interrupt(SubchDev *sch);
+ void css_reset(void);
+ void css_reset_sch(SubchDev *sch);
++void css_crw_add_to_queue(CRW crw);
+ void css_queue_crw(uint8_t rsc, uint8_t erc, int solicited,
+                    int chain, uint16_t rsid);
+ void css_generate_sch_crws(uint8_t cssid, uint8_t ssid, uint16_t schid,
+-- 
+2.17.1
 
 
