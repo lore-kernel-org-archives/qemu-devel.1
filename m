@@ -2,90 +2,72 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 335BBC47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 21:24:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8700C47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 21:36:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E707820661
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 21:24:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EO7LEqUG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E707820661
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9F902206A5
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 21:36:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F902206A5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jW52o-0005wn-1M
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 17:24:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55890)
+	id 1jW5EZ-0005Jz-VG
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 17:36:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58634)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jW51p-0005Mc-7X
- for qemu-devel@nongnu.org; Tue, 05 May 2020 17:23:01 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31872
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jW5De-0004Px-4R
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 17:35:14 -0400
+Resent-Date: Tue, 05 May 2020 17:35:14 -0400
+Resent-Message-Id: <E1jW5De-0004Px-4R@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21347)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jW51n-0002Qn-Dc
- for qemu-devel@nongnu.org; Tue, 05 May 2020 17:23:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588713778;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=sjEwP3bdEXjzHmlAKr8oHB3g0cn++Whr50HiO26/XNE=;
- b=EO7LEqUG7lJnTddftjPz2uCA4j/GjjZbDlwJOGX60eV9PKgcFzlFdk6cCV5/8IimiZBGqt
- aRoP5vPhaWn9wjneCQ16sFlVhewfb7RfB4oJ1QoP+y1nJ/F1zl3JxaTi6D1ZpsVvB09UQX
- G5Ta1Z0Jy+9SU/5YWsoz93P3j1O3Dxg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-261-ebFEjIkeOpeMBnYX7rbReQ-1; Tue, 05 May 2020 17:22:56 -0400
-X-MC-Unique: ebFEjIkeOpeMBnYX7rbReQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64F0D100960F;
- Tue,  5 May 2020 21:22:55 +0000 (UTC)
-Received: from [10.3.114.73] (ovpn-114-73.phx2.redhat.com [10.3.114.73])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E5E7B1000232;
- Tue,  5 May 2020 21:22:54 +0000 (UTC)
-Subject: Re: [PATCH v2 6/6] iotests: Add test 291 to for qemu-img bitmap
- coverage
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-References: <20200421212019.170707-1-eblake@redhat.com>
- <20200421212019.170707-7-eblake@redhat.com>
- <7fb923a4-0ea8-c29b-2b05-86c4336c1286@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <1b6cb574-a15b-e79d-53d5-1d8ea90e0d96@redhat.com>
-Date: Tue, 5 May 2020 16:22:54 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jW5Dc-0006Ar-9V
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 17:35:13 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1588714503; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=ZSz7W5p2y7HZDZrix5ELaKlAH6jrralBGhxqOOF/vxmXnoFT5OaJOfXlQjP1UFQFDelBommoNu7qRKkIn1ys6g35TkeQtGAnt8LuPFYE74KLAN8UGoFBtocxwTGwwdocqTzmUU3YwSoGxGRZngb9PjguDLhV0tHdI0UcYOY5I60=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1588714503;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=twOWM4gumKBXShgEFyp1Rt2CM5iQRFJtT0Rq0POm4wk=; 
+ b=VTrCjgGFc9si7XUrD40sKovi9rcTvwh7fAkBJmB/fKavY7MT/YU8XxLpOGK7CAH2wx7VDbeSFbec3qmkIUdShIaTC4BEUP2xnwaI+UckMEPf4ZnhSdUvgvhet94gi6dTI3rxgH7xH9cw0aPTHk5DkMBnOnGc0/jmnEk71lesaS8=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1588714501047960.1368345888208;
+ Tue, 5 May 2020 14:35:01 -0700 (PDT)
+Message-ID: <158871449979.24779.7583967572244273386@45ef0f9c86ae>
+In-Reply-To: <20200505152926.18877-1-armbru@redhat.com>
+Subject: Re: [PATCH v2 00/18] qom: Spring cleaning
 MIME-Version: 1.0
-In-Reply-To: <7fb923a4-0ea8-c29b-2b05-86c4336c1286@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 15:23:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: armbru@redhat.com
+Date: Tue, 5 May 2020 14:35:01 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 13:41:33
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,127 +81,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, philmd@redhat.com, berrange@redhat.com,
+ qemu-devel@nongnu.org, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/4/20 8:05 AM, Max Reitz wrote:
-> On 21.04.20 23:20, Eric Blake wrote:
->> Add a new test covering the 'qemu-img bitmap' subcommand, as well as
->> 'qemu-img convert --bitmaps', both added in recent patches.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
-
->> +echo
->> +echo "=3D=3D=3D Bitmap preservation not possible to non-qcow2 =3D=3D=3D=
-"
->> +echo
->> +
->> +mv "$TEST_IMG" "$TEST_IMG.orig"
->=20
-> =E2=80=9Cmv=E2=80=9D doesn=E2=80=99t work images with external data files=
-.
->=20
-> (ORIG_IMG=3D$TEST_IMG; TEST_IMG=3D"$TEST_IMG".orig should work)
-
-Good idea.
-
->=20
->> +$QEMU_IMG convert --bitmaps -O raw "$TEST_IMG.orig" "$TEST_IMG"
->> +
->> +echo
->> +echo "=3D=3D=3D Convert with bitmap preservation =3D=3D=3D"
->> +echo
->> +
->> +# Only bitmaps from the active layer are copied
->=20
-> That=E2=80=99s kind of obvious when you think about (whenever an image is
-> attached to a VM, only the active layer=E2=80=99s bitmaps are visible, no=
-t those
-> from the backing chain), but maybe this should be noted in the
-> documentation?
-
-As part of integrating bitmaps with external snapshots, libvirt actually=20
-depends on being able to see bitmaps from the backing chain - but as=20
-bitmaps are always referenced as a 'node name, bitmap name' tuple, this=20
-is indeed doable.
-
->=20
->> +$QEMU_IMG convert --bitmaps -O qcow2 "$TEST_IMG.orig" "$TEST_IMG"
->> +$QEMU_IMG info "$TEST_IMG" | _filter_img_info --format-specific
->> +# But we can also merge in bitmaps from other layers
->> +$QEMU_IMG bitmap --add --disabled -f $IMGFMT "$TEST_IMG" b0
->> +$QEMU_IMG bitmap --add -f $IMGFMT "$TEST_IMG" tmp
->> +$QEMU_IMG bitmap --merge b0 -b "$TEST_IMG.base" -F $IMGFMT "$TEST_IMG" =
-tmp
->> +$QEMU_IMG bitmap --merge tmp "$TEST_IMG" b0
->> +$QEMU_IMG bitmap --remove -f $IMGFMT "$TEST_IMG" tmp
->=20
-> Why do we need tmp here?  Can=E2=80=99t we just merge base=E2=80=99s b0 d=
-irectly into
-> $TEST_IMG=E2=80=99s b0?
-
-Yes, we could.  But then I wouldn't cover as many bitmap subcommands.=20
-Adding a comment about why the example is contrived (for maximal=20
-coverage) is a good idea.
-
-
->> +=3D=3D=3D Check bitmap contents =3D=3D=3D
->> +
->> +[{ "start": 0, "length": 3145728, "depth": 0, "zero": false, "data": tr=
-ue, "offset": OFFSET},
->> +{ "start": 3145728, "length": 1048576, "depth": 0, "zero": false, "data=
-": false},
->> +{ "start": 4194304, "length": 6291456, "depth": 0, "zero": false, "data=
-": true, "offset": OFFSET}]
->> +[{ "start": 0, "length": 1048576, "depth": 0, "zero": false, "data": tr=
-ue, "offset": OFFSET},
->> +{ "start": 1048576, "length": 1048576, "depth": 0, "zero": false, "data=
-": false},
->> +{ "start": 2097152, "length": 8388608, "depth": 0, "zero": false, "data=
-": true, "offset": OFFSET}]
->> +[{ "start": 0, "length": 2097152, "depth": 0, "zero": false, "data": tr=
-ue, "offset": OFFSET},
->> +{ "start": 2097152, "length": 1048576, "depth": 0, "zero": false, "data=
-": false},
->> +{ "start": 3145728, "length": 7340032, "depth": 0, "zero": false, "data=
-": true, "offset": OFFSET}]
->=20
-> Am I looking at this wrong or does the bitmap data seem to be inverted?
->   Everywhere where I=E2=80=99d expect the bitmaps to be cleared, this map=
- reports
-> data=3Dtrue, whereas where I=E2=80=99d expect them to be set, it reports =
-data=3Dfalse.
->=20
-> I suppose that=E2=80=99s intentional, but can you explain this behavior t=
-o me?
-
-This is an artifact of how x-dirty-bitmap works (it has the x- prefix=20
-because it is a hack, but we don't have anything better for reading out=20
-bitmap contents).  The NBD spec returns block status as a 32-bit value=20
-for a 'metadata context'; normally, we use context 'base:allocation'=20
-context where bit 0 is set for holes or clear for allocated, and bit 1=20
-is set for reads-as-zero or clear for unknown contents (favoring all-0=20
-as the most-common case).  But with x-dirty-bitmap, we are instead=20
-abusing NBD to query the 'qemu:dirty-bitmap:FOO' context, where bit 0 is=20
-set for anywhere the bitmap has a 1, yet feed that information into the=20
-pre-existing qemu code for handling block status.  So qemu-img map is=20
-reporting "data":true for what it thinks is the normal 0-for-allocated,=20
-and "data":false for 1-for-sparse, and we just have to translate that=20
-back into an understanding of what the bitmap reported.  Yes, a comment=20
-would be helpful.
-
-I would _really_ love to enhance 'qemu-img map' to output image-specific=20
-metadata _in addition_ to the existing "zero" and "data" fields (by=20
-having qemu-img read two NBD contexts at once: both base:allocation and=20
-qemu:dirty-bitmap:FOO), at which point we can drop the x- prefix and=20
-avoid the abuse of qemu's internals by overwriting the block_status=20
-code.  But that's a bigger project.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUwNTE1MjkyNi4xODg3
+Ny0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDIwMDUwNTE1MjkyNi4xODg3Ny0xLWFybWJydUByZWRo
+YXQuY29tClN1YmplY3Q6IFtQQVRDSCB2MiAwMC8xOF0gcW9tOiBTcHJpbmcgY2xlYW5pbmcKVHlw
+ZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYt
+cGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRj
+aC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQg
+dG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpiZWI2YzUwIHFvbTogRHJvcCBAZXJycCBwYXJhbWV0ZXIg
+b2Ygb2JqZWN0X3Byb3BlcnR5X2RlbCgpCmQwZDU1ZTYgc3BhcHJfcGNpOiBEcm9wIHNvbWUgZGVh
+ZCBlcnJvciBoYW5kbGluZwplYzJkZjk0IHFkZXY6IFVucmVhbGl6ZSBtdXN0IG5vdCBmYWlsCjVi
+OGRlOWUgRHJvcCBtb3JlIEBlcnJwIHBhcmFtZXRlcnMgYWZ0ZXIgcHJldmlvdXMgY29tbWl0CmVk
+Zjk0YzYgcW9tOiBEcm9wIHBhcmFtZXRlciBAZXJycCBvZiBvYmplY3RfcHJvcGVydHlfYWRkKCkg
+JiBmcmllbmRzCjZmZjhmN2QgcWRldjogQ2xlYW4gdXAgcWRldl9jb25uZWN0X2dwaW9fb3V0X25h
+bWVkKCkKNDZkYTMzNCBody9hcm0vYmNtMjgzNTogRHJvcCBmdXRpbGUgYXR0ZW1wdHMgYXQgUU9N
+LWFkb3B0aW5nIG1lbW9yeQo2YTViYzU1IGUxMDAwOiBEb24ndCBydW4gZTEwMDBfaW5zdGFuY2Vf
+aW5pdCgpIHR3aWNlCmM0ODQ0YmQgaHcvaXNhL3N1cGVyaW86IE1ha2UgdGhlIGNvbXBvbmVudHMg
+UU9NIGNoaWxkcmVuCjdiZTE5ZmQgczM5MHgvY3B1bW9kZWw6IEZpeCBVSSB0byBDUFUgZmVhdHVy
+ZXMgcGNjLWNtYWMte2FlcywgZWFlc30tMjU2CmQwOWQyMGUgdGVzdHMvY2hlY2stcW9tLXByb3Bs
+aXN0OiBJbXByb3ZlIGl0ZXJhdG9yIGNvdmVyYWdlCjU0OGEzYzkgcW9tOiBEcm9wIG9iamVjdF9w
+cm9wZXJ0eV9zZXRfZGVzY3JpcHRpb24oKSBwYXJhbWV0ZXIgQGVycnAKYWMxOThmZiBxb206IE1h
+a2UgYWxsIHRoZSBvYmplY3RfcHJvcGVydHlfYWRkX0ZPTygpIHJldHVybiB0aGUgcHJvcGVydHkK
+NjZjNWQyNiBxb206IERyb3AgY29udmVuaWVuY2UgbWV0aG9kIG9iamVjdF9wcm9wZXJ0eV9nZXRf
+dWludDE2TGlzdCgpCjQ4NTNiNWIgcW9tOiBTaW1wbGlmeSBvYmplY3RfcHJvcGVydHlfZ2V0X2Vu
+dW0oKQo0ZjljMjFmIHFvbTogRHJvcCBvYmplY3RfcHJvcGVydHlfZGVsX2NoaWxkKCkncyB1bnVz
+ZWQgcGFyYW1ldGVyIEBlcnJwCmI5OTEzZTIgcW9tOiBDbGVhbiB1cCBpbmNvbnNpc3RlbnQgdXNl
+IG9mIGdjaGFyICogdnMuIGNoYXIgKgowNTBlMDFlIHFvbTogQ2xlYXJlciByZWZlcmVuY2UgY291
+bnRpbmcgaW4gb2JqZWN0X2luaXRpYWxpemVfY2hpbGR2KCkKCj09PSBPVVRQVVQgQkVHSU4gPT09
+CjEvMTggQ2hlY2tpbmcgY29tbWl0IDA1MGUwMWU5YzAzZCAocW9tOiBDbGVhcmVyIHJlZmVyZW5j
+ZSBjb3VudGluZyBpbiBvYmplY3RfaW5pdGlhbGl6ZV9jaGlsZHYoKSkKMi8xOCBDaGVja2luZyBj
+b21taXQgYjk5MTNlMmUwOWFiIChxb206IENsZWFuIHVwIGluY29uc2lzdGVudCB1c2Ugb2YgZ2No
+YXIgKiB2cy4gY2hhciAqKQozLzE4IENoZWNraW5nIGNvbW1pdCA0ZjljMjFmOGU3NjkgKHFvbTog
+RHJvcCBvYmplY3RfcHJvcGVydHlfZGVsX2NoaWxkKCkncyB1bnVzZWQgcGFyYW1ldGVyIEBlcnJw
+KQo0LzE4IENoZWNraW5nIGNvbW1pdCA0ODUzYjViYTg4MWQgKHFvbTogU2ltcGxpZnkgb2JqZWN0
+X3Byb3BlcnR5X2dldF9lbnVtKCkpCjUvMTggQ2hlY2tpbmcgY29tbWl0IDY2YzVkMjY0ZjEyZCAo
+cW9tOiBEcm9wIGNvbnZlbmllbmNlIG1ldGhvZCBvYmplY3RfcHJvcGVydHlfZ2V0X3VpbnQxNkxp
+c3QoKSkKNi8xOCBDaGVja2luZyBjb21taXQgYWMxOThmZmU5ZTdhIChxb206IE1ha2UgYWxsIHRo
+ZSBvYmplY3RfcHJvcGVydHlfYWRkX0ZPTygpIHJldHVybiB0aGUgcHJvcGVydHkpCjcvMTggQ2hl
+Y2tpbmcgY29tbWl0IDU0OGEzYzk3ZjRiZiAocW9tOiBEcm9wIG9iamVjdF9wcm9wZXJ0eV9zZXRf
+ZGVzY3JpcHRpb24oKSBwYXJhbWV0ZXIgQGVycnApCjgvMTggQ2hlY2tpbmcgY29tbWl0IGQwOWQy
+MGU2NzE3NyAodGVzdHMvY2hlY2stcW9tLXByb3BsaXN0OiBJbXByb3ZlIGl0ZXJhdG9yIGNvdmVy
+YWdlKQo5LzE4IENoZWNraW5nIGNvbW1pdCA3YmUxOWZkOTMzNDUgKHMzOTB4L2NwdW1vZGVsOiBG
+aXggVUkgdG8gQ1BVIGZlYXR1cmVzIHBjYy1jbWFjLXthZXMsIGVhZXN9LTI1NikKRVJST1I6IGxp
+bmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM1MzogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0dXJl
+c19kZWYuaW5jLmg6MzE0OgorREVGX0ZFQVQoUENDX0NNQUNfQUVTXzI1NiwgInBjYy1jbWFjLWFl
+cy0yNTYiLCBQQ0MsIDIwLCAiUENDIENvbXB1dGUtTGFzdC1CbG9jay1DTUFDLVVzaW5nLUFFUy0y
+NTYiKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA4IGxpbmVzIGNoZWNrZWQKClBhdGNo
+IDkvMTggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjEwLzE4IENoZWNraW5nIGNvbW1pdCBj
+NDg0NGJkMjIzZjEgKGh3L2lzYS9zdXBlcmlvOiBNYWtlIHRoZSBjb21wb25lbnRzIFFPTSBjaGls
+ZHJlbikKMTEvMTggQ2hlY2tpbmcgY29tbWl0IDZhNWJjNTVhNjcwMyAoZTEwMDA6IERvbid0IHJ1
+biBlMTAwMF9pbnN0YW5jZV9pbml0KCkgdHdpY2UpCjEyLzE4IENoZWNraW5nIGNvbW1pdCA0NmRh
+MzM0MjljOGYgKGh3L2FybS9iY20yODM1OiBEcm9wIGZ1dGlsZSBhdHRlbXB0cyBhdCBRT00tYWRv
+cHRpbmcgbWVtb3J5KQoxMy8xOCBDaGVja2luZyBjb21taXQgNmZmOGY3ZDZiZTY3IChxZGV2OiBD
+bGVhbiB1cCBxZGV2X2Nvbm5lY3RfZ3Bpb19vdXRfbmFtZWQoKSkKMTQvMTggQ2hlY2tpbmcgY29t
+bWl0IGVkZjk0YzY4MDc1NCAocW9tOiBEcm9wIHBhcmFtZXRlciBAZXJycCBvZiBvYmplY3RfcHJv
+cGVydHlfYWRkKCkgJiBmcmllbmRzKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
+MjA5OiBGSUxFOiBiYWNrZW5kcy9ob3N0bWVtLWZpbGUuYzoxODc6CisgICAgICAgIGZpbGVfbWVt
+b3J5X2JhY2tlbmRfZ2V0X2Rpc2NhcmRfZGF0YSwgZmlsZV9tZW1vcnlfYmFja2VuZF9zZXRfZGlz
+Y2FyZF9kYXRhKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMDgwOiBGSUxF
+OiBody9hcm0vcmFzcGkuYzoyODc6CisgICAgb2JqZWN0X3Byb3BlcnR5X2FkZF9jb25zdF9saW5r
+KE9CSkVDVCgmcy0+c29jKSwgInJhbSIsIE9CSkVDVChtYWNoaW5lLT5yYW0pKTsKCldBUk5JTkc6
+IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMDk1OiBGSUxFOiBody9wcGMvc3BhcHIuYzozMzQ2
+OgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAmc3BhcHItPmtlcm5lbF9hZGRy
+LCBPQkpfUFJPUF9GTEFHX1JFQURXUklURSk7Cgp0b3RhbDogMCBlcnJvcnMsIDMgd2FybmluZ3Ms
+IDQ0NzEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTQvMTggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KMTUvMTggQ2hlY2tpbmcgY29tbWl0IDViOGRlOWVlNTY3YSAoRHJvcCBtb3JlIEBlcnJwIHBh
+cmFtZXRlcnMgYWZ0ZXIgcHJldmlvdXMgY29tbWl0KQoxNi8xOCBDaGVja2luZyBjb21taXQgZWMy
+ZGY5NDAxNWVmIChxZGV2OiBVbnJlYWxpemUgbXVzdCBub3QgZmFpbCkKMTcvMTggQ2hlY2tpbmcg
+Y29tbWl0IGQwZDU1ZTZiYTkxNyAoc3BhcHJfcGNpOiBEcm9wIHNvbWUgZGVhZCBlcnJvciBoYW5k
+bGluZykKMTgvMTggQ2hlY2tpbmcgY29tbWl0IGJlYjZjNTA5Y2Q0OSAocW9tOiBEcm9wIEBlcnJw
+IHBhcmFtZXRlciBvZiBvYmplY3RfcHJvcGVydHlfZGVsKCkpCj09PSBPVVRQVVQgRU5EID09PQoK
+VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxh
+YmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNTA1MTUyOTI2LjE4ODc3LTEtYXJt
+YnJ1QHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3Jn
+L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
