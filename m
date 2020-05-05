@@ -6,71 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B5A6C47247
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 15:38:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6A90C47254
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 15:38:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66A02206B9
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 15:38:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A3AA6206B9
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 15:38:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XEw8Ri4B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66A02206B9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HdeMt+qL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3AA6206B9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVzeO-0004Iu-As
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 11:38:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46002)
+	id 1jVzeP-0004Lx-P4
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 11:38:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45994)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jVzVr-0003OU-73
- for qemu-devel@nongnu.org; Tue, 05 May 2020 11:29:39 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41519)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jVzVn-0007RR-A5
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jVzVq-0003NG-JY
  for qemu-devel@nongnu.org; Tue, 05 May 2020 11:29:38 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20826
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jVzVm-0007Qv-4z
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 11:29:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588692573;
+ s=mimecast20190719; t=1588692572;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=kBtM3zIW9dthrt5vgz9AzzxJghrxgkviKsCOyjI5V38=;
- b=XEw8Ri4BSWu/O1xXenFITYaexg0YCJ15dNr9ycG34RvmAIAF/SnOgXMLFk0aO3Bcq7GfWo
- dRwz5HyiZHEUHGRoF6v1NkvIn/PlRYjsERnZw3Cb49pvrkSK7ID5c/rD1KMwElLpbjKNIn
- mJb6PTAM5dQMsqQjsL0crdkMcFaI51o=
+ bh=SSR+TphYHppnsCWK0QjYZsSwK6a1/17R2ldhPjBJizU=;
+ b=HdeMt+qLiTbbx2BA1vGmOp0Cf5DKISrMHeBaQtcF8UhASUESCzKlUqW06KgS38GDEDjI6e
+ xmVbchkeg7GTMRZJdXVnXncogSdpFQRMWPOMq5MADVFBh/nHKnFSeD1xr8Q9fpN8ay2XEy
+ QDXSOyXOlL0TRec7tshzq/2gREYPLcw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-16-xP_tXZ4EPKiGpGrF9mtcVg-1; Tue, 05 May 2020 11:29:32 -0400
-X-MC-Unique: xP_tXZ4EPKiGpGrF9mtcVg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-484-AGJtQv7jOp6MZKK5qqP-gA-1; Tue, 05 May 2020 11:29:30 -0400
+X-MC-Unique: AGJtQv7jOp6MZKK5qqP-gA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2ED33800D24
- for <qemu-devel@nongnu.org>; Tue,  5 May 2020 15:29:31 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A193C107B270
+ for <qemu-devel@nongnu.org>; Tue,  5 May 2020 15:29:29 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C906E6061C;
- Tue,  5 May 2020 15:29:30 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 20C1919C4F;
+ Tue,  5 May 2020 15:29:29 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 6DAC111358CF; Tue,  5 May 2020 17:29:26 +0200 (CEST)
+ id 410BF11358C2; Tue,  5 May 2020 17:29:26 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 18/18] qom: Drop @errp parameter of object_property_del()
-Date: Tue,  5 May 2020 17:29:26 +0200
-Message-Id: <20200505152926.18877-19-armbru@redhat.com>
+Subject: [PATCH v2 06/18] qom: Make all the object_property_add_FOO() return
+ the property
+Date: Tue,  5 May 2020 17:29:14 +0200
+Message-Id: <20200505152926.18877-7-armbru@redhat.com>
 In-Reply-To: <20200505152926.18877-1-armbru@redhat.com>
 References: <20200505152926.18877-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
+ helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
@@ -98,145 +100,669 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Same story as for object_property_add(): the only way
-object_property_del() can fail is when the property with this name
-does not exist.  Since our property names are all hardcoded, failure
-is a programming error, and the appropriate way to handle it is
-passing &error_abort.  Most callers do that, the commit before
-previous fixed one that didn't (and got the error handling wrong), and
-the two remaining exceptions ignore errors.
-
-Drop the @errp parameter.
+Some object_property_add_FOO() return the newly added property, some
+don't.  Clean that up.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qom/object.h       | 2 +-
- hw/core/qdev.c             | 2 +-
- hw/i386/pc_sysfw.c         | 2 +-
- hw/ppc/spapr_drc.c         | 4 ++--
- qom/object.c               | 7 +------
- qom/object_interfaces.c    | 3 +--
- tests/check-qom-proplist.c | 2 +-
- 7 files changed, 8 insertions(+), 14 deletions(-)
+ include/qom/object.h |  50 ++++++---
+ qom/object.c         | 250 ++++++++++++++++++++++---------------------
+ 2 files changed, 164 insertions(+), 136 deletions(-)
 
 diff --git a/include/qom/object.h b/include/qom/object.h
-index 990e28e408..fd453dc8d6 100644
+index 4df9ecebad..0ea5808432 100644
 --- a/include/qom/object.h
 +++ b/include/qom/object.h
-@@ -1047,7 +1047,7 @@ ObjectProperty *object_property_add(Object *obj, cons=
-t char *name,
-                                     ObjectPropertyRelease *release,
-                                     void *opaque);
+@@ -1491,9 +1491,11 @@ Object *object_resolve_path_component(Object *parent=
+, const char *part);
+  * The value of a child property as a C string will be the child object's
+  * canonical path. It can be retrieved using object_property_get_str().
+  * The child object itself can be retrieved using object_property_get_link=
+().
++ *
++ * Returns: The newly added property on success, or %NULL on failure.
+  */
+-void object_property_add_child(Object *obj, const char *name,
+-                               Object *child, Error **errp);
++ObjectProperty *object_property_add_child(Object *obj, const char *name,
++                                          Object *child, Error **errp);
 =20
--void object_property_del(Object *obj, const char *name, Error **errp);
-+void object_property_del(Object *obj, const char *name);
+ typedef enum {
+     /* Unref the link pointer when the property is deleted */
+@@ -1542,8 +1544,10 @@ void object_property_allow_set_link(const Object *, =
+const char *,
+  * <code>@flags</code> <code>OBJ_PROP_LINK_STRONG</code> bit is set,
+  * the reference count is decremented when the property is deleted or
+  * modified.
++ *
++ * Returns: The newly added property on success, or %NULL on failure.
+  */
+-void object_property_add_link(Object *obj, const char *name,
++ObjectProperty *object_property_add_link(Object *obj, const char *name,
+                               const char *type, Object **targetp,
+                               void (*check)(const Object *obj, const char =
+*name,
+                                             Object *val, Error **errp),
+@@ -1569,8 +1573,10 @@ ObjectProperty *object_class_property_add_link(Objec=
+tClass *oc,
+  *
+  * Add a string property using getters/setters.  This function will add a
+  * property of type 'string'.
++ *
++ * Returns: The newly added property on success, or %NULL on failure.
+  */
+-void object_property_add_str(Object *obj, const char *name,
++ObjectProperty *object_property_add_str(Object *obj, const char *name,
+                              char *(*get)(Object *, Error **),
+                              void (*set)(Object *, const char *, Error **)=
+,
+                              Error **errp);
+@@ -1592,8 +1598,10 @@ ObjectProperty *object_class_property_add_str(Object=
+Class *klass,
+  *
+  * Add a bool property using getters/setters.  This function will add a
+  * property of type 'bool'.
++ *
++ * Returns: The newly added property on success, or %NULL on failure.
+  */
+-void object_property_add_bool(Object *obj, const char *name,
++ObjectProperty *object_property_add_bool(Object *obj, const char *name,
+                               bool (*get)(Object *, Error **),
+                               void (*set)(Object *, bool, Error **),
+                               Error **errp);
+@@ -1615,8 +1623,10 @@ ObjectProperty *object_class_property_add_bool(Objec=
+tClass *klass,
+  *
+  * Add an enum property using getters/setters.  This function will add a
+  * property of type '@typename'.
++ *
++ * Returns: The newly added property on success, or %NULL on failure.
+  */
+-void object_property_add_enum(Object *obj, const char *name,
++ObjectProperty *object_property_add_enum(Object *obj, const char *name,
+                               const char *typename,
+                               const QEnumLookup *lookup,
+                               int (*get)(Object *, Error **),
+@@ -1640,8 +1650,10 @@ ObjectProperty *object_class_property_add_enum(Objec=
+tClass *klass,
+  *
+  * Add a read-only struct tm valued property using a getter function.
+  * This function will add a property of type 'struct tm'.
++ *
++ * Returns: The newly added property on success, or %NULL on failure.
+  */
+-void object_property_add_tm(Object *obj, const char *name,
++ObjectProperty *object_property_add_tm(Object *obj, const char *name,
+                             void (*get)(Object *, struct tm *, Error **),
+                             Error **errp);
 =20
- ObjectProperty *object_class_property_add(ObjectClass *klass, const char *=
-name,
-                                           const char *type,
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index b9c7a2f904..9e5538aeae 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -65,7 +65,7 @@ static void bus_remove_child(BusState *bus, DeviceState *=
-child)
-             bus->num_children--;
+@@ -1669,8 +1681,10 @@ typedef enum {
+  *
+  * Add an integer property in memory.  This function will add a
+  * property of type 'uint8'.
++ *
++ * Returns: The newly added property on success, or %NULL on failure.
+  */
+-void object_property_add_uint8_ptr(Object *obj, const char *name,
++ObjectProperty *object_property_add_uint8_ptr(Object *obj, const char *nam=
+e,
+                                    const uint8_t *v, ObjectPropertyFlags f=
+lags,
+                                    Error **errp);
 =20
-             /* This gives back ownership of kid->child back to us.  */
--            object_property_del(OBJECT(bus), name, NULL);
-+            object_property_del(OBJECT(bus), name);
-             object_unref(OBJECT(kid->child));
-             g_free(kid);
-             return;
-diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index 002133a2d8..2abab3a27c 100644
---- a/hw/i386/pc_sysfw.c
-+++ b/hw/i386/pc_sysfw.c
-@@ -120,7 +120,7 @@ static void pc_system_flash_cleanup_unused(PCMachineSta=
-te *pcms)
-         dev_obj =3D OBJECT(pcms->flash[i]);
-         if (!object_property_get_bool(dev_obj, "realized", &error_abort)) =
-{
-             prop_name =3D g_strdup_printf("pflash%d", i);
--            object_property_del(OBJECT(pcms), prop_name, &error_abort);
-+            object_property_del(OBJECT(pcms), prop_name);
-             g_free(prop_name);
-             object_unparent(dev_obj);
-             pcms->flash[i] =3D NULL;
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 8b2171f698..b958f8acb5 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -405,7 +405,7 @@ static void spapr_drc_release(SpaprDrc *drc)
-     g_free(drc->fdt);
-     drc->fdt =3D NULL;
-     drc->fdt_start_offset =3D 0;
--    object_property_del(OBJECT(drc), "device", &error_abort);
-+    object_property_del(OBJECT(drc), "device");
-     drc->dev =3D NULL;
- }
+@@ -1690,8 +1704,10 @@ ObjectProperty *object_class_property_add_uint8_ptr(=
+ObjectClass *klass,
+  *
+  * Add an integer property in memory.  This function will add a
+  * property of type 'uint16'.
++ *
++ * Returns: The newly added property on success, or %NULL on failure.
+  */
+-void object_property_add_uint16_ptr(Object *obj, const char *name,
++ObjectProperty *object_property_add_uint16_ptr(Object *obj, const char *na=
+me,
+                                     const uint16_t *v,
+                                     ObjectPropertyFlags flags,
+                                     Error **errp);
+@@ -1712,8 +1728,10 @@ ObjectProperty *object_class_property_add_uint16_ptr=
+(ObjectClass *klass,
+  *
+  * Add an integer property in memory.  This function will add a
+  * property of type 'uint32'.
++ *
++ * Returns: The newly added property on success, or %NULL on failure.
+  */
+-void object_property_add_uint32_ptr(Object *obj, const char *name,
++ObjectProperty *object_property_add_uint32_ptr(Object *obj, const char *na=
+me,
+                                     const uint32_t *v,
+                                     ObjectPropertyFlags flags,
+                                     Error **errp);
+@@ -1734,8 +1752,10 @@ ObjectProperty *object_class_property_add_uint32_ptr=
+(ObjectClass *klass,
+  *
+  * Add an integer property in memory.  This function will add a
+  * property of type 'uint64'.
++ *
++ * Returns: The newly added property on success, or %NULL on failure.
+  */
+-void object_property_add_uint64_ptr(Object *obj, const char *name,
++ObjectProperty *object_property_add_uint64_ptr(Object *obj, const char *na=
+me,
+                                     const uint64_t *v,
+                                     ObjectPropertyFlags flags,
+                                     Error **Errp);
+@@ -1761,8 +1781,10 @@ ObjectProperty *object_class_property_add_uint64_ptr=
+(ObjectClass *klass,
+  * this property exists.  In the case of a child object or an alias on the=
+ same
+  * object this will be the case.  For aliases to other objects the caller =
+is
+  * responsible for taking a reference.
++ *
++ * Returns: The newly added property on success, or %NULL on failure.
+  */
+-void object_property_add_alias(Object *obj, const char *name,
++ObjectProperty *object_property_add_alias(Object *obj, const char *name,
+                                Object *target_obj, const char *target_name=
+,
+                                Error **errp);
 =20
-@@ -551,7 +551,7 @@ static void unrealize(DeviceState *d)
-     vmstate_unregister(VMSTATE_IF(drc), &vmstate_spapr_drc, drc);
-     root_container =3D container_get(object_get_root(), DRC_CONTAINER_PATH=
-);
-     name =3D g_strdup_printf("%x", spapr_drc_index(drc));
--    object_property_del(root_container, name, &error_abort);
-+    object_property_del(root_container, name);
-     g_free(name);
- }
+@@ -1780,8 +1802,10 @@ void object_property_add_alias(Object *obj, const ch=
+ar *name,
+  * this property exists.  In the case @target is a child of @obj,
+  * this will be the case.  Otherwise, the caller is responsible for
+  * taking a reference.
++ *
++ * Returns: The newly added property on success, or %NULL on failure.
+  */
+-void object_property_add_const_link(Object *obj, const char *name,
++ObjectProperty *object_property_add_const_link(Object *obj, const char *na=
+me,
+                                     Object *target, Error **errp);
 =20
+ /**
 diff --git a/qom/object.c b/qom/object.c
-index 23f481ca46..e89ffbe3d1 100644
+index 54a26ed16a..4e5b2ecacd 100644
 --- a/qom/object.c
 +++ b/qom/object.c
-@@ -1280,15 +1280,10 @@ ObjectProperty *object_class_property_find(ObjectCl=
-ass *klass, const char *name,
-     return prop;
+@@ -1646,33 +1646,30 @@ static void object_finalize_child_property(Object *=
+obj, const char *name,
+     object_unref(child);
  }
 =20
--void object_property_del(Object *obj, const char *name, Error **errp)
-+void object_property_del(Object *obj, const char *name)
+-void object_property_add_child(Object *obj, const char *name,
+-                               Object *child, Error **errp)
++ObjectProperty *
++object_property_add_child(Object *obj, const char *name,
++                          Object *child, Error **errp)
  {
-     ObjectProperty *prop =3D g_hash_table_lookup(obj->properties, name);
+-    Error *local_err =3D NULL;
+-    char *type;
++    g_autofree char *type =3D NULL;
+     ObjectProperty *op;
 =20
--    if (!prop) {
--        error_setg(errp, "Property '.%s' not found", name);
+     if (child->parent !=3D NULL) {
+         error_setg(errp, "child object is already parented");
 -        return;
--    }
++        return NULL;
+     }
+=20
+     type =3D g_strdup_printf("child<%s>", object_get_typename(OBJECT(child=
+)));
+=20
+     op =3D object_property_add(obj, name, type, object_get_child_property,=
+ NULL,
+-                             object_finalize_child_property, child, &local=
+_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        goto out;
++                             object_finalize_child_property, child, errp);
++    if (!op) {
++        return NULL;
+     }
+=20
+     op->resolve =3D object_resolve_child_property;
+     object_ref(child);
+     child->parent =3D obj;
 -
-     if (prop->release) {
-         prop->release(obj, name, prop->opaque);
-     }
-diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-index 054e75043d..7e26f86fa6 100644
---- a/qom/object_interfaces.c
-+++ b/qom/object_interfaces.c
-@@ -89,8 +89,7 @@ Object *user_creatable_add_type(const char *type, const c=
-har *id,
-     user_creatable_complete(USER_CREATABLE(obj), &local_err);
-     if (local_err) {
-         if (id !=3D NULL) {
--            object_property_del(object_get_objects_root(),
--                                id, &error_abort);
-+            object_property_del(object_get_objects_root(), id);
-         }
-         goto out;
-     }
-diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
-index 84f48fe592..13a824cfae 100644
---- a/tests/check-qom-proplist.c
-+++ b/tests/check-qom-proplist.c
-@@ -280,7 +280,7 @@ static void dummy_bus_init(Object *obj)
- static void dummy_bus_unparent(Object *obj)
- {
-     DummyBus *bus =3D DUMMY_BUS(obj);
--    object_property_del(obj->parent, "backend", NULL);
-+    object_property_del(obj->parent, "backend");
-     object_unparent(OBJECT(bus->backend));
+-out:
+-    g_free(type);
++    return op;
  }
 =20
+ void object_property_allow_set_link(const Object *obj, const char *name,
+@@ -1819,16 +1816,16 @@ static void object_release_link_property(Object *ob=
+j, const char *name,
+     }
+ }
+=20
+-static void object_add_link_prop(Object *obj, const char *name,
+-                                 const char *type, void *ptr,
+-                                 void (*check)(const Object *, const char =
+*,
+-                                               Object *, Error **),
+-                                 ObjectPropertyLinkFlags flags,
+-                                 Error **errp)
++static ObjectProperty *
++object_add_link_prop(Object *obj, const char *name,
++                     const char *type, void *ptr,
++                     void (*check)(const Object *, const char *,
++                                   Object *, Error **),
++                     ObjectPropertyLinkFlags flags,
++                     Error **errp)
+ {
+-    Error *local_err =3D NULL;
+     LinkProperty *prop =3D g_malloc(sizeof(*prop));
+-    char *full_type;
++    g_autofree char *full_type =3D NULL;
+     ObjectProperty *op;
+=20
+     if (flags & OBJ_PROP_LINK_DIRECT) {
+@@ -1846,27 +1843,26 @@ static void object_add_link_prop(Object *obj, const=
+ char *name,
+                              check ? object_set_link_property : NULL,
+                              object_release_link_property,
+                              prop,
+-                             &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                             errp);
++    if (!op) {
+         g_free(prop);
+-        goto out;
++        return NULL;
+     }
+=20
+     op->resolve =3D object_resolve_link_property;
+-
+-out:
+-    g_free(full_type);
++    return op;
+ }
+=20
+-void object_property_add_link(Object *obj, const char *name,
+-                              const char *type, Object **targetp,
+-                              void (*check)(const Object *, const char *,
+-                                            Object *, Error **),
+-                              ObjectPropertyLinkFlags flags,
+-                              Error **errp)
++ObjectProperty *
++object_property_add_link(Object *obj, const char *name,
++                         const char *type, Object **targetp,
++                         void (*check)(const Object *, const char *,
++                                       Object *, Error **),
++                         ObjectPropertyLinkFlags flags,
++                         Error **errp)
+ {
+-    object_add_link_prop(obj, name, type, targetp, check, flags, errp);
++    return object_add_link_prop(obj, name, type, targetp, check, flags,
++                                errp);
+ }
+=20
+ ObjectProperty *
+@@ -1908,11 +1904,13 @@ out:
+     return op;
+ }
+=20
+-void object_property_add_const_link(Object *obj, const char *name,
+-                                    Object *target, Error **errp)
++ObjectProperty *
++object_property_add_const_link(Object *obj, const char *name,
++                               Object *target, Error **errp)
+ {
+-    object_add_link_prop(obj, name, object_get_typename(target), target,
+-                         NULL, OBJ_PROP_LINK_DIRECT, errp);
++    return object_add_link_prop(obj, name,
++                                object_get_typename(target), target,
++                                NULL, OBJ_PROP_LINK_DIRECT, errp);
+ }
+=20
+ char *object_get_canonical_path_component(Object *obj)
+@@ -2121,26 +2119,27 @@ static void property_release_str(Object *obj, const=
+ char *name,
+     g_free(prop);
+ }
+=20
+-void object_property_add_str(Object *obj, const char *name,
+-                           char *(*get)(Object *, Error **),
+-                           void (*set)(Object *, const char *, Error **),
+-                           Error **errp)
++ObjectProperty *
++object_property_add_str(Object *obj, const char *name,
++                        char *(*get)(Object *, Error **),
++                        void (*set)(Object *, const char *, Error **),
++                        Error **errp)
+ {
+-    Error *local_err =3D NULL;
+     StringProperty *prop =3D g_malloc0(sizeof(*prop));
++    ObjectProperty *op;
+=20
+     prop->get =3D get;
+     prop->set =3D set;
+=20
+-    object_property_add(obj, name, "string",
+-                        get ? property_get_str : NULL,
+-                        set ? property_set_str : NULL,
+-                        property_release_str,
+-                        prop, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    op =3D object_property_add(obj, name, "string",
++                             get ? property_get_str : NULL,
++                             set ? property_set_str : NULL,
++                             property_release_str,
++                             prop, errp);
++    if (!op) {
+         g_free(prop);
+     }
++    return op;
+ }
+=20
+ ObjectProperty *
+@@ -2215,26 +2214,27 @@ static void property_release_bool(Object *obj, cons=
+t char *name,
+     g_free(prop);
+ }
+=20
+-void object_property_add_bool(Object *obj, const char *name,
+-                              bool (*get)(Object *, Error **),
+-                              void (*set)(Object *, bool, Error **),
+-                              Error **errp)
++ObjectProperty *
++object_property_add_bool(Object *obj, const char *name,
++                         bool (*get)(Object *, Error **),
++                         void (*set)(Object *, bool, Error **),
++                         Error **errp)
+ {
+-    Error *local_err =3D NULL;
+     BoolProperty *prop =3D g_malloc0(sizeof(*prop));
++    ObjectProperty *op;
+=20
+     prop->get =3D get;
+     prop->set =3D set;
+=20
+-    object_property_add(obj, name, "bool",
+-                        get ? property_get_bool : NULL,
+-                        set ? property_set_bool : NULL,
+-                        property_release_bool,
+-                        prop, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    op =3D object_property_add(obj, name, "bool",
++                             get ? property_get_bool : NULL,
++                             set ? property_set_bool : NULL,
++                             property_release_bool,
++                             prop, errp);
++    if (!op) {
+         g_free(prop);
+     }
++    return op;
+ }
+=20
+ ObjectProperty *
+@@ -2301,29 +2301,30 @@ static void property_release_enum(Object *obj, cons=
+t char *name,
+     g_free(prop);
+ }
+=20
+-void object_property_add_enum(Object *obj, const char *name,
+-                              const char *typename,
+-                              const QEnumLookup *lookup,
+-                              int (*get)(Object *, Error **),
+-                              void (*set)(Object *, int, Error **),
+-                              Error **errp)
++ObjectProperty *
++object_property_add_enum(Object *obj, const char *name,
++                         const char *typename,
++                         const QEnumLookup *lookup,
++                         int (*get)(Object *, Error **),
++                         void (*set)(Object *, int, Error **),
++                         Error **errp)
+ {
+-    Error *local_err =3D NULL;
+     EnumProperty *prop =3D g_malloc(sizeof(*prop));
++    ObjectProperty *op;
+=20
+     prop->lookup =3D lookup;
+     prop->get =3D get;
+     prop->set =3D set;
+=20
+-    object_property_add(obj, name, typename,
+-                        get ? property_get_enum : NULL,
+-                        set ? property_set_enum : NULL,
+-                        property_release_enum,
+-                        prop, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    op =3D object_property_add(obj, name, typename,
++                             get ? property_get_enum : NULL,
++                             set ? property_set_enum : NULL,
++                             property_release_enum,
++                             prop, errp);
++    if (!op) {
+         g_free(prop);
+     }
++    return op;
+ }
+=20
+ ObjectProperty *
+@@ -2414,23 +2415,24 @@ static void property_release_tm(Object *obj, const =
+char *name,
+     g_free(prop);
+ }
+=20
+-void object_property_add_tm(Object *obj, const char *name,
+-                            void (*get)(Object *, struct tm *, Error **),
+-                            Error **errp)
++ObjectProperty *
++object_property_add_tm(Object *obj, const char *name,
++                       void (*get)(Object *, struct tm *, Error **),
++                       Error **errp)
+ {
+-    Error *local_err =3D NULL;
+     TMProperty *prop =3D g_malloc0(sizeof(*prop));
++    ObjectProperty *op;
+=20
+     prop->get =3D get;
+=20
+-    object_property_add(obj, name, "struct tm",
+-                        get ? property_get_tm : NULL, NULL,
+-                        property_release_tm,
+-                        prop, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    op =3D object_property_add(obj, name, "struct tm",
++                             get ? property_get_tm : NULL, NULL,
++                             property_release_tm,
++                             prop, errp);
++    if (!op) {
+         g_free(prop);
+     }
++    return op;
+ }
+=20
+ ObjectProperty *
+@@ -2553,10 +2555,11 @@ static void property_set_uint64_ptr(Object *obj, Vi=
+sitor *v, const char *name,
+     *field =3D value;
+ }
+=20
+-void object_property_add_uint8_ptr(Object *obj, const char *name,
+-                                   const uint8_t *v,
+-                                   ObjectPropertyFlags flags,
+-                                   Error **errp)
++ObjectProperty *
++object_property_add_uint8_ptr(Object *obj, const char *name,
++                              const uint8_t *v,
++                              ObjectPropertyFlags flags,
++                              Error **errp)
+ {
+     ObjectPropertyAccessor *getter =3D NULL;
+     ObjectPropertyAccessor *setter =3D NULL;
+@@ -2569,8 +2572,8 @@ void object_property_add_uint8_ptr(Object *obj, const=
+ char *name,
+         setter =3D property_set_uint8_ptr;
+     }
+=20
+-    object_property_add(obj, name, "uint8",
+-                        getter, setter, NULL, (void *)v, errp);
++    return object_property_add(obj, name, "uint8",
++                               getter, setter, NULL, (void *)v, errp);
+ }
+=20
+ ObjectProperty *
+@@ -2594,10 +2597,11 @@ object_class_property_add_uint8_ptr(ObjectClass *kl=
+ass, const char *name,
+                                      getter, setter, NULL, (void *)v, errp=
+);
+ }
+=20
+-void object_property_add_uint16_ptr(Object *obj, const char *name,
+-                                    const uint16_t *v,
+-                                    ObjectPropertyFlags flags,
+-                                    Error **errp)
++ObjectProperty *
++object_property_add_uint16_ptr(Object *obj, const char *name,
++                               const uint16_t *v,
++                               ObjectPropertyFlags flags,
++                               Error **errp)
+ {
+     ObjectPropertyAccessor *getter =3D NULL;
+     ObjectPropertyAccessor *setter =3D NULL;
+@@ -2610,8 +2614,8 @@ void object_property_add_uint16_ptr(Object *obj, cons=
+t char *name,
+         setter =3D property_set_uint16_ptr;
+     }
+=20
+-    object_property_add(obj, name, "uint16",
+-                        getter, setter, NULL, (void *)v, errp);
++    return object_property_add(obj, name, "uint16",
++                               getter, setter, NULL, (void *)v, errp);
+ }
+=20
+ ObjectProperty *
+@@ -2635,10 +2639,11 @@ object_class_property_add_uint16_ptr(ObjectClass *k=
+lass, const char *name,
+                                      getter, setter, NULL, (void *)v, errp=
+);
+ }
+=20
+-void object_property_add_uint32_ptr(Object *obj, const char *name,
+-                                    const uint32_t *v,
+-                                    ObjectPropertyFlags flags,
+-                                    Error **errp)
++ObjectProperty *
++object_property_add_uint32_ptr(Object *obj, const char *name,
++                               const uint32_t *v,
++                               ObjectPropertyFlags flags,
++                               Error **errp)
+ {
+     ObjectPropertyAccessor *getter =3D NULL;
+     ObjectPropertyAccessor *setter =3D NULL;
+@@ -2651,8 +2656,8 @@ void object_property_add_uint32_ptr(Object *obj, cons=
+t char *name,
+         setter =3D property_set_uint32_ptr;
+     }
+=20
+-    object_property_add(obj, name, "uint32",
+-                        getter, setter, NULL, (void *)v, errp);
++    return object_property_add(obj, name, "uint32",
++                               getter, setter, NULL, (void *)v, errp);
+ }
+=20
+ ObjectProperty *
+@@ -2676,10 +2681,11 @@ object_class_property_add_uint32_ptr(ObjectClass *k=
+lass, const char *name,
+                                      getter, setter, NULL, (void *)v, errp=
+);
+ }
+=20
+-void object_property_add_uint64_ptr(Object *obj, const char *name,
+-                                    const uint64_t *v,
+-                                    ObjectPropertyFlags flags,
+-                                    Error **errp)
++ObjectProperty *
++object_property_add_uint64_ptr(Object *obj, const char *name,
++                               const uint64_t *v,
++                               ObjectPropertyFlags flags,
++                               Error **errp)
+ {
+     ObjectPropertyAccessor *getter =3D NULL;
+     ObjectPropertyAccessor *setter =3D NULL;
+@@ -2692,8 +2698,8 @@ void object_property_add_uint64_ptr(Object *obj, cons=
+t char *name,
+         setter =3D property_set_uint64_ptr;
+     }
+=20
+-    object_property_add(obj, name, "uint64",
+-                        getter, setter, NULL, (void *)v, errp);
++    return object_property_add(obj, name, "uint64",
++                               getter, setter, NULL, (void *)v, errp);
+ }
+=20
+ ObjectProperty *
+@@ -2754,19 +2760,19 @@ static void property_release_alias(Object *obj, con=
+st char *name, void *opaque)
+     g_free(prop);
+ }
+=20
+-void object_property_add_alias(Object *obj, const char *name,
+-                               Object *target_obj, const char *target_name=
+,
+-                               Error **errp)
++ObjectProperty *
++object_property_add_alias(Object *obj, const char *name,
++                          Object *target_obj, const char *target_name,
++                          Error **errp)
+ {
+     AliasProperty *prop;
+     ObjectProperty *op;
+     ObjectProperty *target_prop;
+-    char *prop_type;
+-    Error *local_err =3D NULL;
++    g_autofree char *prop_type =3D NULL;
+=20
+     target_prop =3D object_property_find(target_obj, target_name, errp);
+     if (!target_prop) {
+-        return;
++        return NULL;
+     }
+=20
+     if (object_property_is_child(target_prop)) {
+@@ -2784,12 +2790,12 @@ void object_property_add_alias(Object *obj, const c=
+har *name,
+                              property_get_alias,
+                              property_set_alias,
+                              property_release_alias,
+-                             prop, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                             prop, errp);
++    if (!op) {
+         g_free(prop);
+-        goto out;
++        return NULL;
+     }
++
+     op->resolve =3D property_resolve_alias;
+     if (target_prop->defval) {
+         op->defval =3D qobject_ref(target_prop->defval);
+@@ -2798,9 +2804,7 @@ void object_property_add_alias(Object *obj, const cha=
+r *name,
+     object_property_set_description(obj, op->name,
+                                     target_prop->description,
+                                     &error_abort);
+-
+-out:
+-    g_free(prop_type);
++    return op;
+ }
+=20
+ void object_property_set_description(Object *obj, const char *name,
 --=20
 2.21.1
 
