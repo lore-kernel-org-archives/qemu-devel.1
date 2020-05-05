@@ -2,85 +2,73 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 481C5C47247
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 20:19:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 958A1C47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 20:22:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C372B2068E
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 20:19:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZKAoB29u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C372B2068E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6465D2068E
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 20:22:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6465D2068E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jW42V-0005Cb-Mn
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 16:19:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42222)
+	id 1jW45a-0008H2-Hn
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 16:22:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44246)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jW3sD-0004ID-EY
- for qemu-devel@nongnu.org; Tue, 05 May 2020 16:09:01 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47137
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jW44a-0007Gr-II
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 16:21:48 -0400
+Resent-Date: Tue, 05 May 2020 16:21:48 -0400
+Resent-Message-Id: <E1jW44a-0007Gr-II@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21334)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jW3sC-0000rR-Be
- for qemu-devel@nongnu.org; Tue, 05 May 2020 16:09:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588709339;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=aiMabNuCutKQJgfNczJBp7C3ojbmOKIEcHMLOhpTu4M=;
- b=ZKAoB29u8b/cIH7uXEz3fCyb8V95UGGphiGF5zwRVR+cavB2nDxNN3/9c23j/0+h84gTrR
- 3DXFxc7cRk9MZN8Tns6LemUH7maynAobXXAySy0AStMOVHQQCP+LUDaZiR9AqztimMiG5q
- 3u/IrTxpvpRZkywO6UjMOTuDYKrcZXg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-461-Gi3s47FiPJWbz67gmGI9_Q-1; Tue, 05 May 2020 16:08:58 -0400
-X-MC-Unique: Gi3s47FiPJWbz67gmGI9_Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44AC4103098C;
- Tue,  5 May 2020 20:08:56 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.34])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 030EE60621;
- Tue,  5 May 2020 20:08:53 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 12/14] block/crypto: implement blockdev-amend
-Date: Tue,  5 May 2020 23:08:17 +0300
-Message-Id: <20200505200819.5662-13-mlevitsk@redhat.com>
-In-Reply-To: <20200505200819.5662-1-mlevitsk@redhat.com>
-References: <20200505200819.5662-1-mlevitsk@redhat.com>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jW44Y-0006Ly-MZ
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 16:21:48 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1588710099; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=glRT/f+1NmsuvzNPj0Xlc5rEVWynqJErNmiVS01TfA9PrspcyAlxnWKCbt+YgNo2RWBisYRubFZmLECm65KDTO57HV1akpJKowr30idu7TQtjQTKVHpnF7/2feYKZTJV6DtlE6ykzwMRzEYj4MSkiVbA18V1wPDXDNISaFTA+oo=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1588710099;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=9W1ZtrdyZEmUdHGxVqkyozn4M3bqBSwLkACoUULwj+E=; 
+ b=Qs49lTRWbeA7LhkdDez84S30zJHML2TtSMkDGDXTpISMj4ite61h4Ssj9FxfpsnkhEH5aMS80P+EryitZvGrEDIOBimlwTZ5ZcjfHvu6x1E94N9sIWquRsTs8BvsKT8U08yMaKqekQwKhm+yOGIwMGht7M7mOR0Qlrzs86xBrX8=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1588710097786495.0416904123658;
+ Tue, 5 May 2020 13:21:37 -0700 (PDT)
+Message-ID: <158871009655.24779.2854991762026451886@45ef0f9c86ae>
+In-Reply-To: <20200505152926.18877-1-armbru@redhat.com>
+Subject: Re: [PATCH v2 00/18] qom: Spring cleaning
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mlevitsk@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 15:23:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: armbru@redhat.com
+Date: Tue, 5 May 2020 13:21:37 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 13:41:33
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,168 +81,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, John Snow <jsnow@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, philmd@redhat.com, berrange@redhat.com,
+ qemu-devel@nongnu.org, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- block/crypto.c       | 72 ++++++++++++++++++++++++++++++++------------
- qapi/block-core.json | 14 ++++++++-
- 2 files changed, 66 insertions(+), 20 deletions(-)
-
-diff --git a/block/crypto.c b/block/crypto.c
-index b71e57f777..d7725df79e 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -775,32 +775,21 @@ block_crypto_get_specific_info_luks(BlockDriverState =
-*bs, Error **errp)
- }
-=20
- static int
--block_crypto_amend_options_luks(BlockDriverState *bs,
--                                QemuOpts *opts,
--                                BlockDriverAmendStatusCB *status_cb,
--                                void *cb_opaque,
--                                bool force,
--                                Error **errp)
-+block_crypto_amend_options_generic_luks(BlockDriverState *bs,
-+                                        QCryptoBlockAmendOptions *amend_op=
-tions,
-+                                        bool force,
-+                                        Error **errp)
- {
-     BlockCrypto *crypto =3D bs->opaque;
--    QDict *cryptoopts =3D NULL;
--    QCryptoBlockAmendOptions *amend_options =3D NULL;
-     int ret;
-=20
-     assert(crypto);
-     assert(crypto->block);
--    crypto->updating_keys =3D true;
-=20
-+    /* apply for exclusive read/write permissions to the underlying file*/
-+    crypto->updating_keys =3D true;
-     ret =3D bdrv_child_refresh_perms(bs, bs->file, errp);
--    if (ret < 0) {
--        goto cleanup;
--    }
--
--    cryptoopts =3D qemu_opts_to_qdict(opts, NULL);
--    qdict_put_str(cryptoopts, "format", "luks");
--    amend_options =3D block_crypto_amend_opts_init(cryptoopts, errp);
--    if (!amend_options) {
--        ret =3D -EINVAL;
-+    if (ret) {
-         goto cleanup;
-     }
-=20
-@@ -812,13 +801,57 @@ block_crypto_amend_options_luks(BlockDriverState *bs,
-                                       force,
-                                       errp);
- cleanup:
-+    /* release exclusive read/write permissions to the underlying file*/
-     crypto->updating_keys =3D false;
-     bdrv_child_refresh_perms(bs, bs->file, errp);
--    qapi_free_QCryptoBlockAmendOptions(amend_options);
-+    return ret;
-+}
-+
-+static int
-+block_crypto_amend_options_luks(BlockDriverState *bs,
-+                                QemuOpts *opts,
-+                                BlockDriverAmendStatusCB *status_cb,
-+                                void *cb_opaque,
-+                                bool force,
-+                                Error **errp)
-+{
-+    BlockCrypto *crypto =3D bs->opaque;
-+    QDict *cryptoopts =3D NULL;
-+    QCryptoBlockAmendOptions *amend_options =3D NULL;
-+    int ret =3D -EINVAL;
-+
-+    assert(crypto);
-+    assert(crypto->block);
-+
-+    cryptoopts =3D qemu_opts_to_qdict(opts, NULL);
-+    qdict_put_str(cryptoopts, "format", "luks");
-+    amend_options =3D block_crypto_amend_opts_init(cryptoopts, errp);
-     qobject_unref(cryptoopts);
-+    if (!amend_options) {
-+        goto cleanup;
-+    }
-+    ret =3D block_crypto_amend_options_generic_luks(bs, amend_options,
-+                                                  force, errp);
-+cleanup:
-+    qapi_free_QCryptoBlockAmendOptions(amend_options);
-     return ret;
- }
-=20
-+static int
-+coroutine_fn block_crypto_co_amend_luks(BlockDriverState *bs,
-+                                        BlockdevAmendOptions *opts,
-+                                        bool force,
-+                                        Error **errp)
-+{
-+    QCryptoBlockAmendOptions amend_opts;
-+
-+    amend_opts =3D (QCryptoBlockAmendOptions) {
-+        .format =3D Q_CRYPTO_BLOCK_FORMAT_LUKS,
-+        .u.luks =3D *qapi_BlockdevAmendOptionsLUKS_base(&opts->u.luks),
-+    };
-+    return block_crypto_amend_options_generic_luks(bs, &amend_opts,
-+                                                   force, errp);
-+}
-=20
- static void
- block_crypto_child_perms(BlockDriverState *bs, BdrvChild *c,
-@@ -891,6 +924,7 @@ static BlockDriver bdrv_crypto_luks =3D {
-     .bdrv_get_info      =3D block_crypto_get_info_luks,
-     .bdrv_get_specific_info =3D block_crypto_get_specific_info_luks,
-     .bdrv_amend_options =3D block_crypto_amend_options_luks,
-+    .bdrv_co_amend      =3D block_crypto_co_amend_luks,
-=20
-     .strong_runtime_opts =3D block_crypto_strong_runtime_opts,
- };
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 5b9123c15f..a5f679ac17 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -4649,6 +4649,18 @@
-   'data': { 'job-id': 'str',
-             'options': 'BlockdevCreateOptions' } }
-=20
-+##
-+# @BlockdevAmendOptionsLUKS:
-+#
-+# Driver specific image amend options for LUKS.
-+#
-+# Since: 5.0
-+##
-+{ 'struct': 'BlockdevAmendOptionsLUKS',
-+  'base': 'QCryptoBlockAmendOptionsLUKS',
-+  'data': { }
-+}
-+
- ##
- # @BlockdevAmendOptions:
- #
-@@ -4663,7 +4675,7 @@
-       'driver':         'BlockdevDriver' },
-   'discriminator': 'driver',
-   'data': {
--  } }
-+      'luks':           'BlockdevAmendOptionsLUKS' } }
-=20
- ##
- # @x-blockdev-amend:
---=20
-2.17.2
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUwNTE1MjkyNi4xODg3
+Ny0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDIwMDUwNTE1MjkyNi4xODg3Ny0xLWFybWJydUByZWRo
+YXQuY29tClN1YmplY3Q6IFtQQVRDSCB2MiAwMC8xOF0gcW9tOiBTcHJpbmcgY2xlYW5pbmcKVHlw
+ZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYt
+cGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRj
+aC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQg
+dG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpiNmJkMjFmIHFvbTogRHJvcCBAZXJycCBwYXJhbWV0ZXIg
+b2Ygb2JqZWN0X3Byb3BlcnR5X2RlbCgpCmYzMDhhZDQgc3BhcHJfcGNpOiBEcm9wIHNvbWUgZGVh
+ZCBlcnJvciBoYW5kbGluZwpmZGI1NDAwIHFkZXY6IFVucmVhbGl6ZSBtdXN0IG5vdCBmYWlsCjcz
+NDViYWMgRHJvcCBtb3JlIEBlcnJwIHBhcmFtZXRlcnMgYWZ0ZXIgcHJldmlvdXMgY29tbWl0CjJm
+MDM5ZGIgcW9tOiBEcm9wIHBhcmFtZXRlciBAZXJycCBvZiBvYmplY3RfcHJvcGVydHlfYWRkKCkg
+JiBmcmllbmRzCjA4ODcxZjIgcWRldjogQ2xlYW4gdXAgcWRldl9jb25uZWN0X2dwaW9fb3V0X25h
+bWVkKCkKZGVmN2JhMCBody9hcm0vYmNtMjgzNTogRHJvcCBmdXRpbGUgYXR0ZW1wdHMgYXQgUU9N
+LWFkb3B0aW5nIG1lbW9yeQo2ZmQ2YWU1IGUxMDAwOiBEb24ndCBydW4gZTEwMDBfaW5zdGFuY2Vf
+aW5pdCgpIHR3aWNlCmZmNmE1MTIgaHcvaXNhL3N1cGVyaW86IE1ha2UgdGhlIGNvbXBvbmVudHMg
+UU9NIGNoaWxkcmVuCjkzYjI5NzEgczM5MHgvY3B1bW9kZWw6IEZpeCBVSSB0byBDUFUgZmVhdHVy
+ZXMgcGNjLWNtYWMte2FlcywgZWFlc30tMjU2CjRlMjhjODggdGVzdHMvY2hlY2stcW9tLXByb3Bs
+aXN0OiBJbXByb3ZlIGl0ZXJhdG9yIGNvdmVyYWdlCmJkMzNhZmEgcW9tOiBEcm9wIG9iamVjdF9w
+cm9wZXJ0eV9zZXRfZGVzY3JpcHRpb24oKSBwYXJhbWV0ZXIgQGVycnAKYjYzMzBhZCBxb206IE1h
+a2UgYWxsIHRoZSBvYmplY3RfcHJvcGVydHlfYWRkX0ZPTygpIHJldHVybiB0aGUgcHJvcGVydHkK
+ODYyNzBlZiBxb206IERyb3AgY29udmVuaWVuY2UgbWV0aG9kIG9iamVjdF9wcm9wZXJ0eV9nZXRf
+dWludDE2TGlzdCgpCjMyOTM3NDIgcW9tOiBTaW1wbGlmeSBvYmplY3RfcHJvcGVydHlfZ2V0X2Vu
+dW0oKQoxYjYyNWYzIHFvbTogRHJvcCBvYmplY3RfcHJvcGVydHlfZGVsX2NoaWxkKCkncyB1bnVz
+ZWQgcGFyYW1ldGVyIEBlcnJwCjNmZDZmNDYgcW9tOiBDbGVhbiB1cCBpbmNvbnNpc3RlbnQgdXNl
+IG9mIGdjaGFyICogdnMuIGNoYXIgKgozNzY5MWUxIHFvbTogQ2xlYXJlciByZWZlcmVuY2UgY291
+bnRpbmcgaW4gb2JqZWN0X2luaXRpYWxpemVfY2hpbGR2KCkKCj09PSBPVVRQVVQgQkVHSU4gPT09
+CjEvMTggQ2hlY2tpbmcgY29tbWl0IDM3NjkxZTFlMmMxYiAocW9tOiBDbGVhcmVyIHJlZmVyZW5j
+ZSBjb3VudGluZyBpbiBvYmplY3RfaW5pdGlhbGl6ZV9jaGlsZHYoKSkKMi8xOCBDaGVja2luZyBj
+b21taXQgM2ZkNmY0NjUxMDliIChxb206IENsZWFuIHVwIGluY29uc2lzdGVudCB1c2Ugb2YgZ2No
+YXIgKiB2cy4gY2hhciAqKQozLzE4IENoZWNraW5nIGNvbW1pdCAxYjYyNWYzZGRiYmMgKHFvbTog
+RHJvcCBvYmplY3RfcHJvcGVydHlfZGVsX2NoaWxkKCkncyB1bnVzZWQgcGFyYW1ldGVyIEBlcnJw
+KQo0LzE4IENoZWNraW5nIGNvbW1pdCAzMjkzNzQyMmQ5MjYgKHFvbTogU2ltcGxpZnkgb2JqZWN0
+X3Byb3BlcnR5X2dldF9lbnVtKCkpCjUvMTggQ2hlY2tpbmcgY29tbWl0IDg2MjcwZWY1YjJmYSAo
+cW9tOiBEcm9wIGNvbnZlbmllbmNlIG1ldGhvZCBvYmplY3RfcHJvcGVydHlfZ2V0X3VpbnQxNkxp
+c3QoKSkKNi8xOCBDaGVja2luZyBjb21taXQgYjYzMzBhZGEyZDA0IChxb206IE1ha2UgYWxsIHRo
+ZSBvYmplY3RfcHJvcGVydHlfYWRkX0ZPTygpIHJldHVybiB0aGUgcHJvcGVydHkpCjcvMTggQ2hl
+Y2tpbmcgY29tbWl0IGJkMzNhZmFlYmI1MyAocW9tOiBEcm9wIG9iamVjdF9wcm9wZXJ0eV9zZXRf
+ZGVzY3JpcHRpb24oKSBwYXJhbWV0ZXIgQGVycnApCjgvMTggQ2hlY2tpbmcgY29tbWl0IDRlMjhj
+ODgxZGI0YyAodGVzdHMvY2hlY2stcW9tLXByb3BsaXN0OiBJbXByb3ZlIGl0ZXJhdG9yIGNvdmVy
+YWdlKQo5LzE4IENoZWNraW5nIGNvbW1pdCA5M2IyOTcxNmNkY2UgKHMzOTB4L2NwdW1vZGVsOiBG
+aXggVUkgdG8gQ1BVIGZlYXR1cmVzIHBjYy1jbWFjLXthZXMsIGVhZXN9LTI1NikKRVJST1I6IGxp
+bmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM1MzogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0dXJl
+c19kZWYuaW5jLmg6MzE0OgorREVGX0ZFQVQoUENDX0NNQUNfQUVTXzI1NiwgInBjYy1jbWFjLWFl
+cy0yNTYiLCBQQ0MsIDIwLCAiUENDIENvbXB1dGUtTGFzdC1CbG9jay1DTUFDLVVzaW5nLUFFUy0y
+NTYiKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA4IGxpbmVzIGNoZWNrZWQKClBhdGNo
+IDkvMTggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjEwLzE4IENoZWNraW5nIGNvbW1pdCBm
+ZjZhNTEyMGU3ZWEgKGh3L2lzYS9zdXBlcmlvOiBNYWtlIHRoZSBjb21wb25lbnRzIFFPTSBjaGls
+ZHJlbikKMTEvMTggQ2hlY2tpbmcgY29tbWl0IDZmZDZhZTUzMzI0OCAoZTEwMDA6IERvbid0IHJ1
+biBlMTAwMF9pbnN0YW5jZV9pbml0KCkgdHdpY2UpCjEyLzE4IENoZWNraW5nIGNvbW1pdCBkZWY3
+YmEwM2ExYWYgKGh3L2FybS9iY20yODM1OiBEcm9wIGZ1dGlsZSBhdHRlbXB0cyBhdCBRT00tYWRv
+cHRpbmcgbWVtb3J5KQoxMy8xOCBDaGVja2luZyBjb21taXQgMDg4NzFmMjQwYjNhIChxZGV2OiBD
+bGVhbiB1cCBxZGV2X2Nvbm5lY3RfZ3Bpb19vdXRfbmFtZWQoKSkKMTQvMTggQ2hlY2tpbmcgY29t
+bWl0IDJmMDM5ZGIzNzdiMiAocW9tOiBEcm9wIHBhcmFtZXRlciBAZXJycCBvZiBvYmplY3RfcHJv
+cGVydHlfYWRkKCkgJiBmcmllbmRzKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
+MjA5OiBGSUxFOiBiYWNrZW5kcy9ob3N0bWVtLWZpbGUuYzoxODc6CisgICAgICAgIGZpbGVfbWVt
+b3J5X2JhY2tlbmRfZ2V0X2Rpc2NhcmRfZGF0YSwgZmlsZV9tZW1vcnlfYmFja2VuZF9zZXRfZGlz
+Y2FyZF9kYXRhKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMDgwOiBGSUxF
+OiBody9hcm0vcmFzcGkuYzoyODc6CisgICAgb2JqZWN0X3Byb3BlcnR5X2FkZF9jb25zdF9saW5r
+KE9CSkVDVCgmcy0+c29jKSwgInJhbSIsIE9CSkVDVChtYWNoaW5lLT5yYW0pKTsKCldBUk5JTkc6
+IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMDk1OiBGSUxFOiBody9wcGMvc3BhcHIuYzozMzQ2
+OgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAmc3BhcHItPmtlcm5lbF9hZGRy
+LCBPQkpfUFJPUF9GTEFHX1JFQURXUklURSk7Cgp0b3RhbDogMCBlcnJvcnMsIDMgd2FybmluZ3Ms
+IDQ0NzEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTQvMTggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KMTUvMTggQ2hlY2tpbmcgY29tbWl0IDczNDViYWM3NGIyOSAoRHJvcCBtb3JlIEBlcnJwIHBh
+cmFtZXRlcnMgYWZ0ZXIgcHJldmlvdXMgY29tbWl0KQoxNi8xOCBDaGVja2luZyBjb21taXQgZmRi
+NTQwMDkzYzVkIChxZGV2OiBVbnJlYWxpemUgbXVzdCBub3QgZmFpbCkKMTcvMTggQ2hlY2tpbmcg
+Y29tbWl0IGYzMDhhZDQ3YmFjMyAoc3BhcHJfcGNpOiBEcm9wIHNvbWUgZGVhZCBlcnJvciBoYW5k
+bGluZykKMTgvMTggQ2hlY2tpbmcgY29tbWl0IGI2YmQyMWYyNDQ1ZCAocW9tOiBEcm9wIEBlcnJw
+IHBhcmFtZXRlciBvZiBvYmplY3RfcHJvcGVydHlfZGVsKCkpCj09PSBPVVRQVVQgRU5EID09PQoK
+VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxh
+YmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNTA1MTUyOTI2LjE4ODc3LTEtYXJt
+YnJ1QHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3Jn
+L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
