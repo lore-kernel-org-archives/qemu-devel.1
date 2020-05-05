@@ -2,70 +2,74 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65231C47259
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:20:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92B90C47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:21:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3475C20675
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:20:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5BA3420675
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:21:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R30geswY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3475C20675
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g+aZho/2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BA3420675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVugp-0005Sx-BE
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 06:20:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59512)
+	id 1jVuhf-0007Tt-Cl
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 06:21:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59480)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jVufW-0003j8-0j
- for qemu-devel@nongnu.org; Tue, 05 May 2020 06:19:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21379
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jVufU-0003fE-7D
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 06:19:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43762
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jVufU-00081j-Po
- for qemu-devel@nongnu.org; Tue, 05 May 2020 06:19:17 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jVufS-00081N-O4
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 06:19:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588673955;
+ s=mimecast20190719; t=1588673953;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=S0kmFUBAFWqWQce0XxOZhwDORIQQB5RK6jNgj6PUn5Q=;
- b=R30geswYX/QshwIp8rWSVbh3Txn3cl+KDffTX2smjRgb/njk/Tpo1zSuUJ6KmSLmls5axJ
- JuoYIsyJ1FUah/pzmlJ6GG4Ph6ehn3HlHR/M1Fy2spw6qOenSZgCL4HHrFLyqhVEz1GTI5
- ZBF6CMxf6UU97o4ShLgZ3Y64BUDb5sw=
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Zz6PIHu4D9IJMAUYz5GlS7tUaH56am6CeocpGy7vUGA=;
+ b=g+aZho/2icH1oWYRFOb9a7YnmiXAeb1GfMs3IJWECRipRDIvnyQOacOEPpoGjyDkF+x90c
+ PPAuSl7MFbH1Pez9MWMmxUUX5BjtkBgFqGLdsQ7g2v1WhGd/m83iHTeWiwI2oLVFY2xMt6
+ uRvPbPof3kxeGoEOXupLEMzHSPIgATQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-3TXMPgJVOnmqcYMfxxiYlA-1; Tue, 05 May 2020 06:19:13 -0400
-X-MC-Unique: 3TXMPgJVOnmqcYMfxxiYlA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-64-ebb_R8NzPLeRdC7n3d4S_g-1; Tue, 05 May 2020 06:19:11 -0400
+X-MC-Unique: ebb_R8NzPLeRdC7n3d4S_g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0454F1899521;
- Tue,  5 May 2020 10:19:13 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7DE5153
+ for <qemu-devel@nongnu.org>; Tue,  5 May 2020 10:19:10 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4163B5D9D3;
- Tue,  5 May 2020 10:19:10 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 505F16918D
+ for <qemu-devel@nongnu.org>; Tue,  5 May 2020 10:19:10 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C4A0911358BC; Tue,  5 May 2020 12:19:08 +0200 (CEST)
+ id D04C911358C0; Tue,  5 May 2020 12:19:08 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 00/10] More miscellaneous error handling fixes
-Date: Tue,  5 May 2020 12:18:58 +0200
-Message-Id: <20200505101908.6207-1-armbru@redhat.com>
+Subject: [PATCH v2 04/10] tests/migration: Tighten error checking
+Date: Tue,  5 May 2020 12:19:02 +0200
+Message-Id: <20200505101908.6207-5-armbru@redhat.com>
+In-Reply-To: <20200505101908.6207-1-armbru@redhat.com>
+References: <20200505101908.6207-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
@@ -90,52 +94,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Paul Durrant <xadimgnik@gmail.com>, David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v2:
-* PATCH 2: missing return [Paul]
-* PATCH 3: commit message typo [David]
-* PATCH 5: error message tidied up [Eric, Philippe]
-* PATCH 7: commit message pasto
-* Old PATCH 4 dropped [Matthew]
+migrate_get_socket_address() neglects to check
+visit_type_SocketAddressList() failure.  This smells like a leak, but
+it actually will crash dereferencing @addrs.  Pass &error_abort to
+remove the code smell.
 
-Cc: Paul Durrant <xadimgnik@gmail.com>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ tests/qtest/migration-test.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Markus Armbruster (10):
-  nvdimm: Plug memory leak in uuid property setter
-  xen: Fix and improve handling of device_add usb-host errors
-  s390x/cpumodel: Fix harmless misuse of visit_check_struct()
-  tests/migration: Tighten error checking
-  error: Use error_reportf_err() where appropriate
-  mips/malta: Fix create_cps() error handling
-  mips/boston: Fix boston_mach_init() error handling
-  mips/boston: Plug memory leak in boston_mach_init()
-  arm/sabrelite: Consistently use &error_fatal in sabrelite_init()
-  i386: Fix x86_cpu_load_model() error API violation
-
- chardev/char-socket.c        |  5 +++--
- hw/arm/sabrelite.c           |  7 +------
- hw/mem/nvdimm.c              |  1 -
- hw/mips/boston.c             | 17 +++++++----------
- hw/mips/mips_malta.c         | 15 ++++++---------
- hw/sd/pxa2xx_mmci.c          |  4 ++--
- hw/sd/sd.c                   |  4 ++--
- hw/usb/dev-mtp.c             |  9 +++++----
- hw/usb/xen-usb.c             | 19 +++++++++----------
- qemu-nbd.c                   |  7 +++----
- scsi/qemu-pr-helper.c        |  4 ++--
- target/i386/cpu.c            | 25 ++++++++++++++++---------
- target/s390x/cpu_models.c    |  2 +-
- tests/qtest/migration-test.c |  4 ++--
- 14 files changed, 59 insertions(+), 64 deletions(-)
-
+diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-test.c
+index 2568c9529c..dc3490c9fa 100644
+--- a/tests/qtest/migration-test.c
++++ b/tests/qtest/migration-test.c
+@@ -13,6 +13,7 @@
+ #include "qemu/osdep.h"
+=20
+ #include "libqtest.h"
++#include "qapi/error.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qemu/module.h"
+ #include "qemu/option.h"
+@@ -301,7 +302,6 @@ static char *migrate_get_socket_address(QTestState *who=
+, const char *parameter)
+ {
+     QDict *rsp;
+     char *result;
+-    Error *local_err =3D NULL;
+     SocketAddressList *addrs;
+     Visitor *iv =3D NULL;
+     QObject *object;
+@@ -310,7 +310,7 @@ static char *migrate_get_socket_address(QTestState *who=
+, const char *parameter)
+     object =3D qdict_get(rsp, parameter);
+=20
+     iv =3D qobject_input_visitor_new(object);
+-    visit_type_SocketAddressList(iv, NULL, &addrs, &local_err);
++    visit_type_SocketAddressList(iv, NULL, &addrs, &error_abort);
+     visit_free(iv);
+=20
+     /* we are only using a single address */
 --=20
 2.21.1
 
