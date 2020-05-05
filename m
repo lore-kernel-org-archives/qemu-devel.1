@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FD4DC4725A
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 11:51:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF2F8C4725A
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 11:52:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2859A20757
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 11:51:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ACF99206A5
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 11:52:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZmQ/mkIQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2859A20757
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a4FjxXBE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACF99206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVw6J-0002j4-BQ
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 07:51:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50256)
+	id 1jVw7o-0003m2-R5
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 07:52:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50264)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jVw46-0000en-PN
- for qemu-devel@nongnu.org; Tue, 05 May 2020 07:48:46 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60088
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jVw48-0000hK-Fz
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 07:48:48 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44257
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jVw45-0001Wz-1L
- for qemu-devel@nongnu.org; Tue, 05 May 2020 07:48:46 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jVw44-0001Wv-RP
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 07:48:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588679324;
+ s=mimecast20190719; t=1588679323;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=eDr9x13LivUPMbQkiDOyGsFTj0t5fwuXBgI98LFxzso=;
- b=ZmQ/mkIQqZm6u7SiJEQgmk1NKtEy8vXXLL2IPWlPkNIKfAeCP+OxX1DbGJEM4XCZdDavjA
- xD0WKZxBJLlkz6eIQTzFK7KG/RkgR6ozgwCAeNpLfmLXPE3g4NZiwoYuPN3gRjBpNSMjl2
- OqCUKsupDs8pELwNxJAv1vwl0Q6AKvs=
+ bh=qtpeDDynNtK20qdBo4K/42G59uSkh0HyBvkWfOTzut4=;
+ b=a4FjxXBEAeRkQvn3MXy34Q218NWrRfLYXi7BtQNEE6mnwARtiTMnDGhQ7hkfRaw9MpooDF
+ /lqMVXBmvBZj2+uMik7MN0cs105K5zUEv4/eaOLSNIL+qdgYJVx3HeqH6NFYxjTw25wi/x
+ Xn7zr6DQDQUJKC0nrWcgtOlfcHsGBG0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-4CWCEr8EMRuH-UjjGD98kA-1; Tue, 05 May 2020 07:48:42 -0400
-X-MC-Unique: 4CWCEr8EMRuH-UjjGD98kA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-472-fOw7X3FiPI2hBeec9IrdEQ-1; Tue, 05 May 2020 07:48:42 -0400
+X-MC-Unique: fOw7X3FiPI2hBeec9IrdEQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 051D9107ACCA;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 138E7EC1A2;
  Tue,  5 May 2020 11:48:41 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-113-193.ams2.redhat.com
  [10.36.113.193])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 13E832DE95;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0E2A96109F;
  Tue,  5 May 2020 11:48:32 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id EA8E1A1FD; Tue,  5 May 2020 13:38:43 +0200 (CEST)
+ id DCEFDA1FB; Tue,  5 May 2020 13:38:43 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 08/13] acpi: move aml builder code for floppy device
-Date: Tue,  5 May 2020 13:38:38 +0200
-Message-Id: <20200505113843.22012-9-kraxel@redhat.com>
+Subject: [PATCH v4 07/13] acpi: move aml builder code for parallel device
+Date: Tue,  5 May 2020 13:38:37 +0200
+Message-Id: <20200505113843.22012-8-kraxel@redhat.com>
 In-Reply-To: <20200505113843.22012-1-kraxel@redhat.com>
 References: <20200505113843.22012-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -105,267 +105,120 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Also adds support for multiple LPT devices.
+
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/block/fdc.c       | 83 ++++++++++++++++++++++++++++++++++++++++++++
- hw/i386/acpi-build.c | 83 --------------------------------------------
- stubs/cmos.c         |  7 ++++
- stubs/Makefile.objs  |  1 +
- 4 files changed, 91 insertions(+), 83 deletions(-)
- create mode 100644 stubs/cmos.c
+ hw/char/parallel.c   | 32 ++++++++++++++++++++++++++++++++
+ hw/i386/acpi-build.c | 23 -----------------------
+ 2 files changed, 32 insertions(+), 23 deletions(-)
 
-diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index 9628cc171ef8..40faa088b5f7 100644
---- a/hw/block/fdc.c
-+++ b/hw/block/fdc.c
-@@ -32,6 +32,8 @@
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "qemu/timer.h"
-+#include "hw/i386/pc.h"
+diff --git a/hw/char/parallel.c b/hw/char/parallel.c
+index 8dd67d13759b..bc6b55b3b910 100644
+--- a/hw/char/parallel.c
++++ b/hw/char/parallel.c
+@@ -28,6 +28,7 @@
+ #include "qemu/module.h"
+ #include "chardev/char-parallel.h"
+ #include "chardev/char-fe.h"
 +#include "hw/acpi/aml-build.h"
  #include "hw/irq.h"
  #include "hw/isa/isa.h"
  #include "hw/qdev-properties.h"
-@@ -2765,6 +2767,85 @@ void isa_fdc_get_drive_max_chs(FloppyDriveType type,
-     (*maxc)--;
+@@ -568,6 +569,35 @@ static void parallel_isa_realizefn(DeviceState *dev, E=
+rror **errp)
+                              s, "parallel");
  }
 =20
-+static Aml *build_fdinfo_aml(int idx, FloppyDriveType type)
++static void parallel_isa_build_aml(ISADevice *isadev, Aml *scope)
 +{
-+    Aml *dev, *fdi;
-+    uint8_t maxc, maxh, maxs;
-+
-+    isa_fdc_get_drive_max_chs(type, &maxc, &maxh, &maxs);
-+
-+    dev =3D aml_device("FLP%c", 'A' + idx);
-+
-+    aml_append(dev, aml_name_decl("_ADR", aml_int(idx)));
-+
-+    fdi =3D aml_package(16);
-+    aml_append(fdi, aml_int(idx));  /* Drive Number */
-+    aml_append(fdi,
-+        aml_int(cmos_get_fd_drive_type(type)));  /* Device Type */
-+    /*
-+     * the values below are the limits of the drive, and are thus independ=
-ent
-+     * of the inserted media
-+     */
-+    aml_append(fdi, aml_int(maxc));  /* Maximum Cylinder Number */
-+    aml_append(fdi, aml_int(maxs));  /* Maximum Sector Number */
-+    aml_append(fdi, aml_int(maxh));  /* Maximum Head Number */
-+    /*
-+     * SeaBIOS returns the below values for int 0x13 func 0x08 regardless =
-of
-+     * the drive type, so shall we
-+     */
-+    aml_append(fdi, aml_int(0xAF));  /* disk_specify_1 */
-+    aml_append(fdi, aml_int(0x02));  /* disk_specify_2 */
-+    aml_append(fdi, aml_int(0x25));  /* disk_motor_wait */
-+    aml_append(fdi, aml_int(0x02));  /* disk_sector_siz */
-+    aml_append(fdi, aml_int(0x12));  /* disk_eot */
-+    aml_append(fdi, aml_int(0x1B));  /* disk_rw_gap */
-+    aml_append(fdi, aml_int(0xFF));  /* disk_dtl */
-+    aml_append(fdi, aml_int(0x6C));  /* disk_formt_gap */
-+    aml_append(fdi, aml_int(0xF6));  /* disk_fill */
-+    aml_append(fdi, aml_int(0x0F));  /* disk_head_sttl */
-+    aml_append(fdi, aml_int(0x08));  /* disk_motor_strt */
-+
-+    aml_append(dev, aml_name_decl("_FDI", fdi));
-+    return dev;
-+}
-+
-+static void fdc_isa_build_aml(ISADevice *isadev, Aml *scope)
-+{
++    ISAParallelState *isa =3D ISA_PARALLEL(isadev);
++    int i, uid =3D 0;
 +    Aml *dev;
 +    Aml *crs;
-+    int i;
 +
-+#define ACPI_FDE_MAX_FD 4
-+    uint32_t fde_buf[5] =3D {
-+        0, 0, 0, 0,     /* presence of floppy drives #0 - #3 */
-+        cpu_to_le32(2)  /* tape presence (2 =3D=3D never present) */
-+    };
-+
-+    crs =3D aml_resource_template();
-+    aml_append(crs, aml_io(AML_DECODE16, 0x03F2, 0x03F2, 0x00, 0x04));
-+    aml_append(crs, aml_io(AML_DECODE16, 0x03F7, 0x03F7, 0x00, 0x01));
-+    aml_append(crs, aml_irq_no_flags(6));
-+    aml_append(crs,
-+        aml_dma(AML_COMPATIBILITY, AML_NOTBUSMASTER, AML_TRANSFER8, 2));
-+
-+    dev =3D aml_device("FDC0");
-+    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0700")));
-+    aml_append(dev, aml_name_decl("_CRS", crs));
-+
-+    for (i =3D 0; i < MIN(MAX_FD, ACPI_FDE_MAX_FD); i++) {
-+        FloppyDriveType type =3D isa_fdc_get_drive_type(isadev, i);
-+
-+        if (type < FLOPPY_DRIVE_TYPE_NONE) {
-+            fde_buf[i] =3D cpu_to_le32(1);  /* drive present */
-+            aml_append(dev, build_fdinfo_aml(i, type));
++    for (i =3D 0; i < ARRAY_SIZE(isa_parallel_io); i++) {
++        if (isa->iobase =3D=3D isa_parallel_io[i]) {
++            uid =3D i + 1;
 +        }
 +    }
-+    aml_append(dev, aml_name_decl("_FDE",
-+               aml_buffer(sizeof(fde_buf), (uint8_t *)fde_buf)));
++    if (!uid) {
++        return;
++    }
++
++    crs =3D aml_resource_template();
++    aml_append(crs, aml_io(AML_DECODE16, isa->iobase, isa->iobase, 0x08, 0=
+x08));
++    aml_append(crs, aml_irq_no_flags(isa->isairq));
++
++    dev =3D aml_device("LPT%d", uid);
++    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0400")));
++    aml_append(dev, aml_name_decl("_UID", aml_int(uid)));
++    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
++    aml_append(dev, aml_name_decl("_CRS", crs));
 +
 +    aml_append(scope, dev);
 +}
 +
- static const VMStateDescription vmstate_isa_fdc =3D{
-     .name =3D "fdc",
-     .version_id =3D 2,
-@@ -2798,11 +2879,13 @@ static Property isa_fdc_properties[] =3D {
- static void isabus_fdc_class_init(ObjectClass *klass, void *data)
+ /* Memory mapped interface */
+ static uint64_t parallel_mm_readfn(void *opaque, hwaddr addr, unsigned siz=
+e)
+ {
+@@ -624,9 +654,11 @@ static Property parallel_isa_properties[] =3D {
+ static void parallel_isa_class_initfn(ObjectClass *klass, void *data)
  {
      DeviceClass *dc =3D DEVICE_CLASS(klass);
 +    ISADeviceClass *isa =3D ISA_DEVICE_CLASS(klass);
 =20
-     dc->realize =3D isabus_fdc_realize;
-     dc->fw_name =3D "fdc";
-     dc->reset =3D fdctrl_external_reset_isa;
-     dc->vmsd =3D &vmstate_isa_fdc;
-+    isa->build_aml =3D fdc_isa_build_aml;
-     device_class_set_props(dc, isa_fdc_properties);
-     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+     dc->realize =3D parallel_isa_realizefn;
+     dc->vmsd =3D &vmstate_parallel_isa;
++    isa->build_aml =3D parallel_isa_build_aml;
+     device_class_set_props(dc, parallel_isa_properties);
+     set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
  }
 diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 443db94deb5b..775936e28b9a 100644
+index 2188a2b99d18..443db94deb5b 100644
 --- a/hw/i386/acpi-build.c
 +++ b/hw/i386/acpi-build.c
-@@ -1058,85 +1058,6 @@ static void build_hpet_aml(Aml *table)
-     aml_append(table, scope);
+@@ -1173,28 +1173,6 @@ static Aml *build_mouse_device_aml(void)
+     return dev;
  }
 =20
--static Aml *build_fdinfo_aml(int idx, FloppyDriveType type)
+-static void build_lpt_device_aml(Aml *scope)
 -{
--    Aml *dev, *fdi;
--    uint8_t maxc, maxh, maxs;
--
--    isa_fdc_get_drive_max_chs(type, &maxc, &maxh, &maxs);
--
--    dev =3D aml_device("FLP%c", 'A' + idx);
--
--    aml_append(dev, aml_name_decl("_ADR", aml_int(idx)));
--
--    fdi =3D aml_package(16);
--    aml_append(fdi, aml_int(idx));  /* Drive Number */
--    aml_append(fdi,
--        aml_int(cmos_get_fd_drive_type(type)));  /* Device Type */
--    /*
--     * the values below are the limits of the drive, and are thus independ=
-ent
--     * of the inserted media
--     */
--    aml_append(fdi, aml_int(maxc));  /* Maximum Cylinder Number */
--    aml_append(fdi, aml_int(maxs));  /* Maximum Sector Number */
--    aml_append(fdi, aml_int(maxh));  /* Maximum Head Number */
--    /*
--     * SeaBIOS returns the below values for int 0x13 func 0x08 regardless =
-of
--     * the drive type, so shall we
--     */
--    aml_append(fdi, aml_int(0xAF));  /* disk_specify_1 */
--    aml_append(fdi, aml_int(0x02));  /* disk_specify_2 */
--    aml_append(fdi, aml_int(0x25));  /* disk_motor_wait */
--    aml_append(fdi, aml_int(0x02));  /* disk_sector_siz */
--    aml_append(fdi, aml_int(0x12));  /* disk_eot */
--    aml_append(fdi, aml_int(0x1B));  /* disk_rw_gap */
--    aml_append(fdi, aml_int(0xFF));  /* disk_dtl */
--    aml_append(fdi, aml_int(0x6C));  /* disk_formt_gap */
--    aml_append(fdi, aml_int(0xF6));  /* disk_fill */
--    aml_append(fdi, aml_int(0x0F));  /* disk_head_sttl */
--    aml_append(fdi, aml_int(0x08));  /* disk_motor_strt */
--
--    aml_append(dev, aml_name_decl("_FDI", fdi));
--    return dev;
--}
--
--static Aml *build_fdc_device_aml(ISADevice *fdc)
--{
--    int i;
 -    Aml *dev;
 -    Aml *crs;
 -
--#define ACPI_FDE_MAX_FD 4
--    uint32_t fde_buf[5] =3D {
--        0, 0, 0, 0,     /* presence of floppy drives #0 - #3 */
--        cpu_to_le32(2)  /* tape presence (2 =3D=3D never present) */
--    };
+-    if (!memory_region_present(get_system_io(), 0x0378)) {
+-        return;
+-    }
 -
--    dev =3D aml_device("FDC0");
--    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0700")));
+-    dev =3D aml_device("LPT");
+-    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0400")));
+-
+-    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
 -
 -    crs =3D aml_resource_template();
--    aml_append(crs, aml_io(AML_DECODE16, 0x03F2, 0x03F2, 0x00, 0x04));
--    aml_append(crs, aml_io(AML_DECODE16, 0x03F7, 0x03F7, 0x00, 0x01));
--    aml_append(crs, aml_irq_no_flags(6));
--    aml_append(crs,
--        aml_dma(AML_COMPATIBILITY, AML_NOTBUSMASTER, AML_TRANSFER8, 2));
+-    aml_append(crs, aml_io(AML_DECODE16, 0x0378, 0x0378, 0x08, 0x08));
+-    aml_append(crs, aml_irq_no_flags(7));
 -    aml_append(dev, aml_name_decl("_CRS", crs));
 -
--    for (i =3D 0; i < MIN(MAX_FD, ACPI_FDE_MAX_FD); i++) {
--        FloppyDriveType type =3D isa_fdc_get_drive_type(fdc, i);
--
--        if (type < FLOPPY_DRIVE_TYPE_NONE) {
--            fde_buf[i] =3D cpu_to_le32(1);  /* drive present */
--            aml_append(dev, build_fdinfo_aml(i, type));
--        }
--    }
--    aml_append(dev, aml_name_decl("_FDE",
--               aml_buffer(sizeof(fde_buf), (uint8_t *)fde_buf)));
--
--    return dev;
+-    aml_append(scope, dev);
 -}
 -
- static Aml *build_kbd_device_aml(void)
- {
-     Aml *dev;
-@@ -1175,7 +1096,6 @@ static Aml *build_mouse_device_aml(void)
-=20
  static void build_isa_devices_aml(Aml *table)
  {
--    ISADevice *fdc =3D pc_find_fdc0();
-     bool ambiguous;
-=20
-     Aml *scope =3D aml_scope("_SB.PCI0.ISA");
-@@ -1183,9 +1103,6 @@ static void build_isa_devices_aml(Aml *table)
-=20
-     aml_append(scope, build_kbd_device_aml());
-     aml_append(scope, build_mouse_device_aml());
--    if (fdc) {
--        aml_append(scope, build_fdc_device_aml(fdc));
--    }
+     ISADevice *fdc =3D pc_find_fdc0();
+@@ -1208,7 +1186,6 @@ static void build_isa_devices_aml(Aml *table)
+     if (fdc) {
+         aml_append(scope, build_fdc_device_aml(fdc));
+     }
+-    build_lpt_device_aml(scope);
 =20
      if (ambiguous) {
          error_report("Multiple ISA busses, unable to define IPMI ACPI data=
 ");
-diff --git a/stubs/cmos.c b/stubs/cmos.c
-new file mode 100644
-index 000000000000..416cbe4055ff
---- /dev/null
-+++ b/stubs/cmos.c
-@@ -0,0 +1,7 @@
-+#include "qemu/osdep.h"
-+#include "hw/i386/pc.h"
-+
-+int cmos_get_fd_drive_type(FloppyDriveType fd0)
-+{
-+    return 0;
-+}
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 45be5dc0ed78..3cbe472d1c6c 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -3,6 +3,7 @@ stub-obj-y +=3D bdrv-next-monitor-owned.o
- stub-obj-y +=3D blk-commit-all.o
- stub-obj-y +=3D blockdev-close-all-bdrv-states.o
- stub-obj-y +=3D clock-warp.o
-+stub-obj-y +=3D cmos.o
- stub-obj-y +=3D cpu-get-clock.o
- stub-obj-y +=3D cpu-get-icount.o
- stub-obj-y +=3D dump.o
 --=20
 2.18.4
 
