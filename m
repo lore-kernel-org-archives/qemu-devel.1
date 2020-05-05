@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8F44C47247
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 17:40:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09B6FC47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 17:41:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95B01206CC
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 17:40:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C9E1F206CC
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 17:41:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="O4c4WQEs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95B01206CC
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="ZvFzBl/P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9E1F206CC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jW1Yw-0008S6-Ln
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 13:40:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43986)
+	id 1jW1ZA-0000Jp-FN
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 13:41:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43994)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jW1XK-0006FF-Qd; Tue, 05 May 2020 13:39:18 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:38815)
+ id 1jW1XL-0006G3-HJ; Tue, 05 May 2020 13:39:19 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:38882)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jW1XJ-00089e-68; Tue, 05 May 2020 13:39:18 -0400
+ id 1jW1XJ-00089l-7W; Tue, 05 May 2020 13:39:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=Vk2B9SteFyDcjC0pSegxTjepsJ/H9UnjSaSopEjnPPg=; 
- b=O4c4WQEsCtzQ31C7fMIF7YsuYkRofXoAkgwU5qMS/l5auF2lkpPBaG79J1Mlmr9hCEVN6dHLP1vC5GRn43jsqmvn0bAptVttNjcPUCMjt7TanuRO3dGTu+CDCJL6SwD5uia+PAaHxEhairc8vPvMEgt2sFZw8HINLknByXMhL+C61+OGs2mRi9XuIbZ+u2uFZo9Pt3Y8AVxW/zEHIky3vFstukYp+AZeJ1gH8n6B9wwdc/XQyqSMlsjn27BhU4KoTqFubQ3yIyFMTvQzqzY9j1ayxa1NlpgIxJM/8ZGII8hxn+ZuMbETpSS/MJgCmLtYHnXxceAH+/yJSr/xzGn6QQ==;
+ bh=feJ5CefdIcoTetCGy9SxYuJA2zat3t1QrUrRsjHIdhY=; 
+ b=ZvFzBl/PEdsaNfANTIuZI6tc6LkkJPb+znxnopP+vfGmOt70a3t6WJviI03ODdbt9bgi7w7v86b5nFvSBhFK9L13VmXzMXEQ7EgqqPHzRWCdab8Etecm25D8DTCy5VgOGBXKkZfcxUJpSv1uDVWMDJqcxY3n2CJUe49vj2dMkOaysk+Uc2HeDswvKKykE+sLLgxxV5BJfVhHTASjStZ1PqqjmHrR3zgC7ow0b9AYLegCS39jWtG9rJADIVk2UjAM/pY/HcB955Ml/pBZvfwKu0WMvDih062ZDPoU45E6GzzLEZjG/FX4KpflSZvJglxHED5x1MqH1EhVU1Jsetzxeg==;
 Received: from static.160.43.0.81.ibercom.com ([81.0.43.160]
  helo=perseus.local) by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1jW1Ws-00025D-CU; Tue, 05 May 2020 19:38:50 +0200
+ id 1jW1Ws-00025C-D0; Tue, 05 May 2020 19:38:50 +0200
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1jW1Wc-00043r-Oj; Tue, 05 May 2020 19:38:34 +0200
+ id 1jW1Wc-00043n-ML; Tue, 05 May 2020 19:38:34 +0200
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 10/31] qcow2: Add offset_to_sc_index()
-Date: Tue,  5 May 2020 19:38:10 +0200
-Message-Id: <3f533eec7fd06dc67e21c938ca5f23a3b92291bf.1588699789.git.berto@igalia.com>
+Subject: [PATCH v5 08/31] qcow2: Add dummy has_subclusters() function
+Date: Tue,  5 May 2020 19:38:08 +0200
+Message-Id: <47c3829a10028930a36d471ca5b4b9fd342df470.1588699789.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1588699789.git.berto@igalia.com>
 References: <cover.1588699789.git.berto@igalia.com>
@@ -84,33 +84,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For a given offset, return the subcluster number within its cluster
-(i.e. with 32 subclusters per cluster it returns a number between 0
-and 31).
+This function will be used by the qcow2 code to check if an image has
+subclusters or not.
+
+At the moment this simply returns false. Once all patches needed for
+subcluster support are ready then QEMU will be able to create and
+read images with subclusters and this function will return the actual
+value.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/qcow2.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ block/qcow2.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/block/qcow2.h b/block/qcow2.h
-index 9d8ca8068c..e68febb15b 100644
+index 97fbaba574..5e8036c3dd 100644
 --- a/block/qcow2.h
 +++ b/block/qcow2.h
-@@ -563,6 +563,11 @@ static inline int offset_to_l2_slice_index(BDRVQcow2State *s, int64_t offset)
-     return (offset >> s->cluster_bits) & (s->l2_slice_size - 1);
- }
+@@ -492,6 +492,12 @@ typedef enum QCow2MetadataOverlap {
  
-+static inline int offset_to_sc_index(BDRVQcow2State *s, int64_t offset)
+ #define INV_OFFSET (-1ULL)
+ 
++static inline bool has_subclusters(BDRVQcow2State *s)
 +{
-+    return (offset >> s->subcluster_bits) & (s->subclusters_per_cluster - 1);
++    /* FIXME: Return false until this feature is complete */
++    return false;
 +}
 +
- static inline int64_t qcow2_vm_state_offset(BDRVQcow2State *s)
+ static inline uint64_t get_l2_entry(BDRVQcow2State *s, uint64_t *l2_slice,
+                                     int idx)
  {
-     return (int64_t)s->l1_vm_state_index << (s->cluster_bits + s->l2_bits);
 -- 
 2.20.1
 
