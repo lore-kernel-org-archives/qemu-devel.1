@@ -2,89 +2,71 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45861C47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 21:10:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 349C2C47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 21:10:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AE50206FA
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 21:10:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FpfqwZVT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AE50206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EB25F206FA
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 21:10:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB25F206FA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jW4pR-0002Zi-5a
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 17:10:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52994)
+	id 1jW4pi-00035J-0t
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 17:10:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53010)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jW4oQ-0001mV-RN
- for qemu-devel@nongnu.org; Tue, 05 May 2020 17:09:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20251
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jW4og-00025U-8Q; Tue, 05 May 2020 17:09:26 -0400
+Resent-Date: Tue, 05 May 2020 17:09:26 -0400
+Resent-Message-Id: <E1jW4og-00025U-8Q@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21329)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jW4oO-0007Pw-K3
- for qemu-devel@nongnu.org; Tue, 05 May 2020 17:09:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588712946;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Kb+m9HgzUTwfbq3SW9L26vjNpZFZ70IrFzsZN/2JrtM=;
- b=FpfqwZVT+IgR5mL5LMxvZWBBQWubyyZ/AE2NNajjebLZjZWZmC3ONZ/eURRrAbu5g2S1Pl
- sza9N//ZAAuQcAKnOSDqUgzd4giu/wFEd0cjms1ZCPtaj6plFGf3KKN9wnRqGuzNj21f46
- MMadIOqqqDVwcqd4P6INVYxT8sQqLfY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-56-rPCqgm_4Pc24XZyylGAwAg-1; Tue, 05 May 2020 17:09:02 -0400
-X-MC-Unique: rPCqgm_4Pc24XZyylGAwAg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DC53E1800D4A;
- Tue,  5 May 2020 21:08:59 +0000 (UTC)
-Received: from [10.3.114.73] (ovpn-114-73.phx2.redhat.com [10.3.114.73])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 247D65D9C5;
- Tue,  5 May 2020 21:08:57 +0000 (UTC)
-Subject: Re: [PATCH v5 14/31] qcow2: Add QCow2SubclusterType and
- qcow2_get_subcluster_type()
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1588699789.git.berto@igalia.com>
- <5b744e9c0f3d348ea675c7a52aabaeeab6fe7b64.1588699789.git.berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <e6a65feb-e7f9-b006-8171-014e41f62395@redhat.com>
-Date: Tue, 5 May 2020 16:08:57 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jW4oe-0007Qw-Kg; Tue, 05 May 2020 17:09:25 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1588712954; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=R3SbuyGvZWTvNU3qyVoEMUrGX3x+auIXcjWIaE3zn/WladEeJCtaPuj3YfIbGbRA3weqXUuTsMsR4NGtvMYjyR9VYSBDCqi9r9l+MyGQRsPfidb8nyet8A8MAfujX8QUAl4VSLW8KVckJSm+7PVZWChoBBi5lN6c3o1j0qkbu/Y=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1588712954;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=PCtmE9JoI4RaUWTHJpAG8l9TzTXcX+MUZde/b0vX+6c=; 
+ b=MsBuLkmqqtOBKHLmtG5ECp9iY58FyBqz5UJNRvqENheNeu8ujPMVGLmogDdmhlp6R+QgBpjBLwenYrJA/8p1PjSiIUT/28iZwRk2TWp20OzcB9/wrdCnycVZidqruvZUEw5yIGZ2i31XnkWL6QySfyrGxpPfGUt9pr0LjnUQxGU=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1588712952093753.0498730853124;
+ Tue, 5 May 2020 14:09:12 -0700 (PDT)
+Message-ID: <158871295057.24779.817567419595223712@45ef0f9c86ae>
+In-Reply-To: <20200505200819.5662-1-mlevitsk@redhat.com>
+Subject: Re: [PATCH v4 00/14] LUKS: encryption slot management using amend
+ interface
 MIME-Version: 1.0
-In-Reply-To: <5b744e9c0f3d348ea675c7a52aabaeeab6fe7b64.1588699789.git.berto@igalia.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 15:42:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: mlevitsk@redhat.com
+Date: Tue, 5 May 2020 14:09:12 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 13:41:33
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,111 +80,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mlevitsk@redhat.com, berrange@redhat.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com,
+ mreitz@redhat.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/5/20 12:38 PM, Alberto Garcia wrote:
-> This patch adds QCow2SubclusterType, which is the subcluster-level
-> version of QCow2ClusterType. All QCOW2_SUBCLUSTER_* values have the
-> the same meaning as their QCOW2_CLUSTER_* equivalents (when they
-> exist). See below for details and caveats.
-> 
-> In images without extended L2 entries clusters are treated as having
-> exactly one subcluster so it is possible to replace one data type with
-> the other while keeping the exact same semantics.
-> 
-> With extended L2 entries there are new possible values, and every
-> subcluster in the same cluster can obviously have a different
-> QCow2SubclusterType so functions need to be adapted to work on the
-> subcluster level.
-> 
-> There are several things that have to be taken into account:
-> 
->    a) QCOW2_SUBCLUSTER_COMPRESSED means that the whole cluster is
->       compressed. We do not support compression at the subcluster
->       level.
-> 
->    b) There are two different values for unallocated subclusters:
->       QCOW2_SUBCLUSTER_UNALLOCATED_PLAIN which means that the whole
->       cluster is unallocated, and QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC
->       which means that the cluster is allocated but the subcluster is
->       not. The latter can only happen in images with extended L2
->       entries.
-
-Or put differently, extents of the qcow2 file are always allocated a 
-contiguous cluster at a time (so using larger clusters reduces 
-fragmentation), but because we can now defer to the backing image a 
-sub-cluster at a time, we have less I/O to perform the first time the 
-guest touches a subcluster.  The two different return values thus tell 
-us when we need to do a cluster allocation vs. just an in-place 
-overwrite or a sub-cluster COW.
-
-> 
->    c) QCOW2_SUBCLUSTER_INVALID is used to detect the cases where an L2
->       entry has a value that violates the specification. The caller is
->       responsible for handling these situations.
-> 
->       To prevent compatibility problems with images that have invalid
->       values but are currently being read by QEMU without causing side
->       effects, QCOW2_SUBCLUSTER_INVALID is only returned for images
->       with extended L2 entries.
-> 
-> qcow2_cluster_to_subcluster_type() is added as a separate function
-> from qcow2_get_subcluster_type(), but this is only temporary and both
-> will be merged in a subsequent patch.
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->   block/qcow2.h | 127 +++++++++++++++++++++++++++++++++++++++++++++++++-
->   1 file changed, 126 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/qcow2.h b/block/qcow2.h
-> index 4ad93772b9..be7816a3b8 100644
-> --- a/block/qcow2.h
-> +++ b/block/qcow2.h
-> @@ -80,6 +80,21 @@
->   
->   #define QCOW_EXTL2_SUBCLUSTERS_PER_CLUSTER 32
->   
-> +/* The subcluster X [0..31] is allocated */
-> +#define QCOW_OFLAG_SUB_ALLOC(X)   (1ULL << (X))
-> +/* The subcluster X [0..31] reads as zeroes */
-> +#define QCOW_OFLAG_SUB_ZERO(X)    (QCOW_OFLAG_SUB_ALLOC(X) << 32)
-> +/* Subclusters X to Y (both included) are allocated */
-> +#define QCOW_OFLAG_SUB_ALLOC_RANGE(X, Y) \
-> +    (QCOW_OFLAG_SUB_ALLOC((Y) + 1) - QCOW_OFLAG_SUB_ALLOC(X))
-
-Nicer than my initial thoughts on getting rid of the bit-wise loop.  And 
-uses 64-bit math to produce a 32-bit answer, so there are no edge cases 
-where overflow could misbehave even though the intermediate steps may 
-require 33 bits.  Works as long as X <= Y (should that be mentioned in 
-the contract?)
-
-> +/* Subclusters X to Y (both included) read as zeroes */
-> +#define QCOW_OFLAG_SUB_ZERO_RANGE(X, Y) \
-> +    (QCOW_OFLAG_SUB_ALLOC_RANGE(X, Y) << 32)
-
-Also works (you do the math in the low 33 bits before shifting), again 
-if X <= Y.
-
-> +/* L2 entry bitmap with all allocation bits set */
-> +#define QCOW_L2_BITMAP_ALL_ALLOC  (QCOW_OFLAG_SUB_ALLOC_RANGE(0, 31))
-> +/* L2 entry bitmap with all "read as zeroes" bits set */
-> +#define QCOW_L2_BITMAP_ALL_ZEROES (QCOW_OFLAG_SUB_ZERO_RANGE(0, 31))
-
-More complicated than merely writing 0xffffffffULL and 
-(0xffffffffULL<<32), but the compiler will constant-fold it to the same 
-value, and it elegantly expresses the intent.  I like it.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUwNTIwMDgxOS41NjYy
+LTEtbWxldml0c2tAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
+IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
+Zm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAyMDA1MDUyMDA4MTkuNTY2Mi0xLW1sZXZpdHNrQHJl
+ZGhhdC5jb20KU3ViamVjdDogW1BBVENIIHY0IDAwLzE0XSBMVUtTOiBlbmNyeXB0aW9uIHNsb3Qg
+bWFuYWdlbWVudCB1c2luZyBhbWVuZCBpbnRlcmZhY2UKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBT
+Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVs
+bCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
+b3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2Uu
+Lgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
+JwphNjZjMWUwIGlvdGVzdHM6IGFkZCB0ZXN0cyBmb3IgYmxvY2tkZXYtYW1lbmQKZDg1NjRiZiBi
+bG9jay9xY293MjogaW1wbGVtZW50IGJsb2NrZGV2LWFtZW5kCjU3MmVlOWQgYmxvY2svY3J5cHRv
+OiBpbXBsZW1lbnQgYmxvY2tkZXYtYW1lbmQKNWY5ODhhYyBibG9jay9jb3JlOiBhZGQgZ2VuZXJp
+YyBpbmZyYXN0cnVjdHVyZSBmb3IgeC1ibG9ja2Rldi1hbWVuZCBxbXAgY29tbWFuZAo5MmRhYTZh
+IGlvdGVzdHM6IHFlbXUtaW1nIHRlc3RzIGZvciBsdWtzIGtleSBtYW5hZ2VtZW50CjYyMWM5ZTMg
+aW90ZXN0czogZmlsdGVyIGZldyBtb3JlIGx1a3Mgc3BlY2lmaWMgY3JlYXRlIG9wdGlvbnMKZDQ2
+NTUwMiBibG9jay9xY293MjogZXh0ZW5kIHFlbXUtaW1nIGFtZW5kIGludGVyZmFjZSB3aXRoIGNy
+eXB0byBvcHRpb25zCjg2ZTYyMDcgYmxvY2svY3J5cHRvOiBpbXBsZW1lbnQgdGhlIGVuY3J5cHRp
+b24ga2V5IG1hbmFnZW1lbnQKMGY4YmZjZSBibG9jay9jcnlwdG86IHJlbmFtZSB0d28gZnVuY3Rp
+b25zCjg1NTQyYTYgYmxvY2svYW1lbmQ6IHJlZmFjdG9yIHFjb3cyIGFtZW5kIG9wdGlvbnMKZjBm
+NmVmYiBibG9jay9hbWVuZDogc2VwYXJhdGUgYW1lbmQgYW5kIGNyZWF0ZSBvcHRpb25zIGZvciBx
+ZW11LWltZwo3NzFjMzMxIGJsb2NrL2FtZW5kOiBhZGQgJ2ZvcmNlJyBvcHRpb24KMjljN2M5YyBx
+Y3J5cHRvL2x1a3M6IGltcGxlbWVudCBlbmNyeXB0aW9uIGtleSBtYW5hZ2VtZW50Cjk3ZjdmMjUg
+cWNyeXB0by9jb3JlOiBhZGQgZ2VuZXJpYyBpbmZyYXN0cnVjdHVyZSBmb3IgY3J5cHRvIG9wdGlv
+bnMgYW1lbmRtZW50Cgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzE0IENoZWNraW5nIGNvbW1pdCA5
+N2Y3ZjI1NGIyMjkgKHFjcnlwdG8vY29yZTogYWRkIGdlbmVyaWMgaW5mcmFzdHJ1Y3R1cmUgZm9y
+IGNyeXB0byBvcHRpb25zIGFtZW5kbWVudCkKMi8xNCBDaGVja2luZyBjb21taXQgMjljN2M5Y2M5
+YWNlIChxY3J5cHRvL2x1a3M6IGltcGxlbWVudCBlbmNyeXB0aW9uIGtleSBtYW5hZ2VtZW50KQoz
+LzE0IENoZWNraW5nIGNvbW1pdCA3NzFjMzMxZjY3NzMgKGJsb2NrL2FtZW5kOiBhZGQgJ2ZvcmNl
+JyBvcHRpb24pCjQvMTQgQ2hlY2tpbmcgY29tbWl0IGYwZjZlZmJiMWVkMyAoYmxvY2svYW1lbmQ6
+IHNlcGFyYXRlIGFtZW5kIGFuZCBjcmVhdGUgb3B0aW9ucyBmb3IgcWVtdS1pbWcpCkVSUk9SOiBN
+YWNyb3Mgd2l0aCBtdWx0aXBsZSBzdGF0ZW1lbnRzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBhIGRv
+IC0gd2hpbGUgbG9vcAojMzE6IEZJTEU6IGJsb2NrL3Fjb3cyLmM6NTQ5ODoKKyNkZWZpbmUgUUNP
+V19DT01NT05fT1BUSU9OUyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+XAorICAgIHsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBcCisgICAgICAgIC5uYW1lID0gQkxPQ0tfT1BUX1NJWkUsICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9T
+SVpFLCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAuaGVs
+cCA9ICJWaXJ0dWFsIGRpc2sgc2l6ZSIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBc
+CisgICAgfSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAubmFtZSA9IEJMT0NLX09QVF9D
+T01QQVRfTEVWRUwsICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC50eXBl
+ID0gUUVNVV9PUFRfU1RSSU5HLCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwK
+KyAgICAgICAgLmhlbHAgPSAiQ29tcGF0aWJpbGl0eSBsZXZlbCAodjIgWzAuMTBdIG9yIHYzIFsx
+LjFdKSIgICAgICAgXAorICAgIH0sICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgeyAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLm5hbWUg
+PSBCTE9DS19PUFRfQkFDS0lOR19GSUxFLCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAor
+ICAgICAgICAudHlwZSA9IFFFTVVfT1BUX1NUUklORywgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBcCisgICAgICAgIC5oZWxwID0gIkZpbGUgbmFtZSBvZiBhIGJhc2UgaW1hZ2Ui
+ICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICB9LCAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIHsgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisg
+ICAgICAgIC5uYW1lID0gQkxPQ0tfT1BUX0JBQ0tJTkdfRk1ULCAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIFwKKyAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9TVFJJTkcsICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAuaGVscCA9ICJJbWFnZSBmb3JtYXQg
+b2YgdGhlIGJhc2UgaW1hZ2UiICAgICAgICAgICAgICAgICAgICBcCisgICAgfSwgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAg
+ICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgXAorICAgICAgICAubmFtZSA9IEJMT0NLX09QVF9EQVRBX0ZJTEUsICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC50eXBlID0gUUVNVV9PUFRfU1RSSU5H
+LCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLmhlbHAgPSAi
+RmlsZSBuYW1lIG9mIGFuIGV4dGVybmFsIGRhdGEgZmlsZSIgICAgICAgICAgICAgICAgXAorICAg
+IH0sICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBcCisgICAgeyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLm5hbWUgPSBCTE9DS19PUFRfREFUQV9G
+SUxFX1JBVywgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAudHlwZSA9IFFF
+TVVfT1BUX0JPT0wsICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAg
+ICAgIC5oZWxwID0gIlRoZSBleHRlcm5hbCBkYXRhIGZpbGUgbXVzdCBzdGF5IHZhbGlkICIgICAg
+ICAgICAgIFwKKyAgICAgICAgICAgICAgICAiYXMgYSByYXcgaW1hZ2UiICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgXAorICAgIH0sICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgeyAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAg
+ICAgLm5hbWUgPSBCTE9DS19PUFRfRU5DUllQVCwgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgXAorICAgICAgICAudHlwZSA9IFFFTVVfT1BUX0JPT0wsICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5oZWxwID0gIkVuY3J5cHQgdGhlIGltYWdl
+IHdpdGggZm9ybWF0ICdhZXMnLiAoRGVwcmVjYXRlZCAiIFwKKyAgICAgICAgICAgICAgICAiaW4g
+ZmF2b3Igb2YgIiBCTE9DS19PUFRfRU5DUllQVF9GT1JNQVQgIj1hZXMpIiwgICAgXAorICAgIH0s
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBcCisgICAgeyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLm5hbWUgPSBCTE9DS19PUFRfRU5DUllQVF9G
+T1JNQVQsICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAudHlwZSA9IFFFTVVf
+T1BUX1NUUklORywgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAg
+IC5oZWxwID0gIkVuY3J5cHQgdGhlIGltYWdlLCBmb3JtYXQgY2hvaWNlczogJ2FlcycsICdsdWtz
+JyIsIFwKKyAgICB9LCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgXAorICAgIEJMT0NLX0NSWVBUT19PUFRfREVGX0tFWV9TRUNSRVQo
+ImVuY3J5cHQuIiwgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgICJJRCBvZiBzZWNyZXQg
+cHJvdmlkaW5nIHFjb3cgQUVTIGtleSBvciBMVUtTIHBhc3NwaHJhc2UiKSwgIFwKKyAgICBCTE9D
+S19DUllQVE9fT1BUX0RFRl9MVUtTX0NJUEhFUl9BTEcoImVuY3J5cHQuIiksICAgICAgICAgICAg
+ICAgXAorICAgIEJMT0NLX0NSWVBUT19PUFRfREVGX0xVS1NfQ0lQSEVSX01PREUoImVuY3J5cHQu
+IiksICAgICAgICAgICAgICBcCisgICAgQkxPQ0tfQ1JZUFRPX09QVF9ERUZfTFVLU19JVkdFTl9B
+TEcoImVuY3J5cHQuIiksICAgICAgICAgICAgICAgIFwKKyAgICBCTE9DS19DUllQVE9fT1BUX0RF
+Rl9MVUtTX0lWR0VOX0hBU0hfQUxHKCJlbmNyeXB0LiIpLCAgICAgICAgICAgXAorICAgIEJMT0NL
+X0NSWVBUT19PUFRfREVGX0xVS1NfSEFTSF9BTEcoImVuY3J5cHQuIiksICAgICAgICAgICAgICAg
+ICBcCisgICAgQkxPQ0tfQ1JZUFRPX09QVF9ERUZfTFVLU19JVEVSX1RJTUUoImVuY3J5cHQuIiks
+ICAgICAgICAgICAgICAgIFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAubmFtZSA9IEJMT0NLX09Q
+VF9DTFVTVEVSX1NJWkUsICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC50
+eXBlID0gUUVNVV9PUFRfU0laRSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IFwKKyAgICAgICAgLmhlbHAgPSAicWNvdzIgY2x1c3RlciBzaXplIiwgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgXAorICAgICAgICAuZGVmX3ZhbHVlX3N0ciA9IHN0cmluZ2lmeShERUZB
+VUxUX0NMVVNURVJfU0laRSkgICAgICAgICAgICBcCisgICAgfSwgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICB7ICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+XAorICAgICAgICAubmFtZSA9IEJMT0NLX09QVF9QUkVBTExPQywgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBcCisgICAgICAgIC50eXBlID0gUUVNVV9PUFRfU1RSSU5HLCAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLmhlbHAgPSAiUHJlYWxsb2Nh
+dGlvbiBtb2RlIChhbGxvd2VkIHZhbHVlczogb2ZmLCAiICAgICAgICAgXAorICAgICAgICAgICAg
+ICAgICJtZXRhZGF0YSwgZmFsbG9jLCBmdWxsKSIgICAgICAgICAgICAgICAgICAgICAgICAgICBc
+CisgICAgfSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAubmFtZSA9IEJMT0NLX09QVF9M
+QVpZX1JFRkNPVU5UUywgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC50eXBl
+ID0gUUVNVV9PUFRfQk9PTCwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwK
+KyAgICAgICAgLmhlbHAgPSAiUG9zdHBvbmUgcmVmY291bnQgdXBkYXRlcyIsICAgICAgICAgICAg
+ICAgICAgICAgICAgXAorICAgICAgICAuZGVmX3ZhbHVlX3N0ciA9ICJvZmYiICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgfSwgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICB7ICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAor
+ICAgICAgICAubmFtZSA9IEJMT0NLX09QVF9SRUZDT1VOVF9CSVRTLCAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBcCisgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVSLCAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLmhlbHAgPSAiV2lkdGggb2YgYSBy
+ZWZlcmVuY2UgY291bnQgZW50cnkgaW4gYml0cyIsICAgICAgICAgXAorICAgICAgICAuZGVmX3Zh
+bHVlX3N0ciA9ICIxNiIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisg
+ICAgfSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIFwKKwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyMzEgbGluZXMgY2hl
+Y2tlZAoKUGF0Y2ggNC8xNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNS8xNCBDaGVja2lu
+ZyBjb21taXQgODU1NDJhNmM1ZTBlIChibG9jay9hbWVuZDogcmVmYWN0b3IgcWNvdzIgYW1lbmQg
+b3B0aW9ucykKNi8xNCBDaGVja2luZyBjb21taXQgMGY4YmZjZTM0MjI5IChibG9jay9jcnlwdG86
+IHJlbmFtZSB0d28gZnVuY3Rpb25zKQo3LzE0IENoZWNraW5nIGNvbW1pdCA4NmU2MjA3ZTBhMTMg
+KGJsb2NrL2NyeXB0bzogaW1wbGVtZW50IHRoZSBlbmNyeXB0aW9uIGtleSBtYW5hZ2VtZW50KQo4
+LzE0IENoZWNraW5nIGNvbW1pdCBkNDY1NTAyYzEzNzggKGJsb2NrL3Fjb3cyOiBleHRlbmQgcWVt
+dS1pbWcgYW1lbmQgaW50ZXJmYWNlIHdpdGggY3J5cHRvIG9wdGlvbnMpCjkvMTQgQ2hlY2tpbmcg
+Y29tbWl0IDYyMWM5ZTNkMDU4OSAoaW90ZXN0czogZmlsdGVyIGZldyBtb3JlIGx1a3Mgc3BlY2lm
+aWMgY3JlYXRlIG9wdGlvbnMpCjEwLzE0IENoZWNraW5nIGNvbW1pdCA5MmRhYTZhZGI0ODIgKGlv
+dGVzdHM6IHFlbXUtaW1nIHRlc3RzIGZvciBsdWtzIGtleSBtYW5hZ2VtZW50KQpXQVJOSU5HOiBh
+ZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBk
+YXRpbmc/CiMxNTogCm5ldyBmaWxlIG1vZGUgMTAwNzU1Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fy
+bmluZ3MsIDQzMiBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMC8xNCBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgoxMS8xNCBDaGVja2luZyBjb21taXQgNWY5ODhhY2QwODBkIChibG9jay9jb3JlOiBh
+ZGQgZ2VuZXJpYyBpbmZyYXN0cnVjdHVyZSBmb3IgeC1ibG9ja2Rldi1hbWVuZCBxbXAgY29tbWFu
+ZCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJ
+TkVSUyBuZWVkIHVwZGF0aW5nPwojMzE6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAg
+ZXJyb3JzLCAxIHdhcm5pbmdzLCAyMTYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTEvMTQgaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KMTIvMTQgQ2hlY2tpbmcgY29tbWl0IDU3MmVlOWRmNTRjYSAo
+YmxvY2svY3J5cHRvOiBpbXBsZW1lbnQgYmxvY2tkZXYtYW1lbmQpCjEzLzE0IENoZWNraW5nIGNv
+bW1pdCBkODU2NGJmODhmYzcgKGJsb2NrL3Fjb3cyOiBpbXBsZW1lbnQgYmxvY2tkZXYtYW1lbmQp
+CjE0LzE0IENoZWNraW5nIGNvbW1pdCBhNjZjMWUwYzY5NjUgKGlvdGVzdHM6IGFkZCB0ZXN0cyBm
+b3IgYmxvY2tkZXYtYW1lbmQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUo
+cyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzE1OiAKbmV3IGZpbGUgbW9kZSAx
+MDA3NTUKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNTg5IGxpbmVzIGNoZWNrZWQKClBh
+dGNoIDE0LzE0IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
+aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
+aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoK
+VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxh
+YmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNTA1MjAwODE5LjU2NjItMS1tbGV2
+aXRza0ByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1h
+aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9y
+Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNv
+bQ==
 
