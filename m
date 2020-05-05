@@ -2,56 +2,64 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B498C3A5A9
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 00:39:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C594C3A5A9
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 00:56:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3A1A206EB
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 00:39:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D2DFD206D7
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 00:56:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="FMrZ1SRI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3A1A206EB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="RR5qE8Gc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2DFD206D7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVlc5-00078k-Qu
-	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 20:39:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53048)
+	id 1jVlt8-0003pC-2X
+	for qemu-devel@archiver.kernel.org; Mon, 04 May 2020 20:56:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48824)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jVlbO-0006fC-FE; Mon, 04 May 2020 20:38:26 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:35071 helo=ozlabs.org)
+ id 1jVls7-0003Kt-If
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 20:55:43 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:54101 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jVlaw-00060M-T7; Mon, 04 May 2020 20:38:23 -0400
+ id 1jVls0-0007qZ-Uv
+ for qemu-devel@nongnu.org; Mon, 04 May 2020 20:55:42 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 49GLRD1m9Wz9sSW; Tue,  5 May 2020 10:37:44 +1000 (AEST)
+ id 49GLqg4lrNz9sT1; Tue,  5 May 2020 10:55:27 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1588639064;
- bh=gxVoCqIzNwD00Pb7O12s69r0plYWM5h+0WxFcdwwgUI=;
+ d=gibson.dropbear.id.au; s=201602; t=1588640127;
+ bh=3+GdaMRkqZ6W3RnU48Hg6c4IfSv19Oog9d57vMYq6kg=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=FMrZ1SRIxQ5Qawsir4Ff8xtDRzE0vDiEc4DJJO7Jkq4APDyNXP/pXz3wPyR8azQ/v
- 6xK+hEEIe/TTSS+/BIb0TdtWFOqngpsKNuLhkVSFENlHyhXfcl+34mLvHWOiAGFHkY
- 5yjisWDTrmAYEjjuRzFDX6HYvqavpf7qDZEFbU08=
-Date: Tue, 5 May 2020 10:34:23 +1000
+ b=RR5qE8GcehpFmKGhL9Lu4AJN9ndXRLByuMpS4KBeoLTxavHfD7uyhNTZn15CBLyg1
+ H78PmnX3DZMIkc5o57GxMdcF0baiJpjGXf0w/RmSDh7YVxn6t9CV1BNS+I5sh4ISeG
+ MIjwOHmJd1CxSY5svlT8lWb68ELnIYZ+PBHXcTYM=
+Date: Tue, 5 May 2020 10:40:23 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH 5/6] block/nvme: Align block pages queue to host page size
-Message-ID: <20200505003423.GD13695@umbus.fritz.box>
-References: <20200504094641.4963-1-philmd@redhat.com>
- <20200504094641.4963-6-philmd@redhat.com>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v1 4/4] .travis.yml: reduce the load on [ppc64] GCC
+ check-tcg
+Message-ID: <20200505004023.GE13695@umbus.fritz.box>
+References: <20200501111505.4225-1-alex.bennee@linaro.org>
+ <20200501111505.4225-5-alex.bennee@linaro.org>
+ <ad941829-a2f3-6ef3-6251-0681b36be24a@redhat.com>
+ <877dxvke0o.fsf@linaro.org>
+ <20200504021047.GA13695@umbus.fritz.box>
+ <bfdd7881-c9e8-d058-52a8-1c88518b90fb@linaro.org>
+ <87r1vz5vmp.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="TybLhxa8M7aNoW+V"
+ protocol="application/pgp-signature"; boundary="idY8LE8SD6/8DnRI"
 Content-Disposition: inline
-In-Reply-To: <20200504094641.4963-6-philmd@redhat.com>
+In-Reply-To: <87r1vz5vmp.fsf@linaro.org>
 Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/04 20:37:45
@@ -75,69 +83,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Laurent Vivier <lvivier@redhat.com>,
- qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
- Keith Busch <keith.busch@intel.com>,
- =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---TybLhxa8M7aNoW+V
+--idY8LE8SD6/8DnRI
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 04, 2020 at 11:46:40AM +0200, Philippe Mathieu-Daud=E9 wrote:
-> In nvme_create_queue_pair() we create a page list using
-> qemu_blockalign(), then map it with qemu_vfio_dma_map():
+On Mon, May 04, 2020 at 08:48:46PM +0100, Alex Benn=E9e wrote:
 >=20
->   q->prp_list_pages =3D qemu_blockalign0(bs, s->page_size * NVME_QUEUE_SI=
-ZE);
->   r =3D qemu_vfio_dma_map(s->vfio, q->prp_list_pages,
->                         s->page_size * NVME_QUEUE_SIZE, ...);
+> Richard Henderson <richard.henderson@linaro.org> writes:
 >=20
-> With:
+> > On 5/3/20 7:10 PM, David Gibson wrote:
+> >>>>>           - TEST_CMD=3D"make check check-tcg V=3D1"
+> >>>>> -        - CONFIG=3D"--disable-containers --target-list=3D${MAIN_SO=
+FTMMU_TARGETS},ppc64le-linux-user"
+> >>>>> +        - CONFIG=3D"--disable-containers --target-list=3Dppc64-sof=
+tmmu,ppc64le-linux-user"
+> >>>>
+> >>>> Cc'ing David, since I'm not sure about this one... Maybe split as we
+> >>>> did with other jobs?
+> > ...
+> >> Hrm.  I'd prefer not to drop this coverage if we can avoid it.  What
+> >> we're not testing with the proposed patch is TCG generation for a ppc
+> >> host but a non-ppc target.  e.g. if the x86 or ARM target side generat=
+es
+> >> some pattern of TCG ops that's very rare for the ppc target, and is
+> >> buggy in the ppc host side.
+> >
+> > Are we actually testing those here?  As far as I can see, we're not ins=
+talling
+> > any cross-compilers here, so we're not building any non-ppc binaries.  =
+Nor are
+> > we running check-acceptance which would download pre-built foreign
+> > binaries.
 >=20
->   s->page_size =3D MAX(4096, 1 << (12 + ((cap >> 48) & 0xF)));
->=20
-> The qemu_vfio_dma_map() documentation says "The caller need
-> to make sure the area is aligned to page size". While we use
-> multiple s->page_size as alignment, it might be not sufficient
-> on some hosts. Use the qemu_real_host_page_size value to be
-> sure the host alignment is respected.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> We are testing the very minimal boot stubs that each -system binary has
+> in qtest but they are hardly going to be exercising the majority of the
+> TCG. Basically the $SELF-linux-user is going to be exercising more of
+> the TCG than anything else.
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Oh, good points.
 
-> ---
-> Cc: C=E9dric Le Goater <clg@kaod.org>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: Laurent Vivier <lvivier@redhat.com>
-> ---
->  block/nvme.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/block/nvme.c b/block/nvme.c
-> index 7b7c0cc5d6..bde0d28b39 100644
-> --- a/block/nvme.c
-> +++ b/block/nvme.c
-> @@ -627,7 +627,7 @@ static int nvme_init(BlockDriverState *bs, const char=
- *device, int namespace,
-> =20
->      s->page_size =3D MAX(4096, 1 << (12 + ((cap >> 48) & 0xF)));
->      s->doorbell_scale =3D (4 << (((cap >> 32) & 0xF))) / sizeof(uint32_t=
-);
-> -    bs->bl.opt_mem_alignment =3D s->page_size;
-> +    bs->bl.opt_mem_alignment =3D MAX(qemu_real_host_page_size, s->page_s=
-ize);
->      timeout_ms =3D MIN(500 * ((cap >> 24) & 0xFF), 30000);
-> =20
->      /* Reset device to get a clean state. */
+Go ahead then.  In fact we should probably do that for all the
+check-tcg builds that don't install cross compilers.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -145,25 +140,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---TybLhxa8M7aNoW+V
+--idY8LE8SD6/8DnRI
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl6wtI4ACgkQbDjKyiDZ
-s5J8+xAAtRL8ELfJtWXEPq8h3/ak/v7Bp1VXknIJqzGFELuv1eVrZZaeUJKwsu8E
-CKNxmyfj4CRUCNxoGSbtwi/6+Je/loJqvz+kubwX///YAKn00p8Ta3c5rTX0t+x8
-ogGg9RDMxFm02IPfvfFBWBfPp4G5Uu7vGdihI5zV3eC+xyfCEgks/Q08T+oBK7k/
-Vl2/zmkVk9MiRqC0TBY9QWW5sFk2EuJZAywD74Kw0H4LhVVcvOIFwZQUObuAH66Y
-+TMoIPuIYw4P0NxzdW1hEUi9BbV6RM0dQkLCeS+4LKNVeJ5bpl1/CKYbA/R2KweS
-2pVjdEU4+PZnZN5l0CmNNVx840ClKlm28slse1JvsVKDTOwbkUspSHn+WRuWZYoI
-nbVGhOklg9AXK25OwfmuQAfchVzZcCqaauOc3cohfCNnxxdNuDDR6kKsLK1y+p2k
-MMR0h9+ZTX+5R/+i2JmDTyDTXagvigDQ4Uk5Gx2WS0NNi3vcd6Z76JI36fd1T+N4
-T3u2mXJTzJXdzOi0tirQaYDwicJiGfmNUifoJvKllwoJigAPzQ6mtOTEK7YXNU6H
-OihO/BUxzTWY8LobIyFv9uhWWalQ1m3+8CrKfO+BxZJ7EnaBzejIRZf2RhX3LLVF
-m9sb/xuEPI0I9o3LO/hN3QouD8bb1L5BygWyIBZIwE1IS6lyyTw=
-=nfv/
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl6wtfcACgkQbDjKyiDZ
+s5L0fhAAzHP4G2ENnr5NLPm1s6hPoNhuPQGF3vRu8wGzVdMHnK4ZxEDQiLDoHL32
+ykJdcmaxFrmxFBiWEeHKKDed2eMI+EJIo8NW4WJxVYup/GfYhLKFeEiEDzAYXzei
+sSVCR6FuMxQdoWXwiOPZqMHF4rNDmVqteG8uYIJ9jiu91GFxSHUMKQLHr7XJhbq3
+26HzkC+0VsqsQs5L91ieO+FCmX7SEk7oBS3SXU9G1URLk/bX/NmtWTdkNCnZ8uGX
+SJqft2CH8kgN4Z/0J1uQdXe4eyz4VdwtiFz9EKuKTX71DrqNxJStxWj85WGHTOIZ
+FW5l1GC5UHyRsNKLwFcUfJBYvjJN/zdB70JShrkTiNic0DBE4Q0j1U4D+wstpool
+6R0HPXBDa4TTQFDRwD/tjz9Tt1TalmZFFYL9xXKKoPTKnC1O1fGnbLTWyuVqBTfK
+egjavVVhO7flFINb3k0p/JjrTd52hORASJlLWuEFkxsr8ouUHVx6+Qn6b4eTEWiP
+Ppr7Swj6blDlr/B7KMI/rnfFtT/8AIJ5dmhGn2cYQHwCJm6vwKQ3x+qIHV9J1Yx/
+PsVHt8iOCYitoj8HpZRtKBQdRVrtx+zzzpIcIOni+dqIMJCYoK9G3WMwuItaf4mc
+r3vsEr6DGKvD3foQCNA0GQS69Fdcd94YjTGSTkDwjPcBe0oer/I=
+=Ou6a
 -----END PGP SIGNATURE-----
 
---TybLhxa8M7aNoW+V--
+--idY8LE8SD6/8DnRI--
 
