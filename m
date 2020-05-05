@@ -2,72 +2,109 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.8 required=3.0 tests=DATE_IN_PAST_96_XX,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DBBDC47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 15:12:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F38FC47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 15:12:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28CC7207DD
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 15:12:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=hostfission.com header.i=@hostfission.com header.b="BzdA74Li"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28CC7207DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=hostfission.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7E4F12078D
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 15:12:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E4F12078D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVzEp-0008N8-9R
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 11:12:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42010)
+	id 1jVzF8-0000eM-Li
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 11:12:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42088)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <geoff@hostfission.com>)
- id 1jVzDs-00073w-25
- for qemu-devel@nongnu.org; Tue, 05 May 2020 11:11:04 -0400
-Received: from mail1.hostfission.com ([139.99.139.48]:35928)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <geoff@hostfission.com>) id 1jVzDp-0004GZ-T8
- for qemu-devel@nongnu.org; Tue, 05 May 2020 11:11:03 -0400
-Received: from moya.office.hostfission.com (office.hostfission.com
- [220.233.29.71])
- by mail1.hostfission.com (Postfix) with ESMTP id 7EF3A4E2FC;
- Wed,  6 May 2020 01:10:55 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=hostfission.com;
- s=mail; t=1588691455;
- bh=VBBYFogw5r/ED7nsTs3/N4Ph8DIzUvBxYH0Wthko+U4=;
- h=From:Date:Subject:To:Cc:From;
- b=BzdA74Liw2s0IF9XQqdfbUwUbFjGtZdv/cLh0M87JAs0z0guwy9pCi4cvdH09OZGl
- t/EU5yIA+GyWy+Jg1VPXY63uvTisMk4rrw5Q8i7rgUXKk0kDdFEw/uzFilyIRxn76Q
- 4JaGkkC95b7d5un1ayIckr2+nrtZodHu9f1LtwBw=
-Received: by moya.office.hostfission.com (Postfix, from userid 0)
- id 5EAD73A022F; Wed,  6 May 2020 01:10:55 +1000 (AEST)
-From: Geoffrey McRae <geoff@hostfission.com>
-Date: Wed, 29 Apr 2020 15:53:58 +1000
-Subject: [PATCH v6] audio/jack: add JACK client audiodev
-To: <qemu-devel@nongnu.org>
-Cc: <geoff@hostfission.com>
-X-Mailer: mail (GNU Mailutils 3.5)
-Message-Id: <20200505151055.5EAD73A022F@moya.office.hostfission.com>
-Received-SPF: pass client-ip=139.99.139.48; envelope-from=geoff@hostfission.com;
- helo=mail1.hostfission.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 11:10:57
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jVzEE-0007n7-Ef
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 11:11:26 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54200)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jVzED-0005Lb-75
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 11:11:26 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jVzE9-0004KB-Nu
+ for <qemu-devel@nongnu.org>; Tue, 05 May 2020 15:11:22 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 047002E811D
+ for <qemu-devel@nongnu.org>; Tue,  5 May 2020 15:11:21 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 05 May 2020 15:01:14 -0000
+From: Ike Panhc <ike.pan@canonical.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=kunpeng920; status=Triaged; importance=Undecided;
+ assignee=ike.pan@canonical.com; 
+X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-18.04; status=New;
+ importance=Undecided; assignee=None; 
+X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-18.04-hwe; status=New;
+ importance=Undecided; assignee=None; 
+X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-19.10; status=New;
+ importance=Undecided; assignee=None; 
+X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-20.04; status=New;
+ importance=Undecided; assignee=None; 
+X-Launchpad-Bug: product=kunpeng920; productseries=upstream-kernel;
+ status=Fix Committed; importance=Undecided; assignee=None; 
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Incomplete; importance=Medium; assignee=rafaeldtinoco@ubuntu.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
+ component=main; status=Incomplete; importance=Medium;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=qemu; 
+ component=main; status=Incomplete; importance=Medium;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
+ component=main; status=Incomplete; importance=Medium; assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
+ component=main; status=Incomplete; importance=Medium;
+ assignee=None; 
+X-Launchpad-Bug-Tags: ikeradar patch qemu-img
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: andrew-cloke dannf ikepanhc iveskim jan-glauber-i
+ jnsnow kongzizaixian lizhengui rafaeldtinoco
+ ying-fang
+X-Launchpad-Bug-Reporter: dann frazier (dannf)
+X-Launchpad-Bug-Modifier: Ike Panhc (ikepanhc)
+References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
+Message-Id: <158869087465.13722.12667604473532787964.malone@gac.canonical.com>
+Subject: [Bug 1805256] Re: qemu-img hangs on rcu_call_ready_event logic in
+ Aarch64 when converting images
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 0a01f34375d360d798c9a951671c1efdeb7afbd9
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 11:11:17
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: 6
-X-Spam_score: 0.6
-X-Spam_bar: /
-X-Spam_report: (0.6 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_96_XX=3.405,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_PASS=-0.001,
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,865 +113,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This commit adds a new audiodev backend to allow QEMU to use JACK as
-both an audio sink and source.
+The test deb has been pushed to
+https://launchpad.net/~ikepanhc/+archive/ubuntu/lp1805256
 
-Signed-off-by: Geoffrey McRae <geoff@hostfission.com>
----
- audio/Makefile.objs    |   5 +
- audio/audio.c          |   1 +
- audio/audio_template.h |   2 +
- audio/jackaudio.c      | 677 +++++++++++++++++++++++++++++++++++++++++
- configure              |  17 ++
- qapi/audio.json        |  56 +++-
- 6 files changed, 756 insertions(+), 2 deletions(-)
- create mode 100644 audio/jackaudio.c
+40 run with patch mentioned in #43 and all passed.
 
-diff --git a/audio/Makefile.objs b/audio/Makefile.objs
-index d7490a379f..b4a4c11f31 100644
---- a/audio/Makefile.objs
-+++ b/audio/Makefile.objs
-@@ -28,3 +28,8 @@ common-obj-$(CONFIG_AUDIO_SDL) += sdl.mo
- sdl.mo-objs = sdlaudio.o
- sdl.mo-cflags := $(SDL_CFLAGS)
- sdl.mo-libs := $(SDL_LIBS)
-+
-+# jack module
-+common-obj-$(CONFIG_AUDIO_JACK) += jack.mo
-+jack.mo-objs = jackaudio.o
-+jack.mo-libs := $(JACK_LIBS)
-diff --git a/audio/audio.c b/audio/audio.c
-index 7a9e680355..95d9fb16ca 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -1969,6 +1969,7 @@ void audio_create_pdos(Audiodev *dev)
-         CASE(ALSA, alsa, Alsa);
-         CASE(COREAUDIO, coreaudio, Coreaudio);
-         CASE(DSOUND, dsound, );
-+        CASE(JACK, jack, Jack);
-         CASE(OSS, oss, Oss);
-         CASE(PA, pa, Pa);
-         CASE(SDL, sdl, );
-diff --git a/audio/audio_template.h b/audio/audio_template.h
-index 7013d3041f..8dd48ce14e 100644
---- a/audio/audio_template.h
-+++ b/audio/audio_template.h
-@@ -330,6 +330,8 @@ AudiodevPerDirectionOptions *glue(audio_get_pdo_, TYPE)(Audiodev *dev)
-             dev->u.coreaudio.TYPE);
-     case AUDIODEV_DRIVER_DSOUND:
-         return dev->u.dsound.TYPE;
-+    case AUDIODEV_DRIVER_JACK:
-+        return qapi_AudiodevJackPerDirectionOptions_base(dev->u.jack.TYPE);
-     case AUDIODEV_DRIVER_OSS:
-         return qapi_AudiodevOssPerDirectionOptions_base(dev->u.oss.TYPE);
-     case AUDIODEV_DRIVER_PA:
-diff --git a/audio/jackaudio.c b/audio/jackaudio.c
-new file mode 100644
-index 0000000000..c264a696f3
---- /dev/null
-+++ b/audio/jackaudio.c
-@@ -0,0 +1,677 @@
-+/*
-+ * QEMU JACK Audio Connection Kit Client
-+ *
-+ * Copyright (c) 2020 Geoffrey McRae (gnif)
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/module.h"
-+#include "qemu/fifo8.h"
-+#include "qemu-common.h"
-+#include "audio.h"
-+
-+#define AUDIO_CAP "jack"
-+#include "audio_int.h"
-+
-+#include <stdatomic.h>
-+#include <jack/jack.h>
-+#include <jack/thread.h>
-+
-+struct QJack;
-+
-+typedef enum QJackState {
-+    QJACK_STATE_DISCONNECTED,
-+    QJACK_STATE_STOPPED,
-+    QJACK_STATE_RUNNING,
-+    QJACK_STATE_SHUTDOWN
-+}
-+QJackState;
-+
-+typedef struct QJackBuffer {
-+    int          channels;
-+    int          frames;
-+    _Atomic(int) used;
-+    int          rptr, wptr;
-+    float      **data;
-+}
-+QJackBuffer;
-+
-+typedef struct QJackClient {
-+    AudiodevJackPerDirectionOptions *opt;
-+
-+    bool out;
-+    bool finished;
-+    bool connect_ports;
-+    int  packets;
-+
-+    QJackState      state;
-+    jack_client_t  *client;
-+    jack_nframes_t  freq;
-+
-+    struct QJack   *j;
-+    int             nchannels;
-+    int             buffersize;
-+    jack_port_t   **port;
-+    QJackBuffer     fifo;
-+}
-+QJackClient;
-+
-+typedef struct QJackOut {
-+    HWVoiceOut  hw;
-+    QJackClient c;
-+}
-+QJackOut;
-+
-+typedef struct QJackIn {
-+    HWVoiceIn   hw;
-+    QJackClient c;
-+}
-+QJackIn;
-+
-+static int qjack_client_init(QJackClient *c);
-+static void qjack_client_connect_ports(QJackClient *c);
-+static void qjack_client_fini(QJackClient *c);
-+
-+static void qjack_buffer_create(QJackBuffer *buffer, int channels, int frames)
-+{
-+    buffer->channels = channels;
-+    buffer->frames   = frames;
-+    buffer->used     = 0;
-+    buffer->rptr     = 0;
-+    buffer->wptr     = 0;
-+    buffer->data     = g_malloc(channels * sizeof(float *));
-+    for (int i = 0; i < channels; ++i) {
-+        buffer->data[i] = g_malloc(frames * sizeof(float));
-+    }
-+}
-+
-+static void qjack_buffer_clear(QJackBuffer *buffer)
-+{
-+    assert(buffer->data);
-+    atomic_store_explicit(&buffer->used, 0, memory_order_relaxed);
-+    buffer->rptr = 0;
-+    buffer->wptr = 0;
-+}
-+
-+static void qjack_buffer_free(QJackBuffer *buffer)
-+{
-+    if (!buffer->data) {
-+        return;
-+    }
-+
-+    for (int i = 0; i < buffer->channels; ++i) {
-+        g_free(buffer->data[i]);
-+    }
-+
-+    g_free(buffer->data);
-+    buffer->data = NULL;
-+}
-+
-+static inline int qjack_buffer_used(QJackBuffer *buffer)
-+{
-+    assert(buffer->data);
-+    return atomic_load_explicit(&buffer->used, memory_order_relaxed);
-+}
-+
-+/* write PCM interleaved */
-+static int qjack_buffer_write(QJackBuffer *buffer, float *data, int size)
-+{
-+    assert(buffer->data);
-+    const int samples = size / sizeof(float);
-+    int frames        = samples / buffer->channels;
-+    const int avail   = buffer->frames -
-+        atomic_load_explicit(&buffer->used, memory_order_acquire);
-+
-+    if (frames > avail) {
-+        frames = avail;
-+    }
-+
-+    int copy = frames;
-+    int wptr = buffer->wptr;
-+
-+    while (copy) {
-+
-+        for (int c = 0; c < buffer->channels; ++c) {
-+            buffer->data[c][wptr] = *data++;
-+        }
-+
-+        if (++wptr == buffer->frames) {
-+            wptr = 0;
-+        }
-+
-+        --copy;
-+    }
-+
-+    buffer->wptr = wptr;
-+
-+    atomic_fetch_add_explicit(&buffer->used, frames, memory_order_release);
-+    return frames * buffer->channels * sizeof(float);
-+};
-+
-+/* write PCM linear */
-+static int qjack_buffer_write_l(QJackBuffer *buffer, float **dest, int frames)
-+{
-+    assert(buffer->data);
-+    const int avail   = buffer->frames -
-+        atomic_load_explicit(&buffer->used, memory_order_acquire);
-+    int wptr = buffer->wptr;
-+
-+    if (frames > avail) {
-+        frames = avail;
-+    }
-+
-+    int right = buffer->frames - wptr;
-+    if (right > frames) {
-+        right = frames;
-+    }
-+
-+    const int left = frames - right;
-+    for (int c = 0; c < buffer->channels; ++c) {
-+        memcpy(buffer->data[c] + wptr, dest[c]        , right * sizeof(float));
-+        memcpy(buffer->data[c]       , dest[c] + right, left  * sizeof(float));
-+    }
-+
-+    wptr += frames;
-+    if (wptr >= buffer->frames) {
-+        wptr -= buffer->frames;
-+    }
-+    buffer->wptr = wptr;
-+
-+    atomic_fetch_add_explicit(&buffer->used, frames, memory_order_release);
-+    return frames;
-+}
-+
-+/* read PCM interleaved */
-+static int qjack_buffer_read(QJackBuffer *buffer, float *dest, int size)
-+{
-+    assert(buffer->data);
-+    const int samples = size / sizeof(float);
-+    int frames        = samples / buffer->channels;
-+    const int avail   =
-+        atomic_load_explicit(&buffer->used, memory_order_acquire);
-+
-+    if (frames > avail) {
-+        frames = avail;
-+    }
-+
-+    int copy = frames;
-+    int rptr = buffer->rptr;
-+
-+    while (copy) {
-+
-+        for (int c = 0; c < buffer->channels; ++c) {
-+            *dest++ = buffer->data[c][rptr];
-+        }
-+
-+        if (++rptr == buffer->frames) {
-+            rptr = 0;
-+        }
-+
-+        --copy;
-+    }
-+
-+    buffer->rptr = rptr;
-+
-+    atomic_fetch_sub_explicit(&buffer->used, frames, memory_order_release);
-+    return frames * buffer->channels * sizeof(float);
-+}
-+
-+/* read PCM linear */
-+static int qjack_buffer_read_l(QJackBuffer *buffer, float **dest, int frames)
-+{
-+    assert(buffer->data);
-+    int copy       = frames;
-+    const int used = atomic_load_explicit(&buffer->used, memory_order_acquire);
-+    int rptr       = buffer->rptr;
-+
-+    if (copy > used) {
-+        copy = used;
-+    }
-+
-+    int right = buffer->frames - rptr;
-+    if (right > copy) {
-+        right = copy;
-+    }
-+
-+    const int left = copy - right;
-+    for (int c = 0; c < buffer->channels; ++c) {
-+        memcpy(dest[c]        , buffer->data[c] + rptr, right * sizeof(float));
-+        memcpy(dest[c] + right, buffer->data[c]       , left  * sizeof(float));
-+    }
-+
-+    rptr += copy;
-+    if (rptr >= buffer->frames) {
-+        rptr -= buffer->frames;
-+    }
-+    buffer->rptr = rptr;
-+
-+    atomic_fetch_sub_explicit(&buffer->used, copy, memory_order_release);
-+    return copy;
-+}
-+
-+static int qjack_process(jack_nframes_t nframes, void *arg)
-+{
-+    QJackClient *c = (QJackClient *)arg;
-+
-+    if (c->state != QJACK_STATE_RUNNING) {
-+        return 0;
-+    }
-+
-+    /* get the buffers for the ports */
-+    float *buffers[c->nchannels];
-+    for (int i = 0; i < c->nchannels; ++i) {
-+        buffers[i] = jack_port_get_buffer(c->port[i], nframes);
-+    }
-+
-+    if (c->out) {
-+        qjack_buffer_read_l(&c->fifo, buffers, nframes);
-+    } else {
-+        qjack_buffer_write_l(&c->fifo, buffers, nframes);
-+    }
-+
-+    return 0;
-+}
-+
-+static void qjack_port_registration(jack_port_id_t port, int reg, void *arg)
-+{
-+    if (reg) {
-+        QJackClient *c = (QJackClient *)arg;
-+        c->connect_ports = true;
-+    }
-+}
-+
-+static int qjack_xrun(void *arg)
-+{
-+    QJackClient *c = (QJackClient *)arg;
-+    if (c->state != QJACK_STATE_RUNNING) {
-+        return 0;
-+    }
-+
-+    qjack_buffer_clear(&c->fifo);
-+    return 0;
-+}
-+
-+static void qjack_shutdown(void *arg)
-+{
-+    QJackClient *c = (QJackClient *)arg;
-+    c->state = QJACK_STATE_SHUTDOWN;
-+}
-+
-+static void qjack_client_recover(QJackClient *c)
-+{
-+    if (c->state == QJACK_STATE_SHUTDOWN) {
-+        qjack_client_fini(c);
-+    }
-+
-+    /* packets is used simply to throttle this */
-+    if (c->state == QJACK_STATE_DISCONNECTED &&
-+        c->packets % 100 == 0) {
-+
-+        /* if not finished then attempt to recover */
-+        if (!c->finished) {
-+            dolog("attempting to reconnect to server\n");
-+            qjack_client_init(c);
-+        }
-+    }
-+}
-+
-+static size_t qjack_write(HWVoiceOut *hw, void *buf, size_t len)
-+{
-+    QJackOut *jo = (QJackOut *)hw;
-+    ++jo->c.packets;
-+
-+    if (jo->c.state != QJACK_STATE_RUNNING) {
-+        qjack_client_recover(&jo->c);
-+        return len;
-+    }
-+
-+    qjack_client_connect_ports(&jo->c);
-+    return qjack_buffer_write(&jo->c.fifo, buf, len);
-+}
-+
-+static size_t qjack_read(HWVoiceIn *hw, void *buf, size_t len)
-+{
-+    QJackIn *ji = (QJackIn *)hw;
-+    ++ji->c.packets;
-+
-+    if (ji->c.state != QJACK_STATE_RUNNING) {
-+        qjack_client_recover(&ji->c);
-+        return len;
-+    }
-+
-+    qjack_client_connect_ports(&ji->c);
-+    return qjack_buffer_read(&ji->c.fifo, buf, len);
-+}
-+
-+static void qjack_client_connect_ports(QJackClient *c)
-+{
-+    if (!c->connect_ports || !c->opt->connect_ports) {
-+        return;
-+    }
-+
-+    c->connect_ports = false;
-+    const char **ports;
-+    ports = jack_get_ports(c->client, c->opt->connect_ports, NULL,
-+        c->out ? JackPortIsInput : JackPortIsOutput);
-+
-+    if (!ports) {
-+        return;
-+    }
-+
-+    for (int i = 0; i < c->nchannels && ports[i]; ++i) {
-+        const char *p = jack_port_name(c->port[i]);
-+        if (jack_port_connected_to(c->port[i], ports[i])) {
-+            continue;
-+        }
-+
-+        if (c->out) {
-+            dolog("connect %s -> %s\n", p, ports[i]);
-+            jack_connect(c->client, p, ports[i]);
-+        } else {
-+            dolog("connect %s -> %s\n", ports[i], p);
-+            jack_connect(c->client, ports[i], p);
-+        }
-+    }
-+}
-+
-+static int qjack_client_init(QJackClient *c)
-+{
-+    jack_status_t status;
-+    char client_name[jack_client_name_size()];
-+    jack_options_t options = JackNullOption;
-+
-+    c->finished      = false;
-+    c->connect_ports = true;
-+
-+    snprintf(client_name, sizeof(client_name), "%s-%s",
-+        c->out ? "out" : "in",
-+        c->opt->client_name ? c->opt->client_name : qemu_get_vm_name());
-+
-+    if (c->opt->exact_name) {
-+        options |= JackUseExactName;
-+    }
-+
-+    if (!c->opt->start_server) {
-+        options |= JackNoStartServer;
-+    }
-+
-+    if (c->opt->server_name) {
-+        options |= JackServerName;
-+    }
-+
-+    c->client = jack_client_open(client_name, options, &status,
-+      c->opt->server_name);
-+
-+    if (c->client == NULL) {
-+        dolog("jack_client_open failed: status = 0x%2.0x\n", status);
-+        if (status & JackServerFailed) {
-+            dolog("unable to connect to JACK server\n");
-+        }
-+        return -1;
-+    }
-+
-+    c->freq = jack_get_sample_rate(c->client);
-+
-+    if (status & JackServerStarted) {
-+        dolog("JACK server started\n");
-+    }
-+
-+    if (status & JackNameNotUnique) {
-+        dolog("JACK unique name assigned %s\n",
-+          jack_get_client_name(c->client));
-+    }
-+
-+    jack_set_process_callback(c->client, qjack_process , c);
-+    jack_set_port_registration_callback(c->client, qjack_port_registration, c);
-+    jack_set_xrun_callback(c->client, qjack_xrun, c);
-+    jack_on_shutdown(c->client, qjack_shutdown, c);
-+
-+    /*
-+     * ensure the buffersize is no smaller then 512 samples, some (all?) qemu
-+     * virtual devices do not work correctly otherwise
-+     */
-+    if (c->buffersize < 512) {
-+        c->buffersize = 512;
-+    }
-+
-+    /* create a 2 period buffer */
-+    qjack_buffer_create(&c->fifo, c->nchannels, c->buffersize * 2);
-+
-+    /* allocate and register the ports */
-+    c->port = g_malloc(sizeof(jack_port_t *) * c->nchannels);
-+    for (int i = 0; i < c->nchannels; ++i) {
-+
-+        char port_name[16];
-+        snprintf(
-+            port_name,
-+            sizeof(port_name),
-+            c->out ? "output %d" : "input %d",
-+            i);
-+
-+        c->port[i] = jack_port_register(
-+            c->client,
-+            port_name,
-+            JACK_DEFAULT_AUDIO_TYPE,
-+            c->out ? JackPortIsOutput : JackPortIsInput,
-+            0);
-+    }
-+
-+    /* activate the session */
-+    jack_activate(c->client);
-+    c->buffersize = jack_get_buffer_size(c->client);
-+
-+    qjack_client_connect_ports(c);
-+    c->state = QJACK_STATE_RUNNING;
-+    return 0;
-+}
-+
-+static int qjack_init_out(HWVoiceOut *hw, struct audsettings *as,
-+    void *drv_opaque)
-+{
-+    QJackOut *jo  = (QJackOut *)hw;
-+    Audiodev *dev = (Audiodev *)drv_opaque;
-+
-+    if (jo->c.state != QJACK_STATE_DISCONNECTED) {
-+        return 0;
-+    }
-+
-+    jo->c.out       = true;
-+    jo->c.nchannels = as->nchannels;
-+    jo->c.opt       = dev->u.jack.out;
-+    int ret = qjack_client_init(&jo->c);
-+    if (ret != 0) {
-+        return ret;
-+    }
-+
-+    /* report the buffer size to qemu */
-+    hw->samples = jo->c.buffersize;
-+
-+    /* report the audio format we support */
-+    struct audsettings os = {
-+        .freq       = jo->c.freq,
-+        .nchannels  = jo->c.nchannels,
-+        .fmt        = AUDIO_FORMAT_F32,
-+        .endianness = 0
-+    };
-+    audio_pcm_init_info(&hw->info, &os);
-+
-+    dolog("JACK output configured for %dHz (%d samples)\n",
-+        jo->c.freq, jo->c.buffersize);
-+
-+    return 0;
-+}
-+
-+static int qjack_init_in(HWVoiceIn *hw, struct audsettings *as,
-+    void *drv_opaque)
-+{
-+    QJackIn  *ji  = (QJackIn *)hw;
-+    Audiodev *dev = (Audiodev *)drv_opaque;
-+
-+    if (ji->c.state != QJACK_STATE_DISCONNECTED) {
-+        return 0;
-+    }
-+
-+    ji->c.out       = false;
-+    ji->c.nchannels = as->nchannels;
-+    ji->c.opt       = dev->u.jack.in;
-+    int ret = qjack_client_init(&ji->c);
-+    if (ret != 0) {
-+        return ret;
-+    }
-+
-+    /* report the buffer size to qemu */
-+    hw->samples = ji->c.buffersize;
-+
-+    /* report the audio format we support */
-+    struct audsettings is = {
-+        .freq       = ji->c.freq,
-+        .nchannels  = ji->c.nchannels,
-+        .fmt        = AUDIO_FORMAT_F32,
-+        .endianness = 0
-+    };
-+    audio_pcm_init_info(&hw->info, &is);
-+
-+    dolog("JACK input configured for %dHz (%d samples)\n",
-+        ji->c.freq, ji->c.buffersize);
-+
-+    return 0;
-+}
-+
-+static void qjack_client_fini(QJackClient *c)
-+{
-+    switch (c->state) {
-+    case QJACK_STATE_RUNNING:
-+        /* fallthrough */
-+
-+    case QJACK_STATE_STOPPED:
-+        for (int i = 0; i < c->nchannels; ++i) {
-+            jack_port_unregister(c->client, c->port[i]);
-+        }
-+        jack_deactivate(c->client);
-+        /* fallthrough */
-+
-+    case QJACK_STATE_SHUTDOWN:
-+        jack_client_close(c->client);
-+        /* fallthrough */
-+
-+    case QJACK_STATE_DISCONNECTED:
-+        break;
-+    }
-+
-+    qjack_buffer_free(&c->fifo);
-+    g_free(c->port);
-+
-+    c->state = QJACK_STATE_DISCONNECTED;
-+}
-+
-+static void qjack_fini_out(HWVoiceOut *hw)
-+{
-+    QJackOut *jo = (QJackOut *)hw;
-+    jo->c.finished = true;
-+    qjack_client_fini(&jo->c);
-+}
-+
-+static void qjack_fini_in(HWVoiceIn *hw)
-+{
-+    QJackIn *ji = (QJackIn *)hw;
-+    ji->c.finished = true;
-+    qjack_client_fini(&ji->c);
-+}
-+
-+static void qjack_enable_out(HWVoiceOut *hw, bool enable)
-+{
-+}
-+
-+static void qjack_enable_in(HWVoiceIn *hw, bool enable)
-+{
-+}
-+
-+static int qjack_thread_creator(jack_native_thread_t *thread,
-+    const pthread_attr_t *attr, void *(*function)(void *), void *arg)
-+{
-+    int ret = pthread_create(thread, attr, function, arg);
-+    if (ret != 0) {
-+        return ret;
-+    }
-+
-+    /* set the name of the thread */
-+    pthread_setname_np(*thread, "jack-client");
-+
-+    return ret;
-+}
-+
-+static void *qjack_init(Audiodev *dev)
-+{
-+    assert(dev->driver == AUDIODEV_DRIVER_JACK);
-+
-+    dev->u.jack.has_in = false;
-+
-+    return dev;
-+}
-+
-+static void qjack_fini(void *opaque)
-+{
-+}
-+
-+static struct audio_pcm_ops jack_pcm_ops = {
-+    .init_out       = qjack_init_out,
-+    .fini_out       = qjack_fini_out,
-+    .write          = qjack_write,
-+    .run_buffer_out = audio_generic_run_buffer_out,
-+    .enable_out     = qjack_enable_out,
-+
-+    .init_in        = qjack_init_in,
-+    .fini_in        = qjack_fini_in,
-+    .read           = qjack_read,
-+    .enable_in      = qjack_enable_in
-+};
-+
-+static struct audio_driver jack_driver = {
-+    .name           = "jack",
-+    .descr          = "JACK Audio Connection Kit Client",
-+    .init           = qjack_init,
-+    .fini           = qjack_fini,
-+    .pcm_ops        = &jack_pcm_ops,
-+    .can_be_default = 1,
-+    .max_voices_out = INT_MAX,
-+    .max_voices_in  = INT_MAX,
-+    .voice_size_out = sizeof(QJackOut),
-+    .voice_size_in  = sizeof(QJackIn)
-+};
-+
-+static void qjack_error(const char * msg)
-+{
-+    dolog("E: %s\n", msg);
-+}
-+
-+static void qjack_info(const char * msg)
-+{
-+    dolog("I: %s\n", msg);
-+}
-+
-+static void register_audio_jack(void)
-+{
-+    audio_driver_register(&jack_driver);
-+    jack_set_thread_creator(qjack_thread_creator);
-+    jack_set_error_function(qjack_error);
-+    jack_set_info_function(qjack_info);
-+}
-+type_init(register_audio_jack);
-diff --git a/configure b/configure
-index 23b5e93752..004502c775 100755
---- a/configure
-+++ b/configure
-@@ -3629,6 +3629,22 @@ for drv in $audio_drv_list; do
-       oss_libs="$oss_lib"
-     ;;
- 
-+    jack | try-jack)
-+    if $pkg_config jack --exists; then
-+        jack_libs=$($pkg_config jack --libs)
-+        if test "$drv" = "try-jack"; then
-+            audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-jack/jack/')
-+        fi
-+    else
-+        if test "$drv" = "try-jack"; then
-+            audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-jack//')
-+        else
-+            error_exit "$drv check failed" \
-+                "Make sure to have the $drv libs and headers installed."
-+        fi
-+    fi
-+    ;;
-+
-     *)
-     echo "$audio_possible_drivers" | grep -q "\<$drv\>" || {
-         error_exit "Unknown driver '$drv' selected" \
-@@ -6904,6 +6920,7 @@ echo "PULSE_LIBS=$pulse_libs" >> $config_host_mak
- echo "COREAUDIO_LIBS=$coreaudio_libs" >> $config_host_mak
- echo "DSOUND_LIBS=$dsound_libs" >> $config_host_mak
- echo "OSS_LIBS=$oss_libs" >> $config_host_mak
-+echo "JACK_LIBS=$jack_libs" >> $config_host_mak
- if test "$audio_win_int" = "yes" ; then
-   echo "CONFIG_AUDIO_WIN_INT=y" >> $config_host_mak
- fi
-diff --git a/qapi/audio.json b/qapi/audio.json
-index c31251f45b..bdb0552d15 100644
---- a/qapi/audio.json
-+++ b/qapi/audio.json
-@@ -152,6 +152,55 @@
-     '*out':     'AudiodevPerDirectionOptions',
-     '*latency': 'uint32' } }
- 
-+##
-+# @AudiodevJackPerDirectionOptions:
-+#
-+# Options of the JACK backend that are used for both playback and
-+# recording.
-+#
-+# @server-name: select from among several possible concurrent server instances.
-+# If unspecified, use "default" unless $JACK_DEFAULT_SERVER is defined in the
-+# process environment.
-+#
-+# @client-name: the client name to use. The server will modify this name to
-+# create a unique variant, if needed unless @exact_name is true.
-+#
-+# @connect-ports: if set, a regular expression of port name(s) to match to auto
-+# connect to at startup.
-+#
-+# @start-server: set to true to start a jack server instance if one is not
-+# present.
-+#
-+# @exact-name: use the exact name requested otherwise JACK automatically
-+# generates a unique one, if needed.
-+#
-+# Since: 5.1
-+##
-+{ 'struct': 'AudiodevJackPerDirectionOptions',
-+  'base': 'AudiodevPerDirectionOptions',
-+  'data': {
-+    '*server-name':   'str',
-+    '*client-name':   'str',
-+    '*connect-ports': 'str',
-+    '*start-server':  'bool',
-+    '*exact-name':    'bool' } }
-+
-+##
-+# @AudiodevJackOptions:
-+#
-+# Options of the JACK audio backend.
-+#
-+# @in: options of the capture stream
-+#
-+# @out: options of the playback stream
-+#
-+# Since: 5.1
-+##
-+{ 'struct': 'AudiodevJackOptions',
-+  'data': {
-+    '*in':  'AudiodevJackPerDirectionOptions',
-+    '*out': 'AudiodevJackPerDirectionOptions' } }
-+
- ##
- # @AudiodevOssPerDirectionOptions:
- #
-@@ -297,11 +346,13 @@
- #
- # An enumeration of possible audio backend drivers.
- #
-+# @jack: JACK audio backend (since 5.1)
-+#
- # Since: 4.0
- ##
- { 'enum': 'AudiodevDriver',
--  'data': [ 'none', 'alsa', 'coreaudio', 'dsound', 'oss', 'pa', 'sdl',
--            'spice', 'wav' ] }
-+  'data': [ 'none', 'alsa', 'coreaudio', 'dsound', 'jack', 'oss', 'pa',
-+            'sdl', 'spice', 'wav' ] }
- 
- ##
- # @Audiodev:
-@@ -327,6 +378,7 @@
-     'alsa':      'AudiodevAlsaOptions',
-     'coreaudio': 'AudiodevCoreaudioOptions',
-     'dsound':    'AudiodevDsoundOptions',
-+    'jack':      'AudiodevJackOptions',
-     'oss':       'AudiodevOssOptions',
-     'pa':        'AudiodevPaOptions',
-     'sdl':       'AudiodevGenericOptions',
--- 
-2.20.1
+Thanks.
 
+
+** Changed in: kunpeng920
+       Status: Incomplete =3D> Triaged
+
+** Changed in: kunpeng920
+     Assignee: (unassigned) =3D> Ike Panhc (ikepanhc)
+
+** Also affects: kunpeng920/upstream-kernel
+   Importance: Undecided
+       Status: New
+
+** Also affects: kunpeng920/ubuntu-20.04
+   Importance: Undecided
+       Status: New
+
+** Also affects: kunpeng920/ubuntu-19.10
+   Importance: Undecided
+       Status: New
+
+** Also affects: kunpeng920/ubuntu-18.04
+   Importance: Undecided
+       Status: New
+
+** Also affects: kunpeng920/ubuntu-18.04-hwe
+   Importance: Undecided
+       Status: New
+
+** Changed in: kunpeng920/upstream-kernel
+       Status: New =3D> Fix Committed
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1805256
+
+Title:
+  qemu-img hangs on rcu_call_ready_event logic in Aarch64 when
+  converting images
+
+Status in kunpeng920:
+  Triaged
+Status in kunpeng920 ubuntu-18.04 series:
+  New
+Status in kunpeng920 ubuntu-18.04-hwe series:
+  New
+Status in kunpeng920 ubuntu-19.10 series:
+  New
+Status in kunpeng920 ubuntu-20.04 series:
+  New
+Status in kunpeng920 upstream-kernel series:
+  Fix Committed
+Status in QEMU:
+  In Progress
+Status in qemu package in Ubuntu:
+  Incomplete
+Status in qemu source package in Bionic:
+  Incomplete
+Status in qemu source package in Disco:
+  Incomplete
+Status in qemu source package in Eoan:
+  Incomplete
+Status in qemu source package in Focal:
+  Incomplete
+
+Bug description:
+  Command:
+
+  qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
+
+  Hangs indefinitely approximately 30% of the runs.
+
+  ----
+
+  Workaround:
+
+  qemu-img convert -m 1 -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
+
+  Run "qemu-img convert" with "a single coroutine" to avoid this issue.
+
+  ----
+
+  (gdb) thread 1
+  ...
+  (gdb) bt
+  #0 0x0000ffffbf1ad81c in __GI_ppoll
+  #1 0x0000aaaaaabcf73c in ppoll
+  #2 qemu_poll_ns
+  #3 0x0000aaaaaabd0764 in os_host_main_loop_wait
+  #4 main_loop_wait
+  ...
+
+  (gdb) thread 2
+  ...
+  (gdb) bt
+  #0 syscall ()
+  #1 0x0000aaaaaabd41cc in qemu_futex_wait
+  #2 qemu_event_wait (ev=3Dev@entry=3D0xaaaaaac86ce8 <rcu_call_ready_event>)
+  #3 0x0000aaaaaabed05c in call_rcu_thread
+  #4 0x0000aaaaaabd34c8 in qemu_thread_start
+  #5 0x0000ffffbf25c880 in start_thread
+  #6 0x0000ffffbf1b6b9c in thread_start ()
+
+  (gdb) thread 3
+  ...
+  (gdb) bt
+  #0 0x0000ffffbf11aa20 in __GI___sigtimedwait
+  #1 0x0000ffffbf2671b4 in __sigwait
+  #2 0x0000aaaaaabd1ddc in sigwait_compat
+  #3 0x0000aaaaaabd34c8 in qemu_thread_start
+  #4 0x0000ffffbf25c880 in start_thread
+  #5 0x0000ffffbf1b6b9c in thread_start
+
+  ----
+
+  (gdb) run
+  Starting program: /usr/bin/qemu-img convert -f qcow2 -O qcow2
+  ./disk01.ext4.qcow2 ./output.qcow2
+
+  [New Thread 0xffffbec5ad90 (LWP 72839)]
+  [New Thread 0xffffbe459d90 (LWP 72840)]
+  [New Thread 0xffffbdb57d90 (LWP 72841)]
+  [New Thread 0xffffacac9d90 (LWP 72859)]
+  [New Thread 0xffffa7ffed90 (LWP 72860)]
+  [New Thread 0xffffa77fdd90 (LWP 72861)]
+  [New Thread 0xffffa6ffcd90 (LWP 72862)]
+  [New Thread 0xffffa67fbd90 (LWP 72863)]
+  [New Thread 0xffffa5ffad90 (LWP 72864)]
+
+  [Thread 0xffffa5ffad90 (LWP 72864) exited]
+  [Thread 0xffffa6ffcd90 (LWP 72862) exited]
+  [Thread 0xffffa77fdd90 (LWP 72861) exited]
+  [Thread 0xffffbdb57d90 (LWP 72841) exited]
+  [Thread 0xffffa67fbd90 (LWP 72863) exited]
+  [Thread 0xffffacac9d90 (LWP 72859) exited]
+  [Thread 0xffffa7ffed90 (LWP 72860) exited]
+
+  <HUNG w/ 3 threads in the stack trace showed before>
+  """
+
+  All the tasks left are blocked in a system call, so no task left to call
+  qemu_futex_wake() to unblock thread #2 (in futex()), which would unblock
+  thread #1 (doing poll() in a pipe with thread #2).
+
+  Those 7 threads exit before disk conversion is complete (sometimes in
+  the beginning, sometimes at the end).
+
+  ----
+
+  [ Original Description ]
+
+  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
+  frequently hangs (~50% of the time) with this command:
+
+  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
+
+  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
+  qcow2->qcow2 conversion happens to be something uvtool does every time
+  it fetches images.
+
+  Once hung, attaching gdb gives the following backtrace:
+
+  (gdb) bt
+  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
+274213760,
+  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3D<optimized out>, timeout@entry=3D0x0, s=
+igmask=3D0xffffc123b950)
+  =C2=A0=C2=A0=C2=A0=C2=A0at ../sysdeps/unix/sysv/linux/ppoll.c:39
+  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
+ptimized out>,
+  =C2=A0=C2=A0=C2=A0=C2=A0__fds=3D<optimized out>) at /usr/include/aarch64-=
+linux-gnu/bits/poll2.h:77
+  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>,
+  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.=
+c:322
+  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
+  =C2=A0=C2=A0=C2=A0=C2=A0at util/main-loop.c:233
+  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
+  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
+g.c:1980
+  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
+img.c:2456
+  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
+-img.c:4975
+
+  Reproduced w/ latest QEMU git (@ 53744e0a182)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/kunpeng920/+bug/1805256/+subscriptions
 
