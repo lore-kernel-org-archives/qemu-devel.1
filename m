@@ -2,76 +2,94 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45F98C47247
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 07:03:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FF96C47257
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 07:09:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 148532064A
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 07:03:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 148532064A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 4693A206B8
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 07:09:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4693A206B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVrc2-0003SV-0h
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 03:03:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43876)
+	id 1jVrhY-0005yk-Ft
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 03:09:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44852)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jVrbO-0002up-1R
- for qemu-devel@nongnu.org; Tue, 05 May 2020 03:02:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47180)
+ id 1jVrgz-0005Z0-Nt
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 03:08:37 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59368)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jVrbM-0003pP-QR
- for qemu-devel@nongnu.org; Tue, 05 May 2020 03:02:49 -0400
+ id 1jVrgy-0001Qe-NI
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 03:08:37 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jVrbK-0002WS-Vs
- for <qemu-devel@nongnu.org>; Tue, 05 May 2020 07:02:47 +0000
+ id 1jVrgw-0006rL-7v
+ for <qemu-devel@nongnu.org>; Tue, 05 May 2020 07:08:34 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id EF94B2E8107
- for <qemu-devel@nongnu.org>; Tue,  5 May 2020 07:02:46 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 3AE952E80BA
+ for <qemu-devel@nongnu.org>; Tue,  5 May 2020 07:08:34 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 05 May 2020 06:49:48 -0000
-From: John Hartley <1876678@bugs.launchpad.net>
+Date: Tue, 05 May 2020 06:15:37 -0000
+From: Ike Panhc <ike.pan@canonical.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: product=kunpeng920; status=Incomplete; importance=Undecided; 
+ assignee=None; 
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Incomplete; importance=Medium; assignee=rafaeldtinoco@ubuntu.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
+ component=main; status=Incomplete; importance=Medium;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=qemu; 
+ component=main; status=Incomplete; importance=Medium;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
+ component=main; status=Incomplete; importance=Medium; assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
+ component=main; status=Incomplete; importance=Medium;
+ assignee=None; 
+X-Launchpad-Bug-Tags: ikeradar patch qemu-img
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: graphdrum
-X-Launchpad-Bug-Reporter: John Hartley (graphdrum)
-X-Launchpad-Bug-Modifier: John Hartley (graphdrum)
-References: <158858209471.12655.6550590823696382929.malonedeb@gac.canonical.com>
-Message-Id: <158866138924.12522.14355301137013548891.launchpad@wampee.canonical.com>
-Subject: [Bug 1876678] Re: Ubuntu 20.04 KVM / QEMU Failure with nested FreeBSD
- bhyve
+X-Launchpad-Bug-Commenters: andrew-cloke dannf ikepanhc iveskim jan-glauber-i
+ jnsnow kongzizaixian lizhengui rafaeldtinoco
+ ying-fang
+X-Launchpad-Bug-Reporter: dann frazier (dannf)
+X-Launchpad-Bug-Modifier: Ike Panhc (ikepanhc)
+References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
+Message-Id: <158865933778.4932.17603110086791854104.malone@soybean.canonical.com>
+Subject: [Bug 1805256] Re: qemu-img hangs on rcu_call_ready_event logic in
+ Aarch64 when converting images
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 2e1788fc4d5f8342f039573f295b141a509f8dbd
+X-Launchpad-Hash: 492d9b2a0e054f342b11f8bd6c240032dae742af
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 03:02:47
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -65
-X-Spam_score: -6.6
+X-Spam_score_int: -68
+X-Spam_score: -6.9
 X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
  RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -85,190 +103,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1876678 <1876678@bugs.launchpad.net>
+Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Summary changed:
-
-- Ubuntu 20.04 QEMU Failure with nested FreeBSD bhyve =
-
-+ Ubuntu 20.04 KVM / QEMU Failure with nested FreeBSD bhyve
+Thanks. I will test it.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1876678
+https://bugs.launchpad.net/bugs/1805256
 
 Title:
-  Ubuntu 20.04 KVM / QEMU Failure with nested FreeBSD bhyve
+  qemu-img hangs on rcu_call_ready_event logic in Aarch64 when
+  converting images
 
+Status in kunpeng920:
+  Incomplete
 Status in QEMU:
-  New
+  In Progress
+Status in qemu package in Ubuntu:
+  Incomplete
+Status in qemu source package in Bionic:
+  Incomplete
+Status in qemu source package in Disco:
+  Incomplete
+Status in qemu source package in Eoan:
+  Incomplete
+Status in qemu source package in Focal:
+  Incomplete
 
 Bug description:
-  BUG:
+  Command:
 
-  Starting FreeBSD Layer 2 bhyve Guest within Layer 1 FreeBSD VM Host on
-  Layer 0 Ubuntu 20.04 KVM / QEMU Host result in Layer 1 Guest / Host
-  Pausing with "Emulation Failure"
+  qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
 
-  TESTING:
+  Hangs indefinitely approximately 30% of the runs.
 
-  My test scenario is nested virtualisation:
-  Layer 0 - Ubuntu 20.04 Host
-  Layer 1 - FreeBSD 12.1 with OVMF + bhyve hypervisor Guest/Host
-  Layer 2 - FreeBSD 12.1 guest
+  ----
 
-  Layer 0 Host is: Ubuntu 20.04 LTS KVM / QEMU / libvirt
+  Workaround:
 
-  <<START QEMU VERSION>>
-  $ virsh -c qemu:///system version --daemon
-  Compiled against library: libvirt 6.0.0
-  Using library: libvirt 6.0.0
-  Using API: QEMU 6.0.0
-  Running hypervisor: QEMU 4.2.0
-  Running against daemon: 6.0.0
-  <<END QEMU VERSION>
+  qemu-img convert -m 1 -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
 
-  <<START Intel VMX Support & Nesting Enabled>>
-  $ cat /proc/cpuinfo | grep -c vmx
-  64
-  $ cat /sys/module/kvm_intel/parameters/nested
-  Y
-  <<END Intel VMS>>
+  Run "qemu-img convert" with "a single coroutine" to avoid this issue.
 
+  ----
 
-  Layer 1 Guest / Host is: FreeBSD Q35 v4.2 with OVMF:
-
-  Pass Host VMX support to Layer 1 Guest via <cpu mode=3D'host-model>
-
-  <<LIBVIRT CONFIG SNIPPET>>
+  (gdb) thread 1
   ...
+  (gdb) bt
+  #0 0x0000ffffbf1ad81c in __GI_ppoll
+  #1 0x0000aaaaaabcf73c in ppoll
+  #2 qemu_poll_ns
+  #3 0x0000aaaaaabd0764 in os_host_main_loop_wait
+  #4 main_loop_wait
   ...
-    <os>
-      <type arch=3D'x86_64' machine=3D'pc-q35-4.2'>hvm</type>
-      <loader readonly=3D'yes' type=3D'pflash'>/usr/share/OVMF/OVMF_CODE.fd=
-</loader>
-      <nvram>/home/USER/swarm.bhyve.freebsd/OVMF_VARS.fd</nvram>
-    </os>
-    <features>
-      <acpi/>
-      <apic/>
-      <vmport state=3D'off'/>
-    </features>
-    <cpu mode=3D'host-model' check=3D'partial'/>
+
+  (gdb) thread 2
   ...
+  (gdb) bt
+  #0 syscall ()
+  #1 0x0000aaaaaabd41cc in qemu_futex_wait
+  #2 qemu_event_wait (ev=3Dev@entry=3D0xaaaaaac86ce8 <rcu_call_ready_event>)
+  #3 0x0000aaaaaabed05c in call_rcu_thread
+  #4 0x0000aaaaaabd34c8 in qemu_thread_start
+  #5 0x0000ffffbf25c880 in start_thread
+  #6 0x0000ffffbf1b6b9c in thread_start ()
+
+  (gdb) thread 3
   ...
-  <END LIBVIRT CONFIG SNIPPET>>
+  (gdb) bt
+  #0 0x0000ffffbf11aa20 in __GI___sigtimedwait
+  #1 0x0000ffffbf2671b4 in __sigwait
+  #2 0x0000aaaaaabd1ddc in sigwait_compat
+  #3 0x0000aaaaaabd34c8 in qemu_thread_start
+  #4 0x0000ffffbf25c880 in start_thread
+  #5 0x0000ffffbf1b6b9c in thread_start
 
-  Checked that Layer 1 - FreeBSD Quest / Host has VMX feature available:
+  ----
 
-  <<LAYER 1 - FreeBSD CPU Features>>
-  # uname -a
-  FreeBSD swarm.DOMAIN.HERE 12.1-RELEASE FreeBSD 12.1-RELEASE GENERIC  amd64
+  (gdb) run
+  Starting program: /usr/bin/qemu-img convert -f qcow2 -O qcow2
+  ./disk01.ext4.qcow2 ./output.qcow2
 
-  # grep Features /var/run/dmesg.boot =
+  [New Thread 0xffffbec5ad90 (LWP 72839)]
+  [New Thread 0xffffbe459d90 (LWP 72840)]
+  [New Thread 0xffffbdb57d90 (LWP 72841)]
+  [New Thread 0xffffacac9d90 (LWP 72859)]
+  [New Thread 0xffffa7ffed90 (LWP 72860)]
+  [New Thread 0xffffa77fdd90 (LWP 72861)]
+  [New Thread 0xffffa6ffcd90 (LWP 72862)]
+  [New Thread 0xffffa67fbd90 (LWP 72863)]
+  [New Thread 0xffffa5ffad90 (LWP 72864)]
 
-    Features=3D0xf83fbff<FPU,VME,DE,PSE,TSC,MSR,PAE,MCE,CX8,APIC,SEP,MTRR,P=
-GE,MCA,CMOV,PAT,PSE36,MMX,FXSR,SSE,SSE2,SS>
-    Features2=3D0xfffa3223<SSE3,PCLMULQDQ,VMX,SSSE3,FMA,CX16,PCID,SSE4.1,SS=
-E4.2,x2APIC,MOVBE,POPCNT,TSCDLT,AESNI,XSAVE,OSXSAVE,AVX,F16C,RDRAND,HV>
-    AMD Features=3D0x2c100800<SYSCALL,NX,Page1GB,RDTSCP,LM>
-    AMD Features2=3D0x121<LAHF,ABM,Prefetch>
-    Structured Extended Features=3D0x1c0fbb<FSGSBASE,TSCADJ,BMI1,HLE,AVX2,S=
-MEP,BMI2,ERMS,INVPCID,RTM,RDSEED,ADX,SMAP>
-    Structured Extended Features2=3D0x4<UMIP>
-    Structured Extended Features3=3D0xac000400<MD_CLEAR,IBPB,STIBP,ARCH_CAP=
-,SSBD>
-    XSAVE Features=3D0x1<XSAVEOPT>
-  <<END LAYER 1 - FreeBSD CPU Features>
+  [Thread 0xffffa5ffad90 (LWP 72864) exited]
+  [Thread 0xffffa6ffcd90 (LWP 72862) exited]
+  [Thread 0xffffa77fdd90 (LWP 72861) exited]
+  [Thread 0xffffbdb57d90 (LWP 72841) exited]
+  [Thread 0xffffa67fbd90 (LWP 72863) exited]
+  [Thread 0xffffacac9d90 (LWP 72859) exited]
+  [Thread 0xffffa7ffed90 (LWP 72860) exited]
 
-  On Layer 1 FreeBSD Guest / Host start up the Layer 2 guest..
+  <HUNG w/ 3 threads in the stack trace showed before>
+  """
 
-  <<START LAYER 2 GUEST START>>
-  # ls
-  FreeBSD-11.2-RELEASE-amd64-bootonly.iso	FreeBSD-12.1-RELEASE-amd64-dvd1.i=
-so	bee-hd1-01.img
-  # /usr/sbin/bhyve -c 2 -m 2048 -H -A -s 0:0,hostbridge -s 1:0,lpc -s 2:0,=
-e1000,tap0 -s 3:0,ahci-hd,bee-hd1-01.img -l com1,stdio -s 5:0,ahci-cd,./Fre=
-eBSD-12.1-RELEASE-amd64-dvd1.iso bee
-  <<END LAYER 2 GUEST START>>
+  All the tasks left are blocked in a system call, so no task left to call
+  qemu_futex_wake() to unblock thread #2 (in futex()), which would unblock
+  thread #1 (doing poll() in a pipe with thread #2).
 
-  Result is that Layer 1 - FreeBSD Host guest "paused".
+  Those 7 threads exit before disk conversion is complete (sometimes in
+  the beginning, sometimes at the end).
 
-  To Layer 1 machines freezes I cannot get any further diagnostics from
-  this machine, so I run tail on libvirt log from Layer 0 - Ubuntu Host
+  ----
 
-  <<LAYER 0 LOG TAIL>>
-  char device redirected to /dev/pts/29 (label charserial0)
-  2020-05-04T06:09:15.310474Z qemu-system-x86_64: warning: host doesn't sup=
-port requested feature: MSR(48FH).vmx-exit-load-perf-global-ctrl [bit 12]
-  2020-05-04T06:09:15.310531Z qemu-system-x86_64: warning: host doesn't sup=
-port requested feature: MSR(490H).vmx-entry-load-perf-global-ctrl [bit 13]
-  2020-05-04T06:09:15.312533Z qemu-system-x86_64: warning: host doesn't sup=
-port requested feature: MSR(48FH).vmx-exit-load-perf-global-ctrl [bit 12]
-  2020-05-04T06:09:15.312548Z qemu-system-x86_64: warning: host doesn't sup=
-port requested feature: MSR(490H).vmx-entry-load-perf-global-ctrl [bit 13]
-  2020-05-04T06:09:15.313828Z qemu-system-x86_64: warning: host doesn't sup=
-port requested feature: MSR(48FH).vmx-exit-load-perf-global-ctrl [bit 12]
-  2020-05-04T06:09:15.313841Z qemu-system-x86_64: warning: host doesn't sup=
-port requested feature: MSR(490H).vmx-entry-load-perf-global-ctrl [bit 13]
-  2020-05-04T06:09:15.315185Z qemu-system-x86_64: warning: host doesn't sup=
-port requested feature: MSR(48FH).vmx-exit-load-perf-global-ctrl [bit 12]
-  2020-05-04T06:09:15.315201Z qemu-system-x86_64: warning: host doesn't sup=
-port requested feature: MSR(490H).vmx-entry-load-perf-global-ctrl [bit 13]
-  KVM internal error. Suberror: 1
-  emulation failure
-  EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D00000000
-  ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-  EIP=3D00000000 EFL=3D00000000 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D0
-  ES =3D0000 00000000 00000000 00008000 DPL=3D0 <hiword>
-  CS =3D0000 00000000 00000000 00008000 DPL=3D0 <hiword>
-  SS =3D0000 00000000 00000000 00008000 DPL=3D0 <hiword>
-  DS =3D0000 00000000 00000000 00008000 DPL=3D0 <hiword>
-  FS =3D0000 00000000 00000000 00008000 DPL=3D0 <hiword>
-  GS =3D0000 00000000 00000000 00008000 DPL=3D0 <hiword>
-  LDT=3D0000 00000000 00000000 00008000 DPL=3D0 <hiword>
-  TR =3D0000 00000000 00000000 00008000 DPL=3D0 <hiword>
-  GDT=3D     0000000000000000 00000000
-  IDT=3D     0000000000000000 00000000
-  CR0=3D80050033 CR2=3D0000000000000000 CR3=3D0000000000000000 CR4=3D003720=
-60
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000 =
+  [ Original Description ]
 
-  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-  EFER=3D0000000000000d01
-  Code=3D<??> ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?=
-? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?=
-? ?? ?? ??
-  2020-05-04T06:35:39.186799Z qemu-system-x86_64: terminating on signal 15 =
-from pid 2155 (/usr/sbin/libvirtd)
-  2020-05-04 06:35:39.386+0000: shutting down, reason=3Ddestroyed
-  <<END LAYER 0 LOG TAIL>>
+  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
+  frequently hangs (~50% of the time) with this command:
 
-  =
+  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
 
-  I am reporting this bug here as result is very similar to that seen with =
-QEMU seabios failure reported here: https://bugs.launchpad.net/qemu/+bug/18=
-66870
+  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
+  qcow2->qcow2 conversion happens to be something uvtool does every time
+  it fetches images.
 
-  However in this case my VM Layer 1 VM is using OVMF.
+  Once hung, attaching gdb gives the following backtrace:
 
-  NOTE 1: I have also tested with Q35 v3.1 and 2.12 and get the same result.
-  NOTE 2: Due to bug in FreeBSD networking code, I had to compile custom ke=
-rnel with "netmap driver disabled".  This is known bug in FreeBSD that I ha=
-ve reported separately.
-  NOTE 3: I will cross posted this bug report on FreeBSD bugzilla as well: =
-https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=3D246168
-  NOTE 4: Have done extensive testing of Ubuntu 20.04 Nested virtualisation=
- with just Ubuntu hosts  and OVMF and the nested virtualisation runs correc=
-tly, so problem is specific to using FreeBSD / bhyve guest / host.
+  (gdb) bt
+  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
+274213760,
+  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3D<optimized out>, timeout@entry=3D0x0, s=
+igmask=3D0xffffc123b950)
+  =C2=A0=C2=A0=C2=A0=C2=A0at ../sysdeps/unix/sysv/linux/ppoll.c:39
+  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
+ptimized out>,
+  =C2=A0=C2=A0=C2=A0=C2=A0__fds=3D<optimized out>) at /usr/include/aarch64-=
+linux-gnu/bits/poll2.h:77
+  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>,
+  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.=
+c:322
+  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
+  =C2=A0=C2=A0=C2=A0=C2=A0at util/main-loop.c:233
+  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
+  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
+g.c:1980
+  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
+img.c:2456
+  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
+-img.c:4975
+
+  Reproduced w/ latest QEMU git (@ 53744e0a182)
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1876678/+subscriptions
+https://bugs.launchpad.net/kunpeng920/+bug/1805256/+subscriptions
 
