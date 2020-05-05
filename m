@@ -2,105 +2,90 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FDCBC47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:39:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F4BCC47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:40:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDD85206A5
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:39:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B1C9206D7
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:40:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="diOMH/Oc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDD85206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hW4kPXt9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B1C9206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVuzJ-0003nW-5v
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 06:39:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35782)
+	id 1jVv0I-0004z7-FQ
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 06:40:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36380)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVuxV-0002EN-UU
- for qemu-devel@nongnu.org; Tue, 05 May 2020 06:37:53 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56654
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVuxT-00034b-Ti
- for qemu-devel@nongnu.org; Tue, 05 May 2020 06:37:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588675070;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=bSx/kWL/ZVRgKsCRK30Dcu0oHdGGzbVXKC1CW2hhbg8=;
- b=diOMH/OcB0uHSc6mXjeFhHmk1zl2nWNa3WPj7F1YXaTwSsZSu+fM37HGZ6tk45NZBDqHhJ
- 7aWoHiFW4gW+nbvV+Nmrdl3CEQzcwCEcZ4VASQOjK2wc1Xk0A+EqVmJTwuw34witfu6amI
- s0dOy3y+pAY4BTWxFpDW0ktWHqZ67AY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-354-vsDUe76LN8aeOPWfXNCd3A-1; Tue, 05 May 2020 06:37:48 -0400
-X-MC-Unique: vsDUe76LN8aeOPWfXNCd3A-1
-Received: by mail-wm1-f71.google.com with SMTP id t62so872878wma.0
- for <qemu-devel@nongnu.org>; Tue, 05 May 2020 03:37:48 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jVuzM-00041i-Si
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 06:39:48 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40760)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jVuzK-0005Dv-Sp
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 06:39:48 -0400
+Received: by mail-wm1-x344.google.com with SMTP id u16so1751352wmc.5
+ for <qemu-devel@nongnu.org>; Tue, 05 May 2020 03:39:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=iqtoAIU7xIpennD78jpi1MB9eSTq+8xcGcUiNwH/2IM=;
+ b=hW4kPXt91P85A/87pP+LGj+xrGPYnLkZN3BQXC57hiHIvNGNUsfxx5oUMzueDF6cog
+ Hy0KktPjnjT/RN1UTv15RsHM5jmigoY6aXK/Zvo/WlYqGo54yAQJEJCjm1qjQmsZooMJ
+ Ne+nLXVkGG/Nm+yjhxHTAgCT/r3nJVNbl74IE6Ivshw2Qe+Vc9fjccpfzLnIXiStys6H
+ DlQyQFun41MbLZ9ouTA8HbmhXrb3+N3IJN0/7zPXIS12Xe3kz9BtxzufIoabwyqtMRux
+ Z6Oe+UJ6SXuRHCpsMHKfh0J4XNbgbu1p/VuKUFHgl4vlJq6NjS34F8F5/ts7R7qa/r9v
+ xpxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=NCIQxRJF4U66WeF1XU5kIVorK2Nc5LlUu3obB8tWSJg=;
- b=Jj9JRfz5hMdaqUd6baFN5ODZB3Z9qrJxvl5l2y8eQwEzHUHuL0QqJLNs7IlBtn5v9z
- hY/ACqgf7b+vPzmzdKI9MaO89g9DO7yyrGJy6/8duLz4U5TMolsgYuP9j83w5sjXxwLl
- nhq9agcAGnugAemjiXBmECo/eKdhZvKivXsZ2VCzVK5Gp5fanwrImJAeQlesEWlMaO5B
- UYf5gVffoddJ1iwMWWVTkdkOe8zj5Kq12HEAp5gOEqrZOf8PI3/t0VRqz5OmhWP5fXMx
- ykCcK86b2OFjGKDThzEoHpNdFk9J89ZPh6nOoVoOc9eq3v05GF/d7D6USsKShJAxvPX4
- mYjQ==
-X-Gm-Message-State: AGi0PubBFq0m3G/8kTWCHeWfpH8qmwuOjMWt7lx/4uJfwxEB97z988G4
- ZnG+MA9TZa8Fj63CYEazOV4FkxgpjwJ8mwTgYNpg1ujtoheMObDby+1kwu3Dz/laZaNUn6+XQI4
- 8D7rmxnHUZXE+LWE=
-X-Received: by 2002:a1c:9cc6:: with SMTP id f189mr2536425wme.75.1588675066938; 
- Tue, 05 May 2020 03:37:46 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJhjitJOs9HIhpcyBYPb7ncPWWNVtSojIy70TGwBhi/5EXAtftBkU9lq/0IvF7H3UhLyNx1ag==
-X-Received: by 2002:a1c:9cc6:: with SMTP id f189mr2536406wme.75.1588675066709; 
- Tue, 05 May 2020 03:37:46 -0700 (PDT)
-Received: from [192.168.1.38] (26.red-88-21-207.staticip.rima-tde.net.
- [88.21.207.26])
- by smtp.gmail.com with ESMTPSA id g6sm2610474wrw.34.2020.05.05.03.37.45
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 05 May 2020 03:37:45 -0700 (PDT)
-Subject: Re: [PATCH v2 04/10] tests/migration: Tighten error checking
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200505101908.6207-1-armbru@redhat.com>
- <20200505101908.6207-5-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <fa61ef20-1e34-5560-32ef-dd6226211cb8@redhat.com>
-Date: Tue, 5 May 2020 12:37:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=iqtoAIU7xIpennD78jpi1MB9eSTq+8xcGcUiNwH/2IM=;
+ b=tsTUONnUm2r9UtAlo39Q6emaQcyJhnhyJ9DDUrmzVTDD+dH81tULpDFWjz883Miqtp
+ nbAodQrdQqnyvsJL7C3fot+mvXzKL5U+7UIe8X+TGwAsBV427hRMCJPX9VbIeLYhQWZz
+ N0v2JkonsC9oHiNO3Y2YvjXUewB89xrqtOXDhqrbUaVuhVaTC6QojH67yBJlfpEjjfYD
+ XN1BRaSDCsv2FU3Ru3n+LnK+L2VLHzOYHCcqRJ297iXI/RnWfBqbOD1vzmcc7H1JlMoV
+ YCv3mRAMm2DhSGb/wLS5n8OT874P5ukbspzfrCTqV2/sBj1amrn+k6/ZWt+D4psbSs6B
+ 5odQ==
+X-Gm-Message-State: AGi0PuZUlQNRnuQq7FU7UHLvJf9o3xzC6BE+vWNeJ42ZMK//owsKTzks
+ XuFemD/B1A9biC/yl39E2ilrpNF2naX71+RZNxY=
+X-Google-Smtp-Source: APiQypJ1gcsNATD8UtVyeyW3iaITo9WSYalAMT5IEzCRecJTrgbAqiR8DooHHIbwxA6hY0Mkxrr7pd1sOq5uEW4nqPc=
+X-Received: by 2002:a1c:9a13:: with SMTP id c19mr2652887wme.159.1588675185268; 
+ Tue, 05 May 2020 03:39:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200505101908.6207-5-armbru@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Received: by 2002:a1c:28c3:0:0:0:0:0 with HTTP;
+ Tue, 5 May 2020 03:39:44 -0700 (PDT)
+In-Reply-To: <20200505101908.6207-9-armbru@redhat.com>
+References: <20200505101908.6207-1-armbru@redhat.com>
+ <20200505101908.6207-9-armbru@redhat.com>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Tue, 5 May 2020 12:39:44 +0200
+Message-ID: <CAHiYmc70A63di9E_qv0NvW=fn_7kWUNGvKg+djDPJ-c8gsy+NQ@mail.gmail.com>
+Subject: Re: [PATCH v2 08/10] mips/boston: Plug memory leak in
+ boston_mach_init()
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: multipart/alternative; boundary="00000000000014dc3e05a4e4448e"
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -113,54 +98,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Paul Burton <pburton@wavecomp.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/5/20 12:19 PM, Markus Armbruster wrote:
-> migrate_get_socket_address() neglects to check
-> visit_type_SocketAddressList() failure.  This smells like a leak, but
-> it actually will crash dereferencing @addrs.  Pass &error_abort to
-> remove the code smell.
->=20
+--00000000000014dc3e05a4e4448e
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+=D1=83=D1=82=D0=BE=D1=80=D0=B0=D0=BA, 05. =D0=BC=D0=B0=D1=98 2020., Markus =
+Armbruster <armbru@redhat.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=
+=D0=B0=D0=BE/=D0=BB=D0=B0:
+
+> Fixes: df1d8a1f29f567567b9d20be685a4241282e7005
+> Cc: Paul Burton <pburton@wavecomp.com>
+> Cc: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->   tests/qtest/migration-test.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-test.c
-> index 2568c9529c..dc3490c9fa 100644
-> --- a/tests/qtest/migration-test.c
-> +++ b/tests/qtest/migration-test.c
-> @@ -13,6 +13,7 @@
->   #include "qemu/osdep.h"
->  =20
->   #include "libqtest.h"
-> +#include "qapi/error.h"
->   #include "qapi/qmp/qdict.h"
->   #include "qemu/module.h"
->   #include "qemu/option.h"
-> @@ -301,7 +302,6 @@ static char *migrate_get_socket_address(QTestState *w=
-ho, const char *parameter)
->   {
->       QDict *rsp;
->       char *result;
-> -    Error *local_err =3D NULL;
->       SocketAddressList *addrs;
->       Visitor *iv =3D NULL;
->       QObject *object;
-> @@ -310,7 +310,7 @@ static char *migrate_get_socket_address(QTestState *w=
-ho, const char *parameter)
->       object =3D qdict_get(rsp, parameter);
->  =20
->       iv =3D qobject_input_visitor_new(object);
-> -    visit_type_SocketAddressList(iv, NULL, &addrs, &local_err);
-> +    visit_type_SocketAddressList(iv, NULL, &addrs, &error_abort);
->       visit_free(iv);
->  =20
->       /* we are only using a single address */
->=20
+>  hw/mips/boston.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+>
+Thank you, Markus, for spotting this error.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 
+I am fine with you selecting this and another mips-related patch in this
+series in your pull request, that will be result of this series.
+
+Truly yours,
+Aleksandar
+
+
+
+
+> diff --git a/hw/mips/boston.c b/hw/mips/boston.c
+> index 2832dfa6ae..a896056be1 100644
+> --- a/hw/mips/boston.c
+> +++ b/hw/mips/boston.c
+> @@ -426,7 +426,6 @@ static void boston_mach_init(MachineState *machine)
+>  {
+>      DeviceState *dev;
+>      BostonState *s;
+> -    Error *err =3D NULL;
+>      MemoryRegion *flash, *ddr_low_alias, *lcd, *platreg;
+>      MemoryRegion *sys_mem =3D get_system_memory();
+>      XilinxPCIEHost *pcie2;
+> @@ -467,7 +466,8 @@ static void boston_mach_init(MachineState *machine)
+>      sysbus_mmio_map_overlap(SYS_BUS_DEVICE(&s->cps), 0, 0, 1);
+>
+>      flash =3D  g_new(MemoryRegion, 1);
+> -    memory_region_init_rom(flash, NULL, "boston.flash", 128 * MiB, &err)=
+;
+> +    memory_region_init_rom(flash, NULL, "boston.flash", 128 * MiB,
+> +                           &error_fatal);
+>      memory_region_add_subregion_overlap(sys_mem, 0x18000000, flash, 0);
+>
+>      memory_region_add_subregion_overlap(sys_mem, 0x80000000,
+> machine->ram, 0);
+> --
+> 2.21.1
+>
+>
+>
+
+--00000000000014dc3e05a4e4448e
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<br><br>=D1=83=D1=82=D0=BE=D1=80=D0=B0=D0=BA, 05. =D0=BC=D0=B0=D1=98 2020.,=
+ Markus Armbruster &lt;<a href=3D"mailto:armbru@redhat.com">armbru@redhat.c=
+om</a>&gt; =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=
+=D0=B0:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bor=
+der-left:1px #ccc solid;padding-left:1ex">Fixes: df1d8a1f29f567567b9d20be68=
+5a42<wbr>41282e7005<br>
+Cc: Paul Burton &lt;<a href=3D"mailto:pburton@wavecomp.com">pburton@wavecom=
+p.com</a>&gt;<br>
+Cc: Aleksandar Rikalo &lt;<a href=3D"mailto:aleksandar.rikalo@rt-rk.com">al=
+eksandar.rikalo@rt-rk.com</a>&gt;<br>
+Signed-off-by: Markus Armbruster &lt;<a href=3D"mailto:armbru@redhat.com">a=
+rmbru@redhat.com</a>&gt;<br>
+---<br>
+=C2=A0hw/mips/boston.c | 4 ++--<br>
+=C2=A01 file changed, 2 insertions(+), 2 deletions(-)<br>
+<br></blockquote><div><br></div><div>Thank you, Markus, for spotting this e=
+rror.</div><div><br></div><div><span style=3D"color:rgb(34,34,34);font-size=
+:14px;line-height:22.1200008392334px">Reviewed-by: Aleksandar Markovic &lt;=
+</span><a href=3D"mailto:aleksandar.qemu.devel@gmail.com" target=3D"_blank"=
+ style=3D"font-size:14px;line-height:22.1200008392334px">aleksandar.qemu.de=
+vel@gmail.<wbr>com</a><span style=3D"color:rgb(34,34,34);font-size:14px;lin=
+e-height:22.1200008392334px">&gt;</span><br></div><div><span style=3D"color=
+:rgb(34,34,34);font-size:14px;line-height:22.1200008392334px"><br></span></=
+div><div><span style=3D"color:rgb(34,34,34);font-size:14px;line-height:22.1=
+200008392334px">I am fine with you selecting this and another mips-related =
+patch in this series in your pull request, that will be result of this seri=
+es.</span></div><div><br></div><div>Truly yours,</div><div>Aleksandar</div>=
+<div><br></div><div><br></div><div>=C2=A0</div><blockquote class=3D"gmail_q=
+uote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1e=
+x">
+diff --git a/hw/mips/boston.c b/hw/mips/boston.c<br>
+index 2832dfa6ae..a896056be1 100644<br>
+--- a/hw/mips/boston.c<br>
++++ b/hw/mips/boston.c<br>
+@@ -426,7 +426,6 @@ static void boston_mach_init(MachineState *machine)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0DeviceState *dev;<br>
+=C2=A0 =C2=A0 =C2=A0BostonState *s;<br>
+-=C2=A0 =C2=A0 Error *err =3D NULL;<br>
+=C2=A0 =C2=A0 =C2=A0MemoryRegion *flash, *ddr_low_alias, *lcd, *platreg;<br=
+>
+=C2=A0 =C2=A0 =C2=A0MemoryRegion *sys_mem =3D get_system_memory();<br>
+=C2=A0 =C2=A0 =C2=A0XilinxPCIEHost *pcie2;<br>
+@@ -467,7 +466,8 @@ static void boston_mach_init(MachineState *machine)<br>
+=C2=A0 =C2=A0 =C2=A0sysbus_mmio_map_overlap(SYS_<wbr>BUS_DEVICE(&amp;s-&gt;=
+cps), 0, 0, 1);<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0flash =3D=C2=A0 g_new(MemoryRegion, 1);<br>
+-=C2=A0 =C2=A0 memory_region_init_rom(flash, NULL, &quot;boston.flash&quot;=
+, 128 * MiB, &amp;err);<br>
++=C2=A0 =C2=A0 memory_region_init_rom(flash, NULL, &quot;boston.flash&quot;=
+, 128 * MiB,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0&amp;error_fatal);<br>
+=C2=A0 =C2=A0 =C2=A0memory_region_add_subregion_<wbr>overlap(sys_mem, 0x180=
+00000, flash, 0);<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0memory_region_add_subregion_<wbr>overlap(sys_mem, 0x800=
+00000, machine-&gt;ram, 0);<br>
+-- <br>
+2.21.1<br>
+<br>
+<br>
+</blockquote>
+
+--00000000000014dc3e05a4e4448e--
 
