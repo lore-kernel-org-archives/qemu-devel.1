@@ -2,43 +2,45 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59D43C47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 20:37:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0009C47254
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 20:37:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C48220752
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 20:37:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C48220752
+	by mail.kernel.org (Postfix) with ESMTPS id 92A0420752
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 20:37:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92A0420752
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jW4Jx-0006MY-AQ
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 16:37:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47394)
+	id 1jW4Jz-0006P6-K7
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 16:37:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47398)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jW4Is-0004hJ-Qp; Tue, 05 May 2020 16:36:34 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:57564)
+ id 1jW4Iu-0004hm-Gz; Tue, 05 May 2020 16:36:36 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:57576)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jW4Iq-0007pq-Ga; Tue, 05 May 2020 16:36:34 -0400
+ id 1jW4Iq-0007px-P6; Tue, 05 May 2020 16:36:36 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id B3B0EBF627;
- Tue,  5 May 2020 20:36:29 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 2F3A2BF720;
+ Tue,  5 May 2020 20:36:30 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH 0/2] hw/block/nvme: fixes for interrupt behavior
-Date: Tue,  5 May 2020 22:36:01 +0200
-Message-Id: <20200505203603.278339-1-its@irrelevant.dk>
+Subject: [PATCH 1/2] hw/block/nvme: fix pin-based interrupt behavior
+Date: Tue,  5 May 2020 22:36:02 +0200
+Message-Id: <20200505203603.278339-2-its@irrelevant.dk>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200505203603.278339-1-its@irrelevant.dk>
+References: <20200505203603.278339-1-its@irrelevant.dk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
@@ -72,14 +74,78 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Klaus Jensen (2):
-  hw/block/nvme: fix pin-based interrupt behavior
-  hw/block/nvme: allow use of any valid msix vector
+First, since the device only supports MSI-X or pin-based interrupt, if
+MSI-X is not enabled, it should not accept interrupt vectors different
+from 0 when creating completion queues.
 
- hw/block/nvme.c | 14 +++++++++-----
+Secondly, the irq_status NvmeCtrl member is meant to be compared to the
+INTMS register, so it should only be 32 bits wide. And it is really only
+useful when used with multi-message MSI.
+
+Third, since we do not force a 1-to-1 correspondence between cqid and
+interrupt vector, the irq_status register should not have bits set
+according to cqid, but according to the associated interrupt vector.
+
+Fix these issues, but keep irq_status available so we can easily support
+multi-message MSI down the line.
+
+Fixes: 5e9aa92eb1a5 ("hw/block: Fix pin-based interrupt behaviour of NVMe")
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+---
+ hw/block/nvme.c | 12 ++++++++----
  hw/block/nvme.h |  2 +-
- 2 files changed, 10 insertions(+), 6 deletions(-)
+ 2 files changed, 9 insertions(+), 5 deletions(-)
 
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 9b453423cf2c..2b072bbb21e7 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -127,8 +127,8 @@ static void nvme_irq_assert(NvmeCtrl *n, NvmeCQueue *cq)
+             msix_notify(&(n->parent_obj), cq->vector);
+         } else {
+             trace_nvme_irq_pin();
+-            assert(cq->cqid < 64);
+-            n->irq_status |= 1 << cq->cqid;
++            assert(cq->vector < 32);
++            n->irq_status |= 1 << cq->vector;
+             nvme_irq_check(n);
+         }
+     } else {
+@@ -142,8 +142,8 @@ static void nvme_irq_deassert(NvmeCtrl *n, NvmeCQueue *cq)
+         if (msix_enabled(&(n->parent_obj))) {
+             return;
+         } else {
+-            assert(cq->cqid < 64);
+-            n->irq_status &= ~(1 << cq->cqid);
++            assert(cq->vector < 32);
++            n->irq_status &= ~(1 << cq->vector);
+             nvme_irq_check(n);
+         }
+     }
+@@ -642,6 +642,10 @@ static uint16_t nvme_create_cq(NvmeCtrl *n, NvmeCmd *cmd)
+         trace_nvme_err_invalid_create_cq_addr(prp1);
+         return NVME_INVALID_FIELD | NVME_DNR;
+     }
++    if (unlikely(!msix_enabled(&n->parent_obj) && vector)) {
++        trace_nvme_err_invalid_create_cq_vector(vector);
++        return NVME_INVALID_IRQ_VECTOR | NVME_DNR;
++    }
+     if (unlikely(vector > n->num_queues)) {
+         trace_nvme_err_invalid_create_cq_vector(vector);
+         return NVME_INVALID_IRQ_VECTOR | NVME_DNR;
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index 6520a9f0bead..db62589247d7 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -78,7 +78,7 @@ typedef struct NvmeCtrl {
+     uint32_t    cmbsz;
+     uint32_t    cmbloc;
+     uint8_t     *cmbuf;
+-    uint64_t    irq_status;
++    uint32_t    irq_status;
+     uint64_t    host_timestamp;                 /* Timestamp sent by the host */
+     uint64_t    timestamp_set_qemu_clock_ms;    /* QEMU clock time */
+ 
 -- 
 2.26.2
 
