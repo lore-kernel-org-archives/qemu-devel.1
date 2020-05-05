@@ -2,98 +2,87 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E65AC47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:25:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16844C47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:26:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCE702073B
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:25:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CEE9320675
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:26:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="udBIpGEF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCE702073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XWpYo0VO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEE9320675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVyVO-00039j-21
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 10:25:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58496)
+	id 1jVyX3-0004m2-RW
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 10:26:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59454)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jVySU-0006uy-BP
- for qemu-devel@nongnu.org; Tue, 05 May 2020 10:22:06 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:32953)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jVyST-0000Pw-5p
- for qemu-devel@nongnu.org; Tue, 05 May 2020 10:22:05 -0400
-Received: by mail-pl1-x643.google.com with SMTP id t7so887435plr.0
- for <qemu-devel@nongnu.org>; Tue, 05 May 2020 07:22:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=I+PHkLMxuMk+Wdchq0uj0QQeoqRliPkmTbI1x4e+ffY=;
- b=udBIpGEF+ZOtzUKN3ZduY1DY2uNFZRlmlpLwdalWOd3NuK0ERzFIq8lUmdntsgwYzl
- 2Tqfr7exmHdSD+Rx67hCPt2t5MPCWEOfg/4PMIOKTtyH4IWvJM0sQTzIikeyB9xx5RK5
- 9MMso+wtIBFQt/T2f+iLjjdzeuZJUMhmLXbRZXAy0yJZQU/RLZfYa/cgCWnMkLQgbFHg
- N/TEGm5TIwmKu70ReLMIhUtrwXyctT/rLao2cm+C2VeGoZzzgbZ/ub7KJTtL4zR951P+
- 7xcy7A8NF7QgUdJHImZq0Vz+H+/4hVsLSM4Qn5W9ydvJG0ILTdBOS1BMlRflMV9iCieC
- 4+AA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=I+PHkLMxuMk+Wdchq0uj0QQeoqRliPkmTbI1x4e+ffY=;
- b=Iq5cLi2yo/8b5OaRSvuOx0TJv3qPHdEw+oX0Ed7R9tI9yoIyvvPNPIorSkuNH9K26b
- 0C/MxQ7sUA9qNCrXYHuSvp6W3QW5zgTFXJBHFtxMkyt5uNRhIzVjyAU0X4OgH6bBGPGa
- bLVrZMNh2+5OUjTivo9Ryrepx6RjbtIzraoUJF4yBkE9A+YahEMaMMZSQY19/THaduyO
- k4wd1MJ2wkYICOjC23pa2N0axEsdyEhD6YlkA2FQ+7xpT1MlNYFJ6cFlxwUttu93h6GZ
- KSdjeStR5Y1VbeBEnovpyvjN/OLY2SDxLRUQDCNSs3X2oTcwZku3Vx83/pU2VmTJpTJJ
- OOdw==
-X-Gm-Message-State: AGi0Pub/JSmy7Eg/57PsCU7Xq+6Wunq8KSdL/wQyeIrBnEBXDWxd965d
- HWjRxg3WgV/AxRGP9Zy9U9+yqg==
-X-Google-Smtp-Source: APiQypJHPFtvIw1Axjexfk+BeObCo67HYUDwrZ/EH4PY5HqaoUzZHK4Ey6xWt/uwwO4VbQ/CNZrP3A==
-X-Received: by 2002:a17:90a:db91:: with SMTP id
- h17mr3502246pjv.10.1588688523499; 
- Tue, 05 May 2020 07:22:03 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id a200sm2111717pfa.201.2020.05.05.07.22.02
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 05 May 2020 07:22:02 -0700 (PDT)
-Subject: Re: [PATCH v3 3/3] target/arm: Use clear_vec_high more effectively
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200504192344.13404-1-richard.henderson@linaro.org>
- <20200504192344.13404-4-richard.henderson@linaro.org>
- <aaa3d497-3c54-9acf-7ef1-fc47bd9d699d@amsat.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0b943dee-7275-90ea-2b66-ed5b5246d4be@linaro.org>
-Date: Tue, 5 May 2020 07:22:00 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jVyWR-0004Hs-HR
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 10:26:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32495
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jVyWQ-0003LR-IR
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 10:26:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588688769;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=XJaqp6t3CRqMVr4oSCWcPsvmAWzsy4f45i/wxN37IcM=;
+ b=XWpYo0VO8GFuNMAIwn34MPCIYqQk5vj+4WP2VFa1kgnNPVu9RVVwe1YU5U6kJaRDAsO1Br
+ wOjN2yVyaQplLF+raci+tMjnLEzMOIZwH+PvovjSldHm20GNuq1ywVtHn0kiqWI7S8WrQM
+ Ed5SsMXfQfgQ8HcTtUVM13qMLE76h1E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-381-92BYn3kJM0mLMe1i3g_Zfw-1; Tue, 05 May 2020 10:26:08 -0400
+X-MC-Unique: 92BYn3kJM0mLMe1i3g_Zfw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16BB6107ACCD;
+ Tue,  5 May 2020 14:26:07 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.7])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5A0C660BEC;
+ Tue,  5 May 2020 14:25:56 +0000 (UTC)
+Date: Tue, 5 May 2020 16:25:55 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH v2 05/13] acpi: move acpi_init_common_fadt_data to
+ acpi-common.c
+Message-ID: <20200505162555.104fa99a@redhat.com>
+In-Reply-To: <20200505134305.22666-6-kraxel@redhat.com>
+References: <20200505134305.22666-1-kraxel@redhat.com>
+ <20200505134305.22666-6-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <aaa3d497-3c54-9acf-7ef1-fc47bd9d699d@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,41 +95,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/4/20 11:09 PM, Philippe Mathieu-Daudé wrote:
->> @@ -7111,7 +7121,7 @@ static void disas_simd_zip_trn
->>       }
->>         tcg_resl = tcg_const_i64(0);
->> -    tcg_resh = tcg_const_i64(0);
->> +    tcg_resh = is_q ? tcg_const_i64(0) : NULL;
->>       tcg_res = tcg_temp_new_i64();
->>         for (i = 0; i < elements; i++) {
->> @@ -7162,9 +7172,12 @@ static void disas_simd_zip_trn(DisasContext *s,
->> uint32_t insn)
-> 
-> More context:
-> 
->            ...
->            ofs = i * esize;
->            if (ofs < 64) {
->                tcg_gen_shli_i64(tcg_res, tcg_res, ofs);
->                tcg_gen_or_i64(tcg_resl, tcg_resl, tcg_res);
->            } else {
->                tcg_gen_shli_i64(tcg_res, tcg_res, ofs - 64);
->                tcg_gen_or_i64(tcg_resh, tcg_resh, tcg_res);
-> 
->                          here ^^^^^^^^ tcg_resh is NULL too.
-> 
->            }
->        }
+On Tue,  5 May 2020 15:42:57 +0200
+Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-When is_q is false, the vector length is 64.  Thus that line is not reachable.
+the same question like with FACS, why legacy data are needed for with reduced profile?
+it mostly initializes data for fixed-hw model.
 
+I'd preffer if you drop FACS and use minimal FADT like build_fadt_rev5() does
+without pulling along a bunch of legacy junk (unless there is a good justification for it).
 
-r~
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  hw/i386/acpi-common.h |  5 ++++-
+>  hw/i386/acpi-build.c  | 43 +------------------------------------------
+>  hw/i386/acpi-common.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 48 insertions(+), 43 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-common.h b/hw/i386/acpi-common.h
+> index 583c320bbe7d..5788a13da9ca 100644
+> --- a/hw/i386/acpi-common.h
+> +++ b/hw/i386/acpi-common.h
+> @@ -1,7 +1,8 @@
+>  #ifndef HW_I386_ACPI_COMMON_H
+>  #define HW_I386_ACPI_COMMON_H
+> +
+> +#include "include/hw/acpi/acpi-defs.h"
+>  #include "include/hw/acpi/acpi_dev_interface.h"
+> -
+>  #include "include/hw/acpi/bios-linker-loader.h"
+>  #include "include/hw/i386/x86.h"
+>  
+> @@ -12,5 +13,7 @@ void acpi_build_madt(GArray *table_data, BIOSLinker *linker,
+>                       X86MachineState *x86ms, AcpiDeviceIf *adev,
+>                       bool has_pci);
+>  void acpi_build_facs(GArray *table_data);
+> +void acpi_init_common_fadt_data(MachineState *ms, Object *o,
+> +                                AcpiFadtData *data);
+>  
+>  #endif
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index a69b85a266e7..d1f14394734e 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -132,47 +132,6 @@ const struct AcpiGenericAddress x86_nvdimm_acpi_dsmio = {
+>      .bit_width = NVDIMM_ACPI_IO_LEN << 3
+>  };
+>  
+> -static void init_common_fadt_data(MachineState *ms, Object *o,
+> -                                  AcpiFadtData *data)
+> -{
+> -    uint32_t io = object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BASE, NULL);
+> -    AmlAddressSpace as = AML_AS_SYSTEM_IO;
+> -    AcpiFadtData fadt = {
+> -        .rev = 3,
+> -        .flags =
+> -            (1 << ACPI_FADT_F_WBINVD) |
+> -            (1 << ACPI_FADT_F_PROC_C1) |
+> -            (1 << ACPI_FADT_F_SLP_BUTTON) |
+> -            (1 << ACPI_FADT_F_RTC_S4) |
+> -            (1 << ACPI_FADT_F_USE_PLATFORM_CLOCK) |
+> -            /* APIC destination mode ("Flat Logical") has an upper limit of 8
+> -             * CPUs for more than 8 CPUs, "Clustered Logical" mode has to be
+> -             * used
+> -             */
+> -            ((ms->smp.max_cpus > 8) ?
+> -                        (1 << ACPI_FADT_F_FORCE_APIC_CLUSTER_MODEL) : 0),
+> -        .int_model = 1 /* Multiple APIC */,
+> -        .rtc_century = RTC_CENTURY,
+> -        .plvl2_lat = 0xfff /* C2 state not supported */,
+> -        .plvl3_lat = 0xfff /* C3 state not supported */,
+> -        .smi_cmd = ACPI_PORT_SMI_CMD,
+> -        .sci_int = object_property_get_uint(o, ACPI_PM_PROP_SCI_INT, NULL),
+> -        .acpi_enable_cmd =
+> -            object_property_get_uint(o, ACPI_PM_PROP_ACPI_ENABLE_CMD, NULL),
+> -        .acpi_disable_cmd =
+> -            object_property_get_uint(o, ACPI_PM_PROP_ACPI_DISABLE_CMD, NULL),
+> -        .pm1a_evt = { .space_id = as, .bit_width = 4 * 8, .address = io },
+> -        .pm1a_cnt = { .space_id = as, .bit_width = 2 * 8,
+> -                      .address = io + 0x04 },
+> -        .pm_tmr = { .space_id = as, .bit_width = 4 * 8, .address = io + 0x08 },
+> -        .gpe0_blk = { .space_id = as, .bit_width =
+> -            object_property_get_uint(o, ACPI_PM_PROP_GPE0_BLK_LEN, NULL) * 8,
+> -            .address = object_property_get_uint(o, ACPI_PM_PROP_GPE0_BLK, NULL)
+> -        },
+> -    };
+> -    *data = fadt;
+> -}
+> -
+>  static Object *object_resolve_type_unambiguous(const char *typename)
+>  {
+>      bool ambig;
+> @@ -195,7 +154,7 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
+>      pm->pcihp_io_len = 0;
+>  
+>      assert(obj);
+> -    init_common_fadt_data(machine, obj, &pm->fadt);
+> +    acpi_init_common_fadt_data(machine, obj, &pm->fadt);
+>      if (piix) {
+>          /* w2k requires FADT(rev1) or it won't boot, keep PC compatible */
+>          pm->fadt.rev = 1;
+> diff --git a/hw/i386/acpi-common.c b/hw/i386/acpi-common.c
+> index 5187653893a8..69dfbf0252f3 100644
+> --- a/hw/i386/acpi-common.c
+> +++ b/hw/i386/acpi-common.c
+> @@ -28,6 +28,8 @@
+>  #include "hw/acpi/aml-build.h"
+>  #include "hw/acpi/utils.h"
+>  #include "hw/i386/pc.h"
+> +#include "hw/isa/apm.h"
+> +#include "hw/rtc/mc146818rtc_regs.h"
+>  #include "target/i386/cpu.h"
+>  
+>  #include "acpi-build.h"
+> @@ -161,3 +163,44 @@ void acpi_build_facs(GArray *table_data)
+>      memcpy(&facs->signature, "FACS", 4);
+>      facs->length = cpu_to_le32(sizeof(*facs));
+>  }
+> +
+> +void acpi_init_common_fadt_data(MachineState *ms, Object *o,
+> +                                AcpiFadtData *data)
+> +{
+> +    uint32_t io = object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BASE, NULL);
+> +    AmlAddressSpace as = AML_AS_SYSTEM_IO;
+> +    AcpiFadtData fadt = {
+> +        .rev = 3,
+> +        .flags =
+> +            (1 << ACPI_FADT_F_WBINVD) |
+> +            (1 << ACPI_FADT_F_PROC_C1) |
+> +            (1 << ACPI_FADT_F_SLP_BUTTON) |
+> +            (1 << ACPI_FADT_F_RTC_S4) |
+> +            (1 << ACPI_FADT_F_USE_PLATFORM_CLOCK) |
+> +            /* APIC destination mode ("Flat Logical") has an upper limit of 8
+> +             * CPUs for more than 8 CPUs, "Clustered Logical" mode has to be
+> +             * used
+> +             */
+> +            ((ms->smp.max_cpus > 8) ?
+> +                        (1 << ACPI_FADT_F_FORCE_APIC_CLUSTER_MODEL) : 0),
+> +        .int_model = 1 /* Multiple APIC */,
+> +        .rtc_century = RTC_CENTURY,
+> +        .plvl2_lat = 0xfff /* C2 state not supported */,
+> +        .plvl3_lat = 0xfff /* C3 state not supported */,
+> +        .smi_cmd = ACPI_PORT_SMI_CMD,
+> +        .sci_int = object_property_get_uint(o, ACPI_PM_PROP_SCI_INT, NULL),
+> +        .acpi_enable_cmd =
+> +            object_property_get_uint(o, ACPI_PM_PROP_ACPI_ENABLE_CMD, NULL),
+> +        .acpi_disable_cmd =
+> +            object_property_get_uint(o, ACPI_PM_PROP_ACPI_DISABLE_CMD, NULL),
+> +        .pm1a_evt = { .space_id = as, .bit_width = 4 * 8, .address = io },
+> +        .pm1a_cnt = { .space_id = as, .bit_width = 2 * 8,
+> +                      .address = io + 0x04 },
+> +        .pm_tmr = { .space_id = as, .bit_width = 4 * 8, .address = io + 0x08 },
+> +        .gpe0_blk = { .space_id = as, .bit_width =
+> +            object_property_get_uint(o, ACPI_PM_PROP_GPE0_BLK_LEN, NULL) * 8,
+> +            .address = object_property_get_uint(o, ACPI_PM_PROP_GPE0_BLK, NULL)
+> +        },
+> +    };
+> +    *data = fadt;
+> +}
+
 
