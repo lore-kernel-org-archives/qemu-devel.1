@@ -2,96 +2,87 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E947BC47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:14:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFFD9C47254
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:17:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DAC320675
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:14:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7DC1E206CC
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:17:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="EwZ2top9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DAC320675
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uh0mg/F5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DC1E206CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVuan-0007uq-0u
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 06:14:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57170)
+	id 1jVue4-0001yq-J7
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 06:17:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57298)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jan.kiszka@web.de>)
- id 1jVuW7-00057R-EN; Tue, 05 May 2020 06:09:35 -0400
-Received: from mout.web.de ([212.227.15.3]:42415)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jan.kiszka@web.de>)
- id 1jVuW5-0001f6-A5; Tue, 05 May 2020 06:09:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1588673368;
- bh=7tm2uiWWOBJDWwfvQsO5SvZX/DgVGHJc0wj85CCMSuo=;
- h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
- b=EwZ2top9cGJJweP7LIfomRMMsIs0r+qLJiLGzye8pAL1jhZPVeDBOppH7xTk3aIvW
- F2bO6+ugWXykf2K9IrrGcVd0+HOoHMDZ2MbLOB6Tdcxj1Fl9ZIFof+cAnsw7mpEJSG
- 5quYIUAA4w6zBeFl37Lbst65T/156P0jNKKQgsbo=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [167.87.245.84] ([95.157.53.180]) by smtp.web.de (mrweb003
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0MSJH1-1jhCuR0li7-00TTIG; Tue, 05
- May 2020 12:09:28 +0200
-Subject: Re: [RFC PATCH] hw/arm/musicpal: Map the UART devices unconditionally
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200505095945.23146-1-f4bug@amsat.org>
-From: Jan Kiszka <jan.kiszka@web.de>
-Message-ID: <bc8d1213-5578-52f2-7a86-f45dfa8b33be@web.de>
-Date: Tue, 5 May 2020 12:09:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jVuXG-0005w3-Th
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 06:10:47 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40665)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jVuXE-0001wa-OH
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 06:10:46 -0400
+Received: by mail-ot1-x344.google.com with SMTP id i27so1149608ota.7
+ for <qemu-devel@nongnu.org>; Tue, 05 May 2020 03:10:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=k2E1BANozowIuRLwzQhWAkc5j3kkcoUCFJeH+kJb5Uc=;
+ b=uh0mg/F57LfyLKGl4gKQ3i0zq5ozIDmsn8qKb11GOhDcpbjfHr6hB/rEzY3yh2CGKb
+ +Md45jf9/FnbjvrtBj7/rM+nf2v0VpJlYDBqpaSJ9qo8tNTfiwQuLKmxTQ4XRzb7G/ZK
+ 9iqO0kHqLIMJLVs1WW2HrWEqlkwYay64rQ7uxgN2q/Y0a98WvVmA99YdQc8EYYoHymic
+ srIq5b5/XodbyjHh/f92tScv2wjQiO3QG+YKAx8REtKosdjTNoNcTAVJlxl1a+1mgfDF
+ yfQx6aZvM+q4lWvHt8VrBOsGFHL8fLVh0CIVSTcBnbaTdpwvk7I81fbPbe1UMNWRRArK
+ 1XHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=k2E1BANozowIuRLwzQhWAkc5j3kkcoUCFJeH+kJb5Uc=;
+ b=MaizxJPxt6/TsMex29qd49rgUyX9I3a8cT9s957Xn97vtJCAVimUrOM633Hlk8fUGy
+ ipuxDFn6n9jDKxwp8V61bWjixWjcHKIqNkGZqsymggPaP1mfkPYCZ65rVYbsk0wTnkUJ
+ UmqvRgyV2gxLfAOYq+XSfrczv/eBn2YYqZw/zydnDRqWsEZxOwkUVoWMdwV5YwgNpOOJ
+ K88uIPTrcvICm9LOsA79rRblLBhZYGrvMuogAgiuFR/uL93ISAWMh19q0509ls1ENI0J
+ SHmovfwp9mz6gp9iYn+P3bm9roiHIlISnXY35/mMBC7XmuXbdjtEQbcI1ADre0l4sebe
+ uwdQ==
+X-Gm-Message-State: AGi0Pub0Acp8QajbsQvTfGIT2JI4LAFPSrT0z385WiG3RBy6Bh5WP4GL
+ DxFW9S+0NYOxOCrzZp0hsm/u9ktwPkiBGOW7a0ru/A==
+X-Google-Smtp-Source: APiQypKIz+/6r5BxIdWv5d82lj7PFK3reoqhsmCv0YU0m63wT+DpqE4O3aogEg86yuPuswJQAerbSq21v+PJ6qTwjRY=
+X-Received: by 2002:a9d:2c08:: with SMTP id f8mr1591546otb.135.1588673443251; 
+ Tue, 05 May 2020 03:10:43 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200505095945.23146-1-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+References: <20200505095945.23146-1-f4bug@amsat.org>
+ <bc8d1213-5578-52f2-7a86-f45dfa8b33be@web.de>
+In-Reply-To: <bc8d1213-5578-52f2-7a86-f45dfa8b33be@web.de>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 5 May 2020 11:10:32 +0100
+Message-ID: <CAFEAcA_Ci7ymqWV2tvnJX-Me5D0QQhaKaBkJVaL7KxeixCZJ_Q@mail.gmail.com>
+Subject: Re: [RFC PATCH] hw/arm/musicpal: Map the UART devices unconditionally
+To: Jan Kiszka <jan.kiszka@web.de>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:/0PbicFLYknB61oxXHaRRxsD+broSIQwq0iltFjDSI3QVq/orn5
- 3vMgVJqwoIFMnNRk2ngSRFTufb9i6vtgTLvCHcuIglrbO1O0WScSgPf74eyOuOI3Z2xtud5
- 7JhovJXN4fzfCxDyyoJvJYO5FTSEP6VujL1X81jtEXBMuFFQEu1UcwneLhUcGctRS9nofDz
- ctimd01nny+FRM6k1b3BA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ookMrKmGhbU=:aEOY7hfQAy/3l4277ovEi9
- WxATQWVWi3DZvt44OscOxTPU7DVLx/4UlZFicBiUANoMcENA3Fz/AyrohQEOfQfmaIuCsGPEs
- QhMIYlTZ2a3MxAUeKzNritfwCwOtu+0WLTrjtwJV9DEzN932EOAYXntAj3MomYjcOiiofdmsB
- oDCKV8QrKfytW9NTFkhIpjFA/H9vS1lvX8k0iEaH6wSx2i6Bp9AdxC0B4unq4cCxlrKXzWev4
- lbYTop7v84/w9Yl5R+vlkudhA2FLdpdJ6u7cvbCd9D/4lnPx3eqxBtON6EGyam3tyS+9yTFuR
- MB1UcqG4bvf/A0T3mV4k4i4Yohv0ELylnVrOZLlxu0KbmOLlTKCKilMgzdQ5eA1GceZA6bqhg
- xt7YBG83L6MUXa9tbEhg0Fe5NtXYckP0VySpVWEPmf41UWe4GFoMN83KtvuVIGoVF2wRsRGhF
- JBNgeGWB7D5fm+aMzD3Y7Rc9f+ydG8PyF1YE422KZyP0BdKP4xYaDec4yQV51j0w/C/WoFMkS
- CEdYtUqAmdcWDJfZS8q7xMwSZ92TBsJbK+B65cPwrP/z2WYFEnH6R+khDXm1t/T03WCalA7q1
- vQ2XGgp/4Jq2m0oCSctCoY5YcRmdn3TE90GZ+W4Tb4/xSOueHeCcYR9DPAKhZyx9zi8+ofHGU
- rNwROkno+rBtSIOtB1XMprIy53exL9l2P5kz27wLU9cAuBe/qZ9uvvFjmX1NK8lyKCilMcbEt
- nFdrym3fDF/Ac4mgpcpWLLm8VQIcmnFT93JMr+7khSn+TY8Jr+NFeBgW1wRn4RCUvsMS0DzIG
- JZzI3iZZd0vDraRUaKAAtF/PXRlhkPASRfHoN/LcxOf7fhE8Mn5v9VRSnivw36yXK1gdBjoNw
- zvpKSEzY3jgFrnDz2HvhhMQXipW+AnbcZYjnLPrtvd03Pz/cgLSbbRsMdXPSTQ0v60Q9fYDtP
- B0lZ5OTEDHJo2bcZFv4KiRn7DGSabHk3YqkgWPaWh6LhxQnaDbQPPyL/sk1Vr91S8iXF9+FEw
- zoJy11sTXy4WBIFMVab36gtPVuxs7nUVlXuQtqzD1Q0akYUX9JsfjW1lgiiXeggHdxMKPeD7v
- xeg6BEVEP/uE9+BWYGs5Ip6jNZkmFqm9D4qPbmRvOknAvKM9iHHzaMP6VSKM3/jf/vzSIuh5V
- HxABVdLyvaX4w795WkMG9OzN5e7MBZPu5pxhFAIFwl2bKCvdmQ/DsLC/cBJ4Db++Mz3F4coJT
- vauRit2Oh/dZ8p2EM
-Received-SPF: pass client-ip=212.227.15.3; envelope-from=jan.kiszka@web.de;
- helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 06:09:29
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,58 +95,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
+Cc: qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05.05.20 11:59, Philippe Mathieu-Daud=C3=A9 wrote:
-> I can't find proper documentation or datasheet, but it is likely
-> a MMIO mapped serial device mapped in the 0x80000000..0x8000ffff
-> range belongs to the SoC address space, thus is always mapped in
-> the memory bus.
-> Map the devices on the bus regardless a chardev is attached to it.
+On Tue, 5 May 2020 at 11:09, Jan Kiszka <jan.kiszka@web.de> wrote:
 >
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> from 2019... found while doing housekeeping
-> ---
->   hw/arm/musicpal.c | 12 ++++--------
->   1 file changed, 4 insertions(+), 8 deletions(-)
->
-> diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
-> index b2d0cfdac8..92f33ed87e 100644
-> --- a/hw/arm/musicpal.c
-> +++ b/hw/arm/musicpal.c
-> @@ -1619,14 +1619,10 @@ static void musicpal_init(MachineState *machine)
->                             pic[MP_TIMER2_IRQ], pic[MP_TIMER3_IRQ],
->                             pic[MP_TIMER4_IRQ], NULL);
->
-> -    if (serial_hd(0)) {
-> -        serial_mm_init(address_space_mem, MP_UART1_BASE, 2, pic[MP_UART=
-1_IRQ],
-> -                       1825000, serial_hd(0), DEVICE_NATIVE_ENDIAN);
-> -    }
-> -    if (serial_hd(1)) {
-> -        serial_mm_init(address_space_mem, MP_UART2_BASE, 2, pic[MP_UART=
-2_IRQ],
-> -                       1825000, serial_hd(1), DEVICE_NATIVE_ENDIAN);
-> -    }
-> +    serial_mm_init(address_space_mem, MP_UART1_BASE, 2, pic[MP_UART1_IR=
-Q],
-> +                   1825000, serial_hd(0), DEVICE_NATIVE_ENDIAN);
-> +    serial_mm_init(address_space_mem, MP_UART2_BASE, 2, pic[MP_UART2_IR=
-Q],
-> +                   1825000, serial_hd(1), DEVICE_NATIVE_ENDIAN);
->
->       /* Register flash */
->       dinfo =3D drive_get(IF_PFLASH, 0, 0);
->
+> On 05.05.20 11:59, Philippe Mathieu-Daud=C3=A9 wrote:
+> I don't recall details anymore either (more than 10 year ago now...),
+> but this looks reasonable.
 
-I don't recall details anymore either (more than 10 year ago now...),
-but this looks reasonable.
+My guess is that it dates back to when the serial code would
+crash if passed a NULL pointer for the backend rather than
+treating it as "same as if connected to a /dev/null backend".
 
-Reviewed-by: Jan Kiszka <jan.kiszka@web.de>
-
-Jan
+thanks
+-- PMM
 
