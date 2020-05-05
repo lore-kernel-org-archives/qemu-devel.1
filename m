@@ -2,100 +2,87 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D573C47247
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:01:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55FA9C47254
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:03:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFC4A20757
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:01:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2509E2064A
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:03:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Quia9v/x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFC4A20757
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sg3dhZ8n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2509E2064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVy84-0001gR-3T
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 10:01:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54146)
+	id 1jVyAj-0003IN-7T
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 10:03:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54750)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <xadimgnik@gmail.com>)
- id 1jVy77-00016y-Oy
- for qemu-devel@nongnu.org; Tue, 05 May 2020 10:00:01 -0400
-Received: from mail-ed1-x532.google.com ([2a00:1450:4864:20::532]:36811)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <xadimgnik@gmail.com>)
- id 1jVy76-0007EQ-00
- for qemu-devel@nongnu.org; Tue, 05 May 2020 10:00:01 -0400
-Received: by mail-ed1-x532.google.com with SMTP id t12so1933844edw.3
- for <qemu-devel@nongnu.org>; Tue, 05 May 2020 06:59:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:reply-to:to:cc:references:in-reply-to:subject:date:message-id
- :mime-version:content-transfer-encoding:thread-index
- :content-language;
- bh=O9OCBMkBxpYV7nwYvW253+iHNM16Xw+0gCVniK4rZ0A=;
- b=Quia9v/xRYgVnTDwV1BgYeICL+6UIoPhizH6hPPF4DkNcTtvHJl5Ty9UDZWF1Wj0AF
- FS3KgmAq6KlzYeXdYQ3OA++1Q4I0seBrL8agnF3UoSJLLSKmOeC9DQqvrhlT51K/e1v3
- xgF6OTVucZjrirHv5xQwRe0P3H9l5KoUo+hkDyXcUw1NGQ9dQeGxOR/N8raXLcTN0s5g
- wPBq8vTmzTMQayESPKqeEdcHb8eiqjxUByqyltjrifpPut7NUtSbThKGFcm/cKMcc+tQ
- RrGmgDnKGOp8PJc1PEzW2mY7Ht46+7iAqPL4RGQCqPpT46h6N8Zf18TpGw7OoG96GT/c
- phFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:reply-to:to:cc:references:in-reply-to
- :subject:date:message-id:mime-version:content-transfer-encoding
- :thread-index:content-language;
- bh=O9OCBMkBxpYV7nwYvW253+iHNM16Xw+0gCVniK4rZ0A=;
- b=GRZKpOLVl4ZAdHi6hpaz6mzhmnU/s74cw+gU4cJpNPlEA6JCQQr0YYuxPeUxh7dHZQ
- iqBBs9ZsGmCdah2qbNr4aye40KVGePzIJTHzeZBWaEOTlHnoiVXDNRvb5HjUEfJ6bqoj
- ucEONLgNDALG4rUxDGq+tGB1PpRezlKsbmCyQF2gHenehMKdcY4r+5bYF/xN6w4unVKF
- MeKQ3BDVCiIQtJ/x2JMpei8GL8CCcdQLuXN2xz/PntNC5to/lEZxkfL27JoctvkTWinX
- rFB8K2Gsmdw1qJmQV13riCGeDRkIQZN1Z1jK9WRCIyKvf4KCn2MNG7LG691p2sTlGF5x
- Tl5w==
-X-Gm-Message-State: AGi0PuZnxl0hW7n/Xgr9dQNZeKeLCXAclGefPU6UZ7rT/lRi067Isibs
- 1nbod2gb1uec8viOnVf6ric=
-X-Google-Smtp-Source: APiQypKMaCbhuhWKhU6qOX1gyF4ylKwmgItCJ0Vgnfw2kOhlHOT2eRuqxGQbmSbMf9zCagFUVC55Eg==
-X-Received: by 2002:aa7:c0d2:: with SMTP id j18mr2756750edp.283.1588687198204; 
- Tue, 05 May 2020 06:59:58 -0700 (PDT)
-Received: from CBGR90WXYV0 ([54.239.6.187])
- by smtp.gmail.com with ESMTPSA id n7sm280474edt.69.2020.05.05.06.59.56
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 05 May 2020 06:59:57 -0700 (PDT)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: "Paul Durrant" <paul@xen.org>
-To: "'Markus Armbruster'" <armbru@redhat.com>,
-	<qemu-devel@nongnu.org>
-References: <20200505101908.6207-1-armbru@redhat.com>
- <20200505101908.6207-3-armbru@redhat.com>
-In-Reply-To: <20200505101908.6207-3-armbru@redhat.com>
-Subject: RE: [PATCH v2 02/10] xen: Fix and improve handling of device_add
- usb-host errors
-Date: Tue, 5 May 2020 14:59:56 +0100
-Message-ID: <004001d622e5$75fd2d70$61f78850$@xen.org>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jVyA3-0002YF-Ml
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 10:03:03 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22458
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jVyA1-0007wf-7C
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 10:03:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588687380;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=eWcxnVLFK4nmVscBRZrQ+DSnmddrmJNBE1g9bW+1Jss=;
+ b=Sg3dhZ8n3+AU7HyI5uO+LzJmF7h30Vp9AHswGp/BC9XGwdzcpdPDq0Gs8gMUqhoPo7unNX
+ vKOrRdOuzbKjr6I1vvJZdc0OdP0wsJmaQabx4aD0bYXSHZhb9K/u5sCViD4vrN0KWftJtU
+ yBr5ZQl04X1y0FzUP+mW9rjA6ptBpNg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-415-w03ej_LRPBCyFGmcNz07cA-1; Tue, 05 May 2020 10:02:52 -0400
+X-MC-Unique: w03ej_LRPBCyFGmcNz07cA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E05AC80183C;
+ Tue,  5 May 2020 14:02:51 +0000 (UTC)
+Received: from [10.3.114.73] (ovpn-114-73.phx2.redhat.com [10.3.114.73])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 988265D9D5;
+ Tue,  5 May 2020 14:02:51 +0000 (UTC)
+Subject: Re: [PATCH] iotests/055: Use cache.no-flush for vmdk target
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200505064618.16267-1-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <8f0e1827-09f0-7c97-011e-efb7592607a4@redhat.com>
+Date: Tue, 5 May 2020 09:02:51 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+In-Reply-To: <20200505064618.16267-1-kwolf@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQD2kCtjJmTvNkmzRgy8FtMMvttLfQNDV1uLqj6PYxA=
-Content-Language: en-gb
-Received-SPF: pass client-ip=2a00:1450:4864:20::532;
- envelope-from=xadimgnik@gmail.com; helo=mail-ed1-x532.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -109,36 +96,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: paul@xen.org
-Cc: 'Anthony Perard' <anthony.perard@citrix.com>,
- xen-devel@lists.xenproject.org, 'Stefano Stabellini' <sstabellini@kernel.org>,
- 'Gerd Hoffmann' <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> -----Original Message-----
-> From: Markus Armbruster <armbru@redhat.com>
-> Sent: 05 May 2020 11:19
-> To: qemu-devel@nongnu.org
-> Cc: Stefano Stabellini <sstabellini@kernel.org>; Anthony Perard <anthony.perard@citrix.com>; Paul
-> Durrant <paul@xen.org>; Gerd Hoffmann <kraxel@redhat.com>; xen-devel@lists.xenproject.org
-> Subject: [PATCH v2 02/10] xen: Fix and improve handling of device_add usb-host errors
+On 5/5/20 1:46 AM, Kevin Wolf wrote:
+> 055 uses the backup block job to create a compressed backup of an
+> $IMGFMT image with both qcow2 and vmdk targets. However, cluster
+> allocation in vmdk is very slow because it flushes the image file after
+> each L2 update.
 > 
-> usbback_portid_add() leaks the error when qdev_device_add() fails.
-> Fix that.  While there, use the error to improve the error message.
+> There is no reason why we need this level of safety in this test, so
+> let's disable flushes for vmdk. For the blockdev-backup tests this is
+> achieved by simply adding the cache.no-flush=on to the drive_add() for
+> the target. For drive-backup, the caching flags are copied from the
+> source node, so we'll also add the flag to the source node, even though
+> it is not vmdk.
 > 
-> The qemu_opts_from_qdict() similarly leaks on failure.  But any
-> failure there is a programming error.  Pass &error_abort.
+> This can make the test run significantly faster (though it doesn't make
+> a difference on tmpfs). In my usual setup it goes from ~45s to ~15s.
 > 
-> Fixes: 816ac92ef769f9ffc534e49a1bb6177bddce7aa2
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: Paul Durrant <paul@xen.org>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: xen-devel@lists.xenproject.org
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>   tests/qemu-iotests/055 | 11 +++++++----
+>   1 file changed, 7 insertions(+), 4 deletions(-)
 
-Acked-by: Paul Durrant <paul@xen.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
