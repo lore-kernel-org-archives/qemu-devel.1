@@ -2,99 +2,85 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88209C47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:47:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 561B0C47259
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:47:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E3BB206A5
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:47:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2481B206A5
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:47:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BvvmV11u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E3BB206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XIRWWWCV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2481B206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVv6N-0001tt-By
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 06:47:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37610)
+	id 1jVv7G-0002zQ-9A
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 06:47:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jVv5C-0000np-Nb
- for qemu-devel@nongnu.org; Tue, 05 May 2020 06:45:50 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:39767)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jVv5C-0003qX-0s
- for qemu-devel@nongnu.org; Tue, 05 May 2020 06:45:50 -0400
-Received: by mail-wm1-x342.google.com with SMTP id y24so1775403wma.4
- for <qemu-devel@nongnu.org>; Tue, 05 May 2020 03:45:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=0faX7m1nnDSKM3e8pMwiYo4N+XiY/JMjDZuFiiNtkKc=;
- b=BvvmV11u4QEtG2REI/S7xG7FCW38jHrNATa5uNKP0A1Q8GyhmbMQ81vA2T1+KFqYII
- T+Ev4SwLRK/gubtTMJehlrDirMT6SLiUdPlJ30mLchtWc4Xb11sTQQCP5YQHJACybBX/
- ei5rpuhC1KlyZVD/RO6avGEi0q0QqXLpjFcytoSi9g323vzrmCqj3LjqsHK1MrINeZR5
- 2ZKKzjoknqOhj5VDzr/k2cpdJq0DjHQ2O7/38xqYTwa4tHuStAcx0L0exOD8uOnR8sbk
- V3CAsQSC0j3fS65eMRgsn0NbN71BS9WruxSOm9vAu16J+rnhaa03xz8Pte1oMrza8cF9
- 09gQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=0faX7m1nnDSKM3e8pMwiYo4N+XiY/JMjDZuFiiNtkKc=;
- b=gc9JykgL3Bi/KnpzlKPzNdF8E3PGrqx9xxZIinD5AohoL2fFtoMY9MzpMB30K7Os43
- Phyaou0Ayq8g4fvfhhz4MnKvfBm6dOV9JCPD4mpbjxkQh1svjcA9//UT6M3FWpP89OwK
- fI13wq/bjsz5TGh62GsFViI8gj6B3lc7AwQXMAwBVMzOzt37HO+YSZzGKpEhZnb8upGR
- Vv1e/KWV/dHRTU9hrJUIwQkNDKjsxQ40a7hr59IYslEUROtJnrVW6lWJX1j7qR3mUyeG
- GznOCI1R9fIOyVqfd+THO/ioTpYo+V8EkAcKQmr3RORseu39/5XhkLtdP7oPpOHohk7g
- L5Ug==
-X-Gm-Message-State: AGi0PuYIzHsIbpOumXEa6YOyrHldLTQeKRPumH5Kp251LWOSCBI4GEeg
- VoH+ShuSJAKYnLcKWocwgX8=
-X-Google-Smtp-Source: APiQypKDExyt6OBtcRN+nKI3uOUhuUK2KCmHSm0AHCeEprpEx7AVaVQjgIlHepPhcbprO2atg7WFnw==
-X-Received: by 2002:a05:600c:2314:: with SMTP id
- 20mr2732682wmo.35.1588675548447; 
- Tue, 05 May 2020 03:45:48 -0700 (PDT)
-Received: from [192.168.1.38] (26.red-88-21-207.staticip.rima-tde.net.
- [88.21.207.26])
- by smtp.gmail.com with ESMTPSA id y3sm2741344wrm.64.2020.05.05.03.45.47
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 05 May 2020 03:45:47 -0700 (PDT)
-Subject: Re: [PATCH] hw/audio/gus: Use AUDIO_HOST_ENDIANNESS definition from
- 'audio/audio.h'
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20200505100750.27332-1-f4bug@amsat.org>
- <bc9f6295-9c1a-9617-ecd9-f38ea0ad5d79@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <79194c5a-ea10-3921-aeb4-1e0432b38c3d@amsat.org>
-Date: Tue, 5 May 2020 12:45:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jVv6K-00028r-5i
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 06:47:00 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59532
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jVv6I-0006Su-TF
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 06:46:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588675617;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=u3PBXlwcAwgmvfl9quRjTguvwTUCKxMW9LIm0GF7wT0=;
+ b=XIRWWWCV8u47rHeVQBjkN0vy8YZDjCvZgRFLHHNO3AozLS0Kimnc00+jNrTHin8jBw6t38
+ ppqWEKSvo8h3msx3HWZcHjdGyG+2CKuck85yIu0/LTxl9Pi+By4y36LWSjS5inHx5eYXh5
+ wwhzgsIAkB3vD8jcLIkI2NiKfDu+XFQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-82-onKmB-XbNaC9y-_u7nbHdg-1; Tue, 05 May 2020 06:46:55 -0400
+X-MC-Unique: onKmB-XbNaC9y-_u7nbHdg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EFDAD460;
+ Tue,  5 May 2020 10:46:52 +0000 (UTC)
+Received: from gondolin (ovpn-112-219.ams2.redhat.com [10.36.112.219])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AD1F719C58;
+ Tue,  5 May 2020 10:46:41 +0000 (UTC)
+Date: Tue, 5 May 2020 12:46:39 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v18 QEMU 07/18] vfio: Add migration state change notifier
+Message-ID: <20200505124639.56531df8.cohuck@redhat.com>
+In-Reply-To: <1588632293-18932-8-git-send-email-kwankhede@nvidia.com>
+References: <1588632293-18932-1-git-send-email-kwankhede@nvidia.com>
+ <1588632293-18932-8-git-send-email-kwankhede@nvidia.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <bc9f6295-9c1a-9617-ecd9-f38ea0ad5d79@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,22 +94,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: cjia@nvidia.com, aik@ozlabs.ru, Zhengxiao.zx@Alibaba-inc.com,
+ shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ eauger@redhat.com, yi.l.liu@intel.com, quintela@redhat.com,
+ ziye.yang@intel.com, armbru@redhat.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, felipe@nutanix.com, zhi.a.wang@intel.com,
+ kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
+ alex.williamson@redhat.com, changpeng.liu@intel.com, eskultet@redhat.com,
+ Ken.Xue@amd.com, jonathan.davies@nutanix.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/5/20 12:10 PM, Paolo Bonzini wrote:
-> On 05/05/20 12:07, Philippe Mathieu-Daudé wrote:
->> Use the generic AUDIO_HOST_ENDIANNESS definition instead
->> of a custom one.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->> Who/what machine is using this device anyway?
-> 
-> PC, like all old ISA audio cards.
+On Tue, 5 May 2020 04:14:42 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-I imagined, but any particular project in mind? I'm wondering if we 
-should add a test for it, and what kind of testing.
+> Added migration state change notifier to get notification on migration state
+> change. These states are translated to VFIO device state and conveyed to vendor
+> driver.
+> 
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> ---
+>  hw/vfio/migration.c           | 30 ++++++++++++++++++++++++++++++
+>  hw/vfio/trace-events          |  5 +++--
+>  include/hw/vfio/vfio-common.h |  1 +
+>  3 files changed, 34 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> index e79b34003079..c2f5564b51c3 100644
+> --- a/hw/vfio/migration.c
+> +++ b/hw/vfio/migration.c
+> @@ -154,6 +154,28 @@ static void vfio_vmstate_change(void *opaque, int running, RunState state)
+>      }
+>  }
+>  
+> +static void vfio_migration_state_notifier(Notifier *notifier, void *data)
+> +{
+> +    MigrationState *s = data;
+> +    VFIODevice *vbasedev = container_of(notifier, VFIODevice, migration_state);
+> +    int ret;
+> +
+> +    trace_vfio_migration_state_notifier(vbasedev->name,
+> +                                        MigrationStatus_str(s->state));
+> +
+> +    switch (s->state) {
+> +    case MIGRATION_STATUS_CANCELLING:
+> +    case MIGRATION_STATUS_CANCELLED:
+> +    case MIGRATION_STATUS_FAILED:
+> +        ret = vfio_migration_set_state(vbasedev,
+> +                      ~(VFIO_DEVICE_STATE_SAVING | VFIO_DEVICE_STATE_RESUMING),
+> +                      VFIO_DEVICE_STATE_RUNNING);
+> +        if (ret) {
+> +            error_report("%s: Failed to set state RUNNING", vbasedev->name);
+> +        }
+
+What is the actually desired state transition here? Again, I find the
+interface hard to read... and my comments regarding state propagation
+and error states from the previous patch apply here as well.
+
+
+> +    }
+> +}
+> +
+
 
