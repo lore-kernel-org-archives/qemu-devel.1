@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10960C47247
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:06:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CCD0C47259
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:07:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8C9C206B9
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:06:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2BA9D20836
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:07:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WWpkhlsa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8C9C206B9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Maiyb5Iq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BA9D20836
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVxHD-0004n5-Uu
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 09:06:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38672)
+	id 1jVxIJ-000751-Bb
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 09:07:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38912)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jVx9s-0001Bx-AI
- for qemu-devel@nongnu.org; Tue, 05 May 2020 08:58:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52899
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jVxAM-00022o-RP
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 08:59:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37259
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jVx9r-0000lj-GJ
- for qemu-devel@nongnu.org; Tue, 05 May 2020 08:58:47 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jVxAL-0001Jp-KM
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 08:59:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588683526;
+ s=mimecast20190719; t=1588683556;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=sQB5k6xN6HD62SbaGywdMB2xlMYvChcdkicnAIwVHzY=;
- b=WWpkhlsaTurP5SDum4RcYNRylpqRrfzKPGWtmF8v+HfhfGQY66AGnapEWw2EhHUp3gi8PX
- froyvjeLTH0EkMznq6pELUzYaXgXEu8S0sqfjhMlhFCPf4NvUWWbDlEzX1+w6IRRbOrS/y
- o4RSkZFyz3Uf4PapVq6Endl2rUjCfpY=
+ bh=hsrwIJ/Flr1sv6EY55lTdvGYeHZHKszAYF5KUsMQUjI=;
+ b=Maiyb5IqZSH6QQ9OFuS0MIMb/l2s5Ei/Wd2FASUvg5gwBHqrjlkRcphRpkexqXAQWWXttf
+ v0X8g8LwLWbqFE/YeQuzypyXrK85iqbAVPHZ0UJ4Qcq3Wv05uS5IDO8ZH3fUkoSPb0fv6r
+ 9H3r6SJez9PCmGifRm3Df3Ly9KP+IGk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-198-UBA-xrIHNSi2Y3aON6Nu9A-1; Tue, 05 May 2020 08:58:42 -0400
-X-MC-Unique: UBA-xrIHNSi2Y3aON6Nu9A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-384-4YIJ62UQN8efgzfsB6SlLA-1; Tue, 05 May 2020 08:59:14 -0400
+X-MC-Unique: 4YIJ62UQN8efgzfsB6SlLA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C4D21005510;
- Tue,  5 May 2020 12:58:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42B4B800687;
+ Tue,  5 May 2020 12:59:13 +0000 (UTC)
 Received: from localhost (ovpn-113-206.ams2.redhat.com [10.36.113.206])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 320F560C18;
- Tue,  5 May 2020 12:58:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B13AD5C1D4;
+ Tue,  5 May 2020 12:59:12 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 06/24] iotests: alphabetize standard imports
-Date: Tue,  5 May 2020 14:58:08 +0200
-Message-Id: <20200505125826.1001451-7-mreitz@redhat.com>
+Subject: [PULL 20/24] block/block-copy: rename in-flight requests to tasks
+Date: Tue,  5 May 2020 14:58:22 +0200
+Message-Id: <20200505125826.1001451-21-mreitz@redhat.com>
 In-Reply-To: <20200505125826.1001451-1-mreitz@redhat.com>
 References: <20200505125826.1001451-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
  helo=us-smtp-1.mimecast.com
@@ -98,55 +98,241 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: John Snow <jsnow@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-I had to fix a merge conflict, so do this tiny harmless thing while I'm
-here.
+We are going to use aio-task-pool API and extend in-flight request
+structure to be a successor of AioTask, so rename things appropriately.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20200331000014.11581-7-jsnow@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Message-Id: <20200429130847.28124-2-vsementsov@virtuozzo.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ block/block-copy.c | 98 +++++++++++++++++++++++-----------------------
+ 1 file changed, 48 insertions(+), 50 deletions(-)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index d8dc60275b..dae124872e 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -16,19 +16,19 @@
- # along with this program.  If not, see <http://www.gnu.org/licenses/>.
- #
+diff --git a/block/block-copy.c b/block/block-copy.c
+index 05227e18bf..bbb29366dc 100644
+--- a/block/block-copy.c
++++ b/block/block-copy.c
+@@ -24,12 +24,12 @@
+ #define BLOCK_COPY_MAX_BUFFER (1 * MiB)
+ #define BLOCK_COPY_MAX_MEM (128 * MiB)
 =20
-+import atexit
-+from collections import OrderedDict
-+import faulthandler
-+import io
-+import json
-+import logging
- import os
- import re
-+import signal
-+import struct
- import subprocess
--import unittest
- import sys
--import struct
--import json
--import signal
--import logging
--import atexit
--import io
--from collections import OrderedDict
--import faulthandler
-+import unittest
+-typedef struct BlockCopyInFlightReq {
++typedef struct BlockCopyTask {
+     int64_t offset;
+     int64_t bytes;
+-    QLIST_ENTRY(BlockCopyInFlightReq) list;
+-    CoQueue wait_queue; /* coroutines blocked on this request */
+-} BlockCopyInFlightReq;
++    QLIST_ENTRY(BlockCopyTask) list;
++    CoQueue wait_queue; /* coroutines blocked on this task */
++} BlockCopyTask;
 =20
- # pylint: disable=3Dimport-error, wrong-import-position
- sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'pytho=
-n'))
+ typedef struct BlockCopyState {
+     /*
+@@ -45,7 +45,7 @@ typedef struct BlockCopyState {
+     bool use_copy_range;
+     int64_t copy_size;
+     uint64_t len;
+-    QLIST_HEAD(, BlockCopyInFlightReq) inflight_reqs;
++    QLIST_HEAD(, BlockCopyTask) tasks;
+=20
+     BdrvRequestFlags write_flags;
+=20
+@@ -73,15 +73,14 @@ typedef struct BlockCopyState {
+     SharedResource *mem;
+ } BlockCopyState;
+=20
+-static BlockCopyInFlightReq *find_conflicting_inflight_req(BlockCopyState =
+*s,
+-                                                           int64_t offset,
+-                                                           int64_t bytes)
++static BlockCopyTask *find_conflicting_task(BlockCopyState *s,
++                                            int64_t offset, int64_t bytes)
+ {
+-    BlockCopyInFlightReq *req;
++    BlockCopyTask *t;
+=20
+-    QLIST_FOREACH(req, &s->inflight_reqs, list) {
+-        if (offset + bytes > req->offset && offset < req->offset + req->by=
+tes) {
+-            return req;
++    QLIST_FOREACH(t, &s->tasks, list) {
++        if (offset + bytes > t->offset && offset < t->offset + t->bytes) {
++            return t;
+         }
+     }
+=20
+@@ -89,73 +88,72 @@ static BlockCopyInFlightReq *find_conflicting_inflight_=
+req(BlockCopyState *s,
+ }
+=20
+ /*
+- * If there are no intersecting requests return false. Otherwise, wait for=
+ the
+- * first found intersecting request to finish and return true.
++ * If there are no intersecting tasks return false. Otherwise, wait for th=
+e
++ * first found intersecting tasks to finish and return true.
+  */
+ static bool coroutine_fn block_copy_wait_one(BlockCopyState *s, int64_t of=
+fset,
+                                              int64_t bytes)
+ {
+-    BlockCopyInFlightReq *req =3D find_conflicting_inflight_req(s, offset,=
+ bytes);
++    BlockCopyTask *task =3D find_conflicting_task(s, offset, bytes);
+=20
+-    if (!req) {
++    if (!task) {
+         return false;
+     }
+=20
+-    qemu_co_queue_wait(&req->wait_queue, NULL);
++    qemu_co_queue_wait(&task->wait_queue, NULL);
+=20
+     return true;
+ }
+=20
+ /* Called only on full-dirty region */
+-static void block_copy_inflight_req_begin(BlockCopyState *s,
+-                                          BlockCopyInFlightReq *req,
+-                                          int64_t offset, int64_t bytes)
++static void block_copy_task_begin(BlockCopyState *s, BlockCopyTask *task,
++                                  int64_t offset, int64_t bytes)
+ {
+-    assert(!find_conflicting_inflight_req(s, offset, bytes));
++    assert(!find_conflicting_task(s, offset, bytes));
+=20
+     bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, bytes);
+     s->in_flight_bytes +=3D bytes;
+=20
+-    req->offset =3D offset;
+-    req->bytes =3D bytes;
+-    qemu_co_queue_init(&req->wait_queue);
+-    QLIST_INSERT_HEAD(&s->inflight_reqs, req, list);
++    task->offset =3D offset;
++    task->bytes =3D bytes;
++    qemu_co_queue_init(&task->wait_queue);
++    QLIST_INSERT_HEAD(&s->tasks, task, list);
+ }
+=20
+ /*
+- * block_copy_inflight_req_shrink
++ * block_copy_task_shrink
+  *
+- * Drop the tail of the request to be handled later. Set dirty bits back a=
+nd
+- * wake up all requests waiting for us (may be some of them are not inters=
+ecting
+- * with shrunk request)
++ * Drop the tail of the task to be handled later. Set dirty bits back and
++ * wake up all tasks waiting for us (may be some of them are not intersect=
+ing
++ * with shrunk task)
+  */
+-static void coroutine_fn block_copy_inflight_req_shrink(BlockCopyState *s,
+-        BlockCopyInFlightReq *req, int64_t new_bytes)
++static void coroutine_fn block_copy_task_shrink(BlockCopyState *s,
++                                                BlockCopyTask *task,
++                                                int64_t new_bytes)
+ {
+-    if (new_bytes =3D=3D req->bytes) {
++    if (new_bytes =3D=3D task->bytes) {
+         return;
+     }
+=20
+-    assert(new_bytes > 0 && new_bytes < req->bytes);
++    assert(new_bytes > 0 && new_bytes < task->bytes);
+=20
+-    s->in_flight_bytes -=3D req->bytes - new_bytes;
++    s->in_flight_bytes -=3D task->bytes - new_bytes;
+     bdrv_set_dirty_bitmap(s->copy_bitmap,
+-                          req->offset + new_bytes, req->bytes - new_bytes)=
+;
++                          task->offset + new_bytes, task->bytes - new_byte=
+s);
+=20
+-    req->bytes =3D new_bytes;
+-    qemu_co_queue_restart_all(&req->wait_queue);
++    task->bytes =3D new_bytes;
++    qemu_co_queue_restart_all(&task->wait_queue);
+ }
+=20
+-static void coroutine_fn block_copy_inflight_req_end(BlockCopyState *s,
+-                                                     BlockCopyInFlightReq =
+*req,
+-                                                     int ret)
++static void coroutine_fn block_copy_task_end(BlockCopyState *s,
++                                             BlockCopyTask *task, int ret)
+ {
+-    s->in_flight_bytes -=3D req->bytes;
++    s->in_flight_bytes -=3D task->bytes;
+     if (ret < 0) {
+-        bdrv_set_dirty_bitmap(s->copy_bitmap, req->offset, req->bytes);
++        bdrv_set_dirty_bitmap(s->copy_bitmap, task->offset, task->bytes);
+     }
+-    QLIST_REMOVE(req, list);
+-    qemu_co_queue_restart_all(&req->wait_queue);
++    QLIST_REMOVE(task, list);
++    qemu_co_queue_restart_all(&task->wait_queue);
+ }
+=20
+ void block_copy_state_free(BlockCopyState *s)
+@@ -223,7 +221,7 @@ BlockCopyState *block_copy_state_new(BdrvChild *source,=
+ BdrvChild *target,
+         s->copy_size =3D MAX(s->cluster_size, BLOCK_COPY_MAX_BUFFER);
+     }
+=20
+-    QLIST_INIT(&s->inflight_reqs);
++    QLIST_INIT(&s->tasks);
+=20
+     return s;
+ }
+@@ -474,7 +472,7 @@ static int coroutine_fn block_copy_dirty_clusters(Block=
+CopyState *s,
+     assert(QEMU_IS_ALIGNED(bytes, s->cluster_size));
+=20
+     while (bytes) {
+-        BlockCopyInFlightReq req;
++        BlockCopyTask task;
+         int64_t next_zero, cur_bytes, status_bytes;
+=20
+         if (!bdrv_dirty_bitmap_get(s->copy_bitmap, offset)) {
+@@ -495,14 +493,14 @@ static int coroutine_fn block_copy_dirty_clusters(Blo=
+ckCopyState *s,
+             assert(next_zero < offset + cur_bytes); /* no need to do MIN()=
+ */
+             cur_bytes =3D next_zero - offset;
+         }
+-        block_copy_inflight_req_begin(s, &req, offset, cur_bytes);
++        block_copy_task_begin(s, &task, offset, cur_bytes);
+=20
+         ret =3D block_copy_block_status(s, offset, cur_bytes, &status_byte=
+s);
+         assert(ret >=3D 0); /* never fail */
+         cur_bytes =3D MIN(cur_bytes, status_bytes);
+-        block_copy_inflight_req_shrink(s, &req, cur_bytes);
++        block_copy_task_shrink(s, &task, cur_bytes);
+         if (s->skip_unallocated && !(ret & BDRV_BLOCK_ALLOCATED)) {
+-            block_copy_inflight_req_end(s, &req, 0);
++            block_copy_task_end(s, &task, 0);
+             progress_set_remaining(s->progress,
+                                    bdrv_get_dirty_count(s->copy_bitmap) +
+                                    s->in_flight_bytes);
+@@ -518,7 +516,7 @@ static int coroutine_fn block_copy_dirty_clusters(Block=
+CopyState *s,
+         ret =3D block_copy_do_copy(s, offset, cur_bytes, ret & BDRV_BLOCK_=
+ZERO,
+                                  error_is_read);
+         co_put_to_shres(s->mem, cur_bytes);
+-        block_copy_inflight_req_end(s, &req, ret);
++        block_copy_task_end(s, &task, ret);
+         if (ret < 0) {
+             return ret;
+         }
 --=20
 2.26.2
 
