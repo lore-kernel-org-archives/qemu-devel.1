@@ -2,95 +2,85 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A85BAC47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:07:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78B42C47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:08:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71CD220661
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:07:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F06820661
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:08:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vN17DgH7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71CD220661
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AEvHH6vY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F06820661
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVyE8-00081R-L6
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 10:07:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54368)
+	id 1jVyFX-000115-Cx
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 10:08:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54434)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jVy87-0001uC-Ei
- for qemu-devel@nongnu.org; Tue, 05 May 2020 10:01:03 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:42855)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jVy82-0002ci-UM
- for qemu-devel@nongnu.org; Tue, 05 May 2020 10:01:02 -0400
-Received: by mail-pl1-x644.google.com with SMTP id v2so850318plp.9
- for <qemu-devel@nongnu.org>; Tue, 05 May 2020 07:00:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=D2mBVlnpvVYcF4KObf8GAsSOgtsOhe3PMdTj4MtMF2I=;
- b=vN17DgH7myYytRFcaLnzNj24WClrwW+RJrr+6Spq7JG5MMo6dVcYHORH2/Ux5eKC3F
- Ul7/LbH/CPXA8sgWJs9WZ6wbVP+074T8m3sNsrvUkYhkESt3uNY30XT0PUDOJFeHRH7q
- 8tt2/wnkXe8E+DOnD4lNhpwUP5jnSKDCNMkF8oie3tBQYHG8U/NYIQTlMlguVec7pdaE
- blHI/7qJ51tekKaFffgFOrQ3ek0rmk2jKzA+8LThLnOpvBGiyY2IrlBHwxKRgvmOOwlh
- TbgI3R7aBI9nU1tZzfB0ZttsQE6LCAqgGKHxQaJaO13D8sDu7OdmNv01iLWTIEbCkgjV
- hHYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=D2mBVlnpvVYcF4KObf8GAsSOgtsOhe3PMdTj4MtMF2I=;
- b=lONLggqn0MOkHiGfEdIsKR94SF3Ed/B0aAObdNGamzkFUTHDNJ9i1pg7hbyFtRyqLe
- u/Pq/Eb9bC84qPiMEJB25C51ObXKdawYvTD+8GQvKwaGhMT5BztyXVv8ibc7H+hmDhKC
- MBjhdR8z5b4H7jG4M/K7iNIWjjKnaCEgOL3PmvMICaRYhLsygIApWfn2ryNupuy8INQ6
- yDHf2FEKenwewp8JBlzlFFqIe8OFe5r+VaHiDTVdZMIYZF3FJQWpLuoSYDiGOkmgFk4u
- 5KuPL2MurESy8qpA7JlwdA4y6gFevs95lNA33Xpnqpr9j4txhYZ1jXYHMEnjVhzydIbK
- YfdQ==
-X-Gm-Message-State: AGi0PuY+VQjud/U8gBOZibSnBec57KQJAABk1AU42K3HA57HuLVN8dr/
- sI5UGngv1zBzzleYC4ZCnNIj2B2adPk=
-X-Google-Smtp-Source: APiQypJVGTXsDFH4aWjJxTruJak85U5iEnJ2mvEvSyeEvRBSURPvuPBE8HLPMzQecQQ7G0hgC6IrHQ==
-X-Received: by 2002:a17:90a:21ee:: with SMTP id
- q101mr3338085pjc.24.1588687256592; 
- Tue, 05 May 2020 07:00:56 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id nm22sm2123823pjb.38.2020.05.05.07.00.55
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 05 May 2020 07:00:55 -0700 (PDT)
-Subject: Re: [PATCH v2 00/15] target/arm: partial vector cleanup
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200502224503.2282-1-richard.henderson@linaro.org>
- <CAFEAcA-fbQwjU3_UuorV3q-k9exr9f_uqO_YSP7aggsm=oP=wg@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <7825f17f-2306-7b07-b65c-60d87db48137@linaro.org>
-Date: Tue, 5 May 2020 07:00:53 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jVy8I-0001yz-LL
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 10:01:15 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50082
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jVy8D-0003Ky-Hw
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 10:01:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588687268;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1s0r4SR6wcmENpppBztkVy4Z3DaKBeeEgvOm2Z8Ir3s=;
+ b=AEvHH6vYvQ+7o7kabFUhReWKfI6L6N1NaMqFL1QI3yDxCsZYnES8uxAz3AHAJrUSB3J8/S
+ u/tOLWewvtIT682NuxKhdKoZCb5TOvNOpuxuKZelzWQlSPniwVoVIk7Zj/N8Oa12aCjhYS
+ 53j7tPJO0o4fwNy0xh6M7Nsp8MqUq4s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-222-87p_v0agPZig9YccwlzNtw-1; Tue, 05 May 2020 10:01:06 -0400
+X-MC-Unique: 87p_v0agPZig9YccwlzNtw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4F9A83DB79;
+ Tue,  5 May 2020 14:01:01 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.7])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6F47260BEC;
+ Tue,  5 May 2020 14:00:56 +0000 (UTC)
+Date: Tue, 5 May 2020 16:00:54 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH v2 02/13] acpi: create acpi-common.c and move madt code
+Message-ID: <20200505160054.41df87dc@redhat.com>
+In-Reply-To: <20200505134305.22666-3-kraxel@redhat.com>
+References: <20200505134305.22666-1-kraxel@redhat.com>
+ <20200505134305.22666-3-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-fbQwjU3_UuorV3q-k9exr9f_uqO_YSP7aggsm=oP=wg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,35 +94,376 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/5/20 3:38 AM, Peter Maydell wrote:
-> This doesn't apply on master any more as a result of the
-> first lump of decodetree stuff going in. Also patch 2
-> doesn't seem to compile:
+On Tue,  5 May 2020 15:42:54 +0200
+Gerd Hoffmann <kraxel@redhat.com> wrote:
+
+maybe add here that's it's going to be reused by microvm, hence the movement
+
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+>  hw/i386/acpi-common.h |  14 ++++
+>  hw/i386/acpi-build.c  | 126 +---------------------------------
+>  hw/i386/acpi-common.c | 152 ++++++++++++++++++++++++++++++++++++++++++
+>  hw/i386/Makefile.objs |   1 +
+>  4 files changed, 170 insertions(+), 123 deletions(-)
+>  create mode 100644 hw/i386/acpi-common.h
+>  create mode 100644 hw/i386/acpi-common.c
 > 
-> /home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/translate.c: In
-> function ‘gen_gvec_srshr’:
-> /home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/translate.c:4107:9:
-> error: implicit declaration of function ‘tcg_gen_gvec_dup_imm’; did
-> you mean ‘tcg_gen_gvec_dup_i64’?
-> [-Werror=implicit-function-declaration]
->          tcg_gen_gvec_dup_imm(vece, rd_ofs, opr_sz, max_sz, 0);
->          ^~~~~~~~~~~~~~~~~~~~
->          tcg_gen_gvec_dup_i64
-> /home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/translate.c:4107:9:
-> error: nested extern declaration of ‘tcg_gen_gvec_dup_imm’
-> [-Werror=nested-externs]
-> 
-> Any chance you could do a rebase and resend?
+> diff --git a/hw/i386/acpi-common.h b/hw/i386/acpi-common.h
+> new file mode 100644
+> index 000000000000..c30e461f1854
+> --- /dev/null
+> +++ b/hw/i386/acpi-common.h
+> @@ -0,0 +1,14 @@
+> +#ifndef HW_I386_ACPI_COMMON_H
+> +#define HW_I386_ACPI_COMMON_H
+> +#include "include/hw/acpi/acpi_dev_interface.h"
+> +
+> +#include "include/hw/acpi/bios-linker-loader.h"
+> +#include "include/hw/i386/x86.h"
+> +
+> +/* Default IOAPIC ID */
+> +#define ACPI_BUILD_IOAPIC_ID 0x0
+> +
+> +void acpi_build_madt(GArray *table_data, BIOSLinker *linker,
+> +                     X86MachineState *x86ms, AcpiDeviceIf *adev);
+> +
+> +#endif
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index fe60c10201ad..eb530e5cd56d 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -24,6 +24,7 @@
+>  #include "qapi/error.h"
+>  #include "qapi/qmp/qnum.h"
+>  #include "acpi-build.h"
+> +#include "acpi-common.h"
+>  #include "qemu/bitmap.h"
+>  #include "qemu/error-report.h"
+>  #include "hw/pci/pci.h"
+> @@ -89,9 +90,6 @@
+>  #define ACPI_BUILD_DPRINTF(fmt, ...)
+>  #endif
+>  
+> -/* Default IOAPIC ID */
+> -#define ACPI_BUILD_IOAPIC_ID 0x0
+> -
+>  typedef struct AcpiPmInfo {
+>      bool s3_disabled;
+>      bool s4_disabled;
+> @@ -327,124 +325,6 @@ build_facs(GArray *table_data)
+>      facs->length = cpu_to_le32(sizeof(*facs));
+>  }
+>  
+> -void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+> -                       const CPUArchIdList *apic_ids, GArray *entry)
+> -{
+> -    uint32_t apic_id = apic_ids->cpus[uid].arch_id;
+> -
+> -    /* ACPI spec says that LAPIC entry for non present
+> -     * CPU may be omitted from MADT or it must be marked
+> -     * as disabled. However omitting non present CPU from
+> -     * MADT breaks hotplug on linux. So possible CPUs
+> -     * should be put in MADT but kept disabled.
+> -     */
+> -    if (apic_id < 255) {
+> -        AcpiMadtProcessorApic *apic = acpi_data_push(entry, sizeof *apic);
+> -
+> -        apic->type = ACPI_APIC_PROCESSOR;
+> -        apic->length = sizeof(*apic);
+> -        apic->processor_id = uid;
+> -        apic->local_apic_id = apic_id;
+> -        if (apic_ids->cpus[uid].cpu != NULL) {
+> -            apic->flags = cpu_to_le32(1);
+> -        } else {
+> -            apic->flags = cpu_to_le32(0);
+> -        }
+> -    } else {
+> -        AcpiMadtProcessorX2Apic *apic = acpi_data_push(entry, sizeof *apic);
+> -
+> -        apic->type = ACPI_APIC_LOCAL_X2APIC;
+> -        apic->length = sizeof(*apic);
+> -        apic->uid = cpu_to_le32(uid);
+> -        apic->x2apic_id = cpu_to_le32(apic_id);
+> -        if (apic_ids->cpus[uid].cpu != NULL) {
+> -            apic->flags = cpu_to_le32(1);
+> -        } else {
+> -            apic->flags = cpu_to_le32(0);
+> -        }
+> -    }
+> -}
+> -
+> -static void
+> -build_madt(GArray *table_data, BIOSLinker *linker,
+> -           X86MachineState *x86ms, AcpiDeviceIf *adev)
+> -{
+> -    MachineClass *mc = MACHINE_GET_CLASS(x86ms);
+> -    const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(MACHINE(x86ms));
+> -    int madt_start = table_data->len;
+> -    AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_GET_CLASS(adev);
+> -    bool x2apic_mode = false;
+> -
+> -    AcpiMultipleApicTable *madt;
+> -    AcpiMadtIoApic *io_apic;
+> -    AcpiMadtIntsrcovr *intsrcovr;
+> -    int i;
+> -
+> -    madt = acpi_data_push(table_data, sizeof *madt);
+> -    madt->local_apic_address = cpu_to_le32(APIC_DEFAULT_ADDRESS);
+> -    madt->flags = cpu_to_le32(1);
+> -
+> -    for (i = 0; i < apic_ids->len; i++) {
+> -        adevc->madt_cpu(adev, i, apic_ids, table_data);
+> -        if (apic_ids->cpus[i].arch_id > 254) {
+> -            x2apic_mode = true;
+> -        }
+> -    }
+> -
+> -    io_apic = acpi_data_push(table_data, sizeof *io_apic);
+> -    io_apic->type = ACPI_APIC_IO;
+> -    io_apic->length = sizeof(*io_apic);
+> -    io_apic->io_apic_id = ACPI_BUILD_IOAPIC_ID;
+> -    io_apic->address = cpu_to_le32(IO_APIC_DEFAULT_ADDRESS);
+> -    io_apic->interrupt = cpu_to_le32(0);
+> -
+> -    if (x86ms->apic_xrupt_override) {
+> -        intsrcovr = acpi_data_push(table_data, sizeof *intsrcovr);
+> -        intsrcovr->type   = ACPI_APIC_XRUPT_OVERRIDE;
+> -        intsrcovr->length = sizeof(*intsrcovr);
+> -        intsrcovr->source = 0;
+> -        intsrcovr->gsi    = cpu_to_le32(2);
+> -        intsrcovr->flags  = cpu_to_le16(0); /* conforms to bus specifications */
+> -    }
+> -    for (i = 1; i < 16; i++) {
+> -#define ACPI_BUILD_PCI_IRQS ((1<<5) | (1<<9) | (1<<10) | (1<<11))
+> -        if (!(ACPI_BUILD_PCI_IRQS & (1 << i))) {
+> -            /* No need for a INT source override structure. */
+> -            continue;
+> -        }
+> -        intsrcovr = acpi_data_push(table_data, sizeof *intsrcovr);
+> -        intsrcovr->type   = ACPI_APIC_XRUPT_OVERRIDE;
+> -        intsrcovr->length = sizeof(*intsrcovr);
+> -        intsrcovr->source = i;
+> -        intsrcovr->gsi    = cpu_to_le32(i);
+> -        intsrcovr->flags  = cpu_to_le16(0xd); /* active high, level triggered */
+> -    }
+> -
+> -    if (x2apic_mode) {
+> -        AcpiMadtLocalX2ApicNmi *local_nmi;
+> -
+> -        local_nmi = acpi_data_push(table_data, sizeof *local_nmi);
+> -        local_nmi->type   = ACPI_APIC_LOCAL_X2APIC_NMI;
+> -        local_nmi->length = sizeof(*local_nmi);
+> -        local_nmi->uid    = 0xFFFFFFFF; /* all processors */
+> -        local_nmi->flags  = cpu_to_le16(0);
+> -        local_nmi->lint   = 1; /* ACPI_LINT1 */
+> -    } else {
+> -        AcpiMadtLocalNmi *local_nmi;
+> -
+> -        local_nmi = acpi_data_push(table_data, sizeof *local_nmi);
+> -        local_nmi->type         = ACPI_APIC_LOCAL_NMI;
+> -        local_nmi->length       = sizeof(*local_nmi);
+> -        local_nmi->processor_id = 0xff; /* all processors */
+> -        local_nmi->flags        = cpu_to_le16(0);
+> -        local_nmi->lint         = 1; /* ACPI_LINT1 */
+> -    }
+> -
+> -    build_header(linker, table_data,
+> -                 (void *)(table_data->data + madt_start), "APIC",
+> -                 table_data->len - madt_start, 1, NULL, NULL);
+> -}
+> -
+>  static void build_append_pcihp_notify_entry(Aml *method, int slot)
+>  {
+>      Aml *if_ctx;
+> @@ -2560,8 +2440,8 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>      aml_len += tables_blob->len - fadt;
+>  
+>      acpi_add_table(table_offsets, tables_blob);
+> -    build_madt(tables_blob, tables->linker, x86ms,
+> -               ACPI_DEVICE_IF(pcms->acpi_dev));
+> +    acpi_build_madt(tables_blob, tables->linker, x86ms,
+> +                    ACPI_DEVICE_IF(pcms->acpi_dev));
+>  
+>      vmgenid_dev = find_vmgenid_dev();
+>      if (vmgenid_dev) {
+> diff --git a/hw/i386/acpi-common.c b/hw/i386/acpi-common.c
+> new file mode 100644
+> index 000000000000..5caca16a0b59
+> --- /dev/null
+> +++ b/hw/i386/acpi-common.c
+> @@ -0,0 +1,152 @@
+> +/* Support for generating ACPI tables and passing them to Guests
+> + *
+> + * Copyright (C) 2008-2010  Kevin O'Connor <kevin@koconnor.net>
+> + * Copyright (C) 2006 Fabrice Bellard
+> + * Copyright (C) 2013 Red Hat Inc
+> + *
+> + * Author: Michael S. Tsirkin <mst@redhat.com>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License as published by
+> + * the Free Software Foundation; either version 2 of the License, or
+> + * (at your option) any later version.
+> +
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> +
+> + * You should have received a copy of the GNU General Public License along
+> + * with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +
+> +#include "exec/memory.h"
+> +#include "hw/acpi/acpi.h"
+> +#include "hw/acpi/aml-build.h"
+> +#include "hw/acpi/utils.h"
+> +#include "hw/i386/pc.h"
+> +#include "target/i386/cpu.h"
+> +
+> +#include "acpi-build.h"
+> +#include "acpi-common.h"
+> +
+> +void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+> +                       const CPUArchIdList *apic_ids, GArray *entry)
+> +{
+> +    uint32_t apic_id = apic_ids->cpus[uid].arch_id;
+> +
+> +    /* ACPI spec says that LAPIC entry for non present
+> +     * CPU may be omitted from MADT or it must be marked
+> +     * as disabled. However omitting non present CPU from
+> +     * MADT breaks hotplug on linux. So possible CPUs
+> +     * should be put in MADT but kept disabled.
+> +     */
+> +    if (apic_id < 255) {
+> +        AcpiMadtProcessorApic *apic = acpi_data_push(entry, sizeof *apic);
+> +
+> +        apic->type = ACPI_APIC_PROCESSOR;
+> +        apic->length = sizeof(*apic);
+> +        apic->processor_id = uid;
+> +        apic->local_apic_id = apic_id;
+> +        if (apic_ids->cpus[uid].cpu != NULL) {
+> +            apic->flags = cpu_to_le32(1);
+> +        } else {
+> +            apic->flags = cpu_to_le32(0);
+> +        }
+> +    } else {
+> +        AcpiMadtProcessorX2Apic *apic = acpi_data_push(entry, sizeof *apic);
+> +
+> +        apic->type = ACPI_APIC_LOCAL_X2APIC;
+> +        apic->length = sizeof(*apic);
+> +        apic->uid = cpu_to_le32(uid);
+> +        apic->x2apic_id = cpu_to_le32(apic_id);
+> +        if (apic_ids->cpus[uid].cpu != NULL) {
+> +            apic->flags = cpu_to_le32(1);
+> +        } else {
+> +            apic->flags = cpu_to_le32(0);
+> +        }
+> +    }
+> +}
+> +
+> +void acpi_build_madt(GArray *table_data, BIOSLinker *linker,
+> +                     X86MachineState *x86ms, AcpiDeviceIf *adev)
+> +{
+> +    MachineClass *mc = MACHINE_GET_CLASS(x86ms);
+> +    const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(MACHINE(x86ms));
+> +    int madt_start = table_data->len;
+> +    AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_GET_CLASS(adev);
+> +    bool x2apic_mode = false;
+> +
+> +    AcpiMultipleApicTable *madt;
+> +    AcpiMadtIoApic *io_apic;
+> +    AcpiMadtIntsrcovr *intsrcovr;
+> +    int i;
+> +
+> +    madt = acpi_data_push(table_data, sizeof *madt);
+> +    madt->local_apic_address = cpu_to_le32(APIC_DEFAULT_ADDRESS);
+> +    madt->flags = cpu_to_le32(1);
+> +
+> +    for (i = 0; i < apic_ids->len; i++) {
+> +        adevc->madt_cpu(adev, i, apic_ids, table_data);
+> +        if (apic_ids->cpus[i].arch_id > 254) {
+> +            x2apic_mode = true;
+> +        }
+> +    }
+> +
+> +    io_apic = acpi_data_push(table_data, sizeof *io_apic);
+> +    io_apic->type = ACPI_APIC_IO;
+> +    io_apic->length = sizeof(*io_apic);
+> +    io_apic->io_apic_id = ACPI_BUILD_IOAPIC_ID;
+> +    io_apic->address = cpu_to_le32(IO_APIC_DEFAULT_ADDRESS);
+> +    io_apic->interrupt = cpu_to_le32(0);
+> +
+> +    if (x86ms->apic_xrupt_override) {
+> +        intsrcovr = acpi_data_push(table_data, sizeof *intsrcovr);
+> +        intsrcovr->type   = ACPI_APIC_XRUPT_OVERRIDE;
+> +        intsrcovr->length = sizeof(*intsrcovr);
+> +        intsrcovr->source = 0;
+> +        intsrcovr->gsi    = cpu_to_le32(2);
+> +        intsrcovr->flags  = cpu_to_le16(0); /* conforms to bus specifications */
+> +    }
+> +    for (i = 1; i < 16; i++) {
+> +#define ACPI_BUILD_PCI_IRQS ((1<<5) | (1<<9) | (1<<10) | (1<<11))
+> +        if (!(ACPI_BUILD_PCI_IRQS & (1 << i))) {
+> +            /* No need for a INT source override structure. */
+> +            continue;
+> +        }
+> +        intsrcovr = acpi_data_push(table_data, sizeof *intsrcovr);
+> +        intsrcovr->type   = ACPI_APIC_XRUPT_OVERRIDE;
+> +        intsrcovr->length = sizeof(*intsrcovr);
+> +        intsrcovr->source = i;
+> +        intsrcovr->gsi    = cpu_to_le32(i);
+> +        intsrcovr->flags  = cpu_to_le16(0xd); /* active high, level triggered */
+> +    }
+> +
+> +    if (x2apic_mode) {
+> +        AcpiMadtLocalX2ApicNmi *local_nmi;
+> +
+> +        local_nmi = acpi_data_push(table_data, sizeof *local_nmi);
+> +        local_nmi->type   = ACPI_APIC_LOCAL_X2APIC_NMI;
+> +        local_nmi->length = sizeof(*local_nmi);
+> +        local_nmi->uid    = 0xFFFFFFFF; /* all processors */
+> +        local_nmi->flags  = cpu_to_le16(0);
+> +        local_nmi->lint   = 1; /* ACPI_LINT1 */
+> +    } else {
+> +        AcpiMadtLocalNmi *local_nmi;
+> +
+> +        local_nmi = acpi_data_push(table_data, sizeof *local_nmi);
+> +        local_nmi->type         = ACPI_APIC_LOCAL_NMI;
+> +        local_nmi->length       = sizeof(*local_nmi);
+> +        local_nmi->processor_id = 0xff; /* all processors */
+> +        local_nmi->flags        = cpu_to_le16(0);
+> +        local_nmi->lint         = 1; /* ACPI_LINT1 */
+> +    }
+> +
+> +    build_header(linker, table_data,
+> +                 (void *)(table_data->data + madt_start), "APIC",
+> +                 table_data->len - madt_start, 1, NULL, NULL);
+> +}
+> +
+> diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
+> index 8ce1b265335b..6abc74551a72 100644
+> --- a/hw/i386/Makefile.objs
+> +++ b/hw/i386/Makefile.objs
+> @@ -16,4 +16,5 @@ obj-$(CONFIG_VMMOUSE) += vmmouse.o
+>  obj-$(CONFIG_PC) += port92.o
+>  
+>  obj-y += kvmvapic.o
+> +obj-$(CONFIG_ACPI) += acpi-common.o
+>  obj-$(CONFIG_PC) += acpi-build.o
 
-
-Ah yes, it seems built on top of tcg-next.  Time for a pull there too, lest
-this have to get changed yet again.
-
-
-r~
 
