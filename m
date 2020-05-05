@@ -2,101 +2,82 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C2C4C47247
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:11:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B464EC47254
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:12:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02C332078C
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:11:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02C332078C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7DF702078C
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:12:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kduo2br5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DF702078C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVxMJ-0007Jl-RU
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 09:11:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38898)
+	id 1jVxMn-0008WF-IY
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 09:12:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38748)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <farman@linux.ibm.com>)
- id 1jVxAL-000213-Sb; Tue, 05 May 2020 08:59:18 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:17018
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <farman@linux.ibm.com>)
- id 1jVxAH-0000c4-S4; Tue, 05 May 2020 08:59:17 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 045CaFho125378; Tue, 5 May 2020 08:58:05 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 30s1sww6p4-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 05 May 2020 08:58:04 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 045CaW9Y126705;
- Tue, 5 May 2020 08:58:03 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com
- [159.122.73.70])
- by mx0b-001b2d01.pphosted.com with ESMTP id 30s1sww6md-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 05 May 2020 08:58:03 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
- by ppma01fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 045Cu6hv012181;
- Tue, 5 May 2020 12:58:00 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com
- (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
- by ppma01fra.de.ibm.com with ESMTP id 30s0g5aunj-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 05 May 2020 12:58:00 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
- [9.149.105.60])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 045Cvvgc1704214
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 5 May 2020 12:57:57 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8787C42054;
- Tue,  5 May 2020 12:57:57 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 713654204C;
- Tue,  5 May 2020 12:57:57 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
- Tue,  5 May 2020 12:57:57 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
- id 18BE2E065C; Tue,  5 May 2020 14:57:57 +0200 (CEST)
-From: Eric Farman <farman@linux.ibm.com>
-To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
-Subject: [PATCH v4 2/6] vfio-ccw: Refactor cleanup of regions
-Date: Tue,  5 May 2020 14:57:53 +0200
-Message-Id: <20200505125757.98209-3-farman@linux.ibm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200505125757.98209-1-farman@linux.ibm.com>
-References: <20200505125757.98209-1-farman@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.676
- definitions=2020-05-05_07:2020-05-04,
- 2020-05-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- lowpriorityscore=0 malwarescore=0 phishscore=0 adultscore=0
- impostorscore=0 mlxlogscore=999 bulkscore=0 clxscore=1015 suspectscore=2
- mlxscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2005050098
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=farman@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 08:27:02
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jVxA4-0001hR-9j
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 08:59:00 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31290
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jVxA3-00014E-34
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 08:58:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588683538;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vQ7OgkzblVUfXZhWwzaNGGwiSkdBR0Ztb479HveURPo=;
+ b=Kduo2br5zChW+OTA19AGSP94rL1OnmYStTywm5U9xxdJ8VLQPWgE/v4REgYv157R6552no
+ +/UalRzcB7OC49eKpqYJ7+0iCx5blUi9d+oy8EAG3bz+tJ3Y+hWfY84uZdgtXitX264OlM
+ Yzdd+nka59duiX1Mq/jxQbULU1nFBVc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-175-nDDJRC4UOcy_TjbSapWofQ-1; Tue, 05 May 2020 08:58:56 -0400
+X-MC-Unique: nDDJRC4UOcy_TjbSapWofQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 35705800687;
+ Tue,  5 May 2020 12:58:55 +0000 (UTC)
+Received: from localhost (ovpn-113-206.ams2.redhat.com [10.36.113.206])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C6E2560C18;
+ Tue,  5 May 2020 12:58:54 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PULL 12/24] iotest 258: use script_main
+Date: Tue,  5 May 2020 14:58:14 +0200
+Message-Id: <20200505125826.1001451-13-mreitz@redhat.com>
+In-Reply-To: <20200505125826.1001451-1-mreitz@redhat.com>
+References: <20200505125826.1001451-1-mreitz@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -110,68 +91,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>,
- Eric Farman <farman@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Jared Rossi <jrossi@linux.ibm.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-While we're at it, add a g_free() for the async_cmd_region that
-is the last thing currently created.  g_free() knows how to handle
-NULL pointers, so this makes it easier to remember what cleanups
-need to be performed when new regions are added.
+From: John Snow <jsnow@redhat.com>
 
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Since this one is nicely factored to use a single entry point,
+use script_main to run the tests.
+
+Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Message-Id: <20200331000014.11581-13-jsnow@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
+ tests/qemu-iotests/258 | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
 
-Notes:
-    v1-v2:
-     - Add Conny's r-b
-
- hw/vfio/ccw.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
-
-diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-index 50cc2ec75c..ae9e396367 100644
---- a/hw/vfio/ccw.c
-+++ b/hw/vfio/ccw.c
-@@ -370,8 +370,7 @@ static void vfio_ccw_get_region(VFIOCCWDevice *vcdev, Error **errp)
-     vcdev->io_region_size = info->size;
-     if (sizeof(*vcdev->io_region) != vcdev->io_region_size) {
-         error_setg(errp, "vfio: Unexpected size of the I/O region");
--        g_free(info);
--        return;
-+        goto out_err;
-     }
- 
-     vcdev->io_region_offset = info->offset;
-@@ -384,15 +383,20 @@ static void vfio_ccw_get_region(VFIOCCWDevice *vcdev, Error **errp)
-         vcdev->async_cmd_region_size = info->size;
-         if (sizeof(*vcdev->async_cmd_region) != vcdev->async_cmd_region_size) {
-             error_setg(errp, "vfio: Unexpected size of the async cmd region");
--            g_free(vcdev->io_region);
--            g_free(info);
--            return;
-+            goto out_err;
-         }
-         vcdev->async_cmd_region_offset = info->offset;
-         vcdev->async_cmd_region = g_malloc0(info->size);
-     }
- 
-     g_free(info);
-+    return;
-+
-+out_err:
-+    g_free(vcdev->async_cmd_region);
-+    g_free(vcdev->io_region);
-+    g_free(info);
-+    return;
- }
- 
- static void vfio_ccw_put_region(VFIOCCWDevice *vcdev)
--- 
-2.17.1
+diff --git a/tests/qemu-iotests/258 b/tests/qemu-iotests/258
+index a65151dda6..e305a1502f 100755
+--- a/tests/qemu-iotests/258
++++ b/tests/qemu-iotests/258
+@@ -23,12 +23,6 @@ import iotests
+ from iotests import log, qemu_img, qemu_io_silent, \
+         filter_qmp_testfiles, filter_qmp_imgfmt
+=20
+-# Need backing file and change-backing-file support
+-iotests.script_initialize(
+-    supported_fmts=3D['qcow2', 'qed'],
+-    supported_platforms=3D['linux'],
+-)
+-
+ # Returns a node for blockdev-add
+ def node(node_name, path, backing=3DNone, fmt=3DNone, throttle=3DNone):
+     if fmt is None:
+@@ -161,4 +155,7 @@ def main():
+     test_concurrent_finish(False)
+=20
+ if __name__ =3D=3D '__main__':
+-    main()
++    # Need backing file and change-backing-file support
++    iotests.script_main(main,
++                        supported_fmts=3D['qcow2', 'qed'],
++                        supported_platforms=3D['linux'])
+--=20
+2.26.2
 
 
