@@ -1,133 +1,89 @@
 Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C355C47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 21:39:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FAD7C47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 22:00:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43F13206A5
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 21:39:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 46C202075E
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 22:00:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="AmxIEtqb";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="e7qT5By1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43F13206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xs/pR+1J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46C202075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jW5Hv-0007Fl-7S
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 17:39:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59432)
+	id 1jW5by-0000Lb-BI
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 18:00:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35456)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sidneym@quicinc.com>)
- id 1jW5H9-0006mb-BE
- for qemu-devel@nongnu.org; Tue, 05 May 2020 17:38:51 -0400
-Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:15826)
- by eggs.gnu.org with esmtps (TLS1.2:RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <sidneym@quicinc.com>)
- id 1jW5H5-0003ff-GK
- for qemu-devel@nongnu.org; Tue, 05 May 2020 17:38:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
- t=1588714727; x=1620250727;
- h=from:to:subject:date:message-id:mime-version;
- bh=VZZXEnd6TDMoAgYD4sw92vfklcuIRsLiI5hCDOMPqL8=;
- b=AmxIEtqbsxL6PMezWmaARyqUpxDbo/yoCZB9pBExg6Lbcv5V9zUBUdXl
- F5MjPeKvbfvMXH7SQsOVwcEJd1MGjHp9jhySou5o3TRz9z0lZW7qs/uZF
- /FjtvlB113PqviPvjTBEp8gXRcII0MR566RuQ2VZUd6KfgPMRRV4JQMjW c=;
-Received: from unknown (HELO ironmsg05-sd.qualcomm.com) ([10.53.140.145])
- by alexa-out-sd-02.qualcomm.com with ESMTP; 05 May 2020 14:38:44 -0700
-Received: from nasanexm01c.na.qualcomm.com ([10.85.0.83])
- by ironmsg05-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
- 05 May 2020 14:38:44 -0700
-Received: from nasanexm03d.na.qualcomm.com (10.85.0.91) by
- NASANEXM01C.na.qualcomm.com (10.85.0.83) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Tue, 5 May 2020 14:38:43 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (199.106.107.6)
- by nasanexm03d.na.qualcomm.com (10.85.0.91) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2 via Frontend Transport; Tue, 5 May 2020 14:38:43 -0700
-Received: from BYAPR02MB5509.namprd02.prod.outlook.com (2603:10b6:a03:9e::31)
- by BYAPR02MB5477.namprd02.prod.outlook.com (2603:10b6:a03:95::19)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.29; Tue, 5 May
- 2020 21:38:42 +0000
-Received: from BYAPR02MB5509.namprd02.prod.outlook.com
- ([fe80::fc11:c428:7057:1152]) by BYAPR02MB5509.namprd02.prod.outlook.com
- ([fe80::fc11:c428:7057:1152%6]) with mapi id 15.20.2958.030; Tue, 5 May 2020
- 21:38:42 +0000
-From: Sid Manning <sidneym@quicinc.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: linux-user - time64 question
-Thread-Topic: linux-user - time64 question
-Thread-Index: AdYjIth2hlNzOf24Tf+fzAKlcfmaBA==
-Date: Tue, 5 May 2020 21:38:42 +0000
-Message-ID: <BYAPR02MB55094915935E2B24286CB519BEA70@BYAPR02MB5509.namprd02.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=quicinc.com;
-x-originating-ip: [199.106.103.56]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: d8395030-0eb6-49e7-f612-08d7f13cae8d
-x-ms-traffictypediagnostic: BYAPR02MB5477:
-x-microsoft-antispam-prvs: <BYAPR02MB5477954B09C63CD0117C7B88BEA70@BYAPR02MB5477.namprd02.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3383;
-x-forefront-prvs: 0394259C80
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: cOt0ZnzEBWoS9WkwLQZqnwzcwgifLmfXY4pZa0wU4sDpVDOqdOZrVhGo/I24FzK4S6VhBXjqaZJioqO+ceivOv8KKYRdEsUVAMVxuPZ+AM23Fe09jOZVvQWesLVFqp7gmnJ3ejaGOnsAnvgwEsOeLlLCn6dU2imxSZdK2vpl2RD5XnGlAHC3bnHuN2tyRBagAhJULE+i07Fb2KCTe51hnFQxh0hbuLJZAztxyIwUHb3jfDmoTBTYqEb1tqlEt/ney6VLYDTLFdPDoHShMZfVVpDIkLFvg64D0R4h1SGniVRRlM/4Sts9LeutmuGmBxVruetVqdsRI8YXqqbS7ZlG0MAvKw4Hs7f3K+xDfWF7WBAoDUA+Mdllwo/uJgfsLnCtMejoUCVvPT9l/3vYFBKVa2vFPIYwF/tpAkrBEaOWlotNTz/VkYmMDF32LCxK1y92rzzql/e9tfV/ZKZreI9DC8mhvwYhNCbfX3NkoD//pNH2jZDN56Ej5v9phWCewLi7MzgaeVoAZmchOXqSej1e4w==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:BYAPR02MB5509.namprd02.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(136003)(346002)(39860400002)(376002)(396003)(366004)(33430700001)(5660300002)(52536014)(9686003)(86362001)(55016002)(71200400001)(26005)(6506007)(4744005)(186003)(6916009)(33656002)(76116006)(2906002)(7696005)(66446008)(8676002)(66556008)(316002)(64756008)(66946007)(66476007)(8936002)(478600001)(19627405001)(33440700001);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata: dKwqN4/Ob87BgKpRJpLXyc3t2OeeAo1/xjKuvwaEPkNI5EX4rbov+pOCT8fIA4JqSag1u4snkVbeBDUGBjBOfxN9/agvbUkJg7Ty+9fhLVIsfw1/rGRFbopONQwxWzu6xxt1A+WlWxPW7nZc341DPf+y/LV6CLw1FTEx6ydXnNUhpt9uHl/xeitfBgvxFqKOHVYxGQ/oNb+APjFgTPixaY010njSenBVtqq0xB5Ab1Y9f0X1MRjkyVdifIGvM16E/LcxNOMEAJm/MLih1I1F6AHCpnECSAUo5uDCs+LowzY4mcQ3IZ3qVuMhNp4b7n6Ut03+K++eiB+FHeKF/0VAl0k69VNwNNzqT8ge0f7UiK8H5hJQMqPKYgDbxqnUazp+cqjHV/0OnHsMz00+ADRN6UVI/MCVGhUj0ygjRit80RHYMHzlUS0VTwMSq7xz/x6ZmasVI6jG8jnPT0gvIcrrfMw+R70cKkIHkwvNvyZDbt7bS8G4YgQIYtLN/pZk05Qilbv1qBl8oPKtVg3MOvVhjcGpit/gBzkW5MF4nCCNGq45AUrgSOZ8KJPuqok5IZbDtm9nvVxKp2lFrxQKawfHyFrAnuV9fVaqEa/1uZi+MOPWzCwWHHABCsBJdTJJ5UMkLw8VXnxbcjc/xz4THzUuBanrnCj6aph4b0xPYtBNYlv67GMXp0XViWo92r9BbwEFyufBnryyjDNJYIX1D8DZrGmNs/TKjlX/MWhedT/ZAH0MaK80ntFPALkspELLuyao6W9GmhpuNaDKb8TgZVjCalAgrOpoMAHIYt9MxMwZln4=
-x-ms-exchange-transport-forked: True
-arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P4zuFuCnt6/YaSAIdt9ytzE+p6R+f/j0HkfUfHI1q9BWTicR6yHYL6o/RUozoz08pt3+qVfWew+8gl+U4Ur1S7x+jQqOw87AGAzm1TSnekXFiNaq4rAbqKgCZYF5AA0EaRlZFgyw3UJUMX6owSajC/x+QGULtUtK+B5KoevTsZysDEB/fG/ltHpRUccTK5OkBP67rS2YD9Ny+UDGrSkgcOYknPQrmYWuQI9nw5RiMfqr0BaF5BOLhz4MaZgzFgN9wCYJamI5qLDQxaqqNSBcSi5FAb1WVV3/l11MTfpy6lM++oa7AzSVOHwJ3YQaJSUmZFNAtLseB4F9p4t4ue/hZQ==
-arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZZgtcvrTYbQnMe2bLVmqVW8XJr5RqE8bsfn4gE49bN4=;
- b=ld8ZbDVbAQzaxx0Z/6zDPib70NIB6QUgwEtbEXA5flGN+83zBqBTTU5WasPRjQYLEW7bjrAohBz5o7JZy6tQYgg1+gygmGkBRfK8TjZZbWS/DVXOsuT/BMw/vhImfibCoWMmYByrfidd4KPoSsQWW76cFRq4qH5OHjDKWTA3DXUb3asz855tdfFA/pxPD3sQ2GkgnB+ucBbGOYrifj842Ey4AUutEQSsD53TTcaqNGbTc3bRIJf3Uhu4i+cDyL8c0kXevPex3T+KhvI2VWfAj8WNtgbP2dvKySfTaHyl4FgEPRRWjIWrLw+29bwfIMcUx8qomYEZQZSn81W1qsjzeQ==
-arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
- dkim=pass header.d=quicinc.com; arc=none
-dkim-signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZZgtcvrTYbQnMe2bLVmqVW8XJr5RqE8bsfn4gE49bN4=;
- b=e7qT5By1qole6XPEOWKSDOZyh6GqM5aU8+zGakOwqwZO3BvQ4V2AOfav99c5zZwvJ6K0k5511BhCn7jjfqLVKboFW65mfV+Asjlpg5miY582oXrzy68ie6GwizpZqS9d3DslRLP8/d09VwJYa6W8OWF0O9PCbGuEuNY7IHgUX+I=
-x-ms-exchange-crosstenant-network-message-id: d8395030-0eb6-49e7-f612-08d7f13cae8d
-x-ms-exchange-crosstenant-originalarrivaltime: 05 May 2020 21:38:42.3406 (UTC)
-x-ms-exchange-crosstenant-fromentityheader: Hosted
-x-ms-exchange-crosstenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
-x-ms-exchange-crosstenant-mailboxtype: HOSTED
-x-ms-exchange-crosstenant-userprincipalname: 1iO9u7g+KOMF6yaLbirxJiG3AvAEjjFWXI6k2suGoeAOJsAmQ7SkCzqCQFwTXUjiFzRBooaihfhWrR6PpaE6DA==
-x-ms-exchange-transport-crosstenantheadersstamped: BYAPR02MB5477
-x-originatororg: quicinc.com
-Content-Type: multipart/alternative;
- boundary="_000_BYAPR02MB55094915935E2B24286CB519BEA70BYAPR02MB5509namp_"
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jW5b6-0008Ky-Lz
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 17:59:28 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26377
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jW5b4-0002uA-TQ
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 17:59:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588715965;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ea1rileO8TACkSFXABN3qcLBrlyq57QbvoUeRN8aKzE=;
+ b=Xs/pR+1Jpk8wrYGEaYODRJ4ior8Zh8pOL4cyVjHgI1GasargGJEeO5QkWmDurv9aGL6d8W
+ G4moTGGv1lauoF1xgfxWptZxpeNvHNeq86zGRiQEVA9nXhT/KRNwqDU+PfzguG5SCl7lEv
+ 3R+rlJA62xvSe4z+vds++zTlO+OxnwY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-491-IkJYnzNmPlWJcAfLVAqrKA-1; Tue, 05 May 2020 17:59:20 -0400
+X-MC-Unique: IkJYnzNmPlWJcAfLVAqrKA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9C72480183C;
+ Tue,  5 May 2020 21:59:19 +0000 (UTC)
+Received: from [10.3.114.73] (ovpn-114-73.phx2.redhat.com [10.3.114.73])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C39175D9C5;
+ Tue,  5 May 2020 21:59:18 +0000 (UTC)
+Subject: Re: [PATCH v5 19/31] qcow2: Add subcluster support to
+ calculate_l2_meta()
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <cover.1588699789.git.berto@igalia.com>
+ <907ab6846b93b441a27eb6853ff3058f1c821bf9.1588699789.git.berto@igalia.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <12569151-2f16-f136-6928-2a915b25120b@redhat.com>
+Date: Tue, 5 May 2020 16:59:18 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Received-SPF: pass client-ip=199.106.114.39; envelope-from=sidneym@quicinc.com;
- helo=alexa-out-sd-02.qualcomm.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 17:38:44
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+In-Reply-To: <907ab6846b93b441a27eb6853ff3058f1c821bf9.1588699789.git.berto@igalia.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 15:23:58
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -141,147 +97,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---_000_BYAPR02MB55094915935E2B24286CB519BEA70BYAPR02MB5509namp_
-Content-Type: text/plain; charset="Windows-1252"
-Content-Transfer-Encoding: quoted-printable
+On 5/5/20 12:38 PM, Alberto Garcia wrote:
+> If an image has subclusters then there are more copy-on-write
+> scenarios that we need to consider. Let's say we have a write request
+> from the middle of subcluster #3 until the end of the cluster:
+> 
+> 1) If we are writing to a newly allocated cluster then we need
+>     copy-on-write. The previous contents of subclusters #0 to #3 must
+>     be copied to the new cluster. We can optimize this process by
+>     skipping all leading unallocated or zero subclusters (the status of
+>     those skipped subclusters will be reflected in the new L2 bitmap).
+> 
+> 2) If we are overwriting an existing cluster:
+> 
+>     2.1) If subcluster #3 is unallocated or has the all-zeroes bit set
+>          then we need copy-on-write (on subcluster #3 only).
+> 
+>     2.2) If subcluster #3 was already allocated then there is no need
+>          for any copy-on-write. However we still need to update the L2
+>          bitmap to reflect possible changes in the allocation status of
+>          subclusters #4 to #31. Because of this, this function checks
+>          if all the overwritten subclusters are already allocated and
+>          in this case it returns without creating a new QCowL2Meta
+>          structure.
+> 
+> After all these changes l2meta_cow_start() and l2meta_cow_end()
+> are not necessarily cluster-aligned anymore. We need to update the
+> calculation of old_start and old_end in handle_dependencies() to
+> guarantee that no two requests try to write on the same cluster.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>   block/qcow2-cluster.c | 174 +++++++++++++++++++++++++++++++++++-------
+>   1 file changed, 146 insertions(+), 28 deletions(-)
+> 
 
-I=92m looking at a testcase failure when my target uses 64bit time in msg.h=
- (struct msqid_ds).  I=92ve been able to get around this but changing targe=
-t_msqid_ds like so:
+> -    /* Return if there's no COW (all clusters are normal and we keep them) */
+> +    /* Return if there's no COW (all subclusters are normal and we are
+> +     * keeping the clusters) */
+>       if (keep_old) {
+> +        unsigned first_sc = cow_start_to / s->subcluster_size;
+> +        unsigned last_sc = (cow_end_from - 1) / s->subcluster_size;
+>           int i;
+> -        for (i = 0; i < nb_clusters; i++) {
+> -            l2_entry = get_l2_entry(s, l2_slice, l2_index + i);
+> -            if (qcow2_get_cluster_type(bs, l2_entry) != QCOW2_CLUSTER_NORMAL) {
+> +        for (i = first_sc; i <= last_sc; i++) {
+> +            unsigned c = i / s->subclusters_per_cluster;
+> +            unsigned sc = i % s->subclusters_per_cluster;
+> +            l2_entry = get_l2_entry(s, l2_slice, l2_index + c);
+> +            l2_bitmap = get_l2_bitmap(s, l2_slice, l2_index + c);
+> +            type = qcow2_get_subcluster_type(bs, l2_entry, l2_bitmap, sc);
+> +            if (type == QCOW2_SUBCLUSTER_INVALID) {
+> +                l2_index += c; /* Point to the invalid entry */
+> +                goto fail;
+> +            }
+> +            if (type != QCOW2_SUBCLUSTER_NORMAL) {
+>                   break;
+>               }
+>           }
 
-@@ -3900,18 +3901,9 @@ static inline abi_long do_semop(int semid, abi_long =
-ptr,
-unsigned nsops)
- struct target_msqid_ds
- {
-     struct target_ipc_perm msg_perm;
--    abi_ulong msg_stime;
--#if TARGET_ABI_BITS =3D=3D 32
--    abi_ulong __unused1;
--#endif
--    abi_ulong msg_rtime;
--#if TARGET_ABI_BITS =3D=3D 32
--    abi_ulong __unused2;
--#endif
--    abi_ulong msg_ctime;
--#if TARGET_ABI_BITS =3D=3D 32
--    abi_ulong __unused3;
--#endif
-+    abi_ullong msg_stime;
-+    abi_ullong msg_rtime;
-+    abi_ullong msg_ctime;
-     abi_ulong __msg_cbytes;
-     abi_ulong msg_qnum;
-     abi_ulong msg_qbytes;
+This loop is now 32 times slower (for extended L2 entries).  Do you 
+really need to check for an invalid subcluster here, or can we just 
+blindly check that all 32 subclusters are NORMAL, and leave handling of 
+invalid clusters for the rest of the function after we failed the 
+exit-early test?  For that matter, for all but the first and last 
+cluster, checking if 32 clusters are NORMAL is a simple 64-bit 
+comparison rather than 32 iterations of a loop; and even for the first 
+and last cluster, the _RANGE macros in 14/31 work well to mask out which 
+bits must be set/cleared.  My guess is that optimizing this loop is 
+worthwhile, since overwriting existing data is probably more common than 
+allocating new data.
 
-It seems like either should have worked but I get garbage back in some of t=
-he elements below msg_time fields without the change.
+> -        if (i == nb_clusters) {
+> -            return;
+> +        if (i == last_sc + 1) {
+> +            return 0;
+>           }
+>       }
 
-If time_t is 64bits then it seems like stime/rtime/ctime should be abi_ullo=
-ng.
+If we get here, then i is now the address of the first subcluster that 
+was not NORMAL, even if it is much smaller than the final subcluster 
+learned by nb_clusters for the overall request.  [1]
 
-My target is Hexagon and the TARGET_ABI_BITS is 32.
+>   
+>       /* Get the L2 entry of the first cluster */
+>       l2_entry = get_l2_entry(s, l2_slice, l2_index);
+> -    type = qcow2_get_cluster_type(bs, l2_entry);
+> +    l2_bitmap = get_l2_bitmap(s, l2_slice, l2_index);
+> +    sc_index = offset_to_sc_index(s, guest_offset);
+> +    type = qcow2_get_subcluster_type(bs, l2_entry, l2_bitmap, sc_index);
+>   
+> -    if (type == QCOW2_CLUSTER_NORMAL && keep_old) {
+> -        cow_start_from = cow_start_to;
+> +    if (type == QCOW2_SUBCLUSTER_INVALID) {
+> +        goto fail;
+> +    }
+> +
+> +    if (!keep_old) {
+> +        switch (type) {
+> +        case QCOW2_SUBCLUSTER_COMPRESSED:
+> +            cow_start_from = 0;
+> +            break;
+> +        case QCOW2_SUBCLUSTER_NORMAL:
+> +        case QCOW2_SUBCLUSTER_ZERO_ALLOC:
+> +        case QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC: {
+> +            int i;
+> +            /* Skip all leading zero and unallocated subclusters */
+> +            for (i = 0; i < sc_index; i++) {
+> +                QCow2SubclusterType t;
+> +                t = qcow2_get_subcluster_type(bs, l2_entry, l2_bitmap, i);
+> +                if (t == QCOW2_SUBCLUSTER_INVALID) {
+> +                    goto fail;
+> +                } else if (t == QCOW2_SUBCLUSTER_NORMAL) {
+> +                    break;
+> +                }
+> +            }
+> +            cow_start_from = i << s->subcluster_bits;
+> +            break;
 
-Thanks,
+Note that you are only skipping until the first normal subcluster, even 
+if other zero/unallocated clusters occur between the first normal 
+cluster and the start of the action.  Or visually, suppose we have:
 
---_000_BYAPR02MB55094915935E2B24286CB519BEA70BYAPR02MB5509namp_
-Content-Type: text/html; charset="Windows-1252"
-Content-Transfer-Encoding: quoted-printable
+--0-NN-0_NNNNNNNN_NNNNNNNN_NNNNNNNN
 
-<html>
-<head>
-<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3DWindows-1=
-252">
-<style type=3D"text/css" style=3D"display:none;"> P {margin-top:0;margin-bo=
-ttom:0;} </style>
-</head>
-<body dir=3D"ltr">
-<div class=3D"WordSection1"></div>
-<div class=3D"WordSection1">
-<p class=3D"MsoNormal" style=3D"margin: 0in 0in 0.0001pt; font-size: 11pt; =
-font-family: Calibri, sans-serif;">
-I=92m looking at a testcase failure when my target uses 64bit time in <span=
- class=3D"SpellE">
-msg.h</span> (struct <span class=3D"SpellE">msqid_ds</span>).<span style=3D=
-"">&nbsp; </span>
-I=92ve been able to get around this but changing <span class=3D"SpellE">tar=
-get_msqid_ds</span> like so:</p>
-<p class=3D"MsoNormal" style=3D"margin: 0in 0in 0.0001pt; font-size: 11pt; =
-font-family: Calibri, sans-serif;">
-<br>
-</p>
-<div class=3D"MsoNormal" style=3D"margin: 0px 0in 0.000133333px; font-size:=
- 11pt; font-family: Calibri, sans-serif;">
-<span>@@ -3900,18 &#43;3901,9 @@ static inline abi_long do_semop(int semid,=
- abi_long ptr,
-<br>
-</span>
-<div>unsigned nsops)<br>
-</div>
-<div>&nbsp;struct target_msqid_ds<br>
-</div>
-<div>&nbsp;{<br>
-</div>
-<div>&nbsp; &nbsp; &nbsp;struct target_ipc_perm msg_perm;<br>
-</div>
-<div>- &nbsp; &nbsp;abi_ulong msg_stime;<br>
-</div>
-<div>-#if TARGET_ABI_BITS =3D=3D 32<br>
-</div>
-<div>- &nbsp; &nbsp;abi_ulong __unused1;<br>
-</div>
-<div>-#endif<br>
-</div>
-<div>- &nbsp; &nbsp;abi_ulong msg_rtime;<br>
-</div>
-<div>-#if TARGET_ABI_BITS =3D=3D 32<br>
-</div>
-<div>- &nbsp; &nbsp;abi_ulong __unused2;<br>
-</div>
-<div>-#endif<br>
-</div>
-<div>- &nbsp; &nbsp;abi_ulong msg_ctime;<br>
-</div>
-<div>-#if TARGET_ABI_BITS =3D=3D 32<br>
-</div>
-<div>- &nbsp; &nbsp;abi_ulong __unused3;<br>
-</div>
-<div>-#endif<br>
-</div>
-<div>&#43; &nbsp; &nbsp;abi_ullong msg_stime;<br>
-</div>
-<div>&#43; &nbsp; &nbsp;abi_ullong msg_rtime;<br>
-</div>
-<div>&#43; &nbsp; &nbsp;abi_ullong msg_ctime;<br>
-</div>
-<div>&nbsp; &nbsp; &nbsp;abi_ulong __msg_cbytes;<br>
-</div>
-<div>&nbsp; &nbsp; &nbsp;abi_ulong msg_qnum;<br>
-</div>
-<div>&nbsp; &nbsp; &nbsp;abi_ulong msg_qbytes;<br>
-</div>
-<div><br>
-</div>
-<div>It seems like either should have worked but I get garbage back in some=
- of the elements below msg_time fields without the change.</div>
-<div><br>
-</div>
-<div>If time_t is 64bits then it seems like stime/rtime/ctime should be abi=
-_ullong.</div>
-<div><br>
-</div>
-<div>My target is Hexagon and the TARGET_ABI_BITS is 32.</div>
-<div><br>
-</div>
-<div>Thanks,</div>
-<span></span></div>
-</div>
-</body>
-</html>
+as our 32 subclusters, with sc_index of 8.  You will end up skipping 
+subclusters 0-3, but NOT 6 and 7.  Still, even though we spend time 
+copying the allocated contents of those two subclusters, we also copy 
+the subcluster status, and the guest still ends up reading the same data 
+as before.  I don't know if it is worth trying to further minimize I/O 
+to non-contiguous zero/unalloc subclusters in the head.
 
---_000_BYAPR02MB55094915935E2B24286CB519BEA70BYAPR02MB5509namp_--
+> +        }
+> +        case QCOW2_SUBCLUSTER_ZERO_PLAIN:
+> +        case QCOW2_SUBCLUSTER_UNALLOCATED_PLAIN:
+> +            cow_start_from = sc_index << s->subcluster_bits;
+> +            break;
+> +        default:
+> +            g_assert_not_reached();
+> +        }
+>       } else {
+> -        cow_start_from = 0;
+> +        switch (type) {
+> +        case QCOW2_SUBCLUSTER_NORMAL:
+> +            cow_start_from = cow_start_to;
+> +            break;
+> +        case QCOW2_SUBCLUSTER_ZERO_ALLOC:
+> +        case QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC:
+> +            cow_start_from = sc_index << s->subcluster_bits;
+> +            break;
+> +        default:
+> +            g_assert_not_reached();
+> +        }
+>       }
+>   
+>       /* Get the L2 entry of the last cluster */
+> -    l2_entry = get_l2_entry(s, l2_slice, l2_index + nb_clusters - 1);
+> -    type = qcow2_get_cluster_type(bs, l2_entry);
+> +    l2_index += nb_clusters - 1;
+> +    l2_entry = get_l2_entry(s, l2_slice, l2_index);
+> +    l2_bitmap = get_l2_bitmap(s, l2_slice, l2_index);
+> +    sc_index = offset_to_sc_index(s, guest_offset + bytes - 1);
+> +    type = qcow2_get_subcluster_type(bs, l2_entry, l2_bitmap, sc_index);
+
+[1] but here, we are skipping any intermediate clusters, and worrying 
+only about the state of the final cluster.  Is that always going to do 
+the correct thing, or will there be cases where we need to update the L2 
+entries of intermediate clusters?  If we don't check specifically for 
+INVALID in the initial subcluster, but instead break the loop as soon as 
+we find non-NORMAL, then it seems like the rest of the function should 
+fragment the overall request to deal with just the clusters up to the 
+point where we found a non-NORMAL, and leave the remaining portion of 
+the original request for another round.
+
+Thus, I'm not convinced that this patch is quite right.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
