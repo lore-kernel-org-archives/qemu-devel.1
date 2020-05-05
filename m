@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C044C47247
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 08:19:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 342E2C47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 08:20:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53ED32068E
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 08:19:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53ED32068E
+	by mail.kernel.org (Postfix) with ESMTPS id 09FD32068E
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 08:20:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09FD32068E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVsnn-00058k-Gc
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 04:19:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60510)
+	id 1jVsoJ-0005vE-68
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 04:20:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60864)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jVsmF-0003Uo-BL
- for qemu-devel@nongnu.org; Tue, 05 May 2020 04:18:07 -0400
-Resent-Date: Tue, 05 May 2020 04:18:07 -0400
-Resent-Message-Id: <E1jVsmF-0003Uo-BL@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21392)
+ id 1jVsnX-0004zQ-Ph
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 04:19:27 -0400
+Resent-Date: Tue, 05 May 2020 04:19:27 -0400
+Resent-Message-Id: <E1jVsnX-0004zQ-Ph@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21317)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jVsmC-0001kM-Ug
- for qemu-devel@nongnu.org; Tue, 05 May 2020 04:18:06 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1588666677; cv=none; 
+ id 1jVsnW-00039J-S8
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 04:19:27 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1588666761; cv=none; 
  d=zohomail.com; s=zohoarc; 
- b=lGf+Ko5l5QzXJvEfLEvwR79nfG2IjwyIjFDAv67vtmAVuFoQ0vp42uOJBavk50fesSwyDEVqYqHcuR4yeSkI3tNQ+9REslooN3dWHqnln9X7pC7GsdVwb734fw0kdiFRlIMtEwxbV7ILtmIixkeejnL5XAqjinah0HvVkO289IU=
+ b=j46j/YZEsmNVMXuXZ8hjqoFqfioWF3HpyI4vFcd7tSB2TUwuwVfw0VwHBKo2V87zqGNeWGaOSkv8zp/04gHI19fhs6cZD+rf6Zx7ED3nxmb088LoAwq17yI623DKPBZATmc85L8QItxqu9/AuFZMn2s82AZUnkcHCnGOLcCkN/M=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1588666677;
+ s=zohoarc; t=1588666761;
  h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=u0G0aE1/AeBFlFNrGlmXexQaqMQu+qU/RDVEJvoveFU=; 
- b=YtMOmiostfeNbFmlAHCaR0ej4Cf0Nx8Qauk/iVdUwov5oZsDERnicGdgn4BIcrBEdSSrIIBKV41o2aKz/0NVOlxQ2KQ8+kjijGOD1gD8qPUyjv0Dnj7/MR025qQPvNxFNEnYj0aWb37Bz7oKwiWr4fxLWTmhMzkRxbGvn8ofybg=
+ bh=6z2Bq+pHTWy1keED0eUwVvdtDcig/MAV4Xh7QodbSi4=; 
+ b=EJXkH5EUyhCxW0J+8lRg0+HBCqsU57aG6xiG0u9D8Y03V/0sVwRk/pz8KOszwuNvZvsE6VplvXeZxwTvXtZ2ya4Sy+y1cP98dWE/6jojrRHPxXQV6QqG7D1d6QeshgDToueh4yMiuxTdva9iptb+SdljK3Mg8OEyF+sJhadA1Y0=
 ARC-Authentication-Results: i=1; mx.zohomail.com;
  spf=pass  smtp.mailfrom=no-reply@patchew.org;
  dmarc=pass header.from=<no-reply@patchew.org>
  header.from=<no-reply@patchew.org>
 Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1588666676519168.14042809963087;
- Tue, 5 May 2020 01:17:56 -0700 (PDT)
-Message-ID: <158866667557.24779.1454260894222986896@45ef0f9c86ae>
-In-Reply-To: <20200504132300.1AE883C10EF@aeryn.lan.ktmba>
-Subject: Re: [PATCH v5] audio/jack: add JACK client audiodev
+ mx.zohomail.com with SMTPS id 1588666759427170.61205865211105;
+ Tue, 5 May 2020 01:19:19 -0700 (PDT)
+Message-ID: <158866675854.24779.8384250574196591727@45ef0f9c86ae>
+In-Reply-To: <20200504123309.3808-1-peter.maydell@linaro.org>
+Subject: Re: [PULL 00/39] target-arm queue
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
 Resent-From: 
 From: no-reply@patchew.org
-To: geoff@hostfission.com
-Date: Tue, 5 May 2020 01:17:56 -0700 (PDT)
+To: peter.maydell@linaro.org
+Date: Tue, 5 May 2020 01:19:19 -0700 (PDT)
 X-ZohoMailClient: External
 Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
  helo=sender4-of-o53.zoho.com
@@ -87,19 +87,20 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUwNDEzMjMwMC4xQUU4
-ODNDMTBFRkBhZXJ5bi5sYW4ua3RtYmEvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIGJ1aWxk
-IHRlc3Qgb24gRnJlZUJTRCBob3N0LiBQbGVhc2UgZmluZCB0aGUgZGV0YWlscyBiZWxvdy4KCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKIyBUZXN0aW5nIHNjcmlwdCB3aWxs
-IGJlIGludm9rZWQgdW5kZXIgdGhlIGdpdCBjaGVja291dCB3aXRoCiMgSEVBRCBwb2ludGluZyB0
-byBhIGNvbW1pdCB0aGF0IGhhcyB0aGUgcGF0Y2hlcyBhcHBsaWVkIG9uIHRvcCBvZiAiYmFzZSIK
-IyBicmFuY2gKaWYgcWVtdS1zeXN0ZW0teDg2XzY0IC0taGVscCA+L2Rldi9udWxsIDI+JjE7IHRo
-ZW4KICBRRU1VPXFlbXUtc3lzdGVtLXg4Nl82NAplbGlmIC91c3IvbGliZXhlYy9xZW11LWt2bSAt
-LWhlbHAgPi9kZXYvbnVsbCAyPiYxOyB0aGVuCiAgUUVNVT0vdXNyL2xpYmV4ZWMvcWVtdS1rdm0K
-ZWxzZQogIGV4aXQgMQpmaQptYWtlIHZtLWJ1aWxkLWZyZWVic2QgSj0yMSBRRU1VPSRRRU1VCmV4
-aXQgMAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJs
-ZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDUwNDEzMjMwMC4xQUU4ODNDMTBFRkBh
-ZXJ5bi5sYW4ua3RtYmEvdGVzdGluZy5GcmVlQlNELz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10u
-ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUwNDEyMzMwOS4zODA4
+LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCBi
+dWlsZCB0ZXN0IG9uIEZyZWVCU0QgaG9zdC4gUGxlYXNlIGZpbmQgdGhlIGRldGFpbHMgYmVsb3cu
+Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCiMgVGVzdGluZyBzY3JpcHQg
+d2lsbCBiZSBpbnZva2VkIHVuZGVyIHRoZSBnaXQgY2hlY2tvdXQgd2l0aAojIEhFQUQgcG9pbnRp
+bmcgdG8gYSBjb21taXQgdGhhdCBoYXMgdGhlIHBhdGNoZXMgYXBwbGllZCBvbiB0b3Agb2YgImJh
+c2UiCiMgYnJhbmNoCmlmIHFlbXUtc3lzdGVtLXg4Nl82NCAtLWhlbHAgPi9kZXYvbnVsbCAyPiYx
+OyB0aGVuCiAgUUVNVT1xZW11LXN5c3RlbS14ODZfNjQKZWxpZiAvdXNyL2xpYmV4ZWMvcWVtdS1r
+dm0gLS1oZWxwID4vZGV2L251bGwgMj4mMTsgdGhlbgogIFFFTVU9L3Vzci9saWJleGVjL3FlbXUt
+a3ZtCmVsc2UKICBleGl0IDEKZmkKbWFrZSB2bS1idWlsZC1mcmVlYnNkIEo9MjEgUUVNVT0kUUVN
+VQpleGl0IDAKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCgoKClRoZSBmdWxsIGxvZyBpcyBhdmFp
+bGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA1MDQxMjMzMDkuMzgwOC0xLXBl
+dGVyLm1heWRlbGxAbGluYXJvLm9yZy90ZXN0aW5nLkZyZWVCU0QvP3R5cGU9bWVzc2FnZS4KLS0t
+CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hl
+dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
+dC5jb20=
 
