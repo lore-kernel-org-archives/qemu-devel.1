@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2109C47258
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 20:13:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A886C47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 20:14:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F66820663
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 20:13:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0BA8C2068E
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 20:14:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hoNNVrr5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F66820663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ddhKcWLY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BA8C2068E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jW3wo-0004zY-Ll
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 16:13:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42204)
+	id 1jW3xd-0006PL-O7
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 16:14:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jW3sA-00048z-4P
- for qemu-devel@nongnu.org; Tue, 05 May 2020 16:08:58 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21257
+ id 1jW3sK-0004Zv-82
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 16:09:08 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39905
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jW3s8-0000qf-AN
- for qemu-devel@nongnu.org; Tue, 05 May 2020 16:08:57 -0400
+ id 1jW3sH-0000s4-Uc
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 16:09:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588709335;
+ s=mimecast20190719; t=1588709345;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=sjivW3YQQe3fQynwdH3UyJeViz3dyZP8Vo8YaPVKWeY=;
- b=hoNNVrr5MzotgfyDvCLgnpmThClHf+HI1M3RvllwV4FDBlXv85+scbJGJSoiplJ8adSOXW
- 0k5TH4ZZ7xEM8mBoKPCLDOFbLQvJ4+1h0dX7ZGsBZNSMLPfEH2QgGzJiOfUTOYDN0Df8kS
- 1Dc6YDySkREAtz4uWSeH3Gtig+Q3cMM=
+ bh=mp8toag1KOdLycVqz03dtpucaf++c5WLObukaamtrkE=;
+ b=ddhKcWLYbR/hCiv15GE8B1JdzIQcYcdnKPY1jMCNLtRqJdU+8Jmxug89QyJpRXP8UHX3De
+ jmhts0UTuKNFDuyo3TEkK1sG0+Hn+GPrhW8fR1KnlhJMBRaF4NxIYpqKOUqk0UuCrICu/c
+ BBY4Zb0BjGv9Fcu8ha8Vox/2EO8jQxM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-149-WYD0Qh0vPLW1pEGOj9-vwA-1; Tue, 05 May 2020 16:08:51 -0400
-X-MC-Unique: WYD0Qh0vPLW1pEGOj9-vwA-1
+ us-mta-474-s1hyplsTN6qD_5_bjJKS0A-1; Tue, 05 May 2020 16:09:02 -0400
+X-MC-Unique: s1hyplsTN6qD_5_bjJKS0A-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF01B805720;
- Tue,  5 May 2020 20:08:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90FE6468;
+ Tue,  5 May 2020 20:09:01 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.34])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AACA364425;
- Tue,  5 May 2020 20:08:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4D37663F95;
+ Tue,  5 May 2020 20:08:59 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 10/14] iotests: qemu-img tests for luks key management
-Date: Tue,  5 May 2020 23:08:15 +0300
-Message-Id: <20200505200819.5662-11-mlevitsk@redhat.com>
+Subject: [PATCH v4 14/14] iotests: add tests for blockdev-amend
+Date: Tue,  5 May 2020 23:08:19 +0300
+Message-Id: <20200505200819.5662-15-mlevitsk@redhat.com>
 In-Reply-To: <20200505200819.5662-1-mlevitsk@redhat.com>
 References: <20200505200819.5662-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -71,10 +71,10 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mlevitsk@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mlevitsk@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 15:23:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -103,33 +103,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This commit adds two tests, which test the new amend interface
-of both luks raw images and qcow2 luks encrypted images.
+This commit adds two tests that cover the
+new blockdev-amend functionality of luks and qcow2 driver
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- tests/qemu-iotests/300     | 207 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/300.out |  99 ++++++++++++++++++
- tests/qemu-iotests/301     |  90 ++++++++++++++++
- tests/qemu-iotests/301.out |  30 ++++++
- tests/qemu-iotests/group   |   3 +
- 5 files changed, 429 insertions(+)
- create mode 100755 tests/qemu-iotests/300
- create mode 100644 tests/qemu-iotests/300.out
- create mode 100755 tests/qemu-iotests/301
- create mode 100644 tests/qemu-iotests/301.out
+ tests/qemu-iotests/302     | 278 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/302.out |  40 ++++++
+ tests/qemu-iotests/303     | 233 +++++++++++++++++++++++++++++++
+ tests/qemu-iotests/303.out |  33 +++++
+ tests/qemu-iotests/group   |   2 +
+ 5 files changed, 586 insertions(+)
+ create mode 100755 tests/qemu-iotests/302
+ create mode 100644 tests/qemu-iotests/302.out
+ create mode 100755 tests/qemu-iotests/303
+ create mode 100644 tests/qemu-iotests/303.out
 
-diff --git a/tests/qemu-iotests/300 b/tests/qemu-iotests/300
+diff --git a/tests/qemu-iotests/302 b/tests/qemu-iotests/302
 new file mode 100755
-index 0000000000..aa1a77690f
+index 0000000000..f7b4d13bd2
 --- /dev/null
-+++ b/tests/qemu-iotests/300
-@@ -0,0 +1,207 @@
-+#!/usr/bin/env bash
++++ b/tests/qemu-iotests/302
+@@ -0,0 +1,278 @@
++#!/usr/bin/env python3
 +#
-+# Test encryption key management with luks
-+# Based on 134
++# Test case QMP's encrypted key management
 +#
 +# Copyright (C) 2019 Red Hat, Inc.
 +#
@@ -147,349 +146,334 @@ index 0000000000..aa1a77690f
 +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 +#
 +
-+# creator
-+owner=3Dmlevitsk@redhat.com
++import iotests
++import os
++import time
++import json
 +
-+seq=3D`basename $0`
-+echo "QA output created by $seq"
++test_img =3D os.path.join(iotests.test_dir, 'test.img')
 +
-+status=3D1=09# failure is the default!
++class Secret:
++    def __init__(self, index):
++        self._id =3D "keysec" + str(index)
++        # you are not supposed to see the password...
++        self._secret =3D "hunter" + str(index)
 +
-+_cleanup()
-+{
-+=09_cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
++    def id(self):
++        return self._id
 +
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
++    def secret(self):
++        return self._secret
 +
-+_supported_fmt qcow2 luks
-+_supported_proto file #TODO
++    def to_cmdline_object(self):
++        return  [ "secret,id=3D" + self._id + ",data=3D" + self._secret]
 +
-+QEMU_IO_OPTIONS=3D$QEMU_IO_OPTIONS_NO_FMT
++    def to_qmp_object(self):
++        return { "qom_type" : "secret", "id": self.id(),
++                 "props": { "data": self.secret() } }
 +
-+if [ "$IMGFMT" =3D "qcow2" ] ; then
-+=09PR=3D"encrypt."
-+=09EXTRA_IMG_ARGS=3D"-o encrypt.format=3Dluks"
-+fi
++##########################################################################=
+######
++class EncryptionSetupTestCase(iotests.QMPTestCase):
 +
++    # test case startup
++    def setUp(self):
++        # start the VM
++        self.vm =3D iotests.VM()
++        self.vm.launch()
 +
-+# secrets: you are supposed to see the password as *******, see :-)
-+S0=3D"--object secret,id=3Dsec0,data=3Dhunter0"
-+S1=3D"--object secret,id=3Dsec1,data=3Dhunter1"
-+S2=3D"--object secret,id=3Dsec2,data=3Dhunter2"
-+S3=3D"--object secret,id=3Dsec3,data=3Dhunter3"
-+S4=3D"--object secret,id=3Dsec4,data=3Dhunter4"
-+SECRETS=3D"$S0 $S1 $S2 $S3 $S4"
++        # create the secrets and load 'em into the VM
++        self.secrets =3D [ Secret(i) for i in range(0, 6) ]
++        for secret in self.secrets:
++            result =3D self.vm.qmp("object-add", **secret.to_qmp_object())
++            self.assert_qmp(result, 'return', {})
 +
-+# image with given secret
-+IMGS0=3D"--image-opts driver=3D$IMGFMT,file.filename=3D$TEST_IMG,${PR}key-=
-secret=3Dsec0"
-+IMGS1=3D"--image-opts driver=3D$IMGFMT,file.filename=3D$TEST_IMG,${PR}key-=
-secret=3Dsec1"
-+IMGS2=3D"--image-opts driver=3D$IMGFMT,file.filename=3D$TEST_IMG,${PR}key-=
-secret=3Dsec2"
-+IMGS3=3D"--image-opts driver=3D$IMGFMT,file.filename=3D$TEST_IMG,${PR}key-=
-secret=3Dsec3"
-+IMGS4=3D"--image-opts driver=3D$IMGFMT,file.filename=3D$TEST_IMG,${PR}key-=
-secret=3Dsec4"
++        if iotests.imgfmt =3D=3D "qcow2":
++            self.pfx =3D "encrypt."
++            self.img_opts =3D [ '-o', "encrypt.format=3Dluks" ]
++        else:
++            self.pfx =3D ""
++            self.img_opts =3D []
 +
++    # test case shutdown
++    def tearDown(self):
++        # stop the VM
++        self.vm.shutdown()
 +
-+echo "=3D=3D creating a test image =3D=3D"
-+_make_test_img $S0 $EXTRA_IMG_ARGS -o ${PR}key-secret=3Dsec0,${PR}iter-tim=
-e=3D10 32M
++    ######################################################################=
+#####
++    # create the encrypted block device
++    def createImg(self, file, secret):
 +
-+echo
-+echo "=3D=3D test that key 0 opens the image =3D=3D"
-+$QEMU_IO $S0 -c "read 0 4096" $IMGS0 | _filter_qemu_io | _filter_testdir
++        iotests.qemu_img(
++            'create',
++            '--object', *secret.to_cmdline_object(),
++            '-f', iotests.imgfmt,
++            '-o', self.pfx + 'key-secret=3D' + secret.id(),
++            '-o', self.pfx + 'iter-time=3D10',
++            *self.img_opts,
++            file,
++            '1M')
 +
-+echo
-+echo "=3D=3D adding a password to slot 4 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS0 -o ${PR}state=3Dactive,${PR}new-secret=3Ds=
-ec4,${PR}iter-time=3D10,${PR}keyslot=3D4
-+echo "=3D=3D adding a password to slot 1 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS0 -o ${PR}state=3Dactive,${PR}new-secret=3Ds=
-ec1,${PR}iter-time=3D10
-+echo "=3D=3D adding a password to slot 3 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dactive,${PR}new-secret=3Ds=
-ec3,${PR}iter-time=3D10,${PR}keyslot=3D3
++    ######################################################################=
+#####
++    # open an encrypted block device
++    def openImageQmp(self, id, file, secret, read_only =3D False):
 +
-+echo "=3D=3D adding a password to slot 2 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS3 -o ${PR}state=3Dactive,${PR}new-secret=3Ds=
-ec2,${PR}iter-time=3D10
++        encrypt_options =3D {
++            'key-secret' : secret.id()
++        }
 +
++        if iotests.imgfmt =3D=3D "qcow2":
++            encrypt_options =3D {
++                'encrypt': {
++                    'format':'luks',
++                    **encrypt_options
++                }
++            }
 +
-+echo "=3D=3D erase slot 4 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}keyslot=3D4 =
-| _filter_img_create
++        result =3D self.vm.qmp('blockdev-add', **
++            {
++                'driver': iotests.imgfmt,
++                'node-name': id,
++                'read-only': read_only,
 +
++                **encrypt_options,
 +
-+echo
-+echo "=3D=3D all secrets should work =3D=3D"
-+for IMG in "$IMGS0" "$IMGS1" "$IMGS2" "$IMGS3"; do
-+=09$QEMU_IO $SECRETS -c "read 0 4096" $IMG | _filter_qemu_io | _filter_tes=
-tdir
-+done
++                'file': {
++                    'driver': 'file',
++                    'filename': test_img,
++                }
++            }
++        )
++        self.assert_qmp(result, 'return', {})
 +
-+echo
-+echo "=3D=3D erase slot 0 and try it =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}old-secret=
-=3Dsec0 | _filter_img_create
-+$QEMU_IO $SECRETS -c "read 0 4096" $IMGS0 | _filter_qemu_io | _filter_test=
-dir
++    # close the encrypted block device
++    def closeImageQmp(self, id):
++        result =3D self.vm.qmp('blockdev-del', **{ 'node-name': id })
++        self.assert_qmp(result, 'return', {})
 +
-+echo
-+echo "=3D=3D erase slot 2 and try it =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}keyslot=3D2 =
-| _filter_img_create
-+$QEMU_IO $SECRETS -c "read 0 4096" $IMGS2 | _filter_qemu_io | _filter_test=
-dir
++    ######################################################################=
+#####
++    # add a key to an encrypted block device
++    def addKeyQmp(self, id, new_secret, secret =3D None,
++                  slot =3D None, force =3D False):
 +
++        crypt_options =3D {
++            'state'      : 'active',
++            'new-secret' : new_secret.id(),
++            'iter-time' : 10
++        }
 +
-+# at this point slots 1 and 3 should be active
-+
-+echo
-+echo "=3D=3D filling  4 slots with secret 2 =3D=3D"
-+for i in $(seq 0 3) ; do
-+=09$QEMU_IMG amend $SECRETS $IMGS3 -o ${PR}state=3Dactive,${PR}new-secret=
-=3Dsec2,${PR}iter-time=3D10
-+done
-+
-+echo
-+echo "=3D=3D adding secret 0 =3D=3D"
-+=09$QEMU_IMG amend $SECRETS $IMGS3 -o ${PR}state=3Dactive,${PR}new-secret=
-=3Dsec0,${PR}iter-time=3D10
-+
-+echo
-+echo "=3D=3D adding secret 3 (last slot) =3D=3D"
-+=09$QEMU_IMG amend $SECRETS $IMGS3 -o ${PR}state=3Dactive,${PR}new-secret=
-=3Dsec3,${PR}iter-time=3D10
-+
-+echo
-+echo "=3D=3D trying to add another slot (should fail) =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS2 -o ${PR}state=3Dactive,${PR}new-secret=3Ds=
-ec3,${PR}iter-time=3D10
-+
-+echo
-+echo "=3D=3D all secrets should work again =3D=3D"
-+for IMG in "$IMGS0" "$IMGS1" "$IMGS2" "$IMGS3"; do
-+=09$QEMU_IO $SECRETS -c "read 0 4096" $IMG | _filter_qemu_io | _filter_tes=
-tdir
-+done
++        if slot !=3D None:
++            crypt_options['keyslot'] =3D slot
 +
 +
-+echo
++        if secret !=3D None:
++            crypt_options['secret'] =3D secret.id()
 +
-+echo "=3D=3D erase all keys of secret 2=3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}old-secret=
-=3Dsec2
++        if iotests.imgfmt =3D=3D "qcow2":
++            crypt_options['format'] =3D 'luks'
++            crypt_options =3D {
++                'encrypt': crypt_options
++            }
 +
-+echo "=3D=3D erase all keys of secret 1=3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}old-secret=
-=3Dsec1
++        args =3D {
++            'node-name': id,
++            'job-id' : 'job_add_key',
++            'options' : {
++                    'driver' : iotests.imgfmt,
++                    **crypt_options
++                },
++        }
 +
-+echo "=3D=3D erase all keys of secret 0=3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS0 -o ${PR}state=3Dinactive,${PR}old-secret=
-=3Dsec0
++        if force =3D=3D True:
++            args['force'] =3D True
 +
-+echo "=3D=3D erasing secret3 will fail now since it is the only secret (in=
- 3 slots) =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS3 -o ${PR}state=3Dinactive,${PR}old-secret=
-=3Dsec3
++        #TODO: check what jobs return
++        result =3D self.vm.qmp('x-blockdev-amend', **args)
++        assert result['return'] =3D=3D {}
++        self.vm.run_job('job_add_key')
 +
-+echo
-+echo "=3D=3D only secret3 should work now  =3D=3D"
-+for IMG in "$IMGS0" "$IMGS1" "$IMGS2" "$IMGS3"; do
-+=09$QEMU_IO $SECRETS -c "read 0 4096" $IMG | _filter_qemu_io | _filter_tes=
-tdir
-+done
++    # erase a key from an encrypted block device
++    def eraseKeyQmp(self, id, old_secret =3D None, slot =3D None, force =
+=3D False):
 +
-+echo
-+echo "=3D=3D add secret0  =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS3 -o ${PR}state=3Dactive,${PR}new-secret=3Ds=
-ec0,${PR}iter-time=3D10
++        crypt_options =3D {
++            'state'      : 'inactive',
++        }
 +
-+echo "=3D=3D erase secret3 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS0 -o ${PR}state=3Dinactive,${PR}old-secret=
-=3Dsec3
++        if slot !=3D None:
++            crypt_options['keyslot'] =3D slot
++        if old_secret !=3D None:
++            crypt_options['old-secret'] =3D old_secret.id()
 +
-+echo
-+echo "=3D=3D only secret0 should work now  =3D=3D"
-+for IMG in "$IMGS0" "$IMGS1" "$IMGS2" "$IMGS3"; do
-+=09$QEMU_IO $SECRETS -c "read 0 4096" $IMG | _filter_qemu_io | _filter_tes=
-tdir
-+done
++        if iotests.imgfmt =3D=3D "qcow2":
++            crypt_options['format'] =3D 'luks'
++            crypt_options =3D {
++                'encrypt': crypt_options
++            }
 +
-+echo
-+echo "=3D=3D replace secret0 with secret1 (should fail)  =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS0 -o ${PR}state=3Dactive,${PR}new-secret=3Ds=
-ec1,${PR}keyslot=3D0
++        args =3D {
++            'node-name': id,
++            'job-id' : 'job_erase_key',
++            'options' : {
++                    'driver' : iotests.imgfmt,
++                    **crypt_options
++                },
++        }
 +
-+echo
-+echo "=3D=3D replace secret0 with secret1 with force (should work)  =3D=3D=
-"
-+$QEMU_IMG amend $SECRETS $IMGS0 -o ${PR}state=3Dactive,${PR}new-secret=3Ds=
-ec1,${PR}iter-time=3D10,${PR}keyslot=3D0 --force
++        if force =3D=3D True:
++            args['force'] =3D True
 +
-+echo
-+echo "=3D=3D only secret1 should work now  =3D=3D"
-+for IMG in "$IMGS0" "$IMGS1" "$IMGS2" "$IMGS3"; do
-+=09$QEMU_IO $SECRETS -c "read 0 4096" $IMG | _filter_qemu_io | _filter_tes=
-tdir
-+done
++        result =3D self.vm.qmp('x-blockdev-amend', **args)
++        assert result['return'] =3D=3D {}
++        self.vm.run_job('job_erase_key')
++
++    ######################################################################=
+#####
++    # create image, and change its key
++    def testChangeKey(self):
++
++        # create the image with secret0 and open it
++        self.createImg(test_img, self.secrets[0]);
++        self.openImageQmp("testdev", test_img, self.secrets[0])
++
++        # add key to slot 1
++        self.addKeyQmp("testdev", new_secret =3D self.secrets[1])
++
++        # add key to slot 5
++        self.addKeyQmp("testdev", new_secret =3D self.secrets[2], slot=3D5=
+)
++
++        # erase key from slot 0
++        self.eraseKeyQmp("testdev", old_secret =3D self.secrets[0])
++
++        #reopen the image with secret1
++        self.closeImageQmp("testdev")
++        self.openImageQmp("testdev", test_img, self.secrets[1])
++
++        # close and erase the image for good
++        self.closeImageQmp("testdev")
++        os.remove(test_img)
++
++    # test that if we erase the old password,
++    # we can still change the encryption keys using 'old-secret'
++    def testOldPassword(self):
++
++        # create the image with secret0 and open it
++        self.createImg(test_img, self.secrets[0]);
++        self.openImageQmp("testdev", test_img, self.secrets[0])
++
++        # add key to slot 1
++        self.addKeyQmp("testdev", new_secret =3D self.secrets[1])
++
++        # erase key from slot 0
++        self.eraseKeyQmp("testdev", old_secret =3D self.secrets[0])
++
++        # this will fail as the old password is no longer valid
++        self.addKeyQmp("testdev", new_secret =3D self.secrets[2])
++
++        # this will work
++        self.addKeyQmp("testdev", new_secret =3D self.secrets[2], secret =
+=3D self.secrets[1])
++
++        # close and erase the image for good
++        self.closeImageQmp("testdev")
++        os.remove(test_img)
++
++    def testUseForceLuke(self):
++
++        self.createImg(test_img, self.secrets[0]);
++        self.openImageQmp("testdev", test_img, self.secrets[0])
++
++        # Add bunch of secrets
++        self.addKeyQmp("testdev", new_secret =3D self.secrets[1], slot=3D4=
+)
++        self.addKeyQmp("testdev", new_secret =3D self.secrets[4], slot=3D2=
+)
++
++        # overwrite an active secret
++        self.addKeyQmp("testdev", new_secret =3D self.secrets[5], slot=3D2=
+)
++        self.addKeyQmp("testdev", new_secret =3D self.secrets[5], slot=3D2=
+, force=3DTrue)
++
++        self.addKeyQmp("testdev", new_secret =3D self.secrets[0])
++
++        # Now erase all the secrets
++        self.eraseKeyQmp("testdev", old_secret =3D self.secrets[5])
++        self.eraseKeyQmp("testdev", slot=3D4)
++
++        # erase last keyslot
++        self.eraseKeyQmp("testdev", old_secret =3D self.secrets[0])
++        self.eraseKeyQmp("testdev", old_secret =3D self.secrets[0], force=
+=3DTrue)
++
++        self.closeImageQmp("testdev")
++        os.remove(test_img)
 +
 +
-+echo
-+echo "=3D=3D erase last secret (should fail)  =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}keyslot=3D0
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}old-secret=
-=3Dsec1
-+
-+
-+echo "=3D=3D erase non existing secrets (should fail)  =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}old-secret=
-=3Dsec5 --force
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}old-secret=
-=3Dsec0 --force
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}keyslot=3D1 =
---force
-+
-+echo
-+echo "=3D=3D erase last secret with force by slot (should work)  =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}keyslot=3D0 =
---force
-+
-+echo
-+echo "=3D=3D we have no secrets now, data is lost forever =3D=3D"
-+for IMG in "$IMGS0" "$IMGS1" "$IMGS2" "$IMGS3"; do
-+=09$QEMU_IO $SECRETS -c "read 0 4096" $IMG | _filter_qemu_io | _filter_tes=
-tdir
-+done
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=3D0
-+
-diff --git a/tests/qemu-iotests/300.out b/tests/qemu-iotests/300.out
++if __name__ =3D=3D '__main__':
++    # Encrypted formats support
++    iotests.main(supported_fmts =3D ['qcow2', 'luks'])
+diff --git a/tests/qemu-iotests/302.out b/tests/qemu-iotests/302.out
 new file mode 100644
-index 0000000000..081b092342
+index 0000000000..750116fd56
 --- /dev/null
-+++ b/tests/qemu-iotests/300.out
-@@ -0,0 +1,99 @@
-+QA output created by 300
-+=3D=3D creating a test image =3D=3D
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D33554432
++++ b/tests/qemu-iotests/302.out
+@@ -0,0 +1,40 @@
++...
++----------------------------------------------------------------------
++Ran 3 tests
 +
-+=3D=3D test that key 0 opens the image =3D=3D
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=3D=3D adding a password to slot 4 =3D=3D
-+=3D=3D adding a password to slot 1 =3D=3D
-+=3D=3D adding a password to slot 3 =3D=3D
-+=3D=3D adding a password to slot 2 =3D=3D
-+=3D=3D erase slot 4 =3D=3D
-+
-+=3D=3D all secrets should work =3D=3D
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=3D=3D erase slot 0 and try it =3D=3D
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+=3D=3D erase slot 2 and try it =3D=3D
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+=3D=3D filling  4 slots with secret 2 =3D=3D
-+
-+=3D=3D adding secret 0 =3D=3D
-+
-+=3D=3D adding secret 3 (last slot) =3D=3D
-+
-+=3D=3D trying to add another slot (should fail) =3D=3D
-+qemu-img: Can't add a keyslot - all keyslots are in use
-+
-+=3D=3D all secrets should work again =3D=3D
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=3D=3D erase all keys of secret 2=3D=3D
-+=3D=3D erase all keys of secret 1=3D=3D
-+=3D=3D erase all keys of secret 0=3D=3D
-+=3D=3D erasing secret3 will fail now since it is the only secret (in 3 slo=
-ts) =3D=3D
-+qemu-img: All the active keyslots match the (old) password that was given =
-and erasing them will erase all the data in the image irreversibly - refusi=
-ng operation
-+
-+=3D=3D only secret3 should work now  =3D=3D
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=3D=3D add secret0  =3D=3D
-+=3D=3D erase secret3 =3D=3D
-+
-+=3D=3D only secret0 should work now  =3D=3D
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+=3D=3D replace secret0 with secret1 (should fail)  =3D=3D
-+qemu-img: Refusing to overwrite active keyslot 0 - please erase it first
-+
-+=3D=3D replace secret0 with secret1 with force (should work)  =3D=3D
-+
-+=3D=3D only secret1 should work now  =3D=3D
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+=3D=3D erase last secret (should fail)  =3D=3D
-+qemu-img: Attempt to erase the only active keyslot 0 which will erase all =
-the data in the image irreversibly - refusing operation
-+qemu-img: All the active keyslots match the (old) password that was given =
-and erasing them will erase all the data in the image irreversibly - refusi=
-ng operation
-+=3D=3D erase non existing secrets (should fail)  =3D=3D
-+qemu-img: No secret with id 'sec5'
-+qemu-img: No keyslots match given (old) password for erase operation
-+
-+=3D=3D erase last secret with force by slot (should work)  =3D=3D
-+
-+=3D=3D we have no secrets now, data is lost forever =3D=3D
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+*** done
-diff --git a/tests/qemu-iotests/301 b/tests/qemu-iotests/301
++OK
++{"execute": "job-dismiss", "arguments": {"id": "job_add_key"}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job_add_key"}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job_erase_key"}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job_add_key"}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job_erase_key"}}
++{"return": {}}
++Job failed: Invalid password, cannot unlock any keyslot
++{"execute": "job-dismiss", "arguments": {"id": "job_add_key"}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job_add_key"}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job_add_key"}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job_add_key"}}
++{"return": {}}
++Job failed: Refusing to overwrite active keyslot 2 - please erase it first
++{"execute": "job-dismiss", "arguments": {"id": "job_add_key"}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job_add_key"}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job_add_key"}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job_erase_key"}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job_erase_key"}}
++{"return": {}}
++Job failed: All the active keyslots match the (old) password that was give=
+n and erasing them will erase all the data in the image irreversibly - refu=
+sing operation
++{"execute": "job-dismiss", "arguments": {"id": "job_erase_key"}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job_erase_key"}}
++{"return": {}}
+diff --git a/tests/qemu-iotests/303 b/tests/qemu-iotests/303
 new file mode 100755
-index 0000000000..9c95ed8c9a
+index 0000000000..ba30d8781f
 --- /dev/null
-+++ b/tests/qemu-iotests/301
-@@ -0,0 +1,90 @@
++++ b/tests/qemu-iotests/303
+@@ -0,0 +1,233 @@
++#!/usr/bin/env python3
++#
++# Test case for encryption key management versus image sharing
 +#
 +# Copyright (C) 2019 Red Hat, Inc.
 +#
@@ -507,135 +491,284 @@ index 0000000000..9c95ed8c9a
 +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 +#
 +
-+# creator
-+owner=3Dmlevitsk@redhat.com
++import iotests
++import os
++import time
++import json
 +
-+seq=3D`basename $0`
-+echo "QA output created by $seq"
++test_img =3D os.path.join(iotests.test_dir, 'test.img')
 +
-+status=3D1=09# failure is the default!
++class Secret:
++    def __init__(self, index):
++        self._id =3D "keysec" + str(index)
++        # you are not supposed to see the password...
++        self._secret =3D "hunter" + str(index)
 +
-+_cleanup()
-+{
-+=09_cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
++    def id(self):
++        return self._id
 +
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
++    def secret(self):
++        return self._secret
 +
-+_supported_fmt luks
-+_supported_proto file #TODO
++    def to_cmdline_object(self):
++        return  [ "secret,id=3D" + self._id + ",data=3D" + self._secret]
 +
-+QEMU_IO_OPTIONS=3D$QEMU_IO_OPTIONS_NO_FMT
++    def to_qmp_object(self):
++        return { "qom_type" : "secret", "id": self.id(),
++                 "props": { "data": self.secret() } }
 +
-+# you are supposed to see the password as *******, see :-)
-+S0=3D"--object secret,id=3Dsec0,data=3Dhunter0"
-+S1=3D"--object secret,id=3Dsec1,data=3Dhunter1"
-+SECRETS=3D"$S0 $S1"
++##########################################################################=
+######
++
++class EncryptionSetupTestCase(iotests.QMPTestCase):
++
++    # test case startup
++    def setUp(self):
++
++        # start the VMs
++        self.vm1 =3D iotests.VM(path_suffix =3D 'VM1')
++        self.vm2 =3D iotests.VM(path_suffix =3D 'VM2')
++        self.vm1.launch()
++        self.vm2.launch()
++
++        # create the secrets and load 'em into the VMs
++        self.secrets =3D [ Secret(i) for i in range(0, 4) ]
++        for secret in self.secrets:
++            result =3D self.vm1.qmp("object-add", **secret.to_qmp_object()=
+)
++            self.assert_qmp(result, 'return', {})
++            result =3D self.vm2.qmp("object-add", **secret.to_qmp_object()=
+)
++            self.assert_qmp(result, 'return', {})
++
++    # test case shutdown
++    def tearDown(self):
++        # stop the VM
++        self.vm1.shutdown()
++        self.vm2.shutdown()
++
++    ######################################################################=
+#####
++    # create the encrypted block device using qemu-img
++    def createImg(self, file, secret):
++
++        output =3D iotests.qemu_img_pipe(
++            'create',
++            '--object', *secret.to_cmdline_object(),
++            '-f', iotests.imgfmt,
++            '-o', 'key-secret=3D' + secret.id(),
++            '-o', 'iter-time=3D10',
++            file,
++            '1M')
++
++        iotests.log(output, filters=3D[iotests.filter_test_dir])
++
++    # attempts to add a key using qemu-img
++    def addKey(self, file, secret, new_secret):
++
++        image_options =3D {
++            'key-secret' : secret.id(),
++            'driver' : iotests.imgfmt,
++            'file' : {
++                'driver':'file',
++                'filename': file,
++                }
++            }
++
++        output =3D iotests.qemu_img_pipe(
++            'amend',
++            '--object', *secret.to_cmdline_object(),
++            '--object', *new_secret.to_cmdline_object(),
++
++            '-o', 'state=3Dactive',
++            '-o', 'new-secret=3D' + new_secret.id(),
++            '-o', 'iter-time=3D10',
++
++            "json:" + json.dumps(image_options)
++            )
++
++        iotests.log(output, filters=3D[iotests.filter_test_dir])
++
++    ######################################################################=
+#####
++    # open an encrypted block device
++    def openImageQmp(self, vm, id, file, secret,
++                     readOnly =3D False, reOpen =3D False):
++
++        command =3D 'x-blockdev-reopen' if reOpen else 'blockdev-add'
++
++        result =3D vm.qmp(command, **
++            {
++                'driver': iotests.imgfmt,
++                'node-name': id,
++                'read-only': readOnly,
++                'key-secret' : secret.id(),
++                'file': {
++                    'driver': 'file',
++                    'filename': test_img,
++                }
++            }
++        )
++        self.assert_qmp(result, 'return', {})
++
++    # close the encrypted block device
++    def closeImageQmp(self, vm, id):
++        result =3D vm.qmp('blockdev-del', **{ 'node-name': id })
++        self.assert_qmp(result, 'return', {})
++
++    ######################################################################=
+#####
++
++    # add a key to an encrypted block device
++    def addKeyQmp(self, vm, id, new_secret):
++
++        args =3D {
++            'node-name': id,
++            'job-id' : 'job0',
++            'options' : {
++                'state'     : 'active',
++                'driver'    : iotests.imgfmt,
++                'new-secret': new_secret.id(),
++                'iter-time' : 10
++            },
++        }
++
++        result =3D vm.qmp('x-blockdev-amend', **args)
++        assert result['return'] =3D=3D {}
++        vm.run_job('job0')
++
++    # test that when the image opened by two qemu processes,
++    # neither of them can update the image
++    def test1(self):
++        self.createImg(test_img, self.secrets[0]);
++
++        # VM1 opens the image and adds a key
++        self.openImageQmp(self.vm1, "testdev", test_img, self.secrets[0])
++        self.addKeyQmp(self.vm1, "testdev", new_secret =3D self.secrets[1]=
+)
 +
 +
-+IMGS0=3D"--image-opts driver=3D$IMGFMT,file.filename=3D$TEST_IMG,key-secre=
-t=3Dsec0"
-+IMGS1=3D"--image-opts driver=3D$IMGFMT,file.filename=3D$TEST_IMG,key-secre=
-t=3Dsec1"
-+
-+echo "=3D=3D creating a test image =3D=3D"
-+_make_test_img $S0 -o "key-secret=3Dsec0,iter-time=3D10" 32M
-+
-+echo
-+echo "=3D=3D test that key 0 opens the image =3D=3D"
-+$QEMU_IO $S0 -c "read 0 4096" $IMGS0 | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "=3D=3D adding a password to slot 1 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS0 -o state=3Dactive,new-secret=3Dsec1,keyslo=
-t=3D1,iter-time=3D10
-+
-+echo
-+echo "=3D=3D 'backup' the image header =3D=3D"
-+dd if=3D$TEST_IMG_FILE of=3D${TEST_IMG_FILE}.bk bs=3D4K skip=3D0 count=3D1
-+
-+echo
-+echo "=3D=3D erase slot 0 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o state=3Dinactive,keyslot=3D0 | _filter_=
-img_create
-+
-+echo
-+echo "=3D=3D test that key 0 doesn't open the image =3D=3D"
-+$QEMU_IO $S0 -c "read 0 4096" $IMGS0 | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "=3D=3D 'restore' the image header =3D=3D"
-+dd if=3D${TEST_IMG_FILE}.bk of=3D${TEST_IMG_FILE} bs=3D4K skip=3D0 count=
-=3D1 conv=3Dnotrunc
-+
-+echo
-+echo "=3D=3D test that key 0 still doesn't open the image (key material is=
- erased) =3D=3D"
-+$QEMU_IO $SECRETS -c "read 0 4096" $IMGS0 | _filter_qemu_io | _filter_test=
-dir
-+
-+echo
-+echo "=3D=3D test that key 1 still works =3D=3D"
-+$QEMU_IO $SECRETS -c "read 0 4096" $IMGS1 | _filter_qemu_io | _filter_test=
-dir
-+
-+echo "*** done"
-+rm -f $seq.full
-+status=3D0
++        # VM2 opens the image
++        self.openImageQmp(self.vm2, "testdev", test_img, self.secrets[0])
 +
 +
-+exit 0
-diff --git a/tests/qemu-iotests/301.out b/tests/qemu-iotests/301.out
++        # neither VMs now should be able to add a key
++        self.addKeyQmp(self.vm1, "testdev", new_secret =3D self.secrets[2]=
+)
++        self.addKeyQmp(self.vm2, "testdev", new_secret =3D self.secrets[2]=
+)
++
++
++        # VM 1 closes the image
++        self.closeImageQmp(self.vm1, "testdev")
++
++
++        # now VM2 can add the key
++        self.addKeyQmp(self.vm2, "testdev", new_secret =3D self.secrets[2]=
+)
++
++
++        # qemu-img should also not be able to add a key
++        self.addKey(test_img, self.secrets[0], self.secrets[2])
++
++        # cleanup
++        self.closeImageQmp(self.vm2, "testdev")
++        os.remove(test_img)
++
++
++    def test2(self):
++        self.createImg(test_img, self.secrets[0]);
++
++        # VM1 opens the image readonly
++        self.openImageQmp(self.vm1, "testdev", test_img, self.secrets[0],
++                          readOnly =3D True)
++
++        # VM2 opens the image
++        self.openImageQmp(self.vm2, "testdev", test_img, self.secrets[0])
++
++        # VM1 can't add a key since image is readonly
++        self.addKeyQmp(self.vm1, "testdev", new_secret =3D self.secrets[2]=
+)
++
++        # VM2 can't add a key since VM is has the image opened
++        self.addKeyQmp(self.vm2, "testdev", new_secret =3D self.secrets[2]=
+)
++
++
++        #VM1 reopens the image read-write
++        self.openImageQmp(self.vm1, "testdev", test_img, self.secrets[0],
++                          reOpen =3D True, readOnly =3D False)
++
++        # VM1 still can't add the key
++        self.addKeyQmp(self.vm1, "testdev", new_secret =3D self.secrets[2]=
+)
++
++        # VM2 gets away
++        self.closeImageQmp(self.vm2, "testdev")
++
++        # VM1 now can add the key
++        self.addKeyQmp(self.vm1, "testdev", new_secret =3D self.secrets[2]=
+)
++
++        self.closeImageQmp(self.vm1, "testdev")
++        os.remove(test_img)
++
++
++if __name__ =3D=3D '__main__':
++    # support only raw luks since luks encrypted qcow2 is a proper
++    # format driver which doesn't allow any sharing
++    iotests.main(supported_fmts =3D ['luks'])
+diff --git a/tests/qemu-iotests/303.out b/tests/qemu-iotests/303.out
 new file mode 100644
-index 0000000000..e653c30330
+index 0000000000..a62bb20b67
 --- /dev/null
-+++ b/tests/qemu-iotests/301.out
-@@ -0,0 +1,30 @@
-+QA output created by 301
-+=3D=3D creating a test image =3D=3D
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D33554432
++++ b/tests/qemu-iotests/303.out
+@@ -0,0 +1,33 @@
++..
++----------------------------------------------------------------------
++Ran 2 tests
 +
-+=3D=3D test that key 0 opens the image =3D=3D
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++OK
++Formatting 'TEST_DIR/test.img', fmt=3Dluks size=3D1048576 key-secret=3Dkey=
+sec0 iter-time=3D10
 +
-+=3D=3D adding a password to slot 1 =3D=3D
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++Job failed: Failed to get shared "consistent read" lock
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++Job failed: Failed to get shared "consistent read" lock
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++qemu-img: Failed to get shared "consistent read" lock
++Is another process using the image [TEST_DIR/test.img]?
 +
-+=3D=3D 'backup' the image header =3D=3D
-+1+0 records in
-+1+0 records out
++Formatting 'TEST_DIR/test.img', fmt=3Dluks size=3D1048576 key-secret=3Dkey=
+sec0 iter-time=3D10
 +
-+=3D=3D erase slot 0 =3D=3D
-+
-+=3D=3D test that key 0 doesn't open the image =3D=3D
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+=3D=3D 'restore' the image header =3D=3D
-+1+0 records in
-+1+0 records out
-+
-+=3D=3D test that key 0 still doesn't open the image (key material is erase=
-d) =3D=3D
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+=3D=3D test that key 1 still works =3D=3D
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+*** done
++Job failed: Block node is read-only
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++Job failed: Failed to get shared "consistent read" lock
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++Job failed: Failed to get shared "consistent read" lock
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
 diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 1710470e70..ed8580e660 100644
+index ed8580e660..64c6c7d2e6 100644
 --- a/tests/qemu-iotests/group
 +++ b/tests/qemu-iotests/group
-@@ -298,3 +298,6 @@
- 288 quick
- 289 rw quick
- 290 rw auto quick
-+
-+300 rw auto
-+301 rw auto quick
+@@ -301,3 +301,5 @@
+=20
+ 300 rw auto
+ 301 rw auto quick
++302 rw auto
++303 rw auto
 --=20
 2.17.2
 
