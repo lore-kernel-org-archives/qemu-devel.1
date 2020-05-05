@@ -2,85 +2,81 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D117C47247
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 06:47:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45F98C47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 07:03:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18880206A5
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 06:47:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EtCWSC96"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18880206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 148532064A
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 07:03:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 148532064A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVrMZ-0007GN-7P
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 02:47:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39834)
+	id 1jVrc2-0003SV-0h
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 03:03:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43876)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jVrLh-0006lz-G8
- for qemu-devel@nongnu.org; Tue, 05 May 2020 02:46:37 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58771
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jVrLf-0002NM-Pk
- for qemu-devel@nongnu.org; Tue, 05 May 2020 02:46:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588661194;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=9w20DTnLApXp2WBba6e7sCP3P2gYoBJjt39YZPwmO9A=;
- b=EtCWSC96T6MjwgWYvaj72GRDzYZRm9oFY8H4L35wpXtou8o0HgogCsnRzAOeRxKxh4xaJZ
- cpdv+hXpctgj9q34unDYk0IajRXLMdxZlx0oitjnD+YeYUVnhGlXlO9YRuBF6qBRm9VaC5
- 4/nGMm1a83iozSXJqnHzidK3RAZL6mI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-263-GyIgpLwaNF2g7zN5OLhOog-1; Tue, 05 May 2020 02:46:33 -0400
-X-MC-Unique: GyIgpLwaNF2g7zN5OLhOog-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 12A7080183C;
- Tue,  5 May 2020 06:46:32 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-112-11.ams2.redhat.com [10.36.112.11])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 331DD10013D9;
- Tue,  5 May 2020 06:46:30 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH] iotests/055: Use cache.no-flush for vmdk target
-Date: Tue,  5 May 2020 08:46:18 +0200
-Message-Id: <20200505064618.16267-1-kwolf@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jVrbO-0002up-1R
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 03:02:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47180)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jVrbM-0003pP-QR
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 03:02:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jVrbK-0002WS-Vs
+ for <qemu-devel@nongnu.org>; Tue, 05 May 2020 07:02:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id EF94B2E8107
+ for <qemu-devel@nongnu.org>; Tue,  5 May 2020 07:02:46 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Date: Tue, 05 May 2020 06:49:48 -0000
+From: John Hartley <1876678@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: graphdrum
+X-Launchpad-Bug-Reporter: John Hartley (graphdrum)
+X-Launchpad-Bug-Modifier: John Hartley (graphdrum)
+References: <158858209471.12655.6550590823696382929.malonedeb@gac.canonical.com>
+Message-Id: <158866138924.12522.14355301137013548891.launchpad@wampee.canonical.com>
+Subject: [Bug 1876678] Re: Ubuntu 20.04 KVM / QEMU Failure with nested FreeBSD
+ bhyve
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 2e1788fc4d5f8342f039573f295b141a509f8dbd
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 03:02:47
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,79 +85,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+Reply-To: Bug 1876678 <1876678@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-055 uses the backup block job to create a compressed backup of an
-$IMGFMT image with both qcow2 and vmdk targets. However, cluster
-allocation in vmdk is very slow because it flushes the image file after
-each L2 update.
+** Summary changed:
 
-There is no reason why we need this level of safety in this test, so
-let's disable flushes for vmdk. For the blockdev-backup tests this is
-achieved by simply adding the cache.no-flush=3Don to the drive_add() for
-the target. For drive-backup, the caching flags are copied from the
-source node, so we'll also add the flag to the source node, even though
-it is not vmdk.
+- Ubuntu 20.04 QEMU Failure with nested FreeBSD bhyve =
 
-This can make the test run significantly faster (though it doesn't make
-a difference on tmpfs). In my usual setup it goes from ~45s to ~15s.
++ Ubuntu 20.04 KVM / QEMU Failure with nested FreeBSD bhyve
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- tests/qemu-iotests/055 | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+-- =
 
-diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
-index ab90062b99..002706c114 100755
---- a/tests/qemu-iotests/055
-+++ b/tests/qemu-iotests/055
-@@ -490,7 +490,7 @@ class TestSingleTransaction(iotests.QMPTestCase):
-=20
- class TestCompressedToQcow2(iotests.QMPTestCase):
-     image_len =3D 64 * 1024 * 1024 # MB
--    target_fmt =3D {'type': 'qcow2', 'args': ()}
-+    target_fmt =3D {'type': 'qcow2', 'args': (), 'drive-opts': ''}
-=20
-     def tearDown(self):
-         self.vm.shutdown()
-@@ -501,13 +501,15 @@ class TestCompressedToQcow2(iotests.QMPTestCase):
-             pass
-=20
-     def do_prepare_drives(self, attach_target):
--        self.vm =3D iotests.VM().add_drive('blkdebug::' + test_img)
-+        self.vm =3D iotests.VM().add_drive('blkdebug::' + test_img,
-+                                         opts=3Dself.target_fmt['drive-opt=
-s'])
-=20
-         qemu_img('create', '-f', self.target_fmt['type'], blockdev_target_=
-img,
-                  str(self.image_len), *self.target_fmt['args'])
-         if attach_target:
-             self.vm.add_drive(blockdev_target_img,
--                              format=3Dself.target_fmt['type'], interface=
-=3D"none")
-+                              format=3Dself.target_fmt['type'], interface=
-=3D"none",
-+                              opts=3Dself.target_fmt['drive-opts'])
-=20
-         self.vm.launch()
-=20
-@@ -601,7 +603,8 @@ class TestCompressedToQcow2(iotests.QMPTestCase):
-=20
-=20
- class TestCompressedToVmdk(TestCompressedToQcow2):
--    target_fmt =3D {'type': 'vmdk', 'args': ('-o', 'subformat=3DstreamOpti=
-mized')}
-+    target_fmt =3D {'type': 'vmdk', 'args': ('-o', 'subformat=3DstreamOpti=
-mized'),
-+                  'drive-opts': 'cache.no-flush=3Don'}
-=20
-     @iotests.skip_if_unsupported(['vmdk'])
-     def setUp(self):
---=20
-2.25.3
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1876678
 
+Title:
+  Ubuntu 20.04 KVM / QEMU Failure with nested FreeBSD bhyve
+
+Status in QEMU:
+  New
+
+Bug description:
+  BUG:
+
+  Starting FreeBSD Layer 2 bhyve Guest within Layer 1 FreeBSD VM Host on
+  Layer 0 Ubuntu 20.04 KVM / QEMU Host result in Layer 1 Guest / Host
+  Pausing with "Emulation Failure"
+
+  TESTING:
+
+  My test scenario is nested virtualisation:
+  Layer 0 - Ubuntu 20.04 Host
+  Layer 1 - FreeBSD 12.1 with OVMF + bhyve hypervisor Guest/Host
+  Layer 2 - FreeBSD 12.1 guest
+
+  Layer 0 Host is: Ubuntu 20.04 LTS KVM / QEMU / libvirt
+
+  <<START QEMU VERSION>>
+  $ virsh -c qemu:///system version --daemon
+  Compiled against library: libvirt 6.0.0
+  Using library: libvirt 6.0.0
+  Using API: QEMU 6.0.0
+  Running hypervisor: QEMU 4.2.0
+  Running against daemon: 6.0.0
+  <<END QEMU VERSION>
+
+  <<START Intel VMX Support & Nesting Enabled>>
+  $ cat /proc/cpuinfo | grep -c vmx
+  64
+  $ cat /sys/module/kvm_intel/parameters/nested
+  Y
+  <<END Intel VMS>>
+
+
+  Layer 1 Guest / Host is: FreeBSD Q35 v4.2 with OVMF:
+
+  Pass Host VMX support to Layer 1 Guest via <cpu mode=3D'host-model>
+
+  <<LIBVIRT CONFIG SNIPPET>>
+  ...
+  ...
+    <os>
+      <type arch=3D'x86_64' machine=3D'pc-q35-4.2'>hvm</type>
+      <loader readonly=3D'yes' type=3D'pflash'>/usr/share/OVMF/OVMF_CODE.fd=
+</loader>
+      <nvram>/home/USER/swarm.bhyve.freebsd/OVMF_VARS.fd</nvram>
+    </os>
+    <features>
+      <acpi/>
+      <apic/>
+      <vmport state=3D'off'/>
+    </features>
+    <cpu mode=3D'host-model' check=3D'partial'/>
+  ...
+  ...
+  <END LIBVIRT CONFIG SNIPPET>>
+
+  Checked that Layer 1 - FreeBSD Quest / Host has VMX feature available:
+
+  <<LAYER 1 - FreeBSD CPU Features>>
+  # uname -a
+  FreeBSD swarm.DOMAIN.HERE 12.1-RELEASE FreeBSD 12.1-RELEASE GENERIC  amd64
+
+  # grep Features /var/run/dmesg.boot =
+
+    Features=3D0xf83fbff<FPU,VME,DE,PSE,TSC,MSR,PAE,MCE,CX8,APIC,SEP,MTRR,P=
+GE,MCA,CMOV,PAT,PSE36,MMX,FXSR,SSE,SSE2,SS>
+    Features2=3D0xfffa3223<SSE3,PCLMULQDQ,VMX,SSSE3,FMA,CX16,PCID,SSE4.1,SS=
+E4.2,x2APIC,MOVBE,POPCNT,TSCDLT,AESNI,XSAVE,OSXSAVE,AVX,F16C,RDRAND,HV>
+    AMD Features=3D0x2c100800<SYSCALL,NX,Page1GB,RDTSCP,LM>
+    AMD Features2=3D0x121<LAHF,ABM,Prefetch>
+    Structured Extended Features=3D0x1c0fbb<FSGSBASE,TSCADJ,BMI1,HLE,AVX2,S=
+MEP,BMI2,ERMS,INVPCID,RTM,RDSEED,ADX,SMAP>
+    Structured Extended Features2=3D0x4<UMIP>
+    Structured Extended Features3=3D0xac000400<MD_CLEAR,IBPB,STIBP,ARCH_CAP=
+,SSBD>
+    XSAVE Features=3D0x1<XSAVEOPT>
+  <<END LAYER 1 - FreeBSD CPU Features>
+
+  On Layer 1 FreeBSD Guest / Host start up the Layer 2 guest..
+
+  <<START LAYER 2 GUEST START>>
+  # ls
+  FreeBSD-11.2-RELEASE-amd64-bootonly.iso	FreeBSD-12.1-RELEASE-amd64-dvd1.i=
+so	bee-hd1-01.img
+  # /usr/sbin/bhyve -c 2 -m 2048 -H -A -s 0:0,hostbridge -s 1:0,lpc -s 2:0,=
+e1000,tap0 -s 3:0,ahci-hd,bee-hd1-01.img -l com1,stdio -s 5:0,ahci-cd,./Fre=
+eBSD-12.1-RELEASE-amd64-dvd1.iso bee
+  <<END LAYER 2 GUEST START>>
+
+  Result is that Layer 1 - FreeBSD Host guest "paused".
+
+  To Layer 1 machines freezes I cannot get any further diagnostics from
+  this machine, so I run tail on libvirt log from Layer 0 - Ubuntu Host
+
+  <<LAYER 0 LOG TAIL>>
+  char device redirected to /dev/pts/29 (label charserial0)
+  2020-05-04T06:09:15.310474Z qemu-system-x86_64: warning: host doesn't sup=
+port requested feature: MSR(48FH).vmx-exit-load-perf-global-ctrl [bit 12]
+  2020-05-04T06:09:15.310531Z qemu-system-x86_64: warning: host doesn't sup=
+port requested feature: MSR(490H).vmx-entry-load-perf-global-ctrl [bit 13]
+  2020-05-04T06:09:15.312533Z qemu-system-x86_64: warning: host doesn't sup=
+port requested feature: MSR(48FH).vmx-exit-load-perf-global-ctrl [bit 12]
+  2020-05-04T06:09:15.312548Z qemu-system-x86_64: warning: host doesn't sup=
+port requested feature: MSR(490H).vmx-entry-load-perf-global-ctrl [bit 13]
+  2020-05-04T06:09:15.313828Z qemu-system-x86_64: warning: host doesn't sup=
+port requested feature: MSR(48FH).vmx-exit-load-perf-global-ctrl [bit 12]
+  2020-05-04T06:09:15.313841Z qemu-system-x86_64: warning: host doesn't sup=
+port requested feature: MSR(490H).vmx-entry-load-perf-global-ctrl [bit 13]
+  2020-05-04T06:09:15.315185Z qemu-system-x86_64: warning: host doesn't sup=
+port requested feature: MSR(48FH).vmx-exit-load-perf-global-ctrl [bit 12]
+  2020-05-04T06:09:15.315201Z qemu-system-x86_64: warning: host doesn't sup=
+port requested feature: MSR(490H).vmx-entry-load-perf-global-ctrl [bit 13]
+  KVM internal error. Suberror: 1
+  emulation failure
+  EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D00000000
+  ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
+  EIP=3D00000000 EFL=3D00000000 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
+T=3D0
+  ES =3D0000 00000000 00000000 00008000 DPL=3D0 <hiword>
+  CS =3D0000 00000000 00000000 00008000 DPL=3D0 <hiword>
+  SS =3D0000 00000000 00000000 00008000 DPL=3D0 <hiword>
+  DS =3D0000 00000000 00000000 00008000 DPL=3D0 <hiword>
+  FS =3D0000 00000000 00000000 00008000 DPL=3D0 <hiword>
+  GS =3D0000 00000000 00000000 00008000 DPL=3D0 <hiword>
+  LDT=3D0000 00000000 00000000 00008000 DPL=3D0 <hiword>
+  TR =3D0000 00000000 00000000 00008000 DPL=3D0 <hiword>
+  GDT=3D     0000000000000000 00000000
+  IDT=3D     0000000000000000 00000000
+  CR0=3D80050033 CR2=3D0000000000000000 CR3=3D0000000000000000 CR4=3D003720=
+60
+  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
+=3D0000000000000000 =
+
+  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
+  EFER=3D0000000000000d01
+  Code=3D<??> ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?=
+? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?=
+? ?? ?? ??
+  2020-05-04T06:35:39.186799Z qemu-system-x86_64: terminating on signal 15 =
+from pid 2155 (/usr/sbin/libvirtd)
+  2020-05-04 06:35:39.386+0000: shutting down, reason=3Ddestroyed
+  <<END LAYER 0 LOG TAIL>>
+
+  =
+
+  I am reporting this bug here as result is very similar to that seen with =
+QEMU seabios failure reported here: https://bugs.launchpad.net/qemu/+bug/18=
+66870
+
+  However in this case my VM Layer 1 VM is using OVMF.
+
+  NOTE 1: I have also tested with Q35 v3.1 and 2.12 and get the same result.
+  NOTE 2: Due to bug in FreeBSD networking code, I had to compile custom ke=
+rnel with "netmap driver disabled".  This is known bug in FreeBSD that I ha=
+ve reported separately.
+  NOTE 3: I will cross posted this bug report on FreeBSD bugzilla as well: =
+https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=3D246168
+  NOTE 4: Have done extensive testing of Ubuntu 20.04 Nested virtualisation=
+ with just Ubuntu hosts  and OVMF and the nested virtualisation runs correc=
+tly, so problem is specific to using FreeBSD / bhyve guest / host.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1876678/+subscriptions
 
