@@ -2,83 +2,101 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22403C47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:59:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D573C47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:01:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAAD220661
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:59:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DFC4A20757
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:01:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WOEPQ4da"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAAD220661
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Quia9v/x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFC4A20757
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVy6Y-0000Sb-38
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 09:59:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51484)
+	id 1jVy84-0001gR-3T
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 10:01:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54146)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jVxy1-0004KV-RV
- for qemu-devel@nongnu.org; Tue, 05 May 2020 09:50:37 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:23928
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jVxy0-0002tK-SI
- for qemu-devel@nongnu.org; Tue, 05 May 2020 09:50:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588686636;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0BHKYf+uyjsemkjgPewlgPN6fBK+tXCMv6UZn0yd3kI=;
- b=WOEPQ4daDktG5820eMWrbEq5qHfbzJ1Xn1jOaHnfYjopwT4eikpO5rZdqjoEf+rjGYUEuL
- 7245oOMBkeQw4DzPQT7UDgcEcBOV6Ljw9YRKM/2MYTBFrAKuHDmxXP67Q4P2EDynPc2NUR
- yHMtSkyLl3dKQcTsabcG3+P4jx9Pf5M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-KdZYq_xSNmG4FbsEkBNpDQ-1; Tue, 05 May 2020 09:50:34 -0400
-X-MC-Unique: KdZYq_xSNmG4FbsEkBNpDQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF6578014C0;
- Tue,  5 May 2020 13:50:33 +0000 (UTC)
-Received: from localhost (ovpn-112-219.ams2.redhat.com [10.36.112.219])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 64B335C1D3;
- Tue,  5 May 2020 13:50:33 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: qemu-s390x@nongnu.org
-Subject: [PATCH 2/3] docs/s390x: document 3270
-Date: Tue,  5 May 2020 15:50:24 +0200
-Message-Id: <20200505135025.14614-3-cohuck@redhat.com>
-In-Reply-To: <20200505135025.14614-1-cohuck@redhat.com>
-References: <20200505135025.14614-1-cohuck@redhat.com>
+ (Exim 4.90_1) (envelope-from <xadimgnik@gmail.com>)
+ id 1jVy77-00016y-Oy
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 10:00:01 -0400
+Received: from mail-ed1-x532.google.com ([2a00:1450:4864:20::532]:36811)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <xadimgnik@gmail.com>)
+ id 1jVy76-0007EQ-00
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 10:00:01 -0400
+Received: by mail-ed1-x532.google.com with SMTP id t12so1933844edw.3
+ for <qemu-devel@nongnu.org>; Tue, 05 May 2020 06:59:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:reply-to:to:cc:references:in-reply-to:subject:date:message-id
+ :mime-version:content-transfer-encoding:thread-index
+ :content-language;
+ bh=O9OCBMkBxpYV7nwYvW253+iHNM16Xw+0gCVniK4rZ0A=;
+ b=Quia9v/xRYgVnTDwV1BgYeICL+6UIoPhizH6hPPF4DkNcTtvHJl5Ty9UDZWF1Wj0AF
+ FS3KgmAq6KlzYeXdYQ3OA++1Q4I0seBrL8agnF3UoSJLLSKmOeC9DQqvrhlT51K/e1v3
+ xgF6OTVucZjrirHv5xQwRe0P3H9l5KoUo+hkDyXcUw1NGQ9dQeGxOR/N8raXLcTN0s5g
+ wPBq8vTmzTMQayESPKqeEdcHb8eiqjxUByqyltjrifpPut7NUtSbThKGFcm/cKMcc+tQ
+ RrGmgDnKGOp8PJc1PEzW2mY7Ht46+7iAqPL4RGQCqPpT46h6N8Zf18TpGw7OoG96GT/c
+ phFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:reply-to:to:cc:references:in-reply-to
+ :subject:date:message-id:mime-version:content-transfer-encoding
+ :thread-index:content-language;
+ bh=O9OCBMkBxpYV7nwYvW253+iHNM16Xw+0gCVniK4rZ0A=;
+ b=GRZKpOLVl4ZAdHi6hpaz6mzhmnU/s74cw+gU4cJpNPlEA6JCQQr0YYuxPeUxh7dHZQ
+ iqBBs9ZsGmCdah2qbNr4aye40KVGePzIJTHzeZBWaEOTlHnoiVXDNRvb5HjUEfJ6bqoj
+ ucEONLgNDALG4rUxDGq+tGB1PpRezlKsbmCyQF2gHenehMKdcY4r+5bYF/xN6w4unVKF
+ MeKQ3BDVCiIQtJ/x2JMpei8GL8CCcdQLuXN2xz/PntNC5to/lEZxkfL27JoctvkTWinX
+ rFB8K2Gsmdw1qJmQV13riCGeDRkIQZN1Z1jK9WRCIyKvf4KCn2MNG7LG691p2sTlGF5x
+ Tl5w==
+X-Gm-Message-State: AGi0PuZnxl0hW7n/Xgr9dQNZeKeLCXAclGefPU6UZ7rT/lRi067Isibs
+ 1nbod2gb1uec8viOnVf6ric=
+X-Google-Smtp-Source: APiQypKMaCbhuhWKhU6qOX1gyF4ylKwmgItCJ0Vgnfw2kOhlHOT2eRuqxGQbmSbMf9zCagFUVC55Eg==
+X-Received: by 2002:aa7:c0d2:: with SMTP id j18mr2756750edp.283.1588687198204; 
+ Tue, 05 May 2020 06:59:58 -0700 (PDT)
+Received: from CBGR90WXYV0 ([54.239.6.187])
+ by smtp.gmail.com with ESMTPSA id n7sm280474edt.69.2020.05.05.06.59.56
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 05 May 2020 06:59:57 -0700 (PDT)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: "Paul Durrant" <paul@xen.org>
+To: "'Markus Armbruster'" <armbru@redhat.com>,
+	<qemu-devel@nongnu.org>
+References: <20200505101908.6207-1-armbru@redhat.com>
+ <20200505101908.6207-3-armbru@redhat.com>
+In-Reply-To: <20200505101908.6207-3-armbru@redhat.com>
+Subject: RE: [PATCH v2 02/10] xen: Fix and improve handling of device_add
+ usb-host errors
+Date: Tue, 5 May 2020 14:59:56 +0100
+Message-ID: <004001d622e5$75fd2d70$61f78850$@xen.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQD2kCtjJmTvNkmzRgy8FtMMvttLfQNDV1uLqj6PYxA=
+Content-Language: en-gb
+Received-SPF: pass client-ip=2a00:1450:4864:20::532;
+ envelope-from=xadimgnik@gmail.com; helo=mail-ed1-x532.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,75 +109,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Reply-To: paul@xen.org
+Cc: 'Anthony Perard' <anthony.perard@citrix.com>,
+ xen-devel@lists.xenproject.org, 'Stefano Stabellini' <sstabellini@kernel.org>,
+ 'Gerd Hoffmann' <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add some basic info how to use 3270 devices.
+> -----Original Message-----
+> From: Markus Armbruster <armbru@redhat.com>
+> Sent: 05 May 2020 11:19
+> To: qemu-devel@nongnu.org
+> Cc: Stefano Stabellini <sstabellini@kernel.org>; Anthony Perard <anthony.perard@citrix.com>; Paul
+> Durrant <paul@xen.org>; Gerd Hoffmann <kraxel@redhat.com>; xen-devel@lists.xenproject.org
+> Subject: [PATCH v2 02/10] xen: Fix and improve handling of device_add usb-host errors
+> 
+> usbback_portid_add() leaks the error when qdev_device_add() fails.
+> Fix that.  While there, use the error to improve the error message.
+> 
+> The qemu_opts_from_qdict() similarly leaks on failure.  But any
+> failure there is a programming error.  Pass &error_abort.
+> 
+> Fixes: 816ac92ef769f9ffc534e49a1bb6177bddce7aa2
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> Cc: Paul Durrant <paul@xen.org>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: xen-devel@lists.xenproject.org
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- docs/system/s390x/3270.rst   | 32 ++++++++++++++++++++++++++++++++
- docs/system/target-s390x.rst |  1 +
- 2 files changed, 33 insertions(+)
- create mode 100644 docs/system/s390x/3270.rst
-
-diff --git a/docs/system/s390x/3270.rst b/docs/system/s390x/3270.rst
-new file mode 100644
-index 000000000000..e367a457e001
---- /dev/null
-+++ b/docs/system/s390x/3270.rst
-@@ -0,0 +1,32 @@
-+3270 devices
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+With the aid of the ``x3270`` emulator, QEMU provides limited support
-+for making a single 3270 device available to a guest. Note that this
-+supports basic features only.
-+
-+To provide a 3270 device to a guest, create a ``x-3270device`` linked to
-+a ``tn3270`` chardev. The guest will see a 3270 channel device. In order
-+to actually be able to use it, attach the ``x3270`` emulator to the charde=
-v.
-+
-+Example configuration
-+---------------------
-+
-+* Add a ``tn3270`` chardev and a ``x-3270device`` to the QEMU command line=
-::
-+
-+    -chardev socket,id=3Dchar_0,host=3D0.0.0.0,port=3D23,nowait,server,tn3=
-270
-+    -device x-terminal3270,chardev=3Dchar_0,devno=3Dfe.0.000a,id=3Dtermina=
-l_0
-+
-+* Start the guest. In the guest, use ``chccwdev -e 0.0.000a`` to enable
-+  the device.
-+
-+* On the host, start the ``x3270`` emulator::
-+
-+    x3270 <host>:23
-+
-+* In the guest, locate the 3270 device node under ``/dev/3270/`` (say,
-+  ``tty1``) and start a getty on it::
-+
-+    systemctl start serial-getty@3270-tty1.service
-+
-+This should get you an addtional tty for logging into the guest.
-diff --git a/docs/system/target-s390x.rst b/docs/system/target-s390x.rst
-index 37ca032d98ef..2592a05303ef 100644
---- a/docs/system/target-s390x.rst
-+++ b/docs/system/target-s390x.rst
-@@ -24,6 +24,7 @@ or vfio-ap is also available.
- .. toctree::
-    s390x/vfio-ap
-    s390x/css
-+   s390x/3270
-=20
- Architectural features
- =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
---=20
-2.21.3
+Acked-by: Paul Durrant <paul@xen.org>
 
 
