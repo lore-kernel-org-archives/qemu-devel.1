@@ -6,74 +6,75 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB46C4725A
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 15:41:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E72B8C47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 15:43:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B5762078C
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 15:41:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8C8A4206B9
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 15:43:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZY+eyLSR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B5762078C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fOxE69ty"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C8A4206B9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVzhR-0000lp-Jw
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 11:41:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46012)
+	id 1jVziy-0002nD-HN
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 11:43:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46042)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jVzVs-0003Q9-Dm
- for qemu-devel@nongnu.org; Tue, 05 May 2020 11:29:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36771
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jVzVw-0003Wy-64
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 11:29:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41503
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jVzVn-0007RV-E6
- for qemu-devel@nongnu.org; Tue, 05 May 2020 11:29:39 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jVzVn-0007R5-9W
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 11:29:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588692574;
+ s=mimecast20190719; t=1588692572;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=yab3CnP++eHFnk344KL7gjP0smalElGc+a8zjsajbW0=;
- b=ZY+eyLSRtXppTTU9I2lkL20Eb5dGg6YBRzA1PV7aTRkuELvNw7+x7WO/i92kuBIqyTHtx5
- sCFV/aIxEvqclrYRvR3maU7nqX4zTAMFpklb/UXknMXsiGw4TfuIfJFHZjsUC6pNEHORCf
- Mp4tHNudCFyhDtk55dHthgnLr1mneSY=
+ bh=4w7IrnCXfuJRpn2Pwo4QWstitbRFNDkUmnPTKONht1E=;
+ b=fOxE69tyC0+dbwNRneZv0kA9SrBlnsWOzbp998J3k4q+T7uHxKtjwR/e4JNixD4f0JGk3q
+ O8/1Z+agtCYuivli9TK0QAgHHPexCRtWCNMdME5q3iuwvYcxoCXB6z/+JTx/sQk6eDvqId
+ r0mRvlz8Lk0o34KzbuA7eiuR1cNejzM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-441-3sb_h4FkPWa31JbODb6a_Q-1; Tue, 05 May 2020 11:29:32 -0400
-X-MC-Unique: 3sb_h4FkPWa31JbODb6a_Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-508-x42_PInpN6KRsYeJsEA54Q-1; Tue, 05 May 2020 11:29:30 -0400
+X-MC-Unique: x42_PInpN6KRsYeJsEA54Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2ED7D46B
- for <qemu-devel@nongnu.org>; Tue,  5 May 2020 15:29:31 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4600461
+ for <qemu-devel@nongnu.org>; Tue,  5 May 2020 15:29:29 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A2C2C63F90;
- Tue,  5 May 2020 15:29:30 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 288CA165F6;
+ Tue,  5 May 2020 15:29:29 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 62D5B11358CC; Tue,  5 May 2020 17:29:26 +0200 (CEST)
+ id 44E9411358C3; Tue,  5 May 2020 17:29:26 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 15/18] Drop more @errp parameters after previous commit
-Date: Tue,  5 May 2020 17:29:23 +0200
-Message-Id: <20200505152926.18877-16-armbru@redhat.com>
+Subject: [PATCH v2 07/18] qom: Drop object_property_set_description()
+ parameter @errp
+Date: Tue,  5 May 2020 17:29:15 +0200
+Message-Id: <20200505152926.18877-8-armbru@redhat.com>
 In-Reply-To: <20200505152926.18877-1-armbru@redhat.com>
 References: <20200505152926.18877-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 03:48:16
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -99,592 +100,1056 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Several functions can't fail anymore: ich9_pm_add_properties(),
-device_add_bootindex_property(), ppc_compat_add_property(),
-spapr_caps_add_properties(), PropertyInfo.create().  Drop their @errp
-parameter.
+object_property_set_description() and
+object_class_property_set_description() fail only when property @name
+is not found.
+
+There are 85 calls of object_property_set_description() and
+object_class_property_set_description().  None of them can fail:
+
+* 84 immediately follow the creation of the property.
+
+* The one in spapr_rng_instance_init() refers to a property created in
+  spapr_rng_class_init(), from spapr_rng_properties[].
+
+Every one of them still gets to decide what to pass for @errp.
+
+51 calls pass &error_abort, 32 calls pass NULL, one receives the error
+and propagates it to &error_abort, and one propagates it to
+&error_fatal.  I'm actually surprised none of them violates the Error
+API.
+
+What are we gaining by letting callers handle the "property not found"
+error?  Use when the property is not known to exist is simpler: you
+don't have to guard the call with a check.  We haven't found such a
+use in 5+ years.  Until we do, let's make life a bit simpler and drop
+the @errp parameter.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/hw/acpi/ich9.h    | 2 +-
- include/hw/ppc/spapr.h    | 2 +-
- include/hw/qdev-core.h    | 2 +-
- include/sysemu/sysemu.h   | 2 +-
- target/ppc/cpu.h          | 3 +--
- bootdevice.c              | 2 +-
- hw/acpi/ich9.c            | 2 +-
- hw/block/fdc.c            | 4 ++--
- hw/block/nvme.c           | 2 +-
- hw/block/vhost-user-blk.c | 2 +-
- hw/block/virtio-blk.c     | 2 +-
- hw/core/qdev-properties.c | 2 +-
- hw/core/qdev.c            | 2 +-
- hw/isa/lpc_ich9.c         | 2 +-
- hw/net/e1000.c            | 2 +-
- hw/net/e1000e.c           | 2 +-
- hw/net/eepro100.c         | 2 +-
- hw/net/lance.c            | 2 +-
- hw/net/lasi_i82596.c      | 2 +-
- hw/net/ne2000-pci.c       | 2 +-
- hw/net/pcnet-pci.c        | 2 +-
- hw/net/rtl8139.c          | 2 +-
- hw/net/spapr_llan.c       | 2 +-
- hw/net/sungem.c           | 2 +-
- hw/net/sunhme.c           | 2 +-
- hw/net/tulip.c            | 2 +-
- hw/net/virtio-net.c       | 2 +-
- hw/net/vmxnet3.c          | 2 +-
- hw/ppc/spapr.c            | 5 ++---
- hw/ppc/spapr_caps.c       | 2 +-
- hw/s390x/s390-ccw.c       | 2 +-
- hw/scsi/scsi-bus.c        | 2 +-
- hw/scsi/vhost-scsi.c      | 2 +-
- hw/scsi/vhost-user-scsi.c | 2 +-
- hw/usb/dev-network.c      | 2 +-
- hw/usb/host-libusb.c      | 2 +-
- hw/usb/redirect.c         | 2 +-
- hw/vfio/pci.c             | 2 +-
- target/ppc/compat.c       | 3 +--
- 39 files changed, 41 insertions(+), 44 deletions(-)
+ include/qom/object.h       |  6 ++----
+ accel/kvm/kvm-all.c        |  4 ++--
+ accel/tcg/tcg-all.c        |  2 +-
+ backends/hostmem-memfd.c   |  9 +++------
+ backends/hostmem.c         | 16 +++++++--------
+ hw/arm/aspeed.c            |  2 +-
+ hw/arm/vexpress.c          |  6 ++----
+ hw/arm/virt.c              | 20 +++++++------------
+ hw/arm/xlnx-zcu102.c       |  6 ++----
+ hw/core/machine.c          | 41 ++++++++++++++++++--------------------
+ hw/core/qdev.c             |  6 ++----
+ hw/i386/microvm.c          | 14 ++++++-------
+ hw/i386/pc.c               |  2 +-
+ hw/i386/x86.c              |  6 +++---
+ hw/ppc/mac_newworld.c      |  3 +--
+ hw/ppc/pnv.c               |  3 +--
+ hw/ppc/spapr.c             | 21 ++++++++-----------
+ hw/ppc/spapr_caps.c        |  6 +-----
+ hw/ppc/spapr_rng.c         |  3 +--
+ hw/riscv/sifive_u.c        |  5 ++---
+ hw/s390x/css-bridge.c      |  3 +--
+ hw/s390x/s390-virtio-ccw.c |  9 +++------
+ hw/sparc/sun4m.c           |  3 +--
+ hw/xen/xen-common.c        |  2 +-
+ qom/object.c               | 19 ++++--------------
+ target/arm/cpu64.c         |  3 +--
+ target/arm/kvm.c           |  2 +-
+ target/i386/sev.c          |  6 +++---
+ target/ppc/compat.c        |  2 +-
+ target/s390x/cpu_models.c  |  4 ++--
+ 30 files changed, 91 insertions(+), 143 deletions(-)
 
-diff --git a/include/hw/acpi/ich9.h b/include/hw/acpi/ich9.h
-index 41568d1837..28a53181cb 100644
---- a/include/hw/acpi/ich9.h
-+++ b/include/hw/acpi/ich9.h
-@@ -72,7 +72,7 @@ void ich9_pm_init(PCIDevice *lpc_pci, ICH9LPCPMRegs *pm,
- void ich9_pm_iospace_update(ICH9LPCPMRegs *pm, uint32_t pm_io_base);
- extern const VMStateDescription vmstate_ich9_pm;
+diff --git a/include/qom/object.h b/include/qom/object.h
+index 0ea5808432..1f0386a231 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -1813,16 +1813,14 @@ ObjectProperty *object_property_add_const_link(Obje=
+ct *obj, const char *name,
+  * @obj: the object owning the property
+  * @name: the name of the property
+  * @description: the description of the property on the object
+- * @errp: if an error occurs, a pointer to an area to store the error
+  *
+  * Set an object property's description.
+  *
+  */
+ void object_property_set_description(Object *obj, const char *name,
+-                                     const char *description, Error **errp=
+);
++                                     const char *description);
+ void object_class_property_set_description(ObjectClass *klass, const char =
+*name,
+-                                           const char *description,
+-                                           Error **errp);
++                                           const char *description);
 =20
--void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm, Error **errp);
-+void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm);
+ /**
+  * object_child_foreach:
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 439a4efe52..2fb6099cf2 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -3077,13 +3077,13 @@ static void kvm_accel_class_init(ObjectClass *oc, v=
+oid *data)
+         NULL, kvm_set_kernel_irqchip,
+         NULL, NULL, &error_abort);
+     object_class_property_set_description(oc, "kernel-irqchip",
+-        "Configure KVM in-kernel irqchip", &error_abort);
++        "Configure KVM in-kernel irqchip");
 =20
- void ich9_pm_device_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *=
-dev,
-                                 Error **errp);
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 42d64a0368..c5f40c0ac6 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -915,7 +915,7 @@ static inline uint8_t spapr_get_cap(SpaprMachineState *=
-spapr, int cap)
- void spapr_caps_init(SpaprMachineState *spapr);
- void spapr_caps_apply(SpaprMachineState *spapr);
- void spapr_caps_cpu_apply(SpaprMachineState *spapr, PowerPCCPU *cpu);
--void spapr_caps_add_properties(SpaprMachineClass *smc, Error **errp);
-+void spapr_caps_add_properties(SpaprMachineClass *smc);
- int spapr_caps_post_migration(SpaprMachineState *spapr);
+     object_class_property_add(oc, "kvm-shadow-mem", "int",
+         kvm_get_kvm_shadow_mem, kvm_set_kvm_shadow_mem,
+         NULL, NULL, &error_abort);
+     object_class_property_set_description(oc, "kvm-shadow-mem",
+-        "KVM shadow MMU size", &error_abort);
++        "KVM shadow MMU size");
+ }
 =20
- void spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index d87d989e72..6f537f687f 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -286,7 +286,7 @@ struct PropertyInfo {
-     const QEnumLookup *enum_table;
-     int (*print)(DeviceState *dev, Property *prop, char *dest, size_t len)=
+ static const TypeInfo kvm_accel_type =3D {
+diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
+index acfdcfdf59..3398a56ef9 100644
+--- a/accel/tcg/tcg-all.c
++++ b/accel/tcg/tcg-all.c
+@@ -210,7 +210,7 @@ static void tcg_accel_class_init(ObjectClass *oc, void =
+*data)
+         tcg_get_tb_size, tcg_set_tb_size,
+         NULL, NULL, &error_abort);
+     object_class_property_set_description(oc, "tb-size",
+-        "TCG translation block cache size", &error_abort);
++        "TCG translation block cache size");
+=20
+ }
+=20
+diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
+index 74ba9879c4..5991f31459 100644
+--- a/backends/hostmem-memfd.c
++++ b/backends/hostmem-memfd.c
+@@ -144,23 +144,20 @@ memfd_backend_class_init(ObjectClass *oc, void *data)
+                                        memfd_backend_set_hugetlb,
+                                        &error_abort);
+         object_class_property_set_description(oc, "hugetlb",
+-                                              "Use huge pages",
+-                                              &error_abort);
++                                              "Use huge pages");
+         object_class_property_add(oc, "hugetlbsize", "int",
+                                   memfd_backend_get_hugetlbsize,
+                                   memfd_backend_set_hugetlbsize,
+                                   NULL, NULL, &error_abort);
+         object_class_property_set_description(oc, "hugetlbsize",
+-                                              "Huge pages size (ex: 2M, 1G=
+)",
+-                                              &error_abort);
++                                              "Huge pages size (ex: 2M, 1G=
+)");
+     }
+     object_class_property_add_bool(oc, "seal",
+                                    memfd_backend_get_seal,
+                                    memfd_backend_set_seal,
+                                    &error_abort);
+     object_class_property_set_description(oc, "seal",
+-                                          "Seal growing & shrinking",
+-                                          &error_abort);
++                                          "Seal growing & shrinking");
+ }
+=20
+ static const TypeInfo memfd_backend_info =3D {
+diff --git a/backends/hostmem.c b/backends/hostmem.c
+index 327f9eebc3..946d176435 100644
+--- a/backends/hostmem.c
++++ b/backends/hostmem.c
+@@ -465,46 +465,46 @@ host_memory_backend_class_init(ObjectClass *oc, void =
+*data)
+         host_memory_backend_get_merge,
+         host_memory_backend_set_merge, &error_abort);
+     object_class_property_set_description(oc, "merge",
+-        "Mark memory as mergeable", &error_abort);
++        "Mark memory as mergeable");
+     object_class_property_add_bool(oc, "dump",
+         host_memory_backend_get_dump,
+         host_memory_backend_set_dump, &error_abort);
+     object_class_property_set_description(oc, "dump",
+-        "Set to 'off' to exclude from core dump", &error_abort);
++        "Set to 'off' to exclude from core dump");
+     object_class_property_add_bool(oc, "prealloc",
+         host_memory_backend_get_prealloc,
+         host_memory_backend_set_prealloc, &error_abort);
+     object_class_property_set_description(oc, "prealloc",
+-        "Preallocate memory", &error_abort);
++        "Preallocate memory");
+     object_class_property_add(oc, "prealloc-threads", "int",
+         host_memory_backend_get_prealloc_threads,
+         host_memory_backend_set_prealloc_threads,
+         NULL, NULL, &error_abort);
+     object_class_property_set_description(oc, "prealloc-threads",
+-        "Number of CPU threads to use for prealloc", &error_abort);
++        "Number of CPU threads to use for prealloc");
+     object_class_property_add(oc, "size", "int",
+         host_memory_backend_get_size,
+         host_memory_backend_set_size,
+         NULL, NULL, &error_abort);
+     object_class_property_set_description(oc, "size",
+-        "Size of the memory region (ex: 500M)", &error_abort);
++        "Size of the memory region (ex: 500M)");
+     object_class_property_add(oc, "host-nodes", "int",
+         host_memory_backend_get_host_nodes,
+         host_memory_backend_set_host_nodes,
+         NULL, NULL, &error_abort);
+     object_class_property_set_description(oc, "host-nodes",
+-        "Binds memory to the list of NUMA host nodes", &error_abort);
++        "Binds memory to the list of NUMA host nodes");
+     object_class_property_add_enum(oc, "policy", "HostMemPolicy",
+         &HostMemPolicy_lookup,
+         host_memory_backend_get_policy,
+         host_memory_backend_set_policy, &error_abort);
+     object_class_property_set_description(oc, "policy",
+-        "Set the NUMA policy", &error_abort);
++        "Set the NUMA policy");
+     object_class_property_add_bool(oc, "share",
+         host_memory_backend_get_share, host_memory_backend_set_share,
+         &error_abort);
+     object_class_property_set_description(oc, "share",
+-        "Mark the memory as private to QEMU or shared", &error_abort);
++        "Mark the memory as private to QEMU or shared");
+     object_class_property_add_bool(oc, "x-use-canonical-path-for-ramblock-=
+id",
+         host_memory_backend_get_use_canonical_path,
+         host_memory_backend_set_use_canonical_path, &error_abort);
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index a6a2102a93..b9a34cab75 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -422,7 +422,7 @@ static void aspeed_machine_class_props_init(ObjectClass=
+ *oc)
+                                    aspeed_get_mmio_exec,
+                                    aspeed_set_mmio_exec, &error_abort);
+     object_class_property_set_description(oc, "execute-in-place",
+-                           "boot directly from CE0 flash device", &error_a=
+bort);
++                           "boot directly from CE0 flash device");
+ }
+=20
+ static void aspeed_machine_class_init(ObjectClass *oc, void *data)
+diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
+index ed683eeea5..5372ab6c9b 100644
+--- a/hw/arm/vexpress.c
++++ b/hw/arm/vexpress.c
+@@ -752,8 +752,7 @@ static void vexpress_instance_init(Object *obj)
+                              vexpress_set_secure, NULL);
+     object_property_set_description(obj, "secure",
+                                     "Set on/off to enable/disable the ARM =
+"
+-                                    "Security Extensions (TrustZone)",
+-                                    NULL);
++                                    "Security Extensions (TrustZone)");
+ }
+=20
+ static void vexpress_a15_instance_init(Object *obj)
+@@ -770,8 +769,7 @@ static void vexpress_a15_instance_init(Object *obj)
+     object_property_set_description(obj, "virtualization",
+                                     "Set on/off to enable/disable the ARM =
+"
+                                     "Virtualization Extensions "
+-                                    "(defaults to same as 'secure')",
+-                                    NULL);
++                                    "(defaults to same as 'secure')");
+ }
+=20
+ static void vexpress_a9_instance_init(Object *obj)
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 171e6908ec..e9c6b9a340 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -2258,7 +2258,7 @@ static void virt_machine_class_init(ObjectClass *oc, =
+void *data)
+         virt_get_acpi, virt_set_acpi,
+         NULL, NULL, &error_abort);
+     object_class_property_set_description(oc, "acpi",
+-        "Enable ACPI", &error_abort);
++        "Enable ACPI");
+ }
+=20
+ static void virt_instance_init(Object *obj)
+@@ -2275,8 +2275,7 @@ static void virt_instance_init(Object *obj)
+                              virt_set_secure, NULL);
+     object_property_set_description(obj, "secure",
+                                     "Set on/off to enable/disable the ARM =
+"
+-                                    "Security Extensions (TrustZone)",
+-                                    NULL);
++                                    "Security Extensions (TrustZone)");
+=20
+     /* EL2 is also disabled by default, for similar reasons */
+     vms->virt =3D false;
+@@ -2285,8 +2284,7 @@ static void virt_instance_init(Object *obj)
+     object_property_set_description(obj, "virtualization",
+                                     "Set on/off to enable/disable emulatin=
+g a "
+                                     "guest CPU which implements the ARM "
+-                                    "Virtualization Extensions",
+-                                    NULL);
++                                    "Virtualization Extensions");
+=20
+     /* High memory is enabled by default */
+     vms->highmem =3D true;
+@@ -2294,15 +2292,13 @@ static void virt_instance_init(Object *obj)
+                              virt_set_highmem, NULL);
+     object_property_set_description(obj, "highmem",
+                                     "Set on/off to enable/disable using "
+-                                    "physical address space above 32 bits"=
+,
+-                                    NULL);
++                                    "physical address space above 32 bits"=
+);
+     vms->gic_version =3D VIRT_GIC_VERSION_NOSEL;
+     object_property_add_str(obj, "gic-version", virt_get_gic_version,
+                         virt_set_gic_version, NULL);
+     object_property_set_description(obj, "gic-version",
+                                     "Set GIC version. "
+-                                    "Valid values are 2, 3, host and max",
+-                                    NULL);
++                                    "Valid values are 2, 3, host and max")=
 ;
-     void (*set_default_value)(ObjectProperty *op, const Property *prop);
--    void (*create)(ObjectClass *oc, Property *prop, Error **errp);
-+    void (*create)(ObjectClass *oc, Property *prop);
-     ObjectPropertyAccessor *get;
-     ObjectPropertyAccessor *set;
-     ObjectPropertyRelease *release;
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index ef81302e1a..26c0c802d1 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -92,7 +92,7 @@ void check_boot_index(int32_t bootindex, Error **errp);
- void del_boot_device_path(DeviceState *dev, const char *suffix);
- void device_add_bootindex_property(Object *obj, int32_t *bootindex,
-                                    const char *name, const char *suffix,
--                                   DeviceState *dev, Error **errp);
-+                                   DeviceState *dev);
- void restore_boot_order(void *opaque);
- void validate_bootdevices(const char *devices, Error **errp);
- void add_boot_device_lchs(DeviceState *dev, const char *suffix,
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 88d9449555..885e7a0685 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1335,8 +1335,7 @@ void ppc_set_compat_all(uint32_t compat_pvr, Error **=
-errp);
- #endif
- int ppc_compat_max_vthreads(PowerPCCPU *cpu);
- void ppc_compat_add_property(Object *obj, const char *name,
--                             uint32_t *compat_pvr, const char *basedesc,
--                             Error **errp);
-+                             uint32_t *compat_pvr, const char *basedesc);
- #endif /* defined(TARGET_PPC64) */
 =20
- typedef CPUPPCState CPUArchState;
-diff --git a/bootdevice.c b/bootdevice.c
-index d11576d575..0ff55e2b79 100644
---- a/bootdevice.c
-+++ b/bootdevice.c
-@@ -327,7 +327,7 @@ static void property_release_bootindex(Object *obj, con=
-st char *name,
+     vms->highmem_ecam =3D !vmc->no_highmem_ecam;
 =20
- void device_add_bootindex_property(Object *obj, int32_t *bootindex,
-                                    const char *name, const char *suffix,
--                                   DeviceState *dev, Error **errp)
-+                                   DeviceState *dev)
- {
-     BootIndexProperty *prop =3D g_malloc0(sizeof(*prop));
+@@ -2315,8 +2311,7 @@ static void virt_instance_init(Object *obj)
+                                  virt_set_its, NULL);
+         object_property_set_description(obj, "its",
+                                         "Set on/off to enable/disable "
+-                                        "ITS instantiation",
+-                                        NULL);
++                                        "ITS instantiation");
+     }
 =20
-diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
-index 9e4c03bef8..2d204babc6 100644
---- a/hw/acpi/ich9.c
-+++ b/hw/acpi/ich9.c
-@@ -369,7 +369,7 @@ static void ich9_pm_set_enable_tco(Object *obj, bool va=
-lue, Error **errp)
-     s->pm.enable_tco =3D value;
+     /* Default disallows iommu instantiation */
+@@ -2324,8 +2319,7 @@ static void virt_instance_init(Object *obj)
+     object_property_add_str(obj, "iommu", virt_get_iommu, virt_set_iommu, =
+NULL);
+     object_property_set_description(obj, "iommu",
+                                     "Set the IOMMU type. "
+-                                    "Valid values are none and smmuv3",
+-                                    NULL);
++                                    "Valid values are none and smmuv3");
+=20
+     vms->irqmap =3D a15irqmap;
+=20
+diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+index a798e228b7..808fdae804 100644
+--- a/hw/arm/xlnx-zcu102.c
++++ b/hw/arm/xlnx-zcu102.c
+@@ -212,8 +212,7 @@ static void xlnx_zcu102_machine_instance_init(Object *o=
+bj)
+                              zcu102_set_secure, NULL);
+     object_property_set_description(obj, "secure",
+                                     "Set on/off to enable/disable the ARM =
+"
+-                                    "Security Extensions (TrustZone)",
+-                                    NULL);
++                                    "Security Extensions (TrustZone)");
+=20
+     /* Default to virt (EL2) being disabled */
+     s->virt =3D false;
+@@ -222,8 +221,7 @@ static void xlnx_zcu102_machine_instance_init(Object *o=
+bj)
+     object_property_set_description(obj, "virtualization",
+                                     "Set on/off to enable/disable emulatin=
+g a "
+                                     "guest CPU which implements the ARM "
+-                                    "Virtualization Extensions",
+-                                    NULL);
++                                    "Virtualization Extensions");
  }
 =20
--void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm, Error **errp)
-+void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm)
- {
-     static const uint32_t gpe0_len =3D ICH9_PMIO_GPE0_LEN;
-     pm->acpi_memory_hotplug.is_enabled =3D true;
-diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index 9628cc171e..c5fb9d6ece 100644
---- a/hw/block/fdc.c
-+++ b/hw/block/fdc.c
-@@ -2813,10 +2813,10 @@ static void isabus_fdc_instance_init(Object *obj)
+ static void xlnx_zcu102_machine_class_init(ObjectClass *oc, void *data)
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index c1a444cb75..39310acf36 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -786,83 +786,82 @@ static void machine_class_init(ObjectClass *oc, void =
+*data)
+     object_class_property_add_str(oc, "kernel",
+         machine_get_kernel, machine_set_kernel, &error_abort);
+     object_class_property_set_description(oc, "kernel",
+-        "Linux kernel image file", &error_abort);
++        "Linux kernel image file");
 =20
-     device_add_bootindex_property(obj, &isa->bootindexA,
-                                   "bootindexA", "/floppy@0",
--                                  DEVICE(obj), NULL);
-+                                  DEVICE(obj));
-     device_add_bootindex_property(obj, &isa->bootindexB,
-                                   "bootindexB", "/floppy@1",
--                                  DEVICE(obj), NULL);
-+                                  DEVICE(obj));
+     object_class_property_add_str(oc, "initrd",
+         machine_get_initrd, machine_set_initrd, &error_abort);
+     object_class_property_set_description(oc, "initrd",
+-        "Linux initial ramdisk file", &error_abort);
++        "Linux initial ramdisk file");
+=20
+     object_class_property_add_str(oc, "append",
+         machine_get_append, machine_set_append, &error_abort);
+     object_class_property_set_description(oc, "append",
+-        "Linux kernel command line", &error_abort);
++        "Linux kernel command line");
+=20
+     object_class_property_add_str(oc, "dtb",
+         machine_get_dtb, machine_set_dtb, &error_abort);
+     object_class_property_set_description(oc, "dtb",
+-        "Linux kernel device tree file", &error_abort);
++        "Linux kernel device tree file");
+=20
+     object_class_property_add_str(oc, "dumpdtb",
+         machine_get_dumpdtb, machine_set_dumpdtb, &error_abort);
+     object_class_property_set_description(oc, "dumpdtb",
+-        "Dump current dtb to a file and quit", &error_abort);
++        "Dump current dtb to a file and quit");
+=20
+     object_class_property_add(oc, "phandle-start", "int",
+         machine_get_phandle_start, machine_set_phandle_start,
+         NULL, NULL, &error_abort);
+     object_class_property_set_description(oc, "phandle-start",
+-            "The first phandle ID we may generate dynamically", &error_abo=
+rt);
++        "The first phandle ID we may generate dynamically");
+=20
+     object_class_property_add_str(oc, "dt-compatible",
+         machine_get_dt_compatible, machine_set_dt_compatible, &error_abort=
+);
+     object_class_property_set_description(oc, "dt-compatible",
+-        "Overrides the \"compatible\" property of the dt root node",
+-        &error_abort);
++        "Overrides the \"compatible\" property of the dt root node");
+=20
+     object_class_property_add_bool(oc, "dump-guest-core",
+         machine_get_dump_guest_core, machine_set_dump_guest_core, &error_a=
+bort);
+     object_class_property_set_description(oc, "dump-guest-core",
+-        "Include guest memory in a core dump", &error_abort);
++        "Include guest memory in a core dump");
+=20
+     object_class_property_add_bool(oc, "mem-merge",
+         machine_get_mem_merge, machine_set_mem_merge, &error_abort);
+     object_class_property_set_description(oc, "mem-merge",
+-        "Enable/disable memory merge support", &error_abort);
++        "Enable/disable memory merge support");
+=20
+     object_class_property_add_bool(oc, "usb",
+         machine_get_usb, machine_set_usb, &error_abort);
+     object_class_property_set_description(oc, "usb",
+-        "Set on/off to enable/disable usb", &error_abort);
++        "Set on/off to enable/disable usb");
+=20
+     object_class_property_add_bool(oc, "graphics",
+         machine_get_graphics, machine_set_graphics, &error_abort);
+     object_class_property_set_description(oc, "graphics",
+-        "Set on/off to enable/disable graphics emulation", &error_abort);
++        "Set on/off to enable/disable graphics emulation");
+=20
+     object_class_property_add_str(oc, "firmware",
+         machine_get_firmware, machine_set_firmware,
+         &error_abort);
+     object_class_property_set_description(oc, "firmware",
+-        "Firmware image", &error_abort);
++        "Firmware image");
+=20
+     object_class_property_add_bool(oc, "suppress-vmdesc",
+         machine_get_suppress_vmdesc, machine_set_suppress_vmdesc,
+         &error_abort);
+     object_class_property_set_description(oc, "suppress-vmdesc",
+-        "Set on to disable self-describing migration", &error_abort);
++        "Set on to disable self-describing migration");
+=20
+     object_class_property_add_bool(oc, "enforce-config-section",
+         machine_get_enforce_config_section, machine_set_enforce_config_sec=
+tion,
+         &error_abort);
+     object_class_property_set_description(oc, "enforce-config-section",
+-        "Set on to enforce configuration section migration", &error_abort)=
+;
++        "Set on to enforce configuration section migration");
+=20
+     object_class_property_add_str(oc, "memory-encryption",
+         machine_get_memory_encryption, machine_set_memory_encryption,
+         &error_abort);
+     object_class_property_set_description(oc, "memory-encryption",
+-        "Set memory encryption object to use", &error_abort);
++        "Set memory encryption object to use");
  }
 =20
- static const TypeInfo isa_fdc_info =3D {
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 9b453423cf..2f3100e56c 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -1594,7 +1594,7 @@ static void nvme_instance_init(Object *obj)
+ static void machine_class_base_init(ObjectClass *oc, void *data)
+@@ -895,7 +894,7 @@ static void machine_initfn(Object *obj)
+                                  &error_abort);
+         object_property_set_description(obj, "nvdimm",
+                                         "Set on/off to enable/disable "
+-                                        "NVDIMM instantiation", NULL);
++                                        "NVDIMM instantiation");
 =20
-     device_add_bootindex_property(obj, &s->conf.bootindex,
-                                   "bootindex", "/namespace@1,0",
--                                  DEVICE(obj), &error_abort);
-+                                  DEVICE(obj));
- }
+         object_property_add_str(obj, "nvdimm-persistence",
+                                 machine_get_nvdimm_persistence,
+@@ -903,8 +902,7 @@ static void machine_initfn(Object *obj)
+                                 &error_abort);
+         object_property_set_description(obj, "nvdimm-persistence",
+                                         "Set NVDIMM persistence"
+-                                        "Valid values are cpu, mem-ctrl",
+-                                        NULL);
++                                        "Valid values are cpu, mem-ctrl");
+     }
 =20
- static const TypeInfo nvme_info =3D {
-diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-index 6c485d1c9e..5263e0c9ad 100644
---- a/hw/block/vhost-user-blk.c
-+++ b/hw/block/vhost-user-blk.c
-@@ -481,7 +481,7 @@ static void vhost_user_blk_instance_init(Object *obj)
-     VHostUserBlk *s =3D VHOST_USER_BLK(obj);
+     if (mc->cpu_index_to_instance_props && mc->get_default_cpu_node_id) {
+@@ -915,7 +913,7 @@ static void machine_initfn(Object *obj)
+         object_property_set_description(obj, "hmat",
+                                         "Set on/off to enable/disable "
+                                         "ACPI Heterogeneous Memory Attribu=
+te "
+-                                        "Table (HMAT)", NULL);
++                                        "Table (HMAT)");
+     }
 =20
-     device_add_bootindex_property(obj, &s->bootindex, "bootindex",
--                                  "/disk@0,0", DEVICE(obj), NULL);
-+                                  "/disk@0,0", DEVICE(obj));
- }
+     object_property_add_str(obj, "memory-backend",
+@@ -923,8 +921,7 @@ static void machine_initfn(Object *obj)
+                             &error_abort);
+     object_property_set_description(obj, "memory-backend",
+                                     "Set RAM backend"
+-                                    "Valid value is ID of hostmem based ba=
+ckend",
+-                                     &error_abort);
++                                    "Valid value is ID of hostmem based ba=
+ckend");
 =20
- static const VMStateDescription vmstate_vhost_user_blk =3D {
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 97ba8a2187..fb32717a12 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -1248,7 +1248,7 @@ static void virtio_blk_instance_init(Object *obj)
-=20
-     device_add_bootindex_property(obj, &s->conf.conf.bootindex,
-                                   "bootindex", "/disk@0,0",
--                                  DEVICE(obj), NULL);
-+                                  DEVICE(obj));
- }
-=20
- static const VMStateDescription vmstate_virtio_blk =3D {
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 2f294ec4a4..cc924815da 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -1250,7 +1250,7 @@ const PropertyInfo qdev_prop_size =3D {
-=20
- /* --- object link property --- */
-=20
--static void create_link_property(ObjectClass *oc, Property *prop, Error **=
-errp)
-+static void create_link_property(ObjectClass *oc, Property *prop)
- {
-     object_class_property_add_link(oc, prop->name, prop->link_type,
-                                    prop->offset,
+     /* Register notifier when init is done for sysbus sanity checks */
+     ms->sysbus_notifier.notify =3D machine_init_notify;
 diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 3f91bff712..2afa2562b8 100644
+index dd77a56067..ea7118ab0e 100644
 --- a/hw/core/qdev.c
 +++ b/hw/core/qdev.c
-@@ -782,7 +782,7 @@ static void qdev_class_add_property(DeviceClass *klass,=
+@@ -775,8 +775,7 @@ void qdev_property_add_static(DeviceState *dev, Propert=
+y *prop)
+                              prop, &error_abort);
+=20
+     object_property_set_description(obj, prop->name,
+-                                    prop->info->description,
+-                                    &error_abort);
++                                    prop->info->description);
+=20
+     if (prop->set_default) {
+         prop->info->set_default_value(op, prop);
+@@ -805,8 +804,7 @@ static void qdev_class_add_property(DeviceClass *klass,=
  Property *prop)
-     ObjectClass *oc =3D OBJECT_CLASS(klass);
-=20
-     if (prop->info->create) {
--        prop->info->create(oc, prop, &error_abort);
-+        prop->info->create(oc, prop);
-     } else {
-         ObjectProperty *op;
-=20
-diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
-index c975d46675..cd6e169d47 100644
---- a/hw/isa/lpc_ich9.c
-+++ b/hw/isa/lpc_ich9.c
-@@ -639,7 +639,7 @@ static void ich9_lpc_initfn(Object *obj)
-     object_property_add_uint8_ptr(OBJECT(lpc), ACPI_PM_PROP_ACPI_DISABLE_C=
-MD,
-                                   &acpi_disable_cmd, OBJ_PROP_FLAG_READ);
-=20
--    ich9_pm_add_properties(obj, &lpc->pm, NULL);
-+    ich9_pm_add_properties(obj, &lpc->pm);
+         }
+     }
+     object_class_property_set_description(oc, prop->name,
+-                                          prop->info->description,
+-                                          &error_abort);
++                                          prop->info->description);
  }
 =20
- static void ich9_lpc_realize(PCIDevice *d, Error **errp)
-diff --git a/hw/net/e1000.c b/hw/net/e1000.c
-index 0d2c2759e3..a18f80e369 100644
---- a/hw/net/e1000.c
-+++ b/hw/net/e1000.c
-@@ -1774,7 +1774,7 @@ static void e1000_instance_init(Object *obj)
-     E1000State *n =3D E1000(obj);
-     device_add_bootindex_property(obj, &n->conf.bootindex,
-                                   "bootindex", "/ethernet-phy@0",
--                                  DEVICE(n), NULL);
-+                                  DEVICE(n));
+ /* @qdev_alias_all_properties - Add alias properties to the source object =
+for
+diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
+index 38d8e51703..76aaa7a8d8 100644
+--- a/hw/i386/microvm.c
++++ b/hw/i386/microvm.c
+@@ -512,36 +512,35 @@ static void microvm_class_init(ObjectClass *oc, void =
+*data)
+                               microvm_machine_set_pic,
+                               NULL, NULL, &error_abort);
+     object_class_property_set_description(oc, MICROVM_MACHINE_PIC,
+-        "Enable i8259 PIC", &error_abort);
++        "Enable i8259 PIC");
+=20
+     object_class_property_add(oc, MICROVM_MACHINE_PIT, "OnOffAuto",
+                               microvm_machine_get_pit,
+                               microvm_machine_set_pit,
+                               NULL, NULL, &error_abort);
+     object_class_property_set_description(oc, MICROVM_MACHINE_PIT,
+-        "Enable i8254 PIT", &error_abort);
++        "Enable i8254 PIT");
+=20
+     object_class_property_add(oc, MICROVM_MACHINE_RTC, "OnOffAuto",
+                               microvm_machine_get_rtc,
+                               microvm_machine_set_rtc,
+                               NULL, NULL, &error_abort);
+     object_class_property_set_description(oc, MICROVM_MACHINE_RTC,
+-        "Enable MC146818 RTC", &error_abort);
++        "Enable MC146818 RTC");
+=20
+     object_class_property_add_bool(oc, MICROVM_MACHINE_ISA_SERIAL,
+                                    microvm_machine_get_isa_serial,
+                                    microvm_machine_set_isa_serial,
+                                    &error_abort);
+     object_class_property_set_description(oc, MICROVM_MACHINE_ISA_SERIAL,
+-        "Set off to disable the instantiation an ISA serial port",
+-        &error_abort);
++        "Set off to disable the instantiation an ISA serial port");
+=20
+     object_class_property_add_bool(oc, MICROVM_MACHINE_OPTION_ROMS,
+                                    microvm_machine_get_option_roms,
+                                    microvm_machine_set_option_roms,
+                                    &error_abort);
+     object_class_property_set_description(oc, MICROVM_MACHINE_OPTION_ROMS,
+-        "Set off to disable loading option ROMs", &error_abort);
++        "Set off to disable loading option ROMs");
+=20
+     object_class_property_add_bool(oc, MICROVM_MACHINE_AUTO_KERNEL_CMDLINE=
+,
+                                    microvm_machine_get_auto_kernel_cmdline=
+,
+@@ -549,8 +548,7 @@ static void microvm_class_init(ObjectClass *oc, void *d=
+ata)
+                                    &error_abort);
+     object_class_property_set_description(oc,
+         MICROVM_MACHINE_AUTO_KERNEL_CMDLINE,
+-        "Set off to disable adding virtio-mmio devices to the kernel cmdli=
+ne",
+-        &error_abort);
++        "Set off to disable adding virtio-mmio devices to the kernel cmdli=
+ne");
  }
 =20
- static const TypeInfo e1000_base_info =3D {
-diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
-index 79ba158d41..fda34518c9 100644
---- a/hw/net/e1000e.c
-+++ b/hw/net/e1000e.c
-@@ -705,7 +705,7 @@ static void e1000e_instance_init(Object *obj)
-     E1000EState *s =3D E1000E(obj);
-     device_add_bootindex_property(obj, &s->conf.bootindex,
-                                   "bootindex", "/ethernet-phy@0",
--                                  DEVICE(obj), NULL);
-+                                  DEVICE(obj));
+ static const TypeInfo microvm_machine_info =3D {
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index f6b8431c8b..37c16de1df 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1968,7 +1968,7 @@ static void pc_machine_class_init(ObjectClass *oc, vo=
+id *data)
+         pc_machine_get_vmport, pc_machine_set_vmport,
+         NULL, NULL, &error_abort);
+     object_class_property_set_description(oc, PC_MACHINE_VMPORT,
+-        "Enable vmport (pc & q35)", &error_abort);
++        "Enable vmport (pc & q35)");
+=20
+     object_class_property_add_bool(oc, PC_MACHINE_SMBUS,
+         pc_machine_get_smbus, pc_machine_set_smbus, &error_abort);
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index b82770024c..e2bf601273 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -984,19 +984,19 @@ static void x86_machine_class_init(ObjectClass *oc, v=
+oid *data)
+         x86_machine_get_max_ram_below_4g, x86_machine_set_max_ram_below_4g=
+,
+         NULL, NULL, &error_abort);
+     object_class_property_set_description(oc, X86_MACHINE_MAX_RAM_BELOW_4G=
+,
+-        "Maximum ram below the 4G boundary (32bit boundary)", &error_abort=
+);
++        "Maximum ram below the 4G boundary (32bit boundary)");
+=20
+     object_class_property_add(oc, X86_MACHINE_SMM, "OnOffAuto",
+         x86_machine_get_smm, x86_machine_set_smm,
+         NULL, NULL, &error_abort);
+     object_class_property_set_description(oc, X86_MACHINE_SMM,
+-        "Enable SMM", &error_abort);
++        "Enable SMM");
+=20
+     object_class_property_add(oc, X86_MACHINE_ACPI, "OnOffAuto",
+         x86_machine_get_acpi, x86_machine_set_acpi,
+         NULL, NULL, &error_abort);
+     object_class_property_set_description(oc, X86_MACHINE_ACPI,
+-        "Enable ACPI", &error_abort);
++        "Enable ACPI");
  }
 =20
- static const TypeInfo e1000e_info =3D {
-diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
-index f6474f0e68..16e95ef9cc 100644
---- a/hw/net/eepro100.c
-+++ b/hw/net/eepro100.c
-@@ -1883,7 +1883,7 @@ static void eepro100_instance_init(Object *obj)
-     EEPRO100State *s =3D DO_UPCAST(EEPRO100State, dev, PCI_DEVICE(obj));
-     device_add_bootindex_property(obj, &s->conf.bootindex,
-                                   "bootindex", "/ethernet-phy@0",
--                                  DEVICE(s), NULL);
-+                                  DEVICE(s));
+ static const TypeInfo x86_machine_info =3D {
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index 428cf63578..55d1419442 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -631,8 +631,7 @@ static void core99_instance_init(Object *obj)
+                             core99_set_via_config, NULL);
+     object_property_set_description(obj, "via",
+                                     "Set VIA configuration. "
+-                                    "Valid values are cuda, pmu and pmu-ad=
+b",
+-                                    NULL);
++                                    "Valid values are cuda, pmu and pmu-ad=
+b");
+=20
+     return;
+ }
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index c9cb6fa357..71b08e2ae7 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -2002,8 +2002,7 @@ static void pnv_machine_class_init(ObjectClass *oc, v=
+oid *data)
+                                    pnv_machine_get_hb, pnv_machine_set_hb,
+                                    &error_abort);
+     object_class_property_set_description(oc, "hb-mode",
+-                              "Use a hostboot like boot loader",
+-                              NULL);
++                              "Use a hostboot like boot loader");
  }
 =20
- static E100PCIDeviceInfo e100_devices[] =3D {
-diff --git a/hw/net/lance.c b/hw/net/lance.c
-index 688724db0b..4c5f01baad 100644
---- a/hw/net/lance.c
-+++ b/hw/net/lance.c
-@@ -134,7 +134,7 @@ static void lance_instance_init(Object *obj)
-=20
-     device_add_bootindex_property(obj, &s->conf.bootindex,
-                                   "bootindex", "/ethernet-phy@0",
--                                  DEVICE(obj), NULL);
-+                                  DEVICE(obj));
- }
-=20
- static Property lance_properties[] =3D {
-diff --git a/hw/net/lasi_i82596.c b/hw/net/lasi_i82596.c
-index 52637a562d..5e0fd69763 100644
---- a/hw/net/lasi_i82596.c
-+++ b/hw/net/lasi_i82596.c
-@@ -152,7 +152,7 @@ static void lasi_82596_instance_init(Object *obj)
-=20
-     device_add_bootindex_property(obj, &s->conf.bootindex,
-                                   "bootindex", "/ethernet-phy@0",
--                                  DEVICE(obj), NULL);
-+                                  DEVICE(obj));
- }
-=20
- static Property lasi_82596_properties[] =3D {
-diff --git a/hw/net/ne2000-pci.c b/hw/net/ne2000-pci.c
-index e11d67bf75..9e5d10859a 100644
---- a/hw/net/ne2000-pci.c
-+++ b/hw/net/ne2000-pci.c
-@@ -92,7 +92,7 @@ static void ne2000_instance_init(Object *obj)
-=20
-     device_add_bootindex_property(obj, &s->c.bootindex,
-                                   "bootindex", "/ethernet-phy@0",
--                                  &pci_dev->qdev, NULL);
-+                                  &pci_dev->qdev);
- }
-=20
- static Property ne2000_properties[] =3D {
-diff --git a/hw/net/pcnet-pci.c b/hw/net/pcnet-pci.c
-index d1f31e0272..49d3e42e83 100644
---- a/hw/net/pcnet-pci.c
-+++ b/hw/net/pcnet-pci.c
-@@ -250,7 +250,7 @@ static void pcnet_instance_init(Object *obj)
-=20
-     device_add_bootindex_property(obj, &s->conf.bootindex,
-                                   "bootindex", "/ethernet-phy@0",
--                                  DEVICE(obj), NULL);
-+                                  DEVICE(obj));
- }
-=20
- static Property pcnet_properties[] =3D {
-diff --git a/hw/net/rtl8139.c b/hw/net/rtl8139.c
-index 70aca7ec26..ab93d78ab3 100644
---- a/hw/net/rtl8139.c
-+++ b/hw/net/rtl8139.c
-@@ -3415,7 +3415,7 @@ static void rtl8139_instance_init(Object *obj)
-=20
-     device_add_bootindex_property(obj, &s->conf.bootindex,
-                                   "bootindex", "/ethernet-phy@0",
--                                  DEVICE(obj), NULL);
-+                                  DEVICE(obj));
- }
-=20
- static Property rtl8139_properties[] =3D {
-diff --git a/hw/net/spapr_llan.c b/hw/net/spapr_llan.c
-index a2377025a7..968a1ce78e 100644
---- a/hw/net/spapr_llan.c
-+++ b/hw/net/spapr_llan.c
-@@ -340,7 +340,7 @@ static void spapr_vlan_instance_init(Object *obj)
-=20
-     device_add_bootindex_property(obj, &dev->nicconf.bootindex,
-                                   "bootindex", "",
--                                  DEVICE(dev), NULL);
-+                                  DEVICE(dev));
-=20
-     if (dev->compat_flags & SPAPRVLAN_FLAG_RX_BUF_POOLS) {
-         for (i =3D 0; i < RX_MAX_POOLS; i++) {
-diff --git a/hw/net/sungem.c b/hw/net/sungem.c
-index b01197d952..e4b7b57704 100644
---- a/hw/net/sungem.c
-+++ b/hw/net/sungem.c
-@@ -1378,7 +1378,7 @@ static void sungem_instance_init(Object *obj)
-=20
-     device_add_bootindex_property(obj, &s->conf.bootindex,
-                                   "bootindex", "/ethernet-phy@0",
--                                  DEVICE(obj), NULL);
-+                                  DEVICE(obj));
- }
-=20
- static Property sungem_properties[] =3D {
-diff --git a/hw/net/sunhme.c b/hw/net/sunhme.c
-index 9c38583180..bc48d46b9f 100644
---- a/hw/net/sunhme.c
-+++ b/hw/net/sunhme.c
-@@ -901,7 +901,7 @@ static void sunhme_instance_init(Object *obj)
-=20
-     device_add_bootindex_property(obj, &s->conf.bootindex,
-                                   "bootindex", "/ethernet-phy@0",
--                                  DEVICE(obj), NULL);
-+                                  DEVICE(obj));
- }
-=20
- static void sunhme_reset(DeviceState *ds)
-diff --git a/hw/net/tulip.c b/hw/net/tulip.c
-index 1295f51d07..6cefc0add2 100644
---- a/hw/net/tulip.c
-+++ b/hw/net/tulip.c
-@@ -1001,7 +1001,7 @@ static void tulip_instance_init(Object *obj)
-=20
-     device_add_bootindex_property(obj, &d->c.bootindex,
-                                   "bootindex", "/ethernet-phy@0",
--                                  &pci_dev->qdev, NULL);
-+                                  &pci_dev->qdev);
- }
-=20
- static Property tulip_properties[] =3D {
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index e51231e795..b43fd7d608 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -3125,7 +3125,7 @@ static void virtio_net_instance_init(Object *obj)
-     n->config_size =3D sizeof(struct virtio_net_config);
-     device_add_bootindex_property(obj, &n->nic_conf.bootindex,
-                                   "bootindex", "/ethernet-phy@0",
--                                  DEVICE(n), NULL);
-+                                  DEVICE(n));
- }
-=20
- static int virtio_net_pre_save(void *opaque)
-diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
-index 6d91cd8309..7a6ca4ec35 100644
---- a/hw/net/vmxnet3.c
-+++ b/hw/net/vmxnet3.c
-@@ -2237,7 +2237,7 @@ static void vmxnet3_instance_init(Object *obj)
-     VMXNET3State *s =3D VMXNET3(obj);
-     device_add_bootindex_property(obj, &s->conf.bootindex,
-                                   "bootindex", "/ethernet-phy@0",
--                                  DEVICE(obj), NULL);
-+                                  DEVICE(obj));
- }
-=20
- static void vmxnet3_pci_uninit(PCIDevice *pci_dev)
+ #define DEFINE_PNV8_CHIP_TYPE(type, class_initfn) \
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 6048345496..b67e4389fb 100644
+index 9a2bd501aa..91138e7c67 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -3326,8 +3326,7 @@ static void spapr_instance_init(Object *obj)
+@@ -3317,8 +3317,7 @@ static void spapr_instance_init(Object *obj)
+     object_property_add_str(obj, "kvm-type",
+                             spapr_get_kvm_type, spapr_set_kvm_type, NULL);
+     object_property_set_description(obj, "kvm-type",
+-                                    "Specifies the KVM virtualization mode=
+ (HV, PR)",
+-                                    NULL);
++                                    "Specifies the KVM virtualization mode=
+ (HV, PR)");
+     object_property_add_bool(obj, "modern-hotplug-events",
+                             spapr_get_modern_hotplug_events,
+                             spapr_set_modern_hotplug_events,
+@@ -3326,8 +3325,7 @@ static void spapr_instance_init(Object *obj)
+     object_property_set_description(obj, "modern-hotplug-events",
+                                     "Use dedicated hotplug event mechanism=
+ in"
                                      " place of standard EPOW events when p=
 ossible"
-                                     " (required for memory hot-unplug supp=
+-                                    " (required for memory hot-unplug supp=
+ort)",
+-                                    NULL);
++                                    " (required for memory hot-unplug supp=
 ort)");
      ppc_compat_add_property(obj, "max-cpu-compat", &spapr->max_compat_pvr,
--                            "Maximum permitted CPU compatibility mode",
--                            &error_fatal);
-+                            "Maximum permitted CPU compatibility mode");
-=20
+                             "Maximum permitted CPU compatibility mode",
+                             &error_fatal);
+@@ -3335,14 +3333,13 @@ static void spapr_instance_init(Object *obj)
      object_property_add_str(obj, "resize-hpt",
-                             spapr_get_resize_hpt, spapr_set_resize_hpt);
-@@ -4532,7 +4531,7 @@ static void spapr_machine_class_init(ObjectClass *oc,=
- void *data)
-     smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D SPAPR_CAP_ON;
-     smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_ON;
-     smc->default_caps.caps[SPAPR_CAP_FWNMI] =3D SPAPR_CAP_ON;
--    spapr_caps_add_properties(smc, &error_abort);
-+    spapr_caps_add_properties(smc);
-     smc->irq =3D &spapr_irq_dual;
-     smc->dr_phb_enabled =3D true;
-     smc->linux_pci_probe =3D true;
+                             spapr_get_resize_hpt, spapr_set_resize_hpt, NU=
+LL);
+     object_property_set_description(obj, "resize-hpt",
+-                                    "Resizing of the Hash Page Table (enab=
+led, disabled, required)",
+-                                    NULL);
++                                    "Resizing of the Hash Page Table (enab=
+led, disabled, required)");
+     object_property_add_uint32_ptr(obj, "vsmt",
+                                    &spapr->vsmt, OBJ_PROP_FLAG_READWRITE,
+                                    &error_abort);
+     object_property_set_description(obj, "vsmt",
+                                     "Virtual SMT: KVM behaves as if this w=
+ere"
+-                                    " the host's SMT mode", &error_abort);
++                                    " the host's SMT mode");
+=20
+     object_property_add_bool(obj, "vfio-no-msix-emulation",
+                              spapr_get_msix_emulation, NULL, NULL);
+@@ -3352,27 +3349,25 @@ static void spapr_instance_init(Object *obj)
+                                    &error_abort);
+     object_property_set_description(obj, "kernel-addr",
+                                     stringify(KERNEL_LOAD_ADDR)
+-                                    " for -kernel is the default",
+-                                    NULL);
++                                    " for -kernel is the default");
+     spapr->kernel_addr =3D KERNEL_LOAD_ADDR;
+     /* The machine class defines the default interrupt controller mode */
+     spapr->irq =3D smc->irq;
+     object_property_add_str(obj, "ic-mode", spapr_get_ic_mode,
+                             spapr_set_ic_mode, NULL);
+     object_property_set_description(obj, "ic-mode",
+-                 "Specifies the interrupt controller mode (xics, xive, dua=
+l)",
+-                 NULL);
++                 "Specifies the interrupt controller mode (xics, xive, dua=
+l)");
+=20
+     object_property_add_str(obj, "host-model",
+         spapr_get_host_model, spapr_set_host_model,
+         &error_abort);
+     object_property_set_description(obj, "host-model",
+-        "Host model to advertise in guest device tree", &error_abort);
++        "Host model to advertise in guest device tree");
+     object_property_add_str(obj, "host-serial",
+         spapr_get_host_serial, spapr_set_host_serial,
+         &error_abort);
+     object_property_set_description(obj, "host-serial",
+-        "Host serial number to advertise in guest device tree", &error_abo=
+rt);
++        "Host serial number to advertise in guest device tree");
+ }
+=20
+ static void spapr_machine_finalizefn(Object *obj)
 diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 184563e608..efdc0dbbcf 100644
+index eb54f94227..0870961fc9 100644
 --- a/hw/ppc/spapr_caps.c
 +++ b/hw/ppc/spapr_caps.c
-@@ -824,7 +824,7 @@ void spapr_caps_cpu_apply(SpaprMachineState *spapr, Pow=
-erPCCPU *cpu)
+@@ -845,12 +845,8 @@ void spapr_caps_add_properties(SpaprMachineClass *smc,=
+ Error **errp)
+         }
+=20
+         desc =3D g_strdup_printf("%s", cap->description);
+-        object_class_property_set_description(klass, name, desc, &local_er=
+r);
++        object_class_property_set_description(klass, name, desc);
+         g_free(name);
+         g_free(desc);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
+-            return;
+-        }
+     }
+ }
+diff --git a/hw/ppc/spapr_rng.c b/hw/ppc/spapr_rng.c
+index e8e8d65ec0..85bf64d68e 100644
+--- a/hw/ppc/spapr_rng.c
++++ b/hw/ppc/spapr_rng.c
+@@ -103,8 +103,7 @@ static void spapr_rng_instance_init(Object *obj)
+     }
+=20
+     object_property_set_description(obj, "rng",
+-                                    "ID of the random number generator bac=
+kend",
+-                                    NULL);
++                                    "ID of the random number generator bac=
+kend");
+ }
+=20
+ static void spapr_rng_realize(DeviceState *dev, Error **errp)
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index bed10fcfa8..da48c958e2 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -445,13 +445,12 @@ static void sifive_u_machine_instance_init(Object *ob=
+j)
+                              sifive_u_machine_set_start_in_flash, NULL);
+     object_property_set_description(obj, "start-in-flash",
+                                     "Set on to tell QEMU's ROM to jump to =
+"
+-                                    "flash. Otherwise QEMU will jump to DR=
+AM",
+-                                    NULL);
++                                    "flash. Otherwise QEMU will jump to DR=
+AM");
+=20
+     s->serial =3D OTP_SERIAL;
+     object_property_add(obj, "serial", "uint32", sifive_u_machine_get_seri=
+al,
+                         sifive_u_machine_set_serial, NULL, &s->serial, NUL=
+L);
+-    object_property_set_description(obj, "serial", "Board serial number", =
+NULL);
++    object_property_set_description(obj, "serial", "Board serial number");
+ }
+=20
+ static void sifive_u_machine_class_init(ObjectClass *oc, void *data)
+diff --git a/hw/s390x/css-bridge.c b/hw/s390x/css-bridge.c
+index a306a78e6c..c9ce06b043 100644
+--- a/hw/s390x/css-bridge.c
++++ b/hw/s390x/css-bridge.c
+@@ -144,8 +144,7 @@ static void virtual_css_bridge_class_init(ObjectClass *=
+klass, void *data)
+                                    prop_get_true, NULL, NULL);
+     object_class_property_set_description(klass, "cssid-unrestricted",
+             "A css device can use any cssid, regardless whether virtual"
+-            " or not (read only, always true)",
+-            NULL);
++            " or not (read only, always true)");
+ }
+=20
+ static const TypeInfo virtual_css_bridge_info =3D {
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 45292fb5a8..8643c0baae 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -731,24 +731,21 @@ static inline void s390_machine_initfn(Object *obj)
+                              machine_get_aes_key_wrap,
+                              machine_set_aes_key_wrap, NULL);
+     object_property_set_description(obj, "aes-key-wrap",
+-            "enable/disable AES key wrapping using the CPACF wrapping key"=
+,
+-            NULL);
++            "enable/disable AES key wrapping using the CPACF wrapping key"=
+);
+     object_property_set_bool(obj, true, "aes-key-wrap", NULL);
+=20
+     object_property_add_bool(obj, "dea-key-wrap",
+                              machine_get_dea_key_wrap,
+                              machine_set_dea_key_wrap, NULL);
+     object_property_set_description(obj, "dea-key-wrap",
+-            "enable/disable DEA key wrapping using the CPACF wrapping key"=
+,
+-            NULL);
++            "enable/disable DEA key wrapping using the CPACF wrapping key"=
+);
+     object_property_set_bool(obj, true, "dea-key-wrap", NULL);
+     object_property_add_str(obj, "loadparm",
+             machine_get_loadparm, machine_set_loadparm, NULL);
+     object_property_set_description(obj, "loadparm",
+             "Up to 8 chars in set of [A-Za-z0-9. ] (lower case chars conve=
+rted"
+             " to upper case) to pass to machine loader, boot manager,"
+-            " and guest kernel",
+-            NULL);
++            " and guest kernel");
+ }
+=20
+ static const TypeInfo ccw_machine_info =3D {
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index 36ee1a0a3d..7472d24e2c 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -797,8 +797,7 @@ static void ram_initfn(Object *obj)
+                              object_property_allow_set_link,
+                              OBJ_PROP_LINK_STRONG, &error_abort);
+     object_property_set_description(obj, "memdev", "Set RAM backend"
+-                                    "Valid value is ID of a hostmem backen=
+d",
+-                                     &error_abort);
++                                    "Valid value is ID of a hostmem backen=
+d");
+ }
+=20
+ static void ram_class_init(ObjectClass *klass, void *data)
+diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
+index a15070f7f6..adaab81ce0 100644
+--- a/hw/xen/xen-common.c
++++ b/hw/xen/xen-common.c
+@@ -201,7 +201,7 @@ static void xen_accel_class_init(ObjectClass *oc, void =
+*data)
+         xen_get_igd_gfx_passthru, xen_set_igd_gfx_passthru,
+         &error_abort);
+     object_class_property_set_description(oc, "igd-passthru",
+-        "Set on/off to enable/disable igd passthrou", &error_abort);
++        "Set on/off to enable/disable igd passthrou");
+ }
+=20
+ #define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")
+diff --git a/qom/object.c b/qom/object.c
+index 4e5b2ecacd..58a6ec9b1b 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -2802,38 +2802,27 @@ object_property_add_alias(Object *obj, const char *=
+name,
+     }
+=20
+     object_property_set_description(obj, op->name,
+-                                    target_prop->description,
+-                                    &error_abort);
++                                    target_prop->description);
+     return op;
+ }
+=20
+ void object_property_set_description(Object *obj, const char *name,
+-                                     const char *description, Error **errp=
+)
++                                     const char *description)
+ {
+     ObjectProperty *op;
+=20
+-    op =3D object_property_find(obj, name, errp);
+-    if (!op) {
+-        return;
+-    }
+-
++    op =3D object_property_find(obj, name, &error_abort);
+     g_free(op->description);
+     op->description =3D g_strdup(description);
+ }
+=20
+ void object_class_property_set_description(ObjectClass *klass,
+                                            const char *name,
+-                                           const char *description,
+-                                           Error **errp)
++                                           const char *description)
+ {
+     ObjectProperty *op;
+=20
+     op =3D g_hash_table_lookup(klass->properties, name);
+-    if (!op) {
+-        error_setg(errp, "Property '.%s' not found", name);
+-        return;
+-    }
+-
+     g_free(op->description);
+     op->description =3D g_strdup(description);
+ }
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 9bdf75b1ab..a435a1f24f 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -781,8 +781,7 @@ static void aarch64_cpu_initfn(Object *obj)
+                              aarch64_cpu_set_aarch64, NULL);
+     object_property_set_description(obj, "aarch64",
+                                     "Set on/off to enable/disable aarch64 =
+"
+-                                    "execution state ",
+-                                    NULL);
++                                    "execution state ");
+ }
+=20
+ static void aarch64_cpu_finalizefn(Object *obj)
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index 390077c518..1ea2d047e3 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -204,7 +204,7 @@ void kvm_arm_add_vcpu_properties(Object *obj)
+     object_property_set_description(obj, "kvm-no-adjvtime",
+                                     "Set on to disable the adjustment of "
+                                     "the virtual counter. VM stopped time =
+"
+-                                    "will be counted.", &error_abort);
++                                    "will be counted.");
+ }
+=20
+ bool kvm_arm_pmu_supported(CPUState *cpu)
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 846018a12d..6842cfc26d 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -251,19 +251,19 @@ qsev_guest_class_init(ObjectClass *oc, void *data)
+                                   qsev_guest_set_sev_device,
+                                   NULL);
+     object_class_property_set_description(oc, "sev-device",
+-            "SEV device to use", NULL);
++            "SEV device to use");
+     object_class_property_add_str(oc, "dh-cert-file",
+                                   qsev_guest_get_dh_cert_file,
+                                   qsev_guest_set_dh_cert_file,
+                                   NULL);
+     object_class_property_set_description(oc, "dh-cert-file",
+-            "guest owners DH certificate (encoded with base64)", NULL);
++            "guest owners DH certificate (encoded with base64)");
+     object_class_property_add_str(oc, "session-file",
+                                   qsev_guest_get_session_file,
+                                   qsev_guest_set_session_file,
+                                   NULL);
+     object_class_property_set_description(oc, "session-file",
+-            "guest owners session parameters (encoded with base64)", NULL)=
+;
++            "guest owners session parameters (encoded with base64)");
+ }
+=20
+ static void
+diff --git a/target/ppc/compat.c b/target/ppc/compat.c
+index f48df25944..46ffb6da6d 100644
+--- a/target/ppc/compat.c
++++ b/target/ppc/compat.c
+@@ -324,7 +324,7 @@ void ppc_compat_add_property(Object *obj, const char *n=
+ame,
+=20
+     names =3D g_strjoinv(", ", namesv);
+     desc =3D g_strdup_printf("%s. Valid values are %s.", basedesc, names);
+-    object_property_set_description(obj, name, desc, &local_err);
++    object_property_set_description(obj, name, desc);
+=20
+     g_free(names);
+     g_free(desc);
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index 7c32180269..aa7fc713ca 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -1107,13 +1107,13 @@ void s390_cpu_model_register_props(Object *obj)
+         const S390FeatDef *def =3D s390_feat_def(feat);
+         object_property_add(obj, def->name, "bool", get_feature,
+                             set_feature, NULL, (void *) feat, NULL);
+-        object_property_set_description(obj, def->name, def->desc , NULL);
++        object_property_set_description(obj, def->name, def->desc);
+     }
+     for (group =3D 0; group < S390_FEAT_GROUP_MAX; group++) {
+         const S390FeatGroupDef *def =3D s390_feat_group_def(group);
+         object_property_add(obj, def->name, "bool", get_feature_group,
+                             set_feature_group, NULL, (void *) group, NULL)=
+;
+-        object_property_set_description(obj, def->name, def->desc , NULL);
++        object_property_set_description(obj, def->name, def->desc);
      }
  }
 =20
--void spapr_caps_add_properties(SpaprMachineClass *smc, Error **errp)
-+void spapr_caps_add_properties(SpaprMachineClass *smc)
- {
-     ObjectClass *klass =3D OBJECT_CLASS(smc);
-     int i;
-diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
-index 0c5a5b60bd..569020dae4 100644
---- a/hw/s390x/s390-ccw.c
-+++ b/hw/s390x/s390-ccw.c
-@@ -151,7 +151,7 @@ static void s390_ccw_instance_init(Object *obj)
-     S390CCWDevice *dev =3D S390_CCW_DEVICE(obj);
-=20
-     device_add_bootindex_property(obj, &dev->bootindex, "bootindex",
--                                  "/disk@0,0", DEVICE(obj), NULL);
-+                                  "/disk@0,0", DEVICE(obj));
- }
-=20
- static void s390_ccw_class_init(ObjectClass *klass, void *data)
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index ab5459a589..1733307407 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -1738,7 +1738,7 @@ static void scsi_dev_instance_init(Object *obj)
-=20
-     device_add_bootindex_property(obj, &s->conf.bootindex,
-                                   "bootindex", NULL,
--                                  &s->qdev, NULL);
-+                                  &s->qdev);
- }
-=20
- static const TypeInfo scsi_device_type_info =3D {
-diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-index f052377b7e..ffa667171d 100644
---- a/hw/scsi/vhost-scsi.c
-+++ b/hw/scsi/vhost-scsi.c
-@@ -311,7 +311,7 @@ static void vhost_scsi_instance_init(Object *obj)
-     vsc->feature_bits =3D kernel_feature_bits;
-=20
-     device_add_bootindex_property(obj, &vsc->bootindex, "bootindex", NULL,
--                                  DEVICE(vsc), NULL);
-+                                  DEVICE(vsc));
- }
-=20
- static const TypeInfo vhost_scsi_info =3D {
-diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
-index a01bf63a08..ae380b63b4 100644
---- a/hw/scsi/vhost-user-scsi.c
-+++ b/hw/scsi/vhost-user-scsi.c
-@@ -217,7 +217,7 @@ static void vhost_user_scsi_instance_init(Object *obj)
-=20
-     /* Add the bootindex property for this object */
-     device_add_bootindex_property(obj, &vsc->bootindex, "bootindex", NULL,
--                                  DEVICE(vsc), NULL);
-+                                  DEVICE(vsc));
- }
-=20
- static const TypeInfo vhost_user_scsi_info =3D {
-diff --git a/hw/usb/dev-network.c b/hw/usb/dev-network.c
-index 6210427544..720744488b 100644
---- a/hw/usb/dev-network.c
-+++ b/hw/usb/dev-network.c
-@@ -1381,7 +1381,7 @@ static void usb_net_instance_init(Object *obj)
-=20
-     device_add_bootindex_property(obj, &s->conf.bootindex,
-                                   "bootindex", "/ethernet-phy@0",
--                                  &dev->qdev, NULL);
-+                                  &dev->qdev);
- }
-=20
- static const VMStateDescription vmstate_usb_net =3D {
-diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
-index 2ac7a936fb..78a5c2ba55 100644
---- a/hw/usb/host-libusb.c
-+++ b/hw/usb/host-libusb.c
-@@ -1101,7 +1101,7 @@ static void usb_host_instance_init(Object *obj)
-=20
-     device_add_bootindex_property(obj, &s->bootindex,
-                                   "bootindex", NULL,
--                                  &udev->qdev, NULL);
-+                                  &udev->qdev);
- }
-=20
- static void usb_host_unrealize(USBDevice *udev, Error **errp)
-diff --git a/hw/usb/redirect.c b/hw/usb/redirect.c
-index 45d8b76218..e9a97feaed 100644
---- a/hw/usb/redirect.c
-+++ b/hw/usb/redirect.c
-@@ -2595,7 +2595,7 @@ static void usbredir_instance_init(Object *obj)
-=20
-     device_add_bootindex_property(obj, &dev->bootindex,
-                                   "bootindex", NULL,
--                                  &udev->qdev, NULL);
-+                                  &udev->qdev);
- }
-=20
- static const TypeInfo usbredir_dev_info =3D {
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 5e75a95129..342dd6b912 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -3133,7 +3133,7 @@ static void vfio_instance_init(Object *obj)
-=20
-     device_add_bootindex_property(obj, &vdev->bootindex,
-                                   "bootindex", NULL,
--                                  &pci_dev->qdev, NULL);
-+                                  &pci_dev->qdev);
-     vdev->host.domain =3D ~0U;
-     vdev->host.bus =3D ~0U;
-     vdev->host.slot =3D ~0U;
-diff --git a/target/ppc/compat.c b/target/ppc/compat.c
-index 7f144392f8..fda0dfe8f8 100644
---- a/target/ppc/compat.c
-+++ b/target/ppc/compat.c
-@@ -298,8 +298,7 @@ out:
- }
-=20
- void ppc_compat_add_property(Object *obj, const char *name,
--                             uint32_t *compat_pvr, const char *basedesc,
--                             Error **errp)
-+                             uint32_t *compat_pvr, const char *basedesc)
- {
-     gchar *namesv[ARRAY_SIZE(compat_table) + 1];
-     gchar *names, *desc;
 --=20
 2.21.1
 
