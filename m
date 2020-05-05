@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6BE4C47247
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 17:53:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36126C47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 17:53:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E20B20746
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 17:53:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED9BF206B9
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 17:53:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="kWhO/fU3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E20B20746
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="M3+0Anpy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED9BF206B9
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jW1kl-0002Ee-KT
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 13:53:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44120)
+	id 1jW1kw-0002gV-4H
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 13:53:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44088)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jW1Xf-0006wo-RG; Tue, 05 May 2020 13:39:39 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:39028)
+ id 1jW1Xd-0006s5-QY; Tue, 05 May 2020 13:39:37 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:38888)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jW1Xd-0008Qj-Jv; Tue, 05 May 2020 13:39:39 -0400
+ id 1jW1Xb-00089p-HH; Tue, 05 May 2020 13:39:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=gDhxCR7OHusS/Zl+2ck2F/ypSmlrdbE/+hA/eOXp1yE=; 
- b=kWhO/fU3BHWBnWs9FNh6KJqE+rqFzLNHRdSPzP/xjxlaVlHATxzb/VNUz7ToQnwjOH95I1R5ucUiclhWIG3H8d2HahMRa4QNq9JDopNuZwJmzkH3UXFRU2pgq97/a8sl6aQOiDlK9qDmrJfKt6h4xgIzVBjqkQ4Nc6BP2H89ZAvayFQlSox3zT+r11vgL/9FLKwxDfyPq9SiczIcPt/+K364NkesqZtPBz9GGKjg/lcPJ1F7a027G67+yHNOyDcQVvX/Uvzt3EfFeCe1W4k4+GIWFllQHBe/ynwRMZgQX82KtVpnaIKMjZhqqOewG892FVr+9E5DCj64Af9HDn82XQ==;
+ bh=r4aQFHFPPed9tru7iD9u+cRmPttMB9629IF56vCsKSM=; 
+ b=M3+0AnpyXXMXOA57WWpCh9F95Fq0snKvwdXG2zqs5LArUhUImx8HCul7zFc6xKKdzeTMnjCLvv3z4x4SmxAvuj0JGBdZblEIXvAufg1tArLXot9O9pvSagyou8d35Waw2529uvyLyB6d8DekDBC0MG81LMBdkcyKsJekczhNBd/dqmL+Bk1ar0sKTIgEuCwkNC1Q2LfWsucpHoYxD/bTK7HUlovXZwlmSOkNvFhoElspg6R1i/oq4hL8MTkwS77DYnOE6yOxdRUwfmVZ5iCBqlqVxeFE/k8w30PXref/V0XJFe5NNh46OQC1c2CA/Qsm4KujJBeZs79DXPHZm4jNDA==;
 Received: from static.160.43.0.81.ibercom.com ([81.0.43.160]
  helo=perseus.local) by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1jW1Ws-00025A-Co; Tue, 05 May 2020 19:38:50 +0200
+ id 1jW1Ws-00025a-EG; Tue, 05 May 2020 19:38:50 +0200
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1jW1Wc-00043z-SP; Tue, 05 May 2020 19:38:34 +0200
+ id 1jW1Wd-00044l-AU; Tue, 05 May 2020 19:38:35 +0200
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 14/31] qcow2: Add QCow2SubclusterType and
- qcow2_get_subcluster_type()
-Date: Tue,  5 May 2020 19:38:14 +0200
-Message-Id: <5b744e9c0f3d348ea675c7a52aabaeeab6fe7b64.1588699789.git.berto@igalia.com>
+Subject: [PATCH v5 27/31] qcow2: Add subcluster support to
+ qcow2_co_pwrite_zeroes()
+Date: Tue,  5 May 2020 19:38:27 +0200
+Message-Id: <e1fba1eff527d8cd9fd7e4e96c5354157a9fd9d8.1588699789.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1588699789.git.berto@igalia.com>
 References: <cover.1588699789.git.berto@igalia.com>
@@ -85,219 +85,251 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds QCow2SubclusterType, which is the subcluster-level
-version of QCow2ClusterType. All QCOW2_SUBCLUSTER_* values have the
-the same meaning as their QCOW2_CLUSTER_* equivalents (when they
-exist). See below for details and caveats.
+This works now at the subcluster level and pwrite_zeroes_alignment is
+updated accordingly.
 
-In images without extended L2 entries clusters are treated as having
-exactly one subcluster so it is possible to replace one data type with
-the other while keeping the exact same semantics.
+qcow2_cluster_zeroize() is turned into qcow2_subcluster_zeroize() with
+the following changes:
 
-With extended L2 entries there are new possible values, and every
-subcluster in the same cluster can obviously have a different
-QCow2SubclusterType so functions need to be adapted to work on the
-subcluster level.
+   - The request can now be subcluster-aligned.
 
-There are several things that have to be taken into account:
+   - The cluster-aligned body of the request is still zeroized using
+     zero_in_l2_slice() as before.
 
-  a) QCOW2_SUBCLUSTER_COMPRESSED means that the whole cluster is
-     compressed. We do not support compression at the subcluster
-     level.
+   - The subcluster-aligned head and tail of the request are zeroized
+     with the new zero_l2_subclusters() function.
 
-  b) There are two different values for unallocated subclusters:
-     QCOW2_SUBCLUSTER_UNALLOCATED_PLAIN which means that the whole
-     cluster is unallocated, and QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC
-     which means that the cluster is allocated but the subcluster is
-     not. The latter can only happen in images with extended L2
-     entries.
+There is just one thing to take into account for a possible future
+improvement: compressed clusters cannot be partially zeroized so
+zero_l2_subclusters() on the head or the tail can return -ENOTSUP.
+This makes the caller repeat the *complete* request and write actual
+zeroes to disk. This is sub-optimal because
 
-  c) QCOW2_SUBCLUSTER_INVALID is used to detect the cases where an L2
-     entry has a value that violates the specification. The caller is
-     responsible for handling these situations.
+   1) if the head area was compressed we would still be able to use
+      the fast path for the body and possibly the tail.
 
-     To prevent compatibility problems with images that have invalid
-     values but are currently being read by QEMU without causing side
-     effects, QCOW2_SUBCLUSTER_INVALID is only returned for images
-     with extended L2 entries.
-
-qcow2_cluster_to_subcluster_type() is added as a separate function
-from qcow2_get_subcluster_type(), but this is only temporary and both
-will be merged in a subsequent patch.
+   2) if the tail area was compressed we are writing zeroes to the
+      head and the body areas, which are already zeroized.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2.h | 127 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 126 insertions(+), 1 deletion(-)
+ block/qcow2.h         |  4 +--
+ block/qcow2-cluster.c | 80 +++++++++++++++++++++++++++++++++++++++----
+ block/qcow2.c         | 27 ++++++++-------
+ 3 files changed, 90 insertions(+), 21 deletions(-)
 
 diff --git a/block/qcow2.h b/block/qcow2.h
-index 4ad93772b9..be7816a3b8 100644
+index 05e3ef0ece..7349c6ce40 100644
 --- a/block/qcow2.h
 +++ b/block/qcow2.h
-@@ -80,6 +80,21 @@
+@@ -881,8 +881,8 @@ void qcow2_alloc_cluster_abort(BlockDriverState *bs, QCowL2Meta *m);
+ int qcow2_cluster_discard(BlockDriverState *bs, uint64_t offset,
+                           uint64_t bytes, enum qcow2_discard_type type,
+                           bool full_discard);
+-int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
+-                          uint64_t bytes, int flags);
++int qcow2_subcluster_zeroize(BlockDriverState *bs, uint64_t offset,
++                             uint64_t bytes, int flags);
  
- #define QCOW_EXTL2_SUBCLUSTERS_PER_CLUSTER 32
- 
-+/* The subcluster X [0..31] is allocated */
-+#define QCOW_OFLAG_SUB_ALLOC(X)   (1ULL << (X))
-+/* The subcluster X [0..31] reads as zeroes */
-+#define QCOW_OFLAG_SUB_ZERO(X)    (QCOW_OFLAG_SUB_ALLOC(X) << 32)
-+/* Subclusters X to Y (both included) are allocated */
-+#define QCOW_OFLAG_SUB_ALLOC_RANGE(X, Y) \
-+    (QCOW_OFLAG_SUB_ALLOC((Y) + 1) - QCOW_OFLAG_SUB_ALLOC(X))
-+/* Subclusters X to Y (both included) read as zeroes */
-+#define QCOW_OFLAG_SUB_ZERO_RANGE(X, Y) \
-+    (QCOW_OFLAG_SUB_ALLOC_RANGE(X, Y) << 32)
-+/* L2 entry bitmap with all allocation bits set */
-+#define QCOW_L2_BITMAP_ALL_ALLOC  (QCOW_OFLAG_SUB_ALLOC_RANGE(0, 31))
-+/* L2 entry bitmap with all "read as zeroes" bits set */
-+#define QCOW_L2_BITMAP_ALL_ZEROES (QCOW_OFLAG_SUB_ZERO_RANGE(0, 31))
-+
- /* Size of normal and extended L2 entries */
- #define L2E_SIZE_NORMAL   (sizeof(uint64_t))
- #define L2E_SIZE_EXTENDED (sizeof(uint64_t) * 2)
-@@ -444,6 +459,33 @@ typedef struct QCowL2Meta
-     QLIST_ENTRY(QCowL2Meta) next_in_flight;
- } QCowL2Meta;
- 
-+/*
-+ * In images with standard L2 entries all clusters are treated as if
-+ * they had one subcluster so QCow2ClusterType and QCow2SubclusterType
-+ * can be mapped to each other and have the exact same meaning
-+ * (QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC cannot happen in these images).
-+ *
-+ * In images with extended L2 entries QCow2ClusterType refers to the
-+ * complete cluster and QCow2SubclusterType to each of the individual
-+ * subclusters, so there are several possible combinations:
-+ *
-+ *     |--------------+---------------------------|
-+ *     | Cluster type | Possible subcluster types |
-+ *     |--------------+---------------------------|
-+ *     | UNALLOCATED  |         UNALLOCATED_PLAIN |
-+ *     |              |                ZERO_PLAIN |
-+ *     |--------------+---------------------------|
-+ *     | NORMAL       |         UNALLOCATED_ALLOC |
-+ *     |              |                ZERO_ALLOC |
-+ *     |              |                    NORMAL |
-+ *     |--------------+---------------------------|
-+ *     | COMPRESSED   |                COMPRESSED |
-+ *     |--------------+---------------------------|
-+ *
-+ * QCOW2_SUBCLUSTER_INVALID means that the L2 entry is incorrect and
-+ * the image should be marked corrupt.
-+ */
-+
- typedef enum QCow2ClusterType {
-     QCOW2_CLUSTER_UNALLOCATED,
-     QCOW2_CLUSTER_ZERO_PLAIN,
-@@ -452,6 +494,16 @@ typedef enum QCow2ClusterType {
-     QCOW2_CLUSTER_COMPRESSED,
- } QCow2ClusterType;
- 
-+typedef enum QCow2SubclusterType {
-+    QCOW2_SUBCLUSTER_UNALLOCATED_PLAIN,
-+    QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC,
-+    QCOW2_SUBCLUSTER_ZERO_PLAIN,
-+    QCOW2_SUBCLUSTER_ZERO_ALLOC,
-+    QCOW2_SUBCLUSTER_NORMAL,
-+    QCOW2_SUBCLUSTER_COMPRESSED,
-+    QCOW2_SUBCLUSTER_INVALID,
-+} QCow2SubclusterType;
-+
- typedef enum QCow2MetadataOverlap {
-     QCOW2_OL_MAIN_HEADER_BITNR      = 0,
-     QCOW2_OL_ACTIVE_L1_BITNR        = 1,
-@@ -616,9 +668,11 @@ static inline int64_t qcow2_vm_state_offset(BDRVQcow2State *s)
- static inline QCow2ClusterType qcow2_get_cluster_type(BlockDriverState *bs,
-                                                       uint64_t l2_entry)
- {
-+    BDRVQcow2State *s = bs->opaque;
-+
-     if (l2_entry & QCOW_OFLAG_COMPRESSED) {
-         return QCOW2_CLUSTER_COMPRESSED;
--    } else if (l2_entry & QCOW_OFLAG_ZERO) {
-+    } else if ((l2_entry & QCOW_OFLAG_ZERO) && !has_subclusters(s)) {
-         if (l2_entry & L2E_OFFSET_MASK) {
-             return QCOW2_CLUSTER_ZERO_ALLOC;
-         }
-@@ -638,6 +692,77 @@ static inline QCow2ClusterType qcow2_get_cluster_type(BlockDriverState *bs,
-     }
+ int qcow2_expand_zero_clusters(BlockDriverState *bs,
+                                BlockDriverAmendStatusCB *status_cb,
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 0a295076a3..d0cf9d52e6 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1971,12 +1971,58 @@ static int zero_in_l2_slice(BlockDriverState *bs, uint64_t offset,
+     return nb_clusters;
  }
  
-+/*
-+ * For an image without extended L2 entries, return the
-+ * QCow2SubclusterType equivalent of a given QCow2ClusterType.
-+ */
-+static inline
-+QCow2SubclusterType qcow2_cluster_to_subcluster_type(QCow2ClusterType type)
+-int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
+-                          uint64_t bytes, int flags)
++static int zero_l2_subclusters(BlockDriverState *bs, uint64_t offset,
++                               unsigned nb_subclusters)
 +{
-+    switch (type) {
++    BDRVQcow2State *s = bs->opaque;
++    uint64_t *l2_slice;
++    uint64_t old_l2_bitmap, l2_bitmap;
++    int l2_index, ret, sc = offset_to_sc_index(s, offset);
++
++    /* For full clusters use zero_in_l2_slice() instead */
++    assert(nb_subclusters > 0 && nb_subclusters < s->subclusters_per_cluster);
++    assert(sc + nb_subclusters <= s->subclusters_per_cluster);
++
++    ret = get_cluster_table(bs, offset, &l2_slice, &l2_index);
++    if (ret < 0) {
++        return ret;
++    }
++
++    switch (qcow2_get_cluster_type(bs, get_l2_entry(s, l2_slice, l2_index))) {
 +    case QCOW2_CLUSTER_COMPRESSED:
-+        return QCOW2_SUBCLUSTER_COMPRESSED;
-+    case QCOW2_CLUSTER_ZERO_PLAIN:
-+        return QCOW2_SUBCLUSTER_ZERO_PLAIN;
-+    case QCOW2_CLUSTER_ZERO_ALLOC:
-+        return QCOW2_SUBCLUSTER_ZERO_ALLOC;
++        ret = -ENOTSUP; /* We cannot partially zeroize compressed clusters */
++        goto out;
 +    case QCOW2_CLUSTER_NORMAL:
-+        return QCOW2_SUBCLUSTER_NORMAL;
 +    case QCOW2_CLUSTER_UNALLOCATED:
-+        return QCOW2_SUBCLUSTER_UNALLOCATED_PLAIN;
++        break;
 +    default:
 +        g_assert_not_reached();
 +    }
-+}
 +
-+/*
-+ * In an image without subsclusters @l2_bitmap is ignored and
-+ * @sc_index must be 0.
-+ */
-+static inline
-+QCow2SubclusterType qcow2_get_subcluster_type(BlockDriverState *bs,
-+                                              uint64_t l2_entry,
-+                                              uint64_t l2_bitmap,
-+                                              unsigned sc_index)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    QCow2ClusterType type = qcow2_get_cluster_type(bs, l2_entry);
-+    assert(sc_index < s->subclusters_per_cluster);
++    old_l2_bitmap = l2_bitmap = get_l2_bitmap(s, l2_slice, l2_index);
 +
-+    if (has_subclusters(s)) {
-+        bool sc_zero  = l2_bitmap & QCOW_OFLAG_SUB_ZERO(sc_index);
-+        bool sc_alloc = l2_bitmap & QCOW_OFLAG_SUB_ALLOC(sc_index);
-+        switch (type) {
-+        case QCOW2_CLUSTER_COMPRESSED:
-+            return QCOW2_SUBCLUSTER_COMPRESSED;
-+        case QCOW2_CLUSTER_NORMAL:
-+            if (!sc_zero && !sc_alloc) {
-+                return QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC;
-+            } else if (!sc_zero && sc_alloc) {
-+                return QCOW2_SUBCLUSTER_NORMAL;
-+            } else if (sc_zero && !sc_alloc) {
-+                return QCOW2_SUBCLUSTER_ZERO_ALLOC;
-+            } else { /* sc_zero && sc_alloc */
-+                return QCOW2_SUBCLUSTER_INVALID;
-+            }
-+        case QCOW2_CLUSTER_UNALLOCATED:
-+            if (!sc_zero && !sc_alloc) {
-+                return QCOW2_SUBCLUSTER_UNALLOCATED_PLAIN;
-+            } else if (!sc_zero && sc_alloc) {
-+                return QCOW2_SUBCLUSTER_INVALID;
-+            } else if (sc_zero && !sc_alloc) {
-+                return QCOW2_SUBCLUSTER_ZERO_PLAIN;
-+            } else { /* sc_zero && sc_alloc */
-+                return QCOW2_SUBCLUSTER_INVALID;
-+            }
-+        default:
-+            g_assert_not_reached();
-+        }
-+    } else {
-+        return qcow2_cluster_to_subcluster_type(type);
++    l2_bitmap |=  QCOW_OFLAG_SUB_ZERO_RANGE(sc, sc + nb_subclusters - 1);
++    l2_bitmap &= ~QCOW_OFLAG_SUB_ALLOC_RANGE(sc, sc + nb_subclusters - 1);
++
++    if (old_l2_bitmap != l2_bitmap) {
++        set_l2_bitmap(s, l2_slice, l2_index, l2_bitmap);
++        qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
 +    }
++
++    ret = 0;
++out:
++    qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
++
++    return ret;
 +}
 +
- /* Check whether refcounts are eager or lazy */
- static inline bool qcow2_need_accurate_refcounts(BDRVQcow2State *s)
++int qcow2_subcluster_zeroize(BlockDriverState *bs, uint64_t offset,
++                             uint64_t bytes, int flags)
  {
+     BDRVQcow2State *s = bs->opaque;
+     uint64_t end_offset = offset + bytes;
+     uint64_t nb_clusters;
++    unsigned head, tail;
+     int64_t cleared;
+     int ret;
+ 
+@@ -1991,8 +2037,8 @@ int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
+     }
+ 
+     /* Caller must pass aligned values, except at image end */
+-    assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
+-    assert(QEMU_IS_ALIGNED(end_offset, s->cluster_size) ||
++    assert(offset_into_subcluster(s, offset) == 0);
++    assert(offset_into_subcluster(s, end_offset) == 0 ||
+            end_offset >= bs->total_sectors << BDRV_SECTOR_BITS);
+ 
+     /* The zero flag is only supported by version 3 and newer */
+@@ -2000,11 +2046,26 @@ int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
+         return -ENOTSUP;
+     }
+ 
+-    /* Each L2 slice is handled by its own loop iteration */
+-    nb_clusters = size_to_clusters(s, bytes);
++    head = MIN(end_offset, ROUND_UP(offset, s->cluster_size)) - offset;
++    offset += head;
++
++    tail = (end_offset >= bs->total_sectors << BDRV_SECTOR_BITS) ? 0 :
++        end_offset - MAX(offset, start_of_cluster(s, end_offset));
++    end_offset -= tail;
+ 
+     s->cache_discards = true;
+ 
++    if (head) {
++        ret = zero_l2_subclusters(bs, offset - head,
++                                  size_to_subclusters(s, head));
++        if (ret < 0) {
++            goto fail;
++        }
++    }
++
++    /* Each L2 slice is handled by its own loop iteration */
++    nb_clusters = size_to_clusters(s, end_offset - offset);
++
+     while (nb_clusters > 0) {
+         cleared = zero_in_l2_slice(bs, offset, nb_clusters, flags);
+         if (cleared < 0) {
+@@ -2016,6 +2077,13 @@ int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
+         offset += (cleared * s->cluster_size);
+     }
+ 
++    if (tail) {
++        ret = zero_l2_subclusters(bs, end_offset, size_to_subclusters(s, tail));
++        if (ret < 0) {
++            goto fail;
++        }
++    }
++
+     ret = 0;
+ fail:
+     s->cache_discards = false;
+diff --git a/block/qcow2.c b/block/qcow2.c
+index cc5591fe8f..ec4d1405f0 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1843,7 +1843,7 @@ static void qcow2_refresh_limits(BlockDriverState *bs, Error **errp)
+         /* Encryption works on a sector granularity */
+         bs->bl.request_alignment = qcrypto_block_get_sector_size(s->crypto);
+     }
+-    bs->bl.pwrite_zeroes_alignment = s->cluster_size;
++    bs->bl.pwrite_zeroes_alignment = s->subcluster_size;
+     bs->bl.pdiscard_alignment = s->cluster_size;
+ }
+ 
+@@ -3736,8 +3736,9 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
+     int ret;
+     BDRVQcow2State *s = bs->opaque;
+ 
+-    uint32_t head = offset % s->cluster_size;
+-    uint32_t tail = (offset + bytes) % s->cluster_size;
++    uint32_t head = offset_into_subcluster(s, offset);
++    uint32_t tail = ROUND_UP(offset + bytes, s->subcluster_size) -
++        (offset + bytes);
+ 
+     trace_qcow2_pwrite_zeroes_start_req(qemu_coroutine_self(), offset, bytes);
+     if (offset + bytes == bs->total_sectors * BDRV_SECTOR_SIZE) {
+@@ -3749,20 +3750,19 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
+         unsigned int nr;
+         QCow2SubclusterType type;
+ 
+-        assert(head + bytes <= s->cluster_size);
++        assert(head + bytes + tail <= s->subcluster_size);
+ 
+         /* check whether remainder of cluster already reads as zero */
+         if (!(is_zero(bs, offset - head, head) &&
+-              is_zero(bs, offset + bytes,
+-                      tail ? s->cluster_size - tail : 0))) {
++              is_zero(bs, offset + bytes, tail))) {
+             return -ENOTSUP;
+         }
+ 
+         qemu_co_mutex_lock(&s->lock);
+         /* We can have new write after previous check */
+-        offset = QEMU_ALIGN_DOWN(offset, s->cluster_size);
+-        bytes = s->cluster_size;
+-        nr = s->cluster_size;
++        offset -= head;
++        bytes = s->subcluster_size;
++        nr = s->subcluster_size;
+         ret = qcow2_get_host_offset(bs, offset, &nr, &off, &type);
+         if (ret < 0 ||
+             (type != QCOW2_SUBCLUSTER_UNALLOCATED_PLAIN &&
+@@ -3778,8 +3778,8 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
+ 
+     trace_qcow2_pwrite_zeroes(qemu_coroutine_self(), offset, bytes);
+ 
+-    /* Whatever is left can use real zero clusters */
+-    ret = qcow2_cluster_zeroize(bs, offset, bytes, flags);
++    /* Whatever is left can use real zero subclusters */
++    ret = qcow2_subcluster_zeroize(bs, offset, bytes, flags);
+     qemu_co_mutex_unlock(&s->lock);
+ 
+     return ret;
+@@ -4243,12 +4243,13 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
+         uint64_t zero_start = QEMU_ALIGN_UP(old_length, s->cluster_size);
+ 
+         /*
+-         * Use zero clusters as much as we can. qcow2_cluster_zeroize()
++         * Use zero clusters as much as we can. qcow2_subcluster_zeroize()
+          * requires a cluster-aligned start. The end may be unaligned if it is
+          * at the end of the image (which it is here).
+          */
+         if (offset > zero_start) {
+-            ret = qcow2_cluster_zeroize(bs, zero_start, offset - zero_start, 0);
++            ret = qcow2_subcluster_zeroize(bs, zero_start, offset - zero_start,
++                                           0);
+             if (ret < 0) {
+                 error_setg_errno(errp, -ret, "Failed to zero out new clusters");
+                 goto fail;
 -- 
 2.20.1
 
