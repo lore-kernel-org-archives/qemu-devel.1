@@ -2,86 +2,87 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87F67C47247
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:19:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66EC5C47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:19:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5663320675
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:19:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C04220675
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 14:19:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qg1KAtlL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5663320675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YfiW7UOw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C04220675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVyPt-0002Re-Dm
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 10:19:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57354)
+	id 1jVyPv-0002WV-95
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 10:19:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57514)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jVyNA-0007Pz-LW
- for qemu-devel@nongnu.org; Tue, 05 May 2020 10:16:36 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24885
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jVyN9-0004vi-NY
- for qemu-devel@nongnu.org; Tue, 05 May 2020 10:16:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588688191;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=D5oz5UNNZ+exrzQk6KTn4ulkeDcjXFA92PKpUnZ/kEA=;
- b=Qg1KAtlL5MCeAimiUxyjYOaEnzonKgNVsPb+veYV5JyZwa4v4MyOEZ44CNDHBbhWHyyTFs
- KNcJ/URc3llJ2Ci65LZMt9BWN3ZZdUDZPFFg15A8vXQ7WN/e2l3f0Gmb6nkLmnQtepeTOO
- uc0t9CShnyyoec6BRYYYwP359rLru9c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-98ay6OsAOJSan9kMQSBzxw-1; Tue, 05 May 2020 10:16:28 -0400
-X-MC-Unique: 98ay6OsAOJSan9kMQSBzxw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 566AC460;
- Tue,  5 May 2020 14:16:27 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 09F8564421;
- Tue,  5 May 2020 14:16:15 +0000 (UTC)
-Date: Tue, 5 May 2020 16:16:13 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH v2 04/13] acpi: move acpi_build_facs to acpi-common.c
-Message-ID: <20200505161613.10105643@redhat.com>
-In-Reply-To: <20200505134305.22666-5-kraxel@redhat.com>
-References: <20200505134305.22666-1-kraxel@redhat.com>
- <20200505134305.22666-5-kraxel@redhat.com>
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jVyO5-0008Kt-Gg; Tue, 05 May 2020 10:17:33 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:41782)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jVyO4-0005HC-O2; Tue, 05 May 2020 10:17:33 -0400
+Received: by mail-lf1-x143.google.com with SMTP id a9so1489928lfb.8;
+ Tue, 05 May 2020 07:17:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=bjVoctQqo/4MwwvukrYp9moB4syUyfv4XonW2FlcGoI=;
+ b=YfiW7UOwXhiEiB/+7CPeE2LEgopbLS6+g1YGp0Q9h5/iNNiK/wgufuAbe4+yXtugjC
+ uYOKSzKozXybMH6ZZCU84B1iyGXMRxBj5JsrqbnYtgvcget76iiokeTGh8DoryTlQ2rV
+ QEoYV8v2s0knNTVm0cTN5OV08fVKFFRqLhK8gCRRJGxSfvEePKqJ1L9CHBIotNifcl/d
+ LAKmgi2X1IMw7QRKguda2SnizZjyHuA0WIkh6Id8Wv1uwyk6nbFYmEC69ZsMGSEXapA1
+ goEnbReDnA5v0i1KVT2PTDjcPXsE+FyKwxCn1Nyd4BaT79OEZvmfZr9M7bqPvBF+PtXl
+ E2Ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=bjVoctQqo/4MwwvukrYp9moB4syUyfv4XonW2FlcGoI=;
+ b=CfpNhEFSMMyjn2aOubh0vXQRY7Il6Cbw0U7PeDr1aCU4Da1uMDQlFVVCuKtwgViHR+
+ HfFyPuTCdHmr3m3g/y+4eF0G0jb4zRWQfkD6rAdUZuL7t/FdXaOPgZqwqpgvS/QUk3vE
+ qxnZe/Ogpp5WXJtIMQDahhUgFZ46LVjtjplqWfC7IOkbrg2+7p92E76TdoYC1AAlWzE6
+ tKI24gdWXTLfa8OXmAug7QOHkUiVzWpxQy9aJk2gLVeXpYw5O1Uba4EmHcRuduv4X90r
+ eIvXWudUJ5mpYUS3F3H5YqFlKuXf3n5tPZ8XaGoucTqJ9VnV2HwQAUVdip01FF7ch6Fa
+ Adrw==
+X-Gm-Message-State: AGi0PuYFhc0E2tTokeMNcLm1wEeW/Uk+WVIxK9clLELi4gT4Ia/jYTfv
+ bGOaj68Uo1wL0mgJ6jQnrQSn+piOL4g=
+X-Google-Smtp-Source: APiQypLx1kdFgVW933udCgDVGkwv/Ayudmio9lWpGw6uZI04qZlMIlYJH23MWha1fjJJG5m2LGmLjg==
+X-Received: by 2002:ac2:5684:: with SMTP id 4mr1851708lfr.88.1588688250294;
+ Tue, 05 May 2020 07:17:30 -0700 (PDT)
+Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id t16sm1878625ljo.6.2020.05.05.07.17.29
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 05 May 2020 07:17:29 -0700 (PDT)
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 0/1] target/arm: Remove access_el3_aa32ns_aa64any()
+Date: Tue,  5 May 2020 16:17:28 +0200
+Message-Id: <20200505141729.31930-1-edgar.iglesias@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=imammedo@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::143;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lf1-x143.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 13
+X-Spam_score: 1.3
+X-Spam_bar: +
+X-Spam_report: (1.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ FSL_HELO_FAKE=3.399, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,80 +95,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: laurent.desnogues@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org,
+ richard.henderson@linaro.org, edgar.iglesias@xilinx.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue,  5 May 2020 15:42:56 +0200
-Gerd Hoffmann <kraxel@redhat.com> wrote:
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Hi,
 
-why do you need FACS with reduced profile?
+Laurent reported hitting the assert in access_el3_aa32ns()
+when accessing 32-bit versions of some of the virtualization
+regs when EL3 is 64-bit.
 
-> ---
->  hw/i386/acpi-common.h |  1 +
->  hw/i386/acpi-build.c  | 11 +----------
->  hw/i386/acpi-common.c |  7 +++++++
->  3 files changed, 9 insertions(+), 10 deletions(-)
-> 
-> diff --git a/hw/i386/acpi-common.h b/hw/i386/acpi-common.h
-> index 9cac18dddf5b..583c320bbe7d 100644
-> --- a/hw/i386/acpi-common.h
-> +++ b/hw/i386/acpi-common.h
-> @@ -11,5 +11,6 @@
->  void acpi_build_madt(GArray *table_data, BIOSLinker *linker,
->                       X86MachineState *x86ms, AcpiDeviceIf *adev,
->                       bool has_pci);
-> +void acpi_build_facs(GArray *table_data);
->  
->  #endif
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 4cce2192eeb0..a69b85a266e7 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -316,15 +316,6 @@ static void acpi_align_size(GArray *blob, unsigned align)
->      g_array_set_size(blob, ROUND_UP(acpi_data_len(blob), align));
->  }
->  
-> -/* FACS */
-> -static void
-> -build_facs(GArray *table_data)
-> -{
-> -    AcpiFacsDescriptorRev1 *facs = acpi_data_push(table_data, sizeof *facs);
-> -    memcpy(&facs->signature, "FACS", 4);
-> -    facs->length = cpu_to_le32(sizeof(*facs));
-> -}
-> -
->  static void build_append_pcihp_notify_entry(Aml *method, int slot)
->  {
->      Aml *if_ctx;
-> @@ -2417,7 +2408,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
->       * requirements.
->       */
->      facs = tables_blob->len;
-> -    build_facs(tables_blob);
-> +    acpi_build_facs(tables_blob);
->  
->      /* DSDT is pointed to by FADT */
->      dsdt = tables_blob->len;
-> diff --git a/hw/i386/acpi-common.c b/hw/i386/acpi-common.c
-> index ab9b00581a15..5187653893a8 100644
-> --- a/hw/i386/acpi-common.c
-> +++ b/hw/i386/acpi-common.c
-> @@ -154,3 +154,10 @@ void acpi_build_madt(GArray *table_data, BIOSLinker *linker,
->                   table_data->len - madt_start, 1, NULL, NULL);
->  }
->  
-> +/* FACS */
-> +void acpi_build_facs(GArray *table_data)
-> +{
-> +    AcpiFacsDescriptorRev1 *facs = acpi_data_push(table_data, sizeof *facs);
-> +    memcpy(&facs->signature, "FACS", 4);
-> +    facs->length = cpu_to_le32(sizeof(*facs));
-> +}
+I think we got this wrong back then and it seems to me like
+we should merge access_el3_aa32ns and access_el3_aa32ns_aa64_any()
+and always call the merged function to handle both aa32-only cases
+and mixed aa32/aa64.
+
+Cheers,
+Edgar
+
+ChangeLog:
+
+v2 -> v3:
+* Update commit message and cover letter to reflect that
+  access_el3_aa32ns_aa64any is now being removed
+
+v1 -> v2:
+* Keep access_el3_aa32ns in favor of access_el3_aa32ns_aa64any
+* Simplify description of access_el3_aa32ns
+* Tweak secure aa32-el3 check in access_el3_aa32ns as suggested by Peter
+
+
+Edgar E. Iglesias (1):
+  target/arm: Drop access_el3_aa32ns_aa64any()
+
+ target/arm/helper.c | 30 +++++++-----------------------
+ 1 file changed, 7 insertions(+), 23 deletions(-)
+
+-- 
+2.20.1
 
 
