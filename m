@@ -4,68 +4,84 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21032C47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:23:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54037C47254
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:25:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB3B920658
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:23:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 22A442078D
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:25:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="a8T3WzsU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB3B920658
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i/KQqCAm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22A442078D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45824 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVxY1-000455-2q
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 09:23:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45022)
+	id 1jVxZK-0005Co-Ax
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 09:25:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45778)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jVxWB-0001KK-B3; Tue, 05 May 2020 09:21:51 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:42085)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jVxW9-0005Gk-4Z; Tue, 05 May 2020 09:21:50 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 49GgNk6Q42z9sSW; Tue,  5 May 2020 23:21:42 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1588684903;
- bh=PUTsjPhduyvC2ZKBTGR6sZ0iw0VQlw/rumIfug5o038=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=a8T3WzsUgmW7sPOpVhsCAE4QSpjbfICwcykpEdUmzlloUEC9LvODR0mUY4cE4Vz+9
- Ka+sNUs5XyNno+44hopGFqYTZP2SWQj/CWPcfTHjN3ncD1IFxDkfXgR5Rkzs4ZPav2
- uCWeT31sUbRhA4xrr4g9SMPZ9VQjD9qY18GoafjE=
-Date: Tue, 5 May 2020 22:37:15 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Daniele Buono <dbuono@linux.vnet.ibm.com>
-Subject: Re: [PATCH 1/1] target-ppc: fix rlwimi, rlwinm, rlwnm for Clang-9
-Message-ID: <20200505123715.GE218517@umbus.fritz.box>
-References: <20200501190913.25008-1-dbuono@linux.vnet.ibm.com>
- <20200501190913.25008-2-dbuono@linux.vnet.ibm.com>
- <20200505050815.GC218517@umbus.fritz.box>
- <6bce4a90-21c8-0533-e9c2-22fd770da3ee@linux.vnet.ibm.com>
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jVxYl-0004ij-0Y
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 09:24:31 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59047
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jVxYk-0001y3-AW
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 09:24:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588685069;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=0THkgzTFsFecD40eeH/iHJYjgfh4HqNJO7rYqHvY2lk=;
+ b=i/KQqCAmsmLLEyQ5umBPAKVzTnQjixTGCJbN0eeoMEAxk1/men5A1YLuMFlfQNiRA28K3j
+ el0MmmDeg94RD6hsmpy1Y0oQAX0b+iiX6fiGYKGl+vabx/g/32rYmNv9vb/Rgz3div/uqf
+ v1YOXl4OLCxuJvATB2cHxkrZy8I8Eoc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-386-CN5pXSyNOz-Dnl_PwUwMvA-1; Tue, 05 May 2020 09:24:25 -0400
+X-MC-Unique: CN5pXSyNOz-Dnl_PwUwMvA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ACE171005510;
+ Tue,  5 May 2020 13:24:24 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.7])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 33B185D9D5;
+ Tue,  5 May 2020 13:24:12 +0000 (UTC)
+Date: Tue, 5 May 2020 15:24:10 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH v4 03/13] acpi: rtc: use a single crs range
+Message-ID: <20200505152410.69d576f8@redhat.com>
+In-Reply-To: <20200505113843.22012-4-kraxel@redhat.com>
+References: <20200505113843.22012-1-kraxel@redhat.com>
+ <20200505113843.22012-4-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="3XA6nns4nE4KvaS/"
-Content-Disposition: inline
-In-Reply-To: <6bce4a90-21c8-0533-e9c2-22fd770da3ee@linux.vnet.ibm.com>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,192 +94,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, dbuono@us.ibm.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue,  5 May 2020 13:38:33 +0200
+Gerd Hoffmann <kraxel@redhat.com> wrote:
 
---3XA6nns4nE4KvaS/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Use a single io range for _CRS instead of two,
+> following what real hardware does.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  hw/rtc/mc146818rtc.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+> 
+> diff --git a/hw/rtc/mc146818rtc.c b/hw/rtc/mc146818rtc.c
+> index 2104e0aa3b14..47fafcfb7c1d 100644
+> --- a/hw/rtc/mc146818rtc.c
+> +++ b/hw/rtc/mc146818rtc.c
+> @@ -1015,10 +1015,8 @@ static void rtc_build_aml(ISADevice *isadev, Aml *scope)
+>  
+>      crs = aml_resource_template();
+>      aml_append(crs, aml_io(AML_DECODE16, RTC_ISA_BASE, RTC_ISA_BASE,
+> -                           0x10, 0x02));
+> +                           0x10, 0x08));
+>      aml_append(crs, aml_irq_no_flags(RTC_ISA_IRQ));
+> -    aml_append(crs, aml_io(AML_DECODE16, RTC_ISA_BASE + 2, RTC_ISA_BASE + 2,
+> -                           0x02, 0x06));
+can we just drop the later range as unused? (I don't see where it's actually initialized)
 
-On Tue, May 05, 2020 at 08:26:48AM -0400, Daniele Buono wrote:
-> On 5/5/2020 1:08 AM, David Gibson wrote:
-> > On Fri, May 01, 2020 at 03:09:13PM -0400, Daniele Buono wrote:
-> > > Starting with Clang v9, -Wtype-limits is implemented and triggers a
-> > > few "result of comparison is always true" errors when compiling PPC32
-> > > targets.
-> > >=20
-> > > The comparisons seem to be necessary only on PPC64, since the
-> > > else branch in PPC32 only has a "g_assert_not_reached();" in all case=
-s.
-> > >=20
-> > > This patch restructures the code so that PPC32 does not execute the
-> > > check, while PPC64 works like before
-> > >=20
-> > > Signed-off-by: Daniele Buono <dbuono@linux.vnet.ibm.com>
-> >=20
-> > Urgh.  #ifdefs intertangled with if statements gets pretty ugly.  But,
-> > then, it's already pretty ugly, so, applied.
-> >=20
-> Agreed, it's very ugly. After I sent the patch I thought of an alternative
-> that looks like this:
->=20
-> bool mask_in_32b =3D true;
->=20
-> #if defined(TARGET_PPC64)
-> if (mask > 0xffffffffu)
->   mask_in_32b =3D false;
-> #endif
->=20
-> if (mask_in_32b) {
-> /* Original if-else untouched using mask_in_32b instead of mask*/
->=20
-> It does have an additional if, but with a bit of luck the compiler may
-> optimize it out (at least for the 32bit case).
-> If you think the final outcome may be better, let me know and I'll send a
-> patch v2 like that.
+>  
+>      dev = aml_device("RTC");
+>      aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0B00")));
 
-Yeah, that would be a bit nicer.  Please send the v2.
-
->=20
-> > > ---
-> > >   target/ppc/translate.c | 34 +++++++++++++++++++---------------
-> > >   1 file changed, 19 insertions(+), 15 deletions(-)
-> > >=20
-> > > diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> > > index 807d14faaa..9400fa2c7c 100644
-> > > --- a/target/ppc/translate.c
-> > > +++ b/target/ppc/translate.c
-> > > @@ -1882,6 +1882,7 @@ static void gen_rlwimi(DisasContext *ctx)
-> > >           tcg_gen_deposit_tl(t_ra, t_ra, t_rs, sh, me - mb + 1);
-> > >       } else {
-> > >           target_ulong mask;
-> > > +        TCGv_i32 t0;
-> > >           TCGv t1;
-> > >   #if defined(TARGET_PPC64)
-> > > @@ -1891,20 +1892,20 @@ static void gen_rlwimi(DisasContext *ctx)
-> > >           mask =3D MASK(mb, me);
-> > >           t1 =3D tcg_temp_new();
-> > > +#if defined(TARGET_PPC64)
-> > >           if (mask <=3D 0xffffffffu) {
-> > > -            TCGv_i32 t0 =3D tcg_temp_new_i32();
-> > > +#endif
-> > > +            t0 =3D tcg_temp_new_i32();
-> > >               tcg_gen_trunc_tl_i32(t0, t_rs);
-> > >               tcg_gen_rotli_i32(t0, t0, sh);
-> > >               tcg_gen_extu_i32_tl(t1, t0);
-> > >               tcg_temp_free_i32(t0);
-> > > -        } else {
-> > >   #if defined(TARGET_PPC64)
-> > > +        } else {
-> > >               tcg_gen_deposit_i64(t1, t_rs, t_rs, 32, 32);
-> > >               tcg_gen_rotli_i64(t1, t1, sh);
-> > > -#else
-> > > -            g_assert_not_reached();
-> > > -#endif
-> > >           }
-> > > +#endif
-> > >           tcg_gen_andi_tl(t1, t1, mask);
-> > >           tcg_gen_andi_tl(t_ra, t_ra, ~mask);
-> > > @@ -1938,7 +1939,9 @@ static void gen_rlwinm(DisasContext *ctx)
-> > >           me +=3D 32;
-> > >   #endif
-> > >           mask =3D MASK(mb, me);
-> > > +#if defined(TARGET_PPC64)
-> > >           if (mask <=3D 0xffffffffu) {
-> > > +#endif
-> > >               if (sh =3D=3D 0) {
-> > >                   tcg_gen_andi_tl(t_ra, t_rs, mask);
-> > >               } else {
-> > > @@ -1949,15 +1952,13 @@ static void gen_rlwinm(DisasContext *ctx)
-> > >                   tcg_gen_extu_i32_tl(t_ra, t0);
-> > >                   tcg_temp_free_i32(t0);
-> > >               }
-> > > -        } else {
-> > >   #if defined(TARGET_PPC64)
-> > > +        } else {
-> > >               tcg_gen_deposit_i64(t_ra, t_rs, t_rs, 32, 32);
-> > >               tcg_gen_rotli_i64(t_ra, t_ra, sh);
-> > >               tcg_gen_andi_i64(t_ra, t_ra, mask);
-> > > -#else
-> > > -            g_assert_not_reached();
-> > > -#endif
-> > >           }
-> > > +#endif
-> > >       }
-> > >       if (unlikely(Rc(ctx->opcode) !=3D 0)) {
-> > >           gen_set_Rc0(ctx, t_ra);
-> > > @@ -1972,6 +1973,9 @@ static void gen_rlwnm(DisasContext *ctx)
-> > >       TCGv t_rb =3D cpu_gpr[rB(ctx->opcode)];
-> > >       uint32_t mb =3D MB(ctx->opcode);
-> > >       uint32_t me =3D ME(ctx->opcode);
-> > > +    TCGv_i32 t0;
-> > > +    TCGv_i32 t1;
-> > > +
-> > >       target_ulong mask;
-> > >   #if defined(TARGET_PPC64)
-> > > @@ -1980,9 +1984,11 @@ static void gen_rlwnm(DisasContext *ctx)
-> > >   #endif
-> > >       mask =3D MASK(mb, me);
-> > > +#if defined(TARGET_PPC64)
-> > >       if (mask <=3D 0xffffffffu) {
-> > > -        TCGv_i32 t0 =3D tcg_temp_new_i32();
-> > > -        TCGv_i32 t1 =3D tcg_temp_new_i32();
-> > > +#endif
-> > > +        t0 =3D tcg_temp_new_i32();
-> > > +        t1 =3D tcg_temp_new_i32();
-> > >           tcg_gen_trunc_tl_i32(t0, t_rb);
-> > >           tcg_gen_trunc_tl_i32(t1, t_rs);
-> > >           tcg_gen_andi_i32(t0, t0, 0x1f);
-> > > @@ -1990,17 +1996,15 @@ static void gen_rlwnm(DisasContext *ctx)
-> > >           tcg_gen_extu_i32_tl(t_ra, t1);
-> > >           tcg_temp_free_i32(t0);
-> > >           tcg_temp_free_i32(t1);
-> > > -    } else {
-> > >   #if defined(TARGET_PPC64)
-> > > +    } else {
-> > >           TCGv_i64 t0 =3D tcg_temp_new_i64();
-> > >           tcg_gen_andi_i64(t0, t_rb, 0x1f);
-> > >           tcg_gen_deposit_i64(t_ra, t_rs, t_rs, 32, 32);
-> > >           tcg_gen_rotl_i64(t_ra, t_ra, t0);
-> > >           tcg_temp_free_i64(t0);
-> > > -#else
-> > > -        g_assert_not_reached();
-> > > -#endif
-> > >       }
-> > > +#endif
-> > >       tcg_gen_andi_tl(t_ra, t_ra, mask);
-> >=20
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---3XA6nns4nE4KvaS/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl6xXfgACgkQbDjKyiDZ
-s5IXbQ/+O90Mk+9l8lELvX92xtpyu6Hwk9lxaSgc3O1kuC7RnaD4YUTpomKxHQjl
-4j7Md15yXogshhr44qyCV1Ab65UJ9Taye0uQpa8qqc+FKwzSD4nD8LhNsOCQ3gUP
-E95TXTe2ywANFI8iqxrjHpotD+o30kdfSFcMTlIffij1y11qFuxm7+HpSArlHBOK
-sy53EGNwPa0y/wA1x/Kdlr1YqqVt46A9UzEKog3agtd6Ioba4rSa/TRyes0PtuK+
-DxO0TJPHfCQbNMiopwnRSN3/GCk8CwImB2pJ6KoNXQcf6WpqSvN6StaTevn/xtNY
-ayIQWt3AGtBbPuJCFpQqpP+ewNst0w6lELxP4sBmkeUN3HceXqy54yUR3tE3tJkF
-9uzNIUnQYc725RdXBrXPuqZwWmk8q6O+fYTpiwNtweMt7fR1a8UIIR1X5WbjyLkz
-dB27KV0Fw2/nRDdAehhr1SMywk5U9ODLrZ+CO24tCmiTs0FOEo8ucFbm8UQAAWEm
-IeunhZ+6nPobB8rgD4pwvlNCCmyq76XR5Yir6mwEVm/Zqns1cRi8kR+DzX9FfkT1
-vdPr9AFieP32tw4cMzUm11qRkfd9qTRv+r8gObAPYdVIkw2yKsFIGp4bdiSAe31E
-xWAWuSIk/j5TczILHKncFup/VzdCAsjs7gQMU1WK6Z5ybGcXOmY=
-=UxsX
------END PGP SIGNATURE-----
-
---3XA6nns4nE4KvaS/--
 
