@@ -2,93 +2,72 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8438C47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 23:18:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00BDAC47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 23:26:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 756E9206A4
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 23:18:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="o+J38nKI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 756E9206A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	by mail.kernel.org (Postfix) with ESMTPS id C3491206FA
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 23:26:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3491206FA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jW6py-000325-AJ
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 19:18:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48450)
+	id 1jW6wq-00052w-Sv
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 19:26:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49528)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=387c5e0cc=alistair.francis@wdc.com>)
- id 1jW6pD-0001td-87
- for qemu-devel@nongnu.org; Tue, 05 May 2020 19:18:07 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:50938)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=387c5e0cc=alistair.francis@wdc.com>)
- id 1jW6pC-0007G7-1q
- for qemu-devel@nongnu.org; Tue, 05 May 2020 19:18:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1588720687; x=1620256687;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=hCXi4JrMuFCwKzE8foG1p8GTrmqDZrBdid/5XT1A6Qo=;
- b=o+J38nKIl/38kLpcXfDBoVlnl0iK24b0Ho1AB9T7R+F8JmvqGBiNujQL
- Z2Z6GeJkPa81Vo0geydySqoZ47HKRKNYSTR6Ypq2CajnHydwlBhDC8qOz
- KzXRZ7OtibbCC7Pf7nklpmVy46gSgUmlC9Ilp2X0NW7HS37V9BEGtcS0J
- kiDwbJCa6CfQ8dXdaL939eKOaLgh5aCbGtmpMhTxDsV8pPZfd6LYX9G7B
- S4YAnXdfqm5UROIuAmKGak2Y3nA+nhI0zTcfAFvhAQl4JInreSuIQkZI4
- K6ukjHoUriy0pAl8J5/NOPZ+rZYM/nknr42Qd9FQ6qWQmcC8Ct6kKQRh/ g==;
-IronPort-SDR: Y/ZeesKoR4KMX7cD9awh9cFYDdEdN6rWDeizPBOXUedj3N8VJIMtjQxHzjw817W6jn1Ie3DxZ0
- Ht/R3RU21KbLKJf/Uila/XMVoMf9uid/8UusVGII65gvCBaiTZvJ2DEMyWu4qMnlOB0D6aQrr6
- y/BJQziJA+I/LGz6pA9nw3Gbj4mjfs8cV0WwR+J5er7e0vtpltDIDepS19H6pbRTsmxQBQ+yxR
- iFtej/i/OJheT6O8qk7sy/P1rzo9OzgAwLlaKYf8Qh0aDcI0B4oSD4vmuFmuGyXTcoLKElngEe
- DXE=
-X-IronPort-AV: E=Sophos;i="5.73,357,1583164800"; d="scan'208";a="137331071"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 06 May 2020 07:18:00 +0800
-IronPort-SDR: m86hkfuw2y8agm3Q7MCnDLMP01T5ZlNOsyprgWmC0ZHZ7euK5tsSxqYDwh3/VrQZdmfzz09uYj
- Xfq+z/mfEq+WZM+zO0BrBbiyTiYJMOF9U=
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 05 May 2020 16:07:53 -0700
-IronPort-SDR: 9ymhMnGEnbj9c/raTHtSgbHhyvEBs6HQGwQO9229wvNPc+U+yrmVWmcZFXacvb/t3gjjXZ3M0Z
- OptDgSttjmmA==
-WDCIronportException: Internal
-Received: from use204286.ad.shared (HELO risc6-mainframe.hgst.com)
- ([10.86.56.224])
- by uls-op-cesaip01.wdc.com with ESMTP; 05 May 2020 16:17:59 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: peter.maydell@linaro.org
-Subject: [PULL 1/1] hw/core/register: Add register_init_block8 helper.
-Date: Tue,  5 May 2020 16:09:41 -0700
-Message-Id: <20200505230941.3984108-2-alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200505230941.3984108-1-alistair.francis@wdc.com>
-References: <20200505230941.3984108-1-alistair.francis@wdc.com>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jW6wG-0004ZU-NF
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 19:25:24 -0400
+Resent-Date: Tue, 05 May 2020 19:25:24 -0400
+Resent-Message-Id: <E1jW6wG-0004ZU-NF@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21352)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jW6wE-0001Ar-U1
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 19:25:24 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1588721114; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=XsI++i7AZ4K0V5JjGiN0BKfNF9s6P1HEahlRadeZpLUiNI0a6UxwAs6W+7RqenGFqZbZ/oDe618WLsZl9zsOFAozIJE15+47hOVvveakOzSEJoM05nwxaWD4pdpVyb/I1jLmY3BOpGKYiq8BrmtSZogE0n5xjjEGLip9zpZjzzQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1588721114;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=ux3LP/3wsZgTeVAfnqKKuTWsY1V3QlXV+enZQ0M2xEs=; 
+ b=CKe0jdPey2zEQ4FQQiuMfmXoECkQlbgZakBE+iR4NfiLZYs4K9WyfZ/1hUJ8shOuDV3A0BepeiL7tG/WrHXvQfZtUmavDd01xIZxgH7V2c3b+W7C7IXOES1CitV1898M7WiYXSagDrTQfBjNKRar0+JhRpgSVJvIskZYLnurEi8=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1588721111778218.5344369536681;
+ Tue, 5 May 2020 16:25:11 -0700 (PDT)
+Message-ID: <158872111042.24779.10569159884458800505@45ef0f9c86ae>
+In-Reply-To: <20200505152926.18877-1-armbru@redhat.com>
+Subject: Re: [PATCH v2 00/18] qom: Spring cleaning
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.153.144;
- envelope-from=prvs=387c5e0cc=alistair.francis@wdc.com;
- helo=esa5.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 19:17:59
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: armbru@redhat.com
+Date: Tue, 5 May 2020 16:25:11 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 13:41:33
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,124 +81,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Joaquin de Andres <me@xcancerberox.com.ar>,
- Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, philmd@redhat.com, berrange@redhat.com,
+ qemu-devel@nongnu.org, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Joaquin de Andres <me@xcancerberox.com.ar>
-
-There was no support for 8 bits block registers. Changed
-register_init_block32 to be generic and static, adding register
-size in bits as parameter. Created one helper for each size.
-
-Signed-off-by: Joaquin de Andres <me@xcancerberox.com.ar>
-Message-Id: <20200402162839.76636-1-me@xcancerberox.com.ar>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- hw/core/register.c    | 46 +++++++++++++++++++++++++++++++++----------
- include/hw/register.h |  8 ++++++++
- 2 files changed, 44 insertions(+), 10 deletions(-)
-
-diff --git a/hw/core/register.c b/hw/core/register.c
-index 3c77396587..ddf91eb445 100644
---- a/hw/core/register.c
-+++ b/hw/core/register.c
-@@ -246,16 +246,18 @@ uint64_t register_read_memory(void *opaque, hwaddr addr,
-     return extract64(read_val, 0, size * 8);
- }
- 
--RegisterInfoArray *register_init_block32(DeviceState *owner,
--                                         const RegisterAccessInfo *rae,
--                                         int num, RegisterInfo *ri,
--                                         uint32_t *data,
--                                         const MemoryRegionOps *ops,
--                                         bool debug_enabled,
--                                         uint64_t memory_size)
-+static RegisterInfoArray *register_init_block(DeviceState *owner,
-+                                              const RegisterAccessInfo *rae,
-+                                              int num, RegisterInfo *ri,
-+                                              void *data,
-+                                              const MemoryRegionOps *ops,
-+                                              bool debug_enabled,
-+                                              uint64_t memory_size,
-+                                              size_t data_size_bits)
- {
-     const char *device_prefix = object_get_typename(OBJECT(owner));
-     RegisterInfoArray *r_array = g_new0(RegisterInfoArray, 1);
-+    int data_size = data_size_bits >> 3;
-     int i;
- 
-     r_array->r = g_new0(RegisterInfo *, num);
-@@ -264,12 +266,12 @@ RegisterInfoArray *register_init_block32(DeviceState *owner,
-     r_array->prefix = device_prefix;
- 
-     for (i = 0; i < num; i++) {
--        int index = rae[i].addr / 4;
-+        int index = rae[i].addr / data_size;
-         RegisterInfo *r = &ri[index];
- 
-         *r = (RegisterInfo) {
--            .data = &data[index],
--            .data_size = sizeof(uint32_t),
-+            .data = data + data_size * index,
-+            .data_size = data_size,
-             .access = &rae[i],
-             .opaque = owner,
-         };
-@@ -284,6 +286,30 @@ RegisterInfoArray *register_init_block32(DeviceState *owner,
-     return r_array;
- }
- 
-+RegisterInfoArray *register_init_block8(DeviceState *owner,
-+                                        const RegisterAccessInfo *rae,
-+                                        int num, RegisterInfo *ri,
-+                                        uint8_t *data,
-+                                        const MemoryRegionOps *ops,
-+                                        bool debug_enabled,
-+                                        uint64_t memory_size)
-+{
-+    return register_init_block(owner, rae, num, ri, (void *)
-+                               data, ops, debug_enabled, memory_size, 8);
-+}
-+
-+RegisterInfoArray *register_init_block32(DeviceState *owner,
-+                                         const RegisterAccessInfo *rae,
-+                                         int num, RegisterInfo *ri,
-+                                         uint32_t *data,
-+                                         const MemoryRegionOps *ops,
-+                                         bool debug_enabled,
-+                                         uint64_t memory_size)
-+{
-+    return register_init_block(owner, rae, num, ri, (void *)
-+                               data, ops, debug_enabled, memory_size, 32);
-+}
-+
- void register_finalize_block(RegisterInfoArray *r_array)
- {
-     object_unparent(OBJECT(&r_array->mem));
-diff --git a/include/hw/register.h b/include/hw/register.h
-index 5796584588..5d2c565ae0 100644
---- a/include/hw/register.h
-+++ b/include/hw/register.h
-@@ -185,6 +185,14 @@ uint64_t register_read_memory(void *opaque, hwaddr addr, unsigned size);
-  *          memory region (r_array->mem) the caller should add to a container.
-  */
- 
-+RegisterInfoArray *register_init_block8(DeviceState *owner,
-+                                        const RegisterAccessInfo *rae,
-+                                        int num, RegisterInfo *ri,
-+                                        uint8_t *data,
-+                                        const MemoryRegionOps *ops,
-+                                        bool debug_enabled,
-+                                        uint64_t memory_size);
-+
- RegisterInfoArray *register_init_block32(DeviceState *owner,
-                                          const RegisterAccessInfo *rae,
-                                          int num, RegisterInfo *ri,
--- 
-2.26.2
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUwNTE1MjkyNi4xODg3
+Ny0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDIwMDUwNTE1MjkyNi4xODg3Ny0xLWFybWJydUByZWRo
+YXQuY29tClN1YmplY3Q6IFtQQVRDSCB2MiAwMC8xOF0gcW9tOiBTcHJpbmcgY2xlYW5pbmcKVHlw
+ZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYt
+cGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRj
+aC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcg
+M2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0
+aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3
+LzIwMjAwNTA1MjMwOTQxLjM5ODQxMDgtMS1hbGlzdGFpci5mcmFuY2lzQHdkYy5jb20gLT4gcGF0
+Y2hldy8yMDIwMDUwNTIzMDk0MS4zOTg0MTA4LTEtYWxpc3RhaXIuZnJhbmNpc0B3ZGMuY29tClN3
+aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMjU4Mzc4ZCBxb206IERyb3AgQGVycnAgcGFy
+YW1ldGVyIG9mIG9iamVjdF9wcm9wZXJ0eV9kZWwoKQphZTc4MDNkIHNwYXByX3BjaTogRHJvcCBz
+b21lIGRlYWQgZXJyb3IgaGFuZGxpbmcKMzg2NzM0MSBxZGV2OiBVbnJlYWxpemUgbXVzdCBub3Qg
+ZmFpbAoyN2FiOTY0IERyb3AgbW9yZSBAZXJycCBwYXJhbWV0ZXJzIGFmdGVyIHByZXZpb3VzIGNv
+bW1pdAowNTFhYjAxIHFvbTogRHJvcCBwYXJhbWV0ZXIgQGVycnAgb2Ygb2JqZWN0X3Byb3BlcnR5
+X2FkZCgpICYgZnJpZW5kcwpkOTk4N2I0IHFkZXY6IENsZWFuIHVwIHFkZXZfY29ubmVjdF9ncGlv
+X291dF9uYW1lZCgpCjRhYzk0OTIgaHcvYXJtL2JjbTI4MzU6IERyb3AgZnV0aWxlIGF0dGVtcHRz
+IGF0IFFPTS1hZG9wdGluZyBtZW1vcnkKNTc2YmNjMSBlMTAwMDogRG9uJ3QgcnVuIGUxMDAwX2lu
+c3RhbmNlX2luaXQoKSB0d2ljZQoxZTM0M2ZiIGh3L2lzYS9zdXBlcmlvOiBNYWtlIHRoZSBjb21w
+b25lbnRzIFFPTSBjaGlsZHJlbgoyNTQ2MzcyIHMzOTB4L2NwdW1vZGVsOiBGaXggVUkgdG8gQ1BV
+IGZlYXR1cmVzIHBjYy1jbWFjLXthZXMsIGVhZXN9LTI1Ngo5ZmVlZTRlIHRlc3RzL2NoZWNrLXFv
+bS1wcm9wbGlzdDogSW1wcm92ZSBpdGVyYXRvciBjb3ZlcmFnZQplM2Y0ZTI0IHFvbTogRHJvcCBv
+YmplY3RfcHJvcGVydHlfc2V0X2Rlc2NyaXB0aW9uKCkgcGFyYW1ldGVyIEBlcnJwCjIyMzVjNzIg
+cW9tOiBNYWtlIGFsbCB0aGUgb2JqZWN0X3Byb3BlcnR5X2FkZF9GT08oKSByZXR1cm4gdGhlIHBy
+b3BlcnR5CjRhOTYxZjYgcW9tOiBEcm9wIGNvbnZlbmllbmNlIG1ldGhvZCBvYmplY3RfcHJvcGVy
+dHlfZ2V0X3VpbnQxNkxpc3QoKQphNGZmZWM4IHFvbTogU2ltcGxpZnkgb2JqZWN0X3Byb3BlcnR5
+X2dldF9lbnVtKCkKMzBjYTg5OCBxb206IERyb3Agb2JqZWN0X3Byb3BlcnR5X2RlbF9jaGlsZCgp
+J3MgdW51c2VkIHBhcmFtZXRlciBAZXJycAo3N2Q4MTlhIHFvbTogQ2xlYW4gdXAgaW5jb25zaXN0
+ZW50IHVzZSBvZiBnY2hhciAqIHZzLiBjaGFyICoKOTYyMDlmMyBxb206IENsZWFyZXIgcmVmZXJl
+bmNlIGNvdW50aW5nIGluIG9iamVjdF9pbml0aWFsaXplX2NoaWxkdigpCgo9PT0gT1VUUFVUIEJF
+R0lOID09PQoxLzE4IENoZWNraW5nIGNvbW1pdCA5NjIwOWYzOWYxNjcgKHFvbTogQ2xlYXJlciBy
+ZWZlcmVuY2UgY291bnRpbmcgaW4gb2JqZWN0X2luaXRpYWxpemVfY2hpbGR2KCkpCjIvMTggQ2hl
+Y2tpbmcgY29tbWl0IDc3ZDgxOWFjYmMwMyAocW9tOiBDbGVhbiB1cCBpbmNvbnNpc3RlbnQgdXNl
+IG9mIGdjaGFyICogdnMuIGNoYXIgKikKMy8xOCBDaGVja2luZyBjb21taXQgMzBjYTg5OGJiN2Rj
+IChxb206IERyb3Agb2JqZWN0X3Byb3BlcnR5X2RlbF9jaGlsZCgpJ3MgdW51c2VkIHBhcmFtZXRl
+ciBAZXJycCkKNC8xOCBDaGVja2luZyBjb21taXQgYTRmZmVjODYzYjhkIChxb206IFNpbXBsaWZ5
+IG9iamVjdF9wcm9wZXJ0eV9nZXRfZW51bSgpKQo1LzE4IENoZWNraW5nIGNvbW1pdCA0YTk2MWY2
+N2FmMjIgKHFvbTogRHJvcCBjb252ZW5pZW5jZSBtZXRob2Qgb2JqZWN0X3Byb3BlcnR5X2dldF91
+aW50MTZMaXN0KCkpCjYvMTggQ2hlY2tpbmcgY29tbWl0IDIyMzVjNzJkNDVhNiAocW9tOiBNYWtl
+IGFsbCB0aGUgb2JqZWN0X3Byb3BlcnR5X2FkZF9GT08oKSByZXR1cm4gdGhlIHByb3BlcnR5KQo3
+LzE4IENoZWNraW5nIGNvbW1pdCBlM2Y0ZTI0ZGRiMmUgKHFvbTogRHJvcCBvYmplY3RfcHJvcGVy
+dHlfc2V0X2Rlc2NyaXB0aW9uKCkgcGFyYW1ldGVyIEBlcnJwKQo4LzE4IENoZWNraW5nIGNvbW1p
+dCA5ZmVlZTRlM2RhNDAgKHRlc3RzL2NoZWNrLXFvbS1wcm9wbGlzdDogSW1wcm92ZSBpdGVyYXRv
+ciBjb3ZlcmFnZSkKOS8xOCBDaGVja2luZyBjb21taXQgMjU0NjM3MmU2ZTg1IChzMzkweC9jcHVt
+b2RlbDogRml4IFVJIHRvIENQVSBmZWF0dXJlcyBwY2MtY21hYy17YWVzLCBlYWVzfS0yNTYpCkVS
+Uk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNTM6IEZJTEU6IHRhcmdldC9zMzkweC9jcHVf
+ZmVhdHVyZXNfZGVmLmluYy5oOjMxNDoKK0RFRl9GRUFUKFBDQ19DTUFDX0FFU18yNTYsICJwY2Mt
+Y21hYy1hZXMtMjU2IiwgUENDLCAyMCwgIlBDQyBDb21wdXRlLUxhc3QtQmxvY2stQ01BQy1Vc2lu
+Zy1BRVMtMjU2IikKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgOCBsaW5lcyBjaGVja2Vk
+CgpQYXRjaCA5LzE4IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoxMC8xOCBDaGVja2luZyBj
+b21taXQgMWUzNDNmYmU5OWFmIChody9pc2Evc3VwZXJpbzogTWFrZSB0aGUgY29tcG9uZW50cyBR
+T00gY2hpbGRyZW4pCjExLzE4IENoZWNraW5nIGNvbW1pdCA1NzZiY2MxMjZkY2EgKGUxMDAwOiBE
+b24ndCBydW4gZTEwMDBfaW5zdGFuY2VfaW5pdCgpIHR3aWNlKQoxMi8xOCBDaGVja2luZyBjb21t
+aXQgNGFjOTQ5MjkzNjE3IChody9hcm0vYmNtMjgzNTogRHJvcCBmdXRpbGUgYXR0ZW1wdHMgYXQg
+UU9NLWFkb3B0aW5nIG1lbW9yeSkKMTMvMTggQ2hlY2tpbmcgY29tbWl0IGQ5OTg3YjQ5ZjM3MyAo
+cWRldjogQ2xlYW4gdXAgcWRldl9jb25uZWN0X2dwaW9fb3V0X25hbWVkKCkpCjE0LzE4IENoZWNr
+aW5nIGNvbW1pdCAwNTFhYjAxZWQ1ZmUgKHFvbTogRHJvcCBwYXJhbWV0ZXIgQGVycnAgb2Ygb2Jq
+ZWN0X3Byb3BlcnR5X2FkZCgpICYgZnJpZW5kcykKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJh
+Y3RlcnMKIzIwOTogRklMRTogYmFja2VuZHMvaG9zdG1lbS1maWxlLmM6MTg3OgorICAgICAgICBm
+aWxlX21lbW9yeV9iYWNrZW5kX2dldF9kaXNjYXJkX2RhdGEsIGZpbGVfbWVtb3J5X2JhY2tlbmRf
+c2V0X2Rpc2NhcmRfZGF0YSk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTA4
+MDogRklMRTogaHcvYXJtL3Jhc3BpLmM6Mjg3OgorICAgIG9iamVjdF9wcm9wZXJ0eV9hZGRfY29u
+c3RfbGluayhPQkpFQ1QoJnMtPnNvYyksICJyYW0iLCBPQkpFQ1QobWFjaGluZS0+cmFtKSk7CgpX
+QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzA5NTogRklMRTogaHcvcHBjL3NwYXBy
+LmM6MzM0NjoKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJnNwYXByLT5rZXJu
+ZWxfYWRkciwgT0JKX1BST1BfRkxBR19SRUFEV1JJVEUpOwoKdG90YWw6IDAgZXJyb3JzLCAzIHdh
+cm5pbmdzLCA0NDcxIGxpbmVzIGNoZWNrZWQKClBhdGNoIDE0LzE4IGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCjE1LzE4IENoZWNraW5nIGNvbW1pdCAyN2FiOTY0MmY1YjkgKERyb3AgbW9yZSBA
+ZXJycCBwYXJhbWV0ZXJzIGFmdGVyIHByZXZpb3VzIGNvbW1pdCkKMTYvMTggQ2hlY2tpbmcgY29t
+bWl0IDM4NjczNDE0OTc5MyAocWRldjogVW5yZWFsaXplIG11c3Qgbm90IGZhaWwpCjE3LzE4IENo
+ZWNraW5nIGNvbW1pdCBhZTc4MDNkNzM3ZjQgKHNwYXByX3BjaTogRHJvcCBzb21lIGRlYWQgZXJy
+b3IgaGFuZGxpbmcpCjE4LzE4IENoZWNraW5nIGNvbW1pdCAyNTgzNzhkZDk3NWQgKHFvbTogRHJv
+cCBAZXJycCBwYXJhbWV0ZXIgb2Ygb2JqZWN0X3Byb3BlcnR5X2RlbCgpKQo9PT0gT1VUUFVUIEVO
+RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlz
+IGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDUwNTE1MjkyNi4xODg3
+Ny0xLWFybWJydUByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgot
+LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRj
+aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVk
+aGF0LmNvbQ==
 
