@@ -2,97 +2,57 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCF31C47256
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 05:37:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B1B7C47256
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 05:50:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97F26206B9
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 05:37:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hA0vNcoR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97F26206B9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5E1FB206CC
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 05:50:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E1FB206CC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVqGh-00045t-Lt
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 01:37:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48036)
+	id 1jVqTG-0000Lf-D9
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 01:50:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53544)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jVqG2-00037I-KO
- for qemu-devel@nongnu.org; Tue, 05 May 2020 01:36:42 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36151)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jVqG1-0000Pi-N0
- for qemu-devel@nongnu.org; Tue, 05 May 2020 01:36:42 -0400
-Received: by mail-wm1-x342.google.com with SMTP id u127so816001wmg.1
- for <qemu-devel@nongnu.org>; Mon, 04 May 2020 22:36:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=EQlRqJvgXWWWJ6knTRuEkwjmJ3l974XtsswEaxhE2Ns=;
- b=hA0vNcoRaRjBSRj7GiwRJ5aI3OoIZIwEdJbTWRihj2IKZnUia/3TBuR/H1FpxM8rej
- ajRMrUP9l7BGgEQeBNVuJuSpJiTXKd1Q/WZAfZCa+Lpn4yRhxFqrq+qMJzonHHMUc9SW
- tT0LxZ6HRQJDlABGIkSpQgAOeCaEGaUesu7Z3Cq7YPKf7+XV7K+CNFkcZuWVlr8vWeYQ
- zMCjp5by9je+2tEbmyCSeirnKgmgiVuR5WS0rHbvkSyGqsc2H58V97g48KFjvbPHJoUF
- RMtIgfdaFZoDIzNn5DiKhLancAkHdXtmW9l6CeQUTd7kfzYpanwo38JQPCxdheShoUsW
- +1EA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=EQlRqJvgXWWWJ6knTRuEkwjmJ3l974XtsswEaxhE2Ns=;
- b=hn4bNa0w0VimRsd2J4Y4DXIRO93zKj3D1v7xfYoTRBc1sTJxs/GaTeCxfwmh2++WvK
- voBjfjNBnRFTQFTg/3kk3ROK5J7SvRaexLdLYCPu0jtLikKNpi74viM9TLy8EF/VRpw/
- Ey8eGHeIxOSAHW1xnc0gUS5Nu7xwY2C5M3JygqDvMo9rgPoJ5C9cI/aU81TqD3b7NSek
- JL8POW7+t7bCy7oT5OX2Wva7MJneJF2R3O7UPMHAfW8EyXE9MhAPBn1nZEnUTfYjspKa
- IZW7jgW7pe6TVRx4qDVsAoFEMYRAqQeGa+IA435YVpmEfy/fzYgP3TFIoQNYPXOJD0VO
- 4zSw==
-X-Gm-Message-State: AGi0Pub+n/6izSMmWZUR3LCCL8tgmXpjzCuJ16zOS2e2k7Cj/ANy8JAy
- mq9yOmRE3RFOfYhhCUC83kU=
-X-Google-Smtp-Source: APiQypIbFH/hJ3t3Kqj7AYNt3Lfjq05XNnn0Os/sXXRTsjdCJ7uhSG4eJa0rD4+icBBNLhUwB6gybg==
-X-Received: by 2002:a1c:6455:: with SMTP id y82mr1212702wmb.128.1588657000149; 
- Mon, 04 May 2020 22:36:40 -0700 (PDT)
-Received: from [192.168.1.39] (26.red-88-21-207.staticip.rima-tde.net.
- [88.21.207.26])
- by smtp.gmail.com with ESMTPSA id v16sm1932127wml.30.2020.05.04.22.36.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 04 May 2020 22:36:39 -0700 (PDT)
-Subject: Re: [PATCH 4/4] hw/i386: Make vmmouse helpers static
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200504083342.24273-1-f4bug@amsat.org>
- <20200504083342.24273-5-f4bug@amsat.org>
- <f01f89f6-10e8-5173-c68d-0fb779f77d0e@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <09da6f09-d6a2-39f1-0f47-278334e272dc@amsat.org>
-Date: Tue, 5 May 2020 07:36:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jVqS5-00072J-FX; Tue, 05 May 2020 01:49:09 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:56242)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jVqS1-0005CH-Ue; Tue, 05 May 2020 01:49:07 -0400
+Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 573E2BF7AF;
+ Tue,  5 May 2020 05:49:03 +0000 (UTC)
+From: Klaus Jensen <its@irrelevant.dk>
+To: qemu-block@nongnu.org
+Subject: [PATCH v5 01/18] nvme: fix pci doorbell size calculation
+Date: Tue,  5 May 2020 07:48:23 +0200
+Message-Id: <20200505054840.186586-2-its@irrelevant.dk>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200505054840.186586-1-its@irrelevant.dk>
+References: <20200505054840.186586-1-its@irrelevant.dk>
 MIME-Version: 1.0
-In-Reply-To: <f01f89f6-10e8-5173-c68d-0fb779f77d0e@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
+Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
+ helo=charlie.dont.surf
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:31:35
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,61 +65,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
+ Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Klaus Jensen <its@irrelevant.dk>,
+ Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/4/20 7:29 PM, Richard Henderson wrote:
-> On 5/4/20 1:33 AM, Philippe Mathieu-Daudé wrote:
->> +++ b/hw/i386/vmport.c
->> @@ -23,10 +23,10 @@
->>    */
->>   #include "qemu/osdep.h"
->>   #include "hw/isa/isa.h"
->> -#include "hw/i386/pc.h"
->>   #include "sysemu/hw_accel.h"
->>   #include "qemu/log.h"
->>   #include "vmport.h"
->> +#include "cpu.h"
->>   #include "trace.h"
->>   
->>   #define VMPORT_CMD_GETVERSION 0x0a
->> @@ -109,27 +109,6 @@ static uint32_t vmport_cmd_ram_size(void *opaque, uint32_t addr)
->>       return ram_size;
->>   }
->>   
->> -/* vmmouse helpers */
->> -void vmmouse_get_data(uint32_t *data)
->> -{
->> -    X86CPU *cpu = X86_CPU(current_cpu);
->> -    CPUX86State *env = &cpu->env;
->> -
->> -    data[0] = env->regs[R_EAX]; data[1] = env->regs[R_EBX];
->> -    data[2] = env->regs[R_ECX]; data[3] = env->regs[R_EDX];
->> -    data[4] = env->regs[R_ESI]; data[5] = env->regs[R_EDI];
->> -}
-> 
-> Why are you adding "cpu.h" when removing code?
+From: Klaus Jensen <k.jensen@samsung.com>
 
-Because this file still use the X86 register definitions:
+The size of the BAR is 0x1000 (main registers) + 8 bytes for each
+queue. Currently, the size of the BAR is calculated like so:
 
-   static uint32_t vmport_cmd_get_version(void *opaque, uint32_t addr)
-   {
-       X86CPU *cpu = X86_CPU(current_cpu);
+    n->reg_size = pow2ceil(0x1004 + 2 * (n->num_queues + 1) * 4);
 
-       cpu->env.regs[R_EBX] = VMPORT_MAGIC;
-       return 6;
-   }
+Since the 'num_queues' parameter already accounts for the admin queue,
+this should in any case not need to be incremented by one. Also, the
+size should be initialized to (0x1000).
 
-> Does that mean you don't need to add "cpu.h" to vmmouse.c?
+    n->reg_size = pow2ceil(0x1000 + 2 * n->num_queues * 4);
 
-Now both files vmmouse/vmport uses the X86 register definitions, but 
-they don't use anything declared in "hw/i386/pc.h".
+This, with the default value of num_queues (64), we will set aside room
+for 1 admin queue and 63 I/O queues (4 bytes per doorbell, 2 doorbells
+per queue).
 
-> 
-> 
-> r~
-> 
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Keith Busch <kbusch@kernel.org>
+---
+ hw/block/nvme.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 9b453423cf2c..1d7d7fb3c67a 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -54,6 +54,9 @@
+ #include "trace.h"
+ #include "nvme.h"
+ 
++#define NVME_REG_SIZE 0x1000
++#define NVME_DB_SIZE  4
++
+ #define NVME_GUEST_ERR(trace, fmt, ...) \
+     do { \
+         (trace_##trace)(__VA_ARGS__); \
+@@ -1403,7 +1406,9 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+     pcie_endpoint_cap_init(pci_dev, 0x80);
+ 
+     n->num_namespaces = 1;
+-    n->reg_size = pow2ceil(0x1004 + 2 * (n->num_queues + 1) * 4);
++
++    /* num_queues is really number of pairs, so each has two doorbells */
++    n->reg_size = pow2ceil(NVME_REG_SIZE + 2 * n->num_queues * NVME_DB_SIZE);
+     n->ns_size = bs_size / (uint64_t)n->num_namespaces;
+ 
+     n->namespaces = g_new0(NvmeNamespace, n->num_namespaces);
+-- 
+2.26.2
+
 
