@@ -2,85 +2,96 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23EA6C47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB64FC47254
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:37:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3502205ED
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:33:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 92609206A4
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:37:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DqOhxVcb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3502205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f17EbuiS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92609206A4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVutU-00076K-4X
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 06:33:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34236)
+	id 1jVuwo-0001NU-NX
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 06:37:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35392)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jVus1-000693-6W
- for qemu-devel@nongnu.org; Tue, 05 May 2020 06:32:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30649
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jVurz-0004Fl-Tt
- for qemu-devel@nongnu.org; Tue, 05 May 2020 06:32:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588674731;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=B/ATC1Apm8jZkYS/3yZsCVadYViIHtu/niZs3YWzOz4=;
- b=DqOhxVcbA4ubL5U6/TjD9h23oqZQroam7J4H5Y+NhTB8hXdZ0exG7ztBLcMKpt7xhPi50F
- muqg265kMz8fjgIFXKdcllCL1m4fgoRasDtfCFe2KPTtI2TbDxGzKI6iDcC9+TkdBxpGIc
- OB/bP917eMpEjN8vWldmW+jsesIhEh4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-101-rO5dl4xwMwmLCu6sLFolQA-1; Tue, 05 May 2020 06:32:08 -0400
-X-MC-Unique: rO5dl4xwMwmLCu6sLFolQA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E7504107ACF5;
- Tue,  5 May 2020 10:32:06 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 60C0F7053F;
- Tue,  5 May 2020 10:31:56 +0000 (UTC)
-Date: Tue, 5 May 2020 12:31:55 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: Re: [PATCH v25 06/10] ACPI: Record the Generic Error Status Block
- address
-Message-ID: <20200505123155.3b11394f@redhat.com>
-In-Reply-To: <20200410114639.32844-7-gengdongjiu@huawei.com>
-References: <20200410114639.32844-1-gengdongjiu@huawei.com>
- <20200410114639.32844-7-gengdongjiu@huawei.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jVuw3-0000gn-SL; Tue, 05 May 2020 06:36:23 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40795)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jVuw2-0000mQ-QJ; Tue, 05 May 2020 06:36:23 -0400
+Received: by mail-wr1-x441.google.com with SMTP id e16so2115374wra.7;
+ Tue, 05 May 2020 03:36:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=sklmjy3eA+wxj59B/HeXK/747r+mSrWS964aHUgV2lo=;
+ b=f17EbuiSkA+BazVWyFvtm53SDrQe2ieCrzLCjMj+oSl78CnMmkIM8ZJh9HxAlinj4q
+ pKdnyiK4uAEO9OsONCkfbz5SiHviufO42U0b79KbQx+fwQgHvwxBnD8idQc/pycC9EwY
+ dBPewcB9OiUTU+A/kvqTn7mQPATfi7Rk9VO/VXcQa7zkpiQYI7jJ+lM9vx6C/J1+FY5W
+ 61/DXaqvPIq/q+lJ5FIkvEqAI+EuYwcAHN3pg58QmQgnO9NMeeUgRqP1x0p4wilxOKD5
+ wUHOSoGluXYemeJ56Cw5elEwAw039VGvf3Z5Azd9WXYEIGvljSwYSYZOGV23RmAA3Hmt
+ sLxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=sklmjy3eA+wxj59B/HeXK/747r+mSrWS964aHUgV2lo=;
+ b=ff8q/eOPTPneLgq9ENBMhoRqUFpJq1cRsWyTyGebxedNAz/ehJ15oRWb+xMHavSVod
+ ePXMK18/7XNfsfdc/JrVjErj/UZRNMcGfkgvToKuijqDxrdS5aI3TpjuvtlzmMyJjqxg
+ HEw+C3JNgNwbJGOKGT6IBYGmK0ELC0xZ+DN2fRadUG8uPI+rhm6rrCm7/DzwTss1KozH
+ 6nkI6VN6ryuoNlM+AmHRz5H6MxaqBujCARnmKgGvNJK2HURDhNsq/Ub/1CxImUWId1I3
+ cCtOzLYzyN8DjOXtuk4hWYZl0le7dy3gSGcRGgR8PKnem+lly4CzufT1fMvfMzHb+4Pa
+ ZXQQ==
+X-Gm-Message-State: AGi0PuYrbkIa7BKfEFQ53h3dhr8+OLHd8cCz+rsHwjQyLLH55CV1c7tG
+ wokmvf4bAGBkcuEqPrOcrzA=
+X-Google-Smtp-Source: APiQypL8WdQMX19fALBss6Xbp/NGFu5wzc47ZYNIdhMmdQe9Kkw0DmNqWgvwcluTcT1sqjr64GCJ7w==
+X-Received: by 2002:adf:82c1:: with SMTP id 59mr2809240wrc.377.1588674980969; 
+ Tue, 05 May 2020 03:36:20 -0700 (PDT)
+Received: from [192.168.1.38] (26.red-88-21-207.staticip.rima-tde.net.
+ [88.21.207.26])
+ by smtp.gmail.com with ESMTPSA id p7sm2630504wrf.31.2020.05.05.03.36.19
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 05 May 2020 03:36:20 -0700 (PDT)
+Subject: Re: [PATCH V2] tests/Makefile: Fix description of "make check"
+To: Huacai Chen <zltjiangshi@gmail.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, Fam Zheng <fam@euphon.net>,
+ Markus Armbruster <armbru@redhat.com>
+References: <1588674291-6486-1-git-send-email-chenhc@lemote.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <6c0fbc8f-e838-16e8-083c-6390c4fd2938@amsat.org>
+Date: Tue, 5 May 2020 12:36:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=imammedo@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+In-Reply-To: <1588674291-6486-1-git-send-email-chenhc@lemote.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,174 +105,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, peter.maydell@linaro.org, xiaoguangrong.eric@gmail.com,
- kvm@vger.kernel.org, mst@redhat.com, mtosatti@redhat.com,
- qemu-devel@nongnu.org, ehabkost@redhat.com, linuxarm@huawei.com,
- shannon.zhaosl@gmail.com, zhengxiang9@huawei.com, qemu-arm@nongnu.org,
- Jonathan.Cameron@huawei.com, pbonzini@redhat.com, rth@twiddle.net
+Cc: qemu-trivial@nongnu.org, Huacai Chen <chenhuacai@gmail.com>,
+ qemu-devel@nongnu.org, Huacai Chen <chenhc@lemote.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 10 Apr 2020 19:46:35 +0800
-Dongjiu Geng <gengdongjiu@huawei.com> wrote:
-
-> Record the GHEB address via fw_cfg file, when recording
-> a error to CPER, it will use this address to find out
-> Generic Error Data Entries and write the error.
+On 5/5/20 12:24 PM, Huacai Chen wrote:
+> The description of "make check" is out-of-date, so fix it by adding
+> block and softfloat.
 > 
-> In order to avoid migration failure, make hardware
-> error table address to a part of GED device instead
-> of global variable, then this address will be migrated
-> to target QEMU.
-> 
-> Acked-by: Xiang Zheng <zhengxiang9@huawei.com>
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
+> Reviewed-by: Claudio Fontana <cfontana@suse.de>
+> Signed-off-by: Huacai Chen <chenhc@lemote.com>
 > ---
-> change since v24:
-> 1. Use s->ghes_state.ghes_addr_le to check in ghes_needed()
-> 2. Using hardware_error->len instead of request_block_size to calculate in acpi_ghes_add_fw_cfg()
-> 3. Remove assert(vms->acpi_dev) be build APEI table
-> 4. Directly use ACPI_GED(vms->acpi_dev) instead of ACPI_GED(vms->acpi_dev)
-> ---
->  hw/acpi/generic_event_device.c         | 19 +++++++++++++++++++
->  hw/acpi/ghes.c                         | 14 ++++++++++++++
->  hw/arm/virt-acpi-build.c               |  8 ++++++++
->  include/hw/acpi/generic_event_device.h |  2 ++
->  include/hw/acpi/ghes.h                 |  6 ++++++
->  5 files changed, 49 insertions(+)
+>   tests/Makefile.include | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
-> index 021ed2b..1491291 100644
-> --- a/hw/acpi/generic_event_device.c
-> +++ b/hw/acpi/generic_event_device.c
-> @@ -234,6 +234,24 @@ static const VMStateDescription vmstate_ged_state = {
->      }
->  };
->  
-> +static bool ghes_needed(void *opaque)
-> +{
-> +    AcpiGedState *s = opaque;
-> +    return s->ghes_state.ghes_addr_le;
-> +}
-> +
-> +static const VMStateDescription vmstate_ghes_state = {
-> +    .name = "acpi-ged/ghes",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .needed = ghes_needed,
-> +    .fields      = (VMStateField[]) {
-> +        VMSTATE_STRUCT(ghes_state, AcpiGedState, 1,
-> +                       vmstate_ghes_state, AcpiGhesState),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->  static const VMStateDescription vmstate_acpi_ged = {
->      .name = "acpi-ged",
->      .version_id = 1,
-> @@ -244,6 +262,7 @@ static const VMStateDescription vmstate_acpi_ged = {
->      },
->      .subsections = (const VMStateDescription * []) {
->          &vmstate_memhp_state,
-> +        &vmstate_ghes_state,
->          NULL
->      }
->  };
-> diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
-> index 091fd87..e74af23 100644
-> --- a/hw/acpi/ghes.c
-> +++ b/hw/acpi/ghes.c
-> @@ -24,6 +24,8 @@
->  #include "hw/acpi/ghes.h"
->  #include "hw/acpi/aml-build.h"
->  #include "qemu/error-report.h"
-> +#include "hw/acpi/generic_event_device.h"
-> +#include "hw/nvram/fw_cfg.h"
->  
->  #define ACPI_GHES_ERRORS_FW_CFG_FILE        "etc/hardware_errors"
->  #define ACPI_GHES_DATA_ADDR_FW_CFG_FILE     "etc/hardware_errors_addr"
-> @@ -213,3 +215,15 @@ void acpi_build_hest(GArray *table_data, BIOSLinker *linker)
->      build_header(linker, table_data, (void *)(table_data->data + hest_start),
->          "HEST", table_data->len - hest_start, 1, NULL, NULL);
->  }
-> +
-> +void acpi_ghes_add_fw_cfg(AcpiGhesState *ags, FWCfgState *s,
-> +                          GArray *hardware_error)
-> +{
-> +    /* Create a read-only fw_cfg file for GHES */
-> +    fw_cfg_add_file(s, ACPI_GHES_ERRORS_FW_CFG_FILE, hardware_error->data,
-> +                    hardware_error->len);
-> +
-> +    /* Create a read-write fw_cfg file for Address */
-> +    fw_cfg_add_file_callback(s, ACPI_GHES_DATA_ADDR_FW_CFG_FILE, NULL, NULL,
-> +        NULL, &(ags->ghes_addr_le), sizeof(ags->ghes_addr_le), false);
-> +}
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index f611bce..2726aac 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -911,6 +911,7 @@ void virt_acpi_setup(VirtMachineState *vms)
->  {
->      AcpiBuildTables tables;
->      AcpiBuildState *build_state;
-> +    AcpiGedState *acpi_ged_state;
->  
->      if (!vms->fw_cfg) {
->          trace_virt_acpi_setup();
-> @@ -941,6 +942,13 @@ void virt_acpi_setup(VirtMachineState *vms)
->      fw_cfg_add_file(vms->fw_cfg, ACPI_BUILD_TPMLOG_FILE, tables.tcpalog->data,
->                      acpi_data_len(tables.tcpalog));
->  
-> +    if (vms->ras) {
-> +        assert(vms->acpi_dev);
-> +        acpi_ged_state = ACPI_GED(vms->acpi_dev);
-> +        acpi_ghes_add_fw_cfg(&acpi_ged_state->ghes_state,
-> +                             vms->fw_cfg, tables.hardware_errors);
-> +    }
-> +
->      build_state->rsdp_mr = acpi_add_rom_blob(virt_acpi_build_update,
->                                               build_state, tables.rsdp,
->                                               ACPI_BUILD_RSDP_FILE, 0);
-> diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
-> index d157eac..037d2b5 100644
-> --- a/include/hw/acpi/generic_event_device.h
-> +++ b/include/hw/acpi/generic_event_device.h
-> @@ -61,6 +61,7 @@
->  
->  #include "hw/sysbus.h"
->  #include "hw/acpi/memory_hotplug.h"
-> +#include "hw/acpi/ghes.h"
->  
->  #define ACPI_POWER_BUTTON_DEVICE "PWRB"
->  
-> @@ -95,6 +96,7 @@ typedef struct AcpiGedState {
->      GEDState ged_state;
->      uint32_t ged_event_bitmap;
->      qemu_irq irq;
-> +    AcpiGhesState ghes_state;
->  } AcpiGedState;
->  
->  void build_ged_aml(Aml *table, const char* name, HotplugHandler *hotplug_dev,
-> diff --git a/include/hw/acpi/ghes.h b/include/hw/acpi/ghes.h
-> index 18debd8..a3420fc 100644
-> --- a/include/hw/acpi/ghes.h
-> +++ b/include/hw/acpi/ghes.h
-> @@ -62,6 +62,12 @@ enum {
->      ACPI_HEST_SRC_ID_RESERVED,
->  };
->  
-> +typedef struct AcpiGhesState {
-> +    uint64_t ghes_addr_le;
-> +} AcpiGhesState;
-> +
->  void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker);
->  void acpi_build_hest(GArray *table_data, BIOSLinker *linker);
-> +void acpi_ghes_add_fw_cfg(AcpiGhesState *vms, FWCfgState *s,
-> +                          GArray *hardware_errors);
->  #endif
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 03a74b6..5d32239 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -4,7 +4,7 @@
+>   check-help:
+>   	@echo "Regression testing targets:"
+>   	@echo
+> -	@echo " $(MAKE) check                Run unit, qapi-schema, qtest and decodetree"
+> +	@echo " $(MAKE) check                Run block, qapi-schema, unit, softfloat, qtest and decodetree tests"
+>   	@echo
+>   	@echo " $(MAKE) check-qtest-TARGET   Run qtest tests for given target"
+>   	@echo " $(MAKE) check-qtest          Run qtest tests"
+> 
 
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
