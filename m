@@ -8,66 +8,68 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65847C47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 16:40:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDE11C47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 16:42:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BBD720746
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 16:40:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A2D1420746
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 16:42:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IUR0R4HG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BBD720746
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rP6HSnYQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2D1420746
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jW0cR-0007MG-BP
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 12:40:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59946)
+	id 1jW0eV-0000xN-Q5
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 12:42:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60136)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jW0bW-0006LD-QT; Tue, 05 May 2020 12:39:34 -0400
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:44621)
+ id 1jW0d1-0008Ci-Uh; Tue, 05 May 2020 12:41:13 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:42187)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jW0bV-00034z-DO; Tue, 05 May 2020 12:39:34 -0400
-Received: by mail-io1-xd43.google.com with SMTP id z2so2605128iol.11;
- Tue, 05 May 2020 09:39:32 -0700 (PDT)
+ id 1jW0d0-0003nB-9T; Tue, 05 May 2020 12:41:07 -0400
+Received: by mail-io1-xd43.google.com with SMTP id e9so2618641iok.9;
+ Tue, 05 May 2020 09:41:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=WIRaXa5uWOFOqTJW7emtu3GQdvnFhLb8E2Xsvd+NElk=;
- b=IUR0R4HG4AqMmEagj5njddYP3Wdx8hlZEHWI12mbGHjXO3ryP18h+y5CxKpca7z21Q
- Qi9jONRsmR3M+j5El4o9i47YuygRmIylTCt0PggKUgN3RHXpnu/wM8WGD/J3ZzgVKjH2
- knUgRiduFB068AkBc158Huew9rAWgxZi7qfHyQ+6t38R6H2COZ/7XJHiqEv8piIdVQHq
- JCgxioLh/rWGdS0vGYcaJb75I7FyhNfExWMasoOKa5fRAXYpF23kT9pEjQqFoBdDVRBV
- xhVTBX5X6DWxK7qH01B8Y67mYZGvfUJzUJXJeUWD3I0N3QwFTKJykccBX3SlTrZjN0Uf
- 91HA==
+ :cc; bh=a3BifNvPbVwluYeKRL84K9yT77rhPqmGn0+TObNAbXk=;
+ b=rP6HSnYQRiq668N9eSUUC0P8s99ox2lQCbWMJO6cnq1v3uSab42nB0/y/PeCTtjfKS
+ fDlUvd0KEafTah0GJNuvybq/4cCXkYxAXcakAND+0zfdEXQfRxENhbX35fCtpyU/yhNr
+ gK9eFw9pAlFPLU+c5/u1nohMcur1co3pKv1rfCtBAjCVIw6e7UPq8qlL5w3aGUgARVam
+ 2I8guhlVW2lci4StNcqrz5oDtaT1lapMg5Cs7bZMW6gBO7/6SnJq6oXoE1UKTyqwqvAl
+ 93KrfeZNogGqlHxnmtG1X1G3pdpiBunfn6BgOciS6i0+WU9Q4UUXLNRd7UFT4HPh+WAH
+ b25w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=WIRaXa5uWOFOqTJW7emtu3GQdvnFhLb8E2Xsvd+NElk=;
- b=HD/iDAY8Bdy8zWMq21OwAzeL6hUB4THsh7lNB9KePXwIOoiG7BEBx5Cgdp3vkKHXKT
- yPz78Ek6isuvQ854qvmo8o7YGrAFqvB4GexGkbu+I0b2Vhtt18AKABarlsUxW2WVqnui
- xiNuLi3x1MrpCmXFGjPl33vTslJJwoYhNapKPHXnL9WUN4shPVPCEAIcoEY80aKNmIhr
- ILhkOSKdFMCarnMBVLVZS+8UGXKAWKmVCm4PYMtf1DcWsaI+88JF+1EEwmJraIB7HBIp
- RS+r321ojOQ8ZKqX1Ri8CrofWN3T72DFgT42zxPHNI5zeUD+KXJ3ODi91i0GU3xAqZr1
- 2fiQ==
-X-Gm-Message-State: AGi0PuYa3l+OhQUJz04RFE8N0YPzBoM1d3uYC6+tApDf6Zv8lPJSpj10
- f5cwq7W10cInRET8vS6XZuq+AVlu5KQ3in40poY=
-X-Google-Smtp-Source: APiQypJ679JoZdHtd3el0Lvqe5jCQzHdw/OzBsksQwfQPrUJzVMCdf2aYxvWOk+3Kma/Zm2bJdJkPo+D8HyizHGPvJw=
-X-Received: by 2002:a02:b60e:: with SMTP id h14mr4362061jam.91.1588696772028; 
- Tue, 05 May 2020 09:39:32 -0700 (PDT)
+ bh=a3BifNvPbVwluYeKRL84K9yT77rhPqmGn0+TObNAbXk=;
+ b=ZbagN2YhtA9/l+IPliI5WhKIbCG0v2VdOSCIazmlQoy84RS+wPwjJPcCuzJpXb2B/K
+ 7vC2+RhZduvJrTnrj5LdegRkAZSMDg5sopSekxJg/LKs2TbHQnQQckg1U/Ndc4zwHnJl
+ ro/Z8UbAuWD395O8NM0cu9xObuO0FVrNN4boSO6kgSMCShpMUjUo3o4WmgIjHB6o4MVI
+ 9kdAzrQSxffDyaMZlzRm0Z22yWlKJjAU30dPv+YDJPiPgtVwco16/t+Y9JMikvMaIE2N
+ M+2vp9eZofnjsRs1vVm/40DboAiE5mSeIk9MzYP5sKVszjGcX6H88qj7y72OrhzSIbyO
+ WRUg==
+X-Gm-Message-State: AGi0PuaAfMcLNJ0GvRyz2E8e9e5uVEesWvR4sgi6RcgcG8NXFWGUgrQQ
+ F4ohSGSMdvHRs8vDUUt4+BOAnGL4WGat3DNShSI=
+X-Google-Smtp-Source: APiQypKacCVJoT+F81hEFU+ci8RV92pSKCLm7jUcnKNZJzlHgkIwn7lr4i9oHgIr+cGF3B2yOYeLJgoZ0n+NxzRSrGs=
+X-Received: by 2002:a05:6602:d:: with SMTP id
+ b13mr4074236ioa.176.1588696864976; 
+ Tue, 05 May 2020 09:41:04 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200430162439.2659-1-edgar.iglesias@gmail.com>
- <20200430162439.2659-4-edgar.iglesias@gmail.com>
-In-Reply-To: <20200430162439.2659-4-edgar.iglesias@gmail.com>
+ <20200430162439.2659-5-edgar.iglesias@gmail.com>
+In-Reply-To: <20200430162439.2659-5-edgar.iglesias@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 5 May 2020 09:30:50 -0700
-Message-ID: <CAKmqyKMyAT9+z7MscVi870O5ssDGsn5qvZc4QbFgounk60WL6A@mail.gmail.com>
-Subject: Re: [PATCH v1 3/9] hw/net/xilinx_axienet: Remove unncessary cast
+Date: Tue, 5 May 2020 09:32:23 -0700
+Message-ID: <CAKmqyKNhj6QK_httF8S+D0T_U=D4fCEm3y6z9O99=qmJDiEs6Q@mail.gmail.com>
+Subject: Re: [PATCH v1 4/9] hw/dma/xilinx_axidma: Add DMA memory-region
+ property
 To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
@@ -109,13 +111,13 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Apr 30, 2020 at 9:28 AM Edgar E. Iglesias
+On Thu, Apr 30, 2020 at 9:29 AM Edgar E. Iglesias
 <edgar.iglesias@gmail.com> wrote:
 >
 > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 >
-> Remove unncessary cast, buf is already uint8_t *.
-> No functional change.
+> Add DMA memory-region property to externally control what
+> address-space this DMA operates on.
 >
 > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
@@ -124,22 +126,122 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/net/xilinx_axienet.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/dma/xilinx_axidma.c | 30 +++++++++++++++++++++++-------
+>  1 file changed, 23 insertions(+), 7 deletions(-)
 >
-> diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
-> index 84073753d7..c8dfcda3ee 100644
-> --- a/hw/net/xilinx_axienet.c
-> +++ b/hw/net/xilinx_axienet.c
-> @@ -918,7 +918,7 @@ xilinx_axienet_data_stream_push(StreamSlave *obj, uint8_t *buf, size_t size)
->          uint16_t csum;
+> diff --git a/hw/dma/xilinx_axidma.c b/hw/dma/xilinx_axidma.c
+> index 018f36991b..4540051448 100644
+> --- a/hw/dma/xilinx_axidma.c
+> +++ b/hw/dma/xilinx_axidma.c
+> @@ -33,6 +33,7 @@
+>  #include "qemu/log.h"
+>  #include "qemu/module.h"
 >
->          tmp_csum = net_checksum_add(size - start_off,
-> -                                    (uint8_t *)buf + start_off);
-> +                                    buf + start_off);
->          /* Accumulate the seed.  */
->          tmp_csum += s->hdr[2] & 0xffff;
+> +#include "sysemu/dma.h"
+>  #include "hw/stream.h"
 >
+>  #define D(x)
+> @@ -103,6 +104,7 @@ enum {
+>  };
+>
+>  struct Stream {
+> +    struct XilinxAXIDMA *dma;
+>      ptimer_state *ptimer;
+>      qemu_irq irq;
+>
+> @@ -125,6 +127,9 @@ struct XilinxAXIDMAStreamSlave {
+>  struct XilinxAXIDMA {
+>      SysBusDevice busdev;
+>      MemoryRegion iomem;
+> +    MemoryRegion *dma_mr;
+> +    AddressSpace as;
+> +
+>      uint32_t freqhz;
+>      StreamSlave *tx_data_dev;
+>      StreamSlave *tx_control_dev;
+> @@ -186,7 +191,7 @@ static void stream_desc_load(struct Stream *s, hwaddr addr)
+>  {
+>      struct SDesc *d = &s->desc;
+>
+> -    cpu_physical_memory_read(addr, d, sizeof *d);
+> +    address_space_read(&s->dma->as, addr, MEMTXATTRS_UNSPECIFIED, d, sizeof *d);
+>
+>      /* Convert from LE into host endianness.  */
+>      d->buffer_address = le64_to_cpu(d->buffer_address);
+> @@ -204,7 +209,8 @@ static void stream_desc_store(struct Stream *s, hwaddr addr)
+>      d->nxtdesc = cpu_to_le64(d->nxtdesc);
+>      d->control = cpu_to_le32(d->control);
+>      d->status = cpu_to_le32(d->status);
+> -    cpu_physical_memory_write(addr, d, sizeof *d);
+> +    address_space_write(&s->dma->as, addr, MEMTXATTRS_UNSPECIFIED,
+> +                        d, sizeof *d);
+>  }
+>
+>  static void stream_update_irq(struct Stream *s)
+> @@ -286,8 +292,9 @@ static void stream_process_mem2s(struct Stream *s, StreamSlave *tx_data_dev,
+>                       txlen + s->pos);
+>          }
+>
+> -        cpu_physical_memory_read(s->desc.buffer_address,
+> -                                 s->txbuf + s->pos, txlen);
+> +        address_space_read(&s->dma->as, s->desc.buffer_address,
+> +                           MEMTXATTRS_UNSPECIFIED,
+> +                           s->txbuf + s->pos, txlen);
+>          s->pos += txlen;
+>
+>          if (stream_desc_eof(&s->desc)) {
+> @@ -336,7 +343,8 @@ static size_t stream_process_s2mem(struct Stream *s, unsigned char *buf,
+>              rxlen = len;
+>          }
+>
+> -        cpu_physical_memory_write(s->desc.buffer_address, buf + pos, rxlen);
+> +        address_space_write(&s->dma->as, s->desc.buffer_address,
+> +                            MEMTXATTRS_UNSPECIFIED, buf + pos, rxlen);
+>          len -= rxlen;
+>          pos += rxlen;
+>
+> @@ -525,6 +533,7 @@ static void xilinx_axidma_realize(DeviceState *dev, Error **errp)
+>      XilinxAXIDMAStreamSlave *cs = XILINX_AXI_DMA_CONTROL_STREAM(
+>                                                              &s->rx_control_dev);
+>      Error *local_err = NULL;
+> +    int i;
+>
+>      object_property_add_link(OBJECT(ds), "dma", TYPE_XILINX_AXI_DMA,
+>                               (Object **)&ds->dma,
+> @@ -545,17 +554,19 @@ static void xilinx_axidma_realize(DeviceState *dev, Error **errp)
+>          goto xilinx_axidma_realize_fail;
+>      }
+>
+> -    int i;
+> -
+>      for (i = 0; i < 2; i++) {
+>          struct Stream *st = &s->streams[i];
+>
+> +        st->dma = s;
+>          st->nr = i;
+>          st->ptimer = ptimer_init(timer_hit, st, PTIMER_POLICY_DEFAULT);
+>          ptimer_transaction_begin(st->ptimer);
+>          ptimer_set_freq(st->ptimer, s->freqhz);
+>          ptimer_transaction_commit(st->ptimer);
+>      }
+> +
+> +    address_space_init(&s->as,
+> +                       s->dma_mr ? s->dma_mr : get_system_memory(), "dma");
+>      return;
+>
+>  xilinx_axidma_realize_fail:
+> @@ -575,6 +586,11 @@ static void xilinx_axidma_init(Object *obj)
+>                              &s->rx_control_dev, sizeof(s->rx_control_dev),
+>                              TYPE_XILINX_AXI_DMA_CONTROL_STREAM, &error_abort,
+>                              NULL);
+> +    object_property_add_link(obj, "dma", TYPE_MEMORY_REGION,
+> +                             (Object **)&s->dma_mr,
+> +                             qdev_prop_allow_set_link_before_realize,
+> +                             OBJ_PROP_LINK_STRONG,
+> +                             &error_abort);
+>
+>      sysbus_init_irq(sbd, &s->streams[0].irq);
+>      sysbus_init_irq(sbd, &s->streams[1].irq);
 > --
 > 2.20.1
 >
