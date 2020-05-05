@@ -2,95 +2,78 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCFC9C47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 09:42:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B616C47254
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 09:43:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EA3020675
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 09:42:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 605F520675
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 09:43:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aH39MH0L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EA3020675
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DWSdrMBJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 605F520675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVu5R-0005rF-O2
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 05:42:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51132)
+	id 1jVu6Z-0006pr-K0
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 05:43:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51440)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVu4h-0005Cz-H7
- for qemu-devel@nongnu.org; Tue, 05 May 2020 05:41:17 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51387
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jVu60-0006M8-JG
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 05:42:36 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29824
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVu4f-0000Vs-9z
- for qemu-devel@nongnu.org; Tue, 05 May 2020 05:41:15 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jVu5z-00050u-NO
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 05:42:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588671671;
+ s=mimecast20190719; t=1588671754;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=APH4hBhdTuvzeDLElBxVXJocUsvJrKNmf7PAsYZm3Aw=;
- b=aH39MH0LTqLgP9re3t1zREw4+xSLTZh2C/4XC2JIa1IhkJIfOJ5UCz3G+n7jFp3kAvYHoI
- gZHSIKXaF7KinYfAPYNWZvGbSXmgz2PdndyVlTszlg8B+tSJFxLlNGTHYTJs0JDToL5Voh
- xO1W2vWjUcTIt3Oi+puSGjM7WD3rado=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-501-A_ZisbeTMcSKVPmN2XZBkw-1; Tue, 05 May 2020 05:41:08 -0400
-X-MC-Unique: A_ZisbeTMcSKVPmN2XZBkw-1
-Received: by mail-wr1-f71.google.com with SMTP id y4so952909wrt.4
- for <qemu-devel@nongnu.org>; Tue, 05 May 2020 02:41:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=APH4hBhdTuvzeDLElBxVXJocUsvJrKNmf7PAsYZm3Aw=;
- b=JbEZ3ncAt4QTsHiUvHZBgLiR1/9yKBvmLfforlLZpDgrAgD4oIKC73QHLmJOGFcaf5
- QysgeqK0WIfz2cMCNbWm4EsdK0I/5F72eyPZHaG0a4/7dEJWoT7iFqwFhHPR3qcOkMHN
- nYQdiIhUnmxZ3l+V7+lCbNeUiZuvZrg1XRqgAnUZXvxRdS3PZ9KpzuP5FWjytuZ9CKHI
- gbIiP4TsXmbNPbESEwiOR4iYgMrxyBdHUWBK5r4FnIf+VVgXF0kbvU/iYXBHzlUtgsWC
- MkwOzShBTecWelyM4ou4cqdREjoqST0Wg59qp8EPX+IoPb9kDl3AO9Z7grL8AVoV3z7n
- YJcw==
-X-Gm-Message-State: AGi0PuarDzjlFZDibN2hWu/39r5PPZOfmu/i87S/762JqtUp6R6ooPnN
- e4Bvxq0gPjUkkU50U3HZXmZjAzioAAu21zIyobQ0BMRr0wJnS05+4cTeffxcCNoGcRTHUF7Tpj/
- l3doViZ38uDL5IGc=
-X-Received: by 2002:a5d:42c1:: with SMTP id t1mr2839977wrr.18.1588671666840;
- Tue, 05 May 2020 02:41:06 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJ+cVSW6HdW++quzjkY3kClpm7ImJkiC19JSn5hbfbtvzFIEhLh27EqkvSaZXPfJzFmkNLj0Q==
-X-Received: by 2002:a5d:42c1:: with SMTP id t1mr2839937wrr.18.1588671666582;
- Tue, 05 May 2020 02:41:06 -0700 (PDT)
-Received: from [192.168.1.38] (26.red-88-21-207.staticip.rima-tde.net.
- [88.21.207.26])
- by smtp.gmail.com with ESMTPSA id x16sm2271137wrn.76.2020.05.05.02.41.04
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 05 May 2020 02:41:05 -0700 (PDT)
-Subject: Re: [PATCH v5 00/18] nvme: refactoring and cleanups
-To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
-References: <20200505054840.186586-1-its@irrelevant.dk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <4dcfd794-5722-31d9-4f03-7b1a6425c6b8@redhat.com>
-Date: Tue, 5 May 2020 11:41:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ bh=iGQEU5+7JurZ0RC6WQaKDJ8xcHgdhhgIoYSUkJF16HY=;
+ b=DWSdrMBJGZOcjvOImJauwhB7/P9L5I5i5kpt9q7W4g99V/rElviVoGGY2PpvcuptekJ1JJ
+ Utet1rU7Apfg2E8+D+gXqaVL7uSfy8Mx4jCuXBuAxtJcnULMdRzvRoKFwDrIC+Q91DDo7M
+ 7XJwIxDklaL2nRC3V3WtXnIB5152vUs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-379-vBt-DCLwPfyPFOY38OPBxA-1; Tue, 05 May 2020 05:42:30 -0400
+X-MC-Unique: vBt-DCLwPfyPFOY38OPBxA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED74C80183C;
+ Tue,  5 May 2020 09:42:27 +0000 (UTC)
+Received: from gondolin (ovpn-112-219.ams2.redhat.com [10.36.112.219])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 21C825D9D3;
+ Tue,  5 May 2020 09:42:16 +0000 (UTC)
+Date: Tue, 5 May 2020 11:42:14 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v18 QEMU 05/18] vfio: Add migration region
+ initialization and finalize function
+Message-ID: <20200505114214.1a9850aa.cohuck@redhat.com>
+In-Reply-To: <1588632293-18932-6-git-send-email-kwankhede@nvidia.com>
+References: <1588632293-18932-1-git-send-email-kwankhede@nvidia.com>
+ <1588632293-18932-6-git-send-email-kwankhede@nvidia.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200505054840.186586-1-its@irrelevant.dk>
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:38
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -111,64 +94,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
- Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Javier Gonzalez <javier.gonz@samsung.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
+Cc: cjia@nvidia.com, aik@ozlabs.ru, Zhengxiao.zx@Alibaba-inc.com,
+ shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ eauger@redhat.com, yi.l.liu@intel.com, quintela@redhat.com,
+ ziye.yang@intel.com, armbru@redhat.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, felipe@nutanix.com, zhi.a.wang@intel.com,
+ kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
+ alex.williamson@redhat.com, changpeng.liu@intel.com, eskultet@redhat.com,
+ Ken.Xue@amd.com, jonathan.davies@nutanix.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/5/20 7:48 AM, Klaus Jensen wrote:
-> From: Klaus Jensen <k.jensen@samsung.com>
-> 
-> Changes since v5
-> ~~~~~~~~~~~~~~~~
-> No functional changes, just updated Reviewed-by tags. Also, I screwed up
-> the CC list when sending v4.
-> 
-> Philippe and Keith, please add a Reviewed-by to
-> 
->    * "nvme: factor out pmr setup" and
->    * "do cmb/pmr init as part of pci init"
-> 
-> since the first one was added and the second one was changed in v4 when
-> rebasing on Kevins block-next tree which had the PMR work that was not
-> in master at the time.
-> 
-> With those in place, it should be ready for Kevin to merge.
-> 
-> Klaus Jensen (18):
->    nvme: fix pci doorbell size calculation
->    nvme: rename trace events to pci_nvme
->    nvme: remove superfluous breaks
->    nvme: move device parameters to separate struct
->    nvme: use constants in identify
->    nvme: refactor nvme_addr_read
->    nvme: add max_ioqpairs device parameter
->    nvme: remove redundant cmbloc/cmbsz members
->    nvme: factor out property/constraint checks
->    nvme: factor out device state setup
->    nvme: factor out block backend setup
->    nvme: add namespace helpers
->    nvme: factor out namespace setup
->    nvme: factor out pci setup
->    nvme: factor out cmb setup
->    nvme: factor out pmr setup
->    nvme: do cmb/pmr init as part of pci init
->    nvme: factor out controller identify setup
+On Tue, 5 May 2020 04:14:40 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-Thinking loudly, it would be easier to differentiate emulated device vs 
-block driver using 's,^nvme,hw/nvme,' in patches (and series) title. 
-Kevin, if you are motivated...
+> - Migration functions are implemented for VFIO_DEVICE_TYPE_PCI device in this
+>   patch series.
 
+I would drop this sentence; people looking at this patch in the future
+are unlikely to care.
+
+> - VFIO device supports migration or not is decided based of migration region
+
+"Whether the VFIO device..."
+
+s/based of/based on/
+
+>   query. If migration region query is successful and migration region
+>   initialization is successful then migration is supported else migration is
+>   blocked.
 > 
->   hw/block/nvme.c       | 543 ++++++++++++++++++++++++------------------
->   hw/block/nvme.h       |  31 ++-
->   hw/block/trace-events | 180 +++++++-------
->   include/block/nvme.h  |   8 +
->   4 files changed, 429 insertions(+), 333 deletions(-)
-> 
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> ---
+>  hw/vfio/Makefile.objs         |   2 +-
+>  hw/vfio/migration.c           | 138 ++++++++++++++++++++++++++++++++++++++++++
+>  hw/vfio/trace-events          |   3 +
+>  include/hw/vfio/vfio-common.h |   9 +++
+>  4 files changed, 151 insertions(+), 1 deletion(-)
+>  create mode 100644 hw/vfio/migration.c
+
+
+> +int vfio_migration_probe(VFIODevice *vbasedev, Error **errp)
+> +{
+> +    struct vfio_region_info *info;
+> +    Error *local_err = NULL;
+> +    int ret;
+> +
+> +    ret = vfio_get_dev_region_info(vbasedev, VFIO_REGION_TYPE_MIGRATION,
+> +                                   VFIO_REGION_SUBTYPE_MIGRATION, &info);
+> +    if (ret) {
+> +        goto add_blocker;
+> +    }
+> +
+> +    ret = vfio_migration_init(vbasedev, info);
+> +    if (ret) {
+> +        goto add_blocker;
+> +    }
+> +
+> +    trace_vfio_migration_probe(vbasedev->name, info->index);
+> +    return 0;
+> +
+> +add_blocker:
+> +    error_setg(&vbasedev->migration_blocker,
+> +               "VFIO device doesn't support migration");
+> +    ret = migrate_add_blocker(vbasedev->migration_blocker, &local_err);
+> +    if (local_err) {
+
+Rather check for ret?
+
+> +        error_propagate(errp, local_err);
+> +        error_free(vbasedev->migration_blocker);
+
+vbasedev->migration_blocker = NULL; ?
+
+> +    }
+> +    return ret;
+
+I think you also need to free info somewhere?
+
+> +}
 
 
