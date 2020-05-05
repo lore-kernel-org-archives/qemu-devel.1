@@ -2,87 +2,84 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1BB1C47247
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:30:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A166C47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:30:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97E20206A4
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:30:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C22E5206A4
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:30:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pEqC30jY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97E20206A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xba7ED3v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C22E5206A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVupv-0003eP-Pa
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 06:30:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60176)
+	id 1jVuqi-0004l2-PX
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 06:30:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33660)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jVujH-00034c-0X
- for qemu-devel@nongnu.org; Tue, 05 May 2020 06:23:11 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:35982)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jVujF-00021E-Po
- for qemu-devel@nongnu.org; Tue, 05 May 2020 06:23:10 -0400
-Received: by mail-wm1-x343.google.com with SMTP id u127so1714979wmg.1
- for <qemu-devel@nongnu.org>; Tue, 05 May 2020 03:23:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=GBSP5CqJ50V4GXbDH9gnIscg4meCA2LQ/ec3DF0Px4E=;
- b=pEqC30jY9HqR1YrJy918sA7xMhkXU06KBp5f7y2SW5knjqv+lRHLbL2VYUQRbSDByZ
- wi0iOMsOFC+1uZ0zQOrkE6GtqV9zjI3iXawMZHTy8PtTcjlW6XXv4OydnCQY8O1+TmH3
- iHQEUkXlKEH+6WDdjXqFwrw08QgO+0KYBre23BpGvEEsEBs+79pfQCno2VA36ecQc3wH
- ZJDtFT6YJBOMZXb3MId9xdAV7gKpvE5xXKqCA8qkB3yDXv8qsTZ6CYkq5uHnqZV3pkSC
- cZUGT6rJRxQV0R9i3vh9ooD1WY0lcR0aoplzTcNMY3h/Pz7B8RFqmpUFCSnxkBHm8oiE
- cSrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=GBSP5CqJ50V4GXbDH9gnIscg4meCA2LQ/ec3DF0Px4E=;
- b=CjbXlNrcbo+nbjsKeFpYO+GK/+o3AoNcPcErI/aEB/nxk/j7UmOm/wy0lo6V7cHKVU
- pTt69TyKxXo1uxdlVH09z6dSly7G0H2IHSmnWLWVIpkWATmgQTS1agKeNT6/FBhxXOfT
- yOj17h3mx68ZAgTUPKHn582FwbnnlzWswEGKod1ZSEKBCOHMhilOf78eyRoqK/U6wpIS
- ysUKzbbGSZ5cWlauctmxa6bS3aIrlKezEi6+mXi8953sin3bY44fvhJUurtrq5xjs5TM
- tmGTdOhS49708bIzvQugX3YQcn4I2eKA3pwgZ0VwuKZTqlaoDBVXpZoKPzqtRXufA8m7
- v98w==
-X-Gm-Message-State: AGi0PubWnk+cdc4QVxihbGqw0ytilF9Zb6aLJ4wEgxC8QokjRDWps/Ge
- 2FpgHxUsnrklS88TiPzU/OuAcUf+vSSJZO8qddY=
-X-Google-Smtp-Source: APiQypIOqHoMYndaV5h1XwkCt7HOSqAFNszaWkPwgOQPAj7VeHixdnilEtFhmtz5BQcyzPSAwi4fEZ+P+gJ/wlTmiA8=
-X-Received: by 2002:a1c:9a13:: with SMTP id c19mr2579607wme.159.1588674188402; 
- Tue, 05 May 2020 03:23:08 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jVupY-0003Qb-T5
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 06:29:41 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:41863
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jVupX-00024p-Qc
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 06:29:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588674579;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=DZaS9nZ5VdTmoHBsIU5s4MEb3WmJO7MAAINQWipU08c=;
+ b=Xba7ED3vUx+UKErHEajvD5IyLAO3bYzgc1kLa9TIDKEXPjNq6Q7D0P1DGkWe+rf9pnP0bC
+ a18kgLH5yZMjpDjxf+6jrzsFFPfUxCJaSXcaEVBsJ0NIO15ZNmUObdx4ocFnNBImdrs4An
+ G3v6mALxt0Jie+BP+bU3IU/K6Z4eR9E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-449-9iftFuSsMAyFWaaXRoPgWw-1; Tue, 05 May 2020 06:29:35 -0400
+X-MC-Unique: 9iftFuSsMAyFWaaXRoPgWw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5F9C8014C1;
+ Tue,  5 May 2020 10:29:33 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.7])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DD9A070549;
+ Tue,  5 May 2020 10:29:24 +0000 (UTC)
+Date: Tue, 5 May 2020 12:29:22 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Subject: Re: [PATCH v25 05/10] ACPI: Build Hardware Error Source Table
+Message-ID: <20200505122922.3789668b@redhat.com>
+In-Reply-To: <20200410114639.32844-6-gengdongjiu@huawei.com>
+References: <20200410114639.32844-1-gengdongjiu@huawei.com>
+ <20200410114639.32844-6-gengdongjiu@huawei.com>
 MIME-Version: 1.0
-Received: by 2002:a1c:28c3:0:0:0:0:0 with HTTP;
- Tue, 5 May 2020 03:23:08 -0700 (PDT)
-In-Reply-To: <1588663771-5534-1-git-send-email-chenhc@lemote.com>
-References: <1588663771-5534-1-git-send-email-chenhc@lemote.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Tue, 5 May 2020 12:23:08 +0200
-Message-ID: <CAHiYmc669jBy1ms3QuRsHrKaawGOh6tVb4L-Z2izd9t_upRHNg@mail.gmail.com>
-Subject: Re: [PATCH] tests/Makefile: Fix description of "make check"
-To: Huacai Chen <zltjiangshi@gmail.com>
-Content-Type: multipart/alternative; boundary="000000000000a9e39705a4e408d0"
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,109 +93,259 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Huacai Chen <chenhuacai@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Markus Armbruster <armbru@redhat.com>, Huacai Chen <chenhc@lemote.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: fam@euphon.net, peter.maydell@linaro.org, xiaoguangrong.eric@gmail.com,
+ kvm@vger.kernel.org, mst@redhat.com, mtosatti@redhat.com,
+ qemu-devel@nongnu.org, ehabkost@redhat.com, linuxarm@huawei.com,
+ shannon.zhaosl@gmail.com, zhengxiang9@huawei.com, qemu-arm@nongnu.org,
+ Jonathan.Cameron@huawei.com, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000a9e39705a4e408d0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Fri, 10 Apr 2020 19:46:34 +0800
+Dongjiu Geng <gengdongjiu@huawei.com> wrote:
 
-=D1=83=D1=82=D0=BE=D1=80=D0=B0=D0=BA, 05. =D0=BC=D0=B0=D1=98 2020., Huacai =
-Chen <zltjiangshi@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=
-=B0=D0=BE/=D0=BB=D0=B0:
+> This patch builds Hardware Error Source Table(HEST) via fw_cfg blobs.
+> Now it only supports ARMv8 SEA, a type of Generic Hardware Error
+> Source version 2(GHESv2) error source. Afterwards, we can extend
+> the supported types if needed. For the CPER section, currently it
+> is memory section because kernel mainly wants userspace to handle
+> the memory errors.
+> 
+> This patch follows the spec ACPI 6.2 to build the Hardware Error
+> Source table. For more detailed information, please refer to
+> document: docs/specs/acpi_hest_ghes.rst
+> 
+> build_ghes_hw_error_notification() helper will help to add Hardware
+> Error Notification to ACPI tables without using packed C structures
+> and avoid endianness issues as API doesn't need explicit conversion.
+> 
+> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 
-> The description of "make check" is out-of-date, so fix it by adding
-> block and softfloat.
->
-> Signed-off-by: Huacai Chen <chenhc@lemote.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+
 > ---
+> change since v24:
+> 1. Add acpi_add_table() before acpi_build_hest()
+> 2. Pass NULL for oem_table_id in build_header() to build Hardware
+>    Error Source Table header
+> ---
+>  hw/acpi/ghes.c           | 126 +++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/arm/virt-acpi-build.c |   2 +
+>  include/hw/acpi/ghes.h   |  39 +++++++++++++++
+>  3 files changed, 167 insertions(+)
+> 
+> diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
+> index e1b3f8f..091fd87 100644
+> --- a/hw/acpi/ghes.c
+> +++ b/hw/acpi/ghes.c
+> @@ -23,6 +23,7 @@
+>  #include "qemu/units.h"
+>  #include "hw/acpi/ghes.h"
+>  #include "hw/acpi/aml-build.h"
+> +#include "qemu/error-report.h"
+>  
+>  #define ACPI_GHES_ERRORS_FW_CFG_FILE        "etc/hardware_errors"
+>  #define ACPI_GHES_DATA_ADDR_FW_CFG_FILE     "etc/hardware_errors_addr"
+> @@ -33,6 +34,42 @@
+>  /* Now only support ARMv8 SEA notification type error source */
+>  #define ACPI_GHES_ERROR_SOURCE_COUNT        1
+>  
+> +/* Generic Hardware Error Source version 2 */
+> +#define ACPI_GHES_SOURCE_GENERIC_ERROR_V2   10
+> +
+> +/* Address offset in Generic Address Structure(GAS) */
+> +#define GAS_ADDR_OFFSET 4
+> +
+> +/*
+> + * Hardware Error Notification
+> + * ACPI 4.0: 17.3.2.7 Hardware Error Notification
+> + * Composes dummy Hardware Error Notification descriptor of specified type
+> + */
+> +static void build_ghes_hw_error_notification(GArray *table, const uint8_t type)
+> +{
+> +    /* Type */
+> +    build_append_int_noprefix(table, type, 1);
+> +    /*
+> +     * Length:
+> +     * Total length of the structure in bytes
+> +     */
+> +    build_append_int_noprefix(table, 28, 1);
+> +    /* Configuration Write Enable */
+> +    build_append_int_noprefix(table, 0, 2);
+> +    /* Poll Interval */
+> +    build_append_int_noprefix(table, 0, 4);
+> +    /* Vector */
+> +    build_append_int_noprefix(table, 0, 4);
+> +    /* Switch To Polling Threshold Value */
+> +    build_append_int_noprefix(table, 0, 4);
+> +    /* Switch To Polling Threshold Window */
+> +    build_append_int_noprefix(table, 0, 4);
+> +    /* Error Threshold Value */
+> +    build_append_int_noprefix(table, 0, 4);
+> +    /* Error Threshold Window */
+> +    build_append_int_noprefix(table, 0, 4);
+> +}
+> +
+>  /*
+>   * Build table for the hardware error fw_cfg blob.
+>   * Initialize "etc/hardware_errors" and "etc/hardware_errors_addr" fw_cfg blobs.
+> @@ -87,3 +124,92 @@ void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker)
+>      bios_linker_loader_write_pointer(linker, ACPI_GHES_DATA_ADDR_FW_CFG_FILE,
+>          0, sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE, 0);
+>  }
+> +
+> +/* Build Generic Hardware Error Source version 2 (GHESv2) */
+> +static void build_ghes_v2(GArray *table_data, int source_id, BIOSLinker *linker)
+> +{
+> +    uint64_t address_offset;
+> +    /*
+> +     * Type:
+> +     * Generic Hardware Error Source version 2(GHESv2 - Type 10)
+> +     */
+> +    build_append_int_noprefix(table_data, ACPI_GHES_SOURCE_GENERIC_ERROR_V2, 2);
+> +    /* Source Id */
+> +    build_append_int_noprefix(table_data, source_id, 2);
+> +    /* Related Source Id */
+> +    build_append_int_noprefix(table_data, 0xffff, 2);
+> +    /* Flags */
+> +    build_append_int_noprefix(table_data, 0, 1);
+> +    /* Enabled */
+> +    build_append_int_noprefix(table_data, 1, 1);
+> +
+> +    /* Number of Records To Pre-allocate */
+> +    build_append_int_noprefix(table_data, 1, 4);
+> +    /* Max Sections Per Record */
+> +    build_append_int_noprefix(table_data, 1, 4);
+> +    /* Max Raw Data Length */
+> +    build_append_int_noprefix(table_data, ACPI_GHES_MAX_RAW_DATA_LENGTH, 4);
+> +
+> +    address_offset = table_data->len;
+> +    /* Error Status Address */
+> +    build_append_gas(table_data, AML_AS_SYSTEM_MEMORY, 0x40, 0,
+> +                     4 /* QWord access */, 0);
+> +    bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
+> +        address_offset + GAS_ADDR_OFFSET, sizeof(uint64_t),
+> +        ACPI_GHES_ERRORS_FW_CFG_FILE, source_id * sizeof(uint64_t));
+> +
+> +    switch (source_id) {
+> +    case ACPI_HEST_SRC_ID_SEA:
+> +        /*
+> +         * Notification Structure
+> +         * Now only enable ARMv8 SEA notification type
+> +         */
+> +        build_ghes_hw_error_notification(table_data, ACPI_GHES_NOTIFY_SEA);
+> +        break;
+> +    default:
+> +        error_report("Not support this error source");
+> +        abort();
+> +    }
+> +
+> +    /* Error Status Block Length */
+> +    build_append_int_noprefix(table_data, ACPI_GHES_MAX_RAW_DATA_LENGTH, 4);
+> +
+> +    /*
+> +     * Read Ack Register
+> +     * ACPI 6.1: 18.3.2.8 Generic Hardware Error Source
+> +     * version 2 (GHESv2 - Type 10)
+> +     */
+> +    address_offset = table_data->len;
+> +    build_append_gas(table_data, AML_AS_SYSTEM_MEMORY, 0x40, 0,
+> +                     4 /* QWord access */, 0);
+> +    bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
+> +        address_offset + GAS_ADDR_OFFSET,
+> +        sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE,
+> +        (ACPI_GHES_ERROR_SOURCE_COUNT + source_id) * sizeof(uint64_t));
+> +
+> +    /*
+> +     * Read Ack Preserve field
+> +     * We only provide the first bit in Read Ack Register to OSPM to write
+> +     * while the other bits are preserved.
+> +     */
+> +    build_append_int_noprefix(table_data, ~0x1ULL, 8);
+> +    /* Read Ack Write */
+> +    build_append_int_noprefix(table_data, 0x1, 8);
+> +}
+> +
+> +/* Build Hardware Error Source Table */
+> +void acpi_build_hest(GArray *table_data, BIOSLinker *linker)
+> +{
+> +    uint64_t hest_start = table_data->len;
+> +
+> +    /* Hardware Error Source Table header*/
+> +    acpi_data_push(table_data, sizeof(AcpiTableHeader));
+> +
+> +    /* Error Source Count */
+> +    build_append_int_noprefix(table_data, ACPI_GHES_ERROR_SOURCE_COUNT, 4);
+> +
+> +    build_ghes_v2(table_data, ACPI_HEST_SRC_ID_SEA, linker);
+> +
+> +    build_header(linker, table_data, (void *)(table_data->data + hest_start),
+> +        "HEST", table_data->len - hest_start, 1, NULL, NULL);
+> +}
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index cc6ffcd..f611bce 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -820,6 +820,8 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+>  
+>      if (vms->ras) {
+>          build_ghes_error_table(tables->hardware_errors, tables->linker);
+> +        acpi_add_table(table_offsets, tables_blob);
+> +        acpi_build_hest(tables_blob, tables->linker);
+>      }
+>  
+>      if (ms->numa_state->num_nodes > 0) {
+> diff --git a/include/hw/acpi/ghes.h b/include/hw/acpi/ghes.h
+> index 50379b0..18debd8 100644
+> --- a/include/hw/acpi/ghes.h
+> +++ b/include/hw/acpi/ghes.h
+> @@ -24,5 +24,44 @@
+>  
+>  #include "hw/acpi/bios-linker-loader.h"
+>  
+> +/*
+> + * Values for Hardware Error Notification Type field
+> + */
+> +enum AcpiGhesNotifyType {
+> +    /* Polled */
+> +    ACPI_GHES_NOTIFY_POLLED = 0,
+> +    /* External Interrupt */
+> +    ACPI_GHES_NOTIFY_EXTERNAL = 1,
+> +    /* Local Interrupt */
+> +    ACPI_GHES_NOTIFY_LOCAL = 2,
+> +    /* SCI */
+> +    ACPI_GHES_NOTIFY_SCI = 3,
+> +    /* NMI */
+> +    ACPI_GHES_NOTIFY_NMI = 4,
+> +    /* CMCI, ACPI 5.0: 18.3.2.7, Table 18-290 */
+> +    ACPI_GHES_NOTIFY_CMCI = 5,
+> +    /* MCE, ACPI 5.0: 18.3.2.7, Table 18-290 */
+> +    ACPI_GHES_NOTIFY_MCE = 6,
+> +    /* GPIO-Signal, ACPI 6.0: 18.3.2.7, Table 18-332 */
+> +    ACPI_GHES_NOTIFY_GPIO = 7,
+> +    /* ARMv8 SEA, ACPI 6.1: 18.3.2.9, Table 18-345 */
+> +    ACPI_GHES_NOTIFY_SEA = 8,
+> +    /* ARMv8 SEI, ACPI 6.1: 18.3.2.9, Table 18-345 */
+> +    ACPI_GHES_NOTIFY_SEI = 9,
+> +    /* External Interrupt - GSIV, ACPI 6.1: 18.3.2.9, Table 18-345 */
+> +    ACPI_GHES_NOTIFY_GSIV = 10,
+> +    /* Software Delegated Exception, ACPI 6.2: 18.3.2.9, Table 18-383 */
+> +    ACPI_GHES_NOTIFY_SDEI = 11,
+> +    /* 12 and greater are reserved */
+> +    ACPI_GHES_NOTIFY_RESERVED = 12
+> +};
+> +
+> +enum {
+> +    ACPI_HEST_SRC_ID_SEA = 0,
+> +    /* future ids go here */
+> +    ACPI_HEST_SRC_ID_RESERVED,
+> +};
+> +
+>  void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker);
+> +void acpi_build_hest(GArray *table_data, BIOSLinker *linker);
+>  #endif
 
-
-Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-
-
->  tests/Makefile.include | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 03a74b6..5d32239 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -4,7 +4,7 @@
->  check-help:
->         @echo "Regression testing targets:"
->         @echo
-> -       @echo " $(MAKE) check                Run unit, qapi-schema, qtest
-> and decodetree"
-> +       @echo " $(MAKE) check                Run block, qapi-schema, unit=
-,
-> softfloat, qtest and decodetree"
->         @echo
->         @echo " $(MAKE) check-qtest-TARGET   Run qtest tests for given
-> target"
->         @echo " $(MAKE) check-qtest          Run qtest tests"
-> --
-> 2.7.0
->
->
->
-
---000000000000a9e39705a4e408d0
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>=D1=83=D1=82=D0=BE=D1=80=D0=B0=D0=BA, 05. =D0=BC=D0=B0=D1=98 2020.,=
- Huacai Chen &lt;<a href=3D"mailto:zltjiangshi@gmail.com">zltjiangshi@gmail=
-.com</a>&gt; =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=
-=D0=B0:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bor=
-der-left:1px #ccc solid;padding-left:1ex">The description of &quot;make che=
-ck&quot; is out-of-date, so fix it by adding<br>
-block and softfloat.<br>
-<br>
-Signed-off-by: Huacai Chen &lt;<a href=3D"mailto:chenhc@lemote.com">chenhc@=
-lemote.com</a>&gt;<br>
----</blockquote><div><br></div><div><span style=3D"color:rgb(34,34,34);font=
--size:14px;line-height:22.1200008392334px">Reviewed-by: Aleksandar Markovic=
- &lt;</span><a href=3D"mailto:aleksandar.qemu.devel@gmail.com" target=3D"_b=
-lank" style=3D"font-size:14px;line-height:22.1200008392334px">aleksandar.qe=
-mu.devel@gmail.<wbr>com</a><span style=3D"color:rgb(34,34,34);font-size:14p=
-x;line-height:22.1200008392334px">&gt;</span></div><div>=C2=A0<br></div><bl=
-ockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #=
-ccc solid;padding-left:1ex">
-=C2=A0tests/Makefile.include | 2 +-<br>
-=C2=A01 file changed, 1 insertion(+), 1 deletion(-)<br>
-<br>
-diff --git a/tests/Makefile.include b/tests/Makefile.include<br>
-index 03a74b6..5d32239 100644<br>
---- a/tests/Makefile.include<br>
-+++ b/tests/Makefile.include<br>
-@@ -4,7 +4,7 @@<br>
-=C2=A0check-help:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 @echo &quot;Regression testing targets:&quot;<b=
-r>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 @echo<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0@echo &quot; $(MAKE) check=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Run unit, qapi-schema, qtest and decodet=
-ree&quot;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0@echo &quot; $(MAKE) check=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Run block, qapi-schema, unit, softfloat,=
- qtest and decodetree&quot;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 @echo<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 @echo &quot; $(MAKE) check-qtest-TARGET=C2=A0 =
-=C2=A0Run qtest tests for given target&quot;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 @echo &quot; $(MAKE) check-qtest=C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 Run qtest tests&quot;<br>
--- <br>
-2.7.0<br>
-<br>
-<br>
-</blockquote>
-
---000000000000a9e39705a4e408d0--
 
