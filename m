@@ -2,84 +2,131 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CA6AC47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:10:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7DF9C47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:11:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D078C2078C
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:10:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 83F692078C
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:11:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c/H1WK+x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D078C2078C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PpilxJwx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83F692078C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVxLI-0004sE-Ud
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 09:10:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38770)
+	id 1jVxM4-0006fO-Ke
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 09:11:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39696)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jVxA6-0001oN-UB
- for qemu-devel@nongnu.org; Tue, 05 May 2020 08:59:02 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48896
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jVxDe-0007mo-En
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 09:02:42 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59473
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jVxA5-000171-2x
- for qemu-devel@nongnu.org; Tue, 05 May 2020 08:59:02 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jVxDd-0004Vl-MG
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 09:02:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588683540;
+ s=mimecast20190719; t=1588683761;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0gr15OrJS9tsXYgJJWW/K6LyEGhoZx2WchC4Ory6oOA=;
- b=c/H1WK+xdeWIWh1RnsDS/oCW6mBUSzpcjpnP5KoZ9LwVnbgvYhyESedcnsyq+lcVRj+z13
- 6etM0JaJ2w1leFq6wb9lcbn+hKfODbxZBPpDfbNFggnPzZFJKXQ69sQBi5fjA1uqQoWb9v
- zcTr2kwoiittW1w3HjCIb8IoXhO38Y8=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=GpRN0dizxwK7izBL373H9uEyBrDcim4MnjQkg2bOO9g=;
+ b=PpilxJwx6eDf5zCIgGw5csi5FrsjfB52E8Jd9O0EeprcpPA+0THgCUH0vtwPep7/MSTGNr
+ bfTUJF/Or8ERTCPhHloKaNLTyp7WQ665H7ncJ/ayXqI7DEWzPngSciY2BK12vcWSMdBHc4
+ DDPB+79e/pp9JF/o8BemIr+rQrFjimM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-441-zab3n-jLN0KNVViENfGLkA-1; Tue, 05 May 2020 08:58:49 -0400
-X-MC-Unique: zab3n-jLN0KNVViENfGLkA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-82-D4z-IDFxNOSjmYxAAvOZ5g-1; Tue, 05 May 2020 09:02:37 -0400
+X-MC-Unique: D4z-IDFxNOSjmYxAAvOZ5g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31D2A1899526;
- Tue,  5 May 2020 12:58:48 +0000 (UTC)
-Received: from localhost (ovpn-113-206.ams2.redhat.com [10.36.113.206])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A09305D9DA;
- Tue,  5 May 2020 12:58:47 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 09/24] iotests: limit line length to 79 chars
-Date: Tue,  5 May 2020 14:58:11 +0200
-Message-Id: <20200505125826.1001451-10-mreitz@redhat.com>
-In-Reply-To: <20200505125826.1001451-1-mreitz@redhat.com>
-References: <20200505125826.1001451-1-mreitz@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3DDC18730EC;
+ Tue,  5 May 2020 13:02:36 +0000 (UTC)
+Received: from [10.36.114.14] (ovpn-114-14.ams2.redhat.com [10.36.114.14])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0F3D162482;
+ Tue,  5 May 2020 13:02:32 +0000 (UTC)
+Subject: Re: [PATCH] s390x: pv: Fix KVM_PV_PREP_RESET command wrapper name
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20200505124159.24099-1-frankja@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <07ae8741-1577-09ee-5f07-4473bfee3027@redhat.com>
+Date: Tue, 5 May 2020 15:02:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200505124159.24099-1-frankja@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=david@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 03:48:16
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,238 +139,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: John Snow <jsnow@redhat.com>
+On 05.05.20 14:41, Janosch Frank wrote:
+> s390_pv_perf_clear_reset() is not a very helpful name since that
+> function needs to be called for a normal and a clear reset via
+> diag308.
+> 
+> Let's instead name it s390_pv_prep_reset() which reflects the purpose
+> of the function a bit better.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  hw/s390x/pv.c              | 2 +-
+>  hw/s390x/s390-virtio-ccw.c | 2 +-
+>  include/hw/s390x/pv.h      | 4 ++--
+>  3 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/s390x/pv.c b/hw/s390x/pv.c
+> index f11868e865..ab3a2482aa 100644
+> --- a/hw/s390x/pv.c
+> +++ b/hw/s390x/pv.c
+> @@ -88,7 +88,7 @@ int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak)
+>      return s390_pv_cmd(KVM_PV_UNPACK, &args);
+>  }
+>  
+> -void s390_pv_perf_clear_reset(void)
+> +void s390_pv_prep_reset(void)
+>  {
+>      s390_pv_cmd_exit(KVM_PV_PREP_RESET, NULL);
+>  }
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 45292fb5a8..f2c0357aed 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -401,7 +401,7 @@ static void s390_pv_prepare_reset(S390CcwMachineState *ms)
+>          s390_cpu_set_state(S390_CPU_STATE_STOPPED, S390_CPU(cs));
+>      }
+>      s390_pv_unshare();
+> -    s390_pv_perf_clear_reset();
+> +    s390_pv_prep_reset();
+>  }
+>  
+>  static void s390_machine_reset(MachineState *machine)
+> diff --git a/include/hw/s390x/pv.h b/include/hw/s390x/pv.h
+> index 522ca6a04e..aee758bc2d 100644
+> --- a/include/hw/s390x/pv.h
+> +++ b/include/hw/s390x/pv.h
+> @@ -39,7 +39,7 @@ int s390_pv_vm_enable(void);
+>  void s390_pv_vm_disable(void);
+>  int s390_pv_set_sec_parms(uint64_t origin, uint64_t length);
+>  int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak);
+> -void s390_pv_perf_clear_reset(void);
+> +void s390_pv_prep_reset(void);
+>  int s390_pv_verify(void);
+>  void s390_pv_unshare(void);
+>  void s390_pv_inject_reset_error(CPUState *cs);
+> @@ -49,7 +49,7 @@ static inline int s390_pv_vm_enable(void) { return 0; }
+>  static inline void s390_pv_vm_disable(void) {}
+>  static inline int s390_pv_set_sec_parms(uint64_t origin, uint64_t length) { return 0; }
+>  static inline int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak) { return 0; }
+> -static inline void s390_pv_perf_clear_reset(void) {}
+> +static inline void s390_pv_prep_reset(void) {}
+>  static inline int s390_pv_verify(void) { return 0; }
+>  static inline void s390_pv_unshare(void) {}
+>  static inline void s390_pv_inject_reset_error(CPUState *cs) {};
+> 
 
-79 is the PEP8 recommendation. This recommendation works well for
-reading patch diffs in TUI email clients.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20200331000014.11581-10-jsnow@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/iotests.py | 64 +++++++++++++++++++++++------------
- tests/qemu-iotests/pylintrc   |  6 +++-
- 2 files changed, 47 insertions(+), 23 deletions(-)
+-- 
+Thanks,
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 69f24223d2..9f5da32dae 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -80,9 +80,11 @@ luks_default_key_secret_opt =3D 'key-secret=3Dkeysec0'
- def qemu_img(*args):
-     '''Run qemu-img and return the exit code'''
-     devnull =3D open('/dev/null', 'r+')
--    exitcode =3D subprocess.call(qemu_img_args + list(args), stdin=3Ddevnu=
-ll, stdout=3Ddevnull)
-+    exitcode =3D subprocess.call(qemu_img_args + list(args),
-+                               stdin=3Ddevnull, stdout=3Ddevnull)
-     if exitcode < 0:
--        sys.stderr.write('qemu-img received signal %i: %s\n' % (-exitcode,=
- ' '.join(qemu_img_args + list(args))))
-+        sys.stderr.write('qemu-img received signal %i: %s\n'
-+                         % (-exitcode, ' '.join(qemu_img_args + list(args)=
-)))
-     return exitcode
-=20
- def ordered_qmp(qmsg, conv_keys=3DTrue):
-@@ -121,7 +123,8 @@ def qemu_img_verbose(*args):
-     '''Run qemu-img without suppressing its output and return the exit cod=
-e'''
-     exitcode =3D subprocess.call(qemu_img_args + list(args))
-     if exitcode < 0:
--        sys.stderr.write('qemu-img received signal %i: %s\n' % (-exitcode,=
- ' '.join(qemu_img_args + list(args))))
-+        sys.stderr.write('qemu-img received signal %i: %s\n'
-+                         % (-exitcode, ' '.join(qemu_img_args + list(args)=
-)))
-     return exitcode
-=20
- def qemu_img_pipe(*args):
-@@ -132,7 +135,8 @@ def qemu_img_pipe(*args):
-                             universal_newlines=3DTrue)
-     exitcode =3D subp.wait()
-     if exitcode < 0:
--        sys.stderr.write('qemu-img received signal %i: %s\n' % (-exitcode,=
- ' '.join(qemu_img_args + list(args))))
-+        sys.stderr.write('qemu-img received signal %i: %s\n'
-+                         % (-exitcode, ' '.join(qemu_img_args + list(args)=
-)))
-     return subp.communicate()[0]
-=20
- def qemu_img_log(*args):
-@@ -162,7 +166,8 @@ def qemu_io(*args):
-                             universal_newlines=3DTrue)
-     exitcode =3D subp.wait()
-     if exitcode < 0:
--        sys.stderr.write('qemu-io received signal %i: %s\n' % (-exitcode, =
-' '.join(args)))
-+        sys.stderr.write('qemu-io received signal %i: %s\n'
-+                         % (-exitcode, ' '.join(args)))
-     return subp.communicate()[0]
-=20
- def qemu_io_log(*args):
-@@ -284,10 +289,13 @@ win32_re =3D re.compile(r"\r")
- def filter_win32(msg):
-     return win32_re.sub("", msg)
-=20
--qemu_io_re =3D re.compile(r"[0-9]* ops; [0-9\/:. sec]* \([0-9\/.inf]* [EPT=
-GMKiBbytes]*\/sec and [0-9\/.inf]* ops\/sec\)")
-+qemu_io_re =3D re.compile(r"[0-9]* ops; [0-9\/:. sec]* "
-+                        r"\([0-9\/.inf]* [EPTGMKiBbytes]*\/sec "
-+                        r"and [0-9\/.inf]* ops\/sec\)")
- def filter_qemu_io(msg):
-     msg =3D filter_win32(msg)
--    return qemu_io_re.sub("X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)=
-", msg)
-+    return qemu_io_re.sub("X ops; XX:XX:XX.X "
-+                          "(XXX YYY/sec and XXX ops/sec)", msg)
-=20
- chown_re =3D re.compile(r"chown [0-9]+:[0-9]+")
- def filter_chown(msg):
-@@ -340,7 +348,9 @@ def filter_img_info(output, filename):
-         line =3D filter_testfiles(line)
-         line =3D line.replace(imgfmt, 'IMGFMT')
-         line =3D re.sub('iters: [0-9]+', 'iters: XXX', line)
--        line =3D re.sub('uuid: [-a-f0-9]+', 'uuid: XXXXXXXX-XXXX-XXXX-XXXX=
--XXXXXXXXXXXX', line)
-+        line =3D re.sub('uuid: [-a-f0-9]+',
-+                      'uuid: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX',
-+                      line)
-         line =3D re.sub('cid: [0-9]+', 'cid: XXXXXXXXXX', line)
-         lines.append(line)
-     return '\n'.join(lines)
-@@ -538,11 +548,13 @@ class VM(qtest.QEMUQtestMachine):
-             self.pause_drive(drive, "write_aio")
-             return
-         self.qmp('human-monitor-command',
--                 command_line=3D'qemu-io %s "break %s bp_%s"' % (drive, ev=
-ent, drive))
-+                 command_line=3D'qemu-io %s "break %s bp_%s"'
-+                 % (drive, event, drive))
-=20
-     def resume_drive(self, drive):
-         self.qmp('human-monitor-command',
--                 command_line=3D'qemu-io %s "remove_break bp_%s"' % (drive=
-, drive))
-+                 command_line=3D'qemu-io %s "remove_break bp_%s"'
-+                 % (drive, drive))
-=20
-     def hmp_qemu_io(self, drive, cmd):
-         '''Write to a given drive using an HMP command'''
-@@ -802,16 +814,18 @@ class QMPTestCase(unittest.TestCase):
-                 idx =3D int(idx)
-=20
-             if not isinstance(d, dict) or component not in d:
--                self.fail('failed path traversal for "%s" in "%s"' % (path=
-, str(d)))
-+                self.fail(f'failed path traversal for "{path}" in "{d}"')
-             d =3D d[component]
-=20
-             if m:
-                 if not isinstance(d, list):
--                    self.fail('path component "%s" in "%s" is not a list i=
-n "%s"' % (component, path, str(d)))
-+                    self.fail(f'path component "{component}" in "{path}" '
-+                              f'is not a list in "{d}"')
-                 try:
-                     d =3D d[idx]
-                 except IndexError:
--                    self.fail('invalid index "%s" in path "%s" in "%s"' % =
-(idx, path, str(d)))
-+                    self.fail(f'invalid index "{idx}" in path "{path}" '
-+                              f'in "{d}"')
-         return d
-=20
-     def assert_qmp_absent(self, d, path):
-@@ -862,10 +876,13 @@ class QMPTestCase(unittest.TestCase):
-         '''Asserts that the given filename is a json: filename and that it=
-s
-            content is equal to the given reference object'''
-         self.assertEqual(json_filename[:5], 'json:')
--        self.assertEqual(self.vm.flatten_qmp_object(json.loads(json_filena=
-me[5:])),
--                         self.vm.flatten_qmp_object(reference))
-+        self.assertEqual(
-+            self.vm.flatten_qmp_object(json.loads(json_filename[5:])),
-+            self.vm.flatten_qmp_object(reference)
-+        )
-=20
--    def cancel_and_wait(self, drive=3D'drive0', force=3DFalse, resume=3DFa=
-lse, wait=3D60.0):
-+    def cancel_and_wait(self, drive=3D'drive0', force=3DFalse,
-+                        resume=3DFalse, wait=3D60.0):
-         '''Cancel a block job and wait for it to finish, returning the eve=
-nt'''
-         result =3D self.vm.qmp('block-job-cancel', device=3Ddrive, force=
-=3Dforce)
-         self.assert_qmp(result, 'return', {})
-@@ -889,8 +906,8 @@ class QMPTestCase(unittest.TestCase):
-         self.assert_no_active_block_jobs()
-         return result
-=20
--    def wait_until_completed(self, drive=3D'drive0', check_offset=3DTrue, =
-wait=3D60.0,
--                             error=3DNone):
-+    def wait_until_completed(self, drive=3D'drive0', check_offset=3DTrue,
-+                             wait=3D60.0, error=3DNone):
-         '''Wait for a block job to finish, returning the event'''
-         while True:
-             for event in self.vm.get_qmp_events(wait=3Dwait):
-@@ -1029,8 +1046,11 @@ def verify_quorum():
-         notrun('quorum support missing')
-=20
- def qemu_pipe(*args):
--    '''Run qemu with an option to print something and exit (e.g. a help op=
-tion),
--    and return its output'''
-+    """
-+    Run qemu with an option to print something and exit (e.g. a help optio=
-n).
-+
-+    :return: QEMU's stdout output.
-+    """
-     args =3D [qemu_prog] + qemu_opts + list(args)
-     subp =3D subprocess.Popen(args, stdout=3Dsubprocess.PIPE,
-                             stderr=3Dsubprocess.STDOUT,
-@@ -1068,8 +1088,8 @@ def skip_if_unsupported(required_formats=3D(), read_o=
-nly=3DFalse):
-=20
-             usf_list =3D list(set(fmts) - set(supported_formats(read_only)=
-))
-             if usf_list:
--                test_case.case_skip('{}: formats {} are not whitelisted'.f=
-ormat(
--                    test_case, usf_list))
-+                msg =3D f'{test_case}: formats {usf_list} are not whitelis=
-ted'
-+                test_case.case_skip(msg)
-                 return None
-             else:
-                 return func(test_case, *args, **kwargs)
-diff --git a/tests/qemu-iotests/pylintrc b/tests/qemu-iotests/pylintrc
-index daec2c4942..5481afe528 100644
---- a/tests/qemu-iotests/pylintrc
-+++ b/tests/qemu-iotests/pylintrc
-@@ -18,5 +18,9 @@ disable=3Dinvalid-name,
-         too-many-locals,
-         too-many-public-methods,
-         # These are temporary, and should be removed:
--        line-too-long,
-         missing-docstring,
-+
-+[FORMAT]
-+
-+# Maximum number of characters on a single line.
-+max-line-length=3D79
---=20
-2.26.2
+David / dhildenb
 
 
