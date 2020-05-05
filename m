@@ -2,85 +2,71 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BFF8C47247
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 08:12:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 088BFC47254
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 08:18:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A740206CC
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 08:12:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DHijol3J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A740206CC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D170F2068E
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 08:18:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D170F2068E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVsgM-0007yU-Ad
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 04:12:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58878)
+	id 1jVsmB-00037J-4v
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 04:18:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60280)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jVsfa-0007QE-VX
- for qemu-devel@nongnu.org; Tue, 05 May 2020 04:11:14 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39478
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jVsl2-0002d0-0R; Tue, 05 May 2020 04:16:52 -0400
+Resent-Date: Tue, 05 May 2020 04:16:52 -0400
+Resent-Message-Id: <E1jVsl2-0002d0-0R@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21374)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jVsfZ-0000pM-5P
- for qemu-devel@nongnu.org; Tue, 05 May 2020 04:11:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588666271;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=rsqncIaGWzVkJyHcMMSQAXbPLbuknw6DfQpMtN3C0wg=;
- b=DHijol3JBHdP+npi9t497Kb3rk2wdlNKEo6BAlf8Ykd9eckpoSMPXbQR08kVKWMk7RhKYS
- r+q/iXHhmkk8Y6YswlrSodEmnysmramFzc4MmLbxU4+bCOLtGd0aPjm1pNYBRzY6I4v58C
- RglVgvpRe8WMA4xjKhLN39CDLLARAzw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-33-ZL5lA0QuPy2fzrHwlij2Xg-1; Tue, 05 May 2020 04:11:10 -0400
-X-MC-Unique: ZL5lA0QuPy2fzrHwlij2Xg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF8C1107ACCD;
- Tue,  5 May 2020 08:11:08 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-112-11.ams2.redhat.com [10.36.112.11])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C33F05C1B2;
- Tue,  5 May 2020 08:11:04 +0000 (UTC)
-Date: Tue, 5 May 2020 10:11:03 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH v5 7/7] qemu-img: Deprecate use of -b without -F
-Message-ID: <20200505081103.GC5759@linux.fritz.box>
-References: <20200403175859.863248-1-eblake@redhat.com>
- <20200403175859.863248-8-eblake@redhat.com>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jVsl0-0000OH-JM; Tue, 05 May 2020 04:16:51 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1588666599; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=epX559PeFStN0XzPNDfLiwsjrz7IOTxRoSFsJ2pqtLSvjIn7MkD/8JUk+L5cakx7PVgTkC8vERB45urOdoVmQyn9Sc0DaRvIOZjDeXsEXYEjm+atJ5T6Ket2z+eqPl726RTIqpCsaUuuobpw7TaQq3Olpae0mB1k3PSRbo/TWbM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1588666599;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=7KCaIebFWcUBxKf3uM8yyxvdmI+MvLMUTq5ozIex6wM=; 
+ b=IVY6Ixg8p4TeXq7KzgGfRXM16klAIAPramFCNHVC6pkXt8WJZWKu6DO6mChg1VaRtNDp0p5uO6bM4p6imfVCy1oZf6XIvi2udxVO2j7QmMffkZar60/gJIiPIBBbuR3J/L5vnpGBa9C1DYVaAQVrGQYlaHwaI3OvAurgPz1IQUA=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1588666596604400.2187264904601;
+ Tue, 5 May 2020 01:16:36 -0700 (PDT)
+Message-ID: <158866659523.24779.11655235333242182991@45ef0f9c86ae>
+In-Reply-To: <20200504131959.9533-1-mlevitsk@redhat.com>
+Subject: Re: [PATCH v2] Fix iotest 153
 MIME-Version: 1.0
-In-Reply-To: <20200403175859.863248-8-eblake@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: mlevitsk@redhat.com
+Date: Tue, 5 May 2020 01:16:36 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 04:16:46
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,52 +79,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, qemu-block@nongnu.org, kchamart@redhat.com,
- libvir-list@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ armbru@redhat.com, mreitz@redhat.com, mlevitsk@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 03.04.2020 um 19:58 hat Eric Blake geschrieben:
-> Creating an image that requires format probing of the backing image is
-> inherently unsafe (we've had several CVEs over the years based on
-> probes leaking information to the guest on a subsequent boot, although
-> these days tools like libvirt are aware of the issue enough to prevent
-> the worst effects).  However, if our probing algorithm ever changes,
-> or if other tools like libvirt determine a different probe result than
-> we do, then subsequent use of that backing file under a different
-> format will present corrupted data to the guest.  Start a deprecation
-> clock so that future qemu-img can refuse to create unsafe backing
-> chains that would rely on probing.  Most warnings are intentionally
-> emitted from bdrv_img_create() in the block layer, but qemu-img
-> convert uses bdrv_create() which cannot emit its own warning without
-> causing spurious warnings on other code paths.  In the end, all
-> command-line image creation or backing file rewriting now performs a
-> check.
->=20
-> However, there is one time where probing is safe: if we probe raw,
-> then it is safe to record that implicitly in the image (but we still
-> warn, as it's better to teach the user to supply -F always than to
-> make them guess when it is safe).
-
-You're not stating it explicitly, but I guess the thing that you mean
-that is actually unsafe is if you have a raw image, always pass
-format=3Draw to QEMU (so the guest could write e.g. a qcow2 header), but
-then create a backing file without -F, so it will be probed. This is as
-bad as specifying format=3Draw only sometimes.
-
-I don't like the idea of responding to this by making raw images more
-convenient to use than actual image formats.
-
-How about we approach it the other way around: The troublemaker is raw,
-so let's require specifying raw explicitly, and record the probed format
-implicitly in other cases. This is a bit weaker in the immediate effect
-in that it doesn't protect you when you actually deal with a malicious
-image, but in normal use it will point out where your scripts or
-management software is too careless. The final result should be that
-management tools are fixed and you'll be safe, while manual users who
-can usually trust their guests aren't inconvenienced too much.
-
-Kevin
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUwNDEzMTk1OS45NTMz
+LTEtbWxldml0c2tAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
+IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
+Zm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAyMDA1MDQxMzE5NTkuOTUzMy0xLW1sZXZpdHNrQHJl
+ZGhhdC5jb20KU3ViamVjdDogW1BBVENIIHYyXSBGaXggaW90ZXN0IDE1MwpUeXBlOiBzZXJpZXMK
+Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNl
+ID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
+dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
+bGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
+MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CmZhdGFsOiB1bmFibGUgdG8gd3JpdGUgbmV3
+IGluZGV4IGZpbGUKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUgInBh
+dGNoZXctdGVzdGVyL3NyYy9wYXRjaGV3LWNsaSIsIGxpbmUgNTIxLCBpbiB0ZXN0X29uZQogICAg
+Z2l0X2Nsb25lX3JlcG8oY2xvbmUsIHJbInJlcG8iXSwgclsiaGVhZCJdLCBsb2dmLCBUcnVlKQog
+IEZpbGUgInBhdGNoZXctdGVzdGVyL3NyYy9wYXRjaGV3LWNsaSIsIGxpbmUgNTcsIGluIGdpdF9j
+bG9uZV9yZXBvCiAgICBjd2Q9Y2xvbmUpCiAgRmlsZSAiL29wdC9yaC9yaC1weXRob24zNi9yb290
+L3Vzci9saWI2NC9weXRob24zLjYvc3VicHJvY2Vzcy5weSIsIGxpbmUgMjkxLCBpbiBjaGVja19j
+YWxsCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNz
+LkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydnaXQnLCAnY2hlY2tvdXQnLCAncmVmcy90
+YWdzL3BhdGNoZXcvMjAyMDA1MDQxMzE5NTkuOTUzMy0xLW1sZXZpdHNrQHJlZGhhdC5jb20nLCAn
+LWInLCAndGVzdCddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAxMjguCgoKClRoZSBm
+dWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA1MDQx
+MzE5NTkuOTUzMy0xLW1sZXZpdHNrQHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBl
+PW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
+dHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
+dy1kZXZlbEByZWRoYXQuY29t
 
