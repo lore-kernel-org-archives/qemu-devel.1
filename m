@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92355C47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:09:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD398C47254
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:09:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D28420757
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:09:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 775F42078C
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:09:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LlxYbydW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D28420757
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N4odJrJa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 775F42078C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVxJx-0002Px-I1
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 09:09:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38926)
+	id 1jVxKd-0003tC-JD
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 09:09:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38872)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jVxAO-00024q-6c
- for qemu-devel@nongnu.org; Tue, 05 May 2020 08:59:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25191
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jVxAK-0001zY-3p
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 08:59:16 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57105
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jVxAN-0001Ke-Bd
- for qemu-devel@nongnu.org; Tue, 05 May 2020 08:59:19 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jVxAI-0001IP-UV
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 08:59:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588683558;
+ s=mimecast20190719; t=1588683553;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=X+Sj31gR/RLHmlc21FjoAOJRNiclOU1V69F/XyE11vs=;
- b=LlxYbydWd+s0AcwGCo8Fm4dN5bNOrtQcUL8Qkce/EFBmaFZmzEAvPa58eDdQqFijmKLlQl
- 3OB7R0Ed+OgQQ19fGv/kCoT/3VwAIz0xFED95Ha9NEtPnwjVfP8GhKUqFqQ6sUtSh/sAKg
- 5GbivwLjM1mqMSZmHvpo+yS1KJ2mzKo=
+ bh=YPVPkTBT7gtmChDFl5iKp++k8KNrrXiv+H5bePQX/1k=;
+ b=N4odJrJaeQTWNJYjiua5Uqh2YQQz25Liv3HMRguYE0kTLG39sJ7lEOa98xO3d1tnUolFqh
+ DkMRX2BImFksvaH1RviPqIbJT1Y/zIOmxYDhshretEBFAeRfg9TVYxXDoNllYs1YF9gdU+
+ IAWsnmei2vphcKWu51vcsejUSZFowas=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-189-UnLzuQC4MOuhK-Xq_2VQCQ-1; Tue, 05 May 2020 08:59:16 -0400
-X-MC-Unique: UnLzuQC4MOuhK-Xq_2VQCQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-405--3Hf_VyIP9aVqi5HTSP8nQ-1; Tue, 05 May 2020 08:59:09 -0400
+X-MC-Unique: -3Hf_VyIP9aVqi5HTSP8nQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6511981CBE3;
- Tue,  5 May 2020 12:59:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5944835B43;
+ Tue,  5 May 2020 12:59:08 +0000 (UTC)
 Received: from localhost (ovpn-113-206.ams2.redhat.com [10.36.113.206])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 07E0F7053E;
- Tue,  5 May 2020 12:59:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7667E1002387;
+ Tue,  5 May 2020 12:59:08 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 21/24] block/block-copy: alloc task on each iteration
-Date: Tue,  5 May 2020 14:58:23 +0200
-Message-Id: <20200505125826.1001451-22-mreitz@redhat.com>
+Subject: [PULL 18/24] block: Comment cleanups
+Date: Tue,  5 May 2020 14:58:20 +0200
+Message-Id: <20200505125826.1001451-19-mreitz@redhat.com>
 In-Reply-To: <20200505125826.1001451-1-mreitz@redhat.com>
 References: <20200505125826.1001451-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:38
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -98,92 +98,152 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
 
-We are going to use aio-task-pool API, so tasks will be handled in
-parallel. We need therefore separate allocated task on each iteration.
-Introduce this logic now.
+It's been a while since we got rid of the sector-based bdrv_read and
+bdrv_write (commit 2e11d756); let's finish the job on a few remaining
+comments.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20200429130847.28124-3-vsementsov@virtuozzo.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20200428213807.776655-1-eblake@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/block-copy.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+ block/io.c             |  3 ++-
+ block/qcow2-refcount.c |  2 +-
+ block/vvfat.c          | 10 +++++-----
+ tests/qemu-iotests/001 |  2 +-
+ tests/qemu-iotests/052 |  2 +-
+ tests/qemu-iotests/134 |  2 +-
+ tests/qemu-iotests/188 |  2 +-
+ 7 files changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/block/block-copy.c b/block/block-copy.c
-index bbb29366dc..8d1b9ab9f0 100644
---- a/block/block-copy.c
-+++ b/block/block-copy.c
-@@ -106,9 +106,11 @@ static bool coroutine_fn block_copy_wait_one(BlockCopy=
-State *s, int64_t offset,
- }
-=20
- /* Called only on full-dirty region */
--static void block_copy_task_begin(BlockCopyState *s, BlockCopyTask *task,
--                                  int64_t offset, int64_t bytes)
-+static BlockCopyTask *block_copy_task_create(BlockCopyState *s,
-+                                             int64_t offset, int64_t bytes=
-)
+diff --git a/block/io.c b/block/io.c
+index a4f9714230..7d30e61edc 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -960,7 +960,7 @@ int bdrv_pwrite_zeroes(BdrvChild *child, int64_t offset=
+,
+  * flags are passed through to bdrv_pwrite_zeroes (e.g. BDRV_REQ_MAY_UNMAP=
+,
+  * BDRV_REQ_FUA).
+  *
+- * Returns < 0 on error, 0 on success. For error codes see bdrv_write().
++ * Returns < 0 on error, 0 on success. For error codes see bdrv_pwrite().
+  */
+ int bdrv_make_zero(BdrvChild *child, BdrvRequestFlags flags)
  {
-+    BlockCopyTask *task =3D g_new(BlockCopyTask, 1);
-+
-     assert(!find_conflicting_task(s, offset, bytes));
-=20
-     bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, bytes);
-@@ -118,6 +120,8 @@ static void block_copy_task_begin(BlockCopyState *s, Bl=
-ockCopyTask *task,
-     task->bytes =3D bytes;
-     qemu_co_queue_init(&task->wait_queue);
-     QLIST_INSERT_HEAD(&s->tasks, task, list);
-+
-+    return task;
+@@ -994,6 +994,7 @@ int bdrv_make_zero(BdrvChild *child, BdrvRequestFlags f=
+lags)
+     }
  }
 =20
++/* return < 0 if error. See bdrv_pwrite() for the return codes */
+ int bdrv_preadv(BdrvChild *child, int64_t offset, QEMUIOVector *qiov)
+ {
+     int ret;
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index d9650b9b6c..0457a6060d 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -2660,7 +2660,7 @@ fail:
+  * - 0 if writing to this offset will not affect the mentioned metadata
+  * - a positive QCow2MetadataOverlap value indicating one overlapping sect=
+ion
+  * - a negative value (-errno) indicating an error while performing a chec=
+k,
+- *   e.g. when bdrv_read failed on QCOW2_OL_INACTIVE_L2
++ *   e.g. when bdrv_pread failed on QCOW2_OL_INACTIVE_L2
+  */
+ int qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t of=
+fset,
+                                  int64_t size)
+diff --git a/block/vvfat.c b/block/vvfat.c
+index ab800c4887..6d5c090dec 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -2148,7 +2148,7 @@ DLOG(checkpoint());
+      * - get modified FAT
+      * - compare the two FATs (TODO)
+      * - get buffer for marking used clusters
+-     * - recurse direntries from root (using bs->bdrv_read to make
++     * - recurse direntries from root (using bs->bdrv_pread to make
+      *    sure to get the new data)
+      *   - check that the FAT agrees with the size
+      *   - count the number of clusters occupied by this directory and
+@@ -2913,9 +2913,9 @@ static int handle_deletes(BDRVVVFATState* s)
  /*
-@@ -472,7 +476,7 @@ static int coroutine_fn block_copy_dirty_clusters(Block=
-CopyState *s,
-     assert(QEMU_IS_ALIGNED(bytes, s->cluster_size));
+  * synchronize mapping with new state:
+  *
+- * - copy FAT (with bdrv_read)
++ * - copy FAT (with bdrv_pread)
+  * - mark all filenames corresponding to mappings as deleted
+- * - recurse direntries from root (using bs->bdrv_read)
++ * - recurse direntries from root (using bs->bdrv_pread)
+  * - delete files corresponding to mappings marked as deleted
+  */
+ static int do_commit(BDRVVVFATState* s)
+@@ -2935,10 +2935,10 @@ static int do_commit(BDRVVVFATState* s)
+         return ret;
+     }
 =20
-     while (bytes) {
--        BlockCopyTask task;
-+        g_autofree BlockCopyTask *task =3D NULL;
-         int64_t next_zero, cur_bytes, status_bytes;
+-    /* copy FAT (with bdrv_read) */
++    /* copy FAT (with bdrv_pread) */
+     memcpy(s->fat.pointer, s->fat2, 0x200 * s->sectors_per_fat);
 =20
-         if (!bdrv_dirty_bitmap_get(s->copy_bitmap, offset)) {
-@@ -493,14 +497,14 @@ static int coroutine_fn block_copy_dirty_clusters(Blo=
-ckCopyState *s,
-             assert(next_zero < offset + cur_bytes); /* no need to do MIN()=
- */
-             cur_bytes =3D next_zero - offset;
-         }
--        block_copy_task_begin(s, &task, offset, cur_bytes);
-+        task =3D block_copy_task_create(s, offset, cur_bytes);
-=20
-         ret =3D block_copy_block_status(s, offset, cur_bytes, &status_byte=
-s);
-         assert(ret >=3D 0); /* never fail */
-         cur_bytes =3D MIN(cur_bytes, status_bytes);
--        block_copy_task_shrink(s, &task, cur_bytes);
-+        block_copy_task_shrink(s, task, cur_bytes);
-         if (s->skip_unallocated && !(ret & BDRV_BLOCK_ALLOCATED)) {
--            block_copy_task_end(s, &task, 0);
-+            block_copy_task_end(s, task, 0);
-             progress_set_remaining(s->progress,
-                                    bdrv_get_dirty_count(s->copy_bitmap) +
-                                    s->in_flight_bytes);
-@@ -516,7 +520,7 @@ static int coroutine_fn block_copy_dirty_clusters(Block=
-CopyState *s,
-         ret =3D block_copy_do_copy(s, offset, cur_bytes, ret & BDRV_BLOCK_=
-ZERO,
-                                  error_is_read);
-         co_put_to_shres(s->mem, cur_bytes);
--        block_copy_task_end(s, &task, ret);
-+        block_copy_task_end(s, task, ret);
-         if (ret < 0) {
-             return ret;
-         }
+-    /* recurse direntries from root (using bs->bdrv_read) */
++    /* recurse direntries from root (using bs->bdrv_pread) */
+     ret =3D commit_direntries(s, 0, -1);
+     if (ret) {
+         fprintf(stderr, "Fatal: error while committing (%d)\n", ret);
+diff --git a/tests/qemu-iotests/001 b/tests/qemu-iotests/001
+index d87a535c33..696726e45f 100755
+--- a/tests/qemu-iotests/001
++++ b/tests/qemu-iotests/001
+@@ -1,6 +1,6 @@
+ #!/usr/bin/env bash
+ #
+-# Test simple read/write using plain bdrv_read/bdrv_write
++# Test simple read/write using plain bdrv_pread/bdrv_pwrite
+ #
+ # Copyright (C) 2009 Red Hat, Inc.
+ #
+diff --git a/tests/qemu-iotests/052 b/tests/qemu-iotests/052
+index 45a140910d..8d5c10601f 100755
+--- a/tests/qemu-iotests/052
++++ b/tests/qemu-iotests/052
+@@ -1,6 +1,6 @@
+ #!/usr/bin/env bash
+ #
+-# Test bdrv_read/bdrv_write using BDRV_O_SNAPSHOT
++# Test bdrv_pread/bdrv_pwrite using BDRV_O_SNAPSHOT
+ #
+ # Copyright (C) 2013 Red Hat, Inc.
+ #
+diff --git a/tests/qemu-iotests/134 b/tests/qemu-iotests/134
+index 5f0fb86211..5162d21662 100755
+--- a/tests/qemu-iotests/134
++++ b/tests/qemu-iotests/134
+@@ -1,6 +1,6 @@
+ #!/usr/bin/env bash
+ #
+-# Test encrypted read/write using plain bdrv_read/bdrv_write
++# Test encrypted read/write using plain bdrv_pread/bdrv_pwrite
+ #
+ # Copyright (C) 2015 Red Hat, Inc.
+ #
+diff --git a/tests/qemu-iotests/188 b/tests/qemu-iotests/188
+index afca44df54..09b9b6083a 100755
+--- a/tests/qemu-iotests/188
++++ b/tests/qemu-iotests/188
+@@ -1,6 +1,6 @@
+ #!/usr/bin/env bash
+ #
+-# Test encrypted read/write using plain bdrv_read/bdrv_write
++# Test encrypted read/write using plain bdrv_pread/bdrv_pwrite
+ #
+ # Copyright (C) 2017 Red Hat, Inc.
+ #
 --=20
 2.26.2
 
