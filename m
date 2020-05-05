@@ -1,73 +1,133 @@
 Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8700C47247
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 21:36:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C355C47254
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 21:39:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F902206A5
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 21:36:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F902206A5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 43F13206A5
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 21:39:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="AmxIEtqb";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="e7qT5By1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43F13206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jW5EZ-0005Jz-VG
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 17:36:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58634)
+	id 1jW5Hv-0007Fl-7S
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 17:39:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59432)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jW5De-0004Px-4R
- for qemu-devel@nongnu.org; Tue, 05 May 2020 17:35:14 -0400
-Resent-Date: Tue, 05 May 2020 17:35:14 -0400
-Resent-Message-Id: <E1jW5De-0004Px-4R@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21347)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jW5Dc-0006Ar-9V
- for qemu-devel@nongnu.org; Tue, 05 May 2020 17:35:13 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1588714503; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=ZSz7W5p2y7HZDZrix5ELaKlAH6jrralBGhxqOOF/vxmXnoFT5OaJOfXlQjP1UFQFDelBommoNu7qRKkIn1ys6g35TkeQtGAnt8LuPFYE74KLAN8UGoFBtocxwTGwwdocqTzmUU3YwSoGxGRZngb9PjguDLhV0tHdI0UcYOY5I60=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1588714503;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=twOWM4gumKBXShgEFyp1Rt2CM5iQRFJtT0Rq0POm4wk=; 
- b=VTrCjgGFc9si7XUrD40sKovi9rcTvwh7fAkBJmB/fKavY7MT/YU8XxLpOGK7CAH2wx7VDbeSFbec3qmkIUdShIaTC4BEUP2xnwaI+UckMEPf4ZnhSdUvgvhet94gi6dTI3rxgH7xH9cw0aPTHk5DkMBnOnGc0/jmnEk71lesaS8=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1588714501047960.1368345888208;
- Tue, 5 May 2020 14:35:01 -0700 (PDT)
-Message-ID: <158871449979.24779.7583967572244273386@45ef0f9c86ae>
-In-Reply-To: <20200505152926.18877-1-armbru@redhat.com>
-Subject: Re: [PATCH v2 00/18] qom: Spring cleaning
+ (Exim 4.90_1) (envelope-from <sidneym@quicinc.com>)
+ id 1jW5H9-0006mb-BE
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 17:38:51 -0400
+Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:15826)
+ by eggs.gnu.org with esmtps (TLS1.2:RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <sidneym@quicinc.com>)
+ id 1jW5H5-0003ff-GK
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 17:38:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1588714727; x=1620250727;
+ h=from:to:subject:date:message-id:mime-version;
+ bh=VZZXEnd6TDMoAgYD4sw92vfklcuIRsLiI5hCDOMPqL8=;
+ b=AmxIEtqbsxL6PMezWmaARyqUpxDbo/yoCZB9pBExg6Lbcv5V9zUBUdXl
+ F5MjPeKvbfvMXH7SQsOVwcEJd1MGjHp9jhySou5o3TRz9z0lZW7qs/uZF
+ /FjtvlB113PqviPvjTBEp8gXRcII0MR566RuQ2VZUd6KfgPMRRV4JQMjW c=;
+Received: from unknown (HELO ironmsg05-sd.qualcomm.com) ([10.53.140.145])
+ by alexa-out-sd-02.qualcomm.com with ESMTP; 05 May 2020 14:38:44 -0700
+Received: from nasanexm01c.na.qualcomm.com ([10.85.0.83])
+ by ironmsg05-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
+ 05 May 2020 14:38:44 -0700
+Received: from nasanexm03d.na.qualcomm.com (10.85.0.91) by
+ NASANEXM01C.na.qualcomm.com (10.85.0.83) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Tue, 5 May 2020 14:38:43 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (199.106.107.6)
+ by nasanexm03d.na.qualcomm.com (10.85.0.91) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2 via Frontend Transport; Tue, 5 May 2020 14:38:43 -0700
+Received: from BYAPR02MB5509.namprd02.prod.outlook.com (2603:10b6:a03:9e::31)
+ by BYAPR02MB5477.namprd02.prod.outlook.com (2603:10b6:a03:95::19)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.29; Tue, 5 May
+ 2020 21:38:42 +0000
+Received: from BYAPR02MB5509.namprd02.prod.outlook.com
+ ([fe80::fc11:c428:7057:1152]) by BYAPR02MB5509.namprd02.prod.outlook.com
+ ([fe80::fc11:c428:7057:1152%6]) with mapi id 15.20.2958.030; Tue, 5 May 2020
+ 21:38:42 +0000
+From: Sid Manning <sidneym@quicinc.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: linux-user - time64 question
+Thread-Topic: linux-user - time64 question
+Thread-Index: AdYjIth2hlNzOf24Tf+fzAKlcfmaBA==
+Date: Tue, 5 May 2020 21:38:42 +0000
+Message-ID: <BYAPR02MB55094915935E2B24286CB519BEA70@BYAPR02MB5509.namprd02.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=quicinc.com;
+x-originating-ip: [199.106.103.56]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: d8395030-0eb6-49e7-f612-08d7f13cae8d
+x-ms-traffictypediagnostic: BYAPR02MB5477:
+x-microsoft-antispam-prvs: <BYAPR02MB5477954B09C63CD0117C7B88BEA70@BYAPR02MB5477.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:3383;
+x-forefront-prvs: 0394259C80
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: cOt0ZnzEBWoS9WkwLQZqnwzcwgifLmfXY4pZa0wU4sDpVDOqdOZrVhGo/I24FzK4S6VhBXjqaZJioqO+ceivOv8KKYRdEsUVAMVxuPZ+AM23Fe09jOZVvQWesLVFqp7gmnJ3ejaGOnsAnvgwEsOeLlLCn6dU2imxSZdK2vpl2RD5XnGlAHC3bnHuN2tyRBagAhJULE+i07Fb2KCTe51hnFQxh0hbuLJZAztxyIwUHb3jfDmoTBTYqEb1tqlEt/ney6VLYDTLFdPDoHShMZfVVpDIkLFvg64D0R4h1SGniVRRlM/4Sts9LeutmuGmBxVruetVqdsRI8YXqqbS7ZlG0MAvKw4Hs7f3K+xDfWF7WBAoDUA+Mdllwo/uJgfsLnCtMejoUCVvPT9l/3vYFBKVa2vFPIYwF/tpAkrBEaOWlotNTz/VkYmMDF32LCxK1y92rzzql/e9tfV/ZKZreI9DC8mhvwYhNCbfX3NkoD//pNH2jZDN56Ej5v9phWCewLi7MzgaeVoAZmchOXqSej1e4w==
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:BYAPR02MB5509.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(136003)(346002)(39860400002)(376002)(396003)(366004)(33430700001)(5660300002)(52536014)(9686003)(86362001)(55016002)(71200400001)(26005)(6506007)(4744005)(186003)(6916009)(33656002)(76116006)(2906002)(7696005)(66446008)(8676002)(66556008)(316002)(64756008)(66946007)(66476007)(8936002)(478600001)(19627405001)(33440700001);
+ DIR:OUT; SFP:1102; 
+x-ms-exchange-antispam-messagedata: dKwqN4/Ob87BgKpRJpLXyc3t2OeeAo1/xjKuvwaEPkNI5EX4rbov+pOCT8fIA4JqSag1u4snkVbeBDUGBjBOfxN9/agvbUkJg7Ty+9fhLVIsfw1/rGRFbopONQwxWzu6xxt1A+WlWxPW7nZc341DPf+y/LV6CLw1FTEx6ydXnNUhpt9uHl/xeitfBgvxFqKOHVYxGQ/oNb+APjFgTPixaY010njSenBVtqq0xB5Ab1Y9f0X1MRjkyVdifIGvM16E/LcxNOMEAJm/MLih1I1F6AHCpnECSAUo5uDCs+LowzY4mcQ3IZ3qVuMhNp4b7n6Ut03+K++eiB+FHeKF/0VAl0k69VNwNNzqT8ge0f7UiK8H5hJQMqPKYgDbxqnUazp+cqjHV/0OnHsMz00+ADRN6UVI/MCVGhUj0ygjRit80RHYMHzlUS0VTwMSq7xz/x6ZmasVI6jG8jnPT0gvIcrrfMw+R70cKkIHkwvNvyZDbt7bS8G4YgQIYtLN/pZk05Qilbv1qBl8oPKtVg3MOvVhjcGpit/gBzkW5MF4nCCNGq45AUrgSOZ8KJPuqok5IZbDtm9nvVxKp2lFrxQKawfHyFrAnuV9fVaqEa/1uZi+MOPWzCwWHHABCsBJdTJJ5UMkLw8VXnxbcjc/xz4THzUuBanrnCj6aph4b0xPYtBNYlv67GMXp0XViWo92r9BbwEFyufBnryyjDNJYIX1D8DZrGmNs/TKjlX/MWhedT/ZAH0MaK80ntFPALkspELLuyao6W9GmhpuNaDKb8TgZVjCalAgrOpoMAHIYt9MxMwZln4=
+x-ms-exchange-transport-forked: True
+arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=P4zuFuCnt6/YaSAIdt9ytzE+p6R+f/j0HkfUfHI1q9BWTicR6yHYL6o/RUozoz08pt3+qVfWew+8gl+U4Ur1S7x+jQqOw87AGAzm1TSnekXFiNaq4rAbqKgCZYF5AA0EaRlZFgyw3UJUMX6owSajC/x+QGULtUtK+B5KoevTsZysDEB/fG/ltHpRUccTK5OkBP67rS2YD9Ny+UDGrSkgcOYknPQrmYWuQI9nw5RiMfqr0BaF5BOLhz4MaZgzFgN9wCYJamI5qLDQxaqqNSBcSi5FAb1WVV3/l11MTfpy6lM++oa7AzSVOHwJ3YQaJSUmZFNAtLseB4F9p4t4ue/hZQ==
+arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZZgtcvrTYbQnMe2bLVmqVW8XJr5RqE8bsfn4gE49bN4=;
+ b=ld8ZbDVbAQzaxx0Z/6zDPib70NIB6QUgwEtbEXA5flGN+83zBqBTTU5WasPRjQYLEW7bjrAohBz5o7JZy6tQYgg1+gygmGkBRfK8TjZZbWS/DVXOsuT/BMw/vhImfibCoWMmYByrfidd4KPoSsQWW76cFRq4qH5OHjDKWTA3DXUb3asz855tdfFA/pxPD3sQ2GkgnB+ucBbGOYrifj842Ey4AUutEQSsD53TTcaqNGbTc3bRIJf3Uhu4i+cDyL8c0kXevPex3T+KhvI2VWfAj8WNtgbP2dvKySfTaHyl4FgEPRRWjIWrLw+29bwfIMcUx8qomYEZQZSn81W1qsjzeQ==
+arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
+ dkim=pass header.d=quicinc.com; arc=none
+dkim-signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZZgtcvrTYbQnMe2bLVmqVW8XJr5RqE8bsfn4gE49bN4=;
+ b=e7qT5By1qole6XPEOWKSDOZyh6GqM5aU8+zGakOwqwZO3BvQ4V2AOfav99c5zZwvJ6K0k5511BhCn7jjfqLVKboFW65mfV+Asjlpg5miY582oXrzy68ie6GwizpZqS9d3DslRLP8/d09VwJYa6W8OWF0O9PCbGuEuNY7IHgUX+I=
+x-ms-exchange-crosstenant-network-message-id: d8395030-0eb6-49e7-f612-08d7f13cae8d
+x-ms-exchange-crosstenant-originalarrivaltime: 05 May 2020 21:38:42.3406 (UTC)
+x-ms-exchange-crosstenant-fromentityheader: Hosted
+x-ms-exchange-crosstenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
+x-ms-exchange-crosstenant-mailboxtype: HOSTED
+x-ms-exchange-crosstenant-userprincipalname: 1iO9u7g+KOMF6yaLbirxJiG3AvAEjjFWXI6k2suGoeAOJsAmQ7SkCzqCQFwTXUjiFzRBooaihfhWrR6PpaE6DA==
+x-ms-exchange-transport-crosstenantheadersstamped: BYAPR02MB5477
+x-originatororg: quicinc.com
+Content-Type: multipart/alternative;
+ boundary="_000_BYAPR02MB55094915935E2B24286CB519BEA70BYAPR02MB5509namp_"
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: armbru@redhat.com
-Date: Tue, 5 May 2020 14:35:01 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 13:41:33
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+Received-SPF: pass client-ip=199.106.114.39; envelope-from=sidneym@quicinc.com;
+ helo=alexa-out-sd-02.qualcomm.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 17:38:44
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,93 +141,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, philmd@redhat.com, berrange@redhat.com,
- qemu-devel@nongnu.org, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUwNTE1MjkyNi4xODg3
-Ny0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDIwMDUwNTE1MjkyNi4xODg3Ny0xLWFybWJydUByZWRo
-YXQuY29tClN1YmplY3Q6IFtQQVRDSCB2MiAwMC8xOF0gcW9tOiBTcHJpbmcgY2xlYW5pbmcKVHlw
-ZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYt
-cGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-cmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRj
-aC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQg
-dG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpiZWI2YzUwIHFvbTogRHJvcCBAZXJycCBwYXJhbWV0ZXIg
-b2Ygb2JqZWN0X3Byb3BlcnR5X2RlbCgpCmQwZDU1ZTYgc3BhcHJfcGNpOiBEcm9wIHNvbWUgZGVh
-ZCBlcnJvciBoYW5kbGluZwplYzJkZjk0IHFkZXY6IFVucmVhbGl6ZSBtdXN0IG5vdCBmYWlsCjVi
-OGRlOWUgRHJvcCBtb3JlIEBlcnJwIHBhcmFtZXRlcnMgYWZ0ZXIgcHJldmlvdXMgY29tbWl0CmVk
-Zjk0YzYgcW9tOiBEcm9wIHBhcmFtZXRlciBAZXJycCBvZiBvYmplY3RfcHJvcGVydHlfYWRkKCkg
-JiBmcmllbmRzCjZmZjhmN2QgcWRldjogQ2xlYW4gdXAgcWRldl9jb25uZWN0X2dwaW9fb3V0X25h
-bWVkKCkKNDZkYTMzNCBody9hcm0vYmNtMjgzNTogRHJvcCBmdXRpbGUgYXR0ZW1wdHMgYXQgUU9N
-LWFkb3B0aW5nIG1lbW9yeQo2YTViYzU1IGUxMDAwOiBEb24ndCBydW4gZTEwMDBfaW5zdGFuY2Vf
-aW5pdCgpIHR3aWNlCmM0ODQ0YmQgaHcvaXNhL3N1cGVyaW86IE1ha2UgdGhlIGNvbXBvbmVudHMg
-UU9NIGNoaWxkcmVuCjdiZTE5ZmQgczM5MHgvY3B1bW9kZWw6IEZpeCBVSSB0byBDUFUgZmVhdHVy
-ZXMgcGNjLWNtYWMte2FlcywgZWFlc30tMjU2CmQwOWQyMGUgdGVzdHMvY2hlY2stcW9tLXByb3Bs
-aXN0OiBJbXByb3ZlIGl0ZXJhdG9yIGNvdmVyYWdlCjU0OGEzYzkgcW9tOiBEcm9wIG9iamVjdF9w
-cm9wZXJ0eV9zZXRfZGVzY3JpcHRpb24oKSBwYXJhbWV0ZXIgQGVycnAKYWMxOThmZiBxb206IE1h
-a2UgYWxsIHRoZSBvYmplY3RfcHJvcGVydHlfYWRkX0ZPTygpIHJldHVybiB0aGUgcHJvcGVydHkK
-NjZjNWQyNiBxb206IERyb3AgY29udmVuaWVuY2UgbWV0aG9kIG9iamVjdF9wcm9wZXJ0eV9nZXRf
-dWludDE2TGlzdCgpCjQ4NTNiNWIgcW9tOiBTaW1wbGlmeSBvYmplY3RfcHJvcGVydHlfZ2V0X2Vu
-dW0oKQo0ZjljMjFmIHFvbTogRHJvcCBvYmplY3RfcHJvcGVydHlfZGVsX2NoaWxkKCkncyB1bnVz
-ZWQgcGFyYW1ldGVyIEBlcnJwCmI5OTEzZTIgcW9tOiBDbGVhbiB1cCBpbmNvbnNpc3RlbnQgdXNl
-IG9mIGdjaGFyICogdnMuIGNoYXIgKgowNTBlMDFlIHFvbTogQ2xlYXJlciByZWZlcmVuY2UgY291
-bnRpbmcgaW4gb2JqZWN0X2luaXRpYWxpemVfY2hpbGR2KCkKCj09PSBPVVRQVVQgQkVHSU4gPT09
-CjEvMTggQ2hlY2tpbmcgY29tbWl0IDA1MGUwMWU5YzAzZCAocW9tOiBDbGVhcmVyIHJlZmVyZW5j
-ZSBjb3VudGluZyBpbiBvYmplY3RfaW5pdGlhbGl6ZV9jaGlsZHYoKSkKMi8xOCBDaGVja2luZyBj
-b21taXQgYjk5MTNlMmUwOWFiIChxb206IENsZWFuIHVwIGluY29uc2lzdGVudCB1c2Ugb2YgZ2No
-YXIgKiB2cy4gY2hhciAqKQozLzE4IENoZWNraW5nIGNvbW1pdCA0ZjljMjFmOGU3NjkgKHFvbTog
-RHJvcCBvYmplY3RfcHJvcGVydHlfZGVsX2NoaWxkKCkncyB1bnVzZWQgcGFyYW1ldGVyIEBlcnJw
-KQo0LzE4IENoZWNraW5nIGNvbW1pdCA0ODUzYjViYTg4MWQgKHFvbTogU2ltcGxpZnkgb2JqZWN0
-X3Byb3BlcnR5X2dldF9lbnVtKCkpCjUvMTggQ2hlY2tpbmcgY29tbWl0IDY2YzVkMjY0ZjEyZCAo
-cW9tOiBEcm9wIGNvbnZlbmllbmNlIG1ldGhvZCBvYmplY3RfcHJvcGVydHlfZ2V0X3VpbnQxNkxp
-c3QoKSkKNi8xOCBDaGVja2luZyBjb21taXQgYWMxOThmZmU5ZTdhIChxb206IE1ha2UgYWxsIHRo
-ZSBvYmplY3RfcHJvcGVydHlfYWRkX0ZPTygpIHJldHVybiB0aGUgcHJvcGVydHkpCjcvMTggQ2hl
-Y2tpbmcgY29tbWl0IDU0OGEzYzk3ZjRiZiAocW9tOiBEcm9wIG9iamVjdF9wcm9wZXJ0eV9zZXRf
-ZGVzY3JpcHRpb24oKSBwYXJhbWV0ZXIgQGVycnApCjgvMTggQ2hlY2tpbmcgY29tbWl0IGQwOWQy
-MGU2NzE3NyAodGVzdHMvY2hlY2stcW9tLXByb3BsaXN0OiBJbXByb3ZlIGl0ZXJhdG9yIGNvdmVy
-YWdlKQo5LzE4IENoZWNraW5nIGNvbW1pdCA3YmUxOWZkOTMzNDUgKHMzOTB4L2NwdW1vZGVsOiBG
-aXggVUkgdG8gQ1BVIGZlYXR1cmVzIHBjYy1jbWFjLXthZXMsIGVhZXN9LTI1NikKRVJST1I6IGxp
-bmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM1MzogRklMRTogdGFyZ2V0L3MzOTB4L2NwdV9mZWF0dXJl
-c19kZWYuaW5jLmg6MzE0OgorREVGX0ZFQVQoUENDX0NNQUNfQUVTXzI1NiwgInBjYy1jbWFjLWFl
-cy0yNTYiLCBQQ0MsIDIwLCAiUENDIENvbXB1dGUtTGFzdC1CbG9jay1DTUFDLVVzaW5nLUFFUy0y
-NTYiKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA4IGxpbmVzIGNoZWNrZWQKClBhdGNo
-IDkvMTggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjEwLzE4IENoZWNraW5nIGNvbW1pdCBj
-NDg0NGJkMjIzZjEgKGh3L2lzYS9zdXBlcmlvOiBNYWtlIHRoZSBjb21wb25lbnRzIFFPTSBjaGls
-ZHJlbikKMTEvMTggQ2hlY2tpbmcgY29tbWl0IDZhNWJjNTVhNjcwMyAoZTEwMDA6IERvbid0IHJ1
-biBlMTAwMF9pbnN0YW5jZV9pbml0KCkgdHdpY2UpCjEyLzE4IENoZWNraW5nIGNvbW1pdCA0NmRh
-MzM0MjljOGYgKGh3L2FybS9iY20yODM1OiBEcm9wIGZ1dGlsZSBhdHRlbXB0cyBhdCBRT00tYWRv
-cHRpbmcgbWVtb3J5KQoxMy8xOCBDaGVja2luZyBjb21taXQgNmZmOGY3ZDZiZTY3IChxZGV2OiBD
-bGVhbiB1cCBxZGV2X2Nvbm5lY3RfZ3Bpb19vdXRfbmFtZWQoKSkKMTQvMTggQ2hlY2tpbmcgY29t
-bWl0IGVkZjk0YzY4MDc1NCAocW9tOiBEcm9wIHBhcmFtZXRlciBAZXJycCBvZiBvYmplY3RfcHJv
-cGVydHlfYWRkKCkgJiBmcmllbmRzKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
-MjA5OiBGSUxFOiBiYWNrZW5kcy9ob3N0bWVtLWZpbGUuYzoxODc6CisgICAgICAgIGZpbGVfbWVt
-b3J5X2JhY2tlbmRfZ2V0X2Rpc2NhcmRfZGF0YSwgZmlsZV9tZW1vcnlfYmFja2VuZF9zZXRfZGlz
-Y2FyZF9kYXRhKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMDgwOiBGSUxF
-OiBody9hcm0vcmFzcGkuYzoyODc6CisgICAgb2JqZWN0X3Byb3BlcnR5X2FkZF9jb25zdF9saW5r
-KE9CSkVDVCgmcy0+c29jKSwgInJhbSIsIE9CSkVDVChtYWNoaW5lLT5yYW0pKTsKCldBUk5JTkc6
-IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMDk1OiBGSUxFOiBody9wcGMvc3BhcHIuYzozMzQ2
-OgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAmc3BhcHItPmtlcm5lbF9hZGRy
-LCBPQkpfUFJPUF9GTEFHX1JFQURXUklURSk7Cgp0b3RhbDogMCBlcnJvcnMsIDMgd2FybmluZ3Ms
-IDQ0NzEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTQvMTggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KMTUvMTggQ2hlY2tpbmcgY29tbWl0IDViOGRlOWVlNTY3YSAoRHJvcCBtb3JlIEBlcnJwIHBh
-cmFtZXRlcnMgYWZ0ZXIgcHJldmlvdXMgY29tbWl0KQoxNi8xOCBDaGVja2luZyBjb21taXQgZWMy
-ZGY5NDAxNWVmIChxZGV2OiBVbnJlYWxpemUgbXVzdCBub3QgZmFpbCkKMTcvMTggQ2hlY2tpbmcg
-Y29tbWl0IGQwZDU1ZTZiYTkxNyAoc3BhcHJfcGNpOiBEcm9wIHNvbWUgZGVhZCBlcnJvciBoYW5k
-bGluZykKMTgvMTggQ2hlY2tpbmcgY29tbWl0IGJlYjZjNTA5Y2Q0OSAocW9tOiBEcm9wIEBlcnJw
-IHBhcmFtZXRlciBvZiBvYmplY3RfcHJvcGVydHlfZGVsKCkpCj09PSBPVVRQVVQgRU5EID09PQoK
-VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxh
-YmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNTA1MTUyOTI2LjE4ODc3LTEtYXJt
-YnJ1QHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
-bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3Jn
-L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+--_000_BYAPR02MB55094915935E2B24286CB519BEA70BYAPR02MB5509namp_
+Content-Type: text/plain; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
+
+I=92m looking at a testcase failure when my target uses 64bit time in msg.h=
+ (struct msqid_ds).  I=92ve been able to get around this but changing targe=
+t_msqid_ds like so:
+
+@@ -3900,18 +3901,9 @@ static inline abi_long do_semop(int semid, abi_long =
+ptr,
+unsigned nsops)
+ struct target_msqid_ds
+ {
+     struct target_ipc_perm msg_perm;
+-    abi_ulong msg_stime;
+-#if TARGET_ABI_BITS =3D=3D 32
+-    abi_ulong __unused1;
+-#endif
+-    abi_ulong msg_rtime;
+-#if TARGET_ABI_BITS =3D=3D 32
+-    abi_ulong __unused2;
+-#endif
+-    abi_ulong msg_ctime;
+-#if TARGET_ABI_BITS =3D=3D 32
+-    abi_ulong __unused3;
+-#endif
++    abi_ullong msg_stime;
++    abi_ullong msg_rtime;
++    abi_ullong msg_ctime;
+     abi_ulong __msg_cbytes;
+     abi_ulong msg_qnum;
+     abi_ulong msg_qbytes;
+
+It seems like either should have worked but I get garbage back in some of t=
+he elements below msg_time fields without the change.
+
+If time_t is 64bits then it seems like stime/rtime/ctime should be abi_ullo=
+ng.
+
+My target is Hexagon and the TARGET_ABI_BITS is 32.
+
+Thanks,
+
+--_000_BYAPR02MB55094915935E2B24286CB519BEA70BYAPR02MB5509namp_
+Content-Type: text/html; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3DWindows-1=
+252">
+<style type=3D"text/css" style=3D"display:none;"> P {margin-top:0;margin-bo=
+ttom:0;} </style>
+</head>
+<body dir=3D"ltr">
+<div class=3D"WordSection1"></div>
+<div class=3D"WordSection1">
+<p class=3D"MsoNormal" style=3D"margin: 0in 0in 0.0001pt; font-size: 11pt; =
+font-family: Calibri, sans-serif;">
+I=92m looking at a testcase failure when my target uses 64bit time in <span=
+ class=3D"SpellE">
+msg.h</span> (struct <span class=3D"SpellE">msqid_ds</span>).<span style=3D=
+"">&nbsp; </span>
+I=92ve been able to get around this but changing <span class=3D"SpellE">tar=
+get_msqid_ds</span> like so:</p>
+<p class=3D"MsoNormal" style=3D"margin: 0in 0in 0.0001pt; font-size: 11pt; =
+font-family: Calibri, sans-serif;">
+<br>
+</p>
+<div class=3D"MsoNormal" style=3D"margin: 0px 0in 0.000133333px; font-size:=
+ 11pt; font-family: Calibri, sans-serif;">
+<span>@@ -3900,18 &#43;3901,9 @@ static inline abi_long do_semop(int semid,=
+ abi_long ptr,
+<br>
+</span>
+<div>unsigned nsops)<br>
+</div>
+<div>&nbsp;struct target_msqid_ds<br>
+</div>
+<div>&nbsp;{<br>
+</div>
+<div>&nbsp; &nbsp; &nbsp;struct target_ipc_perm msg_perm;<br>
+</div>
+<div>- &nbsp; &nbsp;abi_ulong msg_stime;<br>
+</div>
+<div>-#if TARGET_ABI_BITS =3D=3D 32<br>
+</div>
+<div>- &nbsp; &nbsp;abi_ulong __unused1;<br>
+</div>
+<div>-#endif<br>
+</div>
+<div>- &nbsp; &nbsp;abi_ulong msg_rtime;<br>
+</div>
+<div>-#if TARGET_ABI_BITS =3D=3D 32<br>
+</div>
+<div>- &nbsp; &nbsp;abi_ulong __unused2;<br>
+</div>
+<div>-#endif<br>
+</div>
+<div>- &nbsp; &nbsp;abi_ulong msg_ctime;<br>
+</div>
+<div>-#if TARGET_ABI_BITS =3D=3D 32<br>
+</div>
+<div>- &nbsp; &nbsp;abi_ulong __unused3;<br>
+</div>
+<div>-#endif<br>
+</div>
+<div>&#43; &nbsp; &nbsp;abi_ullong msg_stime;<br>
+</div>
+<div>&#43; &nbsp; &nbsp;abi_ullong msg_rtime;<br>
+</div>
+<div>&#43; &nbsp; &nbsp;abi_ullong msg_ctime;<br>
+</div>
+<div>&nbsp; &nbsp; &nbsp;abi_ulong __msg_cbytes;<br>
+</div>
+<div>&nbsp; &nbsp; &nbsp;abi_ulong msg_qnum;<br>
+</div>
+<div>&nbsp; &nbsp; &nbsp;abi_ulong msg_qbytes;<br>
+</div>
+<div><br>
+</div>
+<div>It seems like either should have worked but I get garbage back in some=
+ of the elements below msg_time fields without the change.</div>
+<div><br>
+</div>
+<div>If time_t is 64bits then it seems like stime/rtime/ctime should be abi=
+_ullong.</div>
+<div><br>
+</div>
+<div>My target is Hexagon and the TARGET_ABI_BITS is 32.</div>
+<div><br>
+</div>
+<div>Thanks,</div>
+<span></span></div>
+</div>
+</body>
+</html>
+
+--_000_BYAPR02MB55094915935E2B24286CB519BEA70BYAPR02MB5509namp_--
 
