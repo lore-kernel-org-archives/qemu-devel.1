@@ -2,119 +2,91 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DE44C47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 08:38:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A2A6C47254
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 08:44:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EC7320661
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 08:38:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EC7320661
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 3263020675
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 08:44:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vz18Ys64"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3263020675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVt5n-0001Fs-Cj
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 04:38:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36652)
+	id 1jVtBZ-0003gx-CC
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 04:44:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38358)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jVt1e-0004w2-Sg; Tue, 05 May 2020 04:34:06 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:43017)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1jVt1d-0002Mg-6G; Tue, 05 May 2020 04:34:02 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MsI0I-1jHFmf2Rh4-00tkOJ; Tue, 05 May 2020 10:33:43 +0200
-Subject: Re: [PATCH v3 00/12] user-mode: Prune build dependencies (part 1)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200504152922.21365-1-philmd@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <7f19b263-5493-779b-cf86-b0499c7dc80d@vivier.eu>
-Date: Tue, 5 May 2020 10:33:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <pkrempa@redhat.com>)
+ id 1jVtAi-0003AU-2o
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 04:43:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49589
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pkrempa@redhat.com>)
+ id 1jVtAh-0008D2-8X
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 04:43:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588668202;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=XUnxUnogNznM7VYV4Db5b/OxVJf17/kLaamaZWjC8jg=;
+ b=Vz18Ys648X382drtIdmDWKhpmq4+VVxLcooV0lsbL9x9eiEygw6cTALmWbIMmaiOzU6zrM
+ sGmMw4KrdiZnUrM1ZKbpTabcS+cJclpdYrjk/DZ2mgfEaOzuOc6RHxOpf6cKKfNB51SSaj
+ 4wZ/+Ns+Ph/5/xtpL/Bjx6CcW4rdq7E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-160-MsxAbxV9OteqYr9ttSPseg-1; Tue, 05 May 2020 04:43:18 -0400
+X-MC-Unique: MsxAbxV9OteqYr9ttSPseg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 741F1872FEA;
+ Tue,  5 May 2020 08:43:17 +0000 (UTC)
+Received: from angien.pipo.sk (unknown [10.40.208.39])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C16D310016EB;
+ Tue,  5 May 2020 08:43:12 +0000 (UTC)
+Date: Tue, 5 May 2020 10:43:10 +0200
+From: Peter Krempa <pkrempa@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH v5 7/7] qemu-img: Deprecate use of -b without -F
+Message-ID: <20200505084310.GA2232710@angien.pipo.sk>
+References: <20200403175859.863248-1-eblake@redhat.com>
+ <20200403175859.863248-8-eblake@redhat.com>
+ <20200505081103.GC5759@linux.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <20200504152922.21365-1-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:lBBCM+rJBMA9B9xYXM5G/mh/X58kDkXvzgSQIrCZu7W/8aF0TwM
- 7sGx8JS9N3wMUi4mflsDSl9ipnh3+oOt49vsV4STeTBhaDahRSZrcO5ULXdxN02xOvKSEQE
- /TrBT5Mp8jjJhH/2iQTFE34Hsdupq/iM5wLNB9L5TIUaVz78ifdM658YsY9Mi4g0/NUSE2x
- NX9Ym+Vbu2wQJYlSbNsgg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ELr7W7YrKso=:j9JXoxDLzSIJwFbJSwri31
- oHJepnhY0sdNXpnF7scGqmU/szUN9dzyAN/4Ij/VPFcii7aPfpMwdNk1eNtQVwFU46eCsWndl
- mwud/rcY6N6pKxl3SJirGGRLOhfw/JLrlCeiS3yXtein7bVE5tsr6MgZS3I/KBgE64xld4GuT
- pnb9+xN3pBizrrIfCdNkwCFZDnMKneb0rw5Dzsu7JNaf7K+KssykGSydLQVYa//MREsFhGRaO
- bL0/Hi91zWb6acJG7jpUyQCBht56DVs8RpgEZ/CQK7xefGXd8P++Q3Y9qgvbeu+bX9PuPE9U6
- 30yRzDh/wY1FKrwggfEjIY7Xbut/z6IRqV8cQxmHssrQsepuO/0YuUQrxs2hB6+eSuVuqoBp5
- I1CHKCq0xKf0Wt7Wo6JMS0e86wpsAfHvoUXHoiyDgDn+3P1jy4asG4FkozqiCihnDgApJMFpQ
- p1bWTM2CVm4s7S+ZbnG4L6cU9/53ou3S/wmaorokS96qMg2KU+DfGgJ9rHgZNQ5YiZvcKjzUU
- wOb2sPlu/kX2d4uoMnixxh39aNtxwGVCwyTSnwDgIags95q2zIbR0/WPnM8cd+rE6SSRTlg5P
- r/IOO6SuHkK9qZaiY7MA+XXBgcEHAtEE9ksg7KX2X8MCiYbTrVwxu5K0ytRY6vzVHs+jMm43c
- RHRS8UHXOGyL4tm83LJlfZcWOtt+qzky5V7mqWE+JBVRWFvPv6DWSZz3cVNj2yQJWESTnYQoa
- oJqZvE6RSi+iUUgGBwXbyrK3XWn76gVmerObUIrEbMhEq/rFkCMjfIdZ/rLr5fWWxUQfpFTaT
- 2+EwRKMoHdtNhbGVotmT0gDjwS2mtpWlN4B7l6egyUtfOJO3NDF8h9ZCkBEVcNggwXnzRGU
-Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 04:33:58
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200505081103.GC5759@linux.fritz.box>
+X-PGP-Key-ID: 0xD018682B
+X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pkrempa@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 03:48:16
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,90 +99,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- David Hildenbrand <david@redhat.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-block@nongnu.org, kchamart@redhat.com, libvir-list@redhat.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 04/05/2020 à 17:29, Philippe Mathieu-Daudé a écrit :
-> This is the first part of a series reducing user-mode
-> dependencies. By stripping out unused code, the build
-> and testing time is reduced (as is space used by objects).
-> 
-> Part 1 (generic):
-> - reduce user-mode object list
-> - remove some migration code from user-mode
-> - remove cpu_get_crash_info()
-> 
-> This series is fully reviewed.
-> 
-> Since v2:
-> - Rebased due to conflict when applying patch:
->   "util/Makefile: Reduce the user-mode object list"
->   because commit 01ef6b9e4e modified util/Makefile.objs:
->   "linux-user: factor out reading of /proc/self/maps"
-> 
-> Since v1:
-> - Addressed Laurent/Richard review comments
-> - Removed 'exec: Drop redundant #ifdeffery'
-> - Removed 'target: Restrict write_elfXX_note() handlers to system-mode'
-> 
-> $ git backport-diff -u v1 -r v2
-> Key:
-> [----] : patches are identical
-> [####] : number of functional differences between upstream/downstream patch
-> [down] : patch is downstream-only
-> The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-> 
-> 001/12:[----] [--] 'Makefile: Only build virtiofsd if system-mode is enabled'
-> 002/12:[----] [--] 'configure: Avoid building TCG when not needed'
-> 003/12:[----] [--] 'tests/Makefile: Only display TCG-related tests when TCG is available'
-> 004/12:[----] [--] 'tests/Makefile: Restrict some softmmu-only tests'
-> 005/12:[----] [-C] 'util/Makefile: Reduce the user-mode object list'
-> 006/12:[----] [--] 'stubs/Makefile: Reduce the user-mode object list'
-> 007/12:[----] [--] 'target/riscv/cpu: Restrict CPU migration to system-mode'
-> 008/12:[----] [--] 'exec: Assert CPU migration is not used on user-only build'
-> 009/12:[----] [--] 'arch_init: Remove unused 'qapi-commands-misc.h' include'
-> 010/12:[----] [--] 'target/i386: Restrict CpuClass::get_crash_info() to system-mode'
-> 011/12:[----] [--] 'target/s390x: Restrict CpuClass::get_crash_info() to system-mode'
-> 012/12:[----] [--] 'hw/core: Restrict CpuClass::get_crash_info() to system-mode'
-> 
-> Philippe Mathieu-Daudé (12):
->   Makefile: Only build virtiofsd if system-mode is enabled
->   configure: Avoid building TCG when not needed
->   tests/Makefile: Only display TCG-related tests when TCG is available
->   tests/Makefile: Restrict some softmmu-only tests
->   util/Makefile: Reduce the user-mode object list
->   stubs/Makefile: Reduce the user-mode object list
->   target/riscv/cpu: Restrict CPU migration to system-mode
->   exec: Assert CPU migration is not used on user-only build
->   arch_init: Remove unused 'qapi-commands-misc.h' include
->   target/i386: Restrict CpuClass::get_crash_info() to system-mode
->   target/s390x: Restrict CpuClass::get_crash_info() to system-mode
->   hw/core: Restrict CpuClass::get_crash_info() to system-mode
-> 
->  configure              |  4 +++
->  Makefile               |  2 +-
->  include/hw/core/cpu.h  |  7 ++++-
->  arch_init.c            |  1 -
->  exec.c                 |  4 ++-
->  hw/core/cpu.c          |  2 ++
->  target/i386/cpu.c      |  6 ++++-
->  target/riscv/cpu.c     |  6 +++--
->  target/s390x/cpu.c     | 12 ++++-----
->  stubs/Makefile.objs    | 52 +++++++++++++++++++++----------------
->  tests/Makefile.include | 18 +++++++------
->  util/Makefile.objs     | 59 +++++++++++++++++++++++++++---------------
->  12 files changed, 108 insertions(+), 65 deletions(-)
-> 
+On Tue, May 05, 2020 at 10:11:03 +0200, Kevin Wolf wrote:
+> Am 03.04.2020 um 19:58 hat Eric Blake geschrieben:
+> > Creating an image that requires format probing of the backing image is
+> > inherently unsafe (we've had several CVEs over the years based on
+> > probes leaking information to the guest on a subsequent boot, although
+> > these days tools like libvirt are aware of the issue enough to prevent
+> > the worst effects).  However, if our probing algorithm ever changes,
+> > or if other tools like libvirt determine a different probe result than
+> > we do, then subsequent use of that backing file under a different
+> > format will present corrupted data to the guest.  Start a deprecation
+> > clock so that future qemu-img can refuse to create unsafe backing
+> > chains that would rely on probing.  Most warnings are intentionally
+> > emitted from bdrv_img_create() in the block layer, but qemu-img
+> > convert uses bdrv_create() which cannot emit its own warning without
+> > causing spurious warnings on other code paths.  In the end, all
+> > command-line image creation or backing file rewriting now performs a
+> > check.
+> >=20
+> > However, there is one time where probing is safe: if we probe raw,
+> > then it is safe to record that implicitly in the image (but we still
+> > warn, as it's better to teach the user to supply -F always than to
+> > make them guess when it is safe).
+>=20
+> You're not stating it explicitly, but I guess the thing that you mean
+> that is actually unsafe is if you have a raw image, always pass
+> format=3Draw to QEMU (so the guest could write e.g. a qcow2 header), but
+> then create a backing file without -F, so it will be probed. This is as
+> bad as specifying format=3Draw only sometimes.
+>=20
+> I don't like the idea of responding to this by making raw images more
+> convenient to use than actual image formats.
+>=20
+> How about we approach it the other way around: The troublemaker is raw,
+> so let's require specifying raw explicitly, and record the probed format
+> implicitly in other cases. This is a bit weaker in the immediate effect
+> in that it doesn't protect you when you actually deal with a malicious
+> image, but in normal use it will point out where your scripts or
+> management software is too careless. The final result should be that
+> management tools are fixed and you'll be safe, while manual users who
+> can usually trust their guests aren't inconvenienced too much.
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Tested-by: Laurent Vivier <laurent@vivier.eu>
+That is definitely better than just probing. In my opinion though the
+format should always be specified explicitly. No favorism of 'raw' or
+any other format. In libvirt we fill-in that the format of the image is
+'raw' unless the user specifies something else rather than reporting an
+error. This causes continuous grief for users who forget to set the
+format. (one example is that if you create a fully-allocated qcow2 image
+but use it as raw and install your VM, you'll never notice until you
+want to use qcow2 features. Users usually notice once they try to create
+a sparse image though due to the size difference)
+
 
