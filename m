@@ -2,95 +2,105 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EE7AC47247
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:36:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D08E7C47254
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:36:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 580B2206A5
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:36:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9AF06206A5
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 13:36:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UJlbfFnR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 580B2206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b2UZ715w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AF06206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46510 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVxkE-00008X-CT
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 09:36:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46302)
+	id 1jVxkS-0000Yb-Qy
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 09:36:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48098)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jVxaO-0005vn-Ik
- for qemu-devel@nongnu.org; Tue, 05 May 2020 09:26:12 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54016)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jVxaN-000255-Rg
- for qemu-devel@nongnu.org; Tue, 05 May 2020 09:26:12 -0400
-Received: by mail-wm1-x341.google.com with SMTP id k12so2288658wmj.3
- for <qemu-devel@nongnu.org>; Tue, 05 May 2020 06:26:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=cGQyVlItBWg+QMCBMM+TrrsDfjaKkcl5GXGLKiX+zsQ=;
- b=UJlbfFnRKlo08E6WJSlA71vOjywdkQaq8JSMrcJFkLurvuD973FqV9NTTSz5Pfy1bB
- 4Zm7yZudlNVXRl/QprENSqpS4x0AbPD60mBuwQSLRtiYKtpz9IX4hFYgCAWg80bSJL3l
- lzNiYrc4o8gRF5v3twMs+GAqVH7RMDpn/KC4MkA+A7ICzhQSJmks5eriF8Yz5JxDdnv3
- QYGsWO7FXLRRfC+OqwvUFuwAqVtGVV4ESHPEWeVVUEvM6Yaio+7ZJxXYDWDEy8+JOloj
- KjtkSLQ3PfFBvpOFEl2M3JSR8qOX9jKK9/7etYtXKadYfGI0wq4fkQYtRPfkVpeEpmQC
- rG5g==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVxjj-00085u-Q9
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 09:35:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47354
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVxjh-0007jq-Pz
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 09:35:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588685748;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Brbl/pONNTPMqG5HzVWfa1oZmgTX6EypZh34q9IhqfI=;
+ b=b2UZ715wTnfNteligALSq77+W3lPBEe4HrxZA3RI0WYt9wPPZSFfMJf5fO4l7cO9EGRqof
+ gRaGFcwPZxlYVNScX4WSwiC/jIHGEgrpXhp2tbI8JKOxNmfUx2IWPWqJZu31OPtGwBQYZB
+ yxeykfZeDkwBxgVomNJEzGpAU2cWKFc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-249-oTIbYMCvPuCWttHNzR0RFg-1; Tue, 05 May 2020 09:35:47 -0400
+X-MC-Unique: oTIbYMCvPuCWttHNzR0RFg-1
+Received: by mail-wm1-f71.google.com with SMTP id 14so808387wmo.9
+ for <qemu-devel@nongnu.org>; Tue, 05 May 2020 06:35:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=cGQyVlItBWg+QMCBMM+TrrsDfjaKkcl5GXGLKiX+zsQ=;
- b=FYWqCeV/Cnot+sWWxL9Mc6nCYewK+h7rvOnR5l9b1tjX7F9xm54TPd+yABTFg4wtfa
- //XuSIgWgMJ66JVZMEY1RTbKJh+oMFsVwv/06JxrPv6LXN4tEZpSmKKvYtBbTx5zJkgc
- n0CTsSiMYesOZDEXAjgY7tvnFE0lnWKVYuVOGYlkdWGG7ODQ7c1U4sC65wLWsXMz8hoZ
- 3YpEIWEhOVM7MkoYO6FGdGYheIG3MNgk/09d96KHdZDq2oBd/pKoS7X4ESuSAslXnpbB
- AbobPcCXS7ssXlJlFVL42enivbzwbJ7ubduk/OXJmHUMUlxgE9PV79BFy+/UCSGw6Bhs
- 1kGw==
-X-Gm-Message-State: AGi0PubLO9riENjKbJoJ7IyhDoSzgw7M+qoHhQ/anxT8Qs/LoF/c2PN8
- BvUVM8NXDxMrjOE1eiugG2gLbILz
-X-Google-Smtp-Source: APiQypLJ/z+3NkSEkmxOy4PTp0XwOVusVsKCgTEjSFF/yKI03zb6t0HWCfth41qc8Mm86GY4ej/2ow==
-X-Received: by 2002:a7b:c104:: with SMTP id w4mr3495155wmi.8.1588685170316;
- Tue, 05 May 2020 06:26:10 -0700 (PDT)
-Received: from x1w.redhat.com (26.red-88-21-207.staticip.rima-tde.net.
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Brbl/pONNTPMqG5HzVWfa1oZmgTX6EypZh34q9IhqfI=;
+ b=LxC9icaEtEAlHqUUL++LfjQcqqmYFXUB8pbJZk2RE+6ThtcPg9KQJ6DLthmLz+flrS
+ rLmRNB06LOBXS74FPuFkdCbDTL7e6QY4kHiq2kXQxQTQfLS1qmsaJw6FMyOLGXrCe75t
+ w/jn4P37hZI/p3iqRhnrC+rY9+pvo2MmPAIZus33toBV2LOEqWHnj8FilTgOFhWdrADP
+ eBLPBQmXryGjzlxOn1unBETAhP/GFv5JVeZf5M8RQftrXbzmhetSAIp+lTyfv7evni4H
+ tMNlceP0iiJHnULwHas3iVk3fwVWJPUSZrviw4XFgyXsdNepa3JpL9p1rKxMJjoD4O6A
+ U5sA==
+X-Gm-Message-State: AGi0PuZ349lmE7G77fOIRMPtqRHsqeOGyQmGP11VDecGZOvXP63b8e/4
+ FVBYGJy9FqOHAzaKpldyAushmGUfTcAsN+1E2MHSN3DhnzTwqwWQ4OzlUa/AqDdilWd/mbe1iT7
+ fiiP4ud94vY3TcQM=
+X-Received: by 2002:adf:ea83:: with SMTP id s3mr3808049wrm.264.1588685745917; 
+ Tue, 05 May 2020 06:35:45 -0700 (PDT)
+X-Google-Smtp-Source: APiQypL4u1Wx2eQw7jCu8HAC0dHnA83ohnR4uxkK+bIWTVKSxjz1YyXnyc+tvDk5v4SucNdN37dGqA==
+X-Received: by 2002:adf:ea83:: with SMTP id s3mr3808012wrm.264.1588685745686; 
+ Tue, 05 May 2020 06:35:45 -0700 (PDT)
+Received: from [192.168.1.38] (26.red-88-21-207.staticip.rima-tde.net.
  [88.21.207.26])
- by smtp.gmail.com with ESMTPSA id n6sm3427424wrs.81.2020.05.05.06.26.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 05 May 2020 06:26:09 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 4/7] audio: Split advance() helper as in() and out()
-Date: Tue,  5 May 2020 15:26:00 +0200
-Message-Id: <20200505132603.8575-5-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200505132603.8575-1-f4bug@amsat.org>
-References: <20200505132603.8575-1-f4bug@amsat.org>
+ by smtp.gmail.com with ESMTPSA id 89sm3501681wrj.37.2020.05.05.06.35.44
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 05 May 2020 06:35:44 -0700 (PDT)
+Subject: Re: [PATCH v4 07/13] acpi: move aml builder code for parallel device
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20200505113843.22012-1-kraxel@redhat.com>
+ <20200505113843.22012-8-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <97cd8a76-c6b8-92b6-86ae-b29d05635751@redhat.com>
+Date: Tue, 5 May 2020 15:35:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200505113843.22012-8-kraxel@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,107 +113,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- =?UTF-8?q?Volker=20R=C3=BCmelin?= <vr_qemu@t-online.de>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=20Zolt=C3=A1n?= <DirtY.iCE.hu@gmail.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When the buffer is to be filled, rename as advance_in().
-When the buffer is already filled, use advance_out().
+Hi Gerd,
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- audio/audio_int.h | 8 +++++++-
- audio/alsaaudio.c | 4 ++--
- audio/audio.c     | 2 +-
- audio/ossaudio.c  | 4 ++--
- 4 files changed, 12 insertions(+), 6 deletions(-)
+On 5/5/20 1:38 PM, Gerd Hoffmann wrote:
+> Also adds support for multiple LPT devices.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>   hw/char/parallel.c   | 32 ++++++++++++++++++++++++++++++++
+>   hw/i386/acpi-build.c | 23 -----------------------
+>   2 files changed, 32 insertions(+), 23 deletions(-)
+> 
+> diff --git a/hw/char/parallel.c b/hw/char/parallel.c
+> index 8dd67d13759b..bc6b55b3b910 100644
+> --- a/hw/char/parallel.c
+> +++ b/hw/char/parallel.c
+> @@ -28,6 +28,7 @@
+>   #include "qemu/module.h"
+>   #include "chardev/char-parallel.h"
+>   #include "chardev/char-fe.h"
+> +#include "hw/acpi/aml-build.h"
+>   #include "hw/irq.h"
+>   #include "hw/isa/isa.h"
+>   #include "hw/qdev-properties.h"
+> @@ -568,6 +569,35 @@ static void parallel_isa_realizefn(DeviceState *dev, Error **errp)
+>                                s, "parallel");
+>   }
+>   
+> +static void parallel_isa_build_aml(ISADevice *isadev, Aml *scope)
+> +{
+> +    ISAParallelState *isa = ISA_PARALLEL(isadev);
+> +    int i, uid = 0;
+> +    Aml *dev;
+> +    Aml *crs;
+> +
+> +    for (i = 0; i < ARRAY_SIZE(isa_parallel_io); i++) {
+> +        if (isa->iobase == isa_parallel_io[i]) {
+> +            uid = i + 1;
 
-diff --git a/audio/audio_int.h b/audio/audio_int.h
-index fb6947c435..62829de4e8 100644
---- a/audio/audio_int.h
-+++ b/audio/audio_int.h
-@@ -255,12 +255,18 @@ static inline size_t audio_ring_dist(size_t dst, size_t src, size_t len)
-     return (dst >= src) ? (dst - src) : (len - src + dst);
- }
- 
--static inline void *advance(void *p, int incr)
-+static inline void *advance_in(void *p, int incr)
- {
-     uint8_t *d = p;
-     return d + incr;
- }
- 
-+static inline const void *advance_out(const void *p, int incr)
-+{
-+    const uint8_t *d = p;
-+    return d + incr;
-+}
-+
- #define dolog(fmt, ...) AUD_log(AUDIO_CAP, fmt, ## __VA_ARGS__)
- 
- #ifdef DEBUG
-diff --git a/audio/alsaaudio.c b/audio/alsaaudio.c
-index a8e62542f9..a32db8ff39 100644
---- a/audio/alsaaudio.c
-+++ b/audio/alsaaudio.c
-@@ -615,7 +615,7 @@ static size_t alsa_write(HWVoiceOut *hw, void *buf, size_t len)
-     size_t len_frames = len / hw->info.bytes_per_frame;
- 
-     while (len_frames) {
--        char *src = advance(buf, pos);
-+        const char *src = advance_out(buf, pos);
-         snd_pcm_sframes_t written;
- 
-         written = snd_pcm_writei(alsa->handle, src, len_frames);
-@@ -809,7 +809,7 @@ static size_t alsa_read(HWVoiceIn *hw, void *buf, size_t len)
-     size_t pos = 0;
- 
-     while (len) {
--        void *dst = advance(buf, pos);
-+        void *dst = advance_in(buf, pos);
-         snd_pcm_sframes_t nread;
- 
-         nread = snd_pcm_readi(
-diff --git a/audio/audio.c b/audio/audio.c
-index 7a9e680355..c75455bbb5 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -571,7 +571,7 @@ static void audio_pcm_hw_clip_out(HWVoiceOut *hw, void *pcm_buf, size_t len)
- 
-     while (len) {
-         st_sample *src = hw->mix_buf->samples + pos;
--        uint8_t *dst = advance(pcm_buf, clipped * hw->info.bytes_per_frame);
-+        uint8_t *dst = advance_in(pcm_buf, clipped * hw->info.bytes_per_frame);
-         size_t samples_till_end_of_buf = hw->mix_buf->size - pos;
-         size_t samples_to_clip = MIN(len, samples_till_end_of_buf);
- 
-diff --git a/audio/ossaudio.c b/audio/ossaudio.c
-index f88d076ec2..7778138df5 100644
---- a/audio/ossaudio.c
-+++ b/audio/ossaudio.c
-@@ -439,7 +439,7 @@ static size_t oss_write(HWVoiceOut *hw, void *buf, size_t len)
-     pos = 0;
-     while (len) {
-         ssize_t bytes_written;
--        void *pcm = advance(buf, pos);
-+        const void *pcm = advance_out(buf, pos);
- 
-         bytes_written = write(oss->fd, pcm, len);
-         if (bytes_written < 0) {
-@@ -678,7 +678,7 @@ static size_t oss_read(HWVoiceIn *hw, void *buf, size_t len)
-     while (len) {
-         ssize_t nread;
- 
--        void *dst = advance(buf, pos);
-+        void *dst = advance_in(buf, pos);
-         nread = read(oss->fd, dst, len);
- 
-         if (nread == -1) {
--- 
-2.21.3
+I'm not sure about this check, as we can create a ISA device setting 
+manually index & iobase. What about using simply "uid = isa->index + 1" 
+instead?
+
+> +        }
+> +    }
+> +    if (!uid) {
+> +        return;
+> +    }
+> +
+> +    crs = aml_resource_template();
+> +    aml_append(crs, aml_io(AML_DECODE16, isa->iobase, isa->iobase, 0x08, 0x08));
+> +    aml_append(crs, aml_irq_no_flags(isa->isairq));
+> +
+> +    dev = aml_device("LPT%d", uid);
+> +    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0400")));
+> +    aml_append(dev, aml_name_decl("_UID", aml_int(uid)));
+> +    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
+> +    aml_append(dev, aml_name_decl("_CRS", crs));
+> +
+> +    aml_append(scope, dev);
+> +}
+> +
+>   /* Memory mapped interface */
+>   static uint64_t parallel_mm_readfn(void *opaque, hwaddr addr, unsigned size)
+>   {
+> @@ -624,9 +654,11 @@ static Property parallel_isa_properties[] = {
+>   static void parallel_isa_class_initfn(ObjectClass *klass, void *data)
+>   {
+>       DeviceClass *dc = DEVICE_CLASS(klass);
+> +    ISADeviceClass *isa = ISA_DEVICE_CLASS(klass);
+>   
+>       dc->realize = parallel_isa_realizefn;
+>       dc->vmsd = &vmstate_parallel_isa;
+> +    isa->build_aml = parallel_isa_build_aml;
+>       device_class_set_props(dc, parallel_isa_properties);
+>       set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+>   }
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 2188a2b99d18..443db94deb5b 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -1173,28 +1173,6 @@ static Aml *build_mouse_device_aml(void)
+>       return dev;
+>   }
+>   
+> -static void build_lpt_device_aml(Aml *scope)
+> -{
+> -    Aml *dev;
+> -    Aml *crs;
+> -
+> -    if (!memory_region_present(get_system_io(), 0x0378)) {
+> -        return;
+> -    }
+> -
+> -    dev = aml_device("LPT");
+> -    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0400")));
+> -
+> -    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
+> -
+> -    crs = aml_resource_template();
+> -    aml_append(crs, aml_io(AML_DECODE16, 0x0378, 0x0378, 0x08, 0x08));
+> -    aml_append(crs, aml_irq_no_flags(7));
+> -    aml_append(dev, aml_name_decl("_CRS", crs));
+> -
+> -    aml_append(scope, dev);
+> -}
+> -
+>   static void build_isa_devices_aml(Aml *table)
+>   {
+>       ISADevice *fdc = pc_find_fdc0();
+> @@ -1208,7 +1186,6 @@ static void build_isa_devices_aml(Aml *table)
+>       if (fdc) {
+>           aml_append(scope, build_fdc_device_aml(fdc));
+>       }
+> -    build_lpt_device_aml(scope);
+>   
+>       if (ambiguous) {
+>           error_report("Multiple ISA busses, unable to define IPMI ACPI data");
+> 
 
 
