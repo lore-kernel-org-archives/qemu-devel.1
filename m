@@ -2,78 +2,76 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A760FC47247
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 11:39:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16499C47254
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 11:40:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F47320735
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 11:39:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CED2620735
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 11:40:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WX93NGHg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F47320735
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q1pYda3w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CED2620735
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVvvW-0006xg-GA
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 07:39:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47974)
+	id 1jVvvn-0007FM-RU
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 07:40:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47980)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jVvue-0005Ut-9c
- for qemu-devel@nongnu.org; Tue, 05 May 2020 07:39:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30960
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jVvuf-0005VB-35
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 07:39:01 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:23079
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jVvud-0002xF-DR
- for qemu-devel@nongnu.org; Tue, 05 May 2020 07:38:59 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jVvuc-0002xA-Mk
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 07:39:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588678738;
+ s=mimecast20190719; t=1588678737;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6IqETt5z2n1+qLMRm5mlFsd1YfiZHlEhtghPUBdf5oo=;
- b=WX93NGHgQE8xyYT+scpCd3qTIVh8d2NzM5LU1jpYZvsO2VPdZLl6APBXAb5UepitEsu6M4
- /c2dLS4AhmI0hqgOmCNkEuhb8iTWv2X/iTQAcksOguI3PWVF8mp3PTEfkFH1tnXovqOFvE
- BU0Drxt5l1bgjHkM7cCz+08Pn7ni3zQ=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=xYQubRLaeBIkXfV3lDNiOMXW1hs8NbE+0dBEIHKrFOQ=;
+ b=Q1pYda3wc/NYYdK0vp/lHXCPg3M7oVcFARVVwlBicTzUefQ/w3V+POSiaRu6NBPNZgLmBJ
+ ha3N54/tvCjpQqoh+9A62B6sN+1+7Knsuf/OMAYLlw0wS42P7QFrCdlFwBX0TTvsjU0b0B
+ eL3bsL7CZ9TLDIpTyYKqluqDjkPxSTs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-66-rdSuyNGOOs-HRIUaCiXNxQ-1; Tue, 05 May 2020 07:38:56 -0400
-X-MC-Unique: rdSuyNGOOs-HRIUaCiXNxQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-39-TFh-KY12N7eYNTtiSxNHJQ-1; Tue, 05 May 2020 07:38:56 -0400
+X-MC-Unique: TFh-KY12N7eYNTtiSxNHJQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB13B107B7C3;
- Tue,  5 May 2020 11:38:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1F5D1B18BC0;
+ Tue,  5 May 2020 11:38:54 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-113-193.ams2.redhat.com
  [10.36.113.193])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 573B95D785;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B425F600F5;
  Tue,  5 May 2020 11:38:45 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id AD3DE17516; Tue,  5 May 2020 13:38:43 +0200 (CEST)
+ id 913FE17510; Tue,  5 May 2020 13:38:43 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 02/13] acpi: move aml builder code for rtc device
-Date: Tue,  5 May 2020 13:38:32 +0200
-Message-Id: <20200505113843.22012-3-kraxel@redhat.com>
-In-Reply-To: <20200505113843.22012-1-kraxel@redhat.com>
-References: <20200505113843.22012-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Subject: [PATCH v4 00/13] acpi: i386 tweaks
+Date: Tue,  5 May 2020 13:38:30 +0200
+Message-Id: <20200505113843.22012-1-kraxel@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 03:48:16
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -105,97 +103,59 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/i386/acpi-build.c | 17 -----------------
- hw/rtc/mc146818rtc.c | 22 ++++++++++++++++++++++
- 2 files changed, 22 insertions(+), 17 deletions(-)
+First batch of microvm patches, some generic acpi stuff.
+Split the acpi-build.c monster, specifically split the
+pc and q35 and pci bits into a separate file which we
+can skip building at some point in the future.
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 2e15f6848e7e..0bfa2dd23fcc 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -1137,22 +1137,6 @@ static Aml *build_fdc_device_aml(ISADevice *fdc)
-     return dev;
- }
-=20
--static Aml *build_rtc_device_aml(void)
--{
--    Aml *dev;
--    Aml *crs;
--
--    dev =3D aml_device("RTC");
--    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0B00")));
--    crs =3D aml_resource_template();
--    aml_append(crs, aml_io(AML_DECODE16, 0x0070, 0x0070, 0x10, 0x02));
--    aml_append(crs, aml_irq_no_flags(8));
--    aml_append(crs, aml_io(AML_DECODE16, 0x0072, 0x0072, 0x02, 0x06));
--    aml_append(dev, aml_name_decl("_CRS", crs));
--
--    return dev;
--}
--
- static Aml *build_kbd_device_aml(void)
- {
-     Aml *dev;
-@@ -1278,7 +1262,6 @@ static void build_isa_devices_aml(Aml *table)
-     Aml *scope =3D aml_scope("_SB.PCI0.ISA");
-     Object *obj =3D object_resolve_path_type("", TYPE_ISA_BUS, &ambiguous)=
-;
-=20
--    aml_append(scope, build_rtc_device_aml());
-     aml_append(scope, build_kbd_device_aml());
-     aml_append(scope, build_mouse_device_aml());
-     if (fdc) {
-diff --git a/hw/rtc/mc146818rtc.c b/hw/rtc/mc146818rtc.c
-index d18c09911be2..2104e0aa3b14 100644
---- a/hw/rtc/mc146818rtc.c
-+++ b/hw/rtc/mc146818rtc.c
-@@ -27,6 +27,7 @@
- #include "qemu/cutils.h"
- #include "qemu/module.h"
- #include "qemu/bcd.h"
-+#include "hw/acpi/aml-build.h"
- #include "hw/irq.h"
- #include "hw/qdev-properties.h"
- #include "qemu/timer.h"
-@@ -1007,13 +1008,34 @@ static void rtc_resetdev(DeviceState *d)
-     }
- }
-=20
-+static void rtc_build_aml(ISADevice *isadev, Aml *scope)
-+{
-+    Aml *dev;
-+    Aml *crs;
-+
-+    crs =3D aml_resource_template();
-+    aml_append(crs, aml_io(AML_DECODE16, RTC_ISA_BASE, RTC_ISA_BASE,
-+                           0x10, 0x02));
-+    aml_append(crs, aml_irq_no_flags(RTC_ISA_IRQ));
-+    aml_append(crs, aml_io(AML_DECODE16, RTC_ISA_BASE + 2, RTC_ISA_BASE + =
-2,
-+                           0x02, 0x06));
-+
-+    dev =3D aml_device("RTC");
-+    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0B00")));
-+    aml_append(dev, aml_name_decl("_CRS", crs));
-+
-+    aml_append(scope, dev);
-+}
-+
- static void rtc_class_initfn(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    ISADeviceClass *isa =3D ISA_DEVICE_CLASS(klass);
-=20
-     dc->realize =3D rtc_realizefn;
-     dc->reset =3D rtc_resetdev;
-     dc->vmsd =3D &vmstate_rtc;
-+    isa->build_aml =3D rtc_build_aml;
-     device_class_set_props(dc, mc146818rtc_properties);
- }
-=20
---=20
+v2 changes: leave acpi-build.c largely as-is, move useful
+bits to other places to allow them being reused, specifically:
+
+ * move isa device generator functions to individual isa devices.
+ * move fw_cfg generator function to fw_cfg.c
+
+v3 changes: fix rtc, support multiple lpt devices.
+
+v4 changes:
+ * drop merged patches.
+ * split rtc crs change to separata patch.
+ * added two cleanup patches.
+ * picked up ack & review tags.
+
+take care,
+  Gerd
+
+Gerd Hoffmann (13):
+  qtest: allow DSDT acpi table changes
+  acpi: move aml builder code for rtc device
+  acpi: rtc: use a single crs range
+  acpi: serial: don't use _STA method
+  acpi: move aml builder code for serial device
+  acpi: parallel: don't use _STA method
+  acpi: move aml builder code for parallel device
+  acpi: move aml builder code for floppy device
+  acpi: move aml builder code for i8042 (kbd+mouse) device
+  acpi: factor out fw_cfg_add_acpi_dsdt()
+  acpi: simplify build_isa_devices_aml()
+  acpi: drop serial/parallel enable bits from dsdt
+  floppy: make isa_fdc_get_drive_max_chs static
+
+ hw/i386/fw_cfg.h                            |   1 +
+ include/hw/block/fdc.h                      |   2 -
+ tests/qtest/bios-tables-test-allowed-diff.h |  17 ++
+ hw/block/fdc.c                              |  87 +++++-
+ hw/char/parallel.c                          |  32 +++
+ hw/char/serial-isa.c                        |  32 +++
+ hw/i386/acpi-build.c                        | 285 +-------------------
+ hw/i386/fw_cfg.c                            |  28 ++
+ hw/input/pckbd.c                            |  31 +++
+ hw/rtc/mc146818rtc.c                        |  20 ++
+ stubs/cmos.c                                |   7 +
+ stubs/Makefile.objs                         |   1 +
+ 12 files changed, 260 insertions(+), 283 deletions(-)
+ create mode 100644 stubs/cmos.c
+
+-- 
 2.18.4
 
 
