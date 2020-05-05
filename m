@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42342C47247
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 11:42:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 003FEC47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 11:42:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D88520735
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 11:42:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BF89F20735
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 11:42:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IDgMqRCf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D88520735
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UXTMa0Ma"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF89F20735
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVvxl-0002IM-4Y
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 07:42:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48030)
+	id 1jVvxx-0002tE-VX
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 07:42:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48016)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jVvuk-0005hA-Cm
- for qemu-devel@nongnu.org; Tue, 05 May 2020 07:39:06 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44991
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jVvui-0005cU-GO
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 07:39:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57348
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jVvuj-00030N-LQ
- for qemu-devel@nongnu.org; Tue, 05 May 2020 07:39:06 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jVvuh-000303-Qg
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 07:39:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588678744;
+ s=mimecast20190719; t=1588678743;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PQWu/fHvSZB1LtdFtXK6TuQ1En7hTTdw+2Muuo+23rM=;
- b=IDgMqRCfEkRfBD7UuTimvJWDsijwciiCnWKcFZ+j3JyYqElYbL7bkb9m2G9OuS4/Kdpovr
- mP1iwlWR2QJpP5s837pSB10SmjzfxkKYfxY8xnfi00Kd2+YvMWMkGhUEvKLu2nuXtPdO6p
- 9mID+dKHQTS4pnA+yNKz+iqwNaj7EzM=
+ bh=jkt6DMP7Cu56UuKfuu6ojOeNGRo3I3g7NWXz+3XeDUs=;
+ b=UXTMa0MaCUT8IP1MMfZwoh/+1uje2drsRZEqdb2tRbpiYX1Vwd+T0TzePeFmEl2efqZ9kn
+ zjPTM7FsV7I7j3kNQg8qY3wvnaRtAIreOOQMz75X9BreweyTLjfyp1HgP+P5N7xsuh1AVb
+ bwwiw9CGUrQlJvBl7ooUx0A7yxwEc2w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-342-aHJLe2V2MoObt18LRqxpMw-1; Tue, 05 May 2020 07:39:01 -0400
-X-MC-Unique: aHJLe2V2MoObt18LRqxpMw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-457-QdryxUodO1-d7A1J1YYRTQ-1; Tue, 05 May 2020 07:38:57 -0400
+X-MC-Unique: QdryxUodO1-d7A1J1YYRTQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB0478014D7;
- Tue,  5 May 2020 11:38:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E360462;
+ Tue,  5 May 2020 11:38:56 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-113-193.ams2.redhat.com
  [10.36.113.193])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D185C5D9D3;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 768C71002387;
  Tue,  5 May 2020 11:38:45 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id B5DD517532; Tue,  5 May 2020 13:38:43 +0200 (CEST)
+ id 990A317511; Tue,  5 May 2020 13:38:43 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 03/13] acpi: rtc: use a single crs range
-Date: Tue,  5 May 2020 13:38:33 +0200
-Message-Id: <20200505113843.22012-4-kraxel@redhat.com>
+Subject: [PATCH v4 01/13] qtest: allow DSDT acpi table changes
+Date: Tue,  5 May 2020 13:38:31 +0200
+Message-Id: <20200505113843.22012-2-kraxel@redhat.com>
 In-Reply-To: <20200505113843.22012-1-kraxel@redhat.com>
 References: <20200505113843.22012-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -105,32 +105,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use a single io range for _CRS instead of two,
-following what real hardware does.
-
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/rtc/mc146818rtc.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ tests/qtest/bios-tables-test-allowed-diff.h | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/hw/rtc/mc146818rtc.c b/hw/rtc/mc146818rtc.c
-index 2104e0aa3b14..47fafcfb7c1d 100644
---- a/hw/rtc/mc146818rtc.c
-+++ b/hw/rtc/mc146818rtc.c
-@@ -1015,10 +1015,8 @@ static void rtc_build_aml(ISADevice *isadev, Aml *sc=
-ope)
-=20
-     crs =3D aml_resource_template();
-     aml_append(crs, aml_io(AML_DECODE16, RTC_ISA_BASE, RTC_ISA_BASE,
--                           0x10, 0x02));
-+                           0x10, 0x08));
-     aml_append(crs, aml_irq_no_flags(RTC_ISA_IRQ));
--    aml_append(crs, aml_io(AML_DECODE16, RTC_ISA_BASE + 2, RTC_ISA_BASE + =
-2,
--                           0x02, 0x06));
-=20
-     dev =3D aml_device("RTC");
-     aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0B00")));
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios=
+-tables-test-allowed-diff.h
+index dfb8523c8bf4..6a052c50447a 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1 +1,18 @@
+ /* List of comma-separated changed AML files to ignore */
++"tests/data/acpi/pc/DSDT",
++"tests/data/acpi/pc/DSDT.acpihmat",
++"tests/data/acpi/pc/DSDT.bridge",
++"tests/data/acpi/pc/DSDT.cphp",
++"tests/data/acpi/pc/DSDT.dimmpxm",
++"tests/data/acpi/pc/DSDT.ipmikcs",
++"tests/data/acpi/pc/DSDT.memhp",
++"tests/data/acpi/pc/DSDT.numamem",
++"tests/data/acpi/q35/DSDT",
++"tests/data/acpi/q35/DSDT.acpihmat",
++"tests/data/acpi/q35/DSDT.bridge",
++"tests/data/acpi/q35/DSDT.cphp",
++"tests/data/acpi/q35/DSDT.dimmpxm",
++"tests/data/acpi/q35/DSDT.ipmibt",
++"tests/data/acpi/q35/DSDT.memhp",
++"tests/data/acpi/q35/DSDT.mmio64",
++"tests/data/acpi/q35/DSDT.numamem",
 --=20
 2.18.4
 
