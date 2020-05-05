@@ -2,87 +2,105 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05EEEC47254
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:39:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FDCBC47254
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:39:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDB28206A5
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:39:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EDD85206A5
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 10:39:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qENpLMHL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDB28206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="diOMH/Oc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDD85206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVuym-0002u7-Ty
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 06:39:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35960)
+	id 1jVuzJ-0003nW-5v
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 06:39:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35782)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jVuxu-0002M0-0d
- for qemu-devel@nongnu.org; Tue, 05 May 2020 06:38:18 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:43885)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jVuxs-0003XW-Sj
- for qemu-devel@nongnu.org; Tue, 05 May 2020 06:38:17 -0400
-Received: by mail-ot1-x344.google.com with SMTP id g14so1193675otg.10
- for <qemu-devel@nongnu.org>; Tue, 05 May 2020 03:38:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=6Wf2JDkyu1epQNIJRFfISHKG+COWmGo22KN/bX6e+n8=;
- b=qENpLMHLa+WJNx7P5SrxGrb/HCYKWCHiTnSxOVUlRJepAkAZrjy4USZdpvElXsK011
- mSCKHALFvTJsmC21V0Dovb/zxNdO9IGw6dv2R+dI7RmIrx65AfYe/R2ZMrG6D0VYuBgn
- iTftdd4iRVevOhq1YP+e/G4ECrx4a1Lt/6KyQN8bL3UvcAGFhr147wuG8nJUxOygyfKy
- AVaSsdyqfneCNpxfq2duM0chtcgeKqLrB8DYXwHDa1dt7z56yL3nCfogNKStpTMQIffP
- sAYcp8L1pFagIFULWs5dtSX8Q9asClT8edNBY8onMT85lyTbvsGLu8PDrXRzok3yhAeG
- iKpw==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVuxV-0002EN-UU
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 06:37:53 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56654
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jVuxT-00034b-Ti
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 06:37:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588675070;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=bSx/kWL/ZVRgKsCRK30Dcu0oHdGGzbVXKC1CW2hhbg8=;
+ b=diOMH/OcB0uHSc6mXjeFhHmk1zl2nWNa3WPj7F1YXaTwSsZSu+fM37HGZ6tk45NZBDqHhJ
+ 7aWoHiFW4gW+nbvV+Nmrdl3CEQzcwCEcZ4VASQOjK2wc1Xk0A+EqVmJTwuw34witfu6amI
+ s0dOy3y+pAY4BTWxFpDW0ktWHqZ67AY=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-354-vsDUe76LN8aeOPWfXNCd3A-1; Tue, 05 May 2020 06:37:48 -0400
+X-MC-Unique: vsDUe76LN8aeOPWfXNCd3A-1
+Received: by mail-wm1-f71.google.com with SMTP id t62so872878wma.0
+ for <qemu-devel@nongnu.org>; Tue, 05 May 2020 03:37:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=6Wf2JDkyu1epQNIJRFfISHKG+COWmGo22KN/bX6e+n8=;
- b=tEOVTrkGjGb7p861LTRkM6K6fgGSdDFROF1lElC7YMzCaq8nerB+GfkMewOgYKaOeI
- wpKW3EBjWWbuUdWL96DKPY6LsiYfsozxITiCrQlS/T2ka55NqtDHA8lAMDNTKJ3QfDHj
- VsI67xJ9gp8Aycn1bUwzyV/LImgRhPc545AkMETdythRLj453hmbsbXMgkLvk2Xgg/5F
- MrgsVZ8dflDXwfYe+udAdhQTty4RiBIt1H488K+srlkQzugKg2lxQR9jLkSfsEr+OZzw
- 6eAOheEBe5hAzrrb4PaWSA6ZfY15H0ScP/x6V+HxGkHhoQavXrtlSgF+gnoneDihxcfD
- w9WQ==
-X-Gm-Message-State: AGi0PublR62bmhwN2a/H9hsgREPpUrUBnvgWiH102IMIzyjgqR0+Ek5A
- 4lM2L+Jwrd9On9S+4RmPkpJ2OQrtCduUsr1NCzxfNA==
-X-Google-Smtp-Source: APiQypLySE8IvXRCRE3SSeJ6uGDlOzEOj5Wa9G8vCpc3k61jWPBgCZm8uIOf6bxC9IbpV0moxRU+7pDwfv284PQ20ak=
-X-Received: by 2002:a05:6830:1e4e:: with SMTP id
- e14mr1611838otj.91.1588675094805; 
- Tue, 05 May 2020 03:38:14 -0700 (PDT)
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=NCIQxRJF4U66WeF1XU5kIVorK2Nc5LlUu3obB8tWSJg=;
+ b=Jj9JRfz5hMdaqUd6baFN5ODZB3Z9qrJxvl5l2y8eQwEzHUHuL0QqJLNs7IlBtn5v9z
+ hY/ACqgf7b+vPzmzdKI9MaO89g9DO7yyrGJy6/8duLz4U5TMolsgYuP9j83w5sjXxwLl
+ nhq9agcAGnugAemjiXBmECo/eKdhZvKivXsZ2VCzVK5Gp5fanwrImJAeQlesEWlMaO5B
+ UYf5gVffoddJ1iwMWWVTkdkOe8zj5Kq12HEAp5gOEqrZOf8PI3/t0VRqz5OmhWP5fXMx
+ ykCcK86b2OFjGKDThzEoHpNdFk9J89ZPh6nOoVoOc9eq3v05GF/d7D6USsKShJAxvPX4
+ mYjQ==
+X-Gm-Message-State: AGi0PubBFq0m3G/8kTWCHeWfpH8qmwuOjMWt7lx/4uJfwxEB97z988G4
+ ZnG+MA9TZa8Fj63CYEazOV4FkxgpjwJ8mwTgYNpg1ujtoheMObDby+1kwu3Dz/laZaNUn6+XQI4
+ 8D7rmxnHUZXE+LWE=
+X-Received: by 2002:a1c:9cc6:: with SMTP id f189mr2536425wme.75.1588675066938; 
+ Tue, 05 May 2020 03:37:46 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJhjitJOs9HIhpcyBYPb7ncPWWNVtSojIy70TGwBhi/5EXAtftBkU9lq/0IvF7H3UhLyNx1ag==
+X-Received: by 2002:a1c:9cc6:: with SMTP id f189mr2536406wme.75.1588675066709; 
+ Tue, 05 May 2020 03:37:46 -0700 (PDT)
+Received: from [192.168.1.38] (26.red-88-21-207.staticip.rima-tde.net.
+ [88.21.207.26])
+ by smtp.gmail.com with ESMTPSA id g6sm2610474wrw.34.2020.05.05.03.37.45
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 05 May 2020 03:37:45 -0700 (PDT)
+Subject: Re: [PATCH v2 04/10] tests/migration: Tighten error checking
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200505101908.6207-1-armbru@redhat.com>
+ <20200505101908.6207-5-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <fa61ef20-1e34-5560-32ef-dd6226211cb8@redhat.com>
+Date: Tue, 5 May 2020 12:37:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200502224503.2282-1-richard.henderson@linaro.org>
-In-Reply-To: <20200502224503.2282-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 5 May 2020 11:38:03 +0100
-Message-ID: <CAFEAcA-fbQwjU3_UuorV3q-k9exr9f_uqO_YSP7aggsm=oP=wg@mail.gmail.com>
-Subject: Re: [PATCH v2 00/15] target/arm: partial vector cleanup
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200505101908.6207-5-armbru@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,46 +113,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 2 May 2020 at 23:45, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> This is not complete, but shows the direction I'd like to go.
->
-> It may well help what Peter is doing with the neon decodetree
-> conversion.  It may be helpful to apply before the conversion
-> in order to reduce the number of special cases.  As may
-> continuing with the cleanup; I'll probably work on that more
-> next week.
->
-> Version 2 extracts more bits from my sve2 branch.  There's
-> still more to pull back, especially for crypto_helper.c, where
-> there are also tail clearing bugs to fix.
+On 5/5/20 12:19 PM, Markus Armbruster wrote:
+> migrate_get_socket_address() neglects to check
+> visit_type_SocketAddressList() failure.  This smells like a leak, but
+> it actually will crash dereferencing @addrs.  Pass &error_abort to
+> remove the code smell.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   tests/qtest/migration-test.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-test.c
+> index 2568c9529c..dc3490c9fa 100644
+> --- a/tests/qtest/migration-test.c
+> +++ b/tests/qtest/migration-test.c
+> @@ -13,6 +13,7 @@
+>   #include "qemu/osdep.h"
+>  =20
+>   #include "libqtest.h"
+> +#include "qapi/error.h"
+>   #include "qapi/qmp/qdict.h"
+>   #include "qemu/module.h"
+>   #include "qemu/option.h"
+> @@ -301,7 +302,6 @@ static char *migrate_get_socket_address(QTestState *w=
+ho, const char *parameter)
+>   {
+>       QDict *rsp;
+>       char *result;
+> -    Error *local_err =3D NULL;
+>       SocketAddressList *addrs;
+>       Visitor *iv =3D NULL;
+>       QObject *object;
+> @@ -310,7 +310,7 @@ static char *migrate_get_socket_address(QTestState *w=
+ho, const char *parameter)
+>       object =3D qdict_get(rsp, parameter);
+>  =20
+>       iv =3D qobject_input_visitor_new(object);
+> -    visit_type_SocketAddressList(iv, NULL, &addrs, &local_err);
+> +    visit_type_SocketAddressList(iv, NULL, &addrs, &error_abort);
+>       visit_free(iv);
+>  =20
+>       /* we are only using a single address */
+>=20
 
-This doesn't apply on master any more as a result of the
-first lump of decodetree stuff going in. Also patch 2
-doesn't seem to compile:
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-/home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/translate.c: In
-function =E2=80=98gen_gvec_srshr=E2=80=99:
-/home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/translate.c:4107:9:
-error: implicit declaration of function =E2=80=98tcg_gen_gvec_dup_imm=E2=80=
-=99; did
-you mean =E2=80=98tcg_gen_gvec_dup_i64=E2=80=99?
-[-Werror=3Dimplicit-function-declaration]
-         tcg_gen_gvec_dup_imm(vece, rd_ofs, opr_sz, max_sz, 0);
-         ^~~~~~~~~~~~~~~~~~~~
-         tcg_gen_gvec_dup_i64
-/home/petmay01/linaro/qemu-from-laptop/qemu/target/arm/translate.c:4107:9:
-error: nested extern declaration of =E2=80=98tcg_gen_gvec_dup_imm=E2=80=99
-[-Werror=3Dnested-externs]
-
-Any chance you could do a rebase and resend?
-
-thanks
--- PMM
 
