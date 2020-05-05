@@ -2,87 +2,70 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C8EFC47247
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 09:17:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80D04C47247
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 09:17:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18C04206B8
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 09:17:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 47086206B8
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 09:17:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NRLWCuA4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18C04206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="L70PHBju"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47086206B8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVthm-00008z-76
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 05:17:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44994)
+	id 1jVthy-0000c8-FV
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 05:17:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45034)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jVtgo-0007Uw-K7
- for qemu-devel@nongnu.org; Tue, 05 May 2020 05:16:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49678
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jVtgn-0002G2-4D
- for qemu-devel@nongnu.org; Tue, 05 May 2020 05:16:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588670192;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=x7YHxfw7LTK4O3G+OqEHk6Sk2KF4Rk7nNhf/Wk3Oapo=;
- b=NRLWCuA4lduEJTwjOkPmbgrpJ6Znwgq1l3rtPlw+XmScOEc9N+r6XMMRgdFPGD05pxXc5M
- b2kcVoXMlr3FnqF7wrZQPyPtaYOyq+WRmGEMwyqbLtKdUlzjOh2/uzVD/rfjzjWfSfvvTA
- 1koOyaAtmHde8LTb38CKB20xhqv20OY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-70-7Wzza1D9OXyO6hV84h34GQ-1; Tue, 05 May 2020 05:16:28 -0400
-X-MC-Unique: 7Wzza1D9OXyO6hV84h34GQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7E1184638F;
- Tue,  5 May 2020 09:16:27 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-112-11.ams2.redhat.com [10.36.112.11])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 94A135D9D3;
- Tue,  5 May 2020 09:16:25 +0000 (UTC)
-Date: Tue, 5 May 2020 11:16:24 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Alberto Garcia <berto@igalia.com>
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1jVth1-0007l6-Ec; Tue, 05 May 2020 05:16:47 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:47756)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1jVtgz-0002L9-Cy; Tue, 05 May 2020 05:16:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=OJ9QUH5erwhAaGS8241h5qZu1gDOQSLXDgNz561Lh3g=; 
+ b=L70PHBjufhWhovPlITiZff3n+wHo0eSCd7wTV7U69Q/pGYdnimO2E700rb98WqqWQvEHhpAFQM1Y9+JPB+v+8rFfeiFTVgCMurP8nAt9Zs9zet9nGpUfP4gHaYuWoBXhKfzeMesPeI0g8MxQCFK+qQ1osFDQWl62QgZJiwgntwdaRnicmr5HBOeMI9il9A0uQniZznYL40Ha7Wc1cY0KEly3dUiu0qoUGSMK47sQIsogr0l3euTSPc6e/5B4z9mgCikk2Hvft2LBZ+svFH0EO99eYEWMsej36hHl7VJk41veyYXqYrEGd1JRA/0Af//nDRmnhGfMHM//EveO8D3aZw==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1jVtgu-0005Mc-Hc; Tue, 05 May 2020 11:16:40 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1jVtgu-0001wk-88; Tue, 05 May 2020 11:16:40 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Kevin Wolf <kwolf@redhat.com>
 Subject: Re: [PATCH v3] qcow2: Avoid integer wraparound in qcow2_co_truncate()
-Message-ID: <20200505091624.GE5759@linux.fritz.box>
+In-Reply-To: <20200505085412.GD5759@linux.fritz.box>
 References: <20200504155217.10325-1-berto@igalia.com>
  <6fefd4af-3687-7f38-3933-aa67f2f221e8@redhat.com>
  <w51368fiq7k.fsf@maestria.local.igalia.com>
  <20200505085412.GD5759@linux.fritz.box>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Tue, 05 May 2020 11:16:40 +0200
+Message-ID: <w514ksuvj0n.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20200505085412.GD5759@linux.fritz.box>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 03:48:16
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Content-Type: text/plain
+Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
+ helo=fanzine.igalia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 03:23:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,48 +83,26 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 05.05.2020 um 10:54 hat Kevin Wolf geschrieben:
-> Am 04.05.2020 um 19:07 hat Alberto Garcia geschrieben:
-> > On Mon 04 May 2020 06:01:19 PM CEST, Eric Blake wrote:
-> > >> +_supported_fmt qcow2
-> > >> +_supported_proto file
-> > >
-> > > Do we have to limit it to qcow2 and file?  Yes, it's testing a bugfix
-> > > for qcow2, but are there other formats that it doesn't hurt to have
-> > > the extra testing?
-> >=20
-> > It doesn't work with any other format at the moment (meaning: reading
-> > the tail of the image after growing it returns the data from the backin=
-g
-> > file).
-> >=20
-> > Also, it seems that qemu-img's -F does not work with other formats
-> > either.
-> >=20
-> > > Also, I don't see anything preventing this from working with non-file
-> > > protocol.
-> >=20
-> > Right, that can be updated I guess (whoever commits this, feel free to
-> > do it).
->=20
-> I don't know for which protocols it works. I know that qcow2 over nbd
-> doesn't work.
->=20
-> But I think there is a more important problem with the test: It seems to
-> pass even with old binaries that don't have the fix. Is this only on my
-> system or do you get the same?
+On Tue 05 May 2020 10:54:12 AM CEST, Kevin Wolf wrote:
+> But I think there is a more important problem with the test: It seems
+> to pass even with old binaries that don't have the fix. Is this only
+> on my system or do you get the same?
 
-Ah, I do get the overflow in the calculation of the length for
-qcow2_cluster_zeroize(), but size_to_clusters() inside the function
-overflows back the other direction, so this ends up with
-nb_clusters =3D 0 and we don't do anything bad.
+With old binaries when qcow2_cluster_zeroize() is called it receives
+bytes = (UINT64_MAX - 9216), however that number is then used to
+calculate the number of affected clusters, so it's rounded up, wraps
+around again and back to zero. There's no visible sign of the error, it
+just happens to work fine.
 
-We could probably trigger a bad case with data_file_raw=3Don, but then we
-don't have a backing file, so nothing sets BDRV_REQ_ZERO_WRITE.
+If there was a raw data file then we would try to write UINT64_MAX-9216
+bytes to it, but in this case there's no backing file allowed and
+therefore the image is not zeroed, so qcow2_cluster_zeroize() never
+happens.
 
-So I guess the bug isn't even really testable, but we just add the test
-in case something else in the same scenario breaks?
+Why the test case then? There was a mistake with my first patch and
+there it crashed (due to an assertion), that's why Eric thought it would
+be a good idea to add a test case anyway, in case we have to change that
+code in the future and we screw up.
 
-Kevin
-
+Berto
 
