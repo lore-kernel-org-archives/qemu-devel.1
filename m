@@ -2,88 +2,71 @@ Return-Path: <SRS0=1jZz=6T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9468DC47247
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 09:20:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68904C4725A
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 09:25:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DFCF206B9
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 09:20:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cdrkYEQO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DFCF206B9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3E054206CC
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 May 2020 09:25:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E054206CC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jVtkO-000388-GM
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 05:20:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45600)
+	id 1jVtpZ-0004x6-E4
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 05:25:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46802)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jVtjp-0002cH-5p
- for qemu-devel@nongnu.org; Tue, 05 May 2020 05:19:41 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25717
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jVtot-0004HU-Gm; Tue, 05 May 2020 05:24:55 -0400
+Resent-Date: Tue, 05 May 2020 05:24:55 -0400
+Resent-Message-Id: <E1jVtot-0004HU-Gm@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21328)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jVtjo-0004fv-HU
- for qemu-devel@nongnu.org; Tue, 05 May 2020 05:19:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588670379;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=U4vhjQF4ENmA/SSW0P31nwlQjBbQBmUz5xTfSxmUKKc=;
- b=cdrkYEQORbtI8ja3FPVQvbaXm81fSjOuyhaGTX6a5omMFR5Cj2mDV+KduIlhJW8LNCeksK
- oc39HTxbE5q52ZrRTmHonRTaYWBScRG1R+fh8oMtlt20FjdvE/kYz0RjaoMPaT6vZ4ppG0
- 59FmbvczQk7SS/4Oi6uhhrICgAVMApc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-168-MU8S34XjO0mpPn9434En9g-1; Tue, 05 May 2020 05:19:36 -0400
-X-MC-Unique: MU8S34XjO0mpPn9434En9g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3AF081054F92;
- Tue,  5 May 2020 09:19:35 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-112-11.ams2.redhat.com [10.36.112.11])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1589D5C1B2;
- Tue,  5 May 2020 09:19:33 +0000 (UTC)
-Date: Tue, 5 May 2020 11:19:32 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Alberto Garcia <berto@igalia.com>
-Subject: Re: [PATCH v3] qcow2: Avoid integer wraparound in qcow2_co_truncate()
-Message-ID: <20200505091927.GF5759@linux.fritz.box>
-References: <20200504155217.10325-1-berto@igalia.com>
- <6fefd4af-3687-7f38-3933-aa67f2f221e8@redhat.com>
- <w51368fiq7k.fsf@maestria.local.igalia.com>
- <20200505085412.GD5759@linux.fritz.box>
- <w514ksuvj0n.fsf@maestria.local.igalia.com>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jVtoq-0001SA-Bb; Tue, 05 May 2020 05:24:55 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1588670681; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=Wm2uQQQkvPn1rzPCGz3mKaYrvG0V5x3v+g8odMGQ5zeY+o97wEl3p71LoY6tYrHXh7p3SIIx1ogSAzaf9bOAcSTVio3bjPydWwPc5tJUdpS0jmCT/x5nghudXjeMLbDEokED+rPfCB22O7G76d5H+f8PO91hx4c7cOwuhyFaxBY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1588670681;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=M2+qVBI994rvijMPurSNQ1iK1Lt+3BChHqLJI5frr0I=; 
+ b=BCweWcbPOa6gR29IHGpV226yAOyomgaeOfK5QOdqlpx7KhQm7Y+5G8lM79vF/CRKlMbzfiGkF9fnpQgnWoJPHRFwj9Xk8g96SGi0CkNoENkd0IwdXLigHNOBnamu4hf74OG/+NtfBZ2LtKEiUeFtZdroTds5qFkpo16nZ6Qo4Cg=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1588670678982549.4287905633315;
+ Tue, 5 May 2020 02:24:38 -0700 (PDT)
+Message-ID: <158867067770.24779.1984605556267794794@45ef0f9c86ae>
+In-Reply-To: <20200504142125.31180-1-edgar.iglesias@gmail.com>
+Subject: Re: [PATCH v2 0/1] target/arm: Remove access_el3_aa32ns()
 MIME-Version: 1.0
-In-Reply-To: <w514ksuvj0n.fsf@maestria.local.igalia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 00:37:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: edgar.iglesias@gmail.com
+Date: Tue, 5 May 2020 02:24:38 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 04:16:46
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,35 +79,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org,
+ richard.henderson@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ laurent.desnogues@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 05.05.2020 um 11:16 hat Alberto Garcia geschrieben:
-> On Tue 05 May 2020 10:54:12 AM CEST, Kevin Wolf wrote:
-> > But I think there is a more important problem with the test: It seems
-> > to pass even with old binaries that don't have the fix. Is this only
-> > on my system or do you get the same?
->=20
-> With old binaries when qcow2_cluster_zeroize() is called it receives
-> bytes =3D (UINT64_MAX - 9216), however that number is then used to
-> calculate the number of affected clusters, so it's rounded up, wraps
-> around again and back to zero. There's no visible sign of the error, it
-> just happens to work fine.
->=20
-> If there was a raw data file then we would try to write UINT64_MAX-9216
-> bytes to it, but in this case there's no backing file allowed and
-> therefore the image is not zeroed, so qcow2_cluster_zeroize() never
-> happens.
->=20
-> Why the test case then? There was a mistake with my first patch and
-> there it crashed (due to an assertion), that's why Eric thought it would
-> be a good idea to add a test case anyway, in case we have to change that
-> code in the future and we screw up.
-
-Thanks for the explanation, this makes sense. I'll apply the patch now.
-
-Kevin
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUwNDE0MjEyNS4zMTE4
+MC0xLWVkZ2FyLmlnbGVzaWFzQGdtYWlsLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
+byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
+b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAyMDA1MDQxNDIxMjUuMzExODAtMS1lZGdh
+ci5pZ2xlc2lhc0BnbWFpbC5jb20KU3ViamVjdDogW1BBVENIIHYyIDAvMV0gdGFyZ2V0L2FybTog
+UmVtb3ZlIGFjY2Vzc19lbDNfYWEzMm5zKCkKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQg
+QkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBl
+eGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGht
+IGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0g
+VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
+NDRiZDg4ODcxMzM4NApmYXRhbDogdW5hYmxlIHRvIHdyaXRlIG5ldyBpbmRleCBmaWxlCndhcm5p
+bmc6IENsb25lIHN1Y2NlZWRlZCwgYnV0IGNoZWNrb3V0IGZhaWxlZC4KWW91IGNhbiBpbnNwZWN0
+IHdoYXQgd2FzIGNoZWNrZWQgb3V0IHdpdGggJ2dpdCBzdGF0dXMnCmFuZCByZXRyeSB0aGUgY2hl
+Y2tvdXQgd2l0aCAnZ2l0IGNoZWNrb3V0IC1mIEhFQUQnCgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50
+IGNhbGwgbGFzdCk6CiAgRmlsZSAicGF0Y2hldy10ZXN0ZXIvc3JjL3BhdGNoZXctY2xpIiwgbGlu
+ZSA1MjEsIGluIHRlc3Rfb25lCiAgICBnaXRfY2xvbmVfcmVwbyhjbG9uZSwgclsicmVwbyJdLCBy
+WyJoZWFkIl0sIGxvZ2YsIFRydWUpCiAgRmlsZSAicGF0Y2hldy10ZXN0ZXIvc3JjL3BhdGNoZXct
+Y2xpIiwgbGluZSA1MywgaW4gZ2l0X2Nsb25lX3JlcG8KICAgIHN1YnByb2Nlc3MuY2hlY2tfY2Fs
+bChjbG9uZV9jbWQsIHN0ZGVycj1sb2dmLCBzdGRvdXQ9bG9nZikKICBGaWxlICIvb3B0L3JoL3Jo
+LXB5dGhvbjM2L3Jvb3QvdXNyL2xpYjY0L3B5dGhvbjMuNi9zdWJwcm9jZXNzLnB5IiwgbGluZSAy
+OTEsIGluIGNoZWNrX2NhbGwKICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBj
+bWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ2dpdCcsICdjbG9u
+ZScsICctcScsICcvaG9tZS9wYXRjaGV3Ly5jYWNoZS9wYXRjaGV3LWdpdC1jYWNoZS9odHRwc2dp
+dGh1YmNvbXBhdGNoZXdwcm9qZWN0cWVtdS0zYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
+ODg4NzEzMzg0JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1qdHM3ZTM1ai9zcmMnXScg
+cmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMTI4LgoKCgpUaGUgZnVsbCBsb2cgaXMgYXZh
+aWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNTA0MTQyMTI1LjMxMTgwLTEt
+ZWRnYXIuaWdsZXNpYXNAZ21haWwuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdl
+LgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9w
+YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
+cmVkaGF0LmNvbQ==
 
