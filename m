@@ -2,101 +2,96 @@ Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 286C6C28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 11:51:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55673C28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 11:54:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E86572073A
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 11:51:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 16A5C20714
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 11:54:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DFTZsFZB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E86572073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HUrFj1Rw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16A5C20714
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWIaA-0000zm-Ut
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 07:51:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52654)
+	id 1jWIcx-0002G1-5Q
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 07:54:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53014)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jWIZY-0000Rt-8U
- for qemu-devel@nongnu.org; Wed, 06 May 2020 07:50:44 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40323
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jWIZX-0007Fv-Ac
- for qemu-devel@nongnu.org; Wed, 06 May 2020 07:50:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588765842;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Bifi6yeK19cuHiLsQuyg60oMZR/70MpbLi1jZ+gxDcA=;
- b=DFTZsFZBGKvSxyzkhK2ud+j3Fm89NKxlMQrjAL58RVC0j6xDVa/fpKKnaqFuiDGkt8/kSK
- i7zV18r2WEIhX5QcCsDp6qWiOER3HzgUuyhkCuwHoSkVfooXFwLy36GMCludrFkHc64kr+
- UI3sgUMAVNFunwLuUlwaMDS6vZKi0j4=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-224-fzHrhiXmOhS4EOcJbqnBsg-1; Wed, 06 May 2020 07:50:38 -0400
-X-MC-Unique: fzHrhiXmOhS4EOcJbqnBsg-1
-Received: by mail-wm1-f72.google.com with SMTP id g142so251180wme.6
- for <qemu-devel@nongnu.org>; Wed, 06 May 2020 04:50:38 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jWIcM-0001go-MV; Wed, 06 May 2020 07:53:38 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:33629)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jWIcL-0000K1-LE; Wed, 06 May 2020 07:53:38 -0400
+Received: by mail-wm1-x341.google.com with SMTP id v8so4780993wma.0;
+ Wed, 06 May 2020 04:53:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=6nDHGv+x5MzSN6e9HqFTFoJna3eWFNJxWNsVHYYVHFU=;
+ b=HUrFj1RwdtBYDSZipP9vM/t+HJUNqFhCVPyyGhjV/1Eq0XimbJaqSVbBhVfZt4KsdK
+ BU7ao9UrTFbyHN5sGYJkPMW959ehMQmji/xkkHZInCMEWNcsJEb1ZHVoRRYjOz3VWOdw
+ GVurB2j2WblgF33TTlCuD+pnVIz/tXy3opZFftpkq5cIeg70NHDl+zsqfCkH6V9hG8jM
+ iSWfDDggF4KOhG2FK2DGYQXtP6euEFWkih2i1EfvwELFY/C0aE1Q862k88Tu7qHupgrn
+ kh7xqSwDcQUZ3FdYca/D2aUM9P6dwf0pc62jZaCBsxyoaShBzVwQ/lroC4VynvEJ9m+M
+ USuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=wLoOvk5UJ/3sAEMFGuPtx1Zers9oxiSdGGAYaHPTRJ0=;
- b=AbFeqVOuZfqUnsujwpoxP/AMR3oBqjYpblFQngQjeW5wuAvAm4R179RIHCdINJGmIC
- NeIYPF5JttKa2p+ABBYSWBSX461zY3EKqKoK6q6xBSKY7JpKqC2isFUEbUOouOPKUee5
- It1MJb+b5plJLc8DFakE3iLJMXnJgIuZ2ftlLGMQPwHztsD8K7C3wntQipflxHFZA73j
- EfSdFLmVvSNHsIlaMezO7AKPQtXR2V+LxzyUDFdBDXb39/5mbD/lsHhZA5sv5J7M8SQA
- mrObj5CG6/Jy5eAz5qaMlY8+2UpOkg3eHhRbVxWjp1KLvmKoPHLp4gnizG8DMBwfTe2X
- P1jQ==
-X-Gm-Message-State: AGi0PuZBQPuFZz9UGxFsVwV3NKJzqkXstIzI4eIObyeRqXVKToraVChv
- WQzP0nD9Ow6zNP/GSogNJkh7S9b2rOUG4DpPaMbzrwYpji7ix7eM36VpmlRiJnnS0ITcSqPl4jV
- 3HQGrTseA11Z0Uzg=
-X-Received: by 2002:a7b:c399:: with SMTP id s25mr3845463wmj.169.1588765837262; 
- Wed, 06 May 2020 04:50:37 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLxSnxJZLfUdeNLQ+jxAWtQmVqIxMu++ICSJsAwB1SnIrOElZc9MgKVryRszzU8fxkvWAB2Hw==
-X-Received: by 2002:a7b:c399:: with SMTP id s25mr3845441wmj.169.1588765837010; 
- Wed, 06 May 2020 04:50:37 -0700 (PDT)
-Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
- by smtp.gmail.com with ESMTPSA id
- n7sm2602185wmd.11.2020.05.06.04.50.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 06 May 2020 04:50:36 -0700 (PDT)
-Date: Wed, 6 May 2020 07:50:33 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH v2 00/13] microvm: add acpi support
-Message-ID: <20200506074939-mutt-send-email-mst@kernel.org>
-References: <20200505134305.22666-1-kraxel@redhat.com>
- <20200505100010-mutt-send-email-mst@kernel.org>
- <20200506114635.b5msujuhhbim2kdv@sirius.home.kraxel.org>
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=6nDHGv+x5MzSN6e9HqFTFoJna3eWFNJxWNsVHYYVHFU=;
+ b=VgIZ/RTQ4Rhi25sad+McWarsGYXDO9Y0+iz++ep6dBuwSUAwQd5lj9NrP3XMpMBOBC
+ nWOwi9O1L+1MBuPX43p3/4nI1exsYbWt28csWX+5gdxzdo6YJ8f6YQba0cUr0TmytktC
+ JMD9LPo2ol4oh+Nv8YivCdvk00RnecRHkk0/qTjT80ftUJop/r+Txn38ifgKlfjK8sfQ
+ SPse3O1lbLOTa2UEZln1fsq2EXot/7JWRgoR+d5OUfIbJLQaajDFDRgy+K16W0z5YkYd
+ Kcyv8zEDDQqYH8zzGIip+0YbSrB0kZ2rwOLJ8yVH5Jkl4fpE5ow2LN/CJef+jJC23PUW
+ dZ6g==
+X-Gm-Message-State: AGi0PubcfTdYm1EBDx4H/1Ap/8HerKxNJJQE08O3xz2kEitiviBkwUK1
+ cA2wxgmoe6D71HNURdE8g8g=
+X-Google-Smtp-Source: APiQypIAAnunLua9rcyZ7yrXJpgDdDIkwMD30R6yQAszv1+FvAG2FtSMQEPQ+r2VYyf55XMkKwEVQQ==
+X-Received: by 2002:a1c:f20f:: with SMTP id s15mr3790147wmc.114.1588766015201; 
+ Wed, 06 May 2020 04:53:35 -0700 (PDT)
+Received: from [192.168.1.37] (26.red-88-21-207.staticip.rima-tde.net.
+ [88.21.207.26])
+ by smtp.gmail.com with ESMTPSA id p8sm2373376wre.11.2020.05.06.04.53.33
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 06 May 2020 04:53:34 -0700 (PDT)
+Subject: Re: [PATCH v2 5/9] hw/core: stream: Add an end-of-packet flag
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
+References: <20200506082513.18751-1-edgar.iglesias@gmail.com>
+ <20200506082513.18751-6-edgar.iglesias@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c7f6947d-7815-8df3-6835-3fe933ad4dbc@amsat.org>
+Date: Wed, 6 May 2020 13:53:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200506114635.b5msujuhhbim2kdv@sirius.home.kraxel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 05:50:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200506082513.18751-6-edgar.iglesias@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,110 +104,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: damien.hedde@greensocs.com, peter.maydell@linaro.org,
+ sstabellini@kernel.org, edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
+ frasse.iglesias@gmail.com, jasowang@redhat.com, alistair@alistair23.me,
+ frederic.konrad@adacore.com, qemu-arm@nongnu.org, figlesia@xilinx.com,
+ luc.michel@greensocs.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, May 06, 2020 at 01:46:35PM +0200, Gerd Hoffmann wrote:
-> On Tue, May 05, 2020 at 10:04:02AM -0400, Michael S. Tsirkin wrote:
-> > On Tue, May 05, 2020 at 03:42:52PM +0200, Gerd Hoffmann wrote:
-> > > I know that not supporting ACPI in microvm is intentional.  If you st=
-ill
-> > > don't want ACPI this is perfectly fine, you can use the usual -no-acp=
-i
-> > > switch to toggle ACPI support.
-> > >=20
-> > > These are the advantages you are going to loose then:
-> > >=20
-> > >   (1) virtio-mmio device discovery without command line hacks (tweaki=
-ng
-> > >       the command line is a problem when not using direct kernel boot=
-).
-> > >   (2) Better IO-APIC support, we can use IRQ lines 16-23.
-> > >   (3) ACPI power button (aka powerdown request) works.
-> > >   (4) machine poweroff (aka S5 state) works.
-> >=20
-> > Questions
-> >=20
-> > - what's the tradeoff in startup time?
->=20
-> In the noise.  0.28-0.29 seconds on my hardware to the "i8042: PNP: No
-> PS/2 controller found" message, no matter whenever acpi is on or off.
-> With "quiet" (acpi prints more and logging to the serial console is
-> slow).
->=20
-> At that point -no-acpi takes one second to figure the ps2 controller
-> really isn't there (as discussed before).
->=20
-> Another interesting difference is interrupt handling.
->=20
-> The -no-acpi version:
->=20
->            CPU0      =20
->   2:          0    XT-PIC      cascade
->   4:        284   IO-APIC   4-edge      ttyS0
->   8:          0   IO-APIC   8-edge      rtc0
->  14:       5399   IO-APIC  14-edge      virtio1
->  15:         58   IO-APIC  15-edge      virtio0
-> NMI:          0   Non-maskable interrupts
-> [ ... ]
->=20
-> The acpi version:
->=20
->            CPU0      =20
->   1:          0   IO-APIC   9-edge      ACPI:Ged
->   2:        231   IO-APIC  23-fasteoi   virtio0
->   3:       6291   IO-APIC  22-fasteoi   virtio1
->   4:       1758   IO-APIC   4-edge      ttyS0
->   5:          0   IO-APIC   8-edge      rtc0
-> NMI:          0   Non-maskable interrupts
-> [ ... ]
->=20
-> > - what should be the default?
->=20
-> IMO it makes sense to enable it by default.  You get working
-> power management.  You can boot stock cloud images (patched
-> seabios parses the dsdt to find virtio-mmio devices to boot
-> from virtio-mmio disks).
->=20
-> It's easier to leave behind legacy stuff:  The kernel trusts the
-> firmware and doesn't go into "trying harder to find ps2 kbd" mode.
-> Also what is this "cascade" thing in /proc/interrupts above? [1]
->=20
-> I expect dropping the rtc is easier with acpi too, the kernel probably
-> wouldn't try to find it then.  Right now seabios needs rtc cmos for
-> ram size probing, so I didn't test that yet.
->=20
-> On the other hand I don't really see any disadvantages.  The tables are
-> small ...
->=20
-> # find /sys/firmware/acpi/tables/ -type f | xargs ls -l
-> -r--------. 1 root root  70 May  6 06:48 /sys/firmware/acpi/tables/APIC
-> -r--------. 1 root root 472 May  6 06:48 /sys/firmware/acpi/tables/DSDT
-> -r--------. 1 root root 268 May  6 06:48 /sys/firmware/acpi/tables/FACP
->=20
-> ... and simple (no methods) so you can hardly call that "bloat".
->=20
-> > Based on above I'd be inclined to say default should stay no acpi and
-> > users should enable acpi with an option.
->=20
-> I disagree, but I can live with off by default too.  We already have
-> acpi=3DOnOffAuto for X86MachineState, so it is just a matter of handling
-> microvm.acpi=3Dauto accordingly in x86_machine_is_acpi_enabled().
->=20
-> take care,
->   Gerd
->=20
-> [1] Rhetorical question, I know what it is. [2]
-> [2] I don't want remember though.
+Hi Edgar,
 
-Let's leave flipping the default as a separate patch, to be
-decided on merits after a bunch of people test with/without.
+On 5/6/20 10:25 AM, Edgar E. Iglesias wrote:
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> 
+> Some stream clients stream an endless stream of data while
+> other clients stream data in packets. Stream interfaces
+> usually have a way to signal the end of a packet or the
+> last beat of a transfer.
+> 
+> This adds an end-of-packet flag to the push interface.
+> 
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> ---
+>   include/hw/stream.h     |  5 +++--
+>   hw/core/stream.c        |  4 ++--
+>   hw/dma/xilinx_axidma.c  | 10 ++++++----
+>   hw/net/xilinx_axienet.c | 14 ++++++++++----
+>   hw/ssi/xilinx_spips.c   |  2 +-
+>   5 files changed, 22 insertions(+), 13 deletions(-)
+> 
+> diff --git a/include/hw/stream.h b/include/hw/stream.h
+> index d02f62ca89..ed09e83683 100644
+> --- a/include/hw/stream.h
+> +++ b/include/hw/stream.h
+> @@ -39,12 +39,13 @@ typedef struct StreamSlaveClass {
+>        * @obj: Stream slave to push to
+>        * @buf: Data to write
+>        * @len: Maximum number of bytes to write
+> +     * @eop: End of packet flag
+>        */
+> -    size_t (*push)(StreamSlave *obj, unsigned char *buf, size_t len);
+> +    size_t (*push)(StreamSlave *obj, unsigned char *buf, size_t len, bool eop);
 
---=20
-MST
+I'd split this patch, first add EOP in the push handler, keeping current 
+code working, then the following patches (implementing the feature in 
+the backend handlers), then ...
 
+>   } StreamSlaveClass;
+>   
+>   size_t
+> -stream_push(StreamSlave *sink, uint8_t *buf, size_t len);
+> +stream_push(StreamSlave *sink, uint8_t *buf, size_t len, bool eop);
+
+... this final patch, enable the feature and let the frontends use it.
+
+>   
+>   bool
+>   stream_can_push(StreamSlave *sink, StreamCanPushNotifyFn notify,
+> diff --git a/hw/core/stream.c b/hw/core/stream.c
+> index 39b1e595cd..a65ad1208d 100644
+> --- a/hw/core/stream.c
+> +++ b/hw/core/stream.c
+> @@ -3,11 +3,11 @@
+>   #include "qemu/module.h"
+>   
+>   size_t
+> -stream_push(StreamSlave *sink, uint8_t *buf, size_t len)
+> +stream_push(StreamSlave *sink, uint8_t *buf, size_t len, bool eop)
+>   {
+>       StreamSlaveClass *k =  STREAM_SLAVE_GET_CLASS(sink);
+>   
+> -    return k->push(sink, buf, len);
+> +    return k->push(sink, buf, len, eop);
+
+So in this first part patch I'd use 'false' here, and update by 'eop' in 
+the other part (last patch in series). Does it make sense?
+
+Regards,
+
+Phil.
+
+>   }
+>   
+>   bool
+> diff --git a/hw/dma/xilinx_axidma.c b/hw/dma/xilinx_axidma.c
+> index 4540051448..a770e12c96 100644
+> --- a/hw/dma/xilinx_axidma.c
+> +++ b/hw/dma/xilinx_axidma.c
+> @@ -283,7 +283,7 @@ static void stream_process_mem2s(struct Stream *s, StreamSlave *tx_data_dev,
+>   
+>           if (stream_desc_sof(&s->desc)) {
+>               s->pos = 0;
+> -            stream_push(tx_control_dev, s->desc.app, sizeof(s->desc.app));
+> +            stream_push(tx_control_dev, s->desc.app, sizeof(s->desc.app), true);
+>           }
+>   
+>           txlen = s->desc.control & SDESC_CTRL_LEN_MASK;
+> @@ -298,7 +298,7 @@ static void stream_process_mem2s(struct Stream *s, StreamSlave *tx_data_dev,
+>           s->pos += txlen;
+>   
+>           if (stream_desc_eof(&s->desc)) {
+> -            stream_push(tx_data_dev, s->txbuf, s->pos);
+> +            stream_push(tx_data_dev, s->txbuf, s->pos, true);
+>               s->pos = 0;
+>               stream_complete(s);
+>           }
+> @@ -384,7 +384,7 @@ static void xilinx_axidma_reset(DeviceState *dev)
+>   
+>   static size_t
+>   xilinx_axidma_control_stream_push(StreamSlave *obj, unsigned char *buf,
+> -                                  size_t len)
+> +                                  size_t len, bool eop)
+>   {
+>       XilinxAXIDMAStreamSlave *cs = XILINX_AXI_DMA_CONTROL_STREAM(obj);
+>       struct Stream *s = &cs->dma->streams[1];
+> @@ -416,12 +416,14 @@ xilinx_axidma_data_stream_can_push(StreamSlave *obj,
+>   }
+>   
+>   static size_t
+> -xilinx_axidma_data_stream_push(StreamSlave *obj, unsigned char *buf, size_t len)
+> +xilinx_axidma_data_stream_push(StreamSlave *obj, unsigned char *buf, size_t len,
+> +                               bool eop)
+>   {
+>       XilinxAXIDMAStreamSlave *ds = XILINX_AXI_DMA_DATA_STREAM(obj);
+>       struct Stream *s = &ds->dma->streams[1];
+>       size_t ret;
+>   
+> +    assert(eop);
+>       ret = stream_process_s2mem(s, buf, len);
+>       stream_update_irq(s);
+>       return ret;
+> diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
+> index c8dfcda3ee..bd48305577 100644
+> --- a/hw/net/xilinx_axienet.c
+> +++ b/hw/net/xilinx_axienet.c
+> @@ -697,14 +697,14 @@ static void axienet_eth_rx_notify(void *opaque)
+>                                              axienet_eth_rx_notify, s)) {
+>           size_t ret = stream_push(s->tx_control_dev,
+>                                    (void *)s->rxapp + CONTROL_PAYLOAD_SIZE
+> -                                 - s->rxappsize, s->rxappsize);
+> +                                 - s->rxappsize, s->rxappsize, true);
+>           s->rxappsize -= ret;
+>       }
+>   
+>       while (s->rxsize && stream_can_push(s->tx_data_dev,
+>                                           axienet_eth_rx_notify, s)) {
+>           size_t ret = stream_push(s->tx_data_dev, (void *)s->rxmem + s->rxpos,
+> -                                 s->rxsize);
+> +                                 s->rxsize, true);
+>           s->rxsize -= ret;
+>           s->rxpos += ret;
+>           if (!s->rxsize) {
+> @@ -874,12 +874,14 @@ static ssize_t eth_rx(NetClientState *nc, const uint8_t *buf, size_t size)
+>   }
+>   
+>   static size_t
+> -xilinx_axienet_control_stream_push(StreamSlave *obj, uint8_t *buf, size_t len)
+> +xilinx_axienet_control_stream_push(StreamSlave *obj, uint8_t *buf, size_t len,
+> +                                   bool eop)
+>   {
+>       int i;
+>       XilinxAXIEnetStreamSlave *cs = XILINX_AXI_ENET_CONTROL_STREAM(obj);
+>       XilinxAXIEnet *s = cs->enet;
+>   
+> +    assert(eop);
+>       if (len != CONTROL_PAYLOAD_SIZE) {
+>           hw_error("AXI Enet requires %d byte control stream payload\n",
+>                    (int)CONTROL_PAYLOAD_SIZE);
+> @@ -894,11 +896,15 @@ xilinx_axienet_control_stream_push(StreamSlave *obj, uint8_t *buf, size_t len)
+>   }
+>   
+>   static size_t
+> -xilinx_axienet_data_stream_push(StreamSlave *obj, uint8_t *buf, size_t size)
+> +xilinx_axienet_data_stream_push(StreamSlave *obj, uint8_t *buf, size_t size,
+> +                                bool eop)
+>   {
+>       XilinxAXIEnetStreamSlave *ds = XILINX_AXI_ENET_DATA_STREAM(obj);
+>       XilinxAXIEnet *s = ds->enet;
+>   
+> +    /* We don't support fragmented packets yet.  */
+> +    assert(eop);
+> +
+>       /* TX enable ?  */
+>       if (!(s->tc & TC_TX)) {
+>           return size;
+> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+> index c57850a505..4cfce882ab 100644
+> --- a/hw/ssi/xilinx_spips.c
+> +++ b/hw/ssi/xilinx_spips.c
+> @@ -868,7 +868,7 @@ static void xlnx_zynqmp_qspips_notify(void *opaque)
+>   
+>           memcpy(rq->dma_buf, rxd, num);
+>   
+> -        ret = stream_push(rq->dma, rq->dma_buf, num);
+> +        ret = stream_push(rq->dma, rq->dma_buf, num, false);
+>           assert(ret == num);
+>           xlnx_zynqmp_qspips_check_flush(rq);
+>       }
+> 
 
