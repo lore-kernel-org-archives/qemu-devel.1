@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=DATE_IN_FUTURE_06_12,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21A4CC28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 03:31:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 701B9C47256
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 03:31:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5ED02073B
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 03:31:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5ED02073B
+	by mail.kernel.org (Postfix) with ESMTPS id 46D2A2073B
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 03:31:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46D2A2073B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWAmR-000760-0v
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 23:31:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35176)
+	id 1jWAmT-0007AX-9U
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 23:31:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
- id 1jWAlR-0005fK-RZ
- for qemu-devel@nongnu.org; Tue, 05 May 2020 23:30:29 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:47866 helo=huawei.com)
+ id 1jWAlT-0005fY-82
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 23:30:31 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:47864 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
- id 1jWAlQ-0006ws-9G
- for qemu-devel@nongnu.org; Tue, 05 May 2020 23:30:29 -0400
+ id 1jWAlS-0006wo-5d
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 23:30:30 -0400
 Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id CAEFA667C04D7198064D;
+ by Forcepoint Email with ESMTP id C30DB8F4DD765A0971EB;
  Wed,  6 May 2020 11:30:15 +0800 (CST)
 Received: from opensource.huawei.com (10.175.104.212) by
  DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 6 May 2020 11:30:09 +0800
+ 14.3.487.0; Wed, 6 May 2020 11:30:08 +0800
 From: Pan Nengyuan <pannengyuan@huawei.com>
 To: <quintela@redhat.com>, <dgilbert@redhat.com>
-Subject: [PATCH 2/2] migration/multifd: Do error_free after migrate_set_error
- to avoid memleaks
-Date: Wed, 6 May 2020 05:54:16 -0400
-Message-ID: <20200506095416.26099-3-pannengyuan@huawei.com>
+Subject: [PATCH 1/2] migration/multifd: fix memleaks in
+ multifd_new_send_channel_async
+Date: Wed, 6 May 2020 05:54:15 -0400
+Message-ID: <20200506095416.26099-2-pannengyuan@huawei.com>
 X-Mailer: git-send-email 2.18.2
 In-Reply-To: <20200506095416.26099-1-pannengyuan@huawei.com>
 References: <20200506095416.26099-1-pannengyuan@huawei.com>
@@ -80,77 +80,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When error happen in multifd_send_thread, it use error_copy to set migrate error in
-multifd_send_terminate_threads(). We should call error_free after it.
-
-Similarly, fix another two places in multifd_recv_thread/multifd_save_cleanup.
+When error happen in multifd_new_send_channel_async, 'sioc' will not be used
+to create the multifd_send_thread. Let's free it to avoid a memleak. And also
+do error_free after migrate_set_error() to avoid another leak in the same place.
 
 The leak stack:
-Direct leak of 48 byte(s) in 1 object(s) allocated from:
-    #0 0x7f781af07cf0 in calloc (/lib64/libasan.so.5+0xefcf0)
-    #1 0x7f781a2ce22d in g_malloc0 (/lib64/libglib-2.0.so.0+0x5322d)
-    #2 0x55ee1d075c17 in error_setv /mnt/sdb/backup/qemu/util/error.c:61
-    #3 0x55ee1d076464 in error_setg_errno_internal /mnt/sdb/backup/qemu/util/error.c:109
-    #4 0x55ee1cef066e in qio_channel_socket_writev /mnt/sdb/backup/qemu/io/channel-socket.c:569
-    #5 0x55ee1cee806b in qio_channel_writev /mnt/sdb/backup/qemu/io/channel.c:207
-    #6 0x55ee1cee806b in qio_channel_writev_all /mnt/sdb/backup/qemu/io/channel.c:171
-    #7 0x55ee1cee8248 in qio_channel_write_all /mnt/sdb/backup/qemu/io/channel.c:257
-    #8 0x55ee1ca12c9a in multifd_send_thread /mnt/sdb/backup/qemu/migration/multifd.c:657
-    #9 0x55ee1d0607fc in qemu_thread_start /mnt/sdb/backup/qemu/util/qemu-thread-posix.c:519
-    #10 0x7f78159ae2dd in start_thread (/lib64/libpthread.so.0+0x82dd)
-    #11 0x7f78156df4b2 in __GI___clone (/lib64/libc.so.6+0xfc4b2)
+Direct leak of 2880 byte(s) in 8 object(s) allocated from:
+    #0 0x7f20b5118ae8 in __interceptor_malloc (/lib64/libasan.so.5+0xefae8)
+    #1 0x7f20b44df1d5 in g_malloc (/lib64/libglib-2.0.so.0+0x531d5)
+    #2 0x564133bce18b in object_new_with_type /mnt/sdb/backup/qemu/qom/object.c:683
+    #3 0x564133eea950 in qio_channel_socket_new /mnt/sdb/backup/qemu/io/channel-socket.c:56
+    #4 0x5641339cfe4f in socket_send_channel_create /mnt/sdb/backup/qemu/migration/socket.c:37
+    #5 0x564133a10328 in multifd_save_setup /mnt/sdb/backup/qemu/migration/multifd.c:772
+    #6 0x5641339cebed in migrate_fd_connect /mnt/sdb/backup/qemu/migration/migration.c:3530
+    #7 0x5641339d15e4 in migration_channel_connect /mnt/sdb/backup/qemu/migration/channel.c:92
+    #8 0x5641339cf5b7 in socket_outgoing_migration /mnt/sdb/backup/qemu/migration/socket.c:108
 
-Indirect leak of 52 byte(s) in 1 object(s) allocated from:
-    #0 0x7f781af07f28 in __interceptor_realloc (/lib64/libasan.so.5+0xeff28)
-    #1 0x7f78156f07d9 in __GI___vasprintf_chk (/lib64/libc.so.6+0x10d7d9)
-    #2 0x7f781a30ea6c in g_vasprintf (/lib64/libglib-2.0.so.0+0x93a6c)
-    #3 0x7f781a2e7cd0 in g_strdup_vprintf (/lib64/libglib-2.0.so.0+0x6ccd0)
-    #4 0x7f781a2e7d8c in g_strdup_printf (/lib64/libglib-2.0.so.0+0x6cd8c)
-    #5 0x55ee1d075c86 in error_setv /mnt/sdb/backup/qemu/util/error.c:65
-    #6 0x55ee1d076464 in error_setg_errno_internal /mnt/sdb/backup/qemu/util/error.c:109
-    #7 0x55ee1cef066e in qio_channel_socket_writev /mnt/sdb/backup/qemu/io/channel-socket.c:569
-    #8 0x55ee1cee806b in qio_channel_writev /mnt/sdb/backup/qemu/io/channel.c:207
-    #9 0x55ee1cee806b in qio_channel_writev_all /mnt/sdb/backup/qemu/io/channel.c:171
-    #10 0x55ee1cee8248 in qio_channel_write_all /mnt/sdb/backup/qemu/io/channel.c:257
-    #11 0x55ee1ca12c9a in multifd_send_thread /mnt/sdb/backup/qemu/migration/multifd.c:657
-    #12 0x55ee1d0607fc in qemu_thread_start /mnt/sdb/backup/qemu/util/qemu-thread-posix.c:519
-    #13 0x7f78159ae2dd in start_thread (/lib64/libpthread.so.0+0x82dd)
-    #14 0x7f78156df4b2 in __GI___clone (/lib64/libc.so.6+0xfc4b2)
+Direct leak of 384 byte(s) in 8 object(s) allocated from:
+    #0 0x7f20b5118cf0 in calloc (/lib64/libasan.so.5+0xefcf0)
+    #1 0x7f20b44df22d in g_malloc0 (/lib64/libglib-2.0.so.0+0x5322d)
+    #2 0x56413406fc17 in error_setv /mnt/sdb/backup/qemu/util/error.c:61
+    #3 0x564134070464 in error_setg_errno_internal /mnt/sdb/backup/qemu/util/error.c:109
+    #4 0x5641340851be in inet_connect_addr /mnt/sdb/backup/qemu/util/qemu-sockets.c:379
+    #5 0x5641340851be in inet_connect_saddr /mnt/sdb/backup/qemu/util/qemu-sockets.c:458
+    #6 0x5641340870ab in socket_connect /mnt/sdb/backup/qemu/util/qemu-sockets.c:1105
+    #7 0x564133eeaabf in qio_channel_socket_connect_sync /mnt/sdb/backup/qemu/io/channel-socket.c:145
+    #8 0x564133eeabf5 in qio_channel_socket_connect_worker /mnt/sdb/backup/qemu/io/channel-socket.c:168
+
+Indirect leak of 360 byte(s) in 8 object(s) allocated from:
+    #0 0x7f20b5118ae8 in __interceptor_malloc (/lib64/libasan.so.5+0xefae8)
+    #1 0x7f20af901817 in __GI___vasprintf_chk (/lib64/libc.so.6+0x10d817)
+    #2 0x7f20b451fa6c in g_vasprintf (/lib64/libglib-2.0.so.0+0x93a6c)
+    #3 0x7f20b44f8cd0 in g_strdup_vprintf (/lib64/libglib-2.0.so.0+0x6ccd0)
+    #4 0x7f20b44f8d8c in g_strdup_printf (/lib64/libglib-2.0.so.0+0x6cd8c)
+    #5 0x56413406fc86 in error_setv /mnt/sdb/backup/qemu/util/error.c:65
+    #6 0x564134070464 in error_setg_errno_internal /mnt/sdb/backup/qemu/util/error.c:109
+    #7 0x5641340851be in inet_connect_addr /mnt/sdb/backup/qemu/util/qemu-sockets.c:379
+    #8 0x5641340851be in inet_connect_saddr /mnt/sdb/backup/qemu/util/qemu-sockets.c:458
+    #9 0x5641340870ab in socket_connect /mnt/sdb/backup/qemu/util/qemu-sockets.c:1105
+    #10 0x564133eeaabf in qio_channel_socket_connect_sync /mnt/sdb/backup/qemu/io/channel-socket.c:145
+    #11 0x564133eeabf5 in qio_channel_socket_connect_worker /mnt/sdb/backup/qemu/io/channel-socket.c:168
 
 Reported-by: Euler Robot <euler.robot@huawei.com>
 Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
 ---
- migration/multifd.c | 3 +++
- 1 file changed, 3 insertions(+)
+ migration/multifd.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/migration/multifd.c b/migration/multifd.c
-index 197d59294a..35ae3180d2 100644
+index cb6a4a3ab8..197d59294a 100644
 --- a/migration/multifd.c
 +++ b/migration/multifd.c
-@@ -550,6 +550,7 @@ void multifd_save_cleanup(void)
-         multifd_send_state->ops->send_cleanup(p, &local_err);
-         if (local_err) {
-             migrate_set_error(migrate_get_current(), local_err);
-+            error_free(local_err);
-         }
-     }
-     qemu_sem_destroy(&multifd_send_state->channels_ready);
-@@ -688,6 +689,7 @@ out:
-     if (local_err) {
-         trace_multifd_send_error(p->id);
-         multifd_send_terminate_threads(local_err);
+@@ -727,6 +727,8 @@ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
+          * its status.
+          */
+         p->quit = true;
++        object_unref(OBJECT(sioc));
 +        error_free(local_err);
-     }
- 
-     /*
-@@ -965,6 +967,7 @@ static void *multifd_recv_thread(void *opaque)
- 
-     if (local_err) {
-         multifd_recv_terminate_threads(local_err);
-+        error_free(local_err);
-     }
-     qemu_mutex_lock(&p->mutex);
-     p->running = false;
+     } else {
+         p->c = QIO_CHANNEL(sioc);
+         qio_channel_set_delay(p->c, false);
 -- 
 2.18.2
 
