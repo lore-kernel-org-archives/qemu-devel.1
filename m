@@ -2,88 +2,95 @@ Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4D8AC38A24
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:42:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A029C38A24
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:43:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E03C20752
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:42:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1913F206D5
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:43:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i+L6ils2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E03C20752
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CNnD6LMK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1913F206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWJNx-0004vt-KZ
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 08:42:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34036)
+	id 1jWJOd-00067F-As
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 08:43:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34110)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jWJNE-00040d-E6
- for qemu-devel@nongnu.org; Wed, 06 May 2020 08:42:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32665
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jWJND-0007vR-KE
- for qemu-devel@nongnu.org; Wed, 06 May 2020 08:42:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588768923;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=b+aumLI5ASUJTiZpYbaRAhuuAnmXcwT0juGSF4WTVN4=;
- b=i+L6ils2II1GS2Up0uvMg2FZUsdcG8YtmcBAgOT2h9eJL+lOwDwD42ppuJyq9qz5/erKeh
- dkI7lTninuBsa0xr76eNpQGK530R63U+UQWQbrSy0lNzip2bN2uHUN+puCqSHurIOQksRb
- xv5AwH/GV1DigaqmrVV7bQqzE159KAc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-460-Wvzj4IJXNwCodWvnWmj-sw-1; Wed, 06 May 2020 08:42:01 -0400
-X-MC-Unique: Wvzj4IJXNwCodWvnWmj-sw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A1271005510;
- Wed,  6 May 2020 12:42:00 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F0F611001B07;
- Wed,  6 May 2020 12:41:46 +0000 (UTC)
-Date: Wed, 6 May 2020 14:41:43 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH v2 08/13] acpi: generic event device for x86
-Message-ID: <20200506144143.1f68c383@redhat.com>
-In-Reply-To: <20200506103106.nih5mf5zpltv3fns@sirius.home.kraxel.org>
-References: <20200505134305.22666-1-kraxel@redhat.com>
- <20200505134305.22666-9-kraxel@redhat.com>
- <20200505170316.7e72da4d@redhat.com>
- <20200506103106.nih5mf5zpltv3fns@sirius.home.kraxel.org>
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jWJNd-0004fS-O0; Wed, 06 May 2020 08:42:29 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:42559)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jWJNc-0008Ui-Fs; Wed, 06 May 2020 08:42:29 -0400
+Received: by mail-lj1-x242.google.com with SMTP id a21so2160593ljb.9;
+ Wed, 06 May 2020 05:42:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to
+ :user-agent; bh=nOQSLGpGO3TwX+eyRCdr9lG1bDd+uzfPjZvAcBu5KYU=;
+ b=CNnD6LMKxH/UHRdV/AtJzu7v6vhha/ireUVs6C9lbk6Uv1YCVk6Ed+wt5nw9PZ0MSB
+ mfKvpczQnxyj8saG0EYxa4ah4bHqiMcLO5FUO6ZVESdpnaD43of7bxZmRpd9C1dB3VNO
+ SdxNOHRIo9Rro+uRMjXyyeRozB6SBfap75Vksj82YCv0uvti6C54v+xLQqA4crGlwNYL
+ zI5byQ1tjxR8xnhHfLx4Ag92++TlmOCB5sZQD84YpnAiOqwD7BayNuTFW6DKLRktevNJ
+ Ty59TWDceKPMsnopVQXRafPKlierpdI4UzxtXhycGSYxHOELtWljAV6D1B7pF0/xUwSX
+ Fjsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=nOQSLGpGO3TwX+eyRCdr9lG1bDd+uzfPjZvAcBu5KYU=;
+ b=SNBms1hVFbIdAiDSb4bIGJgqq/TrS5EeHZ48ljZH7y7hjaGmvguIT5rQA1Ylo4E6iH
+ +8urVQq+VlQS0wCz4x0f+J/owbaSDq/jNZXtwnkC4KS0HYn5+WSfuSZXIArfNRo43p5S
+ AyNevfh2HV3VdjXPqlQZZDQQ6l8kzQvq7kioKsXGHREYIuEWWtCpV/obTigOaSmESTk1
+ M4gz+fKR9/yOFpk3Sb67x9JfR/R8OLbkEbbVVgvbxhaLraoBhkNcXDZOIpqhTPYWHaPu
+ 5mGptuVvCH3wrEl7+Z4iUepT3AYxFHuxn/eMWPy7VYVzym3unr+U6OP42ipUwmb5NzKH
+ /TTA==
+X-Gm-Message-State: AGi0PuZGkkixL1I16UIiszQtivJGZi+/2G9LY7wIIiFRyvxY4plbPBAi
+ NCfWA6549gBPIbeYb/gq2AQ=
+X-Google-Smtp-Source: APiQypL201vwMzSr2Cde+ZQPfPCKd2wn+pxD60z5YpPmVIeNiZDRI7yhTUTM+JU5C0tUIW4uazKO3A==
+X-Received: by 2002:a2e:740f:: with SMTP id p15mr4910495ljc.151.1588768946065; 
+ Wed, 06 May 2020 05:42:26 -0700 (PDT)
+Received: from localhost (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id s11sm1605438lfo.86.2020.05.06.05.42.25
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 06 May 2020 05:42:25 -0700 (PDT)
+Date: Wed, 6 May 2020 14:42:09 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v2 5/9] hw/core: stream: Add an end-of-packet flag
+Message-ID: <20200506124209.GK5519@toto>
+References: <20200506082513.18751-1-edgar.iglesias@gmail.com>
+ <20200506082513.18751-6-edgar.iglesias@gmail.com>
+ <c7f6947d-7815-8df3-6835-3fe933ad4dbc@amsat.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=imammedo@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 04:02:22
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <c7f6947d-7815-8df3-6835-3fe933ad4dbc@amsat.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Received-SPF: pass client-ip=2a00:1450:4864:20::242;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x242.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,42 +103,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: damien.hedde@greensocs.com, peter.maydell@linaro.org,
+ sstabellini@kernel.org, edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
+ frasse.iglesias@gmail.com, jasowang@redhat.com, alistair@alistair23.me,
+ qemu-devel@nongnu.org, frederic.konrad@adacore.com, qemu-arm@nongnu.org,
+ figlesia@xilinx.com, luc.michel@greensocs.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 6 May 2020 12:31:06 +0200
-Gerd Hoffmann <kraxel@redhat.com> wrote:
+On Wed, May 06, 2020 at 01:53:33PM +0200, Philippe Mathieu-Daudé wrote:
+> Hi Edgar,
 
-> On Tue, May 05, 2020 at 05:03:16PM +0200, Igor Mammedov wrote:
-> > On Tue,  5 May 2020 15:43:00 +0200
-> > Gerd Hoffmann <kraxel@redhat.com> wrote:
-> >   
-> > > Uses TYPE_ACPI_GED as QOM parent for code reuse.
-> > > Add registers for sleep states and reset.
-> > > Add powerdown notifier for power button events.  
-> > registers aren't x86 specific per spec,
-> > can we put these registers into TYPE_ACPI_GED
-> > and enable the optionally like is done with memory hotplug registers
-> > in acpi_ged_initfn()  
-> 
-> Sure, will do.
-> 
-> > > Set AcpiDeviceIfClass->madt_cpu.  
-> > that's the only reason I could justify adding x86 specific flavour.  
-> 
-> Also the powerdown notifier.  Seems the workflow is slightly different
-> on x86 (acpi device registers notifier) and arm (machine registers
-> notifier and calls acpidev->send_event).
+Hi Philippe,
 
-Is it possible to use ARM's approach, without notifier?
+
 
 > 
-> take care,
->   Gerd
+> On 5/6/20 10:25 AM, Edgar E. Iglesias wrote:
+> > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> > 
+> > Some stream clients stream an endless stream of data while
+> > other clients stream data in packets. Stream interfaces
+> > usually have a way to signal the end of a packet or the
+> > last beat of a transfer.
+> > 
+> > This adds an end-of-packet flag to the push interface.
+> > 
+> > Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> > Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+> > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> > ---
+> >   include/hw/stream.h     |  5 +++--
+> >   hw/core/stream.c        |  4 ++--
+> >   hw/dma/xilinx_axidma.c  | 10 ++++++----
+> >   hw/net/xilinx_axienet.c | 14 ++++++++++----
+> >   hw/ssi/xilinx_spips.c   |  2 +-
+> >   5 files changed, 22 insertions(+), 13 deletions(-)
+> > 
+> > diff --git a/include/hw/stream.h b/include/hw/stream.h
+> > index d02f62ca89..ed09e83683 100644
+> > --- a/include/hw/stream.h
+> > +++ b/include/hw/stream.h
+> > @@ -39,12 +39,13 @@ typedef struct StreamSlaveClass {
+> >        * @obj: Stream slave to push to
+> >        * @buf: Data to write
+> >        * @len: Maximum number of bytes to write
+> > +     * @eop: End of packet flag
+> >        */
+> > -    size_t (*push)(StreamSlave *obj, unsigned char *buf, size_t len);
+> > +    size_t (*push)(StreamSlave *obj, unsigned char *buf, size_t len, bool eop);
 > 
+> I'd split this patch, first add EOP in the push handler, keeping current
+> code working, then the following patches (implementing the feature in the
+> backend handlers), then ...
+> 
+> >   } StreamSlaveClass;
+> >   size_t
+> > -stream_push(StreamSlave *sink, uint8_t *buf, size_t len);
+> > +stream_push(StreamSlave *sink, uint8_t *buf, size_t len, bool eop);
+> 
+> ... this final patch, enable the feature and let the frontends use it.
+> 
+> >   bool
+> >   stream_can_push(StreamSlave *sink, StreamCanPushNotifyFn notify,
+> > diff --git a/hw/core/stream.c b/hw/core/stream.c
+> > index 39b1e595cd..a65ad1208d 100644
+> > --- a/hw/core/stream.c
+> > +++ b/hw/core/stream.c
+> > @@ -3,11 +3,11 @@
+> >   #include "qemu/module.h"
+> >   size_t
+> > -stream_push(StreamSlave *sink, uint8_t *buf, size_t len)
+> > +stream_push(StreamSlave *sink, uint8_t *buf, size_t len, bool eop)
+> >   {
+> >       StreamSlaveClass *k =  STREAM_SLAVE_GET_CLASS(sink);
+> > -    return k->push(sink, buf, len);
+> > +    return k->push(sink, buf, len, eop);
+> 
+> So in this first part patch I'd use 'false' here, and update by 'eop' in the
+> other part (last patch in series). Does it make sense?
 
+Current code implicitly assumes eop = true, so this patch keeps things
+working as before. It just makes the assumption explicit and guarding
+backends with asserts. The support for eop = false is then added
+(where relevant) in future patches, roughly the way you describe it.
+
+I can add something to the commit message to clarify that.
+
+Best regards,
+Edgar
 
