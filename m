@@ -2,110 +2,107 @@ Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B335C28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 20:21:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C33C3C28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 20:23:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2ABE206D5
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 20:21:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2ABE206D5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ubuntu.com
+	by mail.kernel.org (Postfix) with ESMTPS id 820E4206D5
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 20:23:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L7F+KnKf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 820E4206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWQXx-0007wh-1o
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 16:21:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58364)
+	id 1jWQa3-0001zo-L8
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 16:23:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58908)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jWQX4-0007T7-9T
- for qemu-devel@nongnu.org; Wed, 06 May 2020 16:20:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48638)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jWQX3-00065i-14
- for qemu-devel@nongnu.org; Wed, 06 May 2020 16:20:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jWQX0-0008Gt-Nf
- for <qemu-devel@nongnu.org>; Wed, 06 May 2020 20:20:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B1CE72E810D
- for <qemu-devel@nongnu.org>; Wed,  6 May 2020 20:20:38 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jWQZA-0000kK-2f
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 16:22:52 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40836
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jWQZ8-0008MO-5Y
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 16:22:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588796568;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/soio6tKr4qkWf6sw7ixJ8P4+vJX0+Y+vZgXjVDXGFU=;
+ b=L7F+KnKf38KEs5yMxwG0ouIKaD/8plXrwENwBF6iu67jb8lCLHQ2//bbBBU21dTQhaVU2G
+ wWiioCclMwNF8myo0t3qVvRvPMq0ekrGVovP8eAZSt2mC1KLVdfdsd6Mvmmmpx+j1Yo89M
+ nAJOkQQHynbapXTXigaCcv5ZnhhZQh0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-109-z0OftuiBNmWjereaK3Pt3Q-1; Wed, 06 May 2020 16:22:44 -0400
+X-MC-Unique: z0OftuiBNmWjereaK3Pt3Q-1
+Received: by mail-wm1-f71.google.com with SMTP id h184so1855739wmf.5
+ for <qemu-devel@nongnu.org>; Wed, 06 May 2020 13:22:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=U+1bCSviFwcdpe08mjhiimwDdJ7yxmjwmBMzGnTCUCI=;
+ b=RiAmxWGHYuC+dKeEh+qFJQ5+yqG09kpdLJeGT/MtXwbIjdzCovvSMpTrBhl1dab1/l
+ Fb+54JnRQNqtXKbBDHLKPnDu3bKJyE4IoTY19+sCV9Qu5zZLyyUqj4fekAi1QLRJIEWg
+ j8iR19xYNYmvCPdSnUyMWirBsTvPPUltBtxhS0k2mNRpn2kCHratfQeV9sr1YFhSguIx
+ E3TTlAr76s6HlEvopMy3HIVeJUOIcP1KpPN6wfJTaLKL0/Dcct6KybvX5m5NEAl0Lqmr
+ tiqNuWZ8jQKblcyyRjKyQRzLe3ZonPmK9MnB9TeGhjjKffODAhb6c0KwdaURfTzQjdUS
+ 3dxw==
+X-Gm-Message-State: AGi0PubRLdv02liJWA8fyrKCrbTug6gmKjeKlrQWHuBlm96rmrA4Y2tG
+ lZ344ibZR3ddV8MSW7NqPz7tlxI6xxlgXZxpcnsQIBL7JGD2AJST/m0BuC8o6hNrBMy9noz5AAD
+ A4xaw84Nndc04v5s=
+X-Received: by 2002:adf:ab57:: with SMTP id r23mr12312823wrc.180.1588796563252; 
+ Wed, 06 May 2020 13:22:43 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKsG/6G0HlElYxbWp6ObmCaRkdfbfKZhgV0OSZkWsR5YxOIPzhRBRDsOzaIXyA2tNa7IaCe1g==
+X-Received: by 2002:adf:ab57:: with SMTP id r23mr12312789wrc.180.1588796562842; 
+ Wed, 06 May 2020 13:22:42 -0700 (PDT)
+Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
+ by smtp.gmail.com with ESMTPSA id
+ z18sm4203551wrw.41.2020.05.06.13.22.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 06 May 2020 13:22:42 -0700 (PDT)
+Date: Wed, 6 May 2020 16:22:39 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Subject: Re: [PATCH v25 04/10] ACPI: Build related register address fields
+ via hardware error fw_cfg blob
+Message-ID: <20200506162234-mutt-send-email-mst@kernel.org>
+References: <20200410114639.32844-1-gengdongjiu@huawei.com>
+ <20200410114639.32844-5-gengdongjiu@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200410114639.32844-5-gengdongjiu@huawei.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 06 May 2020 20:11:21 -0000
-From: Rafael David Tinoco <rafaeldtinoco@ubuntu.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=kunpeng920; status=Triaged; importance=Undecided;
- assignee=ike.pan@canonical.com; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-18.04; status=Triaged;
- importance=Undecided; assignee=ike.pan@canonical.com; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-18.04-hwe;
- status=Triaged; importance=Undecided; assignee=ike.pan@canonical.com; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-19.10; status=Triaged;
- importance=Undecided; assignee=ike.pan@canonical.com; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-20.04; status=Triaged;
- importance=Undecided; assignee=ike.pan@canonical.com; 
-X-Launchpad-Bug: product=kunpeng920; productseries=upstream-kernel;
- status=Fix Committed; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=In Progress; importance=Medium; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
- component=main; status=In Progress; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=qemu; 
- component=main; status=In Progress; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
- component=main; status=In Progress; importance=Medium; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
- component=main; status=In Progress; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug-Tags: ikeradar patch qemu-img
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: andrew-cloke dannf ikepanhc iveskim jan-glauber-i
- jnsnow kongzizaixian lizhengui philmd
- rafaeldtinoco ying-fang
-X-Launchpad-Bug-Reporter: dann frazier (dannf)
-X-Launchpad-Bug-Modifier: Rafael David Tinoco (rafaeldtinoco)
-References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
-Message-Id: <158879588170.14318.10798099807682855525.malone@gac.canonical.com>
-Subject: [Bug 1805256] Re: qemu-img hangs on rcu_call_ready_event logic in
- Aarch64 when converting images
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 27e3a3d1670672a2ad06bdcc41714ea44154b386
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 15:11:46
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 02:39:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -114,204 +111,285 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
+Cc: fam@euphon.net, peter.maydell@linaro.org, xiaoguangrong.eric@gmail.com,
+ kvm@vger.kernel.org, mtosatti@redhat.com, qemu-devel@nongnu.org,
+ ehabkost@redhat.com, linuxarm@huawei.com, shannon.zhaosl@gmail.com,
+ zhengxiang9@huawei.com, qemu-arm@nongnu.org, Jonathan.Cameron@huawei.com,
+ pbonzini@redhat.com, imammedo@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-FYIO, from now on all the "merge" work will be done in the merge
-requests being linked to this BUG (at the top). @paelzer will be
-verifying those.
+On Fri, Apr 10, 2020 at 07:46:33PM +0800, Dongjiu Geng wrote:
+> This patch builds error_block_address and read_ack_register fields
+> in hardware errors table , the error_block_address points to Generic
+> Error Status Block(GESB) via bios_linker. The max size for one GESB
+> is 1kb, For more detailed information, please refer to
+> document: docs/specs/acpi_hest_ghes.rst
+>=20
+> Now we only support one Error source, if necessary, we can extend to
+> support more.
+>=20
+> Suggested-by: Laszlo Ersek <lersek@redhat.com>
+> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 
--- =
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805256
+> ---
+> change since v24:
+> 1.move acpi_add_table() to the patch that adds acpi_build_hest()
+> ---
+>  default-configs/arm-softmmu.mak |  1 +
+>  hw/acpi/Kconfig                 |  4 ++
+>  hw/acpi/Makefile.objs           |  1 +
+>  hw/acpi/aml-build.c             |  2 +
+>  hw/acpi/ghes.c                  | 89 +++++++++++++++++++++++++++++++++++=
+++++++
+>  hw/arm/virt-acpi-build.c        |  5 +++
+>  include/hw/acpi/aml-build.h     |  1 +
+>  include/hw/acpi/ghes.h          | 28 +++++++++++++
+>  8 files changed, 131 insertions(+)
+>  create mode 100644 hw/acpi/ghes.c
+>  create mode 100644 include/hw/acpi/ghes.h
+>=20
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmm=
+u.mak
+> index 36a0e89..8fc09a4 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -42,3 +42,4 @@ CONFIG_FSL_IMX7=3Dy
+>  CONFIG_FSL_IMX6UL=3Dy
+>  CONFIG_SEMIHOSTING=3Dy
+>  CONFIG_ALLWINNER_H3=3Dy
+> +CONFIG_ACPI_APEI=3Dy
+> diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
+> index 54209c6..1932f66 100644
+> --- a/hw/acpi/Kconfig
+> +++ b/hw/acpi/Kconfig
+> @@ -28,6 +28,10 @@ config ACPI_HMAT
+>      bool
+>      depends on ACPI
+> =20
+> +config ACPI_APEI
+> +    bool
+> +    depends on ACPI
+> +
+>  config ACPI_PCI
+>      bool
+>      depends on ACPI && PCI
+> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
+> index 777da07..28c5ddb 100644
+> --- a/hw/acpi/Makefile.objs
+> +++ b/hw/acpi/Makefile.objs
+> @@ -8,6 +8,7 @@ common-obj-$(CONFIG_ACPI_NVDIMM) +=3D nvdimm.o
+>  common-obj-$(CONFIG_ACPI_VMGENID) +=3D vmgenid.o
+>  common-obj-$(CONFIG_ACPI_HW_REDUCED) +=3D generic_event_device.o
+>  common-obj-$(CONFIG_ACPI_HMAT) +=3D hmat.o
+> +common-obj-$(CONFIG_ACPI_APEI) +=3D ghes.o
+>  common-obj-$(call lnot,$(CONFIG_ACPI_X86)) +=3D acpi-stub.o
+>  common-obj-$(call lnot,$(CONFIG_PC)) +=3D acpi-x86-stub.o
+> =20
+> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+> index 2c3702b..3681ec6 100644
+> --- a/hw/acpi/aml-build.c
+> +++ b/hw/acpi/aml-build.c
+> @@ -1578,6 +1578,7 @@ void acpi_build_tables_init(AcpiBuildTables *tables=
+)
+>      tables->table_data =3D g_array_new(false, true /* clear */, 1);
+>      tables->tcpalog =3D g_array_new(false, true /* clear */, 1);
+>      tables->vmgenid =3D g_array_new(false, true /* clear */, 1);
+> +    tables->hardware_errors =3D g_array_new(false, true /* clear */, 1);
+>      tables->linker =3D bios_linker_loader_init();
+>  }
+> =20
+> @@ -1588,6 +1589,7 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tab=
+les, bool mfre)
+>      g_array_free(tables->table_data, true);
+>      g_array_free(tables->tcpalog, mfre);
+>      g_array_free(tables->vmgenid, mfre);
+> +    g_array_free(tables->hardware_errors, mfre);
+>  }
+> =20
+>  /*
+> diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
+> new file mode 100644
+> index 0000000..e1b3f8f
+> --- /dev/null
+> +++ b/hw/acpi/ghes.c
+> @@ -0,0 +1,89 @@
+> +/*
+> + * Support for generating APEI tables and recording CPER for Guests
+> + *
+> + * Copyright (c) 2020 HUAWEI TECHNOLOGIES CO., LTD.
+> + *
+> + * Author: Dongjiu Geng <gengdongjiu@huawei.com>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License as published by
+> + * the Free Software Foundation; either version 2 of the License, or
+> + * (at your option) any later version.
+> +
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> +
+> + * You should have received a copy of the GNU General Public License alo=
+ng
+> + * with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/units.h"
+> +#include "hw/acpi/ghes.h"
+> +#include "hw/acpi/aml-build.h"
+> +
+> +#define ACPI_GHES_ERRORS_FW_CFG_FILE        "etc/hardware_errors"
+> +#define ACPI_GHES_DATA_ADDR_FW_CFG_FILE     "etc/hardware_errors_addr"
+> +
+> +/* The max size in bytes for one error block */
+> +#define ACPI_GHES_MAX_RAW_DATA_LENGTH   (1 * KiB)
+> +
+> +/* Now only support ARMv8 SEA notification type error source */
+> +#define ACPI_GHES_ERROR_SOURCE_COUNT        1
+> +
+> +/*
+> + * Build table for the hardware error fw_cfg blob.
+> + * Initialize "etc/hardware_errors" and "etc/hardware_errors_addr" fw_cf=
+g blobs.
+> + * See docs/specs/acpi_hest_ghes.rst for blobs format.
+> + */
+> +void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker)
+> +{
+> +    int i, error_status_block_offset;
+> +
+> +    /* Build error_block_address */
+> +    for (i =3D 0; i < ACPI_GHES_ERROR_SOURCE_COUNT; i++) {
+> +        build_append_int_noprefix(hardware_errors, 0, sizeof(uint64_t));
+> +    }
+> +
+> +    /* Build read_ack_register */
+> +    for (i =3D 0; i < ACPI_GHES_ERROR_SOURCE_COUNT; i++) {
+> +        /*
+> +         * Initialize the value of read_ack_register to 1, so GHES can b=
+e
+> +         * writeable after (re)boot.
+> +         * ACPI 6.2: 18.3.2.8 Generic Hardware Error Source version 2
+> +         * (GHESv2 - Type 10)
+> +         */
+> +        build_append_int_noprefix(hardware_errors, 1, sizeof(uint64_t));
+> +    }
+> +
+> +    /* Generic Error Status Block offset in the hardware error fw_cfg bl=
+ob */
+> +    error_status_block_offset =3D hardware_errors->len;
+> +
+> +    /* Reserve space for Error Status Data Block */
+> +    acpi_data_push(hardware_errors,
+> +        ACPI_GHES_MAX_RAW_DATA_LENGTH * ACPI_GHES_ERROR_SOURCE_COUNT);
+> +
+> +    /* Tell guest firmware to place hardware_errors blob into RAM */
+> +    bios_linker_loader_alloc(linker, ACPI_GHES_ERRORS_FW_CFG_FILE,
+> +                             hardware_errors, sizeof(uint64_t), false);
+> +
+> +    for (i =3D 0; i < ACPI_GHES_ERROR_SOURCE_COUNT; i++) {
+> +        /*
+> +         * Tell firmware to patch error_block_address entries to point t=
+o
+> +         * corresponding "Generic Error Status Block"
+> +         */
+> +        bios_linker_loader_add_pointer(linker,
+> +            ACPI_GHES_ERRORS_FW_CFG_FILE, sizeof(uint64_t) * i,
+> +            sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE,
+> +            error_status_block_offset + i * ACPI_GHES_MAX_RAW_DATA_LENGT=
+H);
+> +    }
+> +
+> +    /*
+> +     * tell firmware to write hardware_errors GPA into
+> +     * hardware_errors_addr fw_cfg, once the former has been initialized=
+.
+> +     */
+> +    bios_linker_loader_write_pointer(linker, ACPI_GHES_DATA_ADDR_FW_CFG_=
+FILE,
+> +        0, sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE, 0);
+> +}
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 7ef0733..cc6ffcd 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -48,6 +48,7 @@
+>  #include "sysemu/reset.h"
+>  #include "kvm_arm.h"
+>  #include "migration/vmstate.h"
+> +#include "hw/acpi/ghes.h"
+> =20
+>  #define ARM_SPI_BASE 32
+> =20
+> @@ -817,6 +818,10 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuil=
+dTables *tables)
+>      acpi_add_table(table_offsets, tables_blob);
+>      build_spcr(tables_blob, tables->linker, vms);
+> =20
+> +    if (vms->ras) {
+> +        build_ghes_error_table(tables->hardware_errors, tables->linker);
+> +    }
+> +
+>      if (ms->numa_state->num_nodes > 0) {
+>          acpi_add_table(table_offsets, tables_blob);
+>          build_srat(tables_blob, tables->linker, vms);
+> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+> index de4a406..8f13620 100644
+> --- a/include/hw/acpi/aml-build.h
+> +++ b/include/hw/acpi/aml-build.h
+> @@ -220,6 +220,7 @@ struct AcpiBuildTables {
+>      GArray *rsdp;
+>      GArray *tcpalog;
+>      GArray *vmgenid;
+> +    GArray *hardware_errors;
+>      BIOSLinker *linker;
+>  } AcpiBuildTables;
+> =20
+> diff --git a/include/hw/acpi/ghes.h b/include/hw/acpi/ghes.h
+> new file mode 100644
+> index 0000000..50379b0
+> --- /dev/null
+> +++ b/include/hw/acpi/ghes.h
+> @@ -0,0 +1,28 @@
+> +/*
+> + * Support for generating APEI tables and recording CPER for Guests
+> + *
+> + * Copyright (c) 2020 HUAWEI TECHNOLOGIES CO., LTD.
+> + *
+> + * Author: Dongjiu Geng <gengdongjiu@huawei.com>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License as published by
+> + * the Free Software Foundation; either version 2 of the License, or
+> + * (at your option) any later version.
+> +
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> +
+> + * You should have received a copy of the GNU General Public License alo=
+ng
+> + * with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#ifndef ACPI_GHES_H
+> +#define ACPI_GHES_H
+> +
+> +#include "hw/acpi/bios-linker-loader.h"
+> +
+> +void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker)=
+;
+> +#endif
+> --=20
+> 1.8.3.1
 
-Title:
-  qemu-img hangs on rcu_call_ready_event logic in Aarch64 when
-  converting images
-
-Status in kunpeng920:
-  Triaged
-Status in kunpeng920 ubuntu-18.04 series:
-  Triaged
-Status in kunpeng920 ubuntu-18.04-hwe series:
-  Triaged
-Status in kunpeng920 ubuntu-19.10 series:
-  Triaged
-Status in kunpeng920 ubuntu-20.04 series:
-  Triaged
-Status in kunpeng920 upstream-kernel series:
-  Fix Committed
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  In Progress
-Status in qemu source package in Bionic:
-  In Progress
-Status in qemu source package in Disco:
-  In Progress
-Status in qemu source package in Eoan:
-  In Progress
-Status in qemu source package in Focal:
-  In Progress
-
-Bug description:
-  [Impact]
-
-  * QEMU locking primitives might face a race condition in QEMU Async
-  I/O bottom halves scheduling. This leads to a dead lock making either
-  QEMU or one of its tools to hang indefinitely.
-
-  [Test Case]
-
-  * qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Hangs indefinitely approximately 30% of the runs in Aarch64.
-
-  [Regression Potential]
-
-  * This is a change to a core part of QEMU: The AIO scheduling. It
-  works like a "kernel" scheduler, whereas kernel schedules OS tasks,
-  the QEMU AIO code is responsible to schedule QEMU coroutines or event
-  listeners callbacks.
-
-  * There was a long discussion upstream about primitives and Aarch64.
-  After quite sometime Paolo released this patch and it solves the
-  issue. Tested platforms were: amd64 and aarch64 based on his commit
-  log.
-
-  * Christian suggests that this fix stay little longer in -proposed to
-  make sure it won't cause any regressions.
-
-  * dannf suggests we also check for performance regressions; e.g. how
-  long it takes to convert a cloud image on high-core systems.
-
-  [Other Info]
-
-  =C2=A0* Original Description bellow:
-
-  Command:
-
-  qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Hangs indefinitely approximately 30% of the runs.
-
-  ----
-
-  Workaround:
-
-  qemu-img convert -m 1 -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Run "qemu-img convert" with "a single coroutine" to avoid this issue.
-
-  ----
-
-  (gdb) thread 1
-  ...
-  (gdb) bt
-  #0 0x0000ffffbf1ad81c in __GI_ppoll
-  #1 0x0000aaaaaabcf73c in ppoll
-  #2 qemu_poll_ns
-  #3 0x0000aaaaaabd0764 in os_host_main_loop_wait
-  #4 main_loop_wait
-  ...
-
-  (gdb) thread 2
-  ...
-  (gdb) bt
-  #0 syscall ()
-  #1 0x0000aaaaaabd41cc in qemu_futex_wait
-  #2 qemu_event_wait (ev=3Dev@entry=3D0xaaaaaac86ce8 <rcu_call_ready_event>)
-  #3 0x0000aaaaaabed05c in call_rcu_thread
-  #4 0x0000aaaaaabd34c8 in qemu_thread_start
-  #5 0x0000ffffbf25c880 in start_thread
-  #6 0x0000ffffbf1b6b9c in thread_start ()
-
-  (gdb) thread 3
-  ...
-  (gdb) bt
-  #0 0x0000ffffbf11aa20 in __GI___sigtimedwait
-  #1 0x0000ffffbf2671b4 in __sigwait
-  #2 0x0000aaaaaabd1ddc in sigwait_compat
-  #3 0x0000aaaaaabd34c8 in qemu_thread_start
-  #4 0x0000ffffbf25c880 in start_thread
-  #5 0x0000ffffbf1b6b9c in thread_start
-
-  ----
-
-  (gdb) run
-  Starting program: /usr/bin/qemu-img convert -f qcow2 -O qcow2
-  ./disk01.ext4.qcow2 ./output.qcow2
-
-  [New Thread 0xffffbec5ad90 (LWP 72839)]
-  [New Thread 0xffffbe459d90 (LWP 72840)]
-  [New Thread 0xffffbdb57d90 (LWP 72841)]
-  [New Thread 0xffffacac9d90 (LWP 72859)]
-  [New Thread 0xffffa7ffed90 (LWP 72860)]
-  [New Thread 0xffffa77fdd90 (LWP 72861)]
-  [New Thread 0xffffa6ffcd90 (LWP 72862)]
-  [New Thread 0xffffa67fbd90 (LWP 72863)]
-  [New Thread 0xffffa5ffad90 (LWP 72864)]
-
-  [Thread 0xffffa5ffad90 (LWP 72864) exited]
-  [Thread 0xffffa6ffcd90 (LWP 72862) exited]
-  [Thread 0xffffa77fdd90 (LWP 72861) exited]
-  [Thread 0xffffbdb57d90 (LWP 72841) exited]
-  [Thread 0xffffa67fbd90 (LWP 72863) exited]
-  [Thread 0xffffacac9d90 (LWP 72859) exited]
-  [Thread 0xffffa7ffed90 (LWP 72860) exited]
-
-  <HUNG w/ 3 threads in the stack trace showed before>
-  """
-
-  All the tasks left are blocked in a system call, so no task left to call
-  qemu_futex_wake() to unblock thread #2 (in futex()), which would unblock
-  thread #1 (doing poll() in a pipe with thread #2).
-
-  Those 7 threads exit before disk conversion is complete (sometimes in
-  the beginning, sometimes at the end).
-
-  ----
-
-  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
-  frequently hangs (~50% of the time) with this command:
-
-  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
-
-  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
-  qcow2->qcow2 conversion happens to be something uvtool does every time
-  it fetches images.
-
-  Once hung, attaching gdb gives the following backtrace:
-
-  (gdb) bt
-  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
-274213760,
-  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3D<optimized out>, timeout@entry=3D0x0, s=
-igmask=3D0xffffc123b950)
-  =C2=A0=C2=A0=C2=A0=C2=A0at ../sysdeps/unix/sysv/linux/ppoll.c:39
-  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
-ptimized out>,
-  =C2=A0=C2=A0=C2=A0=C2=A0__fds=3D<optimized out>) at /usr/include/aarch64-=
-linux-gnu/bits/poll2.h:77
-  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>,
-  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.=
-c:322
-  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
-  =C2=A0=C2=A0=C2=A0=C2=A0at util/main-loop.c:233
-  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
-  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
-g.c:1980
-  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
-img.c:2456
-  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
--img.c:4975
-
-  Reproduced w/ latest QEMU git (@ 53744e0a182)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/kunpeng920/+bug/1805256/+subscriptions
 
