@@ -2,81 +2,77 @@ Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FF6EC38A2A
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 09:52:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03DF4C38A24
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 09:53:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0C1420714
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 09:52:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BECA920714
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 09:53:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KX89zU5q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0C1420714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fCSPGidB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BECA920714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWGjK-0000CM-Nu
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 05:52:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54432)
+	id 1jWGjn-00012X-PS
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 05:53:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54088)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jWGho-0005fZ-Kq
- for qemu-devel@nongnu.org; Wed, 06 May 2020 05:51:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46451
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jWGgu-0004e8-PN
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 05:50:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43672
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jWGhm-00054s-Ep
- for qemu-devel@nongnu.org; Wed, 06 May 2020 05:51:08 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jWGgt-0003c5-VS
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 05:50:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588758665;
+ s=mimecast20190719; t=1588758610;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=W2SInkhAIawUVaThIi/q7IY8VTE4Y+kHdMQ9prL2k5E=;
- b=KX89zU5qTTKdfuKN9XftIhWEYJcgv2cOFn/d8qYH0MqCOvE8rbTTLswbynadhlNahVZ9S9
- 6LAW25EO+7xzTF+lv8QIi0cMdLxWgryqZ8p7brf70SDmoOPcT6p5rvFMdftf/cp5MKb2NC
- Ltmv2dAXdwN/CD6tKpqzs69RCavgzUQ=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=uwx25ggXFYcraw8wlJgMYjAcAt7rECdGCBo2VgZbClU=;
+ b=fCSPGidBIR4AT8o5vcFrYW4z44mshPKC+ymIEc2iE6RM2l7xBY+oBZpSvX87sKkYs899wr
+ OqmtevEjNFpUWGLGXE5Y84bVVjDZgXOMmZ0a05OwY8S4V2pBY5qx3y1y5S/wiQ3TVzSClk
+ kGmwr9EZz7cy7RgLtRYaEr0BSBcgZhg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-263-Ah1xG7R5OV-pXh4BYC61wg-1; Wed, 06 May 2020 05:51:02 -0400
-X-MC-Unique: Ah1xG7R5OV-pXh4BYC61wg-1
+ us-mta-256-GBwgf7kXNXKT49c3ZENCcw-1; Wed, 06 May 2020 05:50:04 -0400
+X-MC-Unique: GBwgf7kXNXKT49c3ZENCcw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13A6D835B41;
- Wed,  6 May 2020 09:51:01 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89710835B44;
+ Wed,  6 May 2020 09:50:01 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-113-17.ams2.redhat.com [10.36.113.17])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AD9265C1BD;
- Wed,  6 May 2020 09:50:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 27BF65C1BD;
+ Wed,  6 May 2020 09:49:48 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 15/17] pc: Support for virtio-mem-pci
-Date: Wed,  6 May 2020 11:49:46 +0200
-Message-Id: <20200506094948.76388-16-david@redhat.com>
-In-Reply-To: <20200506094948.76388-1-david@redhat.com>
-References: <20200506094948.76388-1-david@redhat.com>
+Subject: [PATCH v1 00/17] virtio-mem: Paravirtualized memory hot(un)plug
+Date: Wed,  6 May 2020 11:49:31 +0200
+Message-Id: <20200506094948.76388-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=david@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 23:48:07
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 04:02:22
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,186 +85,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- "Michael S . Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
+Cc: Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
+ "Michael S . Tsirkin" <mst@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Juan Quintela <quintela@redhat.com>, David Hildenbrand <david@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Richard Henderson <rth@twiddle.net>, Eric Farman <farman@linux.ibm.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
  "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+ Alex Williamson <alex.williamson@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
+ Tony Krowiak <akrowiak@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let's wire it up similar to virtio-pmem. Also disallow unplug, so it's
-harder for users to shoot themselves into the foot.
+This is the very basic, initial version of virtio-mem. More info on
+virtio-mem in general can be found in the Linux kernel driver posting [1]
+and in patch #10.
 
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/i386/Kconfig |  1 +
- hw/i386/pc.c    | 49 ++++++++++++++++++++++++++++---------------------
- 2 files changed, 29 insertions(+), 21 deletions(-)
+"The basic idea of virtio-mem is to provide a flexible,
+cross-architecture memory hot(un)plug solution that avoids many limitatio=
+ns
+imposed by existing technologies, architectures, and interfaces."
 
-diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
-index c93f32f657..03e347b207 100644
---- a/hw/i386/Kconfig
-+++ b/hw/i386/Kconfig
-@@ -35,6 +35,7 @@ config PC
-     select ACPI_PCI
-     select ACPI_VMGENID
-     select VIRTIO_PMEM_SUPPORTED
-+    select VIRTIO_MEM_SUPPORTED
-=20
- config PC_PCI
-     bool
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index f6b8431c8b..588804f895 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -86,6 +86,7 @@
- #include "hw/net/ne2000-isa.h"
- #include "standard-headers/asm-x86/bootparam.h"
- #include "hw/virtio/virtio-pmem-pci.h"
-+#include "hw/virtio/virtio-mem-pci.h"
- #include "hw/mem/memory-device.h"
- #include "sysemu/replay.h"
- #include "qapi/qmp/qerror.h"
-@@ -1654,8 +1655,8 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug=
-_dev,
-     numa_cpu_pre_plug(cpu_slot, dev, errp);
- }
-=20
--static void pc_virtio_pmem_pci_pre_plug(HotplugHandler *hotplug_dev,
--                                        DeviceState *dev, Error **errp)
-+static void pc_virtio_md_pci_pre_plug(HotplugHandler *hotplug_dev,
-+                                      DeviceState *dev, Error **errp)
- {
-     HotplugHandler *hotplug_dev2 =3D qdev_get_bus_hotplug_handler(dev);
-     Error *local_err =3D NULL;
-@@ -1666,7 +1667,8 @@ static void pc_virtio_pmem_pci_pre_plug(HotplugHand=
-ler *hotplug_dev,
-          * order. This should never be the case on x86, however better a=
-dd
-          * a safety net.
-          */
--        error_setg(errp, "virtio-pmem-pci not supported on this bus.");
-+        error_setg(errp,
-+                   "virtio based memory devices not supported on this bu=
-s.");
-         return;
-     }
-     /*
-@@ -1681,8 +1683,8 @@ static void pc_virtio_pmem_pci_pre_plug(HotplugHand=
-ler *hotplug_dev,
-     error_propagate(errp, local_err);
- }
-=20
--static void pc_virtio_pmem_pci_plug(HotplugHandler *hotplug_dev,
--                                    DeviceState *dev, Error **errp)
-+static void pc_virtio_md_pci_plug(HotplugHandler *hotplug_dev,
-+                                  DeviceState *dev, Error **errp)
- {
-     HotplugHandler *hotplug_dev2 =3D qdev_get_bus_hotplug_handler(dev);
-     Error *local_err =3D NULL;
-@@ -1700,17 +1702,17 @@ static void pc_virtio_pmem_pci_plug(HotplugHandle=
-r *hotplug_dev,
-     error_propagate(errp, local_err);
- }
-=20
--static void pc_virtio_pmem_pci_unplug_request(HotplugHandler *hotplug_de=
-v,
--                                              DeviceState *dev, Error **=
-errp)
-+static void pc_virtio_md_pci_unplug_request(HotplugHandler *hotplug_dev,
-+                                            DeviceState *dev, Error **er=
-rp)
- {
--    /* We don't support virtio pmem hot unplug */
--    error_setg(errp, "virtio pmem device unplug not supported.");
-+    /* We don't support hot unplug of virtio based memory devices */
-+    error_setg(errp, "virtio based memory devices cannot be unplugged.")=
-;
- }
-=20
--static void pc_virtio_pmem_pci_unplug(HotplugHandler *hotplug_dev,
--                                      DeviceState *dev, Error **errp)
-+static void pc_virtio_md_pci_unplug(HotplugHandler *hotplug_dev,
-+                                    DeviceState *dev, Error **errp)
- {
--    /* We don't support virtio pmem hot unplug */
-+    /* We don't support hot unplug of virtio based memory devices */
- }
-=20
- static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-@@ -1720,8 +1722,9 @@ static void pc_machine_device_pre_plug_cb(HotplugHa=
-ndler *hotplug_dev,
-         pc_memory_pre_plug(hotplug_dev, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         pc_cpu_pre_plug(hotplug_dev, dev, errp);
--    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
--        pc_virtio_pmem_pci_pre_plug(hotplug_dev, dev, errp);
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
-+               object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
-+        pc_virtio_md_pci_pre_plug(hotplug_dev, dev, errp);
-     }
- }
-=20
-@@ -1732,8 +1735,9 @@ static void pc_machine_device_plug_cb(HotplugHandle=
-r *hotplug_dev,
-         pc_memory_plug(hotplug_dev, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         pc_cpu_plug(hotplug_dev, dev, errp);
--    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
--        pc_virtio_pmem_pci_plug(hotplug_dev, dev, errp);
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
-+               object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
-+        pc_virtio_md_pci_plug(hotplug_dev, dev, errp);
-     }
- }
-=20
-@@ -1744,8 +1748,9 @@ static void pc_machine_device_unplug_request_cb(Hot=
-plugHandler *hotplug_dev,
-         pc_memory_unplug_request(hotplug_dev, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         pc_cpu_unplug_request_cb(hotplug_dev, dev, errp);
--    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
--        pc_virtio_pmem_pci_unplug_request(hotplug_dev, dev, errp);
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
-+               object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
-+        pc_virtio_md_pci_unplug_request(hotplug_dev, dev, errp);
-     } else {
-         error_setg(errp, "acpi: device unplug request for not supported =
-device"
-                    " type: %s", object_get_typename(OBJECT(dev)));
-@@ -1759,8 +1764,9 @@ static void pc_machine_device_unplug_cb(HotplugHand=
-ler *hotplug_dev,
-         pc_memory_unplug(hotplug_dev, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         pc_cpu_unplug_cb(hotplug_dev, dev, errp);
--    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
--        pc_virtio_pmem_pci_unplug(hotplug_dev, dev, errp);
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
-+               object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
-+        pc_virtio_md_pci_unplug(hotplug_dev, dev, errp);
-     } else {
-         error_setg(errp, "acpi: device unplug for not supported device"
-                    " type: %s", object_get_typename(OBJECT(dev)));
-@@ -1772,7 +1778,8 @@ static HotplugHandler *pc_get_hotplug_handler(Machi=
-neState *machine,
- {
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) ||
-         object_dynamic_cast(OBJECT(dev), TYPE_CPU) ||
--        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
-+        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
-+        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
-         return HOTPLUG_HANDLER(machine);
-     }
-=20
+There are a lot of addons in the works (esp. protection of unplugged
+memory, better hugepage support (esp. when reading unplugged memory),
+resizeable memory backends, migration optimizations, support for more
+architectures, ...), this is the very basic version to get the ball
+rolling.
+
+The first 8 patches make sure we don't have any sudden surprises e.g., if
+somebody tries to pin all memory in RAM blocks, resulting in a higher
+memory consumption than desired. The remaining patches add basic virtio-m=
+em
+along with support for x86-64.
+
+[1] https://lkml.kernel.org/r/20200311171422.10484-1-david@redhat.com
+
+David Hildenbrand (17):
+  exec: Introduce ram_block_discard_set_(unreliable|required)()
+  vfio: Convert to ram_block_discard_set_broken()
+  accel/kvm: Convert to ram_block_discard_set_broken()
+  s390x/pv: Convert to ram_block_discard_set_broken()
+  virtio-balloon: Rip out qemu_balloon_inhibit()
+  target/i386: sev: Use ram_block_discard_set_broken()
+  migration/rdma: Use ram_block_discard_set_broken()
+  migration/colo: Use ram_block_discard_set_broken()
+  linux-headers: update to contain virtio-mem
+  virtio-mem: Paravirtualized memory hot(un)plug
+  virtio-pci: Proxy for virtio-mem
+  MAINTAINERS: Add myself as virtio-mem maintainer
+  hmp: Handle virtio-mem when printing memory device info
+  numa: Handle virtio-mem in NUMA stats
+  pc: Support for virtio-mem-pci
+  virtio-mem: Allow notifiers for size changes
+  virtio-pci: Send qapi events when the virtio-mem size changes
+
+ MAINTAINERS                                 |   8 +
+ accel/kvm/kvm-all.c                         |   3 +-
+ balloon.c                                   |  17 -
+ exec.c                                      |  48 ++
+ hw/core/numa.c                              |   6 +
+ hw/i386/Kconfig                             |   1 +
+ hw/i386/pc.c                                |  49 +-
+ hw/s390x/s390-virtio-ccw.c                  |  22 +-
+ hw/vfio/ap.c                                |  10 +-
+ hw/vfio/ccw.c                               |  11 +-
+ hw/vfio/common.c                            |  53 +-
+ hw/vfio/pci.c                               |   6 +-
+ hw/virtio/Kconfig                           |  11 +
+ hw/virtio/Makefile.objs                     |   2 +
+ hw/virtio/virtio-balloon.c                  |  12 +-
+ hw/virtio/virtio-mem-pci.c                  | 159 ++++
+ hw/virtio/virtio-mem-pci.h                  |  34 +
+ hw/virtio/virtio-mem.c                      | 781 ++++++++++++++++++++
+ include/exec/memory.h                       |  41 +
+ include/hw/pci/pci.h                        |   1 +
+ include/hw/vfio/vfio-common.h               |   4 +-
+ include/hw/virtio/virtio-mem.h              |  85 +++
+ include/migration/colo.h                    |   2 +-
+ include/standard-headers/linux/virtio_ids.h |   1 +
+ include/standard-headers/linux/virtio_mem.h | 208 ++++++
+ include/sysemu/balloon.h                    |   2 -
+ migration/migration.c                       |   8 +-
+ migration/postcopy-ram.c                    |  23 -
+ migration/rdma.c                            |  18 +-
+ migration/savevm.c                          |  11 +-
+ monitor/hmp-cmds.c                          |  16 +
+ monitor/monitor.c                           |   1 +
+ qapi/misc.json                              |  64 +-
+ target/i386/sev.c                           |   1 +
+ 34 files changed, 1598 insertions(+), 121 deletions(-)
+ create mode 100644 hw/virtio/virtio-mem-pci.c
+ create mode 100644 hw/virtio/virtio-mem-pci.h
+ create mode 100644 hw/virtio/virtio-mem.c
+ create mode 100644 include/hw/virtio/virtio-mem.h
+ create mode 100644 include/standard-headers/linux/virtio_mem.h
+
 --=20
 2.25.3
 
