@@ -7,95 +7,95 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E864AC38A2A
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 21:38:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 451B1C28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 21:38:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B31D420643
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 21:38:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0AC7320643
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 21:38:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="oEmzsQGI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B31D420643
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Bzhan7eY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AC7320643
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWRkU-00036w-Sl
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 17:38:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50754)
+	id 1jWRkk-0003QK-WA
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 17:38:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50802)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eyal.moscovici@oracle.com>)
- id 1jWRhV-00071Z-7O; Wed, 06 May 2020 17:35:33 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:52688)
+ id 1jWRhb-0007AA-L1; Wed, 06 May 2020 17:35:39 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:50490)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eyal.moscovici@oracle.com>)
- id 1jWRhT-0007Qn-H2; Wed, 06 May 2020 17:35:32 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 046LHusM102069;
- Wed, 6 May 2020 21:35:29 GMT
+ id 1jWRhZ-0007ob-5z; Wed, 06 May 2020 17:35:39 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 046LJSHo100003;
+ Wed, 6 May 2020 21:35:34 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
- bh=fJuh9yEQX+2FkhodxnzfqX7Jo2/iC7Lfk8tHnWZtPYg=;
- b=oEmzsQGIxSMawk2fAx30Q0UgJU/d0D7TLCwVYlHJD//kpQcRh3z7aB26OdLYcrrXfH/l
- gfInq3UJdiUA4mXxjfEP8IuL5zwtLeLVIgUuEkNW4DKQD1lUnHD0yQ+hVixstBE1kMq8
- VEGRxx9J+mCsisFRGieh0JJ911z6OwnlRqn9YR7zQ9z8U/UTmgGKWwcS2dzbfTitZJWI
- TwDUofuK6cXtP2BBIuSbZpt8QKRR9DgrV4P8P2eCi+Rq6PSkGdq62NobH5ISRd/PifXK
- U11TWJFiSBVtTWFgBKWpt7WFdtUUMkzyHyq3Krlk/vjWQBu5KqOWr7mkqTYsPSprtF6B cg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by userp2120.oracle.com with ESMTP id 30s1gncq0y-1
+ bh=wYBItL0O1HkGz9n/QNq2NII3wXKWScs2S1KCgSg+tyg=;
+ b=Bzhan7eYLMAbpDdA91UuqJmOVkOCoTfPYlV6hIgtJWAFkvh8O+8UtRAz+ULpO1srq+fp
+ vv+1gQ1mEp5RgkFJbi/NC5t9lUSZALS/37nMqC7DgLAnK+Ag0UrBrA4DqWxdxPD8XY6F
+ 9QKdQ1frJSUEolfoeSslV0H25gBevIYl0uIK2h3+gEklK0Bl9xhCN394Xz4fHfc4R2Jd
+ ytRaBk7jyq38+vK9eppZrqKfTBSl0DMHVyOvj6Faj+ZuAHjyXJO30IRL0DRLvOgt1lmM
+ WPN0ZqJqvKC4mAM6HwjuU69y6qHRuZNaRWSr+5wpEMZca4mKPp4FEPvD/Yy31OPkaoq5 6g== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by aserp2120.oracle.com with ESMTP id 30usgq3y98-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 06 May 2020 21:35:29 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 046LHnRw039807;
- Wed, 6 May 2020 21:35:29 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by userp3030.oracle.com with ESMTP id 30t1r8ss4k-1
+ Wed, 06 May 2020 21:35:34 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 046LZ1pD118799;
+ Wed, 6 May 2020 21:35:34 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3030.oracle.com with ESMTP id 30sjdwduf8-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 06 May 2020 21:35:29 +0000
+ Wed, 06 May 2020 21:35:33 +0000
 Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 046LZSpm018020;
- Wed, 6 May 2020 21:35:28 GMT
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 046LZWQs016525;
+ Wed, 6 May 2020 21:35:32 GMT
 Received: from localhost.localdomain (/10.74.121.228)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 06 May 2020 14:35:27 -0700
+ with ESMTP ; Wed, 06 May 2020 14:35:31 -0700
 From: Eyal Moscovici <eyal.moscovici@oracle.com>
 To: 
-Subject: [PATCH v2 3/5] qemu-img: validate image length in img_map
-Date: Thu,  7 May 2020 00:34:57 +0300
-Message-Id: <20200506213459.44743-4-eyal.moscovici@oracle.com>
+Subject: [PATCH v2 4/5] qemu-img: refactor dump_map_entry JSON format output
+Date: Thu,  7 May 2020 00:34:58 +0300
+Message-Id: <20200506213459.44743-5-eyal.moscovici@oracle.com>
 X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 In-Reply-To: <20200506213459.44743-1-eyal.moscovici@oracle.com>
 References: <59b0896d-85ad-08b5-fcc1-36adad7501a4@redhat.com>
  <20200506213459.44743-1-eyal.moscovici@oracle.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9613
  signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- adultscore=0 suspectscore=0
- spamscore=0 mlxlogscore=870 malwarescore=0 phishscore=0 mlxscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
+ suspectscore=0 mlxscore=0
+ bulkscore=0 adultscore=0 phishscore=0 mlxlogscore=999 malwarescore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
  definitions=main-2005060172
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9613
  signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- suspectscore=0 mlxscore=0
- spamscore=0 clxscore=1015 priorityscore=1501 bulkscore=0 phishscore=0
- impostorscore=0 malwarescore=0 lowpriorityscore=0 mlxlogscore=910
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2005060172
-Received-SPF: pass client-ip=156.151.31.85;
- envelope-from=eyal.moscovici@oracle.com; helo=userp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 17:35:22
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0
+ mlxscore=0
+ priorityscore=1501 lowpriorityscore=0 malwarescore=0 clxscore=1015
+ mlxlogscore=999 spamscore=0 adultscore=0 bulkscore=0 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2005060172
+Received-SPF: pass client-ip=141.146.126.78;
+ envelope-from=eyal.moscovici@oracle.com; helo=aserp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 17:35:26
 X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
 X-Spam_score_int: -43
 X-Spam_score: -4.4
 X-Spam_bar: ----
 X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -116,31 +116,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The code handles this case correctly we merely skip the loop. However it
-is probably best to return an explicit error.
+Previously dump_map_entry identified whether we need to start a new JSON
+array based on whether start address == 0. In this refactor we remove
+this assumption as in following patches we will allow map to start from
+an arbitrary position.
 
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Acked-by: Mark Kanda <mark.kanda@oracle.com>
 Signed-off-by: Eyal Moscovici <eyal.moscovici@oracle.com>
 ---
- qemu-img.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ qemu-img.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/qemu-img.c b/qemu-img.c
-index 4a06ab7fe8..a1b507a0be 100644
+index a1b507a0be..0a140fe564 100644
 --- a/qemu-img.c
 +++ b/qemu-img.c
-@@ -3086,6 +3086,11 @@ static int img_map(int argc, char **argv)
+@@ -2896,9 +2896,8 @@ static int dump_map_entry(OutputFormat output_format, MapEntry *e,
+         }
+         break;
+     case OFORMAT_JSON:
+-        printf("%s{ \"start\": %"PRId64", \"length\": %"PRId64","
++        printf("{ \"start\": %"PRId64", \"length\": %"PRId64","
+                " \"depth\": %"PRId64", \"zero\": %s, \"data\": %s",
+-               (e->start == 0 ? "[" : ",\n"),
+                e->start, e->length, e->depth,
+                e->zero ? "true" : "false",
+                e->data ? "true" : "false");
+@@ -2907,8 +2906,8 @@ static int dump_map_entry(OutputFormat output_format, MapEntry *e,
+         }
+         putchar('}');
+ 
+-        if (!next) {
+-            printf("]\n");
++        if (next) {
++            puts(",");
+         }
+         break;
+     }
+@@ -3083,6 +3082,8 @@ static int img_map(int argc, char **argv)
+ 
+     if (output_format == OFORMAT_HUMAN) {
+         printf("%-16s%-16s%-16s%s\n", "Offset", "Length", "Mapped to", "File");
++    } else if (output_format == OFORMAT_JSON) {
++        putchar('[');
      }
  
      length = blk_getlength(blk);
-+    if (length < 0) {
-+        error_report("Failed to get size for '%s'", filename);
-+        return 1;
+@@ -3119,6 +3120,9 @@ static int img_map(int argc, char **argv)
+     }
+ 
+     ret = dump_map_entry(output_format, &curr, NULL);
++    if (output_format == OFORMAT_JSON) {
++        puts("]");
 +    }
-+
-     while (curr.start + curr.length < length) {
-         int64_t offset = curr.start + curr.length;
-         int64_t n;
+ 
+ out:
+     blk_unref(blk);
 -- 
 2.17.2 (Apple Git-113)
 
