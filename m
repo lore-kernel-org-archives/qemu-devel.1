@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F22AAC47257
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 21:36:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CE60C28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 21:37:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD3EF2070B
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 21:36:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 360E62076D
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 21:37:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JPXYcFi3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD3EF2070B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="RfqsuDax"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 360E62076D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWRil-0008Ou-OH
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 17:36:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50726)
+	id 1jWRj3-0000VP-3q
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 17:37:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50696)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eyal.moscovici@oracle.com>)
- id 1jWRhR-0006wz-V6; Wed, 06 May 2020 17:35:30 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:50436)
+ id 1jWRhN-0006o2-Jm; Wed, 06 May 2020 17:35:25 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:52636)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eyal.moscovici@oracle.com>)
- id 1jWRhQ-0007HT-J0; Wed, 06 May 2020 17:35:29 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 046LJG2N099741;
- Wed, 6 May 2020 21:35:26 GMT
+ id 1jWRhM-0006wV-Cg; Wed, 06 May 2020 17:35:25 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 046LJ9Vn102767;
+ Wed, 6 May 2020 21:35:22 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
- bh=KfZMoZ7bnwZv2BOgcPIdtmUUQ0+cdV+ar33s6cn9D04=;
- b=JPXYcFi3KIh2jVZ7A3U7Zf2ZiOQkbRX2AKnYqKDAQU2WUQmo90ZdgQ+N8P7+NMOeF4RW
- r+D0LN0G0XcgU3s4573RZ1WMzMDZ7D526gekj6ih6z9qBv36MV4hSSxqAYo2qzDiVk+t
- O628XT5+TldekmLPwTHWBkzSugvdWDRJXLPr7w8uv9/t2uWVAagTNOeoqt7Sfx9rozfY
- +iKgJCKB9XHsK9PlYTtBNRg/+TwM83haKAN/xGjGhnDQz5ypWiStIyTU2oAr8robbsUN
- 2YRaDLAVmSjr86M6DzfNKTNv0N8rOwCt4rb5rHbDT/wBB0xr1Lj5lYy+jKFF7+Pc8NK7 Ow== 
+ bh=sJ4m17NJK5cs8JtIQvb12r57i6kH9t2M3Mg55ZLfYHQ=;
+ b=RfqsuDaxFcilvOURMCXES5fTegBX0/MHyYXbEOIG67b3I0k+OupWVpOGzq8u3cPlv45f
+ c2mX1vGBr+D0ojla19GkbL+hKvLSdyCCQmWAqHgefW3Rl3E70H3NI7TUjZPDTlLtQ204
+ JuTvWNxrB18eoQ++wsPSRQmovSVl5xsC3VpsT7bo1AqtNVmRtnrnwcwD4uK7JWk5LnPL
+ 0zWPUMb2sl2YqpVhBZoZVOo3coVaD6N/KBEjylr8tHOl7T8hmrdh9N3Ejy5WVkNlgCUP
+ MOY/OSdrbSJ2lJh56z7X26Sm39266lCoPq/60OfchjAUtxPDfVMjvhSIH+ZoG+065ppB qA== 
 Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by aserp2120.oracle.com with ESMTP id 30usgq3y8u-1
+ by userp2120.oracle.com with ESMTP id 30s1gncq0r-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 06 May 2020 21:35:26 +0000
+ Wed, 06 May 2020 21:35:22 +0000
 Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 046LHnku039740;
- Wed, 6 May 2020 21:35:25 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by userp3030.oracle.com with ESMTP id 30t1r8ss1r-1
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 046LHn7H039657;
+ Wed, 6 May 2020 21:35:22 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3030.oracle.com with ESMTP id 30t1r8sryn-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 06 May 2020 21:35:25 +0000
+ Wed, 06 May 2020 21:35:21 +0000
 Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 046LZONI017970;
- Wed, 6 May 2020 21:35:24 GMT
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 046LZLQe012347;
+ Wed, 6 May 2020 21:35:21 GMT
 Received: from localhost.localdomain (/10.74.121.228)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 06 May 2020 14:35:24 -0700
+ with ESMTP ; Wed, 06 May 2020 14:35:20 -0700
 From: Eyal Moscovici <eyal.moscovici@oracle.com>
 To: 
-Subject: [PATCH v2 2/5] qemu_img: add error report to cvtnum
-Date: Thu,  7 May 2020 00:34:56 +0300
-Message-Id: <20200506213459.44743-3-eyal.moscovici@oracle.com>
+Subject: [PATCH v2 1/5] qemu-img: remove check that cvtnum value > MAX_INT
+Date: Thu,  7 May 2020 00:34:55 +0300
+Message-Id: <20200506213459.44743-2-eyal.moscovici@oracle.com>
 X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 In-Reply-To: <20200506213459.44743-1-eyal.moscovici@oracle.com>
 References: <59b0896d-85ad-08b5-fcc1-36adad7501a4@redhat.com>
@@ -79,23 +79,23 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
  definitions=main-2005060172
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9613
  signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0
- mlxscore=0
- priorityscore=1501 lowpriorityscore=0 malwarescore=0 clxscore=1015
- mlxlogscore=999 spamscore=0 adultscore=0 bulkscore=0 phishscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2005060172
-Received-SPF: pass client-ip=141.146.126.78;
- envelope-from=eyal.moscovici@oracle.com; helo=aserp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 17:35:26
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ suspectscore=0 mlxscore=0
+ spamscore=0 clxscore=1015 priorityscore=1501 bulkscore=0 phishscore=0
+ impostorscore=0 malwarescore=0 lowpriorityscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2005060172
+Received-SPF: pass client-ip=156.151.31.85;
+ envelope-from=eyal.moscovici@oracle.com; helo=userp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 17:35:22
 X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
 X-Spam_score_int: -43
 X-Spam_score: -4.4
 X-Spam_bar: ----
 X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -116,190 +116,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-All calls to cvtnum check the return value and print the same error message more
-or less. And so error reporting moved to cvtnum to reduce duplicate code and
-provide a single error message.
+Following commit f46bfdbfc8f95cf65d7818ef68a801e063c40332 (util/cutils: Change
+qemu_strtosz*() from int64_t to uint64_t) which added a similar check to
+cvtnum. As a result there is no need to check it separately outside of cvtnum.
 
 Acked-by: Mark Kanda <mark.kanda@oracle.com>
 Signed-off-by: Eyal Moscovici <eyal.moscovici@oracle.com>
 ---
- qemu-img.c                 | 63 ++++++++++++++++----------------------
- tests/qemu-iotests/049.out |  4 +--
- 2 files changed, 28 insertions(+), 39 deletions(-)
+ qemu-img.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/qemu-img.c b/qemu-img.c
-index 116a9c6349..4a06ab7fe8 100644
+index 6a4327aaba..116a9c6349 100644
 --- a/qemu-img.c
 +++ b/qemu-img.c
-@@ -470,16 +470,22 @@ static int add_old_style_options(const char *fmt, QemuOpts *opts,
-     return 0;
- }
- 
--static int64_t cvtnum(const char *s)
-+static int64_t cvtnum(const char *arg_name, const char *arg_value)
- {
-     int err;
-     uint64_t value;
- 
--    err = qemu_strtosz(s, NULL, &value);
--    if (err < 0) {
-+    err = qemu_strtosz(arg_value, NULL, &value);
-+    if (err < 0 && err != -ERANGE) {
-+        error_report("Invalid %s specified! You may use "
-+                     "k, M, G, T, P or E suffixes for ", arg_name);
-+        error_report("kilobytes, megabytes, gigabytes, terabytes, "
-+                     "petabytes and exabytes.");
-         return err;
-     }
--    if (value > INT64_MAX) {
-+    if (err == -ERANGE || value > INT64_MAX) {
-+        error_report("Invalid %s specified! Must be less than 8 EiB!",
-+                     arg_name);
-         return -ERANGE;
-     }
-     return value;
-@@ -572,16 +578,8 @@ static int img_create(int argc, char **argv)
-     if (optind < argc) {
-         int64_t sval;
- 
--        sval = cvtnum(argv[optind++]);
-+        sval = cvtnum("image size", argv[optind++]);
-         if (sval < 0) {
--            if (sval == -ERANGE) {
--                error_report("Image size must be less than 8 EiB!");
--            } else {
--                error_report("Invalid image size specified! You may use k, M, "
--                      "G, T, P or E suffixes for ");
--                error_report("kilobytes, megabytes, gigabytes, terabytes, "
--                             "petabytes and exabytes.");
--            }
-             goto fail;
-         }
-         img_size = (uint64_t)sval;
-@@ -2187,8 +2185,10 @@ static int img_convert(int argc, char **argv)
-         {
+@@ -4307,7 +4307,7 @@ static int img_bench(int argc, char **argv)
              int64_t sval;
  
--            sval = cvtnum(optarg);
--            if (sval < 0 || !QEMU_IS_ALIGNED(sval, BDRV_SECTOR_SIZE) ||
-+            sval = cvtnum("buffer size for sparse output", optarg);
+             sval = cvtnum(optarg);
+-            if (sval < 0 || sval > INT_MAX) {
 +            if (sval < 0) {
-+                goto fail_getopt;
-+            } else if (!QEMU_IS_ALIGNED(sval, BDRV_SECTOR_SIZE) ||
-                 sval / BDRV_SECTOR_SIZE > MAX_BUF_SECTORS) {
-                 error_report("Invalid buffer size for sparse output specified. "
-                     "Valid sizes are multiples of %llu up to %llu. Select "
-@@ -4291,9 +4291,8 @@ static int img_bench(int argc, char **argv)
-             break;
-         case 'o':
-         {
--            offset = cvtnum(optarg);
-+            offset = cvtnum("offset", optarg);
-             if (offset < 0) {
--                error_report("Invalid offset specified");
+                 error_report("Invalid buffer size specified");
                  return 1;
              }
-             break;
-@@ -4306,9 +4305,8 @@ static int img_bench(int argc, char **argv)
-         {
+@@ -4320,7 +4320,7 @@ static int img_bench(int argc, char **argv)
              int64_t sval;
  
--            sval = cvtnum(optarg);
-+            sval = cvtnum("buffer size", optarg);
-             if (sval < 0) {
--                error_report("Invalid buffer size specified");
+             sval = cvtnum(optarg);
+-            if (sval < 0 || sval > INT_MAX) {
++            if (sval < 0) {
+                 error_report("Invalid step size specified");
                  return 1;
              }
+@@ -4493,7 +4493,7 @@ static int img_dd_bs(const char *arg,
  
-@@ -4319,9 +4317,8 @@ static int img_bench(int argc, char **argv)
-         {
-             int64_t sval;
+     res = cvtnum(arg);
  
--            sval = cvtnum(optarg);
-+            sval = cvtnum("step_size", optarg);
-             if (sval < 0) {
--                error_report("Invalid step size specified");
-                 return 1;
-             }
- 
-@@ -4491,10 +4488,12 @@ static int img_dd_bs(const char *arg,
- {
-     int64_t res;
- 
--    res = cvtnum(arg);
-+    res = cvtnum("bs", arg);
- 
--    if (res <= 0) {
--        error_report("invalid number: '%s'", arg);
-+    if (res < 0) {
-+        return 1;
-+    } else if (res == 0) {
-+        error_report("Invalid bs specified! It cannot be 0.");
+-    if (res <= 0 || res > INT_MAX) {
++    if (res <= 0) {
+         error_report("invalid number: '%s'", arg);
          return 1;
      }
-     in->bsz = out->bsz = res;
-@@ -4506,10 +4505,9 @@ static int img_dd_count(const char *arg,
-                         struct DdIo *in, struct DdIo *out,
-                         struct DdInfo *dd)
- {
--    dd->count = cvtnum(arg);
-+    dd->count = cvtnum("count", arg);
- 
-     if (dd->count < 0) {
--        error_report("invalid number: '%s'", arg);
-         return 1;
-     }
- 
-@@ -4538,10 +4536,9 @@ static int img_dd_skip(const char *arg,
-                        struct DdIo *in, struct DdIo *out,
-                        struct DdInfo *dd)
- {
--    in->offset = cvtnum(arg);
-+    in->offset = cvtnum("skip", arg);
- 
-     if (in->offset < 0) {
--        error_report("invalid number: '%s'", arg);
-         return 1;
-     }
- 
-@@ -4923,16 +4920,8 @@ static int img_measure(int argc, char **argv)
-         {
-             int64_t sval;
- 
--            sval = cvtnum(optarg);
-+            sval = cvtnum("image size", optarg);
-             if (sval < 0) {
--                if (sval == -ERANGE) {
--                    error_report("Image size must be less than 8 EiB!");
--                } else {
--                    error_report("Invalid image size specified! You may use "
--                                 "k, M, G, T, P or E suffixes for ");
--                    error_report("kilobytes, megabytes, gigabytes, terabytes, "
--                                 "petabytes and exabytes.");
--                }
-                 goto out;
-             }
-             img_size = (uint64_t)sval;
-diff --git a/tests/qemu-iotests/049.out b/tests/qemu-iotests/049.out
-index affa55b341..0ec2e6b82e 100644
---- a/tests/qemu-iotests/049.out
-+++ b/tests/qemu-iotests/049.out
-@@ -92,13 +92,13 @@ Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1649267441664 cluster_size=65536 l
- == 3. Invalid sizes ==
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 -- -1024
--qemu-img: Image size must be less than 8 EiB!
-+qemu-img: Invalid image size specified! Must be less than 8 EiB!
- 
- qemu-img create -f qcow2 -o size=-1024 TEST_DIR/t.qcow2
- qemu-img: TEST_DIR/t.qcow2: Value '-1024' is out of range for parameter 'size'
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 -- -1k
--qemu-img: Image size must be less than 8 EiB!
-+qemu-img: Invalid image size specified! Must be less than 8 EiB!
- 
- qemu-img create -f qcow2 -o size=-1k TEST_DIR/t.qcow2
- qemu-img: TEST_DIR/t.qcow2: Value '-1k' is out of range for parameter 'size'
 -- 
 2.17.2 (Apple Git-113)
 
