@@ -4,96 +4,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0B15C28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 09:47:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07413C28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 09:51:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 693362070B
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 09:47:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C272C2070B
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 09:51:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KqXrRtm9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 693362070B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PEybXLPz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C272C2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWGeX-0003tV-HO
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 05:47:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53358)
+	id 1jWGi8-0005xX-St
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 05:51:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54066)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
- id 1jWGdz-0003Nz-7c
- for qemu-devel@nongnu.org; Wed, 06 May 2020 05:47:11 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20022
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jWGgs-0004c4-C4
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 05:50:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20482
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
- id 1jWGdy-0001Gq-B8
- for qemu-devel@nongnu.org; Wed, 06 May 2020 05:47:10 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jWGgr-0003Qw-50
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 05:50:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588758429;
+ s=mimecast20190719; t=1588758608;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rZSmXkE5hbHUFGr4fqRhpF9EfEwVQeDRGEVGFjzUmlc=;
- b=KqXrRtm9FhWJmaaSRgPn7rqBdpPsONTs4PdtMpl5UDY5/iP3ayuuJzQii1PKsQFl/7QytN
- dJorNWhgX4tKehyaaEC5tXxe6PF5HmxDjN68G1/IJMlNnxqXZWWSY84sStGmaRhNcLKAPB
- lOBcRJ3SR19UgP1xp9Y3SBEszSkuhnA=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-309-hhVzdKuLOaWGHaUfDJxL-w-1; Wed, 06 May 2020 05:47:06 -0400
-X-MC-Unique: hhVzdKuLOaWGHaUfDJxL-w-1
-Received: by mail-io1-f69.google.com with SMTP id t130so1081300iod.10
- for <qemu-devel@nongnu.org>; Wed, 06 May 2020 02:47:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=rZSmXkE5hbHUFGr4fqRhpF9EfEwVQeDRGEVGFjzUmlc=;
- b=G7niPeZmaR8nPidk69UgIgnohZMvgA6O3CqgojSmMBpbHCXEnM1odbbKt4p6NACiCM
- 3Wkk4yPcX8klr7ECRtaCK/usQJDi7k5zww+MDu0IOKIGocYtVttKvxLdlO6l3G+bEQMO
- BoPiZtgvXGZX/qfw2F4+4t1pCCWOKeMZP77csbHxD37WUhJ+wcy5bofT3fGQqtgqhufF
- 8Xpl8TnvulIeOIN57HYaMZX0oQk+PZqX6FUhyhcrX8YJpBcCgx88v2HE66eABPovIWFR
- 7uI+N5/MPHn97kp/YvLDgwWzzKg2UqiFYRaE5E8yDHa49qYMSgiDeCpRF9xM78bqJtBx
- mkFA==
-X-Gm-Message-State: AGi0PubwEj0EpbEp9huthXiK6LJqGlitnhu09hZ+HXQXgXXhDZL0/ePX
- 7q6/l9epy9HGwD9+M6lJPtkv8wDB/5QBS3Yzbjzc+ZtoT3Q5vH6368OqW7H05+FkA/gA2+V44d6
- uwel4E26miCKYqk+Oxi4ZPrycEfUGaP4=
-X-Received: by 2002:a5e:dd0c:: with SMTP id t12mr7565464iop.82.1588758425588; 
- Wed, 06 May 2020 02:47:05 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIHYY9LWcbGo5FOl3fyXEaBJyRmzUFJJJ0vlptdhh8S69K0fyGb25N/Jn/qq8+Dq75hsBGGUSwlXpcqgTdQgq4=
-X-Received: by 2002:a5e:dd0c:: with SMTP id t12mr7565442iop.82.1588758425264; 
- Wed, 06 May 2020 02:47:05 -0700 (PDT)
+ bh=1b7WzEdOr0opnS44tYvGmSayhyE3oXt+X3RgB8uyQ/4=;
+ b=PEybXLPzyCAXbc0VPHNSmX4nyPKA9AIDQDyvs+FYMXf8oLwjU3hmQ5nnxuzlHYhMfjGnUo
+ oPIFlxXn12O2P5lQ7GvMxly7eJEVKGhNSfc0P0hcn0nOb3H5wnzB0cz6gTdNTTPdUz7lOu
+ RPZ8MxhsWZN4BLOVyY67FFmvgxAw6UU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-287-tQp4UaSBNF61XvzTMO_hOA-1; Wed, 06 May 2020 05:50:06 -0400
+X-MC-Unique: tQp4UaSBNF61XvzTMO_hOA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 99C2C835B44;
+ Wed,  6 May 2020 09:50:05 +0000 (UTC)
+Received: from t480s.redhat.com (ovpn-113-17.ams2.redhat.com [10.36.113.17])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D68BA5C1D4;
+ Wed,  6 May 2020 09:50:01 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v1 01/17] exec: Introduce
+ ram_block_discard_set_(unreliable|required)()
+Date: Wed,  6 May 2020 11:49:32 +0200
+Message-Id: <20200506094948.76388-2-david@redhat.com>
+In-Reply-To: <20200506094948.76388-1-david@redhat.com>
+References: <20200506094948.76388-1-david@redhat.com>
 MIME-Version: 1.0
-References: <cover.1588252861.git.dimastep@yandex-team.ru>
- <2f783e19d2bfe75946ec677ddd5e979f9a3683d2.1588252862.git.dimastep@yandex-team.ru>
-In-Reply-To: <2f783e19d2bfe75946ec677ddd5e979f9a3683d2.1588252862.git.dimastep@yandex-team.ru>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Wed, 6 May 2020 11:46:54 +0200
-Message-ID: <CAMxuvay_kcOPSfDV3OFKe+FGU9A_oP25pQfEuvo6ZA1stN_ycw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/5] char-socket: return -1 in case of disconnect
- during tcp_chr_write
-To: Dima Stepanov <dimastep@yandex-team.ru>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mlureau@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 02:39:40
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 23:48:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FROM_EXCESS_BASE64=0.979, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,106 +90,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, "Wolf, Kevin" <kwolf@redhat.com>,
- yc-core@yandex-team.ru, qemu-block <qemu-block@nongnu.org>,
- Michael Tsirkin <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, David Gilbert <dgilbert@redhat.com>,
- Gonglei <arei.gonglei@huawei.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>, Li Feng <fengli@smartx.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, "Bonzini, Paolo" <pbonzini@redhat.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ "Michael S . Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-s390x@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Apr 30, 2020 at 3:37 PM Dima Stepanov <dimastep@yandex-team.ru> wro=
-te:
->
-> During testing of the vhost-user-blk reconnect functionality the qemu
-> SIGSEGV was triggered:
->  start qemu as:
->  x86_64-softmmu/qemu-system-x86_64 -m 1024M -M q35 \
->    -object memory-backend-file,id=3Dram-node0,size=3D1024M,mem-path=3D/de=
-v/shm/qemu,share=3Don \
->    -numa node,cpus=3D0,memdev=3Dram-node0 \
->    -chardev socket,id=3Dchardev0,path=3D./vhost.sock,noserver,reconnect=
-=3D1 \
->    -device vhost-user-blk-pci,chardev=3Dchardev0,num-queues=3D4 --enable-=
-kvm
->  start vhost-user-blk daemon:
->  ./vhost-user-blk -s ./vhost.sock -b test-img.raw
->
-> If vhost-user-blk will be killed during the vhost initialization
-> process, for instance after getting VHOST_SET_VRING_CALL command, then
-> QEMU will fail with the following backtrace:
->
-> Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
-> 0x00005555559272bb in vhost_user_read (dev=3D0x7fffef2d53e0, msg=3D0x7fff=
-ffffd5b0)
->     at ./hw/virtio/vhost-user.c:260
-> 260         CharBackend *chr =3D u->user->chr;
->
->  #0  0x00005555559272bb in vhost_user_read (dev=3D0x7fffef2d53e0, msg=3D0=
-x7fffffffd5b0)
->     at ./hw/virtio/vhost-user.c:260
->  #1  0x000055555592acb8 in vhost_user_get_config (dev=3D0x7fffef2d53e0, c=
-onfig=3D0x7fffef2d5394 "", config_len=3D60)
->     at ./hw/virtio/vhost-user.c:1645
->  #2  0x0000555555925525 in vhost_dev_get_config (hdev=3D0x7fffef2d53e0, c=
-onfig=3D0x7fffef2d5394 "", config_len=3D60)
->     at ./hw/virtio/vhost.c:1490
->  #3  0x00005555558cc46b in vhost_user_blk_device_realize (dev=3D0x7fffef2=
-d51a0, errp=3D0x7fffffffd8f0)
->     at ./hw/block/vhost-user-blk.c:429
->  #4  0x0000555555920090 in virtio_device_realize (dev=3D0x7fffef2d51a0, e=
-rrp=3D0x7fffffffd948)
->     at ./hw/virtio/virtio.c:3615
->  #5  0x0000555555a9779c in device_set_realized (obj=3D0x7fffef2d51a0, val=
-ue=3Dtrue, errp=3D0x7fffffffdb88)
->     at ./hw/core/qdev.c:891
->  ...
->
-> The problem is that vhost_user_write doesn't get an error after
-> disconnect and try to call vhost_user_read(). The tcp_chr_write()
-> routine should return -1 in case of disconnect. Indicate the EIO error
-> if this routine is called in the disconnected state.
->
-> Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+We want to replace qemu_balloon_inhibit() by something more generic.
+Especially, we want to make sure that technologies that really rely on
+RAM block discards to work reliably to run mutual exclusive with
+technologies that break it.
 
+E.g., vfio will usually pin all guest memory, turning the virtio-balloon
+basically useless and make the VM consume more memory than reported via
+the balloon. While the balloon is special already (=3D> no guarantees, sa=
+me
+behavior possible afer reboots and with huge pages), this will be
+different, especially, with virtio-mem.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Let's implement a way such that we can make both types of technology run
+mutually exclusive. We'll convert existing balloon inhibitors in successi=
+ve
+patches and add some new ones. Add the check to
+qemu_balloon_is_inhibited() for now. We might want to make
+virtio-balloon an acutal inhibitor in the future - however, that
+requires more thought to not break existing setups.
 
-> ---
->  chardev/char-socket.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
->
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index 185fe38..c128cca 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -175,14 +175,16 @@ static int tcp_chr_write(Chardev *chr, const uint8_=
-t *buf, int len)
->          if (ret < 0 && errno !=3D EAGAIN) {
->              if (tcp_chr_read_poll(chr) <=3D 0) {
->                  tcp_chr_disconnect_locked(chr);
-> -                return len;
-> +                /* Return an error since we made a disconnect. */
-> +                return ret;
->              } /* else let the read handler finish it properly */
->          }
->
->          return ret;
->      } else {
-> -        /* XXX: indicate an error ? */
-> -        return len;
-> +        /* Indicate an error. */
-> +        errno =3D EIO;
-> +        return -1;
->      }
->  }
->
-> --
-> 2.7.4
->
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ balloon.c             |  3 ++-
+ exec.c                | 48 +++++++++++++++++++++++++++++++++++++++++++
+ include/exec/memory.h | 41 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 91 insertions(+), 1 deletion(-)
+
+diff --git a/balloon.c b/balloon.c
+index f104b42961..c49f57c27b 100644
+--- a/balloon.c
++++ b/balloon.c
+@@ -40,7 +40,8 @@ static int balloon_inhibit_count;
+=20
+ bool qemu_balloon_is_inhibited(void)
+ {
+-    return atomic_read(&balloon_inhibit_count) > 0;
++    return atomic_read(&balloon_inhibit_count) > 0 ||
++           ram_block_discard_is_broken();
+ }
+=20
+ void qemu_balloon_inhibit(bool state)
+diff --git a/exec.c b/exec.c
+index 2874bb5088..52a6e40e99 100644
+--- a/exec.c
++++ b/exec.c
+@@ -4049,4 +4049,52 @@ void mtree_print_dispatch(AddressSpaceDispatch *d,=
+ MemoryRegion *root)
+     }
+ }
+=20
++static int ram_block_discard_broken;
++
++int ram_block_discard_set_broken(bool state)
++{
++    int old;
++
++    if (!state) {
++        atomic_dec(&ram_block_discard_broken);
++        return 0;
++    }
++
++    do {
++        old =3D atomic_read(&ram_block_discard_broken);
++        if (old < 0) {
++            return -EBUSY;
++        }
++    } while (atomic_cmpxchg(&ram_block_discard_broken, old, old + 1) !=3D=
+ old);
++    return 0;
++}
++
++int ram_block_discard_set_required(bool state)
++{
++    int old;
++
++    if (!state) {
++        atomic_inc(&ram_block_discard_broken);
++        return 0;
++    }
++
++    do {
++        old =3D atomic_read(&ram_block_discard_broken);
++        if (old > 0) {
++            return -EBUSY;
++        }
++    } while (atomic_cmpxchg(&ram_block_discard_broken, old, old - 1) !=3D=
+ old);
++    return 0;
++}
++
++bool ram_block_discard_is_broken(void)
++{
++    return atomic_read(&ram_block_discard_broken) > 0;
++}
++
++bool ram_block_discard_is_required(void)
++{
++    return atomic_read(&ram_block_discard_broken) < 0;
++}
++
+ #endif
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index e000bd2f97..9bb5ced38d 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -2463,6 +2463,47 @@ static inline MemOp devend_memop(enum device_endia=
+n end)
+ }
+ #endif
+=20
++/*
++ * Inhibit technologies that rely on discarding of parts of RAM blocks t=
+o work
++ * reliably, e.g., to manage the actual amount of memory consumed by the=
+ VM
++ * (then, the memory provided by RAM blocks might be bigger than the des=
+ired
++ * memory consumption). This *must* be set if:
++ * - Discarding parts of a RAM blocks does not result in the change bein=
+g
++ *   reflected in the VM and the pages getting freed.
++ * - All memory in RAM blocks is pinned or duplicated, invaldiating any =
+previous
++ *   discards blindly.
++ * - Discarding parts of a RAM blocks will result in integrity issues (e=
+.g.,
++ *   encrypted VMs).
++ * Technologies that only temporarily pin the current working set of a
++ * driver are fine, because we don't expect such pages to be discarded
++ * (esp. based on guest action like balloon inflation).
++ *
++ * This is *not* to be used to protect from concurrent discards (esp.,
++ * postcopy).
++ *
++ * Returns 0 if successful. Returns -EBUSY if a technology that relies o=
+n
++ * discards to work reliably is active.
++ */
++int ram_block_discard_set_broken(bool state);
++
++/*
++ * Inhibit technologies that will break discarding of pages in RAM block=
+s.
++ *
++ * Returns 0 if successful. Returns -EBUSY if discards are already set t=
+o
++ * broken.
++ */
++int ram_block_discard_set_required(bool state);
++
++/*
++ * Test if discarding of memory in ram blocks is broken.
++ */
++bool ram_block_discard_is_broken(void);
++
++/*
++ * Test if discarding of memory in ram blocks is required to work reliab=
+ly.
++ */
++bool ram_block_discard_is_required(void);
++
+ #endif
+=20
+ #endif
+--=20
+2.25.3
 
 
