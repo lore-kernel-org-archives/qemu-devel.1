@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB4F8C28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 15:59:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E43FC28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 16:03:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A34972068E
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 15:59:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0766D2068E
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 16:03:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OBFuWxMK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A34972068E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hPD8+5DJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0766D2068E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWMSU-0001lt-Qh
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 11:59:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50068)
+	id 1jWMVi-0006CB-6S
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 12:03:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50538)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jWMRq-0001Kn-DD
- for qemu-devel@nongnu.org; Wed, 06 May 2020 11:59:03 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60579
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jWMU7-0003iZ-G5
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 12:01:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40598
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jWMRp-0000yw-LI
- for qemu-devel@nongnu.org; Wed, 06 May 2020 11:59:02 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jWMU6-0002tB-01
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 12:01:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588780739;
+ s=mimecast20190719; t=1588780881;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=merf9dA+BjiqyLT8q0lZ2ckbH3ecdknfBqHs5LLcLME=;
- b=OBFuWxMKVNpOBJlxw6eHL+kdDsz3QkyTAq2RTDyjYwGuO0FcU+sHoeR6J5lhCE1if5FQ/4
- kwRsOI6dalaTZdeUISi2bBsRUVbr/TrxUxtky0m0mUpTEFlUmWu1i91Zchmm0+qqXh6Ddl
- R/KRHV/62iDSSoCwZ2NeYNNVAMwGEWA=
+ bh=8VDCkaXcyoxW7fY0Lm8yCASCn4j9uzmsrJwnbaMylDo=;
+ b=hPD8+5DJbn0SmCNtoKdJGtMrg50DkhQqkPOjtlyjWhz5gkwJEzqb1hmyfTzG8uxsr1mtSN
+ xRbN8hl6QSazZnCpNQPOfo0f6wh3Tdc9ZOg/P847cInSVhW5MrQ6Iul2UIKcKZgTiXh4N+
+ xNVfSsitKJNMWkk/NM1P5e9sS3IgsSk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-1QhliYrBP9uQMfy-E8fdgg-1; Wed, 06 May 2020 11:58:58 -0400
-X-MC-Unique: 1QhliYrBP9uQMfy-E8fdgg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-230-Q-2YaqwwMLucH9bPXORVYg-1; Wed, 06 May 2020 12:01:16 -0400
+X-MC-Unique: Q-2YaqwwMLucH9bPXORVYg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1C753835B5A;
- Wed,  6 May 2020 15:58:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D53A78014C0;
+ Wed,  6 May 2020 16:01:14 +0000 (UTC)
 Received: from gondolin (ovpn-112-211.ams2.redhat.com [10.36.112.211])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B2A7E60619;
- Wed,  6 May 2020 15:58:55 +0000 (UTC)
-Date: Wed, 6 May 2020 17:58:53 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6FA0D4233;
+ Wed,  6 May 2020 16:01:13 +0000 (UTC)
+Date: Wed, 6 May 2020 18:01:10 +0200
 From: Cornelia Huck <cohuck@redhat.com>
 To: Eric Farman <farman@linux.ibm.com>
-Subject: Re: [PATCH v4 5/6] s390x/css: Refactor the css_queue_crw() routine
-Message-ID: <20200506175853.04dc508a.cohuck@redhat.com>
-In-Reply-To: <20200505125757.98209-6-farman@linux.ibm.com>
+Subject: Re: [PATCH v4 6/6] vfio-ccw: Add support for the CRW region and IRQ
+Message-ID: <20200506180110.106bd1b0.cohuck@redhat.com>
+In-Reply-To: <20200505125757.98209-7-farman@linux.ibm.com>
 References: <20200505125757.98209-1-farman@linux.ibm.com>
- <20200505125757.98209-6-farman@linux.ibm.com>
+ <20200505125757.98209-7-farman@linux.ibm.com>
 Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 05:50:09
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 04:02:22
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -100,24 +100,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue,  5 May 2020 14:57:56 +0200
+On Tue,  5 May 2020 14:57:57 +0200
 Eric Farman <farman@linux.ibm.com> wrote:
 
-> We have a use case (vfio-ccw) where a CRW is already built and
-> ready to use.  Rather than teasing out the components just to
-> reassemble it later, let's rework this code so we can queue a
-> fully-qualified CRW directly.
+> From: Farhan Ali <alifm@linux.ibm.com>
 > 
+> The crw region can be used to obtain information about
+> Channel Report Words (CRW) from vfio-ccw driver.
+> 
+> Currently only channel-path related CRWs are passed to
+> QEMU from vfio-ccw driver.
+> 
+> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
 > Signed-off-by: Eric Farman <farman@linux.ibm.com>
 > ---
 > 
 > Notes:
 >     v3->v4:
->      - s/css_queue_crw_cont/css_crw_add_to_queue/ [CH]
+>      - Merge region patch into IRQ patch [CH]
+>      - Rework the testing/clearing notifier and reading region [CH]
+>     
+>     v2->v3:
+>      - Remove "size==0" check in CRW notifier [CH]
+>      - Remove intermediate rsc/erc variables, use css_queue_crw_cont() [CH]
+>      - s/crw0/crw/ [CH]
+>     
+>     v1->v2:
+>      - Add a loop to continually read region while data is
+>        present, queueing CRWs as found [CH]
+>     
+>     v0->v1: [EF]
+>      - Fixed copy/paste error in error message (s/schib/CRW)
+>      - Check vcdev->crw_region before registering the irq,
+>        in case host kernel does not have matching support
+>      - Split the refactoring changes to an earlier (new) patch
+>        (and don't remove the "num_irqs" check in the register
+>        routine, but adjust it to the check the input variable)
+>      - Don't revert the cool vfio_set_irq_signaling() stuff
+>      - Unregister CRW IRQ before IO IRQ in unrealize
+>      - s/crw1/crw0/
 > 
->  hw/s390x/css.c         | 44 ++++++++++++++++++++++++++++--------------
->  include/hw/s390x/css.h |  1 +
->  2 files changed, 30 insertions(+), 15 deletions(-)
+>  hw/vfio/ccw.c | 73 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 73 insertions(+)
+> 
 
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
