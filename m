@@ -2,126 +2,69 @@ Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7E92C28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 15:00:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 254CFC28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 15:03:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A74D20746
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 15:00:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D98D620746
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 15:03:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="rrsEcAXu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A74D20746
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="RC7DDxtg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D98D620746
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWLWr-0005fT-D3
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 11:00:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36838)
+	id 1jWLaN-0007f2-Vp
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 11:03:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37948)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jWLVq-00058q-Aj; Wed, 06 May 2020 10:59:06 -0400
-Received: from mail-eopbgr50103.outbound.protection.outlook.com
- ([40.107.5.103]:2894 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jWLVn-0003Zq-F3; Wed, 06 May 2020 10:59:05 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kxDvWQyqSFaAYl//elh2LntiCINmuH78/JqAiTRt0OLDDcO68aNjLT2rMuJl1j+LEIw5TJOwQao6lgqbPxZdqb4WGItwXuu5fT44QZpYVMk7xj9wqcyCxkuJChX3CdXSPMYNVrGYOzNTYhE7XV6IKNwP+9hO0SbS2bqucgz3mjecEr+Zw7uV3BYh55fUWumT0n3+2iZVC/wHJRHJBc81XZ/CymVNABfPisQSf4pqVSOtRajUuGHnjsbgLC1o2j+QyaV3IG/y9CxyWhvX5wC5ABpbTiVCPABe1EbBi94x8+A0Cry5gRi5LmIaESPZi/gz7iTEbrSxwV0O1qT6R/XH5w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kGhsn+MCiTSw4o96jc5+rnuh8Ap7jrIlX6fdNmtw6qA=;
- b=HQDHrl5Khd80Vr1e7QoClYs7dBmwdGJ1w4rDg1CvFt04RrU0xiFpvBFqyy4jNVn35HiHBGifpStZjpggcaG03YcilYEe3wE578nJbE4m+eJsrfSQVs0nwE6eTar8tPW6n7D2OyRQFZUCB3STcRdU4/UI2M62zstuaNaCSygVoC17bRZf1OZ+3c2DR765xucidTac/Y1bEwckdYrUo5hvQfA9jx7ySIwpsShVKipVO0EHjsoNbCVCvd/K5ULlMI1xSG95m3lTvh4hzfoeoCOVbKXfThfUVPcw3ODFJOz056XwcdsUM38G1XyDFMxUwc7MzWiC6UKz7FBjT4ZUI9WRDg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kGhsn+MCiTSw4o96jc5+rnuh8Ap7jrIlX6fdNmtw6qA=;
- b=rrsEcAXupF8Y/m5lw6YkqF+jJI5xfSvBdI4oqTe7ACKMbaTl04QVi2L7PzRz28merdxS7/jwboF1xACpbRMa2F6rCCCUwfDI+ODCW1t6WBfwqBmXmziCmvAt25eur0yQY61y+ksvZx1gaJQYoMk9Soe7j7S6dnqNXmWs45tj3Gw=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5302.eurprd08.prod.outlook.com (2603:10a6:20b:103::10)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.27; Wed, 6 May
- 2020 14:58:59 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2958.030; Wed, 6 May 2020
- 14:58:58 +0000
-Subject: Re: [PATCH 7/8] qemu-img: convert: don't use
- unallocated_blocks_are_zero
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-References: <20200506092513.20904-1-vsementsov@virtuozzo.com>
- <20200506092513.20904-8-vsementsov@virtuozzo.com>
- <6e430529-5fe1-65de-6e07-6176d0d9a201@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200506175856842
-Message-ID: <09fe1e55-ea75-9bf2-505e-15088cdec9e8@virtuozzo.com>
-Date: Wed, 6 May 2020 17:58:56 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <6e430529-5fe1-65de-6e07-6176d0d9a201@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM0PR02CA0004.eurprd02.prod.outlook.com
- (2603:10a6:208:3e::17) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1jWLZa-0006oW-FK; Wed, 06 May 2020 11:02:58 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:49505)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1jWLZY-0006ZY-4s; Wed, 06 May 2020 11:02:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=sHIl9q4uSH0GC4zmVXN3kQnxRlJqRsrYbNBGHJkk3Tw=; 
+ b=RC7DDxtgEE01UUC2CowBApCH8aHpga3py+1zxJe+CryOANa1jYw11aXDz3HQ9WQDGEWon60r1nxTAD6llOrpA2WPbSKqXP4D9HjN5cLjjfqb3ttBrOjlEN+LWa+xd4c2AMAqKkT6QC7CRvGfDm1J9U6qMz65F3vN3PuSwuzIC3Yc8b4iiqn9AX/on79+mcxVKeNgaTByuqKj0DXoZNvGXOGJo1VcSMEbCsnEjH9l/Q4ujutj7ZiLXzNDGdww+L7Qicj3xvJSVUT7vRBWc+6NoDBUjlU0scgE2c+3oomAf+VYAOv+6X96qM3+G3+JfHha1QBsnzTThJCC1FVZtRpYGQ==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1jWLZU-0004SR-EH; Wed, 06 May 2020 17:02:52 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1jWLZU-0001NW-3a; Wed, 06 May 2020 17:02:52 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Subject: Re: [PATCH v5 07/31] qcow2: Document the Extended L2 Entries feature
+In-Reply-To: <52c059ee-8a80-89af-dbab-ffea3976421e@redhat.com>
+References: <cover.1588699789.git.berto@igalia.com>
+ <ad59735f252161ec7ed2f08b30cd517cbfb1d360.1588699789.git.berto@igalia.com>
+ <52c059ee-8a80-89af-dbab-ffea3976421e@redhat.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Wed, 06 May 2020 17:02:52 +0200
+Message-ID: <w51d07h9kdf.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.178) by
- AM0PR02CA0004.eurprd02.prod.outlook.com (2603:10a6:208:3e::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2979.27 via Frontend Transport; Wed, 6 May 2020 14:58:58 +0000
-X-Tagtoolbar-Keys: D20200506175856842
-X-Originating-IP: [185.215.60.178]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: cbe5ce7f-2a41-4dc4-a612-08d7f1ce0196
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5302:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5302CBAE6C5C1B849FE1D5A1C1A40@AM7PR08MB5302.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2150;
-X-Forefront-PRVS: 03950F25EC
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jnm//jzg6FmtovO6/EFWadEm4fB2k7VcKPvSXEO/mrnrJkOrU42nSXJxfWfv5MMhi8SdeO7H1U3mujDXukQ7W3IyhX8vuyXxu2tbvccnDq+8Bq0vauWkc4SRBIWNomRHKoMQqe9EKmL+0W7pNCv4D4eRLRZ0wRESvaB+NKRLlJ9JAUSfbnI7DZaVm32TxQzcSwgGMrfm1hQZo3S/GExwRI5x6frmXnyXGjJ5wFAnbvCImKaNy7X+yEENcD0gXUBHfXYO8rxwqOrulQmSHXfGF9euyYBlW1TKf4H05NiFKdvthCD7lGebSzr0p7GgxFsjWV2jEmT1N4ITPuMspZZwTauLwZ376ewZJk/QxSvSFSgHL/pU3KUE6YXJwqAg8+fPB7aOanbvZyicun0ZE2xOH80yTu5ejWe5cdytfcoNkOsdQjMp8E/2oSi7HoiAFwPdwrOSydJXFXuAvlrWsLRvkb4ggQiWd8s7YWJLRztvs6ibFSWBXpeiThhTSALnO72tP1BOcdElXhQ24YiEjZepojMGAy9urJbHRPhHpEFYN6Q+FaX6OpLUozB3fjXzKwZt
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(376002)(346002)(136003)(366004)(396003)(39840400004)(33430700001)(8936002)(956004)(2616005)(8676002)(7416002)(4326008)(16576012)(6486002)(31696002)(5660300002)(316002)(16526019)(186003)(36756003)(33440700001)(26005)(86362001)(52116002)(31686004)(66946007)(66476007)(53546011)(2906002)(478600001)(66556008)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 2R3U9g9hX1HR26++5rG0bvwtzp1nzDQ8VFhv83tzlUxQ1S86jcCLKtLrb46sB8rit+fRbCEf3Y3fvUhuhSn+MFinbry5WJelV/x65T5ye0lwQFinBLcHFqfc85LRNWAeJhPyHF6AsyC2uEJWhXavo1FVOiSX6asWOU/9yI1EkxtY4mBmmK/HN66e4irv5mib9s7POBmhY7yZDEMJe5WeRB4mre/Gs/oZhtHujWZQ0SzHnv9q22cuX58g55Z/+JjyP3TIDUpCFYF6+z9ocSzMuGwftzxAXwiXnvD0d5O8cTa568kHnvm5e54W9QhgmMEdKPv5wfbSBr325SCY8sMIEuqEGdpTEJZQTuKEjI1Ns3i1HTM+kaKNwTMIQzYjuSCuLiDdQ1z5csV1LqNeteV3XQK7Z5rKQNraVFXC2NTZqZHcC9OlOImdgxi6iocXFcFpke7fBtpMQy+3dFXj0GDx4YUi+s6/0fNY3CZFb9cg0BFAo8gLFfbHr6eybHRY6nz/fJVkjBkxK7pGp4u54k9cZ02kYF/T07eXWOnfFo95VJGO0rxcrGMtu9tqeQoLj+QiH3rD2OOWKbTf+lxaPYmZE3zHoq7LfyNfClP4DnuQk4u3uzR11+DpdCQCjRv3VoZ4Sqx1Co7SDnTM69cnpxIiUIEmVB2aoMKZWOBK4B5aHnqIm81o6zmAA0dBA5K1fyCwmrPh6vnF/EIZ0H/x9OBgLEMXY4Y5wad0BGk4xXYMS8Mp3ppHzpe6K5fcv2itOGYhC0iVAcntIYUCeQtFID4PBU2JvjX1LUWGG1FP/kx59Yw=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cbe5ce7f-2a41-4dc4-a612-08d7f1ce0196
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2020 14:58:58.9437 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NqXPKhZC9X8P02U8MgRFmvTgbjV64la7mxt+176+xPDhHLsKxEFqpyIo3lx7es7Gn+eE0iEY6277g1WiZi9bTz08SDn7iqKPVFcUx3Pf0uQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5302
-Received-SPF: pass client-ip=40.107.5.103;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR03-VE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 10:58:59
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- T_DKIM_INVALID=0.01, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain
+Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
+ helo=fanzine.igalia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 11:02:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -134,66 +77,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, ronniesahlberg@gmail.com,
- codyprime@gmail.com, sw@weilnetz.de, pl@kamp.de, qemu-devel@nongnu.org,
- mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-06.05.2020 17:49, Eric Blake wrote:
-> On 5/6/20 4:25 AM, Vladimir Sementsov-Ogievskiy wrote:
->> qemu-img convert wants to distinguish ZERO which comes from short
->> backing files. unallocated_blocks_are_zero field of bdi is unrelated:
->> space after EOF is always considered to be zero anyway. So, just make
->> post_backing_zero true in case of short backing file.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On Tue 05 May 2020 09:35:06 PM CEST, Eric Blake wrote:
+> On 5/5/20 12:38 PM, Alberto Garcia wrote:
+>> Subcluster allocation in qcow2 is implemented by extending the
+>> existing L2 table entries and adding additional information to
+>> indicate the allocation status of each subcluster.
+>> 
+>> This patch documents the changes to the qcow2 format and how they
+>> affect the calculation of the L2 cache size.
+>> 
+>> Signed-off-by: Alberto Garcia <berto@igalia.com>
+>> Reviewed-by: Max Reitz <mreitz@redhat.com>
 >> ---
->>   qemu-img.c | 4 +---
->>   1 file changed, 1 insertion(+), 3 deletions(-)
-> 
-> This patch should come first in the series.  It would have saved me a lot of time in reviewing 1/8.
+>>   docs/interop/qcow2.txt | 68 ++++++++++++++++++++++++++++++++++++++++--
+>>   docs/qcow2-cache.txt   | 19 +++++++++++-
+>>   2 files changed, 83 insertions(+), 4 deletions(-)
+>> 
+>
+>> @@ -547,7 +557,8 @@ Standard Cluster Descriptor:
+>>                       nor is data read from the backing file if the cluster is
+>>                       unallocated.
+>>   
+>> -                    With version 2, this is always 0.
+>> +                    With version 2 or with extended L2 entries (see the next
+>> +                    section), this is always 0.
+>
+> In your cover letter, you said you changed things to tolerate this bit
+> being set even with extended L2 entries.  Does this sentence need a
+> tweak?
 
-I'm sorry :(
+Not a bad idea.
 
-> 
->>
->> diff --git a/qemu-img.c b/qemu-img.c
->> index 6a4327aaba..4fe751878b 100644
->> --- a/qemu-img.c
->> +++ b/qemu-img.c
->> @@ -1632,7 +1632,6 @@ typedef struct ImgConvertState {
->>       BlockBackend *target;
->>       bool has_zero_init;
->>       bool compressed;
->> -    bool unallocated_blocks_are_zero;
->>       bool target_is_new;
->>       bool target_has_backing;
->>       int64_t target_backing_sectors; /* negative if unknown */
->> @@ -1677,7 +1676,7 @@ static int convert_iteration_sectors(ImgConvertState *s, int64_t sector_num)
->>       if (s->target_backing_sectors >= 0) {
->>           if (sector_num >= s->target_backing_sectors) {
->> -            post_backing_zero = s->unallocated_blocks_are_zero;
->> +            post_backing_zero = true;
->>           } else if (sector_num + n > s->target_backing_sectors) {
->>               /* Split requests around target_backing_sectors (because
->>                * starting from there, zeros are handled differently) */
->> @@ -2580,7 +2579,6 @@ static int img_convert(int argc, char **argv)
->>       } else {
->>           s.compressed = s.compressed || bdi.needs_compressed_writes;
->>           s.cluster_sectors = bdi.cluster_size / BDRV_SECTOR_SIZE;
->> -        s.unallocated_blocks_are_zero = bdi.unallocated_blocks_are_zero;
->>       }
-> 
-> My question in 1/8 about whether we have iotest coverage of this optimization remains, but I concur that the block layer takes care of reading zero when encountering unallocated blocks beyond EOF of a short backing file, and therefore performing this optimization always rather than just when the driver claims that unallocated blocks read as zero should be safe.
-> 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> 
 
-Thanks!
+>> +The last 64 bits contain a subcluster allocation bitmap with this format:
+>> +
+>> +Subcluster Allocation Bitmap (for standard clusters):
+>> +
+>> +    Bit  0 -  31:   Allocation status (one bit per subcluster)
+>
+> Why two spaces after '-'?
 
--- 
-Best regards,
-Vladimir
+No reason, I guess I just didn't notice. I'll fix it.
+
+Berto
 
