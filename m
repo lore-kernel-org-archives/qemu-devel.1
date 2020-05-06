@@ -2,69 +2,103 @@ Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4184C28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 17:15:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F7A5C28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 17:31:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A1A820708
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 17:15:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CCEF3206B8
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 17:31:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="mgt5FbTA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A1A820708
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=stwcx.xyz header.i=@stwcx.xyz header.b="pAebr2KA";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="iokxDrkH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCEF3206B8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=stwcx.xyz
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWNe2-00022S-Mf
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 13:15:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40938)
+	id 1jWNtl-0007oA-TS
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 13:31:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45668)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jWNct-0001QT-Nl; Wed, 06 May 2020 13:14:31 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:48494)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jWNcr-0003D3-B8; Wed, 06 May 2020 13:14:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=8u7Sgt9fMYKrRW02McIw8M1xGPM+odtO4FYvYIPULxk=; 
- b=mgt5FbTAPuAW5l+6+CEu86Zrqf1Vt3oKh4vN4NQVcXQscbKORD0yFg8tEsds/MZSohV1tqaz5yRMr/0OTLJd5m+jkUMl1NjiMfLqbrCf9nflhCD428MSF0A3RDEYuQNagDfwhxCG7/r0KIZNeYmg/6UwSNTzXR8eKyWQAtI59S8PJrLKUFULH66u5eFXGQNxBoNk3ySbCAPoC07NT0pxfOr1XlZ/+1EAHAAR1sn18UurNYk8/dGKH1InhHXmjecbT2F4+N/yXJ9eyBvYUInsZe3JGAT+WVULZFNXuDhz7L/p9aXU6IhcSX9CvopHlnbxN5yfgna6Oc6IGHLEN2UVsQ==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1jWNcn-00027i-OE; Wed, 06 May 2020 19:14:25 +0200
-Received: from berto by mail.igalia.com with local (Exim)
- id 1jWNcn-0004re-F1; Wed, 06 May 2020 19:14:25 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Subject: Re: [PATCH v5 19/31] qcow2: Add subcluster support to
- calculate_l2_meta()
-In-Reply-To: <12569151-2f16-f136-6928-2a915b25120b@redhat.com>
-References: <cover.1588699789.git.berto@igalia.com>
- <907ab6846b93b441a27eb6853ff3058f1c821bf9.1588699789.git.berto@igalia.com>
- <12569151-2f16-f136-6928-2a915b25120b@redhat.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Wed, 06 May 2020 19:14:25 +0200
-Message-ID: <w517dxp9ea6.fsf@maestria.local.igalia.com>
+ (Exim 4.90_1) (envelope-from <patrick@stwcx.xyz>)
+ id 1jWNsf-0007BG-Ca; Wed, 06 May 2020 13:30:49 -0400
+Received: from wout3-smtp.messagingengine.com ([64.147.123.19]:48823)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <patrick@stwcx.xyz>)
+ id 1jWNsd-00038A-Ht; Wed, 06 May 2020 13:30:49 -0400
+Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
+ by mailout.west.internal (Postfix) with ESMTP id 988CD9EA;
+ Wed,  6 May 2020 13:30:43 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+ by compute7.internal (MEProxy); Wed, 06 May 2020 13:30:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=stwcx.xyz; h=
+ from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-type:content-transfer-encoding; s=fm1; bh=
+ le0TrXnjxNexSHwUHhBLtj35Z6Tm86hJSExVVUMMBM4=; b=pAebr2KAUpmIyRM5
+ Uiu5mBinrMi8XLd61/YnC05LlqsI9RvSAgO05Hiv11YCq91jTyBrbY2Rk9LI1aCO
+ sWIRyoiWvHgGULzEo6UbzhsnYJXwoFjJ+BlM5r044Ss7i4Hag/1SgjH5O9dDOH9h
+ 3g+kVsE46OlF4MhbrwLNIHwYmG4rClJWiMY5bHGmvkBJ46gZ/Bb9TZCkD0bNAgN2
+ OdvFlXuU/k8bGIIy1F6GG33TEVhDix0gnsKvd72fVB0SNFULWWfVtC6IX7R4PRqA
+ xZEqqgGNH9AENYmInOztS9HuaacZJOQtyRIyXE23XLP+QuyWpwvlfOXC0rLVbfDp
+ FfSgUQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-transfer-encoding:content-type
+ :date:from:in-reply-to:message-id:mime-version:references
+ :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+ :x-sasl-enc; s=fm2; bh=le0TrXnjxNexSHwUHhBLtj35Z6Tm86hJSExVVUMMB
+ M4=; b=iokxDrkH2LHssH3vQcCNjgzOhEIVYpflhcEKnZdSOPAnqgwgjVnv0SqN3
+ tE61abpw7MdxIfK3GDBJ4AnqvwnDJY6NSp+nyysMH1wHBUugRLCfk+agXm7fESmt
+ Ojvg1vKMrli8H60aKmxbAKPPS76Eeb3sIbPoztCeS6sDgPy9hr+duVP6EONTh5Au
+ uGx6kpafIT38xqKYSIAtP8LMS6hQIntvoCebP1K9bT2UmvjI35s7dy7HIRxVpvSp
+ abkqmj/H1gm+121T3u+6ojNsRiBvUgCeL5HtMaTLdnIR2XNt1S2fTTbNWdHdKCKR
+ obObdaCXk95aR0fKnDaGUq/S+TETQ==
+X-ME-Sender: <xms:QvSyXiV3pyeyS_ANiW4P-JdQ1IZ8tFcGmFAKwPU2S5oZ-iuD1ggnQA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedrjeekgdduuddtucetufdoteggodetrfdotf
+ fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+ uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+ hmihhsshhinhhgucfvqfcufhhivghlugculdeftddmnegfrhhlucfvnfffucdlvdefmden
+ ucfjughrpefhvffufffkofgjfhggtgfgsehtkeertdertdejnecuhfhrohhmpefrrghtrh
+ hitghkucghihhllhhirghmshcuoehprghtrhhitghksehsthiftgigrdighiiiqeenucgg
+ tffrrghtthgvrhhnpefghfeluefgvdelhefhvddvtdejudekueeuheevudeludfhtdekge
+ etkeejiedvtdenucffohhmrghinhepghhithhhuhgsrdgtohhmnecukfhppeduieeirddu
+ jeeirdduvdefrddvtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrih
+ hlfhhrohhmpehprghtrhhitghksehsthiftgigrdighiii
+X-ME-Proxy: <xmx:QvSyXug51kK-AajFKRuQy_cofMv_h4lmEJtuMxAwAZCZ02pjxXZazg>
+ <xmx:QvSyXh82Ho--CE5E_vE3cnpHJ5Gszl7oX-jJMkBhQa3aL4HutaQ-xw>
+ <xmx:QvSyXuQ52Tf_F2VtQZsW5Z3FPj039Z9G670NpVorsGIpH0hRxBqB_w>
+ <xmx:Q_SyXp0lWFRAjb-HF_RdsfFR3vPr1b9KwMndTDNB9D_4ozL5yVHmRA>
+Received: from localhost (mobile-166-176-123-20.mycingular.net
+ [166.176.123.20])
+ by mail.messagingengine.com (Postfix) with ESMTPA id CAD0F328006A;
+ Wed,  6 May 2020 13:30:41 -0400 (EDT)
+From: Patrick Williams <patrick@stwcx.xyz>
+To: 
+Subject: [PATCH v2] aspeed: Add support for the sonorapass-bmc board
+Date: Wed,  6 May 2020 12:30:35 -0500
+Message-Id: <20200506173035.2154053-1-patrick@stwcx.xyz>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200501113704.2240698-1-patrick@stwcx.xyz>
+References: <20200501113704.2240698-1-patrick@stwcx.xyz>
 MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
- helo=fanzine.igalia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 11:02:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=64.147.123.19; envelope-from=patrick@stwcx.xyz;
+ helo=wout3-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 13:30:44
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -78,173 +112,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ Amithash Prasad <amithash@fb.com>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ Patrick Williams <patrick@stwcx.xyz>,
+ "open list:ASPEED BMCs" <qemu-arm@nongnu.org>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Vijay Khemka <vijaykhemka@fb.com>, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue 05 May 2020 11:59:18 PM CEST, Eric Blake wrote:
->> +        for (i = first_sc; i <= last_sc; i++) {
->> +            unsigned c = i / s->subclusters_per_cluster;
->> +            unsigned sc = i % s->subclusters_per_cluster;
->> +            l2_entry = get_l2_entry(s, l2_slice, l2_index + c);
->> +            l2_bitmap = get_l2_bitmap(s, l2_slice, l2_index + c);
->> +            type = qcow2_get_subcluster_type(bs, l2_entry, l2_bitmap, sc);
->> +            if (type == QCOW2_SUBCLUSTER_INVALID) {
->> +                l2_index += c; /* Point to the invalid entry */
->> +                goto fail;
->> +            }
->> +            if (type != QCOW2_SUBCLUSTER_NORMAL) {
->>                   break;
->>               }
->>           }
->
-> This loop is now 32 times slower (for extended L2 entries).  Do you
-> really need to check for an invalid subcluster here, or can we just
-> blindly check that all 32 subclusters are NORMAL, and leave handling
-> of invalid clusters for the rest of the function after we failed the
-> exit-early test?  For that matter, for all but the first and last
-> cluster, checking if 32 clusters are NORMAL is a simple 64-bit
-> comparison rather than 32 iterations of a loop; and even for the first
-> and last cluster, the _RANGE macros in 14/31 work well to mask out
-> which bits must be set/cleared.  My guess is that optimizing this loop
-> is worthwhile, since overwriting existing data is probably more common
-> than allocating new data.
+Sonora Pass is a 2 socket x86 motherboard designed by Facebook
+and supported by OpenBMC.  Strapping configuration was obtained
+from hardware and i2c configuration is based on dts found at:
 
-I think you're right, and now we have the _RANGE macros so it should be
-doable. I'll look into it.
+https://github.com/facebook/openbmc-linux/blob/1633c87b8ba7c162095787c988979b748ba65dc8/arch/arm/boot/dts/aspeed-bmc-facebook-sonorapass.dts
 
->> -        if (i == nb_clusters) {
->> -            return;
->> +        if (i == last_sc + 1) {
->> +            return 0;
->>           }
->>       }
->
-> If we get here, then i is now the address of the first subcluster that 
-> was not NORMAL, even if it is much smaller than the final subcluster 
-> learned by nb_clusters for the overall request.  [1]
+Booted a test image of http://github.com/facebook/openbmc to login
+prompt.
 
-I'm replying to this part later in [1]
+Signed-off-by: Patrick Williams <patrick@stwcx.xyz>
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+---
+ hw/arm/aspeed.c | 77 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 77 insertions(+)
 
->>       /* Get the L2 entry of the first cluster */
->>       l2_entry = get_l2_entry(s, l2_slice, l2_index);
->> -    type = qcow2_get_cluster_type(bs, l2_entry);
->> +    l2_bitmap = get_l2_bitmap(s, l2_slice, l2_index);
->> +    sc_index = offset_to_sc_index(s, guest_offset);
->> +    type = qcow2_get_subcluster_type(bs, l2_entry, l2_bitmap, sc_index);
->>   
->> -    if (type == QCOW2_CLUSTER_NORMAL && keep_old) {
->> -        cow_start_from = cow_start_to;
->> +    if (type == QCOW2_SUBCLUSTER_INVALID) {
->> +        goto fail;
->> +    }
->> +
->> +    if (!keep_old) {
->> +        switch (type) {
->> +        case QCOW2_SUBCLUSTER_COMPRESSED:
->> +            cow_start_from = 0;
->> +            break;
->> +        case QCOW2_SUBCLUSTER_NORMAL:
->> +        case QCOW2_SUBCLUSTER_ZERO_ALLOC:
->> +        case QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC: {
->> +            int i;
->> +            /* Skip all leading zero and unallocated subclusters */
->> +            for (i = 0; i < sc_index; i++) {
->> +                QCow2SubclusterType t;
->> +                t = qcow2_get_subcluster_type(bs, l2_entry, l2_bitmap, i);
->> +                if (t == QCOW2_SUBCLUSTER_INVALID) {
->> +                    goto fail;
->> +                } else if (t == QCOW2_SUBCLUSTER_NORMAL) {
->> +                    break;
->> +                }
->> +            }
->> +            cow_start_from = i << s->subcluster_bits;
->> +            break;
->
-> Note that you are only skipping until the first normal subcluster, even 
-> if other zero/unallocated clusters occur between the first normal 
-> cluster and the start of the action.
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index a6a2102a93..01e74e34be 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -84,6 +84,21 @@ struct AspeedBoardState {
+         SCU_AST2500_HW_STRAP_ACPI_ENABLE |                              \
+         SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER))
+ 
++/* Sonorapass hardware value: 0xF100D216 */
++#define SONORAPASS_BMC_HW_STRAP1 (                                      \
++        SCU_AST2500_HW_STRAP_SPI_AUTOFETCH_ENABLE |                     \
++        SCU_AST2500_HW_STRAP_GPIO_STRAP_ENABLE |                        \
++        SCU_AST2500_HW_STRAP_UART_DEBUG |                               \
++        SCU_AST2500_HW_STRAP_RESERVED28 |                               \
++        SCU_AST2500_HW_STRAP_DDR4_ENABLE |                              \
++        SCU_HW_STRAP_VGA_CLASS_CODE |                                   \
++        SCU_HW_STRAP_LPC_RESET_PIN |                                    \
++        SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER) |                \
++        SCU_AST2500_HW_STRAP_SET_AXI_AHB_RATIO(AXI_AHB_RATIO_2_1) |     \
++        SCU_HW_STRAP_VGA_BIOS_ROM |                                     \
++        SCU_HW_STRAP_VGA_SIZE_SET(VGA_16M_DRAM) |                       \
++        SCU_AST2500_HW_STRAP_RESERVED1)
++
+ /* Witherspoon hardware value: 0xF10AD216 (but use romulus definition) */
+ #define WITHERSPOON_BMC_HW_STRAP1 ROMULUS_BMC_HW_STRAP1
+ 
+@@ -372,6 +387,49 @@ static void swift_bmc_i2c_init(AspeedBoardState *bmc)
+     i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 12), "tmp105", 0x4a);
+ }
+ 
++static void sonorapass_bmc_i2c_init(AspeedBoardState *bmc)
++{
++    AspeedSoCState *soc = &bmc->soc;
++
++    /* bus 2 : */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 2), "tmp105", 0x48);
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 2), "tmp105", 0x49);
++    /* bus 2 : pca9546 @ 0x73 */
++
++    /* bus 3 : pca9548 @ 0x70 */
++
++    /* bus 4 : */
++    uint8_t *eeprom4_54 = g_malloc0(8 * 1024);
++    smbus_eeprom_init_one(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), 0x54,
++                          eeprom4_54);
++    /* PCA9539 @ 0x76, but PCA9552 is compatible */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), "pca9552", 0x76);
++    /* PCA9539 @ 0x77, but PCA9552 is compatible */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), "pca9552", 0x77);
++
++    /* bus 6 : */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 6), "tmp105", 0x48);
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 6), "tmp105", 0x49);
++    /* bus 6 : pca9546 @ 0x73 */
++
++    /* bus 8 : */
++    uint8_t *eeprom8_56 = g_malloc0(8 * 1024);
++    smbus_eeprom_init_one(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 8), 0x56,
++                          eeprom8_56);
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 8), "pca9552", 0x60);
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 8), "pca9552", 0x61);
++    /* bus 8 : adc128d818 @ 0x1d */
++    /* bus 8 : adc128d818 @ 0x1f */
++
++    /* bus 13 : pca9548 @ 0x71
++     *      - channel 3:
++     *          - tmm421 @ 0x4c
++     *          - tmp421 @ 0x4e
++     *          - tmp421 @ 0x4f
++     */
++
++}
++
+ static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
+ {
+     AspeedSoCState *soc = &bmc->soc;
+@@ -499,6 +557,21 @@ static void aspeed_machine_swift_class_init(ObjectClass *oc, void *data)
+     mc->default_ram_size       = 512 * MiB;
+ };
+ 
++static void aspeed_machine_sonorapass_class_init(ObjectClass *oc, void *data)
++{
++    MachineClass *mc = MACHINE_CLASS(oc);
++    AspeedMachineClass *amc = ASPEED_MACHINE_CLASS(oc);
++
++    mc->desc       = "OpenPOWER SonoraPass BMC (ARM1176)";
++    amc->soc_name  = "ast2500-a1";
++    amc->hw_strap1 = SONORAPASS_BMC_HW_STRAP1;
++    amc->fmc_model = "mx66l1g45g";
++    amc->spi_model = "mx66l1g45g";
++    amc->num_cs    = 2;
++    amc->i2c_init  = sonorapass_bmc_i2c_init;
++    mc->default_ram_size       = 512 * MiB;
++};
++
+ static void aspeed_machine_witherspoon_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -563,6 +636,10 @@ static const TypeInfo aspeed_machine_types[] = {
+         .name          = MACHINE_TYPE_NAME("swift-bmc"),
+         .parent        = TYPE_ASPEED_MACHINE,
+         .class_init    = aspeed_machine_swift_class_init,
++    }, {
++        .name          = MACHINE_TYPE_NAME("sonorapass-bmc"),
++        .parent        = TYPE_ASPEED_MACHINE,
++        .class_init    = aspeed_machine_sonorapass_class_init,
+     }, {
+         .name          = MACHINE_TYPE_NAME("witherspoon-bmc"),
+         .parent        = TYPE_ASPEED_MACHINE,
+-- 
+2.26.2
 
-That's correct.
-
-> Or visually, suppose we have:
->
-> --0-NN-0_NNNNNNNN_NNNNNNNN_NNNNNNNN
->
-> as our 32 subclusters, with sc_index of 8.  You will end up skipping
-> subclusters 0-3, but NOT 6 and 7.
-
-That's correct. This function works with the assumption that the initial
-COW region is located immediately before the data region, which is in
-turn contiguous to the tail COW region.
-
-I'm actually not sure that it necessarily has to be that way, but at
-least it seems that functions like handle_alloc_space() rely on
-that. Certainly before subclusters I don't see how there would be any
-space between the COW regions and the actual data region.
-
-While checking the documentation of QCowL2Meta I also realized that
-maybe it also needs to be updated. "The COW Region between the start of
-the first allocated cluster and the area the guest actually writes to",
-it's not necessarily the start of the cluster anymore, although the word
-"between" leaves some room for interpretation.
-
-Anyway, even if we could do COW of subclusters 4-5 only, there's no
-general way to do that without touching QCowL2Meta or using more than
-one structure (imagine we have -N-N-N-N_NNNN ...). I'm also not sure
-that it's worth it.
-
-> Still, even though we spend time copying the allocated contents of
-> those two subclusters, we also copy the subcluster status, and the
-> guest still ends up reading the same data as before.
-
-No, the subcluster status is updated and those subclusters are marked
-now as allocated. That's actually why we can use the _RANGE masks that
-you proposed here:
-
-   https://lists.gnu.org/archive/html/qemu-block/2020-04/msg01155.html
-
-In other words, we have this bitmap:
-
-   --0-NN-0_NNNNNNNN_NNNNNNNN_NNNNNNNN
-
-If we write to subcluster 8 (which was already allocated), the resulting
-bitmap is this one:
-
-   --0-NNNN_NNNNNNNN_NNNNNNNN_NNNNNNNN
-
-The last block in iotest 271 deals exactly with this kind of scenarios.
-
->>       /* Get the L2 entry of the last cluster */
->> -    l2_entry = get_l2_entry(s, l2_slice, l2_index + nb_clusters - 1);
->> -    type = qcow2_get_cluster_type(bs, l2_entry);
->> +    l2_index += nb_clusters - 1;
->> +    l2_entry = get_l2_entry(s, l2_slice, l2_index);
->> +    l2_bitmap = get_l2_bitmap(s, l2_slice, l2_index);
->> +    sc_index = offset_to_sc_index(s, guest_offset + bytes - 1);
->> +    type = qcow2_get_subcluster_type(bs, l2_entry, l2_bitmap, sc_index);
->
-> [1] but here, we are skipping any intermediate clusters, and worrying
-> only about the state of the final cluster.  Is that always going to do
-> the correct thing, or will there be cases where we need to update the
-> L2 entries of intermediate clusters?
-
-       Cluster 1             Cluster 2             Cluster 3
-|---------------------|---------------------|---------------------|
-   <---cow_start--><-------write request--------><--cow_end--->
-
-
-All L2 entries from the beginning of cow_start until the end of cow_end
-are always updated. That's again what the loop that I optimized using
-the _RANGE masks (and that I liked above) was doing.
-
-The code in calculate_l2_meta() is only concerned with determining the
-actual start and end points. Everything between them will be written to
-and marked as allocated. It's only the subclusters outside that range
-that keep the previous values (unallocated, or zero).
-
-Berto
 
