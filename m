@@ -2,111 +2,95 @@ Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 259BFC28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 19:21:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95924C28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 19:24:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F18E42075A
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 19:21:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F18E42075A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 6595D24958
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 19:24:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="Wap6xo7V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6595D24958
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWPbp-00079T-6k
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 15:21:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44002)
+	id 1jWPeL-0001Bv-K7
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 15:24:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44430)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jWPb2-0006WD-Ux
- for qemu-devel@nongnu.org; Wed, 06 May 2020 15:20:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34386)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jWPb1-0000tr-6r
- for qemu-devel@nongnu.org; Wed, 06 May 2020 15:20:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jWPay-0004nt-41
- for <qemu-devel@nongnu.org>; Wed, 06 May 2020 19:20:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 123102E810A
- for <qemu-devel@nongnu.org>; Wed,  6 May 2020 19:20:40 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1jWPdc-0000lT-Kb
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 15:23:24 -0400
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:14065)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1jWPdb-0002BR-8j
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 15:23:24 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5eb30e990001>; Wed, 06 May 2020 12:23:05 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Wed, 06 May 2020 12:23:17 -0700
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Wed, 06 May 2020 12:23:17 -0700
+Received: from [10.40.101.152] (172.20.13.39) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 6 May
+ 2020 19:23:08 +0000
+Subject: Re: [PATCH v18 QEMU 02/18] vfio: Add function to unmap VFIO region
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ <alex.williamson@redhat.com>, <cjia@nvidia.com>
+References: <1588632293-18932-1-git-send-email-kwankhede@nvidia.com>
+ <1588632293-18932-3-git-send-email-kwankhede@nvidia.com>
+ <9747d731-4547-5689-8f40-61d3a2945078@redhat.com>
+X-Nvconfidentiality: public
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <ba999ab9-27eb-ebc5-14e7-84ddd6ab4f2d@nvidia.com>
+Date: Thu, 7 May 2020 00:53:03 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <9747d731-4547-5689-8f40-61d3a2945078@redhat.com>
+X-Originating-IP: [172.20.13.39]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 06 May 2020 19:09:29 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1805256@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=kunpeng920; status=Triaged; importance=Undecided;
- assignee=ike.pan@canonical.com; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-18.04; status=Triaged;
- importance=Undecided; assignee=ike.pan@canonical.com; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-18.04-hwe;
- status=Triaged; importance=Undecided; assignee=ike.pan@canonical.com; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-19.10; status=Triaged;
- importance=Undecided; assignee=ike.pan@canonical.com; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-20.04; status=Triaged;
- importance=Undecided; assignee=ike.pan@canonical.com; 
-X-Launchpad-Bug: product=kunpeng920; productseries=upstream-kernel;
- status=Fix Committed; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=In Progress; importance=Medium; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
- component=main; status=In Progress; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=qemu; 
- component=main; status=In Progress; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
- component=main; status=In Progress; importance=Medium; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
- component=main; status=In Progress; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug-Tags: ikeradar patch qemu-img
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: andrew-cloke dannf ikepanhc iveskim jan-glauber-i
- jnsnow kongzizaixian lizhengui philmd
- rafaeldtinoco ying-fang
-X-Launchpad-Bug-Reporter: dann frazier (dannf)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
-Message-Id: <158879216940.3828.17751295934760283389.malone@chaenomeles.canonical.com>
-Subject: [Bug 1805256] Re: qemu-img hangs on rcu_call_ready_event logic in
- Aarch64 when converting images
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 63fb4b30e1575f3f013131ff3f82dbf20015df45
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 15:11:46
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1588792985; bh=724FqxVf63Y+LUizwiFaeKmscdUQ123rnDqMYzzwy2w=;
+ h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+ Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+ X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+ Content-Transfer-Encoding;
+ b=Wap6xo7V/paJCxGYRml55M7LicoopuBG/YHKFoakrJHduziL+8Qbuaa+2rHwOiVc+
+ mbpq3aKlkcziYOdF4Wsfa4DikNNlDNvAiSQKQkj831UA6hzIe56Va1Gv3m25sj384a
+ gL2L7TeJuhsF6sDpgCKwPG+47AnWUZAE1i878sMoNLDzgZVaKuEBSrd3ndzVzbMEto
+ jAT7L5/7BkYnOkaS/m2741JyrR5VU301HKHLnmLgwPw64MMGjOi9S4w5fah9rP3V29
+ 3xnPiKAe7aMDFytL8JUi80I6JiS3/A95AYAXPUKxtH5qQfKmLWD99JPVozPKT1miEs
+ aKivUFYJ8ODTA==
+Received-SPF: pass client-ip=216.228.121.65; envelope-from=kwankhede@nvidia.com;
+ helo=hqnvemgate26.nvidia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 15:23:18
+X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
+X-Spam_score_int: -70
+X-Spam_score: -7.1
+X-Spam_bar: -------
+X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_HI=-5, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -115,239 +99,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
+Cc: cohuck@redhat.com, aik@ozlabs.ru, Zhengxiao.zx@Alibaba-inc.com,
+ shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ eauger@redhat.com, yi.l.liu@intel.com, eskultet@redhat.com,
+ ziye.yang@intel.com, armbru@redhat.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, felipe@nutanix.com, Ken.Xue@amd.com, kevin.tian@intel.com,
+ yan.y.zhao@intel.com, dgilbert@redhat.com, changpeng.liu@intel.com,
+ quintela@redhat.com, zhi.a.wang@intel.com, jonathan.davies@nutanix.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Isn't this fixed by commit 5710a3e09f9?
 
-commit 5710a3e09f9b85801e5ce70797a4a511e5fc9e2c
-Author: Paolo Bonzini <pbonzini@redhat.com>
-Date:   Tue Apr 7 10:07:46 2020 -0400
 
-    async: use explicit memory barriers
-    =
+On 5/5/2020 11:46 AM, Philippe Mathieu-Daud=E9 wrote:
+> Hi Kirti,
+>=20
+> On 5/5/20 12:44 AM, Kirti Wankhede wrote:
+>> This function will be used for migration region.
+>> Migration region is mmaped when migration starts and will be unmapped=20
+>> when
+>> migration is complete.
+>>
+>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>> ---
+>> =A0 hw/vfio/common.c=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 | 20 +++++++=
++++++++++++++
+>> =A0 hw/vfio/trace-events=A0=A0=A0=A0=A0=A0=A0=A0=A0 |=A0 1 +
+>> =A0 include/hw/vfio/vfio-common.h |=A0 1 +
+>> =A0 3 files changed, 22 insertions(+)
+>>
+>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+>> index 0b3593b3c0c4..4a2f0d6a2233 100644
+>> --- a/hw/vfio/common.c
+>> +++ b/hw/vfio/common.c
+>> @@ -983,6 +983,26 @@ int vfio_region_mmap(VFIORegion *region)
+>> =A0=A0=A0=A0=A0 return 0;
+>> =A0 }
+>> +void vfio_region_unmap(VFIORegion *region)
+>> +{
+>> +=A0=A0=A0 int i;
+>> +
+>> +=A0=A0=A0 if (!region->mem) {
+>> +=A0=A0=A0=A0=A0=A0=A0 return;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 for (i =3D 0; i < region->nr_mmaps; i++) {
+>=20
+> I'd refactor this=A0 block <...
+>> +       =20
+>> trace_vfio_region_unmap(memory_region_name(&region->mmaps[i].mem),
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0 region->mmaps[i].offset,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0 region->mmaps[i].offset +
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0 region->mmaps[i].size - 1);
+>> +=A0=A0=A0=A0=A0=A0=A0 memory_region_del_subregion(region->mem, &region-=
+>mmaps[i].mem);
+>> +=A0=A0=A0=A0=A0=A0=A0 munmap(region->mmaps[i].mmap, region->mmaps[i].si=
+ze);
+>> +=A0=A0=A0=A0=A0=A0=A0 object_unparent(OBJECT(&region->mmaps[i].mem));
+>> +=A0=A0=A0=A0=A0=A0=A0 region->mmaps[i].mmap =3D NULL;
+>=20
+> ...> into a helper and reuse it in vfio_region_mmap(). Well, actually=20
+> I'd factor it out from vfio_region_mmap() then reuse it here. Anyway=20
+> this is v18 so can be done later on top.
+>=20
 
-    When using C11 atomics, non-seqcst reads and writes do not participate
-    in the total order of seqcst operations.  In util/async.c and util/aio-=
-posix.c,
-    in particular, the pattern that we use
-    =
+Nevermind, this is not the last version, I'll do suggested change.
 
-              write ctx->notify_me                 write bh->scheduled
-              read bh->scheduled                   read ctx->notify_me
-              if !bh->scheduled, sleep             if ctx->notify_me, notify
-    =
+> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+>=20
 
-    needs to use seqcst operations for both the write and the read.  In
-    general this is something that we do not want, because there can be
-    many sources that are polled in addition to bottom halves.  The
-    alternative is to place a seqcst memory barrier between the write
-    and the read.  This also comes with a disadvantage, in that the
-    memory barrier is implicit on strongly-ordered architectures and
-    it wastes a few dozen clock cycles.
-    =
+Thanks,
+Kirti
 
-    Fortunately, ctx->notify_me is never written concurrently by two
-    threads, so we can assert that and relax the writes to ctx->notify_me.
-    The resulting solution works and performs well on both aarch64 and x86.
-    =
-
-    Note that the atomic_set/atomic_read combination is not an atomic
-    read-modify-write, and therefore it is even weaker than C11 ATOMIC_RELA=
-XED;
-    on x86, ATOMIC_RELAXED compiles to a locked operation.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805256
-
-Title:
-  qemu-img hangs on rcu_call_ready_event logic in Aarch64 when
-  converting images
-
-Status in kunpeng920:
-  Triaged
-Status in kunpeng920 ubuntu-18.04 series:
-  Triaged
-Status in kunpeng920 ubuntu-18.04-hwe series:
-  Triaged
-Status in kunpeng920 ubuntu-19.10 series:
-  Triaged
-Status in kunpeng920 ubuntu-20.04 series:
-  Triaged
-Status in kunpeng920 upstream-kernel series:
-  Fix Committed
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  In Progress
-Status in qemu source package in Bionic:
-  In Progress
-Status in qemu source package in Disco:
-  In Progress
-Status in qemu source package in Eoan:
-  In Progress
-Status in qemu source package in Focal:
-  In Progress
-
-Bug description:
-  [Impact]
-
-  * QEMU locking primitives might face a race condition in QEMU Async
-  I/O bottom halves scheduling. This leads to a dead lock making either
-  QEMU or one of its tools to hang indefinitely.
-
-  [Test Case]
-
-  * qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Hangs indefinitely approximately 30% of the runs in Aarch64.
-
-  [Regression Potential]
-
-  * This is a change to a core part of QEMU: The AIO scheduling. It
-  works like a "kernel" scheduler, whereas kernel schedules OS tasks,
-  the QEMU AIO code is responsible to schedule QEMU coroutines or event
-  listeners callbacks.
-
-  * There was a long discussion upstream about primitives and Aarch64.
-  After quite sometime Paolo released this patch and it solves the
-  issue. Tested platforms were: amd64 and aarch64 based on his commit
-  log.
-
-  * Christian suggests that this fix stay little longer in -proposed to
-  make sure it won't cause any regressions.
-
-  * dannf suggests we also check for performance regressions; e.g. how
-  long it takes to convert a cloud image on high-core systems.
-
-  [Other Info]
-
-  =C2=A0* Original Description bellow:
-
-  Command:
-
-  qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Hangs indefinitely approximately 30% of the runs.
-
-  ----
-
-  Workaround:
-
-  qemu-img convert -m 1 -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Run "qemu-img convert" with "a single coroutine" to avoid this issue.
-
-  ----
-
-  (gdb) thread 1
-  ...
-  (gdb) bt
-  #0 0x0000ffffbf1ad81c in __GI_ppoll
-  #1 0x0000aaaaaabcf73c in ppoll
-  #2 qemu_poll_ns
-  #3 0x0000aaaaaabd0764 in os_host_main_loop_wait
-  #4 main_loop_wait
-  ...
-
-  (gdb) thread 2
-  ...
-  (gdb) bt
-  #0 syscall ()
-  #1 0x0000aaaaaabd41cc in qemu_futex_wait
-  #2 qemu_event_wait (ev=3Dev@entry=3D0xaaaaaac86ce8 <rcu_call_ready_event>)
-  #3 0x0000aaaaaabed05c in call_rcu_thread
-  #4 0x0000aaaaaabd34c8 in qemu_thread_start
-  #5 0x0000ffffbf25c880 in start_thread
-  #6 0x0000ffffbf1b6b9c in thread_start ()
-
-  (gdb) thread 3
-  ...
-  (gdb) bt
-  #0 0x0000ffffbf11aa20 in __GI___sigtimedwait
-  #1 0x0000ffffbf2671b4 in __sigwait
-  #2 0x0000aaaaaabd1ddc in sigwait_compat
-  #3 0x0000aaaaaabd34c8 in qemu_thread_start
-  #4 0x0000ffffbf25c880 in start_thread
-  #5 0x0000ffffbf1b6b9c in thread_start
-
-  ----
-
-  (gdb) run
-  Starting program: /usr/bin/qemu-img convert -f qcow2 -O qcow2
-  ./disk01.ext4.qcow2 ./output.qcow2
-
-  [New Thread 0xffffbec5ad90 (LWP 72839)]
-  [New Thread 0xffffbe459d90 (LWP 72840)]
-  [New Thread 0xffffbdb57d90 (LWP 72841)]
-  [New Thread 0xffffacac9d90 (LWP 72859)]
-  [New Thread 0xffffa7ffed90 (LWP 72860)]
-  [New Thread 0xffffa77fdd90 (LWP 72861)]
-  [New Thread 0xffffa6ffcd90 (LWP 72862)]
-  [New Thread 0xffffa67fbd90 (LWP 72863)]
-  [New Thread 0xffffa5ffad90 (LWP 72864)]
-
-  [Thread 0xffffa5ffad90 (LWP 72864) exited]
-  [Thread 0xffffa6ffcd90 (LWP 72862) exited]
-  [Thread 0xffffa77fdd90 (LWP 72861) exited]
-  [Thread 0xffffbdb57d90 (LWP 72841) exited]
-  [Thread 0xffffa67fbd90 (LWP 72863) exited]
-  [Thread 0xffffacac9d90 (LWP 72859) exited]
-  [Thread 0xffffa7ffed90 (LWP 72860) exited]
-
-  <HUNG w/ 3 threads in the stack trace showed before>
-  """
-
-  All the tasks left are blocked in a system call, so no task left to call
-  qemu_futex_wake() to unblock thread #2 (in futex()), which would unblock
-  thread #1 (doing poll() in a pipe with thread #2).
-
-  Those 7 threads exit before disk conversion is complete (sometimes in
-  the beginning, sometimes at the end).
-
-  ----
-
-  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
-  frequently hangs (~50% of the time) with this command:
-
-  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
-
-  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
-  qcow2->qcow2 conversion happens to be something uvtool does every time
-  it fetches images.
-
-  Once hung, attaching gdb gives the following backtrace:
-
-  (gdb) bt
-  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
-274213760,
-  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3D<optimized out>, timeout@entry=3D0x0, s=
-igmask=3D0xffffc123b950)
-  =C2=A0=C2=A0=C2=A0=C2=A0at ../sysdeps/unix/sysv/linux/ppoll.c:39
-  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
-ptimized out>,
-  =C2=A0=C2=A0=C2=A0=C2=A0__fds=3D<optimized out>) at /usr/include/aarch64-=
-linux-gnu/bits/poll2.h:77
-  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>,
-  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.=
-c:322
-  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
-  =C2=A0=C2=A0=C2=A0=C2=A0at util/main-loop.c:233
-  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
-  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
-g.c:1980
-  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
-img.c:2456
-  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
--img.c:4975
-
-  Reproduced w/ latest QEMU git (@ 53744e0a182)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/kunpeng920/+bug/1805256/+subscriptions
+>> +=A0=A0=A0 }
+>> +}
+>> +
+>> =A0 void vfio_region_exit(VFIORegion *region)
+>> =A0 {
+>> =A0=A0=A0=A0=A0 int i;
+>> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+>> index b1ef55a33ffd..8cdc27946cb8 100644
+>> --- a/hw/vfio/trace-events
+>> +++ b/hw/vfio/trace-events
+>> @@ -111,6 +111,7 @@ vfio_region_mmap(const char *name, unsigned long=20
+>> offset, unsigned long end) "Reg
+>> =A0 vfio_region_exit(const char *name, int index) "Device %s, region %d"
+>> =A0 vfio_region_finalize(const char *name, int index) "Device %s, region=
+=20
+>> %d"
+>> =A0 vfio_region_mmaps_set_enabled(const char *name, bool enabled)=20
+>> "Region %s mmaps enabled: %d"
+>> +vfio_region_unmap(const char *name, unsigned long offset, unsigned=20
+>> long end) "Region %s unmap [0x%lx - 0x%lx]"
+>> =A0 vfio_region_sparse_mmap_header(const char *name, int index, int=20
+>> nr_areas) "Device %s region %d: %d sparse mmap entries"
+>> =A0 vfio_region_sparse_mmap_entry(int i, unsigned long start, unsigned=20
+>> long end) "sparse entry %d [0x%lx - 0x%lx]"
+>> =A0 vfio_get_dev_region(const char *name, int index, uint32_t type,=20
+>> uint32_t subtype) "%s index %d, %08x/%0x8"
+>> diff --git a/include/hw/vfio/vfio-common.h=20
+>> b/include/hw/vfio/vfio-common.h
+>> index fd564209ac71..8d7a0fbb1046 100644
+>> --- a/include/hw/vfio/vfio-common.h
+>> +++ b/include/hw/vfio/vfio-common.h
+>> @@ -171,6 +171,7 @@ int vfio_region_setup(Object *obj, VFIODevice=20
+>> *vbasedev, VFIORegion *region,
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 in=
+t index, const char *name);
+>> =A0 int vfio_region_mmap(VFIORegion *region);
+>> =A0 void vfio_region_mmaps_set_enabled(VFIORegion *region, bool enabled)=
+;
+>> +void vfio_region_unmap(VFIORegion *region);
+>> =A0 void vfio_region_exit(VFIORegion *region);
+>> =A0 void vfio_region_finalize(VFIORegion *region);
+>> =A0 void vfio_reset_handler(void *opaque);
+>>
+>=20
 
