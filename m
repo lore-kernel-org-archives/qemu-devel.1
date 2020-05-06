@@ -2,71 +2,80 @@ Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3DC1C47247
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 01:54:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5739C47247
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 02:51:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A717B206A5
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 01:54:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="o8gpuSal"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A717B206A5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id BE4F420735
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 02:51:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE4F420735
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jW9Gy-0000IR-P0
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 21:54:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45242)
+	id 1jWA9a-0000Tw-Ty
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 22:51:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jW9GK-00087E-Ou; Tue, 05 May 2020 21:54:16 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:37659 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jW9GJ-0004nx-Ao; Tue, 05 May 2020 21:54:16 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 49H04w5fc3z9sSt; Wed,  6 May 2020 11:54:08 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1588730048;
- bh=2eUKPz5IP2fippP36oVghAp/DJOi5RVRyCG2hZ5Sblo=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=o8gpuSal+gq3vZQLsBlVQ0zhjeDS83Mtsp/FRJ5nEihKZEEwVOJgb6J0aBCOTnhEc
- S9UrCHO5DZ3r3NI+s2I/69mFzyukIuR8GCuFr10fEwGEAKNkt9po7PGFBTR5/SMR8f
- Yyb/NjKk/ANVcWhyfxLKcd/Qn49MzbiT/T5/ADws=
-Date: Wed, 6 May 2020 11:36:43 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Daniele Buono <dbuono@linux.vnet.ibm.com>
-Subject: Re: [PATCH v2 1/1] target-ppc: fix rlwimi, rlwinm, rlwnm for Clang-9
-Message-ID: <20200506013643.GF218517@umbus.fritz.box>
-References: <20200505183818.32688-1-dbuono@linux.vnet.ibm.com>
- <20200505183818.32688-2-dbuono@linux.vnet.ibm.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jWA8o-0008Uy-TZ
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 22:50:34 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40630)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jWA8n-00087O-Gq
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 22:50:34 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jWA8l-00062e-EE
+ for <qemu-devel@nongnu.org>; Wed, 06 May 2020 02:50:31 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 6821B2E8104
+ for <qemu-devel@nongnu.org>; Wed,  6 May 2020 02:50:31 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="6v9BRtpmy+umdQlo"
-Content-Disposition: inline
-In-Reply-To: <20200505183818.32688-2-dbuono@linux.vnet.ibm.com>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 06 May 2020 02:43:28 -0000
+From: xuan <1877015@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: xavier-ding
+X-Launchpad-Bug-Reporter: xuan (xavier-ding)
+X-Launchpad-Bug-Modifier: xuan (xavier-ding)
+Message-Id: <158873300816.14142.15664636500998863138.malonedeb@gac.canonical.com>
+Subject: [Bug 1877015] [NEW] virtio only support packed ring size power of 2
+ between 256 and 1024
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 99d89655fb9b7ba7feaed518721cf59845aab8ad
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 22:50:31
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,133 +84,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Reply-To: Bug 1877015 <1877015@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Public bug reported:
 
---6v9BRtpmy+umdQlo
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Issue discription=EF=BC=9A
+When QEMU starts with "-device virtio-net-pci,netdev=3Dnetdev0,mac=3D52:54:=
+00:00:00:01,disable-modern=3Dfalse,mrg_rxbuf=3Don,rx_queue_size=3D1025,tx_q=
+ueue_size=3D1025,mq=3Don,vectors=3D15,packed=3Don"
 
-On Tue, May 05, 2020 at 02:38:17PM -0400, Daniele Buono wrote:
-> Starting with Clang v9, -Wtype-limits is implemented and triggers a
-> few "result of comparison is always true" errors when compiling PPC32
-> targets.
->=20
-> The comparisons seem to be necessary only on PPC64, since the
-> else branch in PPC32 only has a "g_assert_not_reached();" in all cases.
->=20
-> This patch restructures the code so that the actual if/else is done on a
-> local flag variable, that is set accordingly for PPC64, and always
-> true for PPC32.
->=20
-> Signed-off-by: Daniele Buono <dbuono@linux.vnet.ibm.com>
+It raises error: Invalid rx_queue_size (=3D 1025), must be a power of 2
+between 256 and 1024
 
-That's a bit nicer, thanks.  Applied to ppc-for-5.1 in place of the
-earlier version.
+Analysis:
+According to virtio1.1 spec, the packed queue size value does not have to b=
+e a power of 2.
 
-> ---
->  target/ppc/translate.c | 24 +++++++++++++++++++++---
->  1 file changed, 21 insertions(+), 3 deletions(-)
->=20
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index 807d14faaa..338529879f 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -1882,6 +1882,7 @@ static void gen_rlwimi(DisasContext *ctx)
->          tcg_gen_deposit_tl(t_ra, t_ra, t_rs, sh, me - mb + 1);
->      } else {
->          target_ulong mask;
-> +        bool mask_in_32b =3D true;
->          TCGv t1;
-> =20
->  #if defined(TARGET_PPC64)
-> @@ -1890,8 +1891,13 @@ static void gen_rlwimi(DisasContext *ctx)
->  #endif
->          mask =3D MASK(mb, me);
-> =20
-> +#if defined(TARGET_PPC64)
-> +        if (mask > 0xffffffffu) {
-> +            mask_in_32b =3D false;
-> +        }
-> +#endif
->          t1 =3D tcg_temp_new();
-> -        if (mask <=3D 0xffffffffu) {
-> +        if (mask_in_32b) {
->              TCGv_i32 t0 =3D tcg_temp_new_i32();
->              tcg_gen_trunc_tl_i32(t0, t_rs);
->              tcg_gen_rotli_i32(t0, t0, sh);
-> @@ -1933,12 +1939,18 @@ static void gen_rlwinm(DisasContext *ctx)
->          tcg_gen_extract_tl(t_ra, t_rs, rsh, len);
->      } else {
->          target_ulong mask;
-> +        bool mask_in_32b =3D true;
->  #if defined(TARGET_PPC64)
->          mb +=3D 32;
->          me +=3D 32;
->  #endif
->          mask =3D MASK(mb, me);
-> -        if (mask <=3D 0xffffffffu) {
-> +#if defined(TARGET_PPC64)
-> +        if (mask > 0xffffffffu) {
-> +            mask_in_32b =3D false;
-> +        }
-> +#endif
-> +        if (mask_in_32b) {
->              if (sh =3D=3D 0) {
->                  tcg_gen_andi_tl(t_ra, t_rs, mask);
->              } else {
-> @@ -1973,6 +1985,7 @@ static void gen_rlwnm(DisasContext *ctx)
->      uint32_t mb =3D MB(ctx->opcode);
->      uint32_t me =3D ME(ctx->opcode);
->      target_ulong mask;
-> +    bool mask_in_32b =3D true;
-> =20
->  #if defined(TARGET_PPC64)
->      mb +=3D 32;
-> @@ -1980,7 +1993,12 @@ static void gen_rlwnm(DisasContext *ctx)
->  #endif
->      mask =3D MASK(mb, me);
-> =20
-> -    if (mask <=3D 0xffffffffu) {
-> +#if defined(TARGET_PPC64)
-> +    if (mask > 0xffffffffu) {
-> +        mask_in_32b =3D false;
-> +    }
-> +#endif
-> +    if (mask_in_32b) {
->          TCGv_i32 t0 =3D tcg_temp_new_i32();
->          TCGv_i32 t1 =3D tcg_temp_new_i32();
->          tcg_gen_trunc_tl_i32(t0, t_rb);
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+-- =
 
---6v9BRtpmy+umdQlo
-Content-Type: application/pgp-signature; name="signature.asc"
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1877015
 
------BEGIN PGP SIGNATURE-----
+Title:
+  virtio only support packed ring size power of 2 between 256 and 1024
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl6yFKkACgkQbDjKyiDZ
-s5K1wQ//fh0KkTctegx6M75cWKf+gnI95/tcehIoNxxtdfXqYWl+4Ihc10qP75Lg
-kvji7V6OzM3CGm6WWJ2LzxjnEF8AhfdDpVQJQOzeFvBpdJW7dDWxvTDmPitr6R2K
-a0vV4ngPfE5amCdXNUjyT/y0XkIiBDMpeuQRDIGFNH65c9R7tYZZnxj0+yleyczm
-0gmACx7u1E4MTASPt1y+6udnx0i9L6DOmzDAO2x79f2EupOYA7f4dWL4BDpK36LT
-PtqMNrY1FI+cVK6QFxjXS0wSJrfQbgSVz31P2lUZ8kXKORa0SR8JlFyqWaHKH6ap
-i0fQx409iwBrspptQaY8OlrCVDRUa6vo/9Uxn+EMjxH3ft5eeJEzfA57Yl0Y+CuA
-19afOOlXrUUreOErfjOsouYb50XCHxGn+YNNxoWcJXdshad+2IqbdUIgsbdy+F7M
-+Mta7rU8E3RBNC0s9IVdM06fqqZgyhGWXww7L3Z+wB/qF/eCAUAqdt7Akeaj80cN
-PXZJ61koA113flnW+hh+wTwBGmeEl02u322rogzjES2I4A/LKkwYZj0a+cZ1wkd6
-iMHSk+TmyGAbRbZkkSthelvOIoEOVbYZJ6xv+G8LkK/Km0B1EWhIN8KNse1X3tkf
-DiRrryGCaKL98b5UtagiKIOVfryjY76BC4cVl/tv2Zb5owIbPCk=
-=dra/
------END PGP SIGNATURE-----
+Status in QEMU:
+  New
 
---6v9BRtpmy+umdQlo--
+Bug description:
+  Issue discription=EF=BC=9A
+  When QEMU starts with "-device virtio-net-pci,netdev=3Dnetdev0,mac=3D52:5=
+4:00:00:00:01,disable-modern=3Dfalse,mrg_rxbuf=3Don,rx_queue_size=3D1025,tx=
+_queue_size=3D1025,mq=3Don,vectors=3D15,packed=3Don"
+
+  It raises error: Invalid rx_queue_size (=3D 1025), must be a power of 2
+  between 256 and 1024
+
+  Analysis:
+  According to virtio1.1 spec, the packed queue size value does not have to=
+ be a power of 2.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1877015/+subscriptions
 
