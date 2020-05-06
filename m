@@ -2,85 +2,121 @@ Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B68BC28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 10:38:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E535C28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 10:41:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB9D320663
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 10:38:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2936C20663
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 10:41:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GUjeqmZd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB9D320663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="h9rXR0ue"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2936C20663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWHRG-0006Yq-0i
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 06:38:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35294)
+	id 1jWHUE-000882-A4
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 06:41:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36452)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jWHQf-00063t-G8
- for qemu-devel@nongnu.org; Wed, 06 May 2020 06:37:29 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40313
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jWHQe-0007mb-Dv
- for qemu-devel@nongnu.org; Wed, 06 May 2020 06:37:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588761447;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3ZH2Jzjrd2COQQn9MkT54G2ZB9T9G10Aabepdp5D33E=;
- b=GUjeqmZdZWGywiAXtm8wAPD7lNn9ZOVn7rZf21cvZCZ8AI2muFW2/p6xv/beW18ypiRM/P
- UrEi5+5opCKZmuqUdX850D0KVpD+wkYOvwpKiS6A9Kbmn6Y0iY+xsfA4ma3RoGbYfYbmzn
- RBQoKIiERPymvNbZursoKn3bR6dXbEY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-492-U0Up68PhPhasWxEEWMVrxQ-1; Wed, 06 May 2020 06:37:25 -0400
-X-MC-Unique: U0Up68PhPhasWxEEWMVrxQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4ABB8018A1;
- Wed,  6 May 2020 10:37:24 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-113-140.ams2.redhat.com [10.36.113.140])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B44995C1D4;
- Wed,  6 May 2020 10:37:23 +0000 (UTC)
-Date: Wed, 6 May 2020 12:37:22 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [PATCH v3 09/33] block: Add generic bdrv_inherited_options()
-Message-ID: <20200506103722.GB6333@linux.fritz.box>
-References: <20200218124242.584644-1-mreitz@redhat.com>
- <20200218124242.584644-10-mreitz@redhat.com>
-MIME-Version: 1.0
-In-Reply-To: <20200218124242.584644-10-mreitz@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+ (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
+ id 1jWHTZ-0007bD-Vn; Wed, 06 May 2020 06:40:30 -0400
+Received: from mail-eopbgr680082.outbound.protection.outlook.com
+ ([40.107.68.82]:6921 helo=NAM04-BN3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
+ id 1jWHTW-0007oa-DJ; Wed, 06 May 2020 06:40:29 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VkVzlNUQ+SVHRJkKvFHWB3T1BPvmM9jI38L0FSjG5anZVi1cSC5+vJ1soXYRlXst0m4V2QE1Xv1szreAeSVNyoRuB+5E6zfPnp7zyuCS9yvNs7RQGne4MMjK9e5T2zxJKy8m08CoPCd6Rkw601CADeckf8czcAYwwht0xLhDcfU7Wp4DJD4N6TBI4QGPqfT49lxe90h2APLoFqGkctktyHKOl1phS91AZa2cmp0jMNVxeNKjXRRrcPHZiWufJ0uWn3aGgkAw034dKmSXZtk9eqNjuy1MEjITRqr8caiombdY8tJTk6ldyegK4yUFKMNZSqNZemc3bk4lPDHgZR6e7w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=J8BmKc/HG/LDliF76kquHHed1r8J0BvOIKg0e8WQ7t8=;
+ b=UU7ShmoJ61w6PKCxTSb9OeF/yqBu+cbr+9EtzpD7REkWZxobP/xMuwzRm+cv0j6uY6BG0TQ91LktnklQQb4ha2FZX7VEjSCPXaDvDomHGVcl86X9jpQtkJCphDcs+9IXCV52uqwZSW4Q7e6pfM4gjpP2EYpgbFkxqevD8I/WK1CVECVqSE/mkHv7VOLy/5MzFfkxLSp4eIoFsbzTzYuXUnYi8K2Aed/bfkpnYf0iBS5h2NGfccd5G5teYkQ9MQRsnwmqU4vLi9ZWapZ6SH+YrnysbfhfrF4Xd31aLRe2Kd/iBlhIMNuNL5QPGE8/LHe60cihoeDSAk3A4k3rkZdtmg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=xilinx.com; dmarc=pass action=none header.from=xilinx.com;
+ dkim=pass header.d=xilinx.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=J8BmKc/HG/LDliF76kquHHed1r8J0BvOIKg0e8WQ7t8=;
+ b=h9rXR0ueF1LLE5bi3WPqKJH9IiXqjtx4wUTZZ6LRr+qqj9OG/xWrG7mSKsE1a1fFBv7mw6C38KhwU24YWECINvVKwVpUhDsBsSrbBS7cFAIqFa8w3hT5E2Rdufnz2cBNcysrdkemopSLsAJFZPxQXv2LprfO2SSP5pC6oXOJJRU=
+Received: from BY5PR02MB6772.namprd02.prod.outlook.com (2603:10b6:a03:206::11)
+ by BY5PR02MB6017.namprd02.prod.outlook.com (2603:10b6:a03:1f5::22)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.20; Wed, 6 May
+ 2020 10:40:22 +0000
+Received: from BY5PR02MB6772.namprd02.prod.outlook.com
+ ([fe80::9165:a37e:f249:48f6]) by BY5PR02MB6772.namprd02.prod.outlook.com
+ ([fe80::9165:a37e:f249:48f6%9]) with mapi id 15.20.2979.028; Wed, 6 May 2020
+ 10:40:22 +0000
+From: Sai Pavan Boddu <saipava@xilinx.com>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Subject: RE: [PATCH v2 04/10] net: cadence_gem: Define access permission for
+ interrupt registers
+Thread-Topic: [PATCH v2 04/10] net: cadence_gem: Define access permission for
+ interrupt registers
+Thread-Index: AQHWIiRM5nM2lanWykCZb+AnZJCBAaia4RYA
+Date: Wed, 6 May 2020 10:40:22 +0000
+Message-ID: <BY5PR02MB6772FC19BB5B6E832B9661C8CAA40@BY5PR02MB6772.namprd02.prod.outlook.com>
+References: <1588601168-27576-1-git-send-email-sai.pavan.boddu@xilinx.com>
+ <1588601168-27576-5-git-send-email-sai.pavan.boddu@xilinx.com>
+ <20200504145710.GD5519@toto>
+In-Reply-To: <20200504145710.GD5519@toto>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-TNEF-Correlator: 
+authentication-results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=xilinx.com;
+x-originating-ip: [149.199.50.128]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: b0de31eb-8afe-4911-5a9e-08d7f1a9e13d
+x-ms-traffictypediagnostic: BY5PR02MB6017:|BY5PR02MB6017:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BY5PR02MB60173704C5FB634DB08B0229CAA40@BY5PR02MB6017.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:590;
+x-forefront-prvs: 03950F25EC
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: A0re2W1Zt4j9izbaHwecLgc8arAgVVLotDy8RXbk4eNDaoBV66aYUeQUxNCLpB8uY7qEDbz47/bty+bpd+B3Gteo3ekL5HUkeGol0G4Wtz70pCdjceIupZhlN4yL1j6S/h7jE4pEaGdJI51ln3qGLZwDHk4xfq8lDWQAOfkAWbeL3LabW2WekF6DIWXbLYPcc75afomMEghEUlWBAtgOCCyi+K7MU9i441xBONv6YR1Gkg9XyykKgBawjbKawRIma/8hG+ELt5d2Wh82Pf+szRISzOOxmOl2zeBTVuP+e9SpI3ldOXvS5oUSuw1in3TlN053PSc80SWRLWPvKezuzZdW7faficzTZYTGNT6RgnBXBNNJdxz63sM/HDdSO38B6u3Ev75lgZlRhPQb8MN3V/bmXBAjZ40hlKzYUID+qT1bfFCqmHWNeMGaKiAwEXP7jbw67rCauaZfiRkVKD539bu6IJAwzEnhRNM10uQ4FbaFWvY7cipsXe2hhJgHK5T31nF0gO5sMnF7vm3V29MH1g==
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:BY5PR02MB6772.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(136003)(376002)(346002)(396003)(39860400002)(366004)(33430700001)(52536014)(478600001)(66476007)(66946007)(66446008)(66556008)(64756008)(186003)(26005)(5660300002)(7696005)(6916009)(53546011)(4326008)(6506007)(316002)(9686003)(55016002)(2906002)(33656002)(71200400001)(8936002)(54906003)(8676002)(33440700001)(86362001)(76116006);
+ DIR:OUT; SFP:1101; 
+x-ms-exchange-antispam-messagedata: Z3UIqzXP1ckzHWtrGgamIbwEquViRqCwVTXa3TYSzfr9mEQA4IdRfHkEWli0/dL8H/bKAkL/VbV8YNl67do0QxHCJbjVRrC6IxdGgUkFrTOvPnVkE8ElyoOCJozI0Ir2zmpSehMWHepbfbvb1APBUvLtweGqeQB5bm//JU06oEV9eameRWmE6cxvS9/4UXMV3Lb39N5PF55I/MeZSMuKjpNNTDCyZ7cSP0OkO3H7LM4VtyoPvWzXqzAyHW5QHosqX4/n0bFM4Nbgo4pSVO3ONrTnPhmmk01Vol0yzfa9QJBg478hUJmKL/wSIDSwFkimEcnvD7f7oi+gQ7SpUZafJ+05BMZ/imnLINkWf9kIL5HmFeEjB8JIZPUh0PqJWPB9tXcde64Swk1wDrx+VLSzzG1SEN6QS2E+qUX3rPqg0d0uGulGbHX7zXEw2v6nnZm1FdQrgObujB34X3xPN4qLF/l/5dohlgPhsppWKkwMhcgivy4TqQhgg/LxtHl5cZq30lBpgtodmaFZM0Qzv0o3dk9V6gRfIh+zUW7HtqlWeapWZQdz51isn1bcMgr9+x94npvyNgFjTjt8aN3VxtzE7nKl3QKF0n9I8sRCQ4Vf5b1qCh+kANjWNyyc6MVRI/u+voIrhGPM/an8G1NH/t4oWYWZQbd7LgoqrIGf8yPW9W3e416rt3cVaF405ulqOnQ3uJpBTQw6GmndMgWnZT1lBfWm2q1qLq/4sR4V7ucGW0rIRTWWdoLFT3fIGM5gaX9dAFRicyV2/sp/zkSmx4zy2W5Zl46xcgFNFBMEuWAr2JE=
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 05:50:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+MIME-Version: 1.0
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b0de31eb-8afe-4911-5a9e-08d7f1a9e13d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 May 2020 10:40:22.5123 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: YN955DgYdfCKcDPkvvHMjMgrXwWWMvRonf9FH3+XFjr/Ruj5V/p042NPI3m1b2AqhaUWRphh3yGmLaj2HkZU6Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR02MB6017
+Received-SPF: pass client-ip=40.107.68.82; envelope-from=saipava@xilinx.com;
+ helo=NAM04-BN3-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 06:40:24
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,164 +129,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Ramon Fried <rfried.dev@gmail.com>,
+ =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Tong Ho <tongh@xilinx.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 18.02.2020 um 13:42 hat Max Reitz geschrieben:
-> After the series this patch belongs to, we want to have a common
-> BdrvChildClass that encompasses all of child_file, child_format, and
-> child_backing.  Such a single class needs a single .inherit_options()
-> implementation, and this patch introduces it.
+Hi Edgar,
+
+> -----Original Message-----
+> From: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+> Sent: Monday, May 4, 2020 8:27 PM
+> To: Sai Pavan Boddu <saipava@xilinx.com>
+> Cc: Alistair Francis <Alistair.Francis@wdc.com>; Peter Maydell
+> <peter.maydell@linaro.org>; Jason Wang <jasowang@redhat.com>; Markus
+> Armbruster <armbru@redhat.com>; Philippe Mathieu-Daud=E9
+> <philmd@redhat.com>; Tong Ho <tongh@xilinx.com>; Ramon Fried
+> <rfried.dev@gmail.com>; qemu-arm@nongnu.org; qemu-
+> devel@nongnu.org
+> Subject: Re: [PATCH v2 04/10] net: cadence_gem: Define access permission
+> for interrupt registers
 >=20
-> The next patch will show how the existing implementations can fall back
-> to it just by passing appropriate BdrvChildRole and parent_is_format
-> values.
+> On Mon, May 04, 2020 at 07:36:02PM +0530, Sai Pavan Boddu wrote:
+> > Q1 to Q7 ISR's are clear-on-read, IER/IDR registers are write-only,
+> > mask reg are read-only.
+> >
+> > Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+> > ---
+> >  hw/net/cadence_gem.c | 14 ++++++++++++++
+> >  1 file changed, 14 insertions(+)
+> >
+> > diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c index
+> > a930bf1..c532a14 100644
+> > --- a/hw/net/cadence_gem.c
+> > +++ b/hw/net/cadence_gem.c
+> > @@ -458,6 +458,7 @@ static const uint8_t broadcast_addr[] =3D { 0xFF, 0=
+xFF,
+> 0xFF, 0xFF, 0xFF, 0xFF };
+> >   */
+> >  static void gem_init_register_masks(CadenceGEMState *s)  {
+> > +    unsigned int i;
+> >      /* Mask of register bits which are read only */
+> >      memset(&s->regs_ro[0], 0, sizeof(s->regs_ro));
+> >      s->regs_ro[GEM_NWCTRL]   =3D 0xFFF80000;
+> > @@ -470,10 +471,19 @@ static void
+> gem_init_register_masks(CadenceGEMState *s)
+> >      s->regs_ro[GEM_ISR]      =3D 0xFFFFFFFF;
+> >      s->regs_ro[GEM_IMR]      =3D 0xFFFFFFFF;
+> >      s->regs_ro[GEM_MODID]    =3D 0xFFFFFFFF;
+> > +    for (i =3D 0; i < s->num_priority_queues; i++) {
+> > +        s->regs_ro[GEM_INT_Q1_STATUS + i] =3D 0xFFFFFFFF;
+> > +        s->regs_ro[GEM_INT_Q1_ENABLE + i] =3D 0xFFFFE319;
+> > +        s->regs_ro[GEM_INT_Q1_DISABLE + i] =3D 0xFFFFE319;
 >=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
->  block.c | 84 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 84 insertions(+)
+> Shouldn't these be 0xfffff319?
+[Sai Pavan Boddu] This one is right. I would fix it thanks.
+
+Regards,
+Sai Pavan
+> Perhaps I'm looking at old specs but mine says bits upper bits [31:12] ar=
+e
+> reserved and read-only.
 >=20
-> diff --git a/block.c b/block.c
-> index c33f0e9b42..9179b9b604 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -998,6 +998,90 @@ static void bdrv_temp_snapshot_options(int *child_fl=
-ags, QDict *child_options,
->      *child_flags &=3D ~BDRV_O_NATIVE_AIO;
->  }
-> =20
-> +/*
-> + * Returns the options and flags that a generic child of a BDS should
-> + * get, based on the given options and flags for the parent BDS.
-> + */
-> +static void __attribute__((unused))
-> +    bdrv_inherited_options(BdrvChildRole role, bool parent_is_format,
-> +                           int *child_flags, QDict *child_options,
-> +                           int parent_flags, QDict *parent_options)
-> +{
-> +    int flags =3D parent_flags;
-> +
-> +    /*
-> +     * First, decide whether to set, clear, or leave BDRV_O_PROTOCOL.
-> +     * Generally, the question to answer is: Should this child be
-> +     * format-probed by default?
-> +     */
-> +
-> +    /*
-> +     * Pure and non-filtered data children of non-format nodes should
-> +     * be probed by default (even when the node itself has BDRV_O_PROTOC=
-OL
-> +     * set).  This only affects a very limited set of drivers (namely
-> +     * quorum and blkverify when this comment was written).
-> +     * Force-clear BDRV_O_PROTOCOL then.
-> +     */
-> +    if (!parent_is_format &&
-> +        (role & (BDRV_CHILD_DATA | BDRV_CHILD_METADATA |
-> +                 BDRV_CHILD_FILTERED)) =3D=3D
-> +            BDRV_CHILD_DATA)
-
-You could avoid the odd indentation (I can't decide whether or not it
-should be one space more to align correctly) and probably also make the
-expression more readable if you split it into:
-
-    (role & BDRV_CHILD_DATA) &&
-    !(role & (BDRV_CHILD_METADATA | BDRV_CHILD_FILTERED))
-
-> +    {
-> +        flags &=3D ~BDRV_O_PROTOCOL;
-> +    }
-> +
-> +    /*
-> +     * All children of format nodes (except for COW children) and all
-> +     * metadata children in general should never be format-probed.
-> +     * Force-set BDRV_O_PROTOCOL then.
-> +     */
-> +    if ((parent_is_format && !(role & BDRV_CHILD_COW)) ||
-> +        (role & BDRV_CHILD_METADATA))
-> +    {
-> +        flags |=3D BDRV_O_PROTOCOL;
-> +    }
-> +
-> +    /*
-> +     * If the cache mode isn't explicitly set, inherit direct and no-flu=
-sh from
-> +     * the parent.
-> +     */
-> +    qdict_copy_default(child_options, parent_options, BDRV_OPT_CACHE_DIR=
-ECT);
-> +    qdict_copy_default(child_options, parent_options, BDRV_OPT_CACHE_NO_=
-FLUSH);
-> +    qdict_copy_default(child_options, parent_options, BDRV_OPT_FORCE_SHA=
-RE);
-> +
-> +    if (role & BDRV_CHILD_COW) {
-> +        /* backing files are always opened read-only */
-
-Not "always", just by default.
-
-> +        qdict_set_default_str(child_options, BDRV_OPT_READ_ONLY, "on");
-> +        qdict_set_default_str(child_options, BDRV_OPT_AUTO_READ_ONLY, "o=
-ff");
-> +    } else {
-> +        /* Inherit the read-only option from the parent if it's not set =
-*/
-> +        qdict_copy_default(child_options, parent_options, BDRV_OPT_READ_=
-ONLY);
-> +        qdict_copy_default(child_options, parent_options,
-> +                           BDRV_OPT_AUTO_READ_ONLY);
-> +    }
-> +
-> +    if (parent_is_format && !(role & BDRV_CHILD_COW)) {
-> +        /*
-> +         * Our format drivers take care to send flushes and respect
-> +         * unmap policy, so we can default to enable both on lower
-> +         * layers regardless of the corresponding parent options.
-> +         */
-> +        qdict_set_default_str(child_options, BDRV_OPT_DISCARD, "unmap");
-> +    }
-
-Why the restriction to format here? Don't we break "unmap" propagation
-through filters with this?
-
-It would probably also be a good question why we don't propagate it to
-the backing file, but this is preexisting.
-
-> +    /* Clear flags that only apply to the top layer */
-> +    flags &=3D ~(BDRV_O_SNAPSHOT | BDRV_O_NO_BACKING | BDRV_O_COPY_ON_RE=
-AD);
-> +
-> +    if (role & BDRV_CHILD_METADATA) {
-> +        flags &=3D ~BDRV_O_NO_IO;
-> +    }
-
-Hm... This is interesting, but I guess it makes sense. It just never was
-a hard rule that a format driver must not access data even internally
-with NO_IO, but I think it holds true.
-
-> +    if (role & BDRV_CHILD_COW) {
-> +        flags &=3D ~BDRV_O_TEMPORARY;
-> +    }
-
-We could probably have a long discussion about whether this is right in
-theory, but in practice BDRV_O_TEMPORARY only exists for snapshot=3Don,
-for which we know that it's always qcow2 with a file and a backing
-child. And there is no doubt that we make the right distinction in this
-case.
-
-> +    *child_flags =3D flags;
-> +}
-> +
->  /*
->   * Returns the options and flags that bs->file should get if a protocol =
-driver
->   * is expected, based on the given options and flags for the parent BDS
-> --=20
-> 2.24.1
-
-Kevin
-
+>=20
+> With that fixed:
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+>=20
+>=20
+>=20
+>=20
+>=20
+> > +        s->regs_ro[GEM_INT_Q1_MASK + i] =3D 0xFFFFFFFF;
+>=20
+> > +    }
+> >
+> >      /* Mask of register bits which are clear on read */
+> >      memset(&s->regs_rtc[0], 0, sizeof(s->regs_rtc));
+> >      s->regs_rtc[GEM_ISR]      =3D 0xFFFFFFFF;
+> > +    for (i =3D 0; i < s->num_priority_queues; i++) {
+> > +        s->regs_rtc[GEM_INT_Q1_STATUS + i] =3D 0x00000CE6;
+> > +    }
+> >
+> >      /* Mask of register bits which are write 1 to clear */
+> >      memset(&s->regs_w1c[0], 0, sizeof(s->regs_w1c)); @@ -485,6
+> > +495,10 @@ static void gem_init_register_masks(CadenceGEMState *s)
+> >      s->regs_wo[GEM_NWCTRL]   =3D 0x00073E60;
+> >      s->regs_wo[GEM_IER]      =3D 0x07FFFFFF;
+> >      s->regs_wo[GEM_IDR]      =3D 0x07FFFFFF;
+> > +    for (i =3D 0; i < s->num_priority_queues; i++) {
+> > +        s->regs_wo[GEM_INT_Q1_ENABLE + i] =3D 0x00000CE6;
+> > +        s->regs_wo[GEM_INT_Q1_DISABLE + i] =3D 0x00000CE6;
+> > +    }
+> >  }
+> >
+> >  /*
+> > --
+> > 2.7.4
+> >
 
