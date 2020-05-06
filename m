@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A48FBC38A24
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:06:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA98EC47257
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:07:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70D6820714
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:06:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B8AFE20714
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:07:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AEMhra6h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70D6820714
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p+AimE4a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8AFE20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWIp7-0007pl-EN
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 08:06:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56482)
+	id 1jWIpU-0000Ng-TT
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 08:07:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56438)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jWIo3-0006BQ-T6
- for qemu-devel@nongnu.org; Wed, 06 May 2020 08:05:43 -0400
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:40657)
+ id 1jWIo0-00066m-0k
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 08:05:40 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:34192)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jWIo2-0000Zh-RO
- for qemu-devel@nongnu.org; Wed, 06 May 2020 08:05:43 -0400
-Received: by mail-wm1-x32b.google.com with SMTP id u16so2332859wmc.5
- for <qemu-devel@nongnu.org>; Wed, 06 May 2020 05:05:42 -0700 (PDT)
+ id 1jWInx-0008Bm-EP
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 08:05:39 -0400
+Received: by mail-wr1-x431.google.com with SMTP id y3so1915290wrt.1
+ for <qemu-devel@nongnu.org>; Wed, 06 May 2020 05:05:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=nswgQ5gSAZuGHO+UvPAeMZ2cIqUKiQZ2ZazFCKpY7L4=;
- b=AEMhra6hRfbwnR7u9gNmQ0hVPEUat++KuMjBMS9JO63c2FKu0hssxkKZZ+yP2S0TK1
- mBMD1lxAk+/r3YH2PcpOS/wlqkJvFRcatYcsq0BSpiQcUZOHJQekY/mu9QZiZUEuCGaw
- wGzXEFm+iOpH1alHmGXbLtpxgA7imVe4rjAa2mky8l4SMvtcAR5vf8lNrJK0WRaGBV/D
- CsO0/xRQ33oDX0sj4PtMDafMD+XWRIMZBKfcTySNOPi6CVnSV6q2XGMPfQLbMG6HCkAp
- InnoWbhF+ZpetA0QmVdNvhqEzrxjEb855orVhUjAst7iFsxcd5eymMInLS3Ni37yCw6o
- E73g==
+ bh=d1f2aEdjsEFanYx6BNV67Yvn98soCaaI3O+YSwy/f9s=;
+ b=p+AimE4aJ/Cg7++kZR1l90QvFobmfJUBthYDeijnCz5z3u0ahbytbgl3PQRFAfCn4K
+ +ZYIIVMg03PqQ+1GwBd5sxM8okQk7USpTxOc6konF5rz7LcYCWwyXwOkHmCb4VSzu5ie
+ JmctO2bWAdqyXtFALYRKicg7kcP3klW2GLDyAAlnpgb44fvvUglsGaLOGDjbXv+DSsqV
+ dDq6aVj9biHd/yKNC+T9vImsanmQOPQ+3mKbVsicB9OktZpBnN3Hc4rfWAbOLrcYnXYH
+ WufOdWpNgo/5afdjckaiUp7nJJBCRPQtpdDyAYKPNw07BLSDU+52mLMzY+nP2gkmskr1
+ xFnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=nswgQ5gSAZuGHO+UvPAeMZ2cIqUKiQZ2ZazFCKpY7L4=;
- b=oasflDxvLB9l3FyKtBB8d0E6MxWFDQKxedQukDYHaUEvABDuklyi7Uo2zSq0JXUcZP
- eygKXuep028fmPdgFdjXB9vqXvHp/Gp0/9TfyNCaDZzV0XYBWZOEmcr2c7Eq4QOZfu/v
- u6Npne77sHuJrAe1r1sbWkxkoL8ry9ZYp03q7iSUyddUuOqPk1tcaRqWEabsxm+QXmaL
- gjqyfQCIWIiguVhoanTaSrknJHKwkDK+9GnmcxZYl+J1qflgIz4ZWGQ3UqLX5jTUJ6Uj
- KJLO0Tx0TRa/Cn1bkgrOQTiAoJUB5+9UyBzVDOSwllpLobMQ9PsI5f0soAkMZTMntWjc
- wGBw==
-X-Gm-Message-State: AGi0PuYDGcEdM1I1WMjWw6yXS7ymBsR32Q91QxI1/Mjkr61ph8Fb4152
- Crsw9eySYkOKiuDi/IFVh/ba0Q==
-X-Google-Smtp-Source: APiQypKMuzBkpsiZzPlOFKdB3IZBQ4CkWGCFtBFBQTMXp7dqNCQ7e6svV1RzlkFKFqUN5jl3wdhJOQ==
-X-Received: by 2002:a1c:668a:: with SMTP id a132mr4403683wmc.46.1588766741346; 
- Wed, 06 May 2020 05:05:41 -0700 (PDT)
+ bh=d1f2aEdjsEFanYx6BNV67Yvn98soCaaI3O+YSwy/f9s=;
+ b=dwRB5d3v1OuYcVItgiFYqT8EKn2cHBTj+AO+TSTE/fBy9/oMJZB/ZQvoTmktqAKdH1
+ DEUskthbr5hSkHfiH+K7UW3adktw8X72THT/oYtNnKA2zqGlUO9ZHF8zcMaQRNr31mWf
+ qSg2OLqz6YJYijPQF1bdYfyDL8u4arn3rH1/x3ejk+rWMe3GDJUe9sTcJxjTKrYyyjQY
+ y/U+zG4xfninyWxHAlMM2Oc5WYFECorN6edVMi5ogakzPKJsbeBC86KH8kGkR101a9Xv
+ hzWHkr/LCiwj8Vbayb7CI/fns6kvCLl2XJl56RsZwKsYM+4x8n3tN8xlYjT5/SyZTEmX
+ U1cQ==
+X-Gm-Message-State: AGi0PuY4oZXx3rvjIUBgVXRfvMkyWDCza3EoTeWExu+zc6SYvGXN8bRs
+ WPp+m9re4rfWpC9q1efzKzc3Lg==
+X-Google-Smtp-Source: APiQypLpiKxmTG7yG/IAkqbCGr6rn9WKEMKGU6fwjNoIzHr3aBX3owMf7JdZE5Yc4AWApNYXUwGDbA==
+X-Received: by 2002:a5d:6503:: with SMTP id x3mr10149959wru.153.1588766733628; 
+ Wed, 06 May 2020 05:05:33 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id y31sm2568014wrd.83.2020.05.06.05.05.34
+ by smtp.gmail.com with ESMTPSA id i6sm2432884wrw.97.2020.05.06.05.05.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 06 May 2020 05:05:37 -0700 (PDT)
+ Wed, 06 May 2020 05:05:30 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 6953D1FF96;
- Wed,  6 May 2020 13:05:30 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id EBBEF1FF8F;
+ Wed,  6 May 2020 13:05:29 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 08/14] tests/tcg: better trap gdb failures
-Date: Wed,  6 May 2020 13:05:23 +0100
-Message-Id: <20200506120529.18974-9-alex.bennee@linaro.org>
+Subject: [PULL 03/14] .cirrus.yml: bump FreeBSD to the current stable release
+Date: Wed,  6 May 2020 13:05:18 +0100
+Message-Id: <20200506120529.18974-4-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200506120529.18974-1-alex.bennee@linaro.org>
 References: <20200506120529.18974-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32b;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32b.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::431;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x431.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,78 +103,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: Ed Maste <emaste@freebsd.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Li-Wen Hsu <lwhsu@freebsd.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It seems older and non-multiarach aware GDBs might not fail gracefully
-when faced with something they don't know. For example when faced with
-a target XML for s390x the Ubuntu 18.04 gdb will generate an internal
-fault and prompt for a core dump.
-
-Work around this by invoking GDB in a more batch orientated way and
-then trying to filter out between test failures and gdb failures.
+Hopefully this will un-stick the test which has been broken for a long
+time.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200430190122.4592-4-alex.bennee@linaro.org>
+Reviewed-by: Li-Wen Hsu <lwhsu@freebsd.org>
+Tested-by: Li-Wen Hsu <lwhsu@freebsd.org>
+Message-Id: <20200501111505.4225-4-alex.bennee@linaro.org>
 
-diff --git a/tests/guest-debug/run-test.py b/tests/guest-debug/run-test.py
-index 8c49ee2f225..2bbb8fbaa38 100755
---- a/tests/guest-debug/run-test.py
-+++ b/tests/guest-debug/run-test.py
-@@ -50,8 +50,25 @@ if __name__ == '__main__':
-     inferior = subprocess.Popen(shlex.split(cmd))
+diff --git a/.cirrus.yml b/.cirrus.yml
+index 90645fede6b..f06f5af2b93 100644
+--- a/.cirrus.yml
++++ b/.cirrus.yml
+@@ -3,7 +3,7 @@ env:
  
-     # Now launch gdb with our test and collect the result
--    gdb_cmd = "%s %s -ex 'target remote localhost:1234' -x %s" % (args.gdb, args.binary, args.test)
-+    gdb_cmd = "%s %s" % (args.gdb, args.binary)
-+    # run quietly and ignore .gdbinit
-+    gdb_cmd += " -q -n -batch"
-+    # disable prompts in case of crash
-+    gdb_cmd += " -ex 'set confirm off'"
-+    # connect to remote
-+    gdb_cmd += " -ex 'target remote localhost:1234'"
-+    # finally the test script itself
-+    gdb_cmd += " -x %s" % (args.test)
-+
-+    print("GDB CMD: %s" % (gdb_cmd))
- 
-     result = subprocess.call(gdb_cmd, shell=True);
- 
-+    # A negative result is the result of an internal gdb failure like
-+    # a crash. We force a return of 0 so we don't fail the test on
-+    # account of broken external tools.
-+    if result < 0:
-+        print("GDB crashed? SKIPPING")
-+        exit(0)
-+
-     exit(result)
-diff --git a/tests/tcg/aarch64/gdbstub/test-sve-ioctl.py b/tests/tcg/aarch64/gdbstub/test-sve-ioctl.py
-index 984fbeb277e..387b2fc20aa 100644
---- a/tests/tcg/aarch64/gdbstub/test-sve-ioctl.py
-+++ b/tests/tcg/aarch64/gdbstub/test-sve-ioctl.py
-@@ -70,7 +70,6 @@ except (gdb.error, AttributeError):
- try:
-     # These are not very useful in scripts
-     gdb.execute("set pagination off")
--    gdb.execute("set confirm off")
- 
-     # Run the actual tests
-     run_test()
-diff --git a/tests/tcg/aarch64/gdbstub/test-sve.py b/tests/tcg/aarch64/gdbstub/test-sve.py
-index dbe7f2aa932..5995689625e 100644
---- a/tests/tcg/aarch64/gdbstub/test-sve.py
-+++ b/tests/tcg/aarch64/gdbstub/test-sve.py
-@@ -71,7 +71,6 @@ except (gdb.error, AttributeError):
- try:
-     # These are not very useful in scripts
-     gdb.execute("set pagination off")
--    gdb.execute("set confirm off")
- 
-     # Run the actual tests
-     run_test()
+ freebsd_12_task:
+   freebsd_instance:
+-    image: freebsd-12-0-release-amd64
++    image_family: freebsd-12-1
+     cpu: 8
+     memory: 8G
+   install_script: pkg install -y
 -- 
 2.20.1
 
