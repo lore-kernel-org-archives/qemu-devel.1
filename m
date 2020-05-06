@@ -2,106 +2,94 @@ Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BEFDC28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:13:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13904C28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:14:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAF4C206DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:13:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D293D206DB
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:14:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZDFUxsM4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAF4C206DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="POJtNPv3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D293D206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWIvW-0003jc-Sl
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 08:13:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57402)
+	id 1jWIwX-0004zC-2n
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 08:14:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56534)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jWIu3-0001t7-6p
- for qemu-devel@nongnu.org; Wed, 06 May 2020 08:11:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31160
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jWIu1-0000UI-Hs
- for qemu-devel@nongnu.org; Wed, 06 May 2020 08:11:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588767112;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Vt9SliqM2j8xkrP1xGFxSvvkfmqNLfEXM6C9njeT6k0=;
- b=ZDFUxsM4brRtg9tYK+WZgU1158zBXNDcpfiF+oxbQ20xxfCpyrXMBKVjUwmoMBoe3kjTwE
- kWmNjOrV74hcgOTFoIHwJS2neTysKCWaECLQwVirDN7R2nKYg7jTD4N2Byb0x0mp0fZ0Op
- TbqtZEWTEZMkIy0CIU/nfZQAtpAdiuw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-274-YYRsg6ONOpiHSiNxRi__lQ-1; Wed, 06 May 2020 08:11:50 -0400
-X-MC-Unique: YYRsg6ONOpiHSiNxRi__lQ-1
-Received: by mail-wr1-f70.google.com with SMTP id z5so1194969wrt.17
- for <qemu-devel@nongnu.org>; Wed, 06 May 2020 05:11:50 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jWIo9-0006Lf-Ah
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 08:05:49 -0400
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:39606)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jWIo7-00012z-6z
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 08:05:48 -0400
+Received: by mail-wm1-x32d.google.com with SMTP id y24so2344096wma.4
+ for <qemu-devel@nongnu.org>; Wed, 06 May 2020 05:05:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=usxqN0chs/+svG7Q89+uOboA+O3BScfxkits4ZbaY44=;
+ b=POJtNPv3efthz7dl5Ok8qN9NoLDOYAH5sEvyJa1iHs+ZEaywIM42HrYrK+6dNHrf4R
+ xGZghz6KEq33gyAp3xmwjCCfK/aDSj15xcTcJ0fEjvW1MdLT33P3LvQwuZnZA8AUpuFf
+ /1iu0o7Z0CPnyEsYqa9UiYEO/++x8ckI1uxf65onWQGih/LSz4fKdqe4giP/mcMcgJM1
+ q3EHslFqG17hve4e/cv+4bSp2NsdxMzGK9LstrA174r/gQbGfYiJDdANURKt893/X0lI
+ okPmN4bqEZXpMKb2XbnCizS2gu1CxGYRs3SAN/w9K9bsKgxVnViSf+5bcc8c5jsBOZOh
+ 8lMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Vt9SliqM2j8xkrP1xGFxSvvkfmqNLfEXM6C9njeT6k0=;
- b=Qru5tH5bQVbafGY0xXhOBMvPv3eOBhPLKz6raKcyHwxSIWoP/yqEwRCua9idAmLrkh
- q9huly+DlqIDwmey2ps5e8c7eBDm3hy91L23FiNNOGaGAPv8biVGWdxqjJawrSbTJyvK
- 7AaaDnYWNjucMshHbU9ErOY9uHQ/ZcIkG9ElQyQfx26Eh6Zp+PnnSuL2QM/MuR+Gdx9a
- zOImViOzMY7pnaO7Ld6JyzlaCzHJ9P6jXzNrZIqGrOLjP+i7+r++ooOszMZaH411LMc0
- Lu85+NotYfj2Lg5IvhU5C/NKvaV85+xWpMRdfNxrdQHv4C0EXKr8gtLVp3Y2Q1BtjNko
- /6fQ==
-X-Gm-Message-State: AGi0Pubq2Wkdtv36V/G3cEJHjo++vG1Uq9bI3fg0Vbbf+BuXOHowomgK
- eugFSh8owGOUUiqsTTWhFFTy8KhQRKbMTc1n56fw4l02cqELqZ8bNVQL/wHIvB4jLWHp4bfFuEX
- Z5Ep2yls3ZBxjeFc=
-X-Received: by 2002:a5d:6b8c:: with SMTP id n12mr7209865wrx.107.1588767108791; 
- Wed, 06 May 2020 05:11:48 -0700 (PDT)
-X-Google-Smtp-Source: APiQypITkwYuWilC7he8r6kz3Ay7y1MhvlvXtclL+VvPjE0cooz5s8R+0HG/KsnWZ13/Y/LPi7HdoQ==
-X-Received: by 2002:a5d:6b8c:: with SMTP id n12mr7209816wrx.107.1588767108346; 
- Wed, 06 May 2020 05:11:48 -0700 (PDT)
-Received: from [192.168.1.37] (26.red-88-21-207.staticip.rima-tde.net.
- [88.21.207.26])
- by smtp.gmail.com with ESMTPSA id w4sm2459947wro.28.2020.05.06.05.11.47
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 06 May 2020 05:11:47 -0700 (PDT)
-Subject: Re: [PATCH v1 2/2] target/riscv: Drop support for ISA spec version
- 1.09.1
-To: Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
-References: <cover.1588727508.git.alistair.francis@wdc.com>
- <31e61b6cd45bbfa91ce924cdb19ca9844f0907b9.1588727508.git.alistair.francis@wdc.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <59587535-3780-fc3a-3c28-869c495cf739@redhat.com>
-Date: Wed, 6 May 2020 14:11:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=usxqN0chs/+svG7Q89+uOboA+O3BScfxkits4ZbaY44=;
+ b=VsBzc4vKXE9GC5jvsC2pyelwGSKH6LSgf5Lilky0qHeuEGIDF50Gu92uLXiaMoi5LE
+ dic8JCm3f6h7fxGWomW+TniUdHCq0V61+zofhyRXmb/a4yd7XioD6RUskz9s4Pc2IYrh
+ LL0G92Hr8Ubs+M7j6AgbwcLQFZsaPoV2xaCFgq3VXOefT11T28XADhYYPdGU61Y6/civ
+ 1j2BwwUBXgyoC/oqyv2ujZZXQKSEn3mCh0ZQlkU7fDU4fOvlHebKAo5NGoZmMhVJTbiL
+ tvQHP/ExYUYfU8xzbcSB6vz2OmCCOAry/lQBn6qOfcHMMwDusrCL4mPdU2+VldXkFTLI
+ 0yBg==
+X-Gm-Message-State: AGi0PuZaXdCT7gjVvE1EV3E39BVp2VJlhLAHb175i5RJexIfSxgC1q9D
+ T1oR2/ySOl8GsJy6ROpg9AZjLg==
+X-Google-Smtp-Source: APiQypKuKQ2WvvBAp1PD6GMe3t7G8p+MGB027vrBL635JT2rUcR/4hVBiV9bHko4+8IF256fbSMHqw==
+X-Received: by 2002:a1c:bc08:: with SMTP id m8mr3946648wmf.119.1588766745661; 
+ Wed, 06 May 2020 05:05:45 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id k17sm2683515wmi.10.2020.05.06.05.05.36
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 06 May 2020 05:05:37 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id ADFEB1FF9A;
+ Wed,  6 May 2020 13:05:30 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Subject: [PULL 11/14] gdbstub/linux-user: support debugging over a unix socket
+Date: Wed,  6 May 2020 13:05:26 +0100
+Message-Id: <20200506120529.18974-12-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200506120529.18974-1-alex.bennee@linaro.org>
+References: <20200506120529.18974-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <31e61b6cd45bbfa91ce924cdb19ca9844f0907b9.1588727508.git.alistair.francis@wdc.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 04:02:22
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::32d;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -115,307 +103,276 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, palmer@dabbelt.com
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alistair,
+While debugging over TCP is fairly straightforward now we have test
+cases that want to orchestrate via make and currently a parallel build
+fails as two processes can't use the same listening port. While system
+emulation offers a wide cornucopia of connection methods thanks to the
+chardev abstraction we are a little more limited for linux user.
+Thankfully the programming API for a TCP socket and a local UNIX
+socket is pretty much the same once it's set up.
 
-On 5/6/20 3:12 AM, Alistair Francis wrote:
-> The RISC-V ISA spec version 1.09.1 has been deprecated in QEMU since
-> 4.1. It's not commonly used so let's remove support for it.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->   target/riscv/cpu.c                            | 30 -------
->   target/riscv/cpu.h                            |  8 --
->   target/riscv/csr.c                            | 82 ++++---------------
->   .../riscv/insn_trans/trans_privileged.inc.c   |  6 --
->   tests/qtest/machine-none-test.c               |  4 +-
->   5 files changed, 19 insertions(+), 111 deletions(-)
-> 
-> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-> index 059d71f2c7..eeb91f8513 100644
-> --- a/target/riscv/cpu.c
-> +++ b/target/riscv/cpu.c
-> @@ -135,16 +135,6 @@ static void riscv_base32_cpu_init(Object *obj)
->       set_misa(env, 0);
->   }
->   
-> -static void rv32gcsu_priv1_09_1_cpu_init(Object *obj)
-> -{
-> -    CPURISCVState *env = &RISCV_CPU(obj)->env;
-> -    set_misa(env, RV32 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
-> -    set_priv_version(env, PRIV_VERSION_1_09_1);
-> -    set_resetvec(env, DEFAULT_RSTVEC);
-> -    set_feature(env, RISCV_FEATURE_MMU);
-> -    set_feature(env, RISCV_FEATURE_PMP);
-> -}
-> -
->   static void rv32gcsu_priv1_10_0_cpu_init(Object *obj)
->   {
->       CPURISCVState *env = &RISCV_CPU(obj)->env;
-> @@ -182,16 +172,6 @@ static void riscv_base64_cpu_init(Object *obj)
->       set_misa(env, 0);
->   }
->   
-> -static void rv64gcsu_priv1_09_1_cpu_init(Object *obj)
-> -{
-> -    CPURISCVState *env = &RISCV_CPU(obj)->env;
-> -    set_misa(env, RV64 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
-> -    set_priv_version(env, PRIV_VERSION_1_09_1);
-> -    set_resetvec(env, DEFAULT_RSTVEC);
-> -    set_feature(env, RISCV_FEATURE_MMU);
-> -    set_feature(env, RISCV_FEATURE_PMP);
-> -}
-> -
->   static void rv64gcsu_priv1_10_0_cpu_init(Object *obj)
->   {
->       CPURISCVState *env = &RISCV_CPU(obj)->env;
-> @@ -388,8 +368,6 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
->               priv_version = PRIV_VERSION_1_11_0;
->           } else if (!g_strcmp0(cpu->cfg.priv_spec, "v1.10.0")) {
->               priv_version = PRIV_VERSION_1_10_0;
-> -        } else if (!g_strcmp0(cpu->cfg.priv_spec, "v1.9.1")) {
-> -            priv_version = PRIV_VERSION_1_09_1;
->           } else {
->               error_setg(errp,
->                          "Unsupported privilege spec version '%s'",
-> @@ -621,18 +599,10 @@ static const TypeInfo riscv_cpu_type_infos[] = {
->       DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31,       rv32imacu_nommu_cpu_init),
->       DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E34,       rv32imafcu_nommu_cpu_init),
->       DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rv32gcsu_priv1_10_0_cpu_init),
-> -    /* Depreacted */
-> -    DEFINE_CPU(TYPE_RISCV_CPU_RV32IMACU_NOMMU,  rv32imacu_nommu_cpu_init),
-> -    DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_09_1, rv32gcsu_priv1_09_1_cpu_init),
-> -    DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_10_0, rv32gcsu_priv1_10_0_cpu_init)
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200430190122.4592-7-alex.bennee@linaro.org>
 
-Shouldn't you let TYPE_RISCV_CPU_RV32GCSU_V1_10_0 until you remove v1.10.0?
-
-Or remove TYPE_RISCV_CPU_RV32GCSU_V1_10_0 & 
-TYPE_RISCV_CPU_RV64GCSU_V1_10_0 in another patch after this one 
-(restricted to 1.09.1).
-
->   #elif defined(TARGET_RISCV64)
->       DEFINE_CPU(TYPE_RISCV_CPU_BASE64,           riscv_base64_cpu_init),
->       DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E51,       rv64imacu_nommu_cpu_init),
->       DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U54,       rv64gcsu_priv1_10_0_cpu_init),
-> -    /* Deprecated */
-> -    DEFINE_CPU(TYPE_RISCV_CPU_RV64IMACU_NOMMU,  rv64imacu_nommu_cpu_init),
-> -    DEFINE_CPU(TYPE_RISCV_CPU_RV64GCSU_V1_09_1, rv64gcsu_priv1_09_1_cpu_init),
-> -    DEFINE_CPU(TYPE_RISCV_CPU_RV64GCSU_V1_10_0, rv64gcsu_priv1_10_0_cpu_init)
-
-Ditto.
-
->   #endif
->   };
->   
-> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> index d0e7f5b9c5..c022539012 100644
-> --- a/target/riscv/cpu.h
-> +++ b/target/riscv/cpu.h
-> @@ -40,13 +40,6 @@
->   #define TYPE_RISCV_CPU_SIFIVE_E51       RISCV_CPU_TYPE_NAME("sifive-e51")
->   #define TYPE_RISCV_CPU_SIFIVE_U34       RISCV_CPU_TYPE_NAME("sifive-u34")
->   #define TYPE_RISCV_CPU_SIFIVE_U54       RISCV_CPU_TYPE_NAME("sifive-u54")
-> -/* Deprecated */
-> -#define TYPE_RISCV_CPU_RV32IMACU_NOMMU  RISCV_CPU_TYPE_NAME("rv32imacu-nommu")
-> -#define TYPE_RISCV_CPU_RV32GCSU_V1_09_1 RISCV_CPU_TYPE_NAME("rv32gcsu-v1.9.1")
-> -#define TYPE_RISCV_CPU_RV32GCSU_V1_10_0 RISCV_CPU_TYPE_NAME("rv32gcsu-v1.10.0")
-
-Ditto.
-
-> -#define TYPE_RISCV_CPU_RV64IMACU_NOMMU  RISCV_CPU_TYPE_NAME("rv64imacu-nommu")
-> -#define TYPE_RISCV_CPU_RV64GCSU_V1_09_1 RISCV_CPU_TYPE_NAME("rv64gcsu-v1.9.1")
-> -#define TYPE_RISCV_CPU_RV64GCSU_V1_10_0 RISCV_CPU_TYPE_NAME("rv64gcsu-v1.10.0")
-
-Ditto.
-
->   
->   #define RV32 ((target_ulong)1 << (TARGET_LONG_BITS - 2))
->   #define RV64 ((target_ulong)2 << (TARGET_LONG_BITS - 2))
-> @@ -80,7 +73,6 @@ enum {
->       RISCV_FEATURE_MISA
->   };
->   
-> -#define PRIV_VERSION_1_09_1 0x00010901
->   #define PRIV_VERSION_1_10_0 0x00011000
->   #define PRIV_VERSION_1_11_0 0x00011100
->   
-> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-> index 11d184cd16..df3498b24f 100644
-> --- a/target/riscv/csr.c
-> +++ b/target/riscv/csr.c
-> @@ -58,31 +58,11 @@ static int ctr(CPURISCVState *env, int csrno)
->   #if !defined(CONFIG_USER_ONLY)
->       CPUState *cs = env_cpu(env);
->       RISCVCPU *cpu = RISCV_CPU(cs);
-> -    uint32_t ctr_en = ~0u;
->   
->       if (!cpu->cfg.ext_counters) {
->           /* The Counters extensions is not enabled */
->           return -1;
->       }
-> -
-> -    /*
-> -     * The counters are always enabled at run time on newer priv specs, as the
-> -     * CSR has changed from controlling that the counters can be read to
-> -     * controlling that the counters increment.
-> -     */
-> -    if (env->priv_ver > PRIV_VERSION_1_09_1) {
-> -        return 0;
-> -    }
-> -
-> -    if (env->priv < PRV_M) {
-> -        ctr_en &= env->mcounteren;
-> -    }
-> -    if (env->priv < PRV_S) {
-> -        ctr_en &= env->scounteren;
-> -    }
-> -    if (!(ctr_en & (1u << (csrno & 31)))) {
-> -        return -1;
-> -    }
->   #endif
->       return 0;
->   }
-> @@ -358,34 +338,21 @@ static int write_mstatus(CPURISCVState *env, int csrno, target_ulong val)
->       int dirty;
->   
->       /* flush tlb on mstatus fields that affect VM */
-> -    if (env->priv_ver <= PRIV_VERSION_1_09_1) {
-> -        if ((val ^ mstatus) & (MSTATUS_MXR | MSTATUS_MPP |
-> -                MSTATUS_MPRV | MSTATUS_SUM | MSTATUS_VM)) {
-> -            tlb_flush(env_cpu(env));
-> -        }
-> -        mask = MSTATUS_SIE | MSTATUS_SPIE | MSTATUS_MIE | MSTATUS_MPIE |
-> -            MSTATUS_SPP | MSTATUS_FS | MSTATUS_MPRV | MSTATUS_SUM |
-> -            MSTATUS_MPP | MSTATUS_MXR |
-> -            (validate_vm(env, get_field(val, MSTATUS_VM)) ?
-> -                MSTATUS_VM : 0);
-> +    if ((val ^ mstatus) & (MSTATUS_MXR | MSTATUS_MPP | MSTATUS_MPV |
-> +            MSTATUS_MPRV | MSTATUS_SUM)) {
-> +        tlb_flush(env_cpu(env));
->       }
-> -    if (env->priv_ver >= PRIV_VERSION_1_10_0) {
-> -        if ((val ^ mstatus) & (MSTATUS_MXR | MSTATUS_MPP | MSTATUS_MPV |
-> -                MSTATUS_MPRV | MSTATUS_SUM)) {
-> -            tlb_flush(env_cpu(env));
-> -        }
-> -        mask = MSTATUS_SIE | MSTATUS_SPIE | MSTATUS_MIE | MSTATUS_MPIE |
-> -            MSTATUS_SPP | MSTATUS_FS | MSTATUS_MPRV | MSTATUS_SUM |
-> -            MSTATUS_MPP | MSTATUS_MXR | MSTATUS_TVM | MSTATUS_TSR |
-> -            MSTATUS_TW;
-> +    mask = MSTATUS_SIE | MSTATUS_SPIE | MSTATUS_MIE | MSTATUS_MPIE |
-> +        MSTATUS_SPP | MSTATUS_FS | MSTATUS_MPRV | MSTATUS_SUM |
-> +        MSTATUS_MPP | MSTATUS_MXR | MSTATUS_TVM | MSTATUS_TSR |
-> +        MSTATUS_TW;
->   #if defined(TARGET_RISCV64)
-> -            /*
-> -             * RV32: MPV and MTL are not in mstatus. The current plan is to
-> -             * add them to mstatush. For now, we just don't support it.
-> -             */
-> -            mask |= MSTATUS_MTL | MSTATUS_MPV;
-> +        /*
-> +         * RV32: MPV and MTL are not in mstatus. The current plan is to
-> +         * add them to mstatush. For now, we just don't support it.
-> +         */
-> +        mask |= MSTATUS_MTL | MSTATUS_MPV;
->   #endif
-> -    }
->   
->       mstatus = (mstatus & ~mask) | (val & mask);
->   
-> @@ -553,8 +520,7 @@ static int write_mcounteren(CPURISCVState *env, int csrno, target_ulong val)
->   /* This regiser is replaced with CSR_MCOUNTINHIBIT in 1.11.0 */
->   static int read_mscounteren(CPURISCVState *env, int csrno, target_ulong *val)
->   {
-> -    if (env->priv_ver > PRIV_VERSION_1_09_1
-> -        && env->priv_ver < PRIV_VERSION_1_11_0) {
-> +    if (env->priv_ver < PRIV_VERSION_1_11_0) {
->           return -1;
->       }
->       *val = env->mcounteren;
-> @@ -564,8 +530,7 @@ static int read_mscounteren(CPURISCVState *env, int csrno, target_ulong *val)
->   /* This regiser is replaced with CSR_MCOUNTINHIBIT in 1.11.0 */
->   static int write_mscounteren(CPURISCVState *env, int csrno, target_ulong val)
->   {
-> -    if (env->priv_ver > PRIV_VERSION_1_09_1
-> -        && env->priv_ver < PRIV_VERSION_1_11_0) {
-> +    if (env->priv_ver < PRIV_VERSION_1_11_0) {
->           return -1;
->       }
->       env->mcounteren = val;
-> @@ -574,20 +539,13 @@ static int write_mscounteren(CPURISCVState *env, int csrno, target_ulong val)
->   
->   static int read_mucounteren(CPURISCVState *env, int csrno, target_ulong *val)
->   {
-> -    if (env->priv_ver > PRIV_VERSION_1_09_1) {
-> -        return -1;
-> -    }
-> -    *val = env->scounteren;
-> +    return -1;
->       return 0;
->   }
->   
->   static int write_mucounteren(CPURISCVState *env, int csrno, target_ulong val)
->   {
-> -    if (env->priv_ver > PRIV_VERSION_1_09_1) {
-> -        return -1;
-> -    }
-> -    env->scounteren = val;
-> -    return 0;
-> +    return -1;
->   }
->   
->   /* Machine Trap Handling */
-> @@ -829,13 +787,7 @@ static int write_satp(CPURISCVState *env, int csrno, target_ulong val)
->       if (!riscv_feature(env, RISCV_FEATURE_MMU)) {
->           return 0;
->       }
-> -    if (env->priv_ver <= PRIV_VERSION_1_09_1 && (val ^ env->sptbr)) {
-> -        tlb_flush(env_cpu(env));
-> -        env->sptbr = val & (((target_ulong)
-> -            1 << (TARGET_PHYS_ADDR_SPACE_BITS - PGSHIFT)) - 1);
-> -    }
-> -    if (env->priv_ver >= PRIV_VERSION_1_10_0 &&
-> -        validate_vm(env, get_field(val, SATP_MODE)) &&
-> +    if (validate_vm(env, get_field(val, SATP_MODE)) &&
->           ((val ^ env->satp) & (SATP_MODE | SATP_ASID | SATP_PPN)))
->       {
->           if (env->priv == PRV_S && get_field(env->mstatus, MSTATUS_TVM)) {
-> diff --git a/target/riscv/insn_trans/trans_privileged.inc.c b/target/riscv/insn_trans/trans_privileged.inc.c
-> index 76c2fad71c..1af9fa7df8 100644
-> --- a/target/riscv/insn_trans/trans_privileged.inc.c
-> +++ b/target/riscv/insn_trans/trans_privileged.inc.c
-> @@ -95,12 +95,6 @@ static bool trans_sfence_vma(DisasContext *ctx, arg_sfence_vma *a)
->   
->   static bool trans_sfence_vm(DisasContext *ctx, arg_sfence_vm *a)
->   {
-> -#ifndef CONFIG_USER_ONLY
-> -    if (ctx->priv_ver <= PRIV_VERSION_1_09_1) {
-> -        gen_helper_tlb_flush(cpu_env);
-> -        return true;
-> -    }
-> -#endif
->       return false;
->   }
->   
-> diff --git a/tests/qtest/machine-none-test.c b/tests/qtest/machine-none-test.c
-> index 8bb54a6360..b52311ec2e 100644
-> --- a/tests/qtest/machine-none-test.c
-> +++ b/tests/qtest/machine-none-test.c
-> @@ -54,8 +54,8 @@ static struct arch2cpu cpus_map[] = {
->       { "xtensa", "dc233c" },
->       { "xtensaeb", "fsf" },
->       { "hppa", "hppa" },
-> -    { "riscv64", "rv64gcsu-v1.10.0" },
-> -    { "riscv32", "rv32gcsu-v1.9.1" },
-> +    { "riscv64", "sifive-u54" },
-> +    { "riscv32", "sifive-u34" },
->       { "rx", "rx62n" },
->   };
->   
-> 
+diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
+index 4a2b8e30893..94d8f83e92d 100644
+--- a/include/exec/gdbstub.h
++++ b/include/exec/gdbstub.h
+@@ -177,11 +177,15 @@ static inline uint8_t * gdb_get_reg_ptr(GByteArray *buf, int len)
+ 
+ #endif
+ 
+-#ifdef CONFIG_USER_ONLY
+-int gdbserver_start(int);
+-#else
+-int gdbserver_start(const char *port);
+-#endif
++/**
++ * gdbserver_start: start the gdb server
++ * @port_or_device: connection spec for gdb
++ *
++ * For CONFIG_USER this is either a tcp port or a path to a fifo. For
++ * system emulation you can use a full chardev spec for your gdbserver
++ * port.
++ */
++int gdbserver_start(const char *port_or_device);
+ 
+ void gdbserver_cleanup(void);
+ 
+diff --git a/bsd-user/main.c b/bsd-user/main.c
+index 770c2b267ad..28f122b80e6 100644
+--- a/bsd-user/main.c
++++ b/bsd-user/main.c
+@@ -738,7 +738,7 @@ int main(int argc, char **argv)
+     CPUState *cpu;
+     int optind;
+     const char *r;
+-    int gdbstub_port = 0;
++    const char *gdbstub = NULL;
+     char **target_environ, **wrk;
+     envlist_t *envlist = NULL;
+     char *trace_file = NULL;
+@@ -814,7 +814,7 @@ int main(int argc, char **argv)
+                 exit(1);
+             }
+         } else if (!strcmp(r, "g")) {
+-            gdbstub_port = atoi(argv[optind++]);
++            gdbstub = g_strdup(argv[optind++]);
+         } else if (!strcmp(r, "r")) {
+             qemu_uname_release = argv[optind++];
+         } else if (!strcmp(r, "cpu")) {
+@@ -1124,8 +1124,8 @@ int main(int argc, char **argv)
+ #error unsupported target CPU
+ #endif
+ 
+-    if (gdbstub_port) {
+-        gdbserver_start (gdbstub_port);
++    if (gdbstub) {
++        gdbserver_start(gdbstub);
+         gdb_handlesig(cpu, 0);
+     }
+     cpu_loop(env);
+diff --git a/gdbstub.c b/gdbstub.c
+index b5381aa5204..6950fd243f3 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -355,6 +355,7 @@ typedef struct GDBState {
+     int signal;
+ #ifdef CONFIG_USER_ONLY
+     int fd;
++    char *socket_path;
+     int running_state;
+ #else
+     CharBackend chr;
+@@ -2962,6 +2963,9 @@ void gdb_exit(CPUArchState *env, int code)
+       return;
+   }
+ #ifdef CONFIG_USER_ONLY
++  if (gdbserver_state.socket_path) {
++      unlink(gdbserver_state.socket_path);
++  }
+   if (gdbserver_state.fd < 0) {
+       return;
+   }
+@@ -3066,7 +3070,66 @@ void gdb_signalled(CPUArchState *env, int sig)
+     put_packet(buf);
+ }
+ 
+-static bool gdb_accept(int gdb_fd)
++static void gdb_accept_init(int fd)
++{
++    init_gdbserver_state();
++    create_default_process(&gdbserver_state);
++    gdbserver_state.processes[0].attached = true;
++    gdbserver_state.c_cpu = gdb_first_attached_cpu();
++    gdbserver_state.g_cpu = gdbserver_state.c_cpu;
++    gdbserver_state.fd = fd;
++    gdb_has_xml = false;
++}
++
++static bool gdb_accept_socket(int gdb_fd)
++{
++    int fd;
++
++    for(;;) {
++        fd = accept(gdb_fd, NULL, NULL);
++        if (fd < 0 && errno != EINTR) {
++            perror("accept socket");
++            return false;
++        } else if (fd >= 0) {
++            qemu_set_cloexec(fd);
++            break;
++        }
++    }
++
++    gdb_accept_init(fd);
++    return true;
++}
++
++static int gdbserver_open_socket(const char *path)
++{
++    struct sockaddr_un sockaddr;
++    int fd, ret;
++
++    fd = socket(AF_UNIX, SOCK_STREAM, 0);
++    if (fd < 0) {
++        perror("create socket");
++        return -1;
++    }
++
++    sockaddr.sun_family = AF_UNIX;
++    pstrcpy(sockaddr.sun_path, sizeof(sockaddr.sun_path) - 1, path);
++    ret = bind(fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr));
++    if (ret < 0) {
++        perror("bind socket");
++        close(fd);
++        return -1;
++    }
++    ret = listen(fd, 1);
++    if (ret < 0) {
++        perror("listen socket");
++        close(fd);
++        return -1;
++    }
++
++    return fd;
++}
++
++static bool gdb_accept_tcp(int gdb_fd)
+ {
+     struct sockaddr_in sockaddr;
+     socklen_t len;
+@@ -3091,17 +3154,11 @@ static bool gdb_accept(int gdb_fd)
+         return false;
+     }
+ 
+-    init_gdbserver_state();
+-    create_default_process(&gdbserver_state);
+-    gdbserver_state.processes[0].attached = true;
+-    gdbserver_state.c_cpu = gdb_first_attached_cpu();
+-    gdbserver_state.g_cpu = gdbserver_state.c_cpu;
+-    gdbserver_state.fd = fd;
+-    gdb_has_xml = false;
++    gdb_accept_init(fd);
+     return true;
+ }
+ 
+-static int gdbserver_open(int port)
++static int gdbserver_open_port(int port)
+ {
+     struct sockaddr_in sockaddr;
+     int fd, ret;
+@@ -3130,21 +3187,35 @@ static int gdbserver_open(int port)
+         close(fd);
+         return -1;
+     }
++
+     return fd;
+ }
+ 
+-int gdbserver_start(int port)
++int gdbserver_start(const char *port_or_path)
+ {
+-    int gdb_fd = gdbserver_open(port);
++    int port = g_ascii_strtoull(port_or_path, NULL, 10);
++    int gdb_fd;
++
++    if (port > 0) {
++        gdb_fd = gdbserver_open_port(port);
++    } else {
++        gdb_fd = gdbserver_open_socket(port_or_path);
++    }
++
+     if (gdb_fd < 0) {
+         return -1;
+     }
+-    /* accept connections */
+-    if (!gdb_accept(gdb_fd)) {
+-        close(gdb_fd);
+-        return -1;
++
++    if (port > 0 && gdb_accept_tcp(gdb_fd)) {
++        return 0;
++    } else if (gdb_accept_socket(gdb_fd)) {
++        gdbserver_state.socket_path = g_strdup(port_or_path);
++        return 0;
+     }
+-    return 0;
++
++    /* gone wrong */
++    close(gdb_fd);
++    return -1;
+ }
+ 
+ /* Disable gdb stub for child processes.  */
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 22578b16336..2cd443237d8 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -51,7 +51,7 @@ char *exec_path;
+ 
+ int singlestep;
+ static const char *argv0;
+-static int gdbstub_port;
++static const char *gdbstub;
+ static envlist_t *envlist;
+ static const char *cpu_model;
+ static const char *cpu_type;
+@@ -310,7 +310,7 @@ static void handle_arg_seed(const char *arg)
+ 
+ static void handle_arg_gdb(const char *arg)
+ {
+-    gdbstub_port = atoi(arg);
++    gdbstub = g_strdup(arg);
+ }
+ 
+ static void handle_arg_uname(const char *arg)
+@@ -861,10 +861,10 @@ int main(int argc, char **argv, char **envp)
+ 
+     target_cpu_copy_regs(env, regs);
+ 
+-    if (gdbstub_port) {
+-        if (gdbserver_start(gdbstub_port) < 0) {
+-            fprintf(stderr, "qemu: could not open gdbserver on port %d\n",
+-                    gdbstub_port);
++    if (gdbstub) {
++        if (gdbserver_start(gdbstub) < 0) {
++            fprintf(stderr, "qemu: could not open gdbserver on %s\n",
++                    gdbstub);
+             exit(EXIT_FAILURE);
+         }
+         gdb_handlesig(cpu, 0);
+-- 
+2.20.1
 
 
