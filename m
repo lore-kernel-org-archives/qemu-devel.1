@@ -2,84 +2,86 @@ Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 911E5C28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:06:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A48FBC38A24
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:06:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F4D320714
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:06:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 70D6820714
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:06:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lvdM2U1M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F4D320714
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AEMhra6h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70D6820714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWIp5-0007la-CN
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 08:06:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56446)
+	id 1jWIp7-0007pl-EN
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 08:06:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56482)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jWIo0-00067G-JP
- for qemu-devel@nongnu.org; Wed, 06 May 2020 08:05:40 -0400
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:33706)
+ id 1jWIo3-0006BQ-T6
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 08:05:43 -0400
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:40657)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jWInx-0007wv-Ey
- for qemu-devel@nongnu.org; Wed, 06 May 2020 08:05:40 -0400
-Received: by mail-wr1-x42f.google.com with SMTP id h9so1912706wrt.0
- for <qemu-devel@nongnu.org>; Wed, 06 May 2020 05:05:33 -0700 (PDT)
+ id 1jWIo2-0000Zh-RO
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 08:05:43 -0400
+Received: by mail-wm1-x32b.google.com with SMTP id u16so2332859wmc.5
+ for <qemu-devel@nongnu.org>; Wed, 06 May 2020 05:05:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=Kysom4i8NwH5auTulZbYwaQkg2dMIuW11Qe11nlqzl0=;
- b=lvdM2U1MkXwBH3wYb+DNpAxjbIr4daSTWeT4l1dyVH/2IgsF1FLSUodJmFOqDC3GlJ
- AZseuIm/Xh2JWWDi3xvx4PecLYnzbkhu+ujC8Ya1vasK0cHqBa78HU1cFEzA702bGbu9
- LiMpNqi2GHvPwzxYLlHzN33LlArIJNFGLALtwk8NXq3XeO8SDJZb69hhyDh5ZHI6NdxY
- W/iijqi/qrgYlpKPMfFcrSdBOjeLi041wYC5HpHbXYyK23rjCnPrI5xY02q1RR/xwC6D
- jWYAUvBd7jkM4U0M//FQyIpO9OycaG8QZ35s6jXKje0qu4BJvqXVLUA43qRk6QDYWnFT
- 1Obw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=nswgQ5gSAZuGHO+UvPAeMZ2cIqUKiQZ2ZazFCKpY7L4=;
+ b=AEMhra6hRfbwnR7u9gNmQ0hVPEUat++KuMjBMS9JO63c2FKu0hssxkKZZ+yP2S0TK1
+ mBMD1lxAk+/r3YH2PcpOS/wlqkJvFRcatYcsq0BSpiQcUZOHJQekY/mu9QZiZUEuCGaw
+ wGzXEFm+iOpH1alHmGXbLtpxgA7imVe4rjAa2mky8l4SMvtcAR5vf8lNrJK0WRaGBV/D
+ CsO0/xRQ33oDX0sj4PtMDafMD+XWRIMZBKfcTySNOPi6CVnSV6q2XGMPfQLbMG6HCkAp
+ InnoWbhF+ZpetA0QmVdNvhqEzrxjEb855orVhUjAst7iFsxcd5eymMInLS3Ni37yCw6o
+ E73g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=Kysom4i8NwH5auTulZbYwaQkg2dMIuW11Qe11nlqzl0=;
- b=GF7Xo5tP1nwB5X3KBQ1e2EYypOYgpX652Zj0SPimWvH2DPm514S0pdklvEGsHRQ4mb
- 2PSfvlupfxhzjjSMgpsO4v4ljQ4dd2ZEA67NgnoVMzXPgfK5S/FhDFGO17ogqY3hXitj
- zkLKWSJ+4K9nx7hA+tITSIII+WypO8lEgFZUOLKlcvPz9ux30bsg9yL5MjJxGx1R/TZU
- k/3Tpb306onCTg31FxqRLDKu5Et08VCwvcROPOWCiB9DPnLzRg3EFH1wIA321GUwNVM6
- Lo24nRLVkMA7MbjJZhYTJVjgdFmdoTV6n4N1NEMsx0TuBERnq0wUxauTXDwT5e0fl7nG
- 7DRw==
-X-Gm-Message-State: AGi0PuYb2KBstQvezkYdnsEt46CqnFO2dqSXkakCCuQNwmYewD2CBJ1o
- YM+5tcBc5ebaOwi+MBmxAeU3Ey7jjqo=
-X-Google-Smtp-Source: APiQypJ6zuEixh5269VicW24mmvC9u2mnFAk3axfIp22X86rIqceioeXrN2Rl3t0k9e7Tpq1r/rgJA==
-X-Received: by 2002:adf:ecc3:: with SMTP id s3mr9883839wro.116.1588766732518; 
- Wed, 06 May 2020 05:05:32 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=nswgQ5gSAZuGHO+UvPAeMZ2cIqUKiQZ2ZazFCKpY7L4=;
+ b=oasflDxvLB9l3FyKtBB8d0E6MxWFDQKxedQukDYHaUEvABDuklyi7Uo2zSq0JXUcZP
+ eygKXuep028fmPdgFdjXB9vqXvHp/Gp0/9TfyNCaDZzV0XYBWZOEmcr2c7Eq4QOZfu/v
+ u6Npne77sHuJrAe1r1sbWkxkoL8ry9ZYp03q7iSUyddUuOqPk1tcaRqWEabsxm+QXmaL
+ gjqyfQCIWIiguVhoanTaSrknJHKwkDK+9GnmcxZYl+J1qflgIz4ZWGQ3UqLX5jTUJ6Uj
+ KJLO0Tx0TRa/Cn1bkgrOQTiAoJUB5+9UyBzVDOSwllpLobMQ9PsI5f0soAkMZTMntWjc
+ wGBw==
+X-Gm-Message-State: AGi0PuYDGcEdM1I1WMjWw6yXS7ymBsR32Q91QxI1/Mjkr61ph8Fb4152
+ Crsw9eySYkOKiuDi/IFVh/ba0Q==
+X-Google-Smtp-Source: APiQypKMuzBkpsiZzPlOFKdB3IZBQ4CkWGCFtBFBQTMXp7dqNCQ7e6svV1RzlkFKFqUN5jl3wdhJOQ==
+X-Received: by 2002:a1c:668a:: with SMTP id a132mr4403683wmc.46.1588766741346; 
+ Wed, 06 May 2020 05:05:41 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z1sm2741114wmf.15.2020.05.06.05.05.30
+ by smtp.gmail.com with ESMTPSA id y31sm2568014wrd.83.2020.05.06.05.05.34
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 06 May 2020 05:05:30 -0700 (PDT)
+ Wed, 06 May 2020 05:05:37 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id AC9091FF7E;
- Wed,  6 May 2020 13:05:29 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 6953D1FF96;
+ Wed,  6 May 2020 13:05:30 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 00/14] testing and gdbstub updates
-Date: Wed,  6 May 2020 13:05:15 +0100
-Message-Id: <20200506120529.18974-1-alex.bennee@linaro.org>
+Subject: [PULL 08/14] tests/tcg: better trap gdb failures
+Date: Wed,  6 May 2020 13:05:23 +0100
+Message-Id: <20200506120529.18974-9-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200506120529.18974-1-alex.bennee@linaro.org>
+References: <20200506120529.18974-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42f;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42f.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32b;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32b.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,80 +103,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
+Cc: "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit f19d118bed77bb95681b07f4e76dbb700c16918d:
+It seems older and non-multiarach aware GDBs might not fail gracefully
+when faced with something they don't know. For example when faced with
+a target XML for s390x the Ubuntu 18.04 gdb will generate an internal
+fault and prompt for a core dump.
 
-  Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2020-05-04' into staging (2020-05-05 15:47:44 +0100)
+Work around this by invoking GDB in a more batch orientated way and
+then trying to filter out between test failures and gdb failures.
 
-are available in the Git repository at:
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Message-Id: <20200430190122.4592-4-alex.bennee@linaro.org>
 
-  https://github.com/stsquad/qemu.git tags/pull-testing-and-gdbstub-060520-1
-
-for you to fetch changes up to a976ed3ffdede7f64c89ac235d0154d048981b5f:
-
-  target/m68k: fix gdb for m68xxx (2020-05-06 09:29:26 +0100)
-
-----------------------------------------------------------------
-Testing and gdbstub updates:
-
-  - travis: drop macosx, tweak ppc64 native
-  - cirrus: fix FreeBSD, guard against future breakage
-  - gdbstub: support socket debug for linux-user
-  - gdbstub: add multiarch tests
-  - gdbstub: fixes for m68k
-
-----------------------------------------------------------------
-Alex Bennée (11):
-      .travis.yml: show free disk space at end of run
-      .travis.yml: drop MacOSX
-      .cirrus.yml: bump FreeBSD to the current stable release
-      .travis.yml: reduce the load on [ppc64] GCC check-tcg
-      configure: favour gdb-multiarch if we have it
-      tests/tcg: better trap gdb failures
-      tests/tcg: drop inferior.was_attached() test
-      gdbstub: eliminate gdbserver_fd global
-      gdbstub/linux-user: support debugging over a unix socket
-      tests/guest-debug: use the unix socket for linux-user tests
-      tests/tcg: add a multiarch linux-user gdb test
-
-KONRAD Frederic (1):
-      target/m68k: fix gdb for m68xxx
-
-Li-Wen Hsu (1):
-      .cirrus.yml: bootstrap pkg unconditionally
-
-Philippe Mathieu-Daudé (1):
-      gdbstub: Introduce gdb_get_float64() to get 64-bit float registers
-
- configure                                   |   4 +-
- include/exec/gdbstub.h                      |  25 ++++--
- bsd-user/main.c                             |   8 +-
- gdbstub.c                                   | 119 ++++++++++++++++++++++------
- linux-user/main.c                           |  12 +--
- target/m68k/cpu.c                           |  52 ++++++++----
- target/m68k/helper.c                        |   3 +-
- target/ppc/gdbstub.c                        |   4 +-
- target/ppc/translate_init.inc.c             |   2 +-
- .cirrus.yml                                 |   4 +-
- .travis.yml                                 |  31 +-------
- gdb-xml/m68k-core.xml                       |  29 +++++++
- tests/guest-debug/run-test.py               |  30 ++++++-
- tests/tcg/aarch64/Makefile.target           |   5 +-
- tests/tcg/aarch64/gdbstub/test-sve-ioctl.py |   4 -
- tests/tcg/aarch64/gdbstub/test-sve.py       |   4 -
- tests/tcg/cris/Makefile.target              |   1 +
- tests/tcg/multiarch/Makefile.target         |  14 ++++
- tests/tcg/multiarch/gdbstub/sha1.py         |  81 +++++++++++++++++++
- 19 files changed, 328 insertions(+), 104 deletions(-)
- create mode 100644 gdb-xml/m68k-core.xml
- create mode 100644 tests/tcg/multiarch/gdbstub/sha1.py
-
-
+diff --git a/tests/guest-debug/run-test.py b/tests/guest-debug/run-test.py
+index 8c49ee2f225..2bbb8fbaa38 100755
+--- a/tests/guest-debug/run-test.py
++++ b/tests/guest-debug/run-test.py
+@@ -50,8 +50,25 @@ if __name__ == '__main__':
+     inferior = subprocess.Popen(shlex.split(cmd))
+ 
+     # Now launch gdb with our test and collect the result
+-    gdb_cmd = "%s %s -ex 'target remote localhost:1234' -x %s" % (args.gdb, args.binary, args.test)
++    gdb_cmd = "%s %s" % (args.gdb, args.binary)
++    # run quietly and ignore .gdbinit
++    gdb_cmd += " -q -n -batch"
++    # disable prompts in case of crash
++    gdb_cmd += " -ex 'set confirm off'"
++    # connect to remote
++    gdb_cmd += " -ex 'target remote localhost:1234'"
++    # finally the test script itself
++    gdb_cmd += " -x %s" % (args.test)
++
++    print("GDB CMD: %s" % (gdb_cmd))
+ 
+     result = subprocess.call(gdb_cmd, shell=True);
+ 
++    # A negative result is the result of an internal gdb failure like
++    # a crash. We force a return of 0 so we don't fail the test on
++    # account of broken external tools.
++    if result < 0:
++        print("GDB crashed? SKIPPING")
++        exit(0)
++
+     exit(result)
+diff --git a/tests/tcg/aarch64/gdbstub/test-sve-ioctl.py b/tests/tcg/aarch64/gdbstub/test-sve-ioctl.py
+index 984fbeb277e..387b2fc20aa 100644
+--- a/tests/tcg/aarch64/gdbstub/test-sve-ioctl.py
++++ b/tests/tcg/aarch64/gdbstub/test-sve-ioctl.py
+@@ -70,7 +70,6 @@ except (gdb.error, AttributeError):
+ try:
+     # These are not very useful in scripts
+     gdb.execute("set pagination off")
+-    gdb.execute("set confirm off")
+ 
+     # Run the actual tests
+     run_test()
+diff --git a/tests/tcg/aarch64/gdbstub/test-sve.py b/tests/tcg/aarch64/gdbstub/test-sve.py
+index dbe7f2aa932..5995689625e 100644
+--- a/tests/tcg/aarch64/gdbstub/test-sve.py
++++ b/tests/tcg/aarch64/gdbstub/test-sve.py
+@@ -71,7 +71,6 @@ except (gdb.error, AttributeError):
+ try:
+     # These are not very useful in scripts
+     gdb.execute("set pagination off")
+-    gdb.execute("set confirm off")
+ 
+     # Run the actual tests
+     run_test()
 -- 
 2.20.1
 
