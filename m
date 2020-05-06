@@ -7,72 +7,71 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6520DC47254
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 01:22:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E5E8C47254
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 01:23:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BEC120721
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 01:22:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D889D20721
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 01:23:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="PV3LyRNy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BEC120721
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="i2TTOJWq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D889D20721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jW8lI-0000ue-Aj
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 21:22:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40380)
+	id 1jW8mN-0001mz-Vf
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 21:23:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40394)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=3884e71da=alistair.francis@wdc.com>)
- id 1jW8jg-0007vR-S6; Tue, 05 May 2020 21:20:32 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:1670)
+ id 1jW8jh-0007vu-PK; Tue, 05 May 2020 21:20:33 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:1677)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=3884e71da=alistair.francis@wdc.com>)
- id 1jW8je-0005N2-Kn; Tue, 05 May 2020 21:20:32 -0400
+ id 1jW8je-0005UR-VS; Tue, 05 May 2020 21:20:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
  t=1588728031; x=1620264031;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=+n/mufbfP8GMD6LJEhMJy6CTB2O7tHSCoE9CO3G3mgM=;
- b=PV3LyRNy/ootdr+T1SxcSayPgf6krS2YQD1z7AxxC6P1XeNxQntALKdK
- q/cGEztGG9j6qtMc/79rAdox6xQEo99amjfAhUbFyRMJEEypHgN8KKVXv
- kqWTAm2/IAXacY2IAnVJ2w6iRDzkcsKsrGmpsPFo3Th0quqp/4bdlUITZ
- MDAYD585YB+nR04f1ZoyQV8UhIa7UaaRatGukdBRhABDDDDalrSeCDFln
- FRMWCkq8ltJfoXE7/bLFjfhj0i3iB3ZbwV3a51793fMBSI2/KPJYsMyv/
- +dpwJ+er4cOjJiZj5MP3M7bgEpQLsjrPZTDgI1VygyMR97fgxsdWqh17g g==;
-IronPort-SDR: MXlCU0DdJmm6SGiP2A5SxPrtv1C3NHXN8hrNij6YLg783bx77OTIufB8/mF0OD1JLgyfxu5/TZ
- UptXTpjbDF3m+9W5g8Nxl4sn4Fi/izDDNkN0v60W+Prt1JP4xbPk/S5bcAwtXBF9v7rfRslhPa
- sThYbUsrj+wm76NtXJCAyks0uTJQsjn7Cz5X2fRp1W12F6xkv96+Szgs6VdZQffGOjkpkSgthq
- 2/7tEvGlztNy6QLZFNCsXd10ocJ8NmPUxWst9xGF4Us3vRVIhS6Ki4ZJozQdU/PumpPPfHFdy9
- DdE=
-X-IronPort-AV: E=Sophos;i="5.73,357,1583164800"; d="scan'208";a="138433827"
+ bh=N9MhgPPg7IPRCiV7k9AHL7ldHKDkULH8EwoDhsj+uL8=;
+ b=i2TTOJWqQNsMjtnpL05DlsawlkMvWrvjPKqt62uwUBrxBjtfZ1Fehxq5
+ xBO1FfYS7zmH5ODsWFxp0xq6eu2m62ufRkdjGhhqKAZM8PM6Ni5EKp2jc
+ pH54+09AS+gjC/Ig5LfuIvExvpqA4qwcEZosyelfXoWsS0/RIWXFW0hEe
+ J0VrSBPVv/S56eHrx21n9Lt2mddm/jeOtkv2cq0CZHSbr9TwRGFGJ1mnI
+ ruCsQqHPRVriAk31jtQT1OjxNh+xkNuWx7Xcq1BGutwY8D/nmRZeUxRiM
+ wk9vsbuRsS2mbgio5nm8y9YOVBmjcv6TMjuNII33O+x0Po7seCF5AX34M w==;
+IronPort-SDR: 6yBRWDSyKC0HG/KTKp30szcViQYka1u447t/QwGE7LBfCM/zvLxzwY+nfv09zHkI7ptFIshE07
+ cETDs6zo9K17U3VE8AXtLbxzUCpi7R9L7TdX0i7qAyunoTys53jeZhXm/RCVWpeRZWWay184C9
+ wKyQMcHgxwNLBParuzhFarAK2S/t74zOztiebFuYBTRaQURkJXPocdVy1LhRJ+/tF8q4mbjqXe
+ 8T/UBsnetgkSNh5xp65TyeU82nRW5t0/md1gtLGPvm1ZU4bktZ+fjBD5ZMBszZoK5SP91uS37C
+ T9E=
+X-IronPort-AV: E=Sophos;i="5.73,357,1583164800"; d="scan'208";a="138433831"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 06 May 2020 09:20:26 +0800
-IronPort-SDR: 3Sno6j5C2FA1FjCG3Py7wSrgY7QAy1ACFCR0XKmnb3uwJygvou6JGLca/B924oZEydLGR4wO//
- F7ixiqF1Lk4FLKjLzO7HvWPFYnUEjBQ+U=
+ by ob1.hgst.iphmx.com with ESMTP; 06 May 2020 09:20:29 +0800
+IronPort-SDR: mlRyUITPe+2thttFavfxxNPyOukRMOpLZfgBX/JUgxJpZ+6kUt2bxLZDdL/EwnbZXqhyroMhdQ
+ 2T7Ffs+fMBV9GJphwmPREGYizxv5Yqe5U=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 05 May 2020 18:10:52 -0700
-IronPort-SDR: ytzNuk7+qEfoIK+bD4KYwvOF9SCsf88YQdX3zTIIgD2ps5j8Eg2FvIHp/brzrh5/+e60huL9JT
- fY2/zFuIs98A==
+ 05 May 2020 18:10:56 -0700
+IronPort-SDR: a94lCTybhGbVD3k5krTyIvqplyck7/8OP4bg0/ZBgSjBbroB6aEyw+4eIlCVKAUJ4uUvRgRHc/
+ c+06m81mnxeg==
 WDCIronportException: Internal
 Received: from use204286.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.56.224])
- by uls-op-cesaip01.wdc.com with ESMTP; 05 May 2020 18:20:24 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 05 May 2020 18:20:28 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v1 1/2] hw/riscv: spike: Remove deprecated ISA specific
- machines
-Date: Tue,  5 May 2020 18:12:07 -0700
-Message-Id: <a051869c728f7f9c5e274b363ee76fc16451a043.1588727508.git.alistair.francis@wdc.com>
+Subject: [PATCH v1 2/2] target/riscv: Drop support for ISA spec version 1.09.1
+Date: Tue,  5 May 2020 18:12:11 -0700
+Message-Id: <31e61b6cd45bbfa91ce924cdb19ca9844f0907b9.1588727508.git.alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <cover.1588727508.git.alistair.francis@wdc.com>
 References: <cover.1588727508.git.alistair.francis@wdc.com>
@@ -107,266 +106,283 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The ISA specific Spike machines have  been deprecated in QEMU since 4.1,
-let's finally remove them.
+The RISC-V ISA spec version 1.09.1 has been deprecated in QEMU since
+4.1. It's not commonly used so let's remove support for it.
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- hw/riscv/spike.c         | 217 ---------------------------------------
- include/hw/riscv/spike.h |   6 +-
- 2 files changed, 2 insertions(+), 221 deletions(-)
+ target/riscv/cpu.c                            | 30 -------
+ target/riscv/cpu.h                            |  8 --
+ target/riscv/csr.c                            | 82 ++++---------------
+ .../riscv/insn_trans/trans_privileged.inc.c   |  6 --
+ tests/qtest/machine-none-test.c               |  4 +-
+ 5 files changed, 19 insertions(+), 111 deletions(-)
 
-diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-index d0c4843712..7bbbdb5036 100644
---- a/hw/riscv/spike.c
-+++ b/hw/riscv/spike.c
-@@ -257,221 +257,6 @@ static void spike_board_init(MachineState *machine)
-         false);
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 059d71f2c7..eeb91f8513 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -135,16 +135,6 @@ static void riscv_base32_cpu_init(Object *obj)
+     set_misa(env, 0);
  }
  
--static void spike_v1_10_0_board_init(MachineState *machine)
+-static void rv32gcsu_priv1_09_1_cpu_init(Object *obj)
 -{
--    const struct MemmapEntry *memmap = spike_memmap;
--
--    SpikeState *s = g_new0(SpikeState, 1);
--    MemoryRegion *system_memory = get_system_memory();
--    MemoryRegion *main_mem = g_new(MemoryRegion, 1);
--    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
--    int i;
--    unsigned int smp_cpus = machine->smp.cpus;
--
--    if (!qtest_enabled()) {
--        info_report("The Spike v1.10.0 machine has been deprecated. "
--                    "Please use the generic spike machine and specify the ISA "
--                    "versions using -cpu.");
--    }
--
--    /* Initialize SOC */
--    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
--                            TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
--    object_property_set_str(OBJECT(&s->soc), SPIKE_V1_10_0_CPU, "cpu-type",
--                            &error_abort);
--    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
--                            &error_abort);
--    object_property_set_bool(OBJECT(&s->soc), true, "realized",
--                            &error_abort);
--
--    /* register system main memory (actual RAM) */
--    memory_region_init_ram(main_mem, NULL, "riscv.spike.ram",
--                           machine->ram_size, &error_fatal);
--    memory_region_add_subregion(system_memory, memmap[SPIKE_DRAM].base,
--        main_mem);
--
--    /* create device tree */
--    create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
--
--    /* boot rom */
--    memory_region_init_rom(mask_rom, NULL, "riscv.spike.mrom",
--                           memmap[SPIKE_MROM].size, &error_fatal);
--    memory_region_add_subregion(system_memory, memmap[SPIKE_MROM].base,
--                                mask_rom);
--
--    if (machine->kernel_filename) {
--        riscv_load_kernel(machine->kernel_filename, htif_symbol_callback);
--    }
--
--    /* reset vector */
--    uint32_t reset_vec[8] = {
--        0x00000297,                  /* 1:  auipc  t0, %pcrel_hi(dtb) */
--        0x02028593,                  /*     addi   a1, t0, %pcrel_lo(1b) */
--        0xf1402573,                  /*     csrr   a0, mhartid  */
--#if defined(TARGET_RISCV32)
--        0x0182a283,                  /*     lw     t0, 24(t0) */
--#elif defined(TARGET_RISCV64)
--        0x0182b283,                  /*     ld     t0, 24(t0) */
--#endif
--        0x00028067,                  /*     jr     t0 */
--        0x00000000,
--        memmap[SPIKE_DRAM].base,     /* start: .dword DRAM_BASE */
--        0x00000000,
--                                     /* dtb: */
--    };
--
--    /* copy in the reset vector in little_endian byte order */
--    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
--        reset_vec[i] = cpu_to_le32(reset_vec[i]);
--    }
--    rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
--                          memmap[SPIKE_MROM].base, &address_space_memory);
--
--    /* copy in the device tree */
--    if (fdt_pack(s->fdt) || fdt_totalsize(s->fdt) >
--            memmap[SPIKE_MROM].size - sizeof(reset_vec)) {
--        error_report("not enough space to store device-tree");
--        exit(1);
--    }
--    qemu_fdt_dumpdtb(s->fdt, fdt_totalsize(s->fdt));
--    rom_add_blob_fixed_as("mrom.fdt", s->fdt, fdt_totalsize(s->fdt),
--                          memmap[SPIKE_MROM].base + sizeof(reset_vec),
--                          &address_space_memory);
--
--    /* initialize HTIF using symbols found in load_kernel */
--    htif_mm_init(system_memory, mask_rom, &s->soc.harts[0].env, serial_hd(0));
--
--    /* Core Local Interruptor (timer and IPI) */
--    sifive_clint_create(memmap[SPIKE_CLINT].base, memmap[SPIKE_CLINT].size,
--        smp_cpus, SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE,
--        false);
+-    CPURISCVState *env = &RISCV_CPU(obj)->env;
+-    set_misa(env, RV32 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
+-    set_priv_version(env, PRIV_VERSION_1_09_1);
+-    set_resetvec(env, DEFAULT_RSTVEC);
+-    set_feature(env, RISCV_FEATURE_MMU);
+-    set_feature(env, RISCV_FEATURE_PMP);
 -}
 -
--static void spike_v1_09_1_board_init(MachineState *machine)
--{
--    const struct MemmapEntry *memmap = spike_memmap;
--
--    SpikeState *s = g_new0(SpikeState, 1);
--    MemoryRegion *system_memory = get_system_memory();
--    MemoryRegion *main_mem = g_new(MemoryRegion, 1);
--    MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
--    int i;
--    unsigned int smp_cpus = machine->smp.cpus;
--
--    if (!qtest_enabled()) {
--        info_report("The Spike v1.09.1 machine has been deprecated. "
--                    "Please use the generic spike machine and specify the ISA "
--                    "versions using -cpu.");
--    }
--
--    /* Initialize SOC */
--    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
--                            TYPE_RISCV_HART_ARRAY, &error_abort, NULL);
--    object_property_set_str(OBJECT(&s->soc), SPIKE_V1_09_1_CPU, "cpu-type",
--                            &error_abort);
--    object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
--                            &error_abort);
--    object_property_set_bool(OBJECT(&s->soc), true, "realized",
--                            &error_abort);
--
--    /* register system main memory (actual RAM) */
--    memory_region_init_ram(main_mem, NULL, "riscv.spike.ram",
--                           machine->ram_size, &error_fatal);
--    memory_region_add_subregion(system_memory, memmap[SPIKE_DRAM].base,
--        main_mem);
--
--    /* boot rom */
--    memory_region_init_rom(mask_rom, NULL, "riscv.spike.mrom",
--                           memmap[SPIKE_MROM].size, &error_fatal);
--    memory_region_add_subregion(system_memory, memmap[SPIKE_MROM].base,
--                                mask_rom);
--
--    if (machine->kernel_filename) {
--        riscv_load_kernel(machine->kernel_filename, htif_symbol_callback);
--    }
--
--    /* reset vector */
--    uint32_t reset_vec[8] = {
--        0x297 + memmap[SPIKE_DRAM].base - memmap[SPIKE_MROM].base, /* lui */
--        0x00028067,                   /* jump to DRAM_BASE */
--        0x00000000,                   /* reserved */
--        memmap[SPIKE_MROM].base + sizeof(reset_vec), /* config string pointer */
--        0, 0, 0, 0                    /* trap vector */
--    };
--
--    /* part one of config string - before memory size specified */
--    const char *config_string_tmpl =
--        "platform {\n"
--        "  vendor ucb;\n"
--        "  arch spike;\n"
--        "};\n"
--        "rtc {\n"
--        "  addr 0x%" PRIx64 "x;\n"
--        "};\n"
--        "ram {\n"
--        "  0 {\n"
--        "    addr 0x%" PRIx64 "x;\n"
--        "    size 0x%" PRIx64 "x;\n"
--        "  };\n"
--        "};\n"
--        "core {\n"
--        "  0" " {\n"
--        "    " "0 {\n"
--        "      isa %s;\n"
--        "      timecmp 0x%" PRIx64 "x;\n"
--        "      ipi 0x%" PRIx64 "x;\n"
--        "    };\n"
--        "  };\n"
--        "};\n";
--
--    /* build config string with supplied memory size */
--    char *isa = riscv_isa_string(&s->soc.harts[0]);
--    char *config_string = g_strdup_printf(config_string_tmpl,
--        (uint64_t)memmap[SPIKE_CLINT].base + SIFIVE_TIME_BASE,
--        (uint64_t)memmap[SPIKE_DRAM].base,
--        (uint64_t)ram_size, isa,
--        (uint64_t)memmap[SPIKE_CLINT].base + SIFIVE_TIMECMP_BASE,
--        (uint64_t)memmap[SPIKE_CLINT].base + SIFIVE_SIP_BASE);
--    g_free(isa);
--    size_t config_string_len = strlen(config_string);
--
--    /* copy in the reset vector in little_endian byte order */
--    for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
--        reset_vec[i] = cpu_to_le32(reset_vec[i]);
--    }
--    rom_add_blob_fixed_as("mrom.reset", reset_vec, sizeof(reset_vec),
--                          memmap[SPIKE_MROM].base, &address_space_memory);
--
--    /* copy in the config string */
--    rom_add_blob_fixed_as("mrom.reset", config_string, config_string_len,
--                          memmap[SPIKE_MROM].base + sizeof(reset_vec),
--                          &address_space_memory);
--
--    /* initialize HTIF using symbols found in load_kernel */
--    htif_mm_init(system_memory, mask_rom, &s->soc.harts[0].env, serial_hd(0));
--
--    /* Core Local Interruptor (timer and IPI) */
--    sifive_clint_create(memmap[SPIKE_CLINT].base, memmap[SPIKE_CLINT].size,
--        smp_cpus, SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE,
--        false);
--
--    g_free(config_string);
--}
--
--static void spike_v1_09_1_machine_init(MachineClass *mc)
--{
--    mc->desc = "RISC-V Spike Board (Privileged ISA v1.9.1)";
--    mc->init = spike_v1_09_1_board_init;
--    mc->max_cpus = 1;
--}
--
--static void spike_v1_10_0_machine_init(MachineClass *mc)
--{
--    mc->desc = "RISC-V Spike Board (Privileged ISA v1.10)";
--    mc->init = spike_v1_10_0_board_init;
--    mc->max_cpus = 1;
--}
--
- static void spike_machine_init(MachineClass *mc)
+ static void rv32gcsu_priv1_10_0_cpu_init(Object *obj)
  {
-     mc->desc = "RISC-V Spike Board";
-@@ -481,6 +266,4 @@ static void spike_machine_init(MachineClass *mc)
-     mc->default_cpu_type = SPIKE_V1_10_0_CPU;
+     CPURISCVState *env = &RISCV_CPU(obj)->env;
+@@ -182,16 +172,6 @@ static void riscv_base64_cpu_init(Object *obj)
+     set_misa(env, 0);
  }
  
--DEFINE_MACHINE("spike_v1.9.1", spike_v1_09_1_machine_init)
--DEFINE_MACHINE("spike_v1.10", spike_v1_10_0_machine_init)
- DEFINE_MACHINE("spike", spike_machine_init)
-diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
-index dc770421bc..b98cfea0e4 100644
---- a/include/hw/riscv/spike.h
-+++ b/include/hw/riscv/spike.h
-@@ -39,11 +39,9 @@ enum {
+-static void rv64gcsu_priv1_09_1_cpu_init(Object *obj)
+-{
+-    CPURISCVState *env = &RISCV_CPU(obj)->env;
+-    set_misa(env, RV64 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
+-    set_priv_version(env, PRIV_VERSION_1_09_1);
+-    set_resetvec(env, DEFAULT_RSTVEC);
+-    set_feature(env, RISCV_FEATURE_MMU);
+-    set_feature(env, RISCV_FEATURE_PMP);
+-}
+-
+ static void rv64gcsu_priv1_10_0_cpu_init(Object *obj)
+ {
+     CPURISCVState *env = &RISCV_CPU(obj)->env;
+@@ -388,8 +368,6 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+             priv_version = PRIV_VERSION_1_11_0;
+         } else if (!g_strcmp0(cpu->cfg.priv_spec, "v1.10.0")) {
+             priv_version = PRIV_VERSION_1_10_0;
+-        } else if (!g_strcmp0(cpu->cfg.priv_spec, "v1.9.1")) {
+-            priv_version = PRIV_VERSION_1_09_1;
+         } else {
+             error_setg(errp,
+                        "Unsupported privilege spec version '%s'",
+@@ -621,18 +599,10 @@ static const TypeInfo riscv_cpu_type_infos[] = {
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31,       rv32imacu_nommu_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E34,       rv32imafcu_nommu_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rv32gcsu_priv1_10_0_cpu_init),
+-    /* Depreacted */
+-    DEFINE_CPU(TYPE_RISCV_CPU_RV32IMACU_NOMMU,  rv32imacu_nommu_cpu_init),
+-    DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_09_1, rv32gcsu_priv1_09_1_cpu_init),
+-    DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_10_0, rv32gcsu_priv1_10_0_cpu_init)
+ #elif defined(TARGET_RISCV64)
+     DEFINE_CPU(TYPE_RISCV_CPU_BASE64,           riscv_base64_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E51,       rv64imacu_nommu_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U54,       rv64gcsu_priv1_10_0_cpu_init),
+-    /* Deprecated */
+-    DEFINE_CPU(TYPE_RISCV_CPU_RV64IMACU_NOMMU,  rv64imacu_nommu_cpu_init),
+-    DEFINE_CPU(TYPE_RISCV_CPU_RV64GCSU_V1_09_1, rv64gcsu_priv1_09_1_cpu_init),
+-    DEFINE_CPU(TYPE_RISCV_CPU_RV64GCSU_V1_10_0, rv64gcsu_priv1_10_0_cpu_init)
+ #endif
  };
  
- #if defined(TARGET_RISCV32)
--#define SPIKE_V1_09_1_CPU TYPE_RISCV_CPU_RV32GCSU_V1_09_1
--#define SPIKE_V1_10_0_CPU TYPE_RISCV_CPU_RV32GCSU_V1_10_0
-+#define SPIKE_V1_10_0_CPU TYPE_RISCV_CPU_SIFIVE_U34
- #elif defined(TARGET_RISCV64)
--#define SPIKE_V1_09_1_CPU TYPE_RISCV_CPU_RV64GCSU_V1_09_1
--#define SPIKE_V1_10_0_CPU TYPE_RISCV_CPU_RV64GCSU_V1_10_0
-+#define SPIKE_V1_10_0_CPU TYPE_RISCV_CPU_SIFIVE_U54
- #endif
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index d0e7f5b9c5..c022539012 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -40,13 +40,6 @@
+ #define TYPE_RISCV_CPU_SIFIVE_E51       RISCV_CPU_TYPE_NAME("sifive-e51")
+ #define TYPE_RISCV_CPU_SIFIVE_U34       RISCV_CPU_TYPE_NAME("sifive-u34")
+ #define TYPE_RISCV_CPU_SIFIVE_U54       RISCV_CPU_TYPE_NAME("sifive-u54")
+-/* Deprecated */
+-#define TYPE_RISCV_CPU_RV32IMACU_NOMMU  RISCV_CPU_TYPE_NAME("rv32imacu-nommu")
+-#define TYPE_RISCV_CPU_RV32GCSU_V1_09_1 RISCV_CPU_TYPE_NAME("rv32gcsu-v1.9.1")
+-#define TYPE_RISCV_CPU_RV32GCSU_V1_10_0 RISCV_CPU_TYPE_NAME("rv32gcsu-v1.10.0")
+-#define TYPE_RISCV_CPU_RV64IMACU_NOMMU  RISCV_CPU_TYPE_NAME("rv64imacu-nommu")
+-#define TYPE_RISCV_CPU_RV64GCSU_V1_09_1 RISCV_CPU_TYPE_NAME("rv64gcsu-v1.9.1")
+-#define TYPE_RISCV_CPU_RV64GCSU_V1_10_0 RISCV_CPU_TYPE_NAME("rv64gcsu-v1.10.0")
  
+ #define RV32 ((target_ulong)1 << (TARGET_LONG_BITS - 2))
+ #define RV64 ((target_ulong)2 << (TARGET_LONG_BITS - 2))
+@@ -80,7 +73,6 @@ enum {
+     RISCV_FEATURE_MISA
+ };
+ 
+-#define PRIV_VERSION_1_09_1 0x00010901
+ #define PRIV_VERSION_1_10_0 0x00011000
+ #define PRIV_VERSION_1_11_0 0x00011100
+ 
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index 11d184cd16..df3498b24f 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -58,31 +58,11 @@ static int ctr(CPURISCVState *env, int csrno)
+ #if !defined(CONFIG_USER_ONLY)
+     CPUState *cs = env_cpu(env);
+     RISCVCPU *cpu = RISCV_CPU(cs);
+-    uint32_t ctr_en = ~0u;
+ 
+     if (!cpu->cfg.ext_counters) {
+         /* The Counters extensions is not enabled */
+         return -1;
+     }
+-
+-    /*
+-     * The counters are always enabled at run time on newer priv specs, as the
+-     * CSR has changed from controlling that the counters can be read to
+-     * controlling that the counters increment.
+-     */
+-    if (env->priv_ver > PRIV_VERSION_1_09_1) {
+-        return 0;
+-    }
+-
+-    if (env->priv < PRV_M) {
+-        ctr_en &= env->mcounteren;
+-    }
+-    if (env->priv < PRV_S) {
+-        ctr_en &= env->scounteren;
+-    }
+-    if (!(ctr_en & (1u << (csrno & 31)))) {
+-        return -1;
+-    }
  #endif
+     return 0;
+ }
+@@ -358,34 +338,21 @@ static int write_mstatus(CPURISCVState *env, int csrno, target_ulong val)
+     int dirty;
+ 
+     /* flush tlb on mstatus fields that affect VM */
+-    if (env->priv_ver <= PRIV_VERSION_1_09_1) {
+-        if ((val ^ mstatus) & (MSTATUS_MXR | MSTATUS_MPP |
+-                MSTATUS_MPRV | MSTATUS_SUM | MSTATUS_VM)) {
+-            tlb_flush(env_cpu(env));
+-        }
+-        mask = MSTATUS_SIE | MSTATUS_SPIE | MSTATUS_MIE | MSTATUS_MPIE |
+-            MSTATUS_SPP | MSTATUS_FS | MSTATUS_MPRV | MSTATUS_SUM |
+-            MSTATUS_MPP | MSTATUS_MXR |
+-            (validate_vm(env, get_field(val, MSTATUS_VM)) ?
+-                MSTATUS_VM : 0);
++    if ((val ^ mstatus) & (MSTATUS_MXR | MSTATUS_MPP | MSTATUS_MPV |
++            MSTATUS_MPRV | MSTATUS_SUM)) {
++        tlb_flush(env_cpu(env));
+     }
+-    if (env->priv_ver >= PRIV_VERSION_1_10_0) {
+-        if ((val ^ mstatus) & (MSTATUS_MXR | MSTATUS_MPP | MSTATUS_MPV |
+-                MSTATUS_MPRV | MSTATUS_SUM)) {
+-            tlb_flush(env_cpu(env));
+-        }
+-        mask = MSTATUS_SIE | MSTATUS_SPIE | MSTATUS_MIE | MSTATUS_MPIE |
+-            MSTATUS_SPP | MSTATUS_FS | MSTATUS_MPRV | MSTATUS_SUM |
+-            MSTATUS_MPP | MSTATUS_MXR | MSTATUS_TVM | MSTATUS_TSR |
+-            MSTATUS_TW;
++    mask = MSTATUS_SIE | MSTATUS_SPIE | MSTATUS_MIE | MSTATUS_MPIE |
++        MSTATUS_SPP | MSTATUS_FS | MSTATUS_MPRV | MSTATUS_SUM |
++        MSTATUS_MPP | MSTATUS_MXR | MSTATUS_TVM | MSTATUS_TSR |
++        MSTATUS_TW;
+ #if defined(TARGET_RISCV64)
+-            /*
+-             * RV32: MPV and MTL are not in mstatus. The current plan is to
+-             * add them to mstatush. For now, we just don't support it.
+-             */
+-            mask |= MSTATUS_MTL | MSTATUS_MPV;
++        /*
++         * RV32: MPV and MTL are not in mstatus. The current plan is to
++         * add them to mstatush. For now, we just don't support it.
++         */
++        mask |= MSTATUS_MTL | MSTATUS_MPV;
+ #endif
+-    }
+ 
+     mstatus = (mstatus & ~mask) | (val & mask);
+ 
+@@ -553,8 +520,7 @@ static int write_mcounteren(CPURISCVState *env, int csrno, target_ulong val)
+ /* This regiser is replaced with CSR_MCOUNTINHIBIT in 1.11.0 */
+ static int read_mscounteren(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+-    if (env->priv_ver > PRIV_VERSION_1_09_1
+-        && env->priv_ver < PRIV_VERSION_1_11_0) {
++    if (env->priv_ver < PRIV_VERSION_1_11_0) {
+         return -1;
+     }
+     *val = env->mcounteren;
+@@ -564,8 +530,7 @@ static int read_mscounteren(CPURISCVState *env, int csrno, target_ulong *val)
+ /* This regiser is replaced with CSR_MCOUNTINHIBIT in 1.11.0 */
+ static int write_mscounteren(CPURISCVState *env, int csrno, target_ulong val)
+ {
+-    if (env->priv_ver > PRIV_VERSION_1_09_1
+-        && env->priv_ver < PRIV_VERSION_1_11_0) {
++    if (env->priv_ver < PRIV_VERSION_1_11_0) {
+         return -1;
+     }
+     env->mcounteren = val;
+@@ -574,20 +539,13 @@ static int write_mscounteren(CPURISCVState *env, int csrno, target_ulong val)
+ 
+ static int read_mucounteren(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+-    if (env->priv_ver > PRIV_VERSION_1_09_1) {
+-        return -1;
+-    }
+-    *val = env->scounteren;
++    return -1;
+     return 0;
+ }
+ 
+ static int write_mucounteren(CPURISCVState *env, int csrno, target_ulong val)
+ {
+-    if (env->priv_ver > PRIV_VERSION_1_09_1) {
+-        return -1;
+-    }
+-    env->scounteren = val;
+-    return 0;
++    return -1;
+ }
+ 
+ /* Machine Trap Handling */
+@@ -829,13 +787,7 @@ static int write_satp(CPURISCVState *env, int csrno, target_ulong val)
+     if (!riscv_feature(env, RISCV_FEATURE_MMU)) {
+         return 0;
+     }
+-    if (env->priv_ver <= PRIV_VERSION_1_09_1 && (val ^ env->sptbr)) {
+-        tlb_flush(env_cpu(env));
+-        env->sptbr = val & (((target_ulong)
+-            1 << (TARGET_PHYS_ADDR_SPACE_BITS - PGSHIFT)) - 1);
+-    }
+-    if (env->priv_ver >= PRIV_VERSION_1_10_0 &&
+-        validate_vm(env, get_field(val, SATP_MODE)) &&
++    if (validate_vm(env, get_field(val, SATP_MODE)) &&
+         ((val ^ env->satp) & (SATP_MODE | SATP_ASID | SATP_PPN)))
+     {
+         if (env->priv == PRV_S && get_field(env->mstatus, MSTATUS_TVM)) {
+diff --git a/target/riscv/insn_trans/trans_privileged.inc.c b/target/riscv/insn_trans/trans_privileged.inc.c
+index 76c2fad71c..1af9fa7df8 100644
+--- a/target/riscv/insn_trans/trans_privileged.inc.c
++++ b/target/riscv/insn_trans/trans_privileged.inc.c
+@@ -95,12 +95,6 @@ static bool trans_sfence_vma(DisasContext *ctx, arg_sfence_vma *a)
+ 
+ static bool trans_sfence_vm(DisasContext *ctx, arg_sfence_vm *a)
+ {
+-#ifndef CONFIG_USER_ONLY
+-    if (ctx->priv_ver <= PRIV_VERSION_1_09_1) {
+-        gen_helper_tlb_flush(cpu_env);
+-        return true;
+-    }
+-#endif
+     return false;
+ }
+ 
+diff --git a/tests/qtest/machine-none-test.c b/tests/qtest/machine-none-test.c
+index 8bb54a6360..b52311ec2e 100644
+--- a/tests/qtest/machine-none-test.c
++++ b/tests/qtest/machine-none-test.c
+@@ -54,8 +54,8 @@ static struct arch2cpu cpus_map[] = {
+     { "xtensa", "dc233c" },
+     { "xtensaeb", "fsf" },
+     { "hppa", "hppa" },
+-    { "riscv64", "rv64gcsu-v1.10.0" },
+-    { "riscv32", "rv32gcsu-v1.9.1" },
++    { "riscv64", "sifive-u54" },
++    { "riscv32", "sifive-u34" },
+     { "rx", "rx62n" },
+ };
+ 
 -- 
 2.26.2
 
