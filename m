@@ -2,93 +2,72 @@ Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 091FFC28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 09:59:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA61DC28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 09:59:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1C22206DB
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 09:59:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B92CF206DB
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 09:59:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qj+3jPIF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1C22206DB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K32mckEC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B92CF206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWGqJ-0003iq-UI
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 05:59:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55604)
+	id 1jWGqL-0003mg-Sk
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 05:59:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54402)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jWGp2-0002JZ-FR
- for qemu-devel@nongnu.org; Wed, 06 May 2020 05:58:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33386
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jWGhm-0005at-Sl
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 05:51:06 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26791
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jWGp1-0007mJ-Ge
- for qemu-devel@nongnu.org; Wed, 06 May 2020 05:58:36 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jWGhl-00052p-CC
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 05:51:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588759113;
+ s=mimecast20190719; t=1588758663;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=VTQ2zZbAUkCiQOtJoMzyx7tooV4XfYYcQpIyI7xQuwY=;
- b=Qj+3jPIFvgdnYnCVv/bG1s3AI0hx8ANXERT1Keeew1ck0US03uqd8tLcG2FYNEYF+/MXzU
- +HsUOjQcplgzUBmfgkCkHibtl8DdxY9l8CRu1wYC1M47/nB2SNapcb5jBjHTsErxtjD2br
- jwzqbB07IWQFDuC0elz897FAtFI/WhE=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-145-gcE6y0UPPTO8NzdNyRgKdg-1; Wed, 06 May 2020 05:58:30 -0400
-X-MC-Unique: gcE6y0UPPTO8NzdNyRgKdg-1
-Received: by mail-wm1-f70.google.com with SMTP id h22so947048wml.1
- for <qemu-devel@nongnu.org>; Wed, 06 May 2020 02:58:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=NRlhaJxOsTWvjcE0SIFi7KX4jHXlWQZ1YFHZy35Rr+8=;
- b=hw3dkibN6v0CTQyLnI6viBR6NOAVMXyTYmgL+OM7/3csP+yBCV1366Acem4C/B9R/m
- qzU6B0dhA9WJXbh1ZXrZX0N/lvM+L9O2tfMvsF+NG/UZi8OzBtm02fOsVSEpqwVKd8gY
- 8UypK6bnZMWzAdzcWc4ho7jdl4Y4tNfdh42Gc/V9tMyZDYmrQwJc9k78cuGt8PhMdrSO
- QjjNeUmp75F10wEnSINmu3Uopw2wZSoDEpjg9oAn/T+iKJgX8mMUuXgoaVk9hSnZHpNK
- du27HF1XLeP5ee4FoKlDmcNo5WWxjARi1GfFUEMGqiR7RjxloM+RndN0PW8mpV+230NF
- zX5A==
-X-Gm-Message-State: AGi0PuacbsxIQApste1Bjv/cqHxyNYG1jSoQN0oTYakAKOdjV3qoSKcQ
- Zk0TvwMJMkwGHc2Z1tP5x7YqcgzKhCTnzlMdz38UHgKMvMYw0JvnTxXkUSbcT/FrmQVld789dtM
- 1aEXJ9Rc1f/AadDc=
-X-Received: by 2002:a5d:6503:: with SMTP id x3mr9535745wru.153.1588759109100; 
- Wed, 06 May 2020 02:58:29 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIuZhE5ugb09uApb7phZKVP0GeTHFMimDAGiI9mzeA9EYskTccXK9w0MytX/YsXKv87w3TJYg==
-X-Received: by 2002:a5d:6503:: with SMTP id x3mr9535716wru.153.1588759108917; 
- Wed, 06 May 2020 02:58:28 -0700 (PDT)
-Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
- by smtp.gmail.com with ESMTPSA id 1sm2298804wmi.0.2020.05.06.02.58.27
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 06 May 2020 02:58:28 -0700 (PDT)
-Date: Wed, 6 May 2020 05:58:25 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v2 1/3] acpi: Move build_tpm2() in the generic part
-Message-ID: <20200506055747-mutt-send-email-mst@kernel.org>
-References: <20200505144419.29174-1-eric.auger@redhat.com>
- <20200505144419.29174-2-eric.auger@redhat.com>
- <20200506063314.4qvnyfonjixcknuj@kamzik.brq.redhat.com>
+ bh=gPYy5xjngtAqGsyw4OWH5Hdfo7Ahip1m9nldPmeLgtA=;
+ b=K32mckECEvZa3R7CdL5EN+oq1noP9tShMvgV0MN9tbFSddmUkY/BMvmZxixFc7XTsNQRzK
+ nyGHpH8HRFHwDhaPdWosBX8koUIg+TvNdbvVg3KqNXJdC+qSdJFyuG/pSftDUbFdQGvW6n
+ g6QwaOGsKanwrACL1P2pJ3KybFV0+vI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-49-4NIsTY3ePFGNQHX65Cxkwg-1; Wed, 06 May 2020 05:50:59 -0400
+X-MC-Unique: 4NIsTY3ePFGNQHX65Cxkwg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5CD4B1800D4A;
+ Wed,  6 May 2020 09:50:58 +0000 (UTC)
+Received: from t480s.redhat.com (ovpn-113-17.ams2.redhat.com [10.36.113.17])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 58E345C1BD;
+ Wed,  6 May 2020 09:50:56 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v1 14/17] numa: Handle virtio-mem in NUMA stats
+Date: Wed,  6 May 2020 11:49:45 +0200
+Message-Id: <20200506094948.76388-15-david@redhat.com>
+In-Reply-To: <20200506094948.76388-1-david@redhat.com>
+References: <20200506094948.76388-1-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200506063314.4qvnyfonjixcknuj@kamzik.brq.redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 23:48:07
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 02:39:40
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -109,22 +88,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, gshan@redhat.com, shannon.zhaosl@gmail.com,
- qemu-devel@nongnu.org, Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org,
- marcandre.lureau@redhat.com, imammedo@redhat.com, eric.auger.pro@gmail.com,
- lersek@redhat.com, ardb@kernel.org, stefanb@linux.ibm.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ "Michael S . Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-s390x@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, May 06, 2020 at 08:33:14AM +0200, Andrew Jones wrote:
-> I realize this function is just getting moved, but maybe it should get
-> converted to the build_append* API while being moved?
+Account the memory to the configured nid.
 
-I'd rather refactoring was done in a separate patch -
-easier to review.
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/core/numa.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 316bc50d75..06960918e7 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -812,6 +812,7 @@ static void numa_stat_memory_devices(NumaNodeMem node=
+_mem[])
+     MemoryDeviceInfoList *info;
+     PCDIMMDeviceInfo     *pcdimm_info;
+     VirtioPMEMDeviceInfo *vpi;
++    VirtioMEMDeviceInfo *vmi;
+=20
+     for (info =3D info_list; info; info =3D info->next) {
+         MemoryDeviceInfo *value =3D info->value;
+@@ -832,6 +833,11 @@ static void numa_stat_memory_devices(NumaNodeMem nod=
+e_mem[])
+                 node_mem[0].node_mem +=3D vpi->size;
+                 node_mem[0].node_plugged_mem +=3D vpi->size;
+                 break;
++            case MEMORY_DEVICE_INFO_KIND_VIRTIO_MEM:
++                vmi =3D value->u.virtio_mem.data;
++                node_mem[vmi->node].node_mem +=3D vmi->size;
++                node_mem[vmi->node].node_plugged_mem +=3D vmi->size;
++                break;
+             default:
+                 g_assert_not_reached();
+             }
 --=20
-MST
+2.25.3
 
 
