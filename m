@@ -2,92 +2,107 @@ Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MIME_QP_LONG_LINE,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52C6CC28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 10:03:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83FABC28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 10:04:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CBF220714
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 10:03:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F8242073A
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 10:04:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BPUNLVmh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CBF220714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Ngeba1Kn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F8242073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWGto-0000tF-4r
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 06:03:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55994)
+	id 1jWGux-0002nC-9z
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 06:04:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54690)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jWGr9-0005Jk-Os; Wed, 06 May 2020 06:00:47 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:37030)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jWGr8-0001uG-Bd; Wed, 06 May 2020 06:00:47 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id f5so694393ybo.4;
- Wed, 06 May 2020 03:00:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=SWc4qWT+nZ7Fk22uUCEeFT+mHLwEpabyDRXH2Eix3z4=;
- b=BPUNLVmhvNn/d1WejCP6KC5OVV1IIbdloYEViWssjyRvX78tBNBqYh9dVAS1KAiGtD
- l/2yLKkY/LrhxTjVA0W7QFCe2UIAiy5a9WSdHlK7XeU0Db90V2UY/fM+YlnHcqYxfDQN
- PgX2QMePpod8UFaI8oikOoRmIpSJ9xAalF5sRfxSSc3+nC1deXIOAiUZaUdzA5naGdQS
- qTXY47wqyBnmE/vCWWJonvzdzCt4ZKCKGSomi4/Y3rj1Onkb8z3Hx0hiLGza3lHlOU89
- wSOEk4H1YYW02/SrGOmhhNlOEIfCofRwpLmyRbG3OZ/ijuSuVNnOnnmAYayw43c77xAt
- 130Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=SWc4qWT+nZ7Fk22uUCEeFT+mHLwEpabyDRXH2Eix3z4=;
- b=mY4TkfgO24ZvuUSVdsfIrfgcSp6kEQplzs3NT1C+KsfapN1n78ib/MeVZKabIhdzSn
- FqBhZXt0on7fZMY+yAbuyztztInRnNLN5vi80dUt3lN9NldeP8j1NlSA/t5CHKlkEedP
- +8KOJw2tLgLAms17xQf7N4HN5pvzbuaoDqQ9ofcat+HkDmBCBpub3pTjnCVPRqnzYFuD
- +5sbNgsW0QoInQsc8Bw/b8mN9w4EhPvbYnTNxf2tcq3nZ8sdjaCByxLF+YFSIxgFj0wh
- VbcbcMwV3xvxbxjoGcucxtAicOXEjzjWDQA6Vgkn5H5pUMbWMra8MZ6RFeQNXaXJYNea
- y1Og==
-X-Gm-Message-State: AGi0PuZoOtvBFNWm3RRLzmhDqc8WCReL/FmfxcpaJ42xwhy2trlm0Bag
- ICOIY3yTStVm+tR8U+eIgTHzokpKYxho6pScIFQ=
-X-Google-Smtp-Source: APiQypIzhypiwD/WRX+4Q17XtV0qYn3kvps+odAWrqsV1IgkXZFbYzRBfLl/daoOm3JsaszTMmiG3i0qIZ+/SO9OdrM=
-X-Received: by 2002:a25:cace:: with SMTP id
- a197mr13030677ybg.387.1588759244417; 
- Wed, 06 May 2020 03:00:44 -0700 (PDT)
-MIME-Version: 1.0
-References: <1588348254-7241-1-git-send-email-bmeng.cn@gmail.com>
- <1588348254-7241-2-git-send-email-bmeng.cn@gmail.com>
- <CAAhSdy06i1zb6_aedLn41rWDzrjyTcJ_T954DcwX7k2bM_VcVw@mail.gmail.com>
- <CAEUhbmXMcxZqk4RUjcWMG-5MCd-Z3wPn=ktQnHLA3Rvn01iq+g@mail.gmail.com>
- <CAAhSdy1kWxW6kyQiMd+-9ZkwMr9xFcZurU7HHoRTE0ST9rnq0Q@mail.gmail.com>
- <CAEUhbmUzPNxHXgNU=nM3C3AdyqwNh4sS9pq02F9vLwipRRWwDA@mail.gmail.com>
- <CAEUhbmWD_L_dJZ3hVZrw08ycCaLr3UDTRRA9JreJfqZHpPntmQ@mail.gmail.com>
- <CAKmqyKPkwDRhweEEa9nXO1VCcyRBkcOzU7TaW_umXyf_63AVBw@mail.gmail.com>
-In-Reply-To: <CAKmqyKPkwDRhweEEa9nXO1VCcyRBkcOzU7TaW_umXyf_63AVBw@mail.gmail.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Wed, 6 May 2020 18:00:32 +0800
-Message-ID: <CAEUhbmUQvs=JsDGnxEt2wTQva6KdrxsOz3P4LB57abJH5TuDjA@mail.gmail.com>
-Subject: Re: [PATCH 1/5] roms/opensbi: Update to support building bios images
- for generic platform
-To: Alistair Francis <alistair23@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b41;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb41.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ (Exim 4.90_1) (envelope-from <eyal.moscovici@oracle.com>)
+ id 1jWGjK-0000n0-I9; Wed, 06 May 2020 05:52:42 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:49258)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <eyal.moscovici@oracle.com>)
+ id 1jWGjI-0005GE-MK; Wed, 06 May 2020 05:52:42 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0469nExg010611;
+ Wed, 6 May 2020 09:52:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=date : subject : from
+ : to : cc : message-id : references : in-reply-to : mime-version :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=xNte2sPIQONrxMh4kopWLxS/WxObBHFeLrhWpVIZ1YE=;
+ b=Ngeba1KnYnERQDQyzeDl6m7lFJY9K1a7+T3AI2vTZZDF7lFrWdro3XlsbV1ZXlHjAlxi
+ N3lrEtt+c2DCjP2VG9TC2oJqfMUuI9Q/4kXzGXREYSX2kTAgpXv4U+QzYRm45UC66L6k
+ yr2tN26SSyY/ITFA3aOOXVY2CbU38qQFgx1iLCkuPMTI/QRFeYW0HJyscaNIjKw3UDVf
+ NUMWMrUck0qYPHYo8y83ATuvT8WKJrQBcrKDLXAUUR85WINsp5WkPtV+mImQHj+B0w98
+ fvoGnpuVFghhzSSmCVrwNLwyehSXvp8hIsWvZs+M6Vo2Qc7+GpsdEniKDk3U9Tig2QNu sQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by aserp2120.oracle.com with ESMTP id 30usgq0guj-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 06 May 2020 09:52:35 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0469pjpe061162;
+ Wed, 6 May 2020 09:52:34 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by userp3030.oracle.com with ESMTP id 30t1r7ctex-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 06 May 2020 09:52:34 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0469qXNw032165;
+ Wed, 6 May 2020 09:52:33 GMT
+Received: from [10.74.121.227] (/10.74.121.227)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Wed, 06 May 2020 02:52:33 -0700
+User-Agent: Microsoft-MacOutlook/10.1e.0.191013
+Date: Wed, 06 May 2020 12:52:22 +0300
+Subject: Re: [PATCH 2/2] qemu-img: Add --start-offset and --max-length to map
+From: Eyal Moscovici <eyal.moscovici@oracle.com>
+To: Eric Blake <eblake@redhat.com>, <qemu-devel@nongnu.org>
+Message-ID: <D5701B9A-BC36-4F70-BE80-D4BC4D6B4DA5@oracle.com>
+Thread-Topic: [PATCH 2/2] qemu-img: Add --start-offset and --max-length to map
+References: <20200322091117.79443-1-eyal.moscovici@oracle.com>
+ <20200322091117.79443-3-eyal.moscovici@oracle.com>
+ <30f82564-3807-89d4-e7b1-923868f15705@redhat.com>
+In-Reply-To: <30f82564-3807-89d4-e7b1-923868f15705@redhat.com>
+Mime-version: 1.0
+Content-type: text/plain;
+	charset="UTF-8"
+Content-transfer-encoding: quoted-printable
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9612
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ adultscore=0 suspectscore=0
+ spamscore=0 mlxlogscore=999 malwarescore=0 phishscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2005060077
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9612
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0
+ mlxscore=0
+ priorityscore=1501 lowpriorityscore=0 malwarescore=0 clxscore=1011
+ mlxlogscore=999 spamscore=0 adultscore=0 bulkscore=0 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2005060076
+Received-SPF: pass client-ip=141.146.126.78;
+ envelope-from=eyal.moscovici@oracle.com; helo=aserp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 05:52:36
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MIME_QP_LONG_LINE=0.001, RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,196 +116,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Anup Patel <Anup.Patel@wdc.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Kevin Wolf <kwolf@redhat.com>, liran.alon@oracle.com,
+ Yoav Elnekave <yoav.elnekave@oracle.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alistair,
+Thanks for the review. I will send V2 based on QEMU version 5.0.
 
-On Tue, May 5, 2020 at 12:00 AM Alistair Francis <alistair23@gmail.com> wrote:
->
-> On Mon, May 4, 2020 at 1:05 AM Bin Meng <bmeng.cn@gmail.com> wrote:
-> >
-> > On Mon, May 4, 2020 at 4:00 PM Bin Meng <bmeng.cn@gmail.com> wrote:
-> > >
-> > > Hi Anup,
-> > >
-> > > On Mon, May 4, 2020 at 3:52 PM Anup Patel <anup@brainfault.org> wrote:
-> > > >
-> > > > On Mon, May 4, 2020 at 12:46 PM Bin Meng <bmeng.cn@gmail.com> wrote:
-> > > > >
-> > > > > Hi Anup,
-> > > > >
-> > > > > On Sun, May 3, 2020 at 12:38 PM Anup Patel <anup@brainfault.org> wrote:
-> > > > > >
-> > > > > > On Fri, May 1, 2020 at 9:26 PM Bin Meng <bmeng.cn@gmail.com> wrote:
-> > > > > > >
-> > > > > > > From: Bin Meng <bin.meng@windriver.com>
-> > > > > > >
-> > > > > > > The RISC-V generic platform is a flattened device tree (FDT) based
-> > > > > > > platform where all platform specific functionality is provided based
-> > > > > > > on FDT passed by previous booting stage. The support was added in
-> > > > > > > upstream opensbi recently.
-> > > > > > >
-> > > > > > > Bring the QEMU roms/opensbi submodule to the upstream opensbi commit:
-> > > > > > > commit 4f18c6e55049 ("platform: generic: Add Sifive FU540 TLB flush range limit override")
-> > > > > > > with the following changes since v0.7 release:
-> > > > > > >
-> > > > > > >   1bb00ab lib: No need to provide default PMP region using platform callbacks
-> > > > > > >   a9eac67 include: sbi_platform: Combine reboot and shutdown into one callback
-> > > > > > >   6585fab lib: utils: Add SiFive test device
-> > > > > > >   4781545 platform: Add Nuclei UX600 platform
-> > > > > > >   3a326af scripts: adapt binary archive script for Nuclei UX600
-> > > > > > >   5bdf022 firmware: fw_base: Remove CSR_MTVEC update check
-> > > > > > >   e6c1345 lib: utils/serial: Skip baudrate config if input frequency is zero
-> > > > > > >   01a8c8e lib: utils: Improve fdt_parse_uart8250() API
-> > > > > > >   0a0093b lib: utils: Add fdt_parse_uart8250_node() function
-> > > > > > >   243b0d0 lib: utils: Remove redundant clint_ipi_sync() declaration
-> > > > > > >   e3ad7c1 lib: utils: Rename fdt_parse_clint() to fdt_parse_compat_addr()
-> > > > > > >   a39cd6f lib: utils: Add FDT match table based node lookup
-> > > > > > >   dd33b9e lib: utils: Make fdt_get_node_addr_size() public function
-> > > > > > >   66185b3 lib: utils: Add fdt_parse_sifive_uart_node() function
-> > > > > > >   19e966b lib: utils: Add fdt_parse_hart_id() function
-> > > > > > >   44dd7be lib: utils: Add fdt_parse_max_hart_id() API
-> > > > > > >   f0eb503 lib: utils: Add fdt_parse_plic_node() function
-> > > > > > >   1ac794c include: Add array_size() macro
-> > > > > > >   8ff2b94 lib: utils: Add simple FDT timer framework
-> > > > > > >   76f0f81 lib: utils: Add simple FDT ipi framework
-> > > > > > >   75322a6 lib: utils: Add simple FDT irqchip framework
-> > > > > > >   76a8940 lib: utils: Add simple FDT serial framework
-> > > > > > >   7cc6fa4 lib: utils: Add simple FDT reset framework
-> > > > > > >   4d06353 firmware: fw_base: Introduce optional fw_platform_init()
-> > > > > > >   f1aa9e5 platform: Add generic FDT based platform support
-> > > > > > >   1f21b99 lib: sbi: Print platform hart count at boot time
-> > > > > > >   2ba7087 scripts: Add generic platform to create-binary-archive.sh
-> > > > > > >   4f18c6e platform: generic: Add Sifive FU540 TLB flush range limit override
-> > > > > > >
-> > > > > > > Update our Makefile to build the generic platform instead of building
-> > > > > > > virt and sifive_u separately.
->
-> Hey Bin,
->
-> Thanks for the patch!
->
-> I don't think we can take this update though, as we should stick with
-> OpenSBI releases.
+=EF=BB=BFOn 29/04/2020, 18:06, "Eric Blake" <eblake@redhat.com> wrote:
 
-Sure, will delay this series once OpenSBI v0.8 release is out.
+    On 3/22/20 4:11 AM, Eyal Moscovici wrote:
+    > The mapping operation of large disks especially ones stored over a
+    > long chain of QCOW2 files can take a long time to finish.
+    > Additionally when mapping fails there was no way recover by
+    > restarting the mapping from the failed location.
+    >=20
+    > The new options, --start-offset and --max-length allows the user to
+    > divide these type of map operations into shorter independent tasks.
+    >=20
+    > Acked-by: Mark Kanda <mark.kanda@oracle.com>
+    > Co-developed-by: Yoav Elnekave <yoav.elnekave@oracle.com>
+    > Signed-off-by: Yoav Elnekave <yoav.elnekave@oracle.com>
+    > Signed-off-by: Eyal Moscovici <eyal.moscovici@oracle.com>
+    > ---
+    >   docs/tools/qemu-img.rst |  2 +-
+    >   qemu-img-cmds.hx        |  4 ++--
+    >   qemu-img.c              | 30 +++++++++++++++++++++++++++++-
+    >   3 files changed, 32 insertions(+), 4 deletions(-)
+    >=20
+    > diff --git a/docs/tools/qemu-img.rst b/docs/tools/qemu-img.rst
+    > index 0080f83a76..924e89f679 100644
+    > --- a/docs/tools/qemu-img.rst
+    > +++ b/docs/tools/qemu-img.rst
+    > @@ -519,7 +519,7 @@ Command description:
+    >       ``ImageInfoSpecific*`` QAPI object (e.g. ``ImageInfoSpecificQCo=
+w2``
+    >       for qcow2 images).
+    >  =20
+    > -.. option:: map [--object OBJECTDEF] [--image-opts] [-f FMT] [--outp=
+ut=3DOFMT] [-U] FILENAME
+    > +.. option:: map [--object OBJECTDEF] [--image-opts] [-f FMT] [--star=
+t-offset=3Doffset] [--max-length=3Dlen] [--output=3DOFMT] [-U] FILENAME
+   =20
+    Consistency with the rest of the line says this should be=20
+    [--start-offset=3DOFFSET] [--max-length=3DLEN]
 
->
-> > > > > > >
-> > > > > > > Signed-off-by: Bin Meng <bin.meng@windriver.com>
-> > > > > > > ---
-> > > > > > >
-> > > > > > >  roms/Makefile | 30 ++++++++----------------------
-> > > > > > >  roms/opensbi  |  2 +-
-> > > > > > >  2 files changed, 9 insertions(+), 23 deletions(-)
-> > > > > > >
-> > > > > > > diff --git a/roms/Makefile b/roms/Makefile
-> > > > > > > index f9acf39..cb00628 100644
-> > > > > > > --- a/roms/Makefile
-> > > > > > > +++ b/roms/Makefile
-> > > > > > > @@ -64,10 +64,8 @@ default help:
-> > > > > > >         @echo "  u-boot.e500        -- update u-boot.e500"
-> > > > > > >         @echo "  u-boot.sam460      -- update u-boot.sam460"
-> > > > > > >         @echo "  efi                -- update UEFI (edk2) platform firmware"
-> > > > > > > -       @echo "  opensbi32-virt     -- update OpenSBI for 32-bit virt machine"
-> > > > > > > -       @echo "  opensbi64-virt     -- update OpenSBI for 64-bit virt machine"
-> > > > > > > -       @echo "  opensbi32-sifive_u -- update OpenSBI for 32-bit sifive_u machine"
-> > > > > > > -       @echo "  opensbi64-sifive_u -- update OpenSBI for 64-bit sifive_u machine"
-> > > > > > > +       @echo "  opensbi32-generic  -- update OpenSBI for 32-bit generic machine"
-> > > > > > > +       @echo "  opensbi64-generic  -- update OpenSBI for 64-bit generic machine"
-> > > > > > >         @echo "  bios-microvm       -- update bios-microvm.bin (qboot)"
-> > > > > > >         @echo "  clean              -- delete the files generated by the previous" \
-> > > > > > >                                       "build targets"
-> > > > > > > @@ -170,29 +168,17 @@ skiboot:
-> > > > > > >  efi: edk2-basetools
-> > > > > > >         $(MAKE) -f Makefile.edk2
-> > > > > > >
-> > > > > > > -opensbi32-virt:
-> > > > > > > +opensbi32-generic:
-> > > > > > >         $(MAKE) -C opensbi \
-> > > > > > >                 CROSS_COMPILE=$(riscv32_cross_prefix) \
-> > > > > > > -               PLATFORM="qemu/virt"
-> > > > > > > -       cp opensbi/build/platform/qemu/virt/firmware/fw_jump.bin ../pc-bios/opensbi-riscv32-virt-fw_jump.bin
-> > > > > > > +               PLATFORM="generic"
-> > > > > > > +       cp opensbi/build/platform/generic/firmware/fw_jump.bin ../pc-bios/opensbi-riscv32-generic-fw_jump.bin
-> > > > > >
-> > > > > > I think you should copy fw_jump.elf as well because QEMU Spike
-> > > > > > platform needs it.
-> > > > > >
-> > > > >
-> > > > > I believe we intended only to ship default bios images for virt and
-> > > > > sifive_u. Spike bios image was not shipped in previous QEMU version
-> > > > > too.
-> > > >
-> > > > Is there a specific reason for not shipping bios image for Spike machine ?
-> > > >
-> > >
-> > > That's only my guess.  Based on what I see from git history, adding
-> > > "-bios" support was added via:
-> > >
-> > > commit 5b8a986350a9 ("hw/riscv/spike: Allow loading firmware
-> > > separately using -bios option")
-> > >
-> > > with bios image as opensbi-riscv{32,64}-spike-fw_jump.elf, but the
-> > > images were not added to QEMU repo.
-> > >
-> > > > There were issues booting Linux on QEMU spike machine which are
-> > > > now fixed and available in QEMU master. I think we should certainly
-> > > > ship fw_jump.elf for Spike machine. This way we have OpenSBI generic
-> > > > firmware available as a bios image for three QEMU machines(virt, sifive_u,
-> > > > and spike).
-> > > >
-> > >
-> > > If everyone thinks shipping the ELF image is OK, I can do that in v2.
->
-> I don't really mind either way.
->
-> On one hand it is nice to have all the boards "just work" with
-> OpenSBI. On the other hand Spike isn't used very often from what I can
-> tell and it's a larger maintenance burden to update another image.
->
-> >
-> > One additional note, that's why patch 5 in this series for. Without
-> > the default bios image being shipped in QEMU, QEMU testing will
-> > complain.
-> >
-> > So in the future, when we have more QEMU RISC-V machines added, if
-> > they are not using the generic firmware, do we want to ship all of
-> > these different firmware images in QEMU?
->
-> That's a good point.
->
-> I don't really want to be maintaining 20 different OpenSBI binaries.
->
-> I suspect the plan will be that we supply OpenSBI binaries for the
-> "key" boards. Which is the Virt board and sifive_u. If other boards
-> can use the same OpenSBI binary then that's great. If not we won't
-> ship a binary. The main reason to ship the binary is to allow people
-> to try RISC-V easily. The virt and sifive_u machines do that, we don't
-> need them all to do that.
->
-> So on that note, I think we should include the generic elf which will
-> support Spike and any future boards that need the elf as well.
->
-> So to summarise my ramblings:
->  - We will swap to shipping generic ELF and BIN OpenSBI files
->  - All boards that can use those should
->  - Other boards won't have pre-built OpenSBI support
->  - For future updates we just update the 4 files (32-bit and 64-bit)
-> on each release.
+Will fix.
+   =20
+    >  =20
+    >     Dump the metadata of image *FILENAME* and its backing file chain.
+    >     In particular, this commands dumps the allocation state of every =
+sector
+    > diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+    > index c9c54de1df..35f832816f 100644
+    > --- a/qemu-img-cmds.hx
+    > +++ b/qemu-img-cmds.hx
+    > @@ -63,9 +63,9 @@ SRST
+    >   ERST
+    >  =20
+    >   DEF("map", img_map,
+    > -    "map [--object objectdef] [--image-opts] [-f fmt] [--output=3Dofmt=
+] [-U] filename")
+    > +    "map [--object objectdef] [--image-opts] [-f fmt] [--start-offse=
+t=3Doffset] [--max-length=3Dlen] [--output=3Dofmt] [-U] filename")
+   =20
+    this one is fine,
+   =20
+    >   SRST
+    > -.. option:: map [--object OBJECTDEF] [--image-opts] [-f FMT] [--outp=
+ut=3DOFMT] [-U] FILENAME
+    > +.. option:: map [--object OBJECTDEF] [--image-opts] [-f FMT] [--star=
+t-offset=3DOFFSET] [--max-length=3DLEN] [--output=3DOFMT] [-U] FILENAME
+   =20
+    this one has the same problem as the .rst.
+   =20
+    > @@ -3005,6 +3009,26 @@ static int img_map(int argc, char **argv)
+    >           case OPTION_OUTPUT:
+    >               output =3D optarg;
+    >               break;
+    > +        case 's':
+    > +            start_offset =3D cvtnum(optarg);
+    > +            if (start_offset < 0) {
+    > +                error_report("Invalid start offset specified! You ma=
+y use "
+    > +                             "k, M, G, T, P or E suffixes for ");
+    > +                error_report("kilobytes, megabytes, gigabytes, terab=
+ytes, "
+    > +                             "petabytes and exabytes.");
+   =20
+    Pre-existing elsewhere in the file, but this seems rather verbose -=20
+    shouldn't we have cvtnum() (or another wrapper function) give this extr=
+a=20
+    information about what is valid, rather than open-coding it at every=20
+    client of cvtnum()?
 
-Sounds good to me. Thanks for providing the guideline from the
-maintainer's view!
+You are probably right I will send a patch that adds the error message  abo=
+ut the units to cvtnum().
+   =20
+    > +                return 1;
+    > +            }
+    > +            break;
+    > +        case 'l':
+    > +            max_length =3D cvtnum(optarg);
+    > +            if (max_length < 0) {
+    > +                error_report("Invalid max length specified! You may =
+use "
+    > +                             "k, M, G, T, P or E suffixes for ");
+    > +                error_report("kilobytes, megabytes, gigabytes, terab=
+ytes, "
+    > +                             "petabytes and exabytes.");
+    > +                return 1;
+    > +            }
+    > +            break;
+    >           case OPTION_OBJECT: {
+    >               QemuOpts *opts;
+    >               opts =3D qemu_opts_parse_noisily(&qemu_object_opts,
+    > @@ -3050,7 +3074,11 @@ static int img_map(int argc, char **argv)
+    >           printf("[");
+    >       }
+    >  =20
+    > +    curr.start =3D start_offset;
+    >       length =3D blk_getlength(blk);
+    > +    if (max_length !=3D -1) {
+    > +        length =3D MIN(start_offset + max_length, length);
+    > +    }
+   =20
+    Pre-existing, but where does this code check for length =3D=3D -1?  But you=
+r=20
+    MIN() doesn't make it any worse (if we fail to get length, we merely=20
+    skip the loop).
 
-Regards,
-Bin
+I don't think there is a check. I will add a check in a different patch.
+   =20
+    >       while (curr.start + curr.length < length) {
+    >           int64_t offset =3D curr.start + curr.length;
+    >           int64_t n;
+    >=20
+   =20
+    Overall, the idea makes sense to me.  But I'm not sure which maintainer=
+=20
+    should actually incorporate the patch.
+   =20
+    Reviewed-by: Eric Blake <eblake@redhat.com>
+   =20
+    --=20
+    Eric Blake, Principal Software Engineer
+    Red Hat, Inc.           +1-919-301-3226
+    Virtualization:  qemu.org | libvirt.org
+   =20
+   =20
+
+
 
