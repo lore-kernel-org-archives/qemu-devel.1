@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A91E4C4724C
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 08:21:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DD3DC47258
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 08:21:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 824C3206E6
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 08:21:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 824C3206E6
+	by mail.kernel.org (Postfix) with ESMTPS id 622D220735
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 08:21:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 622D220735
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=andreas-weller.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWFJL-0008K8-Mw
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 04:21:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37562)
+	id 1jWFJQ-0008Pq-I2
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 04:21:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37584)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jWFIL-00076H-7e
- for qemu-devel@nongnu.org; Wed, 06 May 2020 04:20:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41674)
+ id 1jWFIR-000771-5f
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 04:20:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41816)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jWFIJ-0003Hb-U8
- for qemu-devel@nongnu.org; Wed, 06 May 2020 04:20:44 -0400
+ id 1jWFIQ-0003Rh-3o
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 04:20:50 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jWFII-0005Yd-54
- for <qemu-devel@nongnu.org>; Wed, 06 May 2020 08:20:42 +0000
+ id 1jWFIN-0005gs-7V
+ for <qemu-devel@nongnu.org>; Wed, 06 May 2020 08:20:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 236EE2E80E7
- for <qemu-devel@nongnu.org>; Wed,  6 May 2020 08:20:42 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 371562E8104
+ for <qemu-devel@nongnu.org>; Wed,  6 May 2020 08:20:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 06 May 2020 08:01:53 -0000
+Date: Wed, 06 May 2020 08:09:13 -0000
 From: Andreas Weller <weller@andreas-weller.de>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -55,7 +55,7 @@ X-Launchpad-Bug-Commenters: weller-andreas-weller
 X-Launchpad-Bug-Reporter: Andreas Weller (weller-andreas-weller)
 X-Launchpad-Bug-Modifier: Andreas Weller (weller-andreas-weller)
 References: <158875190128.5304.17617014708809905297.malonedeb@soybean.canonical.com>
-Message-Id: <158875211320.5426.5189590794265072598.malone@chaenomeles.canonical.com>
+Message-Id: <158875255399.6281.16356173978063938412.malone@soybean.canonical.com>
 Subject: [Bug 1877052] Re: KVM Win 10 guest pauses after kernel upgrade
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -63,7 +63,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a0b913c9998b7e7e46f64d686c3276b8fabcbdfb
+X-Launchpad-Hash: 9f99e6645580f646cc2d72a5c637f4e25caa9a79
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 04:05:47
@@ -91,9 +91,13 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Attachment added: "Libvirt Logfile"
-   https://bugs.launchpad.net/qemu/+bug/1877052/+attachment/5367244/+files/=
-win10.log
+** Attachment added: "VM's XML configuration file"
+   https://bugs.launchpad.net/qemu/+bug/1877052/+attachment/5367249/+files/=
+win10.xml
+
+** Also affects: qemu (Ubuntu)
+   Importance: Undecided
+       Status: New
 
 -- =
 
