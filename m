@@ -2,91 +2,87 @@ Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C322C28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 22:05:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 891A5C28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 22:09:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D8052076D
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 22:05:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D3122076D
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 22:09:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SyjKyqU6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D8052076D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fTeANqBY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D3122076D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWSAr-0002fe-BN
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 18:05:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57142)
+	id 1jWSEL-0004Vm-Dj
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 18:09:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58690)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jWS9o-00020G-C2
- for qemu-devel@nongnu.org; Wed, 06 May 2020 18:04:48 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46175
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jWS9m-00012O-FY
- for qemu-devel@nongnu.org; Wed, 06 May 2020 18:04:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588802685;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=LcU5heNxCuMY3deTCEGxZl7R1GD2wZ8WfWD2Ae7SOYE=;
- b=SyjKyqU6Ke8eF1aQvQGp5E/SMt4AEMb07BwYVYRnKYDnLvobfl1AUZsHJpzDNXYKldvGWt
- Nkx99vFhKC35W/+9bUhlCxR+faNk3qtU4hi3M0btc2q6tuhFlBdH4U352piE3yOMJIjm+i
- 6qJTF0Aee+gMHFmDFuze7rsu61cbJls=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-353-pijZE6EhPteZgt28QZTxow-1; Wed, 06 May 2020 18:04:43 -0400
-X-MC-Unique: pijZE6EhPteZgt28QZTxow-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28D2E107ACCA;
- Wed,  6 May 2020 22:04:42 +0000 (UTC)
-Received: from [10.3.114.73] (ovpn-114-73.phx2.redhat.com [10.3.114.73])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6760C100238A;
- Wed,  6 May 2020 22:04:41 +0000 (UTC)
-Subject: Re: [PATCH v2 5/5] qemu-img: Add --start-offset and --max-length to
- map
-To: Eyal Moscovici <eyal.moscovici@oracle.com>
-References: <59b0896d-85ad-08b5-fcc1-36adad7501a4@redhat.com>
- <20200506213459.44743-1-eyal.moscovici@oracle.com>
- <20200506213459.44743-6-eyal.moscovici@oracle.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <0a3bc115-ea14-4723-2993-6a6c9de12208@redhat.com>
-Date: Wed, 6 May 2020 17:04:40 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
+ id 1jWSDg-0003rd-Vc; Wed, 06 May 2020 18:08:49 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:42575)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
+ id 1jWSDf-0002c8-M8; Wed, 06 May 2020 18:08:48 -0400
+Received: by mail-il1-x143.google.com with SMTP id t12so1716735ile.9;
+ Wed, 06 May 2020 15:08:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=qesP6xxhEPogSCylPLjFVLV0s1EX26GFExOIn5WY4TE=;
+ b=fTeANqBY/5G+Hh1Xge/9a2dnFddKYFPsxj0j4GN4kTe4xDjuyTbMo8vis9/bF6vVHG
+ n0xUyMGvuXjY1hwO1sw+YJQBjKL4ohBu56aVzsHiExhMoGq+AlyqlaSD1zD69Q1qKu+Y
+ IPg9aIvx7J0MYq9vGyEIBkMFm4j6v3yBf87jTg406Z+wCiswrzEJxzYQU4IFdx4AFmCN
+ zowcZSA8nVayHNrx7cP602bsZsC1hEEToFTFfVkGbb70oyuJLwVchUjU7rOBvWD2m28F
+ vDVEnwzVPv5T3SC0W7qcsY8WYfCqsoq5OtoJJNz1eIyj15RMX7/emvhiqJzhu4YLIfFc
+ FuvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=qesP6xxhEPogSCylPLjFVLV0s1EX26GFExOIn5WY4TE=;
+ b=nsnlvfajHlNgmyP1E7VqMz3q58lan/il2i+BpkDqe/MS8UOtXhp1W7W8c2A0U2fB7j
+ aiw46KKrPScRGTJ/Nn+Z0jKD3HFwTOHpG02otNityYA+ALiL9FdlEBIWGzO7veXMmU5e
+ P2BrvsWJKOTy0CWwoffSTO0DLkvBFGoYzVcXFHQw6gdpBZfjGPQoDXndtkAcU9HZvDDF
+ Nh0sXHN1KDOQc0XHMCHr0uoQKpQDL0IcINxnHjcsTwk3tdgQaEERURsLSwLzA8ZuhZy4
+ LwN1F/6sSun0HFWPenP0hHvbMKvzaAwozdLcj8gDR6VDmgau3HO+iqFwFI5Vzz3xK3SE
+ Z0kA==
+X-Gm-Message-State: AGi0PuY1E6hK7ByHzsCjzUtIXlt0Avne1MtAC3Z1N9Q6bnyu10pNkjDp
+ IvjiKvcgZS5+EI0WMOQ0gsIMFy6fmMstros0Bd8=
+X-Google-Smtp-Source: APiQypJE1siFEV5wM054ktIOBpfjURNsDj0oZxAQx/v1mrMd1X8XlV8UmYZRJN7BUJLc/UBEo1fTh4lOsGfX1nomnHE=
+X-Received: by 2002:a92:d7c6:: with SMTP id g6mr11159279ilq.51.1588802925623; 
+ Wed, 06 May 2020 15:08:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200506213459.44743-6-eyal.moscovici@oracle.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 02:39:40
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <cover.1588252861.git.dimastep@yandex-team.ru>
+ <d25241eb1fe7a55fc7dbe63ecedb4f1adf407837.1588252862.git.dimastep@yandex-team.ru>
+In-Reply-To: <d25241eb1fe7a55fc7dbe63ecedb4f1adf407837.1588252862.git.dimastep@yandex-team.ru>
+From: Raphael Norwitz <raphael.s.norwitz@gmail.com>
+Date: Wed, 6 May 2020 18:08:34 -0400
+Message-ID: <CAFubqFsvn+wNm-rAU1sLBic6J70-ZP_UT4xMDcvGeZ9TarYdjw@mail.gmail.com>
+Subject: Re: [PATCH v2 5/5] vhost: add device started check in migration set
+ log
+To: Dima Stepanov <dimastep@yandex-team.ru>, mst@redhat.com, fengli@smartx.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=raphael.s.norwitz@gmail.com; helo=mail-il1-x143.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,46 +95,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, liran.alon@oracle.com,
- Yoav Elnekave <yoav.elnekave@oracle.com>
+Cc: fam@euphon.net, kwolf@redhat.com, stefanha@redhat.com,
+ qemu-block@nongnu.org, jasowang@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, raphael.norwitz@nutanix.com, arei.gonglei@huawei.com,
+ yc-core@yandex-team.ru, pbonzini@redhat.com, marcandre.lureau@redhat.com,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/6/20 4:34 PM, Eyal Moscovici wrote:
-> The mapping operation of large disks especially ones stored over a
-> long chain of QCOW2 files can take a long time to finish.
-> Additionally when mapping fails there was no way recover by
-> restarting the mapping from the failed location.
-> 
-> The new options, --start-offset and --max-length allows the user to
-> divide these type of map operations into shorter independent tasks.
-> 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+As you correctly point out, this code needs to be looked at more
+carefully so that
+if the device does disconnect in the background we can handle the migration=
+ path
+gracefully. In particular, we need to decide whether a migration
+should be allowed
+to continue if a device disconnects durning the migration stage.
 
-This patch has some changes from v1.  Among others,...
+mst, any thoughts?
 
-> @@ -3041,6 +3045,18 @@ static int img_map(int argc, char **argv)
->           case OPTION_OUTPUT:
->               output = optarg;
->               break;
-> +        case 's':
-> +            start_offset = cvtnum("start offset", optarg);
-> +            if (start_offset < 0) {
-> +                return 1;
-> +            }
-> +            break;
+Have you looked at the suggestion I gave Li Feng to move vhost_dev_cleanup(=
+)
+into the connection path in vhost-user-blk? I=E2=80=99m not sure if he=E2=
+=80=99s
+actively working on it,
+but I would prefer if we can find a way to keep some state around
+between reconnects
+so we aren=E2=80=99t constantly checking dev->started. A device can be stop=
+ped
+for reasons
+other than backend disconnect so I=E2=80=99d rather not reuse this field to
+check for backend
+disconnect failures.
 
-the new semantics of cvtnum() in this series is enough of a difference 
-that I would have removed R-b to make sure the updated patch gets 
-re-reviewed, if it had been me as author.  But in this case, it does 
-look like the changes are all addressed to comments I suggested in v1, 
-so I'm fine that you left my R-b.
+On Thu, Apr 30, 2020 at 9:57 AM Dima Stepanov <dimastep@yandex-team.ru> wro=
+te:
+>
+> If vhost-user daemon is used as a backend for the vhost device, then we
+> should consider a possibility of disconnect at any moment. If such
+> disconnect happened in the vhost_migration_log() routine the vhost
+> device structure will be clean up.
+> At the start of the vhost_migration_log() function there is a check:
+>   if (!dev->started) {
+>       dev->log_enabled =3D enable;
+>       return 0;
+>   }
+> To be consistent with this check add the same check after calling the
+> vhost_dev_set_log() routine. This in general help not to break a
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Could you point to the specific asserts which are being triggered?
 
+> migration due the assert() message. But it looks like that this code
+> should be revised to handle these errors more carefully.
+>
+> In case of vhost-user device backend the fail paths should consider the
+> state of the device. In this case we should skip some function calls
+> during rollback on the error paths, so not to get the NULL dereference
+> errors.
+>
+> Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+> ---
+>  hw/virtio/vhost.c | 39 +++++++++++++++++++++++++++++++++++----
+>  1 file changed, 35 insertions(+), 4 deletions(-)
+>
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index 3ee50c4..d5ab96d 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -787,6 +787,17 @@ static int vhost_dev_set_features(struct vhost_dev *=
+dev,
+>  static int vhost_dev_set_log(struct vhost_dev *dev, bool enable_log)
+>  {
+>      int r, i, idx;
+
+A couple points here
+
+
+(1) This will fail the live migration if the device is disconnected.
+That my be the right thing
+      to do, but if there are cases where migrations can proceed with
+a disconnected device,
+      this may not be desirable.
+
+(2) This looks racy. As far as I can tell vhost_dev_set_log() is only
+called by vhost_migration_log(),
+      and as you say one of the first things vhost_migration_log does
+is return if dev->started is not
+      set. What=E2=80=99s to stop a disconnect from clearing the vdev right
+after this check, just before
+      vhost_dev_set_features() is called?
+
+As stated above, I would prefer it if we could add some state which
+would persist between
+reconnects which could then be checked in the vhost-user code before
+interacting with
+the backend. I understand this will be a much more involved change and
+will require a lot
+of thought.
+
+Also, regarding (1) above, if the original check in
+vhost_migration_log() returns success if the
+device is not started why return an error here? I imagine this could
+lead to some inconsistent
+behavior if the device disconnects before the first check verses
+before the second.
+
+> +
+> +    if (!dev->started) {
+> +        /*
+> +         * If vhost-user daemon is used as a backend for the
+> +         * device and the connection is broken, then the vhost_dev
+> +         * structure will be reset all its values to 0.
+> +         * Add additional check for the device state.
+> +         */
+> +        return -1;
+> +    }
+> +
+>      r =3D vhost_dev_set_features(dev, enable_log);
+>      if (r < 0) {
+>          goto err_features;
+> @@ -801,12 +812,19 @@ static int vhost_dev_set_log(struct vhost_dev *dev,=
+ bool enable_log)
+>      }
 
