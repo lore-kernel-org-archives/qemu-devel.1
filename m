@@ -2,107 +2,89 @@ Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MIME_QP_LONG_LINE,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C74DCC28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 10:05:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B23C1C28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 10:07:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E86F20714
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 10:05:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E52720714
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 10:07:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="cw8ov/Ce"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E86F20714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GwkLqF3A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E52720714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWGw5-0004Pi-PA
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 06:05:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55050)
+	id 1jWGxD-0005MQ-MH
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 06:07:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55670)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eyal.moscovici@oracle.com>)
- id 1jWGlk-0005q4-U3; Wed, 06 May 2020 05:55:12 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:55776)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eyal.moscovici@oracle.com>)
- id 1jWGli-0005rm-6a; Wed, 06 May 2020 05:55:12 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0469rpYW006882;
- Wed, 6 May 2020 09:55:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=date : subject : from
- : to : cc : message-id : references : in-reply-to : mime-version :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=HHCISilUIWEMJOR3hboHEcpNQ6UrfIAkcvRJIaaOa8w=;
- b=cw8ov/CeSaZSBdZOD6iue85ACE2W3CfOyLlhggWBCKftbVApXtL5a+DhHIJ4Wvr2kxJT
- 9YlnTNs1s6uZFN5dTovf4a7PukREer54m+YaeqetXQdlVW2YZg9wbQeU42xosenL4JJy
- DCWwd4u6MjHqSYznNg6OwDE18iD6XhbXysiTJ3JdGQmqZxODnDtw1m9vRigxbGNwfc+9
- pOgq0Jy9SEMPfWQfP95IKcwkGKiHXdvSiij5+kDcBrhgOs8oomECZcKRI2kCxeqG3Q1M
- UQluoPeyzle2das5KJlkmpnrSwrSj9NZVhBLjQkLXLTXcvHBUU/hYbAVWumWmdA1HgRT bQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by userp2120.oracle.com with ESMTP id 30s1gn98pv-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 06 May 2020 09:55:08 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0469qawH072281;
- Wed, 6 May 2020 09:55:07 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by userp3020.oracle.com with ESMTP id 30us7m7ceg-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 06 May 2020 09:55:07 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0469t6RY000694;
- Wed, 6 May 2020 09:55:06 GMT
-Received: from [10.74.121.227] (/10.74.121.227)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 06 May 2020 02:55:06 -0700
-User-Agent: Microsoft-MacOutlook/10.1e.0.191013
-Date: Wed, 06 May 2020 12:55:04 +0300
-Subject: Re: [PATCH 1/2] qemu-img: refactor dump_map_entry JSON format output
-From: Eyal Moscovici <eyal.moscovici@oracle.com>
-To: Eric Blake <eblake@redhat.com>, <qemu-devel@nongnu.org>
-Message-ID: <794C0193-218B-4914-95A8-FA2CEF8E4908@oracle.com>
-Thread-Topic: [PATCH 1/2] qemu-img: refactor dump_map_entry JSON format output
-References: <20200322091117.79443-1-eyal.moscovici@oracle.com>
- <20200322091117.79443-2-eyal.moscovici@oracle.com>
- <487b9270-4e39-9a0d-ca7e-c261ee2f02c2@redhat.com>
-In-Reply-To: <487b9270-4e39-9a0d-ca7e-c261ee2f02c2@redhat.com>
-Mime-version: 1.0
-Content-type: text/plain;
-	charset="UTF-8"
-Content-transfer-encoding: quoted-printable
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9612
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- adultscore=0 suspectscore=0
- mlxlogscore=999 malwarescore=0 phishscore=0 mlxscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2005060077
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9612
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- suspectscore=0 mlxscore=0
- spamscore=0 clxscore=1015 priorityscore=1501 bulkscore=0 phishscore=0
- impostorscore=0 malwarescore=0 lowpriorityscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2005060077
-Received-SPF: pass client-ip=156.151.31.85;
- envelope-from=eyal.moscovici@oracle.com; helo=userp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 05:55:08
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jWGpe-0003M1-I0
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 05:59:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32625
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jWGpd-0007s7-Ik
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 05:59:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588759152;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4zvEnd1h/BCOSS6RyUBo4IOIsyq26sFYQfuwkmJ6Ldo=;
+ b=GwkLqF3AmWnNyYdh1pl6sD64bRaYyKk674dUk+U+V/8311LmZa1I6mKnqV4JpPIkxAfjaI
+ v4bxMb+k/CyLQz/rl2kXzIQEeMf3S/h0B06V7WyiokEsjoaR5ef20rpGM7RNfwIV6Y/A46
+ GM/8SvqkEz4PGjbaX6mdMMYRiIVWYqI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-280-pB3vgmhlNSmjEN2GyA768g-1; Wed, 06 May 2020 05:59:09 -0400
+X-MC-Unique: pB3vgmhlNSmjEN2GyA768g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4F871899520;
+ Wed,  6 May 2020 09:59:06 +0000 (UTC)
+Received: from gondolin (ovpn-112-211.ams2.redhat.com [10.36.112.211])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 781E92E16F;
+ Wed,  6 May 2020 09:58:59 +0000 (UTC)
+Date: Wed, 6 May 2020 11:58:56 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: [PATCH v16 QEMU 08/16] vfio: Register SaveVMHandlers for VFIO
+ device
+Message-ID: <20200506115856.012c88d8.cohuck@redhat.com>
+In-Reply-To: <20200506063846.GB19334@joy-OptiPlex-7040>
+References: <1585084154-29461-1-git-send-email-kwankhede@nvidia.com>
+ <1585084154-29461-9-git-send-email-kwankhede@nvidia.com>
+ <20200325150248.6661e1bd@w520.home>
+ <a3a082a4-cc2f-b84b-60c6-a20f86528a6d@nvidia.com>
+ <20200504223726.5d4bb9ce@x1.home>
+ <20200506063846.GB19334@joy-OptiPlex-7040>
+Organization: Red Hat GmbH
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 04:02:22
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MIME_QP_LONG_LINE=0.001, RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -116,54 +98,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, liran.alon@oracle.com, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "cjia@nvidia.com" <cjia@nvidia.com>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+ "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ Kirti Wankhede <kwankhede@nvidia.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>,
+ "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ "eauger@redhat.com" <eauger@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu, 
+ Changpeng" <changpeng.liu@intel.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 6 May 2020 02:38:46 -0400
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
+> On Tue, May 05, 2020 at 12:37:26PM +0800, Alex Williamson wrote:
+> > It's been a long time, but that doesn't seem like what I was asking.
+> > The sysfs version checking is used to select a target that is likely to
+> > succeed, but the migration stream is still generated by a user and the
+> > vendor driver is still ultimately responsible for validating that
+> > stream.  I would hope that a vendor migration stream therefore starts
+> > with information similar to that found in the sysfs interface, allowing
+> > the receiving vendor driver to validate the source device and vendor
+> > software version, such that we can fail an incoming migration that the
+> > vendor driver deems incompatible.  Ideally the vendor driver might also
+> > include consistency and sequence checking throughout the stream to
+> > prevent a malicious user from exploiting the internal operation of the
+> > vendor driver.  Thanks,
 
-=EF=BB=BFOn 29/04/2020, 17:58, "Eric Blake" <eblake@redhat.com> wrote:
+Some kind of somewhat standardized marker for driver/version seems like
+a good idea. Further checking is also a good idea, but I think the
+details of that need to be left to the individual drivers.
 
-    On 3/22/20 4:11 AM, Eyal Moscovici wrote:
-    > Previously dump_map_entry identified whether we need to start a new J=
-SON
-    > array based on whether start address =3D=3D 0. In this refactor we remove
-    > this assumption as in following patches we will allow map to start fr=
-om
-    > an arbitrary position.
-    >=20
-    > Acked-by: Mark Kanda <mark.kanda@oracle.com>
-    > Signed-off-by: Eyal Moscovici <eyal.moscovici@oracle.com>
-    > ---
-    >   qemu-img.c | 12 ++++++++----
-    >   1 file changed, 8 insertions(+), 4 deletions(-)
-    >=20
-   =20
-    > @@ -2871,8 +2870,8 @@ static int dump_map_entry(OutputFormat output_f=
-ormat, MapEntry *e,
-    >           }
-    >           putchar('}');
-    >  =20
-    > -        if (!next) {
-    > -            printf("]\n");
-    > +        if (next) {
-    > +            printf(",\n");
-   =20
-    As long as you're touching this, puts(",") is slightly more efficient=20
-    than printf().  But what you have is not wrong.
+> >   
+> maybe we can add a rw field migration_version in
+> struct vfio_device_migration_info besides sysfs interface ?
+> 
+> when reading it in src, it gets the same string as that from sysfs;
+> when writing it in target, it returns success or not to check
+> compatibility and fails the migration early in setup phase.
 
-Thanks, will fix.
-   =20
-    Reviewed-by: Eric Blake <eblake@redhat.com>
-   =20
-    --=20
-    Eric Blake, Principal Software Engineer
-    Red Hat, Inc.           +1-919-301-3226
-    Virtualization:  qemu.org | libvirt.org
-   =20
-   =20
+Getting both populated from the same source seems like a good idea.
 
+Not sure if a string is the best value to put into a migration stream;
+maybe the sysfs interface can derive a human-readable string from a
+more compact value to be put into the migration region (and ultimately
+the stream)? Might be overengineering, just thinking out aloud here.
 
 
