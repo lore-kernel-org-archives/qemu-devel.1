@@ -6,63 +6,63 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0747C28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 15:58:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB4F8C28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 15:59:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95045214D8
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 15:58:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A34972068E
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 15:59:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BMiGTQpY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95045214D8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OBFuWxMK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A34972068E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWMQs-0000aE-Mr
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 11:58:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49650)
+	id 1jWMSU-0001lt-Qh
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 11:59:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50068)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jWMPy-0007vH-J6
- for qemu-devel@nongnu.org; Wed, 06 May 2020 11:57:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49722
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jWMRq-0001Kn-DD
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 11:59:03 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60579
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jWMPw-0004DH-F4
- for qemu-devel@nongnu.org; Wed, 06 May 2020 11:57:06 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jWMRp-0000yw-LI
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 11:59:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588780623;
+ s=mimecast20190719; t=1588780739;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+TMGCDYFMQDQHhAHC4nM0k55f8ZpjUDsqA39MHbiTUM=;
- b=BMiGTQpYW7fkxUQsyFuTJnt2KfoHlr8HVp0hUYkvx7Z/viV8KbGZR5UUGtHxW5/x58vtUm
- qgiMt0KtbyLRgqYvLel9KeBysvbfvUUPOZJTDjYdW+7Zm/9mhaZNvrzHx2NGQp+Dm3/3RT
- mCtLi87FGTS3UlUkFYi14tT0W0Tx3gw=
+ bh=merf9dA+BjiqyLT8q0lZ2ckbH3ecdknfBqHs5LLcLME=;
+ b=OBFuWxMKVNpOBJlxw6eHL+kdDsz3QkyTAq2RTDyjYwGuO0FcU+sHoeR6J5lhCE1if5FQ/4
+ kwRsOI6dalaTZdeUISi2bBsRUVbr/TrxUxtky0m0mUpTEFlUmWu1i91Zchmm0+qqXh6Ddl
+ R/KRHV/62iDSSoCwZ2NeYNNVAMwGEWA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-486-ZO3F7TG1NX6oVYT84oO3QA-1; Wed, 06 May 2020 11:57:01 -0400
-X-MC-Unique: ZO3F7TG1NX6oVYT84oO3QA-1
+ us-mta-174-1QhliYrBP9uQMfy-E8fdgg-1; Wed, 06 May 2020 11:58:58 -0400
+X-MC-Unique: 1QhliYrBP9uQMfy-E8fdgg-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82A7F460;
- Wed,  6 May 2020 15:57:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1C753835B5A;
+ Wed,  6 May 2020 15:58:57 +0000 (UTC)
 Received: from gondolin (ovpn-112-211.ams2.redhat.com [10.36.112.211])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CE1C860619;
- Wed,  6 May 2020 15:56:58 +0000 (UTC)
-Date: Wed, 6 May 2020 17:56:56 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B2A7E60619;
+ Wed,  6 May 2020 15:58:55 +0000 (UTC)
+Date: Wed, 6 May 2020 17:58:53 +0200
 From: Cornelia Huck <cohuck@redhat.com>
 To: Eric Farman <farman@linux.ibm.com>
-Subject: Re: [PATCH v4 3/6] vfio-ccw: Add support for the schib region
-Message-ID: <20200506175656.53f60dc1.cohuck@redhat.com>
-In-Reply-To: <20200505125757.98209-4-farman@linux.ibm.com>
+Subject: Re: [PATCH v4 5/6] s390x/css: Refactor the css_queue_crw() routine
+Message-ID: <20200506175853.04dc508a.cohuck@redhat.com>
+In-Reply-To: <20200505125757.98209-6-farman@linux.ibm.com>
 References: <20200505125757.98209-1-farman@linux.ibm.com>
- <20200505125757.98209-4-farman@linux.ibm.com>
+ <20200505125757.98209-6-farman@linux.ibm.com>
 Organization: Red Hat GmbH
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
@@ -70,9 +70,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=cohuck@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 04:02:22
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 05:50:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -100,98 +100,24 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue,  5 May 2020 14:57:54 +0200
+On Tue,  5 May 2020 14:57:56 +0200
 Eric Farman <farman@linux.ibm.com> wrote:
 
-> From: Farhan Ali <alifm@linux.ibm.com>
+> We have a use case (vfio-ccw) where a CRW is already built and
+> ready to use.  Rather than teasing out the components just to
+> reassemble it later, let's rework this code so we can queue a
+> fully-qualified CRW directly.
 > 
-> The schib region can be used to obtain the latest SCHIB from the host
-> passthrough subchannel. Since the guest SCHIB is virtualized,
-> we currently only update the path related information so that the
-> guest is aware of any path related changes when it issues the
-> 'stsch' instruction.
-> 
-> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
 > Signed-off-by: Eric Farman <farman@linux.ibm.com>
 > ---
 > 
 > Notes:
->     v1->v2:
->      - Remove silly variable intialization, and add a block comment,
->        to css_do_stsch() [CH]
->      - Add a TODO statement to s390_ccw_store(), for myself to sort
->        out while we go over kernel code more closely [CH/EF]
->      - In vfio_ccw_handle_store(),
->         - Set schib pointer once region is determined to be non-NULL [CH]
->         - Return cc=0 if pread() fails, and log an error [CH]
->     
->     v0->v1: [EF]
->      - Change various incarnations of "update chp status" to
->        "handle_store", to reflect the STSCH instruction that will
->        drive this code
->      - Remove temporary variable for casting/testing purposes in
->        s390_ccw_store(), and add a block comment of WHY its there.
->      - Add a few comments to vfio_ccw_handle_store()
+>     v3->v4:
+>      - s/css_queue_crw_cont/css_crw_add_to_queue/ [CH]
 > 
->  hw/s390x/css.c              | 13 ++++++--
->  hw/s390x/s390-ccw.c         | 21 +++++++++++++
->  hw/vfio/ccw.c               | 63 +++++++++++++++++++++++++++++++++++++
->  include/hw/s390x/css.h      |  3 +-
->  include/hw/s390x/s390-ccw.h |  1 +
->  target/s390x/ioinst.c       |  3 +-
->  6 files changed, 99 insertions(+), 5 deletions(-)
-> 
-(...)
->  
-> +static IOInstEnding vfio_ccw_handle_store(SubchDev *sch)
-> +{
-> +    S390CCWDevice *cdev = sch->driver_data;
-> +    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
-> +    SCHIB *schib = &sch->curr_status;
-> +    struct ccw_schib_region *region = vcdev->schib_region;
-> +    SCHIB *s;
-> +    int ret;
-> +
-> +    /* schib region not available so nothing else to do */
-> +    if (!region) {
-> +        return IOINST_CC_EXPECTED;
-> +    }
-> +
-> +    memset(region, 0, sizeof(*region));
-> +    ret = pread(vcdev->vdev.fd, region, vcdev->schib_region_size,
-> +                vcdev->schib_region_offset);
-> +
-> +    if (ret == -1) {
-> +        /*
-> +         * Device is probably damaged, but store subchannel does not
-> +         * have a nonzero cc defined for this scenario.  Log an error,
-> +         * and presume things are otherwise fine.
-
-One thing we might do is set the device number valid bit to 0 in our
-local copy and inject a (subchannel) crw. Maybe as a patch on top later.
-
-> +         */
-> +        error_report("vfio-ccw: store region read failed with errno=%d", errno);
-> +        return IOINST_CC_EXPECTED;
-> +    }
-> +
-> +    /*
-> +     * Selectively copy path-related bits of the SCHIB,
-> +     * rather than copying the entire struct.
-> +     */
-> +    s = (SCHIB *)region->schib_area;
-> +    schib->pmcw.pnom = s->pmcw.pnom;
-> +    schib->pmcw.lpum = s->pmcw.lpum;
-> +    schib->pmcw.pam = s->pmcw.pam;
-> +    schib->pmcw.pom = s->pmcw.pom;
-> +
-> +    if (s->scsw.flags & SCSW_FLAGS_MASK_PNO) {
-> +        schib->scsw.flags |= SCSW_FLAGS_MASK_PNO;
-> +    }
-> +
-> +    return IOINST_CC_EXPECTED;
-> +}
-> +
+>  hw/s390x/css.c         | 44 ++++++++++++++++++++++++++++--------------
+>  include/hw/s390x/css.h |  1 +
+>  2 files changed, 30 insertions(+), 15 deletions(-)
 
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
