@@ -2,67 +2,85 @@ Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1B82C28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 13:47:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCC57C28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 13:48:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91C2920752
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 13:47:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91C2920752
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id A849D20736
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 13:48:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ap+WYMFK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A849D20736
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWKOc-0007lP-N0
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 09:47:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49064)
+	id 1jWKPb-0000Md-Qe
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 09:48:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49224)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jWKNY-0007Ce-6w
- for qemu-devel@nongnu.org; Wed, 06 May 2020 09:46:28 -0400
-Received: from 7.mo6.mail-out.ovh.net ([46.105.59.196]:59785)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jWKNW-0000Wp-M2
- for qemu-devel@nongnu.org; Wed, 06 May 2020 09:46:27 -0400
-Received: from player772.ha.ovh.net (unknown [10.108.57.95])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id E4BC120E83E
- for <qemu-devel@nongnu.org>; Wed,  6 May 2020 15:46:14 +0200 (CEST)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player772.ha.ovh.net (Postfix) with ESMTPSA id C5DAE12254ADE;
- Wed,  6 May 2020 13:46:09 +0000 (UTC)
-Subject: Re: [PATCH] aspeed: sdmc: Implement AST2600 locking behaviour
-To: Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>
-References: <20200505090136.341426-1-joel@jms.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <46a86f01-0e46-f96f-c1d7-d4ffc9f2974d@kaod.org>
-Date: Wed, 6 May 2020 15:46:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jWKOO-0007o7-Pc
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 09:47:21 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44453
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jWKON-0002aV-2k
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 09:47:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588772837;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=JZncH62c+miB40yVrqLL8UvcWuBkfa1NF4RkAmeZymE=;
+ b=Ap+WYMFKYnUCqr8VEdTD9Zo/Hoq987wLqLImDpAZt/wT0nxx4LiYk4WlR1+g/S3EE+Tli0
+ HncY/yK5tfVrQWXTGhoSGduPGnHI2cI2JyLmHLz3lFrZRuSCakZHBf/oUSq57Kpmu220yA
+ vdMzey15BB2W57Gvp5ju3f4PYVz7fc8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-410-LN6BCuYdOpS3SKkbX5av4g-1; Wed, 06 May 2020 09:47:15 -0400
+X-MC-Unique: LN6BCuYdOpS3SKkbX5av4g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CFBA8107ACCA;
+ Wed,  6 May 2020 13:47:14 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-113-140.ams2.redhat.com [10.36.113.140])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A42FC579A5;
+ Wed,  6 May 2020 13:47:13 +0000 (UTC)
+Date: Wed, 6 May 2020 15:47:12 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Subject: Re: [PATCH v3 18/33] block: Add bdrv_default_perms()
+Message-ID: <20200506134712.GG6333@linux.fritz.box>
+References: <20200218124242.584644-1-mreitz@redhat.com>
+ <20200218124242.584644-19-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200505090136.341426-1-joel@jms.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 13809725309549906752
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrjeekgdeigecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepfeffvddtudegieefudeugffhjefgieegieegleettdehgfeiieevueeihfegfefgnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeejvddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-Received-SPF: pass client-ip=46.105.59.196; envelope-from=clg@kaod.org;
- helo=7.mo6.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 09:46:15
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200218124242.584644-19-mreitz@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 05:50:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -75,120 +93,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/5/20 11:01 AM, Joel Stanley wrote:
-> The AST2600 handles this differently with the extra 'hardlock' state, so
-> move the testing to the soc specific class' write callback.
-> 
-> Signed-off-by: Joel Stanley <joel@jms.id.au>
-
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-
+Am 18.02.2020 um 13:42 hat Max Reitz geschrieben:
+> This callback can be used by BDSs that use child_of_bds with the
+> appropriate BdrvChildRole for their children.
+>=20
+> Also, make bdrv_format_default_perms() use it for child_of_bds children
+> (just a temporary solution until we can drop bdrv_format_default_perms()
+> altogether).
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 > ---
->  hw/misc/aspeed_sdmc.c | 55 +++++++++++++++++++++++++++++++++++--------
->  1 file changed, 45 insertions(+), 10 deletions(-)
-> 
-> diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
-> index 02940e7c2a76..7c688becf8c7 100644
-> --- a/hw/misc/aspeed_sdmc.c
-> +++ b/hw/misc/aspeed_sdmc.c
-> @@ -23,7 +23,12 @@
->  
->  /* Protection Key Register */
->  #define R_PROT            (0x00 / 4)
-> +#define   PROT_UNLOCKED      0x01
-> +#define   PROT_HARDLOCKED    0x10  /* AST2600 */
-> +#define   PROT_SOFTLOCKED    0x00
-> +
->  #define   PROT_KEY_UNLOCK     0xFC600309
-> +#define   PROT_KEY_HARDLOCK   0xDEADDEAD /* AST2600 */
->  
->  /* Configuration Register */
->  #define R_CONF            (0x04 / 4)
-> @@ -130,16 +135,6 @@ static void aspeed_sdmc_write(void *opaque, hwaddr addr, uint64_t data,
->          return;
->      }
->  
-> -    if (addr == R_PROT) {
-> -        s->regs[addr] = (data == PROT_KEY_UNLOCK) ? 1 : 0;
-> -        return;
-> -    }
-> -
-> -    if (!s->regs[R_PROT]) {
-> -        qemu_log_mask(LOG_GUEST_ERROR, "%s: SDMC is locked!\n", __func__);
-> -        return;
-> -    }
-> -
->      asc->write(s, addr, data);
+>  block.c                   | 46 ++++++++++++++++++++++++++++++++-------
+>  include/block/block_int.h | 11 ++++++++++
+>  2 files changed, 49 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/block.c b/block.c
+> index c0ba274743..3e5b0bc345 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -2383,14 +2383,12 @@ static void bdrv_default_perms_for_metadata(Block=
+DriverState *bs, BdrvChild *c,
+>      *nshared =3D shared;
 >  }
->  
-> @@ -291,6 +286,16 @@ static uint32_t aspeed_2400_sdmc_compute_conf(AspeedSDMCState *s, uint32_t data)
->  static void aspeed_2400_sdmc_write(AspeedSDMCState *s, uint32_t reg,
->                                     uint32_t data)
+> =20
+> -/* TODO: Use */
+> -static void __attribute__((unused))
+> -bdrv_default_perms_for_data(BlockDriverState *bs, BdrvChild *c,
+> -                            const BdrvChildClass *child_class,
+> -                            BdrvChildRole role,
+> -                            BlockReopenQueue *reopen_queue,
+> -                            uint64_t perm, uint64_t shared,
+> -                            uint64_t *nperm, uint64_t *nshared)
+> +static void bdrv_default_perms_for_data(BlockDriverState *bs, BdrvChild =
+*c,
+> +                                        const BdrvChildClass *child_clas=
+s,
+> +                                        BdrvChildRole role,
+> +                                        BlockReopenQueue *reopen_queue,
+> +                                        uint64_t perm, uint64_t shared,
+> +                                        uint64_t *nperm, uint64_t *nshar=
+ed)
 >  {
-> +    if (reg == R_PROT) {
-> +        s->regs[reg] = (data == PROT_KEY_UNLOCK) ? PROT_UNLOCKED : PROT_SOFTLOCKED;
-> +        return;
-> +    }
-> +
-> +    if (!s->regs[R_PROT]) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: SDMC is locked!\n", __func__);
-> +        return;
-> +    }
-> +
->      switch (reg) {
->      case R_CONF:
->          data = aspeed_2400_sdmc_compute_conf(s, data);
-> @@ -339,6 +344,16 @@ static uint32_t aspeed_2500_sdmc_compute_conf(AspeedSDMCState *s, uint32_t data)
->  static void aspeed_2500_sdmc_write(AspeedSDMCState *s, uint32_t reg,
->                                     uint32_t data)
+>      assert(child_class =3D=3D &child_of_bds && (role & BDRV_CHILD_DATA))=
+;
+> =20
+> @@ -2425,6 +2423,13 @@ void bdrv_format_default_perms(BlockDriverState *b=
+s, BdrvChild *c,
+>                                 uint64_t *nperm, uint64_t *nshared)
 >  {
-> +    if (reg == R_PROT) {
-> +        s->regs[reg] = (data == PROT_KEY_UNLOCK) ? PROT_UNLOCKED : PROT_SOFTLOCKED;
+>      bool backing =3D (child_class =3D=3D &child_backing);
+> +
+> +    if (child_class =3D=3D &child_of_bds) {
+> +        bdrv_default_perms(bs, c, child_class, role, reopen_queue,
+> +                           perm, shared, nperm, nshared);
 > +        return;
 > +    }
 > +
-> +    if (!s->regs[R_PROT]) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: SDMC is locked!\n", __func__);
-> +        return;
-> +    }
+>      assert(child_class =3D=3D &child_backing || child_class =3D=3D &chil=
+d_file);
+> =20
+>      if (!backing) {
+> @@ -2436,6 +2441,31 @@ void bdrv_format_default_perms(BlockDriverState *b=
+s, BdrvChild *c,
+>      }
+>  }
+> =20
+> +void bdrv_default_perms(BlockDriverState *bs, BdrvChild *c,
+> +                        const BdrvChildClass *child_class, BdrvChildRole=
+ role,
+> +                        BlockReopenQueue *reopen_queue,
+> +                        uint64_t perm, uint64_t shared,
+> +                        uint64_t *nperm, uint64_t *nshared)
+> +{
+> +    assert(child_class =3D=3D &child_of_bds);
 > +
->      switch (reg) {
->      case R_CONF:
->          data = aspeed_2500_sdmc_compute_conf(s, data);
-> @@ -395,7 +410,27 @@ static uint32_t aspeed_2600_sdmc_compute_conf(AspeedSDMCState *s, uint32_t data)
->  static void aspeed_2600_sdmc_write(AspeedSDMCState *s, uint32_t reg,
->                                     uint32_t data)
->  {
-> +    if (s->regs[R_PROT] == PROT_HARDLOCKED) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: SDMC is locked until system reset!\n",
-> +                __func__);
-> +        return;
+> +    if (role & BDRV_CHILD_FILTERED) {
+> +        bdrv_filter_default_perms(bs, c, child_class, role, reopen_queue=
+,
+> +                                  perm, shared, nperm, nshared);
+> +    } else if (role & BDRV_CHILD_COW) {
+> +        bdrv_default_perms_for_backing(bs, c, child_class, role, reopen_=
+queue,
+> +                                       perm, shared, nperm, nshared);
+> +    } else if (role & BDRV_CHILD_METADATA) {
+> +        bdrv_default_perms_for_metadata(bs, c, child_class, role, reopen=
+_queue,
+> +                                        perm, shared, nperm, nshared);
+> +    } else if (role & BDRV_CHILD_DATA) {
+> +        bdrv_default_perms_for_data(bs, c, child_class, role, reopen_que=
+ue,
+> +                                    perm, shared, nperm, nshared);
+> +    } else {
+> +        g_assert_not_reached();
 > +    }
-> +
-> +    if (reg != R_PROT && s->regs[R_PROT] == PROT_SOFTLOCKED) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: SDMC is locked!\n", __func__);
-> +        return;
-> +    }
-> +
->      switch (reg) {
-> +    case R_PROT:
-> +        if (data == PROT_KEY_UNLOCK)  {
-> +            data = PROT_UNLOCKED;
-> +        } else if (data == PROT_KEY_HARDLOCK) {
-> +            data = PROT_HARDLOCKED;
-> +        } else {
-> +            data = PROT_SOFTLOCKED;
-> +        }
-> +        break;
->      case R_CONF:
->          data = aspeed_2600_sdmc_compute_conf(s, data);
->          break;
-> 
+> +}
+
+Here the discussion from the start of the series becomes relevant: Which
+flags can be combined with which other flags, and if multiple flags are
+set, which one takes precedence?
+
+First undocumented requirement: You must set at least one of FILTERED,
+COW, METADATA and DATA.
+
+Then, for FILTERED we decided to document that DATA shouldn't be set at
+the same time. I guess neither should COW and METADATA. Apart for
+documentation, worth an assertion?
+
+COW seems to be exclusive in practice, too. I guess you could construct
+a driver that somehow keeps its own (meta)data in its backing file,
+maybe in the VM state area. It also sounds like a really bad idea. So
+forbid it, document it and assert it, too?
+
+METADATA and DATA can be set at the same time. As your previous patch
+shows, the function for DATA is a laxer version of the one for METADATA,
+requesting a subset of the METADATA permissions and sharing a superset.
+So the order in the code makes sense.
+
+But can we make sure that this condition will be true in the future?
+Imagine we find a need for a new permission that is used for data files,
+but not for metadata. I think at the very least, this deserves a
+comment. But probably it means that both should stay a single function
+that can check each flag for the exact permission bits it influences.
+
+Kevin
 
 
