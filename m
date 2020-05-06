@@ -2,97 +2,88 @@ Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18558C28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 11:44:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A6DEC28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 11:47:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8139206D5
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 11:44:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 14E31206D5
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 11:47:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B6fQnv1h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8139206D5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eG8/p+t0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14E31206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWITq-0006Nv-1D
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 07:44:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51230)
+	id 1jWIWX-0007ti-5K
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 07:47:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51924)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jWIS2-0004xl-ST; Wed, 06 May 2020 07:42:58 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:46396)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jWIS2-00019S-2D; Wed, 06 May 2020 07:42:58 -0400
-Received: by mail-wr1-x442.google.com with SMTP id w7so972767wre.13;
- Wed, 06 May 2020 04:42:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=A/Az2XDN35xhRqhd5a6KCSsW2OrbB6KAjTnp3g3tixU=;
- b=B6fQnv1huRedz2Emov4uLOGEOUdCfr8nVsr61ek5g6YIS6hualvmPD8bE5mRnIJer8
- +ya0/5pwh6IV0JnNTsrlpdEjX1prAlHalvF2AK9D04xuHkhOGEHOupr6UWOcSj9GWdLx
- YUEi9hETXylZAmNpUJI2CcqSkkSeP5SYaAxGI9Ii8MOtfrL9XpDL+ZbZ+TGMV7R8Wq+A
- pHxV+dsWrUNO5l1/Dgv/jgK16jzsTmPSZXE5rYoaqtCvo+WYUXCBBQ3psuDXP2d9pB3K
- DYOaZCd+J/HtFOwEWdVEQIUWssiPis9w3CdCwMkc80C8/23M+Rlb5D1HfOBJIc0uvzNf
- ycsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=A/Az2XDN35xhRqhd5a6KCSsW2OrbB6KAjTnp3g3tixU=;
- b=QypoEjMoA1QQmC0PjCmRCaAIcUvadl+kmgRggB+ILaM3FlkvkmRjCnVKqjHByfwzXJ
- BOqzQ4z/I7XE0YCI88I8oj4T5AWYrReOB8NFkN3w5luiTmTC02b7qWk2iFalF+shgE/B
- SVfpuDzfQxBj9Z1kz55b8Od/v/5vAOtV8SIkQ5hHPgUMnlt/s47L7tb1odcgGmT7pFGU
- ISPb4IoryNdHjIB6rTbppGbyuKWt03iGv214HrGHMLofuvO2QdrHLl3ZJi0uK9YhOuY9
- U8MpKSz9XNynWsWBQbK5XR7nceAM/QRnqAR6cjBRwb6di829zAU0lJJrx2n4pxSjKImj
- 9QcQ==
-X-Gm-Message-State: AGi0PubRnvzjesZtHuqByREiedVNZozpIx7LkGNWvfFnQxcrmd1X6sF8
- XcX5OsDt7xAeRVYoDn+eh+c=
-X-Google-Smtp-Source: APiQypItJ0OAbqD5pBI82CHQYlLWidVk1nGnkoQ8ZPhDSeLg3/YmFo8PRsZbZo7TY4g2CjftiIhLbA==
-X-Received: by 2002:adf:ce02:: with SMTP id p2mr9035521wrn.173.1588765376288; 
- Wed, 06 May 2020 04:42:56 -0700 (PDT)
-Received: from [192.168.1.37] (26.red-88-21-207.staticip.rima-tde.net.
- [88.21.207.26])
- by smtp.gmail.com with ESMTPSA id o18sm2347255wrp.23.2020.05.06.04.42.54
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 06 May 2020 04:42:55 -0700 (PDT)
-Subject: Re: [PATCH v2 4/9] hw/dma/xilinx_axidma: Add DMA memory-region
- property
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
-References: <20200506082513.18751-1-edgar.iglesias@gmail.com>
- <20200506082513.18751-5-edgar.iglesias@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6e5b9aa9-aff2-25b6-c294-4764d38e3bb8@amsat.org>
-Date: Wed, 6 May 2020 13:42:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jWIVm-0007GF-5F
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 07:46:50 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51056
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jWIVl-0003I7-4S
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 07:46:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588765607;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=rNwbRdcjy134DSQmFIXGl0rUXTqfFhwOaIAGdon8tXo=;
+ b=eG8/p+t05/YCinMJ779tTkvZ+1Gh09ZV1lnqtAWnZAnL53j8l/ap2YcHOowt3JX4m2jhNJ
+ QRLD8b7eywbLHXqL+rjG+SA794WT4kNfW7kt886VCZYo53kjhs2fiCWMjI7k0g81rBjuGu
+ CskbEBH4FQ9DkqMFbQ8oo8wUY8LyL6Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-277-5JlkDANXO2axYwiJbxQzyQ-1; Wed, 06 May 2020 07:46:45 -0400
+X-MC-Unique: 5JlkDANXO2axYwiJbxQzyQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C54A6835B46;
+ Wed,  6 May 2020 11:46:44 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-113-193.ams2.redhat.com
+ [10.36.113.193])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 412305D9DA;
+ Wed,  6 May 2020 11:46:36 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 370891747D; Wed,  6 May 2020 13:46:35 +0200 (CEST)
+Date: Wed, 6 May 2020 13:46:35 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v2 00/13] microvm: add acpi support
+Message-ID: <20200506114635.b5msujuhhbim2kdv@sirius.home.kraxel.org>
+References: <20200505134305.22666-1-kraxel@redhat.com>
+ <20200505100010-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20200506082513.18751-5-edgar.iglesias@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200505100010-mutt-send-email-mst@kernel.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 02:39:40
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,149 +96,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: damien.hedde@greensocs.com, peter.maydell@linaro.org,
- sstabellini@kernel.org, edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
- frasse.iglesias@gmail.com, jasowang@redhat.com, alistair@alistair23.me,
- frederic.konrad@adacore.com, qemu-arm@nongnu.org, figlesia@xilinx.com,
- luc.michel@greensocs.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Edgar,
+On Tue, May 05, 2020 at 10:04:02AM -0400, Michael S. Tsirkin wrote:
+> On Tue, May 05, 2020 at 03:42:52PM +0200, Gerd Hoffmann wrote:
+> > I know that not supporting ACPI in microvm is intentional.  If you stil=
+l
+> > don't want ACPI this is perfectly fine, you can use the usual -no-acpi
+> > switch to toggle ACPI support.
+> >=20
+> > These are the advantages you are going to loose then:
+> >=20
+> >   (1) virtio-mmio device discovery without command line hacks (tweaking
+> >       the command line is a problem when not using direct kernel boot).
+> >   (2) Better IO-APIC support, we can use IRQ lines 16-23.
+> >   (3) ACPI power button (aka powerdown request) works.
+> >   (4) machine poweroff (aka S5 state) works.
+>=20
+> Questions
+>=20
+> - what's the tradeoff in startup time?
 
-On 5/6/20 10:25 AM, Edgar E. Iglesias wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> 
-> Add DMA memory-region property to externally control what
-> address-space this DMA operates on.
-> 
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> ---
->   hw/dma/xilinx_axidma.c | 30 +++++++++++++++++++++++-------
->   1 file changed, 23 insertions(+), 7 deletions(-)
-> 
-> diff --git a/hw/dma/xilinx_axidma.c b/hw/dma/xilinx_axidma.c
-> index 018f36991b..4540051448 100644
-> --- a/hw/dma/xilinx_axidma.c
-> +++ b/hw/dma/xilinx_axidma.c
-> @@ -33,6 +33,7 @@
->   #include "qemu/log.h"
->   #include "qemu/module.h"
->   
-> +#include "sysemu/dma.h"
->   #include "hw/stream.h"
->   
->   #define D(x)
-> @@ -103,6 +104,7 @@ enum {
->   };
->   
->   struct Stream {
-> +    struct XilinxAXIDMA *dma;
->       ptimer_state *ptimer;
->       qemu_irq irq;
->   
-> @@ -125,6 +127,9 @@ struct XilinxAXIDMAStreamSlave {
->   struct XilinxAXIDMA {
->       SysBusDevice busdev;
->       MemoryRegion iomem;
-> +    MemoryRegion *dma_mr;
-> +    AddressSpace as;
-> +
->       uint32_t freqhz;
->       StreamSlave *tx_data_dev;
->       StreamSlave *tx_control_dev;
-> @@ -186,7 +191,7 @@ static void stream_desc_load(struct Stream *s, hwaddr addr)
->   {
->       struct SDesc *d = &s->desc;
->   
-> -    cpu_physical_memory_read(addr, d, sizeof *d);
-> +    address_space_read(&s->dma->as, addr, MEMTXATTRS_UNSPECIFIED, d, sizeof *d);
->   
->       /* Convert from LE into host endianness.  */
->       d->buffer_address = le64_to_cpu(d->buffer_address);
-> @@ -204,7 +209,8 @@ static void stream_desc_store(struct Stream *s, hwaddr addr)
->       d->nxtdesc = cpu_to_le64(d->nxtdesc);
->       d->control = cpu_to_le32(d->control);
->       d->status = cpu_to_le32(d->status);
-> -    cpu_physical_memory_write(addr, d, sizeof *d);
-> +    address_space_write(&s->dma->as, addr, MEMTXATTRS_UNSPECIFIED,
-> +                        d, sizeof *d);
->   }
->   
->   static void stream_update_irq(struct Stream *s)
-> @@ -286,8 +292,9 @@ static void stream_process_mem2s(struct Stream *s, StreamSlave *tx_data_dev,
->                        txlen + s->pos);
->           }
->   
-> -        cpu_physical_memory_read(s->desc.buffer_address,
-> -                                 s->txbuf + s->pos, txlen);
-> +        address_space_read(&s->dma->as, s->desc.buffer_address,
-> +                           MEMTXATTRS_UNSPECIFIED,
-> +                           s->txbuf + s->pos, txlen);
->           s->pos += txlen;
->   
->           if (stream_desc_eof(&s->desc)) {
-> @@ -336,7 +343,8 @@ static size_t stream_process_s2mem(struct Stream *s, unsigned char *buf,
->               rxlen = len;
->           }
->   
-> -        cpu_physical_memory_write(s->desc.buffer_address, buf + pos, rxlen);
-> +        address_space_write(&s->dma->as, s->desc.buffer_address,
-> +                            MEMTXATTRS_UNSPECIFIED, buf + pos, rxlen);
->           len -= rxlen;
->           pos += rxlen;
->   
-> @@ -525,6 +533,7 @@ static void xilinx_axidma_realize(DeviceState *dev, Error **errp)
->       XilinxAXIDMAStreamSlave *cs = XILINX_AXI_DMA_CONTROL_STREAM(
->                                                               &s->rx_control_dev);
->       Error *local_err = NULL;
-> +    int i;
->   
->       object_property_add_link(OBJECT(ds), "dma", TYPE_XILINX_AXI_DMA,
->                                (Object **)&ds->dma,
-> @@ -545,17 +554,19 @@ static void xilinx_axidma_realize(DeviceState *dev, Error **errp)
->           goto xilinx_axidma_realize_fail;
->       }
->   
-> -    int i;
-> -
->       for (i = 0; i < 2; i++) {
->           struct Stream *st = &s->streams[i];
->   
-> +        st->dma = s;
->           st->nr = i;
->           st->ptimer = ptimer_init(timer_hit, st, PTIMER_POLICY_DEFAULT);
->           ptimer_transaction_begin(st->ptimer);
->           ptimer_set_freq(st->ptimer, s->freqhz);
->           ptimer_transaction_commit(st->ptimer);
->       }
-> +
-> +    address_space_init(&s->as,
-> +                       s->dma_mr ? s->dma_mr : get_system_memory(), "dma");
+In the noise.  0.28-0.29 seconds on my hardware to the "i8042: PNP: No
+PS/2 controller found" message, no matter whenever acpi is on or off.
+With "quiet" (acpi prints more and logging to the serial console is
+slow).
 
-I'd instead return an error (earlier in this function) if dma_mr 
-property is not set. If you ever respin...
+At that point -no-acpi takes one second to figure the ps2 controller
+really isn't there (as discussed before).
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Another interesting difference is interrupt handling.
 
+The -no-acpi version:
 
->       return;
->   
->   xilinx_axidma_realize_fail:
-> @@ -575,6 +586,11 @@ static void xilinx_axidma_init(Object *obj)
->                               &s->rx_control_dev, sizeof(s->rx_control_dev),
->                               TYPE_XILINX_AXI_DMA_CONTROL_STREAM, &error_abort,
->                               NULL);
-> +    object_property_add_link(obj, "dma", TYPE_MEMORY_REGION,
-> +                             (Object **)&s->dma_mr,
-> +                             qdev_prop_allow_set_link_before_realize,
-> +                             OBJ_PROP_LINK_STRONG,
-> +                             &error_abort);
->   
->       sysbus_init_irq(sbd, &s->streams[0].irq);
->       sysbus_init_irq(sbd, &s->streams[1].irq);
-> 
+           CPU0      =20
+  2:          0    XT-PIC      cascade
+  4:        284   IO-APIC   4-edge      ttyS0
+  8:          0   IO-APIC   8-edge      rtc0
+ 14:       5399   IO-APIC  14-edge      virtio1
+ 15:         58   IO-APIC  15-edge      virtio0
+NMI:          0   Non-maskable interrupts
+[ ... ]
+
+The acpi version:
+
+           CPU0      =20
+  1:          0   IO-APIC   9-edge      ACPI:Ged
+  2:        231   IO-APIC  23-fasteoi   virtio0
+  3:       6291   IO-APIC  22-fasteoi   virtio1
+  4:       1758   IO-APIC   4-edge      ttyS0
+  5:          0   IO-APIC   8-edge      rtc0
+NMI:          0   Non-maskable interrupts
+[ ... ]
+
+> - what should be the default?
+
+IMO it makes sense to enable it by default.  You get working
+power management.  You can boot stock cloud images (patched
+seabios parses the dsdt to find virtio-mmio devices to boot
+from virtio-mmio disks).
+
+It's easier to leave behind legacy stuff:  The kernel trusts the
+firmware and doesn't go into "trying harder to find ps2 kbd" mode.
+Also what is this "cascade" thing in /proc/interrupts above? [1]
+
+I expect dropping the rtc is easier with acpi too, the kernel probably
+wouldn't try to find it then.  Right now seabios needs rtc cmos for
+ram size probing, so I didn't test that yet.
+
+On the other hand I don't really see any disadvantages.  The tables are
+small ...
+
+# find /sys/firmware/acpi/tables/ -type f | xargs ls -l
+-r--------. 1 root root  70 May  6 06:48 /sys/firmware/acpi/tables/APIC
+-r--------. 1 root root 472 May  6 06:48 /sys/firmware/acpi/tables/DSDT
+-r--------. 1 root root 268 May  6 06:48 /sys/firmware/acpi/tables/FACP
+
+... and simple (no methods) so you can hardly call that "bloat".
+
+> Based on above I'd be inclined to say default should stay no acpi and
+> users should enable acpi with an option.
+
+I disagree, but I can live with off by default too.  We already have
+acpi=3DOnOffAuto for X86MachineState, so it is just a matter of handling
+microvm.acpi=3Dauto accordingly in x86_machine_is_acpi_enabled().
+
+take care,
+  Gerd
+
+[1] Rhetorical question, I know what it is. [2]
+[2] I don't want remember though.
+
 
