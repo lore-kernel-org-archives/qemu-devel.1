@@ -7,82 +7,81 @@ X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A631C28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 11:39:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26C27C28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 11:41:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9C6220714
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 11:39:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E36A320714
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 11:41:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MuxYx4VM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9C6220714
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D8kedB2c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E36A320714
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWIP0-0001mW-U7
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 07:39:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50624)
+	id 1jWIQO-00034f-5l
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 07:41:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50760)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jWIO8-0000xv-4F; Wed, 06 May 2020 07:38:56 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43455)
+ id 1jWIOx-0001uM-Bo; Wed, 06 May 2020 07:39:48 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44187)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jWIO7-0005qC-5r; Wed, 06 May 2020 07:38:55 -0400
-Received: by mail-wr1-x444.google.com with SMTP id i15so1362957wrx.10;
- Wed, 06 May 2020 04:38:54 -0700 (PDT)
+ id 1jWIOw-0000GT-Lw; Wed, 06 May 2020 07:39:47 -0400
+Received: by mail-wr1-x443.google.com with SMTP id y4so1773382wrm.11;
+ Wed, 06 May 2020 04:39:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=yrJD0nf/1yh/ai4LTsZD9jBphmSNiHQQnt08pdWzbfM=;
- b=MuxYx4VMIwNmEBDBea7dUfKGGlH5AN4mc6pT2GI068FAbjQtn3wsO9LjDE/5/Oz4Cp
- 2tZr2H8Vl/WzA4BqB/hIgBNqZSrpIq2m4wOycZN2kWL2jBB2NCaE2UTRI31s8UqCC0m8
- XwADi1k9qYoXu6Buyi1W4Ld4kDvQ2rF3UnsRPn4cbONk8C/20usxdrhDjVVGmVMncD3E
- W+HH0caGCwfz7mvfAyC1b7cZEV49NjbFRlHcTmf9/IRadFEaff4ajq8dQfrNzgfOAdt1
- JmvEt8ODvsbZqX2ejH2fV9u9lKomtxkE85DoB3HZg+NUUGr6AbBPssuZNGv/c/WTXSiF
- oIkA==
+ bh=KKHgCP+iHc+SKiHkbPN/nSorkFA7/T4CCDdYvJxSM0o=;
+ b=D8kedB2c+9xqws30YyBhXuuAGviEaZYWuCWaWWc9QHYCHFWT1W5fBj3JTC7Ujx5S19
+ dFpaa0rzfYp9k6gpB7I99qTvh8dtH4wpAVRHykpw8S5KSNy+plmIADWzyw1iqKVL/Kvn
+ F0gwwid4fkNyzGa8kKEBJ3TvWOjlG2QkyfnUUDnLrU79AmlPAgWO+xhcVlbgt5Ruzgxe
+ 85QaIn1BXj4BvwuU/SkxcTNt5TOrx0GEHrd/6CmlY0uDVwWgG4qwD5SHyYGeR9RgUtp2
+ BmyZzaNO79jfOESfawvz/0X89f4sU+wTAKuyVXgYTFanac9Dh5Y+KBsDf2wfObyCySsC
+ ZE8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=yrJD0nf/1yh/ai4LTsZD9jBphmSNiHQQnt08pdWzbfM=;
- b=X8UykLDwKpN8XfHKOaD6bwHJ2U316P0MQsD66yfAvDMiQAAPBLA97GTrZISGsvrbQl
- NoStPAqDOBR1zcioa+iv159gOxGrsveBkp4ucax925haa7UR6zBQhV/XWrCO/8zyp6V8
- L1eVEhcVC8ksT2IvuRh43trAOJgsCjDRLbGRMqh9WKZudoO0TWMvEuqVTxRhp2h6RgIn
- L+oofcYSNLiKwB1lePjBaKeFXNOn6tYktYpj+s6boXYtv0LnP3uHJQVOodO0VPl0b1BW
- WY65mcsIUGikFcB4CmaXzpsakzExl4/FSrIH0FEtjUOQEjkf1BcxcVb+2MdKTNYGAcAu
- rdPQ==
-X-Gm-Message-State: AGi0PuYQmC6loVPcydwtsGxO6CXHJq6TSaThmX6XQFxPJvHvp50+S5a7
- npje3MTvhjXTu0K9obIeCU4=
-X-Google-Smtp-Source: APiQypLdAP3l5NRPBCiYq5YRUhUpVHPz9VEk4un13QcbaJhcyEvdthf+d066Qcdtq2PsmVfRmoqCKA==
-X-Received: by 2002:adf:dd8b:: with SMTP id x11mr8548161wrl.238.1588765132923; 
- Wed, 06 May 2020 04:38:52 -0700 (PDT)
+ bh=KKHgCP+iHc+SKiHkbPN/nSorkFA7/T4CCDdYvJxSM0o=;
+ b=X3UPsci2FQyJ2/9U0vX70WFd+IUMUI5wuDkPxCBKQNrIkto3SZt05YHO0J4OG63+Ho
+ n71I49OsSc/dV0AQcwuztiSLg4HgiVavWlLvBjKf5PS/JonvLKLnxHWWjQyc8UiwlwSh
+ AmVz03AszuLtmLnuu4Ohs5DpPib+hG/D6kWjKbufTvlRDkpVaCPPTQvIlLqE2Sf9ZT8M
+ R/X/lcih3VZOcvTce1Ufhg9PoE+Lw+OKjOltfkh8rNiBsbH1Du4nAb13M6YmE2hn8Fin
+ NxIlLa6SkYJ4zGQpBvyEPVxtwDK/99oFOCPLzW39RP6MQT+ZMHs5jQt6MZMGQRykFI+y
+ Ls/A==
+X-Gm-Message-State: AGi0PuZgkDMY74A/fTp7PM53VhHV9YwW+96eKR5HJ4L5dzoRDykDMaUJ
+ lS31gi9vsGDNHw1vY1z+AJk=
+X-Google-Smtp-Source: APiQypI6v4wjXMtz2zywlwmTNHsi8ac7foliXScDBA3tSZLT+G7i1oDOfDBEPnWcfp7CkeLms6FbkQ==
+X-Received: by 2002:adf:fa92:: with SMTP id h18mr5667802wrr.260.1588765182558; 
+ Wed, 06 May 2020 04:39:42 -0700 (PDT)
 Received: from [192.168.1.37] (26.red-88-21-207.staticip.rima-tde.net.
  [88.21.207.26])
- by smtp.gmail.com with ESMTPSA id t4sm2714342wri.54.2020.05.06.04.38.51
+ by smtp.gmail.com with ESMTPSA id 88sm2389294wrq.77.2020.05.06.04.39.41
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 06 May 2020 04:38:52 -0700 (PDT)
-Subject: Re: [PATCH v2 2/9] hw/net/xilinx_axienet: Cleanup stream->push
- assignment
+ Wed, 06 May 2020 04:39:41 -0700 (PDT)
+Subject: Re: [PATCH v2 3/9] hw/net/xilinx_axienet: Remove unncessary cast
 To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
 References: <20200506082513.18751-1-edgar.iglesias@gmail.com>
- <20200506082513.18751-3-edgar.iglesias@gmail.com>
+ <20200506082513.18751-4-edgar.iglesias@gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9e75e512-c09f-8c48-1971-fecc4850ffc1@amsat.org>
-Date: Wed, 6 May 2020 13:38:50 +0200
+Message-ID: <8022a626-f81e-a39d-f6f9-9259e2c99267@amsat.org>
+Date: Wed, 6 May 2020 13:39:40 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200506082513.18751-3-edgar.iglesias@gmail.com>
+In-Reply-To: <20200506082513.18751-4-edgar.iglesias@gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -117,64 +116,33 @@ Sender: "Qemu-devel"
 On 5/6/20 10:25 AM, Edgar E. Iglesias wrote:
 > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 > 
-> Split the shared stream_class_init function to assign
-> stream->push with better type-safety.
+> Remove unncessary cast, buf is already uint8_t *.
+
+Typo "unnecessary" here and in patch subject.
+Otherwise:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> No functional change.
 > 
 > Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 > Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
 > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
 > ---
->   hw/net/xilinx_axienet.c | 18 ++++++++++++------
->   1 file changed, 12 insertions(+), 6 deletions(-)
+>   hw/net/xilinx_axienet.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 > diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
-> index 0f97510d8a..84073753d7 100644
+> index 84073753d7..c8dfcda3ee 100644
 > --- a/hw/net/xilinx_axienet.c
 > +++ b/hw/net/xilinx_axienet.c
-> @@ -1029,11 +1029,19 @@ static void xilinx_enet_class_init(ObjectClass *klass, void *data)
->       dc->reset = xilinx_axienet_reset;
->   }
+> @@ -918,7 +918,7 @@ xilinx_axienet_data_stream_push(StreamSlave *obj, uint8_t *buf, size_t size)
+>           uint16_t csum;
 >   
-> -static void xilinx_enet_stream_class_init(ObjectClass *klass, void *data)
-> +static void xilinx_enet_control_stream_class_init(ObjectClass *klass,
-> +                                                  void *data)
->   {
->       StreamSlaveClass *ssc = STREAM_SLAVE_CLASS(klass);
+>           tmp_csum = net_checksum_add(size - start_off,
+> -                                    (uint8_t *)buf + start_off);
+> +                                    buf + start_off);
+>           /* Accumulate the seed.  */
+>           tmp_csum += s->hdr[2] & 0xffff;
 >   
-> -    ssc->push = data;
-> +    ssc->push = xilinx_axienet_control_stream_push;
-> +}
-> +
-> +static void xilinx_enet_data_stream_class_init(ObjectClass *klass, void *data)
-> +{
-> +    StreamSlaveClass *ssc = STREAM_SLAVE_CLASS(klass);
-> +
-> +    ssc->push = xilinx_axienet_data_stream_push;
->   }
->   
->   static const TypeInfo xilinx_enet_info = {
-> @@ -1048,8 +1056,7 @@ static const TypeInfo xilinx_enet_data_stream_info = {
->       .name          = TYPE_XILINX_AXI_ENET_DATA_STREAM,
->       .parent        = TYPE_OBJECT,
->       .instance_size = sizeof(struct XilinxAXIEnetStreamSlave),
-> -    .class_init    = xilinx_enet_stream_class_init,
-> -    .class_data    = xilinx_axienet_data_stream_push,
-> +    .class_init    = xilinx_enet_data_stream_class_init,
->       .interfaces = (InterfaceInfo[]) {
->               { TYPE_STREAM_SLAVE },
->               { }
-> @@ -1060,8 +1067,7 @@ static const TypeInfo xilinx_enet_control_stream_info = {
->       .name          = TYPE_XILINX_AXI_ENET_CONTROL_STREAM,
->       .parent        = TYPE_OBJECT,
->       .instance_size = sizeof(struct XilinxAXIEnetStreamSlave),
-> -    .class_init    = xilinx_enet_stream_class_init,
-> -    .class_data    = xilinx_axienet_control_stream_push,
-> +    .class_init    = xilinx_enet_control_stream_class_init,
->       .interfaces = (InterfaceInfo[]) {
->               { TYPE_STREAM_SLAVE },
->               { }
 > 
 
