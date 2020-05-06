@@ -1,87 +1,98 @@
 Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-11.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57236C28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 08:09:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC1B0C28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 08:17:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25C6120661
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 08:09:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B8947206E6
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 08:17:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="z20FouPu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25C6120661
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DR3CU60+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8947206E6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWF78-0003fz-8b
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 04:09:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35522)
+	id 1jWFFP-0005Ry-SL
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 04:17:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36998)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yuri.benditovich@daynix.com>)
- id 1jWF6a-0003H7-4x
- for qemu-devel@nongnu.org; Wed, 06 May 2020 04:08:36 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:41687)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jWFEi-0004wu-MQ
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 04:17:00 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35541)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <yuri.benditovich@daynix.com>)
- id 1jWF6Z-00082z-4W
- for qemu-devel@nongnu.org; Wed, 06 May 2020 04:08:35 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id w137so537143ybg.8
- for <qemu-devel@nongnu.org>; Wed, 06 May 2020 01:08:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=QBoQcq26X5IlJyCrqUS2mhYO9rMfyiRH6PeZR70LsXw=;
- b=z20FouPus7rbY9GunnMpYnCtpqAbBIp5v+CES7BDKy3LW/MNdElAeoUUaMcNu/wlSJ
- JvUIPNgldzeZaeFMdg2Ij/83dkzf1HuHID9CPTtymz1i1BvXfeEiou6cFpaLzXAmmJjT
- rilBvTWb/p2MDqwDsDcoC36melEJ/Sgd3dqhcUrOLKyx6p00As8uh3GJJdexJZZ4Pv77
- i1IrwhDD0+/Odh45oncSCZgkreYpS1kgJZiV5tg8qhsrPsap0LAbto+ACvc3Hvongufh
- KkevwvZoG8Q8HRL+VrbOmTL/Se0AkcPx1znqTO61KoCdpKAJzIVwwphfKgmLpNX+/uKs
- t7mQ==
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jWFEh-000588-JE
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 04:17:00 -0400
+Received: by mail-wm1-x341.google.com with SMTP id r26so1506307wmh.0
+ for <qemu-devel@nongnu.org>; Wed, 06 May 2020 01:16:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=H+JIuyPT0GScT7S16v0JPwJem//OYqZ21V1wqUwNIK8=;
+ b=DR3CU60+njj3IFqgXFaFMFdgLXAGRP0eQZfGKcWn5BUCuv1onAofYTSRhpxq085ShL
+ ApYK2TOWufgvFkrjV+PJQr2EoAK4q4ZgM5+iynNVhbJxYKAgLqNVadqJXdCJUP3YqNeN
+ QwwGTRa9j5/jhJyT5HEUR7bZyTcfhbcDlgKGEH3PBY2MltadK7jD0SLYOqzD1vKR3lci
+ FuB69/tg4OU946OrvbEnOOtX3ELMgX3dwlrTNhCmiReDzBOeELNbxDzgk684z41Sdrov
+ a9pykbZc5kLMcI4RJd1ZsUsJlOgOStkvsIDNGuRmzK7U2pFIXcgOyg3bQRRn06wDh45D
+ GC4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=QBoQcq26X5IlJyCrqUS2mhYO9rMfyiRH6PeZR70LsXw=;
- b=Tsivi4UYdHjRNeEkzjG6lfFhOVk3bwM5H5QKRIAeM9rlMff+tDrrISZBh9CmuHv2XO
- mLf1Nw3pvy6gFL6RZQ7GXBSzhNAvfTRr4TjcUZlWTv+gdkmId9ZDZF8WlaBi2gK9UIU3
- r3RZqIKikjVj6x5FGodBdvoDoDsfBa+oa0VT+RHPEGeffRKZ/XkwIwnmYXivDsPrpw6Y
- NjtVhZfoKG3by0gBnR119mOoIedihjmP0cofKhKxHXp5PuggmFqIwWe6O3laZVE26fpr
- MuXj6x7+QRbnj3h/zD8LsU1EvpkzgiKIFooK/mXWH8nnMflJNK/TNcaqG9jJoLlvZ4Di
- bHgA==
-X-Gm-Message-State: AGi0PuaEoRpxK74HwhlsJ/DWwEGkrtCPAuAKt+1NCAdJWAXIoTeBKOSP
- sn8mOAuIcLFlC7H3ptGFkOksqnZ7vy0Wg2UjSfh1Rg==
-X-Google-Smtp-Source: APiQypIivjATMIzVr7ZnWP/R+NYHijYmeWgRdqqiQX2R+GXJCLSpnJHFZVijJEoGw2AYkZk4S8/OxLly0CdnTaS+Fro=
-X-Received: by 2002:a5b:49:: with SMTP id e9mr12345725ybp.447.1588752513605;
- Wed, 06 May 2020 01:08:33 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=H+JIuyPT0GScT7S16v0JPwJem//OYqZ21V1wqUwNIK8=;
+ b=KLTtqAcBekX8GwLRJzc3F42IFAsrVgk24mlSPCh7GlOw3MTJLY5ORC4/KEojbd9f0h
+ vla2zHTCWcCdn5xW3AR/Vwpe5SQz+I0YttaC+qxT1s0gRLlW5an5irtm4bcmBEe6ptB7
+ ZjjXUWpZ87YhOKWGnqVxIzGcAtRVzxMuyrmiFgURS1koGy1St+x6AwHVM59UGhqjtFME
+ b55durUm+24Go/Ts1w83WF8i326HiPiBMUFikw7jJTf68wlOaghHXsKvLW10Tdbv6nl4
+ hg9/DtnsJE2sm33Un1/D2FyAuet8BL56O8aYVy9AF6zZdtaVfHnjNdgMDf/xPNpxIvDs
+ HPBQ==
+X-Gm-Message-State: AGi0PuYoTVdX3X8/nnYSK+KqKPBlqPRf+i/UHJ+hodE/UyERifwQH5iz
+ UzXIQK5Ado8nSVRpUjmLLWqL3w==
+X-Google-Smtp-Source: APiQypIIzhQ3DCZqFdZVSE3+EFNc6iHACEn0yj+ypg70EgT9BB3oV367EUnLG3vVj8cZfgWxUF08bQ==
+X-Received: by 2002:a1c:3dd6:: with SMTP id k205mr2983586wma.138.1588753017238; 
+ Wed, 06 May 2020 01:16:57 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id h1sm1795948wme.42.2020.05.06.01.16.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 06 May 2020 01:16:55 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id E0C0D1FF7E;
+ Wed,  6 May 2020 09:16:54 +0100 (BST)
+References: <20200501111505.4225-1-alex.bennee@linaro.org>
+ <20200501111505.4225-4-alex.bennee@linaro.org>
+ <CAKBkRUzicxphjjkkxdgzB3cDSv=AszD5V4X499jT2BjiAaazGw@mail.gmail.com>
+User-agent: mu4e 1.4.4; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Li-Wen Hsu <lwhsu@freebsd.org>
+Subject: Re: [PATCH v1 3/4] .cirrus.yml: bump FreeBSD to the current stable
+ release
+In-reply-to: <CAKBkRUzicxphjjkkxdgzB3cDSv=AszD5V4X499jT2BjiAaazGw@mail.gmail.com>
+Date: Wed, 06 May 2020 09:16:54 +0100
+Message-ID: <87lfm55vgp.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20200329150953.23812-1-yuri.benditovich@daynix.com>
- <20200331102004-mutt-send-email-mst@kernel.org>
- <CAOEp5OeOcTZM_b254LxX5=jRiiAkGSoLsbMeiMjPs2OoF1MxNA@mail.gmail.com>
- <90f00200-da2d-a8d6-a734-fc08e2e5313a@redhat.com>
-In-Reply-To: <90f00200-da2d-a8d6-a734-fc08e2e5313a@redhat.com>
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-Date: Wed, 6 May 2020 11:08:24 +0300
-Message-ID: <CAOEp5OfuP7c+aOBhQP71BLRF=Wxg+w1BPFSm8=e8dfQOnLCK5Q@mail.gmail.com>
-Subject: Re: [PATCH v7 0/7] reference implementation of RSS and hash report
-To: Jason Wang <jasowang@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000035b37d05a4f645eb"
-Received-SPF: none client-ip=2607:f8b0:4864:20::b41;
- envelope-from=yuri.benditovich@daynix.com; helo=mail-yb1-xb41.google.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,78 +106,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yan Vugenfirer <yan@daynix.com>, qemu-devel@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Ed Maste <emaste@freebsd.org>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000035b37d05a4f645eb
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-I'll send v8 soon
+Li-Wen Hsu <lwhsu@freebsd.org> writes:
 
-Thanks,
-Yuri
+> On Fri, May 1, 2020 at 7:15 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> =
+wrote:
+>>
+>> Hopefully this will un-stick the test which has been broken for a long
+>> time.
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> ---
+>>  .cirrus.yml | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/.cirrus.yml b/.cirrus.yml
+>> index 90645fede6..f06f5af2b9 100644
+>> --- a/.cirrus.yml
+>> +++ b/.cirrus.yml
+>> @@ -3,7 +3,7 @@ env:
+>>
+>>  freebsd_12_task:
+>>    freebsd_instance:
+>> -    image: freebsd-12-0-release-amd64
+>> +    image_family: freebsd-12-1
+>>      cpu: 8
+>>      memory: 8G
+>>    install_script: pkg install -y
+>> --
+>> 2.20.1
+>>
+>
+> Reviewed-by: Li-Wen Hsu <lwhsu@freebsd.org>
+> Tested-by: Li-Wen Hsu <lwhsu@freebsd.org>
+>
+> I would be nice to also add this patch:
+> https://github.com/lwhsu/qemu/commit/ac699f79b4d86d8195d76c3befada65ade44=
+9cc0.patch
+> To prevent problems in the future.
 
-On Wed, May 6, 2020 at 8:37 AM Jason Wang <jasowang@redhat.com> wrote:
+Done. I took the liberty of apply your s-o-b tag as it wasn't on the
+github commit but it came from your repo.
 
 >
-> On 2020/5/1 =E4=B8=8B=E5=8D=8812:01, Yuri Benditovich wrote:
-> > Michael/Jason,
-> >
-> > As Linux headers was updated in qemu and now include RSC/RSS/Hash
-> > definitions, please let me know what you prefer:
-> > 1. You apply this series as is, then I submit clean-up series that
-> > will remove all the redundant defines from virtio-net.c
-> > 2. I post v8 of this series with cleanup of all the redundant defines
-> > and also RSC ones
-> > 3. Something other
+> The error was due to the pkg version got "fixed" when building image,
+> and was too old when VM got provisioned, then it cannot be not
+> compatible with the package repository. Ref:
+> https://lists.freebsd.org/pipermail/freebsd-cloud/2020-April/000234.html
 >
->
-> Hi Yuri:
->
-> Though I've queued this series but consider we have new headers, I think
-> it's better to post v8.
->
-> Thanks
->
->
+> Best,
+> Li-Wen
 
---00000000000035b37d05a4f645eb
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr">I&#39;ll send v8 soon<div><br></div><div>Thanks,</div><div=
->Yuri</div></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"g=
-mail_attr">On Wed, May 6, 2020 at 8:37 AM Jason Wang &lt;<a href=3D"mailto:=
-jasowang@redhat.com">jasowang@redhat.com</a>&gt; wrote:<br></div><blockquot=
-e class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px s=
-olid rgb(204,204,204);padding-left:1ex"><br>
-On 2020/5/1 =E4=B8=8B=E5=8D=8812:01, Yuri Benditovich wrote:<br>
-&gt; Michael/Jason,<br>
-&gt;<br>
-&gt; As Linux headers was updated in qemu and now include RSC/RSS/Hash <br>
-&gt; definitions, please let me know what you prefer:<br>
-&gt; 1. You apply this series as is, then I submit clean-up series that <br=
->
-&gt; will remove all the redundant defines from virtio-net.c<br>
-&gt; 2. I post v8 of this series with cleanup of all the redundant defines =
-<br>
-&gt; and also RSC ones<br>
-&gt; 3. Something other<br>
-<br>
-<br>
-Hi Yuri:<br>
-<br>
-Though I&#39;ve queued this series but consider we have new headers, I thin=
-k <br>
-it&#39;s better to post v8.<br>
-<br>
-Thanks<br>
-<br>
-</blockquote></div>
-
---00000000000035b37d05a4f645eb--
+--=20
+Alex Benn=C3=A9e
 
