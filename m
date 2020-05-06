@@ -2,94 +2,85 @@ Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 685C2C28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 11:28:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7B5FC28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 11:32:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 328702073A
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 11:28:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A38B6206DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 11:32:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ueKYye/d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 328702073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IChv2S1C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A38B6206DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWIE2-0005tn-9w
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 07:28:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47266)
+	id 1jWII5-0007WD-Qq
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 07:32:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48078)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jWICM-00050R-U7
- for qemu-devel@nongnu.org; Wed, 06 May 2020 07:26:49 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:32773)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jWICL-0006PU-A5
- for qemu-devel@nongnu.org; Wed, 06 May 2020 07:26:46 -0400
-Received: by mail-wr1-x441.google.com with SMTP id h9so1776884wrt.0
- for <qemu-devel@nongnu.org>; Wed, 06 May 2020 04:26:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=9ajHyZDjj19qkaeavLFsEz0T72+60eTRBcrBi5UQEGA=;
- b=ueKYye/dWfysjaldofZJ3/lO/Ggt//0+JLr7A5R1Fnfx7JLYhI5Vjt9tsJSbVjjgpM
- QIM9XQAtMAEYydEf5faGR7THZ3BryRQeE7BMP6EhPbYkWyioCMypNPUVHPDQStPTn4PC
- rKhKQt/ucU/iFApPRape0H3mkxJNh3h2mYlHKhGBzoeotNdW2UtZzpGDaoIecgPz/rj+
- M/f5WmiLYx+8U2VyTDzIOmtFkVe2byqdxNZ4okGizYvcLaFTy1QNf3V88LNxpEvdH3s4
- 1lzDfNUE5+p1qkU8tXaFXFR4LdG1b+FGeTFc/SFnhmOltH7Z0WllSJQSj2I5M92gwNDo
- jYiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=9ajHyZDjj19qkaeavLFsEz0T72+60eTRBcrBi5UQEGA=;
- b=l+dV813rqg+IByDPMwgRI+JaBra6ub2+TrD3ACv0Q19rou+prCProT7dqUGUzq+h6u
- cXQr59FCzjHwa0OgEq7H8P3R+/qHsigIJj2mPDtMiME2RVrlE1CFGbAkYElqSOZdVOZ2
- rI32AT3GeS4kQQBYE0LwG1g9AJk/793t8U9dlbGCZFiaO7IgRpmQtnN7sTeycp5B4/6F
- GPRqEgmW3Qxqj38lprSOdqDVIdnXstcrA9r76PKCW05Zu49ObwpeP9V3KmAmvbgb+O0z
- Z7xbdNP0NveYH3hPHaVEzuYxAXvpK1UBrxC6Qd5QTLU/prl4li478llmS98QCzG5VtLC
- GA5A==
-X-Gm-Message-State: AGi0PuZuja8JPWwD2fmUmK/O1315Asp0mOCCghtMBwOpAjqQox+HsSPs
- cttLAXP3wTKkumkgWs6DREvn7A==
-X-Google-Smtp-Source: APiQypJLhuu5lgOu4bObuKexLgM+vWeNS8uyNtwjq1PMfIL25JEun7HrSQDuzjGo9RLZnZXYT1lRxQ==
-X-Received: by 2002:adf:e5ce:: with SMTP id a14mr8770742wrn.82.1588764403506; 
- Wed, 06 May 2020 04:26:43 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id c190sm2686177wme.10.2020.05.06.04.26.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 06 May 2020 04:26:41 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id DFB031FF7E;
- Wed,  6 May 2020 12:26:40 +0100 (BST)
-References: <CAHiYmc67UNCKt0fqaGtj9d+w+qTHc3pYONqD_xLQsOXhMhKRDQ@mail.gmail.com>
- <CAHiYmc4JuaPW7VsDiqK8ToZZzdBJhJjyKB-7614xts22p00RMQ@mail.gmail.com>
-User-agent: mu4e 1.4.4; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Subject: Re: [INFO] Some preliminary performance data
-In-reply-to: <CAHiYmc4JuaPW7VsDiqK8ToZZzdBJhJjyKB-7614xts22p00RMQ@mail.gmail.com>
-Date: Wed, 06 May 2020 12:26:40 +0100
-Message-ID: <87imh95mof.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jWIHI-00071i-Qv
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 07:31:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48943
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jWIHG-0006j9-N7
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 07:31:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588764709;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=h8SVk6eCS0C6IDx3Ix710FaAyICTcWjkz93EMRkG/PI=;
+ b=IChv2S1CxkyCBC3dfyiHSLB5Sex938D3Za1unL0JYYftJM2kR1OuJnplRf5H5r4x89GZyy
+ 6g3okV/ArVtbiF7cpew3SF8FQpFRT2Nv19CwW60jBvmnMc9854nedXhzJhPYcrJbZqFbOx
+ yoQv3cZBLhgp/KfSRCKmlJ48r8Jewes=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-46-6WqX1GxXNMyx7ldLvEjV0Q-1; Wed, 06 May 2020 07:31:47 -0400
+X-MC-Unique: 6WqX1GxXNMyx7ldLvEjV0Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6AEE880183C;
+ Wed,  6 May 2020 11:31:46 +0000 (UTC)
+Received: from gondolin (ovpn-112-211.ams2.redhat.com [10.36.112.211])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 64CAB63F90;
+ Wed,  6 May 2020 11:31:41 +0000 (UTC)
+Date: Wed, 6 May 2020 13:31:38 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v2 09/18] s390x/cpumodel: Fix UI to CPU features
+ pcc-cmac-{aes,eaes}-256
+Message-ID: <20200506133138.4443502c.cohuck@redhat.com>
+In-Reply-To: <20200505152926.18877-10-armbru@redhat.com>
+References: <20200505152926.18877-1-armbru@redhat.com>
+ <20200505152926.18877-10-armbru@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 04:02:22
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,155 +94,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, ahmedkhaledkaraman@gmail.com,
- "Emilio G . Cota" <cota@braap.org>, kraxel@redhat.com
+Cc: berrange@redhat.com, ehabkost@redhat.com,
+ David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ pbonzini@redhat.com, philmd@redhat.com, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue,  5 May 2020 17:29:17 +0200
+Markus Armbruster <armbru@redhat.com> wrote:
 
-Aleksandar Markovic <aleksandar.qemu.devel@gmail.com> writes:
+> Both s390_features[S390_FEAT_PCC_CMAC_AES_256].name and
+> s390_features[S390_FEAT_PCC_CMAC_EAES_256].name is
+> "pcc-cmac-eaes-256".  The former is obviously a pasto.
+> 
+> Impact:
+> 
+> * s390_feat_bitmap_to_ascii() misidentifies S390_FEAT_PCC_CMAC_AES_256
+>   as "pcc-cmac-eaes-256".  Affects QMP commands query-cpu-definitions,
+>   query-cpu-model-expansion, query-cpu-model-baseline,
+>   query-cpu-model-comparison, and the error message when
+>   s390_realize_cpu_model() fails in check_compatibility().
+> 
+> * s390_cpu_list() also misidentifies it.  Affects -cpu help.
+> 
+> * s390_cpu_model_register_props() creates CPU property
+>   "pcc-cmac-eaes-256" twice.  The second one fails, but the error is
+>   ignored (a later commit will change that).  Results in a single
+>   property "pcc-cmac-eaes-256" with the description for
+>   S390_FEAT_PCC_CMAC_AES_256, and no property for
+>   S390_FEAT_PCC_CMAC_EAES_256.  CPU properties are visible in CLI -cpu
+>   and -device, QMP & HMP device_add, QMP device-list-properties, and
+>   QOM introspection.
+> 
+> Fix by deleting the wayward 'e'.
+> 
+> Fixes: 782417446279717aa85320191a519b51f6d5dd31
 
-Some preliminary thoughts....
+I like the more standard
 
->> Hi, all.
->>
->> I just want to share with you some bits and pieces of data that I got
->> while doing some preliminary experimentation for the GSoC project "TCG
->> Continuous Benchmarking", that Ahmed Karaman, a student of the fourth fi=
-nal
->> year of Electical Engineering Faculty in Cairo, will execute.
->>
->> *User Mode*
->>
->>    * As expected, for any program dealing with any substantional
->> floating-point calculation, softfloat library will be the the heaviest C=
-PU
->> cycles consumer.
->>    * We plan to examine the performance behaviour of non-FP programs
->> (integer arithmetic), or even non-numeric programs (sorting strings, for
->> example).
+Fixes: 782417446279 ("s390x/cpumodel: introduce CPU features")
 
-Emilio was the last person to do extensive bench-marking on TCG and he
-used a mild fork of the venerable nbench:
+for that.
 
-  https://github.com/cota/dbt-bench
+> Cc: Halil Pasic <pasic@linux.ibm.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: qemu-s390x@nongnu.org
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  target/s390x/cpu_features_def.inc.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-as the hot code is fairly small it offers a good way of testing quality
-of the output. Larger programs will differ as they can involve more code
-generation.
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
->>
->> *System Mode*
->>
->>    * I did profiling of booting several machines using a tool called
->> callgrind (a part of valgrind). The tool offers pletora of information,
->> however it looks it is little confused by usage of coroutines, and that
->> makes some of its reports look very illogical, or plain ugly.
+I assume you'll take this one together with the rest of the series?
 
-Doesn't running through valgrind inherently serialise execution anyway?
-If you are looking for latency caused by locks we have support for the
-QEMU sync profiler built into the code. See "help sync-profile" on the HMP.
-
->> Still, it
->> seems valid data can be extracted from it. Without going into details, h=
-ere
->> is what it says for one machine (bear in mind that results may vary to a
->> great extent between machines):
-
-You can also use perf to use sampling to find hot points in the code.
-One of last years GSoC student wrote some patches that included the
-ability to dump a jit info file for perf to consume. We never got it
-merged in the end but it might be worth having a go at pulling the
-relevant bits out from:
-
-  Subject: [PATCH  v9 00/13] TCG code quality tracking and perf integration
-  Date: Mon,  7 Oct 2019 16:28:26 +0100
-  Message-Id: <20191007152839.30804-1-alex.bennee@linaro.org>
-
->>      ** The booting involved six threads, one for display handling, one
->> for emulations, and four more. The last four did almost nothing during
->> boot, just almost entire time siting idle, waiting for something. As far=
- as
->> "Total Instruction Fetch Count" (this is the main measure used in
->> callgrind), they were distributed in proportion 1:3 between display thre=
-ad
->> and emulation thread (the rest of threads were negligible) (but,
->> interestingly enough, for another machine that proportion was 1:20).
->>      ** The display thread is dominated by vga_update_display() function
->> (21.5% "self" time, and 51.6% "self + callees" time, called almost 40000
->> times). Other functions worth mentioning are
->> cpu_physical_memory_snapshot_get_dirty() and
->> memory_region_snapshot_get_dirty(), which are very small functions, but =
-are
->> both invoked over 26 000 000 times, and contribute with over 20% of disp=
-lay
->> thread instruction fetch count together.
-
-The memory region tracking code will end up forcing the slow path for a
-lot of memory accesses to video memory via softmmu. You may want to
-measure if there is a difference using one of the virtio based graphics
-displays.
-
->>      ** Focusing now on emulation thread, "Total Instruction Fetch Count=
-s"
->> were roughly distributed this way:
->>            - 15.7% is execution of GIT-ed code from translation block
->> buffer
->>            - 39.9% is execution of helpers
->>            - 44.4% is code translation stage, including some coroutine
->> activities
->>         Top two among helpers:
->>           - helper_le_stl_memory()
-
-I assume that is the MMU slow-path being called from the generated code.
-
->>           - helper_lookup_tb_ptr() (this one is invoked whopping 36 000
->> 000 times)
-
-This is an optimisation to avoid exiting the run-loop to find the next
-block. From memory I think the two main cases you'll see are:
-
- - computed jumps (i.e. target not known at JIT time)
- - jumps outside of the current page
-
->>         Single largest instruction consumer of code translation:
->>           - liveness_pass_1(), that constitutes 21.5% of the entire
->> "emulation thread" consumption, or, in other way, almost half of code
->> translation stage (that sits at 44.4%)
-
-This is very much driven by how much code generation vs running you see.
-In most of my personal benchmarks I never really notice code generation
-because I give my machines large amounts of RAM so code tends to stay
-resident so not need to be re-translated. When the optimiser shows up
-it's usually accompanied by high TB flush and invalidate counts in "info
-jit" because we are doing more translation that we usually do.
-
-I'll also mention my foray into tracking down the performance regression
-of DOSBox Doom:
-
-  https://diasp.eu/posts/8659062
-
-it presented a very nice demonstration of the increasing complexity (and
-run time) of the optimiser which was completely wasted due to
-self-modifying code causing us to regenerate code all the time.
-
->>
->> Please take all this with a little grain of salt, since these results are
->> just of preliminary nature.
->>
->> I would like to use this opportunity to welcome Ahmed Karaman, a talented
->> young man from Egypt, into QEMU development community, that'll work on "=
-TCG
->> Continuous Benchmarking" project this summer. Please do help them in his
->> first steps as our colleague. Best luck to Ahmed!
-
-Welcome to the QEMU community Ahmed. Feel free to CC me on TCG
-performance related patches. I like to see things go faster ;-)
-
---=20
-Alex Benn=C3=A9e
 
