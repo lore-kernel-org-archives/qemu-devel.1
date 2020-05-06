@@ -2,46 +2,46 @@ Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5739C47247
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 02:51:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B5A3C47247
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 03:06:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE4F420735
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 02:51:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE4F420735
+	by mail.kernel.org (Postfix) with ESMTPS id 229ED206E6
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 03:06:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 229ED206E6
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWA9a-0000Tw-Ty
-	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 22:51:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55620)
+	id 1jWANz-00039a-8k
+	for qemu-devel@archiver.kernel.org; Tue, 05 May 2020 23:06:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58094)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jWA8o-0008Uy-TZ
- for qemu-devel@nongnu.org; Tue, 05 May 2020 22:50:34 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40630)
+ id 1jWANN-0002jl-Cj
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 23:05:37 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45676)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jWA8n-00087O-Gq
- for qemu-devel@nongnu.org; Tue, 05 May 2020 22:50:34 -0400
+ id 1jWANM-0007Wl-21
+ for qemu-devel@nongnu.org; Tue, 05 May 2020 23:05:37 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jWA8l-00062e-EE
- for <qemu-devel@nongnu.org>; Wed, 06 May 2020 02:50:31 +0000
+ id 1jWANK-0000Bg-6G
+ for <qemu-devel@nongnu.org>; Wed, 06 May 2020 03:05:34 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6821B2E8104
- for <qemu-devel@nongnu.org>; Wed,  6 May 2020 02:50:31 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 2CF4C2E80E7
+ for <qemu-devel@nongnu.org>; Wed,  6 May 2020 03:05:34 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 06 May 2020 02:43:28 -0000
+Date: Wed, 06 May 2020 02:56:36 -0000
 From: xuan <1877015@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -52,16 +52,16 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: xavier-ding
 X-Launchpad-Bug-Reporter: xuan (xavier-ding)
 X-Launchpad-Bug-Modifier: xuan (xavier-ding)
-Message-Id: <158873300816.14142.15664636500998863138.malonedeb@gac.canonical.com>
-Subject: [Bug 1877015] [NEW] virtio only support packed ring size power of 2
- between 256 and 1024
+References: <158873300816.14142.15664636500998863138.malonedeb@gac.canonical.com>
+Message-Id: <158873379700.13253.13216768981471973072.launchpad@gac.canonical.com>
+Subject: [Bug 1877015] Re: virtio only support packed ring size power of 2
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 99d89655fb9b7ba7feaed518721cf59845aab8ad
+X-Launchpad-Hash: 88111d4d020ae5a8e4c4a41c16adb45d7f361b56
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 22:50:31
@@ -89,23 +89,10 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+** Summary changed:
 
-Issue discription=EF=BC=9A
-When QEMU starts with "-device virtio-net-pci,netdev=3Dnetdev0,mac=3D52:54:=
-00:00:00:01,disable-modern=3Dfalse,mrg_rxbuf=3Don,rx_queue_size=3D1025,tx_q=
-ueue_size=3D1025,mq=3Don,vectors=3D15,packed=3Don"
-
-It raises error: Invalid rx_queue_size (=3D 1025), must be a power of 2
-between 256 and 1024
-
-Analysis:
-According to virtio1.1 spec, the packed queue size value does not have to b=
-e a power of 2.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+- virtio only support packed ring size power of 2 between 256 and 1024
++ virtio only support packed ring size power of 2
 
 -- =
 
@@ -114,7 +101,7 @@ devel-ml, which is subscribed to QEMU.
 https://bugs.launchpad.net/bugs/1877015
 
 Title:
-  virtio only support packed ring size power of 2 between 256 and 1024
+  virtio only support packed ring size power of 2
 
 Status in QEMU:
   New
