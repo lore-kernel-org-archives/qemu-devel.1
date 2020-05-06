@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3117C28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 17:05:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 637E6C28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 17:14:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79A352080D
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 17:05:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2BED02080D
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 17:14:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dD3C+dOn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79A352080D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y1bY6MGL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BED02080D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWNU5-0005iq-Jt
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 13:05:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38202)
+	id 1jWNcR-0000tG-9v
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 13:14:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40472)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jWNTS-0005Ce-EJ
- for qemu-devel@nongnu.org; Wed, 06 May 2020 13:04:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50731
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jWNbo-0000HA-MR
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 13:13:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58870
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jWNTR-0002zL-1n
- for qemu-devel@nongnu.org; Wed, 06 May 2020 13:04:45 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jWNbm-0007Do-KL
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 13:13:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588784683;
+ s=mimecast20190719; t=1588785201;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=fnTjtNSNb0AbHn8SrQy1JNLz80nxdr3J1Bj3DEEqPtc=;
- b=dD3C+dOnAuDRU41YHiNbSgy4lfY05iohtJNWofTVeK2tnUHIwpj6TAoZNwLMeeCnFx3PI/
- WSYgO/AErz+L3EN/jV8fREMn2ofu2Vo3GhbGR4TryHUBxBz3GF+y7H9AA/Ci9H3DIxgNgx
- S4UhI8q+KXOAObuvrL6KY6g+CU3H07g=
+ bh=Uuqm2kQe56o2Z4gEs36I57dNoAY0o5xOxbAZ7adebRA=;
+ b=Y1bY6MGLEKORlIQ7+ER4DqsUPsOPcZMR48xHet/K5RY9ed9uUta93nZgg2MWPhtso9o/5x
+ SmPDVqPkBqy2iRluFI/y+y+XCwuqoBIGoV1bH4tqdGHXJCZtG7Ffe7pxKCP3Mnge2tsqA3
+ 1JlTLHOMVhS+f56tCeelyUU+XkBZRD8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-216-2Ky2At4VP06JcWaPltMKOw-1; Wed, 06 May 2020 13:04:41 -0400
-X-MC-Unique: 2Ky2At4VP06JcWaPltMKOw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-318-j1QQdrSJOPyOKsnPHvzZRQ-1; Wed, 06 May 2020 13:13:19 -0400
+X-MC-Unique: j1QQdrSJOPyOKsnPHvzZRQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 24F2A39346;
- Wed,  6 May 2020 17:04:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9032D18FF661;
+ Wed,  6 May 2020 17:13:18 +0000 (UTC)
 Received: from linux.fritz.box (ovpn-113-140.ams2.redhat.com [10.36.113.140])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 845F56E71F;
- Wed,  6 May 2020 17:04:27 +0000 (UTC)
-Date: Wed, 6 May 2020 19:04:26 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 62E8E5C1B5;
+ Wed,  6 May 2020 17:13:17 +0000 (UTC)
+Date: Wed, 6 May 2020 19:13:15 +0200
 From: Kevin Wolf <kwolf@redhat.com>
 To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [PATCH v3 26/33] block: Use child_of_bds in remaining places
-Message-ID: <20200506170426.GI6333@linux.fritz.box>
+Subject: Re: [PATCH v3 32/33] block: Pass BdrvChildRole in remaining cases
+Message-ID: <20200506171315.GJ6333@linux.fritz.box>
 References: <20200218124242.584644-1-mreitz@redhat.com>
- <20200218124242.584644-27-mreitz@redhat.com>
+ <20200218124242.584644-33-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200218124242.584644-27-mreitz@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200218124242.584644-33-mreitz@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
@@ -99,29 +99,31 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Am 18.02.2020 um 13:42 hat Max Reitz geschrieben:
-> Replace child_file by child_of_bds in all remaining places (excluding
-> tests).
+> These calls have no real use for the child role yet, but it will not
+> harm to give one.
+>=20
+> Notably, the bdrv_root_attach_child() call in blockjob.c is left
+> unmodified because there is not much the generic BlockJob object wants
+> from its children.
 >=20
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> diff --git a/block/blkreplay.c b/block/blkreplay.c
-> index f97493f45a..71628f4d56 100644
-> --- a/block/blkreplay.c
-> +++ b/block/blkreplay.c
-> @@ -27,8 +27,9 @@ static int blkreplay_open(BlockDriverState *bs, QDict *=
-options, int flags,
->      int ret;
-> =20
->      /* Open the image file */
-> -    bs->file =3D bdrv_open_child(NULL, options, "image",
-> -                               bs, &child_file, 0, false, &local_err);
-> +    bs->file =3D bdrv_open_child(NULL, options, "image", bs, &child_of_b=
-ds,
-> +                               BDRV_CHILD_DATA | BDRV_CHILD_PRIMARY,
-> +                               false, &local_err);
+> diff --git a/block/vvfat.c b/block/vvfat.c
+> index 8f4ff5a97e..d4f4218924 100644
+> --- a/block/vvfat.c
+> +++ b/block/vvfat.c
+> @@ -3186,7 +3186,7 @@ static int enable_write_target(BlockDriverState *bs=
+, Error **errp)
+>      options =3D qdict_new();
+>      qdict_put_str(options, "write-target.driver", "qcow");
+>      s->qcow =3D bdrv_open_child(s->qcow_filename, options, "write-target=
+", bs,
+> -                              &child_vvfat_qcow, 0, false, errp);
+> +                              &child_vvfat_qcow, BDRV_CHILD_DATA, false,=
+ errp);
 
-Why isn't blkreplay a filter?
+Doesn't it contain metadata, too?
 
 Kevin
 
