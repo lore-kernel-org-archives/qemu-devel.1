@@ -7,77 +7,76 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53334C28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 18:13:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 692D7C4724C
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 18:14:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D62D20735
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 18:13:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 38AFB2078C
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 18:14:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M16bWsto"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D62D20735
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f6A4yzPC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38AFB2078C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWOXf-0004Wn-5M
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 14:13:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56298)
+	id 1jWOZ9-0005br-44
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 14:14:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57058)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jWOWO-00040v-OH
- for qemu-devel@nongnu.org; Wed, 06 May 2020 14:11:52 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52545
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jWOYR-00056p-3q
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 14:13:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36721
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jWOWO-0000A0-34
- for qemu-devel@nongnu.org; Wed, 06 May 2020 14:11:52 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jWOYQ-0003Wf-8d
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 14:13:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588788711;
+ s=mimecast20190719; t=1588788837;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1GItoqWGMgAlUvSgr9EIgF/U2dcag+tFnpsip8SswFc=;
- b=M16bWstoRCBlVWOB1yqyBMpOo+R9eHNeup0Clzxmf6efGqGPyf+rTsbwUqTNjCnH8Va1Iz
- XPo2C4V1BwpwBVNxEjfhazwDLQkqyDfQfqys9EkfFblKISiVm8OCyriHOAU8W2LgzddPGr
- 2ydSD5G7fX68DWh8o05yzWobC0T72bI=
+ bh=lVQ5Vb9c6MYoArPJ9NN/qS0gONz2R7VI2he2JbeQdz4=;
+ b=f6A4yzPClRjj7yaxuOb1Pbijfp+uyER0xRINhAbc6iVL643SqBUXGXerZFZ9W5/3Wo66/m
+ V2MZZ4yBqTGu6xX2FzxKa0lHt/hxCN2omH7G8rv9Zi2WOaitiiN+8AMez/d9tvWc2ZeUww
+ jJZggBG9Fwxog+7vb4/cx/jHdBRWeTw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-470-I4H5QNbhMuaUO40NNh2nag-1; Wed, 06 May 2020 14:11:47 -0400
-X-MC-Unique: I4H5QNbhMuaUO40NNh2nag-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-184-vqW8tCc5PxG5zZlt6U8-ug-1; Wed, 06 May 2020 14:13:53 -0400
+X-MC-Unique: vqW8tCc5PxG5zZlt6U8-ug-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D9FA1005510;
- Wed,  6 May 2020 18:11:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A782107ACF2;
+ Wed,  6 May 2020 18:13:52 +0000 (UTC)
 Received: from [10.3.114.73] (ovpn-114-73.phx2.redhat.com [10.3.114.73])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1425962952;
- Wed,  6 May 2020 18:11:44 +0000 (UTC)
-Subject: Re: [PATCH v5 29/31] qcow2: Assert that expand_zero_clusters_in_l1()
- does not support subclusters
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AA82960FB9;
+ Wed,  6 May 2020 18:13:51 +0000 (UTC)
+Subject: Re: [PATCH v5 30/31] qcow2: Add subcluster support to qcow2_measure()
 To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 References: <cover.1588699789.git.berto@igalia.com>
- <7254228f69935c1802b2a16b2e77121fa6a46d5a.1588699789.git.berto@igalia.com>
+ <04394b984ec09146373ad6a23996423bcfffdb19.1588699789.git.berto@igalia.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <69094e7a-0f9b-940a-a818-8deae2d3c596@redhat.com>
-Date: Wed, 6 May 2020 13:11:44 -0500
+Message-ID: <39aaec0f-e81f-16c9-986d-f2c06aae8fd2@redhat.com>
+Date: Wed, 6 May 2020 13:13:51 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <7254228f69935c1802b2a16b2e77121fa6a46d5a.1588699789.git.berto@igalia.com>
+In-Reply-To: <04394b984ec09146373ad6a23996423bcfffdb19.1588699789.git.berto@igalia.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 05:50:09
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 04:02:22
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -106,19 +105,18 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 5/5/20 12:38 PM, Alberto Garcia wrote:
-> This function is only used by qcow2_expand_zero_clusters() to
-> downgrade a qcow2 image to a previous version. It is however not
-> possible to downgrade an image with extended L2 entries because older
-> versions of qcow2 do not have this feature.
+> Extended L2 entries are bigger than normal L2 entries so this has an
+> impact on the amount of metadata needed for a qcow2 file.
 > 
 > Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
 > ---
->   block/qcow2-cluster.c      | 8 +++++++-
->   tests/qemu-iotests/061     | 6 ++++++
->   tests/qemu-iotests/061.out | 5 +++++
->   3 files changed, 18 insertions(+), 1 deletion(-)
+>   block/qcow2.c | 19 ++++++++++++-------
+>   1 file changed, 12 insertions(+), 7 deletions(-)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Should this be hoisted earlier in the series, before 28/31?
+
+Should there be iotest coverage?
 
 -- 
 Eric Blake, Principal Software Engineer
