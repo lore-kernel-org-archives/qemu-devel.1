@@ -2,123 +2,87 @@ Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A630FC28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 08:03:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92C1CC28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 08:03:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 766502075A
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 08:03:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5DFC220661
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 08:03:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="hgqCGfHr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 766502075A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ieKVMA1P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DFC220661
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWF1O-0000kj-K4
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 04:03:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34174)
+	id 1jWF1i-0001IQ-JT
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 04:03:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34226)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1jWF0E-0008B8-Ry; Wed, 06 May 2020 04:02:02 -0400
-Received: from mail-am6eur05on2115.outbound.protection.outlook.com
- ([40.107.22.115]:34625 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1jWF0A-0003Xs-Ht; Wed, 06 May 2020 04:02:01 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JplGCLFsbj0ZSp7CerPg/E/TbEEwJAjti66a6XRnyPFLDjJNqSWanU/PuvzeFh11gcKEETKjpNOQ54xQ1dQ8dr63vE+bC8YEbz5ud0gBELq8r6V52p6iRRh6Y6SkcpWGNbeWj/dBeiFcvrQEL3o4hAyh2PtzteBVesrb+PPngBtqQMelkO2GN8TOzzw97+3Jn+gZz3jXyl1hLR2vRSLas6zJmqOIFC50p74dthsMtfZ0w4T+c+ZuJlMN8Vxk1egTH/0lTvPRmMQYYBf8ZcQpIjjTgfzatbJS+uKp9CGN77ITZvUkojVurQLnKkfrrpTSuJIQbaRAdr9CD8NW0l7ZdA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C22ZRWHBXIL50ZzE/IVHo4wa3tAr4EFzOGPq6rHO8zA=;
- b=WDFHrbbhbSoMM8bQRkPUO59ZvV/Ej5vaeNFAx4n8WQHO38AAsYPa3D0s0EU7hwtkkQi7MYZs1lfmXNr9tCZlesbWHa3HLI6pbLFWzVeQ55LmukmpQX2wbUAuW4xnFjQKlmyQ4m7UJyznla/1BA5hymeZ+R8MzB3S51BktqYBfLlEZG8yK9D6AgWSyKORpdv60c7kXrFDQA9JI2EGG7FFlzJlB6QBad+Y485c5xyajjPd117S8dK70fuMy6u8kPtqDhuqXiCEGY3xIbOOJ1D6QUm0DHHSPQgoMi4kXWV4eQBJXFgxuyvSbuTCDpA2j0StkU7cFwihpiUNLhJxlKw+tQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C22ZRWHBXIL50ZzE/IVHo4wa3tAr4EFzOGPq6rHO8zA=;
- b=hgqCGfHryOZ++AzI/DHFAQaemViji5spI74tX3BsgFFgS+0FmDj1Ar7MF574rP/6ivQDwlu+D9O6N+5/XaT7lc2XtGG9ot0FwD3p8EQzvclDGWK5jTCKB7B+ULfjuMdkoBvktbtnV3nx5Xr5QY+/x3dp80ZQCylCN/wGqL9G6rg=
-Authentication-Results: igalia.com; dkim=none (message not signed)
- header.d=none;igalia.com; dmarc=none action=none header.from=virtuozzo.com;
-Received: from VI1PR08MB3760.eurprd08.prod.outlook.com (2603:10a6:803:c1::27)
- by VI1PR08MB4447.eurprd08.prod.outlook.com (2603:10a6:803:f3::16)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.27; Wed, 6 May
- 2020 08:01:52 +0000
-Received: from VI1PR08MB3760.eurprd08.prod.outlook.com
- ([fe80::acf5:3103:8e4d:af20]) by VI1PR08MB3760.eurprd08.prod.outlook.com
- ([fe80::acf5:3103:8e4d:af20%7]) with mapi id 15.20.2979.027; Wed, 6 May 2020
- 08:01:52 +0000
-Subject: Re: [PATCH v23 0/4] implement zstd cluster compression method
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-References: <20200430101918.30351-1-dplotnikov@virtuozzo.com>
- <8f4de4c5-f88d-5693-2327-309ccfc325ff@redhat.com>
- <ebc9d7e5-af1b-fee8-b76f-fb6bc75dc987@redhat.com>
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Message-ID: <e839211c-ae2b-4227-8e69-a9174eb13ffe@virtuozzo.com>
-Date: Wed, 6 May 2020 11:01:48 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-In-Reply-To: <ebc9d7e5-af1b-fee8-b76f-fb6bc75dc987@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-ClientProxiedBy: AM0PR04CA0014.eurprd04.prod.outlook.com
- (2603:10a6:208:122::27) To VI1PR08MB3760.eurprd08.prod.outlook.com
- (2603:10a6:803:c1::27)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jWF0d-0000Gw-HP
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 04:02:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36859
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jWF0c-0003bp-Hj
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 04:02:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588752145;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gy4/cXnuZIzW+1E2KKNGMftszP7qbd4WisGOHmTgO7U=;
+ b=ieKVMA1PYtncoRRkeSauhiA9VfCGzrwCOACdgI8xxGggH5eH/DoYE57WEgMm2vL7aKi6rF
+ sGxQXuvqgPFijkh2LzPpxv/2rkjRj19cHN60VPpSoEQpE3/xtcuZoRdOYmQ59sS+89cmeA
+ QHRH4DqKpTyqfufmK5BE5ZBN1ec8dIo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-348-zxBZFQMsOSGEx2Ndw2uNsA-1; Wed, 06 May 2020 04:02:21 -0400
+X-MC-Unique: zxBZFQMsOSGEx2Ndw2uNsA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1404D80058A;
+ Wed,  6 May 2020 08:02:20 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-113-140.ams2.redhat.com [10.36.113.140])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7EAD8707A0;
+ Wed,  6 May 2020 08:02:18 +0000 (UTC)
+Date: Wed, 6 May 2020 10:02:16 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v2 3/4] backup: Make sure that source and target size match
+Message-ID: <20200506080216.GA6333@linux.fritz.box>
+References: <20200430142755.315494-1-kwolf@redhat.com>
+ <20200430142755.315494-4-kwolf@redhat.com>
+ <d5de1915-523b-fbdb-2ebe-8c31cf0e0cdf@virtuozzo.com>
+ <20200505100334.GH5759@linux.fritz.box>
+ <f91f3d3d-5c20-dfde-c9e0-506f8618c585@virtuozzo.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.1.64] (178.34.160.183) by
- AM0PR04CA0014.eurprd04.prod.outlook.com (2603:10a6:208:122::27) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.20 via Frontend
- Transport; Wed, 6 May 2020 08:01:50 +0000
-X-Originating-IP: [178.34.160.183]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 17eb8fee-66b9-4524-0de0-08d7f193bc51
-X-MS-TrafficTypeDiagnostic: VI1PR08MB4447:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR08MB4447F56996992278472B5400CFA40@VI1PR08MB4447.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2657;
-X-Forefront-PRVS: 03950F25EC
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ho5rpBu4QiJ0l3pg2KF6mtlycFWejhu/BQQO7z6DgJFKX2om72LvC5y5MAH1+kQILZ0DSSR520utgTvcSiGP1+mAuYXk4m1K1HlqkJqFHlNhmiNtILsbxVgXQC25hh6F3ERKgbFl2Tb/BKlzsTCwNVgTUTwog7JEOAwpkr1qsCJr/rVjoCFRDHlpSAshFwn6wxYKW4RZk7lYNWbroIq9akUGzHjaurCLWKSlg56eLKQSAgfq7QP409kie2ukh3swz6Nk9jH12Szv7MRXhCtjqAgMBHGreoCLW532pTyTJSpA5t3asN5VdgW9a4DHsYWbvIdSlKy2vcQo691jpzIApSn2eCvRiSZi8Ij8R1F6sQt5dpmHxRqtlyZxpDDtnf+hF7hlBo6FOyOUxDJZQcOXWcF1ivxOqKQRVfhUsMjkBhTj0GJA5asJOp3Ngz6lwblAJ9lvaTlGNjJ/nDh4+tOlqgDzoUICCExvmg2+ji95PwW/XstRe7e99yI/LvE6aiIRQnWLS76kVixBrHq10U1RA36XfEk6BUCn0t2u7PynWE1yiOTWHnPeb2RpLErwc8zE
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:VI1PR08MB3760.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(396003)(39830400003)(136003)(366004)(346002)(376002)(33430700001)(6486002)(2616005)(956004)(36756003)(16576012)(5660300002)(4326008)(16526019)(33440700001)(186003)(8936002)(2906002)(52116002)(31696002)(8676002)(26005)(86362001)(66946007)(31686004)(316002)(66556008)(478600001)(53546011)(66476007)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: lpuZlfdLp5kWG6RDIFdhWh1RILdz71sUmpp00qAsez6Wy153vtoz51z4TB5eyyVqlkrhi+Si2nC2QCMGOlQDTX8HJIrBDdbstZiL2nBPjtL9D5i99J0aPZ+/AJn8mIffgL2BHGgFoZY95L6DAoKxNf0PNwKDfHXWMGhXXnZpsgKIlKbHup4LCcg4V1/eDImdyj4RbJfQ7ecK0pwDUuUz/5fIl05HrnRJYvMv9OffCZnpT7YmL/1D7HThp1WSpIEqNnCMCGrYMYIVbeYRYE24RDLxAdcbO/ka4uEsUQTK7VWpN+vzuRunSq/7A71o9Fqi2Ul1+vntAIzr74h0JPLxXqZTaAAMenXkLB69ktYkhDDYJPQtmxTSoLrTshPy7jX9FHEaz/pSHhT9R/kwx/ty2SssjVXHG7hI8XHu8SpPFAwn4VBM7tiGGue0rbMWml6izl8NOdbqLU6/bNnN29ZccwbipqAOTLhpySaFEGrOlmPGa0FHErKLdR+gyC++zfYCzh7kFWYJj5a7UshbzLCTNx/1pGH4Di4Lx6YS1b/jKWbcgwcLJTTOM+nTgQ71Il4HxdhYFvTRrOjKwLLqNadTACipIAipplAA181U6WY/ysYW1P3eufVcRKJcH9SDHvRNeEpq9WJPzdvxLDQbRpA6yAjjpgQKZ3EoQ5oVsVLoqhR5NJeFoYJOWd5mbnhDp2izSB7fwzDR1SVG3WoYYyMGKGxrzZsSsYGH4gjqBtaw8y2sGxQCQU0+bwDi6umgF6CEdMmhKfQ/v5x0F9WKkZM2Yls51ked62a2YDUN218AVz4=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 17eb8fee-66b9-4524-0de0-08d7f193bc51
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2020 08:01:52.0388 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yzcz2utYT13BX5vajhGXbQF4EyO0/JLzqNmjASfTbD5DZknl1UK9j67DH6IJq0CLvvyiE5A1xrOH4G5vpcSQdJhHcT49kglbujo4M7NT0VM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB4447
-Received-SPF: pass client-ip=40.107.22.115;
- envelope-from=dplotnikov@virtuozzo.com;
- helo=EUR05-AM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 04:01:53
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -24
-X-Spam_score: -2.5
+In-Reply-To: <f91f3d3d-5c20-dfde-c9e0-506f8618c585@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 04:02:22
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001, T_DKIM_INVALID=0.01,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -132,69 +96,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
- qemu-block@nongnu.org, armbru@redhat.com, den@openvz.org
+Cc: jsnow@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Am 06.05.2020 um 08:07 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> 05.05.2020 13:03, Kevin Wolf wrote:
+> > Am 30.04.2020 um 20:21 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> > > 30.04.2020 17:27, Kevin Wolf wrote:
+> > > > Since the introduction of a backup filter node in commit 00e30f05d,=
+ the
+> > > > backup block job crashes when the target image is smaller than the
+> > > > source image because it will try to write after the end of the targ=
+et
+> > > > node without having BLK_PERM_RESIZE. (Previously, the BlockBackend =
+layer
+> > > > would have caught this and errored out gracefully.)
+> > > >=20
+> > > > We can fix this and even do better than the old behaviour: Check th=
+at
+> > > > source and target have the same image size at the start of the bloc=
+k job
+> > > > and unshare BLK_PERM_RESIZE. (This permission was already unshared
+> > > > before the same commit 00e30f05d, but the BlockBackend that was use=
+d to
+> > > > make the restriction was removed without a replacement.) This will
+> > > > immediately error out when starting the job instead of only when wr=
+iting
+> > > > to a block that doesn't exist in the target.
+> > > >=20
+> > > > Longer target than source would technically work because we would n=
+ever
+> > > > write to blocks that don't exist, but semantically these are invali=
+d,
+> > > > too, because a backup is supposed to create a copy, not just an ima=
+ge
+> > > > that starts with a copy.
+> > > >=20
+> > > > Fixes: 00e30f05de1d19586345ec373970ef4c192c6270
+> > > > Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1778593
+> > > > Cc: qemu-stable@nongnu.org
+> > > > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > >=20
+> > > I'm OK with it as is, as it fixes bug:
+> > >=20
+> > > Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> > >=20
+> > > still, some notes below
+> > >=20
+> > >=20
+> > > > ---
+> > > >    block/backup-top.c | 14 +++++++++-----
+> > > >    block/backup.c     | 14 +++++++++++++-
+> > > >    2 files changed, 22 insertions(+), 6 deletions(-)
+> > > >=20
+> > > > diff --git a/block/backup-top.c b/block/backup-top.c
+> > > > index 3b50c06e2c..79b268e6dc 100644
+> > > > --- a/block/backup-top.c
+> > > > +++ b/block/backup-top.c
+> > > > @@ -148,8 +148,10 @@ static void backup_top_child_perm(BlockDriverS=
+tate *bs, BdrvChild *c,
+> > > >             *
+> > > >             * Share write to target (child_file), to not interfere
+> > > >             * with guest writes to its disk which may be in target =
+backing chain.
+> > > > +         * Can't resize during a backup block job because we check=
+ the size
+> > > > +         * only upfront.
+> > > >             */
+> > > > -        *nshared =3D BLK_PERM_ALL;
+> > > > +        *nshared =3D BLK_PERM_ALL & ~BLK_PERM_RESIZE;
+> > > >            *nperm =3D BLK_PERM_WRITE;
+> > > >        } else {
+> > > >            /* Source child */
+> > > > @@ -159,7 +161,7 @@ static void backup_top_child_perm(BlockDriverSt=
+ate *bs, BdrvChild *c,
+> > > >            if (perm & BLK_PERM_WRITE) {
+> > > >                *nperm =3D *nperm | BLK_PERM_CONSISTENT_READ;
+> > > >            }
+> > > > -        *nshared &=3D ~BLK_PERM_WRITE;
+> > > > +        *nshared &=3D ~(BLK_PERM_WRITE | BLK_PERM_RESIZE);
+> > > >        }
+> > > >    }
+> > > > @@ -192,11 +194,13 @@ BlockDriverState *bdrv_backup_top_append(Bloc=
+kDriverState *source,
+> > > >    {
+> > > >        Error *local_err =3D NULL;
+> > > >        BDRVBackupTopState *state;
+> > > > -    BlockDriverState *top =3D bdrv_new_open_driver(&bdrv_backup_to=
+p_filter,
+> > > > -                                                 filter_node_name,
+> > > > -                                                 BDRV_O_RDWR, errp=
+);
+> > > > +    BlockDriverState *top;
+> > > >        bool appended =3D false;
+> > > > +    assert(source->total_sectors =3D=3D target->total_sectors);
+> > >=20
+> > > May be better to error-out, just to keep backup-top independent. Stil=
+l, now it's not
+> > > really needed, as we have only one caller. And this function have to =
+be refactored
+> > > anyway, when publishing this filter (open() and close() should appear=
+, so this code
+> > > will be rewritten anyway.)
+> >=20
+> > Yes, the whole function only works because it's used in this restricted
+> > context today. For example, we only know that total_sectors is up to
+> > date because the caller has called bdrv_getlength() just a moment ago.
+> >=20
+> > I think fixing this would be beyond the scope of this patch, but
+> > certainly a good idea anyway.
+> >=20
+> > > And the other thought: the permissions we declared above, will be act=
+ivated only after
+> > > successful bdrv_child_refresh_perms(). I think some kind of race is p=
+ossible, so that
+> > > size is changed actual permission activation. So, may be good to doub=
+le check sizes after
+> > > bdrv_child_refresh_perms().. But it's a kind of paranoia.
+> >=20
+> > We're not in coroutine context, so we can't yield. I don't see who coul=
+d
+> > change the size in parallel (apart from an external process, but an
+> > external process can mess up anything).
+> >=20
+> > When we make backup-top an independent driver, instead of double
+> > checking (what would you do on error?), maybe we could move the size
+> > initialisation (then with bdrv_getlength()) to after
+> > bdrv_child_refresh_perms().
+> >=20
+> > > Also, third thought: the restricted permissions doesn't save us from =
+resizing
+> > > of the source through exactly this node, does it? Hmm, but your test =
+works somehow. But
+> > > (I assume) it worked in a previous patch version without unsharing on=
+ source..
+> > >=20
+> > > Ha, but bdrv_co_truncate just can't work on backup-top, because it do=
+esn't have file child.
+> > > But, if we fix bdrv_co_truncate to skip filters, we'll need to define=
+ .bdrv_co_truncate in
+> > > backup_top, which will return something like -EBUSY.. Or just -ENOTSU=
+P, doesn't matter.
+> >=20
+> > Maybe this is a sign that bdrv_co_truncate shouldn't automatically skip
+> > filters because filters might depend on a fixed size?
+> >=20
+> > Or we could make the automatic skipping depend on having BLK_PERM_RESIZ=
+E
+> > for the child. If the filter doesn't have the permission, we must not
+> > call truncate for its child (it would crash). Then backup-top and
+> > similar filters must just be careful not to take RESIZE permissions.
+> >=20
+>=20
+> Hmm this should work.. Still it's a workaround, seems out of the
+> concept of permission system..
 
+I'm not sure about this. I see the problem more with unconditionally
+skipping the filter without checking whether the operation is even
+allowed on the filtered child.
 
-On 05.05.2020 15:03, Max Reitz wrote:
-> On 05.05.20 12:26, Max Reitz wrote:
->> On 30.04.20 12:19, Denis Plotnikov wrote:
->>> v23:
->>>     Undecided: whether to add zstd(zlib) compression
->>>                details to the qcow2 spec
->>>     03: tighten assertion on zstd decompression [Eric]
->>>     04: use _rm_test_img appropriately [Max]
->> Thanks, applied to my block branch:
-> I’m afraid I have to unqueue this series again, because it makes many
-> iotests fail due to an additional “compression_type=zlib” output when
-> images are created, an additional “compression type” line in
-> qemu-img info output where format-specific information is not
-> suppressed, and an additional line in qemu-img create -f qcow2 -o help.
->
-> Max
->
+> I think, that the problem is that .bdrv_top_child_perm can't return an
+> error.  The handler answers the question:
+>=20
+> - Hi, we are your owners and we want the following cumulative
+> permissions on you. Then, which permissions do you want on your child?
+>=20
+> And the handler can't answer: "Hi, you guys want too much, I refuse to
+> play by your rules"..
 
-Hmm, this is strange. I made some modifications for the tests
-in 0001 of the series (qcow2: introduce compression type feature).
+It can implement .bdrv_check_perm to do that. It's just a bit more work
+for each driver to do that.
 
-Among the other test related changes, the patch contains the hunk:
+Kevin
 
-+++ b/tests/qemu-iotests/common.filter
-@@ -152,7 +152,8 @@ _filter_img_create()
-          -e "s# refcount_bits=[0-9]\\+##g" \
-          -e "s# key-secret=[a-zA-Z0-9]\\+##g" \
-          -e "s# iter-time=[0-9]\\+##g" \
--        -e "s# force_size=\\(on\\|off\\)##g"
-+        -e "s# force_size=\\(on\\|off\\)##g" \
-+        -e "s# compression_type=[a-zA-Z0-9]\\+##g"
-  }
-
-which has to filter out "compression_type" on image creation.
-
-But you say that you can see the "compression_type" on the image creation.
-May be the patch wasn't fully applied? Or the test related modification 
-were omitted?
-
-I've just re-based the series on top of:
-
-681b07f4e76dbb700c16918d (vanilla/master, mainstream)
-Merge: a2261b2754 714eb0dbc5
-Author: Peter Maydell <peter.maydell@linaro.org>
-Date:   Tue May 5 15:47:44 2020 +0100
-
-and run the tests with 'make check-block'
-
-and got the following:
-
-Not run: 071 099 184 220 259 267
-Some cases not run in: 030 040 041
-Passed all 113 iotests
-
-May be I do something wrong?
-
-Denis
 
