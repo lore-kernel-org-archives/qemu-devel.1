@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DD3DC47258
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 08:21:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1D90C47258
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 08:23:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 622D220735
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 08:21:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 622D220735
+	by mail.kernel.org (Postfix) with ESMTPS id 8AF12206E6
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 08:23:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AF12206E6
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=andreas-weller.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWFJQ-0008Pq-I2
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 04:21:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37584)
+	id 1jWFKx-0002Cl-LA
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 04:23:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37568)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jWFIR-000771-5f
- for qemu-devel@nongnu.org; Wed, 06 May 2020 04:20:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41816)
+ id 1jWFIM-00076R-Fs
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 04:20:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41696)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jWFIQ-0003Rh-3o
- for qemu-devel@nongnu.org; Wed, 06 May 2020 04:20:50 -0400
+ id 1jWFIK-0003LM-65
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 04:20:46 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jWFIN-0005gs-7V
- for <qemu-devel@nongnu.org>; Wed, 06 May 2020 08:20:47 +0000
+ id 1jWFIJ-0005d3-7W
+ for <qemu-devel@nongnu.org>; Wed, 06 May 2020 08:20:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 371562E8104
- for <qemu-devel@nongnu.org>; Wed,  6 May 2020 08:20:47 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 347472E8104
+ for <qemu-devel@nongnu.org>; Wed,  6 May 2020 08:20:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 06 May 2020 08:09:13 -0000
+Date: Wed, 06 May 2020 08:02:13 -0000
 From: Andreas Weller <weller@andreas-weller.de>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -55,7 +55,7 @@ X-Launchpad-Bug-Commenters: weller-andreas-weller
 X-Launchpad-Bug-Reporter: Andreas Weller (weller-andreas-weller)
 X-Launchpad-Bug-Modifier: Andreas Weller (weller-andreas-weller)
 References: <158875190128.5304.17617014708809905297.malonedeb@soybean.canonical.com>
-Message-Id: <158875255399.6281.16356173978063938412.malone@soybean.canonical.com>
+Message-Id: <158875213399.13722.11947616465793382122.malone@gac.canonical.com>
 Subject: [Bug 1877052] Re: KVM Win 10 guest pauses after kernel upgrade
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -63,7 +63,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 9f99e6645580f646cc2d72a5c637f4e25caa9a79
+X-Launchpad-Hash: 373c4a1ec80c47911e0d8d8ed109c68902eb30a9
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 04:05:47
@@ -91,13 +91,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Attachment added: "VM's XML configuration file"
-   https://bugs.launchpad.net/qemu/+bug/1877052/+attachment/5367249/+files/=
-win10.xml
+** Attachment added: "History.log from apt"
+   https://bugs.launchpad.net/qemu/+bug/1877052/+attachment/5367245/+files/=
+history.log
 
-** Also affects: qemu (Ubuntu)
-   Importance: Undecided
-       Status: New
+** Description changed:
+
+- =
+
+  Hello!
+  Unfortunately the bug has apparently reappeared. I have a Windows 10 runn=
+ing in a VM, which after my today's "apt upgrade" goes into pause mode afte=
+r a few seconds of running time.
+  =
+
+  Until yesterday it used to work and I was able to boot the VM. During
+  the kernel update (from 5.4.0-28.33 to 5.4.0-29.34) the VM was active
+  and then went into pause mode. Even after a reboot of my host system the
+  problem still persists: the VM boots for a few seconds and then switches
+  to pause mode.
+  =
+
++ Current Kernel: Linux andreas-laptop 5.4.0-29-generic #33-Ubuntu SMP Wed
++ Apr 29 14:32:27 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
++ =
+
+  =
+
+  Kind regards,
+-    Andreas
++ =C2=A0=C2=A0=C2=A0Andreas
 
 -- =
 
