@@ -1,84 +1,87 @@
 Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55828C28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:47:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A527C28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:56:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B9CC20746
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:47:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B9CC20746
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 6001D2073A
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:56:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KNhLApxO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6001D2073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWJS4-0007UW-8x
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 08:47:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34772)
+	id 1jWJbe-0001dv-G6
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 08:56:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38892)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jWJR8-000727-0x
- for qemu-devel@nongnu.org; Wed, 06 May 2020 08:46:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34520)
+ (Exim 4.90_1) (envelope-from <priyamvad.agnisys@gmail.com>)
+ id 1jWJb6-0001Dt-9w
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 08:56:24 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:46743)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jWJR6-0003vT-Pc
- for qemu-devel@nongnu.org; Wed, 06 May 2020 08:46:05 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jWJR3-0000qy-9s
- for <qemu-devel@nongnu.org>; Wed, 06 May 2020 12:46:01 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 64B5A2E8133
- for <qemu-devel@nongnu.org>; Wed,  6 May 2020 12:45:58 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <priyamvad.agnisys@gmail.com>)
+ id 1jWJb5-00019d-LR
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 08:56:24 -0400
+Received: by mail-lj1-x241.google.com with SMTP id f18so2196282lja.13
+ for <qemu-devel@nongnu.org>; Wed, 06 May 2020 05:56:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=X5jMTmvORI1mzcC0YGhr+6ixyJJe6wwu6bstylJsaO0=;
+ b=KNhLApxOR3wCEsM7ZXzZzU4YlPrpy8bfwPnE4oTvnBwnH+tW4dTa1FEkelLpLP3NTw
+ idN/5Pv3HGSRRaQrTk890WoC9LDNU4wRmBExUG3vIowHa/ScKfbMfFgGUFis7sz4Qfy2
+ TSGSPSDjVudZENwKOLuxTqMYdtAM+55pmJICBErSObq7T62lca+1z9Kt3vYimkofQNxo
+ +r6nF7Ijsws8lnwjM2StlabEdmEhjJZgTI+y06QWPS5D1MAnj1mGJVQ/Am+M21htd9I2
+ wQH1YTlX+h0yu3f70xMLZHmBcswZjjjnLRRfPRNrPskEY0USD7PQb3010E8GzQg9LT53
+ IHFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=X5jMTmvORI1mzcC0YGhr+6ixyJJe6wwu6bstylJsaO0=;
+ b=ZE9zBdXg9gs/iJMYattOwonx8dsjNQf90FYk7B8ISI6Yj4OApp4owDwWwMTX/wwEMo
+ 0Rp5OO7qY+bCpDi3fPCaS/DhFa8fa3FhasVzu08OvBpSglDhiaJZKAAjmyO0NDKmrUfK
+ mW3sPoa29a8sY4gZvYgWPfo7vqSHp+ZJAU6DxEJ66gyQbw0kaSMlwmLSg3boxRr+yLtt
+ lcn2wE7Hl/EmJ+RS7yqhYWX83OjW9t7jtFBpMPzTuCANPl0Y+9D9WTlYo1bKuTsjymS0
+ BWOd56sEA0R0ppvSSmCIUb0vkcGnQDrTa0bSsQ9pxV5z7jD1/qSpOL5bMnFKtMraCh9Z
+ 9rDg==
+X-Gm-Message-State: AGi0PuaNBvU7NZPOdXVX5ciDUtJayPMrg7Foh4GurryooLk8i9PtYZjS
+ P8clLLhPv6qfuxiteApme1b7BgYg07T9i4lGXTZWq0HuPOY=
+X-Google-Smtp-Source: APiQypLa04U99kbpXY8pJ6/I5xHcIFR9wS8CfLwPrFZIwikiW7THTBj+wypFAfXZL39nO0viAQEqhqY19ASmAb6POxw=
+X-Received: by 2002:a2e:97d4:: with SMTP id m20mr4708436ljj.159.1588769780790; 
+ Wed, 06 May 2020 05:56:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 06 May 2020 12:34:12 -0000
-From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1877052@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=New; importance=Undecided; assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: paelzer weller-andreas-weller
-X-Launchpad-Bug-Reporter: Andreas Weller (weller-andreas-weller)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
- =?utf-8?q?=29?=
-References: <158875190128.5304.17617014708809905297.malonedeb@soybean.canonical.com>
-Message-Id: <158876845224.12738.1330753240934953846.malone@gac.canonical.com>
-Subject: [Bug 1877052] Re: KVM Win 10 guest pauses after kernel upgrade
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: d94db5c2a41e6259f26fdaf9a213fd05cc1517a5
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 08:46:02
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+From: Priyamvad Acharya <priyamvad.agnisys@gmail.com>
+Date: Wed, 6 May 2020 18:26:08 +0530
+Message-ID: <CAPV47zdeH0+G85De2nOeD-dw91PKqPZh0U4SZuwuFmdqRyhXjQ@mail.gmail.com>
+Subject: Parameter 'driver' expects pluggable device type
+To: qemu-devel <qemu-devel@nongnu.org>
+Content-Type: multipart/alternative; boundary="00000000000069fd0305a4fa4af7"
+Received-SPF: pass client-ip=2a00:1450:4864:20::241;
+ envelope-from=priyamvad.agnisys@gmail.com; helo=mail-lj1-x241.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,60 +90,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1877052 <1877052@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Note: might be related (or not) to bug 1866870
-Let's analyze as independent and dup if it turns out to be a dup.
+--00000000000069fd0305a4fa4af7
+Content-Type: text/plain; charset="UTF-8"
 
--- =
+Hello developer community,
+I want to allow a *sysbus *type device to boot with kernel image(arm
+architecture) via Qemu command line .
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1877052
+When I run qemu arm system executable with *-device *option via qemu
+command line,I get following error message
 
-Title:
-  KVM Win 10 guest pauses after kernel upgrade
+> qemu-system-arm: -device pl061: Parameter 'driver' expects pluggable
+device type
 
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  New
+So, how to allow a sysbus device via command line?
+Is there any working patch?
 
-Bug description:
-  Hello!
-  Unfortunately the bug has apparently reappeared. I have a Windows 10 runn=
-ing in a VM, which after my today's "apt upgrade" goes into pause mode afte=
-r a few seconds of running time.
+--00000000000069fd0305a4fa4af7
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-  Until yesterday it used to work and I was able to boot the VM. During
-  the kernel update (from 5.4.0-28.33 to 5.4.0-29.34) the VM was active
-  and then went into pause mode. Even after a reboot of my host system
-  the problem still persists: the VM boots for a few seconds and then
-  switches to pause mode.
+<div dir=3D"ltr"><br><div>Hello developer community,</div><div>I want to al=
+low a <b>sysbus </b>type device to boot with kernel image(arm architecture)=
+ via Qemu command line .</div><div><br></div><div>When I run qemu arm syste=
+m executable with <b>-device </b>option via qemu command line,I get followi=
+ng error message</div><div><br></div><div style=3D"margin-left:40px">&gt; q=
+emu-system-arm: -device pl061: Parameter &#39;driver&#39; expects pluggable=
+ device type</div><div style=3D"margin-left:40px"><br></div><div>So, how to=
+ allow a sysbus device via command line?</div><div>Is there any working pat=
+ch?<br></div></div>
 
-  Current Kernel: Linux andreas-laptop 5.4.0-29-generic #33-Ubuntu SMP
-  Wed Apr 29 14:32:27 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
-
-  Maybe relevant logfile lines:
-  2020-05-06T07:46:42.857574Z qemu-system-x86_64: warning: host doesn't sup=
-port requested feature: MSR(48FH).vmx-exit-load-perf-global-ctrl [bit 12]
-  2020-05-06T07:46:42.857718Z qemu-system-x86_64: warning: host doesn't sup=
-port requested feature: MSR(490H).vmx-entry-load-perf-global-ctrl [bit 13]
-  2020-05-06T07:46:42.860567Z qemu-system-x86_64: warning: host doesn't sup=
-port requested feature: MSR(48FH).vmx-exit-load-perf-global-ctrl [bit 12]
-  2020-05-06T07:46:42.860582Z qemu-system-x86_64: warning: host doesn't sup=
-port requested feature: MSR(490H).vmx-entry-load-perf-global-ctrl [bit 13]
-  2020-05-06T07:47:22.901057Z qemu-system-x86_64: terminating on signal 15 =
-from pid 1593 (/usr/sbin/libvirtd)
-  2020-05-06 07:47:23.101+0000: shutting down, reason=3Ddestroyed
-
-
-  Kind regards,
-  =C2=A0=C2=A0=C2=A0Andreas
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1877052/+subscriptions
+--00000000000069fd0305a4fa4af7--
 
