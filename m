@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CE60C28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 21:37:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E864AC38A2A
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 21:38:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 360E62076D
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 21:37:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B31D420643
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 21:38:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="RfqsuDax"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 360E62076D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="oEmzsQGI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B31D420643
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWRj3-0000VP-3q
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 17:37:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50696)
+	id 1jWRkU-00036w-Sl
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 17:38:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50754)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eyal.moscovici@oracle.com>)
- id 1jWRhN-0006o2-Jm; Wed, 06 May 2020 17:35:25 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:52636)
+ id 1jWRhV-00071Z-7O; Wed, 06 May 2020 17:35:33 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:52688)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eyal.moscovici@oracle.com>)
- id 1jWRhM-0006wV-Cg; Wed, 06 May 2020 17:35:25 -0400
+ id 1jWRhT-0007Qn-H2; Wed, 06 May 2020 17:35:32 -0400
 Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 046LJ9Vn102767;
- Wed, 6 May 2020 21:35:22 GMT
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 046LHusM102069;
+ Wed, 6 May 2020 21:35:29 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
- bh=sJ4m17NJK5cs8JtIQvb12r57i6kH9t2M3Mg55ZLfYHQ=;
- b=RfqsuDaxFcilvOURMCXES5fTegBX0/MHyYXbEOIG67b3I0k+OupWVpOGzq8u3cPlv45f
- c2mX1vGBr+D0ojla19GkbL+hKvLSdyCCQmWAqHgefW3Rl3E70H3NI7TUjZPDTlLtQ204
- JuTvWNxrB18eoQ++wsPSRQmovSVl5xsC3VpsT7bo1AqtNVmRtnrnwcwD4uK7JWk5LnPL
- 0zWPUMb2sl2YqpVhBZoZVOo3coVaD6N/KBEjylr8tHOl7T8hmrdh9N3Ejy5WVkNlgCUP
- MOY/OSdrbSJ2lJh56z7X26Sm39266lCoPq/60OfchjAUtxPDfVMjvhSIH+ZoG+065ppB qA== 
+ bh=fJuh9yEQX+2FkhodxnzfqX7Jo2/iC7Lfk8tHnWZtPYg=;
+ b=oEmzsQGIxSMawk2fAx30Q0UgJU/d0D7TLCwVYlHJD//kpQcRh3z7aB26OdLYcrrXfH/l
+ gfInq3UJdiUA4mXxjfEP8IuL5zwtLeLVIgUuEkNW4DKQD1lUnHD0yQ+hVixstBE1kMq8
+ VEGRxx9J+mCsisFRGieh0JJ911z6OwnlRqn9YR7zQ9z8U/UTmgGKWwcS2dzbfTitZJWI
+ TwDUofuK6cXtP2BBIuSbZpt8QKRR9DgrV4P8P2eCi+Rq6PSkGdq62NobH5ISRd/PifXK
+ U11TWJFiSBVtTWFgBKWpt7WFdtUUMkzyHyq3Krlk/vjWQBu5KqOWr7mkqTYsPSprtF6B cg== 
 Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by userp2120.oracle.com with ESMTP id 30s1gncq0r-1
+ by userp2120.oracle.com with ESMTP id 30s1gncq0y-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 06 May 2020 21:35:22 +0000
+ Wed, 06 May 2020 21:35:29 +0000
 Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 046LHn7H039657;
- Wed, 6 May 2020 21:35:22 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by userp3030.oracle.com with ESMTP id 30t1r8sryn-1
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 046LHnRw039807;
+ Wed, 6 May 2020 21:35:29 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by userp3030.oracle.com with ESMTP id 30t1r8ss4k-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 06 May 2020 21:35:21 +0000
+ Wed, 06 May 2020 21:35:29 +0000
 Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 046LZLQe012347;
- Wed, 6 May 2020 21:35:21 GMT
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 046LZSpm018020;
+ Wed, 6 May 2020 21:35:28 GMT
 Received: from localhost.localdomain (/10.74.121.228)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 06 May 2020 14:35:20 -0700
+ with ESMTP ; Wed, 06 May 2020 14:35:27 -0700
 From: Eyal Moscovici <eyal.moscovici@oracle.com>
 To: 
-Subject: [PATCH v2 1/5] qemu-img: remove check that cvtnum value > MAX_INT
-Date: Thu,  7 May 2020 00:34:55 +0300
-Message-Id: <20200506213459.44743-2-eyal.moscovici@oracle.com>
+Subject: [PATCH v2 3/5] qemu-img: validate image length in img_map
+Date: Thu,  7 May 2020 00:34:57 +0300
+Message-Id: <20200506213459.44743-4-eyal.moscovici@oracle.com>
 X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 In-Reply-To: <20200506213459.44743-1-eyal.moscovici@oracle.com>
 References: <59b0896d-85ad-08b5-fcc1-36adad7501a4@redhat.com>
@@ -74,7 +74,7 @@ X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9613
  signatures=668687
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
  adultscore=0 suspectscore=0
- spamscore=0 mlxlogscore=999 malwarescore=0 phishscore=0 mlxscore=0
+ spamscore=0 mlxlogscore=870 malwarescore=0 phishscore=0 mlxscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
  definitions=main-2005060172
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9613
@@ -82,7 +82,7 @@ X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9613
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
  suspectscore=0 mlxscore=0
  spamscore=0 clxscore=1015 priorityscore=1501 bulkscore=0 phishscore=0
- impostorscore=0 malwarescore=0 lowpriorityscore=0 mlxlogscore=999
+ impostorscore=0 malwarescore=0 lowpriorityscore=0 mlxlogscore=910
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
  definitions=main-2005060172
 Received-SPF: pass client-ip=156.151.31.85;
@@ -116,47 +116,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Following commit f46bfdbfc8f95cf65d7818ef68a801e063c40332 (util/cutils: Change
-qemu_strtosz*() from int64_t to uint64_t) which added a similar check to
-cvtnum. As a result there is no need to check it separately outside of cvtnum.
+The code handles this case correctly we merely skip the loop. However it
+is probably best to return an explicit error.
 
 Acked-by: Mark Kanda <mark.kanda@oracle.com>
 Signed-off-by: Eyal Moscovici <eyal.moscovici@oracle.com>
 ---
- qemu-img.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ qemu-img.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/qemu-img.c b/qemu-img.c
-index 6a4327aaba..116a9c6349 100644
+index 4a06ab7fe8..a1b507a0be 100644
 --- a/qemu-img.c
 +++ b/qemu-img.c
-@@ -4307,7 +4307,7 @@ static int img_bench(int argc, char **argv)
-             int64_t sval;
- 
-             sval = cvtnum(optarg);
--            if (sval < 0 || sval > INT_MAX) {
-+            if (sval < 0) {
-                 error_report("Invalid buffer size specified");
-                 return 1;
-             }
-@@ -4320,7 +4320,7 @@ static int img_bench(int argc, char **argv)
-             int64_t sval;
- 
-             sval = cvtnum(optarg);
--            if (sval < 0 || sval > INT_MAX) {
-+            if (sval < 0) {
-                 error_report("Invalid step size specified");
-                 return 1;
-             }
-@@ -4493,7 +4493,7 @@ static int img_dd_bs(const char *arg,
- 
-     res = cvtnum(arg);
- 
--    if (res <= 0 || res > INT_MAX) {
-+    if (res <= 0) {
-         error_report("invalid number: '%s'", arg);
-         return 1;
+@@ -3086,6 +3086,11 @@ static int img_map(int argc, char **argv)
      }
+ 
+     length = blk_getlength(blk);
++    if (length < 0) {
++        error_report("Failed to get size for '%s'", filename);
++        return 1;
++    }
++
+     while (curr.start + curr.length < length) {
+         int64_t offset = curr.start + curr.length;
+         int64_t n;
 -- 
 2.17.2 (Apple Git-113)
 
