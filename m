@@ -6,64 +6,69 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B3BFC28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 05:24:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56860C28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 05:36:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18CF3206E6
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 05:24:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18CF3206E6
+	by mail.kernel.org (Postfix) with ESMTPS id 273E920714
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 05:36:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 273E920714
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWCXI-0007Yq-8S
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 01:24:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56910)
+	id 1jWCjG-0001zw-BK
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 01:36:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33192)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jWCU5-0005Zy-0o
- for qemu-devel@nongnu.org; Wed, 06 May 2020 01:20:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39048)
+ id 1jWCig-0001bC-KL
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 01:35:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47986)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jWCU3-0007gJ-EP
- for qemu-devel@nongnu.org; Wed, 06 May 2020 01:20:40 -0400
+ id 1jWCif-000852-88
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 01:35:46 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jWCU1-000743-Qb
- for <qemu-devel@nongnu.org>; Wed, 06 May 2020 05:20:37 +0000
+ id 1jWCid-0001B3-3t
+ for <qemu-devel@nongnu.org>; Wed, 06 May 2020 05:35:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C6ECF2E8105
- for <qemu-devel@nongnu.org>; Wed,  6 May 2020 05:20:37 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 1B2BB2E8109
+ for <qemu-devel@nongnu.org>; Wed,  6 May 2020 05:35:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 06 May 2020 05:14:20 -0000
-From: xuan <1877015@bugs.launchpad.net>
+Date: Wed, 06 May 2020 05:26:36 -0000
+From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1866870@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Invalid; importance=Undecided; assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=seabios; component=main;
+ status=Fix Released; importance=Undecided; assignee=None; 
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: luoyonggang xavier-ding
-X-Launchpad-Bug-Reporter: xuan (xavier-ding)
-X-Launchpad-Bug-Modifier: xuan (xavier-ding)
-References: <158873300816.14142.15664636500998863138.malonedeb@gac.canonical.com>
- <CAE2XoE8tLwbUPWXbGFxf_kZ2S5X-hrmQuqEM_difn8=gcJQbwg@mail.gmail.com>
-Message-Id: <7bea3ac6f10943e8b950957e484c1486@intel.com>
-Subject: RE: [Bug 1877015] [NEW] virtio only support packed ring size power of
- 2 between 256 and 1024
+X-Launchpad-Bug-Commenters: ahasenack dbaxps0220 dgilbert-h janitor paelzer
+ tstrike34 weller-andreas-weller
+X-Launchpad-Bug-Reporter: tstrike (tstrike34)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
+ =?utf-8?q?=29?=
+References: <158386023038.12575.5865810528923078550.malonedeb@soybean.canonical.com>
+Message-Id: <158874279652.6048.16960322410905285290.malone@soybean.canonical.com>
+Subject: [Bug 1866870] Re: KVM Guest pauses after upgrade to Ubuntu 20.04
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 024f0bb4d1003ac2a43edd78b4750468d3a57cfb
+X-Launchpad-Hash: 50acdc034bbdac5190b61fe09632ce9408e3c1d1
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 22:50:31
@@ -86,140 +91,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1877015 <1877015@bugs.launchpad.net>
+Reply-To: Bug 1866870 <1866870@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thank you for your reply.  I think the code should add the handling for
-packed ring size to follow the spec.
+Hi Andreas,
+so the only upgrade you did to trigger this for you was to bump the kernel =
+from 5.4.0-28.33 to 5.4.0-29.34 - nothing else? I have not (yet?) heard oth=
+er similar reports, but it might be just too early?
+At least on my system for now things still work with the new kernel like be=
+fore.
 
------Original Message-----
-From: bounces@canonical.com <bounces@canonical.com> On Behalf Of Yonggang L=
-uo
-Sent: Wednesday, May 6, 2020 12:32 PM
-To: Ding, Xuan <xuan.ding@intel.com>
-Subject: Re: [Bug 1877015] [NEW] virtio only support packed ring size power=
- of 2 between 256 and 1024
+I'd recommend filing a new bug, refer to this one as maybe being related an=
+d adding the following right away:
+- kernel version (you have this here I know)
+- qemu/libvirt/seabios/ovmf version (if you don't mind just attach `dpkg -l=
+`)
+- guest XML (if using libvirt) otherwise the qemu command-line
+- add a cross check and report what happens with other guests configs (e.g.=
+ non windows, using =
 
-Maybe the virtio need to be revised?
+  another bios as the former issue was tied to seabios, use different guest=
+ CPU types)
+- the full /var/log/apt/history.log
+- a date when you last started the VM successfully (not just still-had-it-r=
+unning, but started it) =
 
-On Wed, May 6, 2020 at 10:51 AM xuan <1877015@bugs.launchpad.net> wrote:
-
-> Public bug reported:
->
-> Issue discription=EF=BC=9A
-> When QEMU starts with "-device
-> virtio-net-pci,netdev=3Dnetdev0,mac=3D52:54:00:00:00:01,disable-modern=3D=
-false,mrg_rxbuf=3Don,rx_queue_size=3D1025,tx_queue_size=3D1025,mq=3Don,vect=
-ors=3D15,packed=3Don"
->
-> It raises error: Invalid rx_queue_size (=3D 1025), must be a power of 2 =
-
-> between 256 and 1024
->
-> Analysis:
-> According to virtio1.1 spec, the packed queue size value does not have =
-
-> to be a power of 2.
->
-> ** Affects: qemu
->      Importance: Undecided
->          Status: New
->
-> --
-> You received this bug notification because you are a member of qemu- =
-
-> devel-ml, which is subscribed to QEMU.
-> https://bugs.launchpad.net/bugs/1877015
->
-> Title:
->   virtio only support packed ring size power of 2 between 256 and 1024
->
-> Status in QEMU:
->   New
->
-> Bug description:
->   Issue discription=EF=BC=9A
->   When QEMU starts with "-device
-> virtio-net-pci,netdev=3Dnetdev0,mac=3D52:54:00:00:00:01,disable-modern=3D=
-false,mrg_rxbuf=3Don,rx_queue_size=3D1025,tx_queue_size=3D1025,mq=3Don,vect=
-ors=3D15,packed=3Don"
->
->   It raises error: Invalid rx_queue_size (=3D 1025), must be a power of 2
->   between 256 and 1024
->
->   Analysis:
->   According to virtio1.1 spec, the packed queue size value does not =
-
-> have to be a power of 2.
->
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1877015/+subscriptions
->
->
-
--- =
-
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---
-You received this bug notification because you are subscribed to the bug re=
-port.
-https://bugs.launchpad.net/bugs/1877015
-
-Title:
-  virtio only support packed ring size power of 2
-
-Status in QEMU:
-  New
-
-Bug description:
-  Issue discription=EF=BC=9A
-  When QEMU starts with "-device virtio-net-pci,netdev=3Dnetdev0,mac=3D52:5=
-4:00:00:00:01,disable-modern=3Dfalse,mrg_rxbuf=3Don,rx_queue_size=3D1025,tx=
-_queue_size=3D1025,mq=3Don,vectors=3D15,packed=3Don"
-
-  It raises error: Invalid rx_queue_size (=3D 1025), must be a power of 2
-  between 256 and 1024
-
-  Analysis:
-  According to virtio1.1 spec, the packed queue size value does not have to=
- be a power of 2.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1877015/+subscriptions
+  and the date when it started to fail (probably yesterday then I guess)
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1877015
+https://bugs.launchpad.net/bugs/1866870
 
 Title:
-  virtio only support packed ring size power of 2
+  KVM Guest pauses after upgrade to Ubuntu 20.04
 
 Status in QEMU:
-  New
+  Invalid
+Status in qemu package in Ubuntu:
+  Invalid
+Status in seabios package in Ubuntu:
+  Fix Released
 
 Bug description:
-  Issue discription=EF=BC=9A
-  When QEMU starts with "-device virtio-net-pci,netdev=3Dnetdev0,mac=3D52:5=
-4:00:00:00:01,disable-modern=3Dfalse,mrg_rxbuf=3Don,rx_queue_size=3D1025,tx=
-_queue_size=3D1025,mq=3Don,vectors=3D15,packed=3Don"
+  Symptom:
+  Error unpausing domain: internal error: unable to execute QEMU command 'c=
+ont': Resetting the Virtual Machine is required
 
-  It raises error: Invalid rx_queue_size (=3D 1025), must be a power of 2
-  between 256 and 1024
+  Traceback (most recent call last):
+    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 75, in cb_=
+wrapper
+      callback(asyncjob, *args, **kwargs)
+    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 111, in tm=
+pcb
+      callback(*args, **kwargs)
+    File "/usr/share/virt-manager/virtManager/object/libvirtobject.py", lin=
+e 66, in newfn
+      ret =3D fn(self, *args, **kwargs)
+    File "/usr/share/virt-manager/virtManager/object/domain.py", line 1311,=
+ in resume
+      self._backend.resume()
+    File "/usr/lib/python3/dist-packages/libvirt.py", line 2174, in resume
+      if ret =3D=3D -1: raise libvirtError ('virDomainResume() failed', dom=
+=3Dself)
+  libvirt.libvirtError: internal error: unable to execute QEMU command 'con=
+t': Resetting the Virtual Machine is required
 
-  Analysis:
-  According to virtio1.1 spec, the packed queue size value does not have to=
- be a power of 2.
+  =
+
+  ---
+
+  As outlined here:
+  https://bugs.launchpad.net/qemu/+bug/1813165/comments/15
+
+  After upgrade, all KVM guests are in a default pause state. Even after
+  forcing them off via virsh, and restarting them the guests are paused.
+
+  These Guests are not nested.
+
+  A lot of diganostic information are outlined in the previous bug
+  report link provided. The solution mentioned in previous report had
+  been allegedly integrated into the downstream updates.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1877015/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1866870/+subscriptions
 
