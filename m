@@ -2,78 +2,81 @@ Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7210FC28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:42:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4D8AC38A24
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:42:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C661206D5
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:42:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E03C20752
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 12:42:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KFn6HYMM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C661206D5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i+L6ils2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E03C20752
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48126 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWJNd-0004Hr-Bc
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 08:42:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33998)
+	id 1jWJNx-0004vt-KZ
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 08:42:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34036)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jWJMw-0003fS-LR
- for qemu-devel@nongnu.org; Wed, 06 May 2020 08:41:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33710
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jWJNE-00040d-E6
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 08:42:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32665
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jWJMv-0007hV-54
- for qemu-devel@nongnu.org; Wed, 06 May 2020 08:41:46 -0400
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jWJND-0007vR-KE
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 08:42:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588768904;
+ s=mimecast20190719; t=1588768923;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qDYBBhniPPSNn7Lf300gpuTkvLKnh+u1QO++slaKMbs=;
- b=KFn6HYMMjNI58T1tQwlhoG5fAVpixTNS8SuR8I1ibbfmdawJT3qU5ZqG3gJ44U744eGy4m
- eiQrD1vYZpOHN/uP8OCy790SNbZZIbzl4PB4pn394yYKRXp5FH49EvwISjxBpuMFEM/nAr
- dWJFRwT+sISYIuaNeF1Q+hFm6N14cs4=
+ bh=b+aumLI5ASUJTiZpYbaRAhuuAnmXcwT0juGSF4WTVN4=;
+ b=i+L6ils2II1GS2Up0uvMg2FZUsdcG8YtmcBAgOT2h9eJL+lOwDwD42ppuJyq9qz5/erKeh
+ dkI7lTninuBsa0xr76eNpQGK530R63U+UQWQbrSy0lNzip2bN2uHUN+puCqSHurIOQksRb
+ xv5AwH/GV1DigaqmrVV7bQqzE159KAc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-191-PpCWLcDmMIay7K_ugAwWPQ-1; Wed, 06 May 2020 08:41:42 -0400
-X-MC-Unique: PpCWLcDmMIay7K_ugAwWPQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-460-Wvzj4IJXNwCodWvnWmj-sw-1; Wed, 06 May 2020 08:42:01 -0400
+X-MC-Unique: Wvzj4IJXNwCodWvnWmj-sw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1ECA2107ACCD;
- Wed,  6 May 2020 12:41:41 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-113-140.ams2.redhat.com [10.36.113.140])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 232336061C;
- Wed,  6 May 2020 12:41:39 +0000 (UTC)
-Date: Wed, 6 May 2020 14:41:38 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [PATCH v3 12/33] block: Unify bdrv_child_cb_detach()
-Message-ID: <20200506124138.GC6333@linux.fritz.box>
-References: <20200218124242.584644-1-mreitz@redhat.com>
- <20200218124242.584644-13-mreitz@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A1271005510;
+ Wed,  6 May 2020 12:42:00 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.7])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F0F611001B07;
+ Wed,  6 May 2020 12:41:46 +0000 (UTC)
+Date: Wed, 6 May 2020 14:41:43 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH v2 08/13] acpi: generic event device for x86
+Message-ID: <20200506144143.1f68c383@redhat.com>
+In-Reply-To: <20200506103106.nih5mf5zpltv3fns@sirius.home.kraxel.org>
+References: <20200505134305.22666-1-kraxel@redhat.com>
+ <20200505134305.22666-9-kraxel@redhat.com>
+ <20200505170316.7e72da4d@redhat.com>
+ <20200506103106.nih5mf5zpltv3fns@sirius.home.kraxel.org>
 MIME-Version: 1.0
-In-Reply-To: <20200218124242.584644-13-mreitz@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=imammedo@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/05 23:48:07
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 04:02:22
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -93,45 +96,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 18.02.2020 um 13:42 hat Max Reitz geschrieben:
-> Make bdrv_child_cb_detach() call bdrv_backing_detach() for children with
-> a COW role (and drop the reverse call from bdrv_backing_detach()), so it
-> can be used for any child (with a proper role set).
->=20
-> Because so far no child has a proper role set, we need a temporary new
-> callback for child_backing.detach that ensures bdrv_backing_detach() is
-> called for all COW children that do not have their role set yet.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
->  block.c | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
->=20
-> diff --git a/block.c b/block.c
-> index 3cf1293a7b..0f24546863 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -943,6 +943,7 @@ static void bdrv_child_cb_drained_end(BdrvChild *chil=
-d,
->  }
-> =20
->  static void bdrv_backing_attach(BdrvChild *c);
-> +static void bdrv_backing_detach(BdrvChild *c);
+On Wed, 6 May 2020 12:31:06 +0200
+Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-This series leaves a few static forward declarations behind, and even
-in the middle of the code rather than at the top.
+> On Tue, May 05, 2020 at 05:03:16PM +0200, Igor Mammedov wrote:
+> > On Tue,  5 May 2020 15:43:00 +0200
+> > Gerd Hoffmann <kraxel@redhat.com> wrote:
+> >   
+> > > Uses TYPE_ACPI_GED as QOM parent for code reuse.
+> > > Add registers for sleep states and reset.
+> > > Add powerdown notifier for power button events.  
+> > registers aren't x86 specific per spec,
+> > can we put these registers into TYPE_ACPI_GED
+> > and enable the optionally like is done with memory hotplug registers
+> > in acpi_ged_initfn()  
+> 
+> Sure, will do.
+> 
+> > > Set AcpiDeviceIfClass->madt_cpu.  
+> > that's the only reason I could justify adding x86 specific flavour.  
+> 
+> Also the powerdown notifier.  Seems the workflow is slightly different
+> on x86 (acpi device registers notifier) and arm (machine registers
+> notifier and calls acpidev->send_event).
 
-Does anything stop us from adding bdrv_inherited_options() after all the
-old functions instead? This will require a temporary forward
-declaration, too, but it can go away at the end of the series when there
-is only child_of_bds left.
+Is it possible to use ARM's approach, without notifier?
 
-Kevin
+> 
+> take care,
+>   Gerd
+> 
 
 
