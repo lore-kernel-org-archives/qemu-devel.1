@@ -6,66 +6,66 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8626C28CBC
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 22:26:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEE28C28CBC
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 22:28:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DA3A20753
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 22:26:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7926C20708
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 22:28:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RGZP43EC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DA3A20753
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ezr+cLpS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7926C20708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWSUQ-00005f-Px
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 18:26:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33740)
+	id 1jWSWm-00017W-HH
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 18:28:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34576)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1jWSTo-00083H-8o
- for qemu-devel@nongnu.org; Wed, 06 May 2020 18:25:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52030
+ id 1jWSW2-0000dr-Pw
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 18:27:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58013
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1jWSTl-00033g-Te
- for qemu-devel@nongnu.org; Wed, 06 May 2020 18:25:27 -0400
+ id 1jWSW1-0007X2-PF
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 18:27:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588803923;
+ s=mimecast20190719; t=1588804065;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=E3U+gsBilIHMZ4uPxCytIc/RMmv38zJeb/Hi2ox4QaI=;
- b=RGZP43ECvlygbzmatp6o94TYzwf6ONRUJTelu4+RdXdQcuv4hrzKkUaxsQtqynDjgkqI0u
- iHpPhoHB7JX65bkPC6KZPc/xPDAOPoT6SIxd9sQ6cdObfeWqZbkDC4WezK9Wiggci6NRX8
- OsTf2FFSKyjShF2QzuWmfqAxWfQAT2w=
+ bh=xtyZQxIBvrwGclxq/zCovldcHxaVBe7Li+rCCyfx+sE=;
+ b=ezr+cLpSjNDC75mJ3AXp92mzUiLKS2JB3jonmZ9JOyNpVoO2OWaMroNmUqrk2+1sv1AgqK
+ 7fEC764Ewrf0kaLeeIZcGSTzvqUPI+3g+cNDhHRDTLiNagq5r1mxnv2S4oNr1msv2i/+n1
+ Jv+HJ+dsewZZ6sEGbugdRtCojGPkGmM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-151-_N0XuafGPgq7bt-1I3bQFQ-1; Wed, 06 May 2020 18:25:19 -0400
-X-MC-Unique: _N0XuafGPgq7bt-1I3bQFQ-1
+ us-mta-237-5x6HgCc7N-mvSSmOZ1TKEg-1; Wed, 06 May 2020 18:27:43 -0400
+X-MC-Unique: 5x6HgCc7N-mvSSmOZ1TKEg-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4CB5E460;
- Wed,  6 May 2020 22:25:17 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 055E78014D9;
+ Wed,  6 May 2020 22:27:41 +0000 (UTC)
 Received: from w520.home (ovpn-113-95.phx2.redhat.com [10.3.113.95])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3D03F1001920;
- Wed,  6 May 2020 22:25:14 +0000 (UTC)
-Date: Wed, 6 May 2020 16:25:11 -0600
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6DCCE1001920;
+ Wed,  6 May 2020 22:27:39 +0000 (UTC)
+Date: Wed, 6 May 2020 16:27:38 -0600
 From: Alex Williamson <alex.williamson@redhat.com>
 To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH Kernel v18 5/7] vfio iommu: Update UNMAP_DMA ioctl to
- get dirty bitmap before unmap
-Message-ID: <20200506162511.032bb1e6@w520.home>
-In-Reply-To: <1588607939-26441-6-git-send-email-kwankhede@nvidia.com>
+Subject: Re: [PATCH Kernel v18 6/7] vfio iommu: Add migration capability to
+ report supported features
+Message-ID: <20200506162738.6e08dbf2@w520.home>
+In-Reply-To: <1588607939-26441-7-git-send-email-kwankhede@nvidia.com>
 References: <1588607939-26441-1-git-send-email-kwankhede@nvidia.com>
- <1588607939-26441-6-git-send-email-kwankhede@nvidia.com>
+ <1588607939-26441-7-git-send-email-kwankhede@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
@@ -104,221 +104,82 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 4 May 2020 21:28:57 +0530
+On Mon, 4 May 2020 21:28:58 +0530
 Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-> DMA mapped pages, including those pinned by mdev vendor drivers, might
-> get unpinned and unmapped while migration is active and device is still
-> running. For example, in pre-copy phase while guest driver could access
-> those pages, host device or vendor driver can dirty these mapped pages.
-> Such pages should be marked dirty so as to maintain memory consistency
-> for a user making use of dirty page tracking.
-> 
-> To get bitmap during unmap, user should allocate memory for bitmap, set
-> size of allocated memory, set page size to be considered for bitmap and
-> set flag VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP.
+> Added migration capability in IOMMU info chain.
+> User application should check IOMMU info chain for migration capability
+> to use dirty page tracking feature provided by kernel module.
 > 
 > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
 > ---
->  drivers/vfio/vfio_iommu_type1.c | 84 +++++++++++++++++++++++++++++++++++++++--
->  include/uapi/linux/vfio.h       | 10 +++++
->  2 files changed, 90 insertions(+), 4 deletions(-)
+>  drivers/vfio/vfio_iommu_type1.c | 15 +++++++++++++++
+>  include/uapi/linux/vfio.h       | 14 ++++++++++++++
+>  2 files changed, 29 insertions(+)
 > 
 > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 01dcb417836f..8b27faf1ec38 100644
+> index 8b27faf1ec38..b38d278d7bff 100644
 > --- a/drivers/vfio/vfio_iommu_type1.c
 > +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -983,12 +983,14 @@ static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
+> @@ -2378,6 +2378,17 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
+>  	return ret;
 >  }
 >  
->  static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
-> -			     struct vfio_iommu_type1_dma_unmap *unmap)
-> +			     struct vfio_iommu_type1_dma_unmap *unmap,
-> +			     struct vfio_bitmap *bitmap)
+> +static int vfio_iommu_migration_build_caps(struct vfio_info_cap *caps)
+> +{
+> +	struct vfio_iommu_type1_info_cap_migration cap_mig;
+> +
+> +	cap_mig.header.id = VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION;
+> +	cap_mig.header.version = 1;
+> +	cap_mig.flags = VFIO_IOMMU_INFO_CAPS_MIGRATION_DIRTY_PAGE_TRACK;
+> +
+> +	return vfio_info_add_capability(caps, &cap_mig.header, sizeof(cap_mig));
+> +}
+> +
+>  static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  				   unsigned int cmd, unsigned long arg)
 >  {
->  	uint64_t mask;
->  	struct vfio_dma *dma, *dma_last = NULL;
->  	size_t unmapped = 0;
->  	int ret = 0, retries = 0;
-> +	unsigned long *final_bitmap = NULL, *temp_bitmap = NULL;
->  
->  	mask = ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
->  
-> @@ -1041,6 +1043,7 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->  			ret = -EINVAL;
->  			goto unlock;
->  		}
-> +
->  		dma = vfio_find_dma(iommu, unmap->iova + unmap->size - 1, 0);
->  		if (dma && dma->iova + dma->size != unmap->iova + unmap->size) {
->  			ret = -EINVAL;
-> @@ -1048,6 +1051,22 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->  		}
->  	}
->  
-> +	if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
-> +	     iommu->dirty_page_tracking) {
-
-Why do we even accept VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP when not
-dirty page tracking rather than returning -EINVAL?  It would simplify
-things here to reject it at the ioctl and silently ignoring a flag is
-rarely if ever the right approach.
-
-> +		final_bitmap = kvzalloc(bitmap->size, GFP_KERNEL);
-> +		if (!final_bitmap) {
-> +			ret = -ENOMEM;
-> +			goto unlock;
-> +		}
-> +
-> +		temp_bitmap = kvzalloc(bitmap->size, GFP_KERNEL);
-> +		if (!temp_bitmap) {
-> +			ret = -ENOMEM;
-> +			kfree(final_bitmap);
-> +			goto unlock;
-> +		}
-
-YIKES!  So the user can instantly trigger the kernel to internally
-allocate 2 x 256MB, regardless of how much they can actually map.
-
-> +	}
-> +
->  	while ((dma = vfio_find_dma(iommu, unmap->iova, unmap->size))) {
->  		if (!iommu->v2 && unmap->iova > dma->iova)
->  			break;
-> @@ -1058,6 +1077,24 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->  		if (dma->task->mm != current->mm)
->  			break;
->  
-> +		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
-> +		     iommu->dirty_page_tracking) {
-> +			unsigned long pgshift = __ffs(bitmap->pgsize);
-> +			unsigned int npages = dma->size >> pgshift;
-> +			unsigned int shift;
-> +
-> +			vfio_iova_dirty_bitmap(iommu, dma->iova, dma->size,
-> +					bitmap->pgsize, (u64 *)temp_bitmap);
-
-vfio_iova_dirty_bitmap() takes a __user bitmap, we're doing
-copy_to_user() on a kernel allocated buffer???
-
-> +
-> +			shift = (dma->iova - unmap->iova) >> pgshift;
-> +			if (shift)
-> +				bitmap_shift_left(temp_bitmap, temp_bitmap,
-> +						  shift, npages);
-> +			bitmap_or(final_bitmap, final_bitmap, temp_bitmap,
-> +				  shift + npages);
-> +			memset(temp_bitmap, 0, bitmap->size);
-> +		}
-
-It seems like if the per vfio_dma dirty bitmap was oversized by a long
-that we could shift it in place, then we'd only need one working bitmap
-buffer and we could size that to fit the vfio_dma (or the largest
-vfio_dma if we don't want to free and re-alloc for each vfio_dma).
-We'd need to do more copy_to/from_user()s, but we'd also avoid copying
-between sparse mappings (user zero'd bitmap required) and we'd have a
-far more reasonable memory usage.  Thanks,
-
-Alex
-
-> +
->  		if (!RB_EMPTY_ROOT(&dma->pfn_list)) {
->  			struct vfio_iommu_type1_dma_unmap nb_unmap;
->  
-> @@ -1088,6 +1125,16 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->  	}
->  
->  unlock:
-> +	if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
-> +	     iommu->dirty_page_tracking && final_bitmap) {
-> +		if (copy_to_user((void __user *)bitmap->data, final_bitmap,
-> +				 bitmap->size))
-> +			ret = -EFAULT;
-> +
-> +		kfree(final_bitmap);
-> +		kfree(temp_bitmap);
-> +	}
-> +
->  	mutex_unlock(&iommu->lock);
->  
->  	/* Report how much was unmapped */
-> @@ -2419,17 +2466,46 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->  
->  	} else if (cmd == VFIO_IOMMU_UNMAP_DMA) {
->  		struct vfio_iommu_type1_dma_unmap unmap;
-> -		long ret;
-> +		struct vfio_bitmap bitmap = { 0 };
-> +		int ret;
->  
->  		minsz = offsetofend(struct vfio_iommu_type1_dma_unmap, size);
->  
->  		if (copy_from_user(&unmap, (void __user *)arg, minsz))
->  			return -EFAULT;
->  
-> -		if (unmap.argsz < minsz || unmap.flags)
-> +		if (unmap.argsz < minsz ||
-> +		    unmap.flags & ~VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP)
->  			return -EINVAL;
->  
-> -		ret = vfio_dma_do_unmap(iommu, &unmap);
-> +		if (unmap.flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
-> +			unsigned long pgshift;
-> +			size_t iommu_pgsize =
-> +				(size_t)1 << __ffs(vfio_pgsize_bitmap(iommu));
-> +
-> +			if (unmap.argsz < (minsz + sizeof(bitmap)))
-> +				return -EINVAL;
-> +
-> +			if (copy_from_user(&bitmap,
-> +					   (void __user *)(arg + minsz),
-> +					   sizeof(bitmap)))
-> +				return -EFAULT;
-> +
-> +			/* allow only min supported pgsize */
-> +			if (bitmap.pgsize != iommu_pgsize)
-> +				return -EINVAL;
-> +			if (!access_ok((void __user *)bitmap.data, bitmap.size))
-> +				return -EINVAL;
-> +
-> +			pgshift = __ffs(bitmap.pgsize);
-> +			ret = verify_bitmap_size(unmap.size >> pgshift,
-> +						 bitmap.size);
-> +			if (ret)
-> +				return ret;
-> +
-> +		}
-> +
-> +		ret = vfio_dma_do_unmap(iommu, &unmap, &bitmap);
+> @@ -2427,6 +2438,10 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
 >  		if (ret)
 >  			return ret;
 >  
+> +		ret = vfio_iommu_migration_build_caps(&caps);
+> +		if (ret)
+> +			return ret;
+> +
+>  		if (caps.size) {
+>  			info.flags |= VFIO_IOMMU_INFO_CAPS;
+>  
 > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 5f359c63f5ef..e3cbf8b78623 100644
+> index e3cbf8b78623..df9ce8aaafab 100644
 > --- a/include/uapi/linux/vfio.h
 > +++ b/include/uapi/linux/vfio.h
-> @@ -1048,12 +1048,22 @@ struct vfio_bitmap {
->   * field.  No guarantee is made to the user that arbitrary unmaps of iova
->   * or size different from those used in the original mapping call will
->   * succeed.
-> + * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP should be set to get dirty bitmap
-> + * before unmapping IO virtual addresses. When this flag is set, user must
-> + * provide data[] as structure vfio_bitmap. User must allocate memory to get
-> + * bitmap and must set size of allocated memory in vfio_bitmap.size field.
-> + * A bit in bitmap represents one page of user provided page size in 'pgsize',
-> + * consecutively starting from iova offset. Bit set indicates page at that
-> + * offset from iova is dirty. Bitmap of pages in the range of unmapped size is
-> + * returned in vfio_bitmap.data
->   */
->  struct vfio_iommu_type1_dma_unmap {
->  	__u32	argsz;
->  	__u32	flags;
-> +#define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
->  	__u64	iova;				/* IO virtual address */
->  	__u64	size;				/* Size of mapping (bytes) */
-> +	__u8    data[];
+> @@ -1013,6 +1013,20 @@ struct vfio_iommu_type1_info_cap_iova_range {
+>  	struct	vfio_iova_range iova_ranges[];
 >  };
 >  
->  #define VFIO_IOMMU_UNMAP_DMA _IO(VFIO_TYPE, VFIO_BASE + 14)
+> +/*
+> + * The migration capability allows to report supported features for migration.
+> + *
+> + * The structures below define version 1 of this capability.
+> + */
+> +#define VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION  1
+> +
+> +struct vfio_iommu_type1_info_cap_migration {
+> +	struct	vfio_info_cap_header header;
+> +	__u32	flags;
+> +	/* supports dirty page tracking */
+> +#define VFIO_IOMMU_INFO_CAPS_MIGRATION_DIRTY_PAGE_TRACK	(1 << 0)
+> +};
+> +
+
+What about exposing the maximum supported dirty bitmap size and the
+supported page sizes?  Thanks,
+
+Alex
+
+>  #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
+>  
+>  /**
 
 
