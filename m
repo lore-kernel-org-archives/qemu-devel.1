@@ -4,65 +4,64 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9765C38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 12:57:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03200C38A2A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 12:57:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85654208CA
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 12:57:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7C6812082E
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 12:57:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EexUMCh1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85654208CA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RS9N2k3H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C6812082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWg62-0004UB-Ly
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 08:57:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50572)
+	id 1jWg5z-0004If-Jb
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 08:57:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50478)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jWg3C-0007NM-3E
- for qemu-devel@nongnu.org; Thu, 07 May 2020 08:54:54 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22918
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1jWg34-0007AC-2o
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 08:54:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45377
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jWg3A-0003O7-BD
- for qemu-devel@nongnu.org; Thu, 07 May 2020 08:54:53 -0400
+ id 1jWg2w-0002SN-Qn
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 08:54:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588856091;
+ s=mimecast20190719; t=1588856076;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pKWHhNBOoPG97iPKEehsBGoilB35XSMwsonrnezh4Ro=;
- b=EexUMCh1W7xg+z7lYB+p0gtOyJQZ+0q905/FZq0FUn1yrTXQlovnONGt5NY02ABP9vGBN5
- LDF/+Fmi9SWmY6de+AIi0WOh8sSwdWv/R2v2OdQWJrhf+zzmOeEwTk4Q2xGZvJnoDKSEdh
- 7pA+FzZqTBj/aDW+cxc9RY1TdsuVBQc=
+ bh=dEGwbV57hKlhtKyYWuHPvJVL1kYGfzTgq1TPb0lsDC8=;
+ b=RS9N2k3H5CK7cLppiTZ/wkNX1wv4LqBLhxN1r5OqNBC5cV4TtCsvUpC1ITgJywXxTg1JL8
+ 7KLTBHenNFiMB7glRIuNPL03Bp0N6hyG4Z2veoMyE3StlhiPhV2Khh301w6pVDNKpm+BC/
+ sleWZwHmNvjT1GaTp9NgIBKTuOqJpZY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-316-wQbUkFPKOk6ly8ZqyPb40Q-1; Thu, 07 May 2020 08:54:48 -0400
-X-MC-Unique: wQbUkFPKOk6ly8ZqyPb40Q-1
+ us-mta-194-Bct-JLWKO92L4iOW4MZl5Q-1; Thu, 07 May 2020 08:54:34 -0400
+X-MC-Unique: Bct-JLWKO92L4iOW4MZl5Q-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B0F5107B26F;
- Thu,  7 May 2020 12:54:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 338AF18FE860;
+ Thu,  7 May 2020 12:54:33 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EE19270559;
- Thu,  7 May 2020 12:54:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7F9F7707B7;
+ Thu,  7 May 2020 12:54:30 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 10/14] iotests: qemu-img tests for luks key management
-Date: Thu,  7 May 2020 15:54:10 +0300
-Message-Id: <20200507125414.2151-11-mlevitsk@redhat.com>
+Subject: [PATCH v5 05/14] block/amend: refactor qcow2 amend options
+Date: Thu,  7 May 2020 15:54:05 +0300
+Message-Id: <20200507125414.2151-6-mlevitsk@redhat.com>
 In-Reply-To: <20200507125414.2151-1-mlevitsk@redhat.com>
 References: <20200507125414.2151-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -71,17 +70,17 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mlevitsk@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 02:00:54
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 03:15:48
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,538 +102,2878 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This commit adds two tests, which test the new amend interface
-of both luks raw images and qcow2 luks encrypted images.
+Some qcow2 create options can't be used for amend.
+Remove them from the qcow2 create options and add generic logic to detect
+such options in qemu-img
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- tests/qemu-iotests/293     | 207 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/293.out |  99 ++++++++++++++++++
- tests/qemu-iotests/294     |  90 ++++++++++++++++
- tests/qemu-iotests/294.out |  30 ++++++
- tests/qemu-iotests/group   |   2 +
- 5 files changed, 428 insertions(+)
- create mode 100755 tests/qemu-iotests/293
- create mode 100644 tests/qemu-iotests/293.out
- create mode 100755 tests/qemu-iotests/294
- create mode 100644 tests/qemu-iotests/294.out
+ block/qcow2.c              | 108 ++++++---------------
+ qemu-img.c                 |  18 +++-
+ tests/qemu-iotests/049.out | 102 ++++++++++----------
+ tests/qemu-iotests/061.out |  12 ++-
+ tests/qemu-iotests/079.out |  18 ++--
+ tests/qemu-iotests/082.out | 149 ++++------------------------
+ tests/qemu-iotests/085.out |  38 ++++----
+ tests/qemu-iotests/087.out |   6 +-
+ tests/qemu-iotests/115.out |   2 +-
+ tests/qemu-iotests/121.out |   4 +-
+ tests/qemu-iotests/125.out | 192 ++++++++++++++++++-------------------
+ tests/qemu-iotests/134.out |   2 +-
+ tests/qemu-iotests/144.out |   4 +-
+ tests/qemu-iotests/158.out |   4 +-
+ tests/qemu-iotests/182.out |   2 +-
+ tests/qemu-iotests/185.out |   8 +-
+ tests/qemu-iotests/188.out |   2 +-
+ tests/qemu-iotests/189.out |   4 +-
+ tests/qemu-iotests/198.out |   4 +-
+ tests/qemu-iotests/243.out |  16 ++--
+ tests/qemu-iotests/250.out |   2 +-
+ tests/qemu-iotests/255.out |   8 +-
+ tests/qemu-iotests/259.out |   2 +-
+ tests/qemu-iotests/263.out |   4 +-
+ tests/qemu-iotests/280.out |   2 +-
+ 25 files changed, 284 insertions(+), 429 deletions(-)
 
-diff --git a/tests/qemu-iotests/293 b/tests/qemu-iotests/293
-new file mode 100755
-index 0000000000..aa1a77690f
---- /dev/null
-+++ b/tests/qemu-iotests/293
-@@ -0,0 +1,207 @@
-+#!/usr/bin/env bash
-+#
-+# Test encryption key management with luks
-+# Based on 134
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=3Dmlevitsk@redhat.com
-+
-+seq=3D`basename $0`
-+echo "QA output created by $seq"
-+
-+status=3D1=09# failure is the default!
-+
-+_cleanup()
-+{
-+=09_cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt qcow2 luks
-+_supported_proto file #TODO
-+
-+QEMU_IO_OPTIONS=3D$QEMU_IO_OPTIONS_NO_FMT
-+
-+if [ "$IMGFMT" =3D "qcow2" ] ; then
-+=09PR=3D"encrypt."
-+=09EXTRA_IMG_ARGS=3D"-o encrypt.format=3Dluks"
-+fi
-+
-+
-+# secrets: you are supposed to see the password as *******, see :-)
-+S0=3D"--object secret,id=3Dsec0,data=3Dhunter0"
-+S1=3D"--object secret,id=3Dsec1,data=3Dhunter1"
-+S2=3D"--object secret,id=3Dsec2,data=3Dhunter2"
-+S3=3D"--object secret,id=3Dsec3,data=3Dhunter3"
-+S4=3D"--object secret,id=3Dsec4,data=3Dhunter4"
-+SECRETS=3D"$S0 $S1 $S2 $S3 $S4"
-+
-+# image with given secret
-+IMGS0=3D"--image-opts driver=3D$IMGFMT,file.filename=3D$TEST_IMG,${PR}key-=
-secret=3Dsec0"
-+IMGS1=3D"--image-opts driver=3D$IMGFMT,file.filename=3D$TEST_IMG,${PR}key-=
-secret=3Dsec1"
-+IMGS2=3D"--image-opts driver=3D$IMGFMT,file.filename=3D$TEST_IMG,${PR}key-=
-secret=3Dsec2"
-+IMGS3=3D"--image-opts driver=3D$IMGFMT,file.filename=3D$TEST_IMG,${PR}key-=
-secret=3Dsec3"
-+IMGS4=3D"--image-opts driver=3D$IMGFMT,file.filename=3D$TEST_IMG,${PR}key-=
-secret=3Dsec4"
-+
-+
-+echo "=3D=3D creating a test image =3D=3D"
-+_make_test_img $S0 $EXTRA_IMG_ARGS -o ${PR}key-secret=3Dsec0,${PR}iter-tim=
-e=3D10 32M
-+
-+echo
-+echo "=3D=3D test that key 0 opens the image =3D=3D"
-+$QEMU_IO $S0 -c "read 0 4096" $IMGS0 | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "=3D=3D adding a password to slot 4 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS0 -o ${PR}state=3Dactive,${PR}new-secret=3Ds=
-ec4,${PR}iter-time=3D10,${PR}keyslot=3D4
-+echo "=3D=3D adding a password to slot 1 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS0 -o ${PR}state=3Dactive,${PR}new-secret=3Ds=
-ec1,${PR}iter-time=3D10
-+echo "=3D=3D adding a password to slot 3 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dactive,${PR}new-secret=3Ds=
-ec3,${PR}iter-time=3D10,${PR}keyslot=3D3
-+
-+echo "=3D=3D adding a password to slot 2 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS3 -o ${PR}state=3Dactive,${PR}new-secret=3Ds=
-ec2,${PR}iter-time=3D10
-+
-+
-+echo "=3D=3D erase slot 4 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}keyslot=3D4 =
-| _filter_img_create
-+
-+
-+echo
-+echo "=3D=3D all secrets should work =3D=3D"
-+for IMG in "$IMGS0" "$IMGS1" "$IMGS2" "$IMGS3"; do
-+=09$QEMU_IO $SECRETS -c "read 0 4096" $IMG | _filter_qemu_io | _filter_tes=
-tdir
-+done
-+
-+echo
-+echo "=3D=3D erase slot 0 and try it =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}old-secret=
-=3Dsec0 | _filter_img_create
-+$QEMU_IO $SECRETS -c "read 0 4096" $IMGS0 | _filter_qemu_io | _filter_test=
-dir
-+
-+echo
-+echo "=3D=3D erase slot 2 and try it =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}keyslot=3D2 =
-| _filter_img_create
-+$QEMU_IO $SECRETS -c "read 0 4096" $IMGS2 | _filter_qemu_io | _filter_test=
-dir
-+
-+
-+# at this point slots 1 and 3 should be active
-+
-+echo
-+echo "=3D=3D filling  4 slots with secret 2 =3D=3D"
-+for i in $(seq 0 3) ; do
-+=09$QEMU_IMG amend $SECRETS $IMGS3 -o ${PR}state=3Dactive,${PR}new-secret=
-=3Dsec2,${PR}iter-time=3D10
-+done
-+
-+echo
-+echo "=3D=3D adding secret 0 =3D=3D"
-+=09$QEMU_IMG amend $SECRETS $IMGS3 -o ${PR}state=3Dactive,${PR}new-secret=
-=3Dsec0,${PR}iter-time=3D10
-+
-+echo
-+echo "=3D=3D adding secret 3 (last slot) =3D=3D"
-+=09$QEMU_IMG amend $SECRETS $IMGS3 -o ${PR}state=3Dactive,${PR}new-secret=
-=3Dsec3,${PR}iter-time=3D10
-+
-+echo
-+echo "=3D=3D trying to add another slot (should fail) =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS2 -o ${PR}state=3Dactive,${PR}new-secret=3Ds=
-ec3,${PR}iter-time=3D10
-+
-+echo
-+echo "=3D=3D all secrets should work again =3D=3D"
-+for IMG in "$IMGS0" "$IMGS1" "$IMGS2" "$IMGS3"; do
-+=09$QEMU_IO $SECRETS -c "read 0 4096" $IMG | _filter_qemu_io | _filter_tes=
-tdir
-+done
-+
-+
-+echo
-+
-+echo "=3D=3D erase all keys of secret 2=3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}old-secret=
-=3Dsec2
-+
-+echo "=3D=3D erase all keys of secret 1=3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}old-secret=
-=3Dsec1
-+
-+echo "=3D=3D erase all keys of secret 0=3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS0 -o ${PR}state=3Dinactive,${PR}old-secret=
-=3Dsec0
-+
-+echo "=3D=3D erasing secret3 will fail now since it is the only secret (in=
- 3 slots) =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS3 -o ${PR}state=3Dinactive,${PR}old-secret=
-=3Dsec3
-+
-+echo
-+echo "=3D=3D only secret3 should work now  =3D=3D"
-+for IMG in "$IMGS0" "$IMGS1" "$IMGS2" "$IMGS3"; do
-+=09$QEMU_IO $SECRETS -c "read 0 4096" $IMG | _filter_qemu_io | _filter_tes=
-tdir
-+done
-+
-+echo
-+echo "=3D=3D add secret0  =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS3 -o ${PR}state=3Dactive,${PR}new-secret=3Ds=
-ec0,${PR}iter-time=3D10
-+
-+echo "=3D=3D erase secret3 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS0 -o ${PR}state=3Dinactive,${PR}old-secret=
-=3Dsec3
-+
-+echo
-+echo "=3D=3D only secret0 should work now  =3D=3D"
-+for IMG in "$IMGS0" "$IMGS1" "$IMGS2" "$IMGS3"; do
-+=09$QEMU_IO $SECRETS -c "read 0 4096" $IMG | _filter_qemu_io | _filter_tes=
-tdir
-+done
-+
-+echo
-+echo "=3D=3D replace secret0 with secret1 (should fail)  =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS0 -o ${PR}state=3Dactive,${PR}new-secret=3Ds=
-ec1,${PR}keyslot=3D0
-+
-+echo
-+echo "=3D=3D replace secret0 with secret1 with force (should work)  =3D=3D=
-"
-+$QEMU_IMG amend $SECRETS $IMGS0 -o ${PR}state=3Dactive,${PR}new-secret=3Ds=
-ec1,${PR}iter-time=3D10,${PR}keyslot=3D0 --force
-+
-+echo
-+echo "=3D=3D only secret1 should work now  =3D=3D"
-+for IMG in "$IMGS0" "$IMGS1" "$IMGS2" "$IMGS3"; do
-+=09$QEMU_IO $SECRETS -c "read 0 4096" $IMG | _filter_qemu_io | _filter_tes=
-tdir
-+done
-+
-+
-+echo
-+echo "=3D=3D erase last secret (should fail)  =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}keyslot=3D0
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}old-secret=
-=3Dsec1
-+
-+
-+echo "=3D=3D erase non existing secrets (should fail)  =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}old-secret=
-=3Dsec5 --force
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}old-secret=
-=3Dsec0 --force
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}keyslot=3D1 =
---force
-+
-+echo
-+echo "=3D=3D erase last secret with force by slot (should work)  =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}state=3Dinactive,${PR}keyslot=3D0 =
---force
-+
-+echo
-+echo "=3D=3D we have no secrets now, data is lost forever =3D=3D"
-+for IMG in "$IMGS0" "$IMGS1" "$IMGS2" "$IMGS3"; do
-+=09$QEMU_IO $SECRETS -c "read 0 4096" $IMG | _filter_qemu_io | _filter_tes=
-tdir
-+done
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=3D0
-+
-diff --git a/tests/qemu-iotests/293.out b/tests/qemu-iotests/293.out
-new file mode 100644
-index 0000000000..7260783126
---- /dev/null
-+++ b/tests/qemu-iotests/293.out
-@@ -0,0 +1,99 @@
-+QA output created by 293
-+=3D=3D creating a test image =3D=3D
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D33554432
-+
-+=3D=3D test that key 0 opens the image =3D=3D
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=3D=3D adding a password to slot 4 =3D=3D
-+=3D=3D adding a password to slot 1 =3D=3D
-+=3D=3D adding a password to slot 3 =3D=3D
-+=3D=3D adding a password to slot 2 =3D=3D
-+=3D=3D erase slot 4 =3D=3D
-+
-+=3D=3D all secrets should work =3D=3D
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=3D=3D erase slot 0 and try it =3D=3D
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+=3D=3D erase slot 2 and try it =3D=3D
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+=3D=3D filling  4 slots with secret 2 =3D=3D
-+
-+=3D=3D adding secret 0 =3D=3D
-+
-+=3D=3D adding secret 3 (last slot) =3D=3D
-+
-+=3D=3D trying to add another slot (should fail) =3D=3D
-+qemu-img: Can't add a keyslot - all keyslots are in use
-+
-+=3D=3D all secrets should work again =3D=3D
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=3D=3D erase all keys of secret 2=3D=3D
-+=3D=3D erase all keys of secret 1=3D=3D
-+=3D=3D erase all keys of secret 0=3D=3D
-+=3D=3D erasing secret3 will fail now since it is the only secret (in 3 slo=
-ts) =3D=3D
-+qemu-img: All the active keyslots match the (old) password that was given =
-and erasing them will erase all the data in the image irreversibly - refusi=
-ng operation
-+
-+=3D=3D only secret3 should work now  =3D=3D
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=3D=3D add secret0  =3D=3D
-+=3D=3D erase secret3 =3D=3D
-+
-+=3D=3D only secret0 should work now  =3D=3D
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+=3D=3D replace secret0 with secret1 (should fail)  =3D=3D
-+qemu-img: Refusing to overwrite active keyslot 0 - please erase it first
-+
-+=3D=3D replace secret0 with secret1 with force (should work)  =3D=3D
-+
-+=3D=3D only secret1 should work now  =3D=3D
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+=3D=3D erase last secret (should fail)  =3D=3D
-+qemu-img: Attempt to erase the only active keyslot 0 which will erase all =
-the data in the image irreversibly - refusing operation
-+qemu-img: All the active keyslots match the (old) password that was given =
-and erasing them will erase all the data in the image irreversibly - refusi=
-ng operation
-+=3D=3D erase non existing secrets (should fail)  =3D=3D
-+qemu-img: No secret with id 'sec5'
-+qemu-img: No keyslots match given (old) password for erase operation
-+
-+=3D=3D erase last secret with force by slot (should work)  =3D=3D
-+
-+=3D=3D we have no secrets now, data is lost forever =3D=3D
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+*** done
-diff --git a/tests/qemu-iotests/294 b/tests/qemu-iotests/294
-new file mode 100755
-index 0000000000..9c95ed8c9a
---- /dev/null
-+++ b/tests/qemu-iotests/294
-@@ -0,0 +1,90 @@
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=3Dmlevitsk@redhat.com
-+
-+seq=3D`basename $0`
-+echo "QA output created by $seq"
-+
-+status=3D1=09# failure is the default!
-+
-+_cleanup()
-+{
-+=09_cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt luks
-+_supported_proto file #TODO
-+
-+QEMU_IO_OPTIONS=3D$QEMU_IO_OPTIONS_NO_FMT
-+
-+# you are supposed to see the password as *******, see :-)
-+S0=3D"--object secret,id=3Dsec0,data=3Dhunter0"
-+S1=3D"--object secret,id=3Dsec1,data=3Dhunter1"
-+SECRETS=3D"$S0 $S1"
-+
-+
-+IMGS0=3D"--image-opts driver=3D$IMGFMT,file.filename=3D$TEST_IMG,key-secre=
-t=3Dsec0"
-+IMGS1=3D"--image-opts driver=3D$IMGFMT,file.filename=3D$TEST_IMG,key-secre=
-t=3Dsec1"
-+
-+echo "=3D=3D creating a test image =3D=3D"
-+_make_test_img $S0 -o "key-secret=3Dsec0,iter-time=3D10" 32M
-+
-+echo
-+echo "=3D=3D test that key 0 opens the image =3D=3D"
-+$QEMU_IO $S0 -c "read 0 4096" $IMGS0 | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "=3D=3D adding a password to slot 1 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS0 -o state=3Dactive,new-secret=3Dsec1,keyslo=
-t=3D1,iter-time=3D10
-+
-+echo
-+echo "=3D=3D 'backup' the image header =3D=3D"
-+dd if=3D$TEST_IMG_FILE of=3D${TEST_IMG_FILE}.bk bs=3D4K skip=3D0 count=3D1
-+
-+echo
-+echo "=3D=3D erase slot 0 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o state=3Dinactive,keyslot=3D0 | _filter_=
-img_create
-+
-+echo
-+echo "=3D=3D test that key 0 doesn't open the image =3D=3D"
-+$QEMU_IO $S0 -c "read 0 4096" $IMGS0 | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "=3D=3D 'restore' the image header =3D=3D"
-+dd if=3D${TEST_IMG_FILE}.bk of=3D${TEST_IMG_FILE} bs=3D4K skip=3D0 count=
-=3D1 conv=3Dnotrunc
-+
-+echo
-+echo "=3D=3D test that key 0 still doesn't open the image (key material is=
- erased) =3D=3D"
-+$QEMU_IO $SECRETS -c "read 0 4096" $IMGS0 | _filter_qemu_io | _filter_test=
-dir
-+
-+echo
-+echo "=3D=3D test that key 1 still works =3D=3D"
-+$QEMU_IO $SECRETS -c "read 0 4096" $IMGS1 | _filter_qemu_io | _filter_test=
-dir
-+
-+echo "*** done"
-+rm -f $seq.full
-+status=3D0
-+
-+
-+exit 0
-diff --git a/tests/qemu-iotests/294.out b/tests/qemu-iotests/294.out
-new file mode 100644
-index 0000000000..994ae87308
---- /dev/null
-+++ b/tests/qemu-iotests/294.out
-@@ -0,0 +1,30 @@
-+QA output created by 294
-+=3D=3D creating a test image =3D=3D
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D33554432
-+
-+=3D=3D test that key 0 opens the image =3D=3D
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=3D=3D adding a password to slot 1 =3D=3D
-+
-+=3D=3D 'backup' the image header =3D=3D
-+1+0 records in
-+1+0 records out
-+
-+=3D=3D erase slot 0 =3D=3D
-+
-+=3D=3D test that key 0 doesn't open the image =3D=3D
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+=3D=3D 'restore' the image header =3D=3D
-+1+0 records in
-+1+0 records out
-+
-+=3D=3D test that key 0 still doesn't open the image (key material is erase=
-d) =3D=3D
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+=3D=3D test that key 1 still works =3D=3D
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 1710470e70..560e50e9fa 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -298,3 +298,5 @@
- 288 quick
- 289 rw quick
- 290 rw auto quick
-+293 rw auto
-+294 rw auto quick
+diff --git a/block/qcow2.c b/block/qcow2.c
+index f2cf72ead2..aa0cadb86f 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2971,17 +2971,6 @@ static int qcow2_change_backing_file(BlockDriverStat=
+e *bs,
+     return qcow2_update_header(bs);
+ }
+=20
+-static int qcow2_crypt_method_from_format(const char *encryptfmt)
+-{
+-    if (g_str_equal(encryptfmt, "luks")) {
+-        return QCOW_CRYPT_LUKS;
+-    } else if (g_str_equal(encryptfmt, "aes")) {
+-        return QCOW_CRYPT_AES;
+-    } else {
+-        return -EINVAL;
+-    }
+-}
+-
+ static int qcow2_set_up_encryption(BlockDriverState *bs,
+                                    QCryptoBlockCreateOptions *cryptoopts,
+                                    Error **errp)
+@@ -5229,9 +5218,6 @@ static int qcow2_amend_options(BlockDriverState *bs, =
+QemuOpts *opts,
+     bool lazy_refcounts =3D s->use_lazy_refcounts;
+     bool data_file_raw =3D data_file_is_raw(bs);
+     const char *compat =3D NULL;
+-    uint64_t cluster_size =3D s->cluster_size;
+-    bool encrypt;
+-    int encformat;
+     int refcount_bits =3D s->refcount_bits;
+     int ret;
+     QemuOptDesc *desc =3D opts->list->desc;
+@@ -5256,44 +5242,12 @@ static int qcow2_amend_options(BlockDriverState *bs=
+, QemuOpts *opts,
+                 error_setg(errp, "Unknown compatibility level %s", compat)=
+;
+                 return -EINVAL;
+             }
+-        } else if (!strcmp(desc->name, BLOCK_OPT_PREALLOC)) {
+-            error_setg(errp, "Cannot change preallocation mode");
+-            return -ENOTSUP;
+         } else if (!strcmp(desc->name, BLOCK_OPT_SIZE)) {
+             new_size =3D qemu_opt_get_size(opts, BLOCK_OPT_SIZE, 0);
+         } else if (!strcmp(desc->name, BLOCK_OPT_BACKING_FILE)) {
+             backing_file =3D qemu_opt_get(opts, BLOCK_OPT_BACKING_FILE);
+         } else if (!strcmp(desc->name, BLOCK_OPT_BACKING_FMT)) {
+             backing_format =3D qemu_opt_get(opts, BLOCK_OPT_BACKING_FMT);
+-        } else if (!strcmp(desc->name, BLOCK_OPT_ENCRYPT)) {
+-            encrypt =3D qemu_opt_get_bool(opts, BLOCK_OPT_ENCRYPT,
+-                                        !!s->crypto);
+-
+-            if (encrypt !=3D !!s->crypto) {
+-                error_setg(errp,
+-                           "Changing the encryption flag is not supported"=
+);
+-                return -ENOTSUP;
+-            }
+-        } else if (!strcmp(desc->name, BLOCK_OPT_ENCRYPT_FORMAT)) {
+-            encformat =3D qcow2_crypt_method_from_format(
+-                qemu_opt_get(opts, BLOCK_OPT_ENCRYPT_FORMAT));
+-
+-            if (encformat !=3D s->crypt_method_header) {
+-                error_setg(errp,
+-                           "Changing the encryption format is not supporte=
+d");
+-                return -ENOTSUP;
+-            }
+-        } else if (g_str_has_prefix(desc->name, "encrypt.")) {
+-            error_setg(errp,
+-                       "Changing the encryption parameters is not supporte=
+d");
+-            return -ENOTSUP;
+-        } else if (!strcmp(desc->name, BLOCK_OPT_CLUSTER_SIZE)) {
+-            cluster_size =3D qemu_opt_get_size(opts, BLOCK_OPT_CLUSTER_SIZ=
+E,
+-                                             cluster_size);
+-            if (cluster_size !=3D s->cluster_size) {
+-                error_setg(errp, "Changing the cluster size is not support=
+ed");
+-                return -ENOTSUP;
+-            }
+         } else if (!strcmp(desc->name, BLOCK_OPT_LAZY_REFCOUNTS)) {
+             lazy_refcounts =3D qemu_opt_get_bool(opts, BLOCK_OPT_LAZY_REFC=
+OUNTS,
+                                                lazy_refcounts);
+@@ -5544,37 +5498,6 @@ void qcow2_signal_corruption(BlockDriverState *bs, b=
+ool fatal, int64_t offset,
+         .help =3D "The external data file must stay valid "           \
+                 "as a raw image"                                    \
+     },                                                              \
+-    {                                                               \
+-        .name =3D BLOCK_OPT_ENCRYPT,                                  \
+-        .type =3D QEMU_OPT_BOOL,                                      \
+-        .help =3D "Encrypt the image with format 'aes'. (Deprecated " \
+-                "in favor of " BLOCK_OPT_ENCRYPT_FORMAT "=3Daes)",    \
+-    },                                                              \
+-    {                                                               \
+-        .name =3D BLOCK_OPT_ENCRYPT_FORMAT,                           \
+-        .type =3D QEMU_OPT_STRING,                                    \
+-        .help =3D "Encrypt the image, format choices: 'aes', 'luks'", \
+-    },                                                              \
+-    BLOCK_CRYPTO_OPT_DEF_KEY_SECRET("encrypt.",                     \
+-        "ID of secret providing qcow AES key or LUKS passphrase"),  \
+-    BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG("encrypt."),               \
+-    BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE("encrypt."),              \
+-    BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG("encrypt."),                \
+-    BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG("encrypt."),           \
+-    BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG("encrypt."),                 \
+-    BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME("encrypt."),                \
+-    {                                                               \
+-        .name =3D BLOCK_OPT_CLUSTER_SIZE,                             \
+-        .type =3D QEMU_OPT_SIZE,                                      \
+-        .help =3D "qcow2 cluster size",                               \
+-        .def_value_str =3D stringify(DEFAULT_CLUSTER_SIZE)            \
+-    },                                                              \
+-    {                                                               \
+-        .name =3D BLOCK_OPT_PREALLOC,                                 \
+-        .type =3D QEMU_OPT_STRING,                                    \
+-        .help =3D "Preallocation mode (allowed values: off, "         \
+-                "metadata, falloc, full)"                           \
+-    },                                                              \
+     {                                                               \
+         .name =3D BLOCK_OPT_LAZY_REFCOUNTS,                           \
+         .type =3D QEMU_OPT_BOOL,                                      \
+@@ -5592,6 +5515,37 @@ static QemuOptsList qcow2_create_opts =3D {
+     .name =3D "qcow2-create-opts",
+     .head =3D QTAILQ_HEAD_INITIALIZER(qcow2_create_opts.head),
+     .desc =3D {
++        {                                                               \
++            .name =3D BLOCK_OPT_ENCRYPT,                                  =
+\
++            .type =3D QEMU_OPT_BOOL,                                      =
+\
++            .help =3D "Encrypt the image with format 'aes'. (Deprecated " =
+\
++                    "in favor of " BLOCK_OPT_ENCRYPT_FORMAT "=3Daes)",    =
+\
++        },                                                              \
++        {                                                               \
++            .name =3D BLOCK_OPT_ENCRYPT_FORMAT,                           =
+\
++            .type =3D QEMU_OPT_STRING,                                    =
+\
++            .help =3D "Encrypt the image, format choices: 'aes', 'luks'", =
+\
++        },                                                              \
++        BLOCK_CRYPTO_OPT_DEF_KEY_SECRET("encrypt.",                     \
++            "ID of secret providing qcow AES key or LUKS passphrase"),  \
++        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG("encrypt."),               \
++        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE("encrypt."),              \
++        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG("encrypt."),                \
++        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG("encrypt."),           \
++        BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG("encrypt."),                 \
++        BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME("encrypt."),                \
++        {                                                               \
++            .name =3D BLOCK_OPT_CLUSTER_SIZE,                             =
+\
++            .type =3D QEMU_OPT_SIZE,                                      =
+\
++            .help =3D "qcow2 cluster size",                               =
+\
++            .def_value_str =3D stringify(DEFAULT_CLUSTER_SIZE)            =
+\
++        },                                                              \
++        {                                                               \
++            .name =3D BLOCK_OPT_PREALLOC,                                 =
+\
++            .type =3D QEMU_OPT_STRING,                                    =
+\
++            .help =3D "Preallocation mode (allowed values: off, "         =
+\
++                    "metadata, falloc, full)"                           \
++        },                                                              \
+         QCOW_COMMON_OPTIONS,
+         { /* end of list */ }
+     }
+diff --git a/qemu-img.c b/qemu-img.c
+index 8f69366f03..b291081249 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -3939,9 +3939,8 @@ static int print_amend_option_help(const char *format=
+)
+     /* Every driver supporting amendment must have amend_opts */
+     assert(drv->amend_opts);
+=20
+-    printf("Creation options for '%s':\n", format);
++    printf("Amend options for '%s':\n", format);
+     qemu_opts_print_help(drv->amend_opts, false);
+-    printf("\nNote that not all of these options may be amendable.\n");
+     return 0;
+ }
+=20
+@@ -4087,7 +4086,22 @@ static int img_amend(int argc, char **argv)
+     amend_opts =3D qemu_opts_append(amend_opts, bs->drv->amend_opts);
+     opts =3D qemu_opts_create(amend_opts, NULL, 0, &error_abort);
+     qemu_opts_do_parse(opts, options, NULL, &err);
++
+     if (err) {
++        /* Try to parse options using the create options*/
++        Error *err1 =3D NULL;
++        amend_opts =3D qemu_opts_append(amend_opts, bs->drv->create_opts);
++        qemu_opts_del(opts);
++        opts =3D qemu_opts_create(amend_opts, NULL, 0, &error_abort);
++        qemu_opts_do_parse(opts, options, NULL, &err1);
++
++        if (!err1) {
++            error_append_hint(&err,
++                              "This option is only supported for image cre=
+ation\n");
++        } else {
++            error_free(err1);
++        }
++
+         error_report_err(err);
+         ret =3D -1;
+         goto out;
+diff --git a/tests/qemu-iotests/049.out b/tests/qemu-iotests/049.out
+index affa55b341..dad3be70d3 100644
+--- a/tests/qemu-iotests/049.out
++++ b/tests/qemu-iotests/049.out
+@@ -4,90 +4,90 @@ QA output created by 049
+ =3D=3D 1. Traditional size parameter =3D=3D
+=20
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1024
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1024 cluster_size=3D6553=
+6 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D102=
+4 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1024b
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1024 cluster_size=3D6553=
+6 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D102=
+4 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1k
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1024 cluster_size=3D6553=
+6 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D102=
+4 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1K
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1024 cluster_size=3D6553=
+6 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D102=
+4 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1048576 cluster_size=3D6=
+5536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D104=
+8576 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1G
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1073741824 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D107=
+3741824 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1T
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1099511627776 cluster_si=
+ze=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D109=
+9511627776 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1024.0
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1024 cluster_size=3D6553=
+6 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D102=
+4 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1024.0b
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1024 cluster_size=3D6553=
+6 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D102=
+4 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1.5k
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1536 cluster_size=3D6553=
+6 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D153=
+6 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1.5K
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1536 cluster_size=3D6553=
+6 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D153=
+6 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1.5M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1572864 cluster_size=3D6=
+5536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D157=
+2864 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1.5G
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1610612736 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D161=
+0612736 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 TEST_DIR/t.qcow2 1.5T
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1649267441664 cluster_si=
+ze=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D164=
+9267441664 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ =3D=3D 2. Specifying size via -o =3D=3D
+=20
+ qemu-img create -f qcow2 -o size=3D1024 TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1024 cluster_size=3D6553=
+6 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D102=
+4 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o size=3D1024b TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1024 cluster_size=3D6553=
+6 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D102=
+4 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o size=3D1k TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1024 cluster_size=3D6553=
+6 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D102=
+4 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o size=3D1K TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1024 cluster_size=3D6553=
+6 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D102=
+4 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o size=3D1M TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1048576 cluster_size=3D6=
+5536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D104=
+8576 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o size=3D1G TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1073741824 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D107=
+3741824 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o size=3D1T TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1099511627776 cluster_si=
+ze=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D109=
+9511627776 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o size=3D1024.0 TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1024 cluster_size=3D6553=
+6 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D102=
+4 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o size=3D1024.0b TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1024 cluster_size=3D6553=
+6 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D102=
+4 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o size=3D1.5k TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1536 cluster_size=3D6553=
+6 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D153=
+6 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o size=3D1.5K TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1536 cluster_size=3D6553=
+6 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D153=
+6 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o size=3D1.5M TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1572864 cluster_size=3D6=
+5536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D157=
+2864 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o size=3D1.5G TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1610612736 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D161=
+0612736 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o size=3D1.5T TEST_DIR/t.qcow2
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D1649267441664 cluster_si=
+ze=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D164=
+9267441664 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ =3D=3D 3. Invalid sizes =3D=3D
+=20
+@@ -129,84 +129,84 @@ qemu-img: TEST_DIR/t.qcow2: The image size must be sp=
+ecified only once
+ =3D=3D Check correct interpretation of suffixes for cluster size =3D=3D
+=20
+ qemu-img create -f qcow2 -o cluster_size=3D1024 TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 cluster_size=3D=
+1024 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D1024 size=3D6710=
+8864 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o cluster_size=3D1024b TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 cluster_size=3D=
+1024 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D1024 size=3D6710=
+8864 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o cluster_size=3D1k TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 cluster_size=3D=
+1024 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D1024 size=3D6710=
+8864 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o cluster_size=3D1K TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 cluster_size=3D=
+1024 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D1024 size=3D6710=
+8864 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o cluster_size=3D1M TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 cluster_size=3D=
+1048576 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D1048576 size=3D6=
+7108864 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o cluster_size=3D1024.0 TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 cluster_size=3D=
+1024 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D1024 size=3D6710=
+8864 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o cluster_size=3D1024.0b TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 cluster_size=3D=
+1024 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D1024 size=3D6710=
+8864 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o cluster_size=3D0.5k TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 cluster_size=3D=
+512 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D512 size=3D67108=
+864 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o cluster_size=3D0.5K TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 cluster_size=3D=
+512 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D512 size=3D67108=
+864 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o cluster_size=3D0.5M TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 cluster_size=3D=
+524288 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D524288 size=3D67=
+108864 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ =3D=3D Check compat level option =3D=3D
+=20
+ qemu-img create -f qcow2 -o compat=3D0.10 TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 compat=3D0.10 c=
+luster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D671=
+08864 compat=3D0.10 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o compat=3D1.1 TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 compat=3D1.1 cl=
+uster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D671=
+08864 compat=3D1.1 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o compat=3D0.42 TEST_DIR/t.qcow2 64M
+ qemu-img: TEST_DIR/t.qcow2: Invalid parameter '0.42'
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 compat=3D0.42 c=
+luster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D671=
+08864 compat=3D0.42 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o compat=3Dfoobar TEST_DIR/t.qcow2 64M
+ qemu-img: TEST_DIR/t.qcow2: Invalid parameter 'foobar'
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 compat=3Dfoobar=
+ cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D671=
+08864 compat=3Dfoobar lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ =3D=3D Check preallocation option =3D=3D
+=20
+ qemu-img create -f qcow2 -o preallocation=3Doff TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 cluster_size=3D=
+65536 preallocation=3Doff lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 preallocat=
+ion=3Doff size=3D67108864 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o preallocation=3Dmetadata TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 cluster_size=3D=
+65536 preallocation=3Dmetadata lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 preallocat=
+ion=3Dmetadata size=3D67108864 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o preallocation=3D1234 TEST_DIR/t.qcow2 64M
+ qemu-img: TEST_DIR/t.qcow2: Invalid parameter '1234'
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 cluster_size=3D=
+65536 preallocation=3D1234 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 preallocat=
+ion=3D1234 size=3D67108864 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ =3D=3D Check encryption option =3D=3D
+=20
+ qemu-img create -f qcow2 -o encryption=3Doff TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 encryption=3Dof=
+f cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 encryption=3Doff cluster_size=
+=3D65536 size=3D67108864 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 --object secret,id=3Dsec0,data=3D123456 -o encryp=
+tion=3Don,encrypt.key-secret=3Dsec0 TEST_DIR/t.qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 encryption=3Don=
+ encrypt.key-secret=3Dsec0 cluster_size=3D65536 lazy_refcounts=3Doff refcou=
+nt_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 encryption=3Don encrypt.key-sec=
+ret=3Dsec0 cluster_size=3D65536 size=3D67108864 lazy_refcounts=3Doff refcou=
+nt_bits=3D16
+=20
+ =3D=3D Check lazy_refcounts option (only with v3) =3D=3D
+=20
+ qemu-img create -f qcow2 -o compat=3D1.1,lazy_refcounts=3Doff TEST_DIR/t.q=
+cow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 compat=3D1.1 cl=
+uster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D671=
+08864 compat=3D1.1 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o compat=3D1.1,lazy_refcounts=3Don TEST_DIR/t.qc=
+ow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 compat=3D1.1 cl=
+uster_size=3D65536 lazy_refcounts=3Don refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D671=
+08864 compat=3D1.1 lazy_refcounts=3Don refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o compat=3D0.10,lazy_refcounts=3Doff TEST_DIR/t.=
+qcow2 64M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 compat=3D0.10 c=
+luster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D671=
+08864 compat=3D0.10 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ qemu-img create -f qcow2 -o compat=3D0.10,lazy_refcounts=3Don TEST_DIR/t.q=
+cow2 64M
+ qemu-img: TEST_DIR/t.qcow2: Lazy refcounts only supported with compatibili=
+ty level 1.1 and above (use version=3Dv3 or greater)
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 compat=3D0.10 c=
+luster_size=3D65536 lazy_refcounts=3Don refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D671=
+08864 compat=3D0.10 lazy_refcounts=3Don refcount_bits=3D16
+=20
+ *** done
+diff --git a/tests/qemu-iotests/061.out b/tests/qemu-iotests/061.out
+index 5a8d36d005..9ea22c8c24 100644
+--- a/tests/qemu-iotests/061.out
++++ b/tests/qemu-iotests/061.out
+@@ -381,16 +381,20 @@ qemu-img: Lazy refcounts only supported with compatib=
+ility level 1.1 and above (
+ qemu-img: Lazy refcounts only supported with compatibility level 1.1 and a=
+bove (use compat=3D1.1 or greater)
+ qemu-img: Unknown compatibility level 0.42
+ qemu-img: Invalid parameter 'foo'
+-qemu-img: Changing the cluster size is not supported
+-qemu-img: Changing the encryption flag is not supported
+-qemu-img: Cannot change preallocation mode
++qemu-img: Invalid parameter 'cluster_size'
++This option is only supported for image creation
++qemu-img: Invalid parameter 'encryption'
++This option is only supported for image creation
++qemu-img: Invalid parameter 'preallocation'
++This option is only supported for image creation
+=20
+ =3D=3D=3D Testing correct handling of unset value =3D=3D=3D
+=20
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
+ Should work:
+ Should not work:
+-qemu-img: Changing the cluster size is not supported
++qemu-img: Invalid parameter 'cluster_size'
++This option is only supported for image creation
+=20
+ =3D=3D=3D Testing zero expansion on inactive clusters =3D=3D=3D
+=20
+diff --git a/tests/qemu-iotests/079.out b/tests/qemu-iotests/079.out
+index aab922fb36..c7e37152f4 100644
+--- a/tests/qemu-iotests/079.out
++++ b/tests/qemu-iotests/079.out
+@@ -1,14 +1,14 @@
+ QA output created by 079
+ =3D=3D=3D Check option preallocation and cluster_size =3D=3D=3D
+=20
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D4294967296 preallocati=
+on=3Dmetadata
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D4294967296 preallocati=
+on=3Dmetadata
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D4294967296 preallocati=
+on=3Dmetadata
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D4294967296 preallocati=
+on=3Dmetadata
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D4294967296 preallocati=
+on=3Dmetadata
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D4294967296 preallocati=
+on=3Dmetadata
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D4294967296 preallocati=
+on=3Dmetadata
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D4294967296 preallocati=
+on=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D4294967296
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D4294967296
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D4294967296
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D4294967296
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D4294967296
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D4294967296
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D4294967296
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D4294967296
+ qemu-img: TEST_DIR/t.IMGFMT: Cluster size must be a power of two between 5=
+12 and 2048k
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D4294967296 preallocati=
+on=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D4294967296
+ *** done
+diff --git a/tests/qemu-iotests/082.out b/tests/qemu-iotests/082.out
+index 9d4ed4dc9d..c68458da8c 100644
+--- a/tests/qemu-iotests/082.out
++++ b/tests/qemu-iotests/082.out
+@@ -3,14 +3,14 @@ QA output created by 082
+ =3D=3D=3D create: Options specified more than once =3D=3D=3D
+=20
+ Testing: create -f foo -f qcow2 TEST_DIR/t.qcow2 128M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D134217728 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D134=
+217728 lazy_refcounts=3Doff refcount_bits=3D16
+ image: TEST_DIR/t.IMGFMT
+ file format: IMGFMT
+ virtual size: 128 MiB (134217728 bytes)
+ cluster_size: 65536
+=20
+ Testing: create -f qcow2 -o cluster_size=3D4k -o lazy_refcounts=3Don TEST_=
+DIR/t.qcow2 128M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D134217728 cluster_size=
+=3D4096 lazy_refcounts=3Don refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D4096 size=3D1342=
+17728 lazy_refcounts=3Don refcount_bits=3D16
+ image: TEST_DIR/t.IMGFMT
+ file format: IMGFMT
+ virtual size: 128 MiB (134217728 bytes)
+@@ -22,7 +22,7 @@ Format specific information:
+     corrupt: false
+=20
+ Testing: create -f qcow2 -o cluster_size=3D4k -o lazy_refcounts=3Don -o cl=
+uster_size=3D8k TEST_DIR/t.qcow2 128M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D134217728 cluster_size=
+=3D8192 lazy_refcounts=3Don refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D8192 size=3D1342=
+17728 lazy_refcounts=3Don refcount_bits=3D16
+ image: TEST_DIR/t.IMGFMT
+ file format: IMGFMT
+ virtual size: 128 MiB (134217728 bytes)
+@@ -34,7 +34,7 @@ Format specific information:
+     corrupt: false
+=20
+ Testing: create -f qcow2 -o cluster_size=3D4k,cluster_size=3D8k TEST_DIR/t=
+.qcow2 128M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D134217728 cluster_size=
+=3D8192 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D8192 size=3D1342=
+17728 lazy_refcounts=3Doff refcount_bits=3D16
+ image: TEST_DIR/t.IMGFMT
+ file format: IMGFMT
+ virtual size: 128 MiB (134217728 bytes)
+@@ -227,10 +227,10 @@ Supported options:
+   size=3D<size>            - Virtual disk size
+=20
+ Testing: create -f qcow2 -u -o backing_file=3DTEST_DIR/t.qcow2,,help TEST_=
+DIR/t.qcow2 128M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D134217728 backing_file=
+=3DTEST_DIR/t.qcow2,,help cluster_size=3D65536 lazy_refcounts=3Doff refcoun=
+t_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D134=
+217728 backing_file=3DTEST_DIR/t.qcow2,,help lazy_refcounts=3Doff refcount_=
+bits=3D16
+=20
+ Testing: create -f qcow2 -u -o backing_file=3DTEST_DIR/t.qcow2,,? TEST_DIR=
+/t.qcow2 128M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D134217728 backing_file=
+=3DTEST_DIR/t.qcow2,,? cluster_size=3D65536 lazy_refcounts=3Doff refcount_b=
+its=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D134=
+217728 backing_file=3DTEST_DIR/t.qcow2,,? lazy_refcounts=3Doff refcount_bit=
+s=3D16
+=20
+ Testing: create -f qcow2 -o backing_file=3DTEST_DIR/t.qcow2, -o help TEST_=
+DIR/t.qcow2 128M
+ qemu-img: Invalid option list: backing_file=3DTEST_DIR/t.qcow2,
+@@ -279,7 +279,7 @@ qemu-img: Format driver 'bochs' does not support image =
+creation
+ =3D=3D=3D convert: Options specified more than once =3D=3D=3D
+=20
+ Testing: create -f qcow2 TEST_DIR/t.qcow2 128M
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D134217728 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D134=
+217728 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ Testing: convert -f foo -f qcow2 TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
+ image: TEST_DIR/t.IMGFMT.base
+@@ -614,197 +614,93 @@ cluster_size: 65536
+ =3D=3D=3D amend: help for -o =3D=3D=3D
+=20
+ Testing: amend -f qcow2 -o help TEST_DIR/t.qcow2
+-Creation options for 'qcow2':
++Amend options for 'qcow2':
+   backing_file=3D<str>     - File name of a base image
+   backing_fmt=3D<str>      - Image format of the base image
+-  cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+   data_file=3D<str>        - File name of an external data file
+   data_file_raw=3D<bool (on/off)> - The external data file must stay valid=
+ as a raw image
+-  encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+-  encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+-  encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', 'lu=
+ks'
+-  encrypt.hash-alg=3D<str> - Name of encryption hash algorithm
+-  encrypt.iter-time=3D<num> - Time to spend in PBKDF in milliseconds
+-  encrypt.ivgen-alg=3D<str> - Name of IV generator algorithm
+-  encrypt.ivgen-hash-alg=3D<str> - Name of IV generator hash algorithm
+-  encrypt.key-secret=3D<str> - ID of secret providing qcow AES key or LUKS=
+ passphrase
+-  encryption=3D<bool (on/off)> - Encrypt the image with format 'aes'. (Dep=
+recated in favor of encrypt.format=3Daes)
+   lazy_refcounts=3D<bool (on/off)> - Postpone refcount updates
+-  preallocation=3D<str>    - Preallocation mode (allowed values: off, meta=
+data, falloc, full)
+   refcount_bits=3D<num>    - Width of a reference count entry in bits
+   size=3D<size>            - Virtual disk size
+=20
+-Note that not all of these options may be amendable.
+-
+ Testing: amend -f qcow2 -o ? TEST_DIR/t.qcow2
+-Creation options for 'qcow2':
++Amend options for 'qcow2':
+   backing_file=3D<str>     - File name of a base image
+   backing_fmt=3D<str>      - Image format of the base image
+-  cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+   data_file=3D<str>        - File name of an external data file
+   data_file_raw=3D<bool (on/off)> - The external data file must stay valid=
+ as a raw image
+-  encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+-  encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+-  encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', 'lu=
+ks'
+-  encrypt.hash-alg=3D<str> - Name of encryption hash algorithm
+-  encrypt.iter-time=3D<num> - Time to spend in PBKDF in milliseconds
+-  encrypt.ivgen-alg=3D<str> - Name of IV generator algorithm
+-  encrypt.ivgen-hash-alg=3D<str> - Name of IV generator hash algorithm
+-  encrypt.key-secret=3D<str> - ID of secret providing qcow AES key or LUKS=
+ passphrase
+-  encryption=3D<bool (on/off)> - Encrypt the image with format 'aes'. (Dep=
+recated in favor of encrypt.format=3Daes)
+   lazy_refcounts=3D<bool (on/off)> - Postpone refcount updates
+-  preallocation=3D<str>    - Preallocation mode (allowed values: off, meta=
+data, falloc, full)
+   refcount_bits=3D<num>    - Width of a reference count entry in bits
+   size=3D<size>            - Virtual disk size
+=20
+-Note that not all of these options may be amendable.
+-
+ Testing: amend -f qcow2 -o cluster_size=3D4k,help TEST_DIR/t.qcow2
+-Creation options for 'qcow2':
++Amend options for 'qcow2':
+   backing_file=3D<str>     - File name of a base image
+   backing_fmt=3D<str>      - Image format of the base image
+-  cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+   data_file=3D<str>        - File name of an external data file
+   data_file_raw=3D<bool (on/off)> - The external data file must stay valid=
+ as a raw image
+-  encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+-  encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+-  encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', 'lu=
+ks'
+-  encrypt.hash-alg=3D<str> - Name of encryption hash algorithm
+-  encrypt.iter-time=3D<num> - Time to spend in PBKDF in milliseconds
+-  encrypt.ivgen-alg=3D<str> - Name of IV generator algorithm
+-  encrypt.ivgen-hash-alg=3D<str> - Name of IV generator hash algorithm
+-  encrypt.key-secret=3D<str> - ID of secret providing qcow AES key or LUKS=
+ passphrase
+-  encryption=3D<bool (on/off)> - Encrypt the image with format 'aes'. (Dep=
+recated in favor of encrypt.format=3Daes)
+   lazy_refcounts=3D<bool (on/off)> - Postpone refcount updates
+-  preallocation=3D<str>    - Preallocation mode (allowed values: off, meta=
+data, falloc, full)
+   refcount_bits=3D<num>    - Width of a reference count entry in bits
+   size=3D<size>            - Virtual disk size
+=20
+-Note that not all of these options may be amendable.
+-
+ Testing: amend -f qcow2 -o cluster_size=3D4k,? TEST_DIR/t.qcow2
+-Creation options for 'qcow2':
++Amend options for 'qcow2':
+   backing_file=3D<str>     - File name of a base image
+   backing_fmt=3D<str>      - Image format of the base image
+-  cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+   data_file=3D<str>        - File name of an external data file
+   data_file_raw=3D<bool (on/off)> - The external data file must stay valid=
+ as a raw image
+-  encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+-  encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+-  encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', 'lu=
+ks'
+-  encrypt.hash-alg=3D<str> - Name of encryption hash algorithm
+-  encrypt.iter-time=3D<num> - Time to spend in PBKDF in milliseconds
+-  encrypt.ivgen-alg=3D<str> - Name of IV generator algorithm
+-  encrypt.ivgen-hash-alg=3D<str> - Name of IV generator hash algorithm
+-  encrypt.key-secret=3D<str> - ID of secret providing qcow AES key or LUKS=
+ passphrase
+-  encryption=3D<bool (on/off)> - Encrypt the image with format 'aes'. (Dep=
+recated in favor of encrypt.format=3Daes)
+   lazy_refcounts=3D<bool (on/off)> - Postpone refcount updates
+-  preallocation=3D<str>    - Preallocation mode (allowed values: off, meta=
+data, falloc, full)
+   refcount_bits=3D<num>    - Width of a reference count entry in bits
+   size=3D<size>            - Virtual disk size
+=20
+-Note that not all of these options may be amendable.
+-
+ Testing: amend -f qcow2 -o help,cluster_size=3D4k TEST_DIR/t.qcow2
+-Creation options for 'qcow2':
++Amend options for 'qcow2':
+   backing_file=3D<str>     - File name of a base image
+   backing_fmt=3D<str>      - Image format of the base image
+-  cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+   data_file=3D<str>        - File name of an external data file
+   data_file_raw=3D<bool (on/off)> - The external data file must stay valid=
+ as a raw image
+-  encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+-  encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+-  encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', 'lu=
+ks'
+-  encrypt.hash-alg=3D<str> - Name of encryption hash algorithm
+-  encrypt.iter-time=3D<num> - Time to spend in PBKDF in milliseconds
+-  encrypt.ivgen-alg=3D<str> - Name of IV generator algorithm
+-  encrypt.ivgen-hash-alg=3D<str> - Name of IV generator hash algorithm
+-  encrypt.key-secret=3D<str> - ID of secret providing qcow AES key or LUKS=
+ passphrase
+-  encryption=3D<bool (on/off)> - Encrypt the image with format 'aes'. (Dep=
+recated in favor of encrypt.format=3Daes)
+   lazy_refcounts=3D<bool (on/off)> - Postpone refcount updates
+-  preallocation=3D<str>    - Preallocation mode (allowed values: off, meta=
+data, falloc, full)
+   refcount_bits=3D<num>    - Width of a reference count entry in bits
+   size=3D<size>            - Virtual disk size
+=20
+-Note that not all of these options may be amendable.
+-
+ Testing: amend -f qcow2 -o ?,cluster_size=3D4k TEST_DIR/t.qcow2
+-Creation options for 'qcow2':
++Amend options for 'qcow2':
+   backing_file=3D<str>     - File name of a base image
+   backing_fmt=3D<str>      - Image format of the base image
+-  cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+   data_file=3D<str>        - File name of an external data file
+   data_file_raw=3D<bool (on/off)> - The external data file must stay valid=
+ as a raw image
+-  encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+-  encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+-  encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', 'lu=
+ks'
+-  encrypt.hash-alg=3D<str> - Name of encryption hash algorithm
+-  encrypt.iter-time=3D<num> - Time to spend in PBKDF in milliseconds
+-  encrypt.ivgen-alg=3D<str> - Name of IV generator algorithm
+-  encrypt.ivgen-hash-alg=3D<str> - Name of IV generator hash algorithm
+-  encrypt.key-secret=3D<str> - ID of secret providing qcow AES key or LUKS=
+ passphrase
+-  encryption=3D<bool (on/off)> - Encrypt the image with format 'aes'. (Dep=
+recated in favor of encrypt.format=3Daes)
+   lazy_refcounts=3D<bool (on/off)> - Postpone refcount updates
+-  preallocation=3D<str>    - Preallocation mode (allowed values: off, meta=
+data, falloc, full)
+   refcount_bits=3D<num>    - Width of a reference count entry in bits
+   size=3D<size>            - Virtual disk size
+=20
+-Note that not all of these options may be amendable.
+-
+ Testing: amend -f qcow2 -o cluster_size=3D4k -o help TEST_DIR/t.qcow2
+-Creation options for 'qcow2':
++Amend options for 'qcow2':
+   backing_file=3D<str>     - File name of a base image
+   backing_fmt=3D<str>      - Image format of the base image
+-  cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+   data_file=3D<str>        - File name of an external data file
+   data_file_raw=3D<bool (on/off)> - The external data file must stay valid=
+ as a raw image
+-  encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+-  encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+-  encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', 'lu=
+ks'
+-  encrypt.hash-alg=3D<str> - Name of encryption hash algorithm
+-  encrypt.iter-time=3D<num> - Time to spend in PBKDF in milliseconds
+-  encrypt.ivgen-alg=3D<str> - Name of IV generator algorithm
+-  encrypt.ivgen-hash-alg=3D<str> - Name of IV generator hash algorithm
+-  encrypt.key-secret=3D<str> - ID of secret providing qcow AES key or LUKS=
+ passphrase
+-  encryption=3D<bool (on/off)> - Encrypt the image with format 'aes'. (Dep=
+recated in favor of encrypt.format=3Daes)
+   lazy_refcounts=3D<bool (on/off)> - Postpone refcount updates
+-  preallocation=3D<str>    - Preallocation mode (allowed values: off, meta=
+data, falloc, full)
+   refcount_bits=3D<num>    - Width of a reference count entry in bits
+   size=3D<size>            - Virtual disk size
+=20
+-Note that not all of these options may be amendable.
+-
+ Testing: amend -f qcow2 -o cluster_size=3D4k -o ? TEST_DIR/t.qcow2
+-Creation options for 'qcow2':
++Amend options for 'qcow2':
+   backing_file=3D<str>     - File name of a base image
+   backing_fmt=3D<str>      - Image format of the base image
+-  cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+   data_file=3D<str>        - File name of an external data file
+   data_file_raw=3D<bool (on/off)> - The external data file must stay valid=
+ as a raw image
+-  encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+-  encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+-  encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', 'lu=
+ks'
+-  encrypt.hash-alg=3D<str> - Name of encryption hash algorithm
+-  encrypt.iter-time=3D<num> - Time to spend in PBKDF in milliseconds
+-  encrypt.ivgen-alg=3D<str> - Name of IV generator algorithm
+-  encrypt.ivgen-hash-alg=3D<str> - Name of IV generator hash algorithm
+-  encrypt.key-secret=3D<str> - ID of secret providing qcow AES key or LUKS=
+ passphrase
+-  encryption=3D<bool (on/off)> - Encrypt the image with format 'aes'. (Dep=
+recated in favor of encrypt.format=3Daes)
+   lazy_refcounts=3D<bool (on/off)> - Postpone refcount updates
+-  preallocation=3D<str>    - Preallocation mode (allowed values: off, meta=
+data, falloc, full)
+   refcount_bits=3D<num>    - Width of a reference count entry in bits
+   size=3D<size>            - Virtual disk size
+=20
+-Note that not all of these options may be amendable.
+-
+ Testing: amend -f qcow2 -o backing_file=3DTEST_DIR/t.qcow2,,help TEST_DIR/=
+t.qcow2
+=20
+ Testing: rebase -u -b  -f qcow2 TEST_DIR/t.qcow2
+@@ -823,29 +719,16 @@ Testing: amend -f qcow2 -o backing_file=3DTEST_DIR/t.=
+qcow2 -o ,, -o help TEST_DIR/
+ qemu-img: Invalid option list: ,,
+=20
+ Testing: amend -f qcow2 -o help
+-Creation options for 'qcow2':
++Amend options for 'qcow2':
+   backing_file=3D<str>     - File name of a base image
+   backing_fmt=3D<str>      - Image format of the base image
+-  cluster_size=3D<size>    - qcow2 cluster size
+   compat=3D<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
+   data_file=3D<str>        - File name of an external data file
+   data_file_raw=3D<bool (on/off)> - The external data file must stay valid=
+ as a raw image
+-  encrypt.cipher-alg=3D<str> - Name of encryption cipher algorithm
+-  encrypt.cipher-mode=3D<str> - Name of encryption cipher mode
+-  encrypt.format=3D<str>   - Encrypt the image, format choices: 'aes', 'lu=
+ks'
+-  encrypt.hash-alg=3D<str> - Name of encryption hash algorithm
+-  encrypt.iter-time=3D<num> - Time to spend in PBKDF in milliseconds
+-  encrypt.ivgen-alg=3D<str> - Name of IV generator algorithm
+-  encrypt.ivgen-hash-alg=3D<str> - Name of IV generator hash algorithm
+-  encrypt.key-secret=3D<str> - ID of secret providing qcow AES key or LUKS=
+ passphrase
+-  encryption=3D<bool (on/off)> - Encrypt the image with format 'aes'. (Dep=
+recated in favor of encrypt.format=3Daes)
+   lazy_refcounts=3D<bool (on/off)> - Postpone refcount updates
+-  preallocation=3D<str>    - Preallocation mode (allowed values: off, meta=
+data, falloc, full)
+   refcount_bits=3D<num>    - Width of a reference count entry in bits
+   size=3D<size>            - Virtual disk size
+=20
+-Note that not all of these options may be amendable.
+-
+ Testing: amend -o help
+ qemu-img: Expecting one image file name
+=20
+diff --git a/tests/qemu-iotests/085.out b/tests/qemu-iotests/085.out
+index fd11aae678..39a950a8ad 100644
+--- a/tests/qemu-iotests/085.out
++++ b/tests/qemu-iotests/085.out
+@@ -13,7 +13,7 @@ Formatting 'TEST_DIR/t.IMGFMT.2', fmt=3DIMGFMT size=3D134=
+217728
+ =3D=3D=3D Create a single snapshot on virtio0 =3D=3D=3D
+=20
+ { 'execute': 'blockdev-snapshot-sync', 'arguments': { 'device': 'virtio0',=
+ 'snapshot-file':'TEST_DIR/1-snapshot-v0.IMGFMT', 'format': 'IMGFMT' } }
+-Formatting 'TEST_DIR/1-snapshot-v0.qcow2', fmt=3Dqcow2 size=3D134217728 ba=
+cking_file=3DTEST_DIR/t.qcow2.1 backing_fmt=3Dqcow2 cluster_size=3D65536 la=
+zy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/1-snapshot-v0.qcow2', fmt=3Dqcow2 cluster_size=3D6553=
+6 size=3D134217728 backing_file=3DTEST_DIR/t.qcow2.1 backing_fmt=3Dqcow2 la=
+zy_refcounts=3Doff refcount_bits=3D16
+ {"return": {}}
+=20
+ =3D=3D=3D Invalid command - missing device and nodename =3D=3D=3D
+@@ -30,40 +30,40 @@ Formatting 'TEST_DIR/1-snapshot-v0.qcow2', fmt=3Dqcow2 =
+size=3D134217728 backing_file
+ =3D=3D=3D Create several transactional group snapshots =3D=3D=3D
+=20
+ { 'execute': 'transaction', 'arguments': {'actions': [ { 'type': 'blockdev=
+-snapshot-sync', 'data' : { 'device': 'virtio0', 'snapshot-file': 'TEST_DIR=
+/2-snapshot-v0.IMGFMT' } }, { 'type': 'blockdev-snapshot-sync', 'data' : { =
+'device': 'virtio1', 'snapshot-file': 'TEST_DIR/2-snapshot-v1.IMGFMT' } } ]=
+ } }
+-Formatting 'TEST_DIR/2-snapshot-v0.qcow2', fmt=3Dqcow2 size=3D134217728 ba=
+cking_file=3DTEST_DIR/1-snapshot-v0.qcow2 backing_fmt=3Dqcow2 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+-Formatting 'TEST_DIR/2-snapshot-v1.qcow2', fmt=3Dqcow2 size=3D134217728 ba=
+cking_file=3DTEST_DIR/t.qcow2.2 backing_fmt=3Dqcow2 cluster_size=3D65536 la=
+zy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/2-snapshot-v0.qcow2', fmt=3Dqcow2 cluster_size=3D6553=
+6 size=3D134217728 backing_file=3DTEST_DIR/1-snapshot-v0.qcow2 backing_fmt=
+=3Dqcow2 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/2-snapshot-v1.qcow2', fmt=3Dqcow2 cluster_size=3D6553=
+6 size=3D134217728 backing_file=3DTEST_DIR/t.qcow2.2 backing_fmt=3Dqcow2 la=
+zy_refcounts=3Doff refcount_bits=3D16
+ {"return": {}}
+ { 'execute': 'transaction', 'arguments': {'actions': [ { 'type': 'blockdev=
+-snapshot-sync', 'data' : { 'device': 'virtio0', 'snapshot-file': 'TEST_DIR=
+/3-snapshot-v0.IMGFMT' } }, { 'type': 'blockdev-snapshot-sync', 'data' : { =
+'device': 'virtio1', 'snapshot-file': 'TEST_DIR/3-snapshot-v1.IMGFMT' } } ]=
+ } }
+-Formatting 'TEST_DIR/3-snapshot-v0.qcow2', fmt=3Dqcow2 size=3D134217728 ba=
+cking_file=3DTEST_DIR/2-snapshot-v0.qcow2 backing_fmt=3Dqcow2 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+-Formatting 'TEST_DIR/3-snapshot-v1.qcow2', fmt=3Dqcow2 size=3D134217728 ba=
+cking_file=3DTEST_DIR/2-snapshot-v1.qcow2 backing_fmt=3Dqcow2 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/3-snapshot-v0.qcow2', fmt=3Dqcow2 cluster_size=3D6553=
+6 size=3D134217728 backing_file=3DTEST_DIR/2-snapshot-v0.qcow2 backing_fmt=
+=3Dqcow2 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/3-snapshot-v1.qcow2', fmt=3Dqcow2 cluster_size=3D6553=
+6 size=3D134217728 backing_file=3DTEST_DIR/2-snapshot-v1.qcow2 backing_fmt=
+=3Dqcow2 lazy_refcounts=3Doff refcount_bits=3D16
+ {"return": {}}
+ { 'execute': 'transaction', 'arguments': {'actions': [ { 'type': 'blockdev=
+-snapshot-sync', 'data' : { 'device': 'virtio0', 'snapshot-file': 'TEST_DIR=
+/4-snapshot-v0.IMGFMT' } }, { 'type': 'blockdev-snapshot-sync', 'data' : { =
+'device': 'virtio1', 'snapshot-file': 'TEST_DIR/4-snapshot-v1.IMGFMT' } } ]=
+ } }
+-Formatting 'TEST_DIR/4-snapshot-v0.qcow2', fmt=3Dqcow2 size=3D134217728 ba=
+cking_file=3DTEST_DIR/3-snapshot-v0.qcow2 backing_fmt=3Dqcow2 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+-Formatting 'TEST_DIR/4-snapshot-v1.qcow2', fmt=3Dqcow2 size=3D134217728 ba=
+cking_file=3DTEST_DIR/3-snapshot-v1.qcow2 backing_fmt=3Dqcow2 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/4-snapshot-v0.qcow2', fmt=3Dqcow2 cluster_size=3D6553=
+6 size=3D134217728 backing_file=3DTEST_DIR/3-snapshot-v0.qcow2 backing_fmt=
+=3Dqcow2 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/4-snapshot-v1.qcow2', fmt=3Dqcow2 cluster_size=3D6553=
+6 size=3D134217728 backing_file=3DTEST_DIR/3-snapshot-v1.qcow2 backing_fmt=
+=3Dqcow2 lazy_refcounts=3Doff refcount_bits=3D16
+ {"return": {}}
+ { 'execute': 'transaction', 'arguments': {'actions': [ { 'type': 'blockdev=
+-snapshot-sync', 'data' : { 'device': 'virtio0', 'snapshot-file': 'TEST_DIR=
+/5-snapshot-v0.IMGFMT' } }, { 'type': 'blockdev-snapshot-sync', 'data' : { =
+'device': 'virtio1', 'snapshot-file': 'TEST_DIR/5-snapshot-v1.IMGFMT' } } ]=
+ } }
+-Formatting 'TEST_DIR/5-snapshot-v0.qcow2', fmt=3Dqcow2 size=3D134217728 ba=
+cking_file=3DTEST_DIR/4-snapshot-v0.qcow2 backing_fmt=3Dqcow2 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+-Formatting 'TEST_DIR/5-snapshot-v1.qcow2', fmt=3Dqcow2 size=3D134217728 ba=
+cking_file=3DTEST_DIR/4-snapshot-v1.qcow2 backing_fmt=3Dqcow2 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/5-snapshot-v0.qcow2', fmt=3Dqcow2 cluster_size=3D6553=
+6 size=3D134217728 backing_file=3DTEST_DIR/4-snapshot-v0.qcow2 backing_fmt=
+=3Dqcow2 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/5-snapshot-v1.qcow2', fmt=3Dqcow2 cluster_size=3D6553=
+6 size=3D134217728 backing_file=3DTEST_DIR/4-snapshot-v1.qcow2 backing_fmt=
+=3Dqcow2 lazy_refcounts=3Doff refcount_bits=3D16
+ {"return": {}}
+ { 'execute': 'transaction', 'arguments': {'actions': [ { 'type': 'blockdev=
+-snapshot-sync', 'data' : { 'device': 'virtio0', 'snapshot-file': 'TEST_DIR=
+/6-snapshot-v0.IMGFMT' } }, { 'type': 'blockdev-snapshot-sync', 'data' : { =
+'device': 'virtio1', 'snapshot-file': 'TEST_DIR/6-snapshot-v1.IMGFMT' } } ]=
+ } }
+-Formatting 'TEST_DIR/6-snapshot-v0.qcow2', fmt=3Dqcow2 size=3D134217728 ba=
+cking_file=3DTEST_DIR/5-snapshot-v0.qcow2 backing_fmt=3Dqcow2 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+-Formatting 'TEST_DIR/6-snapshot-v1.qcow2', fmt=3Dqcow2 size=3D134217728 ba=
+cking_file=3DTEST_DIR/5-snapshot-v1.qcow2 backing_fmt=3Dqcow2 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/6-snapshot-v0.qcow2', fmt=3Dqcow2 cluster_size=3D6553=
+6 size=3D134217728 backing_file=3DTEST_DIR/5-snapshot-v0.qcow2 backing_fmt=
+=3Dqcow2 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/6-snapshot-v1.qcow2', fmt=3Dqcow2 cluster_size=3D6553=
+6 size=3D134217728 backing_file=3DTEST_DIR/5-snapshot-v1.qcow2 backing_fmt=
+=3Dqcow2 lazy_refcounts=3Doff refcount_bits=3D16
+ {"return": {}}
+ { 'execute': 'transaction', 'arguments': {'actions': [ { 'type': 'blockdev=
+-snapshot-sync', 'data' : { 'device': 'virtio0', 'snapshot-file': 'TEST_DIR=
+/7-snapshot-v0.IMGFMT' } }, { 'type': 'blockdev-snapshot-sync', 'data' : { =
+'device': 'virtio1', 'snapshot-file': 'TEST_DIR/7-snapshot-v1.IMGFMT' } } ]=
+ } }
+-Formatting 'TEST_DIR/7-snapshot-v0.qcow2', fmt=3Dqcow2 size=3D134217728 ba=
+cking_file=3DTEST_DIR/6-snapshot-v0.qcow2 backing_fmt=3Dqcow2 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+-Formatting 'TEST_DIR/7-snapshot-v1.qcow2', fmt=3Dqcow2 size=3D134217728 ba=
+cking_file=3DTEST_DIR/6-snapshot-v1.qcow2 backing_fmt=3Dqcow2 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/7-snapshot-v0.qcow2', fmt=3Dqcow2 cluster_size=3D6553=
+6 size=3D134217728 backing_file=3DTEST_DIR/6-snapshot-v0.qcow2 backing_fmt=
+=3Dqcow2 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/7-snapshot-v1.qcow2', fmt=3Dqcow2 cluster_size=3D6553=
+6 size=3D134217728 backing_file=3DTEST_DIR/6-snapshot-v1.qcow2 backing_fmt=
+=3Dqcow2 lazy_refcounts=3Doff refcount_bits=3D16
+ {"return": {}}
+ { 'execute': 'transaction', 'arguments': {'actions': [ { 'type': 'blockdev=
+-snapshot-sync', 'data' : { 'device': 'virtio0', 'snapshot-file': 'TEST_DIR=
+/8-snapshot-v0.IMGFMT' } }, { 'type': 'blockdev-snapshot-sync', 'data' : { =
+'device': 'virtio1', 'snapshot-file': 'TEST_DIR/8-snapshot-v1.IMGFMT' } } ]=
+ } }
+-Formatting 'TEST_DIR/8-snapshot-v0.qcow2', fmt=3Dqcow2 size=3D134217728 ba=
+cking_file=3DTEST_DIR/7-snapshot-v0.qcow2 backing_fmt=3Dqcow2 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+-Formatting 'TEST_DIR/8-snapshot-v1.qcow2', fmt=3Dqcow2 size=3D134217728 ba=
+cking_file=3DTEST_DIR/7-snapshot-v1.qcow2 backing_fmt=3Dqcow2 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/8-snapshot-v0.qcow2', fmt=3Dqcow2 cluster_size=3D6553=
+6 size=3D134217728 backing_file=3DTEST_DIR/7-snapshot-v0.qcow2 backing_fmt=
+=3Dqcow2 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/8-snapshot-v1.qcow2', fmt=3Dqcow2 cluster_size=3D6553=
+6 size=3D134217728 backing_file=3DTEST_DIR/7-snapshot-v1.qcow2 backing_fmt=
+=3Dqcow2 lazy_refcounts=3Doff refcount_bits=3D16
+ {"return": {}}
+ { 'execute': 'transaction', 'arguments': {'actions': [ { 'type': 'blockdev=
+-snapshot-sync', 'data' : { 'device': 'virtio0', 'snapshot-file': 'TEST_DIR=
+/9-snapshot-v0.IMGFMT' } }, { 'type': 'blockdev-snapshot-sync', 'data' : { =
+'device': 'virtio1', 'snapshot-file': 'TEST_DIR/9-snapshot-v1.IMGFMT' } } ]=
+ } }
+-Formatting 'TEST_DIR/9-snapshot-v0.qcow2', fmt=3Dqcow2 size=3D134217728 ba=
+cking_file=3DTEST_DIR/8-snapshot-v0.qcow2 backing_fmt=3Dqcow2 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+-Formatting 'TEST_DIR/9-snapshot-v1.qcow2', fmt=3Dqcow2 size=3D134217728 ba=
+cking_file=3DTEST_DIR/8-snapshot-v1.qcow2 backing_fmt=3Dqcow2 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/9-snapshot-v0.qcow2', fmt=3Dqcow2 cluster_size=3D6553=
+6 size=3D134217728 backing_file=3DTEST_DIR/8-snapshot-v0.qcow2 backing_fmt=
+=3Dqcow2 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/9-snapshot-v1.qcow2', fmt=3Dqcow2 cluster_size=3D6553=
+6 size=3D134217728 backing_file=3DTEST_DIR/8-snapshot-v1.qcow2 backing_fmt=
+=3Dqcow2 lazy_refcounts=3Doff refcount_bits=3D16
+ {"return": {}}
+ { 'execute': 'transaction', 'arguments': {'actions': [ { 'type': 'blockdev=
+-snapshot-sync', 'data' : { 'device': 'virtio0', 'snapshot-file': 'TEST_DIR=
+/10-snapshot-v0.IMGFMT' } }, { 'type': 'blockdev-snapshot-sync', 'data' : {=
+ 'device': 'virtio1', 'snapshot-file': 'TEST_DIR/10-snapshot-v1.IMGFMT' } }=
+ ] } }
+-Formatting 'TEST_DIR/10-snapshot-v0.qcow2', fmt=3Dqcow2 size=3D134217728 b=
+acking_file=3DTEST_DIR/9-snapshot-v0.qcow2 backing_fmt=3Dqcow2 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+-Formatting 'TEST_DIR/10-snapshot-v1.qcow2', fmt=3Dqcow2 size=3D134217728 b=
+acking_file=3DTEST_DIR/9-snapshot-v1.qcow2 backing_fmt=3Dqcow2 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/10-snapshot-v0.qcow2', fmt=3Dqcow2 cluster_size=3D655=
+36 size=3D134217728 backing_file=3DTEST_DIR/9-snapshot-v0.qcow2 backing_fmt=
+=3Dqcow2 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/10-snapshot-v1.qcow2', fmt=3Dqcow2 cluster_size=3D655=
+36 size=3D134217728 backing_file=3DTEST_DIR/9-snapshot-v1.qcow2 backing_fmt=
+=3Dqcow2 lazy_refcounts=3Doff refcount_bits=3D16
+ {"return": {}}
+=20
+ =3D=3D=3D Create a couple of snapshots using blockdev-snapshot =3D=3D=3D
+diff --git a/tests/qemu-iotests/087.out b/tests/qemu-iotests/087.out
+index 2d92ea847b..f23bffbbf1 100644
+--- a/tests/qemu-iotests/087.out
++++ b/tests/qemu-iotests/087.out
+@@ -34,7 +34,7 @@ QMP_VERSION
+=20
+ =3D=3D=3D Encrypted image QCow =3D=3D=3D
+=20
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728 encryption=
+=3Don encrypt.key-secret=3Dsec0
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encryption=3Don encrypt.key-s=
+ecret=3Dsec0 size=3D134217728
+ Testing:
+ QMP_VERSION
+ {"return": {}}
+@@ -46,7 +46,7 @@ QMP_VERSION
+=20
+ =3D=3D=3D Encrypted image LUKS =3D=3D=3D
+=20
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728 encrypt.form=
+at=3Dluks encrypt.key-secret=3Dsec0
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encrypt.format=3Dluks encrypt=
+.key-secret=3Dsec0 size=3D134217728
+ Testing:
+ QMP_VERSION
+ {"return": {}}
+@@ -58,7 +58,7 @@ QMP_VERSION
+=20
+ =3D=3D=3D Missing driver =3D=3D=3D
+=20
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728 encryption=
+=3Don encrypt.key-secret=3Dsec0
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encryption=3Don encrypt.key-s=
+ecret=3Dsec0 size=3D134217728
+ Testing: -S
+ QMP_VERSION
+ {"return": {}}
+diff --git a/tests/qemu-iotests/115.out b/tests/qemu-iotests/115.out
+index dbdad17b27..074b5cc84d 100644
+--- a/tests/qemu-iotests/115.out
++++ b/tests/qemu-iotests/115.out
+@@ -2,7 +2,7 @@ QA output created by 115
+=20
+ =3D=3D=3D Testing large refcount and L1 table =3D=3D=3D
+=20
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D268435456 preallocatio=
+n=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D268435456
+ No errors were found on the image.
+ 100.00% allocated clusters
+ *** done
+diff --git a/tests/qemu-iotests/121.out b/tests/qemu-iotests/121.out
+index 613d56185e..fbe4b575f7 100644
+--- a/tests/qemu-iotests/121.out
++++ b/tests/qemu-iotests/121.out
+@@ -4,7 +4,7 @@ QA output created by 121
+=20
+ --- Test 1 ---
+=20
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D66060288 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D66060288
+ Image resized.
+ wrote 1049600/1049600 bytes at offset 65011712
+ 1.001 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -14,7 +14,7 @@ No errors were found on the image.
+=20
+ --- Test 2 ---
+=20
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D66061312 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D66061312
+ Image resized.
+ wrote 133120/133120 bytes at offset 66060288
+ 130 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+diff --git a/tests/qemu-iotests/125.out b/tests/qemu-iotests/125.out
+index 596905f533..767c52d622 100644
+--- a/tests/qemu-iotests/125.out
++++ b/tests/qemu-iotests/125.out
+@@ -1,6 +1,6 @@
+ QA output created by 125
+ --- cluster_size=3D512 growth_size=3D16 create_mode=3Doff growth_mode=3Dof=
+f ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -8,7 +8,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D16 create_mode=3Doff growth_mode=3Dme=
+tadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -16,7 +16,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D16 create_mode=3Doff growth_mode=3Dfa=
+lloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -24,7 +24,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D16 create_mode=3Doff growth_mode=3Dfu=
+ll ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -32,7 +32,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D16 create_mode=3Dmetadata growth_mode=
+=3Doff ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -40,7 +40,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D16 create_mode=3Dmetadata growth_mode=
+=3Dmetadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -48,7 +48,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D16 create_mode=3Dmetadata growth_mode=
+=3Dfalloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -56,7 +56,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D16 create_mode=3Dmetadata growth_mode=
+=3Dfull ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -64,7 +64,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D16 create_mode=3Dfalloc growth_mode=
+=3Doff ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -72,7 +72,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D16 create_mode=3Dfalloc growth_mode=
+=3Dmetadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -80,7 +80,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D16 create_mode=3Dfalloc growth_mode=
+=3Dfalloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -88,7 +88,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D16 create_mode=3Dfalloc growth_mode=
+=3Dfull ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -96,7 +96,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D16 create_mode=3Dfull growth_mode=3Do=
+ff ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -104,7 +104,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D16 create_mode=3Dfull growth_mode=3Dm=
+etadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -112,7 +112,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D16 create_mode=3Dfull growth_mode=3Df=
+alloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -120,7 +120,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D16 create_mode=3Dfull growth_mode=3Df=
+ull ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -128,7 +128,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D48 create_mode=3Doff growth_mode=3Dof=
+f ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -136,7 +136,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D48 create_mode=3Doff growth_mode=3Dme=
+tadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -144,7 +144,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D48 create_mode=3Doff growth_mode=3Dfa=
+lloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -152,7 +152,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D48 create_mode=3Doff growth_mode=3Dfu=
+ll ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -160,7 +160,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D48 create_mode=3Dmetadata growth_mode=
+=3Doff ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -168,7 +168,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D48 create_mode=3Dmetadata growth_mode=
+=3Dmetadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -176,7 +176,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D48 create_mode=3Dmetadata growth_mode=
+=3Dfalloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -184,7 +184,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D48 create_mode=3Dmetadata growth_mode=
+=3Dfull ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -192,7 +192,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D48 create_mode=3Dfalloc growth_mode=
+=3Doff ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -200,7 +200,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D48 create_mode=3Dfalloc growth_mode=
+=3Dmetadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -208,7 +208,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D48 create_mode=3Dfalloc growth_mode=
+=3Dfalloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -216,7 +216,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D48 create_mode=3Dfalloc growth_mode=
+=3Dfull ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -224,7 +224,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D48 create_mode=3Dfull growth_mode=3Do=
+ff ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -232,7 +232,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D48 create_mode=3Dfull growth_mode=3Dm=
+etadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -240,7 +240,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D48 create_mode=3Dfull growth_mode=3Df=
+alloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -248,7 +248,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D48 create_mode=3Dfull growth_mode=3Df=
+ull ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -256,7 +256,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D80 create_mode=3Doff growth_mode=3Dof=
+f ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -264,7 +264,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D80 create_mode=3Doff growth_mode=3Dme=
+tadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -272,7 +272,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D80 create_mode=3Doff growth_mode=3Dfa=
+lloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -280,7 +280,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D80 create_mode=3Doff growth_mode=3Dfu=
+ll ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -288,7 +288,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D80 create_mode=3Dmetadata growth_mode=
+=3Doff ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -296,7 +296,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D80 create_mode=3Dmetadata growth_mode=
+=3Dmetadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -304,7 +304,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D80 create_mode=3Dmetadata growth_mode=
+=3Dfalloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -312,7 +312,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D80 create_mode=3Dmetadata growth_mode=
+=3Dfull ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -320,7 +320,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D80 create_mode=3Dfalloc growth_mode=
+=3Doff ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -328,7 +328,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D80 create_mode=3Dfalloc growth_mode=
+=3Dmetadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -336,7 +336,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D80 create_mode=3Dfalloc growth_mode=
+=3Dfalloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -344,7 +344,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D80 create_mode=3Dfalloc growth_mode=
+=3Dfull ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -352,7 +352,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D80 create_mode=3Dfull growth_mode=3Do=
+ff ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -360,7 +360,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D80 create_mode=3Dfull growth_mode=3Dm=
+etadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -368,7 +368,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D80 create_mode=3Dfull growth_mode=3Df=
+alloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -376,7 +376,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D512 growth_size=3D80 create_mode=3Dfull growth_mode=3Df=
+ull ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -384,7 +384,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D16 create_mode=3Doff growth_mode=3Dof=
+f ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -392,7 +392,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D16 create_mode=3Doff growth_mode=3Dme=
+tadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -400,7 +400,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D16 create_mode=3Doff growth_mode=3Dfa=
+lloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -408,7 +408,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D16 create_mode=3Doff growth_mode=3Dfu=
+ll ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -416,7 +416,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D16 create_mode=3Dmetadata growth_mode=
+=3Doff ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -424,7 +424,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D16 create_mode=3Dmetadata growth_mode=
+=3Dmetadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -432,7 +432,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D16 create_mode=3Dmetadata growth_mode=
+=3Dfalloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -440,7 +440,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D16 create_mode=3Dmetadata growth_mode=
+=3Dfull ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -448,7 +448,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D16 create_mode=3Dfalloc growth_mode=
+=3Doff ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -456,7 +456,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D16 create_mode=3Dfalloc growth_mode=
+=3Dmetadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -464,7 +464,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D16 create_mode=3Dfalloc growth_mode=
+=3Dfalloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -472,7 +472,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D16 create_mode=3Dfalloc growth_mode=
+=3Dfull ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -480,7 +480,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D16 create_mode=3Dfull growth_mode=3Do=
+ff ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -488,7 +488,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D16 create_mode=3Dfull growth_mode=3Dm=
+etadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -496,7 +496,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D16 create_mode=3Dfull growth_mode=3Df=
+alloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -504,7 +504,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D16 create_mode=3Dfull growth_mode=3Df=
+ull ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -512,7 +512,7 @@ wrote 16384/16384 bytes at offset 2048000
+ 16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D48 create_mode=3Doff growth_mode=3Dof=
+f ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -520,7 +520,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D48 create_mode=3Doff growth_mode=3Dme=
+tadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -528,7 +528,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D48 create_mode=3Doff growth_mode=3Dfa=
+lloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -536,7 +536,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D48 create_mode=3Doff growth_mode=3Dfu=
+ll ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -544,7 +544,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D48 create_mode=3Dmetadata growth_mode=
+=3Doff ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -552,7 +552,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D48 create_mode=3Dmetadata growth_mode=
+=3Dmetadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -560,7 +560,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D48 create_mode=3Dmetadata growth_mode=
+=3Dfalloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -568,7 +568,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D48 create_mode=3Dmetadata growth_mode=
+=3Dfull ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -576,7 +576,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D48 create_mode=3Dfalloc growth_mode=
+=3Doff ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -584,7 +584,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D48 create_mode=3Dfalloc growth_mode=
+=3Dmetadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -592,7 +592,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D48 create_mode=3Dfalloc growth_mode=
+=3Dfalloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -600,7 +600,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D48 create_mode=3Dfalloc growth_mode=
+=3Dfull ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -608,7 +608,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D48 create_mode=3Dfull growth_mode=3Do=
+ff ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -616,7 +616,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D48 create_mode=3Dfull growth_mode=3Dm=
+etadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -624,7 +624,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D48 create_mode=3Dfull growth_mode=3Df=
+alloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -632,7 +632,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D48 create_mode=3Dfull growth_mode=3Df=
+ull ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -640,7 +640,7 @@ wrote 49152/49152 bytes at offset 2048000
+ 48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D80 create_mode=3Doff growth_mode=3Dof=
+f ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -648,7 +648,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D80 create_mode=3Doff growth_mode=3Dme=
+tadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -656,7 +656,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D80 create_mode=3Doff growth_mode=3Dfa=
+lloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -664,7 +664,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D80 create_mode=3Doff growth_mode=3Dfu=
+ll ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D20=
+48000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -672,7 +672,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D80 create_mode=3Dmetadata growth_mode=
+=3Doff ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -680,7 +680,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D80 create_mode=3Dmetadata growth_mode=
+=3Dmetadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -688,7 +688,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D80 create_mode=3Dmetadata growth_mode=
+=3Dfalloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -696,7 +696,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D80 create_mode=3Dmetadata growth_mode=
+=3Dfull ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -704,7 +704,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D80 create_mode=3Dfalloc growth_mode=
+=3Doff ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -712,7 +712,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D80 create_mode=3Dfalloc growth_mode=
+=3Dmetadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -720,7 +720,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D80 create_mode=3Dfalloc growth_mode=
+=3Dfalloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -728,7 +728,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D80 create_mode=3Dfalloc growth_mode=
+=3Dfull ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D2048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -736,7 +736,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D80 create_mode=3Dfull growth_mode=3Do=
+ff ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -744,7 +744,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D80 create_mode=3Dfull growth_mode=3Dm=
+etadata ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -752,7 +752,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D80 create_mode=3Dfull growth_mode=3Df=
+alloc ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -760,7 +760,7 @@ wrote 81920/81920 bytes at offset 2048000
+ 80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ --- cluster_size=3D64k growth_size=3D80 create_mode=3Dfull growth_mode=3Df=
+ull ---
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2048000 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D2=
+048000
+ Image resized.
+ wrote 2048000/2048000 bytes at offset 0
+ 1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+diff --git a/tests/qemu-iotests/134.out b/tests/qemu-iotests/134.out
+index 09d46f6b17..f2878f5f3a 100644
+--- a/tests/qemu-iotests/134.out
++++ b/tests/qemu-iotests/134.out
+@@ -1,5 +1,5 @@
+ QA output created by 134
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728 encryption=
+=3Don encrypt.key-secret=3Dsec0
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encryption=3Don encrypt.key-s=
+ecret=3Dsec0 size=3D134217728
+=20
+ =3D=3D reading whole image =3D=3D
+ read 134217728/134217728 bytes at offset 0
+diff --git a/tests/qemu-iotests/144.out b/tests/qemu-iotests/144.out
+index c7aa2e4820..3900a46ed0 100644
+--- a/tests/qemu-iotests/144.out
++++ b/tests/qemu-iotests/144.out
+@@ -9,7 +9,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D5368709=
+12
+ { 'execute': 'qmp_capabilities' }
+ {"return": {}}
+ { 'execute': 'blockdev-snapshot-sync', 'arguments': { 'device': 'virtio0',=
+ 'snapshot-file':'TEST_DIR/tmp.IMGFMT', 'format': 'IMGFMT' } }
+-Formatting 'TEST_DIR/tmp.qcow2', fmt=3Dqcow2 size=3D536870912 backing_file=
+=3DTEST_DIR/t.qcow2 backing_fmt=3Dqcow2 cluster_size=3D65536 lazy_refcounts=
+=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/tmp.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D5=
+36870912 backing_file=3DTEST_DIR/t.qcow2 backing_fmt=3Dqcow2 lazy_refcounts=
+=3Doff refcount_bits=3D16
+ {"return": {}}
+=20
+ =3D=3D=3D Performing block-commit on active layer =3D=3D=3D
+@@ -31,6 +31,6 @@ Formatting 'TEST_DIR/tmp.qcow2', fmt=3Dqcow2 size=3D53687=
+0912 backing_file=3DTEST_DIR/
+ =3D=3D=3D Performing Live Snapshot 2 =3D=3D=3D
+=20
+ { 'execute': 'blockdev-snapshot-sync', 'arguments': { 'device': 'virtio0',=
+ 'snapshot-file':'TEST_DIR/tmp2.IMGFMT', 'format': 'IMGFMT' } }
+-Formatting 'TEST_DIR/tmp2.qcow2', fmt=3Dqcow2 size=3D536870912 backing_fil=
+e=3DTEST_DIR/t.qcow2 backing_fmt=3Dqcow2 cluster_size=3D65536 lazy_refcount=
+s=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/tmp2.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D=
+536870912 backing_file=3DTEST_DIR/t.qcow2 backing_fmt=3Dqcow2 lazy_refcount=
+s=3Doff refcount_bits=3D16
+ {"return": {}}
+ *** done
+diff --git a/tests/qemu-iotests/158.out b/tests/qemu-iotests/158.out
+index 6def216e55..fa2294bb85 100644
+--- a/tests/qemu-iotests/158.out
++++ b/tests/qemu-iotests/158.out
+@@ -1,6 +1,6 @@
+ QA output created by 158
+ =3D=3D create base =3D=3D
+-Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT size=3D134217728 encrypt=
+ion=3Don encrypt.key-secret=3Dsec0
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT encryption=3Don encrypt.=
+key-secret=3Dsec0 size=3D134217728
+=20
+ =3D=3D writing whole image =3D=3D
+ wrote 134217728/134217728 bytes at offset 0
+@@ -10,7 +10,7 @@ wrote 134217728/134217728 bytes at offset 0
+ read 134217728/134217728 bytes at offset 0
+ 128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ =3D=3D create overlay =3D=3D
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728 backing_file=
+=3DTEST_DIR/t.IMGFMT.base encryption=3Don encrypt.key-secret=3Dsec0
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encryption=3Don encrypt.key-s=
+ecret=3Dsec0 size=3D134217728 backing_file=3DTEST_DIR/t.IMGFMT.base
+=20
+ =3D=3D writing part of a cluster =3D=3D
+ wrote 1024/1024 bytes at offset 0
+diff --git a/tests/qemu-iotests/182.out b/tests/qemu-iotests/182.out
+index a8eea166c3..a31bfb57b3 100644
+--- a/tests/qemu-iotests/182.out
++++ b/tests/qemu-iotests/182.out
+@@ -13,7 +13,7 @@ Is another process using the image [TEST_DIR/t.qcow2]?
+ {'execute': 'blockdev-add', 'arguments': { 'node-name': 'node0', 'driver':=
+ 'file', 'filename': 'TEST_DIR/t.IMGFMT', 'locking': 'on' } }
+ {"return": {}}
+ {'execute': 'blockdev-snapshot-sync', 'arguments': { 'node-name': 'node0',=
+ 'snapshot-file': 'TEST_DIR/t.IMGFMT.overlay', 'snapshot-node-name': 'node1=
+' } }
+-Formatting 'TEST_DIR/t.qcow2.overlay', fmt=3Dqcow2 size=3D197120 backing_f=
+ile=3DTEST_DIR/t.qcow2 backing_fmt=3Dfile cluster_size=3D65536 lazy_refcoun=
+ts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2.overlay', fmt=3Dqcow2 cluster_size=3D65536 si=
+ze=3D197120 backing_file=3DTEST_DIR/t.qcow2 backing_fmt=3Dfile lazy_refcoun=
+ts=3Doff refcount_bits=3D16
+ {"return": {}}
+ {'execute': 'blockdev-add', 'arguments': { 'node-name': 'node1', 'driver':=
+ 'file', 'filename': 'TEST_DIR/t.IMGFMT', 'locking': 'on' } }
+ {"return": {}}
+diff --git a/tests/qemu-iotests/185.out b/tests/qemu-iotests/185.out
+index 9a3b65782b..41c4773edc 100644
+--- a/tests/qemu-iotests/185.out
++++ b/tests/qemu-iotests/185.out
+@@ -9,14 +9,14 @@ Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT size=3D=
+67108864
+ =3D=3D=3D Creating backing chain =3D=3D=3D
+=20
+ { 'execute': 'blockdev-snapshot-sync', 'arguments': { 'device': 'disk', 's=
+napshot-file': 'TEST_DIR/t.IMGFMT.mid', 'format': 'IMGFMT', 'mode': 'absolu=
+te-paths' } }
+-Formatting 'TEST_DIR/t.qcow2.mid', fmt=3Dqcow2 size=3D67108864 backing_fil=
+e=3DTEST_DIR/t.qcow2.base backing_fmt=3Dqcow2 cluster_size=3D65536 lazy_ref=
+counts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2.mid', fmt=3Dqcow2 cluster_size=3D65536 size=
+=3D67108864 backing_file=3DTEST_DIR/t.qcow2.base backing_fmt=3Dqcow2 lazy_r=
+efcounts=3Doff refcount_bits=3D16
+ {"return": {}}
+ { 'execute': 'human-monitor-command', 'arguments': { 'command-line': 'qemu=
+-io disk "write 0 4M"' } }
+ wrote 4194304/4194304 bytes at offset 0
+ 4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ {"return": ""}
+ { 'execute': 'blockdev-snapshot-sync', 'arguments': { 'device': 'disk', 's=
+napshot-file': 'TEST_DIR/t.IMGFMT', 'format': 'IMGFMT', 'mode': 'absolute-p=
+aths' } }
+-Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D67108864 backing_file=3D=
+TEST_DIR/t.qcow2.mid backing_fmt=3Dqcow2 cluster_size=3D65536 lazy_refcount=
+s=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=3D671=
+08864 backing_file=3DTEST_DIR/t.qcow2.mid backing_fmt=3Dqcow2 lazy_refcount=
+s=3Doff refcount_bits=3D16
+ {"return": {}}
+=20
+ =3D=3D=3D Start commit job and exit qemu =3D=3D=3D
+@@ -48,7 +48,7 @@ Formatting 'TEST_DIR/t.qcow2', fmt=3Dqcow2 size=3D6710886=
+4 backing_file=3DTEST_DIR/t.q
+ { 'execute': 'qmp_capabilities' }
+ {"return": {}}
+ { 'execute': 'drive-mirror', 'arguments': { 'device': 'disk', 'target': 'T=
+EST_DIR/t.IMGFMT.copy', 'format': 'IMGFMT', 'sync': 'full', 'speed': 65536 =
+} }
+-Formatting 'TEST_DIR/t.qcow2.copy', fmt=3Dqcow2 size=3D67108864 cluster_si=
+ze=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2.copy', fmt=3Dqcow2 cluster_size=3D65536 size=
+=3D67108864 lazy_refcounts=3Doff refcount_bits=3D16
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event"=
+: "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "disk"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event"=
+: "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "disk"}}
+ {"return": {}}
+@@ -62,7 +62,7 @@ Formatting 'TEST_DIR/t.qcow2.copy', fmt=3Dqcow2 size=3D67=
+108864 cluster_size=3D65536 l
+ { 'execute': 'qmp_capabilities' }
+ {"return": {}}
+ { 'execute': 'drive-backup', 'arguments': { 'device': 'disk', 'target': 'T=
+EST_DIR/t.IMGFMT.copy', 'format': 'IMGFMT', 'sync': 'full', 'speed': 65536 =
+} }
+-Formatting 'TEST_DIR/t.qcow2.copy', fmt=3Dqcow2 size=3D67108864 cluster_si=
+ze=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/t.qcow2.copy', fmt=3Dqcow2 cluster_size=3D65536 size=
+=3D67108864 lazy_refcounts=3Doff refcount_bits=3D16
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event"=
+: "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "disk"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event"=
+: "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "disk"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event"=
+: "JOB_STATUS_CHANGE", "data": {"status": "paused", "id": "disk"}}
+diff --git a/tests/qemu-iotests/188.out b/tests/qemu-iotests/188.out
+index c568ef3701..4b9aadd51c 100644
+--- a/tests/qemu-iotests/188.out
++++ b/tests/qemu-iotests/188.out
+@@ -1,5 +1,5 @@
+ QA output created by 188
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D16777216 encrypt.forma=
+t=3Dluks encrypt.key-secret=3Dsec0 encrypt.iter-time=3D10
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encrypt.format=3Dluks encrypt=
+.key-secret=3Dsec0 encrypt.iter-time=3D10 size=3D16777216
+=20
+ =3D=3D reading whole image =3D=3D
+ read 16777216/16777216 bytes at offset 0
+diff --git a/tests/qemu-iotests/189.out b/tests/qemu-iotests/189.out
+index a0b7c9c24c..e536d95d53 100644
+--- a/tests/qemu-iotests/189.out
++++ b/tests/qemu-iotests/189.out
+@@ -1,6 +1,6 @@
+ QA output created by 189
+ =3D=3D create base =3D=3D
+-Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT size=3D16777216 encrypt.=
+format=3Dluks encrypt.key-secret=3Dsec0 encrypt.iter-time=3D10
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT encrypt.format=3Dluks en=
+crypt.key-secret=3Dsec0 encrypt.iter-time=3D10 size=3D16777216
+=20
+ =3D=3D writing whole image =3D=3D
+ wrote 16777216/16777216 bytes at offset 0
+@@ -10,7 +10,7 @@ wrote 16777216/16777216 bytes at offset 0
+ read 16777216/16777216 bytes at offset 0
+ 16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ =3D=3D create overlay =3D=3D
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D16777216 backing_file=
+=3DTEST_DIR/t.IMGFMT.base encrypt.format=3Dluks encrypt.key-secret=3Dsec1 e=
+ncrypt.iter-time=3D10
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encrypt.format=3Dluks encrypt=
+.key-secret=3Dsec1 encrypt.iter-time=3D10 size=3D16777216 backing_file=3DTE=
+ST_DIR/t.IMGFMT.base
+=20
+ =3D=3D writing part of a cluster =3D=3D
+ wrote 1024/1024 bytes at offset 0
+diff --git a/tests/qemu-iotests/198.out b/tests/qemu-iotests/198.out
+index 831ce3a289..b0f2d417af 100644
+--- a/tests/qemu-iotests/198.out
++++ b/tests/qemu-iotests/198.out
+@@ -1,12 +1,12 @@
+ QA output created by 198
+ =3D=3D create base =3D=3D
+-Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT size=3D16777216 encrypt.=
+format=3Dluks encrypt.key-secret=3Dsec0 encrypt.iter-time=3D10
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT encrypt.format=3Dluks en=
+crypt.key-secret=3Dsec0 encrypt.iter-time=3D10 size=3D16777216
+=20
+ =3D=3D writing whole image base =3D=3D
+ wrote 16777216/16777216 bytes at offset 0
+ 16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ =3D=3D create overlay =3D=3D
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D16777216 backing_file=
+=3DTEST_DIR/t.IMGFMT.base encrypt.format=3Dluks encrypt.key-secret=3Dsec1 e=
+ncrypt.iter-time=3D10
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encrypt.format=3Dluks encrypt=
+.key-secret=3Dsec1 encrypt.iter-time=3D10 size=3D16777216 backing_file=3DTE=
+ST_DIR/t.IMGFMT.base
+=20
+ =3D=3D writing whole image layer =3D=3D
+ wrote 16777216/16777216 bytes at offset 0
+diff --git a/tests/qemu-iotests/243.out b/tests/qemu-iotests/243.out
+index dcb33fac32..341ef3b7d0 100644
+--- a/tests/qemu-iotests/243.out
++++ b/tests/qemu-iotests/243.out
+@@ -2,31 +2,31 @@ QA output created by 243
+=20
+ =3D=3D=3D preallocation=3Doff =3D=3D=3D
+=20
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 preallocation=
+=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D67=
+108864
+ File size: 196616
+ Disk usage: low
+=20
+ =3D=3D=3D preallocation=3Dmetadata =3D=3D=3D
+=20
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D67108864
+ File size: 67436544
+ Disk usage: low
+=20
+ =3D=3D=3D preallocation=3Dfalloc =3D=3D=3D
+=20
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 preallocation=
+=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D67108864
+ File size: 67436544
+ Disk usage: high
+=20
+ =3D=3D=3D preallocation=3Dfull =3D=3D=3D
+=20
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 preallocation=
+=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D6=
+7108864
+ File size: 67436544
+ Disk usage: high
+=20
+ =3D=3D=3D External data file: preallocation=3Doff =3D=3D=3D
+=20
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 data_file=3DT=
+EST_DIR/t.IMGFMT.data preallocation=3Doff
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Doff size=3D67=
+108864 data_file=3DTEST_DIR/t.IMGFMT.data
+ qcow2 file size: 196616
+ data file size:  67108864
+ qcow2 disk usage: low
+@@ -34,7 +34,7 @@ data disk usage:  low
+=20
+ =3D=3D=3D External data file: preallocation=3Dmetadata =3D=3D=3D
+=20
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 data_file=3DT=
+EST_DIR/t.IMGFMT.data preallocation=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D67108864 data_file=3DTEST_DIR/t.IMGFMT.data
+ qcow2 file size: 327680
+ data file size:  67108864
+ qcow2 disk usage: low
+@@ -42,7 +42,7 @@ data disk usage:  low
+=20
+ =3D=3D=3D External data file: preallocation=3Dfalloc =3D=3D=3D
+=20
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 data_file=3DT=
+EST_DIR/t.IMGFMT.data preallocation=3Dfalloc
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfalloc size=
+=3D67108864 data_file=3DTEST_DIR/t.IMGFMT.data
+ qcow2 file size: 327680
+ data file size:  67108864
+ qcow2 disk usage: low
+@@ -50,7 +50,7 @@ data disk usage:  high
+=20
+ =3D=3D=3D External data file: preallocation=3Dfull =3D=3D=3D
+=20
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 data_file=3DT=
+EST_DIR/t.IMGFMT.data preallocation=3Dfull
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dfull size=3D6=
+7108864 data_file=3DTEST_DIR/t.IMGFMT.data
+ qcow2 file size: 327680
+ data file size:  67108864
+ qcow2 disk usage: low
+diff --git a/tests/qemu-iotests/250.out b/tests/qemu-iotests/250.out
+index f480fd273b..0b737097f3 100644
+--- a/tests/qemu-iotests/250.out
++++ b/tests/qemu-iotests/250.out
+@@ -1,5 +1,5 @@
+ QA output created by 250
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2202009600 preallocati=
+on=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT preallocation=3Dmetadata size=
+=3D2202009600
+ discard 10485760/10485760 bytes at offset 0
+ 10 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ discard 10485760/10485760 bytes at offset 2191523840
+diff --git a/tests/qemu-iotests/255.out b/tests/qemu-iotests/255.out
+index 348909fdef..96502e4336 100644
+--- a/tests/qemu-iotests/255.out
++++ b/tests/qemu-iotests/255.out
+@@ -3,9 +3,9 @@ Finishing a commit job with background reads
+=20
+ =3D=3D=3D Create backing chain and start VM =3D=3D=3D
+=20
+-Formatting 'TEST_DIR/PID-t.qcow2.mid', fmt=3Dqcow2 size=3D134217728 cluste=
+r_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/PID-t.qcow2.mid', fmt=3Dqcow2 cluster_size=3D65536 si=
+ze=3D134217728 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+-Formatting 'TEST_DIR/PID-t.qcow2', fmt=3Dqcow2 size=3D134217728 cluster_si=
+ze=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/PID-t.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=
+=3D134217728 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ =3D=3D=3D Start background read requests =3D=3D=3D
+=20
+@@ -23,9 +23,9 @@ Closing the VM while a job is being cancelled
+=20
+ =3D=3D=3D Create images and start VM =3D=3D=3D
+=20
+-Formatting 'TEST_DIR/PID-src.qcow2', fmt=3Dqcow2 size=3D134217728 cluster_=
+size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/PID-src.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=
+=3D134217728 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+-Formatting 'TEST_DIR/PID-dst.qcow2', fmt=3Dqcow2 size=3D134217728 cluster_=
+size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/PID-dst.qcow2', fmt=3Dqcow2 cluster_size=3D65536 size=
+=3D134217728 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ wrote 1048576/1048576 bytes at offset 0
+ 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+diff --git a/tests/qemu-iotests/259.out b/tests/qemu-iotests/259.out
+index ffed19c2a0..edf4377650 100644
+--- a/tests/qemu-iotests/259.out
++++ b/tests/qemu-iotests/259.out
+@@ -10,5 +10,5 @@ disk size: unavailable
+=20
+ --- Testing creation for which the node would need to grow ---
+ qemu-img: TEST_DIR/t.IMGFMT: Could not resize image: Image format driver d=
+oes not support resize
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3Dqcow2 size=3D67108864 preallocation=
+=3Dmetadata
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3Dqcow2 preallocation=3Dmetadata size=
+=3D67108864
+ *** done
+diff --git a/tests/qemu-iotests/263.out b/tests/qemu-iotests/263.out
+index 0c982c55cb..4cf5c79ed8 100644
+--- a/tests/qemu-iotests/263.out
++++ b/tests/qemu-iotests/263.out
+@@ -2,7 +2,7 @@ QA output created by 263
+=20
+ testing LUKS qcow2 encryption
+=20
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576 encrypt.format=
+=3Dluks encrypt.key-secret=3Dsec0 encrypt.iter-time=3D10
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encrypt.format=3Dluks encrypt=
+.key-secret=3Dsec0 encrypt.iter-time=3D10 size=3D1048576
+ =3D=3D reading the whole image =3D=3D
+ read 1048576/1048576 bytes at offset 0
+ 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -21,7 +21,7 @@ read 982528/982528 bytes at offset 66048
+=20
+ testing legacy AES qcow2 encryption
+=20
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576 encrypt.format=
+=3Daes encrypt.key-secret=3Dsec0
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT encrypt.format=3Daes encrypt.=
+key-secret=3Dsec0 size=3D1048576
+ =3D=3D reading the whole image =3D=3D
+ read 1048576/1048576 bytes at offset 0
+ 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+diff --git a/tests/qemu-iotests/280.out b/tests/qemu-iotests/280.out
+index 5d382faaa8..0c0a30456b 100644
+--- a/tests/qemu-iotests/280.out
++++ b/tests/qemu-iotests/280.out
+@@ -1,4 +1,4 @@
+-Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D67108864 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 cluster_size=3D65536 size=3D67=
+108864 lazy_refcounts=3Doff refcount_bits=3D16
+=20
+ =3D=3D=3D Launch VM =3D=3D=3D
+ Enabling migration QMP events on VM...
 --=20
 2.17.2
 
