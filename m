@@ -2,113 +2,107 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCF8EC54E4B
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 09:29:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A159AC38A2A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 09:31:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9CE9221F7
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 09:29:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6FB5A20747
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 09:31:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fLO0krVO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9CE9221F7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Wv0shiml"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FB5A20747
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWcqo-0001f1-RH
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 05:29:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60726)
+	id 1jWcs8-0003OQ-Ja
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 05:31:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60828)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jWcpw-0000k1-JC
- for qemu-devel@nongnu.org; Thu, 07 May 2020 05:29:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48332
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jWcpu-0004gr-2Q
- for qemu-devel@nongnu.org; Thu, 07 May 2020 05:29:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588843736;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=v0NcA2CgeNHB+EgUSP209mkMYGbbkcrknixYKV8jRC4=;
- b=fLO0krVOtGE5NQP7Wd5Ei2V+2I5uTmcuMmnyjkPL8+jNBjyYApG6r6h2z6DtuId+1XsJj5
- to+GZHB1SiUHPbE6AF0IH4rS3Yb9kg95dvYBPFRrJkg4tjIqbu2kFYs3GEqDLdTLkZZb7M
- cLYhQHmF5do336SjwZxKsXL1aG9s2m8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-486-Ed5t7DKKMfeBH5e4wXuxvw-1; Thu, 07 May 2020 05:28:54 -0400
-X-MC-Unique: Ed5t7DKKMfeBH5e4wXuxvw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D949980183C;
- Thu,  7 May 2020 09:28:53 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-114-92.ams2.redhat.com
- [10.36.114.92])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6A41E5D9C5;
- Thu,  7 May 2020 09:28:52 +0000 (UTC)
-Subject: Re: [PATCH v3 22/33] block: Make backing files child_of_bds children
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200218124242.584644-1-mreitz@redhat.com>
- <20200218124242.584644-23-mreitz@redhat.com>
- <20200506163722.GH6333@linux.fritz.box>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <8d7be826-863d-cf99-9ee7-73da4603692a@redhat.com>
-Date: Thu, 7 May 2020 11:28:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
+ id 1jWcqC-00012t-LH
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 05:29:17 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:48304)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
+ id 1jWcqA-0005sN-0b
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 05:29:16 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0479Hu5j107945;
+ Thu, 7 May 2020 09:29:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : in-reply-to : references : date : message-id : mime-version :
+ content-type; s=corp-2020-01-29;
+ bh=qaEF2W7p4xQVdmrWWKxqqD3qaJ0mR/JvI0NTxzQfnsw=;
+ b=Wv0shimlN1wvQOVEGYmVrGebPYUDNFi730OlXHTs04iKSYBzONWjGy8zF2MXjwyn+FrR
+ /X/aM4/Fn3UOmY0q28LGY1Ok89fo37fZdYkv3s9puvE8iEE/CMElvXBzXRNGREU8FcUP
+ lEAu4+qLUe5FoNVe0/Dgs9TpoVeAg4COZmu83bWGH25m5SvnotmzelC0SwM1OAfQxbD+
+ ciBfZ5/op0AXyh+V42mfG0WvIehNtQ8StfflEW5762lI8LsjmZbhTEsDyCpzKyhxuTBJ
+ KuRtQo2egQdZCsZycSXUs7p/9R3jON/dVUK+qlNpuSXjzN+hlYTZBZ0ZgNPRLJS+/5cn LQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2120.oracle.com with ESMTP id 30veckgffu-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 07 May 2020 09:29:06 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0479CrMM164597;
+ Thu, 7 May 2020 09:29:05 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3030.oracle.com with ESMTP id 30sjdxme5y-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 07 May 2020 09:29:05 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0479T3eS027524;
+ Thu, 7 May 2020 09:29:03 GMT
+Received: from starbug-mbp.localdomain (/79.97.215.145)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 07 May 2020 02:29:03 -0700
+Received: by starbug-mbp.localdomain (Postfix, from userid 501)
+ id C14946854F9D; Thu,  7 May 2020 10:29:00 +0100 (IST)
+From: Darren Kenny <darren.kenny@oracle.com>
+To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
+Subject: Re: [PATCH v2 1/2] chardev: enable distinct input for -chardev file
+In-Reply-To: <20200507062442.15215-2-alxndr@bu.edu>
+References: <20200507062442.15215-1-alxndr@bu.edu>
+ <20200507062442.15215-2-alxndr@bu.edu>
+Date: Thu, 07 May 2020 10:29:00 +0100
+Message-ID: <m2pnbg6qlf.fsf@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20200506163722.GH6333@linux.fritz.box>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="dJPh2xV4uZiQrVY4lWLCqYdKlZCmmFjmS"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 03:15:48
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9613
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
+ suspectscore=2 mlxscore=0
+ bulkscore=0 adultscore=0 phishscore=0 mlxlogscore=999 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2005070076
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9613
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ mlxscore=0 bulkscore=0
+ spamscore=0 malwarescore=0 impostorscore=0 clxscore=1011
+ lowpriorityscore=0 phishscore=0 mlxlogscore=999 suspectscore=2
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2005070076
+Received-SPF: pass client-ip=156.151.31.85;
+ envelope-from=darren.kenny@oracle.com; helo=userp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 05:29:08
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -121,122 +115,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: berrange@redhat.com, Alexander Bulekov <alxndr@bu.edu>,
+ marcandre.lureau@gmail.com, stefanha@redhat.com,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---dJPh2xV4uZiQrVY4lWLCqYdKlZCmmFjmS
-Content-Type: multipart/mixed; boundary="q0VLYhSKZhnOe6gYwCmXPz7uzBwUlvmS2"
+On Thursday, 2020-05-07 at 02:24:41 -04, Alexander Bulekov wrote:
+> char-file already supports distinct paths for input/output but it was
+> only possible to specify a distinct input through QMP. With this change,
+> we can also specify a distinct input with the -chardev file argument:
+>     qemu -chardev file,id=char1,path=/out/file,pathin=/in/file
+>
+> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---q0VLYhSKZhnOe6gYwCmXPz7uzBwUlvmS2
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
 
-On 06.05.20 18:37, Kevin Wolf wrote:
-> Am 18.02.2020 um 13:42 hat Max Reitz geschrieben:
->> Make all parents of backing files pass the appropriate BdrvChildRole.
->> By doing so, we can switch their BdrvChildClass over to the generic
->> child_of_bds, which will do the right thing when given a correct
->> BdrvChildRole.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->> ---
->>  block.c                 | 26 ++++++++++++++++++++------
->>  block/backup-top.c      |  2 +-
->>  block/vvfat.c           |  3 ++-
->>  tests/test-bdrv-drain.c | 13 +++++++------
->>  4 files changed, 30 insertions(+), 14 deletions(-)
->>
->> diff --git a/block.c b/block.c
->> index 43df38ca30..31affcb4ee 100644
->> --- a/block.c
->> +++ b/block.c
->> @@ -2770,6 +2770,20 @@ static bool bdrv_inherits_from_recursive(BlockDri=
-verState *child,
->>      return child !=3D NULL;
->>  }
->> =20
->> +/*
->> + * Return the BdrvChildRole for @bs's backing child.  bs->backing is
->> + * mostly used for COW backing children (role =3D COW), but also for
->> + * filtered children (role =3D FILTERED | PRIMARY).
->> + */
->> +static BdrvChildRole bdrv_backing_role(BlockDriverState *bs)
->> +{
->> +    if (bs->drv && bs->drv->is_filter) {
->> +        return BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY;
->> +    } else {
->> +        return BDRV_CHILD_COW;
->> +    }
->> +}
->=20
-> bdrv_mirror_top and bdrv_commit_top don't set .is_filter, so it will
-> return the wrong role for them. (They also don't set .supports_backing,
-> so grepping for that wouldn't help...)
-
-I=E2=80=99ll pull in =E2=80=9Cblock: Mark commit and mirror as filter drive=
-rs=E2=80=9D from the
-main series then.
-
->>  /*
->>   * Sets the backing file link of a BDS. A new reference is created; cal=
-lers
->>   * which don't need their own reference any more must call bdrv_unref()=
-.
->> @@ -2797,8 +2811,8 @@ void bdrv_set_backing_hd(BlockDriverState *bs, Blo=
-ckDriverState *backing_hd,
->>          goto out;
->>      }
->> =20
->> -    bs->backing =3D bdrv_attach_child(bs, backing_hd, "backing", &child=
-_backing,
->> -                                    0, errp);
->> +    bs->backing =3D bdrv_attach_child(bs, backing_hd, "backing", &child=
-_of_bds,
->> +                                    bdrv_backing_role(bs), errp);
->>      /* If backing_hd was already part of bs's backing chain, and
->>       * inherits_from pointed recursively to bs then let's update it to
->>       * point directly to bs (else it will become NULL). */
->> @@ -2895,7 +2909,7 @@ int bdrv_open_backing_file(BlockDriverState *bs, Q=
-Dict *parent_options,
->>      }
->> =20
->>      backing_hd =3D bdrv_open_inherit(backing_filename, reference, optio=
-ns, 0, bs,
->> -                                   &child_backing, 0, errp);
->> +                                   &child_of_bds, BDRV_CHILD_COW, errp)=
-;
->=20
-> Wouldn't it be more consistent to use bdrv_backing_role() here, too?
-
-It=E2=80=99d be indeed.
-
-Max
-
-
---q0VLYhSKZhnOe6gYwCmXPz7uzBwUlvmS2--
-
---dJPh2xV4uZiQrVY4lWLCqYdKlZCmmFjmS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6z1NIACgkQ9AfbAGHV
-z0Cm9Af+INMmgNJpy66buhsgiZGgFIUnev1v93S3NvsS2+9Zslo2RJJ62gEmE7/+
-6/aNJBR/W0SPTcnRWR2TdcjDuaN/2OasF0Tu8dPi9Udi2Nm25xvzx4uzQkM0IGty
-0QJO1p8Ib+ibGCmE2G9lf6y+vAZQpjSkhOAP+sG1P6m7MkkAJBbHeOvCYuuuuYhk
-ZA0m0Mx8FuXKkDrrDq5n4SK+nXnCyggdcc6jelNLrPk+O8ryT4MNgbpiikBi6NNt
-MqQZ0aNPeO57ejEPfe2UKCp3HIYuSuPJRVrns0S7JWqi3olHDf4pBIlA259CGo2P
-0A0xnQfGbwIOZQr8I0Ah9HjQRXxzpA==
-=aL40
------END PGP SIGNATURE-----
-
---dJPh2xV4uZiQrVY4lWLCqYdKlZCmmFjmS--
-
+> ---
+>  chardev/char-file.c | 5 +++++
+>  chardev/char.c      | 3 +++
+>  qemu-options.hx     | 7 +++++--
+>  3 files changed, 13 insertions(+), 2 deletions(-)
+>
+> diff --git a/chardev/char-file.c b/chardev/char-file.c
+> index 2fd80707e5..031f2aa7d7 100644
+> --- a/chardev/char-file.c
+> +++ b/chardev/char-file.c
+> @@ -100,6 +100,7 @@ static void qemu_chr_parse_file_out(QemuOpts *opts, ChardevBackend *backend,
+>                                      Error **errp)
+>  {
+>      const char *path = qemu_opt_get(opts, "path");
+> +    const char *pathin = qemu_opt_get(opts, "pathin");
+>      ChardevFile *file;
+>  
+>      backend->type = CHARDEV_BACKEND_KIND_FILE;
+> @@ -110,6 +111,10 @@ static void qemu_chr_parse_file_out(QemuOpts *opts, ChardevBackend *backend,
+>      file = backend->u.file.data = g_new0(ChardevFile, 1);
+>      qemu_chr_parse_common(opts, qapi_ChardevFile_base(file));
+>      file->out = g_strdup(path);
+> +    if (pathin) {
+> +        file->has_in = true;
+> +        file->in = g_strdup(pathin);
+> +    }
+>  
+>      file->has_append = true;
+>      file->append = qemu_opt_get_bool(opts, "append", false);
+> diff --git a/chardev/char.c b/chardev/char.c
+> index e77564060d..97e03a8e48 100644
+> --- a/chardev/char.c
+> +++ b/chardev/char.c
+> @@ -849,6 +849,9 @@ QemuOptsList qemu_chardev_opts = {
+>          },{
+>              .name = "path",
+>              .type = QEMU_OPT_STRING,
+> +        },{
+> +            .name = "pathin",
+> +            .type = QEMU_OPT_STRING,
+>          },{
+>              .name = "host",
+>              .type = QEMU_OPT_STRING,
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 292d4e7c0c..488961099b 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -2938,7 +2938,7 @@ DEF("chardev", HAS_ARG, QEMU_OPTION_chardev,
+>      "-chardev vc,id=id[[,width=width][,height=height]][[,cols=cols][,rows=rows]]\n"
+>      "         [,mux=on|off][,logfile=PATH][,logappend=on|off]\n"
+>      "-chardev ringbuf,id=id[,size=size][,logfile=PATH][,logappend=on|off]\n"
+> -    "-chardev file,id=id,path=path[,mux=on|off][,logfile=PATH][,logappend=on|off]\n"
+> +    "-chardev file,id=id,path=path[,pathin=PATH][,mux=on|off][,logfile=PATH][,logappend=on|off]\n"
+>      "-chardev pipe,id=id,path=path[,mux=on|off][,logfile=PATH][,logappend=on|off]\n"
+>  #ifdef _WIN32
+>      "-chardev console,id=id[,mux=on|off][,logfile=PATH][,logappend=on|off]\n"
+> @@ -3137,13 +3137,16 @@ The available backends are:
+>      Create a ring buffer with fixed size ``size``. size must be a power
+>      of two and defaults to ``64K``.
+>  
+> -``-chardev file,id=id,path=path``
+> +``-chardev file,id=id,path=path[,pathin=pathin]``
+>      Log all traffic received from the guest to a file.
+>  
+>      ``path`` specifies the path of the file to be opened. This file will
+>      be created if it does not already exist, and overwritten if it does.
+>      ``path`` is required.
+>  
+> +    ``pathin`` specifies a separate file as the input to the chardev. If
+> +    ``pathin`` is omitted, ``path`` is used for both input and output
+> +
+>  ``-chardev pipe,id=id,path=path``
+>      Create a two-way connection to the guest. The behaviour differs
+>      slightly between Windows hosts and other hosts:
+> -- 
+> 2.26.2
 
