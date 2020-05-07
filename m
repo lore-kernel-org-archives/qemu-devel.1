@@ -7,88 +7,81 @@ X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99A78C38A2A
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 14:42:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04DD2C38A24
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 14:44:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63C7720575
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 14:42:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B268B20575
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 14:44:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PVVoHxH6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63C7720575
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NaBY03AU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B268B20575
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWhjP-0004yH-Jf
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 10:42:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46860)
+	id 1jWhkz-0006Fn-Qj
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 10:44:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47238)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jWhhe-0003lG-Oq
- for qemu-devel@nongnu.org; Thu, 07 May 2020 10:40:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33911
+ id 1jWhk7-0005kK-4f
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 10:43:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26394
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jWhhc-0000O2-Mt
- for qemu-devel@nongnu.org; Thu, 07 May 2020 10:40:45 -0400
+ id 1jWhk5-0003DQ-Uh
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 10:43:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588862443;
+ s=mimecast20190719; t=1588862597;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7FL5Gugaze7/UjtoSUkhJGFsjJuye4LPs/zlnVRTnDE=;
- b=PVVoHxH6yjuw2h6eelE4OdlZ99NfJ5NX1K5r90I6UamFu4NPivWUOBCQJwsCsRQwCPA9AP
- 1kD3IESowBkRidET5v9nylK061RjOEGktrM4eJ2pAuugxhH3kdeglUrBrp/CcxP/zwtYCR
- RJlzspmeXRgj7rz5+qv0m6ydVGakWzk=
+ bh=Fmj+TxsqcfaWnGRv+bXSTtnVxhBzJpHOBFAax8SPGR4=;
+ b=NaBY03AUVXQWtagT7ufYv8M08TDCPcIt5MJpmXRSh78/95mLM/NDjLO69yUU69w8dnM95t
+ WuvSvBPqU6xSl/DgcKnrt5bp0/Xo0QVc7IYYBgIW+XuJuyYm3VWxPDmM9MilWm/1oYFCUI
+ 7I0XrjaJn29iDGTbl6rz4ujClpXeHKY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-359-gorSq-p6PdG3KbZ4gyqqlQ-1; Thu, 07 May 2020 10:40:42 -0400
-X-MC-Unique: gorSq-p6PdG3KbZ4gyqqlQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-58-71pHwSlQOY2syutbCSN_Ww-1; Thu, 07 May 2020 10:43:13 -0400
+X-MC-Unique: 71pHwSlQOY2syutbCSN_Ww-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF7D1872FE0;
- Thu,  7 May 2020 14:40:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC12319057A1;
+ Thu,  7 May 2020 14:43:11 +0000 (UTC)
 Received: from [10.36.114.214] (ovpn-114-214.ams2.redhat.com [10.36.114.214])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7AE285C1B0;
- Thu,  7 May 2020 14:40:27 +0000 (UTC)
-Subject: Re: [EXT] Re: [PATCH v9 1/9] hw/vfio/common: Remove error print on
- mmio region translation by viommu
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A9555707BA;
+ Thu,  7 May 2020 14:42:56 +0000 (UTC)
+Subject: Re: [PATCH v9 8/9] virtio-iommu: Implement probe request
 To: Bharat Bhushan <bharatb.linux@gmail.com>
 References: <20200323084617.1782-1-bbhushan2@marvell.com>
- <20200323084617.1782-2-bbhushan2@marvell.com>
- <20200323170835.5021f845@w520.home>
- <8ec6af3c-6bd7-a3dc-c531-16db6b2089c5@redhat.com>
- <20200326115318.094ab79a@x1.home>
- <MWHPR1801MB196612966851882A99A6D3F3E3C60@MWHPR1801MB1966.namprd18.prod.outlook.com>
- <72e3ea5c-c98c-3e02-26d1-b956ee81e30f@redhat.com>
- <CAAeCc_nnE2FBo2wW+NkJX-vOP3FF_wSvLg0KngND4HhFUAGf9Q@mail.gmail.com>
- <987c2781-ce4d-9c6a-eae6-ac53fdc581c0@redhat.com>
- <CAAeCc_m_+13YxByDQPU1VNFCNp2hhUWjMRc5LTC6CdvOm0q6Zw@mail.gmail.com>
- <CAAeCc_mLcgO3bPYnx5+265SVAcEL-2tw0AfojqNmyQyLjaKjVg@mail.gmail.com>
+ <20200323084617.1782-9-bbhushan2@marvell.com>
+ <20200423160952.GB645865@myrica>
+ <199e049a-99f0-7760-778f-b7c547f158e9@redhat.com>
+ <CAAeCc_nPrmiHDe61drkFmFVVWqOg6yvmC13TVfKmiZn1GF2eXA@mail.gmail.com>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <34f8ec04-eac4-c883-d30d-c7329e5a1021@redhat.com>
-Date: Thu, 7 May 2020 16:40:25 +0200
+Message-ID: <44bd0135-89ec-caa0-bb47-f3a8c69860e7@redhat.com>
+Date: Thu, 7 May 2020 16:42:54 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <CAAeCc_mLcgO3bPYnx5+265SVAcEL-2tw0AfojqNmyQyLjaKjVg@mail.gmail.com>
+In-Reply-To: <CAAeCc_nPrmiHDe61drkFmFVVWqOg6yvmC13TVfKmiZn1GF2eXA@mail.gmail.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120;
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.120;
  envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 03:56:18
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 03:15:48
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -108,208 +101,409 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "yang.zhong@intel.com" <yang.zhong@intel.com>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "kevin.tian@intel.com" <kevin.tian@intel.com>,
- "Tomasz Nowicki \[C\]" <tnowicki@marvell.com>,
- "mst@redhat.com" <mst@redhat.com>, "drjones@redhat.com" <drjones@redhat.com>,
- "peterx@redhat.com" <peterx@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Alex Williamson <alex.williamson@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
- Bharat Bhushan <bbhushan2@marvell.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- "linuc.decode@gmail.com" <linuc.decode@gmail.com>,
- "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
+Cc: "Zhong, Yang" <yang.zhong@intel.com>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>, kevin.tian@intel.com,
+ tnowicki@marvell.com, mst@redhat.com, Peter Maydell <peter.maydell@linaro.org>,
+ drjones@redhat.com, peterx@redhat.com, qemu-devel@nongnu.org,
+ alex.williamson@redhat.com, qemu-arm@nongnu.org,
+ Bharat Bhushan <bbhushan2@marvell.com>, linuc.decode@gmail.com,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Hi Bharat,
 
-On 5/5/20 12:18 PM, Bharat Bhushan wrote:
-> Hi Eric,
-> 
-> On Tue, May 5, 2020 at 3:16 PM Bharat Bhushan <bharatb.linux@gmail.com> wrote:
+On 5/5/20 11:06 AM, Bharat Bhushan wrote:
+> On Fri, Apr 24, 2020 at 7:22 PM Auger Eric <eric.auger@redhat.com> wrote:
 >>
->> hi Eric,
->>
->> On Tue, May 5, 2020 at 3:00 PM Auger Eric <eric.auger@redhat.com> wrote:
->>>
+>> Hi Bharat,
+>> On 4/23/20 6:09 PM, Jean-Philippe Brucker wrote:
 >>> Hi Bharat,
 >>>
->>> On 5/5/20 11:25 AM, Bharat Bhushan wrote:
->>>> Hi Eric,
+>>> A few more things found while rebasing
+>>>
+>>> On Mon, Mar 23, 2020 at 02:16:16PM +0530, Bharat Bhushan wrote:
+>>>> This patch implements the PROBE request. Currently supported
+>>>> page size mask per endpoint is returned. Also append a NONE
+>>>> property in the end.
 >>>>
->>>> On Fri, Apr 24, 2020 at 7:47 PM Auger Eric <eric.auger@redhat.com> wrote:
->>>>>
->>>>> Hi Bharat,
->>>>>
->>>>> On 4/2/20 11:01 AM, Bharat Bhushan wrote:
->>>>>> Hi Eric/Alex,
->>>>>>
->>>>>>> -----Original Message-----
->>>>>>> From: Alex Williamson <alex.williamson@redhat.com>
->>>>>>> Sent: Thursday, March 26, 2020 11:23 PM
->>>>>>> To: Auger Eric <eric.auger@redhat.com>
->>>>>>> Cc: Bharat Bhushan <bbhushan2@marvell.com>; peter.maydell@linaro.org;
->>>>>>> peterx@redhat.com; eric.auger.pro@gmail.com; kevin.tian@intel.com;
->>>>>>> mst@redhat.com; Tomasz Nowicki [C] <tnowicki@marvell.com>;
->>>>>>> drjones@redhat.com; linuc.decode@gmail.com; qemu-devel@nongnu.org; qemu-
->>>>>>> arm@nongnu.org; bharatb.linux@gmail.com; jean-philippe@linaro.org;
->>>>>>> yang.zhong@intel.com; David Gibson <david@gibson.dropbear.id.au>
->>>>>>> Subject: [EXT] Re: [PATCH v9 1/9] hw/vfio/common: Remove error print on mmio
->>>>>>> region translation by viommu
->>>>>>>
->>>>>>> External Email
->>>>>>>
->>>>>>> ----------------------------------------------------------------------
->>>>>>> On Thu, 26 Mar 2020 18:35:48 +0100
->>>>>>> Auger Eric <eric.auger@redhat.com> wrote:
->>>>>>>
->>>>>>>> Hi Alex,
->>>>>>>>
->>>>>>>> On 3/24/20 12:08 AM, Alex Williamson wrote:
->>>>>>>>> [Cc +dwg who originated this warning]
->>>>>>>>>
->>>>>>>>> On Mon, 23 Mar 2020 14:16:09 +0530
->>>>>>>>> Bharat Bhushan <bbhushan2@marvell.com> wrote:
->>>>>>>>>
->>>>>>>>>> On ARM, the MSI doorbell is translated by the virtual IOMMU.
->>>>>>>>>> As such address_space_translate() returns the MSI controller MMIO
->>>>>>>>>> region and we get an "iommu map to non memory area"
->>>>>>>>>> message. Let's remove this latter.
->>>>>>>>>>
->>>>>>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>>>>>>>> Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
->>>>>>>>>> ---
->>>>>>>>>>  hw/vfio/common.c | 2 --
->>>>>>>>>>  1 file changed, 2 deletions(-)
->>>>>>>>>>
->>>>>>>>>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c index
->>>>>>>>>> 5ca11488d6..c586edf47a 100644
->>>>>>>>>> --- a/hw/vfio/common.c
->>>>>>>>>> +++ b/hw/vfio/common.c
->>>>>>>>>> @@ -426,8 +426,6 @@ static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb,
->>>>>>> void **vaddr,
->>>>>>>>>>                                   &xlat, &len, writable,
->>>>>>>>>>                                   MEMTXATTRS_UNSPECIFIED);
->>>>>>>>>>      if (!memory_region_is_ram(mr)) {
->>>>>>>>>> -        error_report("iommu map to non memory area %"HWADDR_PRIx"",
->>>>>>>>>> -                     xlat);
->>>>>>>>>>          return false;
->>>>>>>>>>      }
->>>>>>>>>>
->>>>>>>>>
->>>>>>>>> I'm a bit confused here, I think we need more justification beyond
->>>>>>>>> "we hit this warning and we don't want to because it's ok in this
->>>>>>>>> one special case, therefore remove it".  I assume the special case
->>>>>>>>> is that the device MSI address is managed via the SET_IRQS ioctl and
->>>>>>>>> therefore we won't actually get DMAs to this range.
->>>>>>>> Yes exactly. The guest creates a mapping between one giova and this
->>>>>>>> gpa (corresponding to the MSI controller doorbell) because MSIs are
->>>>>>>> mapped on ARM. But practically the physical device is programmed with
->>>>>>>> an host chosen iova that maps onto the physical MSI controller's
->>>>>>>> doorbell. so the device never performs DMA accesses to this range.
->>>>>>>>
->>>>>>>>   But I imagine the case that
->>>>>>>>> was in mind when adding this warning was general peer-to-peer
->>>>>>>>> between and assigned and emulated device.
->>>>>>>> yes makes sense.
->>>>>>>>
->>>>>>>>   Maybe there's an argument to be made
->>>>>>>>> that such a p2p mapping might also be used in a non-vIOMMU case.  We
->>>>>>>>> skip creating those mappings and drivers continue to work, maybe
->>>>>>>>> because nobody attempts to do p2p DMA with the types of devices we
->>>>>>>>> emulate, maybe because p2p DMA is not absolutely reliable on bare
->>>>>>>>> metal and drivers test it before using it.
->>>>>>>> MSI doorbells are mapped using the IOMMU_MMIO flag (dma-iommu.c
->>>>>>>> iommu_dma_get_msi_page).
->>>>>>>> One idea could be to pass that flag through the IOMMU Notifier
->>>>>>>> mechanism into the iotlb->perm. Eventually when we get this in
->>>>>>>> vfio_get_vaddr() we would not print the warning. Could that make sense?
->>>>>>>
->>>>>>> Yeah, if we can identify a valid case that doesn't need a warning, that's fine by me.
->>>>>>> Thanks,
->>>>>>
->>>>>> Let me know if I understood the proposal correctly:
->>>>>>
->>>>>> virtio-iommu driver in guest will make map (VIRTIO_IOMMU_T_MAP) with VIRTIO_IOMMU_MAP_F_MMIO flag for MSI mapping.
->>>>>> In qemu, virtio-iommu device will set a new defined flag (say IOMMU_MMIO) in iotlb->perm in memory_region_notify_iommu(). vfio_get_vaddr() will check same flag and will not print the warning.>
->>>>>> Is above correct?
->>>>> Yes that's what I had in mind.
+>>>> Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
+>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>> ---
+>>>>  include/standard-headers/linux/virtio_iommu.h |   6 +
+>>>>  hw/virtio/virtio-iommu.c                      | 161 +++++++++++++++++=
+-
+>>>>  hw/virtio/trace-events                        |   2 +
+>>>>  3 files changed, 166 insertions(+), 3 deletions(-)
 >>>>
->>>> In that case virtio-iommu driver in guest should not make map
->>>> (VIRTIO_IOMMU_T_MAP) call as it known nothing to be mapped.
->>> sorry I don't catch what you meant. Please can you elaborate?
+>>>> diff --git a/include/standard-headers/linux/virtio_iommu.h b/include/s=
+tandard-headers/linux/virtio_iommu.h
+>>>> index b9443b83a1..8a0d47b907 100644
+>>>> --- a/include/standard-headers/linux/virtio_iommu.h
+>>>> +++ b/include/standard-headers/linux/virtio_iommu.h
+>>>> @@ -111,6 +111,7 @@ struct virtio_iommu_req_unmap {
+>>>>
+>>>>  #define VIRTIO_IOMMU_PROBE_T_NONE           0
+>>>>  #define VIRTIO_IOMMU_PROBE_T_RESV_MEM               1
+>>>> +#define VIRTIO_IOMMU_PROBE_T_PAGE_SIZE_MASK 2
+>>>>
+>>>>  #define VIRTIO_IOMMU_PROBE_T_MASK           0xfff
+>>>>
+>>>> @@ -130,6 +131,11 @@ struct virtio_iommu_probe_resv_mem {
+>>>>      uint64_t                                        end;
+>>>>  };
+>>>>
+>>>> +struct virtio_iommu_probe_pgsize_mask {
+>>>> +    struct virtio_iommu_probe_property      head;
+>>>> +    uint64_t                                pgsize_bitmap;
+>>>> +};
+>>>> +
+>>>>  struct virtio_iommu_req_probe {
+>>>>      struct virtio_iommu_req_head            head;
+>>>>      uint32_t                                        endpoint;
+>>>> diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
+>>>> index 747e3cf1da..63fbacdcdc 100644
+>>>> --- a/hw/virtio/virtio-iommu.c
+>>>> +++ b/hw/virtio/virtio-iommu.c
+>>>> @@ -38,6 +38,10 @@
+>>>>
+>>>>  /* Max size */
+>>>>  #define VIOMMU_DEFAULT_QUEUE_SIZE 256
+>>>> +#define VIOMMU_PROBE_SIZE 512
+>>>> +
+>>>> +#define SUPPORTED_PROBE_PROPERTIES (\
+>>>> +    1 << VIRTIO_IOMMU_PROBE_T_PAGE_SIZE_MASK)
+>>>>
+>>>>  typedef struct VirtIOIOMMUDomain {
+>>>>      uint32_t id;
+>>>> @@ -62,6 +66,13 @@ typedef struct VirtIOIOMMUMapping {
+>>>>      uint32_t flags;
+>>>>  } VirtIOIOMMUMapping;
+>>>>
+>>>> +typedef struct VirtIOIOMMUPropBuffer {
+>>>> +    VirtIOIOMMUEndpoint *endpoint;
+>>>> +    size_t filled;
+>>>> +    uint8_t *start;
+>>>> +    bool error;
+>>>
+>>> It doesn't seem like bufstate->error gets used anywhere
+>> maybe rebase your work on
+>> [PATCH for-4.2 v10 10/15] virtio-iommu: Implement probe request
+>> which tests it.
+>=20
+> This was the staring point for me, As of now i moved away from "error"
+> from above struct.
+>=20
 >>
->> What I understood of the proposal is:
->> Linux:
->>  1) MSI doorbells are mapped using the IOMMU_MMIO flag (dma-iommu.c
->> iommu_dma_get_msi_page)
->>  2) virtio-iommu driver in guest will make map (VIRTIO_IOMMU_T_MAP)
->> with VIRTIO_IOMMU_MAP_F_MMIO flag for MSI mapping.
->>
->> GEMU:
->> 3) virtio-iommu device - If VIRTIO_IOMMU_MAP_F_MMIO flag set then will
->> set a new defined flag (say IOMMU_MMIO) in iotlb->perm in
->> memory_region_notify_iommu()
->> 4. vfio_get_vaddr() will check same flag and will not print the
->> warning. Also vfio_iommu_map_notify() will not do anything.
->>
->> So, rather than going down to step 3 and 4, can we avoid maling map()
->> calling in step-2 itself?
-> 
-> ohh, We need to setup msi translation mapping, correct.
+>> Also in
+>> [Qemu-devel] [PATCH for-4.2 v10 10/15] virtio-iommu: Implement probe req=
+uest
+>> I changed the implementation to keep it simpler.
 
-I sent
-[PATCH 0/5] VIRTIO-IOMMU probe request support and MSI bypass on ARM
-
-With this series, the guest does not attempt to map the ITS MSI doorbell
-anymore. So you shouldn't get "iommu map to non memory area" anymore if
-you rebase on it and remove this patch.
-
-At the moment I only bypass the ITS doorbell but I think it is safe to
-do the same with GICv2M doorbell as well. Anyway all assigned devices
-will be able to access this latter.
+In [PATCH 2/5] virtio-iommu: Implement RESV_MEM probe request
+I reworked the original implementation. I think this version is simpler
+to start from. I removed the VirtIOIOMMUPropBuffer struct which looks
+more complex than requested.
 
 Thanks
 
 Eric
-> 
-> Thanks
-> -Bharat
-> 
 >>
 >> Thanks
->> -Bharat
 >>
+>> Eric
 >>>
->>> Thanks
+>>>> +} VirtIOIOMMUPropBuffer;
+>>>> +
+>>>>  static inline uint16_t virtio_iommu_get_bdf(IOMMUDevice *dev)
+>>>>  {
+>>>>      return PCI_BUILD_BDF(pci_bus_num(dev->bus), dev->devfn);
+>>>> @@ -490,6 +501,114 @@ static int virtio_iommu_unmap(VirtIOIOMMU *s,
+>>>>      return ret;
+>>>>  }
+>>>>
+>>>> +static int virtio_iommu_fill_none_prop(VirtIOIOMMUPropBuffer *bufstat=
+e)
+>>>> +{
+>>>> +    struct virtio_iommu_probe_property *prop;
+>>>> +
+>>>> +    prop =3D (struct virtio_iommu_probe_property *)
+>>>> +                (bufstate->start + bufstate->filled);
+>>>> +    prop->type =3D 0;
+>>>> +    prop->length =3D 0;
+>>>> +    bufstate->filled +=3D sizeof(*prop);
+>>>> +    trace_virtio_iommu_fill_none_property(bufstate->endpoint->id);
+>>>> +    return 0;
+>>>> +}
+>>>> +
+>>>> +static int virtio_iommu_fill_page_size_mask(VirtIOIOMMUPropBuffer *bu=
+fstate)
+>>>> +{
+>>>> +    struct virtio_iommu_probe_pgsize_mask *page_size_mask;
+>>>> +    size_t prop_size =3D sizeof(*page_size_mask);
+>>>> +    VirtIOIOMMUEndpoint *ep =3D bufstate->endpoint;
+>>>> +    VirtIOIOMMU *s =3D ep->viommu;
+>>>> +    IOMMUDevice *sdev;
+>>>> +
+>>>> +    if (bufstate->filled + prop_size >=3D VIOMMU_PROBE_SIZE) {
+>>>> +        bufstate->error =3D true;
+>>>> +        /* get the traversal stopped by returning true */
+>>>> +        return true;
+>>>> +    }
+>>>> +
+>>>> +    page_size_mask =3D (struct virtio_iommu_probe_pgsize_mask *)
+>>>> +                     (bufstate->start + bufstate->filled);
+>>>> +
+>>>> +    page_size_mask->head.type =3D VIRTIO_IOMMU_PROBE_T_PAGE_SIZE_MASK=
+;
+>>>> +    page_size_mask->head.length =3D prop_size;
+>>>> +    QLIST_FOREACH(sdev, &s->notifiers_list, next) {
+>>>> +        if (ep->id =3D=3D sdev->devfn) {
+>>>> +            page_size_mask->pgsize_bitmap =3D sdev->page_size_mask;
 >>>
->>> Eric
+>>> Do we need a cpu_to_le64 here?
+>=20
+> Ack, yes, even head.type and head.length needed  cpu_to_le16().
+>=20
+>>>
+>>>> +    }
+>>>> +    }
+>>>> +    bufstate->filled +=3D sizeof(*page_size_mask);
+>>>> +    trace_virtio_iommu_fill_pgsize_mask_property(bufstate->endpoint->=
+id,
+>>>> +                                                 page_size_mask->pgsi=
+ze_bitmap,
+>>>> +                                                 bufstate->filled);
+>>>> +    return false;
+>>>> +}
+>>>> +
+>>>> +/* Fill the properties[] buffer with properties of type @type */
+>>>> +static int virtio_iommu_fill_property(int type,
+>>>> +                                      VirtIOIOMMUPropBuffer *bufstate=
+)
+>>>> +{
+>>>> +    int ret =3D -ENOSPC;
+>>>> +
+>>>> +    if (bufstate->filled + sizeof(struct virtio_iommu_probe_property)
+>>>> +            >=3D VIOMMU_PROBE_SIZE) {
+>>>> +        /* no space left for the header */
+>>>> +        bufstate->error =3D true;
+>>>> +        goto out;
+>>>> +    }
+>>>> +
+>>>> +    switch (type) {
+>>>> +    case VIRTIO_IOMMU_PROBE_T_NONE:
+>>>> +        ret =3D virtio_iommu_fill_none_prop(bufstate);
+>>>> +        break;
+>>>> +    case VIRTIO_IOMMU_PROBE_T_PAGE_SIZE_MASK:
+>>>> +    {
+>>>> +        ret =3D virtio_iommu_fill_page_size_mask(bufstate);
+>>>> +    break;
+>>>> +    }
+>>>> +    default:
+>>>> +        ret =3D -ENOENT;
+>>>> +        break;
+>>>> +    }
+>>>> +out:
+>>>> +    if (ret) {
+>>>> +        error_report("%s property of type=3D%d could not be filled (%=
+d),"
+>>>> +                     " remaining size =3D 0x%lx",
+>>>> +                     __func__, type, ret, bufstate->filled);
+>>>> +    }
+>>>> +    return ret;
+>>>> +}
+>>>> +
+>>>> +/**
+>>>> + * virtio_iommu_probe - Fill the probe request buffer with all
+>>>> + * the properties the device is able to return and add a NONE
+>>>> + * property at the end. @buf points to properties[].
+>>>> + */
+>>>> +static int virtio_iommu_probe(VirtIOIOMMU *s,
+>>>> +                              struct virtio_iommu_req_probe *req,
+>>>> +                              uint8_t *buf)
+>>>> +{
+>>>> +    uint32_t ep_id =3D le32_to_cpu(req->endpoint);
+>>>> +    VirtIOIOMMUEndpoint *ep =3D virtio_iommu_get_endpoint(s, ep_id);
+>>>> +    int16_t prop_types =3D SUPPORTED_PROBE_PROPERTIES, type;
+>>>> +    VirtIOIOMMUPropBuffer bufstate =3D {.start =3D buf, .filled =3D 0=
+,
+>>>> +                                       .error =3D false, .endpoint =
+=3D ep};
+>>>
+>>> Probably need to check if ep is valid before going further
+>=20
+> yes, will take care
+>=20
+>>>
+>>>> +
+>>>> +    while ((type =3D ctz32(prop_types)) !=3D 32) {
+>>>> +        if (virtio_iommu_fill_property(type, &bufstate)) {
+>>>> +            goto failure;
+>>>> +        }
+>>>> +        prop_types &=3D ~(1 << type);
+>>>> +    }
+>>>> +    if (virtio_iommu_fill_property(VIRTIO_IOMMU_PROBE_T_NONE, &bufsta=
+te)) {
+>>>> +        goto failure;
+>>>> +    }
+>>>
+>>> We got rid of the NONE property in the spec, now there is:
+>>>
+>>>  "If the device doesn=E2=80=99t fill all probe_size bytes with properti=
+es, it
+>>>   SHOULD fill the remaining bytes of properties with zeroes."
+>>>
+>>> So I think you can get rid of virtio_iommu_fill_none_prop() and fill th=
+e
+>>> rest of the buffer with zeroes here instead.
+>=20
+> will do changes accordingly.
+>=20
+> Stay Safe !!
+>=20
+> Thanks
+> -Bharat
+>>>
+>>> Thanks,
+>>> Jean
+>>>
+>>>> +    return VIRTIO_IOMMU_S_OK;
+>>>> +failure:
+>>>> +    return VIRTIO_IOMMU_S_INVAL;
+>>>> +}
+>>>> +
+>>>>  static int virtio_iommu_iov_to_req(struct iovec *iov,
+>>>>                                     unsigned int iov_cnt,
+>>>>                                     void *req, size_t req_sz)
+>>>> @@ -519,6 +638,17 @@ virtio_iommu_handle_req(detach)
+>>>>  virtio_iommu_handle_req(map)
+>>>>  virtio_iommu_handle_req(unmap)
 >>>>
->>>> Stay Safe
+>>>> +static int virtio_iommu_handle_probe(VirtIOIOMMU *s,
+>>>> +                                     struct iovec *iov,
+>>>> +                                     unsigned int iov_cnt,
+>>>> +                                     uint8_t *buf)
+>>>> +{
+>>>> +    struct virtio_iommu_req_probe req;
+>>>> +    int ret =3D virtio_iommu_iov_to_req(iov, iov_cnt, &req, sizeof(re=
+q));
+>>>> +
+>>>> +    return ret ? ret : virtio_iommu_probe(s, &req, buf);
+>>>> +}
+>>>> +
+>>>>  static void virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue=
+ *vq)
+>>>>  {
+>>>>      VirtIOIOMMU *s =3D VIRTIO_IOMMU(vdev);
+>>>> @@ -564,17 +694,33 @@ static void virtio_iommu_handle_command(VirtIODe=
+vice *vdev, VirtQueue *vq)
+>>>>          case VIRTIO_IOMMU_T_UNMAP:
+>>>>              tail.status =3D virtio_iommu_handle_unmap(s, iov, iov_cnt=
+);
+>>>>              break;
+>>>> +        case VIRTIO_IOMMU_T_PROBE:
+>>>> +        {
+>>>> +            struct virtio_iommu_req_tail *ptail;
+>>>> +            uint8_t *buf =3D g_malloc0(s->config.probe_size + sizeof(=
+tail));
+>>>> +
+>>>> +            ptail =3D (struct virtio_iommu_req_tail *)
+>>>> +                        (buf + s->config.probe_size);
+>>>> +            ptail->status =3D virtio_iommu_handle_probe(s, iov, iov_c=
+nt, buf);
+>>>> +
+>>>> +            sz =3D iov_from_buf(elem->in_sg, elem->in_num, 0,
+>>>> +                              buf, s->config.probe_size + sizeof(tail=
+));
+>>>> +            g_free(buf);
+>>>> +            assert(sz =3D=3D s->config.probe_size + sizeof(tail));
+>>>> +            goto push;
+>>>> +        }
+>>>>          default:
+>>>>              tail.status =3D VIRTIO_IOMMU_S_UNSUPP;
+>>>>          }
+>>>> -        qemu_mutex_unlock(&s->mutex);
 >>>>
->>>> Thanks
->>>> -Bharat
+>>>>  out:
+>>>>          sz =3D iov_from_buf(elem->in_sg, elem->in_num, 0,
+>>>>                            &tail, sizeof(tail));
+>>>>          assert(sz =3D=3D sizeof(tail));
 >>>>
->>>>>
->>>>> Thanks
->>>>>
->>>>> Eric
->>>>>>
->>>>>> Thanks
->>>>>> -Bharat
->>>>>>
->>>>>>>
->>>>>>> Alex
->>>>>>
->>>>>>
->>>>>
+>>>> -        virtqueue_push(vq, elem, sizeof(tail));
+>>>> +push:
+>>>> +        qemu_mutex_unlock(&s->mutex);
+>>>> +        virtqueue_push(vq, elem, sz);
+>>>>          virtio_notify(vdev, vq);
+>>>>          g_free(elem);
+>>>>      }
+>>>> @@ -634,16 +780,23 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMM=
+UMemoryRegion *mr, hwaddr addr,
+>>>>      VirtIOIOMMUEndpoint *ep;
+>>>>      uint32_t sid, flags;
+>>>>      bool bypass_allowed;
+>>>> +    hwaddr addr_mask;
+>>>>      bool found;
+>>>>
+>>>>      interval.low =3D addr;
+>>>>      interval.high =3D addr + 1;
+>>>>
+>>>> +    if (sdev->page_size_mask) {
+>>>> +        addr_mask =3D (1 << ctz32(sdev->page_size_mask)) - 1;
+>>>> +    } else {
+>>>> +        addr_mask =3D (1 << ctz32(s->config.page_size_mask)) - 1;
+>>>> +    }
+>>>> +
+>>>>      IOMMUTLBEntry entry =3D {
+>>>>          .target_as =3D &address_space_memory,
+>>>>          .iova =3D addr,
+>>>>          .translated_addr =3D addr,
+>>>> -        .addr_mask =3D (1 << ctz32(s->config.page_size_mask)) - 1,
+>>>> +        .addr_mask =3D addr_mask,
+>>>>          .perm =3D IOMMU_NONE,
+>>>>      };
+>>>>
+>>>> @@ -831,6 +984,7 @@ static void virtio_iommu_device_realize(DeviceStat=
+e *dev, Error **errp)
+>>>>      s->config.page_size_mask =3D TARGET_PAGE_MASK;
+>>>>      s->config.input_range.end =3D -1UL;
+>>>>      s->config.domain_range.end =3D 32;
+>>>> +    s->config.probe_size =3D VIOMMU_PROBE_SIZE;
+>>>>
+>>>>      virtio_add_feature(&s->features, VIRTIO_RING_F_EVENT_IDX);
+>>>>      virtio_add_feature(&s->features, VIRTIO_RING_F_INDIRECT_DESC);
+>>>> @@ -840,6 +994,7 @@ static void virtio_iommu_device_realize(DeviceStat=
+e *dev, Error **errp)
+>>>>      virtio_add_feature(&s->features, VIRTIO_IOMMU_F_MAP_UNMAP);
+>>>>      virtio_add_feature(&s->features, VIRTIO_IOMMU_F_BYPASS);
+>>>>      virtio_add_feature(&s->features, VIRTIO_IOMMU_F_MMIO);
+>>>> +    virtio_add_feature(&s->features, VIRTIO_IOMMU_F_PROBE);
+>>>>
+>>>>      qemu_mutex_init(&s->mutex);
+>>>>
+>>>> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+>>>> index 8bae651191..b0a6e4bda3 100644
+>>>> --- a/hw/virtio/trace-events
+>>>> +++ b/hw/virtio/trace-events
+>>>> @@ -76,3 +76,5 @@ virtio_iommu_report_fault(uint8_t reason, uint32_t f=
+lags, uint32_t endpoint, uin
+>>>>  virtio_iommu_notify_map(const char *name, uint64_t iova, uint64_t pad=
+dr, uint64_t map_size) "mr=3D%s iova=3D0x%"PRIx64" pa=3D0x%" PRIx64" size=
+=3D0x%"PRIx64
+>>>>  virtio_iommu_notify_unmap(const char *name, uint64_t iova, uint64_t m=
+ap_size) "mr=3D%s iova=3D0x%"PRIx64" size=3D0x%"PRIx64
+>>>>  virtio_iommu_remap(uint64_t iova, uint64_t pa, uint64_t size) "iova=
+=3D0x%"PRIx64" pa=3D0x%" PRIx64" size=3D0x%"PRIx64""
+>>>> +virtio_iommu_fill_none_property(uint32_t devid) "devid=3D%d"
+>>>> +virtio_iommu_fill_pgsize_mask_property(uint32_t devid, uint64_t pgsiz=
+e_mask, size_t filled) "dev=3D %d, pgsize_mask=3D0x%"PRIx64" filled=3D0x%lx=
+"
+>>>> --
+>>>> 2.17.1
 >>>>
 >>>
-> 
+>>
+>=20
 
 
