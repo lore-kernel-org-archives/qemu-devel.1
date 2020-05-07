@@ -2,87 +2,123 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71C75C38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 18:21:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36C24C38A24
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 18:22:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3202120735
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 18:21:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E9DCF215A4
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 18:22:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f24JsHq8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3202120735
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="AIAKy2AU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9DCF215A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWl8m-0006iX-9u
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 14:21:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40304)
+	id 1jWlAb-000864-3F
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 14:22:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41252)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1jWl7v-0006Cf-6H
- for qemu-devel@nongnu.org; Thu, 07 May 2020 14:20:07 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58768
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1jWl7u-0002ZZ-5t
- for qemu-devel@nongnu.org; Thu, 07 May 2020 14:20:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588875604;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UgewtUy9bTNyZauHpI56baWIlBcAHHHwwe5CUmUNguk=;
- b=f24JsHq8PIKEvtblQYnI2TrRqm+Qen4tcuhV/o0POV/9Dvx9dcPvhu98fjIUaxy4scESW9
- u5Szl+Dbj7tRAhXWoEX8rov856u3+DmqzAaDIyn1OXOxQbIbPitrqZRpABgA4ojjJQQMYl
- LL/RQjaXv2KXVISaf69TOgPnWrMgFk4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-49-1X-11krePSqtA8qFXcj8yA-1; Thu, 07 May 2020 14:20:00 -0400
-X-MC-Unique: 1X-11krePSqtA8qFXcj8yA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C257107ACCD;
- Thu,  7 May 2020 18:19:58 +0000 (UTC)
-Received: from x1.home (ovpn-113-95.phx2.redhat.com [10.3.113.95])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 98CB970559;
- Thu,  7 May 2020 18:19:56 +0000 (UTC)
-Date: Thu, 7 May 2020 12:19:56 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH Kernel v18 4/7] vfio iommu: Implementation of ioctl for
- dirty pages tracking.
-Message-ID: <20200507121956.45b2500f@x1.home>
-In-Reply-To: <24223faa-15ac-bd71-6c5d-9d0401fbd839@nvidia.com>
-References: <1588607939-26441-1-git-send-email-kwankhede@nvidia.com>
- <1588607939-26441-5-git-send-email-kwankhede@nvidia.com>
- <20200506081510.GC19334@joy-OptiPlex-7040>
- <24223faa-15ac-bd71-6c5d-9d0401fbd839@nvidia.com>
-Organization: Red Hat
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jWl9s-0007bY-0s; Thu, 07 May 2020 14:22:08 -0400
+Received: from mail-vi1eur05on2133.outbound.protection.outlook.com
+ ([40.107.21.133]:42432 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jWl9p-00087l-Pw; Thu, 07 May 2020 14:22:06 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fyNlmG8lJGnVq6wTp1mxGnXxGeoQfDEeBflj5fjJvUxbEGtWI/5dixtihgvbpApDcPp0tz4gGSHs9YpnJCvxPsHmiX6yUebEpnQXoiIzu0NqrRsi/cNCOe24kxiQPFi6fk00x5UhHNbFuvOVzEHyvdZj0ARYLgizNlwddzrFXZgZEf4uFjVC2b353zSkXXOpjo3xV3cFQuP4EehP0L99ZPDgUHBFToQaE6ySxyOIi+qbNDzoaGGetVdaxWC0DQQ64Ke9BButlN10jNlH0WdYGgJ2YXhsGABz8bVWlArmMrG2uysFoFFWqA6xcDWqRPe5U/XG2rzqBSjxY3Jgr68PoQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fMbh1X5DfgOcGYqcQDxYaSzsKN70ZfhNWe6inROa/ps=;
+ b=OIFrxAWc7BKSNQNwRMuZqyxUI7xpoxFO8Rh7hITR2dDZUzHqQidmI75BfqTN3GUn0p5Mlmabljenrai/RZiYcmQzEIhHrcxlPD+scsZt6QZr4s9tVJhfiF8h2rpSvokBeBNdQtkWj0xpsz/jwHg7ijF292ERQJGr9SOyM6DOD/6fUWQYodcwzB3NunW/icdLtpwOvqq4yoZ5BYR8z2Oq0h0F2/Hhb8oDRu7ogzDAGjAoj87qJgOEdcRGHhumb8uKx5g0OzulZO5e8T/PVpqAQ+aib6gM8IzQPpau1dWJvak2+D0QvTVsyFA1rHCvD6o24aJ3d5DPIRc4k1YsLRw5wA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fMbh1X5DfgOcGYqcQDxYaSzsKN70ZfhNWe6inROa/ps=;
+ b=AIAKy2AUCaD+NjGx65eeESIHqMJ+UOtO5ji61nNYEJKcyPEhVw/Uo1f703m3n2vQLxy/1iE/x0isnvNEkMXN7RnNtSXbJleCgddoKt8R8x4g9YOBS4pF/toL6WlrZGUUnNqaijH8c24n8Bnjg4DHr2PBq2to1X9JFj1MNSKCP/s=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5366.eurprd08.prod.outlook.com (2603:10a6:20b:10b::11)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.26; Thu, 7 May
+ 2020 18:22:02 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2958.034; Thu, 7 May 2020
+ 18:22:02 +0000
+Subject: Re: [PATCH v2 10/9] qed: Simplify backing reads
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200507084800.20596-1-vsementsov@virtuozzo.com>
+ <20200507144513.348470-1-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200507212200850
+Message-ID: <a38cc167-2d60-9841-6dc2-79966d8b4812@virtuozzo.com>
+Date: Thu, 7 May 2020 21:22:00 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <20200507144513.348470-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Received-SPF: pass client-ip=207.211.31.120;
- envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 03:56:18
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-ClientProxiedBy: FR2P281CA0026.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:14::13) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.171) by
+ FR2P281CA0026.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:14::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2979.29 via Frontend Transport; Thu, 7 May 2020 18:22:01 +0000
+X-Tagtoolbar-Keys: D20200507212200850
+X-Originating-IP: [185.215.60.171]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b703abbd-61e2-4d19-f732-08d7f2b389f4
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5366:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB536606F49363A6F7E1F573ADC1A50@AM7PR08MB5366.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1265;
+X-Forefront-PRVS: 03965EFC76
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Zy9CqjXt6YIgJnB6IwZx2y9ad3+fTeIwyGvo3NWwmv+/aE1Ij2MXGyoXa95X6UKhTVyKwHtDtPvmfan7K1tielfuaJZNyyk4/MCbBLUJt7wcfFnXGxu9+dfH5zPGzm4+Tj73FytD7rqrgtsXLO9F73YixzHPIz6oyl3Jue4fvHL1KHSW1rX/C3T57K6ntnQPkwJzzc/9aYm9oDVCpjyJhV/XnFlIYQn8OwbqGs572tYAEAC02+lYBFQ60Cg27vvao+EdfxL56pG8T1oRCKqmxhl0Phvto/OyZ1fLZFViXDWBIjuDiUn9lns6m5mQdrsiY47AFdohxlci8/K3Sp53UIpgvN6dKtNR4O86cEC7SWOYqu5RRQw3kF2Mh7OcwTEUa2zA6LvOsv895asxtynj6woXK2suvccF77kAprN0tvopTFXJPWb8gV9dkvY3tKcEZERowPaztAH6BJZJpwP1Mu1q1GQNqF6iwQoDDrSIypGmnnmOUi////lmnyXaTFnyJtp0y/B/5x4CW8wcEnubLRd6hCLW/Sj7OMIm9kRHVaMEvsuTyP52ULeZRnbpQJsZ
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(396003)(136003)(39850400004)(346002)(376002)(366004)(33430700001)(2906002)(16576012)(8676002)(316002)(66946007)(52116002)(4326008)(31686004)(66556008)(86362001)(2616005)(4744005)(186003)(956004)(26005)(66476007)(31696002)(478600001)(16526019)(8936002)(5660300002)(83310400001)(6486002)(36756003)(83280400001)(83320400001)(83290400001)(33440700001)(83300400001)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: MSajB5rOJZI8YlGenutA5xL1astXxyLv+hgf3kPH0GHs6E/swsd+LxQ/EiIXsTeYp7uTC8bJPDTW/AhGnY5QhQAT0yoJuOX5QDkryscFBA5tRXaLq4unptVnRvmMCNITZyKis7l1cXayoySmEWarICqb5i69Wn337zm1NfkdvR+NTww5ztjIdj4o1vgT6jV9TFfo/3VSWXP/C7EeUf/Vn0khRMhjZvKX1DTzLRhSllw/mcScqBTkW92Iws/EV/MyvT/PonL1s4rQRsO40foVZreJ2SEJZr873kridXJmWfa2XVGd+/+nGF/cFvp2g+r1d3PWOzVeegbBJ/zbTNweGTmDk63MqCX2go378SxbcPZ+5YgcWzE4b1jFULqfQvKkiduBCxsimlYyT8fulYowT1uUt2JCib0A7aaR3+4XWraHAtYyrwdltwSxBuL6NRm/79oDFL8UCTlyNNPUDQfrS+bufNZzaV6Ka83waIZve7OQmIULRgr8bEnGKzCAOdrzOni+8yNHprHaO0/QkxIAzCVw1QiFjJ0haBoaK3KdIVDfWTBffwRdA432QV4skmZo9dVFHhIyM4VsXUgcXqGDe1Q+mHxxOrPRq1CG3tGeihWf+s6G7gUA9Cl+Ev6zXfMQypDFyIO0/r0WhmqoQ/UmFfzXJ7e+Zq8fjaggC+RBX8JuyApRyLKUM++3Ntctj1trzgspUSjYJLLxGioonydTQkDjQm/o32lAmJnmqhHfvmtAogtj8kINn0tKIp8GE+rOgrIUjHEDQhM9kQut2neh7LriJXcjGaV92QawfU7tF2U=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b703abbd-61e2-4d19-f732-08d7f2b389f4
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2020 18:22:02.4721 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: v1RxwejI/ZwNZ13miL6gJNfUtayE87rbj7cj7GPkOKu8CLp0bxnjO1DMMQp8M08VXAYOwMMxbBjXaS51d3k/eMYZrLkJECFKTUaJnMncXFA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5366
+Received-SPF: pass client-ip=40.107.21.133;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 14:22:03
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,61 +132,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
- Yan Zhao <yan.y.zhao@intel.com>, "Liu, Changpeng" <changpeng.liu@intel.com>,
- "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: kwolf@redhat.com, "open list:qed" <qemu-block@nongnu.org>,
+ stefanha@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 7 May 2020 01:12:25 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
-
-> On 5/6/2020 1:45 PM, Yan Zhao wrote:
-> > On Mon, May 04, 2020 at 11:58:56PM +0800, Kirti Wankhede wrote:  
+07.05.2020 17:45, Eric Blake wrote:
+> The other four drivers that support backing files (qcow, qcow2,
+> parallels, vmdk) all rely on the block layer to populate zeroes when
+> reading beyond EOF of a short backing file.  We can simplify the qed
+> code by doing likewise.
 > 
-> <snip>
-> 
-> >>   /*
-> >>    * Helper Functions for host iova-pfn list
-> >>    */
-> >> @@ -567,6 +654,18 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
-> >>   			vfio_unpin_page_external(dma, iova, do_accounting);
-> >>   			goto pin_unwind;
-> >>   		}
-> >> +
-> >> +		if (iommu->dirty_page_tracking) {
-> >> +			unsigned long pgshift =
-> >> +					 __ffs(vfio_pgsize_bitmap(iommu));
-> >> +  
-> > hi Kirti,
-> > may I know if there's any vfio_pin_pages() happpening during NVidia's vGPU migration?
-> > the code would enter into deadlock as I reported in last version.
-> >   
-> 
-> Hm, you are right and same is the case in vfio_iommu_type1_dma_rw_chunk().
-> 
-> Instead of calling vfio_pgsize_bitmap() from lots of places, I'm 
-> thinking of saving pgsize_bitmap in struct vfio_iommu, which should be 
-> populated whenever domain_list is updated. Alex, will that be fine?
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-I've wondered why we don't already cache this, so yes, that's fine, but
-the cached value will only be valid when evaluated under iommu->lock.
-Thanks,
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Alex
-
+-- 
+Best regards,
+Vladimir
 
