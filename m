@@ -2,88 +2,84 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0E63C38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 05:41:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46C58C38A24
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 05:50:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97608207DD
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 05:41:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F003320753
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 05:50:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="Qik7l5s7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97608207DD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="O0sBPXO/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F003320753
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWZHs-0006TZ-Ox
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 01:41:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42130)
+	id 1jWZQe-00011A-4Y
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 01:50:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43518)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jWZHD-0005l7-3e
- for qemu-devel@nongnu.org; Thu, 07 May 2020 01:40:55 -0400
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:14952)
+ id 1jWZPy-0000SB-Ez
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 01:49:58 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:14761)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jWZHB-0000Bu-LG
- for qemu-devel@nongnu.org; Thu, 07 May 2020 01:40:54 -0400
+ id 1jWZPw-0006cv-Ag
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 01:49:58 -0400
 Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5eb39f1d0000>; Wed, 06 May 2020 22:39:41 -0700
+ hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5eb3a1000000>; Wed, 06 May 2020 22:47:44 -0700
 Received: from hqmail.nvidia.com ([172.20.161.6])
  by hqpgpgate101.nvidia.com (PGP Universal service);
- Wed, 06 May 2020 22:40:52 -0700
+ Wed, 06 May 2020 22:49:54 -0700
 X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Wed, 06 May 2020 22:40:52 -0700
-Received: from [10.40.101.152] (172.20.13.39) by HQMAIL107.nvidia.com
+ by hqpgpgate101.nvidia.com on Wed, 06 May 2020 22:49:54 -0700
+Received: from [10.40.101.152] (10.124.1.5) by HQMAIL107.nvidia.com
  (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 7 May
- 2020 05:40:44 +0000
-Subject: Re: [PATCH v16 QEMU 04/16] vfio: Add save and load functions for VFIO
- PCI devices
-To: Alex Williamson <alex.williamson@redhat.com>
-References: <1585084154-29461-1-git-send-email-kwankhede@nvidia.com>
- <1585084154-29461-5-git-send-email-kwankhede@nvidia.com>
- <20200325135638.32421bf9@w520.home>
- <8504c8ad-9b0b-6079-3290-60caa447e708@nvidia.com>
- <20200504223711.307123eb@x1.home> <20200506061102.GA19334@joy-OptiPlex-7040>
- <8a120b05-adf9-cd16-7497-f9f533f53117@nvidia.com>
- <20200506140314.618f054d@w520.home>
+ 2020 05:49:45 +0000
+Subject: Re: [PATCH v1 2/2] Sample mtty: Add migration capability to mtty
+ module
+To: Yan Zhao <yan.y.zhao@intel.com>
+References: <1588614860-16330-1-git-send-email-kwankhede@nvidia.com>
+ <1588614860-16330-3-git-send-email-kwankhede@nvidia.com>
+ <20200507010126.GD19334@joy-OptiPlex-7040>
 X-Nvconfidentiality: public
 From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <d452234b-f192-4b56-36d9-aa24553a96fd@nvidia.com>
-Date: Thu, 7 May 2020 11:10:40 +0530
+Message-ID: <a26d1031-3630-2e7f-e8df-e9a5db07397c@nvidia.com>
+Date: Thu, 7 May 2020 11:19:40 +0530
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200506140314.618f054d@w520.home>
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+In-Reply-To: <20200507010126.GD19334@joy-OptiPlex-7040>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
  HQMAIL107.nvidia.com (172.20.187.13)
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1588829981; bh=eui0fPVxY5uz6TgIj0rQ9x+dTpa15SbP5OkhLpNuyIo=;
+ t=1588830464; bh=QMrHD8NsSkdPVanYHQ5XrGVopuTeHjei30hFL2q43ls=;
  h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
  Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
  X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
  Content-Transfer-Encoding;
- b=Qik7l5s7T8aAVjca4HBwOlNWGigbfbtv7/n/PyQQla5zfK6njPh/KENlrtSJuAJny
- BO5dGkMce3K4yjgMFbl5e4wMEE0ypRZ/T4TboHH4lBlvZWnjRhn4lA2HiYglC2uzG8
- S4nkQWExyh4lpX0RS2SGcU0GNKoyE9ysEQLEuAiKDbhjIrvDet3LIvR8zWxBB4sB1c
- lucJq4juj8U6Upbghjy8vS5KAddpsq9/zXuTtUgQJzLQ0dFlH1DHdqUnMABEOVzL6/
- PrLG1T/1QPSoS/eyFNk8kfedZ5iLnIX8oWRFAHcHiCNRfUXXTaWKNMfB0mJFW2np9p
- Zmh1+ydrCKAXw==
-Received-SPF: pass client-ip=216.228.121.64; envelope-from=kwankhede@nvidia.com;
- helo=hqnvemgate25.nvidia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 01:40:52
+ b=O0sBPXO/O++83pr519B4xRCCws55IVfUCYCzJsHFJTvNjEm/8IhG2g6IwKirHhHUs
+ 9Z4PHzEl64OKyN+1SsQd/DiV5TJZM4XpoTcVqGMZa0GIEbF9xNgONxyQ9S+cQDQ4M6
+ 5sMhZFrHLR2UjXS/YiSPoORXG9VWf0rKf8LxKN+8qqXfzGoz2+TJSMU62+dwcsIgAC
+ XcTi5R22oomwU0SSMwtYsXnOpEb3UoC3d93M2NEq5X+exCPDemZ6hYK+bQoe1sDIHQ
+ xLK/NfwNIYO/ku8OHJ6k57LKP7LcUceGyFdJ26N2L4oTsKL2PjLjA3bD5m9oB1Bq4B
+ TGl4R4e2PhB+A==
+Received-SPF: pass client-ip=216.228.121.143;
+ envelope-from=kwankhede@nvidia.com; helo=hqnvemgate24.nvidia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 01:37:39
 X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
 X-Spam_score_int: -70
 X-Spam_score: -7.1
@@ -106,6 +102,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
  Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
  "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
  "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
  Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
  "cohuck@redhat.com" <cohuck@redhat.com>,
@@ -113,285 +110,388 @@ Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
  "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang, 
  Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
  "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
  "eauger@redhat.com" <eauger@redhat.com>,
  "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
- Yan Zhao <yan.y.zhao@intel.com>, "Liu, Changpeng" <changpeng.liu@intel.com>,
- "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 5/7/2020 1:33 AM, Alex Williamson wrote:
-> On Thu, 7 May 2020 01:18:19 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
->> On 5/6/2020 11:41 AM, Yan Zhao wrote:
->>> On Tue, May 05, 2020 at 12:37:11PM +0800, Alex Williamson wrote:
->>>> On Tue, 5 May 2020 04:48:37 +0530
->>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
->>>>   
->>>>> On 3/26/2020 1:26 AM, Alex Williamson wrote:
->>>>>> On Wed, 25 Mar 2020 02:39:02 +0530
->>>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
->>>>>>       
->>>>>>> These functions save and restore PCI device specific data - config
->>>>>>> space of PCI device.
->>>>>>> Tested save and restore with MSI and MSIX type.
->>>>>>>
->>>>>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->>>>>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
->>>>>>> ---
->>>>>>>     hw/vfio/pci.c                 | 163 ++++++++++++++++++++++++++++++++++++++++++
->>>>>>>     include/hw/vfio/vfio-common.h |   2 +
->>>>>>>     2 files changed, 165 insertions(+)
->>>>>>>
->>>>>>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
->>>>>>> index 6c77c12e44b9..8deb11e87ef7 100644
->>>>>>> --- a/hw/vfio/pci.c
->>>>>>> +++ b/hw/vfio/pci.c
->>>>>>> @@ -41,6 +41,7 @@
->>>>>>>     #include "trace.h"
->>>>>>>     #include "qapi/error.h"
->>>>>>>     #include "migration/blocker.h"
->>>>>>> +#include "migration/qemu-file.h"
->>>>>>>     
->>>>>>>     #define TYPE_VFIO_PCI "vfio-pci"
->>>>>>>     #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
->>>>>>> @@ -1632,6 +1633,50 @@ static void vfio_bars_prepare(VFIOPCIDevice *vdev)
->>>>>>>         }
->>>>>>>     }
->>>>>>>     
->>>>>>> +static int vfio_bar_validate(VFIOPCIDevice *vdev, int nr)
->>>>>>> +{
->>>>>>> +    PCIDevice *pdev = &vdev->pdev;
->>>>>>> +    VFIOBAR *bar = &vdev->bars[nr];
->>>>>>> +    uint64_t addr;
->>>>>>> +    uint32_t addr_lo, addr_hi = 0;
->>>>>>> +
->>>>>>> +    /* Skip unimplemented BARs and the upper half of 64bit BARS. */
->>>>>>> +    if (!bar->size) {
->>>>>>> +        return 0;
->>>>>>> +    }
->>>>>>> +
->>>>>>> +    addr_lo = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + nr * 4, 4);
->>>>>>> +
->>>>>>> +    addr_lo = addr_lo & (bar->ioport ? PCI_BASE_ADDRESS_IO_MASK :
->>>>>>> +                                       PCI_BASE_ADDRESS_MEM_MASK);
->>>>>>
->>>>>> Nit, &= or combine with previous set.
->>>>>>       
->>>>>>> +    if (bar->type == PCI_BASE_ADDRESS_MEM_TYPE_64) {
->>>>>>> +        addr_hi = pci_default_read_config(pdev,
->>>>>>> +                                         PCI_BASE_ADDRESS_0 + (nr + 1) * 4, 4);
->>>>>>> +    }
->>>>>>> +
->>>>>>> +    addr = ((uint64_t)addr_hi << 32) | addr_lo;
->>>>>>
->>>>>> Could we use a union?
->>>>>>       
->>>>>>> +
->>>>>>> +    if (!QEMU_IS_ALIGNED(addr, bar->size)) {
->>>>>>> +        return -EINVAL;
->>>>>>> +    }
->>>>>>
->>>>>> What specifically are we validating here?  This should be true no
->>>>>> matter what we wrote to the BAR or else BAR emulation is broken.  The
->>>>>> bits that could make this unaligned are not implemented in the BAR.
->>>>>>       
->>>>>>> +
->>>>>>> +    return 0;
->>>>>>> +}
->>>>>>> +
->>>>>>> +static int vfio_bars_validate(VFIOPCIDevice *vdev)
->>>>>>> +{
->>>>>>> +    int i, ret;
->>>>>>> +
->>>>>>> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
->>>>>>> +        ret = vfio_bar_validate(vdev, i);
->>>>>>> +        if (ret) {
->>>>>>> +            error_report("vfio: BAR address %d validation failed", i);
->>>>>>> +            return ret;
->>>>>>> +        }
->>>>>>> +    }
->>>>>>> +    return 0;
->>>>>>> +}
->>>>>>> +
->>>>>>>     static void vfio_bar_register(VFIOPCIDevice *vdev, int nr)
->>>>>>>     {
->>>>>>>         VFIOBAR *bar = &vdev->bars[nr];
->>>>>>> @@ -2414,11 +2459,129 @@ static Object *vfio_pci_get_object(VFIODevice *vbasedev)
->>>>>>>         return OBJECT(vdev);
->>>>>>>     }
->>>>>>>     
->>>>>>> +static void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
->>>>>>> +{
->>>>>>> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
->>>>>>> +    PCIDevice *pdev = &vdev->pdev;
->>>>>>> +    uint16_t pci_cmd;
->>>>>>> +    int i;
->>>>>>> +
->>>>>>> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
->>>>>>> +        uint32_t bar;
->>>>>>> +
->>>>>>> +        bar = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, 4);
->>>>>>> +        qemu_put_be32(f, bar);
->>>>>>> +    }
->>>>>>> +
->>>>>>> +    qemu_put_be32(f, vdev->interrupt);
->>>>>>> +    if (vdev->interrupt == VFIO_INT_MSI) {
->>>>>>> +        uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
->>>>>>> +        bool msi_64bit;
->>>>>>> +
->>>>>>> +        msi_flags = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
->>>>>>> +                                            2);
->>>>>>> +        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
->>>>>>> +
->>>>>>> +        msi_addr_lo = pci_default_read_config(pdev,
->>>>>>> +                                         pdev->msi_cap + PCI_MSI_ADDRESS_LO, 4);
->>>>>>> +        qemu_put_be32(f, msi_addr_lo);
->>>>>>> +
->>>>>>> +        if (msi_64bit) {
->>>>>>> +            msi_addr_hi = pci_default_read_config(pdev,
->>>>>>> +                                             pdev->msi_cap + PCI_MSI_ADDRESS_HI,
->>>>>>> +                                             4);
->>>>>>> +        }
->>>>>>> +        qemu_put_be32(f, msi_addr_hi);
->>>>>>> +
->>>>>>> +        msi_data = pci_default_read_config(pdev,
->>>>>>> +                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
->>>>>>> +                2);
->>>>>>> +        qemu_put_be32(f, msi_data);
->>>>>>
->>>>>> Isn't the data field only a u16?
->>>>>>       
->>>>>
->>>>> Yes, fixing it.
->>>>>   
->>>>>>> +    } else if (vdev->interrupt == VFIO_INT_MSIX) {
->>>>>>> +        uint16_t offset;
->>>>>>> +
->>>>>>> +        /* save enable bit and maskall bit */
->>>>>>> +        offset = pci_default_read_config(pdev,
->>>>>>> +                                       pdev->msix_cap + PCI_MSIX_FLAGS + 1, 2);
->>>>>>> +        qemu_put_be16(f, offset);
->>>>>>> +        msix_save(pdev, f);
->>>>>>> +    }
->>>>>>> +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
->>>>>>> +    qemu_put_be16(f, pci_cmd);
->>>>>>> +}
->>>>>>> +
->>>>>>> +static int vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
->>>>>>> +{
->>>>>>> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
->>>>>>> +    PCIDevice *pdev = &vdev->pdev;
->>>>>>> +    uint32_t interrupt_type;
->>>>>>> +    uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
->>>>>>> +    uint16_t pci_cmd;
->>>>>>> +    bool msi_64bit;
->>>>>>> +    int i, ret;
->>>>>>> +
->>>>>>> +    /* retore pci bar configuration */
->>>>>>> +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
->>>>>>> +    vfio_pci_write_config(pdev, PCI_COMMAND,
->>>>>>> +                        pci_cmd & (!(PCI_COMMAND_IO | PCI_COMMAND_MEMORY)), 2);
->>>>>>> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
->>>>>>> +        uint32_t bar = qemu_get_be32(f);
->>>>>>> +
->>>>>>> +        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, bar, 4);
->>>>>>> +    }
->>>>>>> +
->>>>>>> +    ret = vfio_bars_validate(vdev);
->>>>>>> +    if (ret) {
->>>>>>> +        return ret;
->>>>>>> +    }
->>>>>>> +
->>>>>>> +    interrupt_type = qemu_get_be32(f);
->>>>>>> +
->>>>>>> +    if (interrupt_type == VFIO_INT_MSI) {
->>>>>>> +        /* restore msi configuration */
->>>>>>> +        msi_flags = pci_default_read_config(pdev,
->>>>>>> +                                            pdev->msi_cap + PCI_MSI_FLAGS, 2);
->>>>>>> +        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
->>>>>>> +
->>>>>>> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
->>>>>>> +                              msi_flags & (!PCI_MSI_FLAGS_ENABLE), 2);
->>>>>>> +
->>>>>>> +        msi_addr_lo = qemu_get_be32(f);
->>>>>>> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_LO,
->>>>>>> +                              msi_addr_lo, 4);
->>>>>>> +
->>>>>>> +        msi_addr_hi = qemu_get_be32(f);
->>>>>>> +        if (msi_64bit) {
->>>>>>> +            vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_HI,
->>>>>>> +                                  msi_addr_hi, 4);
->>>>>>> +        }
->>>>>>> +        msi_data = qemu_get_be32(f);
->>>>>>> +        vfio_pci_write_config(pdev,
->>>>>>> +                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
->>>>>>> +                msi_data, 2);
->>>>>>> +
->>>>>>> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
->>>>>>> +                              msi_flags | PCI_MSI_FLAGS_ENABLE, 2);
->>>>>>> +    } else if (interrupt_type == VFIO_INT_MSIX) {
->>>>>>> +        uint16_t offset = qemu_get_be16(f);
->>>>>>> +
->>>>>>> +        /* load enable bit and maskall bit */
->>>>>>> +        vfio_pci_write_config(pdev, pdev->msix_cap + PCI_MSIX_FLAGS + 1,
->>>>>>> +                              offset, 2);
->>>>>>> +        msix_load(pdev, f);
->>>>>>> +    }
->>>>>>> +    pci_cmd = qemu_get_be16(f);
->>>>>>> +    vfio_pci_write_config(pdev, PCI_COMMAND, pci_cmd, 2);
->>>>>>> +    return 0;
->>>>>>> +}
->>>>>>
->>>>>> It always seems like there should be a lot more state than this, and I
->>>>>> probably sound like a broken record because I ask every time, but maybe
->>>>>> that's a good indication that we (or at least I) need a comment
->>>>>> explaining why we only care about these.  For example, what if we
->>>>>> migrate a device in the D3 power state, don't we need to account for
->>>>>> the state stored in the PM capability or does the device wake up into
->>>>>> D0 auto-magically after migration?  I think we could repeat that
->>>>>> question for every capability that can be modified.  Even for the MSI/X
->>>>>> cases, the interrupt may not be active, but there could be state in
->>>>>> virtual config space that would be different on the target.  For
->>>>>> example, if we migrate with a device in INTx mode where the guest had
->>>>>> written vector fields on the source, but only writes the enable bit on
->>>>>> the target, can we seamlessly figure out the rest?  For other
->>>>>> capabilities, that state may represent config space changes written
->>>>>> through to the physical device and represent a functional difference on
->>>>>> the target.  Thanks,
->>>>>>      
->>>>>
->>>>> These are very basic set of registers from config state. Other are more
->>>>> of vendor specific which vendor driver can save and restore in their own
->>>>> data. I don't think we have to take care of all those vendor specific
->>>>> fields here.
->>>>
->>>> That had not been clear to me.  Intel folks, is this your understanding
->>>> regarding the responsibility of the user to save and restore config
->>>> space of the device as part of the vendor provided migration stream
->>>> data?  Thanks,
->>>>   
->>> Currently, the code works for us. but I agree with you that there should
->>> be more states to save, at least for emulated config bits.
->>> I think we should call pci_device_save() to serve that purpose.
->>>    
+On 5/7/2020 6:31 AM, Yan Zhao wrote:
+> On Tue, May 05, 2020 at 01:54:20AM +0800, Kirti Wankhede wrote:
+>> This patch makes mtty device migration capable. Purpose od this code is
+>> to test migration interface. Only stop-and-copy phase is implemented.
+>> Postcopy migration is not supported.
 >>
->> If vendor driver can restore all vendor specific config space, then
->> adding it again in QEMU might be redundant. As an example, I had mailed
->> mtty sample code, in which config space has vendor specific information
->> and that is restored in easy way.
-> 
-> The redundancy is implementing it in each vendor driver.  Thanks,
+>> Actual data for mtty device migration is very less. Appended dummy data to
+>> migration data stream, default 100 Mbytes. Added sysfs file
+>> 'dummy_data_size_MB' to get dummy data size from user which can be used
+>> to check performance of based of data size. During resuming dummy data is
+>> read and discarded.
+>>
+>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>> ---
+>>   samples/vfio-mdev/mtty.c | 602 ++++++++++++++++++++++++++++++++++++++++++++---
+>>   1 file changed, 574 insertions(+), 28 deletions(-)
+>>
+>> diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
+>> index bf666cce5bb7..f9194234fc6a 100644
+>> --- a/samples/vfio-mdev/mtty.c
+>> +++ b/samples/vfio-mdev/mtty.c
+>> @@ -44,9 +44,23 @@
+>>   
+>>   #define MTTY_STRING_LEN		16
+>>   
+>> -#define MTTY_CONFIG_SPACE_SIZE  0xff
+>> -#define MTTY_IO_BAR_SIZE        0x8
+>> -#define MTTY_MMIO_BAR_SIZE      0x100000
+>> +#define MTTY_CONFIG_SPACE_SIZE		0xff
+>> +#define MTTY_IO_BAR_SIZE		0x8
+>> +#define MTTY_MMIO_BAR_SIZE		0x100000
+>> +#define MTTY_MIGRATION_REGION_SIZE	0x1000000	// 16M
+>> +
+>> +#define MTTY_MIGRATION_REGION_INDEX	VFIO_PCI_NUM_REGIONS
+>> +#define MTTY_REGIONS_MAX		(MTTY_MIGRATION_REGION_INDEX + 1)
+>> +
+>> +/* Data section start from page aligned offset */
+>> +#define MTTY_MIGRATION_REGION_DATA_OFFSET	(0x1000)
+>> +
+>> +/* First page is used for struct vfio_device_migration_info */
+>> +#define MTTY_MIGRATION_REGION_SIZE_MMAP     \
+>> +	(MTTY_MIGRATION_REGION_SIZE - MTTY_MIGRATION_REGION_DATA_OFFSET)
+>> +
+>> +#define MIGRATION_INFO_OFFSET(MEMBER)	\
+>> +		offsetof(struct vfio_device_migration_info, MEMBER)
+>>   
+>>   #define STORE_LE16(addr, val)   (*(u16 *)addr = val)
+>>   #define STORE_LE32(addr, val)   (*(u32 *)addr = val)
+>> @@ -129,6 +143,28 @@ struct serial_port {
+>>   	u8 intr_trigger_level;  /* interrupt trigger level */
+>>   };
+>>   
+>> +/* Migration packet */
+>> +#define PACKET_ID		(u16)(0xfeedbaba)
+>> +
+>> +#define PACKET_FLAGS_ACTUAL_DATA	(1 << 0)
+>> +#define PACKET_FLAGS_DUMMY_DATA		(1 << 1)
+>> +
+>> +#define PACKET_DATA_SIZE_MAX		(8 * 1024 * 1024)
+>> +
+>> +struct packet {
+>> +	u16 id;
+>> +	u16 flags;
+>> +	u32 data_size;
+>> +	u8 data[];
+>> +};
+>> +
+>> +enum {
+>> +	PACKET_STATE_NONE = 0,
+>> +	PACKET_STATE_PREPARED,
+>> +	PACKET_STATE_COPIED,
+>> +	PACKET_STATE_LAST,
+>> +};
+>> +
+>>   /* State of each mdev device */
+>>   struct mdev_state {
+>>   	int irq_fd;
+>> @@ -138,22 +174,37 @@ struct mdev_state {
+>>   	u8 *vconfig;
+>>   	struct mutex ops_lock;
+>>   	struct mdev_device *mdev;
+>> -	struct mdev_region_info region_info[VFIO_PCI_NUM_REGIONS];
+>> -	u32 bar_mask[VFIO_PCI_NUM_REGIONS];
+>> +	struct mdev_region_info region_info[MTTY_REGIONS_MAX];
+>> +	u32 bar_mask[MTTY_REGIONS_MAX];
+>>   	struct list_head next;
+>>   	struct serial_port s[2];
+>>   	struct mutex rxtx_lock;
+>>   	struct vfio_device_info dev_info;
+>> -	int nr_ports;
+>> +	u32 nr_ports;
+>>   
+>>   	/* List of pinned gpfns, gpfn as index and content is translated hpfn */
+>>   	unsigned long *gpfn_to_hpfn;
+>>   	struct notifier_block nb;
+>> +
+>> +	u32 device_state;
+>> +	u64 saved_size;
+>> +	void *mig_region_base;
+>> +	bool is_actual_data_sent;
+>> +	struct packet *pkt;
+>> +	u32 packet_state;
+>> +	u64 dummy_data_size;
+>>   };
+>>   
+>>   static struct mutex mdev_list_lock;
+>>   static struct list_head mdev_devices_list;
+>>   
+>> +/*
+>> + * Default dummy data size set to 100 MB. To change value of dummy data size at
+>> + * runtime but before migration write size in MB to sysfs file
+>> + * dummy_data_size_MB
+>> + */
+>> +static unsigned long user_dummy_data_size = (100 * 1024 * 1024);
+>> +
+>>   static const struct file_operations vd_fops = {
+>>   	.owner          = THIS_MODULE,
+>>   };
+>> @@ -639,6 +690,288 @@ static void mdev_read_base(struct mdev_state *mdev_state)
+>>   	}
+>>   }
+>>   
+>> +static int save_setup(struct mdev_state *mdev_state)
+>> +{
+>> +	mdev_state->is_actual_data_sent = false;
+>> +
+>> +	memset(mdev_state->pkt, 0, sizeof(struct packet) +
+>> +				   PACKET_DATA_SIZE_MAX);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int set_device_state(struct mdev_state *mdev_state, u32 device_state)
+>> +{
+>> +	int ret = 0;
+>> +
+>> +	if (mdev_state->device_state == device_state)
+>> +		return 0;
+>> +
+>> +	if (device_state & VFIO_DEVICE_STATE_RUNNING) {
+>> +#if defined(DEBUG)
+>> +		if (device_state & VFIO_DEVICE_STATE_SAVING) {
+>> +			pr_info("%s: %s Pre-copy\n", __func__,
+>> +				dev_name(mdev_dev(mdev_state->mdev)));
+>> +		} else
+>> +			pr_info("%s: %s Running\n", __func__,
+>> +				dev_name(mdev_dev(mdev_state->mdev)));
+>> +#endif
+>> +	} else {
+>> +		if (device_state & VFIO_DEVICE_STATE_SAVING) {
+>> +#if defined(DEBUG)
+>> +			pr_info("%s: %s Stop-n-copy\n", __func__,
+>> +				dev_name(mdev_dev(mdev_state->mdev)));
+>> +#endif
+>> +			ret = save_setup(mdev_state);
+>> +
+>> +		} else if (device_state & VFIO_DEVICE_STATE_RESUMING) {
+>> +#if defined(DEBUG)
+>> +			pr_info("%s: %s Resuming\n", __func__,
+>> +				dev_name(mdev_dev(mdev_state->mdev)));
+>> +		} else {
+>> +			pr_info("%s: %s Stopped\n", __func__,
+>> +				dev_name(mdev_dev(mdev_state->mdev)));
+>> +#endif
+>> +		}
+>> +	}
+>> +
+>> +	mdev_state->device_state = device_state;
+>> +
+>> +	return ret;
+>> +}
+>> +
+>> +static u32 get_device_state(struct mdev_state *mdev_state)
+>> +{
+>> +	return mdev_state->device_state;
+>> +}
+>> +
+>> +static void write_to_packet(struct packet *pkt, u8 *data, size_t size)
+>> +{
+>> +	if ((pkt->data_size + size) > PACKET_DATA_SIZE_MAX) {
+>> +		pr_err("%s: packet data overflow\n", __func__);
+>> +		return;
+>> +	}
+>> +	memcpy((void *)&pkt->data[pkt->data_size], (void *)data, size);
+>> +	pkt->data_size += size;
+>> +}
+>> +
+>> +static void read_from_packet(struct packet *pkt, u8 *data,
+>> +			     int index, size_t size)
+>> +{
+>> +	if ((index + size) > PACKET_DATA_SIZE_MAX) {
+>> +		pr_err("%s: packet data overflow\n", __func__);
+>> +		return;
+>> +	}
+>> +
+>> +	memcpy((void *)data, (void *)&pkt->data[index], size);
+>> +}
+>> +
+>> +static int save_device_data(struct mdev_state *mdev_state, u64 *pending)
+>> +{
+>> +	/* Save device data only during stop-and-copy phase */
+>> +	if (mdev_state->device_state != VFIO_DEVICE_STATE_SAVING) {
+>> +		*pending = 0;
+>> +		return 0;
+>> +	}
+>> +
+>> +	if (mdev_state->packet_state == PACKET_STATE_PREPARED) {
+>> +		*pending = sizeof(struct packet) + mdev_state->pkt->data_size;
+>> +		return 0;
+>> +	}
+>> +
+>> +	if (!mdev_state->is_actual_data_sent) {
+>> +
+>> +		/* create actual data packet */
+>> +		write_to_packet(mdev_state->pkt, (u8 *)&mdev_state->nr_ports,
+>> +				sizeof(mdev_state->nr_ports));
+>> +		write_to_packet(mdev_state->pkt, (u8 *)&mdev_state->s,
+>> +				sizeof(struct serial_port) * 2);
+>> +
+>> +		write_to_packet(mdev_state->pkt, mdev_state->vconfig,
+>> +				MTTY_CONFIG_SPACE_SIZE);
+>> +
+>> +		write_to_packet(mdev_state->pkt, (u8 *)mdev_state->gpfn_to_hpfn,
+>> +				sizeof(unsigned long) * MAX_GPFN_COUNT);
+>> +
+>> +		mdev_state->pkt->id = PACKET_ID;
+>> +		mdev_state->pkt->flags = PACKET_FLAGS_ACTUAL_DATA;
+>> +
+>> +		mdev_state->is_actual_data_sent = true;
+>> +	} else {
+>> +		/* create dummy data packet */
+>> +		if (mdev_state->dummy_data_size > user_dummy_data_size) {
+>> +			*pending = 0;
+>> +			mdev_state->packet_state = PACKET_STATE_NONE;
+>> +			return 0;
+>> +		}
+>> +
+>> +		memset(mdev_state->pkt->data, 0xa5, PACKET_DATA_SIZE_MAX);
+>> +
+>> +		mdev_state->pkt->id = PACKET_ID;
+>> +		mdev_state->pkt->flags = PACKET_FLAGS_DUMMY_DATA;
+>> +		mdev_state->pkt->data_size = PACKET_DATA_SIZE_MAX;
+>> +		mdev_state->dummy_data_size += PACKET_DATA_SIZE_MAX;
+>> +	}
+>> +
+>> +	*pending = sizeof(struct packet) + mdev_state->pkt->data_size;
+>> +	mdev_state->packet_state = PACKET_STATE_PREPARED;
+>> +	mdev_state->saved_size = 0;
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int copy_device_data(struct mdev_state *mdev_state)
+>> +{
+>> +	u64 size;
+>> +
+>> +	if (!mdev_state->pkt || !mdev_state->mig_region_base)
+>> +		return -EINVAL;
+>> +
+>> +	if (mdev_state->packet_state == PACKET_STATE_COPIED)
+>> +		return 0;
+>> +
+>> +	if (!mdev_state->pkt->data_size)
+>> +		return 0;
+>> +
+>> +	size = sizeof(struct packet) + mdev_state->pkt->data_size;
+>> +
+>> +	memcpy(mdev_state->mig_region_base, mdev_state->pkt, size);
+>> +
+> if data area is mmaped, who is going to copy data from mdev_state->pkt
+> to mdev_state->mig_region_base ?
+> actually, I do see this area is mmaped in this sample.
 > 
 
-Vendor driver knows better about vendor specific configs, isn't it 
-better vendor driver handle those at their end rather than adding vendor 
-specific quirks in QEMU?
+This area ia mmap and is backed by memory, see mtty_mmap(), on read 
+access to data_offset, packet data is copied to mmaped memory.
+
+>> +	mdev_state->saved_size = size;
+>> +	mdev_state->packet_state = PACKET_STATE_COPIED;
+>> +	memset(mdev_state->pkt, 0, sizeof(struct packet));
+>> +	return 0;
+>> +}
+>> +
+>> +static int resume_device_data(struct mdev_state *mdev_state, u64 data_size)
+>> +{
+>> +	unsigned long i;
+>> +
+>> +	if (mdev_state->device_state != VFIO_DEVICE_STATE_RESUMING)
+>> +		return -EINVAL;
+>> +
+>> +	if (!mdev_state->pkt || !mdev_state->mig_region_base)
+>> +		return -EINVAL;
+>> +
+>> +	memcpy(mdev_state->pkt, mdev_state->mig_region_base, data_size);
+>> +
+>> +	if (mdev_state->pkt->flags & PACKET_FLAGS_ACTUAL_DATA) {
+>> +		int index = 0;
+>> +		/* restore device data */
+>> +		read_from_packet(mdev_state->pkt, (u8 *)&mdev_state->nr_ports,
+>> +				 index, sizeof(mdev_state->nr_ports));
+>> +		index += sizeof(mdev_state->nr_ports);
+>> +
+>> +		read_from_packet(mdev_state->pkt, (u8 *)&mdev_state->s,
+>> +				index, sizeof(struct serial_port) * 2);
+>> +		index += sizeof(struct serial_port) * 2;
+>> +
+>> +		read_from_packet(mdev_state->pkt, mdev_state->vconfig,
+>> +				 index, MTTY_CONFIG_SPACE_SIZE);
+>> +		index += MTTY_CONFIG_SPACE_SIZE;
+>> +
+>> +		read_from_packet(mdev_state->pkt,
+>> +				(u8 *)mdev_state->gpfn_to_hpfn,
+>> +				index, sizeof(unsigned long) * MAX_GPFN_COUNT);
+>> +		index += sizeof(unsigned long) * MAX_GPFN_COUNT;
+>> +
+>> +		for (i = 0; i < MAX_GPFN_COUNT; i++) {
+>> +			if (mdev_state->gpfn_to_hpfn[i] != PFN_NULL) {
+>> +				int ret;
+>> +				unsigned long hpfn;
+>> +
+>> +				ret = vfio_pin_pages(mdev_dev(mdev_state->mdev),
+>> +				       &i, 1, IOMMU_READ | IOMMU_WRITE, &hpfn);
+>> +				if (ret <= 0) {
+>> +					pr_err("%s: 0x%lx unpin error %d\n",
+>> +							__func__, i, ret);
+>> +					continue;
+>> +				}
+>> +				mdev_state->gpfn_to_hpfn[i] = hpfn;
+>> +			}
+>> +		}
+>> +	} else {
+>> +#if defined(DEBUG)
+>> +		pr_info("%s: %s discard data 0x%llx\n",
+>> +			 __func__, dev_name(mdev_dev(mdev_state->mdev)),
+>> +			data_size);
+>> +#endif
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int handle_mig_read(unsigned int index, struct mdev_state *mdev_state,
+>> +			   loff_t offset, u8 *buf, u32 count)
+>> +{
+>> +	int ret = 0;
+>> +	u64 pending = 0;
+>> +
+>> +	switch (offset) {
+>> +	case MIGRATION_INFO_OFFSET(device_state):	// 0x00
+>> +		*(u32 *)buf = get_device_state(mdev_state);
+>> +		break;
+>> +
+>> +	case MIGRATION_INFO_OFFSET(pending_bytes):	// 0x08
+>> +		ret = save_device_data(mdev_state, &pending);
+>> +		if (ret)
+>> +			break;
+>> +		*(u64 *)buf = pending;
+>> +		break;
+>> +
+>> +	case MIGRATION_INFO_OFFSET(data_offset):	// 0x10
+>> +		if (mdev_state->device_state & VFIO_DEVICE_STATE_SAVING) {
+>> +			ret = copy_device_data(mdev_state);
+>> +			if (ret)
+>> +				break;
+>> +		}
+>> +		*(u64 *)buf = MTTY_MIGRATION_REGION_DATA_OFFSET;
+> what is this?
+
+I think macro is self explanatory, its data offset within migration 
+region where vendor driver has copied data and user application should 
+data from this offset of migration region.
 
 Thanks,
 Kirti
