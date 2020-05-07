@@ -2,87 +2,94 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68A4FC38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 18:07:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA96CC38A2A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 18:15:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C1A92063A
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 18:07:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A58421473
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 18:15:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UoX2EyiI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C1A92063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PbO+vDI2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A58421473
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWkvX-0001F5-7A
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 14:07:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37010)
+	id 1jWl3h-0003ZH-P7
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 14:15:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38612)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent.desnogues@gmail.com>)
- id 1jWkun-0000py-VR
- for qemu-devel@nongnu.org; Thu, 07 May 2020 14:06:36 -0400
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:38883)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <laurent.desnogues@gmail.com>)
- id 1jWkul-0001iW-O9
- for qemu-devel@nongnu.org; Thu, 07 May 2020 14:06:33 -0400
-Received: by mail-io1-xd43.google.com with SMTP id d7so3091835ioq.5
- for <qemu-devel@nongnu.org>; Thu, 07 May 2020 11:06:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=SFTw9Y9RY7xQsfjqIaubev7qysRFd9x6c40Yxxi6gyM=;
- b=UoX2EyiI3jcVlT4IfJhkyOe49gw7LGAC7knHd77b5vKTsFXrHfNUxl0CxfcLB6EbT7
- IoJO8tZRUuZGvA3wBCMLO1wkr/CPPDiWX3yiedHYdnah6NS7NvDP1h2jBLBcmkvvokQ6
- v/4E7fQsZkHzc83lj3e8tupwKXA5qDX6CP1+lY05ayFSwUW9Yj16mdxQfzea8oj3XE6B
- FQn1Z9eXALchK0BQA0vvTfuO+ETohzWpBvauZlDzrcFrISUaT/UFcwKaMHVcj7+q7D6y
- uMkuvES4cY65Srv9ZMZMw3ovsihJAk5YCQVog17dyj/iA4/5aMSerJI61FNnkYgg/aHi
- jcig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=SFTw9Y9RY7xQsfjqIaubev7qysRFd9x6c40Yxxi6gyM=;
- b=c2tk17bPBVPYcCDhmiH5uPcFEPTfyZuZqZTZCN1iKleJnOBChoQ9gKATeFfcf8oJXV
- F3/Tl721gBYXLQ4mUb3lVsggMD56viX3z7zkV41N88rb/urXTpoFlSwU9Ie/CtI1TsQ/
- B6gpuADx0xqJCqN1nCKK3lGjbcasjvPXfl45y2gSJkhap7v0uDYSLARn+4yKFdyaQuBB
- Ze/jo8BFphUoMo7aZcDv8lK6YRI7tjOMJUfdFw/bc89aQpoXfaarSpsFVwXP2irQYTxZ
- 07chM0/2Oc62FYqC/g1O7I+gvggus76FDCOOZ+wYtLD9PbG7yXrPL87ZBg6cwnPnaCir
- FiUQ==
-X-Gm-Message-State: AGi0PuYZu6/AogINly/QjWZ1J5xWnABUeL6hvI5h5Nc/xH7UvjnS9O1C
- TLGA8mx72S1V2k6yxSQGELFiNK8cMqwTfbeL4eQ=
-X-Google-Smtp-Source: APiQypLWdrmKVFNHUetrKGBJ/OlwRWJJKBcCfXV9PjzCIrqeBTXrODhbxNhQgM2Gwi0t+8V/nwpUbJiKhkea+WX/EkQ=
-X-Received: by 2002:a02:2a47:: with SMTP id w68mr14819132jaw.76.1588874790351; 
- Thu, 07 May 2020 11:06:30 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jWl2v-00033S-5F
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 14:14:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59449
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jWl2t-0003X1-86
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 14:14:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588875293;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=NlDo2o1ItP+TnmSsFj/tiuouyCTYl1CHmc5Igb+vahM=;
+ b=PbO+vDI2sDfsWy9CVM3pzvfSXbvaNTiUyaE+nwFTEt0TZ0FlK3s0r82k0woXF16E8x879N
+ 6shymcmq4I9+0dYaRu90l5OvIU5tHyQ4NFfOU4TJgf/49Z9IWwemEXLz1eBB4O+rgLQQFq
+ tp1VWOhAKmkK2S4L95XwdumwifMbTBQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-369-ZOQOz6KnMpuCgnvHdsXF-w-1; Thu, 07 May 2020 14:14:49 -0400
+X-MC-Unique: ZOQOz6KnMpuCgnvHdsXF-w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B724800688;
+ Thu,  7 May 2020 18:14:46 +0000 (UTC)
+Received: from x1.home (ovpn-113-95.phx2.redhat.com [10.3.113.95])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 043102E055;
+ Thu,  7 May 2020 18:14:43 +0000 (UTC)
+Date: Thu, 7 May 2020 12:14:43 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v16 QEMU 04/16] vfio: Add save and load functions for
+ VFIO PCI devices
+Message-ID: <20200507121443.79ca1fb4@x1.home>
+In-Reply-To: <d452234b-f192-4b56-36d9-aa24553a96fd@nvidia.com>
+References: <1585084154-29461-1-git-send-email-kwankhede@nvidia.com>
+ <1585084154-29461-5-git-send-email-kwankhede@nvidia.com>
+ <20200325135638.32421bf9@w520.home>
+ <8504c8ad-9b0b-6079-3290-60caa447e708@nvidia.com>
+ <20200504223711.307123eb@x1.home>
+ <20200506061102.GA19334@joy-OptiPlex-7040>
+ <8a120b05-adf9-cd16-7497-f9f533f53117@nvidia.com>
+ <20200506140314.618f054d@w520.home>
+ <d452234b-f192-4b56-36d9-aa24553a96fd@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <20200507172352.15418-1-richard.henderson@linaro.org>
- <20200507172352.15418-5-richard.henderson@linaro.org>
-In-Reply-To: <20200507172352.15418-5-richard.henderson@linaro.org>
-From: Laurent Desnogues <laurent.desnogues@gmail.com>
-Date: Thu, 7 May 2020 20:06:19 +0200
-Message-ID: <CABoDooPHQismSRmM8bxDu8sSj1AQuVKR_1FgEWc4ScUc53jxPA@mail.gmail.com>
-Subject: Re: [PATCH v2 4/4] target/arm: Fix tcg_gen_gvec_dup_imm vs DUP
- (indexed)
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
- envelope-from=laurent.desnogues@gmail.com; helo=mail-io1-xd43.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120;
+ envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 03:56:18
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,54 +103,306 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "cjia@nvidia.com" <cjia@nvidia.com>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+ Yan Zhao <yan.y.zhao@intel.com>, "Liu, Changpeng" <changpeng.liu@intel.com>,
+ "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 7, 2020 at 7:23 PM Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> DUP (indexed) can duplicate 128-bit elements, so using esz
-> unconditionally can assert in tcg_gen_gvec_dup_imm.
->
-> Fixes: 8711e71f9cbb
-> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On Thu, 7 May 2020 11:10:40 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+> On 5/7/2020 1:33 AM, Alex Williamson wrote:
+> > On Thu, 7 May 2020 01:18:19 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >   
+> >> On 5/6/2020 11:41 AM, Yan Zhao wrote:  
+> >>> On Tue, May 05, 2020 at 12:37:11PM +0800, Alex Williamson wrote:  
+> >>>> On Tue, 5 May 2020 04:48:37 +0530
+> >>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >>>>     
+> >>>>> On 3/26/2020 1:26 AM, Alex Williamson wrote:  
+> >>>>>> On Wed, 25 Mar 2020 02:39:02 +0530
+> >>>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >>>>>>         
+> >>>>>>> These functions save and restore PCI device specific data - config
+> >>>>>>> space of PCI device.
+> >>>>>>> Tested save and restore with MSI and MSIX type.
+> >>>>>>>
+> >>>>>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> >>>>>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> >>>>>>> ---
+> >>>>>>>     hw/vfio/pci.c                 | 163 ++++++++++++++++++++++++++++++++++++++++++
+> >>>>>>>     include/hw/vfio/vfio-common.h |   2 +
+> >>>>>>>     2 files changed, 165 insertions(+)
+> >>>>>>>
+> >>>>>>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> >>>>>>> index 6c77c12e44b9..8deb11e87ef7 100644
+> >>>>>>> --- a/hw/vfio/pci.c
+> >>>>>>> +++ b/hw/vfio/pci.c
+> >>>>>>> @@ -41,6 +41,7 @@
+> >>>>>>>     #include "trace.h"
+> >>>>>>>     #include "qapi/error.h"
+> >>>>>>>     #include "migration/blocker.h"
+> >>>>>>> +#include "migration/qemu-file.h"
+> >>>>>>>     
+> >>>>>>>     #define TYPE_VFIO_PCI "vfio-pci"
+> >>>>>>>     #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
+> >>>>>>> @@ -1632,6 +1633,50 @@ static void vfio_bars_prepare(VFIOPCIDevice *vdev)
+> >>>>>>>         }
+> >>>>>>>     }
+> >>>>>>>     
+> >>>>>>> +static int vfio_bar_validate(VFIOPCIDevice *vdev, int nr)
+> >>>>>>> +{
+> >>>>>>> +    PCIDevice *pdev = &vdev->pdev;
+> >>>>>>> +    VFIOBAR *bar = &vdev->bars[nr];
+> >>>>>>> +    uint64_t addr;
+> >>>>>>> +    uint32_t addr_lo, addr_hi = 0;
+> >>>>>>> +
+> >>>>>>> +    /* Skip unimplemented BARs and the upper half of 64bit BARS. */
+> >>>>>>> +    if (!bar->size) {
+> >>>>>>> +        return 0;
+> >>>>>>> +    }
+> >>>>>>> +
+> >>>>>>> +    addr_lo = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + nr * 4, 4);
+> >>>>>>> +
+> >>>>>>> +    addr_lo = addr_lo & (bar->ioport ? PCI_BASE_ADDRESS_IO_MASK :
+> >>>>>>> +                                       PCI_BASE_ADDRESS_MEM_MASK);  
+> >>>>>>
+> >>>>>> Nit, &= or combine with previous set.
+> >>>>>>         
+> >>>>>>> +    if (bar->type == PCI_BASE_ADDRESS_MEM_TYPE_64) {
+> >>>>>>> +        addr_hi = pci_default_read_config(pdev,
+> >>>>>>> +                                         PCI_BASE_ADDRESS_0 + (nr + 1) * 4, 4);
+> >>>>>>> +    }
+> >>>>>>> +
+> >>>>>>> +    addr = ((uint64_t)addr_hi << 32) | addr_lo;  
+> >>>>>>
+> >>>>>> Could we use a union?
+> >>>>>>         
+> >>>>>>> +
+> >>>>>>> +    if (!QEMU_IS_ALIGNED(addr, bar->size)) {
+> >>>>>>> +        return -EINVAL;
+> >>>>>>> +    }  
+> >>>>>>
+> >>>>>> What specifically are we validating here?  This should be true no
+> >>>>>> matter what we wrote to the BAR or else BAR emulation is broken.  The
+> >>>>>> bits that could make this unaligned are not implemented in the BAR.
+> >>>>>>         
+> >>>>>>> +
+> >>>>>>> +    return 0;
+> >>>>>>> +}
+> >>>>>>> +
+> >>>>>>> +static int vfio_bars_validate(VFIOPCIDevice *vdev)
+> >>>>>>> +{
+> >>>>>>> +    int i, ret;
+> >>>>>>> +
+> >>>>>>> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
+> >>>>>>> +        ret = vfio_bar_validate(vdev, i);
+> >>>>>>> +        if (ret) {
+> >>>>>>> +            error_report("vfio: BAR address %d validation failed", i);
+> >>>>>>> +            return ret;
+> >>>>>>> +        }
+> >>>>>>> +    }
+> >>>>>>> +    return 0;
+> >>>>>>> +}
+> >>>>>>> +
+> >>>>>>>     static void vfio_bar_register(VFIOPCIDevice *vdev, int nr)
+> >>>>>>>     {
+> >>>>>>>         VFIOBAR *bar = &vdev->bars[nr];
+> >>>>>>> @@ -2414,11 +2459,129 @@ static Object *vfio_pci_get_object(VFIODevice *vbasedev)
+> >>>>>>>         return OBJECT(vdev);
+> >>>>>>>     }
+> >>>>>>>     
+> >>>>>>> +static void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
+> >>>>>>> +{
+> >>>>>>> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
+> >>>>>>> +    PCIDevice *pdev = &vdev->pdev;
+> >>>>>>> +    uint16_t pci_cmd;
+> >>>>>>> +    int i;
+> >>>>>>> +
+> >>>>>>> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
+> >>>>>>> +        uint32_t bar;
+> >>>>>>> +
+> >>>>>>> +        bar = pci_default_read_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, 4);
+> >>>>>>> +        qemu_put_be32(f, bar);
+> >>>>>>> +    }
+> >>>>>>> +
+> >>>>>>> +    qemu_put_be32(f, vdev->interrupt);
+> >>>>>>> +    if (vdev->interrupt == VFIO_INT_MSI) {
+> >>>>>>> +        uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
+> >>>>>>> +        bool msi_64bit;
+> >>>>>>> +
+> >>>>>>> +        msi_flags = pci_default_read_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
+> >>>>>>> +                                            2);
+> >>>>>>> +        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
+> >>>>>>> +
+> >>>>>>> +        msi_addr_lo = pci_default_read_config(pdev,
+> >>>>>>> +                                         pdev->msi_cap + PCI_MSI_ADDRESS_LO, 4);
+> >>>>>>> +        qemu_put_be32(f, msi_addr_lo);
+> >>>>>>> +
+> >>>>>>> +        if (msi_64bit) {
+> >>>>>>> +            msi_addr_hi = pci_default_read_config(pdev,
+> >>>>>>> +                                             pdev->msi_cap + PCI_MSI_ADDRESS_HI,
+> >>>>>>> +                                             4);
+> >>>>>>> +        }
+> >>>>>>> +        qemu_put_be32(f, msi_addr_hi);
+> >>>>>>> +
+> >>>>>>> +        msi_data = pci_default_read_config(pdev,
+> >>>>>>> +                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
+> >>>>>>> +                2);
+> >>>>>>> +        qemu_put_be32(f, msi_data);  
+> >>>>>>
+> >>>>>> Isn't the data field only a u16?
+> >>>>>>         
+> >>>>>
+> >>>>> Yes, fixing it.
+> >>>>>     
+> >>>>>>> +    } else if (vdev->interrupt == VFIO_INT_MSIX) {
+> >>>>>>> +        uint16_t offset;
+> >>>>>>> +
+> >>>>>>> +        /* save enable bit and maskall bit */
+> >>>>>>> +        offset = pci_default_read_config(pdev,
+> >>>>>>> +                                       pdev->msix_cap + PCI_MSIX_FLAGS + 1, 2);
+> >>>>>>> +        qemu_put_be16(f, offset);
+> >>>>>>> +        msix_save(pdev, f);
+> >>>>>>> +    }
+> >>>>>>> +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
+> >>>>>>> +    qemu_put_be16(f, pci_cmd);
+> >>>>>>> +}
+> >>>>>>> +
+> >>>>>>> +static int vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
+> >>>>>>> +{
+> >>>>>>> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
+> >>>>>>> +    PCIDevice *pdev = &vdev->pdev;
+> >>>>>>> +    uint32_t interrupt_type;
+> >>>>>>> +    uint32_t msi_flags, msi_addr_lo, msi_addr_hi = 0, msi_data;
+> >>>>>>> +    uint16_t pci_cmd;
+> >>>>>>> +    bool msi_64bit;
+> >>>>>>> +    int i, ret;
+> >>>>>>> +
+> >>>>>>> +    /* retore pci bar configuration */
+> >>>>>>> +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
+> >>>>>>> +    vfio_pci_write_config(pdev, PCI_COMMAND,
+> >>>>>>> +                        pci_cmd & (!(PCI_COMMAND_IO | PCI_COMMAND_MEMORY)), 2);
+> >>>>>>> +    for (i = 0; i < PCI_ROM_SLOT; i++) {
+> >>>>>>> +        uint32_t bar = qemu_get_be32(f);
+> >>>>>>> +
+> >>>>>>> +        vfio_pci_write_config(pdev, PCI_BASE_ADDRESS_0 + i * 4, bar, 4);
+> >>>>>>> +    }
+> >>>>>>> +
+> >>>>>>> +    ret = vfio_bars_validate(vdev);
+> >>>>>>> +    if (ret) {
+> >>>>>>> +        return ret;
+> >>>>>>> +    }
+> >>>>>>> +
+> >>>>>>> +    interrupt_type = qemu_get_be32(f);
+> >>>>>>> +
+> >>>>>>> +    if (interrupt_type == VFIO_INT_MSI) {
+> >>>>>>> +        /* restore msi configuration */
+> >>>>>>> +        msi_flags = pci_default_read_config(pdev,
+> >>>>>>> +                                            pdev->msi_cap + PCI_MSI_FLAGS, 2);
+> >>>>>>> +        msi_64bit = (msi_flags & PCI_MSI_FLAGS_64BIT);
+> >>>>>>> +
+> >>>>>>> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
+> >>>>>>> +                              msi_flags & (!PCI_MSI_FLAGS_ENABLE), 2);
+> >>>>>>> +
+> >>>>>>> +        msi_addr_lo = qemu_get_be32(f);
+> >>>>>>> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_LO,
+> >>>>>>> +                              msi_addr_lo, 4);
+> >>>>>>> +
+> >>>>>>> +        msi_addr_hi = qemu_get_be32(f);
+> >>>>>>> +        if (msi_64bit) {
+> >>>>>>> +            vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_ADDRESS_HI,
+> >>>>>>> +                                  msi_addr_hi, 4);
+> >>>>>>> +        }
+> >>>>>>> +        msi_data = qemu_get_be32(f);
+> >>>>>>> +        vfio_pci_write_config(pdev,
+> >>>>>>> +                pdev->msi_cap + (msi_64bit ? PCI_MSI_DATA_64 : PCI_MSI_DATA_32),
+> >>>>>>> +                msi_data, 2);
+> >>>>>>> +
+> >>>>>>> +        vfio_pci_write_config(pdev, pdev->msi_cap + PCI_MSI_FLAGS,
+> >>>>>>> +                              msi_flags | PCI_MSI_FLAGS_ENABLE, 2);
+> >>>>>>> +    } else if (interrupt_type == VFIO_INT_MSIX) {
+> >>>>>>> +        uint16_t offset = qemu_get_be16(f);
+> >>>>>>> +
+> >>>>>>> +        /* load enable bit and maskall bit */
+> >>>>>>> +        vfio_pci_write_config(pdev, pdev->msix_cap + PCI_MSIX_FLAGS + 1,
+> >>>>>>> +                              offset, 2);
+> >>>>>>> +        msix_load(pdev, f);
+> >>>>>>> +    }
+> >>>>>>> +    pci_cmd = qemu_get_be16(f);
+> >>>>>>> +    vfio_pci_write_config(pdev, PCI_COMMAND, pci_cmd, 2);
+> >>>>>>> +    return 0;
+> >>>>>>> +}  
+> >>>>>>
+> >>>>>> It always seems like there should be a lot more state than this, and I
+> >>>>>> probably sound like a broken record because I ask every time, but maybe
+> >>>>>> that's a good indication that we (or at least I) need a comment
+> >>>>>> explaining why we only care about these.  For example, what if we
+> >>>>>> migrate a device in the D3 power state, don't we need to account for
+> >>>>>> the state stored in the PM capability or does the device wake up into
+> >>>>>> D0 auto-magically after migration?  I think we could repeat that
+> >>>>>> question for every capability that can be modified.  Even for the MSI/X
+> >>>>>> cases, the interrupt may not be active, but there could be state in
+> >>>>>> virtual config space that would be different on the target.  For
+> >>>>>> example, if we migrate with a device in INTx mode where the guest had
+> >>>>>> written vector fields on the source, but only writes the enable bit on
+> >>>>>> the target, can we seamlessly figure out the rest?  For other
+> >>>>>> capabilities, that state may represent config space changes written
+> >>>>>> through to the physical device and represent a functional difference on
+> >>>>>> the target.  Thanks,
+> >>>>>>        
+> >>>>>
+> >>>>> These are very basic set of registers from config state. Other are more
+> >>>>> of vendor specific which vendor driver can save and restore in their own
+> >>>>> data. I don't think we have to take care of all those vendor specific
+> >>>>> fields here.  
+> >>>>
+> >>>> That had not been clear to me.  Intel folks, is this your understanding
+> >>>> regarding the responsibility of the user to save and restore config
+> >>>> space of the device as part of the vendor provided migration stream
+> >>>> data?  Thanks,
+> >>>>     
+> >>> Currently, the code works for us. but I agree with you that there should
+> >>> be more states to save, at least for emulated config bits.
+> >>> I think we should call pci_device_save() to serve that purpose.
+> >>>      
+> >>
+> >> If vendor driver can restore all vendor specific config space, then
+> >> adding it again in QEMU might be redundant. As an example, I had mailed
+> >> mtty sample code, in which config space has vendor specific information
+> >> and that is restored in easy way.  
+> > 
+> > The redundancy is implementing it in each vendor driver.  Thanks,
+> >   
+> 
+> Vendor driver knows better about vendor specific configs, isn't it 
+> better vendor driver handle those at their end rather than adding vendor 
+> specific quirks in QEMU?
 
-I had the same fix locally.
+Some capabilities, ex. the vendor specific capability, interact with
+hardware in ways that are opaque to QEMU, the vendor driver needs to
+include that underlying state as part of its migration stream.  Other
+capabilities are completely standard, for example the PM capability.
+Do we really want every vendor driver to implement their own power
+state save and restore?  I think we want to centralize anything we can
+in the save/restore process so that we don't see different behavior and
+different bugs from every single vendor driver.  Thanks,
 
-Thanks,
+Alex
 
-Laurent
-
-
-> ---
->  target/arm/translate-sve.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-> index c8649283be..83614e9e70 100644
-> --- a/target/arm/translate-sve.c
-> +++ b/target/arm/translate-sve.c
-> @@ -2044,7 +2044,11 @@ static bool trans_DUP_x(DisasContext *s, arg_DUP_x *a)
->              unsigned nofs = vec_reg_offset(s, a->rn, index, esz);
->              tcg_gen_gvec_dup_mem(esz, dofs, nofs, vsz, vsz);
->          } else {
-> -            tcg_gen_gvec_dup_imm(esz, dofs, vsz, vsz, 0);
-> +            /*
-> +             * While dup_mem handles 128-bit elements, dup_imm does not.
-> +             * Thankfully element size doesn't matter for splatting zero.
-> +             */
-> +            tcg_gen_gvec_dup_imm(MO_64, dofs, vsz, vsz, 0);
->          }
->      }
->      return true;
-> --
-> 2.20.1
->
 
