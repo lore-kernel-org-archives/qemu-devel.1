@@ -4,53 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E6DCC38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:41:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95050C38A24
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:41:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 452062082E
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:41:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 452062082E
+	by mail.kernel.org (Postfix) with ESMTPS id 6944C2075E
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:41:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6944C2075E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWgmQ-0000S3-8N
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 09:41:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33040)
+	id 1jWgmc-0000vm-FS
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 09:41:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33042)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <gengdongjiu@huawei.com>)
- id 1jWglK-0006Zj-98; Thu, 07 May 2020 09:40:30 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:50730 helo=huawei.com)
+ id 1jWglK-0006aj-Gb; Thu, 07 May 2020 09:40:30 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:50726 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <gengdongjiu@huawei.com>)
- id 1jWglI-0001WO-Gz; Thu, 07 May 2020 09:40:29 -0400
+ id 1jWglI-0001T7-Vl; Thu, 07 May 2020 09:40:30 -0400
 Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id C8144298E5D23D3D8D96;
+ by Forcepoint Email with ESMTP id CFDA4BC5B75FA7C11E28;
  Thu,  7 May 2020 21:40:22 +0800 (CST)
 Received: from huawei.com (10.151.151.243) by DGGEMS412-HUB.china.huawei.com
  (10.3.19.212) with Microsoft SMTP Server id 14.3.487.0; Thu, 7 May 2020
- 21:40:13 +0800
+ 21:40:16 +0800
 From: Dongjiu Geng <gengdongjiu@huawei.com>
 To: <imammedo@redhat.com>, <mst@redhat.com>, <xiaoguangrong.eric@gmail.com>,
  <peter.maydell@linaro.org>, <shannon.zhaosl@gmail.com>,
  <pbonzini@redhat.com>, <fam@euphon.net>, <rth@twiddle.net>,
  <ehabkost@redhat.com>, <mtosatti@redhat.com>, <qemu-devel@nongnu.org>,
  <kvm@vger.kernel.org>, <qemu-arm@nongnu.org>
-Subject: [PATCH v26 07/10] KVM: Move hwpoison page related functions into
- kvm-all.c
-Date: Thu, 7 May 2020 21:42:02 +0800
-Message-ID: <20200507134205.7559-8-gengdongjiu@huawei.com>
+Subject: [PATCH v26 10/10] MAINTAINERS: Add ACPI/HEST/GHES entries
+Date: Thu, 7 May 2020 21:42:05 +0800
+Message-ID: <20200507134205.7559-11-gengdongjiu@huawei.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200507134205.7559-1-gengdongjiu@huawei.com>
 References: <20200507134205.7559-1-gengdongjiu@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-Originating-IP: [10.151.151.243]
 X-CFilter-Loop: Reflected
 Received-SPF: pass client-ip=45.249.212.35;
@@ -81,167 +80,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-kvm_hwpoison_page_add() and kvm_unpoison_all() will both
-be used by X86 and ARM platforms, so moving them into
-"accel/kvm/kvm-all.c" to avoid duplicate code.
+I and Xiang are willing to review the APEI-related patches and
+volunteer as the reviewers for the HEST/GHES part.
 
-For architectures that don't use the poison-list functionality
-the reset handler will harmlessly do nothing, so let's register
-the kvm_unpoison_all() function in the generic kvm_init() function.
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-Acked-by: Xiang Zheng <zhengxiang9@huawei.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- accel/kvm/kvm-all.c      | 36 ++++++++++++++++++++++++++++++++++++
- include/sysemu/kvm_int.h | 12 ++++++++++++
- target/i386/kvm.c        | 36 ------------------------------------
- 3 files changed, 48 insertions(+), 36 deletions(-)
+ MAINTAINERS | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 439a4ef..36be117 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -44,6 +44,7 @@
- #include "qapi/visitor.h"
- #include "qapi/qapi-types-common.h"
- #include "qapi/qapi-visit-common.h"
-+#include "sysemu/reset.h"
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 1f84e3a..9619b90 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1516,6 +1516,15 @@ F: tests/qtest/bios-tables-test.c
+ F: tests/qtest/acpi-utils.[hc]
+ F: tests/data/acpi/
  
- #include "hw/boards.h"
- 
-@@ -883,6 +884,39 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension)
-     return ret;
- }
- 
-+typedef struct HWPoisonPage {
-+    ram_addr_t ram_addr;
-+    QLIST_ENTRY(HWPoisonPage) list;
-+} HWPoisonPage;
++ACPI/HEST/GHES
++R: Dongjiu Geng <gengdongjiu@huawei.com>
++R: Xiang Zheng <zhengxiang9@huawei.com>
++L: qemu-arm@nongnu.org
++S: Maintained
++F: hw/acpi/ghes.c
++F: include/hw/acpi/ghes.h
++F: docs/specs/acpi_hest_ghes.rst
 +
-+static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
-+    QLIST_HEAD_INITIALIZER(hwpoison_page_list);
-+
-+static void kvm_unpoison_all(void *param)
-+{
-+    HWPoisonPage *page, *next_page;
-+
-+    QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
-+        QLIST_REMOVE(page, list);
-+        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
-+        g_free(page);
-+    }
-+}
-+
-+void kvm_hwpoison_page_add(ram_addr_t ram_addr)
-+{
-+    HWPoisonPage *page;
-+
-+    QLIST_FOREACH(page, &hwpoison_page_list, list) {
-+        if (page->ram_addr == ram_addr) {
-+            return;
-+        }
-+    }
-+    page = g_new(HWPoisonPage, 1);
-+    page->ram_addr = ram_addr;
-+    QLIST_INSERT_HEAD(&hwpoison_page_list, page, list);
-+}
-+
- static uint32_t adjust_ioeventfd_endianness(uint32_t val, uint32_t size)
- {
- #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
-@@ -2085,6 +2119,8 @@ static int kvm_init(MachineState *ms)
-         s->kernel_irqchip_split = mc->default_kernel_irqchip_split ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
-     }
- 
-+    qemu_register_reset(kvm_unpoison_all, NULL);
-+
-     if (s->kernel_irqchip_allowed) {
-         kvm_irqchip_create(s);
-     }
-diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
-index ac2d1f8..c660a70 100644
---- a/include/sysemu/kvm_int.h
-+++ b/include/sysemu/kvm_int.h
-@@ -42,4 +42,16 @@ void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
-                                   AddressSpace *as, int as_id);
- 
- void kvm_set_max_memslot_size(hwaddr max_slot_size);
-+
-+/**
-+ * kvm_hwpoison_page_add:
-+ *
-+ * Parameters:
-+ *  @ram_addr: the address in the RAM for the poisoned page
-+ *
-+ * Add a poisoned page to the list
-+ *
-+ * Return: None.
-+ */
-+void kvm_hwpoison_page_add(ram_addr_t ram_addr);
- #endif
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 4901c6d..34f8387 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -24,7 +24,6 @@
- #include "sysemu/sysemu.h"
- #include "sysemu/hw_accel.h"
- #include "sysemu/kvm_int.h"
--#include "sysemu/reset.h"
- #include "sysemu/runstate.h"
- #include "kvm_i386.h"
- #include "hyperv.h"
-@@ -533,40 +532,6 @@ uint64_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
-     }
- }
- 
--
--typedef struct HWPoisonPage {
--    ram_addr_t ram_addr;
--    QLIST_ENTRY(HWPoisonPage) list;
--} HWPoisonPage;
--
--static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
--    QLIST_HEAD_INITIALIZER(hwpoison_page_list);
--
--static void kvm_unpoison_all(void *param)
--{
--    HWPoisonPage *page, *next_page;
--
--    QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
--        QLIST_REMOVE(page, list);
--        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
--        g_free(page);
--    }
--}
--
--static void kvm_hwpoison_page_add(ram_addr_t ram_addr)
--{
--    HWPoisonPage *page;
--
--    QLIST_FOREACH(page, &hwpoison_page_list, list) {
--        if (page->ram_addr == ram_addr) {
--            return;
--        }
--    }
--    page = g_new(HWPoisonPage, 1);
--    page->ram_addr = ram_addr;
--    QLIST_INSERT_HEAD(&hwpoison_page_list, page, list);
--}
--
- static int kvm_get_mce_cap_supported(KVMState *s, uint64_t *mce_cap,
-                                      int *max_banks)
- {
-@@ -2180,7 +2145,6 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-         fprintf(stderr, "e820_add_entry() table is full\n");
-         return ret;
-     }
--    qemu_register_reset(kvm_unpoison_all, NULL);
- 
-     shadow_mem = object_property_get_int(OBJECT(s), "kvm-shadow-mem", &error_abort);
-     if (shadow_mem != -1) {
+ ppc4xx
+ M: David Gibson <david@gibson.dropbear.id.au>
+ L: qemu-ppc@nongnu.org
 -- 
 1.8.3.1
 
