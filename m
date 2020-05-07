@@ -2,92 +2,95 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1F3FC38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 17:28:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E826CC38A2A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 17:29:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C236820A8B
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 17:28:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jPamNmxO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C236820A8B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id BF07F2184D
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 17:29:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF07F2184D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWkJm-0000fN-Vk
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 13:28:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56804)
+	id 1jWkKS-0001Lx-P5
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 13:29:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57124)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jWkFe-0002ZO-ES
- for qemu-devel@nongnu.org; Thu, 07 May 2020 13:24:02 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:51337)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jWkFd-0005h5-I2
- for qemu-devel@nongnu.org; Thu, 07 May 2020 13:24:02 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id mq3so2932815pjb.1
- for <qemu-devel@nongnu.org>; Thu, 07 May 2020 10:24:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=JDlFiCjVr5xHxciN5joXRaUK1WSJQwdyA4WuZ989PgM=;
- b=jPamNmxOcXpYg9gdWJg1gmYijQWrOlp48jjB8HSlbYTN9B1K6rQHL2FRECq1sINIeX
- /JWTsTF3FRthwOHIKW9Pqwj4g2Nly+U2peT5C3GzJHnAEQ7WWST1Ozf/Nar6SF5bR9aR
- /JsTjIUoAxrmlT62X+cdIHzWeiSNSa7F6fLxWWKhcWttP8fYR7Oh0y9UI1INvloMIPZw
- BreWkQVLBwVh7m0Dc9/fEZroupZ7dIbczqwJVEnpiYrGGCkRgYKKshWM89NDa4vTo6E7
- HAYij2bPCvq84JAtuN4/He+YGbX+s5yI7opgzZxrjVAIf6TUoSIqS2kHA6ZLONTrXyG+
- q1Vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=JDlFiCjVr5xHxciN5joXRaUK1WSJQwdyA4WuZ989PgM=;
- b=TQv7Fcx3cHckUYcjZ//U//YX296j+GoGIcgvxN9MI4sx1bMPJzeCAd8PmOudMWHBY1
- rf56w5LDZA7G1hcYEflMYeI0Un6BLdERXTA61yUMKw5NlEb54e1OK5yg0eM+Ro0tYcr9
- mPtoP0LtlruLMLmhQq+Rl8TJ5j9oiEKUBkTgNs0blohuc4e3q/ekDUFlMzp/lBsEVCxC
- IXzZ9vpfUl9T8fMuinVEnJC0VRloC7E7e+1/f42TAh0/Cy+z8nhvnhk+WAbUb4NLuCqY
- L+DEoClacSpwj8GLmoOkvjunZWPrLs6A2SLrYki+2FmsuLD8LRay0/ShkleClyxC2zRD
- RyZw==
-X-Gm-Message-State: AGi0Puaeo/u0GRzeAtqFrudACYZ0IEPwM3KiocFEGKNiIbWETo82CIIr
- a2c2fsjSa2hn8POahoUNyGX8PoXyy6c=
-X-Google-Smtp-Source: APiQypK3j2oV23f6kwFGM3rOxkYG2/S/NybkJ2uW8VHvx+OFd6F+YL07RJqSDP6cr3QffcxkL6ACUQ==
-X-Received: by 2002:a17:90a:8815:: with SMTP id
- s21mr1244170pjn.154.1588872239509; 
- Thu, 07 May 2020 10:23:59 -0700 (PDT)
-Received: from localhost.localdomain (174-21-149-226.tukw.qwest.net.
- [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id 19sm312228pjl.52.2020.05.07.10.23.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 07 May 2020 10:23:58 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 4/4] target/arm: Fix tcg_gen_gvec_dup_imm vs DUP (indexed)
-Date: Thu,  7 May 2020 10:23:52 -0700
-Message-Id: <20200507172352.15418-5-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200507172352.15418-1-richard.henderson@linaro.org>
-References: <20200507172352.15418-1-richard.henderson@linaro.org>
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>)
+ id 1jWkIY-00078d-0e; Thu, 07 May 2020 13:27:02 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46236)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>)
+ id 1jWkIX-0007CK-5w; Thu, 07 May 2020 13:27:01 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 047H2bdw131901; Thu, 7 May 2020 13:26:50 -0400
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com
+ [159.122.73.70])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 30uf8kbngc-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 07 May 2020 13:26:49 -0400
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+ by ppma01fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 047HPsxN004211;
+ Thu, 7 May 2020 17:26:47 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com
+ (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+ by ppma01fra.de.ibm.com with ESMTP id 30s0g5ctpc-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 07 May 2020 17:26:47 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 047HQjoG63111494
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 7 May 2020 17:26:45 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4ABB74C044;
+ Thu,  7 May 2020 17:26:45 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 11E814C046;
+ Thu,  7 May 2020 17:26:45 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.160.63])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu,  7 May 2020 17:26:44 +0000 (GMT)
+Subject: [PATCH 2/6] target/ppc: Pass const pointer to
+ ppc_radix64_get_fully_qualified_addr()
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Thu, 07 May 2020 19:26:44 +0200
+Message-ID: <158887240409.1564424.12790243891531523570.stgit@bahia.lan>
+In-Reply-To: <158887239173.1564424.16721638327458334129.stgit@bahia.lan>
+References: <158887239173.1564424.16721638327458334129.stgit@bahia.lan>
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1044.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
+ definitions=2020-05-07_10:2020-05-07,
+ 2020-05-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 bulkscore=0
+ impostorscore=0 spamscore=0 priorityscore=1501 malwarescore=0 mlxscore=0
+ lowpriorityscore=0 adultscore=0 mlxlogscore=629 phishscore=0 clxscore=1034
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2005070135
+Received-SPF: softfail client-ip=148.163.156.1; envelope-from=groug@kaod.org;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 13:26:52
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_SOFTFAIL=0.665,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,39 +104,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Desnogues <laurent.desnogues@gmail.com>, peter.maydell@linaro.org
+Cc: qemu-ppc@nongnu.org, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DUP (indexed) can duplicate 128-bit elements, so using esz
-unconditionally can assert in tcg_gen_gvec_dup_imm.
+This doesn't require write access to the CPU registers.
 
-Fixes: 8711e71f9cbb
-Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- target/arm/translate-sve.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ target/ppc/mmu-radix64.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index c8649283be..83614e9e70 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -2044,7 +2044,11 @@ static bool trans_DUP_x(DisasContext *s, arg_DUP_x *a)
-             unsigned nofs = vec_reg_offset(s, a->rn, index, esz);
-             tcg_gen_gvec_dup_mem(esz, dofs, nofs, vsz, vsz);
-         } else {
--            tcg_gen_gvec_dup_imm(esz, dofs, vsz, vsz, 0);
-+            /*
-+             * While dup_mem handles 128-bit elements, dup_imm does not.
-+             * Thankfully element size doesn't matter for splatting zero.
-+             */
-+            tcg_gen_gvec_dup_imm(MO_64, dofs, vsz, vsz, 0);
-         }
-     }
-     return true;
--- 
-2.20.1
+diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
+index 1404e53deca8..c76879f65b78 100644
+--- a/target/ppc/mmu-radix64.c
++++ b/target/ppc/mmu-radix64.c
+@@ -28,7 +28,8 @@
+ #include "mmu-radix64.h"
+ #include "mmu-book3s-v3.h"
+ 
+-static bool ppc_radix64_get_fully_qualified_addr(CPUPPCState *env, vaddr eaddr,
++static bool ppc_radix64_get_fully_qualified_addr(const CPUPPCState *env,
++                                                 vaddr eaddr,
+                                                  uint64_t *lpid, uint64_t *pid)
+ {
+     if (msr_hv) { /* MSR[HV] -> Hypervisor/bare metal */
 
 
