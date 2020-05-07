@@ -2,60 +2,60 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A98B5C38A24
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB71AC47257
 	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 05:05:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6885F20753
+	by mail.kernel.org (Postfix) with ESMTPS id 68DB120838
 	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 05:05:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="OleOt0fq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6885F20753
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Zs/mo7F3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68DB120838
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWYjA-0000pn-Bx
+	id 1jWYjA-0000qR-D1
 	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 01:05:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33526)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33528)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jWYht-0007Uu-58; Thu, 07 May 2020 01:04:25 -0400
-Received: from ozlabs.org ([203.11.71.1]:46253)
+ id 1jWYht-0007V4-Ht; Thu, 07 May 2020 01:04:25 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:44631)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jWYhr-0006zq-Fl; Thu, 07 May 2020 01:04:24 -0400
+ id 1jWYhr-00070M-Gv; Thu, 07 May 2020 01:04:25 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 49HhFn4Mp5z9sSk; Thu,  7 May 2020 15:04:13 +1000 (AEST)
+ id 49HhFn4ztWz9sSm; Thu,  7 May 2020 15:04:13 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1588827853;
- bh=uCaTANb2yoKIfc6GQwlTA7Oai6/KVGiIVGXK+qiTZ4w=;
+ bh=F8qKptjSIPSTQGjLaBtQk0trTc8MzA+Ysu7dOVrTfrA=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=OleOt0fqrou/ANuF8RVMSOeB5eVN6/d51Tc1I9vm7CmN7K5v5eZIBqd/CxdbqnKLb
- PEjZW3ZwVCwuiKFuMlgXhiKd4Dp+kDG0bmT1m72qXSZHEXxpXiceZH5S3iBf/+8NrF
- b1y/R7ZUbaqHVua1FtA24lrfvP+lCMGqECWrl3vM=
+ b=Zs/mo7F3SV4/XKhrlZPLffr/bhOQbYHWd40ncB3ddX6HFSSt+iU6TaBbjoCzKpQjU
+ +xgdmNt2dwkxXGbJ3CXSXvcJBHGJhJq6qo0Ig4uKbCxlhyeCFwUmBUN2BLHCFXHzME
+ OQVvplRn1Z7OZanjssfkZ9w3AuXwD8VBeTD0TZGA=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 03/18] ppc/spapr: tweak change system reset helper
-Date: Thu,  7 May 2020 15:02:13 +1000
-Message-Id: <20200507050228.802395-4-david@gibson.dropbear.id.au>
+Subject: [PULL 04/18] ppc/pnv: Add support for NMI interface
+Date: Thu,  7 May 2020 15:02:14 +1000
+Message-Id: <20200507050228.802395-5-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200507050228.802395-1-david@gibson.dropbear.id.au>
 References: <20200507050228.802395-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 01:04:14
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -17
 X-Spam_score: -1.8
 X-Spam_bar: -
@@ -83,87 +83,90 @@ Sender: "Qemu-devel"
 
 From: Nicholas Piggin <npiggin@gmail.com>
 
-Rather than have the helper take an optional vector address
-override, instead have its caller modify env->nip itself.
-This is more consistent when adding pnv nmi support, and also
-with mce injection added later.
+This implements the NMI interface for the PNV machine, similarly to
+commit 3431648272d ("spapr: Add support for new NMI interface") for
+SPAPR.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-Message-Id: <20200325144147.221875-2-npiggin@gmail.com>
+Message-Id: <20200325144147.221875-3-npiggin@gmail.com>
 Reviewed-by: Cédric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c           | 9 ++++++---
- target/ppc/cpu.h         | 2 +-
- target/ppc/excp_helper.c | 5 +----
- 3 files changed, 8 insertions(+), 8 deletions(-)
+ hw/ppc/pnv.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 9a2bd501aa..785c41d205 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3385,13 +3385,13 @@ static void spapr_machine_finalizefn(Object *obj)
- void spapr_do_system_reset_on_cpu(CPUState *cs, run_on_cpu_data arg)
- {
-     SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index c9cb6fa357..a3b7a8d0ff 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -27,6 +27,7 @@
+ #include "sysemu/runstate.h"
+ #include "sysemu/cpus.h"
+ #include "sysemu/device_tree.h"
++#include "sysemu/hw_accel.h"
+ #include "target/ppc/cpu.h"
+ #include "qemu/log.h"
+ #include "hw/ppc/fdt.h"
+@@ -34,6 +35,7 @@
+ #include "hw/ppc/pnv.h"
+ #include "hw/ppc/pnv_core.h"
+ #include "hw/loader.h"
++#include "hw/nmi.h"
+ #include "exec/address-spaces.h"
+ #include "qapi/visitor.h"
+ #include "monitor/monitor.h"
+@@ -1977,10 +1979,35 @@ static void pnv_machine_set_hb(Object *obj, bool value, Error **errp)
+     }
+ }
+ 
++static void pnv_cpu_do_nmi_on_cpu(CPUState *cs, run_on_cpu_data arg)
++{
 +    PowerPCCPU *cpu = POWERPC_CPU(cs);
 +    CPUPPCState *env = &cpu->env;
- 
-     cpu_synchronize_state(cs);
-     /* If FWNMI is inactive, addr will be -1, which will deliver to 0x100 */
-     if (spapr->fwnmi_system_reset_addr != -1) {
-         uint64_t rtas_addr, addr;
--        PowerPCCPU *cpu = POWERPC_CPU(cs);
--        CPUPPCState *env = &cpu->env;
- 
-         /* get rtas addr from fdt */
-         rtas_addr = spapr_get_rtas_addr();
-@@ -3405,7 +3405,10 @@ void spapr_do_system_reset_on_cpu(CPUState *cs, run_on_cpu_data arg)
-         stq_be_phys(&address_space_memory, addr + sizeof(uint64_t), 0);
-         env->gpr[3] = addr;
-     }
--    ppc_cpu_do_system_reset(cs, spapr->fwnmi_system_reset_addr);
++
++    cpu_synchronize_state(cs);
 +    ppc_cpu_do_system_reset(cs);
-+    if (spapr->fwnmi_system_reset_addr != -1) {
-+        env->nip = spapr->fwnmi_system_reset_addr;
++    /*
++     * SRR1[42:45] is set to 0100 which the ISA defines as implementation
++     * dependent. POWER processors use this for xscom triggered interrupts,
++     * which come from the BMC or NMI IPIs.
++     */
++    env->spr[SPR_SRR1] |= PPC_BIT(43);
++}
++
++static void pnv_nmi(NMIState *n, int cpu_index, Error **errp)
++{
++    CPUState *cs;
++
++    CPU_FOREACH(cs) {
++        async_run_on_cpu(cs, pnv_cpu_do_nmi_on_cpu, RUN_ON_CPU_NULL);
 +    }
- }
- 
- static void spapr_nmi(NMIState *n, int cpu_index, Error **errp)
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 88d9449555..f4a5304d43 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1220,7 +1220,7 @@ int ppc64_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
- int ppc32_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
-                                int cpuid, void *opaque);
- #ifndef CONFIG_USER_ONLY
--void ppc_cpu_do_system_reset(CPUState *cs, target_ulong vector);
-+void ppc_cpu_do_system_reset(CPUState *cs);
- void ppc_cpu_do_fwnmi_machine_check(CPUState *cs, target_ulong vector);
- extern const VMStateDescription vmstate_ppc_cpu;
- #endif
-diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-index 81ee19ebae..1acc3786de 100644
---- a/target/ppc/excp_helper.c
-+++ b/target/ppc/excp_helper.c
-@@ -983,15 +983,12 @@ static void ppc_hw_interrupt(CPUPPCState *env)
-     }
- }
- 
--void ppc_cpu_do_system_reset(CPUState *cs, target_ulong vector)
-+void ppc_cpu_do_system_reset(CPUState *cs)
++}
++
+ static void pnv_machine_class_init(ObjectClass *oc, void *data)
  {
-     PowerPCCPU *cpu = POWERPC_CPU(cs);
-     CPUPPCState *env = &cpu->env;
+     MachineClass *mc = MACHINE_CLASS(oc);
+     InterruptStatsProviderClass *ispc = INTERRUPT_STATS_PROVIDER_CLASS(oc);
++    NMIClass *nc = NMI_CLASS(oc);
  
-     powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_RESET);
--    if (vector != -1) {
--        env->nip = vector;
--    }
- }
+     mc->desc = "IBM PowerNV (Non-Virtualized)";
+     mc->init = pnv_init;
+@@ -1997,6 +2024,7 @@ static void pnv_machine_class_init(ObjectClass *oc, void *data)
+     mc->default_ram_size = INITRD_LOAD_ADDR + INITRD_MAX_SIZE;
+     mc->default_ram_id = "pnv.ram";
+     ispc->print_info = pnv_pic_print_info;
++    nc->nmi_monitor_handler = pnv_nmi;
  
- void ppc_cpu_do_fwnmi_machine_check(CPUState *cs, target_ulong vector)
+     object_class_property_add_bool(oc, "hb-mode",
+                                    pnv_machine_get_hb, pnv_machine_set_hb,
+@@ -2060,6 +2088,7 @@ static const TypeInfo types[] = {
+         .class_size    = sizeof(PnvMachineClass),
+         .interfaces = (InterfaceInfo[]) {
+             { TYPE_INTERRUPT_STATS_PROVIDER },
++            { TYPE_NMI },
+             { },
+         },
+     },
 -- 
 2.26.2
 
