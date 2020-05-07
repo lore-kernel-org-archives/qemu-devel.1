@@ -6,64 +6,64 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C252C38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:56:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6713EC4724C
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:58:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1083E2073A
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:56:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 29C5E2082E
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:58:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Evxa8A3A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1083E2073A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F4MS+Emy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29C5E2082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWh0q-0006wj-7x
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 09:56:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34784)
+	id 1jWh2w-0002fA-9v
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 09:58:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34882)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1jWguY-0005B0-8K
- for qemu-devel@nongnu.org; Thu, 07 May 2020 09:50:02 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37078
+ id 1jWguw-0005cN-6X
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 09:50:26 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54217
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1jWguV-0004Fs-Pg
- for qemu-devel@nongnu.org; Thu, 07 May 2020 09:50:01 -0400
+ id 1jWguv-0004Os-7U
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 09:50:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588859398;
+ s=mimecast20190719; t=1588859424;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=k3Z66kkuiR9aG62JuAgsT0L+YxBIBApb6k2KUo4EdNc=;
- b=Evxa8A3AmIzB4PUg8H7T7v915bQF61D5RxtfXvLrmpf1jLMj1TLlRtFM/lJILRN6et8VLh
- ms9iavQgPNr79G52nGYqZ3jCaY7ahpyubXY20VGDxLK+k9WJSkzsTEt6tCovu+iHGfOR8j
- 0tIDSvAHMAMWRxEzpreCbfXJRUD/tFc=
+ bh=YmI8JvlQjrwTZWQydukYds1iNBFMusDFRHQgYvAm6TM=;
+ b=F4MS+Emy6L/HzwIbcRxkEddNXtd0l832btywOwCIc4Bh9EkyYWbSPAS76cGUgi1UL3Matm
+ 9+FXsNiNnl/JX0zDQid/EC8w+ArgG+WeTMDsVdngEu3xQvRMHUeHT/PjMCYiWWIOf57eEP
+ aE2rjAWJ4cJRkeAvcjfFJ02yorl4nUM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-198-EbLiiLPFPme6a93fqTBVbQ-1; Thu, 07 May 2020 09:49:55 -0400
-X-MC-Unique: EbLiiLPFPme6a93fqTBVbQ-1
+ us-mta-72-IDH3XFNaMyOgHCPAhWtusw-1; Thu, 07 May 2020 09:50:22 -0400
+X-MC-Unique: IDH3XFNaMyOgHCPAhWtusw-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B2AB872FE1;
- Thu,  7 May 2020 13:49:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CA7B107ACF2;
+ Thu,  7 May 2020 13:50:21 +0000 (UTC)
 Received: from thinkpad.redhat.com (ovpn-114-199.ams2.redhat.com
  [10.36.114.199])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4E92E10013BD;
- Thu,  7 May 2020 13:49:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 82EFD10013BD;
+ Thu,  7 May 2020 13:49:54 +0000 (UTC)
 From: Laurent Vivier <lvivier@redhat.com>
 To: lvivier@redhat.com,
 	qemu-devel@nongnu.org
-Subject: [RFC v4 4/6] qmp: add QMP command x-debug-virtio-queue-status
-Date: Thu,  7 May 2020 15:47:58 +0200
-Message-Id: <20200507134800.10837-5-lvivier@redhat.com>
+Subject: [RFC v4 5/6] qmp: add QMP command x-debug-virtio-queue-element
+Date: Thu,  7 May 2020 15:47:59 +0200
+Message-Id: <20200507134800.10837-6-lvivier@redhat.com>
 In-Reply-To: <20200507134800.10837-1-lvivier@redhat.com>
 References: <20200507134800.10837-1-lvivier@redhat.com>
 MIME-Version: 1.0
@@ -109,47 +109,82 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This new command shows internal status of a VirtQueue.
-(vrings and indexes).
+This new command shows the information of a VirtQueue element.
 
 Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 ---
- hw/virtio/virtio-stub.c |  6 +++
- hw/virtio/virtio.c      | 35 +++++++++++++++
- qapi/virtio.json        | 98 +++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 139 insertions(+)
+ hw/virtio/virtio-stub.c |   9 +++
+ hw/virtio/virtio.c      | 130 ++++++++++++++++++++++++++++++++++++++++
+ qapi/virtio.json        |  94 +++++++++++++++++++++++++++++
+ 3 files changed, 233 insertions(+)
 
 diff --git a/hw/virtio/virtio-stub.c b/hw/virtio/virtio-stub.c
-index ddb592f72eee..3c1bf172acf6 100644
+index 3c1bf172acf6..8275e31430e7 100644
 --- a/hw/virtio/virtio-stub.c
 +++ b/hw/virtio/virtio-stub.c
-@@ -17,3 +17,9 @@ VirtioStatus *qmp_x_debug_virtio_status(const char* path,=
- Error **errp)
+@@ -23,3 +23,12 @@ VirtQueueStatus *qmp_x_debug_virtio_queue_status(const c=
+har *path,
  {
      return qmp_virtio_unsupported(errp);
  }
 +
-+VirtQueueStatus *qmp_x_debug_virtio_queue_status(const char *path,
-+                                                 uint16_t queue, Error **e=
-rrp)
++VirtioQueueElement *qmp_x_debug_virtio_queue_element(const char* path,
++                                                     uint16_t queue,
++                                                     bool has_index,
++                                                     uint16_t index,
++                                                     Error **errp)
 +{
 +    return qmp_virtio_unsupported(errp);
 +}
 diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 59bf6ef651a6..57552bf05014 100644
+index 57552bf05014..66dc2cef1b39 100644
 --- a/hw/virtio/virtio.c
 +++ b/hw/virtio/virtio.c
-@@ -3877,6 +3877,41 @@ static VirtIODevice *virtio_device_find(const char *=
-path)
-     return NULL;
+@@ -4033,6 +4033,136 @@ VirtioStatus *qmp_x_debug_virtio_status(const char*=
+ path, Error **errp)
+     return status;
  }
 =20
-+VirtQueueStatus *qmp_x_debug_virtio_queue_status(const char *path,
-+                                                 uint16_t queue, Error **e=
-rrp)
++static VirtioRingDescFlagsList *qmp_decode_vring_desc_flags(uint16_t flags=
+)
++{
++    VirtioRingDescFlagsList *list =3D NULL;
++    VirtioRingDescFlagsList *node;
++    int i;
++    struct {
++        uint16_t flag;
++        VirtioRingDescFlags value;
++    } map[] =3D {
++        { VRING_DESC_F_NEXT, VIRTIO_RING_DESC_FLAGS_NEXT },
++        { VRING_DESC_F_WRITE, VIRTIO_RING_DESC_FLAGS_WRITE },
++        { VRING_DESC_F_INDIRECT, VIRTIO_RING_DESC_FLAGS_INDIRECT },
++        { 1 << VRING_PACKED_DESC_F_AVAIL, VIRTIO_RING_DESC_FLAGS_AVAIL },
++        { 1 << VRING_PACKED_DESC_F_USED, VIRTIO_RING_DESC_FLAGS_USED },
++        { 0, -1 }
++    };
++
++    for (i =3D 0; map[i].flag; i++) {
++        if ((map[i].flag & flags) =3D=3D 0) {
++            continue;
++        }
++        node =3D g_malloc0(sizeof(VirtioRingDescFlagsList));
++        node->value =3D map[i].value;
++        node->next =3D list;
++        list =3D node;
++    }
++
++    return list;
++}
++
++VirtioQueueElement *qmp_x_debug_virtio_queue_element(const char* path,
++                                                     uint16_t queue,
++                                                     bool has_index,
++                                                     uint16_t index,
++                                                     Error **errp)
 +{
 +    VirtIODevice *vdev;
-+    VirtQueueStatus *status;
++    VirtQueue *vq;
++    VirtioQueueElement *element =3D NULL;
 +
 +    vdev =3D virtio_device_find(path);
 +    if (vdev =3D=3D NULL) {
@@ -162,133 +197,194 @@ rrp)
 +        error_setg(errp, "Invalid virtqueue number %d", queue);
 +        return NULL;
 +    }
++    vq =3D &vdev->vq[queue];
 +
-+    status =3D g_new0(VirtQueueStatus, 1);
-+    status->queue_index =3D vdev->vq[queue].queue_index;
-+    status->inuse =3D vdev->vq[queue].inuse;
-+    status->vring_num =3D vdev->vq[queue].vring.num;
-+    status->vring_num_default =3D vdev->vq[queue].vring.num_default;
-+    status->vring_align =3D vdev->vq[queue].vring.align;
-+    status->vring_desc =3D vdev->vq[queue].vring.desc;
-+    status->vring_avail =3D vdev->vq[queue].vring.avail;
-+    status->vring_used =3D vdev->vq[queue].vring.used;
-+    status->last_avail_idx =3D vdev->vq[queue].last_avail_idx;
-+    status->shadow_avail_idx =3D vdev->vq[queue].shadow_avail_idx;
-+    status->used_idx =3D vdev->vq[queue].used_idx;
-+    status->signalled_used =3D vdev->vq[queue].signalled_used;
-+    status->signalled_used_valid =3D vdev->vq[queue].signalled_used_valid;
++    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
++        error_setg(errp, "Packed ring not supported");
++        return NULL;
++    } else {
++        unsigned int head, i, max;
++        VRingMemoryRegionCaches *caches;
++        MemoryRegionCache indirect_desc_cache =3D MEMORY_REGION_CACHE_INVA=
+LID;
++        MemoryRegionCache *desc_cache;
++        VRingDesc desc;
++        VirtioRingDescList *list =3D NULL;
++        VirtioRingDescList *node;
++        int rc;
 +
-+    return status;
++        RCU_READ_LOCK_GUARD();
++
++        max =3D vq->vring.num;
++
++        if (!has_index) {
++            head =3D vring_avail_ring(vq, vq->last_avail_idx % vq->vring.n=
+um);
++        } else {
++            head =3D vring_avail_ring(vq, index % vq->vring.num);
++        }
++        i =3D head;
++
++        caches =3D vring_get_region_caches(vq);
++        if (!caches) {
++            error_setg(errp, "Region caches not initialized");
++            return NULL;
++        }
++
++        if (caches->desc.len < max * sizeof(VRingDesc)) {
++            error_setg(errp, "Cannot map descriptor ring");
++            return NULL;
++        }
++
++        desc_cache =3D &caches->desc;
++        vring_split_desc_read(vdev, &desc, desc_cache, i);
++        if (desc.flags & VRING_DESC_F_INDIRECT) {
++            int64_t len;
++
++            len =3D address_space_cache_init(&indirect_desc_cache, vdev->d=
+ma_as,
++                                           desc.addr, desc.len, false);
++            desc_cache =3D &indirect_desc_cache;
++            if (len < desc.len) {
++                error_setg(errp, "Cannot map indirect buffer");
++                goto done;
++            }
++            i =3D 0;
++            vring_split_desc_read(vdev, &desc, desc_cache, i);
++        }
++
++        element =3D g_new0(VirtioQueueElement, 1);
++        element->index =3D head;
++        element->ndescs =3D 0;
++
++        do {
++            node =3D g_new0(VirtioRingDescList, 1);
++            node->value =3D g_new0(VirtioRingDesc, 1);
++            node->value->addr =3D desc.addr;
++            node->value->len =3D desc.len;
++            node->value->flags =3D qmp_decode_vring_desc_flags(desc.flags)=
+;
++            node->next =3D list;
++            list =3D node;
++
++            element->ndescs++;
++
++            rc =3D virtqueue_split_read_next_desc(vdev, &desc, desc_cache,
++                                                max, &i);
++        } while (rc =3D=3D VIRTQUEUE_READ_DESC_MORE);
++
++        element->descs =3D list;
++done:
++        address_space_cache_destroy(&indirect_desc_cache);
++    }
++
++    return element;
 +}
 +
- #define CONVERT_FEATURES(type, map)                \
-     ({                                           \
-         type *list =3D NULL;                         \
+ static const TypeInfo virtio_device_info =3D {
+     .name =3D TYPE_VIRTIO_DEVICE,
+     .parent =3D TYPE_DEVICE,
 diff --git a/qapi/virtio.json b/qapi/virtio.json
-index 69dd107d0c9b..43c234a9fc69 100644
+index 43c234a9fc69..a55103dca780 100644
 --- a/qapi/virtio.json
 +++ b/qapi/virtio.json
-@@ -308,3 +308,101 @@
-   'data': { 'path': 'str' },
-   'returns': 'VirtioStatus'
+@@ -406,3 +406,97 @@
+   'data': { 'path': 'str', 'queue': 'uint16' },
+   'returns': 'VirtQueueStatus'
  }
 +
 +##
-+# @VirtQueueStatus:
++# @VirtioRingDescFlags:
 +#
-+# Status of a VirtQueue
-+#
-+# @queue-index: VirtQueue queue_index
-+#
-+# @inuse: VirtQueue inuse
-+#
-+# @vring-num: VirtQueue vring.num
-+#
-+# @vring-num-default: VirtQueue vring.num_default
-+#
-+# @vring-align: VirtQueue vring.align
-+#
-+# @vring-desc: VirtQueue vring.desc
-+#
-+# @vring-avail: VirtQueue vring.avail
-+#
-+# @vring-used: VirtQueue vring.used
-+#
-+# @last-avail-idx: VirtQueue last_avail_idx
-+#
-+# @shadow-avail-idx: VirtQueue shadow_avail_idx
-+#
-+# @used-idx: VirtQueue used_idx
-+#
-+# @signalled-used: VirtQueue signalled_used
-+#
-+# @signalled-used-valid: VirtQueue signalled_used_valid
++# An enumeration of the virtio ring descriptor flags
 +#
 +# Since: 5.1
 +#
 +##
 +
-+{ 'struct': 'VirtQueueStatus',
++{ 'enum': 'VirtioRingDescFlags',
++  'data': [ 'next', 'write', 'indirect', 'avail', 'used' ]
++}
++
++##
++# @VirtioRingDesc:
++#
++# @addr: guest physical address of the descriptor data
++#
++# @len: length of the descriptor data
++#
++# @flags: descriptor flags
++#
++# Since: 5.1
++#
++##
++
++{ 'struct': 'VirtioRingDesc',
 +  'data': {
-+    'queue-index': 'uint16',
-+    'inuse': 'uint32',
-+    'vring-num': 'int',
-+    'vring-num-default': 'int',
-+    'vring-align': 'int',
-+    'vring-desc': 'uint64',
-+    'vring-avail': 'uint64',
-+    'vring-used': 'uint64',
-+    'last-avail-idx': 'uint16',
-+    'shadow-avail-idx': 'uint16',
-+    'used-idx': 'uint16',
-+    'signalled-used': 'uint16',
-+    'signalled-used-valid': 'uint16'
++    'addr': 'uint64',
++    'len': 'uint32',
++    'flags': [ 'VirtioRingDescFlags' ]
 +  }
 +}
 +
 +##
-+# @x-debug-virtio-queue-status:
++# @VirtioQueueElement:
 +#
-+# Return the status of a given VirtQueue
++# @index: index of the element in the queue
++#
++# @ndescs: number of descriptors
++#
++# @descs: list of the descriptors
++#
++# Since: 5.1
++#
++##
++
++{ 'struct': 'VirtioQueueElement',
++  'data': {
++    'index': 'uint32',
++    'ndescs': 'uint32',
++    'descs': ['VirtioRingDesc']
++  }
++}
++
++##
++# @x-debug-virtio-queue-element:
++#
++# Return the information about an element queue (by default head)
 +#
 +# @path: QOBject path of the VirtIODevice
 +#
 +# @queue: queue number to examine
 +#
-+# Returns: Status of the VirtQueue
++# @index: the index in the queue, by default head
++#
++# Returns: the element information
 +#
 +# Since: 5.1
 +#
 +# Example:
 +#
-+# -> { "execute": "x-debug-virtio-queue-status",
++# -> { "execute": "x-debug-virtio-queue-element",
 +#      "arguments": {
 +#          "path": "/machine/peripheral-anon/device[3]/virtio-backend",
 +#          "queue": 0
 +#      }
 +#   }
-+# <- { "return": {
-+#      "signalled-used": 373,
-+#      "inuse": 0,
-+#      "vring-desc": 864411648,
-+#      "vring-num-default": 256,
-+#      "signalled-used-valid": 1,
-+#      "vring-avail": 864415744,
-+#      "last-avail-idx": 373,
-+#      "queue-index": 0,
-+#      "vring-used": 864416320,
-+#      "shadow-avail-idx": 619,
-+#      "used-idx": 373,
-+#      "vring-num": 256,
-+#      "vring-align": 4096
++# -> { "return": {
++#         "index": 24,
++#         "ndescs": 1,
++#         "descs": [
++#             { "flags": ["write"], "len": 1536, "addr": 2027557376 }
++#         ]
 +#      }
-+#    }
++#   }
 +#
 +##
 +
-+{ 'command': 'x-debug-virtio-queue-status',
-+  'data': { 'path': 'str', 'queue': 'uint16' },
-+  'returns': 'VirtQueueStatus'
++{ 'command': 'x-debug-virtio-queue-element',
++  'data': { 'path': 'str', 'queue': 'uint16', '*index': 'uint16' },
++  'returns': 'VirtioQueueElement'
 +}
 --=20
 2.26.2
