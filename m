@@ -2,117 +2,125 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFF02C38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 06:40:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EC1AC54E49
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 07:06:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8DE020753
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 06:40:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B17A208CA
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 07:06:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="t6Kq7ERc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8DE020753
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="mHDsxsPH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B17A208CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWaD9-00057U-KV
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 02:40:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52380)
+	id 1jWabd-0000T9-59
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 03:06:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58750)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jWaCR-0004Kd-8j
- for qemu-devel@nongnu.org; Thu, 07 May 2020 02:40:03 -0400
-Received: from mail-bn7nam10on2095.outbound.protection.outlook.com
- ([40.107.92.95]:34657 helo=NAM10-BN7-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jWaap-0008IH-7u; Thu, 07 May 2020 03:05:15 -0400
+Received: from mail-eopbgr80101.outbound.protection.outlook.com
+ ([40.107.8.101]:49891 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jWaCP-0007Wt-E2
- for qemu-devel@nongnu.org; Thu, 07 May 2020 02:40:02 -0400
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jWaam-0006g8-FN; Thu, 07 May 2020 03:05:14 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Rox2YqH4LZFBK++dqZJfiTn7bE6186UksfURB8JyRQIXXTCV3eSTDROS/UTBV+l8IAMZ1dwSPjGU7OuOSt+P5hvfdN6BJ50JBHi3x3HKBPu6OsE4mHzCA32kUSneNwQvpc308FaBT92bj1dS1c52rXAUY/hJ9LVPWXiGXwD9FufEhEoNGEeigf2PTJth463HPHI2wPm7o8sJu26nxzS3cq+QqVAv+9QixBlEvkU9hdF/2IeOr7zJhvsO1KFUZniSHBb5kwJLMiPzvvVJkJ8wvrJitJD3qev6UmZNPxFGcB0RARLCeqCcpEyWB+n0xV8y7CUUXphDyxNMylBfXG85pA==
+ b=Yufo6BzG0hw1F0oOVo/9wCdwo11YcQ9mrbrh/HSkVKlTtrZAs2jjw62+eCyOyWCLVwDfK3DdViJgUmVBLDDSub1trwGHeo3oW5oE/f/bXhKhBvz1ypMZQfFyDg7EIXFCCWgI8P8ASb0qGsH/EjzbND44TE/Qzmy4g63Su21Biug4keqpHqihZFpNhv+g4uZZcOso7ex644/r7nDbb3cHJE8hsWoX9Zaru724naAEuIh3Ipxf4T3A0+iMUXjdZdBNEFMI5CmrODFAYphQZB6X3HmICg1YU45ts4jENnAcluG8Cyy0OUF4NHTlQDYpBarGzlDaT40bTOLPFS49vXrKaw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HlmB/tUFGrlc+jYZe11MTuCqAW0ufk0yZfbjnUJCpM0=;
- b=NJ2MHtuSNulOerzXjRM2J42eCTQLWYmI4msoLD3t/7AfVAGTIr38LJqRKsQf0vEApbLzuzhzIv/mBfcMehMlkLw1pyb4AxcV37neOwENu0Gd8We6G6M3bzQZdaojpvnIp4MZNJ979eOjLS1B5i+iDXbBOX1ktIzApTcb+cYBDaUjYMS3ELRPPQ/qP4ioD3IbffytHkRB/wf86yRUa1MXEHQeG+SbkTDSA4SaLoW+VKz3yDLCJl4SMyltNhIb8LdQ1zqQ0zMH1a+hNmxLxjfJyPSwG9N5+U+oqeihVSfC0j+nRwc4RuqO5cnMx/GryT73E3kgpANBPs1YDD36aAjuOg==
+ bh=8ayJ1VRjH9mPvPkJnKjtt+msUAqwsopcYYIgp406QY8=;
+ b=hLVvTAnjS1haVVhco0/fUwLjrZHYsl5kIakwXQVAPAin2dKAhAXcozi3qIXRxLRaoMyhWHb2IbWy5SoMi0kIYWDXjsE55QSOpctsx9LAX4BMGtCDykAayBmSElVSGNekrvx6kG7e5RR/JGy8tiXAreDkxNWYbmF76LM6ff2ALDl94pccseDksYvbrJOudTL0Am/2AYT1/sObpKZgBgT3Qc5WbJ8zst7qUYozGww0abSuaIoFy3tx8q1I+CIe49agT5Y87DCjDP2Rwqv4+fR4oJIrIGgx64jTBr/jUSZr2AVThAaHuq8Jye52pVbetn+LkBDBUzU8/83U7l6rtS9lPg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
- header.d=bu.edu; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HlmB/tUFGrlc+jYZe11MTuCqAW0ufk0yZfbjnUJCpM0=;
- b=t6Kq7ERc9l9p7LMTqInHYzk6QLu4uwrYS2qERTU63rK62jC7zCiZxbylchi7SjkWX+w8DTzKr0TAuG9JXjL2IVvGqGh6663351RpZ0Ngq2pkZ3ZITNLH3j6UvDilDA6eKXRvtv6zZT/bC3z1WWtZXKmQ6BjmZrhTsGgcYFyrpFg=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=bu.edu;
-Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
- by SN6PR03MB4591.namprd03.prod.outlook.com (2603:10b6:805:f6::23)
+ bh=8ayJ1VRjH9mPvPkJnKjtt+msUAqwsopcYYIgp406QY8=;
+ b=mHDsxsPHzcpdO+QZrP3Nkv/08KoHICbMiW9VovJFcVerXqK/hve36kWHr7EiPzk1uT+wEXpc+MteRxDTtvZ//6qov4vld3kaVjgAVsnoa/zZnMEYddnZA/HbZLCJddBTaDbcSVBqLFfnB5FGOiSZEgK+UcGwaMXYZoO7K1bQeA8=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5413.eurprd08.prod.outlook.com (2603:10a6:20b:10a::18)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.26; Thu, 7 May
- 2020 06:24:56 +0000
-Received: from SN6PR03MB3871.namprd03.prod.outlook.com
- ([fe80::640a:1123:37c1:42db]) by SN6PR03MB3871.namprd03.prod.outlook.com
- ([fe80::640a:1123:37c1:42db%3]) with mapi id 15.20.2979.028; Thu, 7 May 2020
- 06:24:56 +0000
-From: Alexander Bulekov <alxndr@bu.edu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 0/2] Add pathin option to -chardev file
-Date: Thu,  7 May 2020 02:24:40 -0400
-Message-Id: <20200507062442.15215-1-alxndr@bu.edu>
-X-Mailer: git-send-email 2.26.2
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.21; Thu, 7 May
+ 2020 07:05:03 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2958.034; Thu, 7 May 2020
+ 07:05:03 +0000
+Subject: Re: [PATCH 8/8] block: drop unallocated_blocks_are_zero
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+References: <20200506092513.20904-1-vsementsov@virtuozzo.com>
+ <20200506092513.20904-9-vsementsov@virtuozzo.com>
+ <ad581d23-d79d-bf78-3cd5-848eb29a90f5@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200507100501347
+Message-ID: <903973be-6af6-edd3-3509-b7688e0bb8d5@virtuozzo.com>
+Date: Thu, 7 May 2020 10:05:01 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <ad581d23-d79d-bf78-3cd5-848eb29a90f5@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BL0PR02CA0125.namprd02.prod.outlook.com
- (2603:10b6:208:35::30) To SN6PR03MB3871.namprd03.prod.outlook.com
- (2603:10b6:805:6d::32)
+X-ClientProxiedBy: AM4PR0701CA0028.eurprd07.prod.outlook.com
+ (2603:10a6:200:42::38) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mozz.bu.edu (128.197.127.33) by
- BL0PR02CA0125.namprd02.prod.outlook.com (2603:10b6:208:35::30) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2979.28 via Frontend Transport; Thu, 7 May 2020 06:24:55 +0000
-X-Mailer: git-send-email 2.26.2
-X-Originating-IP: [128.197.127.33]
+Received: from [192.168.100.2] (185.215.60.171) by
+ AM4PR0701CA0028.eurprd07.prod.outlook.com (2603:10a6:200:42::38) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.17 via Frontend
+ Transport; Thu, 7 May 2020 07:05:02 +0000
+X-Tagtoolbar-Keys: D20200507100501347
+X-Originating-IP: [185.215.60.171]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2f2b0741-4764-4897-ad33-08d7f24f5c42
-X-MS-TrafficTypeDiagnostic: SN6PR03MB4591:
+X-MS-Office365-Filtering-Correlation-Id: bedc6003-1e20-45de-2e8e-08d7f254f706
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5413:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR03MB4591EA5BD02B4DBD5DDDB472BAA50@SN6PR03MB4591.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4502;
+X-Microsoft-Antispam-PRVS: <AM7PR08MB541331F48A0D03BB23D52761C1A50@AM7PR08MB5413.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2958;
 X-Forefront-PRVS: 03965EFC76
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: oNvlghmfohUd+XoJEt2F0M3ED6rBJBLzDRKnXeFn/tjc8G+rTWSPCH/96yOmfDvBEKbAhqsY8uXRBl1dVWF6EHtBFqmXbenjQX/ft65mnEa1u6xAsUfsjS1w1cQD1Tr08PUxE4W5n5orJ/yZThPZM7W0mc+Juf4OT4pAts7hOWxuB7L3XDZFlAut6wVkjA0qYkOSCD1Byu80tVPXXZ/vGBrN+AngCGExZfqS5TT78YaIkCBC2SppqSrqdEMcnXHdx2GcFwbP+3d3PbhXuxa/sdpxTbv9xsXCVtQDr53H3C+CF3k9utSfB6GOa6flbfTYqXJtWUdNB3zZOuzrKc3Zv68SVUPtuSssaYFAoXTI3gIacn1k+7Rkqx8i/5MLrmIolr4I7Ox8E2yBCyQMLHTZ8+B7uRosR0iRaGnoyLIKPcY5Op9uQEz7Q3DoW/vRRbQz6FpHi4Clhi6ZYrgeP3K6q4B3yfbRfvPhJ9MEuBTMXEP0J7VCetNC63Gpt2uP+9es1mwL3jWX0boBhF30xYrz6g==
+X-Microsoft-Antispam-Message-Info: 1rwsDSpFLtvGBVy9H8ba3Ho0u4Mm/OmgU70w3bHakGd42E7vZiZ6hC4OTX2rHezuxKeja+kJuXOGjykkgPjFTijKhLLVFnRw5YkNFeHhOfyVIcnY9ERrY6PKq/Cjqh0E5EC5OHNXaWBmBO/PWfqoEJC2YwLpfLmCZnk1V/4Ru/yrmnCEhqyfljKXFZXePJC5sLNTRfrbki/8F/MDKzteLBnbGB3ZU7JWZWZYXL9Y2y9thzEOL54cD1ctqQAxNngy2FAvxnVdwdB0b2+diC0L7DHwv749yUCPXNWMokppKHupLk3J6nY+mpCg8eZkN0IWidQxpWSC3htyP9dQbgEmmaM9cegvTZuBEjDCR3wPeZTrT2TjnOW13I30xV5ZnhWml1BE46/GeTow4M9yfVtum+QYSmpAk/a+xdAqGysgl/Axst1Dy7sjgpV0NacOxcUA/ROzzwBp2VAfV72wpM1PozhBNwh6Viwa4XV4Oj9/o85Cinms9NiiHpl0SJ7zgEIMSXLYrKvcvi921kzuVfaQ0RUpqIp8JDFQEFFA1vONw6fB5CQ0M1pC5zacTUFiADHh
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(396003)(376002)(366004)(346002)(136003)(39860400002)(33430700001)(33440700001)(5660300002)(2616005)(478600001)(4744005)(66946007)(1076003)(83280400001)(8936002)(83300400001)(83310400001)(83290400001)(83320400001)(186003)(4326008)(956004)(6486002)(26005)(16526019)(66476007)(66556008)(36756003)(8676002)(6666004)(86362001)(6916009)(75432002)(7696005)(316002)(2906002)(786003)(52116002);
+ SFS:(4636009)(346002)(376002)(136003)(39850400004)(366004)(396003)(33430700001)(8676002)(66556008)(66476007)(66946007)(16526019)(7416002)(36756003)(956004)(2616005)(83300400001)(83290400001)(83310400001)(83320400001)(83280400001)(8936002)(31696002)(2906002)(16576012)(478600001)(186003)(31686004)(26005)(52116002)(6486002)(5660300002)(33440700001)(316002)(4326008)(86362001)(53546011)(43740500002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 7PCb/ApI7tFAd4xmAWwDcjgESL+LRANNM4q02M65jDDOD/C7F3vOG1Dzvei3r56TYl91IlXDPlXdWAxOsTqdokfjjog2gaMvNhuLBLkFz9xmdDittepA9Nkcm5lkUIM3LQc7atYsPwOnEmQ07lD3i2+Q6BXf2TE19KFVRIzHYtQqinOxUI0wg77f73Jhrb4HhSGl5KPKOElYje5MFWufF+eKJ3HPQYUl5Z6v387DcZvSJevH6Wf3cRsDnOjOLIrVTMLIvc8ym9TlhRU5vLawXsv+qkVd0ovY4tpK6R+77WlsDNG41/5KeotteuGpezsxsFtk6n/sYAKpoPuRDr3yeE8qpe/X757U1D2d/tSi4gP61yuEhlKjH8mkw6A9A9El1YXvoe8WthrO2tqW4PzXQGxhdaZZ2K3zM9EeKbNdDxZg9sRzFjaZSQJfBnJlm2BwgB17rIHr+SLDG4tnY4y4XiEBTvnp4rk1FR35+oJUB2M1hI1KQ0nJTMANi2Av2EzXt5jtKBwSz9D57Api92fJdrOvV4vzVrtSjJ51GfRHZdphCKRRc58sPsBX5bLOwF8GkpSPDZwXM72DOG6r/1B28EBTo77AXv3reVktr2uPpF0cbgoPg48An6wyYon+I+H5ii7/m56bDSB69yHba1c75Eu8YdRBot9CijifDSLDkHPBfiJBaIWR52RV/4x+gZYuKiaA1clz1c9CEsiStDhLA1rUxnpnKnhTwTNQM0QbxS1K75YzZuQxHTEAEpH+PwTxBIR28NusJiT+tvDiOyp/NtLVtueVNdLzwbWS51TLW7I=
-X-OriginatorOrg: bu.edu
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2f2b0741-4764-4897-ad33-08d7f24f5c42
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2020 06:24:56.5073 (UTC)
+X-MS-Exchange-AntiSpam-MessageData: GqibZ401vBv/z+XXLPclgS5vCIjhT3Wgrs8vt2p3Ni2hdnHCMJES3by3ci7t46vPWkRJXg5q9XKce7tOkJ1fnGXvcRfs370aCJeFyxbtPh16O9lQZ0B/mzCVAjhHYH6DmhQ1XL8li+lueJpQK0C29Ka8wfDLNjRAhs90stR9RJz1CHTN17fcEagPP5LXuHrGG/JsOY9/8prhRCyCXEFPPGUfHDXOpzcjboQHCU3Kdl7uew/zH9Bz2RCjTbDPKJslFNIy9SuyZ85LmwfNh7m2eZfBi6m9LmL4XBlFkKf0BDXme9N5hC8aX4fwO/yhTtELNzfM9LBX5u7Nkb9R+xSqu1yPfN2avk7P+zxVnXEOe7Lgli1TKTapOfSVKKGBsjshtI3oA4QLOEdhRHNmHPkSQhKURVTseeJdnn+5QJg3vZu44fMJVThjIsFePtXaduloDGmK63IaVEb+vLNZNBGjXwsPghrcJzOgE+QPdg4tzlUBH0Vr4PcBFXkOIMbzQlQOPy6vKY2vrZmgGxG8gF+2STs4cXtmJwIKTQKn1qxTFeHVzX1Lt3ldvhZqvUiC/PwvYCKmFxJu85jw415Pqs2f/VJ2M16rVjfskg+tt6vNftQYaOdUbpqzigk2/bHllhVIs3WoL55cWu8lhR4l2ISfbtm4n0V0KmVJ1oHbVDWjQlkbxQYlbuKZdzLzHPcNsmcOsP5i5UF5AjQMBh7r5Eq/VPGwVpn7tUHWw6o6TGQzbQ3L5jxmKos43mlLyZyk32osIgkvSFVn+t3j4PFKPdg54nYOrnFmWQCD7poJoKEDxD0=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bedc6003-1e20-45de-2e8e-08d7f254f706
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2020 07:05:03.7571 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yOBjbpHFk4ZocKhRwqr2+4LVwLMUCHweXAH/83oVvqSjENgEdHmlLSTNcuKmFpML
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR03MB4591
-Received-SPF: pass client-ip=40.107.92.95; envelope-from=alxndr@bu.edu;
- helo=NAM10-BN7-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 02:39:59
+X-MS-Exchange-CrossTenant-UserPrincipalName: dFmMEOKEhQNS/IcDz3OQsXbYQH5Qiy3jP74H0hRgHKZRDBvzqubLX186+ZV/ssv3M5DF17+Wlu81CLERGRu6CbOT8xn1j9MEy+XA1DEBYrU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5413
+Received-SPF: pass client-ip=40.107.8.101;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 03:05:05
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, HK_RANDOM_ENVFROM=0.001,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+X-Spam_score_int: -24
+X-Spam_score: -2.5
+X-Spam_bar: --
+X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001, T_DKIM_INVALID=0.01,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -126,27 +134,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@gmail.com, berrange@redhat.com, stefanha@redhat.com,
- Alexander Bulekov <alxndr@bu.edu>
+Cc: fam@euphon.net, kwolf@redhat.com, ronniesahlberg@gmail.com,
+ codyprime@gmail.com, sw@weilnetz.de, pl@kamp.de, qemu-devel@nongnu.org,
+ mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds a pathin= option to -chardev file, which allows specifying
-distinct input and output paths for the chardev. This functionaliy was
-already available through QMP.
+06.05.2020 18:14, Eric Blake wrote:
+> On 5/6/20 4:25 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Currently this field only set by qed and qcow2.
+> 
+> Well, only after patches 1-6 (prior to then, it was also set in protocol drivers).  I think you might be able to hoist part of this patch earlier in the series, to make the changes to the protocol drivers easier to review, by rewording this sentence:
+> 
+> Currently, the only format drivers that set this field are qed and qcow2.
+> 
+>> But in fact, all
+>> backing-supporting formats (parallels, qcow, qcow2, qed, vmdk) share
+>> this semantics: on unallocated blocks, if there is no backing file they
+> 
+> s/this/these/
+> 
+>> just memset the buffer with zeroes.
+>>
+>> So, document this behavior for .supports_backing and drop
+>> .unallocated_blocks_are_zero
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   include/block/block.h     |  6 ------
+>>   include/block/block_int.h | 13 ++++++++++++-
+>>   block.c                   | 15 ---------------
+>>   block/io.c                |  8 ++++----
+>>   block/qcow2.c             |  1 -
+>>   block/qed.c               |  1 -
+>>   6 files changed, 16 insertions(+), 28 deletions(-)
+>>
+>> diff --git a/include/block/block.h b/include/block/block.h
+>> index 8b62429aa4..db1cb503ec 100644
+>> --- a/include/block/block.h
+>> +++ b/include/block/block.h
+>> @@ -21,11 +21,6 @@ typedef struct BlockDriverInfo {
+>>       /* offset at which the VM state can be saved (0 if not possible) */
+>>       int64_t vm_state_offset;
+>>       bool is_dirty;
+>> -    /*
+>> -     * True if unallocated blocks read back as zeroes. This is equivalent
+>> -     * to the LBPRZ flag in the SCSI logical block provisioning page.
+>> -     */
+>> -    bool unallocated_blocks_are_zero;
+> 
+> You can't delete this field until all protocol drivers are cleaned up, so deferring this part of the change to the end of the series makes sense.
+> 
+>>       /*
+>>        * True if this block driver only supports compressed writes
+>>        */
+>> @@ -431,7 +426,6 @@ int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
+>>   int bdrv_has_zero_init_1(BlockDriverState *bs);
+>>   int bdrv_has_zero_init(BlockDriverState *bs);
+>>   int bdrv_has_zero_init_truncate(BlockDriverState *bs);
+>> -bool bdrv_unallocated_blocks_are_zero(BlockDriverState *bs);
+> 
+> Doing this cleanup makes sense: there is only one caller of this function pre-patch, and 0 callers post-patch - but whether the cleanup should be at the same time as you fix the one caller, or deferred to when you also clean up the field, is less important.
+> 
+> If I were writing the series:
+> 
+> 1 - fix qemu-img.c to not use the field
+> 2 - fix block_status to not use the function
 
-Alexander Bulekov (2):
-  chardev: enable distinct input for -chardev file
-  char-file: add test for distinct path= and pathin=
+Hmm stop. We still need patches 1,2 before modifying block_status, otherwise we'll still need to check unallocated_blocks_are_zero
 
- chardev/char-file.c |  5 +++
- chardev/char.c      |  3 ++
- qemu-options.hx     |  7 ++--
- tests/test-char.c   | 83 +++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 96 insertions(+), 2 deletions(-)
+> 3-n - fix protocol drivers that set the field to also return _ZERO
+>   during block status (but not delete the field at that time)
+> n+1 - delete unused function and field (from ALL drivers)
+> 
+>>   bool bdrv_can_write_zeroes_with_unmap(BlockDriverState *bs);
+>>   int bdrv_block_status(BlockDriverState *bs, int64_t offset,
+>>                         int64_t bytes, int64_t *pnum, int64_t *map,
+>> diff --git a/include/block/block_int.h b/include/block/block_int.h
+>> index 92335f33c7..c156b22c6b 100644
+>> --- a/include/block/block_int.h
+>> +++ b/include/block/block_int.h
+>> @@ -115,7 +115,18 @@ struct BlockDriver {
+>>        */
+>>       bool bdrv_needs_filename;
+>> -    /* Set if a driver can support backing files */
+>> +    /*
+>> +     * Set if a driver can support backing files. This also implies the
+>> +     * following semantics:
+>> +     *
+>> +     *  - Return status 0 of .bdrv_co_block_status means that corresponding
+>> +     *    blocks are not allocated in this layer of backing-chain
+>> +     *  - For such (unallocated) blocks, read will:
+>> +     *    - read from backing file if there is one and big enough
+> 
+> s/and/and it is/
+> 
+>> +     *    - fill buffer with zeroes if there is no backing file
+>> +     *    - space after EOF of the backing file considered as zero
+>> +     *      (corresponding part of read-buffer must be zeroed by driver)
+> 
+> Does the driver actually have to do the zeroing?  Looking at qcow2.c, I see:
+> static coroutine_fn int qcow2_co_preadv_task(BlockDriverState *bs,
+> ...
+> 
+>      case QCOW2_CLUSTER_UNALLOCATED:
+>          assert(bs->backing); /* otherwise handled in qcow2_co_preadv_part */
+> 
+>          BLKDBG_EVENT(bs->file, BLKDBG_READ_BACKING_AIO);
+>          return bdrv_co_preadv_part(bs->backing, offset, bytes,
+>                                     qiov, qiov_offset, 0);
+> 
+> which just defers to the block layer to handle read-beyond-EOF, rather than an explicit memset in the driver.
+> 
+> So maybe you can simplify to:
+> - For such (unallocated) blocks, read will:
+>    - fill buffer with zeros if there is no backing file
+>    - read from the backing file otherwise, where the block layer
+>      takes care of reading zeros beyond EOF if backing file is short
+> 
+> But the effect is the same.
+> 
+>> +++ b/block/io.c
+>> @@ -2385,16 +2385,16 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+>>       if (ret & (BDRV_BLOCK_DATA | BDRV_BLOCK_ZERO)) {
+>>           ret |= BDRV_BLOCK_ALLOCATED;
+>> -    } else if (want_zero) {
+>> -        if (bdrv_unallocated_blocks_are_zero(bs)) {
+>> -            ret |= BDRV_BLOCK_ZERO;
+>> -        } else if (bs->backing) {
+>> +    } else if (want_zero && bs->drv->supports_backing) {
+>> +        if (bs->backing) {
+>>               BlockDriverState *bs2 = bs->backing->bs;
+>>               int64_t size2 = bdrv_getlength(bs2);
+>>               if (size2 >= 0 && offset >= size2) {
+>>                   ret |= BDRV_BLOCK_ZERO;
+>>               }
+>> +        } else {
+>> +            ret |= BDRV_BLOCK_ZERO;
+>>           }
+> 
+> I like this part of the change.  But if it is done first in the series, it _does_ have a semantic impact on protocol drivers (previously, protocol drivers that return 0 but set the field .unallocated_blocks_are_zero will be changed to report _ZERO; after this patch, protocol drivers do not do that, because they don't support backing files, and it is now only backing files that do the _ZERO magic).  So doing _just_ this change, along with a better analysis of how it changes the semantics of 'qemu-io -c map' on protocol drivers while mentioning why that is okay, would make a better start to the series, rather than here at the end.  Of course, if you defer it to the end, then none of the protocol drivers set .unallocated_blocks_are_zero anyway, but that cost more review work on each altered protocol driver.
+> 
+
 
 -- 
-2.26.2
-
+Best regards,
+Vladimir
 
