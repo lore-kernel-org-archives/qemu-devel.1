@@ -2,104 +2,86 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44848C38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:56:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C252C38A24
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:56:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 102972073A
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:56:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1083E2073A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:56:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IH0vssel"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 102972073A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Evxa8A3A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1083E2073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWh0g-0006mw-3z
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 09:56:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35844)
+	id 1jWh0q-0006wj-7x
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 09:56:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34784)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jWgxq-0001zN-OF
- for qemu-devel@nongnu.org; Thu, 07 May 2020 09:53:26 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43619
+ (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
+ id 1jWguY-0005B0-8K
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 09:50:02 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37078
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jWgxp-0003yM-VI
- for qemu-devel@nongnu.org; Thu, 07 May 2020 09:53:26 -0400
+ (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
+ id 1jWguV-0004Fs-Pg
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 09:50:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588859604;
+ s=mimecast20190719; t=1588859398;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=e8gNxRdoO7T7Jh9XsKdugx/FZO/g8FJ3Zbk8I++SmJk=;
- b=IH0vsselSbmJJPy3SENeu6GwxStcGBjUGUJXRK6sx9+NBeUR6dick583iRMW2DSK/hTIcx
- IhnP+eJvIc8ftIm+3jO/TwIhji9z/OFP1rbwUhViGi7oUvRoghPJIU2P+G0SdX/Jjx/s/H
- PkWW6ar5adb48B0uPh5kxxlziSbaiNM=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-zjbmNobfO7uA4lLtuVmx3Q-1; Thu, 07 May 2020 09:53:20 -0400
-X-MC-Unique: zjbmNobfO7uA4lLtuVmx3Q-1
-Received: by mail-wm1-f72.google.com with SMTP id a206so372067wmh.6
- for <qemu-devel@nongnu.org>; Thu, 07 May 2020 06:53:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=oGhvpbKRRF12rPLBlUaWRAJu5Zn5LwTdeQhQdoMKA7Y=;
- b=T3rgjBYYEcSmhxaV4FR1txHPkJ9LuvPrtZgPYdmBvwV8mJlT1/d+hTDzieJTNgShDl
- bhKyCn43HBopfON2HM0fCL6F9d2XfUwoCTbBMCkOW7cOW8W4Lc60FuQd5+bOp9saPO+Y
- bg9NXY1F47bVS+Br2UYqaos6g9nxkFoq4VtOpDfOUuxMweCtxQpR7FKdSV56rBDzNfn4
- WFG+F16/pxgbjn3rBKg7kdSKmPdv3hm0T3G/t1OME/X56vvtWNy6eCY/DGEwUuWRzBxA
- 4RZmLT9MActfV1CnjKOfEGc0imTqt9vnUvPQ17ulfguZDRK9sk3wKN/avRb+iat1W81s
- 3DFA==
-X-Gm-Message-State: AGi0PubeDFBxBl6OyfCUhzdSmFEF/npuoqXvHzMnOEky7PWHkZyr/w5K
- v21bh74z+AAjlJ6UfWrEN3YH9r8m/aiOy5PW3ayi8QV/vu3gYOnN/0Xy/u5O/Drv1l2SSR6VUVl
- RJQ2s/Il2NfAwu5U=
-X-Received: by 2002:adf:e28c:: with SMTP id v12mr17561604wri.157.1588859598948; 
- Thu, 07 May 2020 06:53:18 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLs3UUgz62xquy70CAaGxyZ83eD6WbwuK2+WAQF6WyDB7dWt4n+ie9uEbm58tLZVZ4P6RM+7w==
-X-Received: by 2002:adf:e28c:: with SMTP id v12mr17561568wri.157.1588859598691; 
- Thu, 07 May 2020 06:53:18 -0700 (PDT)
-Received: from [192.168.1.39] (248.red-88-21-203.staticip.rima-tde.net.
- [88.21.203.248])
- by smtp.gmail.com with ESMTPSA id q74sm587281wme.14.2020.05.07.06.53.17
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 07 May 2020 06:53:18 -0700 (PDT)
-Subject: Re: [PATCH v5 05/15] acpi: move aml builder code for serial device
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-References: <20200507131640.14041-1-kraxel@redhat.com>
- <20200507131640.14041-6-kraxel@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <9776cfdf-f3d2-57d6-69e0-ae16380d6fea@redhat.com>
-Date: Thu, 7 May 2020 15:53:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ bh=k3Z66kkuiR9aG62JuAgsT0L+YxBIBApb6k2KUo4EdNc=;
+ b=Evxa8A3AmIzB4PUg8H7T7v915bQF61D5RxtfXvLrmpf1jLMj1TLlRtFM/lJILRN6et8VLh
+ ms9iavQgPNr79G52nGYqZ3jCaY7ahpyubXY20VGDxLK+k9WJSkzsTEt6tCovu+iHGfOR8j
+ 0tIDSvAHMAMWRxEzpreCbfXJRUD/tFc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-198-EbLiiLPFPme6a93fqTBVbQ-1; Thu, 07 May 2020 09:49:55 -0400
+X-MC-Unique: EbLiiLPFPme6a93fqTBVbQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B2AB872FE1;
+ Thu,  7 May 2020 13:49:54 +0000 (UTC)
+Received: from thinkpad.redhat.com (ovpn-114-199.ams2.redhat.com
+ [10.36.114.199])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4E92E10013BD;
+ Thu,  7 May 2020 13:49:33 +0000 (UTC)
+From: Laurent Vivier <lvivier@redhat.com>
+To: lvivier@redhat.com,
+	qemu-devel@nongnu.org
+Subject: [RFC v4 4/6] qmp: add QMP command x-debug-virtio-queue-status
+Date: Thu,  7 May 2020 15:47:58 +0200
+Message-Id: <20200507134800.10837-5-lvivier@redhat.com>
+In-Reply-To: <20200507134800.10837-1-lvivier@redhat.com>
+References: <20200507134800.10837-1-lvivier@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200507131640.14041-6-kraxel@redhat.com>
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=lvivier@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 00:55:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 02:00:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -113,135 +95,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ qemu-block@nongnu.org, Amit Shah <amit@kernel.org>,
+ Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ David Hildenbrand <david@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/7/20 3:16 PM, Gerd Hoffmann wrote:
-> The code uses the isa_serial_io array to figure what the device uid is.
-> Side effect is that acpi antries are not limited to port 1+2 any more,
-> we'll also get entries for ports 3+4.
->=20
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+This new command shows internal status of a VirtQueue.
+(vrings and indexes).
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+---
+ hw/virtio/virtio-stub.c |  6 +++
+ hw/virtio/virtio.c      | 35 +++++++++++++++
+ qapi/virtio.json        | 98 +++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 139 insertions(+)
 
-> ---
->   hw/char/serial-isa.c | 22 ++++++++++++++++++++++
->   hw/i386/acpi-build.c | 32 --------------------------------
->   2 files changed, 22 insertions(+), 32 deletions(-)
->=20
-> diff --git a/hw/char/serial-isa.c b/hw/char/serial-isa.c
-> index f9b6eed7833d..165e320e65f0 100644
-> --- a/hw/char/serial-isa.c
-> +++ b/hw/char/serial-isa.c
-> @@ -27,6 +27,7 @@
->   #include "qapi/error.h"
->   #include "qemu/module.h"
->   #include "sysemu/sysemu.h"
-> +#include "hw/acpi/aml-build.h"
->   #include "hw/char/serial.h"
->   #include "hw/isa/isa.h"
->   #include "hw/qdev-properties.h"
-> @@ -81,6 +82,25 @@ static void serial_isa_realizefn(DeviceState *dev, Err=
-or **errp)
->       isa_register_ioport(isadev, &s->io, isa->iobase);
->   }
->  =20
-> +static void serial_isa_build_aml(ISADevice *isadev, Aml *scope)
-> +{
-> +    ISASerialState *isa =3D ISA_SERIAL(isadev);
-> +    Aml *dev;
-> +    Aml *crs;
-> +
-> +    crs =3D aml_resource_template();
-> +    aml_append(crs, aml_io(AML_DECODE16, isa->iobase, isa->iobase, 0x00,=
- 0x08));
-> +    aml_append(crs, aml_irq_no_flags(isa->isairq));
-> +
-> +    dev =3D aml_device("COM%d", isa->index + 1);
-> +    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0501")));
-> +    aml_append(dev, aml_name_decl("_UID", aml_int(isa->index + 1)));
-> +    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
-> +    aml_append(dev, aml_name_decl("_CRS", crs));
-> +
-> +    aml_append(scope, dev);
-> +}
-> +
->   static const VMStateDescription vmstate_isa_serial =3D {
->       .name =3D "serial",
->       .version_id =3D 3,
-> @@ -103,9 +123,11 @@ static Property serial_isa_properties[] =3D {
->   static void serial_isa_class_initfn(ObjectClass *klass, void *data)
->   {
->       DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +    ISADeviceClass *isa =3D ISA_DEVICE_CLASS(klass);
->  =20
->       dc->realize =3D serial_isa_realizefn;
->       dc->vmsd =3D &vmstate_isa_serial;
-> +    isa->build_aml =3D serial_isa_build_aml;
->       device_class_set_props(dc, serial_isa_properties);
->       set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
->   }
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 3a82730a0d19..0e6a5151f4c3 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -1208,36 +1208,6 @@ static Aml *build_lpt_device_aml(void)
->       return dev;
->   }
->  =20
-> -static void build_com_device_aml(Aml *scope, uint8_t uid)
-> -{
-> -    Aml *dev;
-> -    Aml *crs;
-> -    uint8_t irq =3D 4;
-> -    uint16_t io_port =3D 0x03F8;
-> -
-> -    assert(uid =3D=3D 1 || uid =3D=3D 2);
-> -    if (uid =3D=3D 2) {
-> -        irq =3D 3;
-> -        io_port =3D 0x02F8;
-> -    }
-> -    if (!memory_region_present(get_system_io(), io_port)) {
-> -        return;
-> -    }
-> -
-> -    dev =3D aml_device("COM%d", uid);
-> -    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0501")));
-> -    aml_append(dev, aml_name_decl("_UID", aml_int(uid)));
-> -
-> -    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
-> -
-> -    crs =3D aml_resource_template();
-> -    aml_append(crs, aml_io(AML_DECODE16, io_port, io_port, 0x00, 0x08));
-> -    aml_append(crs, aml_irq_no_flags(irq));
-> -    aml_append(dev, aml_name_decl("_CRS", crs));
-> -
-> -    aml_append(scope, dev);
-> -}
-> -
->   static void build_isa_devices_aml(Aml *table)
->   {
->       ISADevice *fdc =3D pc_find_fdc0();
-> @@ -1252,8 +1222,6 @@ static void build_isa_devices_aml(Aml *table)
->           aml_append(scope, build_fdc_device_aml(fdc));
->       }
->       aml_append(scope, build_lpt_device_aml());
-> -    build_com_device_aml(scope, 1);
-> -    build_com_device_aml(scope, 2);
->  =20
->       if (ambiguous) {
->           error_report("Multiple ISA busses, unable to define IPMI ACPI d=
-ata");
->=20
+diff --git a/hw/virtio/virtio-stub.c b/hw/virtio/virtio-stub.c
+index ddb592f72eee..3c1bf172acf6 100644
+--- a/hw/virtio/virtio-stub.c
++++ b/hw/virtio/virtio-stub.c
+@@ -17,3 +17,9 @@ VirtioStatus *qmp_x_debug_virtio_status(const char* path,=
+ Error **errp)
+ {
+     return qmp_virtio_unsupported(errp);
+ }
++
++VirtQueueStatus *qmp_x_debug_virtio_queue_status(const char *path,
++                                                 uint16_t queue, Error **e=
+rrp)
++{
++    return qmp_virtio_unsupported(errp);
++}
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 59bf6ef651a6..57552bf05014 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -3877,6 +3877,41 @@ static VirtIODevice *virtio_device_find(const char *=
+path)
+     return NULL;
+ }
+=20
++VirtQueueStatus *qmp_x_debug_virtio_queue_status(const char *path,
++                                                 uint16_t queue, Error **e=
+rrp)
++{
++    VirtIODevice *vdev;
++    VirtQueueStatus *status;
++
++    vdev =3D virtio_device_find(path);
++    if (vdev =3D=3D NULL) {
++        error_setg(errp, "Path %s is not a VirtIO device", path);
++        return NULL;
++    }
++
++    if (queue >=3D VIRTIO_QUEUE_MAX || !virtio_queue_get_num(vdev, queue))=
+ {
++        error_setg(errp, "Invalid virtqueue number %d", queue);
++        return NULL;
++    }
++
++    status =3D g_new0(VirtQueueStatus, 1);
++    status->queue_index =3D vdev->vq[queue].queue_index;
++    status->inuse =3D vdev->vq[queue].inuse;
++    status->vring_num =3D vdev->vq[queue].vring.num;
++    status->vring_num_default =3D vdev->vq[queue].vring.num_default;
++    status->vring_align =3D vdev->vq[queue].vring.align;
++    status->vring_desc =3D vdev->vq[queue].vring.desc;
++    status->vring_avail =3D vdev->vq[queue].vring.avail;
++    status->vring_used =3D vdev->vq[queue].vring.used;
++    status->last_avail_idx =3D vdev->vq[queue].last_avail_idx;
++    status->shadow_avail_idx =3D vdev->vq[queue].shadow_avail_idx;
++    status->used_idx =3D vdev->vq[queue].used_idx;
++    status->signalled_used =3D vdev->vq[queue].signalled_used;
++    status->signalled_used_valid =3D vdev->vq[queue].signalled_used_valid;
++
++    return status;
++}
++
+ #define CONVERT_FEATURES(type, map)                \
+     ({                                           \
+         type *list =3D NULL;                         \
+diff --git a/qapi/virtio.json b/qapi/virtio.json
+index 69dd107d0c9b..43c234a9fc69 100644
+--- a/qapi/virtio.json
++++ b/qapi/virtio.json
+@@ -308,3 +308,101 @@
+   'data': { 'path': 'str' },
+   'returns': 'VirtioStatus'
+ }
++
++##
++# @VirtQueueStatus:
++#
++# Status of a VirtQueue
++#
++# @queue-index: VirtQueue queue_index
++#
++# @inuse: VirtQueue inuse
++#
++# @vring-num: VirtQueue vring.num
++#
++# @vring-num-default: VirtQueue vring.num_default
++#
++# @vring-align: VirtQueue vring.align
++#
++# @vring-desc: VirtQueue vring.desc
++#
++# @vring-avail: VirtQueue vring.avail
++#
++# @vring-used: VirtQueue vring.used
++#
++# @last-avail-idx: VirtQueue last_avail_idx
++#
++# @shadow-avail-idx: VirtQueue shadow_avail_idx
++#
++# @used-idx: VirtQueue used_idx
++#
++# @signalled-used: VirtQueue signalled_used
++#
++# @signalled-used-valid: VirtQueue signalled_used_valid
++#
++# Since: 5.1
++#
++##
++
++{ 'struct': 'VirtQueueStatus',
++  'data': {
++    'queue-index': 'uint16',
++    'inuse': 'uint32',
++    'vring-num': 'int',
++    'vring-num-default': 'int',
++    'vring-align': 'int',
++    'vring-desc': 'uint64',
++    'vring-avail': 'uint64',
++    'vring-used': 'uint64',
++    'last-avail-idx': 'uint16',
++    'shadow-avail-idx': 'uint16',
++    'used-idx': 'uint16',
++    'signalled-used': 'uint16',
++    'signalled-used-valid': 'uint16'
++  }
++}
++
++##
++# @x-debug-virtio-queue-status:
++#
++# Return the status of a given VirtQueue
++#
++# @path: QOBject path of the VirtIODevice
++#
++# @queue: queue number to examine
++#
++# Returns: Status of the VirtQueue
++#
++# Since: 5.1
++#
++# Example:
++#
++# -> { "execute": "x-debug-virtio-queue-status",
++#      "arguments": {
++#          "path": "/machine/peripheral-anon/device[3]/virtio-backend",
++#          "queue": 0
++#      }
++#   }
++# <- { "return": {
++#      "signalled-used": 373,
++#      "inuse": 0,
++#      "vring-desc": 864411648,
++#      "vring-num-default": 256,
++#      "signalled-used-valid": 1,
++#      "vring-avail": 864415744,
++#      "last-avail-idx": 373,
++#      "queue-index": 0,
++#      "vring-used": 864416320,
++#      "shadow-avail-idx": 619,
++#      "used-idx": 373,
++#      "vring-num": 256,
++#      "vring-align": 4096
++#      }
++#    }
++#
++##
++
++{ 'command': 'x-debug-virtio-queue-status',
++  'data': { 'path': 'str', 'queue': 'uint16' },
++  'returns': 'VirtQueueStatus'
++}
+--=20
+2.26.2
 
 
