@@ -2,107 +2,67 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2E5FC38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 16:25:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F78EC38A24
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 16:36:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CD972083B
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 16:25:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ATK45EsY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CD972083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5110820643
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 16:36:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5110820643
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWjKu-00084w-Jy
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 12:25:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41156)
+	id 1jWjVa-0002sS-C1
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 12:36:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44406)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jWjKH-0007Qi-G9
- for qemu-devel@nongnu.org; Thu, 07 May 2020 12:24:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42762
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jWjKF-0004zB-Lk
- for qemu-devel@nongnu.org; Thu, 07 May 2020 12:24:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588868680;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Y4qAclFnl9n6aLCNsz1yjmf+UolQnMzPbDgXy0E/uVQ=;
- b=ATK45EsY8SPckWcZgLaPbGf59Q3fNaiQH6jX3N0sQ5n9FHOfJjkoGrebJfnb2DgnduTO+e
- 1w6YquIRMKQXhu2HJ9qH6soCTSS+HjJZLV23UfuXtFagkQI5YR+FAxSTooqQ7/f777VkPH
- 3xqJe8i8OXgmr51eCRon7U4ss6eie6U=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-327-M65L3SiYNj-wayK11brmRQ-1; Thu, 07 May 2020 12:24:37 -0400
-X-MC-Unique: M65L3SiYNj-wayK11brmRQ-1
-Received: by mail-wr1-f71.google.com with SMTP id g10so3736903wrr.10
- for <qemu-devel@nongnu.org>; Thu, 07 May 2020 09:24:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to;
- bh=KMF5LqoPzB8XFZampQNMX7Qi3EOzXSSLI6wO6rwu5wg=;
- b=E2ofkJkmcJAWbRrJafLbpYJMewj85YH8/ucKbEbQGOWSwTx/eyFdXN+9sAsDo6zLC+
- HXZqq/xpjoltk94rImm57N4uRLG4f1WyDKjr5YHmeIBHwDg5XA6ml3vxHL7ESVdt9JEd
- j4ztnrteKFeTg+vrKMEo+ltFKCYpeKWf+D9WLj3bqdae4OhiiIUBrvdnWR+2w3ipAURK
- l9afFbb0iuUAzJ9bAOgNzCbqbssmAaLFtCXFZgE+5DnMpSctcBSfBO26ouyXA1XaeTQW
- n0XePziuwYOQwrCn8o5UIQM8c5cJW/mkdZ1uw2ecA07GUMyzNHCzvowEiAf7GZUZwU1/
- TI5Q==
-X-Gm-Message-State: AGi0PuaDQlcaJHIfPR02+LoRi3HVw2KwAlFTpJiEbHV3DG52riwFFRQh
- +qNCrqTLBAelX7QZLa6P/aapIguzSvP+/nzo/jcWmmQKTE6IyT5xfALLZY+aqkoySm3Z7lE4xtH
- ojOr6skzEnXqdfXY=
-X-Received: by 2002:adf:e74a:: with SMTP id c10mr16397356wrn.109.1588868676479; 
- Thu, 07 May 2020 09:24:36 -0700 (PDT)
-X-Google-Smtp-Source: APiQypKQSAnm1kMPRgmnH15U/kpmIK/to6cLZyjxUeD/3yoQ9+VqG08QixF5FuSt1gQLImQ8W3aVPA==
-X-Received: by 2002:adf:e74a:: with SMTP id c10mr16397338wrn.109.1588868676258; 
- Thu, 07 May 2020 09:24:36 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:8d3e:39e5:cd88:13cc?
- ([2001:b07:6468:f312:8d3e:39e5:cd88:13cc])
- by smtp.gmail.com with ESMTPSA id k6sm9272266wma.19.2020.05.07.09.24.35
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 07 May 2020 09:24:35 -0700 (PDT)
-Subject: Re: [RFC PATCH 6/6] hw/block/nvme: Make device target agnostic
-To: Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-References: <20200504094641.4963-1-philmd@redhat.com>
- <20200504094641.4963-7-philmd@redhat.com>
- <9a46b1b4-bfbf-21bd-cc66-5904e784150c@redhat.com>
- <20200507100435.GG34079@stefanha-x1.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <694917e5-294c-bf57-8916-d86ce74edb1f@redhat.com>
-Date: Thu, 7 May 2020 18:24:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jWjUy-0002TY-9x
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 12:35:48 -0400
+Received: from 2.mo6.mail-out.ovh.net ([46.105.76.65]:53142)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jWjUw-0003l9-4r
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 12:35:48 -0400
+Received: from player761.ha.ovh.net (unknown [10.108.42.167])
+ by mo6.mail-out.ovh.net (Postfix) with ESMTP id 4847920EAB0
+ for <qemu-devel@nongnu.org>; Thu,  7 May 2020 18:35:42 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player761.ha.ovh.net (Postfix) with ESMTPSA id 9CA061224844D;
+ Thu,  7 May 2020 16:35:40 +0000 (UTC)
+Date: Thu, 7 May 2020 18:35:36 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH] 9pfs: Fix potential deadlock of QEMU mainloop
+Message-ID: <20200507183536.1714287f@bahia.lan>
+In-Reply-To: <3839530.O0e2CIhMhP@silver>
+References: <158826201391.1344781.9403916162733181811.stgit@bahia.lan>
+ <8590081.eFxiLWWr9E@silver> <20200507163328.4736534d@bahia.lan>
+ <3839530.O0e2CIhMhP@silver>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200507100435.GG34079@stefanha-x1.localdomain>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="aEjiGRKjX1hgzpjGj3EUZ3Q4GdwkcrCTs"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 03:56:18
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 4097431238336026944
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrkedtgddutddtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeehkefhtdehgeehheejledufeekhfdvleefvdeihefhkefhudffhfeuuedvffdthfenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeeiuddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=46.105.76.65; envelope-from=groug@kaod.org;
+ helo=2.mo6.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 12:35:42
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -115,65 +75,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Beata Michalska <beata.michalska@linaro.org>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aEjiGRKjX1hgzpjGj3EUZ3Q4GdwkcrCTs
-Content-Type: multipart/mixed; boundary="LyXizUDjDR3ex5jtGRubyM3oMZgJzz9ok"
+On Thu, 07 May 2020 17:03:46 +0200
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
 
---LyXizUDjDR3ex5jtGRubyM3oMZgJzz9ok
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+> On Donnerstag, 7. Mai 2020 16:33:28 CEST Greg Kurz wrote:
+> > > I also haven't reviewed QEMU's lock implementations in very detail, but
+> > > IIRC CoMutexes are completely handled in user space, while QemuMutex uses
+> > > regular OS mutexes and hence might cost context switches.
+> > 
+> > ... since the locking would only been exercised with an hypothetical
+> > client doing stupid things, this is beginning to look like bike-shedding
+> > to me. :)
+> 
+> Aha, keep that in mind when you're doing your next review. ;-)
+> 
 
-On 07/05/20 12:04, Stefan Hajnoczi wrote:
->>>               (NVME_PMRCAP_PMRWBM(n->bar.pmrcap) & 0x02)) {
->>> -            qemu_ram_writeback(n->pmrdev->mr.ram_block,
->>> -                               0, n->pmrdev->size);
->>> +            memory_region_do_writeback(&n->pmrdev->mr, 0, n->pmrdev->s=
-ize);
-> qemu_ram_write() is being called because we need to msync or persist
-> pmem here.
->=20
-> The memory_region_do_writeback() API is not equivalent, its purpose is
-> for dirty write logging (which we don't care about here because the
-> writes themselves will already have been logged when the guest performed
-> them).
->=20
-> I think qemu_ram_writeback() should just be made common so that this
-> code isn't target-specific. Maybe it should be renamed to
-> qemu_ram_msync() to avoid confusion with dirty write APIs.
+Fair enough. :)
 
-Yes, we can add qemu_ram_msync and memory_region_msync.
+> No seriously, like I said, I don't really care too much about Mutex vs. 
+> CoMutex in you patch here. It was actually more about wide-picture thinking, 
+> i.e. other places of (co)mutexes being used or other potential changes that 
+> would make this or other uses more relevant one day.
+> 
 
-Paolo
+Then I agree with you that it would be better to use CoMutex if we were
+experiencing thread pool exhaustion indeed.
 
+> > > > > > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> > > > > > index 9e046f7acb51..ac84ae804496 100644
+> > > > > > --- a/hw/9pfs/9p.c
+> > > > > > +++ b/hw/9pfs/9p.c
+> > > > > > @@ -2170,7 +2170,7 @@ static int coroutine_fn
+> > > > > > v9fs_do_readdir_with_stat(V9fsPDU *pdu, int32_t count = 0;
+> > > > > > 
+> > > > > >      struct stat stbuf;
+> > > > > >      off_t saved_dir_pos;
+> > > > > > 
+> > > > > > -    struct dirent *dent;
+> > > > > > +    struct dirent dent;
+> > > > > > 
+> > > > > >      /* save the directory position */
+> > > > > >      saved_dir_pos = v9fs_co_telldir(pdu, fidp);
+> > > > > > 
+> > > > > > @@ -2181,13 +2181,11 @@ static int coroutine_fn
+> > > > > > v9fs_do_readdir_with_stat(V9fsPDU *pdu, while (1) {
+> > > > > > 
+> > > > > >          v9fs_path_init(&path);
+> > > > > > 
+> > > > > > -        v9fs_readdir_lock(&fidp->fs.dir);
+> > > > > > -
+> > > > > 
+> > > > > That's the deadlock fix, but ...
+> > > > > 
+> > > > > >          err = v9fs_co_readdir(pdu, fidp, &dent);
+> > > > > > 
+> > > > > > -        if (err || !dent) {
+> > > > > > +        if (err <= 0) {
+> > > > > > 
+> > > > > >              break;
+> > > > > >          
+> > > > > >          }
+> > > > > 
+> > > > > ... even though this code simplification might make sense, I don't
+> > > > > think
+> > > > > it
+> > > > > should be mixed with the deadlock fix together in one patch. They are
+> > > > > not
+> > > > 
+> > > > I could possibly split this in two patches, one for returning a copy
+> > > > and one for moving the locking around, but...
+> > > > 
+> > > > > related with each other, nor is the code simplification you are aiming
+> > > > > trivial
+> > > > 
+> > > > ... this assertion is somewhat wrong: moving the locking to
+> > > > v9fs_co_readdir() really requires it returns a copy.
+> > > 
+> > > Yeah, I am also not sure whether a split would make it more trivial enough
+> > > in this case to be worth the hassle. If you find an acceptable solution,
+> > > good, if not then leave it one patch.
+> > 
+> > Another option would be to g_malloc() the dirent in v9fs_co_readdir() and
+> > g_free() in the callers. This would cause less churn since we could keep
+> > the same function signature.
+> 
+> I was actually just going to suggest the same. So yes, looks like a less 
+> invasive change to me.
+> 
 
---LyXizUDjDR3ex5jtGRubyM3oMZgJzz9ok--
+I'll just do that then :)
 
---aEjiGRKjX1hgzpjGj3EUZ3Q4GdwkcrCTs
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl60NkIACgkQv/vSX3jH
-roNykwgAiiMWIxgYDeZT5CL4Omh1d37EezL4s4wHJWjAmUBhyb0oiO/MtYdGyJYe
-likeByQFLcGOFoe1P28ZlrnE83hgryV4sEvGaqKEHzKRR5D18Nci8j8hJv8iTvgL
-SpfOKqSpcCMxVgv6fgyD5c1kr2e+ctih+VqOAxN+ct9i8etLQNIt9kHUD3KUQmW7
-kxhvjIn/tAlA2rv/G8vMba71iieBmZMPAKc6TrUFByyYPb2vw6dcf2Qokd7tNdXK
-XjxMn9zxPNmOdB5DGKvFtCUlnzjCVNxpSmZnxELy8YfJdbs4t5OBOh6y7JcwGKSs
-jfmZnN2k5ra7ePIydZQOUfkJT8zmbA==
-=A1pQ
------END PGP SIGNATURE-----
-
---aEjiGRKjX1hgzpjGj3EUZ3Q4GdwkcrCTs--
+> Best regards,
+> Christian Schoenebeck
+> 
+> 
 
 
