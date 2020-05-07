@@ -2,64 +2,65 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBC0EC38A2A
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 09:20:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D6A0C38A2A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 09:27:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A75CB2078C
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 09:20:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C9BF20870
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 09:27:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UiQ4BsFA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A75CB2078C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bDMgJAIz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C9BF20870
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWchk-00066g-Qn
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 05:20:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58918)
+	id 1jWcod-00088y-IY
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 05:27:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60244)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jWch7-0005Xj-RH
- for qemu-devel@nongnu.org; Thu, 07 May 2020 05:19:53 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22708
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jWco1-0007Ys-NQ
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 05:27:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36275
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jWch6-0004Je-VC
- for qemu-devel@nongnu.org; Thu, 07 May 2020 05:19:53 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jWco0-0001HE-Sc
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 05:27:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588843192;
+ s=mimecast20190719; t=1588843619;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=8dObnSWUGUEPGBMVpF7pcaJii4/0yJr5w0zaFqBieKc=;
- b=UiQ4BsFA8f2808Qp0IAhgQ4iQ7F8LcipBCPOaAFUVmuAUVMUAvjjc9f8yseN9wEPabYtpG
- haU1jGtwpjUMrSVmps/08w6vOYGtwo9vzCze/JA1es9656jz2k7RrXoIknnurPcDaLmiMd
- B+VsV0N8xb8k96LdZnHv19sN7fF37q0=
+ bh=3jAj7/8aIeRERQdPZo7DUUI/RhXcJzSiVtXKrfyD5j4=;
+ b=bDMgJAIzWywG2kSp4yH+3lQM4XXfYvizJGJRu8GaLCim4mhCMEwB8kLBEIFwYmwfAIs1ay
+ 0zxvjXM2DX1TIwhS0NqFE+EX9JLuhYw3Jzswaa9QdVMtPMQu/3Rusd8GQ7qkFkIwxnOLQh
+ WuRKOh3FSZF3p5BE27XJgWNcKMM1Y/E=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-466-lxf3vw-gOKKhDHcX0kIB5A-1; Thu, 07 May 2020 05:19:49 -0400
-X-MC-Unique: lxf3vw-gOKKhDHcX0kIB5A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-211-OAi9U1NqNJCk4UKd5Yv8SQ-1; Thu, 07 May 2020 05:26:54 -0400
+X-MC-Unique: OAi9U1NqNJCk4UKd5Yv8SQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C36445F;
- Thu,  7 May 2020 09:19:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1F5E1005510;
+ Thu,  7 May 2020 09:26:53 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-114-92.ams2.redhat.com
  [10.36.114.92])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BFDEC60CCC;
- Thu,  7 May 2020 09:19:47 +0000 (UTC)
-Subject: Re: [PATCH v3 15/33] block: Pull out bdrv_default_perms_for_backing()
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 514CD579AD;
+ Thu,  7 May 2020 09:26:51 +0000 (UTC)
+Subject: Re: [PATCH v3 18/33] block: Add bdrv_default_perms()
 To: Kevin Wolf <kwolf@redhat.com>
 References: <20200218124242.584644-1-mreitz@redhat.com>
- <20200218124242.584644-16-mreitz@redhat.com>
- <20200506132134.GF6333@linux.fritz.box>
+ <20200218124242.584644-19-mreitz@redhat.com>
+ <20200506134712.GG6333@linux.fritz.box>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -85,28 +86,29 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <f9a3de21-96bf-9dfc-8b33-14e1885cd046@redhat.com>
-Date: Thu, 7 May 2020 11:19:45 +0200
+Message-ID: <96f61257-4d85-816a-e114-f3ebefdda029@redhat.com>
+Date: Thu, 7 May 2020 11:26:49 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200506132134.GF6333@linux.fritz.box>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200506134712.GG6333@linux.fritz.box>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="mc9oww5y1w46DHZgv0khT7MQDRYDjE1dt"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 02:00:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+ boundary="qoN9KoiKYLiLnB6icOCcfO36HcKy6ZpGo"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 03:56:18
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -125,52 +127,168 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mc9oww5y1w46DHZgv0khT7MQDRYDjE1dt
-Content-Type: multipart/mixed; boundary="0XCXKeKMJRjNK8HXR8FFhY8xdrNF0w0OZ"
+--qoN9KoiKYLiLnB6icOCcfO36HcKy6ZpGo
+Content-Type: multipart/mixed; boundary="ohCnhBjC3Rsb1GhwyJ8kJ27GjLVZFNWQj"
 
---0XCXKeKMJRjNK8HXR8FFhY8xdrNF0w0OZ
+--ohCnhBjC3Rsb1GhwyJ8kJ27GjLVZFNWQj
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 06.05.20 15:21, Kevin Wolf wrote:
+On 06.05.20 15:47, Kevin Wolf wrote:
 > Am 18.02.2020 um 13:42 hat Max Reitz geschrieben:
->> Right now, bdrv_format_default_perms() is used by format parents
->> (generally). We want to switch to a model where most parents use a
->> single BdrvChildClass, which then decides the permissions based on the
->> child role. To do so, we have to split bdrv_format_default_perms() into
->> separate functions for each such role.
+>> This callback can be used by BDSs that use child_of_bds with the
+>> appropriate BdrvChildRole for their children.
+>>
+>> Also, make bdrv_format_default_perms() use it for child_of_bds children
+>> (just a temporary solution until we can drop bdrv_format_default_perms()
+>> altogether).
 >>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> ---
+>>  block.c                   | 46 ++++++++++++++++++++++++++++++++-------
+>>  include/block/block_int.h | 11 ++++++++++
+>>  2 files changed, 49 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/block.c b/block.c
+>> index c0ba274743..3e5b0bc345 100644
+>> --- a/block.c
+>> +++ b/block.c
+>> @@ -2383,14 +2383,12 @@ static void bdrv_default_perms_for_metadata(Bloc=
+kDriverState *bs, BdrvChild *c,
+>>      *nshared =3D shared;
+>>  }
+>> =20
+>> -/* TODO: Use */
+>> -static void __attribute__((unused))
+>> -bdrv_default_perms_for_data(BlockDriverState *bs, BdrvChild *c,
+>> -                            const BdrvChildClass *child_class,
+>> -                            BdrvChildRole role,
+>> -                            BlockReopenQueue *reopen_queue,
+>> -                            uint64_t perm, uint64_t shared,
+>> -                            uint64_t *nperm, uint64_t *nshared)
+>> +static void bdrv_default_perms_for_data(BlockDriverState *bs, BdrvChild=
+ *c,
+>> +                                        const BdrvChildClass *child_cla=
+ss,
+>> +                                        BdrvChildRole role,
+>> +                                        BlockReopenQueue *reopen_queue,
+>> +                                        uint64_t perm, uint64_t shared,
+>> +                                        uint64_t *nperm, uint64_t *nsha=
+red)
+>>  {
+>>      assert(child_class =3D=3D &child_of_bds && (role & BDRV_CHILD_DATA)=
+);
+>> =20
+>> @@ -2425,6 +2423,13 @@ void bdrv_format_default_perms(BlockDriverState *=
+bs, BdrvChild *c,
+>>                                 uint64_t *nperm, uint64_t *nshared)
+>>  {
+>>      bool backing =3D (child_class =3D=3D &child_backing);
+>> +
+>> +    if (child_class =3D=3D &child_of_bds) {
+>> +        bdrv_default_perms(bs, c, child_class, role, reopen_queue,
+>> +                           perm, shared, nperm, nshared);
+>> +        return;
+>> +    }
+>> +
+>>      assert(child_class =3D=3D &child_backing || child_class =3D=3D &chi=
+ld_file);
+>> =20
+>>      if (!backing) {
+>> @@ -2436,6 +2441,31 @@ void bdrv_format_default_perms(BlockDriverState *=
+bs, BdrvChild *c,
+>>      }
+>>  }
+>> =20
+>> +void bdrv_default_perms(BlockDriverState *bs, BdrvChild *c,
+>> +                        const BdrvChildClass *child_class, BdrvChildRol=
+e role,
+>> +                        BlockReopenQueue *reopen_queue,
+>> +                        uint64_t perm, uint64_t shared,
+>> +                        uint64_t *nperm, uint64_t *nshared)
+>> +{
+>> +    assert(child_class =3D=3D &child_of_bds);
+>> +
+>> +    if (role & BDRV_CHILD_FILTERED) {
+>> +        bdrv_filter_default_perms(bs, c, child_class, role, reopen_queu=
+e,
+>> +                                  perm, shared, nperm, nshared);
+>> +    } else if (role & BDRV_CHILD_COW) {
+>> +        bdrv_default_perms_for_backing(bs, c, child_class, role, reopen=
+_queue,
+>> +                                       perm, shared, nperm, nshared);
+>> +    } else if (role & BDRV_CHILD_METADATA) {
+>> +        bdrv_default_perms_for_metadata(bs, c, child_class, role, reope=
+n_queue,
+>> +                                        perm, shared, nperm, nshared);
+>> +    } else if (role & BDRV_CHILD_DATA) {
+>> +        bdrv_default_perms_for_data(bs, c, child_class, role, reopen_qu=
+eue,
+>> +                                    perm, shared, nperm, nshared);
+>> +    } else {
+>> +        g_assert_not_reached();
+>> +    }
+>> +}
 >=20
-> As you want to call this based on the child role, would
-> bdrv_default_perms_for_cow() be a more obvious name?
+> Here the discussion from the start of the series becomes relevant: Which
+> flags can be combined with which other flags, and if multiple flags are
+> set, which one takes precedence?
+>=20
+> First undocumented requirement: You must set at least one of FILTERED,
+> COW, METADATA and DATA.
+>=20
+> Then, for FILTERED we decided to document that DATA shouldn't be set at
+> the same time. I guess neither should COW and METADATA. Apart for
+> documentation, worth an assertion?
+>=20
+> COW seems to be exclusive in practice, too. I guess you could construct
+> a driver that somehow keeps its own (meta)data in its backing file,
+> maybe in the VM state area. It also sounds like a really bad idea. So
+> forbid it, document it and assert it, too?
 
-Sounds good.
+Sounds all good.
+
+> METADATA and DATA can be set at the same time. As your previous patch
+> shows, the function for DATA is a laxer version of the one for METADATA,
+> requesting a subset of the METADATA permissions and sharing a superset.
+> So the order in the code makes sense.
+>=20
+> But can we make sure that this condition will be true in the future?
+> Imagine we find a need for a new permission that is used for data files,
+> but not for metadata. I think at the very least, this deserves a
+> comment. But probably it means that both should stay a single function
+> that can check each flag for the exact permission bits it influences.
+
+Maybe, I=E2=80=99ll see whether it looks good.  If it doesn=E2=80=99t, I co=
+uld also
+rename the _metadata function to _storage, so that it=E2=80=99s generally a
+function that handles metadata+data children (i.e. defined to be
+stricter than the _data function).
 
 Max
 
 
---0XCXKeKMJRjNK8HXR8FFhY8xdrNF0w0OZ--
+--ohCnhBjC3Rsb1GhwyJ8kJ27GjLVZFNWQj--
 
---mc9oww5y1w46DHZgv0khT7MQDRYDjE1dt
+--qoN9KoiKYLiLnB6icOCcfO36HcKy6ZpGo
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6z0rIACgkQ9AfbAGHV
-z0CBPAf+On8uCKh//XdP6NO4C2Co/D45YstoNvptooOYkqEED5KXEV/254Zw5Urr
-TAB0Bz/N9OtbaHGCSOq2QgQht88N3oCk0mnNWDafzsAKruLqOL4GpNxQ0MsjFYg2
-evAAgqK8fypbZqjyvGr/5LVNDKP72htPkhfTRs8n2ctmU/th6FFvs/vsMchCKdOD
-yjbthWn/gmrqWiOJuotOZcyuOl6Vjrj1njZPqd2FdyLTzKCfhLAhgXQojIaKA7sU
-tumnuxUK8Cb1rYkfRTd0rKxD1jja5VR7osA9WBxoIsoNOx4HOmwn4YbiSe09uDbk
-RB6AWZRd6jzfXYaFi/jxG2H/uOgynA==
-=Tio0
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6z1FkACgkQ9AfbAGHV
+z0CsywgAqBMUvrEXOBiJnKHxO6P4wkUCZDkEC9757MLpqgBbBSe+pxFcjWZIehVT
+1dUtb6gogtkwavlPd89aiXPo2MBEui1WCmYuvL3DFB2jclg4Dg3JMru5e9zcZb+r
+GIAq7h8/DwpXfdHn1am9/q02cc6aw4k2vSEWDjE2aK/XMdN0ZlvgSm0DHv2Rb1mr
+pXOBaoHLYiVOBBe52/D80Cibai4CN60Akvrm5RExgcpQ3sPzyQQ0Pdb1qe5czzh6
+DZT/9TBeEoUI8d8/JBqlqruFd7bXm3Os2DrjWgqkZ4v3fA1bESHCD6RceFT5+DZ6
+ZqBUZfBy1YLG/qsa7t/a51o5CqMbWQ==
+=BI5s
 -----END PGP SIGNATURE-----
 
---mc9oww5y1w46DHZgv0khT7MQDRYDjE1dt--
+--qoN9KoiKYLiLnB6icOCcfO36HcKy6ZpGo--
 
 
