@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E824C38A2A
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 17:43:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFDF7C38A2A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 17:43:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EED3520735
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 17:43:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A71D12064A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 17:43:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IrxhOifP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EED3520735
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dzrru/7f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A71D12064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWkYa-0001cE-64
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 13:43:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58674)
+	id 1jWkYm-000218-TW
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 13:43:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58704)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jWkVQ-0004HS-LK
- for qemu-devel@nongnu.org; Thu, 07 May 2020 13:40:20 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43238
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jWkVY-0004SL-Ay
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 13:40:28 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34820
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jWkVP-0001tV-Mr
- for qemu-devel@nongnu.org; Thu, 07 May 2020 13:40:20 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jWkVX-00020v-Fw
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 13:40:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588873219;
+ s=mimecast20190719; t=1588873226;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lxO/QfhV7TdK4OIX7B7RR3nAolSQ5KL0SwXgbuIknFc=;
- b=IrxhOifPTe+j91upsc2c2OXBdBQEeurm9UBtG8tRknIOExAzd0sa11R987aydcVQ9UJ5eH
- U6aBVutYIqH/ZXSH/rCF0RpviK2nqiOTweuCNc9Qs/MTgn+PO6fzqXQjF2ZTQHZHtqxVy4
- ffrCBPPNFi4CDF/hw6uYNO3dDG02BM4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-231-vDE5JFgDPJOIxdrQJLu2sQ-1; Thu, 07 May 2020 13:40:16 -0400
-X-MC-Unique: vDE5JFgDPJOIxdrQJLu2sQ-1
-Received: by mail-wm1-f69.google.com with SMTP id o74so1358353wme.2
- for <qemu-devel@nongnu.org>; Thu, 07 May 2020 10:40:16 -0700 (PDT)
+ bh=ZIo/ym+GwChrjVctsSvXHZCFHOcswzIaMYFLtwhZ4lE=;
+ b=dzrru/7fz/mklnskO3+tTD7YiOLp6j/uEV3iRgqg8if48FKApN0SIHBjinWraYOfUDefMU
+ 2QVbWCzBgjMfrltEUOFVQ/v86nrXEq9oueoGAiU7XBRglC3GoADl1s0GAJ3yqq7Kigd/zP
+ E2eHZgTZmo5y6T3cLXDI9QT9iC9AGq4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-439-FmDPm5V4PCOmGm1V3jHKFw-1; Thu, 07 May 2020 13:40:22 -0400
+X-MC-Unique: FmDPm5V4PCOmGm1V3jHKFw-1
+Received: by mail-wr1-f70.google.com with SMTP id u4so3869705wrm.13
+ for <qemu-devel@nongnu.org>; Thu, 07 May 2020 10:40:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=AYsaK9GNOXZIFUV300k/n6Vn/uB0ELw2OsZ7tcgl1LI=;
- b=KCxjFb4Mvf0PWMi114i882UVszO7MebtyJh9fJvW9FimXet4tFz5dK3EyHnnu/qDta
- FO5sH01SZ38vpfiD4sYCIFzKX0lk6bpLGCf1fYAgwVnUyWKHm1FBhk0UBcI9R4z2ATSx
- GiUi539r2O47hXArtRtaK7Oglw8fhD4bQfcVsb8RAVrw9Uc29UMcgYczNMIELKLxKrbd
- W8hgK9UarOYezHcDkLilgGUACl1iisiIDK7Oj8KVCNiP7TlXcZoihAnM+01gd/biQDtZ
- kOdJYbIKdRO0VyRfdpoNRYr5+6gzBcMGYaO4NPwPWvEO9rZnIFtqrxZbp6rjXKZ1upvd
- BnrA==
-X-Gm-Message-State: AGi0PubnphL7TDaBpHAfh0u3a7KRc1B8oxz+RT4gcawiMPr21BnqvdIK
- ALHKb2PuVRAyBNB/Z6BLPfYl2u8enZsV3zbY/vjiwGeioWpD+XT8uS2lwFe6g7EhtVp6lCUZ+7c
- Rvnj7Cg4wVUwb5+E=
-X-Received: by 2002:a7b:c3d2:: with SMTP id t18mr3291881wmj.100.1588873215514; 
- Thu, 07 May 2020 10:40:15 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJ/AaUMzxN6c9AoFV7na/bw7wTqjkWo0VEqXrFVogrggBfyPF77EaBvs4PKan+/nsLzTJ6QVQ==
-X-Received: by 2002:a7b:c3d2:: with SMTP id t18mr3291851wmj.100.1588873215269; 
- Thu, 07 May 2020 10:40:15 -0700 (PDT)
+ bh=i0MZMfJVODlK5BEAJP5UwDYJxQ9slk7d2GJvo0cW21A=;
+ b=cSabAA1Zr7ui2QAjubogGow4xWJYlL8KSVvIBqspuwZRGdWYN+tWaBX1Fum+o9cShK
+ Ls2/lgDAQsguUtQcaqyBndg+lp9UtAtm2ZVVHwA+rnsc4CP5Dxy/2SjrA/AUDUEpQCIQ
+ PrIMdkTKRU77QSmFqQbLvehQq3KEOVRjL9qrLUe0uduzprvlfnpXc3daoKXBZcbFBKvk
+ JFP7qZ+/xsTXlPAemOKtsvHT2cD0FLM4ieVjMeY++z2awpBRhepKi2tRTHTZYtWK+ziQ
+ 2BqwJt0uLrzhIwGsA75Wb16Q+yoI+4ygvVmKMRjgLjXsGJMGgCXyUQ9MT/tO5ASOZpYG
+ X98Q==
+X-Gm-Message-State: AGi0PuYpt1ENq0oHvfuTbmf8RfuSe5gAUsWFJ2CVI3EpP1M6MNU38vlQ
+ 0VsJlXQLHqx6fW0hV2Bf5eIdGlANr60dcSNMaOb1h0j+zJbi0Z301G8K6C+qXcp/VTZp1G2e7UZ
+ k6TArMQKLvbeNNv4=
+X-Received: by 2002:a1c:2e91:: with SMTP id u139mr11194544wmu.18.1588873221696; 
+ Thu, 07 May 2020 10:40:21 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLjd6hp7wq7mFKudq18rc8BGau0g28R6juxYKJghEkCTOt96u7gXk2f7QLvYsavtxvXfsaWtw==
+X-Received: by 2002:a1c:2e91:: with SMTP id u139mr11194521wmu.18.1588873221496; 
+ Thu, 07 May 2020 10:40:21 -0700 (PDT)
 Received: from localhost.localdomain (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id k23sm8431664wmi.46.2020.05.07.10.40.13
+ by smtp.gmail.com with ESMTPSA id v131sm9445838wmb.19.2020.05.07.10.40.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 07 May 2020 10:40:14 -0700 (PDT)
+ Thu, 07 May 2020 10:40:20 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Subject: [PATCH 02/10] exec/ramblock: Add missing 'qemu/rcu.h' include
-Date: Thu,  7 May 2020 19:39:50 +0200
-Message-Id: <20200507173958.25894-3-philmd@redhat.com>
+Subject: [PATCH 03/10] exec: Move tb_invalidate_phys_range() to
+ 'exec/exec-all.h'
+Date: Thu,  7 May 2020 19:39:51 +0200
+Message-Id: <20200507173958.25894-4-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200507173958.25894-1-philmd@redhat.com>
 References: <20200507173958.25894-1-philmd@redhat.com>
@@ -126,36 +127,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The first field of RAMBlock is a rcu_head structure.
-We need to include the "qemu/rcu.h" to avoid errors when
-including "exec/ramblock.h" without "qemu/rcu.h":
-
-  include/exec/ramblock.h:27:21: error: field =E2=80=98rcu=E2=80=99 has inc=
-omplete type
-     27 |     struct rcu_head rcu;
-        |                     ^~~
-  include/exec/ramblock.h:39:5: error: expected specifier-qualifier-list be=
-fore =E2=80=98QLIST_ENTRY=E2=80=99
-     39 |     QLIST_ENTRY(RAMBlock) next;
-        |     ^~~~~~~~~~~
+Move tb_invalidate_phys_range() to "exec/exec-all.h" with the
+other TranslationBlock invalidate functions. Move all these
+functions altogether. Check for the CONFIG_SOFTMMU definition
+which is more explicit than CONFIG_USER_ONLY.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- include/exec/ramblock.h | 1 +
- 1 file changed, 1 insertion(+)
+ include/exec/exec-all.h | 14 ++++++++------
+ include/exec/ram_addr.h |  2 --
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/include/exec/ramblock.h b/include/exec/ramblock.h
-index 07d50864d8..6ac0aa7a89 100644
---- a/include/exec/ramblock.h
-+++ b/include/exec/ramblock.h
-@@ -21,6 +21,7 @@
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 350c4b451b..f1a9b8a576 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -454,12 +454,15 @@ static inline uint32_t curr_cflags(void)
+ }
 =20
- #ifndef CONFIG_USER_ONLY
- #include "cpu-common.h"
-+#include "qemu/rcu.h"
+ /* TranslationBlock invalidate API */
+-#if defined(CONFIG_USER_ONLY)
++#ifdef CONFIG_SOFTMMU
++void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr, MemTxAttrs att=
+rs);
++void tb_invalidate_phys_range(ram_addr_t start, ram_addr_t end);
++void tb_flush_jmp_cache(CPUState *cpu, target_ulong addr);
++#else
+ void tb_invalidate_phys_addr(target_ulong addr);
+ void tb_invalidate_phys_range(target_ulong start, target_ulong end);
+-#else
+-void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr, MemTxAttrs att=
+rs);
+-#endif
++#endif /* CONFIG_SOFTMMU */
++
+ void tb_flush(CPUState *cpu);
+ void tb_phys_invalidate(TranslationBlock *tb, tb_page_addr_t page_addr);
+ TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
+@@ -583,7 +586,6 @@ void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, =
+ram_addr_t length);
+ void tlb_set_dirty(CPUState *cpu, target_ulong vaddr);
 =20
- struct RAMBlock {
-     struct rcu_head rcu;
+ /* exec.c */
+-void tb_flush_jmp_cache(CPUState *cpu, target_ulong addr);
+=20
+ MemoryRegionSection *
+ address_space_translate_for_iotlb(CPUState *cpu, int asidx, hwaddr addr,
+@@ -591,7 +593,7 @@ address_space_translate_for_iotlb(CPUState *cpu, int as=
+idx, hwaddr addr,
+                                   MemTxAttrs attrs, int *prot);
+ hwaddr memory_region_section_get_iotlb(CPUState *cpu,
+                                        MemoryRegionSection *section);
+-#endif
++#endif /* CONFIG_USER_ONLY */
+=20
+ /* vl.c */
+ extern int singlestep;
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index 7b5c24e928..06096e8c6a 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -147,8 +147,6 @@ static inline void qemu_ram_block_writeback(RAMBlock *b=
+lock)
+ #define DIRTY_CLIENTS_ALL     ((1 << DIRTY_MEMORY_NUM) - 1)
+ #define DIRTY_CLIENTS_NOCODE  (DIRTY_CLIENTS_ALL & ~(1 << DIRTY_MEMORY_COD=
+E))
+=20
+-void tb_invalidate_phys_range(ram_addr_t start, ram_addr_t end);
+-
+ static inline bool cpu_physical_memory_get_dirty(ram_addr_t start,
+                                                  ram_addr_t length,
+                                                  unsigned client)
 --=20
 2.21.3
 
