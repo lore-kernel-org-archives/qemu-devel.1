@@ -4,64 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95050C38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:41:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C676BC38A24
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:43:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6944C2075E
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:41:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6944C2075E
+	by mail.kernel.org (Postfix) with ESMTPS id 961542075E
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:43:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 961542075E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWgmc-0000vm-FS
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 09:41:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33042)
+	id 1jWgnv-0003Sv-N5
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 09:43:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33058)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <gengdongjiu@huawei.com>)
- id 1jWglK-0006aj-Gb; Thu, 07 May 2020 09:40:30 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:50726 helo=huawei.com)
+ id 1jWglM-0006h5-Jg; Thu, 07 May 2020 09:40:32 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:3681 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <gengdongjiu@huawei.com>)
- id 1jWglI-0001T7-Vl; Thu, 07 May 2020 09:40:30 -0400
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id CFDA4BC5B75FA7C11E28;
- Thu,  7 May 2020 21:40:22 +0800 (CST)
+ id 1jWglL-00015u-DR; Thu, 07 May 2020 09:40:32 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id E53868DD50292E4B1F94;
+ Thu,  7 May 2020 21:40:17 +0800 (CST)
 Received: from huawei.com (10.151.151.243) by DGGEMS412-HUB.china.huawei.com
  (10.3.19.212) with Microsoft SMTP Server id 14.3.487.0; Thu, 7 May 2020
- 21:40:16 +0800
+ 21:40:09 +0800
 From: Dongjiu Geng <gengdongjiu@huawei.com>
 To: <imammedo@redhat.com>, <mst@redhat.com>, <xiaoguangrong.eric@gmail.com>,
  <peter.maydell@linaro.org>, <shannon.zhaosl@gmail.com>,
  <pbonzini@redhat.com>, <fam@euphon.net>, <rth@twiddle.net>,
  <ehabkost@redhat.com>, <mtosatti@redhat.com>, <qemu-devel@nongnu.org>,
  <kvm@vger.kernel.org>, <qemu-arm@nongnu.org>
-Subject: [PATCH v26 10/10] MAINTAINERS: Add ACPI/HEST/GHES entries
-Date: Thu, 7 May 2020 21:42:05 +0800
-Message-ID: <20200507134205.7559-11-gengdongjiu@huawei.com>
+Subject: [PATCH v26 01/10] acpi: nvdimm: change NVDIMM_UUID_LE to a common
+ macro
+Date: Thu, 7 May 2020 21:41:56 +0800
+Message-ID: <20200507134205.7559-2-gengdongjiu@huawei.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200507134205.7559-1-gengdongjiu@huawei.com>
 References: <20200507134205.7559-1-gengdongjiu@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-Originating-IP: [10.151.151.243]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35;
+Received-SPF: pass client-ip=45.249.212.190;
  envelope-from=gengdongjiu@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 09:40:23
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 09:40:18
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
 X-Spam_bar: ----
 X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,37 +81,99 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I and Xiang are willing to review the APEI-related patches and
-volunteer as the reviewers for the HEST/GHES part.
+The little end UUID is used in many places, so make
+NVDIMM_UUID_LE to a common macro to convert the UUID
+to a little end array.
 
+Reviewed-by: Xiang Zheng <zhengxiang9@huawei.com>
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Change since v25:
+1. Address Peter's comments to add a proper doc-comment comment for
+   UUID_LE macros.
+---
+ hw/acpi/nvdimm.c    | 10 +++-------
+ include/qemu/uuid.h | 26 ++++++++++++++++++++++++++
+ slirp               |  2 +-
+ 3 files changed, 30 insertions(+), 8 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1f84e3a..9619b90 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1516,6 +1516,15 @@ F: tests/qtest/bios-tables-test.c
- F: tests/qtest/acpi-utils.[hc]
- F: tests/data/acpi/
+diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
+index fa7bf8b..9316d12 100644
+--- a/hw/acpi/nvdimm.c
++++ b/hw/acpi/nvdimm.c
+@@ -27,6 +27,7 @@
+  */
  
-+ACPI/HEST/GHES
-+R: Dongjiu Geng <gengdongjiu@huawei.com>
-+R: Xiang Zheng <zhengxiang9@huawei.com>
-+L: qemu-arm@nongnu.org
-+S: Maintained
-+F: hw/acpi/ghes.c
-+F: include/hw/acpi/ghes.h
-+F: docs/specs/acpi_hest_ghes.rst
+ #include "qemu/osdep.h"
++#include "qemu/uuid.h"
+ #include "hw/acpi/acpi.h"
+ #include "hw/acpi/aml-build.h"
+ #include "hw/acpi/bios-linker-loader.h"
+@@ -34,18 +35,13 @@
+ #include "hw/mem/nvdimm.h"
+ #include "qemu/nvdimm-utils.h"
+ 
+-#define NVDIMM_UUID_LE(a, b, c, d0, d1, d2, d3, d4, d5, d6, d7)             \
+-   { (a) & 0xff, ((a) >> 8) & 0xff, ((a) >> 16) & 0xff, ((a) >> 24) & 0xff, \
+-     (b) & 0xff, ((b) >> 8) & 0xff, (c) & 0xff, ((c) >> 8) & 0xff,          \
+-     (d0), (d1), (d2), (d3), (d4), (d5), (d6), (d7) }
+-
+ /*
+  * define Byte Addressable Persistent Memory (PM) Region according to
+  * ACPI 6.0: 5.2.25.1 System Physical Address Range Structure.
+  */
+ static const uint8_t nvdimm_nfit_spa_uuid[] =
+-      NVDIMM_UUID_LE(0x66f0d379, 0xb4f3, 0x4074, 0xac, 0x43, 0x0d, 0x33,
+-                     0x18, 0xb7, 0x8c, 0xdb);
++      UUID_LE(0x66f0d379, 0xb4f3, 0x4074, 0xac, 0x43, 0x0d, 0x33,
++              0x18, 0xb7, 0x8c, 0xdb);
+ 
+ /*
+  * NVDIMM Firmware Interface Table
+diff --git a/include/qemu/uuid.h b/include/qemu/uuid.h
+index 129c45f..2d17a90 100644
+--- a/include/qemu/uuid.h
++++ b/include/qemu/uuid.h
+@@ -34,6 +34,32 @@ typedef struct {
+     };
+ } QemuUUID;
+ 
++/**
++ * @time_low: The low field of the timestamp
++ * @time_mid: The middle field of the timestamp
++ * @time_hi_and_version: The high field of the timestamp
++ *                       multiplexed with the version number
++ * @clock_seq_hi_and_reserved: The high field of the clock
++ *                             sequence multiplexed with the variant
++ * @clock_seq_low: The low field of the clock sequence
++ * @node0: The spatially unique node0 identifier
++ * @node1: The spatially unique node1 identifier
++ * @node2: The spatially unique node2 identifier
++ * @node3: The spatially unique node3 identifier
++ * @node4: The spatially unique node4 identifier
++ * @node5: The spatially unique node5 identifier
++ *
++ * This macro converts the fields of UUID to little-endian array
++ */
++#define UUID_LE(time_low, time_mid, time_hi_and_version, \
++  clock_seq_hi_and_reserved, clock_seq_low, node0, node1, node2, \
++  node3, node4, node5) \
++  { (time_low) & 0xff, ((time_low) >> 8) & 0xff, ((time_low) >> 16) & 0xff, \
++    ((time_low) >> 24) & 0xff, (time_mid) & 0xff, ((time_mid) >> 8) & 0xff, \
++    (time_hi_and_version) & 0xff, ((time_hi_and_version) >> 8) & 0xff, \
++    (clock_seq_hi_and_reserved), (clock_seq_low), (node0), (node1), (node2),\
++    (node3), (node4), (node5) }
 +
- ppc4xx
- M: David Gibson <david@gibson.dropbear.id.au>
- L: qemu-ppc@nongnu.org
+ #define UUID_FMT "%02hhx%02hhx%02hhx%02hhx-" \
+                  "%02hhx%02hhx-%02hhx%02hhx-" \
+                  "%02hhx%02hhx-" \
+diff --git a/slirp b/slirp
+index 2faae0f..55ab21c 160000
+--- a/slirp
++++ b/slirp
+@@ -1 +1 @@
+-Subproject commit 2faae0f778f818fadc873308f983289df697eb93
++Subproject commit 55ab21c9a36852915b81f1b41ebaf3b6509dd8ba
 -- 
 1.8.3.1
 
