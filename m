@@ -6,66 +6,66 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0B52C38A2A
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:22:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A22E5C38A24
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:24:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62AFA20838
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:22:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6BE2F2075E
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:24:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R9IXyAjr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62AFA20838
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oi9yYBwj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BE2F2075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWgUC-0001uc-GZ
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 09:22:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54976)
+	id 1jWgW3-0004sU-85
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 09:24:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55008)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jWgOb-0000bR-Pe
- for qemu-devel@nongnu.org; Thu, 07 May 2020 09:17:01 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50874
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jWgOe-0000hF-1j
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 09:17:04 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45772
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jWgOa-0005UR-Pe
- for qemu-devel@nongnu.org; Thu, 07 May 2020 09:17:01 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jWgOd-0005Vb-AI
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 09:17:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588857419;
+ s=mimecast20190719; t=1588857422;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=BQtPuNzsiDINldsmqHfPFyQron4PTdZNEFYCOJsCTQ8=;
- b=R9IXyAjrNjHcGO6pjuHZpFPWQUW5dL4Zin+94cRhugI1EhMIbLeAGn3V5sP7GMmFkw/Z30
- e4A9EQ+sKXPgkqtc8UmeY04nPdcVx393E99wYyNfUEiU8mZ7Szyuhq4xfSwYy6i4zdHcrY
- u0ADu+9HxZMtXvGtH4Q0unPsRryyu/0=
+ bh=zb0XE6UFa0dRq3bTacGpMdTeko05ZNrPhqGmL0V5T+o=;
+ b=Oi9yYBwjNUno5ifrN9VMyCb+DxESx7C8rCoLP27rwnf2YoGT+Y4LEBDVolpsJ8CS6N0/pq
+ ImXI46va6+JPsMWUHT2Zsqb1PivoLQqBlBtl4oGuNsVuNgW0ae0QPoTaxzqM8sslnVis+e
+ 2CqfX5K/LV/XjTQ8j7Mt6dQUumsfzrs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-60-Tc2gkTG3NsKuwnmvUlQXHw-1; Thu, 07 May 2020 09:16:53 -0400
-X-MC-Unique: Tc2gkTG3NsKuwnmvUlQXHw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-242-M4dsdSMoO5aHTsLAdUd6dg-1; Thu, 07 May 2020 09:16:53 -0400
+X-MC-Unique: M4dsdSMoO5aHTsLAdUd6dg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B375F80183C;
- Thu,  7 May 2020 13:16:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EFE6483DB38;
+ Thu,  7 May 2020 13:16:51 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-113-193.ams2.redhat.com
  [10.36.113.193])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6201B707B0;
- Thu,  7 May 2020 13:16:52 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 431A55D9DA;
+ Thu,  7 May 2020 13:16:51 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id CDAD09D54; Thu,  7 May 2020 15:16:40 +0200 (CEST)
+ id 8E6AAA1FB; Thu,  7 May 2020 15:16:40 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 13/15] acpi: drop build_piix4_pm()
-Date: Thu,  7 May 2020 15:16:38 +0200
-Message-Id: <20200507131640.14041-14-kraxel@redhat.com>
+Subject: [PATCH v5 07/15] acpi: move aml builder code for parallel device
+Date: Thu,  7 May 2020 15:16:32 +0200
+Message-Id: <20200507131640.14041-8-kraxel@redhat.com>
 In-Reply-To: <20200507131640.14041-1-kraxel@redhat.com>
 References: <20200507131640.14041-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -105,48 +105,110 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The _SB.PCI0.PX13.P13C opregion (holds isa device enable bits)
-is not used any more, remove it from DSDT.
+Also adds support for multiple LPT devices.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/i386/acpi-build.c | 16 ----------------
- 1 file changed, 16 deletions(-)
+ hw/char/parallel.c   | 22 ++++++++++++++++++++++
+ hw/i386/acpi-build.c | 23 -----------------------
+ 2 files changed, 22 insertions(+), 23 deletions(-)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 765409a90eb6..c1e63cce5e8e 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -1441,21 +1441,6 @@ static void build_q35_isa_bridge(Aml *table)
-     aml_append(table, scope);
+diff --git a/hw/char/parallel.c b/hw/char/parallel.c
+index 8dd67d13759b..c0f34bf924ec 100644
+--- a/hw/char/parallel.c
++++ b/hw/char/parallel.c
+@@ -28,6 +28,7 @@
+ #include "qemu/module.h"
+ #include "chardev/char-parallel.h"
+ #include "chardev/char-fe.h"
++#include "hw/acpi/aml-build.h"
+ #include "hw/irq.h"
+ #include "hw/isa/isa.h"
+ #include "hw/qdev-properties.h"
+@@ -568,6 +569,25 @@ static void parallel_isa_realizefn(DeviceState *dev, E=
+rror **errp)
+                              s, "parallel");
  }
 =20
--static void build_piix4_pm(Aml *table)
++static void parallel_isa_build_aml(ISADevice *isadev, Aml *scope)
++{
++    ISAParallelState *isa =3D ISA_PARALLEL(isadev);
++    Aml *dev;
++    Aml *crs;
++
++    crs =3D aml_resource_template();
++    aml_append(crs, aml_io(AML_DECODE16, isa->iobase, isa->iobase, 0x08, 0=
+x08));
++    aml_append(crs, aml_irq_no_flags(isa->isairq));
++
++    dev =3D aml_device("LPT%d", isa->index + 1);
++    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0400")));
++    aml_append(dev, aml_name_decl("_UID", aml_int(isa->index + 1)));
++    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
++    aml_append(dev, aml_name_decl("_CRS", crs));
++
++    aml_append(scope, dev);
++}
++
+ /* Memory mapped interface */
+ static uint64_t parallel_mm_readfn(void *opaque, hwaddr addr, unsigned siz=
+e)
+ {
+@@ -624,9 +644,11 @@ static Property parallel_isa_properties[] =3D {
+ static void parallel_isa_class_initfn(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
++    ISADeviceClass *isa =3D ISA_DEVICE_CLASS(klass);
+=20
+     dc->realize =3D parallel_isa_realizefn;
+     dc->vmsd =3D &vmstate_parallel_isa;
++    isa->build_aml =3D parallel_isa_build_aml;
+     device_class_set_props(dc, parallel_isa_properties);
+     set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+ }
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 2188a2b99d18..443db94deb5b 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -1173,28 +1173,6 @@ static Aml *build_mouse_device_aml(void)
+     return dev;
+ }
+=20
+-static void build_lpt_device_aml(Aml *scope)
 -{
 -    Aml *dev;
--    Aml *scope;
+-    Aml *crs;
 -
--    scope =3D  aml_scope("_SB.PCI0");
--    dev =3D aml_device("PX13");
--    aml_append(dev, aml_name_decl("_ADR", aml_int(0x00010003)));
+-    if (!memory_region_present(get_system_io(), 0x0378)) {
+-        return;
+-    }
 -
--    aml_append(dev, aml_operation_region("P13C", AML_PCI_CONFIG,
--                                         aml_int(0x00), 0xff));
+-    dev =3D aml_device("LPT");
+-    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0400")));
+-
+-    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
+-
+-    crs =3D aml_resource_template();
+-    aml_append(crs, aml_io(AML_DECODE16, 0x0378, 0x0378, 0x08, 0x08));
+-    aml_append(crs, aml_irq_no_flags(7));
+-    aml_append(dev, aml_name_decl("_CRS", crs));
+-
 -    aml_append(scope, dev);
--    aml_append(table, scope);
 -}
 -
- static void build_piix4_isa_bridge(Aml *table)
+ static void build_isa_devices_aml(Aml *table)
  {
-     Aml *dev;
-@@ -1607,7 +1592,6 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         aml_append(dsdt, sb_scope);
+     ISADevice *fdc =3D pc_find_fdc0();
+@@ -1208,7 +1186,6 @@ static void build_isa_devices_aml(Aml *table)
+     if (fdc) {
+         aml_append(scope, build_fdc_device_aml(fdc));
+     }
+-    build_lpt_device_aml(scope);
 =20
-         build_hpet_aml(dsdt);
--        build_piix4_pm(dsdt);
-         build_piix4_isa_bridge(dsdt);
-         build_isa_devices_aml(dsdt);
-         build_piix4_pci_hotplug(dsdt);
+     if (ambiguous) {
+         error_report("Multiple ISA busses, unable to define IPMI ACPI data=
+");
 --=20
 2.18.4
 
