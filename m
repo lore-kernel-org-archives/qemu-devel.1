@@ -2,66 +2,91 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83FDFC38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 05:13:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27845C38A24
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 05:38:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46CBB20753
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 05:13:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E21E0207DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 05:38:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="VE/Gb0uM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46CBB20753
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="qK7k1n/X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E21E0207DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWYqh-0000QE-9S
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 01:13:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33578)
+	id 1jWZEe-0004c6-26
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 01:38:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41128)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jWYhy-0007g0-CN; Thu, 07 May 2020 01:04:30 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:56607)
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1jWZE6-0004DD-8p
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 01:37:42 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:14286)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jWYhw-0007du-QH; Thu, 07 May 2020 01:04:30 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 49HhFn6kNnz9sSx; Thu,  7 May 2020 15:04:13 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1588827853;
- bh=+QbVUd1UgLdlY1lqI5xNAI7XHDlOWMlYunUoNKLLV3s=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=VE/Gb0uM2mlbyjxEk0AZ/Xo1st4ZBqFl8gm71qUmbZ9HGcNelCeQmQ2F886JmgHpb
- ANE4GegUyXYQw175M6GxLZDv7ByLLyEs3vVKr3/wVFJd/vr7Xvom2qUp6ukWF8cS7m
- xP8zP/i5scZPOHIO+cuEJQqt/z1tiqkxiNq31hUY=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Subject: [PULL 07/18] spapr: Drop CAS reboot flag
-Date: Thu,  7 May 2020 15:02:17 +1000
-Message-Id: <20200507050228.802395-8-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200507050228.802395-1-david@gibson.dropbear.id.au>
-References: <20200507050228.802395-1-david@gibson.dropbear.id.au>
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1jWZE4-00024D-T8
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 01:37:41 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5eb39e200000>; Wed, 06 May 2020 22:35:28 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Wed, 06 May 2020 22:37:38 -0700
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Wed, 06 May 2020 22:37:38 -0700
+Received: from [10.40.101.152] (172.20.13.39) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 7 May
+ 2020 05:37:30 +0000
+Subject: Re: [PATCH Kernel v18 6/7] vfio iommu: Add migration capability to
+ report supported features
+To: Alex Williamson <alex.williamson@redhat.com>
+References: <1588607939-26441-1-git-send-email-kwankhede@nvidia.com>
+ <1588607939-26441-7-git-send-email-kwankhede@nvidia.com>
+ <20200506162738.6e08dbf2@w520.home>
+X-Nvconfidentiality: public
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <79f1a586-52be-ab72-493a-3a3c5ae6e252@nvidia.com>
+Date: Thu, 7 May 2020 11:07:26 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200506162738.6e08dbf2@w520.home>
+X-Originating-IP: [172.20.13.39]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1588829728; bh=PCZ/GyErkVmvQQTaVhthVdSrM4rEkn03vvTTvcYS51g=;
+ h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+ Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+ X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+ Content-Transfer-Encoding;
+ b=qK7k1n/XuYPWG8QTVm2YIdD3m5X0DsURRUDzMkwkyUwf3rZgPeW/aLnmXT83cemTu
+ znGGEtzKX555pRrzGnA0ij+E9MirxbC66VafQC35tWanKlJq1IusH9oKkCYjCahRan
+ nn2x99EWk+TEps7Z2j6YDBd283eAy4YRf3xk5entnyPh+N2HPEKEB6zxFnFQH7eyYY
+ lFIMtKx3nvlJUFo25X/aSS2H59IF6h+SQ4nKATyasxCXqbgsgQX7r2LnG3Mn1vz+sy
+ ejRXV8NXh/qlye+Uv6KtdKxzAa1G+stOANrmYAr4pSh9cu2iDTMKJkDSED9uZaKDVS
+ EpRHE/s9D2Miw==
+Received-SPF: pass client-ip=216.228.121.143;
+ envelope-from=kwankhede@nvidia.com; helo=hqnvemgate24.nvidia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 01:37:39
+X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
+X-Spam_score_int: -70
+X-Spam_score: -7.1
+X-Spam_bar: -------
+X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_HI=-5, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -74,141 +99,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@ozlabs.ru, qemu-devel@nongnu.org, npiggin@gmail.com, groug@kaod.org,
- qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Greg Kurz <groug@kaod.org>
 
-The CAS reboot flag is false by default and all the locations that
-could set it to true have been dropped. This means that all code
-blocks depending on the flag being set is dead code and the other
-code blocks should be executed always.
 
-Just do that and drop the now uneeded CAS reboot flag. Fix a
-comment on the way to make checkpatch happy.
+On 5/7/2020 3:57 AM, Alex Williamson wrote:
+> On Mon, 4 May 2020 21:28:58 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> 
+>> Added migration capability in IOMMU info chain.
+>> User application should check IOMMU info chain for migration capability
+>> to use dirty page tracking feature provided by kernel module.
+>>
+>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>> ---
+>>   drivers/vfio/vfio_iommu_type1.c | 15 +++++++++++++++
+>>   include/uapi/linux/vfio.h       | 14 ++++++++++++++
+>>   2 files changed, 29 insertions(+)
+>>
+>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>> index 8b27faf1ec38..b38d278d7bff 100644
+>> --- a/drivers/vfio/vfio_iommu_type1.c
+>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>> @@ -2378,6 +2378,17 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
+>>   	return ret;
+>>   }
+>>   
+>> +static int vfio_iommu_migration_build_caps(struct vfio_info_cap *caps)
+>> +{
+>> +	struct vfio_iommu_type1_info_cap_migration cap_mig;
+>> +
+>> +	cap_mig.header.id = VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION;
+>> +	cap_mig.header.version = 1;
+>> +	cap_mig.flags = VFIO_IOMMU_INFO_CAPS_MIGRATION_DIRTY_PAGE_TRACK;
+>> +
+>> +	return vfio_info_add_capability(caps, &cap_mig.header, sizeof(cap_mig));
+>> +}
+>> +
+>>   static long vfio_iommu_type1_ioctl(void *iommu_data,
+>>   				   unsigned int cmd, unsigned long arg)
+>>   {
+>> @@ -2427,6 +2438,10 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>>   		if (ret)
+>>   			return ret;
+>>   
+>> +		ret = vfio_iommu_migration_build_caps(&caps);
+>> +		if (ret)
+>> +			return ret;
+>> +
+>>   		if (caps.size) {
+>>   			info.flags |= VFIO_IOMMU_INFO_CAPS;
+>>   
+>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+>> index e3cbf8b78623..df9ce8aaafab 100644
+>> --- a/include/uapi/linux/vfio.h
+>> +++ b/include/uapi/linux/vfio.h
+>> @@ -1013,6 +1013,20 @@ struct vfio_iommu_type1_info_cap_iova_range {
+>>   	struct	vfio_iova_range iova_ranges[];
+>>   };
+>>   
+>> +/*
+>> + * The migration capability allows to report supported features for migration.
+>> + *
+>> + * The structures below define version 1 of this capability.
+>> + */
+>> +#define VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION  1
+>> +
+>> +struct vfio_iommu_type1_info_cap_migration {
+>> +	struct	vfio_info_cap_header header;
+>> +	__u32	flags;
+>> +	/* supports dirty page tracking */
+>> +#define VFIO_IOMMU_INFO_CAPS_MIGRATION_DIRTY_PAGE_TRACK	(1 << 0)
+>> +};
+>> +
+> 
+> What about exposing the maximum supported dirty bitmap size and the
+> supported page sizes?  Thanks,
+> 
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <158514994893.478799.11772512888322840990.stgit@bahia.lan>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr.c         | 18 ++++--------------
- hw/ppc/spapr_hcall.c   | 33 ++++++++++++++-------------------
- include/hw/ppc/spapr.h |  1 -
- 3 files changed, 18 insertions(+), 34 deletions(-)
+How should user application use that?
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index f52488d397..841b5ec59b 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1579,9 +1579,7 @@ void spapr_setup_hpt(SpaprMachineState *spapr)
- {
-     int hpt_shift;
- 
--    if ((spapr->resize_hpt == SPAPR_RESIZE_HPT_DISABLED)
--        || (spapr->cas_reboot
--            && !spapr_ovec_test(spapr->ov5_cas, OV5_HPT_RESIZE))) {
-+    if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DISABLED) {
-         hpt_shift = spapr_hpt_shift_for_ramsize(MACHINE(spapr)->maxram_size);
-     } else {
-         uint64_t current_ram_size;
-@@ -1645,16 +1643,10 @@ static void spapr_machine_reset(MachineState *machine)
- 
-     qemu_devices_reset();
- 
--    /*
--     * If this reset wasn't generated by CAS, we should reset our
--     * negotiated options and start from scratch
--     */
--    if (!spapr->cas_reboot) {
--        spapr_ovec_cleanup(spapr->ov5_cas);
--        spapr->ov5_cas = spapr_ovec_new();
-+    spapr_ovec_cleanup(spapr->ov5_cas);
-+    spapr->ov5_cas = spapr_ovec_new();
- 
--        ppc_set_compat_all(spapr->max_compat_pvr, &error_fatal);
--    }
-+    ppc_set_compat_all(spapr->max_compat_pvr, &error_fatal);
- 
-     /*
-      * This is fixing some of the default configuration of the XIVE
-@@ -1707,8 +1699,6 @@ static void spapr_machine_reset(MachineState *machine)
-     spapr_cpu_set_entry_state(first_ppc_cpu, SPAPR_ENTRY_POINT, 0, fdt_addr, 0);
-     first_ppc_cpu->env.gpr[5] = 0;
- 
--    spapr->cas_reboot = false;
--
-     spapr->fwnmi_system_reset_addr = -1;
-     spapr->fwnmi_machine_check_addr = -1;
-     spapr->fwnmi_machine_check_interlock = -1;
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 48a8745514..0f54988f2e 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1678,6 +1678,7 @@ target_ulong do_client_architecture_support(PowerPCCPU *cpu,
-     bool raw_mode_supported = false;
-     bool guest_xive;
-     CPUState *cs;
-+    void *fdt;
- 
-     /* CAS is supposed to be called early when only the boot vCPU is active. */
-     CPU_FOREACH(cs) {
-@@ -1818,27 +1819,21 @@ target_ulong do_client_architecture_support(PowerPCCPU *cpu,
- 
-     spapr_handle_transient_dev_before_cas(spapr);
- 
--    if (!spapr->cas_reboot) {
--        void *fdt;
--
--        /* If spapr_machine_reset() did not set up a HPT but one is necessary
--         * (because the guest isn't going to use radix) then set it up here. */
--        if ((spapr->patb_entry & PATE1_GR) && !guest_radix) {
--            /* legacy hash or new hash: */
--            spapr_setup_hpt(spapr);
--        }
--
--        fdt = spapr_build_fdt(spapr, false, fdt_bufsize);
--
--        g_free(spapr->fdt_blob);
--        spapr->fdt_size = fdt_totalsize(fdt);
--        spapr->fdt_initial_size = spapr->fdt_size;
--        spapr->fdt_blob = fdt;
-+    /*
-+     * If spapr_machine_reset() did not set up a HPT but one is necessary
-+     * (because the guest isn't going to use radix) then set it up here.
-+     */
-+    if ((spapr->patb_entry & PATE1_GR) && !guest_radix) {
-+        /* legacy hash or new hash: */
-+        spapr_setup_hpt(spapr);
-     }
- 
--    if (spapr->cas_reboot) {
--        qemu_system_reset_request(SHUTDOWN_CAUSE_SUBSYSTEM_RESET);
--    }
-+    fdt = spapr_build_fdt(spapr, false, fdt_bufsize);
-+
-+    g_free(spapr->fdt_blob);
-+    spapr->fdt_size = fdt_totalsize(fdt);
-+    spapr->fdt_initial_size = spapr->fdt_size;
-+    spapr->fdt_blob = fdt;
- 
-     return H_SUCCESS;
- }
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index b7e13e5aaf..e579eaf28c 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -178,7 +178,6 @@ struct SpaprMachineState {
-     SpaprEventSource *event_sources;
- 
-     /* ibm,client-architecture-support option negotiation */
--    bool cas_reboot;
-     bool cas_pre_isa3_guest;
-     SpaprOptionVector *ov5;         /* QEMU-supported option vectors */
-     SpaprOptionVector *ov5_cas;     /* negotiated (via CAS) option vectors */
--- 
-2.26.2
+Thanks,
+Kirti
 
+> Alex
+> 
+>>   #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
+>>   
+>>   /**
+> 
 
