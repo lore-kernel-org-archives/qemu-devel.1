@@ -2,66 +2,66 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=DATE_IN_PAST_06_12,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1200AC35280
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 23:29:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17906C35280
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 23:46:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C65CE20A8B
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 23:29:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D834D208E4
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 23:46:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="TsMDzzWG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C65CE20A8B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="GownFTDe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D834D208E4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWpx9-0006Aa-0Z
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 19:29:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58504)
+	id 1jWqED-0002HP-47
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 19:46:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33706)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jWpwM-0004gO-3Z; Thu, 07 May 2020 19:28:30 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:33989)
+ id 1jWqDW-0001lu-LD; Thu, 07 May 2020 19:46:14 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:55735 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jWpwK-0001Gv-Ca; Thu, 07 May 2020 19:28:29 -0400
+ id 1jWqDS-0001JX-P0; Thu, 07 May 2020 19:46:14 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 49J8ln5SK2z9sSW; Fri,  8 May 2020 09:28:21 +1000 (AEST)
+ id 49J98C53RFz9sSG; Fri,  8 May 2020 09:46:03 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1588894101;
- bh=XMkOuUYZbpnrJpeCHRFjBRXovMkcsHH+lIdDr3doUjE=;
+ d=gibson.dropbear.id.au; s=201602; t=1588895163;
+ bh=/vS34R+k5dXmIeBjV8mvwuWABN1v7+wmk7tOiBHye8Q=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=TsMDzzWGj5SzAl+FudNOeFAiM6d1dSnFKBttH0YWWleZzea09GnFk6V/jfx6dtj7R
- WrC92K8K2vwPoqAlaT1pVEuHH53LkCKUd263lsfaqrII+uLoLss253QFHXUCYK5GNc
- /iH9wf0QtKxmdCgDjTmN1kCsQklpmCGwy6aWXWMQ=
-Date: Thu, 7 May 2020 23:51:54 +1000
+ b=GownFTDe6DIq1YaFkwqV4MooXH/lq1tswwUz5XtkUnhmDxPVm61z6gJlSZr/M0EPI
+ Cyzant49WJRFh9ZjuL6S+nW0wTIvpDelGIWL//GIPNYntg/06K8uqS9HCYj5R0gWZR
+ Aje6EnryqAqIR+wnneY23xp5mDych6ncEOLbzSi0=
+Date: Fri, 8 May 2020 09:33:43 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH] ppc/pnv: Fix NMI system reset SRR1 value
-Message-ID: <20200507135154.GA2282@umbus.fritz.box>
-References: <20200507114824.788942-1-npiggin@gmail.com>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH] target/ppc: Untabify excp_helper.c
+Message-ID: <20200507233343.GC2282@umbus.fritz.box>
+References: <158886788307.1560068.14096740175576278978.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="17pEHd4RhPHOinZp"
+ protocol="application/pgp-signature"; boundary="CblX+4bnyfN0pR09"
 Content-Disposition: inline
-In-Reply-To: <20200507114824.788942-1-npiggin@gmail.com>
+In-Reply-To: <158886788307.1560068.14096740175576278978.stgit@bahia.lan>
 Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -1
-X-Spam_score: -0.2
-X-Spam_bar: /
-X-Spam_report: (-0.2 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_06_12=1.543,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -76,79 +76,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+ Nicholas Piggin <npiggin@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---17pEHd4RhPHOinZp
-Content-Type: text/plain; charset=iso-8859-1
+--CblX+4bnyfN0pR09
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 07, 2020 at 09:48:24PM +1000, Nicholas Piggin wrote:
-> Commit a77fed5bd926 ("ppc/pnv: Add support for NMI interface") got the
-> SRR1 setting wrong for sresets that hit outside of power-save states.
+On Thu, May 07, 2020 at 06:11:23PM +0200, Greg Kurz wrote:
+> Some tabs crept in with a recent change.
 >=20
-> Fix this, better documenting the source for the bit definitions.
->=20
-> Fixes: a77fed5bd926 ("ppc/pnv: Add support for NMI interface") got the
-> Cc: C=E9dric Le Goater <clg@kaod.org>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> Fixes: 6dc6b557913f "target/ppc: Improve syscall exception logging"
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Applied to ppc-for-5.1, thanks.
+Applied, thanks.
+
+Not quite sure why my pre-commit hook didn't catch this before I sent
+the PR, but there you go.
+
 > ---
+>  target/ppc/excp_helper.c |   16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
 >=20
-> Thanks to Cedric for pointing out concerns with a previous MCE patch
-> that unearthed this as well. Linux does not actually care what these
-> SRR1[42:45] bits look like for non-powersave sresets, but we should
-> follow documented behaviour as far as possible.
->=20
->  hw/ppc/pnv.c | 26 ++++++++++++++++++++------
->  1 file changed, 20 insertions(+), 6 deletions(-)
->=20
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index a3b7a8d0ff..1b4748ce6d 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -1986,12 +1986,26 @@ static void pnv_cpu_do_nmi_on_cpu(CPUState *cs, r=
-un_on_cpu_data arg)
-> =20
->      cpu_synchronize_state(cs);
->      ppc_cpu_do_system_reset(cs);
-> -    /*
-> -     * SRR1[42:45] is set to 0100 which the ISA defines as implementation
-> -     * dependent. POWER processors use this for xscom triggered interrup=
-ts,
-> -     * which come from the BMC or NMI IPIs.
-> -     */
-> -    env->spr[SPR_SRR1] |=3D PPC_BIT(43);
-> +    if (env->spr[SPR_SRR1] & PPC_BITMASK(46, 47)) {
-> +        /*
-> +	 * Power-save wakeups, as indicated by non-zero SRR1[46:47] put the
-> +	 * wakeup reason in SRR1[42:45], system reset is indicated with 0b0100
-> +	 * (PPC_BIT(43)).
-> +	 */
-> +        if (!(env->spr[SPR_SRR1] & PPC_BIT(43))) {
-> +            warn_report("ppc_cpu_do_system_reset does not set system res=
-et wakeup reason");
-> +            env->spr[SPR_SRR1] |=3D PPC_BIT(43);
-> +        }
-> +    } else {
-> +        /*
-> +	 * For non-powersave system resets, SRR1[42:45] are defined to be
-> +	 * implementation-dependent. The POWER9 User Manual specifies that
-> +	 * an external (SCOM driven, which may come from a BMC nmi command or
-> +	 * another CPU requesting a NMI IPI) system reset exception should be
-> +	 * 0b0010 (PPC_BIT(44)).
-> +         */
-> +        env->spr[SPR_SRR1] |=3D PPC_BIT(44);
-> +    }
+> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+> index 639cac38f9c3..4db3d9ed9af5 100644
+> --- a/target/ppc/excp_helper.c
+> +++ b/target/ppc/excp_helper.c
+> @@ -70,16 +70,16 @@ static inline void dump_syscall(CPUPPCState *env)
+>  static inline void dump_hcall(CPUPPCState *env)
+>  {
+>      qemu_log_mask(CPU_LOG_INT, "hypercall r3=3D%016" PRIx64
+> -		  " r4=3D%016" PRIx64 " r5=3D%016" PRIx64 " r6=3D%016" PRIx64
+> -		  " r7=3D%016" PRIx64 " r8=3D%016" PRIx64 " r9=3D%016" PRIx64
+> -		  " r10=3D%016" PRIx64 " r11=3D%016" PRIx64 " r12=3D%016" PRIx64
+> +                  " r4=3D%016" PRIx64 " r5=3D%016" PRIx64 " r6=3D%016" P=
+RIx64
+> +                  " r7=3D%016" PRIx64 " r8=3D%016" PRIx64 " r9=3D%016" P=
+RIx64
+> +                  " r10=3D%016" PRIx64 " r11=3D%016" PRIx64 " r12=3D%016=
+" PRIx64
+>                    " nip=3D" TARGET_FMT_lx "\n",
+>                    ppc_dump_gpr(env, 3), ppc_dump_gpr(env, 4),
+> -		  ppc_dump_gpr(env, 5), ppc_dump_gpr(env, 6),
+> -		  ppc_dump_gpr(env, 7), ppc_dump_gpr(env, 8),
+> -		  ppc_dump_gpr(env, 9), ppc_dump_gpr(env, 10),
+> -		  ppc_dump_gpr(env, 11), ppc_dump_gpr(env, 12),
+> -		  env->nip);
+> +                  ppc_dump_gpr(env, 5), ppc_dump_gpr(env, 6),
+> +                  ppc_dump_gpr(env, 7), ppc_dump_gpr(env, 8),
+> +                  ppc_dump_gpr(env, 9), ppc_dump_gpr(env, 10),
+> +                  ppc_dump_gpr(env, 11), ppc_dump_gpr(env, 12),
+> +                  env->nip);
 >  }
 > =20
->  static void pnv_nmi(NMIState *n, int cpu_index, Error **errp)
+>  static int powerpc_reset_wakeup(CPUState *cs, CPUPPCState *env, int excp,
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -156,25 +142,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---17pEHd4RhPHOinZp
+--CblX+4bnyfN0pR09
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl60EncACgkQbDjKyiDZ
-s5JZ6RAAgvHVEZ5jPnKBTu9kLKvuCstTDaFtonVy91pCOyvM3Ztqw9FEFuZ1IUpi
-RULLosoHxdqKQR99Do9LXKQgEdDdYF0PqIaO51Mmss1KIDb4aHRnHvy19NanhVij
-lza27bvI9I11WOQQCjGeahkhwqxAyYmuO+KSwTOT5jv1GsCzIoIR8R0IcSEEZE3C
-lleQ+diJ6r/yKd6+BPp2sTt+mfeQjOXcO0GePWjmkuPXb68+IaTXTAjPj6aiDb/U
-0K1iK7mLkI2yYAjFfbDXiPfdRE1dtY1qzS4PScZQS/GwZr2wvFSluS7fgEJUqeAe
-PdqH3CFEvICGYYPknmGsPn0EdUwNZp3wzC/rCTX0308VAQisiE41R+XAkgD7MW2p
-W4owHLTRS3ReEYMXwBSrUqoqsSIwhlv3HufahOb+ZmYVHmvLqzf8CWsZNo5KzvdQ
-tVam2CTnNYQRirBT3GjP8uSQT52uGt/j18b2GP6mbVIb+1S6w91H7jCA6NN7thMP
-wqmQCXE7daO174LiRNnRvlpJaEy8ZsLdiumXN2RIVZz/LNolLZRia6cEU7xeuz50
-nRMb/g2jWy/ifSctOSthZWJN5loZjyKtR/c6OM+qPb143CgMaahzJJ7OZVE6w4HH
-nX5X2jmjTYLn+4HWLmY2lM9goAh5iR87E4+LIqTcs5+fZQmX7RA=
-=GuLL
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl60mtQACgkQbDjKyiDZ
+s5Lz2g//f8VVrvlfKcc2oL3SNAdW4xwnh6A7S4mFL/6TBs27oW9XzB0U5g5LhuKQ
+Hv6JchtH3z0qZz1g4npAt1n9fkoPPi0UmR/WY2fKE4k5VNr1uY0+u1AOxhPWa1BA
+4r8gBXsm6fXf1sL3Qumjakj1nO7XF9eQlOU2W05f0kYZSNt1k0HZt+P7KwD84y/K
+EyxplN7b10DEDIdlTpRA08QPMYWD3YL5p+13S23vm4l9yu6+d15144bWryhOzsj8
++YdV8D7XwfDNPSGmAlTnQfHH2kqESICz5mQg6kyjvBW9eHgs5QxL6C/MG/Fny85b
+Ju/CQTj6x3BEHflHgTkoMtdW8Zm4bxpmSLMh+caOwzn63GWNJjQIaR4iyiYUHJme
+hCcxubNV7DN4oSOg3dJ0zDHB4p9qo7zCZ7MWLvsecImK1+on8HlRp4GBhFGTDdZ6
+X/DYn+4iVNWT/DPNYzpsKOs/ru0pg9mQA8EJ/ei06wYwjv/vcod+QJnSB2kwFVZb
+POL7z2ExmB9ExjXzsC6yui/R6gmKN4sR4dijuMZtucpphAeZf9eQ42b6gAunmP1R
+c3CT1PAla4JVT0C4P3tWlxBqS9GpfBsPIMVVUTxq22EOrK7YRE2SpFfEFv8Ol1cZ
+HLjnDLMAfb3L6R5xeBr0wXTzLIJcZU6rbyBgxdDN0+pjyhlXDIE=
+=S41N
 -----END PGP SIGNATURE-----
 
---17pEHd4RhPHOinZp--
+--CblX+4bnyfN0pR09--
 
