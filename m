@@ -7,66 +7,67 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBC34C38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 17:04:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EC8EC38A24
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 17:06:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84454207DD
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 17:04:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DBC5B207DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 17:06:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LzBK97jN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84454207DD
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dPrXScDE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBC5B207DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWjws-0006Um-Ls
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 13:04:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51434)
+	id 1jWjyg-0001CH-1Q
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 13:06:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51436)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jWjuy-0004j9-ET
+ id 1jWjuy-0004jK-MQ
  for qemu-devel@nongnu.org; Thu, 07 May 2020 13:02:40 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59505
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25554
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jWjut-0001a9-0G
+ id 1jWjuw-0001bT-7M
  for qemu-devel@nongnu.org; Thu, 07 May 2020 13:02:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588870953;
+ s=mimecast20190719; t=1588870957;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0FeS7J+dpo8/xTc7woyCEyx39nSoYsRltfEaVs0z5v8=;
- b=LzBK97jNLeIm10tV3QH3BqTT2byDXa9ZNgJMZXAs9UCMjn+ZvXW0fFUTXK/LAe2tgZ+2kh
- w4uxAvZ/CYK339PSNZu41F9CliMj2XKaC4TMwfSBo+8Bheh+ZW528u5kanqS99r/LDGnDc
- HCrAO567WUsoHVG08f4XHd+rz/uF+n0=
+ bh=GSknMKkdvC7tRtHbb+/9voPki94/gLtOMaR21Bc80Wk=;
+ b=dPrXScDE+10l2/+EG9UOgeoQxVAj3J4CTIl3HHzAQqETely5RDQ+G6Y1RKgWdkvE8afPXB
+ /TvhtLLSaenuzJzxdCxlN29i1+4zUYIe2MzRUOPDoUmwzwYzTlJI6/0EZPXbdd0b2WxY3v
+ 80XCpf33u3LuUjMAMGyYVzlzkVRVSY4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405-QFl6ERcpMMqe1f9ATrMF5w-1; Thu, 07 May 2020 13:02:26 -0400
-X-MC-Unique: QFl6ERcpMMqe1f9ATrMF5w-1
+ us-mta-149-E0I5iY-dOROZ4_EZEDtsZQ-1; Thu, 07 May 2020 13:02:34 -0400
+X-MC-Unique: E0I5iY-dOROZ4_EZEDtsZQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 338231009445;
- Thu,  7 May 2020 17:02:25 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D750C1800D4A;
+ Thu,  7 May 2020 17:02:32 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-114-224.ams2.redhat.com
  [10.36.114.224])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2AF46100EBA4;
- Thu,  7 May 2020 17:02:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C4B5A1002380;
+ Thu,  7 May 2020 17:02:30 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, david@redhat.com, zhukeqian1@huawei.com,
  maozhongyi@cmss.chinamobile.com, marcandre.lureau@redhat.com,
  pannengyuan@huawei.com, f4bug@amsat.org, wei.w.wang@intel.com,
  yi.y.sun@intel.com, quintela@redhat.com
-Subject: [PULL 01/12] migration: fix bad indentation in error_report()
-Date: Thu,  7 May 2020 18:02:00 +0100
-Message-Id: <20200507170211.238283-2-dgilbert@redhat.com>
+Subject: [PULL 04/12] migration: move the units of migrate parameters from
+ milliseconds to ms
+Date: Thu,  7 May 2020 18:02:03 +0100
+Message-Id: <20200507170211.238283-5-dgilbert@redhat.com>
 In-Reply-To: <20200507170211.238283-1-dgilbert@redhat.com>
 References: <20200507170211.238283-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -104,57 +105,60 @@ Sender: "Qemu-devel"
 
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 
-bad indentation conflicts with CODING_STYLE doc.
-
 Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Message-Id: <09f7529c665cac0c6a5e032ac6fdb6ca701f7e37.1585329482.git.maozho=
-ngyi@cmss.chinamobile.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
+Message-Id: <474bb6cf67defb8be9de5035c11aee57a680557a.1585641083.git.maozho=
+ngyi@cmss.chinamobile.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/migration.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ migration/migration.c | 2 +-
+ monitor/hmp-cmds.c    | 8 ++++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/migration/migration.c b/migration/migration.c
-index 177cce9e95..8f27174ff6 100644
+index 6e079efdcc..79f16f6625 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -2494,7 +2494,7 @@ retry:
-         if (header_type >=3D MIG_RP_MSG_MAX ||
-             header_type =3D=3D MIG_RP_MSG_INVALID) {
-             error_report("RP: Received invalid message 0x%04x length 0x%04=
-x",
--                    header_type, header_len);
-+                         header_type, header_len);
-             mark_source_rp_bad(ms);
-             goto out;
+@@ -1214,7 +1214,7 @@ static bool migrate_params_check(MigrationParameters =
+*params, Error **errp)
+         error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+                    "downtime_limit",
+                    "an integer in the range of 0 to "
+-                    stringify(MAX_MIGRATE_DOWNTIME)" milliseconds");
++                    stringify(MAX_MIGRATE_DOWNTIME)" ms");
+         return false;
+     }
+=20
+diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+index 9bb6946fbf..1552dee489 100644
+--- a/monitor/hmp-cmds.c
++++ b/monitor/hmp-cmds.c
+@@ -231,18 +231,18 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdic=
+t)
+             monitor_printf(mon, "\n");
          }
-@@ -2503,9 +2503,9 @@ retry:
-             header_len !=3D rp_cmd_args[header_type].len) ||
-             header_len > sizeof(buf)) {
-             error_report("RP: Received '%s' message (0x%04x) with"
--                    "incorrect length %d expecting %zu",
--                    rp_cmd_args[header_type].name, header_type, header_len=
-,
--                    (size_t)rp_cmd_args[header_type].len);
-+                         "incorrect length %d expecting %zu",
-+                         rp_cmd_args[header_type].name, header_type, heade=
-r_len,
-+                         (size_t)rp_cmd_args[header_type].len);
-             mark_source_rp_bad(ms);
-             goto out;
+=20
+-        monitor_printf(mon, "total time: %" PRIu64 " milliseconds\n",
++        monitor_printf(mon, "total time: %" PRIu64 " ms\n",
+                        info->total_time);
+         if (info->has_expected_downtime) {
+-            monitor_printf(mon, "expected downtime: %" PRIu64 " millisecon=
+ds\n",
++            monitor_printf(mon, "expected downtime: %" PRIu64 " ms\n",
+                            info->expected_downtime);
          }
-@@ -2560,7 +2560,7 @@ retry:
-             }
-             if (header_len !=3D expected_len) {
-                 error_report("RP: Req_Page_id with length %d expecting %zd=
-",
--                        header_len, expected_len);
-+                             header_len, expected_len);
-                 mark_source_rp_bad(ms);
-                 goto out;
-             }
+         if (info->has_downtime) {
+-            monitor_printf(mon, "downtime: %" PRIu64 " milliseconds\n",
++            monitor_printf(mon, "downtime: %" PRIu64 " ms\n",
+                            info->downtime);
+         }
+         if (info->has_setup_time) {
+-            monitor_printf(mon, "setup: %" PRIu64 " milliseconds\n",
++            monitor_printf(mon, "setup: %" PRIu64 " ms\n",
+                            info->setup_time);
+         }
+     }
 --=20
 2.26.2
 
