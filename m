@@ -6,66 +6,66 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76001C38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 17:30:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E15A7C38A24
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 17:30:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 446E620663
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 17:30:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 446E620663
+	by mail.kernel.org (Postfix) with ESMTPS id B228720663
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 17:30:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B228720663
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWkLo-0004U6-B8
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 13:30:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57140)
+	id 1jWkLz-0004fO-Tz
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 13:30:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57250)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1jWkIl-0007f6-7g; Thu, 07 May 2020 13:27:15 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59658)
+ id 1jWkJM-0000LX-HJ; Thu, 07 May 2020 13:27:54 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:6050
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1jWkIk-0007DQ-E4; Thu, 07 May 2020 13:27:14 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 047H1oo9123955; Thu, 7 May 2020 13:27:02 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com
- [149.81.74.106])
- by mx0a-001b2d01.pphosted.com with ESMTP id 30twj0mb54-1
+ id 1jWkJL-0007Qp-PS; Thu, 07 May 2020 13:27:52 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 047H1Jvx160249; Thu, 7 May 2020 13:27:39 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com
+ [149.81.74.108])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 30s2g5j4cv-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 07 May 2020 13:27:02 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
- by ppma04fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 047HPqIN009099;
- Thu, 7 May 2020 17:27:00 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com
- (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
- by ppma04fra.de.ibm.com with ESMTP id 30s0g64s6u-1
+ Thu, 07 May 2020 13:27:39 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+ by ppma05fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 047HPYCb025012;
+ Thu, 7 May 2020 17:27:37 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com
+ (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+ by ppma05fra.de.ibm.com with ESMTP id 30s0g5ms7t-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 07 May 2020 17:27:00 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 047HQvdS5636564
+ Thu, 07 May 2020 17:27:36 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 047HRYLL60489796
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 7 May 2020 17:26:57 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 74B77A405E;
- Thu,  7 May 2020 17:26:57 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 45B90A4040;
- Thu,  7 May 2020 17:26:57 +0000 (GMT)
+ Thu, 7 May 2020 17:27:34 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 558A9AE093;
+ Thu,  7 May 2020 17:27:34 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C91F8AE05D;
+ Thu,  7 May 2020 17:27:15 +0000 (GMT)
 Received: from bahia.lan (unknown [9.145.160.63])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu,  7 May 2020 17:26:57 +0000 (GMT)
-Subject: [PATCH 3/6] target/ppc: Don't initialize some local variables in
- ppc_radix64_xlate()
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu,  7 May 2020 17:27:15 +0000 (GMT)
+Subject: [PATCH 6/6] target/ppc: Don't update radix PTE R/C bits with gdbstub
 From: Greg Kurz <groug@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 07 May 2020 19:26:50 +0200
-Message-ID: <158887241032.1564424.1335205982073200922.stgit@bahia.lan>
+Date: Thu, 07 May 2020 19:27:15 +0200
+Message-ID: <158887243487.1564424.7276382177976503972.stgit@bahia.lan>
 In-Reply-To: <158887239173.1564424.16721638327458334129.stgit@bahia.lan>
 References: <158887239173.1564424.16721638327458334129.stgit@bahia.lan>
 User-Agent: StGit/unknown-version
@@ -77,14 +77,14 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
  definitions=2020-05-07_10:2020-05-07,
  2020-05-07 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxlogscore=758
- priorityscore=1501 lowpriorityscore=0 bulkscore=0 spamscore=0 phishscore=0
- malwarescore=0 impostorscore=0 suspectscore=0 mlxscore=0 clxscore=1034
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ mlxscore=0 malwarescore=0
+ suspectscore=0 bulkscore=0 priorityscore=1501 spamscore=0
+ lowpriorityscore=0 adultscore=0 phishscore=0 mlxlogscore=912 clxscore=1034
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2003020000 definitions=main-2005070135
-Received-SPF: softfail client-ip=148.163.156.1; envelope-from=groug@kaod.org;
+Received-SPF: softfail client-ip=148.163.158.5; envelope-from=groug@kaod.org;
  helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 13:26:52
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 12:11:34
 X-ACL-Warn: Detected OS   = Linux 3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -110,31 +110,134 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It is the job of the ppc_radix64_get_fully_qualified_addr() function
-which is called at the beginning of ppc_radix64_xlate() to set both
-lpid *and* pid. It doesn't buy us anything to initialize them first.
+gdbstub shouldn't silently change guest visible state when doing address
+translation. While here drop a not very useful comment.
 
-Worse, a bug in ppc_radix64_get_fully_qualified_addr(), eg. failing to
-set either lpid or pid, would be undetectable by static analysis tools
-like coverity.
+This was found while reading the code. I could verify that this affects
+both powernv and pseries, but I failed to observe any actual bug.
 
+Fixes: d04ea940c597 "target/ppc: Add support for Radix partition-scoped translation"
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- target/ppc/mmu-radix64.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/ppc/mmu-radix64.c |   36 ++++++++++++++++++++++++------------
+ 1 file changed, 24 insertions(+), 12 deletions(-)
 
 diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
-index c76879f65b78..5e2d912ee346 100644
+index ceeb3dfe2d49..bc51cd89a079 100644
 --- a/target/ppc/mmu-radix64.c
 +++ b/target/ppc/mmu-radix64.c
-@@ -433,7 +433,7 @@ static int ppc_radix64_xlate(PowerPCCPU *cpu, vaddr eaddr, int rwx,
-                              bool cause_excp)
+@@ -270,7 +270,8 @@ static int ppc_radix64_partition_scoped_xlate(PowerPCCPU *cpu, int rwx,
+                                               ppc_v3_pate_t pate,
+                                               hwaddr *h_raddr, int *h_prot,
+                                               int *h_page_size, bool pde_addr,
+-                                              bool cause_excp)
++                                              bool cause_excp,
++                                              bool cause_rc_update)
+ {
+     int fault_cause = 0;
+     hwaddr pte_addr;
+@@ -291,8 +292,9 @@ static int ppc_radix64_partition_scoped_xlate(PowerPCCPU *cpu, int rwx,
+         return 1;
+     }
+ 
+-    /* Update Reference and Change Bits */
+-    ppc_radix64_set_rc(cpu, rwx, pte, pte_addr, h_prot);
++    if (cause_rc_update) {
++        ppc_radix64_set_rc(cpu, rwx, pte, pte_addr, h_prot);
++    }
+ 
+     return 0;
+ }
+@@ -301,7 +303,8 @@ static int ppc_radix64_process_scoped_xlate(PowerPCCPU *cpu, int rwx,
+                                             vaddr eaddr, uint64_t pid,
+                                             ppc_v3_pate_t pate, hwaddr *g_raddr,
+                                             int *g_prot, int *g_page_size,
+-                                            bool cause_excp)
++                                            bool cause_excp,
++                                            bool cause_rc_update)
+ {
+     CPUState *cs = CPU(cpu);
+     CPUPPCState *env = &cpu->env;
+@@ -336,7 +339,8 @@ static int ppc_radix64_process_scoped_xlate(PowerPCCPU *cpu, int rwx,
+         ret = ppc_radix64_partition_scoped_xlate(cpu, 0, eaddr, prtbe_addr,
+                                                  pate, &h_raddr, &h_prot,
+                                                  &h_page_size, true,
+-                                                 cause_excp);
++                                                 cause_excp,
++                                                 cause_rc_update);
+         if (ret) {
+             return ret;
+         }
+@@ -376,7 +380,8 @@ static int ppc_radix64_process_scoped_xlate(PowerPCCPU *cpu, int rwx,
+             ret = ppc_radix64_partition_scoped_xlate(cpu, 0, eaddr, pte_addr,
+                                                      pate, &h_raddr, &h_prot,
+                                                      &h_page_size, true,
+-                                                     cause_excp);
++                                                     cause_excp,
++                                                     cause_rc_update);
+             if (ret) {
+                 return ret;
+             }
+@@ -408,7 +413,9 @@ static int ppc_radix64_process_scoped_xlate(PowerPCCPU *cpu, int rwx,
+         return 1;
+     }
+ 
+-    ppc_radix64_set_rc(cpu, rwx, pte, pte_addr, g_prot);
++    if (cause_rc_update) {
++        ppc_radix64_set_rc(cpu, rwx, pte, pte_addr, g_prot);
++    }
+ 
+     return 0;
+ }
+@@ -433,7 +440,8 @@ static int ppc_radix64_process_scoped_xlate(PowerPCCPU *cpu, int rwx,
+ static int ppc_radix64_xlate(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+                              bool relocation,
+                              hwaddr *raddr, int *psizep, int *protp,
+-                             bool cause_excp)
++                             bool cause_excp,
++                             bool cause_rc_update)
  {
      CPUPPCState *env = &cpu->env;
--    uint64_t lpid = 0, pid = 0;
-+    uint64_t lpid, pid;
-     ppc_v3_pate_t pate;
-     int psize, prot;
-     hwaddr g_raddr;
+     uint64_t lpid, pid;
+@@ -483,7 +491,9 @@ static int ppc_radix64_xlate(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+     if (relocation) {
+         int ret = ppc_radix64_process_scoped_xlate(cpu, rwx, eaddr, pid,
+                                                    pate, &g_raddr, &prot,
+-                                                   &psize, cause_excp);
++                                                   &psize,
++                                                   cause_excp,
++                                                   cause_rc_update);
+         if (ret) {
+             return ret;
+         }
+@@ -506,7 +516,9 @@ static int ppc_radix64_xlate(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+ 
+             ret = ppc_radix64_partition_scoped_xlate(cpu, rwx, eaddr, g_raddr,
+                                                      pate, raddr, &prot, &psize,
+-                                                     0, cause_excp);
++                                                     0,
++                                                     cause_excp,
++                                                     cause_rc_update);
+             if (ret) {
+                 return ret;
+             }
+@@ -562,7 +574,7 @@ int ppc_radix64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+ 
+     /* Translate eaddr to raddr (where raddr is addr qemu needs for access) */
+     if (ppc_radix64_xlate(cpu, eaddr, rwx, relocation, &raddr,
+-                          &page_size, &prot, true)) {
++                          &page_size, &prot, true, true)) {
+         return 1;
+     }
+ 
+@@ -584,7 +596,7 @@ hwaddr ppc_radix64_get_phys_page_debug(PowerPCCPU *cpu, target_ulong eaddr)
+     }
+ 
+     if (ppc_radix64_xlate(cpu, eaddr, 0, msr_dr, &raddr, &psize,
+-                          &prot, false)) {
++                          &prot, false, false)) {
+         return -1;
+     }
+ 
 
 
