@@ -2,109 +2,108 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C95B4C38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 07:11:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2786DC38A24
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 07:17:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 967B22075E
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 07:11:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 967B22075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+	by mail.kernel.org (Postfix) with ESMTPS id E49E1207DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 07:17:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gpN2YqG9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E49E1207DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWah7-0002nm-P1
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 03:11:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59780)
+	id 1jWamL-0004xx-Us
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 03:17:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jWagZ-0002MJ-Pf
- for qemu-devel@nongnu.org; Thu, 07 May 2020 03:11:11 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60260)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jWagY-0005qv-JK
- for qemu-devel@nongnu.org; Thu, 07 May 2020 03:11:11 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jWagW-0007fA-B2
- for <qemu-devel@nongnu.org>; Thu, 07 May 2020 07:11:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 526F02E802D
- for <qemu-devel@nongnu.org>; Thu,  7 May 2020 07:11:08 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jWal7-0004No-5g
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 03:15:53 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28224
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jWal4-0003HB-6w
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 03:15:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588835749;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cf3b96NuvIThpS9f59kMDGSKOHiZbMPX7vmad87hH/4=;
+ b=gpN2YqG9B3T2C9S1TbF/nif1XWEaRteoF2GqhlHCFiyUM9ct6NVRwPBo6WVv6ph481h8q1
+ iD7Z0Yh/jpHUV5cEOfPQK6W1rN4kp4Q7yGXsD4Z3Fuqsk2llhi1RZ+GLA0cH4NYlR1Kdpq
+ 89/SVVhDV5OgY49KIVzo2c81J7FUlnE=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-52-gq0YGXbGPFGyjxjNMN0bZw-1; Thu, 07 May 2020 03:15:47 -0400
+X-MC-Unique: gq0YGXbGPFGyjxjNMN0bZw-1
+Received: by mail-wr1-f72.google.com with SMTP id z5so2829149wrt.17
+ for <qemu-devel@nongnu.org>; Thu, 07 May 2020 00:15:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=2vVigyUvQxsc7XSeajwsi+zbMnh697hw31fC4iTyfHo=;
+ b=psS26WYZlApfclGqPKTLE2YoTZAvZTeQsRKW/udzrUhT8kUOu77LcbEyDt5D8DrY+3
+ eBdvCs4Arxbu0U1CCe1f/nmYWR4MePAcmPYzmqo86J3uZ+PvX9+Gh7IFFtM18SIlXAoV
+ ndB5ebX2rg9REQQOIvC63sT2n6ZlyqM7Tu1vxoSUB9NMpA1zRlUtIyx/UbpKSefK2tau
+ uY/LiYihObY56d29cmQ2CRILdaCbiL8JNqIy3fgipfBTeKreoCACEX0hH48zmd/prgox
+ BW1OSYKjxHjRFyUDn8JTMCBsWxKaoy9Kf8acnU9SWBVu9zO8+98tpIzA39TOIWUM+1yf
+ +t3Q==
+X-Gm-Message-State: AGi0PuZyClkv0STANmMyC1Ft639SGxo2gUFnd6h9Ee1nHRXVYqCdcO8n
+ OVNr2Jx2e55VG+zb75iQVCtFWe6kMdQqcV70lQ+DbP7VssHSYcW0II3OUfrQCzSQwaAeUf57+TG
+ ZUbHiwj/bBy6+5AU=
+X-Received: by 2002:adf:dd8a:: with SMTP id x10mr14062097wrl.308.1588835746237; 
+ Thu, 07 May 2020 00:15:46 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJxmVtHaOQGB7HjrSvi93vTnr3SqDf84RhB3xdBnm+SDBFkcDvBxhs3mSnob7xBEqsijhUNRg==
+X-Received: by 2002:adf:dd8a:: with SMTP id x10mr14062054wrl.308.1588835745807; 
+ Thu, 07 May 2020 00:15:45 -0700 (PDT)
+Received: from redhat.com (bzq-109-66-7-121.red.bezeqint.net. [109.66.7.121])
+ by smtp.gmail.com with ESMTPSA id
+ n6sm6772975wrs.81.2020.05.07.00.15.43
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 07 May 2020 00:15:45 -0700 (PDT)
+Date: Thu, 7 May 2020 03:15:41 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Raphael Norwitz <raphael.s.norwitz@gmail.com>
+Subject: Re: [PATCH v2 5/5] vhost: add device started check in migration set
+ log
+Message-ID: <20200507031519-mutt-send-email-mst@kernel.org>
+References: <cover.1588252861.git.dimastep@yandex-team.ru>
+ <d25241eb1fe7a55fc7dbe63ecedb4f1adf407837.1588252862.git.dimastep@yandex-team.ru>
+ <CAFubqFsvn+wNm-rAU1sLBic6J70-ZP_UT4xMDcvGeZ9TarYdjw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAFubqFsvn+wNm-rAU1sLBic6J70-ZP_UT4xMDcvGeZ9TarYdjw@mail.gmail.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 07 May 2020 07:00:01 -0000
-From: Ike Panhc <ike.pan@canonical.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=kunpeng920; status=Triaged; importance=Undecided;
- assignee=ike.pan@canonical.com; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-18.04; status=Triaged;
- importance=Undecided; assignee=ike.pan@canonical.com; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-18.04-hwe;
- status=Triaged; importance=Undecided; assignee=ike.pan@canonical.com; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-19.10; status=Triaged;
- importance=Undecided; assignee=ike.pan@canonical.com; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-20.04; status=Triaged;
- importance=Undecided; assignee=ike.pan@canonical.com; 
-X-Launchpad-Bug: product=kunpeng920; productseries=upstream-kernel;
- status=Fix Committed; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=In Progress; importance=Medium; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
- component=main; status=In Progress; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=qemu; 
- component=main; status=In Progress; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
- component=main; status=In Progress; importance=Medium; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
- component=main; status=In Progress; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug-Tags: ikeradar patch qemu-img
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: andrew-cloke dannf ikepanhc iveskim jan-glauber-i
- jnsnow kongzizaixian lizhengui philmd
- rafaeldtinoco ying-fang
-X-Launchpad-Bug-Reporter: dann frazier (dannf)
-X-Launchpad-Bug-Modifier: Ike Panhc (ikepanhc)
-References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
-Message-Id: <158883480140.12028.15004586174613215253.malone@wampee.canonical.com>
-Subject: [Bug 1805256] Re: qemu-img hangs on rcu_call_ready_event logic in
- Aarch64 when converting images
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: f51ab55f6a0c7118d68588708dae49663336feef
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 03:11:09
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 03:15:48
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -113,203 +112,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
+Cc: fam@euphon.net, kwolf@redhat.com, stefanha@redhat.com,
+ qemu-block@nongnu.org, jasowang@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, raphael.norwitz@nutanix.com, arei.gonglei@huawei.com,
+ fengli@smartx.com, yc-core@yandex-team.ru, pbonzini@redhat.com,
+ marcandre.lureau@redhat.com, mreitz@redhat.com,
+ Dima Stepanov <dimastep@yandex-team.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Tested debs in ppa:rafaeldtinoco/lp1805256 for focal and eoan and 1000
-qemu-img convert passed.
+On Wed, May 06, 2020 at 06:08:34PM -0400, Raphael Norwitz wrote:
+> As you correctly point out, this code needs to be looked at more
+> carefully so that
+> if the device does disconnect in the background we can handle the migrati=
+on path
+> gracefully. In particular, we need to decide whether a migration
+> should be allowed
+> to continue if a device disconnects durning the migration stage.
+>=20
+> mst, any thoughts?
 
--- =
+Why not? It can't change state while disconnected, so it just makes
+things easier.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805256
+> Have you looked at the suggestion I gave Li Feng to move vhost_dev_cleanu=
+p()
+> into the connection path in vhost-user-blk? I=E2=80=99m not sure if he=E2=
+=80=99s
+> actively working on it,
+> but I would prefer if we can find a way to keep some state around
+> between reconnects
+> so we aren=E2=80=99t constantly checking dev->started. A device can be st=
+opped
+> for reasons
+> other than backend disconnect so I=E2=80=99d rather not reuse this field =
+to
+> check for backend
+> disconnect failures.
+>=20
+> On Thu, Apr 30, 2020 at 9:57 AM Dima Stepanov <dimastep@yandex-team.ru> w=
+rote:
+> >
+> > If vhost-user daemon is used as a backend for the vhost device, then we
+> > should consider a possibility of disconnect at any moment. If such
+> > disconnect happened in the vhost_migration_log() routine the vhost
+> > device structure will be clean up.
+> > At the start of the vhost_migration_log() function there is a check:
+> >   if (!dev->started) {
+> >       dev->log_enabled =3D enable;
+> >       return 0;
+> >   }
+> > To be consistent with this check add the same check after calling the
+> > vhost_dev_set_log() routine. This in general help not to break a
+>=20
+> Could you point to the specific asserts which are being triggered?
+>=20
+> > migration due the assert() message. But it looks like that this code
+> > should be revised to handle these errors more carefully.
+> >
+> > In case of vhost-user device backend the fail paths should consider the
+> > state of the device. In this case we should skip some function calls
+> > during rollback on the error paths, so not to get the NULL dereference
+> > errors.
+> >
+> > Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+> > ---
+> >  hw/virtio/vhost.c | 39 +++++++++++++++++++++++++++++++++++----
+> >  1 file changed, 35 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> > index 3ee50c4..d5ab96d 100644
+> > --- a/hw/virtio/vhost.c
+> > +++ b/hw/virtio/vhost.c
+> > @@ -787,6 +787,17 @@ static int vhost_dev_set_features(struct vhost_dev=
+ *dev,
+> >  static int vhost_dev_set_log(struct vhost_dev *dev, bool enable_log)
+> >  {
+> >      int r, i, idx;
+>=20
+> A couple points here
+>=20
+>=20
+> (1) This will fail the live migration if the device is disconnected.
+> That my be the right thing
+>       to do, but if there are cases where migrations can proceed with
+> a disconnected device,
+>       this may not be desirable.
+>=20
+> (2) This looks racy. As far as I can tell vhost_dev_set_log() is only
+> called by vhost_migration_log(),
+>       and as you say one of the first things vhost_migration_log does
+> is return if dev->started is not
+>       set. What=E2=80=99s to stop a disconnect from clearing the vdev rig=
+ht
+> after this check, just before
+>       vhost_dev_set_features() is called?
+>=20
+> As stated above, I would prefer it if we could add some state which
+> would persist between
+> reconnects which could then be checked in the vhost-user code before
+> interacting with
+> the backend. I understand this will be a much more involved change and
+> will require a lot
+> of thought.
+>=20
+> Also, regarding (1) above, if the original check in
+> vhost_migration_log() returns success if the
+> device is not started why return an error here? I imagine this could
+> lead to some inconsistent
+> behavior if the device disconnects before the first check verses
+> before the second.
+>=20
+> > +
+> > +    if (!dev->started) {
+> > +        /*
+> > +         * If vhost-user daemon is used as a backend for the
+> > +         * device and the connection is broken, then the vhost_dev
+> > +         * structure will be reset all its values to 0.
+> > +         * Add additional check for the device state.
+> > +         */
+> > +        return -1;
+> > +    }
+> > +
+> >      r =3D vhost_dev_set_features(dev, enable_log);
+> >      if (r < 0) {
+> >          goto err_features;
+> > @@ -801,12 +812,19 @@ static int vhost_dev_set_log(struct vhost_dev *de=
+v, bool enable_log)
+> >      }
 
-Title:
-  qemu-img hangs on rcu_call_ready_event logic in Aarch64 when
-  converting images
-
-Status in kunpeng920:
-  Triaged
-Status in kunpeng920 ubuntu-18.04 series:
-  Triaged
-Status in kunpeng920 ubuntu-18.04-hwe series:
-  Triaged
-Status in kunpeng920 ubuntu-19.10 series:
-  Triaged
-Status in kunpeng920 ubuntu-20.04 series:
-  Triaged
-Status in kunpeng920 upstream-kernel series:
-  Fix Committed
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  In Progress
-Status in qemu source package in Bionic:
-  In Progress
-Status in qemu source package in Disco:
-  In Progress
-Status in qemu source package in Eoan:
-  In Progress
-Status in qemu source package in Focal:
-  In Progress
-
-Bug description:
-  [Impact]
-
-  * QEMU locking primitives might face a race condition in QEMU Async
-  I/O bottom halves scheduling. This leads to a dead lock making either
-  QEMU or one of its tools to hang indefinitely.
-
-  [Test Case]
-
-  * qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Hangs indefinitely approximately 30% of the runs in Aarch64.
-
-  [Regression Potential]
-
-  * This is a change to a core part of QEMU: The AIO scheduling. It
-  works like a "kernel" scheduler, whereas kernel schedules OS tasks,
-  the QEMU AIO code is responsible to schedule QEMU coroutines or event
-  listeners callbacks.
-
-  * There was a long discussion upstream about primitives and Aarch64.
-  After quite sometime Paolo released this patch and it solves the
-  issue. Tested platforms were: amd64 and aarch64 based on his commit
-  log.
-
-  * Christian suggests that this fix stay little longer in -proposed to
-  make sure it won't cause any regressions.
-
-  * dannf suggests we also check for performance regressions; e.g. how
-  long it takes to convert a cloud image on high-core systems.
-
-  [Other Info]
-
-  =C2=A0* Original Description bellow:
-
-  Command:
-
-  qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Hangs indefinitely approximately 30% of the runs.
-
-  ----
-
-  Workaround:
-
-  qemu-img convert -m 1 -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Run "qemu-img convert" with "a single coroutine" to avoid this issue.
-
-  ----
-
-  (gdb) thread 1
-  ...
-  (gdb) bt
-  #0 0x0000ffffbf1ad81c in __GI_ppoll
-  #1 0x0000aaaaaabcf73c in ppoll
-  #2 qemu_poll_ns
-  #3 0x0000aaaaaabd0764 in os_host_main_loop_wait
-  #4 main_loop_wait
-  ...
-
-  (gdb) thread 2
-  ...
-  (gdb) bt
-  #0 syscall ()
-  #1 0x0000aaaaaabd41cc in qemu_futex_wait
-  #2 qemu_event_wait (ev=3Dev@entry=3D0xaaaaaac86ce8 <rcu_call_ready_event>)
-  #3 0x0000aaaaaabed05c in call_rcu_thread
-  #4 0x0000aaaaaabd34c8 in qemu_thread_start
-  #5 0x0000ffffbf25c880 in start_thread
-  #6 0x0000ffffbf1b6b9c in thread_start ()
-
-  (gdb) thread 3
-  ...
-  (gdb) bt
-  #0 0x0000ffffbf11aa20 in __GI___sigtimedwait
-  #1 0x0000ffffbf2671b4 in __sigwait
-  #2 0x0000aaaaaabd1ddc in sigwait_compat
-  #3 0x0000aaaaaabd34c8 in qemu_thread_start
-  #4 0x0000ffffbf25c880 in start_thread
-  #5 0x0000ffffbf1b6b9c in thread_start
-
-  ----
-
-  (gdb) run
-  Starting program: /usr/bin/qemu-img convert -f qcow2 -O qcow2
-  ./disk01.ext4.qcow2 ./output.qcow2
-
-  [New Thread 0xffffbec5ad90 (LWP 72839)]
-  [New Thread 0xffffbe459d90 (LWP 72840)]
-  [New Thread 0xffffbdb57d90 (LWP 72841)]
-  [New Thread 0xffffacac9d90 (LWP 72859)]
-  [New Thread 0xffffa7ffed90 (LWP 72860)]
-  [New Thread 0xffffa77fdd90 (LWP 72861)]
-  [New Thread 0xffffa6ffcd90 (LWP 72862)]
-  [New Thread 0xffffa67fbd90 (LWP 72863)]
-  [New Thread 0xffffa5ffad90 (LWP 72864)]
-
-  [Thread 0xffffa5ffad90 (LWP 72864) exited]
-  [Thread 0xffffa6ffcd90 (LWP 72862) exited]
-  [Thread 0xffffa77fdd90 (LWP 72861) exited]
-  [Thread 0xffffbdb57d90 (LWP 72841) exited]
-  [Thread 0xffffa67fbd90 (LWP 72863) exited]
-  [Thread 0xffffacac9d90 (LWP 72859) exited]
-  [Thread 0xffffa7ffed90 (LWP 72860) exited]
-
-  <HUNG w/ 3 threads in the stack trace showed before>
-  """
-
-  All the tasks left are blocked in a system call, so no task left to call
-  qemu_futex_wake() to unblock thread #2 (in futex()), which would unblock
-  thread #1 (doing poll() in a pipe with thread #2).
-
-  Those 7 threads exit before disk conversion is complete (sometimes in
-  the beginning, sometimes at the end).
-
-  ----
-
-  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
-  frequently hangs (~50% of the time) with this command:
-
-  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
-
-  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
-  qcow2->qcow2 conversion happens to be something uvtool does every time
-  it fetches images.
-
-  Once hung, attaching gdb gives the following backtrace:
-
-  (gdb) bt
-  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
-274213760,
-  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3D<optimized out>, timeout@entry=3D0x0, s=
-igmask=3D0xffffc123b950)
-  =C2=A0=C2=A0=C2=A0=C2=A0at ../sysdeps/unix/sysv/linux/ppoll.c:39
-  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
-ptimized out>,
-  =C2=A0=C2=A0=C2=A0=C2=A0__fds=3D<optimized out>) at /usr/include/aarch64-=
-linux-gnu/bits/poll2.h:77
-  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>,
-  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.=
-c:322
-  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
-  =C2=A0=C2=A0=C2=A0=C2=A0at util/main-loop.c:233
-  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
-  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
-g.c:1980
-  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
-img.c:2456
-  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
--img.c:4975
-
-  Reproduced w/ latest QEMU git (@ 53744e0a182)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/kunpeng920/+bug/1805256/+subscriptions
 
