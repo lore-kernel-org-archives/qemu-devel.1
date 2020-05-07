@@ -2,53 +2,54 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78C24C38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 05:05:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54037C47257
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 05:07:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 473C220753
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 05:05:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1AAA920838
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 05:07:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="YueiBkhb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 473C220753
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="DMTpT1Fd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AAA920838
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWYjK-0001FB-CF
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 01:05:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33534)
+	id 1jWYkh-0004j0-6W
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 01:07:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33530)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jWYht-0007VC-Q7; Thu, 07 May 2020 01:04:25 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:51995 helo=ozlabs.org)
+ id 1jWYht-0007V6-Me; Thu, 07 May 2020 01:04:25 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:44055 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jWYhr-0006zG-GF; Thu, 07 May 2020 01:04:25 -0400
+ id 1jWYhr-0006zf-Ej; Thu, 07 May 2020 01:04:25 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 49HhFn1Cckz9sSW; Thu,  7 May 2020 15:04:13 +1000 (AEST)
+ id 49HhFn3bQ5z9sSc; Thu,  7 May 2020 15:04:13 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1588827853;
- bh=BeBPV0jGM9MMAFCuVvUR8L8BVAjuzxl16FKjLO6gvmg=;
- h=From:To:Cc:Subject:Date:From;
- b=YueiBkhbF3kuk7L3g2mK93+LbujuO1JRIGtpKXgDQjEQaMevraYVPLyPtsjoNQixQ
- IOLlDfn+UDCqc0GA5CHZ4e2z51DrfFkQuCYZXgy7Wu88bVdn7hblJg2YZZR6esZlx9
- H3LkkTz5jb1XMBRKmXnAyxUSd5Mwu3FPOf7MEqMk=
+ bh=rv01STFoNzIdEUQWkxzNomnQspQsudGQNlgPG2JbmyM=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=DMTpT1FdqS2BSW3DjblH09ZoJKG4RsRdVlkOsE/aDexmol5KAfvQs0MYQ6xfAKZOY
+ tw7c+w8fNeNjK66bz5DRcMYUUQYdELWmmyNzXtYzNsdpDH1P7bPnz3IVP9l1b+mdoF
+ 7qeHMZ5WH3vop+XoSL3Oz3tlGsh1/2JrJixNP0QA=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 00/18] ppc-for-5.1 queue 20200507
-Date: Thu,  7 May 2020 15:02:10 +1000
-Message-Id: <20200507050228.802395-1-david@gibson.dropbear.id.au>
+Subject: [PULL 02/18] spapr: Don't check capabilities removed between CAS calls
+Date: Thu,  7 May 2020 15:02:12 +1000
+Message-Id: <20200507050228.802395-3-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200507050228.802395-1-david@gibson.dropbear.id.au>
+References: <20200507050228.802395-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
@@ -79,72 +80,68 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 570a9214827e3d42f7173c4d4c9f045b99834cf0:
+From: Greg Kurz <groug@kaod.org>
 
-  Merge remote-tracking branch 'remotes/alistair/tags/pull-reg-to-apply-20200505' into staging (2020-05-06 15:38:02 +0100)
+We currently check if some capability in OV5 was removed by the guest
+since the previous CAS, and we trigger a CAS reboot in that case. This
+was required because it could call for a device-tree property or node
+removal, that we didn't support until recently (see commit 6787d27b04a7
+"spapr: add option vector handling in CAS-generated resets" for details).
 
-are available in the Git repository at:
+Now that we render a full FDT at CAS and that SLOF is able to handle
+node removal, we don't need to do a CAS reset in this case anymore.
+Also, this check can only return true if the guest has already called
+CAS since the last full system reset (otherwise spapr->ov5_cas is
+empty). Linux doesn't do that so this can be considered as dead code
+for the vast majority of existing setups.
 
-  git://github.com/dgibson/qemu.git tags/ppc-for-5.1-20200507
+Drop the check. Since the only use of the ov5_cas_old variable is
+precisely the check itself, drop the variable as well.
 
-for you to fetch changes up to c4f6a4a3dd5f2aa15329b8158de25f50b5ba3252:
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <158514993021.478799.10928618293640651819.stgit@bahia.lan>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr_hcall.c | 14 +-------------
+ 1 file changed, 1 insertion(+), 13 deletions(-)
 
-  target-ppc: fix rlwimi, rlwinm, rlwnm for Clang-9 (2020-05-07 11:10:50 +1000)
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 0d50fc9117..e8ee447537 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1676,7 +1676,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+     target_ulong fdt_bufsize = args[2];
+     target_ulong ov_table;
+     uint32_t cas_pvr;
+-    SpaprOptionVector *ov1_guest, *ov5_guest, *ov5_cas_old;
++    SpaprOptionVector *ov1_guest, *ov5_guest;
+     bool guest_radix;
+     Error *local_err = NULL;
+     bool raw_mode_supported = false;
+@@ -1782,22 +1782,10 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+      * by LoPAPR 1.1, 14.5.4.8, which QEMU doesn't implement, we don't need
+      * to worry about this for now.
+      */
+-    ov5_cas_old = spapr_ovec_clone(spapr->ov5_cas);
+-
+-    /* also clear the radix/hash bit from the current ov5_cas bits to
+-     * be in sync with the newly ov5 bits. Else the radix bit will be
+-     * seen as being removed and this will generate a reset loop
+-     */
+-    spapr_ovec_clear(ov5_cas_old, OV5_MMU_RADIX_300);
+ 
+     /* full range of negotiated ov5 capabilities */
+     spapr_ovec_intersect(spapr->ov5_cas, spapr->ov5, ov5_guest);
+     spapr_ovec_cleanup(ov5_guest);
+-    /* capabilities that have been added since CAS-generated guest reset.
+-     * if capabilities have since been removed, generate another reset
+-     */
+-    spapr->cas_reboot = !spapr_ovec_subset(ov5_cas_old, spapr->ov5_cas);
+-    spapr_ovec_cleanup(ov5_cas_old);
+     /* Now that processing is finished, set the radix/hash bit for the
+      * guest if it requested a valid mode; otherwise terminate the boot. */
+     if (guest_radix) {
+-- 
+2.26.2
 
-----------------------------------------------------------------
-ppc patch queue for 2020-04-07
-
-First pull request for qemu-5.1.  This includes:
- * Removal of all remaining cases where we had CAS triggered reboots
- * A number of improvements to NMI injection
- * Support for partition scoped radix translation in softmmu
- * Some fixes for NVDIMM handling
- * A handful of other minor fixes
-
-----------------------------------------------------------------
-Alexey Kardashevskiy (1):
-      spapr/cas: Separate CAS handling from rebuilding the FDT
-
-Cédric Le Goater (6):
-      target/ppc: Introduce a relocation bool in ppc_radix64_handle_mmu_fault()
-      target/ppc: Assert if HV mode is set when running under a pseries machine
-      target/ppc: Introduce ppc_radix64_xlate() for Radix tree translation
-      target/ppc: Extend ppc_radix64_check_prot() with a 'partition_scoped' bool
-      target/ppc: Rework ppc_radix64_walk_tree() for partition-scoped translation
-      target/ppc: Add support for Radix partition-scoped translation
-
-Daniel Henrique Barboza (1):
-      spapr_nvdimm.c: make 'label-size' mandatory
-
-Daniele Buono (1):
-      target-ppc: fix rlwimi, rlwinm, rlwnm for Clang-9
-
-David Gibson (2):
-      spapr: Don't allow unplug of NVLink2 devices
-      spapr_nvdimm: Tweak error messages
-
-Greg Kurz (3):
-      spapr: Don't check capabilities removed between CAS calls
-      spapr: Simplify selection of radix/hash during CAS
-      spapr: Drop CAS reboot flag
-
-Nicholas Piggin (3):
-      target/ppc: Improve syscall exception logging
-      ppc/spapr: tweak change system reset helper
-      ppc/pnv: Add support for NMI interface
-
-Suraj Jitindar Singh (1):
-      target/ppc: Enforce that the root page directory size must be at least 5
-
- hw/ppc/pnv.c             |  29 +++
- hw/ppc/spapr.c           |  29 ++-
- hw/ppc/spapr_hcall.c     | 108 ++++++-----
- hw/ppc/spapr_nvdimm.c    |  10 +-
- hw/ppc/spapr_pci.c       |   4 +
- include/hw/ppc/spapr.h   |   8 +-
- target/ppc/cpu.h         |   5 +-
- target/ppc/excp_helper.c |  38 +++-
- target/ppc/mmu-radix64.c | 468 ++++++++++++++++++++++++++++++++++-------------
- target/ppc/translate.c   |  24 ++-
- 10 files changed, 506 insertions(+), 217 deletions(-)
 
