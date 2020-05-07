@@ -2,80 +2,83 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C61C38A2A
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:20:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FBFAC38A2A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:21:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3078020643
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:20:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF47A20643
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:21:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vE9RES/b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3078020643
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xTjvaKod"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF47A20643
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWiKG-0001DT-71
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 11:20:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54106)
+	id 1jWiKr-0002HK-0J
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 11:21:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54118)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jWiI8-0006pU-1Z
+ id 1jWiI8-0006pj-A4
  for qemu-devel@nongnu.org; Thu, 07 May 2020 11:18:29 -0400
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:36939)
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46119)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jWiI5-0002Zf-Ni
- for qemu-devel@nongnu.org; Thu, 07 May 2020 11:18:27 -0400
-Received: by mail-wr1-x42b.google.com with SMTP id k1so6869330wrx.4
- for <qemu-devel@nongnu.org>; Thu, 07 May 2020 08:18:24 -0700 (PDT)
+ id 1jWiI7-0002Zx-Aq
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 11:18:28 -0400
+Received: by mail-wr1-x441.google.com with SMTP id w7so6028458wre.13
+ for <qemu-devel@nongnu.org>; Thu, 07 May 2020 08:18:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=F4gnPhex3QJB960Uti/t2pBixGTOg24fPQC0ctvalqc=;
- b=vE9RES/bisG4aZV37Iv8G8td8FS5eR5kCPEJlWBMRHtrN6vQ6hpdHQusWC/clr7INL
- 1GkHoe2fg1tPQCRmdbZE1TLgSblSWTH3dSNF7EyWGp9VmX/LY4MHLsOHrwjFB9LDBmNN
- GmNkFc8sa2J624JFEcj+9PFwekvkGWTYqzfMi81jJYG3kFlfNrX5Q/ZFv098J2xSNFYy
- ap8hzj4QD3Kcb8cejwUWu/02dim1D2P5cEoXweT6idE81dB7/DARWoMHuKvuT0KyapG9
- MgJ+8X8l6O+VvymiopNETrmzOc8M3e2DEBLCP3uED/MXXkclXVq9QUmotxMUxtEcG2Vd
- 5wGg==
+ bh=GnYXmYc6RRM664iT3oxB7lyBMcCRlVJ8yPsgk5u15TQ=;
+ b=xTjvaKod0wdM/kzGIi61kAVVN9qCdg1E6BZ15UAByaVuiPmS4anUf1W9HzTAvEIRC9
+ fcVfEkwdEYcua0fZ/lpI7Rn52Xgh0canXMQrHvevryPjbvYLvvl58o2DImFkuzZXRCKs
+ 5dP8s4CdwREKu471VbZZKrdod9OwBiIu9fTc+ALdatYhT1RZtGpQN7Cc/KXGgzYCrPq4
+ mt9X3u1D6VV8pGzYkk4Rqd5mRaT2etm6JVv7P3rIjRNdvffS4oPXyOBFSvYQ20F1lEpD
+ 7AtiOG5AnBT3kyIL1WN75v+DceAqGf8JIGMP49aWMeWnNWByxreDjGsvXWZH1ijO4/UH
+ Y6ZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=F4gnPhex3QJB960Uti/t2pBixGTOg24fPQC0ctvalqc=;
- b=JtlhUk7vOSo2NcONVNfE6KvGdYtwVPE6hJqBaTuYfPIvaSpjflEX8nh3HZhIOsMAsX
- yCyLNQd4HuaATjOiuCsiWe2mWRxVds34pdGBG13WbzBFRkfvewkcKcUKxGmq/pnKu5oD
- yECLUoynzXgwyCVY1NV+PWWEhEWR6P+uhPO6MMhjvLFmwOYyYsIsnC07Ad88uzR0uQbB
- BP5W/DgescXjnDRqdn+Vzjzjt9i5r4DVu2L53M363P3mIEiwL8gzrpqkSHNy5Y7xlDBD
- Q4mggFuTUeQ5MEkVdkdJtMT1fgBiEq5Fx7a8u5ue7T99nFpm7PououdkKu6JzvXVP+Qf
- DiSA==
-X-Gm-Message-State: AGi0PuZ1WF1dM8NgKCnTvyFuf2TM/de0WsA8C6ogoGtcT+LI90ctECT6
- gzJDlhuH5G2AvrYE2t8Jkq9Xfw==
-X-Google-Smtp-Source: APiQypIxYBiv2fS2ptmPxCOEMEkkwy94Sxrn4B/xl7YTNUExQkiDqrs6qdA1BYo8xqpQjFrH+f58Xw==
-X-Received: by 2002:adf:fec9:: with SMTP id q9mr15482168wrs.181.1588864702656; 
- Thu, 07 May 2020 08:18:22 -0700 (PDT)
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=GnYXmYc6RRM664iT3oxB7lyBMcCRlVJ8yPsgk5u15TQ=;
+ b=rvovPDx6LDNox6wd+MOPyKH/5h8seR6CVcYzqVoqJj+nnLpi0AkqTP1wPtzqmRpeSP
+ 9kibbytGEvu6N/iBSkWsbAIgakRUnq3AlUnE58tsEjI5jJnq2t2/RAuxpo5PxkPjzQi2
+ l+fg+QAbbRhl9uLYBmXaCyra4YID1/B8rcmaDRBHE+tRI7vpcd4DENN/iFVQsIjLDAqp
+ qgyfVdiXOc2Gt2vRNm4DiuHEZEjs5D54bmnXoGEnytRMyuOmUjgkCHWA1bKOGoX+WE89
+ HL8RyBdoig2RWDbd9H39jgb539KkWmfMu9+oDA/HX3+6iWm5hO027icaNHgH/BJ3/YY8
+ Noww==
+X-Gm-Message-State: AGi0PuaQ0N2yraZB4B2+81/MpQ+ZEkU9VFDaj0kqjPvP0mafKk/yUZ74
+ pp1VpKj99Om2Iqu4vyA7zgcwSOHTELj2bw==
+X-Google-Smtp-Source: APiQypJzqzs4V3aVaX/yPAadfEuBfLXoEuAPby7LDxGcuWdnuBSI77QcM2TgY0AE0yk4rAH4wMJGkg==
+X-Received: by 2002:a5d:51cb:: with SMTP id n11mr13338094wrv.236.1588864705313; 
+ Thu, 07 May 2020 08:18:25 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id q74sm961246wme.14.2020.05.07.08.18.20
+ by smtp.gmail.com with ESMTPSA id q74sm961246wme.14.2020.05.07.08.18.24
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 07 May 2020 08:18:21 -0700 (PDT)
+ Thu, 07 May 2020 08:18:24 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH 0/5] docs/system: Document some arm board models
-Date: Thu,  7 May 2020 16:18:14 +0100
-Message-Id: <20200507151819.28444-1-peter.maydell@linaro.org>
+Subject: [PATCH 2/5] docs/system: Sort Arm board index into alphabetical order
+Date: Thu,  7 May 2020 16:18:16 +0100
+Message-Id: <20200507151819.28444-3-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200507151819.28444-1-peter.maydell@linaro.org>
+References: <20200507151819.28444-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42b;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42b.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,47 +104,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patchset adds (minimal) documentation of these Arm board models:
+Sort the board index into alphabetical order.  (Note that we need to
+sort alphabetically by the title text of each file, which isn't the
+same ordering as sorting by the filename.)
 
-vexpress-a15         ARM Versatile Express for Cortex-A15
-vexpress-a9          ARM Versatile Express for Cortex-A9
-mps2-an385           ARM MPS2 with AN385 FPGA image for Cortex-M35
-mps2-an505           ARM MPS2 with AN505 FPGA image for Cortex-M33
-mps2-an511           ARM MPS2 with AN511 DesignStart FPGA image for Cortex-M3
-mps2-an521           ARM MPS2 with AN521 FPGA image for dual Cortex-M33
-musca-a              ARM Musca-A board (dual Cortex-M33)
-musca-b1             ARM Musca-B1 board (dual Cortex-M33)
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ docs/system/target-arm.rst | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-to the system emulator manual.
-
-Patches 1 and 2 are minor tidyup of the board table-of-contents
-before we start adding new entries with patches 3-5.
-
-I'm aiming more for "at least note that the boards exist" than
-"fully comprehensive" documentation here -- there are still another
-37 Arm board models with no documentation at all...
-
-thanks
--- PMM
-
-Peter Maydell (5):
-  docs/system: Add 'Arm' to the Integrator/CP document title
-  docs/system: Sort Arm board index into alphabetical order
-  docs/system: Document Arm Versatile Express boards
-  docs/system: Document the various MPS2 models
-  docs/system: Document Musca boards
-
- docs/system/arm/integratorcp.rst |  4 +--
- docs/system/arm/mps2.rst         | 29 +++++++++++++++
- docs/system/arm/musca.rst        | 31 +++++++++++++++++
- docs/system/arm/vexpress.rst     | 60 ++++++++++++++++++++++++++++++++
- docs/system/target-arm.rst       | 15 ++++----
- MAINTAINERS                      |  3 ++
- 6 files changed, 134 insertions(+), 8 deletions(-)
- create mode 100644 docs/system/arm/mps2.rst
- create mode 100644 docs/system/arm/musca.rst
- create mode 100644 docs/system/arm/vexpress.rst
-
+diff --git a/docs/system/target-arm.rst b/docs/system/target-arm.rst
+index 324e2af1cbc..d1196cbe01c 100644
+--- a/docs/system/target-arm.rst
++++ b/docs/system/target-arm.rst
+@@ -71,15 +71,15 @@ undocumented; you can get a complete list by running
+    :maxdepth: 1
+ 
+    arm/integratorcp
+-   arm/versatile
+    arm/realview
+-   arm/xscale
+-   arm/palm
+-   arm/nseries
+-   arm/stellaris
++   arm/versatile
+    arm/musicpal
+-   arm/sx1
++   arm/nseries
+    arm/orangepi
++   arm/palm
++   arm/xscale
++   arm/sx1
++   arm/stellaris
+ 
+ Arm CPU features
+ ================
 -- 
 2.20.1
 
