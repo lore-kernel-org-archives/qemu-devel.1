@@ -2,88 +2,68 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B681BC38A2A
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:17:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CECBC38A2A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:18:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FE1E207DD
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:17:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DAFB720643
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:18:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eIlbxC+J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FE1E207DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="DPWNplDq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAFB720643
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWiHL-0005X6-Lf
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 11:17:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53654)
+	id 1jWiIK-0006iI-W5
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 11:18:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53830)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jWiGC-00047p-Td
- for qemu-devel@nongnu.org; Thu, 07 May 2020 11:16:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24252
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jWiGA-0007st-Pz
- for qemu-devel@nongnu.org; Thu, 07 May 2020 11:16:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588864585;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BJyNk/y2vu3vR5QHIWcAnbwI4hxWV7graWXRrzhA8us=;
- b=eIlbxC+JtooONpMW27bgQZomc1zJ2fJf2u/AX3Pb+K7SOC7l/wShXOGUyKCeh83B853BSq
- rIGpk9p66pGZd/QKrEOYcQDy1JGXHg6BhYxjO+kcy5W+jlyzElAMLyvmMketMB6klrBcL0
- oWpgshLcSlueRtX8ChZVDcnWn9ZK1VM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-205-OEj1qCJTMTuCQCL9YyWc7w-1; Thu, 07 May 2020 11:16:23 -0400
-X-MC-Unique: OEj1qCJTMTuCQCL9YyWc7w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73C831005510;
- Thu,  7 May 2020 15:16:22 +0000 (UTC)
-Received: from [10.3.114.73] (ovpn-114-73.phx2.redhat.com [10.3.114.73])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EA35B5C1B0;
- Thu,  7 May 2020 15:16:21 +0000 (UTC)
-Subject: Re: [PATCH 3/3] iotests: Mirror with different source/target size
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200507145228.323412-1-kwolf@redhat.com>
- <20200507145228.323412-4-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <b66c37e7-b69c-35e9-3305-ad5fcf7a2073@redhat.com>
-Date: Thu, 7 May 2020 10:16:21 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1jWiGj-00057Z-OM; Thu, 07 May 2020 11:17:01 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:35785)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1jWiGh-0000zh-Fe; Thu, 07 May 2020 11:17:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=CFUm8VG1NKUPuGjXgmM6pJi/4RUHGzjxdr0Fp9Vg6f4=; 
+ b=DPWNplDqvl11Q+muD+R3dc4tx7DU5U6/YyI5hgDNjW24PZdbAlWPZY3UkDOBGCUnVAwcKovDpDGnKZe3cYTNTYUkeDxna1sVDx8qY8m4LWevbrniXWaDXF2nJ4zNNXT7wj6DPXTJ+3yBZ76eGpj9QupOcZ0tugWhcHzsc65QnajOsAHCwcuA6lHs7R3JeOiBd3dEUNbIDMJhopwBdtiryUCCgfBP6jf8BjJijBNvvp4oE7AGjENhFmRKteUz4cW8NkMF2CI98C2+AlekpkZDsSzkM20LyYynfxc9BeymHsXGNofyueqdMQ9c5G1V7sGF6sgftrouDzpcaq6LElIPVw==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1jWiGd-0005oZ-6K; Thu, 07 May 2020 17:16:55 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1jWiGc-0007Hd-Su; Thu, 07 May 2020 17:16:54 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Subject: Re: [PATCH v5 30/31] qcow2: Add subcluster support to qcow2_measure()
+In-Reply-To: <39aaec0f-e81f-16c9-986d-f2c06aae8fd2@redhat.com>
+References: <cover.1588699789.git.berto@igalia.com>
+ <04394b984ec09146373ad6a23996423bcfffdb19.1588699789.git.berto@igalia.com>
+ <39aaec0f-e81f-16c9-986d-f2c06aae8fd2@redhat.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Thu, 07 May 2020 17:16:54 +0200
+Message-ID: <w51d07fn5ax.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20200507145228.323412-4-kwolf@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 03:56:18
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain
+Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
+ helo=fanzine.igalia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 10:37:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,28 +77,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, jsnow@redhat.com, qemu-devel@nongnu.org,
- mreitz@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/7/20 9:52 AM, Kevin Wolf wrote:
-> This tests that the mirror job catches situations where the target node
-> has a different size than the source node. It must also forbid resize
-> operations when the job is already running.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->   tests/qemu-iotests/041     | 45 ++++++++++++++++++++++++++++++++++++++
->   tests/qemu-iotests/041.out |  4 ++--
->   2 files changed, 47 insertions(+), 2 deletions(-)
-> 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+On Wed 06 May 2020 08:13:51 PM CEST, Eric Blake wrote:
+> On 5/5/20 12:38 PM, Alberto Garcia wrote:
+>> Extended L2 entries are bigger than normal L2 entries so this has an
+>> impact on the amount of metadata needed for a qcow2 file.
+>> 
+>> Signed-off-by: Alberto Garcia <berto@igalia.com>
+>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>   block/qcow2.c | 19 ++++++++++++-------
+>>   1 file changed, 12 insertions(+), 7 deletions(-)
+>
+> Should this be hoisted earlier in the series, before 28/31?
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+I can do that if I call qcow2_calc_prealloc_size() with extended_l2
+always set to false (because there would be no BLOCK_OPT_EXTL2 that the
+caller could use). Maybe it's not a bad idea.
 
+> Should there be iotest coverage?
+
+There are already, in the last patch.
+
+Berto
 
