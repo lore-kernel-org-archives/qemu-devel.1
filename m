@@ -2,66 +2,64 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6252CC38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 09:19:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBC0EC38A2A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 09:20:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1EA3F2075E
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 09:19:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A75CB2078C
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 09:20:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K75L/4Rp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EA3F2075E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UiQ4BsFA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A75CB2078C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWcgQ-000515-61
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 05:19:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58684)
+	id 1jWchk-00066g-Qn
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 05:20:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58918)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jWcfh-0004Vl-RW
- for qemu-devel@nongnu.org; Thu, 07 May 2020 05:18:25 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23603
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jWch7-0005Xj-RH
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 05:19:53 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22708
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jWcff-0003JV-NA
- for qemu-devel@nongnu.org; Thu, 07 May 2020 05:18:25 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jWch6-0004Je-VC
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 05:19:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588843102;
+ s=mimecast20190719; t=1588843192;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=fwvIKQX7Hk3iKvKb/PmJD2U/E6d33PwChmGtacoy5kE=;
- b=K75L/4RpNg1aZpFau/pDJcSf5ubaCrML7uMoLS7yyi9whEaf8KI1iah1ixeT8GMXAmQbQg
- flKxzATfDrdMtQ5E2QtU0111UMu0+rxlsy581Tu/3XGQ6FzBfUQ/rvW0ZBI6p80JiTvu4i
- 61+xcqBMlwDMObp/rQJUCF7u5iHI1lo=
+ bh=8dObnSWUGUEPGBMVpF7pcaJii4/0yJr5w0zaFqBieKc=;
+ b=UiQ4BsFA8f2808Qp0IAhgQ4iQ7F8LcipBCPOaAFUVmuAUVMUAvjjc9f8yseN9wEPabYtpG
+ haU1jGtwpjUMrSVmps/08w6vOYGtwo9vzCze/JA1es9656jz2k7RrXoIknnurPcDaLmiMd
+ B+VsV0N8xb8k96LdZnHv19sN7fF37q0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-184-v4FzPjQeMpSJwIWi1M182g-1; Thu, 07 May 2020 05:18:20 -0400
-X-MC-Unique: v4FzPjQeMpSJwIWi1M182g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-466-lxf3vw-gOKKhDHcX0kIB5A-1; Thu, 07 May 2020 05:19:49 -0400
+X-MC-Unique: lxf3vw-gOKKhDHcX0kIB5A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6B60F464;
- Thu,  7 May 2020 09:18:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C36445F;
+ Thu,  7 May 2020 09:19:49 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-114-92.ams2.redhat.com
  [10.36.114.92])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C06563F61;
- Thu,  7 May 2020 09:18:17 +0000 (UTC)
-Subject: Re: [PATCH v3 09/33] block: Add generic bdrv_inherited_options()
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BFDEC60CCC;
+ Thu,  7 May 2020 09:19:47 +0000 (UTC)
+Subject: Re: [PATCH v3 15/33] block: Pull out bdrv_default_perms_for_backing()
 To: Kevin Wolf <kwolf@redhat.com>
 References: <20200218124242.584644-1-mreitz@redhat.com>
- <20200218124242.584644-10-mreitz@redhat.com>
- <20200506103722.GB6333@linux.fritz.box>
- <20200506131135.GE6333@linux.fritz.box>
+ <20200218124242.584644-16-mreitz@redhat.com>
+ <20200506132134.GF6333@linux.fritz.box>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -87,18 +85,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <7b7084ea-fb31-c994-cae0-f9a2c8438ae1@redhat.com>
-Date: Thu, 7 May 2020 11:18:15 +0200
+Message-ID: <f9a3de21-96bf-9dfc-8b33-14e1885cd046@redhat.com>
+Date: Thu, 7 May 2020 11:19:45 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200506131135.GE6333@linux.fritz.box>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200506132134.GF6333@linux.fritz.box>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="C8K6OzaxsYUYFvqwL9X8KlzQo5MHDUzGA"
+ boundary="mc9oww5y1w46DHZgv0khT7MQDRYDjE1dt"
 Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 02:00:54
@@ -127,112 +125,52 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---C8K6OzaxsYUYFvqwL9X8KlzQo5MHDUzGA
-Content-Type: multipart/mixed; boundary="pkdazhM8xI4hMTMMG6UY1KDFbBPajJRP3"
+--mc9oww5y1w46DHZgv0khT7MQDRYDjE1dt
+Content-Type: multipart/mixed; boundary="0XCXKeKMJRjNK8HXR8FFhY8xdrNF0w0OZ"
 
---pkdazhM8xI4hMTMMG6UY1KDFbBPajJRP3
+--0XCXKeKMJRjNK8HXR8FFhY8xdrNF0w0OZ
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 06.05.20 15:11, Kevin Wolf wrote:
-> Am 06.05.2020 um 12:37 hat Kevin Wolf geschrieben:
->> Am 18.02.2020 um 13:42 hat Max Reitz geschrieben:
->>> After the series this patch belongs to, we want to have a common
->>> BdrvChildClass that encompasses all of child_file, child_format, and
->>> child_backing.  Such a single class needs a single .inherit_options()
->>> implementation, and this patch introduces it.
->>>
->>> The next patch will show how the existing implementations can fall back
->>> to it just by passing appropriate BdrvChildRole and parent_is_format
->>> values.
->>>
->>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>> Reviewed-by: Eric Blake <eblake@redhat.com>
->>> ---
->>>  block.c | 84 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>>  1 file changed, 84 insertions(+)
->>>
->>> diff --git a/block.c b/block.c
->>> index c33f0e9b42..9179b9b604 100644
->>> --- a/block.c
->>> +++ b/block.c
->>> @@ -998,6 +998,90 @@ static void bdrv_temp_snapshot_options(int *child_=
-flags, QDict *child_options,
->>>      *child_flags &=3D ~BDRV_O_NATIVE_AIO;
->>>  }
->>> =20
->>> +/*
->>> + * Returns the options and flags that a generic child of a BDS should
->>> + * get, based on the given options and flags for the parent BDS.
->>> + */
->>> +static void __attribute__((unused))
->>> +    bdrv_inherited_options(BdrvChildRole role, bool parent_is_format,
->>> +                           int *child_flags, QDict *child_options,
->>> +                           int parent_flags, QDict *parent_options)
->>> +{
->>> +    int flags =3D parent_flags;
->>> +
->>> +    /*
->>> +     * First, decide whether to set, clear, or leave BDRV_O_PROTOCOL.
->>> +     * Generally, the question to answer is: Should this child be
->>> +     * format-probed by default?
->>> +     */
->=20
-> Just for clarity: Do you know a good reason to ever leave it (i.e.
-> inherit it from the parent), except that that's what we have always been
-> doing for backing files? Though of course, only formats have backing
-> files, so the flag would never be set in practice in this case.
-
-It seems correct for filters.
-
-[...]
-
->>> +    if (parent_is_format && !(role & BDRV_CHILD_COW)) {
->>> +        /*
->>> +         * Our format drivers take care to send flushes and respect
->>> +         * unmap policy, so we can default to enable both on lower
->>> +         * layers regardless of the corresponding parent options.
->>> +         */
->>> +        qdict_set_default_str(child_options, BDRV_OPT_DISCARD, "unmap"=
-);
->>> +    }
+On 06.05.20 15:21, Kevin Wolf wrote:
+> Am 18.02.2020 um 13:42 hat Max Reitz geschrieben:
+>> Right now, bdrv_format_default_perms() is used by format parents
+>> (generally). We want to switch to a model where most parents use a
+>> single BdrvChildClass, which then decides the permissions based on the
+>> child role. To do so, we have to split bdrv_format_default_perms() into
+>> separate functions for each such role.
 >>
->> Why the restriction to format here? Don't we break "unmap" propagation
->> through filters with this?
->>
->> It would probably also be a good question why we don't propagate it to
->> the backing file, but this is preexisting.
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
 >=20
-> Some patches later, I think the fix is an else branch that copies the
-> flag from parent_options.
+> As you want to call this based on the child role, would
+> bdrv_default_perms_for_cow() be a more obvious name?
 
-I thought about the same thing, but is that really necessary if
-bdrv_co_pdiscard() will already suppress discards on the parent if unmap
-is false?
+Sounds good.
 
 Max
 
 
---pkdazhM8xI4hMTMMG6UY1KDFbBPajJRP3--
+--0XCXKeKMJRjNK8HXR8FFhY8xdrNF0w0OZ--
 
---C8K6OzaxsYUYFvqwL9X8KlzQo5MHDUzGA
+--mc9oww5y1w46DHZgv0khT7MQDRYDjE1dt
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6z0lgACgkQ9AfbAGHV
-z0A4oQf/Q8XeI41Qx7VzT77NFo0MyeALYc3vA1yB7tki4sxl0Knnog9A+iApSM24
-f5dN0nEtF9oCh85MQ/NXTS6lZZdEIJkqY+IZi0ij5VwW2iZkXZ1zBdsLvPyQAWi1
-qKSARkVEhCegvTadfIx2UNNaqvgmepYCz3FetNGE3X+xEpLKkAUT6tbzS4CCdgA8
-hA2KyUaYV/nWRZ/+D/584ZP7n6HRybhI9wsS8ifXuXSlMSSyNmwkhayX65vreFpn
-ms8xRpylh+5WBcqghHzCL5mpIGBCR9KponyeonaHFf2sgdb34jaIlWWghpa813uY
-5nfjIW5Mq9l0tL3738QRKvgFi+slrw==
-=pUap
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6z0rIACgkQ9AfbAGHV
+z0CBPAf+On8uCKh//XdP6NO4C2Co/D45YstoNvptooOYkqEED5KXEV/254Zw5Urr
+TAB0Bz/N9OtbaHGCSOq2QgQht88N3oCk0mnNWDafzsAKruLqOL4GpNxQ0MsjFYg2
+evAAgqK8fypbZqjyvGr/5LVNDKP72htPkhfTRs8n2ctmU/th6FFvs/vsMchCKdOD
+yjbthWn/gmrqWiOJuotOZcyuOl6Vjrj1njZPqd2FdyLTzKCfhLAhgXQojIaKA7sU
+tumnuxUK8Cb1rYkfRTd0rKxD1jja5VR7osA9WBxoIsoNOx4HOmwn4YbiSe09uDbk
+RB6AWZRd6jzfXYaFi/jxG2H/uOgynA==
+=Tio0
 -----END PGP SIGNATURE-----
 
---C8K6OzaxsYUYFvqwL9X8KlzQo5MHDUzGA--
+--mc9oww5y1w46DHZgv0khT7MQDRYDjE1dt--
 
 
