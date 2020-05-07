@@ -7,51 +7,51 @@ X-Spam-Status: No, score=-5.7 required=3.0 tests=DATE_IN_PAST_06_12,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48F6FC35280
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 23:29:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1200AC35280
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 23:29:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C2ED2073A
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 23:29:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C65CE20A8B
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 23:29:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="QYhiah/Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C2ED2073A
+	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="TsMDzzWG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C65CE20A8B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWpx2-0005sS-4l
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 19:29:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58502)
+	id 1jWpx9-0006Aa-0Z
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 19:29:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58504)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jWpwL-0004gL-UN; Thu, 07 May 2020 19:28:29 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:32917 helo=ozlabs.org)
+ id 1jWpwM-0004gO-3Z; Thu, 07 May 2020 19:28:30 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:33989)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jWpwK-0001Gt-DA; Thu, 07 May 2020 19:28:29 -0400
+ id 1jWpwK-0001Gv-Ca; Thu, 07 May 2020 19:28:29 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 49J8ln69Bfz9sRY; Fri,  8 May 2020 09:28:21 +1000 (AEST)
+ id 49J8ln5SK2z9sSW; Fri,  8 May 2020 09:28:21 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1588894101;
- bh=LX+UY2kgK6xt3zpJWZqaQ5mDAW6ZkKK/KCa552FQVkg=;
+ bh=XMkOuUYZbpnrJpeCHRFjBRXovMkcsHH+lIdDr3doUjE=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=QYhiah/ZsR6udMeZBvle8a8nmThQ4eHyTkMg8/YrmfBUfyrE+okImaebSSzwWmJ1q
- BH5E4qvjYKKv7EuXjRFz5bHpnhRct81L4bxjV584jm2OkCkHSjd4OFSC1yia5U7YoI
- V4g1WD48SUlEigfjCbgXH+uCP6r3S6BtqPfg1aJ0=
-Date: Thu, 7 May 2020 23:52:38 +1000
+ b=TsMDzzWGj5SzAl+FudNOeFAiM6d1dSnFKBttH0YWWleZzea09GnFk6V/jfx6dtj7R
+ WrC92K8K2vwPoqAlaT1pVEuHH53LkCKUd263lsfaqrII+uLoLss253QFHXUCYK5GNc
+ /iH9wf0QtKxmdCgDjTmN1kCsQklpmCGwy6aWXWMQ=
+Date: Thu, 7 May 2020 23:51:54 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH] ppc/spapr: add a POWER10 CPU model
-Message-ID: <20200507135238.GB2282@umbus.fritz.box>
-References: <20200507073855.2485680-1-clg@kaod.org>
+To: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH] ppc/pnv: Fix NMI system reset SRR1 value
+Message-ID: <20200507135154.GA2282@umbus.fritz.box>
+References: <20200507114824.788942-1-npiggin@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="K8nIJk4ghYZn606h"
+ protocol="application/pgp-signature"; boundary="17pEHd4RhPHOinZp"
 Content-Disposition: inline
-In-Reply-To: <20200507073855.2485680-1-clg@kaod.org>
+In-Reply-To: <20200507114824.788942-1-npiggin@gmail.com>
 Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
@@ -75,40 +75,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Popple <alistair@popple.id.au>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---K8nIJk4ghYZn606h
+--17pEHd4RhPHOinZp
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 07, 2020 at 09:38:55AM +0200, C=E9dric Le Goater wrote:
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-
-Applied to ppc-for-5.1, thanks
-
-> ---
->  hw/ppc/spapr_cpu_core.c | 1 +
->  1 file changed, 1 insertion(+)
+On Thu, May 07, 2020 at 09:48:24PM +1000, Nicholas Piggin wrote:
+> Commit a77fed5bd926 ("ppc/pnv: Add support for NMI interface") got the
+> SRR1 setting wrong for sresets that hit outside of power-save states.
 >=20
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index ac1c10942771..9c7e0d225a0a 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -410,6 +410,7 @@ static const TypeInfo spapr_cpu_core_type_infos[] =3D=
- {
->      DEFINE_SPAPR_CPU_CORE_TYPE("power8nvl_v1.0"),
->      DEFINE_SPAPR_CPU_CORE_TYPE("power9_v1.0"),
->      DEFINE_SPAPR_CPU_CORE_TYPE("power9_v2.0"),
-> +    DEFINE_SPAPR_CPU_CORE_TYPE("power10_v1.0"),
->  #ifdef CONFIG_KVM
->      DEFINE_SPAPR_CPU_CORE_TYPE("host"),
->  #endif
+> Fix this, better documenting the source for the bit definitions.
+>=20
+> Fixes: a77fed5bd926 ("ppc/pnv: Add support for NMI interface") got the
+> Cc: C=E9dric Le Goater <clg@kaod.org>
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+
+Applied to ppc-for-5.1, thanks.
+> ---
+>=20
+> Thanks to Cedric for pointing out concerns with a previous MCE patch
+> that unearthed this as well. Linux does not actually care what these
+> SRR1[42:45] bits look like for non-powersave sresets, but we should
+> follow documented behaviour as far as possible.
+>=20
+>  hw/ppc/pnv.c | 26 ++++++++++++++++++++------
+>  1 file changed, 20 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index a3b7a8d0ff..1b4748ce6d 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -1986,12 +1986,26 @@ static void pnv_cpu_do_nmi_on_cpu(CPUState *cs, r=
+un_on_cpu_data arg)
+> =20
+>      cpu_synchronize_state(cs);
+>      ppc_cpu_do_system_reset(cs);
+> -    /*
+> -     * SRR1[42:45] is set to 0100 which the ISA defines as implementation
+> -     * dependent. POWER processors use this for xscom triggered interrup=
+ts,
+> -     * which come from the BMC or NMI IPIs.
+> -     */
+> -    env->spr[SPR_SRR1] |=3D PPC_BIT(43);
+> +    if (env->spr[SPR_SRR1] & PPC_BITMASK(46, 47)) {
+> +        /*
+> +	 * Power-save wakeups, as indicated by non-zero SRR1[46:47] put the
+> +	 * wakeup reason in SRR1[42:45], system reset is indicated with 0b0100
+> +	 * (PPC_BIT(43)).
+> +	 */
+> +        if (!(env->spr[SPR_SRR1] & PPC_BIT(43))) {
+> +            warn_report("ppc_cpu_do_system_reset does not set system res=
+et wakeup reason");
+> +            env->spr[SPR_SRR1] |=3D PPC_BIT(43);
+> +        }
+> +    } else {
+> +        /*
+> +	 * For non-powersave system resets, SRR1[42:45] are defined to be
+> +	 * implementation-dependent. The POWER9 User Manual specifies that
+> +	 * an external (SCOM driven, which may come from a BMC nmi command or
+> +	 * another CPU requesting a NMI IPI) system reset exception should be
+> +	 * 0b0010 (PPC_BIT(44)).
+> +         */
+> +        env->spr[SPR_SRR1] |=3D PPC_BIT(44);
+> +    }
+>  }
+> =20
+>  static void pnv_nmi(NMIState *n, int cpu_index, Error **errp)
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -116,25 +156,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---K8nIJk4ghYZn606h
+--17pEHd4RhPHOinZp
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl60EqYACgkQbDjKyiDZ
-s5IgLxAAtDnMURNgzOLywjiHEVfKzssBzwO8EGaKIPkCi+j+pqlgEVCzr/K+/Wy/
-R5/D/EfEvpAED1ReloqIj9QZPQEeQY4No98Y1zZ+/TatOQoUyP97VgNcLLmNfqlV
-OPKBomWqFDVo5+lJ5kp1tWZbeqmOmSxTUCHUcJiDcsfsA/piMP6rKnYQkvsI3lxK
-at8e2YCs523bkDMP+Y9MC8OlkhB6XglM4Ppj8twHPxpMrXdfexEznC7EWVFRmGg/
-+r4hW2LaoIexQTzom/m8Bgjw75W8U6F5thMM220GUSGLJmzC4ArQHrswMooFIZTL
-XCKMCCdm8+5kCoeZ3FkP6sCYam61/iOQtV5JH/902UKl8aIVmthtmekz9ppJfYfs
-aX09619/yDZGn8duc8lqIdmS0gm9bs00X91iEyh8Mb0Pyyqp6uBLPbPeyMndNbeW
-HqgI7vrVDZ6VYbKJbo9j9JOwBuUnLE4CM9kahXvHHMMZUNwhXgB3POmvN+HVCQp/
-xaWSiOwRI1no6RRsHCPb5/4Hg+Q8OPBFMUL9SMDNzzQw+ciSxbfXy6czfV5JzNKr
-eIAgkD8sgdTUknbl2f2tqU0ZuOpejwRemIvYXQIQn/qDN/2DUebYUtb+tbKFdmPR
-I2+6SDbYWQv70XFpxaa1moUXBnPWgo3fcI2OHs/C127AbdzXe8g=
-=OfeW
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl60EncACgkQbDjKyiDZ
+s5JZ6RAAgvHVEZ5jPnKBTu9kLKvuCstTDaFtonVy91pCOyvM3Ztqw9FEFuZ1IUpi
+RULLosoHxdqKQR99Do9LXKQgEdDdYF0PqIaO51Mmss1KIDb4aHRnHvy19NanhVij
+lza27bvI9I11WOQQCjGeahkhwqxAyYmuO+KSwTOT5jv1GsCzIoIR8R0IcSEEZE3C
+lleQ+diJ6r/yKd6+BPp2sTt+mfeQjOXcO0GePWjmkuPXb68+IaTXTAjPj6aiDb/U
+0K1iK7mLkI2yYAjFfbDXiPfdRE1dtY1qzS4PScZQS/GwZr2wvFSluS7fgEJUqeAe
+PdqH3CFEvICGYYPknmGsPn0EdUwNZp3wzC/rCTX0308VAQisiE41R+XAkgD7MW2p
+W4owHLTRS3ReEYMXwBSrUqoqsSIwhlv3HufahOb+ZmYVHmvLqzf8CWsZNo5KzvdQ
+tVam2CTnNYQRirBT3GjP8uSQT52uGt/j18b2GP6mbVIb+1S6w91H7jCA6NN7thMP
+wqmQCXE7daO174LiRNnRvlpJaEy8ZsLdiumXN2RIVZz/LNolLZRia6cEU7xeuz50
+nRMb/g2jWy/ifSctOSthZWJN5loZjyKtR/c6OM+qPb143CgMaahzJJ7OZVE6w4HH
+nX5X2jmjTYLn+4HWLmY2lM9goAh5iR87E4+LIqTcs5+fZQmX7RA=
+=GuLL
 -----END PGP SIGNATURE-----
 
---K8nIJk4ghYZn606h--
+--17pEHd4RhPHOinZp--
 
