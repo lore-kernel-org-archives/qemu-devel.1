@@ -2,117 +2,126 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17CA7C38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 08:24:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF568C38A2A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 08:26:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7E762073A
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 08:24:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7E762073A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 5B5562073A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 08:26:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="erq/Sc6G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B5562073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWbpP-0004nV-Up
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 04:24:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47982)
+	id 1jWbr4-0005zQ-Bp
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 04:26:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48366)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jWbor-0004OI-Vl
- for qemu-devel@nongnu.org; Thu, 07 May 2020 04:23:50 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:43959)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jWboq-0004jZ-NV
- for qemu-devel@nongnu.org; Thu, 07 May 2020 04:23:49 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MHGTI-1jJSg006fg-00DF21; Thu, 07 May 2020 10:23:32 +0200
-Subject: Re: [PATCH] Fix stack corruption when handling PR_GETDEATHSIG
-To: Stephen Long <steplong@quicinc.com>, qemu-devel@nongnu.org
-References: <20200506234751.7920-1-steplong@quicinc.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
- WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
- SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
- UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
- Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
- JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
- q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
- RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
- 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
- LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCJMYXVyZW50IFZp
- dmllciA8bGF1cmVudEB2aXZpZXIuZXU+iQI4BBMBAgAiBQJWBTDeAhsDBgsJCAcDAgYVCAIJ
- CgsEFgIDAQIeAQIXgAAKCRDzDDi9Py++PCEdD/oD8LD5UWxhQrMQCsUgLlXCSM7sxGLkwmmF
- ozqSSljEGRhffxZvO35wMFcdX9Z0QOabVoFTKrT04YmvbjsErh/dP5zeM/4EhUByeOS7s6Yl
- HubMXVQTkak9Wa9Eq6irYC6L41QNzz/oTwNEqL1weV1+XC3TNnht9B76lIaELyrJvRfgsp9M
- rE+PzGPo5h7QHWdL/Cmu8yOtPLa8Y6l/ywEJ040IoiAUfzRoaJs2csMXf0eU6gVBhCJ4bs91
- jtWTXhkzdl4tdV+NOwj3j0ukPy+RjqeL2Ej+bomnPTOW8nAZ32dapmu7Fj7VApuQO/BSIHyO
- NkowMMjB46yohEepJaJZkcgseaus0x960c4ua/SUm/Nm6vioRsxyUmWd2nG0m089pp8LPopq
- WfAk1l4GciiMepp1Cxn7cnn1kmG6fhzedXZ/8FzsKjvx/aVeZwoEmucA42uGJ3Vk9TiVdZes
- lqMITkHqDIpHjC79xzlWkXOsDbA2UY/P18AtgJEZQPXbcrRBtdSifCuXdDfHvI+3exIdTpvj
- BfbgZAar8x+lcsQBugvktlQWPfAXZu4Shobi3/mDYMEDOE92dnNRD2ChNXg2IuvAL4OW40wh
- gXlkHC1ZgToNGoYVvGcZFug1NI+vCeCFchX+L3bXyLMg3rAfWMFPAZLzn42plIDMsBs+x2yP
- +bkCDQRWBSYZARAAvFJBFuX9A6eayxUPFaEczlMbGXugs0mazbOYGlyaWsiyfyc3PStHLFPj
- rSTaeJpPCjBJErwpZUN4BbpkBpaJiMuVO6egrC8Xy8/cnJakHPR2JPEvmj7Gm/L9DphTcE15
- 92rxXLesWzGBbuYxKsj8LEnrrvLyi3kNW6B5LY3Id+ZmU8YTQ2zLuGV5tLiWKKxc6s3eMXNq
- wrJTCzdVd6ThXrmUfAHbcFXOycUyf9vD+s+WKpcZzCXwKgm7x1LKsJx3UhuzT8ier1L363RW
- ZaJBZ9CTPiu8R5NCSn9V+BnrP3wlFbtLqXp6imGhazT9nJF86b5BVKpF8Vl3F0/Y+UZ4gUwL
- d9cmDKBcmQU/JaRUSWvvolNu1IewZZu3rFSVgcpdaj7F/1aC0t5vLdx9KQRyEAKvEOtCmP4m
- 38kU/6r33t3JuTJnkigda4+Sfu5kYGsogeYG6dNyjX5wpK5GJIJikEhdkwcLM+BUOOTi+I9u
- tX03BGSZo7FW/J7S9y0l5a8nooDs2gBRGmUgYKqQJHCDQyYut+hmcr+BGpUn9/pp2FTWijrP
- inb/Pc96YDQLQA1q2AeAFv3Rx3XoBTGl0RCY4KZ02c0kX/dm3eKfMX40XMegzlXCrqtzUk+N
- 8LeipEsnOoAQcEONAWWo1HcgUIgCjhJhBEF0AcELOQzitbJGG5UAEQEAAYkCHwQYAQIACQUC
- VgUmGQIbDAAKCRDzDDi9Py++PCD3D/9VCtydWDdOyMTJvEMRQGbx0GacqpydMEWbE3kUW0ha
- US5jz5gyJZHKR3wuf1En/3z+CEAEfP1M3xNGjZvpaKZXrgWaVWfXtGLoWAVTfE231NMQKGoB
- w2Dzx5ivIqxikXB6AanBSVpRpoaHWb06tPNxDL6SVV9lZpUn03DSR6gZEZvyPheNWkvz7bE6
- FcqszV/PNvwm0C5Ju7NlJA8PBAQjkIorGnvN/vonbVh5GsRbhYPOc/JVwNNr63P76rZL8Gk/
- hb3xtcIEi5CCzab45+URG/lzc6OV2nTj9Lg0SNcRhFZ2ILE3txrmI+aXmAu26+EkxLLfqCVT
- ohb2SffQha5KgGlOSBXustQSGH0yzzZVZb+HZPEvx6d/HjQ+t9sO1bCpEgPdZjyMuuMp9N1H
- ctbwGdQM2Qb5zgXO+8ZSzwC+6rHHIdtcB8PH2j+Nd88dVGYlWFKZ36ELeZxD7iJflsE8E8yg
- OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
- JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
- ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <c7e90e47-f161-10ab-c270-ca9ba56fd9b6@vivier.eu>
-Date: Thu, 7 May 2020 10:23:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <20200506234751.7920-1-steplong@quicinc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jWbq7-0005Nw-8r; Thu, 07 May 2020 04:25:07 -0400
+Received: from mail-eopbgr80111.outbound.protection.outlook.com
+ ([40.107.8.111]:28931 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jWbq2-0004xr-9c; Thu, 07 May 2020 04:25:06 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GeJ5u4xpKigToEDnJXte1rYnbL0J9/kL5+qlwPMhCynyIXlLB33+STlNthuA9Msld/cImhSMqH6RdChuLdsnZ15/MMWVMEwf/gl1nVV4j45w+0ZGCV23ZaceBmL/Y6v4YNgUTEFnZ9cDmM6h7phuZbLTFCDTiIzhR2Y+xoqABwo5RtgYovsDyYbmDklbEAJNwIvK2jB+6B4tCE77FuG7Zu9bvi89oNnjG6DOfAyioqh97DTrTj5Nop6VW1WUTjTsncz7XwbZBGzAIWsGGXGZtFUIxD4I74PEhaWotceeREbLfQXJI7lJo5JnMVyk0W2CGLGlKx8/Kl/ENHvaIt+Z3Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PkUglFuv4BfExaTlQTAJjfbRjLvUS0Wd44d2Tu6edZA=;
+ b=QQbYIJBzyPNYgu4VI152KNQQVv7Q8bqHVculQYnC3qzUw3H965sG3sS6wPeioTmVUteUkOgFhZn1h1FDJM1L4eHSnTqfFlwYWU3rwZp4HiyVmQKKkn/Xr0/GGzly8WmIUSpJQnDpFQD7423IHE/WKZ0Zzu7M2toFgtCchu/61dcSMSLh7ygZlhU4x5hadxteAx6yGYTt7IIVhC7Wus2drKvf67QoNHPC9H0wvqqVxIFjE4ZQwufoAuZ2HoE3KxUAzM/Lxoah7bf8fT1FqhUTX5r9TS7h5OXPS/XK6F0gMgLJYXCVBz777KeJ9IKapJwhkFt8aZHXZZ2uLF7lLaELEA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PkUglFuv4BfExaTlQTAJjfbRjLvUS0Wd44d2Tu6edZA=;
+ b=erq/Sc6GZ/Z8EnVaOgOXWXcpm032G3q0xavAYPYEX1hfZ9r1zfEC75TuP7hMODsmD98jxYev7Ey3Wb0d13RhXoURQXbf1rv8tkZdFubId0tHhpTzisP4kkAsNBc0BcsKwUOYD4pnfBjouv78ELg9n5xfevBVhLaPzn0pGt+BwDI=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5349.eurprd08.prod.outlook.com (2603:10a6:20b:107::22)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.19; Thu, 7 May
+ 2020 08:24:58 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2958.034; Thu, 7 May 2020
+ 08:24:58 +0000
+Subject: Re: [PATCH 8/8] block: drop unallocated_blocks_are_zero
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+References: <20200506092513.20904-1-vsementsov@virtuozzo.com>
+ <20200506092513.20904-9-vsementsov@virtuozzo.com>
+ <ad581d23-d79d-bf78-3cd5-848eb29a90f5@redhat.com>
+ <903973be-6af6-edd3-3509-b7688e0bb8d5@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200507112454719
+Message-ID: <696d0e37-f8dc-dfb3-ba98-3babad5d34d6@virtuozzo.com>
+Date: Thu, 7 May 2020 11:24:54 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <903973be-6af6-edd3-3509-b7688e0bb8d5@virtuozzo.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:gUpQm7LHDvZCD2wV2NZxiNPFwwBPiCtFC+9E1bNehwInvbDNwts
- T4ZulDXz29LRRzFgBuby+dlydgi680URxIHQXGzFGlrp+/ctGWucgIM5OWGXU0CrqRads3K
- 7KEQ0hOGyOCfC4j+AgpcTm8g++dbOdnydaSSKg5bNgT6Fzvy9woIih9AzFOKdHCrQIFMEBx
- pDhWs8nvycv8+XIsOxZSg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:KgW20NFpjxw=:JTu14bYyQNKKup5hRb2kGR
- grF+PeDs5G4GbAKzGXsBPoIzc2Jt2s6MuP/053Vmvic8ms4Wxm+j/T93+fJz2V05x2Z+zG0l3
- +jbZULDk1qjTnuahmfCy03dvKO0v9DgYHN1/53b6MiGeRi8ssmJUfgFAXA3v6WJhURB3QFgLf
- yeO2PZ+bOEBtRFO3AQV+snhD55oSAxs+Key4LnVaVqmp0fqX/u1eMaShoJungI9GivlJBgni8
- hekzOYeOjWVPUDL7XQQhr0A2QF7+Ycq1b6oTPUAjuVIW13io431nSvy/a71Hnq+Sy7TaNcl+u
- O/tpMl+t3y4t3ap3zsvltjBI5kDqxVoq5IGFgYxtyd7wuLJhxGhZbRCXGGkCb2utJaEyfaWqU
- tZWcR4a3EMZrn9YkfV3qVc160qN5MdOJckwdhf1Ir3LoWI1o9Ewe9cJnWzDiXVlfPGocfqAAk
- 9WpBEtqkj0fMIch9v5arW0H0GU+TF3r0bWpzp79Jpnl8QHbS6wyhdbjMQZH5BIFUDS9ujo6oP
- aLqXE6HefSF4rHaDJLNCdVqMXtPbT98aMG//cl74NWmxrwNbE1WFIV47arnq5ZHTv2NrJlbJc
- 5qAbBaV79CmzHhpgglzeXknV/uM0rkkz7K/2FKbejXFWnAkFw3i/euYpnPmy2aa1oKMrlgRY1
- 1kcrukChGOIGhGAzFTHLfbaOSag8FmKhoN8k5MlVSlAR1D4O+TDVvWlBm9ByPHbir+XIScq7S
- v/QjdjCJFsnwAEkWdg0N2fpw+Gx17bZCriekz3Ws4ZguSIWA/82lIkUBwiN1IJBRL6lCClD5w
- Qu1JbO1eUWMGxBrTnVYxA741nmzOg+aVd7c20WXxocAYPpx/DkQV1TXuxYfq8BTg0+wKALX
-Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 04:23:45
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-ClientProxiedBy: AM3PR07CA0062.eurprd07.prod.outlook.com
+ (2603:10a6:207:4::20) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.171) by
+ AM3PR07CA0062.eurprd07.prod.outlook.com (2603:10a6:207:4::20) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2979.18 via Frontend Transport; Thu, 7 May 2020 08:24:56 +0000
+X-Tagtoolbar-Keys: D20200507112454719
+X-Originating-IP: [185.215.60.171]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 6836544b-7a81-4d56-8326-08d7f260210b
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5349:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5349E64D817DDFE4C8C7CF8DC1A50@AM7PR08MB5349.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2958;
+X-Forefront-PRVS: 03965EFC76
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: cXL3ho2U4NaSCG3RBCB9h+MhdFDxVACZpSwBCGcqNhki/+AsMYbOJ87vVSC8k7Fr9YjHhtIxZI4ha1u409P4fi0GQoPRhVK5USHDmuO4ULIH5OISgzfKY3nix2/cUus5VLxsG7s0Wr4py1XSwdDccuIntstF2Fw5IlwwGUwhgHBW2I0AdzgRi3fWrPbfKBaQjinhJdv4c/xjWxW+VHcIBqXf8vPK+/H4tK655mSgdn2MUsrt5FmRCBnlh8IUHXJhL3l7qDTc55jZER8phgASzqn0Q5Gtv3PuXo0ZV1tmaNIQMg9jeKWixCkjmxbazOLL4VKFt2u0ug2GEyrNGZcvj91ZpxxrCBqrU94NOyKi8NpWpHYxy0bqiMWbSc+ZHijtz1awo1JcXi5/JaCop8zApsDeFJTkJQ/6upP3L8MTwYFrfz+D1nSY4/+rMRTg3rwoqkDA0cXpjXwJBtDEPRkxBQO2g7h5crzayY4h8WLC607r4Kfnz+zYrNREUl/RL6bI1SLUh4geFF9VdJ2y0H2EJ93IPRrDv/xKqf+V+682hXNjwzQy3MLUx3A4gfEpbXY0
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(346002)(39850400004)(396003)(376002)(136003)(366004)(33430700001)(33440700001)(316002)(86362001)(31696002)(478600001)(52116002)(31686004)(36756003)(83290400001)(83310400001)(83300400001)(8676002)(8936002)(83320400001)(53546011)(83280400001)(6486002)(16576012)(956004)(2616005)(26005)(66476007)(66556008)(4326008)(5660300002)(66946007)(16526019)(7416002)(186003)(2906002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: bvoZ3rTTBPz76oyDm4I9fV/Q15aaIa4iunYqQvdCP+Ax8xtiw0A7PGw2Nw5RPja7FG+hirboqON0Cqh0Os7gSpWYfdZj4B74RGyhW+uAkX6jQcKR1IGqaQJy2ERRJjPTpplEFuTq+9ap7NdYYSFpyCvk9ACtlpMISE4pjim7bZNnao46LvZLMlf4B7WdSasI+1HlbaCCuqeWhDTG2CUO82QwX0VAFBHBLwUZFOyRgbr3UjHLpJwc6r7+GLq9pfQEYIDr7f6HQcCOsQ9y3fiGybpgsEOisoDV2ucozzH29KK+Tx2Pu3fxIhC6Ecbj3CbAUA5IroYI0MiJ0lJ/zFQwaRZjtTq3JWlRLcXNbBnobLiBjPa6crMRffdPsbZGb9ADXX4woKBsl7RHpEwyvUC7wNgGv8/SwLuS9FlttIifGXvI03y+CNJFRfmpkkAMa2a6wv7LTyhtlYd2FeIe90D2ODVH9Kn+HRDef87Aqsx3ex9F/rss+fpe25uf1Vf88dR+3xBxiIxwSH/FRu7UZOJ+EecPHE+xhmqddgTbBac+79yYbYMHfi9i1sArfeoKScfI244gUUHnrPxiRtsjt6/yFtBZrg7GoERiVJtnVSut9TmNuQ+sAmRUjvcAIkZvqYvjVWiUs9ZHSMrOokvvl2z2JtsegcBCBl5NUL2SPnw1pooCeU/a1WlZ+upabPWiiZNgG+j30ygmqj0iU8NbX8lG9DuBUTEgop6EEaOv7Bg+FQko1manFLR4tkLHv2AUCRWhnfgAM+cCVUBBjUcPo/vmkylhql0VQWI13FoFXbD/rS8=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6836544b-7a81-4d56-8326-08d7f260210b
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2020 08:24:58.2892 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kfRVJXI/QvbtD+wRjf8li9J5ZdA7c47i2xSIVzY08sT39AGMhxHq4OtpDZaYMsBj7wx+wzfNE5wzUIjMOd3Lvk5MnaoOZt8uJwBxJrm9lUo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5349
+Received-SPF: pass client-ip=40.107.8.111;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 04:24:59
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -24
+X-Spam_score: -2.5
+X-Spam_bar: --
+X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001, T_DKIM_INVALID=0.01,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -125,62 +134,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: riku.voipio@iki.fi, efriedma@quicinc.com, apazos@quicinc.com,
- pzheng@quicinc.com
+Cc: fam@euphon.net, kwolf@redhat.com, ronniesahlberg@gmail.com,
+ codyprime@gmail.com, sw@weilnetz.de, pl@kamp.de, qemu-devel@nongnu.org,
+ mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 07/05/2020 Ã  01:47, Stephen Long a Ã©critÂ :
-> From: Ana Pazos <apazos@quicinc.com>
-> 
-> Signed-off-by: Ana Pazos <apazos@quicinc.com>
-> ---
-> Submitting this patch on behalf of Ana Pazos. The bug was triggered by
-> the following c file on aarch64-linux-user.
-> 
->> #include <signal.h>
->> #include <sys/prctl.h>
+07.05.2020 10:05, Vladimir Sementsov-Ogievskiy wrote:
+> 06.05.2020 18:14, Eric Blake wrote:
+>> On 5/6/20 4:25 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> Currently this field only set by qed and qcow2.
 >>
->> int main() {
->>   int PDeachSig = 0;
->>   if (prctl(PR_GET_PDEATHSIG, &PDeachSig) == 0 && PDeachSig == SIGKILL)
->>     prctl(PR_SET_PDEATHSIG, 0);
->>   return (PDeachSig == SIGKILL);
->> }
-
-
-Put the example in the description of the patch, it will help to
-understand the fix by being kept in the log.
-
->  linux-user/syscall.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>> Well, only after patches 1-6 (prior to then, it was also set in protocol drivers).  I think you might be able to hoist part of this patch earlier in the series, to make the changes to the protocol drivers easier to review, by rewording this sentence:
+>>
+>> Currently, the only format drivers that set this field are qed and qcow2.
+>>
+>>> But in fact, all
+>>> backing-supporting formats (parallels, qcow, qcow2, qed, vmdk) share
+>>> this semantics: on unallocated blocks, if there is no backing file they
+>>
+>> s/this/these/
+>>
+>>> just memset the buffer with zeroes.
+>>>
+>>> So, document this behavior for .supports_backing and drop
+>>> .unallocated_blocks_are_zero
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> ---
+>>>   include/block/block.h     |  6 ------
+>>>   include/block/block_int.h | 13 ++++++++++++-
+>>>   block.c                   | 15 ---------------
+>>>   block/io.c                |  8 ++++----
+>>>   block/qcow2.c             |  1 -
+>>>   block/qed.c               |  1 -
+>>>   6 files changed, 16 insertions(+), 28 deletions(-)
+>>>
+>>> diff --git a/include/block/block.h b/include/block/block.h
+>>> index 8b62429aa4..db1cb503ec 100644
+>>> --- a/include/block/block.h
+>>> +++ b/include/block/block.h
+>>> @@ -21,11 +21,6 @@ typedef struct BlockDriverInfo {
+>>>       /* offset at which the VM state can be saved (0 if not possible) */
+>>>       int64_t vm_state_offset;
+>>>       bool is_dirty;
+>>> -    /*
+>>> -     * True if unallocated blocks read back as zeroes. This is equivalent
+>>> -     * to the LBPRZ flag in the SCSI logical block provisioning page.
+>>> -     */
+>>> -    bool unallocated_blocks_are_zero;
+>>
+>> You can't delete this field until all protocol drivers are cleaned up, so deferring this part of the change to the end of the series makes sense.
+>>
+>>>       /*
+>>>        * True if this block driver only supports compressed writes
+>>>        */
+>>> @@ -431,7 +426,6 @@ int bdrv_co_pdiscard(BdrvChild *child, int64_t offset, int64_t bytes);
+>>>   int bdrv_has_zero_init_1(BlockDriverState *bs);
+>>>   int bdrv_has_zero_init(BlockDriverState *bs);
+>>>   int bdrv_has_zero_init_truncate(BlockDriverState *bs);
+>>> -bool bdrv_unallocated_blocks_are_zero(BlockDriverState *bs);
+>>
+>> Doing this cleanup makes sense: there is only one caller of this function pre-patch, and 0 callers post-patch - but whether the cleanup should be at the same time as you fix the one caller, or deferred to when you also clean up the field, is less important.
+>>
+>> If I were writing the series:
+>>
+>> 1 - fix qemu-img.c to not use the field
+>> 2 - fix block_status to not use the function
 > 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 05f03919ff..4eac567f97 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -10253,10 +10253,10 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->          switch (arg1) {
->          case PR_GET_PDEATHSIG:
->          {
-> -            int deathsig;
-> +            uint32_t deathsig;
->              ret = get_errno(prctl(arg1, &deathsig, arg3, arg4, arg5));
->              if (!is_error(ret) && arg2
-> -                && put_user_ual(deathsig, arg2)) {
-> +                && put_user_u32(deathsig, arg2)) {
->                  return -TARGET_EFAULT;
->              }
->              return ret;
+> Hmm stop. We still need patches 1,2 before modifying block_status, otherwise we'll still need to check unallocated_blocks_are_zero
+
+
+Hmm2. This just means that I need to put all commit messages about dropping unallocated_block_are_zero into one commit message rewriting the block_status. I doubt that it simplifies review: instead of analyzing format-by-format, you'll have to analyze all format at once.
+
+> 
+>> 3-n - fix protocol drivers that set the field to also return _ZERO
+>>   during block status (but not delete the field at that time)
+>> n+1 - delete unused function and field (from ALL drivers)
+>>
+>>>   bool bdrv_can_write_zeroes_with_unmap(BlockDriverState *bs);
+>>>   int bdrv_block_status(BlockDriverState *bs, int64_t offset,
+>>>                         int64_t bytes, int64_t *pnum, int64_t *map,
+>>> diff --git a/include/block/block_int.h b/include/block/block_int.h
+>>> index 92335f33c7..c156b22c6b 100644
+>>> --- a/include/block/block_int.h
+>>> +++ b/include/block/block_int.h
+>>> @@ -115,7 +115,18 @@ struct BlockDriver {
+>>>        */
+>>>       bool bdrv_needs_filename;
+>>> -    /* Set if a driver can support backing files */
+>>> +    /*
+>>> +     * Set if a driver can support backing files. This also implies the
+>>> +     * following semantics:
+>>> +     *
+>>> +     *  - Return status 0 of .bdrv_co_block_status means that corresponding
+>>> +     *    blocks are not allocated in this layer of backing-chain
+>>> +     *  - For such (unallocated) blocks, read will:
+>>> +     *    - read from backing file if there is one and big enough
+>>
+>> s/and/and it is/
+>>
+>>> +     *    - fill buffer with zeroes if there is no backing file
+>>> +     *    - space after EOF of the backing file considered as zero
+>>> +     *      (corresponding part of read-buffer must be zeroed by driver)
+>>
+>> Does the driver actually have to do the zeroing?  Looking at qcow2.c, I see:
+>> static coroutine_fn int qcow2_co_preadv_task(BlockDriverState *bs,
+>> ...
+>>
+>>      case QCOW2_CLUSTER_UNALLOCATED:
+>>          assert(bs->backing); /* otherwise handled in qcow2_co_preadv_part */
+>>
+>>          BLKDBG_EVENT(bs->file, BLKDBG_READ_BACKING_AIO);
+>>          return bdrv_co_preadv_part(bs->backing, offset, bytes,
+>>                                     qiov, qiov_offset, 0);
+>>
+>> which just defers to the block layer to handle read-beyond-EOF, rather than an explicit memset in the driver.
+>>
+>> So maybe you can simplify to:
+>> - For such (unallocated) blocks, read will:
+>>    - fill buffer with zeros if there is no backing file
+>>    - read from the backing file otherwise, where the block layer
+>>      takes care of reading zeros beyond EOF if backing file is short
+>>
+>> But the effect is the same.
+>>
+>>> +++ b/block/io.c
+>>> @@ -2385,16 +2385,16 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+>>>       if (ret & (BDRV_BLOCK_DATA | BDRV_BLOCK_ZERO)) {
+>>>           ret |= BDRV_BLOCK_ALLOCATED;
+>>> -    } else if (want_zero) {
+>>> -        if (bdrv_unallocated_blocks_are_zero(bs)) {
+>>> -            ret |= BDRV_BLOCK_ZERO;
+>>> -        } else if (bs->backing) {
+>>> +    } else if (want_zero && bs->drv->supports_backing) {
+>>> +        if (bs->backing) {
+>>>               BlockDriverState *bs2 = bs->backing->bs;
+>>>               int64_t size2 = bdrv_getlength(bs2);
+>>>               if (size2 >= 0 && offset >= size2) {
+>>>                   ret |= BDRV_BLOCK_ZERO;
+>>>               }
+>>> +        } else {
+>>> +            ret |= BDRV_BLOCK_ZERO;
+>>>           }
+>>
+>> I like this part of the change.  But if it is done first in the series, it _does_ have a semantic impact on protocol drivers (previously, protocol drivers that return 0 but set the field .unallocated_blocks_are_zero will be changed to report _ZERO; after this patch, protocol drivers do not do that, because they don't support backing files, and it is now only backing files that do the _ZERO magic).  So doing _just_ this change, along with a better analysis of how it changes the semantics of 'qemu-io -c map' on protocol drivers while mentioning why that is okay, would make a better start to the series, rather than here at the end.  Of course, if you defer it to the end, then none of the protocol drivers set .unallocated_blocks_are_zero anyway, but that cost more review work on each altered protocol driver.
+>>
+> 
 > 
 
-I think you could keep the "int" and only replace put_user_ual() by
-put_user_s32() (to stay in line with the man page that mentions "(int
-*)". "int" is always a signed 32bit..
 
-And add your "Signed-off-by".
-
-Thanks,
-Laurent
+-- 
+Best regards,
+Vladimir
 
