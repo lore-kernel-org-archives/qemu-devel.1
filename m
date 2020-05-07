@@ -2,67 +2,87 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F78EC38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 16:36:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12516C47257
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 17:04:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5110820643
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 16:36:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5110820643
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id CF13A207DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 17:04:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R8u40OHi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF13A207DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWjVa-0002sS-C1
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 12:36:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44406)
+	id 1jWjwV-0005og-Fb
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 13:04:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51398)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jWjUy-0002TY-9x
- for qemu-devel@nongnu.org; Thu, 07 May 2020 12:35:48 -0400
-Received: from 2.mo6.mail-out.ovh.net ([46.105.76.65]:53142)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jWjUw-0003l9-4r
- for qemu-devel@nongnu.org; Thu, 07 May 2020 12:35:48 -0400
-Received: from player761.ha.ovh.net (unknown [10.108.42.167])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id 4847920EAB0
- for <qemu-devel@nongnu.org>; Thu,  7 May 2020 18:35:42 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player761.ha.ovh.net (Postfix) with ESMTPSA id 9CA061224844D;
- Thu,  7 May 2020 16:35:40 +0000 (UTC)
-Date: Thu, 7 May 2020 18:35:36 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH] 9pfs: Fix potential deadlock of QEMU mainloop
-Message-ID: <20200507183536.1714287f@bahia.lan>
-In-Reply-To: <3839530.O0e2CIhMhP@silver>
-References: <158826201391.1344781.9403916162733181811.stgit@bahia.lan>
- <8590081.eFxiLWWr9E@silver> <20200507163328.4736534d@bahia.lan>
- <3839530.O0e2CIhMhP@silver>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jWjum-0004aA-T4
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 13:02:28 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38624
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jWjul-0001ZV-84
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 13:02:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588870945;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=huJWCduFdXan6/tK/E6AOnPZJFaHON21BiOBOz5Fre4=;
+ b=R8u40OHi+W48JGwRapDvRJtmUn2MjB+4vpK9jcbsnLgd3gTJpK3VpYgntKUz54e63PnW+v
+ aZHX7bVO00fZ/5iVhU6j6gay7TVZiW6xAjpd0BLx6oqnjd+QQNmFQIWrbGbLvHYQjJ+pQX
+ 3LLIOiKKAwyua9Rx6gpu7Rb1m42NlKs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-482-e17whfAdNGO0QI_J4wy7ng-1; Thu, 07 May 2020 13:02:23 -0400
+X-MC-Unique: e17whfAdNGO0QI_J4wy7ng-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D3E9E800687;
+ Thu,  7 May 2020 17:02:21 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-114-224.ams2.redhat.com
+ [10.36.114.224])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6FB3510027AB;
+ Thu,  7 May 2020 17:02:13 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, david@redhat.com, zhukeqian1@huawei.com,
+ maozhongyi@cmss.chinamobile.com, marcandre.lureau@redhat.com,
+ pannengyuan@huawei.com, f4bug@amsat.org, wei.w.wang@intel.com,
+ yi.y.sun@intel.com, quintela@redhat.com
+Subject: [PULL 00/12] migration queue
+Date: Thu,  7 May 2020 18:01:59 +0100
+Message-Id: <20200507170211.238283-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 4097431238336026944
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrkedtgddutddtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeehkefhtdehgeehheejledufeekhfdvleefvdeihefhkefhudffhfeuuedvffdthfenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeeiuddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-Received-SPF: pass client-ip=46.105.76.65; envelope-from=groug@kaod.org;
- helo=2.mo6.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 12:35:42
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 02:00:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ T_HK_NAME_DR=0.01, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -75,104 +95,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 07 May 2020 17:03:46 +0200
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-> On Donnerstag, 7. Mai 2020 16:33:28 CEST Greg Kurz wrote:
-> > > I also haven't reviewed QEMU's lock implementations in very detail, but
-> > > IIRC CoMutexes are completely handled in user space, while QemuMutex uses
-> > > regular OS mutexes and hence might cost context switches.
-> > 
-> > ... since the locking would only been exercised with an hypothetical
-> > client doing stupid things, this is beginning to look like bike-shedding
-> > to me. :)
-> 
-> Aha, keep that in mind when you're doing your next review. ;-)
-> 
+The following changes since commit 3c7adbc67d9a5c3e992a4dd13b8704464daaad5b=
+:
 
-Fair enough. :)
+  Merge remote-tracking branch 'remotes/berrange/tags/qcrypto-next-pull-req=
+uest' into staging (2020-05-07 14:30:12 +0100)
 
-> No seriously, like I said, I don't really care too much about Mutex vs. 
-> CoMutex in you patch here. It was actually more about wide-picture thinking, 
-> i.e. other places of (co)mutexes being used or other potential changes that 
-> would make this or other uses more relevant one day.
-> 
+are available in the Git repository at:
 
-Then I agree with you that it would be better to use CoMutex if we were
-experiencing thread pool exhaustion indeed.
+  git://github.com/dagrh/qemu.git tags/pull-migration-20200507a
 
-> > > > > > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> > > > > > index 9e046f7acb51..ac84ae804496 100644
-> > > > > > --- a/hw/9pfs/9p.c
-> > > > > > +++ b/hw/9pfs/9p.c
-> > > > > > @@ -2170,7 +2170,7 @@ static int coroutine_fn
-> > > > > > v9fs_do_readdir_with_stat(V9fsPDU *pdu, int32_t count = 0;
-> > > > > > 
-> > > > > >      struct stat stbuf;
-> > > > > >      off_t saved_dir_pos;
-> > > > > > 
-> > > > > > -    struct dirent *dent;
-> > > > > > +    struct dirent dent;
-> > > > > > 
-> > > > > >      /* save the directory position */
-> > > > > >      saved_dir_pos = v9fs_co_telldir(pdu, fidp);
-> > > > > > 
-> > > > > > @@ -2181,13 +2181,11 @@ static int coroutine_fn
-> > > > > > v9fs_do_readdir_with_stat(V9fsPDU *pdu, while (1) {
-> > > > > > 
-> > > > > >          v9fs_path_init(&path);
-> > > > > > 
-> > > > > > -        v9fs_readdir_lock(&fidp->fs.dir);
-> > > > > > -
-> > > > > 
-> > > > > That's the deadlock fix, but ...
-> > > > > 
-> > > > > >          err = v9fs_co_readdir(pdu, fidp, &dent);
-> > > > > > 
-> > > > > > -        if (err || !dent) {
-> > > > > > +        if (err <= 0) {
-> > > > > > 
-> > > > > >              break;
-> > > > > >          
-> > > > > >          }
-> > > > > 
-> > > > > ... even though this code simplification might make sense, I don't
-> > > > > think
-> > > > > it
-> > > > > should be mixed with the deadlock fix together in one patch. They are
-> > > > > not
-> > > > 
-> > > > I could possibly split this in two patches, one for returning a copy
-> > > > and one for moving the locking around, but...
-> > > > 
-> > > > > related with each other, nor is the code simplification you are aiming
-> > > > > trivial
-> > > > 
-> > > > ... this assertion is somewhat wrong: moving the locking to
-> > > > v9fs_co_readdir() really requires it returns a copy.
-> > > 
-> > > Yeah, I am also not sure whether a split would make it more trivial enough
-> > > in this case to be worth the hassle. If you find an acceptable solution,
-> > > good, if not then leave it one patch.
-> > 
-> > Another option would be to g_malloc() the dirent in v9fs_co_readdir() and
-> > g_free() in the callers. This would cause less churn since we could keep
-> > the same function signature.
-> 
-> I was actually just going to suggest the same. So yes, looks like a less 
-> invasive change to me.
-> 
+for you to fetch changes up to 13f2cb21e5fb33e9f8d7db8eee48edc1c67b812f:
 
-I'll just do that then :)
+  migration/multifd: Do error_free after migrate_set_error to avoid memleak=
+s (2020-05-07 17:40:24 +0100)
 
-> Best regards,
-> Christian Schoenebeck
-> 
-> 
+----------------------------------------------------------------
+Migration pull 2020-05-07
+
+Mostly tidy-ups, but two new features:
+  cpu-throttle-tailslow for making a gentler throttle
+  xbzrle encoding rate measurement for getting a feal for xbzrle
+performance.
+
+----------------------------------------------------------------
+David Hildenbrand (1):
+      migration/ram: Consolidate variable reset after placement in ram_load=
+_postcopy()
+
+Keqian Zhu (1):
+      migration/throttle: Add cpu-throttle-tailslow migration parameter
+
+Mao Zhongyi (4):
+      migration: fix bad indentation in error_report()
+      migration/migration: improve error reporting for migrate parameters
+      monitor/hmp-cmds: add hmp_handle_error() for hmp_migrate_set_speed()
+      migration: move the units of migrate parameters from milliseconds to =
+ms
+
+Marc-Andr=C3=A9 Lureau (1):
+      docs/devel/migration: start a debugging section
+
+Pan Nengyuan (3):
+      migration/rdma: fix a memleak on error path in rdma_start_incoming_mi=
+gration
+      migration/multifd: fix memleaks in multifd_new_send_channel_async
+      migration/multifd: Do error_free after migrate_set_error to avoid mem=
+leaks
+
+Philippe Mathieu-Daud=C3=A9 (1):
+      migration/colo: Add missing error-propagation code
+
+Wei Wang (1):
+      migration/xbzrle: add encoding rate
+
+ docs/devel/migration.rst | 20 +++++++++++++
+ migration/colo.c         |  3 ++
+ migration/migration.c    | 44 +++++++++++++++++++---------
+ migration/multifd.c      |  5 ++++
+ migration/ram.c          | 74 ++++++++++++++++++++++++++++++++++++++++----=
+----
+ migration/rdma.c         |  1 +
+ monitor/hmp-cmds.c       | 23 +++++++++++----
+ qapi/migration.json      | 53 +++++++++++++++++++++++++++++++++-
+ 8 files changed, 192 insertions(+), 31 deletions(-)
 
 
