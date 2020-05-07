@@ -2,89 +2,98 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90D47C38A2A
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 16:11:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD730C38A2A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 16:12:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 589402083B
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 16:11:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gVXsVdJ9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 589402083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A5CE92083B
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 16:12:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5CE92083B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWj72-0007Un-DQ
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 12:11:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38192)
+	id 1jWj8d-0001By-PF
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 12:12:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38438)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jWj67-0006Rp-7f
- for qemu-devel@nongnu.org; Thu, 07 May 2020 12:10:07 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57126
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jWj66-0000T2-KL
- for qemu-devel@nongnu.org; Thu, 07 May 2020 12:10:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588867806;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hwjq21lcCrQqwZ5+slNoct19Z90wGFnf91z6iYgKdZA=;
- b=gVXsVdJ9d8XdQ+IqqSJ0BqYJjDdUt4m9Nlg7H355nX2r0UnjJtLRX65alLLOCDlzdRGUej
- EskKLzGm/s7o/TuC2horTRXuN/UMuwkgSgT5cTFhtxH0V1Z7JrV1KIaCXLSfTbk7WBwsJC
- Or9lLkLRESN1bPc67HhD6tC9gkM+Z9Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-487-GAyhwXHKM9GMXZ-Gkl5pug-1; Thu, 07 May 2020 12:09:48 -0400
-X-MC-Unique: GAyhwXHKM9GMXZ-Gkl5pug-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41953800687;
- Thu,  7 May 2020 16:09:47 +0000 (UTC)
-Received: from [10.3.114.73] (ovpn-114-73.phx2.redhat.com [10.3.114.73])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9CD1660FB9;
- Thu,  7 May 2020 16:09:45 +0000 (UTC)
-Subject: Re: [PATCH v5 01/14] qcrypto/core: add generic infrastructure for
- crypto options amendment
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-References: <20200507125414.2151-1-mlevitsk@redhat.com>
- <20200507125414.2151-2-mlevitsk@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <08257b8a-ed70-1a6d-ffb9-20441b5af91f@redhat.com>
-Date: Thu, 7 May 2020 11:09:43 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>)
+ id 1jWj7Z-00007T-Kv; Thu, 07 May 2020 12:11:37 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14032
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>)
+ id 1jWj7X-0001VU-UN; Thu, 07 May 2020 12:11:37 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 047F8geP119768; Thu, 7 May 2020 12:11:29 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 30vmqaj1w5-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 07 May 2020 12:11:29 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 047Fv6j0117907;
+ Thu, 7 May 2020 12:11:28 -0400
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com
+ [159.122.73.70])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 30vmqaj1uv-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 07 May 2020 12:11:28 -0400
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+ by ppma01fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 047G9oeU019081;
+ Thu, 7 May 2020 16:11:26 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com
+ (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+ by ppma01fra.de.ibm.com with ESMTP id 30s0g5csa4-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 07 May 2020 16:11:26 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 047GAEGo63766876
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 7 May 2020 16:10:14 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 2C3A75204E;
+ Thu,  7 May 2020 16:11:24 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.160.63])
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id E68B652050;
+ Thu,  7 May 2020 16:11:23 +0000 (GMT)
+Subject: [PATCH] target/ppc: Untabify excp_helper.c
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Thu, 07 May 2020 18:11:23 +0200
+Message-ID: <158886788307.1560068.14096740175576278978.stgit@bahia.lan>
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-In-Reply-To: <20200507125414.2151-2-mlevitsk@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 00:55:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
+ definitions=2020-05-07_09:2020-05-07,
+ 2020-05-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1034
+ priorityscore=1501 lowpriorityscore=0 phishscore=0 bulkscore=0
+ adultscore=0 malwarescore=0 spamscore=0 suspectscore=0 impostorscore=0
+ mlxscore=0 mlxlogscore=884 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2005070123
+Received-SPF: softfail client-ip=148.163.158.5; envelope-from=groug@kaod.org;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 12:11:34
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_SOFTFAIL=0.665,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,54 +106,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ Nicholas Piggin <npiggin@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/7/20 7:54 AM, Maxim Levitsky wrote:
-> This will be used first to implement luks keyslot management.
->=20
-> block_crypto_amend_opts_init will be used to convert
-> qemu-img cmdline to QCryptoBlockAmendOptions
->=20
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
+Some tabs crept in with a recent change.
 
-> +++ b/qapi/crypto.json
-> @@ -309,3 +309,19 @@
->     'base': 'QCryptoBlockInfoBase',
->     'discriminator': 'format',
->     'data': { 'luks': 'QCryptoBlockInfoLUKS' } }
-> +
-> +
-> +
-> +##
-> +# @QCryptoBlockAmendOptions:
-> +#
-> +# The options that are available for all encryption formats
-> +# when amending encryption settings
-> +#
-> +# Since: 5.0
+Fixes: 6dc6b557913f "target/ppc: Improve syscall exception logging"
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ target/ppc/excp_helper.c |   16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-Looks like our mail crossed, my v4 review landed after you sent v5.=20
-We'll still have to scrub this series for s/5.0/5.1/
-
-> +##
-> +{ 'union': 'QCryptoBlockAmendOptions',
-> +  'base': 'QCryptoBlockOptionsBase',
-> +  'discriminator': 'format',
-> +  'data': {
-> +            } }
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+index 639cac38f9c3..4db3d9ed9af5 100644
+--- a/target/ppc/excp_helper.c
++++ b/target/ppc/excp_helper.c
+@@ -70,16 +70,16 @@ static inline void dump_syscall(CPUPPCState *env)
+ static inline void dump_hcall(CPUPPCState *env)
+ {
+     qemu_log_mask(CPU_LOG_INT, "hypercall r3=%016" PRIx64
+-		  " r4=%016" PRIx64 " r5=%016" PRIx64 " r6=%016" PRIx64
+-		  " r7=%016" PRIx64 " r8=%016" PRIx64 " r9=%016" PRIx64
+-		  " r10=%016" PRIx64 " r11=%016" PRIx64 " r12=%016" PRIx64
++                  " r4=%016" PRIx64 " r5=%016" PRIx64 " r6=%016" PRIx64
++                  " r7=%016" PRIx64 " r8=%016" PRIx64 " r9=%016" PRIx64
++                  " r10=%016" PRIx64 " r11=%016" PRIx64 " r12=%016" PRIx64
+                   " nip=" TARGET_FMT_lx "\n",
+                   ppc_dump_gpr(env, 3), ppc_dump_gpr(env, 4),
+-		  ppc_dump_gpr(env, 5), ppc_dump_gpr(env, 6),
+-		  ppc_dump_gpr(env, 7), ppc_dump_gpr(env, 8),
+-		  ppc_dump_gpr(env, 9), ppc_dump_gpr(env, 10),
+-		  ppc_dump_gpr(env, 11), ppc_dump_gpr(env, 12),
+-		  env->nip);
++                  ppc_dump_gpr(env, 5), ppc_dump_gpr(env, 6),
++                  ppc_dump_gpr(env, 7), ppc_dump_gpr(env, 8),
++                  ppc_dump_gpr(env, 9), ppc_dump_gpr(env, 10),
++                  ppc_dump_gpr(env, 11), ppc_dump_gpr(env, 12),
++                  env->nip);
+ }
+ 
+ static int powerpc_reset_wakeup(CPUState *cs, CPUPPCState *env, int excp,
 
 
