@@ -6,64 +6,64 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6D1BC38A2A
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:54:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E67DC38A24
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:56:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C3622073A
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:54:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2513A2073A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:56:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K4PnygfJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C3622073A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SqKk3jRd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2513A2073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWgz9-0003iX-J9
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 09:54:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34600)
+	id 1jWh0M-0006CO-32
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 09:56:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34500)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1jWgto-0004Cm-RB
- for qemu-devel@nongnu.org; Thu, 07 May 2020 09:49:16 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56095
- helo=us-smtp-1.mimecast.com)
+ id 1jWgtU-0003z7-9n
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 09:48:56 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38052
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1jWgtm-0003se-Rz
- for qemu-devel@nongnu.org; Thu, 07 May 2020 09:49:16 -0400
+ id 1jWgtS-0003Ip-9i
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 09:48:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588859353;
+ s=mimecast20190719; t=1588859333;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zZ9Pe/WVczrEDvhE3PiCnPpVn9zjTs2i3Rv4vtfTtuc=;
- b=K4PnygfJORNWcAuDO8we35Xv0nmk5WmVB9VFkHIjXQpMvxv+Tg+d25MNdsFyxJLS9jdUBr
- zWEXdpksIiFGDLiEmGhP9dPQWoHfCPXqbK1mHZ2ulerTXRcP8SjQlB+Qyos6zWAVTCHWGq
- ye87wLqOTUhWR43dFPA8lu50Kgv/3Qo=
+ bh=u5j+c2TImbGIqhAmcmscAySueDWf9irIaJXboUVTLsM=;
+ b=SqKk3jRds74Egn2JP0AkV5WWDIPV9BZXRK8nWlkCxZ2LxFqhDKUTZLEIJhyHE+2u0XtEWg
+ +EJdFvN2dp8dswl+lWaCp0wWn3pMcflc9ZJmJWZmXlHSvORxjaq4g1i/c8vsWG2+3IDFEe
+ HRhw4UhBL7ZeiQirR9QbozfMBAWL5Ag=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-292-O0QCBrzBPWOGXjXupxifJg-1; Thu, 07 May 2020 09:49:11 -0400
-X-MC-Unique: O0QCBrzBPWOGXjXupxifJg-1
+ us-mta-206-pttp7b5uNduk6AZ8i0lE4w-1; Thu, 07 May 2020 09:48:49 -0400
+X-MC-Unique: pttp7b5uNduk6AZ8i0lE4w-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 470DE460;
- Thu,  7 May 2020 13:49:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 831B3107ACF4;
+ Thu,  7 May 2020 13:48:48 +0000 (UTC)
 Received: from thinkpad.redhat.com (ovpn-114-199.ams2.redhat.com
  [10.36.114.199])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DA45510013BD;
- Thu,  7 May 2020 13:48:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B1E7010013BD;
+ Thu,  7 May 2020 13:48:25 +0000 (UTC)
 From: Laurent Vivier <lvivier@redhat.com>
 To: lvivier@redhat.com,
 	qemu-devel@nongnu.org
-Subject: [RFC v4 2/6] qmp: add QMP command x-debug-virtio-status
-Date: Thu,  7 May 2020 15:47:56 +0200
-Message-Id: <20200507134800.10837-3-lvivier@redhat.com>
+Subject: [RFC v4 1/6] qmp: add QMP command x-debug-query-virtio
+Date: Thu,  7 May 2020 15:47:55 +0200
+Message-Id: <20200507134800.10837-2-lvivier@redhat.com>
 In-Reply-To: <20200507134800.10837-1-lvivier@redhat.com>
 References: <20200507134800.10837-1-lvivier@redhat.com>
 MIME-Version: 1.0
@@ -72,9 +72,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=lvivier@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 03:15:48
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=lvivier@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 02:00:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -109,175 +109,258 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This new command shows the status of a VirtIODevice
-(features, endianness and number of virtqueues)
+This new command lists all the instances of VirtIODevice with
+their path and virtio type
 
 Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 ---
- hw/virtio/virtio-stub.c |  5 +++
- hw/virtio/virtio.c      | 50 +++++++++++++++++++++++++++
- qapi/virtio.json        | 76 +++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 131 insertions(+)
+ hw/virtio/Makefile.objs    |  2 ++
+ hw/virtio/virtio-stub.c    | 14 ++++++++
+ hw/virtio/virtio.c         | 28 ++++++++++++++++
+ include/hw/virtio/virtio.h |  1 +
+ qapi/Makefile.objs         |  2 +-
+ qapi/qapi-schema.json      |  1 +
+ qapi/virtio.json           | 68 ++++++++++++++++++++++++++++++++++++++
+ tests/qtest/qmp-cmd-test.c |  1 +
+ 8 files changed, 116 insertions(+), 1 deletion(-)
+ create mode 100644 hw/virtio/virtio-stub.c
+ create mode 100644 qapi/virtio.json
 
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+index 4e4d39a0a48f..0b649f120044 100644
+--- a/hw/virtio/Makefile.objs
++++ b/hw/virtio/Makefile.objs
+@@ -38,6 +38,8 @@ obj-$(CONFIG_VIRTIO_SERIAL) +=3D virtio-serial-pci.o
+ endif
+ else
+ common-obj-y +=3D vhost-stub.o
++common-obj-y +=3D virtio-stub.o
+ endif
+=20
+ common-obj-$(CONFIG_ALL) +=3D vhost-stub.o
++common-obj-$(CONFIG_ALL) +=3D virtio-stub.o
 diff --git a/hw/virtio/virtio-stub.c b/hw/virtio/virtio-stub.c
-index d4a88f5753a9..ddb592f72eee 100644
---- a/hw/virtio/virtio-stub.c
+new file mode 100644
+index 000000000000..d4a88f5753a9
+--- /dev/null
 +++ b/hw/virtio/virtio-stub.c
-@@ -12,3 +12,8 @@ VirtioInfoList *qmp_x_debug_query_virtio(Error **errp)
- {
-     return qmp_virtio_unsupported(errp);
- }
+@@ -0,0 +1,14 @@
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qapi/qapi-commands-virtio.h"
 +
-+VirtioStatus *qmp_x_debug_virtio_status(const char* path, Error **errp)
++static void *qmp_virtio_unsupported(Error **errp)
++{
++    error_setg(errp, "Virtio is disabled");
++    return NULL;
++}
++
++VirtioInfoList *qmp_x_debug_query_virtio(Error **errp)
 +{
 +    return qmp_virtio_unsupported(errp);
 +}
 diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 05b640bcc267..af69e874258d 100644
+index b6c8ef5bc025..05b640bcc267 100644
 --- a/hw/virtio/virtio.c
 +++ b/hw/virtio/virtio.c
-@@ -3840,6 +3840,56 @@ VirtioInfoList *qmp_x_debug_query_virtio(Error **err=
-p)
-     return list;
+@@ -13,6 +13,8 @@
+=20
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "qapi/qapi-commands-virtio.h"
++#include "qapi/qapi-visit-virtio.h"
+ #include "cpu.h"
+ #include "trace.h"
+ #include "exec/address-spaces.h"
+@@ -28,6 +30,8 @@
+ #include "sysemu/dma.h"
+ #include "sysemu/runstate.h"
+=20
++static QTAILQ_HEAD(, VirtIODevice) virtio_list;
++
+ /*
+  * The alignment to use between consumer and producer parts of vring.
+  * x86 pagesize again. This is the default, used by transports like PCI
+@@ -3628,6 +3632,7 @@ static void virtio_device_realize(DeviceState *dev, E=
+rror **errp)
+=20
+     vdev->listener.commit =3D virtio_memory_listener_commit;
+     memory_listener_register(&vdev->listener, vdev->dma_as);
++    QTAILQ_INSERT_TAIL(&virtio_list, vdev, next);
  }
 =20
-+static VirtIODevice *virtio_device_find(const char *path)
+ static void virtio_device_unrealize(DeviceState *dev, Error **errp)
+@@ -3646,6 +3651,7 @@ static void virtio_device_unrealize(DeviceState *dev,=
+ Error **errp)
+         }
+     }
+=20
++    QTAILQ_REMOVE(&virtio_list, vdev, next);
+     g_free(vdev->bus_name);
+     vdev->bus_name =3D NULL;
+ }
+@@ -3802,6 +3808,8 @@ static void virtio_device_class_init(ObjectClass *kla=
+ss, void *data)
+     vdc->stop_ioeventfd =3D virtio_device_stop_ioeventfd_impl;
+=20
+     vdc->legacy_features |=3D VIRTIO_LEGACY_FEATURES;
++
++    QTAILQ_INIT(&virtio_list);
+ }
+=20
+ bool virtio_device_ioeventfd_enabled(VirtIODevice *vdev)
+@@ -3812,6 +3820,26 @@ bool virtio_device_ioeventfd_enabled(VirtIODevice *v=
+dev)
+     return virtio_bus_ioeventfd_enabled(vbus);
+ }
+=20
++VirtioInfoList *qmp_x_debug_query_virtio(Error **errp)
 +{
++    VirtioInfoList *list =3D NULL;
++    VirtioInfoList *node;
 +    VirtIODevice *vdev;
 +
 +    QTAILQ_FOREACH(vdev, &virtio_list, next) {
 +        DeviceState *dev =3D DEVICE(vdev);
-+
-+        if (strcmp(dev->canonical_path, path) !=3D 0) {
-+            continue;
-+        }
-+        return vdev;
++        node =3D g_new0(VirtioInfoList, 1);
++        node->value =3D g_new(VirtioInfo, 1);
++        node->value->path =3D g_strdup(dev->canonical_path);
++        node->value->type =3D qapi_enum_parse(&VirtioType_lookup, vdev->na=
+me,
++                                            VIRTIO_TYPE_UNKNOWN, NULL);
++        node->next =3D list;
++        list =3D node;
 +    }
 +
-+    return NULL;
-+}
-+
-+VirtioStatus *qmp_x_debug_virtio_status(const char* path, Error **errp)
-+{
-+    VirtIODevice *vdev;
-+    VirtioStatus *status;
-+
-+    vdev =3D virtio_device_find(path);
-+    if (vdev =3D=3D NULL) {
-+        error_setg(errp, "Path %s is not a VirtIO device", path);
-+        return NULL;
-+    }
-+
-+    status =3D g_new0(VirtioStatus, 1);
-+    status->guest_features =3D vdev->guest_features;
-+    status->host_features =3D vdev->host_features;
-+    status->backend_features =3D vdev->backend_features;
-+    status->device_id =3D vdev->device_id;
-+
-+    switch (vdev->device_endian) {
-+    case VIRTIO_DEVICE_ENDIAN_LITTLE:
-+        status->device_endian =3D VIRTIO_STATUS_ENDIANNESS_LITTLE;
-+        break;
-+    case VIRTIO_DEVICE_ENDIAN_BIG:
-+        status->device_endian =3D VIRTIO_STATUS_ENDIANNESS_BIG;
-+        break;
-+    default:
-+        status->device_endian =3D VIRTIO_STATUS_ENDIANNESS_UNKNOWN;
-+        break;
-+    }
-+
-+    status->num_vqs =3D virtio_get_num_queues(vdev);
-+
-+    return status;
++    return list;
 +}
 +
  static const TypeInfo virtio_device_info =3D {
      .name =3D TYPE_VIRTIO_DEVICE,
      .parent =3D TYPE_DEVICE,
-diff --git a/qapi/virtio.json b/qapi/virtio.json
-index da59a118dbfb..9142818d198c 100644
---- a/qapi/virtio.json
-+++ b/qapi/virtio.json
-@@ -66,3 +66,79 @@
- ##
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index b69d51749635..65adce680188 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -111,6 +111,7 @@ struct VirtIODevice
+     bool use_guest_notifier_mask;
+     AddressSpace *dma_as;
+     QLIST_HEAD(, VirtQueue) *vector_queues;
++    QTAILQ_ENTRY(VirtIODevice) next;
+ };
 =20
- { 'command': 'x-debug-query-virtio', 'returns': ['VirtioInfo'] }
+ typedef struct VirtioDeviceClass {
+diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
+index 4673ab7490df..4fae2e37cfc9 100644
+--- a/qapi/Makefile.objs
++++ b/qapi/Makefile.objs
+@@ -8,7 +8,7 @@ util-obj-y +=3D qapi-util.o
+ QAPI_COMMON_MODULES =3D audio authz block-core block char common control c=
+rypto
+ QAPI_COMMON_MODULES +=3D dump error introspect job machine migration misc
+ QAPI_COMMON_MODULES +=3D net pragma qdev qom rdma rocker run-state sockets=
+ tpm
+-QAPI_COMMON_MODULES +=3D trace transaction ui
++QAPI_COMMON_MODULES +=3D trace transaction ui virtio
+ QAPI_TARGET_MODULES =3D machine-target misc-target
+ QAPI_MODULES =3D $(QAPI_COMMON_MODULES) $(QAPI_TARGET_MODULES)
+=20
+diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
+index 43b0ba0dea22..189f5a0a7383 100644
+--- a/qapi/qapi-schema.json
++++ b/qapi/qapi-schema.json
+@@ -84,3 +84,4 @@
+ { 'include': 'misc.json' }
+ { 'include': 'misc-target.json' }
+ { 'include': 'audio.json' }
++{ 'include': 'virtio.json' }
+diff --git a/qapi/virtio.json b/qapi/virtio.json
+new file mode 100644
+index 000000000000..da59a118dbfb
+--- /dev/null
++++ b/qapi/virtio.json
+@@ -0,0 +1,68 @@
++##
++# =3D Virtio devices
++##
 +
 +##
-+# @VirtioStatusEndianness:
++# @VirtioType:
 +#
-+# Enumeration of endianness for VirtioDevice
++# An enumeration of Virtio device types.
 +#
-+# Since: 5.1
++# Since: 5.1.0
 +##
-+{ 'enum': 'VirtioStatusEndianness',
-+  'data': [ 'unknown', 'little', 'big' ]
++{ 'enum': 'VirtioType',
++  'data': [ 'unknown', 'virtio-9p', 'virtio-blk', 'virtio-serial',
++            'virtio-gpu', 'virtio-input', 'virtio-net', 'virtio-scsi',
++            'vhost-user-fs', 'vhost-vsock', 'virtio-balloon', 'virtio-cryp=
+to',
++            'virtio-iommu', 'virtio-pmem', 'virtio-rng' ]
 +}
 +
 +##
-+# @VirtioStatus:
++# @VirtioInfo:
 +#
-+# @device-id: VirtIODevice status
++# Information about a given VirtIODevice
 +#
-+# @device-endian: VirtIODevice device_endian
++# @path: VirtIO device canonical path.
 +#
-+# @guest-features: VirtIODevice guest_features
-+#
-+# @host-features: VirtIODevice host_features
-+#
-+# @backend-features: VirtIODevice backend_features
-+#
-+# @num-vqs: number of VirtIODevice queues
++# @type: VirtIO device type.
 +#
 +# Since: 5.1
 +#
 +##
-+
-+{ 'struct': 'VirtioStatus',
++{ 'struct': 'VirtioInfo',
 +  'data': {
-+    'device-id': 'int',
-+    'device-endian': 'VirtioStatusEndianness',
-+    'guest-features': 'uint64',
-+    'host-features': 'uint64',
-+    'backend-features': 'uint64',
-+    'num-vqs': 'uint16'
++    'path': 'str',
++    'type': 'VirtioType'
 +  }
 +}
 +
 +##
-+# @x-debug-virtio-status:
++# @x-debug-query-virtio:
 +#
-+# Return the status of virtio device
++# Return the list of all VirtIO devices
 +#
-+# @path: QOBject path of the VirtIODevice
-+#
-+# Returns: status of the VirtIODevice
++# Returns: list of @VirtioInfo
 +#
 +# Since: 5.1
 +#
 +# Example:
 +#
-+# -> { "execute": "x-debug-virtio-status",
-+#      "arguments": {
-+#          "path": "/machine/peripheral-anon/device[3]/virtio-backend"
-+#      }
-+#   }
-+# <- { "return": {
-+#          "backend-features": 0,
-+#          "guest-features": 5111807911,
-+#          "num-vqs": 3,
-+#          "host-features": 6337593319,
-+#          "device-endian": "little",
-+#          "device-id": 1
-+#      }
++# -> { "execute": "x-debug-query-virtio" }
++# <- { "return": [
++#        {
++#            "path": "/machine/peripheral-anon/device[3]/virtio-backend",
++#            "type": "virtio-net"
++#        },
++#        {
++#            "path": "/machine/peripheral-anon/device[1]/virtio-backend",
++#            "type": "virtio-serial"
++#        },
++#        {
++#            "path": "/machine/peripheral-anon/device[0]/virtio-backend",
++#            "type": "virtio-blk"
++#        }
++#      ]
 +#    }
 +#
 +##
 +
-+{ 'command': 'x-debug-virtio-status',
-+  'data': { 'path': 'str' },
-+  'returns': 'VirtioStatus'
-+}
++{ 'command': 'x-debug-query-virtio', 'returns': ['VirtioInfo'] }
+diff --git a/tests/qtest/qmp-cmd-test.c b/tests/qtest/qmp-cmd-test.c
+index 9f5228cd9951..a7bf8aab6357 100644
+--- a/tests/qtest/qmp-cmd-test.c
++++ b/tests/qtest/qmp-cmd-test.c
+@@ -92,6 +92,7 @@ static bool query_is_blacklisted(const char *cmd)
+         "query-gic-capabilities", /* arm */
+         /* Success depends on target-specific build configuration: */
+         "query-pci",              /* CONFIG_PCI */
++        "x-debug-query-virtio",   /* CONFIG_VIRTIO */
+         /* Success depends on launching SEV guest */
+         "query-sev-launch-measure",
+         /* Success depends on Host or Hypervisor SEV support */
 --=20
 2.26.2
 
