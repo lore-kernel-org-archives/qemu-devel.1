@@ -2,87 +2,118 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED365C38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 14:37:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41EB7C47247
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 14:38:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B99612083B
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 14:37:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Uykjw1Bs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B99612083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1A2CB21473
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 14:38:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A2CB21473
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWhei-0000S7-TF
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 10:37:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44402)
+	id 1jWhfK-0001gL-8w
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 10:38:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45682)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jWha3-0000vH-0R
- for qemu-devel@nongnu.org; Thu, 07 May 2020 10:32:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38593
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jWha0-00071m-Dm
- for qemu-devel@nongnu.org; Thu, 07 May 2020 10:32:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588861971;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RhQ91pRwzpLxFRrlWiGTazWbwSFA2C59jlcmdYefAGI=;
- b=Uykjw1BsmpUX4hu4KEl9BY4v4/a8WpOOwCbAFBOQ/TX3qK0yakt8BdQYdrtZI6gOV+PfHR
- PluusSWIsxgtRzUmuZBm6WYn38kny9HtwuAQsLO0k6T5Au1lcxzk4kut/kp/wMTUfk66yF
- 7gmSRRZn7YuSu7J5930g7lfTxjEEl+s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-U7nf-Y08NmCsRVpfFPG1oA-1; Thu, 07 May 2020 10:32:47 -0400
-X-MC-Unique: U7nf-Y08NmCsRVpfFPG1oA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE8AA107ACCA;
- Thu,  7 May 2020 14:32:45 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-113-33.ams2.redhat.com [10.36.113.33])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2588162952;
- Thu,  7 May 2020 14:32:44 +0000 (UTC)
-Date: Thu, 7 May 2020 16:32:43 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH 0/9] More truncate improvements
-Message-ID: <20200507143243.GF6019@linux.fritz.box>
-References: <20200428202905.770727-1-eblake@redhat.com>
- <20200507101502.GB6019@linux.fritz.box>
- <355c3850-a164-6474-ec3a-535c6a455143@redhat.com>
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jWhdC-0006X4-Jc
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 10:36:10 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:39789)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jWhd7-0000Av-8G
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 10:36:10 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1M9WmQ-1jRBJq1DzY-005ZDg; Thu, 07 May 2020 16:35:50 +0200
+To: Tobias Koch <tobias.koch@nonterra.com>, qemu-devel@nongnu.org
+References: <20200305210534.28392-1-tobias.koch@nonterra.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Subject: Re: [PATCH] linux-user: mremap fails with EFAULT if address range
+ overlaps with stack guard
+Message-ID: <d643f0d0-d5e7-d1f3-d3e2-7d62661774e8@vivier.eu>
+Date: Thu, 7 May 2020 16:35:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <355c3850-a164-6474-ec3a-535c6a455143@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 03:56:18
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200305210534.28392-1-tobias.koch@nonterra.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:ryYexHVoUBbfWw7xsCjdnBtzcNWyuUeaUVRd7l9jtyedAoDOV63
+ 8h+qEXRY1prFUnTeso49IsEA07Wl625nYaqbt9HwuJdpBiNQnUpdwcEK9JUH3v+gwKAH8L4
+ SdqPhGwP6xrPSLYqT5CloGWcytEvWSgfFQCv7/wLwqhiY9r22AnNCHAnGH7ttBBqJbAdoZQ
+ fs+17rx54qDqk9VkoVZYQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:U4HwvrIDk28=:onliGEFZb5jwWDKBwP6tzn
+ 9zvcpmVCQUuaJSz1tHRjNLMgsUa+CmZTWneHTQUGtp1gZ6PCpLd3tO/a0usQoMPl4NSAvHm60
+ gvJyTuuP09pC/O39gGUJ6duPdu3gaM9HeM7G+Ut1YT1T+uD3wCm/gBHDhhFuAYWFkzrOG3UCP
+ WNo/YM0RU61dDjjt9zyhMlGzf0E2Ocicn1DIYd9iyDMwqW7GYIyyUqe5D21cKCXIbG6g8+om/
+ C+H4xIqS08WTEqWwtVZJzDluNY0SeAnTKimjDTMnCvtcOxpait6W1NbbJtBbvUyGrB5Nq5ouv
+ SPRloCzlKK/qEvDLlDvQPM8oEnUTrZeT8msB4tHKfWM2ee2ncQf8cD5WLbGoqfYxWHjK0sdUL
+ xEixR8TKxi35OSn+2tpSYQAPS6fYWqBt/33Lq7LB7kfBkbYUbapHHNZvOfHinC52zsWogamq/
+ Bjo+8R+1a0Yf4K0beMhLVTTKDo0HS5o1IYMXd7YDfP601WBTXmVGKETO4ecIAVgr/WTmWhWAT
+ /E/TXtgZC0BKKkJrjMTO14s6WfS9b6OXh3fdau/vhLguTbtHBLotC2Q2GYVm0Uqpbnu3oP2cl
+ jLdIiWKP2ZeGNhV705QV7Cuk9xg0kAqjdcA6m6VfF8O+eDDr56hgrk3LfSkD7FIIZBjDjdP1k
+ 5v4zDdc2qRXEYMpPVN/InVZMlZe1QN8aU/wAP+N+GKRS4pZhWciDT1xMYlxyOoO/hb3YNao2a
+ 4hPBPxCikJM0JNJ6LixKj/Y0gq9RsRZPv+UtNN9N20JxAWM55pdUJo7LHKqkwdKdWZH5/pLHT
+ vt8IUoyI7D2bLhMJyuTGPNQy1au+c7/q6SABjO3AML+exgDXq6lu0+beySrX+cTYRs34jVf
+Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 10:17:48
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,56 +126,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: riku.voipio@iki.fi
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 07.05.2020 um 16:29 hat Eric Blake geschrieben:
-> On 5/7/20 5:15 AM, Kevin Wolf wrote:
-> > Am 28.04.2020 um 22:28 hat Eric Blake geschrieben:
-> > > Based-on: <20200424125448.63318-1-kwolf@redhat.com>
-> > > [PATCH v7 00/10] block: Fix resize (extending) of short overlays
-> > >=20
-> > > After reviewing Kevin's work, I questioned if we had a redundancy wit=
-h
-> > > bdrv_has_zero_init_truncate.  It turns out we do, and this is the res=
-ult.
-> > >=20
-> > > Patch 1 has been previously posted [1] and reviewed, the rest is new.
-> > > I did not address Neils' comment that modern gluster also always
-> > > 0-initializes [2], as I am not set up to verify it (my changes to the
-> > > other drivers are semantic no-ops, so I don't feel as bad about
-> > > posting them with less rigourous testing).
-> > >=20
-> > > [1] https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg08070.ht=
-ml
-> > > [2] https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg04266.ht=
-ml
-> >=20
-> > block/parallels.c: In function 'parallels_co_writev':
-> > block/parallels.c:218:12: error: 'ret' may be used uninitialized in thi=
-s function [-Werror=3Dmaybe-uninitialized]
-> >    218 |         if (ret < 0) {
-> >        |            ^
-> > block/parallels.c:169:9: note: 'ret' was declared here
-> >    169 |     int ret;
-> >        |         ^~~
-> > cc1: all warnings being treated as errors
->=20
-> Yep, fixup posted here:
-> https://lists.gnu.org/archive/html/qemu-devel/2020-04/msg05199.html
->=20
-> >=20
-> > Apart from that, you can add:
-> >=20
-> > Reviewed-by: Kevin Wolf <kwolf@redhat.com>
->=20
-> Do you need me to send a v2?
+Le 05/03/2020 à 22:05, Tobias Koch a écrit :
+> If the address range starting at old_address overlaps with the stack guard it
+> is invalid and mremap must fail with EFAULT. The musl c library relies on this
+> behavior to detect the stack size, which it does by doing consecutive mremaps
+> until it hits the stack guard. Without this patch, software (such as the Ruby
+> interpreter) that calls pthread_getattr_np under musl will crash on 32 bit
+> targets emulated on a 64 bit host.
 
-Ah, sorry, I missed that you had already sent a fixup. I'll squash it
-in.
+Could you share some pointers to the code that is doing this?
 
-Kevin
+We have already this kind of code in linux-user/elfload.c,
+setup_arg_pages(): could you check why it doesn't work?
 
+Thanks,
+Laurent
 
