@@ -2,72 +2,88 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1987CC47247
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:51:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60FA4C38A2A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:52:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD00420659
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:51:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2AD4D20659
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:52:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="Xg19i3y4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD00420659
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i/yiYdMi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AD4D20659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWint-0000Al-22
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 11:51:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33654)
+	id 1jWipM-0001PX-DP
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 11:52:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33890)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jWinF-00088d-S1; Thu, 07 May 2020 11:50:37 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:47172)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jWinC-0002yl-L7; Thu, 07 May 2020 11:50:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=Zj2F1XoVheMGa4Sm50Jol9OJtUOeEulaakXnSbsUT4E=; 
- b=Xg19i3y4rwfhuMYHJTjS7gSSLTNgckZf9mZmACPe+XtOTBJwD+NaFt5wEMNmEIG/MPjL32jyGLkduhOzCQ4QljnOjIsZBd0/rlzVh0CR9FkMzCIchYUVt+mY/avyM975sasWGBexnBdyZLmFsk97iafBoZbQjYK5p1ybDEjckr8wyLDSxivgq3Tyc5EH+spa1sD4ml+vYNANrvIaV9kO9rq3Qi0szEY0EHn48sVpJyyrqe0wBu2QW/uHPIdPTTAvQuLU5l8WkoWdLITxB2Gf6T29dhK4wssbQzd33q7TX8OzJpYKB6P2XYklcn7PEUxnQUaV5PFdGdpAXC+r7zEuwg==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1jWin9-0001iA-8Y; Thu, 07 May 2020 17:50:31 +0200
-Received: from berto by mail.igalia.com with local (Exim)
- id 1jWin8-0000gg-VK; Thu, 07 May 2020 17:50:30 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Subject: Re: [PATCH v5 19/31] qcow2: Add subcluster support to
- calculate_l2_meta()
-In-Reply-To: <w51a72jn4hx.fsf@maestria.local.igalia.com>
-References: <cover.1588699789.git.berto@igalia.com>
- <907ab6846b93b441a27eb6853ff3058f1c821bf9.1588699789.git.berto@igalia.com>
- <12569151-2f16-f136-6928-2a915b25120b@redhat.com>
- <w517dxp9ea6.fsf@maestria.local.igalia.com>
- <9478ac11-8cae-4576-345e-3acf9e287119@redhat.com>
- <w51a72jn4hx.fsf@maestria.local.igalia.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Thu, 07 May 2020 17:50:30 +0200
-Message-ID: <w517dxnn3qx.fsf@maestria.local.igalia.com>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jWiob-0000oE-W2
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 11:52:02 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48718
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jWiob-0004pG-AX
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 11:52:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588866720;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=RKtDwjoKpoNomLmsbqU87QgwjrxGQ/q8GY8DUxU3VtU=;
+ b=i/yiYdMiBA3e10spXnVfnTMszxLh+tC1D2FMBMDR5ymTt27IwHpUCD2T5Yjyd5EN1Qyquo
+ 6JKLQpGJzhLKa0HjKM5Jckaz0Amlb8PLn+sfuh+vpyC+ps5g1hdMdBbyQzuziMLI57GRp2
+ 3lOypkC4NVwlxTXiK5tqiikMa2HTWPA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-107-V3yKOn7iMoGMm5B1WwS7Ag-1; Thu, 07 May 2020 11:51:56 -0400
+X-MC-Unique: V3yKOn7iMoGMm5B1WwS7Ag-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17CD980058A;
+ Thu,  7 May 2020 15:51:55 +0000 (UTC)
+Received: from [10.3.114.73] (ovpn-114-73.phx2.redhat.com [10.3.114.73])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8244B649D6;
+ Thu,  7 May 2020 15:51:39 +0000 (UTC)
+Subject: Re: [RFC v3 6/6] hmp: add x-debug-virtio commands
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+References: <20200507114927.6733-1-lvivier@redhat.com>
+ <20200507114927.6733-7-lvivier@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <ce9d977b-a833-3b21-2283-31234f51511b@redhat.com>
+Date: Thu, 7 May 2020 10:51:39 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
- helo=fanzine.igalia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 10:37:24
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
+In-Reply-To: <20200507114927.6733-7-lvivier@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 03:56:18
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,45 +97,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
+ David Hildenbrand <david@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Amit Shah <amit@kernel.org>,
+ Max Reitz <mreitz@redhat.com>, Eric Auger <eric.auger@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu 07 May 2020 05:34:18 PM CEST, Alberto Garcia wrote:
-> On Wed 06 May 2020 07:39:48 PM CEST, Eric Blake wrote:
->>   In fact, if we rely on 20/31 checking for invalid subclusters when
->> computing nb_clusters, we could probably assert that the start and end
->> cluster in this function are not invalid, instead of adding the fail:
->> label.
->
-> I think you're right with that, good catch! There's no need to return an
-> error code in this function.
+On 5/7/20 6:49 AM, Laurent Vivier wrote:
+> This patch implements HMP version of the virtio QMP commands
+> 
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 
-No, wait, I got confused. 
+Most HMP commands do not use '-' in their name.  Also, HMP doesn't 
+promise api compatibility; so we could just name this 'info virtio' or 
+'debug_virtio' without an x- prefix, with no real loss.
 
-Patch 20/31 updates qcow2_get_host_offset(), and that's used for
-reading.
+> ---
+>   Makefile                |   2 +-
+>   Makefile.target         |   7 +-
+>   docs/system/monitor.rst |   2 +
+>   hmp-commands-virtio.hx  | 160 +++++++++++++++++++++++++++++++++
+>   hmp-commands.hx         |  10 +++
+>   hw/virtio/virtio.c      | 193 +++++++++++++++++++++++++++++++++++++++-
+>   include/monitor/hmp.h   |   4 +
+>   monitor/misc.c          |  17 ++++
+>   8 files changed, 391 insertions(+), 4 deletions(-)
+>   create mode 100644 hmp-commands-virtio.hx
+> 
 
-The caller of calculate_l2_meta() is qcow2_alloc_cluster_offset()
-(indirectly), which is used for writing.
+> +SRST
+> +``x-debug-virtio`` *subcommand*
+> +  Show various information about virtio.
+> +
+> +  Example:
+> +
+> +  List all sub-commands::
+> +
+> +    (qemu) x-debug-virtio
+> +    x-debug-virtio query  -- List all available virtio devices
+> +    x-debug-virtio status path -- Display status of a given virtio device
+> +    x-debug-virtio queue-status path queue -- Display status of a given virtio queue
+> +    x-debug-virtio queue-element path queue [index] -- Display element of a given virtio queue
 
-nb_clusters here is calculated with cluster_needs_new_alloc(), but that
-doesn't check whether a cluster is valid or not, and certainly doesn't
-check if every single subcluster is valid.
+Oh, you're introducing it as a metacommand (like 'info' already is) with 
+several subcommands.  Still, naming it 'virtio' instead of 
+'x-debug-virtio' would make sense to me, even though the underlying QMP 
+commands are (correctly) in the x-debug- namespace.
 
-Thinking about it, there are probably faster ways to check for the
-validity of extended L2 entries, for example:
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-- For QCOW2_CLUSTER_NORMAL, (l2_bitmap >> 32) & l2_bitmap should be 0.
-
-- For QCOW2_CLUSTER_UNALLOCATED, l2_bitmap & QCOW_L2_BITMAP_ALL_ALLOC
-  should be 0.
-
-That's enough to cover all cases of QCOW2_SUBCLUSTER_INVALID that we
-have at the moment.
-
-Berto
 
