@@ -1,141 +1,88 @@
-Return-Path: <SRS0=CRBd=6U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCAD7C38A2A
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 23:50:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC433C28CBC
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 00:25:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 982452075A
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 May 2020 23:50:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7035920735
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 00:25:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="V3/XnR91";
-	dkim=pass (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="Teew6UoL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 982452075A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
+	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="wfH5qK35"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7035920735
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWToO-0000Bz-OA
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 19:50:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52804)
+	id 1jWUMB-0004kY-KA
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 20:25:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60806)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <steplong@quicinc.com>)
- id 1jWTly-0006lO-RT
- for qemu-devel@nongnu.org; Wed, 06 May 2020 19:48:19 -0400
-Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:2215)
- by eggs.gnu.org with esmtps (TLS1.2:RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <steplong@quicinc.com>)
- id 1jWTlw-0006pP-Eo
- for qemu-devel@nongnu.org; Wed, 06 May 2020 19:48:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
- t=1588808896; x=1620344896;
- h=from:to:cc:subject:date:message-id:mime-version;
- bh=aKMSDx7zBZ2OSwytABORyUusEb539iVinrWqy9IGK/Y=;
- b=V3/XnR919+Wz1ffj3wmTrVFgRh3ZYDjVQAv42w7Mj4YqZaAeiB0xdZaA
- dHbzgh0SnR+qTCmbrZ/If/rTZz7yI8MkkXee8L8D+FS+GcsvQBE7ZSlZJ
- mJGJd+NmLnQk8hlNpGJGtK6Gy2sJeGpH0cizPAWtoV6q+cRG1AESAkcuE E=;
-Received: from unknown (HELO ironmsg04-sd.qualcomm.com) ([10.53.140.144])
- by alexa-out-sd-01.qualcomm.com with ESMTP; 06 May 2020 16:48:10 -0700
-Received: from nasanexm01c.na.qualcomm.com ([10.85.0.83])
- by ironmsg04-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
- 06 May 2020 16:48:10 -0700
-Received: from apsanexr02e.ap.qualcomm.com (10.85.0.28) by
- NASANEXM01C.na.qualcomm.com (10.85.0.83) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Wed, 6 May 2020 16:48:09 -0700
-Received: from NASANEXM01E.na.qualcomm.com (10.85.0.31) by
- apsanexr02e.ap.qualcomm.com (10.85.0.28) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Wed, 6 May 2020 16:48:07 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (199.106.107.6)
- by NASANEXM01E.na.qualcomm.com (10.85.0.31) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2 via Frontend Transport; Wed, 6 May 2020 16:48:07 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P5E3XV0iF1bRYV+9hS84WLFLve5Jt26Uz6cfkyJlZYeMY07QQ/CUibYHLGm2QWLinLVRcJIIDrddEQAWEsEGDPqbBfPhk1TJ+fyl2wT9E0m4ddEJwxxe7Mk/XtNiqHTirKcTchuZx0XL3cZTv0yWQbe5J3L2DjY7Rk7LSnt3QGMseavNuFaWfV4X7Z8f4SMWFxjN/jai8zx2fMQYxf6fvzNZ3dMRTE4PxrcdDRaJXIZQFqEA1Jsfp0e9C6JIW0jNpyt+APisekJwzFrJqmDqv8UcQE/c4VL8pV3h6bECfeewpvsff4Os5PazTnEXkBZO06H+2HowuQJbrHQsAR2EwA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nfziM7tJJgSPx4z0atQ5AIdkpw6g3UM6IiE6l1UFGPQ=;
- b=SKMYbyR3CsW45RF3TSJkBPhX+ZmySj7iJK6d050xlSBLwXj1NOD2BpYJXtewehSqdUhxdmufFSOHJR3EwSaJ201aDFp2++aOsW7IcsLlnBRPp+Dzd90yY5V+oRrG/AR85ei3oixozNX8qXI1EWVrH8KwttIaBVjMPIdg5hfI+nXlw7jPQ8Ot50jTNBv9NC2guELWFFOWTjIf/xl5IIXhmpsUey0ELLEG6IAwxmlL3cYVWdVOc5wW34B400ud6H2+2smvXo+eFKHkY2SF4vF/b8s7ddpeQ2XFhc0N56Ze3kuH0qziH8FkwZL+KkNMU6yqfPGZjzlSmEuhb6wd3or/JA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
- dkim=pass header.d=quicinc.com; arc=none
+ (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1jWULK-00041c-7T
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 20:24:50 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:43966)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1jWULI-0004N0-Mc
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 20:24:49 -0400
+Received: by mail-lj1-x242.google.com with SMTP id l19so4351577lje.10
+ for <qemu-devel@nongnu.org>; Wed, 06 May 2020 17:24:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nfziM7tJJgSPx4z0atQ5AIdkpw6g3UM6IiE6l1UFGPQ=;
- b=Teew6UoLJFd0H9sJNb9/W+8KPlF8ZjrtXGCwuEdoHoz1FYovsvGW/4IPaDI4Ocf8AkihM9y4pN/jpk6SHhu/c2NMp5wAxTa4Vb3igAHSH67DwW9IZmmjLaorQ4d1/KesIh8kSK6F44qEyVtYfZRZt5cdntY5P/uI9QQiuBcZ2kM=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=quicinc.com;
-Received: from MWHPR0201MB3547.namprd02.prod.outlook.com
- (2603:10b6:301:7b::24) by MWHPR0201MB3626.namprd02.prod.outlook.com
- (2603:10b6:301:77::39) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.26; Wed, 6 May
- 2020 23:48:06 +0000
-Received: from MWHPR0201MB3547.namprd02.prod.outlook.com
- ([fe80::10ad:5df5:d575:1f37]) by MWHPR0201MB3547.namprd02.prod.outlook.com
- ([fe80::10ad:5df5:d575:1f37%3]) with mapi id 15.20.2979.028; Wed, 6 May 2020
- 23:48:06 +0000
-From: Stephen Long <steplong@quicinc.com>
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH] Fix stack corruption when handling PR_GETDEATHSIG
-Date: Wed,  6 May 2020 16:47:51 -0700
-Message-ID: <20200506234751.7920-1-steplong@quicinc.com>
-X-Mailer: git-send-email 2.17.1
-Content-Type: text/plain
-X-ClientProxiedBy: MN2PR06CA0005.namprd06.prod.outlook.com
- (2603:10b6:208:23d::10) To MWHPR0201MB3547.namprd02.prod.outlook.com
- (2603:10b6:301:7b::24)
+ d=daynix-com.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=qD1c7REwBEKcDQVl/lAZh92gsdIE/e/TVVeaXW6CI30=;
+ b=wfH5qK35YHsv8iwKMeJSMtTQWed6fhOxm0ETYreWhSC8bUX1Py/d04kZ2n/+Axdsa0
+ oMn51/2sX+TNXLgEWk92MS1vyxnyaCODnK6SByymRdK93Zo9VaEocrWwb2hYpJ1QOX9m
+ hQ/+TXejYtwB/KUjMnErEXbew+hqXeFefn5HhcQK33I+ERLB2QPaQO9ZJ9T5NfucP0sc
+ PIT9YJHW6ayi6+YjpGWb/VB1WwCy/BZzkHAGRh7exMmHg/sGnMDf8hjkWrm0Bp90r9Y0
+ E6lpVHFVFbmgOsvn7pHswl1NUiRXwq4Lekc39pH0NdsW9DN8NN5TdAxwufq7kLaFSfip
+ ngUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=qD1c7REwBEKcDQVl/lAZh92gsdIE/e/TVVeaXW6CI30=;
+ b=FXCAOoHDpeshACmvnJK8TLrqD4yP4y1rlp2dDOlB/twXWDSR9xw5N5KhoOEwQhBS4g
+ 1DYTj8PMKDqEB+o90nYaQ49bpGyxn6Vn4MSRSrl9Njb5OGu+oIQGGJzLoQL3MIl7E948
+ wQY/9vOSjKD75yA8vDMzB0y44ZyXWG1L5jPlfA5fyYWu44QryMKklZuzBbXZB4wMUQzV
+ YTOwTd6iFlfnnN1xPGRNJLWahvbKbDyxtiPDZcNBJKsByBGYxDvsSM1GiWTBUZg9hU3M
+ QCyMUvXSIqF5UzhjSrLPDs55iZ56q8iZyvXkuRG3u3XOjZOxWDIs23D/Jb+ARHKUTCGw
+ M6mw==
+X-Gm-Message-State: AGi0PuZmKqf58UjwJiB1Atau2PeoVVurKElI7MBhOempQAA4yxu+EE1c
+ 86no3RVeRJjkWQd5YUX0XhvhrMOwHgTUMw==
+X-Google-Smtp-Source: APiQypKtjvPKCAkqdGCI8a5E4V23hjZDCiDksrBGdP3TGugEdcBNhBm4WX5qUSZDo9aG3K9PvDQ6zw==
+X-Received: by 2002:a2e:7508:: with SMTP id q8mr6830185ljc.234.1588811086382; 
+ Wed, 06 May 2020 17:24:46 -0700 (PDT)
+Received: from navi.cosmonova.net.ua ([95.67.24.131])
+ by smtp.gmail.com with ESMTPSA id m15sm2280455lji.21.2020.05.06.17.24.45
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 06 May 2020 17:24:45 -0700 (PDT)
+From: andrew@daynix.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH] hw/net: Added basic IPv6 fragmentation. Fixed IPv6 payload
+ length. Fixed CSO for IPv6.
+Date: Thu,  7 May 2020 03:52:34 +0300
+Message-Id: <20200507005234.959590-1-andrew@daynix.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from STEPLONG.qualcomm.com (24.102.122.190) by
- MN2PR06CA0005.namprd06.prod.outlook.com (2603:10b6:208:23d::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.26 via Frontend
- Transport; Wed, 6 May 2020 23:48:04 +0000
-X-Mailer: git-send-email 2.17.1
-X-Originating-IP: [24.102.122.190]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 9647a07c-fb42-45e9-3ff1-08d7f217ec24
-X-MS-TrafficTypeDiagnostic: MWHPR0201MB3626:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <MWHPR0201MB3626B1B9EE47490FAEAD0145C7A40@MWHPR0201MB3626.namprd02.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:862;
-X-Forefront-PRVS: 03950F25EC
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: FnucNo19aczOzjlKrw2AvZsyQHVnN+xMPxKA/+WFtsHLKVv3ITl2/fSW+JNYWs4YclvuBkDElFiOlra7h8RYiICpGjhjbcawqF5Ieji74J1tyscPLMklRkSWckU8PAaeobfWUEM8OXGApOdbo4CcAskn2hyS7WxeXGb/WFNPwLnQmJ3nVHJadBaXO2kO13h1Xr1I/Zaz6GEkkrxlxuKinDSz6SHoClq0gABUmn+JlAruLQIbQ9YA7ZHXtsUSWD21grn9ADuKYl0jY5WfNqj5kbn/5m9/NBfM+4gaUXhMMenNGGStRoos4f4GzjXNbYkMSDdaQBQvSKSmzGGGV+ZpsPzG5YQ9YeAIb7hrWBageUlnyJmC8mN9i5/p039UphEQ9RPkbS8ntI6gKpLmCq/HGi/nBAJJo7/qwvlrLouy5Mfn5pb+hGfsUS+R6Id3jWpyKwFehGEnLLr3gW4/6Cty0ecLkMBCYgwMyYLMlHHeS2pU6f1wsXAA4AvQ8CuoCLFzxOXh6Sa5qkuyYrIVUhAG3Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:MWHPR0201MB3547.namprd02.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(376002)(366004)(136003)(39860400002)(346002)(396003)(33430700001)(8936002)(66946007)(66556008)(66476007)(186003)(6512007)(956004)(16526019)(316002)(26005)(86362001)(8676002)(52116002)(2906002)(5660300002)(6506007)(4326008)(478600001)(1076003)(2616005)(6916009)(107886003)(33440700001)(6666004)(6486002)(36756003);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: Bj21FYr8/m7YQGPSxsRim/qm6ZVqtBrYyR4w2iDm4XBGmv2zAGI4eiKCt9G4CDOq5QOUd2MIVxAYtMKaCofVHpW227pPCGcKua67LC5QyJSFdXW9sHuPpXhmoqfywfP8gsz404BWX3WO4SCJXYl/9uI14ziqemOdMgrRQzSUZ37Ni8V9y1ebIBbUwsoQRR7jgLfrPK6Iya2KVBkDJDxtOdq//8IVS3poWEd/4CpxPZHtdGAiS/DTwbxMn4qjn7K6DcbYj9117Zn6epeJoNbvrLopuU2MIt7DLgjYaavw2zV64ccRUmrNNZpvIGWeRw4E/5uWjzqbNOQjAsd10qzbiBUY8lVgiHsl2OBP80op0I5Pjf4PaH4HfAcxap0AhpLnHwbp44V0bVuboFWf+b1SGNHLwf1GfxvLsVd576+C0+XLkXeoAWFY3pIjhpZtS+5KSUfUR7aYEpegQUMadpzAeWxix6NC8Ufmy6DQRPnV9z39Z5j+plfqrvclElBy5/J+2YuClnJAoPNft8qGcXef2qXSaImoeOSxnmtYfh8n8or86+8mjw6V3IxBRYwblcKqZFbgvYwrPJRoQo6aABF6EHbnjSHTBBOznnCzohS1ne7Hxd7PFTVm8wH3HLFQJaUfzj1vR7ZBs9XxpJS98reZBH6VSiuCwsMUdWwtRoodD24G5Y+cOUOrmFJh3obkSR0RnVgEDNvSLAXOWsRJ3Sa5bLhjvJFCpCU6Q3PGwwPoqPdC/Db/Sdz34FZ/1jNGvMesnPVaJOk3/ExkZBqOQzs9VMGsHdkQxZvn2j7RdF7/N1c=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9647a07c-fb42-45e9-3ff1-08d7f217ec24
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2020 23:48:05.9606 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: un+VReAmp8JEWfk50LPaHPnrUSioTBXzD0P/nDZzmjjMtqMq4NqBFi1SH1VQyJCvZfjOo/hwHQIx2KvlSkKh2A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR0201MB3626
-X-OriginatorOrg: quicinc.com
-Received-SPF: pass client-ip=199.106.114.38; envelope-from=steplong@quicinc.com;
- helo=alexa-out-sd-01.qualcomm.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 19:48:10
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
+Content-Transfer-Encoding: 8bit
+Received-SPF: none client-ip=2a00:1450:4864:20::242;
+ envelope-from=andrew@daynix.com; helo=mail-lj1-x242.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -149,50 +96,302 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pzheng@quicinc.com, riku.voipio@iki.fi, efriedma@quicinc.com,
- laurent@vivier.eu, apazos@quicinc.com
+Cc: jasowang@redhat.com, dmitry.fleytman@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Ana Pazos <apazos@quicinc.com>
+From: Andrew Melnychenko <andrew@daynix.com>
 
-Signed-off-by: Ana Pazos <apazos@quicinc.com>
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1708065
+Overall, there was an issue that big frames of IPv6 doesn't sent.
+With network backend with 'virtual header' - there was an issue
+in 'plen' field. Overall, during TSO, 'plen' would be changed,
+but with 'vheader' this field should be set to the size of the
+payload itself instead of '0'.
+For software offload - there is added basic IPv6 fragmentation.
+Also fixed checksum offload for IPv6.
+The basic IPv6 fragmentation - adding 'frag' extension to
+the packet, overall shares some logic with IPv4. It works,
+but there are still issues with a combination of
+extensions - in the future, it would require refactoring
+work to implement workflow with IPv6 and extension.
+e1000e driver doesn't set the 'plen' field for IPv6 for big packets
+if TSO is enabled. "Jumbo option" isn't added yet, until
+qemu supports packets greater than 64K.
+
+Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
 ---
-Submitting this patch on behalf of Ana Pazos. The bug was triggered by
-the following c file on aarch64-linux-user.
+ hw/net/net_tx_pkt.c | 53 ++++++++++++++++++++++++---
+ hw/net/net_tx_pkt.h |  7 ++++
+ include/net/eth.h   | 15 ++++++--
+ net/eth.c           | 89 ++++++++++++++++++++++++++++++++++++++++++---
+ 4 files changed, 150 insertions(+), 14 deletions(-)
 
-> #include <signal.h>
-> #include <sys/prctl.h>
->
-> int main() {
->   int PDeachSig = 0;
->   if (prctl(PR_GET_PDEATHSIG, &PDeachSig) == 0 && PDeachSig == SIGKILL)
->     prctl(PR_SET_PDEATHSIG, 0);
->   return (PDeachSig == SIGKILL);
-> }
-
- linux-user/syscall.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 05f03919ff..4eac567f97 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -10253,10 +10253,10 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         switch (arg1) {
-         case PR_GET_PDEATHSIG:
-         {
--            int deathsig;
-+            uint32_t deathsig;
-             ret = get_errno(prctl(arg1, &deathsig, arg3, arg4, arg5));
-             if (!is_error(ret) && arg2
--                && put_user_ual(deathsig, arg2)) {
-+                && put_user_u32(deathsig, arg2)) {
-                 return -TARGET_EFAULT;
-             }
-             return ret;
+diff --git a/hw/net/net_tx_pkt.c b/hw/net/net_tx_pkt.c
+index 162f802dd7..e3c7850b54 100644
+--- a/hw/net/net_tx_pkt.c
++++ b/hw/net/net_tx_pkt.c
+@@ -468,8 +468,8 @@ static void net_tx_pkt_do_sw_csum(struct NetTxPkt *pkt)
+     /* num of iovec without vhdr */
+     uint32_t iov_len = pkt->payload_frags + NET_TX_PKT_PL_START_FRAG - 1;
+     uint16_t csl;
+-    struct ip_header *iphdr;
+     size_t csum_offset = pkt->virt_hdr.csum_start + pkt->virt_hdr.csum_offset;
++    uint16_t l3_proto = eth_get_l3_proto(iov, 1, iov->iov_len);
+ 
+     /* Put zero to checksum field */
+     iov_from_buf(iov, iov_len, csum_offset, &csum, sizeof csum);
+@@ -477,9 +477,17 @@ static void net_tx_pkt_do_sw_csum(struct NetTxPkt *pkt)
+     /* Calculate L4 TCP/UDP checksum */
+     csl = pkt->payload_len;
+ 
++    csum_cntr = 0;
+     /* add pseudo header to csum */
+-    iphdr = pkt->vec[NET_TX_PKT_L3HDR_FRAG].iov_base;
+-    csum_cntr = eth_calc_ip4_pseudo_hdr_csum(iphdr, csl, &cso);
++    if (l3_proto == ETH_P_IP) {
++        csum_cntr = eth_calc_ip4_pseudo_hdr_csum(
++                pkt->vec[NET_TX_PKT_L3HDR_FRAG].iov_base,
++                csl, &cso);
++    } else if (l3_proto == ETH_P_IPV6) {
++        csum_cntr = eth_calc_ip6_pseudo_hdr_csum(
++                pkt->vec[NET_TX_PKT_L3HDR_FRAG].iov_base,
++                csl, pkt->l4proto, &cso);
++    }
+ 
+     /* data checksum */
+     csum_cntr +=
+@@ -580,10 +588,11 @@ static bool net_tx_pkt_do_sw_fragmentation(struct NetTxPkt *pkt,
+ 
+         more_frags = (fragment_offset + fragment_len < pkt->payload_len);
+ 
+-        eth_setup_ip4_fragmentation(l2_iov_base, l2_iov_len, l3_iov_base,
+-            l3_iov_len, fragment_len, fragment_offset, more_frags);
++        eth_setup_ip_fragmentation(l2_iov_base, l2_iov_len, l3_iov_base,
++            &l3_iov_len, ETH_MAX_IP_DGRAM_LEN,
++            fragment_len, fragment_offset, more_frags);
+ 
+-        eth_fix_ip4_checksum(l3_iov_base, l3_iov_len);
++        fragment[NET_TX_PKT_FRAGMENT_L3_HDR_POS].iov_len = l3_iov_len;
+ 
+         net_tx_pkt_sendv(pkt, nc, fragment, dst_idx);
+ 
+@@ -617,6 +626,7 @@ bool net_tx_pkt_send(struct NetTxPkt *pkt, NetClientState *nc)
+ 
+     if (pkt->has_virt_hdr ||
+         pkt->virt_hdr.gso_type == VIRTIO_NET_HDR_GSO_NONE) {
++        net_tx_pkt_fix_ip6_payload_len(pkt);
+         net_tx_pkt_sendv(pkt, nc, pkt->vec,
+             pkt->payload_frags + NET_TX_PKT_PL_START_FRAG);
+         return true;
+@@ -635,3 +645,34 @@ bool net_tx_pkt_send_loopback(struct NetTxPkt *pkt, NetClientState *nc)
+ 
+     return res;
+ }
++
++void net_tx_pkt_fix_ip6_payload_len(struct NetTxPkt *pkt)
++{
++    /*
++     * If ipv6 payload length field is 0 - then there should be Hop-by-Hop
++     * option for packets greater than 65,535.
++     * For packets with payload less than 65,535: fix 'plen' field.
++     * For now, qemu drops every packet with size greater 64K
++     * (see net_tx_pkt_send()) so, there is no reason to add jumbo option to ip6
++     * hop-by-hop extension if it's missed
++     */
++
++    struct iovec *l2 = &pkt->vec[NET_TX_PKT_L2HDR_FRAG];
++    if (eth_get_l3_proto(l2, 1, l2->iov_len) == ETH_P_IPV6) {
++        struct ip6_header *ip6 = (struct ip6_header *) pkt->l3_hdr;
++        /*
++         * TODO: if qemu would support >64K packets - add jumbo option check
++         * something like that:
++         * 'if (ip6->ip6_plen == 0 && !has_jumbo_option(ip6)) {'
++         */
++        if (ip6->ip6_plen == 0) {
++            if (pkt->payload_len <= ETH_MAX_IP_DGRAM_LEN) {
++                ip6->ip6_plen = htons(pkt->payload_len);
++            }
++            /*
++             * TODO: if qemu would support >64K packets
++             * add jumbo option for packets greater then 65,535 bytes
++             */
++        }
++    }
++}
+diff --git a/hw/net/net_tx_pkt.h b/hw/net/net_tx_pkt.h
+index 212ecc62fc..912d56ef13 100644
+--- a/hw/net/net_tx_pkt.h
++++ b/hw/net/net_tx_pkt.h
+@@ -187,4 +187,11 @@ bool net_tx_pkt_parse(struct NetTxPkt *pkt);
+ */
+ bool net_tx_pkt_has_fragments(struct NetTxPkt *pkt);
+ 
++/**
++ * Fix IPv6 'plen' field.
++ *
++ * @pkt            packet
++ */
++void net_tx_pkt_fix_ip6_payload_len(struct NetTxPkt *pkt);
++
+ #endif
+diff --git a/include/net/eth.h b/include/net/eth.h
+index 7f45c678e7..05c75ac9fc 100644
+--- a/include/net/eth.h
++++ b/include/net/eth.h
+@@ -139,6 +139,14 @@ struct ip6_ext_hdr_routing {
+     uint8_t     rsvd[4];
+ };
+ 
++struct ip6_ext_hdr_fragment {
++    uint8_t     nxt;
++    uint8_t     res0;
++    uint16_t    off;
++    uint32_t    id;
++};
++
++
+ struct ip6_option_hdr {
+ #define IP6_OPT_PAD1   (0x00)
+ #define IP6_OPT_HOME   (0xC9)
+@@ -186,6 +194,7 @@ struct tcp_hdr {
+ 
+ #define ip6_nxt      ip6_ctlun.ip6_un1.ip6_un1_nxt
+ #define ip6_ecn_acc  ip6_ctlun.ip6_un3.ip6_un3_ecn
++#define ip6_plen     ip6_ctlun.ip6_un1.ip6_un1_plen
+ 
+ #define PKT_GET_ETH_HDR(p)        \
+     ((struct eth_header *)(p))
+@@ -398,9 +407,9 @@ void eth_get_protocols(const struct iovec *iov, int iovcnt,
+                        eth_ip4_hdr_info *ip4hdr_info,
+                        eth_l4_hdr_info  *l4hdr_info);
+ 
+-void eth_setup_ip4_fragmentation(const void *l2hdr, size_t l2hdr_len,
+-                                 void *l3hdr, size_t l3hdr_len,
+-                                 size_t l3payload_len,
++void eth_setup_ip_fragmentation(const void *l2hdr, size_t l2hdr_len,
++                                 void *l3hdr, size_t *l3hdr_len,
++                                 size_t l3hdr_max_len, size_t l3payload_len,
+                                  size_t frag_offset, bool more_frags);
+ 
+ void
+diff --git a/net/eth.c b/net/eth.c
+index 0c1d413ee2..21ec5dc33d 100644
+--- a/net/eth.c
++++ b/net/eth.c
+@@ -314,10 +314,62 @@ eth_strip_vlan_ex(const struct iovec *iov, int iovcnt, size_t iovoff,
+     return 0;
+ }
+ 
++static bool eth_is_ip6_extension_header_type(uint8_t hdr_type);
++
++static void *eth_ip6_find_ext(struct ip6_header *ip6, uint8_t ext_type)
++{
++    uint8_t curr_ext_hdr_type = ip6->ip6_nxt;
++    struct ip6_ext_hdr *ext_hdr = (struct ip6_ext_hdr *)(ip6 + 1);
++    for (; eth_is_ip6_extension_header_type(curr_ext_hdr_type);) {
++        if (curr_ext_hdr_type == ext_type) {
++            return ext_hdr;
++        }
++        curr_ext_hdr_type = ext_hdr->ip6r_nxt;
++        ext_hdr = (struct ip6_ext_hdr *)(((uint8_t *)ext_hdr)
++                + (ext_hdr->ip6r_len + 1) * IP6_EXT_GRANULARITY);
++    }
++
++    return NULL;
++}
++
++/*
++ * To add an extension - there is should be
++ * enough memory 'behind' the ip6 header.
++ */
++static void *eth_ip6_add_ext_nonsafe(struct ip6_header *ip6, uint8_t ext_type)
++{
++    uint8_t curr_ext_hdr_type = ip6->ip6_nxt;
++    struct ip6_ext_hdr *ext_hdr = (struct ip6_ext_hdr *)(ip6 + 1);
++    struct ip6_ext_hdr *ext_hdr_prev = NULL;
++
++    if (!eth_is_ip6_extension_header_type(curr_ext_hdr_type)) {
++        ext_hdr->ip6r_nxt = ip6->ip6_nxt;
++        ip6->ip6_nxt = ext_type;
++        return ext_hdr;
++    }
++
++    ext_hdr_prev = ext_hdr;
++    curr_ext_hdr_type = ext_hdr->ip6r_nxt;
++    ext_hdr = (struct ip6_ext_hdr *)(((uint8_t *)ext_hdr)
++            + (ext_hdr->ip6r_len + 1) * IP6_EXT_GRANULARITY);
++
++    for (; eth_is_ip6_extension_header_type(curr_ext_hdr_type);) {
++        ext_hdr_prev = ext_hdr;
++        curr_ext_hdr_type = ext_hdr->ip6r_nxt;
++        ext_hdr = (struct ip6_ext_hdr *)(((uint8_t *)ext_hdr)
++                + (ext_hdr->ip6r_len + 1) * IP6_EXT_GRANULARITY);
++    }
++
++    ext_hdr->ip6r_nxt = ext_hdr_prev->ip6r_nxt;
++    ext_hdr_prev->ip6r_nxt = ext_type;
++
++    return ext_hdr;
++}
++
+ void
+-eth_setup_ip4_fragmentation(const void *l2hdr, size_t l2hdr_len,
+-                            void *l3hdr, size_t l3hdr_len,
+-                            size_t l3payload_len,
++eth_setup_ip_fragmentation(const void *l2hdr, size_t l2hdr_len,
++                            void *l3hdr, size_t *l3hdr_len,
++                            size_t l3hdr_max_len, size_t l3payload_len,
+                             size_t frag_offset, bool more_frags)
+ {
+     const struct iovec l2vec = {
+@@ -325,7 +377,9 @@ eth_setup_ip4_fragmentation(const void *l2hdr, size_t l2hdr_len,
+         .iov_len = l2hdr_len
+     };
+ 
+-    if (eth_get_l3_proto(&l2vec, 1, l2hdr_len) == ETH_P_IP) {
++    uint16_t l3_proto = eth_get_l3_proto(&l2vec, 1, l2hdr_len);
++
++    if (l3_proto == ETH_P_IP) {
+         uint16_t orig_flags;
+         struct ip_header *iphdr = (struct ip_header *) l3hdr;
+         uint16_t frag_off_units = frag_offset / IP_FRAG_UNIT_SIZE;
+@@ -337,7 +391,32 @@ eth_setup_ip4_fragmentation(const void *l2hdr, size_t l2hdr_len,
+         orig_flags = be16_to_cpu(iphdr->ip_off) & ~(IP_OFFMASK|IP_MF);
+         new_ip_off = frag_off_units | orig_flags  | (more_frags ? IP_MF : 0);
+         iphdr->ip_off = cpu_to_be16(new_ip_off);
+-        iphdr->ip_len = cpu_to_be16(l3payload_len + l3hdr_len);
++        iphdr->ip_len = cpu_to_be16(l3payload_len + *l3hdr_len);
++
++        eth_fix_ip4_checksum(l3hdr, *l3hdr_len);
++    } else if (l3_proto == ETH_P_IPV6) {
++        struct ip6_header *ip6 = (struct ip6_header *) l3hdr;
++
++        struct ip6_ext_hdr_fragment *frag_ext = NULL;
++
++        /* Find frag extension */
++        frag_ext = eth_ip6_find_ext(ip6, IP6_FRAGMENT);
++        if (frag_ext == NULL) {
++            /* No frag extension? Add one */
++            if (*l3hdr_len + sizeof(*frag_ext) > l3hdr_max_len) {
++                return; /* TODO: request to reallocate l3hdr */
++            }
++            frag_ext = eth_ip6_add_ext_nonsafe(ip6, IP6_FRAGMENT);
++            *l3hdr_len += sizeof(*frag_ext);
++            static uint32_t s_id = 0x71656d75; /* 'qemu' */
++            frag_ext->id = cpu_to_be32(s_id);
++            ++s_id;
++        }
++
++        frag_ext->off = cpu_to_be16((frag_offset / IP_FRAG_UNIT_SIZE) << 3
++                | (uint16_t)!!more_frags);
++
++        ip6->ip6_plen = cpu_to_be16(l3payload_len + *l3hdr_len - sizeof(*ip6));
+     }
+ }
+ 
 -- 
-2.17.1
+2.24.1
 
 
