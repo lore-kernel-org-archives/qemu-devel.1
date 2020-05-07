@@ -2,92 +2,88 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C55FAC38A2A
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:22:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD0F2C38A24
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:23:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 943C520643
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:22:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E2592073A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:23:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t/P45Hhf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 943C520643
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PqEgOpiH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E2592073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWiM3-00047b-Ow
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 11:22:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54112)
+	id 1jWiN8-00063y-LM
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 11:23:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55004)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jWiI8-0006pd-0N
- for qemu-devel@nongnu.org; Thu, 07 May 2020 11:18:29 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51046)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jWiI5-0002Zo-Od
- for qemu-devel@nongnu.org; Thu, 07 May 2020 11:18:27 -0400
-Received: by mail-wm1-x343.google.com with SMTP id m12so2072859wmc.0
- for <qemu-devel@nongnu.org>; Thu, 07 May 2020 08:18:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=TGcmfNlDWPZF6zKifFKModO2QCDgF7kjS3M9oH6wUnM=;
- b=t/P45HhfXSOxnzevGByJpsItNSTteT0+FvltoX/hvsGi2Gt5qrpcA5tCi2ImJ20sks
- SjJmu7pWh5VyXeXUQDukMRJiy3znFPJehUFE5yYs9cxRPiRaqy1XT1HZMzoZRiiljPVV
- qYFhsL/KjSfz62iHQvrnRI+e5B5G4wqtiDDjdLcX4x57rXvPNuhAUSJpl5pEKzB/zzhj
- D06xc3GpGeLqAmdHlUl3TcZV8k9CryzQGgdRUdxu825z+k4vpchW0uOdNpxf4BVJ358D
- qzdawIJgwKrJWUbypZlQPR6SWCKhtxWfNZ8Z4f5Ji4KN7F1DYLEMAWgyFMWCMLcb9o5T
- Xv8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=TGcmfNlDWPZF6zKifFKModO2QCDgF7kjS3M9oH6wUnM=;
- b=lqV4kTn1e54V28aNYAHnsK1nDOo+9qy1T+rZ9nw7RmxAvP3dHcFkpmtV/IJArw2cxL
- iWKyH5oATHuTjRoHzqgkJa2XX/4eoO4gowUs+zaetU9sw3CqpfJh5P3f24CWjysl3F32
- 1E8heJj9nKa8aiBfUt7IL0GOzXCXzbSdPhbzGcyB6JTo96oE0bjkT4xJ2LUH6t7ThmDk
- VWJLVl6XkS5OUouZH/JqY465Gz/4gAY+h7+VqF645nOWKlheDoTiSCs/J3e5Cld3B4mj
- gio0RVvh7GZmIsp1oG6CQPqahpyXu+x6xDxLy6dODv1b/h49WTM780ayv/IFT3xkME/x
- fdOw==
-X-Gm-Message-State: AGi0PubTdqXkdI6QjGUFRn6Sa0vXvjEP/GM9blEf9T7K7iffPq3W5co/
- ZIABf8ipa7XQ2XJtNotI3KAgvw==
-X-Google-Smtp-Source: APiQypIk1l3dAIwZzQXczf5nsuvc8qoVIPHvore/ektV3epakATUHPxxDGvB1rFyjnYyku6TZ7s5OQ==
-X-Received: by 2002:a1c:dc8b:: with SMTP id
- t133mr11000234wmg.117.1588864704035; 
- Thu, 07 May 2020 08:18:24 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id q74sm961246wme.14.2020.05.07.08.18.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 07 May 2020 08:18:23 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH 1/5] docs/system: Add 'Arm' to the Integrator/CP document title
-Date: Thu,  7 May 2020 16:18:15 +0100
-Message-Id: <20200507151819.28444-2-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200507151819.28444-1-peter.maydell@linaro.org>
-References: <20200507151819.28444-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jWiM8-0004iq-OG
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 11:22:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21241
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jWiM7-0006YO-7x
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 11:22:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588864953;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=qjsElYeA98Mk6wvP5XkghHrqQzIOv4gcR4sNpY8jjnk=;
+ b=PqEgOpiHx8P8NaCYnyWIAUF5A5/6R3DyUHbchrG16/mQzmebXA+c5R62QHMjP3XMqdCjUL
+ YWm6Dr+kzpQxKlvCd4gYQgx54sRt20ponm/e7/VSNnwoURel8ZJgp6jEss4uAHDPH9ky5H
+ GXULVh4yDx6sOxAt/aFM9Fh7NGHqR00=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-428-hievSRiBOxO8S9jM8VeCLw-1; Thu, 07 May 2020 11:22:31 -0400
+X-MC-Unique: hievSRiBOxO8S9jM8VeCLw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6A96473;
+ Thu,  7 May 2020 15:22:29 +0000 (UTC)
+Received: from [10.3.114.73] (ovpn-114-73.phx2.redhat.com [10.3.114.73])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 862D462A98;
+ Thu,  7 May 2020 15:22:26 +0000 (UTC)
+Subject: Re: [PATCH v2 10/9] qed: Simplify backing reads
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+References: <20200507084800.20596-1-vsementsov@virtuozzo.com>
+ <20200507144513.348470-1-eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <afd569f7-48e5-8984-70aa-678292fd25b5@redhat.com>
+Date: Thu, 7 May 2020 10:22:25 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20200507144513.348470-1-eblake@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 03:15:48
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,32 +97,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, stefanha@redhat.com,
+ "open list:qed" <qemu-block@nongnu.org>, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add 'Arm' to the Integrator/CP document title, for consistency with
-the titling of the other documentation of Arm devboard models
-(versatile, realview).
+On 5/7/20 9:45 AM, Eric Blake wrote:
+> The other four drivers that support backing files (qcow, qcow2,
+> parallels, vmdk) all rely on the block layer to populate zeroes when
+> reading beyond EOF of a short backing file.  We can simplify the qed
+> code by doing likewise.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+> 
+> I noticed this during my audit that v1 of Vladimir's series was correct.
+> 
+> No change in iotests results (test 274 is currently failing for qed,
+> but for other reasons:
+> +Traceback (most recent call last):
+> +  File "274", line 24, in <module>
+> +    iotests.verify_image_format(supported_fmts=['qcow2'])
+> +AttributeError: module 'iotests' has no attribute 'verify_image_format'
+> )
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- docs/system/arm/integratorcp.rst | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+That iotest failure was due to a stale branch on my end; after updating 
+to latest git master plus Kevin's latest 'block' branch, 274 is now 
+skipped on qed.
 
-diff --git a/docs/system/arm/integratorcp.rst b/docs/system/arm/integratorcp.rst
-index e6f050f602b..594438008e4 100644
---- a/docs/system/arm/integratorcp.rst
-+++ b/docs/system/arm/integratorcp.rst
-@@ -1,5 +1,5 @@
--Integrator/CP (``integratorcp``)
--================================
-+Arm Integrator/CP (``integratorcp``)
-+====================================
- 
- The Arm Integrator/CP board is emulated with the following devices:
- 
 -- 
-2.20.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
