@@ -2,68 +2,88 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CECBC38A2A
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:18:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6755EC38A24
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:19:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAFB720643
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:18:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B82A20643
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:19:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="DPWNplDq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAFB720643
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B09M4sQN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B82A20643
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWiIK-0006iI-W5
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 11:18:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53830)
+	id 1jWiIu-0007tU-Ah
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 11:19:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53928)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jWiGj-00057Z-OM; Thu, 07 May 2020 11:17:01 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:35785)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jWiGh-0000zh-Fe; Thu, 07 May 2020 11:17:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=CFUm8VG1NKUPuGjXgmM6pJi/4RUHGzjxdr0Fp9Vg6f4=; 
- b=DPWNplDqvl11Q+muD+R3dc4tx7DU5U6/YyI5hgDNjW24PZdbAlWPZY3UkDOBGCUnVAwcKovDpDGnKZe3cYTNTYUkeDxna1sVDx8qY8m4LWevbrniXWaDXF2nJ4zNNXT7wj6DPXTJ+3yBZ76eGpj9QupOcZ0tugWhcHzsc65QnajOsAHCwcuA6lHs7R3JeOiBd3dEUNbIDMJhopwBdtiryUCCgfBP6jf8BjJijBNvvp4oE7AGjENhFmRKteUz4cW8NkMF2CI98C2+AlekpkZDsSzkM20LyYynfxc9BeymHsXGNofyueqdMQ9c5G1V7sGF6sgftrouDzpcaq6LElIPVw==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1jWiGd-0005oZ-6K; Thu, 07 May 2020 17:16:55 +0200
-Received: from berto by mail.igalia.com with local (Exim)
- id 1jWiGc-0007Hd-Su; Thu, 07 May 2020 17:16:54 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Subject: Re: [PATCH v5 30/31] qcow2: Add subcluster support to qcow2_measure()
-In-Reply-To: <39aaec0f-e81f-16c9-986d-f2c06aae8fd2@redhat.com>
-References: <cover.1588699789.git.berto@igalia.com>
- <04394b984ec09146373ad6a23996423bcfffdb19.1588699789.git.berto@igalia.com>
- <39aaec0f-e81f-16c9-986d-f2c06aae8fd2@redhat.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Thu, 07 May 2020 17:16:54 +0200
-Message-ID: <w51d07fn5ax.fsf@maestria.local.igalia.com>
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jWiGz-0005Uk-IU
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 11:17:17 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26887
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jWiGy-0001eg-FX
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 11:17:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588864635;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Z/OlOzT8kXQ9tIV1zzNzkxq8AeByeB5Iybv/LYpMqOY=;
+ b=B09M4sQNDoyQkpvFWzQbYAO7WD8zs6e/bvAgF5aK6/okOVxDRkZe9XJJhEjI5/J6x1xg+C
+ kKTB+FSg2kZCy9xFQYDC0LG2TdjGXGqxvdPDSzNsaL3CWHZyu4HGddB4/kjaDzusk2ubia
+ QQJDl4jZQfSZgoPMSYM8GrwMjxCirZA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-90-YmlexjKBPbq3u_QbS9JsXQ-1; Thu, 07 May 2020 11:17:13 -0400
+X-MC-Unique: YmlexjKBPbq3u_QbS9JsXQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1625B473;
+ Thu,  7 May 2020 15:17:11 +0000 (UTC)
+Received: from x1.home (ovpn-113-95.phx2.redhat.com [10.3.113.95])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CFC8D9323;
+ Thu,  7 May 2020 15:17:07 +0000 (UTC)
+Date: Thu, 7 May 2020 09:17:06 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH Kernel v18 6/7] vfio iommu: Add migration capability to
+ report supported features
+Message-ID: <20200507091706.4ca1508e@x1.home>
+In-Reply-To: <79f1a586-52be-ab72-493a-3a3c5ae6e252@nvidia.com>
+References: <1588607939-26441-1-git-send-email-kwankhede@nvidia.com>
+ <1588607939-26441-7-git-send-email-kwankhede@nvidia.com>
+ <20200506162738.6e08dbf2@w520.home>
+ <79f1a586-52be-ab72-493a-3a3c5ae6e252@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
- helo=fanzine.igalia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 10:37:24
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Received-SPF: pass client-ip=205.139.110.120;
+ envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 03:15:48
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -77,33 +97,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed 06 May 2020 08:13:51 PM CEST, Eric Blake wrote:
-> On 5/5/20 12:38 PM, Alberto Garcia wrote:
->> Extended L2 entries are bigger than normal L2 entries so this has an
->> impact on the amount of metadata needed for a qcow2 file.
->> 
->> Signed-off-by: Alberto Garcia <berto@igalia.com>
->> Reviewed-by: Max Reitz <mreitz@redhat.com>
->> ---
->>   block/qcow2.c | 19 ++++++++++++-------
->>   1 file changed, 12 insertions(+), 7 deletions(-)
->
-> Should this be hoisted earlier in the series, before 28/31?
+On Thu, 7 May 2020 11:07:26 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-I can do that if I call qcow2_calc_prealloc_size() with extended_l2
-always set to false (because there would be no BLOCK_OPT_EXTL2 that the
-caller could use). Maybe it's not a bad idea.
+> On 5/7/2020 3:57 AM, Alex Williamson wrote:
+> > On Mon, 4 May 2020 21:28:58 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >   
+> >> Added migration capability in IOMMU info chain.
+> >> User application should check IOMMU info chain for migration capability
+> >> to use dirty page tracking feature provided by kernel module.
+> >>
+> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> >> ---
+> >>   drivers/vfio/vfio_iommu_type1.c | 15 +++++++++++++++
+> >>   include/uapi/linux/vfio.h       | 14 ++++++++++++++
+> >>   2 files changed, 29 insertions(+)
+> >>
+> >> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> >> index 8b27faf1ec38..b38d278d7bff 100644
+> >> --- a/drivers/vfio/vfio_iommu_type1.c
+> >> +++ b/drivers/vfio/vfio_iommu_type1.c
+> >> @@ -2378,6 +2378,17 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
+> >>   	return ret;
+> >>   }
+> >>   
+> >> +static int vfio_iommu_migration_build_caps(struct vfio_info_cap *caps)
+> >> +{
+> >> +	struct vfio_iommu_type1_info_cap_migration cap_mig;
+> >> +
+> >> +	cap_mig.header.id = VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION;
+> >> +	cap_mig.header.version = 1;
+> >> +	cap_mig.flags = VFIO_IOMMU_INFO_CAPS_MIGRATION_DIRTY_PAGE_TRACK;
+> >> +
+> >> +	return vfio_info_add_capability(caps, &cap_mig.header, sizeof(cap_mig));
+> >> +}
+> >> +
+> >>   static long vfio_iommu_type1_ioctl(void *iommu_data,
+> >>   				   unsigned int cmd, unsigned long arg)
+> >>   {
+> >> @@ -2427,6 +2438,10 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+> >>   		if (ret)
+> >>   			return ret;
+> >>   
+> >> +		ret = vfio_iommu_migration_build_caps(&caps);
+> >> +		if (ret)
+> >> +			return ret;
+> >> +
+> >>   		if (caps.size) {
+> >>   			info.flags |= VFIO_IOMMU_INFO_CAPS;
+> >>   
+> >> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> >> index e3cbf8b78623..df9ce8aaafab 100644
+> >> --- a/include/uapi/linux/vfio.h
+> >> +++ b/include/uapi/linux/vfio.h
+> >> @@ -1013,6 +1013,20 @@ struct vfio_iommu_type1_info_cap_iova_range {
+> >>   	struct	vfio_iova_range iova_ranges[];
+> >>   };
+> >>   
+> >> +/*
+> >> + * The migration capability allows to report supported features for migration.
+> >> + *
+> >> + * The structures below define version 1 of this capability.
+> >> + */
+> >> +#define VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION  1
+> >> +
+> >> +struct vfio_iommu_type1_info_cap_migration {
+> >> +	struct	vfio_info_cap_header header;
+> >> +	__u32	flags;
+> >> +	/* supports dirty page tracking */
+> >> +#define VFIO_IOMMU_INFO_CAPS_MIGRATION_DIRTY_PAGE_TRACK	(1 << 0)
+> >> +};
+> >> +  
+> > 
+> > What about exposing the maximum supported dirty bitmap size and the
+> > supported page sizes?  Thanks,
+> >   
+> 
+> How should user application use that?
 
-> Should there be iotest coverage?
+How does a user application currently discover that only a PAGE_SIZE
+dirty bitmap granularity is supported or that the when performing an
+unmap while requesting the dirty bitmap, those unmaps need to be
+chunked to no more than 2^31 * PAGE_SIZE?  I don't see anything in the
+uapi that expresses these restrictions.
 
-There are already, in the last patch.
+It seems we're currently relying on the QEMU implementation to
+coincide with bitmap granularity support, with no mechanism other than
+trial and error to validate or expand that support.  Likewise, I think
+it's largely a coincidence that KVM also has the same slot size
+restrictions, so we're unlikely to see an unmap exceeding this limit,
+but our api does not restrict an unmap to only cover a single mapping.
+We probably also need to think about whether we need to expose a
+mapping chunk limitation separately or if it should be extrapolated
+from the migration support (we might have non-migration reasons to
+limit it at some point).
 
-Berto
+If we leave these as assumptions then we risk breaking userspace or
+limiting the usefulness of expending this support.  If we include
+within the uapi a mechanism for learning about these restrictions, then
+it becomes a userspace problem to follow the uapi and take advantage of
+the uapi provided.  Thanks,
+
+Alex
+
 
