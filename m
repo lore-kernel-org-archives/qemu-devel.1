@@ -2,70 +2,133 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBA85C38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 16:02:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C801C54E4A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 16:03:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0C4F20659
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 16:02:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0C4F20659
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2BF7520659
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 16:03:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZRXlCMpP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BF7520659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWiys-0003a4-RR
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 12:02:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36338)
+	id 1jWizX-0004hd-7y
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 12:03:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35506)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jWiwO-0001sr-1b
- for qemu-devel@nongnu.org; Thu, 07 May 2020 12:00:04 -0400
-Received: from 1.mo6.mail-out.ovh.net ([46.105.56.136]:57260)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jWiwM-00044F-6J
- for qemu-devel@nongnu.org; Thu, 07 May 2020 12:00:03 -0400
-Received: from player690.ha.ovh.net (unknown [10.110.115.67])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id 16B2C20EA14
- for <qemu-devel@nongnu.org>; Thu,  7 May 2020 17:59:55 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player690.ha.ovh.net (Postfix) with ESMTPSA id 75F1D12041965;
- Thu,  7 May 2020 15:59:54 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-95G001e8d9f1e8-1641-4944-be00-424590eaca86,AF032C7111AD4BAD20ACDD539227CED07D4E1059)
- smtp.auth=groug@kaod.org
-Date: Thu, 7 May 2020 17:59:52 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH v6 3/5] 9pfs: add new function v9fs_co_readdir_many()
-Message-ID: <20200507175952.119eae30@bahia.lan>
-In-Reply-To: <4330996.EtvE2UMZrz@silver>
-References: <cover.1587309014.git.qemu_oss@crudebyte.com>
- <5819799.mbObChnQ2B@silver> <20200504111834.117c98d9@bahia.lan>
- <4330996.EtvE2UMZrz@silver>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jWiu8-0006Ge-AY
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 11:57:44 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30235
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jWiu6-00050u-DX
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 11:57:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588867061;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=oHJq7LX0c+S5/4EwdKvn00EgP8NayYBL1A6FaC5KVLI=;
+ b=ZRXlCMpPKIy5kVocqZRgDev+WUOOZcFqKiuaBc2LEZpa2RH/pzRVZoYedzZykIKe+1MPv7
+ 3cmTkWI+NC5wH5WU1IFA2TEMGOKEKKfT0XbG/gqAmdwy3Sb0GYjiCxTZfWhL4vfgCPrkJX
+ VrKyoKl7ce4NjQ/vkZ30Bs1y814aXbk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-201-xEAPTizlMIi_cB-gqZhu4Q-1; Thu, 07 May 2020 11:57:37 -0400
+X-MC-Unique: xEAPTizlMIi_cB-gqZhu4Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC72480058A;
+ Thu,  7 May 2020 15:57:36 +0000 (UTC)
+Received: from [10.36.113.245] (ovpn-113-245.ams2.redhat.com [10.36.113.245])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E38A2100164D;
+ Thu,  7 May 2020 15:57:28 +0000 (UTC)
+Subject: Re: [PATCH v4 09/13] migration/ram: Consolidate variable reset after
+ placement in ram_load_postcopy()
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <20200421085300.7734-1-david@redhat.com>
+ <20200421085300.7734-10-david@redhat.com> <20200424102514.GD3106@work-vm>
+ <20200507154245.GF17348@work-vm>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <e6df0abf-2993-7dfe-eeaa-164f0eabc9db@redhat.com>
+Date: Thu, 7 May 2020 17:57:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200507154245.GF17348@work-vm>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 3493385936021330240
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrkedtgdelfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheekhfdtheegheehjeeludefkefhvdelfedvieehhfekhfdufffhueeuvdfftdfhnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheiledtrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Received-SPF: pass client-ip=46.105.56.136; envelope-from=groug@kaod.org;
- helo=1.mo6.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 11:59:56
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 00:55:34
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,99 +141,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 07 May 2020 14:16:43 +0200
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-
-> On Montag, 4. Mai 2020 11:18:34 CEST Greg Kurz wrote:
-> > On Fri, 01 May 2020 16:04:41 +0200
-> > 
-> > Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-> > > On Donnerstag, 30. April 2020 15:30:49 CEST Greg Kurz wrote:
-> > > > > > I agree that a client that issues concurrent readdir requests on the
-> > > > > > same fid is probably asking for troubles, but this permitted by the
-> > > > > > spec. Whether we should detect such conditions and warn or even fail
-> > > > > > is discussion for another thread.
-> > > > > > 
-> > > > > > The locking is only needed to avoid concurrent accesses to the
-> > > > > > dirent
-> > > > > > structure returned by readdir(), otherwise we could return partially
-> > > > > > overwritten file names to the client. It must be done for each
-> > > > > > individual
-> > > > > > call to readdir(), but certainly not for multiple calls.
-> > > > > 
-> > > > > Yeah, that would resolve this issue more appropriately for 9p2000.L,
-> > > > > since
-> > > > > Treaddir specifies an offset, but for 9p2000.u the result of a
-> > > > > concurrent
-> > > > > read on a directory (9p2000.u) would still be undefined.
-> > > > 
-> > > > The bad client behavior you want to tackle has nothing to do with
-> > > > the locking itself. Since all the code in 9p.c runs serialized in
-> > > > the context of the QEMU main loop, concurrent readdir requests could
-> > > > easily be detected up-front with a simple flag in the fid structure.
-> > > 
-> > > Well, it's fine with me. I don't really see an issue here right now. But
-> > > that all the code was serialized is not fully true. Most of the 9p.c code
-> > > is still heavily dispatching between main thread and worker threads back
-> > > and forth. And for that reason the order of request processing might
-> > > change quite arbitrarily in between. Just keep that in mind.
-> > 
-> > Just to make things clear. The code in 9p.c is ALWAYS exclusively run by
-> > the main thread. Only the code called under v9fs_co_run_in_worker() is
-> > dispatched on worker threads. So, yes the order of individual backend
-> > operations may change, but the start of a new client request is necessarily
-> > serialized with the completion of pending ones, which is the only thing
-> > we care for actually.
+On 07.05.20 17:42, Dr. David Alan Gilbert wrote:
+> * Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
+>> * David Hildenbrand (david@redhat.com) wrote:
+>>> Let's consolidate resetting the variables.
+>>>
+>>> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>>> Cc: Juan Quintela <quintela@redhat.com>
+>>> Cc: Peter Xu <peterx@redhat.com>
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>
+>> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > 
-> I just looked at this. 9p.c code is called by main I/O thread only, that's 
-> clear. The start of requests come also in in order, yes, but it seems you 
-> would think that main I/O thread would not grab the next client request from 
-> queue before completing the current/previous client request (that is not 
-> before transmitting result to client). If yes, I am not so sure about this 
-> claim:
-> 
+> Queued this one only; I had to do manual patch application due to some
+> renaming in 91ba442; but I think it's still OK.
 
-Hrm... I don't think I've ever said anything like that :)
+Thanks, how to best proceed with the other 12 patches in this series?
 
-What I'm saying is that, thanks to the serialization of
-request start and completion, v9fs_readdir() and v9fs_read()
-can:
-- flag the fid as being involved in a readdir request
-- clear the flag when the request is complete or failed
-- directly fail or print a warning if the fid already
-  has the flag set (ie. a previous request hasn't
-  completed yet)
 
-But again, I'm not a big fan of adding code to handle
-such an unlikely situation which is even not explicitly
-forbidden by the 9p spec.
+-- 
+Thanks,
 
-> For instance v9fs_path_write_lock() is using a co-mutex, right? So an 
-> unsuccesful lock would cause main I/O thread to grab the next request before 
-> completing the current/previous request.
-> 
-
-An unsuccessful lock would cause the main I/O thread to switch
-to some other task.
-
-> And what happens on any run_in_worker({}) call? If there is another client 
-> request in the queue, main I/O thread would pull that request from the queue 
-> before waiting for the worker thread to complete its task, wouldn't it?
-> 
-
-The main I/O thread won't wait for anything, so, yes, it will probably
-start handling the new request until it yields.
-
-> Just looked at the code so far, haven't tested it yet ...
-> 
-> Best regards,
-> Christian Schoenebeck
-> 
-> 
+David / dhildenb
 
 
