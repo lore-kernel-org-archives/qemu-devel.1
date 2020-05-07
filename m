@@ -2,121 +2,113 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 168CCC38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 08:53:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43FC0C38A24
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 08:55:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0CF020747
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 08:53:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1270D2075E
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 08:55:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="hPV5okVm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0CF020747
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jCtklF/0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1270D2075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWcHz-0002QD-W3
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 04:53:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52250)
+	id 1jWcJL-0004Mr-8r
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 04:55:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52364)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jWcDJ-00025C-Mz; Thu, 07 May 2020 04:49:05 -0400
-Received: from mail-eopbgr80138.outbound.protection.outlook.com
- ([40.107.8.138]:13902 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jWcDI-0006Er-Ry; Thu, 07 May 2020 04:49:05 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dOw1nevti1faf+gPfVzg4abrZoKlbFoqbNoCoWSarNflsPaDKkTTHJoC68Dl9R8l8t023gU8fpj+zrnQO7r4ne81Pc0ScMkEITIu68GDYU/9uCEBjgnHWbjmmc+02CC+2HRmw/5vD/IGaXj4Y/wyG9rUzXvsWoSl6R2K1pZfS/kzxNSVzk5yonBkj5LE9ApFYTlob36HWMDaS8nUhTU54i6KXsCgycr6G6+cMA1ziMy0OhGVbNGR2NLoaguSlHr3RQNzF4/5pHxmJVhBIIfdJeMM0yuc1pIOlaiB5MUfnR4p8LgefCp2tL406BN3o5LdvccZYyv2mYCmPTiZMfDO8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HAXFO4PGkoECMrka3NeTmIHeGqfaW7zgtjVmbJiOv+M=;
- b=ZNFULcJ56D0zVaYiGndLzgV6op59SHdsg+vJe+iue7tVeJeQjlVa+/b6Nvu4IGQUTiSCy7g4SMbDNc/DD+odbYl48PQec0kQZv2dby2xx+5DYbRjtup72AYm/MKxKf81s+2B+zkJM1pgUGleOMkEGneV1PUH86YxhxY2AO/s8Z2OogfgUqgG4iiEWiHPJr0o8hoa08kfJ7COvKqyvDoSrB30T9YZEJ8n2+rpvPqGnDUYYKB0wASMdoeUgY2T25DVffz5rzbdsXXujdhjXoDpv+jBI7xW+miguEH1tE5L9sG6SIWlCt5FnF17iU34RCTF6/hX3UY71HUOcdINQcjhXw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HAXFO4PGkoECMrka3NeTmIHeGqfaW7zgtjVmbJiOv+M=;
- b=hPV5okVmTHGIUy2OdPkL2He5PtcWmR9z4lT65DM2TiC3Rakj4E4UXrkLjvOINrjLjuc1VogqGwi3bkAwVbkkQE37G4AYebVT/2gBnJowHdl7+Bq3EZ7dRhn2cw2Ftm+s2XDTOrrMFvh4VZa3lFsvco8pc1afMmpF4jWQjYWQ8M4=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5495.eurprd08.prod.outlook.com (2603:10a6:20b:104::19)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.26; Thu, 7 May
- 2020 08:48:43 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2958.034; Thu, 7 May 2020
- 08:48:43 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2 8/9] block/vhdx: drop unallocated_blocks_are_zero
-Date: Thu,  7 May 2020 11:47:59 +0300
-Message-Id: <20200507084800.20596-9-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200507084800.20596-1-vsementsov@virtuozzo.com>
-References: <20200507084800.20596-1-vsementsov@virtuozzo.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: FR2P281CA0034.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:14::21) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jWcDg-0002zn-9w
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 04:49:28 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22041
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jWcDf-0007Ny-6d
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 04:49:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588841366;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=TEBDyPZg+tWEo8hM9o2TLwMBbs4f3EjolsavhpT8kMI=;
+ b=jCtklF/0s4kKJl/Lp74ria+VeoczemD0+dIpkZ8/qokAtVBxeMyzvfCV1XFfJD0zQv25TC
+ Li1phhCkTX3eAKQM2LoAguvg5Osbuy8eoBgYo8jFPc2DLZggZ1RKHiYmUMSe1R5449ozu2
+ HDR6iAUi8g0HO36SU9evcFJiabNA11k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-86-7k8xdBYiM_edQs4p2x4iJQ-1; Thu, 07 May 2020 04:49:22 -0400
+X-MC-Unique: 7k8xdBYiM_edQs4p2x4iJQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 72E01464;
+ Thu,  7 May 2020 08:49:21 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-114-92.ams2.redhat.com
+ [10.36.114.92])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DDF5462952;
+ Thu,  7 May 2020 08:49:19 +0000 (UTC)
+Subject: Re: [PATCH v3 09/33] block: Add generic bdrv_inherited_options()
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200218124242.584644-1-mreitz@redhat.com>
+ <20200218124242.584644-10-mreitz@redhat.com>
+ <20200506103722.GB6333@linux.fritz.box>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <7d226c94-2f14-eddb-b795-f8a961023947@redhat.com>
+Date: Thu, 7 May 2020 10:49:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (185.215.60.171) by
- FR2P281CA0034.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:14::21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2979.26 via Frontend Transport; Thu, 7 May 2020 08:48:42 +0000
-X-Mailer: git-send-email 2.21.0
-X-Originating-IP: [185.215.60.171]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 0cf06539-5b44-4c7a-0d0c-08d7f263728b
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5495:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5495DB1A10B291C10A59619CC1A50@AM7PR08MB5495.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:85;
-X-Forefront-PRVS: 03965EFC76
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wNSQnvM8vhVbIJAZWlcAPHTV7FfWP8m/UmHuNkKiz/n0Gjok28gcTJvwBvEWkqfbaP64oMiMJ+PbPiFT+K+XM6hLg1PsfP/JisGuc14XVXmHdfkIzHnsXWjjnxIUxkVm/aeyk4qzZBk9Yidrg++DhsoZR734HFlKqtDIo6E+AqSi1MDLYQ+pJNiwR/xbqc8cnkrtVPD96Fk2jzSi0JXKmEIjXj/envtbcfoGaK8KNB7dAZr/PUdvi2ppsbZh58Ks5V/ihMkfCW5sZOjZ86tDNv/llYOzNrLRvKcz6cZp4nENtmVbvllF0k9WCRpshram8ljBihX9FuxNGI7M1Z+DpgSIA+lzZeLoWxqlli6UCcLOONHQzi9xYYn+Ouzv71qPP1r4mDWz+n1R+hFCTd2OSWIQKsstOIpTZIrItJ2ET85lLNGB832hCyS3ccNjRGx0dWeuW8l0sSyH7X5m8COMHdoqPVlSe8W+x+4g7bu9Y9V3lvp7DCPBR4BmVhPhZ/S1CGtJJOT+eP/XbBQ1l5UL6QLZcxnLUZjmMr56USauIsyAFu39ggOMnIfBKi9G1KuN
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(376002)(346002)(39850400004)(396003)(366004)(136003)(33430700001)(4326008)(478600001)(66476007)(66946007)(66556008)(4744005)(5660300002)(69590400007)(2906002)(52116002)(7416002)(6486002)(1076003)(36756003)(86362001)(6512007)(83280400001)(6916009)(186003)(16526019)(83320400001)(956004)(26005)(33440700001)(8676002)(83300400001)(83290400001)(6666004)(2616005)(83310400001)(8936002)(6506007)(316002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 6udyDmxfb4i7U5a0sQA4Jzw8zokegShFaMGWAp4ZfsL5CeE6tPUkGKUw9lulWxKm4wHv9nKf5ZBEimLpIvemGW7HphYgWPXb24HzJUO2MZYt6ZXgDUS6yvnfv2xKYlsFFYwHSKDKKFW+01JvG9yeYAcmBWYCBl4esUXMtLcfsw+CoTIn/3Bys4SX9LVeswq6MgJrioVMRjaByyC0PqH8NmN8TBJRuvxXd+2D4FVfxe0B0CgVZGjKmKpKXf3EjUp2IMTuEnvG84DC61Y221adecq/q2AMthstPhcnzwhLOp3iZ9+MhlhwCFbBjJ95DgAHcptWWzSGJBYP+zau9B8GPV1YSj6dJqicB9bTnug3QAEY0hjsj0yBwp5p/ZyUYTbXLg1cK2YwfEmzbDUbLy33d7tO6AfegEFSQhc6a2pnKDwMC6fCCFjh/J643t6FFqfZcTTj+DRDyjuoS2Uh52P/+ed2MILNK/cz+R2Hr3OfjRoupwH86hxfyQ+Zbg4I3gevaa2MfUQCeRtqNdFCJx+jXLxMNNprMW1HGPrVo+Cl4doPecDLJZsGhIGFgnr60sgDzXl4OJRypnIPkXqI6B7GeVwhBag48Snmj1h5TwnGi1M54IJiJ0r2irgv01Fn/8Clnm2gXv8PrIVnETORabjp6mlgGSz6gQe/FSBL2VDbI8/rOQ88TyDdKRK+T1mnj5gtw06emOo/S4dzFuM9wEQUAvwm4nHHMdz5OovkQe0Yj1bpz/n25dDQ/kWcbS1YQu4eqghrZy7qknxxIxxBnrANBAGmW01UYzDCMNnugJd6K8U=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0cf06539-5b44-4c7a-0d0c-08d7f263728b
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2020 08:48:43.5714 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 13MYRqRET1EJUut9JH3SL7OsNo+jD1Dmy85BP+BpRh91lIVbSYDyhC5bdYe100KDqqyMhhhbvB4c+wBQVBEVOvA3z6OJ0NLU9hlFCjfDygM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5495
-Received-SPF: pass client-ip=40.107.8.138;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 04:48:43
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+In-Reply-To: <20200506103722.GB6333@linux.fritz.box>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="XJL9UXjnNVfCqg5hRGcUPHHgUkIN9dfsM"
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 02:00:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -129,40 +121,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
- stefanha@redhat.com, codyprime@gmail.com, sw@weilnetz.de, pl@kamp.de,
- qemu-devel@nongnu.org, mreitz@redhat.com, ronniesahlberg@gmail.com,
- den@openvz.org, pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-vhdx doesn't have .bdrv_co_block_status handler, so DATA|ALLOCATED is
-always assumed for it in bdrv_co_block_status().
-unallocated_blocks_are_zero is useless (it doesn't affect the only user
-of the field: bdrv_co_block_status()), drop it.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XJL9UXjnNVfCqg5hRGcUPHHgUkIN9dfsM
+Content-Type: multipart/mixed; boundary="fRBdyO9iKXoZZYyzxABrzEY8HlCWT20IL"
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- block/vhdx.c | 3 ---
- 1 file changed, 3 deletions(-)
+--fRBdyO9iKXoZZYyzxABrzEY8HlCWT20IL
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/block/vhdx.c b/block/vhdx.c
-index aedd782604..45963a3166 100644
---- a/block/vhdx.c
-+++ b/block/vhdx.c
-@@ -1164,9 +1164,6 @@ static int vhdx_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
- 
-     bdi->cluster_size = s->block_size;
- 
--    bdi->unallocated_blocks_are_zero =
--        (s->params.data_bits & VHDX_PARAMS_HAS_PARENT) == 0;
--
-     return 0;
- }
- 
--- 
-2.21.0
+On 06.05.20 12:37, Kevin Wolf wrote:
+> Am 18.02.2020 um 13:42 hat Max Reitz geschrieben:
+>> After the series this patch belongs to, we want to have a common
+>> BdrvChildClass that encompasses all of child_file, child_format, and
+>> child_backing.  Such a single class needs a single .inherit_options()
+>> implementation, and this patch introduces it.
+>>
+>> The next patch will show how the existing implementations can fall back
+>> to it just by passing appropriate BdrvChildRole and parent_is_format
+>> values.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> ---
+>>  block.c | 84 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 84 insertions(+)
+>>
+>> diff --git a/block.c b/block.c
+>> index c33f0e9b42..9179b9b604 100644
+>> --- a/block.c
+>> +++ b/block.c
+>> @@ -998,6 +998,90 @@ static void bdrv_temp_snapshot_options(int *child_f=
+lags, QDict *child_options,
+>>      *child_flags &=3D ~BDRV_O_NATIVE_AIO;
+>>  }
+>> =20
+>> +/*
+>> + * Returns the options and flags that a generic child of a BDS should
+>> + * get, based on the given options and flags for the parent BDS.
+>> + */
+>> +static void __attribute__((unused))
+>> +    bdrv_inherited_options(BdrvChildRole role, bool parent_is_format,
+>> +                           int *child_flags, QDict *child_options,
+>> +                           int parent_flags, QDict *parent_options)
+>> +{
+>> +    int flags =3D parent_flags;
+>> +
+>> +    /*
+>> +     * First, decide whether to set, clear, or leave BDRV_O_PROTOCOL.
+>> +     * Generally, the question to answer is: Should this child be
+>> +     * format-probed by default?
+>> +     */
+>> +
+>> +    /*
+>> +     * Pure and non-filtered data children of non-format nodes should
+>> +     * be probed by default (even when the node itself has BDRV_O_PROTO=
+COL
+>> +     * set).  This only affects a very limited set of drivers (namely
+>> +     * quorum and blkverify when this comment was written).
+>> +     * Force-clear BDRV_O_PROTOCOL then.
+>> +     */
+>> +    if (!parent_is_format &&
+>> +        (role & (BDRV_CHILD_DATA | BDRV_CHILD_METADATA |
+>> +                 BDRV_CHILD_FILTERED)) =3D=3D
+>> +            BDRV_CHILD_DATA)
+>=20
+> You could avoid the odd indentation (I can't decide whether or not it
+> should be one space more to align correctly) and probably also make the
+> expression more readable if you split it into:
+>=20
+>     (role & BDRV_CHILD_DATA) &&
+>     !(role & (BDRV_CHILD_METADATA | BDRV_CHILD_FILTERED))
+
+Yes, looks good.
+
+>> +    {
+>> +        flags &=3D ~BDRV_O_PROTOCOL;
+>> +    }
+>> +
+>> +    /*
+>> +     * All children of format nodes (except for COW children) and all
+>> +     * metadata children in general should never be format-probed.
+>> +     * Force-set BDRV_O_PROTOCOL then.
+>> +     */
+>> +    if ((parent_is_format && !(role & BDRV_CHILD_COW)) ||
+>> +        (role & BDRV_CHILD_METADATA))
+>> +    {
+>> +        flags |=3D BDRV_O_PROTOCOL;
+>> +    }
+>> +
+>> +    /*
+>> +     * If the cache mode isn't explicitly set, inherit direct and no-fl=
+ush from
+>> +     * the parent.
+>> +     */
+>> +    qdict_copy_default(child_options, parent_options, BDRV_OPT_CACHE_DI=
+RECT);
+>> +    qdict_copy_default(child_options, parent_options, BDRV_OPT_CACHE_NO=
+_FLUSH);
+>> +    qdict_copy_default(child_options, parent_options, BDRV_OPT_FORCE_SH=
+ARE);
+>> +
+>> +    if (role & BDRV_CHILD_COW) {
+>> +        /* backing files are always opened read-only */
+>=20
+> Not "always", just by default.
+
+OK.  I just copied the comment from bdrv_backing_options().
+
+>> +        qdict_set_default_str(child_options, BDRV_OPT_READ_ONLY, "on");
+>> +        qdict_set_default_str(child_options, BDRV_OPT_AUTO_READ_ONLY, "=
+off");
+>> +    } else {
+>> +        /* Inherit the read-only option from the parent if it's not set=
+ */
+>> +        qdict_copy_default(child_options, parent_options, BDRV_OPT_READ=
+_ONLY);
+>> +        qdict_copy_default(child_options, parent_options,
+>> +                           BDRV_OPT_AUTO_READ_ONLY);
+>> +    }
+>> +
+>> +    if (parent_is_format && !(role & BDRV_CHILD_COW)) {
+>> +        /*
+>> +         * Our format drivers take care to send flushes and respect
+>> +         * unmap policy, so we can default to enable both on lower
+>> +         * layers regardless of the corresponding parent options.
+>> +         */
+>> +        qdict_set_default_str(child_options, BDRV_OPT_DISCARD, "unmap")=
+;
+>> +    }
+>=20
+> Why the restriction to format here? Don't we break "unmap" propagation
+> through filters with this?
+
+Right now (before this series), the behavior seems ambiguous, in that
+for filters that use bs->file, it is set, but for those that use
+bs->backing, it isn=E2=80=99t.
+
+But I suspect the main reason for what I did is the way I interpreted
+the comment (which before this series only mentions block drivers in
+general, not specifically format drivers): It sounded to me as if the
+block driver needed to respect the unmap policy, and I didn=E2=80=99t think
+filters did that.  So it was my understanding that filter drivers would
+just propagate discards and thus we couldn=E2=80=99t default-enable unmap o=
+n
+their children.
+
+But I was wrong, the block driver doesn=E2=80=99t need to respect anything,
+because bdrv_co_pdiscard() already does.
+
+So I suppose it should indeed be enabled for all children, with the
+comment changed to express that it isn=E2=80=99t any block driver that resp=
+ects
+unmap policy, but bdrv_co_pdiscard(), e.g.:
+
+bdrv_co_pdiscard() respects unmap policy for the parent, so we can
+default to enable it on lower layers regardless of the parent option.
+
+> It would probably also be a good question why we don't propagate it to
+> the backing file, but this is preexisting.
+
+I suppose we should, although it=E2=80=99s irrelevant, so.  I suppose I=E2=
+=80=99ll just
+drop the parent_is_format, adjust the comment and that should be fine
+for this series.
+
+Max
+
+
+--fRBdyO9iKXoZZYyzxABrzEY8HlCWT20IL--
+
+--XJL9UXjnNVfCqg5hRGcUPHHgUkIN9dfsM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6zy40ACgkQ9AfbAGHV
+z0AoMwgAkxyDoRcFWFlAXMzWaTNajiievWxXB+BOMyNoyDdKlKZ0dkgnMZYUMyBF
+sGe2zjRE/TagnZdm35kHsZpZ9tqVou8bbX9YzsxNKkz5lkRArdNjxfFctWQZ3o9h
+U4PUKPz8s4N8OVy4XwySKAGAwQsZkz2Jw4ag0TnP+MhoEdqJ25MYWGT6C42cIncR
+c6LV9YAtUNjjqeGHp45cfKS/UUf3PWzrBTsGz9C1cqQcq7zJqb0GCbAd5pzmOxQ4
+xRbpoxkz7Rd4H74vA3f76cK+Y9Oxq01W6B4UQgKUN7X5vPtLPEwDOcNlslkcKx+/
+x1Is+2LUXNnoa+lv7eKkPoptf2N/Qg==
+=0Sj2
+-----END PGP SIGNATURE-----
+
+--XJL9UXjnNVfCqg5hRGcUPHHgUkIN9dfsM--
 
 
