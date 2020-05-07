@@ -2,92 +2,88 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31C00C38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 11:53:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73E4DC38A2A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 11:54:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECC2420735
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 11:53:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2CED520735
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 11:54:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P4S39jld"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECC2420735
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p6mEoIo0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CED520735
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWf5U-0003ps-2d
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 07:53:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35066)
+	id 1jWf6f-0004yV-Da
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 07:54:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35314)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jWf4Y-0003FD-MJ
- for qemu-devel@nongnu.org; Thu, 07 May 2020 07:52:14 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37793
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jWf4W-0003hJ-E8
- for qemu-devel@nongnu.org; Thu, 07 May 2020 07:52:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588852330;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kLdemT+VNc81PgW9e/tmFRApx9eZOiuq0r8Ixs6TCTQ=;
- b=P4S39jldO7Mg13OSRt4vnQ/ySVchuN4wT0Yao6sbkAg4Gy+Ro67Q2OetFa9UTAksAIvjaU
- Lm8Z/xEVhdGTcq64G/TQ/tZ+yU2phLrTqAijGsWf59X5nJUqkKuZ1qeDZKQtwN/BBriQ4G
- ohkGAR6wqcY27i2iZIpV3baXyt83z68=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-296-CTZMv696OZyFwcZagR0c3g-1; Thu, 07 May 2020 07:52:08 -0400
-X-MC-Unique: CTZMv696OZyFwcZagR0c3g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3DA13107B0E1;
- Thu,  7 May 2020 11:52:07 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.63])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 210BB62A42;
- Thu,  7 May 2020 11:52:04 +0000 (UTC)
-Date: Thu, 7 May 2020 12:52:01 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Stefan Berger <stefanb@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH V2 4/4] hw/tpm: fix usage of bool in tpm-tis.c
-Message-ID: <20200507115201.GA1120808@redhat.com>
-References: <1553351197-14581-1-git-send-email-cafer.abdi@gmail.com>
- <1553351197-14581-5-git-send-email-cafer.abdi@gmail.com>
- <a467e1f5-b104-ae69-8ea0-10c05f1263cf@redhat.com>
- <471c060c-2abc-50e9-1a51-871ab62185ea@linux.ibm.com>
+ (Exim 4.90_1) (envelope-from <npiggin@gmail.com>)
+ id 1jWf5x-0004Qd-UD; Thu, 07 May 2020 07:53:41 -0400
+Received: from mail-pg1-x529.google.com ([2607:f8b0:4864:20::529]:46400)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <npiggin@gmail.com>)
+ id 1jWf5w-000633-Fg; Thu, 07 May 2020 07:53:41 -0400
+Received: by mail-pg1-x529.google.com with SMTP id q124so2405002pgq.13;
+ Thu, 07 May 2020 04:53:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=0MTCUuzC+KpC/+t5UR4xw+8dprD3mdRS9/7ISfmOrR4=;
+ b=p6mEoIo0+sO+DtxUsFPFE71XRJjmJHxF9iEcX3YbxgNNYrf6yLipFU0UQ5K+sQYOfM
+ STriMnJYxT5XWNN23g5e2pQwS5sBWMWQ4ZLfxZ9cdXKGCBS5wdUK9zs/dRj/exdn8fmC
+ O/8acNLkh2AZmAkZ53gAjh4B4FiLkxnCsbgwildEmm1/Tnlxzv6Aj9qw4898kqeTYaFM
+ vxtTgmmP4pWQdTyV57BfRK3PYXNuLbyhE/axYUZHxUkZf/17iEowSb53Ui6n/j8+O9Xm
+ FPc+E2s1v5H4UquY3Ws+O/lFbwip/sJxu2Ja43yr7zFxe4glcVlnMDgQFIp1N244AjFI
+ Dp7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=0MTCUuzC+KpC/+t5UR4xw+8dprD3mdRS9/7ISfmOrR4=;
+ b=Bla8Wb/yej8CnoRZj59pwtde2ksYtr2SE1byBVeWe3YUOePo+bc1Pw3DGg92WuSaNm
+ FfXm/AEKUgFf3QNYWk1sglOCJuRXqp+EZLMTMNnEUv+sM+IgfQpgSi0JHAfM1C2RCfWv
+ uJmW+3O28zOQuGQYMF2xaRqLAbkxvWxZu4I7eRiwOqgDJmOuL5FVS56u/ZH5wEaN5cf2
+ Z6i9xq/vs0UVUo9QFgfLu6P1r9HffIcNvAUtkRRKmaJNe9Sedg0go82UGVT0j+1P/kqA
+ /010Sl2Ab6TNbbD6l6GexjUmD+fghEq9JXIha3ViS0QeZMBNDlxIYuUHmFaP/uT0iuUy
+ eB9w==
+X-Gm-Message-State: AGi0Puage8Jg5VfsFaUEqI8/iIHfFqqEYLStkYJvjICLa9ROqj0C1mGe
+ kUdzqBXwGg8EhOS22Ak0MeVV9W3d
+X-Google-Smtp-Source: APiQypLsn1JMe88il6Oq5XSZ9LNzb7sjlhg8ShHvYviNUhVx6DOh/iqDPIQ2Cd6mIoyxUxh/XYCuHw==
+X-Received: by 2002:a62:7d8c:: with SMTP id
+ y134mr14301614pfc.231.1588852417797; 
+ Thu, 07 May 2020 04:53:37 -0700 (PDT)
+Received: from bobo.ozlabs.ibm.com (61-68-214-199.tpgi.com.au. [61.68.214.199])
+ by smtp.gmail.com with ESMTPSA id y16sm4921426pfp.45.2020.05.07.04.53.34
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 07 May 2020 04:53:37 -0700 (PDT)
+From: Nicholas Piggin <npiggin@gmail.com>
+To: qemu-ppc@nongnu.org
+Subject: [PATCH] target/ppc: Add support for scv and rfscv instructions
+Date: Thu,  7 May 2020 21:53:28 +1000
+Message-Id: <20200507115328.789175-1-npiggin@gmail.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-In-Reply-To: <471c060c-2abc-50e9-1a51-871ab62185ea@linux.ibm.com>
-User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 02:00:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FROM_EXCESS_BASE64=0.979, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::529;
+ envelope-from=npiggin@gmail.com; helo=mail-pg1-x529.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,79 +96,392 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Jafar Abdi <cafer.abdi@gmail.com>,
- QEMU Trivial <qemu-trivial@nongnu.org>, stefanha@gmail.com,
- qemu-devel@nongnu.org, jusual@mail.ru
+Cc: qemu-devel@nongnu.org, Nicholas Piggin <npiggin@gmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ping, again, for either qemu-trivial or TPM maintainers to take this
-patch.
+POWER9 adds scv and rfscv instructions and the system call vectored
+interrupt. Linux does not support this instruction yet but it has
+been tested with a modified kernel that runs on real hardware.
 
-The other three in this series are merged, but this TPM patch is
-still pending.
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+---
+This was tested with out-of-tree Linux patches and seems to work fine.
 
-On Tue, Mar 26, 2019 at 09:55:24AM -0400, Stefan Berger wrote:
-> On 3/24/19 3:41 PM, Thomas Huth wrote:
-> > On 23/03/2019 15.26, Jafar Abdi wrote:
-> > > Clean up wrong usage of FALSE and TRUE in places that use "bool" from=
- stdbool.h.
-> > >=20
-> > > FALSE and TRUE (with capital letters) are the constants defined by gl=
-ib for
-> > > being used with the "gboolean" type of glib. But some parts of the co=
-de also use
-> > > TRUE and FALSE for variables that are declared as "bool" (the type fr=
-om <stdbool.h>).
-> > >=20
-> > > Signed-off-by: Jafar Abdi <cafer.abdi@gmail.com>
-> > > ---
-> > >   hw/tpm/tpm_tis.c | 4 ++--
-> > >   1 file changed, 2 insertions(+), 2 deletions(-)
-> > >=20
-> > > diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-> > > index fd183e8..c1eb094 100644
-> > > --- a/hw/tpm/tpm_tis.c
-> > > +++ b/hw/tpm/tpm_tis.c
-> > > @@ -611,7 +611,7 @@ static void tpm_tis_mmio_write(void *opaque, hwad=
-dr addr,
-> > >               while ((TPM_TIS_IS_VALID_LOCTY(s->active_locty) &&
-> > >                       locty > s->active_locty) ||
-> > >                       !TPM_TIS_IS_VALID_LOCTY(s->active_locty)) {
-> > > -                bool higher_seize =3D FALSE;
-> > > +                bool higher_seize =3D false;
-> > >                   /* already a pending SEIZE ? */
-> > >                   if ((s->loc[locty].access & TPM_TIS_ACCESS_SEIZE)) =
-{
-> > > @@ -621,7 +621,7 @@ static void tpm_tis_mmio_write(void *opaque, hwad=
-dr addr,
-> > >                   /* check for ongoing seize by a higher locality */
-> > >                   for (l =3D locty + 1; l < TPM_TIS_NUM_LOCALITIES; l=
-++) {
-> > >                       if ((s->loc[l].access & TPM_TIS_ACCESS_SEIZE)) =
-{
-> > > -                        higher_seize =3D TRUE;
-> > > +                        higher_seize =3D true;
-> > >                           break;
-> > >                       }
-> > >                   }
-> > >=20
-> > Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
-> >=20
->=20
->=20
+This fixes the linux-user compile error that David reported last time,
+by disabling everything for CONFIG_USER_ONLY. I have the user
+implementation which is pretty simple, but we don't have an official
+user ABI yet so I'll wait until we get support merged in the kernel.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+Thanks,
+Nick
+
+ linux-user/ppc/cpu_loop.c       |  1 +
+ target/ppc/cpu.h                |  7 ++-
+ target/ppc/excp_helper.c        | 98 ++++++++++++++++++++++++---------
+ target/ppc/helper.h             |  1 +
+ target/ppc/translate.c          | 52 ++++++++++++++++-
+ target/ppc/translate_init.inc.c |  3 +-
+ 6 files changed, 132 insertions(+), 30 deletions(-)
+
+diff --git a/linux-user/ppc/cpu_loop.c b/linux-user/ppc/cpu_loop.c
+index 5b27f8603e..df71e15a25 100644
+--- a/linux-user/ppc/cpu_loop.c
++++ b/linux-user/ppc/cpu_loop.c
+@@ -267,6 +267,7 @@ void cpu_loop(CPUPPCState *env)
+             queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+             break;
+         case POWERPC_EXCP_SYSCALL:  /* System call exception                 */
++        case POWERPC_EXCP_SYSCALL_VECTORED:
+             cpu_abort(cs, "Syscall exception while in user mode. "
+                       "Aborting\n");
+             break;
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 6b6dd7e483..df5c30160d 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -127,8 +127,9 @@ enum {
+     POWERPC_EXCP_SDOOR_HV = 100,
+     /* ISA 3.00 additions */
+     POWERPC_EXCP_HVIRT    = 101,
++    POWERPC_EXCP_SYSCALL_VECTORED = 102, /* scv exception                     */
+     /* EOL                                                                   */
+-    POWERPC_EXCP_NB       = 102,
++    POWERPC_EXCP_NB       = 103,
+     /* QEMU exceptions: used internally during code translation              */
+     POWERPC_EXCP_STOP         = 0x200, /* stop translation                   */
+     POWERPC_EXCP_BRANCH       = 0x201, /* branch instruction                 */
+@@ -478,6 +479,7 @@ typedef struct ppc_v3_pate_t {
+ /* Facility Status and Control (FSCR) bits */
+ #define FSCR_EBB        (63 - 56) /* Event-Based Branch Facility */
+ #define FSCR_TAR        (63 - 55) /* Target Address Register */
++#define FSCR_SCV        (63 - 51) /* System call vectored */
+ /* Interrupt cause mask and position in FSCR. HFSCR has the same format */
+ #define FSCR_IC_MASK    (0xFFULL)
+ #define FSCR_IC_POS     (63 - 7)
+@@ -487,6 +489,7 @@ typedef struct ppc_v3_pate_t {
+ #define FSCR_IC_TM          5
+ #define FSCR_IC_EBB         7
+ #define FSCR_IC_TAR         8
++#define FSCR_IC_SCV        12
+ 
+ /* Exception state register bits definition                                  */
+ #define ESR_PIL   PPC_BIT(36) /* Illegal Instruction                    */
+@@ -554,6 +557,8 @@ enum {
+     POWERPC_FLAG_VSX      = 0x00080000,
+     /* Has Transaction Memory (ISA 2.07)                                     */
+     POWERPC_FLAG_TM       = 0x00100000,
++    /* Has SCV (ISA 3.00)                                                    */
++    POWERPC_FLAG_SCV      = 0x00200000,
+ };
+ 
+ /*****************************************************************************/
+diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+index f052979664..170b3be4c4 100644
+--- a/target/ppc/excp_helper.c
++++ b/target/ppc/excp_helper.c
+@@ -67,6 +67,18 @@ static inline void dump_syscall(CPUPPCState *env)
+                   ppc_dump_gpr(env, 8), env->nip);
+ }
+ 
++static inline void dump_syscall_vectored(CPUPPCState *env)
++{
++    qemu_log_mask(CPU_LOG_INT, "syscall r0=%016" PRIx64
++                  " r3=%016" PRIx64 " r4=%016" PRIx64 " r5=%016" PRIx64
++                  " r6=%016" PRIx64 " r7=%016" PRIx64 " r8=%016" PRIx64
++                  " nip=" TARGET_FMT_lx "\n",
++                  ppc_dump_gpr(env, 0), ppc_dump_gpr(env, 3),
++                  ppc_dump_gpr(env, 4), ppc_dump_gpr(env, 5),
++                  ppc_dump_gpr(env, 6), ppc_dump_gpr(env, 7),
++                  ppc_dump_gpr(env, 8), env->nip);
++}
++
+ static inline void dump_hcall(CPUPPCState *env)
+ {
+     qemu_log_mask(CPU_LOG_INT, "hypercall r3=%016" PRIx64
+@@ -185,7 +197,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
+     CPUState *cs = CPU(cpu);
+     CPUPPCState *env = &cpu->env;
+     target_ulong msr, new_msr, vector;
+-    int srr0, srr1, asrr0, asrr1, lev, ail;
++    int srr0, srr1, asrr0, asrr1, lev = -1, ail;
+     bool lpes0;
+ 
+     qemu_log_mask(CPU_LOG_INT, "Raise exception at " TARGET_FMT_lx
+@@ -421,6 +433,13 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
+             new_msr |= (target_ulong)MSR_HVB;
+         }
+         break;
++    case POWERPC_EXCP_SYSCALL_VECTORED: /* scv exception                     */
++        lev = env->error_code;
++        dump_syscall_vectored(env);
++        env->nip += 4;
++        new_msr |= env->msr & ((target_ulong)1 << MSR_EE);
++        new_msr |= env->msr & ((target_ulong)1 << MSR_RI);
++        break;
+     case POWERPC_EXCP_FPU:       /* Floating-point unavailable exception     */
+     case POWERPC_EXCP_APU:       /* Auxiliary processor unavailable          */
+     case POWERPC_EXCP_DECR:      /* Decrementer exception                    */
+@@ -724,12 +743,6 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
+         break;
+     }
+ 
+-    /* Save PC */
+-    env->spr[srr0] = env->nip;
+-
+-    /* Save MSR */
+-    env->spr[srr1] = msr;
+-
+     /* Sanity check */
+     if (!(env->msr_mask & MSR_HVB)) {
+         if (new_msr & MSR_HVB) {
+@@ -742,14 +755,6 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
+         }
+     }
+ 
+-    /* If any alternate SRR register are defined, duplicate saved values */
+-    if (asrr0 != -1) {
+-        env->spr[asrr0] = env->spr[srr0];
+-    }
+-    if (asrr1 != -1) {
+-        env->spr[asrr1] = env->spr[srr1];
+-    }
+-
+     /*
+      * Sort out endianness of interrupt, this differs depending on the
+      * CPU, the HV mode, etc...
+@@ -784,14 +789,6 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
+     }
+ #endif
+ 
+-    /* Jump to handler */
+-    vector = env->excp_vectors[excp];
+-    if (vector == (target_ulong)-1ULL) {
+-        cpu_abort(cs, "Raised an exception without defined vector %d\n",
+-                  excp);
+-    }
+-    vector |= env->excp_prefix;
+-
+     /*
+      * AIL only works if there is no HV transition and we are running
+      * with translations enabled
+@@ -800,10 +797,21 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
+         ((new_msr & MSR_HVB) && !(msr & MSR_HVB))) {
+         ail = 0;
+     }
+-    /* Handle AIL */
+-    if (ail) {
+-        new_msr |= (1 << MSR_IR) | (1 << MSR_DR);
+-        vector |= ppc_excp_vector_offset(cs, ail);
++
++    vector = env->excp_vectors[excp];
++    if (vector == (target_ulong)-1ULL) {
++        cpu_abort(cs, "Raised an exception without defined vector %d\n",
++                  excp);
++    }
++
++    vector |= env->excp_prefix;
++
++    /* If any alternate SRR register are defined, duplicate saved values */
++    if (asrr0 != -1) {
++        env->spr[asrr0] = env->nip;
++    }
++    if (asrr1 != -1) {
++        env->spr[asrr1] = msr;
+     }
+ 
+ #if defined(TARGET_PPC64)
+@@ -823,6 +831,37 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
+     }
+ #endif
+ 
++    if (excp != POWERPC_EXCP_SYSCALL_VECTORED) {
++        /* Save PC */
++        env->spr[srr0] = env->nip;
++
++        /* Save MSR */
++        env->spr[srr1] = msr;
++
++        /* Handle AIL */
++        if (ail) {
++            new_msr |= (1 << MSR_IR) | (1 << MSR_DR);
++            vector |= ppc_excp_vector_offset(cs, ail);
++        }
++
++#if defined(TARGET_PPC64)
++    } else {
++        /* scv AIL is a little different */
++        if (ail) {
++            new_msr |= (1 << MSR_IR) | (1 << MSR_DR);
++        }
++        if (ail == AIL_C000_0000_0000_4000) {
++            vector |= 0xc000000000003000ull;
++        } else {
++            vector |= 0x0000000000017000ull;
++        }
++        vector += lev * 0x20;
++
++        env->lr = env->nip;
++        env->ctr = msr;
++#endif
++    }
++
+     powerpc_set_excp_state(cpu, vector, new_msr);
+ }
+ 
+@@ -1160,6 +1199,11 @@ void helper_rfid(CPUPPCState *env)
+     do_rfi(env, env->spr[SPR_SRR0], env->spr[SPR_SRR1]);
+ }
+ 
++void helper_rfscv(CPUPPCState *env)
++{
++    do_rfi(env, env->lr, env->ctr);
++}
++
+ void helper_hrfid(CPUPPCState *env)
+ {
+     do_rfi(env, env->spr[SPR_HSRR0], env->spr[SPR_HSRR1]);
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index a95c010391..2dfa1c6942 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -15,6 +15,7 @@ DEF_HELPER_1(rfmci, void, env)
+ #if defined(TARGET_PPC64)
+ DEF_HELPER_2(pminsn, void, env, i32)
+ DEF_HELPER_1(rfid, void, env)
++DEF_HELPER_1(rfscv, void, env)
+ DEF_HELPER_1(hrfid, void, env)
+ DEF_HELPER_2(store_lpcr, void, env, tl)
+ DEF_HELPER_2(store_pcr, void, env, tl)
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 807d14faaa..9a7ae9a160 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -173,6 +173,7 @@ struct DisasContext {
+     bool vsx_enabled;
+     bool spe_enabled;
+     bool tm_enabled;
++    bool scv_enabled;
+     bool gtse;
+     ppc_spr_t *spr_cb; /* Needed to check rights for mfspr/mtspr */
+     int singlestep_enabled;
+@@ -4012,6 +4013,24 @@ static void gen_rfid(DisasContext *ctx)
+ #endif
+ }
+ 
++#if !defined(CONFIG_USER_ONLY)
++static void gen_rfscv(DisasContext *ctx)
++{
++#if defined(CONFIG_USER_ONLY)
++    GEN_PRIV;
++#else
++    /* Restore CPU state */
++    CHK_SV;
++    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
++        gen_io_start();
++    }
++    gen_update_cfar(ctx, ctx->base.pc_next - 4);
++    gen_helper_rfscv(cpu_env);
++    gen_sync_exception(ctx);
++#endif
++}
++#endif
++
+ static void gen_hrfid(DisasContext *ctx)
+ {
+ #if defined(CONFIG_USER_ONLY)
+@@ -4030,6 +4049,7 @@ static void gen_hrfid(DisasContext *ctx)
+ #define POWERPC_SYSCALL POWERPC_EXCP_SYSCALL_USER
+ #else
+ #define POWERPC_SYSCALL POWERPC_EXCP_SYSCALL
++#define POWERPC_SYSCALL_VECTORED POWERPC_EXCP_SYSCALL_VECTORED
+ #endif
+ static void gen_sc(DisasContext *ctx)
+ {
+@@ -4039,6 +4059,23 @@ static void gen_sc(DisasContext *ctx)
+     gen_exception_err(ctx, POWERPC_SYSCALL, lev);
+ }
+ 
++#if defined(TARGET_PPC64)
++#if !defined(CONFIG_USER_ONLY)
++static void gen_scv(DisasContext *ctx)
++{
++    uint32_t lev;
++
++    if (unlikely(!ctx->scv_enabled)) {
++        gen_exception_err(ctx, POWERPC_EXCP_FU, FSCR_IC_SCV);
++        return;
++    }
++
++    lev = (ctx->opcode >> 5) & 0x7F;
++    gen_exception_err(ctx, POWERPC_SYSCALL_VECTORED, lev);
++}
++#endif
++#endif
++
+ /***                                Trap                                   ***/
+ 
+ /* Check for unconditional traps (always or never) */
+@@ -7031,6 +7068,12 @@ GEN_HANDLER(mcrf, 0x13, 0x00, 0xFF, 0x00000001, PPC_INTEGER),
+ GEN_HANDLER(rfi, 0x13, 0x12, 0x01, 0x03FF8001, PPC_FLOW),
+ #if defined(TARGET_PPC64)
+ GEN_HANDLER(rfid, 0x13, 0x12, 0x00, 0x03FF8001, PPC_64B),
++#if !defined(CONFIG_USER_ONLY)
++/* Top bit of opc2 corresponds with low bit of LEV, so use two handlers */
++GEN_HANDLER_E(scv, 0x11, 0x10, 0xFF, 0x03FFF01E, PPC_NONE, PPC2_ISA300),
++GEN_HANDLER_E(scv, 0x11, 0x00, 0xFF, 0x03FFF01E, PPC_NONE, PPC2_ISA300),
++GEN_HANDLER_E(rfscv, 0x13, 0x12, 0x02, 0x03FF8001, PPC_NONE, PPC2_ISA300),
++#endif
+ GEN_HANDLER_E(stop, 0x13, 0x12, 0x0b, 0x03FFF801, PPC_NONE, PPC2_ISA300),
+ GEN_HANDLER_E(doze, 0x13, 0x12, 0x0c, 0x03FFF801, PPC_NONE, PPC2_PM_ISA206),
+ GEN_HANDLER_E(nap, 0x13, 0x12, 0x0d, 0x03FFF801, PPC_NONE, PPC2_PM_ISA206),
+@@ -7038,7 +7081,9 @@ GEN_HANDLER_E(sleep, 0x13, 0x12, 0x0e, 0x03FFF801, PPC_NONE, PPC2_PM_ISA206),
+ GEN_HANDLER_E(rvwinkle, 0x13, 0x12, 0x0f, 0x03FFF801, PPC_NONE, PPC2_PM_ISA206),
+ GEN_HANDLER(hrfid, 0x13, 0x12, 0x08, 0x03FF8001, PPC_64H),
+ #endif
+-GEN_HANDLER(sc, 0x11, 0xFF, 0xFF, 0x03FFF01D, PPC_FLOW),
++/* Top bit of opc2 corresponds with low bit of LEV, so use two handlers */
++GEN_HANDLER(sc, 0x11, 0x11, 0xFF, 0x03FFF01D, PPC_FLOW),
++GEN_HANDLER(sc, 0x11, 0x01, 0xFF, 0x03FFF01D, PPC_FLOW),
+ GEN_HANDLER(tw, 0x1F, 0x04, 0x00, 0x00000001, PPC_FLOW),
+ GEN_HANDLER(twi, 0x03, 0xFF, 0xFF, 0x00000000, PPC_FLOW),
+ #if defined(TARGET_PPC64)
+@@ -7817,6 +7862,11 @@ static void ppc_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+     } else {
+         ctx->vsx_enabled = false;
+     }
++    if ((env->flags & POWERPC_FLAG_SCV) && (env->spr[SPR_FSCR] & (1ull << FSCR_SCV))) {
++        ctx->scv_enabled = true;
++    } else {
++        ctx->scv_enabled = false;
++    }
+ #if defined(TARGET_PPC64)
+     if ((env->flags & POWERPC_FLAG_TM) && msr_tm) {
+         ctx->tm_enabled = !!msr_tm;
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+index fd763e588e..18f275d4fa 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -3382,6 +3382,7 @@ static void init_excp_POWER9(CPUPPCState *env)
+ 
+ #if !defined(CONFIG_USER_ONLY)
+     env->excp_vectors[POWERPC_EXCP_HVIRT]    = 0x00000EA0;
++    env->excp_vectors[POWERPC_EXCP_SYSCALL_VECTORED] = 0x00000000;
+ #endif
+ }
+ 
+@@ -9030,7 +9031,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+     pcc->flags = POWERPC_FLAG_VRE | POWERPC_FLAG_SE |
+                  POWERPC_FLAG_BE | POWERPC_FLAG_PMM |
+                  POWERPC_FLAG_BUS_CLK | POWERPC_FLAG_CFAR |
+-                 POWERPC_FLAG_VSX | POWERPC_FLAG_TM;
++                 POWERPC_FLAG_VSX | POWERPC_FLAG_TM | POWERPC_FLAG_SCV;
+     pcc->l1_dcache_size = 0x8000;
+     pcc->l1_icache_size = 0x8000;
+     pcc->interrupts_big_endian = ppc_cpu_interrupts_big_endian_lpcr;
+-- 
+2.23.0
 
 
