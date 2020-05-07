@@ -2,89 +2,93 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BF9BC38A2A
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:38:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9098AC38A2A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:39:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11A8C20838
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:38:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C90D207DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:39:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="PDkGgEvr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11A8C20838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HzHHrzTo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C90D207DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWibt-0002LX-Am
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 11:38:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58156)
+	id 1jWicg-0003MN-Ii
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 11:39:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58800)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1jWiYu-00077T-00; Thu, 07 May 2020 11:35:50 -0400
-Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:50960)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1jWiYq-000581-6Q; Thu, 07 May 2020 11:35:45 -0400
-Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net
- [IPv6:2a02:6b8:0:1402::301])
- by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 281A92E14A2;
- Thu,  7 May 2020 18:35:37 +0300 (MSK)
-Received: from myt5-70c90f7d6d7d.qloud-c.yandex.net
- (myt5-70c90f7d6d7d.qloud-c.yandex.net [2a02:6b8:c12:3e2c:0:640:70c9:f7d])
- by mxbackcorp1g.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- LBSBtsIgWp-ZXAW05eQ; Thu, 07 May 2020 18:35:37 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1588865737; bh=/5GXJG9eUCdGWb8cYyWbwzOnn6eoGYAZtBOUVc00AVQ=;
- h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
- b=PDkGgEvrsgygRkIzarRQL6CUU+hSmV+8zbI8M1FbWqfFqpkF+7YJjXIp/Q0NitOnt
- WPfFBi9qBPu685nRvfnJfV4RzEAdxVSkdK+fUUrLcJJbJwrn0npiIfm5K1zlWDsTuM
- PoZg4VvCWetSlNYh89p9WEamJ2omjDzRpqLK1mjY=
-Authentication-Results: mxbackcorp1g.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
- [2a02:6b8:b080:6605::1:1])
- by myt5-70c90f7d6d7d.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- lKluwpfIBe-ZXW8BQZj; Thu, 07 May 2020 18:35:33 +0300
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (Client certificate not present)
-Date: Thu, 7 May 2020 18:35:32 +0300
-From: Dima Stepanov <dimastep@yandex-team.ru>
-To: Raphael Norwitz <raphael.s.norwitz@gmail.com>
-Subject: Re: [PATCH v2 5/5] vhost: add device started check in migration set
- log
-Message-ID: <20200507153530.GA6808@dimastep-nix>
-References: <cover.1588252861.git.dimastep@yandex-team.ru>
- <d25241eb1fe7a55fc7dbe63ecedb4f1adf407837.1588252862.git.dimastep@yandex-team.ru>
- <CAFubqFsvn+wNm-rAU1sLBic6J70-ZP_UT4xMDcvGeZ9TarYdjw@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jWibu-0002WP-Qk
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 11:38:54 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31990
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jWibu-0007JH-5E
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 11:38:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588865933;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hOgNcHKYgXFcaHcNh1iTpHECttzanKYWcnUskx93+Ec=;
+ b=HzHHrzTog4xLRsLHnWxgc74DhP0odGfKRroy/s7Fb3mu/4lBhk0X6JGInh6c8JtjaST6Fk
+ bDQRLTnv0GK01vCqdJkyD/VQ+A+H504wq0bE+KvJyazZ0532aVqidWq1gJWFu8HFZBpKC6
+ MWq1dqgLku3ZSaLm/VMao3BianKLXX0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-329-IbxgYCpxMs6cFdPcdmGj_Q-1; Thu, 07 May 2020 11:38:47 -0400
+X-MC-Unique: IbxgYCpxMs6cFdPcdmGj_Q-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06F57876E05;
+ Thu,  7 May 2020 15:38:46 +0000 (UTC)
+Received: from [10.3.114.73] (ovpn-114-73.phx2.redhat.com [10.3.114.73])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0E72B579AD;
+ Thu,  7 May 2020 15:38:25 +0000 (UTC)
+Subject: Re: [RFC v3 1/6] qmp: add QMP command x-debug-query-virtio
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+References: <20200507114927.6733-1-lvivier@redhat.com>
+ <20200507114927.6733-2-lvivier@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <c496da5b-447b-eb09-5a18-f51229f489d9@redhat.com>
+Date: Thu, 7 May 2020 10:38:24 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAFubqFsvn+wNm-rAU1sLBic6J70-ZP_UT4xMDcvGeZ9TarYdjw@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-Received-SPF: pass client-ip=77.88.29.217;
- envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1p.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 11:35:37
+In-Reply-To: <20200507114927.6733-2-lvivier@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 00:55:34
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -93,207 +97,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, stefanha@redhat.com,
- qemu-block@nongnu.org, mst@redhat.com, jasowang@redhat.com,
- qemu-devel@nongnu.org, dgilbert@redhat.com, raphael.norwitz@nutanix.com,
- arei.gonglei@huawei.com, fengli@smartx.com, yc-core@yandex-team.ru,
- pbonzini@redhat.com, marcandre.lureau@redhat.com, mreitz@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
+ David Hildenbrand <david@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Amit Shah <amit@kernel.org>,
+ Max Reitz <mreitz@redhat.com>, Eric Auger <eric.auger@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, May 06, 2020 at 06:08:34PM -0400, Raphael Norwitz wrote:
-> As you correctly point out, this code needs to be looked at more
-> carefully so that
-> if the device does disconnect in the background we can handle the migration path
-> gracefully. In particular, we need to decide whether a migration
-> should be allowed
-> to continue if a device disconnects durning the migration stage.
-From what i see from the code it is allowed. At the start of the
-hw/virtio/vhost.c:vhost_migration_log() routine there is a check:
-    if (!dev->started) {
-        dev->log_enabled = enable;
-        return 0;
-    }
-So our changes had the same idea. If device isn't started then 0 can be
-returned. Please note, that if we want to return error here then the
-following assert will be hit (hw/virtio/vhost.c)
-    static void vhost_log_global_start(MemoryListener *listener)
-    {
-        int r;
+On 5/7/20 6:49 AM, Laurent Vivier wrote:
+> This new command lists all the instances of VirtIODevice with
+> their path and virtio type
+> 
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> ---
 
-        r = vhost_migration_log(listener, true);
-        if (r < 0) {
-            abort();
-        }
-    }
-But as i mentioned we didn't change this logic, we just propogate it on
-the whole migration start process during vhost handshake. After it our
-tests passed successfully.
+> +++ b/qapi/virtio.json
+> @@ -0,0 +1,68 @@
+> +##
+> +# = Virtio devices
+> +##
+> +
+> +##
+> +# @VirtioType:
+> +#
+> +# An enumeration of Virtio device types.
+> +#
+> +# Since: 5.1.0
 
-> 
-> mst, any thoughts?
-> 
-> Have you looked at the suggestion I gave Li Feng to move vhost_dev_cleanup()
-> into the connection path in vhost-user-blk? I’m not sure if he’s
-> actively working on it,
-> but I would prefer if we can find a way to keep some state around
-> between reconnects
-> so we aren’t constantly checking dev->started. A device can be stopped
-> for reasons
-> other than backend disconnect so I’d rather not reuse this field to
-> check for backend
-> disconnect failures.
-In fact i didn't try to use >started field to signal about disconnect.
-What i tried to follow is that if device not started (because of
-disconnect or any other reason), there is no need to continue
-initialization and we can proceed with the next migration step.
+Inconsistent on x.y.z vs.
 
-> 
-> On Thu, Apr 30, 2020 at 9:57 AM Dima Stepanov <dimastep@yandex-team.ru> wrote:
-> >
-> > If vhost-user daemon is used as a backend for the vhost device, then we
-> > should consider a possibility of disconnect at any moment. If such
-> > disconnect happened in the vhost_migration_log() routine the vhost
-> > device structure will be clean up.
-> > At the start of the vhost_migration_log() function there is a check:
-> >   if (!dev->started) {
-> >       dev->log_enabled = enable;
-> >       return 0;
-> >   }
-> > To be consistent with this check add the same check after calling the
-> > vhost_dev_set_log() routine. This in general help not to break a
-> 
-> Could you point to the specific asserts which are being triggered?
-Just to be clear here. The assert message i mentioned is described
-above. I wanted to explain why we followed the "(!dev->started) return 0"
-logic. And in this case we didn't return error and return 0.
+> +##
+> +{ 'enum': 'VirtioType',
+> +  'data': [ 'unknown', 'virtio-9p', 'virtio-blk', 'virtio-serial',
+> +            'virtio-gpu', 'virtio-input', 'virtio-net', 'virtio-scsi',
+> +            'vhost-user-fs', 'vhost-vsock', 'virtio-balloon', 'virtio-crypto',
+> +            'virtio-iommu', 'virtio-pmem', 'virtio-rng' ]
+> +}
+> +
+> +##
+> +# @VirtioInfo:
+> +#
+> +# Information about a given VirtIODevice
+> +#
+> +# @path: VirtIO device canonical path.
+> +#
+> +# @type: VirtIO device type.
+> +#
+> +# Since: 5.1
 
-But the first error we hit during migration testing was SIGSEGV:
-Program terminated with signal SIGSEGV, Segmentation fault.
-#0  0x000056354db0a74a in vhost_dev_has_iommu (dev=0x563550562b00)
-    at hw/virtio/vhost.c:299
-299         return vdev->dma_as != &address_space_memory &&
-(gdb) p vdev
-$1 = (VirtIODevice *) 0x0
-(gdb) bt
-#0  0x000056354db0a74a in vhost_dev_has_iommu (dev=0x563550562b00)
-    at hw/virtio/vhost.c:299
-#1  0x000056354db0bb76 in vhost_dev_set_features (dev=0x563550562b00, enable_log=true)
-    at hw/virtio/vhost.c:777
-#2  0x000056354db0bc1e in vhost_dev_set_log (dev=0x563550562b00, enable_log=true)
-    at hw/virtio/vhost.c:790
-    #3  0x000056354db0be58 in vhost_migration_log (listener=0x563550562b08, enable=1)
-    at hw/virtio/vhost.c:834
-#4  0x000056354db0be9b in vhost_log_global_start (listener=0x563550562b08)
-    at hw/virtio/vhost.c:847
-#5  0x000056354da72e7e in memory_global_dirty_log_start ()
-    at memory.c:2611
-...
+x.y.  Most of our QAPI seems to have settled on just x.y these days.
 
+The x-debug- prefix is nice; it gives us more flexibility to mess with 
+this later as needed.
 
-> 
-> > migration due the assert() message. But it looks like that this code
-> > should be revised to handle these errors more carefully.
-> >
-> > In case of vhost-user device backend the fail paths should consider the
-> > state of the device. In this case we should skip some function calls
-> > during rollback on the error paths, so not to get the NULL dereference
-> > errors.
-> >
-> > Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
-> > ---
-> >  hw/virtio/vhost.c | 39 +++++++++++++++++++++++++++++++++++----
-> >  1 file changed, 35 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> > index 3ee50c4..d5ab96d 100644
-> > --- a/hw/virtio/vhost.c
-> > +++ b/hw/virtio/vhost.c
-> > @@ -787,6 +787,17 @@ static int vhost_dev_set_features(struct vhost_dev *dev,
-> >  static int vhost_dev_set_log(struct vhost_dev *dev, bool enable_log)
-> >  {
-> >      int r, i, idx;
-> 
-> A couple points here
-> 
-> 
-> (1) This will fail the live migration if the device is disconnected.
-> That my be the right thing
->       to do, but if there are cases where migrations can proceed with
-> a disconnected device,
->       this may not be desirable.
-I'm not sure that it is correct. VM could be migrated successfully
-during device daemon disconnect.
+Otherwise:
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> 
-> (2) This looks racy. As far as I can tell vhost_dev_set_log() is only
-> called by vhost_migration_log(),
->       and as you say one of the first things vhost_migration_log does
-> is return if dev->started is not
->       set. What’s to stop a disconnect from clearing the vdev right
-> after this check, just before
->       vhost_dev_set_features() is called?
-Sorry, but i'm not sure that i've got your point here. We can't stop
-disconnect just before vhost_dev_set_features() right now. Or do you
-mean that it should be like don't make clean up if device is in the
-migration step? Well, it is hard to say. If we can agree that
-dev-started logic is correct, then there is no reason for it. But if we
-think that this logic is wrong, then yes, we should change smth.
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-> 
-> As stated above, I would prefer it if we could add some state which
-> would persist between
-> reconnects which could then be checked in the vhost-user code before
-> interacting with
-> the backend. I understand this will be a much more involved change and
-> will require a lot
-> of thought.
-> 
-> Also, regarding (1) above, if the original check in
-> vhost_migration_log() returns success if the
-> device is not started why return an error here? I imagine this could
-> lead to some inconsistent
-> behavior if the device disconnects before the first check verses
-> before the second.
-Yes, i agree with you. That is why i mentioned in the commit message
-that maybe this code should be reviewed carefully. On the other side
-our changes, as i see it:
-  - following the same logic with the device state
-  - fix the SIGSEGV error in case of disconnect
-  - migration/disconnect test passed successfully
-Some words about the test:
-  - run src VM with vhost-usr-blk daemon used
-  - run fio inside it
-  - perform reconnect every X seconds (just kill and restart daemon),
-    X is random
-  - run dst VM
-  - perform migration
-  - fio should complete in dst VM
-And we cycle this test like forever. SIGSEGV during vhost handshake is
-hit once per ~30 tries. By adding an artificial delay in the QEMU source
-code we were able to hit this SIGSEGV in 100% of times. After this patch
-our test passed successfully.
-
-What do you think?
-
-No other comments mixed in below.
-
-> 
-> > +
-> > +    if (!dev->started) {
-> > +        /*
-> > +         * If vhost-user daemon is used as a backend for the
-> > +         * device and the connection is broken, then the vhost_dev
-> > +         * structure will be reset all its values to 0.
-> > +         * Add additional check for the device state.
-> > +         */
-> > +        return -1;
-> > +    }
-> > +
-> >      r = vhost_dev_set_features(dev, enable_log);
-> >      if (r < 0) {
-> >          goto err_features;
-> > @@ -801,12 +812,19 @@ static int vhost_dev_set_log(struct vhost_dev *dev, bool enable_log)
-> >      }
 
