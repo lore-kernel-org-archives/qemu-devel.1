@@ -2,112 +2,107 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B937C38A2A
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 09:37:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51B3FC38A2A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 09:39:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB933208E4
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 09:37:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C4AD208E4
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 09:39:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Aksqgo24"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB933208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="UPwHnVMK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C4AD208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWcyB-0006Wg-UK
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 05:37:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34522)
+	id 1jWd0N-0007Sh-BS
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 05:39:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35082)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jWcxc-00062H-1o
- for qemu-devel@nongnu.org; Thu, 07 May 2020 05:36:56 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50439
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jWcxb-0007yu-48
- for qemu-devel@nongnu.org; Thu, 07 May 2020 05:36:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588844214;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=AHuja6XADl+X51k5NW/6QCBtJCgLMCom4u9zGSqG9Cg=;
- b=Aksqgo24U2oo1HuOExawybkhDn+1GrmkajDzQh048tvZGxO1MkVYZlU4/N96z7L6tQyUUh
- /MRWXYu33a07LRo7flP2XxWirYp0E5t3fMuemRz4E0RX7ydCwFNBLG45edIZ3EKYUUy8Vm
- CdHwciYyaVlSBJmwTWjJyMtrrucqqdU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410-HCq-bjIYN9qDHxcO8qmrzw-1; Thu, 07 May 2020 05:36:52 -0400
-X-MC-Unique: HCq-bjIYN9qDHxcO8qmrzw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71400100A8E7;
- Thu,  7 May 2020 09:36:51 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-114-92.ams2.redhat.com
- [10.36.114.92])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0A36262A43;
- Thu,  7 May 2020 09:36:49 +0000 (UTC)
-Subject: Re: [PATCH v3 32/33] block: Pass BdrvChildRole in remaining cases
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200218124242.584644-1-mreitz@redhat.com>
- <20200218124242.584644-33-mreitz@redhat.com>
- <20200506171315.GJ6333@linux.fritz.box>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <1a39d014-e921-3a6c-e540-55724ad77bb1@redhat.com>
-Date: Thu, 7 May 2020 11:36:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
+ id 1jWczX-00072U-Bm
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 05:38:55 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:48552)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
+ id 1jWczV-0005CG-RE
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 05:38:54 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0479XaaV114218;
+ Thu, 7 May 2020 09:38:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : in-reply-to : references : date : message-id : mime-version :
+ content-type; s=corp-2020-01-29;
+ bh=qXh2384Rge9veRxP8YE1sCOU3s2RkTQtHf3wuv5p7Rg=;
+ b=UPwHnVMKwR6NsZsYU1lbZclEStTe0Ex1/0wVukTOml365joUsnK420q5AwJeBMFQaA+r
+ fhZHRlpE6rzgW8fEJHvl6LKfADk0EeQIPZOGyxwKRValS+GZjLIRYesCeFSLiU689kqO
+ +zPB7YIiAvFjHSaNhp28xmM/feJiav676pkTzKCYQwli1HSGq9AJMp6//5HWs7RWBI4J
+ vr1VvAExjW96kgBfHz8PLkVlHYMGmZ2K/CiseygzJdNTiSfd8+fJzfVl378dJoQLBJ0K
+ M21T6sPX8/KyQyCkbNAnWDPCEA7M1DO6LmNBlruGtmjmdrhSFtGH+wCNrdqE7as3laU7 kg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by aserp2120.oracle.com with ESMTP id 30usgq67mt-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 07 May 2020 09:38:50 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0479arcK048090;
+ Thu, 7 May 2020 09:38:50 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by aserp3030.oracle.com with ESMTP id 30sjdxn26m-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 07 May 2020 09:38:50 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0479cmEJ002321;
+ Thu, 7 May 2020 09:38:48 GMT
+Received: from starbug-mbp.localdomain (/79.97.215.145)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 07 May 2020 02:38:48 -0700
+Received: by starbug-mbp.localdomain (Postfix, from userid 501)
+ id 20C8C685536E; Thu,  7 May 2020 10:38:46 +0100 (IST)
+From: Darren Kenny <darren.kenny@oracle.com>
+To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
+Subject: Re: [PATCH v2 2/2] char-file: add test for distinct path= and pathin=
+In-Reply-To: <20200507062442.15215-3-alxndr@bu.edu>
+References: <20200507062442.15215-1-alxndr@bu.edu>
+ <20200507062442.15215-3-alxndr@bu.edu>
+Date: Thu, 07 May 2020 10:38:46 +0100
+Message-ID: <m2mu6k6q55.fsf@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20200506171315.GJ6333@linux.fritz.box>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="yxnHcaDU7j4MHWjFZlAtx7N3e5MZSVONr"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 02:00:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9613
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
+ suspectscore=59 mlxscore=0
+ bulkscore=0 adultscore=0 phishscore=0 mlxlogscore=999 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2005070078
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9613
+ signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0
+ mlxscore=0
+ priorityscore=1501 lowpriorityscore=0 malwarescore=0 clxscore=1015
+ mlxlogscore=999 spamscore=0 adultscore=0 bulkscore=0 phishscore=0
+ suspectscore=59 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2005070077
+Received-SPF: pass client-ip=141.146.126.78;
+ envelope-from=darren.kenny@oracle.com; helo=aserp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 05:38:52
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -120,79 +115,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: berrange@redhat.com, marcandre.lureau@gmail.com, stefanha@redhat.com,
+ Alexander Bulekov <alxndr@bu.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---yxnHcaDU7j4MHWjFZlAtx7N3e5MZSVONr
-Content-Type: multipart/mixed; boundary="8X0G3kGdajnMkGEjrTSwkGqOZmpOYLaUG"
+Hi Alex,
 
---8X0G3kGdajnMkGEjrTSwkGqOZmpOYLaUG
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+For the most part this looks fine, but I wonder if maybe there should be
+a couple more assertions to be certain that things are set up correctly
+at first, as well as maybe being sure to confirm that things weren't
+modified using stat().
 
-On 06.05.20 19:13, Kevin Wolf wrote:
-> Am 18.02.2020 um 13:42 hat Max Reitz geschrieben:
->> These calls have no real use for the child role yet, but it will not
->> harm to give one.
->>
->> Notably, the bdrv_root_attach_child() call in blockjob.c is left
->> unmodified because there is not much the generic BlockJob object wants
->> from its children.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
->> diff --git a/block/vvfat.c b/block/vvfat.c
->> index 8f4ff5a97e..d4f4218924 100644
->> --- a/block/vvfat.c
->> +++ b/block/vvfat.c
->> @@ -3186,7 +3186,7 @@ static int enable_write_target(BlockDriverState *b=
-s, Error **errp)
->>      options =3D qdict_new();
->>      qdict_put_str(options, "write-target.driver", "qcow");
->>      s->qcow =3D bdrv_open_child(s->qcow_filename, options, "write-targe=
-t", bs,
->> -                              &child_vvfat_qcow, 0, false, errp);
->> +                              &child_vvfat_qcow, BDRV_CHILD_DATA, false=
-, errp);
->=20
-> Doesn't it contain metadata, too?
+See below...
 
-Aw, I don=E2=80=99t know...  This is vvfat, I don=E2=80=99t want to know.
+On Thursday, 2020-05-07 at 02:24:42 -04, Alexander Bulekov wrote:
+> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+> ---
+>  tests/test-char.c | 83 +++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 83 insertions(+)
+>
+> diff --git a/tests/test-char.c b/tests/test-char.c
+> index 3afc9b1b8d..9b3e1e2a9b 100644
+> --- a/tests/test-char.c
+> +++ b/tests/test-char.c
+> @@ -1228,6 +1228,88 @@ static void char_file_test_internal(Chardev *ext_chr, const char *filepath)
+>      g_free(out);
+>  }
+>  
+> +static int file_can_read(void *opaque)
+> +{
+> +    return 4096;
+> +}
+> +
+> +static void file_read(void *opaque, const uint8_t *buf, int size)
+> +{
+> +    int ret;
+> +    Chardev *chr = *(Chardev **)opaque;
+> +    g_assert_cmpint(size, <=, file_can_read(opaque));
+> +
+> +    g_assert_cmpint(size, ==, 6);
+> +    g_assert(strncmp((const char *)buf, "hello!", 6) == 0);
+> +    ret = qemu_chr_write_all(chr, buf, size);
+> +    g_assert_cmpint(ret, ==, 6);
+> +    quit = true;
+> +}
+> +
+> +static void char_file_separate_input_file(void)
+> +{
+> +    char *tmp_path = g_dir_make_tmp("qemu-test-char.XXXXXX", NULL);
+> +    char *in;
+> +    char *out;
+> +    QemuOpts *opts;
+> +    Chardev *chr;
+> +    ChardevFile file = {};
+> +    CharBackend be;
+> +    ChardevBackend backend = { .type = CHARDEV_BACKEND_KIND_FILE,
+> +                               .u.file.data = &file };
+> +    char *contents = NULL;
+> +    gsize length;
+> +    int ret;
+> +
+> +    in = g_build_filename(tmp_path, "in", NULL);
+> +    out = g_build_filename(tmp_path, "out", NULL);
+> +
+> +    ret = g_file_set_contents(in, "hello!", 6, NULL);
 
-Do you mean metadata beyond the filesystem structures?  Are those
-structures data or metadata in this context?  Does it even matter?
+Might be good to confirm that this worked here if we're expecting it to
+be correct later.
 
-I suppose I just don=E2=80=99t want to think about all of that, and the sim=
-plest
-way to do it is to indeed pass METADATA, too.
+> +
+> +    opts = qemu_opts_create(qemu_find_opts("chardev"), "serial-id",
+> +                            1, &error_abort);
+> +    qemu_opt_set(opts, "backend", "file", &error_abort);
+> +    qemu_opt_set(opts, "pathin", in, &error_abort);
+> +    qemu_opt_set(opts, "path", out, &error_abort);
+> +
+> +    chr = qemu_chr_new_from_opts(opts, NULL, NULL);
+> +    qemu_chr_fe_init(&be, chr, &error_abort);
+> +
+> +    file.has_in = true;
+> +    file.in = in;
+> +    file.out = out;
+> +
+> +
+> +    qemu_chr_fe_set_handlers(&be, file_can_read,
+> +                             file_read,
+> +                             NULL, NULL, &chr, NULL, true);
+> +
+> +    chr = qemu_chardev_new(NULL, TYPE_CHARDEV_FILE, &backend,
+> +                               NULL, &error_abort);
 
-Max
+Similarly, maybe confirm here that chr is valid.
 
+> +    main_loop(); /* should call file_read, and copy contents of in to out */
+> +
+> +    qemu_chr_fe_deinit(&be, true);
+> +
+> +    /* Check that contents of in were copied to out */
+> +    ret = g_file_get_contents(out, &contents, &length, NULL);
+> +    g_assert(ret == TRUE);
+> +    g_assert_cmpint(length, ==, 6);
+> +    g_assert(strncmp(contents, "hello!", 6) == 0);
+> +    g_free(contents);
+> +
+> +    /* Check that in hasn't changed */
+> +    ret = g_file_get_contents(in, &contents, &length, NULL);
 
---8X0G3kGdajnMkGEjrTSwkGqOZmpOYLaUG--
+While this tells us that the content is the same, it doesn't guarantee
+that it wasn't modified - it might be worth doing a stat(), or g_stat(),
+to ensure that the creation and modifications times are the same?
+(Assuming that g_file_set_contents() will do that, or we compare a
+before and after struct stat, if not)
 
---yxnHcaDU7j4MHWjFZlAtx7N3e5MZSVONr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+I've seen cases in other things where the file was been re-written
+exactly the same but only noticed because Vim told me it was externally
+modified when I wasn't expecting it have been.
 
------BEGIN PGP SIGNATURE-----
+> +    g_assert(ret == TRUE);
+> +    g_assert_cmpint(length, ==, 6);
+> +    g_assert(strncmp(contents, "hello!", 6) == 0);
+> +
+> +    g_free(contents);
+> +    g_rmdir(tmp_path);
+> +    g_free(tmp_path);
+> +    g_free(in);
+> +    g_free(out);
+> +}
+> +
+>  static void char_file_test(void)
+>  {
+>      char_file_test_internal(NULL, NULL);
+> @@ -1398,6 +1480,7 @@ int main(int argc, char **argv)
+>      g_test_add_func("/char/pipe", char_pipe_test);
+>  #endif
+>      g_test_add_func("/char/file", char_file_test);
+> +    g_test_add_func("/char/file/pathin", char_file_separate_input_file);
+>  #ifndef _WIN32
+>      g_test_add_func("/char/file-fifo", char_file_fifo_test);
+>  #endif
+> -- 
+> 2.26.2
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6z1q8ACgkQ9AfbAGHV
-z0CeIwgAoqrDE3H5PT2kzze77rCgAc/gwINEbeHfsTKfqsgEcSz281FedgGGNSvm
-b8mtDbKSl10X4GQgboDrapIlmeRrWmIY4QdUbd3ND2I+jFlHeg59mKE0NSxARh03
-pBZUkzkg2FDprdSo6UHlqfwuGdWNZh4TE6wE3bWXwUgnM2YZzjhV6BpEwcjojr3r
-w/HuNCVmwdr70/+c+b6yZz3r28IvxH6DgOkBJA9WLs1Ql+AP0PCmXNgEc3TLkCeJ
-sPFGfo/ZQycsYRonxNzhdslDSOrIS1J+vyZsXRbrSLYu7iLHzpEM8Slpd4LA/JdK
-EMfQhgi4GFQKDzpbV8GRy7vNzS8diQ==
-=oUf6
------END PGP SIGNATURE-----
+Thanks,
 
---yxnHcaDU7j4MHWjFZlAtx7N3e5MZSVONr--
-
+Darren.
 
