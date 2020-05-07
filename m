@@ -2,90 +2,85 @@ Return-Path: <SRS0=s5cl=6V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F25CC38A2A
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:58:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3497EC38A2A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:59:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6626B2082E
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:58:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F044020659
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 15:59:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="et/+nqCu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6626B2082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gwj93LLL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F044020659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWius-0007Hh-ID
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 11:58:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35280)
+	id 1jWiwH-0001fR-6D
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 11:59:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jWite-0005MI-LG
- for qemu-devel@nongnu.org; Thu, 07 May 2020 11:57:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44402
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jWitd-0001eh-UD
- for qemu-devel@nongnu.org; Thu, 07 May 2020 11:57:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588867033;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=346PQ8E1QbOv6V25nMYzOV257SQXFBHA2If1FR1Wu64=;
- b=et/+nqCurznZrMvXfOOJicsGnibtNHB1lE6oYMCXwH2/UJ5CxyFc0If8sAXCNKwXcYtfei
- sSoOPehQ/O3x8CIJneUY0m89OEHqVg00QngfIgeX8CEerZ3UXhsEFrp1wSehTzrO/EVnO9
- Ps5KXDEQfvukYMsVRpK7M5HbBpHX6UY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-99-pi89rYjPN8qo5MGpsTsoKg-1; Thu, 07 May 2020 11:57:09 -0400
-X-MC-Unique: pi89rYjPN8qo5MGpsTsoKg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 69F42461;
- Thu,  7 May 2020 15:57:08 +0000 (UTC)
-Received: from [10.3.114.73] (ovpn-114-73.phx2.redhat.com [10.3.114.73])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E9AFF60C47;
- Thu,  7 May 2020 15:57:07 +0000 (UTC)
-Subject: Re: [PATCH 1/2] block/block-copy: Fix uninitialized variable in
- block_copy_task_entry
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200507121129.29760-1-philmd@redhat.com>
- <20200507121129.29760-2-philmd@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <b39d671f-f399-c482-851e-c6c77cab94de@redhat.com>
-Date: Thu, 7 May 2020 10:57:07 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jWiu3-00069a-Dl
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 11:57:39 -0400
+Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:39452)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jWiu2-0004bF-Cc
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 11:57:39 -0400
+Received: by mail-ot1-x336.google.com with SMTP id m13so4883804otf.6
+ for <qemu-devel@nongnu.org>; Thu, 07 May 2020 08:57:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=TAwOdgTnRqInVqMLXVb9jIAeKshHZj+JptbTxB15GhQ=;
+ b=gwj93LLLcBtiby0iLA3B4MBeozzElnIIWGemZaOPUJUFEg4OsShHhKkgd0cW3pwNmT
+ CQQro6iCeOget7DnpUASg0RQiCy5E8XUIoBoLTwYOAnESZoGo4146scPn6M15O0QX0rJ
+ qCFsVp9vCiuI7b33yd0bxKbCzORc8A5Kn9JHZ3ZS6HLzxnsD1BT3G43LX1oeca+1pWSj
+ B1SYtevzPN8L/KnUA0WXEAYOgSGvwSCOHm+O0/5EbOOg2zuuZ8jrMwZXU5yog3gJj19/
+ tpQv7vkCxn1Yk4xzcXLjh1EkMbdjgC/T0IAdA5R46IvpFL0ZlohBDCLPk1VE7X9ueNmw
+ 5/Dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=TAwOdgTnRqInVqMLXVb9jIAeKshHZj+JptbTxB15GhQ=;
+ b=TJ8a5IwcFmCISmJ9pQBM0tRPwL+/ep6UDNTjUUDdqKLeWuzFBqc4xeIoT5nNDidn+E
+ /6/f9pvK92JdGUfkcxYhUIqR+iBsvdx/C4YiSpkPZVRsTMqQptmot1O6cK69Wrb5qPQb
+ mD1RMtmvCoAeNvrMJL3CR7JKfYRZKpfxf9qQvJmmMaLcWkZqr/G2n8SppD2U4rOYZmRc
+ OW1hxcsxqeCr7sjUU8NvuqeaMbkGPOFcbtb6XSs/tczUmEWk+vjGz04cnXblKbAbSZCz
+ fW0gYEZB/JxqsdkYHEaRvDR59dU/90DNtqEM3QTVsbpnV8hqn8Gr/3PxOyugBmIjw98c
+ Q6vg==
+X-Gm-Message-State: AGi0PubcunAi36ongmavtFv18grYSzYJta4yNc+gqwV3AghNk8cMwp0m
+ 8zUdJfZScPiSzQLeqRtI9AbVELQ3hjWPaWXLHMEkpQ==
+X-Google-Smtp-Source: APiQypKgtMkUnX5cgiooSlTTcMurA47uPd7qgwqWZ/vPPYhE89BYY89vP7ue8YJLO/ynAm3/JoGRvcSU39/8IY55Pj4=
+X-Received: by 2002:a05:6830:22dc:: with SMTP id
+ q28mr10489423otc.221.1588867057003; 
+ Thu, 07 May 2020 08:57:37 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200507121129.29760-2-philmd@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 03:56:18
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200429072048.29963-1-armbru@redhat.com>
+ <20200429072048.29963-14-armbru@redhat.com>
+In-Reply-To: <20200429072048.29963-14-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 May 2020 16:57:26 +0100
+Message-ID: <CAFEAcA-CH=2zR2=PC4ss8WDQrRoo9Yr62b96+BoVh9uQay5qqg@mail.gmail.com>
+Subject: Re: [PULL 13/32] cpus: Fix configure_icount() error API violation
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::336;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x336.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,41 +94,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-trivial@nongnu.org,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/7/20 7:11 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Fix when building with -Os:
->=20
->      CC      block/block-copy.o
->    block/block-copy.c: In function =E2=80=98block_copy_task_entry=E2=80=
-=99:
->    block/block-copy.c:428:38: error: =E2=80=98error_is_read=E2=80=99 may =
-be used uninitialized in this function [-Werror=3Dmaybe-uninitialized]
->      428 |         t->call_state->error_is_read =3D error_is_read;
->          |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~
->=20
+On Wed, 29 Apr 2020 at 08:34, Markus Armbruster <armbru@redhat.com> wrote:
+>
+> The Error ** argument must be NULL, &error_abort, &error_fatal, or a
+> pointer to a variable containing NULL.  Passing an argument of the
+> latter kind twice without clearing it in between is wrong: if the
+> first call sets an error, it no longer points to NULL for the second
+> call.
+>
+> configure_icount() is wrong that way.  Harmless, because its @errp is
+> always &error_abort or &error_fatal.
+>
+> Just as wrong (and just as harmless): when it fails, it can still
+> update global state.
 
-Looks like -Os triggered different inlining of block_copy_do_copy().  I=20
-confirm that block_copy_do_copy does NOT initialize error_is_read except=20
-when returning < 0, but similarly block_copy_task_entry() does not read=20
-error_is_read except in the same setups.  So it looks like no actual bug=20
-was triggered, but we can definitely aid the compiler's analysis by=20
-initializing.
+Hi; Coverity complains about this change (CID 1428754):
+>
+>  void configure_icount(QemuOpts *opts, Error **errp)
+>  {
+> -    const char *option;
+> +    const char *option = qemu_opt_get(opts, "shift");
+> +    bool sleep = qemu_opt_get_bool(opts, "sleep", true);
+> +    bool align = qemu_opt_get_bool(opts, "align", false);
+> +    long time_shift = -1;
+>      char *rem_str = NULL;
+>
+> -    option = qemu_opt_get(opts, "shift");
+> -    if (!option) {
+> -        if (qemu_opt_get(opts, "align") != NULL) {
+> -            error_setg(errp, "Please specify shift option when using align");
+> -        }
+> +    if (!option && qemu_opt_get(opts, "align")) {
+> +        error_setg(errp, "Please specify shift option when using align");
+>          return;
 
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->   block/block-copy.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+Previously, if option was NULL we would always take this early
+exit. Now we only take the exit if option is NULL and the
+qemu_opt_get() returns true, so in some cases execution
+can continue through the function with a NULL option...
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+>      }
+>
+> -    icount_sleep = qemu_opt_get_bool(opts, "sleep", true);
+> +    if (align && !sleep) {
+> +        error_setg(errp, "align=on and sleep=off are incompatible");
+> +        return;
+> +    }
+> +
+> +    if (strcmp(option, "auto") != 0) {
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+...but here we pass option to strcmp(), which is wrong if it
+can be NULL.
 
+thanks
+-- PMM
 
