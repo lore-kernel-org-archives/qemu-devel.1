@@ -6,63 +6,62 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EB0AC38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 12:59:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93291C38A24
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 12:59:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A94EB2082E
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 12:59:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C60F20735
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 12:59:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O2keQiU+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A94EB2082E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fqpSPV9o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C60F20735
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWg7G-0007Bt-J8
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 08:59:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50420)
+	id 1jWg7p-0007xN-Hv
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 08:59:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50638)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jWg2t-00073g-Qr
- for qemu-devel@nongnu.org; Thu, 07 May 2020 08:54:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52027
- helo=us-smtp-1.mimecast.com)
+ id 1jWg3I-0007cp-8C
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 08:55:00 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60031
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jWg2r-0002E6-Ow
- for qemu-devel@nongnu.org; Thu, 07 May 2020 08:54:35 -0400
+ id 1jWg3G-0003ZM-LT
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 08:54:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588856072;
+ s=mimecast20190719; t=1588856097;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rzOQA68SVPaOjCIyRgSg7TvHuiO+iGvD0uJ6UAFQ4l0=;
- b=O2keQiU+4TrS6z0sOfRxB7nwefFfW/v5aJ/nviTaggB7kNZ7Bj8S1gtBDENvGDOolIIS3U
- OnSFirxICFgYLZKShTg5eIL+zFf2weBXV+tUa9AIhceFdWGrbCV+jPUfW8JHAiuz+vZGvi
- altUze4X/SGwD+sV1sqBNMvjRbNMg7w=
+ bh=jdyHcz2dV/yCH3o6yGkTBPqWApHX7WToV0KlatOBDmM=;
+ b=fqpSPV9onChOnVz4qgT3qud0QCS8hIv6lWsq2pLh1Lw5yiQKJkOScnDU9WcB2znVomNVbj
+ LgYvKwn+xpOsppG3sohMqEDUSFBSfEe7NIzqXx4+eFxcmBNYtwzJ40FSFe5+0SxV/op+SH
+ Z/WCCkmYOrlEmzGIK6Y4yj2iS3hWKoQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-238-HjPO0OZdM9KtZJKbTF-tgw-1; Thu, 07 May 2020 08:54:31 -0400
-X-MC-Unique: HjPO0OZdM9KtZJKbTF-tgw-1
+ us-mta-450-RvbM9ZpRM9SgQ1asZFIj_Q-1; Thu, 07 May 2020 08:54:56 -0400
+X-MC-Unique: RvbM9ZpRM9SgQ1asZFIj_Q-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 24732800687;
- Thu,  7 May 2020 12:54:30 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 330F51800D4A;
+ Thu,  7 May 2020 12:54:55 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 782D470557;
- Thu,  7 May 2020 12:54:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E633A707AF;
+ Thu,  7 May 2020 12:54:52 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 04/14] block/amend: separate amend and create options for
- qemu-img
-Date: Thu,  7 May 2020 15:54:04 +0300
-Message-Id: <20200507125414.2151-5-mlevitsk@redhat.com>
+Subject: [PATCH v5 13/14] block/qcow2: implement blockdev-amend
+Date: Thu,  7 May 2020 15:54:13 +0300
+Message-Id: <20200507125414.2151-14-mlevitsk@redhat.com>
 In-Reply-To: <20200507125414.2151-1-mlevitsk@redhat.com>
 References: <20200507125414.2151-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -71,9 +70,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mlevitsk@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 03:15:48
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 02:00:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -103,281 +102,111 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some options are only useful for creation
-(or hard to be amended, like cluster size for qcow2), while some other
-options are only useful for amend, like upcoming keyslot management
-options for luks
-
-Since currently only qcow2 supports amend, move all its options
-to a common macro and then include it in each action option list.
-
-In future it might be useful to remove some options which are
-not supported anyway from amend list, which currently
-cause an error message if amended.
+Currently the implementation only supports amending the encryption
+options, unlike the qemu-img version
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- block/qcow2.c             | 160 +++++++++++++++++++++-----------------
- include/block/block_int.h |   4 +
- qemu-img.c                |  18 ++---
- 3 files changed, 100 insertions(+), 82 deletions(-)
+ block/qcow2.c        | 39 +++++++++++++++++++++++++++++++++++++++
+ qapi/block-core.json | 16 +++++++++++++++-
+ 2 files changed, 54 insertions(+), 1 deletion(-)
 
 diff --git a/block/qcow2.c b/block/qcow2.c
-index 06c0e77cfe..f2cf72ead2 100644
+index 25fa7ac0b0..8d0a181fb4 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -5512,83 +5512,96 @@ void qcow2_signal_corruption(BlockDriverState *bs, =
-bool fatal, int64_t offset,
-     s->signaled_corruption =3D true;
- }
-=20
-+#define QCOW_COMMON_OPTIONS                                         \
-+    {                                                               \
-+        .name =3D BLOCK_OPT_SIZE,                                     \
-+        .type =3D QEMU_OPT_SIZE,                                      \
-+        .help =3D "Virtual disk size"                                 \
-+    },                                                              \
-+    {                                                               \
-+        .name =3D BLOCK_OPT_COMPAT_LEVEL,                             \
-+        .type =3D QEMU_OPT_STRING,                                    \
-+        .help =3D "Compatibility level (v2 [0.10] or v3 [1.1])"       \
-+    },                                                              \
-+    {                                                               \
-+        .name =3D BLOCK_OPT_BACKING_FILE,                             \
-+        .type =3D QEMU_OPT_STRING,                                    \
-+        .help =3D "File name of a base image"                         \
-+    },                                                              \
-+    {                                                               \
-+        .name =3D BLOCK_OPT_BACKING_FMT,                              \
-+        .type =3D QEMU_OPT_STRING,                                    \
-+        .help =3D "Image format of the base image"                    \
-+    },                                                              \
-+    {                                                               \
-+        .name =3D BLOCK_OPT_DATA_FILE,                                \
-+        .type =3D QEMU_OPT_STRING,                                    \
-+        .help =3D "File name of an external data file"                \
-+    },                                                              \
-+    {                                                               \
-+        .name =3D BLOCK_OPT_DATA_FILE_RAW,                            \
-+        .type =3D QEMU_OPT_BOOL,                                      \
-+        .help =3D "The external data file must stay valid "           \
-+                "as a raw image"                                    \
-+    },                                                              \
-+    {                                                               \
-+        .name =3D BLOCK_OPT_ENCRYPT,                                  \
-+        .type =3D QEMU_OPT_BOOL,                                      \
-+        .help =3D "Encrypt the image with format 'aes'. (Deprecated " \
-+                "in favor of " BLOCK_OPT_ENCRYPT_FORMAT "=3Daes)",    \
-+    },                                                              \
-+    {                                                               \
-+        .name =3D BLOCK_OPT_ENCRYPT_FORMAT,                           \
-+        .type =3D QEMU_OPT_STRING,                                    \
-+        .help =3D "Encrypt the image, format choices: 'aes', 'luks'", \
-+    },                                                              \
-+    BLOCK_CRYPTO_OPT_DEF_KEY_SECRET("encrypt.",                     \
-+        "ID of secret providing qcow AES key or LUKS passphrase"),  \
-+    BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG("encrypt."),               \
-+    BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE("encrypt."),              \
-+    BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG("encrypt."),                \
-+    BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG("encrypt."),           \
-+    BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG("encrypt."),                 \
-+    BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME("encrypt."),                \
-+    {                                                               \
-+        .name =3D BLOCK_OPT_CLUSTER_SIZE,                             \
-+        .type =3D QEMU_OPT_SIZE,                                      \
-+        .help =3D "qcow2 cluster size",                               \
-+        .def_value_str =3D stringify(DEFAULT_CLUSTER_SIZE)            \
-+    },                                                              \
-+    {                                                               \
-+        .name =3D BLOCK_OPT_PREALLOC,                                 \
-+        .type =3D QEMU_OPT_STRING,                                    \
-+        .help =3D "Preallocation mode (allowed values: off, "         \
-+                "metadata, falloc, full)"                           \
-+    },                                                              \
-+    {                                                               \
-+        .name =3D BLOCK_OPT_LAZY_REFCOUNTS,                           \
-+        .type =3D QEMU_OPT_BOOL,                                      \
-+        .help =3D "Postpone refcount updates",                        \
-+        .def_value_str =3D "off"                                      \
-+    },                                                              \
-+    {                                                               \
-+        .name =3D BLOCK_OPT_REFCOUNT_BITS,                            \
-+        .type =3D QEMU_OPT_NUMBER,                                    \
-+        .help =3D "Width of a reference count entry in bits",         \
-+        .def_value_str =3D "16"                                       \
-+    }                                                               \
-+
- static QemuOptsList qcow2_create_opts =3D {
-     .name =3D "qcow2-create-opts",
-     .head =3D QTAILQ_HEAD_INITIALIZER(qcow2_create_opts.head),
-     .desc =3D {
--        {
--            .name =3D BLOCK_OPT_SIZE,
--            .type =3D QEMU_OPT_SIZE,
--            .help =3D "Virtual disk size"
--        },
--        {
--            .name =3D BLOCK_OPT_COMPAT_LEVEL,
--            .type =3D QEMU_OPT_STRING,
--            .help =3D "Compatibility level (v2 [0.10] or v3 [1.1])"
--        },
--        {
--            .name =3D BLOCK_OPT_BACKING_FILE,
--            .type =3D QEMU_OPT_STRING,
--            .help =3D "File name of a base image"
--        },
--        {
--            .name =3D BLOCK_OPT_BACKING_FMT,
--            .type =3D QEMU_OPT_STRING,
--            .help =3D "Image format of the base image"
--        },
--        {
--            .name =3D BLOCK_OPT_DATA_FILE,
--            .type =3D QEMU_OPT_STRING,
--            .help =3D "File name of an external data file"
--        },
--        {
--            .name =3D BLOCK_OPT_DATA_FILE_RAW,
--            .type =3D QEMU_OPT_BOOL,
--            .help =3D "The external data file must stay valid as a raw ima=
-ge"
--        },
--        {
--            .name =3D BLOCK_OPT_ENCRYPT,
--            .type =3D QEMU_OPT_BOOL,
--            .help =3D "Encrypt the image with format 'aes'. (Deprecated "
--                    "in favor of " BLOCK_OPT_ENCRYPT_FORMAT "=3Daes)",
--        },
--        {
--            .name =3D BLOCK_OPT_ENCRYPT_FORMAT,
--            .type =3D QEMU_OPT_STRING,
--            .help =3D "Encrypt the image, format choices: 'aes', 'luks'",
--        },
--        BLOCK_CRYPTO_OPT_DEF_KEY_SECRET("encrypt.",
--            "ID of secret providing qcow AES key or LUKS passphrase"),
--        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG("encrypt."),
--        BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE("encrypt."),
--        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG("encrypt."),
--        BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG("encrypt."),
--        BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG("encrypt."),
--        BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME("encrypt."),
--        {
--            .name =3D BLOCK_OPT_CLUSTER_SIZE,
--            .type =3D QEMU_OPT_SIZE,
--            .help =3D "qcow2 cluster size",
--            .def_value_str =3D stringify(DEFAULT_CLUSTER_SIZE)
--        },
--        {
--            .name =3D BLOCK_OPT_PREALLOC,
--            .type =3D QEMU_OPT_STRING,
--            .help =3D "Preallocation mode (allowed values: off, metadata, =
-"
--                    "falloc, full)"
--        },
--        {
--            .name =3D BLOCK_OPT_LAZY_REFCOUNTS,
--            .type =3D QEMU_OPT_BOOL,
--            .help =3D "Postpone refcount updates",
--            .def_value_str =3D "off"
--        },
--        {
--            .name =3D BLOCK_OPT_REFCOUNT_BITS,
--            .type =3D QEMU_OPT_NUMBER,
--            .help =3D "Width of a reference count entry in bits",
--            .def_value_str =3D "16"
--        },
-+        QCOW_COMMON_OPTIONS,
-+        { /* end of list */ }
-+    }
-+};
-+
-+static QemuOptsList qcow2_amend_opts =3D {
-+    .name =3D "qcow2-amend-opts",
-+    .head =3D QTAILQ_HEAD_INITIALIZER(qcow2_amend_opts.head),
-+    .desc =3D {
-+        QCOW_COMMON_OPTIONS,
-         { /* end of list */ }
-     }
- };
-@@ -5649,6 +5662,7 @@ BlockDriver bdrv_qcow2 =3D {
-     .bdrv_inactivate            =3D qcow2_inactivate,
-=20
-     .create_opts         =3D &qcow2_create_opts,
-+    .amend_opts          =3D &qcow2_amend_opts,
-     .strong_runtime_opts =3D qcow2_strong_runtime_opts,
-     .mutable_opts        =3D mutable_opts,
-     .bdrv_co_check       =3D qcow2_co_check,
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 98671ecdf6..1f0524285d 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -412,6 +412,10 @@ struct BlockDriver {
-=20
-     /* List of options for creating images, terminated by name =3D=3D NULL=
- */
-     QemuOptsList *create_opts;
-+
-+    /* List of options for image amend*/
-+    QemuOptsList *amend_opts;
-+
-     /*
-      * If this driver supports reopening images this contains a
-      * NULL-terminated list of the runtime options that can be
-diff --git a/qemu-img.c b/qemu-img.c
-index ef422d5471..8f69366f03 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -3936,11 +3936,11 @@ static int print_amend_option_help(const char *form=
-at)
-         return 1;
-     }
-=20
--    /* Every driver supporting amendment must have create_opts */
--    assert(drv->create_opts);
-+    /* Every driver supporting amendment must have amend_opts */
-+    assert(drv->amend_opts);
-=20
-     printf("Creation options for '%s':\n", format);
--    qemu_opts_print_help(drv->create_opts, false);
-+    qemu_opts_print_help(drv->amend_opts, false);
-     printf("\nNote that not all of these options may be amendable.\n");
+@@ -5465,6 +5465,44 @@ static int qcow2_amend_options(BlockDriverState *bs,=
+ QemuOpts *opts,
      return 0;
  }
-@@ -3950,7 +3950,7 @@ static int img_amend(int argc, char **argv)
-     Error *err =3D NULL;
-     int c, ret =3D 0;
-     char *options =3D NULL;
--    QemuOptsList *create_opts =3D NULL;
-+    QemuOptsList *amend_opts =3D NULL;
-     QemuOpts *opts =3D NULL;
-     const char *fmt =3D NULL, *filename, *cache;
-     int flags;
-@@ -4081,11 +4081,11 @@ static int img_amend(int argc, char **argv)
-         goto out;
-     }
 =20
--    /* Every driver supporting amendment must have create_opts */
--    assert(bs->drv->create_opts);
-+    /* Every driver supporting amendment must have amend_opts */
-+    assert(bs->drv->amend_opts);
++static int coroutine_fn qcow2_co_amend(BlockDriverState *bs,
++                                       BlockdevAmendOptions *opts,
++                                       bool force,
++                                       Error **errp)
++{
++    BlockdevAmendOptionsQcow2 *qopts =3D &opts->u.qcow2;
++    BDRVQcow2State *s =3D bs->opaque;
++    int ret =3D 0;
++
++    if (qopts->has_encrypt) {
++        if (!s->crypto) {
++            error_setg(errp, "image is not encrypted, can't amend");
++            return -EOPNOTSUPP;
++        }
++
++        if (qopts->encrypt->format !=3D Q_CRYPTO_BLOCK_FORMAT_LUKS) {
++            error_setg(errp,
++                       "Amend can't be used to change the qcow2 encryption=
+ format");
++            return -EOPNOTSUPP;
++        }
++
++        if (s->crypt_method_header !=3D QCOW_CRYPT_LUKS) {
++            error_setg(errp,
++                       "Only LUKS encryption options can be amended for qc=
+ow2 with blockdev-amend");
++            return -EOPNOTSUPP;
++        }
++
++        ret =3D qcrypto_block_amend_options(s->crypto,
++                                          qcow2_crypto_hdr_read_func,
++                                          qcow2_crypto_hdr_write_func,
++                                          bs,
++                                          qopts->encrypt,
++                                          force,
++                                          errp);
++    }
++    return ret;
++}
++
+ /*
+  * If offset or size are negative, respectively, they will not be included=
+ in
+  * the BLOCK_IMAGE_CORRUPTED event emitted.
+@@ -5675,6 +5713,7 @@ BlockDriver bdrv_qcow2 =3D {
+     .mutable_opts        =3D mutable_opts,
+     .bdrv_co_check       =3D qcow2_co_check,
+     .bdrv_amend_options  =3D qcow2_amend_options,
++    .bdrv_co_amend       =3D qcow2_co_amend,
 =20
--    create_opts =3D qemu_opts_append(create_opts, bs->drv->create_opts);
--    opts =3D qemu_opts_create(create_opts, NULL, 0, &error_abort);
-+    amend_opts =3D qemu_opts_append(amend_opts, bs->drv->amend_opts);
-+    opts =3D qemu_opts_create(amend_opts, NULL, 0, &error_abort);
-     qemu_opts_do_parse(opts, options, NULL, &err);
-     if (err) {
-         error_report_err(err);
-@@ -4108,7 +4108,7 @@ out:
- out_no_progress:
-     blk_unref(blk);
-     qemu_opts_del(opts);
--    qemu_opts_free(create_opts);
-+    qemu_opts_free(amend_opts);
-     g_free(options);
+     .bdrv_detach_aio_context  =3D qcow2_detach_aio_context,
+     .bdrv_attach_aio_context  =3D qcow2_attach_aio_context,
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index a5f679ac17..0ffdc1c3d4 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -4661,6 +4661,19 @@
+   'data': { }
+ }
 =20
-     if (ret) {
++##
++# @BlockdevAmendOptionsQcow2:
++#
++# Driver specific image amend options for qcow2.
++# For now, only encryption options can be amended
++#
++# @encrypt          Encryption options to be amended
++#
++# Since: 5.0
++##
++{ 'struct': 'BlockdevAmendOptionsQcow2',
++  'data': { '*encrypt':         'QCryptoBlockAmendOptions' } }
++
+ ##
+ # @BlockdevAmendOptions:
+ #
+@@ -4675,7 +4688,8 @@
+       'driver':         'BlockdevDriver' },
+   'discriminator': 'driver',
+   'data': {
+-      'luks':           'BlockdevAmendOptionsLUKS' } }
++      'luks':           'BlockdevAmendOptionsLUKS',
++      'qcow2':          'BlockdevAmendOptionsQcow2' } }
+=20
+ ##
+ # @x-blockdev-amend:
 --=20
 2.17.2
 
