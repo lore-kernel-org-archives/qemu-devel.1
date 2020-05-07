@@ -6,80 +6,80 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26DD3C38A24
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:24:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37C38C38A24
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:25:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2BDC2075E
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:24:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 04C1E20870
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 13:25:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EfZf4foz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2BDC2075E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E7EsuxcK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04C1E20870
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWgWC-0005EB-3n
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 09:24:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54990)
+	id 1jWgWQ-0005h5-6D
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 09:25:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55026)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jWgOc-0000e0-R2
- for qemu-devel@nongnu.org; Thu, 07 May 2020 09:17:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58762
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jWgOf-0000mO-PE
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 09:17:05 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43581
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jWgOc-0005V9-1F
- for qemu-devel@nongnu.org; Thu, 07 May 2020 09:17:02 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jWgOe-0005W0-PM
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 09:17:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588857421;
+ s=mimecast20190719; t=1588857424;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gM9CYxAKvVg1hN4bItv68KBJKyF6SrKF+mESMvEQDn8=;
- b=EfZf4fozF6jpu48yX47uAFEAKzPeDh+MVwnxbllJNBrakMzFffWjCiyM6ZdrRy72HOYLLH
- G/XP6yK8H3jMUm+O8zCmaR54KVCT6vrsX+EZgaNITjiAQli06VJWWiMYReH/0I35tKq9By
- WFcWa8cjNvayzv2tmJa0O8aJczqLBKA=
+ bh=OrDgrxh64Bow9vyUxq3NmkleqbrEp9IVfEoYh6vCD+U=;
+ b=E7EsuxcKI69YdNsy0JSnMMDvT/qBy3ZKQoRAf+stUrBhsKy/Pi3PvM7keiIMDPSVDPdGAL
+ bGRqM+DNhHmZIeNaw6+4QyD1sEFZ6gyiD0SAxWfKhjnjHFs5PBIx/qzOm/vVz5yh6oa3sB
+ k6g5met6Hz7m8/EeFxQ5e9bLxJCpNhA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-425--vOgiHGdMFCaKCx7J3mblA-1; Thu, 07 May 2020 09:16:52 -0400
-X-MC-Unique: -vOgiHGdMFCaKCx7J3mblA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-447-2EonWqYnPqOk_p4okWtZqg-1; Thu, 07 May 2020 09:17:00 -0400
+X-MC-Unique: 2EonWqYnPqOk_p4okWtZqg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BEBE9102C85A;
- Thu,  7 May 2020 13:16:51 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 043911937FDF;
+ Thu,  7 May 2020 13:16:59 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-113-193.ams2.redhat.com
  [10.36.113.193])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5493170870;
- Thu,  7 May 2020 13:16:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 946ED649A9;
+ Thu,  7 May 2020 13:16:50 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id C4DF79DB0; Thu,  7 May 2020 15:16:40 +0200 (CEST)
+ id 83CEDA1EE; Thu,  7 May 2020 15:16:40 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 12/15] acpi: drop serial/parallel enable bits from dsdt
-Date: Thu,  7 May 2020 15:16:37 +0200
-Message-Id: <20200507131640.14041-13-kraxel@redhat.com>
+Subject: [PATCH v5 06/15] acpi: parallel: don't use _STA method
+Date: Thu,  7 May 2020 15:16:31 +0200
+Message-Id: <20200507131640.14041-7-kraxel@redhat.com>
 In-Reply-To: <20200507131640.14041-1-kraxel@redhat.com>
 References: <20200507131640.14041-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 03:56:18
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 00:55:34
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,63 +105,82 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The _STA methods for COM+LPT used to reference them,
-but that isn't the case any more.
+The _STA method dates back to the days where we had a static DSDT.  The
+device is listed in the DSDT table unconditionally and the _STA method
+checks a bit in the isa bridge pci config space to figure whenever a
+given is isa device is present or not, then evaluates to 0x0f (present)
+or 0x00 (absent).
+
+These days the DSDT is generated by qemu anyway, so if a device is not
+present we can simply drop it from the DSDT instead.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/i386/acpi-build.c | 23 -----------------------
- 1 file changed, 23 deletions(-)
+ hw/i386/acpi-build.c | 29 ++++++++---------------------
+ 1 file changed, 8 insertions(+), 21 deletions(-)
 
 diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 1922868f3401..765409a90eb6 100644
+index 0e6a5151f4c3..2188a2b99d18 100644
 --- a/hw/i386/acpi-build.c
 +++ b/hw/i386/acpi-build.c
-@@ -1437,15 +1437,6 @@ static void build_q35_isa_bridge(Aml *table)
-     aml_append(field, aml_named_field("LPTD", 2));
-     aml_append(dev, field);
-=20
--    aml_append(dev, aml_operation_region("LPCE", AML_PCI_CONFIG,
--                                         aml_int(0x82), 0x02));
--    /* enable bits */
--    field =3D aml_field("LPCE", AML_ANY_ACC, AML_NOLOCK, AML_PRESERVE);
--    aml_append(field, aml_named_field("CAEN", 1));
--    aml_append(field, aml_named_field("CBEN", 1));
--    aml_append(field, aml_named_field("LPEN", 1));
--    aml_append(dev, field);
--
-     aml_append(scope, dev);
-     aml_append(table, scope);
+@@ -1173,39 +1173,26 @@ static Aml *build_mouse_device_aml(void)
+     return dev;
  }
-@@ -1469,7 +1460,6 @@ static void build_piix4_isa_bridge(Aml *table)
+=20
+-static Aml *build_lpt_device_aml(void)
++static void build_lpt_device_aml(Aml *scope)
  {
      Aml *dev;
-     Aml *scope;
--    Aml *field;
+     Aml *crs;
+-    Aml *method;
+-    Aml *if_ctx;
+-    Aml *else_ctx;
+-    Aml *zero =3D aml_int(0);
+-    Aml *is_present =3D aml_local(0);
++
++    if (!memory_region_present(get_system_io(), 0x0378)) {
++        return;
++    }
 =20
-     scope =3D  aml_scope("_SB.PCI0");
-     dev =3D aml_device("ISA");
-@@ -1478,19 +1468,6 @@ static void build_piix4_isa_bridge(Aml *table)
-     /* PIIX PCI to ISA irq remapping */
-     aml_append(dev, aml_operation_region("P40C", AML_PCI_CONFIG,
-                                          aml_int(0x60), 0x04));
--    /* enable bits */
--    field =3D aml_field("^PX13.P13C", AML_ANY_ACC, AML_NOLOCK, AML_PRESERV=
-E);
--    /* Offset(0x5f),, 7, */
--    aml_append(field, aml_reserved_field(0x2f8));
--    aml_append(field, aml_reserved_field(7));
--    aml_append(field, aml_named_field("LPEN", 1));
--    /* Offset(0x67),, 3, */
--    aml_append(field, aml_reserved_field(0x38));
--    aml_append(field, aml_reserved_field(3));
--    aml_append(field, aml_named_field("CAEN", 1));
--    aml_append(field, aml_reserved_field(3));
--    aml_append(field, aml_named_field("CBEN", 1));
--    aml_append(dev, field);
+     dev =3D aml_device("LPT");
+     aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0400")));
 =20
-     aml_append(scope, dev);
-     aml_append(table, scope);
+-    method =3D aml_method("_STA", 0, AML_NOTSERIALIZED);
+-    aml_append(method, aml_store(aml_name("LPEN"), is_present));
+-    if_ctx =3D aml_if(aml_equal(is_present, zero));
+-    {
+-        aml_append(if_ctx, aml_return(aml_int(0x00)));
+-    }
+-    aml_append(method, if_ctx);
+-    else_ctx =3D aml_else();
+-    {
+-        aml_append(else_ctx, aml_return(aml_int(0x0f)));
+-    }
+-    aml_append(method, else_ctx);
+-    aml_append(dev, method);
++    aml_append(dev, aml_name_decl("_STA", aml_int(0xf)));
+=20
+     crs =3D aml_resource_template();
+     aml_append(crs, aml_io(AML_DECODE16, 0x0378, 0x0378, 0x08, 0x08));
+     aml_append(crs, aml_irq_no_flags(7));
+     aml_append(dev, aml_name_decl("_CRS", crs));
+=20
+-    return dev;
++    aml_append(scope, dev);
+ }
+=20
+ static void build_isa_devices_aml(Aml *table)
+@@ -1221,7 +1208,7 @@ static void build_isa_devices_aml(Aml *table)
+     if (fdc) {
+         aml_append(scope, build_fdc_device_aml(fdc));
+     }
+-    aml_append(scope, build_lpt_device_aml());
++    build_lpt_device_aml(scope);
+=20
+     if (ambiguous) {
+         error_report("Multiple ISA busses, unable to define IPMI ACPI data=
+");
 --=20
 2.18.4
 
