@@ -6,62 +6,62 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B8B8C38A2A
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 00:47:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D99A2C47257
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 00:47:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F86420736
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 00:47:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F86420736
+	by mail.kernel.org (Postfix) with ESMTPS id B13212064A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 00:47:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B13212064A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codesourcery.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45186 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWUh6-0003WM-Gm
-	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 20:47:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36996)
+	id 1jWUhR-00041i-Qu
+	for qemu-devel@archiver.kernel.org; Wed, 06 May 2020 20:47:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37072)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <joseph_myers@mentor.com>)
- id 1jWUfc-0002E2-Cf
- for qemu-devel@nongnu.org; Wed, 06 May 2020 20:45:48 -0400
-Received: from esa2.mentor.iphmx.com ([68.232.141.98]:50702)
+ id 1jWUgO-00030M-W4
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 20:46:37 -0400
+Received: from esa1.mentor.iphmx.com ([68.232.129.153]:28734)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <joseph_myers@mentor.com>)
- id 1jWUfb-0008Mq-9w
- for qemu-devel@nongnu.org; Wed, 06 May 2020 20:45:48 -0400
-IronPort-SDR: NMx6hQ/vDVrFkIpsNr9qd6sMQqRDFbgXLccMljreNhYzZBO7EOXN+FEhe2lkHnf7+q2nRMRpXx
- iFz3Jeq4ZD3f1D/hSUlqLJEpbek+wymws6lFVHwe2qORSqWOFUgMU5zUQnIakQnuXSPc2hAujn
- hujmW1eKkP3JfbmZikc2Bhx0sS21FVyLwZYb/cp1kDQl7MKP4en8z4eMV4KCFUncYTP6JSp19G
- rP1QRlRktaO7aPLy84Z/jIQ/wCEjZoGeqBZ6P9eLo3KnwUUpwQu38atDLPGFSSN++OcAzsiDFE
- FA0=
-X-IronPort-AV: E=Sophos;i="5.73,361,1583222400"; d="scan'208";a="48541271"
+ id 1jWUgN-0008Qd-Td
+ for qemu-devel@nongnu.org; Wed, 06 May 2020 20:46:36 -0400
+IronPort-SDR: ZxyQrGsU5nH7qRNuFKktqrairlk72hQhOKe4tUth7/B4h1cBexY9D004llfm9cJC1g2bs4Arg7
+ NzVK5bj6d5d3BrQInnBohJXHONZMZ2IyJPlMMoV9JuS/YIANAqIUaCgBI5wR197BJCjNs1Bpew
+ vvhH2bOmzPzU0LBU4wJ8GN61uJjmD5biF+3JHq708PHWa/UTZVzuf/7hkodneUKlVxhbPRMYaw
+ AqFgf+wE37SUcbW5AlKU6HS3cMBjrDyFzEBgtjnl2900grxd17f+2qd8zieHwshiKlak1A/K7w
+ uIo=
+X-IronPort-AV: E=Sophos;i="5.73,361,1583222400"; d="scan'208";a="50620999"
 Received: from orw-gwy-01-in.mentorg.com ([192.94.38.165])
- by esa2.mentor.iphmx.com with ESMTP; 06 May 2020 16:45:45 -0800
-IronPort-SDR: qAOHe37JFgHzBd4LhAompjpE8YO5zhfpeffgCVNEqwvXFdAtRsbBwVRGXc+N8ptnsRbBLwLEOT
- 6ciObTdj4b7mhLb45E8Ze3Lgvik9lWrfvcINTaH6Uu/YVVfiFe5yswQKHtM5RNdJVcqdNy1xrl
- eAbc8W6D8CMVMK/FDOuQ5XiKW15siwaCMPNqT05+7k4+uQuplECZSKf+3s8FC/G1Ou/R0T0Gxm
- I34P67k/DmZfKSCTW7l4Ao9ci+Jnmae4AUkWT6pyHX3hk5KQ1s3C3hWP9UdK0CSG2C3INRjzyN
- e2I=
-Date: Thu, 7 May 2020 00:45:38 +0000
+ by esa1.mentor.iphmx.com with ESMTP; 06 May 2020 16:46:32 -0800
+IronPort-SDR: 9ELJo0XDSiuZvCWlVruAvRGDMC4MyDWnEtY7Ba4zLZ0xdyHnIfm34qFJn+xp9Al5Z9R1lA3n2E
+ 7C6VRlxMijSJhkjXaP6Ylr11hckbxdi+zvgdO2ZvP/MQxfMREQ11hpoKf4GWC5oNBeHPsg9DyD
+ By8Mx+gC968EurwQNsFuIVL86DQzuJ21Jnk0UPn17c5dm3nhNztKKe1adSxfVEaldOndsOS7gO
+ MpT1bWpHTrS0CAoAkC1VfBLqdZyOBR63oLg04Ka2CnqfnLHXaJdRrAhr0ggFrrWpzDd+iSFzF8
+ txE=
+Date: Thu, 7 May 2020 00:46:28 +0000
 From: Joseph Myers <joseph@codesourcery.com>
 X-X-Sender: jsm28@digraph.polyomino.org.uk
 To: <qemu-devel@nongnu.org>, <pbonzini@redhat.com>, <rth@twiddle.net>,
  <ehabkost@redhat.com>
-Subject: [PATCH 4/5] target/i386: fix fscale handling of infinite exponents
+Subject: [PATCH 5/5] target/i386: fix fscale handling of rounding precision
 In-Reply-To: <alpine.DEB.2.21.2005070038550.18350@digraph.polyomino.org.uk>
-Message-ID: <alpine.DEB.2.21.2005070045010.18350@digraph.polyomino.org.uk>
+Message-ID: <alpine.DEB.2.21.2005070045430.18350@digraph.polyomino.org.uk>
 References: <alpine.DEB.2.21.2005070038550.18350@digraph.polyomino.org.uk>
 User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="US-ASCII"
 X-Originating-IP: [137.202.0.90]
-X-ClientProxiedBy: svr-ies-mbx-01.mgc.mentorg.com (139.181.222.1) To
+X-ClientProxiedBy: SVR-IES-MBX-04.mgc.mentorg.com (139.181.222.4) To
  svr-ies-mbx-01.mgc.mentorg.com (139.181.222.1)
-Received-SPF: pass client-ip=68.232.141.98;
- envelope-from=joseph_myers@mentor.com; helo=esa2.mentor.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 20:42:37
+Received-SPF: pass client-ip=68.232.129.153;
+ envelope-from=joseph_myers@mentor.com; helo=esa1.mentor.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/06 20:46:34
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
 X-Spam_score_int: -39
 X-Spam_score: -4.0
@@ -85,98 +85,61 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The fscale implementation passes infinite exponents through to generic
-code that rounds the exponent to a 32-bit integer before using
-floatx80_scalbn.  In round-to-nearest mode, and ignoring exceptions,
-this works in many cases.  But it fails to handle the special cases of
-scaling 0 by a +Inf exponent or an infinity by a -Inf exponent, which
-should produce a NaN, and because it produces an inexact result for
-finite nonzero numbers being scaled, the result is sometimes incorrect
-in other rounding modes.  Add appropriate handling of infinite
-exponents to produce a NaN or an appropriately signed exact zero or
-infinity as a result.
+The fscale implementation uses floatx80_scalbn for the final scaling
+operation.  floatx80_scalbn ends up rounding the result using the
+dynamic rounding precision configured for the FPU.  But only a limited
+set of x87 floating-point instructions are supposed to respect the
+dynamic rounding precision, and fscale is not in that set.  Fix the
+implementation to save and restore the rounding precision around the
+call to floatx80_scalbn.
 
 Signed-off-by: Joseph Myers <joseph@codesourcery.com>
 ---
- target/i386/fpu_helper.c          | 22 ++++++++++++++++++++++
- tests/tcg/i386/test-i386-fscale.c | 29 +++++++++++++++++++++++++++++
- 2 files changed, 51 insertions(+)
+ target/i386/fpu_helper.c          |  3 +++
+ tests/tcg/i386/test-i386-fscale.c | 13 +++++++++++++
+ 2 files changed, 16 insertions(+)
 
 diff --git a/target/i386/fpu_helper.c b/target/i386/fpu_helper.c
-index 7709af8fdd..d4c15728e1 100644
+index d4c15728e1..0c3fce933c 100644
 --- a/target/i386/fpu_helper.c
 +++ b/target/i386/fpu_helper.c
-@@ -977,6 +977,28 @@ void helper_fscale(CPUX86State *env)
-             float_raise(float_flag_invalid, &env->fp_status);
-             ST0 = floatx80_silence_nan(ST0, &env->fp_status);
+@@ -1001,7 +1001,10 @@ void helper_fscale(CPUX86State *env)
          }
-+    } else if (floatx80_is_infinity(ST1) &&
-+               !floatx80_invalid_encoding(ST0) &&
-+               !floatx80_is_any_nan(ST0)) {
-+        if (floatx80_is_neg(ST1)) {
-+            if (floatx80_is_infinity(ST0)) {
-+                float_raise(float_flag_invalid, &env->fp_status);
-+                ST0 = floatx80_default_nan(&env->fp_status);
-+            } else {
-+                ST0 = (floatx80_is_neg(ST0) ?
-+                       floatx80_chs(floatx80_zero) :
-+                       floatx80_zero);
-+            }
-+        } else {
-+            if (floatx80_is_zero(ST0)) {
-+                float_raise(float_flag_invalid, &env->fp_status);
-+                ST0 = floatx80_default_nan(&env->fp_status);
-+            } else {
-+                ST0 = (floatx80_is_neg(ST0) ?
-+                       floatx80_chs(floatx80_infinity) :
-+                       floatx80_infinity);
-+            }
-+        }
      } else {
          int n = floatx80_to_int32_round_to_zero(ST1, &env->fp_status);
++        signed char save = env->fp_status.floatx80_rounding_precision;
++        env->fp_status.floatx80_rounding_precision = 80;
          ST0 = floatx80_scalbn(ST0, n, &env->fp_status);
++        env->fp_status.floatx80_rounding_precision = save;
+     }
+ }
+ 
 diff --git a/tests/tcg/i386/test-i386-fscale.c b/tests/tcg/i386/test-i386-fscale.c
-index b65a055d0a..b953e7c563 100644
+index b953e7c563..d23b3cfeec 100644
 --- a/tests/tcg/i386/test-i386-fscale.c
 +++ b/tests/tcg/i386/test-i386-fscale.c
-@@ -31,6 +31,7 @@ int issignaling_ld(long double x)
+@@ -8,6 +8,8 @@ union u {
+     long double ld;
+ };
  
- int main(void)
- {
-+    short cw;
-     int ret = 0;
-     __asm__ volatile ("fscale" : "=t" (ld_res) :
-                       "0" (2.5L), "u" (__builtin_nansl("")));
-@@ -62,5 +63,33 @@ int main(void)
-         printf("FAIL: fscale invalid 4\n");
++volatile long double ld_third = 1.0L / 3.0L;
++volatile long double ld_four_thirds = 4.0L / 3.0L;
+ volatile union u ld_invalid_1 = { .s = { 1, 1234 } };
+ volatile union u ld_invalid_2 = { .s = { 0, 1234 } };
+ volatile union u ld_invalid_3 = { .s = { 0, 0x7fff } };
+@@ -91,5 +93,16 @@ int main(void)
+         printf("FAIL: fscale finite down inf\n");
          ret = 1;
      }
-+    __asm__ volatile ("fscale" : "=t" (ld_res) :
-+                      "0" (0.0L), "u" (__builtin_infl()));
-+    if (!isnan_ld(ld_res) || issignaling_ld(ld_res)) {
-+        printf("FAIL: fscale 0 up inf\n");
-+        ret = 1;
-+    }
-+    __asm__ volatile ("fscale" : "=t" (ld_res) :
-+                      "0" (__builtin_infl()), "u" (-__builtin_infl()));
-+    if (!isnan_ld(ld_res) || issignaling_ld(ld_res)) {
-+        printf("FAIL: fscale inf down inf\n");
-+        ret = 1;
-+    }
-+    /* Set round-downward.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0x400;
++    /* Set round-to-nearest with single-precision rounding.  */
++    cw = cw & ~0xf00;
 +    __asm__ volatile ("fldcw %0" : : "m" (cw));
 +    __asm__ volatile ("fscale" : "=t" (ld_res) :
-+                      "0" (1.0L), "u" (__builtin_infl()));
-+    if (ld_res != __builtin_infl()) {
-+        printf("FAIL: fscale finite up inf\n");
-+        ret = 1;
-+    }
-+    __asm__ volatile ("fscale" : "=t" (ld_res) :
-+                      "0" (-1.0L), "u" (-__builtin_infl()));
-+    if (ld_res != -0.0L || __builtin_copysignl(1.0L, ld_res) != -1.0L) {
-+        printf("FAIL: fscale finite down inf\n");
++                      "0" (ld_third), "u" (2.0L));
++    cw = cw | 0x300;
++    __asm__ volatile ("fldcw %0" : : "m" (cw));
++    if (ld_res != ld_four_thirds) {
++        printf("FAIL: fscale single-precision\n");
 +        ret = 1;
 +    }
      return ret;
