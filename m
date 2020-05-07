@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E68CC38A2A
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 09:33:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B937C38A2A
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 09:37:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47E552080D
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 09:33:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB933208E4
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 May 2020 09:37:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D5nRwi8N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47E552080D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Aksqgo24"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB933208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWcuh-0004qR-E0
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 05:33:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33916)
+	id 1jWcyB-0006Wg-UK
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 05:37:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34522)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jWcu1-0004LY-5g
- for qemu-devel@nongnu.org; Thu, 07 May 2020 05:33:14 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56831
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jWcxc-00062H-1o
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 05:36:56 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50439
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jWcty-0007Vh-5g
- for qemu-devel@nongnu.org; Thu, 07 May 2020 05:33:12 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jWcxb-0007yu-48
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 05:36:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588843989;
+ s=mimecast20190719; t=1588844214;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=3rW0oZFj3ph1i8R6l/ajEXQ583xgi4g7aKzy75z/mXE=;
- b=D5nRwi8NCnIOQd90TwYYvLN65afL9o5lpACqCcumJJC3Ye1r/MpZ+2zEzoJ9CL/P5kMKIY
- dWaRPM0ijIwXcTp5ESIYSdeKT+SeZV6di8H4yxaaXjyV4PNgtfbdqJtlUWjrwjd0+KF+5R
- SdYAFz9/hBHYr27gXq5nBLalrEb52Qk=
+ bh=AHuja6XADl+X51k5NW/6QCBtJCgLMCom4u9zGSqG9Cg=;
+ b=Aksqgo24U2oo1HuOExawybkhDn+1GrmkajDzQh048tvZGxO1MkVYZlU4/N96z7L6tQyUUh
+ /MRWXYu33a07LRo7flP2XxWirYp0E5t3fMuemRz4E0RX7ydCwFNBLG45edIZ3EKYUUy8Vm
+ CdHwciYyaVlSBJmwTWjJyMtrrucqqdU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-430-EzmXPirJP9qkeXoLNzPI2A-1; Thu, 07 May 2020 05:33:07 -0400
-X-MC-Unique: EzmXPirJP9qkeXoLNzPI2A-1
+ us-mta-410-HCq-bjIYN9qDHxcO8qmrzw-1; Thu, 07 May 2020 05:36:52 -0400
+X-MC-Unique: HCq-bjIYN9qDHxcO8qmrzw-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4527B80058A;
- Thu,  7 May 2020 09:33:06 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71400100A8E7;
+ Thu,  7 May 2020 09:36:51 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-114-92.ams2.redhat.com
  [10.36.114.92])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0E12962AA0;
- Thu,  7 May 2020 09:33:04 +0000 (UTC)
-Subject: Re: [PATCH v3 26/33] block: Use child_of_bds in remaining places
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0A36262A43;
+ Thu,  7 May 2020 09:36:49 +0000 (UTC)
+Subject: Re: [PATCH v3 32/33] block: Pass BdrvChildRole in remaining cases
 To: Kevin Wolf <kwolf@redhat.com>
 References: <20200218124242.584644-1-mreitz@redhat.com>
- <20200218124242.584644-27-mreitz@redhat.com>
- <20200506170426.GI6333@linux.fritz.box>
+ <20200218124242.584644-33-mreitz@redhat.com>
+ <20200506171315.GJ6333@linux.fritz.box>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -86,18 +86,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <b05ff158-1c8c-4596-235a-1114ac0ff3a1@redhat.com>
-Date: Thu, 7 May 2020 11:33:02 +0200
+Message-ID: <1a39d014-e921-3a6c-e540-55724ad77bb1@redhat.com>
+Date: Thu, 7 May 2020 11:36:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200506170426.GI6333@linux.fritz.box>
+In-Reply-To: <20200506171315.GJ6333@linux.fritz.box>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="YyzRBPStVlpZ2WLmnHg5hLqKStpEaHdyb"
+ boundary="yxnHcaDU7j4MHWjFZlAtx7N3e5MZSVONr"
 Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 02:00:54
@@ -126,72 +126,73 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---YyzRBPStVlpZ2WLmnHg5hLqKStpEaHdyb
-Content-Type: multipart/mixed; boundary="07sPTXAdT6QtLpB01I4f4kxwXBFj4IV6r"
+--yxnHcaDU7j4MHWjFZlAtx7N3e5MZSVONr
+Content-Type: multipart/mixed; boundary="8X0G3kGdajnMkGEjrTSwkGqOZmpOYLaUG"
 
---07sPTXAdT6QtLpB01I4f4kxwXBFj4IV6r
+--8X0G3kGdajnMkGEjrTSwkGqOZmpOYLaUG
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 06.05.20 19:04, Kevin Wolf wrote:
+On 06.05.20 19:13, Kevin Wolf wrote:
 > Am 18.02.2020 um 13:42 hat Max Reitz geschrieben:
->> Replace child_file by child_of_bds in all remaining places (excluding
->> tests).
+>> These calls have no real use for the child role yet, but it will not
+>> harm to give one.
+>>
+>> Notably, the bdrv_root_attach_child() call in blockjob.c is left
+>> unmodified because there is not much the generic BlockJob object wants
+>> from its children.
 >>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >> Reviewed-by: Eric Blake <eblake@redhat.com>
 >=20
->> diff --git a/block/blkreplay.c b/block/blkreplay.c
->> index f97493f45a..71628f4d56 100644
->> --- a/block/blkreplay.c
->> +++ b/block/blkreplay.c
->> @@ -27,8 +27,9 @@ static int blkreplay_open(BlockDriverState *bs, QDict =
-*options, int flags,
->>      int ret;
->> =20
->>      /* Open the image file */
->> -    bs->file =3D bdrv_open_child(NULL, options, "image",
->> -                               bs, &child_file, 0, false, &local_err);
->> +    bs->file =3D bdrv_open_child(NULL, options, "image", bs, &child_of_=
-bds,
->> +                               BDRV_CHILD_DATA | BDRV_CHILD_PRIMARY,
->> +                               false, &local_err);
+>> diff --git a/block/vvfat.c b/block/vvfat.c
+>> index 8f4ff5a97e..d4f4218924 100644
+>> --- a/block/vvfat.c
+>> +++ b/block/vvfat.c
+>> @@ -3186,7 +3186,7 @@ static int enable_write_target(BlockDriverState *b=
+s, Error **errp)
+>>      options =3D qdict_new();
+>>      qdict_put_str(options, "write-target.driver", "qcow");
+>>      s->qcow =3D bdrv_open_child(s->qcow_filename, options, "write-targe=
+t", bs,
+>> -                              &child_vvfat_qcow, 0, false, errp);
+>> +                              &child_vvfat_qcow, BDRV_CHILD_DATA, false=
+, errp);
 >=20
-> Why isn't blkreplay a filter?
-I don=E2=80=99t know, but that=E2=80=99s pre-existing.  (It doesn=E2=80=99t=
- set .is_filter.)
+> Doesn't it contain metadata, too?
 
-I=E2=80=99m afraid I have little insight into what blkreplay actually does.=
-  I
-thought maybe in conjunction with the whole replay stuff it might turn
-out not to be a filter.
+Aw, I don=E2=80=99t know...  This is vvfat, I don=E2=80=99t want to know.
 
-So is it a filter?  If so, no problem.  I suppose we can fix it up in
-the same patch that marks mirror-top and commit-top as filters.
+Do you mean metadata beyond the filesystem structures?  Are those
+structures data or metadata in this context?  Does it even matter?
+
+I suppose I just don=E2=80=99t want to think about all of that, and the sim=
+plest
+way to do it is to indeed pass METADATA, too.
 
 Max
 
 
---07sPTXAdT6QtLpB01I4f4kxwXBFj4IV6r--
+--8X0G3kGdajnMkGEjrTSwkGqOZmpOYLaUG--
 
---YyzRBPStVlpZ2WLmnHg5hLqKStpEaHdyb
+--yxnHcaDU7j4MHWjFZlAtx7N3e5MZSVONr
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6z1c4ACgkQ9AfbAGHV
-z0Dm2Qf+NG9JS7cOKKEkr/E+ByTGdNwhbNqQ48n4FHYLUjtWU4iG30plOl7ELPIl
-nYpjMmK7vWWeJTNzx2iqq+nWTggJB5XZ9ahqtrhanOKhl9C7phFDp/ms69tpth6F
-SO+2HfvKY4V0nzU86zjNKrKRNxXbUlBVK+0j5xvj6ZwofqjHxxkUuGASarwO3Jef
-ew4a7ECNvngOhURFD1Ohi6clRdZDj82AxTXN74Mm5NrJXqGy+zaiuPup0EcMdvm/
-49CJhGoVg2NWrqRIA+EvXibrMsWS24CsLWKS0l+Hf4fQEXz7EuIXfuDvBo/DHFaQ
-DSym8a9D85U9XY7MFH1YYoqDu62FdQ==
-=jg+r
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6z1q8ACgkQ9AfbAGHV
+z0CeIwgAoqrDE3H5PT2kzze77rCgAc/gwINEbeHfsTKfqsgEcSz281FedgGGNSvm
+b8mtDbKSl10X4GQgboDrapIlmeRrWmIY4QdUbd3ND2I+jFlHeg59mKE0NSxARh03
+pBZUkzkg2FDprdSo6UHlqfwuGdWNZh4TE6wE3bWXwUgnM2YZzjhV6BpEwcjojr3r
+w/HuNCVmwdr70/+c+b6yZz3r28IvxH6DgOkBJA9WLs1Ql+AP0PCmXNgEc3TLkCeJ
+sPFGfo/ZQycsYRonxNzhdslDSOrIS1J+vyZsXRbrSLYu7iLHzpEM8Slpd4LA/JdK
+EMfQhgi4GFQKDzpbV8GRy7vNzS8diQ==
+=oUf6
 -----END PGP SIGNATURE-----
 
---YyzRBPStVlpZ2WLmnHg5hLqKStpEaHdyb--
+--yxnHcaDU7j4MHWjFZlAtx7N3e5MZSVONr--
 
 
