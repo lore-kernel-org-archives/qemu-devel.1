@@ -2,94 +2,99 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46EEEC38A2A
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 21:33:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FA95C38A2A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 23:10:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED8FF21582
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 21:33:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dE9/mmwN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED8FF21582
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id C9A212173E
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 23:10:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9A212173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXAd4-0007nW-5A
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 17:33:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36850)
+	id 1jXC8L-0005KG-SS
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 19:10:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alexander.duyck@gmail.com>)
- id 1jXAZF-000410-2t
- for qemu-devel@nongnu.org; Fri, 08 May 2020 17:30:01 -0400
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:37840)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alexander.duyck@gmail.com>)
- id 1jXAZD-0008KD-RR
- for qemu-devel@nongnu.org; Fri, 08 May 2020 17:30:00 -0400
-Received: by mail-qt1-x842.google.com with SMTP id 4so2699189qtb.4
- for <qemu-devel@nongnu.org>; Fri, 08 May 2020 14:29:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:from:to:cc:date:message-id:in-reply-to:references
- :user-agent:mime-version:content-transfer-encoding;
- bh=9FgnM4HvErXKWZJbbQvfcjSzozlq0cqUHZYYv5AzslI=;
- b=dE9/mmwNCYqGmNdmAMBLvA11eqRXGtZaSQqXXKFKlDsGslJfQjnbKOVxUdCBQU6I6/
- Q/q9Efl3TrAfsdoc/mjGLVShCwUL54m1/cQpEqXp/xzfZbBJVHhLsHLjQ3jIPhc/PWfi
- 53igVLyL4rPCMgd2+KwA8LQSSqbWp15/qKzKtPxmnXrMhBICJM1VlA2wqHct/o3DI4qd
- E1i1ux/PtOotYskDeYN3cN2DYWWMTwMs5/2tEEgHj87PmkWfLCrLuVETP0PPrn9nBPwK
- 35k0C3gCHdPvq0UxIjjKHPPSJzuLAaXjAI7geXxKEyWOFbj0BXE8RBvmz3f5LsYpMdsu
- Pchw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:date:message-id:in-reply-to
- :references:user-agent:mime-version:content-transfer-encoding;
- bh=9FgnM4HvErXKWZJbbQvfcjSzozlq0cqUHZYYv5AzslI=;
- b=uR9lh1q6R42om3Oh/zG1zce30LdHsXj4zr5Ph8wnencEkVH/VhfBOwZrW3fIl/DRok
- 5yHEF3LL9qZAOoegutCt9zBVo7aT2nlkVM98ZUwWhkn3kgzrLq/SNxfkNOlXK3q6ama4
- NZChe5ZtnugpTjWCn4eeHbD0NUbPAWPgfkJM58/OClTmaN5kId4JUjbZX7JNhGfi2ieb
- goURvtBKiTZQnMW5YlnaXLeTLFqJ7nDNO87z7iC9pDH+9qqajqZI+R16lh34mEnOQaZ6
- IuXxywVWqy5bWE74pZ8AAfgoOdTwqmuyAoGB1eocp6DBmA15eS+WrvJisvtZpW27AIF3
- ZLAQ==
-X-Gm-Message-State: AGi0Pub/buMnnbZAvL2FeiylEA1UVwKPpVZ9pN7dbqawOw8TCviXFy6w
- jvZxsSVOF29xaBXzt1rs68Y=
-X-Google-Smtp-Source: APiQypKhYspCYXH6/jwB5rjEnguUH9nlu704/Wb1Wj87JnPcObyB9qOFLn55mci18Hkc958eZfkpRQ==
-X-Received: by 2002:aed:2b43:: with SMTP id p61mr5127368qtd.298.1588973398716; 
- Fri, 08 May 2020 14:29:58 -0700 (PDT)
-Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
- by smtp.gmail.com with ESMTPSA id x34sm2638903qta.43.2020.05.08.14.29.57
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 08 May 2020 14:29:58 -0700 (PDT)
-Subject: [PATCH v24 QEMU 1/3] virtio-balloon: Replace free page hinting
- references to 'report' with 'hint'
-From: Alexander Duyck <alexander.duyck@gmail.com>
-To: david@redhat.com, mst@redhat.com
-Date: Fri, 08 May 2020 14:29:57 -0700
-Message-ID: <20200508212957.26071.86438.stgit@localhost.localdomain>
-In-Reply-To: <20200508212719.26071.94248.stgit@localhost.localdomain>
-References: <20200508212719.26071.94248.stgit@localhost.localdomain>
-User-Agent: StGit/0.17.1-dirty
+ (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
+ id 1jXC6r-0003NS-Ra; Fri, 08 May 2020 19:08:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24930
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
+ id 1jXC6q-0005nn-5x; Fri, 08 May 2020 19:08:49 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 048N2iZq015499; Fri, 8 May 2020 19:08:45 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 30vtwd347q-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 08 May 2020 19:08:45 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 048N5XMM023029;
+ Fri, 8 May 2020 19:08:45 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 30vtwd347f-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 08 May 2020 19:08:45 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 048N4GCS027771;
+ Fri, 8 May 2020 23:08:44 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com
+ [9.57.198.25]) by ppma01dal.us.ibm.com with ESMTP id 30s0g7k02n-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 08 May 2020 23:08:44 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
+ [9.57.199.111])
+ by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 048N8hAM52691274
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 8 May 2020 23:08:43 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 42268AC05B;
+ Fri,  8 May 2020 23:08:43 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 0DCEAAC05E;
+ Fri,  8 May 2020 23:08:43 +0000 (GMT)
+Received: from localhost.localdomain.com (unknown [9.85.189.36])
+ by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+ Fri,  8 May 2020 23:08:42 +0000 (GMT)
+From: Collin Walling <walling@linux.ibm.com>
+To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+Subject: [PATCH v1 0/8] s390: Extended-Length SCCB & DIAGNOSE 0x318
+Date: Fri,  8 May 2020 19:08:15 -0400
+Message-Id: <20200508230823.22956-1-walling@linux.ibm.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::842;
- envelope-from=alexander.duyck@gmail.com; helo=mail-qt1-x842.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
+ definitions=2020-05-08_19:2020-05-08,
+ 2020-05-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0
+ bulkscore=0 mlxscore=0 impostorscore=0 malwarescore=0 spamscore=0
+ mlxlogscore=723 suspectscore=0 phishscore=0 clxscore=1011
+ priorityscore=1501 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2003020000 definitions=main-2005080190
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=walling@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 19:08:45
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,278 +107,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+Cc: frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, mst@redhat.com,
+ svens@linux.ibm.com, pbonzini@redhat.com, mihajlov@linux.ibm.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+This patch series introduces two features for an s390 KVM quest:
+    - Extended-Length SCCB (els) for the Read SCP/CPU Info SCLP 
+        commands
+    - DIAGNOSE 0x318 (diag318) enabling / migration handling
 
-In an upcoming patch a feature named Free Page Reporting is about to be
-added. In order to avoid any confusion we should drop the use of the word
-'report' when referring to Free Page Hinting. So what this patch does is go
-through and replace all instances of 'report' with 'hint" when we are
-referring to free page hinting.
+The diag318 feature depends on els and KVM support.
 
-Acked-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
----
- hw/virtio/virtio-balloon.c         |   78 ++++++++++++++++++------------------
- include/hw/virtio/virtio-balloon.h |   20 +++++----
- 2 files changed, 49 insertions(+), 49 deletions(-)
+The els feature is handled entirely with QEMU, and does not require 
+KVM support.
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index a4729f7fc930..a209706b4d8d 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -466,21 +466,21 @@ static bool get_free_page_hints(VirtIOBalloon *dev)
-             ret = false;
-             goto out;
-         }
--        if (id == dev->free_page_report_cmd_id) {
--            dev->free_page_report_status = FREE_PAGE_REPORT_S_START;
-+        if (id == dev->free_page_hint_cmd_id) {
-+            dev->free_page_hint_status = FREE_PAGE_HINT_S_START;
-         } else {
-             /*
-              * Stop the optimization only when it has started. This
-              * avoids a stale stop sign for the previous command.
-              */
--            if (dev->free_page_report_status == FREE_PAGE_REPORT_S_START) {
--                dev->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
-+            if (dev->free_page_hint_status == FREE_PAGE_HINT_S_START) {
-+                dev->free_page_hint_status = FREE_PAGE_HINT_S_STOP;
-             }
-         }
-     }
- 
-     if (elem->in_num) {
--        if (dev->free_page_report_status == FREE_PAGE_REPORT_S_START) {
-+        if (dev->free_page_hint_status == FREE_PAGE_HINT_S_START) {
-             qemu_guest_free_page_hint(elem->in_sg[0].iov_base,
-                                       elem->in_sg[0].iov_len);
-         }
-@@ -506,11 +506,11 @@ static void virtio_ballloon_get_free_page_hints(void *opaque)
-         qemu_mutex_unlock(&dev->free_page_lock);
-         virtio_notify(vdev, vq);
-       /*
--       * Start to poll the vq once the reporting started. Otherwise, continue
-+       * Start to poll the vq once the hinting started. Otherwise, continue
-        * only when there are entries on the vq, which need to be given back.
-        */
-     } while (continue_to_get_hints ||
--             dev->free_page_report_status == FREE_PAGE_REPORT_S_START);
-+             dev->free_page_hint_status == FREE_PAGE_HINT_S_START);
-     virtio_queue_set_notification(vq, 1);
- }
- 
-@@ -531,14 +531,14 @@ static void virtio_balloon_free_page_start(VirtIOBalloon *s)
-         return;
-     }
- 
--    if (s->free_page_report_cmd_id == UINT_MAX) {
--        s->free_page_report_cmd_id =
--                       VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN;
-+    if (s->free_page_hint_cmd_id == UINT_MAX) {
-+        s->free_page_hint_cmd_id =
-+                       VIRTIO_BALLOON_FREE_PAGE_HINT_CMD_ID_MIN;
-     } else {
--        s->free_page_report_cmd_id++;
-+        s->free_page_hint_cmd_id++;
-     }
- 
--    s->free_page_report_status = FREE_PAGE_REPORT_S_REQUESTED;
-+    s->free_page_hint_status = FREE_PAGE_HINT_S_REQUESTED;
-     virtio_notify_config(vdev);
- }
- 
-@@ -546,18 +546,18 @@ static void virtio_balloon_free_page_stop(VirtIOBalloon *s)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(s);
- 
--    if (s->free_page_report_status != FREE_PAGE_REPORT_S_STOP) {
-+    if (s->free_page_hint_status != FREE_PAGE_HINT_S_STOP) {
-         /*
-          * The lock also guarantees us that the
-          * virtio_ballloon_get_free_page_hints exits after the
--         * free_page_report_status is set to S_STOP.
-+         * free_page_hint_status is set to S_STOP.
-          */
-         qemu_mutex_lock(&s->free_page_lock);
-         /*
--         * The guest hasn't done the reporting, so host sends a notification
--         * to the guest to actively stop the reporting.
-+         * The guest isn't done hinting, so send a notification
-+         * to the guest to actively stop the hinting.
-          */
--        s->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
-+        s->free_page_hint_status = FREE_PAGE_HINT_S_STOP;
-         qemu_mutex_unlock(&s->free_page_lock);
-         virtio_notify_config(vdev);
-     }
-@@ -567,15 +567,15 @@ static void virtio_balloon_free_page_done(VirtIOBalloon *s)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(s);
- 
--    s->free_page_report_status = FREE_PAGE_REPORT_S_DONE;
-+    s->free_page_hint_status = FREE_PAGE_HINT_S_DONE;
-     virtio_notify_config(vdev);
- }
- 
- static int
--virtio_balloon_free_page_report_notify(NotifierWithReturn *n, void *data)
-+virtio_balloon_free_page_hint_notify(NotifierWithReturn *n, void *data)
- {
-     VirtIOBalloon *dev = container_of(n, VirtIOBalloon,
--                                      free_page_report_notify);
-+                                      free_page_hint_notify);
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     PrecopyNotifyData *pnd = data;
- 
-@@ -624,7 +624,7 @@ static size_t virtio_balloon_config_size(VirtIOBalloon *s)
-     if (virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-         return offsetof(struct virtio_balloon_config, poison_val);
-     }
--    return offsetof(struct virtio_balloon_config, free_page_report_cmd_id);
-+    return offsetof(struct virtio_balloon_config, free_page_hint_cmd_id);
- }
- 
- static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
-@@ -635,14 +635,14 @@ static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
-     config.num_pages = cpu_to_le32(dev->num_pages);
-     config.actual = cpu_to_le32(dev->actual);
- 
--    if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED) {
--        config.free_page_report_cmd_id =
--                       cpu_to_le32(dev->free_page_report_cmd_id);
--    } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_STOP) {
--        config.free_page_report_cmd_id =
-+    if (dev->free_page_hint_status == FREE_PAGE_HINT_S_REQUESTED) {
-+        config.free_page_hint_cmd_id =
-+                       cpu_to_le32(dev->free_page_hint_cmd_id);
-+    } else if (dev->free_page_hint_status == FREE_PAGE_HINT_S_STOP) {
-+        config.free_page_hint_cmd_id =
-                        cpu_to_le32(VIRTIO_BALLOON_CMD_ID_STOP);
--    } else if (dev->free_page_report_status == FREE_PAGE_REPORT_S_DONE) {
--        config.free_page_report_cmd_id =
-+    } else if (dev->free_page_hint_status == FREE_PAGE_HINT_S_DONE) {
-+        config.free_page_hint_cmd_id =
-                        cpu_to_le32(VIRTIO_BALLOON_CMD_ID_DONE);
-     }
- 
-@@ -743,14 +743,14 @@ static int virtio_balloon_post_load_device(void *opaque, int version_id)
-     return 0;
- }
- 
--static const VMStateDescription vmstate_virtio_balloon_free_page_report = {
-+static const VMStateDescription vmstate_virtio_balloon_free_page_hint = {
-     .name = "virtio-balloon-device/free-page-report",
-     .version_id = 1,
-     .minimum_version_id = 1,
-     .needed = virtio_balloon_free_page_support,
-     .fields = (VMStateField[]) {
--        VMSTATE_UINT32(free_page_report_cmd_id, VirtIOBalloon),
--        VMSTATE_UINT32(free_page_report_status, VirtIOBalloon),
-+        VMSTATE_UINT32(free_page_hint_cmd_id, VirtIOBalloon),
-+        VMSTATE_UINT32(free_page_hint_status, VirtIOBalloon),
-         VMSTATE_END_OF_LIST()
-     }
- };
-@@ -766,7 +766,7 @@ static const VMStateDescription vmstate_virtio_balloon_device = {
-         VMSTATE_END_OF_LIST()
-     },
-     .subsections = (const VMStateDescription * []) {
--        &vmstate_virtio_balloon_free_page_report,
-+        &vmstate_virtio_balloon_free_page_hint,
-         NULL
-     }
- };
-@@ -797,12 +797,12 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
-                            VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-         s->free_page_vq = virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE,
-                                            virtio_balloon_handle_free_page_vq);
--        s->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
--        s->free_page_report_cmd_id =
--                           VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN;
--        s->free_page_report_notify.notify =
--                                       virtio_balloon_free_page_report_notify;
--        precopy_add_notifier(&s->free_page_report_notify);
-+        s->free_page_hint_status = FREE_PAGE_HINT_S_STOP;
-+        s->free_page_hint_cmd_id =
-+                           VIRTIO_BALLOON_FREE_PAGE_HINT_CMD_ID_MIN;
-+        s->free_page_hint_notify.notify =
-+                                       virtio_balloon_free_page_hint_notify;
-+        precopy_add_notifier(&s->free_page_hint_notify);
-         if (s->iothread) {
-             object_ref(OBJECT(s->iothread));
-             s->free_page_bh = aio_bh_new(iothread_get_aio_context(s->iothread),
-@@ -827,7 +827,7 @@ static void virtio_balloon_device_unrealize(DeviceState *dev, Error **errp)
-     if (virtio_balloon_free_page_support(s)) {
-         qemu_bh_delete(s->free_page_bh);
-         virtio_balloon_free_page_stop(s);
--        precopy_remove_notifier(&s->free_page_report_notify);
-+        precopy_remove_notifier(&s->free_page_hint_notify);
-     }
-     balloon_stats_destroy_timer(s);
-     qemu_remove_balloon_handler(s);
-diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
-index d1c968d2376e..108cff97e71a 100644
---- a/include/hw/virtio/virtio-balloon.h
-+++ b/include/hw/virtio/virtio-balloon.h
-@@ -23,7 +23,7 @@
- #define VIRTIO_BALLOON(obj) \
-         OBJECT_CHECK(VirtIOBalloon, (obj), TYPE_VIRTIO_BALLOON)
- 
--#define VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN 0x80000000
-+#define VIRTIO_BALLOON_FREE_PAGE_HINT_CMD_ID_MIN 0x80000000
- 
- typedef struct virtio_balloon_stat VirtIOBalloonStat;
- 
-@@ -33,20 +33,20 @@ typedef struct virtio_balloon_stat_modern {
-        uint64_t val;
- } VirtIOBalloonStatModern;
- 
--enum virtio_balloon_free_page_report_status {
--    FREE_PAGE_REPORT_S_STOP = 0,
--    FREE_PAGE_REPORT_S_REQUESTED = 1,
--    FREE_PAGE_REPORT_S_START = 2,
--    FREE_PAGE_REPORT_S_DONE = 3,
-+enum virtio_balloon_free_page_hint_status {
-+    FREE_PAGE_HINT_S_STOP = 0,
-+    FREE_PAGE_HINT_S_REQUESTED = 1,
-+    FREE_PAGE_HINT_S_START = 2,
-+    FREE_PAGE_HINT_S_DONE = 3,
- };
- 
- typedef struct VirtIOBalloon {
-     VirtIODevice parent_obj;
-     VirtQueue *ivq, *dvq, *svq, *free_page_vq;
--    uint32_t free_page_report_status;
-+    uint32_t free_page_hint_status;
-     uint32_t num_pages;
-     uint32_t actual;
--    uint32_t free_page_report_cmd_id;
-+    uint32_t free_page_hint_cmd_id;
-     uint64_t stats[VIRTIO_BALLOON_S_NR];
-     VirtQueueElement *stats_vq_elem;
-     size_t stats_vq_offset;
-@@ -55,7 +55,7 @@ typedef struct VirtIOBalloon {
-     QEMUBH *free_page_bh;
-     /*
-      * Lock to synchronize threads to access the free page reporting related
--     * fields (e.g. free_page_report_status).
-+     * fields (e.g. free_page_hint_status).
-      */
-     QemuMutex free_page_lock;
-     QemuCond  free_page_cond;
-@@ -64,7 +64,7 @@ typedef struct VirtIOBalloon {
-      * stopped.
-      */
-     bool block_iothread;
--    NotifierWithReturn free_page_report_notify;
-+    NotifierWithReturn free_page_hint_notify;
-     int64_t stats_last_update;
-     int64_t stats_poll_interval;
-     uint32_t host_features;
+These patches are introduced together for two main reasons:
+    - els allows diag318 to exist while retaining the original 248 
+        VCPU max
+    - diag318 is presented to show how els is useful
+
+Full els support is dependant on the Linux kernel, which must react
+to the SCLP response code and set an appropriate-length SCCB. 
+
+A user should take care when tuning the CPU model for a VM.
+If a user defines a VM with els support and specifies 248 CPUs, but
+the guest Linux kernel cannot react to the SCLP response code, then
+the guest will crash immediately upon kernel startup.
+
+Since it has been some time since the last review and a few things
+have changed, I've removed all ack's and set this submission to v1.
+
+Collin L. Walling (8):
+  s390/sclp: remove SCLPDevice param from prepare_cpu_entries
+  s390/sclp: check sccb len before filling in data
+  s390/sclp: rework sclp boundary and length checks
+  s390/sclp: read sccb from mem based on sccb length
+  s390/sclp: use cpu offset to locate cpu entries
+  s390/sclp: add extended-length sccb support for kvm guest
+  s390/kvm: header sync for diag318
+  s390: diagnose 318 info reset and migration support
+
+ hw/s390x/s390-virtio-ccw.c          |  45 +++++++++++++
+ hw/s390x/sclp.c                     | 101 +++++++++++++++++++++-------
+ include/hw/s390x/s390-virtio-ccw.h  |   1 +
+ include/hw/s390x/sclp.h             |   4 ++
+ linux-headers/asm-s390/kvm.h        |   5 ++
+ smp.max_cpus                        |   0
+ target/s390x/cpu.c                  |  19 ++++++
+ target/s390x/cpu.h                  |   4 ++
+ target/s390x/cpu_features.h         |   1 +
+ target/s390x/cpu_features_def.inc.h |   4 ++
+ target/s390x/cpu_models.c           |   1 +
+ target/s390x/gen-features.c         |   2 +
+ target/s390x/kvm-stub.c             |  10 +++
+ target/s390x/kvm.c                  |  52 ++++++++++++++
+ target/s390x/kvm_s390x.h            |   3 +
+ 15 files changed, 229 insertions(+), 23 deletions(-)
+ create mode 100644 smp.max_cpus
+
+-- 
+2.21.1
 
 
