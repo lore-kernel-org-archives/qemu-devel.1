@@ -1,87 +1,90 @@
 Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+X-Spam-Level: 
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 239C5C38A2A
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 13:06:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12DFBC47247
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 13:06:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E88FC24970
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 13:06:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D67BC24969
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 13:06:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="IUInBYh7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E88FC24970
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SfOLxMtd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D67BC24969
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX2hW-0002dz-2A
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 09:06:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54318)
+	id 1jX2hi-00034O-0x
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 09:06:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50942)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yuri.benditovich@daynix.com>)
- id 1jX2Yi-0002MT-8k
- for qemu-devel@nongnu.org; Fri, 08 May 2020 08:56:56 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:43008)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <yuri.benditovich@daynix.com>)
- id 1jX2Yh-00089g-7h
- for qemu-devel@nongnu.org; Fri, 08 May 2020 08:56:55 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id o198so866397ybg.10
- for <qemu-devel@nongnu.org>; Fri, 08 May 2020 05:56:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=yawplcW+s6eTVKC/zWKsoN6KA2rF31bdzEEW/HgGGac=;
- b=IUInBYh76Q54mYfArJG3VoyNFXlZ2uUWKhnBJ5ynLRwgyAzPfZ8HiFPeKQp49qwEVh
- vYN5EXqf6wirszmOkD3iCOeaI40Ue9O6f/FihrM5ExbPwr2Pcml1DgjEhRbwSoQhVOkf
- 9Mk0AN0/PxB9jBABQiZRIS3tBUUMcnxrI3icYDME79rx5ekJn8c4yxcenhUf3VNnl+QW
- WjOUsEVzne10Wddjb3OAPOnmhYJMOxKGfmjxmiNagDZEa+88L6t6gPWc+wsFXH0PdB0x
- Hyh0A5I3gsNJ/gm5e71JiMfAqzlk8y0vsLjNZz2cVj5equ7y7OC2/x1+btomwbTCCfjf
- 6pIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=yawplcW+s6eTVKC/zWKsoN6KA2rF31bdzEEW/HgGGac=;
- b=YBXmzr9RZzv4HYdhEX4q6CJ4QXG5Y8kGgETyyvuC/KrLg++Bh3fyJ8znjJrd2TtHos
- rK1J+aCMMfKOfKDBIHfwl/HGtcOo4cU3A3r7sCCdEIkoYvwLhIIJETMUQ/Iu6MryUcCI
- hCDA4RQMt52ln50XW2FZRmpAa1H+yJQ+BcmOn4kbS+bfsRzCE0SUA0JXYbSj5mPx+u5G
- 2hLOc0b8sFXsWmwFYP7sTT/i3vgcdeVz/X0k1NAx4ZrtXx3V8eMQZX8gQr7wrJaNP63Z
- fjLwcLRx/91oSeWCPU+/mY5sRYBRHAqe7SsCtnOWtvrk3u79RuRYTKuBXFgaJGegLMSW
- O7Pw==
-X-Gm-Message-State: AGi0PuYzbQ7R3qh54CfHQPmk6NmpJJ0shh9h4mwuf2DKbqn9cCB+o7d6
- VC/f/hvLuVIc//cGnsUh7ORsNJvLrqUdinMinwqVJL/0v6g=
-X-Google-Smtp-Source: APiQypKxxEd1TGBRwSCDhZNf082yNPNfFXZFbv2vI/UNFGTTUyusYAtHqa1ZGphjjFekvadl2Gga7GrrG1MzCKYMsbA=
-X-Received: by 2002:a25:3a03:: with SMTP id h3mr4467883yba.265.1588942613672; 
- Fri, 08 May 2020 05:56:53 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jX2PX-0001Ft-MT
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 08:47:28 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29004
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jX2PR-0001XY-NA
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 08:47:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588942040;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=fsnozb6kIQGYwomOyBKftMgcGklRNkmQU34LmQ0rQgU=;
+ b=SfOLxMtdXmgGzdvsjglMWBv6LvsfWkuqYSTFU0S7UUeod9yianCmFpbt22Ldh9gefBd/AV
+ nZrazawrPwp0YQZq04JYtEMDzU0ofDX/vaOzWiwwDIuAephuHrsdf/54Me+aTjeXvffehr
+ VjFudQC+cZ8C3epxhiJ0IM5rDl4TnJA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-381-xHC9BoC8MPSLoyVaICWZKA-1; Fri, 08 May 2020 08:47:17 -0400
+X-MC-Unique: xHC9BoC8MPSLoyVaICWZKA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 541CB107ACF2;
+ Fri,  8 May 2020 12:47:13 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 60BF76ACF1;
+ Fri,  8 May 2020 12:47:06 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id D67E811358BC; Fri,  8 May 2020 14:47:04 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v2 3/3] hw: Remove unnecessary DEVICE() cast
+References: <20200504100735.10269-1-f4bug@amsat.org>
+ <20200504100735.10269-4-f4bug@amsat.org>
+Date: Fri, 08 May 2020 14:47:04 +0200
+In-Reply-To: <20200504100735.10269-4-f4bug@amsat.org> ("Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 4 May 2020 12:07:35
+ +0200")
+Message-ID: <87r1vuy4on.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-References: <20200508125452.7802-1-yuri.benditovich@daynix.com>
-In-Reply-To: <20200508125452.7802-1-yuri.benditovich@daynix.com>
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-Date: Fri, 8 May 2020 15:56:41 +0300
-Message-ID: <CAOEp5OcvTsw-pqMKoK-5K0NRS_bt7P2MRr_pJiSH0cHNvdp9ww@mail.gmail.com>
-Subject: Re: [PATCH 0/7] reference implementation of RSS and hash report
-To: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, 
- quintela@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000000e8aea05a5228872"
-Received-SPF: none client-ip=2607:f8b0:4864:20::b41;
- envelope-from=yuri.benditovich@daynix.com; helo=mail-yb1-xb41.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 01:34:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,99 +97,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yan Vugenfirer <yan@daynix.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paul Durrant <paul@xen.org>,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, qemu-block@nongnu.org,
+ David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Joel Stanley <joel@jms.id.au>, Anthony Perard <anthony.perard@citrix.com>,
+ xen-devel@lists.xenproject.org, David Gibson <david@gibson.dropbear.id.au>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>,
+ =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>,
+ "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ Andrew Jeffery <andrew@aj.id.au>, Cornelia Huck <cohuck@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000000e8aea05a5228872
-Content-Type: text/plain; charset="UTF-8"
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-Please ignore mistaken v7 instead of v8
+> The DEVICE() macro is defined as:
+>
+>   #define DEVICE(obj) OBJECT_CHECK(DeviceState, (obj), TYPE_DEVICE)
+>
+> which expands to:
+>
+>   ((DeviceState *)object_dynamic_cast_assert((Object *)(obj), (name),
+>                                              __FILE__, __LINE__,
+>                                              __func__))
+>
+> This assertion can only fail when @obj points to something other
+> than its stated type, i.e. when we're in undefined behavior country.
+>
+> Remove the unnecessary DEVICE() casts when we already know the
+> pointer is of DeviceState type.
+>
+> Patch created mechanically using spatch with this script:
+>
+>   @@
+>   typedef DeviceState;
+>   DeviceState *s;
+>   @@
+>   -   DEVICE(s)
+>   +   s
+>
+> Acked-by: David Gibson <david@gibson.dropbear.id.au>
+> Acked-by: Paul Durrant <paul@xen.org>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Acked-by: John Snow <jsnow@redhat.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-On Fri, May 8, 2020 at 3:54 PM Yuri Benditovich <yuri.benditovich@daynix.com>
-wrote:
+Lovely.
 
-> Support for VIRTIO_NET_F_RSS and VIRTIO_NET_F_HASH_REPORT
-> features in QEMU for reference purpose.
-> Implements Toeplitz hash calculation for incoming
-> packets according to configuration provided by driver.
-> Uses calculated hash for decision on receive virtqueue
-> and/or reports the hash in the virtio header
->
-> Changes from v7:
-> Patch 7.1: removed (RSS and hash report definitions)
-> Patch 7.2: delete configuration struct with RSS definitions
-> Patch 7.4: delete duplicated packet structure
-> Added patch 7 - adapt RSC definitions to updated header
->
-> Yuri Benditovich (7):
->   virtio-net: implement RSS configuration command
->   virtio-net: implement RX RSS processing
->   tap: allow extended virtio header with hash info
->   virtio-net: reference implementation of hash report
->   vmstate.h: provide VMSTATE_VARRAY_UINT16_ALLOC macro
->   virtio-net: add migration support for RSS and hash report
->   virtio-net: align RSC fields with updated virtio-net header
->
->  hw/net/trace-events            |   3 +
->  hw/net/virtio-net.c            | 387 +++++++++++++++++++++++++++++----
->  include/hw/virtio/virtio-net.h |  16 ++
->  include/migration/vmstate.h    |  10 +
->  net/tap.c                      |   3 +-
->  5 files changed, 379 insertions(+), 40 deletions(-)
->
-> --
-> 2.17.1
->
->
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
---0000000000000e8aea05a5228872
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Now repeat this exercise for each QOM type cast macro :)
 
-<div dir=3D"ltr">Please ignore mistaken v7 instead of v8</div><br><div clas=
-s=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Fri, May 8, 2020=
- at 3:54 PM Yuri Benditovich &lt;<a href=3D"mailto:yuri.benditovich@daynix.=
-com">yuri.benditovich@daynix.com</a>&gt; wrote:<br></div><blockquote class=
-=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rg=
-b(204,204,204);padding-left:1ex">Support for VIRTIO_NET_F_RSS and VIRTIO_NE=
-T_F_HASH_REPORT<br>
-features in QEMU for reference purpose.<br>
-Implements Toeplitz hash calculation for incoming<br>
-packets according to configuration provided by driver.<br>
-Uses calculated hash for decision on receive virtqueue<br>
-and/or reports the hash in the virtio header<br>
-<br>
-Changes from v7:<br>
-Patch 7.1: removed (RSS and hash report definitions)<br>
-Patch 7.2: delete configuration struct with RSS definitions<br>
-Patch 7.4: delete duplicated packet structure<br>
-Added patch 7 - adapt RSC definitions to updated header<br>
-<br>
-Yuri Benditovich (7):<br>
-=C2=A0 virtio-net: implement RSS configuration command<br>
-=C2=A0 virtio-net: implement RX RSS processing<br>
-=C2=A0 tap: allow extended virtio header with hash info<br>
-=C2=A0 virtio-net: reference implementation of hash report<br>
-=C2=A0 vmstate.h: provide VMSTATE_VARRAY_UINT16_ALLOC macro<br>
-=C2=A0 virtio-net: add migration support for RSS and hash report<br>
-=C2=A0 virtio-net: align RSC fields with updated virtio-net header<br>
-<br>
-=C2=A0hw/net/trace-events=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =
-=C2=A03 +<br>
-=C2=A0hw/net/virtio-net.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 387 ++=
-+++++++++++++++++++++++++++----<br>
-=C2=A0include/hw/virtio/virtio-net.h |=C2=A0 16 ++<br>
-=C2=A0include/migration/vmstate.h=C2=A0 =C2=A0 |=C2=A0 10 +<br>
-=C2=A0net/tap.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A03 +-<br>
-=C2=A05 files changed, 379 insertions(+), 40 deletions(-)<br>
-<br>
--- <br>
-2.17.1<br>
-<br>
-</blockquote></div>
-
---0000000000000e8aea05a5228872--
 
