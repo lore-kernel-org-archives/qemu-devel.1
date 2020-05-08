@@ -2,102 +2,89 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 093CDC38A2A
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 20:17:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A2C8C38A2A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 20:22:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4251206D3
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 20:17:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wvg8mDQr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4251206D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 06B40206D3
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 20:22:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06B40206D3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX9Qf-0002W3-PZ
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 16:17:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38072)
+	id 1jX9VY-0005DM-3i
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 16:22:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43972)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jX9Pk-0001tA-2q
- for qemu-devel@nongnu.org; Fri, 08 May 2020 16:16:08 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:38486)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jX9Um-0004MP-0M
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 16:21:20 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51704)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jX9Ph-0001mI-LM
- for qemu-devel@nongnu.org; Fri, 08 May 2020 16:16:07 -0400
-Received: by mail-pf1-x442.google.com with SMTP id y25so1515687pfn.5
- for <qemu-devel@nongnu.org>; Fri, 08 May 2020 13:16:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=bIGHQvRQq5Gcv5I5cSvS3nAGK5+TSbCAkAa1j8XYBxI=;
- b=wvg8mDQr5bzooh6M09TPXQrc93AXvGSxc9D9Nu0MD/jZYpFMrIqXisXDU5H3IGOqjc
- J7a1ZXUfMEHpuVZb49KHOiOAE6SZPn2w31KMk02CG2f17l6ty1mqQUYx0MwIEFNC4625
- SDbxp7U38dlLtjToKfqwBjVA2YLc/ytQgQpCCixZJr79wI8ipcjUUdk6cdTlAVgub+p3
- cPBFgLlvlqyzVC5xHIDIYEXD4C5fT3fyxNck/jqn+Rt1P7RQcoKSkoI/E63yzycOil8m
- i0Z9P8lJyU4t+uVZKZkdwv86hsf2wzbRaGKQn+6a+ZfLWIj1YybOnbFXpZfSaqM93+Uf
- z90Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=bIGHQvRQq5Gcv5I5cSvS3nAGK5+TSbCAkAa1j8XYBxI=;
- b=ZvBHY024FbX3p7tAM/ZVQOy0vCQQV7qLRuVtY0Ao2RDutZSMVXVvWZpfwpXdvWdQvU
- QIuPEfQ1N3kEwYboL8H+8VI5I7a41djolF+gZ7ZE9bjURwWd2FJir3BaHs9yKbCnT7nd
- Ew8si2AJToK1r9SlW2nKzsOvUNdQPG8xSGpCPeD86Rwxau99qmuqqVQQgd7JU5wfYUMS
- dTH7leLHhINfMVrJYxYlVvwrg+bbFdbTNnr1paGMiWLjf6YGYoEnBSSaWtyMLT1CxTbV
- EfpcCWrDANZQ0DO2uIDMob1QzKdY2mrqN3j02pagiBjhtYmm5fuULHLBp6gjIaxvXU9+
- smDQ==
-X-Gm-Message-State: AGi0PubP2rumCe+dI7QgqjkXGHY9AY9LWFE/OT3SE+DUxgamIgjkhKFs
- nnIhe1yt77ykc4KaawUtkjCQ6A==
-X-Google-Smtp-Source: APiQypIzQnLEmL1C4XM+91e5mZ9+aDpOxWzzn6bG46g6xeMsdGeh0gwzo5CFet0vz1ALXVJws0RJ4Q==
-X-Received: by 2002:a62:3287:: with SMTP id y129mr4771046pfy.167.1588968963932; 
- Fri, 08 May 2020 13:16:03 -0700 (PDT)
-Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id a15sm3067236pju.3.2020.05.08.13.16.02
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 08 May 2020 13:16:03 -0700 (PDT)
-Subject: Re: [PATCH 1/4] memory: Rename memory_region_do_writeback ->
- memory_region_writeback
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200508062456.23344-1-philmd@redhat.com>
- <20200508062456.23344-2-philmd@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <df18d27a-7a87-32f7-fe62-115be72a08a5@linaro.org>
-Date: Fri, 8 May 2020 13:16:00 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jX9UY-0008Ov-JP
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 16:21:19 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jX9UV-0001Ur-8r
+ for <qemu-devel@nongnu.org>; Fri, 08 May 2020 20:21:03 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 3A95B2E8106
+ for <qemu-devel@nongnu.org>; Fri,  8 May 2020 20:21:03 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200508062456.23344-2-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 08 May 2020 20:11:34 -0000
+From: Bug Watch Updater <1868116@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Triaged; importance=High; assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=vte2.91; component=main;
+ status=Fix Released; importance=Critical;
+ assignee=ubuntu-desktop@lists.ubuntu.com; 
+X-Launchpad-Bug: distribution=debian; sourcepackage=qemu; component=main;
+ status=Fix Released; importance=Unknown; assignee=None; 
+X-Launchpad-Bug-Tags: amd64 apport-bug champagne focal rls-ee-incoming
+ server-next
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dgilbert-h egmont-gmail furretuber janitor paelzer
+ seb128
+X-Launchpad-Bug-Reporter: FurretUber (furretuber)
+X-Launchpad-Bug-Modifier: Bug Watch Updater (bug-watch-updater)
+References: <158463145822.18899.10972607578883935283.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158896869609.19435.17299314575032506261.launchpad@loganberry.canonical.com>
+Subject: [Bug 1868116] Re: QEMU monitor no longer works
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: e67c4fd54184232ca0ebb495653c281b02ecee7f
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 16:21:04
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -15
+X-Spam_score: -1.6
+X-Spam_bar: -
+X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_MSPIKE_H3=0.001,
+ RCVD_IN_MSPIKE_WL=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -106,28 +93,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Beata Michalska <beata.michalska@linaro.org>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>, qemu-arm@nongnu.org,
- Keith Busch <kbusch@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1868116 <1868116@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/7/20 11:24 PM, Philippe Mathieu-Daudé wrote:
-> We usually use '_do_' for internal functions. Rename
-> memory_region_do_writeback() as memory_region_writeback().
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  include/exec/memory.h | 4 ++--
->  memory.c              | 2 +-
->  target/arm/helper.c   | 2 +-
->  3 files changed, 4 insertions(+), 4 deletions(-)
+** Changed in: qemu (Debian)
+       Status: New =3D> Fix Released
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1868116
 
-r~
+Title:
+  QEMU monitor no longer works
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Triaged
+Status in vte2.91 package in Ubuntu:
+  Fix Released
+Status in qemu package in Debian:
+  Fix Released
+
+Bug description:
+  Repro:
+  VTE
+  $ meson _build && ninja -C _build && ninja -C _build install
+
+  qemu:
+  $ ../configure --python=3D/usr/bin/python3 --disable-werror --disable-use=
+r --disable-linux-user --disable-docs --disable-guest-agent --disable-sdl -=
+-enable-gtk --disable-vnc --disable-xen --disable-brlapi --disable-fdt --di=
+sable-hax --disable-vde --disable-netmap --disable-rbd --disable-libiscsi -=
+-disable-libnfs --disable-smartcard --disable-libusb --disable-usb-redir --=
+disable-seccomp --disable-glusterfs --disable-tpm --disable-numa --disable-=
+opengl --disable-virglrenderer --disable-xfsctl --disable-vxhs --disable-sl=
+irp --disable-blobs --target-list=3Dx86_64-softmmu --disable-rdma --disable=
+-pvrdma --disable-attr --disable-vhost-net --disable-vhost-vsock --disable-=
+vhost-scsi --disable-vhost-crypto --disable-vhost-user --disable-spice --di=
+sable-qom-cast-debug --disable-vxhs --disable-bochs --disable-cloop --disab=
+le-dmg --disable-qcow1 --disable-vdi --disable-vvfat --disable-qed --disabl=
+e-parallels --disable-sheepdog --disable-avx2 --disable-nettle --disable-gn=
+utls --disable-capstone --disable-tools --disable-libpmem --disable-iconv -=
+-disable-cap-ng
+  $ make
+
+  Test:
+  $ LD_LIBRARY_PATH=3D/usr/local/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH ./b=
+uild/x86_64-softmmu/qemu-system-x86_64 -enable-kvm --drive media=3Dcdrom,fi=
+le=3Dhttp://archive.ubuntu.com/ubuntu/dists/bionic/main/installer-amd64/cur=
+rent/images/netboot/mini.iso
+  - switch to monitor with CTRL+ALT+2
+  - try to enter something
+
+  Affects head of both usptream git repos.
+
+  =
+
+  --- original bug ---
+
+  It was observed that the QEMU console (normally accessible using
+  Ctrl+Alt+2) accepts no input, so it can't be used. This is being
+  problematic because there are cases where it's required to send
+  commands to the guest, or key combinations that the host would grab
+  (as Ctrl-Alt-F1 or Alt-F4).
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 20.04
+  Package: qemu 1:4.2-3ubuntu2
+  Uname: Linux 5.6.0-rc6+ x86_64
+  ApportVersion: 2.20.11-0ubuntu20
+  Architecture: amd64
+  CurrentDesktop: XFCE
+  Date: Thu Mar 19 12:16:31 2020
+  Dependencies:
+
+  InstallationDate: Installed on 2017-06-13 (1009 days ago)
+  InstallationMedia: Xubuntu 17.04 "Zesty Zapus" - Release amd64 (20170412)
+  KvmCmdLine:
+  =C2=A0COMMAND         STAT  EUID  RUID     PID    PPID %CPU COMMAND
+  =C2=A0qemu-system-x86 Sl+   1000  1000   34275   25235 29.2 qemu-system-x=
+86_64 -m 4G -cpu Skylake-Client -device virtio-vga,virgl=3Dtrue,xres=3D1280=
+,yres=3D720 -accel kvm -device nec-usb-xhci -serial vc -serial stdio -hda /=
+home/usuario/Sistemas/androidx86.img -display gtk,gl=3Don -device usb-audio
+  =C2=A0kvm-nx-lpage-re S        0     0   34284       2  0.0 [kvm-nx-lpage=
+-re]
+  =C2=A0kvm-pit/34275   S        0     0   34286       2  0.0 [kvm-pit/3427=
+5]
+  MachineType: LENOVO 80UG
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-5.6.0-rc6+ root=3DUUID=3D6b=
+4ae5c0-c78c-49a6-a1ba-029192618a7a ro quiet ro kvm.ignore_msrs=3D1 kvm.repo=
+rt_ignored_msrs=3D0 kvm.halt_poll_ns=3D0 kvm.halt_poll_ns_grow=3D0 i915.ena=
+ble_gvt=3D1 i915.fastboot=3D1 cgroup_enable=3Dmemory swapaccount=3D1 zswap.=
+enabled=3D1 zswap.zpool=3Dz3fold resume=3DUUID=3Da82e38a0-8d20-49dd-9cbd-de=
+7216b589fc log_buf_len=3D16M usbhid.quirks=3D0x0079:0x0006:0x100000 config_=
+scsi_mq_default=3Dy scsi_mod.use_blk_mq=3D1 mtrr_gran_size=3D64M mtrr_chunk=
+_size=3D64M nbd.nbds_max=3D2 nbd.max_part=3D63
+  SourcePackage: qemu
+  UpgradeStatus: Upgraded to focal on 2019-12-22 (87 days ago)
+  dmi.bios.date: 08/09/2018
+  dmi.bios.vendor: LENOVO
+  dmi.bios.version: 0XCN45WW
+  dmi.board.asset.tag: NO Asset Tag
+  dmi.board.name: Toronto 4A2
+  dmi.board.vendor: LENOVO
+  dmi.board.version: SDK0J40679 WIN
+  dmi.chassis.asset.tag: NO Asset Tag
+  dmi.chassis.type: 10
+  dmi.chassis.vendor: LENOVO
+  dmi.chassis.version: Lenovo ideapad 310-14ISK
+  dmi.modalias: dmi:bvnLENOVO:bvr0XCN45WW:bd08/09/2018:svnLENOVO:pn80UG:pvr=
+Lenovoideapad310-14ISK:rvnLENOVO:rnToronto4A2:rvrSDK0J40679WIN:cvnLENOVO:ct=
+10:cvrLenovoideapad310-14ISK:
+  dmi.product.family: IDEAPAD
+  dmi.product.name: 80UG
+  dmi.product.sku: LENOVO_MT_80UG_BU_idea_FM_Lenovo ideapad 310-14ISK
+  dmi.product.version: Lenovo ideapad 310-14ISK
+  dmi.sys.vendor: LENOVO
+  mtime.conffile..etc.apport.crashdb.conf: 2019-08-29T08:39:36.787240
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1868116/+subscriptions
 
