@@ -2,87 +2,107 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45197C38A2A
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 16:15:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34A74C4724C
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 16:16:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FA3F24953
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 16:15:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 03F622184D
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 16:16:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W13vPOhX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FA3F24953
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vq30TD1U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03F622184D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX5eS-0007Oj-Gw
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 12:15:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49762)
+	id 1jX5g0-0001fJ-2w
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 12:16:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49276)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jX5dO-0006KJ-WD
- for qemu-devel@nongnu.org; Fri, 08 May 2020 12:13:59 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:37695)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jX5dN-0005h0-VI
- for qemu-devel@nongnu.org; Fri, 08 May 2020 12:13:58 -0400
-Received: by mail-ot1-x342.google.com with SMTP id z17so1876385oto.4
- for <qemu-devel@nongnu.org>; Fri, 08 May 2020 09:13:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=uMvtjqSIi+SfgqGsC3I/HVWEec++sM2K49vmzGtQBS4=;
- b=W13vPOhXjrigXDZUJ2BBhCqXbrcXja79CUJGUjNQLcfAR9dZUeAFXlGrugE0purg+p
- McFp2i3rzK0efkk9y7+FC8mC7YLi/CUp2L33/mS5GbtVO+WJ8gHFHhhOSrcAc8Z3ou9F
- 0Mu+ZqTTJH0PimZgigUDO8glWa3bMiNwZGOB+EXP2tMeS80ntORxQtuxVyDgPlVgVCcn
- Tw5Aii8x0X6Clw/J7Fbh6DgGk2+iCfhkUAF0uUNgkA8BbcPR0q1FuuJJq6iFPNqFneJ3
- Ow2g6bBPbgHd/0xCMZ8Dfzgx5iFT6RrlrA8XoywSTc9XZhqPT9Ucd3D5cORW+GhpNIwG
- YvOQ==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jX5cD-0004gU-5z
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 12:12:45 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54968
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jX5cA-0002EW-KJ
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 12:12:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588954361;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=pZyv5rx/E9/BAfTRG5gFWFzRN8AyQLrLXzppU17ZMro=;
+ b=Vq30TD1UgVFST7N2C2qWiDGUU67VrHw89W1VoSycsnMwPKk2az4XNSLtUcvtg87sYRslDF
+ 3zvl7MVtVa8H8YnczHSaVJue0mES/UYb8bzYmg3LVBMSv37/78gKwZvWjzGF8lc6ESQ5fC
+ e+E4Y3pMLbN/4mdc6IdvEs8aS9k+Xis=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-438-GKHlttkjPwmielLc63fBcg-1; Fri, 08 May 2020 12:12:38 -0400
+X-MC-Unique: GKHlttkjPwmielLc63fBcg-1
+Received: by mail-wm1-f70.google.com with SMTP id d134so5533744wmd.0
+ for <qemu-devel@nongnu.org>; Fri, 08 May 2020 09:12:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=uMvtjqSIi+SfgqGsC3I/HVWEec++sM2K49vmzGtQBS4=;
- b=ZAwHk84vv/uAtN9ddx/2YdsIMmKSDkni0gyhYF+2MoHWFLNNJh/R3Y2sOiKu5QTBlV
- 7zX/KSVOlvJ4OCm+bNCpVfMDfl0PEkYHs8UeJkxyHNe4KCmSvDn0/c2hJ6XAr305gY2W
- y5vc5fXOVu6aZ+WCt6+LkIJRkhDpjQ5tU7Agw656xlUuUjqyh8HPDALDDadFY05/j0NI
- S9H8H5C4IPqgdVDAqr0da0uNYaSrsDgN3/V0203DejMok71sBEHnHR7LPgRC8Th8/tkb
- OuwRnk6qYseHgg4WKlKXh3agIBwoWOGq0Q+MpRTsr+XibRBvizYU5TB+Gzv18rXJF3Ig
- fGZA==
-X-Gm-Message-State: AGi0PubRFUxYjJIVEsAI16Oul9WVRsRI+5cChHE8xsjrnCxrcLc2Rkie
- S2doh1lRxc5dVPd834SAkQRnnuGA4mX1w52oGzTujA==
-X-Google-Smtp-Source: APiQypL6nljNnOEPHLWbJy8AUBJvT3VanHlkiPEm2UxW1svuC/wEmv1deiKU2JECn54PnvYIMB3gQwWNJSoNGKzbM/U=
-X-Received: by 2002:a05:6830:22dc:: with SMTP id
- q28mr2681748otc.221.1588954436651; 
- Fri, 08 May 2020 09:13:56 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=pZyv5rx/E9/BAfTRG5gFWFzRN8AyQLrLXzppU17ZMro=;
+ b=gR4TqhU7L43FfxFMDLtk6F3L9+jzpgFEg23ack9jJz+x6fO47jvxyaxp6wtp1Rdn8a
+ Xs19gA8Fd9TNNZvyTLtCCz2qZuk9/3ydEHeGU8V9SgSdz1+K73D+mEpFFGNGhDAUOtpU
+ 1fk4M2STs5VfSeVEO6jBMo159Dp+21byzhsoTN74nv4Nycvaxe8EE3SGeOFCqFl2INlT
+ 9VASgntID7d5K+MZcg/SQFd2orXav+AnntD/HyaCNt1nIuxJIiKssPFCvJVd+pJdIsuE
+ QZCE20Y9fTlXE0dqlmfLUpjyJilO/K1+LP+lHpQCm2g3V9qgBOSHwA4vDb2UjfQsa9aQ
+ N+og==
+X-Gm-Message-State: AGi0Pub22yQp6jDblZrFa8SP3/sZaeaOFuJn5uo0nxPPq05O9srAxHVX
+ CtKIlrnKGL/77YSsMyAw32pHwUfxAFytIeoXHah5T/8WIb/2IuVCgPGCToiOWqe5ig03AduT6jH
+ 3pWfptud6IcHkubM=
+X-Received: by 2002:adf:afdb:: with SMTP id y27mr3562786wrd.323.1588954357002; 
+ Fri, 08 May 2020 09:12:37 -0700 (PDT)
+X-Google-Smtp-Source: APiQypISir3fWeW5ELncrsbWF+mfvfl4OVsQh+su9SHqfN/m1IyMe8uWjGMp04P3rFA63RHt9+glgw==
+X-Received: by 2002:adf:afdb:: with SMTP id y27mr3562765wrd.323.1588954356810; 
+ Fri, 08 May 2020 09:12:36 -0700 (PDT)
+Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id a187sm13903904wmh.40.2020.05.08.09.12.35
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 08 May 2020 09:12:36 -0700 (PDT)
+Subject: Re: [PATCH] cpus: Fix botched configure_icount() error API violation
+ fix
+To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200508104933.19051-1-armbru@redhat.com>
+ <85ab3d39-0916-3637-6568-70166436e7f8@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <6f13227c-3575-319a-6722-c48584c2c516@redhat.com>
+Date: Fri, 8 May 2020 18:12:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200508154359.7494-1-richard.henderson@linaro.org>
- <20200508154359.7494-5-richard.henderson@linaro.org>
-In-Reply-To: <20200508154359.7494-5-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 8 May 2020 17:13:45 +0100
-Message-ID: <CAFEAcA-9bd11QTUGYdta+pDRFvd-9qtiBiBCGUCCX7Mi+swQbA@mail.gmail.com>
-Subject: Re: [PATCH v5 04/19] accel/tcg: Adjust probe_access call to
- page_check_range
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <85ab3d39-0916-3637-6568-70166436e7f8@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 08:00:48
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,31 +115,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: pbonzini@redhat.com, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 8 May 2020 at 16:44, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> We have validated that addr+size does not cross a page boundary.
-> Therefore we need to validate exactly one page.  We can achieve
-> that passing any value 1 <= x <= size to page_check_range.
->
-> Passing 1 will simplify the next patch.
+On 5/8/20 3:45 PM, Eric Blake wrote:
+> On 5/8/20 5:49 AM, Markus Armbruster wrote:
+>> Fixes: abc9bf69a66a11499a801ff545b8fe7adbb3a04c
+>> Fixes: Coverity CID 1428754
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>   cpus.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> 
+>>
+>> diff --git a/cpus.c b/cpus.c
+>> index 5670c96bcf..b9275c672d 100644
+>> --- a/cpus.c
+>> +++ b/cpus.c
+>> @@ -813,7 +813,7 @@ void configure_icount(QemuOpts *opts, Error **errp)
+>>           return;
+>>       }
+>> -    if (strcmp(option, "auto") != 0) {
+>> +    if (option && !strcmp(option, "auto")) {
+> 
+> Another alternative would be using g_strcmp0, but this form is fine.
 
-It's not clear to me how it simplifies the next patch, though --
-we have the size right there in the new function which
-calls page_check_range(), don't we? So I still don't
-understand why we're using '1' -- it isn't allowing
-us to avoid passing the size into probe_access_internal(),
-because we need to pass it anyway.
+"Leading by example is the fastest way to train a team." ;)
 
-We've gone round this multiple times now so I feel like
-I must be missing something here.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-thanks
--- PMM
+> 
+>>           if (qemu_strtol(option, NULL, 0, &time_shift) < 0
+>>               || time_shift < 0 || time_shift > MAX_ICOUNT_SHIFT) {
+>>               error_setg(errp, "icount: Invalid shift value");
+>>
+> 
+
 
