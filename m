@@ -2,74 +2,87 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 324FEC35280
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 01:35:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2A27C35280
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 02:09:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC742208D6
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 01:35:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC742208D6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id BEC76206B9
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 02:09:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XNAOYMSH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEC76206B9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWrvG-00030r-5M
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 21:35:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58408)
+	id 1jWsSK-0004gf-WB
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 22:09:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38172)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1jWru9-00029Z-9v
- for qemu-devel@nongnu.org; Thu, 07 May 2020 21:34:21 -0400
-Received: from mga17.intel.com ([192.55.52.151]:4519)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1jWru6-0004Tx-Pr
- for qemu-devel@nongnu.org; Thu, 07 May 2020 21:34:20 -0400
-IronPort-SDR: J1R8qqa7i4jqnMffyH/fPG9+ImeXm2bBLu9Z8PHenVli0oywhmQgNN6UO3Dsj4rpC3KNjuUEQ1
- GjqNtv6k2xaw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
- by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 07 May 2020 18:34:10 -0700
-IronPort-SDR: B0oLcHnIiyXMK90Mg+GeImiEn2zta5c8TpzmaYx9mVzzlvzHK1M3gQbUZrqU8XnD4ND7KmeE3G
- WGovEEYhqTVg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,366,1583222400"; d="scan'208";a="435510730"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.16])
- by orsmga005.jf.intel.com with ESMTP; 07 May 2020 18:34:05 -0700
-Date: Thu, 7 May 2020 21:24:19 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v1 2/2] Sample mtty: Add migration capability to mtty
- module
-Message-ID: <20200508012417.GA26026@joy-OptiPlex-7040>
-References: <1588614860-16330-1-git-send-email-kwankhede@nvidia.com>
- <1588614860-16330-3-git-send-email-kwankhede@nvidia.com>
- <20200507010126.GD19334@joy-OptiPlex-7040>
- <a26d1031-3630-2e7f-e8df-e9a5db07397c@nvidia.com>
+ (Exim 4.90_1) (envelope-from <priyamvad.agnisys@gmail.com>)
+ id 1jWsRn-0004I5-4M
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 22:09:07 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:34279)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <priyamvad.agnisys@gmail.com>)
+ id 1jWsRl-0007HJ-Tn
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 22:09:06 -0400
+Received: by mail-lj1-x243.google.com with SMTP id f11so25050ljp.1
+ for <qemu-devel@nongnu.org>; Thu, 07 May 2020 19:09:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=4JX2CguDDJl9WQNK9lPvg2yUGcHHhh1EKNvF+1dss3A=;
+ b=XNAOYMSHzwOmmXQR6E1oID7mFO1UICndjqZ1Z4U7zj+XloGWLUQUNJyYc1qKO2vv3W
+ av2lneWIaWv5Z30PN3V2YKBQS86x+480LbJWxLD2jW+RzKYKnCr6NnbdMzU8W1IY/lvq
+ thK6CrXlSMhKV/DdYDKbqV+wyleE2TOIrihswbsxbuthy4yRg42IhYsZEeMxfaxwHGBH
+ DiwuQA9RpjG4N4xST3ta4h1ysa98C1hY78gP77G5Eey6yJEW4yTXSaIylDK6/cHB6zgl
+ 99een0tonrRRf7xPDTh48XTeS8/3MH4OS/0shMolvsVQbcYvmL2/+7ygPaKyE4BpFlGR
+ hLng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=4JX2CguDDJl9WQNK9lPvg2yUGcHHhh1EKNvF+1dss3A=;
+ b=tqnYCVxPXgaPY7WzXyCFVYF6ccqZiPDzxqiyZFneu04/h4XqyEKhdxMFzI5yAVgpLL
+ zw1FR6EVuWlxvkBhom53/HvSvmpCVYeHjTBMMVYRCQ2ucWUlbeBF5Aak7g2FvoyqmyXb
+ xthVJ0gtz0wimjMu/WcrUAbNP3Wa2lKwMRcMdQZFU1D8Lx+WwlipLnnBVXFnO6XWeDTc
+ pqNzhCm49if3/Gx0OUiLeZzAYbehGOkTdcy+W8S7sFHPgD6H4hq3SFwSUTggvJOVS+PH
+ xPEnFdFmHxSkp5Nc4ApA73Z0fPILYKFkTvBuLNqKQA8JsOLpKcP0j4Ag/PRnuaWGagmT
+ Xvyw==
+X-Gm-Message-State: AOAM533xnjRibJoh9v9kabMOdkFnbVs7LHDvLBsXqLUpUdzRxCfWzwsm
+ 1QMsx57omCWLQmBFXfKgRZr5K85MTZJlsPsozTg=
+X-Google-Smtp-Source: ABdhPJxsRIZD/1Q+DD3EtOWnmt/MriXqsV9vuPUl3urGPkDsQP2bBs4Gcd8EgjJD89zz7rBVY7O5PPAQ5rjq2J62BVI=
+X-Received: by 2002:a2e:a556:: with SMTP id e22mr90162ljn.130.1588903742930;
+ Thu, 07 May 2020 19:09:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a26d1031-3630-2e7f-e8df-e9a5db07397c@nvidia.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-Received-SPF: pass client-ip=192.55.52.151; envelope-from=yan.y.zhao@intel.com;
- helo=mga17.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 21:34:10
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+References: <CAPV47zdeH0+G85De2nOeD-dw91PKqPZh0U4SZuwuFmdqRyhXjQ@mail.gmail.com>
+ <d418f253-1749-8d29-c228-0c69c2cec3a7@redhat.com>
+In-Reply-To: <d418f253-1749-8d29-c228-0c69c2cec3a7@redhat.com>
+From: Priyamvad Acharya <priyamvad.agnisys@gmail.com>
+Date: Fri, 8 May 2020 07:38:51 +0530
+Message-ID: <CAPV47zfy84NGNo-Zy=XB62p2jFpNGziHXJ9qK78UYoB5hHgD7g@mail.gmail.com>
+Subject: Re: Parameter 'driver' expects pluggable device type
+To: John Snow <jsnow@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000002e027005a5197bf8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::243;
+ envelope-from=priyamvad.agnisys@gmail.com; helo=mail-lj1-x243.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,398 +95,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 07, 2020 at 11:19:40AM +0530, Kirti Wankhede wrote:
-> 
-> 
-> On 5/7/2020 6:31 AM, Yan Zhao wrote:
-> > On Tue, May 05, 2020 at 01:54:20AM +0800, Kirti Wankhede wrote:
-> > > This patch makes mtty device migration capable. Purpose od this code is
-> > > to test migration interface. Only stop-and-copy phase is implemented.
-> > > Postcopy migration is not supported.
-> > > 
-> > > Actual data for mtty device migration is very less. Appended dummy data to
-> > > migration data stream, default 100 Mbytes. Added sysfs file
-> > > 'dummy_data_size_MB' to get dummy data size from user which can be used
-> > > to check performance of based of data size. During resuming dummy data is
-> > > read and discarded.
-> > > 
-> > > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > > ---
-> > >   samples/vfio-mdev/mtty.c | 602 ++++++++++++++++++++++++++++++++++++++++++++---
-> > >   1 file changed, 574 insertions(+), 28 deletions(-)
-> > > 
-> > > diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
-> > > index bf666cce5bb7..f9194234fc6a 100644
-> > > --- a/samples/vfio-mdev/mtty.c
-> > > +++ b/samples/vfio-mdev/mtty.c
-> > > @@ -44,9 +44,23 @@
-> > >   #define MTTY_STRING_LEN		16
-> > > -#define MTTY_CONFIG_SPACE_SIZE  0xff
-> > > -#define MTTY_IO_BAR_SIZE        0x8
-> > > -#define MTTY_MMIO_BAR_SIZE      0x100000
-> > > +#define MTTY_CONFIG_SPACE_SIZE		0xff
-> > > +#define MTTY_IO_BAR_SIZE		0x8
-> > > +#define MTTY_MMIO_BAR_SIZE		0x100000
-> > > +#define MTTY_MIGRATION_REGION_SIZE	0x1000000	// 16M
-> > > +
-> > > +#define MTTY_MIGRATION_REGION_INDEX	VFIO_PCI_NUM_REGIONS
-> > > +#define MTTY_REGIONS_MAX		(MTTY_MIGRATION_REGION_INDEX + 1)
-> > > +
-> > > +/* Data section start from page aligned offset */
-> > > +#define MTTY_MIGRATION_REGION_DATA_OFFSET	(0x1000)
-> > > +
-> > > +/* First page is used for struct vfio_device_migration_info */
-> > > +#define MTTY_MIGRATION_REGION_SIZE_MMAP     \
-> > > +	(MTTY_MIGRATION_REGION_SIZE - MTTY_MIGRATION_REGION_DATA_OFFSET)
-> > > +
-> > > +#define MIGRATION_INFO_OFFSET(MEMBER)	\
-> > > +		offsetof(struct vfio_device_migration_info, MEMBER)
-> > >   #define STORE_LE16(addr, val)   (*(u16 *)addr = val)
-> > >   #define STORE_LE32(addr, val)   (*(u32 *)addr = val)
-> > > @@ -129,6 +143,28 @@ struct serial_port {
-> > >   	u8 intr_trigger_level;  /* interrupt trigger level */
-> > >   };
-> > > +/* Migration packet */
-> > > +#define PACKET_ID		(u16)(0xfeedbaba)
-> > > +
-> > > +#define PACKET_FLAGS_ACTUAL_DATA	(1 << 0)
-> > > +#define PACKET_FLAGS_DUMMY_DATA		(1 << 1)
-> > > +
-> > > +#define PACKET_DATA_SIZE_MAX		(8 * 1024 * 1024)
-> > > +
-> > > +struct packet {
-> > > +	u16 id;
-> > > +	u16 flags;
-> > > +	u32 data_size;
-> > > +	u8 data[];
-> > > +};
-> > > +
-> > > +enum {
-> > > +	PACKET_STATE_NONE = 0,
-> > > +	PACKET_STATE_PREPARED,
-> > > +	PACKET_STATE_COPIED,
-> > > +	PACKET_STATE_LAST,
-> > > +};
-> > > +
-> > >   /* State of each mdev device */
-> > >   struct mdev_state {
-> > >   	int irq_fd;
-> > > @@ -138,22 +174,37 @@ struct mdev_state {
-> > >   	u8 *vconfig;
-> > >   	struct mutex ops_lock;
-> > >   	struct mdev_device *mdev;
-> > > -	struct mdev_region_info region_info[VFIO_PCI_NUM_REGIONS];
-> > > -	u32 bar_mask[VFIO_PCI_NUM_REGIONS];
-> > > +	struct mdev_region_info region_info[MTTY_REGIONS_MAX];
-> > > +	u32 bar_mask[MTTY_REGIONS_MAX];
-> > >   	struct list_head next;
-> > >   	struct serial_port s[2];
-> > >   	struct mutex rxtx_lock;
-> > >   	struct vfio_device_info dev_info;
-> > > -	int nr_ports;
-> > > +	u32 nr_ports;
-> > >   	/* List of pinned gpfns, gpfn as index and content is translated hpfn */
-> > >   	unsigned long *gpfn_to_hpfn;
-> > >   	struct notifier_block nb;
-> > > +
-> > > +	u32 device_state;
-> > > +	u64 saved_size;
-> > > +	void *mig_region_base;
-> > > +	bool is_actual_data_sent;
-> > > +	struct packet *pkt;
-> > > +	u32 packet_state;
-> > > +	u64 dummy_data_size;
-> > >   };
-> > >   static struct mutex mdev_list_lock;
-> > >   static struct list_head mdev_devices_list;
-> > > +/*
-> > > + * Default dummy data size set to 100 MB. To change value of dummy data size at
-> > > + * runtime but before migration write size in MB to sysfs file
-> > > + * dummy_data_size_MB
-> > > + */
-> > > +static unsigned long user_dummy_data_size = (100 * 1024 * 1024);
-> > > +
-> > >   static const struct file_operations vd_fops = {
-> > >   	.owner          = THIS_MODULE,
-> > >   };
-> > > @@ -639,6 +690,288 @@ static void mdev_read_base(struct mdev_state *mdev_state)
-> > >   	}
-> > >   }
-> > > +static int save_setup(struct mdev_state *mdev_state)
-> > > +{
-> > > +	mdev_state->is_actual_data_sent = false;
-> > > +
-> > > +	memset(mdev_state->pkt, 0, sizeof(struct packet) +
-> > > +				   PACKET_DATA_SIZE_MAX);
-> > > +
-> > > +	return 0;
-> > > +}
-> > > +
-> > > +static int set_device_state(struct mdev_state *mdev_state, u32 device_state)
-> > > +{
-> > > +	int ret = 0;
-> > > +
-> > > +	if (mdev_state->device_state == device_state)
-> > > +		return 0;
-> > > +
-> > > +	if (device_state & VFIO_DEVICE_STATE_RUNNING) {
-> > > +#if defined(DEBUG)
-> > > +		if (device_state & VFIO_DEVICE_STATE_SAVING) {
-> > > +			pr_info("%s: %s Pre-copy\n", __func__,
-> > > +				dev_name(mdev_dev(mdev_state->mdev)));
-> > > +		} else
-> > > +			pr_info("%s: %s Running\n", __func__,
-> > > +				dev_name(mdev_dev(mdev_state->mdev)));
-> > > +#endif
-> > > +	} else {
-> > > +		if (device_state & VFIO_DEVICE_STATE_SAVING) {
-> > > +#if defined(DEBUG)
-> > > +			pr_info("%s: %s Stop-n-copy\n", __func__,
-> > > +				dev_name(mdev_dev(mdev_state->mdev)));
-> > > +#endif
-> > > +			ret = save_setup(mdev_state);
-> > > +
-> > > +		} else if (device_state & VFIO_DEVICE_STATE_RESUMING) {
-> > > +#if defined(DEBUG)
-> > > +			pr_info("%s: %s Resuming\n", __func__,
-> > > +				dev_name(mdev_dev(mdev_state->mdev)));
-> > > +		} else {
-> > > +			pr_info("%s: %s Stopped\n", __func__,
-> > > +				dev_name(mdev_dev(mdev_state->mdev)));
-> > > +#endif
-> > > +		}
-> > > +	}
-> > > +
-> > > +	mdev_state->device_state = device_state;
-> > > +
-> > > +	return ret;
-> > > +}
-> > > +
-> > > +static u32 get_device_state(struct mdev_state *mdev_state)
-> > > +{
-> > > +	return mdev_state->device_state;
-> > > +}
-> > > +
-> > > +static void write_to_packet(struct packet *pkt, u8 *data, size_t size)
-> > > +{
-> > > +	if ((pkt->data_size + size) > PACKET_DATA_SIZE_MAX) {
-> > > +		pr_err("%s: packet data overflow\n", __func__);
-> > > +		return;
-> > > +	}
-> > > +	memcpy((void *)&pkt->data[pkt->data_size], (void *)data, size);
-> > > +	pkt->data_size += size;
-> > > +}
-> > > +
-> > > +static void read_from_packet(struct packet *pkt, u8 *data,
-> > > +			     int index, size_t size)
-> > > +{
-> > > +	if ((index + size) > PACKET_DATA_SIZE_MAX) {
-> > > +		pr_err("%s: packet data overflow\n", __func__);
-> > > +		return;
-> > > +	}
-> > > +
-> > > +	memcpy((void *)data, (void *)&pkt->data[index], size);
-> > > +}
-> > > +
-> > > +static int save_device_data(struct mdev_state *mdev_state, u64 *pending)
-> > > +{
-> > > +	/* Save device data only during stop-and-copy phase */
-> > > +	if (mdev_state->device_state != VFIO_DEVICE_STATE_SAVING) {
-> > > +		*pending = 0;
-> > > +		return 0;
-> > > +	}
-> > > +
-> > > +	if (mdev_state->packet_state == PACKET_STATE_PREPARED) {
-> > > +		*pending = sizeof(struct packet) + mdev_state->pkt->data_size;
-> > > +		return 0;
-> > > +	}
-> > > +
-> > > +	if (!mdev_state->is_actual_data_sent) {
-> > > +
-> > > +		/* create actual data packet */
-> > > +		write_to_packet(mdev_state->pkt, (u8 *)&mdev_state->nr_ports,
-> > > +				sizeof(mdev_state->nr_ports));
-> > > +		write_to_packet(mdev_state->pkt, (u8 *)&mdev_state->s,
-> > > +				sizeof(struct serial_port) * 2);
-> > > +
-> > > +		write_to_packet(mdev_state->pkt, mdev_state->vconfig,
-> > > +				MTTY_CONFIG_SPACE_SIZE);
-> > > +
-> > > +		write_to_packet(mdev_state->pkt, (u8 *)mdev_state->gpfn_to_hpfn,
-> > > +				sizeof(unsigned long) * MAX_GPFN_COUNT);
-> > > +
-> > > +		mdev_state->pkt->id = PACKET_ID;
-> > > +		mdev_state->pkt->flags = PACKET_FLAGS_ACTUAL_DATA;
-> > > +
-> > > +		mdev_state->is_actual_data_sent = true;
-> > > +	} else {
-> > > +		/* create dummy data packet */
-> > > +		if (mdev_state->dummy_data_size > user_dummy_data_size) {
-> > > +			*pending = 0;
-> > > +			mdev_state->packet_state = PACKET_STATE_NONE;
-> > > +			return 0;
-> > > +		}
-> > > +
-> > > +		memset(mdev_state->pkt->data, 0xa5, PACKET_DATA_SIZE_MAX);
-> > > +
-> > > +		mdev_state->pkt->id = PACKET_ID;
-> > > +		mdev_state->pkt->flags = PACKET_FLAGS_DUMMY_DATA;
-> > > +		mdev_state->pkt->data_size = PACKET_DATA_SIZE_MAX;
-> > > +		mdev_state->dummy_data_size += PACKET_DATA_SIZE_MAX;
-> > > +	}
-> > > +
-> > > +	*pending = sizeof(struct packet) + mdev_state->pkt->data_size;
-> > > +	mdev_state->packet_state = PACKET_STATE_PREPARED;
-> > > +	mdev_state->saved_size = 0;
-> > > +
-> > > +	return 0;
-> > > +}
-> > > +
-> > > +static int copy_device_data(struct mdev_state *mdev_state)
-> > > +{
-> > > +	u64 size;
-> > > +
-> > > +	if (!mdev_state->pkt || !mdev_state->mig_region_base)
-> > > +		return -EINVAL;
-> > > +
-> > > +	if (mdev_state->packet_state == PACKET_STATE_COPIED)
-> > > +		return 0;
-> > > +
-> > > +	if (!mdev_state->pkt->data_size)
-> > > +		return 0;
-> > > +
-> > > +	size = sizeof(struct packet) + mdev_state->pkt->data_size;
-> > > +
-> > > +	memcpy(mdev_state->mig_region_base, mdev_state->pkt, size);
-> > > +
-> > if data area is mmaped, who is going to copy data from mdev_state->pkt
-> > to mdev_state->mig_region_base ?
-> > actually, I do see this area is mmaped in this sample.
-> > 
-> 
-> This area ia mmap and is backed by memory, see mtty_mmap(), on read access
-> to data_offset, packet data is copied to mmaped memory.
-> 
-> > > +	mdev_state->saved_size = size;
-> > > +	mdev_state->packet_state = PACKET_STATE_COPIED;
-> > > +	memset(mdev_state->pkt, 0, sizeof(struct packet));
-> > > +	return 0;
-> > > +}
-> > > +
-> > > +static int resume_device_data(struct mdev_state *mdev_state, u64 data_size)
-> > > +{
-> > > +	unsigned long i;
-> > > +
-> > > +	if (mdev_state->device_state != VFIO_DEVICE_STATE_RESUMING)
-> > > +		return -EINVAL;
-> > > +
-> > > +	if (!mdev_state->pkt || !mdev_state->mig_region_base)
-> > > +		return -EINVAL;
-> > > +
-> > > +	memcpy(mdev_state->pkt, mdev_state->mig_region_base, data_size);
-> > > +
-> > > +	if (mdev_state->pkt->flags & PACKET_FLAGS_ACTUAL_DATA) {
-> > > +		int index = 0;
-> > > +		/* restore device data */
-> > > +		read_from_packet(mdev_state->pkt, (u8 *)&mdev_state->nr_ports,
-> > > +				 index, sizeof(mdev_state->nr_ports));
-> > > +		index += sizeof(mdev_state->nr_ports);
-> > > +
-> > > +		read_from_packet(mdev_state->pkt, (u8 *)&mdev_state->s,
-> > > +				index, sizeof(struct serial_port) * 2);
-> > > +		index += sizeof(struct serial_port) * 2;
-> > > +
-> > > +		read_from_packet(mdev_state->pkt, mdev_state->vconfig,
-> > > +				 index, MTTY_CONFIG_SPACE_SIZE);
-> > > +		index += MTTY_CONFIG_SPACE_SIZE;
-> > > +
-> > > +		read_from_packet(mdev_state->pkt,
-> > > +				(u8 *)mdev_state->gpfn_to_hpfn,
-> > > +				index, sizeof(unsigned long) * MAX_GPFN_COUNT);
-> > > +		index += sizeof(unsigned long) * MAX_GPFN_COUNT;
-> > > +
-> > > +		for (i = 0; i < MAX_GPFN_COUNT; i++) {
-> > > +			if (mdev_state->gpfn_to_hpfn[i] != PFN_NULL) {
-> > > +				int ret;
-> > > +				unsigned long hpfn;
-> > > +
-> > > +				ret = vfio_pin_pages(mdev_dev(mdev_state->mdev),
-> > > +				       &i, 1, IOMMU_READ | IOMMU_WRITE, &hpfn);
-> > > +				if (ret <= 0) {
-> > > +					pr_err("%s: 0x%lx unpin error %d\n",
-> > > +							__func__, i, ret);
-> > > +					continue;
-> > > +				}
-> > > +				mdev_state->gpfn_to_hpfn[i] = hpfn;
-> > > +			}
-> > > +		}
-> > > +	} else {
-> > > +#if defined(DEBUG)
-> > > +		pr_info("%s: %s discard data 0x%llx\n",
-> > > +			 __func__, dev_name(mdev_dev(mdev_state->mdev)),
-> > > +			data_size);
-> > > +#endif
-> > > +	}
-> > > +
-> > > +	return 0;
-> > > +}
-> > > +
-> > > +static int handle_mig_read(unsigned int index, struct mdev_state *mdev_state,
-> > > +			   loff_t offset, u8 *buf, u32 count)
-> > > +{
-> > > +	int ret = 0;
-> > > +	u64 pending = 0;
-> > > +
-> > > +	switch (offset) {
-> > > +	case MIGRATION_INFO_OFFSET(device_state):	// 0x00
-> > > +		*(u32 *)buf = get_device_state(mdev_state);
-> > > +		break;
-> > > +
-> > > +	case MIGRATION_INFO_OFFSET(pending_bytes):	// 0x08
-> > > +		ret = save_device_data(mdev_state, &pending);
-> > > +		if (ret)
-> > > +			break;
-> > > +		*(u64 *)buf = pending;
-> > > +		break;
-> > > +
-> > > +	case MIGRATION_INFO_OFFSET(data_offset):	// 0x10
-> > > +		if (mdev_state->device_state & VFIO_DEVICE_STATE_SAVING) {
-> > > +			ret = copy_device_data(mdev_state);
-> > > +			if (ret)
-> > > +				break;
-> > > +		}
-> > > +		*(u64 *)buf = MTTY_MIGRATION_REGION_DATA_OFFSET;
-> > what is this?
-> 
-> I think macro is self explanatory, its data offset within migration region
-> where vendor driver has copied data and user application should data from
-> this offset of migration region.
->
-ok. just mixed the data_offset with real data offset of the data area.
-BTW, it's really confusing to take reading of data_offset as the indicator
-of data preparing and writing of data_size as the indicator of data loading.
+--0000000000002e027005a5197bf8
+Content-Type: text/plain; charset="UTF-8"
 
-Thanks
-Yan
+Hi,
+Thanks for providing relevant information.
+FYI
+I am using Qemu version *4.2.94 (v5.0.0-rc4-dirty).*
+I am using *virt* board.
+
+Where we need to set *user creatable *to true?
+Any other modification is needed to allow sysbus device support?
+
+Below is the script which I am using  to boot linux image with pl061 device
+on virt board.
+
+#!/bin/bash
+>
+> KERNEL="/lhome/priyamvad/debian_qemu_arm32/vmlinuz-3.16.0-6-armmp-lpae"
+>
+> INIT_IMAGE="/lhome/priyamvad/debian_qemu_arm32/initrd.img-3.16.0-6-armmp-lpae"
+> DISK="/lhome/priyamvad/debian_qemu_arm32/hda30.qcow2"
+>
+> ./qemu-system-arm \
+> -M virt \
+> -m 1024 \
+> -smp 4 \
+> -kernel $KERNEL \
+> -object rng-random,filename=/dev/urandom,id=rng0 \
+> -device virtio-rng-device,rng=rng0 \
+> -initrd $INIT_IMAGE \
+> -append 'root=/dev/vda2' \
+> -drive if=none,file=$DISK,format=qcow2,id=hd \
+> -device pl061 \
+> -device virtio-blk-device,drive=hd \
+> -device virtio-net-device,netdev=usernet \
+> -netdev user,id=usernet,hostfwd=tcp::2222-:22 \
+> -nographic
+>
+
+Is this script  to boot linux image with pl061 device on virt board?
+
+
+On Fri, 8 May 2020 at 02:32, John Snow <jsnow@redhat.com> wrote:
+
+>
+>
+> On 5/6/20 8:56 AM, Priyamvad Acharya wrote:
+> >
+> > Hello developer community,
+> > I want to allow a *sysbus *type device to boot with kernel image(arm
+> > architecture) via Qemu command line .
+> >
+> > When I run qemu arm system executable with *-device *option via qemu
+> > command line,I get following error message
+> >
+> >> qemu-system-arm: -device pl061: Parameter 'driver' expects pluggable
+> > device type
+> >
+> > So, how to allow a sysbus device via command line?
+> > Is there any working patch?
+>
+> Hi, it looks like the pl061 device is not declared "user creatable" so
+> it is unavailable from the CLI. As a sysbus device, QEMU is not aware,
+> in the abstract, of how to "connect" the device to other devices.
+>
+> See the sysbus class initialization code for more detail:
+> https://github.com/qemu/qemu/blob/master/hw/core/sysbus.c#L301
+>
+>
+> However, It looks like these boards/devices create such a device:
+>
+> hw/arm/highbank
+> hw/arm/realview
+> hw/arm/sbsa-ref
+> hw/arm/stellaris
+> hw/arm/versatilepb
+> hw/arm/virt
+>
+> If you want one on some other kind of machine, you'll need to write it
+> up yourself in the machine board code, but you didn't tell us what
+> version of QEMU you're using, what machine type you are trying to use, etc.
+>
+> --js
+>
+>
+
+--0000000000002e027005a5197bf8
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>Hi,</div><div>Thanks for providing relevant informati=
+on.</div><div>FYI</div><div>I am using Qemu version <b>4.2.94 (v5.0.0-rc4-d=
+irty).</b></div><div>I am using <b>virt</b> board.</div><div><br></div><div=
+>Where we need to set <b>user creatable </b>to true?</div><div>Any other mo=
+dification is needed to allow sysbus device support?</div><div><br></div><d=
+iv>Below is the script which I am using=C2=A0 to boot linux image with pl06=
+1 device on virt board.</div><div><br></div><blockquote class=3D"gmail_quot=
+e" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204)=
+;padding-left:1ex"><div>#!/bin/bash<br><br>KERNEL=3D&quot;/lhome/priyamvad/=
+debian_qemu_arm32/vmlinuz-3.16.0-6-armmp-lpae&quot;<br>INIT_IMAGE=3D&quot;/=
+lhome/priyamvad/debian_qemu_arm32/initrd.img-3.16.0-6-armmp-lpae&quot;<br>D=
+ISK=3D&quot;/lhome/priyamvad/debian_qemu_arm32/hda30.qcow2&quot;<br><br>./q=
+emu-system-arm \<br>	-M virt \<br>	-m 1024 \<br>	-smp 4 \<br>	-kernel $KERN=
+EL \<br>	-object rng-random,filename=3D/dev/urandom,id=3Drng0 \<br>	-device=
+ virtio-rng-device,rng=3Drng0 \<br>	-initrd $INIT_IMAGE \<br>	-append &#39;=
+root=3D/dev/vda2&#39; \<br>	-drive if=3Dnone,file=3D$DISK,format=3Dqcow2,id=
+=3Dhd \<br>	-device pl061 \ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 <br>	-device virtio-bl=
+k-device,drive=3Dhd \<br>	-device virtio-net-device,netdev=3Dusernet \<br>	=
+-netdev user,id=3Dusernet,hostfwd=3Dtcp::2222-:22 \<br>	-nographic<br></div=
+></blockquote><div><br></div><div>Is this script=C2=A0=20
+ to boot linux image with pl061 device on virt board?
+
+</div><div><br></div></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
+class=3D"gmail_attr">On Fri, 8 May 2020 at 02:32, John Snow &lt;<a href=3D"=
+mailto:jsnow@redhat.com">jsnow@redhat.com</a>&gt; wrote:<br></div><blockquo=
+te class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px =
+solid rgb(204,204,204);padding-left:1ex"><br>
+<br>
+On 5/6/20 8:56 AM, Priyamvad Acharya wrote:<br>
+&gt; <br>
+&gt; Hello developer community,<br>
+&gt; I want to allow a *sysbus *type device to boot with kernel image(arm<b=
+r>
+&gt; architecture) via Qemu command line .<br>
+&gt; <br>
+&gt; When I run qemu arm system executable with *-device *option via qemu<b=
+r>
+&gt; command line,I get following error message<br>
+&gt; <br>
+&gt;&gt; qemu-system-arm: -device pl061: Parameter &#39;driver&#39; expects=
+ pluggable<br>
+&gt; device type<br>
+&gt; <br>
+&gt; So, how to allow a sysbus device via command line?<br>
+&gt; Is there any working patch?<br>
+<br>
+Hi, it looks like the pl061 device is not declared &quot;user creatable&quo=
+t; so<br>
+it is unavailable from the CLI. As a sysbus device, QEMU is not aware,<br>
+in the abstract, of how to &quot;connect&quot; the device to other devices.=
+<br>
+<br>
+See the sysbus class initialization code for more detail:<br>
+<a href=3D"https://github.com/qemu/qemu/blob/master/hw/core/sysbus.c#L301" =
+rel=3D"noreferrer" target=3D"_blank">https://github.com/qemu/qemu/blob/mast=
+er/hw/core/sysbus.c#L301</a><br>
+<br>
+<br>
+However, It looks like these boards/devices create such a device:<br>
+<br>
+hw/arm/highbank<br>
+hw/arm/realview<br>
+hw/arm/sbsa-ref<br>
+hw/arm/stellaris<br>
+hw/arm/versatilepb<br>
+hw/arm/virt<br>
+<br>
+If you want one on some other kind of machine, you&#39;ll need to write it<=
+br>
+up yourself in the machine board code, but you didn&#39;t tell us what<br>
+version of QEMU you&#39;re using, what machine type you are trying to use, =
+etc.<br>
+<br>
+--js<br>
+<br>
+</blockquote></div>
+
+--0000000000002e027005a5197bf8--
 
