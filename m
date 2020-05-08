@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4B1EC47247
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 12:59:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10146C38A2A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 13:00:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86045206D6
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 12:59:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CC0D3206D6
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 13:00:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XOHF/k5i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86045206D6
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hfSFog76"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC0D3206D6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX2bC-0008Ab-Mm
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 08:59:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49394)
+	id 1jX2c5-0001Hm-SX
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 09:00:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49522)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX2KX-0000FE-EP
- for qemu-devel@nongnu.org; Fri, 08 May 2020 08:42:17 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26560
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX2Kl-0000OD-3T
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 08:42:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49689
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX2KS-0008BF-JT
- for qemu-devel@nongnu.org; Fri, 08 May 2020 08:42:17 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX2Kf-0000Fr-4p
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 08:42:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588941730;
+ s=mimecast20190719; t=1588941743;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1YhUnrGIM/5EB2xN/8sYYA+98OC8bUtlmJNRi3eRl+A=;
- b=XOHF/k5inoRd9ZpH4pllk2bDAsPXJTAyNZ8RkX97928sEyZoGsY+VBFyhssnIOGyj2pSEy
- SSlZsgcanyMnxPJyGV/mvtd4hLrO6PBwxvS0fLOlthWRy5hkTZlPUq3Hvkt+tBopS/nx0a
- SGIbrPGIfBKy/S4j6ExuX46Vh74xBLg=
+ bh=J7aOk/BXPBSopj9gx0iL/4RO/rqlNhssjAKXQj5V6Nw=;
+ b=hfSFog76orfMMqWenYu2OcbDx6+FpRtNwr2C+8J9uDBRUsj/PvTt+lisOd46FMXJD5Q66O
+ TjI56zv0O19hrmMFvU6aot37gvV+e32aLNOsbXkAL2/8rbn/GhNqdE4obr3uCILNtqfOxc
+ IktIJdpHc594yVdoDw3iPSdoplv5RNQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-390-Lli9h5p4O6S9o4IZDxuyOA-1; Fri, 08 May 2020 08:42:06 -0400
-X-MC-Unique: Lli9h5p4O6S9o4IZDxuyOA-1
+ us-mta-46-pIKo1VWQPG6fzoO4CsTDUg-1; Fri, 08 May 2020 08:42:21 -0400
+X-MC-Unique: pIKo1VWQPG6fzoO4CsTDUg-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E90BD19057A0;
- Fri,  8 May 2020 12:42:05 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52D9C835B8B;
+ Fri,  8 May 2020 12:42:20 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-113-190.ams2.redhat.com
  [10.36.113.190])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E6FDD19167;
- Fri,  8 May 2020 12:42:04 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 532F46E715;
+ Fri,  8 May 2020 12:42:19 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 18/30] backup: Make sure that source and target size match
-Date: Fri,  8 May 2020 14:41:23 +0200
-Message-Id: <20200508124135.252565-19-kwolf@redhat.com>
+Subject: [PULL 29/30] vhdx: Rework truncation logic
+Date: Fri,  8 May 2020 14:41:34 +0200
+Message-Id: <20200508124135.252565-30-kwolf@redhat.com>
 In-Reply-To: <20200508124135.252565-1-kwolf@redhat.com>
 References: <20200508124135.252565-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -70,17 +70,17 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 08:00:48
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 02:25:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,121 +98,166 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since the introduction of a backup filter node in commit 00e30f05d, the
-backup block job crashes when the target image is smaller than the
-source image because it will try to write after the end of the target
-node without having BLK_PERM_RESIZE. (Previously, the BlockBackend layer
-would have caught this and errored out gracefully.)
+From: Eric Blake <eblake@redhat.com>
 
-We can fix this and even do better than the old behaviour: Check that
-source and target have the same image size at the start of the block job
-and unshare BLK_PERM_RESIZE. (This permission was already unshared
-before the same commit 00e30f05d, but the BlockBackend that was used to
-make the restriction was removed without a replacement.) This will
-immediately error out when starting the job instead of only when writing
-to a block that doesn't exist in the target.
+The vhdx driver uses truncation for image growth, with a special case
+for blocks that already read as zero but which are only being
+partially written.  But with a bit of rearranging, it's just as easy
+to defer the decision on whether truncation resulted in zeroes to the
+actual allocation attempt, reducing the number of places that still
+use bdrv_has_zero_init_truncate.
 
-Longer target than source would technically work because we would never
-write to blocks that don't exist, but semantically these are invalid,
-too, because a backup is supposed to create a copy, not just an image
-that starts with a copy.
-
-Fixes: 00e30f05de1d19586345ec373970ef4c192c6270
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1778593
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Message-Id: <20200430142755.315494-4-kwolf@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20200428202905.770727-9-eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/backup-top.c | 14 +++++++++-----
- block/backup.c     | 14 +++++++++++++-
- 2 files changed, 22 insertions(+), 6 deletions(-)
+ block/vhdx.c | 89 ++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 51 insertions(+), 38 deletions(-)
 
-diff --git a/block/backup-top.c b/block/backup-top.c
-index 3b50c06e2c..79b268e6dc 100644
---- a/block/backup-top.c
-+++ b/block/backup-top.c
-@@ -148,8 +148,10 @@ static void backup_top_child_perm(BlockDriverState *bs=
-, BdrvChild *c,
-          *
-          * Share write to target (child_file), to not interfere
-          * with guest writes to its disk which may be in target backing ch=
-ain.
-+         * Can't resize during a backup block job because we check the siz=
-e
-+         * only upfront.
-          */
--        *nshared =3D BLK_PERM_ALL;
-+        *nshared =3D BLK_PERM_ALL & ~BLK_PERM_RESIZE;
-         *nperm =3D BLK_PERM_WRITE;
-     } else {
-         /* Source child */
-@@ -159,7 +161,7 @@ static void backup_top_child_perm(BlockDriverState *bs,=
- BdrvChild *c,
-         if (perm & BLK_PERM_WRITE) {
-             *nperm =3D *nperm | BLK_PERM_CONSISTENT_READ;
-         }
--        *nshared &=3D ~BLK_PERM_WRITE;
-+        *nshared &=3D ~(BLK_PERM_WRITE | BLK_PERM_RESIZE);
+diff --git a/block/vhdx.c b/block/vhdx.c
+index e11fb7413a..53e756438a 100644
+--- a/block/vhdx.c
++++ b/block/vhdx.c
+@@ -1240,12 +1240,16 @@ exit:
+ /*
+  * Allocate a new payload block at the end of the file.
+  *
+- * Allocation will happen at 1MB alignment inside the file
++ * Allocation will happen at 1MB alignment inside the file.
++ *
++ * If @need_zero is set on entry but not cleared on return, then truncatio=
+n
++ * could not guarantee that the new portion reads as zero, and the caller
++ * will take care of it instead.
+  *
+  * Returns the file offset start of the new payload block
+  */
+ static int vhdx_allocate_block(BlockDriverState *bs, BDRVVHDXState *s,
+-                                    uint64_t *new_offset)
++                               uint64_t *new_offset, bool *need_zero)
+ {
+     int64_t current_len;
+=20
+@@ -1262,6 +1266,17 @@ static int vhdx_allocate_block(BlockDriverState *bs,=
+ BDRVVHDXState *s,
+         return -EINVAL;
      }
+=20
++    if (*need_zero) {
++        int ret;
++
++        ret =3D bdrv_truncate(bs->file, *new_offset + s->block_size, false=
+,
++                            PREALLOC_MODE_OFF, BDRV_REQ_ZERO_WRITE, NULL);
++        if (ret !=3D -ENOTSUP) {
++            *need_zero =3D false;
++            return ret;
++        }
++    }
++
+     return bdrv_truncate(bs->file, *new_offset + s->block_size, false,
+                          PREALLOC_MODE_OFF, 0, NULL);
  }
+@@ -1355,18 +1370,38 @@ static coroutine_fn int vhdx_co_writev(BlockDriverS=
+tate *bs, int64_t sector_num,
+                 /* in this case, we need to preserve zero writes for
+                  * data that is not part of this write, so we must pad
+                  * the rest of the buffer to zeroes */
+-
+-                /* if we are on a posix system with ftruncate() that exten=
+ds
+-                 * a file, then it is zero-filled for us.  On Win32, the r=
+aw
+-                 * layer uses SetFilePointer and SetFileEnd, which does no=
+t
+-                 * zero fill AFAIK */
+-
+-                /* Queue another write of zero buffers if the underlying f=
+ile
+-                 * does not zero-fill on file extension */
+-
+-                if (bdrv_has_zero_init_truncate(bs->file->bs) =3D=3D 0) {
+-                    use_zero_buffers =3D true;
+-
++                use_zero_buffers =3D true;
++                /* fall through */
++            case PAYLOAD_BLOCK_NOT_PRESENT: /* fall through */
++            case PAYLOAD_BLOCK_UNMAPPED:
++            case PAYLOAD_BLOCK_UNMAPPED_v095:
++            case PAYLOAD_BLOCK_UNDEFINED:
++                bat_prior_offset =3D sinfo.file_offset;
++                ret =3D vhdx_allocate_block(bs, s, &sinfo.file_offset,
++                                          &use_zero_buffers);
++                if (ret < 0) {
++                    goto exit;
++                }
++                /*
++                 * once we support differencing files, this may also be
++                 * partially present
++                 */
++                /* update block state to the newly specified state */
++                vhdx_update_bat_table_entry(bs, s, &sinfo, &bat_entry,
++                                            &bat_entry_offset,
++                                            PAYLOAD_BLOCK_FULLY_PRESENT);
++                bat_update =3D true;
++                /*
++                 * Since we just allocated a block, file_offset is the
++                 * beginning of the payload block. It needs to be the
++                 * write address, which includes the offset into the
++                 * block, unless the entire block needs to read as
++                 * zeroes but truncation was not able to provide them,
++                 * in which case we need to fill in the rest.
++                 */
++                if (!use_zero_buffers) {
++                    sinfo.file_offset +=3D sinfo.block_offset;
++                } else {
+                     /* zero fill the front, if any */
+                     if (sinfo.block_offset) {
+                         iov1.iov_len =3D sinfo.block_offset;
+@@ -1378,7 +1413,7 @@ static coroutine_fn int vhdx_co_writev(BlockDriverSta=
+te *bs, int64_t sector_num,
+                     }
 =20
-@@ -192,11 +194,13 @@ BlockDriverState *bdrv_backup_top_append(BlockDriverS=
-tate *source,
- {
-     Error *local_err =3D NULL;
-     BDRVBackupTopState *state;
--    BlockDriverState *top =3D bdrv_new_open_driver(&bdrv_backup_top_filter=
-,
--                                                 filter_node_name,
--                                                 BDRV_O_RDWR, errp);
-+    BlockDriverState *top;
-     bool appended =3D false;
+                     /* our actual data */
+-                    qemu_iovec_concat(&hd_qiov, qiov,  bytes_done,
++                    qemu_iovec_concat(&hd_qiov, qiov, bytes_done,
+                                       sinfo.bytes_avail);
 =20
-+    assert(source->total_sectors =3D=3D target->total_sectors);
+                     /* zero fill the back, if any */
+@@ -1393,29 +1428,7 @@ static coroutine_fn int vhdx_co_writev(BlockDriverSt=
+ate *bs, int64_t sector_num,
+                         sectors_to_write +=3D iov2.iov_len >> BDRV_SECTOR_=
+BITS;
+                     }
+                 }
+-                /* fall through */
+-            case PAYLOAD_BLOCK_NOT_PRESENT: /* fall through */
+-            case PAYLOAD_BLOCK_UNMAPPED:
+-            case PAYLOAD_BLOCK_UNMAPPED_v095:
+-            case PAYLOAD_BLOCK_UNDEFINED:
+-                bat_prior_offset =3D sinfo.file_offset;
+-                ret =3D vhdx_allocate_block(bs, s, &sinfo.file_offset);
+-                if (ret < 0) {
+-                    goto exit;
+-                }
+-                /* once we support differencing files, this may also be
+-                 * partially present */
+-                /* update block state to the newly specified state */
+-                vhdx_update_bat_table_entry(bs, s, &sinfo, &bat_entry,
+-                                            &bat_entry_offset,
+-                                            PAYLOAD_BLOCK_FULLY_PRESENT);
+-                bat_update =3D true;
+-                /* since we just allocated a block, file_offset is the
+-                 * beginning of the payload block. It needs to be the
+-                 * write address, which includes the offset into the block=
+ */
+-                if (!use_zero_buffers) {
+-                    sinfo.file_offset +=3D sinfo.block_offset;
+-                }
 +
-+    top =3D bdrv_new_open_driver(&bdrv_backup_top_filter, filter_node_name=
-,
-+                               BDRV_O_RDWR, errp);
-     if (!top) {
-         return NULL;
-     }
-diff --git a/block/backup.c b/block/backup.c
-index c4c3b8cd46..4f13bb20a5 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -340,7 +340,7 @@ BlockJob *backup_job_create(const char *job_id, BlockDr=
-iverState *bs,
-                   BlockCompletionFunc *cb, void *opaque,
-                   JobTxn *txn, Error **errp)
- {
--    int64_t len;
-+    int64_t len, target_len;
-     BackupBlockJob *job =3D NULL;
-     int64_t cluster_size;
-     BdrvRequestFlags write_flags;
-@@ -405,6 +405,18 @@ BlockJob *backup_job_create(const char *job_id, BlockD=
-riverState *bs,
-         goto error;
-     }
-=20
-+    target_len =3D bdrv_getlength(target);
-+    if (target_len < 0) {
-+        error_setg_errno(errp, -target_len, "Unable to get length for '%s'=
-",
-+                         bdrv_get_device_or_node_name(bs));
-+        goto error;
-+    }
-+
-+    if (target_len !=3D len) {
-+        error_setg(errp, "Source and target image have different sizes");
-+        goto error;
-+    }
-+
-     cluster_size =3D backup_calculate_cluster_size(target, errp);
-     if (cluster_size < 0) {
-         goto error;
+                 /* fall through */
+             case PAYLOAD_BLOCK_FULLY_PRESENT:
+                 /* if the file offset address is in the header zone,
 --=20
 2.25.3
 
