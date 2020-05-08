@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0DD1C38A2A
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 12:51:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46D34C38A2A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 12:51:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A5FC24953
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 12:51:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1516224966
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 12:51:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KKsq4blB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A5FC24953
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bSn2t/hY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1516224966
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX2TP-0006VK-M2
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 08:51:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49350)
+	id 1jX2Ta-0006sx-7g
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 08:51:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49448)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX2KU-0000Be-Ed
- for qemu-devel@nongnu.org; Fri, 08 May 2020 08:42:14 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21817
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX2Kd-0000Hd-Dg
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 08:42:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26360
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX2KN-000869-Ii
- for qemu-devel@nongnu.org; Fri, 08 May 2020 08:42:14 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX2Kb-00007f-Ej
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 08:42:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588941726;
+ s=mimecast20190719; t=1588941739;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+CxTJcdLUVWj5Wybblu9Gx5OEIzan5qW+8m1lJRkdx4=;
- b=KKsq4blBiNygf9cYMIWA3BSvsTf5beukDiqaYuyr2Ud81twAdRCoHfZ8RP/Hec8y3q6Y3t
- cZ3BNw7WouU8s49OX/ws6Jr7aaQSshze81Qb7AlrRkbsQhTB8rvzVHMjELXlxI9fJ/a2sM
- dgJMprLJNa3gJpWo48tCrckCXha76nM=
+ bh=7HQylRIVQfJwZEZ7Qe8VlAfHLYkLF2X07hXACpQ9d+A=;
+ b=bSn2t/hYHDDGoiNgJ12HZRA/7yG56v41+ZqQjSPcll/P7uPm88JM1fGfPiOp5Z6AxLfGMO
+ wsndvANpNMgrQcWrRyyQ802LFeyaqkeNvRdwKafmWHTwCgAzRkzBBiT2RG3cOjPvF6rNqJ
+ I3+dBewILS6eEfB7XPW6GajZ6S9sdCc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-_Ad1PUY0NiGBhvsLhRp-tQ-1; Fri, 08 May 2020 08:42:04 -0400
-X-MC-Unique: _Ad1PUY0NiGBhvsLhRp-tQ-1
+ us-mta-166-XLpiziUSPbe5vuvyDP5TXw-1; Fri, 08 May 2020 08:42:14 -0400
+X-MC-Unique: XLpiziUSPbe5vuvyDP5TXw-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5555A100CCC1;
- Fri,  8 May 2020 12:42:03 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF3BA107ACF5;
+ Fri,  8 May 2020 12:42:13 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-113-190.ams2.redhat.com
  [10.36.113.190])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 540B819167;
- Fri,  8 May 2020 12:42:02 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C2B2219167;
+ Fri,  8 May 2020 12:42:12 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 16/30] iotests/283: Use consistent size for source and target
-Date: Fri,  8 May 2020 14:41:21 +0200
-Message-Id: <20200508124135.252565-17-kwolf@redhat.com>
+Subject: [PULL 24/30] nfs: Support BDRV_REQ_ZERO_WRITE for truncate
+Date: Fri,  8 May 2020 14:41:29 +0200
+Message-Id: <20200508124135.252565-25-kwolf@redhat.com>
 In-Reply-To: <20200508124135.252565-1-kwolf@redhat.com>
 References: <20200508124135.252565-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -70,17 +70,17 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 01:34:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 02:25:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,52 +98,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The test case forgot to specify the null-co size for the target node.
-When adding a check to backup that both sizes match, this would fail
-because of the size mismatch and not the behaviour that the test really
-wanted to test.
+From: Eric Blake <eblake@redhat.com>
 
-Fixes: a541fcc27c98b96da187c7d4573f3270f3ddd283
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Message-Id: <20200430142755.315494-2-kwolf@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Our .bdrv_has_zero_init_truncate returns 1 if we detect that the OS
+always 0-fills; we can use that same knowledge to implement
+BDRV_REQ_ZERO_WRITE by ignoring it when the OS gives it to us for
+free.
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20200428202905.770727-4-eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/283     | 6 +++++-
- tests/qemu-iotests/283.out | 2 +-
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ block/nfs.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/tests/qemu-iotests/283 b/tests/qemu-iotests/283
-index e17b953333..383797ed62 100644
---- a/tests/qemu-iotests/283
-+++ b/tests/qemu-iotests/283
-@@ -74,7 +74,11 @@ to check that crash is fixed :)
- vm =3D iotests.VM()
- vm.launch()
+diff --git a/block/nfs.c b/block/nfs.c
+index 385d756e1d..76daa7c9f6 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -620,6 +620,9 @@ static int nfs_file_open(BlockDriverState *bs, QDict *o=
+ptions, int flags,
+     }
 =20
--vm.qmp_log('blockdev-add', **{'node-name': 'target', 'driver': 'null-co'})
-+vm.qmp_log('blockdev-add', **{
-+    'node-name': 'target',
-+    'driver': 'null-co',
-+    'size': size,
-+})
+     bs->total_sectors =3D ret;
++    if (client->has_zero_init) {
++        bs->supported_truncate_flags =3D BDRV_REQ_ZERO_WRITE;
++    }
+     return 0;
+ }
 =20
- vm.qmp_log('blockdev-add', **{
-     'node-name': 'source',
-diff --git a/tests/qemu-iotests/283.out b/tests/qemu-iotests/283.out
-index daaf5828c1..d8cff22cc1 100644
---- a/tests/qemu-iotests/283.out
-+++ b/tests/qemu-iotests/283.out
-@@ -1,4 +1,4 @@
--{"execute": "blockdev-add", "arguments": {"driver": "null-co", "node-name"=
-: "target"}}
-+{"execute": "blockdev-add", "arguments": {"driver": "null-co", "node-name"=
-: "target", "size": 1048576}}
- {"return": {}}
- {"execute": "blockdev-add", "arguments": {"driver": "blkdebug", "image": {=
-"driver": "null-co", "node-name": "base", "size": 1048576}, "node-name": "s=
-ource"}}
- {"return": {}}
 --=20
 2.25.3
 
