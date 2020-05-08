@@ -2,66 +2,86 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55087C38A2A
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 08:43:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B310C38A2A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 08:50:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D1F7205ED
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 08:43:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D1F7205ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 45283207DD
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 08:50:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F/n/5SQr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45283207DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWybp-0003bD-AQ
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 04:43:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50720)
+	id 1jWyhl-0007ih-El
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 04:50:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51644)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jWybF-000310-UV
- for qemu-devel@nongnu.org; Fri, 08 May 2020 04:43:17 -0400
-Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:43831)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1jWybE-0006EP-Ql
- for qemu-devel@nongnu.org; Fri, 08 May 2020 04:43:17 -0400
-Received: from player159.ha.ovh.net (unknown [10.108.57.245])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id 5C1A11D3184
- for <qemu-devel@nongnu.org>; Fri,  8 May 2020 10:43:12 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player159.ha.ovh.net (Postfix) with ESMTPSA id 94BE31222AAB6;
- Fri,  8 May 2020 08:43:07 +0000 (UTC)
-Date: Fri, 8 May 2020 10:43:05 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH] ppc/pnv: Fix NMI system reset SRR1 value
-Message-ID: <20200508104305.355e97d8@bahia.lan>
-In-Reply-To: <20200507135154.GA2282@umbus.fritz.box>
-References: <20200507114824.788942-1-npiggin@gmail.com>
- <20200507135154.GA2282@umbus.fritz.box>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jWyh2-0007ED-OP
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 04:49:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24802
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jWyh1-0007ot-4z
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 04:49:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588927753;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=np32KWlFHp/R5FBTcBUL+ha2Z3sdT8VN0/nqzfEWOng=;
+ b=F/n/5SQrX1VFDkXBgSlEeTwEc0Z7QkTpEWMJbKqb8dYcOTOTDURSv4Agydbk5ihCOhuZqW
+ 3e4krEnt59P7+ZSCwV3WeCq7C6fUKx5tid6q8coy9Cf7v0KrAr/TSqtHD44QUjrI3TgCzK
+ IIYWZCmVMhx28YM9fFwdr0NxdJOD8i8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-229-azftg7yxMySNEu8l5cYMKg-1; Fri, 08 May 2020 04:49:09 -0400
+X-MC-Unique: azftg7yxMySNEu8l5cYMKg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18BA5EC1A2;
+ Fri,  8 May 2020 08:49:08 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-113-190.ams2.redhat.com [10.36.113.190])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 02CDE1001920;
+ Fri,  8 May 2020 08:49:04 +0000 (UTC)
+Date: Fri, 8 May 2020 10:49:03 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v3 06/10] iotests: add testfinder.py
+Message-ID: <20200508084903.GA4970@linux.fritz.box>
+References: <20200421073601.28710-1-vsementsov@virtuozzo.com>
+ <20200421073601.28710-7-vsementsov@virtuozzo.com>
+ <20200421165647.GE22440@linux.fritz.box>
+ <5a185a4e-1c5d-9887-c88c-6ca71ebeeee1@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/mPAzPNBXx08z7ApvtMDWprT";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Ovh-Tracer-Id: 1990309563038210534
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrkedvgddtjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgesghdtreerredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnheplefhteekfeegkeeufffghfelvefgveevteevffffudeiudfgteffuefhveevuedtnecuffhomhgrihhnpehqvghmuhdrohhrghenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrudehledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-Received-SPF: pass client-ip=188.165.52.147; envelope-from=groug@kaod.org;
- helo=8.mo2.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 04:43:12
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+In-Reply-To: <5a185a4e-1c5d-9887-c88c-6ca71ebeeee1@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 02:23:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -75,115 +95,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- Nicholas Piggin <npiggin@gmail.com>,
- =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
+ den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/mPAzPNBXx08z7ApvtMDWprT
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, 7 May 2020 23:51:54 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> On Thu, May 07, 2020 at 09:48:24PM +1000, Nicholas Piggin wrote:
-> > Commit a77fed5bd926 ("ppc/pnv: Add support for NMI interface") got the
-
-Please note that the culprit patch was merged with a different SHA1:
-
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D01b552b05b0f21f8ff57a508f=
-7ad26f7abbcd123
-
-> > SRR1 setting wrong for sresets that hit outside of power-save states.
+Am 07.05.2020 um 19:43 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> 21.04.2020 19:56, Kevin Wolf wrote:
+> > Am 21.04.2020 um 09:35 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> > > Add python script with new logic of searching for tests:
+> > >=20
+> > > Current ./check behavior:
+> > >   - tests are named [0-9][0-9][0-9]
+> > >   - tests must be registered in group file (even if test doesn't belo=
+ng
+> > >     to any group, like 142)
+> > >=20
+> > > Behavior of new test:
+> > >   - group file is dropped
+> > >   - tests are searched by file-name instead of group file, so it's no=
+t
+> > >     needed more to "register the test", just create it with name
+> > >     *-test. Old names like [0-9][0-9][0-9] are supported too, but not
+> > >     recommended for new tests
 > >=20
-> > Fix this, better documenting the source for the bit definitions.
+> > I wonder if a tests/ subdirectory instead of the -test suffix would
+> > organise things a bit better.
 > >=20
-> > Fixes: a77fed5bd926 ("ppc/pnv: Add support for NMI interface") got the
-
-Fixes: 01b552b05b0f ("ppc/pnv: Add support for NMI interface")
-
-> > Cc: C=C3=A9dric Le Goater <clg@kaod.org>
-> > Cc: David Gibson <david@gibson.dropbear.id.au>
-> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 >=20
-> Applied to ppc-for-5.1, thanks.
-> > ---
-> >=20
-> > Thanks to Cedric for pointing out concerns with a previous MCE patch
-> > that unearthed this as well. Linux does not actually care what these
-> > SRR1[42:45] bits look like for non-powersave sresets, but we should
-> > follow documented behaviour as far as possible.
-> >=20
-> >  hw/ppc/pnv.c | 26 ++++++++++++++++++++------
-> >  1 file changed, 20 insertions(+), 6 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> > index a3b7a8d0ff..1b4748ce6d 100644
-> > --- a/hw/ppc/pnv.c
-> > +++ b/hw/ppc/pnv.c
-> > @@ -1986,12 +1986,26 @@ static void pnv_cpu_do_nmi_on_cpu(CPUState *cs,=
- run_on_cpu_data arg)
-> > =20
-> >      cpu_synchronize_state(cs);
-> >      ppc_cpu_do_system_reset(cs);
-> > -    /*
-> > -     * SRR1[42:45] is set to 0100 which the ISA defines as implementat=
-ion
-> > -     * dependent. POWER processors use this for xscom triggered interr=
-upts,
-> > -     * which come from the BMC or NMI IPIs.
-> > -     */
-> > -    env->spr[SPR_SRR1] |=3D PPC_BIT(43);
-> > +    if (env->spr[SPR_SRR1] & PPC_BITMASK(46, 47)) {
-> > +        /*
-> > +	 * Power-save wakeups, as indicated by non-zero SRR1[46:47] put the
-> > +	 * wakeup reason in SRR1[42:45], system reset is indicated with 0b0100
-> > +	 * (PPC_BIT(43)).
-> > +	 */
-> > +        if (!(env->spr[SPR_SRR1] & PPC_BIT(43))) {
-> > +            warn_report("ppc_cpu_do_system_reset does not set system r=
-eset wakeup reason");
-> > +            env->spr[SPR_SRR1] |=3D PPC_BIT(43);
-> > +        }
-> > +    } else {
-> > +        /*
-> > +	 * For non-powersave system resets, SRR1[42:45] are defined to be
-> > +	 * implementation-dependent. The POWER9 User Manual specifies that
-> > +	 * an external (SCOM driven, which may come from a BMC nmi command or
-> > +	 * another CPU requesting a NMI IPI) system reset exception should be
-> > +	 * 0b0010 (PPC_BIT(44)).
-> > +         */
-> > +        env->spr[SPR_SRR1] |=3D PPC_BIT(44);
-> > +    }
-> >  }
-> > =20
-> >  static void pnv_nmi(NMIState *n, int cpu_index, Error **errp)
+> It will make more difficult to import iotests.py.. Calling common.rc from
+> bash tests will need to be modified too.
 >=20
+> So, we'll need additional line in all python tests:
+>=20
+> sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
+Hm, yes, this is nasty.
 
---Sig_/mPAzPNBXx08z7ApvtMDWprT
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Would it be any better have a wrapper script that just imports the
+actual test so that the import path would still contain the main
+qemu-iotests/ directory?
 
------BEGIN PGP SIGNATURE-----
+> which doesn't seem to be good practice.. So, instead we'd better call
+> tests with PYTHONPATH set appropriately..
 
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl61G5kACgkQcdTV5YIv
-c9bXfg/7BxK8Inr23wwCz7ZBVCl03mHONfUiVV5sxX52SJd7gOTdMQhJbbryGIBW
-is5KvLUttwugq3HMjquEmgG+KBYyiipKmmAwAQ+m1JhQiyPDav7j0tVlGVk6YoeD
-rD9tdind9R/om0SE9pIqPlDdhI/sQCbyR8BQFhXumsjkA7ZGEFrgCYQGPJ8V3uPH
-xb5GKWG6dzpWkxIkuAzFxXSXfhALlXmG5vsTw+N94Fs4EMeZ+uHbecdDrCyh6PPm
-XxjurN9L1+szz8S9sNc9sUx+4xC9qoy8gFsregGnsduY3FmUzNJv0e9cujaiHDZ/
-GBDodvpXrbzbxILI/Mkklzs2wxxAsJYhkxGh08BzuVFI6gawgzHFZhBSJPYhm6ox
-tBq0wcXW3jLAV8yn9cH92fPMMqh24lEagC4nz5mWiJUfB7DxbrD4rbPXqz6vcR+h
-RTjxIFA99wULVNwsVktPfc3eot+s/7/0VlKPSDYzvc4F+1vmFue/hzRNTJlXw3aS
-lI13owxBgl6M9StqIS9IkUh8EP6S2TK+/Gb7dVMORZ9rF59qO5nql9qhxwFz6B6y
-Nu6CsZTjx6Ull1MLFYwE79YSS35WX7iR060dwnkada3nwHy/FcHOsL750iDI0oHU
-BghgE4UR2OVumN7CqU8ZEBRgubXelfpeUtAxzeJyJP1R49XLUXs=
-=cpIS
------END PGP SIGNATURE-----
+This is another option, especially if we do want to create a lib/.
 
---Sig_/mPAzPNBXx08z7ApvtMDWprT--
+> and modify bash tests to do
+> . ../common.rc
+> . ../common.filter
+> <etc>
+>=20
+> or again, better to export BASH_TEST_LIB directory.
+
+I don't think this is necessary because the working directory wouldn't
+change, so bash scripts should just keep working as before.
+
+> Is it worth doing?
+>=20
+> I think, there are two variants:
+>=20
+> 1) keep as is: all in one directory, add *-test notation
+
+I think it would make it rather hard to find the files that belong to
+the test harness implementation between all the tests. Currently, 'ls'
+in the qemu-iotests directory is still kind of usable because all the
+test cases are at the start and everything that comes later is not a
+test.
+
+> 2) go further and restructure to something like:
+>=20
+> iotests/<only check script and its dependencies here>
+> iotests/tests/<all-tests-here>
+> iotests/lib/python/iotests.py
+> iotests/lib/bash/<common.rc and friends here>
+>=20
+> And then, check script will export PYTHONPATH and BASH_TEST_LIB
+> variables.
+
+I think leaving everything except named tests where it is, but setting
+PYTHONPATH or having a wrapper script, is still a third option that's
+worth considering. It sounds like the most attrative option to me.
+
+Kevin
+
 
