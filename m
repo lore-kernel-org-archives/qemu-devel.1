@@ -2,90 +2,72 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDE66C47247
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 05:15:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C944EC38A2A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 05:30:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D70E206D3
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 05:15:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=smartx-com.20150623.gappssmtp.com header.i=@smartx-com.20150623.gappssmtp.com header.b="eQ+hHayu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D70E206D3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
+	by mail.kernel.org (Postfix) with ESMTPS id 986A4208CA
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 05:30:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 986A4208CA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWvLu-0004zA-QD
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 01:15:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55878)
+	id 1jWvaI-0001aP-RJ
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 01:30:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59398)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <fengli@smartx.com>) id 1jWvKy-000492-3L
- for qemu-devel@nongnu.org; Fri, 08 May 2020 01:14:16 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:33113)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <fengli@smartx.com>) id 1jWvKw-00059s-Lf
- for qemu-devel@nongnu.org; Fri, 08 May 2020 01:14:15 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id 7so4754805pjo.0
- for <qemu-devel@nongnu.org>; Thu, 07 May 2020 22:14:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=smartx-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=U1L9f3dRdWOpqF8hwt16uqX6nGTTq0rfQ0pyeSsS3VY=;
- b=eQ+hHayufAHMzv2fp65pkeTRDBFR4Aat3NPbjDAWndZSNKSbS1qi+oJQw28afvEZZ+
- 8ODa846DlPv+lEZql+IvfVycFUIebEzSaOJfiWH4yx9JRWacjyPXP7gOdkLSAST3HtHQ
- 17xgD7HRbKn22LZDYkDSuVrU0ocUVuzAKO84+nfABn8uzHKuEJgs9ZJSbSISy1vcxT1B
- 0YGtBWcg/P9WSn6R1wxb3I9Bx0nbPI8cbBNk0jTHu5ZgZablSEQHhj+3dVQ58cwad7x0
- /I+9QNpvAy80iMWiZsiB3o1Yht07uVnmccyrNDkWZvelBc5pLUafY3mhEsfiyJODg4x+
- Atmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=U1L9f3dRdWOpqF8hwt16uqX6nGTTq0rfQ0pyeSsS3VY=;
- b=Zy4y+JqQVxmBhkkeRUsCbfInBQF3F1yN64zBfZ8l700Zft3jpKH6HHTQDX++z/zqWN
- fhDlsj+5hL74MzoXfGJUAhZvWWJB1NmGXVcLCRCQNGhqRBKSc7Krq5cWYsxtwxnIQnof
- CWQ2o0tMxwPR62ZcPPbdtO2Wm19kcsfOqYNPgrDuXKqKFAZgRguUdOtuRtrOpL2JsCiT
- /eeyQA7y5Wrp+mv29t9Zh2JZXnhfBbHJyzgj1Ak/Cfvv2qFbjUbVR2+lfSXz1/0TfsS6
- 48vm40Fj5erCcybIGmFJc2Z2B4LJ0Wm8SeHN0mniuqcgAtCjZ7VimBcc9Gf1JDFPcOmt
- lJKg==
-X-Gm-Message-State: AGi0PubY8LVdBtxwTE0N1dSoHUbHVmggRpqazoKm9YK8D1odrIFZUCiS
- NnHYiwqkPhqbptB8wkPukcySUw==
-X-Google-Smtp-Source: APiQypLQ5XEUEVDEHaDoDNvpu5D4aba5Wua64np+JJ0v9v/1FL7nx0v9iNj4p/hsjMPsZui7j7yfCw==
-X-Received: by 2002:a17:90a:d56:: with SMTP id
- 22mr3703685pju.187.1588914853490; 
- Thu, 07 May 2020 22:14:13 -0700 (PDT)
-Received: from 31_216.localdomain ([47.240.167.159])
- by smtp.gmail.com with ESMTPSA id b15sm477050pfd.139.2020.05.07.22.14.11
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 07 May 2020 22:14:12 -0700 (PDT)
-From: Li Feng <fengli@smartx.com>
-To: kyle@smartx.com, lifeng1519@gmail.com, dimastep@yandex-team.ru,
- marcandre.lureau@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-devel@nongnu.org (open list:All patches CC here)
-Subject: [PATCH v3 2/2] char-socket: initialize reconnect timer only when the
- timer doesn't start
-Date: Fri,  8 May 2020 13:14:41 +0800
-Message-Id: <20200508051441.8143-3-fengli@smartx.com>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20200508051441.8143-1-fengli@smartx.com>
-References: <20200428085122.1621-1-fengli@smartx.com>
- <20200508051441.8143-1-fengli@smartx.com>
-Received-SPF: none client-ip=2607:f8b0:4864:20::1044;
- envelope-from=fengli@smartx.com; helo=mail-pj1-x1044.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jWvZi-00019n-1I
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 01:29:30 -0400
+Resent-Date: Fri, 08 May 2020 01:29:30 -0400
+Resent-Message-Id: <E1jWvZi-00019n-1I@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21362)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jWvZg-0004DE-5N
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 01:29:29 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1588915714; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=gGOLUL5jv1FqajGDS9KQXITm2iGvRqwwcft3VSyDoaqc0SQuIMwP1X48RDUGfEMdzXZU9PCqnYOuwBejtGILhVWzXzQZF7j4o8zR2+4D0ZpjsuemOkDDAxtm07rl9ftMqPB6wO66xr4xy5moRVrhctKeg3HoZ/pdG66O3MterLQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1588915714;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=n7E/tdChMElF0r6ONrCQIBFdxsWeY+gIjsdn0eo3/6M=; 
+ b=mts2fZ0Pq2nOGyXAK53IVO+dEfE8xgKfJO9LNTa7A/LpWtIrB09L+cttv0eVKE79dYmjH3au5i5gvr75G5e+Dpwb2hRE4ERRfVrimLLNuBAsKebalzj9VtPrQaU20CJK3AGhAFVgPiv3yaLUQZh/l2siOq/20eu4PBT0lPsQigs=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1588915712512575.8488904048985;
+ Thu, 7 May 2020 22:28:32 -0700 (PDT)
+Message-ID: <158891571032.29923.11626722130579684161@45ef0f9c86ae>
+In-Reply-To: <20200507155813.16169-1-philmd@redhat.com>
+Subject: Re: [PATCH] accel: Move Xen accelerator code under accel/xen/
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: philmd@redhat.com
+Date: Thu, 7 May 2020 22:28:32 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 23:43:30
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,237 +81,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Feng <fengli@smartx.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: sstabellini@kernel.org, ehabkost@redhat.com, quintela@redhat.com,
+ paul@xen.org, dgilbert@redhat.com, qemu-devel@nongnu.org,
+ xen-devel@lists.xenproject.org, aleksandar.qemu.devel@gmail.com,
+ mst@redhat.com, pbonzini@redhat.com, anthony.perard@citrix.com,
+ imammedo@redhat.com, philmd@redhat.com, aurelien@aurel32.net, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When the disconnect event is triggered in the connecting stage,
-the tcp_chr_disconnect_locked may be called twice.
-
-The first call:
-    #0  qemu_chr_socket_restart_timer (chr=0x55555582ee90) at chardev/char-socket.c:120
-    #1  0x000055555558e38c in tcp_chr_disconnect_locked (chr=<optimized out>) at chardev/char-socket.c:490
-    #2  0x000055555558e3cd in tcp_chr_disconnect (chr=0x55555582ee90) at chardev/char-socket.c:497
-    #3  0x000055555558ea32 in tcp_chr_new_client (chr=chr@entry=0x55555582ee90, sioc=sioc@entry=0x55555582f0b0) at chardev/char-socket.c:892
-    #4  0x000055555558eeb8 in qemu_chr_socket_connected (task=0x55555582f300, opaque=<optimized out>) at chardev/char-socket.c:1090
-    #5  0x0000555555574352 in qio_task_complete (task=task@entry=0x55555582f300) at io/task.c:196
-    #6  0x00005555555745f4 in qio_task_thread_result (opaque=0x55555582f300) at io/task.c:111
-    #7  qio_task_wait_thread (task=0x55555582f300) at io/task.c:190
-    #8  0x000055555558f17e in tcp_chr_wait_connected (chr=0x55555582ee90, errp=0x555555802a08 <error_abort>) at chardev/char-socket.c:1013
-    #9  0x0000555555567cbd in char_socket_client_reconnect_test (opaque=0x5555557fe020 <client8unix>) at tests/test-char.c:1152
-The second call:
-    #0  0x00007ffff5ac3277 in raise () from /lib64/libc.so.6
-    #1  0x00007ffff5ac4968 in abort () from /lib64/libc.so.6
-    #2  0x00007ffff5abc096 in __assert_fail_base () from /lib64/libc.so.6
-    #3  0x00007ffff5abc142 in __assert_fail () from /lib64/libc.so.6
-    #4  0x000055555558d10a in qemu_chr_socket_restart_timer (chr=0x55555582ee90) at chardev/char-socket.c:125
-    #5  0x000055555558df0c in tcp_chr_disconnect_locked (chr=<optimized out>) at chardev/char-socket.c:490
-    #6  0x000055555558df4d in tcp_chr_disconnect (chr=0x55555582ee90) at chardev/char-socket.c:497
-    #7  0x000055555558e5b2 in tcp_chr_new_client (chr=chr@entry=0x55555582ee90, sioc=sioc@entry=0x55555582f0b0) at chardev/char-socket.c:892
-    #8  0x000055555558e93a in tcp_chr_connect_client_sync (chr=chr@entry=0x55555582ee90, errp=errp@entry=0x7fffffffd178) at chardev/char-socket.c:944
-    #9  0x000055555558ec78 in tcp_chr_wait_connected (chr=0x55555582ee90, errp=0x555555802a08 <error_abort>) at chardev/char-socket.c:1035
-    #10 0x000055555556804b in char_socket_client_test (opaque=0x5555557fe020 <client8unix>) at tests/test-char.c:1023
-
-Run test/test-char to reproduce this issue.
-
-test-char: chardev/char-socket.c:125: qemu_chr_socket_restart_timer: Assertion `!s->reconnect_timer' failed.
-
-Signed-off-by: Li Feng <fengli@smartx.com>
----
- chardev/char-socket.c |  2 +-
- tests/test-char.c     | 68 ++++++++++++++++++++++++++++++++++++++++-----------
- 2 files changed, 55 insertions(+), 15 deletions(-)
-
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 1f14c2c7c8..d84330b3c9 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -486,7 +486,7 @@ static void tcp_chr_disconnect_locked(Chardev *chr)
-     if (emit_close) {
-         qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
-     }
--    if (s->reconnect_time) {
-+    if (s->reconnect_time && !s->reconnect_timer) {
-         qemu_chr_socket_restart_timer(chr);
-     }
- }
-diff --git a/tests/test-char.c b/tests/test-char.c
-index 8d39bdc9fa..d5c9049eec 100644
---- a/tests/test-char.c
-+++ b/tests/test-char.c
-@@ -625,12 +625,14 @@ static void char_udp_test(void)
- typedef struct {
-     int event;
-     bool got_pong;
-+    CharBackend *be;
- } CharSocketTestData;
- 
- 
- #define SOCKET_PING "Hello"
- #define SOCKET_PONG "World"
- 
-+typedef void (*char_socket_cb)(void *opaque, QEMUChrEvent event);
- 
- static void
- char_socket_event(void *opaque, QEMUChrEvent event)
-@@ -639,6 +641,27 @@ char_socket_event(void *opaque, QEMUChrEvent event)
-     data->event = event;
- }
- 
-+static void
-+char_socket_event_with_error(void *opaque, QEMUChrEvent event)
-+{
-+    static bool first_error;
-+    CharSocketTestData *data = opaque;
-+    CharBackend *be = data->be;
-+    data->event = event;
-+    switch (event) {
-+    case CHR_EVENT_OPENED:
-+        if (!first_error) {
-+            first_error = true;
-+            qemu_chr_fe_disconnect(be);
-+        }
-+        return;
-+    case CHR_EVENT_CLOSED:
-+        return;
-+    default:
-+        return;
-+    }
-+}
-+
- 
- static void
- char_socket_read(void *opaque, const uint8_t *buf, int size)
-@@ -699,19 +722,24 @@ char_socket_addr_to_opt_str(SocketAddress *addr, bool fd_pass,
- }
- 
- 
--static void
-+static int
- char_socket_ping_pong(QIOChannel *ioc)
- {
-     char greeting[sizeof(SOCKET_PING)];
-     const char *response = SOCKET_PONG;
- 
--    qio_channel_read_all(ioc, greeting, sizeof(greeting), &error_abort);
-+    int ret;
-+    ret = qio_channel_read_all(ioc, greeting, sizeof(greeting), &error_abort);
-+    if (ret != 0) {
-+        object_unref(OBJECT(ioc));
-+        return -1;
-+    }
- 
-     g_assert(memcmp(greeting, SOCKET_PING, sizeof(greeting)) == 0);
- 
-     qio_channel_write_all(ioc, response, sizeof(SOCKET_PONG), &error_abort);
--
-     object_unref(OBJECT(ioc));
-+    return 0;
- }
- 
- 
-@@ -783,6 +811,7 @@ static void char_socket_server_test(gconstpointer opaque)
- 
-  reconnect:
-     data.event = -1;
-+    data.be = &be;
-     qemu_chr_fe_set_handlers(&be, NULL, NULL,
-                              char_socket_event, NULL,
-                              &data, NULL, true);
-@@ -855,10 +884,13 @@ char_socket_client_server_thread(gpointer data)
-     QIOChannelSocket *ioc = data;
-     QIOChannelSocket *cioc;
- 
-+retry:
-     cioc = qio_channel_socket_accept(ioc, &error_abort);
-     g_assert_nonnull(cioc);
- 
--    char_socket_ping_pong(QIO_CHANNEL(cioc));
-+    if (char_socket_ping_pong(QIO_CHANNEL(cioc)) != 0) {
-+        goto retry;
-+    }
- 
-     return NULL;
- }
-@@ -869,6 +901,7 @@ typedef struct {
-     const char *reconnect;
-     bool wait_connected;
-     bool fd_pass;
-+    char_socket_cb event_cb;
- } CharSocketClientTestConfig;
- 
- static void char_socket_client_dupid_test(gconstpointer opaque)
-@@ -920,6 +953,7 @@ static void char_socket_client_dupid_test(gconstpointer opaque)
- static void char_socket_client_test(gconstpointer opaque)
- {
-     const CharSocketClientTestConfig *config = opaque;
-+    const char_socket_cb event_cb = config->event_cb;
-     QIOChannelSocket *ioc;
-     char *optstr;
-     Chardev *chr;
-@@ -983,8 +1017,9 @@ static void char_socket_client_test(gconstpointer opaque)
- 
-  reconnect:
-     data.event = -1;
-+    data.be = &be;
-     qemu_chr_fe_set_handlers(&be, NULL, NULL,
--                             char_socket_event, NULL,
-+                             event_cb, NULL,
-                              &data, NULL, true);
-     if (config->reconnect) {
-         g_assert(data.event == -1);
-@@ -1022,7 +1057,7 @@ static void char_socket_client_test(gconstpointer opaque)
-     /* Setup a callback to receive the reply to our greeting */
-     qemu_chr_fe_set_handlers(&be, char_socket_can_read,
-                              char_socket_read,
--                             char_socket_event, NULL,
-+                             event_cb, NULL,
-                              &data, NULL, true);
-     g_assert(data.event == CHR_EVENT_OPENED);
-     data.event = -1;
-@@ -1467,19 +1502,22 @@ int main(int argc, char **argv)
- 
- #define SOCKET_CLIENT_TEST(name, addr)                                  \
-     static CharSocketClientTestConfig client1 ## name =                 \
--        { addr, NULL, false, false };                                   \
-+        { addr, NULL, false, false, char_socket_event};                 \
-     static CharSocketClientTestConfig client2 ## name =                 \
--        { addr, NULL, true, false };                                    \
-+        { addr, NULL, true, false, char_socket_event };                 \
-     static CharSocketClientTestConfig client3 ## name =                 \
--        { addr, ",reconnect=1", false };                                \
-+        { addr, ",reconnect=1", false, false, char_socket_event };      \
-     static CharSocketClientTestConfig client4 ## name =                 \
--        { addr, ",reconnect=1", true };                                 \
-+        { addr, ",reconnect=1", true, false, char_socket_event };       \
-     static CharSocketClientTestConfig client5 ## name =                 \
--        { addr, NULL, false, true };                                    \
-+        { addr, NULL, false, true, char_socket_event };                 \
-     static CharSocketClientTestConfig client6 ## name =                 \
--        { addr, NULL, true, true };                                     \
-+        { addr, NULL, true, true, char_socket_event };                  \
-     static CharSocketClientTestConfig client7 ## name =                 \
--        { addr, ",reconnect=1", false, false };                         \
-+        { addr, ",reconnect=1", false, false, char_socket_event };      \
-+    static CharSocketClientTestConfig client8 ## name =                 \
-+        { addr, ",reconnect=1", true, false,                            \
-+            char_socket_event_with_error };                             \
-     g_test_add_data_func("/char/socket/client/mainloop/" # name,        \
-                          &client1 ##name, char_socket_client_test);     \
-     g_test_add_data_func("/char/socket/client/wait-conn/" # name,       \
-@@ -1493,7 +1531,9 @@ int main(int argc, char **argv)
-     g_test_add_data_func("/char/socket/client/wait-conn-fdpass/" # name, \
-                          &client6 ##name, char_socket_client_test);     \
-     g_test_add_data_func("/char/socket/client/dupid-reconnect/" # name, \
--                         &client7 ##name, char_socket_client_dupid_test)
-+                         &client7 ##name, char_socket_client_dupid_test);\
-+    g_test_add_data_func("/char/socket/client/reconnect-error/" # name, \
-+                         &client8 ##name, char_socket_client_test)
- 
-     if (has_ipv4) {
-         SOCKET_SERVER_TEST(tcp, &tcpaddr);
--- 
-2.11.0
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUwNzE1NTgxMy4xNjE2
+OS0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
+a2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
+bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
+ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
+VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVU
+V09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0x
+NCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCi90bXAvcWVtdS10ZXN0L3NyYy90
+ZXN0cy9xdGVzdC9saWJxdGVzdC5jOjE3NToga2lsbF9xZW11KCkgZGV0ZWN0ZWQgUUVNVSBkZWF0
+aCBmcm9tIHNpZ25hbCA2IChBYm9ydGVkKSAoY29yZSBkdW1wZWQpCiAgVEVTVCAgICBjaGVjay11
+bml0OiB0ZXN0cy9jaGVjay1xZGljdAogIFRFU1QgICAgaW90ZXN0LXFjb3cyOiAwMDcKRVJST1Ig
+LSB0b28gZmV3IHRlc3RzIHJ1biAoZXhwZWN0ZWQgNSwgZ290IDApCm1ha2U6ICoqKiBbY2hlY2st
+cXRlc3QtYWFyY2g2NF0gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBq
+b2JzLi4uLgogIFRFU1QgICAgY2hlY2stcXRlc3QteDg2XzY0OiB0ZXN0cy9xdGVzdC9mZGMtdGVz
+dAogIFRFU1QgICAgY2hlY2stdW5pdDogdGVzdHMvY2hlY2stYmxvY2stcWRpY3QKLS0tCiAgICBy
+YWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFBy
+b2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1s
+YWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPWU1OTRiOTc0OTQwNDQ0OTY4Yjc3Zjk0MjQz
+MTBjYTNjJywgJy11JywgJzEwMDMnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZp
+bmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VS
+RV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScs
+ICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12Jywg
+Jy9ob21lL3BhdGNoZXcyLy5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hl
+OnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXAybjRvcGUyL3NyYy9kb2Nr
+ZXItc3JjLjIwMjAtMDUtMDgtMDEuMTUuMTQuMjE2MTg6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3Fl
+bXU6Y2VudG9zNycsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVk
+IG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5p
+bnN0YW5jZS51dWlkPWU1OTRiOTc0OTQwNDQ0OTY4Yjc3Zjk0MjQzMTBjYTNjCm1ha2VbMV06ICoq
+KiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90
+bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXAybjRvcGUyL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVu
+LXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3IgMgoKcmVhbCAgICAxM20xNi4yNzZzCnVzZXIgICAg
+MG04LjE4NXMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9y
+Zy9sb2dzLzIwMjAwNTA3MTU1ODEzLjE2MTY5LTEtcGhpbG1kQHJlZGhhdC5jb20vdGVzdGluZy5k
+b2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
+dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
+ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
