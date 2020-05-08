@@ -2,84 +2,85 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0445BC38A2A
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 15:41:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27837C38A2A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 15:41:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8BF121841
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 15:41:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E2D0021841
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 15:41:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SASCfKKQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8BF121841
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JprZnie5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2D0021841
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX57g-0001PQ-QD
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 11:41:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34928)
+	id 1jX57v-0001x0-0E
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 11:41:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35042)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jX4pG-0004TB-Dn
- for qemu-devel@nongnu.org; Fri, 08 May 2020 11:22:10 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:53720)
+ id 1jX4pS-0004hb-O9
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 11:22:23 -0400
+Received: from mail-pj1-x1035.google.com ([2607:f8b0:4864:20::1035]:40802)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jX4pF-00074W-Gm
- for qemu-devel@nongnu.org; Fri, 08 May 2020 11:22:10 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id hi11so4406718pjb.3
- for <qemu-devel@nongnu.org>; Fri, 08 May 2020 08:22:09 -0700 (PDT)
+ id 1jX4pQ-0007Cf-TQ
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 11:22:22 -0400
+Received: by mail-pj1-x1035.google.com with SMTP id fu13so4389200pjb.5
+ for <qemu-devel@nongnu.org>; Fri, 08 May 2020 08:22:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=P8q6V0iik55UUDqAciuD8of8rt9ZSjxKLPBKIwVKE6U=;
- b=SASCfKKQNfB4YH8qYJvppHPRmjaTeg8nyvXp1tYN4R6JQlKj9ocdu2JxPxPntXL36O
- rMKuTTczpRiDZJbKaTMeXoE+Az9Pe7NkENqELts71YtQbUdwWhgQZLlkMlBTiyqKPngF
- UHERB4wVdoZJSIyy1igzSsYES5qmlAUIkMYfV+U6eMS0os+LdM0b7xBAkhjvcjk14fVh
- bePQ4Pkel192dW2AovobBxGBj8bbMDpoaOYWWR+U9gpk46TrbWAXOuA+OIbQP7f+0m3/
- YueXxiCcwGCNhmmjLGRUTC84lrSY5wRU2KDCdiwOGLWTnl93eeqT/6M00+LsiGCSf9BH
- qlSg==
+ bh=bxUsBWRJww8ejhrlDwXgOXgiUwWOHVNz3+zWU3i5HOQ=;
+ b=JprZnie5KakcICF8sZYB9lLGBDvCv1jG8Rq/RHKxt/wJTpIOXPuDQcOk06wI7YKE6G
+ WngPiKGG2u/gCMWxW+WBf6HAtLS4FuEyBlE+e+O94IofjS91Q33B0BFjsmxmGmUu6+PA
+ 3nQ8bq0d5MpgnGvp9o3XTGvMtAaoQNXn7NG/8YZvQk+B6Gg34s3o5YFofUblVz1ebIaO
+ rDAiuFHDLDbQOZ+lhFbmg1sEJ89tev7FXljYLYn2z5o4JCpLOZdL2sAYEpy1FWh0UcIw
+ rRs9Bc8hhheh53+zXA2Z09ZVTf1/BKoZF2iQRvKmAPWM1AfiIGxr4+0uey6a7QLz7OpE
+ u4Qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=P8q6V0iik55UUDqAciuD8of8rt9ZSjxKLPBKIwVKE6U=;
- b=HNuoGEbISOYlqZ5GT0iyw7pMwpJkzMwVLcgI4gLAurKeabB3XIFIy6GbCi8Bd4naQM
- xnn7ZxIdJkgCRiqwKLEFobZtyV9r6EJxCVbDmMAUrnSLc77lVHh6VkPoJ/gMkazba19k
- DHJbbanNL0v0/k2sUvK6jwQ3SFx9/32qZVgUFiakut/Zoi4AdgiqctR5ZQHM644EcbF0
- aUbWZPTA/K9aw3hnhIxj9Ki9feic2ZBsH01SWlptV0d25J4gRGXo34EBdRdE1Mc1G5XF
- 0C72/hDQDmGpAXS+gPX/+e6FzQMUZHM2wDLFn/LcJyHkWhd7PVPcc2bCM4xlHmR/rPHY
- sK2A==
-X-Gm-Message-State: AGi0PuYfMgpTSZK446WhBVgZZ+OqpKR+iQ+GLW70PxkbSp0FHDpTLIPs
- NKqsfK5Sj1OXBeWZigjZ2PqICdB2oXk=
-X-Google-Smtp-Source: APiQypINqrlXamFYkTMHgDkf8s/3hHFfkaVLA/KUHLvgc85GlSTuf4+MKdKa4IeGdRcYn5Q7ntA3rg==
-X-Received: by 2002:a17:90a:2e82:: with SMTP id
- r2mr6809299pjd.128.1588951327715; 
- Fri, 08 May 2020 08:22:07 -0700 (PDT)
+ bh=bxUsBWRJww8ejhrlDwXgOXgiUwWOHVNz3+zWU3i5HOQ=;
+ b=UT+3g0Z/V3d7lOVpLO4lbLTBch1xibInI1p+PEhIXzqDHuL1WHMpOnC6SuIWDQv2Rt
+ Si7B8tbMpeYlCv7GcLej2zgaVf7wYGm/MIlXMGUr0W0AXXd5boPLOyBxSFMla7/Jk3Xq
+ S0jIyQc1wyEsszoqvwu3pF0GthJrKkkdtqyhhrqTAUt8liBp3tjeMWh55k3D2cxh80uh
+ 5sHFpgFMwoKqJON8xJ+euF6o61a5aVJyEnRBFvNwhw7J0ZtTyV1qI+CeXm99UqgJ1f1A
+ 4ZbSe982KxKRstl/+djoUQYIoDt55GP+m4+ZkOWqJ8nWXsUJh8F/igD08+8/G4yYPikz
+ 7X0w==
+X-Gm-Message-State: AGi0PuZ4GGYpSw5HyCkwjESR1swX/Jw7Yggy/K1PXojbCkAcWkr9Diaa
+ lVIuNVEas2VIUDmm0kjU7PmA7HTCUH4=
+X-Google-Smtp-Source: APiQypJhE5Z2rYw3CDhljb5lqvPBFIlFmZ5zTYBQYjhfrPq7LgnO7dDRhnI/L42fCeWfV5xBR3KYsw==
+X-Received: by 2002:a17:90a:eacb:: with SMTP id
+ ev11mr6497620pjb.80.1588951337417; 
+ Fri, 08 May 2020 08:22:17 -0700 (PDT)
 Received: from localhost.localdomain (174-21-149-226.tukw.qwest.net.
  [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id n16sm2104575pfq.61.2020.05.08.08.22.06
+ by smtp.gmail.com with ESMTPSA id n16sm2104575pfq.61.2020.05.08.08.22.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 08 May 2020 08:22:06 -0700 (PDT)
+ Fri, 08 May 2020 08:22:16 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 04/16] target/arm: Remove unnecessary range check for VSHL
-Date: Fri,  8 May 2020 08:21:48 -0700
-Message-Id: <20200508152200.6547-5-richard.henderson@linaro.org>
+Subject: [PATCH v3 11/16] target/arm: Remove fp_status from helper_{recpe,
+ rsqrte}_u32
+Date: Fri,  8 May 2020 08:21:55 -0700
+Message-Id: <20200508152200.6547-12-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200508152200.6547-1-richard.henderson@linaro.org>
 References: <20200508152200.6547-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1035;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1035.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,38 +107,109 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In 1dc8425e551, while converting to gvec, I added an extra range check
-against the shift count.  This was unnecessary because the encoding of
-the shift count produces 0 to the element size - 1.
+These operations do not touch fp_status.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 12 ++----------
- 1 file changed, 2 insertions(+), 10 deletions(-)
+ target/arm/helper.h        |  4 ++--
+ target/arm/translate-a64.c |  5 ++---
+ target/arm/translate.c     | 12 ++----------
+ target/arm/vfp_helper.c    |  4 ++--
+ 4 files changed, 8 insertions(+), 17 deletions(-)
 
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index 33c76192d2..aed3050965 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -211,8 +211,8 @@ DEF_HELPER_FLAGS_2(recpe_f64, TCG_CALL_NO_RWG, f64, f64, ptr)
+ DEF_HELPER_FLAGS_2(rsqrte_f16, TCG_CALL_NO_RWG, f16, f16, ptr)
+ DEF_HELPER_FLAGS_2(rsqrte_f32, TCG_CALL_NO_RWG, f32, f32, ptr)
+ DEF_HELPER_FLAGS_2(rsqrte_f64, TCG_CALL_NO_RWG, f64, f64, ptr)
+-DEF_HELPER_2(recpe_u32, i32, i32, ptr)
+-DEF_HELPER_FLAGS_2(rsqrte_u32, TCG_CALL_NO_RWG, i32, i32, ptr)
++DEF_HELPER_FLAGS_1(recpe_u32, TCG_CALL_NO_RWG, i32, i32)
++DEF_HELPER_FLAGS_1(rsqrte_u32, TCG_CALL_NO_RWG, i32, i32)
+ DEF_HELPER_FLAGS_4(neon_tbl, TCG_CALL_NO_RWG, i32, i32, i32, ptr, i32)
+ 
+ DEF_HELPER_3(shl_cc, i32, env, i32, i32)
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index ea5f6ceadc..367fa403ae 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -9699,7 +9699,7 @@ static void handle_2misc_reciprocal(DisasContext *s, int opcode,
+ 
+             switch (opcode) {
+             case 0x3c: /* URECPE */
+-                gen_helper_recpe_u32(tcg_res, tcg_op, fpst);
++                gen_helper_recpe_u32(tcg_res, tcg_op);
+                 break;
+             case 0x3d: /* FRECPE */
+                 gen_helper_recpe_f32(tcg_res, tcg_op, fpst);
+@@ -12244,7 +12244,6 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
+                 unallocated_encoding(s);
+                 return;
+             }
+-            need_fpstatus = true;
+             break;
+         case 0x1e: /* FRINT32Z */
+         case 0x1f: /* FRINT64Z */
+@@ -12412,7 +12411,7 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
+                     gen_helper_rints_exact(tcg_res, tcg_op, tcg_fpstatus);
+                     break;
+                 case 0x7c: /* URSQRTE */
+-                    gen_helper_rsqrte_u32(tcg_res, tcg_op, tcg_fpstatus);
++                    gen_helper_rsqrte_u32(tcg_res, tcg_op);
+                     break;
+                 case 0x1e: /* FRINT32Z */
+                 case 0x5e: /* FRINT32X */
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index e221d0c959..967108b3f4 100644
+index 72c3aab544..676701143b 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -5750,16 +5750,8 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                         gen_gvec_sli(size, rd_ofs, rm_ofs, shift,
-                                      vec_size, vec_size);
-                     } else { /* VSHL */
--                        /* Shifts larger than the element size are
--                         * architecturally valid and results in zero.
--                         */
--                        if (shift >= 8 << size) {
--                            tcg_gen_gvec_dup_imm(size, rd_ofs,
--                                                 vec_size, vec_size, 0);
--                        } else {
--                            tcg_gen_gvec_shli(size, rd_ofs, rm_ofs, shift,
--                                              vec_size, vec_size);
+@@ -6873,19 +6873,11 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                             break;
+                         }
+                         case NEON_2RM_VRECPE:
+-                        {
+-                            TCGv_ptr fpstatus = get_fpstatus_ptr(1);
+-                            gen_helper_recpe_u32(tmp, tmp, fpstatus);
+-                            tcg_temp_free_ptr(fpstatus);
++                            gen_helper_recpe_u32(tmp, tmp);
+                             break;
 -                        }
-+                        tcg_gen_gvec_shli(size, rd_ofs, rm_ofs, shift,
-+                                          vec_size, vec_size);
-                     }
-                     return 0;
-                 }
+                         case NEON_2RM_VRSQRTE:
+-                        {
+-                            TCGv_ptr fpstatus = get_fpstatus_ptr(1);
+-                            gen_helper_rsqrte_u32(tmp, tmp, fpstatus);
+-                            tcg_temp_free_ptr(fpstatus);
++                            gen_helper_rsqrte_u32(tmp, tmp);
+                             break;
+-                        }
+                         case NEON_2RM_VRECPE_F:
+                         {
+                             TCGv_ptr fpstatus = get_fpstatus_ptr(1);
+diff --git a/target/arm/vfp_helper.c b/target/arm/vfp_helper.c
+index 930d6e747f..a792661166 100644
+--- a/target/arm/vfp_helper.c
++++ b/target/arm/vfp_helper.c
+@@ -1023,7 +1023,7 @@ float64 HELPER(rsqrte_f64)(float64 input, void *fpstp)
+     return make_float64(val);
+ }
+ 
+-uint32_t HELPER(recpe_u32)(uint32_t a, void *fpstp)
++uint32_t HELPER(recpe_u32)(uint32_t a)
+ {
+     /* float_status *s = fpstp; */
+     int input, estimate;
+@@ -1038,7 +1038,7 @@ uint32_t HELPER(recpe_u32)(uint32_t a, void *fpstp)
+     return deposit32(0, (32 - 9), 9, estimate);
+ }
+ 
+-uint32_t HELPER(rsqrte_u32)(uint32_t a, void *fpstp)
++uint32_t HELPER(rsqrte_u32)(uint32_t a)
+ {
+     int estimate;
+ 
 -- 
 2.20.1
 
