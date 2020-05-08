@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B149C47247
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 15:58:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DB2DC38A2A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 15:59:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D096A2054F
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 15:58:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A9D720725
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 15:59:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uXTaOqrC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D096A2054F
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CJU3Guc/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A9D720725
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX5Ok-0001yl-Vr
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 11:58:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41372)
+	id 1jX5Pg-0003t4-Eu
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 11:59:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45660)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jX5Au-0007yw-Oe
- for qemu-devel@nongnu.org; Fri, 08 May 2020 11:44:32 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:45420)
+ id 1jX5Np-0000UT-MV
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 11:57:53 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:50433)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jX5An-0005el-Q3
- for qemu-devel@nongnu.org; Fri, 08 May 2020 11:44:32 -0400
-Received: by mail-pf1-x444.google.com with SMTP id w65so1114571pfc.12
- for <qemu-devel@nongnu.org>; Fri, 08 May 2020 08:44:25 -0700 (PDT)
+ id 1jX5Nn-0008LA-6g
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 11:57:53 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id t9so4508617pjw.0
+ for <qemu-devel@nongnu.org>; Fri, 08 May 2020 08:57:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=9amWqshE7k/NAq9a276bjEryeqReUJxYJNXk6wnm0Gs=;
- b=uXTaOqrCbW6DRLKayNg3TbogxRgngrFV0oGMtAKJI1+RhhrK2lDgd8VEC8V8clRz6C
- mhuXNAbvTs3+Ii7CKMuL2LCjtJMrIbktkgiEsw65+pwfgUvcDTKbQDIk8zlgzBG7qBiJ
- JawWLFppFCPnxFtHKv1vplAv03yiBLN4VoNwap4VXVZIY5JZPBFSc2cV2NKIIMmjcnR0
- K70+mDW7zMKLwg9QF/NQh1gzayvB5ud50Nvecf5KchT6wBupLtm9j3mthCb8U1FDpbGp
- gdsndXofZ3EJa51Nuinqw1zo2cIfQSco7PTKbitWsm+8OTjQ84MbhqOUMniwOovPplDg
- QdwQ==
+ bh=jxLoNReJJL5KF4Ar6fPotnMAR/lcvKW06PVOX3O9p8o=;
+ b=CJU3Guc/YMxUmmDafPAGtMBKPhSWjKxiDxafMwTG+Nurpkq4KgfJ1RojZeO5XLEDDS
+ cbY3Sw3iqxX9BukPSSE8bCIjAjroyFSQ6wPOEid/Hm7T5dJJP8Iw8snonztsf0gN29z4
+ DdRLawI/r7Y8JgFCgSwJov6YPpATmurcfYZL24X3lWBCCwCI27JIsah6TzOu3A9AhSN7
+ 5IYww5Au7wnEdU0Vmmr2bFJBoW6Z43RC3gpHO3aQa0+RVUNPPkrcOoQRB0cWVdbFEjuD
+ mbIAvOytQGdwPnNhNRF+ELGGhWKNl1l1aCs28WMcx0PiEQUwebqaFHrGwwqTdASY3JjJ
+ AEYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=9amWqshE7k/NAq9a276bjEryeqReUJxYJNXk6wnm0Gs=;
- b=qPEcvdmlvwNvsn8ZqF8i+bZVzZBjiG1s4NQPQOJak5fZldAg5rIBAllP4btEPPZQmu
- 4QoD5Lha2gp8mZITpMfIdS0ZJb7upbMpBAhnvbR/wY871oUZiCJ0WoCKlBxFuTgXesgR
- OqAx1M3OIwVfh/LtpUXfvj4GcgvbF6TJ8Mx7ZXPhW7eaEWwHfDnbY8ESt1itjOyhr0n/
- 56bVkb4nWgh/hhwrdeLgcqeK9XybJEkDo6VGbP2VxgAYOadoqfWhbUCMyEdov3LDKk+w
- tidH43bWTt7QC2G/RhWBSyRrw90dIiHcDGw1WJp2tuXVOZwkGDZLtxPldzG214SAkwBO
- gn2w==
-X-Gm-Message-State: AGi0PuY9143uCjzBS+za6GSRDpWugAAHDq7rTut3CXk/AD6ZdeLCmWwD
- uWrbFiveP/vFQnuSRV4LM/F8wGG/E5c=
-X-Google-Smtp-Source: APiQypIfnmUEWakuS+919YrZ2/No+RL3zsAiPjKwhcjT1NLyywr/a1xwocdS7zIzZ9YVZcbM8cDX1w==
-X-Received: by 2002:a62:1b84:: with SMTP id b126mr3558424pfb.123.1588952663383; 
- Fri, 08 May 2020 08:44:23 -0700 (PDT)
+ bh=jxLoNReJJL5KF4Ar6fPotnMAR/lcvKW06PVOX3O9p8o=;
+ b=AsqqAWa0SduNTCwqXCpRFmIf2sLPlXB6jm9Fa4UxsQxV/urZBXXMDNN4Uks7cbiWAm
+ U8M8Az4PEjUtLixNA8Cajm8XX84CFANCge8i6Hem3M+Oe3BEvsfT84fv6o5Phvl6ErrU
+ K8H4vCzNIcIAqG8UtjGkRph/VIlRT54Z+go4vL9WuiJTzwJEW7NpUQmh/3u3smDlJGQK
+ SyL8N5iJpOSfH/lM0pPqF5rNUr8DO3O0dUTkqZU5HRTEZ6g35IPk25+J57CTYpnKhN9E
+ oCVoJQ3AP7yilZTaJr+0X1cp5eiVlfs9dAi9MNLOeCiHmQJK0gmu7bmBFepfPGZVM7Wr
+ sHmA==
+X-Gm-Message-State: AGi0PuZV9XgVw/ERV0L8StqbdJCdaDzUb3kmUDQ3GpUjiMYLoxuC3y+2
+ 7zhtMJnpu/TeWufw4z9+4eDS65AuQdM=
+X-Google-Smtp-Source: APiQypJNQhhzX/PxHvVSw3wXjfRTsbBcGj5I8uA7I0ifzbaJa7gZP+8FOm2QL9NJhJU0ffI9cGAWtA==
+X-Received: by 2002:a17:902:c406:: with SMTP id
+ k6mr2961820plk.203.1588953468984; 
+ Fri, 08 May 2020 08:57:48 -0700 (PDT)
 Received: from localhost.localdomain (174-21-149-226.tukw.qwest.net.
  [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id o99sm2727662pjo.8.2020.05.08.08.44.22
+ by smtp.gmail.com with ESMTPSA id z7sm2141601pff.47.2020.05.08.08.57.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 08 May 2020 08:44:22 -0700 (PDT)
+ Fri, 08 May 2020 08:57:48 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 13/19] target/arm: Use SVEContLdSt for multi-register
- contiguous loads
-Date: Fri,  8 May 2020 08:43:53 -0700
-Message-Id: <20200508154359.7494-14-richard.henderson@linaro.org>
+Subject: [PATCH 1/3] tcg/s390: Change FACILITY representation
+Date: Fri,  8 May 2020 08:57:43 -0700
+Message-Id: <20200508155745.8223-2-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200508154359.7494-1-richard.henderson@linaro.org>
-References: <20200508154359.7494-1-richard.henderson@linaro.org>
+In-Reply-To: <20200508155745.8223-1-richard.henderson@linaro.org>
+References: <20200508155745.8223-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x444.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,366 +101,391 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
+Cc: david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+We will shortly need to be able to check facilities
+beyond the first 64.  Instead of explicitly masking
+against s390_facilities, create a FACILITY macro
+that indexes an array.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/sve_helper.c | 223 ++++++++++++++--------------------------
- 1 file changed, 79 insertions(+), 144 deletions(-)
+ tcg/s390/tcg-target.h     | 29 ++++++++-------
+ tcg/s390/tcg-target.inc.c | 74 +++++++++++++++++++--------------------
+ 2 files changed, 52 insertions(+), 51 deletions(-)
 
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 7992a569b0..9365e32646 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -4449,27 +4449,28 @@ static inline bool test_host_page(void *host)
- }
+diff --git a/tcg/s390/tcg-target.h b/tcg/s390/tcg-target.h
+index 07accabbd1..7ca48457ff 100644
+--- a/tcg/s390/tcg-target.h
++++ b/tcg/s390/tcg-target.h
+@@ -52,16 +52,19 @@ typedef enum TCGReg {
+ /* A list of relevant facilities used by this translator.  Some of these
+    are required for proper operation, and these are checked at startup.  */
  
- /*
-- * Common helper for all contiguous one-register predicated loads.
-+ * Common helper for all contiguous 1,2,3,4-register predicated stores.
-  */
- static inline QEMU_ALWAYS_INLINE
--void sve_ld1_r(CPUARMState *env, uint64_t *vg, const target_ulong addr,
-+void sve_ldN_r(CPUARMState *env, uint64_t *vg, const target_ulong addr,
-                uint32_t desc, const uintptr_t retaddr,
--               const int esz, const int msz,
-+               const int esz, const int msz, const int N,
-                sve_ldst1_host_fn *host_fn,
-                sve_ldst1_tlb_fn *tlb_fn)
- {
-     const unsigned rd = extract32(desc, SIMD_DATA_SHIFT + MEMOPIDX_SHIFT, 5);
--    void *vd = &env->vfp.zregs[rd];
-     const intptr_t reg_max = simd_oprsz(desc);
-     intptr_t reg_off, reg_last, mem_off;
-     SVEContLdSt info;
-     void *host;
--    int flags;
-+    int flags, i;
+-#define FACILITY_ZARCH_ACTIVE         (1ULL << (63 - 2))
+-#define FACILITY_LONG_DISP            (1ULL << (63 - 18))
+-#define FACILITY_EXT_IMM              (1ULL << (63 - 21))
+-#define FACILITY_GEN_INST_EXT         (1ULL << (63 - 34))
+-#define FACILITY_LOAD_ON_COND         (1ULL << (63 - 45))
++#define FACILITY_ZARCH_ACTIVE         2
++#define FACILITY_LONG_DISP            18
++#define FACILITY_EXT_IMM              21
++#define FACILITY_GEN_INST_EXT         34
++#define FACILITY_LOAD_ON_COND         45
+ #define FACILITY_FAST_BCR_SER         FACILITY_LOAD_ON_COND
+ #define FACILITY_DISTINCT_OPS         FACILITY_LOAD_ON_COND
+-#define FACILITY_LOAD_ON_COND2        (1ULL << (63 - 53))
++#define FACILITY_LOAD_ON_COND2        53
  
-     /* Find the active elements.  */
--    if (!sve_cont_ldst_elements(&info, addr, vg, reg_max, esz, 1 << msz)) {
-+    if (!sve_cont_ldst_elements(&info, addr, vg, reg_max, esz, N << msz)) {
-         /* The entire predicate was false; no load occurs.  */
--        memset(vd, 0, reg_max);
-+        for (i = 0; i < N; ++i) {
-+            memset(&env->vfp.zregs[(rd + i) & 31], 0, reg_max);
-+        }
-         return;
-     }
- 
-@@ -4477,7 +4478,7 @@ void sve_ld1_r(CPUARMState *env, uint64_t *vg, const target_ulong addr,
-     sve_cont_ldst_pages(&info, FAULT_ALL, env, addr, MMU_DATA_LOAD, retaddr);
- 
-     /* Handle watchpoints for all active elements. */
--    sve_cont_ldst_watchpoints(&info, env, vg, addr, 1 << esz, 1 << msz,
-+    sve_cont_ldst_watchpoints(&info, env, vg, addr, 1 << esz, N << msz,
-                               BP_MEM_READ, retaddr);
- 
-     /* TODO: MTE check. */
-@@ -4493,9 +4494,8 @@ void sve_ld1_r(CPUARMState *env, uint64_t *vg, const target_ulong addr,
-          * which for ARM will raise SyncExternal.  Perform the load
-          * into scratch memory to preserve register state until the end.
-          */
--        ARMVectorReg scratch;
-+        ARMVectorReg scratch[4] = { };
- 
--        memset(&scratch, 0, reg_max);
-         mem_off = info.mem_off_first[0];
-         reg_off = info.reg_off_first[0];
-         reg_last = info.reg_off_last[1];
-@@ -4510,21 +4510,29 @@ void sve_ld1_r(CPUARMState *env, uint64_t *vg, const target_ulong addr,
-             uint64_t pg = vg[reg_off >> 6];
-             do {
-                 if ((pg >> (reg_off & 63)) & 1) {
--                    tlb_fn(env, &scratch, reg_off, addr + mem_off, retaddr);
-+                    for (i = 0; i < N; ++i) {
-+                        tlb_fn(env, &scratch[i], reg_off,
-+                               addr + mem_off + (i << msz), retaddr);
-+                    }
-                 }
-                 reg_off += 1 << esz;
--                mem_off += 1 << msz;
-+                mem_off += N << msz;
-             } while (reg_off & 63);
-         } while (reg_off <= reg_last);
- 
--        memcpy(vd, &scratch, reg_max);
-+        for (i = 0; i < N; ++i) {
-+            memcpy(&env->vfp.zregs[(rd + i) & 31], &scratch[i], reg_max);
-+        }
-         return;
- #endif
-     }
- 
-     /* The entire operation is in RAM, on valid pages. */
- 
--    memset(vd, 0, reg_max);
-+    for (i = 0; i < N; ++i) {
-+        memset(&env->vfp.zregs[(rd + i) & 31], 0, reg_max);
-+    }
+-extern uint64_t s390_facilities;
++extern uint64_t s390_facilities[1];
 +
-     mem_off = info.mem_off_first[0];
-     reg_off = info.reg_off_first[0];
-     reg_last = info.reg_off_last[0];
-@@ -4534,10 +4542,13 @@ void sve_ld1_r(CPUARMState *env, uint64_t *vg, const target_ulong addr,
-         uint64_t pg = vg[reg_off >> 6];
-         do {
-             if ((pg >> (reg_off & 63)) & 1) {
--                host_fn(vd, reg_off, host + mem_off);
-+                for (i = 0; i < N; ++i) {
-+                    host_fn(&env->vfp.zregs[(rd + i) & 31], reg_off,
-+                            host + mem_off + (i << msz));
-+                }
++#define FACILITY(X) \
++    ((s390_facilities[FACILITY_##X / 64] >> (63 - FACILITY_##X % 64)) & 1)
+ 
+ /* optional instructions */
+ #define TCG_TARGET_HAS_div2_i32       1
+@@ -82,8 +85,8 @@ extern uint64_t s390_facilities;
+ #define TCG_TARGET_HAS_clz_i32        0
+ #define TCG_TARGET_HAS_ctz_i32        0
+ #define TCG_TARGET_HAS_ctpop_i32      0
+-#define TCG_TARGET_HAS_deposit_i32    (s390_facilities & FACILITY_GEN_INST_EXT)
+-#define TCG_TARGET_HAS_extract_i32    (s390_facilities & FACILITY_GEN_INST_EXT)
++#define TCG_TARGET_HAS_deposit_i32    FACILITY(GEN_INST_EXT)
++#define TCG_TARGET_HAS_extract_i32    FACILITY(GEN_INST_EXT)
+ #define TCG_TARGET_HAS_sextract_i32   0
+ #define TCG_TARGET_HAS_extract2_i32   0
+ #define TCG_TARGET_HAS_movcond_i32    1
+@@ -96,7 +99,7 @@ extern uint64_t s390_facilities;
+ #define TCG_TARGET_HAS_extrl_i64_i32  0
+ #define TCG_TARGET_HAS_extrh_i64_i32  0
+ #define TCG_TARGET_HAS_goto_ptr       1
+-#define TCG_TARGET_HAS_direct_jump    (s390_facilities & FACILITY_GEN_INST_EXT)
++#define TCG_TARGET_HAS_direct_jump    FACILITY(GEN_INST_EXT)
+ 
+ #define TCG_TARGET_HAS_div2_i64       1
+ #define TCG_TARGET_HAS_rot_i64        1
+@@ -116,11 +119,11 @@ extern uint64_t s390_facilities;
+ #define TCG_TARGET_HAS_eqv_i64        0
+ #define TCG_TARGET_HAS_nand_i64       0
+ #define TCG_TARGET_HAS_nor_i64        0
+-#define TCG_TARGET_HAS_clz_i64        (s390_facilities & FACILITY_EXT_IMM)
++#define TCG_TARGET_HAS_clz_i64        FACILITY(EXT_IMM)
+ #define TCG_TARGET_HAS_ctz_i64        0
+ #define TCG_TARGET_HAS_ctpop_i64      0
+-#define TCG_TARGET_HAS_deposit_i64    (s390_facilities & FACILITY_GEN_INST_EXT)
+-#define TCG_TARGET_HAS_extract_i64    (s390_facilities & FACILITY_GEN_INST_EXT)
++#define TCG_TARGET_HAS_deposit_i64    FACILITY(GEN_INST_EXT)
++#define TCG_TARGET_HAS_extract_i64    FACILITY(GEN_INST_EXT)
+ #define TCG_TARGET_HAS_sextract_i64   0
+ #define TCG_TARGET_HAS_extract2_i64   0
+ #define TCG_TARGET_HAS_movcond_i64    1
+diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
+index b07e9ff7d6..123286857f 100644
+--- a/tcg/s390/tcg-target.inc.c
++++ b/tcg/s390/tcg-target.inc.c
+@@ -53,7 +53,7 @@
+    We don't need this when we have pc-relative loads with the general
+    instructions extension facility.  */
+ #define TCG_REG_TB      TCG_REG_R12
+-#define USE_REG_TB      (!(s390_facilities & FACILITY_GEN_INST_EXT))
++#define USE_REG_TB      (!FACILITY(GEN_INST_EXT))
+ 
+ #ifndef CONFIG_SOFTMMU
+ #define TCG_GUEST_BASE_REG TCG_REG_R13
+@@ -364,7 +364,7 @@ static void * const qemu_st_helpers[16] = {
+ #endif
+ 
+ static tcg_insn_unit *tb_ret_addr;
+-uint64_t s390_facilities;
++uint64_t s390_facilities[1];
+ 
+ static bool patch_reloc(tcg_insn_unit *code_ptr, int type,
+                         intptr_t value, intptr_t addend)
+@@ -610,7 +610,7 @@ static void tcg_out_movi_int(TCGContext *s, TCGType type, TCGReg ret,
+     }
+ 
+     /* Try all 48-bit insns that can load it in one go.  */
+-    if (s390_facilities & FACILITY_EXT_IMM) {
++    if (FACILITY(EXT_IMM)) {
+         if (sval == (int32_t)sval) {
+             tcg_out_insn(s, RIL, LGFI, ret, sval);
+             return;
+@@ -653,7 +653,7 @@ static void tcg_out_movi_int(TCGContext *s, TCGType type, TCGReg ret,
+     }
+ 
+     /* Otherwise, stuff it in the constant pool.  */
+-    if (s390_facilities & FACILITY_GEN_INST_EXT) {
++    if (FACILITY(GEN_INST_EXT)) {
+         tcg_out_insn(s, RIL, LGRL, ret, 0);
+         new_pool_label(s, sval, R_390_PC32DBL, s->code_ptr - 2, 2);
+     } else if (USE_REG_TB && !in_prologue) {
+@@ -738,7 +738,7 @@ static void tcg_out_ld_abs(TCGContext *s, TCGType type, TCGReg dest, void *abs)
+ {
+     intptr_t addr = (intptr_t)abs;
+ 
+-    if ((s390_facilities & FACILITY_GEN_INST_EXT) && !(addr & 1)) {
++    if (FACILITY(GEN_INST_EXT) && !(addr & 1)) {
+         ptrdiff_t disp = tcg_pcrel_diff(s, abs) >> 1;
+         if (disp == (int32_t)disp) {
+             if (type == TCG_TYPE_I32) {
+@@ -772,7 +772,7 @@ static inline void tcg_out_risbg(TCGContext *s, TCGReg dest, TCGReg src,
+ 
+ static void tgen_ext8s(TCGContext *s, TCGType type, TCGReg dest, TCGReg src)
+ {
+-    if (s390_facilities & FACILITY_EXT_IMM) {
++    if (FACILITY(EXT_IMM)) {
+         tcg_out_insn(s, RRE, LGBR, dest, src);
+         return;
+     }
+@@ -792,7 +792,7 @@ static void tgen_ext8s(TCGContext *s, TCGType type, TCGReg dest, TCGReg src)
+ 
+ static void tgen_ext8u(TCGContext *s, TCGType type, TCGReg dest, TCGReg src)
+ {
+-    if (s390_facilities & FACILITY_EXT_IMM) {
++    if (FACILITY(EXT_IMM)) {
+         tcg_out_insn(s, RRE, LLGCR, dest, src);
+         return;
+     }
+@@ -812,7 +812,7 @@ static void tgen_ext8u(TCGContext *s, TCGType type, TCGReg dest, TCGReg src)
+ 
+ static void tgen_ext16s(TCGContext *s, TCGType type, TCGReg dest, TCGReg src)
+ {
+-    if (s390_facilities & FACILITY_EXT_IMM) {
++    if (FACILITY(EXT_IMM)) {
+         tcg_out_insn(s, RRE, LGHR, dest, src);
+         return;
+     }
+@@ -832,7 +832,7 @@ static void tgen_ext16s(TCGContext *s, TCGType type, TCGReg dest, TCGReg src)
+ 
+ static void tgen_ext16u(TCGContext *s, TCGType type, TCGReg dest, TCGReg src)
+ {
+-    if (s390_facilities & FACILITY_EXT_IMM) {
++    if (FACILITY(EXT_IMM)) {
+         tcg_out_insn(s, RRE, LLGHR, dest, src);
+         return;
+     }
+@@ -920,7 +920,7 @@ static void tgen_andi(TCGContext *s, TCGType type, TCGReg dest, uint64_t val)
+         tgen_ext32u(s, dest, dest);
+         return;
+     }
+-    if (s390_facilities & FACILITY_EXT_IMM) {
++    if (FACILITY(EXT_IMM)) {
+         if ((val & valid) == 0xff) {
+             tgen_ext8u(s, TCG_TYPE_I64, dest, dest);
+             return;
+@@ -941,7 +941,7 @@ static void tgen_andi(TCGContext *s, TCGType type, TCGReg dest, uint64_t val)
+     }
+ 
+     /* Try all 48-bit insns that can perform it in one go.  */
+-    if (s390_facilities & FACILITY_EXT_IMM) {
++    if (FACILITY(EXT_IMM)) {
+         for (i = 0; i < 2; i++) {
+             tcg_target_ulong mask = ~(0xffffffffull << i*32);
+             if (((val | ~valid) & mask) == mask) {
+@@ -950,7 +950,7 @@ static void tgen_andi(TCGContext *s, TCGType type, TCGReg dest, uint64_t val)
              }
-             reg_off += 1 << esz;
--            mem_off += 1 << msz;
-+            mem_off += N << msz;
-         } while (reg_off <= reg_last && (reg_off & 63));
+         }
+     }
+-    if ((s390_facilities & FACILITY_GEN_INST_EXT) && risbg_mask(val)) {
++    if (FACILITY(GEN_INST_EXT) && risbg_mask(val)) {
+         tgen_andi_risbg(s, dest, dest, val);
+         return;
+     }
+@@ -999,7 +999,7 @@ static void tgen_ori(TCGContext *s, TCGType type, TCGReg dest, uint64_t val)
      }
  
-@@ -4547,7 +4558,11 @@ void sve_ld1_r(CPUARMState *env, uint64_t *vg, const target_ulong addr,
-      */
-     mem_off = info.mem_off_split;
-     if (unlikely(mem_off >= 0)) {
--        tlb_fn(env, vd, info.reg_off_split, addr + mem_off, retaddr);
-+        reg_off = info.reg_off_split;
-+        for (i = 0; i < N; ++i) {
-+            tlb_fn(env, &env->vfp.zregs[(rd + i) & 31], reg_off,
-+                   addr + mem_off + (i << msz), retaddr);
-+        }
+     /* Try all 48-bit insns that can perform it in one go.  */
+-    if (s390_facilities & FACILITY_EXT_IMM) {
++    if (FACILITY(EXT_IMM)) {
+         for (i = 0; i < 2; i++) {
+             tcg_target_ulong mask = (0xffffffffull << i*32);
+             if ((val & mask) != 0 && (val & ~mask) == 0) {
+@@ -1024,7 +1024,7 @@ static void tgen_ori(TCGContext *s, TCGType type, TCGReg dest, uint64_t val)
+         /* Perform the OR via sequential modifications to the high and
+            low parts.  Do this via recursion to handle 16-bit vs 32-bit
+            masks in each half.  */
+-        tcg_debug_assert(s390_facilities & FACILITY_EXT_IMM);
++        tcg_debug_assert(FACILITY(EXT_IMM));
+         tgen_ori(s, type, dest, val & 0x00000000ffffffffull);
+         tgen_ori(s, type, dest, val & 0xffffffff00000000ull);
+     }
+@@ -1033,7 +1033,7 @@ static void tgen_ori(TCGContext *s, TCGType type, TCGReg dest, uint64_t val)
+ static void tgen_xori(TCGContext *s, TCGType type, TCGReg dest, uint64_t val)
+ {
+     /* Try all 48-bit insns that can perform it in one go.  */
+-    if (s390_facilities & FACILITY_EXT_IMM) {
++    if (FACILITY(EXT_IMM)) {
+         if ((val & 0xffffffff00000000ull) == 0) {
+             tcg_out_insn(s, RIL, XILF, dest, val);
+             return;
+@@ -1057,7 +1057,7 @@ static void tgen_xori(TCGContext *s, TCGType type, TCGReg dest, uint64_t val)
+                        -(intptr_t)s->code_gen_ptr);
+     } else {
+         /* Perform the xor by parts.  */
+-        tcg_debug_assert(s390_facilities & FACILITY_EXT_IMM);
++        tcg_debug_assert(FACILITY(EXT_IMM));
+         if (val & 0xffffffff) {
+             tcg_out_insn(s, RIL, XILF, dest, val);
+         }
+@@ -1091,7 +1091,7 @@ static int tgen_cmp(TCGContext *s, TCGType type, TCGCond c, TCGReg r1,
+             goto exit;
+         }
+ 
+-        if (s390_facilities & FACILITY_EXT_IMM) {
++        if (FACILITY(EXT_IMM)) {
+             if (type == TCG_TYPE_I32) {
+                 op = (is_unsigned ? RIL_CLFI : RIL_CFI);
+                 tcg_out_insn_RIL(s, op, r1, c2);
+@@ -1154,7 +1154,7 @@ static void tgen_setcond(TCGContext *s, TCGType type, TCGCond cond,
+     bool have_loc;
+ 
+     /* With LOC2, we can always emit the minimum 3 insns.  */
+-    if (s390_facilities & FACILITY_LOAD_ON_COND2) {
++    if (FACILITY(LOAD_ON_COND2)) {
+         /* Emit: d = 0, d = (cc ? 1 : d).  */
+         cc = tgen_cmp(s, type, cond, c1, c2, c2const, false);
+         tcg_out_movi(s, TCG_TYPE_I64, dest, 0);
+@@ -1162,7 +1162,7 @@ static void tgen_setcond(TCGContext *s, TCGType type, TCGCond cond,
+         return;
      }
  
-     mem_off = info.mem_off_first[1];
-@@ -4560,10 +4575,13 @@ void sve_ld1_r(CPUARMState *env, uint64_t *vg, const target_ulong addr,
-             uint64_t pg = vg[reg_off >> 6];
-             do {
-                 if ((pg >> (reg_off & 63)) & 1) {
--                    host_fn(vd, reg_off, host + mem_off);
-+                    for (i = 0; i < N; ++i) {
-+                        host_fn(&env->vfp.zregs[(rd + i) & 31], reg_off,
-+                                host + mem_off + (i << msz));
-+                    }
+-    have_loc = (s390_facilities & FACILITY_LOAD_ON_COND) != 0;
++    have_loc = FACILITY(LOAD_ON_COND);
+ 
+     /* For HAVE_LOC, only the paths through GTU/GT/LEU/LE are smaller.  */
+  restart:
+@@ -1248,7 +1248,7 @@ static void tgen_movcond(TCGContext *s, TCGType type, TCGCond c, TCGReg dest,
+                          TCGArg v3, int v3const)
+ {
+     int cc;
+-    if (s390_facilities & FACILITY_LOAD_ON_COND) {
++    if (FACILITY(LOAD_ON_COND)) {
+         cc = tgen_cmp(s, type, c, c1, c2, c2const, false);
+         if (v3const) {
+             tcg_out_insn(s, RIE, LOCGHI, dest, v3, cc);
+@@ -1281,7 +1281,7 @@ static void tgen_clz(TCGContext *s, TCGReg dest, TCGReg a1,
+         } else {
+             tcg_out_mov(s, TCG_TYPE_I64, dest, a2);
+         }
+-        if (s390_facilities & FACILITY_LOAD_ON_COND) {
++        if (FACILITY(LOAD_ON_COND)) {
+             /* Emit: if (one bit found) dest = r0.  */
+             tcg_out_insn(s, RRF, LOCGR, dest, TCG_REG_R0, 2);
+         } else {
+@@ -1373,7 +1373,7 @@ static void tgen_brcond(TCGContext *s, TCGType type, TCGCond c,
+ {
+     int cc;
+ 
+-    if (s390_facilities & FACILITY_GEN_INST_EXT) {
++    if (FACILITY(GEN_INST_EXT)) {
+         bool is_unsigned = is_unsigned_cond(c);
+         bool in_range;
+         S390Opcode opc;
+@@ -1567,7 +1567,7 @@ static TCGReg tcg_out_tlb_read(TCGContext *s, TCGReg addr_reg, MemOp opc,
+        cross pages using the address of the last byte of the access.  */
+     a_off = (a_bits >= s_bits ? 0 : s_mask - a_mask);
+     tlb_mask = (uint64_t)TARGET_PAGE_MASK | a_mask;
+-    if ((s390_facilities & FACILITY_GEN_INST_EXT) && a_off == 0) {
++    if (FACILITY(GEN_INST_EXT) && a_off == 0) {
+         tgen_andi_risbg(s, TCG_REG_R3, addr_reg, tlb_mask);
+     } else {
+         tcg_out_insn(s, RX, LA, TCG_REG_R3, addr_reg, TCG_REG_NONE, a_off);
+@@ -1854,7 +1854,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+                     tcg_out_insn(s, RI, AHI, a0, a2);
+                     break;
                  }
-                 reg_off += 1 << esz;
--                mem_off += 1 << msz;
-+                mem_off += N << msz;
-             } while (reg_off & 63);
-         } while (reg_off <= reg_last);
+-                if (s390_facilities & FACILITY_EXT_IMM) {
++                if (FACILITY(EXT_IMM)) {
+                     tcg_out_insn(s, RIL, AFI, a0, a2);
+                     break;
+                 }
+@@ -2078,7 +2078,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+                     tcg_out_insn(s, RI, AGHI, a0, a2);
+                     break;
+                 }
+-                if (s390_facilities & FACILITY_EXT_IMM) {
++                if (FACILITY(EXT_IMM)) {
+                     if (a2 == (int32_t)a2) {
+                         tcg_out_insn(s, RIL, AGFI, a0, a2);
+                         break;
+@@ -2303,8 +2303,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+         /* The host memory model is quite strong, we simply need to
+            serialize the instruction stream.  */
+         if (args[0] & TCG_MO_ST_LD) {
+-            tcg_out_insn(s, RR, BCR,
+-                         s390_facilities & FACILITY_FAST_BCR_SER ? 14 : 15, 0);
++            tcg_out_insn(s, RR, BCR, FACILITY(FAST_BCR_SER) ? 14 : 15, 0);
+         }
+         break;
+ 
+@@ -2372,20 +2371,20 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     case INDEX_op_or_i64:
+     case INDEX_op_xor_i32:
+     case INDEX_op_xor_i64:
+-        return (s390_facilities & FACILITY_DISTINCT_OPS ? &r_r_ri : &r_0_ri);
++        return FACILITY(DISTINCT_OPS) ? &r_r_ri : &r_0_ri;
+ 
+     case INDEX_op_mul_i32:
+         /* If we have the general-instruction-extensions, then we have
+            MULTIPLY SINGLE IMMEDIATE with a signed 32-bit, otherwise we
+            have only MULTIPLY HALFWORD IMMEDIATE, with a signed 16-bit.  */
+-        return (s390_facilities & FACILITY_GEN_INST_EXT ? &r_0_ri : &r_0_rI);
++        return FACILITY(GEN_INST_EXT) ? &r_0_ri : &r_0_rI;
+     case INDEX_op_mul_i64:
+-        return (s390_facilities & FACILITY_GEN_INST_EXT ? &r_0_rJ : &r_0_rI);
++        return FACILITY(GEN_INST_EXT) ? &r_0_rJ : &r_0_rI;
+ 
+     case INDEX_op_shl_i32:
+     case INDEX_op_shr_i32:
+     case INDEX_op_sar_i32:
+-        return (s390_facilities & FACILITY_DISTINCT_OPS ? &r_r_ri : &r_0_ri);
++        return FACILITY(DISTINCT_OPS) ? &r_r_ri : &r_0_ri;
+ 
+     case INDEX_op_shl_i64:
+     case INDEX_op_shr_i64:
+@@ -2451,7 +2450,7 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+                 = { .args_ct_str = { "r", "r", "ri", "r", "0" } };
+             static const TCGTargetOpDef movc_l
+                 = { .args_ct_str = { "r", "r", "ri", "rI", "0" } };
+-            return (s390_facilities & FACILITY_LOAD_ON_COND2 ? &movc_l : &movc);
++            return FACILITY(LOAD_ON_COND2) ? &movc_l : &movc;
+         }
+     case INDEX_op_div2_i32:
+     case INDEX_op_div2_i64:
+@@ -2471,10 +2470,10 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+ 
+     case INDEX_op_add2_i32:
+     case INDEX_op_sub2_i32:
+-        return (s390_facilities & FACILITY_EXT_IMM ? &a2_ri : &a2_r);
++        return FACILITY(EXT_IMM) ? &a2_ri : &a2_r;
+     case INDEX_op_add2_i64:
+     case INDEX_op_sub2_i64:
+-        return (s390_facilities & FACILITY_EXT_IMM ? &a2_rA : &a2_r);
++        return FACILITY(EXT_IMM) ? &a2_rA : &a2_r;
+ 
+     default:
+         break;
+@@ -2489,13 +2488,12 @@ static void query_s390_facilities(void)
+     /* Is STORE FACILITY LIST EXTENDED available?  Honestly, I believe this
+        is present on all 64-bit systems, but let's check for it anyway.  */
+     if (hwcap & HWCAP_S390_STFLE) {
+-        register int r0 __asm__("0");
+-        register void *r1 __asm__("1");
++        register int r0 __asm__("0") = ARRAY_SIZE(s390_facilities) - 1;
++        register void *r1 __asm__("1") = s390_facilities;
+ 
+         /* stfle 0(%r1) */
+-        r1 = &s390_facilities;
+         asm volatile(".word 0xb2b0,0x1000"
+-                     : "=r"(r0) : "0"(0), "r"(r1) : "memory", "cc");
++                     : "=r"(r0) : "r"(r0), "r"(r1) : "memory", "cc");
      }
-@@ -4573,7 +4591,7 @@ void sve_ld1_r(CPUARMState *env, uint64_t *vg, const target_ulong addr,
- void HELPER(sve_##NAME##_r)(CPUARMState *env, void *vg,        \
-                             target_ulong addr, uint32_t desc)  \
- {                                                              \
--    sve_ld1_r(env, vg, addr, desc, GETPC(), ESZ, 0,            \
-+    sve_ldN_r(env, vg, addr, desc, GETPC(), ESZ, MO_8, 1,      \
-               sve_##NAME##_host, sve_##NAME##_tlb);            \
  }
  
-@@ -4581,159 +4599,76 @@ void HELPER(sve_##NAME##_r)(CPUARMState *env, void *vg,        \
- void HELPER(sve_##NAME##_le_r)(CPUARMState *env, void *vg,        \
-                                target_ulong addr, uint32_t desc)  \
- {                                                                 \
--    sve_ld1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ,             \
-+    sve_ldN_r(env, vg, addr, desc, GETPC(), ESZ, MSZ, 1,          \
-               sve_##NAME##_le_host, sve_##NAME##_le_tlb);         \
- }                                                                 \
- void HELPER(sve_##NAME##_be_r)(CPUARMState *env, void *vg,        \
-                                target_ulong addr, uint32_t desc)  \
- {                                                                 \
--    sve_ld1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ,             \
-+    sve_ldN_r(env, vg, addr, desc, GETPC(), ESZ, MSZ, 1,          \
-               sve_##NAME##_be_host, sve_##NAME##_be_tlb);         \
- }
- 
--DO_LD1_1(ld1bb,  0)
--DO_LD1_1(ld1bhu, 1)
--DO_LD1_1(ld1bhs, 1)
--DO_LD1_1(ld1bsu, 2)
--DO_LD1_1(ld1bss, 2)
--DO_LD1_1(ld1bdu, 3)
--DO_LD1_1(ld1bds, 3)
-+DO_LD1_1(ld1bb,  MO_8)
-+DO_LD1_1(ld1bhu, MO_16)
-+DO_LD1_1(ld1bhs, MO_16)
-+DO_LD1_1(ld1bsu, MO_32)
-+DO_LD1_1(ld1bss, MO_32)
-+DO_LD1_1(ld1bdu, MO_64)
-+DO_LD1_1(ld1bds, MO_64)
- 
--DO_LD1_2(ld1hh,  1, 1)
--DO_LD1_2(ld1hsu, 2, 1)
--DO_LD1_2(ld1hss, 2, 1)
--DO_LD1_2(ld1hdu, 3, 1)
--DO_LD1_2(ld1hds, 3, 1)
-+DO_LD1_2(ld1hh,  MO_16, MO_16)
-+DO_LD1_2(ld1hsu, MO_32, MO_16)
-+DO_LD1_2(ld1hss, MO_32, MO_16)
-+DO_LD1_2(ld1hdu, MO_64, MO_16)
-+DO_LD1_2(ld1hds, MO_64, MO_16)
- 
--DO_LD1_2(ld1ss,  2, 2)
--DO_LD1_2(ld1sdu, 3, 2)
--DO_LD1_2(ld1sds, 3, 2)
-+DO_LD1_2(ld1ss,  MO_32, MO_32)
-+DO_LD1_2(ld1sdu, MO_64, MO_32)
-+DO_LD1_2(ld1sds, MO_64, MO_32)
- 
--DO_LD1_2(ld1dd,  3, 3)
-+DO_LD1_2(ld1dd,  MO_64, MO_64)
- 
- #undef DO_LD1_1
- #undef DO_LD1_2
- 
--/*
-- * Common helpers for all contiguous 2,3,4-register predicated loads.
-- */
--static void sve_ld2_r(CPUARMState *env, void *vg, target_ulong addr,
--                      uint32_t desc, int size, uintptr_t ra,
--                      sve_ldst1_tlb_fn *tlb_fn)
--{
--    const unsigned rd = extract32(desc, SIMD_DATA_SHIFT + MEMOPIDX_SHIFT, 5);
--    intptr_t i, oprsz = simd_oprsz(desc);
--    ARMVectorReg scratch[2] = { };
--
--    for (i = 0; i < oprsz; ) {
--        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
--        do {
--            if (pg & 1) {
--                tlb_fn(env, &scratch[0], i, addr, ra);
--                tlb_fn(env, &scratch[1], i, addr + size, ra);
--            }
--            i += size, pg >>= size;
--            addr += 2 * size;
--        } while (i & 15);
--    }
--
--    /* Wait until all exceptions have been raised to write back.  */
--    memcpy(&env->vfp.zregs[rd], &scratch[0], oprsz);
--    memcpy(&env->vfp.zregs[(rd + 1) & 31], &scratch[1], oprsz);
--}
--
--static void sve_ld3_r(CPUARMState *env, void *vg, target_ulong addr,
--                      uint32_t desc, int size, uintptr_t ra,
--                      sve_ldst1_tlb_fn *tlb_fn)
--{
--    const unsigned rd = extract32(desc, SIMD_DATA_SHIFT + MEMOPIDX_SHIFT, 5);
--    intptr_t i, oprsz = simd_oprsz(desc);
--    ARMVectorReg scratch[3] = { };
--
--    for (i = 0; i < oprsz; ) {
--        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
--        do {
--            if (pg & 1) {
--                tlb_fn(env, &scratch[0], i, addr, ra);
--                tlb_fn(env, &scratch[1], i, addr + size, ra);
--                tlb_fn(env, &scratch[2], i, addr + 2 * size, ra);
--            }
--            i += size, pg >>= size;
--            addr += 3 * size;
--        } while (i & 15);
--    }
--
--    /* Wait until all exceptions have been raised to write back.  */
--    memcpy(&env->vfp.zregs[rd], &scratch[0], oprsz);
--    memcpy(&env->vfp.zregs[(rd + 1) & 31], &scratch[1], oprsz);
--    memcpy(&env->vfp.zregs[(rd + 2) & 31], &scratch[2], oprsz);
--}
--
--static void sve_ld4_r(CPUARMState *env, void *vg, target_ulong addr,
--                      uint32_t desc, int size, uintptr_t ra,
--                      sve_ldst1_tlb_fn *tlb_fn)
--{
--    const unsigned rd = extract32(desc, SIMD_DATA_SHIFT + MEMOPIDX_SHIFT, 5);
--    intptr_t i, oprsz = simd_oprsz(desc);
--    ARMVectorReg scratch[4] = { };
--
--    for (i = 0; i < oprsz; ) {
--        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
--        do {
--            if (pg & 1) {
--                tlb_fn(env, &scratch[0], i, addr, ra);
--                tlb_fn(env, &scratch[1], i, addr + size, ra);
--                tlb_fn(env, &scratch[2], i, addr + 2 * size, ra);
--                tlb_fn(env, &scratch[3], i, addr + 3 * size, ra);
--            }
--            i += size, pg >>= size;
--            addr += 4 * size;
--        } while (i & 15);
--    }
--
--    /* Wait until all exceptions have been raised to write back.  */
--    memcpy(&env->vfp.zregs[rd], &scratch[0], oprsz);
--    memcpy(&env->vfp.zregs[(rd + 1) & 31], &scratch[1], oprsz);
--    memcpy(&env->vfp.zregs[(rd + 2) & 31], &scratch[2], oprsz);
--    memcpy(&env->vfp.zregs[(rd + 3) & 31], &scratch[3], oprsz);
--}
--
- #define DO_LDN_1(N) \
--void QEMU_FLATTEN HELPER(sve_ld##N##bb_r) \
--    (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)  \
--{                                                                   \
--    sve_ld##N##_r(env, vg, addr, desc, 1, GETPC(), sve_ld1bb_tlb);  \
-+void HELPER(sve_ld##N##bb_r)(CPUARMState *env, void *vg,        \
-+                             target_ulong addr, uint32_t desc)  \
-+{                                                               \
-+    sve_ldN_r(env, vg, addr, desc, GETPC(), MO_8, MO_8, N,      \
-+              sve_ld1bb_host, sve_ld1bb_tlb);                   \
- }
- 
--#define DO_LDN_2(N, SUFF, SIZE)                                       \
--void QEMU_FLATTEN HELPER(sve_ld##N##SUFF##_le_r)                      \
--    (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)    \
-+#define DO_LDN_2(N, SUFF, ESZ) \
-+void HELPER(sve_ld##N##SUFF##_le_r)(CPUARMState *env, void *vg,       \
-+                                    target_ulong addr, uint32_t desc) \
- {                                                                     \
--    sve_ld##N##_r(env, vg, addr, desc, SIZE, GETPC(),                 \
--                  sve_ld1##SUFF##_le_tlb);                            \
-+    sve_ldN_r(env, vg, addr, desc, GETPC(), ESZ, ESZ, N,              \
-+              sve_ld1##SUFF##_le_host, sve_ld1##SUFF##_le_tlb);       \
- }                                                                     \
--void QEMU_FLATTEN HELPER(sve_ld##N##SUFF##_be_r)                      \
--    (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)    \
-+void HELPER(sve_ld##N##SUFF##_be_r)(CPUARMState *env, void *vg,       \
-+                                    target_ulong addr, uint32_t desc) \
- {                                                                     \
--    sve_ld##N##_r(env, vg, addr, desc, SIZE, GETPC(),                 \
--                  sve_ld1##SUFF##_be_tlb);                            \
-+    sve_ldN_r(env, vg, addr, desc, GETPC(), ESZ, ESZ, N,              \
-+              sve_ld1##SUFF##_be_host, sve_ld1##SUFF##_be_tlb);       \
- }
- 
- DO_LDN_1(2)
- DO_LDN_1(3)
- DO_LDN_1(4)
- 
--DO_LDN_2(2, hh, 2)
--DO_LDN_2(3, hh, 2)
--DO_LDN_2(4, hh, 2)
-+DO_LDN_2(2, hh, MO_16)
-+DO_LDN_2(3, hh, MO_16)
-+DO_LDN_2(4, hh, MO_16)
- 
--DO_LDN_2(2, ss, 4)
--DO_LDN_2(3, ss, 4)
--DO_LDN_2(4, ss, 4)
-+DO_LDN_2(2, ss, MO_32)
-+DO_LDN_2(3, ss, MO_32)
-+DO_LDN_2(4, ss, MO_32)
- 
--DO_LDN_2(2, dd, 8)
--DO_LDN_2(3, dd, 8)
--DO_LDN_2(4, dd, 8)
-+DO_LDN_2(2, dd, MO_64)
-+DO_LDN_2(3, dd, MO_64)
-+DO_LDN_2(4, dd, MO_64)
- 
- #undef DO_LDN_1
- #undef DO_LDN_2
 -- 
 2.20.1
 
