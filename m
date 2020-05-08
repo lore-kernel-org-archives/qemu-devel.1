@@ -6,71 +6,71 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62AECC38A2A
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 23:13:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68EEBC38A2A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 23:14:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 317062070B
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 23:13:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 317062070B
+	by mail.kernel.org (Postfix) with ESMTPS id 3606A2173E
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 23:14:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3606A2173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXCBU-0003SG-CC
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 19:13:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53386)
+	id 1jXCBx-0004Nn-Cf
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 19:14:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53422)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1jXC71-0003SG-0k; Fri, 08 May 2020 19:08:59 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52758)
+ id 1jXC71-0003U4-Tq; Fri, 08 May 2020 19:08:59 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57542)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1jXC6r-0005op-AI; Fri, 08 May 2020 19:08:58 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ id 1jXC6q-0005sL-UF; Fri, 08 May 2020 19:08:59 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 048N1hgK004417; Fri, 8 May 2020 19:08:46 -0400
+ 048N1vvS040968; Fri, 8 May 2020 19:08:47 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 30vtsf32ad-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 30vtsh2y1v-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 08 May 2020 19:08:47 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 048N7XhY053108;
+ Fri, 8 May 2020 19:08:46 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.26])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 30vtsh2y1k-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
  Fri, 08 May 2020 19:08:46 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 048N2Esn008302;
- Fri, 8 May 2020 19:08:45 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0a-001b2d01.pphosted.com with ESMTP id 30vtsf32a2-1
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+ by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 048N7Eb6025964;
+ Fri, 8 May 2020 23:08:45 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com
+ [9.57.198.27]) by ppma04wdc.us.ibm.com with ESMTP id 30s0g7ng90-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 08 May 2020 19:08:45 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 048N1phw001097;
- Fri, 8 May 2020 23:08:44 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
- [9.57.198.26]) by ppma03dal.us.ibm.com with ESMTP id 30s0g8ay0w-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 08 May 2020 23:08:44 +0000
+ Fri, 08 May 2020 23:08:45 +0000
 Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
  [9.57.199.111])
- by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 048N8i7g15533042
+ by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 048N8jH347841740
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 8 May 2020 23:08:44 GMT
+ Fri, 8 May 2020 23:08:45 GMT
 Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0D087AC05E;
+ by IMSVA (Postfix) with ESMTP id 1D84AAC05B;
+ Fri,  8 May 2020 23:08:45 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C9257AC064;
  Fri,  8 May 2020 23:08:44 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C54F0AC05F;
- Fri,  8 May 2020 23:08:43 +0000 (GMT)
 Received: from localhost.localdomain.com (unknown [9.85.189.36])
  by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
- Fri,  8 May 2020 23:08:43 +0000 (GMT)
+ Fri,  8 May 2020 23:08:44 +0000 (GMT)
 From: Collin Walling <walling@linux.ibm.com>
 To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
-Subject: [PATCH v1 3/8] s390/sclp: rework sclp boundary and length checks
-Date: Fri,  8 May 2020 19:08:18 -0400
-Message-Id: <20200508230823.22956-4-walling@linux.ibm.com>
+Subject: [PATCH v1 7/8] s390/kvm: header sync for diag318
+Date: Fri,  8 May 2020 19:08:22 -0400
+Message-Id: <20200508230823.22956-8-walling@linux.ibm.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200508230823.22956-1-walling@linux.ibm.com>
 References: <20200508230823.22956-1-walling@linux.ibm.com>
@@ -81,10 +81,10 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
  definitions=2020-05-08_19:2020-05-08,
  2020-05-08 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 phishscore=0
- bulkscore=0 impostorscore=0 malwarescore=0 clxscore=1015 mlxscore=0
- lowpriorityscore=0 spamscore=0 mlxlogscore=999 priorityscore=1501
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ adultscore=0 mlxscore=0
+ impostorscore=0 lowpriorityscore=0 priorityscore=1501 mlxlogscore=999
+ spamscore=0 phishscore=0 suspectscore=0 malwarescore=0 clxscore=1015
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2003020000 definitions=main-2005080190
 Received-SPF: pass client-ip=148.163.156.1; envelope-from=walling@linux.ibm.com;
  helo=mx0a-001b2d01.pphosted.com
@@ -116,94 +116,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let's factor out the SCLP boundary and length checks
-into separate functions.
-
 Signed-off-by: Collin Walling <walling@linux.ibm.com>
 ---
- hw/s390x/sclp.c | 41 +++++++++++++++++++++++++++++++++++------
- 1 file changed, 35 insertions(+), 6 deletions(-)
+ linux-headers/asm-s390/kvm.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-index d08a291e40..470d5da7a2 100644
---- a/hw/s390x/sclp.c
-+++ b/hw/s390x/sclp.c
-@@ -49,6 +49,34 @@ static inline bool sclp_command_code_valid(uint32_t code)
-     return false;
- }
+diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
+index 0138ccb0d8..b661feafdc 100644
+--- a/linux-headers/asm-s390/kvm.h
++++ b/linux-headers/asm-s390/kvm.h
+@@ -74,6 +74,7 @@ struct kvm_s390_io_adapter_req {
+ #define KVM_S390_VM_CRYPTO		2
+ #define KVM_S390_VM_CPU_MODEL		3
+ #define KVM_S390_VM_MIGRATION		4
++#define KVM_S390_VM_MISC		5
  
-+static bool check_sccb_boundary_valid(uint64_t sccb_addr, uint32_t code,
-+                                      SCCB *sccb)
-+{
-+    uint64_t current_len = sccb_addr + be16_to_cpu(sccb->h.length);
-+    uint64_t allowed_len = (sccb_addr & PAGE_MASK) + PAGE_SIZE;
+ /* kvm attributes for mem_ctrl */
+ #define KVM_S390_VM_MEM_ENABLE_CMMA	0
+@@ -171,6 +172,10 @@ struct kvm_s390_vm_cpu_subfunc {
+ #define KVM_S390_VM_MIGRATION_START	1
+ #define KVM_S390_VM_MIGRATION_STATUS	2
+ 
++/* kvm attributes for KVM_S390_VM_MISC */
++#define KVM_S390_VM_MISC_ENABLE_DIAG318		0
++#define KVM_S390_VM_MISC_DIAG318			1
 +
-+    switch (code & SCLP_CMD_CODE_MASK) {
-+    default:
-+        if (current_len <= allowed_len) {
-+            return true;
-+        }
-+    }
-+    sccb->h.response_code = cpu_to_be16(SCLP_RC_SCCB_BOUNDARY_VIOLATION);
-+    return false;
-+}
-+
-+static bool check_sufficient_sccb_len(SCCB *sccb, int size)
-+{
-+    MachineState *ms = MACHINE(qdev_get_machine());
-+    int required_len = size + ms->possible_cpus->len * sizeof(CPUEntry);
-+
-+    if (be16_to_cpu(sccb->h.length) < required_len) {
-+        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
-+        return false;
-+    }
-+    return true;
-+}
-+
- static void prepare_cpu_entries(CPUEntry *entry, int *count)
- {
-     MachineState *ms = MACHINE(qdev_get_machine());
-@@ -76,8 +104,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
-     int rnsize, rnmax;
-     IplParameterBlock *ipib = s390_ipl_get_iplb();
- 
--    if (be16_to_cpu(sccb->h.length) < (sizeof(ReadInfo) + cpu_count * sizeof(CPUEntry))) {
--        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
-+    if (!check_sufficient_sccb_len(sccb, sizeof(ReadInfo))) {
-         return;
-     }
- 
-@@ -134,8 +161,7 @@ static void sclp_read_cpu_info(SCLPDevice *sclp, SCCB *sccb)
-     ReadCpuInfo *cpu_info = (ReadCpuInfo *) sccb;
-     int cpu_count;
- 
--    if (be16_to_cpu(sccb->h.length) < (sizeof(ReadCpuInfo) + cpu_count * sizeof(CPUEntry))) {
--        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
-+    if (!check_sufficient_sccb_len(sccb, sizeof(ReadCpuInfo))) {
-         return;
-     }
- 
-@@ -227,6 +253,10 @@ int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
-         goto out_write;
-     }
- 
-+    if (!check_sccb_boundary_valid(sccb, code, &work_sccb)) {
-+        goto out_write;
-+    }
-+
-     sclp_c->execute(sclp, &work_sccb, code);
- out_write:
-     s390_cpu_pv_mem_write(env_archcpu(env), 0, &work_sccb,
-@@ -272,8 +302,7 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
-         goto out_write;
-     }
- 
--    if ((sccb + be16_to_cpu(work_sccb.h.length)) > ((sccb & PAGE_MASK) + PAGE_SIZE)) {
--        work_sccb.h.response_code = cpu_to_be16(SCLP_RC_SCCB_BOUNDARY_VIOLATION);
-+    if (!check_sccb_boundary_valid(sccb, code, &work_sccb)) {
-         goto out_write;
-     }
- 
+ /* for KVM_GET_REGS and KVM_SET_REGS */
+ struct kvm_regs {
+ 	/* general purpose regs for s390 */
 -- 
 2.21.1
 
