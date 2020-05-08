@@ -2,79 +2,89 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HK_RANDOM_FROM,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D699C38A2A
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 13:13:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 412F8C47247
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 13:14:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1181520A8B
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 13:13:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1181520A8B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 026D420870
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 13:14:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="hm+M4anA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 026D420870
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX2oy-0006xc-7L
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 09:13:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57366)
+	id 1jX2q4-0008GS-8Q
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 09:14:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54848)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <miaoyubo@huawei.com>)
- id 1jX2o3-000643-KV
- for qemu-devel@nongnu.org; Fri, 08 May 2020 09:12:47 -0400
-Received: from szxga08-in.huawei.com ([45.249.212.255]:36928 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <miaoyubo@huawei.com>)
- id 1jX2o1-00015T-FK
- for qemu-devel@nongnu.org; Fri, 08 May 2020 09:12:47 -0400
-Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.55])
- by Forcepoint Email with ESMTP id 6F76D7BDB36C489EA122;
- Fri,  8 May 2020 21:12:37 +0800 (CST)
-Received: from dggeme706-chm.china.huawei.com (10.1.199.102) by
- DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Fri, 8 May 2020 21:12:37 +0800
-Received: from dggeme756-chm.china.huawei.com (10.3.19.102) by
- dggeme706-chm.china.huawei.com (10.1.199.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Fri, 8 May 2020 21:12:36 +0800
-Received: from dggeme756-chm.china.huawei.com ([10.6.80.68]) by
- dggeme756-chm.china.huawei.com ([10.6.80.68]) with mapi id 15.01.1913.007;
- Fri, 8 May 2020 21:12:36 +0800
-From: miaoyubo <miaoyubo@huawei.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: RE: [PATCH v6 4/8] acpi: Refactor the source of host bridge and build
- tables for pxb
-Thread-Topic: [PATCH v6 4/8] acpi: Refactor the source of host bridge and
- build tables for pxb
-Thread-Index: AQHWDaWUgk8XPHd7pEW80FwYFoj5+6iXl1yAgAa8SUA=
-Date: Fri, 8 May 2020 13:12:36 +0000
-Message-ID: <21a5fb02602242d0ade3cf3621a44b59@huawei.com>
-References: <20200408125816.955-1-miaoyubo@huawei.com>
- <20200408125816.955-5-miaoyubo@huawei.com>
- <20200504095329-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200504095329-mutt-send-email-mst@kernel.org>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.221.29]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.255; envelope-from=miaoyubo@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 09:12:38
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ (Exim 4.90_1) (envelope-from <yuri.benditovich@daynix.com>)
+ id 1jX2bW-00015g-SX
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 08:59:50 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:37212)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <yuri.benditovich@daynix.com>)
+ id 1jX2bV-0006cv-LE
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 08:59:50 -0400
+Received: by mail-wm1-x344.google.com with SMTP id z72so863209wmc.2
+ for <qemu-devel@nongnu.org>; Fri, 08 May 2020 05:59:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=daynix-com.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=+bp650bbQnsCHD8PQdaLw/0ZvWnorlER0/N7ka6DFss=;
+ b=hm+M4anAJ6rvR2wLlcCYVeiXdT6/hHYMAktdiYLaZz8LpaxQf559LFVlW5yg8ps4hh
+ CRtIj4au7Gr4S+WId0gygxY1rBDyTB4UmVG/oGyPm3+QaDzn2J1JMYM4p28+R6fNG4gj
+ 0kYtgpqOTr1NMib688A9izbS1UiDJRVE8FA5B1vY0Mlqzlpls/yiA3trgdS5/Z9zL3FU
+ +zUMUjx6kC/4kGHkZ0vIyg731EQ/9OQmF7kPscHrXAhMS16bpV2rLMVLjjSfDejpcODo
+ /hv4C+wPe7s4NVVGXxxFKSIwD1ZcyhZP8pzJtpYteZDsDdIBl/GwONnTGmsPfqwKm/kr
+ 9HxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=+bp650bbQnsCHD8PQdaLw/0ZvWnorlER0/N7ka6DFss=;
+ b=PfT5uqH+jToep+KG/1rIeVIoLf/xlySsDPT39CuBzPEd5nPW3wdrAUon0Gt7W7nM7Q
+ oyF0u4d8nIl67pp5xC99fyvLQx71ckRsP/u7EcJDDu31+9hsCekZmUzMfoCS2ovCG3Oc
+ LWsTbeYz6lW+TLHBSTVy6/C4XUQRCiAlx1sIEJ1ridCQsm1abm3+MeI0SqRNZm/6vUxj
+ vVPcYVpoWlNpkFsxYlu/yoi3LkLYRgZVgGUN8DuFEE2uDHfu4rptWuUccG/yrr7tj2Q/
+ tVQ7DisY1W0p5Ixk78m35XhT+8p2ie1Xbjka76KvFIZbk8pOYMh8uP3dE07AIOlBL0qu
+ FLFw==
+X-Gm-Message-State: AGi0PubRXIDEuKmrwEIFZK0Ewq3a01JYDa9Io5ctv5wuzjlG70FTtvXD
+ VWZZZKecxiN2h37+R9Aa0NPyK/OrwSUapQ==
+X-Google-Smtp-Source: APiQypKxjkujSe/5iGde1NyNrYo34TTb2geckCJLKgvVuDkpeP1kpN/3SE4au86IvMq0RO1pF0w1cQ==
+X-Received: by 2002:a1c:6a08:: with SMTP id f8mr15127798wmc.132.1588942787831; 
+ Fri, 08 May 2020 05:59:47 -0700 (PDT)
+Received: from f2.redhat.com (bzq-79-183-19-16.red.bezeqint.net.
+ [79.183.19.16])
+ by smtp.gmail.com with ESMTPSA id g6sm2915974wrw.34.2020.05.08.05.59.46
+ (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+ Fri, 08 May 2020 05:59:47 -0700 (PDT)
+From: Yuri Benditovich <yuri.benditovich@daynix.com>
+To: qemu-devel@nongnu.org, mst@redhat.com, jasowang@redhat.com,
+ quintela@redhat.com, dgilbert@redhat.com
+Subject: [PATCH v8 4/7] virtio-net: reference implementation of hash report
+Date: Fri,  8 May 2020 15:59:31 +0300
+Message-Id: <20200508125934.7861-5-yuri.benditovich@daynix.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200508125934.7861-1-yuri.benditovich@daynix.com>
+References: <20200508125934.7861-1-yuri.benditovich@daynix.com>
+Received-SPF: none client-ip=2a00:1450:4864:20::344;
+ envelope-from=yuri.benditovich@daynix.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -88,236 +98,304 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Xiexiangyou <xiexiangyou@huawei.com>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- "imammedo@redhat.com" <imammedo@redhat.com>,
- "lersek@redhat.com" <lersek@redhat.com>
+Cc: yan@daynix.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks so much for such a careful review!!
+Suggest VIRTIO_NET_F_HASH_REPORT if specified in device
+parameters.
+If the VIRTIO_NET_F_HASH_REPORT is set,
+the device extends configuration space. If the feature
+is negotiated, the packet layout is extended to
+accomodate the hash information. In this case deliver
+packet's hash value and report type in virtio header
+extension.
+Use for configuration the same procedure as already
+used for RSS. We add two fields in rss_data that
+controls what the device does with the calculated hash
+if rss_data.enabled is set. If field 'populate' is set
+the hash is set in the packet, if field 'redirect' is
+set the hash is used to decide the queue to place the
+packet to.
 
-> -----Original Message-----
-> From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> Sent: Monday, May 4, 2020 10:01 PM
-> To: miaoyubo <miaoyubo@huawei.com>
-> Cc: peter.maydell@linaro.org; shannon.zhaosl@gmail.com;
-> lersek@redhat.com; imammedo@redhat.com; qemu-devel@nongnu.org;
-> berrange@redhat.com; Xiexiangyou <xiexiangyou@huawei.com>
-> Subject: Re: [PATCH v6 4/8] acpi: Refactor the source of host bridge and =
-build
-> tables for pxb
->=20
-> On Wed, Apr 08, 2020 at 08:58:12PM +0800, Yubo Miao wrote:
-> > From: miaoyubo <miaoyubo@huawei.com>
-> >
-> > The resources of pxbs and obtained by crs_build and the resources used
-> > by pxbs would be moved form the resources defined for host-bridge.
-> >
-> > The resources for pxb are composed of the bar space of the
-> > pci-bridge/pcie-root-port behined it and the config space of devices
-> > behind it.
-> >
-> > Signed-off-by: miaoyubo <miaoyubo@huawei.com>
->=20
-> A bunch of spelling/syntax mistakes in the log, pls spellcheck.
->=20
-> Pls use the format
->  Yubo Miao <miaoyubo@huawei.com>
->=20
->=20
->=20
+Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+---
+ hw/net/virtio-net.c            | 99 +++++++++++++++++++++++++++-------
+ include/hw/virtio/virtio-net.h |  2 +
+ 2 files changed, 81 insertions(+), 20 deletions(-)
 
-Thanks for pointing out the mistakes!
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 3511ea6c13..5facd333ce 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -119,7 +119,7 @@ static VirtIOFeature feature_sizes[] = {
+      .end = endof(struct virtio_net_config, mtu)},
+     {.flags = 1ULL << VIRTIO_NET_F_SPEED_DUPLEX,
+      .end = endof(struct virtio_net_config, duplex)},
+-    {.flags = 1ULL << VIRTIO_NET_F_RSS,
++    {.flags = (1ULL << VIRTIO_NET_F_RSS) | (1ULL << VIRTIO_NET_F_HASH_REPORT),
+      .end = endof(struct virtio_net_config, supported_hash_types)},
+     {}
+ };
+@@ -153,7 +153,8 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
+     netcfg.duplex = n->net_conf.duplex;
+     netcfg.rss_max_key_size = VIRTIO_NET_RSS_MAX_KEY_SIZE;
+     virtio_stw_p(vdev, &netcfg.rss_max_indirection_table_length,
+-                 VIRTIO_NET_RSS_MAX_TABLE_LEN);
++                 virtio_host_has_feature(vdev, VIRTIO_NET_F_RSS) ?
++                 VIRTIO_NET_RSS_MAX_TABLE_LEN : 1);
+     virtio_stl_p(vdev, &netcfg.supported_hash_types,
+                  VIRTIO_NET_RSS_SUPPORTED_HASHES);
+     memcpy(config, &netcfg, n->config_size);
+@@ -579,7 +580,7 @@ static int peer_has_ufo(VirtIONet *n)
+ }
+ 
+ static void virtio_net_set_mrg_rx_bufs(VirtIONet *n, int mergeable_rx_bufs,
+-                                       int version_1)
++                                       int version_1, int hash_report)
+ {
+     int i;
+     NetClientState *nc;
+@@ -587,7 +588,10 @@ static void virtio_net_set_mrg_rx_bufs(VirtIONet *n, int mergeable_rx_bufs,
+     n->mergeable_rx_bufs = mergeable_rx_bufs;
+ 
+     if (version_1) {
+-        n->guest_hdr_len = sizeof(struct virtio_net_hdr_mrg_rxbuf);
++        n->guest_hdr_len = hash_report ?
++            sizeof(struct virtio_net_hdr_v1_hash) :
++            sizeof(struct virtio_net_hdr_mrg_rxbuf);
++        n->rss_data.populate_hash = !!hash_report;
+     } else {
+         n->guest_hdr_len = n->mergeable_rx_bufs ?
+             sizeof(struct virtio_net_hdr_mrg_rxbuf) :
+@@ -708,6 +712,8 @@ static uint64_t virtio_net_get_features(VirtIODevice *vdev, uint64_t features,
+         virtio_clear_feature(&features, VIRTIO_NET_F_GUEST_TSO4);
+         virtio_clear_feature(&features, VIRTIO_NET_F_GUEST_TSO6);
+         virtio_clear_feature(&features, VIRTIO_NET_F_GUEST_ECN);
++
++        virtio_clear_feature(&features, VIRTIO_NET_F_HASH_REPORT);
+     }
+ 
+     if (!peer_has_vnet_hdr(n) || !peer_has_ufo(n)) {
+@@ -720,6 +726,7 @@ static uint64_t virtio_net_get_features(VirtIODevice *vdev, uint64_t features,
+     }
+ 
+     virtio_clear_feature(&features, VIRTIO_NET_F_RSS);
++    virtio_clear_feature(&features, VIRTIO_NET_F_HASH_REPORT);
+     features = vhost_net_get_features(get_vhost_net(nc->peer), features);
+     vdev->backend_features = features;
+ 
+@@ -886,12 +893,15 @@ static void virtio_net_set_features(VirtIODevice *vdev, uint64_t features)
+                                virtio_has_feature(features,
+                                                   VIRTIO_NET_F_MRG_RXBUF),
+                                virtio_has_feature(features,
+-                                                  VIRTIO_F_VERSION_1));
++                                                  VIRTIO_F_VERSION_1),
++                               virtio_has_feature(features,
++                                                  VIRTIO_NET_F_HASH_REPORT));
+ 
+     n->rsc4_enabled = virtio_has_feature(features, VIRTIO_NET_F_RSC_EXT) &&
+         virtio_has_feature(features, VIRTIO_NET_F_GUEST_TSO4);
+     n->rsc6_enabled = virtio_has_feature(features, VIRTIO_NET_F_RSC_EXT) &&
+         virtio_has_feature(features, VIRTIO_NET_F_GUEST_TSO6);
++    n->rss_data.redirect = virtio_has_feature(features, VIRTIO_NET_F_RSS);
+ 
+     if (n->has_vnet_hdr) {
+         n->curr_guest_offloads =
+@@ -1165,7 +1175,9 @@ static void virtio_net_disable_rss(VirtIONet *n)
+ }
+ 
+ static uint16_t virtio_net_handle_rss(VirtIONet *n,
+-                                      struct iovec *iov, unsigned int iov_cnt)
++                                      struct iovec *iov,
++                                      unsigned int iov_cnt,
++                                      bool do_rss)
+ {
+     VirtIODevice *vdev = VIRTIO_DEVICE(n);
+     struct virtio_net_rss_config cfg;
+@@ -1178,10 +1190,14 @@ static uint16_t virtio_net_handle_rss(VirtIONet *n,
+     const char *err_msg = "";
+     uint32_t err_value = 0;
+ 
+-    if (!virtio_vdev_has_feature(vdev, VIRTIO_NET_F_RSS)) {
++    if (do_rss && !virtio_vdev_has_feature(vdev, VIRTIO_NET_F_RSS)) {
+         err_msg = "RSS is not negotiated";
+         goto error;
+     }
++    if (!do_rss && !virtio_vdev_has_feature(vdev, VIRTIO_NET_F_HASH_REPORT)) {
++        err_msg = "Hash report is not negotiated";
++        goto error;
++    }
+     size_get = offsetof(struct virtio_net_rss_config, indirection_table);
+     s = iov_to_buf(iov, iov_cnt, offset, &cfg, size_get);
+     if (s != size_get) {
+@@ -1193,6 +1209,9 @@ static uint16_t virtio_net_handle_rss(VirtIONet *n,
+     n->rss_data.indirections_len =
+         virtio_lduw_p(vdev, &cfg.indirection_table_mask);
+     n->rss_data.indirections_len++;
++    if (!do_rss) {
++        n->rss_data.indirections_len = 1;
++    }
+     if (!is_power_of_2(n->rss_data.indirections_len)) {
+         err_msg = "Invalid size of indirection table";
+         err_value = n->rss_data.indirections_len;
+@@ -1203,8 +1222,8 @@ static uint16_t virtio_net_handle_rss(VirtIONet *n,
+         err_value = n->rss_data.indirections_len;
+         goto error;
+     }
+-    n->rss_data.default_queue =
+-        virtio_lduw_p(vdev, &cfg.unclassified_queue);
++    n->rss_data.default_queue = do_rss ?
++        virtio_lduw_p(vdev, &cfg.unclassified_queue) : 0;
+     if (n->rss_data.default_queue >= n->max_queues) {
+         err_msg = "Invalid default queue";
+         err_value = n->rss_data.default_queue;
+@@ -1238,7 +1257,7 @@ static uint16_t virtio_net_handle_rss(VirtIONet *n,
+         err_value = (uint32_t)s;
+         goto error;
+     }
+-    queues = virtio_lduw_p(vdev, &temp.us);
++    queues = do_rss ? virtio_lduw_p(vdev, &temp.us) : n->curr_queues;
+     if (queues == 0 || queues > n->max_queues) {
+         err_msg = "Invalid number of queues";
+         err_value = queues;
+@@ -1284,8 +1303,12 @@ static int virtio_net_handle_mq(VirtIONet *n, uint8_t cmd,
+     uint16_t queues;
+ 
+     virtio_net_disable_rss(n);
++    if (cmd == VIRTIO_NET_CTRL_MQ_HASH_CONFIG) {
++        queues = virtio_net_handle_rss(n, iov, iov_cnt, false);
++        return queues ? VIRTIO_NET_OK : VIRTIO_NET_ERR;
++    }
+     if (cmd == VIRTIO_NET_CTRL_MQ_RSS_CONFIG) {
+-        queues = virtio_net_handle_rss(n, iov, iov_cnt);
++        queues = virtio_net_handle_rss(n, iov, iov_cnt, true);
+     } else if (cmd == VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET) {
+         struct virtio_net_ctrl_mq mq;
+         size_t s;
+@@ -1572,15 +1595,34 @@ static uint8_t virtio_net_get_hash_type(bool isip4,
+     return 0xff;
+ }
+ 
++static void virtio_set_packet_hash(const uint8_t *buf, uint8_t report,
++                                   uint32_t hash)
++{
++    struct virtio_net_hdr_v1_hash *hdr = (void *)buf;
++    hdr->hash_value = hash;
++    hdr->hash_report = report;
++}
++
+ static int virtio_net_process_rss(NetClientState *nc, const uint8_t *buf,
+                                   size_t size)
+ {
+     VirtIONet *n = qemu_get_nic_opaque(nc);
+-    unsigned int index = nc->queue_index, new_index;
++    unsigned int index = nc->queue_index, new_index = index;
+     struct NetRxPkt *pkt = n->rx_pkt;
+     uint8_t net_hash_type;
+     uint32_t hash;
+     bool isip4, isip6, isudp, istcp;
++    static const uint8_t reports[NetPktRssIpV6UdpEx + 1] = {
++        VIRTIO_NET_HASH_REPORT_IPv4,
++        VIRTIO_NET_HASH_REPORT_TCPv4,
++        VIRTIO_NET_HASH_REPORT_TCPv6,
++        VIRTIO_NET_HASH_REPORT_IPv6,
++        VIRTIO_NET_HASH_REPORT_IPv6_EX,
++        VIRTIO_NET_HASH_REPORT_TCPv6_EX,
++        VIRTIO_NET_HASH_REPORT_UDPv4,
++        VIRTIO_NET_HASH_REPORT_UDPv6,
++        VIRTIO_NET_HASH_REPORT_UDPv6_EX
++    };
+ 
+     net_rx_pkt_set_protocols(pkt, buf + n->host_hdr_len,
+                              size - n->host_hdr_len);
+@@ -1594,16 +1636,24 @@ static int virtio_net_process_rss(NetClientState *nc, const uint8_t *buf,
+     net_hash_type = virtio_net_get_hash_type(isip4, isip6, isudp, istcp,
+                                              n->rss_data.hash_types);
+     if (net_hash_type > NetPktRssIpV6UdpEx) {
+-        return n->rss_data.default_queue;
++        if (n->rss_data.populate_hash) {
++            virtio_set_packet_hash(buf, VIRTIO_NET_HASH_REPORT_NONE, 0);
++        }
++        return n->rss_data.redirect ? n->rss_data.default_queue : -1;
+     }
+ 
+     hash = net_rx_pkt_calc_rss_hash(pkt, net_hash_type, n->rss_data.key);
+-    new_index = hash & (n->rss_data.indirections_len - 1);
+-    new_index = n->rss_data.indirections_table[new_index];
+-    if (index == new_index) {
+-        return -1;
++
++    if (n->rss_data.populate_hash) {
++        virtio_set_packet_hash(buf, reports[net_hash_type], hash);
+     }
+-    return new_index;
++
++    if (n->rss_data.redirect) {
++        new_index = hash & (n->rss_data.indirections_len - 1);
++        new_index = n->rss_data.indirections_table[new_index];
++    }
++
++    return (index == new_index) ? -1 : new_index;
+ }
+ 
+ static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
+@@ -1679,6 +1729,11 @@ static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
+             }
+ 
+             receive_header(n, sg, elem->in_num, buf, size);
++            if (n->rss_data.populate_hash) {
++                offset = sizeof(mhdr);
++                iov_from_buf(sg, elem->in_num, offset,
++                             buf + offset, n->host_hdr_len - sizeof(mhdr));
++            }
+             offset = n->host_hdr_len;
+             total += n->guest_hdr_len;
+             guest_offset = n->guest_hdr_len;
+@@ -2671,7 +2726,9 @@ static int virtio_net_post_load_device(void *opaque, int version_id)
+     trace_virtio_net_post_load_device();
+     virtio_net_set_mrg_rx_bufs(n, n->mergeable_rx_bufs,
+                                virtio_vdev_has_feature(vdev,
+-                                                       VIRTIO_F_VERSION_1));
++                                                       VIRTIO_F_VERSION_1),
++                               virtio_vdev_has_feature(vdev,
++                                                       VIRTIO_NET_F_HASH_REPORT));
+ 
+     /* MAC_TABLE_ENTRIES may be different from the saved image */
+     if (n->mac_table.in_use > MAC_TABLE_ENTRIES) {
+@@ -3290,7 +3347,7 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+ 
+     n->vqs[0].tx_waiting = 0;
+     n->tx_burst = n->net_conf.txburst;
+-    virtio_net_set_mrg_rx_bufs(n, 0, 0);
++    virtio_net_set_mrg_rx_bufs(n, 0, 0, 0);
+     n->promisc = 1; /* for compatibility */
+ 
+     n->mac_table.macs = g_malloc0(MAC_TABLE_ENTRIES * ETH_ALEN);
+@@ -3445,6 +3502,8 @@ static Property virtio_net_properties[] = {
+     DEFINE_PROP_BIT64("mq", VirtIONet, host_features, VIRTIO_NET_F_MQ, false),
+     DEFINE_PROP_BIT64("rss", VirtIONet, host_features,
+                     VIRTIO_NET_F_RSS, false),
++    DEFINE_PROP_BIT64("hash", VirtIONet, host_features,
++                    VIRTIO_NET_F_HASH_REPORT, false),
+     DEFINE_PROP_BIT64("guest_rsc_ext", VirtIONet, host_features,
+                     VIRTIO_NET_F_RSC_EXT, false),
+     DEFINE_PROP_UINT32("rsc_interval", VirtIONet, rsc_timeout,
+diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
+index 5081f3c52a..a45ef8278e 100644
+--- a/include/hw/virtio/virtio-net.h
++++ b/include/hw/virtio/virtio-net.h
+@@ -131,6 +131,8 @@ typedef struct VirtioNetRscChain {
+ 
+ typedef struct VirtioNetRssData {
+     bool    enabled;
++    bool    redirect;
++    bool    populate_hash;
+     uint32_t hash_types;
+     uint8_t key[VIRTIO_NET_RSS_MAX_KEY_SIZE];
+     uint16_t indirections_len;
+-- 
+2.17.1
 
-> > ---
-> >  hw/arm/virt-acpi-build.c | 131
-> > +++++++++++++++++++++++++++++++++------
-> >  1 file changed, 111 insertions(+), 20 deletions(-)
-> >
-> > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c index
-> > e8ba09855c..7bcd04dfb7 100644
-> > --- a/hw/arm/virt-acpi-build.c
-> > +++ b/hw/arm/virt-acpi-build.c
-> > @@ -49,6 +49,9 @@
-> >  #include "kvm_arm.h"
-> >  #include "migration/vmstate.h"
-> >
-> > +#include "hw/arm/virt.h"
-> > +#include "hw/pci/pci_bus.h"
-> > +#include "hw/pci/pci_bridge.h"
-> >  #define ARM_SPI_BASE 32
-> >
-> >  static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus) @@ -266,19
-> > +269,81 @@ static void acpi_dsdt_add_pci_osc(Aml *dev, Aml *scope)  }
-> >
-> >  static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry
-> *memmap,
-> > -                              uint32_t irq, bool use_highmem, bool hig=
-hmem_ecam)
-> > +                              uint32_t irq, bool use_highmem, bool hig=
-hmem_ecam,
-> > +                              VirtMachineState *vms)
-> >  {
-> >      int ecam_id =3D VIRT_ECAM_ID(highmem_ecam);
-> > -    Aml *method, *crs;
-> > +    int i;
-> > +    Aml *method, *crs, *dev;
-> >      hwaddr base_mmio =3D memmap[VIRT_PCIE_MMIO].base;
-> >      hwaddr size_mmio =3D memmap[VIRT_PCIE_MMIO].size;
-> >      hwaddr base_pio =3D memmap[VIRT_PCIE_PIO].base;
-> >      hwaddr size_pio =3D memmap[VIRT_PCIE_PIO].size;
-> >      hwaddr base_ecam =3D memmap[ecam_id].base;
-> >      hwaddr size_ecam =3D memmap[ecam_id].size;
-> > +    CrsRangeEntry *entry;
-> > +    CrsRangeSet crs_range_set;
-> > +
-> > +    crs_range_set_init(&crs_range_set);
-> >      int nr_pcie_buses =3D size_ecam / PCIE_MMCFG_SIZE_MIN;
-> > +    PCIHostState *s =3D OBJECT_CHECK(PCIHostState,
-> > +                                   object_resolve_path_type("",
-> > +                                   "pcie-host-bridge", NULL),
-> > +                                   TYPE_PCI_HOST_BRIDGE);
->=20
-> Not TYPE_PCIE_HOST_BRIDGE? And what if it's ambiguous?
->=20
->=20
-
-Yes, TYPE_PCI_HOST_BRIDGE is ambiguous, I would fix it. =20
-
-> > +
-> > +    PCIBus *bus =3D s->bus;
-> > +    /* start to construct the tables for pxb*/
->=20
->=20
-> coding style violation. weird that ehckpatch didn't notice it.
->=20
-
-Thanks for such a careful review!
-
-> > +    if (bus) {
-> > +        QLIST_FOREACH(bus, &bus->child, sibling) {
-> > +            uint8_t bus_num =3D pci_bus_num(bus);
-> > +            uint8_t numa_node =3D pci_bus_numa_node(bus);
-> > +
-> > +            if (!pci_bus_is_root(bus)) {
-> > +                continue;
-> > +            }
-> > +            /*
-> > +             * Coded up the MIN of the busNr defined for pxb-pcie,
-> > +             * the MIN - 1 would be the MAX bus number for the main
-> > +             * host bridge.
->=20
->=20
-> Couldn't figure out this comment. Pls rephrase in some way so it's
-> understandable.
->=20
-
-How about=20
-/* 0 - (nr_pcie_buses - 1) is the bus range for the main
-  * host-bridge and it equals the MIN of the
-  * busNr defined for pxb-pcie*/
-
-> > +             */
-> > +            if (bus_num < nr_pcie_buses) {
-> > +                nr_pcie_buses =3D bus_num;
-> > +            }
-> > +
-> > +            }
-> > +
-> > +            acpi_dsdt_add_pci_route_table(dev, scope, irq);
-> > +
-> > +            /*
-> > +             * Resources deined for PXBs are composed by the folling p=
-arts:
-> > +             * 1. The resources the pci-brige/pcie-root-port need.
-> > +             * 2. The resources the devices behind pxb need.
-> > +             */
->=20
->=20
-> syntax/grammar errors here too.
->=20
-
-Sorry for the syntax error!
-
-> > +            crs =3D build_crs(PCI_HOST_BRIDGE(BUS(bus)->parent),
-> &crs_range_set);
-> > +            aml_append(dev, aml_name_decl("_CRS", crs));
-> > +
-> > +            acpi_dsdt_add_pci_osc(dev, scope);
-> > +
-> > +            aml_append(scope, dev);
-> > +
-> > +        }
-> > +    }
-> >
-> > -    Aml *dev =3D aml_device("%s", "PCI0");
-> > +    /* start to construct the tables for main host bridge */
->=20
-> tables for the main.
->=20
->
-=20
-Yes, tables for the main is better.
-
->=20
-> > +    dev =3D aml_device("%s", "PCI0");
->=20
->=20
-> Make dev above local in scope, then this can stay unchanged.
->=20
-
-Sure.
-
-> >      aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A08")));
-> >      aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03")));
-> >      aml_append(dev, aml_name_decl("_SEG", aml_int(0))); @@ -299,25
-> > +364,51 @@ static void acpi_dsdt_add_pci(Aml *scope, const
-> MemMapEntry *memmap,
-> >          aml_word_bus_number(AML_MIN_FIXED, AML_MAX_FIXED,
-> AML_POS_DECODE,
-> >                              0x0000, 0x0000, nr_pcie_buses - 1, 0x0000,
-> >                              nr_pcie_buses));
-> > -    aml_append(rbuf,
-> > -        aml_dword_memory(AML_POS_DECODE, AML_MIN_FIXED,
-> AML_MAX_FIXED,
-> >      unsigned dsdt, xsdt;
-> >      GArray *tables_blob =3D tables->table_data;
-> >      MachineState *ms =3D MACHINE(vms);
-> > -
-> >      table_offsets =3D g_array_new(false, true /* clear */,
-> >                                          sizeof(uint32_t));
-> >
->=20
-> this empty line didn't hurt
->=20
-
-I would keep it.
-
-> > @@ -952,7 +1044,6 @@ void virt_acpi_setup(VirtMachineState *vms)
-> >      build_state->rsdp_mr =3D acpi_add_rom_blob(virt_acpi_build_update,
-> >                                               build_state, tables.rsdp,
-> >                                               ACPI_BUILD_RSDP_FILE,
-> > 0);
-> > -
-> >      qemu_register_reset(virt_acpi_build_reset, build_state);
-> >      virt_acpi_build_reset(build_state);
-> >      vmstate_register(NULL, 0, &vmstate_virt_acpi_build, build_state);
->=20
->=20
-> this line didn't hurt either.
->=20
-
-I would keep it
-
-> > --
-> > 2.19.1
-> >
-
-Regards,
-Miao
 
