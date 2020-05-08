@@ -2,94 +2,90 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D277C4724C
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 03:56:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E324AC38A2A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 05:15:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10BE820735
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 03:56:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9FF74206D3
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 05:15:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qnap.com header.i=@qnap.com header.b="kUSxTgDT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10BE820735
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=qnap.com
+	dkim=pass (2048-bit key) header.d=smartx-com.20150623.gappssmtp.com header.i=@smartx-com.20150623.gappssmtp.com header.b="HTptYX1H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FF74206D3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWu82-0005aU-8s
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 23:56:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36658)
+	id 1jWvLs-0004ws-NO
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 01:15:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dereksu@qnap.com>) id 1jWu7L-00057T-F1
- for qemu-devel@nongnu.org; Thu, 07 May 2020 23:56:07 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:45979)
+ (Exim 4.90_1) (envelope-from <fengli@smartx.com>) id 1jWvKy-000496-9C
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 01:14:16 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:53335)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <dereksu@qnap.com>) id 1jWu7K-0003Bs-0f
- for qemu-devel@nongnu.org; Thu, 07 May 2020 23:56:07 -0400
-Received: by mail-pg1-x542.google.com with SMTP id s18so241012pgl.12
- for <qemu-devel@nongnu.org>; Thu, 07 May 2020 20:56:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qnap.com; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=X2Dn7bNnuqHGjHdduKehjzI1ZKbit1B5jrC9GMqyM3M=;
- b=kUSxTgDTOJcF79QZrvV2BwQTUm97YFsaOe7/kxGDHHjzgRN4V+uG7b451PH7cjsTT+
- fwBmBQ9k5tFOvhK8WrsCSeRYjUqsSJfUr69cjmRcgGLPuhYne916yz5c4slZO7Dm2LbQ
- tHV6SEmuTZuWOzXwHIuNtowDr5BwHQuTB/jVw=
+ (Exim 4.90_1) (envelope-from <fengli@smartx.com>) id 1jWvKv-00055F-Gd
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 01:14:16 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id hi11so3723713pjb.3
+ for <qemu-devel@nongnu.org>; Thu, 07 May 2020 22:14:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=smartx-com.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=QOtqGyEJpUTLx+cPS0nOVZY9irhcSsfmy5lGrFkJCF0=;
+ b=HTptYX1Hb3ash1icIcePvl0oCcOy0gYXHbanffUMJyLCWHaMyxYWvd1Py1NmI3q+rq
+ cnKbqjpTwU6LchnHxaNLFzN6QIuIgVSipmWJhLYK5F2Bk8cntD5VBnuJMEANzkYkljEO
+ k92aufH7qA5asTwSlmpRUJAWXAO4v9pMw4VEkAcyhJE0QMj+8PhKYEwX94mb53dF8RwC
+ ICY1nuGOIlXCSrMvQtqfdhzjtpJP5+hhPngTcO/WZPrYBuPi1MZhSE403Gi/aFU81ANQ
+ EQqzxmvJfcnUrO5VA/mh2ZK8l7bP0HQ2SDyYEnS874oW2XCsLfn42Soxo2k+VRyVzZA3
+ Dy8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=X2Dn7bNnuqHGjHdduKehjzI1ZKbit1B5jrC9GMqyM3M=;
- b=VjN2zl/XensJ1dt3ricBKhdNp4H7nhL0GLYge1v5ug6GtexXuhSEXMcXGpyoF7uuGh
- I/fAt9O6O2Edmh/Fzt1UI6SzKoDctgcQImhxHwXXHKPrZj168tT68w8eQsmfce24Xeel
- zevJq/vIJv5OBogcZ+zHzJPlydkmkeVsc9mdPTPs2ZvIUPGCdU3UddPfPrD7CyfO/ZVW
- WkZVxC4ti4zNHKuxtswuZHLDKccM3R3smlomKoXHTC7209D9IuBgveNtIpImgjHwSGss
- sZrx9+Ii7sDsxRjE/ffBm2vw9dpPD3wGDpPp9leGk3KA5cINM4N8TDntExMUNlioDPzO
- pJRA==
-X-Gm-Message-State: AGi0PuZpcXKZ5zR7OiwnCR/ZDLrvIXECu80F6L8ql0QPsr/YgIihO+Bx
- /egiZfDr64KuMvQX5Ww6ArKbwQ==
-X-Google-Smtp-Source: APiQypKFmy5yIzWMbn0W8dSJ7bHjQjTG6SN3I995m0c1oxZ3wCl5tH0fF0gFvpNYEIGjR1Y61yrnNw==
-X-Received: by 2002:aa7:8b0d:: with SMTP id f13mr708470pfd.270.1588910163732; 
- Thu, 07 May 2020 20:56:03 -0700 (PDT)
-Received: from Jing-Weide-MacBook-Pro-3.local
- (202-39-79-13.HINET-IP.hinet.net. [202.39.79.13])
- by smtp.gmail.com with ESMTPSA id q7sm310980pgs.13.2020.05.07.20.56.01
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 07 May 2020 20:56:03 -0700 (PDT)
-Subject: Re: [PATCH v4 5/6] net/colo-compare.c, softmmu/vl.c: Check that
- colo-compare is active
-To: "Zhang, Chen" <chen.zhang@intel.com>, Lukas Straub <lukasstraub2@web.de>
-References: <cover.1588587700.git.lukasstraub2@web.de>
- <f6cbde747d78ff080f680c710e2793867a3cf1fa.1588587700.git.lukasstraub2@web.de>
- <0380e994e53947cd961cc363d46561d3@intel.com> <20200507175421.185b48f8@luklap>
- <59eea784a36643b4b1fe32b0700f57f7@intel.com>
-From: Derek Su <dereksu@qnap.com>
-Message-ID: <82d9726c-11e5-2090-96d9-4e8617f8f02e@qnap.com>
-Date: Fri, 8 May 2020 11:55:59 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.8.0
-MIME-Version: 1.0
-In-Reply-To: <59eea784a36643b4b1fe32b0700f57f7@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=dereksu@qnap.com; helo=mail-pg1-x542.google.com
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=QOtqGyEJpUTLx+cPS0nOVZY9irhcSsfmy5lGrFkJCF0=;
+ b=hWVgi06pAHVPMLBfziGP9py7eGn9HHBqELOcfL1Wli9ho2XWt5xys2pOMIICu8AKul
+ ocvQUqiQH73wrnYjPJlTvh2KvlAiDX+PcjDTA71brHCgBe+m/VqPv+Y6vSUKno+S2bVM
+ DGP9e08nRPkrSdXkNnNFJnDj5ByWhG0BKdDLblBO0BgNPZk/NYZBTbws8q0ff8MWJ0cY
+ EHZeN/YzJ8TMPgPTRvFMAsi30F9zmSj8W+IQ4/mbKRKzqWFF1rbLFzbn9ARxss11PJO8
+ 2c8N+q3ult/bcXbbrgqTSYJkfOE6PFPdrGyfejlorayYMaO0AV9MnzNFrlUIhBiLaggs
+ aUqQ==
+X-Gm-Message-State: AGi0PuY8TGzs2ejYozOW/vwchngJkO603DW8Rqem4pdX68rSt54izz38
+ fxBT2jiYs6tY/Kk7ZtO/SEuszQ==
+X-Google-Smtp-Source: APiQypKx40PLa/wSDNMk728RDnadleRWSE5SZgiVvXSPjKwL5r2bJEbkI3gcP7tSD0O0he2ub8W2kw==
+X-Received: by 2002:a17:902:7249:: with SMTP id c9mr692589pll.23.1588914850742; 
+ Thu, 07 May 2020 22:14:10 -0700 (PDT)
+Received: from 31_216.localdomain ([47.240.167.159])
+ by smtp.gmail.com with ESMTPSA id b15sm477050pfd.139.2020.05.07.22.14.08
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 07 May 2020 22:14:10 -0700 (PDT)
+From: Li Feng <fengli@smartx.com>
+To: kyle@smartx.com, lifeng1519@gmail.com, dimastep@yandex-team.ru,
+ marcandre.lureau@redhat.com,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org (open list:All patches CC here)
+Subject: [PATCH v3 1/2] io/channel: fix crash when qio_channel_readv_all
+ return 0
+Date: Fri,  8 May 2020 13:14:40 +0800
+Message-Id: <20200508051441.8143-2-fengli@smartx.com>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20200508051441.8143-1-fengli@smartx.com>
+References: <20200428085122.1621-1-fengli@smartx.com>
+ <20200508051441.8143-1-fengli@smartx.com>
+Received-SPF: none client-ip=2607:f8b0:4864:20::1041;
+ envelope-from=fengli@smartx.com; helo=mail-pj1-x1041.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,240 +99,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Jason Wang <jasowang@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Li Zhijian <lizhijian@cn.fujitsu.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Li Feng <fengli@smartx.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2020/5/8 上午10:26, Zhang, Chen wrote:
-> 
-> 
->> -----Original Message-----
->> From: Lukas Straub <lukasstraub2@web.de>
->> Sent: Thursday, May 7, 2020 11:54 PM
->> To: Zhang, Chen <chen.zhang@intel.com>
->> Cc: qemu-devel <qemu-devel@nongnu.org>; Li Zhijian
->> <lizhijian@cn.fujitsu.com>; Jason Wang <jasowang@redhat.com>; Marc-
->> André Lureau <marcandre.lureau@redhat.com>; Paolo Bonzini
->> <pbonzini@redhat.com>
->> Subject: Re: [PATCH v4 5/6] net/colo-compare.c, softmmu/vl.c: Check that
->> colo-compare is active
->>
->> On Thu, 7 May 2020 11:38:04 +0000
->> "Zhang, Chen" <chen.zhang@intel.com> wrote:
->>
->>>> -----Original Message-----
->>>> From: Lukas Straub <lukasstraub2@web.de>
->>>> Sent: Monday, May 4, 2020 6:28 PM
->>>> To: qemu-devel <qemu-devel@nongnu.org>
->>>> Cc: Zhang, Chen <chen.zhang@intel.com>; Li Zhijian
->>>> <lizhijian@cn.fujitsu.com>; Jason Wang <jasowang@redhat.com>; Marc-
->>>> André Lureau <marcandre.lureau@redhat.com>; Paolo Bonzini
->>>> <pbonzini@redhat.com>
->>>> Subject: [PATCH v4 5/6] net/colo-compare.c, softmmu/vl.c: Check that
->>>> colo- compare is active
->>>>
->>>> If the colo-compare object is removed before failover and a
->>>> checkpoint happens, qemu crashes because it tries to lock the
->>>> destroyed event_mtx in colo_notify_compares_event.
->>>>
->>>> Fix this by checking if everything is initialized by introducing a
->>>> new variable colo_compare_active which is protected by a new mutex
->>>> colo_compare_mutex. The new mutex also protects against concurrent
->>>> access of the net_compares list and makes sure that
->>>> colo_notify_compares_event isn't active while we destroy event_mtx
->>>> and event_complete_cond.
->>>>
->>>> With this it also is again possible to use colo without colo-compare
->>>> (periodic
->>>> mode) and to use multiple colo-compare for multiple network interfaces.
->>>>
->>>
->>> Hi Lukas,
->>>
->>> For this case I think we don't need to touch vl.c code, we can solve this
->> issue from another perspective:
->>> How to remove colo-compare?
->>> User will use qemu-monitor or QMP command to disable an object, so we
->>> just need return operation failed When user try to remove colo-compare
->> object while COLO is running.
->>
->> Yeah, but that still leaves the other problem that colo can't be used without
->> colo-compare (qemu crashes then).
-> 
-> Yes, the COLO-compare is necessary module in COLO original design.
-> At most cases, user need it do dynamic sync.
-> For rare cases, maybe we can add a new colo-compare parameter to bypass all the network workload.
+Root cause:
+From `man recvmsg`, the RETURN VALUE says:
+These  calls return the number of bytes received, or -1 if an error occurred.
+In the event of an error, errno is set to indicate the error.
+The return value will be 0 when the peer has performed an orderly shutdown.
 
-Hi, Chen
+When an error happens, the socket will be closed, and recvmsg return 0,
+then error_setg will trigger a crash.
 
-In our application, we only need "periodical mode" because of the 
-performance issue, and have internal patch now. Is it OK to send the 
-internal patch for review?
+This unit test could reproduce this issue:
+tests/test-char -p /char/socket/client/reconnect-error/unix
 
-Thanks.
+The core file backtrace is :
 
-Regards,
-Derek
+(gdb) bt
+    #0  0x00007ffff5ac3277 in raise () from /lib64/libc.so.6
+    #1  0x00007ffff5ac4968 in abort () from /lib64/libc.so.6
+    #2  0x00005555555aaa94 in error_handle_fatal (errp=<optimized out>, err=0x7fffec0012d0) at util/error.c:40
+    #3  0x00005555555aab6d in error_setv (errp=0x555555802a08 <error_abort>, src=0x5555555c4280 "io/channel.c", line=148,
+        func=0x5555555c4580 <__func__.17489> "qio_channel_readv_all", err_class=ERROR_CLASS_GENERIC_ERROR,
+        fmt=<optimized out>, ap=0x7ffff423bae0, suffix=0x0) at util/error.c:73
+    #4  0x00005555555aacf0 in error_setg_internal (errp=errp@entry=0x555555802a08 <error_abort>,
+        src=src@entry=0x5555555c4280 "io/channel.c", line=line@entry=148,
+        func=func@entry=0x5555555c4580 <__func__.17489> "qio_channel_readv_all",
+        fmt=fmt@entry=0x5555555c43a0 "Unexpected end-of-file before all bytes were read") at util/error.c:97
+    #5  0x000055555556c25c in qio_channel_readv_all (ioc=<optimized out>, iov=<optimized out>, niov=<optimized out>,
+        errp=0x555555802a08 <error_abort>) at io/channel.c:147
+    #6  0x000055555556c29a in qio_channel_read_all (ioc=<optimized out>, buf=<optimized out>, buflen=<optimized out>,
+        errp=<optimized out>) at io/channel.c:247
+    #7  0x000055555556ad22 in char_socket_ping_pong (ioc=0x7fffec0008c0) at tests/test-char.c:732
+    #8  0x000055555556ae12 in char_socket_client_server_thread (data=data@entry=0x55555582e350) at tests/test-char.c:891
+    #9  0x00005555555a95b6 in qemu_thread_start (args=<optimized out>) at util/qemu-thread-posix.c:519
+    #10 0x00007ffff5e61e25 in start_thread () from /lib64/libpthread.so.0
+    #11 0x00007ffff5b8bbad in clone () from /lib64/libc.so.6
 
-> 
-> Thanks
-> Zhang Chen
-> 
->>
->> Regards,
->> Lukas Straub
->>
->>> Thanks
->>> Zhang Chen
->>>
->>>> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
->>>> ---
->>>>   net/colo-compare.c | 35 +++++++++++++++++++++++++++++------
->>>>   net/colo-compare.h |  1 +
->>>>   softmmu/vl.c       |  2 ++
->>>>   3 files changed, 32 insertions(+), 6 deletions(-)
->>>>
->>>> diff --git a/net/colo-compare.c b/net/colo-compare.c index
->>>> 56db3d3bfc..c7572d75e9 100644
->>>> --- a/net/colo-compare.c
->>>> +++ b/net/colo-compare.c
->>>> @@ -54,6 +54,8 @@ static NotifierList colo_compare_notifiers =
->>>> #define REGULAR_PACKET_CHECK_MS 3000  #define
->> DEFAULT_TIME_OUT_MS
->>>> 3000
->>>>
->>>> +static QemuMutex colo_compare_mutex; static bool
->>>> +colo_compare_active;
->>>>   static QemuMutex event_mtx;
->>>>   static QemuCond event_complete_cond;  static int
->>>> event_unhandled_count; @@ -906,6 +908,12 @@ static void
->>>> check_old_packet_regular(void *opaque) void
->>>> colo_notify_compares_event(void *opaque, int event, Error **errp)  {
->>>>       CompareState *s;
->>>> +    qemu_mutex_lock(&colo_compare_mutex);
->>>> +
->>>> +    if (!colo_compare_active) {
->>>> +        qemu_mutex_unlock(&colo_compare_mutex);
->>>> +        return;
->>>> +    }
->>>>
->>>>       qemu_mutex_lock(&event_mtx);
->>>>       QTAILQ_FOREACH(s, &net_compares, next) { @@ -919,6 +927,7 @@
->>>> void colo_notify_compares_event(void *opaque, int event, Error **errp)
->>>>       }
->>>>
->>>>       qemu_mutex_unlock(&event_mtx);
->>>> +    qemu_mutex_unlock(&colo_compare_mutex);
->>>>   }
->>>>
->>>>   static void colo_compare_timer_init(CompareState *s) @@ -1274,7
->>>> +1283,14 @@ static void colo_compare_complete(UserCreatable *uc,
->> Error **errp)
->>>>                              s->vnet_hdr);
->>>>       }
->>>>
->>>> +    qemu_mutex_lock(&colo_compare_mutex);
->>>> +    if (!colo_compare_active) {
->>>> +        qemu_mutex_init(&event_mtx);
->>>> +        qemu_cond_init(&event_complete_cond);
->>>> +        colo_compare_active = true;
->>>> +    }
->>>>       QTAILQ_INSERT_TAIL(&net_compares, s, next);
->>>> +    qemu_mutex_unlock(&colo_compare_mutex);
->>>>
->>>>       s->out_sendco.s = s;
->>>>       s->out_sendco.chr = &s->chr_out; @@ -1290,9 +1306,6 @@ static
->>>> void colo_compare_complete(UserCreatable
->>>> *uc, Error **errp)
->>>>
->>>>       g_queue_init(&s->conn_list);
->>>>
->>>> -    qemu_mutex_init(&event_mtx);
->>>> -    qemu_cond_init(&event_complete_cond);
->>>> -
->>>>       s->connection_track_table =
->>>> g_hash_table_new_full(connection_key_hash,
->>>>                                                         connection_key_equal,
->>>>                                                         g_free, @@
->>>> -1384,12 +1397,19 @@ static void colo_compare_finalize(Object *obj)
->>>>
->>>>       qemu_bh_delete(s->event_bh);
->>>>
->>>> +    qemu_mutex_lock(&colo_compare_mutex);
->>>>       QTAILQ_FOREACH(tmp, &net_compares, next) {
->>>>           if (tmp == s) {
->>>>               QTAILQ_REMOVE(&net_compares, s, next);
->>>>               break;
->>>>           }
->>>>       }
->>>> +    if (QTAILQ_EMPTY(&net_compares)) {
->>>> +        colo_compare_active = false;
->>>> +        qemu_mutex_destroy(&event_mtx);
->>>> +        qemu_cond_destroy(&event_complete_cond);
->>>> +    }
->>>> +    qemu_mutex_unlock(&colo_compare_mutex);
->>>>
->>>>       AioContext *ctx = iothread_get_aio_context(s->iothread);
->>>>       aio_context_acquire(ctx);
->>>> @@ -1413,15 +1433,18 @@ static void colo_compare_finalize(Object *obj)
->>>>           object_unref(OBJECT(s->iothread));
->>>>       }
->>>>
->>>> -    qemu_mutex_destroy(&event_mtx);
->>>> -    qemu_cond_destroy(&event_complete_cond);
->>>> -
->>>>       g_free(s->pri_indev);
->>>>       g_free(s->sec_indev);
->>>>       g_free(s->outdev);
->>>>       g_free(s->notify_dev);
->>>>   }
->>>>
->>>> +void colo_compare_init_globals(void) {
->>>> +    colo_compare_active = false;
->>>> +    qemu_mutex_init(&colo_compare_mutex);
->>>> +}
->>>> +
->>>>   static const TypeInfo colo_compare_info = {
->>>>       .name = TYPE_COLO_COMPARE,
->>>>       .parent = TYPE_OBJECT,
->>>> diff --git a/net/colo-compare.h b/net/colo-compare.h index
->>>> 22ddd512e2..eb483ac586 100644
->>>> --- a/net/colo-compare.h
->>>> +++ b/net/colo-compare.h
->>>> @@ -17,6 +17,7 @@
->>>>   #ifndef QEMU_COLO_COMPARE_H
->>>>   #define QEMU_COLO_COMPARE_H
->>>>
->>>> +void colo_compare_init_globals(void);
->>>>   void colo_notify_compares_event(void *opaque, int event, Error
->>>> **errp); void colo_compare_register_notifier(Notifier *notify);
->>>> void colo_compare_unregister_notifier(Notifier *notify); diff --git
->>>> a/softmmu/vl.c b/softmmu/vl.c index 32c0047889..a913ed5469 100644
->>>> --- a/softmmu/vl.c
->>>> +++ b/softmmu/vl.c
->>>> @@ -112,6 +112,7 @@
->>>>   #include "qapi/qmp/qerror.h"
->>>>   #include "sysemu/iothread.h"
->>>>   #include "qemu/guest-random.h"
->>>> +#include "net/colo-compare.h"
->>>>
->>>>   #define MAX_VIRTIO_CONSOLES 1
->>>>
->>>> @@ -2906,6 +2907,7 @@ void qemu_init(int argc, char **argv, char
->> **envp)
->>>>       precopy_infrastructure_init();
->>>>       postcopy_infrastructure_init();
->>>>       monitor_init_globals();
->>>> +    colo_compare_init_globals();
->>>>
->>>>       if (qcrypto_init(&err) < 0) {
->>>>           error_reportf_err(err, "cannot initialize crypto: ");
->>>> --
->>>> 2.20.1
->>>
-> 
+Signed-off-by: Li Feng <fengli@smartx.com>
+---
+ io/channel.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/io/channel.c b/io/channel.c
+index e4376eb0bc..1a4a505f01 100644
+--- a/io/channel.c
++++ b/io/channel.c
+@@ -144,8 +144,6 @@ int qio_channel_readv_all(QIOChannel *ioc,
+ 
+     if (ret == 0) {
+         ret = -1;
+-        error_setg(errp,
+-                   "Unexpected end-of-file before all bytes were read");
+     } else if (ret == 1) {
+         ret = 0;
+     }
+-- 
+2.11.0
 
 
