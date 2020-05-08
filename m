@@ -2,84 +2,79 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 913AFC38A2A
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 15:32:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F0CC38A2A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 15:33:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E19521841
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 15:32:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 883F6218AC
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 15:33:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L2JtC1OH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E19521841
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oSgQhyu/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 883F6218AC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX4zE-0003Z6-J0
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 11:32:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33974)
+	id 1jX4zw-0005AA-Kg
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 11:33:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34466)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jX4lU-0006Cj-M7
- for qemu-devel@nongnu.org; Fri, 08 May 2020 11:18:16 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:34388)
+ (Exim 4.90_1) (envelope-from <beata.michalska@linaro.org>)
+ id 1jX4nw-0001bw-Vh
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 11:20:49 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:32977)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jX4lQ-0003F2-Lj
- for qemu-devel@nongnu.org; Fri, 08 May 2020 11:18:16 -0400
-Received: by mail-pl1-x642.google.com with SMTP id s10so856698plr.1
- for <qemu-devel@nongnu.org>; Fri, 08 May 2020 08:18:11 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <beata.michalska@linaro.org>)
+ id 1jX4nv-0004ON-UG
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 11:20:48 -0400
+Received: by mail-il1-x143.google.com with SMTP id q10so1764229ile.0
+ for <qemu-devel@nongnu.org>; Fri, 08 May 2020 08:20:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Kyd75dQ6HSF4Bc6As5SxJ/ajmbJCQUS6r+6XFxFF4i4=;
- b=L2JtC1OHJja/JFbC8t/jwZOoHqQXOpAkJhI9MUtaF/romDh/Qb4I2eZA0KqKUY3GQ0
- WZxHSlmgJWd4TSZVAQPVACGHU35+rpcXbouvanT+AnZNiDL1BI895cGZoJSc+ytKtRaN
- 1XR+7NguW2tlZ9mK0YsHVQ9ABRCL3oVPtlM0YQY8o6C9d4clPykot5lWH1fUAEMfVhPK
- b9NbHYfY7Ygo5Mf2HYtw4lA1pvEXIygfdaT6UfCOAHY2jgzuBidSdHpedTnohXLJCF8y
- gOuBaxDnjcmeFYvbt5ZTM/fk/TK0vHCGDywDVETJyzw6koecs7gdKTPJ/Ld9Sdz3mqlB
- h0Ow==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=1PQ1zQ4t+iMGhM0XL17e3vyoRaws04JFW++AeBDNqMA=;
+ b=oSgQhyu/QAnOpJuhTk9AOSr8lfLjk8RBSpy/OTg+dvC4swQut2oye5lJgspvl0y9Et
+ 99RnTdsZo3RSVDZafJqxzChG8YsqoboYEFXFMfZZ6jBnK5bzthYeFeaUR2fmwQhGbUgl
+ N2PFjqODsalxHJ9e2D3Wd2yWUG1ZmAPp8VLruvEL9K+3wuOvodG3e7ZDbVHKcdZJv7T2
+ xx1ESm4LLzs3wym64mfFcTmdH1PbsVjpG0T3AKpxnZB/Ompu8o9bkyydRQ7yhZET9k+H
+ aUY5J0O88u4hKGurpuTTpFUN4HrNi3BWOw5s6auW1rejcPIZx0PkFbakG0I7GqftR66B
+ JC0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Kyd75dQ6HSF4Bc6As5SxJ/ajmbJCQUS6r+6XFxFF4i4=;
- b=Q6lnU97+zPechQLezyAoySmtvSrUk6XkHO7cff/2tVPSV+D4RbbQC+7u+U042fr7m9
- /crzK7aIRZdG7RIY7GdLWny1awa4qntSjea3s7MMilCFUULRwNRzc/oVJOgCoV+EgbKr
- 2ZqzC513EOo7oquN2v7CeyEkbCXKwEL9p9WHiCGVH0s4/wxqyCr70qSsVGHZDX5W29BB
- jnbfB4NXHIWdZfUK9X9Sk7alBwYNxkDnfk1mvfwPPmFcCAVuR3dS2KxhJEYGl3ZsW08a
- xRxMq+QFUhzAJ5mJRqXVsZf7JhE7cDVs/LM2/xEeQs6eG3fFKXOIgRBGw3lduwKfff/E
- szXQ==
-X-Gm-Message-State: AGi0PuZN8/zpA7iFMdZKsVXEX6V118Ne1TvseKrKQ8nozv+8+2wJ15ZN
- M3z1FYXwlJbL8FsuDYGbgS59RlINIUc=
-X-Google-Smtp-Source: APiQypLfNouruWAeFRVCv5y4tmWDtC6ZpeQHwkSOT1Hjmwb8DlnUy8xyVlN0lok3jRlSw+PwmHxKvg==
-X-Received: by 2002:a17:902:40a:: with SMTP id
- 10mr2901923ple.183.1588951090222; 
- Fri, 08 May 2020 08:18:10 -0700 (PDT)
-Received: from localhost.localdomain (174-21-149-226.tukw.qwest.net.
- [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id b5sm2125933pfb.190.2020.05.08.08.18.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 08 May 2020 08:18:09 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 17/19] tcg: Add tcg_reg_alloc_dup2
-Date: Fri,  8 May 2020 08:17:45 -0700
-Message-Id: <20200508151747.6166-18-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200508151747.6166-1-richard.henderson@linaro.org>
-References: <20200508151747.6166-1-richard.henderson@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=1PQ1zQ4t+iMGhM0XL17e3vyoRaws04JFW++AeBDNqMA=;
+ b=LCHorRJtixsJQVKRuM3DOsaEJk/stnyUnDOCwbZi2UhJx53boMm75qBTeWyWtATIcH
+ 3R9e9q4j/Y80IM8zxU5hp80dDZpGwb+s78Vo2Cv5nA7JP35ZM0h7vC7ip7Tm36/XngTl
+ NRNRHCTWH4F0jfgRYUAXz02+88dKWlC+Eli7CutL/f7UyErY5SxdYMn+E536BGXtHlbO
+ yBsCwqEgqhcL6dfmAGU0cscv6mg/CrMwuyKKy+U0U0ejBB+ZMRPT3jHOnR+ZkZkHxWFz
+ ey9c6Ach7fGSnAtdeCU+xL5S7a00Zlmh1qGfD0NzqALw+MEQsPznD0dxmtg9EKO6NW5+
+ ZouA==
+X-Gm-Message-State: AGi0PuaPQ1m1QUduAklKrkeCNnLS6U7ZiN34lsVWui/6c9dk6x9sHgqF
+ zOpMjy+zMjXYNA0kvvIO6GEqxCDoep0EpLXU4OWcGg==
+X-Google-Smtp-Source: APiQypKHw2oomnx3Wp8QXKu05d8p+V31JXcgw4ZDrLaYf5MxnTMYj2NNz4JdUVu3aKrOBiP0OURAlsJasQefP4dTRr8=
+X-Received: by 2002:a92:cb42:: with SMTP id f2mr3447717ilq.101.1588951246491; 
+ Fri, 08 May 2020 08:20:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
+References: <20200508062456.23344-1-philmd@redhat.com>
+ <9396e0cb-388a-e08e-c066-82a60708ecdc@redhat.com>
+In-Reply-To: <9396e0cb-388a-e08e-c066-82a60708ecdc@redhat.com>
+From: Beata Michalska <beata.michalska@linaro.org>
+Date: Fri, 8 May 2020 16:20:35 +0100
+Message-ID: <CADSWDzvECqOXzusk=tj8r4z-E5CDZn4TNG8PJ5pxLHAn3saOzA@mail.gmail.com>
+Subject: Re: [PATCH 0/4] memory: Add memory_region_msync() & make NVMe
+ emulated device generic
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=beata.michalska@linaro.org; helo=mail-il1-x143.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,126 +96,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Keith Busch <kbusch@kernel.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There are several ways we can expand a vector dup of a 64-bit
-element on a 32-bit host.
+On Fri, 8 May 2020 at 07:33, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 08/05/20 08:24, Philippe Mathieu-Daud=C3=A9 wrote:
+> > It is not clear if dccvap_writefn() really needs
+> > memory_region_writeback() or could use memory_region_msync().
+>
+> Indeed, I don't understand the code and why it matters that
+> mr->dirty_log_mask is nonzero.
+>
+> mr->dirty_log_mask tells if dirty tracking has been enabled, not if the
+> page is dirty.  It would always be true during live migration and when
+> running on TCG, but otherwise it would always be false.
+>
+> Beata, can you explain what you had in mind? :)
+>
+It has been a while ... , but the intention there was to skip the sync
+if there is nothing to be synced in the first place - so for performance
+reasons. I honestly do not recall why I went for the dirty_log_mask,
+as that seems not  to be the right choice .
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/tcg.c | 88 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 88 insertions(+)
-
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 18ebcc98f6..e8fe2d580b 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -3908,6 +3908,91 @@ static void tcg_reg_alloc_op(TCGContext *s, const TCGOp *op)
-     }
- }
- 
-+static void tcg_reg_alloc_dup2(TCGContext *s, const TCGOp *op)
-+{
-+    const TCGLifeData arg_life = op->life;
-+    TCGTemp *ots, *itsl, *itsh;
-+    TCGType vtype = TCGOP_VECL(op) + TCG_TYPE_V64;
-+
-+    /* This opcode is only valid for 32-bit hosts, for 64-bit elements. */
-+    tcg_debug_assert(TCG_TARGET_REG_BITS == 32);
-+    tcg_debug_assert(TCGOP_VECE(op) == MO_64);
-+
-+    ots = arg_temp(op->args[0]);
-+    itsl = arg_temp(op->args[1]);
-+    itsh = arg_temp(op->args[2]);
-+
-+    /* ENV should not be modified.  */
-+    tcg_debug_assert(!temp_readonly(ots));
-+
-+    /* Allocate the output register now.  */
-+    if (ots->val_type != TEMP_VAL_REG) {
-+        TCGRegSet allocated_regs = s->reserved_regs;
-+        TCGRegSet dup_out_regs =
-+            tcg_op_defs[INDEX_op_dup_vec].args_ct[0].u.regs;
-+
-+        /* Make sure to not spill the input registers. */
-+        if (!IS_DEAD_ARG(1) && itsl->val_type == TEMP_VAL_REG) {
-+            tcg_regset_set_reg(allocated_regs, itsl->reg);
-+        }
-+        if (!IS_DEAD_ARG(2) && itsh->val_type == TEMP_VAL_REG) {
-+            tcg_regset_set_reg(allocated_regs, itsh->reg);
-+        }
-+
-+        ots->reg = tcg_reg_alloc(s, dup_out_regs, allocated_regs,
-+                                 op->output_pref[0], ots->indirect_base);
-+        ots->val_type = TEMP_VAL_REG;
-+        ots->mem_coherent = 0;
-+        s->reg_to_temp[ots->reg] = ots;
-+    }
-+
-+    /* Promote dup2 of immediates to dupi_vec. */
-+    if (itsl->val_type == TEMP_VAL_CONST &&
-+        itsh->val_type == TEMP_VAL_CONST) {
-+        tcg_out_dupi_vec(s, vtype, ots->reg,
-+                         (uint32_t)itsl->val | ((uint64_t)itsh->val << 32));
-+        goto done;
-+    }
-+
-+    /* If the two inputs form one 64-bit value, try dupm_vec. */
-+    if (itsl + 1 == itsh &&
-+        itsl->base_type == TCG_TYPE_I64 &&
-+        itsh->base_type == TCG_TYPE_I64) {
-+        if (!itsl->mem_coherent) {
-+            temp_sync(s, itsl, s->reserved_regs, 0, 0);
-+        }
-+        if (!itsl->mem_coherent) {
-+            temp_sync(s, itsl, s->reserved_regs, 0, 0);
-+        }
-+#ifdef HOST_WORDS_BIGENDIAN
-+        TCGTemp *its = itsh;
-+#else
-+        TCGTemp *its = itsl;
-+#endif
-+        if (tcg_out_dupm_vec(s, vtype, MO_64, ots->reg,
-+                             its->mem_base->reg, its->mem_offset)) {
-+            goto done;
-+        }
-+    }
-+
-+    /* Fall back to generic expansion. */
-+    tcg_reg_alloc_op(s, op);
-+    return;
-+
-+ done:
-+    if (IS_DEAD_ARG(1)) {
-+        temp_dead(s, itsl);
-+    }
-+    if (IS_DEAD_ARG(2)) {
-+        temp_dead(s, itsh);
-+    }
-+    if (NEED_SYNC_ARG(0)) {
-+        temp_sync(s, ots, s->reserved_regs, 0, IS_DEAD_ARG(0));
-+    } else if (IS_DEAD_ARG(0)) {
-+        temp_dead(s, ots);
-+    }
-+}
-+
- #ifdef TCG_TARGET_STACK_GROWSUP
- #define STACK_DIR(x) (-(x))
- #else
-@@ -4299,6 +4384,9 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
-         case INDEX_op_dup_vec:
-             tcg_reg_alloc_dup(s, op);
-             break;
-+        case INDEX_op_dup2_vec:
-+            tcg_reg_alloc_dup2(s, op);
-+            break;
-         case INDEX_op_insn_start:
-             if (num_insns >= 0) {
-                 size_t off = tcg_current_code_size(s);
--- 
-2.20.1
-
+BR
+Beata
+> Paolo
+>
 
