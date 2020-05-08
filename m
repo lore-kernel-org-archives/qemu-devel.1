@@ -7,80 +7,81 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B3C9C38A2A
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 18:29:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 640E4C38A2A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 18:31:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBCEE2192A
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 18:29:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1FF1C2192A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 18:31:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tYuUW3no"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBCEE2192A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DvRDGDzp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FF1C2192A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX7kV-0003R7-Vg
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 14:29:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33718)
+	id 1jX7me-0007CI-9g
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 14:31:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33700)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jX7hf-0006py-Fb
- for qemu-devel@nongnu.org; Fri, 08 May 2020 14:26:31 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:54673)
+ id 1jX7hd-0006lX-Ie
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 14:26:29 -0400
+Received: from mail-pj1-x102e.google.com ([2607:f8b0:4864:20::102e]:35605)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jX7hd-0006Jt-O9
- for qemu-devel@nongnu.org; Fri, 08 May 2020 14:26:31 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id y6so4678005pjc.4
- for <qemu-devel@nongnu.org>; Fri, 08 May 2020 11:26:29 -0700 (PDT)
+ id 1jX7hb-00061R-Km
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 14:26:29 -0400
+Received: by mail-pj1-x102e.google.com with SMTP id ms17so4658553pjb.0
+ for <qemu-devel@nongnu.org>; Fri, 08 May 2020 11:26:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=xmadSpOQwsQc/jlcXZb4SKOmMYrqNW8ASv1JO/0wGNg=;
- b=tYuUW3noapmBsjf9Wk0HHaIHWWfTxMAUtFJqikZiu/8nqfOashyFzq8tJjElf55zsX
- MDMgsCLzgQlKST4xgfBdEX5HyY8udTR0likL1fcEOIBtomUnnU20gQLCCJ8gdCSrmhb1
- WAH+G7jx0LwhqESjmjk5dUNYloME/m2UzAvjWCRjO7ZdgRFQWquJtG0VJnWsAfqEruW/
- O/kstVkIPLFyLtlUfyUgZ4gC1kGtTO+OXPobnz3je9vUYs4MKCRyzQkmN2rtaGryLTho
- ed9Wceknh0aUIqi3TbRUg63sHqp7ykyzFlRMixacomoCDmCfjHs6Zz6J/klgux02mvPx
- wMTg==
+ bh=NsnJVOaPLwH5XsOssCR1XTL/4FrFEQFISOVbUenMYyk=;
+ b=DvRDGDzpTAD4PPesue8Le9rXSDC0dfRdEUdfkQc7ITnRsXuK2QpbNd1g0vhChvI+yC
+ pwcx3M3I84GVQFD6KaSGSOdHljZFGGcACMBWB5/01pzQJJGYMdxSaPcmNQGoCRTRraIE
+ x5ZfLkucPrF7R9tX8Ex2K8ZWaWvSvtO3mytgXX2SmzqJpMh6J9T3St0qUsbCecmM5sF6
+ Fisxtica996Ru8v4uhIWzfc1WKtxVsLihpVwtX5eoprsVpI8nmgJWmfdKmkelPElZyQF
+ ymcK73v7nKFJLFUZsq/jTOMo/X3gwv20zctCKfE3YOhxWRKVmE5HK7PmcXLtGexOoBtK
+ KUgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=xmadSpOQwsQc/jlcXZb4SKOmMYrqNW8ASv1JO/0wGNg=;
- b=YzdzjhtY1mLYIq/s6Bp6CfT9NUrgGwpGlzDrxkZiaLajj6WRFu+GPuqnifPbGKnMlk
- mmGrf2ZN6JmLJCom0VJhbxtLrvQ3uQfoCNhuRtI9PqSplDyO7f/UDQVm1K4xIU2UxGio
- QTuuBENwgeoLY/cwFyp9zvf9LdsuUI4caxg0eIh1EO4JqiAvnaX1+4Cbs4T4W6+7hmz3
- e7PJ7rG2GQebLwoj1dHiTogddZYuFMZA4IpLuOdXbnLffCtlXn4vXbm0LfA0thbvnjtH
- uZ93deg1CXTQMQnoW6zgJBLaLZI4xrPQ29a005JXET2eXnpr/m6HM5KLCmaZUfX8224q
- Bcfg==
-X-Gm-Message-State: AGi0Pub+cvHcUR8rT8rHjtVumo80LKUL7RPMjDxzT9dWSLvCqDMdDMNT
- Bw6ZDQF5GiSmsdG66gLOM7fdtH1V9YA=
-X-Google-Smtp-Source: APiQypK6gkCs8Hv4mGSTfTwKO8mUhygDuKI8EOwOu30jIeaQmuThjm1YVLe3jBrD4BuX693AyRzdBw==
-X-Received: by 2002:a17:902:8b84:: with SMTP id
- ay4mr3692583plb.167.1588962387626; 
- Fri, 08 May 2020 11:26:27 -0700 (PDT)
+ bh=NsnJVOaPLwH5XsOssCR1XTL/4FrFEQFISOVbUenMYyk=;
+ b=MYy8GsBg4XIYgMvfH1bW5HYsGbyzNVHKqlzJpcxm6eZ4+1lMpYGqzYcXmsTaxzc+5V
+ Lf+hEbyi32g411T29N7XEXXwem509/VOZHshE2jmTOF4mpxnea0RPHrN7OACH7BOh2Qc
+ WWG2Xw6Un9hsrg5wLU6x67My9a8oSRXskFcdH7Of/cW9PJNsZpw8XUV1zroI/vsYS+Uq
+ 4LdxtFRdiGBRTCKW3weSvpb4ovkG0fE518hxwfADysvRar/GID991/nZvVme/2WZVxVa
+ 8oQMZvwybt04Gsn9FjKy3vudcxRsZvWpH5NmrIY7hj0QJt00Ib1+ahry3TqtR58wPcQE
+ NhDQ==
+X-Gm-Message-State: AGi0Pub2LTDu85ohEfm/Nl02FyhL3HvFS8qNdnJi3a9MQk0BnQWH2dXr
+ Zi5fWRP9rBERgN3tS0z9PnIjegDCa9I=
+X-Google-Smtp-Source: APiQypL0M2/1dBArShNDg77kTZcY/EtzYORYy2L6Iwy3tzQOSxpfd7vpCYHbeI1J6VL4nfiam/uQLA==
+X-Received: by 2002:a17:90a:a414:: with SMTP id
+ y20mr6841155pjp.45.1588962385219; 
+ Fri, 08 May 2020 11:26:25 -0700 (PDT)
 Received: from localhost.localdomain (174-21-149-226.tukw.qwest.net.
  [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id u9sm2421775pfn.197.2020.05.08.11.26.26
+ by smtp.gmail.com with ESMTPSA id u9sm2421775pfn.197.2020.05.08.11.26.24
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 08 May 2020 11:26:26 -0700 (PDT)
+ Fri, 08 May 2020 11:26:24 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 07/19] tcg: Use tcg_constant_{i32, i64,
- vec} with tcg gvec expanders
-Date: Fri,  8 May 2020 11:26:04 -0700
-Message-Id: <20200508182616.18318-8-richard.henderson@linaro.org>
+Subject: [PATCH v4 05/19] tcg: Use tcg_constant_{i32,
+ i64} with tcg int expanders
+Date: Fri,  8 May 2020 11:26:02 -0700
+Message-Id: <20200508182616.18318-6-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200508182616.18318-1-richard.henderson@linaro.org>
 References: <20200508182616.18318-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1042.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::102e;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x102e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,439 +108,616 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/tcg-op-gvec.c | 125 +++++++++++++++++++---------------------------
- 1 file changed, 50 insertions(+), 75 deletions(-)
+ include/tcg/tcg-op.h |  13 +--
+ tcg/tcg-op.c         | 216 ++++++++++++++++++++-----------------------
+ 2 files changed, 100 insertions(+), 129 deletions(-)
 
-diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
-index 3707c0effb..8ecaf4d67e 100644
---- a/tcg/tcg-op-gvec.c
-+++ b/tcg/tcg-op-gvec.c
-@@ -96,7 +96,7 @@ void tcg_gen_gvec_2_ool(uint32_t dofs, uint32_t aofs,
-                         gen_helper_gvec_2 *fn)
- {
-     TCGv_ptr a0, a1;
--    TCGv_i32 desc = tcg_const_i32(simd_desc(oprsz, maxsz, data));
-+    TCGv_i32 desc = tcg_constant_i32(simd_desc(oprsz, maxsz, data));
+diff --git a/include/tcg/tcg-op.h b/include/tcg/tcg-op.h
+index 5abf17fecc..b4fba35e87 100644
+--- a/include/tcg/tcg-op.h
++++ b/include/tcg/tcg-op.h
+@@ -271,6 +271,7 @@ void tcg_gen_mb(TCGBar);
  
-     a0 = tcg_temp_new_ptr();
-     a1 = tcg_temp_new_ptr();
-@@ -108,7 +108,6 @@ void tcg_gen_gvec_2_ool(uint32_t dofs, uint32_t aofs,
+ /* 32 bit ops */
  
-     tcg_temp_free_ptr(a0);
-     tcg_temp_free_ptr(a1);
--    tcg_temp_free_i32(desc);
- }
- 
- /* Generate a call to a gvec-style helper with two vector operands
-@@ -118,7 +117,7 @@ void tcg_gen_gvec_2i_ool(uint32_t dofs, uint32_t aofs, TCGv_i64 c,
-                          gen_helper_gvec_2i *fn)
- {
-     TCGv_ptr a0, a1;
--    TCGv_i32 desc = tcg_const_i32(simd_desc(oprsz, maxsz, data));
-+    TCGv_i32 desc = tcg_constant_i32(simd_desc(oprsz, maxsz, data));
- 
-     a0 = tcg_temp_new_ptr();
-     a1 = tcg_temp_new_ptr();
-@@ -130,7 +129,6 @@ void tcg_gen_gvec_2i_ool(uint32_t dofs, uint32_t aofs, TCGv_i64 c,
- 
-     tcg_temp_free_ptr(a0);
-     tcg_temp_free_ptr(a1);
--    tcg_temp_free_i32(desc);
- }
- 
- /* Generate a call to a gvec-style helper with three vector operands.  */
-@@ -139,7 +137,7 @@ void tcg_gen_gvec_3_ool(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-                         gen_helper_gvec_3 *fn)
- {
-     TCGv_ptr a0, a1, a2;
--    TCGv_i32 desc = tcg_const_i32(simd_desc(oprsz, maxsz, data));
-+    TCGv_i32 desc = tcg_constant_i32(simd_desc(oprsz, maxsz, data));
- 
-     a0 = tcg_temp_new_ptr();
-     a1 = tcg_temp_new_ptr();
-@@ -154,7 +152,6 @@ void tcg_gen_gvec_3_ool(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-     tcg_temp_free_ptr(a0);
-     tcg_temp_free_ptr(a1);
-     tcg_temp_free_ptr(a2);
--    tcg_temp_free_i32(desc);
- }
- 
- /* Generate a call to a gvec-style helper with four vector operands.  */
-@@ -163,7 +160,7 @@ void tcg_gen_gvec_4_ool(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-                         int32_t data, gen_helper_gvec_4 *fn)
- {
-     TCGv_ptr a0, a1, a2, a3;
--    TCGv_i32 desc = tcg_const_i32(simd_desc(oprsz, maxsz, data));
-+    TCGv_i32 desc = tcg_constant_i32(simd_desc(oprsz, maxsz, data));
- 
-     a0 = tcg_temp_new_ptr();
-     a1 = tcg_temp_new_ptr();
-@@ -181,7 +178,6 @@ void tcg_gen_gvec_4_ool(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-     tcg_temp_free_ptr(a1);
-     tcg_temp_free_ptr(a2);
-     tcg_temp_free_ptr(a3);
--    tcg_temp_free_i32(desc);
- }
- 
- /* Generate a call to a gvec-style helper with five vector operands.  */
-@@ -190,7 +186,7 @@ void tcg_gen_gvec_5_ool(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-                         uint32_t maxsz, int32_t data, gen_helper_gvec_5 *fn)
- {
-     TCGv_ptr a0, a1, a2, a3, a4;
--    TCGv_i32 desc = tcg_const_i32(simd_desc(oprsz, maxsz, data));
-+    TCGv_i32 desc = tcg_constant_i32(simd_desc(oprsz, maxsz, data));
- 
-     a0 = tcg_temp_new_ptr();
-     a1 = tcg_temp_new_ptr();
-@@ -211,7 +207,6 @@ void tcg_gen_gvec_5_ool(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-     tcg_temp_free_ptr(a2);
-     tcg_temp_free_ptr(a3);
-     tcg_temp_free_ptr(a4);
--    tcg_temp_free_i32(desc);
- }
- 
- /* Generate a call to a gvec-style helper with three vector operands
-@@ -221,7 +216,7 @@ void tcg_gen_gvec_2_ptr(uint32_t dofs, uint32_t aofs,
-                         int32_t data, gen_helper_gvec_2_ptr *fn)
- {
-     TCGv_ptr a0, a1;
--    TCGv_i32 desc = tcg_const_i32(simd_desc(oprsz, maxsz, data));
-+    TCGv_i32 desc = tcg_constant_i32(simd_desc(oprsz, maxsz, data));
- 
-     a0 = tcg_temp_new_ptr();
-     a1 = tcg_temp_new_ptr();
-@@ -233,7 +228,6 @@ void tcg_gen_gvec_2_ptr(uint32_t dofs, uint32_t aofs,
- 
-     tcg_temp_free_ptr(a0);
-     tcg_temp_free_ptr(a1);
--    tcg_temp_free_i32(desc);
- }
- 
- /* Generate a call to a gvec-style helper with three vector operands
-@@ -243,7 +237,7 @@ void tcg_gen_gvec_3_ptr(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-                         int32_t data, gen_helper_gvec_3_ptr *fn)
- {
-     TCGv_ptr a0, a1, a2;
--    TCGv_i32 desc = tcg_const_i32(simd_desc(oprsz, maxsz, data));
-+    TCGv_i32 desc = tcg_constant_i32(simd_desc(oprsz, maxsz, data));
- 
-     a0 = tcg_temp_new_ptr();
-     a1 = tcg_temp_new_ptr();
-@@ -258,7 +252,6 @@ void tcg_gen_gvec_3_ptr(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-     tcg_temp_free_ptr(a0);
-     tcg_temp_free_ptr(a1);
-     tcg_temp_free_ptr(a2);
--    tcg_temp_free_i32(desc);
- }
- 
- /* Generate a call to a gvec-style helper with four vector operands
-@@ -269,7 +262,7 @@ void tcg_gen_gvec_4_ptr(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-                         gen_helper_gvec_4_ptr *fn)
- {
-     TCGv_ptr a0, a1, a2, a3;
--    TCGv_i32 desc = tcg_const_i32(simd_desc(oprsz, maxsz, data));
-+    TCGv_i32 desc = tcg_constant_i32(simd_desc(oprsz, maxsz, data));
- 
-     a0 = tcg_temp_new_ptr();
-     a1 = tcg_temp_new_ptr();
-@@ -287,7 +280,6 @@ void tcg_gen_gvec_4_ptr(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-     tcg_temp_free_ptr(a1);
-     tcg_temp_free_ptr(a2);
-     tcg_temp_free_ptr(a3);
--    tcg_temp_free_i32(desc);
- }
- 
- /* Generate a call to a gvec-style helper with five vector operands
-@@ -298,7 +290,7 @@ void tcg_gen_gvec_5_ptr(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-                         gen_helper_gvec_5_ptr *fn)
- {
-     TCGv_ptr a0, a1, a2, a3, a4;
--    TCGv_i32 desc = tcg_const_i32(simd_desc(oprsz, maxsz, data));
-+    TCGv_i32 desc = tcg_constant_i32(simd_desc(oprsz, maxsz, data));
- 
-     a0 = tcg_temp_new_ptr();
-     a1 = tcg_temp_new_ptr();
-@@ -319,7 +311,6 @@ void tcg_gen_gvec_5_ptr(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-     tcg_temp_free_ptr(a2);
-     tcg_temp_free_ptr(a3);
-     tcg_temp_free_ptr(a4);
--    tcg_temp_free_i32(desc);
- }
- 
- /* Return true if we want to implement something of OPRSZ bytes
-@@ -609,16 +600,13 @@ static void do_dup(unsigned vece, uint32_t dofs, uint32_t oprsz,
-     /* Otherwise implement out of line.  */
-     t_ptr = tcg_temp_new_ptr();
-     tcg_gen_addi_ptr(t_ptr, cpu_env, dofs);
--    t_desc = tcg_const_i32(simd_desc(oprsz, maxsz, 0));
-+    t_desc = tcg_constant_i32(simd_desc(oprsz, maxsz, 0));
- 
-     if (vece == MO_64) {
--        if (in_64) {
--            gen_helper_gvec_dup64(t_ptr, t_desc, in_64);
--        } else {
--            t_64 = tcg_const_i64(in_c);
--            gen_helper_gvec_dup64(t_ptr, t_desc, t_64);
--            tcg_temp_free_i64(t_64);
-+        if (!in_64) {
-+            in_64 = tcg_constant_i64(in_c);
-         }
-+        gen_helper_gvec_dup64(t_ptr, t_desc, in_64);
-     } else {
-         typedef void dup_fn(TCGv_ptr, TCGv_i32, TCGv_i32);
-         static dup_fn * const fns[3] = {
-@@ -646,7 +634,6 @@ static void do_dup(unsigned vece, uint32_t dofs, uint32_t oprsz,
++void tcg_gen_movi_i32(TCGv_i32 ret, int32_t arg);
+ void tcg_gen_addi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
+ void tcg_gen_subfi_i32(TCGv_i32 ret, int32_t arg1, TCGv_i32 arg2);
+ void tcg_gen_subi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2);
+@@ -349,11 +350,6 @@ static inline void tcg_gen_mov_i32(TCGv_i32 ret, TCGv_i32 arg)
      }
+ }
  
-     tcg_temp_free_ptr(t_ptr);
--    tcg_temp_free_i32(t_desc);
-     return;
+-static inline void tcg_gen_movi_i32(TCGv_i32 ret, int32_t arg)
+-{
+-    tcg_gen_op2i_i32(INDEX_op_movi_i32, ret, arg);
+-}
+-
+ static inline void tcg_gen_ld8u_i32(TCGv_i32 ret, TCGv_ptr arg2,
+                                     tcg_target_long offset)
+ {
+@@ -467,6 +463,7 @@ static inline void tcg_gen_not_i32(TCGv_i32 ret, TCGv_i32 arg)
  
-  done:
-@@ -1196,10 +1183,8 @@ void tcg_gen_gvec_2i(uint32_t dofs, uint32_t aofs, uint32_t oprsz,
-             if (g->fno) {
-                 tcg_gen_gvec_2_ool(dofs, aofs, oprsz, maxsz, c, g->fno);
-             } else {
--                TCGv_i64 tcg_c = tcg_const_i64(c);
--                tcg_gen_gvec_2i_ool(dofs, aofs, tcg_c, oprsz,
--                                    maxsz, c, g->fnoi);
--                tcg_temp_free_i64(tcg_c);
-+                tcg_gen_gvec_2i_ool(dofs, aofs, tcg_constant_i64(c),
-+                                    oprsz, maxsz, 0, g->fnoi);
-             }
-             oprsz = maxsz;
+ /* 64 bit ops */
+ 
++void tcg_gen_movi_i64(TCGv_i64 ret, int64_t arg);
+ void tcg_gen_addi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
+ void tcg_gen_subfi_i64(TCGv_i64 ret, int64_t arg1, TCGv_i64 arg2);
+ void tcg_gen_subi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2);
+@@ -550,11 +547,6 @@ static inline void tcg_gen_mov_i64(TCGv_i64 ret, TCGv_i64 arg)
+     }
+ }
+ 
+-static inline void tcg_gen_movi_i64(TCGv_i64 ret, int64_t arg)
+-{
+-    tcg_gen_op2i_i64(INDEX_op_movi_i64, ret, arg);
+-}
+-
+ static inline void tcg_gen_ld8u_i64(TCGv_i64 ret, TCGv_ptr arg2,
+                                     tcg_target_long offset)
+ {
+@@ -698,7 +690,6 @@ static inline void tcg_gen_sub_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2)
+ 
+ void tcg_gen_discard_i64(TCGv_i64 arg);
+ void tcg_gen_mov_i64(TCGv_i64 ret, TCGv_i64 arg);
+-void tcg_gen_movi_i64(TCGv_i64 ret, int64_t arg);
+ void tcg_gen_ld8u_i64(TCGv_i64 ret, TCGv_ptr arg2, tcg_target_long offset);
+ void tcg_gen_ld8s_i64(TCGv_i64 ret, TCGv_ptr arg2, tcg_target_long offset);
+ void tcg_gen_ld16u_i64(TCGv_i64 ret, TCGv_ptr arg2, tcg_target_long offset);
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index e60b74fb82..202d8057c5 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -104,15 +104,18 @@ void tcg_gen_mb(TCGBar mb_type)
+ 
+ /* 32 bit ops */
+ 
++void tcg_gen_movi_i32(TCGv_i32 ret, int32_t arg)
++{
++    tcg_gen_mov_i32(ret, tcg_constant_i32(arg));
++}
++
+ void tcg_gen_addi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
+ {
+     /* some cases can be optimized here */
+     if (arg2 == 0) {
+         tcg_gen_mov_i32(ret, arg1);
+     } else {
+-        TCGv_i32 t0 = tcg_const_i32(arg2);
+-        tcg_gen_add_i32(ret, arg1, t0);
+-        tcg_temp_free_i32(t0);
++        tcg_gen_add_i32(ret, arg1, tcg_constant_i32(arg2));
+     }
+ }
+ 
+@@ -122,9 +125,7 @@ void tcg_gen_subfi_i32(TCGv_i32 ret, int32_t arg1, TCGv_i32 arg2)
+         /* Don't recurse with tcg_gen_neg_i32.  */
+         tcg_gen_op2_i32(INDEX_op_neg_i32, ret, arg2);
+     } else {
+-        TCGv_i32 t0 = tcg_const_i32(arg1);
+-        tcg_gen_sub_i32(ret, t0, arg2);
+-        tcg_temp_free_i32(t0);
++        tcg_gen_sub_i32(ret, tcg_constant_i32(arg1), arg2);
+     }
+ }
+ 
+@@ -134,15 +135,12 @@ void tcg_gen_subi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
+     if (arg2 == 0) {
+         tcg_gen_mov_i32(ret, arg1);
+     } else {
+-        TCGv_i32 t0 = tcg_const_i32(arg2);
+-        tcg_gen_sub_i32(ret, arg1, t0);
+-        tcg_temp_free_i32(t0);
++        tcg_gen_sub_i32(ret, arg1, tcg_constant_i32(arg2));
+     }
+ }
+ 
+ void tcg_gen_andi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
+ {
+-    TCGv_i32 t0;
+     /* Some cases can be optimized here.  */
+     switch (arg2) {
+     case 0:
+@@ -165,9 +163,8 @@ void tcg_gen_andi_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
          }
-@@ -1647,16 +1632,14 @@ static void gen_addv_mask(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b, TCGv_i64 m)
- 
- void tcg_gen_vec_add8_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
- {
--    TCGv_i64 m = tcg_const_i64(dup_const(MO_8, 0x80));
-+    TCGv_i64 m = tcg_constant_i64(dup_const(MO_8, 0x80));
-     gen_addv_mask(d, a, b, m);
--    tcg_temp_free_i64(m);
+         break;
+     }
+-    t0 = tcg_const_i32(arg2);
+-    tcg_gen_and_i32(ret, arg1, t0);
+-    tcg_temp_free_i32(t0);
++
++    tcg_gen_and_i32(ret, arg1, tcg_constant_i32(arg2));
  }
  
- void tcg_gen_vec_add16_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
- {
--    TCGv_i64 m = tcg_const_i64(dup_const(MO_16, 0x8000));
-+    TCGv_i64 m = tcg_constant_i64(dup_const(MO_16, 0x8000));
-     gen_addv_mask(d, a, b, m);
--    tcg_temp_free_i64(m);
+ void tcg_gen_ori_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
+@@ -178,9 +175,7 @@ void tcg_gen_ori_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
+     } else if (arg2 == 0) {
+         tcg_gen_mov_i32(ret, arg1);
+     } else {
+-        TCGv_i32 t0 = tcg_const_i32(arg2);
+-        tcg_gen_or_i32(ret, arg1, t0);
+-        tcg_temp_free_i32(t0);
++        tcg_gen_or_i32(ret, arg1, tcg_constant_i32(arg2));
+     }
  }
  
- void tcg_gen_vec_add32_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
-@@ -1740,9 +1723,8 @@ void tcg_gen_gvec_adds(unsigned vece, uint32_t dofs, uint32_t aofs,
- void tcg_gen_gvec_addi(unsigned vece, uint32_t dofs, uint32_t aofs,
-                        int64_t c, uint32_t oprsz, uint32_t maxsz)
- {
--    TCGv_i64 tmp = tcg_const_i64(c);
-+    TCGv_i64 tmp = tcg_constant_i64(c);
-     tcg_gen_gvec_adds(vece, dofs, aofs, tmp, oprsz, maxsz);
--    tcg_temp_free_i64(tmp);
+@@ -193,9 +188,7 @@ void tcg_gen_xori_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
+         /* Don't recurse with tcg_gen_not_i32.  */
+         tcg_gen_op2_i32(INDEX_op_not_i32, ret, arg1);
+     } else {
+-        TCGv_i32 t0 = tcg_const_i32(arg2);
+-        tcg_gen_xor_i32(ret, arg1, t0);
+-        tcg_temp_free_i32(t0);
++        tcg_gen_xor_i32(ret, arg1, tcg_constant_i32(arg2));
+     }
  }
  
- static const TCGOpcode vecop_list_sub[] = { INDEX_op_sub_vec, 0 };
-@@ -1800,16 +1782,14 @@ static void gen_subv_mask(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b, TCGv_i64 m)
- 
- void tcg_gen_vec_sub8_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
- {
--    TCGv_i64 m = tcg_const_i64(dup_const(MO_8, 0x80));
-+    TCGv_i64 m = tcg_constant_i64(dup_const(MO_8, 0x80));
-     gen_subv_mask(d, a, b, m);
--    tcg_temp_free_i64(m);
+@@ -205,9 +198,7 @@ void tcg_gen_shli_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
+     if (arg2 == 0) {
+         tcg_gen_mov_i32(ret, arg1);
+     } else {
+-        TCGv_i32 t0 = tcg_const_i32(arg2);
+-        tcg_gen_shl_i32(ret, arg1, t0);
+-        tcg_temp_free_i32(t0);
++        tcg_gen_shl_i32(ret, arg1, tcg_constant_i32(arg2));
+     }
  }
  
- void tcg_gen_vec_sub16_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
- {
--    TCGv_i64 m = tcg_const_i64(dup_const(MO_16, 0x8000));
-+    TCGv_i64 m = tcg_constant_i64(dup_const(MO_16, 0x8000));
-     gen_subv_mask(d, a, b, m);
--    tcg_temp_free_i64(m);
+@@ -217,9 +208,7 @@ void tcg_gen_shri_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
+     if (arg2 == 0) {
+         tcg_gen_mov_i32(ret, arg1);
+     } else {
+-        TCGv_i32 t0 = tcg_const_i32(arg2);
+-        tcg_gen_shr_i32(ret, arg1, t0);
+-        tcg_temp_free_i32(t0);
++        tcg_gen_shr_i32(ret, arg1, tcg_constant_i32(arg2));
+     }
  }
  
- void tcg_gen_vec_sub32_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
-@@ -1920,9 +1900,8 @@ void tcg_gen_gvec_muls(unsigned vece, uint32_t dofs, uint32_t aofs,
- void tcg_gen_gvec_muli(unsigned vece, uint32_t dofs, uint32_t aofs,
-                        int64_t c, uint32_t oprsz, uint32_t maxsz)
- {
--    TCGv_i64 tmp = tcg_const_i64(c);
-+    TCGv_i64 tmp = tcg_constant_i64(c);
-     tcg_gen_gvec_muls(vece, dofs, aofs, tmp, oprsz, maxsz);
--    tcg_temp_free_i64(tmp);
+@@ -229,9 +218,7 @@ void tcg_gen_sari_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
+     if (arg2 == 0) {
+         tcg_gen_mov_i32(ret, arg1);
+     } else {
+-        TCGv_i32 t0 = tcg_const_i32(arg2);
+-        tcg_gen_sar_i32(ret, arg1, t0);
+-        tcg_temp_free_i32(t0);
++        tcg_gen_sar_i32(ret, arg1, tcg_constant_i32(arg2));
+     }
  }
  
- void tcg_gen_gvec_ssadd(unsigned vece, uint32_t dofs, uint32_t aofs,
-@@ -1979,18 +1958,16 @@ void tcg_gen_gvec_sssub(unsigned vece, uint32_t dofs, uint32_t aofs,
- 
- static void tcg_gen_usadd_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
- {
--    TCGv_i32 max = tcg_const_i32(-1);
-+    TCGv_i32 max = tcg_constant_i32(-1);
-     tcg_gen_add_i32(d, a, b);
-     tcg_gen_movcond_i32(TCG_COND_LTU, d, d, a, max, d);
--    tcg_temp_free_i32(max);
+@@ -250,9 +237,7 @@ void tcg_gen_brcondi_i32(TCGCond cond, TCGv_i32 arg1, int32_t arg2, TCGLabel *l)
+     if (cond == TCG_COND_ALWAYS) {
+         tcg_gen_br(l);
+     } else if (cond != TCG_COND_NEVER) {
+-        TCGv_i32 t0 = tcg_const_i32(arg2);
+-        tcg_gen_brcond_i32(cond, arg1, t0, l);
+-        tcg_temp_free_i32(t0);
++        tcg_gen_brcond_i32(cond, arg1, tcg_constant_i32(arg2), l);
+     }
  }
  
- static void tcg_gen_usadd_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
+@@ -271,9 +256,7 @@ void tcg_gen_setcond_i32(TCGCond cond, TCGv_i32 ret,
+ void tcg_gen_setcondi_i32(TCGCond cond, TCGv_i32 ret,
+                           TCGv_i32 arg1, int32_t arg2)
  {
--    TCGv_i64 max = tcg_const_i64(-1);
-+    TCGv_i64 max = tcg_constant_i64(-1);
-     tcg_gen_add_i64(d, a, b);
-     tcg_gen_movcond_i64(TCG_COND_LTU, d, d, a, max, d);
--    tcg_temp_free_i64(max);
+-    TCGv_i32 t0 = tcg_const_i32(arg2);
+-    tcg_gen_setcond_i32(cond, ret, arg1, t0);
+-    tcg_temp_free_i32(t0);
++    tcg_gen_setcond_i32(cond, ret, arg1, tcg_constant_i32(arg2));
  }
  
- void tcg_gen_gvec_usadd(unsigned vece, uint32_t dofs, uint32_t aofs,
-@@ -2023,18 +2000,16 @@ void tcg_gen_gvec_usadd(unsigned vece, uint32_t dofs, uint32_t aofs,
- 
- static void tcg_gen_ussub_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
- {
--    TCGv_i32 min = tcg_const_i32(0);
-+    TCGv_i32 min = tcg_constant_i32(0);
-     tcg_gen_sub_i32(d, a, b);
-     tcg_gen_movcond_i32(TCG_COND_LTU, d, a, b, min, d);
--    tcg_temp_free_i32(min);
+ void tcg_gen_muli_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
+@@ -283,9 +266,7 @@ void tcg_gen_muli_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
+     } else if (is_power_of_2(arg2)) {
+         tcg_gen_shli_i32(ret, arg1, ctz32(arg2));
+     } else {
+-        TCGv_i32 t0 = tcg_const_i32(arg2);
+-        tcg_gen_mul_i32(ret, arg1, t0);
+-        tcg_temp_free_i32(t0);
++        tcg_gen_mul_i32(ret, arg1, tcg_constant_i32(arg2));
+     }
  }
  
- static void tcg_gen_ussub_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
+@@ -433,9 +414,7 @@ void tcg_gen_clz_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2)
+ 
+ void tcg_gen_clzi_i32(TCGv_i32 ret, TCGv_i32 arg1, uint32_t arg2)
  {
--    TCGv_i64 min = tcg_const_i64(0);
-+    TCGv_i64 min = tcg_constant_i64(0);
-     tcg_gen_sub_i64(d, a, b);
-     tcg_gen_movcond_i64(TCG_COND_LTU, d, a, b, min, d);
--    tcg_temp_free_i64(min);
+-    TCGv_i32 t = tcg_const_i32(arg2);
+-    tcg_gen_clz_i32(ret, arg1, t);
+-    tcg_temp_free_i32(t);
++    tcg_gen_clz_i32(ret, arg1, tcg_constant_i32(arg2));
  }
  
- void tcg_gen_gvec_ussub(unsigned vece, uint32_t dofs, uint32_t aofs,
-@@ -2195,16 +2170,14 @@ static void gen_negv_mask(TCGv_i64 d, TCGv_i64 b, TCGv_i64 m)
- 
- void tcg_gen_vec_neg8_i64(TCGv_i64 d, TCGv_i64 b)
- {
--    TCGv_i64 m = tcg_const_i64(dup_const(MO_8, 0x80));
-+    TCGv_i64 m = tcg_constant_i64(dup_const(MO_8, 0x80));
-     gen_negv_mask(d, b, m);
--    tcg_temp_free_i64(m);
+ void tcg_gen_ctz_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2)
+@@ -468,10 +447,9 @@ void tcg_gen_ctz_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2)
+             tcg_gen_clzi_i32(t, t, 32);
+             tcg_gen_xori_i32(t, t, 31);
+         }
+-        z = tcg_const_i32(0);
++        z = tcg_constant_i32(0);
+         tcg_gen_movcond_i32(TCG_COND_EQ, ret, arg1, z, arg2, t);
+         tcg_temp_free_i32(t);
+-        tcg_temp_free_i32(z);
+     } else {
+         gen_helper_ctz_i32(ret, arg1, arg2);
+     }
+@@ -487,9 +465,7 @@ void tcg_gen_ctzi_i32(TCGv_i32 ret, TCGv_i32 arg1, uint32_t arg2)
+         tcg_gen_ctpop_i32(ret, t);
+         tcg_temp_free_i32(t);
+     } else {
+-        TCGv_i32 t = tcg_const_i32(arg2);
+-        tcg_gen_ctz_i32(ret, arg1, t);
+-        tcg_temp_free_i32(t);
++        tcg_gen_ctz_i32(ret, arg1, tcg_constant_i32(arg2));
+     }
  }
  
- void tcg_gen_vec_neg16_i64(TCGv_i64 d, TCGv_i64 b)
- {
--    TCGv_i64 m = tcg_const_i64(dup_const(MO_16, 0x8000));
-+    TCGv_i64 m = tcg_constant_i64(dup_const(MO_16, 0x8000));
-     gen_negv_mask(d, b, m);
--    tcg_temp_free_i64(m);
+@@ -547,9 +523,7 @@ void tcg_gen_rotli_i32(TCGv_i32 ret, TCGv_i32 arg1, int32_t arg2)
+     if (arg2 == 0) {
+         tcg_gen_mov_i32(ret, arg1);
+     } else if (TCG_TARGET_HAS_rot_i32) {
+-        TCGv_i32 t0 = tcg_const_i32(arg2);
+-        tcg_gen_rotl_i32(ret, arg1, t0);
+-        tcg_temp_free_i32(t0);
++        tcg_gen_rotl_i32(ret, arg1, tcg_constant_i32(arg2));
+     } else {
+         TCGv_i32 t0, t1;
+         t0 = tcg_temp_new_i32();
+@@ -653,9 +627,8 @@ void tcg_gen_deposit_z_i32(TCGv_i32 ret, TCGv_i32 arg,
+         tcg_gen_andi_i32(ret, arg, (1u << len) - 1);
+     } else if (TCG_TARGET_HAS_deposit_i32
+                && TCG_TARGET_deposit_i32_valid(ofs, len)) {
+-        TCGv_i32 zero = tcg_const_i32(0);
++        TCGv_i32 zero = tcg_constant_i32(0);
+         tcg_gen_op5ii_i32(INDEX_op_deposit_i32, ret, zero, arg, ofs, len);
+-        tcg_temp_free_i32(zero);
+     } else {
+         /* To help two-operand hosts we prefer to zero-extend first,
+            which allows ARG to stay live.  */
+@@ -1052,7 +1025,7 @@ void tcg_gen_bswap32_i32(TCGv_i32 ret, TCGv_i32 arg)
+     } else {
+         TCGv_i32 t0 = tcg_temp_new_i32();
+         TCGv_i32 t1 = tcg_temp_new_i32();
+-        TCGv_i32 t2 = tcg_const_i32(0x00ff00ff);
++        TCGv_i32 t2 = tcg_constant_i32(0x00ff00ff);
+ 
+                                         /* arg = abcd */
+         tcg_gen_shri_i32(t0, arg, 8);   /*  t0 = .abc */
+@@ -1067,7 +1040,6 @@ void tcg_gen_bswap32_i32(TCGv_i32 ret, TCGv_i32 arg)
+ 
+         tcg_temp_free_i32(t0);
+         tcg_temp_free_i32(t1);
+-        tcg_temp_free_i32(t2);
+     }
  }
  
- void tcg_gen_vec_neg32_i64(TCGv_i64 d, TCGv_i64 b)
-@@ -2472,9 +2445,8 @@ void tcg_gen_gvec_ands(unsigned vece, uint32_t dofs, uint32_t aofs,
- void tcg_gen_gvec_andi(unsigned vece, uint32_t dofs, uint32_t aofs,
-                        int64_t c, uint32_t oprsz, uint32_t maxsz)
- {
--    TCGv_i64 tmp = tcg_const_i64(dup_const(vece, c));
-+    TCGv_i64 tmp = tcg_constant_i64(dup_const(vece, c));
-     tcg_gen_gvec_2s(dofs, aofs, oprsz, maxsz, tmp, &gop_ands);
--    tcg_temp_free_i64(tmp);
+@@ -1237,6 +1209,14 @@ void tcg_gen_mul_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2)
+     tcg_temp_free_i64(t0);
+     tcg_temp_free_i32(t1);
+ }
++
++#else
++
++void tcg_gen_movi_i64(TCGv_i64 ret, int64_t arg)
++{
++    tcg_gen_mov_i64(ret, tcg_constant_i64(arg));
++}
++
+ #endif /* TCG_TARGET_REG_SIZE == 32 */
+ 
+ void tcg_gen_addi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+@@ -1244,10 +1224,12 @@ void tcg_gen_addi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+     /* some cases can be optimized here */
+     if (arg2 == 0) {
+         tcg_gen_mov_i64(ret, arg1);
++    } else if (TCG_TARGET_REG_BITS == 64) {
++        tcg_gen_add_i64(ret, arg1, tcg_constant_i64(arg2));
+     } else {
+-        TCGv_i64 t0 = tcg_const_i64(arg2);
+-        tcg_gen_add_i64(ret, arg1, t0);
+-        tcg_temp_free_i64(t0);
++        tcg_gen_add2_i32(TCGV_LOW(ret), TCGV_HIGH(ret),
++                         TCGV_LOW(arg1), TCGV_HIGH(arg1),
++                         tcg_constant_i32(arg2), tcg_constant_i32(arg2 >> 32));
+     }
  }
  
- static const GVecGen2s gop_xors = {
-@@ -2497,9 +2469,8 @@ void tcg_gen_gvec_xors(unsigned vece, uint32_t dofs, uint32_t aofs,
- void tcg_gen_gvec_xori(unsigned vece, uint32_t dofs, uint32_t aofs,
-                        int64_t c, uint32_t oprsz, uint32_t maxsz)
- {
--    TCGv_i64 tmp = tcg_const_i64(dup_const(vece, c));
-+    TCGv_i64 tmp = tcg_constant_i64(dup_const(vece, c));
-     tcg_gen_gvec_2s(dofs, aofs, oprsz, maxsz, tmp, &gop_xors);
--    tcg_temp_free_i64(tmp);
+@@ -1256,10 +1238,12 @@ void tcg_gen_subfi_i64(TCGv_i64 ret, int64_t arg1, TCGv_i64 arg2)
+     if (arg1 == 0 && TCG_TARGET_HAS_neg_i64) {
+         /* Don't recurse with tcg_gen_neg_i64.  */
+         tcg_gen_op2_i64(INDEX_op_neg_i64, ret, arg2);
++    } else if (TCG_TARGET_REG_BITS == 64) {
++        tcg_gen_sub_i64(ret, tcg_constant_i64(arg1), arg2);
+     } else {
+-        TCGv_i64 t0 = tcg_const_i64(arg1);
+-        tcg_gen_sub_i64(ret, t0, arg2);
+-        tcg_temp_free_i64(t0);
++        tcg_gen_sub2_i32(TCGV_LOW(ret), TCGV_HIGH(ret),
++                         tcg_constant_i32(arg1), tcg_constant_i32(arg1 >> 32),
++                         TCGV_LOW(arg2), TCGV_HIGH(arg2));
+     }
  }
  
- static const GVecGen2s gop_ors = {
-@@ -2522,9 +2493,8 @@ void tcg_gen_gvec_ors(unsigned vece, uint32_t dofs, uint32_t aofs,
- void tcg_gen_gvec_ori(unsigned vece, uint32_t dofs, uint32_t aofs,
-                       int64_t c, uint32_t oprsz, uint32_t maxsz)
- {
--    TCGv_i64 tmp = tcg_const_i64(dup_const(vece, c));
-+    TCGv_i64 tmp = tcg_constant_i64(dup_const(vece, c));
-     tcg_gen_gvec_2s(dofs, aofs, oprsz, maxsz, tmp, &gop_ors);
--    tcg_temp_free_i64(tmp);
+@@ -1268,17 +1252,17 @@ void tcg_gen_subi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+     /* some cases can be optimized here */
+     if (arg2 == 0) {
+         tcg_gen_mov_i64(ret, arg1);
++    } else if (TCG_TARGET_REG_BITS == 64) {
++        tcg_gen_sub_i64(ret, arg1, tcg_constant_i64(arg2));
+     } else {
+-        TCGv_i64 t0 = tcg_const_i64(arg2);
+-        tcg_gen_sub_i64(ret, arg1, t0);
+-        tcg_temp_free_i64(t0);
++        tcg_gen_sub2_i32(TCGV_LOW(ret), TCGV_HIGH(ret),
++                         TCGV_LOW(arg1), TCGV_HIGH(arg1),
++                         tcg_constant_i32(arg2), tcg_constant_i32(arg2 >> 32));
+     }
  }
  
- void tcg_gen_vec_shl8i_i64(TCGv_i64 d, TCGv_i64 a, int64_t c)
-@@ -3011,10 +2981,11 @@ void tcg_gen_gvec_rotls(unsigned vece, uint32_t dofs, uint32_t aofs,
- static void tcg_gen_shlv_mod_vec(unsigned vece, TCGv_vec d,
-                                  TCGv_vec a, TCGv_vec b)
+ void tcg_gen_andi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
  {
--    TCGv_vec t = tcg_temp_new_vec_matching(d);
-+    TCGType type = tcgv_vec_temp(d)->type;
-+    TCGv_vec t = tcg_temp_new_vec(type);
-+    TCGv_vec m = tcg_constant_vec(type, vece, (8 << vece) - 1);
- 
--    tcg_gen_dupi_vec(vece, t, (8 << vece) - 1);
--    tcg_gen_and_vec(vece, t, t, b);
-+    tcg_gen_and_vec(vece, t, b, m);
-     tcg_gen_shlv_vec(vece, d, a, t);
-     tcg_temp_free_vec(t);
+-    TCGv_i64 t0;
+-
+     if (TCG_TARGET_REG_BITS == 32) {
+         tcg_gen_andi_i32(TCGV_LOW(ret), TCGV_LOW(arg1), arg2);
+         tcg_gen_andi_i32(TCGV_HIGH(ret), TCGV_HIGH(arg1), arg2 >> 32);
+@@ -1313,9 +1297,8 @@ void tcg_gen_andi_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+         }
+         break;
+     }
+-    t0 = tcg_const_i64(arg2);
+-    tcg_gen_and_i64(ret, arg1, t0);
+-    tcg_temp_free_i64(t0);
++
++    tcg_gen_and_i64(ret, arg1, tcg_constant_i64(arg2));
  }
-@@ -3074,10 +3045,11 @@ void tcg_gen_gvec_shlv(unsigned vece, uint32_t dofs, uint32_t aofs,
- static void tcg_gen_shrv_mod_vec(unsigned vece, TCGv_vec d,
-                                  TCGv_vec a, TCGv_vec b)
+ 
+ void tcg_gen_ori_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+@@ -1331,9 +1314,7 @@ void tcg_gen_ori_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+     } else if (arg2 == 0) {
+         tcg_gen_mov_i64(ret, arg1);
+     } else {
+-        TCGv_i64 t0 = tcg_const_i64(arg2);
+-        tcg_gen_or_i64(ret, arg1, t0);
+-        tcg_temp_free_i64(t0);
++        tcg_gen_or_i64(ret, arg1, tcg_constant_i64(arg2));
+     }
+ }
+ 
+@@ -1351,9 +1332,7 @@ void tcg_gen_xori_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+         /* Don't recurse with tcg_gen_not_i64.  */
+         tcg_gen_op2_i64(INDEX_op_not_i64, ret, arg1);
+     } else {
+-        TCGv_i64 t0 = tcg_const_i64(arg2);
+-        tcg_gen_xor_i64(ret, arg1, t0);
+-        tcg_temp_free_i64(t0);
++        tcg_gen_xor_i64(ret, arg1, tcg_constant_i64(arg2));
+     }
+ }
+ 
+@@ -1415,9 +1394,7 @@ void tcg_gen_shli_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+     } else if (arg2 == 0) {
+         tcg_gen_mov_i64(ret, arg1);
+     } else {
+-        TCGv_i64 t0 = tcg_const_i64(arg2);
+-        tcg_gen_shl_i64(ret, arg1, t0);
+-        tcg_temp_free_i64(t0);
++        tcg_gen_shl_i64(ret, arg1, tcg_constant_i64(arg2));
+     }
+ }
+ 
+@@ -1429,9 +1406,7 @@ void tcg_gen_shri_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+     } else if (arg2 == 0) {
+         tcg_gen_mov_i64(ret, arg1);
+     } else {
+-        TCGv_i64 t0 = tcg_const_i64(arg2);
+-        tcg_gen_shr_i64(ret, arg1, t0);
+-        tcg_temp_free_i64(t0);
++        tcg_gen_shr_i64(ret, arg1, tcg_constant_i64(arg2));
+     }
+ }
+ 
+@@ -1443,9 +1418,7 @@ void tcg_gen_sari_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+     } else if (arg2 == 0) {
+         tcg_gen_mov_i64(ret, arg1);
+     } else {
+-        TCGv_i64 t0 = tcg_const_i64(arg2);
+-        tcg_gen_sar_i64(ret, arg1, t0);
+-        tcg_temp_free_i64(t0);
++        tcg_gen_sar_i64(ret, arg1, tcg_constant_i64(arg2));
+     }
+ }
+ 
+@@ -1468,12 +1441,17 @@ void tcg_gen_brcond_i64(TCGCond cond, TCGv_i64 arg1, TCGv_i64 arg2, TCGLabel *l)
+ 
+ void tcg_gen_brcondi_i64(TCGCond cond, TCGv_i64 arg1, int64_t arg2, TCGLabel *l)
  {
--    TCGv_vec t = tcg_temp_new_vec_matching(d);
-+    TCGType type = tcgv_vec_temp(d)->type;
-+    TCGv_vec t = tcg_temp_new_vec(type);
-+    TCGv_vec m = tcg_constant_vec(type, vece, (8 << vece) - 1);
- 
--    tcg_gen_dupi_vec(vece, t, (8 << vece) - 1);
--    tcg_gen_and_vec(vece, t, t, b);
-+    tcg_gen_and_vec(vece, t, b, m);
-     tcg_gen_shrv_vec(vece, d, a, t);
-     tcg_temp_free_vec(t);
+-    if (cond == TCG_COND_ALWAYS) {
++    if (TCG_TARGET_REG_BITS == 64) {
++        tcg_gen_brcond_i64(cond, arg1, tcg_constant_i64(arg2), l);
++    } else if (cond == TCG_COND_ALWAYS) {
+         tcg_gen_br(l);
+     } else if (cond != TCG_COND_NEVER) {
+-        TCGv_i64 t0 = tcg_const_i64(arg2);
+-        tcg_gen_brcond_i64(cond, arg1, t0, l);
+-        tcg_temp_free_i64(t0);
++        l->refs++;
++        tcg_gen_op6ii_i32(INDEX_op_brcond2_i32,
++                          TCGV_LOW(arg1), TCGV_HIGH(arg1),
++                          tcg_constant_i32(arg2),
++                          tcg_constant_i32(arg2 >> 32),
++                          cond, label_arg(l));
+     }
  }
-@@ -3137,10 +3109,11 @@ void tcg_gen_gvec_shrv(unsigned vece, uint32_t dofs, uint32_t aofs,
- static void tcg_gen_sarv_mod_vec(unsigned vece, TCGv_vec d,
-                                  TCGv_vec a, TCGv_vec b)
+ 
+@@ -1499,9 +1477,19 @@ void tcg_gen_setcond_i64(TCGCond cond, TCGv_i64 ret,
+ void tcg_gen_setcondi_i64(TCGCond cond, TCGv_i64 ret,
+                           TCGv_i64 arg1, int64_t arg2)
  {
--    TCGv_vec t = tcg_temp_new_vec_matching(d);
-+    TCGType type = tcgv_vec_temp(d)->type;
-+    TCGv_vec t = tcg_temp_new_vec(type);
-+    TCGv_vec m = tcg_constant_vec(type, vece, (8 << vece) - 1);
- 
--    tcg_gen_dupi_vec(vece, t, (8 << vece) - 1);
--    tcg_gen_and_vec(vece, t, t, b);
-+    tcg_gen_and_vec(vece, t, b, m);
-     tcg_gen_sarv_vec(vece, d, a, t);
-     tcg_temp_free_vec(t);
+-    TCGv_i64 t0 = tcg_const_i64(arg2);
+-    tcg_gen_setcond_i64(cond, ret, arg1, t0);
+-    tcg_temp_free_i64(t0);
++    if (TCG_TARGET_REG_BITS == 64) {
++        tcg_gen_setcond_i64(cond, ret, arg1, tcg_constant_i64(arg2));
++    } else if (cond == TCG_COND_ALWAYS) {
++        tcg_gen_movi_i64(ret, 1);
++    } else if (cond == TCG_COND_NEVER) {
++        tcg_gen_movi_i64(ret, 0);
++    } else {
++        tcg_gen_op6i_i32(INDEX_op_setcond2_i32, TCGV_LOW(ret),
++                         TCGV_LOW(arg1), TCGV_HIGH(arg1),
++                         tcg_constant_i32(arg2),
++                         tcg_constant_i32(arg2 >> 32), cond);
++        tcg_gen_movi_i32(TCGV_HIGH(ret), 0);
++    }
  }
-@@ -3200,10 +3173,11 @@ void tcg_gen_gvec_sarv(unsigned vece, uint32_t dofs, uint32_t aofs,
- static void tcg_gen_rotlv_mod_vec(unsigned vece, TCGv_vec d,
-                                   TCGv_vec a, TCGv_vec b)
- {
--    TCGv_vec t = tcg_temp_new_vec_matching(d);
-+    TCGType type = tcgv_vec_temp(d)->type;
-+    TCGv_vec t = tcg_temp_new_vec(type);
-+    TCGv_vec m = tcg_constant_vec(type, vece, (8 << vece) - 1);
  
--    tcg_gen_dupi_vec(vece, t, (8 << vece) - 1);
--    tcg_gen_and_vec(vece, t, t, b);
-+    tcg_gen_and_vec(vece, t, b, m);
-     tcg_gen_rotlv_vec(vece, d, a, t);
-     tcg_temp_free_vec(t);
- }
-@@ -3259,10 +3233,11 @@ void tcg_gen_gvec_rotlv(unsigned vece, uint32_t dofs, uint32_t aofs,
- static void tcg_gen_rotrv_mod_vec(unsigned vece, TCGv_vec d,
-                                   TCGv_vec a, TCGv_vec b)
- {
--    TCGv_vec t = tcg_temp_new_vec_matching(d);
-+    TCGType type = tcgv_vec_temp(d)->type;
-+    TCGv_vec t = tcg_temp_new_vec(type);
-+    TCGv_vec m = tcg_constant_vec(type, vece, (8 << vece) - 1);
+ void tcg_gen_muli_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+@@ -1690,7 +1678,7 @@ void tcg_gen_bswap32_i64(TCGv_i64 ret, TCGv_i64 arg)
+     } else {
+         TCGv_i64 t0 = tcg_temp_new_i64();
+         TCGv_i64 t1 = tcg_temp_new_i64();
+-        TCGv_i64 t2 = tcg_const_i64(0x00ff00ff);
++        TCGv_i64 t2 = tcg_constant_i64(0x00ff00ff);
  
--    tcg_gen_dupi_vec(vece, t, (8 << vece) - 1);
--    tcg_gen_and_vec(vece, t, t, b);
-+    tcg_gen_and_vec(vece, t, b, m);
-     tcg_gen_rotrv_vec(vece, d, a, t);
-     tcg_temp_free_vec(t);
+                                         /* arg = ....abcd */
+         tcg_gen_shri_i64(t0, arg, 8);   /*  t0 = .....abc */
+@@ -1706,7 +1694,6 @@ void tcg_gen_bswap32_i64(TCGv_i64 ret, TCGv_i64 arg)
+ 
+         tcg_temp_free_i64(t0);
+         tcg_temp_free_i64(t1);
+-        tcg_temp_free_i64(t2);
+     }
  }
+ 
+@@ -1850,16 +1837,16 @@ void tcg_gen_clzi_i64(TCGv_i64 ret, TCGv_i64 arg1, uint64_t arg2)
+     if (TCG_TARGET_REG_BITS == 32
+         && TCG_TARGET_HAS_clz_i32
+         && arg2 <= 0xffffffffu) {
+-        TCGv_i32 t = tcg_const_i32((uint32_t)arg2 - 32);
+-        tcg_gen_clz_i32(t, TCGV_LOW(arg1), t);
++        TCGv_i32 t = tcg_temp_new_i32();
++        tcg_gen_clzi_i32(t, TCGV_LOW(arg1), arg2 - 32);
+         tcg_gen_addi_i32(t, t, 32);
+         tcg_gen_clz_i32(TCGV_LOW(ret), TCGV_HIGH(arg1), t);
+         tcg_gen_movi_i32(TCGV_HIGH(ret), 0);
+         tcg_temp_free_i32(t);
+     } else {
+-        TCGv_i64 t = tcg_const_i64(arg2);
+-        tcg_gen_clz_i64(ret, arg1, t);
+-        tcg_temp_free_i64(t);
++        TCGv_i64 t0 = tcg_const_i64(arg2);
++        tcg_gen_clz_i64(ret, arg1, t0);
++        tcg_temp_free_i64(t0);
+     }
+ }
+ 
+@@ -1881,7 +1868,7 @@ void tcg_gen_ctz_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2)
+             tcg_gen_clzi_i64(t, t, 64);
+             tcg_gen_xori_i64(t, t, 63);
+         }
+-        z = tcg_const_i64(0);
++        z = tcg_constant_i64(0);
+         tcg_gen_movcond_i64(TCG_COND_EQ, ret, arg1, z, arg2, t);
+         tcg_temp_free_i64(t);
+         tcg_temp_free_i64(z);
+@@ -1895,8 +1882,8 @@ void tcg_gen_ctzi_i64(TCGv_i64 ret, TCGv_i64 arg1, uint64_t arg2)
+     if (TCG_TARGET_REG_BITS == 32
+         && TCG_TARGET_HAS_ctz_i32
+         && arg2 <= 0xffffffffu) {
+-        TCGv_i32 t32 = tcg_const_i32((uint32_t)arg2 - 32);
+-        tcg_gen_ctz_i32(t32, TCGV_HIGH(arg1), t32);
++        TCGv_i32 t32 = tcg_temp_new_i32();
++        tcg_gen_ctzi_i32(t32, TCGV_HIGH(arg1), arg2 - 32);
+         tcg_gen_addi_i32(t32, t32, 32);
+         tcg_gen_ctz_i32(TCGV_LOW(ret), TCGV_LOW(arg1), t32);
+         tcg_gen_movi_i32(TCGV_HIGH(ret), 0);
+@@ -1911,9 +1898,9 @@ void tcg_gen_ctzi_i64(TCGv_i64 ret, TCGv_i64 arg1, uint64_t arg2)
+         tcg_gen_ctpop_i64(ret, t);
+         tcg_temp_free_i64(t);
+     } else {
+-        TCGv_i64 t64 = tcg_const_i64(arg2);
+-        tcg_gen_ctz_i64(ret, arg1, t64);
+-        tcg_temp_free_i64(t64);
++        TCGv_i64 t0 = tcg_const_i64(arg2);
++        tcg_gen_ctz_i64(ret, arg1, t0);
++        tcg_temp_free_i64(t0);
+     }
+ }
+ 
+@@ -1969,9 +1956,7 @@ void tcg_gen_rotli_i64(TCGv_i64 ret, TCGv_i64 arg1, int64_t arg2)
+     if (arg2 == 0) {
+         tcg_gen_mov_i64(ret, arg1);
+     } else if (TCG_TARGET_HAS_rot_i64) {
+-        TCGv_i64 t0 = tcg_const_i64(arg2);
+-        tcg_gen_rotl_i64(ret, arg1, t0);
+-        tcg_temp_free_i64(t0);
++        tcg_gen_rotl_i64(ret, arg1, tcg_constant_i64(arg2));
+     } else {
+         TCGv_i64 t0, t1;
+         t0 = tcg_temp_new_i64();
+@@ -2089,9 +2074,8 @@ void tcg_gen_deposit_z_i64(TCGv_i64 ret, TCGv_i64 arg,
+         tcg_gen_andi_i64(ret, arg, (1ull << len) - 1);
+     } else if (TCG_TARGET_HAS_deposit_i64
+                && TCG_TARGET_deposit_i64_valid(ofs, len)) {
+-        TCGv_i64 zero = tcg_const_i64(0);
++        TCGv_i64 zero = tcg_constant_i64(0);
+         tcg_gen_op5ii_i64(INDEX_op_deposit_i64, ret, zero, arg, ofs, len);
+-        tcg_temp_free_i64(zero);
+     } else {
+         if (TCG_TARGET_REG_BITS == 32) {
+             if (ofs >= 32) {
+@@ -3102,9 +3086,8 @@ void tcg_gen_atomic_cmpxchg_i32(TCGv_i32 retv, TCGv addr, TCGv_i32 cmpv,
+ 
+ #ifdef CONFIG_SOFTMMU
+         {
+-            TCGv_i32 oi = tcg_const_i32(make_memop_idx(memop & ~MO_SIGN, idx));
+-            gen(retv, cpu_env, addr, cmpv, newv, oi);
+-            tcg_temp_free_i32(oi);
++            TCGMemOpIdx oi = make_memop_idx(memop & ~MO_SIGN, idx);
++            gen(retv, cpu_env, addr, cmpv, newv, tcg_constant_i32(oi));
+         }
+ #else
+         gen(retv, cpu_env, addr, cmpv, newv);
+@@ -3147,9 +3130,8 @@ void tcg_gen_atomic_cmpxchg_i64(TCGv_i64 retv, TCGv addr, TCGv_i64 cmpv,
+ 
+ #ifdef CONFIG_SOFTMMU
+         {
+-            TCGv_i32 oi = tcg_const_i32(make_memop_idx(memop, idx));
+-            gen(retv, cpu_env, addr, cmpv, newv, oi);
+-            tcg_temp_free_i32(oi);
++            TCGMemOpIdx oi = make_memop_idx(memop, idx);
++            gen(retv, cpu_env, addr, cmpv, newv, tcg_constant_i32(oi));
+         }
+ #else
+         gen(retv, cpu_env, addr, cmpv, newv);
+@@ -3210,9 +3192,8 @@ static void do_atomic_op_i32(TCGv_i32 ret, TCGv addr, TCGv_i32 val,
+ 
+ #ifdef CONFIG_SOFTMMU
+     {
+-        TCGv_i32 oi = tcg_const_i32(make_memop_idx(memop & ~MO_SIGN, idx));
+-        gen(ret, cpu_env, addr, val, oi);
+-        tcg_temp_free_i32(oi);
++        TCGMemOpIdx oi = make_memop_idx(memop & ~MO_SIGN, idx);
++        gen(ret, cpu_env, addr, val, tcg_constant_i32(oi));
+     }
+ #else
+     gen(ret, cpu_env, addr, val);
+@@ -3255,9 +3236,8 @@ static void do_atomic_op_i64(TCGv_i64 ret, TCGv addr, TCGv_i64 val,
+ 
+ #ifdef CONFIG_SOFTMMU
+         {
+-            TCGv_i32 oi = tcg_const_i32(make_memop_idx(memop & ~MO_SIGN, idx));
+-            gen(ret, cpu_env, addr, val, oi);
+-            tcg_temp_free_i32(oi);
++            TCGMemOpIdx oi = make_memop_idx(memop & ~MO_SIGN, idx);
++            gen(ret, cpu_env, addr, val, tcg_constant_i32(oi));
+         }
+ #else
+         gen(ret, cpu_env, addr, val);
 -- 
 2.20.1
 
