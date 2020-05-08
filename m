@@ -2,86 +2,66 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 653DDC35280
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 02:11:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D20C35280
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 02:14:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 316FF206B9
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 02:11:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oBwsvIql"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 316FF206B9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3954320731
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 02:14:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3954320731
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWsUO-0007EL-Bz
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 22:11:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38974)
+	id 1jWsWh-0000Cl-Da
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 22:14:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39616)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <priyamvad.agnisys@gmail.com>)
- id 1jWsTj-0006La-TB
- for qemu-devel@nongnu.org; Thu, 07 May 2020 22:11:07 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:37257)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <priyamvad.agnisys@gmail.com>)
- id 1jWsTi-0005Li-Q6
- for qemu-devel@nongnu.org; Thu, 07 May 2020 22:11:07 -0400
-Received: by mail-lf1-x141.google.com with SMTP id t11so188877lfe.4
- for <qemu-devel@nongnu.org>; Thu, 07 May 2020 19:11:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=GdPk+Y7sXr+rpKHx8JS3zG6W4GNtP+tDm32LRQa9mqc=;
- b=oBwsvIqlNwkosWuX3pk89UiabGOSFtmgYbpQYZBBc1quJNhw1cR5FJpHP6OhgAfmRq
- Rz5j0d49/Ss9haR0VI1+DEVTtv4X/hTZwL9GTsDLGLwP4SU6PoG0hqCZhloWx7bpLWl4
- i2ZaRchC7j1rUnKlsTguwq54paMwUGoSk2qwX5dVHN2o45ZL/FiN2RnRU5xCYd22eCfh
- AViJ767TRhI+69+EV8uy9SO44YxkgZAq6N6nmklJa0BQmxu9SCZI7kXi/pndBOCviBIy
- uc5LjmKdRgYXYmiscvTFDVaeBE0zYN0IgeZrlNB2Ixf903t9rMsv+HNs1YKDfoQt2eZX
- n5jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=GdPk+Y7sXr+rpKHx8JS3zG6W4GNtP+tDm32LRQa9mqc=;
- b=Oh9ihyvET+SwI5Xz3Zjf50TvjCnc2rxoh4FI259/WdqEW5p7EYHzRi7cLlx4aLDf/7
- snHvc72kluZizt0f4uTdBQ+qi+F3IjdmMtg4k809x04fATkm4R+NxFG884HxGekV15fL
- i1mNREnLSUAC7RbvbQv/aujLwX2HUxQjvJ+30her1LizRmZ+Cd/gRBMeJcOCNOR5rjiL
- wmCXLFa3gJJSJTDCZarR6evQW2ep1VXW5vVzM7DPM3op5h2LVlalwgLJkyADRirQbCo+
- hxzDIRc5kNIqWkv1F+YJ5alAqNOkSeC0q6IXEXPDj8B2MTR8oRQJ2MQF7fwTFjQLchgr
- s+BQ==
-X-Gm-Message-State: AOAM530gKKrz5PuQ6oF/UlL358dOy8YTkMhrNttNp3OQVLQtuKs/iiNj
- FG1PebZcZi4iK2BD+PTYgLfEDm6WJLz/oWj4TbQ=
-X-Google-Smtp-Source: ABdhPJxK6GngJAcxNeBW85vJ6YzL6+kbmRh0nnS93oluHUe+g1xLIcebLDbbqeVOM+JQumqE9sduQr4+LQIeDfiBSCw=
-X-Received: by 2002:a19:4f02:: with SMTP id d2mr272229lfb.180.1588903865094;
- Thu, 07 May 2020 19:11:05 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
+ id 1jWsWA-00089S-5B
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 22:13:38 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3750 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
+ id 1jWsW8-00025r-Lh
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 22:13:37 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 87760471C4CB50CEF83C;
+ Fri,  8 May 2020 10:13:21 +0800 (CST)
+Received: from [10.184.39.213] (10.184.39.213) by smtp.huawei.com
+ (10.3.19.202) with Microsoft SMTP Server (TLS) id 14.3.487.0; Fri, 8 May 2020
+ 10:13:14 +0800
+Subject: Re: [PATCH] migration/rdma: fix a memleak on error path in
+ rdma_start_incoming_migration
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <20200420102727.17339-1-pannengyuan@huawei.com>
+ <20200424094657.GC3106@work-vm>
+From: Pan Nengyuan <pannengyuan@huawei.com>
+Message-ID: <bee9d208-2810-cf69-1247-52e1597d791d@huawei.com>
+Date: Fri, 8 May 2020 10:13:13 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-References: <CAPV47zdeH0+G85De2nOeD-dw91PKqPZh0U4SZuwuFmdqRyhXjQ@mail.gmail.com>
- <d418f253-1749-8d29-c228-0c69c2cec3a7@redhat.com>
-In-Reply-To: <d418f253-1749-8d29-c228-0c69c2cec3a7@redhat.com>
-From: Priyamvad Acharya <priyamvad.agnisys@gmail.com>
-Date: Fri, 8 May 2020 07:40:53 +0530
-Message-ID: <CAPV47zdA3YR7Dn6h27Lsu1Hm9nkaZ44+zDZtX98eAU_T7enT9g@mail.gmail.com>
-Subject: Re: Parameter 'driver' expects pluggable device type
-To: John Snow <jsnow@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000076151c05a51982da"
-Received-SPF: pass client-ip=2a00:1450:4864:20::141;
- envelope-from=priyamvad.agnisys@gmail.com; helo=mail-lf1-x141.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+In-Reply-To: <20200424094657.GC3106@work-vm>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.184.39.213]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.191;
+ envelope-from=pannengyuan@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 22:13:22
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,183 +75,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, euler.robot@huawei.com,
+ qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000076151c05a51982da
-Content-Type: text/plain; charset="UTF-8"
 
- Hi,
-Thanks for providing relevant information.
-FYI
-I am using Qemu version *4.2.94 (v5.0.0-rc4-dirty).*
-I am using *virt* board.
 
-Where we need to set *user creatable *to true?
-Any other modification is needed to allow sysbus device support?
+On 4/24/2020 5:46 PM, Dr. David Alan Gilbert wrote:
+> * Pan Nengyuan (pannengyuan@huawei.com) wrote:
+>> 'rdma->host' is malloced in qemu_rdma_data_init, but forgot to free on the error
+>> path in rdma_start_incoming_migration(), this patch fix that.
+>>
+>> The leak stack:
+>> Direct leak of 2 byte(s) in 1 object(s) allocated from:
+>>     #0 0x7fb7add18ae8 in __interceptor_malloc (/lib64/libasan.so.5+0xefae8)
+>>     #1 0x7fb7ad0df1d5 in g_malloc (/lib64/libglib-2.0.so.0+0x531d5)
+>>     #2 0x7fb7ad0f8b32 in g_strdup (/lib64/libglib-2.0.so.0+0x6cb32)
+>>     #3 0x55a0464a0f6f in qemu_rdma_data_init /mnt/sdb/qemu/migration/rdma.c:2647
+>>     #4 0x55a0464b0e76 in rdma_start_incoming_migration /mnt/sdb/qemu/migration/rdma.c:4020
+>>     #5 0x55a0463f898a in qemu_start_incoming_migration /mnt/sdb/qemu/migration/migration.c:365
+>>     #6 0x55a0458c75d3 in qemu_init /mnt/sdb/qemu/softmmu/vl.c:4438
+>>     #7 0x55a046a3d811 in main /mnt/sdb/qemu/softmmu/main.c:48
+>>     #8 0x7fb7a8417872 in __libc_start_main (/lib64/libc.so.6+0x23872)
+>>     #9 0x55a04536b26d in _start (/mnt/sdb/qemu/build/x86_64-softmmu/qemu-system-x86_64+0x286926d)
+>>
+>> Reported-by: Euler Robot <euler.robot@huawei.com>
+>> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+> 
+> Thanks,
+> 
+> 
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> 
+>> ---
+>>  migration/rdma.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/migration/rdma.c b/migration/rdma.c
+>> index f61587891b..967fda5b0c 100644
+>> --- a/migration/rdma.c
+>> +++ b/migration/rdma.c
+>> @@ -4056,6 +4056,7 @@ void rdma_start_incoming_migration(const char *host_port, Error **errp)
+>>      return;
+>>  err:
+>>      error_propagate(errp, local_err);
+>> +    g_free(rdma->host);
+>>      g_free(rdma);
+>>      g_free(rdma_return_path);
+>>  }
+>> -- 
+>> 2.18.2
+>>
 
-Below is the script which I am using  to boot linux image with pl061 device
-on virt board.
+Oh, I'm sorry, this may cause a potential nullptr access when taking the first error branch in rdma_start_incoming_migration:
 
-#!/bin/bash
->
-> KERNEL="/lhome/priyamvad/debian_qemu_arm32/vmlinuz-3.16.0-6-armmp-lpae"
->
-> INIT_IMAGE="/lhome/priyamvad/debian_qemu_arm32/initrd.img-3.16.0-6-armmp-lpae"
-> DISK="/lhome/priyamvad/debian_qemu_arm32/hda30.qcow2"
->
-> ./qemu-system-arm \
-> -M virt \
-> -m 1024 \
-> -smp 4 \
-> -kernel $KERNEL \
-> -object rng-random,filename=/dev/urandom,id=rng0 \
-> -device virtio-rng-device,rng=rng0 \
-> -initrd $INIT_IMAGE \
-> -append 'root=/dev/vda2' \
-> -drive if=none,file=$DISK,format=qcow2,id=hd \
-> -device pl061 \
-> -device virtio-blk-device,drive=hd \
-> -device virtio-net-device,netdev=usernet \
-> -netdev user,id=usernet,hostfwd=tcp::2222-:22 \
-> -nographic
->
+    rdma = qemu_rdma_data_init(host_port, &local_err);
 
-Is the above script  correct  to boot linux image with pl061 device on virt
-board?
+    if (rdma == NULL) {
+        goto err;
+    }
+    ...
 
-On Fri, 8 May 2020 at 02:32, John Snow <jsnow@redhat.com> wrote:
+Since it has applied, I will send a new patch to fix it.
 
->
->
-> On 5/6/20 8:56 AM, Priyamvad Acharya wrote:
-> >
-> > Hello developer community,
-> > I want to allow a *sysbus *type device to boot with kernel image(arm
-> > architecture) via Qemu command line .
-> >
-> > When I run qemu arm system executable with *-device *option via qemu
-> > command line,I get following error message
-> >
-> >> qemu-system-arm: -device pl061: Parameter 'driver' expects pluggable
-> > device type
-> >
-> > So, how to allow a sysbus device via command line?
-> > Is there any working patch?
->
-> Hi, it looks like the pl061 device is not declared "user creatable" so
-> it is unavailable from the CLI. As a sysbus device, QEMU is not aware,
-> in the abstract, of how to "connect" the device to other devices.
->
-> See the sysbus class initialization code for more detail:
-> https://github.com/qemu/qemu/blob/master/hw/core/sysbus.c#L301
->
->
-> However, It looks like these boards/devices create such a device:
->
-> hw/arm/highbank
-> hw/arm/realview
-> hw/arm/sbsa-ref
-> hw/arm/stellaris
-> hw/arm/versatilepb
-> hw/arm/virt
->
-> If you want one on some other kind of machine, you'll need to write it
-> up yourself in the machine board code, but you didn't tell us what
-> version of QEMU you're using, what machine type you are trying to use, etc.
->
-> --js
->
->
-
---00000000000076151c05a51982da
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">
-<div>Hi,</div><div>Thanks for providing relevant information.</div><div>FYI=
-</div><div>I am using Qemu version <b>4.2.94 (v5.0.0-rc4-dirty).</b></div><=
-div>I am using <b>virt</b> board.</div><div><br></div><div>Where we need to=
- set <b>user creatable </b>to true?</div><div>Any other modification is nee=
-ded to allow sysbus device support?</div><div><br></div><div>Below is the s=
-cript which I am using=C2=A0 to boot linux image with pl061 device on virt =
-board.</div><div><br></div><blockquote class=3D"gmail_quote" style=3D"margi=
-n:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex=
-"><div>#!/bin/bash<br><br>KERNEL=3D&quot;/lhome/priyamvad/debian_qemu_arm32=
-/vmlinuz-3.16.0-6-armmp-lpae&quot;<br>INIT_IMAGE=3D&quot;/lhome/priyamvad/d=
-ebian_qemu_arm32/initrd.img-3.16.0-6-armmp-lpae&quot;<br>DISK=3D&quot;/lhom=
-e/priyamvad/debian_qemu_arm32/hda30.qcow2&quot;<br><br>./qemu-system-arm \<=
-br>	-M virt \<br>	-m 1024 \<br>	-smp 4 \<br>	-kernel $KERNEL \<br>	-object =
-rng-random,filename=3D/dev/urandom,id=3Drng0 \<br>	-device virtio-rng-devic=
-e,rng=3Drng0 \<br>	-initrd $INIT_IMAGE \<br>	-append &#39;root=3D/dev/vda2&=
-#39; \<br>	-drive if=3Dnone,file=3D$DISK,format=3Dqcow2,id=3Dhd \<br>	-devi=
-ce pl061 \ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 <br>	-device virtio-blk-device,drive=3Dh=
-d \<br>	-device virtio-net-device,netdev=3Dusernet \<br>	-netdev user,id=3D=
-usernet,hostfwd=3Dtcp::2222-:22 \<br>	-nographic<br></div></blockquote><div=
-><br></div><div>Is the above script=C2=A0=20
-correct=C2=A0 to boot linux image with pl061 device on virt board?
-
-</div><div class=3D"gmail-yj6qo gmail-ajU"><div id=3D"gmail-:1xb" class=3D"=
-gmail-ajR" tabindex=3D"0"><img class=3D"gmail-ajT" src=3D"https://ssl.gstat=
-ic.com/ui/v1/icons/mail/images/cleardot.gif"></div></div>
-
-</div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">=
-On Fri, 8 May 2020 at 02:32, John Snow &lt;<a href=3D"mailto:jsnow@redhat.c=
-om">jsnow@redhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quo=
-te" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204=
-);padding-left:1ex"><br>
-<br>
-On 5/6/20 8:56 AM, Priyamvad Acharya wrote:<br>
-&gt; <br>
-&gt; Hello developer community,<br>
-&gt; I want to allow a *sysbus *type device to boot with kernel image(arm<b=
-r>
-&gt; architecture) via Qemu command line .<br>
-&gt; <br>
-&gt; When I run qemu arm system executable with *-device *option via qemu<b=
-r>
-&gt; command line,I get following error message<br>
-&gt; <br>
-&gt;&gt; qemu-system-arm: -device pl061: Parameter &#39;driver&#39; expects=
- pluggable<br>
-&gt; device type<br>
-&gt; <br>
-&gt; So, how to allow a sysbus device via command line?<br>
-&gt; Is there any working patch?<br>
-<br>
-Hi, it looks like the pl061 device is not declared &quot;user creatable&quo=
-t; so<br>
-it is unavailable from the CLI. As a sysbus device, QEMU is not aware,<br>
-in the abstract, of how to &quot;connect&quot; the device to other devices.=
-<br>
-<br>
-See the sysbus class initialization code for more detail:<br>
-<a href=3D"https://github.com/qemu/qemu/blob/master/hw/core/sysbus.c#L301" =
-rel=3D"noreferrer" target=3D"_blank">https://github.com/qemu/qemu/blob/mast=
-er/hw/core/sysbus.c#L301</a><br>
-<br>
-<br>
-However, It looks like these boards/devices create such a device:<br>
-<br>
-hw/arm/highbank<br>
-hw/arm/realview<br>
-hw/arm/sbsa-ref<br>
-hw/arm/stellaris<br>
-hw/arm/versatilepb<br>
-hw/arm/virt<br>
-<br>
-If you want one on some other kind of machine, you&#39;ll need to write it<=
-br>
-up yourself in the machine board code, but you didn&#39;t tell us what<br>
-version of QEMU you&#39;re using, what machine type you are trying to use, =
-etc.<br>
-<br>
---js<br>
-<br>
-</blockquote></div>
-
---00000000000076151c05a51982da--
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+> .
+> 
 
