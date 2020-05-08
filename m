@@ -2,89 +2,142 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FDE6C38A2A
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 11:23:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A05A2C47257
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 11:25:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C62420661
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 11:23:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 704AC206D6
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 11:25:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o6qD2vZH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C62420661
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="TAOIALx1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 704AC206D6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX16S-00051g-GL
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 07:23:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59324)
+	id 1jX189-0006uq-Lj
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 07:25:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jX15r-0004ce-Q1
- for qemu-devel@nongnu.org; Fri, 08 May 2020 07:23:03 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:53848)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jX15q-0007nf-8K
- for qemu-devel@nongnu.org; Fri, 08 May 2020 07:23:03 -0400
-Received: by mail-wm1-x342.google.com with SMTP id k12so9792657wmj.3
- for <qemu-devel@nongnu.org>; Fri, 08 May 2020 04:23:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=gxTu+BptZNmY+f6nAeoR5hFSnpmhp03FQjB1IrvxGE8=;
- b=o6qD2vZHbIIUEyBdfLY6/WENHdnEusBbe1BoDBsj4mANpRtc4izvSrP/A55E5sXX9g
- +u3IWJw2LGgIsqSo4aIY99QnUciTKNg5GpSipbku8jYfB2KZN2fI0uP9Rm5kQ7bpDrsQ
- sut5t6Wb/ebOG0/kCH1zmCrhngAKloKEc0H0xhznSfXa8eJhdr76LE+jrP937F+Qojt4
- Um9kbNovySvEsY+76GW9jfv24v0K7wHAUHRGcfR0T1A3o40E83m+MYxLmXJ2Q8UB98OF
- wu0rHjqMn8YozbPB3XVnIIBT9sNAYe27J60WOvSCl/CTd49DmBFhu9tWKG2QE8MFD8Wj
- lwog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=gxTu+BptZNmY+f6nAeoR5hFSnpmhp03FQjB1IrvxGE8=;
- b=H5eOTH/qEs+IQATiPhx9fzbtEOExB7j74dlZNIEBEMz4ZmZbno13cf0hEfaEDDSfZe
- nt+FFSQGGzO8jbEX9Om9YF1QsdInEPLmGI2t6kgLNTfKuBK4raH9iPxvSrxzEayoajaL
- dQpMB3xJl3XpSP6vxgQ6LKGmj4yBKlqKyZV1NmHZNJt43i/fGs4xi0r71Fb95A5o9MJb
- Fagl5RHNomskp/rcOXe1ALZOEBsE3mLKouXMfV000E+soWyJrl4ohMdhMxYDXhg+pML8
- g6YIdpp6SW/oej3Al09OkzKDvcAgL9rL7eTUR4dv8UxrzLznROVuzGMW/zqrGa2+N/av
- I6Qw==
-X-Gm-Message-State: AGi0PuZMbAiJ2w995Ps5XzehVsuzs5z4ohONJtle8qR6K81Qm5zMXUIR
- YLLvwZ9cutffaiE6P8zMXHVaJAUjkaLdGNEgukY=
-X-Google-Smtp-Source: APiQypJsMmA8yqQyiJQ09LneNrCjpVIT6yT+vc+b2YtHT48Ll207QOPxkDLPKb2X+HB/y7a0diZuxLdAaZXD64GLnQM=
-X-Received: by 2002:a1c:f211:: with SMTP id s17mr17208980wmc.168.1588936979875; 
- Fri, 08 May 2020 04:22:59 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
+ id 1jX16d-0005QQ-EM; Fri, 08 May 2020 07:23:51 -0400
+Received: from mail-dm6nam10on2085.outbound.protection.outlook.com
+ ([40.107.93.85]:52608 helo=NAM10-DM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
+ id 1jX16b-0000RI-Re; Fri, 08 May 2020 07:23:50 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MH3Lqvht746QHpytDIlLcvvXpjHB32V1XRvdq9SIqLk6VK9nZ65Hhy9xY+dRGLilXHj9ld7QhknmEFNsnYtGFYBOztJrvAcOg4IjZAVstzyDs70X51xfJDJbwVWX2NuwasAKYK7148fF/m0h+Fwu7YI3Z98Vgysty5jRLKTiUwZyJbxt7xK5vNiqWgNe75R7w2Hyn/KjWnPHcciFMWSqE77pQ6sLB9CCXxzEGpZw8oTiKLPO0+Y1R6wDCC6ZKD8BlEnQLrLz4GQEqK+WDL/NPP/BZZsTD83xhAGrT2PJjMYMNRNKpMCQN64zYpWtTl5S2nYv0DCszcJ3Yk0VmyIikQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=reSzmGPtX+dRBZxkhovPyeXLiomAonzfHw4MjuHWCZE=;
+ b=fZqXT7+JYZkEwbb0v242YPFDLtNfnaE4XI/LKKOjRttGkg9UnStrEXdRiLxIy47UcIHwCO1pD0yplgp0cfEjt1m65l9yeaJ7ipJaCjaFhUJpv8o1fm8IsSi03tc01vQ6SyLieJVOqSylKNwrWHbUizX04fUQPSmoWTUoIpY5yMFn7e+H1i9U8U277lYUPhdJEjW8Gxqb+KSer38nOa8H+H1kt4Zu9uSid8q24MDIPosKuU9k6PW4QW0NaocGwzDRoeBm4mRQM5mvKae+q0SqDLdQ7iasMPOd0bV2lvIr5Z/tbMyzU+RrskuLU9NbDhuMRbixRo4jmNrbOS9lmfoAiA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 149.199.60.83) smtp.rcpttodomain=wdc.com smtp.mailfrom=xilinx.com;
+ dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
+ not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=reSzmGPtX+dRBZxkhovPyeXLiomAonzfHw4MjuHWCZE=;
+ b=TAOIALx14BL2EN1yMWRQp6cxGOcOe5o9Tj2WHIuzF5sfYiAn1tX9yuZi9rSA4hvbNs7sPZrf6v6yWahTrUSHBkfSTareU4eM8vTeMYCghyHXOv0L7RTI4RHl7q/E1zO41YiqifOrd+WoqmOjEn5EOvhUEjHQxwjxdHAHHxDXr+A=
+Received: from SN4PR0201CA0060.namprd02.prod.outlook.com
+ (2603:10b6:803:20::22) by SN1PR02MB3728.namprd02.prod.outlook.com
+ (2603:10b6:802:31::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.27; Fri, 8 May
+ 2020 11:08:45 +0000
+Received: from SN1NAM02FT030.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:803:20:cafe::11) by SN4PR0201CA0060.outlook.office365.com
+ (2603:10b6:803:20::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.27 via Frontend
+ Transport; Fri, 8 May 2020 11:08:45 +0000
+Authentication-Results: spf=pass (sender IP is 149.199.60.83)
+ smtp.mailfrom=xilinx.com; wdc.com; dkim=none (message not signed)
+ header.d=none;wdc.com; dmarc=bestguesspass action=none
+ header.from=xilinx.com;
+Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
+ 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
+ client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
+Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
+ SN1NAM02FT030.mail.protection.outlook.com (10.152.72.114) with Microsoft SMTP
+ Server id 15.20.2979.29 via Frontend Transport; Fri, 8 May 2020 11:08:44
+ +0000
+Received: from [149.199.38.66] (port=35543 helo=xsj-pvapsmtp01)
+ by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
+ (envelope-from <sai.pavan.boddu@xilinx.com>)
+ id 1jX0rp-0002Ta-Hr; Fri, 08 May 2020 04:08:33 -0700
+Received: from [127.0.0.1] (helo=xsj-smtp-dlp2.xlnx.xilinx.com)
+ by xsj-pvapsmtp01 with esmtp (Exim 4.63)
+ (envelope-from <sai.pavan.boddu@xilinx.com>)
+ id 1jX0s0-0005YF-Az; Fri, 08 May 2020 04:08:44 -0700
+Received: from xsj-pvapsmtp01 (smtp-fallback.xilinx.com [149.199.38.66] (may
+ be forged))
+ by xsj-smtp-dlp2.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 048B8hiq021128; 
+ Fri, 8 May 2020 04:08:43 -0700
+Received: from [10.140.6.35] (helo=xhdsaipava40.xilinx.com)
+ by xsj-pvapsmtp01 with esmtp (Exim 4.63)
+ (envelope-from <saipava@xhdsaipava40.xilinx.com>)
+ id 1jX0ry-0005Xj-RJ; Fri, 08 May 2020 04:08:43 -0700
+Received: by xhdsaipava40.xilinx.com (Postfix, from userid 14131)
+ id BF02D13C03F7; Fri,  8 May 2020 16:30:50 +0530 (IST)
+From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Tong Ho <tong.ho@xilinx.com>, Ramon Fried <rfried.dev@gmail.com>
+Subject: [PATCH v3 00/11] Cadence GEM Fixes
+Date: Fri,  8 May 2020 16:30:34 +0530
+Message-Id: <1588935645-20351-1-git-send-email-sai.pavan.boddu@xilinx.com>
+X-Mailer: git-send-email 2.7.4
+X-RCIS-Action: ALLOW
+X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
+X-TM-AS-User-Approved-Sender: Yes;Yes
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
+ SFTY:;
+ SFS:(396003)(136003)(39860400002)(376002)(346002)(46966005)(33430700001)(42186006)(356005)(5660300002)(82310400002)(47076004)(336012)(8676002)(426003)(2616005)(4326008)(6266002)(70586007)(110136005)(82740400003)(33440700001)(186003)(478600001)(8936002)(316002)(81166007)(2906002)(70206006)(6666004)(26005)(36756003)(42866002);
+ DIR:OUT; SFP:1101; 
 MIME-Version: 1.0
-References: <1588500367-1056-1-git-send-email-chenhc@lemote.com>
- <1588500367-1056-11-git-send-email-chenhc@lemote.com>
-In-Reply-To: <1588500367-1056-11-git-send-email-chenhc@lemote.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Fri, 8 May 2020 13:22:39 +0200
-Message-ID: <CAHiYmc4S=jH35B4OzfLZ7tVEUn--W3WrLPVnt2tZKbqv9f22WQ@mail.gmail.com>
-Subject: Re: [PATCH V3 10/14] KVM: MIPS: Add Loongson-3 Virtual IPI interrupt
- support
-To: Huacai Chen <chenhc@lemote.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 5a920c2e-3936-4178-f411-08d7f3402c84
+X-MS-TrafficTypeDiagnostic: SN1PR02MB3728:
+X-Microsoft-Antispam-PRVS: <SN1PR02MB372845A81FCA17917BB11EA0CAA20@SN1PR02MB3728.namprd02.prod.outlook.com>
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-Oob-TLC-OOBClassifiers: OLM:4502;
+X-Forefront-PRVS: 039735BC4E
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 7hgRnkaE0af4ufMQ8W1s7RIBcLQUGMPGvXZzIbjWtYu1LBsVzM8DZmJW+rBzcfhpRw/yawyiL0NU47/auEkO5a+/3RC5eNDY9+tpNTV8AmXINw/51+Ncj9V18Sv+O0ubObK+Yflfo8flzBdwnkvbnBc+iJrnDhvUjdtT0bQB8j+AryVCb+UwrBDOFIsL62j94OwrUx+uzGclI6Ut4IfN0Qi9s12e0/Wy8ftpiC9jjy6EnIcoy84n+tHB2fbJrHRRFSxV2+klpLZ2OFf/Kx3LAQc8JCOQEZXhZAyovMy2WzFepFIqIiko9nl7i41XeQA2r61NPxzstIeEJuxIt7CkB1m3WdTZ6UKwVcqwmVSzzX6zLlB9pCo+exYBVT8NBRO6SRADT2hi+YK2pyD8IEqIiDNNM2OtgE+TdcR+m6S36kS7cZRMYnwh7+ZrDOFDYdAyLMc4i45LfgFrP4vya++N91hQ5yg+HM/1niCWMm6xBEwp3ccNad+AYKIqqylGQ/lih4G2Nw3qjKfdyBBBjYrD5e6TIKwBe12mCsTQx6sirR47SIr1S93S7AMG5Wt3SXMA+Dj8jRhuRW1BZkxOiPNfIv+NmdaAW8L1XbtCfNi0FQY=
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2020 11:08:44.6451 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5a920c2e-3936-4178-f411-08d7f3402c84
+X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
+ Helo=[xsj-pvapsmtpgw01]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR02MB3728
+Received-SPF: pass client-ip=40.107.93.85; envelope-from=saipava@xilinx.com;
+ helo=NAM10-DM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 07:23:48
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,441 +151,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>, kvm@vger.kernel.org,
- Huacai Chen <chenhuacai@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Fuxin Zhang <zhangfx@lemote.com>, Paolo Bonzini <pbonzini@redhat.com>,
- linux-mips@vger.kernel.org
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=D0=BD=D0=B5=D0=B4, 3. =D0=BC=D0=B0=D1=98 2020. =D1=83 12:14 Huacai Chen <c=
-henhc@lemote.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=
-=D0=BB=D0=B0:
->
-> This patch add Loongson-3 Virtual IPI interrupt support in the kernel,
-> because emulate it in QEMU is too expensive for performance.
->
+Hi,
 
-Huacei, hi!
+Following patch series fixes issues with priority queues,
+Adds JUMBO Frame support,
+Makes Debug statements compilable &
+Fixes related to multicast frames.
 
-While, in principle, I support this patch, could you please, just for
-the sake of everybody being on the same page, describe the
-hyphothetical alternative implementation in QEMU, and explain why it
-would be more expensive than the solution proposed in this patch.
+Changes for V2:
+	Fixed build failure on fedora docker machine
+	Fix buggy debug print to use sized integer casting
+Changes for V3:
+	1/11: Fixed debug statments to use %u and %zd
+	      Remove rxoffset for buffer address
+	2/11: Add inline functions to get tx/rx queue base address.
+	4/11: fix read only mask
+	5/11: Move packet buffers to CadenceGEMState
+	6/11: Add JUMBO MAX LEN register
 
-No need to go into details, I would like to see just the general idea
-you had in your mind.
+Sai Pavan Boddu (10):
+  net: cadence_gem: Fix debug statements
+  net: cadence_gem: Fix the queue address update during wrap around
+  net: cadence_gem: Fix irq update w.r.t queue
+  net: cadence_gem: Define access permission for interrupt registers
+  net: cadence_gem: Set ISR according to queue in use
+  net: cadence_gem: Move tx/rx packet buffert to CadenceGEMState
+  net: cadence_gem: Add support for jumbo frames
+  net: cadnece_gem: Update irq_read_clear field of designcfg_debug1 reg
+  net: cadence_gem: Update the reset value for interrupt mask register
+  net: cadence_gem: TX_LAST bit should be set by guest
 
-Yours,
-Aleksandar
+Tong Ho (1):
+  net: cadence_gem: Fix RX address filtering
 
+ hw/net/cadence_gem.c         | 236 ++++++++++++++++++++++++++-----------------
+ include/hw/net/cadence_gem.h |   3 +
+ 2 files changed, 145 insertions(+), 94 deletions(-)
 
-> Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> ---
->  arch/mips/include/asm/kvm_host.h |  32 ++++++
->  arch/mips/kvm/Makefile           |   3 +
->  arch/mips/kvm/emulate.c          |  23 ++++-
->  arch/mips/kvm/loongson_ipi.c     | 214 +++++++++++++++++++++++++++++++++=
-++++++
->  arch/mips/kvm/mips.c             |   6 ++
->  5 files changed, 277 insertions(+), 1 deletion(-)
->  create mode 100644 arch/mips/kvm/loongson_ipi.c
->
-> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm=
-_host.h
-> index a7758c0..f165902 100644
-> --- a/arch/mips/include/asm/kvm_host.h
-> +++ b/arch/mips/include/asm/kvm_host.h
-> @@ -23,6 +23,8 @@
->  #include <asm/inst.h>
->  #include <asm/mipsregs.h>
->
-> +#include <kvm/iodev.h>
-> +
->  /* MIPS KVM register ids */
->  #define MIPS_CP0_32(_R, _S)                                    \
->         (KVM_REG_MIPS_CP0 | KVM_REG_SIZE_U32 | (8 * (_R) + (_S)))
-> @@ -181,11 +183,39 @@ struct kvm_vcpu_stat {
->  struct kvm_arch_memory_slot {
->  };
->
-> +#ifdef CONFIG_CPU_LOONGSON64
-> +struct ipi_state {
-> +       uint32_t status;
-> +       uint32_t en;
-> +       uint32_t set;
-> +       uint32_t clear;
-> +       uint64_t buf[4];
-> +};
-> +
-> +struct loongson_kvm_ipi;
-> +
-> +struct ipi_io_device {
-> +       int node_id;
-> +       struct loongson_kvm_ipi *ipi;
-> +       struct kvm_io_device device;
-> +};
-> +
-> +struct loongson_kvm_ipi {
-> +       spinlock_t lock;
-> +       struct kvm *kvm;
-> +       struct ipi_state ipistate[16];
-> +       struct ipi_io_device dev_ipi[4];
-> +};
-> +#endif
-> +
->  struct kvm_arch {
->         /* Guest physical mm */
->         struct mm_struct gpa_mm;
->         /* Mask of CPUs needing GPA ASID flush */
->         cpumask_t asid_flush_mask;
-> +#ifdef CONFIG_CPU_LOONGSON64
-> +       struct loongson_kvm_ipi ipi;
-> +#endif
->  };
->
->  #define N_MIPS_COPROC_REGS     32
-> @@ -1133,6 +1163,8 @@ extern int kvm_mips_trans_mtc0(union mips_instructi=
-on inst, u32 *opc,
->  /* Misc */
->  extern void kvm_mips_dump_stats(struct kvm_vcpu *vcpu);
->  extern unsigned long kvm_mips_get_ramsize(struct kvm *kvm);
-> +extern int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
-> +                            struct kvm_mips_interrupt *irq);
->
->  static inline void kvm_arch_hardware_unsetup(void) {}
->  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
-> diff --git a/arch/mips/kvm/Makefile b/arch/mips/kvm/Makefile
-> index 0a3cef6..506c4ac 100644
-> --- a/arch/mips/kvm/Makefile
-> +++ b/arch/mips/kvm/Makefile
-> @@ -13,6 +13,9 @@ kvm-objs :=3D $(common-objs-y) mips.o emulate.o entry.o=
- \
->             fpu.o
->  kvm-objs +=3D hypcall.o
->  kvm-objs +=3D mmu.o
-> +ifdef CONFIG_CPU_LOONGSON64
-> +kvm-objs +=3D loongson_ipi.o
-> +endif
->
->  ifdef CONFIG_KVM_MIPS_VZ
->  kvm-objs               +=3D vz.o
-> diff --git a/arch/mips/kvm/emulate.c b/arch/mips/kvm/emulate.c
-> index 754094b..3946499 100644
-> --- a/arch/mips/kvm/emulate.c
-> +++ b/arch/mips/kvm/emulate.c
-> @@ -1600,6 +1600,7 @@ enum emulation_result kvm_mips_emulate_store(union =
-mips_instruction inst,
->                                              struct kvm_run *run,
->                                              struct kvm_vcpu *vcpu)
->  {
-> +       int r;
->         enum emulation_result er;
->         u32 rt;
->         void *data =3D run->mmio.data;
-> @@ -1666,9 +1667,18 @@ enum emulation_result kvm_mips_emulate_store(union=
- mips_instruction inst,
->                 goto out_fail;
->         }
->
-> -       run->mmio.is_write =3D 1;
->         vcpu->mmio_needed =3D 1;
-> +       run->mmio.is_write =3D 1;
->         vcpu->mmio_is_write =3D 1;
-> +
-> +       r =3D kvm_io_bus_write(vcpu, KVM_MMIO_BUS,
-> +                       run->mmio.phys_addr, run->mmio.len, data);
-> +
-> +       if (!r) {
-> +               vcpu->mmio_needed =3D 0;
-> +               return EMULATE_DONE;
-> +       }
-> +
->         return EMULATE_DO_MMIO;
->
->  out_fail:
-> @@ -1681,6 +1691,7 @@ enum emulation_result kvm_mips_emulate_load(union m=
-ips_instruction inst,
->                                             u32 cause, struct kvm_run *ru=
-n,
->                                             struct kvm_vcpu *vcpu)
->  {
-> +       int r;
->         enum emulation_result er;
->         unsigned long curr_pc;
->         u32 op, rt;
-> @@ -1745,6 +1756,16 @@ enum emulation_result kvm_mips_emulate_load(union =
-mips_instruction inst,
->
->         run->mmio.is_write =3D 0;
->         vcpu->mmio_is_write =3D 0;
-> +
-> +       r =3D kvm_io_bus_read(vcpu, KVM_MMIO_BUS,
-> +                       run->mmio.phys_addr, run->mmio.len, run->mmio.dat=
-a);
-> +
-> +       if (!r) {
-> +               kvm_mips_complete_mmio_load(vcpu, run);
-> +               vcpu->mmio_needed =3D 0;
-> +               return EMULATE_DONE;
-> +       }
-> +
->         return EMULATE_DO_MMIO;
->  }
->
-> diff --git a/arch/mips/kvm/loongson_ipi.c b/arch/mips/kvm/loongson_ipi.c
-> new file mode 100644
-> index 00000000..3681fc8
-> --- /dev/null
-> +++ b/arch/mips/kvm/loongson_ipi.c
-> @@ -0,0 +1,214 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + * Loongson-3 Virtual IPI interrupt support.
-> + *
-> + * Copyright (C) 2019  Loongson Technologies, Inc.  All rights reserved.
-> + *
-> + * Authors: Chen Zhu <zhuchen@loongson.cn>
-> + * Authors: Huacai Chen <chenhc@lemote.com>
-> + */
-> +
-> +#include <linux/kvm_host.h>
-> +
-> +#define IPI_BASE            0x3ff01000ULL
-> +
-> +#define CORE0_STATUS_OFF       0x000
-> +#define CORE0_EN_OFF           0x004
-> +#define CORE0_SET_OFF          0x008
-> +#define CORE0_CLEAR_OFF        0x00c
-> +#define CORE0_BUF_20           0x020
-> +#define CORE0_BUF_28           0x028
-> +#define CORE0_BUF_30           0x030
-> +#define CORE0_BUF_38           0x038
-> +
-> +#define CORE1_STATUS_OFF       0x100
-> +#define CORE1_EN_OFF           0x104
-> +#define CORE1_SET_OFF          0x108
-> +#define CORE1_CLEAR_OFF        0x10c
-> +#define CORE1_BUF_20           0x120
-> +#define CORE1_BUF_28           0x128
-> +#define CORE1_BUF_30           0x130
-> +#define CORE1_BUF_38           0x138
-> +
-> +#define CORE2_STATUS_OFF       0x200
-> +#define CORE2_EN_OFF           0x204
-> +#define CORE2_SET_OFF          0x208
-> +#define CORE2_CLEAR_OFF        0x20c
-> +#define CORE2_BUF_20           0x220
-> +#define CORE2_BUF_28           0x228
-> +#define CORE2_BUF_30           0x230
-> +#define CORE2_BUF_38           0x238
-> +
-> +#define CORE3_STATUS_OFF       0x300
-> +#define CORE3_EN_OFF           0x304
-> +#define CORE3_SET_OFF          0x308
-> +#define CORE3_CLEAR_OFF        0x30c
-> +#define CORE3_BUF_20           0x320
-> +#define CORE3_BUF_28           0x328
-> +#define CORE3_BUF_30           0x330
-> +#define CORE3_BUF_38           0x338
-> +
-> +static int loongson_vipi_read(struct loongson_kvm_ipi *ipi,
-> +                               gpa_t addr, int len, void *val)
-> +{
-> +       uint32_t core =3D (addr >> 8) & 3;
-> +       uint32_t node =3D (addr >> 44) & 3;
-> +       uint32_t id =3D core + node * 4;
-> +       uint64_t offset =3D addr & 0xff;
-> +       void *pbuf;
-> +       struct ipi_state *s =3D &(ipi->ipistate[id]);
-> +
-> +       BUG_ON(offset & (len - 1));
-> +
-> +       switch (offset) {
-> +       case CORE0_STATUS_OFF:
-> +               *(uint64_t *)val =3D s->status;
-> +               break;
-> +
-> +       case CORE0_EN_OFF:
-> +               *(uint64_t *)val =3D s->en;
-> +               break;
-> +
-> +       case CORE0_SET_OFF:
-> +               *(uint64_t *)val =3D 0;
-> +               break;
-> +
-> +       case CORE0_CLEAR_OFF:
-> +               *(uint64_t *)val =3D 0;
-> +               break;
-> +
-> +       case CORE0_BUF_20 ... CORE0_BUF_38:
-> +               pbuf =3D (void *)s->buf + (offset - 0x20);
-> +               if (len =3D=3D 8)
-> +                       *(uint64_t *)val =3D *(uint64_t *)pbuf;
-> +               else /* Assume len =3D=3D 4 */
-> +                       *(uint32_t *)val =3D *(uint32_t *)pbuf;
-> +               break;
-> +
-> +       default:
-> +               pr_notice("%s with unknown addr %llx\n", __func__, addr);
-> +               break;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +static int loongson_vipi_write(struct loongson_kvm_ipi *ipi,
-> +                               gpa_t addr, int len, const void *val)
-> +{
-> +       uint32_t core =3D (addr >> 8) & 3;
-> +       uint32_t node =3D (addr >> 44) & 3;
-> +       uint32_t id =3D core + node * 4;
-> +       uint64_t data, offset =3D addr & 0xff;
-> +       void *pbuf;
-> +       struct kvm *kvm =3D ipi->kvm;
-> +       struct kvm_mips_interrupt irq;
-> +       struct ipi_state *s =3D &(ipi->ipistate[id]);
-> +
-> +       data =3D *(uint64_t *)val;
-> +       BUG_ON(offset & (len - 1));
-> +
-> +       switch (offset) {
-> +       case CORE0_STATUS_OFF:
-> +               break;
-> +
-> +       case CORE0_EN_OFF:
-> +               s->en =3D data;
-> +               break;
-> +
-> +       case CORE0_SET_OFF:
-> +               s->status |=3D data;
-> +               irq.cpu =3D id;
-> +               irq.irq =3D 6;
-> +               kvm_vcpu_ioctl_interrupt(kvm->vcpus[id], &irq);
-> +               break;
-> +
-> +       case CORE0_CLEAR_OFF:
-> +               s->status &=3D ~data;
-> +               if (!s->status) {
-> +                       irq.cpu =3D id;
-> +                       irq.irq =3D -6;
-> +                       kvm_vcpu_ioctl_interrupt(kvm->vcpus[id], &irq);
-> +               }
-> +               break;
-> +
-> +       case CORE0_BUF_20 ... CORE0_BUF_38:
-> +               pbuf =3D (void *)s->buf + (offset - 0x20);
-> +               if (len =3D=3D 8)
-> +                       *(uint64_t *)pbuf =3D (uint64_t)data;
-> +               else /* Assume len =3D=3D 4 */
-> +                       *(uint32_t *)pbuf =3D (uint32_t)data;
-> +               break;
-> +
-> +       default:
-> +               pr_notice("%s with unknown addr %llx\n", __func__, addr);
-> +               break;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +static int kvm_ipi_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev=
-,
-> +                       gpa_t addr, int len, void *val)
-> +{
-> +       unsigned long flags;
-> +       struct loongson_kvm_ipi *ipi;
-> +       struct ipi_io_device *ipi_device;
-> +
-> +       ipi_device =3D container_of(dev, struct ipi_io_device, device);
-> +       ipi =3D ipi_device->ipi;
-> +
-> +       spin_lock_irqsave(&ipi->lock, flags);
-> +       loongson_vipi_read(ipi, addr, len, val);
-> +       spin_unlock_irqrestore(&ipi->lock, flags);
-> +
-> +       return 0;
-> +}
-> +
-> +static int kvm_ipi_write(struct kvm_vcpu *vcpu, struct kvm_io_device *de=
-v,
-> +                       gpa_t addr, int len, const void *val)
-> +{
-> +       unsigned long flags;
-> +       struct loongson_kvm_ipi *ipi;
-> +       struct ipi_io_device *ipi_device;
-> +
-> +       ipi_device =3D container_of(dev, struct ipi_io_device, device);
-> +       ipi =3D ipi_device->ipi;
-> +
-> +       spin_lock_irqsave(&ipi->lock, flags);
-> +       loongson_vipi_write(ipi, addr, len, val);
-> +       spin_unlock_irqrestore(&ipi->lock, flags);
-> +
-> +       return 0;
-> +}
-> +
-> +static const struct kvm_io_device_ops kvm_ipi_ops =3D {
-> +       .read     =3D kvm_ipi_read,
-> +       .write    =3D kvm_ipi_write,
-> +};
-> +
-> +void kvm_init_loongson_ipi(struct kvm *kvm)
-> +{
-> +       int i;
-> +       unsigned long addr;
-> +       struct loongson_kvm_ipi *s;
-> +       struct kvm_io_device *device;
-> +
-> +       s =3D &kvm->arch.ipi;
-> +       s->kvm =3D kvm;
-> +       spin_lock_init(&s->lock);
-> +
-> +       /*
-> +        * Initialize IPI device
-> +        */
-> +       for (i =3D 0; i < 4; i++) {
-> +               device =3D &s->dev_ipi[i].device;
-> +               kvm_iodevice_init(device, &kvm_ipi_ops);
-> +               addr =3D (((unsigned long)i) << 44) + IPI_BASE;
-> +               mutex_lock(&kvm->slots_lock);
-> +               kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS, addr, 0x400, d=
-evice);
-> +               mutex_unlock(&kvm->slots_lock);
-> +               s->dev_ipi[i].ipi =3D s;
-> +               s->dev_ipi[i].node_id =3D i;
-> +       }
-> +}
-> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-> index 5ca122c..ed989ef 100644
-> --- a/arch/mips/kvm/mips.c
-> +++ b/arch/mips/kvm/mips.c
-> @@ -128,6 +128,8 @@ int kvm_arch_check_processor_compat(void *opaque)
->         return 0;
->  }
->
-> +extern void kvm_init_loongson_ipi(struct kvm *kvm);
-> +
->  int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  {
->         switch (type) {
-> @@ -147,6 +149,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long =
-type)
->         if (!kvm->arch.gpa_mm.pgd)
->                 return -ENOMEM;
->
-> +#ifdef CONFIG_CPU_LOONGSON64
-> +       kvm_init_loongson_ipi(kvm);
-> +#endif
-> +
->         return 0;
->  }
->
-> --
-> 2.7.0
->
+-- 
+2.7.4
+
 
