@@ -2,99 +2,79 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96BFFC47257
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 09:33:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C951C38A2A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 09:34:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61EC52070B
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 09:33:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 636092070B
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 09:34:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a0Y7JZlS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61EC52070B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DiUSyq4F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 636092070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWzNn-0004Ed-J9
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 05:33:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33674)
+	id 1jWzOJ-00057s-NC
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 05:34:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33720)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jWzMW-0002yn-5O
- for qemu-devel@nongnu.org; Fri, 08 May 2020 05:32:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39497
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jWzMr-000379-3K
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 05:32:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57627
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jWzMV-0003Bn-9v
- for qemu-devel@nongnu.org; Fri, 08 May 2020 05:32:07 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jWzMp-0003Qb-Ij
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 05:32:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588930326;
+ s=mimecast20190719; t=1588930345;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7Fizs/jTz7Evgj0jXTg1CAo/rJD+kXMrBLYhiLKYfrQ=;
- b=a0Y7JZlS8PIeEJ5Y/Bqo88ovA5LcqN8tQi1DME1E6pi8inPs6MaUEb3t8Okt5gKls0PrL7
- sCjqqwRo8nje26Gx4lAuXwActJ/wr2LWcNuJaB/Jz22EaIcEn51Mu/qMbb8isxXSWXdZsG
- t5Hfg0bkVScl6dw7hkR6jBYOVQBD0LA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-1-23SuHNl3NpeyCdk2FhCDJw-1; Fri, 08 May 2020 05:32:02 -0400
-X-MC-Unique: 23SuHNl3NpeyCdk2FhCDJw-1
-Received: by mail-wm1-f69.google.com with SMTP id a206so1347561wmh.6
- for <qemu-devel@nongnu.org>; Fri, 08 May 2020 02:32:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=BFoDHna6XRL92Q6uyxjk4+3nW/j50BtcEQYU7yuSZ4c=;
- b=V8qfM7VxjfqfsNTm4aes78zEarQ1dsOW+FHvCFdPsiK0FQOSuYIrAHNlKbhkNOyv26
- 8fy/4dE3Ba2/8gO7M5DK+/xVGio317fOKq1LCVO4wGdf2N964uyU95wJgjD6/XlD2zmi
- uF11pv/XPfXOU01WIdD7VRWM1S8WVW6GBCRF3KSf0/08BZmgJZ+TVCdCgRNTRW7KTps/
- 6jbPU+mp1JTW0Pb8ASu7m0g46Dfqla80cYhpEWLVK0wcqGUFC88ity2fXT3mx9W4XaV6
- 2DZswRhlmU8xKQ+Wt3R5p6hu1teTVFLzTUs44qBA31Awe13OMeAokB/H0/cZseyHV1mb
- kp9g==
-X-Gm-Message-State: AGi0PuaCtMv2dALeEehegc4WqoqB3NoFt5wNtuYGf5bbC4rtyszvuVL5
- cxDO+WwszLDa7jaoDA33fEMrKUROh4mo50PvtU60j+/ykR6UmYUb/Xw095Kj2LKlrxO4nz7SzHd
- SjLN2Pw1Zjh/7VyQ=
-X-Received: by 2002:a7b:ca47:: with SMTP id m7mr16080728wml.55.1588930321644; 
- Fri, 08 May 2020 02:32:01 -0700 (PDT)
-X-Google-Smtp-Source: APiQypIn9j1oj4Str39MCCMkLIi/fuLFk9d58QkDTA/zKBxxIA1JCsgbH5eufVPx8yt9TWGYgHt8rQ==
-X-Received: by 2002:a7b:ca47:: with SMTP id m7mr16080690wml.55.1588930321362; 
- Fri, 08 May 2020 02:32:01 -0700 (PDT)
-Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id i6sm1966693wrw.97.2020.05.08.02.31.59
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 08 May 2020 02:32:00 -0700 (PDT)
-Subject: Re: [PATCH v2 1/2] exec: Check Xen is enabled before calling the Xen
- API
-To: quintela@redhat.com
-References: <20200508080738.2646-1-philmd@redhat.com>
- <20200508080738.2646-2-philmd@redhat.com> <87wo5mes6g.fsf@secure.mitica>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0731df30-b0c4-c7bf-6194-42cd6cc90ba5@redhat.com>
-Date: Fri, 8 May 2020 11:31:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ bh=90gg94RIij9PKO3TBm55uQYlq2tbzaaBnLSmF5y7tVg=;
+ b=DiUSyq4F1FaX8lrqLIZwIhvWa/t2UK1D3eSOEgsb8YYW9IGZ7/poLgy8mX2g3zCSoYemjo
+ AGN2Ki9+Fcle1zeJGJ4L1GVK6pVofFY/jTrjiIudsvYssWxnu9et30TlK2O33E3onOq0an
+ ffzfnqf9t+TAYj12Cl0lRIxrP8mpe+I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-82-UtnOvgPbNeCOgdEekb8YPA-1; Fri, 08 May 2020 05:32:24 -0400
+X-MC-Unique: UtnOvgPbNeCOgdEekb8YPA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 183FA1005510;
+ Fri,  8 May 2020 09:32:22 +0000 (UTC)
+Received: from gondolin (ovpn-112-144.ams2.redhat.com [10.36.112.144])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 68B155C1C5;
+ Fri,  8 May 2020 09:32:10 +0000 (UTC)
+Date: Fri, 8 May 2020 11:32:07 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Subject: Re: [PATCH 07/10] exec: Move all RAMBlock functions to
+ 'exec/ramblock.h'
+Message-ID: <20200508113207.26770b12.cohuck@redhat.com>
+In-Reply-To: <20200507173958.25894-8-philmd@redhat.com>
+References: <20200507173958.25894-1-philmd@redhat.com>
+ <20200507173958.25894-8-philmd@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <87wo5mes6g.fsf@secure.mitica>
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=cohuck@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 02:23:32
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 02:25:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -114,92 +94,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefano Stabellini <sstabellini@kernel.org>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Paul Durrant <paul@xen.org>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- xen-devel@lists.xenproject.org, Anthony Perard <anthony.perard@citrix.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org,
+ David Hildenbrand <david@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ qemu-ppc@nongnu.org, Keith Busch <kbusch@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Dr.
+ David Alan Gilbert" <dgilbert@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Juan,
+On Thu,  7 May 2020 19:39:55 +0200
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-On 5/8/20 10:39 AM, Juan Quintela wrote:
-> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> ---
->>   include/exec/ram_addr.h | 8 ++++++--
->>   1 file changed, 6 insertions(+), 2 deletions(-)
->>
->> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
->> index 5e59a3d8d7..dd8713179e 100644
->> --- a/include/exec/ram_addr.h
->> +++ b/include/exec/ram_addr.h
->> @@ -330,7 +330,9 @@ static inline void cpu_physical_memory_set_dirty_ran=
-ge(ram_addr_t start,
->>           }
->>       }
->>  =20
->> -    xen_hvm_modified_memory(start, length);
->> +    if (xen_enabled()) {
->> +        xen_hvm_modified_memory(start, length);
->> +    }
->>   }
->>  =20
->>   #if !defined(_WIN32)
->> @@ -388,7 +390,9 @@ static inline void cpu_physical_memory_set_dirty_leb=
-itmap(unsigned long *bitmap,
->>               }
->>           }
->>  =20
->> -        xen_hvm_modified_memory(start, pages << TARGET_PAGE_BITS);
->> +        if (xen_enabled()) {
->> +            xen_hvm_modified_memory(start, pages << TARGET_PAGE_BITS);
->> +        }
->>       } else {
->>           uint8_t clients =3D tcg_enabled() ? DIRTY_CLIENTS_ALL : DIRTY_=
-CLIENTS_NOCODE;
+> The RAMBlock API was dispersed in 3 different headers.
+> One of these headers, "exec/ram_addr.h", is restricted
+> to target dependent code. However these functions are
+> not target specific. Move all functions into a single
+> place.  Now all these functions can be accessed by
+> target-agnostic code.
 >=20
-> I don't object moving the xen code to accell.  But I think that this
-> change is bad.
->=20
-> On the following patch:
-> - You export xen_allowed
->    (ok, it was already exported, but I think it shouldn't)
->=20
-> (master)$ find . -type f | xargs grep xen_allowed
-> ./hw/xen/xen-common.c:    ac->allowed =3D &xen_allowed;
-> ./include/hw/xen/xen.h:extern bool xen_allowed;
-> ./include/hw/xen/xen.h:    return xen_allowed;
-> ./softmmu/vl.c:bool xen_allowed;
->=20
-> This are all the users that I can find.
->=20
-> And xen_havm_modified_memory() is an empty function if xen is not
-> compiled in.  And in the case that xen is compiled in, the 1st thing
-> that it checks is:
->=20
->     if (unlikely(xen_in_migration)) {
->=20
-> That is way more restrictive that xen_enabled().
->=20
-> So, I think that it is better to drop this patch, maintain next one, but
-> just un-exporting xen_allowed.
->=20
-> What do you think?
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  include/exec/cpu-common.h    |  24 -------
+>  include/exec/ram_addr.h      | 105 ---------------------------
+>  include/exec/ramblock.h      | 134 +++++++++++++++++++++++++++++++++++
+>  migration/migration.h        |   1 +
+>  accel/tcg/translate-all.c    |   2 -
+>  hw/block/nvme.c              |   2 +-
+>  hw/s390x/s390-stattrib-kvm.c |   1 -
+>  hw/s390x/s390-stattrib.c     |   1 -
+>  hw/s390x/s390-virtio-ccw.c   |   1 -
+>  hw/virtio/vhost-user.c       |   1 +
+>  hw/virtio/vhost.c            |   1 +
+>  hw/virtio/virtio-balloon.c   |   1 +
+>  memory.c                     |   1 +
+>  migration/migration.c        |   1 +
+>  migration/postcopy-ram.c     |   1 +
+>  migration/savevm.c           |   1 +
+>  stubs/ram-block.c            |   2 +-
+>  target/ppc/kvm.c             |   1 -
+>  target/s390x/kvm.c           |   1 -
+>  util/vfio-helpers.c          |   2 +-
+>  20 files changed, 145 insertions(+), 139 deletions(-)
 
-I blindly trust your judgement on this :) I'd rather not touch this code=20
-but as it happens to be in "exec/ram_addr.h" I had to modify it.
-
-Thanks for your reviews!
-
->=20
-> Later, Juan.
->=20
->=20
+Acked-by: Cornelia Huck <cohuck@redhat.com>
 
 
