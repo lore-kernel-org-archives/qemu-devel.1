@@ -2,90 +2,120 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61539C35280
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 03:06:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3FD4C4724C
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 03:43:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2570C20746
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 03:06:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B692220731
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 03:43:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bRvGx5Vf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2570C20746
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L4BNc+QU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B692220731
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWtKp-0000us-BH
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 23:05:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52252)
+	id 1jWtvL-0004GA-Sy
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 23:43:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33688)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jWtJ9-0008VZ-34
- for qemu-devel@nongnu.org; Thu, 07 May 2020 23:04:15 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44649
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jWtJ8-0005Xc-5k
- for qemu-devel@nongnu.org; Thu, 07 May 2020 23:04:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588907053;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=GYZYpsQMf4a0OYsaG0GcbbgQxqIgSI8WLHoXeiPHa8U=;
- b=bRvGx5VfexT8WACBdFKhKrzZ0f65OW73eOG6GvlvP9iBOY/ZK24wdWSt6V6IJEb3V81IKw
- tkCG8lR89rtmhBYCtAe49KfoOGnp5HOoD/AluJg9idcZBMYquIM6c0q4VrPemJutZ7WJXK
- RJJIXQmXJMoSF79qVOEqdFYDO1urasM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-412-EmH0rb_nP-m5I4lknbZ1eQ-1; Thu, 07 May 2020 23:04:09 -0400
-X-MC-Unique: EmH0rb_nP-m5I4lknbZ1eQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EFDEC8014D6;
- Fri,  8 May 2020 03:04:07 +0000 (UTC)
-Received: from [10.72.13.98] (ovpn-13-98.pek2.redhat.com [10.72.13.98])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 40CA370545;
- Fri,  8 May 2020 03:03:42 +0000 (UTC)
-Subject: Re: [RFC v3 5/6] qmp: add QMP command x-debug-virtio-queue-element
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-References: <20200507114927.6733-1-lvivier@redhat.com>
- <20200507114927.6733-6-lvivier@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <5964e564-4ab1-93d2-c41e-b961ae9054c4@redhat.com>
-Date: Fri, 8 May 2020 11:03:41 +0800
+ (Exim 4.90_1) (envelope-from <rth7680@gmail.com>) id 1jWtuh-0003rQ-AQ
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 23:43:03 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:33405)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <rth7680@gmail.com>) id 1jWtug-0004RG-8Q
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 23:43:02 -0400
+Received: by mail-pf1-x444.google.com with SMTP id x77so255077pfc.0
+ for <qemu-devel@nongnu.org>; Thu, 07 May 2020 20:43:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=pMbi7iquNQD7u7ceQnQ/FROgpEUJ26+C3qNVd8jsCZc=;
+ b=L4BNc+QUM/o8pAP8qjq9P3rQgQTNFFBxoBk6NaL7ZjQFhtAiSbMJp+FLaEJ+n7qPu9
+ bYVdFtV0qcDeQbOwTXZVhr/qDMnfl0qCOryxFn5JAgyvCII3CM70YvzEsoj47ni7YcCX
+ DztvrL7qt9H03qgIo/ufVp6k68dKrpfz/NkH+eyZVqPgs3OK5kDsOC3XsAR/FoHK+lub
+ ZgXZTaq0M3PbNHRaBe4ho/xFOiNwHdr72icLYwBrpLdF1tkEir39XhXbrV7cm2Xv9nWa
+ rwJKQw7L17lw3GnkdA423NtjgJpHeWsj5saYwS6rzm/DnuOEg2BYlE4irbK9kNNaG0XD
+ JqRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=pMbi7iquNQD7u7ceQnQ/FROgpEUJ26+C3qNVd8jsCZc=;
+ b=ugx9z6OnUb1WHoQG3B2gmzfHpKxqX2Gscujhl+2H40Wz+ih7ZLcr9fh/LXIiupMAMc
+ 8VYW9WEHfFhru1Q9Hb3YbDjUm0IWl1rZPkZ1I8K+0zWFFNe0h4xK4Y1jKH60XUEtbsDz
+ ED8ipTp7pml7wu/OYvUEIWimCFjvN6Xd9NMQw6nvOsBhe+2TzxA7Ce7nyfd/fIFZyD7e
+ /zreXnG5uJsV0yn+qc1d2ZseUyHOx55dbMn691n/SmMKUbJMyApgOpsx7sVz4pJ9ndP3
+ bpmClXWtSKZPOt4GrLTXfhvNVeyCk33qWRsYCEexbyHo4VFNDyTc5zWbzk+mAMINfpjd
+ M1KQ==
+X-Gm-Message-State: AGi0PuZTAI3AqKBrfw0Ca21EZq6CjTzdaHr+8Pnfuk5XVJ34obX+XKfE
+ 9PyJisQNoyAKjPEPfWkFfEw=
+X-Google-Smtp-Source: APiQypIvVSxHHHk4SRNXJ1uk1z7FD4BlY4uRAKhY8sCcIqossQnDRtlWgK64dBA+3iFHuXbq3M0mRw==
+X-Received: by 2002:a62:ed14:: with SMTP id u20mr676943pfh.69.1588909380315;
+ Thu, 07 May 2020 20:43:00 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
+ by smtp.googlemail.com with ESMTPSA id s76sm284769pgc.85.2020.05.07.20.42.58
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 07 May 2020 20:42:59 -0700 (PDT)
+Subject: Re: [PATCH 0/5] target/i386: fxtract, fscale fixes
+To: Joseph Myers <joseph@codesourcery.com>, qemu-devel@nongnu.org
+References: <158881758425.4109.8939056494235923582@45ef0f9c86ae>
+ <alpine.DEB.2.21.2005071449350.26071@digraph.polyomino.org.uk>
+From: Richard Henderson <rth@twiddle.net>
+Autocrypt: addr=rth@twiddle.net; prefer-encrypt=mutual; keydata=
+ mQENBFGuLC8BCADcAoWcnW9lTsDMzbO3MBU+KbiGaj5JPatEUscRDkQYM2fyNjJp2tIWDK5a
+ n4yngeXB3eX61WbYR3QraRK8mlYLGxyAdHMEQfPipbqf3TmN043fssT2bc82ApJcs1zvLYgI
+ rhMht7Dck7A0wNC1jo+ZjVVFig5gDTN7gOzaAdBtV8tVNUddwkLzzaGpfihhSD6U46NdqKOG
+ Wlnn6TrkMy0QGdQ5NaXHkRlUjnnUTSW/nKfoxD+EI+A9V4sYOd8mc/TL4aJh/i/AiU57eLbo
+ n17uQI6/VTWDUWl8USiz4x9c8vmqlywLx00tAFxxoRWqk4KVJlj+Sh0up/D/sJ+vPpgBABEB
+ AAG0I1JpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+iQFYBBMBAgBCAhsDBgsJ
+ CAcDAgYVCAIJCgsEFgIDAQIeAQIXgAIZARYhBJyxjdr46EmtKvwWpK0ScMxN0CebBQJdweUY
+ BQkP1h/pAAoJEK0ScMxN0CebqDsH/0YyfnXk+Dc++H37VCEKgRet2i1ATFzxRnifkvmdxha0
+ V+PVptQ2fwSe+w3KxoFecD8W75nysmUjrU/FicW9yU5YRlGONPZjruG02/KzmhA5PzWJdYO3
+ i/t0qRayvWIcX2qA/flsXEbmb/BbAFM05LQIdcOu74eiBFe5CBCOWBDJeneE1urIE0hSYxoh
+ nCcG60ULrNj13ohZ4zAEluoY32qIo7/OPWmtR88cPrEbZT8k+RqgZbsotzaPT1/RlL74fL8k
+ ofYfTgKAFH7eEy6fF2nzDp2GThVn+3sA62xtpSXUf/X1m75B40KOcq1EQbHypNTmBc1wt13e
+ ibhPNEVX2am5AQ0EUa4sLwEIALITHfH3gciRNfQIe7awDTDvn6H3C6gDyCAnv5LiuLTLZiyK
+ NZp3lNO3rPowyKrGT2RIDlumlqPgdeHzqEEX91YK0yk2vdFvwU04rJ4D+qRgdUPoeICLD1zo
+ PwOv2FaY6Tf8dKYas1RHF5QU5yQNey8j7IYYoE2yGPn2PtBmvtmK4iLataUEvx0U385Zr+jf
+ HscqwTiToryeDC8Io/9BsMvAssE5Yf5URS2nJ7LFOvc4njsQJPF1i9egBXaIloqv7p2hVCKJ
+ Hl5UWIxitQ9QQIl6iU4LCpz8mVYTXwv48IAVpbUf7+ak9V9Kk3jCeQnlxCJBUHjUhoIzinbS
+ JHPHtkkAEQEAAYkBPAQYAQIAJgIbDBYhBJyxjdr46EmtKvwWpK0ScMxN0CebBQJdweVIBQkP
+ 1iAZAAoJEK0ScMxN0CebGHUH/RtouOlWl6To97tQsTJUq/2YwmRpFOsvV0/zCX4fKBGAbeZi
+ VaELSt2+3UEErA+n8HwbQmjJ6IrdhA9GustOpOyCcbLVSMwql/OlAwBtDzCcC8dTU4zcuY2a
+ rGG2A8i5krU85G9r1wowVcWZBsdmW7/dKiNoadLQiig4bHNiSaV4ograas5efyEjqTxiY+yG
+ hzPw5DK2kbp2co8iDF1vW0LWPeLFBinCgItcI9LvgHWaB3rwjOfvNpMn5m64SoQYHB8wbnid
+ erAjOzkBzmqnfS1tAUr8mtESStEwrEmNv0ZoA6S0Wt+c9pyTr+BpG4OFlhj7ZI+Eh7zOrr33
+ q9OBIdA=
+Message-ID: <729a0fb1-5432-e9f5-ed48-57088e303463@twiddle.net>
+Date: Thu, 7 May 2020 20:42:57 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200507114927.6733-6-lvivier@redhat.com>
+In-Reply-To: <alpine.DEB.2.21.2005071449350.26071@digraph.polyomino.org.uk>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 22:21:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
+ envelope-from=rth7680@gmail.com; helo=mail-pf1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_ENVFROM_END_DIGIT=0.25,
+ FREEMAIL_FORGED_FROMDOMAIN=0.001, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,308 +128,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
- David Hildenbrand <david@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Amit Shah <amit@kernel.org>,
- Max Reitz <mreitz@redhat.com>, Eric Auger <eric.auger@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: patchew-devel@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 5/7/20 7:57 AM, Joseph Myers wrote:
+> On Thu, 7 May 2020, no-reply@patchew.org wrote:
+> 
+>> === OUTPUT BEGIN ===
+>> 1/5 Checking commit 69eed0bcaaaf (target/i386: implement special cases for fxtract)
+>> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> 
+> I don't think any MAINTAINERS update is needed for a new testcase in an 
+> existing directory.
+> 
+>> ERROR: Use of volatile is usually wrong, please add a comment
+> 
+> I think the justification for volatile in such testcase code is obvious 
+> without comments in individual cases - to avoid any code movement or 
+> optimization that might break what the tests are intending to test (these 
+> tests are making heavy use of mixed C and inline asm to test how emulated 
+> instructions behave, including on input representations that are not valid 
+> long double values in the ABI and with the rounding precision changed 
+> behind the compiler's back).  I think making everything possibly relevant 
+> volatile in these tests is better than trying to produce a fragile 
+> argument that in fact certain data does not need to be volatile to avoid 
+> problematic code movement.
+> 
+>> ERROR: spaces required around that '-' (ctx:VxV)
+>> #139: FILE: tests/tcg/i386/test-i386-fxtract.c:80:
+>> +                      "0" (0x1p-16445L));
+>>                                 ^
+> 
+> No, this is a C99 hex float contstant, not a subtraction.  There are 
+> already such constants in tests/tcg/multiarch/float_helpers.c and 
+> tests/tcg/multiarch/float_madds.c at least, so I assume they are OK in 
+> QEMU floating-point tests and this style checker should not be objecting 
+> to them.
+> 
 
-On 2020/5/7 =E4=B8=8B=E5=8D=887:49, Laurent Vivier wrote:
-> This new command shows the information of a VirtQueue element.
->
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->   hw/virtio/virtio-stub.c |   9 +++
->   hw/virtio/virtio.c      | 130 ++++++++++++++++++++++++++++++++++++++++
->   qapi/virtio.json        |  94 +++++++++++++++++++++++++++++
->   3 files changed, 233 insertions(+)
->
-> diff --git a/hw/virtio/virtio-stub.c b/hw/virtio/virtio-stub.c
-> index 3c1bf172acf6..8275e31430e7 100644
-> --- a/hw/virtio/virtio-stub.c
-> +++ b/hw/virtio/virtio-stub.c
-> @@ -23,3 +23,12 @@ VirtQueueStatus *qmp_x_debug_virtio_queue_status(const=
- char *path,
->   {
->       return qmp_virtio_unsupported(errp);
->   }
-> +
-> +VirtioQueueElement *qmp_x_debug_virtio_queue_element(const char* path,
-> +                                                     uint16_t queue,
-> +                                                     bool has_index,
-> +                                                     uint16_t index,
-> +                                                     Error **errp)
-> +{
-> +    return qmp_virtio_unsupported(errp);
-> +}
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 57552bf05014..66dc2cef1b39 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -4033,6 +4033,136 @@ VirtioStatus *qmp_x_debug_virtio_status(const cha=
-r* path, Error **errp)
->       return status;
->   }
->  =20
-> +static VirtioRingDescFlagsList *qmp_decode_vring_desc_flags(uint16_t fla=
-gs)
-> +{
-> +    VirtioRingDescFlagsList *list =3D NULL;
-> +    VirtioRingDescFlagsList *node;
-> +    int i;
-> +    struct {
-> +        uint16_t flag;
-> +        VirtioRingDescFlags value;
-> +    } map[] =3D {
-> +        { VRING_DESC_F_NEXT, VIRTIO_RING_DESC_FLAGS_NEXT },
-> +        { VRING_DESC_F_WRITE, VIRTIO_RING_DESC_FLAGS_WRITE },
-> +        { VRING_DESC_F_INDIRECT, VIRTIO_RING_DESC_FLAGS_INDIRECT },
-> +        { 1 << VRING_PACKED_DESC_F_AVAIL, VIRTIO_RING_DESC_FLAGS_AVAIL }=
-,
-> +        { 1 << VRING_PACKED_DESC_F_USED, VIRTIO_RING_DESC_FLAGS_USED },
-> +        { 0, -1 }
-> +    };
-> +
-> +    for (i =3D 0; map[i].flag; i++) {
-> +        if ((map[i].flag & flags) =3D=3D 0) {
-> +            continue;
-> +        }
-> +        node =3D g_malloc0(sizeof(VirtioRingDescFlagsList));
-> +        node->value =3D map[i].value;
-> +        node->next =3D list;
-> +        list =3D node;
-> +    }
-> +
-> +    return list;
-> +}
-> +
-> +VirtioQueueElement *qmp_x_debug_virtio_queue_element(const char* path,
-> +                                                     uint16_t queue,
-> +                                                     bool has_index,
-> +                                                     uint16_t index,
-> +                                                     Error **errp)
-> +{
-> +    VirtIODevice *vdev;
-> +    VirtQueue *vq;
-> +    VirtioQueueElement *element =3D NULL;
-> +
-> +    vdev =3D virtio_device_find(path);
-> +    if (vdev =3D=3D NULL) {
-> +        error_setg(errp, "Path %s is not a VirtIO device", path);
-> +        return NULL;
-> +    }
-> +
-> +    if (queue >=3D VIRTIO_QUEUE_MAX || !virtio_queue_get_num(vdev, queue=
-)) {
-> +        error_setg(errp, "Invalid virtqueue number %d", queue);
-> +        return NULL;
-> +    }
-> +    vq =3D &vdev->vq[queue];
-> +
-> +    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-> +        error_setg(errp, "Packed ring not supported");
-> +        return NULL;
-> +    } else {
-> +        unsigned int head, i, max;
-> +        VRingMemoryRegionCaches *caches;
-> +        MemoryRegionCache indirect_desc_cache =3D MEMORY_REGION_CACHE_IN=
-VALID;
-> +        MemoryRegionCache *desc_cache;
-> +        VRingDesc desc;
-> +        VirtioRingDescList *list =3D NULL;
-> +        VirtioRingDescList *node;
-> +        int rc;
-> +
-> +        RCU_READ_LOCK_GUARD();
-> +
-> +        max =3D vq->vring.num;
-> +
-> +        if (!has_index) {
-> +            head =3D vring_avail_ring(vq, vq->last_avail_idx % vq->vring=
-.num);
-> +        } else {
-> +            head =3D vring_avail_ring(vq, index % vq->vring.num);
-> +        }
-> +        i =3D head;
-> +
-> +        caches =3D vring_get_region_caches(vq);
-> +        if (!caches) {
-> +            error_setg(errp, "Region caches not initialized");
-> +            return NULL;
-> +        }
-> +
-> +        if (caches->desc.len < max * sizeof(VRingDesc)) {
-> +            error_setg(errp, "Cannot map descriptor ring");
-> +            return NULL;
-> +        }
-> +
-> +        desc_cache =3D &caches->desc;
-> +        vring_split_desc_read(vdev, &desc, desc_cache, i);
-> +        if (desc.flags & VRING_DESC_F_INDIRECT) {
-> +            int64_t len;
-> +
-> +            len =3D address_space_cache_init(&indirect_desc_cache, vdev-=
->dma_as,
-> +                                           desc.addr, desc.len, false);
-> +            desc_cache =3D &indirect_desc_cache;
-> +            if (len < desc.len) {
-> +                error_setg(errp, "Cannot map indirect buffer");
-> +                goto done;
-> +            }
-> +            i =3D 0;
-> +            vring_split_desc_read(vdev, &desc, desc_cache, i);
-> +        }
-> +
-> +        element =3D g_new0(VirtioQueueElement, 1);
-> +        element->index =3D head;
-> +        element->ndescs =3D 0;
-> +
-> +        do {
-> +            node =3D g_new0(VirtioRingDescList, 1);
-> +            node->value =3D g_new0(VirtioRingDesc, 1);
-> +            node->value->addr =3D desc.addr;
-> +            node->value->len =3D desc.len;
-> +            node->value->flags =3D qmp_decode_vring_desc_flags(desc.flag=
-s);
-> +            node->next =3D list;
-> +            list =3D node;
-> +
-> +            element->ndescs++;
-> +
-> +            rc =3D virtqueue_split_read_next_desc(vdev, &desc, desc_cach=
-e,
-> +                                                max, &i);
-> +        } while (rc =3D=3D VIRTQUEUE_READ_DESC_MORE);
+Correct, these are all false positives.
 
 
-It's better to limit the maximum number of iterations here to e.g=20
-vring.num. A buggy driver may produce a infinite loop here.
-
-Thanks
-
-
-> +
-> +        element->descs =3D list;
-> +done:
-> +        address_space_cache_destroy(&indirect_desc_cache);
-> +    }
-> +
-> +    return element;
-> +}
-> +
->   static const TypeInfo virtio_device_info =3D {
->       .name =3D TYPE_VIRTIO_DEVICE,
->       .parent =3D TYPE_DEVICE,
-> diff --git a/qapi/virtio.json b/qapi/virtio.json
-> index 43c234a9fc69..a55103dca780 100644
-> --- a/qapi/virtio.json
-> +++ b/qapi/virtio.json
-> @@ -406,3 +406,97 @@
->     'data': { 'path': 'str', 'queue': 'uint16' },
->     'returns': 'VirtQueueStatus'
->   }
-> +
-> +##
-> +# @VirtioRingDescFlags:
-> +#
-> +# An enumeration of the virtio ring descriptor flags
-> +#
-> +# Since: 5.1
-> +#
-> +##
-> +
-> +{ 'enum': 'VirtioRingDescFlags',
-> +  'data': [ 'next', 'write', 'indirect', 'avail', 'used' ]
-> +}
-> +
-> +##
-> +# @VirtioRingDesc:
-> +#
-> +# @addr: guest physical address of the descriptor data
-> +#
-> +# @len: length of the descriptor data
-> +#
-> +# @flags: descriptor flags
-> +#
-> +# Since: 5.1
-> +#
-> +##
-> +
-> +{ 'struct': 'VirtioRingDesc',
-> +  'data': {
-> +    'addr': 'uint64',
-> +    'len': 'uint32',
-> +    'flags': [ 'VirtioRingDescFlags' ]
-> +  }
-> +}
-> +
-> +##
-> +# @VirtioQueueElement:
-> +#
-> +# @index: index of the element in the queue
-> +#
-> +# @ndescs: number of descriptors
-> +#
-> +# @descs: list of the descriptors
-> +#
-> +# Since: 5.1
-> +#
-> +##
-> +
-> +{ 'struct': 'VirtioQueueElement',
-> +  'data': {
-> +    'index': 'uint32',
-> +    'ndescs': 'uint32',
-> +    'descs': ['VirtioRingDesc']
-> +  }
-> +}
-> +
-> +##
-> +# @x-debug-virtio-queue-element:
-> +#
-> +# Return the information about an element queue (by default head)
-> +#
-> +# @path: QOBject path of the VirtIODevice
-> +#
-> +# @queue: queue number to examine
-> +#
-> +# @index: the index in the queue, by default head
-> +#
-> +# Returns: the element information
-> +#
-> +# Since: 5.1
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "x-debug-virtio-queue-element",
-> +#      "arguments": {
-> +#          "path": "/machine/peripheral-anon/device[3]/virtio-backend",
-> +#          "queue": 0
-> +#      }
-> +#   }
-> +# -> { "return": {
-> +#         "index": 24,
-> +#         "ndescs": 1,
-> +#         "descs": [
-> +#             { "flags": ["write"], "len": 1536, "addr": 2027557376 }
-> +#         ]
-> +#      }
-> +#   }
-> +#
-> +##
-> +
-> +{ 'command': 'x-debug-virtio-queue-element',
-> +  'data': { 'path': 'str', 'queue': 'uint16', '*index': 'uint16' },
-> +  'returns': 'VirtioQueueElement'
-> +}
-
+r~
 
