@@ -7,61 +7,62 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BBB0C38A2A
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 12:45:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB64FC47254
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 12:48:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63FF4208D6
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 12:45:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7B4E624966
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 12:48:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EY2ifV02"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63FF4208D6
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f7RFMJoL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B4E624966
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX2NY-0005mX-JH
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 08:45:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49184)
+	id 1jX2Q9-0001Wb-D0
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 08:48:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49206)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX2KB-0008RB-Op
- for qemu-devel@nongnu.org; Fri, 08 May 2020 08:41:55 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25608
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX2KE-0008Ui-F1
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 08:42:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38505
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX2KA-0007xT-LV
- for qemu-devel@nongnu.org; Fri, 08 May 2020 08:41:55 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX2KD-0007yk-NJ
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 08:41:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588941714;
+ s=mimecast20190719; t=1588941716;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=TszdQ2ktFpW0gdOfVVNS21f7NO5mQ6NURobsLnXgct0=;
- b=EY2ifV02rK0sN9tAC7WylUUQ+qRwdq/FOo1Y68v7ZFkyj3dg3SEwaER/8kL07vHoj939/2
- MQA3oVWIVff1SANbI0woFUeEV8QOs3kXfWT5OiA6VcU1gABxVlLVTJTJfaZzse/xM8wU9J
- xwy0vMaS8oqHxuV6L7fofZpgakIm7M4=
+ bh=7oq2a3siUA30JcZw3UcGIEgLFEu65ZoCtYNkgQf0L4o=;
+ b=f7RFMJoLusZQciIMyZnqEHRb9pxLRJb06w59t/cVeoijmkss/EBfQp+tJmb7ctH/5AdgBe
+ EFV1nVXRb5JuQzUJH6hYQRe7oqnrAoM0MnjA26gs3tvvOqWc/DWX7hv1wJ2+H5fURbyEf+
+ JHeWrGhQSiCNBLSnsAGfmvAMn7e7DoA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-282-ZCvniW-pOMeKyG36HoZguQ-1; Fri, 08 May 2020 08:41:49 -0400
-X-MC-Unique: ZCvniW-pOMeKyG36HoZguQ-1
+ us-mta-301-yQ6SKZ8oNa--zRBpVDx7BA-1; Fri, 08 May 2020 08:41:52 -0400
+X-MC-Unique: yQ6SKZ8oNa--zRBpVDx7BA-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E832A835B8B;
- Fri,  8 May 2020 12:41:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8744A835B8B;
+ Fri,  8 May 2020 12:41:51 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-113-190.ams2.redhat.com
  [10.36.113.190])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EA96619167;
- Fri,  8 May 2020 12:41:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 887C319167;
+ Fri,  8 May 2020 12:41:50 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 05/30] iotests/055: refactor compressed backup to vmdk
-Date: Fri,  8 May 2020 14:41:10 +0200
-Message-Id: <20200508124135.252565-6-kwolf@redhat.com>
+Subject: [PULL 07/30] iotests/109: mark required formats as required to
+ support whitelisting
+Date: Fri,  8 May 2020 14:41:12 +0200
+Message-Id: <20200508124135.252565-8-kwolf@redhat.com>
 In-Reply-To: <20200508124135.252565-1-kwolf@redhat.com>
 References: <20200508124135.252565-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -70,10 +71,10 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 08:00:48
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 02:23:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -100,175 +101,25 @@ Sender: "Qemu-devel"
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Instead of looping in each test, let's better refactor vmdk target case
-as a subclass.
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20200430124713.3067-6-vsementsov@virtuozzo.com>
+Message-Id: <20200430124713.3067-8-vsementsov@virtuozzo.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/055     | 70 ++++++++++++++++++++------------------
- tests/qemu-iotests/055.out |  4 +--
- 2 files changed, 39 insertions(+), 35 deletions(-)
+ tests/qemu-iotests/109 | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
-index 4175fff5e4..d9e8985167 100755
---- a/tests/qemu-iotests/055
-+++ b/tests/qemu-iotests/055
-@@ -450,10 +450,9 @@ class TestSingleTransaction(iotests.QMPTestCase):
-         self.assert_no_active_block_jobs()
+diff --git a/tests/qemu-iotests/109 b/tests/qemu-iotests/109
+index a51dd84b3d..5bc2e9b001 100755
+--- a/tests/qemu-iotests/109
++++ b/tests/qemu-iotests/109
+@@ -42,6 +42,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ _supported_fmt raw
+ _supported_proto file
+ _supported_os Linux
++_require_drivers qcow qcow2 qed vdi vmdk vpc
 =20
+ qemu_comm_method=3Dqmp
 =20
--class TestDriveCompression(iotests.QMPTestCase):
-+class TestCompressedToQcow2(iotests.QMPTestCase):
-     image_len =3D 64 * 1024 * 1024 # MB
--    fmt_supports_compression =3D [{'type': 'qcow2', 'args': ()},
--                                {'type': 'vmdk', 'args': ('-o', 'subformat=
-=3DstreamOptimized')}]
-+    target_fmt =3D {'type': 'qcow2', 'args': ()}
-=20
-     def tearDown(self):
-         self.vm.shutdown()
-@@ -463,19 +462,20 @@ class TestDriveCompression(iotests.QMPTestCase):
-         except OSError:
-             pass
-=20
--    def do_prepare_drives(self, fmt, args, attach_target):
-+    def do_prepare_drives(self, attach_target):
-         self.vm =3D iotests.VM().add_drive('blkdebug::' + test_img)
-=20
--        qemu_img('create', '-f', fmt, blockdev_target_img,
--                 str(TestDriveCompression.image_len), *args)
-+        qemu_img('create', '-f', self.target_fmt['type'], blockdev_target_=
-img,
-+                 str(self.image_len), *self.target_fmt['args'])
-         if attach_target:
-             self.vm.add_drive(blockdev_target_img,
--                              img_format=3Dfmt, interface=3D"none")
-+                              img_format=3Dself.target_fmt['type'],
-+                              interface=3D"none")
-=20
-         self.vm.launch()
-=20
--    def do_test_compress_complete(self, cmd, format, attach_target, **args=
-):
--        self.do_prepare_drives(format['type'], format['args'], attach_targ=
-et)
-+    def do_test_compress_complete(self, cmd, attach_target, **args):
-+        self.do_prepare_drives(attach_target)
-=20
-         self.assert_no_active_block_jobs()
-=20
-@@ -486,21 +486,21 @@ class TestDriveCompression(iotests.QMPTestCase):
-=20
-         self.vm.shutdown()
-         self.assertTrue(iotests.compare_images(test_img, blockdev_target_i=
-mg,
--                                               iotests.imgfmt, format['typ=
-e']),
-+                                               iotests.imgfmt,
-+                                               self.target_fmt['type']),
-                         'target image does not match source after backup')
-=20
-     def test_complete_compress_drive_backup(self):
--        for format in TestDriveCompression.fmt_supports_compression:
--            self.do_test_compress_complete('drive-backup', format, False,
--                                           target=3Dblockdev_target_img, m=
-ode=3D'existing')
-+        self.do_test_compress_complete('drive-backup', False,
-+                                       target=3Dblockdev_target_img,
-+                                       mode=3D'existing')
-=20
-     def test_complete_compress_blockdev_backup(self):
--        for format in TestDriveCompression.fmt_supports_compression:
--            self.do_test_compress_complete('blockdev-backup', format, True=
-,
--                                           target=3D'drive1')
-+        self.do_test_compress_complete('blockdev-backup',
-+                                       True, target=3D'drive1')
-=20
--    def do_test_compress_cancel(self, cmd, format, attach_target, **args):
--        self.do_prepare_drives(format['type'], format['args'], attach_targ=
-et)
-+    def do_test_compress_cancel(self, cmd, attach_target, **args):
-+        self.do_prepare_drives(attach_target)
-=20
-         self.assert_no_active_block_jobs()
-=20
-@@ -514,17 +514,16 @@ class TestDriveCompression(iotests.QMPTestCase):
-         self.vm.shutdown()
-=20
-     def test_compress_cancel_drive_backup(self):
--        for format in TestDriveCompression.fmt_supports_compression:
--            self.do_test_compress_cancel('drive-backup', format, False,
--                                         target=3Dblockdev_target_img, mod=
-e=3D'existing')
-+        self.do_test_compress_cancel('drive-backup', False,
-+                                     target=3Dblockdev_target_img,
-+                                     mode=3D'existing')
-=20
-     def test_compress_cancel_blockdev_backup(self):
--       for format in TestDriveCompression.fmt_supports_compression:
--            self.do_test_compress_cancel('blockdev-backup', format, True,
--                                         target=3D'drive1')
-+        self.do_test_compress_cancel('blockdev-backup', True,
-+                                     target=3D'drive1')
-=20
--    def do_test_compress_pause(self, cmd, format, attach_target, **args):
--        self.do_prepare_drives(format['type'], format['args'], attach_targ=
-et)
-+    def do_test_compress_pause(self, cmd, attach_target, **args):
-+        self.do_prepare_drives(attach_target)
-=20
-         self.assert_no_active_block_jobs()
-=20
-@@ -550,18 +549,23 @@ class TestDriveCompression(iotests.QMPTestCase):
-=20
-         self.vm.shutdown()
-         self.assertTrue(iotests.compare_images(test_img, blockdev_target_i=
-mg,
--                                               iotests.imgfmt, format['typ=
-e']),
-+                                               iotests.imgfmt,
-+                                               self.target_fmt['type']),
-                         'target image does not match source after backup')
-=20
-     def test_compress_pause_drive_backup(self):
--        for format in TestDriveCompression.fmt_supports_compression:
--            self.do_test_compress_pause('drive-backup', format, False,
--                                        target=3Dblockdev_target_img, mode=
-=3D'existing')
-+        self.do_test_compress_pause('drive-backup', False,
-+                                    target=3Dblockdev_target_img,
-+                                    mode=3D'existing')
-=20
-     def test_compress_pause_blockdev_backup(self):
--        for format in TestDriveCompression.fmt_supports_compression:
--            self.do_test_compress_pause('blockdev-backup', format, True,
--                                        target=3D'drive1')
-+        self.do_test_compress_pause('blockdev-backup', True,
-+                                    target=3D'drive1')
-+
-+
-+class TestCompressedToVmdk(TestCompressedToQcow2):
-+    target_fmt =3D {'type': 'vmdk', 'args': ('-o', 'subformat=3DstreamOpti=
-mized')}
-+
-=20
- if __name__ =3D=3D '__main__':
-     iotests.main(supported_fmts=3D['raw', 'qcow2'],
-diff --git a/tests/qemu-iotests/055.out b/tests/qemu-iotests/055.out
-index 5ce2f9a2ed..5c26d15c0d 100644
---- a/tests/qemu-iotests/055.out
-+++ b/tests/qemu-iotests/055.out
-@@ -1,5 +1,5 @@
--..............................
-+....................................
- ----------------------------------------------------------------------
--Ran 30 tests
-+Ran 36 tests
-=20
- OK
 --=20
 2.25.3
 
