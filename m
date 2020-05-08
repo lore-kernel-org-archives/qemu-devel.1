@@ -2,69 +2,89 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C297C38A2A
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 11:46:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A42FAC38A2A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 11:48:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F9D3208DB
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 11:46:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C9C2206D5
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 11:48:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="ZjBg/mQn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F9D3208DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mNgMV+3t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C9C2206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX1SW-0005Zx-Fs
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 07:46:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37266)
+	id 1jX1Ue-0007kf-KQ
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 07:48:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37862)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jX1R0-00044v-GS; Fri, 08 May 2020 07:44:54 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:43604)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jX1Sx-0006QV-VX
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 07:46:55 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35687)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jX1Qy-00083t-MC; Fri, 08 May 2020 07:44:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=f2k3CoJ7c9Fa+epKJZzqwwWFio7++7SFTro/IdOcniQ=; 
- b=ZjBg/mQn7BJ3TBLqp6c+Hzo5vvKiREggwFNC2cwSy6d68vOuHV6zBOt/zhnyZKPOTM2cIVk7nlAESTH7lQtm/3x5FTXDTgF1XZLOaIaUU7ei1kvTOK6h/9hvNlOBDXdDllqcyHjaDT0fTbrLFDM4x6zNSliX300M6TNTdPKIKZIxTEOpulGyAoRriat+b2aJfE6h0CqDa3Iiu3V+RE68Efo4YzyclVg5r28ksH47nEblfbfeldcF5R4KFlRxeSaldhjcngV8apd9u9WUfUGrXZLvKCCkMPT/AQO4si1tZEPZm63/WezrhSOg1qyUNE/Bj+QKj8zDFx4nVlxglI3Gsg==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1jX1Qu-0001aN-My; Fri, 08 May 2020 13:44:48 +0200
-Received: from berto by mail.igalia.com with local (Exim)
- id 1jX1Qu-0005K4-DN; Fri, 08 May 2020 13:44:48 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Subject: Re: [PATCH v5 20/31] qcow2: Add subcluster support to
- qcow2_get_host_offset()
-In-Reply-To: <80306243-b500-6977-3fcd-82853c905105@redhat.com>
-References: <cover.1588699789.git.berto@igalia.com>
- <d4b41accb4c52f31dc7faa3b58084062ac4407f4.1588699789.git.berto@igalia.com>
- <80306243-b500-6977-3fcd-82853c905105@redhat.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Fri, 08 May 2020 13:44:48 +0200
-Message-ID: <w518si2bqhb.fsf@maestria.local.igalia.com>
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jX1Sw-0007yI-62
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 07:46:55 -0400
+Received: by mail-wm1-x341.google.com with SMTP id r26so10285552wmh.0
+ for <qemu-devel@nongnu.org>; Fri, 08 May 2020 04:46:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Zeg1isCk/qA15Nm8XJ//2/bcp2eI0rlW3j2tOTx8cFg=;
+ b=mNgMV+3to1jAspW72+9rQCzpUFmL0hFu8D4NSJ8zZIzOTKIkfwDygd2ZDsGbNsIa5n
+ 4ETE4ol86MfEZiXplLnakmSlK3LmKqlElweTKKbkf8D2sPCFsgVoL9Qtwud/AaTFiTtM
+ haznP9anbYkKhm6aviLXazBGJGV3eek9G3a189H2I+n4bGu0yU4ur5Hc4VjyhsbkBkWZ
+ sIFK6xxY60XnoXHFciqYPpq851WJLz0ER6ReF5UP2bW64EaQz93dSF/JKSo/gCcpWpwR
+ y4jAbR9QUfNF/H9wOu8lk7biL0M5fPe5DVTQCkutPCnfMAET2hPDonKNbsGqSUZSs68G
+ XsbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Zeg1isCk/qA15Nm8XJ//2/bcp2eI0rlW3j2tOTx8cFg=;
+ b=cLeUqs3vtw948eDPwHLrhAFd+IEp5fZQ/xB5Id4RTm79wzNbZmjnOfucxOZlt2X8Ge
+ S4+BwUVoen32YraAqT4R0ZzSIdDF6y8zz7YQ3Nr1fGlgjV9K8sgixWhZQ7NTBwnnFUvv
+ hMscEfKWi2xgDZLjEonDGkBDHW6Em1VywOXDbnYzigTfcMirbggx8rX8guelcbV0WjEi
+ jBk47vNlqYE73tDg/+flDqlhgNCFojDGbXiRe5AtkXmD1gwBV66ivm5/g2nX3g8Xa0po
+ onXKqb5fjoo0iXhgaZDWCDEwNR6AGT2qmACalu9qKww8beme/CHXLF1PyBi8eTTT9VCS
+ ++Iw==
+X-Gm-Message-State: AGi0PuYSpeBP/fufYRDg/ZffCGJnwWELcsgiq4/5lASsmbJpIm5Fy7Ux
+ Ob7hSsNLGUS7ZV+xv3zwQLcYJkL11+keq350r3Q=
+X-Google-Smtp-Source: APiQypJ3a/GnVTNavr/YqLa//bJaveHv64RQQCCDMj1MEEaZFVw5xhyEagcqDZxhFDFslNNb+pWju0btFqaBPQX2WdA=
+X-Received: by 2002:a1c:f211:: with SMTP id s17mr17313372wmc.168.1588938412505; 
+ Fri, 08 May 2020 04:46:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
- helo=fanzine.igalia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 07:44:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
+References: <1588500367-1056-1-git-send-email-chenhc@lemote.com>
+ <1588500367-1056-14-git-send-email-chenhc@lemote.com>
+In-Reply-To: <1588500367-1056-14-git-send-email-chenhc@lemote.com>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Fri, 8 May 2020 13:46:39 +0200
+Message-ID: <CAHiYmc4sNYYO=diSrXFUyWY15FeyNPiOXqQStnnEMF9As7h=QA@mail.gmail.com>
+Subject: Re: [PATCH V3 13/14] KVM: MIPS: Add more MMIO load/store instructions
+ emulation
+To: Huacai Chen <chenhc@lemote.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -78,138 +98,652 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>, kvm@vger.kernel.org,
+ Huacai Chen <chenhuacai@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Fuxin Zhang <zhangfx@lemote.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ linux-mips@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed 06 May 2020 07:55:29 PM CEST, Eric Blake wrote:
-> On 5/5/20 12:38 PM, Alberto Garcia wrote:
->> The logic of this function remains pretty much the same, except that
->> it uses count_contiguous_subclusters(), which combines the logic of
->> count_contiguous_clusters() / count_contiguous_clusters_unallocated()
->> and checks individual subclusters.
+=D0=BD=D0=B5=D0=B4, 3. =D0=BC=D0=B0=D1=98 2020. =D1=83 12:16 Huacai Chen <c=
+henhc@lemote.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=
+=D0=BB=D0=B0:
 >
-> Maybe mention that qcow2_cluster_to_subcluster_type() is now inlined 
-> into its lone remaining caller.
-
-Ok.
-
->> +static int count_contiguous_subclusters(BlockDriverState *bs, int nb_clusters,
->> +                                        unsigned sc_index, uint64_t *l2_slice,
->> +                                        int l2_index)
->>   {
+> This patch add more MMIO load/store instructions emulation, which can
+> be observed in QXL and some other device drivers:
 >
->> +
->> +    assert(type != QCOW2_SUBCLUSTER_INVALID); /* The caller should check this */
->> +    assert(l2_index + nb_clusters <= s->l2_size);
->> +
->> +    if (type == QCOW2_SUBCLUSTER_COMPRESSED) {
->> +        /* Compressed clusters are always processed one by one */
->> +        return s->subclusters_per_cluster - sc_index;
+> 1, LWL, LWR, LDW, LDR, SWL, SWR, SDL and SDR for all MIPS;
+> 2, GSLBX, GSLHX, GSLWX, GSLDX, GSSBX, GSSHX, GSSWX and GSSDX for
+>    Loongson-3.
 >
-> Should this assert(sc_index == 0)?
-
-No. The documentation of the function says "Compressed clusters are
-always processed one by one but for the purpose of this count they are
-treated as if they were divided into subclusters of size
-s->subcluster_size".
-
-Let's say we have a compressed cluster at offset 0 (size 64k) and we
-perform a read request with offset=32k, size=8k.
-
-qcow2_co_preadv_part() calls qcow2_get_host_offset() and asks "How many
-bytes up to 8k can we read in one go at offset 32k?".
-
-The offset is 32k so the first subcluster is #16. And this function
-(count_contiguous_subclusters()) is asked "how many contiguous
-subclusters do we have starting at subcluster #16?" and the answer is
-32 - 16 = 16 subclusters.
-
-qcow2_get_host_offset() only needs 8k/2k = 4 subclusters, so it tells
-the original caller (qcow2_co_preadv_part()) "you can read all 8k in one
-go and the subcluster type is _COMPRESSED".
-
->>       for (i = 0; i < nb_clusters; i++) {
->> -        uint64_t entry = get_l2_entry(s, l2_slice, l2_index + i);
->> -        QCow2ClusterType type = qcow2_get_cluster_type(bs, entry);
->> -
->> -        if (type != wanted_type) {
->> -            break;
->> +        l2_entry = get_l2_entry(s, l2_slice, l2_index + i);
->> +        l2_bitmap = get_l2_bitmap(s, l2_slice, l2_index + i);
->> +        if (check_offset && expected_offset != (l2_entry & L2E_OFFSET_MASK)) {
->> +            return count;
->> +        }
->> +        for (j = (i == 0) ? sc_index : 0; j < s->subclusters_per_cluster; j++) {
->> +            if (qcow2_get_subcluster_type(bs, l2_entry, l2_bitmap, j) != type) {
->> +                return count;
->> +            }
+> Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> ---
+>  arch/mips/kvm/emulate.c | 480 ++++++++++++++++++++++++++++++++++++++++++=
++++++-
+>  1 file changed, 470 insertions(+), 10 deletions(-)
 >
-> This really is checking that sub-clusters have the exact same type.
-
-Correct.
-
->> @@ -604,24 +604,17 @@ int qcow2_get_host_offset(BlockDriverState *bs, uint64_t offset,
->>               ret = -EIO;
->>               goto fail;
->>           }
->> -        /* Compressed clusters can only be processed one by one */
->> -        c = 1;
->>           *host_offset = l2_entry & L2E_COMPRESSED_OFFSET_SIZE_MASK;
->>           break;
->> -    case QCOW2_CLUSTER_ZERO_PLAIN:
->> -    case QCOW2_CLUSTER_UNALLOCATED:
->> -        /* how many empty clusters ? */
->> -        c = count_contiguous_clusters_unallocated(bs, nb_clusters,
->> -                                                  l2_slice, l2_index, type);
+> diff --git a/arch/mips/kvm/emulate.c b/arch/mips/kvm/emulate.c
+> index 3946499..71316fa 100644
+> --- a/arch/mips/kvm/emulate.c
+> +++ b/arch/mips/kvm/emulate.c
+> @@ -1604,6 +1604,7 @@ enum emulation_result kvm_mips_emulate_store(union =
+mips_instruction inst,
+>         enum emulation_result er;
+>         u32 rt;
+>         void *data =3D run->mmio.data;
+> +       unsigned int imme;
+>         unsigned long curr_pc;
 >
-> The old code was counting how many contiguous clusters has similar 
-> types, coalescing ranges of two different cluster types into one 
-> nb_clusters result.
-
-Not really. The old code had three different cases in the switch()
-block:
-
-- Compressed clusters: return always 1.
-
-- Unallocated / zero_plain: count the number of clusters of the exact
-  same type (one of the parameters was 'wanted_type').
-
-- Normal / zero_alloc: count the number of clusters of type normal or
-  zero_alloc that are contiguous on the image file **but stop** if the
-  QCOW_OFLAG_ZERO flag changes. In other words, count contiguous
-  clusters of the same type.
-
-The new code simply merges all three cases in the same function. It
-could be done even without having subclusters.
-
-Plus, the old function was also returning the cluster type, so it had to
-be the same one for the whole region.
-
->>           if (offset_into_cluster(s, host_cluster_offset)) {
->>               qcow2_signal_corruption(bs, true, -1, -1,
->>                                       "Cluster allocation offset %#"
->> @@ -647,9 +640,11 @@ int qcow2_get_host_offset(BlockDriverState *bs, uint64_t offset,
->>           abort();
->>       }
->>   
->> +    sc = count_contiguous_subclusters(bs, nb_clusters, sc_index,
->> +                                      l2_slice, l2_index);
+>         /*
+> @@ -1661,6 +1662,211 @@ enum emulation_result kvm_mips_emulate_store(unio=
+n mips_instruction inst,
+>                           vcpu->arch.gprs[rt], *(u8 *)data);
+>                 break;
 >
-> But the new code is stopping at the first different subcluster type, 
-> rather than trying to coalesce as many compatible types into one larger 
-> nb_clusters.  When coupled with patch 19, that factors into my concern 
-> over whether patch 19 needed to check for INVALID clusters in the 
-> middle, or whether its fail: label was unreachable.  But it also means 
-> that you are potentially fragmenting the write in more places (every 
-> time a subcluster status changes) rather than coalescing similar status, 
-> the way the old code used to operate.
+> +       case swl_op:
+> +               run->mmio.phys_addr =3D kvm_mips_callbacks->gva_to_gpa(
+> +                                       vcpu->arch.host_cp0_badvaddr) & (=
+~0x3);
+> +               run->mmio.len =3D 4;
+> +               imme =3D vcpu->arch.host_cp0_badvaddr & 0x3;
+> +               switch (imme) {
+> +               case 0:
+> +                       *(u32 *)data =3D ((*(u32 *)data) & 0xffffff00) |
+> +                                       (vcpu->arch.gprs[rt] >> 24);
+> +                       break;
+> +               case 1:
+> +                       *(u32 *)data =3D ((*(u32 *)data) & 0xffff0000) |
+> +                                       (vcpu->arch.gprs[rt] >> 16);
+> +                       break;
+> +               case 2:
+> +                       *(u32 *)data =3D ((*(u32 *)data) & 0xff000000) |
+> +                                       (vcpu->arch.gprs[rt] >> 8);
+> +                       break;
+> +               case 3:
+> +                       *(u32 *)data =3D vcpu->arch.gprs[rt];
+> +                       break;
+> +               default:
+> +                       break;
+> +               }
+> +
+> +               kvm_debug("[%#lx] OP_SWL: eaddr: %#lx, gpr: %#lx, data: %=
+#x\n",
+> +                         vcpu->arch.pc, vcpu->arch.host_cp0_badvaddr,
+> +                         vcpu->arch.gprs[rt], *(u32 *)data);
+> +               break;
+> +
+> +       case swr_op:
+> +               run->mmio.phys_addr =3D kvm_mips_callbacks->gva_to_gpa(
+> +                                       vcpu->arch.host_cp0_badvaddr) & (=
+~0x3);
+> +               run->mmio.len =3D 4;
+> +               imme =3D vcpu->arch.host_cp0_badvaddr & 0x3;
+> +               switch (imme) {
+> +               case 0:
+> +                       *(u32 *)data =3D vcpu->arch.gprs[rt];
+> +                       break;
+> +               case 1:
+> +                       *(u32 *)data =3D ((*(u32 *)data) & 0xff) |
+> +                                       (vcpu->arch.gprs[rt] << 8);
+> +                       break;
+> +               case 2:
+> +                       *(u32 *)data =3D ((*(u32 *)data) & 0xffff) |
+> +                                       (vcpu->arch.gprs[rt] << 16);
+> +                       break;
+> +               case 3:
+> +                       *(u32 *)data =3D ((*(u32 *)data) & 0xffffff) |
+> +                                       (vcpu->arch.gprs[rt] << 24);
+> +                       break;
+> +               default:
+> +                       break;
+> +               }
+> +
+> +               kvm_debug("[%#lx] OP_SWR: eaddr: %#lx, gpr: %#lx, data: %=
+#x\n",
+> +                         vcpu->arch.pc, vcpu->arch.host_cp0_badvaddr,
+> +                         vcpu->arch.gprs[rt], *(u32 *)data);
+> +               break;
+> +
+> +       case sdl_op:
+> +               run->mmio.phys_addr =3D kvm_mips_callbacks->gva_to_gpa(
+> +                                       vcpu->arch.host_cp0_badvaddr) & (=
+~0x7);
+> +
+> +               run->mmio.len =3D 8;
+> +               imme =3D vcpu->arch.host_cp0_badvaddr & 0x7;
+> +               switch (imme) {
+> +               case 0:
+> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffffffffffff=
+ff00) |
+> +                                       ((vcpu->arch.gprs[rt] >> 56) & 0x=
+ff);
+> +                       break;
+> +               case 1:
+> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffffffffffff=
+0000) |
+> +                                       ((vcpu->arch.gprs[rt] >> 48) & 0x=
+ffff);
+> +                       break;
+> +               case 2:
+> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffffffffff00=
+0000) |
+> +                                       ((vcpu->arch.gprs[rt] >> 40) & 0x=
+ffffff);
+> +                       break;
+> +               case 3:
+> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffffffff0000=
+0000) |
+> +                                       ((vcpu->arch.gprs[rt] >> 32) & 0x=
+ffffffff);
+> +                       break;
+> +               case 4:
+> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffffff000000=
+0000) |
+> +                                       ((vcpu->arch.gprs[rt] >> 24) & 0x=
+ffffffffff);
+> +                       break;
+> +               case 5:
+> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffff00000000=
+0000) |
+> +                                       ((vcpu->arch.gprs[rt] >> 16) & 0x=
+ffffffffffff);
+> +                       break;
+> +               case 6:
+> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xff0000000000=
+0000) |
+> +                                       ((vcpu->arch.gprs[rt] >> 8) & 0xf=
+fffffffffffff);
+> +                       break;
+> +               case 7:
+> +                       *(u64 *)data =3D vcpu->arch.gprs[rt];
+> +                       break;
+> +               default:
+> +                       break;
+> +               }
+> +
+> +               kvm_debug("[%#lx] OP_SDL: eaddr: %#lx, gpr: %#lx, data: %=
+llx\n",
+> +                         vcpu->arch.pc, vcpu->arch.host_cp0_badvaddr,
+> +                         vcpu->arch.gprs[rt], *(u64 *)data);
+> +               break;
+> +
+> +       case sdr_op:
+> +               run->mmio.phys_addr =3D kvm_mips_callbacks->gva_to_gpa(
+> +                                       vcpu->arch.host_cp0_badvaddr) & (=
+~0x7);
+> +
+> +               run->mmio.len =3D 8;
+> +               imme =3D vcpu->arch.host_cp0_badvaddr & 0x7;
+> +               switch (imme) {
+> +               case 0:
+> +                       *(u64 *)data =3D vcpu->arch.gprs[rt];
+> +                       break;
+> +               case 1:
+> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xff) |
+> +                                       (vcpu->arch.gprs[rt] << 8);
+> +                       break;
+> +               case 2:
+> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffff) |
+> +                                       (vcpu->arch.gprs[rt] << 16);
+> +                       break;
+> +               case 3:
+> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffffff) |
+> +                                       (vcpu->arch.gprs[rt] << 24);
+> +                       break;
+> +               case 4:
+> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffffffff) |
+> +                                       (vcpu->arch.gprs[rt] << 32);
+> +                       break;
+> +               case 5:
+> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffffffffff) =
+|
+> +                                       (vcpu->arch.gprs[rt] << 40);
+> +                       break;
+> +               case 6:
+> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffffffffffff=
+) |
+> +                                       (vcpu->arch.gprs[rt] << 48);
+> +                       break;
+> +               case 7:
+> +                       *(u64 *)data =3D ((*(u64 *)data) & 0xffffffffffff=
+ff) |
+> +                                       (vcpu->arch.gprs[rt] << 56);
+> +                       break;
+> +               default:
+> +                       break;
+> +               }
+> +
+> +               kvm_debug("[%#lx] OP_SDR: eaddr: %#lx, gpr: %#lx, data: %=
+llx\n",
+> +                         vcpu->arch.pc, vcpu->arch.host_cp0_badvaddr,
+> +                         vcpu->arch.gprs[rt], *(u64 *)data);
+> +               break;
+> +
+> +#ifdef CONFIG_CPU_LOONGSON64
+> +       case sdc2_op:
+> +               rt =3D inst.loongson3_lsdc2_format.rt;
+> +               switch (inst.loongson3_lsdc2_format.opcode1) {
+> +               /*
+> +                * Loongson-3 overridden sdc2 instructions.
+> +                * opcode1              instruction
+> +                *   0x0          gssbx: store 1 bytes from GPR
+> +                *   0x1          gsshx: store 2 bytes from GPR
+> +                *   0x2          gsswx: store 4 bytes from GPR
+> +                *   0x3          gssdx: store 8 bytes from GPR
+> +                */
+> +               case 0x0:
+> +                       run->mmio.len =3D 1;
+> +                       *(u8 *)data =3D vcpu->arch.gprs[rt];
+> +
+> +                       kvm_debug("[%#lx] OP_GSSBX: eaddr: %#lx, gpr: %#l=
+x, data: %#x\n",
+> +                                 vcpu->arch.pc, vcpu->arch.host_cp0_badv=
+addr,
+> +                                 vcpu->arch.gprs[rt], *(u8 *)data);
+> +                       break;
+> +               case 0x1:
+> +                       run->mmio.len =3D 2;
+> +                       *(u16 *)data =3D vcpu->arch.gprs[rt];
+> +
+> +                       kvm_debug("[%#lx] OP_GSSSHX: eaddr: %#lx, gpr: %#=
+lx, data: %#x\n",
+> +                                 vcpu->arch.pc, vcpu->arch.host_cp0_badv=
+addr,
+> +                                 vcpu->arch.gprs[rt], *(u16 *)data);
+> +                       break;
+> +               case 0x2:
+> +                       run->mmio.len =3D 4;
+> +                       *(u32 *)data =3D vcpu->arch.gprs[rt];
+> +
+> +                       kvm_debug("[%#lx] OP_GSSWX: eaddr: %#lx, gpr: %#l=
+x, data: %#x\n",
+> +                                 vcpu->arch.pc, vcpu->arch.host_cp0_badv=
+addr,
+> +                                 vcpu->arch.gprs[rt], *(u32 *)data);
+> +                       break;
+> +               case 0x3:
+> +                       run->mmio.len =3D 8;
+> +                       *(u64 *)data =3D vcpu->arch.gprs[rt];
+> +
+> +                       kvm_debug("[%#lx] OP_GSSDX: eaddr: %#lx, gpr: %#l=
+x, data: %#llx\n",
+> +                                 vcpu->arch.pc, vcpu->arch.host_cp0_badv=
+addr,
+> +                                 vcpu->arch.gprs[rt], *(u64 *)data);
+> +                       break;
+> +               default:
+> +                       kvm_err("Godson Exteneded GS-Store not yet suppor=
+ted (inst=3D0x%08x)\n",
+> +                               inst.word);
+> +                       break;
+> +               }
+> +               break;
+> +#endif
+>         default:
+>                 kvm_err("Store not yet supported (inst=3D0x%08x)\n",
+>                         inst.word);
+> @@ -1695,6 +1901,7 @@ enum emulation_result kvm_mips_emulate_load(union m=
+ips_instruction inst,
+>         enum emulation_result er;
+>         unsigned long curr_pc;
+>         u32 op, rt;
+> +       unsigned int imme;
+>
+>         rt =3D inst.i_format.rt;
+>         op =3D inst.i_format.opcode;
+> @@ -1747,6 +1954,162 @@ enum emulation_result kvm_mips_emulate_load(union=
+ mips_instruction inst,
+>                 run->mmio.len =3D 1;
+>                 break;
+>
+> +       case lwl_op:
+> +               run->mmio.phys_addr =3D kvm_mips_callbacks->gva_to_gpa(
+> +                                       vcpu->arch.host_cp0_badvaddr) & (=
+~0x3);
+> +
+> +               run->mmio.len =3D 4;
+> +               imme =3D vcpu->arch.host_cp0_badvaddr & 0x3;
+> +               switch (imme) {
+> +               case 0:
+> +                       vcpu->mmio_needed =3D 3;  /* 1 byte */
+> +                       break;
+> +               case 1:
+> +                       vcpu->mmio_needed =3D 4;  /* 2 bytes */
+> +                       break;
+> +               case 2:
+> +                       vcpu->mmio_needed =3D 5;  /* 3 bytes */
+> +                       break;
+> +               case 3:
+> +                       vcpu->mmio_needed =3D 6;  /* 4 bytes */
+> +                       break;
+> +               default:
+> +                       break;
+> +               }
+> +               break;
+> +
+> +       case lwr_op:
+> +               run->mmio.phys_addr =3D kvm_mips_callbacks->gva_to_gpa(
+> +                                       vcpu->arch.host_cp0_badvaddr) & (=
+~0x3);
+> +
+> +               run->mmio.len =3D 4;
+> +               imme =3D vcpu->arch.host_cp0_badvaddr & 0x3;
+> +               switch (imme) {
+> +               case 0:
+> +                       vcpu->mmio_needed =3D 7;  /* 4 bytes */
+> +                       break;
+> +               case 1:
+> +                       vcpu->mmio_needed =3D 8;  /* 3 bytes */
+> +                       break;
+> +               case 2:
+> +                       vcpu->mmio_needed =3D 9;  /* 2 bytes */
+> +                       break;
+> +               case 3:
+> +                       vcpu->mmio_needed =3D 10; /* 1 byte */
+> +                       break;
+> +               default:
+> +                       break;
+> +               }
+> +               break;
+> +
+> +       case ldl_op:
+> +               run->mmio.phys_addr =3D kvm_mips_callbacks->gva_to_gpa(
+> +                                       vcpu->arch.host_cp0_badvaddr) & (=
+~0x7);
+> +
+> +               run->mmio.len =3D 8;
+> +               imme =3D vcpu->arch.host_cp0_badvaddr & 0x7;
+> +               switch (imme) {
+> +               case 0:
+> +                       vcpu->mmio_needed =3D 11; /* 1 byte */
+> +                       break;
+> +               case 1:
+> +                       vcpu->mmio_needed =3D 12; /* 2 bytes */
+> +                       break;
+> +               case 2:
+> +                       vcpu->mmio_needed =3D 13; /* 3 bytes */
+> +                       break;
+> +               case 3:
+> +                       vcpu->mmio_needed =3D 14; /* 4 bytes */
+> +                       break;
+> +               case 4:
+> +                       vcpu->mmio_needed =3D 15; /* 5 bytes */
+> +                       break;
+> +               case 5:
+> +                       vcpu->mmio_needed =3D 16; /* 6 bytes */
+> +                       break;
+> +               case 6:
+> +                       vcpu->mmio_needed =3D 17; /* 7 bytes */
+> +                       break;
+> +               case 7:
+> +                       vcpu->mmio_needed =3D 18; /* 8 bytes */
+> +                       break;
+> +               default:
+> +                       break;
+> +               }
+> +               break;
+> +
+> +       case ldr_op:
+> +               run->mmio.phys_addr =3D kvm_mips_callbacks->gva_to_gpa(
+> +                                       vcpu->arch.host_cp0_badvaddr) & (=
+~0x7);
+> +
+> +               run->mmio.len =3D 8;
+> +               imme =3D vcpu->arch.host_cp0_badvaddr & 0x7;
+> +               switch (imme) {
+> +               case 0:
+> +                       vcpu->mmio_needed =3D 19; /* 8 bytes */
+> +                       break;
+> +               case 1:
+> +                       vcpu->mmio_needed =3D 20; /* 7 bytes */
+> +                       break;
+> +               case 2:
+> +                       vcpu->mmio_needed =3D 21; /* 6 bytes */
+> +                       break;
+> +               case 3:
+> +                       vcpu->mmio_needed =3D 22; /* 5 bytes */
+> +                       break;
+> +               case 4:
+> +                       vcpu->mmio_needed =3D 23; /* 4 bytes */
+> +                       break;
+> +               case 5:
+> +                       vcpu->mmio_needed =3D 24; /* 3 bytes */
+> +                       break;
+> +               case 6:
+> +                       vcpu->mmio_needed =3D 25; /* 2 bytes */
+> +                       break;
+> +               case 7:
+> +                       vcpu->mmio_needed =3D 26; /* 1 byte */
+> +                       break;
+> +               default:
+> +                       break;
+> +               }
+> +               break;
+> +
+> +#ifdef CONFIG_CPU_LOONGSON64
+> +       case ldc2_op:
+> +               rt =3D inst.loongson3_lsdc2_format.rt;
+> +               switch (inst.loongson3_lsdc2_format.opcode1) {
+> +               /*
+> +                * Loongson-3 overridden ldc2 instructions.
+> +                * opcode1              instruction
+> +                *   0x0          gslbx: store 1 bytes from GPR
+> +                *   0x1          gslhx: store 2 bytes from GPR
+> +                *   0x2          gslwx: store 4 bytes from GPR
+> +                *   0x3          gsldx: store 8 bytes from GPR
+> +                */
+> +               case 0x0:
+> +                       run->mmio.len =3D 1;
+> +                       vcpu->mmio_needed =3D 27; /* signed */
+> +                       break;
+> +               case 0x1:
+> +                       run->mmio.len =3D 2;
+> +                       vcpu->mmio_needed =3D 28; /* signed */
+> +                       break;
+> +               case 0x2:
+> +                       run->mmio.len =3D 4;
+> +                       vcpu->mmio_needed =3D 29; /* signed */
+> +                       break;
+> +               case 0x3:
+> +                       run->mmio.len =3D 8;
+> +                       vcpu->mmio_needed =3D 30; /* signed */
+> +                       break;
+> +               default:
+> +                       kvm_err("Godson Exteneded GS-Load for float not y=
+et supported (inst=3D0x%08x)\n",
+> +                               inst.word);
+> +                       break;
+> +               }
+> +               break;
+> +#endif
+> +
+>         default:
+>                 kvm_err("Load not yet supported (inst=3D0x%08x)\n",
+>                         inst.word);
+> @@ -2612,28 +2975,125 @@ enum emulation_result kvm_mips_complete_mmio_loa=
+d(struct kvm_vcpu *vcpu,
+>
+>         switch (run->mmio.len) {
+>         case 8:
+> -               *gpr =3D *(s64 *)run->mmio.data;
+> +               switch (vcpu->mmio_needed) {
+> +               case 11:
+> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
+ffffffffffffff) |
+> +                               (((*(s64 *)run->mmio.data) & 0xff) << 56)=
+;
+> +                       break;
+> +               case 12:
+> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
+ffffffffffff) |
+> +                               (((*(s64 *)run->mmio.data) & 0xffff) << 4=
+8);
+> +                       break;
+> +               case 13:
+> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
+ffffffffff) |
+> +                               (((*(s64 *)run->mmio.data) & 0xffffff) <<=
+ 40);
+> +                       break;
+> +               case 14:
+> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
+ffffffff) |
+> +                               (((*(s64 *)run->mmio.data) & 0xffffffff) =
+<< 32);
+> +                       break;
+> +               case 15:
+> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
+ffffff) |
+> +                               (((*(s64 *)run->mmio.data) & 0xffffffffff=
+) << 24);
+> +                       break;
+> +               case 16:
+> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
+ffff) |
+> +                               (((*(s64 *)run->mmio.data) & 0xffffffffff=
+ff) << 16);
+> +                       break;
+> +               case 17:
+> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
+ff) |
+> +                               (((*(s64 *)run->mmio.data) & 0xffffffffff=
+ffff) << 8);
+> +                       break;
+> +               case 18:
+> +               case 19:
+> +                       *gpr =3D *(s64 *)run->mmio.data;
+> +                       break;
+> +               case 20:
+> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
+ff00000000000000) |
+> +                               ((((*(s64 *)run->mmio.data)) >> 8) & 0xff=
+ffffffffffff);
+> +                       break;
+> +               case 21:
+> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
+ffff000000000000) |
+> +                               ((((*(s64 *)run->mmio.data)) >> 16) & 0xf=
+fffffffffff);
+> +                       break;
+> +               case 22:
+> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
+ffffff0000000000) |
+> +                               ((((*(s64 *)run->mmio.data)) >> 24) & 0xf=
+fffffffff);
+> +                       break;
+> +               case 23:
+> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
+ffffffff00000000) |
+> +                               ((((*(s64 *)run->mmio.data)) >> 32) & 0xf=
+fffffff);
+> +                       break;
+> +               case 24:
+> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
+ffffffffff000000) |
+> +                               ((((*(s64 *)run->mmio.data)) >> 40) & 0xf=
+fffff);
+> +                       break;
+> +               case 25:
+> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
+ffffffffffff0000) |
+> +                               ((((*(s64 *)run->mmio.data)) >> 48) & 0xf=
+fff);
+> +                       break;
+> +               case 26:
+> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
+ffffffffffffff00) |
+> +                               ((((*(s64 *)run->mmio.data)) >> 56) & 0xf=
+f);
+> +                       break;
+> +               default:
+> +                       *gpr =3D *(s64 *)run->mmio.data;
+> +               }
+>                 break;
+>
+>         case 4:
+> -               if (vcpu->mmio_needed =3D=3D 2)
+> -                       *gpr =3D *(s32 *)run->mmio.data;
+> -               else
+> +               switch (vcpu->mmio_needed) {
+> +               case 1:
+>                         *gpr =3D *(u32 *)run->mmio.data;
+> +                       break;
+> +               case 2:
+> +                       *gpr =3D *(s32 *)run->mmio.data;
+> +                       break;
+> +               case 3:
+> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
+ffffff) |
+> +                               (((*(s32 *)run->mmio.data) & 0xff) << 24)=
+;
+> +                       break;
+> +               case 4:
+> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
+ffff) |
+> +                               (((*(s32 *)run->mmio.data) & 0xffff) << 1=
+6);
+> +                       break;
+> +               case 5:
+> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
+ff) |
+> +                               (((*(s32 *)run->mmio.data) & 0xffffff) <<=
+ 8);
+> +                       break;
+> +               case 6:
+> +               case 7:
+> +                       *gpr =3D *(s32 *)run->mmio.data;
+> +                       break;
+> +               case 8:
+> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
+ff000000) |
+> +                               ((((*(s32 *)run->mmio.data)) >> 8) & 0xff=
+ffff);
+> +                       break;
+> +               case 9:
+> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
+ffff0000) |
+> +                               ((((*(s32 *)run->mmio.data)) >> 16) & 0xf=
+fff);
+> +                       break;
+> +               case 10:
+> +                       *gpr =3D (vcpu->arch.gprs[vcpu->arch.io_gpr] & 0x=
+ffffff00) |
+> +                               ((((*(s32 *)run->mmio.data)) >> 24) & 0xf=
+f);
+> +                       break;
+> +               default:
+> +                       *gpr =3D *(s32 *)run->mmio.data;
+> +               }
+>                 break;
+>
+>         case 2:
+> -               if (vcpu->mmio_needed =3D=3D 2)
+> -                       *gpr =3D *(s16 *) run->mmio.data;
+> -               else
+> +               if (vcpu->mmio_needed =3D=3D 1)
+>                         *gpr =3D *(u16 *)run->mmio.data;
+> +               else
+> +                       *gpr =3D *(s16 *)run->mmio.data;
+>
+>                 break;
+>         case 1:
+> -               if (vcpu->mmio_needed =3D=3D 2)
+> -                       *gpr =3D *(s8 *) run->mmio.data;
+> +               if (vcpu->mmio_needed =3D=3D 1)
+> +                       *gpr =3D *(u8 *)run->mmio.data;
+>                 else
+> -                       *gpr =3D *(u8 *) run->mmio.data;
+> +                       *gpr =3D *(s8 *)run->mmio.data;
+>                 break;
+>         }
+>
+> --
+> 2.7.0
+>
 
-Note that the functions in this patch that you're reviewing are
-concerned with read requests, not write requests.
-
-Berto
+Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 
