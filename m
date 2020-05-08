@@ -2,81 +2,90 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E41BC47247
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 14:51:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD0CC38A2A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 15:11:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7A3F2173E
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 14:51:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7A3F2173E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 9CB2D206B8
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 15:11:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MEp/kfMg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CB2D206B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX4LZ-00068U-UL
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 10:51:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55206)
+	id 1jX4fD-0003LC-Px
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 11:11:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59914)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jX4Kw-0005Vr-VH
- for qemu-devel@nongnu.org; Fri, 08 May 2020 10:50:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40362)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jX4eD-00026h-6P
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 11:10:45 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42261)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jX4Kv-0005OK-Ht
- for qemu-devel@nongnu.org; Fri, 08 May 2020 10:50:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jX4Kr-000656-G3
- for <qemu-devel@nongnu.org>; Fri, 08 May 2020 14:50:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A8C1A2E812F
- for <qemu-devel@nongnu.org>; Fri,  8 May 2020 14:50:43 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jX4eB-0003kD-Gx
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 11:10:44 -0400
+Received: by mail-ot1-x344.google.com with SMTP id m18so1685871otq.9
+ for <qemu-devel@nongnu.org>; Fri, 08 May 2020 08:10:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=p2Yzq4gLI/K5s4vRhVGkYMwv2US9cSjHREK9IoRTnSA=;
+ b=MEp/kfMgZ/ceyv7N1Nw8FQAIUa2I/1cy45HP/h8GMVh/tQHf2+1gZOOnP7ewil1u9V
+ v8EnOCk8TVE87IK6s5tXRj0zy7Oqf6O8O8IrSOhzebFjODatgIiCvJt0MGOTXsUVUrxq
+ Fe0/x6Lh8Fmlp4eyYOw/n9srba8pu1hk+2hzDYPHxEaVTqtk8hP4WV3+BzZKN0/v7lwL
+ FPHnsX2o9uwiEnngBsipD6QN+IL0x9cUpVhoRgNhlkeRiFsql9FyUe4ThBUjQbobjJ9u
+ Lg8u2SfPQgUpady5yYh0HGHvFiSutg+aQ/OB6LWVEbuA9bOnLUM0+PKEN5ZJEKlXCT4v
+ PniA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=p2Yzq4gLI/K5s4vRhVGkYMwv2US9cSjHREK9IoRTnSA=;
+ b=Ym4uflI2QFgpmiDzJ3XcUdMCzSPMu0/2Kw6cPU4y6vcmawtyQVZ2/1KyP9ST4TggxD
+ wWwwBaiiHfvsWM7D/saghx37ZqqDizomId3+adS1zkNj5U+xElNHUbgHD8TxvLiS2YK1
+ 3lpP1Vsbj7vlYbax7eoVouPBefif1VG2FZWfF5Vr9m1bnMKOBqTO1+MPFAreyjYuEbu/
+ CbkZqlmFIVQx2tNXbk8ZySvLjN+8ZRSq5g+8DtwiL3j8UQOWDz+zS8HvNDqjTRFmGr44
+ cXPIl+qNrObJBHp+WGh++k31dM4wR2yj8M64ZiclZ6n4EqIb/JXlKy9/BOO3bo2JwAdJ
+ Ggcg==
+X-Gm-Message-State: AGi0PuZVjitc+u05ZSuCGJIN1/WdJ3irhhUVzpm4ewv/OOICbvfOWGuu
+ EbcfhqW1BV1L2q08kc4agACMmHVFHJZAM20SCptiOA==
+X-Google-Smtp-Source: APiQypIjt7WctderPSnmTVseva3WpR5IFnvKM5i6GQKQVdqLUxYoy6f1J69Hl6dbFvFwwG46bTnS9TzxrsmgT7YMlEM=
+X-Received: by 2002:a05:6830:1e4e:: with SMTP id
+ e14mr2500058otj.91.1588950641110; 
+ Fri, 08 May 2020 08:10:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 08 May 2020 14:35:47 -0000
-From: Thomas Huth <1877526@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: agpr123 th-huth
-X-Launchpad-Bug-Reporter: Prashant (agpr123)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <158892251663.4400.3590186641467240793.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158894854746.10575.3989795634476642801.malone@wampee.canonical.com>
-Subject: [Bug 1877526] Re: KVM internal crash
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 4d4454369924ba64b47314984e6a6c9bc332d167
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 10:50:47
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+References: <20200508124135.252565-1-kwolf@redhat.com>
+In-Reply-To: <20200508124135.252565-1-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 8 May 2020 16:10:30 +0100
+Message-ID: <CAFEAcA84KC=OpbZ3ALY2b2tMO_xUULOsWJ=2ostorVnuCB70wA@mail.gmail.com>
+Subject: Re: [PULL 00/30] Block layer patches
+To: Kevin Wolf <kwolf@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,92 +94,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1877526 <1877526@bugs.launchpad.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-RHEL 6.6 and qemu-kvm 0.12 are *very* old, can't you update the machine
-to a newer version? At least RHEL 6.10, or even better RHEL 7 or 8?
+On Fri, 8 May 2020 at 13:41, Kevin Wolf <kwolf@redhat.com> wrote:
+>
+> The following changes since commit 1b8c45899715d292398152ba97ef755ccaf84680:
+>
+>   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-20200507a' into staging (2020-05-07 18:43:20 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>
+> for you to fetch changes up to 47e0b38a13935cb666f88964c3096654092f42d6:
+>
+>   block: Drop unused .bdrv_has_zero_init_truncate (2020-05-08 13:26:35 +0200)
+>
+> ----------------------------------------------------------------
+> Block layer patches:
+>
+> - qcow2: Fix preallocation on block devices
+> - backup: Make sure that source and target size match
+> - vmdk: Fix zero cluster handling
+> - Follow-up cleanups and fixes for the truncate changes
+> - iotests: Skip more tests if required drivers are missing
+>
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Applied, thanks.
 
--- =
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
+for any user-visible changes.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1877526
-
-Title:
-  KVM internal crash
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Hi,
-  I am new to this. (apologies if I miss something)
-
-  I see the following error on my host mc when I run an application on
-  my QEMU based VM running ubuntu linux:
-
-  Code=3D4d 39 c8 7f 64 0f 1f 40 00 4d 8d 40 80 49 81 f8 80 00 00 00 <66> 0=
-f 7f 07 66 0f 7f 47 10 66 0f 7f 47 20 66 0f 7f 47 30
-  66 0f 7f 47 40 66 0f 7f 47 50 66
-  KVM internal error. Suberror: 1
-  emulation failure
-  RAX=3D00007fffeb85a000 RBX=3D00000000069ee400 RCX=3D0000000000000000 RDX=
-=3D0000000000000000
-  RSI=3D0000000000000000 RDI=3D00007fffeb85a000 RBP=3D00007fffffff9570 RSP=
-=3D00007fffffff9548
-  R8 =3D0000000000000f80 R9 =3D0000000001000000 R10=3D0000000000000000 R11=
-=3D0000003694e83f3a
-  R12=3D0000000000000000 R13=3D0000000000000000 R14=3D0000000000000000 R15=
-=3D0000000006b75350
-  RIP=3D0000003694e8443b RFL=3D00010206 [-----P-] CPL=3D3 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-  ES =3D0000 0000000000000000 ffffffff 00000000
-  CS =3D0033 0000000000000000 ffffffff 00a0fb00 DPL=3D3 CS64 [-RA]
-  SS =3D002b 0000000000000000 ffffffff 00c0f300 DPL=3D3 DS   [-WA]
-  DS =3D0000 0000000000000000 ffffffff 00000000
-  FS =3D0000 00007ffff45b5720 ffffffff 00000000
-  GS =3D0000 0000000000000000 ffffffff 00000000
-  LDT=3D0000 0000000000000000 ffffffff 00000000
-  TR =3D0040 ffff88047fd13140 00002087 00008b00 DPL=3D0 TSS64-busy
-  GDT=3D	 ffff88047fd04000 0000007f
-  IDT=3D	 ffffffffff57c000 00000fff
-  CR0=3D80050033 CR2=3D00007ffff7ff4000 CR3=3D000000046cb38000 CR4=3D000006=
-e0
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000
-  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-  EFER=3D0000000000000d01
-
-  This occurs with qemu-kvm version(host m/c has RHEL 6.6) :
-  Name        : qemu-kvm
-  Arch        : x86_64
-  Epoch       : 2
-  Version     : 0.12.1.2
-  Release     : 2.506.el6_10.7
-
-  I have another m/c with RHEL 7.5, and the same test case passes with the =
-1.5.3 version.
-  yum info qemu-kvm
-  Name        : qemu-kvm
-  Arch        : x86_64
-  Epoch       : 10
-  Version     : 1.5.3
-
-  How do I investigate this?
-  I would need to patch up the qemu-kvm on the host to get this fixed, I th=
-ink.
-
-  Please let me know if I need to provide more info, (and what?)
-
-  Regards,
-  Prashant
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1877526/+subscriptions
+-- PMM
 
