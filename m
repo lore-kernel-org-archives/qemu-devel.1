@@ -2,87 +2,97 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56163C38A2A
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 16:56:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45171C47247
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 16:57:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 128572184D
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 16:56:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1234C2184D
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 16:57:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DWI/AHAc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 128572184D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p5myEHgI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1234C2184D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX6IM-00035E-7a
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 12:56:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38602)
+	id 1jX6Jj-00059J-9U
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 12:57:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39076)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jX6Hl-0002Wy-51
- for qemu-devel@nongnu.org; Fri, 08 May 2020 12:55:41 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34963)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jX6J9-0004OL-G5
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 12:57:07 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:34785)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jX6Hk-0004Ep-Cf
- for qemu-devel@nongnu.org; Fri, 08 May 2020 12:55:40 -0400
-Received: by mail-wr1-x441.google.com with SMTP id j5so2696012wrq.2
- for <qemu-devel@nongnu.org>; Fri, 08 May 2020 09:55:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=aV3VTiQEVFUuEj8BgLu7tSmD3IFIS4sDXhKPNbCNXQ8=;
- b=DWI/AHAckTi3UDLva4fYaEnn6MCaPG8KZawLuy7AsXY+1KzSBhrcKv61j2Df237zpd
- UQw0OPzU/2XUshbfS8v/1TEqAS85n7OFfmgznBEeem4tNajNKzSB4FadsUhb3qLg0yhx
- 40VrBIfQkj4eFUZ9hIuu5DOzcPV1RQ32bgX2nAqqfv8O7lriPNUMHXCI8NtTiajG2tP/
- oaSJbOLYh5xC0vHEDf1gQPqKZyCtGE+JzYhjjObQsKYXyQeuX9tsrmDlLHoAwcYWnfyo
- bZekToqkqSmSNm66dzT999mfg2pSnpV2++6HDIrO9sHK3cA5qGbkWkcOmsno12zJS9FW
- fN3g==
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jX6J8-0000oX-AQ
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 12:57:06 -0400
+Received: by mail-pf1-x442.google.com with SMTP id x15so668167pfa.1
+ for <qemu-devel@nongnu.org>; Fri, 08 May 2020 09:57:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=fe7KfmaG0NGarcrIZ/p83lG7wLhXQPuh/EAsiaozjiw=;
+ b=p5myEHgIDdYLtInWTseIV5VQ1jkVS/mWjHZNqC5xH9myUBqVSyv4xTuouGImfrof7N
+ oL4Fr4JRyUAzu90jVjcGI298qMMDSTqq9tsm7mr37QHTJhPHrP2cHwPnkrB/M7it5kwO
+ NHSFdOqIGqenCC1cLXwF5bT7bi5aJAaDnyh36bzqdo5DYiFVdHN0BEt86nwIlJzhK8+U
+ ByTTMCLoHxspaZlbJ2qNQEth+bMgT6ZU7fMzre3x4Bbv0S3D8/ZHIFqiF5upkTU3qm8y
+ X6vhWo4wFxtTxPRIMDTByr1TyGveIVbfnNC9yy4W7gonu4UYU18mdzRY2E9+KDyVa109
+ jIZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=aV3VTiQEVFUuEj8BgLu7tSmD3IFIS4sDXhKPNbCNXQ8=;
- b=PrWE+vkCHAS1mFhATq7vu7NXETFYRc3zJ2ippwPKOVA5eAth4ms2AU2+u9PhrsnTpu
- 9siILblXCDiiEUQCeEZvNPG+6gN23KQLNelcrPA7AIgfA/ysRbHFXWC2VUhP6JrtTssI
- LUEjt+3ehPu0C8zTvowkTnBrLImXIVhx47cjeW37ByxkXR9o7BC62WuAjKN34jegIlnS
- I5Y/ke9N5nhP3aCs3HoL8XlQ/w7C8mNFsITDoWnfTuB9rZJVhqS/7TCD/PMHLrbVNEX2
- oTeGu8Ir0cbWOqRUiiCq8rO49AYd1aHaO0ONo13wS6rE5JQJDBCnUvYzWJCMJqYsQfJu
- qlfQ==
-X-Gm-Message-State: AGi0PuaUR3GukrDKEA0q2clGaYkXS2wyWDWDAptkxS0qb3GLnCwxqcv+
- R1kSHfEByX1gkwqo34Nr387dk0Zzhx0iEyFik0A=
-X-Google-Smtp-Source: APiQypKgByWuT62OzfwOrDwk18/RHHyWG4ZmGZ4fsP3gHiT3WzB/jy3LrDVGtHnqY9/H8onkvEf9KeVDuxtI0rVAZ7M=
-X-Received: by 2002:adf:9793:: with SMTP id s19mr3683026wrb.147.1588956938352; 
- Fri, 08 May 2020 09:55:38 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=fe7KfmaG0NGarcrIZ/p83lG7wLhXQPuh/EAsiaozjiw=;
+ b=avshadTNEBJJSPgQfdyiDaeAYjd/uBzReRCEX1WWzPYFfjcik2EXNHAEX5N6HgKFTO
+ I4jk4TNg6ZSsNHMflXmmLuq89VOGxbQsN5pciORABqkfFKzmOSMSjERu7Ykf6r2lMFli
+ LiYNsvsgZaonkWPOF2ChHdQmvoisu7Yq4mtkosnjoMqK6xRwZqoQNnxVZrhbJ+GDaGGK
+ KbXKrfZg7zzRg+MPKW0Hbq9oz+W3tndCu2Q0lqMxUdJ5Ldl+bqOnkn66q0o764KiT08g
+ dY/5VR4N3GsWuiWmi8Q3c0Vbc9Lo4Ysrx9qMWAi82A4xgelZb7wWdzwVzwjD+aGoZSU3
+ 4Szw==
+X-Gm-Message-State: AGi0PuYJSg4IHrvp3ivPG45FDstzyG7aKuugdT7Srfx2309El5T1hbd1
+ y+TsSASqyJOiaAVQvmlnNPGE8A==
+X-Google-Smtp-Source: APiQypIRGikFYfjVuW5TSR8/Ug24v8F32iBCI0G15l/BsQacAMLpXVBTdSCu+QLept6qHC9mcQ4ctg==
+X-Received: by 2002:a63:3603:: with SMTP id d3mr3031786pga.101.1588957024586; 
+ Fri, 08 May 2020 09:57:04 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
+ by smtp.gmail.com with ESMTPSA id fy21sm2752245pjb.25.2020.05.08.09.57.03
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 08 May 2020 09:57:03 -0700 (PDT)
+Subject: Re: [PATCH v5 04/19] accel/tcg: Adjust probe_access call to
+ page_check_range
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200508154359.7494-1-richard.henderson@linaro.org>
+ <20200508154359.7494-5-richard.henderson@linaro.org>
+ <CAFEAcA-9bd11QTUGYdta+pDRFvd-9qtiBiBCGUCCX7Mi+swQbA@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <62eca244-78dd-0359-d82b-30089d893d39@linaro.org>
+Date: Fri, 8 May 2020 09:57:02 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-References: <1588501221-1205-1-git-send-email-chenhc@lemote.com>
-In-Reply-To: <1588501221-1205-1-git-send-email-chenhc@lemote.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Fri, 8 May 2020 18:55:26 +0200
-Message-ID: <CAHiYmc4GnBE7YWghRk9FUL93RBsbJ+QddNsqMZFOGsUQumhmSg@mail.gmail.com>
-Subject: Re: [PATCH for-5.1 V3 0/7] mips: Add Loongson-3 machine support (with
- KVM)
-To: Huacai Chen <zltjiangshi@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x441.google.com
+In-Reply-To: <CAFEAcA-9bd11QTUGYdta+pDRFvd-9qtiBiBCGUCCX7Mi+swQbA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,49 +105,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <chenhuacai@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Huacai Chen <chenhc@lemote.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=D0=BD=D0=B5=D0=B4, 3. =D0=BC=D0=B0=D1=98 2020. =D1=83 12:21 Huacai Chen <z=
-ltjiangshi@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=
-=BE/=D0=BB=D0=B0:
->
-> Loongson-3 CPU family include Loongson-3A R1/R2/R3/R4 and Loongson-3B
-> R1/R2. Loongson-3A R1 is the oldest and its ISA is the smallest, while
-> Loongson-3A R4 is the newest and its ISA is almost the superset of all
-> others. To reduce complexity, in QEMU we just define two CPU types:
->
-> 1, "Loongson-3A1000" CPU which is corresponding to Loongson-3A R1. It is
->    suitable for TCG because Loongson-3A R1 has fewest ASE.
-> 2, "Loongson-3A4000" CPU which is corresponding to Loongson-3A R4. It is
->    suitable for KVM because Loongson-3A R4 has the VZ ASE.
->
+On 5/8/20 9:13 AM, Peter Maydell wrote:
+> On Fri, 8 May 2020 at 16:44, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>>
+>> We have validated that addr+size does not cross a page boundary.
+>> Therefore we need to validate exactly one page.  We can achieve
+>> that passing any value 1 <= x <= size to page_check_range.
+>>
+>> Passing 1 will simplify the next patch.
+> 
+> It's not clear to me how it simplifies the next patch, though --
+> we have the size right there in the new function which
+> calls page_check_range(), don't we? So I still don't
+> understand why we're using '1' -- it isn't allowing
+> us to avoid passing the size into probe_access_internal(),
+> because we need to pass it anyway.
+> 
+> We've gone round this multiple times now so I feel like
+> I must be missing something here.
 
-Hi, Huacei,
+While probe_access() has a size parameter, probe_access_flags() does not.
 
-Just a couple of practicalities. As you know, we can't upstream this
-series until correspondent kernel support is upstreamed into kernel.
-This is my advice, timing-wise:
+For probe_access_internal(), I currently have a "fault_size" parameter that
+gets passed to tlb_fill, which is "size" for probe_access() and 0 for
+probe_access_flags().
 
-- I think it is too late (and not good from testing/risk perspective)
-to shoot for integrating your kernel series into kernel 5.7;
-- My advice is to try to upstream your kernel series at the beginning
-of 5.8 development cycle (which should not be too far)
-- Once this is done, it will open the door for integrating this series
-into QEMU upstream
-- This means that combination of kernel 5.8 and QEMU 5.1 will
-hopefully be a working system from Loongson KVM point of view
-- This will also mean we will have relatively sufficient time to test,
-and possibly fix some new bugs before QEMU 5.1 release.
+I *could* add another "check_size" parameter to probe_access_internal, to be
+passed on to page_check_range(). It would be "size" for probe_access() and 1
+for probe_access_flags().  But what's the point?  Always passing 1 to
+page_check_range() has the same effect.
 
-I hope this tentative plan sounds good to you.
+I feel like I'm missing something with your objection.
 
-Sincerely,
-Aleksandar
+
+r~
 
