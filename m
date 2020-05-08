@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF7AAC38A2A
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 13:09:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8C7BC38A2A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 13:09:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F7C524970
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 13:09:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A84724970
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 13:09:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="2O6v3ziH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F7C524970
+	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="VHqHdCsX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A84724970
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX2lA-0000qI-Nu
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 09:09:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53866)
+	id 1jX2lI-00016g-Oy
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 09:09:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53886)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yuri.benditovich@daynix.com>)
- id 1jX2Wz-0007Tq-Vf
- for qemu-devel@nongnu.org; Fri, 08 May 2020 08:55:09 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33261)
+ id 1jX2X1-0007Zc-Jj
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 08:55:11 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40196)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <yuri.benditovich@daynix.com>)
- id 1jX2Wy-0003Zt-4z
- for qemu-devel@nongnu.org; Fri, 08 May 2020 08:55:08 -0400
-Received: by mail-wr1-x444.google.com with SMTP id h9so1740661wrt.0
- for <qemu-devel@nongnu.org>; Fri, 08 May 2020 05:55:07 -0700 (PDT)
+ id 1jX2X0-0003mD-PJ
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 08:55:11 -0400
+Received: by mail-wr1-x443.google.com with SMTP id e16so1717256wra.7
+ for <qemu-devel@nongnu.org>; Fri, 08 May 2020 05:55:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=daynix-com.20150623.gappssmtp.com; s=20150623;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=bKbcDZF4VvCdwc1Z3LgA0n0/o1l3SD8mbWQhoT1XpcI=;
- b=2O6v3ziHVNSlz5hskCELkYEU3KISPyKL5+5XeWc5/9h9taj0hvfcubXPOikV1RCsXh
- Qydzp7+AH09RZ541OgAUcG33N/ToTtuggRsg0niG9UFk73bb9k/NgmL3VNFWG0QK4qx4
- nRSctY9XqNwf9ssZSDMmE+MhNrzmCY8HuxeroGKF8vApkPr6uzMLuggYQEF9dQw4CFeT
- 7B0s7B8HyJCfpLeNIj+isYWYo+mK5zUKoDcBRpGnXHmqf28gIENw9sW4GtT80LQ4vISb
- iiw/mCrLg9qBmMWg0niUUqEDdEJ1YWf2tbdFtFxtLoTm6u7pMeZbGLTM2oD7T+GtoOHt
- 1JyA==
+ bh=/hmWHO6d7/G558em/hObj2NusDs/d8TWPYPLgPOejdI=;
+ b=VHqHdCsXsWwK9GVzrfW/O6tznjR6I3uF04yXtT+oEdybe91qHsx0QcYw82/duS4G2G
+ /w3m+ttQroKp4YSaphGSVf2zWFT/fe7YJouZztz8qtVLiPULHWS2whqY3R8G3Ux0rvyU
+ u8SiwngO0NS04C1o+pMwvbYqGGMjYf3Ognsig3hntgozWSagpERhhSFRymc9g5Y1mrUw
+ I74t3it7G4ZekXJeetLnWidU9Ob9ZLieDLalQqbdrI7KgzIoWt9ZFVxInmiOmDxAvWP9
+ bfMkMbPvLd+2P3hspmMnGhOYU19zMDBpuMrCLNk82i++iBpai0U61yIQb3r+H1tRlsZN
+ fNHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=bKbcDZF4VvCdwc1Z3LgA0n0/o1l3SD8mbWQhoT1XpcI=;
- b=EJAnEIlQTwPTcsHvS30RsLqK8mfCAzvQVH1tOWM0QrHZxnJZ/VI7k6HfCQHZaEb956
- LIOg1m7hdNTozimn7jlGv9r2mmeEtk+9feyzcdw8ic5F3XdaOti2+26zcRUclH0vZaut
- 4vW2MmpxaxvafA3JsraoWdccwtuHgDHewVRa8HgIVuv1r6FRefJstVamXEVDsOZ2Gqoa
- z79l24ZN2B4X3F2ENTuGI37rbBt+XGMMwytxjC6I7B/8qmBDnGcusdja1sKyXDFKzkNk
- IRW8LcjyJ8jpPCpXAgPZXejkImwvnhE01qbBh3LMv3Bc+Wad4cjn2UwNZT80mO2BL0BE
- C6aA==
-X-Gm-Message-State: AGi0PuYRV2OS8RvPNUbN5gtWQZtR3Z7rKsFybZiKb5XI0whvRQNJvLJ1
- tLsFhVWJZs5V11VufMfXNOz2Pfl7qeSw0w==
-X-Google-Smtp-Source: APiQypJwBTG/q5IZmjupnfUpJdBZJRqwefjBgSfDuCPt0givpX0ht33oBb4ujyGd9rH+LreGaQ6Lwg==
-X-Received: by 2002:adf:ea0d:: with SMTP id q13mr2784353wrm.211.1588942506647; 
- Fri, 08 May 2020 05:55:06 -0700 (PDT)
+ bh=/hmWHO6d7/G558em/hObj2NusDs/d8TWPYPLgPOejdI=;
+ b=sC5r+CAsGyD3HgNPRFS2iMB8k4Un06C6/1TBYkSWkM53qXwwxg4U9wE2IZgugQBtoi
+ qOaXkqSoWppNjfm0BlIXyi6TpnZZY/7yMv5OAnc9zqng8nQdtrqdfRHx9Y4HdEiJMYU7
+ ut1tdrVJeRRvkm5WYOYeRrs9aD4P4YtBPd3dftOnCaQmMmVsYNApnCOQ4YRNWDRHldOU
+ LyuKEd4EFK2KRWNsbYstjRMMOpuXTmy+sKAE18Mp4YXxdPRWf8TPz4XTLTB1Qty89myt
+ Dz8NC75L/a1b6BiLDZj60UOYLuCAdJ25uvwU1glhP8aBYlBDtXWh0qgl2mqT/6ROg39P
+ QOXA==
+X-Gm-Message-State: AGi0PuZY8EBbd1h26z2cG6d/BXn+Xd6UpvHqt6BxcId+teFPOqXc7ZZC
+ IVQX/8VIgOXx4DRWCG5YU6WE5HWfHVLaUg==
+X-Google-Smtp-Source: APiQypLiO+cg10X08BMNDGKyHzEKQO1Nxap5HLqnuE/19vW/GqbqXbYYe2QNzW7hT3A7gzxQijl5SQ==
+X-Received: by 2002:adf:e64c:: with SMTP id b12mr2762220wrn.131.1588942509339; 
+ Fri, 08 May 2020 05:55:09 -0700 (PDT)
 Received: from f2.redhat.com (bzq-79-183-19-16.red.bezeqint.net.
  [79.183.19.16])
- by smtp.gmail.com with ESMTPSA id a8sm2852375wrg.85.2020.05.08.05.55.05
+ by smtp.gmail.com with ESMTPSA id a8sm2852375wrg.85.2020.05.08.05.55.08
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Fri, 08 May 2020 05:55:06 -0700 (PDT)
+ Fri, 08 May 2020 05:55:08 -0700 (PDT)
 From: Yuri Benditovich <yuri.benditovich@daynix.com>
 To: qemu-devel@nongnu.org, mst@redhat.com, jasowang@redhat.com,
  quintela@redhat.com, dgilbert@redhat.com
-Subject: [PATCH 5/7] vmstate.h: provide VMSTATE_VARRAY_UINT16_ALLOC macro
-Date: Fri,  8 May 2020 15:54:50 +0300
-Message-Id: <20200508125452.7802-6-yuri.benditovich@daynix.com>
+Subject: [PATCH 7/7] virtio-net: align RSC fields with updated virtio-net
+ header
+Date: Fri,  8 May 2020 15:54:52 +0300
+Message-Id: <20200508125452.7802-8-yuri.benditovich@daynix.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200508125452.7802-1-yuri.benditovich@daynix.com>
 References: <20200508125452.7802-1-yuri.benditovich@daynix.com>
-Received-SPF: none client-ip=2a00:1450:4864:20::444;
- envelope-from=yuri.benditovich@daynix.com; helo=mail-wr1-x444.google.com
+Received-SPF: none client-ip=2a00:1450:4864:20::443;
+ envelope-from=yuri.benditovich@daynix.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -18
@@ -103,36 +104,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Similar to VMSTATE_VARRAY_UINT32_ALLOC, but the size is
-16-bit field.
+Removal of duplicated RSC definitions. Changing names of the
+fields to ones defined in the Linux header.
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
 ---
- include/migration/vmstate.h | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ hw/net/virtio-net.c | 28 ++++------------------------
+ 1 file changed, 4 insertions(+), 24 deletions(-)
 
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index 30667631bc..baaefb6b9b 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -432,6 +432,16 @@ extern const VMStateInfo vmstate_info_qlist;
-     .offset     = vmstate_offset_pointer(_state, _field, _type),     \
- }
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index c263b1511d..10b4ba50ad 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -88,26 +88,6 @@
+                                          VIRTIO_NET_RSS_HASH_TYPE_TCP_EX | \
+                                          VIRTIO_NET_RSS_HASH_TYPE_UDP_EX)
  
-+#define VMSTATE_VARRAY_UINT16_ALLOC(_field, _state, _field_num, _version, _info, _type) {\
-+    .name       = (stringify(_field)),                               \
-+    .version_id = (_version),                                        \
-+    .num_offset = vmstate_offset_value(_state, _field_num, uint16_t),\
-+    .info       = &(_info),                                          \
-+    .size       = sizeof(_type),                                     \
-+    .flags      = VMS_VARRAY_UINT16 | VMS_POINTER | VMS_ALLOC,       \
-+    .offset     = vmstate_offset_pointer(_state, _field, _type),     \
-+}
-+
- #define VMSTATE_VARRAY_UINT16_UNSAFE(_field, _state, _field_num, _version, _info, _type) {\
-     .name       = (stringify(_field)),                               \
-     .version_id = (_version),                                        \
+-/* temporary until standard header include it */
+-#if !defined(VIRTIO_NET_HDR_F_RSC_INFO)
+-
+-#define VIRTIO_NET_HDR_F_RSC_INFO  4 /* rsc_ext data in csum_ fields */
+-#define VIRTIO_NET_F_RSC_EXT       61
+-
+-#endif
+-
+-static inline __virtio16 *virtio_net_rsc_ext_num_packets(
+-    struct virtio_net_hdr *hdr)
+-{
+-    return &hdr->csum_start;
+-}
+-
+-static inline __virtio16 *virtio_net_rsc_ext_num_dupacks(
+-    struct virtio_net_hdr *hdr)
+-{
+-    return &hdr->csum_offset;
+-}
+-
+ static VirtIOFeature feature_sizes[] = {
+     {.flags = 1ULL << VIRTIO_NET_F_MAC,
+      .end = endof(struct virtio_net_config, mac)},
+@@ -1821,15 +1801,15 @@ static size_t virtio_net_rsc_drain_seg(VirtioNetRscChain *chain,
+                                        VirtioNetRscSeg *seg)
+ {
+     int ret;
+-    struct virtio_net_hdr *h;
++    struct virtio_net_hdr_v1 *h;
+ 
+-    h = (struct virtio_net_hdr *)seg->buf;
++    h = (struct virtio_net_hdr_v1 *)seg->buf;
+     h->flags = 0;
+     h->gso_type = VIRTIO_NET_HDR_GSO_NONE;
+ 
+     if (seg->is_coalesced) {
+-        *virtio_net_rsc_ext_num_packets(h) = seg->packets;
+-        *virtio_net_rsc_ext_num_dupacks(h) = seg->dup_ack;
++        h->rsc.segments = seg->packets;
++        h->rsc.dup_acks = seg->dup_ack;
+         h->flags = VIRTIO_NET_HDR_F_RSC_INFO;
+         if (chain->proto == ETH_P_IP) {
+             h->gso_type = VIRTIO_NET_HDR_GSO_TCPV4;
 -- 
 2.17.1
 
