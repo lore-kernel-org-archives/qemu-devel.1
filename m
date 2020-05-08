@@ -2,73 +2,104 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C944EC38A2A
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 05:30:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BECBC38A2A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 05:35:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 986A4208CA
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 05:30:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 986A4208CA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 46B9E208CA
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 05:35:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DnBg/zKt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46B9E208CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWvaI-0001aP-RJ
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 01:30:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59398)
+	id 1jWvfa-0003Yh-GE
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 01:35:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32960)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jWvZi-00019n-1I
- for qemu-devel@nongnu.org; Fri, 08 May 2020 01:29:30 -0400
-Resent-Date: Fri, 08 May 2020 01:29:30 -0400
-Resent-Message-Id: <E1jWvZi-00019n-1I@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21362)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jWvez-00039I-Ln
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 01:34:57 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48197
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jWvZg-0004DE-5N
- for qemu-devel@nongnu.org; Fri, 08 May 2020 01:29:29 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1588915714; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=gGOLUL5jv1FqajGDS9KQXITm2iGvRqwwcft3VSyDoaqc0SQuIMwP1X48RDUGfEMdzXZU9PCqnYOuwBejtGILhVWzXzQZF7j4o8zR2+4D0ZpjsuemOkDDAxtm07rl9ftMqPB6wO66xr4xy5moRVrhctKeg3HoZ/pdG66O3MterLQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1588915714;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=n7E/tdChMElF0r6ONrCQIBFdxsWeY+gIjsdn0eo3/6M=; 
- b=mts2fZ0Pq2nOGyXAK53IVO+dEfE8xgKfJO9LNTa7A/LpWtIrB09L+cttv0eVKE79dYmjH3au5i5gvr75G5e+Dpwb2hRE4ERRfVrimLLNuBAsKebalzj9VtPrQaU20CJK3AGhAFVgPiv3yaLUQZh/l2siOq/20eu4PBT0lPsQigs=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1588915712512575.8488904048985;
- Thu, 7 May 2020 22:28:32 -0700 (PDT)
-Message-ID: <158891571032.29923.11626722130579684161@45ef0f9c86ae>
-In-Reply-To: <20200507155813.16169-1-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jWvey-0004eQ-0k
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 01:34:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588916094;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=j9cIxYZ4M6GBlMag/rjs0c76h4zJpAwA0JgCL0kqyZo=;
+ b=DnBg/zKtiJLM8rB2xAKVzSKB1Z8eFZ/EXEV836lEpDf3FaZP5WTQimxmS4KgG9f79dENrf
+ LKgj/Ks00BFZxH3c8gbGXevG+KX++Q4k3DbfRTaCaExdLoU0wnJcjGzCz6rcYLkUeXBFiL
+ 0q7HhgQ/xyoqsk9HoBWYf9f9f2K3vtc=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-439-reh7XOhdPFqOl6u11CNL3Q-1; Fri, 08 May 2020 01:34:52 -0400
+X-MC-Unique: reh7XOhdPFqOl6u11CNL3Q-1
+Received: by mail-wr1-f71.google.com with SMTP id z8so348758wrp.7
+ for <qemu-devel@nongnu.org>; Thu, 07 May 2020 22:34:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=gUS4ClGn6G8XqFXHNiGlmCwk06xms6ktvah597TE/uY=;
+ b=iYdhuWlnX8ZNGoV6ZXwrrVQa90DFGrCf+G4OzoeErlKoACeo4ZRDkSsOkI4iksjM5M
+ 0+eyJKpsH1EObPB71Mt+I3N0rcBwRxB8qE1Nd7Mj5E8iFK3nxowKQaRhzwTG7Yz6ToHs
+ ngwixGoxXYiH+9Hr0aZSZtsPYWTE7oAIIxsHZ2SIK+/MYc5xoJsrdTfXY++8+cOCkT0T
+ AWQ2duOSrIYHQUWUHd7XOqfRpvsPWTfCN9tCtObKge0FWGewL4XExr+wyD/BkWB4vE3W
+ 6E2PlqjJX0Ss9zZ5J4luPgECWooA6iGtSfIKuL3O/pRuevunBchmKW2dJ5AKgP1Nu7vI
+ jIxg==
+X-Gm-Message-State: AGi0PuZzR5s6l7DnRM+aDZPgLuRtGkE5RBIDghERJBfIHnwtQFQE5JYG
+ hs2WFdRjglu5BD0SquRq7ThiTPdZcJITG0i3glvqnLPseVaRgyZLOcgsepY1aJDVO1+PisjfUeg
+ ISAWEAVJhycRQDLo=
+X-Received: by 2002:a1c:4e15:: with SMTP id g21mr13547738wmh.29.1588916091364; 
+ Thu, 07 May 2020 22:34:51 -0700 (PDT)
+X-Google-Smtp-Source: APiQypI61Fm7WBN/SXhfhIYSOo0bFejh0pT6oDtMsWaGpFR+cCbdXjuMM/JbC85hgfYNOcJ8QGT+TQ==
+X-Received: by 2002:a1c:4e15:: with SMTP id g21mr13547723wmh.29.1588916091120; 
+ Thu, 07 May 2020 22:34:51 -0700 (PDT)
+Received: from [192.168.1.39] (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id a67sm12158464wmc.30.2020.05.07.22.34.49
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 07 May 2020 22:34:50 -0700 (PDT)
 Subject: Re: [PATCH] accel: Move Xen accelerator code under accel/xen/
+To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+References: <20200507155813.16169-1-philmd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d84e5541-da7a-4ead-6277-3b144744f58b@redhat.com>
+Date: Fri, 8 May 2020 07:34:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: philmd@redhat.com
-Date: Thu, 7 May 2020 22:28:32 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 23:43:30
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200507155813.16169-1-philmd@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 01:34:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,50 +112,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: sstabellini@kernel.org, ehabkost@redhat.com, quintela@redhat.com,
- paul@xen.org, dgilbert@redhat.com, qemu-devel@nongnu.org,
- xen-devel@lists.xenproject.org, aleksandar.qemu.devel@gmail.com,
- mst@redhat.com, pbonzini@redhat.com, anthony.perard@citrix.com,
- imammedo@redhat.com, philmd@redhat.com, aurelien@aurel32.net, rth@twiddle.net
+Cc: Stefano Stabellini <sstabellini@kernel.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paul Durrant <paul@xen.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUwNzE1NTgxMy4xNjE2
-OS0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
-a2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
-bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
-ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVU
-V09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0x
-NCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCi90bXAvcWVtdS10ZXN0L3NyYy90
-ZXN0cy9xdGVzdC9saWJxdGVzdC5jOjE3NToga2lsbF9xZW11KCkgZGV0ZWN0ZWQgUUVNVSBkZWF0
-aCBmcm9tIHNpZ25hbCA2IChBYm9ydGVkKSAoY29yZSBkdW1wZWQpCiAgVEVTVCAgICBjaGVjay11
-bml0OiB0ZXN0cy9jaGVjay1xZGljdAogIFRFU1QgICAgaW90ZXN0LXFjb3cyOiAwMDcKRVJST1Ig
-LSB0b28gZmV3IHRlc3RzIHJ1biAoZXhwZWN0ZWQgNSwgZ290IDApCm1ha2U6ICoqKiBbY2hlY2st
-cXRlc3QtYWFyY2g2NF0gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBq
-b2JzLi4uLgogIFRFU1QgICAgY2hlY2stcXRlc3QteDg2XzY0OiB0ZXN0cy9xdGVzdC9mZGMtdGVz
-dAogIFRFU1QgICAgY2hlY2stdW5pdDogdGVzdHMvY2hlY2stYmxvY2stcWRpY3QKLS0tCiAgICBy
-YWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFBy
-b2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1s
-YWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPWU1OTRiOTc0OTQwNDQ0OTY4Yjc3Zjk0MjQz
-MTBjYTNjJywgJy11JywgJzEwMDMnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZp
-bmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VS
-RV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScs
-ICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12Jywg
-Jy9ob21lL3BhdGNoZXcyLy5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hl
-OnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXAybjRvcGUyL3NyYy9kb2Nr
-ZXItc3JjLjIwMjAtMDUtMDgtMDEuMTUuMTQuMjE2MTg6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3Fl
-bXU6Y2VudG9zNycsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVk
-IG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5p
-bnN0YW5jZS51dWlkPWU1OTRiOTc0OTQwNDQ0OTY4Yjc3Zjk0MjQzMTBjYTNjCm1ha2VbMV06ICoq
-KiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90
-bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXAybjRvcGUyL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVu
-LXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3IgMgoKcmVhbCAgICAxM20xNi4yNzZzCnVzZXIgICAg
-MG04LjE4NXMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9y
-Zy9sb2dzLzIwMjAwNTA3MTU1ODEzLjE2MTY5LTEtcGhpbG1kQHJlZGhhdC5jb20vdGVzdGluZy5k
-b2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
-dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
-ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On 5/7/20 5:58 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> This code is not related to hardware emulation.
+> Move it under accel/ with the other hypervisors.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+> We could also move the memory management functions from
+> hw/i386/xen/xen-hvm.c but it is not trivial.
+>=20
+> Necessary step to remove "exec/ram_addr.h" in the next series.
+> ---
+>   include/exec/ram_addr.h                    |  2 +-
+>   include/hw/xen/xen.h                       | 11 ------
+>   include/sysemu/xen.h                       | 40 ++++++++++++++++++++++
+>   hw/xen/xen-common.c =3D> accel/xen/xen-all.c |  3 ++
+>   hw/acpi/piix4.c                            |  2 +-
+>   hw/i386/pc.c                               |  1 +
+>   hw/i386/pc_piix.c                          |  1 +
+>   hw/i386/pc_q35.c                           |  1 +
+>   hw/i386/xen/xen-hvm.c                      |  1 +
+>   hw/i386/xen/xen_platform.c                 |  1 +
+>   hw/isa/piix3.c                             |  1 +
+>   hw/pci/msix.c                              |  1 +
+>   migration/savevm.c                         |  2 +-
+>   softmmu/vl.c                               |  2 +-
+>   stubs/xen-hvm.c                            |  9 -----
+>   target/i386/cpu.c                          |  2 +-
+>   MAINTAINERS                                |  2 ++
+>   accel/Makefile.objs                        |  1 +
+>   accel/xen/Makefile.objs                    |  1 +
+>   hw/xen/Makefile.objs                       |  2 +-
+>   20 files changed, 60 insertions(+), 26 deletions(-)
+>   create mode 100644 include/sysemu/xen.h
+>   rename hw/xen/xen-common.c =3D> accel/xen/xen-all.c (99%)
+>   create mode 100644 accel/xen/Makefile.objs
+>=20
+> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+> index 5e59a3d8d7..4e05292f91 100644
+> --- a/include/exec/ram_addr.h
+> +++ b/include/exec/ram_addr.h
+> @@ -21,7 +21,7 @@
+>  =20
+>   #ifndef CONFIG_USER_ONLY
+>   #include "cpu.h"
+> -#include "hw/xen/xen.h"
+> +#include "sysemu/xen.h"
+>   #include "sysemu/tcg.h"
+>   #include "exec/ramlist.h"
+>   #include "exec/ramblock.h"
+> diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
+> index 5ac1c6dc55..771dd447f2 100644
+> --- a/include/hw/xen/xen.h
+> +++ b/include/hw/xen/xen.h
+> @@ -20,13 +20,6 @@ extern uint32_t xen_domid;
+>   extern enum xen_mode xen_mode;
+>   extern bool xen_domid_restrict;
+>  =20
+> -extern bool xen_allowed;
+> -
+> -static inline bool xen_enabled(void)
+> -{
+> -    return xen_allowed;
+> -}
+> -
+>   int xen_pci_slot_get_pirq(PCIDevice *pci_dev, int irq_num);
+>   void xen_piix3_set_irq(void *opaque, int irq_num, int level);
+>   void xen_piix_pci_write_config_client(uint32_t address, uint32_t val, i=
+nt len);
+> @@ -39,10 +32,6 @@ void xenstore_store_pv_console_info(int i, struct Char=
+dev *chr);
+>  =20
+>   void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory);
+>  =20
+> -void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
+> -                   struct MemoryRegion *mr, Error **errp);
+> -void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length);
+> -
+>   void xen_register_framebuffer(struct MemoryRegion *mr);
+>  =20
+>   #endif /* QEMU_HW_XEN_H */
+> diff --git a/include/sysemu/xen.h b/include/sysemu/xen.h
+> new file mode 100644
+> index 0000000000..609d2d4184
+> --- /dev/null
+> +++ b/include/sysemu/xen.h
+> @@ -0,0 +1,40 @@
+> +/*
+> + * QEMU Xen support
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef SYSEMU_XEN_H
+> +#define SYSEMU_XEN_H
+> +
+> +#ifdef CONFIG_XEN
+> +
+> +extern bool xen_allowed;
+> +
+> +#define xen_enabled() (xen_allowed)
+> +
+> +#ifndef CONFIG_USER_ONLY
+> +void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length);
+> +void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
+> +                   struct MemoryRegion *mr, Error **errp);
+> +#endif
+> +
+> +#else /* !CONFIG_XEN */
+> +
+> +#define xen_enabled() 0
+> +#ifndef CONFIG_USER_ONLY
+> +static inline void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t =
+length)
+> +{
+> +    abort();
+> +}
+> +static inline void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
+> +                                 MemoryRegion *mr, Error **errp)
+> +{
+> +    abort();
+> +}
+> +#endif
+
+Unfortunately this triggers:
+
+#1  0x00007fca778a5895 abort (libc.so.6)
+#2  0x000055f51ebd3e12 xen_hvm_modified_memory (qemu-system-aarch64)
+#3  0x000055f51ebd44c9 cpu_physical_memory_set_dirty_range=20
+(qemu-system-aarch64)
+#4  0x000055f51ebd9de4 ram_block_add (qemu-system-aarch64)
+#5  0x000055f51ebda2e3 qemu_ram_alloc_internal (qemu-system-aarch64)
+#6  0x000055f51ebda3be qemu_ram_alloc (qemu-system-aarch64)
+#7  0x000055f51ec3db9b memory_region_init_ram_shared_nomigrate=20
+(qemu-system-aarch64)
+#8  0x000055f51ef089e6 ram_backend_memory_alloc (qemu-system-aarch64)
+#9  0x000055f51ef081ae host_memory_backend_memory_complete=20
+(qemu-system-aarch64)
+#10 0x000055f51f2b624b user_creatable_complete (qemu-system-aarch64)
+#11 0x000055f51ed93382 create_default_memdev (qemu-system-aarch64)
+#12 0x000055f51ed96d1a qemu_init (qemu-system-aarch64)
+#13 0x000055f51f3b14bb main (qemu-system-aarch64)
+#14 0x00007fca778a6f43 __libc_start_main (libc.so.6)
+#15 0x000055f51ebd27de _start (qemu-system-aarch64)
+
+I'll resend adding the following patch checking for xen_enabled() before=20
+calling, as we do with other accelerators:
+
+-- >8 --
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+@@ -330,7 +330,9 @@ static inline void=20
+cpu_physical_memory_set_dirty_range(ram_addr_t start,
+          }
+      }
+
+-    xen_hvm_modified_memory(start, length);
++    if (xen_enabled()) {
++        xen_hvm_modified_memory(start, length);
++    }
+  }
+
+  #if !defined(_WIN32)
+@@ -388,7 +390,9 @@ static inline void=20
+cpu_physical_memory_set_dirty_lebitmap(unsigned long *bitmap,
+              }
+          }
+
+-        xen_hvm_modified_memory(start, pages << TARGET_PAGE_BITS);
++        if (xen_enabled()) {
++            xen_hvm_modified_memory(start, pages << TARGET_PAGE_BITS);
++        }
+      } else {
+          uint8_t clients =3D tcg_enabled() ? DIRTY_CLIENTS_ALL :=20
+DIRTY_CLIENTS_NOCODE;
+---
+
 
