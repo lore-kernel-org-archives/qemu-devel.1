@@ -7,62 +7,61 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4B22C47254
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5F69C38A2A
 	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 12:44:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1E2721473
+	by mail.kernel.org (Postfix) with ESMTPS id 974F72145D
 	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 12:44:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QySs6Qh5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1E2721473
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FbBEfgWC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 974F72145D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX2N5-0005HZ-RA
+	id 1jX2N5-0005G5-JS
 	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 08:44:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49182)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49152)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX2KB-0008QR-Hm
- for qemu-devel@nongnu.org; Fri, 08 May 2020 08:41:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27897
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX2K8-0008KQ-QE
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 08:41:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51816
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX2KA-0007x5-5I
- for qemu-devel@nongnu.org; Fri, 08 May 2020 08:41:55 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX2K7-0007nu-GV
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 08:41:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588941713;
+ s=mimecast20190719; t=1588941710;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4MU6HaJvPAeIgA5vvgF4Trxs9Ip2DhXproq2i7WRbhc=;
- b=QySs6Qh5bZnBWP5353AeM8HWKG1SwMF6SdQT/L/zBIOtVXgH0044pkyeGLtKqoMZqAVrMn
- RB9Itv9GEdd84orBkmOYaYK8OGemawGTAO0u+RPVQA8yiAyUUMGiLgTaHdXk7wDdVc+3xi
- GwCSs6NQ8jiH821TDt5tH4XyC/R0Bl0=
+ bh=PucWFx0qX5O5/bvBOe/L6iV7fWG+49LMEtcEeBzK55k=;
+ b=FbBEfgWC9BWxrMQLgYqKYwhK2wk0cmnWCEIUfbsztgpvLJOLhMHL+8AD5bkFrBh9ByzyfD
+ zh0caKQf+/ZQmZWlfYMJ0mQXBAMlw/ajvVCwEObRvMEjtdUsrMMi7+uok8qKmXvHfhPnpe
+ 4tWITQ0U/aLMj2VTCd1f6MG+gjbGJnY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-194-qHi1JxQvNBKHYPkW9tSt8Q-1; Fri, 08 May 2020 08:41:51 -0400
-X-MC-Unique: qHi1JxQvNBKHYPkW9tSt8Q-1
+ us-mta-234-TaoU_zyvMLWWEoqs07oyIQ-1; Fri, 08 May 2020 08:41:48 -0400
+X-MC-Unique: TaoU_zyvMLWWEoqs07oyIQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E085107ACF3;
- Fri,  8 May 2020 12:41:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9FF018018A7;
+ Fri,  8 May 2020 12:41:47 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-113-190.ams2.redhat.com
  [10.36.113.190])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3E1B019167;
- Fri,  8 May 2020 12:41:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A27F963F9D;
+ Fri,  8 May 2020 12:41:46 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 06/30] iotests/055: skip vmdk target tests if vmdk is not
- whitelisted
-Date: Fri,  8 May 2020 14:41:11 +0200
-Message-Id: <20200508124135.252565-7-kwolf@redhat.com>
+Subject: [PULL 04/30] iotests/041: drop self.assert_no_active_block_jobs()
+Date: Fri,  8 May 2020 14:41:09 +0200
+Message-Id: <20200508124135.252565-5-kwolf@redhat.com>
 In-Reply-To: <20200508124135.252565-1-kwolf@redhat.com>
 References: <20200508124135.252565-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -101,29 +100,70 @@ Sender: "Qemu-devel"
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
+Drop check for no block-jobs: it's obvious that there no jobs
+immediately after vm.launch().
+
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20200430124713.3067-7-vsementsov@virtuozzo.com>
+Message-Id: <20200430124713.3067-5-vsementsov@virtuozzo.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/055 | 4 ++++
- 1 file changed, 4 insertions(+)
+ tests/qemu-iotests/041 | 8 --------
+ 1 file changed, 8 deletions(-)
 
-diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
-index d9e8985167..e250f798f9 100755
---- a/tests/qemu-iotests/055
-+++ b/tests/qemu-iotests/055
-@@ -566,6 +566,10 @@ class TestCompressedToQcow2(iotests.QMPTestCase):
- class TestCompressedToVmdk(TestCompressedToQcow2):
-     target_fmt =3D {'type': 'vmdk', 'args': ('-o', 'subformat=3DstreamOpti=
-mized')}
+diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
+index 46bf1f6c81..1812dd8479 100755
+--- a/tests/qemu-iotests/041
++++ b/tests/qemu-iotests/041
+@@ -904,8 +904,6 @@ class TestRepairQuorum(iotests.QMPTestCase):
+                 pass
 =20
-+    @iotests.skip_if_unsupported(['vmdk'])
-+    def setUp(self):
-+        pass
-+
+     def test_complete(self):
+-        self.assert_no_active_block_jobs()
+-
+         result =3D self.vm.qmp('drive-mirror', job_id=3D'job0', device=3D'=
+quorum0',
+                              sync=3D'full', node_name=3D"repair0", replace=
+s=3D"img1",
+                              target=3Dquorum_repair_img, format=3Diotests.=
+imgfmt)
+@@ -919,8 +917,6 @@ class TestRepairQuorum(iotests.QMPTestCase):
+                         'target image does not match source after mirrorin=
+g')
 =20
- if __name__ =3D=3D '__main__':
-     iotests.main(supported_fmts=3D['raw', 'qcow2'],
+     def test_cancel(self):
+-        self.assert_no_active_block_jobs()
+-
+         result =3D self.vm.qmp('drive-mirror', job_id=3D'job0', device=3D'=
+quorum0',
+                              sync=3D'full', node_name=3D"repair0", replace=
+s=3D"img1",
+                              target=3Dquorum_repair_img, format=3Diotests.=
+imgfmt)
+@@ -932,8 +928,6 @@ class TestRepairQuorum(iotests.QMPTestCase):
+         self.assert_has_block_node(None, quorum_img3)
+=20
+     def test_cancel_after_ready(self):
+-        self.assert_no_active_block_jobs()
+-
+         result =3D self.vm.qmp('drive-mirror', job_id=3D'job0', device=3D'=
+quorum0',
+                              sync=3D'full', node_name=3D"repair0", replace=
+s=3D"img1",
+                              target=3Dquorum_repair_img, format=3Diotests.=
+imgfmt)
+@@ -948,8 +942,6 @@ class TestRepairQuorum(iotests.QMPTestCase):
+                         'target image does not match source after mirrorin=
+g')
+=20
+     def test_pause(self):
+-        self.assert_no_active_block_jobs()
+-
+         result =3D self.vm.qmp('drive-mirror', job_id=3D'job0', device=3D'=
+quorum0',
+                              sync=3D'full', node_name=3D"repair0", replace=
+s=3D"img1",
+                              target=3Dquorum_repair_img, format=3Diotests.=
+imgfmt)
 --=20
 2.25.3
 
