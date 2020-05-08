@@ -7,61 +7,62 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D090C38A2A
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 12:43:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4B22C47254
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 12:44:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E37E224974
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 12:43:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A1E2721473
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 12:44:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LRxXjzNg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E37E224974
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QySs6Qh5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1E2721473
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX2Lh-00024v-TZ
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 08:43:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49154)
+	id 1jX2N5-0005HZ-RA
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 08:44:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX2K9-0008Kn-1I
- for qemu-devel@nongnu.org; Fri, 08 May 2020 08:41:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43165
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX2KB-0008QR-Hm
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 08:41:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27897
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX2K7-0007o1-Oz
- for qemu-devel@nongnu.org; Fri, 08 May 2020 08:41:52 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX2KA-0007x5-5I
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 08:41:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588941711;
+ s=mimecast20190719; t=1588941713;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=va4aXJaudfoAorWRfMslUxZNxb3eCJJPObDkKvDdEtA=;
- b=LRxXjzNglTfteBpaCZK5miJJwyRaQf+a9oMshmVb+LRLUZDZyNDL36hlOlZ/KFw8wJfQ5f
- DQt+kAGuMHewRbHQd/TZSsckNiPTeNLNVHX7CEbYyOQgAJ1v+7/goW16yMIkA0uPnzJKpx
- kDX14ZhY5ezo91bp1WUXidtVCxmNhDk=
+ bh=4MU6HaJvPAeIgA5vvgF4Trxs9Ip2DhXproq2i7WRbhc=;
+ b=QySs6Qh5bZnBWP5353AeM8HWKG1SwMF6SdQT/L/zBIOtVXgH0044pkyeGLtKqoMZqAVrMn
+ RB9Itv9GEdd84orBkmOYaYK8OGemawGTAO0u+RPVQA8yiAyUUMGiLgTaHdXk7wDdVc+3xi
+ GwCSs6NQ8jiH821TDt5tH4XyC/R0Bl0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-428-oORCcSc3P3SPza7B6y9XQg-1; Fri, 08 May 2020 08:41:47 -0400
-X-MC-Unique: oORCcSc3P3SPza7B6y9XQg-1
+ us-mta-194-qHi1JxQvNBKHYPkW9tSt8Q-1; Fri, 08 May 2020 08:41:51 -0400
+X-MC-Unique: qHi1JxQvNBKHYPkW9tSt8Q-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 57D941005510;
- Fri,  8 May 2020 12:41:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E085107ACF3;
+ Fri,  8 May 2020 12:41:50 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-113-190.ams2.redhat.com
  [10.36.113.190])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5897D19167;
- Fri,  8 May 2020 12:41:45 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3E1B019167;
+ Fri,  8 May 2020 12:41:49 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 03/30] iotests/148: use skip_if_unsupported
-Date: Fri,  8 May 2020 14:41:08 +0200
-Message-Id: <20200508124135.252565-4-kwolf@redhat.com>
+Subject: [PULL 06/30] iotests/055: skip vmdk target tests if vmdk is not
+ whitelisted
+Date: Fri,  8 May 2020 14:41:11 +0200
+Message-Id: <20200508124135.252565-7-kwolf@redhat.com>
 In-Reply-To: <20200508124135.252565-1-kwolf@redhat.com>
 References: <20200508124135.252565-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -100,27 +101,29 @@ Sender: "Qemu-devel"
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Skip test-case with quorum if quorum is not whitelisted.
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20200430124713.3067-4-vsementsov@virtuozzo.com>
+Message-Id: <20200430124713.3067-7-vsementsov@virtuozzo.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/148 | 1 +
- 1 file changed, 1 insertion(+)
+ tests/qemu-iotests/055 | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/tests/qemu-iotests/148 b/tests/qemu-iotests/148
-index 90931948e3..5e14a455b1 100755
---- a/tests/qemu-iotests/148
-+++ b/tests/qemu-iotests/148
-@@ -47,6 +47,7 @@ sector =3D "%d"
- ''' % bad_sector)
-         file.close()
+diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
+index d9e8985167..e250f798f9 100755
+--- a/tests/qemu-iotests/055
++++ b/tests/qemu-iotests/055
+@@ -566,6 +566,10 @@ class TestCompressedToQcow2(iotests.QMPTestCase):
+ class TestCompressedToVmdk(TestCompressedToQcow2):
+     target_fmt =3D {'type': 'vmdk', 'args': ('-o', 'subformat=3DstreamOpti=
+mized')}
 =20
-+    @iotests.skip_if_unsupported(['quorum'])
-     def setUp(self):
-         driveopts =3D ['driver=3Dquorum', 'vote-threshold=3D2']
-         driveopts.append('read-pattern=3D%s' % self.read_pattern)
++    @iotests.skip_if_unsupported(['vmdk'])
++    def setUp(self):
++        pass
++
+=20
+ if __name__ =3D=3D '__main__':
+     iotests.main(supported_fmts=3D['raw', 'qcow2'],
 --=20
 2.25.3
 
