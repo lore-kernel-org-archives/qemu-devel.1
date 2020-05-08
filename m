@@ -2,88 +2,95 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55632C47254
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 11:38:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E8C2C38A2A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 11:40:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CA0820870
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 11:38:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 436B6208D6
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 11:40:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P1q1rIJl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CA0820870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JkoQsLsK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 436B6208D6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX1Kw-0007qE-4u
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 07:38:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35356)
+	id 1jX1Ma-0000Kc-D2
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 07:40:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35610)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX1KL-0007N7-Tm
- for qemu-devel@nongnu.org; Fri, 08 May 2020 07:38:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56728
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jX1KK-0006uK-A3
- for qemu-devel@nongnu.org; Fri, 08 May 2020 07:38:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588937878;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=86MJC+7FFIpAiM5vqBPgxOZCKdjA6pScZG0VyLoQ/fk=;
- b=P1q1rIJl7B12DOvMWGDsThL25LSoLcVo6eXMjGMH9YFExy6/0hnBL7TTaD7al+hphu+k1E
- 9nNXRMNZUdJF7xo2WVG+ynAX/QiSLNW/IowNVXMta7qLsg35j3mjmZwNyb+vs2NKkppOzB
- CN9PJFCG2e3JwKCxPQrr8p/IuWUqfX0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-344-mJpSD0AqMnO00o-djjP1iQ-1; Fri, 08 May 2020 07:37:57 -0400
-X-MC-Unique: mJpSD0AqMnO00o-djjP1iQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 509991895A2A;
- Fri,  8 May 2020 11:37:56 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-113-190.ams2.redhat.com [10.36.113.190])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 124FC2E056;
- Fri,  8 May 2020 11:37:54 +0000 (UTC)
-Date: Fri, 8 May 2020 13:37:53 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH v2 2/6] blockdev: Split off basic bitmap operations for
- qemu-img
-Message-ID: <20200508113753.GC4970@linux.fritz.box>
-References: <20200421212019.170707-1-eblake@redhat.com>
- <20200421212019.170707-3-eblake@redhat.com>
- <6ce69bac-9bbc-05fd-e658-89a2ad63a322@redhat.com>
- <a16c3c4d-272b-6c5f-9d67-2a222c8f1f88@redhat.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jX1M1-0008LI-4Q
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 07:39:45 -0400
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:38621)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jX1Lz-0008VG-Rh
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 07:39:44 -0400
+Received: by mail-wm1-x32e.google.com with SMTP id g12so10238481wmh.3
+ for <qemu-devel@nongnu.org>; Fri, 08 May 2020 04:39:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=Q43gVxLtXyZVieDw0AQ6DRz4FFD8AMXuRSu39tjxhPw=;
+ b=JkoQsLsKBj3j+l12nkKDlMuqHbQ3kT1iQD0guyPZZtu73BOH3sukve57AC1K+HCob4
+ SZ8FPugQXFkf502DYg8agaa0NHhFIKqkYs7dVdSEG1cZ/+VHi427sq5JgMWvK2oi2Yr3
+ VjkTBaA1CXKNuYVN2oguOn7T/wIvebFh9ATl49MVBB9hnXk9E4ve+Iry75eH/PHHciLq
+ GOJOSBJFz+v1XYEYcjtKQHxXg6vdafKm37zT9fdfXt/OszoWIcdIYGL9va4qfVu0MYWh
+ gMLpEEdVobi9CqpHB4Wime+o8AuLAb6p4E7QuUy9H0UwwdYjuZqNcWyPnaNR8ckoMrKk
+ vw2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=Q43gVxLtXyZVieDw0AQ6DRz4FFD8AMXuRSu39tjxhPw=;
+ b=Pdn0278rc6JKwap5PI6XnNriVGtKQP0DH2wKxfAkn1v++0xgIH+ILaTOf4teMacdI6
+ 7IY3QkExKs7eoN5FgZTKv9VJynCecGVelzUhcU+a06dWaXLRDYapPvRETyVCUiEUVnbc
+ vXbwzM6rJEY5tj4zbjJWS424sd/gL/hbsLBN3xpUrGxaod91SVV0r1Hjzuob2Kw7pqEF
+ SRv7va46entXjxqLD3FEsUJoaqYq6YlbndZ11uRX2LcABaSZpKzhWGvRrZSgP+jtCW0Q
+ BN8/MZovLLWRa4bJZnN+/jZtncPK4z1+fx9Y1ovWqqS2E+FruPpH9kvexpWZV1J7qZ4k
+ b4zg==
+X-Gm-Message-State: AGi0PuYSpMvdNs8pareTJ2RY3eUCOP0zcqqyfJMJeCeGlVW+eqnfUJEN
+ +7oJKB3Eav575ST1M8nREsduF8FbBwk=
+X-Google-Smtp-Source: APiQypKdlS7vcMJ91Pm7HrtqSVnfq7CrPtAV+HaQdehvtf1aF3XPsLu1y62v4LGb98yrT4S9+4AicA==
+X-Received: by 2002:a05:600c:2284:: with SMTP id
+ 4mr14872205wmf.97.1588937980964; 
+ Fri, 08 May 2020 04:39:40 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id g74sm12572675wme.44.2020.05.08.04.39.39
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 08 May 2020 04:39:39 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 8C33D1FF7E;
+ Fri,  8 May 2020 12:39:38 +0100 (BST)
+References: <tencent_D787B2532D5D3E3EBC6DD3B6A714D4106F08@qq.com>
+User-agent: mu4e 1.4.4; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: casmac <1482995675@qq.com>
+Subject: Re: how to run qemu test
+In-reply-to: <tencent_D787B2532D5D3E3EBC6DD3B6A714D4106F08@qq.com>
+Date: Fri, 08 May 2020 12:39:38 +0100
+Message-ID: <87y2q24pvp.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <a16c3c4d-272b-6c5f-9d67-2a222c8f1f88@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 02:25:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Received-SPF: pass client-ip=2a00:1450:4864:20::32e;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32e.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,52 +103,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 30.04.2020 um 16:50 hat Eric Blake geschrieben:
-> On 4/30/20 8:59 AM, Max Reitz wrote:
-> > On 21.04.20 23:20, Eric Blake wrote:
-> > > Upcoming patches want to add some basic bitmap manipulation abilities
-> > > to qemu-img.  But blockdev.o is too heavyweight to link into qemu-img
-> > > (among other things, it would drag in block jobs and transaction
-> > > support - qemu-img does offline manipulation, where atomicity is less
-> > > important because there are no concurrent modifications to compete
-> > > with), so it's time to split off the bare bones of what we will need
-> > > into a new file blockbitmaps.o.
-> > >=20
-> > > In addition to exposing 6 QMP commands for use by qemu-img (add,
-> > > remove, clear, enable, disable, merge), this also has to export three
-> > > previously-static functions for use by blockdev.c transactions.
-> > >=20
-> > > Signed-off-by: Eric Blake <eblake@redhat.com>
-> > > ---
-> > >   Makefile.objs             |   2 +-
-> > >   include/sysemu/blockdev.h |  14 ++
-> > >   blockbitmaps.c            | 324 +++++++++++++++++++++++++++++++++++=
-+++
-> >=20
-> > Hm.  Can we get a better name?  blockdev-bitmaps.c, for example?
->=20
-> Sure, I'm open to bike-shed suggestions.  I'd also _really_ love to make =
-the
-> new file NOT live in the top-level, but that's a harder task that I'm not
-> sure how to do (it's easy to tweak Makefile.objs for another file in the
-> same directory, but harder to see through the magic to figure out how to
-> relocate things).
 
-Yes, please move it somewhere else. I'd suggest something like
-block/monitor/bitmap-qmp-cmds.c for the QMP command handlers, and if
-there are functions that are more generally useful, block/bitmaps.c.
+casmac <1482995675@qq.com> writes:
 
-Instead of modifying the top-level Makefile.objs, you would just edit
-block/monitor/Makefile.objs instead and add the filename there. I don't
-think you need to understand any magic apart from knowing that is exists
-and does what you would expect.
+> Hi all,
+> &nbsp; &nbsp;I am having trouble running qemu tests. basically ,can not r=
+un check-tcg and check-unit.
+> &nbsp; Before executing the tests, I did the configuration=EF=BC=9A&nbsp;=
+configure --target-list=3Dsparc-softmmu --cross-prefix=3Dx86_64-w64-mingw32=
+- --enable-gtk --enable-sdl --enable-debug
+> &nbsp; The source code is built&nbsp; alrigtht . but can not execute the =
+tests.
+> &nbsp; Running make check-tcg returned nothing but:
+> $ make check-tcg
+> &nbsp; BUILD&nbsp; &nbsp;TCG tests for sparc-softmmu
+> &nbsp; BUILD&nbsp; &nbsp;sparc-softmmu guest-tests SKIPPED
+> &nbsp; RUN&nbsp; &nbsp; &nbsp;TCG tests for sparc-softmmu
+> &nbsp; RUN&nbsp; &nbsp; &nbsp;tests for sparc-softmmu SKIPPED
 
-Kevin
+You will either need docker/podman setup so we can use those images to
+cross-build the tests for other architectures or have cross compilers
+installed for your targets. This is documented in docs/devel/testing.rst
 
+> &nbsp; Runing make check-unit, give me "undefined reference"error message=
+=EF=BC=9A
+> $ make check-unit
+> C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86=
+_64-w64-mingw32/bin/ld.exe: tests/test-bitmap.o: in function `check_bitmap_=
+copy_with_offset':
+> D:/cuix/workspace_devl/qemu-4.2.0/tests/test-bitmap.c:25: undefined refer=
+ence to `random'
+> C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86=
+_64-w64-mingw32/bin/ld.exe: D:/cuix/workspace_devl/qemu-4.2.0/tests/test-bi=
+tmap.c:26: undefined reference to `random'
+> C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86=
+_64-w64-mingw32/bin/ld.exe: D:/cuix/workspace_devl/qemu-4.2.0/tests/test-bi=
+tmap.c:27: undefined reference to `random'
+> C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/9.3.0/../../../../x86=
+_64-w64-mingw32/bin/ld.exe: D:/cuix/workspace_devl/qemu-4.2.0/tests/test-bi=
+tmap.c:28: undefined reference to `random'
+> collect2.exe: error: ld returned 1 exit status
+> make: *** [/d/cuix/workspace_devl/qemu-4.2.0/rules.mak:124=EF=BC=9A
+> tests/test-bitmap.exe] error&nbsp; 1
+
+Hmm not sure about this but I suspect the unit tests are written
+assuming a POSIX environment although I would have thought glib would
+have smoothed over those differences.
+
+>
+> &nbsp; &nbsp;Something went wrong but I have no clue at all. Any suggesti=
+ons?&nbsp;
+> &nbsp; &nbsp;Thanks a lot.
+>
+>
+> regards,
+>
+>
+> xiaolei
+
+
+--=20
+Alex Benn=C3=A9e
 
