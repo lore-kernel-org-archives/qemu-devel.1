@@ -2,95 +2,91 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDED8C47255
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 20:49:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B6DFC38A2A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 21:31:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A63C020725
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 20:49:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A63C020725
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 397D4218AC
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 21:31:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hf7VaXvD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 397D4218AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX9vs-0005RC-Q1
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 16:49:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44282)
+	id 1jXAaf-0004nV-C3
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 17:31:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36772)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jX9u0-00048K-Nk
- for qemu-devel@nongnu.org; Fri, 08 May 2020 16:47:26 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:25952
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jX9tx-0006OQ-KE
- for qemu-devel@nongnu.org; Fri, 08 May 2020 16:47:24 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 048KWEuu060011; Fri, 8 May 2020 16:47:19 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0b-001b2d01.pphosted.com with ESMTP id 30wdcg22jb-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 08 May 2020 16:47:19 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 048Kk5fw002566;
- Fri, 8 May 2020 20:47:19 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
- [9.57.198.29]) by ppma03dal.us.ibm.com with ESMTP id 30s0g8a19w-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 08 May 2020 20:47:19 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
- [9.57.199.107])
- by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 048KlIXo53215492
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 8 May 2020 20:47:18 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 3485F124053;
- Fri,  8 May 2020 20:47:18 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1E3CC124052;
- Fri,  8 May 2020 20:47:18 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
- Fri,  8 May 2020 20:47:18 +0000 (GMT)
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 0/1] Merge tpm 2020/05/08 v2
-Date: Fri,  8 May 2020 16:47:15 -0400
-Message-Id: <20200508204716.1279160-1-stefanb@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.24.1
+ (Exim 4.90_1) (envelope-from <alexander.duyck@gmail.com>)
+ id 1jXAZ8-0003vd-H7
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 17:29:54 -0400
+Received: from mail-qv1-xf41.google.com ([2607:f8b0:4864:20::f41]:45749)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alexander.duyck@gmail.com>)
+ id 1jXAZ7-0008AX-CP
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 17:29:54 -0400
+Received: by mail-qv1-xf41.google.com with SMTP id p13so1542040qvt.12
+ for <qemu-devel@nongnu.org>; Fri, 08 May 2020 14:29:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=subject:from:to:cc:date:message-id:user-agent:mime-version
+ :content-transfer-encoding;
+ bh=vxofOa6SkCodTLc1swG4ipN5CZU0JprATw9nd/eJ96M=;
+ b=hf7VaXvD98G/AlFsFDX0dAyBU8+0U/o86YUpY3MaCaelOc1gkeJZUuVEZIHpjtXkYh
+ 3ZVbnwDF+RRyRefg9QJVzckJr+uSKMnzwYBeXsGMOTJ4VOdj06kUpCX5F2aYRgjKayrE
+ G/FlPVEq3ThScicVQNowptdVQ6FwE07icl/7cp7eOQMB7ew1oddcua+pe8SbFIB5ZKMk
+ +lccPZyBNf0DOiOJDH2qs/UBz76hsTWd+C6LcSrp9S2YuJcXflSpcyxD22A+bF84k8bk
+ KbW2B24lec0BiYFmHukTx4c25lRN6lVlLBDvl2UZJ1Shv8RRmR3NdpIhMFuGzjXRsH1A
+ Xwhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:from:to:cc:date:message-id:user-agent
+ :mime-version:content-transfer-encoding;
+ bh=vxofOa6SkCodTLc1swG4ipN5CZU0JprATw9nd/eJ96M=;
+ b=T4qDEEv0quGU6uz5BpgSflRga6pPNm7r8TKuqde2fG29NzFw1+s/FwjSmnLi+gmpxt
+ PLnJkh7tgIIY1qUNzKbL51A33CoCRshX1lX+q2qGqFI0s0B5Hg810m0M/iktCuupx8fx
+ 2Y+1U9moJRR/tpzDxLTpaOqIdXSpJcXBv+6gSQVAC/5CVOy1uIzHPnecnNemrtCBTHOy
+ QrJQqfKptz4tgjbjud1jJ+FeNAsNgkOb8vPgbgml7au6zFesACVWZ9Fr+U0DqvjfVhXD
+ CxuLPvZZJp6X7uO+3/u4tS94DEKSGjtGoqHVSQXAfKsslBVtRdNjnETAcEhPxzyfG3LM
+ dDcg==
+X-Gm-Message-State: AGi0PuYEQuE5TPHgU7PQHDFwA9ETFGud9p+kHk7aizuSKRo9zWp+K31X
+ WISJg342zS0sNIVakhsGuuk=
+X-Google-Smtp-Source: APiQypIK2rc5g4iySPpWnmuCse+1VaB1yQBkbYrzJQzIWxnqW4DfJnSTjUZTxaJ2wLtCYXdgsCZYYQ==
+X-Received: by 2002:a05:6214:a14:: with SMTP id
+ dw20mr4768951qvb.179.1588973391818; 
+ Fri, 08 May 2020 14:29:51 -0700 (PDT)
+Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
+ by smtp.gmail.com with ESMTPSA id l9sm2395909qth.60.2020.05.08.14.29.50
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 08 May 2020 14:29:51 -0700 (PDT)
+Subject: [PATCH v24 QEMU 0/3] virtio-balloon: add support for page poison
+ reporting and free page reporting
+From: Alexander Duyck <alexander.duyck@gmail.com>
+To: david@redhat.com, mst@redhat.com
+Date: Fri, 08 May 2020 14:29:49 -0700
+Message-ID: <20200508212719.26071.94248.stgit@localhost.localdomain>
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
- definitions=2020-05-08_18:2020-05-08,
- 2020-05-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 suspectscore=1
- priorityscore=1501 mlxlogscore=980 impostorscore=0 phishscore=0
- malwarescore=0 bulkscore=0 clxscore=1015 mlxscore=0 adultscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2005080169
-Received-SPF: none client-ip=148.163.158.5;
- envelope-from=stefanb@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 15:43:05
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::f41;
+ envelope-from=alexander.duyck@gmail.com; helo=mail-qv1-xf41.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,33 +99,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This PR submits a fix that changes improperly used 'FALSE' to 'false'.
+This series provides an asynchronous means of reporting free guest pages
+to QEMU through virtio-balloon so that the memory associated with those
+pages can be dropped and reused by other processes and/or guests on the
+host. Using this it is possible to avoid unnecessary I/O to disk and
+greatly improve performance in the case of memory overcommit on the host.
 
-The following changes since commit c88f1ffc19e38008a1c33ae039482a860aa7418c:
+I originally submitted this patch series back on February 11th 2020[1],
+but at that time I was focused primarily on the kernel portion of this
+patch set. However as of April 7th those patches are now included in
+Linus's kernel tree[2] and so I am submitting the QEMU pieces for
+inclusion.
 
-  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2020-05-08 14:29:18 +0100)
+[1]: https://lore.kernel.org/lkml/20200211224416.29318.44077.stgit@localhost.localdomain/
+[2]: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=b0c504f154718904ae49349147e3b7e6ae91ffdc
 
-are available in the Git repository at:
+Changes from v17:
+Fixed typo in patch 1 title
+Addressed white-space issues reported via checkpatch
+Added braces {} for two if statements to match expected coding style
 
-  git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2020-05-08-1
+Changes from v18:
+Updated patches 2 and 3 based on input from dhildenb
+Added comment to patch 2 describing what keeps us from reporting a bad page
+Added patch to address issue with ROM devices being directly writable
 
-for you to fetch changes up to 441adbb4540423c90e4628a3c553e61d38445d73:
+Changes from v19:
+Added std-headers change to match changes pushed for linux kernel headers
+Added patch to remove "report" from page hinting code paths
+Updated comment to better explain why we disable hints w/ page poisoning
+Removed code that was modifying config size for poison vs hinting
+Dropped x-page-poison property
+Added code to bounds check the reported region vs the RAM block
+Dropped patch for ROM devices as that was already pulled in by Paolo
 
-  hw/tpm: fix usage of bool in tpm-tis.c (2020-05-08 16:40:45 -0400)
+Changes from v20:
+Rearranged patches to push Linux header sync patches to front
+Removed association between free page hinting and VIRTIO_BALLOON_F_PAGE_POISON
+Added code to enable VIRTIO_BALLOON_F_PAGE_POISON if page reporting is enabled
+Fixed possible resource leak if poison or qemu_balloon_is_inhibited return true
 
-----------------------------------------------------------------
-Jafar Abdi (1):
-      hw/tpm: fix usage of bool in tpm-tis.c
+Changes from v21:
+Added ack for patch 3
+Rewrote patch description for page poison reporting feature
+Made page-poison independent property and set to enabled by default
+Added logic to migrate poison_val
+Added several comments in code to better explain features
+Switched free-page-reporting property to disabled by default
 
- hw/tpm/tpm_tis_common.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Changes from v22:
+Added ack for patches 4 & 5
+Added additional comment fixes in patch 3 to remove "reporting" reference
+Renamed rvq in patch 5 to reporting_vq to better match linux kernel
+Moved call adding reporting_vq to after free_page_vq
 
--- 
-2.24.1
+Changes from v23:
+Rebased on latest QEMU
+Dropped patches 1 & 2 as Linux kernel headers were synced
+Added compat machine bits for page-poison feature
 
+---
+
+Alexander Duyck (3):
+      virtio-balloon: Replace free page hinting references to 'report' with 'hint'
+      virtio-balloon: Implement support for page poison reporting feature
+      virtio-balloon: Provide an interface for free page reporting
+
+
+ hw/core/machine.c                  |    4 +
+ hw/virtio/virtio-balloon.c         |  176 ++++++++++++++++++++++++++++--------
+ include/hw/virtio/virtio-balloon.h |   23 ++---
+ 3 files changed, 152 insertions(+), 51 deletions(-)
+
+--
 
