@@ -2,89 +2,87 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 816C9C38A2A
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 18:58:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A68CC38A2A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 18:59:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E7BC2083B
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 18:58:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 214862173E
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 18:59:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XS0i46kt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E7BC2083B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tcfKCcbd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 214862173E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX8CA-0007pQ-EC
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 14:58:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41786)
+	id 1jX8E0-0000np-6S
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 14:59:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42318)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jX8Ba-00075V-5t
- for qemu-devel@nongnu.org; Fri, 08 May 2020 14:57:26 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55844)
+ id 1jX8DQ-0000O6-Kp
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 14:59:20 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37097)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jX8BY-0004nn-U2
- for qemu-devel@nongnu.org; Fri, 08 May 2020 14:57:25 -0400
-Received: by mail-wm1-x342.google.com with SMTP id e26so11239419wmk.5
- for <qemu-devel@nongnu.org>; Fri, 08 May 2020 11:57:24 -0700 (PDT)
+ id 1jX8DP-0002Pk-W6
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 14:59:20 -0400
+Received: by mail-wr1-x441.google.com with SMTP id k1so3118659wrx.4
+ for <qemu-devel@nongnu.org>; Fri, 08 May 2020 11:59:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=KYGmL8wZ7i/RZkbpKz3T4wP+Q0BUKCaOCTJV/BWd9zw=;
- b=XS0i46ktRx74aPLfq9HObWq95bAzAufulVWPTM8OpwdRtfzzufWF3xL6VC3eFelZLP
- 79pq4Rw2uPUOywm2VF9undJKkvLHy9mvO9aYE7hd1XFTshbcHpNFom02pRKPMBcu/5AM
- WU2gP56l1Cv/9LJeyM9yt+NmroVgT/PTORRD1N6qR3F6wKpuikoahGzzWk/W1UkhqCBm
- Af7fh++yrQgWB7S5bYi9FXfObKB7hIkg3PGDhnHT+2zLcj3wpVQX050EESgkS/SqlHjB
- FVpIqyKfueLe4FWEaCYdR92c6p69ygKVZVkXgUgKg9qisaj3BOE05o9lR9onkwfRo1oU
- 1low==
+ bh=Y4hLlZCldwWpVfnCB3CzdKiUmoIsVvcaYIHI++Lv+ng=;
+ b=tcfKCcbdcIJ8JYujXxxDUS0nzooo6PzyoQBKJwPPKIXAUkJWz+aZOSdI+pmyx4myE/
+ jyidS7K5Zu0B11bo7Fn2Zx6WsRu6mH2XgMAYT50L9U04BqMO+uRdECJTYjnlN4CRsldl
+ IhPq+hh1TUfNJ7DZ7Q22Q+850YtPCvbLhz9VW3PxsgimEmYnAAAW/EPwcLK5IA3qktjz
+ PrXkquI1FFBAkq4KwFoTwF9JCb2RAGwXVrl5sKrH/Glfw5pI6Dv9gZ2mExHfN8Pw5twF
+ XqfP73PM/DHWOgZE0PeFv/Wkh6ADyohdATxbqs2LVTCdpIGjTy2qfZLyXf6MhXtlqnDD
+ 1MHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=KYGmL8wZ7i/RZkbpKz3T4wP+Q0BUKCaOCTJV/BWd9zw=;
- b=jmVuaZ21ApZyR1lqqzskQh6xzKKSRWr4+QIWoCC30YKLm18aPBkRmDj2fvncL37//b
- sy/z2VcKWl5V3kFo6Z2curJv3CliltDPzdeYvpnwi+15atbBPM7oUnRn0sUUmlgqROSK
- Tks/qQQ2wywA2cvWQjpcK4nmEoMHp90cRBrnMeT17lwOo66afJvp3Xscwy3gf6p31gAa
- +LzdIO47SQu3+Nj08hBKvf2EgiO2pkP3av4c7Ew//t/WHeBO3YMcbiJK+L9q4F/FRVle
- AEuDPHmuITYlRP0cN8l01yJ7DY2SgTID4wp1221OVguV8FTx4ln02ISC0GV1aG5sCuVs
- ts3g==
-X-Gm-Message-State: AGi0PuaCQGEHz1WzirYPEjBEIwNhqmRHrvBXQUGVWTPJRcjdct3YECil
- iMJFe4hov0ExstA5Wic9HzMVBmOz36U=
-X-Google-Smtp-Source: APiQypK0mp3r/DbMrE2CoBOONHdEwfjMBnP9UftHVhZuv01HE1VQLY1JltNa7gdeqfXgUKXS5GVo5A==
-X-Received: by 2002:a05:600c:295a:: with SMTP id
- n26mr19389916wmd.16.1588964243282; 
- Fri, 08 May 2020 11:57:23 -0700 (PDT)
+ bh=Y4hLlZCldwWpVfnCB3CzdKiUmoIsVvcaYIHI++Lv+ng=;
+ b=AzBRPYGDkBQIBlW2vPidvmNKA6I3gf9BwSyebg9oiotP9QXWSie9UBhyHPLnI4zsAI
+ zVgFU1CfMuvh4B5DVkZou6uzecwt59jOAOV7PkYjevQYytxQJax8Br9oyU9oPwnBQyKP
+ Sk3naVUX/0qCpDAlStTCo9rZCcv1XtXel1P/DvNyDMH4puOs4FLT+ksGTDLrOhVv7VIz
+ aW2CSExItzkO3kICvaTJxlbMjP0tiBEhvC/FqY5nXtR5cSpGO8pqv26Qgv+1qdCKhDSR
+ vdhePeqklh6ShhkUakVyBSUcNGYRqb7QQPPp9pQyvY4kbAenr33rlYIzbFacn7EPgxMh
+ o4hw==
+X-Gm-Message-State: AGi0Puaujsy3bw5hnghlJapFmIR59pyDl9C+px9OBYSXMj3mSn4hIWqF
+ +W95CVWh/IAQlfvVafiSslw=
+X-Google-Smtp-Source: APiQypLy/90WLliZxXuwKSgVUUgPqy2aX4xxFFy/o3dEzG87DpIKWbsdUmi7ZGHjkh4jvdzJC0IIlg==
+X-Received: by 2002:adf:fa04:: with SMTP id m4mr4432689wrr.30.1588964358276;
+ Fri, 08 May 2020 11:59:18 -0700 (PDT)
 Received: from [192.168.1.37] (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id 32sm4513683wrg.19.2020.05.08.11.57.22
+ by smtp.gmail.com with ESMTPSA id h16sm4852124wrw.36.2020.05.08.11.59.17
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 08 May 2020 11:57:22 -0700 (PDT)
-Subject: Re: [PATCH v3 01/19] tcg: Consolidate 3 bits into enum TCGTempKind
+ Fri, 08 May 2020 11:59:17 -0700 (PDT)
+Subject: Re: [PATCH v4 01/19] tcg: Consolidate 3 bits into enum TCGTempKind
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200508151747.6166-1-richard.henderson@linaro.org>
- <20200508151747.6166-2-richard.henderson@linaro.org>
+References: <20200508182616.18318-1-richard.henderson@linaro.org>
+ <20200508182616.18318-2-richard.henderson@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6cb38eff-062f-eb43-135e-431e93546df8@amsat.org>
-Date: Fri, 8 May 2020 20:57:21 +0200
+Message-ID: <8380dee6-091f-89a8-a390-292c42eead58@amsat.org>
+Date: Fri, 8 May 2020 20:59:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200508151747.6166-2-richard.henderson@linaro.org>
+In-Reply-To: <20200508182616.18318-2-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -112,419 +110,17 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/8/20 5:17 PM, Richard Henderson wrote:
+On 5/8/20 8:25 PM, Richard Henderson wrote:
 > The temp_fixed, temp_global, temp_local bits are all related.
 > Combine them into a single enumeration.
 > 
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
 >   include/tcg/tcg.h |  20 +++++---
 >   tcg/optimize.c    |   8 +--
 >   tcg/tcg.c         | 122 ++++++++++++++++++++++++++++------------------
 >   3 files changed, 90 insertions(+), 60 deletions(-)
-> 
-> diff --git a/include/tcg/tcg.h b/include/tcg/tcg.h
-> index 380014ed80..06486635e6 100644
-> --- a/include/tcg/tcg.h
-> +++ b/include/tcg/tcg.h
-> @@ -483,23 +483,27 @@ typedef enum TCGTempVal {
->       TEMP_VAL_CONST,
->   } TCGTempVal;
->   
-> +typedef enum TCGTempKind {
-> +    /* Temp is dead at the end of all basic blocks. */
-> +    TEMP_NORMAL,
-> +    /* Temp is saved across basic blocks but dead at the end of TBs. */
-> +    TEMP_LOCAL,
-> +    /* Temp is saved across both basic blocks and translation blocks. */
-> +    TEMP_GLOBAL,
-> +    /* Temp is in a fixed register. */
-> +    TEMP_FIXED,
-> +} TCGTempKind;
-> +
->   typedef struct TCGTemp {
->       TCGReg reg:8;
->       TCGTempVal val_type:8;
->       TCGType base_type:8;
->       TCGType type:8;
-> -    unsigned int fixed_reg:1;
-> +    TCGTempKind kind:3;
->       unsigned int indirect_reg:1;
->       unsigned int indirect_base:1;
->       unsigned int mem_coherent:1;
->       unsigned int mem_allocated:1;
-> -    /* If true, the temp is saved across both basic blocks and
-> -       translation blocks.  */
-> -    unsigned int temp_global:1;
-> -    /* If true, the temp is saved across basic blocks but dead
-> -       at the end of translation blocks.  If false, the temp is
-> -       dead at the end of basic blocks.  */
-> -    unsigned int temp_local:1;
->       unsigned int temp_allocated:1;
->   
->       tcg_target_long val;
-> diff --git a/tcg/optimize.c b/tcg/optimize.c
-> index 53aa8e5329..afb4a9a5a9 100644
-> --- a/tcg/optimize.c
-> +++ b/tcg/optimize.c
-> @@ -116,21 +116,21 @@ static TCGTemp *find_better_copy(TCGContext *s, TCGTemp *ts)
->       TCGTemp *i;
->   
->       /* If this is already a global, we can't do better. */
-> -    if (ts->temp_global) {
-> +    if (ts->kind >= TEMP_GLOBAL) {
->           return ts;
->       }
->   
->       /* Search for a global first. */
->       for (i = ts_info(ts)->next_copy; i != ts; i = ts_info(i)->next_copy) {
-> -        if (i->temp_global) {
-> +        if (i->kind >= TEMP_GLOBAL) {
->               return i;
->           }
->       }
->   
->       /* If it is a temp, search for a temp local. */
-> -    if (!ts->temp_local) {
-> +    if (ts->kind == TEMP_NORMAL) {
->           for (i = ts_info(ts)->next_copy; i != ts; i = ts_info(i)->next_copy) {
-> -            if (ts->temp_local) {
-> +            if (i->kind >= TEMP_LOCAL) {
->                   return i;
->               }
->           }
-> diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index 216a6963b3..2c022c9621 100644
-> --- a/tcg/tcg.c
-> +++ b/tcg/tcg.c
-> @@ -1155,7 +1155,7 @@ static inline TCGTemp *tcg_global_alloc(TCGContext *s)
->       tcg_debug_assert(s->nb_globals == s->nb_temps);
->       s->nb_globals++;
->       ts = tcg_temp_alloc(s);
-> -    ts->temp_global = 1;
-> +    ts->kind = TEMP_GLOBAL;
->   
->       return ts;
->   }
-> @@ -1172,7 +1172,7 @@ static TCGTemp *tcg_global_reg_new_internal(TCGContext *s, TCGType type,
->       ts = tcg_global_alloc(s);
->       ts->base_type = type;
->       ts->type = type;
-> -    ts->fixed_reg = 1;
-> +    ts->kind = TEMP_FIXED;
->       ts->reg = reg;
->       ts->name = name;
->       tcg_regset_set_reg(s->reserved_regs, reg);
-> @@ -1199,7 +1199,7 @@ TCGTemp *tcg_global_mem_new_internal(TCGType type, TCGv_ptr base,
->       bigendian = 1;
->   #endif
->   
-> -    if (!base_ts->fixed_reg) {
-> +    if (base_ts->kind != TEMP_FIXED) {
->           /* We do not support double-indirect registers.  */
->           tcg_debug_assert(!base_ts->indirect_reg);
->           base_ts->indirect_base = 1;
-> @@ -1247,6 +1247,7 @@ TCGTemp *tcg_global_mem_new_internal(TCGType type, TCGv_ptr base,
->   TCGTemp *tcg_temp_new_internal(TCGType type, bool temp_local)
->   {
->       TCGContext *s = tcg_ctx;
-> +    TCGTempKind kind = temp_local ? TEMP_LOCAL : TEMP_NORMAL;
->       TCGTemp *ts;
->       int idx, k;
->   
-> @@ -1259,7 +1260,7 @@ TCGTemp *tcg_temp_new_internal(TCGType type, bool temp_local)
->           ts = &s->temps[idx];
->           ts->temp_allocated = 1;
->           tcg_debug_assert(ts->base_type == type);
-> -        tcg_debug_assert(ts->temp_local == temp_local);
-> +        tcg_debug_assert(ts->kind == kind);
->       } else {
->           ts = tcg_temp_alloc(s);
->           if (TCG_TARGET_REG_BITS == 32 && type == TCG_TYPE_I64) {
-> @@ -1268,18 +1269,18 @@ TCGTemp *tcg_temp_new_internal(TCGType type, bool temp_local)
->               ts->base_type = type;
->               ts->type = TCG_TYPE_I32;
->               ts->temp_allocated = 1;
-> -            ts->temp_local = temp_local;
-> +            ts->kind = kind;
->   
->               tcg_debug_assert(ts2 == ts + 1);
->               ts2->base_type = TCG_TYPE_I64;
->               ts2->type = TCG_TYPE_I32;
->               ts2->temp_allocated = 1;
-> -            ts2->temp_local = temp_local;
-> +            ts2->kind = kind;
->           } else {
->               ts->base_type = type;
->               ts->type = type;
->               ts->temp_allocated = 1;
-> -            ts->temp_local = temp_local;
-> +            ts->kind = kind;
->           }
-
-We can move out of the if():
-
-         ts->base_type = type;
-         ts->temp_allocated = 1;
-         ts->kind = kind;
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
->       }
->   
-> @@ -1336,12 +1337,12 @@ void tcg_temp_free_internal(TCGTemp *ts)
->       }
->   #endif
->   
-> -    tcg_debug_assert(ts->temp_global == 0);
-> +    tcg_debug_assert(ts->kind < TEMP_GLOBAL);
->       tcg_debug_assert(ts->temp_allocated != 0);
->       ts->temp_allocated = 0;
->   
->       idx = temp_idx(ts);
-> -    k = ts->base_type + (ts->temp_local ? TCG_TYPE_COUNT : 0);
-> +    k = ts->base_type + (ts->kind == TEMP_NORMAL ? 0 : TCG_TYPE_COUNT);
->       set_bit(idx, s->free_temps[k].l);
->   }
->   
-> @@ -1871,17 +1872,27 @@ void tcg_gen_callN(void *func, TCGTemp *ret, int nargs, TCGTemp **args)
->   static void tcg_reg_alloc_start(TCGContext *s)
->   {
->       int i, n;
-> -    TCGTemp *ts;
->   
-> -    for (i = 0, n = s->nb_globals; i < n; i++) {
-> -        ts = &s->temps[i];
-> -        ts->val_type = (ts->fixed_reg ? TEMP_VAL_REG : TEMP_VAL_MEM);
-> -    }
-> -    for (n = s->nb_temps; i < n; i++) {
-> -        ts = &s->temps[i];
-> -        ts->val_type = (ts->temp_local ? TEMP_VAL_MEM : TEMP_VAL_DEAD);
-> -        ts->mem_allocated = 0;
-> -        ts->fixed_reg = 0;
-> +    for (i = 0, n = s->nb_temps; i < n; i++) {
-> +        TCGTemp *ts = &s->temps[i];
-> +        TCGTempVal val = TEMP_VAL_MEM;
-> +
-> +        switch (ts->kind) {
-> +        case TEMP_FIXED:
-> +            val = TEMP_VAL_REG;
-> +            break;
-> +        case TEMP_GLOBAL:
-> +            break;
-> +        case TEMP_NORMAL:
-> +            val = TEMP_VAL_DEAD;
-> +            /* fall through */
-> +        case TEMP_LOCAL:
-> +            ts->mem_allocated = 0;
-> +            break;
-> +        default:
-> +            g_assert_not_reached();
-> +        }
-> +        ts->val_type = val;
->       }
->   
->       memset(s->reg_to_temp, 0, sizeof(s->reg_to_temp));
-> @@ -1892,12 +1903,17 @@ static char *tcg_get_arg_str_ptr(TCGContext *s, char *buf, int buf_size,
->   {
->       int idx = temp_idx(ts);
->   
-> -    if (ts->temp_global) {
-> +    switch (ts->kind) {
-> +    case TEMP_FIXED:
-> +    case TEMP_GLOBAL:
->           pstrcpy(buf, buf_size, ts->name);
-> -    } else if (ts->temp_local) {
-> +        break;
-> +    case TEMP_LOCAL:
->           snprintf(buf, buf_size, "loc%d", idx - s->nb_globals);
-> -    } else {
-> +        break;
-> +    case TEMP_NORMAL:
->           snprintf(buf, buf_size, "tmp%d", idx - s->nb_globals);
-> +        break;
->       }
->       return buf;
->   }
-> @@ -2493,15 +2509,24 @@ static void la_bb_end(TCGContext *s, int ng, int nt)
->   {
->       int i;
->   
-> -    for (i = 0; i < ng; ++i) {
-> -        s->temps[i].state = TS_DEAD | TS_MEM;
-> -        la_reset_pref(&s->temps[i]);
-> -    }
-> -    for (i = ng; i < nt; ++i) {
-> -        s->temps[i].state = (s->temps[i].temp_local
-> -                             ? TS_DEAD | TS_MEM
-> -                             : TS_DEAD);
-> -        la_reset_pref(&s->temps[i]);
-> +    for (i = 0; i < nt; ++i) {
-> +        TCGTemp *ts = &s->temps[i];
-> +        int state;
-> +
-> +        switch (ts->kind) {
-> +        case TEMP_FIXED:
-> +        case TEMP_GLOBAL:
-> +        case TEMP_LOCAL:
-> +            state = TS_DEAD | TS_MEM;
-> +            break;
-> +        case TEMP_NORMAL:
-> +            state = TS_DEAD;
-> +            break;
-> +        default:
-> +            g_assert_not_reached();
-> +        }
-> +        ts->state = state;
-> +        la_reset_pref(ts);
->       }
->   }
->   
-> @@ -3110,7 +3135,8 @@ static void check_regs(TCGContext *s)
->       }
->       for (k = 0; k < s->nb_temps; k++) {
->           ts = &s->temps[k];
-> -        if (ts->val_type == TEMP_VAL_REG && !ts->fixed_reg
-> +        if (ts->val_type == TEMP_VAL_REG
-> +            && ts->kind != TEMP_FIXED
->               && s->reg_to_temp[ts->reg] != ts) {
->               printf("Inconsistency for temp %s:\n",
->                      tcg_get_arg_str_ptr(s, buf, sizeof(buf), ts));
-> @@ -3147,15 +3173,14 @@ static void temp_load(TCGContext *, TCGTemp *, TCGRegSet, TCGRegSet, TCGRegSet);
->      mark it free; otherwise mark it dead.  */
->   static void temp_free_or_dead(TCGContext *s, TCGTemp *ts, int free_or_dead)
->   {
-> -    if (ts->fixed_reg) {
-> +    if (ts->kind == TEMP_FIXED) {
->           return;
->       }
->       if (ts->val_type == TEMP_VAL_REG) {
->           s->reg_to_temp[ts->reg] = NULL;
->       }
->       ts->val_type = (free_or_dead < 0
-> -                    || ts->temp_local
-> -                    || ts->temp_global
-> +                    || ts->kind != TEMP_NORMAL
->                       ? TEMP_VAL_MEM : TEMP_VAL_DEAD);
->   }
->   
-> @@ -3172,7 +3197,7 @@ static inline void temp_dead(TCGContext *s, TCGTemp *ts)
->   static void temp_sync(TCGContext *s, TCGTemp *ts, TCGRegSet allocated_regs,
->                         TCGRegSet preferred_regs, int free_or_dead)
->   {
-> -    if (ts->fixed_reg) {
-> +    if (ts->kind == TEMP_FIXED) {
->           return;
->       }
->       if (!ts->mem_coherent) {
-> @@ -3330,7 +3355,8 @@ static void temp_save(TCGContext *s, TCGTemp *ts, TCGRegSet allocated_regs)
->   {
->       /* The liveness analysis already ensures that globals are back
->          in memory. Keep an tcg_debug_assert for safety. */
-> -    tcg_debug_assert(ts->val_type == TEMP_VAL_MEM || ts->fixed_reg);
-> +    tcg_debug_assert(ts->val_type == TEMP_VAL_MEM
-> +                     || ts->kind == TEMP_FIXED);
->   }
->   
->   /* save globals to their canonical location and assume they can be
-> @@ -3355,7 +3381,7 @@ static void sync_globals(TCGContext *s, TCGRegSet allocated_regs)
->       for (i = 0, n = s->nb_globals; i < n; i++) {
->           TCGTemp *ts = &s->temps[i];
->           tcg_debug_assert(ts->val_type != TEMP_VAL_REG
-> -                         || ts->fixed_reg
-> +                         || ts->kind == TEMP_FIXED
->                            || ts->mem_coherent);
->       }
->   }
-> @@ -3368,7 +3394,7 @@ static void tcg_reg_alloc_bb_end(TCGContext *s, TCGRegSet allocated_regs)
->   
->       for (i = s->nb_globals; i < s->nb_temps; i++) {
->           TCGTemp *ts = &s->temps[i];
-> -        if (ts->temp_local) {
-> +        if (ts->kind == TEMP_LOCAL) {
->               temp_save(s, ts, allocated_regs);
->           } else {
->               /* The liveness analysis already ensures that temps are dead.
-> @@ -3388,7 +3414,7 @@ static void tcg_reg_alloc_do_movi(TCGContext *s, TCGTemp *ots,
->                                     TCGRegSet preferred_regs)
->   {
->       /* ENV should not be modified.  */
-> -    tcg_debug_assert(!ots->fixed_reg);
-> +    tcg_debug_assert(ots->kind != TEMP_FIXED);
->   
->       /* The movi is not explicitly generated here.  */
->       if (ots->val_type == TEMP_VAL_REG) {
-> @@ -3428,7 +3454,7 @@ static void tcg_reg_alloc_mov(TCGContext *s, const TCGOp *op)
->       ts = arg_temp(op->args[1]);
->   
->       /* ENV should not be modified.  */
-> -    tcg_debug_assert(!ots->fixed_reg);
-> +    tcg_debug_assert(ots->kind != TEMP_FIXED);
->   
->       /* Note that otype != itype for no-op truncation.  */
->       otype = ots->type;
-> @@ -3467,7 +3493,7 @@ static void tcg_reg_alloc_mov(TCGContext *s, const TCGOp *op)
->           }
->           temp_dead(s, ots);
->       } else {
-> -        if (IS_DEAD_ARG(1) && !ts->fixed_reg) {
-> +        if (IS_DEAD_ARG(1) && ts->kind != TEMP_FIXED) {
->               /* the mov can be suppressed */
->               if (ots->val_type == TEMP_VAL_REG) {
->                   s->reg_to_temp[ots->reg] = NULL;
-> @@ -3489,7 +3515,7 @@ static void tcg_reg_alloc_mov(TCGContext *s, const TCGOp *op)
->                    * Store the source register into the destination slot
->                    * and leave the destination temp as TEMP_VAL_MEM.
->                    */
-> -                assert(!ots->fixed_reg);
-> +                assert(ots->kind != TEMP_FIXED);
->                   if (!ts->mem_allocated) {
->                       temp_allocate_frame(s, ots);
->                   }
-> @@ -3526,7 +3552,7 @@ static void tcg_reg_alloc_dup(TCGContext *s, const TCGOp *op)
->       its = arg_temp(op->args[1]);
->   
->       /* ENV should not be modified.  */
-> -    tcg_debug_assert(!ots->fixed_reg);
-> +    tcg_debug_assert(ots->kind != TEMP_FIXED);
->   
->       itype = its->type;
->       vece = TCGOP_VECE(op);
-> @@ -3666,7 +3692,7 @@ static void tcg_reg_alloc_op(TCGContext *s, const TCGOp *op)
->           i_preferred_regs = o_preferred_regs = 0;
->           if (arg_ct->ct & TCG_CT_IALIAS) {
->               o_preferred_regs = op->output_pref[arg_ct->alias_index];
-> -            if (ts->fixed_reg) {
-> +            if (ts->kind == TEMP_FIXED) {
->                   /* if fixed register, we must allocate a new register
->                      if the alias is not the same register */
->                   if (arg != op->args[arg_ct->alias_index]) {
-> @@ -3757,7 +3783,7 @@ static void tcg_reg_alloc_op(TCGContext *s, const TCGOp *op)
->               ts = arg_temp(arg);
->   
->               /* ENV should not be modified.  */
-> -            tcg_debug_assert(!ts->fixed_reg);
-> +            tcg_debug_assert(ts->kind != TEMP_FIXED);
->   
->               if ((arg_ct->ct & TCG_CT_ALIAS)
->                   && !const_args[arg_ct->alias_index]) {
-> @@ -3799,7 +3825,7 @@ static void tcg_reg_alloc_op(TCGContext *s, const TCGOp *op)
->           ts = arg_temp(op->args[i]);
->   
->           /* ENV should not be modified.  */
-> -        tcg_debug_assert(!ts->fixed_reg);
-> +        tcg_debug_assert(ts->kind != TEMP_FIXED);
->   
->           if (NEED_SYNC_ARG(i)) {
->               temp_sync(s, ts, o_allocated_regs, 0, IS_DEAD_ARG(i));
-> @@ -3931,7 +3957,7 @@ static void tcg_reg_alloc_call(TCGContext *s, TCGOp *op)
->           ts = arg_temp(arg);
->   
->           /* ENV should not be modified.  */
-> -        tcg_debug_assert(!ts->fixed_reg);
-> +        tcg_debug_assert(ts->kind != TEMP_FIXED);
->   
->           reg = tcg_target_call_oarg_regs[i];
->           tcg_debug_assert(s->reg_to_temp[reg] == NULL);
-> 
 
