@@ -2,94 +2,91 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C72F2C38A2A
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 18:22:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF85BC38A2A
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 18:27:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97B17208CA
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 18:22:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97B17208CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id C369324953
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 18:27:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IJoubZIS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C369324953
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jX7dw-0004Mg-Qg
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 14:22:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54330)
+	id 1jX7ik-00087n-Oz
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 14:27:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33632)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <arbab@linux.ibm.com>)
- id 1jX7Hi-0004io-Jf; Fri, 08 May 2020 13:59:42 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43626)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <arbab@linux.ibm.com>)
- id 1jX7Hh-0002k1-61; Fri, 08 May 2020 13:59:42 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 048HXm7c056383; Fri, 8 May 2020 13:59:32 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0a-001b2d01.pphosted.com with ESMTP id 30vtt449a5-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 08 May 2020 13:59:32 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 048HtLYx023932;
- Fri, 8 May 2020 17:59:31 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
- [9.57.198.23]) by ppma03dal.us.ibm.com with ESMTP id 30s0g88vgg-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 08 May 2020 17:59:31 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
- [9.57.199.111])
- by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 048HxUOb55050590
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 8 May 2020 17:59:30 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id AC370AC05B;
- Fri,  8 May 2020 17:59:30 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 31B3FAC059;
- Fri,  8 May 2020 17:59:30 +0000 (GMT)
-Received: from arbab-laptop.localdomain (unknown [9.65.228.143])
- by b01ledav006.gho.pok.ibm.com (Postfix) with SMTP;
- Fri,  8 May 2020 17:59:30 +0000 (GMT)
-Received: by arbab-laptop.localdomain (Postfix, from userid 152845)
- id C0D854606EE; Fri,  8 May 2020 12:59:27 -0500 (CDT)
-From: Reza Arbab <arbab@linux.ibm.com>
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org
-Subject: [PATCH] spapr: Add a new level of NUMA for GPUs
-Date: Fri,  8 May 2020 12:59:27 -0500
-Message-Id: <20200508175927.21791-1-arbab@linux.ibm.com>
-X-Mailer: git-send-email 2.18.1
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
- definitions=2020-05-08_16:2020-05-08,
- 2020-05-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 adultscore=0
- spamscore=0 clxscore=1011 priorityscore=1501 suspectscore=0 bulkscore=0
- lowpriorityscore=0 malwarescore=0 mlxscore=0 mlxlogscore=999 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2005080147
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=arbab@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 13:59:37
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jX7hW-0006YC-C0
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 14:26:22 -0400
+Received: from mail-pg1-x531.google.com ([2607:f8b0:4864:20::531]:42497)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jX7hU-0004vf-GP
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 14:26:21 -0400
+Received: by mail-pg1-x531.google.com with SMTP id n11so1227266pgl.9
+ for <qemu-devel@nongnu.org>; Fri, 08 May 2020 11:26:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=He1E3wpQCl9jPTfjN7MBWAwPVAbruYVbszesB5MhDtw=;
+ b=IJoubZIS/saWfxZhu2SpWZxsjr+WyR1xNQpbsmt3hHzFd5UcN3R6LKkOxCl33yoG8L
+ 01PuIz0Zodf0U/ZVWjFtFcUOFqymsWqU/sKEDvwVWWYeScmPm925nQlv97LjKhBGGpTI
+ Qhr6wGRc767oFEHdwNKUUBAeaWLqhUG+qJkg+3+KoOYZyYL6BasFG+HJgIG5aXYARrPj
+ 8yNgcmtijZKhnX+F58fP6HgvKkqZI9AxurmMKEPRAy19K43lljUuP5+w5HSfMGybFjjg
+ HTBqD3JQ89zGvAacfEGwaVk22t8DH+Q7kPE97YftqFNp8lBVBIC6jf/8zlscTCAu7HMx
+ PqtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=He1E3wpQCl9jPTfjN7MBWAwPVAbruYVbszesB5MhDtw=;
+ b=YKol0tPvUtJSNRja9mylL/k4LmnX6iY7fPe347taeP72nPFRZ/qauaaFLruDF6o7RK
+ jcLVaxITuHIP1UASdVCRa9E45nJHp1FSfZCfi0+NdDuvjL0vHC9qiHd0b/bdYBqENQov
+ zqEA5yEcDfYvI7LQdW6zR32pn1DTtnPumgSjfMRnGm3E9DsrsuH9MQVclBAWaY1hNXjH
+ Ht1aLUa1Ew2Gll2wHz38TXX1tynlSCZIGTIsdA7dWKmS1oVNlEwyESLkzoQSpHVUWI00
+ Ez+aKRmry62jdsB5oHuOgGG/fS5ZT0G5FxVyaaldTZMerMaOA5UaLsAwthdh3p7QRHHL
+ sdVw==
+X-Gm-Message-State: AGi0PuZLsCNEXfAUZtSOTvxZcv+NbUYPu29YdzT2GUMEx2GKuKMgvW7d
+ plSYwNEfD6MaxfuPCqvuTdbOigZbVnU=
+X-Google-Smtp-Source: APiQypKLa75pBdqdvb72YtRN2YmLXUuSJoN5G5VCbUz8/teXy9DfUnDF29VrX83JiIOGWXIFMLkZhw==
+X-Received: by 2002:aa7:8d93:: with SMTP id i19mr4321010pfr.112.1588962378182; 
+ Fri, 08 May 2020 11:26:18 -0700 (PDT)
+Received: from localhost.localdomain (174-21-149-226.tukw.qwest.net.
+ [174.21.149.226])
+ by smtp.gmail.com with ESMTPSA id u9sm2421775pfn.197.2020.05.08.11.26.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 08 May 2020 11:26:17 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 00/19] tcg: Better handling of constants
+Date: Fri,  8 May 2020 11:25:57 -0700
+Message-Id: <20200508182616.18318-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::531;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x531.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
-X-Mailman-Approved-At: Fri, 08 May 2020 14:22:03 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,93 +98,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
- Daniel Henrique Barboza <danielhb@linux.ibm.com>,
- Leonardo Augusto Guimaraes Garcia <lagarcia@linux.ibm.com>
+Cc: alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-NUMA nodes corresponding to GPU memory currently have the same
-affinity/distance as normal memory nodes. Add a third NUMA associativity
-reference point enabling us to give GPU nodes more distance.
+V4 adds the r-b against v2 that I forgot to go back and add.
 
-Before, `numactl -H` output in a guest with 4 GPUs (nodes 2-5):
+Re patch 17, Alex asked if I could ifdef tcg_reg_alloc_dup2
+instead of assert within it.  Answer: No, not without adding
+still more ifdefs to compensate.  In the end I prefer the assert.
 
-node distances:
-node   0   1   2   3   4   5
-  0:  10  40  40  40  40  40
-  1:  40  10  40  40  40  40
-  2:  40  40  10  40  40  40
-  3:  40  40  40  10  40  40
-  4:  40  40  40  40  10  40
-  5:  40  40  40  40  40  10
+V3 fixes the target/sparc regression during register allocation.
 
-After:
+V1 blurb:
 
-node distances:
-node   0   1   2   3   4   5
-  0:  10  40  80  80  80  80
-  1:  40  10  80  80  80  80
-  2:  80  80  10  80  80  80
-  3:  80  80  80  10  80  80
-  4:  80  80  80  80  10  80
-  5:  80  80  80  80  80  10
+This promotes constants to full-fledged temporaries, which are then
+hashed so we have only a single copy across the TB.  If an opcode
+requires forcing one into a register, then we will only do this
+once -- at least until the register is killed, e.g. by a function call.
 
-These are the same distances as on the host, mirroring the change made
-to host firmware in skiboot commit f845a648b8cb ("numa/associativity:
-Add a new level of NUMA for GPU's").
+While this is probably an modest improvement for integer code, it is
+significant for SVE vector code.  In particular, where a generator function
+loads a constant for the operation, and then the generator function is
+called N times for the N x 128-bit vector.  Previously we'd be loading
+up the same constant N times and now we do so only once.
 
-Signed-off-by: Reza Arbab <arbab@linux.ibm.com>
----
- hw/ppc/spapr.c             | 6 +++++-
- hw/ppc/spapr_pci_nvlink2.c | 8 +++-----
- 2 files changed, 8 insertions(+), 6 deletions(-)
+The existing tcg_const_{type}() functions are unchanged, allocating
+a new temporary and initializing it.  The constant propagation pass
+of the optimizer will generally remove the temporary when it turns
+out not to be modified further.
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index c18eab0a2305..53567f98f0c6 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -892,7 +892,11 @@ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
-     int rtas;
-     GString *hypertas = g_string_sized_new(256);
-     GString *qemu_hypertas = g_string_sized_new(256);
--    uint32_t refpoints[] = { cpu_to_be32(0x4), cpu_to_be32(0x4) };
-+    uint32_t refpoints[] = {
-+        cpu_to_be32(0x4),
-+        cpu_to_be32(0x4),
-+        cpu_to_be32(0x2),
-+    };
-     uint64_t max_device_addr = MACHINE(spapr)->device_memory->base +
-         memory_region_size(&MACHINE(spapr)->device_memory->mr);
-     uint32_t lrdr_capacity[] = {
-diff --git a/hw/ppc/spapr_pci_nvlink2.c b/hw/ppc/spapr_pci_nvlink2.c
-index 8332d5694e46..f2cb26019e88 100644
---- a/hw/ppc/spapr_pci_nvlink2.c
-+++ b/hw/ppc/spapr_pci_nvlink2.c
-@@ -37,8 +37,6 @@
- #define PHANDLE_NVLINK(phb, gn, nn)  (0x00130000 | (((phb)->index) << 8) | \
-                                      ((gn) << 4) | (nn))
- 
--#define SPAPR_GPU_NUMA_ID           (cpu_to_be32(1))
--
- typedef struct SpaprPhbPciNvGpuSlot {
-         uint64_t tgt;
-         uint64_t gpa;
-@@ -361,9 +359,9 @@ void spapr_phb_nvgpu_ram_populate_dt(SpaprPhbState *sphb, void *fdt)
-                                                     "nvlink2-mr[0]", NULL);
-         uint32_t associativity[] = {
-             cpu_to_be32(0x4),
--            SPAPR_GPU_NUMA_ID,
--            SPAPR_GPU_NUMA_ID,
--            SPAPR_GPU_NUMA_ID,
-+            cpu_to_be32(nvslot->numa_id),
-+            cpu_to_be32(nvslot->numa_id),
-+            cpu_to_be32(nvslot->numa_id),
-             cpu_to_be32(nvslot->numa_id)
-         };
-         uint64_t size = object_property_get_uint(nv_mrobj, "size", NULL);
+This adds new tcg_constant_{type}() functions which produce a read-only
+temporary containing the constant which need not be freed.  I have
+updated the generic expanders to take advantage of this, but have not
+touched the target front ends.
+
+This also, in the end, allows the complete removal of the tcg opcodes
+that create a constant: INDEX_op_movi_{i32,i64} and INDEX_op_dupi_vec.
+Loading of constants into hard registers is completely controlled by
+the register allocator.
+
+
+r~
+
+
+Richard Henderson (19):
+  tcg: Consolidate 3 bits into enum TCGTempKind
+  tcg: Add temp_readonly
+  tcg: Introduce TYPE_CONST temporaries
+  tcg: Use tcg_constant_i32 with icount expander
+  tcg: Use tcg_constant_{i32,i64} with tcg int expanders
+  tcg: Use tcg_constant_{i32,vec} with tcg vec expanders
+  tcg: Use tcg_constant_{i32,i64,vec} with tcg gvec expanders
+  tcg: Use tcg_constant_{i32,i64} with tcg plugins
+  tcg: Rename struct tcg_temp_info to TempOptInfo
+  tcg/optimize: Improve find_better_copy
+  tcg/optimize: Adjust TempOptInfo allocation
+  tcg/optimize: Use tcg_constant_internal with constant folding
+  tcg/tci: Add special tci_movi_{i32,i64} opcodes
+  tcg: Remove movi and dupi opcodes
+  tcg: Use tcg_out_dupi_vec from temp_load
+  tcg: Increase tcg_out_dupi_vec immediate to int64_t
+  tcg: Add tcg_reg_alloc_dup2
+  tcg/i386: Use tcg_constant_vec with tcg vec expanders
+  tcg: Remove tcg_gen_dup{8,16,32,64}i_vec
+
+ include/exec/gen-icount.h    |  25 +--
+ include/tcg/tcg-op.h         |  17 +-
+ include/tcg/tcg-opc.h        |  11 +-
+ include/tcg/tcg.h            |  50 ++++-
+ accel/tcg/plugin-gen.c       |  49 ++---
+ tcg/aarch64/tcg-target.inc.c |  12 +-
+ tcg/arm/tcg-target.inc.c     |   1 -
+ tcg/i386/tcg-target.inc.c    | 110 ++++++----
+ tcg/mips/tcg-target.inc.c    |   2 -
+ tcg/optimize.c               | 204 +++++++++---------
+ tcg/ppc/tcg-target.inc.c     |  24 +--
+ tcg/riscv/tcg-target.inc.c   |   2 -
+ tcg/s390/tcg-target.inc.c    |   2 -
+ tcg/sparc/tcg-target.inc.c   |   2 -
+ tcg/tcg-op-gvec.c            | 125 +++++------
+ tcg/tcg-op-vec.c             |  83 ++++----
+ tcg/tcg-op.c                 | 216 +++++++++----------
+ tcg/tcg.c                    | 397 ++++++++++++++++++++++++++---------
+ tcg/tci.c                    |   4 +-
+ tcg/tci/tcg-target.inc.c     |   6 +-
+ 20 files changed, 751 insertions(+), 591 deletions(-)
+
 -- 
-2.18.1
+2.20.1
 
 
