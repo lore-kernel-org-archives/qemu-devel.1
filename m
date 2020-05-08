@@ -2,133 +2,90 @@ Return-Path: <SRS0=NBT7=6W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9929CC47247
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 02:56:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36769C35280
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 02:58:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66305208CA
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 02:56:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0013820731
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 May 2020 02:58:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=bt.com header.i=@bt.com header.b="lzIWs7De"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66305208CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bCSjEvjh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0013820731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jWtBr-0004kh-LR
-	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 22:56:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50128)
+	id 1jWtDX-0006Jc-6D
+	for qemu-devel@archiver.kernel.org; Thu, 07 May 2020 22:58:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50782)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasper.lowell@bt.com>)
- id 1jWtBF-0004Gq-89
- for qemu-devel@nongnu.org; Thu, 07 May 2020 22:56:05 -0400
-Received: from smtpe1.intersmtp.com ([213.121.35.78]:36946)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jWtCx-0005qS-IZ
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 22:57:51 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:33968
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasper.lowell@bt.com>)
- id 1jWtBB-00061m-Fq
- for qemu-devel@nongnu.org; Thu, 07 May 2020 22:56:04 -0400
-Received: from tpw09926dag12h.domain1.systemhost.net (10.9.212.36) by
- BWP09926083.bt.com (10.36.82.114) with Microsoft SMTP Server (version=TLS1_2, 
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Fri, 8 May
- 2020 03:55:52 +0100
-Received: from tpw09926dag06f.domain1.systemhost.net (10.9.202.25) by
- tpw09926dag12h.domain1.systemhost.net (10.9.212.36) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Fri, 8 May 2020 03:55:57 +0100
-Received: from bwp09926083.bt.com (10.36.82.114) by
- tpw09926dag06f.domain1.systemhost.net (10.9.202.25) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4 via Frontend Transport; Fri, 8 May 2020 03:55:57
- +0100
-Received: from GBR01-LO2-obe.outbound.protection.outlook.com (104.47.21.53) by
- smtpe1.intersmtp.com (10.36.82.114) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id
- 15.1.1713.5; Fri, 8 May 2020 03:55:50 +0100
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=S6vARg9ZNXhTxreh/S9AQ9j06BBrbm0gWTREoNguOQwIQhf5BaFR1FF3StzvNB4aX69RqhOisGzEPloTS7W1lXYXvWqRe80JP+BL/aoCvxS3IDLg0YyaCBwJEpNq9o68hXPxSKotCcwDEe6AIgE9K4T1KYRAZxUk+gm7VD++Lp8HpVlqwszcKUOsWEhiLmtTXEigitVEbmf/gqVmOenK/40FfZEccgbCCF9QrM/R+U3hGYZllQYHvIwhLJSCeGmIyGf5tNF2iFreenizhZ2I9kRmASmCUx/m/x1Jt9aukDhxhlOxXHjNcYi6cZhBepJV6qmNE/lK+WmB8aUGFe83Ag==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Huryq8cj0RXKU7/kCbXnm77L1sCLVlBkMXVEogbLSGE=;
- b=M65X651/kRnuXcFH8r35eRDia4sY83DMrWdszzliRke2/ejlSXhzJ5yQOCwwHzZ7+onUbkSOrdI6t8LraaMaj28xeQ2aDJb1ti41PuPar8F1jSGxq3D4+TU1CFg5AgbwfBDtbwI+N2UZHS56OBweavNOc5/1XrH1rEhp412FpQItBIH6lsBa7ifuIea0m710K3v97fuuw5hPU3X2KPw6KVkhreN/AYDiAJ/VSdYQTyDoV0oGT+HVtp6L1NP8RgVAbNUcjmKAaJmewUhPoBeCBZU7kxI/m6ON4Y2bwAeN1C/HhavLhhTg5eejOmcQ3F4ZlVFwbc0KoqoCc9N4mIik+Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bt.com; dmarc=pass action=none header.from=bt.com; dkim=pass
- header.d=bt.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bt.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Huryq8cj0RXKU7/kCbXnm77L1sCLVlBkMXVEogbLSGE=;
- b=lzIWs7DeUuJgXGWTRDOmcxOvWLm5JRU2LfwctfUMQPulFDQsyrwiUdprxCJgaZUxX4Xo0D5OdUbLQPVaQyVtWaevzJa9vjvIJAJ1X011eq2G44Aw5gAlCSO3iLEF5YZarzRP4zK60Il2lfaztwgOedRTPW2lpPjOn9msjvEHubE=
-Received: from CWXP123MB1958.GBRP123.PROD.OUTLOOK.COM (20.179.109.18) by
- CWXP123MB2486.GBRP123.PROD.OUTLOOK.COM (20.179.109.81) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2958.20; Fri, 8 May 2020 02:55:46 +0000
-Received: from CWXP123MB1958.GBRP123.PROD.OUTLOOK.COM
- ([fe80::f132:e811:f232:2bdf]) by CWXP123MB1958.GBRP123.PROD.OUTLOOK.COM
- ([fe80::f132:e811:f232:2bdf%7]) with mapi id 15.20.2958.035; Fri, 8 May 2020
- 02:55:45 +0000
-From: <jasper.lowell@bt.com>
-To: <balaton@eik.bme.hu>
-Subject: Re: Emulating Solaris 10 on SPARC64 sun4u
-Thread-Topic: Emulating Solaris 10 on SPARC64 sun4u
-Thread-Index: AdXb7aKPCyPc5BgLRMag+zXZgy3FKQDThhmAEVAOwAAACTw4AAAQ0PIA
-Date: Fri, 8 May 2020 02:55:45 +0000
-Message-ID: <78d72c7f09a45357b151231cba9454d6d288680d.camel@bt.com>
-References: <CWXP123MB2262B6F3159B7AA7AB010F4183020@CWXP123MB2262.GBRP123.PROD.OUTLOOK.COM>
- <f0f00ecd-1989-9bc1-02e0-8a9b4819f051@ilande.co.uk>
- <f833edcfed7dd58a6bb27269de66acfed0e550eb.camel@bt.com>
- <alpine.BSF.2.22.395.2005072048510.5891@zero.eik.bme.hu>
-In-Reply-To: <alpine.BSF.2.22.395.2005072048510.5891@zero.eik.bme.hu>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: eik.bme.hu; dkim=none (message not signed)
- header.d=none;eik.bme.hu; dmarc=none action=none header.from=bt.com;
-x-originating-ip: [217.138.204.133]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 35c00117-26eb-4687-3896-08d7f2fb4e40
-x-ms-traffictypediagnostic: CWXP123MB2486:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <CWXP123MB24865CEDF8DD4FECEF2E0E5083A20@CWXP123MB2486.GBRP123.PROD.OUTLOOK.COM>
-x-antispam-2: 1
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 039735BC4E
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: CuAtvLu61ieGl73VAYbfhdtlqWQ3oJRD9kowsw9sQmiqGSl+uyn6i2KyGnlGJsnfoej7F0bEZIGZiQgapSdA7Cdk5jDVsEMH3VbNqIvALggVcEdsKNDvjEGkCeiTJPnR2g3Kj76guZ9z6ck22PdZ5L/HvsWAbuH+/VhR8z1NbEeIS0QiHF/rt3k71tk7Zl8djren21Dqxom+hKMQrhBi+XCPz5xy/khPxCRAyJEPufj9m8pk2NSW+mms7e75glM3qb92NuUiamYV3veWnP+kdX//aIlj+gVYUtzdclfkOISS/KYUzWNqxa6ynC3DUrSVDIBTmI32qHx745BsNL7MIyIWLFfLKIr+I77Dxvtdw4Nva49wMBftq42s8FOr5CGLcgaNGpqCQ30cWB+OSlhL0LTcDuibVdR+VicOH0+CYYEBbLxUvU45YIwd0p0g4iA459Ot+ZUgQbq3MyT/yfvfthLjdHDWucM0jSjmpbTN/a4zcDZJ+iCzuxNkFKb9CyCqpgXmRPScvSY0M/mLvF0Wzu29OjL0+LgjKiMeO0+nzo+tHTxiVUaVWH/LjoC4qn4W
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:CWXP123MB1958.GBRP123.PROD.OUTLOOK.COM; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(376002)(366004)(346002)(136003)(396003)(39860400002)(33430700001)(26005)(316002)(2906002)(64756008)(6506007)(54906003)(8676002)(5660300002)(2616005)(478600001)(33440700001)(71200400001)(36756003)(91956017)(6916009)(66946007)(66446008)(66556008)(66476007)(76116006)(6486002)(83320400001)(83280400001)(83310400001)(86362001)(83290400001)(83300400001)(4326008)(8936002)(186003)(6512007)(32563001);
- DIR:OUT; SFP:1101; 
-x-ms-exchange-antispam-messagedata: nJDR8xTrb7rsH6livslBryGxE+AWG7ll26RYJuQzFO2Hywl4m2H22BstpjL1K0wM6hj2850XxQGnNp/ovZzGLMXE4z967fh0xzN+9OxgnN7k10JkcX8LXfcvE/LLHETw3WzFpkW7utW1zYGdDh+lhGEehEQuus8C/xBbU4NDgRWJRCPn5IAiapOlvccVmos+3FvybxqkoTfVshxfK62qO28WzJPvONHZYSYY9zpigrj4cG2pqC9kJCX9XcWaDukHiBjMYzQozT00nCvqP10fWZWYv7yu3Y119Lmr4XKVrGxGokbCG6Gla+/c24PTFNpa4JxOehr9nByxcOM5Deile16Qlxv9KlBYKrL96q+w5mDmleDWwa5QABYJwq4Mo2CGwV3TLmMR3CIVQtFhdYPhH+S39r/kF1+zyvTqPcvoSs0qskAtvAM9IYDaL8JRD9JJGvS4dKqRNJfgrbqbZzkhNdVM3NgdANhYaQDsyT18+58M8EGAMzkzuU5jz8EvRpI+
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <947045F56DEFF245B1712D98DFC666F7@GBRP123.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jWtCw-00031L-Kw
+ for qemu-devel@nongnu.org; Thu, 07 May 2020 22:57:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1588906669;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=doTu5dYoS8ND08F1Nqnq9rPcJ5QJwC7fuuyIZsSrvL0=;
+ b=bCSjEvjhzQdS1rF5X9cuFoDDfiUnwERt9PsVNQWLIi6s62h1UZBvj0o2117domsUf4UoCL
+ TXVgQYXBy+5wocdputwyNv4xYZA8hSoZmdApa4mI4rJEdw+kcfp1hph0CoVPBo3HJ0ElQT
+ q4/pVeNnbutJ1TNr6vWn4WY6vWiTVg8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-104-a_GrDiMvNQiU_Aa2y3NWaQ-1; Thu, 07 May 2020 22:57:48 -0400
+X-MC-Unique: a_GrDiMvNQiU_Aa2y3NWaQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9AAB2461;
+ Fri,  8 May 2020 02:57:46 +0000 (UTC)
+Received: from [10.72.13.98] (ovpn-13-98.pek2.redhat.com [10.72.13.98])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 20E6F5C1BE;
+ Fri,  8 May 2020 02:57:21 +0000 (UTC)
+Subject: Re: [RFC v3 4/6] qmp: add QMP command x-debug-virtio-queue-status
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+References: <20200507114927.6733-1-lvivier@redhat.com>
+ <20200507114927.6733-5-lvivier@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <126aefa1-ec80-4006-36c2-c1ce0a8306bd@redhat.com>
+Date: Fri, 8 May 2020 10:57:19 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 35c00117-26eb-4687-3896-08d7f2fb4e40
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 May 2020 02:55:45.8140 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a7f35688-9c00-4d5e-ba41-29f146377ab0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: NV2awfB3JRxrQwIzTKIdDDXxKOBbRFp8xVUUv4sXl4dB+pZVuzClhwCygeqAsEHVD63zLniuYvD0LGzQunaK6g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWXP123MB2486
-X-OriginatorOrg: bt.com
-Received-SPF: pass client-ip=213.121.35.78; envelope-from=jasper.lowell@bt.com;
- helo=smtpe1.intersmtp.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 22:55:59
-X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+In-Reply-To: <20200507114927.6733-5-lvivier@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/07 22:21:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -141,48 +98,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: tony.nguyen@bt.com, mark.cave-ayland@ilande.co.uk, dgilbert@redhat.com,
- atar4qemu@gmail.com, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
+ David Hildenbrand <david@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Amit Shah <amit@kernel.org>,
+ Max Reitz <mreitz@redhat.com>, Eric Auger <eric.auger@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiBJIGRvbid0IGtub3cgYW55dGhpbmcgYWJvdXQgdGhpcyBjaGlwIHNvIGRvbid0IGtub3cgaWYg
-aXQgaGVscHMgYnV0DQo+IGlmIA0KPiBpdCdzIGFueSB3YXkgc2ltaWxhciB0byBFU0NDIChhbmQg
-dGhlIEVTQ0MyIG5hbWUgaXMgbm90IGp1c3QNCj4gbWFya2V0aW5nKSANCj4gdGhlbiB0aGVyZSdz
-IHNvbWUgZW11bGF0aW9uIG9mIHRoYXQgaW4gaHcvY2hhci9lc2NjLmMgdGhhdCB5b3UgbWF5DQo+
-IHdhbnQgdG8gDQo+IGxvb2sgYXQuDQoNCkZyb20gd2hhdCBJIGNhbiB0ZWxsLCB0aGUgU0FCIDgy
-NTMyIGlzIGEgYml0IG1vcmUgY29tcGxleCB0aGFuIHRoZSBFU0NDDQpvbmVzLiBJdCdzIG5vdCBk
-aWZmaWN1bHQgdG8gaW1wbGVtZW50IGJ1dCBhIGNvbXBsZXRlIHNvbHV0aW9uIHdpbGwgYmUNCmxl
-bmd0aHkgYmVjYXVzZSBvZiB0aGUgbGFyZ2UgY29tYmluYXRpb24gb2YgY29uZmlndXJhdGlvbiBv
-cHRpb25zIHRoZQ0KY2hpcCBzdXBwb3J0cy4NCg0KPiBNYXliZSB5b3UgY2FuIGdldCBhd2F5IHdp
-dGggc2V0dGluZyB0aGVzZSB0byB0aGUgdmFsdWVzIHRoZSBkcml2ZXINCj4gd291bGQgDQo+IHNl
-dCBhbmQgaGFyZCBjb2RpbmcgaXQgZm9yIG5vdyBqdXN0IHRvIGdldCBzb21lIG91dHB1dC4gVGhl
-biB5b3UgY2FuIA0KPiBpZ25vcmUgdGhlIGNvcnJlc3BvbmRpbmcgcmVnaXN0ZXJzIHdoaWNoIGNv
-dWxkIHNpbXBsaWZ5IGluaXRpYWwNCj4gZGV2aWNlIA0KPiBtb2RlbC4NCg0KSSdsbCB0YWtlIHRo
-aXMgYXBwcm9hY2guDQoNClRoYW5rcywNCkphc3BlciBMb3dlbGwuDQoNCk9uIFRodSwgMjAyMC0w
-NS0wNyBhdCAyMDo1NCArMDIwMCwgQkFMQVRPTiBab2x0YW4gd3JvdGU6DQo+IE9uIFRodSwgNyBN
-YXkgMjAyMCwgamFzcGVyLmxvd2VsbEBidC5jb20gd3JvdGU6DQo+ID4gSSd2ZSBzdGFydGVkIHdv
-cmsgb24gZW11bGF0aW5nIHRoZSBTQUIgODI1MzIgRVNTQzIgYnV0IGl0J3MNCj4gPiB1bmZvcnR1
-bmF0ZWx5IHdheSBtb3JlIGNvbXBsZXggdGhhbiB0aGFuIHRoZSAxNjU1MEEuIEZvciBpbnN0YW5j
-ZSwNCj4gPiBpdCdzDQo+IA0KPiBJIGRvbid0IGtub3cgYW55dGhpbmcgYWJvdXQgdGhpcyBjaGlw
-IHNvIGRvbid0IGtub3cgaWYgaXQgaGVscHMgYnV0DQo+IGlmIA0KPiBpdCdzIGFueSB3YXkgc2lt
-aWxhciB0byBFU0NDIChhbmQgdGhlIEVTQ0MyIG5hbWUgaXMgbm90IGp1c3QNCj4gbWFya2V0aW5n
-KSANCj4gdGhlbiB0aGVyZSdzIHNvbWUgZW11bGF0aW9uIG9mIHRoYXQgaW4gaHcvY2hhci9lc2Nj
-LmMgdGhhdCB5b3UgbWF5DQo+IHdhbnQgdG8gDQo+IGxvb2sgYXQuDQo+IA0KPiA+IHBvc3NpYmxl
-IHRvIGNvbmZpZ3VyZSBkaWZmZXJlbnQgYmF1ZHJhdGVzIGZvciByZWNlaXZpbmcgYW5kDQo+ID4g
-dHJhbnNtaXR0aW5nLiBRRU1VJ3MgY2hhcmRldiBpbnRlcmZhY2UgZG9lc24ndCBhcHBlYXIgdG8g
-aGFuZGxlDQo+ID4gdGhhdC4NCj4gPiBRRU1VU2VyaWFsU2V0UGFyYW1zIGhhcyBhIHNpbmdsZSBz
-cGVlZCB2YWx1ZSB0aGF0IGlzIHBhc3NlZCB0bw0KPiA+IGNmc2V0aXNwZWVkIGFuZCBjZnNldG9z
-cGVlZC4gVGhlIGNoaXAgYWxzbyBoYXMgc3VwcG9ydCBmb3Igc3RpY2sNCj4gPiBwYXJpdHkNCj4g
-PiAsIHdoaWNoIGFyZW4ndCB2YWxpZCBvcHRpb25zIHJpZ2h0IG5vdyBlaXRoZXIuIElmIEknbSB3
-cm9uZyBvbg0KPiA+IGVpdGhlcg0KPiA+IG9mIHRob3NlIHBvaW50cyBwbGVhc2UgY29ycmVjdCBt
-ZS4gVW5sZXNzIHRoZXJlIGlzIGFuIGFsdGVybmF0aXZlLA0KPiA+IGNoYW5nZXMgdG8gdGhlIGlu
-dGVyZmFjZSBtYXkgbmVlZCB0byBiZSBtYWRlIGlmIGFkZGluZyB0aGlzIGRldmljZQ0KPiA+IGlz
-DQo+ID4gdG8gYmUgY29uc2lkZXJlZC4NCj4gDQo+IE1heWJlIHlvdSBjYW4gZ2V0IGF3YXkgd2l0
-aCBzZXR0aW5nIHRoZXNlIHRvIHRoZSB2YWx1ZXMgdGhlIGRyaXZlcg0KPiB3b3VsZCANCj4gc2V0
-IGFuZCBoYXJkIGNvZGluZyBpdCBmb3Igbm93IGp1c3QgdG8gZ2V0IHNvbWUgb3V0cHV0LiBUaGVu
-IHlvdSBjYW4gDQo+IGlnbm9yZSB0aGUgY29ycmVzcG9uZGluZyByZWdpc3RlcnMgd2hpY2ggY291
-bGQgc2ltcGxpZnkgaW5pdGlhbA0KPiBkZXZpY2UgDQo+IG1vZGVsLg0KPiANCj4gUmVnYXJkcywN
-Cj4gQkFMQVRPTiBab2x0YW4NCg==
+
+On 2020/5/7 =E4=B8=8B=E5=8D=887:49, Laurent Vivier wrote:
+> This new command shows internal status of a VirtQueue.
+> (vrings and indexes).
+>
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+
+
+It looks to me that packed virtqueue is not supported. It's better to=20
+add them in the future.
+
+
+> ---
+>   hw/virtio/virtio-stub.c |  6 +++
+>   hw/virtio/virtio.c      | 35 +++++++++++++++
+>   qapi/virtio.json        | 98 +++++++++++++++++++++++++++++++++++++++++
+>   3 files changed, 139 insertions(+)
+>
+> diff --git a/hw/virtio/virtio-stub.c b/hw/virtio/virtio-stub.c
+> index ddb592f72eee..3c1bf172acf6 100644
+> --- a/hw/virtio/virtio-stub.c
+> +++ b/hw/virtio/virtio-stub.c
+> @@ -17,3 +17,9 @@ VirtioStatus *qmp_x_debug_virtio_status(const char* pat=
+h, Error **errp)
+>   {
+>       return qmp_virtio_unsupported(errp);
+>   }
+> +
+> +VirtQueueStatus *qmp_x_debug_virtio_queue_status(const char *path,
+> +                                                 uint16_t queue, Error *=
+*errp)
+> +{
+> +    return qmp_virtio_unsupported(errp);
+> +}
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index 59bf6ef651a6..57552bf05014 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -3877,6 +3877,41 @@ static VirtIODevice *virtio_device_find(const char=
+ *path)
+>       return NULL;
+>   }
+>  =20
+> +VirtQueueStatus *qmp_x_debug_virtio_queue_status(const char *path,
+> +                                                 uint16_t queue, Error *=
+*errp)
+> +{
+> +    VirtIODevice *vdev;
+> +    VirtQueueStatus *status;
+> +
+> +    vdev =3D virtio_device_find(path);
+> +    if (vdev =3D=3D NULL) {
+> +        error_setg(errp, "Path %s is not a VirtIO device", path);
+> +        return NULL;
+> +    }
+> +
+> +    if (queue >=3D VIRTIO_QUEUE_MAX || !virtio_queue_get_num(vdev, queue=
+)) {
+> +        error_setg(errp, "Invalid virtqueue number %d", queue);
+> +        return NULL;
+> +    }
+> +
+> +    status =3D g_new0(VirtQueueStatus, 1);
+> +    status->queue_index =3D vdev->vq[queue].queue_index;
+> +    status->inuse =3D vdev->vq[queue].inuse;
+> +    status->vring_num =3D vdev->vq[queue].vring.num;
+> +    status->vring_num_default =3D vdev->vq[queue].vring.num_default;
+> +    status->vring_align =3D vdev->vq[queue].vring.align;
+> +    status->vring_desc =3D vdev->vq[queue].vring.desc;
+> +    status->vring_avail =3D vdev->vq[queue].vring.avail;
+> +    status->vring_used =3D vdev->vq[queue].vring.used;
+> +    status->last_avail_idx =3D vdev->vq[queue].last_avail_idx;
+
+
+This might not be correct when vhost is used.
+
+We may consider to sync last_avail_idx from vhost backends here?
+
+Thanks
+
+
+> +    status->shadow_avail_idx =3D vdev->vq[queue].shadow_avail_idx;
+> +    status->used_idx =3D vdev->vq[queue].used_idx;
+> +    status->signalled_used =3D vdev->vq[queue].signalled_used;
+> +    status->signalled_used_valid =3D vdev->vq[queue].signalled_used_vali=
+d;
+> +
+> +    return status;
+> +}
+> +
+>   #define CONVERT_FEATURES(type, map)                \
+>       ({                                           \
+>           type *list =3D NULL;                         \
+> diff --git a/qapi/virtio.json b/qapi/virtio.json
+> index 69dd107d0c9b..43c234a9fc69 100644
+> --- a/qapi/virtio.json
+> +++ b/qapi/virtio.json
+> @@ -308,3 +308,101 @@
+>     'data': { 'path': 'str' },
+>     'returns': 'VirtioStatus'
+>   }
+> +
+> +##
+> +# @VirtQueueStatus:
+> +#
+> +# Status of a VirtQueue
+> +#
+> +# @queue-index: VirtQueue queue_index
+> +#
+> +# @inuse: VirtQueue inuse
+> +#
+> +# @vring-num: VirtQueue vring.num
+> +#
+> +# @vring-num-default: VirtQueue vring.num_default
+> +#
+> +# @vring-align: VirtQueue vring.align
+> +#
+> +# @vring-desc: VirtQueue vring.desc
+> +#
+> +# @vring-avail: VirtQueue vring.avail
+> +#
+> +# @vring-used: VirtQueue vring.used
+> +#
+> +# @last-avail-idx: VirtQueue last_avail_idx
+> +#
+> +# @shadow-avail-idx: VirtQueue shadow_avail_idx
+> +#
+> +# @used-idx: VirtQueue used_idx
+> +#
+> +# @signalled-used: VirtQueue signalled_used
+> +#
+> +# @signalled-used-valid: VirtQueue signalled_used_valid
+> +#
+> +# Since: 5.1
+> +#
+> +##
+> +
+> +{ 'struct': 'VirtQueueStatus',
+> +  'data': {
+> +    'queue-index': 'uint16',
+> +    'inuse': 'uint32',
+> +    'vring-num': 'int',
+> +    'vring-num-default': 'int',
+> +    'vring-align': 'int',
+> +    'vring-desc': 'uint64',
+> +    'vring-avail': 'uint64',
+> +    'vring-used': 'uint64',
+> +    'last-avail-idx': 'uint16',
+> +    'shadow-avail-idx': 'uint16',
+> +    'used-idx': 'uint16',
+> +    'signalled-used': 'uint16',
+> +    'signalled-used-valid': 'uint16'
+> +  }
+> +}
+> +
+> +##
+> +# @x-debug-virtio-queue-status:
+> +#
+> +# Return the status of a given VirtQueue
+> +#
+> +# @path: QOBject path of the VirtIODevice
+> +#
+> +# @queue: queue number to examine
+> +#
+> +# Returns: Status of the VirtQueue
+> +#
+> +# Since: 5.1
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "x-debug-virtio-queue-status",
+> +#      "arguments": {
+> +#          "path": "/machine/peripheral-anon/device[3]/virtio-backend",
+> +#          "queue": 0
+> +#      }
+> +#   }
+> +# <- { "return": {
+> +#      "signalled-used": 373,
+> +#      "inuse": 0,
+> +#      "vring-desc": 864411648,
+> +#      "vring-num-default": 256,
+> +#      "signalled-used-valid": 1,
+> +#      "vring-avail": 864415744,
+> +#      "last-avail-idx": 373,
+> +#      "queue-index": 0,
+> +#      "vring-used": 864416320,
+> +#      "shadow-avail-idx": 619,
+> +#      "used-idx": 373,
+> +#      "vring-num": 256,
+> +#      "vring-align": 4096
+> +#      }
+> +#    }
+> +#
+> +##
+> +
+> +{ 'command': 'x-debug-virtio-queue-status',
+> +  'data': { 'path': 'str', 'queue': 'uint16' },
+> +  'returns': 'VirtQueueStatus'
+> +}
+
 
