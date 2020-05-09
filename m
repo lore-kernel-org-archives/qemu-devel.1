@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7519EC28CBC
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 08:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61902C28CBC
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 08:28:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4AA1C2495A
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 08:16:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AA1C2495A
+	by mail.kernel.org (Postfix) with ESMTPS id 3089924953
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 08:28:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3089924953
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53186 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXKfH-0001L6-E4
-	for qemu-devel@archiver.kernel.org; Sat, 09 May 2020 04:16:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44560)
+	id 1jXKq5-0008FK-AX
+	for qemu-devel@archiver.kernel.org; Sat, 09 May 2020 04:28:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45754)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jXKeE-0000bu-4v
- for qemu-devel@nongnu.org; Sat, 09 May 2020 04:15:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52916)
+ id 1jXKp4-00070C-PI
+ for qemu-devel@nongnu.org; Sat, 09 May 2020 04:27:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53628)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jXKeD-0004gf-09
- for qemu-devel@nongnu.org; Sat, 09 May 2020 04:15:49 -0400
+ id 1jXKp3-0000wi-Nx
+ for qemu-devel@nongnu.org; Sat, 09 May 2020 04:27:02 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jXKeB-000859-AD
- for <qemu-devel@nongnu.org>; Sat, 09 May 2020 08:15:47 +0000
+ id 1jXKoz-0000CJ-Rq
+ for <qemu-devel@nongnu.org>; Sat, 09 May 2020 08:26:57 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 46ED62E8052
- for <qemu-devel@nongnu.org>; Sat,  9 May 2020 08:15:47 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id C0F662E80BA
+ for <qemu-devel@nongnu.org>; Sat,  9 May 2020 08:26:57 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 09 May 2020 08:10:21 -0000
+Date: Sat, 09 May 2020 08:17:17 -0000
 From: Xavier <1877716@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -52,15 +52,16 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: zkrx
 X-Launchpad-Bug-Reporter: Xavier (zkrx)
 X-Launchpad-Bug-Modifier: Xavier (zkrx)
-Message-Id: <158901182209.5021.12832610872088111923.malonedeb@soybean.canonical.com>
-Subject: [Bug 1877716] [NEW] Win10 guest unsuable after a few minutes
+References: <158901182209.5021.12832610872088111923.malonedeb@soybean.canonical.com>
+Message-Id: <158901223755.5986.15843160190337741176.malone@soybean.canonical.com>
+Subject: [Bug 1877716] Re: Win10 guest unsuable after a few minutes
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 256fec435823905de25a73e0d1dc13a31de8f25e
+X-Launchpad-Hash: 0b2687108309ea8be482d1df90488dfd9285b45c
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/09 00:00:46
@@ -88,32 +89,8 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
-
-On Arch Linux, the recent qemu package update seems to misbehave on some
-systems. In my case, my Windows 10 guest runs fine for around 5 minutes
-and then start to get really sluggish, even unresponsive. It needs to be
-forced off. I could reproduce this on a minimal VM with no passthrough,
-although my current testing setup involves an nvme pcie passthrough.
-
-I bisected it to the following commit which rapidly starts to run sluggishl=
-y on my setup:
-https://github.com/qemu/qemu/commit/73fd282e7b6dd4e4ea1c3bbb3d302c8db51e4ccf
-
-I've ran the previous commit (
-https://github.com/qemu/qemu/commit/b321051cf48ccc2d3d832af111d688f2282f089b
-) for the entire night without an issue so far.
-
-I believe this might be a duplicate of
-https://bugs.launchpad.net/qemu/+bug/1873032 , although I'm not sure.
-
-Linux cc 5.6.10-arch1-1 #1 SMP PREEMPT Sat, 02 May 2020 19:11:54 +0000 x86_=
-64 GNU/Linux
-AMD Ryzen 7 2700X Eight-Core Processor
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+Note that bisecting is difficult due to the nature of the bug (does not
+appear before 5 to 10 minutes on my machine).
 
 -- =
 
