@@ -2,79 +2,80 @@ Return-Path: <SRS0=giGJ=6X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77BA7C38A2A
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 02:53:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF1CAC38A2A
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 03:01:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 357DC21841
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 02:53:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9FCD521655
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 03:01:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JelZd7Sx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 357DC21841
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iAR+oiHo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FCD521655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXFcC-000750-B0
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 22:53:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37486)
+	id 1jXFjZ-0001hD-Gv
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 23:01:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39888)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <priyamvad.agnisys@gmail.com>)
- id 1jXFba-0006fC-Uv
- for qemu-devel@nongnu.org; Fri, 08 May 2020 22:52:46 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:33482)
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1jXFir-0001B9-Ks
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 23:00:17 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:40473)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <priyamvad.agnisys@gmail.com>)
- id 1jXFbZ-0004rh-Lr
- for qemu-devel@nongnu.org; Fri, 08 May 2020 22:52:46 -0400
-Received: by mail-lj1-x243.google.com with SMTP id w20so3721054ljj.0
- for <qemu-devel@nongnu.org>; Fri, 08 May 2020 19:52:44 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1jXFip-0000wo-5o
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 23:00:16 -0400
+Received: by mail-lj1-x242.google.com with SMTP id y4so3709177ljn.7
+ for <qemu-devel@nongnu.org>; Fri, 08 May 2020 20:00:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Ye7W3Ohvj2QkSpZ03ms/sG20jTS7Zt7A94K5Vq0Kgzw=;
- b=JelZd7SxeINzJNVkKlxnadOJY5iDLHyIsJJPcsCoh1Xf7pBRCOndkb0b3qCEQWWFeI
- cw7ahed2MwsCH+RoJlATa72g0Amegvjg8IuQaFdF3EL4lQDFXMbKJO4bgHABVYpbWUox
- QjL6MHaMkOFoTSAGpGga1riXw6OaATWTZ4EgNuKGNt36nndPtED0q1uxJ7qLMBvzpJni
- N+NT8XfEsnO3jHGk43fGUl7kX2e0cajCnYwoNZA34F6b/kGfsefe+xu6pfWXdiQSjOdJ
- DQjPbJ5BWFv4tl7vllPKiCXK7VmcRmS1qJaccAfOiGhpHwkUuFz/YCHmj0SmUY4N11rm
- RAZA==
+ :cc:content-transfer-encoding;
+ bh=SGyC04vMmQZ1Q3PPNwr6iHH4M23gvNf4HdfnG6lYuew=;
+ b=iAR+oiHoKzF4k6IxAsX89TV7SAgwVO2tOhs9+BqI6qiALtg51IQ/bKAH0Y3W241rvY
+ 82IZTmEuQogeq6+f6GxBpKy/eGSzO/Y6XEkalWTD1fryeGVyOkDimZZNdEIip82AIRXh
+ X4b67aTCIPWqBMvCmyoKcVcHUo9QAR4P5cWSB51gJF8Z2rZ6BoOsfB3E+Cp3tEdi2eBT
+ AjVwJP0rCDH30upjxeF8AoT9ltwVConJmfPhXC8DQphwrc5oUr89urg37g7Bwqe2xGPk
+ Rv+NxrkokeGTEVc8Tpt6zepiXwXQP8hX64paZ/O3bXsmLuwzq3DQj44GXqY/QCCtjJvo
+ qL8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Ye7W3Ohvj2QkSpZ03ms/sG20jTS7Zt7A94K5Vq0Kgzw=;
- b=WSN6su1Y3VMbpR7mANcZMF0TJcHMtXCDRN9FziNiYy6fQTEZdzw5UjNnvb8k/TzUeB
- VRqkdH3qMT82B5vickMHYLHSxbPQVRRf6jNUgsM5AOjbgWogGxu+Y9mMXhKV+lj/OETJ
- mGn+FQjVk9AA5E0Z44fl0BgVRfRa7oWHpbEGVgfzb/T1LWDEoqXVS1tkGqtzZJoGh0NX
- 33nmFXtX9zTAAHaUibpfGQrp3DsVghhDiAbBmEWEQDNcXCHYMP39VLH/fzgLe9OeR+sf
- VeJfCwlpxL4lVHtAFQs1ZdKIq9zo5ERo7PM6wD6jXhuowY4RPQzlvHzf0vzElKxpWKbi
- e8Ug==
-X-Gm-Message-State: AOAM532JDR4R2nynQFseA60AglxwDOrucWBlsP17E5WjMnI+1ETKDND2
- HLReOYKDARNBedXFAEbil94n6p9MlyawDGe/yB4=
-X-Google-Smtp-Source: ABdhPJye/QGPHgx3EYb4guJNBKundOH+Wd6RLAkVYFIg5Dx67j6Mwka5SMOrhCKAsE7l7+evmST6UToU39iL9IYpLIQ=
-X-Received: by 2002:a2e:9a04:: with SMTP id o4mr3469690lji.117.1588992763202; 
- Fri, 08 May 2020 19:52:43 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=SGyC04vMmQZ1Q3PPNwr6iHH4M23gvNf4HdfnG6lYuew=;
+ b=DOP6ea5nsGJreVnsuF8nPeyfNwjlclQakVKQeu/TDk7WA25ray7LJS+z2sz4zHA/Qk
+ aXgOV2nqM0kCbczNIntfeaRfHqFoGnAsTZQwSv19TIrqXaEfaP6YfDGTtIqNoIDy5qEz
+ H4rfeBy4N9Rxwo9jiJ7AvMjobxvHVVyJqbG7dhrx6qcenfwohDR8BZQAlZOqoIttZP1R
+ QOw3PL6aJnR8YLqHREFOADWjg/9GIA/RMyvnFP1+E6bEy+qij3HfyFNiOcwbmc9TbAbB
+ uFrgbYgDzR8sLUp5rkIY7wEgW2mthIs8mj6vN1i4dFMXtCEn870Jqpv+q4McUisC9fH/
+ Ls/w==
+X-Gm-Message-State: AOAM532gK28vHPUC3dIlXKCYWzm/03ALQEAptEjzJLkbvh5q2ZMSRT33
+ 7hn37eG6QIKodLvVsVR2yk5vr4vAOInv5opvesU=
+X-Google-Smtp-Source: ABdhPJwZFxa4eGsLRJCaW1fDvOvabk9jOeNIxrYLpbU8OZhToGlzdd/lc5mx6S7MMoBFZlIYy20JiAcQ0pPlo12htMk=
+X-Received: by 2002:a2e:9b0f:: with SMTP id u15mr3505438lji.272.1588993213044; 
+ Fri, 08 May 2020 20:00:13 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAPV47zdeH0+G85De2nOeD-dw91PKqPZh0U4SZuwuFmdqRyhXjQ@mail.gmail.com>
- <d418f253-1749-8d29-c228-0c69c2cec3a7@redhat.com>
- <CAPV47zdA3YR7Dn6h27Lsu1Hm9nkaZ44+zDZtX98eAU_T7enT9g@mail.gmail.com>
-In-Reply-To: <CAPV47zdA3YR7Dn6h27Lsu1Hm9nkaZ44+zDZtX98eAU_T7enT9g@mail.gmail.com>
-From: Priyamvad Acharya <priyamvad.agnisys@gmail.com>
-Date: Sat, 9 May 2020 08:22:32 +0530
-Message-ID: <CAPV47zd3PBrqsKi6jkVGZywwH2Vrf0=rOC6Sev_vtBrXC1=DHg@mail.gmail.com>
-Subject: Re: Parameter 'driver' expects pluggable device type
-To: John Snow <jsnow@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000003390a805a52e3569"
-Received-SPF: pass client-ip=2a00:1450:4864:20::243;
- envelope-from=priyamvad.agnisys@gmail.com; helo=mail-lj1-x243.google.com
+References: <1588501221-1205-1-git-send-email-chenhc@lemote.com>
+ <CAHiYmc4GnBE7YWghRk9FUL93RBsbJ+QddNsqMZFOGsUQumhmSg@mail.gmail.com>
+In-Reply-To: <CAHiYmc4GnBE7YWghRk9FUL93RBsbJ+QddNsqMZFOGsUQumhmSg@mail.gmail.com>
+From: chen huacai <zltjiangshi@gmail.com>
+Date: Sat, 9 May 2020 11:07:54 +0800
+Message-ID: <CABDp7Voi1PJL+fnNHMpWU=T7fLG2cmS9gN1O5mFKDGYocNE-3g@mail.gmail.com>
+Subject: Re: [PATCH for-5.1 V3 0/7] mips: Add Loongson-3 machine support (with
+ KVM)
+To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::242;
+ envelope-from=zltjiangshi@gmail.com; helo=mail-lj1-x242.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -82,8 +83,7 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,214 +96,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+Cc: Huacai Chen <chenhuacai@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Huacai Chen <chenhc@lemote.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000003390a805a52e3569
-Content-Type: text/plain; charset="UTF-8"
+Hi, Aleksandar,
 
-Hi,
-I have set user_creatable to true in class_init function of pl061 source
-code.
-Now when I run qemu via command line with *-device *option it gives below
-output
-
-> qemu-system-arm: Device pl061 can not be dynamically instantiated
+On Sat, May 9, 2020 at 12:55 AM Aleksandar Markovic
+<aleksandar.qemu.devel@gmail.com> wrote:
 >
-
-
-I request community members to reply asap!!!!!!!!!!!!!!!
-
-
-
-On Fri, 8 May 2020 at 07:40, Priyamvad Acharya <priyamvad.agnisys@gmail.com>
-wrote:
-
-> Hi,
-> Thanks for providing relevant information.
-> FYI
-> I am using Qemu version *4.2.94 (v5.0.0-rc4-dirty).*
-> I am using *virt* board.
+> =D0=BD=D0=B5=D0=B4, 3. =D0=BC=D0=B0=D1=98 2020. =D1=83 12:21 Huacai Chen =
+<zltjiangshi@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=
+=D0=BE/=D0=BB=D0=B0:
+> >
+> > Loongson-3 CPU family include Loongson-3A R1/R2/R3/R4 and Loongson-3B
+> > R1/R2. Loongson-3A R1 is the oldest and its ISA is the smallest, while
+> > Loongson-3A R4 is the newest and its ISA is almost the superset of all
+> > others. To reduce complexity, in QEMU we just define two CPU types:
+> >
+> > 1, "Loongson-3A1000" CPU which is corresponding to Loongson-3A R1. It i=
+s
+> >    suitable for TCG because Loongson-3A R1 has fewest ASE.
+> > 2, "Loongson-3A4000" CPU which is corresponding to Loongson-3A R4. It i=
+s
+> >    suitable for KVM because Loongson-3A R4 has the VZ ASE.
+> >
 >
-> Where we need to set *user creatable *to true?
-> Any other modification is needed to allow sysbus device support?
+> Hi, Huacei,
 >
-> Below is the script which I am using  to boot linux image with pl061
-> device on virt board.
+> Just a couple of practicalities. As you know, we can't upstream this
+> series until correspondent kernel support is upstreamed into kernel.
+> This is my advice, timing-wise:
 >
-> #!/bin/bash
->>
->> KERNEL="/lhome/priyamvad/debian_qemu_arm32/vmlinuz-3.16.0-6-armmp-lpae"
->>
->> INIT_IMAGE="/lhome/priyamvad/debian_qemu_arm32/initrd.img-3.16.0-6-armmp-lpae"
->> DISK="/lhome/priyamvad/debian_qemu_arm32/hda30.qcow2"
->>
->> ./qemu-system-arm \
->> -M virt \
->> -m 1024 \
->> -smp 4 \
->> -kernel $KERNEL \
->> -object rng-random,filename=/dev/urandom,id=rng0 \
->> -device virtio-rng-device,rng=rng0 \
->> -initrd $INIT_IMAGE \
->> -append 'root=/dev/vda2' \
->> -drive if=none,file=$DISK,format=qcow2,id=hd \
->> -device pl061 \
->> -device virtio-blk-device,drive=hd \
->> -device virtio-net-device,netdev=usernet \
->> -netdev user,id=usernet,hostfwd=tcp::2222-:22 \
->> -nographic
->>
+> - I think it is too late (and not good from testing/risk perspective)
+> to shoot for integrating your kernel series into kernel 5.7;
+> - My advice is to try to upstream your kernel series at the beginning
+> of 5.8 development cycle (which should not be too far)
+> - Once this is done, it will open the door for integrating this series
+> into QEMU upstream
+> - This means that combination of kernel 5.8 and QEMU 5.1 will
+> hopefully be a working system from Loongson KVM point of view
+> - This will also mean we will have relatively sufficient time to test,
+> and possibly fix some new bugs before QEMU 5.1 release.
 >
-> Is the above script  correct  to boot linux image with pl061 device on
-> virt board?
+> I hope this tentative plan sounds good to you.
+OK, I will try to upstream kernel series at first, and send a V4 of
+qemu series after that.
 >
-> On Fri, 8 May 2020 at 02:32, John Snow <jsnow@redhat.com> wrote:
->
->>
->>
->> On 5/6/20 8:56 AM, Priyamvad Acharya wrote:
->> >
->> > Hello developer community,
->> > I want to allow a *sysbus *type device to boot with kernel image(arm
->> > architecture) via Qemu command line .
->> >
->> > When I run qemu arm system executable with *-device *option via qemu
->> > command line,I get following error message
->> >
->> >> qemu-system-arm: -device pl061: Parameter 'driver' expects pluggable
->> > device type
->> >
->> > So, how to allow a sysbus device via command line?
->> > Is there any working patch?
->>
->> Hi, it looks like the pl061 device is not declared "user creatable" so
->> it is unavailable from the CLI. As a sysbus device, QEMU is not aware,
->> in the abstract, of how to "connect" the device to other devices.
->>
->> See the sysbus class initialization code for more detail:
->> https://github.com/qemu/qemu/blob/master/hw/core/sysbus.c#L301
->>
->>
->> However, It looks like these boards/devices create such a device:
->>
->> hw/arm/highbank
->> hw/arm/realview
->> hw/arm/sbsa-ref
->> hw/arm/stellaris
->> hw/arm/versatilepb
->> hw/arm/virt
->>
->> If you want one on some other kind of machine, you'll need to write it
->> up yourself in the machine board code, but you didn't tell us what
->> version of QEMU you're using, what machine type you are trying to use,
->> etc.
->>
->> --js
->>
->>
+> Sincerely,
+> Aleksandar
 
---0000000000003390a805a52e3569
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr"><div dir=3D"ltr"><div dir=3D"ltr"><div>Hi,</div><div>I hav=
-e set user_creatable to true in class_init function of pl061 source code.</=
-div><div>Now when I run qemu via command line with <b>-device </b>option it=
- gives below output</div><blockquote class=3D"gmail_quote" style=3D"margin:=
-0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">=
-<div>qemu-system-arm: Device pl061 can not be dynamically instantiated<br><=
-/div></blockquote><div><br></div><div>=C2=A0</div><div>I request community =
-members to reply asap!!!!!!!!!!!!!!!</div><div><br></div><div><br></div></d=
-iv></div></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gma=
-il_attr">On Fri, 8 May 2020 at 07:40, Priyamvad Acharya &lt;<a href=3D"mail=
-to:priyamvad.agnisys@gmail.com">priyamvad.agnisys@gmail.com</a>&gt; wrote:<=
-br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8e=
-x;border-left:1px solid rgb(204,204,204);padding-left:1ex"><div dir=3D"ltr"=
->
-<div>Hi,</div><div>Thanks for providing relevant information.</div><div>FYI=
-</div><div>I am using Qemu version <b>4.2.94 (v5.0.0-rc4-dirty).</b></div><=
-div>I am using <b>virt</b> board.</div><div><br></div><div>Where we need to=
- set <b>user creatable </b>to true?</div><div>Any other modification is nee=
-ded to allow sysbus device support?</div><div><br></div><div>Below is the s=
-cript which I am using=C2=A0 to boot linux image with pl061 device on virt =
-board.</div><div><br></div><blockquote class=3D"gmail_quote" style=3D"margi=
-n:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex=
-"><div>#!/bin/bash<br><br>KERNEL=3D&quot;/lhome/priyamvad/debian_qemu_arm32=
-/vmlinuz-3.16.0-6-armmp-lpae&quot;<br>INIT_IMAGE=3D&quot;/lhome/priyamvad/d=
-ebian_qemu_arm32/initrd.img-3.16.0-6-armmp-lpae&quot;<br>DISK=3D&quot;/lhom=
-e/priyamvad/debian_qemu_arm32/hda30.qcow2&quot;<br><br>./qemu-system-arm \<=
-br>	-M virt \<br>	-m 1024 \<br>	-smp 4 \<br>	-kernel $KERNEL \<br>	-object =
-rng-random,filename=3D/dev/urandom,id=3Drng0 \<br>	-device virtio-rng-devic=
-e,rng=3Drng0 \<br>	-initrd $INIT_IMAGE \<br>	-append &#39;root=3D/dev/vda2&=
-#39; \<br>	-drive if=3Dnone,file=3D$DISK,format=3Dqcow2,id=3Dhd \<br>	-devi=
-ce pl061 \ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 <br>	-device virtio-blk-device,drive=3Dh=
-d \<br>	-device virtio-net-device,netdev=3Dusernet \<br>	-netdev user,id=3D=
-usernet,hostfwd=3Dtcp::2222-:22 \<br>	-nographic<br></div></blockquote><div=
-><br></div><div>Is the above script=C2=A0=20
-correct=C2=A0 to boot linux image with pl061 device on virt board?
 
-</div><div><div id=3D"gmail-m_-5255884491266261797gmail-:1xb"><img src=3D"h=
-ttps://ssl.gstatic.com/ui/v1/icons/mail/images/cleardot.gif"></div></div>
-
-</div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">=
-On Fri, 8 May 2020 at 02:32, John Snow &lt;<a href=3D"mailto:jsnow@redhat.c=
-om" target=3D"_blank">jsnow@redhat.com</a>&gt; wrote:<br></div><blockquote =
-class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px sol=
-id rgb(204,204,204);padding-left:1ex"><br>
-<br>
-On 5/6/20 8:56 AM, Priyamvad Acharya wrote:<br>
-&gt; <br>
-&gt; Hello developer community,<br>
-&gt; I want to allow a *sysbus *type device to boot with kernel image(arm<b=
-r>
-&gt; architecture) via Qemu command line .<br>
-&gt; <br>
-&gt; When I run qemu arm system executable with *-device *option via qemu<b=
-r>
-&gt; command line,I get following error message<br>
-&gt; <br>
-&gt;&gt; qemu-system-arm: -device pl061: Parameter &#39;driver&#39; expects=
- pluggable<br>
-&gt; device type<br>
-&gt; <br>
-&gt; So, how to allow a sysbus device via command line?<br>
-&gt; Is there any working patch?<br>
-<br>
-Hi, it looks like the pl061 device is not declared &quot;user creatable&quo=
-t; so<br>
-it is unavailable from the CLI. As a sysbus device, QEMU is not aware,<br>
-in the abstract, of how to &quot;connect&quot; the device to other devices.=
-<br>
-<br>
-See the sysbus class initialization code for more detail:<br>
-<a href=3D"https://github.com/qemu/qemu/blob/master/hw/core/sysbus.c#L301" =
-rel=3D"noreferrer" target=3D"_blank">https://github.com/qemu/qemu/blob/mast=
-er/hw/core/sysbus.c#L301</a><br>
-<br>
-<br>
-However, It looks like these boards/devices create such a device:<br>
-<br>
-hw/arm/highbank<br>
-hw/arm/realview<br>
-hw/arm/sbsa-ref<br>
-hw/arm/stellaris<br>
-hw/arm/versatilepb<br>
-hw/arm/virt<br>
-<br>
-If you want one on some other kind of machine, you&#39;ll need to write it<=
-br>
-up yourself in the machine board code, but you didn&#39;t tell us what<br>
-version of QEMU you&#39;re using, what machine type you are trying to use, =
-etc.<br>
-<br>
---js<br>
-<br>
-</blockquote></div>
-</blockquote></div>
-
---0000000000003390a805a52e3569--
+--=20
+Huacai Chen
 
