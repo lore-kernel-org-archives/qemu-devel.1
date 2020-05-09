@@ -2,83 +2,82 @@ Return-Path: <SRS0=giGJ=6X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D736C28CBC
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 19:21:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE61FC28CBC
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 20:02:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1523A20644
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 19:21:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1523A20644
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 86EDE20731
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 20:02:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86EDE20731
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXV2s-0002dC-9G
-	for qemu-devel@archiver.kernel.org; Sat, 09 May 2020 15:21:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47392)
+	id 1jXVgI-0003RB-ML
+	for qemu-devel@archiver.kernel.org; Sat, 09 May 2020 16:02:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52290)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jXV1a-00011K-Ii
- for qemu-devel@nongnu.org; Sat, 09 May 2020 15:20:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42356)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jXVfP-0001kA-05; Sat, 09 May 2020 16:01:47 -0400
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:36233)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jXV1Z-0005Q6-5W
- for qemu-devel@nongnu.org; Sat, 09 May 2020 15:20:38 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jXV1X-0003lh-HK
- for <qemu-devel@nongnu.org>; Sat, 09 May 2020 19:20:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 744172E80E7
- for <qemu-devel@nongnu.org>; Sat,  9 May 2020 19:20:35 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jXVfN-0006h4-N4; Sat, 09 May 2020 16:01:46 -0400
+Received: by mail-ed1-f66.google.com with SMTP id b91so85187edf.3;
+ Sat, 09 May 2020 13:01:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=OxfL0UPSJno+2EUjjhpNsjBaPYzXLE/oZ40gfSPjXpE=;
+ b=sbmoARaFK+15ma8wI2YerdXQTChXYZZmFwd7nul4b8rs+I2qOlcGF9WsgA2DBoc6wE
+ w89GBO3xkVR/j3UuiWmZqvVJAz1S89OFaTg6bGbSaEBoTQqn8PnJAVfQIw/4wzVmw9Lk
+ CT5hOhqvc17vhaT4ZzEmYnQXOPhCl3o0NQ1IIzucUn2LDQlyA1cwJYrhOhtChKzE37hS
+ 2BXVV1sqxcBJQ1RMrjgfPsnjivqoBtk01wEhOEj/FJ8Q5Z6O2UFT63QwE1I4Wg2N0eX3
+ IjGYxmwZNrhaq6sWxTyVPvRJ0aItY0QGHT59lwfSfBfHRynrTQxhdSObbfCHnvWS/gmj
+ 0qMQ==
+X-Gm-Message-State: AGi0Pubq6MQ8j5a/Om+i9uOhS6RwVRbHp2p1COEL+PzTYQXIopyRLTkd
+ mD+AvQMN2ozcWHhxpkGZRzUBpUm22VNoMLLe0ht3C0quWvs=
+X-Google-Smtp-Source: APiQypJmeQftIJvvC+BxNCOoNrPcjZ7VoK69GaJv7Xj8mt5c1GYVfjptAJTsW9Qjjj70Cf+t1v5R70xJENcn/VmWzyA=
+X-Received: by 2002:a50:c3c2:: with SMTP id i2mr7108561edf.93.1589054502343;
+ Sat, 09 May 2020 13:01:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20200509130910.26335-1-f4bug@amsat.org>
+ <20200509130910.26335-10-f4bug@amsat.org>
+ <ba3d3ba1-09bf-17a0-2116-549fa92e1ed6@amsat.org>
+In-Reply-To: <ba3d3ba1-09bf-17a0-2116-549fa92e1ed6@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Sat, 9 May 2020 22:01:30 +0200
+Message-ID: <CAAdtpL5KT0H3+yVRgzCwVaLYUUSCBW8vK4X3cHX_N91NPkUFBg@mail.gmail.com>
+Subject: Re: [PATCH 09/11] target/cpu: Restrict handlers using hwaddr type to
+ system-mode
+To: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Peter Maydell <peter.maydell@linaro.org>, 
+ Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 09 May 2020 19:13:03 -0000
-From: A A <1877688@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
- assignee=qemu_oss@crudebyte.com; 
-X-Launchpad-Bug-Tags: 9p virtfs
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: c3bacd17 schoenebeck
-X-Launchpad-Bug-Reporter: A A (c3bacd17)
-X-Launchpad-Bug-Modifier: A A (c3bacd17)
-References: <158898272347.4759.14841085044555564691.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158905158332.5900.11720226240927918667.malone@soybean.canonical.com>
-Subject: [Bug 1877688] Re: 9p virtfs device reports error when opening certain
- files
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: b50d312a51158c9edabf20537b2f3383fb40e1a0
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/09 15:10:42
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+Received-SPF: pass client-ip=209.85.208.66;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-f66.google.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/09 16:01:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -15
+X-Spam_score: -1.6
+X-Spam_bar: -
+X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9,
+ FREEMAIL_FORGED_FROMDOMAIN=0.001, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,52 +86,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1877688 <1877688@bugs.launchpad.net>
+Cc: Chris Wulff <crwulff@gmail.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ David Hildenbrand <david@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Laurent Vivier <laurent@vivier.eu>, Max Filippov <jcmvbkbc@gmail.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Marek Vasut <marex@denx.de>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
+ "open list:vfio-ccw" <qemu-s390x@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Stafford Horne <shorne@gmail.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>,
+ "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Cornelia Huck <cohuck@redhat.com>, Roman Bolshakov <r.bolshakov@yadro.com>,
+ "qemu-ppc@nongnu.org list:PowerPC" <qemu-ppc@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks, it works.
+On Sat, May 9, 2020 at 6:08 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
+> wrote:
+> On 5/9/20 3:09 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> > Restrict the following handlers to system-mode:
+> > - do_unaligned_access
+> > - do_transaction_failed
+> > - get_phys_page_debug
+> > - get_phys_page_attrs_debug
+> >
+> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > ---
+> >   include/hw/core/cpu.h           |  8 +++++---
+> >   target/alpha/cpu.h              |  4 +++-
+> >   target/arm/cpu.h                |  6 +++---
+> >   target/arm/internals.h          |  4 ++++
+> >   target/cris/cpu.h               |  2 ++
+> >   target/hppa/cpu.h               |  2 +-
+> >   target/i386/cpu.h               |  2 ++
+> >   target/m68k/cpu.h               |  7 ++++++-
+> >   target/microblaze/cpu.h         |  5 ++++-
+> >   target/mips/internal.h          |  2 +-
+> >   target/nios2/cpu.h              |  5 ++++-
+> >   target/openrisc/cpu.h           |  3 ++-
+> >   target/ppc/cpu.h                |  2 +-
+> >   target/riscv/cpu.h              | 20 ++++++++++----------
+> >   target/sh4/cpu.h                |  2 +-
+> >   target/sparc/cpu.h              |  2 ++
+> >   target/xtensa/cpu.h             | 12 +++++++-----
+> >   target/hppa/cpu.c               |  4 +++-
+> >   target/ppc/translate_init.inc.c |  2 +-
+> >   19 files changed, 62 insertions(+), 32 deletions(-)
+> >
+> > diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+> > index 5bf94d28cf..ed09d056d1 100644
+> > --- a/include/hw/core/cpu.h
+> > +++ b/include/hw/core/cpu.h
+> > @@ -167,6 +167,7 @@ typedef struct CPUClass {
+> >       int reset_dump_flags;
+> >       bool (*has_work)(CPUState *cpu);
+> >       void (*do_interrupt)(CPUState *cpu);
+> > +#ifndef CONFIG_USER_ONLY
+>
+> I forgot once Peter Maydell told me we can't do that for some reason I
+> don't remember.
+>
+> At least this changes the sizeof(CPUClass), so we get:
+>
+> qom/object.c:315:type_initialize: assertion failed: (parent->class_size
+> <=3D ti->class_size)
+>
+> So we can't poison the hwaddr type? (final patch of this series).
 
--- =
+Well, this works...:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1877688
+-- >8 --
+diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+--- a/include/hw/core/cpu.h
++++ b/include/hw/core/cpu.h
+@@ -167,6 +167,7 @@ typedef struct CPUClass {
+     int reset_dump_flags;
+     bool (*has_work)(CPUState *cpu);
+     void (*do_interrupt)(CPUState *cpu);
++#ifndef CONFIG_USER_ONLY
+     void (*do_unaligned_access)(CPUState *cpu, vaddr addr,
+                                 MMUAccessType access_type,
+                                 int mmu_idx, uintptr_t retaddr);
+@@ -174,6 +175,12 @@ typedef struct CPUClass {
+                                   unsigned size, MMUAccessType access_type=
+,
+                                   int mmu_idx, MemTxAttrs attrs,
+                                   MemTxResult response, uintptr_t retaddr)=
+;
++    hwaddr (*get_phys_page_debug)(CPUState *cpu, vaddr addr);
++    hwaddr (*get_phys_page_attrs_debug)(CPUState *cpu, vaddr addr,
++                                        MemTxAttrs *attrs);
++#else
++    void (*reserved[4])(CPUState *cpu, ...);
++#endif /* CONFIG_USER_ONLY */
+     bool (*virtio_is_big_endian)(CPUState *cpu);
+     int (*memory_rw_debug)(CPUState *cpu, vaddr addr,
+                            uint8_t *buf, int len, bool is_write);
+@@ -189,9 +196,6 @@ typedef struct CPUClass {
+     bool (*tlb_fill)(CPUState *cpu, vaddr address, int size,
+                      MMUAccessType access_type, int mmu_idx,
+                      bool probe, uintptr_t retaddr);
+-    hwaddr (*get_phys_page_debug)(CPUState *cpu, vaddr addr);
+-    hwaddr (*get_phys_page_attrs_debug)(CPUState *cpu, vaddr addr,
+-                                        MemTxAttrs *attrs);
+     int (*asidx_from_attrs)(CPUState *cpu, MemTxAttrs attrs);
+     int (*gdb_read_register)(CPUState *cpu, GByteArray *buf, int reg);
+     int (*gdb_write_register)(CPUState *cpu, uint8_t *buf, int reg);
+---
 
-Title:
-  9p virtfs device reports error when opening certain files
+Ugly?
 
-Status in QEMU:
-  In Progress
-
-Bug description:
-  Reading certain files on a 9p mounted FS produces this error message:
-
-  qemu-system-x86_64: VirtFS reply type 117 needs 12 bytes, buffer has
-  12, less than minimum
-
-  After this error message is generated, further accesses to the 9p FS
-  hangs whatever tries to access it. The Arch Linux guest system is
-  otherwise usable. This happens with QEMU 5.0.0 and guest kernel
-  version 5.6.11, hosted on an Arch Linux distro. I use the following
-  command to launch QEMU:
-
-  exec qemu-system-x86_64 -enable-kvm -display gtk -vga virtio -cpu host
-  -m 4G -netdev tap,ifname=3Dvmtap0,id=3Dvn0,script=3Dno,downscript=3Dno -d=
-evice
-  virtio-net-pci,netdev=3Dvn0 -kernel kernel.img -drive
-  file=3Dfile.img,format=3Draw,if=3Dvirtio -virtfs
-  local,path=3Dmnt,mount_tag=3Dhost0,security_model=3Dpassthrough,id=3Dhost0
-  -append "console=3DttyS0 root=3D/dev/vda rw"
-
-  There's nothing relevant in the guest kernel logs as far as I'm aware
-  of with loglevel set to 7.
-
-  I tracked down the issue to readv() with a small buffer(<=3D12 bytes)
-  and then a large buffer(>=3D 1024 bytes). A C program is provided to
-  trigger this behavior.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1877688/+subscriptions
+>
+> >       void (*do_unaligned_access)(CPUState *cpu, vaddr addr,
+> >                                   MMUAccessType access_type,
+> >                                   int mmu_idx, uintptr_t retaddr);
+> > @@ -174,6 +175,10 @@ typedef struct CPUClass {
+> >                                     unsigned size, MMUAccessType access=
+_type,
+> >                                     int mmu_idx, MemTxAttrs attrs,
+> >                                     MemTxResult response, uintptr_t ret=
+addr);
+> > +    hwaddr (*get_phys_page_debug)(CPUState *cpu, vaddr addr);
+> > +    hwaddr (*get_phys_page_attrs_debug)(CPUState *cpu, vaddr addr,
+> > +                                        MemTxAttrs *attrs);
+> > +#endif /* CONFIG_USER_ONLY */
+> >       bool (*virtio_is_big_endian)(CPUState *cpu);
+> >       int (*memory_rw_debug)(CPUState *cpu, vaddr addr,
+> >                              uint8_t *buf, int len, bool is_write);
+> > @@ -189,9 +194,6 @@ typedef struct CPUClass {
+> >       bool (*tlb_fill)(CPUState *cpu, vaddr address, int size,
+> >                        MMUAccessType access_type, int mmu_idx,
+> >                        bool probe, uintptr_t retaddr);
+> > -    hwaddr (*get_phys_page_debug)(CPUState *cpu, vaddr addr);
+> > -    hwaddr (*get_phys_page_attrs_debug)(CPUState *cpu, vaddr addr,
+> > -                                        MemTxAttrs *attrs);
+> >       int (*asidx_from_attrs)(CPUState *cpu, MemTxAttrs attrs);
+> >       int (*gdb_read_register)(CPUState *cpu, GByteArray *buf, int reg)=
+;
+> >       int (*gdb_write_register)(CPUState *cpu, uint8_t *buf, int reg);
+> [...]
 
