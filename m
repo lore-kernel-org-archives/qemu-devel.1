@@ -2,84 +2,95 @@ Return-Path: <SRS0=giGJ=6X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D89F6C28CBC
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 05:43:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1753C28CBC
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 06:02:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD36D21775
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 05:43:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD36D21775
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fbriere.net
+	by mail.kernel.org (Postfix) with ESMTPS id 72A06214D8
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 06:02:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cTC5nDiE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72A06214D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXIGg-0001hb-Sy
-	for qemu-devel@archiver.kernel.org; Sat, 09 May 2020 01:43:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55916)
+	id 1jXIZY-0002zG-JS
+	for qemu-devel@archiver.kernel.org; Sat, 09 May 2020 02:02:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49016)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jXGfS-0007gL-R2
- for qemu-devel@nongnu.org; Sat, 09 May 2020 00:00:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33780)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jXGfR-0006AI-0C
- for qemu-devel@nongnu.org; Sat, 09 May 2020 00:00:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jXGfO-0006TO-Jp
- for <qemu-devel@nongnu.org>; Sat, 09 May 2020 04:00:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 8FA4B2E80E7
- for <qemu-devel@nongnu.org>; Sat,  9 May 2020 04:00:46 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jXIYq-0002Ei-Qd
+ for qemu-devel@nongnu.org; Sat, 09 May 2020 02:02:08 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27693
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jXIYo-0005I5-VH
+ for qemu-devel@nongnu.org; Sat, 09 May 2020 02:02:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589004125;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ZKd3N3/WWSRbt3cjnuhhR9RD6PM4vBsqIuixPxX3KEU=;
+ b=cTC5nDiEf0O3Ji8BUM4UadPnNYXOQjNI3dVJUq52V8CWzgnoXKXYfbA2PmV5Cy76rrmUMn
+ 32v44Q7vVSuPnFfO88TPJQ3avzhM0JsQqmaOzdMPtpgn+8DZ9EVlOkkJQPNY47qKlXp7fm
+ i3D3IT9UgfdXt3B+HL4tIiA214bOWYo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-273-93sJXKfmPReUBJLyXVDvtg-1; Sat, 09 May 2020 02:01:58 -0400
+X-MC-Unique: 93sJXKfmPReUBJLyXVDvtg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 943E8460;
+ Sat,  9 May 2020 06:01:57 +0000 (UTC)
+Received: from [10.72.13.128] (ovpn-13-128.pek2.redhat.com [10.72.13.128])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E5F565EE0E;
+ Sat,  9 May 2020 06:01:54 +0000 (UTC)
+Subject: Re: [PATCH v2] e1000e: Added ICR clearing by corresponding IMS bit.
+To: Andrew Melnichenko <andrew@daynix.com>
+References: <20200506212645.894533-1-andrew@daynix.com>
+ <b67e29f9-a904-242f-9df2-801410f07aba@redhat.com>
+ <CABcq3pEicPdvMDAC7v_ns_YasCBvc8o-3-6vOb=+mTfXzvTJeQ@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <53be0d4e-214d-dc9c-58a4-0bbd9c46b78f@redhat.com>
+Date: Sat, 9 May 2020 14:01:53 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 09 May 2020 03:51:03 -0000
-From: =?utf-8?b?RnLDqWTDqXJpYyBCcmnDqHJl?= <fbriere@fbriere.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: gui usability
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berrange fbriere lockywolf
-X-Launchpad-Bug-Reporter: Lockywolf (lockywolf)
-X-Launchpad-Bug-Modifier: =?utf-8?b?RnLDqWTDqXJpYyBCcmnDqHJlIChmYnJpZXJl?=
- =?utf-8?q?=29?=
-References: <158469084688.19486.16271224237247905413.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158899626383.5105.14524558046346022993.malone@chaenomeles.canonical.com>
-Subject: [Bug 1868221] Re: /usr/share/applications/qemu.desktop should have an
- "Exec=" key.
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: d99f6be9fb67d6eb5e0e27d4cee346bfa60e1bd8
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/09 00:00:46
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -56
-X-Spam_score: -5.7
-X-Spam_bar: -----
-X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, FROM_EXCESS_BASE64=0.979,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <CABcq3pEicPdvMDAC7v_ns_YasCBvc8o-3-6vOb=+mTfXzvTJeQ@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/09 02:02:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
-X-Mailman-Approved-At: Sat, 09 May 2020 01:41:26 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,38 +99,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1868221 <1868221@bugs.launchpad.net>
+Cc: dmitry.fleytman@gmail.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thank you Lockywolf for this bug report.  Have you filed one against KDE
-as you previously mentioned?  If so, could you provide us with a link?
-Thanks in advance!
 
--- =
+On 2020/5/9 上午2:13, Andrew Melnichenko wrote:
+> Yo, I've used OpenSDM_8257x-18.pdf specification.
+> This document was recommended by Intel guys(Also, they referenced to 
+> that note).
+> I've made a fast fix and it works. Before that I had a fix for Linux 
+> e1000e driver.
+> Overall, the issue was in pending interrupts that can't be cleared by 
+> reading ICR in Linux(Windows driver clears by writing to ICR).
+>
+> You can download spec for example from:
+> http://iweb.dl.sourceforge.net/project/e1000/8257x%20Developer%20Manual/Revision%201.8/OpenSDM_8257x-18.pdf
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1868221
 
-Title:
-  /usr/share/applications/qemu.desktop should have an "Exec=3D" key.
+Interesting, this spec doesn't include 82574l which is what e1000e 
+claims to emulate:
 
-Status in QEMU:
-  New
+     c->vendor_id = PCI_VENDOR_ID_INTEL;
+     c->device_id = E1000_DEV_ID_82574L;
 
-Bug description:
-  According to the www.freedesktop.org .desktop-file specification, all
-  "Application" desktop files should have an "Exec=3D" key. The one in
-  qemu doesn't.
+Looking at 82574l spec (using the link mentioned in e1000e_core.c), it 
+said (7.4.3):
 
-  This can be easily verified by running kbuildsycoca4 if KDE4 is
-  present, but the issue is not DE-dependent.
+In MSI-X mode the bits in this register can be configured to auto-clear 
+when the MSI-X
+interrupt message is sent, in order to minimize driver overhead, and 
+when using MSI-X
+interrupt signaling.
+In systems that do not support MSI-X, reading the ICR register clears 
+it's bits or writing
+1b's clears the corresponding bits in this register.
 
-  Which binary exactly should be assigned as the default one, I don't
-  know.
+So the auto clear is under the control of EIAC (MSIX) or unconditionally 
+(non MSI-X).
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1868221/+subscriptions
+But what has been implemented in e1000e_mac_icr_read() is something 
+similar to the behavior of non 82574l card.
+
+So I think we should implement the 82574l behavior?
+
+Thanks
+
+
+>
+> On Fri, May 8, 2020 at 5:21 AM Jason Wang <jasowang@redhat.com 
+> <mailto:jasowang@redhat.com>> wrote:
+>
+>
+>     On 2020/5/7 上午5:26, andrew@daynix.com <mailto:andrew@daynix.com>
+>     wrote:
+>     > From: Andrew Melnychenko <andrew@daynix.com
+>     <mailto:andrew@daynix.com>>
+>     >
+>     > Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1707441
+>     > Added ICR clearing if there is IMS bit - according to the note by
+>     > section 13.3.27 of the 8257X developers manual.
+>     >
+>     > Signed-off-by: Andrew Melnychenko <andrew@daynix.com
+>     <mailto:andrew@daynix.com>>
+>     > ---
+>     >   hw/net/e1000e_core.c | 9 +++++++++
+>     >   hw/net/trace-events  | 1 +
+>     >   2 files changed, 10 insertions(+)
+>     >
+>     > diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+>     > index d5676871fa..302e99ff46 100644
+>     > --- a/hw/net/e1000e_core.c
+>     > +++ b/hw/net/e1000e_core.c
+>     > @@ -2624,6 +2624,15 @@ e1000e_mac_icr_read(E1000ECore *core, int
+>     index)
+>     >           e1000e_clear_ims_bits(core, core->mac[IAM]);
+>     >       }
+>     >
+>     > +    /*
+>     > +     * PCIe* GbE Controllers Open Source Software Developer's
+>     Manual
+>     > +     * 13.3.27 Interrupt Cause Read Register
+>     > +     */
+>
+>
+>     Hi Andrew:
+>
+>     Which version of the manual did you use? I try to use the one
+>     mentioned
+>     in e1000e.c which is
+>     http://www.intel.com/content/dam/doc/datasheet/82574l-gbe-controller-datasheet.pdf.
+>
+>     But I couldn't find chapter 13.3.27.
+>
+>     Thanks
+>
+>
+>     > +    if (core->mac[ICR] & core->mac[IMS]) {
+>     > + trace_e1000e_irq_icr_clear_icr_bit_ims(core->mac[ICR],
+>     core->mac[IMS]);
+>     > +        core->mac[ICR] = 0;
+>     > +    }
+>     > +
+>     >       trace_e1000e_irq_icr_read_exit(core->mac[ICR]);
+>     >       e1000e_update_interrupt_state(core);
+>     >       return ret;
+>     > diff --git a/hw/net/trace-events b/hw/net/trace-events
+>     > index e18f883cfd..46e40fcfa9 100644
+>     > --- a/hw/net/trace-events
+>     > +++ b/hw/net/trace-events
+>     > @@ -237,6 +237,7 @@ e1000e_irq_icr_read_entry(uint32_t icr)
+>     "Starting ICR read. Current ICR: 0x%x"
+>     >   e1000e_irq_icr_read_exit(uint32_t icr) "Ending ICR read.
+>     Current ICR: 0x%x"
+>     >   e1000e_irq_icr_clear_zero_ims(void) "Clearing ICR on read due
+>     to zero IMS"
+>     >   e1000e_irq_icr_clear_iame(void) "Clearing ICR on read due to IAME"
+>     > +e1000e_irq_icr_clear_icr_bit_ims(uint32_t icr, uint32_t ims)
+>     "Clearing ICR on read due corresponding IMS bit: 0x%x & 0x%x"
+>     >   e1000e_irq_iam_clear_eiame(uint32_t iam, uint32_t cause)
+>     "Clearing IMS due to EIAME, IAM: 0x%X, cause: 0x%X"
+>     >   e1000e_irq_icr_clear_eiac(uint32_t icr, uint32_t eiac)
+>     "Clearing ICR bits due to EIAC, ICR: 0x%X, EIAC: 0x%X"
+>     >   e1000e_irq_ims_clear_set_imc(uint32_t val) "Clearing IMS bits
+>     due to IMC write 0x%x"
+>
+
 
