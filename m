@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DC27C28CBC
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 13:10:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCCD0C28CBC
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 13:12:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07EE0214D8
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 13:10:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A32AF214D8
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 13:12:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AP4j+tgC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07EE0214D8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FVDqgvQ0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A32AF214D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXPFm-0007O5-4Q
-	for qemu-devel@archiver.kernel.org; Sat, 09 May 2020 09:10:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44614)
+	id 1jXPGw-0001Us-Q9
+	for qemu-devel@archiver.kernel.org; Sat, 09 May 2020 09:12:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44560)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jXPET-0004BD-Pd; Sat, 09 May 2020 09:09:33 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39675)
+ id 1jXPEH-0003c9-UU; Sat, 09 May 2020 09:09:21 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36305)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jXPES-0003m1-P4; Sat, 09 May 2020 09:09:33 -0400
-Received: by mail-wm1-x343.google.com with SMTP id y24so13637515wma.4;
- Sat, 09 May 2020 06:09:30 -0700 (PDT)
+ id 1jXPEH-0002qr-3W; Sat, 09 May 2020 09:09:21 -0400
+Received: by mail-wm1-x343.google.com with SMTP id u127so13582409wmg.1;
+ Sat, 09 May 2020 06:09:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=LLYk56bTzpbED/TEaMz+Gn8C12EvT1HOdsren3t79iU=;
- b=AP4j+tgCGiMzt4H8rWkM9LRHLvvfy6vChYsu223j14fpzOK2Pqi5/cgs7QkpACs5vh
- N1zCvIR0D66ZYllrAZ2tWAaeGkrPsXt9xm6zo9skgzr2SVMt97UEzXHLUWu6N9Qtkg4/
- euGDM4L2z8UAh+EJOMnGTRHFqqtsYRBZJhTTi+fip9mAE8szTB3dWn8Juth85+yQ+oDS
- nRW22lLT7lShq9EBYOPsyCZ4ollrQzzeo/9LMlFJ48I9X1gdie42VTArpEW7ZghsvF/V
- t7rd6CZDBwaKDER1Wx5YA6IC70y1YDpyUZt5/m71ZO0n6akG0hmukMSpoLbWaz03XO/+
- B/7A==
+ bh=TeWtSAei3ep1DJcrXDtpu+82w6foJlJk1rjchgbdgfo=;
+ b=FVDqgvQ0ukrRJhtKvI+c9JPloXHMWIoy4AmFxurl2ULEWeMwOVaSrI1H5mBNVyd+H1
+ Ed95DK3yvQ4R/SlqX2RCwHGKz/P19lTQd0mUepd5K91LqBkDxhjIlkXh//7fOecLtnL/
+ r58B6l/H4/FQ2PUD2TtH87WSEDAle4hkIVJRdXeRybIVjl21R8MIuCc4yRUQUPToZ6lG
+ SRAuTKsLgWJdL4s5CCiNuuX546BqvIFtJkUUu5YwAancGKkw+JLUcHNgt5tWiS/gndED
+ D5+gmz1DkoKQfL1Dy+dft260i0kfLg6ar12XmZgV7hqsRhdfAF0HqCC2Z1QqjN+bVGtH
+ D44w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=LLYk56bTzpbED/TEaMz+Gn8C12EvT1HOdsren3t79iU=;
- b=pEptVyEigIZLypIRPmGlgIyCubqdYdiUm8anNOp7uJS4oFwbBCjFhql0sHnGGshxvA
- tUnhvfGvzzL8PObxYOgZ9N2M309trv6X+Q4UJmJ29RmmejOZBwyKyUtmfWojwo/5s9je
- tLOnuNOBqRes/M5Jlss1mfvGIZ9BX0eLe5JMUQ+sej92cuXgu1xSLTzchmWpaSJ/d9EG
- BDpxzwwDrBzO+pR117SdtYRj8WkBs5v53Wuxxdebm+MovcIL9s3AU7BN56HHItyYKQDT
- JIuuDUND+H4kikexM5aQrWtp/NBTXfX+VEbLvkLUPTVyxjY4WXQBjpAgSWwDT3e4NG2U
- JatQ==
-X-Gm-Message-State: AGi0PuYA2xc9bWbwxIABGQ631bV7LJy8oo/8gORty0Y3ceBZpA41edSp
- QJTpaZxc1IInlF4Qu34TrSFjHZDvVGc=
-X-Google-Smtp-Source: APiQypJ7r2t/Yta7gA62He4a86vm+KY7sXlClAQIeF/nfivQhskw9hfQngWMoh1D2O9TF+ukw3WKyQ==
-X-Received: by 2002:a7b:cc0e:: with SMTP id f14mr21365946wmh.39.1589029769835; 
- Sat, 09 May 2020 06:09:29 -0700 (PDT)
+ bh=TeWtSAei3ep1DJcrXDtpu+82w6foJlJk1rjchgbdgfo=;
+ b=culRO1TUFFoXO5qduN58a1tWZ0n+ZqdVAD0yqi6x88Z+6uUJyLlqcSEjFupChAtK6j
+ UsbUzlVfv3/9LXUbjC2IpSPM43JTRaYG59oFeO2eCbIug/INWD8JtaYPJ/DoGmlCevM1
+ YEh0FetCeKmbnvkAisaek8CRGhCIPwBxnfrUCequI3cIbr87uFLaJpi19Q6XqqQGCRLr
+ cElP58HhxnoZ0iWIHl3C3sb6JFNg0oGTWNdL2QcwzpashKQDKf2syb1dfc7YoxWj5YNu
+ h6InouU6K3tXP9o8sc7b9KtTJhRyZ06COXJ2jaOem3/+Jyo/Oj8Yck1OKKLkjjDhX7EZ
+ k5JQ==
+X-Gm-Message-State: AGi0PuZ3qnzqt6v3c0OiZR0lh44XZxlYMbAie5o2B4hMjOZ8IVOq/dX7
+ kPVRqMMLQin/khyvt9ksqxZjQVIQ+uY=
+X-Google-Smtp-Source: APiQypK3virEnIkWexu8Mf8qsHDhzVfpImcldIBfa3jsD5SK4vyes6cGvXjwqv8wQQgx4WnoNRS06g==
+X-Received: by 2002:a1c:f306:: with SMTP id q6mr21073205wmq.169.1589029758217; 
+ Sat, 09 May 2020 06:09:18 -0700 (PDT)
 Received: from localhost.localdomain (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id m65sm1411410wmm.17.2020.05.09.06.09.27
+ by smtp.gmail.com with ESMTPSA id m65sm1411410wmm.17.2020.05.09.06.09.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 09 May 2020 06:09:29 -0700 (PDT)
+ Sat, 09 May 2020 06:09:17 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 05/11] target/ppc: Restrict PPCVirtualHypervisorClass to
+Subject: [PATCH 01/11] plugins: Restrict functions handling hwaddr to
  system-mode
-Date: Sat,  9 May 2020 15:09:04 +0200
-Message-Id: <20200509130910.26335-6-f4bug@amsat.org>
+Date: Sat,  9 May 2020 15:09:00 +0200
+Message-Id: <20200509130910.26335-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200509130910.26335-1-f4bug@amsat.org>
 References: <20200509130910.26335-1-f4bug@amsat.org>
@@ -124,111 +124,92 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The code related to PPC Virtual Hypervisor is pointless in user-mode.
+Restrict qemu_plugin_hwaddr_is_io() and
+qemu_plugin_hwaddr_device_offset() to system-mode.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- target/ppc/cpu.h                |  4 ++--
- target/ppc/kvm_ppc.h            | 22 +++++++++++-----------
- target/ppc/translate_init.inc.c |  4 ++++
- 3 files changed, 17 insertions(+), 13 deletions(-)
+ include/qemu/qemu-plugin.h |  2 ++
+ plugins/api.c              | 17 ++---------------
+ 2 files changed, 4 insertions(+), 15 deletions(-)
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 6b6dd7e483..73920a9cac 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1176,6 +1176,7 @@ PowerPCCPUClass *ppc_cpu_class_by_pvr(uint32_t pvr);
- PowerPCCPUClass *ppc_cpu_class_by_pvr_mask(uint32_t pvr);
- PowerPCCPUClass *ppc_cpu_get_family_class(PowerPCCPUClass *pcc);
+diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
+index 5502e112c8..06c271a107 100644
+--- a/include/qemu/qemu-plugin.h
++++ b/include/qemu/qemu-plugin.h
+@@ -326,6 +326,7 @@ bool qemu_plugin_mem_is_store(qemu_plugin_meminfo_t info);
+ struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t info,
+                                                   uint64_t vaddr);
  
 +#ifndef CONFIG_USER_ONLY
- struct PPCVirtualHypervisorClass {
-     InterfaceClass parent;
-     void (*hypercall)(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu);
-@@ -1189,10 +1190,8 @@ struct PPCVirtualHypervisorClass {
-     void (*hpte_set_r)(PPCVirtualHypervisor *vhyp, hwaddr ptex, uint64_t pte1);
-     void (*get_pate)(PPCVirtualHypervisor *vhyp, ppc_v3_pate_t *entry);
-     target_ulong (*encode_hpt_for_kvm_pr)(PPCVirtualHypervisor *vhyp);
--#ifndef CONFIG_USER_ONLY
-     void (*cpu_exec_enter)(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu);
-     void (*cpu_exec_exit)(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu);
--#endif
- };
- 
- #define TYPE_PPC_VIRTUAL_HYPERVISOR "ppc-virtual-hypervisor"
-@@ -1204,6 +1203,7 @@ struct PPCVirtualHypervisorClass {
- #define PPC_VIRTUAL_HYPERVISOR_GET_CLASS(obj) \
-     OBJECT_GET_CLASS(PPCVirtualHypervisorClass, (obj), \
-                      TYPE_PPC_VIRTUAL_HYPERVISOR)
+ /*
+  * The following additional queries can be run on the hwaddr structure
+  * to return information about it. For non-IO accesses the device
+@@ -333,6 +334,7 @@ struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t info,
+  */
+ bool qemu_plugin_hwaddr_is_io(struct qemu_plugin_hwaddr *hwaddr);
+ uint64_t qemu_plugin_hwaddr_device_offset(const struct qemu_plugin_hwaddr *haddr);
 +#endif /* CONFIG_USER_ONLY */
  
- void ppc_cpu_do_interrupt(CPUState *cpu);
- bool ppc_cpu_exec_interrupt(CPUState *cpu, int int_req);
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index fcaf745516..701c0c262b 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -280,6 +280,17 @@ static inline bool kvmppc_has_cap_spapr_vfio(void)
-     return false;
- }
+ typedef void
+ (*qemu_plugin_vcpu_mem_cb_t)(unsigned int vcpu_index,
+diff --git a/plugins/api.c b/plugins/api.c
+index 53c8a73582..785ad2e45e 100644
+--- a/plugins/api.c
++++ b/plugins/api.c
+@@ -249,7 +249,8 @@ bool qemu_plugin_mem_is_store(qemu_plugin_meminfo_t info)
+  * Virtual Memory queries
+  */
  
-+static inline void kvmppc_read_hptes(ppc_hash_pte64_t *hptes,
-+                                     hwaddr ptex, int n)
-+{
-+    abort();
-+}
-+
-+static inline void kvmppc_write_hpte(hwaddr ptex, uint64_t pte0, uint64_t pte1)
-+{
-+    abort();
-+}
-+
- #endif /* !CONFIG_USER_ONLY */
- 
- static inline bool kvmppc_has_cap_epr(void)
-@@ -310,17 +321,6 @@ static inline int kvmppc_load_htab_chunk(QEMUFile *f, int fd, uint32_t index,
-     abort();
- }
- 
--static inline void kvmppc_read_hptes(ppc_hash_pte64_t *hptes,
--                                     hwaddr ptex, int n)
--{
--    abort();
--}
--
--static inline void kvmppc_write_hpte(hwaddr ptex, uint64_t pte0, uint64_t pte1)
--{
--    abort();
--}
--
- static inline bool kvmppc_has_cap_fixup_hcalls(void)
- {
-     abort();
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index 2b6e832c4c..4ea0cc501b 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -10946,16 +10946,20 @@ static const TypeInfo ppc_cpu_type_info = {
-     .class_init = ppc_cpu_class_init,
- };
- 
+-#ifdef CONFIG_SOFTMMU
 +#ifndef CONFIG_USER_ONLY
- static const TypeInfo ppc_vhyp_type_info = {
-     .name = TYPE_PPC_VIRTUAL_HYPERVISOR,
-     .parent = TYPE_INTERFACE,
-     .class_size = sizeof(PPCVirtualHypervisorClass),
- };
-+#endif
++
+ static __thread struct qemu_plugin_hwaddr hwaddr_info;
  
- static void ppc_cpu_register_types(void)
+ struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t info,
+@@ -267,26 +268,14 @@ struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t info,
+ 
+     return &hwaddr_info;
+ }
+-#else
+-struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t info,
+-                                                  uint64_t vaddr)
+-{
+-    return NULL;
+-}
+-#endif
+ 
+ bool qemu_plugin_hwaddr_is_io(struct qemu_plugin_hwaddr *hwaddr)
  {
-     type_register_static(&ppc_cpu_type_info);
-+#ifndef CONFIG_USER_ONLY
-     type_register_static(&ppc_vhyp_type_info);
-+#endif
+-#ifdef CONFIG_SOFTMMU
+     return hwaddr->is_io;
+-#else
+-    return false;
+-#endif
  }
  
- type_init(ppc_cpu_register_types)
+ uint64_t qemu_plugin_hwaddr_device_offset(const struct qemu_plugin_hwaddr *haddr)
+ {
+-#ifdef CONFIG_SOFTMMU
+     if (haddr) {
+         if (!haddr->is_io) {
+             ram_addr_t ram_addr = qemu_ram_addr_from_host((void *) haddr->v.ram.hostaddr);
+@@ -299,7 +288,6 @@ uint64_t qemu_plugin_hwaddr_device_offset(const struct qemu_plugin_hwaddr *haddr
+             return haddr->v.io.offset;
+         }
+     }
+-#endif
+     return 0;
+ }
+ 
+@@ -308,7 +296,6 @@ uint64_t qemu_plugin_hwaddr_device_offset(const struct qemu_plugin_hwaddr *haddr
+  * will be. This helps the plugin dimension per-vcpu arrays.
+  */
+ 
+-#ifndef CONFIG_USER_ONLY
+ static MachineState * get_ms(void)
+ {
+     return MACHINE(qdev_get_machine());
 -- 
 2.21.3
 
