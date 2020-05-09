@@ -2,99 +2,81 @@ Return-Path: <SRS0=giGJ=6X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8587AC28CBC
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 13:22:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47400C28CBC
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 14:06:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4AF32217BA
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 13:22:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="or2pU5Vn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AF32217BA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	by mail.kernel.org (Postfix) with ESMTPS id 179382072F
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 14:06:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 179382072F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXPRB-0007fM-BE
-	for qemu-devel@archiver.kernel.org; Sat, 09 May 2020 09:22:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46340)
+	id 1jXQ7Q-0004TJ-5G
+	for qemu-devel@archiver.kernel.org; Sat, 09 May 2020 10:06:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54686)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jXPN1-0004Ma-TC
- for qemu-devel@nongnu.org; Sat, 09 May 2020 09:18:23 -0400
-Received: from mout.web.de ([212.227.17.12]:33805)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jXQ6i-0003Gn-Bb
+ for qemu-devel@nongnu.org; Sat, 09 May 2020 10:05:36 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42448)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jXPN0-0007Xl-B4
- for qemu-devel@nongnu.org; Sat, 09 May 2020 09:18:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1589030296;
- bh=QcPqjEJ/q8mdqpxeK10SK9JBHS7hiYgodOdqwBySo50=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=or2pU5VnUnuwhhmTX1KBSTHnSQOjtm26PYC/q75WGqcXmLidIgad+DWRkTE47nYo0
- gfNkkZTfwaztWfV6EC9pk1OXnzmU4OpjHZP/2Rr8mNfd8GlTkfby4cyreS6sq5Cecl
- lIvnWpfETgRktTm8p5vQq+65tgUuMpAb2PxlE5g0=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([94.134.180.119]) by smtp.web.de (mrweb103
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0Lnj7L-1iuVFA40Vz-00hvYD; Sat, 09
- May 2020 15:18:16 +0200
-Date: Sat, 9 May 2020 15:18:01 +0200
-From: Lukas Straub <lukasstraub2@web.de>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Subject: Re: [PATCH] tests/acceptance/boot_linux: Skip slow Aarch64 'virt'
- machine TCG test
-Message-ID: <20200509151801.780059c3@luklap>
-In-Reply-To: <20200507162235.1790-1-philmd@redhat.com>
-References: <20200507162235.1790-1-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jXQ6g-0005uu-US
+ for qemu-devel@nongnu.org; Sat, 09 May 2020 10:05:35 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jXQ6f-0007DQ-0B
+ for <qemu-devel@nongnu.org>; Sat, 09 May 2020 14:05:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id EFFC52E80BA
+ for <qemu-devel@nongnu.org>; Sat,  9 May 2020 14:05:32 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/GS4RLMFaWIA=F3yFTnAi4j_";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:YR3+YUrz5A3dOxYtz2OxrazPv2d0F1KEsCZ26CUckfic8OIohko
- DB3SBZlJHtVE1fUbUdpYi08fuvFsXhvllfj3sf7LYYnZ6l8QsMeM8wwW4d2gh2QwepYpUTD
- dgoEf14jkPOde3R92rBwkbT17WnvAVaricttuGoARVfg+/ShP2suk+RBTaRTwhUt/nx6Tng
- GtDv0fffiKfcamniv0qzA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:P698mWZ/sco=:QYPG2p0PMn9MMovDdZfM2p
- 4BWTL11cASDl/TkhFYF7N+pRvYhNqY2TkkkpFF3WevarZ909OaM0GR4YCd39FqVCsh+YvMhTI
- 3nJExiGgcYTZITbfdp/Wp5I8t+9+bkrQVfpN+eaUaQkwX4PX2zILezAaleVVWA4oSWaOIGygE
- R1HnMdbm6MjQQs1GWrRZziiR8ffN2JbU6GHsdP5TlqAvg6Mu+k2LpHBiRiUhlO55+x+jj9f+8
- kYNIgrahZoIjlTTrAaB5yYZuVEKt/NG0QNJ9CS5TwreXVT1BeEl30UWGM2g5KpkH8YUMBM/Wz
- W+z2bKusiBMgTfguXjzN65P9JkZw+14IH8cMx5i4i07Oi519vw+mQvblj5nn+U+lM0NXoavO2
- XQnyBC8MZEgLVBDmqW2GBFI9K8oT6H7e798NMZ4RmNulOqziiskrhMhV24X82wrI2Wg9LyDYf
- UYZiM9z1SpDTrD/IaSXh5XmyJtx5egIcpMKHyCoabdDGdIR4pxEzFE4OkODtiHMjcrgXyZ9rE
- unnT+j3UkZXzYpJB2gE3TrV53PVE4t5N+c/MX2f0IdNPQJ/XBrqLn6AJyq+lZEaDHU0ucFcg0
- t4/L1Ieu+tQTk7bTF9re02WByj0ln4cmqkE1Iq7C+1Q0wsK+W48lFkjwJHCZXtyBe++4hW9F4
- ZfIhJZpHolaQFurhauQr0vDpH0o/BVk7XvrVJeY+DkJmsArSHzm9ChU7qz6Ud2+gy/kHj5dKk
- AUy8/Spe08Tx+E6hoI3bknnawRC7V1+fdXL/0yGp0yOJXlKY6OcLjmEDLcVKBGEN6yNNP81lU
- DHW1gkB+SYCs9dLW/jnIYLEhGN+U/7SXnl1VibM8QCbMpjvHaWEvvvqZoeSRjAcYQpsgwRMzZ
- wsGB+MBE75Atuu/+/nvT5D4Bz99+byo9EztsliorKrSLXGBpTUdXLW8814nTVpBeq7Zrj+pdq
- QwrficEmHB8r/Hi3OrTtteiKqvSM5k/VLRqNI6K5Plz87eGtL6PYAH4a6TUvxhkbhSvTqOosf
- KT3epTGyNv9/oT+2Emv00L/wpSdzUlf9Z0Xc1xfB8cmrcNx/03DbATWYYK4QroNbAA5b2MeNW
- S0pWCrBjGTmguTCmGdmogtMwqFxt5W1U5WzoIM3/Hm51sORm70IVhKt0olFBgs57hsOnZMjrJ
- 2ulxhwtSM7egHtq+kvLEXbNe983fvXwDWwFhtrJYa2/4SUJK3auQK06c1ERZVzrVf6pNcugFE
- QPL4M4LCXen4fjfXO
-Received-SPF: pass client-ip=212.227.17.12; envelope-from=lukasstraub2@web.de;
- helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/09 09:18:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -24
-X-Spam_score: -2.5
-X-Spam_bar: --
-X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 09 May 2020 13:57:14 -0000
+From: Christian Schoenebeck <1877384@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: richard-maw schoenebeck
+X-Launchpad-Bug-Reporter: Fishface60 (richard-maw)
+X-Launchpad-Bug-Modifier: Christian Schoenebeck (schoenebeck)
+References: <158886102295.5250.16201751310283363946.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158903263420.12425.18211080645503971430.malone@wampee.canonical.com>
+Subject: [Bug 1877384] Re: 9pfs file create with mapped-xattr can fail on
+ overlayfs
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 3dbe82475a86005ee2e4eaf01ae23f0870e216f4
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/09 10:05:33
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -103,87 +85,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Reply-To: Bug 1877384 <1877384@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/GS4RLMFaWIA=F3yFTnAi4j_
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Since the report is about overlayfs being involved, could you please try if =
 
-On Thu,  7 May 2020 18:22:35 +0200
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+the following patch makes a difference?
 
-> The BootLinuxAarch64.test_virt_tcg is reported to take >7min to run.
-> Add a possibility to users to skip this particular test, by setting
-> the AVOCADO_SKIP_SLOW_TESTS environment variable:
->=20
->   $ AVOCADO_SKIP_SLOW_TESTS=3Dplease make check-acceptance
->   ...
->     (05/88) tests/acceptance/boot_linux.py:BootLinuxAarch64.test_virt_tcg=
-: SKIP: Test takes >7min
->   ...
->=20
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  tests/acceptance/boot_linux.py | 2 ++
->  1 file changed, 2 insertions(+)
->=20
-> diff --git a/tests/acceptance/boot_linux.py b/tests/acceptance/boot_linux=
-.py
-> index 075a386300..a8df50d769 100644
-> --- a/tests/acceptance/boot_linux.py
-> +++ b/tests/acceptance/boot_linux.py
-> @@ -15,6 +15,7 @@
->  from qemu.accel import kvm_available
->  from qemu.accel import tcg_available
-> =20
-> +from avocado import skipIf
->  from avocado.utils import cloudinit
->  from avocado.utils import network
->  from avocado.utils import vmimage
-> @@ -159,6 +160,7 @@ def add_common_args(self):
->          self.vm.add_args('-device', 'virtio-rng-pci,rng=3Drng0')
->          self.vm.add_args('-object', 'rng-random,id=3Drng0,filename=3D/de=
-v/urandom')
-> =20
-> +    @skipIf(os.getenv('AVOCADO_SKIP_SLOW_TESTS'), 'Test takes >7min')
->      def test_virt_tcg(self):
->          """
->          :avocado: tags=3Daccel:tcg
+https://github.com/gkurz/qemu/commit/f7f5a1b01307af1c7b6c94672f2ce75c36f105=
+65
 
-Hi,
-Why not simply add slow tag to the test. Like:
-:avocado: tags=3Dslow
+It's not yet on master, but will be soon.
 
-The slow tests can then be skipped with
-$ make check-acceptance AVOCADO_TAGS=3D'-t -slow'
+-- =
 
-Regards,
-Lukas Straub
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1877384
 
---Sig_/GS4RLMFaWIA=F3yFTnAi4j_
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Title:
+  9pfs file create with mapped-xattr can fail on overlayfs
 
------BEGIN PGP SIGNATURE-----
+Status in QEMU:
+  New
 
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl62rYkACgkQNasLKJxd
-slhofg/+KoZUN+w4ZsDIMna0PtTpMfR7SxhNqMR1oMZvOPorDismlEUNbRGvgzSd
-UAOV8i51xaOQCFcvOUnR+T2GiRoUdJHq3HuOQdOwyyNSA9sTAMCL9wUh8Gyqx1Nu
-3VQEpJvcYavpHtLbW5RRLECIFgF6Gy9BthN1AshY664kVE8uQfmg1BH+/YB9w+H8
-DZzecSl0NCO0lZnjRIK3+Gdwfwq5FLuAJkdy7mBPF9K+NBUDF9EjZLR13i9wvJAc
-6F09JhZbXcvXREOkkNcfUxTFrjB9IT2oBbnPyJG5Zd+Kx0SfyDh4uFXX5BsWF22t
-MGkhEzZZFJzzsUXwqDPIE6UVmFGmVldD8Ddi65MBe0kKTGvPfG03nzTAmgdAFywt
-aVU0qkN7eyC1nnCWIkGuPeT+2JHUfyT+piUsovzuJ1uGBLTyx2bGbk5dtrT2ok1n
-S5KvvYeSYK2wFrb8I0HAHMdpaC84Lke5v6mUnxArjBcT03QbgXiv0myBCa2dCiiv
-Om6K7sjcsfDLxiVxBWO2yofK9UqiB+WzH1IHEl3A4H7nsH4J16aIJaYl6p+Jndvh
-NLIw3l6yacBYR7kR0vqyQ2Q6amzTVKFOhgYRwbws8bDo0K8WYzph1vUSS4nglwFg
-VVG/g+PqSh+qAxCsmGdt4USiaYP99HunlEYAzGRqfUAvoMMuBxU=
-=jstU
------END PGP SIGNATURE-----
+Bug description:
+  QEMU Version: 3.1.0 as packaged in debian buster, but the code appears to=
+ do the same in master.
+  qemu command-line: qemu-system-x86_64 -m 1G -nographic -nic "user,model=
+=3Dvirtio-net-pci,tftp=3D$(pwd),net=3D10.0.2.0/24,host=3D10.0.2.2" -fsdev l=
+ocal,id=3Dfs,path=3D$thisdir/..,security_model=3Dmapped-xattr -device virti=
+o-9p-pci,fsdev=3Dfs,mount_tag=3Dfs -drive "file=3D$rootdisk,if=3Dvirtio,for=
+mat=3Draw" -kernel "$kernel" -initrd "$initrd" -append "$append"
 
---Sig_/GS4RLMFaWIA=F3yFTnAi4j_--
+  =
+
+  I'm using CI that runs in a Docker container and runs a qemu VM with code=
+ and results shared via virtio 9p.
+  The 9p fsdev is configured with security_model=3Dmapped-xattr
+  When the test code attempts to create a log file in an existing directory=
+, open with O_CREAT fails with -ENOENT.
+
+  The relevant strace excerpt is:
+
+  28791 openat(11, ".", O_RDONLY|O_NOFOLLOW|O_PATH|O_DIRECTORY) =3D 20
+  28791 openat(20, "src", O_RDONLY|O_NOCTTY|O_NONBLOCK|O_NOFOLLOW|O_DIRECTO=
+RY) =3D 21
+  28791 fcntl(21, F_SETFL, O_RDONLY|O_DIRECTORY) =3D 0
+  28791 close(20)                         =3D 0
+  28791 openat(21, "client.log", O_WRONLY|O_CREAT|O_NOCTTY|O_NONBLOCK|O_NOF=
+OLLOW, 0600) =3D 20
+  28791 fcntl(20, F_SETFL, O_WRONLY|O_CREAT|O_NONBLOCK|O_NOFOLLOW) =3D 0
+  28791 lsetxattr("/proc/self/fd/21/client.log", "user.virtfs.uid", "\0\0\0=
+", 4, 0) =3D -1 ENOENT (No such file or directory)
+
+  My hypothesis for what's going wrong is since the Docker container's
+  overlayfs copies-up on writes, when it opens the file it's created a
+  new version of the `src` directory containing a `client.log`, but this
+  new src directory isn't accessible by file descriptor 20 and the
+  lsetxattr call is instead attempting to set attributes on the path in
+  the old `src` directory.
+
+  Looking at the code, a fix would be to change `hw/9pfs/9p-local.c` and
+  change `local_open2` to instead of calling `local_set_xattrat` to set
+  the xattrs by directory file descriptor and file name, to have a
+  version of local_set_xattrat` which uses `fsetxattr` to set the virtfs
+  attributes instead of the `fsetxattrat_nofollow` helper.
+
+  This reliably happened for me in CI, but I don't have access to the CI
+  host or the time to strip the test down to make a minimal test case,
+  and had difficulty reproducing the error on other machines.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1877384/+subscriptions
 
