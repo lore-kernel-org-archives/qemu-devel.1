@@ -2,46 +2,46 @@ Return-Path: <SRS0=giGJ=6X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4B7FC47247
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 00:11:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88A9DC47255
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 00:36:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B73E724953
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 00:11:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B73E724953
+	by mail.kernel.org (Postfix) with ESMTPS id 5D695218AC
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 00:36:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D695218AC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXD5f-0000O5-45
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 20:11:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59220)
+	id 1jXDTg-0001c2-F8
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 20:36:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43720)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jXD4q-0008NT-FK
- for qemu-devel@nongnu.org; Fri, 08 May 2020 20:10:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44492)
+ id 1jXDSp-0000yA-Gk
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 20:35:35 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48396)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jXD4o-0007Fh-IZ
- for qemu-devel@nongnu.org; Fri, 08 May 2020 20:10:48 -0400
+ id 1jXDSo-0005z3-8s
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 20:35:35 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jXD4l-0005tY-MB
- for <qemu-devel@nongnu.org>; Sat, 09 May 2020 00:10:43 +0000
+ id 1jXDSl-0001XA-7a
+ for <qemu-devel@nongnu.org>; Sat, 09 May 2020 00:35:31 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A41792E8010
- for <qemu-devel@nongnu.org>; Sat,  9 May 2020 00:10:43 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 369052E810B
+ for <qemu-devel@nongnu.org>; Sat,  9 May 2020 00:35:31 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 09 May 2020 00:05:23 -0000
+Date: Sat, 09 May 2020 00:27:21 -0000
 From: A A <1877688@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -53,16 +53,17 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: c3bacd17
 X-Launchpad-Bug-Reporter: A A (c3bacd17)
 X-Launchpad-Bug-Modifier: A A (c3bacd17)
-Message-Id: <158898272347.4759.14841085044555564691.malonedeb@chaenomeles.canonical.com>
-Subject: [Bug 1877688] [NEW] 9p virtfs device reports error when opening
- certain files
+References: <158898272347.4759.14841085044555564691.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158898404210.10870.1156667153961277357.launchpad@wampee.canonical.com>
+Subject: [Bug 1877688] Re: 9p virtfs device reports error when opening certain
+ files
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 5f85d118820ed8d6552296ffc26911a56025c2ea
+X-Launchpad-Hash: 34a2526fd180f84ca692ddc8c71e09f05237eda6
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 20:10:43
@@ -90,36 +91,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+** Description changed:
 
-Reading certain files on a 9p mounted FS produces this error message:
+  Reading certain files on a 9p mounted FS produces this error message:
+  =
 
-qemu-system-x86_64: VirtFS reply type 117 needs 12 bytes, buffer has 12,
-less than minimum
+  qemu-system-x86_64: VirtFS reply type 117 needs 12 bytes, buffer has 12,
+  less than minimum
+  =
 
-After this error message is generated, further accesses to the 9p FS
-hangs whatever tries to access it. The Arch Linux guest system is
-otherwise usable. This happens with QEMU 5.0.0 and guest kernel version
-5.6.11, hosted on an Arch Linux distro. I use the following command to
-launch QEMU:
+  After this error message is generated, further accesses to the 9p FS
+  hangs whatever tries to access it. The Arch Linux guest system is
+  otherwise usable. This happens with QEMU 5.0.0 and guest kernel version
+  5.6.11, hosted on an Arch Linux distro. I use the following command to
+  launch QEMU:
+  =
 
-exec qemu-system-x86_64 -enable-kvm -display gtk -vga virtio -cpu host
--m 4G -netdev tap,ifname=3Dvmtap0,id=3Dvn0,script=3Dno,downscript=3Dno -dev=
-ice
-virtio-net-pci,netdev=3Dvn0 -kernel kernel.img -drive
-file=3Dfile.img,format=3Draw,if=3Dvirtio -virtfs
-local,path=3Dmnt,mount_tag=3Dhost0,security_model=3Dpassthrough,id=3Dhost0
--append "console=3DttyS0 root=3D/dev/vda rw"
+  exec qemu-system-x86_64 -enable-kvm -display gtk -vga virtio -cpu host
+  -m 4G -netdev tap,ifname=3Dvmtap0,id=3Dvn0,script=3Dno,downscript=3Dno -d=
+evice
+  virtio-net-pci,netdev=3Dvn0 -kernel kernel.img -drive
+  file=3Dfile.img,format=3Draw,if=3Dvirtio -virtfs
+  local,path=3Dmnt,mount_tag=3Dhost0,security_model=3Dpassthrough,id=3Dhost0
+  -append "console=3DttyS0 root=3D/dev/vda rw"
+  =
 
-There's nothing relevant in the guest kernel logs as far as I'm aware of
-with loglevel set to 7.
+  There's nothing relevant in the guest kernel logs as far as I'm aware of
+  with loglevel set to 7.
++ =
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
++ Aha, I found the cursed file. See this strace log:
++ =
 
-
-** Tags: 9p virtfs
++ openat(AT_FDCWD, "/home/user/.local/share/nvim/shada/main.shada", O_RDONL=
+Y|O_CLOEXEC) =3D 25
++ mmap(NULL, 880640, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0=
+) =3D 0x7f3ab8427000
++ mmap(NULL, 880640, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0=
+) =3D 0x7f3ab8350000
++ mmap(NULL, 880640, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0=
+) =3D 0x7f3ab8279000
++ mmap(NULL, 880640, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0=
+) =3D 0x7f3ab81a2000
++ mmap(NULL, 880640, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0=
+) =3D 0x7f3ab80cb000
++ readv(25,
 
 -- =
 
@@ -155,6 +171,22 @@ evice
 
   There's nothing relevant in the guest kernel logs as far as I'm aware
   of with loglevel set to 7.
+
+  Aha, I found the cursed file. See this strace log:
+
+  openat(AT_FDCWD, "/home/user/.local/share/nvim/shada/main.shada", O_RDONL=
+Y|O_CLOEXEC) =3D 25
+  mmap(NULL, 880640, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0=
+) =3D 0x7f3ab8427000
+  mmap(NULL, 880640, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0=
+) =3D 0x7f3ab8350000
+  mmap(NULL, 880640, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0=
+) =3D 0x7f3ab8279000
+  mmap(NULL, 880640, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0=
+) =3D 0x7f3ab81a2000
+  mmap(NULL, 880640, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0=
+) =3D 0x7f3ab80cb000
+  readv(25,
 
 To manage notifications about this bug go to:
 https://bugs.launchpad.net/qemu/+bug/1877688/+subscriptions
