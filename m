@@ -7,71 +7,69 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E16ACC28CBC
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 13:14:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A657C28CBC
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 13:14:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A749321775
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 13:14:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CB4F021775
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 13:14:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GXc5WD/j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A749321775
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HQK3okQo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB4F021775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXPJ2-0006FX-R4
-	for qemu-devel@archiver.kernel.org; Sat, 09 May 2020 09:14:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44600)
+	id 1jXPJ8-0006Oh-2D
+	for qemu-devel@archiver.kernel.org; Sat, 09 May 2020 09:14:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44656)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jXPEQ-00041Y-PY; Sat, 09 May 2020 09:09:30 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52927)
+ id 1jXPEZ-0004S0-Ex; Sat, 09 May 2020 09:09:39 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36715)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jXPEP-0003L7-UG; Sat, 09 May 2020 09:09:30 -0400
-Received: by mail-wm1-x344.google.com with SMTP id m24so3357416wml.2;
- Sat, 09 May 2020 06:09:28 -0700 (PDT)
+ id 1jXPEY-0004jo-J3; Sat, 09 May 2020 09:09:39 -0400
+Received: by mail-wr1-x441.google.com with SMTP id z8so5142038wrw.3;
+ Sat, 09 May 2020 06:09:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=/deFlLfSBeeZSBPphjSFXwpz9fqQ8rThdLclvTAwgLE=;
- b=GXc5WD/jotqsaemJao8jVSg1pXJuzyf3A6lWcUqvDc3kiEcIAE+1c7w8dft4D3P4PQ
- 8933I0NI8h47a5aOH3PEbvKagCUFu7KMOMW/e6+ZgFYN09dkTIUFYz0DGi/pNWSL/Idm
- bW1Y+JkBDZBPP/47h0/q5kq3uBxu4HCBqYD2GzQrV7vp1pVMgmDVEEu5TGis/ayRRhwO
- 3BPIs9U0+X6XuHls3MMhYQHiz0RwtmcuL/J4tdaSIQVfdtX9kglYaQ6u7TbqNX6m607Z
- zy4D0ShG0JNc1PFYtgHeKfGtulBzHHIbVDJouBXhPdd3uBzxhR9LAM59/TYbj5vPjSmg
- L3uw==
+ bh=dOtABLpYucdkmo0UeAZ60MKjOPNkZbYs54q0kVYNjc4=;
+ b=HQK3okQo3XgNVWABTcc/YPdQSiaGJ3DfZD6sUUm77Yk8M91/zHxprIHjBdeBsmNIdg
+ Bn3+sNvRRbzvzyVK7o+vMnT7F6lWE1Iz3Dc5pZD8yA9Su/M/W/MQvv9soEeS1saLjcTe
+ 1nsJCoI4Dt3gaLZtddO2soy9KlYTqguUaHTrFAwy1FsijxkmQEF8Ye47gY/UgB+Ingrx
+ MXCjshWY7FIM1TOUdJ8OPNMRLvDuykIdDhp0rhL65CbYVOl8DVPRp2ITd3RjPSV48+KN
+ dvEWFWdZoycY7hiqyy+y32YfKU0m1Agt5JeQFR0A3mdwVcz9WhrfrydHnlsV1s0wWDZY
+ JRWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=/deFlLfSBeeZSBPphjSFXwpz9fqQ8rThdLclvTAwgLE=;
- b=ZgW7AM+TUTEGUjVIpQnYXThNrfVeXmKWRSVHR743Oiga0d04Yt6imMx/Rl/6bb9miD
- t4OLnEbBUSTZns01ll7/7aRecCLutTBkfSzg1pYfKtOSLtNMz00JKl8Ux65GvrZ0OAeA
- n2zBnzfST14JTj6TjXog/eULExXcyXRyF5zBbCc7vbfq8P6OO/8yBpGZe3+SHwqDvEO8
- BoYa+y4YDRHS4YsdpXw8+elIH7u2iLrVmUzbxWUdn64YWKYuvQJFO2HpyKvU0H1129KL
- c/udDnu6Ll1Vb0m9GGx/XPXx2kDC4MdxMtwslld86YexYeV5FKAuTtjxr3JbLScNv5NF
- NPaA==
-X-Gm-Message-State: AGi0Pua91mmY7yvMapsXT/qt+lbJyJsTuryINUv1KneZ30Cf6/fxJ/O2
- Ff/ykQpQvilcoNes64hGEn8JD4kqU0s=
-X-Google-Smtp-Source: APiQypIVCdAFyRkc2ubH7ow2MRfiq0XjMLNU48lJ+FFzNlFhFUf46VOfeXAxA1DxSFAhNQrANi6jWw==
-X-Received: by 2002:a05:600c:14d4:: with SMTP id
- i20mr22378257wmh.118.1589029766837; 
- Sat, 09 May 2020 06:09:26 -0700 (PDT)
+ bh=dOtABLpYucdkmo0UeAZ60MKjOPNkZbYs54q0kVYNjc4=;
+ b=ox6lqT3O/fT4moBwL2DnU4lLErqkAbpAO+PSL1bptqMKlRBUcqSXBYlUKxU7nLNC1a
+ ddYvLux7TrAsmy6Ikhjp2+tCPHHF+AQQCiuvBw7SLoqgJzuLmSzxI99ScYuR0jFAbJuk
+ 9AlY93tcqi8/WGX3ZU05YbKEpj4gmtBBcA8YTvoqfLMry0vYDqPKqYwHQUdpogrhoyYW
+ s2yy9WH1jO1zCo5tWBa+7vViw7UhuQpCEwJ/vey2f+HmdC287/NjlitCCLChF3NXuQJM
+ DVDeD1OUzXErY0q4CXq4/7oFWD6emPiYZ2+dL/dZadp/MxCdMizF5Q8PnjyImsxygMcN
+ f7nw==
+X-Gm-Message-State: AGi0PuZOswPyeF8gui4PkdGhfXUTlbdIFnwaUz0sB2OlWZIygIvVp181
+ IqFcCIlQRN2oIJ9SaWgaclVYgmq2rnk=
+X-Google-Smtp-Source: APiQypIV8V4JDCd+NtoSYkuzj8e2yB4xHjwhOrS9F9Bxn7DYiVKkt3jysGRG12LFj+3ejc82YWxp8A==
+X-Received: by 2002:adf:d841:: with SMTP id k1mr8240629wrl.129.1589029775565; 
+ Sat, 09 May 2020 06:09:35 -0700 (PDT)
 Received: from localhost.localdomain (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id m65sm1411410wmm.17.2020.05.09.06.09.24
+ by smtp.gmail.com with ESMTPSA id m65sm1411410wmm.17.2020.05.09.06.09.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 09 May 2020 06:09:26 -0700 (PDT)
+ Sat, 09 May 2020 06:09:34 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 04/11] sysemu/hvf: Only declare hvf_allowed when HVF is
- available
-Date: Sat,  9 May 2020 15:09:03 +0200
-Message-Id: <20200509130910.26335-5-f4bug@amsat.org>
+Subject: [PATCH 07/11] target/s390x/helper: Clean ifdef'ry
+Date: Sat,  9 May 2020 15:09:06 +0200
+Message-Id: <20200509130910.26335-8-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200509130910.26335-1-f4bug@amsat.org>
 References: <20200509130910.26335-1-f4bug@amsat.org>
@@ -79,8 +77,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -125,40 +123,61 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When HVF is not available, the tcg_allowed variable does not exist.
+All this code is guarded checking CONFIG_USER_ONLY definition.
+Drop the duplicated checks.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/sysemu/hvf.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Suspicious ifdef'ry in s390_handle_wait() from commit 83f7f32901c.
+---
+ target/s390x/helper.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/include/sysemu/hvf.h b/include/sysemu/hvf.h
-index d211e808e9..fe95743124 100644
---- a/include/sysemu/hvf.h
-+++ b/include/sysemu/hvf.h
-@@ -18,7 +18,6 @@
- #include "exec/memory.h"
- #include "sysemu/accel.h"
+diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+index 09f60406aa..26e3b366e8 100644
+--- a/target/s390x/helper.c
++++ b/target/s390x/helper.c
+@@ -33,6 +33,7 @@
+ #endif
  
--extern bool hvf_allowed;
- #ifdef CONFIG_HVF
- #include <Hypervisor/hv.h>
- #include <Hypervisor/hv_vmx.h>
-@@ -26,11 +25,12 @@ extern bool hvf_allowed;
- #include "target/i386/cpu.h"
- uint32_t hvf_get_supported_cpuid(uint32_t func, uint32_t idx,
-                                  int reg);
-+extern bool hvf_allowed;
- #define hvf_enabled() (hvf_allowed)
--#else
-+#else /* !CONFIG_HVF */
- #define hvf_enabled() 0
- #define hvf_get_supported_cpuid(func, idx, reg) 0
+ #ifndef CONFIG_USER_ONLY
++
+ void s390x_tod_timer(void *opaque)
+ {
+     cpu_inject_clock_comparator((S390CPU *) opaque);
+@@ -42,9 +43,6 @@ void s390x_cpu_timer(void *opaque)
+ {
+     cpu_inject_cpu_timer((S390CPU *) opaque);
+ }
 -#endif
-+#endif /* !CONFIG_HVF */
+-
+-#ifndef CONFIG_USER_ONLY
  
- /* hvf_slot flags */
- #define HVF_SLOT_LOG (1 << 0)
+ hwaddr s390_cpu_get_phys_page_debug(CPUState *cs, vaddr vaddr)
+ {
+@@ -98,14 +96,12 @@ void s390_handle_wait(S390CPU *cpu)
+     CPUState *cs = CPU(cpu);
+ 
+     if (s390_cpu_halt(cpu) == 0) {
+-#ifndef CONFIG_USER_ONLY
+         if (is_special_wait_psw(cpu->env.psw.addr)) {
+             qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
+         } else {
+             cpu->env.crash_reason = S390_CRASH_REASON_DISABLED_WAIT;
+             qemu_system_guest_panicked(cpu_get_crash_info(cs));
+         }
+-#endif
+     }
+ }
+ 
+@@ -328,6 +324,7 @@ int s390_store_adtl_status(S390CPU *cpu, hwaddr addr, hwaddr len)
+     cpu_physical_memory_unmap(sa, len, 1, len);
+     return 0;
+ }
++
+ #endif /* CONFIG_USER_ONLY */
+ 
+ void s390_cpu_dump_state(CPUState *cs, FILE *f, int flags)
 -- 
 2.21.3
 
