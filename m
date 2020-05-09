@@ -2,100 +2,90 @@ Return-Path: <SRS0=giGJ=6X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 634D9C28CBC
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 12:25:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4760BC28CBC
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 12:38:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1848D21775
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 12:25:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 099C1208CA
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 12:38:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="RsAe+BxQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1848D21775
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l4uILE5/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 099C1208CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXOY7-0004eF-06
-	for qemu-devel@archiver.kernel.org; Sat, 09 May 2020 08:25:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35926)
+	id 1jXOkj-00020N-6u
+	for qemu-devel@archiver.kernel.org; Sat, 09 May 2020 08:38:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38300)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jXOUX-0001Hb-9J
- for qemu-devel@nongnu.org; Sat, 09 May 2020 08:22:05 -0400
-Received: from mout.web.de ([217.72.192.78]:42003)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jXOk5-0001JB-BB
+ for qemu-devel@nongnu.org; Sat, 09 May 2020 08:38:09 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53526)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jXOUS-0001pk-LD
- for qemu-devel@nongnu.org; Sat, 09 May 2020 08:22:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1589026891;
- bh=Y78J5fW2WHhbApFJQd2DZniA3lLMIJ/0SdAgDGga2fY=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=RsAe+BxQ8C0g6XgjME9PmlhoTkFAisqam0LBkim9x6iIGVf6ulW1ZifK3XzKj/341
- Shl0Av9Z4mI3xzY44WvoFkfGe7MA9QGS8rVH+W9cEnCp99ce4V+TpmZ8EksrozHZjZ
- 7Ojyjp8yXv1EDZ0xFaORlSTH+TT6pRaCxTAx8wPw=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([94.134.180.119]) by smtp.web.de (mrweb102
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0MTPit-1jerOO2WrX-00SKet; Sat, 09
- May 2020 14:21:31 +0200
-Date: Sat, 9 May 2020 14:21:18 +0200
-From: Lukas Straub <lukasstraub2@web.de>
-To: "Zhang, Chen" <chen.zhang@intel.com>
-Subject: Re: [PATCH v4 5/6] net/colo-compare.c, softmmu/vl.c: Check that
- colo-compare is active
-Message-ID: <20200509142118.1a77d40d@luklap>
-In-Reply-To: <9cacfbefef504b94b2b3c19b2bffaff0@intel.com>
-References: <cover.1588587700.git.lukasstraub2@web.de>
- <f6cbde747d78ff080f680c710e2793867a3cf1fa.1588587700.git.lukasstraub2@web.de>
- <0380e994e53947cd961cc363d46561d3@intel.com>
- <20200507175421.185b48f8@luklap>
- <59eea784a36643b4b1fe32b0700f57f7@intel.com>
- <20200508081057.7f1db99b@luklap>
- <9cacfbefef504b94b2b3c19b2bffaff0@intel.com>
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jXOk4-0007zl-EZ
+ for qemu-devel@nongnu.org; Sat, 09 May 2020 08:38:09 -0400
+Received: by mail-wm1-x343.google.com with SMTP id k12so12911124wmj.3
+ for <qemu-devel@nongnu.org>; Sat, 09 May 2020 05:38:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=nGp6fPGha/RBSFyW+ZcDgpnIeDPdxn8Z5p2SqFOLs/0=;
+ b=l4uILE5/K7ZhaHwCO62GQXmB6ZCh7r+tDgYiMY2ALDyots9nRDe+a70rmFreF6wwkY
+ Vh0mLPIOcS1E3KVxa7WN9dr2Hz1aflKKwafdw4b/p84zjr+Qk2hJ0OcXPSdZFJR4yBwt
+ DhQL/QT8VLloSqjlMAmrYJPp8TvU9748wM0NhHc4DGDo9/8sNkYDHN4T3QTshPzVtw5n
+ PvJLroQ+fjK879RqhZ1p2RMqHya2IZ+WdB9d7Ifc90kqdypx3exoD9xAlchqdtWyP4Q6
+ OZDDsl14JtsUuTP42PQabpCbun8U/VH1TDf04PT5zieFJx585P0DVAYATvOYrcmewenR
+ DLnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=nGp6fPGha/RBSFyW+ZcDgpnIeDPdxn8Z5p2SqFOLs/0=;
+ b=bNuXOZ36PhGCAghE4lAnfGTH4R13BpR5TEKn6kR0A26wh372IP8Fgy4fGP4OcPBUcJ
+ 52fFHj21q6oCKb/WEq7XqY8ITycWCG+vo1zRrQkm9Zi9+/7YvCh93OWLvWOW20tVlmH4
+ o86ncQRBBLZPuy4MznVcpHVkKD91qfij1IYlPIieq5JzDPDTHLGCFicAaObbUgeXD7J+
+ EIAP/w5w7D39bLWiVkBde6qRmqz6mTSL5jLQ1WENx/2HmduFW4LlCir1SsUqHOj8Az6U
+ 2O+EljuxN8582HZwlDRZtVISvG6tDM1rRd9uZVukl9hMN+/OGgEwPTK8HA0IsxV+jATk
+ ZOug==
+X-Gm-Message-State: AGi0PubK9DOOHMp1mQ4CqLAuNaKRSgwfs0jdsGT8gMux0XEsSGq7NtNe
+ hciVAOmWpUJWHBYHjGyXujUwvl3IUmsoXt9oOv0=
+X-Google-Smtp-Source: APiQypJ8Jtoqfmkf4h77UZ032/Z4UE+pDiVwEZl3NxrkPGSV/dOgovS/unlKulbW/HhAnx6MacMvHfBTGd7N4o3cdME=
+X-Received: by 2002:a1c:f211:: with SMTP id s17mr23307990wmc.168.1589027886694; 
+ Sat, 09 May 2020 05:38:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/n2zJZAgFZwzgWSYb6zgU7zD";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:TzmbnrpbiANWdj//4W0Y/Zj5wkN90eH+CinysJzcW0D4dgN7VT5
- jKH0k1sh86/BvYohvqBuPW75sZkDYf0yj8iIyiojLZ3cgehQDEWNkApDSciybl/ldycXSa6
- FcDlWTykcahOmjzEnUlQtcgGHKmFXQbDfLxANHcLtTLTDmMiJ9Kcsj9MYAr6D1eLoTu6H2M
- KTEbEo5jo4qHAmbxe8f9g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:aT1JVCRf32A=:rm/W6KtTfAgxCnFXJCoFby
- vKrO6Raige29CqcPZnooTC4V/GYvGBuxP0wKd09X10pv3+bcBQhgmUVs5EvngS4INQ/veuYJ6
- Dg2yPTYcXyMvxU9KCmU1WGNpmYsLZoPSvSCNJu8QYivLSzgBzeE6ngya/koma8R19bKxPWAUf
- Z4qosjQQMFjH1IhgL1/5OOuhwv0+MCdP8kKNrrWY0kalU5xBkRy3fFdrGsOMQRMuRUWfqjZF6
- gK5GQd6okI9DWtRAUxRQaX4EfR8+IFkHZaSpFijAMM5/JQ5ePQSFy8yw/HX1T7h/vB82N5GOx
- 2jchbbzku5avtDi5iQA+zHnjmIB5EDOec1cCzF2HEE6mkrT1yR1Nkv8uDL+gB0Zzg/0Z+6Yhb
- /uC8xoDnCKnth7aRQGCWtt8JkU4qlQC0U1CWwwch/KvWIXxc5MqDUzksoiKi/DqIRmjJcrGtH
- cCbXMp2JGfBwhwfJD0m4k7YussIheZyvJw3wbB++iD2Bl38e4nQPJ1I4HqsX9YsD4H+pZgFtV
- eVE4ip67ZzV3ZHn69EmS2j+FA6YjkLRdnqBqcRh2k1PyYriiCZsndJ8sDnjiNK20shPHNDH3Y
- Jnmad3+oPWBgAkf3/8QDLI31nsCEXSEpdeEdLsBgYwVJfqHpKJjcXiWWsiM+KfmoIgv3x/lqH
- 2JuIXle1cZm0kDVtErwrHAzxrguFurymR7O0HbU7L7/M/eJalssfuICa4q1LNqegILkxb3pev
- nQq8yr6O16iS2XdYWKNrglb5qxaKZ5tF0zcmjIxWQ44jmgOuIYPPzAMYaYFbtCgP4MbK4tKSQ
- BIbGFmQghNk1cyIkP5FKMd4bfsesFVrnl0aSAW3Q2L2i6y+B1c7I7uzN0hKcpc3SD26BP3vZt
- 4CeD8ZqfyU9dHgKOTyvlYpX76BB/+EQ+vTywdo3kjSMAxjruHc8+GS6F2uBjFNC4hrHAEuPJ3
- qdiSzWF1CbMWuMB9W5VTskVhB/AaTtP3Kx/v4jsctJ9nAFZX1pOkgVs9GZjFy06JJ9iJ6MEQs
- SckZTWBhYF6VfLRII5sgP5B9vIrHsKZd9eDAYp4z02bIUnnXK4pQ2GEKUBslOQSo1CiIk0lJQ
- JCw5pPb1UTO79f/w8Uza66MYA3HZL+ie7ANhVLTcwHhsTbbTE0HwXMYEPauZeumci2c+YJ1cO
- 22yBKYcVsS8KyWAO6GeTBi1Xxr9jbkBLF9p3G+46oC88CwmZlVxD+9tk9MmKnr6XoulVSQrf7
- BigDC7t8iVoY5Bozy
-Received-SPF: pass client-ip=217.72.192.78; envelope-from=lukasstraub2@web.de;
- helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/09 08:21:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -24
-X-Spam_score: -2.5
+References: <CAHiYmc67UNCKt0fqaGtj9d+w+qTHc3pYONqD_xLQsOXhMhKRDQ@mail.gmail.com>
+ <CAHiYmc4JuaPW7VsDiqK8ToZZzdBJhJjyKB-7614xts22p00RMQ@mail.gmail.com>
+ <87imh95mof.fsf@linaro.org>
+ <CAHiYmc4otn_oGqQoVThEs6pmBqWG8u3KjQ+aAvgnZ2jso0-2NQ@mail.gmail.com>
+ <CABoDooNCszaFGJz6nLWsNYDh1VJpDmMr+OJEfALYqHnoYgYsEA@mail.gmail.com>
+In-Reply-To: <CABoDooNCszaFGJz6nLWsNYDh1VJpDmMr+OJEfALYqHnoYgYsEA@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Sat, 9 May 2020 14:37:52 +0200
+Message-ID: <CAHiYmc4ovS5B1ctaMpRGxtf3NzC64AzUAs-A5Of-A_cV7Lc1tw@mail.gmail.com>
+Subject: Re: [INFO] Some preliminary performance data
+To: Laurent Desnogues <laurent.desnogues@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -109,318 +99,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, ahmedkhaledkaraman@gmail.com,
+ "Emilio G . Cota" <cota@braap.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/n2zJZAgFZwzgWSYb6zgU7zD
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, 8 May 2020 06:50:39 +0000
-"Zhang, Chen" <chen.zhang@intel.com> wrote:
-
-> > -----Original Message-----
-> > From: Lukas Straub <lukasstraub2@web.de>
-> > Sent: Friday, May 8, 2020 2:11 PM
-> > To: Zhang, Chen <chen.zhang@intel.com>
-> > Cc: qemu-devel <qemu-devel@nongnu.org>; Li Zhijian
-> > <lizhijian@cn.fujitsu.com>; Jason Wang <jasowang@redhat.com>; Marc-
-> > Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>; Paolo Bonzini
-> > <pbonzini@redhat.com>
-> > Subject: Re: [PATCH v4 5/6] net/colo-compare.c, softmmu/vl.c: Check that
-> > colo-compare is active
-> >=20
-> > On Fri, 8 May 2020 02:26:21 +0000
-> > "Zhang, Chen" <chen.zhang@intel.com> wrote:
-> >  =20
-> > > > -----Original Message-----
-> > > > From: Lukas Straub <lukasstraub2@web.de>
-> > > > Sent: Thursday, May 7, 2020 11:54 PM
-> > > > To: Zhang, Chen <chen.zhang@intel.com>
-> > > > Cc: qemu-devel <qemu-devel@nongnu.org>; Li Zhijian
-> > > > <lizhijian@cn.fujitsu.com>; Jason Wang <jasowang@redhat.com>; Marc-
-> > > > Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>; Paolo Bonzini
-> > > > <pbonzini@redhat.com>
-> > > > Subject: Re: [PATCH v4 5/6] net/colo-compare.c, softmmu/vl.c: Check
-> > > > that colo-compare is active
-> > > >
-> > > > On Thu, 7 May 2020 11:38:04 +0000
-> > > > "Zhang, Chen" <chen.zhang@intel.com> wrote:
-> > > > =20
-> > > > > > -----Original Message-----
-> > > > > > From: Lukas Straub <lukasstraub2@web.de>
-> > > > > > Sent: Monday, May 4, 2020 6:28 PM
-> > > > > > To: qemu-devel <qemu-devel@nongnu.org>
-> > > > > > Cc: Zhang, Chen <chen.zhang@intel.com>; Li Zhijian
-> > > > > > <lizhijian@cn.fujitsu.com>; Jason Wang <jasowang@redhat.com>;
-> > > > > > Marc- Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>; Paolo Bo=
-nzini
-> > > > > > <pbonzini@redhat.com>
-> > > > > > Subject: [PATCH v4 5/6] net/colo-compare.c, softmmu/vl.c: Check
-> > > > > > that
-> > > > > > colo- compare is active
-> > > > > >
-> > > > > > If the colo-compare object is removed before failover and a
-> > > > > > checkpoint happens, qemu crashes because it tries to lock the
-> > > > > > destroyed event_mtx in colo_notify_compares_event.
-> > > > > >
-> > > > > > Fix this by checking if everything is initialized by introducing
-> > > > > > a new variable colo_compare_active which is protected by a new
-> > > > > > mutex colo_compare_mutex. The new mutex also protects against
-> > > > > > concurrent access of the net_compares list and makes sure that
-> > > > > > colo_notify_compares_event isn't active while we destroy
-> > > > > > event_mtx and event_complete_cond.
-> > > > > >
-> > > > > > With this it also is again possible to use colo without
-> > > > > > colo-compare (periodic
-> > > > > > mode) and to use multiple colo-compare for multiple network =20
-> > interfaces. =20
-> > > > > > =20
-> > > > >
-> > > > > Hi Lukas,
-> > > > >
-> > > > > For this case I think we don't need to touch vl.c code, we can
-> > > > > solve this =20
-> > > > issue from another perspective: =20
-> > > > > How to remove colo-compare?
-> > > > > User will use qemu-monitor or QMP command to disable an object, so
-> > > > > we just need return operation failed When user try to remove
-> > > > > colo-compare =20
-> > > > object while COLO is running.
-> > > >
-> > > > Yeah, but that still leaves the other problem that colo can't be
-> > > > used without colo-compare (qemu crashes then). =20
+=D1=81=D1=83=D0=B1, 9. =D0=BC=D0=B0=D1=98 2020. =D1=83 13:37 Laurent Desnog=
+ues
+<laurent.desnogues@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=
+=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> On Sat, May 9, 2020 at 12:17 PM Aleksandar Markovic
+> <aleksandar.qemu.devel@gmail.com> wrote:
+> >  =D1=81=D1=80=D0=B5, 6. =D0=BC=D0=B0=D1=98 2020. =D1=83 13:26 Alex Benn=
+=C3=A9e <alex.bennee@linaro.org> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=
+=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> >
+> > > This is very much driven by how much code generation vs running you s=
+ee.
+> > > In most of my personal benchmarks I never really notice code generati=
+on
+> > > because I give my machines large amounts of RAM so code tends to stay
+> > > resident so not need to be re-translated. When the optimiser shows up
+> > > it's usually accompanied by high TB flush and invalidate counts in "i=
+nfo
+> > > jit" because we are doing more translation that we usually do.
 > > >
-> > > Yes, the COLO-compare is necessary module in COLO original design.
-> > > At most cases, user need it do dynamic sync.
-> > > For rare cases, maybe we can add a new colo-compare parameter to =20
-> > bypass all the network workload.
-> >=20
-> > I think such an parameter would only be a workaround instead of a real
-> > solution like this patch. =20
->=20
-> The root problem is why COLO-compare is necessary.
-> Yes, maybe someone want to use pure periodic synchronization mode,
-> But it means it will lost all guest network support(without colo-compare/=
-filter-mirror/filter-redirector/filter-rewriter).
-> The secondary guest just a solid backup for the primary guest, when occur=
- failover the new build stateful connection (like TCP)
-> will crashed, need userspace to handle this status. It lost the original =
-meaning for COLO FT/HA solution, no need use do HA in application layer.
-> it looks like normal/remote periodic VM snapshot here.=20
+> >
+> > Yes, I think the machine was setup with only 128MB RAM.
+> >
+> > That would be an interesting experiment for Ahmed actually - to
+> > measure impact of given RAM memory to performance.
+> >
+> > But it looks that at least for machines with small RAM, translation
+> > phase will take significant percentage.
+> >
+> > I am attaching call graph for translation phase for "Hello World" built
+> > for mips, and emulated by QEMU: *tb_gen_code() and its calees)
+>
 
-Sure, but maybe the user doesn't need (reliable) network on failover. Also =
-proper network support with periodic mode can easily be implemented by modi=
-fying filter-buffer to buffer packets until checkpoint. Being able to use c=
-olo without colo-compare gives more flexibility to the user.
+Hi, Laurent,
 
-Regards,
-Lukas Straub
+"Hello world" was taken as an example where code generation is
+dominant. It was taken to illustrate how performance-wise code
+generation overhead is distributed (illustrating dominance of a
+single function).
 
-> Dave or Jason have any comments here?=20
->=20
-> Thanks
-> Zhang Chen
->=20
-> >=20
-> > Regards,
-> > Lukas Straub
-> >  =20
-> > > Thanks
-> > > Zhang Chen
-> > > =20
-> > > >
-> > > > Regards,
-> > > > Lukas Straub
-> > > > =20
-> > > > > Thanks
-> > > > > Zhang Chen
-> > > > > =20
-> > > > > > Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-> > > > > > ---
-> > > > > >  net/colo-compare.c | 35 +++++++++++++++++++++++++++++------
-> > > > > >  net/colo-compare.h |  1 +
-> > > > > >  softmmu/vl.c       |  2 ++
-> > > > > >  3 files changed, 32 insertions(+), 6 deletions(-)
-> > > > > >
-> > > > > > diff --git a/net/colo-compare.c b/net/colo-compare.c index
-> > > > > > 56db3d3bfc..c7572d75e9 100644
-> > > > > > --- a/net/colo-compare.c
-> > > > > > +++ b/net/colo-compare.c
-> > > > > > @@ -54,6 +54,8 @@ static NotifierList colo_compare_notifiers =3D
-> > > > > > #define REGULAR_PACKET_CHECK_MS 3000  #define =20
-> > > > DEFAULT_TIME_OUT_MS =20
-> > > > > > 3000
-> > > > > >
-> > > > > > +static QemuMutex colo_compare_mutex; static bool
-> > > > > > +colo_compare_active;
-> > > > > >  static QemuMutex event_mtx;
-> > > > > >  static QemuCond event_complete_cond;  static int
-> > > > > > event_unhandled_count; @@ -906,6 +908,12 @@ static void
-> > > > > > check_old_packet_regular(void *opaque) void
-> > > > > > colo_notify_compares_event(void *opaque, int event, Error **err=
-p) =20
-> > { =20
-> > > > > >      CompareState *s;
-> > > > > > +    qemu_mutex_lock(&colo_compare_mutex);
-> > > > > > +
-> > > > > > +    if (!colo_compare_active) {
-> > > > > > +        qemu_mutex_unlock(&colo_compare_mutex);
-> > > > > > +        return;
-> > > > > > +    }
-> > > > > >
-> > > > > >      qemu_mutex_lock(&event_mtx);
-> > > > > >      QTAILQ_FOREACH(s, &net_compares, next) { @@ -919,6 +927,7
-> > > > > > @@ void colo_notify_compares_event(void *opaque, int event, =20
-> > Error **errp) =20
-> > > > > >      }
-> > > > > >
-> > > > > >      qemu_mutex_unlock(&event_mtx);
-> > > > > > +    qemu_mutex_unlock(&colo_compare_mutex);
-> > > > > >  }
-> > > > > >
-> > > > > >  static void colo_compare_timer_init(CompareState *s) @@ -1274,7
-> > > > > > +1283,14 @@ static void colo_compare_complete(UserCreatable *uc=
-, =20
-> > > > Error **errp) =20
-> > > > > >                             s->vnet_hdr);
-> > > > > >      }
-> > > > > >
-> > > > > > +    qemu_mutex_lock(&colo_compare_mutex);
-> > > > > > +    if (!colo_compare_active) {
-> > > > > > +        qemu_mutex_init(&event_mtx);
-> > > > > > +        qemu_cond_init(&event_complete_cond);
-> > > > > > +        colo_compare_active =3D true;
-> > > > > > +    }
-> > > > > >      QTAILQ_INSERT_TAIL(&net_compares, s, next);
-> > > > > > +    qemu_mutex_unlock(&colo_compare_mutex);
-> > > > > >
-> > > > > >      s->out_sendco.s =3D s;
-> > > > > >      s->out_sendco.chr =3D &s->chr_out; @@ -1290,9 +1306,6 @@
-> > > > > > static void colo_compare_complete(UserCreatable
-> > > > > > *uc, Error **errp)
-> > > > > >
-> > > > > >      g_queue_init(&s->conn_list);
-> > > > > >
-> > > > > > -    qemu_mutex_init(&event_mtx);
-> > > > > > -    qemu_cond_init(&event_complete_cond);
-> > > > > > -
-> > > > > >      s->connection_track_table =3D
-> > > > > > g_hash_table_new_full(connection_key_hash,
-> > > > > >                                                        connecti=
-on_key_equal,
-> > > > > >                                                        g_free,
-> > > > > > @@
-> > > > > > -1384,12 +1397,19 @@ static void colo_compare_finalize(Object
-> > > > > > *obj)
-> > > > > >
-> > > > > >      qemu_bh_delete(s->event_bh);
-> > > > > >
-> > > > > > +    qemu_mutex_lock(&colo_compare_mutex);
-> > > > > >      QTAILQ_FOREACH(tmp, &net_compares, next) {
-> > > > > >          if (tmp =3D=3D s) {
-> > > > > >              QTAILQ_REMOVE(&net_compares, s, next);
-> > > > > >              break;
-> > > > > >          }
-> > > > > >      }
-> > > > > > +    if (QTAILQ_EMPTY(&net_compares)) {
-> > > > > > +        colo_compare_active =3D false;
-> > > > > > +        qemu_mutex_destroy(&event_mtx);
-> > > > > > +        qemu_cond_destroy(&event_complete_cond);
-> > > > > > +    }
-> > > > > > +    qemu_mutex_unlock(&colo_compare_mutex);
-> > > > > >
-> > > > > >      AioContext *ctx =3D iothread_get_aio_context(s->iothread);
-> > > > > >      aio_context_acquire(ctx);
-> > > > > > @@ -1413,15 +1433,18 @@ static void colo_compare_finalize(Objec=
-t =20
-> > *obj) =20
-> > > > > >          object_unref(OBJECT(s->iothread));
-> > > > > >      }
-> > > > > >
-> > > > > > -    qemu_mutex_destroy(&event_mtx);
-> > > > > > -    qemu_cond_destroy(&event_complete_cond);
-> > > > > > -
-> > > > > >      g_free(s->pri_indev);
-> > > > > >      g_free(s->sec_indev);
-> > > > > >      g_free(s->outdev);
-> > > > > >      g_free(s->notify_dev);
-> > > > > >  }
-> > > > > >
-> > > > > > +void colo_compare_init_globals(void) {
-> > > > > > +    colo_compare_active =3D false;
-> > > > > > +    qemu_mutex_init(&colo_compare_mutex);
-> > > > > > +}
-> > > > > > +
-> > > > > >  static const TypeInfo colo_compare_info =3D {
-> > > > > >      .name =3D TYPE_COLO_COMPARE,
-> > > > > >      .parent =3D TYPE_OBJECT,
-> > > > > > diff --git a/net/colo-compare.h b/net/colo-compare.h index
-> > > > > > 22ddd512e2..eb483ac586 100644
-> > > > > > --- a/net/colo-compare.h
-> > > > > > +++ b/net/colo-compare.h
-> > > > > > @@ -17,6 +17,7 @@
-> > > > > >  #ifndef QEMU_COLO_COMPARE_H
-> > > > > >  #define QEMU_COLO_COMPARE_H
-> > > > > >
-> > > > > > +void colo_compare_init_globals(void);
-> > > > > >  void colo_notify_compares_event(void *opaque, int event, Error
-> > > > > > **errp); void colo_compare_register_notifier(Notifier *notify);
-> > > > > > void colo_compare_unregister_notifier(Notifier *notify); diff
-> > > > > > --git a/softmmu/vl.c b/softmmu/vl.c index 32c0047889..a913ed5469
-> > > > > > 100644
-> > > > > > --- a/softmmu/vl.c
-> > > > > > +++ b/softmmu/vl.c
-> > > > > > @@ -112,6 +112,7 @@
-> > > > > >  #include "qapi/qmp/qerror.h"
-> > > > > >  #include "sysemu/iothread.h"
-> > > > > >  #include "qemu/guest-random.h"
-> > > > > > +#include "net/colo-compare.h"
-> > > > > >
-> > > > > >  #define MAX_VIRTIO_CONSOLES 1
-> > > > > >
-> > > > > > @@ -2906,6 +2907,7 @@ void qemu_init(int argc, char **argv, cha=
-r =20
-> > > > **envp) =20
-> > > > > >      precopy_infrastructure_init();
-> > > > > >      postcopy_infrastructure_init();
-> > > > > >      monitor_init_globals();
-> > > > > > +    colo_compare_init_globals();
-> > > > > >
-> > > > > >      if (qcrypto_init(&err) < 0) {
-> > > > > >          error_reportf_err(err, "cannot initialize crypto: ");
-> > > > > > --
-> > > > > > 2.20.1 =20
-> > > > > =20
-> > > =20
->=20
+While "Hello world" by itself is not a significant example, it conveys
+a useful information: it says how much is the overhead of QEMU
+linux-user executable initialization, and code generation spent on
+emulation of loading target executable and printing a simple
+message. This can be roughly deducted from the result for
+a meaningful benchmark.
 
+Booting of a virtual machine is a legitimate scenario for measuring
+performance, and perhaps even attempting improving it.
 
---Sig_/n2zJZAgFZwzgWSYb6zgU7zD
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Everything should be measured - code generation, JIT-ed code
+execution, and helpers execution - in all cases, and checked
+whether it departs from expected behavior.
 
------BEGIN PGP SIGNATURE-----
+Let's say that we emulate a benchmark that basically runs some
+code in a loop, or an algorithm - one would expect that after a
+while, while increasing number of iterations of the loop, or the
+size of data in the algorithm, code generation becomes less and
+less significant, converging to zero. Well, this should be confirmed
+with an experiment, and not taken for granted.
 
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl62oD4ACgkQNasLKJxd
-slgDZA/+IsihxQJFO+Jga/l1gNP8Vmmpi8NLTkzuBHDGMTLWNWH60sBrF5OMUluW
-1Ga4YWXB73d6DFp+uHL3QPEucX3FKN9rryeJoS8j3hwBMwmba+m9zMEhIPbVgKSq
-rbSRoV29AyLlwduT4Xc0mR1mfdv/iNeIwv4iEPLkpAdvIuChVVcNDMBVGFEq4/Hf
-1f74OWuLTt4DD0wDOIr1K88aSsfdeXEHZLHHdZBDZyagl1ZKg2p1nYHP5ljD2h4t
-Iu5IHtxzTeMf80pt2VbkYshrzB0ZoC8Ja+vgl45MYlf6Teg8Uis5KGmkN+fsQhOu
-+FAWnIUkueiouzirBJmCPGQA1eJNtWBA48YjfuDULl9jMy+mcGQGLgmef3GKV/Vu
-+mW/CjNIFX54ZpCYW0v81hFUFypLsOIdhqHywY4mElMMolJ70EX0AEViWsUiXJBG
-CSXwHClYgoxciY+uohJFKmzXa2ayGpEzWVKVNDEUT+haEUWvbG8W3I/GZdTaUyQl
-KFrU1IpmBLbBZFnxt0YWa+HG4wXPqJR+eIxedjR7881fA4oXeK/fMr5Jlnxg/PcR
-vms9ZKxjGQSCpvlQMqM+OhePp2Ay/NTsA2RX5puwXbHbdHQfMfULikUfHwVf0+61
-uIDfVwzujWbMv6pZnNwYKsVQITf7RFFY7Bnf5oBdmDUh7wrP1Ro=
-=ngSD
------END PGP SIGNATURE-----
+I think limiting measurements only on, let's say, execution of
+JIT-ed code (if that is what you implied) is a logical mistake.
+The right conclusions should be drawn from the complete
+picture, shouldn't it?
 
---Sig_/n2zJZAgFZwzgWSYb6zgU7zD--
+Yours,
+Aleksandar
+
+> Sorry if I'm stating the obvious but both "Hello World" and a
+> Linux boot will exhibit similar behaviors with low reuse of
+> translated blocks, which means translation will show up in
+> profiles as a lot of time is spent in translating blocks that
+> will run once.  If you push in that direction you might reach
+> the conclusion that a non JIST simulator is faster than QEMU.
+>
+> You will have to carefully select the tests you run:  you need
+> a large spectrum from Linux boot, "Hello World" up to synthetic
+> benchmarks.
+>
+> Again sorry if that was too trivial :-)
+>
+> Laurent
 
