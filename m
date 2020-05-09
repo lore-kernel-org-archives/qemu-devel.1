@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21B10C28CBC
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 17:06:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D736C28CBC
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 19:21:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBDB12184D
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 17:06:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBDB12184D
+	by mail.kernel.org (Postfix) with ESMTPS id 1523A20644
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 19:21:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1523A20644
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXSvU-0004N9-44
-	for qemu-devel@archiver.kernel.org; Sat, 09 May 2020 13:06:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58174)
+	id 1jXV2s-0002dC-9G
+	for qemu-devel@archiver.kernel.org; Sat, 09 May 2020 15:21:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47392)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jXSut-0003gi-Kc
- for qemu-devel@nongnu.org; Sat, 09 May 2020 13:05:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57292)
+ id 1jXV1a-00011K-Ii
+ for qemu-devel@nongnu.org; Sat, 09 May 2020 15:20:38 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42356)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jXSus-0007qO-Fi
- for qemu-devel@nongnu.org; Sat, 09 May 2020 13:05:35 -0400
+ id 1jXV1Z-0005Q6-5W
+ for qemu-devel@nongnu.org; Sat, 09 May 2020 15:20:38 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jXSuq-0002ev-PM
- for <qemu-devel@nongnu.org>; Sat, 09 May 2020 17:05:32 +0000
+ id 1jXV1X-0003lh-HK
+ for <qemu-devel@nongnu.org>; Sat, 09 May 2020 19:20:35 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id BBF932E80E7
- for <qemu-devel@nongnu.org>; Sat,  9 May 2020 17:05:32 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 744172E80E7
+ for <qemu-devel@nongnu.org>; Sat,  9 May 2020 19:20:35 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 09 May 2020 16:56:05 -0000
-From: Christian Schoenebeck <1877688@bugs.launchpad.net>
+Date: Sat, 09 May 2020 19:13:03 -0000
+From: A A <1877688@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
@@ -53,9 +53,9 @@ X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: c3bacd17 schoenebeck
 X-Launchpad-Bug-Reporter: A A (c3bacd17)
-X-Launchpad-Bug-Modifier: Christian Schoenebeck (schoenebeck)
+X-Launchpad-Bug-Modifier: A A (c3bacd17)
 References: <158898272347.4759.14841085044555564691.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158904336517.13032.6540918277423307470.malone@gac.canonical.com>
+Message-Id: <158905158332.5900.11720226240927918667.malone@soybean.canonical.com>
 Subject: [Bug 1877688] Re: 9p virtfs device reports error when opening certain
  files
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -64,10 +64,10 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 6e38bd436ec4c06e185d2d139757609184c21c3c
+X-Launchpad-Hash: b50d312a51158c9edabf20537b2f3383fb40e1a0
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/09 13:05:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/09 15:10:42
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -65
 X-Spam_score: -6.6
@@ -92,20 +92,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following patch should fix this bug for the kvm backend (not for the
-XEN backend yet).
-
-Please let me know if it fixes this bug for you.
-
-** Patch added: "bug1877688_kvm_fix.patch"
-   https://bugs.launchpad.net/qemu/+bug/1877688/+attachment/5369130/+files/=
-bug1877688_kvm_fix.patch
-
-** Changed in: qemu
-       Status: New =3D> In Progress
-
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Christian Schoenebeck (schoenebeck)
+Thanks, it works.
 
 -- =
 
