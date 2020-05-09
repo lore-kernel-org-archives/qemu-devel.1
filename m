@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CEC8C38A2A
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 02:20:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 158A0C38A2A
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 02:26:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D9F221655
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 02:20:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D61FD21655
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 May 2020 02:26:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UyAwaHWC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D9F221655
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WMGZZx/x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D61FD21655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXF6h-0003Sq-AC
-	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 22:20:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56680)
+	id 1jXFC5-0006MZ-46
+	for qemu-devel@archiver.kernel.org; Fri, 08 May 2020 22:26:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57636)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jXF62-0002zC-30
- for qemu-devel@nongnu.org; Fri, 08 May 2020 22:20:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40644
- helo=us-smtp-1.mimecast.com)
+ id 1jXFBW-0005b3-M2
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 22:25:50 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48939
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jXF60-0004R6-8v
- for qemu-devel@nongnu.org; Fri, 08 May 2020 22:20:09 -0400
+ id 1jXFBV-0000qi-FM
+ for qemu-devel@nongnu.org; Fri, 08 May 2020 22:25:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1588990806;
+ s=mimecast20190719; t=1588991147;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DKPL0Ha2ykcxel3F2y5lx5YITr/BBYGzU7BcUR+epKo=;
- b=UyAwaHWC3UB6ZUCljOw3FidQYF5nkpDSJQgt0V7yyo53ucliCTJ/xmeQ9Snn3uNeQ+LCuu
- 0sSTUrm8tbJX3dZ3dUCEavw8bAeNp2zeFXcDuHBTmMOmC7A5vinEQWsHSIRY5yp27/IJzd
- JQEQutO8Ftjkculsk3yNF0pf2l+cviU=
+ bh=eRQa5lA1uWE3URC6Ka4fV9OUO3EcgfDKX3eRfEwubs8=;
+ b=WMGZZx/xtXG4S2QqJySoR0e4GLFPUK7NGQLoxEfQfoUlR8llv66+xgq5r8sneb0kZbsRcv
+ 1036rUhOgqudaJcWbCanDFDXnaLpG/5ZpHGxxVnOELcZgL/tXMLtMK/gxV7B5NguLHPCba
+ 9vhNb3yZMrKucreYDHtWstcVHdh9tF8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-155-yQzwVhSEMWyzTy9Tx6muEA-1; Fri, 08 May 2020 22:20:03 -0400
-X-MC-Unique: yQzwVhSEMWyzTy9Tx6muEA-1
+ us-mta-396-hFaqb6gANQmcghVfCjqCOQ-1; Fri, 08 May 2020 22:25:46 -0400
+X-MC-Unique: hFaqb6gANQmcghVfCjqCOQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC8D4BFC1;
- Sat,  9 May 2020 02:20:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A0371895A37;
+ Sat,  9 May 2020 02:25:43 +0000 (UTC)
 Received: from [10.72.13.128] (ovpn-13-128.pek2.redhat.com [10.72.13.128])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0B64625262;
- Sat,  9 May 2020 02:19:37 +0000 (UTC)
-Subject: Re: [RFC v2 2/9] net: use the function qemu_get_peer
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D107325262;
+ Sat,  9 May 2020 02:25:25 +0000 (UTC)
+Subject: Re: [RFC v2 3/9] virtio_net: introduce vhost_set_state
 To: Cindy Lu <lulu@redhat.com>, mst@redhat.com, armbru@redhat.com,
  eblake@redhat.com, cohuck@redhat.com
 References: <20200508163218.22592-1-lulu@redhat.com>
- <20200508163218.22592-3-lulu@redhat.com>
+ <20200508163218.22592-4-lulu@redhat.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <ef489ec2-1af9-3987-8f36-2993104e48d7@redhat.com>
-Date: Sat, 9 May 2020 10:19:36 +0800
+Message-ID: <b6988abd-d79a-8af4-4ab0-7f96a37f3c41@redhat.com>
+Date: Sat, 9 May 2020 10:25:23 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200508163218.22592-3-lulu@redhat.com>
+In-Reply-To: <20200508163218.22592-4-lulu@redhat.com>
 Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jasowang@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 22:20:06
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/08 22:25:47
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -112,74 +112,129 @@ Sender: "Qemu-devel"
 
 
 On 2020/5/9 上午12:32, Cindy Lu wrote:
-> user the qemu_get_peer to replace the old process
+> Introduce a function to set the state to the vhost driver.
+> vDPA need to sync the driver's state to NIC
 
 
-The title should be "vhost_net: use the function qemu_get_peer".
+Let's split this patch into two.
 
-Thanks
+1) introduce vhost_set_state
+2) make virtio-net use of vhost_set_state
 
 
 >
 > Signed-off-by: Cindy Lu <lulu@redhat.com>
 > ---
->   hw/net/vhost_net.c | 14 +++++++++-----
->   1 file changed, 9 insertions(+), 5 deletions(-)
+>   hw/net/vhost_net.c                | 9 +++++++++
+>   hw/net/virtio-net.c               | 9 +++++++++
+>   include/hw/virtio/vhost-backend.h | 2 ++
+>   include/net/vhost_net.h           | 2 +-
+>   4 files changed, 21 insertions(+), 1 deletion(-)
 >
 > diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-> index 6b82803fa7..d1d421e3d9 100644
+> index d1d421e3d9..63b2a85d6e 100644
 > --- a/hw/net/vhost_net.c
 > +++ b/hw/net/vhost_net.c
-> @@ -306,7 +306,9 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
->       BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(dev)));
->       VirtioBusState *vbus = VIRTIO_BUS(qbus);
->       VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(vbus);
-> +    struct vhost_net *net;
->       int r, e, i;
-> +    NetClientState *peer;
+> @@ -465,3 +465,12 @@ int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu)
 >   
->       if (!k->set_guest_notifiers) {
->           error_report("binding does not support guest notifiers");
-> @@ -314,9 +316,9 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
+>       return vhost_ops->vhost_net_set_mtu(&net->dev, mtu);
+>   }
+> +int vhost_set_state(NetClientState *nc, uint8_t state)
+> +{
+> +    struct vhost_net *net = get_vhost_net(nc);
+> +    struct vhost_dev *hdev = &net->dev;
+> +        if (hdev->vhost_ops->vhost_set_state) {
+
+
+Indentation looks wrong.
+
+
+> +                return hdev->vhost_ops->vhost_set_state(hdev, state);
+> +        }
+> +    return 0;
+> +}
+> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> index db3d7c38e6..1bddb4b4af 100644
+> --- a/hw/net/virtio-net.c
+> +++ b/hw/net/virtio-net.c
+> @@ -206,6 +206,9 @@ static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
+>       VirtIODevice *vdev = VIRTIO_DEVICE(n);
+>       NetClientState *nc = qemu_get_queue(n->nic);
+>       int queues = n->multiqueue ? n->max_queues : 1;
+> +    NetClientState *peer = qemu_get_peer(nc, 0);
+> +    uint8_t status_set  = vdev->status ;
+> +    uint8_t vhost_started_pre = n->vhost_started;
+>   
+>       if (!get_vhost_net(nc->peer)) {
+>           return;
+> @@ -245,6 +248,7 @@ static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
+>                   return;
+>               }
+>           }
+> +        status_set = status_set | VIRTIO_CONFIG_S_DRIVER_OK;
+>   
+>           n->vhost_started = 1;
+>           r = vhost_net_start(vdev, n->nic->ncs, queues);
+> @@ -252,11 +256,16 @@ static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
+>               error_report("unable to start vhost net: %d: "
+>                            "falling back on userspace virtio", -r);
+>               n->vhost_started = 0;
+> +            status_set = status_set & ~VIRTIO_CONFIG_S_DRIVER_OK;
+>           }
+>       } else {
+>           vhost_net_stop(vdev, n->nic->ncs, queues);
+> +        status_set = status_set & ~VIRTIO_CONFIG_S_DRIVER_OK;
+>           n->vhost_started = 0;
 >       }
+> +    if (vhost_started_pre != n->vhost_started) {
+> +            vhost_set_state(peer, status_set);
+
+
+Any reason why not just passing virtio device status to vhost-vdpa?
+
+
+> +    }
+>   }
 >   
->       for (i = 0; i < total_queues; i++) {
-> -        struct vhost_net *net;
+>   static int virtio_net_set_vnet_endian_one(VirtIODevice *vdev,
+> diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
+> index 6f6670783f..f823055167 100644
+> --- a/include/hw/virtio/vhost-backend.h
+> +++ b/include/hw/virtio/vhost-backend.h
+> @@ -112,6 +112,7 @@ typedef int (*vhost_get_inflight_fd_op)(struct vhost_dev *dev,
+>   typedef int (*vhost_set_inflight_fd_op)(struct vhost_dev *dev,
+>                                           struct vhost_inflight *inflight);
 >   
-> -        net = get_vhost_net(ncs[i].peer);
-> +        peer = qemu_get_peer(ncs, i);
-> +        net = get_vhost_net(peer);
->           vhost_net_set_vq_index(net, i * 2);
+> +typedef int (*vhost_set_state_op)(struct vhost_dev *dev, uint8_t state);
+
+
+Need document what's the meaning of state here, is it e.g virtio device 
+status? If yes, is it better to rename it to vhost_set_status()?
+
+Thanks
+
+
+>   typedef struct VhostOps {
+>       VhostBackendType backend_type;
+>       vhost_backend_init vhost_backend_init;
+> @@ -152,6 +153,7 @@ typedef struct VhostOps {
+>       vhost_backend_mem_section_filter_op vhost_backend_mem_section_filter;
+>       vhost_get_inflight_fd_op vhost_get_inflight_fd;
+>       vhost_set_inflight_fd_op vhost_set_inflight_fd;
+> +    vhost_set_state_op vhost_set_state;
+>   } VhostOps;
 >   
->           /* Suppress the masking guest notifiers on vhost user
-> @@ -335,7 +337,8 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
->       }
+>   extern const VhostOps user_ops;
+> diff --git a/include/net/vhost_net.h b/include/net/vhost_net.h
+> index 77e47398c4..6548a5a105 100644
+> --- a/include/net/vhost_net.h
+> +++ b/include/net/vhost_net.h
+> @@ -39,5 +39,5 @@ int vhost_set_vring_enable(NetClientState * nc, int enable);
+>   uint64_t vhost_net_get_acked_features(VHostNetState *net);
 >   
->       for (i = 0; i < total_queues; i++) {
-> -        r = vhost_net_start_one(get_vhost_net(ncs[i].peer), dev);
-> +        peer = qemu_get_peer(ncs, i);
-> +        r = vhost_net_start_one(get_vhost_net(peer), dev);
->   
->           if (r < 0) {
->               goto err_start;
-> @@ -343,7 +346,7 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
->   
->           if (ncs[i].peer->vring_enable) {
->               /* restore vring enable state */
-> -            r = vhost_set_vring_enable(ncs[i].peer, ncs[i].peer->vring_enable);
-> +            r = vhost_set_vring_enable(peer, peer->vring_enable);
->   
->               if (r < 0) {
->                   goto err_start;
-> @@ -355,7 +358,8 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
->   
->   err_start:
->       while (--i >= 0) {
-> -        vhost_net_stop_one(get_vhost_net(ncs[i].peer), dev);
-> +        peer = qemu_get_peer(ncs , i);
-> +        vhost_net_stop_one(get_vhost_net(peer), dev);
->       }
->       e = k->set_guest_notifiers(qbus->parent, total_queues * 2, false);
->       if (e < 0) {
+>   int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu);
+> -
+> +int vhost_set_state(NetClientState *nc, uint8_t state);
+>   #endif
 
 
