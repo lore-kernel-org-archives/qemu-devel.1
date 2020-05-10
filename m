@@ -2,83 +2,85 @@ Return-Path: <SRS0=vfNf=6Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2380FC54E4B
-	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 15:30:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E2DBC54E8A
+	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 15:30:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA62F2080C
-	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 15:29:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CFBB1208CA
+	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 15:30:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oBv5STKq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA62F2080C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="msAsWSOd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFBB1208CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXntu-0007Kp-Tq
-	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 11:29:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52520)
+	id 1jXntw-0007Zy-Us
+	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 11:30:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52522)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jXnsl-00068Q-Do
+ id 1jXnsl-00068X-UW
  for qemu-devel@nongnu.org; Sun, 10 May 2020 11:28:47 -0400
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:35032)
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36499)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jXnsk-0000yR-3r
+ id 1jXnsl-0000yV-5J
  for qemu-devel@nongnu.org; Sun, 10 May 2020 11:28:47 -0400
-Received: by mail-wr1-x433.google.com with SMTP id j5so7750405wrq.2
- for <qemu-devel@nongnu.org>; Sun, 10 May 2020 08:28:45 -0700 (PDT)
+Received: by mail-wr1-x442.google.com with SMTP id y16so552166wrs.3
+ for <qemu-devel@nongnu.org>; Sun, 10 May 2020 08:28:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=GDBNV10KgpUsGXFc3f+hxEzh+3eyGAg4+UfQtj5vvV0=;
- b=oBv5STKqJtO1lak4Z//MEJJ9c1WfMNCFxdg4ZhgmphQukmFy/IyqdZc1QUfyk7OZUG
- BmSS3Cm6orbaoahN/EZ0XTfGDoR992PYz2Q/Y+a8rAyict1NzhxLhmTtfuhyjUe1A4oZ
- JGI3um7LMiZ79JV6T3dAbGsoeLGyuMJ1euNh13ljwP5YHjJyzp3KuJp83+bhUPzamVH1
- pUXra4h5ZeeLsMZBkW3zBPrYd0yWGnru7ZN44kXVBP7eJr95y1VZGh/5lG6Vr7mSHWVB
- l/ppxn+EFWbm2EAJ5KZegQXx57U92ZPjyQdycqUtXHv0hpbdZSBqjXPN/Ss00SU6OGPz
- feUA==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=FTIVyDAEBMzFrxhPmJ8SqTBQ9LJJn+QNrQQoHkrH+DU=;
+ b=msAsWSOdS3qpXwtqo0IYXM3g7YUfgKFsiIUQKUYL2NWy5aA3/NQSuBnOTcAlH9p33a
+ UZSmuWWJerlcAIEcnDQW45V46Noe3XfBbpJwG0gYSVPsWP3gjGLX/zAsKrwNPf6s5OUC
+ miLsWb9nqjX/ASTB6O2MtORqm907xacoV9LCVTAdB9ZLYfLpg4rKNRCFTJ9aDFuop0rx
+ h//PB7STDUUx1KUbmi0eciZr9DcDQcMlKCOT+6wcFA4cFs4jH43n6qA8JlkbhJreiExo
+ Nv/Il7+jf+f3AvzW48OyVzNmnK7JeUP3987SNoYatKR4H/iyrhOiZCIAywuYTfSuHp7s
+ Q3jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=GDBNV10KgpUsGXFc3f+hxEzh+3eyGAg4+UfQtj5vvV0=;
- b=raroZKTLItLci4Hjs+H42XXub6hZb/UOpDhnVjCIJs10sq0LohkBW93Cdr2Yu6rVah
- /ZwDAJiIqEzkYDVJNqbixAgKnvU2c+aF+bLWWddwMrEbEN90MhZHCWvsMF5OH8aY4AI9
- vEMUP2YuzovI9Knf483aha4Q+3fu/Lc96JiWfchLGn+GKilbn1KvkhvetQF/HaKqlQ/0
- mpR+enpQoWKBiRiGok49iEGjNKcaq1F1yaOXieLeSN1ZvxiqMztmhd8nvtUqIOv/eJgk
- N41UCUt9E2PvztZKMcIAewZJe+Q/ITYLXR9uvAqSFTJKi6ocq9sOU+vHPv0XSOulYodZ
- AkbA==
-X-Gm-Message-State: AGi0PuZXzRYlVRd9IDTTleSrsUdquYLlHfPonbf5PQ85KtUNxdRrfk9s
- PGhMfesz1P4qh4FARAM29SeCCjo+534=
-X-Google-Smtp-Source: APiQypJWkuf+a5hZGf9IsAKlbGhjrc2msT+mfHnno3zfLnS8WsvwJMU1XNGiMdhmuxTijL87zsR5vg==
-X-Received: by 2002:a05:6000:1048:: with SMTP id
- c8mr13903962wrx.1.1589124523872; 
- Sun, 10 May 2020 08:28:43 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=FTIVyDAEBMzFrxhPmJ8SqTBQ9LJJn+QNrQQoHkrH+DU=;
+ b=L3HDSX2f3OTIj2XMsYSNAki37WBZTUxcKqP5CImApX0KQ9O3iBy5oEWU1NlAMsqM4u
+ aQeTO3IUWj3G0CKv+vw1KFChGmQ24GchT4irF3FAQ0mimfvvYb4Dp64XDhyVft5xJg1C
+ JwVojK+7mFIFStWo3QTMnGjYeYoM1a7W3kXzRzvZejBNCDlbC7UFUPRf3+f79LWtV/oF
+ NX5culJA0/2oVQeP2gBCU0BAmFdwNi89x+MvutSQz7vS17giThG+4U0vnXyUa2eur3OS
+ yB/ipIJ5NNJf+LJfyjYtoQPT0Ok3ZH78F2BKi7rFu/3L7xCD70J+INhMx5ZjcU8ZSu+v
+ 1t7g==
+X-Gm-Message-State: AGi0PubAhcQmEWEKchdKDkoGjUHjE5yu04+2uSPTCOeKPd7+l2SHo8YQ
+ h23iFeiO+nsYL7tWleSPOkwWCQgxc4c=
+X-Google-Smtp-Source: APiQypI678r+4XFWrK/Ku+Vu7xlEl2s034DWyKkhgo6vH7aCtp/LpNJiDsZREj0SgAkWekN2tsbkrg==
+X-Received: by 2002:a5d:5189:: with SMTP id k9mr13755787wrv.3.1589124525626;
+ Sun, 10 May 2020 08:28:45 -0700 (PDT)
 Received: from localhost.localdomain (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id a67sm24186702wmc.30.2020.05.10.08.28.41
+ by smtp.gmail.com with ESMTPSA id a67sm24186702wmc.30.2020.05.10.08.28.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 10 May 2020 08:28:42 -0700 (PDT)
+ Sun, 10 May 2020 08:28:45 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/7] hw/misc/empty_slot: Spring cleaning
-Date: Sun, 10 May 2020 17:28:33 +0200
-Message-Id: <20200510152840.13558-1-f4bug@amsat.org>
+Subject: [PATCH 1/7] hw/sparc/sun4m: Use UnimplementedDevice for I/O devices
+Date: Sun, 10 May 2020 17:28:34 +0200
+Message-Id: <20200510152840.13558-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200510152840.13558-1-f4bug@amsat.org>
+References: <20200510152840.13558-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::433;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x433.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -113,46 +115,57 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-New Spring, new opportunity to clean this device :)
-(v1 was in 2018, v2 in 2019).
+These devices are not slots on a bus, but real I/O devices
+that we do not implement. As the ISDN ROM would be a ROMD
+device, also model it as UnimplementedDevice.
 
-- lower device priority
-- follow qdev model and use properties
-- convert to trace events
-- describe with slot name
-- move under hw/misc/ and cover in MAINTAINERS
+Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/sparc/sun4m.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-Peter, I hope you are OK adding it wit UNIMP device,
-as both are very similar, and don't have much activity.
-
-Only MIPS/SPARC32 targets use this device.
-
-v2: https://www.mail-archive.com/qemu-devel@nongnu.org/msg626498.html
-v1: https://www.mail-archive.com/qemu-devel@nongnu.org/msg564060.html
-
-Philippe Mathieu-Daudé (7):
-  hw/sparc/sun4m: Use UnimplementedDevice for I/O devices
-  hw/misc/empty_slot: Lower address space priority
-  hw/misc/empty_slot: Convert 'size' field as qdev property
-  hw/misc/empty_slot: Add a 'name' qdev property
-  hw/misc/empty_slot: Convert debug printf() to trace event
-  hw/misc/empty_slot: Move the 'hw/misc' and cover in MAINTAINERS
-  hw/misc/empty_slot: Name the slots when created
-
- include/hw/empty_slot.h        |  9 -------
- include/hw/misc/empty_slot.h   | 19 ++++++++++++++
- hw/mips/mips_malta.c           |  4 +--
- hw/{core => misc}/empty_slot.c | 47 +++++++++++++++++++---------------
- hw/sparc/sun4m.c               | 23 +++++++++++------
- MAINTAINERS                    |  4 ++-
- hw/core/Makefile.objs          |  1 -
- hw/misc/Makefile.objs          |  1 +
- hw/misc/trace-events           |  4 +++
- 9 files changed, 70 insertions(+), 42 deletions(-)
- delete mode 100644 include/hw/empty_slot.h
- create mode 100644 include/hw/misc/empty_slot.h
- rename hw/{core => misc}/empty_slot.c (66%)
-
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index 9838c5a183..f1494907b0 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -47,6 +47,7 @@
+ #include "hw/nvram/fw_cfg.h"
+ #include "hw/char/escc.h"
+ #include "hw/empty_slot.h"
++#include "hw/misc/unimp.h"
+ #include "hw/irq.h"
+ #include "hw/loader.h"
+ #include "elf.h"
+@@ -920,7 +921,7 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+     }
+ 
+     if (hwdef->sx_base) {
+-        empty_slot_init(hwdef->sx_base, 0x2000);
++        create_unimplemented_device("SUNW,sx", hwdef->sx_base, 0x2000);
+     }
+ 
+     nvram = m48t59_init(slavio_irq[0], hwdef->nvram_base, 0, 0x2000, 1968, 8);
+@@ -983,14 +984,16 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+     if (hwdef->dbri_base) {
+         /* ISDN chip with attached CS4215 audio codec */
+         /* prom space */
+-        empty_slot_init(hwdef->dbri_base+0x1000, 0x30);
++        create_unimplemented_device("SUNW,DBRI.prom",
++                                    hwdef->dbri_base + 0x1000, 0x30);
+         /* reg space */
+-        empty_slot_init(hwdef->dbri_base+0x10000, 0x100);
++        create_unimplemented_device("SUNW,DBRI",
++                                    hwdef->dbri_base + 0x10000, 0x100);
+     }
+ 
+     if (hwdef->bpp_base) {
+         /* parallel port */
+-        empty_slot_init(hwdef->bpp_base, 0x20);
++        create_unimplemented_device("SUNW,bpp", hwdef->bpp_base, 0x20);
+     }
+ 
+     initrd_size = 0;
 -- 
 2.21.3
 
