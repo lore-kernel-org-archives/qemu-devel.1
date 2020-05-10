@@ -4,58 +4,58 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.5 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
 	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7094C38A2A
-	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 18:44:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 846F1C54E8B
+	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 18:44:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F45C2082E
-	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 18:44:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F45C2082E
+	by mail.kernel.org (Postfix) with ESMTPS id 617972082E
+	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 18:44:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 617972082E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=t-online.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXqvv-0000UC-Od
-	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 14:44:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45866)
+	id 1jXqvx-0000Yg-Ia
+	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 14:44:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45862)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <volker.ruemelin@t-online.de>)
- id 1jXquv-0007hR-9Q
- for qemu-devel@nongnu.org; Sun, 10 May 2020 14:43:13 -0400
-Received: from mailout08.t-online.de ([194.25.134.20]:44842)
+ id 1jXquu-0007gh-Jk
+ for qemu-devel@nongnu.org; Sun, 10 May 2020 14:43:12 -0400
+Received: from mailout08.t-online.de ([194.25.134.20]:45010)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <volker.ruemelin@t-online.de>)
- id 1jXqut-0005Kj-B3
- for qemu-devel@nongnu.org; Sun, 10 May 2020 14:43:13 -0400
-Received: from fwd13.aul.t-online.de (fwd13.aul.t-online.de [172.20.27.62])
- by mailout08.t-online.de (Postfix) with SMTP id 6D7E3410DE0D;
- Sun, 10 May 2020 20:43:07 +0200 (CEST)
+ id 1jXqut-0005Kn-SL
+ for qemu-devel@nongnu.org; Sun, 10 May 2020 14:43:12 -0400
+Received: from fwd10.aul.t-online.de (fwd10.aul.t-online.de [172.20.26.152])
+ by mailout08.t-online.de (Postfix) with SMTP id 52081410DE12;
+ Sun, 10 May 2020 20:43:10 +0200 (CEST)
 Received: from linpower.localnet
- (bLYMKoZU8hKhDKb8PFWW0jzr1G64I1AXiXwwqX-uajYjh2-B4mwX-J5cBQZ-ljEwhJ@[46.86.59.135])
- by fwd13.t-online.de
+ (SarWkQZHghCqUVkN6wP8qHFtdnsP6l9FRK8cl2-NPruvS050obWFpTLP-7i5Hnhgnj@[46.86.59.135])
+ by fwd10.t-online.de
  with (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384 encrypted)
- esmtp id 1jXqun-0gUsd60; Sun, 10 May 2020 20:43:05 +0200
+ esmtp id 1jXqus-1vLm640; Sun, 10 May 2020 20:43:10 +0200
 Received: by linpower.localnet (Postfix, from userid 1000)
- id 96DAE200624; Sun, 10 May 2020 20:43:04 +0200 (CEST)
+ id 9A15A200627; Sun, 10 May 2020 20:43:04 +0200 (CEST)
 From: =?UTF-8?q?Volker=20R=C3=BCmelin?= <vr_qemu@t-online.de>
 To: Gerd Hoffmann <kraxel@redhat.com>, Stefan Weil <sw@weilnetz.de>,
  =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Subject: [PATCH 01/10] ui/win32-kbd-hook: handle AltGr in a hook procedure
-Date: Sun, 10 May 2020 20:42:55 +0200
-Message-Id: <20200510184304.9267-1-vr_qemu@t-online.de>
+Subject: [PATCH 03/10] ui/gkt: release all keys on grab-broken-event
+Date: Sun, 10 May 2020 20:42:57 +0200
+Message-Id: <20200510184304.9267-3-vr_qemu@t-online.de>
 X-Mailer: git-send-email 2.26.1
 In-Reply-To: <2393388c-86c3-4d7e-178e-2c7e6d14a8de@t-online.de>
 References: <2393388c-86c3-4d7e-178e-2c7e6d14a8de@t-online.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ID: bLYMKoZU8hKhDKb8PFWW0jzr1G64I1AXiXwwqX-uajYjh2-B4mwX-J5cBQZ-ljEwhJ
-X-TOI-MSGID: 17a9a933-805a-419d-9d43-3b9b32aec4d4
+X-ID: SarWkQZHghCqUVkN6wP8qHFtdnsP6l9FRK8cl2-NPruvS050obWFpTLP-7i5Hnhgnj
+X-TOI-MSGID: c579c7b6-edc9-4a60-90a5-8622e012e7c9
 Received-SPF: none client-ip=194.25.134.20;
  envelope-from=volker.ruemelin@t-online.de; helo=mailout08.t-online.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/10 14:43:07
@@ -64,8 +64,7 @@ X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,163 +82,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Import win32 keyboard hooking code from project spice-gtk. This
-patch removes the extra left control key up/down input events
-inserted by Windows for the right alt key up/down input events
-with international keyboard layouts. Additionally there's some
-code to grab the keyboard.
-
-The next patches will use this code.
-
-Only Windows needs this.
+There is no way to grab the Ctrl-Alt-Del key combination on
+Windows. This key combination will leave all three keys in a
+stuck condition. This patch uses the grab-broken-event to
+release the keys.
 
 Signed-off-by: Volker Rümelin <vr_qemu@t-online.de>
 ---
- ui/Makefile.objs    |   1 +
- ui/win32-kbd-hook.c | 100 ++++++++++++++++++++++++++++++++++++++++++++
- ui/win32-kbd-hook.h |  14 +++++++
- 3 files changed, 115 insertions(+)
- create mode 100644 ui/win32-kbd-hook.c
- create mode 100644 ui/win32-kbd-hook.h
+ ui/gtk.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index e6da6ff047..f74d72a612 100644
---- a/ui/Makefile.objs
-+++ b/ui/Makefile.objs
-@@ -15,6 +15,7 @@ common-obj-$(CONFIG_SPICE) += spice-core.o spice-input.o spice-display.o
- common-obj-$(CONFIG_COCOA) += cocoa.o
- common-obj-$(CONFIG_VNC) += $(vnc-obj-y)
- common-obj-$(call lnot,$(CONFIG_VNC)) += vnc-stubs.o
-+common-obj-$(CONFIG_WIN32) += win32-kbd-hook.o
+diff --git a/ui/gtk.c b/ui/gtk.c
+index 68c63532b1..5de2a75691 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -1132,6 +1132,20 @@ static gboolean gd_key_event(GtkWidget *widget, GdkEventKey *key, void *opaque)
+     return TRUE;
+ }
  
- # ui-sdl module
- common-obj-$(CONFIG_SDL) += sdl.mo
-diff --git a/ui/win32-kbd-hook.c b/ui/win32-kbd-hook.c
-new file mode 100644
-index 0000000000..d558912ef2
---- /dev/null
-+++ b/ui/win32-kbd-hook.c
-@@ -0,0 +1,100 @@
-+/*
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "sysemu/sysemu.h"
-+#include "win32-kbd-hook.h"
-+
-+static Notifier win32_unhook_notifier;
-+static HHOOK win32_keyboard_hook;
-+static HWND win32_window;
-+static DWORD win32_grab;
-+
-+static LRESULT CALLBACK keyboard_hook_cb(int code, WPARAM wparam, LPARAM lparam)
++static gboolean gd_grab_broken_event(GtkWidget *widget,
++                                     GdkEventGrabBroken *event, void *opaque)
 +{
-+    if  (win32_window && code == HC_ACTION && win32_window == GetFocus()) {
-+        KBDLLHOOKSTRUCT *hooked = (KBDLLHOOKSTRUCT *)lparam;
++#ifdef CONFIG_WIN32
++    if (event->keyboard) {
++        VirtualConsole *vc = opaque;
++        GtkDisplayState *s = vc->s;
 +
-+        if (wparam != WM_KEYUP) {
-+            DWORD dwmsg = (hooked->flags << 24) |
-+                          ((hooked->scanCode & 0xff) << 16) | 1;
-+
-+            switch (hooked->vkCode) {
-+            case VK_CAPITAL:
-+                /* fall through */
-+            case VK_SCROLL:
-+                /* fall through */
-+            case VK_NUMLOCK:
-+                /* fall through */
-+            case VK_LSHIFT:
-+                /* fall through */
-+            case VK_RSHIFT:
-+                /* fall through */
-+            case VK_RCONTROL:
-+                /* fall through */
-+            case VK_LMENU:
-+                /* fall through */
-+            case VK_RMENU:
-+                break;
-+
-+            case VK_LCONTROL:
-+                /*
-+                 * When pressing AltGr, an extra VK_LCONTROL with a special
-+                 * scancode with bit 9 set is sent. Let's ignore the extra
-+                 * VK_LCONTROL, as that will make AltGr misbehave.
-+                 */
-+                if (hooked->scanCode & 0x200) {
-+                    return 1;
-+                }
-+                break;
-+
-+            default:
-+                if (win32_grab) {
-+                    SendMessage(win32_window, wparam, hooked->vkCode, dwmsg);
-+                    return 1;
-+                }
-+                break;
-+            }
-+
-+        } else {
-+            switch (hooked->vkCode) {
-+            case VK_LCONTROL:
-+                if (hooked->scanCode & 0x200) {
-+                    return 1;
-+                }
-+                break;
-+            }
-+        }
++        gtk_release_modifiers(s);
 +    }
-+
-+    return CallNextHookEx(NULL, code, wparam, lparam);
-+}
-+
-+static void keyboard_hook_unhook(Notifier *n, void *data)
-+{
-+    UnhookWindowsHookEx(win32_keyboard_hook);
-+    win32_keyboard_hook = NULL;
-+}
-+
-+void win32_kbd_set_window(HWND hwnd)
-+{
-+    if (hwnd && !win32_keyboard_hook) {
-+        /* note: the installing thread must have a message loop */
-+        win32_keyboard_hook = SetWindowsHookEx(WH_KEYBOARD_LL, keyboard_hook_cb,
-+                                               GetModuleHandle(NULL), 0);
-+        if (win32_keyboard_hook) {
-+            win32_unhook_notifier.notify = keyboard_hook_unhook;
-+            qemu_add_exit_notifier(&win32_unhook_notifier);
-+        }
-+    }
-+
-+    win32_window = hwnd;
-+}
-+
-+void win32_kbd_set_grab(bool grab)
-+{
-+    win32_grab = grab;
-+}
-diff --git a/ui/win32-kbd-hook.h b/ui/win32-kbd-hook.h
-new file mode 100644
-index 0000000000..1e0e866610
---- /dev/null
-+++ b/ui/win32-kbd-hook.h
-@@ -0,0 +1,14 @@
-+/*
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef UI_WIN32_KBD_HOOK_H
-+#define UI_WIN32_KBD_HOOK_H
-+
-+void win32_kbd_set_window(HWND hwnd);
-+void win32_kbd_set_grab(bool grab);
-+
 +#endif
++    return TRUE;
++}
++
+ static gboolean gd_event(GtkWidget *widget, GdkEvent *event, void *opaque)
+ {
+     if (event->type == GDK_MOTION_NOTIFY) {
+@@ -1910,6 +1924,8 @@ static void gd_connect_vc_gfx_signals(VirtualConsole *vc)
+                          G_CALLBACK(gd_focus_out_event), vc);
+         g_signal_connect(vc->gfx.drawing_area, "configure-event",
+                          G_CALLBACK(gd_configure), vc);
++        g_signal_connect(vc->gfx.drawing_area, "grab-broken-event",
++                         G_CALLBACK(gd_grab_broken_event), vc);
+     } else {
+         g_signal_connect(vc->gfx.drawing_area, "key-press-event",
+                          G_CALLBACK(gd_text_key_down), vc);
 -- 
 2.26.1
 
