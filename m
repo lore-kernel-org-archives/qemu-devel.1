@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A141BC38A2A
-	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 18:50:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B2D7C54E8A
+	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 18:51:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74F0A2082E
-	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 18:50:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74F0A2082E
+	by mail.kernel.org (Postfix) with ESMTPS id 4A01A2082E
+	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 18:51:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A01A2082E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=t-online.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXr1p-0001NW-Nh
-	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 14:50:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45902)
+	id 1jXr2m-0002Vy-II
+	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 14:51:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45906)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <volker.ruemelin@t-online.de>)
- id 1jXqv7-00081y-Im
- for qemu-devel@nongnu.org; Sun, 10 May 2020 14:43:25 -0400
-Received: from mailout11.t-online.de ([194.25.134.85]:33024)
+ id 1jXqv9-000868-Gt
+ for qemu-devel@nongnu.org; Sun, 10 May 2020 14:43:27 -0400
+Received: from mailout08.t-online.de ([194.25.134.20]:45714)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <volker.ruemelin@t-online.de>)
- id 1jXqv6-0005Rf-Is
- for qemu-devel@nongnu.org; Sun, 10 May 2020 14:43:25 -0400
-Received: from fwd26.aul.t-online.de (fwd26.aul.t-online.de [172.20.26.131])
- by mailout11.t-online.de (Postfix) with SMTP id DC6B04216F8A;
- Sun, 10 May 2020 20:43:22 +0200 (CEST)
+ id 1jXqv8-0005T4-Ot
+ for qemu-devel@nongnu.org; Sun, 10 May 2020 14:43:27 -0400
+Received: from fwd08.aul.t-online.de (fwd08.aul.t-online.de [172.20.26.151])
+ by mailout08.t-online.de (Postfix) with SMTP id 9FFDA411E3C0;
+ Sun, 10 May 2020 20:43:25 +0200 (CEST)
 Received: from linpower.localnet
- (E69VcaZbQhpsoxeUPbOxU4e1EuBmP+jS+ihFAP5ViFXLOHk5paJH8bW764H9b-gZIv@[46.86.59.135])
- by fwd26.t-online.de
+ (bR6pEQZZQhGTvGIx2LKkfKiVVWtHblG8vwx1Phx6Kl1nHSm0QRfZzqDQUs0tM80QOC@[46.86.59.135])
+ by fwd08.t-online.de
  with (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384 encrypted)
- esmtp id 1jXqv4-1qwRU00; Sun, 10 May 2020 20:43:22 +0200
+ esmtp id 1jXqv7-2SgojY0; Sun, 10 May 2020 20:43:25 +0200
 Received: by linpower.localnet (Postfix, from userid 1000)
- id A4BF4200631; Sun, 10 May 2020 20:43:04 +0200 (CEST)
+ id A6BE9200632; Sun, 10 May 2020 20:43:04 +0200 (CEST)
 From: =?UTF-8?q?Volker=20R=C3=BCmelin?= <vr_qemu@t-online.de>
 To: Gerd Hoffmann <kraxel@redhat.com>, Stefan Weil <sw@weilnetz.de>,
  =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Subject: [PATCH 08/10] ui/sdl2-input: use trace-events to debug key events
-Date: Sun, 10 May 2020 20:43:02 +0200
-Message-Id: <20200510184304.9267-8-vr_qemu@t-online.de>
+Subject: [PATCH 09/10] ui/gtk: don't pass on win keys without keyboard grab
+Date: Sun, 10 May 2020 20:43:03 +0200
+Message-Id: <20200510184304.9267-9-vr_qemu@t-online.de>
 X-Mailer: git-send-email 2.26.1
 In-Reply-To: <2393388c-86c3-4d7e-178e-2c7e6d14a8de@t-online.de>
 References: <2393388c-86c3-4d7e-178e-2c7e6d14a8de@t-online.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ID: E69VcaZbQhpsoxeUPbOxU4e1EuBmP+jS+ihFAP5ViFXLOHk5paJH8bW764H9b-gZIv
-X-TOI-MSGID: 13800317-9579-487a-b8f2-4e9cf194af63
-Received-SPF: none client-ip=194.25.134.85;
- envelope-from=volker.ruemelin@t-online.de; helo=mailout11.t-online.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/10 14:43:22
+X-ID: bR6pEQZZQhGTvGIx2LKkfKiVVWtHblG8vwx1Phx6Kl1nHSm0QRfZzqDQUs0tM80QOC
+X-TOI-MSGID: ef055f01-332d-42aa-a346-50fa83c172d3
+Received-SPF: none client-ip=194.25.134.20;
+ envelope-from=volker.ruemelin@t-online.de; helo=mailout08.t-online.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/10 14:43:07
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,47 +82,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This patch applies commit c68f74b02e "win32: do not handle win
+keys when the keyboard is not grabbed" from project spice-gtk
+to ui/gtk.c.
+
 Signed-off-by: Volker Rümelin <vr_qemu@t-online.de>
 ---
- ui/sdl2-input.c | 3 +++
- ui/trace-events | 3 +++
- 2 files changed, 6 insertions(+)
+ ui/gtk.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/ui/sdl2-input.c b/ui/sdl2-input.c
-index 1f9fe831b3..f068382209 100644
---- a/ui/sdl2-input.c
-+++ b/ui/sdl2-input.c
-@@ -27,6 +27,7 @@
- #include "ui/console.h"
- #include "ui/input.h"
- #include "ui/sdl2.h"
-+#include "trace.h"
+diff --git a/ui/gtk.c b/ui/gtk.c
+index 5a25e3fa4c..a43fddc57f 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -1085,10 +1085,17 @@ static gboolean gd_key_event(GtkWidget *widget, GdkEventKey *key, void *opaque)
+     VirtualConsole *vc = opaque;
+     int qcode;
  
- void sdl2_process_key(struct sdl2_console *scon,
-                       SDL_KeyboardEvent *ev)
-@@ -38,6 +39,8 @@ void sdl2_process_key(struct sdl2_console *scon,
-         return;
-     }
-     qcode = qemu_input_map_usb_to_qcode[ev->keysym.scancode];
-+    trace_sdl2_process_key(ev->keysym.scancode, qcode,
-+                           ev->type == SDL_KEYDOWN ? "down" : "up");
-     qkbd_state_key_event(scon->kbd, qcode, ev->type == SDL_KEYDOWN);
- 
-     if (!qemu_console_is_graphic(con)) {
-diff --git a/ui/trace-events b/ui/trace-events
-index 0dcda393c1..5367fd3f16 100644
---- a/ui/trace-events
-+++ b/ui/trace-events
-@@ -75,6 +75,9 @@ input_event_abs(int conidx, const char *axis, int value) "con %d, axis %s, value
- input_event_sync(void) ""
- input_mouse_mode(int absolute) "absolute %d"
- 
-+# sdl2-input.c
-+sdl2_process_key(int sdl_scancode, int qcode, const char *action) "translated SDL scancode %d to QKeyCode %d (%s)"
+-#ifdef WIN32
++#ifdef G_OS_WIN32
+     /* on windows, we ought to ignore the reserved key event? */
+     if (key->hardware_keycode == 0xff)
+         return false;
 +
- # spice-display.c
- qemu_spice_add_memslot(int qid, uint32_t slot_id, unsigned long virt_start, unsigned long virt_end, int async) "%d %u: host virt 0x%lx - 0x%lx async=%d"
- qemu_spice_del_memslot(int qid, uint32_t gid, uint32_t slot_id) "%d gid=%u sid=%u"
++    if (!vc->s->kbd_owner) {
++        if (key->hardware_keycode == VK_LWIN ||
++            key->hardware_keycode == VK_RWIN) {
++            return FALSE;
++        }
++    }
+ #endif
+ 
+     if (key->keyval == GDK_KEY_Pause
 -- 
 2.26.1
 
