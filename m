@@ -2,93 +2,83 @@ Return-Path: <SRS0=vfNf=6Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83813C38A2A
-	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 11:36:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C9D8C38A2A
+	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 13:42:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CE1A2082E
-	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 11:36:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4BBFA20731
+	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 13:42:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RQsKJz3Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CE1A2082E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CWcBH974"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BBFA20731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXkFV-0001er-A4
-	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 07:36:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56354)
+	id 1jXmDl-00053o-Gm
+	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 09:42:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40764)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jXkEi-0001BB-GM
- for qemu-devel@nongnu.org; Sun, 10 May 2020 07:35:13 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35488)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jXkEg-00056x-JQ
- for qemu-devel@nongnu.org; Sun, 10 May 2020 07:35:11 -0400
-Received: by mail-wr1-x443.google.com with SMTP id j5so7253243wrq.2
- for <qemu-devel@nongnu.org>; Sun, 10 May 2020 04:35:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=1sGCszq4iNsnWpjkDa6PLbJ7mB9x9d8Hb21P4Y4Q2OM=;
- b=RQsKJz3Yntu05j41RriCGxx4fLDhXKBE62Rmz4R+Q94FaBhdUfvIG65x0Ym5dntEMb
- K9jaecsqx2Y28wG+zmPDiPwhDPd9FhLQcvcpcgsvC16UC01+zb/NdilIcoNqig6v/2oN
- b6YwnJ6VIohHqF7z7XZIkXoWOvGvafbMCmgUZrN7gx/oPov35/J6GzIHLZJNpDhUHEf7
- EJa8piIE9+JbBClSh+yN+bPwDEWlMnKAzLR+WKnu5gTuTrgaN/2lH/lUSJuXAeckn1YC
- ZtPa6dZyXQARz+ysd5B71Gl/QsZEhZYoiBnZRxuXfRZ3VzneuIhcrcHpU4skRiWJp564
- ID5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=1sGCszq4iNsnWpjkDa6PLbJ7mB9x9d8Hb21P4Y4Q2OM=;
- b=WzIVMLwCGKvyjD3+JkN8Yva6S2pYrq/HCYmMlegyfrvXh3C4yo2DjzUYeUA4lDlA74
- wsgCeQJGmVivB2xCYjiPyVkX8lXG/cwk6MlbAstFvSpQumG8RUKR0PxV4dHwPysjDEuU
- D5qFWntnqKVjPJyeVIUliEctjyEjuat3E6pL3xbEAKDtHKCS94+DE+uF3cBhiQWbG6yo
- lvo+LFIiKzUDfMiTsRyHbOPoVhI/60IzljTPc4ayTriJy97WmxlCNBJx+9lH3pLsOin7
- Wbc/Fj9rnP3s16PvohK3T9BAIgDlJ++z+MA5jutn5rtLVhzSASIAG26SH6ETS9v7Db07
- V2fw==
-X-Gm-Message-State: AGi0PuYae9nFpx3h3MHEJS247+A2hsIHXH8rgRUJmoz7ZS/pYvnjtUgN
- 2LohsAc2f/KB+fJoK6gSL9VDTKqHQ6M=
-X-Google-Smtp-Source: APiQypJzo86kxc1IXAA2M1CAW09ERC5+NRro2ICqyw0rhBnuTbSDcICgN0WliFX7L2dwP1OZJrBRqg==
-X-Received: by 2002:adf:e90b:: with SMTP id f11mr13073485wrm.364.1589110508857; 
- Sun, 10 May 2020 04:35:08 -0700 (PDT)
-Received: from localhost.localdomain (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id q5sm4376297wra.36.2020.05.10.04.35.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 10 May 2020 04:35:08 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1jXmCF-0002tZ-Ul
+ for qemu-devel@nongnu.org; Sun, 10 May 2020 09:40:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41125
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1jXmCE-0003rO-9U
+ for qemu-devel@nongnu.org; Sun, 10 May 2020 09:40:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589118044;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=CH1x7J3syv4gsWsnmaMgT4mfjAUZSfEZZe38VG9lLhw=;
+ b=CWcBH974ykeJS8/iinGulXjXZ77lnCeOGPxjnacsBM/oFBJxZgV3/S+3ULaj3uusdbf4Cd
+ Ksv6UprQLFnBQu30CJm+7lYy4AhFqvXVoAJhMPQG2xfeUpDAV8jHg59uISWl/uRTJNqEHK
+ bYbRE5l1+7HCxpESl2SeKC/icySeUBA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-6-hGhCySnAPDeU6XKu0csnyA-1; Sun, 10 May 2020 09:40:42 -0400
+X-MC-Unique: hGhCySnAPDeU6XKu0csnyA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F6B918A0726;
+ Sun, 10 May 2020 13:40:41 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.153])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A3C002E17D;
+ Sun, 10 May 2020 13:40:38 +0000 (UTC)
+From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH] hw/sparc/sun4m: Use memdev backend for main RAM
-Date: Sun, 10 May 2020 13:35:05 +0200
-Message-Id: <20200510113505.10500-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
+Subject: [PATCH v6 00/14] LUKS: encryption slot management using amend
+ interface
+Date: Sun, 10 May 2020 16:40:23 +0300
+Message-Id: <20200510134037.18487-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/10 09:00:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,111 +91,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, John Snow <jsnow@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since commit 82b911aaff3, machine_run_board_init() checks for
-ram_memdev_id and consume it. As TYPE_SUN4M_MEMORY is no more
-needed, replace it by the generic memdev allocated MemoryRegion
-and remove it. This completes commit b2554752b1da7c8f.
+Hi!
+Here is the updated series of my patches, incorporating all the feedback I received.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/sparc/sun4m.c | 54 ++----------------------------------------------
- 1 file changed, 2 insertions(+), 52 deletions(-)
+This implements the API interface that we agreed upon except that I merged the
+LUKSKeyslotActive/LUKSKeyslotInactive union into a struct because otherwise
+I need nested unions which are not supported currently by QAPI parser.
+This didn't change the API and thus once support for nested unions is there,
+it can always be implemented in backward compatible way.
 
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index 36ee1a0a3d..9838c5a183 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -772,50 +772,6 @@ static const TypeInfo prom_info = {
-     .class_init    = prom_class_init,
- };
- 
--#define TYPE_SUN4M_MEMORY "memory"
--#define SUN4M_RAM(obj) OBJECT_CHECK(RamDevice, (obj), TYPE_SUN4M_MEMORY)
--
--typedef struct RamDevice {
--    SysBusDevice parent_obj;
--    HostMemoryBackend *memdev;
--} RamDevice;
--
--/* System RAM */
--static void ram_realize(DeviceState *dev, Error **errp)
--{
--    RamDevice *d = SUN4M_RAM(dev);
--    MemoryRegion *ram = host_memory_backend_get_memory(d->memdev);
--
--    sysbus_init_mmio(SYS_BUS_DEVICE(dev), ram);
--}
--
--static void ram_initfn(Object *obj)
--{
--    RamDevice *d = SUN4M_RAM(obj);
--    object_property_add_link(obj, "memdev", TYPE_MEMORY_BACKEND,
--                             (Object **)&d->memdev,
--                             object_property_allow_set_link,
--                             OBJ_PROP_LINK_STRONG, &error_abort);
--    object_property_set_description(obj, "memdev", "Set RAM backend"
--                                    "Valid value is ID of a hostmem backend",
--                                     &error_abort);
--}
--
--static void ram_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc = DEVICE_CLASS(klass);
--
--    dc->realize = ram_realize;
--}
--
--static const TypeInfo ram_info = {
--    .name          = TYPE_SUN4M_MEMORY,
--    .parent        = TYPE_SYS_BUS_DEVICE,
--    .instance_size = sizeof(RamDevice),
--    .instance_init = ram_initfn,
--    .class_init    = ram_class_init,
--};
--
- static void cpu_devinit(const char *cpu_type, unsigned int id,
-                         uint64_t prom_addr, qemu_irq **cpu_irqs)
- {
-@@ -858,8 +814,6 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
-     SysBusDevice *s;
-     unsigned int smp_cpus = machine->smp.cpus;
-     unsigned int max_cpus = machine->smp.max_cpus;
--    Object *ram_memdev = object_resolve_path_type(machine->ram_memdev_id,
--                                                  TYPE_MEMORY_BACKEND, NULL);
- 
-     if (machine->ram_size > hwdef->max_mem) {
-         error_report("Too much memory for this machine: %" PRId64 ","
-@@ -876,11 +830,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
-     for (i = smp_cpus; i < MAX_CPUS; i++)
-         cpu_irqs[i] = qemu_allocate_irqs(dummy_cpu_set_irq, NULL, MAX_PILS);
- 
--    /* Create and map RAM frontend */
--    dev = qdev_create(NULL, "memory");
--    object_property_set_link(OBJECT(dev), ram_memdev, "memdev", &error_fatal);
--    qdev_init_nofail(dev);
--    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0);
-+    /* RAM */
-+    memory_region_add_subregion(get_system_memory(), 0, machine->ram);
- 
-     /* models without ECC don't trap when missing ram is accessed */
-     if (!hwdef->ecc_base) {
-@@ -1575,7 +1526,6 @@ static void sun4m_register_types(void)
-     type_register_static(&idreg_info);
-     type_register_static(&afx_info);
-     type_register_static(&prom_info);
--    type_register_static(&ram_info);
- 
-     type_register_static(&ss5_type);
-     type_register_static(&ss10_type);
+I hope that this series will finally be considered for merging, since I am somewhat running
+out of time to finish this task.
+
+Patches are strictly divided by topic to 3 groups, and each group depends on former groups.
+
+* Patches 1,2 implement qcrypto generic amend interface, including definition
+  of structs used in crypto.json and implement this in luks crypto driver
+  Nothing is exposed to the user at this stage
+
+* Patches 3-9 use the code from patches 1,2 to implement qemu-img amend based encryption slot management
+  for luks and for qcow2, and add a bunch of iotests to cover that.
+
+* Patches 10-13 add x-blockdev-amend (I'll drop the -x prefix if you like), and wire it
+  to luks and qcow2 driver to implement qmp based encryption slot management also using
+  the code from patches 1,2, and also add a bunch of iotests to cover this.
+
+Tested with -raw,-qcow2,-nbd and -luks iotests and 'make check'
+
+Changes from V4:
+  * Addresed feedback on patch 2 from Daniel (thanks!)
+  * Gave real numbers to the tests
+  * Updated the copyright in amend.c to RedHat
+  * Rebased and adjusted the python iotests to latest changes in iotest infrastructure
+
+Changes from V5:
+  * Updated all QMP docs to state that all added QMP features are since 5.1
+  * Rebased to latest master
+
+Best regards,
+        Maxim Levitsky
+
+clone of "luks-keymgmnt-v2"
+
+Maxim Levitsky (14):
+  qcrypto/core: add generic infrastructure for crypto options amendment
+  qcrypto/luks: implement encryption key management
+  block/amend: add 'force' option
+  block/amend: separate amend and create options for qemu-img
+  block/amend: refactor qcow2 amend options
+  block/crypto: rename two functions
+  block/crypto: implement the encryption key management
+  block/qcow2: extend qemu-img amend interface with crypto options
+  iotests: filter few more luks specific create options
+  iotests: qemu-img tests for luks key management
+  block/core: add generic infrastructure for x-blockdev-amend qmp
+    command
+  block/crypto: implement blockdev-amend
+  block/qcow2: implement blockdev-amend
+  iotests: add tests for blockdev-amend
+
+ block.c                          |   4 +-
+ block/Makefile.objs              |   2 +-
+ block/amend.c                    | 108 +++++++++
+ block/crypto.c                   | 203 ++++++++++++++--
+ block/crypto.h                   |  37 +++
+ block/qcow2.c                    | 306 ++++++++++++++----------
+ crypto/block-luks.c              | 395 ++++++++++++++++++++++++++++++-
+ crypto/block.c                   |  29 +++
+ crypto/blockpriv.h               |   8 +
+ docs/tools/qemu-img.rst          |   5 +-
+ include/block/block.h            |   1 +
+ include/block/block_int.h        |  24 +-
+ include/crypto/block.h           |  22 ++
+ qapi/block-core.json             |  68 ++++++
+ qapi/crypto.json                 |  75 +++++-
+ qapi/job.json                    |   4 +-
+ qemu-img-cmds.hx                 |   4 +-
+ qemu-img.c                       |  44 +++-
+ tests/qemu-iotests/049.out       | 102 ++++----
+ tests/qemu-iotests/061.out       |  12 +-
+ tests/qemu-iotests/079.out       |  18 +-
+ tests/qemu-iotests/082.out       | 176 ++++----------
+ tests/qemu-iotests/085.out       |  38 +--
+ tests/qemu-iotests/087.out       |   6 +-
+ tests/qemu-iotests/115.out       |   2 +-
+ tests/qemu-iotests/121.out       |   4 +-
+ tests/qemu-iotests/125.out       | 192 +++++++--------
+ tests/qemu-iotests/134.out       |   2 +-
+ tests/qemu-iotests/144.out       |   4 +-
+ tests/qemu-iotests/158.out       |   4 +-
+ tests/qemu-iotests/182.out       |   2 +-
+ tests/qemu-iotests/185.out       |   8 +-
+ tests/qemu-iotests/188.out       |   2 +-
+ tests/qemu-iotests/189.out       |   4 +-
+ tests/qemu-iotests/198.out       |   4 +-
+ tests/qemu-iotests/243.out       |  16 +-
+ tests/qemu-iotests/250.out       |   2 +-
+ tests/qemu-iotests/255.out       |   8 +-
+ tests/qemu-iotests/259.out       |   2 +-
+ tests/qemu-iotests/263.out       |   4 +-
+ tests/qemu-iotests/274.out       |  46 ++--
+ tests/qemu-iotests/280.out       |   2 +-
+ tests/qemu-iotests/284.out       |   6 +-
+ tests/qemu-iotests/293           | 207 ++++++++++++++++
+ tests/qemu-iotests/293.out       |  99 ++++++++
+ tests/qemu-iotests/294           |  90 +++++++
+ tests/qemu-iotests/294.out       |  30 +++
+ tests/qemu-iotests/295           | 279 ++++++++++++++++++++++
+ tests/qemu-iotests/295.out       |  40 ++++
+ tests/qemu-iotests/296           | 234 ++++++++++++++++++
+ tests/qemu-iotests/296.out       |  33 +++
+ tests/qemu-iotests/common.filter |   6 +-
+ tests/qemu-iotests/group         |   4 +
+ 53 files changed, 2494 insertions(+), 533 deletions(-)
+ create mode 100644 block/amend.c
+ create mode 100755 tests/qemu-iotests/293
+ create mode 100644 tests/qemu-iotests/293.out
+ create mode 100755 tests/qemu-iotests/294
+ create mode 100644 tests/qemu-iotests/294.out
+ create mode 100755 tests/qemu-iotests/295
+ create mode 100644 tests/qemu-iotests/295.out
+ create mode 100755 tests/qemu-iotests/296
+ create mode 100644 tests/qemu-iotests/296.out
+
 -- 
-2.21.3
+2.17.2
 
 
