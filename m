@@ -2,69 +2,66 @@ Return-Path: <SRS0=vfNf=6Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64F43C54E8B
-	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 18:35:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 281E8C38A2A
+	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 18:42:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 394FB2080C
-	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 18:35:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="nPnznth+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 394FB2080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	by mail.kernel.org (Postfix) with ESMTPS id F29AA2080C
+	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 18:42:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F29AA2080C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=t-online.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXqnC-00012W-92
-	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 14:35:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44868)
+	id 1jXquf-0007E7-1L
+	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 14:42:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <ad0e5a9b6abde52502aa40b30661d29aebe1590a@lizzy.crudebyte.com>)
- id 1jXqhi-0006Ah-3Z
- for qemu-devel@nongnu.org; Sun, 10 May 2020 14:29:34 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:44391)
+ (Exim 4.90_1) (envelope-from <vr_qemu@t-online.de>)
+ id 1jXqu6-0006c8-Bu
+ for qemu-devel@nongnu.org; Sun, 10 May 2020 14:42:22 -0400
+Received: from mailout01.t-online.de ([194.25.134.80]:46076)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <ad0e5a9b6abde52502aa40b30661d29aebe1590a@lizzy.crudebyte.com>)
- id 1jXqhh-0005RE-BT
- for qemu-devel@nongnu.org; Sun, 10 May 2020 14:29:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
- Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
- Content-Description; bh=vmF7NmnttbFuaHeIWeCyzKORtLSbSPMZue6Yg+i6MrE=; b=nPnzn
- th+MlUrV0bY0+I2y7fObjOQ/LThcRxE2ZOW1h1Aoy9PIgYXzNbBwt9lEL1YGhgZ4GhDVVme3yoTs/
- mEmdSz0p3eLR8I2mhggB3Z9U3nEoI8aH+CYETj2jxItnsTKKYKLArBlku1WTBFg68fSGIqQFDQwjB
- F5rM55E6JP5ihJ4oYg4YBsuLEo9NV/x6PTbaLnfC61zbCz5UXdqSj7qsi3K574Sjkp0mdIbm78JgK
- gU2OJHOP0bUGRNoJciNntwTvpI8uY1Uw9rA2wmnb0ZlNTZQ9IPCcW/BqsGKomfN43DynYScHDQFA8
- GReJ9YmstH0Wxe3XaiWoG5lMnMiHg==;
-Message-Id: <ad0e5a9b6abde52502aa40b30661d29aebe1590a.1589132512.git.qemu_oss@crudebyte.com>
-In-Reply-To: <cover.1589132512.git.qemu_oss@crudebyte.com>
-References: <cover.1589132512.git.qemu_oss@crudebyte.com>
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Sun, 10 May 2020 19:05:02 +0200
-Subject: [PATCH 1/2] xen-9pfs: Fix log messages of reply errors
-To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>, Stefano Stabellini <sstabellini@kernel.org>,
- Anthony Perard <anthony.perard@citrix.com>, Paul Durrant <paul@xen.org>
-Received-SPF: none client-ip=91.194.90.13;
- envelope-from=ad0e5a9b6abde52502aa40b30661d29aebe1590a@lizzy.crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/10 14:00:36
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <vr_qemu@t-online.de>)
+ id 1jXqu4-0004AS-Ms
+ for qemu-devel@nongnu.org; Sun, 10 May 2020 14:42:21 -0400
+Received: from fwd02.aul.t-online.de (fwd02.aul.t-online.de [172.20.26.148])
+ by mailout01.t-online.de (Postfix) with SMTP id 5212E428BDF0;
+ Sun, 10 May 2020 20:42:17 +0200 (CEST)
+Received: from [192.168.211.200]
+ (ZeiB4uZe8hrkks3Hg6s6E5FBRL6FDUTYQf4-n--aatT-D2L07Il8Bgqlrsk4i4yZ+I@[46.86.59.135])
+ by fwd02.t-online.de
+ with (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384 encrypted)
+ esmtp id 1jXqu1-13LabI0; Sun, 10 May 2020 20:42:17 +0200
+From: =?UTF-8?Q?Volker_R=c3=bcmelin?= <vr_qemu@t-online.de>
+Subject: Patches for ui/gtk and ui/sdl
+To: Gerd Hoffmann <kraxel@redhat.com>, Stefan Weil <sw@weilnetz.de>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Message-ID: <2393388c-86c3-4d7e-178e-2c7e6d14a8de@t-online.de>
+Date: Sun, 10 May 2020 20:42:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-ID: ZeiB4uZe8hrkks3Hg6s6E5FBRL6FDUTYQf4-n--aatT-D2L07Il8Bgqlrsk4i4yZ+I
+X-TOI-MSGID: fbb067ab-4ca7-476b-bced-a714040d8224
+Received-SPF: none client-ip=194.25.134.80; envelope-from=vr_qemu@t-online.de;
+ helo=mailout01.t-online.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/10 14:42:17
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,48 +74,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If delivery of some 9pfs response fails for some reason, log the
-error message by mentioning the 9P protocol reply type, not by
-client's request type. The latter could be misleading that the
-error occurred already when handling the request input.
+It's rather difficult to test qemu patches in guests on Windows with important keys missing. These patches mainly fix the guest keyboard on Windows.
 
-Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
----
- hw/9pfs/xen-9p-backend.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
-index 18fe5b7c92..f04caabfe5 100644
---- a/hw/9pfs/xen-9p-backend.c
-+++ b/hw/9pfs/xen-9p-backend.c
-@@ -137,7 +137,8 @@ static ssize_t xen_9pfs_pdu_vmarshal(V9fsPDU *pdu,
-     ret = v9fs_iov_vmarshal(in_sg, num, offset, 0, fmt, ap);
-     if (ret < 0) {
-         xen_pv_printf(&xen_9pfs->xendev, 0,
--                      "Failed to encode VirtFS request type %d\n", pdu->id + 1);
-+                      "Failed to encode VirtFS reply type %d\n",
-+                      pdu->id + 1);
-         xen_be_set_state(&xen_9pfs->xendev, XenbusStateClosing);
-         xen_9pfs_disconnect(&xen_9pfs->xendev);
-     }
-@@ -201,9 +202,9 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
- 
-     buf_size = iov_size(ring->sg, num);
-     if (buf_size  < P9_IOHDRSZ) {
--        xen_pv_printf(&xen_9pfs->xendev, 0, "Xen 9pfs request type %d"
--                "needs %zu bytes, buffer has %zu, less than minimum\n",
--                pdu->id, *size, buf_size);
-+        xen_pv_printf(&xen_9pfs->xendev, 0, "Xen 9pfs reply type %d needs "
-+                      "%zu bytes, buffer has %zu, less than minimum\n",
-+                      pdu->id + 1, *size, buf_size);
-         xen_be_set_state(&xen_9pfs->xendev, XenbusStateClosing);
-         xen_9pfs_disconnect(&xen_9pfs->xendev);
-     }
--- 
-2.20.1
+With best regards,
+Volker
 
 
