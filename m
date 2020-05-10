@@ -7,72 +7,71 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6DB3C38A2A
-	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 21:03:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F98FC54E8D
+	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 21:03:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84B25206F5
-	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 21:03:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 41A362080C
+	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 21:03:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bnUq7SQB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84B25206F5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nd0VSjkO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41A362080C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXt6b-00016k-KX
-	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 17:03:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60426)
+	id 1jXt6c-0001A2-A2
+	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 17:03:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60440)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jXt4r-00073R-59
- for qemu-devel@nongnu.org; Sun, 10 May 2020 17:01:37 -0400
-Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:45333)
+ id 1jXt4v-0007Bl-Ec
+ for qemu-devel@nongnu.org; Sun, 10 May 2020 17:01:42 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:44021)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jXt4q-00015R-C1
- for qemu-devel@nongnu.org; Sun, 10 May 2020 17:01:36 -0400
-Received: by mail-ej1-x642.google.com with SMTP id yc10so4296672ejb.12
- for <qemu-devel@nongnu.org>; Sun, 10 May 2020 14:01:36 -0700 (PDT)
+ id 1jXt4t-00015x-V0
+ for qemu-devel@nongnu.org; Sun, 10 May 2020 17:01:41 -0400
+Received: by mail-ed1-x544.google.com with SMTP id g9so1683301edw.10
+ for <qemu-devel@nongnu.org>; Sun, 10 May 2020 14:01:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=4xpV43cJtjJhTGNuwU3vJ0xowPTiH8xsSOamwFx2umU=;
- b=bnUq7SQBGH34mmIjPwfHTqyfQJgChk3LmtgX5yjF65dLb9TtSZTGYvvq7uE/hBrUNQ
- wTPW77ZkABLX2VaCFgv3JFTzERV/NT6hiR12lYYQCL/xkpwWSriKWVmrazuCNaCZToOn
- x7Ra7cfCSUBq26b1P3dMXxTs8NSGJL1pr6XPkUfHnjdN3gmUBOVOyYBMlFBbz10tckc1
- gLqK8X/CYtF296Or792cXLHmnzPTnhCE+M1KY/IuiOdiwwyIAsVoTHzQgsU70CdZ5h64
- bDauYsN4fNmZwc8fObJiKsdzRRapZ94uadf8B439AsWFRu/0bHvuOXe2zr5/MNJie04x
- Or6w==
+ bh=+ZxNxslkecYKX5bxxdVY39Xg+MqGP6GRs661eU+PrOc=;
+ b=nd0VSjkOzx4wZE4yfHeg48nPpmhdlQY+3MC+d7MMVNeqtSqE9+z9MkO62ibInFBuKk
+ +c95ytRjX5gJbsKNo+BkWXkaTjL+6vy84iYf8K5Bksg2B5V4RgjNCzSTs4CACmxkNEYR
+ iIEreaP4PS641abVl8l5LYkioe55raCklnXtZP7yfXexDkd3EnJovP8Qs9i8hu8pTD+Q
+ GJN0qTQucPS38AXwm2CSikwqC3IizEaqc7+ncZ9G8RaQ6HetbckytRT9OBNp0xzkT5w0
+ qjkBMfPG3r5BPL7QLdiXf16giWPPwWhiSmTkfbQ+8oAOwiv6cRPqpRfuXgxzToyUil6i
+ 2MMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=4xpV43cJtjJhTGNuwU3vJ0xowPTiH8xsSOamwFx2umU=;
- b=OOapKkevyfUjxQFnStpCfTtmm7/q6SumUGghw2Oea6xHdGeSzMNxHinI6C/38U9/LT
- HSh5k85rzUixoxENsqULIVJyjidNnfMxLQZ0tlD+4vSYBy5dkXq5aC+m8JOHJkCjcdDt
- kdbuOig9mIF9MN6XahLoKbnKvMprqymZROu2795TeWyC7gHGGgJlO+/3QnDN8TRth4sM
- i0wNzm+h/OCjs1WTHwBivIe74ZA9/bxpctVJscsm5rdytTUJVFVGec45+x9M4MHtBLPR
- EkUr96QEVO/ZrSTXM5jeIayMG9NMC8qfyq5mOG6bPlSykbA8A8H/vquF2T0rLllH6A2/
- wqzA==
-X-Gm-Message-State: AGi0PuYjN3GIgETDTVDQNhPp7AEkwQkz91FC9Lffm4ZJwsZa0wf2CIXb
- x3QsXkrBhRXBkH/wRzB5U7VW1z/SHC8=
-X-Google-Smtp-Source: APiQypL169Auu2EzRXblkbgLNKZEeT9/XxpJvoDVptfurJvOEQAO166ziZU+o+hapoT/jHfz7eJ2hg==
-X-Received: by 2002:a17:906:ca14:: with SMTP id
- jt20mr10164192ejb.233.1589144494588; 
- Sun, 10 May 2020 14:01:34 -0700 (PDT)
+ bh=+ZxNxslkecYKX5bxxdVY39Xg+MqGP6GRs661eU+PrOc=;
+ b=Bbt5shhzOo+VvHAk5x2fK0gosYC69nl2q57up+2js+3a4LyqsD/wkVhVBhnn5zCTX+
+ yzFKtaYgYLBecRU12DHjivoDw9w7dBWo3KwGBd59N1YlZL5mD8SH3GiSKiDYG0Qer9yN
+ B5BdrY3h6WurYaGkx+is603RejoHrEGynXm6S4oxFC1qvgl7ACztk4CA8y4r0udctZ4l
+ oys/xYBSjKU5T1I+ZNQu/BYhRrXmNooPPJHNt1LsOmZKfTZRNbioCQdouxj5Bu3DMHYe
+ PjMYQHGaewskfdhO1JK9tgZfswgcsIwyf5ylH8a/JSWyp9YUcexni3MoXPP4/3KIJKrT
+ tJzg==
+X-Gm-Message-State: AGi0Pua39few++SBtx0ccvmrRKzLPRM7n7ALbyw/FjW+2Gm8TZIIEBHk
+ VbzPF6X1DKz7fHmZlAMRjO8Bu5zv8fA=
+X-Google-Smtp-Source: APiQypKRqF9l2r5+e9JdH3s/YQq+YwyrzzCNfUrOxujBOvnWWx7bOmuw0cznetegtXdLkQvxuu068Q==
+X-Received: by 2002:a50:d0d7:: with SMTP id g23mr4850665edf.163.1589144498141; 
+ Sun, 10 May 2020 14:01:38 -0700 (PDT)
 Received: from localhost.localdomain (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id d15sm921152ejr.50.2020.05.10.14.01.32
+ by smtp.gmail.com with ESMTPSA id d15sm921152ejr.50.2020.05.10.14.01.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 10 May 2020 14:01:33 -0700 (PDT)
+ Sun, 10 May 2020 14:01:37 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 01/12] MAINTAINERS: Add Huacai Chen as fuloong2e co-maintainer
-Date: Sun, 10 May 2020 23:01:17 +0200
-Message-Id: <20200510210128.18343-2-f4bug@amsat.org>
+Subject: [PATCH 03/12] hw/mips/fuloong2e: Move code and update a comment
+Date: Sun, 10 May 2020 23:01:19 +0200
+Message-Id: <20200510210128.18343-4-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200510210128.18343-1-f4bug@amsat.org>
 References: <20200510210128.18343-1-f4bug@amsat.org>
@@ -80,8 +79,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::642;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x642.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -117,41 +116,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Huacai Chen <chenhc@lemote.com>
+Move the RAM-related call closer to the RAM creation block,
+rename the ROM comment.
 
-I submitted the MIPS/fuloong2e support about ten years ago, and
-after that I became a MIPS kernel developer. Last year, Philippe
-Mathieu- Daudé asked me that whether I can be a reviewer of
-MIPS/fuloong2e, and I promised that I will do some QEMU work in
-the next year (i.e., 2020 and later). I think now (and also in
-future) I can have some spare time, so I can finally do some real
-work on QEMU/MIPS. And if possible, I hope I can be a co-maintainer
-of MIPS/fuloong2e.
-
-Cc: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Signed-off-by: Huacai Chen <chenhc@lemote.com>
-Message-Id: <1586337380-25217-3-git-send-email-chenhc@lemote.com>
-[PMD: Added Jiaxun Yang as reviewer]
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- MAINTAINERS | 2 ++
- 1 file changed, 2 insertions(+)
+ hw/mips/mips_fulong2e.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1f84e3ae2c..aa5c54c75a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1075,8 +1075,10 @@ S: Obsolete
- F: hw/mips/mips_r4k.c
+diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+index f067fa9720..4e1a3646af 100644
+--- a/hw/mips/mips_fulong2e.c
++++ b/hw/mips/mips_fulong2e.c
+@@ -316,12 +316,11 @@ static void mips_fulong2e_init(MachineState *machine)
+         error_report("Invalid RAM size, should be 256MB");
+         exit(EXIT_FAILURE);
+     }
++    memory_region_add_subregion(address_space_mem, 0, machine->ram);
  
- Fulong 2E
-+M: Huacai Chen <chenhc@lemote.com>
- M: Philippe Mathieu-Daudé <f4bug@amsat.org>
- M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-+R: Jiaxun Yang <jiaxun.yang@flygoat.com>
- S: Odd Fixes
- F: hw/mips/mips_fulong2e.c
- F: hw/isa/vt82c686.c
+-    /* allocate RAM */
++    /* Boot ROM */
+     memory_region_init_rom(bios, NULL, "fulong2e.bios", BIOS_SIZE,
+                            &error_fatal);
+-
+-    memory_region_add_subregion(address_space_mem, 0, machine->ram);
+     memory_region_add_subregion(address_space_mem, 0x1fc00000LL, bios);
+ 
+     /*
 -- 
 2.21.3
 
