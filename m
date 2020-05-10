@@ -7,71 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E2DBC54E8A
-	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 15:30:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01111C38A2A
+	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 15:30:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFBB1208CA
-	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 15:30:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B83992080C
+	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 15:30:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="msAsWSOd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFBB1208CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MAQdvNsR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B83992080C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXntw-0007Zy-Us
-	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 11:30:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52522)
+	id 1jXnu8-00083J-Rt
+	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 11:30:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52548)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jXnsl-00068X-UW
- for qemu-devel@nongnu.org; Sun, 10 May 2020 11:28:47 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36499)
+ id 1jXnsw-0006Ok-6W
+ for qemu-devel@nongnu.org; Sun, 10 May 2020 11:28:58 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40245)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jXnsl-0000yV-5J
- for qemu-devel@nongnu.org; Sun, 10 May 2020 11:28:47 -0400
-Received: by mail-wr1-x442.google.com with SMTP id y16so552166wrs.3
- for <qemu-devel@nongnu.org>; Sun, 10 May 2020 08:28:46 -0700 (PDT)
+ id 1jXnsv-0000zU-GO
+ for qemu-devel@nongnu.org; Sun, 10 May 2020 11:28:57 -0400
+Received: by mail-wm1-x344.google.com with SMTP id u16so16046582wmc.5
+ for <qemu-devel@nongnu.org>; Sun, 10 May 2020 08:28:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=FTIVyDAEBMzFrxhPmJ8SqTBQ9LJJn+QNrQQoHkrH+DU=;
- b=msAsWSOdS3qpXwtqo0IYXM3g7YUfgKFsiIUQKUYL2NWy5aA3/NQSuBnOTcAlH9p33a
- UZSmuWWJerlcAIEcnDQW45V46Noe3XfBbpJwG0gYSVPsWP3gjGLX/zAsKrwNPf6s5OUC
- miLsWb9nqjX/ASTB6O2MtORqm907xacoV9LCVTAdB9ZLYfLpg4rKNRCFTJ9aDFuop0rx
- h//PB7STDUUx1KUbmi0eciZr9DcDQcMlKCOT+6wcFA4cFs4jH43n6qA8JlkbhJreiExo
- Nv/Il7+jf+f3AvzW48OyVzNmnK7JeUP3987SNoYatKR4H/iyrhOiZCIAywuYTfSuHp7s
- Q3jQ==
+ bh=QRalvaDaYvhVirD34yrdH3n7kI/+oLwzkO7pUTRzFo0=;
+ b=MAQdvNsRriClSajCP0qe7AQVAt/3didUQJvymUzotBN4+qrhr8u/jpf1+s9NQlENC8
+ pPZeWdjhm78cBMM8B5jWJavJnCnqN9ZXGGAR3f39aCi4Wfi1/PUDPjQbC8hgPOD+Vb7b
+ FMJNXCwjPVrIgZ/LWloV1lpJkhXui763JHhG0nqhKvkXzLGU3QK2lVD/Mjof0q9jm0VG
+ S6D7g3W1Hyk+8VxpArfo3m3RYWJc8u15+3Ud48GUugeWI0OxKacJ7P8S5excm/PiYMMo
+ mkOSuYohdolhFePY5M9I/Xt1O5J/YAkAeja5hOh9RV79NlRTzbLroZCjK5EInobmbj2M
+ +DIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=FTIVyDAEBMzFrxhPmJ8SqTBQ9LJJn+QNrQQoHkrH+DU=;
- b=L3HDSX2f3OTIj2XMsYSNAki37WBZTUxcKqP5CImApX0KQ9O3iBy5oEWU1NlAMsqM4u
- aQeTO3IUWj3G0CKv+vw1KFChGmQ24GchT4irF3FAQ0mimfvvYb4Dp64XDhyVft5xJg1C
- JwVojK+7mFIFStWo3QTMnGjYeYoM1a7W3kXzRzvZejBNCDlbC7UFUPRf3+f79LWtV/oF
- NX5culJA0/2oVQeP2gBCU0BAmFdwNi89x+MvutSQz7vS17giThG+4U0vnXyUa2eur3OS
- yB/ipIJ5NNJf+LJfyjYtoQPT0Ok3ZH78F2BKi7rFu/3L7xCD70J+INhMx5ZjcU8ZSu+v
- 1t7g==
-X-Gm-Message-State: AGi0PubAhcQmEWEKchdKDkoGjUHjE5yu04+2uSPTCOeKPd7+l2SHo8YQ
- h23iFeiO+nsYL7tWleSPOkwWCQgxc4c=
-X-Google-Smtp-Source: APiQypI678r+4XFWrK/Ku+Vu7xlEl2s034DWyKkhgo6vH7aCtp/LpNJiDsZREj0SgAkWekN2tsbkrg==
-X-Received: by 2002:a5d:5189:: with SMTP id k9mr13755787wrv.3.1589124525626;
- Sun, 10 May 2020 08:28:45 -0700 (PDT)
+ bh=QRalvaDaYvhVirD34yrdH3n7kI/+oLwzkO7pUTRzFo0=;
+ b=hvXFFvPnkzvaywXskd99FUhQwi4yJtPYl9P1JS//d0Cfr6MfT7aqnLVQStN++y6tly
+ HTYL+7HCW9Vd9KxmQiSoFXs1pInUUyjANLufUUPkI9sSoIIC9xMyHmO8A5yVoj4NC2vY
+ DZwwFyooTtkeZJbhwMkXvzupVAeoFrWlimxQx7eIlQp90XwgVzHUTZMGfY3sZZT+aJIX
+ 1Xgvs5Q6PiuUN31+lPblOshPcL8TA3hWSmDMCWFTI8ggxU/WwLH4AJPmSrNDxjmpeuaM
+ qMZ33DJiE8lBNcl+MgE/mlhIP85HHzS2YBcQsHjFyChxZdMDX0VVQe0ifYIWUETXuVXL
+ L07w==
+X-Gm-Message-State: AGi0PubgJuh4qmfq3kvlr6uxWnJsA2+gllGJ3BGIlQK5z2Ao+1vePosS
+ nYs9mCkXjCpPuMEIKwiOC0egOw33sMY=
+X-Google-Smtp-Source: APiQypI9oWUOlY5F/2OI2ZaOkNiVZrvbm/i7pqdRAJUjtAna876jqVb/i35c/xjhk9r3HMgQbASGtA==
+X-Received: by 2002:a05:600c:22d3:: with SMTP id
+ 19mr2499082wmg.161.1589124535953; 
+ Sun, 10 May 2020 08:28:55 -0700 (PDT)
 Received: from localhost.localdomain (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id a67sm24186702wmc.30.2020.05.10.08.28.44
+ by smtp.gmail.com with ESMTPSA id a67sm24186702wmc.30.2020.05.10.08.28.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 10 May 2020 08:28:45 -0700 (PDT)
+ Sun, 10 May 2020 08:28:55 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/7] hw/sparc/sun4m: Use UnimplementedDevice for I/O devices
-Date: Sun, 10 May 2020 17:28:34 +0200
-Message-Id: <20200510152840.13558-2-f4bug@amsat.org>
+Subject: [PATCH 7/7] hw/misc/empty_slot: Name the slots when created
+Date: Sun, 10 May 2020 17:28:40 +0200
+Message-Id: <20200510152840.13558-8-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200510152840.13558-1-f4bug@amsat.org>
 References: <20200510152840.13558-1-f4bug@amsat.org>
@@ -79,8 +80,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -115,57 +116,90 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These devices are not slots on a bus, but real I/O devices
-that we do not implement. As the ISDN ROM would be a ROMD
-device, also model it as UnimplementedDevice.
+Directly set the slot name when creating the device,
+to display the device name in trace events.
 
-Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sparc/sun4m.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ include/hw/misc/empty_slot.h |  2 +-
+ hw/mips/mips_malta.c         |  2 +-
+ hw/misc/empty_slot.c         |  2 +-
+ hw/sparc/sun4m.c             | 10 +++++++---
+ 4 files changed, 10 insertions(+), 6 deletions(-)
 
+diff --git a/include/hw/misc/empty_slot.h b/include/hw/misc/empty_slot.h
+index b023bc2d91..dec56e56ae 100644
+--- a/include/hw/misc/empty_slot.h
++++ b/include/hw/misc/empty_slot.h
+@@ -14,6 +14,6 @@
+ 
+ #include "exec/hwaddr.h"
+ 
+-void empty_slot_init(hwaddr addr, uint64_t slot_size);
++void empty_slot_init(const char *name, hwaddr addr, uint64_t slot_size);
+ 
+ #endif
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 30ed3c1538..c6e31a8fb2 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -1246,7 +1246,7 @@ void mips_malta_init(MachineState *machine)
+      * exception when accessing invalid memory. Create an empty slot to
+      * emulate this feature.
+      */
+-    empty_slot_init(0, 0x20000000);
++    empty_slot_init("GT64120", 0, 0x20000000);
+ 
+     qdev_init_nofail(dev);
+ 
+diff --git a/hw/misc/empty_slot.c b/hw/misc/empty_slot.c
+index 54be085189..b568ae202b 100644
+--- a/hw/misc/empty_slot.c
++++ b/hw/misc/empty_slot.c
+@@ -50,7 +50,7 @@ static const MemoryRegionOps empty_slot_ops = {
+     .endianness = DEVICE_NATIVE_ENDIAN,
+ };
+ 
+-void empty_slot_init(hwaddr addr, uint64_t slot_size)
++void empty_slot_init(const char *name, hwaddr addr, uint64_t slot_size)
+ {
+     if (slot_size > 0) {
+         /* Only empty slots larger than 0 byte need handling. */
 diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index 9838c5a183..f1494907b0 100644
+index 6030900124..3ef615fbbe 100644
 --- a/hw/sparc/sun4m.c
 +++ b/hw/sparc/sun4m.c
-@@ -47,6 +47,7 @@
- #include "hw/nvram/fw_cfg.h"
- #include "hw/char/escc.h"
- #include "hw/empty_slot.h"
-+#include "hw/misc/unimp.h"
- #include "hw/irq.h"
- #include "hw/loader.h"
- #include "elf.h"
-@@ -920,7 +921,7 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+@@ -836,7 +836,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+ 
+     /* models without ECC don't trap when missing ram is accessed */
+     if (!hwdef->ecc_base) {
+-        empty_slot_init(machine->ram_size, hwdef->max_mem - machine->ram_size);
++        empty_slot_init("ecc", machine->ram_size,
++                        hwdef->max_mem - machine->ram_size);
      }
  
-     if (hwdef->sx_base) {
--        empty_slot_init(hwdef->sx_base, 0x2000);
-+        create_unimplemented_device("SUNW,sx", hwdef->sx_base, 0x2000);
+     prom_init(hwdef->slavio_base, bios_name);
+@@ -867,7 +868,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+            Software shouldn't use aliased addresses, neither should it crash
+            when does. Using empty_slot instead of aliasing can help with
+            debugging such accesses */
+-        empty_slot_init(hwdef->iommu_pad_base,hwdef->iommu_pad_len);
++        empty_slot_init("iommu.alias",
++                        hwdef->iommu_pad_base, hwdef->iommu_pad_len);
      }
  
-     nvram = m48t59_init(slavio_irq[0], hwdef->nvram_base, 0, 0x2000, 1968, 8);
-@@ -983,14 +984,16 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
-     if (hwdef->dbri_base) {
-         /* ISDN chip with attached CS4215 audio codec */
-         /* prom space */
--        empty_slot_init(hwdef->dbri_base+0x1000, 0x30);
-+        create_unimplemented_device("SUNW,DBRI.prom",
-+                                    hwdef->dbri_base + 0x1000, 0x30);
-         /* reg space */
--        empty_slot_init(hwdef->dbri_base+0x10000, 0x100);
-+        create_unimplemented_device("SUNW,DBRI",
-+                                    hwdef->dbri_base + 0x10000, 0x100);
+     sparc32_dma_init(hwdef->dma_base,
+@@ -916,7 +918,9 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+     for (i = 0; i < MAX_VSIMMS; i++) {
+         /* vsimm registers probed by OBP */
+         if (hwdef->vsimm[i].reg_base) {
+-            empty_slot_init(hwdef->vsimm[i].reg_base, 0x2000);
++            char *name = g_strdup_printf("vsimm[%d]", i);
++            empty_slot_init(name, hwdef->vsimm[i].reg_base, 0x2000);
++            g_free(name);
+         }
      }
  
-     if (hwdef->bpp_base) {
-         /* parallel port */
--        empty_slot_init(hwdef->bpp_base, 0x20);
-+        create_unimplemented_device("SUNW,bpp", hwdef->bpp_base, 0x20);
-     }
- 
-     initrd_size = 0;
 -- 
 2.21.3
 
