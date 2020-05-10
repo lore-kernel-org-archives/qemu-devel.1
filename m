@@ -7,72 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0C6EC38A2A
-	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 21:07:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9FDDC38A2A
+	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 21:08:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A89F3206F5
-	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 21:07:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A3FB22080C
+	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 21:08:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R6blrxJL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A89F3206F5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BPgszTLe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3FB22080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXtAV-0008Cr-S5
-	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 17:07:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60452)
+	id 1jXtBO-0000hZ-Q9
+	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 17:08:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60456)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jXt4z-0007JW-S5
- for qemu-devel@nongnu.org; Sun, 10 May 2020 17:01:47 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:42067)
+ id 1jXt53-0007OG-Dd
+ for qemu-devel@nongnu.org; Sun, 10 May 2020 17:01:49 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:36224)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jXt4z-00016T-4V
- for qemu-devel@nongnu.org; Sun, 10 May 2020 17:01:45 -0400
-Received: by mail-ed1-x541.google.com with SMTP id s10so6189419edy.9
- for <qemu-devel@nongnu.org>; Sun, 10 May 2020 14:01:44 -0700 (PDT)
+ id 1jXt51-00016a-Cv
+ for qemu-devel@nongnu.org; Sun, 10 May 2020 17:01:48 -0400
+Received: by mail-ej1-x643.google.com with SMTP id z5so5392807ejb.3
+ for <qemu-devel@nongnu.org>; Sun, 10 May 2020 14:01:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=BXdTrm0G7e8AJaMl1cQX+rO0kJVj/ZnPckUe++HqUug=;
- b=R6blrxJLXjFopvNoqjcbWyGA0Tx2C5Ho57LJOBFAsi+UIoBntgsouUwP4NedlHP+41
- FSR1g4zzpWnWamBjfUrzJHvI7kMXm+QqVRmPR568ef4cTn8xPjjhDl0o8wOox3piyp4q
- txJnM4lkPNs9egQm/EeJj1qdfllhzkx0pfQRxJOt7cxjI3UdWA1KJDOXi2JaNftCDxOj
- uM4j3gF8sf5nxRoaLvV9Oo0noJBA/hlaO/D7Ihc6R9zAm9dKtpsWTElFtApC5+orKIvq
- dsPO7Wgi4jPxaVFtX2Zn6OcFp/4+B96Vz4Rx2DRPWpw2h95kIv59HJKAqZUW2eq8hG0A
- 0SYw==
+ bh=gEArLcdVFbJa5wuXqVtjUOCd7tloprZST1TLvA6aPgg=;
+ b=BPgszTLex8FCtSMffY6aAHz8T7k64zx3u6G1BEGSP3dYbD2FPuQ7t3OZZ+FkoeAe/V
+ FCy9zmDdrkHmmw4wfWmr58RmfCqSN96Pq7mA1O+aGALRmA4oJwCvl+M96N3ZsMKSUzT7
+ vviR01ddeiAEs4uzBmgVAulingKuuzTlgy1WaQOdCQJAtm4bqmM42vE/xQJPNSzJIpMR
+ ON+dJCoQR5cyPdIJeuTjpib7y51T9lTbQrzEdGFQAZeytNP/bkFEy4yO34K46JukBY2e
+ Z7zOEWDdLwUsg1/6lVsv7fDKeAW/+Yg/xaZde0RhjCV//PighnD0yIYsplXH0Nvb2Utj
+ /SEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=BXdTrm0G7e8AJaMl1cQX+rO0kJVj/ZnPckUe++HqUug=;
- b=LE3FNNEzRSPBR51cRPOAxvqjmtaazhlTOx4m7x8zW/k1QdECdKA/+4GSDM0+nNW2uX
- 6levq8PE/9TUxtTt2gnP3IhbDiHjWbXhGSYseq2Utq2dQf15T5FukXIWvEegciE2JcKB
- t14zGQLJfYW9LZxEj6pkkARGaSNATD06Dk3QpHKRHAxGgQvgwbzcm7O9a8jrCGDiw8ne
- AZtYkT+4AhpFo+U0vgNLp+wuS85hZTfzeM4V8lPV8cdcmRxNESy6I9pxNWNKXtRqG3Ty
- dAeNf974ObCMK/V2VQucwf7crp27TdUoIbLp9q6xIgTJusGU6F/HOILRPcTtrzcnLtBe
- glkQ==
-X-Gm-Message-State: AGi0PuafQL3wtkPi+ZtKBstJNvmbWZYQWMXUwWygJQTZHfEYOHlRzq9X
- TO+97BPsewdUj5/6lY60ujK1+nwZ2iA=
-X-Google-Smtp-Source: APiQypJd3X5j25RzbHX5+Dee748Upsxfeezlggd4uhxe70bm5KdIiYOjCNeBzNFcibw5/D/KWT5KXQ==
-X-Received: by 2002:a05:6402:1d1c:: with SMTP id
- dg28mr10856953edb.315.1589144503742; 
- Sun, 10 May 2020 14:01:43 -0700 (PDT)
+ bh=gEArLcdVFbJa5wuXqVtjUOCd7tloprZST1TLvA6aPgg=;
+ b=fjzuSYaSDT2st7FgJU9yIDWLWsTRfQvtu3qX7LxVfIMmqFvJ7osEVlhwHFRlBBq4hJ
+ bpoeFrzgIAygOJUqOIVWqmAi5HDh7M5FtPrzkx/Cg+gqI/BXVtOFeg+Wg7AaIvtF5hEb
+ pDgjbt5eJYfFtgeNVcfO+w/NbWfFpiXrDPSjxHiy6KJLYN1OC5vDlc0NAL2lh1I1RgYd
+ XhbCTFwLdqevWQ9VedwGIEFykofhBsSKH1r03jnsD0AFehdViR/qwsoO9Jsd1jqKDzNo
+ mua5EZGbkV09M0uUfJd/lLMjBhrSl024OOUtha4KWgmorMvFTiWp8FdJCSy8psJIexCh
+ wWFA==
+X-Gm-Message-State: AGi0Pub/aKai5SKyZpAVTT8teRYVcR//cn144cZ15oI6vjlD/pb+NcZT
+ xCjgl8PdgGEQCQagWYifHjyeGu78wao=
+X-Google-Smtp-Source: APiQypI8vAWsC49U84xRyk7hrGOMA3Ca9DpvjVKp5L0Ublw06S+z/eMkLROJOpJhfM9yYWSlXUNKPw==
+X-Received: by 2002:a17:906:3952:: with SMTP id
+ g18mr10982023eje.191.1589144505540; 
+ Sun, 10 May 2020 14:01:45 -0700 (PDT)
 Received: from localhost.localdomain (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id d15sm921152ejr.50.2020.05.10.14.01.41
+ by smtp.gmail.com with ESMTPSA id d15sm921152ejr.50.2020.05.10.14.01.43
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 10 May 2020 14:01:42 -0700 (PDT)
+ Sun, 10 May 2020 14:01:44 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 06/12] hw/pci-host/bonito: Fix DPRINTF() format strings
-Date: Sun, 10 May 2020 23:01:22 +0200
-Message-Id: <20200510210128.18343-7-f4bug@amsat.org>
+Subject: [PATCH 07/12] hw/pci-host/bonito: Map peripheral using physical
+ address
+Date: Sun, 10 May 2020 23:01:23 +0200
+Message-Id: <20200510210128.18343-8-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200510210128.18343-1-f4bug@amsat.org>
 References: <20200510210128.18343-1-f4bug@amsat.org>
@@ -80,8 +81,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::541;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x541.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::643;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -117,42 +118,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Peripherals are mapped at physical address on busses.
+Only CPU/IOMMU can use virtual addresses.
+
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/pci-host/bonito.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ hw/pci-host/bonito.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
-index b9bfe3c417..10ead31e4f 100644
+index 10ead31e4f..7ed462ffb5 100644
 --- a/hw/pci-host/bonito.c
 +++ b/hw/pci-host/bonito.c
-@@ -239,7 +239,7 @@ static void bonito_writel(void *opaque, hwaddr addr,
+@@ -647,12 +647,12 @@ static void bonito_realize(PCIDevice *dev, Error **errp)
+     memory_region_init_io(&s->iomem_ldma, OBJECT(s), &bonito_ldma_ops, s,
+                           "ldma", 0x100);
+     sysbus_init_mmio(sysbus, &s->iomem_ldma);
+-    sysbus_mmio_map(sysbus, 3, 0xbfe00200);
++    sysbus_mmio_map(sysbus, 3, 0x1fe00200);
  
-     saddr = addr >> 2;
+     memory_region_init_io(&s->iomem_cop, OBJECT(s), &bonito_cop_ops, s,
+                           "cop", 0x100);
+     sysbus_init_mmio(sysbus, &s->iomem_cop);
+-    sysbus_mmio_map(sysbus, 4, 0xbfe00300);
++    sysbus_mmio_map(sysbus, 4, 0x1fe00300);
  
--    DPRINTF("bonito_writel "TARGET_FMT_plx" val %x saddr %x\n",
-+    DPRINTF("bonito_writel "TARGET_FMT_plx" val %lx saddr %x\n",
-             addr, val, saddr);
-     switch (saddr) {
-     case BONITO_BONPONCFG:
-@@ -327,7 +327,7 @@ static void bonito_pciconf_writel(void *opaque, hwaddr addr,
-     PCIBonitoState *s = opaque;
-     PCIDevice *d = PCI_DEVICE(s);
- 
--    DPRINTF("bonito_pciconf_writel "TARGET_FMT_plx" val %x\n", addr, val);
-+    DPRINTF("bonito_pciconf_writel "TARGET_FMT_plx" val %lx\n", addr, val);
-     d->config_write(d, addr, val, 4);
- }
- 
-@@ -474,7 +474,7 @@ static void bonito_spciconf_write(void *opaque, hwaddr addr, uint64_t val,
-     uint32_t pciaddr;
-     uint16_t status;
- 
--    DPRINTF("bonito_spciconf_write "TARGET_FMT_plx" size %d val %x\n",
-+    DPRINTF("bonito_spciconf_write "TARGET_FMT_plx" size %d val %lx\n",
-             addr, size, val);
- 
-     pciaddr = bonito_sbridge_pciaddr(s, addr);
+     /* Map PCI IO Space  0x1fd0 0000 - 0x1fd1 0000 */
+     memory_region_init_alias(&s->bonito_pciio, OBJECT(s), "isa_mmio",
 -- 
 2.21.3
 
