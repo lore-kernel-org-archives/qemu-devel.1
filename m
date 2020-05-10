@@ -6,63 +6,62 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ECEEC38A2A
-	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 13:47:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1950C38A2A
+	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 13:47:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEA0E20708
-	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 13:47:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8AD2D20708
+	for <qemu-devel@archiver.kernel.org>; Sun, 10 May 2020 13:47:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UlpKroFQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEA0E20708
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hnPp3IPv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AD2D20708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXmIj-0005KQ-Ve
-	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 09:47:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40848)
+	id 1jXmJB-00061m-Mh
+	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 09:47:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40860)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jXmCf-0003R6-RL
- for qemu-devel@nongnu.org; Sun, 10 May 2020 09:41:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31023
+ id 1jXmCg-0003S5-WB
+ for qemu-devel@nongnu.org; Sun, 10 May 2020 09:41:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43148
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jXmCZ-0003tw-M7
- for qemu-devel@nongnu.org; Sun, 10 May 2020 09:41:12 -0400
+ id 1jXmCf-0003uZ-HK
+ for qemu-devel@nongnu.org; Sun, 10 May 2020 09:41:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589118066;
+ s=mimecast20190719; t=1589118072;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pr8LU0RT/840DgfWRqnnFDQv0hMTp68mLq+WSMd9iWU=;
- b=UlpKroFQio5iHekNqBs/q3bwu8XBy3ulKZ65xaKiQZvGx7wey/RGZL3QpqBIxxpLHGmQIO
- v1eruyR3yf2HSmU3MrH4lzic7ypKgMLL4i0Rm9jzB3RBTQWjRzQ8yqXrHO+6um18U0aE1v
- W9djigWsL3AqQS3DCJi//kqioPG/+5w=
+ bh=WtcqoeQnc4lIUOckIdvVUOg78hvaSIGMyGT0PrwZSDQ=;
+ b=hnPp3IPvLJNuaZmGAUyZKSfG/A0HT3wMlq5WH2aL/+mhzx9xYzoCJ4+jBljD/v9OzxJDVW
+ ttVt926mMXAqGfCgXbedIqztdmpa31kqBlrwJCU9iIUO6dHvnFLlWfl2o0zmi5zrVSGgu5
+ aq7U30rjtuTWWqVlh/LEiBKuDWG0xRs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-468-eD2twSdCN0CaQshBQNTYIw-1; Sun, 10 May 2020 09:41:04 -0400
-X-MC-Unique: eD2twSdCN0CaQshBQNTYIw-1
+ us-mta-444-EHHsdc6sPJWsa6mr6QVlSQ-1; Sun, 10 May 2020 09:41:07 -0400
+X-MC-Unique: EHHsdc6sPJWsa6mr6QVlSQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F03A7835B40;
- Sun, 10 May 2020 13:41:03 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5977835B40;
+ Sun, 10 May 2020 13:41:06 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.153])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 94F5E2E17D;
- Sun, 10 May 2020 13:41:01 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5CB122E17D;
+ Sun, 10 May 2020 13:41:04 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 08/14] block/qcow2: extend qemu-img amend interface with
- crypto options
-Date: Sun, 10 May 2020 16:40:31 +0300
-Message-Id: <20200510134037.18487-9-mlevitsk@redhat.com>
+Subject: [PATCH v6 09/14] iotests: filter few more luks specific create options
+Date: Sun, 10 May 2020 16:40:32 +0300
+Message-Id: <20200510134037.18487-10-mlevitsk@redhat.com>
 In-Reply-To: <20200510134037.18487-1-mlevitsk@redhat.com>
 References: <20200510134037.18487-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -103,263 +102,339 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that we have all the infrastructure in place,
-wire it in the qcow2 driver and expose this to the user.
+This allows more tests to be able to have same output on both qcow2 luks encrypted images
+and raw luks images
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- block/qcow2.c              | 72 +++++++++++++++++++++++++++++++++-----
- tests/qemu-iotests/082.out | 45 ++++++++++++++++++++++++
- 2 files changed, 108 insertions(+), 9 deletions(-)
+ tests/qemu-iotests/087.out       |  6 ++---
+ tests/qemu-iotests/134.out       |  2 +-
+ tests/qemu-iotests/158.out       |  4 +--
+ tests/qemu-iotests/188.out       |  2 +-
+ tests/qemu-iotests/189.out       |  4 +--
+ tests/qemu-iotests/198.out       |  4 +--
+ tests/qemu-iotests/263.out       |  4 +--
+ tests/qemu-iotests/274.out       | 46 ++++++++++++++++----------------
+ tests/qemu-iotests/284.out       |  6 ++---
+ tests/qemu-iotests/common.filter |  6 +++--
+ 10 files changed, 43 insertions(+), 41 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index db86500839..4bb6e3fc8f 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -176,6 +176,19 @@ static ssize_t qcow2_crypto_hdr_write_func(QCryptoBlock *block, size_t offset,
-     return ret;
+diff --git a/tests/qemu-iotests/087.out b/tests/qemu-iotests/087.out
+index f23bffbbf1..d5ff53302e 100644
+--- a/tests/qemu-iotests/087.out
++++ b/tests/qemu-iotests/087.out
+@@ -34,7 +34,7 @@ QMP_VERSION
+ 
+ === Encrypted image QCow ===
+ 
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encryption=on encrypt.key-secret=sec0 size=134217728
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encryption=on size=134217728
+ Testing:
+ QMP_VERSION
+ {"return": {}}
+@@ -46,7 +46,7 @@ QMP_VERSION
+ 
+ === Encrypted image LUKS ===
+ 
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encrypt.format=luks encrypt.key-secret=sec0 size=134217728
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
+ Testing:
+ QMP_VERSION
+ {"return": {}}
+@@ -58,7 +58,7 @@ QMP_VERSION
+ 
+ === Missing driver ===
+ 
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encryption=on encrypt.key-secret=sec0 size=134217728
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encryption=on size=134217728
+ Testing: -S
+ QMP_VERSION
+ {"return": {}}
+diff --git a/tests/qemu-iotests/134.out b/tests/qemu-iotests/134.out
+index f2878f5f3a..e4733c0b81 100644
+--- a/tests/qemu-iotests/134.out
++++ b/tests/qemu-iotests/134.out
+@@ -1,5 +1,5 @@
+ QA output created by 134
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encryption=on encrypt.key-secret=sec0 size=134217728
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encryption=on size=134217728
+ 
+ == reading whole image ==
+ read 134217728/134217728 bytes at offset 0
+diff --git a/tests/qemu-iotests/158.out b/tests/qemu-iotests/158.out
+index fa2294bb85..52ea9a488f 100644
+--- a/tests/qemu-iotests/158.out
++++ b/tests/qemu-iotests/158.out
+@@ -1,6 +1,6 @@
+ QA output created by 158
+ == create base ==
+-Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT encryption=on encrypt.key-secret=sec0 size=134217728
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT encryption=on size=134217728
+ 
+ == writing whole image ==
+ wrote 134217728/134217728 bytes at offset 0
+@@ -10,7 +10,7 @@ wrote 134217728/134217728 bytes at offset 0
+ read 134217728/134217728 bytes at offset 0
+ 128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ == create overlay ==
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encryption=on encrypt.key-secret=sec0 size=134217728 backing_file=TEST_DIR/t.IMGFMT.base
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encryption=on size=134217728 backing_file=TEST_DIR/t.IMGFMT.base
+ 
+ == writing part of a cluster ==
+ wrote 1024/1024 bytes at offset 0
+diff --git a/tests/qemu-iotests/188.out b/tests/qemu-iotests/188.out
+index 4b9aadd51c..5426861b18 100644
+--- a/tests/qemu-iotests/188.out
++++ b/tests/qemu-iotests/188.out
+@@ -1,5 +1,5 @@
+ QA output created by 188
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10 size=16777216
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216
+ 
+ == reading whole image ==
+ read 16777216/16777216 bytes at offset 0
+diff --git a/tests/qemu-iotests/189.out b/tests/qemu-iotests/189.out
+index e536d95d53..bc213cbe14 100644
+--- a/tests/qemu-iotests/189.out
++++ b/tests/qemu-iotests/189.out
+@@ -1,6 +1,6 @@
+ QA output created by 189
+ == create base ==
+-Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10 size=16777216
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=16777216
+ 
+ == writing whole image ==
+ wrote 16777216/16777216 bytes at offset 0
+@@ -10,7 +10,7 @@ wrote 16777216/16777216 bytes at offset 0
+ read 16777216/16777216 bytes at offset 0
+ 16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ == create overlay ==
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encrypt.format=luks encrypt.key-secret=sec1 encrypt.iter-time=10 size=16777216 backing_file=TEST_DIR/t.IMGFMT.base
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 backing_file=TEST_DIR/t.IMGFMT.base
+ 
+ == writing part of a cluster ==
+ wrote 1024/1024 bytes at offset 0
+diff --git a/tests/qemu-iotests/198.out b/tests/qemu-iotests/198.out
+index b0f2d417af..acfdf96b0c 100644
+--- a/tests/qemu-iotests/198.out
++++ b/tests/qemu-iotests/198.out
+@@ -1,12 +1,12 @@
+ QA output created by 198
+ == create base ==
+-Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10 size=16777216
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=16777216
+ 
+ == writing whole image base ==
+ wrote 16777216/16777216 bytes at offset 0
+ 16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ == create overlay ==
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encrypt.format=luks encrypt.key-secret=sec1 encrypt.iter-time=10 size=16777216 backing_file=TEST_DIR/t.IMGFMT.base
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=16777216 backing_file=TEST_DIR/t.IMGFMT.base
+ 
+ == writing whole image layer ==
+ wrote 16777216/16777216 bytes at offset 0
+diff --git a/tests/qemu-iotests/263.out b/tests/qemu-iotests/263.out
+index 4cf5c79ed8..54bfbeeff8 100644
+--- a/tests/qemu-iotests/263.out
++++ b/tests/qemu-iotests/263.out
+@@ -2,7 +2,7 @@ QA output created by 263
+ 
+ testing LUKS qcow2 encryption
+ 
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10 size=1048576
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
+ == reading the whole image ==
+ read 1048576/1048576 bytes at offset 0
+ 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -21,7 +21,7 @@ read 982528/982528 bytes at offset 66048
+ 
+ testing legacy AES qcow2 encryption
+ 
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT encrypt.format=aes encrypt.key-secret=sec0 size=1048576
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
+ == reading the whole image ==
+ read 1048576/1048576 bytes at offset 0
+ 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+diff --git a/tests/qemu-iotests/274.out b/tests/qemu-iotests/274.out
+index 9d6fdeb1f7..59de176b99 100644
+--- a/tests/qemu-iotests/274.out
++++ b/tests/qemu-iotests/274.out
+@@ -1,9 +1,9 @@
+ == Commit tests ==
+-Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=2097152 cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-base', fmt=qcow2 cluster_size=65536 size=2097152 lazy_refcounts=off refcount_bits=16
+ 
+-Formatting 'TEST_DIR/PID-mid', fmt=qcow2 size=1048576 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-mid', fmt=qcow2 cluster_size=65536 size=1048576 backing_file=TEST_DIR/PID-base lazy_refcounts=off refcount_bits=16
+ 
+-Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=2097152 backing_file=TEST_DIR/PID-mid cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-top', fmt=qcow2 cluster_size=65536 size=2097152 backing_file=TEST_DIR/PID-mid lazy_refcounts=off refcount_bits=16
+ 
+ wrote 2097152/2097152 bytes at offset 0
+ 2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -63,11 +63,11 @@ read 1048576/1048576 bytes at offset 1048576
+ 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ === Testing HMP commit (top -> mid) ===
+-Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=2097152 cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-base', fmt=qcow2 cluster_size=65536 size=2097152 lazy_refcounts=off refcount_bits=16
+ 
+-Formatting 'TEST_DIR/PID-mid', fmt=qcow2 size=1048576 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-mid', fmt=qcow2 cluster_size=65536 size=1048576 backing_file=TEST_DIR/PID-base lazy_refcounts=off refcount_bits=16
+ 
+-Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=2097152 backing_file=TEST_DIR/PID-mid cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-top', fmt=qcow2 cluster_size=65536 size=2097152 backing_file=TEST_DIR/PID-mid lazy_refcounts=off refcount_bits=16
+ 
+ wrote 2097152/2097152 bytes at offset 0
+ 2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -92,11 +92,11 @@ read 1048576/1048576 bytes at offset 1048576
+ 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 
+ === Testing QMP active commit (top -> mid) ===
+-Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=2097152 cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-base', fmt=qcow2 cluster_size=65536 size=2097152 lazy_refcounts=off refcount_bits=16
+ 
+-Formatting 'TEST_DIR/PID-mid', fmt=qcow2 size=1048576 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-mid', fmt=qcow2 cluster_size=65536 size=1048576 backing_file=TEST_DIR/PID-base lazy_refcounts=off refcount_bits=16
+ 
+-Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=2097152 backing_file=TEST_DIR/PID-mid cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-top', fmt=qcow2 cluster_size=65536 size=2097152 backing_file=TEST_DIR/PID-mid lazy_refcounts=off refcount_bits=16
+ 
+ wrote 2097152/2097152 bytes at offset 0
+ 2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -128,9 +128,9 @@ read 1048576/1048576 bytes at offset 1048576
+ 
+ == Resize tests ==
+ === preallocation=off ===
+-Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=6442450944 cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-base', fmt=qcow2 cluster_size=65536 size=6442450944 lazy_refcounts=off refcount_bits=16
+ 
+-Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=1073741824 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-top', fmt=qcow2 cluster_size=65536 size=1073741824 backing_file=TEST_DIR/PID-base lazy_refcounts=off refcount_bits=16
+ 
+ wrote 65536/65536 bytes at offset 5368709120
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -147,9 +147,9 @@ read 65536/65536 bytes at offset 5368709120
+ { "start": 1073741824, "length": 7516192768, "depth": 0, "zero": true, "data": false}]
+ 
+ === preallocation=metadata ===
+-Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=34359738368 cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-base', fmt=qcow2 cluster_size=65536 size=34359738368 lazy_refcounts=off refcount_bits=16
+ 
+-Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=32212254720 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-top', fmt=qcow2 cluster_size=65536 size=32212254720 backing_file=TEST_DIR/PID-base lazy_refcounts=off refcount_bits=16
+ 
+ wrote 65536/65536 bytes at offset 33285996544
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -171,9 +171,9 @@ read 65536/65536 bytes at offset 33285996544
+ { "start": 34896609280, "length": 536870912, "depth": 0, "zero": true, "data": false, "offset": 2685075456}]
+ 
+ === preallocation=falloc ===
+-Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=10485760 cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-base', fmt=qcow2 cluster_size=65536 size=10485760 lazy_refcounts=off refcount_bits=16
+ 
+-Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=5242880 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-top', fmt=qcow2 cluster_size=65536 size=5242880 backing_file=TEST_DIR/PID-base lazy_refcounts=off refcount_bits=16
+ 
+ wrote 65536/65536 bytes at offset 9437184
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -190,9 +190,9 @@ read 65536/65536 bytes at offset 9437184
+ { "start": 5242880, "length": 10485760, "depth": 0, "zero": false, "data": true, "offset": 327680}]
+ 
+ === preallocation=full ===
+-Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=16777216 cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-base', fmt=qcow2 cluster_size=65536 size=16777216 lazy_refcounts=off refcount_bits=16
+ 
+-Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=8388608 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-top', fmt=qcow2 cluster_size=65536 size=8388608 backing_file=TEST_DIR/PID-base lazy_refcounts=off refcount_bits=16
+ 
+ wrote 65536/65536 bytes at offset 11534336
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -209,9 +209,9 @@ read 65536/65536 bytes at offset 11534336
+ { "start": 8388608, "length": 4194304, "depth": 0, "zero": false, "data": true, "offset": 327680}]
+ 
+ === preallocation=off ===
+-Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=393216 cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-base', fmt=qcow2 cluster_size=65536 size=393216 lazy_refcounts=off refcount_bits=16
+ 
+-Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=259072 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-top', fmt=qcow2 cluster_size=65536 size=259072 backing_file=TEST_DIR/PID-base lazy_refcounts=off refcount_bits=16
+ 
+ wrote 65536/65536 bytes at offset 259072
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -229,9 +229,9 @@ read 65536/65536 bytes at offset 259072
+ { "start": 262144, "length": 262144, "depth": 0, "zero": true, "data": false}]
+ 
+ === preallocation=off ===
+-Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=409600 cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-base', fmt=qcow2 cluster_size=65536 size=409600 lazy_refcounts=off refcount_bits=16
+ 
+-Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=262144 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-top', fmt=qcow2 cluster_size=65536 size=262144 backing_file=TEST_DIR/PID-base lazy_refcounts=off refcount_bits=16
+ 
+ wrote 65536/65536 bytes at offset 344064
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+@@ -248,9 +248,9 @@ read 65536/65536 bytes at offset 344064
+ { "start": 262144, "length": 262144, "depth": 0, "zero": true, "data": false}]
+ 
+ === preallocation=off ===
+-Formatting 'TEST_DIR/PID-base', fmt=qcow2 size=524288 cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-base', fmt=qcow2 cluster_size=65536 size=524288 lazy_refcounts=off refcount_bits=16
+ 
+-Formatting 'TEST_DIR/PID-top', fmt=qcow2 size=262144 backing_file=TEST_DIR/PID-base cluster_size=65536 lazy_refcounts=off refcount_bits=16
++Formatting 'TEST_DIR/PID-top', fmt=qcow2 cluster_size=65536 size=262144 backing_file=TEST_DIR/PID-base lazy_refcounts=off refcount_bits=16
+ 
+ wrote 65536/65536 bytes at offset 446464
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+diff --git a/tests/qemu-iotests/284.out b/tests/qemu-iotests/284.out
+index 48216f5742..a929239302 100644
+--- a/tests/qemu-iotests/284.out
++++ b/tests/qemu-iotests/284.out
+@@ -2,7 +2,7 @@ QA output created by 284
+ 
+ testing LUKS qcow2 encryption
+ 
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
+ 
+ == cluster size 512
+ == checking image refcounts ==
+@@ -21,7 +21,7 @@ wrote 1/1 bytes at offset 512
+ 
+ == rechecking image refcounts ==
+ No errors were found on the image.
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
+ 
+ == cluster size 2048
+ == checking image refcounts ==
+@@ -40,7 +40,7 @@ wrote 1/1 bytes at offset 2048
+ 
+ == rechecking image refcounts ==
+ No errors were found on the image.
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 encrypt.format=luks encrypt.key-secret=sec0 encrypt.iter-time=10
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
+ 
+ == cluster size 32768
+ == checking image refcounts ==
+diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
+index 3f8ee3e5f7..bcc4495d52 100644
+--- a/tests/qemu-iotests/common.filter
++++ b/tests/qemu-iotests/common.filter
+@@ -150,8 +150,10 @@ _filter_img_create()
+         -e "s# block_state_zero=\\(on\\|off\\)##g" \
+         -e "s# log_size=[0-9]\\+##g" \
+         -e "s# refcount_bits=[0-9]\\+##g" \
+-        -e "s# key-secret=[a-zA-Z0-9]\\+##g" \
+-        -e "s# iter-time=[0-9]\\+##g" \
++        -e "s# \\(encrypt\\.\\)\\?key-secret=[a-zA-Z0-9]\\+##g" \
++        -e "s# \\(encrypt\\.\\)\\?slot=[0-9]\\+##g" \
++        -e "s# \\(encrypt\\.\\)\\?iter-time=[0-9]\\+##g" \
++        -e "s# encrypt\\.format=[a-zA-Z0-9]\\+##g" \
+         -e "s# force_size=\\(on\\|off\\)##g"
  }
  
-+static QDict*
-+qcow2_extract_crypto_opts(QemuOpts *opts, const char *fmt, Error **errp)
-+{
-+    QDict *cryptoopts_qdict;
-+    QDict *opts_qdict;
-+
-+    /* Extract "encrypt." options into a qdict */
-+    opts_qdict = qemu_opts_to_qdict(opts, NULL);
-+    qdict_extract_subqdict(opts_qdict, &cryptoopts_qdict, "encrypt.");
-+    qobject_unref(opts_qdict);
-+    qdict_put_str(cryptoopts_qdict, "format", fmt);
-+    return cryptoopts_qdict;
-+}
- 
- /*
-  * read qcow2 extension and fill bs
-@@ -4744,17 +4757,11 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
-     g_free(optstr);
- 
-     if (has_luks) {
-+
-         g_autoptr(QCryptoBlockCreateOptions) create_opts = NULL;
--        QDict *opts_qdict;
--        QDict *cryptoopts;
-+        QDict *cryptoopts = qcow2_extract_crypto_opts(opts, "luks", errp);
-         size_t headerlen;
- 
--        opts_qdict = qemu_opts_to_qdict(opts, NULL);
--        qdict_extract_subqdict(opts_qdict, &cryptoopts, "encrypt.");
--        qobject_unref(opts_qdict);
--
--        qdict_put_str(cryptoopts, "format", "luks");
--
-         create_opts = block_crypto_create_opts_init(cryptoopts, errp);
-         qobject_unref(cryptoopts);
-         if (!create_opts) {
-@@ -5149,6 +5156,7 @@ typedef enum Qcow2AmendOperation {
-     QCOW2_NO_OPERATION = 0,
- 
-     QCOW2_UPGRADING,
-+    QCOW2_UPDATING_ENCRYPTION,
-     QCOW2_CHANGING_REFCOUNT_ORDER,
-     QCOW2_DOWNGRADING,
- } Qcow2AmendOperation;
-@@ -5230,6 +5238,7 @@ static int qcow2_amend_options(BlockDriverState *bs, QemuOpts *opts,
-     int ret;
-     QemuOptDesc *desc = opts->list->desc;
-     Qcow2AmendHelperCBInfo helper_cb_info;
-+    bool encryption_update = false;
- 
-     while (desc && desc->name) {
-         if (!qemu_opt_find(opts, desc->name)) {
-@@ -5256,6 +5265,18 @@ static int qcow2_amend_options(BlockDriverState *bs, QemuOpts *opts,
-             backing_file = qemu_opt_get(opts, BLOCK_OPT_BACKING_FILE);
-         } else if (!strcmp(desc->name, BLOCK_OPT_BACKING_FMT)) {
-             backing_format = qemu_opt_get(opts, BLOCK_OPT_BACKING_FMT);
-+        } else if (g_str_has_prefix(desc->name, "encrypt.")) {
-+            if (!s->crypto) {
-+                error_setg(errp,
-+                           "Can't amend encryption options - encryption not present");
-+                return -EINVAL;
-+            }
-+            if (s->crypt_method_header != QCOW_CRYPT_LUKS) {
-+                error_setg(errp,
-+                           "Only LUKS encryption options can be amended");
-+                return -ENOTSUP;
-+            }
-+            encryption_update = true;
-         } else if (!strcmp(desc->name, BLOCK_OPT_LAZY_REFCOUNTS)) {
-             lazy_refcounts = qemu_opt_get_bool(opts, BLOCK_OPT_LAZY_REFCOUNTS,
-                                                lazy_refcounts);
-@@ -5298,7 +5319,8 @@ static int qcow2_amend_options(BlockDriverState *bs, QemuOpts *opts,
-         .original_status_cb = status_cb,
-         .original_cb_opaque = cb_opaque,
-         .total_operations = (new_version != old_version)
--                          + (s->refcount_bits != refcount_bits)
-+                          + (s->refcount_bits != refcount_bits) +
-+                            (encryption_update == true)
-     };
- 
-     /* Upgrade first (some features may require compat=1.1) */
-@@ -5311,6 +5333,33 @@ static int qcow2_amend_options(BlockDriverState *bs, QemuOpts *opts,
-         }
-     }
- 
-+    if (encryption_update) {
-+        QDict *amend_opts_dict;
-+        QCryptoBlockAmendOptions *amend_opts;
-+
-+        helper_cb_info.current_operation = QCOW2_UPDATING_ENCRYPTION;
-+        amend_opts_dict = qcow2_extract_crypto_opts(opts, "luks", errp);
-+        if (!amend_opts_dict) {
-+            return -EINVAL;
-+        }
-+        amend_opts = block_crypto_amend_opts_init(amend_opts_dict, errp);
-+        qobject_unref(amend_opts_dict);
-+        if (!amend_opts) {
-+            return -EINVAL;
-+        }
-+        ret = qcrypto_block_amend_options(s->crypto,
-+                                          qcow2_crypto_hdr_read_func,
-+                                          qcow2_crypto_hdr_write_func,
-+                                          bs,
-+                                          amend_opts,
-+                                          force,
-+                                          errp);
-+        qapi_free_QCryptoBlockAmendOptions(amend_opts);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+    }
-+
-     if (s->refcount_bits != refcount_bits) {
-         int refcount_order = ctz32(refcount_bits);
- 
-@@ -5563,6 +5612,11 @@ static QemuOptsList qcow2_amend_opts = {
-     .name = "qcow2-amend-opts",
-     .head = QTAILQ_HEAD_INITIALIZER(qcow2_amend_opts.head),
-     .desc = {
-+        BLOCK_CRYPTO_OPT_DEF_LUKS_STATE("encrypt."),
-+        BLOCK_CRYPTO_OPT_DEF_LUKS_KEYSLOT("encrypt."),
-+        BLOCK_CRYPTO_OPT_DEF_LUKS_OLD_SECRET("encrypt."),
-+        BLOCK_CRYPTO_OPT_DEF_LUKS_NEW_SECRET("encrypt."),
-+        BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME("encrypt."),
-         QCOW_COMMON_OPTIONS,
-         { /* end of list */ }
-     }
-diff --git a/tests/qemu-iotests/082.out b/tests/qemu-iotests/082.out
-index c68458da8c..6558f38ba8 100644
---- a/tests/qemu-iotests/082.out
-+++ b/tests/qemu-iotests/082.out
-@@ -620,6 +620,11 @@ Amend options for 'qcow2':
-   compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=<str>        - File name of an external data file
-   data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
-+  encrypt.iter-time=<num> - Time to spend in PBKDF in milliseconds
-+  encrypt.keyslot=<num>  - Select a single keyslot to modify explicitly
-+  encrypt.new-secret=<str> - New secret to set in the matching keyslots. Empty string to erase
-+  encrypt.old-secret=<str> - Select all keyslots that match this password
-+  encrypt.state=<str>    - Select new state of affected keyslots (active/inactive)
-   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
-   refcount_bits=<num>    - Width of a reference count entry in bits
-   size=<size>            - Virtual disk size
-@@ -631,6 +636,11 @@ Amend options for 'qcow2':
-   compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=<str>        - File name of an external data file
-   data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
-+  encrypt.iter-time=<num> - Time to spend in PBKDF in milliseconds
-+  encrypt.keyslot=<num>  - Select a single keyslot to modify explicitly
-+  encrypt.new-secret=<str> - New secret to set in the matching keyslots. Empty string to erase
-+  encrypt.old-secret=<str> - Select all keyslots that match this password
-+  encrypt.state=<str>    - Select new state of affected keyslots (active/inactive)
-   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
-   refcount_bits=<num>    - Width of a reference count entry in bits
-   size=<size>            - Virtual disk size
-@@ -642,6 +652,11 @@ Amend options for 'qcow2':
-   compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=<str>        - File name of an external data file
-   data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
-+  encrypt.iter-time=<num> - Time to spend in PBKDF in milliseconds
-+  encrypt.keyslot=<num>  - Select a single keyslot to modify explicitly
-+  encrypt.new-secret=<str> - New secret to set in the matching keyslots. Empty string to erase
-+  encrypt.old-secret=<str> - Select all keyslots that match this password
-+  encrypt.state=<str>    - Select new state of affected keyslots (active/inactive)
-   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
-   refcount_bits=<num>    - Width of a reference count entry in bits
-   size=<size>            - Virtual disk size
-@@ -653,6 +668,11 @@ Amend options for 'qcow2':
-   compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=<str>        - File name of an external data file
-   data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
-+  encrypt.iter-time=<num> - Time to spend in PBKDF in milliseconds
-+  encrypt.keyslot=<num>  - Select a single keyslot to modify explicitly
-+  encrypt.new-secret=<str> - New secret to set in the matching keyslots. Empty string to erase
-+  encrypt.old-secret=<str> - Select all keyslots that match this password
-+  encrypt.state=<str>    - Select new state of affected keyslots (active/inactive)
-   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
-   refcount_bits=<num>    - Width of a reference count entry in bits
-   size=<size>            - Virtual disk size
-@@ -664,6 +684,11 @@ Amend options for 'qcow2':
-   compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=<str>        - File name of an external data file
-   data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
-+  encrypt.iter-time=<num> - Time to spend in PBKDF in milliseconds
-+  encrypt.keyslot=<num>  - Select a single keyslot to modify explicitly
-+  encrypt.new-secret=<str> - New secret to set in the matching keyslots. Empty string to erase
-+  encrypt.old-secret=<str> - Select all keyslots that match this password
-+  encrypt.state=<str>    - Select new state of affected keyslots (active/inactive)
-   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
-   refcount_bits=<num>    - Width of a reference count entry in bits
-   size=<size>            - Virtual disk size
-@@ -675,6 +700,11 @@ Amend options for 'qcow2':
-   compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=<str>        - File name of an external data file
-   data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
-+  encrypt.iter-time=<num> - Time to spend in PBKDF in milliseconds
-+  encrypt.keyslot=<num>  - Select a single keyslot to modify explicitly
-+  encrypt.new-secret=<str> - New secret to set in the matching keyslots. Empty string to erase
-+  encrypt.old-secret=<str> - Select all keyslots that match this password
-+  encrypt.state=<str>    - Select new state of affected keyslots (active/inactive)
-   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
-   refcount_bits=<num>    - Width of a reference count entry in bits
-   size=<size>            - Virtual disk size
-@@ -686,6 +716,11 @@ Amend options for 'qcow2':
-   compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=<str>        - File name of an external data file
-   data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
-+  encrypt.iter-time=<num> - Time to spend in PBKDF in milliseconds
-+  encrypt.keyslot=<num>  - Select a single keyslot to modify explicitly
-+  encrypt.new-secret=<str> - New secret to set in the matching keyslots. Empty string to erase
-+  encrypt.old-secret=<str> - Select all keyslots that match this password
-+  encrypt.state=<str>    - Select new state of affected keyslots (active/inactive)
-   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
-   refcount_bits=<num>    - Width of a reference count entry in bits
-   size=<size>            - Virtual disk size
-@@ -697,6 +732,11 @@ Amend options for 'qcow2':
-   compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=<str>        - File name of an external data file
-   data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
-+  encrypt.iter-time=<num> - Time to spend in PBKDF in milliseconds
-+  encrypt.keyslot=<num>  - Select a single keyslot to modify explicitly
-+  encrypt.new-secret=<str> - New secret to set in the matching keyslots. Empty string to erase
-+  encrypt.old-secret=<str> - Select all keyslots that match this password
-+  encrypt.state=<str>    - Select new state of affected keyslots (active/inactive)
-   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
-   refcount_bits=<num>    - Width of a reference count entry in bits
-   size=<size>            - Virtual disk size
-@@ -725,6 +765,11 @@ Amend options for 'qcow2':
-   compat=<str>           - Compatibility level (v2 [0.10] or v3 [1.1])
-   data_file=<str>        - File name of an external data file
-   data_file_raw=<bool (on/off)> - The external data file must stay valid as a raw image
-+  encrypt.iter-time=<num> - Time to spend in PBKDF in milliseconds
-+  encrypt.keyslot=<num>  - Select a single keyslot to modify explicitly
-+  encrypt.new-secret=<str> - New secret to set in the matching keyslots. Empty string to erase
-+  encrypt.old-secret=<str> - Select all keyslots that match this password
-+  encrypt.state=<str>    - Select new state of affected keyslots (active/inactive)
-   lazy_refcounts=<bool (on/off)> - Postpone refcount updates
-   refcount_bits=<num>    - Width of a reference count entry in bits
-   size=<size>            - Virtual disk size
 -- 
 2.17.2
 
