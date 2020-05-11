@@ -2,81 +2,79 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9D0CC38A2A
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 00:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 565C6C38A2A
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 01:07:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C905208E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 00:04:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1A65220722
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 01:07:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FE4Ckfo3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C905208E4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DbelZUrv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A65220722
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXvw9-0008ST-KD
-	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 20:04:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49002)
+	id 1jXwvC-0003W5-8a
+	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 21:07:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55392)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
- id 1jXvvF-0007fQ-Ud; Sun, 10 May 2020 20:03:53 -0400
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:33520)
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1jXwu1-0002ii-1E
+ for qemu-devel@nongnu.org; Sun, 10 May 2020 21:06:41 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:34089)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
- id 1jXvvE-00020t-W6; Sun, 10 May 2020 20:03:53 -0400
-Received: by mail-io1-xd41.google.com with SMTP id k18so7757768ion.0;
- Sun, 10 May 2020 17:03:51 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1jXwtz-0007WX-SI
+ for qemu-devel@nongnu.org; Sun, 10 May 2020 21:06:40 -0400
+Received: by mail-lj1-x241.google.com with SMTP id f11so7653496ljp.1
+ for <qemu-devel@nongnu.org>; Sun, 10 May 2020 18:06:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=Uv/X3iiOLnYG9v+VxWYmpj3ltl/9g7O73FepiAxM5NI=;
- b=FE4Ckfo3He5aL3NnPMXjHlVGr9dAjJWTJk0NGEucYggBOROsgLl56jfuhvumS1a2Ph
- Fajf3k9vIA0Q3EEYpEWO9y5mytU0D6se8fo7fjY3P4UxtUBhdsQ2AxZQvF6HAbR2hltC
- dZQryRgwzb4tXdn0RCy1PZCkovP9RPr5K9aJ7vUGh+dIlVm2LkroplgfsoHJ7VcnZWDo
- 2jBlzyHBqcHGlNIWYvdFlcaHoTZS72FEd4G3TqU40zQ0nTLauAdlR/yWeBEcxgaZAm/y
- g37l99Fctwtb9VU9im+Y+Ck/fppiUAIotQZoHvHC3bPyvQHO6RNM2VwT6Gc/bm3y6YAt
- 2S7w==
+ bh=onNWIa2FOZ31nfganHbfuVqwz/Y4eXhGGaqpIddJx1U=;
+ b=DbelZUrv4o05YnDAecjhkm2Dzmb2K70F/SepW8zyExc3WrnJNRvKGeRgApqtTSt2yQ
+ cfBk/NM3z/WL9nGvFxO61o1L46R7xeUQsK7azXSfHd9XiP1Ro+eS4BYHemwzyr7Cl1Gj
+ /fqZEmykBt28GC9qqawvHUiBZibdIIeSWqULe3/hQkOfsZ61UxyYDeRlRFPBrHAVWyw1
+ 0dRl9yNntP65d5umx+i3YPRxDgfIiaAw9+G9zlggXASz+ukcya8vvf94v/s3UBZ3VzEY
+ H/xXPyrz+8eP/HYLO9rQV6Qf6zH9S3RVHmCZb5QOtrukqgF7K0+tcT9SfsVtkJMJEMSL
+ iJAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=Uv/X3iiOLnYG9v+VxWYmpj3ltl/9g7O73FepiAxM5NI=;
- b=TldUqD92JAGivFuuNCYCDi8N+n3hoyHKy1NfhlwiQiujAl2wCKqZbYWtsIXP4oF5uL
- tDon6a8Bp8o069zkZUYaEnuckAdweJBOaZSW7NiSetp+EjNg7IDol5F5HgcLF2XraccR
- Q97fy1M1akEdOjh3yIE37kpDVbUgLguzMJUI/irdvFEsmsy+VfoYn5B7UscJ6KYV9Xat
- V50R+NKJCyOQ13RV6TzJ3GNMZw8udH9TlPwfPuMXNQ6cwsadcVdjwX9FK7FyFeMz0IIe
- +0PAY1lmvWUgoI9LLmDXXW/ou25lS0jnMlW36GnW+V8UnNaBXB3DWfdAtsGlzA9eaMwR
- engQ==
-X-Gm-Message-State: AGi0PuYV5m21EULGdvWBLc6TpWQr5S48N8kTKHi5urRFjoEkhPsk9gUd
- f65Vz4VlNU8caMW2zAmFynBOYTVvc2IKB7Wbp58=
-X-Google-Smtp-Source: APiQypJ7CRXGeDTQlVoidEaOvEQHID4ijFJYXzbYUFvojOqtTNGu2GrK9GqhzSF8VtH2+WjED07eJMb3SDvCx4HBIFY=
-X-Received: by 2002:a05:6602:5c9:: with SMTP id
- w9mr2499853iox.207.1589155430427; 
- Sun, 10 May 2020 17:03:50 -0700 (PDT)
+ bh=onNWIa2FOZ31nfganHbfuVqwz/Y4eXhGGaqpIddJx1U=;
+ b=qeLM8H4DUhe7Srgaj/b0hqEkI0wrs9/+OOOxALrySbh1Mb6S886a0VzlO8RlNwYBcB
+ KY9oOmZXMLi2+emT0b7RYi9fXoywfJd/96xYItp80YQLNyRS/Tbh+ckLVZ+Zj2QHZ180
+ NzQ6HC0TbsxBEYehJeDv9cKT1E7oY1Cm9Xv/9mO0THSxUmNnsiedGA5U/IFrVRluFW4c
+ pjjX63p97BDmC7NqGbbARsaa3rJtSKWSBiGB2veb8hX4rS4jif/XQNmJCVH2uRtQ5eEX
+ jPg2kUpayx2kw9+OPmekrcrr5MPfD2QaS7Y1cCbMUAPm4UFEVBEJcELVSI8a10cnDGIq
+ hRGQ==
+X-Gm-Message-State: AOAM53220NYkF0GEOigzpQ+ngbg/ikNyvPCV7dJpFwzpvx6Aghu9lASp
+ ELG8xQNDTQUuGx8vZciZlGHLTluG4qoALm6dsoo=
+X-Google-Smtp-Source: ABdhPJx5y+REiVWpTN8/KCGaqEczTs3+N5K5rLtPFo1vdX3y5zxP3aMa4EKY52PQn2SllcV0iPV3L0Xp+OY0AVAPXjI=
+X-Received: by 2002:a2e:6e13:: with SMTP id j19mr8652663ljc.292.1589159195013; 
+ Sun, 10 May 2020 18:06:35 -0700 (PDT)
 MIME-Version: 1.0
-References: <cover.1588252861.git.dimastep@yandex-team.ru>
- <d25241eb1fe7a55fc7dbe63ecedb4f1adf407837.1588252862.git.dimastep@yandex-team.ru>
- <CAFubqFsvn+wNm-rAU1sLBic6J70-ZP_UT4xMDcvGeZ9TarYdjw@mail.gmail.com>
- <20200507153530.GA6808@dimastep-nix>
-In-Reply-To: <20200507153530.GA6808@dimastep-nix>
-From: Raphael Norwitz <raphael.s.norwitz@gmail.com>
-Date: Sun, 10 May 2020 20:03:39 -0400
-Message-ID: <CAFubqFv_ZPXPBrZpQ=JU69BjJmRK4ePGd2ATtf0rpEUmXNVsKA@mail.gmail.com>
-Subject: Re: [PATCH v2 5/5] vhost: add device started check in migration set
- log
-To: Dima Stepanov <dimastep@yandex-team.ru>
+References: <20200510210128.18343-1-f4bug@amsat.org>
+ <20200510210128.18343-3-f4bug@amsat.org>
+In-Reply-To: <20200510210128.18343-3-f4bug@amsat.org>
+From: chen huacai <zltjiangshi@gmail.com>
+Date: Mon, 11 May 2020 09:14:16 +0800
+Message-ID: <CABDp7Vr=z0o7-G6fMOUfs7kRMvVW9SYitR==KQfG+iVXnuPPjQ@mail.gmail.com>
+Subject: Re: [PATCH 02/12] hw/mips/fuloong2e: Rename PMON BIOS name
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
- envelope-from=raphael.s.norwitz@gmail.com; helo=mail-io1-xd41.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::241;
+ envelope-from=zltjiangshi@gmail.com; helo=mail-lj1-x241.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -98,69 +96,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, stefanha@redhat.com,
- qemu-block@nongnu.org, mst@redhat.com, jasowang@redhat.com,
- qemu-devel@nongnu.org, dgilbert@redhat.com, raphael.norwitz@nutanix.com,
- arei.gonglei@huawei.com, fengli@smartx.com, yc-core@yandex-team.ru,
- pbonzini@redhat.com, marcandre.lureau@redhat.com, mreitz@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Huacai Chen <chenhuacai@gmail.com>, qemu-level <qemu-devel@nongnu.org>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Huacai Chen <chenhc@lemote.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 7, 2020 at 11:35 AM Dima Stepanov <dimastep@yandex-team.ru> wro=
-te:
+Hi,  Philippe,
+
+On Mon, May 11, 2020 at 5:05 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
 >
-> What do you think?
+> I'm not sure where 'pmon_fulong2e.bin' comes from. As I always
+> found this bios named 'pmon_2e.bin', rename the definition.
+>
+The Fuloong BIOS doesn't integrated in QEMU, so its name can be
+anything. So, let's keep the old name (I think the old name more
+distsinguishable)?
+
+Huacai
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/mips/mips_fulong2e.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+> index ef02d54b33..f067fa9720 100644
+> --- a/hw/mips/mips_fulong2e.c
+> +++ b/hw/mips/mips_fulong2e.c
+> @@ -69,7 +69,7 @@
+>   * 2, use "Bonito2edev" to replace "dir_corresponding_to_your_target_har=
+dware"
+>   * in the "Compile Guide".
+>   */
+> -#define FULONG_BIOSNAME "pmon_fulong2e.bin"
+> +#define FULONG_BIOSNAME "pmon_2e.bin"
+>
+>  /* PCI SLOT in fulong 2e */
+>  #define FULONG2E_VIA_SLOT        5
+> --
+> 2.21.3
+>
 >
 
-Apologies - I tripped over the if (dev->started && r < 0) check.
-Never-mind my point with race conditions and failing migrations.
 
-Rather than modifying vhost_dev_set_log(), it may be clearer to put a
-check after vhost_dev_log_resize()? Something like:
-
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -829,11 +829,22 @@ static int vhost_migration_log(MemoryListener
-*listener, int enable)
-         vhost_log_put(dev, false);
-     } else {
-         vhost_dev_log_resize(dev, vhost_get_log_size(dev));
-+        /*
-+         * A device can be stopped because of backend disconnect inside
-+         * vhost_dev_log_resize(). In this case we should mark logging
-+         * enabled and return without attempting to set the backend
-+         * logging state.
-+         */
-+        if (!dev->started) {
-+            goto out_success;
-+        }
-         r =3D vhost_dev_set_log(dev, true);
-         if (r < 0) {
-             return r;
-         }
-     }
-+
-+out_success:
-     dev->log_enabled =3D enable;
-     return 0;
- }
-
-This seems harmless enough to me, and I see how it fixes your
-particular crash, but I would still prefer we worked towards a more
-robust solution. In particular I think we could handle this inside
-vhost-user-blk if we let the device state persist between connections
-(i.e. call vhost_dev_cleanup() inside vhost_user_blk_connect() before
-vhost_dev_init() on reconnect). This should also fix some of the
-crashes Li Feng has hit, and probably others which haven=E2=80=99t been
-reported yet. What do you think?
-
-If that=E2=80=99s unworkable I guess we will need to add these vhost level
-checks. In that case I would still prefer we add a =E2=80=9Cdisconnected=E2=
-=80=9D flag
-in struct vhost_dev struct, and make sure it isn=E2=80=99t cleared by
-vhost_dev_cleanup(). That way we don=E2=80=99t conflate stopping a device w=
-ith
-backend disconnect at the vhost level and potentially regress behavior
-for other device types.
+--=20
+Huacai Chen
 
