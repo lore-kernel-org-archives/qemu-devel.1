@@ -6,69 +6,69 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AC1EC47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 16:14:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BB9EC47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 16:15:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB004206DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 16:14:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F955206DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 16:15:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G+FoyOMI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB004206DB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="THrdzC7u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F955206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYB4a-0000kV-0I
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 12:14:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48226)
+	id 1jYB5e-0002R9-Am
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 12:15:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48284)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jYB0J-0002C1-5h
- for qemu-devel@nongnu.org; Mon, 11 May 2020 12:10:07 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32358
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1jYB0a-0002iI-E2
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 12:10:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42205
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jYB0I-00014k-6W
- for qemu-devel@nongnu.org; Mon, 11 May 2020 12:10:06 -0400
+ id 1jYB0Z-0001DK-FQ
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 12:10:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589213405;
+ s=mimecast20190719; t=1589213422;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=MtXFuOOm3cWbAtx6CbAfAbc97uTwRwSIWWwQ7gjw+kU=;
- b=G+FoyOMIvIggkSwjdmfLspszVM+aN1ozboYQuAIjIOaxKj5NJJwpYfkKoekZPJ9lsRfagJ
- rGmc5nEutCuKd+oIoNg4TdzsBzgqKxw32tfNBYifejlGSJsCUjUI1gDWac9uBNlhFaw5HO
- gtwTunyOm4EaknQnNS8KqNV152/DM68=
+ references:references; bh=M2bq9zCzPz6VKGeh8nVA6yikaTYR6Kt0Jgibe/QpFOE=;
+ b=THrdzC7uFsnu2D6w9HMnXMtr/OdARVwk1IIXcPk2gyOkhaBxlQ/9TWJ0VdwhlpKQxyvKXN
+ z+mda67byFyBKSQbvvP1SRMHv9bQ1jSkYNBUhgBS9EiNuEvoXhaAw7IQPHiYkwoNsNy0gR
+ CO55gmeBxK6knIT/hrUSupLkTDz3fxM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-317-0OkGEouIOCKBksrRXnpGaA-1; Mon, 11 May 2020 12:10:03 -0400
-X-MC-Unique: 0OkGEouIOCKBksrRXnpGaA-1
+ us-mta-115-OLzwoMF6PqyuB0Axg2y-4w-1; Mon, 11 May 2020 12:10:21 -0400
+X-MC-Unique: OLzwoMF6PqyuB0Axg2y-4w-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 178E5107ACCA;
- Mon, 11 May 2020 16:10:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B04180B725;
+ Mon, 11 May 2020 16:10:20 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.222])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 309185C1B5;
- Mon, 11 May 2020 16:09:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 541EA5C1B5;
+ Mon, 11 May 2020 16:10:18 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/7] Implement drain_call_rcu and use it in hmp_device_del
-Date: Mon, 11 May 2020 19:09:46 +0300
-Message-Id: <20200511160951.8733-3-mlevitsk@redhat.com>
+Subject: [PATCH v2 7/7] virtio-scsi: use scsi_device_get
+Date: Mon, 11 May 2020 19:09:51 +0300
+Message-Id: <20200511160951.8733-8-mlevitsk@redhat.com>
 In-Reply-To: <20200511160951.8733-1-mlevitsk@redhat.com>
 References: <20200511160951.8733-1-mlevitsk@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mlevitsk@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 01:43:51
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 02:55:57
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -97,95 +97,113 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This allows to preserve the semantics of hmp_device_del,
-that the device is deleted immediatly which was changed by previos
-patch that delayed this to RCU callback
+This will help us to avoid the scsi device disappearing
+after we took a reference to it.
+
+It doesn't by itself forbid case when we try to access
+an unrealized device
 
 Suggested-by: Stefan Hajnoczi <stefanha@gmail.com>
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- include/qemu/rcu.h |  1 +
- qdev-monitor.c     |  3 +++
- util/rcu.c         | 33 +++++++++++++++++++++++++++++++++
- 3 files changed, 37 insertions(+)
+ hw/scsi/virtio-scsi.c | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
 
-diff --git a/include/qemu/rcu.h b/include/qemu/rcu.h
-index 570aa603eb..0e375ebe13 100644
---- a/include/qemu/rcu.h
-+++ b/include/qemu/rcu.h
-@@ -133,6 +133,7 @@ struct rcu_head {
- };
- 
- extern void call_rcu1(struct rcu_head *head, RCUCBFunc *func);
-+extern void drain_call_rcu(void);
- 
- /* The operands of the minus operator must have the same type,
-  * which must be the one that we specify in the cast.
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index 56cee1483f..70877840a2 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -812,6 +812,8 @@ void qmp_device_add(QDict *qdict, QObject **ret_data, Error **errp)
-         return;
-     }
-     dev = qdev_device_add(opts, &local_err);
-+    drain_call_rcu();
-+
-     if (!dev) {
-         error_propagate(errp, local_err);
-         qemu_opts_del(opts);
-@@ -904,6 +906,7 @@ void qmp_device_del(const char *id, Error **errp)
-         }
- 
-         qdev_unplug(dev, errp);
-+        drain_call_rcu();
-     }
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index 1cc1fc557c..65cd4186fe 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -33,7 +33,7 @@ static inline int virtio_scsi_get_lun(uint8_t *lun)
+     return ((lun[2] << 8) | lun[3]) & 0x3FFF;
  }
  
-diff --git a/util/rcu.c b/util/rcu.c
-index 60a37f72c3..e8b1c4d6c5 100644
---- a/util/rcu.c
-+++ b/util/rcu.c
-@@ -293,6 +293,39 @@ void call_rcu1(struct rcu_head *node, void (*func)(struct rcu_head *node))
-     qemu_event_set(&rcu_call_ready_event);
- }
- 
-+
-+struct rcu_drain {
-+    struct rcu_head rcu;
-+    QemuEvent drain_complete_event;
-+};
-+
-+static void drain_rcu_callback(struct rcu_head *node)
-+{
-+    struct rcu_drain *event = (struct rcu_drain *)node;
-+    qemu_event_set(&event->drain_complete_event);
-+}
-+
-+void drain_call_rcu(void)
-+{
-+    struct rcu_drain rcu_drain;
-+    bool locked = qemu_mutex_iothread_locked();
-+
-+    memset(&rcu_drain, 0, sizeof(struct rcu_drain));
-+
-+    if (locked) {
-+        qemu_mutex_unlock_iothread();
-+    }
-+
-+    qemu_event_init(&rcu_drain.drain_complete_event, false);
-+    call_rcu1(&rcu_drain.rcu, drain_rcu_callback);
-+    qemu_event_wait(&rcu_drain.drain_complete_event);
-+
-+    if (locked) {
-+        qemu_mutex_lock_iothread();
-+    }
-+
-+}
-+
- void rcu_register_thread(void)
+-static inline SCSIDevice *virtio_scsi_device_find(VirtIOSCSI *s, uint8_t *lun)
++static inline SCSIDevice *virtio_scsi_device_get(VirtIOSCSI *s, uint8_t *lun)
  {
-     assert(rcu_reader.ctr == 0);
+     SCSIDevice *device = NULL;
+ 
+@@ -44,7 +44,7 @@ static inline SCSIDevice *virtio_scsi_device_find(VirtIOSCSI *s, uint8_t *lun)
+         return NULL;
+     }
+ 
+-    device = scsi_device_find(&s->bus, 0, lun[1], virtio_scsi_get_lun(lun));
++    device = scsi_device_get(&s->bus, 0, lun[1], virtio_scsi_get_lun(lun));
+ 
+     /*
+      * This function might run on the IO thread and we might race against
+@@ -61,6 +61,8 @@ static inline SCSIDevice *virtio_scsi_device_find(VirtIOSCSI *s, uint8_t *lun)
+     return device;
+ }
+ 
++
++
+ void virtio_scsi_init_req(VirtIOSCSI *s, VirtQueue *vq, VirtIOSCSIReq *req)
+ {
+     VirtIODevice *vdev = VIRTIO_DEVICE(s);
+@@ -273,7 +275,7 @@ static inline void virtio_scsi_ctx_check(VirtIOSCSI *s, SCSIDevice *d)
+  *  case of async cancellation. */
+ static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
+ {
+-    SCSIDevice *d = virtio_scsi_device_find(s, req->req.tmf.lun);
++    SCSIDevice *d = virtio_scsi_device_get(s, req->req.tmf.lun);
+     SCSIRequest *r, *next;
+     BusChild *kid;
+     int target;
+@@ -387,10 +389,10 @@ static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
+ 
+         rcu_read_lock();
+         QTAILQ_FOREACH_RCU(kid, &s->bus.qbus.children, sibling) {
+-             d = SCSI_DEVICE(kid->child);
+-             if (d->channel == 0 && d->id == target) {
+-                qdev_reset_all(&d->qdev);
+-             }
++            SCSIDevice *d1 = SCSI_DEVICE(kid->child);
++            if (d1->channel == 0 && d1->id == target) {
++                qdev_reset_all(&d1->qdev);
++            }
+         }
+         rcu_read_unlock();
+ 
+@@ -403,14 +405,17 @@ static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
+         break;
+     }
+ 
++    object_unref(OBJECT(d));
+     return ret;
+ 
+ incorrect_lun:
+     req->resp.tmf.response = VIRTIO_SCSI_S_INCORRECT_LUN;
++    object_unref(OBJECT(d));
+     return ret;
+ 
+ fail:
+     req->resp.tmf.response = VIRTIO_SCSI_S_BAD_TARGET;
++    object_unref(OBJECT(d));
+     return ret;
+ }
+ 
+@@ -581,7 +586,7 @@ static int virtio_scsi_handle_cmd_req_prepare(VirtIOSCSI *s, VirtIOSCSIReq *req)
+         }
+     }
+ 
+-    d = virtio_scsi_device_find(s, req->req.cmd.lun);
++    d = virtio_scsi_device_get(s, req->req.cmd.lun);
+     if (!d) {
+         req->resp.cmd.response = VIRTIO_SCSI_S_BAD_TARGET;
+         virtio_scsi_complete_cmd_req(req);
+@@ -597,10 +602,12 @@ static int virtio_scsi_handle_cmd_req_prepare(VirtIOSCSI *s, VirtIOSCSIReq *req)
+             req->sreq->cmd.xfer > req->qsgl.size)) {
+         req->resp.cmd.response = VIRTIO_SCSI_S_OVERRUN;
+         virtio_scsi_complete_cmd_req(req);
++        object_unref(OBJECT(d));
+         return -ENOBUFS;
+     }
+     scsi_req_ref(req->sreq);
+     blk_io_plug(d->conf.blk);
++    object_unref(OBJECT(d));
+     return 0;
+ }
+ 
 -- 
 2.17.2
 
