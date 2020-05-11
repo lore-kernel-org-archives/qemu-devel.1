@@ -2,102 +2,90 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C85CEC47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 07:14:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37849C54E8E
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 07:17:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A56820735
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 07:14:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 01DD92080C
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 07:17:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ij1R2jac"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A56820735
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mHuJAJgp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01DD92080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY2dY-0006YZ-Q2
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 03:14:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49636)
+	id 1jY2hA-0008JJ-5S
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 03:17:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50392)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jY2Yu-00025I-9J
- for qemu-devel@nongnu.org; Mon, 11 May 2020 03:09:16 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33154
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jY2Yt-0000Ed-L5
- for qemu-devel@nongnu.org; Mon, 11 May 2020 03:09:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589180954;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=dJH+0FhgWB31ew/3xujSyw7arTj8XDNkT4Re2ahoBVA=;
- b=ij1R2jacHo7b3U7sIJMpnFU4kcXMyPD8WkRBm2kvhMjVrhW0MB+1PmYrtjGVmjb1ddJpd+
- ySwYcVz9RjBogxO7qjdECS/PRvW3W602DzN0z1D12fnIR9TmQ55qvkyW8nYDkuqCBhxUbl
- zrR5sMSvqq1ws7Zr6ZSAanalIqWk4q0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-325-j5UEszKXPJ-IiFQCPvCmWQ-1; Mon, 11 May 2020 03:09:10 -0400
-X-MC-Unique: j5UEszKXPJ-IiFQCPvCmWQ-1
-Received: by mail-wm1-f70.google.com with SMTP id e15so142197wme.1
- for <qemu-devel@nongnu.org>; Mon, 11 May 2020 00:09:10 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jY2gH-0007pw-El
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 03:16:53 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39916)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jY2gF-0001T8-OV
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 03:16:53 -0400
+Received: by mail-wr1-x441.google.com with SMTP id l18so9475675wrn.6
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 00:16:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=cYmSBjzsEC4U8Cz0a4UgA1WWQyWXVQvgeZX/wOzI3WY=;
+ b=mHuJAJgp/8pvCfKW0SNkJWd/H16xtyrLOqDKltxc1g4m9cpycGgHajHVfnBgZRcex4
+ mwZxKSH+pwwZcHM5+tCH52Xq+gvLJtKkBTFWwBCI/CVdWJl0+EcGXskSYzveMM66AH4H
+ n5w7DHJXzUZJMB+cDsPo5iulVqpSQYPWy+9xk5qXz85fYjtO91SpyfH+FQ7fgKXeLM3T
+ K3ThyB972ycBEGQShj9poYhyhHL06BkFjBFM3X1ErKWfBaa+UNJdRpVIHqc+mjAgcneQ
+ BngcLH2cWETLZH2agu//GEWcXGlg3yeIe6IMgmx+jmTLq3bbT5/e5ByTStHCHzkhbXqY
+ JO7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=dJH+0FhgWB31ew/3xujSyw7arTj8XDNkT4Re2ahoBVA=;
- b=ljI5+3tcry17TdNxMg+boV7osttVlsRzXG0YiRUqNJwEJaEQjXKAVcehdZi8T4UGPz
- h9Vc//Rjh3r5DKO+0Pz0snr81HDyxNfa9pOs9Wl6aQpUz3FgbrfHL+r+8xtzNPLiAbkj
- NNVkZL/h3KlpYhWKOHynJpkLG6PVk0/s72cJ+Gkm10PG2i9vREt/4prt+nQ9LLhKjlkB
- h8YjIGgZl7iiox62fP+Qw2qX/I/y1cyEeIr9WLad7Di1X3AvVoQb94HOiOKGnY0PcO3d
- +QAMce0cKeRROtJS7iad5w+SzNZsKvC14VyQs5mGoUWAWZxRwYgdC11K24RzuubLBOmD
- MKdQ==
-X-Gm-Message-State: AGi0PuYx9vXziN7HeVUO8tPCl/dlgOoz3t6n/+AL1VnJyvwjD3LQOyRY
- E3SjAC2RkE2J3nq28krx8/YxiU5o8fcgcIm2I3+euAFFuFVf2uGbJ8oFgTYasX8tRjneNSz/anj
- WFBGE3AkYiGajpNQ=
-X-Received: by 2002:adf:d841:: with SMTP id k1mr16783191wrl.129.1589180949751; 
- Mon, 11 May 2020 00:09:09 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJ4LOL3HZtKmNX3XsZkEEsEbRHYZugqIsAnDUbQ/gnB6eGkctZSq9XqZyoaLqrSq5vwrFYYFg==
-X-Received: by 2002:adf:d841:: with SMTP id k1mr16783163wrl.129.1589180949532; 
- Mon, 11 May 2020 00:09:09 -0700 (PDT)
-Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id n9sm9225376wru.90.2020.05.11.00.09.08
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 11 May 2020 00:09:09 -0700 (PDT)
-Subject: Re: [PATCH 0/2] hw/block/nvme: fixes for interrupt behavior
-To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
-References: <20200505203603.278339-1-its@irrelevant.dk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <635fa8aa-8c8d-98e3-3610-3f3a73a476ef@redhat.com>
-Date: Mon, 11 May 2020 09:09:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=cYmSBjzsEC4U8Cz0a4UgA1WWQyWXVQvgeZX/wOzI3WY=;
+ b=my16a9Uy6miv5XH2YW1ttwekaMcWPQQGmnMsLiHFB6ZoPJyTr/NDGOdJN0BnLK91sR
+ jPmGYd6hlm/T/SK21bB7Ell0kojPSvc3EaMljnejsQudbNUfc7zhrxd3WegJ0CP2gl1Z
+ eV6MbJtAnt73NkYGfWMWEh2p2bIXKYDYlRDi5EfjDeRrY2bMUI8KHY34VlNZwvbViHbq
+ KXgVCwgo0HWVunROc08lZ5HezGmcrtHX94KgRRmM1WKCcXMBdjRVEhOpiXU9Pq9N9T7x
+ oLgundS/C7o05/hf/z7w2FO87iXfpyqwrEJ92kp2pWvC+c6keOWEgMOmOXUpXNmprz5a
+ gtag==
+X-Gm-Message-State: AGi0Puau+gLDPX8bD2rRV5TH/Cw5eSsBDaejy+f1S3uee7DTb80K0dkh
+ grArR7Hf88pUrNQN06ygJRPE9HsRsJeSIRkgZz4=
+X-Google-Smtp-Source: APiQypIflNKP1+6qQ1fnJVS15U8IdVIjY3/oM/LAhGFuQ3miWNLsyH3rVe1GEk3Ov3Io39pOE3Y19FPJRhbsptJDXRg=
+X-Received: by 2002:a5d:4b0f:: with SMTP id v15mr7842739wrq.162.1589181409860; 
+ Mon, 11 May 2020 00:16:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200505203603.278339-1-its@irrelevant.dk>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 02:55:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200510210128.18343-1-f4bug@amsat.org>
+ <20200510210128.18343-12-f4bug@amsat.org>
+ <CAHiYmc5xCbftuexryEkY4+1FxOWVqz-wzJN2fg_dCiif0-BhYQ@mail.gmail.com>
+ <58233ffa-f763-9948-6dfa-1b3159ae829f@amsat.org>
+In-Reply-To: <58233ffa-f763-9948-6dfa-1b3159ae829f@amsat.org>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Mon, 11 May 2020 09:16:37 +0200
+Message-ID: <CAHiYmc6zz=Ym5jd9C5BVYv28ofrXZq-kSMtgseNVr3MmLHt65g@mail.gmail.com>
+Subject: Re: [PATCH 11/12] hw/pci-host/bonito: Set the Config register reset
+ value with FIELD_DP32
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -111,26 +99,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Javier Gonzalez <javier.gonz@samsung.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Huacai Chen <chenhuacai@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Huacai Chen <chenhc@lemote.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-+ Michael & Marcel for MSIX,
-and ping to Keith :)
+=D0=BF=D0=BE=D0=BD, 11. =D0=BC=D0=B0=D1=98 2020. =D1=83 08:30 Philippe Math=
+ieu-Daud=C3=A9 <f4bug@amsat.org> =D1=98=D0=B5
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> On 5/11/20 8:17 AM, Aleksandar Markovic wrote:
+> > =D0=BD=D0=B5=D0=B4, 10. =D0=BC=D0=B0=D1=98 2020. =D1=83 23:01 Philippe =
+Mathieu-Daud=C3=A9 <f4bug@amsat.org> =D1=98=D0=B5
+> > =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> >>
+> >> Describe some Config registers fields with the registerfields
+> >> API. Use the FIELD_DP32() macro to set the BONGENCFG register
+> >> bits at reset.
+> >>
+> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> >> ---
+> >>   hw/pci-host/bonito.c | 21 ++++++++++++++++++++-
+> >>   1 file changed, 20 insertions(+), 1 deletion(-)
+> >>
+> >
+> > Some Config registers? Is there any reason not to cover all Bonito
+> > config registers? Or, the commit message was inprecise?
+>
+> The commit message is not correct English, I wanted to say "some bits of
+> the Config register" (I don't want to overload the file defining bits
+> we'll never use).
+>
+> >
+> > But, in general, I salute the intent of this patch.
+>
+> Thanks! I'll reword the description.
+>
 
-On 5/5/20 10:36 PM, Klaus Jensen wrote:
-> From: Klaus Jensen <k.jensen@samsung.com>
-> 
-> Klaus Jensen (2):
->    hw/block/nvme: fix pin-based interrupt behavior
->    hw/block/nvme: allow use of any valid msix vector
-> 
->   hw/block/nvme.c | 14 +++++++++-----
->   hw/block/nvme.h |  2 +-
->   2 files changed, 10 insertions(+), 6 deletions(-)
+OK, then, with that little rewording, certainly, a good patch:
 
+Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+
+> >
+> > Sincerely,
+> > Aleksandar
+> >
+> >> diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
+> >> index 335c7787eb..86aceb333a 100644
+> >> --- a/hw/pci-host/bonito.c
+> >> +++ b/hw/pci-host/bonito.c
+> >> @@ -50,6 +50,7 @@
+> >>   #include "sysemu/runstate.h"
+> >>   #include "exec/address-spaces.h"
+> >>   #include "hw/misc/unimp.h"
+> >> +#include "hw/registerfields.h"
+> >>
+> >>   /* #define DEBUG_BONITO */
+> >>
+> >> @@ -112,8 +113,19 @@
+> >>   /* Power on register */
+> >>
+> >>   #define BONITO_BONPONCFG        (0x00 >> 2)      /* 0x100 */
+> >> +
+> >> +/* PCI configuration register */
+> >>   #define BONITO_BONGENCFG_OFFSET 0x4
+> >>   #define BONITO_BONGENCFG        (BONITO_BONGENCFG_OFFSET >> 2)   /*0=
+x104 */
+> >> +REG32(BONGENCFG,        0x104)
+> >> +FIELD(BONGENCFG, DEBUGMODE,      0, 1)
+> >> +FIELD(BONGENCFG, SNOOP,          1, 1)
+> >> +FIELD(BONGENCFG, CPUSELFRESET,   2, 1)
+> >> +FIELD(BONGENCFG, BYTESWAP,       6, 1)
+> >> +FIELD(BONGENCFG, UNCACHED,       7, 1)
+> >> +FIELD(BONGENCFG, PREFETCH,       8, 1)
+> >> +FIELD(BONGENCFG, WRITEBEHIND,    9, 1)
+> >> +FIELD(BONGENCFG, PCIQUEUE,      12, 1)
+> >>
+> >>   /* 2. IO & IDE configuration */
+> >>   #define BONITO_IODEVCFG         (0x08 >> 2)      /* 0x108 */
+> >> @@ -577,11 +589,18 @@ static int pci_bonito_map_irq(PCIDevice *pci_dev=
+, int irq_num)
+> >>   static void bonito_reset(void *opaque)
+> >>   {
+> >>       PCIBonitoState *s =3D opaque;
+> >> +    uint32_t val =3D 0;
+> >>
+> >>       /* set the default value of north bridge registers */
+> >>
+> >>       s->regs[BONITO_BONPONCFG] =3D 0xc40;
+> >> -    s->regs[BONITO_BONGENCFG] =3D 0x1384;
+> >> +    val =3D FIELD_DP32(val, BONGENCFG, PCIQUEUE, 1);
+> >> +    val =3D FIELD_DP32(val, BONGENCFG, WRITEBEHIND, 1);
+> >> +    val =3D FIELD_DP32(val, BONGENCFG, PREFETCH, 1);
+> >> +    val =3D FIELD_DP32(val, BONGENCFG, UNCACHED, 1);
+> >> +    val =3D FIELD_DP32(val, BONGENCFG, CPUSELFRESET, 1);
+> >> +    s->regs[BONITO_BONGENCFG] =3D val;
+> >> +
+> >>       s->regs[BONITO_IODEVCFG] =3D 0x2bff8010;
+> >>       s->regs[BONITO_SDCFG] =3D 0x255e0091;
+> >>
+> >> --
+> >> 2.21.3
+> >>
+> >
 
