@@ -2,88 +2,132 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59682C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 09:52:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0848EC47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 09:53:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25151206F9
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 09:52:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C6998206F9
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 09:53:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Byhg+zOS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25151206F9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YsByehQ8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6998206F9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY56r-0007Oq-Au
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 05:52:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42950)
+	id 1jY583-0000TT-1y
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 05:53:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42978)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jY55u-0006BK-T2
- for qemu-devel@nongnu.org; Mon, 11 May 2020 05:51:31 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:40293)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jY55t-0004ht-KX
- for qemu-devel@nongnu.org; Mon, 11 May 2020 05:51:30 -0400
-Received: by mail-oi1-x244.google.com with SMTP id t199so14603418oif.7
- for <qemu-devel@nongnu.org>; Mon, 11 May 2020 02:51:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=fffYlOjj/vQkdA3oSh5IEdQf1eF2J+wkUp4CVQxNbFw=;
- b=Byhg+zOStRJdeK67AUq9rtM7LBZsc+Cvt8xAtgPQqeeWoUf7QZadT7Z3la8LcEhPlr
- r1AiFY03ejjkUWoaEQ3vjO9dmaGaamboIjLzKj7EMUD1spf0PLNE6BkwEn2ji8tshc9/
- tYfrrGQJ5BDyU1beelef2xk4ZwKkNTm69/cxj681/CXKiS9lJSCreS79hZjWQg5mKHuj
- MnQDjglBc62/GJxbHBBMTu2jd2uFLKH/zcTDiJ9wtDAlFv0Q6Iu+uTfFMjKkNzqf/NDL
- rTad87f+kQg4vMhrd5OOmxbG5/ljA9QatUo0RQP4VEkMk6AX6K+tnbRt25tAtOI9HStk
- lyCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=fffYlOjj/vQkdA3oSh5IEdQf1eF2J+wkUp4CVQxNbFw=;
- b=hpgW1VEjYp9UTg9HGXZXD8/PwAavOd21T8PoiNJWMMnN9ePz6MOsRkWNN7vflDfRMA
- wU4MbmUk5HWERI+0GCJppig0bHmWaK/zbBFq3n6HzB2shM5+Ts2QAdEi/91hj+v0Y+uH
- bkAzgVMPenjWnm+Gvl/XKDi+7wa1i3Gemu8zc3T7jehEu/e3HaNU1ZNZRYglgnR1815S
- MaGUxc5/dJSW88FMb4B4EjAFV0yGwPHSnpmt0CZZAI5IFsS9abr9RMBgHX2WzLUNnQgI
- kCp5Cqq/KccVUeWb9DQxKKKqMgDtZyMFbC7RTTSCyhZX9woxGawLOcgxc0mOSrWenJpQ
- mkdg==
-X-Gm-Message-State: AGi0PuatIJWnb5sRKozSO4BC1R4F69iXYqnTSVOaVxe6Repv+HK4CiHy
- 2jZymLbYUMAjB4Ngq62Mgb69KCxaE2whT6GIEUvpZA==
-X-Google-Smtp-Source: APiQypKDK0uA4p7HbVz6OUzr4IA0ilj3sJy9IylHmtjvJykhwMB9TVZ9yrvBIjneV5TaEFqfuUEK0GOr9dxv+ZBhUaU=
-X-Received: by 2002:aca:895:: with SMTP id 143mr19060802oii.163.1589190687722; 
- Mon, 11 May 2020 02:51:27 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jY560-0006FS-AA
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 05:51:37 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39218
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jY55z-0004if-In
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 05:51:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589190694;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=NCW7vd60p8y2dmhAAfVdmo0mljpirqJjPfl87NglPiw=;
+ b=YsByehQ8q7dBEoJVIIa+aIzXnl7U2rUAWARMvuL4vRX0k24KjtAgwPSbrd5iNP1a4Tv5fk
+ XBnpd6U4J/Meh+s4Ptw6JYfY2qsSdWQIT59q2bzAP87FGpQlEEgPmK+CYG0ItFmCFZ74FV
+ iecxyOg5aZOx9Cub2HouFmjPA+0V5Tw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-159-zT0xTFL_NnaVEN7NiEl-Ag-1; Mon, 11 May 2020 05:51:33 -0400
+X-MC-Unique: zT0xTFL_NnaVEN7NiEl-Ag-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DDB0800687;
+ Mon, 11 May 2020 09:51:32 +0000 (UTC)
+Received: from [10.36.114.224] (ovpn-114-224.ams2.redhat.com [10.36.114.224])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6CE335C1D2;
+ Mon, 11 May 2020 09:51:31 +0000 (UTC)
+Subject: Re: [PATCH 0/3] tcg/s390: Support host vector operations
+From: David Hildenbrand <david@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200508155745.8223-1-richard.henderson@linaro.org>
+ <9c9ce42c-f283-67a5-194a-7d973ce9a3d2@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <253a16ad-a964-31ed-32f7-b0eb87287249@redhat.com>
+Date: Mon, 11 May 2020 11:51:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-References: <20200504081953.245912-1-joel@jms.id.au>
- <CACPK8XfTg1OucOEeiUE711_+-Pz4daYCrPmKFDTj25keeM8aMQ@mail.gmail.com>
- <3e8500ab-929b-a3f0-f8b6-fcf8ea5c1306@kaod.org>
-In-Reply-To: <3e8500ab-929b-a3f0-f8b6-fcf8ea5c1306@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 11 May 2020 10:51:16 +0100
-Message-ID: <CAFEAcA-DksOUWgyi7AfnUjNNk40Zd1kzkgXtJVXfFSdM=outJQ@mail.gmail.com>
-Subject: Re: [PATCH v3] aspeed: Add boot stub for smp booting
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x244.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <9c9ce42c-f283-67a5-194a-7d973ce9a3d2@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 01:43:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,46 +140,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Joel Stanley <joel@jms.id.au>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 8 May 2020 at 15:27, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> Indeed, with OpenBMC kernel v5.4.32-260-g7dc9442bbe7d and wfi (patch v3),
->
->     [    0.045214] smp: Bringing up secondary CPUs ...
->     [    1.178127] CPU1: failed to come online
->     [    1.187309] smp: Brought up 1 node, 1 CPU
->     [    1.187590] SMP: Total of 1 processors activated (2250.00 BogoMIPS=
-).
->     [    1.187786] CPU: All CPU(s) started in HYP mode.
->     [    1.187850] CPU: Virtualization extensions available.
->
-> When using wfe (patch v2),
->
->     [    0.091092] smp: Bringing up secondary CPUs ...
->     [    0.096628] smp: Brought up 1 node, 2 CPUs
->     [    0.096718] SMP: Total of 2 processors activated (4500.00 BogoMIPS=
-).
->     [    0.096768] CPU: All CPU(s) started in HYP mode.
->     [    0.096785] CPU: Virtualization extensions available.
+On 11.05.20 10:50, David Hildenbrand wrote:
+> On 08.05.20 17:57, Richard Henderson wrote:
+>> I've had this floating around on a branch for a while now
+>> It is able to run arm sve tests under qemu, but I have not
+>> been able to test it against real hardware. 
+> 
+> You can run qemu-system-arm under qemu-system-s390 with vx=on
 
-OK, I've applied patch v2 to target-arm.next.
+(re-reading, I assume you did exactly that already)
 
-v3 looked a bit odd anyway -- a wfi-based secondary loop generally
-needs to prod the GIC to enable interrupts for the core before
-going into its loop (compare the 32-bit smpboot[] code in hw/arm/boot.c).
-But looking at the code in the kernel's arch/arm/mach-aspeed/platsmp.c,
-it uses dsb_sev() to prod the secondary core, so only wfe will
-work here. If you find that you are often in situations where the
-secondary cores are not started and so QEMU is wasting host CPU
-in this busy-loop, you could look at implementing a non-noop
-wfe/sev in QEMU, though it's not completely trivial because of
-all the things other than sev that are 'wfe wake-up events'.
+I'm having issues building this due to lack of HWCAP_S390_VX.
 
-thanks
--- PMM
+[linux1@rhkvm01 qemu]$ cat /etc/redhat-release
+Red Hat Enterprise Linux Server release 7.7 (Maipo)
+
+-- 
+Thanks,
+
+David / dhildenb
+
 
