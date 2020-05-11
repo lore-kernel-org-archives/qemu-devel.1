@@ -2,87 +2,79 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0336C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 14:51:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F1BEC47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 14:52:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A368520720
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 14:51:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A368520720
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cea.fr
+	by mail.kernel.org (Postfix) with ESMTPS id DDEE020720
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 14:52:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="nyjABrsZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDEE020720
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY9mJ-0001l9-Rh
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 10:51:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59320)
+	id 1jY9ms-0002sh-3I
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 10:52:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59308)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <olivier.lahaye@cea.fr>)
- id 1jY9TE-0003zn-T8; Mon, 11 May 2020 10:31:52 -0400
-Received: from cirse-smtp-out.extra.cea.fr ([132.167.192.148]:43106)
+ (Exim 4.90_1) (envelope-from <laurent.pinchart@ideasonboard.com>)
+ id 1jY9TD-0003y8-3W
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 10:31:51 -0400
+Received: from perceval.ideasonboard.com
+ ([2001:4b98:dc2:55:216:3eff:fef7:d647]:44710)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <olivier.lahaye@cea.fr>)
- id 1jY9TC-0002Je-Vg; Mon, 11 May 2020 10:31:52 -0400
-Received: from pisaure.intra.cea.fr (pisaure.intra.cea.fr [132.166.88.21])
- by cirse-sys.extra.cea.fr (8.14.7/8.14.7/CEAnet-Internet-out-4.0) with ESMTP
- id 04BEVjKW030521; Mon, 11 May 2020 16:31:45 +0200
-Received: from pisaure.intra.cea.fr (localhost [127.0.0.1])
- by localhost (Postfix) with SMTP id 59757210E9F;
- Mon, 11 May 2020 16:31:45 +0200 (CEST)
-Received: from muguet1-smtp-out.intra.cea.fr (muguet1-smtp-out.intra.cea.fr
- [132.166.192.12])
- by pisaure.intra.cea.fr (Postfix) with ESMTP id 42DE5210E8C;
- Mon, 11 May 2020 16:31:45 +0200 (CEST)
-Received: from EXCAH-A0.intra.cea.fr (excah-a0.intra.cea.fr [132.166.88.74])
- by muguet1-sys.intra.cea.fr (8.14.7/8.14.7/CEAnet-Internet-out-4.0) with ESMTP
- id 04BEVjkQ024686; Mon, 11 May 2020 16:31:45 +0200
-Received: from EXDAG0-A3.intra.cea.fr ([fe80::25a1:c396:2106:4c5b]) by
- EXCAH-A0.intra.cea.fr ([fe80::446e:fe1a:2892:9de1%10]) with mapi id
- 14.03.0487.000; Mon, 11 May 2020 16:31:45 +0200
-From: LAHAYE Olivier <olivier.lahaye@cea.fr>
-To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, B3r3n
- <B3r3n@argosnet.com>, "qemu-discuss@nongnu.org" <qemu-discuss@nongnu.org>,
- "Daniel P . Berrange" <berrange@redhat.com>, Gerd Hoffmann
- <kraxel@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
-Subject: Re: Qemu, VNC and non-US keymaps
-Thread-Topic: Qemu, VNC and non-US keymaps
-Thread-Index: AQHWJ5+fVD6rkJq73keSL9W8GvQa16iizwAAgAAjigA=
-Date: Mon, 11 May 2020 14:31:45 +0000
-Message-ID: <336D5401-9C4F-4C18-B8DF-AFCC7233155E@cea.fr>
-References: <E1jY9FF-0000Po-2c@lists.gnu.org>
- <af732fbf-fd70-97bc-3ea8-25d66f5895de@redhat.com>
-In-Reply-To: <af732fbf-fd70-97bc-3ea8-25d66f5895de@redhat.com>
-Accept-Language: fr-FR, en-US
-Content-Language: fr-FR
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Microsoft-MacOutlook/10.22.0.200209
-x-originating-ip: [132.166.88.106]
-x-tm-as-product-ver: SMEX-11.0.0.4179-8.100.1062-23234.003
-x-tm-as-result: No--14.501800-0.000000-31
-x-tm-as-user-approved-sender: Yes
-x-tm-as-user-blocked-sender: No
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <5A5AF00DCE606D49A82DDC5911A48488@cea.fr>
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <laurent.pinchart@ideasonboard.com>)
+ id 1jY9TB-0002Is-5P
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 10:31:50 -0400
+Received: from pendragon.ideasonboard.com (81-175-216-236.bb.dnainternet.fi
+ [81.175.216.236])
+ by perceval.ideasonboard.com (Postfix) with ESMTPSA id AA753304;
+ Mon, 11 May 2020 16:31:42 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
+ s=mail; t=1589207502;
+ bh=oSuLwOGHaFVj3MpyELVNUbPTFWevFH3FlsUl+NAZJU4=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=nyjABrsZDI1gLqkWjquSTgXs5RGdgURpyNSYZ7DI1/RqRsPX3CiM+Vc1WLMCuh0sp
+ nOn/kNmb3tL1TqKCs/cUA+R6GHqc0GGFqzicffsd7pn2Xcr7upDuVTDh6Ia1jiKovp
+ iwqcfNNeR17CETZmytmHTx4jtIJnuALC42eKWbSk=
+Date: Mon, 11 May 2020 17:31:36 +0300
+From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+To: Keiichi Watanabe <keiichiw@chromium.org>
+Subject: Re: [libcamera-devel] [virtio-dev] Re: Fwd: Qemu Support for Virtio
+ Video V4L2 driver
+Message-ID: <20200511143136.GC5830@pendragon.ideasonboard.com>
+References: <CAK25hWN3kJcW-dcpryFrvZ50t7Y0Z=MZM66-8NMuhwjRpNo2aQ@mail.gmail.com>
+ <CAD90Vcb-x1KV++fWrmx+fLV5eNc2DiTtn8=OjQi7aUf7B0ULdA@mail.gmail.com>
+ <CAK25hWM-hLdk=MSKgceumOUo9ZNBrrmM8qSe7MvTUAPGmur_HQ@mail.gmail.com>
+ <2515515.r9knKAEANn@os-lin-dmo>
+ <CAD90VcYeF7drbYNDiEioPBHcQcifqDYUia_CKqNLv_5VAMjPKw@mail.gmail.com>
+ <CAK25hWNR0WdpddU1kDChUB+PWiLG2A76KJW5u5F-LNkGBREj_g@mail.gmail.com>
+ <CAD90VcYJe7+R256RdOQKxFQciq54+PwbyDRF1cynjOzdQBrq-g@mail.gmail.com>
 MIME-Version: 1.0
-Received-SPF: pass client-ip=132.167.192.148;
- envelope-from=olivier.lahaye@cea.fr; helo=cirse-smtp-out.extra.cea.fr
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 10:31:47
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAD90VcYJe7+R256RdOQKxFQciq54+PwbyDRF1cynjOzdQBrq-g@mail.gmail.com>
+Received-SPF: pass client-ip=2001:4b98:dc2:55:216:3eff:fef7:d647;
+ envelope-from=laurent.pinchart@ideasonboard.com;
+ helo=perceval.ideasonboard.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 10:31:43
+X-ACL-Warn: Detected OS   = ???
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
-X-Mailman-Approved-At: Mon, 11 May 2020 10:50:27 -0400
+X-Mailman-Approved-At: Mon, 11 May 2020 10:50:28 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,41 +86,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Samiullah Khawaja <samiullah.khawaja@opensynergy.com>,
+ virtio-dev@lists.oasis-open.org, Alex Lau <alexlau@chromium.org>,
+ Kiran Pawar <Kiran.Pawar@opensynergy.com>,
+ Alexandre Courbot <acourbot@chromium.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Saket Sinha <saket.sinha89@gmail.com>, libcamera-devel@lists.libcamera.org,
+ Gerd Hoffmann <kraxel@redhat.com>, Dmitry Sepp <dmitry.sepp@opensynergy.com>,
+ Pawel Osciak <posciak@chromium.org>,
+ Linux Media Mailing List <linux-media@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SSBoYXZlIGEgc2ltaWxhciBwcm9ibGVtIHdpdGggcWVtdSAoYWxsIHZlcnNpb25zIGluY2x1ZGlu
-ZyA1LjAuMCkgb24gTWFjT1MtMTAuMTQuNiAobWFjIGJvb2sgcHJvIDIwMTd3aXRoIHRvdWNoIGJh
-cikuDQoNClVzaW5nIC1rIGZyLW1hYyB0aGUgIkAiLyIjIiBrZXkgaXMgZGVhZC4NClNob3drZXkg
-ZG9lc24ndCBkZXRlY3QgdGhlIGtleS4NCk1vcmVvdmVyLCB0aGUgIyBhbmQgQCBzeW1ib2xzIGFy
-ZSBtYXBwZWQgb24gdGhlICI8IiAvICI+IiBrZXkgYW5kIHRodXMgSSBtaXNzIHRoZSByZWRpcmVj
-dGlvbiBvcGVyYXRvciBpbiBzaGVsbC4NCg0KQ2hlZXJzLA0KDQpPbGl2aWVyLg0KDQrvu79MZSAx
-MS8wNS8yMDIwIDE2OjI1LCDCqyBRZW11LWRpc2N1c3MgYXUgbm9tIGRlIFBoaWxpcHBlIE1hdGhp
-ZXUtRGF1ZMOpIMK7IDxxZW11LWRpc2N1c3MtYm91bmNlcytvbGl2aWVyLmxhaGF5ZT1jZWEuZnJA
-bm9uZ251Lm9yZyBhdSBub20gZGUgcGhpbG1kQHJlZGhhdC5jb20+IGEgw6ljcml0IDoNCg0KICAg
-IENjJ2luZyBtb3JlIGRldmVsb3BlcnMuDQogICAgDQogICAgT24gNS8xMS8yMCA0OjE3IFBNLCBC
-M3IzbiB3cm90ZToNCiAgICA+IERlYXIgYWxsLA0KICAgID4gDQogICAgPiBJIGFtIHN0cnVnZ2xp
-bmcgZm9yIGRheXMvd2Vla3Mgd2l0aCBRZW11IGFuZCBpdHMgVk5DIGFjY2Vzc2VzLi4ud2l0aCAN
-CiAgICA+IG5vbi1VUyBrZXltYXBzLg0KICAgID4gDQogICAgPiBMZXQgbWUgc3VtbSB0aGUgZmFj
-dHM6DQogICAgPiAtIEkgYW0gdXNpbmcgYSBmcmVuY2gga2V5Ym9hcmQgb3ZlciBhIFVidW50dSAx
-OC4wNC4NCiAgICA+IC0gSSBpbnN0YWxsZWQgYSBzaW1wbGUgRGViaWFuIGluIGEgUWVtdSBWTSwg
-Y29uZmlndXJlZCB3aXRoIEZSIGtleWJvYXJkIA0KICAgID4gKEFaRVJUWSkuDQogICAgPiAtIEkg
-YW0gbGF1bmNoaW5nIHRoZSBRZW11IFZNIHdpdGggdGhlICctayBmcicga2V5bWFwaW5nIChvcmln
-aW5hbCkNCiAgICA+IC0gSSB0ZXN0ZWQgd2l0aCBRZW11IDMuMS4xLCA0LjIuMCAmIDUuMC4wLg0K
-ICAgID4gDQogICAgPiBJIGZhaWwgdG8gaGF2ZSB0aGUgQWx0R3Iga2V5cywgY3JpdGljYWwgdG8g
-ZnJlbmNoZXMgKHBpcGUsIGJhY2tzbGFzaCwgDQogICAgPiBkYXNoIGV0YykuDQogICAgPiBjaGVj
-a2luZyB3aXRoIHNob3drZXksIEkgc2VlIHRoZSBrZXlzIGFycml2aW5nIHByb3Blcmx5ICgyOSs1
-NiwgMjkrMTAwLCANCiAgICA+IGV0YykuDQogICAgPiANCiAgICA+IENvbnNpZGVyaW5nIGl0IG1p
-Z2h0IGJlIGEgZGViaWFuIGlzc3VlIGFzIHdlbGwsIEkgdXBkYXRlZCB0aGUgDQogICAgPiBxZW11
-L2tleW1hcHMvZnIgZmlsZSB0byBoYXZlIGJhciBkaXJlY3RseSB3aXRoIHRoZSA2IGtleSAobm9y
-bWFsbHkgYmFyIA0KICAgID4gaXMgQWx0R3IgKyA2KS4NCiAgICA+IEZvciBhbiB1bmtub3duIHJl
-YXNvbiwgdGhlICc2JyB0aGVuIG5vIGxvbmdlciB3b3JrcyAoc2hvd2tleSBzaG93cyANCiAgICA+
-IG5vdGhpbmcgYXMgd2VsbCkuDQogICAgPiANCiAgICA+IFRoZXJlIG1pZ2h0IGJlIHNvbWV0aGlu
-ZyBJIG1pc3MsIGFuZCB0aGUgbWlnaHQgYWxzbyBiZSBzb21lIGJ1ZyANCiAgICA+IHNvbWV3aGVy
-ZSwgb3Igc29tZSBtaXNzaW5ncy4NCiAgICA+IEZvciBleGFtcGxlLCBtYXliZSBYMTEgbXVzdCBi
-ZSBpbnN0YWxsZWQsIGV2ZW4gaXQgdW51c2VkIChWTkMgY2xpZW50IA0KICAgID4gY29ubmVjdHMg
-dG8gUWVtdSBWTkMgcG9ydCBkaXJlY3RseSksIG9yIHdoYXRldmVyLg0KICAgID4gDQogICAgPiBB
-bnkgaGVscCBhcHByZWNpYXRlZCA6LSkNCiAgICA+IA0KICAgID4gVGhhbmtzDQogICAgPiANCiAg
-ICA+IEJyZ3Jkcw0KICAgID4gDQogICAgPiANCiAgICANCiAgICANCiAgICANCg0K
+Hello,
+
+Jumping in the middle of this thread, so I apologize if some of my
+comments are a bit out of context.
+
+On Mon, May 11, 2020 at 11:06:34PM +0900, Keiichi Watanabe wrote:
+> On Mon, May 11, 2020 at 9:33 PM Saket Sinha <saket.sinha89@gmail.com> wrote:
+> > > > > I do not support the approach of  QEMU implementation forwarding
+> > > > > requests to the host's vicodec module since  this can limit the scope
+> > > > > of the virtio-video device only for testing,
+> > > >
+> > > > That was my understanding as well.
+> > >
+> > > Not really because the API which the vicodec provides is V4L2 stateful
+> > > decoder interface [1], which are also used by other video drivers on
+> > > Linux.
+> > > The difference between vicodec and actual device drivers is that
+> > > vicodec performs decoding in the kernel space without using special
+> > > video devices. In other words, vicodec is a software decoder in kernel
+> > > space which provides the same interface with actual video drivers.
+> > > Thus, if the QEMU implementation can forward virtio-video requests to
+> > > vicodec, it can forward them to the actual V4L2 video decoder devices
+> > > as well and VM gets access to a paravirtualized video device.
+> > >
+> > > The reason why we discussed vicodec in the previous thread was it'll
+> > > allow us to test the virtio-video driver without hardware requirement.
+> > >
+> > > [1] https://www.kernel.org/doc/html/latest/media/uapi/v4l/dev-decoder.html
+> > >
+> >
+> > Thanks for clarification.
+> >
+> > Could  you provide your views if it would be possible to support also
+> > paravirtualized v4l-subdev devices which is enabled by media
+> > controller to expose ISP processing blocks to linux userspace.
+> > Ofcourse, we might need to change implementation and spec to support that
+> > Please refer (1) for details.
+
+I don't think this would be the right level of abstraction. The V4L2 API
+is way too low-level when it comes to camera paravirtualization (and may
+not be the only API we'll have in the future). I thus recommend
+virtualizing cameras with a higher-level API, more or less on top of
+libcamera or the Android camera HAL (they both sit at the same level in
+the camera stack). Anything lower than that won't be practical.
+
+> Again, the current virtio-video protocol and driver only support video
+> encoding and decoding. We had no detailed discussion about camera
+> supports.
+> Moreover, I personally disagree with supporting video capturing in
+> virtio-video protocol. Instead, I believe it's better to have a
+> separate protocol like "virtio-camera". Decoupling video codec APIs
+> and camera APIs should make protocols simpler and easier to maintain.
+> I suggested this idea in [1].
+> 
+> So, the answer to your question is:
+> No in virtio-video protocol. But, it's possible to start designing a
+> new "virtio-camera" protocol that supports camera features including
+> image processing.
+> 
+> [1] https://markmail.org/message/4q2g5oqniw62pmqd
+> 
+> > > > > which instead can be used with multiple use cases such as -
+> > > > >
+> > > > > 1. VM gets access to paravirtualized  camera devices which shares the
+> > > > > video frames input through actual HW camera attached to Host.
+> > > >
+> > > > This use-case is out of the scope of virtio-video. Initially I had a plan to
+> > > > support capture-only streams like camera as well, but later the decision was
+> > > > made upstream that camera should be implemented as separate device type. We
+> > > > still plan to implement a simple frame capture capability as a downstream
+> > > > patch though.
+> > > >
+> > > > >
+> > > > > 2. If Host has multiple video devices (especially in ARM SOCs over
+> > > > > MIPI interfaces or USB), different VM can be started or hotplugged
+> > > > > with selective video streams from actual HW video devices.
+> > > >
+> > > > We do support this in our device implementation. But spec in general has no
+> > > > requirements or instructions regarding this. And it is in fact flexible enough
+> > > > to provide abstraction on top of several HW devices.
+> > > >
+> > > > >
+> > > > > Also instead of using libraries like Gstreamer in Host userspace, they
+> > > > > can also be used inside the VM userspace after getting access to
+> > > > > paravirtualized HW camera devices .
+> > >
+> > > Regarding Gstreamer, I intended this video decoding API [2]. If QEMU
+> > > can translate virtio-video requests to this API, we can easily support
+> > > multiple platforms.
+> > > I'm not sure how feasible it is though, as I have no experience of
+> > > using this API by myself...
+> > >
+> > > [2] https://gstreamer.freedesktop.org/documentation/tutorials/playback/hardware-accelerated-video-decoding.html
+> > >
+> >
+> > Like pointed out above, Gstreamer is not the only framework present there.
+> > We have the newer libcamera framework [2] and then Openmax (used in
+> > Android Hal )
+> > Refer [3] for comparison.
+> 
+> It seems that we had miscommunication here. While I had mentioned
+> Gstreamer as a generic implementation to cover "video decoding" APIs
+> on various platforms, you were talking about "camera" APIs.
+> As I said above, virtio-video is NOT designed for cameras.
+> 
+> For abstraction of video decoding APIs, I don't know any better
+> library than Gstreamer. For cameras, libcamera sounds good, but I'm
+> not so familiar with this area...
+> 
+> > My intentions are to make the implementation more generic so that it
+> > can be used by different frameworks on different platforms.
+> >
+> > [1]: https://static.sched.com/hosted_files/osseu19/21/libcamera.pdf
+> > [2]: http://libcamera.org
+> > [3]: https://processors.wiki.ti.com/images/7/7e/OMX_Android_GST_Comparison.pdf
+
+-- 
+Regards,
+
+Laurent Pinchart
 
