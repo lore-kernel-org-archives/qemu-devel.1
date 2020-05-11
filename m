@@ -2,90 +2,106 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A3DCC47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 20:03:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CFF2C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 20:05:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A20C206F5
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 20:03:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 24E99206F5
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 20:05:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qQJTjS/V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A20C206F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BUqtc8z/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24E99206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYEe7-000641-4K
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 16:03:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57866)
+	id 1jYEfe-0008Fe-DL
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 16:05:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58036)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <leobras.c@gmail.com>)
- id 1jYEdM-0005TZ-Cl; Mon, 11 May 2020 16:02:40 -0400
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:42087)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <leobras.c@gmail.com>)
- id 1jYEdL-0008H9-I6; Mon, 11 May 2020 16:02:40 -0400
-Received: by mail-qt1-x842.google.com with SMTP id x12so9124993qts.9;
- Mon, 11 May 2020 13:02:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=JiciO0iEuz3Ix6g9dsBXqhhpVz+mJsN+11cGOCdnM8I=;
- b=qQJTjS/VHodMqRSsn+LaG2IBWdLDM/SL6/QDhyW3Z1TCFTQHS93wq/qq4YZA1WHHa/
- 4AoD+pU0wjoqn4rXePjux0/q74eLbhFwqPXNWH0/aDqHHX5cbFDUD4ix2HDpBBVS/Vve
- Bsvbcb9aaIJqkgQ4aFsAV6p1azqCI6joc9raNJFygiMWGd6RDTyj3Ujt+1useousgLi1
- cg5XXBXqBILMWJPUURmiFnkcAW+TnOjFXWW/HuMHwQ9jFEuKxgFQfuMq1I8b/RDgdB0w
- vO2ML+gvjJet1/I0EgXEPLqlMifRe6GWiCDD9uDmRG1+gJWOy5JWyEv2ATLhwJhEbsfE
- we6w==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jYEea-0006wM-NP
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 16:03:56 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26744
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jYEeY-000058-I5
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 16:03:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589227433;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=RMr9FKzJIvLrY0bKbKAeCdvfEr//mY2ris5St7Uaaco=;
+ b=BUqtc8z/z9HMF0m/yFI81c6gCzAq+nXm7In0WSfsJ0xRJ8xSAg2oJ/MGxpw64N+X/Dzjiq
+ 4XErIPHvgGS5eeki5YAdW5v8QEsLTwUKTTS7GK8/2rEoJRrVbsBOvQDXgthSLTsqwcWUhV
+ q9loPbD5dgAIjCJ8DABx0VNXjRuwaF0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-39-_qaioSmTM2Cys7i2BU9pFw-1; Mon, 11 May 2020 16:03:49 -0400
+X-MC-Unique: _qaioSmTM2Cys7i2BU9pFw-1
+Received: by mail-wm1-f71.google.com with SMTP id w2so8861561wmc.3
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 13:03:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=JiciO0iEuz3Ix6g9dsBXqhhpVz+mJsN+11cGOCdnM8I=;
- b=RmSL4zcV6Z9ppedwapJrN/9TCjd/lx4NioVzhFKQLwQQfmiJsRH5nSwztWhqY3Zcbp
- 2ygZjM5siXn7gNkIWpO4xYFUNrbe67kKispJgsV51tbyrY4ejXiklhzNMLQ2gEtt8f0F
- 2NLml64iRh4tQDBH2hNcz4UmT3iYsdhmX+hxT419XWt6DNmS37TUkpY7X3yuE558nJ8m
- PK9XAq0FeS6c1jvRR9jhMLLo18+64MXKgQSla7lkB3LDD+dPXccExmEKih8cikiAUGaT
- tIqkm82vR/RoGeTV1sRd6g6imOVbsZaCXhHusJagVjtf6mXDk5lLI9rgdKfMwiJea1aF
- t+cw==
-X-Gm-Message-State: AGi0PubnPQ28Yf0B6qyikGxGes+/JZ4iTXnbrdWWr1/rH/JE2K5ELHr1
- aUFmV3GmDEfFT7+uzUnMEeY=
-X-Google-Smtp-Source: APiQypL2ypwOXa7HrMZ920d3nYaY1BrSiHBMFJCTDwixKVL5GXjbmY+RlfjTzxxgwqnW1v5Nyr4Yhg==
-X-Received: by 2002:ac8:6c6:: with SMTP id j6mr18181841qth.194.1589227357767; 
- Mon, 11 May 2020 13:02:37 -0700 (PDT)
-Received: from LeoBras.aus.stglabs.ibm.com
- (143-255-224-253.dynamic.desktop.com.br. [143.255.224.253])
- by smtp.gmail.com with ESMTPSA id i23sm9208723qke.65.2020.05.11.13.02.34
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 11 May 2020 13:02:36 -0700 (PDT)
-From: Leonardo Bras <leobras.c@gmail.com>
-To: David Gibson <david@gibson.dropbear.id.au>,
- Bharata B Rao <bharata.rao@in.ibm.com>
-Subject: [RESEND PATCH v3 1/1] ppc/spapr: Add hotremovable flag on DIMM LMBs
- on drmem_v2
-Date: Mon, 11 May 2020 17:02:02 -0300
-Message-Id: <20200511200201.58537-1-leobras.c@gmail.com>
-X-Mailer: git-send-email 2.25.4
+ bh=RMr9FKzJIvLrY0bKbKAeCdvfEr//mY2ris5St7Uaaco=;
+ b=eTxdXda0649BRQWnED1bGnLeFdUYPJk4lkIaV+/w/DXzWbebrRXIoFgH2TOLc7PdgB
+ g+n7yrDCbhq/Gq7082wiXHiHIi7NONHDbBm1V+IUJRbQ5knrri03ZyHxCkZ24zoryq6k
+ LZSAhDvUUsN/nxG2cmNih6xVRDwogloBtAA7o4i0sdxCeTaMtSmvWKrXU870iAApHgwS
+ w9govkQPMOyJGsyEmeU0Ms1SKZFcQVt7kmYlW39l0cVA208BUOC/MlKCL2cjjZKz1wSz
+ CxVXNxZ1PWtMVpAMR/yQ0WAmPQAIKC336+RNRz39FWUFYqWwY5HIEAEfnFlwS6F1WvgR
+ oRMw==
+X-Gm-Message-State: AGi0PuZrgDCIgr3WfVuLXw9d02JEGQZaSevN/PHuaooCF0+4cqA74OaB
+ CRys1Pb0vxo+gCD51QlpZL4s2h0otAU+cjLk42YpQMQAScuFS2QJxYy6UNy6b3s7nYDgGMBEJNy
+ NaFCHLlTtdjZoAcU=
+X-Received: by 2002:adf:e4cf:: with SMTP id v15mr20442154wrm.43.1589227428069; 
+ Mon, 11 May 2020 13:03:48 -0700 (PDT)
+X-Google-Smtp-Source: APiQypK1ciI8h807gTMam/ymhqHJQKyTNJ5cvrJEhgCIZave+Ty1FQCDUbTolhkaUPnIQacYfpGi8A==
+X-Received: by 2002:adf:e4cf:: with SMTP id v15mr20442134wrm.43.1589227427841; 
+ Mon, 11 May 2020 13:03:47 -0700 (PDT)
+Received: from [192.168.1.37] (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id v131sm876492wmb.27.2020.05.11.13.03.46
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 11 May 2020 13:03:47 -0700 (PDT)
+Subject: Re: [PATCH] hostmem: don't use mbind() if host-nodes is epmty
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20200430154606.6421-1-imammedo@redhat.com>
+ <20200504154450.GM5244@habkost.net>
+ <34c80b6d-c6f3-3772-140a-4650e2356d25@redhat.com>
+ <20200511212442.6e3f4509@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <db2c1505-d5fb-9310-7805-6c3be2435c04@redhat.com>
+Date: Mon, 11 May 2020 22:03:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <20200511212442.6e3f4509@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::842;
- envelope-from=leobras.c@gmail.com; helo=mail-qt1-x842.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 01:43:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,64 +114,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Leonardo Bras <leonardo@linux.ibm.com>,
- Bharata B Rao <bharata@linux.ibm.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Leonardo Bras <leobras.c@gmail.com>
+Cc: berrange@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-stable@nongnu.org, qemu-devel@nongnu.org, mhohmann@physnet.uni-hamburg.de,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Leonardo Bras <leonardo@linux.ibm.com>
+On 5/11/20 9:24 PM, Igor Mammedov wrote:
+> On Mon, 11 May 2020 18:00:01 +0200
+> Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+> 
+>> Hi Eduardo,
+>>
+>> On 5/4/20 5:44 PM, Eduardo Habkost wrote:
+>>> On Thu, Apr 30, 2020 at 11:46:06AM -0400, Igor Mammedov wrote:
+>>>> Since 5.0 QEMU uses hostmem backend for allocating main guest RAM.
+>>>> The backend however calls mbind() which is typically NOP
+>>>> in case of default policy/absent host-nodes bitmap.
+>>>> However when runing in container with black-listed mbind()
+>>>> syscall, QEMU fails to start with error
+>>>>    "cannot bind memory to host NUMA nodes: Operation not permitted"
+>>>> even when user hasn't provided host-nodes to pin to explictly
+>>>> (which is the case with -m option)
+>>>>
+>>>> To fix issue, call mbind() only in case when user has provided
+>>>> host-nodes explicitly (i.e. host_nodes bitmap is not empty).
+>>>> That should allow to run QEMU in containers with black-listed
+>>>> mbind() without memory pinning. If QEMU provided memory-pinning
+>>>> is required user still has to white-list mbind() in container
+>>>> configuration.
+>>>>
+>>>> Reported-by: Manuel Hohmann <mhohmann@physnet.uni-hamburg.de>
+>>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>>>
+>>> Queued on machine-next, thanks!
+>>
+>> I've been debugging this issue again today and figured it was not
+>> merged, if possible can you add the "Cc: qemu-stable@nongnu.org" tag
+>> before sending your pull request?
+> it's CCed already, so my impression was that will should picked up once it was reviewed.
 
-On reboot, all memory that was previously added using object_add and
-device_add is placed in this DIMM area.
+Correct, however some distributions find easier to grep for the 'Cc: 
+qemu-stable@nongnu.org' merged tag before qemu-stable is released.
 
-The new SPAPR_LMB_FLAGS_HOTREMOVABLE flag helps Linux to put this memory in
-the correct memory zone, so no unmovable allocations are made there,
-allowing the object to be easily hot-removed by device_del and
-object_del.
-
-This new flag was accepted in Power Architecture documentation.
-
-Signed-off-by: Leonardo Bras <leobras.c@gmail.com>
-Reviewed-by: Bharata B Rao <bharata@linux.ibm.com>
-
----
-Changes since v1:
-- Flag name changed from SPAPR_LMB_FLAGS_HOTPLUGGED to
-	SPAPR_LMB_FLAGS_HOTREMOVABLE
----
- hw/ppc/spapr.c         | 3 ++-
- include/hw/ppc/spapr.h | 1 +
- 2 files changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 9a2bd501aa..fe662e297e 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -446,7 +446,8 @@ static int spapr_dt_dynamic_memory_v2(SpaprMachineState *spapr, void *fdt,
-         g_assert(drc);
-         elem = spapr_get_drconf_cell(size / lmb_size, addr,
-                                      spapr_drc_index(drc), node,
--                                     SPAPR_LMB_FLAGS_ASSIGNED);
-+                                     (SPAPR_LMB_FLAGS_ASSIGNED |
-+                                      SPAPR_LMB_FLAGS_HOTREMOVABLE);
-         QSIMPLEQ_INSERT_TAIL(&drconf_queue, elem, entry);
-         nr_entries++;
-         cur_addr = addr + size;
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 42d64a0368..93e0d43051 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -880,6 +880,7 @@ int spapr_rtc_import_offset(SpaprRtcState *rtc, int64_t legacy_offset);
- #define SPAPR_LMB_FLAGS_ASSIGNED 0x00000008
- #define SPAPR_LMB_FLAGS_DRC_INVALID 0x00000020
- #define SPAPR_LMB_FLAGS_RESERVED 0x00000080
-+#define SPAPR_LMB_FLAGS_HOTREMOVABLE 0x00000100
- 
- void spapr_do_system_reset_on_cpu(CPUState *cs, run_on_cpu_data arg);
- 
--- 
-2.25.1
+> 
+>>
+>> Thanks,
+>>
+>> Phil.
+>>
+> 
 
 
