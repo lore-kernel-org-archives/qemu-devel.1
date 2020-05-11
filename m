@@ -2,92 +2,80 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 568D2C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 17:25:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C95E4C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 17:32:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F8A1206D7
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 17:25:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iT+JIGLM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F8A1206D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 950372070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 17:32:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 950372070B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYCBL-0003iR-3q
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 13:25:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34632)
+	id 1jYCHY-0007Q8-KL
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 13:32:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35528)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jYCAP-0002eQ-PQ
- for qemu-devel@nongnu.org; Mon, 11 May 2020 13:24:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51373
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jYCAO-0005QJ-Ts
- for qemu-devel@nongnu.org; Mon, 11 May 2020 13:24:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589217876;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=wjGhb6BbAOG8i3SkIYJGRliPy+C5MraeK7J+y0k5RrA=;
- b=iT+JIGLMBS5bG6kUeeEUj7kKT9mYd3qrBcLjm6t5yLqaM8ug+822ilDV/kUALFmsOVllSs
- JWL3kXfv8nCqpJJ5vDtEQD883yOfKZ0//GhRcZUEXf2872DMOvIquPPiG7Mi+x53wKchzo
- R2D5FdJ9tM0KN9tUavifXiDp8zRDyzY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-162-YqaUnV3RMnO-HRJqS9tCTw-1; Mon, 11 May 2020 13:24:31 -0400
-X-MC-Unique: YqaUnV3RMnO-HRJqS9tCTw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44ED9802EAD;
- Mon, 11 May 2020 17:24:30 +0000 (UTC)
-Received: from work-vm (ovpn-114-150.ams2.redhat.com [10.36.114.150])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9659A100164D;
- Mon, 11 May 2020 17:24:25 +0000 (UTC)
-Date: Mon, 11 May 2020 18:24:23 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Lukas Straub <lukasstraub2@web.de>
-Subject: Re: [PATCH 3/5] block/nbd.c: Add yank feature
-Message-ID: <20200511172423.GK2811@work-vm>
-References: <cover.1589193717.git.lukasstraub2@web.de>
- <1e712fa7f08e4772c2a68197a851161bee51610f.1589193717.git.lukasstraub2@web.de>
- <20200511161909.GJ2811@work-vm> <20200511190524.3681e58c@luklap>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jYCGG-0006sU-IM
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 13:30:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45316)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jYCGF-0000xh-70
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 13:30:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jYCGD-0002eb-NF
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 17:30:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id AB42A2E8105
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 17:30:37 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200511190524.3681e58c@luklap>
-User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 00:05:06
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- T_HK_NAME_DR=0.01 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 11 May 2020 17:24:27 -0000
+From: Alexander Bulekov <1878054@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: a1xndr
+X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
+X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
+References: <158921780313.11557.11335648957795976711.malonedeb@wampee.canonical.com>
+Message-Id: <158921786778.4523.4899032974108077201.malone@chaenomeles.canonical.com>
+Subject: [Bug 1878054] Re: Hang with high CPU usage in sdhci_data_transfer
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 0a2855a6067e605ae85f08012356fa3ad946de97
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 11:35:34
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -96,162 +84,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Reply-To: Bug 1878054 <1878054@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Lukas Straub (lukasstraub2@web.de) wrote:
-> On Mon, 11 May 2020 17:19:09 +0100
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> 
-> > * Lukas Straub (lukasstraub2@web.de) wrote:
-> > > Add yank option, pass it to the socket-channel and register a yank
-> > > function which sets s->state = NBD_CLIENT_QUIT. This is the same
-> > > behaviour as if an error occured.
-> > > 
-> > > Signed-off-by: Lukas Straub <lukasstraub2@web.de>  
-> > 
-> > > +static void nbd_yank(void *opaque)
-> > > +{
-> > > +    BlockDriverState *bs = opaque;
-> > > +    BDRVNBDState *s = (BDRVNBDState *)bs->opaque;
-> > > +
-> > > +    atomic_set(&s->state, NBD_CLIENT_QUIT);  
-> > 
-> > I think I was expecting a shutdown on the socket here - why doesn't it
-> > have one?
-> 
-> For nbd, we register two yank functions: This one and we enable the yank feature on the qio channel (see function nbd_establish_connection below).
+Forgot the attachment..
 
-Oh I see; yeh that still surprises me a little; I'd expected one yank
-per item.
+** Attachment added: "attachment"
+   https://bugs.launchpad.net/qemu/+bug/1878054/+attachment/5369967/+files/=
+attachment
 
-Dave
+-- =
 
-> Regards,
-> Lukas Straub
-> 
-> > Dave
-> > 
-> > > +}
-> > > +
-> > >  static void nbd_client_close(BlockDriverState *bs)
-> > >  {
-> > >      BDRVNBDState *s = (BDRVNBDState *)bs->opaque;
-> > > @@ -1407,14 +1421,17 @@ static void nbd_client_close(BlockDriverState *bs)
-> > >      nbd_teardown_connection(bs);
-> > >  }
-> > >  
-> > > -static QIOChannelSocket *nbd_establish_connection(SocketAddress *saddr,
-> > > +static QIOChannelSocket *nbd_establish_connection(BlockDriverState *bs,
-> > > +                                                  SocketAddress *saddr,
-> > >                                                    Error **errp)
-> > >  {
-> > > +    BDRVNBDState *s = (BDRVNBDState *)bs->opaque;
-> > >      QIOChannelSocket *sioc;
-> > >      Error *local_err = NULL;
-> > >  
-> > >      sioc = qio_channel_socket_new();
-> > >      qio_channel_set_name(QIO_CHANNEL(sioc), "nbd-client");
-> > > +    qio_channel_set_yank(QIO_CHANNEL(sioc), s->yank);
-> > >  
-> > >      qio_channel_socket_connect_sync(sioc, saddr, &local_err);
-> > >      if (local_err) {
-> > > @@ -1438,7 +1455,7 @@ static int nbd_client_connect(BlockDriverState *bs, Error **errp)
-> > >       * establish TCP connection, return error if it fails
-> > >       * TODO: Configurable retry-until-timeout behaviour.
-> > >       */
-> > > -    QIOChannelSocket *sioc = nbd_establish_connection(s->saddr, errp);
-> > > +    QIOChannelSocket *sioc = nbd_establish_connection(bs, s->saddr, errp);
-> > >  
-> > >      if (!sioc) {
-> > >          return -ECONNREFUSED;
-> > > @@ -1829,6 +1846,12 @@ static QemuOptsList nbd_runtime_opts = {
-> > >                      "future requests before a successful reconnect will "
-> > >                      "immediately fail. Default 0",
-> > >          },
-> > > +        {
-> > > +            .name = "yank",
-> > > +            .type = QEMU_OPT_BOOL,
-> > > +            .help = "Forcibly close the connection and don't attempt to "
-> > > +                    "reconnect when the 'yank' qmp command is executed.",
-> > > +        },
-> > >          { /* end of list */ }
-> > >      },
-> > >  };
-> > > @@ -1888,6 +1911,8 @@ static int nbd_process_options(BlockDriverState *bs, QDict *options,
-> > >  
-> > >      s->reconnect_delay = qemu_opt_get_number(opts, "reconnect-delay", 0);
-> > >  
-> > > +    s->yank = qemu_opt_get_bool(opts, "yank", false);
-> > > +
-> > >      ret = 0;
-> > >  
-> > >   error:
-> > > @@ -1921,6 +1946,10 @@ static int nbd_open(BlockDriverState *bs, QDict *options, int flags,
-> > >      /* successfully connected */
-> > >      s->state = NBD_CLIENT_CONNECTED;
-> > >  
-> > > +    if (s->yank) {
-> > > +        yank_register_function(nbd_yank, bs);
-> > > +    }
-> > > +
-> > >      s->connection_co = qemu_coroutine_create(nbd_connection_entry, s);
-> > >      bdrv_inc_in_flight(bs);
-> > >      aio_co_schedule(bdrv_get_aio_context(bs), s->connection_co);
-> > > @@ -1972,6 +2001,11 @@ static void nbd_close(BlockDriverState *bs)
-> > >      BDRVNBDState *s = bs->opaque;
-> > >  
-> > >      nbd_client_close(bs);
-> > > +
-> > > +    if (s->yank) {
-> > > +        yank_unregister_function(nbd_yank, bs);
-> > > +    }
-> > > +
-> > >      nbd_clear_bdrvstate(s);
-> > >  }
-> > >  
-> > > diff --git a/qapi/block-core.json b/qapi/block-core.json
-> > > index 943df1926a..1c1578160e 100644
-> > > --- a/qapi/block-core.json
-> > > +++ b/qapi/block-core.json
-> > > @@ -3862,6 +3862,8 @@
-> > >  #                   reconnect. After that time, any delayed requests and all
-> > >  #                   future requests before a successful reconnect will
-> > >  #                   immediately fail. Default 0 (Since 4.2)
-> > > +# @yank: Forcibly close the connection and don't attempt to reconnect when
-> > > +#        the 'yank' qmp command is executed. (Since: 5.1)
-> > >  #
-> > >  # Since: 2.9
-> > >  ##
-> > > @@ -3870,7 +3872,8 @@
-> > >              '*export': 'str',
-> > >              '*tls-creds': 'str',
-> > >              '*x-dirty-bitmap': 'str',
-> > > -            '*reconnect-delay': 'uint32' } }
-> > > +            '*reconnect-delay': 'uint32',
-> > > +	    'yank': 'bool' } }
-> > >  
-> > >  ##
-> > >  # @BlockdevOptionsRaw:
-> > > -- 
-> > > 2.20.1
-> > >   
-> > 
-> > 
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1878054
 
+Title:
+  Hang with high CPU usage in sdhci_data_transfer
 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Status in QEMU:
+  New
 
+Bug description:
+  Hello,
+  While fuzzing, I found an input that causes QEMU to hang with 100% CPU us=
+age.
+  I have waited several minutes, and QEMU is still unresponsive. Using gdb,=
+ It
+  appears that it is stuck in an sdhci_data_transfer:
+
+  #0   memory_region_access_valid (mr=3D<optimized out>, addr=3D0x10284920,=
+ size=3D<optimized out>, is_write=3D0xff, attrs=3D...) at /home/alxndr/Deve=
+lopment/qemu/memory.c:1378
+  #1   memory_region_dispatch_write (mr=3D<optimized out>, addr=3D<optimize=
+d out>, data=3D<optimized out>, op=3DMO_32, attrs=3D...) at /home/alxndr/De=
+velopment/qemu/memory.c:1463
+  #2   flatview_write_continue (fv=3D<optimized out>, addr=3D0x10284920, at=
+trs=3D..., ptr=3D<optimized out>, len=3D0xb7, addr1=3D0x5555582798e0, l=3D<=
+optimized out>, mr=3D0x5555582798e0 <io_mem_unassigned>) at /home/alxndr/De=
+velopment/qemu/exec.c:3137
+  #3   flatview_write (fv=3D0x606000045da0, addr=3D<optimized out>, attrs=
+=3D..., buf=3D<optimized out>, len=3D<optimized out>) at /home/alxndr/Devel=
+opment/qemu/exec.c:3177
+  #4   address_space_write (as=3D<optimized out>, addr=3D<optimized out>, a=
+ttrs=3D..., buf=3D0xaaaab04f325, len=3D0x4) at /home/alxndr/Development/qem=
+u/exec.c:3268
+  #5   address_space_rw (as=3D0x5555572509ac <unassigned_mem_ops+44>, addr=
+=3D0x5555582798e0, attrs=3D..., attrs@entry=3D..., buf=3D0xaaaab04f325, len=
+=3D0x4, is_write=3D0xb8, is_write@entry=3D0x1) at
+  /home/alxndr/Development/qemu/exec.c:3278
+  #6   dma_memory_rw_relaxed (as=3D0x5555572509ac <unassigned_mem_ops+44>, =
+addr=3D0x5555582798e0, buf=3D0xaaaab04f325, len=3D0x4, dir=3DDMA_DIRECTION_=
+FROM_DEVICE) at /home/alxndr/Development/qemu/include/sysemu/dma.h:87
+  #7   dma_memory_rw (as=3D0x5555572509ac <unassigned_mem_ops+44>, addr=3D0=
+x5555582798e0, buf=3D0xaaaab04f325, len=3D0x4, dir=3DDMA_DIRECTION_FROM_DEV=
+ICE) at /home/alxndr/Development/qemu/include/sysemu/dma.h:110
+  #8   dma_memory_write (as=3D0x5555572509ac <unassigned_mem_ops+44>, addr=
+=3D0x5555582798e0, buf=3D0xaaaab04f325, len=3D0x4) at /home/alxndr/Developm=
+ent/qemu/include/sysemu/dma.h:122
+  #9   sdhci_sdma_transfer_multi_blocks (s=3D<optimized out>) at /home/alxn=
+dr/Development/qemu/hw/sd/sdhci.c:618
+  #10  sdhci_data_transfer (opaque=3D0x61e000021080) at /home/alxndr/Develo=
+pment/qemu/hw/sd/sdhci.c:891
+  #11  sdhci_send_command (s=3D0x61e000021080) at /home/alxndr/Development/=
+qemu/hw/sd/sdhci.c:364
+  #12  sdhci_write (opaque=3D<optimized out>, offset=3D0xc, val=3D<optimize=
+d out>, size=3D<optimized out>) at /home/alxndr/Development/qemu/hw/sd/sdhc=
+i.c:1158
+  #13  memory_region_write_accessor (mr=3D<optimized out>, addr=3D<optimize=
+d out>, value=3D<optimized out>, size=3D<optimized out>, shift=3D<optimized=
+ out>, mask=3D<optimized out>, attrs=3D...) at
+  /home/alxndr/Development/qemu/memory.c:483
+  #14  access_with_adjusted_size (addr=3D<optimized out>, value=3D<optimize=
+d out>, size=3D<optimized out>, access_size_min=3D<optimized out>, access_s=
+ize_max=3D<optimized out>, access_fn=3D<optimized out>, mr=3D0x61e0000219f0=
+, attrs=3D...) at /home/alxndr/Development/qemu/memory.c:544
+  #15  memory_region_dispatch_write (mr=3D<optimized out>, addr=3D<optimize=
+d out>, data=3D0x1ffe0ff, op=3D<optimized out>, attrs=3D...) at /home/alxnd=
+r/Development/qemu/memory.c:1476
+  #16  flatview_write_continue (fv=3D<optimized out>, addr=3D0xe106800c, at=
+trs=3D..., ptr=3D<optimized out>, len=3D0xff3, addr1=3D0x5555582798e0, l=3D=
+<optimized out>, mr=3D0x61e0000219f0) at /home/alxndr/Development/qemu/exec=
+.c:3137
+  #17  flatview_write (fv=3D0x606000045da0, addr=3D<optimized out>, attrs=
+=3D..., buf=3D<optimized out>, len=3D<optimized out>) at /home/alxndr/Devel=
+opment/qemu/exec.c:3177
+  #18  address_space_write (as=3D<optimized out>, addr=3D<optimized out>, a=
+ttrs=3D..., attrs@entry=3D..., buf=3D0xaaaab04f325, buf@entry=3D0x62100008a=
+d00, len=3D0x4) at /home/alxndr/Development/qemu/exec.c:3268
+  #19  qtest_process_command (chr=3D<optimized out>, chr@entry=3D0x55555827=
+c040 <qtest_chr>, words=3D<optimized out>) at /home/alxndr/Development/qemu=
+/qtest.c:567
+  #20  qtest_process_inbuf (chr=3D0x55555827c040 <qtest_chr>, inbuf=3D0x619=
+00000f640) at /home/alxndr/Development/qemu/qtest.c:710
+
+  =
+
+  I am attaching the qtest commands for reproducing it.
+  I can reproduce it in a qemu 5.0 build using:
+
+  qemu-system-i386 -M pc-q35-5.0 -qtest stdio -device sdhci-pci,sd-spec-
+  version=3D3 -device sd-card,drive=3Dmydrive -drive if=3Dsd,index=3D0,file
+  =3Dnull-co://,format=3Draw,id=3Dmydrive -nographic -nographic -serial none
+  -monitor none < attachment
+
+  Please let me know if I can provide any further info.
+  -Alex
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1878054/+subscriptions
 
