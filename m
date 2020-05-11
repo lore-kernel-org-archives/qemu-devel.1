@@ -2,103 +2,93 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B42F2C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 08:51:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E209C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 08:51:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6958E20708
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 08:51:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S9GzZa8v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6958E20708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 610D320708
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 08:51:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 610D320708
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY49Z-0001uA-Fm
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 04:51:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33664)
+	id 1jY49e-0002G8-IO
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 04:51:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33666)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jY47u-00007S-MC
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1jY47v-00007z-SW
  for qemu-devel@nongnu.org; Mon, 11 May 2020 04:49:31 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60163
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jY47t-0002Rj-DZ
- for qemu-devel@nongnu.org; Mon, 11 May 2020 04:49:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589186968;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ujm/k7XqSOSF25VoCj2jMLGjitfu9+QshnUWrWmT6LY=;
- b=S9GzZa8v+stNPB8vwhitcsWFHOwy9hxp3M47xNNDlkXBFt7dGvE3swOsMTXWykpkHo1V1Y
- GMufAWbW3p+CfN0ufjxuU00Mx2xHZnpl1bdd8qBCwLadBFplpHW8o0z1v062RSabC4vp7a
- omb7BDvw8OiYs9WfswllDS3Cgut0rgI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-241-rvOx0ogyMhSSfpRb-s3XUA-1; Mon, 11 May 2020 04:49:24 -0400
-X-MC-Unique: rvOx0ogyMhSSfpRb-s3XUA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E52AC100CCCB;
- Mon, 11 May 2020 08:49:22 +0000 (UTC)
-Received: from [10.36.114.214] (ovpn-114-214.ams2.redhat.com [10.36.114.214])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D65D210016E8;
- Mon, 11 May 2020 08:49:14 +0000 (UTC)
-Subject: Re: [EXT] [PATCH v2 2/5] virtio-iommu: Implement RESV_MEM probe
- request
-To: Bharat Bhushan <bbhushan2@marvell.com>,
- "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "mst@redhat.com" <mst@redhat.com>,
- "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
- "peterx@redhat.com" <peterx@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
-References: <20200508173057.32215-1-eric.auger@redhat.com>
- <20200508173057.32215-3-eric.auger@redhat.com>
- <MWHPR1801MB19669FBFAD49AD36460B0756E3A10@MWHPR1801MB1966.namprd18.prod.outlook.com>
- <ba80143c-e053-5323-70a0-72a1dcc04376@redhat.com>
- <CY4PR1801MB1959F371C327FDBEE4EE7B64E3A10@CY4PR1801MB1959.namprd18.prod.outlook.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <8e3d767e-f22e-41d3-885a-dbda866d0310@redhat.com>
-Date: Mon, 11 May 2020 10:49:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <CY4PR1801MB1959F371C327FDBEE4EE7B64E3A10@CY4PR1801MB1959.namprd18.prod.outlook.com>
+Received: from mga03.intel.com ([134.134.136.65]:16603)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1jY47s-0002RV-Kc
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 04:49:31 -0400
+IronPort-SDR: aEM7hb7bolOy92ox2FI7fx59YZbeCTrC4KB1jPU94f8umyAqNs8J6kvEDS0beRWQnplBIx8v+Y
+ WuE8P4pkvYSw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 11 May 2020 01:49:23 -0700
+IronPort-SDR: d7CuCRKVbisANeFjGQun+IVGCcAmMNVlzDzffEfTLloYyc/N+QRLYXYINXunDYBNRiu84qbCFU
+ 2m3AqdwS27Ig==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,379,1583222400"; d="scan'208";a="408855257"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+ by orsmga004.jf.intel.com with ESMTP; 11 May 2020 01:49:23 -0700
+Received: from shsmsx606.ccr.corp.intel.com (10.109.6.216) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 11 May 2020 01:49:23 -0700
+Received: from shsmsx604.ccr.corp.intel.com (10.109.6.214) by
+ SHSMSX606.ccr.corp.intel.com (10.109.6.216) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 11 May 2020 16:49:21 +0800
+Received: from shsmsx604.ccr.corp.intel.com ([10.109.6.214]) by
+ SHSMSX604.ccr.corp.intel.com ([10.109.6.214]) with mapi id 15.01.1713.004;
+ Mon, 11 May 2020 16:49:21 +0800
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: Lukas Straub <lukasstraub2@web.de>
+Subject: RE: [PATCH v4 5/6] net/colo-compare.c, softmmu/vl.c: Check that
+ colo-compare is active
+Thread-Topic: [PATCH v4 5/6] net/colo-compare.c, softmmu/vl.c: Check that
+ colo-compare is active
+Thread-Index: AQHWIf7Bx4gi7zaHJ0uJupTsMN62paicgaQQ///DzYCAATT/wP//ulaAgACLWyCAAW5zAIADa1tQ
+Date: Mon, 11 May 2020 08:49:21 +0000
+Message-ID: <b2ed0265c0054f08935aececa3a0813a@intel.com>
+References: <cover.1588587700.git.lukasstraub2@web.de>
+ <f6cbde747d78ff080f680c710e2793867a3cf1fa.1588587700.git.lukasstraub2@web.de>
+ <0380e994e53947cd961cc363d46561d3@intel.com>	<20200507175421.185b48f8@luklap>
+ <59eea784a36643b4b1fe32b0700f57f7@intel.com>	<20200508081057.7f1db99b@luklap>
+ <9cacfbefef504b94b2b3c19b2bffaff0@intel.com> <20200509142118.1a77d40d@luklap>
+In-Reply-To: <20200509142118.1a77d40d@luklap>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 02:55:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.36]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Received-SPF: pass client-ip=134.134.136.65; envelope-from=chen.zhang@intel.com;
+ helo=mga03.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 04:49:24
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,296 +101,234 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>,
+ "Dr .
+ David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Bharat,
-
-On 5/11/20 10:42 AM, Bharat Bhushan wrote:
-> Hi Eric,
-> 
->> -----Original Message-----
->> From: Auger Eric <eric.auger@redhat.com>
->> Sent: Monday, May 11, 2020 12:26 PM
->> To: Bharat Bhushan <bbhushan2@marvell.com>; eric.auger.pro@gmail.com;
->> qemu-devel@nongnu.org; qemu-arm@nongnu.org; peter.maydell@linaro.org;
->> mst@redhat.com; jean-philippe@linaro.org; peterx@redhat.com;
->> armbru@redhat.com; pbonzini@redhat.com
->> Subject: Re: [EXT] [PATCH v2 2/5] virtio-iommu: Implement RESV_MEM probe
->> request
->>
->> Hi Bharat,
->> On 5/11/20 8:38 AM, Bharat Bhushan wrote:
->>> Hi Eric,
->>>
->>>> -----Original Message-----
->>>> From: Eric Auger <eric.auger@redhat.com>
->>>> Sent: Friday, May 8, 2020 11:01 PM
->>>> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
->>>> qemu-devel@nongnu.org; qemu-arm@nongnu.org; peter.maydell@linaro.org;
->>>> mst@redhat.com; jean- philippe@linaro.org; Bharat Bhushan
->>>> <bbhushan2@marvell.com>; peterx@redhat.com; armbru@redhat.com;
->>>> pbonzini@redhat.com
->>>> Subject: [EXT] [PATCH v2 2/5] virtio-iommu: Implement RESV_MEM probe
->>>> request
->>>>
->>>> External Email
->>>>
->>>> ---------------------------------------------------------------------
->>>> - This patch implements the PROBE request. At the moment, only THE
->>>> RESV_MEM property is handled. The first goal is to report iommu wide
->>>> reserved regions such as the MSI regions set by the machine code. On
->>>> x86 this will be the IOAPIC MSI region,
->>>> [0xFEE00000 - 0xFEEFFFFF], on ARM this may be the ITS doorbell.
->>>>
->>>> In the future we may introduce per device reserved regions.
->>>> This will be useful when protecting host assigned devices which may
->>>> expose their own reserved regions
->>>>
->>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>>
->>>> ---
->>>>
->>>> v1 -> v2:
->>>> - move the unlock back to the same place
->>>> - remove the push label and factorize the code after the out label
->>>> - fix a bunch of cpu_to_leX according to the latest spec revision
->>>> - do not remove sizeof(last) from free space
->>>> - check the ep exists
->>>> ---
->>>>  include/hw/virtio/virtio-iommu.h |  2 +
->>>>  hw/virtio/virtio-iommu.c         | 94 ++++++++++++++++++++++++++++++--
->>>>  hw/virtio/trace-events           |  1 +
->>>>  3 files changed, 93 insertions(+), 4 deletions(-)
->>>>
->>>> diff --git a/include/hw/virtio/virtio-iommu.h
->>>> b/include/hw/virtio/virtio-iommu.h
->>>> index e653004d7c..49eb105cd8 100644
->>>> --- a/include/hw/virtio/virtio-iommu.h
->>>> +++ b/include/hw/virtio/virtio-iommu.h
->>>> @@ -53,6 +53,8 @@ typedef struct VirtIOIOMMU {
->>>>      GHashTable *as_by_busptr;
->>>>      IOMMUPciBus *iommu_pcibus_by_bus_num[PCI_BUS_MAX];
->>>>      PCIBus *primary_bus;
->>>> +    ReservedRegion *reserved_regions;
->>>> +    uint32_t nb_reserved_regions;
->>>>      GTree *domains;
->>>>      QemuMutex mutex;
->>>>      GTree *endpoints;
->>>> diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
->>>> index
->>>> 22ba8848c2..35d772e021 100644
->>>> --- a/hw/virtio/virtio-iommu.c
->>>> +++ b/hw/virtio/virtio-iommu.c
->>>> @@ -38,6 +38,7 @@
->>>>
->>>>  /* Max size */
->>>>  #define VIOMMU_DEFAULT_QUEUE_SIZE 256
->>>> +#define VIOMMU_PROBE_SIZE 512
->>>>
->>>>  typedef struct VirtIOIOMMUDomain {
->>>>      uint32_t id;
->>>> @@ -378,6 +379,65 @@ static int virtio_iommu_unmap(VirtIOIOMMU *s,
->>>>      return ret;
->>>>  }
->>>>
->>>> +static ssize_t virtio_iommu_fill_resv_mem_prop(VirtIOIOMMU *s, uint32_t ep,
->>>> +                                               uint8_t *buf, size_t
->>>> +free) {
->>>> +    struct virtio_iommu_probe_resv_mem prop = {};
->>>> +    size_t size = sizeof(prop), length = size - sizeof(prop.head), total;
->>>> +    int i;
->>>> +
->>>> +    total = size * s->nb_reserved_regions;
->>>> +
->>>> +    if (total > free) {
->>>> +        return -ENOSPC;
->>>> +    }
->>>> +
->>>> +    for (i = 0; i < s->nb_reserved_regions; i++) {
->>>> +        prop.head.type = cpu_to_le16(VIRTIO_IOMMU_PROBE_T_RESV_MEM);
->>>> +        prop.head.length = cpu_to_le16(length);
->>>> +        prop.subtype = s->reserved_regions[i].type;
->>>> +        prop.start = cpu_to_le64(s->reserved_regions[i].low);
->>>> +        prop.end = cpu_to_le64(s->reserved_regions[i].high);
->>>> +
->>>> +        memcpy(buf, &prop, size);
->>>> +
->>>> +        trace_virtio_iommu_fill_resv_property(ep, prop.subtype,
->>>> +                                              prop.start, prop.end);
->>>> +        buf += size;
->>>> +    }
->>>> +    return total;
->>>> +}
->>>> +
->>>> +/**
->>>> + * virtio_iommu_probe - Fill the probe request buffer with
->>>> + * the properties the device is able to return and add a NONE
->>>> + * property at the end.
->>>> + */
->>>> +static int virtio_iommu_probe(VirtIOIOMMU *s,
->>>> +                              struct virtio_iommu_req_probe *req,
->>>> +                              uint8_t *buf) {
->>>> +    uint32_t ep_id = le32_to_cpu(req->endpoint);
->>>> +    size_t free = VIOMMU_PROBE_SIZE;
->>>> +    ssize_t count;
->>>> +
->>>> +    if (!virtio_iommu_mr(s, ep_id)) {
->>>> +        return VIRTIO_IOMMU_S_NOENT;
->>>> +    }
->>>> +
->>>> +    count = virtio_iommu_fill_resv_mem_prop(s, ep_id, buf, free);
->>>> +    if (count < 0) {
->>>> +        return VIRTIO_IOMMU_S_INVAL;
->>>> +    }
->>>> +    buf += count;
->>>> +    free -= count;
->>>> +
->>>> +    /* Fill the rest with zeroes */
->>>> +    memset(buf, 0, free);
->>>
->>> No need to fill with zero here as "buf" is set to zero on allocation, no?
->>
->> You're right. I will remove this in the next version.
->>
->> Thanks
->>
->> Eric
->>>
->>> Thanks
->>> -Bharat
->>>
->>>> +
->>>> +    return VIRTIO_IOMMU_S_OK;
->>>> +}
->>>> +
->>>>  static int virtio_iommu_iov_to_req(struct iovec *iov,
->>>>                                     unsigned int iov_cnt,
->>>>                                     void *req, size_t req_sz) @@
->>>> -407,15 +467,27 @@
->>>> virtio_iommu_handle_req(detach)
->>>>  virtio_iommu_handle_req(map)
->>>>  virtio_iommu_handle_req(unmap)
->>>>
->>>> +static int virtio_iommu_handle_probe(VirtIOIOMMU *s,
->>>> +                                     struct iovec *iov,
->>>> +                                     unsigned int iov_cnt,
->>>> +                                     uint8_t *buf) {
->>>> +    struct virtio_iommu_req_probe req;
->>>> +    int ret = virtio_iommu_iov_to_req(iov, iov_cnt, &req,
->>>> +sizeof(req));
->>>> +
->>>> +    return ret ? ret : virtio_iommu_probe(s, &req, buf); }
->>>> +
->>>>  static void virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue
->> *vq)  {
->>>>      VirtIOIOMMU *s = VIRTIO_IOMMU(vdev);
->>>>      struct virtio_iommu_req_head head;
->>>>      struct virtio_iommu_req_tail tail = {};
->>>> +    size_t output_size = sizeof(tail), sz;
->>>>      VirtQueueElement *elem;
->>>>      unsigned int iov_cnt;
->>>>      struct iovec *iov;
->>>> -    size_t sz;
->>>> +    void *buf = NULL;
->>>>
->>>>      for (;;) {
->>>>          elem = virtqueue_pop(vq, sizeof(VirtQueueElement)); @@
->>>> -452,6 +524,17 @@ static void virtio_iommu_handle_command(VirtIODevice
->> *vdev, VirtQueue *vq)
->>>>          case VIRTIO_IOMMU_T_UNMAP:
->>>>              tail.status = virtio_iommu_handle_unmap(s, iov, iov_cnt);
->>>>              break;
->>>> +        case VIRTIO_IOMMU_T_PROBE:
-> 
-> As per spec
->   "
->    If the device does not offer the VIRTIO_IOMMU_F_PROBE feature, and if the driver sends a VIRTIO_-
->    IOMMU_T_PROBE request, then the device SHOULD NOT write the buffer and SHOULD set the used
->    length to zero.
->   "
-> So we should check if device supports "VIRTIO_IOMMU_F_PROBE" before proceed?
-But are the device and from that patch onwards we do support the
-VIRTIO_IOMMU_F_PROBE feature, right?
-
-Thanks
-
-Eric
-> 
-> Thanks
-> -Bharat
-> 
->>>> +        {
->>>> +            struct virtio_iommu_req_tail *ptail;
->>>> +
->>>> +            output_size = s->config.probe_size + sizeof(tail);
->>>> +            buf = g_malloc0(output_size);
->>>> +
->>>> +            ptail = (struct virtio_iommu_req_tail *)
->>>> +                        (buf + s->config.probe_size);
->>>> +            ptail->status = virtio_iommu_handle_probe(s, iov, iov_cnt, buf);
->>>> +        }
->>>>          default:
->>>>              tail.status = VIRTIO_IOMMU_S_UNSUPP;
->>>>          }
->>>> @@ -459,12 +542,13 @@ static void
->>>> virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue *vq)
->>>>
->>>>  out:
->>>>          sz = iov_from_buf(elem->in_sg, elem->in_num, 0,
->>>> -                          &tail, sizeof(tail));
->>>> -        assert(sz == sizeof(tail));
->>>> +                          buf ? buf : &tail, output_size);
->>>> +        assert(sz == output_size);
->>>>
->>>> -        virtqueue_push(vq, elem, sizeof(tail));
->>>> +        virtqueue_push(vq, elem, sz);
->>>>          virtio_notify(vdev, vq);
->>>>          g_free(elem);
->>>> +        g_free(buf);
->>>>      }
->>>>  }
->>>>
->>>> @@ -667,6 +751,7 @@ static void
->>>> virtio_iommu_device_realize(DeviceState *dev, Error **errp)
->>>>      s->config.page_size_mask = TARGET_PAGE_MASK;
->>>>      s->config.input_range.end = -1UL;
->>>>      s->config.domain_range.end = 32;
->>>> +    s->config.probe_size = VIOMMU_PROBE_SIZE;
->>>>
->>>>      virtio_add_feature(&s->features, VIRTIO_RING_F_EVENT_IDX);
->>>>      virtio_add_feature(&s->features, VIRTIO_RING_F_INDIRECT_DESC);
->>>> @@ -676,6
->>>> +761,7 @@ static void virtio_iommu_device_realize(DeviceState *dev,
->>>> +Error
->>>> **errp)
->>>>      virtio_add_feature(&s->features, VIRTIO_IOMMU_F_MAP_UNMAP);
->>>>      virtio_add_feature(&s->features, VIRTIO_IOMMU_F_BYPASS);
->>>>      virtio_add_feature(&s->features, VIRTIO_IOMMU_F_MMIO);
->>>> +    virtio_add_feature(&s->features, VIRTIO_IOMMU_F_PROBE);
->>>>
->>>>      qemu_mutex_init(&s->mutex);
->>>>
->>>> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events index
->>>> e83500bee9..5550475691 100644
->>>> --- a/hw/virtio/trace-events
->>>> +++ b/hw/virtio/trace-events
->>>> @@ -73,3 +73,4 @@ virtio_iommu_get_domain(uint32_t domain_id) "Alloc
->>>> domain=%d"
->>>>  virtio_iommu_put_domain(uint32_t domain_id) "Free domain=%d"
->>>>  virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr,
->>>> uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
->>>>  virtio_iommu_report_fault(uint8_t reason, uint32_t flags, uint32_t
->>>> endpoint, uint64_t addr) "FAULT reason=%d flags=%d endpoint=%d
->>>> address =0x%"PRIx64
->>>> +virtio_iommu_fill_resv_property(uint32_t devid, uint8_t subtype,
->>>> +uint64_t start, uint64_t end) "dev= %d, type=%d start=0x%"PRIx64"
->>>> +end=0x%"PRIx64
->>>> --
->>>> 2.20.1
->>>
->>>
-> 
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTHVrYXMgU3RyYXViIDxs
+dWthc3N0cmF1YjJAd2ViLmRlPg0KPiBTZW50OiBTYXR1cmRheSwgTWF5IDksIDIwMjAgODoyMSBQ
+TQ0KPiBUbzogWmhhbmcsIENoZW4gPGNoZW4uemhhbmdAaW50ZWwuY29tPg0KPiBDYzogcWVtdS1k
+ZXZlbCA8cWVtdS1kZXZlbEBub25nbnUub3JnPjsgTGkgWmhpamlhbg0KPiA8bGl6aGlqaWFuQGNu
+LmZ1aml0c3UuY29tPjsgSmFzb24gV2FuZyA8amFzb3dhbmdAcmVkaGF0LmNvbT47IE1hcmMtDQo+
+IEFuZHLDqSBMdXJlYXUgPG1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbT47IFBhb2xvIEJvbnpp
+bmkNCj4gPHBib256aW5pQHJlZGhhdC5jb20+OyBEciAuIERhdmlkIEFsYW4gR2lsYmVydCA8ZGdp
+bGJlcnRAcmVkaGF0LmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2NCA1LzZdIG5ldC9jb2xv
+LWNvbXBhcmUuYywgc29mdG1tdS92bC5jOiBDaGVjayB0aGF0DQo+IGNvbG8tY29tcGFyZSBpcyBh
+Y3RpdmUNCj4gDQo+IE9uIEZyaSwgOCBNYXkgMjAyMCAwNjo1MDozOSArMDAwMA0KPiAiWmhhbmcs
+IENoZW4iIDxjaGVuLnpoYW5nQGludGVsLmNvbT4gd3JvdGU6DQo+IA0KPiA+ID4gLS0tLS1Pcmln
+aW5hbCBNZXNzYWdlLS0tLS0NCj4gPiA+IEZyb206IEx1a2FzIFN0cmF1YiA8bHVrYXNzdHJhdWIy
+QHdlYi5kZT4NCj4gPiA+IFNlbnQ6IEZyaWRheSwgTWF5IDgsIDIwMjAgMjoxMSBQTQ0KPiA+ID4g
+VG86IFpoYW5nLCBDaGVuIDxjaGVuLnpoYW5nQGludGVsLmNvbT4NCj4gPiA+IENjOiBxZW11LWRl
+dmVsIDxxZW11LWRldmVsQG5vbmdudS5vcmc+OyBMaSBaaGlqaWFuDQo+ID4gPiA8bGl6aGlqaWFu
+QGNuLmZ1aml0c3UuY29tPjsgSmFzb24gV2FuZyA8amFzb3dhbmdAcmVkaGF0LmNvbT47IE1hcmMt
+DQo+ID4gPiBBbmRyw6kgTHVyZWF1IDxtYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20+OyBQYW9s
+byBCb256aW5pDQo+ID4gPiA8cGJvbnppbmlAcmVkaGF0LmNvbT4NCj4gPiA+IFN1YmplY3Q6IFJl
+OiBbUEFUQ0ggdjQgNS82XSBuZXQvY29sby1jb21wYXJlLmMsIHNvZnRtbXUvdmwuYzogQ2hlY2sN
+Cj4gPiA+IHRoYXQgY29sby1jb21wYXJlIGlzIGFjdGl2ZQ0KPiA+ID4NCj4gPiA+IE9uIEZyaSwg
+OCBNYXkgMjAyMCAwMjoyNjoyMSArMDAwMA0KPiA+ID4gIlpoYW5nLCBDaGVuIiA8Y2hlbi56aGFu
+Z0BpbnRlbC5jb20+IHdyb3RlOg0KPiA+ID4NCj4gPiA+ID4gPiAtLS0tLU9yaWdpbmFsIE1lc3Nh
+Z2UtLS0tLQ0KPiA+ID4gPiA+IEZyb206IEx1a2FzIFN0cmF1YiA8bHVrYXNzdHJhdWIyQHdlYi5k
+ZT4NCj4gPiA+ID4gPiBTZW50OiBUaHVyc2RheSwgTWF5IDcsIDIwMjAgMTE6NTQgUE0NCj4gPiA+
+ID4gPiBUbzogWmhhbmcsIENoZW4gPGNoZW4uemhhbmdAaW50ZWwuY29tPg0KPiA+ID4gPiA+IENj
+OiBxZW11LWRldmVsIDxxZW11LWRldmVsQG5vbmdudS5vcmc+OyBMaSBaaGlqaWFuDQo+ID4gPiA+
+ID4gPGxpemhpamlhbkBjbi5mdWppdHN1LmNvbT47IEphc29uIFdhbmcgPGphc293YW5nQHJlZGhh
+dC5jb20+Ow0KPiA+ID4gPiA+IE1hcmMtIEFuZHLDqSBMdXJlYXUgPG1hcmNhbmRyZS5sdXJlYXVA
+cmVkaGF0LmNvbT47IFBhb2xvIEJvbnppbmkNCj4gPiA+ID4gPiA8cGJvbnppbmlAcmVkaGF0LmNv
+bT4NCj4gPiA+ID4gPiBTdWJqZWN0OiBSZTogW1BBVENIIHY0IDUvNl0gbmV0L2NvbG8tY29tcGFy
+ZS5jLCBzb2Z0bW11L3ZsLmM6DQo+ID4gPiA+ID4gQ2hlY2sgdGhhdCBjb2xvLWNvbXBhcmUgaXMg
+YWN0aXZlDQo+ID4gPiA+ID4NCj4gPiA+ID4gPiBPbiBUaHUsIDcgTWF5IDIwMjAgMTE6Mzg6MDQg
+KzAwMDAgIlpoYW5nLCBDaGVuIg0KPiA+ID4gPiA+IDxjaGVuLnpoYW5nQGludGVsLmNvbT4gd3Jv
+dGU6DQo+ID4gPiA+ID4NCj4gPiA+ID4gPiA+ID4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0N
+Cj4gPiA+ID4gPiA+ID4gRnJvbTogTHVrYXMgU3RyYXViIDxsdWthc3N0cmF1YjJAd2ViLmRlPg0K
+PiA+ID4gPiA+ID4gPiBTZW50OiBNb25kYXksIE1heSA0LCAyMDIwIDY6MjggUE0NCj4gPiA+ID4g
+PiA+ID4gVG86IHFlbXUtZGV2ZWwgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4NCj4gPiA+ID4gPiA+
+ID4gQ2M6IFpoYW5nLCBDaGVuIDxjaGVuLnpoYW5nQGludGVsLmNvbT47IExpIFpoaWppYW4NCj4g
+PiA+ID4gPiA+ID4gPGxpemhpamlhbkBjbi5mdWppdHN1LmNvbT47IEphc29uIFdhbmcNCj4gPiA+
+ID4gPiA+ID4gPGphc293YW5nQHJlZGhhdC5jb20+Ow0KPiA+ID4gPiA+ID4gPiBNYXJjLSBBbmRy
+w6kgTHVyZWF1IDxtYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20+OyBQYW9sbw0KPiA+ID4gPiA+
+ID4gPiBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPg0KPiA+ID4gPiA+ID4gPiBTdWJqZWN0
+OiBbUEFUQ0ggdjQgNS82XSBuZXQvY29sby1jb21wYXJlLmMsIHNvZnRtbXUvdmwuYzoNCj4gPiA+
+ID4gPiA+ID4gQ2hlY2sgdGhhdA0KPiA+ID4gPiA+ID4gPiBjb2xvLSBjb21wYXJlIGlzIGFjdGl2
+ZQ0KPiA+ID4gPiA+ID4gPg0KPiA+ID4gPiA+ID4gPiBJZiB0aGUgY29sby1jb21wYXJlIG9iamVj
+dCBpcyByZW1vdmVkIGJlZm9yZSBmYWlsb3ZlciBhbmQgYQ0KPiA+ID4gPiA+ID4gPiBjaGVja3Bv
+aW50IGhhcHBlbnMsIHFlbXUgY3Jhc2hlcyBiZWNhdXNlIGl0IHRyaWVzIHRvIGxvY2sNCj4gPiA+
+ID4gPiA+ID4gdGhlIGRlc3Ryb3llZCBldmVudF9tdHggaW4gY29sb19ub3RpZnlfY29tcGFyZXNf
+ZXZlbnQuDQo+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+IEZpeCB0aGlzIGJ5IGNoZWNraW5n
+IGlmIGV2ZXJ5dGhpbmcgaXMgaW5pdGlhbGl6ZWQgYnkNCj4gPiA+ID4gPiA+ID4gaW50cm9kdWNp
+bmcgYSBuZXcgdmFyaWFibGUgY29sb19jb21wYXJlX2FjdGl2ZSB3aGljaCBpcw0KPiA+ID4gPiA+
+ID4gPiBwcm90ZWN0ZWQgYnkgYSBuZXcgbXV0ZXggY29sb19jb21wYXJlX211dGV4LiBUaGUgbmV3
+IG11dGV4DQo+ID4gPiA+ID4gPiA+IGFsc28gcHJvdGVjdHMgYWdhaW5zdCBjb25jdXJyZW50IGFj
+Y2VzcyBvZiB0aGUgbmV0X2NvbXBhcmVzDQo+ID4gPiA+ID4gPiA+IGxpc3QgYW5kIG1ha2VzIHN1
+cmUgdGhhdCBjb2xvX25vdGlmeV9jb21wYXJlc19ldmVudCBpc24ndA0KPiA+ID4gPiA+ID4gPiBh
+Y3RpdmUgd2hpbGUgd2UgZGVzdHJveSBldmVudF9tdHggYW5kIGV2ZW50X2NvbXBsZXRlX2NvbmQu
+DQo+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+IFdpdGggdGhpcyBpdCBhbHNvIGlzIGFnYWlu
+IHBvc3NpYmxlIHRvIHVzZSBjb2xvIHdpdGhvdXQNCj4gPiA+ID4gPiA+ID4gY29sby1jb21wYXJl
+IChwZXJpb2RpYw0KPiA+ID4gPiA+ID4gPiBtb2RlKSBhbmQgdG8gdXNlIG11bHRpcGxlIGNvbG8t
+Y29tcGFyZSBmb3IgbXVsdGlwbGUgbmV0d29yaw0KPiA+ID4gaW50ZXJmYWNlcy4NCj4gPiA+ID4g
+PiA+ID4NCj4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiBIaSBMdWthcywNCj4gPiA+ID4gPiA+DQo+
+ID4gPiA+ID4gPiBGb3IgdGhpcyBjYXNlIEkgdGhpbmsgd2UgZG9uJ3QgbmVlZCB0byB0b3VjaCB2
+bC5jIGNvZGUsIHdlIGNhbg0KPiA+ID4gPiA+ID4gc29sdmUgdGhpcw0KPiA+ID4gPiA+IGlzc3Vl
+IGZyb20gYW5vdGhlciBwZXJzcGVjdGl2ZToNCj4gPiA+ID4gPiA+IEhvdyB0byByZW1vdmUgY29s
+by1jb21wYXJlPw0KPiA+ID4gPiA+ID4gVXNlciB3aWxsIHVzZSBxZW11LW1vbml0b3Igb3IgUU1Q
+IGNvbW1hbmQgdG8gZGlzYWJsZSBhbg0KPiA+ID4gPiA+ID4gb2JqZWN0LCBzbyB3ZSBqdXN0IG5l
+ZWQgcmV0dXJuIG9wZXJhdGlvbiBmYWlsZWQgV2hlbiB1c2VyIHRyeQ0KPiA+ID4gPiA+ID4gdG8g
+cmVtb3ZlIGNvbG8tY29tcGFyZQ0KPiA+ID4gPiA+IG9iamVjdCB3aGlsZSBDT0xPIGlzIHJ1bm5p
+bmcuDQo+ID4gPiA+ID4NCj4gPiA+ID4gPiBZZWFoLCBidXQgdGhhdCBzdGlsbCBsZWF2ZXMgdGhl
+IG90aGVyIHByb2JsZW0gdGhhdCBjb2xvIGNhbid0IGJlDQo+ID4gPiA+ID4gdXNlZCB3aXRob3V0
+IGNvbG8tY29tcGFyZSAocWVtdSBjcmFzaGVzIHRoZW4pLg0KPiA+ID4gPg0KPiA+ID4gPiBZZXMs
+IHRoZSBDT0xPLWNvbXBhcmUgaXMgbmVjZXNzYXJ5IG1vZHVsZSBpbiBDT0xPIG9yaWdpbmFsIGRl
+c2lnbi4NCj4gPiA+ID4gQXQgbW9zdCBjYXNlcywgdXNlciBuZWVkIGl0IGRvIGR5bmFtaWMgc3lu
+Yy4NCj4gPiA+ID4gRm9yIHJhcmUgY2FzZXMsIG1heWJlIHdlIGNhbiBhZGQgYSBuZXcgY29sby1j
+b21wYXJlIHBhcmFtZXRlciB0bw0KPiA+ID4gYnlwYXNzIGFsbCB0aGUgbmV0d29yayB3b3JrbG9h
+ZC4NCj4gPiA+DQo+ID4gPiBJIHRoaW5rIHN1Y2ggYW4gcGFyYW1ldGVyIHdvdWxkIG9ubHkgYmUg
+YSB3b3JrYXJvdW5kIGluc3RlYWQgb2YgYQ0KPiA+ID4gcmVhbCBzb2x1dGlvbiBsaWtlIHRoaXMg
+cGF0Y2guDQo+ID4NCj4gPiBUaGUgcm9vdCBwcm9ibGVtIGlzIHdoeSBDT0xPLWNvbXBhcmUgaXMg
+bmVjZXNzYXJ5Lg0KPiA+IFllcywgbWF5YmUgc29tZW9uZSB3YW50IHRvIHVzZSBwdXJlIHBlcmlv
+ZGljIHN5bmNocm9uaXphdGlvbiBtb2RlLCBCdXQNCj4gPiBpdCBtZWFucyBpdCB3aWxsIGxvc3Qg
+YWxsIGd1ZXN0IG5ldHdvcmsgc3VwcG9ydCh3aXRob3V0IGNvbG8tY29tcGFyZS9maWx0ZXItDQo+
+IG1pcnJvci9maWx0ZXItcmVkaXJlY3Rvci9maWx0ZXItcmV3cml0ZXIpLg0KPiA+IFRoZSBzZWNv
+bmRhcnkgZ3Vlc3QganVzdCBhIHNvbGlkIGJhY2t1cCBmb3IgdGhlIHByaW1hcnkgZ3Vlc3QsIHdo
+ZW4NCj4gPiBvY2N1ciBmYWlsb3ZlciB0aGUgbmV3IGJ1aWxkIHN0YXRlZnVsIGNvbm5lY3Rpb24g
+KGxpa2UgVENQKSB3aWxsIGNyYXNoZWQsDQo+IG5lZWQgdXNlcnNwYWNlIHRvIGhhbmRsZSB0aGlz
+IHN0YXR1cy4gSXQgbG9zdCB0aGUgb3JpZ2luYWwgbWVhbmluZyBmb3IgQ09MTw0KPiBGVC9IQSBz
+b2x1dGlvbiwgbm8gbmVlZCB1c2UgZG8gSEEgaW4gYXBwbGljYXRpb24gbGF5ZXIuDQo+ID4gaXQg
+bG9va3MgbGlrZSBub3JtYWwvcmVtb3RlIHBlcmlvZGljIFZNIHNuYXBzaG90IGhlcmUuDQo+IA0K
+PiBTdXJlLCBidXQgbWF5YmUgdGhlIHVzZXIgZG9lc24ndCBuZWVkIChyZWxpYWJsZSkgbmV0d29y
+ayBvbiBmYWlsb3Zlci4gQWxzbw0KPiBwcm9wZXIgbmV0d29yayBzdXBwb3J0IHdpdGggcGVyaW9k
+aWMgbW9kZSBjYW4gZWFzaWx5IGJlIGltcGxlbWVudGVkIGJ5DQo+IG1vZGlmeWluZyBmaWx0ZXIt
+YnVmZmVyIHRvIGJ1ZmZlciBwYWNrZXRzIHVudGlsIGNoZWNrcG9pbnQuIEJlaW5nIGFibGUgdG8g
+dXNlDQo+IGNvbG8gd2l0aG91dCBjb2xvLWNvbXBhcmUgZ2l2ZXMgbW9yZSBmbGV4aWJpbGl0eSB0
+byB0aGUgdXNlci4NCg0KT0ssIHVzZSB0aGUgZmlsdGVyLWJ1ZmZlciBpbnN0ZWFkIG9mIGNvbG8t
+Y29tcGFyZSBpcyBhIG5ldyB1c2UgY2FzZSBoZXJlLg0KSWYgb3RoZXIgbWFpbnRhaW5lcnMgaGF2
+ZSBubyBjb21tZW50cyBhYm91dCB0b3VjaCB0aGUgdmwuYyBmb3IgQ09MTyAsIEkgdGhpbmsgaXQn
+cyBPSyBoZXJlLg0KDQpUaGFua3MNClpoYW5nIENoZW4gDQoNCg0KPiANCj4gUmVnYXJkcywNCj4g
+THVrYXMgU3RyYXViDQo+IA0KPiA+IERhdmUgb3IgSmFzb24gaGF2ZSBhbnkgY29tbWVudHMgaGVy
+ZT8NCj4gPg0KPiA+IFRoYW5rcw0KPiA+IFpoYW5nIENoZW4NCj4gPg0KPiA+ID4NCj4gPiA+IFJl
+Z2FyZHMsDQo+ID4gPiBMdWthcyBTdHJhdWINCj4gPiA+DQo+ID4gPiA+IFRoYW5rcw0KPiA+ID4g
+PiBaaGFuZyBDaGVuDQo+ID4gPiA+DQo+ID4gPiA+ID4NCj4gPiA+ID4gPiBSZWdhcmRzLA0KPiA+
+ID4gPiA+IEx1a2FzIFN0cmF1Yg0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiBUaGFua3MNCj4gPiA+
+ID4gPiA+IFpoYW5nIENoZW4NCj4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+IFNpZ25lZC1vZmYt
+Ynk6IEx1a2FzIFN0cmF1YiA8bHVrYXNzdHJhdWIyQHdlYi5kZT4NCj4gPiA+ID4gPiA+ID4gLS0t
+DQo+ID4gPiA+ID4gPiA+ICBuZXQvY29sby1jb21wYXJlLmMgfCAzNSArKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKy0tLQ0KPiAtLS0NCj4gPiA+ID4gPiA+ID4gIG5ldC9jb2xvLWNvbXBhcmUu
+aCB8ICAxICsNCj4gPiA+ID4gPiA+ID4gIHNvZnRtbXUvdmwuYyAgICAgICB8ICAyICsrDQo+ID4g
+PiA+ID4gPiA+ICAzIGZpbGVzIGNoYW5nZWQsIDMyIGluc2VydGlvbnMoKyksIDYgZGVsZXRpb25z
+KC0pDQo+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+IGRpZmYgLS1naXQgYS9uZXQvY29sby1j
+b21wYXJlLmMgYi9uZXQvY29sby1jb21wYXJlLmMgaW5kZXgNCj4gPiA+ID4gPiA+ID4gNTZkYjNk
+M2JmYy4uYzc1NzJkNzVlOSAxMDA2NDQNCj4gPiA+ID4gPiA+ID4gLS0tIGEvbmV0L2NvbG8tY29t
+cGFyZS5jDQo+ID4gPiA+ID4gPiA+ICsrKyBiL25ldC9jb2xvLWNvbXBhcmUuYw0KPiA+ID4gPiA+
+ID4gPiBAQCAtNTQsNiArNTQsOCBAQCBzdGF0aWMgTm90aWZpZXJMaXN0IGNvbG9fY29tcGFyZV9u
+b3RpZmllcnMNCj4gPiA+ID4gPiA+ID4gPSAjZGVmaW5lIFJFR1VMQVJfUEFDS0VUX0NIRUNLX01T
+IDMwMDAgICNkZWZpbmUNCj4gPiA+ID4gPiBERUZBVUxUX1RJTUVfT1VUX01TDQo+ID4gPiA+ID4g
+PiA+IDMwMDANCj4gPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+ID4gK3N0YXRpYyBRZW11TXV0ZXgg
+Y29sb19jb21wYXJlX211dGV4OyBzdGF0aWMgYm9vbA0KPiA+ID4gPiA+ID4gPiArY29sb19jb21w
+YXJlX2FjdGl2ZTsNCj4gPiA+ID4gPiA+ID4gIHN0YXRpYyBRZW11TXV0ZXggZXZlbnRfbXR4OyAg
+c3RhdGljIFFlbXVDb25kDQo+ID4gPiA+ID4gPiA+IGV2ZW50X2NvbXBsZXRlX2NvbmQ7ICBzdGF0
+aWMgaW50IGV2ZW50X3VuaGFuZGxlZF9jb3VudDsgQEANCj4gPiA+ID4gPiA+ID4gLTkwNiw2ICs5
+MDgsMTIgQEAgc3RhdGljIHZvaWQgY2hlY2tfb2xkX3BhY2tldF9yZWd1bGFyKHZvaWQNCj4gPiA+
+ID4gPiA+ID4gKm9wYXF1ZSkgdm9pZCBjb2xvX25vdGlmeV9jb21wYXJlc19ldmVudCh2b2lkICpv
+cGFxdWUsIGludA0KPiA+ID4gPiA+ID4gPiBldmVudCwgRXJyb3IgKiplcnJwKQ0KPiA+ID4gew0K
+PiA+ID4gPiA+ID4gPiAgICAgIENvbXBhcmVTdGF0ZSAqczsNCj4gPiA+ID4gPiA+ID4gKyAgICBx
+ZW11X211dGV4X2xvY2soJmNvbG9fY29tcGFyZV9tdXRleCk7DQo+ID4gPiA+ID4gPiA+ICsNCj4g
+PiA+ID4gPiA+ID4gKyAgICBpZiAoIWNvbG9fY29tcGFyZV9hY3RpdmUpIHsNCj4gPiA+ID4gPiA+
+ID4gKyAgICAgICAgcWVtdV9tdXRleF91bmxvY2soJmNvbG9fY29tcGFyZV9tdXRleCk7DQo+ID4g
+PiA+ID4gPiA+ICsgICAgICAgIHJldHVybjsNCj4gPiA+ID4gPiA+ID4gKyAgICB9DQo+ID4gPiA+
+ID4gPiA+DQo+ID4gPiA+ID4gPiA+ICAgICAgcWVtdV9tdXRleF9sb2NrKCZldmVudF9tdHgpOw0K
+PiA+ID4gPiA+ID4gPiAgICAgIFFUQUlMUV9GT1JFQUNIKHMsICZuZXRfY29tcGFyZXMsIG5leHQp
+IHsgQEAgLTkxOSw2DQo+ID4gPiA+ID4gPiA+ICs5MjcsNyBAQCB2b2lkIGNvbG9fbm90aWZ5X2Nv
+bXBhcmVzX2V2ZW50KHZvaWQgKm9wYXF1ZSwgaW50DQo+ID4gPiA+ID4gPiA+IGV2ZW50LA0KPiA+
+ID4gRXJyb3IgKiplcnJwKQ0KPiA+ID4gPiA+ID4gPiAgICAgIH0NCj4gPiA+ID4gPiA+ID4NCj4g
+PiA+ID4gPiA+ID4gICAgICBxZW11X211dGV4X3VubG9jaygmZXZlbnRfbXR4KTsNCj4gPiA+ID4g
+PiA+ID4gKyAgICBxZW11X211dGV4X3VubG9jaygmY29sb19jb21wYXJlX211dGV4KTsNCj4gPiA+
+ID4gPiA+ID4gIH0NCj4gPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+ID4gIHN0YXRpYyB2b2lkIGNv
+bG9fY29tcGFyZV90aW1lcl9pbml0KENvbXBhcmVTdGF0ZSAqcykgQEANCj4gPiA+ID4gPiA+ID4g
+LTEyNzQsNw0KPiA+ID4gPiA+ID4gPiArMTI4MywxNCBAQCBzdGF0aWMgdm9pZCBjb2xvX2NvbXBh
+cmVfY29tcGxldGUoVXNlckNyZWF0YWJsZQ0KPiA+ID4gPiA+ID4gPiArKnVjLA0KPiA+ID4gPiA+
+IEVycm9yICoqZXJycCkNCj4gPiA+ID4gPiA+ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IHMtPnZuZXRfaGRyKTsNCj4gPiA+ID4gPiA+ID4gICAgICB9DQo+ID4gPiA+ID4gPiA+DQo+ID4g
+PiA+ID4gPiA+ICsgICAgcWVtdV9tdXRleF9sb2NrKCZjb2xvX2NvbXBhcmVfbXV0ZXgpOw0KPiA+
+ID4gPiA+ID4gPiArICAgIGlmICghY29sb19jb21wYXJlX2FjdGl2ZSkgew0KPiA+ID4gPiA+ID4g
+PiArICAgICAgICBxZW11X211dGV4X2luaXQoJmV2ZW50X210eCk7DQo+ID4gPiA+ID4gPiA+ICsg
+ICAgICAgIHFlbXVfY29uZF9pbml0KCZldmVudF9jb21wbGV0ZV9jb25kKTsNCj4gPiA+ID4gPiA+
+ID4gKyAgICAgICAgY29sb19jb21wYXJlX2FjdGl2ZSA9IHRydWU7DQo+ID4gPiA+ID4gPiA+ICsg
+ICAgfQ0KPiA+ID4gPiA+ID4gPiAgICAgIFFUQUlMUV9JTlNFUlRfVEFJTCgmbmV0X2NvbXBhcmVz
+LCBzLCBuZXh0KTsNCj4gPiA+ID4gPiA+ID4gKyAgICBxZW11X211dGV4X3VubG9jaygmY29sb19j
+b21wYXJlX211dGV4KTsNCj4gPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+ID4gICAgICBzLT5vdXRf
+c2VuZGNvLnMgPSBzOw0KPiA+ID4gPiA+ID4gPiAgICAgIHMtPm91dF9zZW5kY28uY2hyID0gJnMt
+PmNocl9vdXQ7IEBAIC0xMjkwLDkgKzEzMDYsNiBAQA0KPiA+ID4gPiA+ID4gPiBzdGF0aWMgdm9p
+ZCBjb2xvX2NvbXBhcmVfY29tcGxldGUoVXNlckNyZWF0YWJsZQ0KPiA+ID4gPiA+ID4gPiAqdWMs
+IEVycm9yICoqZXJycCkNCj4gPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+ID4gICAgICBnX3F1ZXVl
+X2luaXQoJnMtPmNvbm5fbGlzdCk7DQo+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+IC0gICAg
+cWVtdV9tdXRleF9pbml0KCZldmVudF9tdHgpOw0KPiA+ID4gPiA+ID4gPiAtICAgIHFlbXVfY29u
+ZF9pbml0KCZldmVudF9jb21wbGV0ZV9jb25kKTsNCj4gPiA+ID4gPiA+ID4gLQ0KPiA+ID4gPiA+
+ID4gPiAgICAgIHMtPmNvbm5lY3Rpb25fdHJhY2tfdGFibGUgPQ0KPiA+ID4gPiA+ID4gPiBnX2hh
+c2hfdGFibGVfbmV3X2Z1bGwoY29ubmVjdGlvbl9rZXlfaGFzaCwNCj4gPiA+ID4gPiA+ID4gICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbm5l
+Y3Rpb25fa2V5X2VxdWFsLA0KPiA+ID4gPiA+ID4gPg0KPiA+ID4gPiA+ID4gPiBnX2ZyZWUsIEBA
+DQo+ID4gPiA+ID4gPiA+IC0xMzg0LDEyICsxMzk3LDE5IEBAIHN0YXRpYyB2b2lkDQo+ID4gPiA+
+ID4gPiA+IGNvbG9fY29tcGFyZV9maW5hbGl6ZShPYmplY3QNCj4gPiA+ID4gPiA+ID4gKm9iaikN
+Cj4gPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+ID4gICAgICBxZW11X2JoX2RlbGV0ZShzLT5ldmVu
+dF9iaCk7DQo+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+ICsgICAgcWVtdV9tdXRleF9sb2Nr
+KCZjb2xvX2NvbXBhcmVfbXV0ZXgpOw0KPiA+ID4gPiA+ID4gPiAgICAgIFFUQUlMUV9GT1JFQUNI
+KHRtcCwgJm5ldF9jb21wYXJlcywgbmV4dCkgew0KPiA+ID4gPiA+ID4gPiAgICAgICAgICBpZiAo
+dG1wID09IHMpIHsNCj4gPiA+ID4gPiA+ID4gICAgICAgICAgICAgIFFUQUlMUV9SRU1PVkUoJm5l
+dF9jb21wYXJlcywgcywgbmV4dCk7DQo+ID4gPiA+ID4gPiA+ICAgICAgICAgICAgICBicmVhazsN
+Cj4gPiA+ID4gPiA+ID4gICAgICAgICAgfQ0KPiA+ID4gPiA+ID4gPiAgICAgIH0NCj4gPiA+ID4g
+PiA+ID4gKyAgICBpZiAoUVRBSUxRX0VNUFRZKCZuZXRfY29tcGFyZXMpKSB7DQo+ID4gPiA+ID4g
+PiA+ICsgICAgICAgIGNvbG9fY29tcGFyZV9hY3RpdmUgPSBmYWxzZTsNCj4gPiA+ID4gPiA+ID4g
+KyAgICAgICAgcWVtdV9tdXRleF9kZXN0cm95KCZldmVudF9tdHgpOw0KPiA+ID4gPiA+ID4gPiAr
+ICAgICAgICBxZW11X2NvbmRfZGVzdHJveSgmZXZlbnRfY29tcGxldGVfY29uZCk7DQo+ID4gPiA+
+ID4gPiA+ICsgICAgfQ0KPiA+ID4gPiA+ID4gPiArICAgIHFlbXVfbXV0ZXhfdW5sb2NrKCZjb2xv
+X2NvbXBhcmVfbXV0ZXgpOw0KPiA+ID4gPiA+ID4gPg0KPiA+ID4gPiA+ID4gPiAgICAgIEFpb0Nv
+bnRleHQgKmN0eCA9IGlvdGhyZWFkX2dldF9haW9fY29udGV4dChzLT5pb3RocmVhZCk7DQo+ID4g
+PiA+ID4gPiA+ICAgICAgYWlvX2NvbnRleHRfYWNxdWlyZShjdHgpOyBAQCAtMTQxMywxNSArMTQz
+MywxOCBAQA0KPiA+ID4gPiA+ID4gPiBzdGF0aWMgdm9pZCBjb2xvX2NvbXBhcmVfZmluYWxpemUo
+T2JqZWN0DQo+ID4gPiAqb2JqKQ0KPiA+ID4gPiA+ID4gPiAgICAgICAgICBvYmplY3RfdW5yZWYo
+T0JKRUNUKHMtPmlvdGhyZWFkKSk7DQo+ID4gPiA+ID4gPiA+ICAgICAgfQ0KPiA+ID4gPiA+ID4g
+Pg0KPiA+ID4gPiA+ID4gPiAtICAgIHFlbXVfbXV0ZXhfZGVzdHJveSgmZXZlbnRfbXR4KTsNCj4g
+PiA+ID4gPiA+ID4gLSAgICBxZW11X2NvbmRfZGVzdHJveSgmZXZlbnRfY29tcGxldGVfY29uZCk7
+DQo+ID4gPiA+ID4gPiA+IC0NCj4gPiA+ID4gPiA+ID4gICAgICBnX2ZyZWUocy0+cHJpX2luZGV2
+KTsNCj4gPiA+ID4gPiA+ID4gICAgICBnX2ZyZWUocy0+c2VjX2luZGV2KTsNCj4gPiA+ID4gPiA+
+ID4gICAgICBnX2ZyZWUocy0+b3V0ZGV2KTsNCj4gPiA+ID4gPiA+ID4gICAgICBnX2ZyZWUocy0+
+bm90aWZ5X2Rldik7DQo+ID4gPiA+ID4gPiA+ICB9DQo+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4g
+PiA+ICt2b2lkIGNvbG9fY29tcGFyZV9pbml0X2dsb2JhbHModm9pZCkgew0KPiA+ID4gPiA+ID4g
+PiArICAgIGNvbG9fY29tcGFyZV9hY3RpdmUgPSBmYWxzZTsNCj4gPiA+ID4gPiA+ID4gKyAgICBx
+ZW11X211dGV4X2luaXQoJmNvbG9fY29tcGFyZV9tdXRleCk7DQo+ID4gPiA+ID4gPiA+ICt9DQo+
+ID4gPiA+ID4gPiA+ICsNCj4gPiA+ID4gPiA+ID4gIHN0YXRpYyBjb25zdCBUeXBlSW5mbyBjb2xv
+X2NvbXBhcmVfaW5mbyA9IHsNCj4gPiA+ID4gPiA+ID4gICAgICAubmFtZSA9IFRZUEVfQ09MT19D
+T01QQVJFLA0KPiA+ID4gPiA+ID4gPiAgICAgIC5wYXJlbnQgPSBUWVBFX09CSkVDVCwNCj4gPiA+
+ID4gPiA+ID4gZGlmZiAtLWdpdCBhL25ldC9jb2xvLWNvbXBhcmUuaCBiL25ldC9jb2xvLWNvbXBh
+cmUuaCBpbmRleA0KPiA+ID4gPiA+ID4gPiAyMmRkZDUxMmUyLi5lYjQ4M2FjNTg2IDEwMDY0NA0K
+PiA+ID4gPiA+ID4gPiAtLS0gYS9uZXQvY29sby1jb21wYXJlLmgNCj4gPiA+ID4gPiA+ID4gKysr
+IGIvbmV0L2NvbG8tY29tcGFyZS5oDQo+ID4gPiA+ID4gPiA+IEBAIC0xNyw2ICsxNyw3IEBADQo+
+ID4gPiA+ID4gPiA+ICAjaWZuZGVmIFFFTVVfQ09MT19DT01QQVJFX0ggICNkZWZpbmUNCj4gUUVN
+VV9DT0xPX0NPTVBBUkVfSA0KPiA+ID4gPiA+ID4gPg0KPiA+ID4gPiA+ID4gPiArdm9pZCBjb2xv
+X2NvbXBhcmVfaW5pdF9nbG9iYWxzKHZvaWQpOw0KPiA+ID4gPiA+ID4gPiAgdm9pZCBjb2xvX25v
+dGlmeV9jb21wYXJlc19ldmVudCh2b2lkICpvcGFxdWUsIGludCBldmVudCwNCj4gPiA+ID4gPiA+
+ID4gRXJyb3IgKiplcnJwKTsgdm9pZCBjb2xvX2NvbXBhcmVfcmVnaXN0ZXJfbm90aWZpZXIoTm90
+aWZpZXINCj4gPiA+ID4gPiA+ID4gKm5vdGlmeSk7IHZvaWQgY29sb19jb21wYXJlX3VucmVnaXN0
+ZXJfbm90aWZpZXIoTm90aWZpZXINCj4gPiA+ID4gPiA+ID4gKm5vdGlmeSk7IGRpZmYgLS1naXQg
+YS9zb2Z0bW11L3ZsLmMgYi9zb2Z0bW11L3ZsLmMgaW5kZXgNCj4gPiA+ID4gPiA+ID4gMzJjMDA0
+Nzg4OS4uYTkxM2VkNTQ2OQ0KPiA+ID4gPiA+ID4gPiAxMDA2NDQNCj4gPiA+ID4gPiA+ID4gLS0t
+IGEvc29mdG1tdS92bC5jDQo+ID4gPiA+ID4gPiA+ICsrKyBiL3NvZnRtbXUvdmwuYw0KPiA+ID4g
+PiA+ID4gPiBAQCAtMTEyLDYgKzExMiw3IEBADQo+ID4gPiA+ID4gPiA+ICAjaW5jbHVkZSAicWFw
+aS9xbXAvcWVycm9yLmgiDQo+ID4gPiA+ID4gPiA+ICAjaW5jbHVkZSAic3lzZW11L2lvdGhyZWFk
+LmgiDQo+ID4gPiA+ID4gPiA+ICAjaW5jbHVkZSAicWVtdS9ndWVzdC1yYW5kb20uaCINCj4gPiA+
+ID4gPiA+ID4gKyNpbmNsdWRlICJuZXQvY29sby1jb21wYXJlLmgiDQo+ID4gPiA+ID4gPiA+DQo+
+ID4gPiA+ID4gPiA+ICAjZGVmaW5lIE1BWF9WSVJUSU9fQ09OU09MRVMgMQ0KPiA+ID4gPiA+ID4g
+Pg0KPiA+ID4gPiA+ID4gPiBAQCAtMjkwNiw2ICsyOTA3LDcgQEAgdm9pZCBxZW11X2luaXQoaW50
+IGFyZ2MsIGNoYXIgKiphcmd2LA0KPiA+ID4gPiA+ID4gPiBjaGFyDQo+ID4gPiA+ID4gKiplbnZw
+KQ0KPiA+ID4gPiA+ID4gPiAgICAgIHByZWNvcHlfaW5mcmFzdHJ1Y3R1cmVfaW5pdCgpOw0KPiA+
+ID4gPiA+ID4gPiAgICAgIHBvc3Rjb3B5X2luZnJhc3RydWN0dXJlX2luaXQoKTsNCj4gPiA+ID4g
+PiA+ID4gICAgICBtb25pdG9yX2luaXRfZ2xvYmFscygpOw0KPiA+ID4gPiA+ID4gPiArICAgIGNv
+bG9fY29tcGFyZV9pbml0X2dsb2JhbHMoKTsNCj4gPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+ID4g
+ICAgICBpZiAocWNyeXB0b19pbml0KCZlcnIpIDwgMCkgew0KPiA+ID4gPiA+ID4gPiAgICAgICAg
+ICBlcnJvcl9yZXBvcnRmX2VycihlcnIsICJjYW5ub3QgaW5pdGlhbGl6ZSBjcnlwdG86DQo+ID4g
+PiA+ID4gPiA+ICIpOw0KPiA+ID4gPiA+ID4gPiAtLQ0KPiA+ID4gPiA+ID4gPiAyLjIwLjENCj4g
+PiA+ID4gPiA+DQo+ID4gPiA+DQo+ID4NCg0K
 
