@@ -2,91 +2,80 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B37C4C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:51:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24D18C54E8D
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:51:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7AA3220722
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:51:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DUwvuoeY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AA3220722
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F095920746
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:51:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F095920746
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY7uE-0006mG-Ie
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 08:51:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41068)
+	id 1jY7uH-0006r6-5d
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 08:51:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41078)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jY7tP-0005w9-Qq
- for qemu-devel@nongnu.org; Mon, 11 May 2020 08:50:47 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28824
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jY7tO-0002Px-C7
- for qemu-devel@nongnu.org; Mon, 11 May 2020 08:50:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589201444;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=aYA6ol9GjahMSUrpPJDAht23k9a8XUsjnG4cH8LJjno=;
- b=DUwvuoeYRh4gENqEs4h4yf0hsP5a06Q3pSH23WzOBW714qTWLN86kxow17gyIUbyUrN/A9
- sK1W1G4CXpjxK+uz98jNpiWhvgwOHePi5+nzGMPQShQgczn7WXy2/j47dseP0J8IYgZA+Q
- 1QCnjeo202vOw/RJ+lgK5c/rAS5fTmk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-482-2hbqwTU2OkqeKiSpm2LdDg-1; Mon, 11 May 2020 08:50:42 -0400
-X-MC-Unique: 2hbqwTU2OkqeKiSpm2LdDg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4928A100CCA4;
- Mon, 11 May 2020 12:50:40 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-142.ams2.redhat.com [10.36.114.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D516D619BF;
- Mon, 11 May 2020 12:50:12 +0000 (UTC)
-Date: Mon, 11 May 2020 14:50:11 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Klaus Jensen <its@irrelevant.dk>
-Subject: Re: [PATCH v5 00/18] nvme: refactoring and cleanups
-Message-ID: <20200511125011.GD5661@linux.fritz.box>
-References: <20200505054840.186586-1-its@irrelevant.dk>
- <20200511062513.3axdfcmr4izulv5x@apples.localdomain>
- <095f3c9b-5b32-7a88-03e9-ca993ca3f3c9@redhat.com>
- <20200511070936.fxarxicz7zrj6mop@apples.localdomain>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jY7tS-000603-Mv
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 08:50:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46208)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jY7tR-0002Qj-Hh
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 08:50:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jY7tP-0005xQ-Ee
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 12:50:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 30D772E810D
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 12:50:47 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200511070936.fxarxicz7zrj6mop@apples.localdomain>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 03:10:56
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 11 May 2020 12:36:10 -0000
+From: Stefan Hajnoczi <1877716@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: busimus post-factum stefanha zkrx
+X-Launchpad-Bug-Reporter: zkrx (zkrx)
+X-Launchpad-Bug-Modifier: Stefan Hajnoczi (stefanha)
+References: <158901182209.5021.12832610872088111923.malonedeb@soybean.canonical.com>
+Message-Id: <158920057023.4508.13500039233411580612.malone@soybean.canonical.com>
+Subject: [Bug 1877716] Re: Win10 guest unusable after a few minutes
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 35baf431896bf9ce325ad6b86941b907da6e65ed
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 08:50:48
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -95,70 +84,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Beata Michalska <beata.michalska@linaro.org>, qemu-block@nongnu.org,
- Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Javier Gonzalez <javier.gonz@samsung.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Reply-To: Bug 1877716 <1877716@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 11.05.2020 um 09:09 hat Klaus Jensen geschrieben:
-> On May 11 09:00, Philippe Mathieu-Daudé wrote:
-> > Hi Klaus,
-> > 
-> > On 5/11/20 8:25 AM, Klaus Jensen wrote:
-> > > On May  5 07:48, Klaus Jensen wrote:
-> > > > From: Klaus Jensen <k.jensen@samsung.com>
-> > > > 
-> > > > Changes since v5
-> > > > ~~~~~~~~~~~~~~~~
-> > > > No functional changes, just updated Reviewed-by tags. Also, I screwed up
-> > > > the CC list when sending v4.
-> > > > 
-> > > > Philippe and Keith, please add a Reviewed-by to
-> > > > 
-> > > >    * "nvme: factor out pmr setup" and
-> > > >    * "do cmb/pmr init as part of pci init"
-> > > > 
-> > > > since the first one was added and the second one was changed in v4 when
-> > > > rebasing on Kevins block-next tree which had the PMR work that was not
-> > > > in master at the time.
-> > > > 
-> > > > With those in place, it should be ready for Kevin to merge.
-> > > > 
-> > > Gentle ping on this.
-> > > 
-> > > Also, please see the two patches in "[PATCH 0/2] hw/block/nvme: fixes
-> > > for interrupt behavior". I think they should go in preparation to this
-> > > series.
-> > 
-> > I was going to ping Kevin last week, but then read your comment on pach #7
-> > "nvme: add max_ioqpairs device parameter", so I interpreted you would
-> > respin.
-> > Now it is clearer, applying in the following order you don't need to respin,
-> > right?
-> > 
-> > - [PATCH 0/2] hw/block/nvme: fixes for interrupt behavior"
-> > - [PATCH v5 00/18] nvme: refactoring and cleanups
+That's good news! Most users do not have io_uring enabled yet.
 
-I was waiting for the review Klaus asked for. You had a comment about
-renaming patches, but I didn't see any comments about the patches in
-question.
+-- =
 
-> Ugh. "[PATCH v5 00/18] nvme: refactoring and cleanups" doesn't apply
-> completely cleanly.
-> 
-> "[PATCH 0/2] hw/block/nvme: fixes for interrupt behavior" was intented
-> to go into master because it fixes a bug, that is why I split them up.
-> 
-> But looks like it is better to just roll it into this series. I'll
-> respin a v6 with the two interrupt fixes.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1877716
 
-Ok, I'll wait for that one then. I'm still not sure, though, whether I
-should then wait for additional review or just apply the patches.
+Title:
+  Win10 guest unusable after a few minutes
 
-Kevin
+Status in QEMU:
+  New
 
+Bug description:
+  On Arch Linux, the recent qemu package update seems to misbehave on
+  some systems. In my case, my Windows 10 guest runs fine for around 5
+  minutes and then start to get really sluggish, even unresponsive. It
+  needs to be forced off. I could reproduce this on a minimal VM with no
+  passthrough, although my current testing setup involves an nvme pcie
+  passthrough.
+
+  I bisected it to the following commit which rapidly starts to run sluggis=
+hly on my setup:
+  https://github.com/qemu/qemu/commit/73fd282e7b6dd4e4ea1c3bbb3d302c8db51e4=
+ccf
+
+  I've ran the previous commit (
+  https://github.com/qemu/qemu/commit/b321051cf48ccc2d3d832af111d688f2282f0=
+89b
+  ) for the entire night without an issue so far.
+
+  I believe this might be a duplicate of
+  https://bugs.launchpad.net/qemu/+bug/1873032 , although I'm not sure.
+
+  Linux cc 5.6.10-arch1-1 #1 SMP PREEMPT Sat, 02 May 2020 19:11:54 +0000 x8=
+6_64 GNU/Linux
+  AMD Ryzen 7 2700X Eight-Core Processor
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1877716/+subscriptions
 
