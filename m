@@ -7,89 +7,90 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4EC2C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:38:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C00AFC54E8D
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:43:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80291206D6
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:38:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F97D206D6
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:43:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="q3d/oDlE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80291206D6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="cbkxlGQH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F97D206D6
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY7hI-000461-EM
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 08:38:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37686)
+	id 1jY7mD-0007MI-Hu
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 08:43:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37704)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jY7Ww-0006Gu-No
- for qemu-devel@nongnu.org; Mon, 11 May 2020 08:27:34 -0400
-Received: from mout.web.de ([212.227.15.3]:60591)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ id 1jY7X0-0006LK-AX
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 08:27:38 -0400
+Received: from mout.web.de ([212.227.17.12]:55115)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jY7Wv-00063k-SG
- for qemu-devel@nongnu.org; Mon, 11 May 2020 08:27:34 -0400
+ id 1jY7Wz-000649-9k
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 08:27:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1589200028;
- bh=Rdxixi7KV4eiUZcjalX0wrnXk1aVs2YQ0vK98vYI6WU=;
+ s=dbaedf251592; t=1589200033;
+ bh=WHLl8IB544s/xbL4S9Gq3qqev/C2bzs+WF4myt75DTM=;
  h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=q3d/oDlEOOkPZymhC29pvlAMCIEWksXfdkjcn58o1Mlom7oNQXyB2XymNGCdk84cv
- 6rXInsKeWYYIad6RIDpuLmlaws7znUslqWP6rEhiPga5aLt3AZUNwg0eqxMekxB38z
- c2Mgjx+KToamCdHSzTL45Ph5ikIWkao6p5XRKDj4=
+ b=cbkxlGQH2T6rZ9gSIELKLDnoQK7B4CBVqK1QZJHBEQoqspsLl9S8lWvIGpWc4B6iz
+ nrCEPk9kMfE+oTDkUxRBLZBUXsCQ/XbFJECSLYqs4KPlJIMFHDZkgemApfij10bNLM
+ UNCN/2nxhfloXAjgQWBIR2coH56LrvYa9ubF0N+c=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([89.247.255.192]) by smtp.web.de (mrweb003
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0LhNmy-1ilubk3QxM-00mf4N; Mon, 11
- May 2020 14:27:08 +0200
-Date: Mon, 11 May 2020 14:27:07 +0200
+Received: from luklap ([89.247.255.192]) by smtp.web.de (mrweb102
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0LeLWz-1ikXgy0UcH-00qCGE; Mon, 11
+ May 2020 14:27:13 +0200
+Date: Mon, 11 May 2020 14:27:11 +0200
 From: Lukas Straub <lukasstraub2@web.de>
 To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH 4/5] configure,Makefile: Install colo resource-agent
-Message-ID: <334d8321f91f23759ef82a7b904f977003164475.1589199922.git.lukasstraub2@web.de>
+Subject: [PATCH 5/5] MAINTAINERS: Add myself as maintainer for COLO resource
+ agent
+Message-ID: <57d7784ead7a2f3be4437b14a0c69ed87bc55a91.1589199922.git.lukasstraub2@web.de>
 In-Reply-To: <cover.1589199922.git.lukasstraub2@web.de>
 References: <cover.1589199922.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/hyZojprBdL+onStKDkN5i4L";
+Content-Type: multipart/signed; boundary="Sig_/tqhr02zDZJ9i_MNE=83F3ke";
  protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:kzRApTIPUtXSXuplx1eKea1e2uuM1fGZVxV6CUIhKCpSXo+GlmG
- ZwdaCoxJqxNfnJZB2C/fgG/xkJoDTwerSUv5RBo0dHqWbXPheMRHmmn8NI5auUyUCNZQim8
- kSBvjDDTAyB5BFg3wIi2z8qu2Ps+OeXYGh0WbEMFcVNQJ3/fBGxLICtMREyP7i1AdBITAGQ
- D/RrsVGxey1F7H5v+5yug==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:A88D/8D1VRs=:w2cXqlouHjy1Yz0HM9EBOV
- QOPXKFPmfH82uHLqR64F+5TrhGjXxDbv61nYNAqKzUaE9INnA1WN01iYmM2IWrTpyxEGnW67A
- lgWQNjc+Rlm/9fzU3Y4GE9zk59HpOu1y81ZoY4Pto2OhTYRksprb6IjIZC8o8Meefw5qx5gsx
- rEvNH4pngsFjEIZGOcLnFUV7jM7cM7JRrTlefbexy1c5S229JLBjzmptLpVJvYXEfbrTFSAlO
- In8hEqI1NV0G+GgItZROEDR8+xJTnItQ1/k1bn6VSaAX1ycai9rwEXcfvpiHRP8NWzCgL9Q2R
- BR0osjGLYVPkm/33cJ59u55xXrlBlgwUtZ2jsAd+YuncyejqOFVO2ryip1uqEhKL7GoOnCU5D
- QBFE/B8TZdx83SC5mRLXn9cUULckj+0z7TlRJvV7x2E7F8KBGeSDBIUNdoDaed/yqN/e40CwA
- fNWtwEpJ+c6wR/mkhpA9ULtl26wCOx5YnVkgOYI/PNw5p6+G2WPouqPlNfpJElTNid/FPLsF8
- s5MCVHkh4EKgg/VC0ko6FxlJrLhePTRecEiHScSOxtEbfa96CI6KJsy+4j9em4Z+UVabyzWM+
- xhXJ61zbKDEu3px/ONhvn9h0I/EzeG9ad6HjQ7s2xBaoLqZGOW3aZKV7/EO/+l8J5Kte4YT7g
- B6c+gvCTOr+ZPSQ8+h21Vs1dmwbxwPVlokOjbkkjMQcEM9g2itIhZcPm0RvAV5h1qoS8WKcus
- up2vlmpTDHpSR9ges2OuuxmNjXnxCy144o3dVxdNucUJ3OyEr+zyOa17DRocaunAtGYU2JV3T
- wwcHcO3FEHfm+dzmkyQqzre1DyEYu5LuucIRn0ZeYcvqltZHqEReZcKm4rsNTe9sPD5Qkxbp/
- 2Wf/4rFduxtZnF4wOHbQQqxwtY+VCNFlGGiPLc9h0h0+a6F7kHmHhr98hnI1MdWsxXz+jnFDh
- Do12la1sB6DHoSmiMaHJggwDC4+PR6KtyqmMgDzvfJVM/gU2iMYZJ/xtlPKN+FVLCOBRvJvXF
- 4sbBkPhoGXpFGd5vqyifH3Pc5f0Xi3JUP4D1H3DyeF5LWb6XwAY6iwr8DA8KmrhQqxGZFp0TJ
- spliA9btU2+hki9CshlEZylATslbywwKF8067uyhBHEsEJ9rKW3OKs4Gvd7Zp0roGlJ2jawu3
- gXSvrxTXE2WTG83UypElTJ0qkrN1ARPRSbeZGq3u+jP0XSXlWCrjbmOf8/p0+tDDTmQVgMTFN
- gRWLN85ldP6FbgLaC
-Received-SPF: pass client-ip=212.227.15.3; envelope-from=lukasstraub2@web.de;
+X-Provags-ID: V03:K1:rA8ZYAEABW72dxjlKx4b62qk8VzjlQyHSWFmMuBHAmzxmNQSYag
+ u9zSg6qifV9j7h4+bfsIh/3gOsZjqltL/lyiBnCbdUtV7JwAfUtDcLnq++guFp2+vEFRjCM
+ C+oZyWqv4KhBYixUVxOJtp9X1CNGdojx1EBqtevqgIAdt7qj0fnRWHQAgagV6RlBCuMP1Nf
+ oXki2At3aT1gvJPA1fFOg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:G48vKEeada8=:qegn5ve0cO9B1KEGUmfjMQ
+ RkbkkDtC5siS6EuLL6VqenUD6XrAYNnbr9hZhNODXVZh6THD2yEtHtJGPziMakXfwiGTcd5UR
+ 7I8TVOkgX71tvD5oAWz6UnEjL9YkMXL/7QcnvgGJvgHkBpoddDQOtmKQ0jNQiOzdomB6N433m
+ GdTH79mC5jBrdpikdwzhClcGByfr+rJSHBJRL971gILu/+K5Hiv8P5rMqmZp4DIw352Zv304O
+ +ptC5jb2G7lIB9slCPv75Oyh7tfm2UUAThBPtEg2dp7g7xh7PB4FrBGTWPfNvSIm582q1UORp
+ 052JM/dN8DhEa+kCdRuK93dwtxvGPwHk5Qsb0GHA4v5HCuUk77Wg5hTyX5PPVoXK9tXm7Euzt
+ soSoq9+xHjx/vw7OAzjH2WWzEfotatAmIEo4hslr4/cDBht3z7hxG+LCMoprkcKYOiv/NdXvU
+ lvNQoaa0UN35enh5jgo49KlGcm4hbdFshEclvDnPzrK/rGUCRlb2fKNtCniMRSR82WZrOFavb
+ oaJyAoU4t/zgLWRDjrzpaFvL62flIy3hTvR+EOmP8xU/8SUtmjwZZaLYMw+QPwZB4x8zlDPD4
+ obMBjaPPeIDqMAEFdDgZOkXrYnmsE1GIqaIYbcPr197jO1dzk1WuMMaQjZPOHtpuIdDLApo09
+ a6Ir1sczfsCAv3DYDnk5GSF+kJiKT42ZXW8SNQt+GKz75X/Wlx0Kx6MWAjl2ifb/kvPj7A7lh
+ QsQv4tkyizcviCXCisaJenyMOwUfJeW94SODSzNBO+kLmo8DpNa/+2r6Vl3hlsKrEsmXFAJSG
+ +ZUwX8hUwhVFFA0xfFKOMXM1WlHrarXvZhqVhYlXdjUrmC6zhaDtjna9U7Ebx+qvfoDFNofvB
+ fGeXNyZqUaTGlqdcW/FztQmW2QST2xPAr5KKjtQpSwFeNaRVOTJSi3lqgmKvzStjIFe/TcS+l
+ VIw/JgQUJT5Jt1zQU0zNfd5CilmUlaeBi/mBGLni+0SjxETNFYNXkLO/tkqB58dINeA2UPKsR
+ NeoHJXS0xBF10Epg0A5EgqzdWSwoT1zsSwOcRkgG1ozRGqZeLC5elW7flMziD+JzZ8J2xWHup
+ i+uv+K6q1xu7SPg0crvGFHmXhiEj8xg9b9HTx5kWdd9zcsmvWprKf6Vt7XELw0PqOq5MVini8
+ qoi+XM5S/HU+mWMpA29y7KpuCAAMNZ4U7Kc3CiJbNrw9SHgTbtap3KLod48AiVSN4AGYjIBD+
+ IdzjMkE/+B2P++5L4
+Received-SPF: pass client-ip=212.227.17.12; envelope-from=lukasstraub2@web.de;
  helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 07:11:00
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 07:10:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -24
 X-Spam_score: -2.5
 X-Spam_bar: --
 X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,110 +109,58 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/hyZojprBdL+onStKDkN5i4L
+--Sig_/tqhr02zDZJ9i_MNE=83F3ke
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-Optionally install the resouce-agent so it gets picked up by
-pacemaker.
+While I'm not going to have much time for this, I'll still
+try to test and review patches.
 
 Signed-off-by: Lukas Straub <lukasstraub2@web.de>
 ---
- Makefile  |  5 +++++
- configure | 10 ++++++++++
- 2 files changed, 15 insertions(+)
+ MAINTAINERS | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index 8a9113e666..2ebffc4465 100644
---- a/Makefile
-+++ b/Makefile
-@@ -973,6 +973,11 @@ ifneq ($(DESCS),)
- 		$(INSTALL_DATA) "$$tmpf" \
- 			"$(DESTDIR)$(qemu_datadir)/firmware/$$x"; \
- 	done
-+endif
-+ifdef INSTALL_COLO_RA
-+	mkdir -p "$(DESTDIR)$(libdir)/ocf/resource.d/qemu"
-+	$(INSTALL_PROG) "scripts/colo-resource-agent/colo" \
-+		"$(DESTDIR)$(libdir)/ocf/resource.d/qemu/colo"
- endif
- 	for s in $(ICON_SIZES); do \
- 		mkdir -p "$(DESTDIR)$(qemu_icondir)/hicolor/$${s}/apps"; \
-diff --git a/configure b/configure
-index 23b5e93752..c9252030cf 100755
---- a/configure
-+++ b/configure
-@@ -430,6 +430,7 @@ softmmu=3D"yes"
- linux_user=3D"no"
- bsd_user=3D"no"
- blobs=3D"yes"
-+colo_ra=3D"no"
- edk2_blobs=3D"no"
- pkgversion=3D""
- pie=3D""
-@@ -1309,6 +1310,10 @@ for opt do
-   ;;
-   --disable-blobs) blobs=3D"no"
-   ;;
-+  --disable-colo-ra) colo_ra=3D"no"
-+  ;;
-+  --enable-colo-ra) colo_ra=3D"yes"
-+  ;;
-   --with-pkgversion=3D*) pkgversion=3D"$optarg"
-   ;;
-   --with-coroutine=3D*) coroutine=3D"$optarg"
-@@ -1776,6 +1781,7 @@ Advanced options (experts only):
-   --enable-gcov            enable test coverage analysis with gcov
-   --gcov=3DGCOV              use specified gcov [$gcov_tool]
-   --disable-blobs          disable installing provided firmware blobs
-+  --enable-colo-ra         enable installing the COLO resource agent for p=
-acemaker
-   --with-vss-sdk=3DSDK-path  enable Windows VSS support in QEMU Guest Agent
-   --with-win-sdk=3DSDK-path  path to Windows Platform SDK (to build VSS .t=
-lb)
-   --tls-priority           default TLS protocol/cipher priority string
-@@ -6647,6 +6653,7 @@ echo "Linux AIO support $linux_aio"
- echo "Linux io_uring support $linux_io_uring"
- echo "ATTR/XATTR support $attr"
- echo "Install blobs     $blobs"
-+echo "Install COLO resource agent $colo_ra"
- echo "KVM support       $kvm"
- echo "HAX support       $hax"
- echo "HVF support       $hvf"
-@@ -7188,6 +7195,9 @@ fi
- if test "$blobs" =3D "yes" ; then
-   echo "INSTALL_BLOBS=3Dyes" >> $config_host_mak
- fi
-+if test "$colo_ra" =3D "yes" ; then
-+  echo "INSTALL_COLO_RA=3Dyes" >> $config_host_mak
-+fi
- if test "$iovec" =3D "yes" ; then
-   echo "CONFIG_IOVEC=3Dy" >> $config_host_mak
- fi
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 8cbc1fac2b..4c623a96e1 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2466,6 +2466,12 @@ F: net/colo*
+ F: net/filter-rewriter.c
+ F: net/filter-mirror.c
+=20
++COLO resource agent and testing
++M: Lukas Straub <lukasstraub2@web.de>
++S: Odd fixes
++F: scripts/colo-resource-agent/*
++F: tests/acceptance/colo.py
++
+ Record/replay
+ M: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+ R: Paolo Bonzini <pbonzini@redhat.com>
 --=20
 2.20.1
 
-
---Sig_/hyZojprBdL+onStKDkN5i4L
+--Sig_/tqhr02zDZJ9i_MNE=83F3ke
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl65RJsACgkQNasLKJxd
-slg4+Q/+M9UtlOWcoWKBDO2Te+FUHe5EFvtvtVIGNjUncp4tq5r+rj/TyilkVGrl
-OHn8iv1Lakx2QHKKw6rPM0EUfluq5AdeVF2dZbZ53dYrjn6jRKRjmSVoBPmwLQKU
-BBHRLnIZOuGIYKTPnx+VFI+UjuBwgRoy5ahmXH3ZWDHu7Qv6A+SCYtXP/PweXNSd
-AVwXkNier5KCllwVRBmEuGGkmGES7Lkjfs9t3U5bkxSVkbXeCDs7OGnZdWeUrG8K
-CrnS3VbKHnbCf7nJIRH7M58wCxrGPKs+6YbW2ZHJ8x1R15TFFRlIylc/mFZ8NSFQ
-IXrajI16t7G07Om0p/C8ftXsBYqvfj78pcy+LqDeqwi3QFNm5w328hwdVWOgVKe3
-8n/rDXUGUAdnaiK4WdpOTSvcmeZPOUBQ5V6V9KpVVGVWZvoxNoEkiRzbPWAtqVk6
-VAhbaMcL3acQ9sW6k3KldGF5liDW0UyYgmEhMWpEX02udMl0ExA9EDdFKzAnpGED
-V9m6C/kHr2bb3ixModY2Cd21xho3LPvKmO/ce7x1VfR+1TEc6R++fnLz8QvrS7tK
-RiE+QnhM+wsSbHem1GqkedL3UjBZKAhf1SOy1IAxlaWMLC5mjrsrkv6VV+LvnUno
-yIW5JiK2FP3UjNjq9PB9HHI05xth7e++C5adCSZ0cJkOQ427fi8=
-=olhj
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl65RJ8ACgkQNasLKJxd
+slic8g//U10f9tOlXyXC9RQPuopPuMipcghIJ18pUnsQb/KRlmne8I2xv4NzeKOq
+0EiOlVmwoFrqTfbmXHumd36N0LHLuxwYpyRm5/fxxoDhEllinujJsZcodybUK/n2
+Avw8Xb+uDG6c9J15yw7u8TRQy3aVtjtFLYIJh+67mIleginakKN8yZ/TuLuvDDSC
+NDHggjeGy3KL2+Y95UszYm8h/99cXoLeDDGJPy2IYtK53Q6e6TqXKlSg3Kf3E0Ut
+AdNODfjvMv7Q9p8CcjwJpWP/EUauXfraWTH+rUPC7XCH6h+j+3pPAPgV8sQEb1yH
+CwtUZ8Kgw7VmUqq/11EvaeZXOLlxVJ+sa8nQ/KlIt75T7BjN+7FgbQ1zCXWSgpEk
+lWScfERC7rb5nGss+2B5G6/ztp11ShWyshXpIjahOa4Bw9t+Cf9J+rjYRfdqbBFt
+Teal6DmGPgkydjShw3i6F8ftosK+G1UWbuPzruvV9igASWh4HDJ/Z8qTcZZxsSam
+u/hoGe3LdCmvlyHcCbxV+/OAneecyiDq3T7ro7YQJ0tk3Rlslil2eHxLVkPvB1xH
+8P9TtTexE5JVcmsohZ2bjcKp2cxGQ+cjYxefneD4tbc0HbHGwgeTJDzadpw9Y8KT
+2YZ5BSoWVibnA40WPcUByT6VQX7EbnaZO6UqoETckDZCeetTtfw=
+=QTmt
 -----END PGP SIGNATURE-----
 
---Sig_/hyZojprBdL+onStKDkN5i4L--
+--Sig_/tqhr02zDZJ9i_MNE=83F3ke--
 
