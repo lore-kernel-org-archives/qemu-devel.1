@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0EDFC47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 13:38:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA914C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 13:38:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B2F7206B7
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 13:38:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A1459206B7
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 13:38:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KM85AzjX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B2F7206B7
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TuQ7Xbfd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1459206B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY8ds-0002eq-Or
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 09:38:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48882)
+	id 1jY8dy-0002tx-Qt
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 09:38:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49034)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jY8ZQ-0001eb-Mf
- for qemu-devel@nongnu.org; Mon, 11 May 2020 09:34:12 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36996)
+ id 1jY8Zj-0002D3-QB
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 09:34:31 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43264)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jY8ZP-0006zZ-OE
- for qemu-devel@nongnu.org; Mon, 11 May 2020 09:34:12 -0400
-Received: by mail-wm1-x341.google.com with SMTP id z72so9672166wmc.2
- for <qemu-devel@nongnu.org>; Mon, 11 May 2020 06:34:11 -0700 (PDT)
+ id 1jY8Zi-00076q-LQ
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 09:34:31 -0400
+Received: by mail-wr1-x441.google.com with SMTP id i15so10962518wrx.10
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 06:34:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=QY58CXVUaQwf+QAV/2GBzlVDHqKHNdceOqgL9U9QO1k=;
- b=KM85AzjXIH2OScFzV350Jbe+tvJFDJ8X7ooJHab4XInMd77kU4IwuRFeONzM87Q+21
- CDw1urxRjkkcAl15MKL+HrqqHG6G+qs9uUE9clXEhRej9hF3JDoxXsdqbr9Z6Db9Fwfe
- MMbKmkBO558zY3nJhrOQiPDxasRdtSJy0fYZGfuMXWwNn/Lf0E5HWzM+thbLCGCNUHwJ
- WAb419HDGOr1mjmRpXuxFchPaMyeHLw+1VQ8kZ0S56GAxFiOgwaHfzZ54rGu4zx8lrrG
- amtsLg0binF53D4kkdorLtj/FyV/k8R/BzZ7+s5/h1E0SRxy0O2XK7wsKVz5jZSW6kvD
- eNAQ==
+ bh=CQboh7y+EHPP7sJC4SySB6VjlEwG4682cwAsQyFjJUM=;
+ b=TuQ7XbfdrHx4FKN38P07EMbrrtmzTHX5VMAW2ZH/pbVi6TMlP+vMWzcF7I+GmkpjQY
+ KWK28k831PPw72n80cVGi+1ERlEVzTCsm4g/P//eOtH8ejz31UyC5GT2j4dyLDgrJuGB
+ POZVSICOdC4n19bo0wqeGzb2iSKxsZZkZmqkDOm0VD7tGOnjbX2Z5w54rZmi4qlwwua2
+ 9WU9J6HyczbYqh7Jph9t8ZLuKcDNSuFV3leoTTGKC85EclyizEMieSL/qgJA6THLRKVe
+ wK04xvds3j++Kn6y1Efyy1EiAO0aKzKFyVnH0a3boMABxMMOB7IRg5qbR79jTkRj0cXH
+ MbHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=QY58CXVUaQwf+QAV/2GBzlVDHqKHNdceOqgL9U9QO1k=;
- b=kF6x2IF1MGwotDbT+7OGhNHBgx2B/9BdwrOzM30TVpTbfVla290P97NFaNts55mQ7n
- 7GgeTYVz6CyRMucNuv4wXwuuu18P1r5B11oRA1vLmyutyBA8zF3OU7rlilhEZBOyhh9E
- N74u5LmV6Jl9p58VmG97tFBNSuLubjNXUgxlUY0u+N21vtguzz8fA8Hch4lpWCsnVjAG
- sNzEEgYHDOQGVcjdxrYEEfG8fD8vHU6JBmvxLG/tc01nZPfK26b9PvPF/yKtBcpYmgnx
- 7fKGWIed18P12zdugcNFoKKDwQ6RZjIiP1Ya5UETt+mD6k0sBLqL3PKIQ2i2oBzYccf2
- 4eGQ==
-X-Gm-Message-State: AGi0PubFmCh1ofqO8ygahOTSmSS7hXt85FY8Cm8JWbiozTR+wE2cHXY2
- BV+iAtjittn0iimrl/GGiTDbmDpgOpRGbA==
-X-Google-Smtp-Source: APiQypLjPexCblnVhZFdsFu4KnRcvGXrCnbttgpWFHUKhlqxx33USgA+KxjC86BkylCcFeU6ViBExQ==
-X-Received: by 2002:a1c:bbc4:: with SMTP id
- l187mr12222887wmf.183.1589204049853; 
- Mon, 11 May 2020 06:34:09 -0700 (PDT)
+ bh=CQboh7y+EHPP7sJC4SySB6VjlEwG4682cwAsQyFjJUM=;
+ b=YpBpKdYh1bxvDeCxGDtqejQxeNKYKJgAotODf2nnCBGSsqe+Jg2+lymm6KxmzONuph
+ SNBmbFbIHx5pfp2WMUiyhDjLp7Q1DikblCNL2VtKE3pdzgY/BVDB5ChtqNtlKLkDFhvb
+ cFLFEXpw8Z8LP3RifIHLYAwdt0DpqMBXnz7ehvhvvtmiJCzjR12yEL+I6rWrfHWNCDjE
+ 6v0MjTK8a0SE/fkcRzI7ztALQhRN1VbjQRZz3B9WrKgyKBZJ3bFSGVcnZmLB5iXsyRCY
+ 4B3UUMgwvGHJu4vYf9yQsvZqfHUtvG0NXq5ejiPwSGztjSfWrdd/kYvx/egjo5z8kVm3
+ MP8g==
+X-Gm-Message-State: AGi0PuZK1oPxFrJwVjEJfQqygpR08Dj2ZWMY8jAobDVf5NkZsGk6gOme
+ 14Gjrxtlz3J7qPy+UCHiKWFXqHXK0jfI0Q==
+X-Google-Smtp-Source: APiQypLMdm5xLfKkAWX+vbi88xq5uBnIOeazWuw93t/4uRQhkZB4okpmR9t5tE4Nbf2y4eCVVwjgtA==
+X-Received: by 2002:a5d:4006:: with SMTP id n6mr19553207wrp.27.1589204068805; 
+ Mon, 11 May 2020 06:34:28 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id m3sm2154818wrn.96.2020.05.11.06.34.08
+ by smtp.gmail.com with ESMTPSA id m3sm2154818wrn.96.2020.05.11.06.34.27
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 11 May 2020 06:34:08 -0700 (PDT)
+ Mon, 11 May 2020 06:34:28 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/34] target/arm: Drop access_el3_aa32ns_aa64any()
-Date: Mon, 11 May 2020 14:33:33 +0100
-Message-Id: <20200511133405.5275-3-peter.maydell@linaro.org>
+Subject: [PULL 18/34] target/arm: Use SVEContLdSt in sve_ld1_r
+Date: Mon, 11 May 2020 14:33:49 +0100
+Message-Id: <20200511133405.5275-19-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200511133405.5275-1-peter.maydell@linaro.org>
 References: <20200511133405.5275-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,101 +104,253 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Calling access_el3_aa32ns() works for AArch32 only cores
-but it does not handle 32-bit EL2 on top of 64-bit EL3
-for mixed 32/64-bit cores.
+First use of the new helper functions, so we can remove the
+unused markup.  No longer need a scratch for user-only, as
+we completely probe the page set before reading; system mode
+still requires a scratch for MMIO.
 
-Merge access_el3_aa32ns_aa64any() into access_el3_aa32ns()
-and only use the latter.
-
-Fixes: 68e9c2fe65 ("target-arm: Add VTCR_EL2")
-Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Message-id: 20200505141729.31930-2-edgar.iglesias@gmail.com
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200508154359.7494-12-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.c | 30 +++++++-----------------------
- 1 file changed, 7 insertions(+), 23 deletions(-)
+ target/arm/sve_helper.c | 188 +++++++++++++++++++++-------------------
+ 1 file changed, 97 insertions(+), 91 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index a94f6507950..b88d27819d5 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -503,35 +503,19 @@ void init_cpreg_list(ARMCPU *cpu)
- }
- 
- /*
-- * Some registers are not accessible if EL3.NS=0 and EL3 is using AArch32 but
-- * they are accessible when EL3 is using AArch64 regardless of EL3.NS.
-- *
-- * access_el3_aa32ns: Used to check AArch32 register views.
-- * access_el3_aa32ns_aa64any: Used to check both AArch32/64 register views.
-+ * Some registers are not accessible from AArch32 EL3 if SCR.NS == 0.
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index d0071377351..6bae342a177 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -4221,9 +4221,9 @@ typedef struct {
+  * final element on each page.  Identify any single element that spans
+  * the page boundary.  Return true if there are any active elements.
   */
- static CPAccessResult access_el3_aa32ns(CPUARMState *env,
-                                         const ARMCPRegInfo *ri,
-                                         bool isread)
+-static bool __attribute__((unused))
+-sve_cont_ldst_elements(SVEContLdSt *info, target_ulong addr, uint64_t *vg,
+-                       intptr_t reg_max, int esz, int msize)
++static bool sve_cont_ldst_elements(SVEContLdSt *info, target_ulong addr,
++                                   uint64_t *vg, intptr_t reg_max,
++                                   int esz, int msize)
  {
--    bool secure = arm_is_secure_below_el3(env);
--
--    assert(!arm_el_is_aa64(env, 3));
--    if (secure) {
-+    if (!is_a64(env) && arm_current_el(env) == 3 &&
-+        arm_is_secure_below_el3(env)) {
-         return CP_ACCESS_TRAP_UNCATEGORIZED;
+     const int esize = 1 << esz;
+     const uint64_t pg_mask = pred_esz_masks[esz];
+@@ -4313,10 +4313,9 @@ sve_cont_ldst_elements(SVEContLdSt *info, target_ulong addr, uint64_t *vg,
+  * Control the generation of page faults with @fault.  Return false if
+  * there is no work to do, which can only happen with @fault == FAULT_NO.
+  */
+-static bool __attribute__((unused))
+-sve_cont_ldst_pages(SVEContLdSt *info, SVEContFault fault, CPUARMState *env,
+-                    target_ulong addr, MMUAccessType access_type,
+-                    uintptr_t retaddr)
++static bool sve_cont_ldst_pages(SVEContLdSt *info, SVEContFault fault,
++                                CPUARMState *env, target_ulong addr,
++                                MMUAccessType access_type, uintptr_t retaddr)
+ {
+     int mmu_idx = cpu_mmu_index(env, false);
+     int mem_off = info->mem_off_first[0];
+@@ -4388,109 +4387,116 @@ static inline bool test_host_page(void *host)
+ /*
+  * Common helper for all contiguous one-register predicated loads.
+  */
+-static void sve_ld1_r(CPUARMState *env, void *vg, const target_ulong addr,
+-                      uint32_t desc, const uintptr_t retaddr,
+-                      const int esz, const int msz,
+-                      sve_ldst1_host_fn *host_fn,
+-                      sve_ldst1_tlb_fn *tlb_fn)
++static inline QEMU_ALWAYS_INLINE
++void sve_ld1_r(CPUARMState *env, uint64_t *vg, const target_ulong addr,
++               uint32_t desc, const uintptr_t retaddr,
++               const int esz, const int msz,
++               sve_ldst1_host_fn *host_fn,
++               sve_ldst1_tlb_fn *tlb_fn)
+ {
+-    const TCGMemOpIdx oi = extract32(desc, SIMD_DATA_SHIFT, MEMOPIDX_SHIFT);
+-    const int mmu_idx = get_mmuidx(oi);
+     const unsigned rd = extract32(desc, SIMD_DATA_SHIFT + MEMOPIDX_SHIFT, 5);
+     void *vd = &env->vfp.zregs[rd];
+-    const int diffsz = esz - msz;
+     const intptr_t reg_max = simd_oprsz(desc);
+-    const intptr_t mem_max = reg_max >> diffsz;
+-    ARMVectorReg scratch;
++    intptr_t reg_off, reg_last, mem_off;
++    SVEContLdSt info;
+     void *host;
+-    intptr_t split, reg_off, mem_off;
++    int flags;
+ 
+-    /* Find the first active element.  */
+-    reg_off = find_next_active(vg, 0, reg_max, esz);
+-    if (unlikely(reg_off == reg_max)) {
++    /* Find the active elements.  */
++    if (!sve_cont_ldst_elements(&info, addr, vg, reg_max, esz, 1 << msz)) {
+         /* The entire predicate was false; no load occurs.  */
+         memset(vd, 0, reg_max);
+         return;
      }
-     return CP_ACCESS_OK;
+-    mem_off = reg_off >> diffsz;
+ 
+-    /*
+-     * If the (remaining) load is entirely within a single page, then:
+-     * For softmmu, and the tlb hits, then no faults will occur;
+-     * For user-only, either the first load will fault or none will.
+-     * We can thus perform the load directly to the destination and
+-     * Vd will be unmodified on any exception path.
+-     */
+-    split = max_for_page(addr, mem_off, mem_max);
+-    if (likely(split == mem_max)) {
+-        host = tlb_vaddr_to_host(env, addr + mem_off, MMU_DATA_LOAD, mmu_idx);
+-        if (test_host_page(host)) {
+-            intptr_t i = reg_off;
+-            host -= mem_off;
+-            do {
+-                host_fn(vd, i, host + (i >> diffsz));
+-                i = find_next_active(vg, i + (1 << esz), reg_max, esz);
+-            } while (i < reg_max);
+-            /* After having taken any fault, zero leading inactive elements. */
+-            swap_memzero(vd, reg_off);
+-            return;
+-        }
+-    }
++    /* Probe the page(s).  Exit with exception for any invalid page. */
++    sve_cont_ldst_pages(&info, FAULT_ALL, env, addr, MMU_DATA_LOAD, retaddr);
+ 
+-    /*
+-     * Perform the predicated read into a temporary, thus ensuring
+-     * if the load of the last element faults, Vd is not modified.
+-     */
++    flags = info.page[0].flags | info.page[1].flags;
++    if (unlikely(flags != 0)) {
+ #ifdef CONFIG_USER_ONLY
+-    swap_memzero(&scratch, reg_off);
+-    host = g2h(addr);
+-    do {
+-        host_fn(&scratch, reg_off, host + (reg_off >> diffsz));
+-        reg_off += 1 << esz;
+-        reg_off = find_next_active(vg, reg_off, reg_max, esz);
+-    } while (reg_off < reg_max);
++        g_assert_not_reached();
+ #else
+-    memset(&scratch, 0, reg_max);
+-    goto start;
+-    while (1) {
+-        reg_off = find_next_active(vg, reg_off, reg_max, esz);
+-        if (reg_off >= reg_max) {
+-            break;
+-        }
+-        mem_off = reg_off >> diffsz;
+-        split = max_for_page(addr, mem_off, mem_max);
++        /*
++         * At least one page includes MMIO (or watchpoints).
++         * Any bus operation can fail with cpu_transaction_failed,
++         * which for ARM will raise SyncExternal.  Perform the load
++         * into scratch memory to preserve register state until the end.
++         */
++        ARMVectorReg scratch;
+ 
+-    start:
+-        if (split - mem_off >= (1 << msz)) {
+-            /* At least one whole element on this page.  */
+-            host = tlb_vaddr_to_host(env, addr + mem_off,
+-                                     MMU_DATA_LOAD, mmu_idx);
+-            if (host) {
+-                host -= mem_off;
+-                do {
+-                    host_fn(&scratch, reg_off, host + mem_off);
+-                    reg_off += 1 << esz;
+-                    reg_off = find_next_active(vg, reg_off, reg_max, esz);
+-                    mem_off = reg_off >> diffsz;
+-                } while (split - mem_off >= (1 << msz));
+-                continue;
++        memset(&scratch, 0, reg_max);
++        mem_off = info.mem_off_first[0];
++        reg_off = info.reg_off_first[0];
++        reg_last = info.reg_off_last[1];
++        if (reg_last < 0) {
++            reg_last = info.reg_off_split;
++            if (reg_last < 0) {
++                reg_last = info.reg_off_last[0];
+             }
+         }
+ 
+-        /*
+-         * Perform one normal read.  This may fault, longjmping out to the
+-         * main loop in order to raise an exception.  It may succeed, and
+-         * as a side-effect load the TLB entry for the next round.  Finally,
+-         * in the extremely unlikely case we're performing this operation
+-         * on I/O memory, it may succeed but not bring in the TLB entry.
+-         * But even then we have still made forward progress.
+-         */
+-        tlb_fn(env, &scratch, reg_off, addr + mem_off, retaddr);
+-        reg_off += 1 << esz;
+-    }
+-#endif
++        do {
++            uint64_t pg = vg[reg_off >> 6];
++            do {
++                if ((pg >> (reg_off & 63)) & 1) {
++                    tlb_fn(env, &scratch, reg_off, addr + mem_off, retaddr);
++                }
++                reg_off += 1 << esz;
++                mem_off += 1 << msz;
++            } while (reg_off & 63);
++        } while (reg_off <= reg_last);
+ 
+-    memcpy(vd, &scratch, reg_max);
++        memcpy(vd, &scratch, reg_max);
++        return;
++#endif
++    }
++
++    /* The entire operation is in RAM, on valid pages. */
++
++    memset(vd, 0, reg_max);
++    mem_off = info.mem_off_first[0];
++    reg_off = info.reg_off_first[0];
++    reg_last = info.reg_off_last[0];
++    host = info.page[0].host;
++
++    while (reg_off <= reg_last) {
++        uint64_t pg = vg[reg_off >> 6];
++        do {
++            if ((pg >> (reg_off & 63)) & 1) {
++                host_fn(vd, reg_off, host + mem_off);
++            }
++            reg_off += 1 << esz;
++            mem_off += 1 << msz;
++        } while (reg_off <= reg_last && (reg_off & 63));
++    }
++
++    /*
++     * Use the slow path to manage the cross-page misalignment.
++     * But we know this is RAM and cannot trap.
++     */
++    mem_off = info.mem_off_split;
++    if (unlikely(mem_off >= 0)) {
++        tlb_fn(env, vd, info.reg_off_split, addr + mem_off, retaddr);
++    }
++
++    mem_off = info.mem_off_first[1];
++    if (unlikely(mem_off >= 0)) {
++        reg_off = info.reg_off_first[1];
++        reg_last = info.reg_off_last[1];
++        host = info.page[1].host;
++
++        do {
++            uint64_t pg = vg[reg_off >> 6];
++            do {
++                if ((pg >> (reg_off & 63)) & 1) {
++                    host_fn(vd, reg_off, host + mem_off);
++                }
++                reg_off += 1 << esz;
++                mem_off += 1 << msz;
++            } while (reg_off & 63);
++        } while (reg_off <= reg_last);
++    }
  }
  
--static CPAccessResult access_el3_aa32ns_aa64any(CPUARMState *env,
--                                                const ARMCPRegInfo *ri,
--                                                bool isread)
--{
--    if (!arm_el_is_aa64(env, 3)) {
--        return access_el3_aa32ns(env, ri, isread);
--    }
--    return CP_ACCESS_OK;
--}
--
- /* Some secure-only AArch32 registers trap to EL3 if used from
-  * Secure EL1 (but are just ordinary UNDEF in other non-EL3 contexts).
-  * Note that an access from Secure EL1 can only happen if EL3 is AArch64.
-@@ -5147,7 +5131,7 @@ static const ARMCPRegInfo el3_no_el2_cp_reginfo[] = {
-       .access = PL2_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-     { .name = "VTCR_EL2", .state = ARM_CP_STATE_BOTH,
-       .opc0 = 3, .opc1 = 4, .crn = 2, .crm = 1, .opc2 = 2,
--      .access = PL2_RW, .accessfn = access_el3_aa32ns_aa64any,
-+      .access = PL2_RW, .accessfn = access_el3_aa32ns,
-       .type = ARM_CP_CONST, .resetvalue = 0 },
-     { .name = "VTTBR", .state = ARM_CP_STATE_AA32,
-       .cp = 15, .opc1 = 6, .crm = 2,
-@@ -5195,7 +5179,7 @@ static const ARMCPRegInfo el3_no_el2_cp_reginfo[] = {
-       .type = ARM_CP_CONST, .resetvalue = 0 },
-     { .name = "HPFAR_EL2", .state = ARM_CP_STATE_BOTH,
-       .opc0 = 3, .opc1 = 4, .crn = 6, .crm = 0, .opc2 = 4,
--      .access = PL2_RW, .accessfn = access_el3_aa32ns_aa64any,
-+      .access = PL2_RW, .accessfn = access_el3_aa32ns,
-       .type = ARM_CP_CONST, .resetvalue = 0 },
-     { .name = "HSTR_EL2", .state = ARM_CP_STATE_BOTH,
-       .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 1, .opc2 = 3,
-@@ -7537,12 +7521,12 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-             ARMCPRegInfo vpidr_regs[] = {
-                 { .name = "VPIDR_EL2", .state = ARM_CP_STATE_BOTH,
-                   .opc0 = 3, .opc1 = 4, .crn = 0, .crm = 0, .opc2 = 0,
--                  .access = PL2_RW, .accessfn = access_el3_aa32ns_aa64any,
-+                  .access = PL2_RW, .accessfn = access_el3_aa32ns,
-                   .type = ARM_CP_CONST, .resetvalue = cpu->midr,
-                   .fieldoffset = offsetof(CPUARMState, cp15.vpidr_el2) },
-                 { .name = "VMPIDR_EL2", .state = ARM_CP_STATE_BOTH,
-                   .opc0 = 3, .opc1 = 4, .crn = 0, .crm = 0, .opc2 = 5,
--                  .access = PL2_RW, .accessfn = access_el3_aa32ns_aa64any,
-+                  .access = PL2_RW, .accessfn = access_el3_aa32ns,
-                   .type = ARM_CP_NO_RAW,
-                   .writefn = arm_cp_write_ignore, .readfn = mpidr_read },
-                 REGINFO_SENTINEL
+ #define DO_LD1_1(NAME, ESZ) \
 -- 
 2.20.1
 
