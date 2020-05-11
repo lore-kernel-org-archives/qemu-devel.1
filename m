@@ -7,51 +7,50 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94528C54E8D
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 475FFC54E4B
 	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 19:19:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 711BC206B9
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 19:19:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 711BC206B9
+	by mail.kernel.org (Postfix) with ESMTPS id 22FBB206B9
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 19:19:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22FBB206B9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYDxB-0003jy-IQ
+	id 1jYDxB-0003fd-0o
 	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 15:19:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51382)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51374)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jonathan.derrick@intel.com>)
- id 1jYDvg-0001hS-Lo
- for qemu-devel@nongnu.org; Mon, 11 May 2020 15:17:32 -0400
-Received: from mga18.intel.com ([134.134.136.126]:15027)
+ id 1jYDvf-0001ge-G5
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 15:17:31 -0400
+Received: from mga18.intel.com ([134.134.136.126]:15021)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jonathan.derrick@intel.com>)
- id 1jYDvf-0001bB-Dx
- for qemu-devel@nongnu.org; Mon, 11 May 2020 15:17:32 -0400
-IronPort-SDR: OK1SdtoHI4Z94rsvnymImHXLFEeGy4tp334Z5hrx9WANmyACIs7VRg4epDSUkFP7hW39utoaLz
- alfbqXGpFG2Q==
+ id 1jYDve-0001Ys-0U
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 15:17:31 -0400
+IronPort-SDR: 3AF57s3TCpHH4AMsW2Owkcui+iY1GHJlRZmXytTj2DzQdZOSmXCqTBFmsQ5kZ0tG+WiwRB/3lS
+ mA9125Bnt2Vg==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 11 May 2020 12:17:21 -0700
-IronPort-SDR: roRqwOjLYhkQ32MOBY1NWaG8Rq4NfXfjhv0xHiAE0sHLAo09c8dlxaMkE1RMVc64sRzQVz9coz
- nUt+Po+4mQ4w==
+ 11 May 2020 12:17:20 -0700
+IronPort-SDR: J1dl4aw3xiNFGvwucvJnxSy7hn4p9TQdkAA/AN+skUvWZgoHHx+3AVCX5+Gaf7cNBFaI/pIN7I
+ AeD6RKVGKtww==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,381,1583222400"; d="scan'208";a="463494245"
+X-IronPort-AV: E=Sophos;i="5.73,381,1583222400"; d="scan'208";a="463494237"
 Received: from unknown (HELO localhost.lm.intel.com) ([10.232.116.74])
- by fmsmga006.fm.intel.com with ESMTP; 11 May 2020 12:17:21 -0700
+ by fmsmga006.fm.intel.com with ESMTP; 11 May 2020 12:17:20 -0700
 From: Jon Derrick <jonathan.derrick@intel.com>
 To: <linux-pci@vger.kernel.org>,
 	qemu-devel@nongnu.org
-Subject: [PATCH v2 2/2] PCI: vmd: Use Shadow MEMBAR registers for QEMU/KVM
- guests
-Date: Mon, 11 May 2020 15:01:29 -0400
-Message-Id: <20200511190129.9313-4-jonathan.derrick@intel.com>
+Subject: [PATCH for QEMU v2] hw/vfio: Add VMD Passthrough Quirk
+Date: Mon, 11 May 2020 15:01:27 -0400
+Message-Id: <20200511190129.9313-2-jonathan.derrick@intel.com>
 X-Mailer: git-send-email 2.18.1
 In-Reply-To: <20200511190129.9313-1-jonathan.derrick@intel.com>
 References: <20200511190129.9313-1-jonathan.derrick@intel.com>
@@ -85,73 +84,192 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-VMD device 28C0 natively assists guest passthrough of the VMD endpoint
-through the use of shadow registers that provide Host Physical Addresses
-to correctly assign bridge windows. These shadow registers are only
-available if VMD config space register 0x70, bit 1 is set.
+The VMD endpoint provides a real PCIe domain to the guest, including
+bridges and endpoints. Because the VMD domain is enumerated by the guest
+kernel, the guest kernel will assign Guest Physical Addresses to the
+downstream endpoint BARs and bridge windows.
 
-For existing VMD which don't natively support the shadow register, VMD
-config space register 0x70 is reserved and will return 0. Future VMD
-will have these registers natively in hardware, but existing VMD can
-still use this feature by emulating the config space register and shadow
-registers.
+When the guest kernel performs MMIO to VMD sub-devices, IOMMU will
+translate from the guest address space to the physical address space.
+Because the bridges have been programmed with guest addresses, the
+bridges will reject the transaction containing physical addresses.
 
-QEMU has been modified to emulate this config space register and the
-shadow membar registers for VMDs which don't natively support this
-feature. This patch updates the supported device list to allow this
-feature to be used on these VMDs.
+VMD device 28C0 natively assists passthrough by providing the Host
+Physical Address in shadow registers accessible to the guest for bridge
+window assignment. The shadow registers are valid if bit 1 is set in VMD
+VMLOCK config register 0x70. Future VMDs will also support this feature.
+Existing VMDs have config register 0x70 reserved, and will return 0 on
+reads.
+
+In order to support existing VMDs, this quirk emulates the VMLOCK and
+HPA shadow registers for all VMD device ids which don't natively assist
+with passthrough. The Linux VMD driver is updated to allow existing VMD
+devices to query VMLOCK for passthrough support.
 
 Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
 ---
- drivers/pci/controller/vmd.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+ hw/vfio/pci-quirks.c | 103 +++++++++++++++++++++++++++++++++++++++++++
+ hw/vfio/pci.c        |   7 +++
+ hw/vfio/pci.h        |   2 +
+ hw/vfio/trace-events |   3 ++
+ 4 files changed, 115 insertions(+)
 
-diff --git a/drivers/pci/controller/vmd.c b/drivers/pci/controller/vmd.c
-index e386d4eac407..ee71d0989875 100644
---- a/drivers/pci/controller/vmd.c
-+++ b/drivers/pci/controller/vmd.c
-@@ -600,6 +600,7 @@ static irqreturn_t vmd_irq(int irq, void *data)
- static int vmd_probe(struct pci_dev *dev, const struct pci_device_id *id)
- {
- 	struct vmd_dev *vmd;
-+	unsigned long features = id->driver_data;
- 	int i, err;
+diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+index 2d348f8237..4060a6a95d 100644
+--- a/hw/vfio/pci-quirks.c
++++ b/hw/vfio/pci-quirks.c
+@@ -1709,3 +1709,106 @@ free_exit:
  
- 	if (resource_size(&dev->resource[VMD_CFGBAR]) < (1 << 20))
-@@ -652,7 +653,7 @@ static int vmd_probe(struct pci_dev *dev, const struct pci_device_id *id)
+     return ret;
+ }
++
++/*
++ * The VMD endpoint provides a real PCIe domain to the guest and the guest
++ * kernel performs enumeration of the VMD sub-device domain. Guest transactions
++ * to VMD sub-devices go through IOMMU translation from guest addresses to
++ * physical addresses. When MMIO goes to an endpoint after being translated to
++ * physical addresses, the bridge rejects the transaction because the window
++ * has been programmed with guest addresses.
++ *
++ * VMD can use the Host Physical Address in order to correctly program the
++ * bridge windows in its PCIe domain. VMD device 28C0 has HPA shadow registers
++ * located at offset 0x2000 in MEMBAR2 (BAR 4). The shadow registers are valid
++ * if bit 1 is set in the VMD VMLOCK config register 0x70. VMD devices without
++ * this native assistance can have these registers safely emulated as these
++ * registers are reserved.
++ */
++typedef struct VFIOVMDQuirk {
++    VFIOPCIDevice *vdev;
++    uint64_t membar_phys[2];
++} VFIOVMDQuirk;
++
++static uint64_t vfio_vmd_quirk_read(void *opaque, hwaddr addr, unsigned size)
++{
++    VFIOVMDQuirk *data = opaque;
++    uint64_t val = 0;
++
++    memcpy(&val, (void *)data->membar_phys + addr, size);
++    return val;
++}
++
++static const MemoryRegionOps vfio_vmd_quirk = {
++    .read = vfio_vmd_quirk_read,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++};
++
++#define VMD_VMLOCK  0x70
++#define VMD_SHADOW  0x2000
++#define VMD_MEMBAR2 4
++
++static int vfio_vmd_emulate_shadow_registers(VFIOPCIDevice *vdev)
++{
++    VFIOQuirk *quirk;
++    VFIOVMDQuirk *data;
++    PCIDevice *pdev = &vdev->pdev;
++    int ret;
++
++    data = g_malloc0(sizeof(*data));
++    ret = pread(vdev->vbasedev.fd, data->membar_phys, 16,
++                vdev->config_offset + PCI_BASE_ADDRESS_2);
++    if (ret != 16) {
++        error_report("VMD %s cannot read MEMBARs (%d)",
++                     vdev->vbasedev.name, ret);
++        g_free(data);
++        return -EFAULT;
++    }
++
++    quirk = vfio_quirk_alloc(1);
++    quirk->data = data;
++    data->vdev = vdev;
++
++    /* Emulate Shadow Registers */
++    memory_region_init_io(quirk->mem, OBJECT(vdev), &vfio_vmd_quirk, data,
++                          "vfio-vmd-quirk", sizeof(data->membar_phys));
++    memory_region_add_subregion_overlap(vdev->bars[VMD_MEMBAR2].region.mem,
++                                        VMD_SHADOW, quirk->mem, 1);
++    memory_region_set_readonly(quirk->mem, true);
++    memory_region_set_enabled(quirk->mem, true);
++
++    QLIST_INSERT_HEAD(&vdev->bars[VMD_MEMBAR2].quirks, quirk, next);
++
++    trace_vfio_pci_vmd_quirk_shadow_regs(vdev->vbasedev.name,
++                                         data->membar_phys[0],
++                                         data->membar_phys[1]);
++
++    /* Advertise Shadow Register support */
++    pci_byte_test_and_set_mask(pdev->config + VMD_VMLOCK, 0x2);
++    pci_set_byte(pdev->wmask + VMD_VMLOCK, 0);
++    pci_set_byte(vdev->emulated_config_bits + VMD_VMLOCK, 0x2);
++
++    trace_vfio_pci_vmd_quirk_vmlock(vdev->vbasedev.name,
++                                    pci_get_byte(pdev->config + VMD_VMLOCK));
++
++    return 0;
++}
++
++int vfio_pci_vmd_init(VFIOPCIDevice *vdev)
++{
++    int ret = 0;
++
++    switch (vdev->device_id) {
++    case 0x28C0: /* Native passthrough support */
++        break;
++    /* Emulates Native passthrough support */
++    case 0x201D:
++    case 0x467F:
++    case 0x4C3D:
++    case 0x9A0B:
++        ret = vfio_vmd_emulate_shadow_registers(vdev);
++        break;
++    }
++
++    return ret;
++}
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 5e75a95129..85425a1a6f 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -3024,6 +3024,13 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+         }
+     }
  
- 	spin_lock_init(&vmd->cfg_lock);
- 	pci_set_drvdata(dev, vmd);
--	err = vmd_enable_domain(vmd, (unsigned long) id->driver_data);
-+	err = vmd_enable_domain(vmd, features);
- 	if (err)
- 		return err;
++    if (vdev->vendor_id == PCI_VENDOR_ID_INTEL) {
++        ret = vfio_pci_vmd_init(vdev);
++        if (ret) {
++            error_report("Failed to setup VMD");
++        }
++    }
++
+     vfio_register_err_notifier(vdev);
+     vfio_register_req_notifier(vdev);
+     vfio_setup_resetfn_quirk(vdev);
+diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+index 0da7a20a7e..e8632d806b 100644
+--- a/hw/vfio/pci.h
++++ b/hw/vfio/pci.h
+@@ -217,6 +217,8 @@ int vfio_pci_igd_opregion_init(VFIOPCIDevice *vdev,
+ int vfio_pci_nvidia_v100_ram_init(VFIOPCIDevice *vdev, Error **errp);
+ int vfio_pci_nvlink2_init(VFIOPCIDevice *vdev, Error **errp);
  
-@@ -716,16 +717,20 @@ static int vmd_resume(struct device *dev)
- static SIMPLE_DEV_PM_OPS(vmd_dev_pm_ops, vmd_suspend, vmd_resume);
++int vfio_pci_vmd_init(VFIOPCIDevice *vdev);
++
+ void vfio_display_reset(VFIOPCIDevice *vdev);
+ int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp);
+ void vfio_display_finalize(VFIOPCIDevice *vdev);
+diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+index b1ef55a33f..ed64e477db 100644
+--- a/hw/vfio/trace-events
++++ b/hw/vfio/trace-events
+@@ -90,6 +90,9 @@ vfio_pci_nvidia_gpu_setup_quirk(const char *name, uint64_t tgt, uint64_t size) "
+ vfio_pci_nvlink2_setup_quirk_ssatgt(const char *name, uint64_t tgt, uint64_t size) "%s tgt=0x%"PRIx64" size=0x%"PRIx64
+ vfio_pci_nvlink2_setup_quirk_lnkspd(const char *name, uint32_t link_speed) "%s link_speed=0x%x"
  
- static const struct pci_device_id vmd_ids[] = {
--	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, PCI_DEVICE_ID_INTEL_VMD_201D),},
-+	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, PCI_DEVICE_ID_INTEL_VMD_201D),
-+		.driver_data = VMD_FEAT_HAS_MEMBAR_SHADOW,},
- 	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, PCI_DEVICE_ID_INTEL_VMD_28C0),
- 		.driver_data = VMD_FEAT_HAS_MEMBAR_SHADOW |
- 				VMD_FEAT_HAS_BUS_RESTRICTIONS,},
- 	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, 0x467f),
--		.driver_data = VMD_FEAT_HAS_BUS_RESTRICTIONS,},
-+		.driver_data = VMD_FEAT_HAS_MEMBAR_SHADOW |
-+				VMD_FEAT_HAS_BUS_RESTRICTIONS,},
- 	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, 0x4c3d),
--		.driver_data = VMD_FEAT_HAS_BUS_RESTRICTIONS,},
-+		.driver_data = VMD_FEAT_HAS_MEMBAR_SHADOW |
-+				VMD_FEAT_HAS_BUS_RESTRICTIONS,},
- 	{PCI_DEVICE(PCI_VENDOR_ID_INTEL, PCI_DEVICE_ID_INTEL_VMD_9A0B),
--		.driver_data = VMD_FEAT_HAS_BUS_RESTRICTIONS,},
-+		.driver_data = VMD_FEAT_HAS_MEMBAR_SHADOW |
-+				VMD_FEAT_HAS_BUS_RESTRICTIONS,},
- 	{0,}
- };
- MODULE_DEVICE_TABLE(pci, vmd_ids);
++vfio_pci_vmd_quirk_shadow_regs(const char *name, uint64_t mb1, uint64_t mb2) "%s membar1_phys=0x%"PRIx64" membar2_phys=0x%"PRIx64
++vfio_pci_vmd_quirk_vmlock(const char *name, uint8_t vmlock) "%s vmlock=0x%x"
++
+ # common.c
+ vfio_region_write(const char *name, int index, uint64_t addr, uint64_t data, unsigned size) " (%s:region%d+0x%"PRIx64", 0x%"PRIx64 ", %d)"
+ vfio_region_read(char *name, int index, uint64_t addr, unsigned size, uint64_t data) " (%s:region%d+0x%"PRIx64", %d) = 0x%"PRIx64
 -- 
 2.18.1
 
