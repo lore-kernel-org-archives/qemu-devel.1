@@ -2,80 +2,98 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E095C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 16:26:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E6E9C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 16:31:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FA1C206DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 16:26:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FA1C206DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id CE22E20731
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 16:31:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IM0B5u3h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE22E20731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYBG5-00052B-72
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 12:26:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52778)
+	id 1jYBL1-0000w5-RP
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 12:31:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53518)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jYBFK-000432-MZ
- for qemu-devel@nongnu.org; Mon, 11 May 2020 12:25:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52396)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jYBK3-0000HH-Lk
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 12:30:31 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:32935)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jYBFI-0005iI-IB
- for qemu-devel@nongnu.org; Mon, 11 May 2020 12:25:38 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jYBFG-0007vD-VP
- for <qemu-devel@nongnu.org>; Mon, 11 May 2020 16:25:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id EB5A32E8107
- for <qemu-devel@nongnu.org>; Mon, 11 May 2020 16:25:34 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jYBK2-0006vi-KG
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 12:30:31 -0400
+Received: by mail-pg1-x543.google.com with SMTP id a4so4799706pgc.0
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 09:30:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=12LvgeCJuJQO3x2fy3fOhZzkeb9hiF3TwYLbtoQhgjE=;
+ b=IM0B5u3hBpCzzpi8IxE9sXcWUgtDEjBiX8nG2PnrRXW9fnY7BhJ4VZX53DNIoh85PL
+ 8ZsqC7xxT1azwq5FYbXqgAEnyIb/4dWXfchjVLFIJmjr909BuKa4fHRFDO8Ir5AobA9B
+ SDQkTu34UIn++jLG22dbNBNZgSA7QSsKOMh7oKLrwdRO7MZy+j8DiFxEqRStMOjFXi8Y
+ Tj/tjmz1RQOlrWw6cf1EIjG6rLbfAqnG4FMVknJEcc43dapTc7kBrhqImYJWuj/21zPS
+ lg+J3318kmpAvYWe/S9nn2JG80kFNJ1STvvAoWVCN1H1M1RYKddg+nPUuDuwyVAwiiXv
+ 2b7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=12LvgeCJuJQO3x2fy3fOhZzkeb9hiF3TwYLbtoQhgjE=;
+ b=JB5zcPPlkybcgq50WD2I/L9eu3F33K6lx6AYWKCVDyc7b8T6RzxSGnu8zKxDbLMT83
+ yT/yvMVpgAlqTH7Jp/XngxQbdfzv6nm99n6fVp7BhB19c9N0L/LyQTvpFxvdbslRhRPP
+ UqMc/agy2+IEbBTTMQmuQ0cqWDCVbVFUfV3eflWJmk0/bG8x+NpGYg6Z1HQVDVZZm1x7
+ j1aAGOs37Ml+UVBbN92DauOvprXy+3BbrEG0P/T6xpm3Fp5bqrehSteYGiJx+QM0MoiO
+ 5D7ZNsCDdJnaedcEZyq8YOaf3Rd+PNxyFQ1LQ9IudYHn5bmp/Bl5ywycC3sUTqTsgaHH
+ /jrA==
+X-Gm-Message-State: AGi0PualtMzqIGfPgmPFlwbq7tRaxGKfU2Q+D3v93WYt100kibuG6UKW
+ a3/70jGsuUSRk/aa7KN1CoheWg==
+X-Google-Smtp-Source: APiQypIxSHvfBpeI5GgcgAdvgUY8hMhxX2Z9+ye+soBg+4jiP7ygMrKAW997OWDcXwNQxQmelp09Mg==
+X-Received: by 2002:a63:4f65:: with SMTP id p37mr15762222pgl.60.1589214628988; 
+ Mon, 11 May 2020 09:30:28 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
+ by smtp.gmail.com with ESMTPSA id w143sm9371201pfc.165.2020.05.11.09.30.27
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 11 May 2020 09:30:28 -0700 (PDT)
+Subject: Re: [RFC PATCH 0/8] RISCV risu porting
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>, peter.maydell@linaro.org
+References: <20200430072139.4602-1-zhiwei_liu@c-sky.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <69d804ea-5274-bee4-9368-69c888082143@linaro.org>
+Date: Mon, 11 May 2020 09:30:26 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 11 May 2020 16:18:57 -0000
-From: Alexander Bulekov <1878043@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
-X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
-Message-Id: <158921393717.5475.17098174167918208525.malonedeb@soybean.canonical.com>
-Subject: [Bug 1878043] [NEW] memcpy param-overlap in Slirp ip_stripoptions
- through e1000e
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 8f8e3acad718693e04b4fc0d6ef02a7397aff5be
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 11:35:34
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+In-Reply-To: <20200430072139.4602-1-zhiwei_liu@c-sky.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x543.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,252 +102,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1878043 <1878043@bugs.launchpad.net>
+Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, palmer@dabbelt.com, alistair23@gmail.com,
+ alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On 4/30/20 12:21 AM, LIU Zhiwei wrote:
+> It's some difficult when I try to support RV32, because it's very
+> similiar to RV64, so I can't make two .risu files like arm.risu and
+> aarch64.risu.
 
-Hello,
-While fuzzing, I found an input that triggers an overlapping memcpy (caught=
- by AddressSanitizer).
-Overlapping memcpys are undefined behavior according to the POSIX and C sta=
-ndards, and can lead to bugs.
+You could a command-line parameter, like --be or --sve for this.
 
-=3D=3D16666=3D=3DERROR: AddressSanitizer: memcpy-param-overlap: memory rang=
-es [0x625000264940,0x62500026699a) and [0x625000264948, 0x6250002669a2) ove=
-rlap
-    #0 0x5622d7b6a3d4 in __asan_memcpy (/home/alxndr/Development/qemu/build=
-/i386-softmmu/qemu-system-i386+0x96c3d4)
-    #1 0x5622d896a2d2 in ip_stripoptions /home/alxndr/Development/qemu/slir=
-p/src/ip_input.c:457:5
-    #2 0x5622d8963378 in udp_input /home/alxndr/Development/qemu/slirp/src/=
-udp.c:86:9
-    #3 0x5622d89351ea in slirp_input /home/alxndr/Development/qemu/slirp/sr=
-c/slirp.c:840:13
-    #4 0x5622d852e162 in net_slirp_receive /home/alxndr/Development/qemu/ne=
-t/slirp.c:126:5
-    #5 0x5622d8515851 in nc_sendv_compat /home/alxndr/Development/qemu/net/=
-net.c:700:15
-    #6 0x5622d8515851 in qemu_deliver_packet_iov /home/alxndr/Development/q=
-emu/net/net.c:728:15
-    #7 0x5622d851786d in qemu_net_queue_deliver_iov /home/alxndr/Developmen=
-t/qemu/net/queue.c:179:11
-    #8 0x5622d851786d in qemu_net_queue_send_iov /home/alxndr/Development/q=
-emu/net/queue.c:224:11
-    #9 0x5622d851b1c1 in net_hub_receive_iov /home/alxndr/Development/qemu/=
-net/hub.c:74:9
-    #10 0x5622d851b1c1 in net_hub_port_receive_iov /home/alxndr/Development=
-/qemu/net/hub.c:125:12
-    #11 0x5622d851572b in qemu_deliver_packet_iov /home/alxndr/Development/=
-qemu/net/net.c:726:15
-    #12 0x5622d851786d in qemu_net_queue_deliver_iov /home/alxndr/Developme=
-nt/qemu/net/queue.c:179:11
-    #13 0x5622d851786d in qemu_net_queue_send_iov /home/alxndr/Development/=
-qemu/net/queue.c:224:11
-    #14 0x5622d828bf87 in net_tx_pkt_sendv /home/alxndr/Development/qemu/hw=
-/net/net_tx_pkt.c:546:9
-    #15 0x5622d828bf87 in net_tx_pkt_send /home/alxndr/Development/qemu/hw/=
-net/net_tx_pkt.c:620:9
-    #16 0x5622d82b5f22 in e1000e_tx_pkt_send /home/alxndr/Development/qemu/=
-hw/net/e1000e_core.c:666:16
-    #17 0x5622d82b5f22 in e1000e_process_tx_desc /home/alxndr/Development/q=
-emu/hw/net/e1000e_core.c:743:17
-    #18 0x5622d82b5f22 in e1000e_start_xmit /home/alxndr/Development/qemu/h=
-w/net/e1000e_core.c:934:9
-    #19 0x5622d82b2be0 in e1000e_set_tdt /home/alxndr/Development/qemu/hw/n=
-et/e1000e_core.c:2451:9
-    #20 0x5622d82a30fc in e1000e_core_write /home/alxndr/Development/qemu/h=
-w/net/e1000e_core.c:3261:9
-    #21 0x5622d7c9e336 in memory_region_write_accessor /home/alxndr/Develop=
-ment/qemu/memory.c:483:5
-    #22 0x5622d7c9dcdf in access_with_adjusted_size /home/alxndr/Developmen=
-t/qemu/memory.c:544:18
-    #23 0x5622d7c9dcdf in memory_region_dispatch_write /home/alxndr/Develop=
-ment/qemu/memory.c:1476:16
-    #24 0x5622d7bb31d3 in flatview_write_continue /home/alxndr/Development/=
-qemu/exec.c:3137:23
-    #25 0x5622d7babb97 in flatview_write /home/alxndr/Development/qemu/exec=
-.c:3177:14
-    #26 0x5622d7babb97 in address_space_write /home/alxndr/Development/qemu=
-/exec.c:3268:18
 
-0x625000264940 is located 64 bytes inside of 8354-byte region [0x6250002649=
-00,0x6250002669a2)
-allocated by thread T0 here:
-    #0 0x5622d7b6b06d in malloc (/home/alxndr/Development/qemu/build/i386-s=
-oftmmu/qemu-system-i386+0x96d06d)
-    #1 0x7f724b932500 in g_malloc (/usr/lib/x86_64-linux-gnu/libglib-2.0.so=
-.0+0x54500)
-
-0x625000264948 is located 72 bytes inside of 8354-byte region [0x6250002649=
-00,0x6250002669a2)
-allocated by thread T0 here:
-    #0 0x5622d7b6b06d in malloc (/home/alxndr/Development/qemu/build/i386-s=
-oftmmu/qemu-system-i386+0x96d06d)
-    #1 0x7f724b932500 in g_malloc (/usr/lib/x86_64-linux-gnu/libglib-2.0.so=
-.0+0x54500)
-
-I can reproduce it in qemu 5.0 built with --enable-sanitizers using:
-cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -M pc-q=
-35-5.0 -accel qtest -qtest stdio -nographic -monitor none -serial none
-outl 0xcf8 0x80001010
-outl 0xcfc 0xe1020000
-outl 0xcf8 0x80001014
-outl 0xcf8 0x80001004
-outw 0xcfc 0x7
-outl 0xcf8 0x800010a2
-outl 0xcf8 0x8000fa24
-outl 0xcfc 0xe1069000
-outl 0xcf8 0x8000fa04
-outw 0xcfc 0x7
-outl 0xcf8 0x8000fb20
-write 0xe1069100 0xe 0xff810000000000008420f9e10019
-write 0x820b 0xc 0x080047bb0c02e10000004011
-write 0xe1020403 0x36 0xb700000000e1000f009006e100000000625c5e0000b70000000=
-0e1000f009006e100000000625c5e0000b700000000e1000f009006e1
-EOF
-
-I also attached the trace to this launchpad report, in case the
-formatting is broken:
-
-qemu-system-i386 -M pc-q35-5.0 -accel qtest -qtest stdio -nographic
--monitor none -serial none < attachment
-
-Please let me know if I can provide any further info.
--Alex
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "attachment"
-   https://bugs.launchpad.net/bugs/1878043/+attachment/5369929/+files/attac=
-hment
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1878043
-
-Title:
-  memcpy param-overlap in Slirp ip_stripoptions through e1000e
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello,
-  While fuzzing, I found an input that triggers an overlapping memcpy (caug=
-ht by AddressSanitizer).
-  Overlapping memcpys are undefined behavior according to the POSIX and C s=
-tandards, and can lead to bugs.
-
-  =3D=3D16666=3D=3DERROR: AddressSanitizer: memcpy-param-overlap: memory ra=
-nges [0x625000264940,0x62500026699a) and [0x625000264948, 0x6250002669a2) o=
-verlap
-      #0 0x5622d7b6a3d4 in __asan_memcpy (/home/alxndr/Development/qemu/bui=
-ld/i386-softmmu/qemu-system-i386+0x96c3d4)
-      #1 0x5622d896a2d2 in ip_stripoptions /home/alxndr/Development/qemu/sl=
-irp/src/ip_input.c:457:5
-      #2 0x5622d8963378 in udp_input /home/alxndr/Development/qemu/slirp/sr=
-c/udp.c:86:9
-      #3 0x5622d89351ea in slirp_input /home/alxndr/Development/qemu/slirp/=
-src/slirp.c:840:13
-      #4 0x5622d852e162 in net_slirp_receive /home/alxndr/Development/qemu/=
-net/slirp.c:126:5
-      #5 0x5622d8515851 in nc_sendv_compat /home/alxndr/Development/qemu/ne=
-t/net.c:700:15
-      #6 0x5622d8515851 in qemu_deliver_packet_iov /home/alxndr/Development=
-/qemu/net/net.c:728:15
-      #7 0x5622d851786d in qemu_net_queue_deliver_iov /home/alxndr/Developm=
-ent/qemu/net/queue.c:179:11
-      #8 0x5622d851786d in qemu_net_queue_send_iov /home/alxndr/Development=
-/qemu/net/queue.c:224:11
-      #9 0x5622d851b1c1 in net_hub_receive_iov /home/alxndr/Development/qem=
-u/net/hub.c:74:9
-      #10 0x5622d851b1c1 in net_hub_port_receive_iov /home/alxndr/Developme=
-nt/qemu/net/hub.c:125:12
-      #11 0x5622d851572b in qemu_deliver_packet_iov /home/alxndr/Developmen=
-t/qemu/net/net.c:726:15
-      #12 0x5622d851786d in qemu_net_queue_deliver_iov /home/alxndr/Develop=
-ment/qemu/net/queue.c:179:11
-      #13 0x5622d851786d in qemu_net_queue_send_iov /home/alxndr/Developmen=
-t/qemu/net/queue.c:224:11
-      #14 0x5622d828bf87 in net_tx_pkt_sendv /home/alxndr/Development/qemu/=
-hw/net/net_tx_pkt.c:546:9
-      #15 0x5622d828bf87 in net_tx_pkt_send /home/alxndr/Development/qemu/h=
-w/net/net_tx_pkt.c:620:9
-      #16 0x5622d82b5f22 in e1000e_tx_pkt_send /home/alxndr/Development/qem=
-u/hw/net/e1000e_core.c:666:16
-      #17 0x5622d82b5f22 in e1000e_process_tx_desc /home/alxndr/Development=
-/qemu/hw/net/e1000e_core.c:743:17
-      #18 0x5622d82b5f22 in e1000e_start_xmit /home/alxndr/Development/qemu=
-/hw/net/e1000e_core.c:934:9
-      #19 0x5622d82b2be0 in e1000e_set_tdt /home/alxndr/Development/qemu/hw=
-/net/e1000e_core.c:2451:9
-      #20 0x5622d82a30fc in e1000e_core_write /home/alxndr/Development/qemu=
-/hw/net/e1000e_core.c:3261:9
-      #21 0x5622d7c9e336 in memory_region_write_accessor /home/alxndr/Devel=
-opment/qemu/memory.c:483:5
-      #22 0x5622d7c9dcdf in access_with_adjusted_size /home/alxndr/Developm=
-ent/qemu/memory.c:544:18
-      #23 0x5622d7c9dcdf in memory_region_dispatch_write /home/alxndr/Devel=
-opment/qemu/memory.c:1476:16
-      #24 0x5622d7bb31d3 in flatview_write_continue /home/alxndr/Developmen=
-t/qemu/exec.c:3137:23
-      #25 0x5622d7babb97 in flatview_write /home/alxndr/Development/qemu/ex=
-ec.c:3177:14
-      #26 0x5622d7babb97 in address_space_write /home/alxndr/Development/qe=
-mu/exec.c:3268:18
-
-  0x625000264940 is located 64 bytes inside of 8354-byte region [0x62500026=
-4900,0x6250002669a2)
-  allocated by thread T0 here:
-      #0 0x5622d7b6b06d in malloc (/home/alxndr/Development/qemu/build/i386=
--softmmu/qemu-system-i386+0x96d06d)
-      #1 0x7f724b932500 in g_malloc (/usr/lib/x86_64-linux-gnu/libglib-2.0.=
-so.0+0x54500)
-
-  0x625000264948 is located 72 bytes inside of 8354-byte region [0x62500026=
-4900,0x6250002669a2)
-  allocated by thread T0 here:
-      #0 0x5622d7b6b06d in malloc (/home/alxndr/Development/qemu/build/i386=
--softmmu/qemu-system-i386+0x96d06d)
-      #1 0x7f724b932500 in g_malloc (/usr/lib/x86_64-linux-gnu/libglib-2.0.=
-so.0+0x54500)
-
-  I can reproduce it in qemu 5.0 built with --enable-sanitizers using:
-  cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -M pc=
--q35-5.0 -accel qtest -qtest stdio -nographic -monitor none -serial none
-  outl 0xcf8 0x80001010
-  outl 0xcfc 0xe1020000
-  outl 0xcf8 0x80001014
-  outl 0xcf8 0x80001004
-  outw 0xcfc 0x7
-  outl 0xcf8 0x800010a2
-  outl 0xcf8 0x8000fa24
-  outl 0xcfc 0xe1069000
-  outl 0xcf8 0x8000fa04
-  outw 0xcfc 0x7
-  outl 0xcf8 0x8000fb20
-  write 0xe1069100 0xe 0xff810000000000008420f9e10019
-  write 0x820b 0xc 0x080047bb0c02e10000004011
-  write 0xe1020403 0x36 0xb700000000e1000f009006e100000000625c5e0000b700000=
-000e1000f009006e100000000625c5e0000b700000000e1000f009006e1
-  EOF
-
-  I also attached the trace to this launchpad report, in case the
-  formatting is broken:
-
-  qemu-system-i386 -M pc-q35-5.0 -accel qtest -qtest stdio -nographic
-  -monitor none -serial none < attachment
-
-  Please let me know if I can provide any further info.
-  -Alex
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1878043/+subscriptions
+r~
 
