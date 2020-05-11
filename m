@@ -2,62 +2,60 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D407C54E4B
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 01:48:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B8BFC38A2A
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 01:49:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 083AE20746
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 01:48:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 29993206D7
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 01:49:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="c3XzV1SO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 083AE20746
+	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="lt1SVYIN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29993206D7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59062 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXxY7-0007Yi-8V
-	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 21:48:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60638)
+	id 1jXxZd-0000vh-Bj
+	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 21:49:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60662)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jXxUt-0000wF-RD; Sun, 10 May 2020 21:44:47 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:40849 helo=ozlabs.org)
+ id 1jXxUx-00011R-5n; Sun, 10 May 2020 21:44:51 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:56995 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jXxUr-0000ep-La; Sun, 10 May 2020 21:44:47 -0400
+ id 1jXxUv-0000hv-92; Sun, 10 May 2020 21:44:50 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 49L3dh0hVTz9sT3; Mon, 11 May 2020 11:44:39 +1000 (AEST)
+ id 49L3dh2KgFz9sT5; Mon, 11 May 2020 11:44:40 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1589161480;
- bh=+Rn3CdA9n9JQew4PZJ8hYG1v3n0iNbURgN1AZwvZ8Es=;
+ bh=9ljOHZlsUvOR4IFaWk5w3kI/2osTQHq6jsLMDg9lJmU=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=c3XzV1SOnMI8Flub2UM/B6MSZb6ONtDbWsML3CM0U1VdVVZ/lumuRdogrGMyk278F
- 1P5oAOpHTBF6vESYOHwzIxfj1dIj6DrmwljtRAYsM74O4h1B/xRnBWnoid9/pDdYwv
- qvYp4PYzf+tBQX1cFaRu3s147XQgxwsrsC/K9cXk=
-Date: Mon, 11 May 2020 11:33:59 +1000
+ b=lt1SVYINhBtc5lrLpYmM4ZgaXztULcpuws4KW9K6dfmKQHUSBHS5Yls1OmhCZphPc
+ wWng509QwtmwPxwCyAphdYj5mPUk4/DTgT+yFflB6TefgNdB7cNA3DgIMB9oq1vq1j
+ 85OseHREHkUNN7yqtGYNNTYQNhc8rl34EzkWmNv4=
+Date: Mon, 11 May 2020 11:37:27 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH 07/10] exec: Move all RAMBlock functions to
- 'exec/ramblock.h'
-Message-ID: <20200511013359.GK2183@umbus.fritz.box>
-References: <20200507173958.25894-1-philmd@redhat.com>
- <20200507173958.25894-8-philmd@redhat.com>
+To: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH] target/ppc: Add support for scv and rfscv instructions
+Message-ID: <20200511013727.GM2183@umbus.fritz.box>
+References: <20200507115328.789175-1-npiggin@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Z9t8O/5YJLB6LEUl"
+ protocol="application/pgp-signature"; boundary="1rguoi8KZGYj2k4L"
 Content-Disposition: inline
-In-Reply-To: <20200507173958.25894-8-philmd@redhat.com>
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+In-Reply-To: <20200507115328.789175-1-npiggin@gmail.com>
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/10 21:17:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -17
 X-Spam_score: -1.8
 X-Spam_bar: -
@@ -77,599 +75,439 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-block@nongnu.org,
- David Hildenbrand <david@redhat.com>, Juan Quintela <quintela@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-ppc@nongnu.org, Keith Busch <kbusch@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---Z9t8O/5YJLB6LEUl
-Content-Type: text/plain; charset=iso-8859-1
+--1rguoi8KZGYj2k4L
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 07, 2020 at 07:39:55PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> The RAMBlock API was dispersed in 3 different headers.
-> One of these headers, "exec/ram_addr.h", is restricted
-> to target dependent code. However these functions are
-> not target specific. Move all functions into a single
-> place.  Now all these functions can be accessed by
-> target-agnostic code.
+On Thu, May 07, 2020 at 09:53:28PM +1000, Nicholas Piggin wrote:
+> POWER9 adds scv and rfscv instructions and the system call vectored
+> interrupt. Linux does not support this instruction yet but it has
+> been tested with a modified kernel that runs on real hardware.
 >=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 
-ppc parts
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Applied to ppc-for-5.1.
 
 > ---
->  include/exec/cpu-common.h    |  24 -------
->  include/exec/ram_addr.h      | 105 ---------------------------
->  include/exec/ramblock.h      | 134 +++++++++++++++++++++++++++++++++++
->  migration/migration.h        |   1 +
->  accel/tcg/translate-all.c    |   2 -
->  hw/block/nvme.c              |   2 +-
->  hw/s390x/s390-stattrib-kvm.c |   1 -
->  hw/s390x/s390-stattrib.c     |   1 -
->  hw/s390x/s390-virtio-ccw.c   |   1 -
->  hw/virtio/vhost-user.c       |   1 +
->  hw/virtio/vhost.c            |   1 +
->  hw/virtio/virtio-balloon.c   |   1 +
->  memory.c                     |   1 +
->  migration/migration.c        |   1 +
->  migration/postcopy-ram.c     |   1 +
->  migration/savevm.c           |   1 +
->  stubs/ram-block.c            |   2 +-
->  target/ppc/kvm.c             |   1 -
->  target/s390x/kvm.c           |   1 -
->  util/vfio-helpers.c          |   2 +-
->  20 files changed, 145 insertions(+), 139 deletions(-)
+> This was tested with out-of-tree Linux patches and seems to work fine.
 >=20
-> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-> index b47e5630e7..347ceb603b 100644
-> --- a/include/exec/cpu-common.h
-> +++ b/include/exec/cpu-common.h
-> @@ -49,25 +49,6 @@ typedef uint32_t CPUReadMemoryFunc(void *opaque, hwadd=
-r addr);
->  void qemu_ram_remap(ram_addr_t addr, ram_addr_t length);
->  /* This should not be used by devices.  */
->  ram_addr_t qemu_ram_addr_from_host(void *ptr);
-> -RAMBlock *qemu_ram_block_by_name(const char *name);
-> -RAMBlock *qemu_ram_block_from_host(void *ptr, bool round_offset,
-> -                                   ram_addr_t *offset);
-> -ram_addr_t qemu_ram_block_host_offset(RAMBlock *rb, void *host);
-> -void qemu_ram_set_idstr(RAMBlock *block, const char *name, DeviceState *=
-dev);
-> -void qemu_ram_unset_idstr(RAMBlock *block);
-> -const char *qemu_ram_get_idstr(RAMBlock *rb);
-> -void *qemu_ram_get_host_addr(RAMBlock *rb);
-> -ram_addr_t qemu_ram_get_offset(RAMBlock *rb);
-> -ram_addr_t qemu_ram_get_used_length(RAMBlock *rb);
-> -bool qemu_ram_is_shared(RAMBlock *rb);
-> -bool qemu_ram_is_uf_zeroable(RAMBlock *rb);
-> -void qemu_ram_set_uf_zeroable(RAMBlock *rb);
-> -bool qemu_ram_is_migratable(RAMBlock *rb);
-> -void qemu_ram_set_migratable(RAMBlock *rb);
-> -void qemu_ram_unset_migratable(RAMBlock *rb);
-> -
-> -size_t qemu_ram_pagesize(RAMBlock *block);
-> -size_t qemu_ram_pagesize_largest(void);
+> This fixes the linux-user compile error that David reported last time,
+> by disabling everything for CONFIG_USER_ONLY. I have the user
+> implementation which is pretty simple, but we don't have an official
+> user ABI yet so I'll wait until we get support merged in the kernel.
+>=20
+> Thanks,
+> Nick
+>=20
+>  linux-user/ppc/cpu_loop.c       |  1 +
+>  target/ppc/cpu.h                |  7 ++-
+>  target/ppc/excp_helper.c        | 98 ++++++++++++++++++++++++---------
+>  target/ppc/helper.h             |  1 +
+>  target/ppc/translate.c          | 52 ++++++++++++++++-
+>  target/ppc/translate_init.inc.c |  3 +-
+>  6 files changed, 132 insertions(+), 30 deletions(-)
+>=20
+> diff --git a/linux-user/ppc/cpu_loop.c b/linux-user/ppc/cpu_loop.c
+> index 5b27f8603e..df71e15a25 100644
+> --- a/linux-user/ppc/cpu_loop.c
+> +++ b/linux-user/ppc/cpu_loop.c
+> @@ -267,6 +267,7 @@ void cpu_loop(CPUPPCState *env)
+>              queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+>              break;
+>          case POWERPC_EXCP_SYSCALL:  /* System call exception            =
+     */
+> +        case POWERPC_EXCP_SYSCALL_VECTORED:
+>              cpu_abort(cs, "Syscall exception while in user mode. "
+>                        "Aborting\n");
+>              break;
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 6b6dd7e483..df5c30160d 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -127,8 +127,9 @@ enum {
+>      POWERPC_EXCP_SDOOR_HV =3D 100,
+>      /* ISA 3.00 additions */
+>      POWERPC_EXCP_HVIRT    =3D 101,
+> +    POWERPC_EXCP_SYSCALL_VECTORED =3D 102, /* scv exception             =
+        */
+>      /* EOL                                                              =
+     */
+> -    POWERPC_EXCP_NB       =3D 102,
+> +    POWERPC_EXCP_NB       =3D 103,
+>      /* QEMU exceptions: used internally during code translation         =
+     */
+>      POWERPC_EXCP_STOP         =3D 0x200, /* stop translation            =
+       */
+>      POWERPC_EXCP_BRANCH       =3D 0x201, /* branch instruction          =
+       */
+> @@ -478,6 +479,7 @@ typedef struct ppc_v3_pate_t {
+>  /* Facility Status and Control (FSCR) bits */
+>  #define FSCR_EBB        (63 - 56) /* Event-Based Branch Facility */
+>  #define FSCR_TAR        (63 - 55) /* Target Address Register */
+> +#define FSCR_SCV        (63 - 51) /* System call vectored */
+>  /* Interrupt cause mask and position in FSCR. HFSCR has the same format =
+*/
+>  #define FSCR_IC_MASK    (0xFFULL)
+>  #define FSCR_IC_POS     (63 - 7)
+> @@ -487,6 +489,7 @@ typedef struct ppc_v3_pate_t {
+>  #define FSCR_IC_TM          5
+>  #define FSCR_IC_EBB         7
+>  #define FSCR_IC_TAR         8
+> +#define FSCR_IC_SCV        12
 > =20
->  void cpu_physical_memory_rw(hwaddr addr, void *buf,
->                              hwaddr len, bool is_write);
-> @@ -100,11 +81,6 @@ void qemu_flush_coalesced_mmio_buffer(void);
-> =20
->  void cpu_flush_icache_range(hwaddr start, hwaddr len);
-> =20
-> -typedef int (RAMBlockIterFunc)(RAMBlock *rb, void *opaque);
-> -
-> -int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque);
-> -int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length);
-> -
->  #endif
-> =20
->  #endif /* CPU_COMMON_H */
-> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-> index c61d5188f7..0deffad66f 100644
-> --- a/include/exec/ram_addr.h
-> +++ b/include/exec/ram_addr.h
-> @@ -26,112 +26,7 @@
->  #include "exec/ramlist.h"
->  #include "exec/ramblock.h"
-> =20
-> -/**
-> - * clear_bmap_size: calculate clear bitmap size
-> - *
-> - * @pages: number of guest pages
-> - * @shift: guest page number shift
-> - *
-> - * Returns: number of bits for the clear bitmap
-> - */
-> -static inline long clear_bmap_size(uint64_t pages, uint8_t shift)
-> -{
-> -    return DIV_ROUND_UP(pages, 1UL << shift);
-> -}
-> =20
-> -/**
-> - * clear_bmap_set: set clear bitmap for the page range
-> - *
-> - * @rb: the ramblock to operate on
-> - * @start: the start page number
-> - * @size: number of pages to set in the bitmap
-> - *
-> - * Returns: None
-> - */
-> -static inline void clear_bmap_set(RAMBlock *rb, uint64_t start,
-> -                                  uint64_t npages)
-> -{
-> -    uint8_t shift =3D rb->clear_bmap_shift;
-> -
-> -    bitmap_set_atomic(rb->clear_bmap, start >> shift,
-> -                      clear_bmap_size(npages, shift));
-> -}
-> -
-> -/**
-> - * clear_bmap_test_and_clear: test clear bitmap for the page, clear if s=
-et
-> - *
-> - * @rb: the ramblock to operate on
-> - * @page: the page number to check
-> - *
-> - * Returns: true if the bit was set, false otherwise
-> - */
-> -static inline bool clear_bmap_test_and_clear(RAMBlock *rb, uint64_t page)
-> -{
-> -    uint8_t shift =3D rb->clear_bmap_shift;
-> -
-> -    return bitmap_test_and_clear_atomic(rb->clear_bmap, page >> shift, 1=
-);
-> -}
-> -
-> -static inline bool offset_in_ramblock(RAMBlock *b, ram_addr_t offset)
-> -{
-> -    return (b && b->host && offset < b->used_length) ? true : false;
-> -}
-> -
-> -static inline void *ramblock_ptr(RAMBlock *block, ram_addr_t offset)
-> -{
-> -    assert(offset_in_ramblock(block, offset));
-> -    return (char *)block->host + offset;
-> -}
-> -
-> -bool ramblock_is_pmem(RAMBlock *rb);
-> -
-> -/**
-> - * qemu_ram_alloc_from_file,
-> - * qemu_ram_alloc_from_fd:  Allocate a ram block from the specified back=
-ing
-> - *                          file or device
-> - *
-> - * Parameters:
-> - *  @size: the size in bytes of the ram block
-> - *  @mr: the memory region where the ram block is
-> - *  @ram_flags: specify the properties of the ram block, which can be one
-> - *              or bit-or of following values
-> - *              - RAM_SHARED: mmap the backing file or device with MAP_S=
-HARED
-> - *              - RAM_PMEM: the backend @mem_path or @fd is persistent m=
-emory
-> - *              Other bits are ignored.
-> - *  @mem_path or @fd: specify the backing file or device
-> - *  @errp: pointer to Error*, to store an error if it happens
-> - *
-> - * Return:
-> - *  On success, return a pointer to the ram block.
-> - *  On failure, return NULL.
-> - */
-> -RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
-> -                                   uint32_t ram_flags, const char *mem_p=
-ath,
-> -                                   Error **errp);
-> -RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
-> -                                 uint32_t ram_flags, int fd,
-> -                                 Error **errp);
-> -
-> -RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
-> -                                  MemoryRegion *mr, Error **errp);
-> -RAMBlock *qemu_ram_alloc(ram_addr_t size, bool share, MemoryRegion *mr,
-> -                         Error **errp);
-> -RAMBlock *qemu_ram_alloc_resizeable(ram_addr_t size, ram_addr_t max_size,
-> -                                    void (*resized)(const char*,
-> -                                                    uint64_t length,
-> -                                                    void *host),
-> -                                    MemoryRegion *mr, Error **errp);
-> -void qemu_ram_free(RAMBlock *block);
-> -
-> -int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp);
-> -
-> -void qemu_ram_msync(RAMBlock *block, ram_addr_t start, ram_addr_t length=
-);
-> -
-> -/* Clear whole block of mem */
-> -static inline void qemu_ram_block_writeback(RAMBlock *block)
-> -{
-> -    qemu_ram_msync(block, 0, block->used_length);
-> -}
-> =20
->  #define DIRTY_CLIENTS_ALL     ((1 << DIRTY_MEMORY_NUM) - 1)
->  #define DIRTY_CLIENTS_NOCODE  (DIRTY_CLIENTS_ALL & ~(1 << DIRTY_MEMORY_C=
-ODE))
-> diff --git a/include/exec/ramblock.h b/include/exec/ramblock.h
-> index 6ac0aa7a89..b6b34141fc 100644
-> --- a/include/exec/ramblock.h
-> +++ b/include/exec/ramblock.h
-> @@ -22,6 +22,7 @@
->  #ifndef CONFIG_USER_ONLY
->  #include "cpu-common.h"
->  #include "qemu/rcu.h"
-> +#include "qemu/bitmap.h"
-> =20
->  struct RAMBlock {
->      struct rcu_head rcu;
-> @@ -61,5 +62,138 @@ struct RAMBlock {
->      unsigned long *clear_bmap;
->      uint8_t clear_bmap_shift;
+>  /* Exception state register bits definition                             =
+     */
+>  #define ESR_PIL   PPC_BIT(36) /* Illegal Instruction                    =
+*/
+> @@ -554,6 +557,8 @@ enum {
+>      POWERPC_FLAG_VSX      =3D 0x00080000,
+>      /* Has Transaction Memory (ISA 2.07)                                =
+     */
+>      POWERPC_FLAG_TM       =3D 0x00100000,
+> +    /* Has SCV (ISA 3.00)                                               =
+     */
+> +    POWERPC_FLAG_SCV      =3D 0x00200000,
 >  };
-> +
-> +RAMBlock *qemu_ram_block_by_name(const char *name);
-> +RAMBlock *qemu_ram_block_from_host(void *ptr, bool round_offset,
-> +                                   ram_addr_t *offset);
-> +ram_addr_t qemu_ram_block_host_offset(RAMBlock *rb, void *host);
-> +void qemu_ram_set_idstr(RAMBlock *block, const char *name, DeviceState *=
-dev);
-> +void qemu_ram_unset_idstr(RAMBlock *block);
-> +const char *qemu_ram_get_idstr(RAMBlock *rb);
-> +void *qemu_ram_get_host_addr(RAMBlock *rb);
-> +ram_addr_t qemu_ram_get_offset(RAMBlock *rb);
-> +ram_addr_t qemu_ram_get_used_length(RAMBlock *rb);
-> +bool qemu_ram_is_shared(RAMBlock *rb);
-> +bool qemu_ram_is_uf_zeroable(RAMBlock *rb);
-> +void qemu_ram_set_uf_zeroable(RAMBlock *rb);
-> +bool qemu_ram_is_migratable(RAMBlock *rb);
-> +void qemu_ram_set_migratable(RAMBlock *rb);
-> +void qemu_ram_unset_migratable(RAMBlock *rb);
-> +
-> +size_t qemu_ram_pagesize(RAMBlock *block);
-> +size_t qemu_ram_pagesize_largest(void);
-> +
-> +/**
-> + * clear_bmap_size: calculate clear bitmap size
-> + *
-> + * @pages: number of guest pages
-> + * @shift: guest page number shift
-> + *
-> + * Returns: number of bits for the clear bitmap
-> + */
-> +static inline long clear_bmap_size(uint64_t pages, uint8_t shift)
+> =20
+>  /***********************************************************************=
+******/
+> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+> index f052979664..170b3be4c4 100644
+> --- a/target/ppc/excp_helper.c
+> +++ b/target/ppc/excp_helper.c
+> @@ -67,6 +67,18 @@ static inline void dump_syscall(CPUPPCState *env)
+>                    ppc_dump_gpr(env, 8), env->nip);
+>  }
+> =20
+> +static inline void dump_syscall_vectored(CPUPPCState *env)
 > +{
-> +    return DIV_ROUND_UP(pages, 1UL << shift);
+> +    qemu_log_mask(CPU_LOG_INT, "syscall r0=3D%016" PRIx64
+> +                  " r3=3D%016" PRIx64 " r4=3D%016" PRIx64 " r5=3D%016" P=
+RIx64
+> +                  " r6=3D%016" PRIx64 " r7=3D%016" PRIx64 " r8=3D%016" P=
+RIx64
+> +                  " nip=3D" TARGET_FMT_lx "\n",
+> +                  ppc_dump_gpr(env, 0), ppc_dump_gpr(env, 3),
+> +                  ppc_dump_gpr(env, 4), ppc_dump_gpr(env, 5),
+> +                  ppc_dump_gpr(env, 6), ppc_dump_gpr(env, 7),
+> +                  ppc_dump_gpr(env, 8), env->nip);
 > +}
 > +
-> +/**
-> + * clear_bmap_set: set clear bitmap for the page range
-> + *
-> + * @rb: the ramblock to operate on
-> + * @start: the start page number
-> + * @size: number of pages to set in the bitmap
-> + *
-> + * Returns: None
-> + */
-> +static inline void clear_bmap_set(RAMBlock *rb, uint64_t start,
-> +                                  uint64_t npages)
-> +{
-> +    uint8_t shift =3D rb->clear_bmap_shift;
-> +
-> +    bitmap_set_atomic(rb->clear_bmap, start >> shift,
-> +                      clear_bmap_size(npages, shift));
-> +}
-> +
-> +/**
-> + * clear_bmap_test_and_clear: test clear bitmap for the page, clear if s=
-et
-> + *
-> + * @rb: the ramblock to operate on
-> + * @page: the page number to check
-> + *
-> + * Returns: true if the bit was set, false otherwise
-> + */
-> +static inline bool clear_bmap_test_and_clear(RAMBlock *rb, uint64_t page)
-> +{
-> +    uint8_t shift =3D rb->clear_bmap_shift;
-> +
-> +    return bitmap_test_and_clear_atomic(rb->clear_bmap, page >> shift, 1=
-);
-> +}
-> +
-> +static inline bool offset_in_ramblock(RAMBlock *b, ram_addr_t offset)
-> +{
-> +    return (b && b->host && offset < b->used_length) ? true : false;
-> +}
-> +
-> +static inline void *ramblock_ptr(RAMBlock *block, ram_addr_t offset)
-> +{
-> +    assert(offset_in_ramblock(block, offset));
-> +    return (char *)block->host + offset;
-> +}
-> +
-> +bool ramblock_is_pmem(RAMBlock *rb);
-> +
-> +/**
-> + * qemu_ram_alloc_from_file,
-> + * qemu_ram_alloc_from_fd:  Allocate a ram block from the specified back=
-ing
-> + *                          file or device
-> + *
-> + * Parameters:
-> + *  @size: the size in bytes of the ram block
-> + *  @mr: the memory region where the ram block is
-> + *  @ram_flags: specify the properties of the ram block, which can be one
-> + *              or bit-or of following values
-> + *              - RAM_SHARED: mmap the backing file or device with MAP_S=
-HARED
-> + *              - RAM_PMEM: the backend @mem_path or @fd is persistent m=
-emory
-> + *              Other bits are ignored.
-> + *  @mem_path or @fd: specify the backing file or device
-> + *  @errp: pointer to Error*, to store an error if it happens
-> + *
-> + * Return:
-> + *  On success, return a pointer to the ram block.
-> + *  On failure, return NULL.
-> + */
-> +RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
-> +                                   uint32_t ram_flags, const char *mem_p=
-ath,
-> +                                   Error **errp);
-> +RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
-> +                                 uint32_t ram_flags, int fd,
-> +                                 Error **errp);
-> +
-> +RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
-> +                                  MemoryRegion *mr, Error **errp);
-> +RAMBlock *qemu_ram_alloc(ram_addr_t size, bool share, MemoryRegion *mr,
-> +                         Error **errp);
-> +RAMBlock *qemu_ram_alloc_resizeable(ram_addr_t size, ram_addr_t max_size,
-> +                                    void (*resized)(const char*,
-> +                                                    uint64_t length,
-> +                                                    void *host),
-> +                                    MemoryRegion *mr, Error **errp);
-> +void qemu_ram_free(RAMBlock *block);
-> +
-> +int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp);
-> +
-> +void qemu_ram_msync(RAMBlock *block, ram_addr_t start, ram_addr_t length=
-);
-> +
-> +/* Clear whole block of mem */
-> +static inline void qemu_ram_block_writeback(RAMBlock *block)
-> +{
-> +    qemu_ram_msync(block, 0, block->used_length);
-> +}
-> +
-> +typedef int (RAMBlockIterFunc)(RAMBlock *rb, void *opaque);
-> +
-> +int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque);
-> +int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length);
-> +
->  #endif
->  #endif
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 507284e563..73eb210ef5 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -21,6 +21,7 @@
->  #include "qemu/coroutine_int.h"
->  #include "io/channel.h"
->  #include "net/announce.h"
-> +#include "exec/ramblock.h"
-> =20
->  struct PostcopyBlocktimeContext;
-> =20
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index 9924e66d1f..15c8ee9110 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -43,8 +43,6 @@
->  #include <libutil.h>
->  #endif
->  #endif
-> -#else
-> -#include "exec/ram_addr.h"
->  #endif
-> =20
->  #include "exec/cputlb.h"
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 21a199e53b..8d8dd7ce80 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -46,7 +46,7 @@
->  #include "qapi/visitor.h"
->  #include "sysemu/hostmem.h"
->  #include "sysemu/block-backend.h"
-> -#include "exec/ram_addr.h"
-> +#include "exec/ramblock.h"
-> =20
->  #include "qemu/log.h"
->  #include "qemu/module.h"
-> diff --git a/hw/s390x/s390-stattrib-kvm.c b/hw/s390x/s390-stattrib-kvm.c
-> index f89d8d9d16..46ca7e7d1f 100644
-> --- a/hw/s390x/s390-stattrib-kvm.c
-> +++ b/hw/s390x/s390-stattrib-kvm.c
-> @@ -15,7 +15,6 @@
->  #include "hw/s390x/storage-attributes.h"
->  #include "qemu/error-report.h"
->  #include "sysemu/kvm.h"
-> -#include "exec/ram_addr.h"
->  #include "cpu.h"
->  #include "kvm_s390x.h"
-> =20
-> diff --git a/hw/s390x/s390-stattrib.c b/hw/s390x/s390-stattrib.c
-> index 58121b9f68..9785d51577 100644
-> --- a/hw/s390x/s390-stattrib.c
-> +++ b/hw/s390x/s390-stattrib.c
-> @@ -16,7 +16,6 @@
->  #include "migration/register.h"
->  #include "hw/s390x/storage-attributes.h"
->  #include "qemu/error-report.h"
-> -#include "exec/ram_addr.h"
->  #include "qapi/error.h"
->  #include "qapi/qmp/qdict.h"
-> =20
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index c009384505..ade36eda5e 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -17,7 +17,6 @@
->  #include "cpu.h"
->  #include "hw/boards.h"
->  #include "exec/address-spaces.h"
-> -#include "exec/ram_addr.h"
->  #include "hw/s390x/s390-virtio-hcall.h"
->  #include "hw/s390x/sclp.h"
->  #include "hw/s390x/s390_flic.h"
-> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> index ec21e8fbe8..12764d6254 100644
-> --- a/hw/virtio/vhost-user.c
-> +++ b/hw/virtio/vhost-user.c
-> @@ -23,6 +23,7 @@
->  #include "sysemu/cryptodev.h"
->  #include "migration/migration.h"
->  #include "migration/postcopy-ram.h"
-> +#include "exec/ramblock.h"
->  #include "trace.h"
-> =20
->  #include <sys/ioctl.h>
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index aff98a0ede..7da8d95a43 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -22,6 +22,7 @@
->  #include "qemu/memfd.h"
->  #include "standard-headers/linux/vhost_types.h"
->  #include "exec/address-spaces.h"
-> +#include "exec/ramblock.h"
->  #include "hw/virtio/virtio-bus.h"
->  #include "hw/virtio/virtio-access.h"
->  #include "migration/blocker.h"
-> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> index a4729f7fc9..ea112e9403 100644
-> --- a/hw/virtio/virtio-balloon.c
-> +++ b/hw/virtio/virtio-balloon.c
-> @@ -23,6 +23,7 @@
->  #include "sysemu/balloon.h"
->  #include "hw/virtio/virtio-balloon.h"
->  #include "exec/address-spaces.h"
-> +#include "exec/ramblock.h"
->  #include "qapi/error.h"
->  #include "qapi/qapi-events-misc.h"
->  #include "qapi/visitor.h"
-> diff --git a/memory.c b/memory.c
-> index 3e65e33ac4..e8e7bcd6c7 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -28,6 +28,7 @@
-> =20
->  #include "exec/memory-internal.h"
->  #include "exec/ram_addr.h"
-> +#include "exec/ramblock.h"
->  #include "sysemu/kvm.h"
->  #include "sysemu/runstate.h"
->  #include "sysemu/tcg.h"
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 177cce9e95..8c7ed8cc79 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -46,6 +46,7 @@
->  #include "qemu/thread.h"
->  #include "trace.h"
->  #include "exec/target_page.h"
-> +#include "exec/ramblock.h"
->  #include "io/channel-buffer.h"
->  #include "migration/colo.h"
->  #include "hw/boards.h"
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index a36402722b..78646abf7a 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -18,6 +18,7 @@
-> =20
->  #include "qemu/osdep.h"
->  #include "exec/target_page.h"
-> +#include "exec/ramblock.h"
->  #include "migration.h"
->  #include "qemu-file.h"
->  #include "savevm.h"
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index b979ea6e7f..714b5b4591 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -48,6 +48,7 @@
->  #include "sysemu/cpus.h"
->  #include "exec/memory.h"
->  #include "exec/target_page.h"
-> +#include "exec/ramblock.h"
->  #include "trace.h"
->  #include "qemu/iov.h"
->  #include "qemu/main-loop.h"
-> diff --git a/stubs/ram-block.c b/stubs/ram-block.c
-> index 73c0a3ee08..9e73543598 100644
-> --- a/stubs/ram-block.c
-> +++ b/stubs/ram-block.c
-> @@ -1,6 +1,6 @@
->  #include "qemu/osdep.h"
->  #include "exec/ramlist.h"
-> -#include "exec/cpu-common.h"
-> +#include "exec/ramblock.h"
-> =20
->  void *qemu_ram_get_host_addr(RAMBlock *rb)
+>  static inline void dump_hcall(CPUPPCState *env)
 >  {
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 2692f76130..1f3db517db 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -43,7 +43,6 @@
->  #include "trace.h"
->  #include "exec/gdbstub.h"
->  #include "exec/memattrs.h"
-> -#include "exec/ram_addr.h"
->  #include "sysemu/hostmem.h"
->  #include "qemu/cutils.h"
->  #include "qemu/main-loop.h"
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index 69881a0da0..42657bc0a5 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -41,7 +41,6 @@
->  #include "sysemu/runstate.h"
->  #include "sysemu/device_tree.h"
->  #include "exec/gdbstub.h"
-> -#include "exec/ram_addr.h"
->  #include "trace.h"
->  #include "hw/s390x/s390-pci-inst.h"
->  #include "hw/s390x/s390-pci-bus.h"
-> diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
-> index e399e330e2..2ee169da58 100644
-> --- a/util/vfio-helpers.c
-> +++ b/util/vfio-helpers.c
-> @@ -15,7 +15,7 @@
->  #include <linux/vfio.h>
->  #include "qapi/error.h"
->  #include "exec/ramlist.h"
-> -#include "exec/cpu-common.h"
-> +#include "exec/ramblock.h"
->  #include "trace.h"
->  #include "qemu/error-report.h"
->  #include "standard-headers/linux/pci_regs.h"
+>      qemu_log_mask(CPU_LOG_INT, "hypercall r3=3D%016" PRIx64
+> @@ -185,7 +197,7 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int =
+excp_model, int excp)
+>      CPUState *cs =3D CPU(cpu);
+>      CPUPPCState *env =3D &cpu->env;
+>      target_ulong msr, new_msr, vector;
+> -    int srr0, srr1, asrr0, asrr1, lev, ail;
+> +    int srr0, srr1, asrr0, asrr1, lev =3D -1, ail;
+>      bool lpes0;
+> =20
+>      qemu_log_mask(CPU_LOG_INT, "Raise exception at " TARGET_FMT_lx
+> @@ -421,6 +433,13 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int=
+ excp_model, int excp)
+>              new_msr |=3D (target_ulong)MSR_HVB;
+>          }
+>          break;
+> +    case POWERPC_EXCP_SYSCALL_VECTORED: /* scv exception                =
+     */
+> +        lev =3D env->error_code;
+> +        dump_syscall_vectored(env);
+> +        env->nip +=3D 4;
+> +        new_msr |=3D env->msr & ((target_ulong)1 << MSR_EE);
+> +        new_msr |=3D env->msr & ((target_ulong)1 << MSR_RI);
+> +        break;
+>      case POWERPC_EXCP_FPU:       /* Floating-point unavailable exception=
+     */
+>      case POWERPC_EXCP_APU:       /* Auxiliary processor unavailable     =
+     */
+>      case POWERPC_EXCP_DECR:      /* Decrementer exception               =
+     */
+> @@ -724,12 +743,6 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int=
+ excp_model, int excp)
+>          break;
+>      }
+> =20
+> -    /* Save PC */
+> -    env->spr[srr0] =3D env->nip;
+> -
+> -    /* Save MSR */
+> -    env->spr[srr1] =3D msr;
+> -
+>      /* Sanity check */
+>      if (!(env->msr_mask & MSR_HVB)) {
+>          if (new_msr & MSR_HVB) {
+> @@ -742,14 +755,6 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int=
+ excp_model, int excp)
+>          }
+>      }
+> =20
+> -    /* If any alternate SRR register are defined, duplicate saved values=
+ */
+> -    if (asrr0 !=3D -1) {
+> -        env->spr[asrr0] =3D env->spr[srr0];
+> -    }
+> -    if (asrr1 !=3D -1) {
+> -        env->spr[asrr1] =3D env->spr[srr1];
+> -    }
+> -
+>      /*
+>       * Sort out endianness of interrupt, this differs depending on the
+>       * CPU, the HV mode, etc...
+> @@ -784,14 +789,6 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int=
+ excp_model, int excp)
+>      }
+>  #endif
+> =20
+> -    /* Jump to handler */
+> -    vector =3D env->excp_vectors[excp];
+> -    if (vector =3D=3D (target_ulong)-1ULL) {
+> -        cpu_abort(cs, "Raised an exception without defined vector %d\n",
+> -                  excp);
+> -    }
+> -    vector |=3D env->excp_prefix;
+> -
+>      /*
+>       * AIL only works if there is no HV transition and we are running
+>       * with translations enabled
+> @@ -800,10 +797,21 @@ static inline void powerpc_excp(PowerPCCPU *cpu, in=
+t excp_model, int excp)
+>          ((new_msr & MSR_HVB) && !(msr & MSR_HVB))) {
+>          ail =3D 0;
+>      }
+> -    /* Handle AIL */
+> -    if (ail) {
+> -        new_msr |=3D (1 << MSR_IR) | (1 << MSR_DR);
+> -        vector |=3D ppc_excp_vector_offset(cs, ail);
+> +
+> +    vector =3D env->excp_vectors[excp];
+> +    if (vector =3D=3D (target_ulong)-1ULL) {
+> +        cpu_abort(cs, "Raised an exception without defined vector %d\n",
+> +                  excp);
+> +    }
+> +
+> +    vector |=3D env->excp_prefix;
+> +
+> +    /* If any alternate SRR register are defined, duplicate saved values=
+ */
+> +    if (asrr0 !=3D -1) {
+> +        env->spr[asrr0] =3D env->nip;
+> +    }
+> +    if (asrr1 !=3D -1) {
+> +        env->spr[asrr1] =3D msr;
+>      }
+> =20
+>  #if defined(TARGET_PPC64)
+> @@ -823,6 +831,37 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int=
+ excp_model, int excp)
+>      }
+>  #endif
+> =20
+> +    if (excp !=3D POWERPC_EXCP_SYSCALL_VECTORED) {
+> +        /* Save PC */
+> +        env->spr[srr0] =3D env->nip;
+> +
+> +        /* Save MSR */
+> +        env->spr[srr1] =3D msr;
+> +
+> +        /* Handle AIL */
+> +        if (ail) {
+> +            new_msr |=3D (1 << MSR_IR) | (1 << MSR_DR);
+> +            vector |=3D ppc_excp_vector_offset(cs, ail);
+> +        }
+> +
+> +#if defined(TARGET_PPC64)
+> +    } else {
+> +        /* scv AIL is a little different */
+> +        if (ail) {
+> +            new_msr |=3D (1 << MSR_IR) | (1 << MSR_DR);
+> +        }
+> +        if (ail =3D=3D AIL_C000_0000_0000_4000) {
+> +            vector |=3D 0xc000000000003000ull;
+> +        } else {
+> +            vector |=3D 0x0000000000017000ull;
+> +        }
+> +        vector +=3D lev * 0x20;
+> +
+> +        env->lr =3D env->nip;
+> +        env->ctr =3D msr;
+> +#endif
+> +    }
+> +
+>      powerpc_set_excp_state(cpu, vector, new_msr);
+>  }
+> =20
+> @@ -1160,6 +1199,11 @@ void helper_rfid(CPUPPCState *env)
+>      do_rfi(env, env->spr[SPR_SRR0], env->spr[SPR_SRR1]);
+>  }
+> =20
+> +void helper_rfscv(CPUPPCState *env)
+> +{
+> +    do_rfi(env, env->lr, env->ctr);
+> +}
+> +
+>  void helper_hrfid(CPUPPCState *env)
+>  {
+>      do_rfi(env, env->spr[SPR_HSRR0], env->spr[SPR_HSRR1]);
+> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+> index a95c010391..2dfa1c6942 100644
+> --- a/target/ppc/helper.h
+> +++ b/target/ppc/helper.h
+> @@ -15,6 +15,7 @@ DEF_HELPER_1(rfmci, void, env)
+>  #if defined(TARGET_PPC64)
+>  DEF_HELPER_2(pminsn, void, env, i32)
+>  DEF_HELPER_1(rfid, void, env)
+> +DEF_HELPER_1(rfscv, void, env)
+>  DEF_HELPER_1(hrfid, void, env)
+>  DEF_HELPER_2(store_lpcr, void, env, tl)
+>  DEF_HELPER_2(store_pcr, void, env, tl)
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index 807d14faaa..9a7ae9a160 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -173,6 +173,7 @@ struct DisasContext {
+>      bool vsx_enabled;
+>      bool spe_enabled;
+>      bool tm_enabled;
+> +    bool scv_enabled;
+>      bool gtse;
+>      ppc_spr_t *spr_cb; /* Needed to check rights for mfspr/mtspr */
+>      int singlestep_enabled;
+> @@ -4012,6 +4013,24 @@ static void gen_rfid(DisasContext *ctx)
+>  #endif
+>  }
+> =20
+> +#if !defined(CONFIG_USER_ONLY)
+> +static void gen_rfscv(DisasContext *ctx)
+> +{
+> +#if defined(CONFIG_USER_ONLY)
+> +    GEN_PRIV;
+> +#else
+> +    /* Restore CPU state */
+> +    CHK_SV;
+> +    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
+> +        gen_io_start();
+> +    }
+> +    gen_update_cfar(ctx, ctx->base.pc_next - 4);
+> +    gen_helper_rfscv(cpu_env);
+> +    gen_sync_exception(ctx);
+> +#endif
+> +}
+> +#endif
+> +
+>  static void gen_hrfid(DisasContext *ctx)
+>  {
+>  #if defined(CONFIG_USER_ONLY)
+> @@ -4030,6 +4049,7 @@ static void gen_hrfid(DisasContext *ctx)
+>  #define POWERPC_SYSCALL POWERPC_EXCP_SYSCALL_USER
+>  #else
+>  #define POWERPC_SYSCALL POWERPC_EXCP_SYSCALL
+> +#define POWERPC_SYSCALL_VECTORED POWERPC_EXCP_SYSCALL_VECTORED
+>  #endif
+>  static void gen_sc(DisasContext *ctx)
+>  {
+> @@ -4039,6 +4059,23 @@ static void gen_sc(DisasContext *ctx)
+>      gen_exception_err(ctx, POWERPC_SYSCALL, lev);
+>  }
+> =20
+> +#if defined(TARGET_PPC64)
+> +#if !defined(CONFIG_USER_ONLY)
+> +static void gen_scv(DisasContext *ctx)
+> +{
+> +    uint32_t lev;
+> +
+> +    if (unlikely(!ctx->scv_enabled)) {
+> +        gen_exception_err(ctx, POWERPC_EXCP_FU, FSCR_IC_SCV);
+> +        return;
+> +    }
+> +
+> +    lev =3D (ctx->opcode >> 5) & 0x7F;
+> +    gen_exception_err(ctx, POWERPC_SYSCALL_VECTORED, lev);
+> +}
+> +#endif
+> +#endif
+> +
+>  /***                                Trap                                =
+   ***/
+> =20
+>  /* Check for unconditional traps (always or never) */
+> @@ -7031,6 +7068,12 @@ GEN_HANDLER(mcrf, 0x13, 0x00, 0xFF, 0x00000001, PP=
+C_INTEGER),
+>  GEN_HANDLER(rfi, 0x13, 0x12, 0x01, 0x03FF8001, PPC_FLOW),
+>  #if defined(TARGET_PPC64)
+>  GEN_HANDLER(rfid, 0x13, 0x12, 0x00, 0x03FF8001, PPC_64B),
+> +#if !defined(CONFIG_USER_ONLY)
+> +/* Top bit of opc2 corresponds with low bit of LEV, so use two handlers =
+*/
+> +GEN_HANDLER_E(scv, 0x11, 0x10, 0xFF, 0x03FFF01E, PPC_NONE, PPC2_ISA300),
+> +GEN_HANDLER_E(scv, 0x11, 0x00, 0xFF, 0x03FFF01E, PPC_NONE, PPC2_ISA300),
+> +GEN_HANDLER_E(rfscv, 0x13, 0x12, 0x02, 0x03FF8001, PPC_NONE, PPC2_ISA300=
+),
+> +#endif
+>  GEN_HANDLER_E(stop, 0x13, 0x12, 0x0b, 0x03FFF801, PPC_NONE, PPC2_ISA300),
+>  GEN_HANDLER_E(doze, 0x13, 0x12, 0x0c, 0x03FFF801, PPC_NONE, PPC2_PM_ISA2=
+06),
+>  GEN_HANDLER_E(nap, 0x13, 0x12, 0x0d, 0x03FFF801, PPC_NONE, PPC2_PM_ISA20=
+6),
+> @@ -7038,7 +7081,9 @@ GEN_HANDLER_E(sleep, 0x13, 0x12, 0x0e, 0x03FFF801, =
+PPC_NONE, PPC2_PM_ISA206),
+>  GEN_HANDLER_E(rvwinkle, 0x13, 0x12, 0x0f, 0x03FFF801, PPC_NONE, PPC2_PM_=
+ISA206),
+>  GEN_HANDLER(hrfid, 0x13, 0x12, 0x08, 0x03FF8001, PPC_64H),
+>  #endif
+> -GEN_HANDLER(sc, 0x11, 0xFF, 0xFF, 0x03FFF01D, PPC_FLOW),
+> +/* Top bit of opc2 corresponds with low bit of LEV, so use two handlers =
+*/
+> +GEN_HANDLER(sc, 0x11, 0x11, 0xFF, 0x03FFF01D, PPC_FLOW),
+> +GEN_HANDLER(sc, 0x11, 0x01, 0xFF, 0x03FFF01D, PPC_FLOW),
+>  GEN_HANDLER(tw, 0x1F, 0x04, 0x00, 0x00000001, PPC_FLOW),
+>  GEN_HANDLER(twi, 0x03, 0xFF, 0xFF, 0x00000000, PPC_FLOW),
+>  #if defined(TARGET_PPC64)
+> @@ -7817,6 +7862,11 @@ static void ppc_tr_init_disas_context(DisasContext=
+Base *dcbase, CPUState *cs)
+>      } else {
+>          ctx->vsx_enabled =3D false;
+>      }
+> +    if ((env->flags & POWERPC_FLAG_SCV) && (env->spr[SPR_FSCR] & (1ull <=
+< FSCR_SCV))) {
+> +        ctx->scv_enabled =3D true;
+> +    } else {
+> +        ctx->scv_enabled =3D false;
+> +    }
+>  #if defined(TARGET_PPC64)
+>      if ((env->flags & POWERPC_FLAG_TM) && msr_tm) {
+>          ctx->tm_enabled =3D !!msr_tm;
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+> index fd763e588e..18f275d4fa 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -3382,6 +3382,7 @@ static void init_excp_POWER9(CPUPPCState *env)
+> =20
+>  #if !defined(CONFIG_USER_ONLY)
+>      env->excp_vectors[POWERPC_EXCP_HVIRT]    =3D 0x00000EA0;
+> +    env->excp_vectors[POWERPC_EXCP_SYSCALL_VECTORED] =3D 0x00000000;
+>  #endif
+>  }
+> =20
+> @@ -9030,7 +9031,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+>      pcc->flags =3D POWERPC_FLAG_VRE | POWERPC_FLAG_SE |
+>                   POWERPC_FLAG_BE | POWERPC_FLAG_PMM |
+>                   POWERPC_FLAG_BUS_CLK | POWERPC_FLAG_CFAR |
+> -                 POWERPC_FLAG_VSX | POWERPC_FLAG_TM;
+> +                 POWERPC_FLAG_VSX | POWERPC_FLAG_TM | POWERPC_FLAG_SCV;
+>      pcc->l1_dcache_size =3D 0x8000;
+>      pcc->l1_icache_size =3D 0x8000;
+>      pcc->interrupts_big_endian =3D ppc_cpu_interrupts_big_endian_lpcr;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -677,25 +515,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Z9t8O/5YJLB6LEUl
+--1rguoi8KZGYj2k4L
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl64q4cACgkQbDjKyiDZ
-s5KTlw/8CdkN1l++QxkA6FxdY8/lT4vIE9jhihBxWNfGSUBcabwpFlbP5eDVlqXs
-giUSOPgXILVYZqPxw3u2CKxLTfjt6FliUUitboWXVjFgQQUxPoV5DrKNEu9GzqJU
-+bYhLl2JWeRB+1JApcbvSX385A6J/DL8CAWVy2BKKz2bqkdXNpiZ+rNZgVTVbpjF
-bKBvk9hiob4zJW+rp7R9sq4CHApQpNY/2DJC8uzs2u7Ije8hyiTREmhmtduD99V/
-CJat+P5qxEsVO5nlVKFSq4kdBwnI5flCZYiPaFakuI5caFTwU8d+t4QYZpAUoQai
-vraNVfJLey6rB3V5ZaFXK3JyFXFAMCjpK6xCnS3UONFYVSI9BfA+IhN7klreUV4/
-gEIy76uyg+OntG/wJuTo3xIl4CsB+SPCAKVTy9jaMvyqW9nT22VUHpw+ndPLgG+Q
-+5mR1dn1mylw+eo9zWLJ+1CVs16LWTH/YP0SEOXhpKpkR+1r6TfsXbXq7ewxrMzn
-wGCP+92W7ufR8NJhwzq2q+zBwR2UwkIQNsq8SHB5Zx/IqnBR7ZyZmCaq14HSuP2v
-zUfQwfiosqeW86lZRRTnmspbVsFf/CMlYCPpAJ3fK8cByt257rRCazKPlpvZwkWG
-ZsoT8IPwQNWmNEvr7uhcqm1IookRyxQOUzK3FE3YkIDCOsadlwI=
-=F15G
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl64rFYACgkQbDjKyiDZ
+s5IHKRAAiVdBGcLxTmRlGnq4BB9D3yELogeYjx9GRqujtucV8d9+6btDhFcVDSkc
+LElMz7f0fKpmlE3KR5/ZmntLdZPMhY15H/YaH+8QJSIzrA5f+GRll+5NQpjxOtGa
+5RIaGbEAR4cExMbGDjNHMkNB8lTGOEUql9HVWPcQ/k69q1HyqtJij1h/ypDEySQb
+gShoZShqPosPJlX0oKHKngUwbMedwOjYrYcZ2ZoG9TrNKHlW4obDtQeVEHTkPKYE
+1oOpQK2BW92DJPx7TvEdS15OFuZc3oXB311qtOjQb8JYAMd8R48SE1lXPZsTjBJe
+VGG5ZtW+a0fMKThwcsG8q4Y2Ty4Mgw3ILBWn+l7Yg3D4J5nkPXxTU14MH8TYwftc
+B7f1NGuNP88m0YDelqIfs44i6O9P/Bc5/vxXsx73W6goL8SbrCOTFqLDM71OB394
+VLRRP5U8ArG+nPd6tsJKAuVOuu/mZIwpQLTJQ25mEfWpwsmmBQhV0U3ZhXZ15Vhr
+7qCQUqYYkeF3ueYlWeHfLKuYy5sICveJqRPIEvs4uai/5HTVHHm6JI5jMxdmz3Sr
+X+ghkh6y/+LOE+yD8cR9ZfvyDgEKBrbtORPfEHpS/WRJJ3dcGe3SZHsKd5myyj6t
+3o6tMGJ0txIftnBMhtVH4G8mxYVefGGlKlisbARd8GluKLnUwGU=
+=ZKuG
 -----END PGP SIGNATURE-----
 
---Z9t8O/5YJLB6LEUl--
+--1rguoi8KZGYj2k4L--
 
