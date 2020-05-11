@@ -2,91 +2,88 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98E48C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:20:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6FA1C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:21:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64968207FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:20:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9BBD5207FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:21:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cw8SUG0S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64968207FF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZGlRATDO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BBD5207FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY7QC-0006Mr-Km
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 08:20:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36330)
+	id 1jY7RP-0007Ly-Oc
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 08:21:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36568)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jY7O0-0004MD-HI
- for qemu-devel@nongnu.org; Mon, 11 May 2020 08:18:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22782
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jY7PS-0005ni-2Z
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 08:19:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33725
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jY7Nz-0001TL-Nd
- for qemu-devel@nongnu.org; Mon, 11 May 2020 08:18:20 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jY7PR-0001rX-78
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 08:19:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589199499;
+ s=mimecast20190719; t=1589199588;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=VpKvH+OX/HhyE0FSafJf0hC/3SfjvlbQ/zKk26ZY5do=;
- b=Cw8SUG0Smvhjlr+8Fz3z/2fqYpGlIkwdS5L8+zLMLKM3q/1ubExR3ODUApnxYiih4mByqP
- b0DjNAriIqbB94mlZZtozJ843xupU4DMz8J+1YBLGwjhENK9R9lqyK0veABiw7Ta3E9wfY
- FR0aiSRCHn10nnBT/vAQ2iVcwgR0pFQ=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-499-RQgGNmOGM0q4UrsOkSwP2g-1; Mon, 11 May 2020 08:18:16 -0400
-X-MC-Unique: RQgGNmOGM0q4UrsOkSwP2g-1
-Received: by mail-wm1-f69.google.com with SMTP id a206so2909886wmh.6
- for <qemu-devel@nongnu.org>; Mon, 11 May 2020 05:18:16 -0700 (PDT)
+ bh=PLyMEMUtWWHmGTQnNne8rTCXzLtrmwfee1Jte6/N6K4=;
+ b=ZGlRATDOCnkCxUz7M9qdkIDqfhJmqlB3OowXwBGzMK2XnT1P+F7RwLt3hfYkTyPbXputiF
+ 7hgmC5m5eUvY/It+5b3kkI+UbNQ7wHLjiDojHh+MZaGpwYHiVx6wlh0Q0deMB51KbndXQ0
+ uHh1jkZiLMlGRs+SLcQSUo7uPCxr1V0=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-203-2VHqtH36PcqcnnAocvf0Iw-1; Mon, 11 May 2020 08:19:45 -0400
+X-MC-Unique: 2VHqtH36PcqcnnAocvf0Iw-1
+Received: by mail-wr1-f69.google.com with SMTP id r14so4857524wrw.8
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 05:19:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=VpKvH+OX/HhyE0FSafJf0hC/3SfjvlbQ/zKk26ZY5do=;
- b=RLCQJVKQ9jc2K9fHyOiPI+0RjetZlWFwY4tf7MJIWs9or3qo4V/Cm+11/CpOr8ssaV
- /uRGC/JX0DCBuwz6gjE0MGV7q6IdIRaqbijOWLnmFFKMGSBWfkChGJ3ZW9kUgnqhRP2T
- mJ90beQ5LLBzS4qFD1uxCBg8vUEJRDDVxLcGgu5JgHcK14ooFiWRekS8RbC/gkC09ByM
- BSdCjA3uFMDsXGvYF7u89MWwXRM3I8BLxOVOboeAMdBILzNmtdhhSh+Jzq2GwPlAv7e0
- nD5/uFHwaSQUCnU29LG4vO9jTc6fNrCNXVqhdSQH68nS+xDkpdh8agB9Df8QVJGWZJEf
- jM3w==
-X-Gm-Message-State: AGi0PuaUCQ/jwepSBYbMDfLlXWfYgyh8Z9yI6Sa/e1MU75/+UgtcVQ3Y
- 4c1duWBmSfXf8ZEKenwu2aWqlWMzXmrlq45gtPN8vV7c0Y5ISWoCAwqHzP74atJ8vXRpTjqeg3E
- 7rvGukfQgHoij0Ws=
-X-Received: by 2002:a1c:5f08:: with SMTP id t8mr17003466wmb.67.1589199495143; 
- Mon, 11 May 2020 05:18:15 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJlembs7C7OEviYyEx02qrq9XV8dulsk2Y22GR1Cjw2vrkvyIQ9ypBT2TzfGcEJd0QLFkfnqw==
-X-Received: by 2002:a1c:5f08:: with SMTP id t8mr17003443wmb.67.1589199494920; 
- Mon, 11 May 2020 05:18:14 -0700 (PDT)
+ bh=PLyMEMUtWWHmGTQnNne8rTCXzLtrmwfee1Jte6/N6K4=;
+ b=JzyJLKv8HJHy+e/ljSa8vA9Fzs6+GlCvs4iZD8Xd+5mofmRMerOH4gNj3FRPGVCeUY
+ NoAdBtWuU2JapmtvEV7jLF6tk5zU67dtY3hA9Ox12jkIkaXHj1CQhN/jJvndU0+SvBn1
+ cLveEw0VY9yrY54fiMjN44Q+KiKpuzzmnD/YPR32yMvxD0p1/mrl66c2M7Wql4Z/QXN1
+ Dz0yLrjTx7n40ZWUd0f7HiP/K3Jyyp948P3V2076xU7TbFLF9yCNGvJVlRQtqYi59Ssp
+ C32lPZtv/xXCknyb50WtHWAkZs2crLgshaQ/oWnYtyVTOFNPSE2Tu2emBAV+pXopW2SO
+ wE+Q==
+X-Gm-Message-State: AGi0PuY1UquztZ6Om4NBIMwOji9t0NC9ZWEcS+PSCcn4YsIYlEJFUq7Z
+ T8qnkoAPAEHRCvsC5w42h5Wbg0IewJJBNvSDmdadrc3GVGzAGAOeptz/Fh67t3DXUBlY0bq3hNa
+ aAtG7ITd8NVWa5yM=
+X-Received: by 2002:a5d:534e:: with SMTP id t14mr18431979wrv.15.1589199584136; 
+ Mon, 11 May 2020 05:19:44 -0700 (PDT)
+X-Google-Smtp-Source: APiQypLWGW6fFeYjOfqU400XpGi5EvUA65zDgYsmAbUloKHp0iWsgUDz4G5vtDJptLsuYIo4kX0B/w==
+X-Received: by 2002:a5d:534e:: with SMTP id t14mr18431959wrv.15.1589199583962; 
+ Mon, 11 May 2020 05:19:43 -0700 (PDT)
 Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id d126sm6927791wmd.32.2020.05.11.05.18.14
+ by smtp.gmail.com with ESMTPSA id a12sm16995644wro.68.2020.05.11.05.19.43
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 11 May 2020 05:18:14 -0700 (PDT)
-Subject: Re: [PATCH v1 6/7] disas: add optional note support to cap_disas
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200501145713.19822-1-alex.bennee@linaro.org>
- <20200501145713.19822-7-alex.bennee@linaro.org>
+ Mon, 11 May 2020 05:19:43 -0700 (PDT)
+Subject: Re: [PATCH v3 0/5] target/arm: Restrict TCG cpus to TCG accel
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200504172448.9402-1-philmd@redhat.com>
+ <CAFEAcA_kV8HzHv3xuPRPMKC4JwH8BDfskWqwtDJ=tHMVt0i_Gg@mail.gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <cd4891c2-e3c1-8c97-1935-e89674205aad@redhat.com>
-Date: Mon, 11 May 2020 14:18:13 +0200
+Message-ID: <bacd7700-9890-5685-3022-370e4490a5ce@redhat.com>
+Date: Mon, 11 May 2020 14:19:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200501145713.19822-7-alex.bennee@linaro.org>
+In-Reply-To: <CAFEAcA_kV8HzHv3xuPRPMKC4JwH8BDfskWqwtDJ=tHMVt0i_Gg@mail.gmail.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -115,107 +112,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: riku.voipio@iki.fi, richard.henderson@linaro.org, laurent@vivier.eu
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/1/20 4:57 PM, Alex Bennée wrote:
-> Include support for outputting a note at the top of a chunk of
-> disassembly to capstone as well.
+On 5/11/20 12:48 PM, Peter Maydell wrote:
+> On Mon, 4 May 2020 at 18:24, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+>>
+>> These are the uncontroversial patches from "Support disabling
+>> TCG on ARM (part 2)"
+>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg689168.html
+>>
+>> The other patches are blocked by the "accel: Allow targets to
+>> use Kconfig" series:
+>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg689024.html
+>>
+>> Patch #4 is new "Restrict v8M IDAU interface to Aarch32 CPUs".
+>>
+>> Since v2:
+>> - Fixed set_feature() clash trying to KISS
+>>    https://www.mail-archive.com/qemu-devel@nongnu.org/msg697523.html
+>> - Fixed aarch64-linux-user build failure reported by Peter:
+>>    https://www.mail-archive.com/qemu-devel@nongnu.org/msg699319.html
+>>
+>> Since v1:
+>> - Dropped 'Make set_feature() available for other files' patch
+>>    which fails to build with KVM only, see:
+>> https://lists.gnu.org/archive/html/qemu-devel/2020-04/msg03843.html
+>>
+>> Many thanks to Richard Henderson for his patience (again...)!
 > 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->   disas.c | 20 ++++++++++++--------
->   1 file changed, 12 insertions(+), 8 deletions(-)
 > 
-> diff --git a/disas.c b/disas.c
-> index bb74650633..5e7eb65326 100644
-> --- a/disas.c
-> +++ b/disas.c
-> @@ -260,7 +260,8 @@ static void cap_dump_insn_units(disassemble_info *info, cs_insn *insn,
->       }
->   }
->   
-> -static void cap_dump_insn(disassemble_info *info, cs_insn *insn)
-> +static void cap_dump_insn(disassemble_info *info, cs_insn *insn,
-> +                          const char *note)
->   {
->       fprintf_function print = info->fprintf_func;
->       int i, n, split;
-> @@ -281,7 +282,8 @@ static void cap_dump_insn(disassemble_info *info, cs_insn *insn)
->       }
->   
->       /* Print the actual instruction.  */
-> -    print(info->stream, "  %-8s %s\n", insn->mnemonic, insn->op_str);
-> +    print(info->stream, "  %-8s %s\t\t%s\n", insn->mnemonic, insn->op_str,
-> +          note ? note : "");
->   
->       /* Dump any remaining part of the insn on subsequent lines.  */
->       for (i = split; i < n; i += split) {
-> @@ -313,7 +315,7 @@ static bool cap_disas_target(disassemble_info *info, uint64_t pc, size_t size)
->           size -= tsize;
->   
->           while (cs_disasm_iter(handle, &cbuf, &csize, &pc, insn)) {
-> -           cap_dump_insn(info, insn);
-> +            cap_dump_insn(info, insn, NULL);
->           }
->   
->           /* If the target memory is not consumed, go back for more... */
-> @@ -342,7 +344,8 @@ static bool cap_disas_target(disassemble_info *info, uint64_t pc, size_t size)
->   }
->   
->   /* Disassemble SIZE bytes at CODE for the host.  */
-> -static bool cap_disas_host(disassemble_info *info, void *code, size_t size)
-> +static bool cap_disas_host(disassemble_info *info, void *code, size_t size,
-> +                           const char *note)
->   {
->       csh handle;
->       const uint8_t *cbuf;
-> @@ -358,7 +361,8 @@ static bool cap_disas_host(disassemble_info *info, void *code, size_t size)
->       pc = (uintptr_t)code;
->   
->       while (cs_disasm_iter(handle, &cbuf, &size, &pc, insn)) {
-> -       cap_dump_insn(info, insn);
-> +        cap_dump_insn(info, insn, note ? note : NULL);
+> 
+> Applied to target-arm.next, thanks.
 
-'note' directly?
+Thanks :)
 
-Otherwise:
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> +        note = NULL;
->       }
->       if (size != 0) {
->           (*info->fprintf_func)(info->stream,
-> @@ -402,7 +406,7 @@ static bool cap_disas_monitor(disassemble_info *info, uint64_t pc, int count)
->           csize += tsize;
->   
->           if (cs_disasm_iter(handle, &cbuf, &csize, &pc, insn)) {
-> -            cap_dump_insn(info, insn);
-> +            cap_dump_insn(info, insn, NULL);
->               if (--count <= 0) {
->                   break;
->               }
-> @@ -416,7 +420,7 @@ static bool cap_disas_monitor(disassemble_info *info, uint64_t pc, int count)
->   #endif /* !CONFIG_USER_ONLY */
->   #else
->   # define cap_disas_target(i, p, s)  false
-> -# define cap_disas_host(i, p, s)  false
-> +# define cap_disas_host(i, p, s, n)  false
->   # define cap_disas_monitor(i, p, c)  false
->   # define cap_disas_plugin(i, p, c) false
->   #endif /* CONFIG_CAPSTONE */
-> @@ -664,7 +668,7 @@ void disas(FILE *out, void *code, unsigned long size, const char *note)
->       print_insn = print_insn_hppa;
->   #endif
->   
-> -    if (s.info.cap_arch >= 0 && cap_disas_host(&s.info, code, size)) {
-> +    if (s.info.cap_arch >= 0 && cap_disas_host(&s.info, code, size, note)) {
->           return;
->       }
->   
+> 
+> -- PMM
 > 
 
 
