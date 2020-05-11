@@ -2,90 +2,105 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B254C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 07:11:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6578FC54E8E
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 07:11:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA19920735
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 07:11:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3080120735
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 07:11:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="nFILUQ9t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA19920735
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N4OZ3xT6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3080120735
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY2bA-00047y-UG
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 03:11:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49532)
+	id 1jY2bD-0004sC-Bg
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 03:11:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49822)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jY2YA-0001m4-0L; Mon, 11 May 2020 03:08:30 -0400
-Received: from mout.web.de ([217.72.192.78]:54235)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jY2Y8-00007v-Uc; Mon, 11 May 2020 03:08:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1589180892;
- bh=kdZYXdLjb9N8p3xlWxsGNaLfKYEwisH80Lk4OmkVxUI=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
- b=nFILUQ9tVPr7vJUhDwdIoH5wkJySXywYutowTyGxfs0Fzp+FfFKEIZmk+iXMHIclD
- L+YTaRbSroq9aBOmMUtr3Bwa4/AcuWxPIhjcV0ov9/lVoqghi3Q1R4BeBoduJAM+0N
- hK+c5vC8IvG+sjH2MoCtDkUZG7XBTf7zEffQ5GbU=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([89.247.255.192]) by smtp.web.de (mrweb101
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0MQvsg-1jgBTZ3Yvm-00ULTs; Mon, 11
- May 2020 09:08:11 +0200
-Date: Mon, 11 May 2020 09:08:01 +0200
-From: Lukas Straub <lukasstraub2@web.de>
-To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH] block/replication.c: Avoid cancelling the job twice
-Message-ID: <20200511090801.7ed5d8f3@luklap>
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jY2aY-0004Bt-QP
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 03:10:58 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22874
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jY2aX-0000eF-O5
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 03:10:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589181056;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=om5XKvopxh0OhbPqD1P3kfr9ycnOyfNaH58tN57LfaY=;
+ b=N4OZ3xT6Ds3sCJETchc47qNq/uV+9MzDm59Koz5RWGoFUxYhlYthAH7TTbfL501H5BY6X4
+ 8As4Lu02xMsf89wByOIm0wb4oDBlwQjqnjhhepQEOE+sXVU4fNw8ti+SI9SWWxrN0fpXEt
+ tosmlSYmQl4p7yxgfdHFjO6TRX1K8Ws=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-20-AKMC7HmWM9aD9x9GOd8KLA-1; Mon, 11 May 2020 03:10:51 -0400
+X-MC-Unique: AKMC7HmWM9aD9x9GOd8KLA-1
+Received: by mail-wr1-f71.google.com with SMTP id z10so790342wrs.2
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 00:10:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=om5XKvopxh0OhbPqD1P3kfr9ycnOyfNaH58tN57LfaY=;
+ b=IxLfJdHpkxhB2wJRkMPqd4WHQTBPn2jy9do/07pVAMpEBo+Yq7rbW7VJzQIVWQkOnT
+ ypg+JyLSDV3EIyjX8UH0ypGPyoC4U+i2Oi9hXJqNGTAgSwcC2NaJQrA0s/oszv2zPQqa
+ Rmef9Vtv5tyDlEwPfPPlIOMc2t1SijhXp1ku95AsUITttkpNlN8Lkk7fpS3iqHQAD4cu
+ 6ICSC2pXsUtEsDXMDYOrDTDyLe6s7vRh9EXCzf5p7jIoqVOLlGC6DaEIocvtB0XNMSRN
+ J66VvwLJqqTOpMyMySebegA5vperkumXA4lvagW3oXfP+0rdhKEPuL9mtQyrQVj136EO
+ h1bA==
+X-Gm-Message-State: AGi0PuZqFKq2du4BfphpC1w7ZBOAn8ghQiqEpwTDvoRVMmV8GbV8fwLq
+ vG6baAoFgUVj/uAujvWN1ZZpDwnOmFAYpJRJzAez2eQvVraQ0Mx/bVpvveqkBy1Ds0fItRYsA5G
+ j4HCj2WfnV8keo3Q=
+X-Received: by 2002:a5d:66c5:: with SMTP id k5mr16760722wrw.17.1589181050279; 
+ Mon, 11 May 2020 00:10:50 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJZ+5/w5EjMP7ihJoOURg9iMQRMid70pCQ8yFw6BaDlKQPjqs1u6QpzpRZPnO7s+PF2wJQtLQ==
+X-Received: by 2002:a5d:66c5:: with SMTP id k5mr16760699wrw.17.1589181050034; 
+ Mon, 11 May 2020 00:10:50 -0700 (PDT)
+Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id a15sm16569792wrw.56.2020.05.11.00.10.49
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 11 May 2020 00:10:49 -0700 (PDT)
+Subject: Re: Abort in mch_update_pciexbar
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
+References: <20200511045912.keffhizkobgwqcag@mozz.bu.edu>
+ <c6b66f8a-40e4-8ad5-afb4-09bddbcac529@redhat.com>
+Message-ID: <2344dc20-5c7f-75eb-96d2-bef0153550d6@redhat.com>
+Date: Mon, 11 May 2020 09:10:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/37uZL0=cJI=k9Vn_.CeuFNk";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:DWUOH31qynvI8d72VHP7zZ7twTny8RBbbbt1DauTNcuPV9Z/5ao
- e45UU9vf14ClU/1luvBhsbj7YyUEv7hQnozNzjDZyLIIMyVN2oMdUI3yZqqAgfC948qviDB
- +dEC/8Kaia9o981lDE/No74Jb/DKSbXOXW/NWuTzbktQYlTWqY6B7r2eSYc04taf3VQxZxc
- FN6mm2AOEPwejBE4WIeRg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:CuPCsJw5j7A=:fps0FunEtkfBiHWQmes0wq
- 8UIQMYoPZyTNoS7wK6VzGoU5tCXx2gV9WCQYAIOY6DaLf1WKV/zCb126dmvVA83PISmIA/IvY
- Iezi2OlvOCZkIoddXxXV5zwAJv2/Z6/UiL8RHJzrgmMejAAnOvC0l2+1d2AQ40EPmPYeSwion
- WLucvjyPTQFOH5tAEXXClnaDtIxkuKAzsVot6m876i+rkCE2Tmsn6Efd2ytSxlNH4xj5Hr2i4
- y9vJvExsMctB2IG1LU1ZsyXRmn7v3EkYWZssklBpkmEwl8kKJxzQiDwtlx3RkEN0MLNF/vdii
- dY36iYdU+phzmzUeYbIMIUKFWZ+j3O7ZtlQwIjVb5TLol7x0iBH4gIWojQHJyb3FMKhKgYyQF
- ujeMlNGjNXd7UfDFeZ/CxVV0heqjAjMOdQDaMRgJhvlHiZFfD932K7RGAE5cT8VYVFjh6PSAI
- 8d1nlVPYq4iLzYI85ZE3vaJ7v2sBzivURn8c2TauRzcrjLDWf69sLeWqXevqRg4l7QNfMCxdp
- YKcLiYn37AEU+cN+D2fugULFtrO8187ChTlXFQZpwaj/u+G4Y0zVzCg6UEs72ZpVzSqPg497A
- v/3u83+Hy3ZgoyNby4Uj+Dcd+FDSmHKsWjhxMAQnPcaqkIOI/z6ubZDhrwMfUQTqVvGpR+v8X
- +dD14C0d2hFLhSXovanfaqBWWlqfgJUQ5+IMTDb161jd7eAw2zz9uvWW6K6BHk9CH3av+DlY2
- e3ccWYckDZu2fkHz4OZwz0xpFBnP/JSxaUl9oN7xPJgCkKWJSYMvUaaOIQnIdXiEuk/wrzml0
- PQz46YWmzXha/dijxWDfsyMhfpSiDmjWTX82e+w/mpmsy33t6ZwTTkpA7gMw+qP/79S33t2Rz
- AZhqXt/UpYBYjj4/auCZTu8P2VxAzD1kpY4n1nQMjW19MfCYxfrypiUWohZm0LWKhDIwwjhzf
- bCJZyEbvee2zVscHJg60Z4L1nZyEy4gL4jnNArYQcAaUCCgXpeNWi9w1BuhgwmYnHbfsVddEX
- I8qa4GooIQjWcmcRlbZ9IPuj/nU0W54iKqrpmx2eHF6SokCzhoCd62+MDh1RQVi+ssFFuwtS9
- tfWDqkm5fsWozgPoRwvf9pdekxMOSjBIMwIDJvtyL3ZhFN/e6DfyJjc+8qJnptaJZweMVNSoW
- Az5sZlMvbK2mfI9xPUI9Aqd/pvN7cPZqqhdDNB9FMlZmSQG7UB8TfRYgvj+Vt4m2v8wHESeCc
- pu9pZR+tT9pe0atTm
-Received-SPF: pass client-ip=217.72.192.78; envelope-from=lukasstraub2@web.de;
- helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 03:08:25
+In-Reply-To: <c6b66f8a-40e4-8ad5-afb4-09bddbcac529@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 03:10:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -24
-X-Spam_score: -2.5
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,66 +113,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
- Xie Changlong <xiechanglong.d@gmail.com>, qemu-block <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/37uZL0=cJI=k9Vn_.CeuFNk
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 5/11/20 8:19 AM, Philippe Mathieu-Daudé wrote:
+> On 5/11/20 6:59 AM, Alexander Bulekov wrote:
+>> Hello,
+>> While fuzzing, I found an input that triggers an assertion failure in
+>> mch_update_pciexbar:
+>>
+>> #6 0x7f38d387c55a in abort 
+>> /build/glibc-GwnBeO/glibc-2.30/stdlib/abort.c:79:7
+>> #7 0x55c27e94ffd0 in mch_update_pciexbar hw/pci-host/q35.c:331:9
+>> #8 0x55c27e94db38 in mch_write_config hw/pci-host/q35.c:487:9
+>> #9 0x55c27e9e3f4c in pci_host_config_write_common hw/pci/pci_host.c:81:5
+>> #10 0x55c27e9e5307 in pci_data_write hw/pci/pci_host.c:118:5
+>> #11 0x55c27e9e6601 in pci_host_data_write hw/pci/pci_host.c:165:9
+>> #12 0x55c27ca3b17b in memory_region_write_accessor memory.c:496:5
+>> #13 0x55c27ca3a5e4 in access_with_adjusted_size memory.c:557:18
+>> #14 0x55c27ca38177 in memory_region_dispatch_write memory.c:1488:16
+>> #15 0x55c27c721325 in flatview_write_continue exec.c:3174:23
+>> #16 0x55c27c70994d in flatview_write exec.c:3214:14
+>> #17 0x55c27c709462 in address_space_write exec.c:3305:18
+> 
+> These lines don't match QEMU v5.0.0.
+> 
+>>
+>> I can reproduce it in a qemu 5.0 build using:
+>> cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -M 
+>> pc-q35-5.0 -display none -nodefaults -nographic -qtest stdio
+>> outl 0xcf8 0xf2000060
+>> outl 0xcfc 0x8400056e
+> 
+> The guest shouldn't ask for a reserved bar length (grep for 
+> MCH_HOST_BRIDGE_PCIEXBAR_LENGTH_RVD). I suppose we should simply report 
+> it as GUEST_ERROR and ignore it.
 
-If qemu in colo secondary mode is stopped, it crashes because
-s->backup_job is canceled twice: First with job_cancel_sync_all()
-in qemu_cleanup() and then in replication_stop().
+This patch prevent the crash:
 
-Fix this by assigning NULL to s->backup_job when the job completes
-so replication_stop() and replication_do_checkpoint() won't touch
-the job.
+-- >8 --
+diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+index 2bbc90b28f..2b744aca93 100644
+--- a/hw/pci-host/q35.c
++++ b/hw/pci-host/q35.c
+@@ -36,6 +36,7 @@
+  #include "qapi/error.h"
+  #include "qapi/visitor.h"
+  #include "qemu/module.h"
++#include "qemu/log.h"
 
-Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+ 
+/****************************************************************************
+   * Q35 host
+@@ -320,6 +321,9 @@ static void mch_update_pciexbar(MCHPCIState *mch)
+          addr_mask |= MCH_HOST_BRIDGE_PCIEXBAR_64ADMSK;
+          break;
+      case MCH_HOST_BRIDGE_PCIEXBAR_LENGTH_RVD:
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: Invalid use of reserved 
+value\n",
++                                       __func__);
++        return;
+      default:
+          abort();
+      }
 ---
- block/replication.c | 2 ++
- 1 file changed, 2 insertions(+)
 
-diff --git a/block/replication.c b/block/replication.c
-index da013c2041..33f2f62a44 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -398,6 +398,8 @@ static void backup_job_cleanup(BlockDriverState *bs)
-     BDRVReplicationState *s =3D bs->opaque;
-     BlockDriverState *top_bs;
-=20
-+    s->backup_job =3D NULL;
-+
-     top_bs =3D bdrv_lookup_bs(s->top_id, s->top_id, NULL);
-     if (!top_bs) {
-         return;
---=20
-2.20.1
+But the real question is what would the real hardware do in this case.
 
---Sig_/37uZL0=cJI=k9Vn_.CeuFNk
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+> 
+>> EOF
+>>
+>> I also uploaded the above trace, in case the formatting is broken:
+>>
+>> curl https://paste.debian.net/plain/1146095 | qemu-system-i386 -M 
+>> pc-q35-5.0 -display none -nodefaults -nographic -qtest stdio
+>>
+>> Please let me know if I can provide any further info.
+> 
+> It would help the community if you fill your bug reports with Launchpad, 
+> so they don't get lost in the high email flow, and we can track/update 
+> them. See for example:
+> https://bugs.launchpad.net/qemu/+bug/1835865 and
+> https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg06082.html 
+> which refers it.
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl64+dEACgkQNasLKJxd
-slg+/w/9FNT9vGcPTDVQo9faWQzNMFgKVvlWNvcquY5Kz5Lw/Tk7eu6H5jNjqauQ
-XvbCayKBQBgKayAUf9bcikZ+8Pg4xF4K/VRWzQ135qV9p8VASSuN91QK3o7brk8A
-JtrX89R4el56y207174kR44+/24k+DCrXPlpB6H/YhL8rsL2hDYFKmuSNrBPsoek
-OhaYyvi9qlXPSFDIF18mrI7olqvK7e6pN6TfHmd/47YedEGtVqhXzurDKDUuUFLu
-nQTlkb+gRHRNnA/bCMizZ60Ku0r2bcUuOvBqWBImyobvaWxWVB4iHkciwcpu/6wW
-UzlOem2VXurDOCe3aoDayj8Rg7fz2g9koBKyLvsYehFdIX70uwm2HO47GvkBxgmZ
-fh7PemMTa+JvP93+5PRBVfMVyAWMXxmH+GCgeibQ0WgP77E7zQ6LarOtLSOIA12N
-Yp7lqRnYlrEU+Psh7EieA0y0nA8m4aZBDNBv4HuIR/4xYybmWHKkgBNi4wVAszpd
-FVdq2tRieJOrNlpP2sdIcXIYEdWN6zC9MI03bg2rUFCV7Y/V2DSxkEsPnxuYCe4O
-ffwM4HmLUIPMP+Rtc1KF8TzBwtO00eHkUb79z1uNS7V9O9WRgDV6Ac0qL+ZfkAmg
-+mKwPIZwquIw3U9mWuJLhe0fIkyiKVKl/KScy6k0RsCB7ocrsrA=
-=9Q56
------END PGP SIGNATURE-----
-
---Sig_/37uZL0=cJI=k9Vn_.CeuFNk--
 
