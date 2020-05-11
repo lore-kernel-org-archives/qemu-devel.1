@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 565C6C38A2A
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 01:07:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C016C38A2A
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 01:09:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A65220722
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 01:07:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 36E3A20722
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 01:09:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DbelZUrv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A65220722
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qk3pB8UO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36E3A20722
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXwvC-0003W5-8a
-	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 21:07:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55392)
+	id 1jXwwc-0004eI-E8
+	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 21:09:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56444)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1jXwu1-0002ii-1E
- for qemu-devel@nongnu.org; Sun, 10 May 2020 21:06:41 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:34089)
+ id 1jXwvK-0003oo-Jf
+ for qemu-devel@nongnu.org; Sun, 10 May 2020 21:08:02 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:35527)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1jXwtz-0007WX-SI
- for qemu-devel@nongnu.org; Sun, 10 May 2020 21:06:40 -0400
-Received: by mail-lj1-x241.google.com with SMTP id f11so7653496ljp.1
- for <qemu-devel@nongnu.org>; Sun, 10 May 2020 18:06:38 -0700 (PDT)
+ id 1jXwvJ-0000yU-IQ
+ for qemu-devel@nongnu.org; Sun, 10 May 2020 21:08:02 -0400
+Received: by mail-lf1-x141.google.com with SMTP id x73so6056500lfa.2
+ for <qemu-devel@nongnu.org>; Sun, 10 May 2020 18:08:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=onNWIa2FOZ31nfganHbfuVqwz/Y4eXhGGaqpIddJx1U=;
- b=DbelZUrv4o05YnDAecjhkm2Dzmb2K70F/SepW8zyExc3WrnJNRvKGeRgApqtTSt2yQ
- cfBk/NM3z/WL9nGvFxO61o1L46R7xeUQsK7azXSfHd9XiP1Ro+eS4BYHemwzyr7Cl1Gj
- /fqZEmykBt28GC9qqawvHUiBZibdIIeSWqULe3/hQkOfsZ61UxyYDeRlRFPBrHAVWyw1
- 0dRl9yNntP65d5umx+i3YPRxDgfIiaAw9+G9zlggXASz+ukcya8vvf94v/s3UBZ3VzEY
- H/xXPyrz+8eP/HYLO9rQV6Qf6zH9S3RVHmCZb5QOtrukqgF7K0+tcT9SfsVtkJMJEMSL
- iJAg==
+ bh=G2O4DwfQ4GOHUmaQT0DJr7TP2U5TisQKHYkZj1DaqZA=;
+ b=qk3pB8UO903Va1wci/GX3h6FnUw00wv7bi8J/PnIiY/vMSMPlPACf+rLuXwxeLXNS6
+ CBdHru4bOue+lu9rCu72asfqXE+85AQICyYmIyvLVCH+xfvn3lFCm6tcWGDJP81Sj+gU
+ /KLZfkPYA2bQJhqKwU1hk5elzJoq7PNz+LZX46Rql+qOjdueZXPbCSi2yjHnp5ZsYiU4
+ fH0kEYfUHEPGWqhJgeR5dPVqId1oaObviTHXCPxhKKPfzxJYn9y19u7w5DfGwPmS47km
+ MtwH1T7AomBOrFl5VUwYM4XYhMSt8ZD7RBU6vCvj9Ukeg8HpQrUyxrWZWUNdNhu5ws/v
+ q69w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=onNWIa2FOZ31nfganHbfuVqwz/Y4eXhGGaqpIddJx1U=;
- b=qeLM8H4DUhe7Srgaj/b0hqEkI0wrs9/+OOOxALrySbh1Mb6S886a0VzlO8RlNwYBcB
- KY9oOmZXMLi2+emT0b7RYi9fXoywfJd/96xYItp80YQLNyRS/Tbh+ckLVZ+Zj2QHZ180
- NzQ6HC0TbsxBEYehJeDv9cKT1E7oY1Cm9Xv/9mO0THSxUmNnsiedGA5U/IFrVRluFW4c
- pjjX63p97BDmC7NqGbbARsaa3rJtSKWSBiGB2veb8hX4rS4jif/XQNmJCVH2uRtQ5eEX
- jPg2kUpayx2kw9+OPmekrcrr5MPfD2QaS7Y1cCbMUAPm4UFEVBEJcELVSI8a10cnDGIq
- hRGQ==
-X-Gm-Message-State: AOAM53220NYkF0GEOigzpQ+ngbg/ikNyvPCV7dJpFwzpvx6Aghu9lASp
- ELG8xQNDTQUuGx8vZciZlGHLTluG4qoALm6dsoo=
-X-Google-Smtp-Source: ABdhPJx5y+REiVWpTN8/KCGaqEczTs3+N5K5rLtPFo1vdX3y5zxP3aMa4EKY52PQn2SllcV0iPV3L0Xp+OY0AVAPXjI=
-X-Received: by 2002:a2e:6e13:: with SMTP id j19mr8652663ljc.292.1589159195013; 
- Sun, 10 May 2020 18:06:35 -0700 (PDT)
+ bh=G2O4DwfQ4GOHUmaQT0DJr7TP2U5TisQKHYkZj1DaqZA=;
+ b=hgUGs2Ap9BYr2Hd93jrFh/piLmt8yN3j5x78JQL/9QnPDSgIs/XNW6sDlCu6RfBDuh
+ MY55YjTixXxSOBKkpm36bx2fWPSsy02rfJpYiOilpo/PMQIPEcK5hHh/7nqdm1J6q5lN
+ zzArryWlLB35nnCKiL/OB4HdB0+2ZBnQSfZ1fPreXWGPgcWGEuZyCtjZRoGQJ2M3dcQF
+ i/4CkgFFXOcDpwNolullDUtFQcd4Ivla1l1f+GpqlB+Agkgi3/omQBIVOe71BkBF/lvX
+ 3I7NzOysn6Dz1kdrSyc3vE/BwT/3iVhlEuf7c2rhA6Ct+IflEKBSl0Cc5ylq/Y8IZqdv
+ aVGQ==
+X-Gm-Message-State: AOAM530Hh0hMoVUst64msT2OXGpKEXJR9j61XrQlEVTU4C79d89g/v1Y
+ 8hJ+QlgB6Jx0LzfAc4/iLb0F4jEflRBBMUh60Ag=
+X-Google-Smtp-Source: ABdhPJytr+BUklTsnkcncN3J/ynjsCAshItc4RD0a1cFOv2qdZZxK7wX5+G+cDS7HpgsjyZwu75KTrSMXGvW88bO+9E=
+X-Received: by 2002:a19:7d02:: with SMTP id y2mr8812341lfc.146.1589159278851; 
+ Sun, 10 May 2020 18:07:58 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200510210128.18343-1-f4bug@amsat.org>
- <20200510210128.18343-3-f4bug@amsat.org>
-In-Reply-To: <20200510210128.18343-3-f4bug@amsat.org>
+ <20200510210128.18343-4-f4bug@amsat.org>
+In-Reply-To: <20200510210128.18343-4-f4bug@amsat.org>
 From: chen huacai <zltjiangshi@gmail.com>
-Date: Mon, 11 May 2020 09:14:16 +0800
-Message-ID: <CABDp7Vr=z0o7-G6fMOUfs7kRMvVW9SYitR==KQfG+iVXnuPPjQ@mail.gmail.com>
-Subject: Re: [PATCH 02/12] hw/mips/fuloong2e: Rename PMON BIOS name
+Date: Mon, 11 May 2020 09:15:41 +0800
+Message-ID: <CABDp7VpFeiPukCGNa5LQ9=TuAxAA8f-2Uwic3Jtd7a1zJAskGQ@mail.gmail.com>
+Subject: Re: [PATCH 03/12] hw/mips/fuloong2e: Move code and update a comment
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::241;
- envelope-from=zltjiangshi@gmail.com; helo=mail-lj1-x241.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::141;
+ envelope-from=zltjiangshi@gmail.com; helo=mail-lf1-x141.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -108,38 +108,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,  Philippe,
+Reviewed-by: Huacai Chen <chenhc@lemote.com>
 
-On Mon, May 11, 2020 at 5:05 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+On Mon, May 11, 2020 at 5:03 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
 g> wrote:
 >
-> I'm not sure where 'pmon_fulong2e.bin' comes from. As I always
-> found this bios named 'pmon_2e.bin', rename the definition.
+> Move the RAM-related call closer to the RAM creation block,
+> rename the ROM comment.
 >
-The Fuloong BIOS doesn't integrated in QEMU, so its name can be
-anything. So, let's keep the old name (I think the old name more
-distsinguishable)?
-
-Huacai
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  hw/mips/mips_fulong2e.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/mips/mips_fulong2e.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 >
 > diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-> index ef02d54b33..f067fa9720 100644
+> index f067fa9720..4e1a3646af 100644
 > --- a/hw/mips/mips_fulong2e.c
 > +++ b/hw/mips/mips_fulong2e.c
-> @@ -69,7 +69,7 @@
->   * 2, use "Bonito2edev" to replace "dir_corresponding_to_your_target_har=
-dware"
->   * in the "Compile Guide".
->   */
-> -#define FULONG_BIOSNAME "pmon_fulong2e.bin"
-> +#define FULONG_BIOSNAME "pmon_2e.bin"
+> @@ -316,12 +316,11 @@ static void mips_fulong2e_init(MachineState *machin=
+e)
+>          error_report("Invalid RAM size, should be 256MB");
+>          exit(EXIT_FAILURE);
+>      }
+> +    memory_region_add_subregion(address_space_mem, 0, machine->ram);
 >
->  /* PCI SLOT in fulong 2e */
->  #define FULONG2E_VIA_SLOT        5
+> -    /* allocate RAM */
+> +    /* Boot ROM */
+>      memory_region_init_rom(bios, NULL, "fulong2e.bios", BIOS_SIZE,
+>                             &error_fatal);
+> -
+> -    memory_region_add_subregion(address_space_mem, 0, machine->ram);
+>      memory_region_add_subregion(address_space_mem, 0x1fc00000LL, bios);
+>
+>      /*
 > --
 > 2.21.3
 >
