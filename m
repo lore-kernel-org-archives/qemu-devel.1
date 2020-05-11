@@ -2,112 +2,89 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25F33C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:04:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E734DC54E4A
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:08:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E46B8206F5
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:04:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B2DD8206F5
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:08:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FUFYYTMT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E46B8206F5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DsXxxIUa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2DD8206F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY7Ae-0003WL-5Q
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 08:04:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34566)
+	id 1jY7EO-0005vy-VR
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 08:08:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35072)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jY79Z-0002Tb-K2
- for qemu-devel@nongnu.org; Mon, 11 May 2020 08:03:25 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27647
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jY7DY-000579-Mb
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 08:07:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32473
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jY79Y-0006kO-Vk
- for qemu-devel@nongnu.org; Mon, 11 May 2020 08:03:25 -0400
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jY7DX-0007kP-Qh
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 08:07:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589198604;
+ s=mimecast20190719; t=1589198850;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=YtHRGKYUL/u5MaJj1LufM2HKfMuUt//YGtg/rTmnYIg=;
- b=FUFYYTMTaCctFzsdPCraMysylssTxSHgEqj9v3nm6SukWnyE1hbiqSRquHeQqoaG299353
- Hw7TC6xXra68NEQhF012VSzDl/N9L/K+Rc9pSHrRwdHV4raGhJa39pM4yZ+6JZHILtQgB0
- TO+lnp1zTLb4We/DacKAnv2MhMKCjS0=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Np+spSlUQoSRWDqNQKklEPYXjcFeyGOTCLfQi6UZtlA=;
+ b=DsXxxIUa2a1oCAlYduYxizbs6sQXkcQIhIX9lM1Md9r1FQBgMBdHFKQl7EkO3na+5NgW+v
+ QGlJRuK2qC/SPTyGDwC+0veJkFoOM+Yn+E4QQm+I1RSN0nhmz+b/Tpd0cEKJR1Ig5VeW8C
+ NpKPx1tRQYKlMpVEVfvcsSSaVrlBAnw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-X0TX_0esMBar8zQrUndRjQ-1; Mon, 11 May 2020 08:03:20 -0400
-X-MC-Unique: X0TX_0esMBar8zQrUndRjQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-304-k07uXTsaNNy5Jeu16Mtv8Q-1; Mon, 11 May 2020 08:07:26 -0400
+X-MC-Unique: k07uXTsaNNy5Jeu16Mtv8Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A920835B4A;
- Mon, 11 May 2020 12:03:19 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-247.ams2.redhat.com
- [10.36.113.247])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 34D5B1001920;
- Mon, 11 May 2020 12:03:17 +0000 (UTC)
-Subject: Re: [PATCH v3 9/9] iotests: Add test 291 to for qemu-img bitmap
- coverage
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200508180340.675712-1-eblake@redhat.com>
- <20200508180340.675712-10-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <e3fadd36-f47d-010d-2999-e64a8ee83666@redhat.com>
-Date: Mon, 11 May 2020 14:03:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BBB3C8005AD;
+ Mon, 11 May 2020 12:07:25 +0000 (UTC)
+Received: from work-vm (ovpn-114-150.ams2.redhat.com [10.36.114.150])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BF0435C1B2;
+ Mon, 11 May 2020 12:07:20 +0000 (UTC)
+Date: Mon, 11 May 2020 13:07:18 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [PATCH 0/5] Introduce 'yank' oob qmp command to recover from
+ hanging qemu
+Message-ID: <20200511120718.GD2811@work-vm>
+References: <cover.1589193717.git.lukasstraub2@web.de>
+ <20200511114947.GJ1135885@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200508180340.675712-10-eblake@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200511114947.GJ1135885@redhat.com>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="EbirjJkwOGcn5z06SjDVbbxLa78ehxp1L"
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 01:43:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 00:05:06
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ T_HK_NAME_DR=0.01, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -120,55 +97,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Lukas Straub <lukasstraub2@web.de>,
+ qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---EbirjJkwOGcn5z06SjDVbbxLa78ehxp1L
-Content-Type: multipart/mixed; boundary="KLTPZ1ppl21sfyILlOtJy42Hh0AnoXp4Q"
+* Daniel P. Berrangé (berrange@redhat.com) wrote:
+> On Mon, May 11, 2020 at 01:14:34PM +0200, Lukas Straub wrote:
+> > Hello Everyone,
+> > In many cases, if qemu has a network connection (qmp, migration, chardev, etc.)
+> > to some other server and that server dies or hangs, qemu hangs too.
+> 
+> If qemu as a whole hangs due to a stalled network connection, that is a
+> bug in QEMU that we should be fixing IMHO. QEMU should be doing non-blocking
+> I/O in general, such that if the network connection or remote server stalls,
+> we simply stop sending I/O - we shouldn't ever hang the QEMU process or main
+> loop.
+> 
+> There are places in QEMU code which are not well behaved in this respect,
+> but many are, and others are getting fixed where found to be important.
+> 
+> Arguably any place in QEMU code which can result in a hang of QEMU in the
+> event of a stalled network should be considered a security flaw, because
+> the network is untrusted in general.
 
---KLTPZ1ppl21sfyILlOtJy42Hh0AnoXp4Q
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+That's not really true of the 'management network' - people trust that
+and I don't see a lot of the qemu code getting fixed safely for all of
+them.
 
-On 08.05.20 20:03, Eric Blake wrote:
-> Add a new test covering the 'qemu-img bitmap' subcommand, as well as
-> 'qemu-img convert --bitmaps', both added in recent patches.
->=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  tests/qemu-iotests/291     | 112 +++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/291.out |  78 ++++++++++++++++++++++++++
->  tests/qemu-iotests/group   |   1 +
->  3 files changed, 191 insertions(+)
->  create mode 100755 tests/qemu-iotests/291
->  create mode 100644 tests/qemu-iotests/291.out
+> > These patches introduce the new 'yank' out-of-band qmp command to recover from
+> > these kinds of hangs. The different subsystems register callbacks which get
+> > executed with the yank command. For example the callback can shutdown() a
+> > socket. This is intended for the colo use-case, but it can be used for other
+> > things too of course.
+> 
+> IIUC, invoking the "yank" command unconditionally kills every single
+> network connection in QEMU that has registered with the "yank" subsystem.
+> IMHO this is way too big of a hammer, even if we accept there are bugs in
+> QEMU not handling stalled networking well.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+But isn't this hammer conditional - I see that it's a migration
+capabiltiy for the migration socket, and a flag in nbd - so it only
+yanks things you've told it to.
+
+> eg if a chardev hangs QEMU, and we tear down everything, killing the NBD
+> connection used for the guest disk, we needlessly break I/O.
+> 
+> eg doing this in the chardev backend is not desirable, because the bugs
+> with hanging QEMU are typically caused by the way the frontend device
+> uses the chardev blocking I/O calls, instead of non-blocking I/O calls.
+> 
+
+Having a way to get out of any of these problems from a single point is
+quite nice.  To be useful in COLO you need to know for sure you can get
+out of any network screwup.
+
+We already use shutdown(2) in migrate_cancel and migrate-pause for
+basically the same reason; I don't think we've got anything similar for
+NBD, and we probably should have (I think I asked for it fairly
+recently).
+
+Dave
 
 
---KLTPZ1ppl21sfyILlOtJy42Hh0AnoXp4Q--
 
---EbirjJkwOGcn5z06SjDVbbxLa78ehxp1L
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl65Pv8ACgkQ9AfbAGHV
-z0C4wAgAsWFrnS+JSiyJhM73oIeqIncHRD6HrjltD4ml2sPpMsojUFL33FY4Rl0E
-dG37wDpZcDfK3f/2wC6IXNretRdVTEbSyIvk0q15vt+jSqeFQPLh6EmnnMjbXOFF
-8mRZcdOHeFKBsMmIduW5eP/nhdUGvNZutiv1PxLJ1oV+g2kpQBqRv/aDDP73ASs2
-g4xSoETdT7e0WytPehPIdHmWYOZ5pZ9QPAapIaIwtVlEPbrIz5i9gmEVpYi74o/T
-wM1qyTnNP5VXbQotjuLmnkJEI/RcGOlp/XiSuIbuWNXYYtHNc/fHNmDSqV/WuEcB
-u/HsrYrpKU1xdL+kCMWd4B9vKumkSg==
-=Pan6
------END PGP SIGNATURE-----
-
---EbirjJkwOGcn5z06SjDVbbxLa78ehxp1L--
+> Regards,
+> Daniel
+> -- 
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
