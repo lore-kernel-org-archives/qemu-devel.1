@@ -2,99 +2,82 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56ADAC47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 09:56:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04666C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 09:57:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 225F2207DD
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 09:56:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fMKMwzHK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 225F2207DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id CD565207DD
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 09:57:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD565207DD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY5AF-0003QH-AP
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 05:55:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43450)
+	id 1jY5Ba-0004hF-1g
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 05:57:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43606)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jY58t-00022q-Jr; Mon, 11 May 2020 05:54:35 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:38728)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jY5AR-0003lr-88
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 05:56:11 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38672)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jY58s-00057Q-Aw; Mon, 11 May 2020 05:54:35 -0400
-Received: by mail-lj1-x243.google.com with SMTP id e25so8757572ljg.5;
- Mon, 11 May 2020 02:54:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:content-transfer-encoding:in-reply-to
- :user-agent; bh=tiyyfkVX+Vv+hcjnSdTeDu1LOtGQ32sOhl+9tc0AzN0=;
- b=fMKMwzHKAL+cC6GYL7w6Jo1hhb5zYEWOu+Hm1gsRT7aE0QuTlXpXlcee6I1vIfHTZC
- Vo9VeSvSNJboZSAY84hXz1eBveXwKvejjHIovRw4E9UfTyYUg71VuDjwlGLgEGTSpzey
- gcCq7dQYd/ajywcWswVmaM5wJQSPlaC4vZTjAmuEVpU5L83wA3QvdbZMz8izaqS5NSTm
- oofor2fr+mK8xGjfS7pD7W4SNCyqQdNEB4eWGL+hLA7IQg4UbP2qqb7gMdvDlICBAqFs
- zW7MSa0A1LOrKMzwxLhYfNPT4H0V3Gf4h4sUii3tJFgofR40LLf6Q3o+UA9GeDOw8op9
- sqUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=tiyyfkVX+Vv+hcjnSdTeDu1LOtGQ32sOhl+9tc0AzN0=;
- b=WEPW0aSCwLU83LGS3fa2z9m74sg/lmQSoYb/v6UHHZwODAW59gGPDM0phRW4tikb8e
- yxN65x9cMhIXE+vsZvA7ovCupP6pdLYmbxeKlO0/CoUqhASEYqtB385GckZbp/TJFLrK
- FZ7uyhhVhQiqMwGXDF9V/5lHaCH8fUdAnRo6Z1sPOrzPZigh/ksVRnTnKmCKGHtmNm2J
- T2O2a+ZhaEtyRk2LgnYaQQM+o4ZYCKLrNLh5SwTuVcmtXASd4tDA0MqUyveY49c5WRXC
- MiP+jvqOy1+jCfc/vIfin9DMxm0rXu82K+DDv7LRmXfJcYdf7oP9pNeQNlKSyIR5rCk8
- 9PJw==
-X-Gm-Message-State: AOAM532o4zcFMw/qreivL4hVqtq8c1i0Moq3VmnhebzE5nargEAuVRqt
- 9k2T008lN7OogSe14m0Lahg=
-X-Google-Smtp-Source: ABdhPJz+MtRuntfrRkEMQVanEs2Ehicxuu4xy5lCw5aWu+zWimC9nOZPengQVdTQtuxI9wjfgHFNyQ==
-X-Received: by 2002:a2e:6e13:: with SMTP id j19mr9855811ljc.292.1589190871093; 
- Mon, 11 May 2020 02:54:31 -0700 (PDT)
-Received: from localhost (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id s7sm10412923lfb.40.2020.05.11.02.54.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 11 May 2020 02:54:29 -0700 (PDT)
-Date: Mon, 11 May 2020 11:54:13 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH 02/11] sysemu/accel: Restrict machine methods to
- system-mode
-Message-ID: <20200511095413.GS5519@toto>
-References: <20200509130910.26335-1-f4bug@amsat.org>
- <20200509130910.26335-3-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jY5AP-0005QD-Rb
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 05:56:10 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jY5AN-00068K-Ur
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 09:56:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id E68BE2E810A
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 09:56:07 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200509130910.26335-3-f4bug@amsat.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Received-SPF: pass client-ip=2a00:1450:4864:20::243;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x243.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 11 May 2020 09:45:30 -0000
+From: Stefan Hajnoczi <1877716@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: stefanha zkrx
+X-Launchpad-Bug-Reporter: zkrx (zkrx)
+X-Launchpad-Bug-Modifier: Stefan Hajnoczi (stefanha)
+References: <158901182209.5021.12832610872088111923.malonedeb@soybean.canonical.com>
+ <CAJSP0QW6hE=Svo2RrUpLeamsC3LwCPef64923dJZTQA9JnO++A@mail.gmail.com>
+Message-Id:
+ <CAJSP0QUQu-Uq3W56iT36vb_BVc5yra5VMbWerRTcsJxShyj4bA@mail.gmail.com>
+Subject: Re: [Bug 1877716] [NEW] Win10 guest unsuable after a few minutes
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 50337883e18827a27a05547b3ca2d32273b9bd9a
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 04:45:50
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -103,58 +86,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Chris Wulff <crwulff@gmail.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- David Hildenbrand <david@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Marek Vasut <marex@denx.de>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, qemu-ppc@nongnu.org,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-s390x@nongnu.org, qemu-arm@nongnu.org, Stafford Horne <shorne@gmail.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>, qemu-riscv@nongnu.org,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Cornelia Huck <cohuck@redhat.com>, Roman Bolshakov <r.bolshakov@yadro.com>,
- Laurent Vivier <laurent@vivier.eu>, Palmer Dabbelt <palmer@dabbelt.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Reply-To: Bug 1877716 <1877716@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200511094530.OtVelZ3PK7soaGtT_FYs5hpYq38uG6Jag7M4haJoodA@z>
 
-On Sat, May 09, 2020 at 03:09:01PM +0200, Philippe Mathieu-Daudé wrote:
-> Restrict init_machine(), setup_post() and has_memory()
-> to system-mode.
+On Mon, May 11, 2020 at 10:12 AM Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> On Sat, May 9, 2020 at 9:16 AM Xavier <1877716@bugs.launchpad.net> wrote:
+> >
+> > Public bug reported:
+> >
+> > On Arch Linux, the recent qemu package update seems to misbehave on some
+> > systems. In my case, my Windows 10 guest runs fine for around 5 minutes
+> > and then start to get really sluggish, even unresponsive. It needs to be
+> > forced off. I could reproduce this on a minimal VM with no passthrough,
+> > although my current testing setup involves an nvme pcie passthrough.
+> >
+> > I bisected it to the following commit which rapidly starts to run slugg=
+ishly on my setup:
+> > https://github.com/qemu/qemu/commit/73fd282e7b6dd4e4ea1c3bbb3d302c8db51=
+e4ccf
+>
+> Thanks for bisecting this bug! Arch Linux can work around it in the
+> short term by building with ./configure --disable-linux-io-uring
+> and/or removing the liburing build dependency.
 
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Hmm...a brief look at the Arch Linux package source suggests QEMU is
+not being built with io_uring enabled. Anatol, please confirm whether
+this is correct.
 
+If io_uring is not enabled then this bug may affect most existing
+users on Linux. Initially I thought it was because Arch Linux had
+enabled the new io_uring feature but I was probably mistaken.
 
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  include/sysemu/accel.h | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
-> index 47e5788530..e08b8ab8fa 100644
-> --- a/include/sysemu/accel.h
-> +++ b/include/sysemu/accel.h
-> @@ -37,10 +37,12 @@ typedef struct AccelClass {
->      /*< public >*/
->  
->      const char *name;
-> +#ifndef CONFIG_USER_ONLY
->      int (*init_machine)(MachineState *ms);
->      void (*setup_post)(MachineState *ms, AccelState *accel);
->      bool (*has_memory)(MachineState *ms, AddressSpace *as,
->                         hwaddr start_addr, hwaddr size);
-> +#endif
->      bool *allowed;
->      /*
->       * Array of global properties that would be applied when specific
-> -- 
-> 2.21.3
-> 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1877716
+
+Title:
+  Win10 guest unusable after a few minutes
+
+Status in QEMU:
+  New
+
+Bug description:
+  On Arch Linux, the recent qemu package update seems to misbehave on
+  some systems. In my case, my Windows 10 guest runs fine for around 5
+  minutes and then start to get really sluggish, even unresponsive. It
+  needs to be forced off. I could reproduce this on a minimal VM with no
+  passthrough, although my current testing setup involves an nvme pcie
+  passthrough.
+
+  I bisected it to the following commit which rapidly starts to run sluggis=
+hly on my setup:
+  https://github.com/qemu/qemu/commit/73fd282e7b6dd4e4ea1c3bbb3d302c8db51e4=
+ccf
+
+  I've ran the previous commit (
+  https://github.com/qemu/qemu/commit/b321051cf48ccc2d3d832af111d688f2282f0=
+89b
+  ) for the entire night without an issue so far.
+
+  I believe this might be a duplicate of
+  https://bugs.launchpad.net/qemu/+bug/1873032 , although I'm not sure.
+
+  Linux cc 5.6.10-arch1-1 #1 SMP PREEMPT Sat, 02 May 2020 19:11:54 +0000 x8=
+6_64 GNU/Linux
+  AMD Ryzen 7 2700X Eight-Core Processor
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1877716/+subscriptions
 
