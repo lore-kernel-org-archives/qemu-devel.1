@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 730DCC54E8E
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 14:54:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEACAC47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 14:54:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 413A720675
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 14:54:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 413A720675
+	by mail.kernel.org (Postfix) with ESMTPS id 8C65520643
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 14:54:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C65520643
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY9pF-0006tT-BH
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 10:54:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34502)
+	id 1jY9pM-0007K9-Mp
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 10:54:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34480)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <geert@linux-m68k.org>)
- id 1jY9nw-0004xk-9d
- for qemu-devel@nongnu.org; Mon, 11 May 2020 10:53:17 -0400
-Received: from xavier.telenet-ops.be ([2a02:1800:120:4::f00:14]:49176)
+ id 1jY9nt-0004w4-Qf
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 10:53:16 -0400
+Received: from baptiste.telenet-ops.be ([2a02:1800:120:4::f00:13]:59820)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <geert@linux-m68k.org>)
- id 1jY9nt-0000dl-3B
- for qemu-devel@nongnu.org; Mon, 11 May 2020 10:53:16 -0400
+ id 1jY9ns-0000dR-Gj
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 10:53:13 -0400
 Received: from ramsan ([IPv6:2a02:1810:ac12:ed60:702c:fb99:3097:2049])
- by xavier.telenet-ops.be with bizsmtp
- id dSsy2200D0GoAb601SsyQf; Mon, 11 May 2020 16:53:09 +0200
+ by baptiste.telenet-ops.be with bizsmtp
+ id dSsy2200E0GoAb601SsyU5; Mon, 11 May 2020 16:53:08 +0200
 Received: from rox.of.borg ([192.168.97.57]) by ramsan with esmtp (Exim 4.90_1)
  (envelope-from <geert@linux-m68k.org>)
- id 1jY9ne-00082s-8S; Mon, 11 May 2020 16:52:58 +0200
+ id 1jY9ne-00082b-0K; Mon, 11 May 2020 16:52:58 +0200
 Received: from geert by rox.of.borg with local (Exim 4.90_1)
  (envelope-from <geert@linux-m68k.org>)
- id 1jY9ne-0005zg-6l; Mon, 11 May 2020 16:52:58 +0200
+ id 1jY9nd-0005zR-UX; Mon, 11 May 2020 16:52:57 +0200
 From: Geert Uytterhoeven <geert+renesas@glider.be>
 To: Linus Walleij <linus.walleij@linaro.org>,
  Bartosz Golaszewski <bgolaszewski@baylibre.com>,
  Jonathan Corbet <corbet@lwn.net>,
  Harish Jenny K N <harish_kandiga@mentor.com>,
  Eugeniu Rosca <erosca@de.adit-jv.com>
-Subject: [PATCH v7 6/6] MAINTAINERS: Add GPIO Aggregator section
-Date: Mon, 11 May 2020 16:52:57 +0200
-Message-Id: <20200511145257.22970-7-geert+renesas@glider.be>
+Subject: [PATCH v7 1/6] i2c: i801: Use GPIO_LOOKUP() helper macro
+Date: Mon, 11 May 2020 16:52:52 +0200
+Message-Id: <20200511145257.22970-2-geert+renesas@glider.be>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200511145257.22970-1-geert+renesas@glider.be>
 References: <20200511145257.22970-1-geert+renesas@glider.be>
-Received-SPF: none client-ip=2a02:1800:120:4::f00:14;
- envelope-from=geert@linux-m68k.org; helo=xavier.telenet-ops.be
+Received-SPF: none client-ip=2a02:1800:120:4::f00:13;
+ envelope-from=geert@linux-m68k.org; helo=baptiste.telenet-ops.be
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -23
@@ -85,49 +85,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a maintainership section for the GPIO Aggregator, covering
-documentation and driver source code.
+i801_add_mux() fills in the GPIO lookup table by manually populating an
+array of gpiod_lookup structures.  Use the existing GPIO_LOOKUP() helper
+macro instead, to relax a dependency on the gpiod_lookup structure's
+member names.
 
 Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Reviewed-by: Eugeniu Rosca <erosca@de.adit-jv.com>
-Tested-by: Eugeniu Rosca <erosca@de.adit-jv.com>
+Reviewed-by: Jean Delvare <jdelvare@suse.de>
 ---
+This is now commit be1b92c133cc91b2 ("i2c: i801: Use GPIO_LOOKUP()
+helper macro") in i2c/for-next.
+
 v7:
-  - Maintained => Supported,
+  - Add Reviewed-by,
 
 v6:
-  - No changes,
-
-v5:
-  - Add Reviewed-by, Tested-by,
-
-v4:
-  - Drop controversial GPIO repeater,
-
-v3:
   - New.
 ---
- MAINTAINERS | 7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/i2c/busses/i2c-i801.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index fb124a4a29cb539e..4f14c1a88ad45c5b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -7232,6 +7232,13 @@ F:	Documentation/firmware-guide/acpi/gpio-properties.rst
- F:	drivers/gpio/gpiolib-acpi.c
- F:	drivers/gpio/gpiolib-acpi.h
- 
-+GPIO AGGREGATOR
-+M:	Geert Uytterhoeven <geert+renesas@glider.be>
-+L:	linux-gpio@vger.kernel.org
-+S:	Supported
-+F:	Documentation/admin-guide/gpio/gpio-aggregator.rst
-+F:	drivers/gpio/gpio-aggregator.c
-+
- GPIO IR Transmitter
- M:	Sean Young <sean@mess.org>
- L:	linux-media@vger.kernel.org
+diff --git a/drivers/i2c/busses/i2c-i801.c b/drivers/i2c/busses/i2c-i801.c
+index a9c03f5c34825a95..4f333889489c882a 100644
+--- a/drivers/i2c/busses/i2c-i801.c
++++ b/drivers/i2c/busses/i2c-i801.c
+@@ -1439,9 +1439,9 @@ static int i801_add_mux(struct i801_priv *priv)
+ 		return -ENOMEM;
+ 	lookup->dev_id = "i2c-mux-gpio";
+ 	for (i = 0; i < mux_config->n_gpios; i++) {
+-		lookup->table[i].chip_label = mux_config->gpio_chip;
+-		lookup->table[i].chip_hwnum = mux_config->gpios[i];
+-		lookup->table[i].con_id = "mux";
++		lookup->table[i] = (struct gpiod_lookup)
++			GPIO_LOOKUP(mux_config->gpio_chip,
++				    mux_config->gpios[i], "mux", 0);
+ 	}
+ 	gpiod_add_lookup_table(lookup);
+ 	priv->lookup = lookup;
 -- 
 2.17.1
 
