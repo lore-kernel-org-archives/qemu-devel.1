@@ -2,94 +2,91 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56DF8C54E8E
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 18:17:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBA50C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 18:21:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCC0D20736
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 18:17:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AEB5620736
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 18:21:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="QRw4sMk3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCC0D20736
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PYi8JWDI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEB5620736
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYCzr-0004s1-HM
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 14:17:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40972)
+	id 1jYD3X-0001Ml-Nb
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 14:21:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41626)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jYCuo-00080S-Bc; Mon, 11 May 2020 14:12:34 -0400
-Received: from mout.web.de ([217.72.192.78]:53625)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jYCun-0005PL-28; Mon, 11 May 2020 14:12:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1589220746;
- bh=RIO1uR5/qXZfhxy8FN26f+NUR2xFvNPnNW8X+jRZNYo=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=QRw4sMk3oNPK/jENO5BV6Imra+H8A0s71ghcOooZMFIKEYLbzK1+JHmqhacFP9Rvk
- bMn/wFxEFEH1c2N3NdOeWrBIA64g2ScjjwyAvw7EY0GoOBtwfzyphmyMrshZpKGfSd
- U/uXh1c9FhTw0PLw126pWhGD7E1Iys5yD7xlJVck=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([89.247.255.192]) by smtp.web.de (mrweb102
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0Lzb94-1j3uSu2sk6-014iJ9; Mon, 11
- May 2020 20:12:26 +0200
-Date: Mon, 11 May 2020 20:12:18 +0200
-From: Lukas Straub <lukasstraub2@web.de>
-To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
-Subject: Re: [PATCH 0/5] Introduce 'yank' oob qmp command to recover from
- hanging qemu
-Message-ID: <20200511201218.76f30e0b@luklap>
-In-Reply-To: <20200511114947.GJ1135885@redhat.com>
-References: <cover.1589193717.git.lukasstraub2@web.de>
- <20200511114947.GJ1135885@redhat.com>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jYCya-0004te-7b
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 14:16:28 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26473
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jYCyX-0006eh-NO
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 14:16:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589220983;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=KfC1cJocgshHEQAVE0zfVFHK/KNW0mNUW+CwwuDywdM=;
+ b=PYi8JWDIkUTzZsEngoP9FaQefLE46FbNugNtq4PmY/9b8ESKwErvMjGF3mQhd/bjh3f41i
+ 9MkHoDs0vSrkUjutovHpij9joX7Zf5oJUbr8gQm3+zcm3AHYs7QzJPFapWJOTkuqTKuyB5
+ XUuZKximXJ5EPqjdorXqAgsuT+Hibj0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-307-i0uRLES3OP6RNU1se6-HUA-1; Mon, 11 May 2020 14:16:19 -0400
+X-MC-Unique: i0uRLES3OP6RNU1se6-HUA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1654A18FE866;
+ Mon, 11 May 2020 18:16:18 +0000 (UTC)
+Received: from [10.3.116.145] (ovpn-116-145.phx2.redhat.com [10.3.116.145])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 926BD7D8DE;
+ Mon, 11 May 2020 18:16:17 +0000 (UTC)
+Subject: Re: [PATCH v3 3/9] block: Make it easier to learn which BDS support
+ bitmaps
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+References: <20200508180340.675712-1-eblake@redhat.com>
+ <20200508180340.675712-4-eblake@redhat.com>
+ <aba3eddd-1201-9182-6011-9fe0bbca1b76@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <b6c61cc5-8a7c-ef2c-76f1-def580827e14@redhat.com>
+Date: Mon, 11 May 2020 13:16:16 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/CD/45VGwZzO3pbSoClW__u3";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:Gt7OEDZmqFSBTJj2FuniN7X5pdGI5vVdcOEXBf4K/kMQqR6JqCx
- 95URnlYtnWqYpfjYGOIwRw+pM7o4XhG9kT3czEdCTkWpNktieiotyHaEUyUejEHNkqJrmEp
- YIyU+Us5b5ac36r/GWm18lETCVdqQZESnrNzyjJG2vsF8okFFaWV6QsNdwL4eiy6OnBPbq/
- BRoKkYHkXghAf+k1xljVw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:MsB/vzk29zg=:UGxldEesNMqcWWFQ/vaxuW
- D15CXuzVGJPBCXZ+PN0QB2lGoU9QPAu+aTqBI7BDP1kYJ+9fgOcS/BrbF9rV25HyoCUiGhZFx
- bz3Zm4KGZG3wDVkHM/fpEYlMLcc+BMFwubQ1djw0k36ptYn27vj8sXzTOnKKvAjMJ+rryXTng
- djy8OFK24WgZh+mfIsN3Pxdl5IY9kSIGFJiL8/JWcqqmIcYKapbEYu3ON5NJOFAhkE00IEyAe
- AhhWVRmXBIbp7JGKWFvzQmUSflBqiqgru0/UzjYyhSU+T3HboTEBn/12VGtGURD2go+gE2cfR
- eWXYKPd9vUnXxjxSQxCIJf2t3m8Nmmq5rgX+OwnQVt0NN41Yjm+soDVo0jMWrwk+8L1+zqXqT
- 36HgaiFpNFTU4yahO56pERxtofx3U90oVhcLPHB0yXSpeKnPvvMVCdz+EG1LP+tJ4dVJReMRW
- fPfzONT+UlxGRbMHsWyrMgsamAyTDYejfRlt+fJ6ZwPlStnsROIuhMJ1F5uofPSoPHOaRJlRQ
- 5FPrwCf68WbiG2sDzSuuT5Oi1saLOd2BJ7yIZ9Gp6yeRyhhcZ4iFep8BN16ZTOzK5MuO4Wc6f
- rYA+g1LTveZU491JTvgzEYWBOCLikiP14fPuN0UwgTEm83xatJaGD3EocMII5hznGVbZu8p8Q
- s2n0OTKEcryFxNf4TJVXjV/KlA7ssG2d60ffBglNFxYBuDkbhGzHiFa9cHRn86+foumyBsfsb
- nv+AbJmGteKDM76FkGapdJoZrw4twOUu/pFNnE+kETEuG6Jrd7MhH0zgP9BPOgHCg/Ojn1apo
- 4r68VTMJyMGO5AnavWDKcitIaVwDjXuRzN87OHKg89Z/9JRXdTyg6NMOlspdhD2TZMs+QzHxa
- Eq9OADMLd8cQMgC0rZJ9qe463dGW/Qfia1qhDZ1AXVC2n4RgDXwsQWf2g/M0k46cSB2vaMvfJ
- gIV80X7pmwDt41wDxEj23Xyz+w6oecBUzLxnVkZh9Yk++tIsRC6JDPJ+yPa1o4RL1Gxt+qMDb
- bzXs6u1xJ6WNGTwJDzrZINoTUFO0PVQhQ/0EBnNOgwWvvlWTWKpmdCHA9+9lFZm9CMl6wP/T0
- y1TwbjzdRAc5agdl9+WXTTZe41F/Ufg2TKrCWCWGpsV/bLBPi1xF0OEfV6bh8p62Sh1T8MA5m
- QUSDVjecch2bU0T71MN+ur672+x6Zl4wg78hNsAqA2a909ngLUrYqK/iiwhfXjLGiLKJI1Yp9
- 96EbEkdpbfId9T7Pr
-Received-SPF: pass client-ip=217.72.192.78; envelope-from=lukasstraub2@web.de;
- helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 13:05:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -24
-X-Spam_score: -2.5
+In-Reply-To: <aba3eddd-1201-9182-6011-9fe0bbca1b76@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 01:43:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,101 +99,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
- Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: kwolf@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/CD/45VGwZzO3pbSoClW__u3
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+On 5/11/20 4:21 AM, Max Reitz wrote:
+> On 08.05.20 20:03, Eric Blake wrote:
+>> Upcoming patches will enhance bitmap support in qemu-img, but in doing
+>> so, it turns out to be nice to suppress output when bitmaps make no
+>> sense (such as on a qcow2 v2 image).  Add a hook to make this easier
+>> to query.
+>>
+>> In the future, when we improve the ability to look up bitmaps through
+>> a filter, we will probably also want to teach the block layer to
+>> automatically let filters pass this request on through.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> ---
+>>   block/qcow2.h                | 1 +
+>>   include/block/block_int.h    | 1 +
+>>   include/block/dirty-bitmap.h | 1 +
+>>   block/dirty-bitmap.c         | 9 +++++++++
+>>   block/qcow2-bitmap.c         | 7 +++++++
+>>   block/qcow2.c                | 1 +
+>>   6 files changed, 20 insertions(+)
+>>
+>> diff --git a/block/qcow2.h b/block/qcow2.h
+>> index f4de0a27d5c3..fb2b2b5a7b4d 100644
+>> --- a/block/qcow2.h
+>> +++ b/block/qcow2.h
+>> @@ -764,6 +764,7 @@ bool qcow2_co_can_store_new_dirty_bitmap(BlockDriverState *bs,
+>>   int qcow2_co_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+>>                                               const char *name,
+>>                                               Error **errp);
+>> +bool qcow2_dirty_bitmap_supported(BlockDriverState *bs);
+>>
+>>   ssize_t coroutine_fn
+>>   qcow2_co_compress(BlockDriverState *bs, void *dest, size_t dest_size,
+>> diff --git a/include/block/block_int.h b/include/block/block_int.h
+>> index df6d0273d679..cb1082da4c43 100644
+>> --- a/include/block/block_int.h
+>> +++ b/include/block/block_int.h
+>> @@ -560,6 +560,7 @@ struct BlockDriver {
+>>                                uint64_t parent_perm, uint64_t parent_shared,
+>>                                uint64_t *nperm, uint64_t *nshared);
+>>
+>> +    bool (*bdrv_dirty_bitmap_supported)(BlockDriverState *bs);
+> 
+> All BDSs support bitmaps, but only some support persistent dirty
+> bitmaps, so I think the name should reflect that.
 
-On Mon, 11 May 2020 12:49:47 +0100
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+How about .bdrv_dirty_bitmap_supports_persistent?
 
-> On Mon, May 11, 2020 at 01:14:34PM +0200, Lukas Straub wrote:
-> > Hello Everyone,
-> > In many cases, if qemu has a network connection (qmp, migration, charde=
-v, etc.)
-> > to some other server and that server dies or hangs, qemu hangs too. =20
->=20
-> If qemu as a whole hangs due to a stalled network connection, that is a
-> bug in QEMU that we should be fixing IMHO. QEMU should be doing non-block=
-ing
-> I/O in general, such that if the network connection or remote server stal=
-ls,
-> we simply stop sending I/O - we shouldn't ever hang the QEMU process or m=
-ain
-> loop.
->=20
-> There are places in QEMU code which are not well behaved in this respect,
-> but many are, and others are getting fixed where found to be important.
->=20
-> Arguably any place in QEMU code which can result in a hang of QEMU in the
-> event of a stalled network should be considered a security flaw, because
-> the network is untrusted in general.
+> 
+> Conceptually, this looks reasonable.  This information might indeed be
+> nice to have, and I’m not sure whether we should extend any existing
+> interface to return it.
+> 
+> (The interfaces that come to my mind are:
+> (1) bdrv_can_store_new_dirty_bitmap() below, which we could make accept
+> a NULL @name to return basically the same information.  But it’s still a
+> bit different, because I’d expect that function to return whether any
+> bitmap can be stored then, not whether the node supports bitmaps at all.
+>   So e.g. if there are already too many bitmaps, it should return false,
+> even though the node itself does support bitmaps.
 
-The fact that out-of-band qmp commands exist at all shows that we have to m=
-ake tradeoffs of developer time vs. doing things right. Sure, the migration=
- code can be rewritten to use non-blocking i/o and finegrained locks. But a=
-s a hobbyist I don't have time to fix this.
+[which reminds me - a while ago, we had patches for qcow2 handling with 
+64k bitmaps, or whatever insane number it took to overflow data 
+structures, and I don't know if those ever got applied...]
 
-> > These patches introduce the new 'yank' out-of-band qmp command to recov=
-er from
-> > these kinds of hangs. The different subsystems register callbacks which=
- get
-> > executed with the yank command. For example the callback can shutdown()=
- a
-> > socket. This is intended for the colo use-case, but it can be used for =
-other
-> > things too of course. =20
->=20
-> IIUC, invoking the "yank" command unconditionally kills every single
-> network connection in QEMU that has registered with the "yank" subsystem.
-> IMHO this is way too big of a hammer, even if we accept there are bugs in
-> QEMU not handling stalled networking well.
->=20
-> eg if a chardev hangs QEMU, and we tear down everything, killing the NBD
-> connection used for the guest disk, we needlessly break I/O.
+> 
+> (2) bdrv_get_info()/BlockDriverInfo: This information would fit in very
+> nicely here, but do we have to put it here just because it does?  I
+> don’t think so.  This patch adds 20 lines of code, that shows that it’s
+> very simple to add a dedicated method, and it’s certainly a bit easier
+> to use than to invoke bdrv_get_info() and throw away all the other
+> information.  Perhaps this patch only shows that BlockDriverInfo doesn’t
+> make much sense in the first place, and most of its fields should have
+> been scalar return values from dedicated functions.)
 
-Yeah, these patches are intended to solve the problems with the colo use-ca=
-se where all external connections (migration, chardevs, nbd) are just for r=
-eplication. In other use-cases you'd enable the yank feature only on the no=
-n-essential connections.
+Indeed, you (re-)discovered some of the very reasons why I chose to make 
+a new interface.  I could tweak the commit message to mention 
+alternatives, if that would help.
 
-> eg doing this in the chardev backend is not desirable, because the bugs
-> with hanging QEMU are typically caused by the way the frontend device
-> uses the chardev blocking I/O calls, instead of non-blocking I/O calls.
->=20
->=20
-> Regards,
-> Daniel
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-
---Sig_/CD/45VGwZzO3pbSoClW__u3
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl65lYIACgkQNasLKJxd
-sljDoRAAh+kIfXBhoAqK8zix85hLtsz21AgGol1JTLO9pvf/8wzlLvaa6hdHJ/ZP
-fN69DTjEQzfv1tgzI1HbsMf+KHPA74OIqfnfs3rd1cP07XWprRNj2Yndz2oQQR7x
-Bi6GZSAkz+l3lJqL+8AYP1LBOJAz/b7TK4VKPgzYSxyDTQBYBh9mepmqQpKbenZB
-aKR8o5ZUNSy4+f/YfBuTbmxM59XjdZMYDTuASKi69XYZps9ZxgYb7Su1xVUxuLYD
-Gd60wcoQ/qbLNXl8BtQmiBl3oYnVYabKG7fKaNmJ6iyfUNRyLpuHkfltKEhEpm2I
-fXr+OROLV8LJwutUDK0Vw0XOQRH1BW1oZhDW34Dmls4VEOiEAIQ5IyCoduFKD5VZ
-bss1CgServ2yG+tQfdAaeRpWDz454mmiNTj7/ClJTu8qWwBiDOu5d3kVa8Zgsa1r
-E0moWJ9ASMDcSHxhkNFKZWZNThuFW7Auj8E6k36czr5r74vfBSSP7f4uCsLztBuG
-p9iNBZXR19NQxkGbRX8xcxATjj9S34sDDBlAGEd0j0rk0cu+WXA5xVmJg5sptIWf
-NONTELTMBjPOjhokvnl02E/tRc74sVa0y1+4zrZxsp+diUJm3WzWiFvlGTnA/5F5
-1yn5s5Nai2eqp0TKoCRJm4O4ZLwnopfNn7RB5d9f0r3Jlno+hrU=
-=snrg
------END PGP SIGNATURE-----
-
---Sig_/CD/45VGwZzO3pbSoClW__u3--
 
