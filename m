@@ -2,74 +2,80 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44AC2C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 15:36:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04F53C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 15:37:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C890206DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 15:36:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="qZszIDK9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C890206DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	by mail.kernel.org (Postfix) with ESMTPS id CEE69206DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 15:37:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEE69206DB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYATN-00057j-6z
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 11:36:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42690)
+	id 1jYAUT-00060k-1G
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 11:37:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43118)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jYAQA-0000Pu-6n; Mon, 11 May 2020 11:32:46 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:40500)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jYASw-0004bN-31
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 11:35:38 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60082)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jYAQ9-00061J-2m; Mon, 11 May 2020 11:32:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=F7ftooCw5/1WDvuvBigqqk8ejVCBr9CDzPhhJ7FpCHg=; 
- b=qZszIDK9jkkV26yooiITjVg8MIXBorsCYN9+jGwMHapNLXPMolWx2FrxfN8+DLvCHBP9wDWpVGPDfglEUVYTZuTPuDIpFZ19ub5w8UcIZ/+i4LJPXru49gM8IU9oKYWJDJdHmSwc1QxIUaZxBFsbUkHUq3JfZLs7IYUU2+RLQhzFYBBoJRboVIFxBPkslZHpWoytwWaSi3HL1Vdi1z5JAIeqbugs19apY4SfXxAKXGe4SBgaBUKiszcXT1xUqzsszjs6BGACTl1FedcCDt7EYooho7Risw5slaGz5w49q2yM2jTAbk5NP7cuDNJz3R35fthI+C8Xe1BWoJrALIONww==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1jYAQ5-0001DD-9m; Mon, 11 May 2020 17:32:41 +0200
-Received: from berto by mail.igalia.com with local (Exim)
- id 1jYAQ4-0004e3-VX; Mon, 11 May 2020 17:32:40 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-Subject: Re: [PATCH v3 02/17] block: use int64_t as bytes type in tracked
- requests
-In-Reply-To: <20200430111033.29980-3-vsementsov@virtuozzo.com>
-References: <20200430111033.29980-1-vsementsov@virtuozzo.com>
- <20200430111033.29980-3-vsementsov@virtuozzo.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Mon, 11 May 2020 17:32:40 +0200
-Message-ID: <w51d07ao5bb.fsf@maestria.local.igalia.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jYASu-0007ho-QD
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 11:35:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jYASr-0004BS-MI
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 15:35:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id A73352E8112
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 15:35:33 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
- helo=fanzine.igalia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 11:28:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 11 May 2020 15:21:24 -0000
+From: Stefan Hajnoczi <1877716@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: busimus post-factum stefanha zkrx
+X-Launchpad-Bug-Reporter: zkrx (zkrx)
+X-Launchpad-Bug-Modifier: Stefan Hajnoczi (stefanha)
+References: <158901182209.5021.12832610872088111923.malonedeb@soybean.canonical.com>
+Message-Id: <158921048438.3557.2513769591820795052.malone@chaenomeles.canonical.com>
+Subject: [Bug 1877716] Re: Win10 guest unusable after a few minutes
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 3dd4a4dd61f7cdf2b67ea55fdb043c0ccd67b6d3
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 11:35:34
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,35 +84,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, integration@gluster.org,
- sheepdog@lists.wpkg.org, pavel.dovgaluk@ispras.ru, dillaman@redhat.com,
- qemu-devel@nongnu.org, sw@weilnetz.de, pl@kamp.de, ronniesahlberg@gmail.com,
- mreitz@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
- stefanha@redhat.com, namei.unix@gmail.com, pbonzini@redhat.com,
- jsnow@redhat.com, ari@tuxera.com
+Reply-To: Bug 1877716 <1877716@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu 30 Apr 2020 01:10:18 PM CEST, Vladimir Sementsov-Ogievskiy wrote:
-> We are generally moving to int64_t for both offset and bytes parameters
-> on all io paths.
->
-> Main motivation is realization of 64-bit write_zeroes operation for
-> fast zeroing large disk chunks, up to the whole disk.
->
-> We chose signed type, to be consistent with off_t (which is signed) and
-> with possibility for signed return type (where negative value means
-> error).
->
-> So, convert tracked requests now.
->
-> Series: 64bit-block-status
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+I have been able to reproduce the issue and found that nodes are not
+being removed from the AioContext->aio_handlers list when
+aio_set_fd_handler() is called. perf shows that large amounts of CPU
+time are spent in aio_pending().
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+Working on getting to the bottom of the issue and fixing it.
 
-Berto
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1877716
+
+Title:
+  Win10 guest unusable after a few minutes
+
+Status in QEMU:
+  New
+
+Bug description:
+  On Arch Linux, the recent qemu package update seems to misbehave on
+  some systems. In my case, my Windows 10 guest runs fine for around 5
+  minutes and then start to get really sluggish, even unresponsive. It
+  needs to be forced off. I could reproduce this on a minimal VM with no
+  passthrough, although my current testing setup involves an nvme pcie
+  passthrough.
+
+  I bisected it to the following commit which rapidly starts to run sluggis=
+hly on my setup:
+  https://github.com/qemu/qemu/commit/73fd282e7b6dd4e4ea1c3bbb3d302c8db51e4=
+ccf
+
+  I've ran the previous commit (
+  https://github.com/qemu/qemu/commit/b321051cf48ccc2d3d832af111d688f2282f0=
+89b
+  ) for the entire night without an issue so far.
+
+  I believe this might be a duplicate of
+  https://bugs.launchpad.net/qemu/+bug/1873032 , although I'm not sure.
+
+  Linux cc 5.6.10-arch1-1 #1 SMP PREEMPT Sat, 02 May 2020 19:11:54 +0000 x8=
+6_64 GNU/Linux
+  AMD Ryzen 7 2700X Eight-Core Processor
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1877716/+subscriptions
 
