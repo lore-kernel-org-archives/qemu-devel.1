@@ -2,83 +2,85 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1AF4C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:32:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46DA2C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:32:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9942B20746
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:32:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D21320746
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:32:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="CMoW0J2d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9942B20746
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="RToi7df7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D21320746
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY7bm-0008DB-MC
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 08:32:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37650)
+	id 1jY7bu-0008Lo-2E
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 08:32:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37672)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jY7Wi-0006AJ-P3
- for qemu-devel@nongnu.org; Mon, 11 May 2020 08:27:20 -0400
-Received: from mout.web.de ([212.227.15.4]:47933)
+ id 1jY7Wo-0006BP-1M
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 08:27:26 -0400
+Received: from mout.web.de ([212.227.17.11]:35071)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jY7Wh-0005vn-Kp
- for qemu-devel@nongnu.org; Mon, 11 May 2020 08:27:20 -0400
+ id 1jY7Wn-0005xt-6W
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 08:27:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1589200011;
- bh=qfGg68Nfb6jE9N0y6KIMdqu5LDQlJ+AcA8oLmpKWpJ4=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
- b=CMoW0J2dOSKFKGd3UaXKl1zMBEcPMB15+5j8shcpax+XAoO5bflZrbk3XLrOWRLPI
- tIx3ClH2ZT3IF4Yi92qLaeLgYcu+2W26Gx/0FcXC9hsZbJh2uqqLeVgw84X0FbJMy3
- FT4SpIptDCnvAEzSSb4/Xs5ccLhrAURSH2T1r02Q=
+ s=dbaedf251592; t=1589200017;
+ bh=D/TPeLNov0t6rmkFP3E5KzxL/A8EmZiUQlUmOgNwPxk=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=RToi7df7ENuhfEuHE+5ZtG+4Aa3g1p/xmJ730tewZIYz6lrkBYPkIjvCnZjbOht40
+ eDWFuVPH2B+DaM1n4xUs4ae50zT4kdLN3c6LntxSEC3NsPrfjwO2c+Wie5uYlTKsTk
+ eDGfPPq2olTQ3aqq7b9UB8av09po/OTZ7H0tPEPo=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([89.247.255.192]) by smtp.web.de (mrweb004
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0MJZLX-1jWCuG25Gd-0031lc; Mon, 11
- May 2020 14:26:51 +0200
-Date: Mon, 11 May 2020 14:26:41 +0200
+Received: from luklap ([89.247.255.192]) by smtp.web.de (mrweb101
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0Lj2QM-1iyW3a3W8s-00dFOX; Mon, 11
+ May 2020 14:26:56 +0200
+Date: Mon, 11 May 2020 14:26:54 +0200
 From: Lukas Straub <lukasstraub2@web.de>
 To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH 0/5] colo: Introduce resource agent and test suite/CI
-Message-ID: <cover.1589199922.git.lukasstraub2@web.de>
+Subject: [PATCH 1/5] block/quorum.c: stable children names
+Message-ID: <9df6b3723ec30cb749ceaa555d82a29a6d79496d.1589199922.git.lukasstraub2@web.de>
+In-Reply-To: <cover.1589199922.git.lukasstraub2@web.de>
+References: <cover.1589199922.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/YV7hbUDMAZhIGSqYwkB0cHN";
+Content-Type: multipart/signed; boundary="Sig_/ZDbrF3WtSLAYs8zlKZizAiT";
  protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:JCN1WQU/u4Sw7qVGrnjacK0WJRnT0GsAhvo9okb+ZiSt1eAaqO7
- snyPu6RCywCV93nczoSfK4SZY9FifHwCInYDubYwQGy70tuH3XLGrtvFYYAoTjVac8Wkamf
- xNjzOvHYamWGs7hcK11KeA0RV9bHuoSNtOo0w0ZTS6T1mbZG6/rhoYW/hwxAo2DwE4tUDhb
- 4PbwO+6JgSwat9r0CKNPw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:+cnAJbnDbqI=:b322e51DVd8McZYRQdz53y
- OsDCFLyUWNRENoXROxj+19z3DdS7GBWauWHiUlomgTcEZqLfAkDtJ65KMmRMZSeTeEXqWQYKD
- 9YiDBydALJY4cdFB9EH6sWklFc4wawCLlfb7XWuDGYQvbDRqopyTh0F2mmk21dbEQ0ImEjAqm
- ivQA7sMmoTCSgpsXT6Cg5+1fE51WK3VyrrFsj+tELWXgwsVKI6s6d+/58I4w0lVXQlQ6FqAJl
- QJ+ehsf9EXVnbLiw+gSYqYmSzI24V1vcMnmapA/sI4sEiKkCcrTVFK6QQCbNzpiJ9UI3m/s41
- knzUpxQCtN8FOse+LEzQ2wavoCtThSiuEJUfNWNuL4ZG+bvl46NOT7B1YX/gFiaDITUgycG0O
- MFMkq+beWDIX847RkMqcLldrnnZJgvB0jMwM8n/yxmr073vgI0cpbKf/h33LeHFf3HaWLC4t+
- bpMQ3U/R8dQCqNX8WwJSZWz2/ih1s0wBRB0RMFvbHdVWaPnlsSz7oJjQgjdVKKvhU+RA/7aQS
- BkJLEAo3xRqK9k6VHRKNGIsb1I7o2byi9NrmsQ32JcwI89GYP5/hXx9plCCjdsHQir3lTwojI
- kpZ9v3fOsIb2DZb5x9EHBOsWZwwcO3tHw+1fI/guiOFBaGHIOoy4+6xdOLhPGPDaRI6ShpHq5
- HKwbgIPKyJICaYjmdOH9GwF9CgMV+BbTuaiJSHqmzIXNdqvWEAz6blMQuiarb5DPV2Z7Kn2uN
- DQRku1bR9MNymOtNQyYbBLTZC7DBqmCuzC8aswQ/28RdUdz4AUval/AbbuBq2VyaacDPCYxqE
- oZDRLqw8ZGoJQCo/0CfOYPTVt2bs8r7Wya5wJN5COnCk4f6nRsJhgnJN4OJ/TZ+i7f7Gmhsup
- eM54zwHcE6XB5p94YSSxaXVm6H0EFdjHU3Kie3LUqHtvUyMchQKL8oKA0onzX/4AYaGUKTc3g
- 6sB9MrbVTWa4Mu5JBFwmRb13RqU38xwfyobnlvEUfbhGSK26Bua0A1qrGeuEyL2uSLIe2gdSP
- edqHP5BJrOnvjhmWpXbqW+p8YoJ5lC7xfNV3HBPhX+5E+DB5zI5pohc1Nkt3uwm5tOdFeuZrg
- HL3Xt8+shlJRhWLBLfWAPfDRsdq3nGbQLS/dmg/GGmKPMTMH2l1I1wp95HaIyNz74f2HNw7j7
- brXmydM569CJFl5ubqvZsubeQuf2VT14Zx97sUzvTtndo7QIqPaGZCtJiGLE9/dlp9oKru5Zm
- hHsLdRS1LaK/0XYfN
-Received-SPF: pass client-ip=212.227.15.4; envelope-from=lukasstraub2@web.de;
+X-Provags-ID: V03:K1:TIVVxpWm1nKnNCw1LaVnWP+BopzU4pmXBGarktqhyf4VbL2PC1h
+ fX0lSGW74sPyoioVMcuboJRiUuwmLGtga/dGV+fvAvSAlqTFvuamSSCsMI/rECblSUgda0m
+ HWIHAkEoFD9QxzTyMmLa3jmLRAY+NB06XIjLJ3DA5XGQPTpqkfhHyoacpmWQH4XRvyqDCTP
+ QlAGwS5V7paOlx7lvDDWA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:jMQYuGskO74=:QsZjYQRoZhUU8ABPzPUtec
+ omlYvTjl8TPNKEwLXvN6EhEaeKoQdPsAUwqzYgnWB1/4mUMJYG5CGhThDNLNyEpGFqErr9cEZ
+ IDM9vqG4sWFmXyCltSRycVEppt7eK69k/ZfkUIvXdbn8Jq8FFitRW5NGLrW9qkXkkRdwXsos9
+ Uaq9ygBp9W5bpju5vmHMSbUHaB1m/FZXOZyS5JdesYw2PUcm7i/5gCDw4LsLoi9oIYEtHqtvD
+ kD92rmqJxNn/aDGWzDw6MqdRfv8YnYAC5jmI/zPH0Qj7tVYpw2HcJBjj1oOyF3qA0cF91DAPY
+ U9AJhfDQmzereH3OaO0MDyZfLp0mswV4e8GqOjNsJEK4Q9t+8OD+vKCfXWxYBQLI1au17PATz
+ cNJH1Ln2X65a+YHyYZsts2xMODCTUeOXuoAqul/gy2I8BrQ0zjZV4ulg/JHVQBGE8AzqAeULQ
+ NNky8E7MJP0wKpMoWfnzMuixjkAOpkONgWu4NtpZznXGbmDTJHzsZxyrENqUXJ88sUXhsynTY
+ V2WGJ2UnKY+j6huoTq8fn38VvEUMk+RyON2tHY8plcJTUQeCPfP9zu250DDD8GdgLsfJxZ9UD
+ /9Kaw4y20uJGI/1xba0zhLOtdwAVoMBvGGxuKYQYcNsJy6Ws0MMdbGFpYkFpO+baX24ZOBDFs
+ Rx3QciJ7DfaJeVw8rXcPgq94tDjqxFRASIbJM2Fe8xyS0O2pibgTcbGRLcLIPdVBC5eCZBkoj
+ kwhGqvsNutYoT/c6SSlTcI8o4T2T/jHrd1wuTcIi142A3h3D8OSkljabcyrCbElD4DdyrQ+qP
+ vH7acm3HNnwExF+tfsQnzTG/rkX2YG8ntB5Tq78o/W9FAWVVVPVv2m2Ro/jWuzhO1DgsXmFqN
+ tZRnpXpqRK9CGDA24B7wTv1aZB3h/RkYZ2HKzPXkelio5TXrR67wk6PRlS+w39X/3qGbFDFP7
+ 295SHdXqgYOA2QNi83GCMNEiI1V9snRtUPc1WL2+BxhsHlvHiqBY4KhrcmgvcPmk8Cm/sB3or
+ UTUuiiGdcL4+63eds020bsN649lA4QLj6BI0k3uOYf8iPH/nMAaVIzPYoqJNx1HQ/k30bxjVn
+ YhdjuTAZDmtx18uLy7bBTkwak7zH78JjTGU9pWUrcHbdpgp/2c3xYfRKYvTZxPbOfp+m/NwOz
+ Ejkf9LxQGQx0MdBLGzbvtsXBXFj3QFGAMtln2yUmihCalH5zDhbnOtccevbGublD4rAdL3/YN
+ PE2J8UK+PBO3sW//s
+Received-SPF: pass client-ip=212.227.17.11; envelope-from=lukasstraub2@web.de;
  helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 07:14:42
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 07:14:43
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -24
 X-Spam_score: -2.5
@@ -86,8 +88,8 @@ X-Spam_bar: --
 X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,94 +108,117 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/YV7hbUDMAZhIGSqYwkB0cHN
+--Sig_/ZDbrF3WtSLAYs8zlKZizAiT
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-Hello Everyone,
-These patches introduce a resource agent for fully automatic management of =
-colo
-and a test suite building upon the resource agent to extensively test colo.
+If we remove the child with the highest index from the quorum,
+decrement s->next_child_index. This way we get stable children
+names as long as we only remove the last child.
 
-Test suite features:
--Tests failover with peer crashing and hanging and failover during checkpoi=
-nt
--Tests network using ssh and iperf3
--Quick test requires no special configuration
--Network test for testing colo-compare
--Stress test: failover all the time with network load
+Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+---
+ block/quorum.c | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
 
-Resource agent features:
--Fully automatic management of colo
--Handles many failures: hanging/crashing qemu, replication error, disk erro=
-r, ...
--Recovers from hanging qemu by using the "yank" oob command
--Tracks which node has up-to-date data
--Works well in clusters with more than 2 nodes
-
-Run times on my laptop:
-Quick test: 200s
-Network test: 800s (tagged as slow)
-Stress test: 1300s (tagged as slow)
-
-The test suite needs access to a network bridge to properly test the networ=
-k,
-so some parameters need to be given to the test run. See
-tests/acceptance/colo.py for more information.
-
-I wonder how this integrates in existing CI infrastructure. Is there a comm=
-on
-CI for qemu where this can run or does every subsystem have to run their own
-CI?
-
-Regards,
-Lukas Straub
-
-
-Lukas Straub (5):
-  block/quorum.c: stable children names
-  colo: Introduce resource agent
-  colo: Introduce high-level test suite
-  configure,Makefile: Install colo resource-agent
-  MAINTAINERS: Add myself as maintainer for COLO resource agent
-
- MAINTAINERS                              |    6 +
- Makefile                                 |    5 +
- block/quorum.c                           |   20 +-
- configure                                |   10 +
- scripts/colo-resource-agent/colo         | 1429 ++++++++++++++++++++++
- scripts/colo-resource-agent/crm_master   |   44 +
- scripts/colo-resource-agent/crm_resource |   12 +
- tests/acceptance/colo.py                 |  689 +++++++++++
- 8 files changed, 2209 insertions(+), 6 deletions(-)
- create mode 100755 scripts/colo-resource-agent/colo
- create mode 100755 scripts/colo-resource-agent/crm_master
- create mode 100755 scripts/colo-resource-agent/crm_resource
- create mode 100644 tests/acceptance/colo.py
-
+diff --git a/block/quorum.c b/block/quorum.c
+index 6d7a56bd93..acfa09c2cc 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -29,6 +29,8 @@
+=20
+ #define HASH_LENGTH 32
+=20
++#define INDEXSTR_LEN 32
++
+ #define QUORUM_OPT_VOTE_THRESHOLD "vote-threshold"
+ #define QUORUM_OPT_BLKVERIFY      "blkverify"
+ #define QUORUM_OPT_REWRITE        "rewrite-corrupted"
+@@ -972,9 +974,9 @@ static int quorum_open(BlockDriverState *bs, QDict *opt=
+ions, int flags,
+     opened =3D g_new0(bool, s->num_children);
+=20
+     for (i =3D 0; i < s->num_children; i++) {
+-        char indexstr[32];
+-        ret =3D snprintf(indexstr, 32, "children.%d", i);
+-        assert(ret < 32);
++        char indexstr[INDEXSTR_LEN];
++        ret =3D snprintf(indexstr, INDEXSTR_LEN, "children.%d", i);
++        assert(ret < INDEXSTR_LEN);
+=20
+         s->children[i] =3D bdrv_open_child(NULL, options, indexstr, bs,
+                                          &child_format, false, &local_err);
+@@ -1026,7 +1028,7 @@ static void quorum_add_child(BlockDriverState *bs, Bl=
+ockDriverState *child_bs,
+ {
+     BDRVQuorumState *s =3D bs->opaque;
+     BdrvChild *child;
+-    char indexstr[32];
++    char indexstr[INDEXSTR_LEN];
+     int ret;
+=20
+     if (s->is_blkverify) {
+@@ -1041,8 +1043,8 @@ static void quorum_add_child(BlockDriverState *bs, Bl=
+ockDriverState *child_bs,
+         return;
+     }
+=20
+-    ret =3D snprintf(indexstr, 32, "children.%u", s->next_child_index);
+-    if (ret < 0 || ret >=3D 32) {
++    ret =3D snprintf(indexstr, INDEXSTR_LEN, "children.%u", s->next_child_=
+index);
++    if (ret < 0 || ret >=3D INDEXSTR_LEN) {
+         error_setg(errp, "cannot generate child name");
+         return;
+     }
+@@ -1069,6 +1071,7 @@ static void quorum_del_child(BlockDriverState *bs, Bd=
+rvChild *child,
+                              Error **errp)
+ {
+     BDRVQuorumState *s =3D bs->opaque;
++    char indexstr[INDEXSTR_LEN];
+     int i;
+=20
+     for (i =3D 0; i < s->num_children; i++) {
+@@ -1090,6 +1093,11 @@ static void quorum_del_child(BlockDriverState *bs, B=
+drvChild *child,
+     /* We know now that num_children > threshold, so blkverify must be fal=
+se */
+     assert(!s->is_blkverify);
+=20
++    snprintf(indexstr, INDEXSTR_LEN, "children.%u", s->next_child_index - =
+1);
++    if (!strncmp(child->name, indexstr, INDEXSTR_LEN)) {
++        s->next_child_index--;
++    }
++
+     bdrv_drained_begin(bs);
+=20
+     /* We can safely remove this child now */
 --=20
 2.20.1
 
---Sig_/YV7hbUDMAZhIGSqYwkB0cHN
+
+--Sig_/ZDbrF3WtSLAYs8zlKZizAiT
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl65RIEACgkQNasLKJxd
-sliRBQ/+M8ZHJRk0YYjsL6HgKCRvX77rGkonQSdYnG4bn8s4OI72LXT3R2Buttf9
-P3NJHxpvFiRd/WjMnsyn7SgoaajAWzelTH+2JWPkkPXOy3+4o1PJZ7KkbQ3rIFVw
-IsKRZXFCNs0dFuGkdJ4unuI0yu3aX5RIIpZJmpUyBK/C92Jda5jeR6K9tneO/khP
-YN9qZskLiMpF0l45k7lLQrqt75xiZq6mvBm+UiZSb3o79b5j7l+tkHfGWTpAJfZi
-R+9NYWATI3R9Gy4mkxY83RtiH2RLZpjCdMzgBG5Ch5B1P3ESCvs6llHZSRPyPQal
-39SVqkjB1fZmt8M5jjzun8Bwd7HAlJeqgQwClZc4nOgqJhXRf6gmWvwd2U0ZvMpU
-46RACHCDwJvrqHNJkqzZpCuUHLOYXRtJn63ohDXKHyHRHT6J3yg8nAU147+tzhW8
-9BKY/XWHnLiRWy4LNBtNV7kgS9lJBNd4HKFrcGF81kHN8QuNB7f3xkXyCgXqqFID
-HyhRqcotEjRJwAO9NTPqb/k3tOATSc9/5N2gOhUqpcKupIzBToESczwpyB1Jfy4c
-bZ42Bm0uQvHcwk/QDbC3w/ySzxOBviavhfRyUfEBFdOvv4HlYtKmOgtihWvj4aTY
-pRlM0Si+Ywutz1+jdOkhNLmTfGSLo0SKJsX0U0osCAcDXuy3zu4=
-=3IzG
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl65RI4ACgkQNasLKJxd
+slif0A//eBbTHuzq4a3GtIT2Lid2N6ET3RA7RQTK2POcO9Iu96D9UHMNBZri0Zti
+69kXkOO1ED7fVh0wIeviH+H+zl9+DZcMlN5zUYmaixlrdA0I7ycTA6qUpbktcwUW
+rV+VDHVvBS1T4mtjmHezIz7knRpLhpQceis5RgG3xUogKcI1F3t7PqcijdVRoFOR
+IbcW4Fe4xdr9jOah0/JpEv9uIbHsZXKBnLTwXJeEpMcZvbUzMMzCRJZ2Q5QNfcsC
+WxCQrubUxXENuVKlMRA27M4MGUh1toWkolbTnYaiaOYiFrmwnhz70xCGAcDJhlt8
+guqetZciH9f20fp+z/d0yINvU8G+XELFlh5JKpPpmA9ykcp4gvPj4zhpJ0ercg/J
+GYRzyKWUJdF/vIdsnr2wR253DHmM9/8VK7gVPDyQSVS3TeSn0auX6F5YVFO5dcug
+P56aPyFZ97Pz96OOjobpA6u/tUR3rpTgTPq8Sqx71xI0JBvJJZfwaddxGzz+yCQ8
+etlp73DXCRCdga1PEQw5NXfk+QKws+tM1Gr1Pmuf6LZGe6i0LktwbDyvzfFwYYYg
+g1mU8sY9EpA7r5DLHKMflaWcQy6P4G3O8OQiKl9VMdYzs+weA2nZJaFhnyTeRzrg
+h94LjoNgUhPzKKtCkZ+iiw+bTU3wXceyZaCjw0+VUQCrI0XB+Bg=
+=iZVd
 -----END PGP SIGNATURE-----
 
---Sig_/YV7hbUDMAZhIGSqYwkB0cHN--
+--Sig_/ZDbrF3WtSLAYs8zlKZizAiT--
 
