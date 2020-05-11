@@ -2,58 +2,83 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.8 required=3.0 tests=HK_RANDOM_FROM,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SUBJ_OBFU_PUNCT_FEW,SUBJ_OBFU_PUNCT_MANY,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6F0FC47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 03:52:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15961C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 04:05:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC42320720
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 03:52:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC42320720
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id CED542075E
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 04:05:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aaiz465d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CED542075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jXzUT-0005QH-PT
-	for qemu-devel@archiver.kernel.org; Sun, 10 May 2020 23:52:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42720)
+	id 1jXzhT-0003bC-21
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 00:05:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48568)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jXzTw-0004zz-4E
- for qemu-devel@nongnu.org; Sun, 10 May 2020 23:51:56 -0400
-Received: from relay64.bu.edu ([128.197.228.104]:58512)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jXzTt-000682-Ni
- for qemu-devel@nongnu.org; Sun, 10 May 2020 23:51:55 -0400
-X-Envelope-From: alxndr@bu.edu
-X-BU-AUTH: mozz.bu.edu [128.197.127.33]
-Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
- bits=0)
- by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 04B3pZNV027134
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
- Sun, 10 May 2020 23:51:39 -0400
-Date: Sun, 10 May 2020 23:51:35 -0400
-From: Alexander Bulekov <alxndr@bu.edu>
-To: qemu-devel@nongnu.org
-Subject: Assertion failure through vring_split_desc_read
-Message-ID: <20200511035124.v2ff4f5gyfh6xlgc@mozz.bu.edu>
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jXzgp-0002ee-Lc
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 00:05:15 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36012
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jXzgk-00031I-6o
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 00:05:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589169906;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=fyFRwCc6QxaUaElcPQY1UK+XmfhSoaN7N7ZlRv46jlQ=;
+ b=aaiz465dYtFt+LKybO21WsiX2hsqpjv3PdN5G0TGnNs2TywaoqGHfrQXAArQv50lBS9hAV
+ Fw5NYcYzGORq2FGGgMirSqoWTnL5UHEMY1MVjvJwHsmNpbIZaKmwF8u4k2SJCw+GN8wWqY
+ Jf74vTqScKyJ3p4xmEgCqhEqVIwBvQ8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-340-4bZG_wYLOSmfaQOsQULkiQ-1; Mon, 11 May 2020 00:05:04 -0400
+X-MC-Unique: 4bZG_wYLOSmfaQOsQULkiQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CE02461;
+ Mon, 11 May 2020 04:05:03 +0000 (UTC)
+Received: from jason-ThinkPad-X1-Carbon-6th.redhat.com
+ (ovpn-12-137.pek2.redhat.com [10.72.12.137])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 967E11001925;
+ Mon, 11 May 2020 04:04:55 +0000 (UTC)
+From: Jason Wang <jasowang@redhat.com>
+To: jasowang@redhat.com
+Subject: [PATCH] net: use peer when purging queue in
+ qemu_flush_or_purge_queue_packets()
+Date: Mon, 11 May 2020 12:04:53 +0800
+Message-Id: <20200511040453.23956-1-jasowang@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: NeoMutt/20180716
-Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
- helo=relay64.bu.edu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/10 23:01:23
-X-ACL-Warn: Detected OS   = Linux 2.6.x
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
- RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/10 23:06:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -67,36 +92,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: alxndr@bu.edu, qemu-stable@nongnu.org, qemu-devel@nongnu.org,
+ stefanha@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
-While fuzzing, I found an input that triggers an assertion failure
-through virtio-rng -> vring_split_desc_read. Maybe this is related to:
-Message-ID: <20200511033001.dzvtbdhl3oz5pgiy@mozz.bu.edu> 
-Assertion failure through virtio_lduw_phys_cached
+The sender of packet will be checked in the qemu_net_queue_purge() but
+we use NetClientState not its peer when trying to purge the incoming
+queue in qemu_flush_or_purge_packets(). This will trigger the assert
+in virtio_net_reset since we can't pass the sender check.
 
-#8 0x7fe6a9acf091 in __assert_fail /build/glibc-GwnBeO/glibc-2.30/assert/assert.c:101:3
-#9 0x564cbe7d96fd in address_space_read_cached include/exec/memory.h:2423:5
-#10 0x564cbe7e79c5 in vring_split_desc_read hw/virtio/virtio.c:236:5
-#11 0x564cbe7e84ce in virtqueue_split_read_next_desc hw/virtio/virtio.c:929:5
-#12 0x564cbe78f86b in virtqueue_split_get_avail_bytes hw/virtio/virtio.c:1009:18
-#13 0x564cbe78ab22 in virtqueue_get_avail_bytes hw/virtio/virtio.c:1208:9
-#14 0x564cc08aade1 in get_request_size hw/virtio/virtio-rng.c:40:5
-#15 0x564cc08aa20b in virtio_rng_process hw/virtio/virtio-rng.c:115:12
-#16 0x564cc08a8c48 in virtio_rng_set_status hw/virtio/virtio-rng.c:172:5
-#17 0x564cbe7a50be in virtio_set_status hw/virtio/virtio.c:1876:9
-#18 0x564cc08d1b8f in virtio_pci_common_write hw/virtio/virtio-pci.c:1245:9
+Fix by using the peer.
 
-I can reproduce it in a qemu 5.0 build using these qtest commands:
-https://paste.debian.net/plain/1146089
-(not including them here, as some are quite long)
+Reported-by: "Alexander Bulekov" <alxndr@bu.edu>
+Fixes: ca77d85e1dbf9 ("net: complete all queued packets on VM stop")
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ net/net.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-wget https://paste.debian.net/plain/1146089 -O qtest-trace; ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -M pc-q35-5.0  -device virtio-rng-pci,addr=04.0 -display none -nodefaults -nographic -qtest stdio < qtest-trace
+diff --git a/net/net.c b/net/net.c
+index 38778e831d..9e47cf727d 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -610,7 +610,7 @@ void qemu_flush_or_purge_queued_packets(NetClientState *nc, bool purge)
+         qemu_notify_event();
+     } else if (purge) {
+         /* Unable to empty the queue, purge remaining packets */
+-        qemu_net_queue_purge(nc->incoming_queue, nc);
++        qemu_net_queue_purge(nc->incoming_queue, nc->peer);
+     }
+ }
+ 
+-- 
+2.20.1
 
-Please let me know if I can provide any further info.
--Alex
 
