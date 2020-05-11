@@ -2,93 +2,91 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC211C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 11:15:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 300FDC47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 11:19:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8599A20722
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 11:15:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E957220722
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 11:19:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="FrZNULWn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8599A20722
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="pInkQOOT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E957220722
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY6Ow-0008Bx-HU
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 07:15:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54862)
+	id 1jY6SZ-0002du-VQ
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 07:19:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55790)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jY6Km-0004pX-S6
- for qemu-devel@nongnu.org; Mon, 11 May 2020 07:10:56 -0400
-Received: from mout.web.de ([212.227.15.14]:37461)
+ id 1jY6OS-0000LJ-D7; Mon, 11 May 2020 07:14:44 -0400
+Received: from mout.web.de ([212.227.15.4]:55247)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jY6Kl-0005kY-Ui
- for qemu-devel@nongnu.org; Mon, 11 May 2020 07:10:56 -0400
+ id 1jY6OR-0006pA-Hm; Mon, 11 May 2020 07:14:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1589195446;
- bh=lr/pPkNofIIuTpKiKjKXeB6X0Y9xXQrBIpptsOBfeRk=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=FrZNULWnieRFZbW0K0iphENSVAphL2UkQG73vpDD3Iewos0HO4wv6rq7GScYCM4uP
- VSWYlFArTUOcG6SFyImx9cf7WqdFSbEcUcW+H6k4oby0eP/BK8Gh1lcwE8LmtjfTxW
- 9tJWstkk0gD7bwemTmJZEzPFY7cjcU9teL2OtM5M=
+ s=dbaedf251592; t=1589195675;
+ bh=humdI/22fGDkxx2xF+0v4LcfHfCCcq0p3L3ORQdAD7g=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
+ b=pInkQOOTMVzmBpxt0ZNcMjV6lPnjiQZZ3QrnzEJHsiBbw/jj7qdBKjMyagLVC6NAL
+ fnT4frnhhgv+FNFCqDzgLqT86nePBiaz1mIIPpWgJk4TBgDOyGYO1vVeuJBqd+LKGQ
+ 6+zw+XWVJN1oy6ZBp58KeKszQenFf+4fR5PSH4Qs=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([89.247.255.192]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MP384-1jkGUc0NX2-00PJnB; Mon, 11
- May 2020 13:10:46 +0200
-Date: Mon, 11 May 2020 13:10:44 +0200
+Received: from luklap ([89.247.255.192]) by smtp.web.de (mrweb004
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0Mg1Nl-1jmBIM1olp-00NTI9; Mon, 11
+ May 2020 13:14:35 +0200
+Date: Mon, 11 May 2020 13:14:34 +0200
 From: Lukas Straub <lukasstraub2@web.de>
 To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH 1/6] migration/colo.c: Use event instead of semaphore
-Message-ID: <fd601ba1beb524aada54ba66e87ebfc12cf4574b.1589193382.git.lukasstraub2@web.de>
-In-Reply-To: <cover.1589193382.git.lukasstraub2@web.de>
-References: <cover.1589193382.git.lukasstraub2@web.de>
+Subject: [PATCH 0/5] Introduce 'yank' oob qmp command to recover from
+ hanging qemu
+Message-ID: <cover.1589193717.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/Kna/+rVkdeScDMcGFaah8Ao";
+Content-Type: multipart/signed; boundary="Sig_/fMdxexITl0+PoIdGC8dHkWa";
  protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:IgsUpe26+RxTYtih8/sHO9Aaw+7fLFEYesdd2zvwqcfQnmTUF/S
- cVX+5scOUPDxUiGgZuJVXn58se/h+sKUaWxARTWDKY0tkqbAAd1bs9jMdyHN6nBF3viRRtK
- ZyDCjN59WsLUtTU73X/J7BUUCLRMo4Hdk5Np+ayMYettrE6Wo3L7NYdEIZ+q6d1QCw43zxE
- lR0+Q9zW1Vrf0JY70gNMw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:a5BOynFPUX0=:2WH5QN2UOyxl1OeG14MS5e
- gL+KaVxRx+wKnoslNzOx5Yf2O97mxSrzLQxz28Se6p5gp0Gok2lY/HnTHkqntrlAasdrT2mHn
- LTrYvdtoKywcC8e21aYM8qNToDqeBAfiz9zMrUyg8GX7oIbBuyUVJBLfzhJEAb0RW0pxp90V4
- oABcKtlF5xdvUwwc6d6tZ3C+5fz7CBe/nvNBlvaBe7g9tQrdMJZUKbgOy80AVi9dLf+QhfYcy
- AAAxzlS32rrw+4lgodySlwlqXo8ljfEru7jsfR8EbXayqXOpZoo+cOcQ+3BGKw6ygKM9DdPSB
- Eps6YeWwAn/ecZZIdUklbcpd9SWkIC5FcQzDmZmneoV7SEwt7XsNu44H1szCAkDrEbKE7Iun3
- kk1miM0xUFUkgh13em3Ptbn80O92adpUQ5HJefc/h55lEHODJ2jAPyjCDnGZEhWI3TLJmWAXh
- LNI80l7tLbdBCVDtyZZ5voRl27vmm1OlJBWUnYPSMUonUgeRp6JCJt7XHOfutkEGdJF0yO1ML
- gYGoIZ59w7Msp2/wCwTv85Y8VErQDaBtucjB8uF+7ODl1P4oJTf9faKbOPYi1ndow6HKgHhY/
- BTV7Fb70EX6y4ox7XinSJOBiDRJsuz490XJLVoNeixVwKobvDttKn0YKIflG0AaKHk4J6ym15
- AnXQpbj5kBommwkEOEHFO0x5KnN2WqQOaGnL/Q3j/ad2bR2b3zSKS8dsJLHxzHtVxrCGYnP0W
- ogorghPzBxGEmUg3VjxsJloW+o08U6pBmMH7TFKUIJbWG+sgy9xEF/HVjMvNji11cgujGkTzV
- oKrYIbYi5iD7LOjOy3OYgwshTTRysjk2Q9lkvEiAAWki0H67XDwN5Tt+1HLcOv+sQr5fV8XkI
- HF4NRnxJgOA95u6glZ7tqSGflq69aD8YLFfyIaXiJOtP8OwHbfR8WsN/Z3dyN3wr2YXcqSNOP
- eXmcJc1V76jSOwb6JQrgwR8HD1nqvR8DfvhTiKcvJAOSDOAw998LST4sN0LpCGXp9wE5J1RfS
- X9l92snOanDL7u756NIbUTR2T5QvoVvd4dmQp/ZFB9N4dTF9tZG6AYiJqGUtfUvCiJnZZcEXZ
- ++4ATsTnTycROL/2frnlsqLuVl48g4Kj10ndjT7k/HfjazhqZA8vQVfGION88P4Y5RBq1cH6D
- p5e4VN3Q1rWEC3T1RDaffe6OqMzqLQFFT5XUE9yYuCmMuOctuSNOWS1JS0Zd5MEoQh0W91Nvs
- i5SK+GcAMUYGfvmoD
-Received-SPF: pass client-ip=212.227.15.14; envelope-from=lukasstraub2@web.de;
+X-Provags-ID: V03:K1:6elkNXNr4kWfEFTrZ3gagqstdgKNhVOyO0SqbBkIjdy4hgrq4p+
+ mdUaHHD8Bt+nHFAoZNPKFoRsWGklP2I7hnZ/lWGGnD5y7R6z+LKXG85pJPdB0gAV+7B2vBU
+ x+Q3Sb9ndhvZYSqI4ArrcDbKPYa7NJkiUy50Lhhb9SGxKbKEvCNxQW1NaNOhzyLxaAyJc64
+ eNpHrbgS6zoavmkQZ/xUw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:aF49x4xSdsw=:jye6um4kS5q8sE6+LkjlzF
+ jw5+fCTMCTePzp686y3DsAeL6Ac7bHN0K7h673T9djzGoslatbPmYylJJc8x0aVPQUi0ZE7S5
+ 5JYO+RYS9WWNNcAtrbf/MD5Qx53xERlgEcCRMHy0hldkehpwlOvJx+nYbKNusPHkJLCqwc5NJ
+ 0rmyQ3wmxEbPr3/ezEiGljQvxog2izilSc9PkSxm89fYSHcYuUU3pUu8DgzuLm7EtnstSvjJ6
+ x9MepwdhzTct1ACGRUlfbn0AXeGISfCUNx8AgXNAwVkFkvapNQVo8iPbN6qhdR32Kq3NgE/Y9
+ rmIvcTYNyJ1rzYR6N5BGtZdJsghk7mKteKxZZL3sUUMaxGzsWKaXdQRVHOw68oHhgtbidmPMZ
+ W++ipZrYXpjzHTKmuQ4Zq5xCAHljytvCAkPFnOA2j6a8iwlrrE48ksShDljAlS0fHZqVA5cJ7
+ dX4KmgO5MgckaRC1rbHTilCt5vvWX6EP+4KjUfT7H1V4ACVgokG9y+7/bgCxqdQkZhWO0+KBx
+ os329HyqyfuYxurz9TLft0dd99VsfSYr5K4hdDmwF1/gStejRYYZaiPLXu5yJjxdIPJ/sThaX
+ jDFnZ65rxbAOmrG/K0R6766K2TyMAbwCNQq1Ri9fc25iYXXLhR+3hvhHvQzq5SysYomOcF7Ys
+ zmYO31Wy6ovfNENsULZHp5B1LOLcscMrnuj4gCLM/TJ+sDb8/02JgXRojQafM0aT2r9vyyZXG
+ 3d2oqb1aZVRJWZ03E09T8FnCs9hXfxyqibktqnxF6jwMPcZ4Xt/F9Pwnk86IBQB/ZDs8HNnO6
+ 48suFFa1IuAQ27nmAu6Z89FcOmkjL4IhE4rcxBz9t55/lpwydSKulI50xo0rjeeGQRQNCLBNh
+ p6uv51EcMCcJ1Si0yzMNXPhY2zz5xeyEhHQn1PwSEcYKAEsjcWvuZ6+yJLz1A7leLQ5CcC/on
+ Civ9XZ/kHG+x9HGSC4xAfWWKYJZ9USpOgdvCbsO9f/DNbW79I4DizSuE03uNFog+HYka47OJB
+ 1ELICu4+5nJYFLrMXXtAzhCFwmojIeoGvG2ZMVUtdqYu+Md3Ph6Bqym2KQ2kc+/kfqJRyjHdG
+ K/6FYxYhSMio7XupVVe4pMHLGEgrR6SW68rfPLSTzWKKcV59rcSpoDgNWLFky/NbL8x/NYKLz
+ Mcfvzbm7mNdZyiM3JBWDhf1kJdC3Hi4mVzme7MnXtAunWiRMPt6IKCYhgvEOandu2zlNAZd93
+ JtiVbaDkK+SxMDCoN
+Received-SPF: pass client-ip=212.227.15.4; envelope-from=lukasstraub2@web.de;
  helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 07:10:54
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 07:14:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+X-Spam_score_int: -24
+X-Spam_score: -2.5
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,129 +99,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Juan Quintela <quintela@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+ qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan
+ Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/Kna/+rVkdeScDMcGFaah8Ao
+--Sig_/fMdxexITl0+PoIdGC8dHkWa
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-If multiple packets miscompare in a short timeframe, the semaphore
-value will be increased multiple times. This causes multiple
-checkpoints even if one would be sufficient.
+Hello Everyone,
+In many cases, if qemu has a network connection (qmp, migration, chardev, e=
+tc.)
+to some other server and that server dies or hangs, qemu hangs too.
+These patches introduce the new 'yank' out-of-band qmp command to recover f=
+rom
+these kinds of hangs. The different subsystems register callbacks which get
+executed with the yank command. For example the callback can shutdown() a
+socket. This is intended for the colo use-case, but it can be used for other
+things too of course.
 
-Fix this by using a event instead of a semaphore for triggering
-checkpoints. Now, checkpoint requests will be ignored until the
-checkpoint event is sent to colo-compare (which releases the
-miscompared packets).
+Regards,
+Lukas Straub
 
-Benchmark results (iperf3):
-Client-to-server tcp:
-without patch: ~66 Mbit/s
-with patch: ~61 Mbit/s
-Server-to-client tcp:
-without patch: ~702 Kbit/s
-with patch: ~16 Mbit/s
+Lukas Straub (5):
+  Introduce yank feature
+  io/channel.c,io/channel-socket.c: Add yank feature
+  block/nbd.c: Add yank feature
+  chardev/char-socket.c: Add yank feature
+  migration: Add yank feature
 
-Signed-off-by: Lukas Straub <lukasstraub2@web.de>
----
- migration/colo.c      | 9 +++++----
- migration/migration.h | 4 ++--
- 2 files changed, 7 insertions(+), 6 deletions(-)
+ Makefile.objs               |  2 +
+ block/nbd.c                 | 68 ++++++++++++++++++++++++---------
+ chardev/char-socket.c       |  8 ++++
+ chardev/char.c              |  3 ++
+ include/io/channel-socket.h |  1 +
+ include/io/channel.h        | 12 ++++++
+ io/channel-socket.c         | 29 ++++++++++++++
+ io/channel.c                |  9 +++++
+ migration/channel.c         |  2 +
+ migration/migration.c       | 11 ++++++
+ qapi/block-core.json        |  5 ++-
+ qapi/char.json              |  5 ++-
+ qapi/migration.json         | 17 +++++++--
+ qapi/misc.json              | 15 ++++++++
+ softmmu/vl.c                |  2 +
+ yank.c                      | 75 +++++++++++++++++++++++++++++++++++++
+ yank.h                      | 12 ++++++
+ 17 files changed, 254 insertions(+), 22 deletions(-)
+ create mode 100644 yank.c
+ create mode 100644 yank.h
 
-diff --git a/migration/colo.c b/migration/colo.c
-index a54ac84f41..09168627bc 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -430,6 +430,7 @@ static int colo_do_checkpoint_transaction(MigrationStat=
-e *s,
-         goto out;
-     }
-=20
-+    qemu_event_reset(&s->colo_checkpoint_event);
-     colo_notify_compares_event(NULL, COLO_EVENT_CHECKPOINT, &local_err);
-     if (local_err) {
-         goto out;
-@@ -580,7 +581,7 @@ static void colo_process_checkpoint(MigrationState *s)
-             goto out;
-         }
-=20
--        qemu_sem_wait(&s->colo_checkpoint_sem);
-+        qemu_event_wait(&s->colo_checkpoint_event);
-=20
-         if (s->state !=3D MIGRATION_STATUS_COLO) {
-             goto out;
-@@ -628,7 +629,7 @@ out:
-     colo_compare_unregister_notifier(&packets_compare_notifier);
-     timer_del(s->colo_delay_timer);
-     timer_free(s->colo_delay_timer);
--    qemu_sem_destroy(&s->colo_checkpoint_sem);
-+    qemu_event_destroy(&s->colo_checkpoint_event);
-=20
-     /*
-      * Must be called after failover BH is completed,
-@@ -645,7 +646,7 @@ void colo_checkpoint_notify(void *opaque)
-     MigrationState *s =3D opaque;
-     int64_t next_notify_time;
-=20
--    qemu_sem_post(&s->colo_checkpoint_sem);
-+    qemu_event_set(&s->colo_checkpoint_event);
-     s->colo_checkpoint_time =3D qemu_clock_get_ms(QEMU_CLOCK_HOST);
-     next_notify_time =3D s->colo_checkpoint_time +
-                     s->parameters.x_checkpoint_delay;
-@@ -655,7 +656,7 @@ void colo_checkpoint_notify(void *opaque)
- void migrate_start_colo_process(MigrationState *s)
- {
-     qemu_mutex_unlock_iothread();
--    qemu_sem_init(&s->colo_checkpoint_sem, 0);
-+    qemu_event_init(&s->colo_checkpoint_event, false);
-     s->colo_delay_timer =3D  timer_new_ms(QEMU_CLOCK_HOST,
-                                 colo_checkpoint_notify, s);
-=20
-diff --git a/migration/migration.h b/migration/migration.h
-index 507284e563..f617960522 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -215,8 +215,8 @@ struct MigrationState
-     /* The semaphore is used to notify COLO thread that failover is finish=
-ed */
-     QemuSemaphore colo_exit_sem;
-=20
--    /* The semaphore is used to notify COLO thread to do checkpoint */
--    QemuSemaphore colo_checkpoint_sem;
-+    /* The event is used to notify COLO thread to do checkpoint */
-+    QemuEvent colo_checkpoint_event;
-     int64_t colo_checkpoint_time;
-     QEMUTimer *colo_delay_timer;
-=20
 --=20
 2.20.1
 
-
---Sig_/Kna/+rVkdeScDMcGFaah8Ao
+--Sig_/fMdxexITl0+PoIdGC8dHkWa
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl65MrQACgkQNasLKJxd
-sliVcw/8D50GNVwZPQNWlOZYCw3KdAv/+sqNEICRAfB4eY/1ZJxTOjp1au/hr+6Y
-ohtp1Gqu+EBONR2LuXrjB1uxsRfFOcJwFPQaolcnqr45Gs7FcpTlc6iHl2DXUx9U
-VoNmL7LUd5N8HgmSlLIIapFdCyf4dt4pbRlrx8VLSQQYUXHBHr5HLXEhTTOloyd8
-Oj6zE5H8pA7+1OnDuSxcwZLACEg1nbgB5Dx2RFWddv7fwPgdaH7sGpEv8REkhzcX
-pp0P0OGfz1ToQTUY/+9SZn1JoY7aveUor0PYXQkglo0pcU9+R7nzJNNQQN5DXYIk
-mQXAyWTOQP11oZR8VYLVVGdq+9Vh4+6B2pRv4kCektomyzMTDkWkDCCHdO+x9S3G
-0rJV9GnSsyrHtUrns3T1f/fLUnu+IMU37X4N2BXBmHzUy/3yopUjOAPJRprrxwn3
-gGQ5F4bMrUlb+6MU/1w7CbNRCc2NP0PvJX/CildtOQLcZvWceaU/Z4YWqOsEKAyg
-JyDSbeEXDFhbXR65znJPqyO8tSuNTmt/IeLuyqASSChvOxBp6lxl7bChn8ibIKOn
-NJ8gAYCMHNH+vJat5L0gIEYdAnovv1BU8qvYLkllk2dYjEQoWJDSeGM+QCerE5aA
-Pj8CyxOFLbepVPsKrN7NcC9X9sRoByuHz8wx2Y5sLvmpF/5eI/A=
-=BbpI
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl65M5oACgkQNasLKJxd
+slgLVw//RrE0dxe7099otWYb0fLRtBKW/pknxHtMLHH5VrhumzeW2Bz+yJlg7kZa
+axZkYRILyfZH0xMmL92dI51rMuSUBz+xlzzBSH3yp4lIuK2PqpQYvUOq02nwvggU
+NdKanbPVUGw0FuKgRUO3X1UDBSsJ9Nc1mvfPwtJl+ZjxkfPwdfemuDibJ9Fzagn6
+iI2rBdSnSDumSw6TL5m9JYWx8OlHWonwrBntr/HZUL6CoOKcH9xiY/Nv4dtdNgfy
+FIdChCrE/gpVAwsF0VOrOEhzX4Epgc7rcvgJfopxou6Jrh5PcrS43sqoDufrVuQx
+QSCYyGzmkKLbAJNtq20IIbxXiejDY+6ASc8rRVq1S9FtXKzlYyu7RJyXYKiKoR2H
+uflSfMZ0AgS9lBFg/DNfDoeL4bhOBObaZpD6Mq2kL1AzdiTRdlMu1uLEPl1EC+RK
+bjfn14Sk3teNtPuuScc9hqLwSqEier0iI3OF+7MAo70E3HGctYIIKhN9/sXye0DX
+gFqY0n4piqwjPmlPVAcz6XtxxBfehWocRI3alK7PEj/0cFFNwRYp5WSWfYkqWeDJ
+keHPvCF/v4xxEQWSE8hXLHkMf7lOttT7P4uSDocYDxx94EK5OHog4FwFvbt/1kGG
+0j0m3pJqanNy4dIuq8MnzBAAaEiY6VtVNjl926S5EVI+Q+TM0Jg=
+=b9EB
 -----END PGP SIGNATURE-----
 
---Sig_/Kna/+rVkdeScDMcGFaah8Ao--
+--Sig_/fMdxexITl0+PoIdGC8dHkWa--
 
