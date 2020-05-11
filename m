@@ -2,117 +2,86 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7DA8C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 18:44:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D9A5C54E4B
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 18:54:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D7E6206E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 18:44:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D7E6206E6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id BF341206DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 18:54:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SUJXoaGN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF341206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYDPM-0006Wg-MP
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 14:44:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45888)
+	id 1jYDZg-0004py-Uw
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 14:54:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48018)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jYDOi-0005oq-DV
- for qemu-devel@nongnu.org; Mon, 11 May 2020 14:43:28 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:57177)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jYDOg-0006HF-Hv
- for qemu-devel@nongnu.org; Mon, 11 May 2020 14:43:28 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1M8yso-1jVRi7304s-0069kk; Mon, 11 May 2020 20:43:17 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: chengang@emindsoft.com.cn, riku.voipio@iki.fi
-References: <20200315122051.9360-1-chengang@emindsoft.com.cn>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Subject: Re: [PATCH v2] linux-user: syscall: ioctls: support DRM_IOCTL_VERSION
-Message-ID: <15f9b7ec-5608-a009-1be7-42a351a9e93f@vivier.eu>
-Date: Mon, 11 May 2020 20:43:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jYDZ5-0004FM-Lh
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 14:54:11 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43108
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jYDZ3-0003Ow-PA
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 14:54:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589223248;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=lxUEpnoGmBlrNvpojO6UPdi9lfXu5blAZvXopWygE5M=;
+ b=SUJXoaGNfC2oCS82yiAF0rqhWrpaN4O44mtRuxZKB1+/CYuqOPZTw+8MvqtVCrz+Ht1RYw
+ VY6KLMmr+fWCxMot/7QCWmyMD20GD5P7dwzrRt73Mf63c8/pvl/4dnaF6QLt4uZ6IxbFSS
+ nVv30ces6aIwO3ltxOCnoOS5A+MZJpA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-508-xA0VL8rZNhOlfgIdam-REw-1; Mon, 11 May 2020 14:54:04 -0400
+X-MC-Unique: xA0VL8rZNhOlfgIdam-REw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B9A8A107ACCA;
+ Mon, 11 May 2020 18:54:02 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.7])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B27376606E;
+ Mon, 11 May 2020 18:53:55 +0000 (UTC)
+Date: Mon, 11 May 2020 20:53:52 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Ani Sinha <ani.sinha@nutanix.com>
+Subject: Re: [PATCH V2] Add a new PIIX option to control PCI hot unplugging
+ of devices on non-root buses
+Message-ID: <20200511205352.05ff541a@redhat.com>
+In-Reply-To: <1588069012-211196-1-git-send-email-ani.sinha@nutanix.com>
+References: <1588069012-211196-1-git-send-email-ani.sinha@nutanix.com>
 MIME-Version: 1.0
-In-Reply-To: <20200315122051.9360-1-chengang@emindsoft.com.cn>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:+9fjx8nGNRja50TAwaZLwmRDzqbsjy5ejza20Y3B4K2yLB/8NmW
- DcgaXw52PGoKTyjwM8cUiE2wGeKMp43iCwzGdfRmSrbGaFdAy4+CXlonJepdMLxM5bi1inb
- 00+VqiDanahn6ZRwtVj5S/0Q1aTS2QgxpxmTXJrVMtHG3pPcE02QxauguU/TxKcprxRQPa5
- nEALxp/CgC3XjIrmPeqiA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:y0atP7VeElE=:YMWeslpId+rg7H0BrlZrUF
- HhJPCwaFkDo4Qz2BwoYw37gELGPFTMAv94SiZf3XqpcZDKj2C6Fc9+gOo2IoZljqSysWOf6nB
- XD7dUe5nrxqPP30vx5pRKIhk074SV5Xx3bcPP7WoFoU5QDvo9vf5i/KbRucjtKzG/XJA/5vcx
- 9gb3pLHyUnkFANViCnFzjvonxfWGgOeK6M33gz3n06zEA5uUHMfG1c8hS/KgLgVJYPymmx+CW
- J98kY57hwApBQyCg1B5pSQoEi4EJPeIv30ruClQsUu6vDHUJS7eHUnwoM4K0RE6unKvJAJ6xR
- w0OrizLLjSC4yiHGU+MDV6DajgpZot1YDAbHxiZYmC11g3xP8+r+6Pegy220dGVHE0t8sTjv6
- DGP+istONjNpG3G3CUZ9760YemR07JIgnAniju9dlGMYXwbQ4Vtg8HPBuJvoXRHeY1OsLBAcG
- wNY8FP3Ew+LETwK8sUTjyJ2gBGWQwEmGYAEgk2+PzcPezMSDGGoSJctoQvqO9+XTd0zE2py2v
- cbHODmwB3bn20RaqPGFqb5xd2+drlM20Hj5WuKPfQPp+P+nmC9t6GGCFWxCJ/V3s0NUMtiBlx
- F+hBneSLAAAkhHRVmqSmMltpvYBREWoONkV3Yh4ay1VeUeIkkglnBuBEWrGHpDRR/gPPZJn4R
- oxL0NNHgLR5LIKzbP8GF3Y3Oj0YVst4RJnPhWqubHi8xoDbG1HOKsPESjq3D4hmXnHc5b+qnP
- JKIjCnbEo8/ZSLPFHcSJqfVv9imxdf5f3b/Rbw0KJM8WS4JOOyS8eqUeWUV5jHjyXhjiAsbCz
- /70LST7AOQHNIg4XQLZClPGjQMBGw6xRKGHf19t4rbEeE9a0nmfRFNu0eHIl1CYZ55IRdn4
-Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 14:43:24
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 03:10:56
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -125,139 +94,255 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael
+ S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, ani@anisinha.ca,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 15/03/2020 à 13:20, chengang@emindsoft.com.cn a écrit :
-> From: Chen Gang <chengang@emindsoft.com.cn>
+On Tue, 28 Apr 2020 10:16:52 +0000
+Ani Sinha <ani.sinha@nutanix.com> wrote:
+
+> A new option "use_acpi_unplug" is introduced for PIIX which will
+> selectively only disable hot unplugging of both hot plugged and
+> cold plugged PCI devices on non-root PCI buses. This will prevent
+> hot unplugging of devices from Windows based guests from system
+> tray but will not prevent devices from being hot plugged into the
+> guest.
 > 
-> Another DRM_IOCTL_* commands will be done later.
+> It has been tested on Windows guests.
 > 
-> Signed-off-by: Chen Gang <chengang@emindsoft.com.cn>
+> Signed-off-by: Ani Sinha <ani.sinha@nutanix.com>
 > ---
->  linux-user/ioctls.h        |  2 ++
->  linux-user/syscall.c       | 62 ++++++++++++++++++++++++++++++++++++++
->  linux-user/syscall_defs.h  | 15 +++++++++
->  linux-user/syscall_types.h | 11 +++++++
->  4 files changed, 90 insertions(+)
+>  hw/acpi/piix4.c      |  3 +++
+>  hw/i386/acpi-build.c | 40 ++++++++++++++++++++++++++--------------
+>  2 files changed, 29 insertions(+), 14 deletions(-)
 > 
-> diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> index 0defa1d8c1..3ae32cbfb1 100644
-> --- a/linux-user/ioctls.h
-> +++ b/linux-user/ioctls.h
-> @@ -574,6 +574,8 @@
->    IOCTL_SPECIAL(SIOCDELRT, IOC_W, do_ioctl_rt,
->                  MK_PTR(MK_STRUCT(STRUCT_rtentry)))
+> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> index 964d6f5..59fa707 100644
+> --- a/hw/acpi/piix4.c
+> +++ b/hw/acpi/piix4.c
+> @@ -78,6 +78,7 @@ typedef struct PIIX4PMState {
 >  
-> +  IOCTL_SPECIAL(DRM_IOCTL_VERSION, IOC_RW, do_ioctl_drm,
-> +                MK_PTR(MK_STRUCT(STRUCT_drm_version)))
-
-Add a blank line here.
-
->  #ifdef TARGET_TIOCSTART
->    IOCTL_IGNORE(TIOCSTART)
->    IOCTL_IGNORE(TIOCSTOP)
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 8d27d10807..2eb7c91ab4 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -112,6 +112,7 @@
->  #include <linux/if_alg.h>
->  #include <linux/rtc.h>
->  #include <sound/asound.h>
-> +#include <libdrm/drm.h>
-
-I think you should check in configure that this file is available on the
-system.
-
->  #include "linux_loop.h"
->  #include "uname.h"
+>      AcpiPciHpState acpi_pci_hotplug;
+>      bool use_acpi_pci_hotplug;
+> +    bool use_acpi_unplug;
 >  
-> @@ -5196,6 +5197,67 @@ static abi_long do_ioctl_tiocgptpeer(const IOCTLEntry *ie, uint8_t *buf_temp,
+>      uint8_t disable_s3;
+>      uint8_t disable_s4;
+> @@ -633,6 +634,8 @@ static Property piix4_pm_properties[] = {
+>      DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_VAL, PIIX4PMState, s4_val, 2),
+>      DEFINE_PROP_BOOL("acpi-pci-hotplug-with-bridge-support", PIIX4PMState,
+>                       use_acpi_pci_hotplug, true),
+> +    DEFINE_PROP_BOOL("acpi-pci-hotunplug-enable-bridge", PIIX4PMState,
+> +                     use_acpi_unplug, true),
+>      DEFINE_PROP_BOOL("memory-hotplug-support", PIIX4PMState,
+>                       acpi_memory_hotplug.is_enabled, true),
+>      DEFINE_PROP_END_OF_LIST(),
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 23c77ee..71b3ac3 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -96,6 +96,7 @@ typedef struct AcpiPmInfo {
+>      bool s3_disabled;
+>      bool s4_disabled;
+>      bool pcihp_bridge_en;
+> +    bool pcihup_bridge_en;
+>      uint8_t s4_val;
+>      AcpiFadtData fadt;
+>      uint16_t cpu_hp_io_base;
+> @@ -240,6 +241,9 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
+>      pm->pcihp_bridge_en =
+>          object_property_get_bool(obj, "acpi-pci-hotplug-with-bridge-support",
+>                                   NULL);
+> +    pm->pcihup_bridge_en =
+> +        object_property_get_bool(obj, "acpi-pci-hotunplug-enable-bridge",
+> +                                 NULL);
 >  }
->  #endif
 >  
-> +static inline abi_long target_to_host_drmversion(struct drm_version *host_ver,
-> +                                                abi_long target_addr)
-> +{
-> +    struct target_drm_version *target_ver;
-> +
-> +    if (!lock_user_struct(VERIFY_READ, target_ver, target_addr, 0)) {
-> +        return -TARGET_EFAULT;
-> +    }
-> +    __get_user(host_ver->name_len, &target_ver->name_len);
-> +    host_ver->name = host_ver->name_len ? g2h(target_ver->name) : NULL;
-> +    __get_user(host_ver->date_len, &target_ver->date_len);
-> +    host_ver->date = host_ver->date_len ? g2h(target_ver->date) : NULL;
-> +    __get_user(host_ver->desc_len, &target_ver->desc_len);
-> +    host_ver->desc = host_ver->desc_len ? g2h(target_ver->desc) : NULL;
-> +    unlock_user_struct(target_ver, target_addr, 0);
-> +    return 0;
-> +}
-> +
-> +static inline abi_long host_to_target_drmversion(abi_ulong target_addr,
-> +                                                 struct drm_version *host_ver)
-> +{
-> +    struct target_drm_version *target_ver;
-> +
-> +    if (!lock_user_struct(VERIFY_WRITE, target_ver, target_addr, 0)) {
-> +        return -TARGET_EFAULT;
-> +    }
-> +    __put_user(host_ver->version_major, &target_ver->version_major);
-> +    __put_user(host_ver->version_minor, &target_ver->version_minor);
-> +    __put_user(host_ver->version_patchlevel, &target_ver->version_patchlevel);
-> +    __put_user(host_ver->name_len, &target_ver->name_len);
-> +    __put_user(host_ver->date_len, &target_ver->date_len);
-> +    __put_user(host_ver->desc_len, &target_ver->desc_len);
-> +    unlock_user_struct(target_ver, target_addr, 0);
-> +    return 0;
-> +}
-> +
-> +static abi_long do_ioctl_drm(const IOCTLEntry *ie, uint8_t *buf_temp,
-> +                             int fd, int cmd, abi_long arg)
-> +{
-> +    struct drm_version *ver;
-> +    abi_long ret;
-> +
-> +    switch (ie->host_cmd) {
-> +    case DRM_IOCTL_VERSION:
-> +        ver = (struct drm_version *)buf_temp;
-> +        memset(ver, 0, sizeof(*ver));
-> +        ret = target_to_host_drmversion(ver, arg);
-> +        if (is_error(ret)) {
-> +            return ret;
-> +        }
-> +        ret = get_errno(safe_ioctl(fd, ie->host_cmd, ver));
-> +        if (is_error(ret)) {
-> +            return ret;
-> +        }
-> +        ret = host_to_target_drmversion(arg, ver);
-> +        return ret;
-> +    }
-> +    return -TARGET_EFAULT;
-> +}
-> +
-> +
->  static IOCTLEntry ioctl_entries[] = {
->  #define IOCTL(cmd, access, ...) \
->      { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
-> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index 152ec637cb..3c261cff0e 100644
-> --- a/linux-user/syscall_defs.h
-> +++ b/linux-user/syscall_defs.h
-> @@ -1167,6 +1167,9 @@ struct target_rtc_pll_info {
->  #define TARGET_DM_TARGET_MSG          TARGET_IOWRU(0xfd, 0x0e)
->  #define TARGET_DM_DEV_SET_GEOMETRY    TARGET_IOWRU(0xfd, 0x0f)
+>  static void acpi_get_misc_info(AcpiMiscInfo *info)
+> @@ -451,7 +455,8 @@ static void build_append_pcihp_notify_entry(Aml *method, int slot)
+>  }
 >  
-> +/* drm ioctls */
-> +#define TARGET_DRM_IOCTL_VERSION      TARGET_IOWRU('d', 0x00)
+>  static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+> -                                         bool pcihp_bridge_en)
+> +                                         bool pcihp_bridge_en,
+> +                                         bool pcihup_bridge_en)
+>  {
+>      Aml *dev, *notify_method = NULL, *method;
+>      QObject *bsel;
+> @@ -479,11 +484,14 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+>                  dev = aml_device("S%.02X", PCI_DEVFN(slot, 0));
+>                  aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
+>                  aml_append(dev, aml_name_decl("_ADR", aml_int(slot << 16)));
+> -                method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
+> -                aml_append(method,
+> -                    aml_call2("PCEJ", aml_name("BSEL"), aml_name("_SUN"))
+> -                );
+> -                aml_append(dev, method);
+> +                if (pcihup_bridge_en || pci_bus_is_root(bus)) {
 
-Why do you use the TARGET_IOWRU variant?
+so you are keeping unplug anyway in case of host bridge, so user will see
+eject icon if device is in root bus?
 
-Can't you use TARGET_IOWR('d', 0x00, struct target_drm_version)?
+Other thing about this patch is that it only partially disable hotplug,
+I'd rather do it the way hardware does i.e. full hotplug or no hotplug at all.
+(like the other hypervisors have done it, to workaround this Windows 'feature')
 
-Thanks,
-Laurent
+which is possible is one puts device on pci bridge without hotplug, i.e.
+
+ -global PIIX4_PM.acpi-pci-hotplug-with-bridge-support=off
+
+that of cause leaves apci hotplug on and as you noticed earlier
+Windows will offer to eject any device on root bus including directly
+attached bridges. And currently there is no way to disable that.
+
+Will following hack work for you?
+possible permutations
+1) ACPI hotplug everywhere
+-global PIIX4_PM.acpi-pci-hotplug=on -global PIIX4_PM.acpi-pci-hotplug-with-bridge-support=on -device pci-bridge,chassis_nr=1,shpc=doesnt_matter -device e1000,bus=pci.1,addr=01,id=netdev1 
+
+2) No hotplug at all
+-global PIIX4_PM.acpi-pci-hotplug=off -global PIIX4_PM.acpi-pci-hotplug-with-bridge-support=on -device pci-bridge,chassis_nr=1,shpc=off -device e1000,bus=pci.1,addr=01,id=netdev1
+
+-global PIIX4_PM.acpi-pci-hotplug=off -global PIIX4_PM.acpi-pci-hotplug-with-bridge-support=off -device pci-bridge,chassis_nr=1,shpc=doesnt_matter  -device e1000,bus=pci.1,addr=01,id=netdev1
+
+3) looks like SHPC kicks in, but it still needs to some bridge description in ACPI that
+   acpi-pci-hotplug-with-bridge-support provides, probably with this you can individually flip hotplug on
+   colplugged bridges using 'shpc' property (requires Vista or newer, tested win10).
+
+   This needs some investigation so we could remove unsed AML and IO ports, but I'm not really interested
+   in PCI stuff. So if 1+2 works for you, I'll post formal patches. If #3 is required feel free
+   to use this patch as a starting base to make it complete. 
+
+-global PIIX4_PM.acpi-pci-hotplug=off -global PIIX4_PM.acpi-pci-hotplug-with-bridge-support=on -device pci-bridge,chassis_nr=1,shpc=on -device e1000,bus=pci.1,addr=01,id=netdev1
+
+---
+
+diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+index 964d6f5990..5f05b2cb87 100644
+--- a/hw/acpi/piix4.c
++++ b/hw/acpi/piix4.c
+@@ -78,6 +78,7 @@ typedef struct PIIX4PMState {
+ 
+     AcpiPciHpState acpi_pci_hotplug;
+     bool use_acpi_pci_hotplug;
++    bool use_acpi_pci_hotplug_on_bridges;
+ 
+     uint8_t disable_s3;
+     uint8_t disable_s4;
+@@ -207,13 +208,13 @@ static const VMStateDescription vmstate_pci_status = {
+ static bool vmstate_test_use_acpi_pci_hotplug(void *opaque, int version_id)
+ {
+     PIIX4PMState *s = opaque;
+-    return s->use_acpi_pci_hotplug;
++    return s->use_acpi_pci_hotplug_on_bridges;
+ }
+ 
+ static bool vmstate_test_no_use_acpi_pci_hotplug(void *opaque, int version_id)
+ {
+     PIIX4PMState *s = opaque;
+-    return !s->use_acpi_pci_hotplug;
++    return !s->use_acpi_pci_hotplug_on_bridges;
+ }
+ 
+ static bool vmstate_test_use_memhp(void *opaque)
+@@ -505,7 +506,6 @@ static void piix4_pm_realize(PCIDevice *dev, Error **errp)
+ 
+     piix4_acpi_system_hot_add_init(pci_address_space_io(dev),
+                                    pci_get_bus(dev), s);
+-    qbus_set_hotplug_handler(BUS(pci_get_bus(dev)), OBJECT(s), &error_abort);
+ 
+     piix4_pm_add_propeties(s);
+ }
+@@ -528,7 +528,7 @@ I2CBus *piix4_pm_init(PCIBus *bus, int devfn, uint32_t smb_io_base,
+     s->smi_irq = smi_irq;
+     s->smm_enabled = smm_enabled;
+     if (xen_enabled()) {
+-        s->use_acpi_pci_hotplug = false;
++        s->use_acpi_pci_hotplug_on_bridges = false;
+     }
+ 
+     qdev_init_nofail(dev);
+@@ -593,7 +593,10 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
+     memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
+ 
+     acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
+-                    s->use_acpi_pci_hotplug);
++                    s->use_acpi_pci_hotplug_on_bridges);
++    if (s->use_acpi_pci_hotplug) {
++        qbus_set_hotplug_handler(BUS(bus), OBJECT(s), &error_abort);
++    }
+ 
+     s->cpu_hotplug_legacy = true;
+     object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
+@@ -632,6 +635,8 @@ static Property piix4_pm_properties[] = {
+     DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_DISABLED, PIIX4PMState, disable_s4, 0),
+     DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_VAL, PIIX4PMState, s4_val, 2),
+     DEFINE_PROP_BOOL("acpi-pci-hotplug-with-bridge-support", PIIX4PMState,
++                     use_acpi_pci_hotplug_on_bridges, true),
++    DEFINE_PROP_BOOL("acpi-pci-hotplug", PIIX4PMState,
+                      use_acpi_pci_hotplug, true),
+     DEFINE_PROP_BOOL("memory-hotplug-support", PIIX4PMState,
+                      acpi_memory_hotplug.is_enabled, true),
+
+---
+
+
+> +                    method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
+> +                    aml_append(method,
+> +                               aml_call2("PCEJ", aml_name("BSEL"),
+> +                                         aml_name("_SUN"))
+> +                        );
+> +                    aml_append(dev, method);
+> +                }
+>                  aml_append(parent_scope, dev);
+>  
+>                  build_append_pcihp_notify_entry(notify_method, slot);
+> @@ -537,12 +545,14 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+>              /* add _SUN/_EJ0 to make slot hotpluggable  */
+>              aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
+>  
+> -            method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
+> -            aml_append(method,
+> -                aml_call2("PCEJ", aml_name("BSEL"), aml_name("_SUN"))
+> -            );
+> -            aml_append(dev, method);
+> -
+> +            if (pcihup_bridge_en || pci_bus_is_root(bus)) {
+> +                method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
+> +                aml_append(method,
+> +                           aml_call2("PCEJ", aml_name("BSEL"),
+> +                                     aml_name("_SUN"))
+> +                    );
+> +                aml_append(dev, method);
+> +            }
+>              if (bsel) {
+>                  build_append_pcihp_notify_entry(notify_method, slot);
+>              }
+> @@ -553,7 +563,8 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+>               */
+>              PCIBus *sec_bus = pci_bridge_get_sec_bus(PCI_BRIDGE(pdev));
+>  
+> -            build_append_pci_bus_devices(dev, sec_bus, pcihp_bridge_en);
+> +            build_append_pci_bus_devices(dev, sec_bus, pcihp_bridge_en,
+> +                                         pcihup_bridge_en);
+>          }
+>          /* slot descriptor has been composed, add it into parent context */
+>          aml_append(parent_scope, dev);
+> @@ -2196,7 +2207,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>          if (bus) {
+>              Aml *scope = aml_scope("PCI0");
+>              /* Scan all PCI buses. Generate tables to support hotplug. */
+> -            build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
+> +            build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en,
+> +                                         pm->pcihup_bridge_en);
+>  
+>              if (TPM_IS_TIS_ISA(tpm)) {
+>                  if (misc->tpm_version == TPM_VERSION_2_0) {
+
 
