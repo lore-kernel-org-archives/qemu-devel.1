@@ -2,63 +2,91 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DA95C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 14:57:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4BD2C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 14:59:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01DEC20643
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 14:57:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01DEC20643
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
+	by mail.kernel.org (Postfix) with ESMTPS id AFF6E20643
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 14:59:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YkkfDzer"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFF6E20643
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY9sD-0006PK-35
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 10:57:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34492)
+	id 1jY9tV-000828-Ug
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 10:59:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34600)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <geert@linux-m68k.org>)
- id 1jY9nu-0004wl-SD
- for qemu-devel@nongnu.org; Mon, 11 May 2020 10:53:17 -0400
-Received: from baptiste.telenet-ops.be ([2a02:1800:120:4::f00:13]:59818)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1jY9oX-00064f-7o
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 10:53:53 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38528)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <geert@linux-m68k.org>)
- id 1jY9ns-0000dQ-UQ
- for qemu-devel@nongnu.org; Mon, 11 May 2020 10:53:14 -0400
-Received: from ramsan ([IPv6:2a02:1810:ac12:ed60:702c:fb99:3097:2049])
- by baptiste.telenet-ops.be with bizsmtp
- id dSsy2200D0GoAb601SsyU4; Mon, 11 May 2020 16:53:08 +0200
-Received: from rox.of.borg ([192.168.97.57]) by ramsan with esmtp (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>)
- id 1jY9nd-00082a-WB; Mon, 11 May 2020 16:52:58 +0200
-Received: from geert by rox.of.borg with local (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>)
- id 1jY9nd-0005zP-TZ; Mon, 11 May 2020 16:52:57 +0200
-From: Geert Uytterhoeven <geert+renesas@glider.be>
-To: Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <bgolaszewski@baylibre.com>,
- Jonathan Corbet <corbet@lwn.net>,
- Harish Jenny K N <harish_kandiga@mentor.com>,
- Eugeniu Rosca <erosca@de.adit-jv.com>
-Subject: [PATCH v7 0/6] gpio: Add GPIO Aggregator
-Date: Mon, 11 May 2020 16:52:51 +0200
-Message-Id: <20200511145257.22970-1-geert+renesas@glider.be>
-X-Mailer: git-send-email 2.17.1
-Received-SPF: none client-ip=2a02:1800:120:4::f00:13;
- envelope-from=geert@linux-m68k.org; helo=baptiste.telenet-ops.be
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1jY9oW-0000jq-D0
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 10:53:52 -0400
+Received: by mail-wr1-x444.google.com with SMTP id x17so11368041wrt.5
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 07:53:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=W4ejrBo7nrPyJLwfZ1XppUEa5/iDzAO0ZOQ42Dxi07g=;
+ b=YkkfDzerKdRjnBY1tnQiEmOR9Obl4Aqcb7nLstacL4LD4SalyTzls6y13wY31shYSy
+ P5lR8GkpG0+Q+JMQo/eG63/d8yA3sdEzipwZ/d8e24c3TwZDlIIpMlWn6TQjiyN0iMnr
+ O/0TJrsehjOwvrFnXpRTLTYUR17JuXvllXNBhBmB4YxkED8s5QniT1zahwyE98EC9SjK
+ B4WC7NCHvo0r90my9WTzZsIle1q3A5/STQkbU3sifBdKhdDRW43H4/tGUJW/umgTPE0U
+ 6yscda2/1ZYH+Z4U4u2pBE6QJoJuNzPIhynew37Jqgc0ZbWsuwDhKt2dTWTjBcY6qerK
+ U/vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=W4ejrBo7nrPyJLwfZ1XppUEa5/iDzAO0ZOQ42Dxi07g=;
+ b=U5BAPUZQtpfOFHdCPfIBTxYRhtm5HWGSPuXTLOdthz1v4XpCayWv1mfoQrQOmk5hI/
+ f5kMi7TvxRP1Dq7FRjEczfpTpcYTRU1OaBQBa3rlpCibRcKmNmGzbXdrrHmhcDl0i7Yw
+ KGxARZY89dp2glkro+tVsDIT15qsGtLi8jZaL2rsnhBIq/TcKbNaYDzHagNr6g1FLjny
+ rjwokn+1xq2X1vPiDV1xUcINwCuG5ddv725AjnTuG0+ob2gDeXx6yBg4KEajZkaYzRMt
+ RIiqkY4Vs93rZ0vs+jOMz3gdnHJNZuYp10Qp9pAAqFuV7Cq6L6yVbSIorfELIaHFuqID
+ eT5g==
+X-Gm-Message-State: AGi0PuYpkZDog+gA58ilQE52fZQwsZXJ/DC6gEnuCrIafI5MUY75e7kC
+ 0vOfaecFZL08wroH+dm5BDI=
+X-Google-Smtp-Source: APiQypI0x8DrV6noFcZHRW29jMaftsx0DiYmkc/4j2YcMmQpsMkySh+m/X8OJjaWbIyfO9zTmgCZTg==
+X-Received: by 2002:a5d:5047:: with SMTP id h7mr19223822wrt.7.1589208830524;
+ Mon, 11 May 2020 07:53:50 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id l12sm16770186wrh.20.2020.05.11.07.53.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 11 May 2020 07:53:49 -0700 (PDT)
+Date: Mon, 11 May 2020 15:53:47 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Geoffrey McRae <geoff@hostfission.com>
+Subject: Re: [PATCH v8] audio/jack: add JACK client audiodev
+Message-ID: <20200511145347.GD182627@stefanha-x1.localdomain>
+References: <20200511042538.60E863A0386@moya.office.hostfission.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="SO98HVl1bnMOfKZd"
+Content-Disposition: inline
+In-Reply-To: <20200511042538.60E863A0386@moya.office.hostfission.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=stefanha@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -23
-X-Spam_score: -2.4
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_LOW=-0.7,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -72,217 +100,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Geert Uytterhoeven <geert+renesas@glider.be>, linux-doc@vger.kernel.org,
- Marc Zyngier <marc.zyngier@arm.com>, Magnus Damm <magnus.damm@gmail.com>,
- Christoffer Dall <christoffer.dall@arm.com>, linux-kernel@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-gpio@vger.kernel.org,
- Alexander Graf <graf@amazon.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Phil Reid <preid@electromag.com.au>
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-	Hi all,
 
-GPIO controllers are exported to userspace using /dev/gpiochip*
-character devices.  Access control to these devices is provided by
-standard UNIX file system permissions, on an all-or-nothing basis:
-either a GPIO controller is accessible for a user, or it is not.
-Currently no mechanism exists to control access to individual GPIOs.
+--SO98HVl1bnMOfKZd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Hence this adds a GPIO driver to aggregate existing GPIOs, and expose
-them as a new gpiochip.  This is useful for implementing access control,
-and assigning a set of GPIOs to a specific user.  Furthermore, this
-simplifies and hardens exporting GPIOs to a virtual machine, as the VM
-can just grab the full GPIO controller, and no longer needs to care
-about which GPIOs to grab and which not, reducing the attack surface.
-This has been implemented for ARM virt in QEMU[1].
+On Wed, Apr 29, 2020 at 03:53:58PM +1000, Geoffrey McRae wrote:
+> This commit adds a new audiodev backend to allow QEMU to use JACK as
+> both an audio sink and source.
+>=20
+> Signed-off-by: Geoffrey McRae <geoff@hostfission.com>
+> ---
+>  audio/Makefile.objs    |   5 +
+>  audio/audio.c          |   1 +
+>  audio/audio_template.h |   2 +
+>  audio/jackaudio.c      | 677 +++++++++++++++++++++++++++++++++++++++++
+>  configure              |  17 ++
+>  qapi/audio.json        |  56 +++-
+>  6 files changed, 756 insertions(+), 2 deletions(-)
+>  create mode 100644 audio/jackaudio.c
 
-Recently, other use cases have been discovered[2], like describing
-simple GPIO-operated devices in DT, and using the GPIO Aggregator as a
-generic GPIO driver for userspace, which is useful for industrial
-control.
+Cool! Out of interest, which emulated audio device do you use and have
+you had issues with buffer sizes/latency?
 
-Note that the first patch of this series ("i2c: i801: Use GPIO_LOOKUP()
-helper macro") has been applied to i2c/for-next.
+I haven't reviewed in depth but in general this looks good.
 
-Changes compared to v6[3]:
-  - Document non-uniqueness of line names,
-  - Rebase on top of commit a0b66a73785ccc8f ("gpio: Rename variable in
-    core APIs"),
-  - Maintained => Supported,
-  - Add Reviewed-by, Acked-by,
-  - Drop applied patches:
-      - "ARM: integrator: impd1: Use GPIO_LOOKUP() helper macro",
-      - "gpiolib: Introduce gpiod_set_config()".
+> +typedef struct QJackBuffer {
+> +    int          channels;
+> +    int          frames;
+> +    _Atomic(int) used;
 
-Changes compared to v5[4]:
-  - Convert raw gpiod_lookup users to GPIO_LOOKUP*(),
-  - Update Documentation/driver-api/gpio/board.rst for gpiod_lookup
-    changes,
-  - Reword rationale behing looking up GPIOs by line name,
-  - Introduce gpiod_set_config(),
-  - Use gpiod_to_chip() instead of open-coding,
-  - Drop debug print of gpio_desc.label, as it usually points to the
-    GPIO Aggregator itself,
-  - Drop no longer needed #include "gpiolib.h",
-  - Fix missing offset translation in gpio_fwd_set_config(),
-  - Fix "allows" without object,
-  - Drop "gpiochipN" support,
-  - Extend example.
+stdatomic.h isn't used directly in QEMU. Can you use "qemu/atomic.h"
+instead?
 
-Changes compared to v4[5]:
-  - Add Reviewed-by, Tested-by,
-  - Fix inconsistent indentation in documentation.
+> +static inline int qjack_buffer_used(QJackBuffer *buffer)
+> +{
+> +    assert(buffer->data);
+> +    return atomic_load_explicit(&buffer->used, memory_order_relaxed);
+> +}
 
-Changes compared to v3[6] (more details in the individual patches):
-  - Drop controversial GPIO repeater,
-  - Drop support for legacy sysfs interface based name matching,
-  - Drop applied "gpiolib: Add GPIOCHIP_NAME definition",
-  - Documentation improvements,
-  - Lots of small cleanups.
+Is this function used?
 
-Changes compared to v2[7] (more details in the individual patches):
-  - Integrate GPIO Repeater functionality,
-  - Absorb GPIO forwarder library, as the Aggregator and Repeater are
-    now a single driver,
-  - Use the aggregator parameters to create a GPIO lookup table instead
-    of an array of GPIO descriptors,
-  - Add documentation,
-  - New patches:
-      - "gpiolib: Add GPIOCHIP_NAME definition",
-      - "gpiolib: Add support for gpiochipN-based table lookup",
-      - "gpiolib: Add support for GPIO line table lookup",
-      - "dt-bindings: gpio: Add gpio-repeater bindings",
-      - "docs: gpio: Add GPIO Aggregator/Repeater documentation",
-      - "MAINTAINERS: Add GPIO Aggregator/Repeater section".
-  - Dropped patches:
-      - "gpio: Export gpiod_{request,free}() to modular GPIO code",
-      - "gpio: Export gpiochip_get_desc() to modular GPIO code",
-      - "gpio: Export gpio_name_to_desc() to modular GPIO code",
-      - "gpio: Add GPIO Forwarder Helper".
+--SO98HVl1bnMOfKZd
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Changes compared to v1[8]:
-  - Drop "virtual", rename to gpio-aggregator,
-  - Create and use new GPIO Forwarder Helper, to allow sharing code with
-    the GPIO inverter,
-  - Lift limit on the maximum number of GPIOs,
-  - Improve parsing of GPIO specifiers,
-  - Fix modular build.
+-----BEGIN PGP SIGNATURE-----
 
-Aggregating GPIOs and exposing them as a new gpiochip was suggested in
-response to my proof-of-concept for GPIO virtualization with QEMU[9][10].
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl65ZvsACgkQnKSrs4Gr
+c8j9IwgAktEvu4hbpzGZ54pl2oML6IW7srMptRs/qEqJ8dbycPdTcoffIJG6IWAj
+QFJzAFaWJGUp9pyi9DORJydOWESO4soWfD4CWRPt/Y6O+3xG/L/3cfnLuZdR/zGo
+2j5v1/OdfEauiPn5YlxZJyqooR4I6nBxShII9DDXuep2kyRsJ3cizuMFRHLgo3Up
+9HzIKOn3x41qqQX/Dv2P979dSLNkg2ZluS1I4mkGME1NQldDV840CP6TlDXHvYQS
+Z8okFSzNWFi4+eBWf+FYZYOMGSPDIdOTVMTrGxh5tLWRWp0QUxIEXZjUJBYuQDBX
+oClDbgpazI9uBV2v3HbojK09nRZYgA==
+=Kvsh
+-----END PGP SIGNATURE-----
 
-For the first use case, aggregated GPIO controllers are instantiated and
-destroyed by writing to atribute files in sysfs.
-Sample session on the Renesas Koelsch development board:
-
-  - Unbind LEDs from leds-gpio driver:
-
-        echo leds > /sys/bus/platform/drivers/leds-gpio/unbind
-
-  - Create aggregators:
-
-    $ echo e6052000.gpio 19,20 \
-        > /sys/bus/platform/drivers/gpio-aggregator/new_device
-
-    gpio-aggregator gpio-aggregator.0: gpio 0 => gpio-953
-    gpio-aggregator gpio-aggregator.0: gpio 1 => gpio-954
-    gpiochip_find_base: found new base at 758
-    gpio gpiochip12: (gpio-aggregator.0): added GPIO chardev (254:13)
-    gpiochip_setup_dev: registered GPIOs 758 to 759 on device: gpiochip12 (gpio-aggregator.0)
-
-    $ echo e6052000.gpio 21 e6050000.gpio 20-22 \
-        > /sys/bus/platform/drivers/gpio-aggregator/new_device
-
-    gpio-aggregator gpio-aggregator.1: gpio 0 => gpio-955
-    gpio-aggregator gpio-aggregator.1: gpio 1 => gpio-1012
-    gpio-aggregator gpio-aggregator.1: gpio 2 => gpio-1013
-    gpio-aggregator gpio-aggregator.1: gpio 3 => gpio-1014
-    gpiochip_find_base: found new base at 754
-    gpio gpiochip13: (gpio-aggregator.1): added GPIO chardev (254:13)
-    gpiochip_setup_dev: registered GPIOs 754 to 757 on device: gpiochip13 (gpio-aggregator.1)
-
-  - Adjust permissions on /dev/gpiochip1[23] (optional)
-
-  - Control LEDs:
-
-    $ gpioset gpiochip12 0=0 1=1 # LED6 OFF, LED7 ON
-    $ gpioset gpiochip12 0=1 1=0 # LED6 ON, LED7 OFF
-    $ gpioset gpiochip13 0=1     # LED8 ON
-    $ gpioset gpiochip13 0=0     # LED8 OFF
-
-  - Destroy aggregators:
-
-    $ echo gpio-aggregator.0 \
-            > /sys/bus/platform/drivers/gpio-aggregator/delete_device
-    $ echo gpio-aggregator.1 \
-            > /sys/bus/platform/drivers/gpio-aggregator/delete_device
-
-To ease testing, I have pushed this series to the
-topic/gpio-aggregator-v7 branch of my renesas-drivers repository at
-git://git.kernel.org/pub/scm/linux/kernel/git/geert/renesas-drivers.git.
-
-Thanks!
-
-References:
-  [1] "[PATCH QEMU v2 0/5] Add a GPIO backend"
-      (https://lore.kernel.org/linux-gpio/20200423090118.11199-1-geert+renesas@glider.be/)
-  [2] "[PATCH V4 2/2] gpio: inverter: document the inverter bindings"
-      (https://lore.kernel.org/r/1561699236-18620-3-git-send-email-harish_kandiga@mentor.com/)
-  [3] "[PATCH v6 0/8] gpio: Add GPIO Aggregator"
-      (https://lore.kernel.org/linux-doc/20200324135328.5796-1-geert+renesas@glider.be/)
-  [4] "[PATCH v5 0/5] gpio: Add GPIO Aggregator"
-      (https://lore.kernel.org/r/20200218151812.7816-1-geert+renesas@glider.be/)
-  [5] "[PATCH v4 0/5] gpio: Add GPIO Aggregator"
-      (https://lore.kernel.org/r/20200115181523.23556-1-geert+renesas@glider.be)
-  [6] "[PATCH v3 0/7] gpio: Add GPIO Aggregator/Repeater"
-      (https://lore.kernel.org/r/20191127084253.16356-1-geert+renesas@glider.be/)
-  [7] "[PATCH/RFC v2 0/5] gpio: Add GPIO Aggregator Driver"
-      (https://lore.kernel.org/r/20190911143858.13024-1-geert+renesas@glider.be/)
-  [8] "[PATCH RFC] gpio: Add Virtual Aggregator GPIO Driver"
-      (https://lore.kernel.org/r/20190705160536.12047-1-geert+renesas@glider.be/)
-  [9] "[PATCH QEMU POC] Add a GPIO backend"
-      (https://lore.kernel.org/r/20181003152521.23144-1-geert+renesas@glider.be/)
- [10] "Getting To Blinky: Virt Edition / Making device pass-through
-       work on embedded ARM"
-      (https://fosdem.org/2019/schedule/event/vai_getting_to_blinky/)
-
-Geert Uytterhoeven (6):
-  i2c: i801: Use GPIO_LOOKUP() helper macro
-  mfd: sm501: Use GPIO_LOOKUP_IDX() helper macro
-  gpiolib: Add support for GPIO lookup by line name
-  gpio: Add GPIO Aggregator
-  docs: gpio: Add GPIO Aggregator documentation
-  MAINTAINERS: Add GPIO Aggregator section
-
- .../admin-guide/gpio/gpio-aggregator.rst      | 111 ++++
- Documentation/admin-guide/gpio/index.rst      |   1 +
- Documentation/driver-api/gpio/board.rst       |  15 +-
- MAINTAINERS                                   |   7 +
- drivers/gpio/Kconfig                          |  12 +
- drivers/gpio/Makefile                         |   1 +
- drivers/gpio/gpio-aggregator.c                | 568 ++++++++++++++++++
- drivers/gpio/gpiolib.c                        |  22 +-
- drivers/i2c/busses/i2c-i801.c                 |   6 +-
- drivers/mfd/sm501.c                           |  24 +-
- include/linux/gpio/machine.h                  |  17 +-
- 11 files changed, 748 insertions(+), 36 deletions(-)
- create mode 100644 Documentation/admin-guide/gpio/gpio-aggregator.rst
- create mode 100644 drivers/gpio/gpio-aggregator.c
-
--- 
-2.17.1
-
-Gr{oetje,eeting}s,
-
-						Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-							    -- Linus Torvalds
+--SO98HVl1bnMOfKZd--
 
