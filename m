@@ -2,93 +2,104 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FAAFC47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 13:55:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8854AC47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 13:56:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9FE0206F5
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 13:55:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 42DB2206D6
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 13:56:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Iae6yii8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9FE0206F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QV2k81JX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42DB2206D6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY8uF-0006hM-19
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 09:55:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49112)
+	id 1jY8v7-000803-Ez
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 09:56:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51522)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jY8Zw-0002VQ-OO
- for qemu-devel@nongnu.org; Mon, 11 May 2020 09:34:44 -0400
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:40335)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jY8Zt-0007Az-Ck
- for qemu-devel@nongnu.org; Mon, 11 May 2020 09:34:44 -0400
-Received: by mail-wm1-x333.google.com with SMTP id u16so19266516wmc.5
- for <qemu-devel@nongnu.org>; Mon, 11 May 2020 06:34:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=9I7M0HWBPw3iGsMCzXlo3E1GoUwu5IN8pY8FcCkfF0c=;
- b=Iae6yii8D6Vwio9mfTVpLSgySTDLdSb9aXuGv09YjqseCxbyG0NleLmCbBIqvX4aNC
- BGMVmQqNIH9kLz9jhCV4opygBaWKlbdXd5/JoUFrSJgk8Ho3y5mO7wNFow2CRP2zhrqQ
- WJUoYSP84gEbW53iz5jIJSZIj9njQwC9MZ8N3UPN13UUJ49oH6avCHRJIg24Su+jcnwr
- 2t3qu+NcEv0knJRhHp0N6xKdKcOuoskhsUA+V3SVUa1kY4yecaJh9wZDBgKlJSdrux/C
- kpNOftBh/CHPG9ytjOcyO90dWksdHWrf10DOSlwHNk9wIqc9hcgTucWCEXVNGUlM5CDK
- J4jw==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jY8n5-0002tn-QK
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 09:48:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35595
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jY8n1-0004ZS-7S
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 09:48:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589204888;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=t3Q3yPKfSZyavoPRIzgRmVuFzWYmw9BiInQkEYAgKHs=;
+ b=QV2k81JXHDap+qDsWST+scgleZpBeMOfVvG1XgI5AjRh3b2GiviEbCHYrn1DA+jaYpmHE0
+ O5GngDIaoRm0gYvo+gSAaxPFo/lxE1C7ErTwye0JIs7lUt2/E+A0YODIilDuQP1C8LM63T
+ R+sAc3GPq4G5EudKyCx0UkxUKmDcPuY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-147-t1Wf445gNGmPqG5koHKF0A-1; Mon, 11 May 2020 09:48:05 -0400
+X-MC-Unique: t1Wf445gNGmPqG5koHKF0A-1
+Received: by mail-wm1-f72.google.com with SMTP id w189so4674189wmg.1
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 06:48:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=9I7M0HWBPw3iGsMCzXlo3E1GoUwu5IN8pY8FcCkfF0c=;
- b=DibT7WNfSFYbQFTyU+Wl1dfC5zyL95868Y531px0KrQDUu7QpMa1Y/mc2jChALCAeB
- oxLKylsvV8Yw/Bqykq91mmaOwlTNDSaCrM3AVc6D72Uqz2CJ4zBf8ZOiDX59Zpse7Z3C
- hVecYZ2uxJC4cAGUpjhX2SS6fIF72jMoWFY4baAtYLwfCn2EumIxodAqmc7/FjdzbwYR
- 9r5GQ6gAhGkGLC2PoizUZTf1c/BYfQUxXJx784EgNAOojnwvGgdRcIE811vt6SuPTlOF
- ZxOgxDBqpE5irZcz+vfrylWaHL9lm5IuYtUkzjcnFqCUI0JeO09w4MUeQ15ht1gL/zep
- cjZQ==
-X-Gm-Message-State: AGi0PubghhlXou7/+GjJ7hju9fVB6y2QqOYX7PTOl+ZCifnLrTb7m24r
- a37A5Z6Rz4KRvvjdqIkSfDZOuBZsJ2FcoQ==
-X-Google-Smtp-Source: APiQypKpBnEds5oIgQtckl2mp1RIC7UdPumRDKaCMxqFBQ6wo0CQe6jZ0ghdboBazGGLu6Lt3HPl4w==
-X-Received: by 2002:a05:600c:2041:: with SMTP id
- p1mr1438888wmg.152.1589204074051; 
- Mon, 11 May 2020 06:34:34 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id m3sm2154818wrn.96.2020.05.11.06.34.32
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 11 May 2020 06:34:33 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 21/34] target/arm: Update contiguous first-fault and no-fault
- loads
-Date: Mon, 11 May 2020 14:33:52 +0100
-Message-Id: <20200511133405.5275-22-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200511133405.5275-1-peter.maydell@linaro.org>
-References: <20200511133405.5275-1-peter.maydell@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=t3Q3yPKfSZyavoPRIzgRmVuFzWYmw9BiInQkEYAgKHs=;
+ b=hyuae2PZcrK6QPQKS4RFWFNOIKX6FxE4T296nwJhC9+mCKnaLaclM3D7Hh3BrvCP37
+ ZQWIrx/lBDWyOEnuWyj69dkUXOlFuHvIjZCESHWDns3vTqy7mVAa1a8Dkhww53OKXzyZ
+ ZqKmVM5GDOm5fzBtn0ioD9Pu7yZ6YuvuZHAw9SYoCSxBdQtdXb1rDkutS1hmiS+mhlps
+ PSt/NMjcdPNJqkNef0bWTQ5DCkgBio/Uf+/Tu6jq4PVLciqpi6dDSDXASDZ52jNDwfJm
+ SxplciwvilCIAbl1mcdKmhN5LCnT/kq9u0xqyLHhp5tZqkb73cRSEoeUKAOGg2XoDvPQ
+ Z03w==
+X-Gm-Message-State: AGi0PuasVpz9wXiT6UEqPP8bfqzHbhS5Y6UYTH+ngKZvelHFPeUe2J+J
+ qnORYmis59enDiasye5/BG6wCMld1lixsMSK80k97k+aGpPloEREc5yQQpUbiZ7fGqV916ZoPGn
+ FyBn9V74LRMSLay8=
+X-Received: by 2002:a1c:2348:: with SMTP id j69mr15383637wmj.11.1589204883814; 
+ Mon, 11 May 2020 06:48:03 -0700 (PDT)
+X-Google-Smtp-Source: APiQypI3RuTnLMFd6Z2OlpE8IoPsci+ScNHlAOMxBHj9zug+qJOrKUU30pN/j1GlKt9521VLAgQvPA==
+X-Received: by 2002:a1c:2348:: with SMTP id j69mr15383613wmj.11.1589204883480; 
+ Mon, 11 May 2020 06:48:03 -0700 (PDT)
+Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id t6sm2403061wma.4.2020.05.11.06.48.02
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 11 May 2020 06:48:02 -0700 (PDT)
+Subject: Re: [PATCH 1/1] tricore: added AURIX TC277 D-Step TriBoard
+To: David Brenken <david.brenken@efs-auto.org>, qemu-devel@nongnu.org
+References: <20200511122159.7260-1-david.brenken@efs-auto.org>
+ <20200511122159.7260-2-david.brenken@efs-auto.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <a0ccf008-cd88-633b-d22c-9528d17e0c6f@redhat.com>
+Date: Mon, 11 May 2020 15:48:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::333;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x333.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20200511122159.7260-2-david.brenken@efs-auto.org>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 02:55:57
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,458 +113,302 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kbastian@mail.uni-paderborn.de,
+ Lars Biermanski <lars.biermanski@efs-auto.de>,
+ Georg Hofstetter <georg.hofstetter@efs-auto.de>,
+ David Brenken <david.brenken@efs-auto.de>,
+ Robert Rasche <robert.rasche@efs-auto.de>,
+ Andreas Konopik <andreas.konopik@efs-auto.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+Hello David,
 
-With sve_cont_ldst_pages, the differences between first-fault and no-fault
-are minimal, so unify the routines.  With cpu_probe_watchpoint, we are able
-to make progress through pages with TLB_WATCHPOINT set when the watchpoint
-does not actually fire.
+On 5/11/20 2:21 PM, David Brenken wrote:
+> From: Andreas Konopik <andreas.konopik@efs-auto.de>
+> 
+> Signed-off-by: Andreas Konopik <andreas.konopik@efs-auto.de>
+> Signed-off-by: David Brenken <david.brenken@efs-auto.de>
+> Signed-off-by: Georg Hofstetter <georg.hofstetter@efs-auto.de>
+> Signed-off-by: Robert Rasche <robert.rasche@efs-auto.de>
+> Signed-off-by: Lars Biermanski <lars.biermanski@efs-auto.de>
+> ---
+>   hw/tricore/Makefile.objs           |   1 +
+>   hw/tricore/aurix_triboard_tc277d.c | 240 +++++++++++++++++++++++++++++
+>   2 files changed, 241 insertions(+)
+>   create mode 100644 hw/tricore/aurix_triboard_tc277d.c
+> 
+> diff --git a/hw/tricore/Makefile.objs b/hw/tricore/Makefile.objs
+> index 5501f6c1a8..e4a2106dd9 100644
+> --- a/hw/tricore/Makefile.objs
+> +++ b/hw/tricore/Makefile.objs
+> @@ -1 +1,2 @@
+>   obj-$(CONFIG_TRICORE) += tricore_testboard.o
+> +obj-$(CONFIG_TRICORE) += aurix_triboard_tc277d.o
+> diff --git a/hw/tricore/aurix_triboard_tc277d.c b/hw/tricore/aurix_triboard_tc277d.c
+> new file mode 100644
+> index 0000000000..86deff9a50
+> --- /dev/null
+> +++ b/hw/tricore/aurix_triboard_tc277d.c
+> @@ -0,0 +1,240 @@
+> +/*
+> + * Infineon AURIX TC277 D-Step TriBoard System emulation.
+> + *
+> + * Copyright (c) 2019 Andreas Konopik <andreas.konopik@efs-auto.de>
+> + * Copyright (c) 2019 David Brenken <david.brenken@efs-auto.de>
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/units.h"
+> +#include "qapi/error.h"
+> +#include "hw/qdev-properties.h"
+> +#include "cpu.h"
+> +#include "net/net.h"
+> +#include "hw/boards.h"
+> +#include "hw/loader.h"
+> +#include "exec/address-spaces.h"
+> +#include "elf.h"
+> +#include "hw/tricore/tricore.h"
+> +#include "qemu/error-report.h"
+> +
+> +/*
+> + * The TriCore processor architecture defines their respective on-chip memory
+> + * layout. Therefore, in contrast to other common architectures, the QEMU
+> + * TriCore machine and cpu are closely coupled.
+> + *
+> + * Memory maps are aligned with the TC27x D-Step Microcontroller layout.
+> + */
+> +
+> +#define TC27XD_MEMMAP_DSPR2        0x50000000
+> +#define TC27XD_MEMMAP_DCACHE2      0x5001E000
+> +#define TC27XD_MEMMAP_DTAG2        0x500C0000
+> +#define TC27XD_MEMMAP_PSPR2        0x50100000
+> +#define TC27XD_MEMMAP_PCACHE2      0x50108000
+> +#define TC27XD_MEMMAP_PTAG2        0x501C0000
+> +#define TC27XD_MEMMAP_DSPR1        0x60000000
+> +#define TC27XD_MEMMAP_DCACHE1      0x6001E000
+> +#define TC27XD_MEMMAP_DTAG1        0x600C0000
+> +#define TC27XD_MEMMAP_PSPR1        0x60100000
+> +#define TC27XD_MEMMAP_PCACHE1      0x60108000
+> +#define TC27XD_MEMMAP_PTAG1        0x601C0000
+> +#define TC27XD_MEMMAP_DSPR0        0x70000000
+> +#define TC27XD_MEMMAP_PSPR0        0x70100000
+> +#define TC27XD_MEMMAP_PCACHE0      0x70106000
+> +#define TC27XD_MEMMAP_PTAG0        0x701C0000
+> +#define TC27XD_MEMMAP_PFLASH0_C    0x80000000
+> +#define TC27XD_MEMMAP_PFLASH1_C    0x80200000
+> +#define TC27XD_MEMMAP_OLDA_C       0x8FE70000
+> +#define TC27XD_MEMMAP_BROM_C       0x8FFF8000
+> +#define TC27XD_MEMMAP_LMURAM_C     0x90000000
+> +#define TC27XD_MEMMAP_EMEM_C       0x9F000000
+> +#define TC27XD_MEMMAP_PFLASH0_U    0xA0000000
+> +#define TC27XD_MEMMAP_PFLASH1_U    0xA0200000
+> +#define TC27XD_MEMMAP_DFLASH0      0xAF000000
+> +#define TC27XD_MEMMAP_DFLASH1      0xAF110000
+> +#define TC27XD_MEMMAP_OLDA_U       0xAFE70000
+> +#define TC27XD_MEMMAP_BROM_U       0xAFFF8000
+> +#define TC27XD_MEMMAP_LMURAM_U     0xB0000000
+> +#define TC27XD_MEMMAP_EMEM_U       0xBF000000
+> +#define TC27XD_MEMMAP_PSPRX        0xC0000000
+> +#define TC27XD_MEMMAP_DSPRX        0xD0000000
+> +
+> +static struct tricore_boot_info tc27xd_db_binfo;
+> +
+> +static void tricore_load_kernel(CPUTriCoreState *env)
+> +{
+> +    uint64_t entry;
+> +    long kernel_size;
+> +
+> +    kernel_size = load_elf(tc27xd_db_binfo.kernel_filename, NULL,
+> +                           NULL, NULL, &entry, NULL,
+> +                           NULL, NULL, 0,
+> +                           EM_TRICORE, 1, 0);
+> +    if (kernel_size <= 0) {
+> +        error_report("no kernel file '%s'",
+> +                tc27xd_db_binfo.kernel_filename);
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200508154359.7494-15-richard.henderson@linaro.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/sve_helper.c | 346 +++++++++++++++++++---------------------
- 1 file changed, 162 insertions(+), 184 deletions(-)
+What kernel are you using? Do you have one we can use to try this board?
 
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 9365e326464..f4969347d41 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -4101,18 +4101,6 @@ static intptr_t find_next_active(uint64_t *vg, intptr_t reg_off,
-     return reg_off;
- }
- 
--/*
-- * Return the maximum offset <= @mem_max which is still within the page
-- * referenced by @base + @mem_off.
-- */
--static intptr_t max_for_page(target_ulong base, intptr_t mem_off,
--                             intptr_t mem_max)
--{
--    target_ulong addr = base + mem_off;
--    intptr_t split = -(intptr_t)(addr | TARGET_PAGE_MASK);
--    return MIN(split, mem_max - mem_off) + mem_off;
--}
--
- /*
-  * Resolve the guest virtual address to info->host and info->flags.
-  * If @nofault, return false if the page is invalid, otherwise
-@@ -4435,19 +4423,6 @@ static void sve_cont_ldst_watchpoints(SVEContLdSt *info, CPUARMState *env,
- #endif
- }
- 
--/*
-- * The result of tlb_vaddr_to_host for user-only is just g2h(x),
-- * which is always non-null.  Elide the useless test.
-- */
--static inline bool test_host_page(void *host)
--{
--#ifdef CONFIG_USER_ONLY
--    return true;
--#else
--    return likely(host != NULL);
--#endif
--}
--
- /*
-  * Common helper for all contiguous 1,2,3,4-register predicated stores.
-  */
-@@ -4705,167 +4680,167 @@ static void record_fault(CPUARMState *env, uintptr_t i, uintptr_t oprsz)
- }
- 
- /*
-- * Common helper for all contiguous first-fault loads.
-+ * Common helper for all contiguous no-fault and first-fault loads.
-  */
--static void sve_ldff1_r(CPUARMState *env, void *vg, const target_ulong addr,
--                        uint32_t desc, const uintptr_t retaddr,
--                        const int esz, const int msz,
--                        sve_ldst1_host_fn *host_fn,
--                        sve_ldst1_tlb_fn *tlb_fn)
-+static inline QEMU_ALWAYS_INLINE
-+void sve_ldnfff1_r(CPUARMState *env, void *vg, const target_ulong addr,
-+                   uint32_t desc, const uintptr_t retaddr,
-+                   const int esz, const int msz, const SVEContFault fault,
-+                   sve_ldst1_host_fn *host_fn,
-+                   sve_ldst1_tlb_fn *tlb_fn)
- {
--    const TCGMemOpIdx oi = extract32(desc, SIMD_DATA_SHIFT, MEMOPIDX_SHIFT);
--    const int mmu_idx = get_mmuidx(oi);
-     const unsigned rd = extract32(desc, SIMD_DATA_SHIFT + MEMOPIDX_SHIFT, 5);
-     void *vd = &env->vfp.zregs[rd];
--    const int diffsz = esz - msz;
-     const intptr_t reg_max = simd_oprsz(desc);
--    const intptr_t mem_max = reg_max >> diffsz;
--    intptr_t split, reg_off, mem_off, i;
-+    intptr_t reg_off, mem_off, reg_last;
-+    SVEContLdSt info;
-+    int flags;
-     void *host;
- 
--    /* Skip to the first active element.  */
--    reg_off = find_next_active(vg, 0, reg_max, esz);
--    if (unlikely(reg_off == reg_max)) {
-+    /* Find the active elements.  */
-+    if (!sve_cont_ldst_elements(&info, addr, vg, reg_max, esz, 1 << msz)) {
-         /* The entire predicate was false; no load occurs.  */
-         memset(vd, 0, reg_max);
-         return;
-     }
--    mem_off = reg_off >> diffsz;
-+    reg_off = info.reg_off_first[0];
- 
--    /*
--     * If the (remaining) load is entirely within a single page, then:
--     * For softmmu, and the tlb hits, then no faults will occur;
--     * For user-only, either the first load will fault or none will.
--     * We can thus perform the load directly to the destination and
--     * Vd will be unmodified on any exception path.
--     */
--    split = max_for_page(addr, mem_off, mem_max);
--    if (likely(split == mem_max)) {
--        host = tlb_vaddr_to_host(env, addr + mem_off, MMU_DATA_LOAD, mmu_idx);
--        if (test_host_page(host)) {
--            i = reg_off;
--            host -= mem_off;
--            do {
--                host_fn(vd, i, host + (i >> diffsz));
--                i = find_next_active(vg, i + (1 << esz), reg_max, esz);
--            } while (i < reg_max);
--            /* After any fault, zero any leading inactive elements.  */
-+    /* Probe the page(s). */
-+    if (!sve_cont_ldst_pages(&info, fault, env, addr, MMU_DATA_LOAD, retaddr)) {
-+        /* Fault on first element. */
-+        tcg_debug_assert(fault == FAULT_NO);
-+        memset(vd, 0, reg_max);
-+        goto do_fault;
-+    }
-+
-+    mem_off = info.mem_off_first[0];
-+    flags = info.page[0].flags;
-+
-+    if (fault == FAULT_FIRST) {
-+        /*
-+         * Special handling of the first active element,
-+         * if it crosses a page boundary or is MMIO.
-+         */
-+        bool is_split = mem_off == info.mem_off_split;
-+        /* TODO: MTE check. */
-+        if (unlikely(flags != 0) || unlikely(is_split)) {
-+            /*
-+             * Use the slow path for cross-page handling.
-+             * Might trap for MMIO or watchpoints.
-+             */
-+            tlb_fn(env, vd, reg_off, addr + mem_off, retaddr);
-+
-+            /* After any fault, zero the other elements. */
-             swap_memzero(vd, reg_off);
--            return;
-+            reg_off += 1 << esz;
-+            mem_off += 1 << msz;
-+            swap_memzero(vd + reg_off, reg_max - reg_off);
-+
-+            if (is_split) {
-+                goto second_page;
-+            }
-+        } else {
-+            memset(vd, 0, reg_max);
-+        }
-+    } else {
-+        memset(vd, 0, reg_max);
-+        if (unlikely(mem_off == info.mem_off_split)) {
-+            /* The first active element crosses a page boundary. */
-+            flags |= info.page[1].flags;
-+            if (unlikely(flags & TLB_MMIO)) {
-+                /* Some page is MMIO, see below. */
-+                goto do_fault;
-+            }
-+            if (unlikely(flags & TLB_WATCHPOINT) &&
-+                (cpu_watchpoint_address_matches
-+                 (env_cpu(env), addr + mem_off, 1 << msz)
-+                 & BP_MEM_READ)) {
-+                /* Watchpoint hit, see below. */
-+                goto do_fault;
-+            }
-+            /* TODO: MTE check. */
-+            /*
-+             * Use the slow path for cross-page handling.
-+             * This is RAM, without a watchpoint, and will not trap.
-+             */
-+            tlb_fn(env, vd, reg_off, addr + mem_off, retaddr);
-+            goto second_page;
-         }
-     }
- 
-     /*
--     * Perform one normal read, which will fault or not.
--     * But it is likely to bring the page into the tlb.
-+     * From this point on, all memory operations are MemSingleNF.
-+     *
-+     * Per the MemSingleNF pseudocode, a no-fault load from Device memory
-+     * must not actually hit the bus -- it returns (UNKNOWN, FAULT) instead.
-+     *
-+     * Unfortuately we do not have access to the memory attributes from the
-+     * PTE to tell Device memory from Normal memory.  So we make a mostly
-+     * correct check, and indicate (UNKNOWN, FAULT) for any MMIO.
-+     * This gives the right answer for the common cases of "Normal memory,
-+     * backed by host RAM" and "Device memory, backed by MMIO".
-+     * The architecture allows us to suppress an NF load and return
-+     * (UNKNOWN, FAULT) for any reason, so our behaviour for the corner
-+     * case of "Normal memory, backed by MMIO" is permitted.  The case we
-+     * get wrong is "Device memory, backed by host RAM", for which we
-+     * should return (UNKNOWN, FAULT) for but do not.
-+     *
-+     * Similarly, CPU_BP breakpoints would raise exceptions, and so
-+     * return (UNKNOWN, FAULT).  For simplicity, we consider gdb and
-+     * architectural breakpoints the same.
-      */
--    tlb_fn(env, vd, reg_off, addr + mem_off, retaddr);
-+    if (unlikely(flags & TLB_MMIO)) {
-+        goto do_fault;
-+    }
- 
--    /* After any fault, zero any leading predicated false elts.  */
--    swap_memzero(vd, reg_off);
--    mem_off += 1 << msz;
--    reg_off += 1 << esz;
-+    reg_last = info.reg_off_last[0];
-+    host = info.page[0].host;
- 
--    /* Try again to read the balance of the page.  */
--    split = max_for_page(addr, mem_off - 1, mem_max);
--    if (split >= (1 << msz)) {
--        host = tlb_vaddr_to_host(env, addr + mem_off, MMU_DATA_LOAD, mmu_idx);
--        if (host) {
--            host -= mem_off;
--            do {
-+    do {
-+        uint64_t pg = *(uint64_t *)(vg + (reg_off >> 3));
-+        do {
-+            if ((pg >> (reg_off & 63)) & 1) {
-+                if (unlikely(flags & TLB_WATCHPOINT) &&
-+                    (cpu_watchpoint_address_matches
-+                     (env_cpu(env), addr + mem_off, 1 << msz)
-+                     & BP_MEM_READ)) {
-+                    goto do_fault;
-+                }
-+                /* TODO: MTE check. */
-                 host_fn(vd, reg_off, host + mem_off);
--                reg_off += 1 << esz;
--                reg_off = find_next_active(vg, reg_off, reg_max, esz);
--                mem_off = reg_off >> diffsz;
--            } while (split - mem_off >= (1 << msz));
--        }
--    }
--
--    record_fault(env, reg_off, reg_max);
--}
--
--/*
-- * Common helper for all contiguous no-fault loads.
-- */
--static void sve_ldnf1_r(CPUARMState *env, void *vg, const target_ulong addr,
--                        uint32_t desc, const int esz, const int msz,
--                        sve_ldst1_host_fn *host_fn)
--{
--    const unsigned rd = extract32(desc, SIMD_DATA_SHIFT + MEMOPIDX_SHIFT, 5);
--    void *vd = &env->vfp.zregs[rd];
--    const int diffsz = esz - msz;
--    const intptr_t reg_max = simd_oprsz(desc);
--    const intptr_t mem_max = reg_max >> diffsz;
--    const int mmu_idx = cpu_mmu_index(env, false);
--    intptr_t split, reg_off, mem_off;
--    void *host;
--
--#ifdef CONFIG_USER_ONLY
--    host = tlb_vaddr_to_host(env, addr, MMU_DATA_LOAD, mmu_idx);
--    if (likely(page_check_range(addr, mem_max, PAGE_READ) == 0)) {
--        /* The entire operation is valid and will not fault.  */
--        reg_off = 0;
--        do {
--            mem_off = reg_off >> diffsz;
--            host_fn(vd, reg_off, host + mem_off);
-+            }
-             reg_off += 1 << esz;
--            reg_off = find_next_active(vg, reg_off, reg_max, esz);
--        } while (reg_off < reg_max);
--        return;
--    }
--#endif
-+            mem_off += 1 << msz;
-+        } while (reg_off <= reg_last && (reg_off & 63));
-+    } while (reg_off <= reg_last);
- 
--    /* There will be no fault, so we may modify in advance.  */
--    memset(vd, 0, reg_max);
--
--    /* Skip to the first active element.  */
--    reg_off = find_next_active(vg, 0, reg_max, esz);
--    if (unlikely(reg_off == reg_max)) {
--        /* The entire predicate was false; no load occurs.  */
--        return;
--    }
--    mem_off = reg_off >> diffsz;
--
--#ifdef CONFIG_USER_ONLY
--    if (page_check_range(addr + mem_off, 1 << msz, PAGE_READ) == 0) {
--        /* At least one load is valid; take the rest of the page.  */
--        split = max_for_page(addr, mem_off + (1 << msz) - 1, mem_max);
--        do {
--            host_fn(vd, reg_off, host + mem_off);
--            reg_off += 1 << esz;
--            reg_off = find_next_active(vg, reg_off, reg_max, esz);
--            mem_off = reg_off >> diffsz;
--        } while (split - mem_off >= (1 << msz));
--    }
--#else
-     /*
--     * If the address is not in the TLB, we have no way to bring the
--     * entry into the TLB without also risking a fault.  Note that
--     * the corollary is that we never load from an address not in RAM.
--     *
--     * This last is out of spec, in a weird corner case.
--     * Per the MemNF/MemSingleNF pseudocode, a NF load from Device memory
--     * must not actually hit the bus -- it returns UNKNOWN data instead.
--     * But if you map non-RAM with Normal memory attributes and do a NF
--     * load then it should access the bus.  (Nobody ought actually do this
--     * in the real world, obviously.)
--     *
--     * Then there are the annoying special cases with watchpoints...
--     * TODO: Add a form of non-faulting loads using cc->tlb_fill(probe=true).
-+     * MemSingleNF is allowed to fail for any reason.  We have special
-+     * code above to handle the first element crossing a page boundary.
-+     * As an implementation choice, decline to handle a cross-page element
-+     * in any other position.
-      */
--    host = tlb_vaddr_to_host(env, addr + mem_off, MMU_DATA_LOAD, mmu_idx);
--    split = max_for_page(addr, mem_off, mem_max);
--    if (host && split >= (1 << msz)) {
--        host -= mem_off;
--        do {
--            host_fn(vd, reg_off, host + mem_off);
--            reg_off += 1 << esz;
--            reg_off = find_next_active(vg, reg_off, reg_max, esz);
--            mem_off = reg_off >> diffsz;
--        } while (split - mem_off >= (1 << msz));
-+    reg_off = info.reg_off_split;
-+    if (reg_off >= 0) {
-+        goto do_fault;
-     }
--#endif
- 
-+ second_page:
-+    reg_off = info.reg_off_first[1];
-+    if (likely(reg_off < 0)) {
-+        /* No active elements on the second page.  All done. */
-+        return;
-+    }
-+
-+    /*
-+     * MemSingleNF is allowed to fail for any reason.  As an implementation
-+     * choice, decline to handle elements on the second page.  This should
-+     * be low frequency as the guest walks through memory -- the next
-+     * iteration of the guest's loop should be aligned on the page boundary,
-+     * and then all following iterations will stay aligned.
-+     */
-+
-+ do_fault:
-     record_fault(env, reg_off, reg_max);
- }
- 
-@@ -4873,58 +4848,61 @@ static void sve_ldnf1_r(CPUARMState *env, void *vg, const target_ulong addr,
- void HELPER(sve_ldff1##PART##_r)(CPUARMState *env, void *vg,            \
-                                  target_ulong addr, uint32_t desc)      \
- {                                                                       \
--    sve_ldff1_r(env, vg, addr, desc, GETPC(), ESZ, 0,                   \
--                sve_ld1##PART##_host, sve_ld1##PART##_tlb);             \
-+    sve_ldnfff1_r(env, vg, addr, desc, GETPC(), ESZ, MO_8, FAULT_FIRST, \
-+                  sve_ld1##PART##_host, sve_ld1##PART##_tlb);           \
- }                                                                       \
- void HELPER(sve_ldnf1##PART##_r)(CPUARMState *env, void *vg,            \
-                                  target_ulong addr, uint32_t desc)      \
- {                                                                       \
--    sve_ldnf1_r(env, vg, addr, desc, ESZ, 0, sve_ld1##PART##_host);     \
-+    sve_ldnfff1_r(env, vg, addr, desc, GETPC(), ESZ, MO_8, FAULT_NO,    \
-+                  sve_ld1##PART##_host, sve_ld1##PART##_tlb);           \
- }
- 
- #define DO_LDFF1_LDNF1_2(PART, ESZ, MSZ) \
- void HELPER(sve_ldff1##PART##_le_r)(CPUARMState *env, void *vg,         \
-                                     target_ulong addr, uint32_t desc)   \
- {                                                                       \
--    sve_ldff1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ,                 \
--                sve_ld1##PART##_le_host, sve_ld1##PART##_le_tlb);       \
-+    sve_ldnfff1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ, FAULT_FIRST,  \
-+                  sve_ld1##PART##_le_host, sve_ld1##PART##_le_tlb);     \
- }                                                                       \
- void HELPER(sve_ldnf1##PART##_le_r)(CPUARMState *env, void *vg,         \
-                                     target_ulong addr, uint32_t desc)   \
- {                                                                       \
--    sve_ldnf1_r(env, vg, addr, desc, ESZ, MSZ, sve_ld1##PART##_le_host); \
-+    sve_ldnfff1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ, FAULT_NO,     \
-+                  sve_ld1##PART##_le_host, sve_ld1##PART##_le_tlb);     \
- }                                                                       \
- void HELPER(sve_ldff1##PART##_be_r)(CPUARMState *env, void *vg,         \
-                                     target_ulong addr, uint32_t desc)   \
- {                                                                       \
--    sve_ldff1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ,                 \
--                sve_ld1##PART##_be_host, sve_ld1##PART##_be_tlb);       \
-+    sve_ldnfff1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ, FAULT_FIRST,  \
-+                  sve_ld1##PART##_be_host, sve_ld1##PART##_be_tlb);     \
- }                                                                       \
- void HELPER(sve_ldnf1##PART##_be_r)(CPUARMState *env, void *vg,         \
-                                     target_ulong addr, uint32_t desc)   \
- {                                                                       \
--    sve_ldnf1_r(env, vg, addr, desc, ESZ, MSZ, sve_ld1##PART##_be_host); \
-+    sve_ldnfff1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ, FAULT_NO,     \
-+                  sve_ld1##PART##_be_host, sve_ld1##PART##_be_tlb);     \
- }
- 
--DO_LDFF1_LDNF1_1(bb,  0)
--DO_LDFF1_LDNF1_1(bhu, 1)
--DO_LDFF1_LDNF1_1(bhs, 1)
--DO_LDFF1_LDNF1_1(bsu, 2)
--DO_LDFF1_LDNF1_1(bss, 2)
--DO_LDFF1_LDNF1_1(bdu, 3)
--DO_LDFF1_LDNF1_1(bds, 3)
-+DO_LDFF1_LDNF1_1(bb,  MO_8)
-+DO_LDFF1_LDNF1_1(bhu, MO_16)
-+DO_LDFF1_LDNF1_1(bhs, MO_16)
-+DO_LDFF1_LDNF1_1(bsu, MO_32)
-+DO_LDFF1_LDNF1_1(bss, MO_32)
-+DO_LDFF1_LDNF1_1(bdu, MO_64)
-+DO_LDFF1_LDNF1_1(bds, MO_64)
- 
--DO_LDFF1_LDNF1_2(hh,  1, 1)
--DO_LDFF1_LDNF1_2(hsu, 2, 1)
--DO_LDFF1_LDNF1_2(hss, 2, 1)
--DO_LDFF1_LDNF1_2(hdu, 3, 1)
--DO_LDFF1_LDNF1_2(hds, 3, 1)
-+DO_LDFF1_LDNF1_2(hh,  MO_16, MO_16)
-+DO_LDFF1_LDNF1_2(hsu, MO_32, MO_16)
-+DO_LDFF1_LDNF1_2(hss, MO_32, MO_16)
-+DO_LDFF1_LDNF1_2(hdu, MO_64, MO_16)
-+DO_LDFF1_LDNF1_2(hds, MO_64, MO_16)
- 
--DO_LDFF1_LDNF1_2(ss,  2, 2)
--DO_LDFF1_LDNF1_2(sdu, 3, 2)
--DO_LDFF1_LDNF1_2(sds, 3, 2)
-+DO_LDFF1_LDNF1_2(ss,  MO_32, MO_32)
-+DO_LDFF1_LDNF1_2(sdu, MO_64, MO_32)
-+DO_LDFF1_LDNF1_2(sds, MO_64, MO_32)
- 
--DO_LDFF1_LDNF1_2(dd,  3, 3)
-+DO_LDFF1_LDNF1_2(dd,  MO_64, MO_64)
- 
- #undef DO_LDFF1_LDNF1_1
- #undef DO_LDFF1_LDNF1_2
--- 
-2.20.1
+> +        exit(1);
+> +    }
+> +    env->PC = entry;
+> +
+> +}
+> +
+> +/*
+> + * Initialize the auxiliary ROM region @mr and map it into
+> + * the memory map at @base.
+> + */
+> +static void make_rom(MemoryRegion *mr, const char *name,
+> +                     hwaddr base, hwaddr size)
+> +{
+> +    memory_region_init_rom(mr, NULL, name, size, &error_fatal);
+> +    memory_region_add_subregion(get_system_memory(), base, mr);
+> +}
+> +
+> +/*
+> + * Initialize the auxiliary RAM region @mr and map it into
+> + * the memory map at @base.
+> + */
+> +static void make_ram(MemoryRegion *mr, const char *name,
+> +                     hwaddr base, hwaddr size)
+> +{
+> +    memory_region_init_ram(mr, NULL, name, size, &error_fatal);
+> +    memory_region_add_subregion(get_system_memory(), base, mr);
+> +}
+> +
+> +/*
+> + * Create an alias of an entire original MemoryRegion @orig
+> + * located at @base in the memory map.
+> + */
+> +static void make_alias(MemoryRegion *mr, const char *name,
+> +                           MemoryRegion *orig, hwaddr base)
+> +{
+> +    memory_region_init_alias(mr, NULL, name, orig, 0,
+> +                             memory_region_size(orig));
+> +    memory_region_add_subregion(get_system_memory(), base, mr);
+> +}
+> +
+> +static void tc27xd_memory_maps_init(void)
+> +{
+
+Nitpicking, I'd rather use a SoC structure, ...
+
+> +    MemoryRegion *dspr0 = g_new(MemoryRegion, 1);
+> +    MemoryRegion *dspr1 = g_new(MemoryRegion, 1);
+> +    MemoryRegion *dspr2 = g_new(MemoryRegion, 1);
+> +    MemoryRegion *dsprX = g_new(MemoryRegion, 1);
+> +    MemoryRegion *pspr0 = g_new(MemoryRegion, 1);
+> +    MemoryRegion *pspr1 = g_new(MemoryRegion, 1);
+> +    MemoryRegion *pspr2 = g_new(MemoryRegion, 1);
+> +    MemoryRegion *psprX = g_new(MemoryRegion, 1);
+
+... holding 3 CPU structure regions + the default alias...
+
+> +
+> +    MemoryRegion *pflash0_c = g_new(MemoryRegion, 1);
+> +    MemoryRegion *pflash1_c = g_new(MemoryRegion, 1);
+> +    MemoryRegion *pflash0_u = g_new(MemoryRegion, 1);
+> +    MemoryRegion *pflash1_u = g_new(MemoryRegion, 1);
+> +    MemoryRegion *dflash0 = g_new(MemoryRegion, 1);
+> +    MemoryRegion *dflash1 = g_new(MemoryRegion, 1);
+> +    MemoryRegion *olda_c = g_new(MemoryRegion, 1);
+> +    MemoryRegion *olda_u = g_new(MemoryRegion, 1);	
+> +    MemoryRegion *brom_c = g_new(MemoryRegion, 1);
+> +    MemoryRegion *brom_u = g_new(MemoryRegion, 1);
+
+... and one structure holding the flash regions.
+
+> +    MemoryRegion *lmuram_c = g_new(MemoryRegion, 1);
+> +    MemoryRegion *lmuram_u = g_new(MemoryRegion, 1);
+> +    MemoryRegion *emem_c = g_new(MemoryRegion, 1);
+> +    MemoryRegion *emem_u = g_new(MemoryRegion, 1);
+> +
+> +    MemoryRegion *pcache0 = g_new(MemoryRegion, 1);
+> +    MemoryRegion *ptag0 = g_new(MemoryRegion, 1);
+> +
+> +    MemoryRegion *dcache1 = g_new(MemoryRegion, 1);
+> +    MemoryRegion *dtag1 = g_new(MemoryRegion, 1);
+> +    MemoryRegion *pcache1 = g_new(MemoryRegion, 1);
+> +    MemoryRegion *ptag1 = g_new(MemoryRegion, 1);
+> +
+> +    MemoryRegion *dcache2 = g_new(MemoryRegion, 1);
+> +    MemoryRegion *dtag2 = g_new(MemoryRegion, 1);
+> +    MemoryRegion *pcache2 = g_new(MemoryRegion, 1);
+> +    MemoryRegion *ptag2 = g_new(MemoryRegion, 1);
+> +
+> +    make_ram(dspr2, "CPU2.DSPR", TC27XD_MEMMAP_DSPR2, 120 * KiB);
+> +    make_ram(pspr2, "CPU2.PSPR", TC27XD_MEMMAP_PSPR2,  32 * KiB);
+> +    make_ram(dspr1, "CPU1.DSPR", TC27XD_MEMMAP_DSPR1, 120 * KiB);
+> +    make_ram(pspr1, "CPU1.PSPR", TC27XD_MEMMAP_PSPR1,  32 * KiB);
+> +    make_ram(dspr0, "CPU0.DSPR", TC27XD_MEMMAP_DSPR0, 112 * KiB);
+> +    make_ram(pspr0, "CPU0.PSPR", TC27XD_MEMMAP_PSPR0,  24 * KiB);
+> +
+> +    /*
+> +     * TriCore QEMU executes CPU0 only, thus it is sufficient to map
+> +     * LOCAL.PSPR/LOCAL.DSPR exclusively onto PSPR0/DSPR0.
+> +     */
+> +    make_alias(psprX, "LOCAL.PSPR", pspr0,
+> +            TC27XD_MEMMAP_PSPRX);
+> +    make_alias(dsprX, "LOCAL.DSPR", dspr0,
+> +            TC27XD_MEMMAP_DSPRX);
+> +
+> +    make_ram(pflash0_c, "PF0",    TC27XD_MEMMAP_PFLASH0_C,  2 * MiB);
+> +    make_ram(pflash1_c, "PF1",    TC27XD_MEMMAP_PFLASH1_C,  2 * MiB);
+> +    make_ram(dflash0,   "DF0",    TC27XD_MEMMAP_DFLASH0,   1 * MiB + 16 * KiB);
+> +    make_ram(dflash1,   "DF1",    TC27XD_MEMMAP_DFLASH1,   64 * KiB);
+> +    make_ram(olda_c,    "OLDA",   TC27XD_MEMMAP_OLDA_C,    32 * KiB);
+> +    make_rom(brom_c,    "BROM",   TC27XD_MEMMAP_BROM_C,    32 * KiB);
+> +    make_ram(lmuram_c,  "LMURAM", TC27XD_MEMMAP_LMURAM_C,  32 * KiB);
+> +    make_ram(emem_c,    "EMEM",   TC27XD_MEMMAP_EMEM_C,     1 * MiB);
+> +
+> +    make_alias(pflash0_u, "PF0.U",    pflash0_c, TC27XD_MEMMAP_PFLASH0_U);
+> +    make_alias(pflash1_u, "PF1.U",    pflash1_c, TC27XD_MEMMAP_PFLASH1_U);
+> +    make_alias(olda_u,    "OLDA.U",   olda_c,    TC27XD_MEMMAP_OLDA_U);
+> +    make_alias(brom_u,    "BROM.U",   brom_c,    TC27XD_MEMMAP_BROM_U);
+> +    make_alias(lmuram_u,  "LMURAM.U", lmuram_c,  TC27XD_MEMMAP_LMURAM_U);
+> +    make_alias(emem_u,    "EMEM.U",   emem_c,    TC27XD_MEMMAP_EMEM_U);
+> +
+> +    /* TODO: Control Cache mapping with Memory Test Unit (MTU) */
+> +    make_ram(dcache2, "CPU2.DCACHE", TC27XD_MEMMAP_DCACHE2,  8 * KiB);
+> +    make_ram(dtag2,   "CPU2.DTAG",   TC27XD_MEMMAP_DTAG2,       2560);
+> +    make_ram(pcache2, "CPU2.PCACHE", TC27XD_MEMMAP_PCACHE2, 16 * KiB);
+> +    make_ram(ptag2,   "CPU2.PTAG",   TC27XD_MEMMAP_PTAG2,       6144);
+> +
+> +    make_ram(dcache1, "CPU1.DCACHE", TC27XD_MEMMAP_DCACHE1,  8 * KiB);
+> +    make_ram(dtag1,   "CPU1.DTAG",   TC27XD_MEMMAP_DTAG1,       2560);
+> +    make_ram(pcache1, "CPU1.PCACHE", TC27XD_MEMMAP_PCACHE1, 16 * KiB);
+> +    make_ram(ptag1,   "CPU1.PTAG",   TC27XD_MEMMAP_PTAG1,       6144);
+> +
+> +    make_ram(pcache0, "CPU0.PCACHE", TC27XD_MEMMAP_PCACHE0,  8 * KiB);
+> +    make_ram(ptag0,   "CPU0.PTAG",   TC27XD_MEMMAP_PTAG0,       2560);
+> +}
+> +
+> +static void tc27xd_tb_init(MachineState *machine)
+> +{
+> +    TriCoreCPU *cpu;
+> +    CPUTriCoreState *env;
+> +
+> +    cpu = TRICORE_CPU(cpu_create(machine->cpu_type));
+> +    env = &cpu->env;
+> +
+> +    tc27xd_memory_maps_init();
+> +
+> +    tc27xd_db_binfo.ram_size = machine->ram_size;
+> +    tc27xd_db_binfo.kernel_filename = machine->kernel_filename;
+> +
+> +    if (machine->kernel_filename) {
+> +        tricore_load_kernel(env);
+
+        } else {
+           // error message
+           exit(1);
+
+> +    }
+> +}
+> +
+> +static void tc27xd_tb_machine_init(MachineClass *mc)
+> +{
+> +    mc->desc = "Infineon AURIX TC277 D-Step TriBoard";
+> +    mc->init = tc27xd_tb_init;
+> +    mc->is_default = 0;
+> +    mc->default_cpu_type = TRICORE_CPU_TYPE_NAME("tc27x");
+> +}
+> +DEFINE_MACHINE("AURIX_TriBoard_TC277D", tc27xd_tb_machine_init)
+> 
 
 
