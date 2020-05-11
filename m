@@ -2,92 +2,100 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB4B7C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 21:22:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B326C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 21:37:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96FEF206D5
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 21:22:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D6F70206D9
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 21:37:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XbJ4AI5H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96FEF206D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fUVBZdsG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6F70206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYFsU-0000Gc-S7
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 17:22:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40640)
+	id 1jYG7G-0005k7-1Y
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 17:37:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43128)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jYFrl-0007jQ-0T
- for qemu-devel@nongnu.org; Mon, 11 May 2020 17:21:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43846
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jYFrk-0007Nr-Az
- for qemu-devel@nongnu.org; Mon, 11 May 2020 17:21:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589232095;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=TR2jGqO+5kRNtV89ZiK2T/UoGvctN4DCMgqWZq6b5eE=;
- b=XbJ4AI5Haen43LEkoACa6GBKKCY1FgdahR269XTsXHEoP/phXrtt/imyb1tXkzd4RuR/ce
- IzfcP+LTB8+jPcf8QBFSYN8VPL4N4Z+Qjg3zP7vz9AorbP+te3zkWxvOZJVVNieIXVMKv0
- 3/EMCF/awVyvSS6BGVNUcvk+78939mc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-181-2cOjLtmTNbGkfpfkcgjKyg-1; Mon, 11 May 2020 17:21:17 -0400
-X-MC-Unique: 2cOjLtmTNbGkfpfkcgjKyg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1C28B18FE875;
- Mon, 11 May 2020 21:21:16 +0000 (UTC)
-Received: from [10.3.116.145] (ovpn-116-145.phx2.redhat.com [10.3.116.145])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6393B5D9DD;
- Mon, 11 May 2020 21:21:15 +0000 (UTC)
-Subject: Re: [PATCH v3 3/9] block: Make it easier to learn which BDS support
- bitmaps
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-References: <20200508180340.675712-1-eblake@redhat.com>
- <20200508180340.675712-4-eblake@redhat.com>
- <aba3eddd-1201-9182-6011-9fe0bbca1b76@redhat.com>
- <b6c61cc5-8a7c-ef2c-76f1-def580827e14@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <bb0d4599-10ec-0170-50a6-7c8d70e67a25@redhat.com>
-Date: Mon, 11 May 2020 16:21:14 -0500
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jYG6D-00056S-6B
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 17:36:33 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50920)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jYG6C-0003Mz-Ei
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 17:36:32 -0400
+Received: by mail-wm1-x342.google.com with SMTP id m12so14692824wmc.0
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 14:36:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=OUeK/4XW2K31fbpxhDrRO5QxaZUZTQWNrTzYWfq3gqY=;
+ b=fUVBZdsGrewYZjuUZlPwcY2kqDcTZKQ072H9xduZufO/3tIOU03E0zQy9lGCTQxf+N
+ mBS19kcPh2+Jn6fh7D/TNWenGtGpp9Tpf1X1mtof6AOv4SwVrpYKpeQdudpv83bggLRG
+ 4fIK+EgpqcPlc40VjzQM/0OLiIg+59Fyt+qxdWWq2O1rYysg0sdqP9rydJdqWjDWe/sW
+ eehtPoxwZFamCYG+r9wFXGtrvVsnmZ7wnid6LEjeaQtijhbhpkMx/1Xk7WsNUum1j8h8
+ urpa6yD2NPIoftFxgvMFPlvth+RzOsAvqiTOT/MPMEhMzpKX812i/ITZ+ovuBpBLFywo
+ WuSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=OUeK/4XW2K31fbpxhDrRO5QxaZUZTQWNrTzYWfq3gqY=;
+ b=oGVCrhM0zhTJhJFvymZ1WJSNl8yFBWxLWDHJiAc5Pf6cclfmWQpEzNTWVG6jaZknXS
+ uOP+8a3Um4G7uwpQ8j735W+Ax9/npiQA0rqtkXZzP+V+xIkRzQUWYmomAyqSXuE4iH5b
+ vlkCIeT09NQs7tl2u3a6Bsg3MzCM/fb4v2VoftIvdHqqfqVwhFUw/mZ+7x5+qF6NaLR3
+ 5eLhRk5Vw9mcQjhHOto+ncGZ4GdFv/SPtYSDTO7+Fnc1GLmKmzRu9nauDw5mYk8I1grD
+ R1tmrD0uq+Hgvk57WyGa1UnG1oTWC7y45Oy7A1mXRol9P06w2zq49Eq2pK9AEMLE8CeN
+ y+0g==
+X-Gm-Message-State: AGi0PuY0QuqSQcgEOlI1kAre4ZzIbpcFH7hI4VlfhgaQQ7cXAvltMDkZ
+ skOzNN4CCwQW/v8wyyxJD/o=
+X-Google-Smtp-Source: APiQypKf/QlhupYku3QoOzpZnYeNetLk5Xg0rfJJTA8Aw0SnbkFinLpCuWVnH0tn7GNcop+zlZc3dw==
+X-Received: by 2002:a05:600c:2c53:: with SMTP id
+ r19mr35464766wmg.40.1589232986925; 
+ Mon, 11 May 2020 14:36:26 -0700 (PDT)
+Received: from [192.168.1.37] (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id h137sm37082678wme.0.2020.05.11.14.36.25
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 11 May 2020 14:36:26 -0700 (PDT)
+Subject: Re: [PATCH 5/7] audio: Let HWVoice write() handlers take a const
+ buffer
+To: =?UTF-8?Q?Volker_R=c3=bcmelin?= <vr_qemu@t-online.de>,
+ qemu-devel@nongnu.org
+References: <20200505132603.8575-1-f4bug@amsat.org>
+ <20200505132603.8575-6-f4bug@amsat.org>
+ <a52cb124-ff0a-c529-038e-6559c5e59e1a@t-online.de>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <8de3167e-7e1d-9916-4051-9ace75e15852@amsat.org>
+Date: Mon, 11 May 2020 23:36:24 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <b6c61cc5-8a7c-ef2c-76f1-def580827e14@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <a52cb124-ff0a-c529-038e-6559c5e59e1a@t-online.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 02:55:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,38 +108,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?B?S8WRdsOhZ8OzIFpvbHTDoW4=?= <DirtY.iCE.hu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/11/20 1:16 PM, Eric Blake wrote:
-> On 5/11/20 4:21 AM, Max Reitz wrote:
-
->>> +++ b/include/block/block_int.h
->>> @@ -560,6 +560,7 @@ struct BlockDriver {
->>>                                uint64_t parent_perm, uint64_t 
->>> parent_shared,
->>>                                uint64_t *nperm, uint64_t *nshared);
->>>
->>> +    bool (*bdrv_dirty_bitmap_supported)(BlockDriverState *bs);
->>
->> All BDSs support bitmaps, but only some support persistent dirty
->> bitmaps, so I think the name should reflect that.
+On 5/6/20 8:22 AM, Volker Rümelin wrote:
 > 
-> How about .bdrv_dirty_bitmap_supports_persistent?
+>> diff --git a/audio/dsoundaudio.c b/audio/dsoundaudio.c
+>> index 4cdf19ab67..bba6bafda4 100644
+>> --- a/audio/dsoundaudio.c
+>> +++ b/audio/dsoundaudio.c
+>> @@ -454,7 +454,7 @@ static void *dsound_get_buffer_out(HWVoiceOut *hw, size_t *size)
+>>       return ret;
+>>   }
+>>   
+>> -static size_t dsound_put_buffer_out(HWVoiceOut *hw, void *buf, size_t len)
+>> +static size_t dsound_put_buffer_out(HWVoiceOut *hw, const void *buf, size_t len)
+>>   {
+>>       DSoundVoiceOut *ds = (DSoundVoiceOut *) hw;
+>>       LPDIRECTSOUNDBUFFER dsb = ds->dsound_buffer;
+> 
+> You forgot to make the buffer const in dsound_put_buffer_in().
+> 
+> I had to cast buf to LPVOID in dsound_get_buffer_in() and dsound_put_buffer_in() because otherwise I see:
+> 
+> C:/usr/msys64/home/ruemelin/git/qemu/audio/dsoundaudio.c: In function 'dsound_put_buffer_out':
+> C:/usr/msys64/home/ruemelin/git/qemu/audio/dsoundaudio.c:466:38: error: passing argument 2 of 'dsound_unlock_out' discards 'const' qualifier from pointer target type [-Werror=discarded-qualifiers]
+>    466 |     int err = dsound_unlock_out(dsb, buf, NULL, len, 0);
+>        |                                      ^~~
+> In file included from C:/usr/msys64/home/ruemelin/git/qemu/audio/dsoundaudio.c:266:
+> C:/usr/msys64/home/ruemelin/git/qemu/audio/dsound_template.h:48:12: note: expected 'LPVOID' {aka 'void *'} but argument is of type 'const void *'
+>     48 |     LPVOID p1,
+>        |     ~~~~~~~^~
+> C:/usr/msys64/home/ruemelin/git/qemu/audio/dsoundaudio.c: In function 'dsound_put_buffer_in':
+> C:/usr/msys64/home/ruemelin/git/qemu/audio/dsoundaudio.c:571:38: error: passing argument 2 of 'dsound_unlock_in' discards 'const' qualifier from pointer target type [-Werror=discarded-qualifiers]
+>    571 |     int err = dsound_unlock_in(dscb, buf, NULL, len, 0);
+>        |                                      ^~~
+> In file included from C:/usr/msys64/home/ruemelin/git/qemu/audio/dsoundaudio.c:268:
+> C:/usr/msys64/home/ruemelin/git/qemu/audio/dsound_template.h:48:12: note: expected 'LPVOID' {aka 'void *'} but argument is of type 'const void *'
+>     48 |     LPVOID p1,
+>        |     ~~~~~~~^~
 
-Bike-shedding myself, it looks like 
-.bdrv_supports_persistent_dirty_bitmap is better (if you go by the 
-naming convention 'noun-verb-details', it makes more sense that a 'bdrv' 
-supports 'persistent dirty bitmaps', than that a 'bdrv dirty bitmap' 
-supports 'persistence', particularly when the parameter is a 
-BlockDriverState rather than a BdrvDirtyBitmap).
+OK thanks for testing. This is unfortunate, because a single backend 
+invalidates the whole series.
+I don't understand why the DirectSound API requires a writable buffer 
+for locking.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+> 
+> With best regards,
+> Volker
+> 
 
