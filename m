@@ -2,73 +2,95 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 316F7C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 18:07:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C6DC47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 18:09:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 047F5206B9
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 18:07:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 047F5206B9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 03DA7206B9
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 18:09:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aYZmNgIk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03DA7206B9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYCpv-0001Yv-6I
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 14:07:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39516)
+	id 1jYCrQ-0003Pp-5S
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 14:09:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40234)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jYCmh-00050h-TY
- for qemu-devel@nongnu.org; Mon, 11 May 2020 14:04:11 -0400
-Resent-Date: Mon, 11 May 2020 14:04:11 -0400
-Resent-Message-Id: <E1jYCmh-00050h-TY@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21390)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jYCmg-0001Gn-Q6
- for qemu-devel@nongnu.org; Mon, 11 May 2020 14:04:11 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1589220237; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=aHzLXB3g79dVj83XD8Xw1HqpGGcTapHWslgD5af1it3ZVmV2GCT6PtFEeGl8EH2xVCgatgkOZhYntxEjrOO39sWj8Qvzyyk1yAp/jrud1f7w1yqyplaly6rfMrV7Ji0A5QaAXT8S646ANP5Cw9/YvyHH6UFOz2v0MAmsJQ7Vaxo=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1589220237;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=ssaolsH5abo67FAkqXSmOEtkFvN5GuWgVBOOO+PPKw0=; 
- b=eN++gFyutOpkWflrncMbmZw80Up/2O8aN9kpQ2cVo7mbY/JC6ONUNVP04ZCIWyhfVbS8l4T3Yg7AD2udeNftLeHMz8OracXayw+DsHje3OA15MXDNDtsPsq4ImtHviYVfI1bcVfdh29hoBkrVAMcgPqPpfEYDjY47WbyHLEzUMg=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1589220235660534.5215559568405;
- Mon, 11 May 2020 11:03:55 -0700 (PDT)
-Message-ID: <158922023425.26583.1084030649985843744@45ef0f9c86ae>
-In-Reply-To: <20200511160951.8733-1-mlevitsk@redhat.com>
-Subject: Re: [PATCH v2 0/7] RFC/WIP: Fix scsi devices plug/unplug races w.r.t
- virtio-scsi iothread
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jYCpM-0000kM-QI
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 14:06:56 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:34204)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jYCpL-0003lC-6d
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 14:06:56 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id h12so7649897pjz.1
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 11:06:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=uQg3dk1dcqkq8wLY3L2wO/TVKMBfc+kSyde7iV+E11g=;
+ b=aYZmNgIk5PScUe6R6YK7CPabwsm3i9EKLilo1oGHDp8eCbHklA/oa9K1hlqU6iKYFr
+ ZafTs3bAuPInj0fErwQn9A+hsBHACAxIQkjZbHq6Ic7vcKukEInaWsr3V8d3eWf+Dg2q
+ seZYIYR3vJy9ZLkwT2S/3JWsnZdRO1YpG6RzlvcB53TWVEwz0kkuHDPliO7vmoigUDz+
+ nY4uyMoUj8Fnl08pqDfoVY7IjBy/HjHnkGhXKseroulXPzSFBcJIZCOB/wCOolNfOF7n
+ Si92YzAZ6SAdi3DIWRK+vMr1BGT3m37vImijOIruwdo4WVmG0CgNqhxFvbpNOAs/QXjr
+ 2NUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=uQg3dk1dcqkq8wLY3L2wO/TVKMBfc+kSyde7iV+E11g=;
+ b=lOvbA/85QaaQVDh6jYIR4VD547FJyLBx0xJmlQyz577wf97qqn1FMd+tBbwr4kPWLA
+ 7/CBDXHaALEwmha1JPs2bguI4AkiM9FW+dWI2AN/AmUQwAgaECVqpBb0RHQdCCVUodmZ
+ XX7Oy3fQh6sXBEik4i1jykIVa6HxzRSYYxs3ijnPqzZLwilEzB0ILr8s5EFh2tfKxDJn
+ LEY0Zt9TcUqQR8Hwi096wOEYwCUHegpfp5gwBWZWVswrfzE0wT3p7DQYQY90kVFKm7OH
+ Sp1+KrSbP6b43ZAGupA2q2e4LqwRjBt5yqyJMLFLPRj1Rob8XHNVjRCP6jeN+lXs6BcG
+ ieXQ==
+X-Gm-Message-State: AGi0Pua/lHTZarfGbjllWLpqo1eDIXqG2BrPDXjL7ilqir25gaUha8/3
+ rQTN7LL+trr9DjdhJFw4D13xyg==
+X-Google-Smtp-Source: APiQypLOqG1cSWUB7b+5FsDbcM3AXgmP6wa4tBQtQ4Sj1PYXV8zO4m8o4KhEqAV0lSojnTr/WxYieA==
+X-Received: by 2002:a17:902:8688:: with SMTP id
+ g8mr16984894plo.268.1589220413721; 
+ Mon, 11 May 2020 11:06:53 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
+ by smtp.gmail.com with ESMTPSA id g9sm8539998pgj.89.2020.05.11.11.06.52
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 11 May 2020 11:06:52 -0700 (PDT)
+Subject: Re: [RFC PATCH 6/8] riscv: Add configure script
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>, peter.maydell@linaro.org
+References: <20200430072139.4602-1-zhiwei_liu@c-sky.com>
+ <20200430072139.4602-7-zhiwei_liu@c-sky.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a434ed23-5102-b39b-8fff-0f60e493e488@linaro.org>
+Date: Mon, 11 May 2020 11:06:50 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: mlevitsk@redhat.com
-Date: Mon, 11 May 2020 11:03:55 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 14:03:32
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+In-Reply-To: <20200430072139.4602-7-zhiwei_liu@c-sky.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1044.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,54 +104,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, berrange@redhat.com, ehabkost@redhat.com, mst@redhat.com,
- qemu-devel@nongnu.org, mlevitsk@redhat.com, pbonzini@redhat.com
+Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, wxy194768@alibaba-inc.com,
+ wenmeng_zhang@c-sky.com, palmer@dabbelt.com, alistair23@gmail.com,
+ alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUxMTE2MDk1MS44NzMz
-LTEtbWxldml0c2tAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
-IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
-Zm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAyMDA1MTExNjA5NTEuODczMy0xLW1sZXZpdHNrQHJl
-ZGhhdC5jb20KU3ViamVjdDogW1BBVENIIHYyIDAvN10gUkZDL1dJUDogRml4IHNjc2kgZGV2aWNl
-cyBwbHVnL3VucGx1ZyByYWNlcyB3LnIudCB2aXJ0aW8tc2NzaSBpb3RocmVhZApUeXBlOiBzZXJp
-ZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBi
-YXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVs
-aW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0t
-bWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpTd2l0Y2hlZCB0byBhIG5l
-dyBicmFuY2ggJ3Rlc3QnCmYxMGFjYzYgdmlydGlvLXNjc2k6IHVzZSBzY3NpX2RldmljZV9nZXQK
-NGIyOGU0MSBzY3NpOiBBZGQgc2NzaV9kZXZpY2VfZ2V0Cjk2OWM3ODQgdmlydGlvLXNjc2k6IGRv
-bid0IHRvdWNoIHNjc2kgZGV2aWNlcyB0aGF0IGFyZSBub3QgeWV0IHJlYWxpemVkIG9yIGFib3V0
-IHRvIGJlIHVuLXJlYWxpemVkCmM5NWMzM2YgZGV2aWNlLWNvcmU6IHVzZSBhdG9taWNfc2V0IG9u
-IC5yZWFsaXplZCBwcm9wZXJ0eQoyMzlhOGNlIGRldmljZS1jb3JlOiB1c2UgUkNVIGZvciBsaXN0
-IG9mIGNoaWxkcyBvZiBhIGJ1cwpkZDBjM2E4IEltcGxlbWVudCBkcmFpbl9jYWxsX3JjdSBhbmQg
-dXNlIGl0IGluIGhtcF9kZXZpY2VfZGVsCmNjN2EwODUgc2NzaS9zY3NpX2J1czogc3dpdGNoIHNl
-YXJjaCBkaXJlY3Rpb24gaW4gc2NzaV9kZXZpY2VfZmluZAoKPT09IE9VVFBVVCBCRUdJTiA9PT0K
-MS83IENoZWNraW5nIGNvbW1pdCBjYzdhMDg1YzJjNTkgKHNjc2kvc2NzaV9idXM6IHN3aXRjaCBz
-ZWFyY2ggZGlyZWN0aW9uIGluIHNjc2lfZGV2aWNlX2ZpbmQpCjIvNyBDaGVja2luZyBjb21taXQg
-ZGQwYzNhOGNmZDliIChJbXBsZW1lbnQgZHJhaW5fY2FsbF9yY3UgYW5kIHVzZSBpdCBpbiBobXBf
-ZGV2aWNlX2RlbCkKMy83IENoZWNraW5nIGNvbW1pdCAyMzlhOGNlZTNjNjAgKGRldmljZS1jb3Jl
-OiB1c2UgUkNVIGZvciBsaXN0IG9mIGNoaWxkcyBvZiBhIGJ1cykKNC83IENoZWNraW5nIGNvbW1p
-dCBjOTVjMzNmNGE3ZGMgKGRldmljZS1jb3JlOiB1c2UgYXRvbWljX3NldCBvbiAucmVhbGl6ZWQg
-cHJvcGVydHkpCjUvNyBDaGVja2luZyBjb21taXQgOTY5Yzc4NGI4ZDhlICh2aXJ0aW8tc2NzaTog
-ZG9uJ3QgdG91Y2ggc2NzaSBkZXZpY2VzIHRoYXQgYXJlIG5vdCB5ZXQgcmVhbGl6ZWQgb3IgYWJv
-dXQgdG8gYmUgdW4tcmVhbGl6ZWQpCjYvNyBDaGVja2luZyBjb21taXQgNGIyOGU0MWVlNzcyIChz
-Y3NpOiBBZGQgc2NzaV9kZXZpY2VfZ2V0KQpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSB0
-cmFpbGluZyAqLyBvbiBhIHNlcGFyYXRlIGxpbmUKIzI5OiBGSUxFOiBody9zY3NpL3Njc2ktYnVz
-LmM6MTU5MjoKKyAqICovCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBh
-cm1zIG9mIHRoaXMgc3RhdGVtZW50CiM2NzogRklMRTogaHcvc2NzaS9zY3NpLWJ1cy5jOjE2MzA6
-CisgICAgaWYgKCFkZXYpClsuLi5dCgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDY2IGxp
-bmVzIGNoZWNrZWQKClBhdGNoIDYvNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNy83IENo
-ZWNraW5nIGNvbW1pdCBmMTBhY2M2MzFjZjcgKHZpcnRpby1zY3NpOiB1c2Ugc2NzaV9kZXZpY2Vf
-Z2V0KQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAx
-CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8y
-MDIwMDUxMTE2MDk1MS44NzMzLTEtbWxldml0c2tAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0
-Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
-dGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
-byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 4/30/20 12:21 AM, LIU Zhiwei wrote:
+> +++ b/configure
+> @@ -58,6 +58,8 @@ guess_arch() {
+>          ARCH="m68k"
+>      elif check_define __powerpc64__ ; then
+>          ARCH="ppc64"
+> +    elif check_define __riscv ; then
+> +        ARCH="riscv64"
+>      else
+>          echo "This cpu is not supported by risu. Try -h. " >&2
+>          exit 1
+
+Why "riscv64" and not "riscv"?
+
+You can't really say more without checking __riscv_xlen.
+
+
+r~
 
