@@ -2,90 +2,73 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C448CC47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 18:02:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8076C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 18:05:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91730206B9
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 18:02:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tu+bdLIU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91730206B9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A549E206B9
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 18:05:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A549E206B9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYCkm-0003ex-Md
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 14:02:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39148)
+	id 1jYCnf-0005j7-Ot
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 14:05:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39402)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jYCjv-0002pD-Kq
- for qemu-devel@nongnu.org; Mon, 11 May 2020 14:01:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25047
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jYCm7-0004hw-Qf
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 14:03:35 -0400
+Resent-Date: Mon, 11 May 2020 14:03:35 -0400
+Resent-Message-Id: <E1jYCm7-0004hw-Qf@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21382)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jYCju-0000mS-CS
- for qemu-devel@nongnu.org; Mon, 11 May 2020 14:01:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589220077;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4RKl3gYD9wmG4rBh207QD6ZaVEF9teVydBeY+eA5SV8=;
- b=Tu+bdLIUS+igd0xdozkHZbtPwu6tAl1UjPm2jHq6uj0/chWo0lvvwfj6tSrfI0yv/7WZoB
- 4rTQePoFnAHuqs88IqQT1I0g65P9GdSUnfzslvC9EdfDSLGTBIdx+MEjnzbrKiEAkqfmQK
- rlMjwS8SGWup4E0xc8G+w5QcIk9iyfI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-339-nY4VUmtcOp-0XAB2XTcaYA-1; Mon, 11 May 2020 14:01:15 -0400
-X-MC-Unique: nY4VUmtcOp-0XAB2XTcaYA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F0981B18BC6;
- Mon, 11 May 2020 18:01:14 +0000 (UTC)
-Received: from [10.3.116.145] (ovpn-116-145.phx2.redhat.com [10.3.116.145])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5813C6C796;
- Mon, 11 May 2020 18:01:07 +0000 (UTC)
-Subject: Re: [PATCH v3 1/3] qemu-sockets: add abstract UNIX domain socket
- support
-To: xiaoqiang zhao <zxq_yx_007@163.com>, berrange@redhat.com,
- marcandre.lureau@redhat.com, kwolf@redhat.com, armbru@redhat.com
-References: <20200510061422.24841-1-zxq_yx_007@163.com>
- <20200510061422.24841-2-zxq_yx_007@163.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <0ead3ac4-efa3-b773-f5c3-7aa055e2af18@redhat.com>
-Date: Mon, 11 May 2020 13:01:06 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jYCm6-00015L-3Q
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 14:03:35 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1589220199; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=gyhfELcGtIwYcnrY+N1xXokWNIHkfYxM3+RjjyEtPD5K/UyjXy1l3EjeU/s/zEnXxA6LqpPKFrzArP2sRYLKdyHrD3MQS35vLatKfzekxPGwqMBvwtEY8b8TEFoe6YzCABQZHfQTAoA/2+TN/sDnHlO4X55Bhabf5tJW7yofv0Y=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1589220199;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=9kNkXkEfpW1s3FbedToxC0jJmaeK2yubekkoApAOUUk=; 
+ b=TEWMFDlXRmsmeSa+q6MN0+QoHzMAXuw1ztuhAaixXoZOBAV0aeO4deLWOaevgtfo68W9iT+yOmj4iTEAXQ2ojMeItiDYzYs92V5mRKwhz4GMZohN9ViKe9wYV8xFdnBedIcXLqlzuywDJWR++YyMCDatK5pEirTjmo8DuKASW/0=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1589220197984719.7258101779075;
+ Mon, 11 May 2020 11:03:17 -0700 (PDT)
+Message-ID: <158922019623.26583.11463412279323664563@45ef0f9c86ae>
+In-Reply-To: <20200511160951.8733-1-mlevitsk@redhat.com>
+Subject: Re: [PATCH v2 0/7] RFC/WIP: Fix scsi devices plug/unplug races w.r.t
+ virtio-scsi iothread
 MIME-Version: 1.0
-In-Reply-To: <20200510061422.24841-2-zxq_yx_007@163.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 02:55:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: mlevitsk@redhat.com
+Date: Mon, 11 May 2020 11:03:17 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 14:03:32
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,54 +82,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, kraxel@redhat.com,
- pbonzini@redhat.com
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, berrange@redhat.com, ehabkost@redhat.com, mst@redhat.com,
+ qemu-devel@nongnu.org, mlevitsk@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/10/20 1:14 AM, xiaoqiang zhao wrote:
-> unix_listen/connect_saddr now support abstract address types
-> 
-> two aditional BOOL switches are introduced:
-> tight: whether to set @addrlen to the minimal string length,
->         or the maximum sun_path length. default is TRUE
-> abstract: whether we use abstract address. default is FALSE
-> 
-> cli example:
-> -monitor unix:/tmp/unix.socket,abstract,tight=off
-> OR
-> -chardev socket,path=/tmp/unix.socket,id=unix1,abstract,tight=on
-> 
-> Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
-> ---
-
-> +++ b/qapi/sockets.json
-> @@ -73,12 +73,19 @@
->   # Captures a socket address in the local ("Unix socket") namespace.
->   #
->   # @path: filesystem path to use
-> +# @tight: pass a socket address length that does not include the whole
-> +#         struct sockaddr_un record but (besides other components) only
-> +#         the relevant part of the filename or abstract string.
-> +#         default value is 'true'
-
-Perhaps:
-
-pass a socket address length confined to the minimum length of the 
-abstract string, rather than the full sockaddr_un record length (only 
-matters for abstract sockets, default true)
-
-> +# @abstract: whether this is a abstract address, default is 'false'
-
-Both new fields should have a '(since 5.1)' tag, to make it obvious that 
-they did not exist in earlier releases with the rest of the struct.
-
-s/a abstract/an abstract/
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUxMTE2MDk1MS44NzMz
+LTEtbWxldml0c2tAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRv
+Y2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNv
+bW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxs
+ZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJ
+UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0xIE5F
+VFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0xIEo9
+MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIFRFU1QgICAgaW90ZXN0LXFj
+b3cyOiAxMTEKICBURVNUICAgIGlvdGVzdC1xY293MjogMTE0CioqCkVSUk9SOi90bXAvcWVtdS10
+ZXN0L3NyYy9xb20vb2JqZWN0LmM6MTEyNDpvYmplY3RfdW5yZWY6IGFzc2VydGlvbiBmYWlsZWQ6
+IChvYmotPnJlZiA+IDApCkJyb2tlbiBwaXBlCi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9xdGVz
+dC9saWJxdGVzdC5jOjE3NToga2lsbF9xZW11KCkgZGV0ZWN0ZWQgUUVNVSBkZWF0aCBmcm9tIHNp
+Z25hbCA2IChBYm9ydGVkKSAoY29yZSBkdW1wZWQpCkVSUk9SIC0gdG9vIGZldyB0ZXN0cyBydW4g
+KGV4cGVjdGVkIDYsIGdvdCA1KQptYWtlOiAqKiogW2NoZWNrLXF0ZXN0LWFhcmNoNjRdIEVycm9y
+IDEKbWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KICBURVNUICAgIGlv
+dGVzdC1xY293MjogMTE3CiAgVEVTVCAgICBpb3Rlc3QtcWNvdzI6IDEyMAotLS0KICAgIHJhaXNl
+IENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vz
+c0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVs
+JywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9ZjRiYjdkMjFjNDM4NDYzNGEzMjJjMmY1Y2QzOGIx
+YmYnLCAnLXUnLCAnMTAwMycsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQn
+LCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09Q
+VFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NI
+T1dfRU5WPTEnLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hv
+bWUvcGF0Y2hldzIvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eics
+ICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtdDk3anlvd2gvc3JjL2RvY2tlci1z
+cmMuMjAyMC0wNS0xMS0xMy40OC4xNi44NTYxOi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmNl
+bnRvczcnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1cm5lZCBub24t
+emVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFu
+Y2UudXVpZD1mNGJiN2QyMWM0Mzg0NjM0YTMyMmMyZjVjZDM4YjFiZgptYWtlWzFdOiAqKiogW2Rv
+Y2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3Bh
+dGNoZXctdGVzdGVyLXRtcC10OTdqeW93aC9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0
+LXF1aWNrQGNlbnRvczddIEVycm9yIDIKCnJlYWwgICAgMTVtMC4xMzVzCnVzZXIgICAgMG04LjYy
+NXMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dz
+LzIwMjAwNTExMTYwOTUxLjg3MzMtMS1tbGV2aXRza0ByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2Vy
+LXF1aWNrQGNlbnRvczcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
+aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
+ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
