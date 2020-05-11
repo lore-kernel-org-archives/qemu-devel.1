@@ -2,90 +2,86 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B010C54E8D
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:48:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B37C4C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:51:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A9AF20722
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:48:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7AA3220722
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 12:51:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tzdxTYYu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A9AF20722
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DUwvuoeY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AA3220722
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY7qu-0002pf-FG
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 08:48:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38410)
+	id 1jY7uE-0006mG-Ie
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 08:51:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41068)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <saket.sinha89@gmail.com>)
- id 1jY7cV-0001U9-RB
- for qemu-devel@nongnu.org; Mon, 11 May 2020 08:33:21 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:37608)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <saket.sinha89@gmail.com>)
- id 1jY7cQ-0007AB-Ln
- for qemu-devel@nongnu.org; Mon, 11 May 2020 08:33:17 -0400
-Received: by mail-lj1-x242.google.com with SMTP id o14so8199669ljp.4
- for <qemu-devel@nongnu.org>; Mon, 11 May 2020 05:33:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=oHhlRVxZKnZbliAUXL2ki5LHIVcU18t1hWnVODIM8kE=;
- b=tzdxTYYuQDgOTkQaCQIpnv7DeeXpVWH/O+8LNEoRIv98ECHBTZzGk2ub9QLoiz6oKh
- gnThiTBNSw6U8W+V642JnmG1VkQVmCmIhmDTp3P/DbpR8Leur56gTP2MQGqM8iRLkrw8
- z9fo/syVfmXAG7cY1S7A/2PNxE+6chb3tGSqtsyVo82NTi03+hU5S05/t6om9A455YXe
- C4A54P5DURMrEjlrZ7aNLe37qRTzttlPDgkaTUzSSn51aRlsBj0zgiIWu2GX1iqvTYnS
- ienq5BjE9menV4KKH5fLmZBuxo5G4sfQ4BuBda6wn5A/B0OC3AvdahaeYJ4zhLbGUVeW
- M7Yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=oHhlRVxZKnZbliAUXL2ki5LHIVcU18t1hWnVODIM8kE=;
- b=jP/7ux9HHysm9zew2NGQWw9fik9cOqhMtmfVq51GreWWTgzejzVAel+qBtjORiY3s0
- N0ZYRV1EKlTF73EhMymSQv9qnw3kFN8SP7ac9panXiOaBDuQ17tDMssfoRhO062YofiT
- 1JWGbBlOVLRKiYYU4LXv/kr0nhny//LbNKor3rYMSADaGyDhq1eksaNsba9X0pp4Qisr
- 7paGryF1HhjbnaxgVWcs+LkVhutVtxGHyHfuBxkDXkO2GiJ6b0kC+vwcvTyZb1L6atia
- D7DHqLruChY24N5Hizgqpg3UQO2dLrPJtNkwC1BHNCGEDRe2hsx6INQGhOM8Nkb3k+A4
- CYMA==
-X-Gm-Message-State: AOAM533T8bed2sCwgMqO7jZOOUZxbedadpsV0gXYFqK03HkwMXE07ARl
- vIhLTFVbxpmbcAz4huiffuqkqFxxe12AyJL+xYw=
-X-Google-Smtp-Source: ABdhPJzRdnYM649Rfmf9USadLnN2By7FRNOk0ZZcMrrjzxwxjn0Wu8vexdR+iPvR1HwfNsuojV+tOqXNMrbF6iMOimQ=
-X-Received: by 2002:a05:651c:54f:: with SMTP id
- q15mr10457298ljp.145.1589200392494; 
- Mon, 11 May 2020 05:33:12 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jY7tP-0005w9-Qq
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 08:50:47 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28824
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jY7tO-0002Px-C7
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 08:50:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589201444;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=aYA6ol9GjahMSUrpPJDAht23k9a8XUsjnG4cH8LJjno=;
+ b=DUwvuoeYRh4gENqEs4h4yf0hsP5a06Q3pSH23WzOBW714qTWLN86kxow17gyIUbyUrN/A9
+ sK1W1G4CXpjxK+uz98jNpiWhvgwOHePi5+nzGMPQShQgczn7WXy2/j47dseP0J8IYgZA+Q
+ 1QCnjeo202vOw/RJ+lgK5c/rAS5fTmk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-482-2hbqwTU2OkqeKiSpm2LdDg-1; Mon, 11 May 2020 08:50:42 -0400
+X-MC-Unique: 2hbqwTU2OkqeKiSpm2LdDg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4928A100CCA4;
+ Mon, 11 May 2020 12:50:40 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-142.ams2.redhat.com [10.36.114.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D516D619BF;
+ Mon, 11 May 2020 12:50:12 +0000 (UTC)
+Date: Mon, 11 May 2020 14:50:11 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Klaus Jensen <its@irrelevant.dk>
+Subject: Re: [PATCH v5 00/18] nvme: refactoring and cleanups
+Message-ID: <20200511125011.GD5661@linux.fritz.box>
+References: <20200505054840.186586-1-its@irrelevant.dk>
+ <20200511062513.3axdfcmr4izulv5x@apples.localdomain>
+ <095f3c9b-5b32-7a88-03e9-ca993ca3f3c9@redhat.com>
+ <20200511070936.fxarxicz7zrj6mop@apples.localdomain>
 MIME-Version: 1.0
-References: <CAK25hWN3kJcW-dcpryFrvZ50t7Y0Z=MZM66-8NMuhwjRpNo2aQ@mail.gmail.com>
- <CAD90Vcb-x1KV++fWrmx+fLV5eNc2DiTtn8=OjQi7aUf7B0ULdA@mail.gmail.com>
- <CAK25hWM-hLdk=MSKgceumOUo9ZNBrrmM8qSe7MvTUAPGmur_HQ@mail.gmail.com>
- <2515515.r9knKAEANn@os-lin-dmo>
- <CAD90VcYeF7drbYNDiEioPBHcQcifqDYUia_CKqNLv_5VAMjPKw@mail.gmail.com>
-In-Reply-To: <CAD90VcYeF7drbYNDiEioPBHcQcifqDYUia_CKqNLv_5VAMjPKw@mail.gmail.com>
-From: Saket Sinha <saket.sinha89@gmail.com>
-Date: Mon, 11 May 2020 14:32:36 +0200
-Message-ID: <CAK25hWNR0WdpddU1kDChUB+PWiLG2A76KJW5u5F-LNkGBREj_g@mail.gmail.com>
-Subject: Re: [virtio-dev] Re: Fwd: Qemu Support for Virtio Video V4L2 driver
-To: Keiichi Watanabe <keiichiw@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::242;
- envelope-from=saket.sinha89@gmail.com; helo=mail-lj1-x242.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+In-Reply-To: <20200511070936.fxarxicz7zrj6mop@apples.localdomain>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 03:10:56
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,99 +95,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Samiullah Khawaja <samiullah.khawaja@opensynergy.com>,
- virtio-dev@lists.oasis-open.org, Alex Lau <alexlau@chromium.org>,
- Kiran Pawar <Kiran.Pawar@opensynergy.com>,
- Alexandre Courbot <acourbot@chromium.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Tomasz Figa <tfiga@chromium.org>, Hans Verkuil <hverkuil@xs4all.nl>,
- libcamera-devel@lists.libcamera.org, Gerd Hoffmann <kraxel@redhat.com>,
- Dmitry Sepp <dmitry.sepp@opensynergy.com>, Pawel Osciak <posciak@chromium.org>,
- Linux Media Mailing List <linux-media@vger.kernel.org>
+Cc: Beata Michalska <beata.michalska@linaro.org>, qemu-block@nongnu.org,
+ Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Javier Gonzalez <javier.gonz@samsung.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Keiichi,
+Am 11.05.2020 um 09:09 hat Klaus Jensen geschrieben:
+> On May 11 09:00, Philippe Mathieu-Daudé wrote:
+> > Hi Klaus,
+> > 
+> > On 5/11/20 8:25 AM, Klaus Jensen wrote:
+> > > On May  5 07:48, Klaus Jensen wrote:
+> > > > From: Klaus Jensen <k.jensen@samsung.com>
+> > > > 
+> > > > Changes since v5
+> > > > ~~~~~~~~~~~~~~~~
+> > > > No functional changes, just updated Reviewed-by tags. Also, I screwed up
+> > > > the CC list when sending v4.
+> > > > 
+> > > > Philippe and Keith, please add a Reviewed-by to
+> > > > 
+> > > >    * "nvme: factor out pmr setup" and
+> > > >    * "do cmb/pmr init as part of pci init"
+> > > > 
+> > > > since the first one was added and the second one was changed in v4 when
+> > > > rebasing on Kevins block-next tree which had the PMR work that was not
+> > > > in master at the time.
+> > > > 
+> > > > With those in place, it should be ready for Kevin to merge.
+> > > > 
+> > > Gentle ping on this.
+> > > 
+> > > Also, please see the two patches in "[PATCH 0/2] hw/block/nvme: fixes
+> > > for interrupt behavior". I think they should go in preparation to this
+> > > series.
+> > 
+> > I was going to ping Kevin last week, but then read your comment on pach #7
+> > "nvme: add max_ioqpairs device parameter", so I interpreted you would
+> > respin.
+> > Now it is clearer, applying in the following order you don't need to respin,
+> > right?
+> > 
+> > - [PATCH 0/2] hw/block/nvme: fixes for interrupt behavior"
+> > - [PATCH v5 00/18] nvme: refactoring and cleanups
 
-> > > I do not support the approach of  QEMU implementation forwarding
-> > > requests to the host's vicodec module since  this can limit the scope
-> > > of the virtio-video device only for testing,
-> >
-> > That was my understanding as well.
->
-> Not really because the API which the vicodec provides is V4L2 stateful
-> decoder interface [1], which are also used by other video drivers on
-> Linux.
-> The difference between vicodec and actual device drivers is that
-> vicodec performs decoding in the kernel space without using special
-> video devices. In other words, vicodec is a software decoder in kernel
-> space which provides the same interface with actual video drivers.
-> Thus, if the QEMU implementation can forward virtio-video requests to
-> vicodec, it can forward them to the actual V4L2 video decoder devices
-> as well and VM gets access to a paravirtualized video device.
->
-> The reason why we discussed vicodec in the previous thread was it'll
-> allow us to test the virtio-video driver without hardware requirement.
->
-> [1] https://www.kernel.org/doc/html/latest/media/uapi/v4l/dev-decoder.html
->
+I was waiting for the review Klaus asked for. You had a comment about
+renaming patches, but I didn't see any comments about the patches in
+question.
 
-Thanks for clarification.
+> Ugh. "[PATCH v5 00/18] nvme: refactoring and cleanups" doesn't apply
+> completely cleanly.
+> 
+> "[PATCH 0/2] hw/block/nvme: fixes for interrupt behavior" was intented
+> to go into master because it fixes a bug, that is why I split them up.
+> 
+> But looks like it is better to just roll it into this series. I'll
+> respin a v6 with the two interrupt fixes.
 
-Could  you provide your views if it would be possible to support also
-paravirtualized v4l-subdev devices which is enabled by media
-controller to expose ISP processing blocks to linux userspace.
-Ofcourse, we might need to change implementation and spec to support that
-Please refer (1) for details.
+Ok, I'll wait for that one then. I'm still not sure, though, whether I
+should then wait for additional review or just apply the patches.
 
-> >
-> > > which instead can be used with multiple use cases such as -
-> > >
-> > > 1. VM gets access to paravirtualized  camera devices which shares the
-> > > video frames input through actual HW camera attached to Host.
-> >
-> > This use-case is out of the scope of virtio-video. Initially I had a plan to
-> > support capture-only streams like camera as well, but later the decision was
-> > made upstream that camera should be implemented as separate device type. We
-> > still plan to implement a simple frame capture capability as a downstream
-> > patch though.
-> >
-> > >
-> > > 2. If Host has multiple video devices (especially in ARM SOCs over
-> > > MIPI interfaces or USB), different VM can be started or hotplugged
-> > > with selective video streams from actual HW video devices.
-> >
-> > We do support this in our device implementation. But spec in general has no
-> > requirements or instructions regarding this. And it is in fact flexible enough
-> > to provide abstraction on top of several HW devices.
-> >
-> > >
-> > > Also instead of using libraries like Gstreamer in Host userspace, they
-> > > can also be used inside the VM userspace after getting access to
-> > > paravirtualized HW camera devices .
->
-> Regarding Gstreamer, I intended this video decoding API [2]. If QEMU
-> can translate virtio-video requests to this API, we can easily support
-> multiple platforms.
-> I'm not sure how feasible it is though, as I have no experience of
-> using this API by myself...
->
-> [2] https://gstreamer.freedesktop.org/documentation/tutorials/playback/hardware-accelerated-video-decoding.html
->
+Kevin
 
-Like pointed out above, Gstreamer is not the only framework present there.
-We have the newer libcamera framework [2] and then Openmax (used in
-Android Hal )
-Refer [3] for comparison.
-
-My intentions are to make the implementation more generic so that it
-can be used by different frameworks on different platforms.
-
-[1]: https://static.sched.com/hosted_files/osseu19/21/libcamera.pdf
-[2]: http://libcamera.org
-[3]: https://processors.wiki.ti.com/images/7/7e/OMX_Android_GST_Comparison.pdf
-
-Regards,
-Saket Sinha
 
