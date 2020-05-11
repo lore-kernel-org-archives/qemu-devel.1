@@ -2,80 +2,91 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0C78C54E8F
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 16:07:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC46FC54E8E
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 16:10:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 728EC20708
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 16:07:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 728EC20708
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id A9F9C20722
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 16:10:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n8w9vOZb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9F9C20722
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYAxr-0000aK-Jp
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 12:07:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47414)
+	id 1jYB0R-00021e-Q6
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 12:10:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48166)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jYAw0-00074i-9O
- for qemu-devel@nongnu.org; Mon, 11 May 2020 12:05:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43316)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jYAzd-0001Vn-FO
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 12:09:25 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:44793)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jYAvx-0007Ws-ER
- for qemu-devel@nongnu.org; Mon, 11 May 2020 12:05:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jYAvv-0002jX-AB
- for <qemu-devel@nongnu.org>; Mon, 11 May 2020 16:05:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 46E722E80E7
- for <qemu-devel@nongnu.org>; Mon, 11 May 2020 16:05:35 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jYAzc-0000u3-9N
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 12:09:25 -0400
+Received: by mail-lf1-x142.google.com with SMTP id d22so1939866lfm.11
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 09:09:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=+j/m/C25PvcZndCgjiMvsb8/dz+Ni/Lb7T3G4r/YIB0=;
+ b=n8w9vOZb43qfCawoO8y5ElIY9JB0alZIYfJDpaBcmckQi6O83KECUf7J9Bw6ShlWau
+ ong+nteATcd8hYfi7kYjdc/QvEy8qbYF+igHd05pm032dU90lb3obVF6FtWsU9tlVeW+
+ XXlNW2w6meSLkofMCyOF48oJPkAKquGl7vTUgsF520B8ONG7BnACfM8vQTLOBAtgw9JK
+ TUrA6VeJFPDm3/udtHDuQcSUQ9VIC+cR8UbZrvWoaEVfd5BGZ4bf4ExwbiHqBm/POYxQ
+ RIeLIksKSTLoJ7IB9sd/eKCzTOloEnMMYmzRV5K8yIgM9OTEx6dNZ0iYI8wqjXayGktM
+ /85A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=+j/m/C25PvcZndCgjiMvsb8/dz+Ni/Lb7T3G4r/YIB0=;
+ b=iXCsoxba8HkIvvAhBf75s+efK+86s75CTXWfl8jFlSSpcv1TC0gB9qOYhxjnrqP7Aa
+ dhRNbqPNl4po5vIF25b3l/GpWwbZgeGlCEks1s5/l5MXKl0T9gdXQMmk10d4GOq1tQgd
+ 57D7/kQUWKq0Cx829TnwbJrM/ZfKDyKrxFo3dGbBzDzr3Sam7OMbXgL9vYa/GSHLX0jH
+ 8Mp4ua0HrQNxHmF/VTFJ4LAK6lYIH2fVs3dXz4XBF/c9XSkofH9fn1/msFZul/1ui5pg
+ 4vRLLbw5w1OEQlIZjoFcgB2sW6sH9ypl4G3zT5fIxoFAB0iFmvvyWWAxbtbUCPHwDfbI
+ tO+g==
+X-Gm-Message-State: AOAM531DCXYsFlMiS7+xnQHIjHQlAhF7U+3uXeuk7hyOco9tdYmF5fs1
+ t5xUwYaPbCKF86gj5qBNdOE8Hri57cxWZLMFQqhjZQ==
+X-Google-Smtp-Source: ABdhPJztiQc0Hqd1ANeryLLTwX9PfbWENpaAhhGsEpuRHgllFdzp9ISqxDEkdQmwB+SdI2j8bDyuKJUjPQSlYQkXcxg=
+X-Received: by 2002:a19:4f1b:: with SMTP id d27mr11602018lfb.81.1589213362313; 
+ Mon, 11 May 2020 09:09:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20200326193156.4322-1-robert.foley@linaro.org>
+ <20200326193156.4322-4-robert.foley@linaro.org> <873686hiqt.fsf@linaro.org>
+In-Reply-To: <873686hiqt.fsf@linaro.org>
+From: Robert Foley <robert.foley@linaro.org>
+Date: Mon, 11 May 2020 12:09:15 -0400
+Message-ID: <CAEyhzFur3_81T2pkt-8p4zx-Sh8zFHazPaZfJ_nDpfndZBtR6g@mail.gmail.com>
+Subject: Re: [PATCH v8 03/74] cpu: introduce cpu_mutex_lock/unlock
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 11 May 2020 15:53:09 -0000
-From: Alexander Bulekov <1878034@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
-X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
-Message-Id: <158921238974.12092.6203453160058985938.malonedeb@wampee.canonical.com>
-Subject: [Bug 1878034] [NEW] memcpy param-overlap through
- e1000e_write_to_rx_buffers
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: b8c007397a6de7346555435ea549bb2f91884045
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 11:35:34
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+Received-SPF: pass client-ip=2a00:1450:4864:20::142;
+ envelope-from=robert.foley@linaro.org; helo=mail-lf1-x142.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,236 +95,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1878034 <1878034@bugs.launchpad.net>
+Cc: Peter Puhov <peter.puhov@linaro.org>, "Emilio G. Cota" <cota@braap.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On Mon, 11 May 2020 at 06:24, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+> Robert Foley <robert.foley@linaro.org> writes:
+snip
+> > +/* XXX: is this really the max number of CPUs? */
+> > +#define CPU_LOCK_BITMAP_SIZE 2048
+>
+> I wonder if we should be asserting this somewhere? Given it's an init
+> time constant we can probably do it somewhere in the machine realise
+> stage. I think the value is set in  MachineState *ms->smp.max_cpus;
 
-Hello,
-While fuzzing, I found an input that triggers an overlapping memcpy (caught=
- by AddressSanitizer).
-Overlapping memcpys are undefined behavior according to the POSIX and C sta=
-ndards, and can lead to bugs.
+Sure, I suppose we can relocate the define to something like hw/core/cpu.h,
+and then assert on it in smp_parse() from hw/core/machine.c?
 
-=3D=3D22287=3D=3DERROR: AddressSanitizer: memcpy-param-overlap: memory rang=
-es
-#0 0x563c9f4823d4 in __asan_memcpy (/home/alxndr/Development/qemu/build/i38=
-6-softmmu/qemu-system-i386+0x97a3d4)
-#1 0x563c9f4cb2b1 in flatview_write_continue /home/alxndr/Development/qemu/=
-exec.c:3142:13
-#2 0x563c9f4c3b97 in flatview_write /home/alxndr/Development/qemu/exec.c:31=
-77:14
-#3 0x563c9f4c3b97 in address_space_write /home/alxndr/Development/qemu/exec=
-.c:3268:18
-#4 0x563c9fbc457b in dma_memory_rw_relaxed /home/alxndr/Development/qemu/in=
-clude/sysemu/dma.h:87:18
-#5 0x563c9fbc457b in dma_memory_rw /home/alxndr/Development/qemu/include/sy=
-semu/dma.h:110:12
-#6 0x563c9fbc457b in pci_dma_rw /home/alxndr/Development/qemu/include/hw/pc=
-i/pci.h:787:5
-#7 0x563c9fbc457b in pci_dma_write /home/alxndr/Development/qemu/include/hw=
-/pci/pci.h:800:12
-#8 0x563c9fbc457b in e1000e_write_to_rx_buffers /home/alxndr/Development/qe=
-mu/hw/net/e1000e_core.c:1412:9
-#9 0x563c9fbb9c98 in e1000e_write_packet_to_guest /home/alxndr/Development/=
-qemu/hw/net/e1000e_core.c:1582:21
-#10 0x563c9fbb9c98 in e1000e_receive_iov /home/alxndr/Development/qemu/hw/n=
-et/e1000e_core.c:1709:9
-#11 0x563c9fba8080 in net_tx_pkt_sendv /home/alxndr/Development/qemu/hw/net=
-/net_tx_pkt.c:544:9
-#12 0x563c9fba8080 in net_tx_pkt_send /home/alxndr/Development/qemu/hw/net/=
-net_tx_pkt.c:620:9
-#13 0x563c9fba8827 in net_tx_pkt_send_loopback /home/alxndr/Development/qem=
-u/hw/net/net_tx_pkt.c:633:11
-#14 0x563c9fbd2052 in e1000e_tx_pkt_send /home/alxndr/Development/qemu/hw/n=
-et/e1000e_core.c:664:16
-#15 0x563c9fbd2052 in e1000e_process_tx_desc /home/alxndr/Development/qemu/=
-hw/net/e1000e_core.c:743:17
-#16 0x563c9fbd2052 in e1000e_start_xmit /home/alxndr/Development/qemu/hw/ne=
-t/e1000e_core.c:934:9
-#17 0x563c9fbcecf0 in e1000e_set_tdt /home/alxndr/Development/qemu/hw/net/e=
-1000e_core.c:2451:9
-#18 0x563c9fbbf20c in e1000e_core_write /home/alxndr/Development/qemu/hw/ne=
-t/e1000e_core.c:3261:9
-#19 0x563c9f5b68d6 in memory_region_write_accessor /home/alxndr/Development=
-/qemu/memory.c:483:5
-#20 0x563c9f5b627f in access_with_adjusted_size /home/alxndr/Development/qe=
-mu/memory.c:544:18
-#21 0x563c9f5b627f in memory_region_dispatch_write /home/alxndr/Development=
-/qemu/memory.c:1476:16
+> <snip>
+> > diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+> > index 45be5dc0ed..d2dd6c94cc 100644
+> > --- a/stubs/Makefile.objs
+> > +++ b/stubs/Makefile.objs
+> > @@ -5,6 +5,7 @@ stub-obj-y +=3D blockdev-close-all-bdrv-states.o
+> >  stub-obj-y +=3D clock-warp.o
+> >  stub-obj-y +=3D cpu-get-clock.o
+> >  stub-obj-y +=3D cpu-get-icount.o
+> > +stub-obj-y +=3D cpu-lock.o
+> >  stub-obj-y +=3D dump.o
+> >  stub-obj-y +=3D error-printf.o
+> >  stub-obj-y +=3D fdset.o
+> > diff --git a/stubs/cpu-lock.c b/stubs/cpu-lock.c
+> > new file mode 100644
+> > index 0000000000..ca2ea8a9c2
+> > --- /dev/null
+> > +++ b/stubs/cpu-lock.c
+> > @@ -0,0 +1,28 @@
+> > +#include "qemu/osdep.h"
+> > +#include "hw/core/cpu.h"
+> > +
+> > +void cpu_mutex_lock_impl(CPUState *cpu, const char *file, int line)
+> > +{
+> > +/* coverity gets confused by the indirect function call */
+> > +#ifdef __COVERITY__
+> > +    qemu_mutex_lock_impl(&cpu->lock, file, line);
+> > +#else
+> > +    QemuMutexLockFunc f =3D atomic_read(&qemu_mutex_lock_func);
+> > +    f(&cpu->lock, file, line);
+> > +#endif
+> > +}
+> > +
+> > +void cpu_mutex_unlock_impl(CPUState *cpu, const char *file, int line)
+> > +{
+> > +    qemu_mutex_unlock_impl(&cpu->lock, file, line);
+> > +}
+>
+> I find this a little confusing because we clearly aren't stubbing
+> something out here - we are indeed doing a lock. What we seem to have is
+> effectively the linux-user implementation of cpu locking which currently
+> doesn't support qsp profiling.
 
-I can reproduce it in qemu 5.0 built with --enable-sanitizers using:
-cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -M pc-q=
-35-5.0 -accel qtest -qtest stdio -nographic -monitor none -serial none
-outl 0xcf8 0x80001010
-outl 0xcfc 0xe1020000
-outl 0xcf8 0x80001014
-outl 0xcf8 0x80001004
-outw 0xcfc 0x7
-outl 0xcf8 0x800010a2
-write 0xe102003a 0x3ff 0xd1055e2d3b0002e10000000001ffd3055e2d3b0002e1000000=
-0001ffd5055e2d3b0002e10000000001ffd7055e2d3b0002e10000000001ffd9055e2d3b000=
-2e10000000001ffdb055e2d3b0002e10000000001ffdd055e2d3b0002e10000000001ffdf05=
-5e2d3b0002e10000000001ffe1055e2d3b0002e10000000001ffe3055e2d3b0002e10000000=
-001ffe5055e2d3b0002e10000000001ffe7055e2d3b0002e10000000001ffe9055e2d3b0002=
-e10000000001ffeb055e2d3b0002e10000000001ffed055e2d3b0002e10000000001ffef055=
-e2d3b0002e10000000001fff1055e2d3b0002e10000000001fff3055e2d3b0002e100000000=
-01fff5055e2d3b0002e10000000001fff7055e2d3b0002e10000000001fff9055e2d3b0002e=
-10000000001fffb055e2d3b0002e10000000001fffd055e2d3b0002e10000000001ffff055e=
-2d3b0002e10000000001ff01055e2d3b0002e10000000001ff03055e2d3b0002e1000000000=
-1ff05055e2d3b0002e10000000001ff07055e2d3b0002e10000000001ff09055e2d3b0002e1=
-0000000001ff0b055e2d3b0002e10000000001ff0d055e2d3b0002e10000000001ff0f055e2=
-d3b0002e10000000001ff11055e2d3b0002e10000000001ff13055e2d3b0002e10000000001=
-ff15055e2d3b0002e10000000001ff17055e2d3b0002e10000000001ff19055e2d3b0002e10=
-000000001ff1b055e2d3b0002e10000000001ff1d055e2d3b0002e10000000001ff1f055e2d=
-3b0002e10000000001ff21055e2d3b0002e10000000001ff23055e2d3b0002e10000000001f=
-f25055e2d3b0002e10000000001ff27055e2d3b0002e10000000001ff29055e2d3b0002e100=
-00000001ff2b055e2d3b0002e10000000001ff2d055e2d3b0002e10000000001ff2f055e2d3=
-b0002e10000000001ff31055e2d3b0002e10000000001ff33055e2d3b0002e10000000001ff=
-35055e2d3b0002e10000000001ff37055e2d3b0002e10000000001ff39055e2d3b0002e1000=
-0000001ff3b055e2d3b0002e10000000001ff3d055e2d3b0002e10000000001ff3f055e2d3b=
-0002e10000000001ff41055e2d3b0002e10000000001ff43055e2d3b0002e10000000001ff4=
-5055e2d3b0002e10000000001ff47055e2d3b0002e10000000001ff49055e2d3b0002e10000=
-000001ff4b055e2d3b0002e10000000001ff4d055e2d3b0002e10000000001ff4f055e2d3b0=
-002e10000000001ff51055e2d3b0002e10000000001ff53055e2d3b0002e10000000001ff55=
-055e2d3b0002e10000000001ff57055e2d3b0002e10000000001ff59055e2d3b0002e100000=
-00001ff5b055e2d3b0002e10000000001ff5d055e2d3b0002e10000000001ff5f055e2d3b00=
-02e10000000001ff61055e2d3b0002e10000000001ff63
-EOF
+I agree, it seems like cpu_mutex_lock/unlock can follow the model of
+stubs/iothread-lock.c,
+which does not use a lock.  Will change this.
 
-I also attached the trace to this launchpad report, in case the
-formatting is broken:
+>
+> > +bool cpu_mutex_locked(const CPUState *cpu)
+> > +{
+> > +    return true;
+> > +}
+> > +
+> > +bool no_cpu_mutex_locked(void)
+> > +{
+> > +    return true;
+> > +}
+>
+> What functions care about these checks. I assume it's only system
+> emulation checks that are in common code. Maybe that indicates we could
+> achieve better separation of emulation and linux-user code. My worry is
+> by adding an assert in linux-user code we wouldn't actually be asserting
+> anything.
 
-qemu-system-i386 -M pc-q35-5.0 -accel qtest -qtest stdio -nographic
--monitor none -serial none < attachment
+There is code that runs during linux-user, which calls
+cpu_mutex_locked().  I found a few cases at least where
+cpu_interrupt_request_set, cpu_halted, cpu_halted_set from
+include/hw/core/cpu.h are called in linux-user.  Also
+cpu_handle_halt_locked from accel/tcg/cpu-exec.c
 
-Please let me know if I can provide any further info.
--Alex
+no_cpu_mutex_locked() is also linked into linux user for
+run_on_cpu()in cpus-common.c.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "attachment"
-   https://bugs.launchpad.net/bugs/1878034/+attachment/5369905/+files/attac=
-hment
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1878034
-
-Title:
-  memcpy param-overlap through e1000e_write_to_rx_buffers
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello,
-  While fuzzing, I found an input that triggers an overlapping memcpy (caug=
-ht by AddressSanitizer).
-  Overlapping memcpys are undefined behavior according to the POSIX and C s=
-tandards, and can lead to bugs.
-
-  =3D=3D22287=3D=3DERROR: AddressSanitizer: memcpy-param-overlap: memory ra=
-nges
-  #0 0x563c9f4823d4 in __asan_memcpy (/home/alxndr/Development/qemu/build/i=
-386-softmmu/qemu-system-i386+0x97a3d4)
-  #1 0x563c9f4cb2b1 in flatview_write_continue /home/alxndr/Development/qem=
-u/exec.c:3142:13
-  #2 0x563c9f4c3b97 in flatview_write /home/alxndr/Development/qemu/exec.c:=
-3177:14
-  #3 0x563c9f4c3b97 in address_space_write /home/alxndr/Development/qemu/ex=
-ec.c:3268:18
-  #4 0x563c9fbc457b in dma_memory_rw_relaxed /home/alxndr/Development/qemu/=
-include/sysemu/dma.h:87:18
-  #5 0x563c9fbc457b in dma_memory_rw /home/alxndr/Development/qemu/include/=
-sysemu/dma.h:110:12
-  #6 0x563c9fbc457b in pci_dma_rw /home/alxndr/Development/qemu/include/hw/=
-pci/pci.h:787:5
-  #7 0x563c9fbc457b in pci_dma_write /home/alxndr/Development/qemu/include/=
-hw/pci/pci.h:800:12
-  #8 0x563c9fbc457b in e1000e_write_to_rx_buffers /home/alxndr/Development/=
-qemu/hw/net/e1000e_core.c:1412:9
-  #9 0x563c9fbb9c98 in e1000e_write_packet_to_guest /home/alxndr/Developmen=
-t/qemu/hw/net/e1000e_core.c:1582:21
-  #10 0x563c9fbb9c98 in e1000e_receive_iov /home/alxndr/Development/qemu/hw=
-/net/e1000e_core.c:1709:9
-  #11 0x563c9fba8080 in net_tx_pkt_sendv /home/alxndr/Development/qemu/hw/n=
-et/net_tx_pkt.c:544:9
-  #12 0x563c9fba8080 in net_tx_pkt_send /home/alxndr/Development/qemu/hw/ne=
-t/net_tx_pkt.c:620:9
-  #13 0x563c9fba8827 in net_tx_pkt_send_loopback /home/alxndr/Development/q=
-emu/hw/net/net_tx_pkt.c:633:11
-  #14 0x563c9fbd2052 in e1000e_tx_pkt_send /home/alxndr/Development/qemu/hw=
-/net/e1000e_core.c:664:16
-  #15 0x563c9fbd2052 in e1000e_process_tx_desc /home/alxndr/Development/qem=
-u/hw/net/e1000e_core.c:743:17
-  #16 0x563c9fbd2052 in e1000e_start_xmit /home/alxndr/Development/qemu/hw/=
-net/e1000e_core.c:934:9
-  #17 0x563c9fbcecf0 in e1000e_set_tdt /home/alxndr/Development/qemu/hw/net=
-/e1000e_core.c:2451:9
-  #18 0x563c9fbbf20c in e1000e_core_write /home/alxndr/Development/qemu/hw/=
-net/e1000e_core.c:3261:9
-  #19 0x563c9f5b68d6 in memory_region_write_accessor /home/alxndr/Developme=
-nt/qemu/memory.c:483:5
-  #20 0x563c9f5b627f in access_with_adjusted_size /home/alxndr/Development/=
-qemu/memory.c:544:18
-  #21 0x563c9f5b627f in memory_region_dispatch_write /home/alxndr/Developme=
-nt/qemu/memory.c:1476:16
-
-  I can reproduce it in qemu 5.0 built with --enable-sanitizers using:
-  cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -M pc=
--q35-5.0 -accel qtest -qtest stdio -nographic -monitor none -serial none
-  outl 0xcf8 0x80001010
-  outl 0xcfc 0xe1020000
-  outl 0xcf8 0x80001014
-  outl 0xcf8 0x80001004
-  outw 0xcfc 0x7
-  outl 0xcf8 0x800010a2
-  write 0xe102003a 0x3ff 0xd1055e2d3b0002e10000000001ffd3055e2d3b0002e10000=
-000001ffd5055e2d3b0002e10000000001ffd7055e2d3b0002e10000000001ffd9055e2d3b0=
-002e10000000001ffdb055e2d3b0002e10000000001ffdd055e2d3b0002e10000000001ffdf=
-055e2d3b0002e10000000001ffe1055e2d3b0002e10000000001ffe3055e2d3b0002e100000=
-00001ffe5055e2d3b0002e10000000001ffe7055e2d3b0002e10000000001ffe9055e2d3b00=
-02e10000000001ffeb055e2d3b0002e10000000001ffed055e2d3b0002e10000000001ffef0=
-55e2d3b0002e10000000001fff1055e2d3b0002e10000000001fff3055e2d3b0002e1000000=
-0001fff5055e2d3b0002e10000000001fff7055e2d3b0002e10000000001fff9055e2d3b000=
-2e10000000001fffb055e2d3b0002e10000000001fffd055e2d3b0002e10000000001ffff05=
-5e2d3b0002e10000000001ff01055e2d3b0002e10000000001ff03055e2d3b0002e10000000=
-001ff05055e2d3b0002e10000000001ff07055e2d3b0002e10000000001ff09055e2d3b0002=
-e10000000001ff0b055e2d3b0002e10000000001ff0d055e2d3b0002e10000000001ff0f055=
-e2d3b0002e10000000001ff11055e2d3b0002e10000000001ff13055e2d3b0002e100000000=
-01ff15055e2d3b0002e10000000001ff17055e2d3b0002e10000000001ff19055e2d3b0002e=
-10000000001ff1b055e2d3b0002e10000000001ff1d055e2d3b0002e10000000001ff1f055e=
-2d3b0002e10000000001ff21055e2d3b0002e10000000001ff23055e2d3b0002e1000000000=
-1ff25055e2d3b0002e10000000001ff27055e2d3b0002e10000000001ff29055e2d3b0002e1=
-0000000001ff2b055e2d3b0002e10000000001ff2d055e2d3b0002e10000000001ff2f055e2=
-d3b0002e10000000001ff31055e2d3b0002e10000000001ff33055e2d3b0002e10000000001=
-ff35055e2d3b0002e10000000001ff37055e2d3b0002e10000000001ff39055e2d3b0002e10=
-000000001ff3b055e2d3b0002e10000000001ff3d055e2d3b0002e10000000001ff3f055e2d=
-3b0002e10000000001ff41055e2d3b0002e10000000001ff43055e2d3b0002e10000000001f=
-f45055e2d3b0002e10000000001ff47055e2d3b0002e10000000001ff49055e2d3b0002e100=
-00000001ff4b055e2d3b0002e10000000001ff4d055e2d3b0002e10000000001ff4f055e2d3=
-b0002e10000000001ff51055e2d3b0002e10000000001ff53055e2d3b0002e10000000001ff=
-55055e2d3b0002e10000000001ff57055e2d3b0002e10000000001ff59055e2d3b0002e1000=
-0000001ff5b055e2d3b0002e10000000001ff5d055e2d3b0002e10000000001ff5f055e2d3b=
-0002e10000000001ff61055e2d3b0002e10000000001ff63
-  EOF
-
-  I also attached the trace to this launchpad report, in case the
-  formatting is broken:
-
-  qemu-system-i386 -M pc-q35-5.0 -accel qtest -qtest stdio -nographic
-  -monitor none -serial none < attachment
-
-  Please let me know if I can provide any further info.
-  -Alex
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1878034/+subscriptions
+Thanks,
+-Rob
 
