@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E06CCC47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 17:22:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4269C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 17:23:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6E4020714
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 17:22:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D0DE20714
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 17:23:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="VKvV+FnI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6E4020714
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="FJeG0AIp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D0DE20714
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYC8k-00007r-S9
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 13:22:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34042)
+	id 1jYC96-0000tK-KM
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 13:23:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34034)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <komlodi@xilinx.com>)
- id 1jYC6z-00058d-7v
- for qemu-devel@nongnu.org; Mon, 11 May 2020 13:21:05 -0400
-Received: from mail-eopbgr760058.outbound.protection.outlook.com
- ([40.107.76.58]:8291 helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+ id 1jYC6y-00056N-Lh
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 13:21:04 -0400
+Received: from mail-bn7nam10on2067.outbound.protection.outlook.com
+ ([40.107.92.67]:10528 helo=NAM10-BN7-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <komlodi@xilinx.com>)
- id 1jYC6w-0003uZ-0l
- for qemu-devel@nongnu.org; Mon, 11 May 2020 13:21:04 -0400
+ id 1jYC6w-0003uT-1W
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 13:21:03 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h1XMymMWEDUw54CF/6WVqeKPE389EFBdS6KsHwQeR512tEmliVohxN00OJ8NbgFQ+tkNkG0eLkKkLPPLzukGsXN1W6w98PsDuUvUFaT+63ixlPWB/uYWq158X+YILZGGUzbhsBFEGgqivS3T9hBwb4UB6qhnMTKNVdhAkN+OTryzmO0Ud1GSYGyOj7rluXTSXINy/zAMR2Ejh9PouMDtwVvxkJn2zXTMyjWCR2uM5gX9yoZzREriKZaewCpqHox3XyS5E+TSzws/ZdnjWJE56UDnJeylRzpBNol8RNrdfQo0vwQAr5l0RFYDQvqKpstU06F0RJmMaMms3LtS0bGVsg==
+ b=jozrcfD5844Hy8lyXgPNnM6hx/CTRFcGhx0Clvs4WnZXWrS78cKbjZGkQ4qHgfSE0n2jMCpqdKahIVnX9CGzRtO4iYXXuRWyL+PhfqOTWTSipKEtPiDOr2AlhsUnFARbrkOl9QZGVKtXds5SkHbgKynZ/hrAhgl0r0mLTM72SFZVXrshGWKuZQ8Rx6Gb6sIz4dsOOFFBoaRYW1laIxWuB76v9hOrafSe6sNm6KESnUZGQzE9f34wwSekH7vn0limL9g9T3qSEOq1PcZ9qVz+OGwNP92gPmqQmZmYHPGSSzRv8j9C4cDNlfbtkfvX6K8hQ2RCJMZO1kLpD2f2NS/Qhg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=95yqqbip7xXPz09ylUg1tmOBtjWhHrQ0bniJROEWzEE=;
- b=EDK3RQJER7RY0Cw/u+iDYHkPg6Ek2VdstqGp8f58lXCZXOP6qk3lel5uIEkhM1jhQatyIilG+0lpGSwKnmZ8pT2/6P0swguoIO4qVyo8riF8i3R56APJZTcMqMGKOAx8xycOePkD6tpcCkI1+aMVP+vT4z5XCt/g8YB0JCHFrsigVyYE7AzgPeWYk4awSrCMfQwJSdiBtnJmK40gb8d3z5nDLcmA/+6McmZElB64yqjERot6+nNg932kh3N3dgdUUgUon8enjKoo7S0mZmftdbDxnWy7DGf84MDw3w7a1LQcxFUw3VZ+jiKD/d4CkPBv3B5uNW4/KA519Hc1uEq+KQ==
+ bh=ky2frw7xYYuP3OgTRuJ2N2y/8tHtihYuCes7f18Xri4=;
+ b=Zo/g62hwEyZ2ufYGJ7YW6KDdFQZsSixNahhPJ3l0tlJyVvjc6hxVdN2rgGRrYg5TYc0pn6QQAi0jF6/WMqll25amFzDT3e7Y52YGALCeCxKIU9/R5p2P+5WQ4nES0HtIIN9fmV69A44oe7u7to7ankiNnKtMGhkrsD0/Yr8cEejGISYPj81JYIFBfyIVguC6VXu0pEFhs1n1JSXStjnj7RAGWuzUWdqLaYa31D/i1/3z66T+gbS362VsoDS70iEuCXnjVFnM00er8/wp1GDJzFmMkc5cgByB8G5Dx31sU1rkoFZxehHb4LslWHKV71a7KzoYdQeve7tb3Xfo1W5hxg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  149.199.60.83) smtp.rcpttodomain=nongnu.org smtp.mailfrom=xilinx.com;
  dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
@@ -49,17 +49,17 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=95yqqbip7xXPz09ylUg1tmOBtjWhHrQ0bniJROEWzEE=;
- b=VKvV+FnIhqDkVnOSxmlgIbpMz4lp0MACOIdSFS7wRmRh3bYss9oplToZdgxT6t9yua2J2TvMCcegzMz3H+C1gLTIW9evG7OD1DcDc8B/UNQos24s34Pq4/C92hlbuCURBTXWbHIHmWQyOFtKkoIIDqFKAwLyt5sNXI3ujN4X0MM=
-Received: from CY4PR16CA0008.namprd16.prod.outlook.com (2603:10b6:903:102::18)
- by MWHPR02MB2221.namprd02.prod.outlook.com (2603:10b6:300:5a::15)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.29; Mon, 11 May
- 2020 17:05:56 +0000
-Received: from CY1NAM02FT046.eop-nam02.prod.protection.outlook.com
- (2603:10b6:903:102:cafe::57) by CY4PR16CA0008.outlook.office365.com
- (2603:10b6:903:102::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.29 via Frontend
+ bh=ky2frw7xYYuP3OgTRuJ2N2y/8tHtihYuCes7f18Xri4=;
+ b=FJeG0AIpv9VnMlkCR1Zqklv96oOQXFGYt5zZpzvOVmUR2oRNsn0X8RbHgqJIjmzayN1YOLIWvSh5QMoDh0XSKIl6xOIhkLCHCaHinB2EGLnKdCJAFnpudlz7fpbMfXcDWAUYN8bfipaPsv/cw9VvTeOFjEbIY7aXZi1RlJcJQDo=
+Received: from SN4PR0501CA0033.namprd05.prod.outlook.com
+ (2603:10b6:803:40::46) by MN2PR02MB6878.namprd02.prod.outlook.com
+ (2603:10b6:208:20c::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.34; Mon, 11 May
+ 2020 17:05:57 +0000
+Received: from SN1NAM02FT015.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:803:40:cafe::d2) by SN4PR0501CA0033.outlook.office365.com
+ (2603:10b6:803:40::46) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.12 via Frontend
  Transport; Mon, 11 May 2020 17:05:56 +0000
 Authentication-Results: spf=pass (sender IP is 149.199.60.83)
  smtp.mailfrom=xilinx.com; nongnu.org; dkim=none (message not signed)
@@ -69,30 +69,30 @@ Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
  149.199.60.83 as permitted sender) receiver=protection.outlook.com;
  client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
 Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- CY1NAM02FT046.mail.protection.outlook.com (10.152.74.232) with Microsoft SMTP
+ SN1NAM02FT015.mail.protection.outlook.com (10.152.72.109) with Microsoft SMTP
  Server id 15.20.2979.29 via Frontend Transport; Mon, 11 May 2020 17:05:56
  +0000
-Received: from [149.199.38.66] (port=35066 helo=xsj-pvapsmtp01)
+Received: from [149.199.38.66] (port=35080 helo=xsj-pvapsmtp01)
  by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
- (envelope-from <joe.komlodi@xilinx.com>) id 1jYBs4-0007n8-PJ
+ (envelope-from <joe.komlodi@xilinx.com>) id 1jYBs4-0007nE-Ul
  for qemu-devel@nongnu.org; Mon, 11 May 2020 10:05:40 -0700
 Received: from [127.0.0.1] (helo=localhost)
  by xsj-pvapsmtp01 with smtp (Exim 4.63)
- (envelope-from <joe.komlodi@xilinx.com>) id 1jYBsJ-0004Py-TP
- for qemu-devel@nongnu.org; Mon, 11 May 2020 10:05:55 -0700
-Received: from xsj-pvapsmtp01 (xsj-mail.xilinx.com [149.199.38.66])
- by xsj-smtp-dlp2.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 04BH5qi3028919; 
+ (envelope-from <joe.komlodi@xilinx.com>) id 1jYBsK-0004Py-3B
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 10:05:56 -0700
+Received: from xsj-pvapsmtp01 (smtp2.xilinx.com [149.199.38.66])
+ by xsj-smtp-dlp1.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 04BH5pRC000795; 
  Mon, 11 May 2020 10:05:52 -0700
 Received: from [172.19.2.32] (helo=xsjkomlodi50.xilinx.com)
  by xsj-pvapsmtp01 with esmtp (Exim 4.63)
  (envelope-from <komlodi@xilinx.com>)
- id 1jYBsF-0004PW-Tz; Mon, 11 May 2020 10:05:51 -0700
+ id 1jYBsF-0004PW-Ql; Mon, 11 May 2020 10:05:51 -0700
 From: Joe Komlodi <joe.komlodi@xilinx.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 4/4] target/microblaze: monitor: Increase the number of
- registers reported
-Date: Mon, 11 May 2020 10:05:51 -0700
-Message-Id: <1589216751-106038-5-git-send-email-komlodi@xilinx.com>
+Subject: [PATCH v1 2/4] target/microblaze: gdb: Extend the number of registers
+ presented to GDB
+Date: Mon, 11 May 2020 10:05:49 -0700
+Message-Id: <1589216751-106038-3-git-send-email-komlodi@xilinx.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1589216751-106038-1-git-send-email-komlodi@xilinx.com>
 References: <1589216751-106038-1-git-send-email-komlodi@xilinx.com>
@@ -104,30 +104,30 @@ X-MS-Office365-Filtering-HT: Tenant
 X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
  SFTY:;
- SFS:(136003)(346002)(39860400002)(396003)(376002)(46966005)(33430700001)(33440700001)(2906002)(82740400003)(8936002)(81166007)(82310400002)(426003)(5660300002)(478600001)(107886003)(6916009)(7696005)(8676002)(316002)(47076004)(336012)(9786002)(356005)(186003)(36756003)(2616005)(44832011)(86362001)(26005)(4326008)(70586007)(70206006);
+ SFS:(136003)(376002)(396003)(39860400002)(346002)(46966005)(33430700001)(26005)(186003)(47076004)(82740400003)(82310400002)(426003)(2616005)(86362001)(316002)(336012)(356005)(81166007)(33440700001)(478600001)(2906002)(8676002)(70586007)(4326008)(70206006)(107886003)(36756003)(9786002)(44832011)(7696005)(8936002)(6916009)(5660300002);
  DIR:OUT; SFP:1101; 
 MIME-Version: 1.0
 Content-Type: text/plain
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 433c2f05-0a6c-4cd6-8ead-08d7f5cd91ef
-X-MS-TrafficTypeDiagnostic: MWHPR02MB2221:
-X-Microsoft-Antispam-PRVS: <MWHPR02MB2221E84965035755A171F127D0A10@MWHPR02MB2221.namprd02.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: b84efa0b-df72-4ff8-f724-08d7f5cd920f
+X-MS-TrafficTypeDiagnostic: MN2PR02MB6878:
+X-Microsoft-Antispam-PRVS: <MN2PR02MB6878D7B01CD071AC374DB7B8D0A10@MN2PR02MB6878.namprd02.prod.outlook.com>
 X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:287;
+X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
 X-Forefront-PRVS: 04004D94E2
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4ao8x8JeP0WxWl4vZIo7bB2OzVhOtMhanIzpLRT3007V2e85ZsATv7+U3MkAhtm0d9phy1XqL8VFxaCJWjW2PI+6DIlbq73ivyT7GYBkiOJ1XbW+D5pgnkUU5gwlRKE7d1BV3CtKHJJzcfLsqhBinYAkalN6D09B7GGBmtmDHA3+8p+aZ2IT+KjnlN3DjSYUhJiGdNttcXJiDuHv+uM/5ofAANdqbK5usl+XGT3BweoYMUhsIHJGdPlZDge7S581ASsuc9TasFVIpEBIbidY0Xlta/CKQqkyfWx9uyXVzQMrjFWhR991vwBOh+tUZsdluTLKSc2rKqXo8B/6S4ko2ju3GWyhoqxxUGKJEnBH9B2o2kpHJaIQxbrwNHMjTx+4tCy0CM1Ycauc0LNKhDVhNfPkPKHtNJSvETntBpLph9HLG4eHzOfodNaOvltk831OtH9qW2kXTkSrHuigOG1Ln7fHtHOgUYrghswcXOQRM4Fjdu/MvB/ip8NdEr8VRxmSAtHcIAb2ZUErz69+lmdriKOl8zwFWK3IEslMIISZB877+H9dXK54297i0iLAUaZLi/esJYFn3iJcdC2Bwqn1VQ==
+X-Microsoft-Antispam-Message-Info: 2aQCzDJXxuI+nUI5V3ns+v09wZE9MjZOSqdQrbTa/sGGwCD2aWRnY0iVQjoYzy/tpXnlw/NSYlR139kbKCpRBjz8ITmmu5U6yaIEuHeEbWpg7QJKdvfUFW6qyTN6CCYrai3shKBWvIp6a/CFrsCCj03yKkUY5CaH6Btd+osGJgyeXAI8573E+eS4B76JX4ghWKLSCtgbU8pxGLruGvIPzESyGA18mQLHmn5jw7NtNe1FBcL7zaZhQfT90qDSjLbE5SZvd/sXm5jxCB6Po0g1H7PZu7QqJVyNxRKfmkFftM4n0jYEt8QjfQbb9QeAZNB7HuJ3jaE4TDB+n87kfMVkpGH1akotCbaEojLprFxZHxRmNX/2hHGc2wWp9OOIgVBXf68P402c/MbIsJ2EIhHGm7gyId6UJ+d3/vjJ/jzc2iR0Y5S2FhF1aym5COXDZptZ3xWd2cDcUNTJauSFarSJ6hDO0UC09c2RXLr7xAIU+uZLU4+Q7tca2cZDkO3lWJPWKYZ2S1UCnRCAmfgHa7ATfMjw4/cP45i7OicdaRDQ6TJT9pmAbYOamcfi+OyNfR3U63ONMG2idI4qzx4tSuYiKQ==
 X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2020 17:05:56.1691 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 433c2f05-0a6c-4cd6-8ead-08d7f5cd91ef
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2020 17:05:56.3805 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b84efa0b-df72-4ff8-f724-08d7f5cd920f
 X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
  Helo=[xsj-pvapsmtpgw01]
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR02MB2221
-Received-SPF: pass client-ip=40.107.76.58; envelope-from=komlodi@xilinx.com;
- helo=NAM02-CY1-obe.outbound.protection.outlook.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR02MB6878
+Received-SPF: pass client-ip=40.107.92.67; envelope-from=komlodi@xilinx.com;
+ helo=NAM10-BN7-obe.outbound.protection.outlook.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 13:20:59
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -18
@@ -154,51 +154,102 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Increase the number of registers reported to match GDB.
-
-Registers that aren't modeled are reported as 0.
+Increase the number of Microblaze registers QEMU will report when
+talking to GDB.
 
 Signed-off-by: Joe Komlodi <komlodi@xilinx.com>
 ---
- target/microblaze/translate.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+ target/microblaze/cpu.c     |  2 +-
+ target/microblaze/gdbstub.c | 52 ++++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 50 insertions(+), 4 deletions(-)
 
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 20b7427..4e7f903a 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -1788,9 +1788,11 @@ void mb_cpu_dump_state(CPUState *cs, FILE *f, int flags)
-     qemu_fprintf(f, "IN: PC=%" PRIx64 " %s\n",
-                  env->sregs[SR_PC], lookup_symbol(env->sregs[SR_PC]));
-     qemu_fprintf(f, "rmsr=%" PRIx64 " resr=%" PRIx64 " rear=%" PRIx64 " "
--                 "debug=%x imm=%x iflags=%x fsr=%" PRIx64 "\n",
-+                 "debug=%x imm=%x iflags=%x fsr=%" PRIx64 " "
-+                 "rbtr=%" PRIx64 "\n",
-                  env->sregs[SR_MSR], env->sregs[SR_ESR], env->sregs[SR_EAR],
--                 env->debug, env->imm, env->iflags, env->sregs[SR_FSR]);
-+                 env->debug, env->imm, env->iflags, env->sregs[SR_FSR],
-+                 env->sregs[SR_BTR]);
-     qemu_fprintf(f, "btaken=%d btarget=%" PRIx64 " mode=%s(saved=%s) "
-                  "eip=%d ie=%d\n",
-                  env->btaken, env->btarget,
-@@ -1798,7 +1800,17 @@ void mb_cpu_dump_state(CPUState *cs, FILE *f, int flags)
-                  (env->sregs[SR_MSR] & MSR_UMS) ? "user" : "kernel",
-                  (bool)(env->sregs[SR_MSR] & MSR_EIP),
-                  (bool)(env->sregs[SR_MSR] & MSR_IE));
-+    for (i = 0; i < 12; i++) {
-+        qemu_fprintf(f, "rpvr%2.2d=%8.8x ", i, env->pvr.regs[i]);
-+        if ((i + 1) % 4 == 0) {
-+            qemu_fprintf(f, "\n");
-+        }
-+    }
+diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
+index 41cac1b..5b6ad5b 100644
+--- a/target/microblaze/cpu.c
++++ b/target/microblaze/cpu.c
+@@ -331,7 +331,7 @@ static void mb_cpu_class_init(ObjectClass *oc, void *data)
+ #endif
+     dc->vmsd = &vmstate_mb_cpu;
+     device_class_set_props(dc, mb_properties);
+-    cc->gdb_num_core_regs = 32 + 5;
++    cc->gdb_num_core_regs = 32 + 27;
+     cc->gdb_get_dynamic_xml = mb_gdb_get_dynamic_xml;
+     cc->gdb_core_xml_file = "microblaze-core.xml";
  
-+    /* Registers that aren't modeled are reported as 0 */
-+    qemu_fprintf(f, "redr=%" PRIx64 " rpid=0 rzpr=0 rtlbx=0 rtlbsx=0 "
-+                    "rtlblo=0 rtlbhi=0\n", env->sregs[SR_EDR]);
-+    qemu_fprintf(f, "slr=%x shr=%x\n", env->slr, env->shr);
-     for (i = 0; i < 32; i++) {
-         qemu_fprintf(f, "r%2.2d=%8.8x ", i, env->regs[i]);
-         if ((i + 1) % 4 == 0)
+diff --git a/target/microblaze/gdbstub.c b/target/microblaze/gdbstub.c
+index cdca434..af29f00 100644
+--- a/target/microblaze/gdbstub.c
++++ b/target/microblaze/gdbstub.c
+@@ -26,12 +26,37 @@ int mb_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
+     MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
+     CPUMBState *env = &cpu->env;
+ 
++    /*
++     * GDB expects registers to be reported in this order:
++     * R0-R31
++     * PC-BTR
++     * PVR0-PVR11
++     * EDR-TLBHI
++     * SLR-SHR
++     */
+     if (n < 32) {
+         return gdb_get_reg32(mem_buf, env->regs[n]);
+     } else {
+-        return gdb_get_reg32(mem_buf, env->sregs[n - 32]);
++        n -= 32;
++        switch (n) {
++        case 0 ... 5:
++            return gdb_get_reg32(mem_buf, env->sregs[n]);
++        /* PVR12 is intentionally skipped */
++        case 6 ... 17:
++            n -= 6;
++            return gdb_get_reg32(mem_buf, env->pvr.regs[n]);
++        case 18 ... 24:
++            /* Add an offset of 6 to resume where we left off with SRegs */
++            n = n - 18 + 6;
++            return gdb_get_reg32(mem_buf, env->sregs[n]);
++        case 25:
++            return gdb_get_reg32(mem_buf, env->slr);
++        case 26:
++            return gdb_get_reg32(mem_buf, env->shr);
++        default:
++            return 0;
++        }
+     }
+-    return 0;
+ }
+ 
+ int mb_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+@@ -50,7 +75,28 @@ int mb_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+     if (n < 32) {
+         env->regs[n] = tmp;
+     } else {
+-        env->sregs[n - 32] = tmp;
++        n -= 32;
++        switch (n) {
++        case 0 ... 5:
++            env->sregs[n] = tmp;
++            break;
++        /* PVR12 is intentionally skipped */
++        case 6 ... 17:
++            n -= 6;
++            env->pvr.regs[n] = tmp;
++            break;
++        case 18 ... 24:
++            /* Add an offset of 6 to resume where we left off with SRegs */
++            n = n - 18 + 6;
++            env->sregs[n] = tmp;
++            break;
++        case 25:
++            env->slr = tmp;
++            break;
++        case 26:
++            env->shr = tmp;
++            break;
++        }
+     }
+     return 4;
+ }
 -- 
 2.7.4
 
