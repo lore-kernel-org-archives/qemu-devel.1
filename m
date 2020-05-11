@@ -2,99 +2,93 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED83BC47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 08:30:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21A81C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 08:32:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D6B22080C
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 08:30:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SEwi1hKv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D6B22080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DA8B720735
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 08:32:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA8B720735
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY3p4-0004ro-Qk
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 04:30:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58790)
+	id 1jY3rA-0006eG-10
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 04:32:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59058)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jY3nU-0003KB-Ux
- for qemu-devel@nongnu.org; Mon, 11 May 2020 04:28:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59525
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jY3nS-0005pd-VE
- for qemu-devel@nongnu.org; Mon, 11 May 2020 04:28:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589185702;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=EdEkKifv9sBa/sBVzNieXwncHlzbzRmDxxk06hFaTkk=;
- b=SEwi1hKvFUCHIK3ZJFguO3KId9hvHg2WJndMuSmDxbcxz+T+w5Qggj8HxjSwdCM5nZlD4M
- NPPULTHzPFP4kzrWFMkkN6j0habnQzeTyoRpb4+XeGy9B1rSKtBfqjAHNTh+X0PX7CzCpy
- nZiuEdLljiB+31Myz/0nDLgrOQsLbUw=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-33GSdhuLPiyN6klXLqTgsQ-1; Mon, 11 May 2020 04:28:20 -0400
-X-MC-Unique: 33GSdhuLPiyN6klXLqTgsQ-1
-Received: by mail-wm1-f71.google.com with SMTP id w189so4282876wmg.1
- for <qemu-devel@nongnu.org>; Mon, 11 May 2020 01:28:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=EdEkKifv9sBa/sBVzNieXwncHlzbzRmDxxk06hFaTkk=;
- b=BBp6iO8M4GPkol9FASer24/IzldqkLumaTJnGzfFLdeSCchrJfgHIrr7B790N8+0Gn
- oWQvH8pNvc2qb+/TVgBvTDu4vANqFCrH8obA/zMFnKkxKEr6+31NwF5AUibl1F/RaUi9
- 1TYHVrZ2gB3sA57JLYhvaaVBVK8eITDy+Nz9Nz2KLbxS0UX6/v1IJF26fuXRM+/PqFLu
- ily0eYSdL+KfMQzPwexRN3pF5mj7pKAXjl2WWeINj2nAXZJwveaMBprNKoMXSds9oaQp
- sZV3dEUKRm7YEdmLuz/Ud5t6In66ep7bKW1foP+3T5n76ec17rhwE2HBqgsHhhY0uO5x
- byRw==
-X-Gm-Message-State: AGi0PuYk06lP1Q5wBN3v68W81YWmh9HUVdnCdIr1Ps8LYzaEzbiArd48
- JbXiSBgv03tbH6SQ1CC55/kYeRioBCztCDaCG6DfIb97bM4iPH3O85A3xqByMKKbdvwEw5EoDS4
- XfGJcHhguNlRiLgo=
-X-Received: by 2002:a1c:9e51:: with SMTP id h78mr32303664wme.177.1589185698795; 
- Mon, 11 May 2020 01:28:18 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJAU1InPfKBnYFEIuqlGR3bbHZHjIaOPNt8tuAxZed7CU5KeOpacJszWuRXnEv0xoQJzsIS5Q==
-X-Received: by 2002:a1c:9e51:: with SMTP id h78mr32303639wme.177.1589185698557; 
- Mon, 11 May 2020 01:28:18 -0700 (PDT)
-Received: from x1w.redhat.com (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id 1sm26363072wmi.0.2020.05.11.01.28.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 11 May 2020 01:28:17 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] scripts/tracetool: Update maintainer email address
-Date: Mon, 11 May 2020 10:28:16 +0200
-Message-Id: <20200511082816.696-1-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1jY3pv-0005mf-C5
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 04:30:56 -0400
+Received: from mga17.intel.com ([192.55.52.151]:38641)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1jY3ps-0006ej-W9
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 04:30:54 -0400
+IronPort-SDR: ACl815NESpOyS/2uR9/vceQ+jtbrH3WzMTQ8VvHtTM9MvZ/bhcwwDKRfE54x98rW5IrdFV1uK+
+ c6XUNMctGgiw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 11 May 2020 01:30:44 -0700
+IronPort-SDR: zdybWLSlmm5nHwP3UPRGdokgUnP4tEa0cpfp67uhZOTcsOc0u5b88gnU5k3mDWWAybGkXfzpdx
+ 1ZqLZV45Bvcw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,379,1583222400"; d="scan'208";a="251097493"
+Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
+ by fmsmga007.fm.intel.com with ESMTP; 11 May 2020 01:30:44 -0700
+Received: from shsmsx604.ccr.corp.intel.com (10.109.6.214) by
+ FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 11 May 2020 01:30:44 -0700
+Received: from shsmsx604.ccr.corp.intel.com (10.109.6.214) by
+ SHSMSX604.ccr.corp.intel.com (10.109.6.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 11 May 2020 16:30:42 +0800
+Received: from shsmsx604.ccr.corp.intel.com ([10.109.6.214]) by
+ SHSMSX604.ccr.corp.intel.com ([10.109.6.214]) with mapi id 15.01.1713.004;
+ Mon, 11 May 2020 16:30:42 +0800
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: Lukas Straub <lukasstraub2@web.de>
+Subject: RE: [PATCH v4 3/6] net/colo-compare.c: Fix deadlock in
+ compare_chr_send
+Thread-Topic: [PATCH v4 3/6] net/colo-compare.c: Fix deadlock in
+ compare_chr_send
+Thread-Index: AQHWIf7BDkECWoyP7kGnccHgaQnR+6icRinA///+YYCAATRuMP//uwAAgACLbgD//5LZAACouMkw
+Date: Mon, 11 May 2020 08:30:42 +0000
+Message-ID: <fdcec695d6d44f92a895546c1e23df36@intel.com>
+References: <cover.1588587700.git.lukasstraub2@web.de>
+ <5536749ec95380f18c01789c472324565c060bcc.1588587700.git.lukasstraub2@web.de>
+ <c27b4dbdc6834e70b4af738d01f9fae4@intel.com>	<20200507175107.45d5d497@luklap>
+ <0636ae8fb8a640a0bae59712ca9447dd@intel.com>	<20200508080804.6677e210@luklap>
+ <274606df46bb49a4bf9d6fa58b1f9689@intel.com> <20200508095626.6b200ee5@luklap>
+In-Reply-To: <20200508095626.6b200ee5@luklap>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.36]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 02:55:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Received-SPF: pass client-ip=192.55.52.151; envelope-from=chen.zhang@intel.com;
+ helo=mga17.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 04:30:45
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,281 +101,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org,
- John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Li Zhijian <lizhijian@cn.fujitsu.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There is an effort in progress to generate a QEMU Python
-package. As I'm not sure this old email is still valid,
-update it to not produce package with broken maintainer
-email.
-
-Patch created mechanically by running:
-
- $ sed -i 's,\(__email__ *= "\)stefanha@linux.vnet.ibm.com",\1stefanha@redhat.com",' \
-         $(git grep -l 'email.*stefanha@linux.vnet.ibm.com')
-
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- scripts/tracetool.py                             | 2 +-
- scripts/tracetool/__init__.py                    | 2 +-
- scripts/tracetool/backend/__init__.py            | 2 +-
- scripts/tracetool/backend/dtrace.py              | 2 +-
- scripts/tracetool/backend/log.py                 | 2 +-
- scripts/tracetool/backend/simple.py              | 2 +-
- scripts/tracetool/backend/ust.py                 | 2 +-
- scripts/tracetool/format/__init__.py             | 2 +-
- scripts/tracetool/format/c.py                    | 2 +-
- scripts/tracetool/format/d.py                    | 2 +-
- scripts/tracetool/format/h.py                    | 2 +-
- scripts/tracetool/format/stap.py                 | 2 +-
- scripts/tracetool/format/tcg_h.py                | 2 +-
- scripts/tracetool/format/tcg_helper_c.py         | 2 +-
- scripts/tracetool/format/tcg_helper_h.py         | 2 +-
- scripts/tracetool/format/tcg_helper_wrapper_h.py | 2 +-
- scripts/tracetool/transform.py                   | 2 +-
- scripts/tracetool/vcpu.py                        | 2 +-
- 18 files changed, 18 insertions(+), 18 deletions(-)
-
-diff --git a/scripts/tracetool.py b/scripts/tracetool.py
-index 264cc9eecc..31146242b7 100755
---- a/scripts/tracetool.py
-+++ b/scripts/tracetool.py
-@@ -10,7 +10,7 @@
- __license__    = "GPL version 2 or (at your option) any later version"
- 
- __maintainer__ = "Stefan Hajnoczi"
--__email__      = "stefanha@linux.vnet.ibm.com"
-+__email__      = "stefanha@redhat.com"
- 
- 
- import sys
-diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.py
-index 13d29f1e42..3ccfa1e116 100644
---- a/scripts/tracetool/__init__.py
-+++ b/scripts/tracetool/__init__.py
-@@ -9,7 +9,7 @@
- __license__    = "GPL version 2 or (at your option) any later version"
- 
- __maintainer__ = "Stefan Hajnoczi"
--__email__      = "stefanha@linux.vnet.ibm.com"
-+__email__      = "stefanha@redhat.com"
- 
- 
- import re
-diff --git a/scripts/tracetool/backend/__init__.py b/scripts/tracetool/backend/__init__.py
-index 54cab2c4de..7bfcc86cc5 100644
---- a/scripts/tracetool/backend/__init__.py
-+++ b/scripts/tracetool/backend/__init__.py
-@@ -50,7 +50,7 @@
- __license__    = "GPL version 2 or (at your option) any later version"
- 
- __maintainer__ = "Stefan Hajnoczi"
--__email__      = "stefanha@linux.vnet.ibm.com"
-+__email__      = "stefanha@redhat.com"
- 
- 
- import os
-diff --git a/scripts/tracetool/backend/dtrace.py b/scripts/tracetool/backend/dtrace.py
-index 638990db79..5711892ba0 100644
---- a/scripts/tracetool/backend/dtrace.py
-+++ b/scripts/tracetool/backend/dtrace.py
-@@ -9,7 +9,7 @@
- __license__    = "GPL version 2 or (at your option) any later version"
- 
- __maintainer__ = "Stefan Hajnoczi"
--__email__      = "stefanha@linux.vnet.ibm.com"
-+__email__      = "stefanha@redhat.com"
- 
- 
- from tracetool import out
-diff --git a/scripts/tracetool/backend/log.py b/scripts/tracetool/backend/log.py
-index 23b274c0fd..877222bbe9 100644
---- a/scripts/tracetool/backend/log.py
-+++ b/scripts/tracetool/backend/log.py
-@@ -9,7 +9,7 @@
- __license__    = "GPL version 2 or (at your option) any later version"
- 
- __maintainer__ = "Stefan Hajnoczi"
--__email__      = "stefanha@linux.vnet.ibm.com"
-+__email__      = "stefanha@redhat.com"
- 
- 
- from tracetool import out
-diff --git a/scripts/tracetool/backend/simple.py b/scripts/tracetool/backend/simple.py
-index b650c262b5..a74d61fcd6 100644
---- a/scripts/tracetool/backend/simple.py
-+++ b/scripts/tracetool/backend/simple.py
-@@ -9,7 +9,7 @@
- __license__    = "GPL version 2 or (at your option) any later version"
- 
- __maintainer__ = "Stefan Hajnoczi"
--__email__      = "stefanha@linux.vnet.ibm.com"
-+__email__      = "stefanha@redhat.com"
- 
- 
- from tracetool import out
-diff --git a/scripts/tracetool/backend/ust.py b/scripts/tracetool/backend/ust.py
-index a772a3b53b..6c0a5f8d68 100644
---- a/scripts/tracetool/backend/ust.py
-+++ b/scripts/tracetool/backend/ust.py
-@@ -9,7 +9,7 @@
- __license__    = "GPL version 2 or (at your option) any later version"
- 
- __maintainer__ = "Stefan Hajnoczi"
--__email__      = "stefanha@linux.vnet.ibm.com"
-+__email__      = "stefanha@redhat.com"
- 
- 
- from tracetool import out
-diff --git a/scripts/tracetool/format/__init__.py b/scripts/tracetool/format/__init__.py
-index aba2f7a441..2dc46f3dd9 100644
---- a/scripts/tracetool/format/__init__.py
-+++ b/scripts/tracetool/format/__init__.py
-@@ -32,7 +32,7 @@
- __license__    = "GPL version 2 or (at your option) any later version"
- 
- __maintainer__ = "Stefan Hajnoczi"
--__email__      = "stefanha@linux.vnet.ibm.com"
-+__email__      = "stefanha@redhat.com"
- 
- 
- import os
-diff --git a/scripts/tracetool/format/c.py b/scripts/tracetool/format/c.py
-index 78af8aff72..23d82ea861 100644
---- a/scripts/tracetool/format/c.py
-+++ b/scripts/tracetool/format/c.py
-@@ -9,7 +9,7 @@
- __license__    = "GPL version 2 or (at your option) any later version"
- 
- __maintainer__ = "Stefan Hajnoczi"
--__email__      = "stefanha@linux.vnet.ibm.com"
-+__email__      = "stefanha@redhat.com"
- 
- 
- from tracetool import out
-diff --git a/scripts/tracetool/format/d.py b/scripts/tracetool/format/d.py
-index d3980b914b..0afb5f3f47 100644
---- a/scripts/tracetool/format/d.py
-+++ b/scripts/tracetool/format/d.py
-@@ -9,7 +9,7 @@
- __license__    = "GPL version 2 or (at your option) any later version"
- 
- __maintainer__ = "Stefan Hajnoczi"
--__email__      = "stefanha@linux.vnet.ibm.com"
-+__email__      = "stefanha@redhat.com"
- 
- 
- from tracetool import out
-diff --git a/scripts/tracetool/format/h.py b/scripts/tracetool/format/h.py
-index 83e1a2f355..e94f0be7da 100644
---- a/scripts/tracetool/format/h.py
-+++ b/scripts/tracetool/format/h.py
-@@ -9,7 +9,7 @@
- __license__    = "GPL version 2 or (at your option) any later version"
- 
- __maintainer__ = "Stefan Hajnoczi"
--__email__      = "stefanha@linux.vnet.ibm.com"
-+__email__      = "stefanha@redhat.com"
- 
- 
- from tracetool import out
-diff --git a/scripts/tracetool/format/stap.py b/scripts/tracetool/format/stap.py
-index 8fc808f2ef..a218b0445c 100644
---- a/scripts/tracetool/format/stap.py
-+++ b/scripts/tracetool/format/stap.py
-@@ -9,7 +9,7 @@
- __license__    = "GPL version 2 or (at your option) any later version"
- 
- __maintainer__ = "Stefan Hajnoczi"
--__email__      = "stefanha@linux.vnet.ibm.com"
-+__email__      = "stefanha@redhat.com"
- 
- 
- from tracetool import out
-diff --git a/scripts/tracetool/format/tcg_h.py b/scripts/tracetool/format/tcg_h.py
-index 0180e3d76c..33cf6a31b3 100644
---- a/scripts/tracetool/format/tcg_h.py
-+++ b/scripts/tracetool/format/tcg_h.py
-@@ -9,7 +9,7 @@
- __license__    = "GPL version 2 or (at your option) any later version"
- 
- __maintainer__ = "Stefan Hajnoczi"
--__email__      = "stefanha@linux.vnet.ibm.com"
-+__email__      = "stefanha@redhat.com"
- 
- 
- from tracetool import out, Arguments
-diff --git a/scripts/tracetool/format/tcg_helper_c.py b/scripts/tracetool/format/tcg_helper_c.py
-index 6527b69afd..2db6317f3c 100644
---- a/scripts/tracetool/format/tcg_helper_c.py
-+++ b/scripts/tracetool/format/tcg_helper_c.py
-@@ -9,7 +9,7 @@
- __license__    = "GPL version 2 or (at your option) any later version"
- 
- __maintainer__ = "Stefan Hajnoczi"
--__email__      = "stefanha@linux.vnet.ibm.com"
-+__email__      = "stefanha@redhat.com"
- 
- 
- from tracetool import Arguments, out
-diff --git a/scripts/tracetool/format/tcg_helper_h.py b/scripts/tracetool/format/tcg_helper_h.py
-index 98ebe52f18..08554fbc85 100644
---- a/scripts/tracetool/format/tcg_helper_h.py
-+++ b/scripts/tracetool/format/tcg_helper_h.py
-@@ -9,7 +9,7 @@
- __license__    = "GPL version 2 or (at your option) any later version"
- 
- __maintainer__ = "Stefan Hajnoczi"
--__email__      = "stefanha@linux.vnet.ibm.com"
-+__email__      = "stefanha@redhat.com"
- 
- 
- from tracetool import out
-diff --git a/scripts/tracetool/format/tcg_helper_wrapper_h.py b/scripts/tracetool/format/tcg_helper_wrapper_h.py
-index 6adeab74df..0c5a9797d1 100644
---- a/scripts/tracetool/format/tcg_helper_wrapper_h.py
-+++ b/scripts/tracetool/format/tcg_helper_wrapper_h.py
-@@ -9,7 +9,7 @@
- __license__    = "GPL version 2 or (at your option) any later version"
- 
- __maintainer__ = "Stefan Hajnoczi"
--__email__      = "stefanha@linux.vnet.ibm.com"
-+__email__      = "stefanha@redhat.com"
- 
- 
- from tracetool import out
-diff --git a/scripts/tracetool/transform.py b/scripts/tracetool/transform.py
-index 8fd4dcf20d..ea8b27799d 100644
---- a/scripts/tracetool/transform.py
-+++ b/scripts/tracetool/transform.py
-@@ -9,7 +9,7 @@
- __license__    = "GPL version 2 or (at your option) any later version"
- 
- __maintainer__ = "Stefan Hajnoczi"
--__email__      = "stefanha@linux.vnet.ibm.com"
-+__email__      = "stefanha@redhat.com"
- 
- 
- def _transform_type(type_, trans):
-diff --git a/scripts/tracetool/vcpu.py b/scripts/tracetool/vcpu.py
-index 0b104e4f15..b54e4f4e7a 100644
---- a/scripts/tracetool/vcpu.py
-+++ b/scripts/tracetool/vcpu.py
-@@ -10,7 +10,7 @@
- __license__    = "GPL version 2 or (at your option) any later version"
- 
- __maintainer__ = "Stefan Hajnoczi"
--__email__      = "stefanha@linux.vnet.ibm.com"
-+__email__      = "stefanha@redhat.com"
- 
- 
- from tracetool import Arguments, try_import
--- 
-2.21.3
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTHVrYXMgU3RyYXViIDxs
+dWthc3N0cmF1YjJAd2ViLmRlPg0KPiBTZW50OiBGcmlkYXksIE1heSA4LCAyMDIwIDM6NTYgUE0N
+Cj4gVG86IFpoYW5nLCBDaGVuIDxjaGVuLnpoYW5nQGludGVsLmNvbT4NCj4gQ2M6IHFlbXUtZGV2
+ZWwgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz47IExpIFpoaWppYW4NCj4gPGxpemhpamlhbkBjbi5m
+dWppdHN1LmNvbT47IEphc29uIFdhbmcgPGphc293YW5nQHJlZGhhdC5jb20+OyBNYXJjLQ0KPiBB
+bmRyw6kgTHVyZWF1IDxtYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20+OyBQYW9sbyBCb256aW5p
+DQo+IDxwYm9uemluaUByZWRoYXQuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIHY0IDMvNl0g
+bmV0L2NvbG8tY29tcGFyZS5jOiBGaXggZGVhZGxvY2sgaW4NCj4gY29tcGFyZV9jaHJfc2VuZA0K
+PiANCj4gT24gRnJpLCA4IE1heSAyMDIwIDA2OjI4OjQ1ICswMDAwDQo+ICJaaGFuZywgQ2hlbiIg
+PGNoZW4uemhhbmdAaW50ZWwuY29tPiB3cm90ZToNCj4gDQo+ID4gPiAtLS0tLU9yaWdpbmFsIE1l
+c3NhZ2UtLS0tLQ0KPiA+ID4gRnJvbTogTHVrYXMgU3RyYXViIDxsdWthc3N0cmF1YjJAd2ViLmRl
+Pg0KPiA+ID4gU2VudDogRnJpZGF5LCBNYXkgOCwgMjAyMCAyOjA4IFBNDQo+ID4gPiBUbzogWmhh
+bmcsIENoZW4gPGNoZW4uemhhbmdAaW50ZWwuY29tPg0KPiA+ID4gQ2M6IHFlbXUtZGV2ZWwgPHFl
+bXUtZGV2ZWxAbm9uZ251Lm9yZz47IExpIFpoaWppYW4NCj4gPiA+IDxsaXpoaWppYW5AY24uZnVq
+aXRzdS5jb20+OyBKYXNvbiBXYW5nIDxqYXNvd2FuZ0ByZWRoYXQuY29tPjsgTWFyYy0NCj4gPiA+
+IEFuZHLDqSBMdXJlYXUgPG1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbT47IFBhb2xvIEJvbnpp
+bmkNCj4gPiA+IDxwYm9uemluaUByZWRoYXQuY29tPg0KPiA+ID4gU3ViamVjdDogUmU6IFtQQVRD
+SCB2NCAzLzZdIG5ldC9jb2xvLWNvbXBhcmUuYzogRml4IGRlYWRsb2NrIGluDQo+ID4gPiBjb21w
+YXJlX2Nocl9zZW5kDQo+ID4gPg0KPiA+ID4gT24gRnJpLCA4IE1heSAyMDIwIDAyOjE5OjAwICsw
+MDAwDQo+ID4gPiAiWmhhbmcsIENoZW4iIDxjaGVuLnpoYW5nQGludGVsLmNvbT4gd3JvdGU6DQo+
+ID4gPiA+ID4gPiBObyBuZWVkIHRvIGluaXQgdGhlIG5vdGlmeV9zZW5kY28gZWFjaCB0aW1lLCBi
+ZWNhdXNlIHRoZQ0KPiA+ID4gPiA+ID4gbm90aWZ5IGRldiBqdXN0DQo+ID4gPiA+ID4gYW4gb3B0
+aW9uYWwgcGFyYW1ldGVyLg0KPiA+ID4gPiA+ID4gWW91IGNhbiB1c2UgdGhlIGlmIChzLT5ub3Rp
+ZnlfZGV2KSBoZXJlLiBKdXN0IFhlbiB1c2UgdGhlDQo+ID4gPiBjaHJfbm90aWZ5X2Rldi4NCj4g
+PiA+ID4gPg0KPiA+ID4gPiA+IE9rLCBJIHdpbGwgY2hhbmdlIHRoYXQgYW5kIHRoZSBjb2RlIGJl
+bG93IGluIHRoZSBuZXh0IHZlcnNpb24uDQo+ID4gPiA+ID4NCj4gPiA+ID4gPiA+IE92ZXJhbGws
+IG1ha2UgdGhlIGNocl9zZW5kIGpvYiB0byBjb3JvdXRpbmUgaXMgYSBnb29kIGlkZWEuIEl0DQo+
+ID4gPiA+ID4gPiBsb29rcyBnb29kDQo+ID4gPiA+ID4gZm9yIG1lLg0KPiA+ID4gPiA+ID4gQW5k
+IHlvdXIgcGF0Y2ggaW5zcGlyZWQgbWUsIGl0IGxvb2tzIHdlIGNhbiByZS11c2UgdGhlDQo+ID4g
+PiA+ID4gPiBjb21wYXJlX2Nocl9zZW5kDQo+ID4gPiA+ID4gY29kZSBvbiBmaWx0ZXIgbWlycm9y
+L3JlZGlyZWN0b3IgdG9vLg0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gSSBhbHJlYWR5IGhhdmUgcGF0
+Y2ggZm9yIHRoYXQsIGJ1dCBJIGRvbid0IHRoaW5rIGl0IGlzIGEgZ29vZA0KPiA+ID4gPiA+IGlk
+ZWEsIGJlY2F1c2UgdGhlIGd1ZXN0IHRoZW4gY2FuIHNlbmQgcGFja2V0cyBmYXN0ZXIgdGhhbg0K
+PiA+ID4gPiA+IGNvbG8tY29tcGFyZSBjYW4gcHJvY2Vzcy4gVGhpcyBsZWFkcyBidWZmZXJibG9h
+dCBhbmQgdGhlDQo+IHBlcmZvcm1hbmNlIGRyb3BzIGluIG15IHRlc3RzOg0KPiA+ID4gPiA+IENs
+aWVudC10by1zZXJ2ZXIgdGNwOg0KPiA+ID4gPiA+IHdpdGhvdXQgcGF0Y2g6IH42NiBNYml0L3MN
+Cj4gPiA+ID4gPiB3aXRoIHBhdGNoOiB+NTkgTWJpdC9zDQo+ID4gPiA+ID4gU2VydmVyLXRvLWNs
+aWVudCB0Y3A6DQo+ID4gPiA+ID4gd2l0aG91dCBwYXRjaDogfjcwMiBLYml0L3MNCj4gPiA+ID4g
+PiB3aXRoIHBhdGNoOiB+MzI4IEtiaXQvcw0KPiA+ID4gPg0KPiA+ID4gPiBPaCwgYSBiaWcgcGVy
+Zm9ybWFuY2UgZHJvcCwgaXMgdGhhdCBjYXVzZWQgYnkgbWVtY3B5L3plcm9fY29weQ0KPiBwYXJ0
+cyA/DQo+ID4gPiA+DQo+ID4gPiA+IFRoYW5rcw0KPiA+ID4gPiBaaGFuZyBDaGVuDQo+ID4gPg0K
+PiA+ID4gTm8sIHRoZXJlIGlzIG5vIG1lbWNweSBvdmVyaGVhZCB3aXRoIHRoaXMgcGF0Y2gsIHNl
+ZSBiZWxvdy4NCj4gPg0KPiA+IEkgbWVhbnMgZm9yIHRoZSBmaWx0ZXIgbWlycm9yL3JlZGlyZWN0
+b3IgcGFydHMgd2h5IGNvcm91dGluZSB3aWxsIGxlYWQgaHVnZQ0KPiBwZXJmb3JtYW5jZSBkcm9w
+Pw0KPiANCj4gSXQncyBiZWNhdXNlIGhhdmluZyBhIGFkZGl0aW9uYWwgYnVmZmVyIGJlZm9yZSB0
+aGUgbmV0d29yayBib3R0bGVuZWNrIChjb2xvLQ0KPiBjb21wYXJlIGluIG91ciBjYXNlKSBjb25m
+dXNlcyBUQ1AncyBjb25nZXN0aW9uLWNvbnRyb2w6DQo+IFRDUCB3aWxsIHNwZWVkIHVwIHRoZSBk
+YXRhIHRyYW5zZmVyIHVudGlsIHBhY2tldHMgc3RhcnQgdG8gZHJvcCAob3IgdGhlDQo+IG5ldHdv
+cmsgaW50ZXJmYWNlIGlzIGJsb2NrZWQpLiBUaGlzIGZlZWRiYWNrIGhhcyB0byBiZSBxdWljayBz
+byBUQ1AgY2FuIHNlbGVjdA0KPiBhIHN1aXRhYmxlIHRyYW5zZmVyIHNwZWVkLiBCdXQgd2l0aCB0
+aGUgcGF0Y2gsIHRoZSBndWVzdCB3aWxsIGZpbGwgdGhlIGJ1ZmZlciBhcw0KPiBmYXN0IGFzIGl0
+IGNhbiAoaXQgZG9lcyBub3QgInNlZSIgdGhlIHNsb3cgYmFuZHdpZHRoIG9mIGNvbG8tY29tcGFy
+ZSBiZWhpbmQNCj4gdGhlIGJ1ZmZlcikgdW50aWwgaXQgaXQgaGl0cyBhZ2FpbnN0IHRoZSBUQ1Ag
+Y29uZ2VzdGlvbiB3aW5kb3cuIEF0IHRoaXMgcG9pbnQgVENQDQo+IGRyYXN0aWNhbGx5IHJlZHVj
+ZXMgaXRzIHRyYW5zZmVyIHNwZWVkIGFuZCBpdCBzdGF5cyBsb3cgYmVjYXVzZSB0aGUgZnVsbCBi
+dWZmZXINCj4gZGVsYXlzIHRoZSBwYWNrZXRzIHNvIGl0IGRvZXNuJ3QgcmVjZWl2ZSBBQ0sncyBz
+byBpdCBjYW4ndCBzcGVlZCB1cCB0aGUNCj4gdHJhbnNmZXIgYWdhaW4uIFVudGlsIHRoZSBidWZm
+ZXIgaXMgZW1wdHkgYWdhaW4gKGNhbiB0YWtlIHVwIHRvIGEgc2Vjb25kIGluIG15DQo+IHRlc3Rz
+KS4gVGhlbiB0aGlzIGN5Y2xlIHJlcGVhdHMuDQoNCk1ha2Ugc2Vuc2UhDQpBZnRlciBmaXggYWJv
+dmUgaXNzdWU6DQpSZXZpZXdlZC1ieTogWmhhbmcgQ2hlbiA8Y2hlbi56aGFuZ0BpbnRlbC5jb20+
+DQoNClRoYW5rcw0KWmhhbmcgQ2hlbg0KDQo+IA0KPiBSZWdhcmRzLA0KPiBMdWthcyBTdHJhdWIN
+Cj4gDQo+ID4gVGhhbmtzDQo+ID4gWmhhbmcgQ2hlbg0KPiA+DQo+ID4gPg0KPiA+ID4gUmVnYXJk
+cywNCj4gPiA+IEx1a2FzIFN0cmF1Yg0KPiA+ID4NCj4gPiA+IC0tLQ0KPiA+ID4gIG5ldC9maWx0
+ZXItbWlycm9yLmMgfCAxNDINCj4gPiA+ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+Ky0tLS0tLS0tLS0tDQo+ID4gPiAgMSBmaWxlIGNoYW5nZWQsIDEwNiBpbnNlcnRpb25zKCspLCAz
+NiBkZWxldGlvbnMoLSkNCj4gPiA+DQo+ID4gPiBkaWZmIC0tZ2l0IGEvbmV0L2ZpbHRlci1taXJy
+b3IuYyBiL25ldC9maWx0ZXItbWlycm9yLmMgaW5kZXgNCj4gPiA+IGQ4M2U4MTU1NDUuLjZiY2Qz
+MTc1MDIgMTAwNjQ0DQo+ID4gPiAtLS0gYS9uZXQvZmlsdGVyLW1pcnJvci5jDQo+ID4gPiArKysg
+Yi9uZXQvZmlsdGVyLW1pcnJvci5jDQo+ID4gPiBAQCAtMjAsNiArMjAsOCBAQA0KPiA+ID4gICNp
+bmNsdWRlICJjaGFyZGV2L2NoYXItZmUuaCINCj4gPiA+ICAjaW5jbHVkZSAicWVtdS9pb3YuaCIN
+Cj4gPiA+ICAjaW5jbHVkZSAicWVtdS9zb2NrZXRzLmgiDQo+ID4gPiArI2luY2x1ZGUgImJsb2Nr
+L2Fpby13YWl0LmgiDQo+ID4gPiArI2luY2x1ZGUgInFlbXUvY29yb3V0aW5lLmgiDQo+ID4gPg0K
+PiA+ID4gICNkZWZpbmUgRklMVEVSX01JUlJPUihvYmopIFwNCj4gPiA+ICAgICAgT0JKRUNUX0NI
+RUNLKE1pcnJvclN0YXRlLCAob2JqKSwgVFlQRV9GSUxURVJfTUlSUk9SKSBAQCAtMzEsNg0KPiA+
+ID4gKzMzLDE4IEBAICAjZGVmaW5lIFRZUEVfRklMVEVSX1JFRElSRUNUT1IgImZpbHRlci1yZWRp
+cmVjdG9yIg0KPiA+ID4gICNkZWZpbmUgUkVESVJFQ1RPUl9NQVhfTEVOIE5FVF9CVUZTSVpFDQo+
+ID4gPg0KPiA+ID4gK3R5cGVkZWYgc3RydWN0IFNlbmRDbyB7DQo+ID4gPiArICAgIENvcm91dGlu
+ZSAqY287DQo+ID4gPiArICAgIEdRdWV1ZSBzZW5kX2xpc3Q7DQo+ID4gPiArICAgIGJvb2wgZG9u
+ZTsNCj4gPiA+ICsgICAgaW50IHJldDsNCj4gPiA+ICt9IFNlbmRDbzsNCj4gPiA+ICsNCj4gPiA+
+ICt0eXBlZGVmIHN0cnVjdCBTZW5kRW50cnkgew0KPiA+ID4gKyAgICBzc2l6ZV90IHNpemU7DQo+
+ID4gPiArICAgIHVpbnQ4X3QgYnVmW107DQo+ID4gPiArfSBTZW5kRW50cnk7DQo+ID4gPiArDQo+
+ID4gPiAgdHlwZWRlZiBzdHJ1Y3QgTWlycm9yU3RhdGUgew0KPiA+ID4gICAgICBOZXRGaWx0ZXJT
+dGF0ZSBwYXJlbnRfb2JqOw0KPiA+ID4gICAgICBjaGFyICppbmRldjsNCj4gPiA+IEBAIC0zOCw1
+OSArNTIsMTAxIEBAIHR5cGVkZWYgc3RydWN0IE1pcnJvclN0YXRlIHsNCj4gPiA+ICAgICAgQ2hh
+ckJhY2tlbmQgY2hyX2luOw0KPiA+ID4gICAgICBDaGFyQmFja2VuZCBjaHJfb3V0Ow0KPiA+ID4g
+ICAgICBTb2NrZXRSZWFkU3RhdGUgcnM7DQo+ID4gPiArICAgIFNlbmRDbyBzZW5kY287DQo+ID4g
+PiAgICAgIGJvb2wgdm5ldF9oZHI7DQo+ID4gPiAgfSBNaXJyb3JTdGF0ZTsNCj4gPiA+DQo+ID4g
+PiAtc3RhdGljIGludCBmaWx0ZXJfc2VuZChNaXJyb3JTdGF0ZSAqcywNCj4gPiA+IC0gICAgICAg
+ICAgICAgICAgICAgICAgIGNvbnN0IHN0cnVjdCBpb3ZlYyAqaW92LA0KPiA+ID4gLSAgICAgICAg
+ICAgICAgICAgICAgICAgaW50IGlvdmNudCkNCj4gPiA+ICtzdGF0aWMgdm9pZCBjb3JvdXRpbmVf
+Zm4gX2ZpbHRlcl9zZW5kKHZvaWQgKm9wYXF1ZSkNCj4gPiA+ICB7DQo+ID4gPiArICAgIE1pcnJv
+clN0YXRlICpzID0gb3BhcXVlOw0KPiA+ID4gKyAgICBTZW5kQ28gKnNlbmRjbyA9ICZzLT5zZW5k
+Y287DQo+ID4gPiAgICAgIE5ldEZpbHRlclN0YXRlICpuZiA9IE5FVEZJTFRFUihzKTsNCj4gPiA+
+ICAgICAgaW50IHJldCA9IDA7DQo+ID4gPiAtICAgIHNzaXplX3Qgc2l6ZSA9IDA7DQo+ID4gPiAt
+ICAgIHVpbnQzMl90IGxlbiA9IDA7DQo+ID4gPiAtICAgIGNoYXIgKmJ1ZjsNCj4gPiA+IC0NCj4g
+PiA+IC0gICAgc2l6ZSA9IGlvdl9zaXplKGlvdiwgaW92Y250KTsNCj4gPiA+IC0gICAgaWYgKCFz
+aXplKSB7DQo+ID4gPiAtICAgICAgICByZXR1cm4gMDsNCj4gPiA+IC0gICAgfQ0KPiA+ID4NCj4g
+PiA+IC0gICAgbGVuID0gaHRvbmwoc2l6ZSk7DQo+ID4gPiAtICAgIHJldCA9IHFlbXVfY2hyX2Zl
+X3dyaXRlX2FsbCgmcy0+Y2hyX291dCwgKHVpbnQ4X3QgKikmbGVuLA0KPiBzaXplb2YobGVuKSk7
+DQo+ID4gPiAtICAgIGlmIChyZXQgIT0gc2l6ZW9mKGxlbikpIHsNCj4gPiA+IC0gICAgICAgIGdv
+dG8gZXJyOw0KPiA+ID4gLSAgICB9DQo+ID4gPiArICAgIHdoaWxlICghZ19xdWV1ZV9pc19lbXB0
+eSgmc2VuZGNvLT5zZW5kX2xpc3QpKSB7DQo+ID4gPiArICAgICAgICBTZW5kRW50cnkgKmVudHJ5
+ID0gZ19xdWV1ZV9wb3BfdGFpbCgmc2VuZGNvLT5zZW5kX2xpc3QpOw0KPiA+ID4gKyAgICAgICAg
+dWludDMyX3QgbGVuID0gaHRvbmwoZW50cnktPnNpemUpOw0KPiA+ID4NCj4gPiA+IC0gICAgaWYg
+KHMtPnZuZXRfaGRyKSB7DQo+ID4gPiAtICAgICAgICAvKg0KPiA+ID4gLSAgICAgICAgICogSWYg
+dm5ldF9oZHIgPSBvbiwgd2Ugc2VuZCB2bmV0IGhlYWRlciBsZW4gdG8gbWFrZSBvdGhlcg0KPiA+
+ID4gLSAgICAgICAgICogbW9kdWxlKGxpa2UgY29sby1jb21wYXJlKSBrbm93IGhvdyB0byBwYXJz
+ZSBuZXQNCj4gPiA+IC0gICAgICAgICAqIHBhY2tldCBjb3JyZWN0bHkuDQo+ID4gPiAtICAgICAg
+ICAgKi8NCj4gPiA+IC0gICAgICAgIHNzaXplX3Qgdm5ldF9oZHJfbGVuOw0KPiA+ID4gKyAgICAg
+ICAgcmV0ID0gcWVtdV9jaHJfZmVfd3JpdGVfYWxsKCZzLT5jaHJfb3V0LA0KPiA+ID4gKyAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICh1aW50OF90ICopJmxlbiwNCj4gPiA+ICsg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzaXplb2YobGVuKSk7DQo+ID4gPiAr
+ICAgICAgICBpZiAocmV0ICE9IHNpemVvZihsZW4pKSB7DQo+ID4gPiArICAgICAgICAgICAgZ19m
+cmVlKGVudHJ5KTsNCj4gPiA+ICsgICAgICAgICAgICBnb3RvIGVycjsNCj4gPiA+ICsgICAgICAg
+IH0NCj4gPiA+DQo+ID4gPiAtICAgICAgICB2bmV0X2hkcl9sZW4gPSBuZi0+bmV0ZGV2LT52bmV0
+X2hkcl9sZW47DQo+ID4gPiArICAgICAgICBpZiAocy0+dm5ldF9oZHIpIHsNCj4gPiA+ICsgICAg
+ICAgICAgICAvKg0KPiA+ID4gKyAgICAgICAgICAgICAqIElmIHZuZXRfaGRyID0gb24sIHdlIHNl
+bmQgdm5ldCBoZWFkZXIgbGVuIHRvIG1ha2Ugb3RoZXINCj4gPiA+ICsgICAgICAgICAgICAgKiBt
+b2R1bGUobGlrZSBjb2xvLWNvbXBhcmUpIGtub3cgaG93IHRvIHBhcnNlIG5ldA0KPiA+ID4gKyAg
+ICAgICAgICAgICAqIHBhY2tldCBjb3JyZWN0bHkuDQo+ID4gPiArICAgICAgICAgICAgICovDQo+
+ID4gPiArDQo+ID4gPiArICAgICAgICAgICAgbGVuID0gaHRvbmwobmYtPm5ldGRldi0+dm5ldF9o
+ZHJfbGVuKTsNCj4gPiA+ICsgICAgICAgICAgICByZXQgPSBxZW11X2Nocl9mZV93cml0ZV9hbGwo
+JnMtPmNocl9vdXQsDQo+ID4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICh1aW50OF90ICopJmxlbiwNCj4gPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgc2l6ZW9mKGxlbikpOw0KPiA+ID4gKyAgICAgICAgICAgIGlmIChyZXQgIT0g
+c2l6ZW9mKGxlbikpIHsNCj4gPiA+ICsgICAgICAgICAgICAgICAgZ19mcmVlKGVudHJ5KTsNCj4g
+PiA+ICsgICAgICAgICAgICAgICAgZ290byBlcnI7DQo+ID4gPiArICAgICAgICAgICAgfQ0KPiA+
+ID4gKyAgICAgICAgfQ0KPiA+ID4NCj4gPiA+IC0gICAgICAgIGxlbiA9IGh0b25sKHZuZXRfaGRy
+X2xlbik7DQo+ID4gPiAtICAgICAgICByZXQgPSBxZW11X2Nocl9mZV93cml0ZV9hbGwoJnMtPmNo
+cl9vdXQsICh1aW50OF90ICopJmxlbiwNCj4gc2l6ZW9mKGxlbikpOw0KPiA+ID4gLSAgICAgICAg
+aWYgKHJldCAhPSBzaXplb2YobGVuKSkgew0KPiA+ID4gKyAgICAgICAgcmV0ID0gcWVtdV9jaHJf
+ZmVfd3JpdGVfYWxsKCZzLT5jaHJfb3V0LA0KPiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICh1aW50OF90ICopZW50cnktPmJ1ZiwNCj4gPiA+ICsgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBlbnRyeS0+c2l6ZSk7DQo+ID4gPiArICAgICAgICBpZiAo
+cmV0ICE9IGVudHJ5LT5zaXplKSB7DQo+ID4gPiArICAgICAgICAgICAgZ19mcmVlKGVudHJ5KTsN
+Cj4gPiA+ICAgICAgICAgICAgICBnb3RvIGVycjsNCj4gPiA+ICAgICAgICAgIH0NCj4gPiA+IC0g
+ICAgfQ0KPiA+ID4NCj4gPiA+IC0gICAgYnVmID0gZ19tYWxsb2Moc2l6ZSk7DQo+ID4gPiAtICAg
+IGlvdl90b19idWYoaW92LCBpb3ZjbnQsIDAsIGJ1Ziwgc2l6ZSk7DQo+ID4gPiAtICAgIHJldCA9
+IHFlbXVfY2hyX2ZlX3dyaXRlX2FsbCgmcy0+Y2hyX291dCwgKHVpbnQ4X3QgKilidWYsIHNpemUp
+Ow0KPiA+ID4gLSAgICBnX2ZyZWUoYnVmKTsNCj4gPiA+IC0gICAgaWYgKHJldCAhPSBzaXplKSB7
+DQo+ID4gPiAtICAgICAgICBnb3RvIGVycjsNCj4gPiA+ICsgICAgICAgIGdfZnJlZShlbnRyeSk7
+DQo+ID4gPiAgICAgIH0NCj4gPiA+DQo+ID4gPiAtICAgIHJldHVybiAwOw0KPiA+ID4gKyAgICBz
+ZW5kY28tPnJldCA9IDA7DQo+ID4gPiArICAgIGdvdG8gb3V0Ow0KPiA+ID4NCj4gPiA+ICBlcnI6
+DQo+ID4gPiAtICAgIHJldHVybiByZXQgPCAwID8gcmV0IDogLUVJTzsNCj4gPiA+ICsgICAgd2hp
+bGUgKCFnX3F1ZXVlX2lzX2VtcHR5KCZzZW5kY28tPnNlbmRfbGlzdCkpIHsNCj4gPiA+ICsgICAg
+ICAgIFNlbmRFbnRyeSAqZW50cnkgPSBnX3F1ZXVlX3BvcF90YWlsKCZzZW5kY28tPnNlbmRfbGlz
+dCk7DQo+ID4gPiArICAgICAgICBnX2ZyZWUoZW50cnkpOw0KPiA+ID4gKyAgICB9DQo+ID4gPiAr
+ICAgIHNlbmRjby0+cmV0ID0gcmV0IDwgMCA/IHJldCA6IC1FSU87DQo+ID4gPiArb3V0Og0KPiA+
+ID4gKyAgICBzZW5kY28tPmNvID0gTlVMTDsNCj4gPiA+ICsgICAgc2VuZGNvLT5kb25lID0gdHJ1
+ZTsNCj4gPiA+ICsgICAgYWlvX3dhaXRfa2ljaygpOw0KPiA+ID4gK30NCj4gPiA+ICsNCj4gPiA+
+ICtzdGF0aWMgaW50IGZpbHRlcl9zZW5kKE1pcnJvclN0YXRlICpzLA0KPiA+ID4gKyAgICAgICAg
+ICAgICAgICAgICAgICAgY29uc3Qgc3RydWN0IGlvdmVjICppb3YsDQo+ID4gPiArICAgICAgICAg
+ICAgICAgICAgICAgICBpbnQgaW92Y250KQ0KPiA+ID4gK3sNCj4gPiA+ICsgICAgU2VuZENvICpz
+ZW5kY28gPSAmcy0+c2VuZGNvOw0KPiA+ID4gKyAgICBTZW5kRW50cnkgKmVudHJ5Ow0KPiA+ID4g
+Kw0KPiA+ID4gKyAgICBzc2l6ZV90IHNpemUgPSBpb3Zfc2l6ZShpb3YsIGlvdmNudCk7DQo+ID4g
+PiArICAgIGlmICghc2l6ZSkgew0KPiA+ID4gKyAgICAgICAgcmV0dXJuIDA7DQo+ID4gPiArICAg
+IH0NCj4gPiA+ICsNCj4gPiA+ICsgICAgZW50cnkgPSBnX21hbGxvYyhzaXplb2YoU2VuZEVudHJ5
+KSArIHNpemUpOw0KPiA+ID4gKyAgICBlbnRyeS0+c2l6ZSA9IHNpemU7DQo+ID4gPiArICAgIGlv
+dl90b19idWYoaW92LCBpb3ZjbnQsIDAsIGVudHJ5LT5idWYsIHNpemUpOw0KPiA+ID4gKyAgICBn
+X3F1ZXVlX3B1c2hfaGVhZCgmc2VuZGNvLT5zZW5kX2xpc3QsIGVudHJ5KTsNCj4gPiA+ICsNCj4g
+PiA+ICsgICAgaWYgKHNlbmRjby0+ZG9uZSkgew0KPiA+ID4gKyAgICAgICAgc2VuZGNvLT5jbyA9
+IHFlbXVfY29yb3V0aW5lX2NyZWF0ZShfZmlsdGVyX3NlbmQsIHMpOw0KPiA+ID4gKyAgICAgICAg
+c2VuZGNvLT5kb25lID0gZmFsc2U7DQo+ID4gPiArICAgICAgICBxZW11X2Nvcm91dGluZV9lbnRl
+cihzZW5kY28tPmNvKTsNCj4gPiA+ICsgICAgICAgIGlmIChzZW5kY28tPmRvbmUpIHsNCj4gPiA+
+ICsgICAgICAgICAgICAvKiByZXBvcnQgZWFybHkgZXJyb3JzICovDQo+ID4gPiArICAgICAgICAg
+ICAgcmV0dXJuIHNlbmRjby0+cmV0Ow0KPiA+ID4gKyAgICAgICAgfQ0KPiA+ID4gKyAgICB9DQo+
+ID4gPiArDQo+ID4gPiArICAgIC8qIGFzc3VtZSBzdWNjZXNzICovDQo+ID4gPiArICAgIHJldHVy
+biAwOw0KPiA+ID4gIH0NCj4gPiA+DQo+ID4gPiAgc3RhdGljIHZvaWQgcmVkaXJlY3Rvcl90b19m
+aWx0ZXIoTmV0RmlsdGVyU3RhdGUgKm5mLCBAQCAtMTk0LDYNCj4gPiA+ICsyNTAsMTAgQEAgc3Rh
+dGljIHZvaWQgZmlsdGVyX21pcnJvcl9jbGVhbnVwKE5ldEZpbHRlclN0YXRlICpuZikgIHsNCj4g
+PiA+ICAgICAgTWlycm9yU3RhdGUgKnMgPSBGSUxURVJfTUlSUk9SKG5mKTsNCj4gPiA+DQo+ID4g
+PiArICAgIEFJT19XQUlUX1dISUxFKE5VTEwsICFzLT5zZW5kY28uZG9uZSk7DQo+ID4gPiArDQo+
+ID4gPiArICAgIGdfcXVldWVfY2xlYXIoJnMtPnNlbmRjby5zZW5kX2xpc3QpOw0KPiA+ID4gKw0K
+PiA+ID4gICAgICBxZW11X2Nocl9mZV9kZWluaXQoJnMtPmNocl9vdXQsIGZhbHNlKTsgIH0NCj4g
+PiA+DQo+ID4gPiBAQCAtMjAxLDYgKzI2MSwxMCBAQCBzdGF0aWMgdm9pZA0KPiA+ID4gZmlsdGVy
+X3JlZGlyZWN0b3JfY2xlYW51cChOZXRGaWx0ZXJTdGF0ZQ0KPiA+ID4gKm5mKSAgew0KPiA+ID4g
+ICAgICBNaXJyb3JTdGF0ZSAqcyA9IEZJTFRFUl9SRURJUkVDVE9SKG5mKTsNCj4gPiA+DQo+ID4g
+PiArICAgIEFJT19XQUlUX1dISUxFKE5VTEwsICFzLT5zZW5kY28uZG9uZSk7DQo+ID4gPiArDQo+
+ID4gPiArICAgIGdfcXVldWVfY2xlYXIoJnMtPnNlbmRjby5zZW5kX2xpc3QpOw0KPiA+ID4gKw0K
+PiA+ID4gICAgICBxZW11X2Nocl9mZV9kZWluaXQoJnMtPmNocl9pbiwgZmFsc2UpOw0KPiA+ID4g
+ICAgICBxZW11X2Nocl9mZV9kZWluaXQoJnMtPmNocl9vdXQsIGZhbHNlKTsgIH0gQEAgLTIyNCw2
+ICsyODgsOSBAQA0KPiA+ID4gc3RhdGljIHZvaWQgZmlsdGVyX21pcnJvcl9zZXR1cChOZXRGaWx0
+ZXJTdGF0ZSAqbmYsIEVycm9yICoqZXJycCkNCj4gPiA+ICAgICAgfQ0KPiA+ID4NCj4gPiA+ICAg
+ICAgcWVtdV9jaHJfZmVfaW5pdCgmcy0+Y2hyX291dCwgY2hyLCBlcnJwKTsNCj4gPiA+ICsNCj4g
+PiA+ICsgICAgcy0+c2VuZGNvLmRvbmUgPSB0cnVlOw0KPiA+ID4gKyAgICBnX3F1ZXVlX2luaXQo
+JnMtPnNlbmRjby5zZW5kX2xpc3QpOw0KPiA+ID4gIH0NCj4gPiA+DQo+ID4gPiAgc3RhdGljIHZv
+aWQgcmVkaXJlY3Rvcl9yc19maW5hbGl6ZShTb2NrZXRSZWFkU3RhdGUgKnJzKSBAQCAtMjgxLDYN
+Cj4gPiA+ICszNDgsOSBAQCBzdGF0aWMgdm9pZCBmaWx0ZXJfcmVkaXJlY3Rvcl9zZXR1cChOZXRG
+aWx0ZXJTdGF0ZSAqbmYsIEVycm9yDQo+ICoqZXJycCkNCj4gPiA+ICAgICAgICAgICAgICByZXR1
+cm47DQo+ID4gPiAgICAgICAgICB9DQo+ID4gPiAgICAgIH0NCj4gPiA+ICsNCj4gPiA+ICsgICAg
+cy0+c2VuZGNvLmRvbmUgPSB0cnVlOw0KPiA+ID4gKyAgICBnX3F1ZXVlX2luaXQoJnMtPnNlbmRj
+by5zZW5kX2xpc3QpOw0KPiA+ID4gIH0NCj4gPiA+DQo+ID4gPiAgc3RhdGljIHZvaWQgZmlsdGVy
+X21pcnJvcl9jbGFzc19pbml0KE9iamVjdENsYXNzICpvYywgdm9pZCAqZGF0YSkNCj4gPiA+IC0t
+DQo+ID4gPiAyLjIwLjENCj4gPg0KDQo=
 
