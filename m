@@ -7,69 +7,71 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2231C54E4A
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 05:52:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CCF5C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 05:54:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8C7920735
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 05:52:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 55C7120735
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 05:54:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BQ1b1wqh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8C7920735
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KWw7oNFn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55C7120735
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY1N3-0006s8-U3
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 01:52:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60600)
+	id 1jY1OV-0008Lq-GO
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 01:54:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33056)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jY1MK-0006RQ-D1
- for qemu-devel@nongnu.org; Mon, 11 May 2020 01:52:12 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:34130)
+ id 1jY1Nv-0007g0-Hi
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 01:53:51 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39087)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jY1MJ-0004Ys-9u
- for qemu-devel@nongnu.org; Mon, 11 May 2020 01:52:12 -0400
-Received: by mail-wm1-x344.google.com with SMTP id g14so5944976wme.1
- for <qemu-devel@nongnu.org>; Sun, 10 May 2020 22:52:10 -0700 (PDT)
+ id 1jY1Nu-0005mC-Ph
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 01:53:51 -0400
+Received: by mail-wm1-x344.google.com with SMTP id y24so17701042wma.4
+ for <qemu-devel@nongnu.org>; Sun, 10 May 2020 22:53:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=462f2OuJJXinybiWqUpUzujWwlIAZiGVzrgw6i7oSUY=;
- b=BQ1b1wqhUT6LpNdYGg9G87oeQsluXIYBDgTNRgr3TNhbpXncWfcIa31UTn3nhyIKaZ
- +ljoghgNQCzXc36T3bfE/Lnb2oK2IafmR2WsHWlHxynN6uD+6FqXV2WE/Rvf7qa6PlnR
- vTmnLaxYon0W3iWyex4V7+xQeWyo7ONQOYfHC7XD4EnqlCQOVpK04A13QHZinX0KGuq7
- EtMSzvyL59VwZUiIB2BWMgsgdz3OFckK+QpMiXbEw4IhgZa1wco1zL4KrOtB7+Vhd/r0
- aSDMNMGiHvdwtRooyY85fkmy4IIasV4NskLEzFf8so3JmRykjbxl/MlEy4hWaGTgTOxv
- nl9A==
+ bh=CrVvmpxXRoGNLDGtoK9vUDFdyyRUbLuAYhl1PfBLIAc=;
+ b=KWw7oNFnX584Jk8fkxrT5e8JDjECGeNcGeaNiNapE9WKCTvhOykEy5+V/G62+s0qo1
+ gNdN8L2Wb1s2A77/kKrd27t/O9EqleQwA2fwTz7YVEl88XYxj3JazmkKI/ze+meq6BSV
+ TCINlU3xIBCbgdTIxHQ9owpkhz3wtNKfdj/WdMWT/oBZHFffxR/r6uyMFRTrjcM2MMDP
+ ytwcGZqOg/7DC1hhF+EeQ2kzbtavK9nR4hGxpSR3i23m0LkeDKYpwxbeUEfS7iBrPUmQ
+ lB45xaRb/XFxek4lBjE7FBpWx3kS3qas1wSqq4dSmBk87T8hslbLgkzinOFj9qetRaUr
+ yV8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=462f2OuJJXinybiWqUpUzujWwlIAZiGVzrgw6i7oSUY=;
- b=IrsIMSlbqU+5wkpdYEn8yED+APqs3HogfR5GSdRf1R6ftJSSimGND2KnMB91m5Tgq2
- LBqzvMSsqyNWuw4ey0o9EwwS5rcKDIuZPaL9xOw3Roj6DmdqpeUX/KAayj/KIwErcZQa
- PLMHwFINfLLJX0kqNDGH40po5I/527qA0WmBah2DUbuYW7RqoEY3LSV+TvGSjHCSj2jQ
- B0sesN2K+aGT5sXcGRJrGr8EKvsAwO5iaEHv60OgH1Tq2Hp2tL3TgBRdiTBDxNx5zQU4
- qCVOEo5ESqFed4m1G+/sbTWz+npFTlD//bILTyXrqO2+j++karwVpY3xOd0DczlB9qQU
- nskA==
-X-Gm-Message-State: AGi0PuZPB1IHpwTldGAmpbte6IcPq9zDlnheFcUxaeirXw0BSSkF/x/M
- t8pfnU1owL1rnVLH30s2mdYmPE/f64aw0ghYZzI=
-X-Google-Smtp-Source: APiQypJpAW8PWfn7tY+kw56l6FP7j0gxiBLwN2DbjgyckY6EjscQbAOtGnaNjJPZsfIpH0Azew6OWSdMVpWUaYn82bs=
-X-Received: by 2002:a1c:f211:: with SMTP id s17mr32257316wmc.168.1589176329744; 
- Sun, 10 May 2020 22:52:09 -0700 (PDT)
+ bh=CrVvmpxXRoGNLDGtoK9vUDFdyyRUbLuAYhl1PfBLIAc=;
+ b=BtlCL6ZxFUjlOHG1kLSZ5khxSIA6g0t+4aQarnTdTVhuBzyVsmCiMi2b6toupb0aVk
+ xaJxhwHYm3cDda2dFFLNzF1dvzSa0KtlCrPylpQjJAcjakTftin2hiyRrsjfOIMpKFbB
+ Al+E4KvhtJfY83em9D/CbFigXL4BLrDSZXrZOIPfzQBKgFV1bJFWCig3+lHIKMHmGx2x
+ 1ETi7CcO4BE3KlHaurGU7Su42RFKuYOMx47kFLm/Qff2IrOLmbhnRv4s7uvtOUquaZ3X
+ q1rQxg18Bt5LJRNGC3FqUnp7f5Mzs0nWW4NHBCKf41spBJ3g4v6X5+gqQFlYSoPEJfy9
+ 51/A==
+X-Gm-Message-State: AGi0Pua5S2IO4X1fcNa4vbhy8EHtumtjanInjRGZqX/sdhms84XJpKlT
+ csdI/rnDzFTBcErkQ1G6yUJkuIWXdgqX+2EHHhY=
+X-Google-Smtp-Source: APiQypJnNnV5+ksljiKAMzqeX9TLS+j/0d/CQf5uBvBd2xJZxmo/3IO18mWW3xOSu9ORSUZkSSv7up9DRmHJmX5MYWc=
+X-Received: by 2002:a05:600c:3cd:: with SMTP id
+ z13mr10313521wmd.159.1589176429476; 
+ Sun, 10 May 2020 22:53:49 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200510210128.18343-1-f4bug@amsat.org>
- <20200510210128.18343-9-f4bug@amsat.org>
-In-Reply-To: <20200510210128.18343-9-f4bug@amsat.org>
+ <20200510210128.18343-11-f4bug@amsat.org>
+In-Reply-To: <20200510210128.18343-11-f4bug@amsat.org>
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Mon, 11 May 2020 07:51:50 +0200
-Message-ID: <CAHiYmc45ayKzTg75375S5vJktcmQXu=qSKztzmxQ3RoVuaBz_Q@mail.gmail.com>
-Subject: Re: [PATCH 08/12] hw/pci-host/bonito: Map all the Bonito64 I/O range
+Date: Mon, 11 May 2020 07:53:26 +0200
+Message-ID: <CAHiYmc52Vp+yY9=xm05L6uMABtVNq=iS57Hh=onA6ye-b9c1gw@mail.gmail.com>
+Subject: Re: [PATCH 10/12] hw/pci-host/bonito: Better describe the I/O CS
+ regions
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
@@ -111,54 +113,54 @@ Sender: "Qemu-devel"
 ieu-Daud=C3=A9 <f4bug@amsat.org> =D1=98=D0=B5
 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
 >
-> To ease following guest accesses to the Bonito64 chipset,
-> map its I/O range as UnimplementedDevice.
-> We can now see the accesses to unimplemented peripheral
-> using the '-d unimp' command line option.
+> Better describe the I/O CS regions, add the ROMCS region.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  hw/pci-host/bonito.c | 3 +++
->  hw/pci-host/Kconfig  | 1 +
->  2 files changed, 4 insertions(+)
+>  hw/pci-host/bonito.c | 13 +++++++++++--
+>  1 file changed, 11 insertions(+), 2 deletions(-)
 >
 
 Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 
 > diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
-> index 7ed462ffb5..9761780f44 100644
+> index 90a6c52a38..335c7787eb 100644
 > --- a/hw/pci-host/bonito.c
 > +++ b/hw/pci-host/bonito.c
-> @@ -48,6 +48,7 @@
->  #include "sysemu/reset.h"
->  #include "sysemu/runstate.h"
->  #include "exec/address-spaces.h"
-> +#include "hw/misc/unimp.h"
->
->  /* #define DEBUG_BONITO */
->
-> @@ -644,6 +645,8 @@ static void bonito_realize(PCIDevice *dev, Error **er=
+> @@ -672,6 +672,8 @@ static void bonito_realize(PCIDevice *dev, Error **er=
 rp)
->      sysbus_init_mmio(sysbus, &phb->data_mem);
->      sysbus_mmio_map(sysbus, 2, BONITO_SPCICONFIG_BASE);
+>      sysbus_init_mmio(sysbus, &s->iomem_cop);
+>      sysbus_mmio_map(sysbus, 4, 0x1fe00300);
 >
-> +    create_unimplemented_device("bonito", BONITO_REG_BASE, BONITO_REG_SI=
-ZE);
+> +    create_unimplemented_device("ROMCS", 0x1c000000, 60 * MiB);
 > +
->      memory_region_init_io(&s->iomem_ldma, OBJECT(s), &bonito_ldma_ops, s=
-,
->                            "ldma", 0x100);
->      sysbus_init_mmio(sysbus, &s->iomem_ldma);
-> diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig
-> index 8db41edc7e..036a61877a 100644
-> --- a/hw/pci-host/Kconfig
-> +++ b/hw/pci-host/Kconfig
-> @@ -58,4 +58,5 @@ config PCI_EXPRESS_DESIGNWARE
+>      /* Map PCI IO Space  0x1fd0 0000 - 0x1fd1 0000 */
+>      memory_region_init_alias(&s->bonito_pciio, OBJECT(s), "isa_mmio",
+>                               get_system_io(), 0, BONITO_PCIIO_SIZE);
+> @@ -679,10 +681,17 @@ static void bonito_realize(PCIDevice *dev, Error **=
+errp)
+>      sysbus_mmio_map(sysbus, 5, BONITO_PCIIO_BASE);
 >
->  config PCI_BONITO
->      select PCI
-> +    select UNIMP
->      bool
+>      /* add pci local io mapping */
+> -    memory_region_init_alias(&s->bonito_localio, OBJECT(s), "isa_mmio",
+> -                             get_system_io(), 0, BONITO_DEV_SIZE);
+> +
+> +    memory_region_init_alias(&s->bonito_localio, OBJECT(s), "IOCS[0]",
+> +                             get_system_io(), 0, 256 * KiB);
+>      sysbus_init_mmio(sysbus, &s->bonito_localio);
+>      sysbus_mmio_map(sysbus, 6, BONITO_DEV_BASE);
+> +    create_unimplemented_device("IOCS[1]", BONITO_DEV_BASE + 1 * 256 * K=
+iB,
+> +                                256 * KiB);
+> +    create_unimplemented_device("IOCS[2]", BONITO_DEV_BASE + 2 * 256 * K=
+iB,
+> +                                256 * KiB);
+> +    create_unimplemented_device("IOCS[3]", BONITO_DEV_BASE + 3 * 256 * K=
+iB,
+> +                                256 * KiB);
+>
+>      MemoryRegion *pcimem_alias =3D g_new(MemoryRegion, 1);
+>      memory_region_init_alias(pcimem_alias, NULL, "pci.mem.alias",
 > --
 > 2.21.3
 >
