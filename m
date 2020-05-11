@@ -7,78 +7,80 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8D28C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 11:19:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C46FC54E8D
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 11:21:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84FB620722
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 11:19:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F035E20722
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 11:21:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="Ls5hh1hN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84FB620722
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="Y7kPtTKD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F035E20722
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY6Ss-0002yu-I0
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 07:19:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55796)
+	id 1jY6Uu-0004ij-Uc
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 07:21:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54868)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jY6OT-0000Nb-FK; Mon, 11 May 2020 07:14:45 -0400
-Received: from mout.web.de ([212.227.17.11]:45173)
+ id 1jY6Ko-0004uB-Qg
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 07:10:58 -0400
+Received: from mout.web.de ([212.227.17.12]:50661)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jY6OS-0006pG-Er; Mon, 11 May 2020 07:14:45 -0400
+ id 1jY6Kn-0005kp-Vb
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 07:10:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1589195679;
- bh=69isl/oloXKqCgT1lMh7Rv9glCgzyS4DtmEifV3kP2Y=;
+ s=dbaedf251592; t=1589195449;
+ bh=fHF36Ki6yNEwvH+HbsyWEOYKs0aX/3g3RLEGn37QNNQ=;
  h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=Ls5hh1hNeY5R9PSRPcu0l8xb9iP8cgvDfwuYZvKhzmNCphsc7EhdeNzPh+ZWkJdPq
- dCSB3itY0opts2furo1sGH4TKfZcTZ5FKyqe3sf8UNJePEkPDXIJErsD5+Y5ajV6GS
- 9JCYXCkygiweynZ0ncWoGRc+3+1JFqEdPwGiOCNg=
+ b=Y7kPtTKDnZLnyyUcEIb1sJ+hrK31f73NOOIdvjgr8TvWU4TzC+WtkkyWS7G9k24yZ
+ imszOWin4ky8ZGMZwp6YaFzy9c2SEBgfwg3wTteU5Ko9u3fL9pFf0bo2pNk90lLTJL
+ B0liIoggwDz7jzZeq/KFyJnmvqAjrUuYs/3U33eM=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([89.247.255.192]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1N7gXQ-1j40SL0KZe-014gPR; Mon, 11
- May 2020 13:14:39 +0200
-Date: Mon, 11 May 2020 13:14:37 +0200
+Received: from luklap ([89.247.255.192]) by smtp.web.de (mrweb101
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0MPpQU-1jUERf2eIc-004zSU; Mon, 11
+ May 2020 13:10:49 +0200
+Date: Mon, 11 May 2020 13:10:48 +0200
 From: Lukas Straub <lukasstraub2@web.de>
 To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH 1/5] Introduce yank feature
-Message-ID: <99931d0c9ab23eb641bd612e154f007348afa690.1589193717.git.lukasstraub2@web.de>
-In-Reply-To: <cover.1589193717.git.lukasstraub2@web.de>
-References: <cover.1589193717.git.lukasstraub2@web.de>
+Subject: [PATCH 2/6] migration/colo.c: Use cpu_synchronize_all_states()
+Message-ID: <9675031ce557b73ebd10e7bd20ebbf57f30b177c.1589193382.git.lukasstraub2@web.de>
+In-Reply-To: <cover.1589193382.git.lukasstraub2@web.de>
+References: <cover.1589193382.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/I_Kx/CpVvM=iQB0A2ZZVo8K";
+Content-Type: multipart/signed; boundary="Sig_/T.A0yy34WUUll3kRBVs_g1_";
  protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:MJUelbv6jUA0wE0LZky0xBVwVS9C3aZj3VVV3jOfm7HZnRG5Mm0
- QY4q73Ow6G9i6DBZaNmccKdFCL1AX30vLnN6xSvjqoz+5KKVGTaW3EnBk7InpRL+7DXpsV7
- vkK3cI+w8qTBbaAiavTEpyhT0IIx7R2OAA2LPBtZxfh4qS+gBnZ4Cq3BvXLi/R8KyHKOM1q
- tBB6JTCxGYekgDGRQnAFg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:zVbW5lOgWBg=:0lyFw7JO3+DbF/yjYHeZDj
- SVyQQI0VVcepf5xP72yT5xqOJoKSQUtL0KbNIEaVgm5LqI2Srzhit0q/Fg5RA0dV0T/GTK4Dc
- ds1ePzZWf1lcXlCkY1R+Fgi7KpZksphPoLvDIGK1Dkng6JGlxyBSkYMpS7PF7iBZgyLi2phw+
- DVOr6PfmZql8DqngKZBpWM/dBEQPOtjZqL/PLCbT8G/W7xZpOfNVvrtqtnyacdkfFpLxsJqLo
- q2DoscYECFfTKTn/9AcxXTe4hCSaATlNS7DpXqdzNn52biLFnp66MLxYUm4SjQk2A3nubrqGM
- K2wNZmNhuzd6Z35PFjjbmAAwtFzUCYe+NLiZWB9vc04GSEb/UwKl198EzxJPNa5RF7QBg2eyJ
- h57vbpxxq8i8tg4fxVbN6/wg/mUCWAYEN2szjgWoCH+F5gCQl6RfWGC4RiFUvrJgNZjVy8o5V
- hgVn59NMcxmSpON+eAIKB/1RYSPtfvBBNCnEXWv9tKkSY+aIOEtKmeMlFYhpeP4a/O3I9gBUj
- BjjkFa/IayvG3nVk1BvedH7tesB737XQeSB8upt0NT3hk+4qH8RVwpksK3SGM7u5plqicheBj
- C3gH9lvouwvIUBJDySL0GBBuWWhIaIkAwqmjCqhIf89xtG6XpW8CMqKQ8dtMGIrXuePOrewCJ
- /6G6J/aS0VXZHTKsTYb+Ppikrkj+7K3Mch0nvxXgoPuNszVecxQSUxkQV0mvb9EznFHMN6qxM
- 6XbXepKGN9j9cm5KM2K69c0y3Z8IC9Qt4Exz4/d0v8p4O+nDP7yah4DrHJteDgjRk1hHH7R5F
- VGRSw5sWw88o9qxrf8pux4OS7/wQzKS0erLq8bYCxMxtI1mialhe905T3HBvS8Q22T2N6HYNz
- kxy5L11dVDULmwMqAv6pKkKhCk2NjYMlPtjJE+MEikJXlrz7jve7Zza41dwBIM/k/AUwM87jD
- zxUuYakuLWW5sQlkwyekoRM93ilMuCZeEzyqxNBmqwMxLBQ2x9LFGVdgj1GJYSp1WyZ45JTam
- Msp4RH3dQZrvtip2k9ZesHrjF14aRaqH04oy483U3X9ZH+P8xDALsU+d8+IPMen/QSxlHDZjn
- Tbg5E7YBe5oBVHo2gv/PjcpPc5UgRrCd8gHL4hkfVntJv3gGn4UXksMoxJQ2JShJyiuuMUGB5
- xbzYq78TNh5rHtxLr1w+6ls8Q4kWKBACunWNJ+SHfLJMagl/b4vvxAAINL+iuSiHfj51RykbK
- LlednjxGt74IvNYRA
-Received-SPF: pass client-ip=212.227.17.11; envelope-from=lukasstraub2@web.de;
+X-Provags-ID: V03:K1:J4iiaiK1ynPM7Kmwo10bTHc7piCUCoI/HzNwQLPal82GaYiXvum
+ MXqTuslu5KSg59/KDgWm7lhRITLwYcbII/a5Jkn+K2qNDNWL+Td2ma8/T440Itas4KCh4OL
+ UioQxsxtPN5c9dQnjCEQHFrLRd7Q1dIQL6FfUSVsT0UvmnhW43NGcptvQYr391vVcxJnz5V
+ lbU46LzV1EM8Y6iY8DFbA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:v8rXSVK0XTY=:K1WWX7lmUKDuUCj1Qpx/kC
+ WqSxI4VeNh37f8/uOyYIRzQb+j0rLG2bwW5T0KGA9sh3jF6N00n4vb1aHDlRthUkuqTO2kOcI
+ kK4DQJd+mBn21qxGy7NQ70eqbbDHEoLzz78pL70yYAXt4OTEzt7mOEL220o5NcPWbYPLBPCVr
+ amusBpTnEu954twQHjEseO5y3jBOuMTRd6Jbt71aBwvwPFDl1GrzZ5p/BrSU2+LE5g0gfunCV
+ oL6taFOH6SWYpo8of9YUrGMQoBCr/ZsCWe003NfH3uIew0dIw0TmlRGdJvEcpaG6iIZGSfsvS
+ 1j4IR5az6F9wQebhmBVgvp0PVF08f2osN7vBIs+xDW0UqctxAF1MdZl4M4J+veTLt/0UotnvW
+ 3A+sy2xTgokz6IEpH6K2JQtM9B1/MsDIGJuv7IojXdPMS5W+5DEv8tUURmmm8Ro7EUlP9xPhg
+ AYICAQvuJB7tXFXBsIxb2vpeHujs6rdB+M0ZObFk5BUEBwZdKJLnqwkkZq7JnXWfqtomvAViA
+ uPtvPHJs6CHZ1B//nYc6vQWSMXjieI61iu2YgQlwSqqiIyniWGgy6LBk4bTsbizsUPWbRRX1p
+ EIgMo0L4qsBHO1uipmROhY0LEpx9j6onTkXrllARsPSxLyveA4FTkGCOyXK9OjAF5ioTbQu3v
+ u+VMCeRsirsb/1JB86RRqHKsliGUucGb0QAWYfxSJO7DcQ11ZhhoKtaOGv1mxfgX1Dkubum3y
+ najaqPxvM64lmgzDl3qcxxGt5Yl4CPBn02y5VDF8WjM8TySeYe/yWDixDZvklg7vZicXkFKtm
+ MBJQgoHaxGs5IeXVDPJLUzP71/9iJDC6Eyu2NJh8HWKxZa1rgAGFjQyzmQFxUHMGCWu37T/Zi
+ EuxDq8mAZEmpalh8CfKp3gIeG4VDRHpsrCxT0iDkVuFQQ8x0NfMrXIaHg2FaXZx+2gM47dkxR
+ bNQ7RK/RxPXj8sziEeMEywhVryvRMag+NkdjXWqZzZGU2JV/VNGjz44WOCQksdWzA8e7hv6S8
+ RXt9Mh8fdtmmEcmrVnU937N/QFBnwyfT0sQYfJOUtxEABFhJ8yM4NhJk6RWbop2PTRDQ0hsAF
+ sfKoQ4GpuQw8/Wq84EO48xNrieNNsoNmI4LIIRCsiva4UVDJbdUe4ku6Udn+VZBFxByTYyvX+
+ dg+df9CUjjgbClqTcMClD+rkGk8mNPm5hSPNDNg5gz7BRvx3riHqmJHs9fdloDg2WPvyDght4
+ 8SvVq6PIzuXKJsDYq
+Received-SPF: pass client-ip=212.227.17.12; envelope-from=lukasstraub2@web.de;
  helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 07:14:43
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 07:10:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -24
 X-Spam_score: -2.5
@@ -100,203 +102,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
- qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan
- Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/I_Kx/CpVvM=iQB0A2ZZVo8K
+--Sig_/T.A0yy34WUUll3kRBVs_g1_
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-The yank feature allows to recover from hanging qemu by "yanking"
-at various parts. Other qemu systems can register yank functions
-which will be called by the 'yank' out-of-band qmp command.
+cpu_synchronize_all_pre_loadvm() marks all vcpus as dirty, so the
+registers are loaded from CPUState before we continue running
+the vm. However if we failover during checkpoint, CPUState is not
+initialized and the registers are loaded with garbage. This causes
+guest hangs and crashes.
+
+Fix this by using cpu_synchronize_all_states(), which initializes
+CPUState from the current cpu registers additionally to marking
+the vcpus as dirty.
 
 Signed-off-by: Lukas Straub <lukasstraub2@web.de>
 ---
- qapi/misc.json | 15 ++++++++++
- softmmu/vl.c   |  2 ++
- yank.c         | 75 ++++++++++++++++++++++++++++++++++++++++++++++++++
- yank.h         | 12 ++++++++
- 4 files changed, 104 insertions(+)
- create mode 100644 yank.c
- create mode 100644 yank.h
+ migration/colo.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 99b90ac80b..de1ee494ae 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -1550,3 +1550,18 @@
- ##
- { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
+diff --git a/migration/colo.c b/migration/colo.c
+index 09168627bc..6b2ad35aa4 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -696,7 +696,7 @@ static void colo_incoming_process_checkpoint(MigrationI=
+ncomingState *mis,
+     }
 =20
-+##
-+# @yank:
-+#
-+# Recover from hanging qemu by calling yank functions.
-+#
-+# Returns: nothing.
-+#
-+# Example:
-+#
-+# -> { "execute": "yank" }
-+# <- { "return": {} }
-+#
-+# Since: 5.1
-+##
-+{ 'command': 'yank', 'allow-oob': true }
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index 32c0047889..5d99749d29 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -112,6 +112,7 @@
- #include "qapi/qmp/qerror.h"
- #include "sysemu/iothread.h"
- #include "qemu/guest-random.h"
-+#include "yank.h"
+     qemu_mutex_lock_iothread();
+-    cpu_synchronize_all_pre_loadvm();
++    cpu_synchronize_all_states();
+     ret =3D qemu_loadvm_state_main(mis->from_src_file, mis);
+     qemu_mutex_unlock_iothread();
 =20
- #define MAX_VIRTIO_CONSOLES 1
-=20
-@@ -2906,6 +2907,7 @@ void qemu_init(int argc, char **argv, char **envp)
-     precopy_infrastructure_init();
-     postcopy_infrastructure_init();
-     monitor_init_globals();
-+    yank_init();
-=20
-     if (qcrypto_init(&err) < 0) {
-         error_reportf_err(err, "cannot initialize crypto: ");
-diff --git a/yank.c b/yank.c
-new file mode 100644
-index 0000000000..cefbfd8ab5
---- /dev/null
-+++ b/yank.c
-@@ -0,0 +1,75 @@
-+/*
-+ * QEMU yank feature
-+ *
-+ * Copyright (c) Lukas Straub <lukasstraub2@web.de>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or late=
-r.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu/thread.h"
-+#include "qemu/queue.h"
-+#include "yank.h"
-+
-+struct YankFuncAndParam {
-+    YankFn *func;
-+    void *opaque;
-+    QLIST_ENTRY(YankFuncAndParam) next;
-+};
-+
-+static QemuMutex lock;
-+static QLIST_HEAD(qlisthead, YankFuncAndParam) head
-+    =3D QLIST_HEAD_INITIALIZER(head);
-+
-+void yank_register_function(YankFn *func, void *opaque)
-+{
-+    struct YankFuncAndParam *tmp =3D g_malloc(sizeof(struct YankFuncAndPar=
-am));
-+    tmp->func =3D func;
-+    tmp->opaque =3D opaque;
-+
-+    qemu_mutex_lock(&lock);
-+    QLIST_INSERT_HEAD(&head, tmp, next);
-+    qemu_mutex_unlock(&lock);
-+}
-+
-+void yank_unregister_function(YankFn *func, void *opaque)
-+{
-+    qemu_mutex_lock(&lock);
-+
-+    struct YankFuncAndParam *tmp;
-+    QLIST_FOREACH(tmp, &head, next) {
-+        if (tmp->func =3D=3D func && tmp->opaque =3D=3D opaque) {
-+            QLIST_REMOVE(tmp, next);
-+            g_free(tmp);
-+            qemu_mutex_unlock(&lock);
-+            return;
-+        }
-+    }
-+
-+    abort();
-+}
-+
-+void yank_call_functions(void)
-+{
-+    qemu_mutex_lock(&lock);
-+
-+    struct YankFuncAndParam *tmp;
-+    QLIST_FOREACH(tmp, &head, next) {
-+        tmp->func(tmp->opaque);
-+    }
-+
-+    qemu_mutex_unlock(&lock);
-+}
-+
-+void qmp_yank(Error **errp)
-+{
-+    yank_call_functions();
-+}
-+
-+void yank_init(void)
-+{
-+    qemu_mutex_init(&lock);
-+    QLIST_INIT(&head);
-+}
-diff --git a/yank.h b/yank.h
-new file mode 100644
-index 0000000000..7376224219
---- /dev/null
-+++ b/yank.h
-@@ -0,0 +1,12 @@
-+
-+#ifndef YANK_H
-+#define YANK_H
-+
-+typedef void (YankFn) (void *opaque);
-+
-+void yank_register_function(YankFn *func, void *opaque);
-+void yank_unregister_function(YankFn *func, void *opaque);
-+void yank_call_functions(void);
-+void yank_init(void);
-+void qmp_yank(Error **errp);
-+#endif
 --=20
 2.20.1
 
 
---Sig_/I_Kx/CpVvM=iQB0A2ZZVo8K
+--Sig_/T.A0yy34WUUll3kRBVs_g1_
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl65M50ACgkQNasLKJxd
-sljF3g//Us2qiNZcJZKouFsTTshtllfrT2KsgQ9R8+mhMUFYR1xg8R2762Q3cdr9
-/5MPThQ0OSAkDVeYlodoTwHJu8v1MXgmXhwEvGSRlo13ITybpoWZD//eOp7yE6mZ
-4wXjMRygQKq1SVZ82tW9lRFCpwUcg7xTR28sKMAYkaY0NiXN/Y/71u/mVmruanIB
-PtN4T+flpH41IXDwwD+mK7lANIjU2BrBJRAXjtENuiKDIuwC9XwFRepr0N/065uY
-/T/nVAR4x4yvDOnu/sJbeOME0Wqm08BBo/sQ86J9vyyI/7machOmXEKLE+RtALjM
-Xbuy36o5bC51JyR/VrOxd3TBdk0jgBsk+J+wUSISvBIh+WuFiYfqNtYkuyqZh7Hr
-xKuI+R0dcCU0t9FZd4LszNN29C9f2P8VR/lfoWw27vUwAfLtD9EF3mVflxzEfrqO
-fHnasQwFXT77SPvBwj/heThaLChu0XuWrBPrLddT+2VNUS/OOC2eiD/KC8P+96+v
-N5RChkGkoq/RrK6NYBWLNgGZfkAaJU5OBbpE/aNerSikUVAW+q43b+qLoaGeGXVE
-Y3UGSlA9roVCiPteWS6JaUKFgAmefZnTASpm610cejMfgG0KK0BizPCpben9vzsu
-vLjIt0utqAU/gbCk7rOzIHpRdgMCqwDeKrxOyZKVDrW41I+0lNI=
-=Qx+H
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl65MrgACgkQNasLKJxd
+slilZQ/+PUEBgUpfk41XvDCGVewbQa7b1LnrepwIyJzNBO/gdYd5SqhOgoMxY4ir
+47+tAaj72/26rH0fiCUCZuRStN4QEeU/9h8FiWACuDshrawNnk/i763JFiiUAZR2
+W4jgs08fzOH1kt0CttQSToKhIYB62w+ajQizEVkeFlvIwckJ8f84VhY+rJf3J1bp
+OkkeJE6JI9lR5pPNPc8RUskKfsOnIHnfzo74xj8M5Rf1XfXvVCwgspK9zZ2jieXF
+w60MwpcJb8X2HexuLZMUX/cGVosQEdI5Ec6dZCgjoUkqlYtV91ibxfyB6rQaVJfI
+zgpYBBjTbq2uYyvR38oWEduhswQeIv+7Ue9khCdfVRcW8u4IjMTZ7vKpWs6VIKPR
+EUZXCbmWu3vLEAKMoh2iYyHN8X36nJpG0o9MA8mmFHy64X6TH6o2JzvygT5KI4b+
+7my9/CWyHS7Zd+54hfQEZUYEb/ThTDO5ibT/VMFtJ7uraEsbJ/U29LsVWQitVdwO
+UOEXU+2SJ47GmAabN66acBsqlzdtC7ePQiBkVTrNk2x/J4BoyBZ4EeRTq1JsifaB
+DAw2e/RbqP3YNGsOZ+8NZgdUWYaoWJooE34+utx3PReX0//Yeika7sSQMJaZ/VfP
+D8+wJjCV8HwDt895vTBGqX1qmGoVrL/MHjtFEjB+fSvNy45y5Sw=
+=H7Vo
 -----END PGP SIGNATURE-----
 
---Sig_/I_Kx/CpVvM=iQB0A2ZZVo8K--
+--Sig_/T.A0yy34WUUll3kRBVs_g1_--
 
