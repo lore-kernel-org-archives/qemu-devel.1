@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DA7AC47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 13:41:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C6DCC47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 13:42:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCD81206B7
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 13:41:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E276206B7
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 13:42:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B9jPscLA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCD81206B7
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IagC0eV3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E276206B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY8gU-00084F-Oa
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 09:41:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49028)
+	id 1jY8hk-0001xL-FK
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 09:42:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49114)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jY8Zi-0002A7-Ri
- for qemu-devel@nongnu.org; Mon, 11 May 2020 09:34:30 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:36416)
+ id 1jY8Zw-0002Vt-Uc
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 09:34:44 -0400
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:52132)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jY8Zh-00076X-JD
- for qemu-devel@nongnu.org; Mon, 11 May 2020 09:34:30 -0400
-Received: by mail-wr1-x435.google.com with SMTP id y16so3815959wrs.3
- for <qemu-devel@nongnu.org>; Mon, 11 May 2020 06:34:29 -0700 (PDT)
+ id 1jY8Zv-0007Co-Q0
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 09:34:44 -0400
+Received: by mail-wm1-x335.google.com with SMTP id f134so5900554wmf.1
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 06:34:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=P7lDzgEvZC3BnbN9htiKg4iA4rXzyl6uaZupWk9DSZI=;
- b=B9jPscLABjOfeTC6pgfQL9kTkiba1LOSambZIDfGuK00yiLrpvaZTNdtORjdYY3QjM
- kb6gJ5FLi7ME5nBnE6bK1B5IqXfd9sBzFiQxVNfKJi/v17lZPjZNhNnhU6WTWnF157+Y
- NGF3cTAO2ZkOfakd9PzgVxRWzs2OXlygJ9Ny3Y03D3fOVWtbH/AzDxYriN9CKr9SdZeI
- gVj1Vs7Zkck+jcKdmlARcjKW2orCnbHdEEJoXU5y12h1vzdv+laJUxhGUEajVrDbVUUy
- 6YqrowwTJolRLpffNbTxxvUAVEta8uAD4TYoCh9N+wdXyDsnW/uB8lLfLfSpXlzSlOfY
- xtXQ==
+ bh=EycYX61osoiUiTKFgHPBJxcF1OjdHnGeFDt+a8slNIw=;
+ b=IagC0eV3GbvO+tI5GJbDS25Os/grZzVWaQyRGqejkYach3H8Pb3w4FDj04Jspye/Yk
+ OVhzZHzh7k6bscJjZdN1hbCsBIT9+u/UrdWOzBX1obOd0x0q9nk/lT0M6pAQksTtQixh
+ 8RWJ1na0z7hjZ9lFQ3bcwVE+FXoVoNuhA0mHTtYFnE9njZjE0AfUUfg7dxmwaaDrZqQU
+ +EcrUZ1z2DuGt/W1fiO6qYMBJpqn+dGVz9D8CjY+c87Tp+tpYDe7EGn5bvhrdF1QsbN0
+ uZeSwXus3N/aZxtzfP4J8kxQg796Oz9/mBvtSCPC7/7rxn7GnsIbQmTPNuF1YUP8JOF/
+ mupQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=P7lDzgEvZC3BnbN9htiKg4iA4rXzyl6uaZupWk9DSZI=;
- b=JOhdR+flBs2BsrOIw6EPUSusqPEt0kG/9G2saVnj+Dmn813nVMg6bq5jBbbGZoolPz
- 37uV+Zl6jyJVl8DIF9p+vZR/4ivLLLmRpL3s9HymalJXgOUWQi2EvgERsn+ComkbNm3Z
- 4hM/49sYn7zKjWcljNA6YpD5oJgZNj9R7zdFSec7o8NUU5iP4t96TzSKN6wVcvxF+VLP
- jW5G2CB/8AytP3IwWvO8Opbr/U3zLM24Q2u044wjm6DtleVmiQH5dnwXQkRNd3JL0PjM
- Z0/fwSrz1+FjYB9BRzd826soF0wkyCCH+PFR1Zhv6+siUh2FfBXOBpYPxZUwZ995YlBg
- rUlQ==
-X-Gm-Message-State: AGi0PuZpHYsb1MPuOJCuFGpkruTjyB061UNCsCtAlxoYW4b28/UbwAaz
- Ez03YUrSEQB4I7dTU7OPfRFLCxfhlsr4sw==
-X-Google-Smtp-Source: APiQypIqNuCd2tETlYtHVYna977R3I5YYc+5WkSXKhUN13flE16jUv3i/xBpp0xojYsJowBXtCThGg==
-X-Received: by 2002:a5d:6504:: with SMTP id x4mr20685643wru.340.1589204067626; 
- Mon, 11 May 2020 06:34:27 -0700 (PDT)
+ bh=EycYX61osoiUiTKFgHPBJxcF1OjdHnGeFDt+a8slNIw=;
+ b=KW2J2H1lPwi8i3OZZhk3ZkVn5pnH/17zU6gu5Q6N/NwsJGzC9PiQPMOigohSi2tqkZ
+ 7wX8r69H6Jp76adBFhDdl8DpMvOHbq3V2OUsnJA9JfG9WD7WDaT/0jtrP/f0q0jePFuK
+ KSFa/3xlQeMhcYNrnqK1rXPW4VshAWPasfgNi8/RhXtgbI2WMV26Chk4hzxBwEuajoUG
+ 5kNKUlHqndMzG5u3QwtIIKtdmMsQP2vhjZ+2fkFWodZWUJpm2XIyK6crzJuicKEZVXjU
+ 0sP1nqociEE5s9F3lo+5g2DdDVD/wlu83sgD39AqGdavSs9ZV288eDjrvlh+HeFIsvRE
+ 1eeg==
+X-Gm-Message-State: AGi0PuafnvvGeURvCDlHxUxozdPuweLOJgCOM8VW2TClY6/814GG1V0v
+ Xnz1A5uyeDTISVR06/1ZTPqchuEMFEG/tQ==
+X-Google-Smtp-Source: APiQypJQ2fDECOnU6bV5jAI3Nvtmsv4YGdFrpXNHCKF6u9ZNfKGAxI4sOq2WgXkigh9o1lQcopcT4w==
+X-Received: by 2002:a1c:e903:: with SMTP id q3mr30634884wmc.76.1589204082008; 
+ Mon, 11 May 2020 06:34:42 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id m3sm2154818wrn.96.2020.05.11.06.34.26
+ by smtp.gmail.com with ESMTPSA id m3sm2154818wrn.96.2020.05.11.06.34.40
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 11 May 2020 06:34:26 -0700 (PDT)
+ Mon, 11 May 2020 06:34:41 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 17/34] target/arm: Adjust interface of sve_ld1_host_fn
-Date: Mon, 11 May 2020 14:33:48 +0100
-Message-Id: <20200511133405.5275-18-peter.maydell@linaro.org>
+Subject: [PULL 27/34] target/arm/kvm: Inline set_feature() calls
+Date: Mon, 11 May 2020 14:33:58 +0100
+Message-Id: <20200511133405.5275-28-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200511133405.5275-1-peter.maydell@linaro.org>
 References: <20200511133405.5275-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::435;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x435.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::335;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x335.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,258 +105,103 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-The current interface includes a loop; change it to load a
-single element.  We will then be able to use the function
-for ld{2,3,4} where individual vector elements are not adjacent.
+We want to move the inlined declarations of set_feature()
+from cpu*.c to cpu.h. To avoid clashing with the KVM
+declarations, inline the few KVM calls.
 
-Replace each call with the simplest possible loop over active
-elements.
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200508154359.7494-11-richard.henderson@linaro.org
+Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20200504172448.9402-2-philmd@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/sve_helper.c | 124 ++++++++++++++++++++--------------------
- 1 file changed, 63 insertions(+), 61 deletions(-)
+ target/arm/kvm32.c | 13 ++++---------
+ target/arm/kvm64.c | 22 ++++++----------------
+ 2 files changed, 10 insertions(+), 25 deletions(-)
 
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 2f053a9152d..d0071377351 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -3972,20 +3972,10 @@ void HELPER(sve_fcmla_zpzzz_d)(CPUARMState *env, void *vg, uint32_t desc)
-  */
+diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
+index f271181ab8e..7b3a19e9aef 100644
+--- a/target/arm/kvm32.c
++++ b/target/arm/kvm32.c
+@@ -22,11 +22,6 @@
+ #include "internals.h"
+ #include "qemu/log.h"
  
- /*
-- * Load elements into @vd, controlled by @vg, from @host + @mem_ofs.
-- * Memory is valid through @host + @mem_max.  The register element
-- * indices are inferred from @mem_ofs, as modified by the types for
-- * which the helper is built.  Return the @mem_ofs of the first element
-- * not loaded (which is @mem_max if they are all loaded).
-- *
-- * For softmmu, we have fully validated the guest page.  For user-only,
-- * we cannot fully validate without taking the mmap lock, but since we
-- * know the access is within one host page, if any access is valid they
-- * all must be valid.  However, when @vg is all false, it may be that
-- * no access is valid.
-+ * Load one element into @vd + @reg_off from @host.
-+ * The controlling predicate is known to be true.
-  */
--typedef intptr_t sve_ld1_host_fn(void *vd, void *vg, void *host,
--                                 intptr_t mem_ofs, intptr_t mem_max);
-+typedef void sve_ldst1_host_fn(void *vd, intptr_t reg_off, void *host);
- 
- /*
-  * Load one element into @vd + @reg_off from (@env, @vaddr, @ra).
-@@ -3999,20 +3989,10 @@ typedef void sve_ldst1_tlb_fn(CPUARMState *env, void *vd, intptr_t reg_off,
-  */
- 
- #define DO_LD_HOST(NAME, H, TYPEE, TYPEM, HOST) \
--static intptr_t sve_##NAME##_host(void *vd, void *vg, void *host,           \
--                                  intptr_t mem_off, const intptr_t mem_max) \
--{                                                                           \
--    intptr_t reg_off = mem_off * (sizeof(TYPEE) / sizeof(TYPEM));           \
--    uint64_t *pg = vg;                                                      \
--    while (mem_off + sizeof(TYPEM) <= mem_max) {                            \
--        TYPEM val = 0;                                                      \
--        if (likely((pg[reg_off >> 6] >> (reg_off & 63)) & 1)) {             \
--            val = HOST(host + mem_off);                                     \
--        }                                                                   \
--        *(TYPEE *)(vd + H(reg_off)) = val;                                  \
--        mem_off += sizeof(TYPEM), reg_off += sizeof(TYPEE);                 \
--    }                                                                       \
--    return mem_off;                                                         \
-+static void sve_##NAME##_host(void *vd, intptr_t reg_off, void *host)  \
-+{                                                                      \
-+    TYPEM val = HOST(host);                                            \
-+    *(TYPEE *)(vd + H(reg_off)) = val;                                 \
- }
- 
- #define DO_LD_TLB(NAME, H, TYPEE, TYPEM, TLB) \
-@@ -4411,7 +4391,7 @@ static inline bool test_host_page(void *host)
- static void sve_ld1_r(CPUARMState *env, void *vg, const target_ulong addr,
-                       uint32_t desc, const uintptr_t retaddr,
-                       const int esz, const int msz,
--                      sve_ld1_host_fn *host_fn,
-+                      sve_ldst1_host_fn *host_fn,
-                       sve_ldst1_tlb_fn *tlb_fn)
- {
-     const TCGMemOpIdx oi = extract32(desc, SIMD_DATA_SHIFT, MEMOPIDX_SHIFT);
-@@ -4445,8 +4425,12 @@ static void sve_ld1_r(CPUARMState *env, void *vg, const target_ulong addr,
-     if (likely(split == mem_max)) {
-         host = tlb_vaddr_to_host(env, addr + mem_off, MMU_DATA_LOAD, mmu_idx);
-         if (test_host_page(host)) {
--            mem_off = host_fn(vd, vg, host - mem_off, mem_off, mem_max);
--            tcg_debug_assert(mem_off == mem_max);
-+            intptr_t i = reg_off;
-+            host -= mem_off;
-+            do {
-+                host_fn(vd, i, host + (i >> diffsz));
-+                i = find_next_active(vg, i + (1 << esz), reg_max, esz);
-+            } while (i < reg_max);
-             /* After having taken any fault, zero leading inactive elements. */
-             swap_memzero(vd, reg_off);
-             return;
-@@ -4459,7 +4443,12 @@ static void sve_ld1_r(CPUARMState *env, void *vg, const target_ulong addr,
-      */
- #ifdef CONFIG_USER_ONLY
-     swap_memzero(&scratch, reg_off);
--    host_fn(&scratch, vg, g2h(addr), mem_off, mem_max);
-+    host = g2h(addr);
-+    do {
-+        host_fn(&scratch, reg_off, host + (reg_off >> diffsz));
-+        reg_off += 1 << esz;
-+        reg_off = find_next_active(vg, reg_off, reg_max, esz);
-+    } while (reg_off < reg_max);
- #else
-     memset(&scratch, 0, reg_max);
-     goto start;
-@@ -4477,9 +4466,13 @@ static void sve_ld1_r(CPUARMState *env, void *vg, const target_ulong addr,
-             host = tlb_vaddr_to_host(env, addr + mem_off,
-                                      MMU_DATA_LOAD, mmu_idx);
-             if (host) {
--                mem_off = host_fn(&scratch, vg, host - mem_off,
--                                  mem_off, split);
--                reg_off = mem_off << diffsz;
-+                host -= mem_off;
-+                do {
-+                    host_fn(&scratch, reg_off, host + mem_off);
-+                    reg_off += 1 << esz;
-+                    reg_off = find_next_active(vg, reg_off, reg_max, esz);
-+                    mem_off = reg_off >> diffsz;
-+                } while (split - mem_off >= (1 << msz));
-                 continue;
-             }
-         }
-@@ -4706,7 +4699,7 @@ static void record_fault(CPUARMState *env, uintptr_t i, uintptr_t oprsz)
- static void sve_ldff1_r(CPUARMState *env, void *vg, const target_ulong addr,
-                         uint32_t desc, const uintptr_t retaddr,
-                         const int esz, const int msz,
--                        sve_ld1_host_fn *host_fn,
-+                        sve_ldst1_host_fn *host_fn,
-                         sve_ldst1_tlb_fn *tlb_fn)
- {
-     const TCGMemOpIdx oi = extract32(desc, SIMD_DATA_SHIFT, MEMOPIDX_SHIFT);
-@@ -4716,7 +4709,7 @@ static void sve_ldff1_r(CPUARMState *env, void *vg, const target_ulong addr,
-     const int diffsz = esz - msz;
-     const intptr_t reg_max = simd_oprsz(desc);
-     const intptr_t mem_max = reg_max >> diffsz;
--    intptr_t split, reg_off, mem_off;
-+    intptr_t split, reg_off, mem_off, i;
-     void *host;
- 
-     /* Skip to the first active element.  */
-@@ -4739,28 +4732,18 @@ static void sve_ldff1_r(CPUARMState *env, void *vg, const target_ulong addr,
-     if (likely(split == mem_max)) {
-         host = tlb_vaddr_to_host(env, addr + mem_off, MMU_DATA_LOAD, mmu_idx);
-         if (test_host_page(host)) {
--            mem_off = host_fn(vd, vg, host - mem_off, mem_off, mem_max);
--            tcg_debug_assert(mem_off == mem_max);
-+            i = reg_off;
-+            host -= mem_off;
-+            do {
-+                host_fn(vd, i, host + (i >> diffsz));
-+                i = find_next_active(vg, i + (1 << esz), reg_max, esz);
-+            } while (i < reg_max);
-             /* After any fault, zero any leading inactive elements.  */
-             swap_memzero(vd, reg_off);
-             return;
-         }
-     }
- 
--#ifdef CONFIG_USER_ONLY
--    /*
--     * The page(s) containing this first element at ADDR+MEM_OFF must
--     * be valid.  Considering that this first element may be misaligned
--     * and cross a page boundary itself, take the rest of the page from
--     * the last byte of the element.
--     */
--    split = max_for_page(addr, mem_off + (1 << msz) - 1, mem_max);
--    mem_off = host_fn(vd, vg, g2h(addr), mem_off, split);
+-static inline void set_feature(uint64_t *features, int feature)
+-{
+-    *features |= 1ULL << feature;
+-}
 -
--    /* After any fault, zero any leading inactive elements.  */
--    swap_memzero(vd, reg_off);
--    reg_off = mem_off << diffsz;
--#else
-     /*
-      * Perform one normal read, which will fault or not.
-      * But it is likely to bring the page into the tlb.
-@@ -4777,11 +4760,15 @@ static void sve_ldff1_r(CPUARMState *env, void *vg, const target_ulong addr,
-     if (split >= (1 << msz)) {
-         host = tlb_vaddr_to_host(env, addr + mem_off, MMU_DATA_LOAD, mmu_idx);
-         if (host) {
--            mem_off = host_fn(vd, vg, host - mem_off, mem_off, split);
--            reg_off = mem_off << diffsz;
-+            host -= mem_off;
-+            do {
-+                host_fn(vd, reg_off, host + mem_off);
-+                reg_off += 1 << esz;
-+                reg_off = find_next_active(vg, reg_off, reg_max, esz);
-+                mem_off = reg_off >> diffsz;
-+            } while (split - mem_off >= (1 << msz));
-         }
-     }
--#endif
- 
-     record_fault(env, reg_off, reg_max);
- }
-@@ -4791,7 +4778,7 @@ static void sve_ldff1_r(CPUARMState *env, void *vg, const target_ulong addr,
-  */
- static void sve_ldnf1_r(CPUARMState *env, void *vg, const target_ulong addr,
-                         uint32_t desc, const int esz, const int msz,
--                        sve_ld1_host_fn *host_fn)
-+                        sve_ldst1_host_fn *host_fn)
+ static int read_sys_reg32(int fd, uint32_t *pret, uint64_t id)
  {
-     const unsigned rd = extract32(desc, SIMD_DATA_SHIFT + MEMOPIDX_SHIFT, 5);
-     void *vd = &env->vfp.zregs[rd];
-@@ -4806,7 +4793,13 @@ static void sve_ldnf1_r(CPUARMState *env, void *vg, const target_ulong addr,
-     host = tlb_vaddr_to_host(env, addr, MMU_DATA_LOAD, mmu_idx);
-     if (likely(page_check_range(addr, mem_max, PAGE_READ) == 0)) {
-         /* The entire operation is valid and will not fault.  */
--        host_fn(vd, vg, host, 0, mem_max);
-+        reg_off = 0;
-+        do {
-+            mem_off = reg_off >> diffsz;
-+            host_fn(vd, reg_off, host + mem_off);
-+            reg_off += 1 << esz;
-+            reg_off = find_next_active(vg, reg_off, reg_max, esz);
-+        } while (reg_off < reg_max);
-         return;
-     }
- #endif
-@@ -4826,8 +4819,12 @@ static void sve_ldnf1_r(CPUARMState *env, void *vg, const target_ulong addr,
-     if (page_check_range(addr + mem_off, 1 << msz, PAGE_READ) == 0) {
-         /* At least one load is valid; take the rest of the page.  */
-         split = max_for_page(addr, mem_off + (1 << msz) - 1, mem_max);
--        mem_off = host_fn(vd, vg, host, mem_off, split);
--        reg_off = mem_off << diffsz;
-+        do {
-+            host_fn(vd, reg_off, host + mem_off);
-+            reg_off += 1 << esz;
-+            reg_off = find_next_active(vg, reg_off, reg_max, esz);
-+            mem_off = reg_off >> diffsz;
-+        } while (split - mem_off >= (1 << msz));
-     }
- #else
-     /*
-@@ -4848,8 +4845,13 @@ static void sve_ldnf1_r(CPUARMState *env, void *vg, const target_ulong addr,
-     host = tlb_vaddr_to_host(env, addr + mem_off, MMU_DATA_LOAD, mmu_idx);
-     split = max_for_page(addr, mem_off, mem_max);
-     if (host && split >= (1 << msz)) {
--        mem_off = host_fn(vd, vg, host - mem_off, mem_off, split);
--        reg_off = mem_off << diffsz;
-+        host -= mem_off;
-+        do {
-+            host_fn(vd, reg_off, host + mem_off);
-+            reg_off += 1 << esz;
-+            reg_off = find_next_active(vg, reg_off, reg_max, esz);
-+            mem_off = reg_off >> diffsz;
-+        } while (split - mem_off >= (1 << msz));
-     }
- #endif
+     struct kvm_one_reg idreg = { .id = id, .addr = (uintptr_t)pret };
+@@ -146,14 +141,14 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+      * timers; this in turn implies most of the other feature
+      * bits, but a few must be tested.
+      */
+-    set_feature(&features, ARM_FEATURE_V7VE);
+-    set_feature(&features, ARM_FEATURE_GENERIC_TIMER);
++    features |= 1ULL << ARM_FEATURE_V7VE;
++    features |= 1ULL << ARM_FEATURE_GENERIC_TIMER;
  
+     if (extract32(id_pfr0, 12, 4) == 1) {
+-        set_feature(&features, ARM_FEATURE_THUMB2EE);
++        features |= 1ULL << ARM_FEATURE_THUMB2EE;
+     }
+     if (extract32(ahcf->isar.mvfr1, 12, 4) == 1) {
+-        set_feature(&features, ARM_FEATURE_NEON);
++        features |= 1ULL << ARM_FEATURE_NEON;
+     }
+ 
+     ahcf->features = features;
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index be5b31c2b0f..cd8ab6b8aed 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -447,16 +447,6 @@ void kvm_arm_pmu_set_irq(CPUState *cs, int irq)
+     }
+ }
+ 
+-static inline void set_feature(uint64_t *features, int feature)
+-{
+-    *features |= 1ULL << feature;
+-}
+-
+-static inline void unset_feature(uint64_t *features, int feature)
+-{
+-    *features &= ~(1ULL << feature);
+-}
+-
+ static int read_sys_reg32(int fd, uint32_t *pret, uint64_t id)
+ {
+     uint64_t ret;
+@@ -648,11 +638,11 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+      * with VFPv4+Neon; this in turn implies most of the other
+      * feature bits.
+      */
+-    set_feature(&features, ARM_FEATURE_V8);
+-    set_feature(&features, ARM_FEATURE_NEON);
+-    set_feature(&features, ARM_FEATURE_AARCH64);
+-    set_feature(&features, ARM_FEATURE_PMU);
+-    set_feature(&features, ARM_FEATURE_GENERIC_TIMER);
++    features |= 1ULL << ARM_FEATURE_V8;
++    features |= 1ULL << ARM_FEATURE_NEON;
++    features |= 1ULL << ARM_FEATURE_AARCH64;
++    features |= 1ULL << ARM_FEATURE_PMU;
++    features |= 1ULL << ARM_FEATURE_GENERIC_TIMER;
+ 
+     ahcf->features = features;
+ 
+@@ -802,7 +792,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     if (cpu->has_pmu) {
+         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_PMU_V3;
+     } else {
+-        unset_feature(&env->features, ARM_FEATURE_PMU);
++        env->features &= ~(1ULL << ARM_FEATURE_PMU);
+     }
+     if (cpu_isar_feature(aa64_sve, cpu)) {
+         assert(kvm_arm_sve_supported(cs));
 -- 
 2.20.1
 
