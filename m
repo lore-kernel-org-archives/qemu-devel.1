@@ -2,117 +2,86 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFF08C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 14:12:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6B26C54E4A
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 14:13:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE67C206DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 14:12:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A5889206DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 14:13:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hycloud.partner.onmschina.cn header.i=@hycloud.partner.onmschina.cn header.b="sI4Y/Abd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE67C206DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huayun.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="n3b7+DIa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5889206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY9AZ-0002dL-T2
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 10:12:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47608)
+	id 1jY9BD-0003fE-P6
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 10:13:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54908)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <quweijie@huayun.com>)
- id 1jY5Tt-0005pM-Uq; Mon, 11 May 2020 06:16:17 -0400
-Received: from mail-bjbon0147.outbound.protection.partner.outlook.cn
- ([42.159.36.147]:43781
- helo=CN01-BJB-obe.outbound.protection.partner.outlook.cn)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <quweijie@huayun.com>)
- id 1jY5To-0001sJ-LD; Mon, 11 May 2020 06:16:17 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IknSg6WML8ej74r4pmX7VThEeqstGZTcdZlpJqOC33o8AWPEs9zdFUtAzDNgk1hO6e9CIQ7MDthyn1ZG1UBv0HDSSzPVuvGGGinq20MgCXHAi8H3+4DtXelNqaMTKxhj0b6p5fnSeljtt2J6a9k5Db8ap6KdXfJCAXltApo01R5sj2/w+Bli9sgTY4t0DdUQJ/2r8S3MMLphvbpir7C+w9sBYpWOikcV3DKRtA9DKxP0gCvOvNh26Ihhup9oi3wwTrW25ROJIoRWAWFIwWy72LjlUswigXeIPR5fyy7/p9+e1Sc+Q4P0gUwhTHs28scQiu/c6kNoM92PwRQVvEDUng==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SDPaY3m6HIuVs3W8O7d4E/rrbhCV1P/Azm0QFTsrqzw=;
- b=WHSfqpx0hoGExfA1rSLzLU6rp0IJJ8cqcS4mFYJChWAIO5wja2/DB42TR4bH86MF0W7BVgW3Vy5gjav6fx3irg7QJevE5pCxWrnkt2yOydDTsD4Lt/nmNQtVa8y9CgS/P7UET6U68DC22f68Xy5KxSBrZA6M9gUfer7WfGkcQg74ohRPZExEfsYJ7UAea8vv8htdWp9iwHCPMf0l/uBW3pMCzQ3z6ETbjqrL+DQKru+1P/GBJqrPi/C6pOyDVvLex9TBg/QIruYdaIU5Eu9WrZw249p3Jlk3Yp5PXccxuqnnLGVumuFxddhr8DQBe+eqS+cJenH9HD5HQ1667jxPKw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=huayun.com; dmarc=pass action=none header.from=huayun.com;
- dkim=pass header.d=huayun.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=hycloud.partner.onmschina.cn; s=selector1-hycloud-partner-onmschina-cn;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SDPaY3m6HIuVs3W8O7d4E/rrbhCV1P/Azm0QFTsrqzw=;
- b=sI4Y/AbdvWeQtHXxxPvTQwWuAnDMHs5qkXBKH80vInm/Di58HJgnZiE3OG5MdbGylh3RHbufPlvsB/FvDpK22YA01WhjYrB/OKmK2Y4VNMe7YZT2M0jtG026NU6NxW5BkUmpiSfPndPtNwIDLR5uavEezAZvGMJJtmS/bSdlQNk=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=huayun.com;
-Received: from SHXPR01MB0574.CHNPR01.prod.partner.outlook.cn (10.43.110.78) by
- SHXPR01MB0637.CHNPR01.prod.partner.outlook.cn (10.43.110.15) with
- Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2979.34; Mon, 11 May 2020 10:00:53 +0000
-Received: from SHXPR01MB0574.CHNPR01.prod.partner.outlook.cn ([10.43.110.78])
- by SHXPR01MB0574.CHNPR01.prod.partner.outlook.cn ([10.43.110.78])
- with mapi id 15.20.2979.033; Mon, 11 May 2020 10:00:53 +0000
-From: quweijie@huayun.com
-To: qemu-devel@nongnu.org
-Subject: [PATCH 1/2] When del child,
- next_child_index need to subtract 1. Otherwise,
- the index will get bigger and bigger.
-Date: Mon, 11 May 2020 18:00:30 +0800
-Message-Id: <1589191231-18876-1-git-send-email-quweijie@huayun.com>
-X-Mailer: git-send-email 1.8.3.1
-Content-Type: text/plain
-X-ClientProxiedBy: SHAPR01CA029.CHNPR01.prod.partner.outlook.cn (10.41.244.36)
- To SHXPR01MB0574.CHNPR01.prod.partner.outlook.cn
- (10.43.110.78)
+ (Exim 4.90_1) (envelope-from <keiichiw@chromium.org>)
+ id 1jY951-0002Zw-OO
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 10:06:51 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:41251)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <keiichiw@chromium.org>)
+ id 1jY94x-0002Or-SW
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 10:06:51 -0400
+Received: by mail-lj1-x242.google.com with SMTP id j3so9609733ljg.8
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 07:06:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=haJMwOvTf5fIl1NGZ/2blWPLBhZV7nR/CzNYhK0YNtE=;
+ b=n3b7+DIaKbaJmEW0MOOdepTs9odKwvh9njPSmX33PZuzNcsHSDv4wcNL+zteym8y9v
+ uchnC8mXHH90NCTwe+7m75OrDXq8d7DIMq37JOc1KHKC8LmQM7MH7ilxQ1AdTWAjf3Ty
+ oHI3GCazdgs0X92bI+TDo9xWGu31EV6mzm9ko=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=haJMwOvTf5fIl1NGZ/2blWPLBhZV7nR/CzNYhK0YNtE=;
+ b=b/lZta7KAER5+wSHc/z+U7syIRqlD6VEjcDWpDj7lhqcGodEKJu5T7Myh0YjiJBDe7
+ GorMchvmk54HLqSsC+b/piHvy73a8VkkSfaOD/8yFVTEUoV4FO+8o209I629krSxCsN4
+ 5G5iMxzKAK8cFKPuToBT+p3eEbyvPOebdFhKUyzBCrxGJDXo+QcgPDI+42HW/khrIz+k
+ 2nU8XIWSyUBlv2xWZutJFIxsBBRptWis8FZVmotmt2gQbP1RfgnPxaMGg/3XBmuTJ6wZ
+ 9/knKgxFK2lhTE2lgLcUEAQIeQ6x2QBU04DSS1yFoZO/SceDfQlrEUW5g9weLnJe/lP2
+ NGmw==
+X-Gm-Message-State: AOAM533a2RD4jW3+QL2j6RYw1fchgZG/3T2VHva6rmk7Fys85sYMxBmF
+ ELvNBqsL9P65wNkVK+RikvmqN1uwGvHWyfKf1Iu0/g==
+X-Google-Smtp-Source: ABdhPJwBH1E+ecdt/FDIZFNnCScP8N2GvNenf9y6DgFEQTQkGQSP9zS/tKDGLkdIcNibwUzh5C9ZKuEYv8PXGjGaVso=
+X-Received: by 2002:a05:651c:32e:: with SMTP id
+ b14mr10453920ljp.277.1589206005853; 
+ Mon, 11 May 2020 07:06:45 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain.localdomain (116.228.45.98) by
- SHAPR01CA029.CHNPR01.prod.partner.outlook.cn (10.41.244.36) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2979.27 via Frontend Transport; Mon, 11 May 2020 10:00:53 +0000
-X-Mailer: git-send-email 1.8.3.1
-X-Originating-IP: [116.228.45.98]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 58e3b243-7cd3-4d84-57be-08d7f5923105
-X-MS-TrafficTypeDiagnostic: SHXPR01MB0637:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SHXPR01MB06379BF3F22EFC19A97883CFB2A10@SHXPR01MB0637.CHNPR01.prod.partner.outlook.cn>
-X-MS-Oob-TLC-OOBClassifiers: OLM:21;
-X-Forefront-PRVS: 04004D94E2
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: YaFzOjp0oPBqN8yqJJJFurtIKS0xvrGPpTF596pBNqE2M4aB3wJhSjjv5VqVW8rfajiTRqUsObskbuCgFYEYu7dL0b2CmWujyDeuAjq1NlAeKRkG2h+F6UmyWlZpjDLBywhcP8RMtOAluhlZb+FR7+IzCyebMPQGpR8Q+iiv2hQiZK9EUWKKHVQsaZxjAfA/hWqeJroz8TI8mGXj5p+KLSON6pVfEJHgHi0Xo1N2T+O5Ez7pOqy6G/rMXdzAzZ/jyqOgeOxYEdw41SKbEIxNiFlE/bTR703Vkm42eOB4Hu1C1L3kwBLLhYdeU02M/Gj+NtAl516iOrAHdpgFCT9QgnZ3pfIXlzTQSX4foDoxu9vz01U+jdDH/hyp3GwuGFvd63WENFbnP2YwliJe+QwnHmQr/YwLSCDach5cISyhyt+GyI4LDZlWqxugsKDll6zJ2WxQq4znb3ifRzUjBIE7r7W/hplI9CciLCd6uunVTyMztbg82/TyHFfibhSQmE9VmtWHpYn2l/sYE6GRh0MN7M+cSh3gp2A2PlvPFkhwPvsPu1Zh8JM4J5UOhoIGLgXGhFt8IL0fjSqzFLKIWcJZUIgUG4WjdljDBQGkkUe7oLT3li2OAjPdfNUQvw7MttPKC5mVyB+/BS7gAEWUc49w9w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:SHXPR01MB0574.CHNPR01.prod.partner.outlook.cn; PTR:;
- CAT:NONE; SFTY:;
- SFS:(376002)(346002)(366004)(329002)(328002)(33430700001)(508600001)(8676002)(86362001)(2906002)(8936002)(4326008)(63696004)(52116002)(36756003)(33440700001)(2616005)(956004)(66946007)(95416001)(6916009)(6666004)(54906003)(66476007)(66556008)(4744005)(5660300002)(26005)(186003)(9686003)(16526019)(94163001)(223183001)(135533001)(142933001);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: /0MRnDB+jXTw0gO1PB6KAZEqLDUp4u6lemY/yQxJIlbGYOxCyFla9Xl5uCOzii+SNtT7zYaC2+C5EXAMKvCP5DM8Qeu8k9F7lg71Czu/uy0V7wvg6X1lg85EW+G0WFgkIdK9DQq3ch2jJg5tlT7oZfyZeXqJskJRT5CwzQ2TsdtOjeQ7oprc1C6PqFW38Z5v6yXiREsBuGCQb4mcogJUB/bwZSNsrsNcQ6mTlJXgx36sBeIgSFLkTcrdgwPJyPwgtPi5/2tH5BJN0QGLd7xuZ/zt7Ei5ql7yLJk1/+Flh0UMyhQMkS2Qj39JXz+VVjNc7aTlTTk7mnRXl28Sgdi1kXc4xdBI5wvSpsAwDTo5nmF9pbdSis0zP+OIf4TLOMGCEQHbOjRz3UaEghg3+donsiJlCp///M+k/TUTCuQYTIQ=
-X-OriginatorOrg: huayun.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 58e3b243-7cd3-4d84-57be-08d7f5923105
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 May 2020 10:00:53.3678 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: a674a363-98d5-4f2d-95da-d54302c8edaa
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 89IS4Uc8hyTcq4nA38pYW5O2dw93brpnX+XaJ8NeqBT7to4qXEoCY0QwvnRSsDwAOAV0wJV1LlJsDJpQ0CbsbA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SHXPR01MB0637
-Received-SPF: pass client-ip=42.159.36.147; envelope-from=quweijie@huayun.com;
- helo=CN01-BJB-obe.outbound.protection.partner.outlook.cn
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 06:16:02
-X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+References: <CAK25hWN3kJcW-dcpryFrvZ50t7Y0Z=MZM66-8NMuhwjRpNo2aQ@mail.gmail.com>
+ <CAD90Vcb-x1KV++fWrmx+fLV5eNc2DiTtn8=OjQi7aUf7B0ULdA@mail.gmail.com>
+ <CAK25hWM-hLdk=MSKgceumOUo9ZNBrrmM8qSe7MvTUAPGmur_HQ@mail.gmail.com>
+ <2515515.r9knKAEANn@os-lin-dmo>
+ <CAD90VcYeF7drbYNDiEioPBHcQcifqDYUia_CKqNLv_5VAMjPKw@mail.gmail.com>
+ <CAK25hWNR0WdpddU1kDChUB+PWiLG2A76KJW5u5F-LNkGBREj_g@mail.gmail.com>
+In-Reply-To: <CAK25hWNR0WdpddU1kDChUB+PWiLG2A76KJW5u5F-LNkGBREj_g@mail.gmail.com>
+From: Keiichi Watanabe <keiichiw@chromium.org>
+Date: Mon, 11 May 2020 23:06:34 +0900
+Message-ID: <CAD90VcYJe7+R256RdOQKxFQciq54+PwbyDRF1cynjOzdQBrq-g@mail.gmail.com>
+Subject: Re: [virtio-dev] Re: Fwd: Qemu Support for Virtio Video V4L2 driver
+To: Saket Sinha <saket.sinha89@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::242;
+ envelope-from=keiichiw@chromium.org; helo=mail-lj1-x242.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-Mailman-Approved-At: Mon, 11 May 2020 10:09:20 -0400
@@ -127,33 +96,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Alberto Garcia <berto@igalia.com>, "open list:Quorum" <qemu-block@nongnu.org>,
- quweijie <quweijie@huayun.com>
+Cc: Samiullah Khawaja <samiullah.khawaja@opensynergy.com>,
+ virtio-dev@lists.oasis-open.org, Alex Lau <alexlau@chromium.org>,
+ Kiran Pawar <Kiran.Pawar@opensynergy.com>,
+ Alexandre Courbot <acourbot@chromium.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Tomasz Figa <tfiga@chromium.org>, Hans Verkuil <hverkuil@xs4all.nl>,
+ libcamera-devel@lists.libcamera.org, Gerd Hoffmann <kraxel@redhat.com>,
+ Dmitry Sepp <dmitry.sepp@opensynergy.com>, Pawel Osciak <posciak@chromium.org>,
+ Linux Media Mailing List <linux-media@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: quweijie <quweijie@huayun.com>
+Hi Saket,
 
-Signed-off-by: quweijie <quweijie@huayun.com>
----
- block/quorum.c | 1 +
- 1 file changed, 1 insertion(+)
+On Mon, May 11, 2020 at 9:33 PM Saket Sinha <saket.sinha89@gmail.com> wrote:
+>
+> Hi Keiichi,
+>
+> > > > I do not support the approach of  QEMU implementation forwarding
+> > > > requests to the host's vicodec module since  this can limit the scope
+> > > > of the virtio-video device only for testing,
+> > >
+> > > That was my understanding as well.
+> >
+> > Not really because the API which the vicodec provides is V4L2 stateful
+> > decoder interface [1], which are also used by other video drivers on
+> > Linux.
+> > The difference between vicodec and actual device drivers is that
+> > vicodec performs decoding in the kernel space without using special
+> > video devices. In other words, vicodec is a software decoder in kernel
+> > space which provides the same interface with actual video drivers.
+> > Thus, if the QEMU implementation can forward virtio-video requests to
+> > vicodec, it can forward them to the actual V4L2 video decoder devices
+> > as well and VM gets access to a paravirtualized video device.
+> >
+> > The reason why we discussed vicodec in the previous thread was it'll
+> > allow us to test the virtio-video driver without hardware requirement.
+> >
+> > [1] https://www.kernel.org/doc/html/latest/media/uapi/v4l/dev-decoder.html
+> >
+>
+> Thanks for clarification.
+>
+> Could  you provide your views if it would be possible to support also
+> paravirtualized v4l-subdev devices which is enabled by media
+> controller to expose ISP processing blocks to linux userspace.
+> Ofcourse, we might need to change implementation and spec to support that
+> Please refer (1) for details.
 
-diff --git a/block/quorum.c b/block/quorum.c
-index 6d7a56b..a8272fe 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -1096,6 +1096,7 @@ static void quorum_del_child(BlockDriverState *bs, BdrvChild *child,
-     memmove(&s->children[i], &s->children[i + 1],
-             (s->num_children - i - 1) * sizeof(BdrvChild *));
-     s->children = g_renew(BdrvChild *, s->children, --s->num_children);
-+    s->next_child_index--;
-     bdrv_unref_child(bs, child);
- 
-     bdrv_drained_end(bs);
--- 
-1.8.3.1
+Again, the current virtio-video protocol and driver only support video
+encoding and decoding. We had no detailed discussion about camera
+supports.
+Moreover, I personally disagree with supporting video capturing in
+virtio-video protocol. Instead, I believe it's better to have a
+separate protocol like "virtio-camera". Decoupling video codec APIs
+and camera APIs should make protocols simpler and easier to maintain.
+I suggested this idea in [1].
 
+So, the answer to your question is:
+No in virtio-video protocol. But, it's possible to start designing a
+new "virtio-camera" protocol that supports camera features including
+image processing.
+
+[1] https://markmail.org/message/4q2g5oqniw62pmqd
+
+>
+> > >
+> > > > which instead can be used with multiple use cases such as -
+> > > >
+> > > > 1. VM gets access to paravirtualized  camera devices which shares the
+> > > > video frames input through actual HW camera attached to Host.
+> > >
+> > > This use-case is out of the scope of virtio-video. Initially I had a plan to
+> > > support capture-only streams like camera as well, but later the decision was
+> > > made upstream that camera should be implemented as separate device type. We
+> > > still plan to implement a simple frame capture capability as a downstream
+> > > patch though.
+> > >
+> > > >
+> > > > 2. If Host has multiple video devices (especially in ARM SOCs over
+> > > > MIPI interfaces or USB), different VM can be started or hotplugged
+> > > > with selective video streams from actual HW video devices.
+> > >
+> > > We do support this in our device implementation. But spec in general has no
+> > > requirements or instructions regarding this. And it is in fact flexible enough
+> > > to provide abstraction on top of several HW devices.
+> > >
+> > > >
+> > > > Also instead of using libraries like Gstreamer in Host userspace, they
+> > > > can also be used inside the VM userspace after getting access to
+> > > > paravirtualized HW camera devices .
+> >
+> > Regarding Gstreamer, I intended this video decoding API [2]. If QEMU
+> > can translate virtio-video requests to this API, we can easily support
+> > multiple platforms.
+> > I'm not sure how feasible it is though, as I have no experience of
+> > using this API by myself...
+> >
+> > [2] https://gstreamer.freedesktop.org/documentation/tutorials/playback/hardware-accelerated-video-decoding.html
+> >
+>
+> Like pointed out above, Gstreamer is not the only framework present there.
+> We have the newer libcamera framework [2] and then Openmax (used in
+> Android Hal )
+> Refer [3] for comparison.
+
+It seems that we had miscommunication here. While I had mentioned
+Gstreamer as a generic implementation to cover "video decoding" APIs
+on various platforms, you were talking about "camera" APIs.
+As I said above, virtio-video is NOT designed for cameras.
+
+For abstraction of video decoding APIs, I don't know any better
+library than Gstreamer. For cameras, libcamera sounds good, but I'm
+not so familiar with this area...
+
+Best regards,
+Keiichi
+
+
+>
+> My intentions are to make the implementation more generic so that it
+> can be used by different frameworks on different platforms.
+>
+> [1]: https://static.sched.com/hosted_files/osseu19/21/libcamera.pdf
+> [2]: http://libcamera.org
+> [3]: https://processors.wiki.ti.com/images/7/7e/OMX_Android_GST_Comparison.pdf
+>
+> Regards,
+> Saket Sinha
 
