@@ -6,70 +6,69 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FBDFC54E8D
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 16:11:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9769EC47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 16:11:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FFBB2070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 16:11:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5DE8E2070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 16:11:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MCkO2T+m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FFBB2070B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D94j3Vr9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DE8E2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYB1j-0003sE-6T
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 12:11:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48214)
+	id 1jYB1v-0004Na-Ej
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 12:11:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48262)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jYB0G-00028D-R7
- for qemu-devel@nongnu.org; Mon, 11 May 2020 12:10:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44719
- helo=us-smtp-1.mimecast.com)
+ id 1jYB0U-0002UR-1x
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 12:10:18 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39451
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jYB0G-000140-0y
- for qemu-devel@nongnu.org; Mon, 11 May 2020 12:10:04 -0400
+ id 1jYB0T-00019P-6B
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 12:10:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589213402;
+ s=mimecast20190719; t=1589213416;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=LqVzIZeE/iyxPQdzaM/w9wa3okOVbVjc1YkNbxM6+O8=;
- b=MCkO2T+mhC+wB4FLVCRT1xvBWOKa6p5gPZmO6iTEfbIQyiv0Wul7Epkr8sddVRcs7jbOUA
- Pijk3EMZ2qZapcju/SyJrGbaTqC4caKqBbhVmGQEDtQqX2M0iPGbyRVhcN/9JG+4Oe1Vgq
- x2Q/blkDxE97b1u7hXQOtnbYpJ3fOZk=
+ references:references; bh=P4QIO4kgNzm3qXY393mDHSXk7baXBdVjmzR7Zrg69Ik=;
+ b=D94j3Vr9BNpT3QCxTUf7qCg+qQfqnJ2ROWTJB4bzZuYotk9ynnfMCZHjkkujNvEIoj249j
+ jftycTUGIaAIMh6tj2jTZt6DZv4rzP4z6SllHB5HnVRbUGOWG8R/Jhodyz55y+BEWmQqfN
+ pQ21xtVZuwie063y3iRdNfGS1Ldndfg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-176-7IGT1_-MNsy0ZlNrZjQD6w-1; Mon, 11 May 2020 12:10:00 -0400
-X-MC-Unique: 7IGT1_-MNsy0ZlNrZjQD6w-1
+ us-mta-434-VGBZvO5nMcOEAO_HGQXfAw-1; Mon, 11 May 2020 12:10:11 -0400
+X-MC-Unique: VGBZvO5nMcOEAO_HGQXfAw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C38D2107ACCA;
- Mon, 11 May 2020 16:09:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 66870100CCC0;
+ Mon, 11 May 2020 16:10:10 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.222])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DF4F25C1B5;
- Mon, 11 May 2020 16:09:57 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 80AAD5C1B5;
+ Mon, 11 May 2020 16:10:08 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/7] scsi/scsi_bus: switch search direction in
- scsi_device_find
-Date: Mon, 11 May 2020 19:09:45 +0300
-Message-Id: <20200511160951.8733-2-mlevitsk@redhat.com>
+Subject: [PATCH v2 4/7] device-core: use atomic_set on .realized property
+Date: Mon, 11 May 2020 19:09:48 +0300
+Message-Id: <20200511160951.8733-5-mlevitsk@redhat.com>
 In-Reply-To: <20200511160951.8733-1-mlevitsk@redhat.com>
 References: <20200511160951.8733-1-mlevitsk@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mlevitsk@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 00:05:06
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 03:10:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -98,44 +97,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This change will allow us to convert the bus children list to RCU,
-while not changing the logic of this function
+Some code might race with placement of new devices on a bus.
+We currently first place a (unrealized) device on the bus
+and then realize it.
+
+As a workaround, users that scan the child device list, can
+check the realized property to see if it is safe to access such a device.
+Use an atomic write here too to aid with this.
+
+A separate discussion is what to do with devices that are unrealized:
+It looks like for this case we only call the hotplug handler's unplug
+callback and its up to it to unrealize the device.
+An atomic operation doesn't cause harm for this code path though.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- hw/scsi/scsi-bus.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ hw/core/qdev.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index 1c980cab38..7bbc37acec 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -1584,7 +1584,7 @@ SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
-     BusChild *kid;
-     SCSIDevice *target_dev = NULL;
- 
--    QTAILQ_FOREACH_REVERSE(kid, &bus->qbus.children, sibling) {
-+    QTAILQ_FOREACH(kid, &bus->qbus.children, sibling) {
-         DeviceState *qdev = kid->child;
-         SCSIDevice *dev = SCSI_DEVICE(qdev);
- 
-@@ -1592,7 +1592,15 @@ SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
-             if (dev->lun == lun) {
-                 return dev;
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 732789e2b7..d530c5922f 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -964,7 +964,20 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
              }
--            target_dev = dev;
+        }
+ 
++       atomic_store_release(&dev->realized, value);
 +
-+            /*
-+             * If we don't find exact match (channel/bus/lun),
-+             * we will return the first device which matches channel/bus
-+             */
+     } else if (!value && dev->realized) {
 +
-+            if (!target_dev) {
-+                target_dev = dev;
-+            }
++        /*
++         * Change the value so that any concurrent users are aware
++         * that the device is going to be unrealized
++         *
++         * TODO: change .realized property to enum that states
++         * each phase of the device realization/unrealization
++         */
++
++        atomic_store_release(&dev->realized, value);
++
+         /* We want local_err to track only the first error */
+         QLIST_FOREACH(bus, &dev->child_bus, sibling) {
+             object_property_set_bool(OBJECT(bus), false, "realized",
+@@ -980,12 +993,12 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+         DEVICE_LISTENER_CALL(unrealize, Reverse, dev);
+ 
+         if (local_err != NULL) {
++            atomic_store_release(&dev->realized, true);
+             goto fail;
          }
      }
-     return target_dev;
+ 
+     assert(local_err == NULL);
+-    dev->realized = value;
+     return;
+ 
+ child_realize_fail:
 -- 
 2.17.2
 
