@@ -2,68 +2,86 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AF17C54E8E
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 16:32:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7A29C54E8D
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 16:34:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEF552075E
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 16:32:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A348B2075E
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 16:34:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="dc00S49F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEF552075E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y9RjR2lG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A348B2075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYBM7-0001pV-UJ
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 12:32:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53564)
+	id 1jYBNt-0003xU-O7
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 12:34:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53864)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jYBKZ-0000pu-82; Mon, 11 May 2020 12:31:03 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:43166)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jYBMo-0002f6-I5
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 12:33:22 -0400
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:34843)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1jYBKW-0006yR-9i; Mon, 11 May 2020 12:31:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=2HhhcguJPx8BAZKMp7yQPsiRYgpsc4FZYLbQHuxLWlI=; 
- b=dc00S49F7eK3x7xaIx9HTw7nTPc9Tn6GKHH9wXjaCBSsjtFyetpJfhrvEiRhLRyLZBmgxcIYYXUvoRoBoOuMpnvF45XTiWeH7SGK8wcj8qG8Knndg3++DX4bSfL4L3eA2TpyVcIXKONA2qUpS2XsNVXCYy5Z+e+00t9zVzZ0Q+JA+hMlk7s+YGuOE1C3P7AyFXayscX0BEnfmgwebje+U3FPGbneeOR4pHpfBO1f1SVnn4aIbPdrBM4vmCT34K+xzxCkCSCuTcUHWINWiuda0/b5mh1dVutw+kMXkHf1n6cxa1inDkpjS/1W2FH9oyxWmO3vZAZnPwGlAsNOvYlL4g==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1jYBKP-0002UN-J7; Mon, 11 May 2020 18:30:53 +0200
-Received: from berto by mail.igalia.com with local (Exim)
- id 1jYBKP-0006Au-9i; Mon, 11 May 2020 18:30:53 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-Subject: Re: [PATCH v3 04/17] block/io: use int64_t bytes in driver wrappers
-In-Reply-To: <20200430111033.29980-5-vsementsov@virtuozzo.com>
-References: <20200430111033.29980-1-vsementsov@virtuozzo.com>
- <20200430111033.29980-5-vsementsov@virtuozzo.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Mon, 11 May 2020 18:30:53 +0200
-Message-ID: <w517dxio2ma.fsf@maestria.local.igalia.com>
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jYBMn-0007HJ-D6
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 12:33:22 -0400
+Received: by mail-lf1-x144.google.com with SMTP id x73so8064265lfa.2
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 09:33:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=fHGeN+d4UU7Im0dX+ueJk82YhWcBNirec264Uw+ZR+c=;
+ b=y9RjR2lGohOkl4P5QyVLkeD1MYsWCf8XLMLEaZic2OQghx6ayWJhPSxX6jNcE3/d5G
+ TWyIyRp4IAXNoNxi3eygjh6iVpi88eEVh1zW/Sw5/unFSgMPzJ4U1MvnDhyYVYvB+O1O
+ xw5DfGwcTrge4tvgheWkJStRs2zNB229OmsK+s/vOLJ7STtb02jPh5mmivaAFx643RL1
+ WRkL8JQX2Y0QQMd2qB8V8h0JG3V94K+PyM/U3lUkC+YgcJWd6d/vdc3X+R4Vgs3wkLrn
+ glL5Q0gnaGriL9pRq05qXpWv0OqcsnhdVKrmSdo8t9xFzstv2pQj2tUcE51IHXwDf/N5
+ ZUXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=fHGeN+d4UU7Im0dX+ueJk82YhWcBNirec264Uw+ZR+c=;
+ b=n3agzz90KjaUjvYfPEx2RwU5erDhNbD5v3az2cAmyvz8q/KnAa+UhN7hzEUU+ptQII
+ cWCsyYiHIVSBaYSNjNIcvrZRSvBmqG9ZCBeBIn70cFmkFga6CqG5MsLSiLpcVAy53J4J
+ 5Hba71sS5k+OKg7Pc0Ct2FpdR5aHLB3mgWymOFFel0PCNBCs/Z+oLC9YvHhyK8ZPPt1G
+ nDc3SWpuMzP9n//mNw4CFF7ZZTeQ7aKs43Zqp6dhdcU07cCvr6La1nOyBoF2z6jYPOss
+ ULFwvHAUJ6qAi+I13nBmxIkE77gR+xScn4haDVo/XaCqB8pK+JUojwankaoXWu5vLD9p
+ OMdA==
+X-Gm-Message-State: AOAM53395YWVyZ9dbrKCL1Qn81wFBtmGhxaGn1t8/6EL/+5O0BUuBrGV
+ 71J7QOKHQU66N+K9dhwqzIYvwna2Tg6Aqw/OLERcBA==
+X-Google-Smtp-Source: ABdhPJzRPf/1DnyvBXNgFuPnz1XbSh974vRucZswEMMeDq7Ce8uNG/Fd8gAtiETFL1lQHD1DK0f8tri/f7UOydrQJKc=
+X-Received: by 2002:a19:4f1b:: with SMTP id d27mr11664578lfb.81.1589214794912; 
+ Mon, 11 May 2020 09:33:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
- helo=fanzine.igalia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 11:28:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
+References: <20200326193156.4322-1-robert.foley@linaro.org>
+ <20200326193156.4322-3-robert.foley@linaro.org> <87r1vqfrxv.fsf@linaro.org>
+In-Reply-To: <87r1vqfrxv.fsf@linaro.org>
+From: Robert Foley <robert.foley@linaro.org>
+Date: Mon, 11 May 2020 12:33:08 -0400
+Message-ID: <CAEyhzFs_J-RChW9ntpOaA+e-pAgtJHK80Bg9qeQ9mpM=wmD9gg@mail.gmail.com>
+Subject: Re: [PATCH v8 02/74] cpu: rename cpu->work_mutex to cpu->lock
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::144;
+ envelope-from=robert.foley@linaro.org; helo=mail-lf1-x144.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -77,100 +95,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, integration@gluster.org,
- sheepdog@lists.wpkg.org, pavel.dovgaluk@ispras.ru, dillaman@redhat.com,
- qemu-devel@nongnu.org, sw@weilnetz.de, pl@kamp.de, ronniesahlberg@gmail.com,
- mreitz@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
- stefanha@redhat.com, namei.unix@gmail.com, pbonzini@redhat.com,
- jsnow@redhat.com, ari@tuxera.com
+Cc: Peter Puhov <peter.puhov@linaro.org>, "Emilio G. Cota" <cota@braap.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu 30 Apr 2020 01:10:20 PM CEST, Vladimir Sementsov-Ogievskiy wrote:
-> We are generally moving to int64_t for both offset and bytes parameters
-> on all io paths.
+On Mon, 11 May 2020 at 10:48, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+> Hmm while bisecting to find another problem I found this commit:
 >
-> Main motivation is realization of 64-bit write_zeroes operation for
-> fast zeroing large disk chunks, up to the whole disk.
+>   /home/alex/lsrc/qemu.git/hw/core/cpu.c: In function =E2=80=98cpu_common=
+_finalize=E2=80=99:
+>   /home/alex/lsrc/qemu.git/hw/core/cpu.c:383:27: error: incompatible type=
+ for argument 1 of =E2=80=98qemu_mutex_destroy=E2=80=99
+>        qemu_mutex_destroy(cpu->lock);
+>                           ~~~^~~~~~
+>   In file included from /home/alex/lsrc/qemu.git/include/hw/core/cpu.h:31=
+,
+>                    from /home/alex/lsrc/qemu.git/hw/core/cpu.c:23:
+>   /home/alex/lsrc/qemu.git/include/qemu/thread.h:26:36: note: expected =
+=E2=80=98QemuMutex *=E2=80=99 {aka =E2=80=98struct QemuMutex *=E2=80=99} bu=
+t argument is of type =E2=80=98QemuMutex=E2=80=99 {aka =E2=80=98struct Qemu=
+Mutex=E2=80=99}
+>    void qemu_mutex_destroy(QemuMutex *mutex);
+>                            ~~~~~~~~~~~^~~~~
+>   make: *** [/home/alex/lsrc/qemu.git/rules.mak:69: hw/core/cpu.o] Error =
+1
 >
-> We chose signed type, to be consistent with off_t (which is signed) and
-> with possibility for signed return type (where negative value means
-> error).
->
-> So, convert driver wrappers parameters which are already 64bit to
-> signed type.
->
-> Patch-correctness audit by Eric Blake:
->
->   bdrv_driver_preadv
->
->     Remains 64 bits, the question is whether any caller could pass in
->     something larger than 63 bits.  Callers are:
->
->     bdrv_co_do_copy_on_readv() - passes 'int64_t pnum', but sets pnum
->       in a fragmenting loop, MAX_BOUNCE_BUFFER when copy-on-read is
->       needed, or max_transfer bounded by BDRV_REQUEST_MAX_BYTES
->       otherwise
->     bdrv_aligned_preadv() - passes 'unsigned int bytes' further limited
->       by fragmenting loop on max_transfer <= INT_MAX
->
->     Input is bounded to < 2G, internal use of 'bytes' is:
->
->     drv->bdrv_co_preadv_part(uint64_t) - safe
->     qemu_iovec_init_slice(size_t) - potential truncation on 32-bit
->       platform [*]
->     drv->bdrv_co_preadv(uint64_t) - safe
->     drv->bdrv_aio_preadv(uint64_t) - safe
->     drv->bdrv_co_readv(int) after assertion of <2G - safe
->
->   bdrv_driver_pwritev
->
->     Remains 64 bits, the question is whether any caller could pass in
->     something larger than 63.  Callers are:
->
->     bdrv_co_do_copy_on_readv() - passes 'int64_t pnum', but set in a
->       fragmenting loop bounded by MAX_BOUNCE_BUFFER
->     bdrv_co_do_pwrite_zeroes() - passes 'int num'
->     bdrv_aligned_pwritev() - passes 'unsigned int bytes' further
->       limited by fragmenting loop on max_transfer <= INT_MAX
->
->     Input is bounded to < 2G, internal use of 'bytes' is:
->
->     drv->bdrv_co_pwritev_part(uint64_t) - safe
->     qemu_iovec_init_slice(size_t) - potential truncation on 32-bit
->       platform [*]
->     drv->bdrv_co_pwritev(uint64_t) - safe
->     drv->bdrv_aio_pwritev(uint64_t) - safe
->     drv->bdrv_co_writev(int) after assertion of <2G - safe
->
->   bdrv_driver_pwritev_compressed
->
->     bdrv_aligned_pwritev() - passes 'unsigned int bytes'
->
->     Input is bounded to < 4G, internal use of 'bytes' is:
->
->     drv->bdrv_co_pwritev_compressed_part(uint64_t) - safe
->     drv->bdrv_co_pwritev_compressed(uint64_t) - safe
->     qemu_iovec_init_slice(size_t) - potential truncation on 32-bit
->       platform [*]
->
-> [*]: QEMUIOVector is in-RAM data, so size_t seems a valid type for
-> it's operation. To avoid truncations we should require max_transfer to
-> be not greater than SIZE_MAX, limiting RAM-occupying operations and
-> QEMUIOVector usage. Still, 64bit discard and write_zeroes (which
-> doesn't use QEMUIOVector) should work even on 32bit machines, not being
-> limited by max_transfer.
->
-> For now, we safe anyway, as all input goes through
-> bdrv_aligned_pwritev() and bdrv_aligned_preadv(), which are limiting
-> max_transfer to INT_MAX.
->
-> Series: 64bit-block-status
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+> which works fine in the final product so I suspect something has slipped
+> between commits somewhere.
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+I agree, looks like something is off with the intermediate commits.
+Thanks for noticing it !  Will fix it.
 
-Berto
+Thanks,
+-Rob
 
