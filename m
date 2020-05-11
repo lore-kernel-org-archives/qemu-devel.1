@@ -2,82 +2,84 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60529C54E8D
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 13:35:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D3C7C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 13:35:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F251206F9
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 13:35:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 35173206F9
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 13:35:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TtNY21Q+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F251206F9
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XQPHx/ga"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35173206F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY8am-0003X2-9O
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 09:35:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48864)
+	id 1jY8aq-0003gk-9E
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 09:35:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48898)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jY8ZO-0001bs-Mg
- for qemu-devel@nongnu.org; Mon, 11 May 2020 09:34:10 -0400
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:41022)
+ id 1jY8ZS-0001ia-Rz
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 09:34:14 -0400
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:52120)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jY8ZN-0006zH-FJ
- for qemu-devel@nongnu.org; Mon, 11 May 2020 09:34:10 -0400
-Received: by mail-wr1-x432.google.com with SMTP id h17so2097856wrc.8
- for <qemu-devel@nongnu.org>; Mon, 11 May 2020 06:34:08 -0700 (PDT)
+ id 1jY8ZR-000707-VZ
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 09:34:14 -0400
+Received: by mail-wm1-x32d.google.com with SMTP id f134so5898898wmf.1
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 06:34:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=0uTj5FuaxLRxQKaETn1roHV13235qFIM0CWbgde5Ozs=;
- b=TtNY21Q+ylAaOWfUa1TZddXisiFB0WizIrBJXguw4YhF2JIHV9hshkc5jIArKVgJG0
- 3EZB8YsUdvOuClWq3XJt9720T5/vSw3Ka1HpDUKDp3ApbJqqQ2ZvUpGduo/qMqXp2rMe
- I9vofwaonazag0dVtUP2Ps95Ai7QQSMkrQjuVBEURCGrs6sK4SN0DJjmC9pgbVppArMx
- pUGVnv105Tr5E4KBz3KM24jK9BQb7Xv0EbGjNXYawReHTeqgu61R9YyvkdW+J7gkDYjB
- AmOXvYKD4CGRsnpKfZTvWtVMAT3DQuM3fJ96Oau1bfVAzJdFd5p5sreUG6EvrL/BD8bb
- E2DA==
+ bh=LZBTHfpEZAJcb/Rg+g/QLUSKbytIhAoqXs85oGOuYl8=;
+ b=XQPHx/ga/2RQnX5Volz9GWLWZgteq9NE8OhV/A5rbyimnj1JlkibTWG2o37aiUeOMk
+ 5NrS4qE88CYTJ6b7NIqtwbiKeKpWyvO+w8rW9kntNH9O2/v2N0X9G9Pu4lDNhfXw3rno
+ LlpvrFSqKJo2kg2bNgKD9RHNMgrthJAc159gvkJborNIumz+hBXEqSOR6WLqlcFZsyzx
+ 7s+JjiKmEQ6Mj75j40o51FBsnmzc8dl34/qKtUWfJifogkDCzrMQz543HegI09x+Nnlo
+ KwTnsubrMSC65/cnaxtfR+LxVrdK+t16cv/MBX/t306hnpDXGBNNHntyvYIOSHdKh63z
+ FKDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=0uTj5FuaxLRxQKaETn1roHV13235qFIM0CWbgde5Ozs=;
- b=i4j9M2xf5sWSnpqLLvnKTrT7R9yj80/VaGZwltfMRHQN+i4dn3B2Dbbd2XekvjDxHF
- fE0cE684Jm7bvtHBVyaKOWo2/B4+/ZZFdCxNpiOlvoJuC1rpIF6Dj+GEYj5Sil53Do9s
- cevDQQqk3JUrB+hszq1Z70hs4StwuzNTf09wfFhXmR8i7+degL2WMb3ITpimxwYMgEWx
- omQJyDCSbzfesqDtprmAND3au44Fo870na536GTE7S935vZfR5W3PKxZDuW3I86OrG0Y
- C8m8X+wIPqLmn8nlFDwa7dwm04+u0OAX9WLf1uRg6qjus5Bp3A/G8e5f19uKEDysz95P
- P6Yw==
-X-Gm-Message-State: AGi0PubjEfbsdlaZyd8jzNVJr7qfqlFQ6PwKzDkwq27adcxdHU7W7aEB
- N7HpWFyCBE2OXURQtzf59fmofgZXOlvBbQ==
-X-Google-Smtp-Source: APiQypKCfug2xkVmnCcoDmBKjmiYY8H+RsWtBvlas4Di2+mmxvMMYCMAJu6ffinl4kAzI7dBGD966g==
-X-Received: by 2002:adf:e752:: with SMTP id c18mr2231718wrn.353.1589204047301; 
- Mon, 11 May 2020 06:34:07 -0700 (PDT)
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=LZBTHfpEZAJcb/Rg+g/QLUSKbytIhAoqXs85oGOuYl8=;
+ b=lhF/hy9RSEwwnCAsYocwum/5U8jN9OTJui7Yp7C57w18x3vTVQx3ahqXoWD8CjHTLx
+ R/bOs9o5YCgSfpt1EB912RgD/mOHtp8HhUPhu1L34gWOJuvLWqHh7tcvibLf+4wqJUal
+ zGM5/u6HBfNeNo2LU/1E148rnTysDXsU3A3ZNo3ZGTon+Elt+i7RoF5qWSLmSrz11h5s
+ hus+VIiJylTFYc8W4th5xOsci99KVWfzhFTkAHKyKqyYNqiMWyI29tol/X5XLGfUvJXM
+ eCoy5TaGCaRuTjKCqUP4vVFIu6Q3rWsolSWqDD5qy+UI3aVY5pLCgQro1Pj+EhJFb0Vh
+ epmQ==
+X-Gm-Message-State: AGi0PuaS+BeJPshXlChy9TkCyg/TCJOuLq0PEhYqjMOJ5hvmuBDbGQRb
+ yLOkPQSyY5lsJ0ZUCws6/X1CGFMxWU31ig==
+X-Google-Smtp-Source: APiQypKNVqnr5JePnzhP5QJDrSCPuuUAUA82qhtXDqi/YZdLEN7bGIefw31iYLPrUvhwC2yLbyjQVg==
+X-Received: by 2002:a1c:f416:: with SMTP id z22mr31779778wma.32.1589204052249; 
+ Mon, 11 May 2020 06:34:12 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id m3sm2154818wrn.96.2020.05.11.06.34.06
+ by smtp.gmail.com with ESMTPSA id m3sm2154818wrn.96.2020.05.11.06.34.11
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 11 May 2020 06:34:06 -0700 (PDT)
+ Mon, 11 May 2020 06:34:11 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/34] target-arm queue
-Date: Mon, 11 May 2020 14:33:31 +0100
-Message-Id: <20200511133405.5275-1-peter.maydell@linaro.org>
+Subject: [PULL 04/34] aspeed: sdmc: Implement AST2600 locking behaviour
+Date: Mon, 11 May 2020 14:33:35 +0100
+Message-Id: <20200511133405.5275-5-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200511133405.5275-1-peter.maydell@linaro.org>
+References: <20200511133405.5275-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::432;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x432.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32d;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,109 +105,116 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit c88f1ffc19e38008a1c33ae039482a860aa7418c:
+From: Joel Stanley <joel@jms.id.au>
 
-  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2020-05-08 14:29:18 +0100)
+The AST2600 handles this differently with the extra 'hardlock' state, so
+move the testing to the soc specific class' write callback.
 
-are available in the Git repository at:
+Signed-off-by: Joel Stanley <joel@jms.id.au>
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+Message-id: 20200505090136.341426-1-joel@jms.id.au
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/misc/aspeed_sdmc.c | 55 +++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 45 insertions(+), 10 deletions(-)
 
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200511
+diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
+index 7b466bf19a6..14db9cfc1f8 100644
+--- a/hw/misc/aspeed_sdmc.c
++++ b/hw/misc/aspeed_sdmc.c
+@@ -23,7 +23,12 @@
+ 
+ /* Protection Key Register */
+ #define R_PROT            (0x00 / 4)
++#define   PROT_UNLOCKED      0x01
++#define   PROT_HARDLOCKED    0x10  /* AST2600 */
++#define   PROT_SOFTLOCKED    0x00
++
+ #define   PROT_KEY_UNLOCK     0xFC600309
++#define   PROT_KEY_HARDLOCK   0xDEADDEAD /* AST2600 */
+ 
+ /* Configuration Register */
+ #define R_CONF            (0x04 / 4)
+@@ -130,16 +135,6 @@ static void aspeed_sdmc_write(void *opaque, hwaddr addr, uint64_t data,
+         return;
+     }
+ 
+-    if (addr == R_PROT) {
+-        s->regs[addr] = (data == PROT_KEY_UNLOCK) ? 1 : 0;
+-        return;
+-    }
+-
+-    if (!s->regs[R_PROT]) {
+-        qemu_log_mask(LOG_GUEST_ERROR, "%s: SDMC is locked!\n", __func__);
+-        return;
+-    }
+-
+     asc->write(s, addr, data);
+ }
+ 
+@@ -320,6 +315,16 @@ static uint32_t aspeed_2400_sdmc_compute_conf(AspeedSDMCState *s, uint32_t data)
+ static void aspeed_2400_sdmc_write(AspeedSDMCState *s, uint32_t reg,
+                                    uint32_t data)
+ {
++    if (reg == R_PROT) {
++        s->regs[reg] = (data == PROT_KEY_UNLOCK) ? PROT_UNLOCKED : PROT_SOFTLOCKED;
++        return;
++    }
++
++    if (!s->regs[R_PROT]) {
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: SDMC is locked!\n", __func__);
++        return;
++    }
++
+     switch (reg) {
+     case R_CONF:
+         data = aspeed_2400_sdmc_compute_conf(s, data);
+@@ -368,6 +373,16 @@ static uint32_t aspeed_2500_sdmc_compute_conf(AspeedSDMCState *s, uint32_t data)
+ static void aspeed_2500_sdmc_write(AspeedSDMCState *s, uint32_t reg,
+                                    uint32_t data)
+ {
++    if (reg == R_PROT) {
++        s->regs[reg] = (data == PROT_KEY_UNLOCK) ? PROT_UNLOCKED : PROT_SOFTLOCKED;
++        return;
++    }
++
++    if (!s->regs[R_PROT]) {
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: SDMC is locked!\n", __func__);
++        return;
++    }
++
+     switch (reg) {
+     case R_CONF:
+         data = aspeed_2500_sdmc_compute_conf(s, data);
+@@ -424,7 +439,27 @@ static uint32_t aspeed_2600_sdmc_compute_conf(AspeedSDMCState *s, uint32_t data)
+ static void aspeed_2600_sdmc_write(AspeedSDMCState *s, uint32_t reg,
+                                    uint32_t data)
+ {
++    if (s->regs[R_PROT] == PROT_HARDLOCKED) {
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: SDMC is locked until system reset!\n",
++                __func__);
++        return;
++    }
++
++    if (reg != R_PROT && s->regs[R_PROT] == PROT_SOFTLOCKED) {
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: SDMC is locked!\n", __func__);
++        return;
++    }
++
+     switch (reg) {
++    case R_PROT:
++        if (data == PROT_KEY_UNLOCK)  {
++            data = PROT_UNLOCKED;
++        } else if (data == PROT_KEY_HARDLOCK) {
++            data = PROT_HARDLOCKED;
++        } else {
++            data = PROT_SOFTLOCKED;
++        }
++        break;
+     case R_CONF:
+         data = aspeed_2600_sdmc_compute_conf(s, data);
+         break;
+-- 
+2.20.1
 
-for you to fetch changes up to 7e17d50ebd359ee5fa3d65d7fdc0fe0336d60694:
-
-  target/arm: Fix tcg_gen_gvec_dup_imm vs DUP (indexed) (2020-05-11 14:22:54 +0100)
-
-----------------------------------------------------------------
-target-arm queue:
- aspeed: Add boot stub for smp booting
- target/arm: Drop access_el3_aa32ns_aa64any()
- aspeed: Support AST2600A1 silicon revision
- aspeed: sdmc: Implement AST2600 locking behaviour
- nrf51: Tracing cleanups
- target/arm: Improve handling of SVE loads and stores
- target/arm: Don't show TCG-only CPUs in KVM-only QEMU builds
- hw/arm/musicpal: Map the UART devices unconditionally
- target/arm: Fix tcg_gen_gvec_dup_imm vs DUP (indexed)
- target/arm: Use tcg_gen_gvec_5_ptr for sve FMLA/FCMLA
-
-----------------------------------------------------------------
-Edgar E. Iglesias (1):
-      target/arm: Drop access_el3_aa32ns_aa64any()
-
-Joel Stanley (3):
-      aspeed: Add boot stub for smp booting
-      aspeed: Support AST2600A1 silicon revision
-      aspeed: sdmc: Implement AST2600 locking behaviour
-
-Philippe Mathieu-Daudé (8):
-      hw/arm/nrf51: Add NRF51_PERIPHERAL_SIZE definition
-      hw/timer/nrf51_timer: Display timer ID in trace events
-      hw/timer/nrf51_timer: Add trace event of counter value update
-      target/arm/kvm: Inline set_feature() calls
-      target/arm/cpu: Use ARRAY_SIZE() to iterate over ARMCPUInfo[]
-      target/arm/cpu: Restrict v8M IDAU interface to Aarch32 CPUs
-      target/arm: Restrict TCG cpus to TCG accel
-      hw/arm/musicpal: Map the UART devices unconditionally
-
-Richard Henderson (21):
-      exec: Add block comments for watchpoint routines
-      exec: Fix cpu_watchpoint_address_matches address length
-      accel/tcg: Add block comment for probe_access
-      accel/tcg: Adjust probe_access call to page_check_range
-      accel/tcg: Add probe_access_flags
-      accel/tcg: Add endian-specific cpu_{ld, st}* operations
-      target/arm: Use cpu_*_data_ra for sve_ldst_tlb_fn
-      target/arm: Drop manual handling of set/clear_helper_retaddr
-      target/arm: Add sve infrastructure for page lookup
-      target/arm: Adjust interface of sve_ld1_host_fn
-      target/arm: Use SVEContLdSt in sve_ld1_r
-      target/arm: Handle watchpoints in sve_ld1_r
-      target/arm: Use SVEContLdSt for multi-register contiguous loads
-      target/arm: Update contiguous first-fault and no-fault loads
-      target/arm: Use SVEContLdSt for contiguous stores
-      target/arm: Reuse sve_probe_page for gather first-fault loads
-      target/arm: Reuse sve_probe_page for scatter stores
-      target/arm: Reuse sve_probe_page for gather loads
-      target/arm: Remove sve_memopidx
-      target/arm: Use tcg_gen_gvec_5_ptr for sve FMLA/FCMLA
-      target/arm: Fix tcg_gen_gvec_dup_imm vs DUP (indexed)
-
-Thomas Huth (1):
-      target/arm: Make set_feature() available for other files
-
- docs/devel/loads-stores.rst    |   39 +-
- include/exec/cpu-all.h         |   13 +-
- include/exec/cpu_ldst.h        |  283 +++--
- include/exec/exec-all.h        |   39 +
- include/hw/arm/nrf51.h         |    3 +-
- include/hw/core/cpu.h          |   23 +
- include/hw/i2c/microbit_i2c.h  |    2 +-
- include/hw/misc/aspeed_scu.h   |    1 +
- include/hw/timer/nrf51_timer.h |    1 +
- target/arm/cpu.h               |   10 +
- target/arm/helper-sve.h        |   45 +-
- target/arm/internals.h         |    5 -
- accel/tcg/cputlb.c             |  413 ++++---
- accel/tcg/user-exec.c          |  256 ++++-
- exec.c                         |    2 +-
- hw/arm/aspeed.c                |   73 +-
- hw/arm/aspeed_ast2600.c        |    6 +-
- hw/arm/musicpal.c              |   12 +-
- hw/arm/nrf51_soc.c             |    9 +-
- hw/i2c/microbit_i2c.c          |    2 +-
- hw/misc/aspeed_scu.c           |   11 +-
- hw/misc/aspeed_sdmc.c          |   55 +-
- hw/timer/nrf51_timer.c         |   14 +-
- target/arm/cpu.c               |  662 +----------
- target/arm/cpu64.c             |   18 +-
- target/arm/cpu_tcg.c           |  664 +++++++++++
- target/arm/helper.c            |   30 +-
- target/arm/kvm32.c             |   13 +-
- target/arm/kvm64.c             |   22 +-
- target/arm/sve_helper.c        | 2398 +++++++++++++++++++++-------------------
- target/arm/translate-sve.c     |   93 +-
- hw/timer/trace-events          |    5 +-
- target/arm/Makefile.objs       |    1 +
- 33 files changed, 2975 insertions(+), 2248 deletions(-)
- create mode 100644 target/arm/cpu_tcg.c
 
