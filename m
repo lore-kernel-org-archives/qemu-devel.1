@@ -2,99 +2,70 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLACK,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2FC2C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 06:34:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 077D3C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 06:38:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC19B207FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 06:34:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C2188207FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 06:38:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZjARBELM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC19B207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="lK0TAnS6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2188207FF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY21X-0007E3-SS
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 02:34:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46184)
+	id 1jY24d-0000qY-TT
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 02:37:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46468)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jY20n-0006k8-4f
- for qemu-devel@nongnu.org; Mon, 11 May 2020 02:34:01 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50795)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jY20l-0006gf-Up
- for qemu-devel@nongnu.org; Mon, 11 May 2020 02:34:00 -0400
-Received: by mail-wm1-x342.google.com with SMTP id m12so11829342wmc.0
- for <qemu-devel@nongnu.org>; Sun, 10 May 2020 23:33:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ihtLHJsjvXDzEPmkXFvqJBRb71oCHyYlH1TVJyDtLdk=;
- b=ZjARBELM1YdRX9wnsA2N+q6rlghJmdc4fzZZ9JBxJprD5COMdctwRD1BjqKAjnOgQq
- Hol8naYs/rdpUyXossDQSbL4/LTZNqUmLZxJdSZzRkI/DesRunDbOt2fh3S3nR6K3Goz
- /CNPxo0ApfQDAKSl2b4DGZNph/qLJb34jdon463GlsZQ5JxhIHgWxfsPUbE20XOmxlDd
- RwDKtmGMIkpxvFmLhewFNBZVg+jxIYRGShu4T2OwPp+dAScdEdLkrZYl7oVlBYCbKrjf
- rgTbV7laEXCmf4YPGJ+ketTn0XGGVO/sZPYwrYhF/LDLIL6T5R/pQKVsJpgM6s5EFJOp
- 2fpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ihtLHJsjvXDzEPmkXFvqJBRb71oCHyYlH1TVJyDtLdk=;
- b=kiGAd7oxlhxF514PPL5phZj7e36waMisodhb5Bo0Euee0r/ALTJVz8oacU+KvaUcwN
- Zy/I7o0rMIcYkh4TOSvi2FzHdvrCCdlS1ax7bFsufb6iNtNx95nMQmZrzaK/wC0tPybd
- U/W/Wjc8v3IgRuqBf5lUEfQBguKm19nRgmw7qewZp+tDXUF/MgbQJfhi/y+D0ovWsPSx
- 6gJbBrQ0AiDSeDa03xkipqKTTA9emrQzL13B71bFFSYrAb2l3jLPoQrRDTme7j3AOl8q
- aBIViy+ClMYTY97nKKndJN7NZbatzbhEOptFesu4WxQ/NngFKjtjcqHSL23JX5jSMvEC
- iO6Q==
-X-Gm-Message-State: AGi0PuZeEP8uZ54Mq48HhpBfJOxUIeUqoSUXTyhUvV6CVriSRJ6v/K/2
- AGjzvnH0JjIoMxq/yYwYhDA=
-X-Google-Smtp-Source: APiQypIw7Rg2kg+Munxow2KsSCLi6tAsDETQqbFoDdwX71sPJbbsOmkkjTccykjtZTcYkZJRXPc+3Q==
-X-Received: by 2002:a1c:e90a:: with SMTP id q10mr29086205wmc.22.1589178838289; 
- Sun, 10 May 2020 23:33:58 -0700 (PDT)
-Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id f7sm15075400wrt.10.2020.05.10.23.33.56
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 10 May 2020 23:33:57 -0700 (PDT)
-Subject: Re: [PATCH 09/12] hw/pci-host/bonito: Map the different PCI ranges
- more detailled
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-References: <20200510210128.18343-1-f4bug@amsat.org>
- <20200510210128.18343-10-f4bug@amsat.org>
- <CAHiYmc4dt43BU41mFrHUv-dK_Xr34Ai8o3xtzXxYikhFaX-N2A@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a170e94e-9539-27fd-21a0-04eab99c54b3@amsat.org>
-Date: Mon, 11 May 2020 08:33:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jY23b-0007uV-Bu; Mon, 11 May 2020 02:36:55 -0400
+Received: from ozlabs.org ([203.11.71.1]:37441)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jY23Y-000742-VA; Mon, 11 May 2020 02:36:55 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 49LB6l0xkgz9sTH; Mon, 11 May 2020 16:36:46 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1589179007;
+ bh=fpH8RoaCbdgmGjevZaV5wDdi3Q9Hoi0Q1eGkanzgnyo=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=lK0TAnS6c+FlkjGAm/SUJtCwQKvVMjWkE6tIWV/yKS1CYip4oqnU80muSUmEMxThr
+ yIuBM5pgY7b+qW4jnCwoaQ+I4OFmIdncOA5Y/cAkmIJE48f9JdqAIM72nk+Dw6Wmv/
+ b0Hyc29VDY2q6FNfPQZcozDTQEVMmWyqQXAN5OYY=
+Date: Mon, 11 May 2020 16:27:01 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Subject: Re: [PATCH qemu] spapr: Add PVR setting capability
+Message-ID: <20200511062701.GQ2183@umbus.fritz.box>
+References: <20200417041105.63563-1-aik@ozlabs.ru>
+ <20200504133027.4f5a18f8@bahia.lan>
+ <15bdf96d-c617-665e-09cd-f4f0e0f107e4@ozlabs.ru>
+ <20200505055007.GD218517@umbus.fritz.box>
+ <7f7467ea-7919-f642-5bbe-083c34a018f5@ozlabs.ru>
 MIME-Version: 1.0
-In-Reply-To: <CAHiYmc4dt43BU41mFrHUv-dK_Xr34Ai8o3xtzXxYikhFaX-N2A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="uRjmd8ppyyws0Tml"
+Content-Disposition: inline
+In-Reply-To: <7f7467ea-7919-f642-5bbe-083c34a018f5@ozlabs.ru>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 02:36:48
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -17
+X-Spam_score: -1.8
 X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,135 +79,235 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Huacai Chen <chenhuacai@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Huacai Chen <chenhc@lemote.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/11/20 8:12 AM, Aleksandar Markovic wrote:
-> нед, 10. мај 2020. у 23:01 Philippe Mathieu-Daudé <f4bug@amsat.org> је
-> написао/ла:
->>
->> Better describe the Bonito64 MEM HI/LO and I/O PCI ranges,
->> add more PCI regions as unimplemented.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>   hw/pci-host/bonito.c | 30 ++++++++++++++++++++++++++----
->>   1 file changed, 26 insertions(+), 4 deletions(-)
->>
->> diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
->> index 9761780f44..90a6c52a38 100644
->> --- a/hw/pci-host/bonito.c
->> +++ b/hw/pci-host/bonito.c
->> @@ -39,6 +39,7 @@
->>    */
->>
->>   #include "qemu/osdep.h"
->> +#include "qemu/units.h"
->>   #include "qemu/error-report.h"
->>   #include "hw/pci/pci.h"
->>   #include "hw/irq.h"
->> @@ -82,7 +83,7 @@
->>   #define BONITO_PCILO1_BASE      0x14000000
->>   #define BONITO_PCILO2_BASE      0x18000000
->>   #define BONITO_PCIHI_BASE       0x20000000
->> -#define BONITO_PCIHI_SIZE       0x20000000
->> +#define BONITO_PCIHI_SIZE       0x60000000
->>   #define BONITO_PCIHI_TOP        (BONITO_PCIHI_BASE + BONITO_PCIHI_SIZE - 1)
->>   #define BONITO_PCIIO_BASE       0x1fd00000
->>   #define BONITO_PCIIO_BASE_VA    0xbfd00000
->> @@ -606,13 +607,25 @@ static void bonito_pcihost_realize(DeviceState *dev, Error **errp)
->>       PCIHostState *phb = PCI_HOST_BRIDGE(dev);
->>       BonitoState *bs = BONITO_PCI_HOST_BRIDGE(dev);
->>
->> -    memory_region_init(&bs->pci_mem, OBJECT(dev), "pci.mem", BONITO_PCILO_SIZE);
->> +    memory_region_init(&bs->pci_mem, OBJECT(dev), "pci.mem", BONITO_PCIHI_SIZE);
->>       phb->bus = pci_register_root_bus(DEVICE(dev), "pci",
->>                                        pci_bonito_set_irq, pci_bonito_map_irq,
->>                                        dev, &bs->pci_mem, get_system_io(),
->>                                        0x28, 32, TYPE_PCI_BUS);
->> -    memory_region_add_subregion(get_system_memory(), BONITO_PCILO_BASE,
->> -                                &bs->pci_mem);
->> +
->> +    MemoryRegion *pcimem_lo_alias = g_new(MemoryRegion, 3);
->> +    for (size_t i = 0; i < 3; i++) {
->> +        char *name = g_strdup_printf("pci.lomem%zu", i);
->> +
->> +        memory_region_init_alias(&pcimem_lo_alias[i], NULL, name,
->> +                                 &bs->pci_mem, i * 64 * MiB, 64 * MiB);
->> +        memory_region_add_subregion(get_system_memory(),
->> +                                    BONITO_PCILO_BASE + i * 64 * MiB,
->> +                                    &pcimem_lo_alias[i]);
->> +        g_free(name);
->> +    }
->> +
->> +    create_unimplemented_device("pci.io", 0x1fd00000, 1 * MiB);
-> 
-> Hi, Philippe.
-> 
-> I am delighted with the whole series, finally cleaning Bonito code feels good.
-> 
-> I just want to ask you if it possible to get rid of constants like
-> 0x1fd00000 (generally in this code, not limited to this patch), and
-> give the some nice "#define" names?
 
-Yes sure. These patches are almost 1year old, gathering the result of a 
-debugging session. Also ...
+--uRjmd8ppyyws0Tml
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> Yours,
-> Aleksandar
-> 
->>   }
->>
->>   static void bonito_realize(PCIDevice *dev, Error **errp)
->> @@ -620,6 +633,7 @@ static void bonito_realize(PCIDevice *dev, Error **errp)
->>       PCIBonitoState *s = PCI_BONITO(dev);
->>       SysBusDevice *sysbus = SYS_BUS_DEVICE(s->pcihost);
->>       PCIHostState *phb = PCI_HOST_BRIDGE(s->pcihost);
->> +    BonitoState *bs = BONITO_PCI_HOST_BRIDGE(s->pcihost);
->>
->>       /*
->>        * Bonito North Bridge, built on FPGA,
->> @@ -652,6 +666,7 @@ static void bonito_realize(PCIDevice *dev, Error **errp)
->>       sysbus_init_mmio(sysbus, &s->iomem_ldma);
->>       sysbus_mmio_map(sysbus, 3, 0x1fe00200);
->>
->> +    /* PCI copier */
->>       memory_region_init_io(&s->iomem_cop, OBJECT(s), &bonito_cop_ops, s,
->>                             "cop", 0x100);
->>       sysbus_init_mmio(sysbus, &s->iomem_cop);
->> @@ -669,6 +684,13 @@ static void bonito_realize(PCIDevice *dev, Error **errp)
->>       sysbus_init_mmio(sysbus, &s->bonito_localio);
->>       sysbus_mmio_map(sysbus, 6, BONITO_DEV_BASE);
->>
->> +    MemoryRegion *pcimem_alias = g_new(MemoryRegion, 1);
+On Tue, May 05, 2020 at 04:18:40PM +1000, Alexey Kardashevskiy wrote:
+>=20
+>=20
+> On 05/05/2020 15:50, David Gibson wrote:
+> > On Tue, May 05, 2020 at 10:56:17AM +1000, Alexey Kardashevskiy wrote:
+> >>
+> >>
+> >> On 04/05/2020 21:30, Greg Kurz wrote:
+> >>> On Fri, 17 Apr 2020 14:11:05 +1000
+> >>> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> >>>
+> >>>> At the moment the VCPU init sequence includes setting PVR which in c=
+ase of
+> >>>> KVM-HV only checks if it matches the hardware PVR mask as PVR cannot=
+ be
+> >>>> virtualized by the hardware. In order to cope with various CPU revis=
+ions
+> >>>> only top 16bit of PVR are checked which works for minor revision upd=
+ates.
+> >>>>
+> >>>> However in every CPU generation starting POWER7 (at least) there wer=
+e CPUs
+> >>>> supporting the (almost) same POWER ISA level but having different top
+> >>>> 16bits of PVR - POWER7+, POWER8E, POWER8NVL; this time we got POWER9+
+> >>>> with a new PVR family. We would normally add the PVR mask for the ne=
+w one
+> >>>> too, the problem with it is that although the physical machines exis=
+t,
+> >>>> P9+ is not going to be released as a product, and this situation is =
+likely
+> >>>> to repeat in the future.
+> >>>>
+> >>>> Instead of adding every new CPU family in QEMU, this adds a new sPAPR
+> >>>> machine capability to force PVR setting/checking. It is "on" by defa=
+ult
+> >>>> to preserve the existing behavior. When "off", it is the user's
+> >>>> responsibility to specify the correct CPU.
+> >>>>
+> >>>
+> >>> I don't quite understand the motivation for this... what does this
+> >>> buy us ?
+> >>
+> >> I answered that part in another mail in this thread, shortly this is to
+> >> make QEMU work with HV KVM on unknown-to-QEMU CPU family (0x004f0000).
+> >>
+> >>
+> >>>
+> >>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> >>>> ---
+> >>>>  include/hw/ppc/spapr.h |  5 ++++-
+> >>>>  hw/ppc/spapr.c         |  1 +
+> >>>>  hw/ppc/spapr_caps.c    | 18 ++++++++++++++++++
+> >>>>  target/ppc/kvm.c       | 16 ++++++++++++++--
+> >>>>  4 files changed, 37 insertions(+), 3 deletions(-)
+> >>>>
+> >>>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> >>>> index e579eaf28c05..5ccac4d56871 100644
+> >>>> --- a/include/hw/ppc/spapr.h
+> >>>> +++ b/include/hw/ppc/spapr.h
+> >>>> @@ -81,8 +81,10 @@ typedef enum {
+> >>>>  #define SPAPR_CAP_CCF_ASSIST            0x09
+> >>>>  /* Implements PAPR FWNMI option */
+> >>>>  #define SPAPR_CAP_FWNMI                 0x0A
+> >>>> +/* Implements PAPR PVR option */
+> >>>> +#define SPAPR_CAP_PVR                   0x0B
+> >>>>  /* Num Caps */
+> >>>> -#define SPAPR_CAP_NUM                   (SPAPR_CAP_FWNMI + 1)
+> >>>> +#define SPAPR_CAP_NUM                   (SPAPR_CAP_PVR + 1)
+> >>>> =20
+> >>>>  /*
+> >>>>   * Capability Values
+> >>>> @@ -912,6 +914,7 @@ extern const VMStateDescription vmstate_spapr_ca=
+p_nested_kvm_hv;
+> >>>>  extern const VMStateDescription vmstate_spapr_cap_large_decr;
+> >>>>  extern const VMStateDescription vmstate_spapr_cap_ccf_assist;
+> >>>>  extern const VMStateDescription vmstate_spapr_cap_fwnmi;
+> >>>> +extern const VMStateDescription vmstate_spapr_cap_pvr;
+> >>>> =20
+> >>>>  static inline uint8_t spapr_get_cap(SpaprMachineState *spapr, int c=
+ap)
+> >>>>  {
+> >>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> >>>> index 841b5ec59b12..ecc74c182b9f 100644
+> >>>> --- a/hw/ppc/spapr.c
+> >>>> +++ b/hw/ppc/spapr.c
+> >>>> @@ -4535,6 +4535,7 @@ static void spapr_machine_class_init(ObjectCla=
+ss *oc, void *data)
+> >>>>      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D SPAPR_C=
+AP_ON;
+> >>>>      smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_ON;
+> >>>>      smc->default_caps.caps[SPAPR_CAP_FWNMI] =3D SPAPR_CAP_ON;
+> >>>> +    smc->default_caps.caps[SPAPR_CAP_PVR] =3D SPAPR_CAP_ON;
+> >>>>      spapr_caps_add_properties(smc, &error_abort);
+> >>>>      smc->irq =3D &spapr_irq_dual;
+> >>>>      smc->dr_phb_enabled =3D true;
+> >>>> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> >>>> index eb54f9422722..398b72b77f9f 100644
+> >>>> --- a/hw/ppc/spapr_caps.c
+> >>>> +++ b/hw/ppc/spapr_caps.c
+> >>>> @@ -525,6 +525,14 @@ static void cap_fwnmi_apply(SpaprMachineState *=
+spapr, uint8_t val,
+> >>>>      }
+> >>>>  }
+> >>>> =20
+> >>>> +static void cap_pvr_apply(SpaprMachineState *spapr, uint8_t val, Er=
+ror **errp)
+> >>>> +{
+> >>>> +    if (val) {
+> >>>> +        return;
+> >>>> +    }
+> >>>> +    warn_report("If you're uing kvm-hv.ko, only \"-cpu host\" is su=
+pported");
+> >>>> +}
+> >>>> +
+> >>>>  SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D {
+> >>>>      [SPAPR_CAP_HTM] =3D {
+> >>>>          .name =3D "htm",
+> >>>> @@ -633,6 +641,15 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_=
+NUM] =3D {
+> >>>>          .type =3D "bool",
+> >>>>          .apply =3D cap_fwnmi_apply,
+> >>>>      },
+> >>>> +    [SPAPR_CAP_PVR] =3D {
+> >>>> +        .name =3D "pvr",
+> >>>> +        .description =3D "Enforce PVR in KVM",
+> >>>> +        .index =3D SPAPR_CAP_PVR,
+> >>>> +        .get =3D spapr_cap_get_bool,
+> >>>> +        .set =3D spapr_cap_set_bool,
+> >>>> +        .type =3D "bool",
+> >>>> +        .apply =3D cap_pvr_apply,
+> >>>> +    },
+> >>>>  };
+> >>>> =20
+> >>>>  static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *s=
+papr,
+> >>>> @@ -773,6 +790,7 @@ SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NES=
+TED_KVM_HV);
+> >>>>  SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
+> >>>>  SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
+> >>>>  SPAPR_CAP_MIG_STATE(fwnmi, SPAPR_CAP_FWNMI);
+> >>>> +SPAPR_CAP_MIG_STATE(pvr, SPAPR_CAP_PVR);
+> >>>> =20
+> >>>>  void spapr_caps_init(SpaprMachineState *spapr)
+> >>>>  {
+> >>>> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> >>>> index 03d0667e8f94..a4adc29b6522 100644
+> >>>> --- a/target/ppc/kvm.c
+> >>>> +++ b/target/ppc/kvm.c
+> >>>> @@ -466,15 +466,27 @@ int kvm_arch_init_vcpu(CPUState *cs)
+> >>>>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> >>>>      CPUPPCState *cenv =3D &cpu->env;
+> >>>>      int ret;
+> >>>> +    SpaprMachineState *spapr;
+> >>>> =20
+> >>>
+> >>> We generally try to avoid adding such explicit dependencies to the
+> >>> machine code within the target directory... A virtual hypervisor
+> >>> hook could possibly do the trick but this would require to set
+> >>> PowerPCCPU::vhyp before kvm_arch_init_vcpu() gets called, eg.
+> >>> when the vCPU is created in spapr_create_vcpu() rather than
+> >>> when it gets realized.
+> >>
+> >> The only thing kvm_arch_sync_sregs() does is setting PVR, and it does
+> >> not do even that for Book3E so there is dependency already, mine at
+> >> least explicit :)
+> >>
+> >> I am really not sure what setting PVR buys us, KVM PR will take
+> >> anything,
+> >=20
+> > PR will take anything, but it changes the behaviour.  Basically PR
+> > will try to match its behaviour to the PVR you specify.  It can't
+> > entirely succeeed in all cases, of course, but that's PR for you.
+> >
+> > From an API point of view, the idea is that setting the PVR here
+> > specifies the model you want the vcpu to appear to be.  But, KVM is
+> > free to say "can't do that".
+>=20
+>=20
+> Except pseries does not care what the CPU appears to be and uses
+> KVM_REG_PPC_ARCH_COMPAT instead.
 
-... I'll declare the variable during function prologue ;)
+I'm not really sure what you mean by that.  The exact cpu model can be
+relevant for pseries in certain edge cases, although in most cases
+it's the compat mode that will matter in practice.
 
->> +    memory_region_init_alias(pcimem_alias, NULL, "pci.mem.alias",
->> +                             &bs->pci_mem, 0, BONITO_PCIHI_SIZE);
->> +    memory_region_add_subregion(get_system_memory(),
->> +                                0x20000000ul, pcimem_alias);
->> +    create_unimplemented_device("PCI_2", 0x80000000ul, 2 * GiB); /* pci_hi */
+> So, is this a no? Thanks,
 
-... And add definitions for these addresses.
+Yes, although not really for the reasons above.  As you say this is
+just for the handful of people who have never-released machines, which
+makes this some ugly and confusing cruft for nearly everyone.  So, I'm
+more inclined to say that if you happen to have one of those machines,
+you get to apply the workaround patch yourself.
 
-Thanks for the other reviews in this series!
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
->> +
->>       /* set the default value of north bridge pci config */
->>       pci_set_word(dev->config + PCI_COMMAND, 0x0000);
->>       pci_set_word(dev->config + PCI_STATUS, 0x0000);
->> --
->> 2.21.3
->>
-> 
+--uRjmd8ppyyws0Tml
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl648DUACgkQbDjKyiDZ
+s5Kf5A//daTfKGY00o1U7bsgt1jIkjeOvcQ0TCRPd+d99ZIUab+kNuBhz7CYqWLH
+301qDH+SV5iNXSCaCDnO7WErQSBcJFB2f+xW8kEpeGrJ38GPeVoKmoy+rKi87fkM
+cd/XecWdePakJSiwV3bNulKIB3ISndZk1I5kGeQDglvlGFbjHwhbw9pSDonO0wWF
+PvCCAA6t+CFbB1EFgSQU9aTLeaXg4y1wsI0NihtaDQYOfLnBc/dDdRWQdJylatBH
+ulhQPeiqzzz36RmnWOoeYWsjm/Qr8ajJd5DtNVJTDw48CNeMggHSN2GQq7noshLl
+LXmyxaQ1isMDG/PbzxZdNhlKxVRJclRduDo/GGlNtBJf72TwsmV8SnAFRQmsjxib
+aqyWPQhS229k3TEQ5Ls2MY/1sTqUu2KZGK8ORmWyLQbz7rlTW16JrWweC/0IEz7M
+tTyWEyMlG2+gTCHyx9sMSleFFhc0rArL8sNPPUrcH4eiUzp3jVT6M77OP6S9oYhn
+sltpdmTHnK6VCgMx1nIcd8iKEayLWr3KXQXZbQiiJuqjZ5JxlDZrqJafNdq1XLxV
+Fwqu5TxkH/iyLbZhtGUEyQdwQggzQ1AZqNbfDmBjYgchqo6Mu08ccEs2b4NsHdZf
+1jSOpgQKyv1P8xlSeS5kJkXPZxCsYzp6e5UWCtCEHDQzLIY65fA=
+=ACLh
+-----END PGP SIGNATURE-----
+
+--uRjmd8ppyyws0Tml--
 
