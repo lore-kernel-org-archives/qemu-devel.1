@@ -2,94 +2,92 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13394C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 11:14:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B84B3C54E4B
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 11:15:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1AFF20708
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 11:14:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 800C220722
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 11:15:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ebuygst+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1AFF20708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="IPYisHWW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 800C220722
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY6Nr-0007ae-WC
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 07:14:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55248)
+	id 1jY6Ou-00087D-DQ
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 07:15:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54860)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jY6MU-0006jm-8t
- for qemu-devel@nongnu.org; Mon, 11 May 2020 07:12:43 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45587)
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1jY6Km-0004p3-Hy
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 07:10:56 -0400
+Received: from mout.web.de ([212.227.17.12]:34251)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jY6MS-00062o-7Y
- for qemu-devel@nongnu.org; Mon, 11 May 2020 07:12:41 -0400
-Received: by mail-wr1-x444.google.com with SMTP id v12so10382664wrp.12
- for <qemu-devel@nongnu.org>; Mon, 11 May 2020 04:12:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=9yzFIdldPL/Z7DlAJrwJ00GzTZpR76To7YfUsBx8AtQ=;
- b=Ebuygst+lfRShO9rijgamS/XSyiJjcGEjhXN5QB6HBAz7GUoOsz9fSgh3hmNO9un3e
- E8XIlaOpKDT+zHunN3vFZne/4OS9ME39iHxdgIuKeI02IKfAVzYLIxc5mbh2VKA7GVbQ
- jDysPMtCctZ3xDnjZxAVHNXvVeGbmyBNQatBgqlB+6ERPWYmYYZ6Bz2q0DUMsuUEdXc4
- 92B2gr9hT4hIhnsdeaLqDe6Cfslsl74B0sZRRRx3/t+/8wjeUTZGtYE/RUXHhSxLqhoy
- Jyz/JryrBxmZ14WY0vkNR5tCMiOFsu0spXO0sAYNi/qVBdvUfzC2qyJjVDUQyrJ9Htwh
- 0JZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=9yzFIdldPL/Z7DlAJrwJ00GzTZpR76To7YfUsBx8AtQ=;
- b=FYduYrOvDBzyMAQ6YXEyTxMRyDW2hiEB6OsFPjrxCBX0+5w83ujDmLuulbQOsABHPS
- 9ZlnHkfnNd1clAf84cvAEWPGrieaMjZE6epBF9NyZ0nWiOksMqGZMhrfJ9+yFz39YHAd
- o92qEtx/2eSyIMV2Oa0B0xZKHOF1nKa6tE89hSuu7ClTRYQVl0lMhGcOreFTbqrY11e2
- aCFT2PaFjv8WDRnPUMqgV78KG3erAGkE5Q5hweSTAIAE6expVGlz7KvlRnM8rULkjKE0
- jpGKqEltRzDnmxM5h1rwZQiXVvSKcdhI6Lf6dA29IKuE8fAww7IZ8wBnVRtEiqL11P4G
- /szw==
-X-Gm-Message-State: AGi0PuYfu4kgk4ppVaPOR+PcU9kHZ29PV7h41Nyx+OIbvheUTj6JhjFl
- IarlRfC+5ox5n82OYv8A211pyQ==
-X-Google-Smtp-Source: APiQypJbhstVeDSCOYeQa73eo5nMTxAsyHaYfYPiHgE10PDaWZchsBpvEdOyRQhjQk3ZE4H7e89ZkQ==
-X-Received: by 2002:a5d:54c4:: with SMTP id x4mr19564571wrv.73.1589195558249; 
- Mon, 11 May 2020 04:12:38 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id f128sm13960763wme.1.2020.05.11.04.12.36
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 11 May 2020 04:12:37 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 211101FF7E;
- Mon, 11 May 2020 12:12:36 +0100 (BST)
-References: <20200501145713.19822-1-alex.bennee@linaro.org>
-User-agent: mu4e 1.4.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH  v1 0/7] various tcg and linux-user updates
-In-reply-to: <20200501145713.19822-1-alex.bennee@linaro.org>
-Date: Mon, 11 May 2020 12:12:36 +0100
-Message-ID: <87tv0mg1y3.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1jY6Kl-0005kU-F9
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 07:10:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1589195441;
+ bh=h7cHtPLnjN4dSH0Rl7oc6q+EpVug8yB3vvCx6daQaSc=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
+ b=IPYisHWWWwpWm8SJeQ6OgkjlQhKl2bUH1gD4li5K2LlqMqEpVuzeDLHdJpn/uqhvK
+ N5/gu6Li70LSVV1DmHJrhXE/daLmK3v6ekCI2rhkgqgrn/+3ND8plLqrMJLmFc86nB
+ 2HuqzIxKT/WU8POB6UT4JZD2bth3pGbbwbJKtWgw=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([89.247.255.192]) by smtp.web.de (mrweb101
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0Llna8-1iz2Yq3sJc-00ZOAp; Mon, 11
+ May 2020 13:10:40 +0200
+Date: Mon, 11 May 2020 13:10:31 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: qemu-devel <qemu-devel@nongnu.org>
+Subject: [PATCH 0/6] colo: migration related bugfixes
+Message-ID: <cover.1589193382.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Type: multipart/signed; boundary="Sig_/_czAUCoP3zPmJvNOZ8/pV7M";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Provags-ID: V03:K1:aYWW+2Ydd6t3DQ+hp/xpHlnKetHZcZ58JTGVwjrtSvrFfv3+qLs
+ AY8oiMCtvO1vYf0fsyDj+uCgjAAjvrqrCRJZ2N8gbyakQi4lDDI5hDVnb+vZfaVB0YjHKdd
+ EJ6BdrTOnYjdsLy5+Rchg7ESjdtCs9mirHVu/9TRq67vZRONskCi5meznbk5ma3GNMrpNqN
+ rGGg8B/hLzUq5xQ+TBCQw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:kUnbbJkZdIc=:eDP3bU8Y1fTlCyy96Sy4Jl
+ nn9/nUwatSqCeYEkK0m0imDjmekY0/9agYJvxZzSm1lAFY1swB5xJmSBMsqf2zzo7d1mClmrE
+ tA6x535vaKOrKPu8oj7lRLr8cttww6tlS9vRzSvAl2LhgMJM3vDxbpywfdi6b8KSh4yPIEwtB
+ i7GgP4s16lk0NSHGea7ZMU2Fs7DQlmSOLokAWdKQEc3s9k7h+mH22YzqE1Vy6DZc7wZ+GYg+2
+ WuB1t3GWSjEdDt4EZQKPzl02igRH1UKvd4p6nLl7pxwhX0Mg519/6Li0tpUT4SetTjNNaW9+O
+ ItMJgBrd0WOkprT9n5GF3zI/KqQ124ZmU8Jit4JhAa+mtQw7M4O2E9iMnVqJqVHho1mH19Ulm
+ WNQTDeKz9gwCk+4v/YlGP/E7ZxcIfyX52sogF2+yPNu1PrMD0pUhYM00MUsv7QyZ7xr+DW+b3
+ 8KraeSIBVolrWnSus//MwS8kV+YoQ8tkf9bQO6i2aZvtR62QE5fWKaYJC2snKO4rRwlK/Xxjn
+ 5fKdZ2xecpMm2NGvY+hQyk5j/6ux71H03wAXkdaDRFFryNfduNb7mLKVqv7V6b5twShWo9V/W
+ sz0rieNIWd8ONUlVbxoBtthEEZ3TW5T7k3EUEqjunwklQ3aD1Sodon++lx+phXHCGVjTRAmDO
+ Oe/fU8hOkJLUwOcL1fSOxdDl4oWqQYBhsfGVOixoCNOEta2/UMLvemdxrNHo9pj1/cq76C5KT
+ kv5IEHROAsOnQNSOs9koHIOU6EFB6pc0s9GvetbmJW2aW7/ckw4rXRnlQVSy3RsGkuQpIIBap
+ oZCdml8ozlCVbkiQgYq0PuopOT0d0X5KZzUJQQj+wpVcSILxFXjTFP7gK7W74Rz2F5+B+Bxtq
+ 4IYA58d71OMzMkDYhA9+QBeEA7lTmJHwJqbBmtK4olZeAN+RaQeRPf5Gzjl7YOs0w/KnOisVO
+ 2QMvClmj9nHBewjuqnmopG8sKJ7tVVYJicl2fVrUpPXGQ98AESjAM6sJjnqtsGNmc9RvklFRi
+ alY6WpMTOb2Rpw1b5xT6xn2gVQcIcQnXMJnSsTuRC33Qo4oj6tsh1mPptYz2H3Q0gCqApZLQD
+ qc/b30IhxmOPsZQiVbEVssTfsjpuXkiQNNAhZwpGpjlEmSTMxzjomjRj9tk/4kdt75rV7YcJW
+ Av4nOcvzlkJuH8VUnWqlF2qeZHGGZ9Xm4614KLhjAKf666HisA8lshmH9pdhExPv1GwSHy114
+ 2s2RU8h1JkwcbFdwR
+Received-SPF: pass client-ip=212.227.17.12; envelope-from=lukasstraub2@web.de;
+ helo=mout.web.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 07:10:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -24
+X-Spam_score: -2.5
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,42 +100,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, riku.voipio@iki.fi,
- richard.henderson@linaro.org, laurent@vivier.eu
+Cc: Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--Sig_/_czAUCoP3zPmJvNOZ8/pV7M
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+Hello Everyone,
+Here are fixes for bugs that I found in my tests.
 
-> Hi,
->
-> Cleaning up my queues into more focused trees these are all tweaks to
-> TCG related stuff. The guest_base changes where posted before but
-> where a little radical for 5.0 but I think are worth getting in early
-> as it enables the sanitizer builds for a range of linux-user targets
-> we couldn't run before. Finally there is a little tweak made to the
-> out_asm handling which makes it a bit easier to see which guest
-> instructions are being emulated by which host code.
->
-> The following need review:
->
->  - translate-all: include guest address in out_asm output
->  - disas: add optional note support to cap_disas
->  - disas: include an optional note for the start of disassembly
->  - accel/tcg: don't disable exec_tb trace events
->  - linux-user: completely re-write init_guest_space
+Regards,
+Lukas Straub
 
-Gentle ping,
+Lukas Straub (6):
+  migration/colo.c: Use event instead of semaphore
+  migration/colo.c: Use cpu_synchronize_all_states()
+  migration/colo.c: Flush ram cache only after receiving device state
+  migration/colo.c: Relaunch failover even if there was an error
+  migration/qemu-file.c: Don't ratelimit a shutdown fd
+  migration/colo.c: Move colo_notify_compares_event to the right place
 
-I would especially like some feed-back on the guest base updates from
-the linux-user maintainers so we can get the sanitizers more widely
-used.
-
-If your happy for me to include them in my next PR I'll just take some
-Acked-by's ;-)
+ migration/colo.c      | 39 ++++++++++++++++++++++++---------------
+ migration/migration.h |  4 ++--
+ migration/qemu-file.c |  2 +-
+ migration/ram.c       |  5 +----
+ migration/ram.h       |  1 +
+ 5 files changed, 29 insertions(+), 22 deletions(-)
 
 --=20
-Alex Benn=C3=A9e
+2.20.1
+
+--Sig_/_czAUCoP3zPmJvNOZ8/pV7M
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl65MqcACgkQNasLKJxd
+sliD3g//Vi3QKo8okDEZkanns9J0nfHwmbwArbmqCgl8I/J0HVPgwIVez/mB5SZ/
+dWYbrYKUKL9nK0yHNW9d0KD+kfPn23iFTx0jCqFtFUq8vmNNJu/NEehRT9mXk5Mz
+dnbUiTbENDLyTebpoecvziNnGbP+18QfbK6PTin37lUWKug7UpS7dHoV1YsJDYBC
+2WKbhcFnKqCRLrJXJ2LcgpnWyf90Gk2zlCfrKU7O8LaepI4m76TUCgbhourPweNp
+wribDao8FXygFxq9kE6xL0uE/aFhWLKzJ6dAF9KF+ubuBwQzvWPa/OnIQ9ohNdOZ
+O7zFZXa0JVQHH62GgdNycwAtjalhsUOZajgSM65aYTqMqP3lyUEfTYjHLQ+Bj0wb
+4tKPr0sLlXgW/UorMMZIAgxThXgBKeOaTxe//+2uAz1nT/sub5p7a0CJcuuUoHWj
+btFDi2BvPhssS5paq7sPWIj1jJX0I+M1NFpQLq3PwMc7UqrnIuV+MypJ0Qz30dln
+gZlCJtf+yPCRrYRZgTumiW3TWKXyk7Fxpygkx5taGmOujpiWibCPq3aAb/KcZgGw
+v4WgqGGzFY01kKSz5v2K6hCBbf1Y1OqZCcXmOwNGOP09CWMQtYJiaRQovaX4QJUi
+ShVfGh1QkGf3iBU3wHEZbE5mHKXWy0xUQEeIZKaVS/U+t6VAiqU=
+=6tVl
+-----END PGP SIGNATURE-----
+
+--Sig_/_czAUCoP3zPmJvNOZ8/pV7M--
 
