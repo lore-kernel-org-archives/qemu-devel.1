@@ -2,109 +2,94 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF294C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 11:12:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13394C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 11:14:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B187206F9
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 11:12:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D1AFF20708
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 11:14:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ADa/HDZK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B187206F9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ebuygst+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1AFF20708
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY6MH-0006Ks-O3
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 07:12:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54934)
+	id 1jY6Nr-0007ae-WC
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 07:14:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jY6L7-0005J2-7m
- for qemu-devel@nongnu.org; Mon, 11 May 2020 07:11:17 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49489
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jY6L6-0005p6-EA
- for qemu-devel@nongnu.org; Mon, 11 May 2020 07:11:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589195475;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=q5crtsZ8C1ZnRGJlZ9cldEnfZWOlTEhC5Hozu7U+jRI=;
- b=ADa/HDZKqcuCwvm1qD6LWLtI/Sfo6+sRFVHk5CNA7Tp+L/baTpC1jStzdkJto1pv4HyGzQ
- 9ad5RDWKQKZCWh403frm1HJQyGxpnD1AxAECSbpKymhRNVNAk4LuviAJlF5QS7v4NPaDP+
- Y3DvGDKBw6FdfoKmjOwWs5VSfIUcOII=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410-e71M698AM2qN4FmiCevkag-1; Mon, 11 May 2020 07:11:13 -0400
-X-MC-Unique: e71M698AM2qN4FmiCevkag-1
-Received: by mail-wr1-f69.google.com with SMTP id z5so5047227wrt.17
- for <qemu-devel@nongnu.org>; Mon, 11 May 2020 04:11:13 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jY6MU-0006jm-8t
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 07:12:43 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45587)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jY6MS-00062o-7Y
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 07:12:41 -0400
+Received: by mail-wr1-x444.google.com with SMTP id v12so10382664wrp.12
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 04:12:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=9yzFIdldPL/Z7DlAJrwJ00GzTZpR76To7YfUsBx8AtQ=;
+ b=Ebuygst+lfRShO9rijgamS/XSyiJjcGEjhXN5QB6HBAz7GUoOsz9fSgh3hmNO9un3e
+ E8XIlaOpKDT+zHunN3vFZne/4OS9ME39iHxdgIuKeI02IKfAVzYLIxc5mbh2VKA7GVbQ
+ jDysPMtCctZ3xDnjZxAVHNXvVeGbmyBNQatBgqlB+6ERPWYmYYZ6Bz2q0DUMsuUEdXc4
+ 92B2gr9hT4hIhnsdeaLqDe6Cfslsl74B0sZRRRx3/t+/8wjeUTZGtYE/RUXHhSxLqhoy
+ Jyz/JryrBxmZ14WY0vkNR5tCMiOFsu0spXO0sAYNi/qVBdvUfzC2qyJjVDUQyrJ9Htwh
+ 0JZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=q5crtsZ8C1ZnRGJlZ9cldEnfZWOlTEhC5Hozu7U+jRI=;
- b=L1IBYeE1aRcShJv+34SCO+O8flMwxLfAYGAOjDU/jl27tCn3VH4XSVbJ552kDQCSHJ
- EwGBwnOtSuj8lIPsseI+ZS3S8FuYukSS9UNkErloL5RlsVULYfGvcPfeew0m1uZXMpBd
- OL61PEnLqqt7sIODXq9OMYWABIHvUGd3vY93qS5HHiSasDmDzlNkcYXNFee6brYf4XNn
- 3uqCs5N5Ym0/qn+C8+Rn6EJlin3wbOxD8kOEhR3ckXtuUH/NqOTtoxVXSFNJdz99pxNi
- 8j78pkgDOqElg6bimW/lJu2nFA0FjOzGUb2Os5d+zMoW2FPHa/lqiavGfE8N9dDDvbqT
- eWyQ==
-X-Gm-Message-State: AGi0Pua88Uifz3VG11yUjPqORd+F2rAxMqkf6Tq+lHHjJIbI0ovSX8Jv
- nPrKaL8iz2tVTjSa/IrD8JwSeG1ew6PM2WvjgVqmtjtWl4fh0mZk2mJkhX7WFU94W8LXv3rbt1N
- gCaRinVK+pu6qCMY=
-X-Received: by 2002:adf:f5c4:: with SMTP id k4mr16414632wrp.23.1589195472439; 
- Mon, 11 May 2020 04:11:12 -0700 (PDT)
-X-Google-Smtp-Source: APiQypImuFSybS82VJpBzOJllgJHAc/wCz6zPqQI1AYKEYn+haLDrVpWWtXSS3/e/+RnmF3p8k39mQ==
-X-Received: by 2002:adf:f5c4:: with SMTP id k4mr16414605wrp.23.1589195472208; 
- Mon, 11 May 2020 04:11:12 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ec64:483c:eca:9b27?
- ([2001:b07:6468:f312:ec64:483c:eca:9b27])
- by smtp.gmail.com with ESMTPSA id o26sm15421208wro.83.2020.05.11.04.11.11
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 11 May 2020 04:11:11 -0700 (PDT)
-Subject: Re: [PATCH 3/4] device-core: use atomic_set on .realized property
-To: Maxim Levitsky <mlevitsk@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-References: <20200416203624.32366-1-mlevitsk@redhat.com>
- <20200416203624.32366-4-mlevitsk@redhat.com>
- <20200504104538.GC354891@stefanha-x1.localdomain>
- <b265d4ee-400e-bb80-cc37-e89c5dab2a8c@redhat.com>
- <948c2e2f293c08b6411030dc5ad91c23a2f773f0.camel@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <82d51a76-fd38-d72e-2d22-c4de1a76d5f9@redhat.com>
-Date: Mon, 11 May 2020 13:11:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=9yzFIdldPL/Z7DlAJrwJ00GzTZpR76To7YfUsBx8AtQ=;
+ b=FYduYrOvDBzyMAQ6YXEyTxMRyDW2hiEB6OsFPjrxCBX0+5w83ujDmLuulbQOsABHPS
+ 9ZlnHkfnNd1clAf84cvAEWPGrieaMjZE6epBF9NyZ0nWiOksMqGZMhrfJ9+yFz39YHAd
+ o92qEtx/2eSyIMV2Oa0B0xZKHOF1nKa6tE89hSuu7ClTRYQVl0lMhGcOreFTbqrY11e2
+ aCFT2PaFjv8WDRnPUMqgV78KG3erAGkE5Q5hweSTAIAE6expVGlz7KvlRnM8rULkjKE0
+ jpGKqEltRzDnmxM5h1rwZQiXVvSKcdhI6Lf6dA29IKuE8fAww7IZ8wBnVRtEiqL11P4G
+ /szw==
+X-Gm-Message-State: AGi0PuYfu4kgk4ppVaPOR+PcU9kHZ29PV7h41Nyx+OIbvheUTj6JhjFl
+ IarlRfC+5ox5n82OYv8A211pyQ==
+X-Google-Smtp-Source: APiQypJbhstVeDSCOYeQa73eo5nMTxAsyHaYfYPiHgE10PDaWZchsBpvEdOyRQhjQk3ZE4H7e89ZkQ==
+X-Received: by 2002:a5d:54c4:: with SMTP id x4mr19564571wrv.73.1589195558249; 
+ Mon, 11 May 2020 04:12:38 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id f128sm13960763wme.1.2020.05.11.04.12.36
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 11 May 2020 04:12:37 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 211101FF7E;
+ Mon, 11 May 2020 12:12:36 +0100 (BST)
+References: <20200501145713.19822-1-alex.bennee@linaro.org>
+User-agent: mu4e 1.4.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH  v1 0/7] various tcg and linux-user updates
+In-reply-to: <20200501145713.19822-1-alex.bennee@linaro.org>
+Date: Mon, 11 May 2020 12:12:36 +0100
+Message-ID: <87tv0mg1y3.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <948c2e2f293c08b6411030dc5ad91c23a2f773f0.camel@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 00:05:06
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,26 +102,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, "Michael S. Tsirkin" <mst@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, riku.voipio@iki.fi,
+ richard.henderson@linaro.org, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/05/20 13:00, Maxim Levitsky wrote:
-> On second thought, I think both cases matter, after I examined the device removal case.
-> In device removal case, the device is first un-realized and then removed from the bus,
-> so just like in device hotplug case, the scsi_device_find can give you an unrealized device.
-> 
-> I will change this patch to set .realized to false at the start (if needed) of the function and to true at the end (also if needed)
-> Will atomic_rcu_set work? or atomic_store_release?
-> (Both are the same thing, but former documents the purpose of using with RCU.
 
-atomic_rcu_set is more to store pointers, in this case you want to store
-the value after any other change to the struct so atomic_store_release
-is more appropriate.
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 
-Paolo
+> Hi,
+>
+> Cleaning up my queues into more focused trees these are all tweaks to
+> TCG related stuff. The guest_base changes where posted before but
+> where a little radical for 5.0 but I think are worth getting in early
+> as it enables the sanitizer builds for a range of linux-user targets
+> we couldn't run before. Finally there is a little tweak made to the
+> out_asm handling which makes it a bit easier to see which guest
+> instructions are being emulated by which host code.
+>
+> The following need review:
+>
+>  - translate-all: include guest address in out_asm output
+>  - disas: add optional note support to cap_disas
+>  - disas: include an optional note for the start of disassembly
+>  - accel/tcg: don't disable exec_tb trace events
+>  - linux-user: completely re-write init_guest_space
 
+Gentle ping,
+
+I would especially like some feed-back on the guest base updates from
+the linux-user maintainers so we can get the sanitizers more widely
+used.
+
+If your happy for me to include them in my next PR I'll just take some
+Acked-by's ;-)
+
+--=20
+Alex Benn=C3=A9e
 
