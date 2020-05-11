@@ -2,87 +2,103 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E022FC47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 08:49:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B42F2C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 08:51:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A998420708
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 08:49:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6958E20708
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 08:51:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oy1g188E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A998420708
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S9GzZa8v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6958E20708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY482-0008TX-Lt
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 04:49:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33560)
+	id 1jY49Z-0001uA-Fm
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 04:51:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33664)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jY47C-00081k-Un
- for qemu-devel@nongnu.org; Mon, 11 May 2020 04:48:46 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37274
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jY47u-00007S-MC
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 04:49:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60163
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jY47A-0002JD-VM
- for qemu-devel@nongnu.org; Mon, 11 May 2020 04:48:45 -0400
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jY47t-0002Rj-DZ
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 04:49:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589186923;
+ s=mimecast20190719; t=1589186968;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=AGA8/gv/uBm4mCZHjhRaJppFMpXRPShx9RI73BaqgQA=;
- b=Oy1g188EhXYGBtfJc+SF2kaKPsTn2zLFkeJxYcpDBfFoWY0xNevBNw90ed8KHsUEC64/vG
- 2tSqSkUUWE8vfnac9SMIYDfkAsWERTVT62bZ3siwqyoyJC1kHS61o2+J2r/S+Kin6Cxii5
- ik4s6CEctSx6mQA3AK19K9ihQ/MNMm4=
+ bh=ujm/k7XqSOSF25VoCj2jMLGjitfu9+QshnUWrWmT6LY=;
+ b=S9GzZa8v+stNPB8vwhitcsWFHOwy9hxp3M47xNNDlkXBFt7dGvE3swOsMTXWykpkHo1V1Y
+ GMufAWbW3p+CfN0ufjxuU00Mx2xHZnpl1bdd8qBCwLadBFplpHW8o0z1v062RSabC4vp7a
+ omb7BDvw8OiYs9WfswllDS3Cgut0rgI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-222-RTzdh-KFPTeU6WABM8QLbQ-1; Mon, 11 May 2020 04:48:41 -0400
-X-MC-Unique: RTzdh-KFPTeU6WABM8QLbQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-241-rvOx0ogyMhSSfpRb-s3XUA-1; Mon, 11 May 2020 04:49:24 -0400
+X-MC-Unique: rvOx0ogyMhSSfpRb-s3XUA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED437108BD12;
- Mon, 11 May 2020 08:48:40 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.222])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5EA3A196AE;
- Mon, 11 May 2020 08:48:36 +0000 (UTC)
-Message-ID: <0f7698095cde89c6cb2f73e389340132f529ee5a.camel@redhat.com>
-Subject: Re: [PATCH 2/4] device-core: use RCU for list of childs of a bus
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Mon, 11 May 2020 11:48:35 +0300
-In-Reply-To: <20200504104111.GB354891@stefanha-x1.localdomain>
-References: <20200416203624.32366-1-mlevitsk@redhat.com>
- <20200416203624.32366-3-mlevitsk@redhat.com>
- <20200504104111.GB354891@stefanha-x1.localdomain>
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E52AC100CCCB;
+ Mon, 11 May 2020 08:49:22 +0000 (UTC)
+Received: from [10.36.114.214] (ovpn-114-214.ams2.redhat.com [10.36.114.214])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D65D210016E8;
+ Mon, 11 May 2020 08:49:14 +0000 (UTC)
+Subject: Re: [EXT] [PATCH v2 2/5] virtio-iommu: Implement RESV_MEM probe
+ request
+To: Bharat Bhushan <bbhushan2@marvell.com>,
+ "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "mst@redhat.com" <mst@redhat.com>,
+ "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+ "peterx@redhat.com" <peterx@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>
+References: <20200508173057.32215-1-eric.auger@redhat.com>
+ <20200508173057.32215-3-eric.auger@redhat.com>
+ <MWHPR1801MB19669FBFAD49AD36460B0756E3A10@MWHPR1801MB1966.namprd18.prod.outlook.com>
+ <ba80143c-e053-5323-70a0-72a1dcc04376@redhat.com>
+ <CY4PR1801MB1959F371C327FDBEE4EE7B64E3A10@CY4PR1801MB1959.namprd18.prod.outlook.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <8e3d767e-f22e-41d3-885a-dbda866d0310@redhat.com>
+Date: Mon, 11 May 2020 10:49:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
+MIME-Version: 1.0
+In-Reply-To: <CY4PR1801MB1959F371C327FDBEE4EE7B64E3A10@CY4PR1801MB1959.namprd18.prod.outlook.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mlevitsk@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 03:10:56
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Received-SPF: pass client-ip=207.211.31.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 02:55:57
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,193 +111,296 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- "Daniel P. =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2020-05-04 at 11:41 +0100, Stefan Hajnoczi wrote:
-> On Thu, Apr 16, 2020 at 11:36:22PM +0300, Maxim Levitsky wrote:
-> > @@ -90,9 +92,13 @@ static void bus_reset_child_foreach(Object *obj, ResettableChildCallback cb,
-> >      BusState *bus = BUS(obj);
-> >      BusChild *kid;
-> >  
-> > -    QTAILQ_FOREACH(kid, &bus->children, sibling) {
-> > +    rcu_read_lock();
-> > +
-> > +    QTAILQ_FOREACH_RCU(kid, &bus->children, sibling) {
-> >          cb(OBJECT(kid->child), opaque, type);
-> >      }
-> > +
-> > +    rcu_read_unlock();
-> >  }
-> >  
-> >  static void qbus_realize(BusState *bus, DeviceState *parent, const char *name)
-> > @@ -138,10 +144,15 @@ static void bus_unparent(Object *obj)
-> >      /* Only the main system bus has no parent, and that bus is never freed */
-> >      assert(bus->parent);
-> >  
-> > -    while ((kid = QTAILQ_FIRST(&bus->children)) != NULL) {
-> > +    rcu_read_lock();
-> > +
-> > +    while ((kid = QTAILQ_FIRST_RCU(&bus->children)) != NULL) {
-> >          DeviceState *dev = kid->child;
-> >          object_unparent(OBJECT(dev));
-> >      }
-> > +
-> > +    rcu_read_unlock();
+Hi Bharat,
+
+On 5/11/20 10:42 AM, Bharat Bhushan wrote:
+> Hi Eric,
 > 
-> rcu_read_lock() is called but this looks like a list write operation.
-> If I understand correctly bus->children list writes can only be called
-> with the QEMU global mutex and therefore rcu_read_lock() is not required
-> here?
-
-This is indeed write operation. Paulo helped me to finally understand
-what RCU guarantees are, so now I understand.
-
-About write locking here (which I also understand now that I need for RCU),
-this is very good question if that can race as well:
-
-It looks like qdev_unplug is what does the device removal, and it first
-calls the hotplug handler which is supposed to unrealize the device,
-in addition to whatever hot unplug actions are needed (like informing the guest),
-and then it does object_unparent which removes the device from the bus.
-Therefore as long as the .realized store is atomic and with proper barriers,
-the scsi IO thread might be able to see the device but it will be unplugged by then.
-
-
-There are plenty of object_unparent calls through the code base and I can only hope
-that these are done with big qemu lock held.
-
-
+>> -----Original Message-----
+>> From: Auger Eric <eric.auger@redhat.com>
+>> Sent: Monday, May 11, 2020 12:26 PM
+>> To: Bharat Bhushan <bbhushan2@marvell.com>; eric.auger.pro@gmail.com;
+>> qemu-devel@nongnu.org; qemu-arm@nongnu.org; peter.maydell@linaro.org;
+>> mst@redhat.com; jean-philippe@linaro.org; peterx@redhat.com;
+>> armbru@redhat.com; pbonzini@redhat.com
+>> Subject: Re: [EXT] [PATCH v2 2/5] virtio-iommu: Implement RESV_MEM probe
+>> request
+>>
+>> Hi Bharat,
+>> On 5/11/20 8:38 AM, Bharat Bhushan wrote:
+>>> Hi Eric,
+>>>
+>>>> -----Original Message-----
+>>>> From: Eric Auger <eric.auger@redhat.com>
+>>>> Sent: Friday, May 8, 2020 11:01 PM
+>>>> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
+>>>> qemu-devel@nongnu.org; qemu-arm@nongnu.org; peter.maydell@linaro.org;
+>>>> mst@redhat.com; jean- philippe@linaro.org; Bharat Bhushan
+>>>> <bbhushan2@marvell.com>; peterx@redhat.com; armbru@redhat.com;
+>>>> pbonzini@redhat.com
+>>>> Subject: [EXT] [PATCH v2 2/5] virtio-iommu: Implement RESV_MEM probe
+>>>> request
+>>>>
+>>>> External Email
+>>>>
+>>>> ---------------------------------------------------------------------
+>>>> - This patch implements the PROBE request. At the moment, only THE
+>>>> RESV_MEM property is handled. The first goal is to report iommu wide
+>>>> reserved regions such as the MSI regions set by the machine code. On
+>>>> x86 this will be the IOAPIC MSI region,
+>>>> [0xFEE00000 - 0xFEEFFFFF], on ARM this may be the ITS doorbell.
+>>>>
+>>>> In the future we may introduce per device reserved regions.
+>>>> This will be useful when protecting host assigned devices which may
+>>>> expose their own reserved regions
+>>>>
+>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>
+>>>> ---
+>>>>
+>>>> v1 -> v2:
+>>>> - move the unlock back to the same place
+>>>> - remove the push label and factorize the code after the out label
+>>>> - fix a bunch of cpu_to_leX according to the latest spec revision
+>>>> - do not remove sizeof(last) from free space
+>>>> - check the ep exists
+>>>> ---
+>>>>  include/hw/virtio/virtio-iommu.h |  2 +
+>>>>  hw/virtio/virtio-iommu.c         | 94 ++++++++++++++++++++++++++++++--
+>>>>  hw/virtio/trace-events           |  1 +
+>>>>  3 files changed, 93 insertions(+), 4 deletions(-)
+>>>>
+>>>> diff --git a/include/hw/virtio/virtio-iommu.h
+>>>> b/include/hw/virtio/virtio-iommu.h
+>>>> index e653004d7c..49eb105cd8 100644
+>>>> --- a/include/hw/virtio/virtio-iommu.h
+>>>> +++ b/include/hw/virtio/virtio-iommu.h
+>>>> @@ -53,6 +53,8 @@ typedef struct VirtIOIOMMU {
+>>>>      GHashTable *as_by_busptr;
+>>>>      IOMMUPciBus *iommu_pcibus_by_bus_num[PCI_BUS_MAX];
+>>>>      PCIBus *primary_bus;
+>>>> +    ReservedRegion *reserved_regions;
+>>>> +    uint32_t nb_reserved_regions;
+>>>>      GTree *domains;
+>>>>      QemuMutex mutex;
+>>>>      GTree *endpoints;
+>>>> diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
+>>>> index
+>>>> 22ba8848c2..35d772e021 100644
+>>>> --- a/hw/virtio/virtio-iommu.c
+>>>> +++ b/hw/virtio/virtio-iommu.c
+>>>> @@ -38,6 +38,7 @@
+>>>>
+>>>>  /* Max size */
+>>>>  #define VIOMMU_DEFAULT_QUEUE_SIZE 256
+>>>> +#define VIOMMU_PROBE_SIZE 512
+>>>>
+>>>>  typedef struct VirtIOIOMMUDomain {
+>>>>      uint32_t id;
+>>>> @@ -378,6 +379,65 @@ static int virtio_iommu_unmap(VirtIOIOMMU *s,
+>>>>      return ret;
+>>>>  }
+>>>>
+>>>> +static ssize_t virtio_iommu_fill_resv_mem_prop(VirtIOIOMMU *s, uint32_t ep,
+>>>> +                                               uint8_t *buf, size_t
+>>>> +free) {
+>>>> +    struct virtio_iommu_probe_resv_mem prop = {};
+>>>> +    size_t size = sizeof(prop), length = size - sizeof(prop.head), total;
+>>>> +    int i;
+>>>> +
+>>>> +    total = size * s->nb_reserved_regions;
+>>>> +
+>>>> +    if (total > free) {
+>>>> +        return -ENOSPC;
+>>>> +    }
+>>>> +
+>>>> +    for (i = 0; i < s->nb_reserved_regions; i++) {
+>>>> +        prop.head.type = cpu_to_le16(VIRTIO_IOMMU_PROBE_T_RESV_MEM);
+>>>> +        prop.head.length = cpu_to_le16(length);
+>>>> +        prop.subtype = s->reserved_regions[i].type;
+>>>> +        prop.start = cpu_to_le64(s->reserved_regions[i].low);
+>>>> +        prop.end = cpu_to_le64(s->reserved_regions[i].high);
+>>>> +
+>>>> +        memcpy(buf, &prop, size);
+>>>> +
+>>>> +        trace_virtio_iommu_fill_resv_property(ep, prop.subtype,
+>>>> +                                              prop.start, prop.end);
+>>>> +        buf += size;
+>>>> +    }
+>>>> +    return total;
+>>>> +}
+>>>> +
+>>>> +/**
+>>>> + * virtio_iommu_probe - Fill the probe request buffer with
+>>>> + * the properties the device is able to return and add a NONE
+>>>> + * property at the end.
+>>>> + */
+>>>> +static int virtio_iommu_probe(VirtIOIOMMU *s,
+>>>> +                              struct virtio_iommu_req_probe *req,
+>>>> +                              uint8_t *buf) {
+>>>> +    uint32_t ep_id = le32_to_cpu(req->endpoint);
+>>>> +    size_t free = VIOMMU_PROBE_SIZE;
+>>>> +    ssize_t count;
+>>>> +
+>>>> +    if (!virtio_iommu_mr(s, ep_id)) {
+>>>> +        return VIRTIO_IOMMU_S_NOENT;
+>>>> +    }
+>>>> +
+>>>> +    count = virtio_iommu_fill_resv_mem_prop(s, ep_id, buf, free);
+>>>> +    if (count < 0) {
+>>>> +        return VIRTIO_IOMMU_S_INVAL;
+>>>> +    }
+>>>> +    buf += count;
+>>>> +    free -= count;
+>>>> +
+>>>> +    /* Fill the rest with zeroes */
+>>>> +    memset(buf, 0, free);
+>>>
+>>> No need to fill with zero here as "buf" is set to zero on allocation, no?
+>>
+>> You're right. I will remove this in the next version.
+>>
+>> Thanks
+>>
+>> Eric
+>>>
+>>> Thanks
+>>> -Bharat
+>>>
+>>>> +
+>>>> +    return VIRTIO_IOMMU_S_OK;
+>>>> +}
+>>>> +
+>>>>  static int virtio_iommu_iov_to_req(struct iovec *iov,
+>>>>                                     unsigned int iov_cnt,
+>>>>                                     void *req, size_t req_sz) @@
+>>>> -407,15 +467,27 @@
+>>>> virtio_iommu_handle_req(detach)
+>>>>  virtio_iommu_handle_req(map)
+>>>>  virtio_iommu_handle_req(unmap)
+>>>>
+>>>> +static int virtio_iommu_handle_probe(VirtIOIOMMU *s,
+>>>> +                                     struct iovec *iov,
+>>>> +                                     unsigned int iov_cnt,
+>>>> +                                     uint8_t *buf) {
+>>>> +    struct virtio_iommu_req_probe req;
+>>>> +    int ret = virtio_iommu_iov_to_req(iov, iov_cnt, &req,
+>>>> +sizeof(req));
+>>>> +
+>>>> +    return ret ? ret : virtio_iommu_probe(s, &req, buf); }
+>>>> +
+>>>>  static void virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue
+>> *vq)  {
+>>>>      VirtIOIOMMU *s = VIRTIO_IOMMU(vdev);
+>>>>      struct virtio_iommu_req_head head;
+>>>>      struct virtio_iommu_req_tail tail = {};
+>>>> +    size_t output_size = sizeof(tail), sz;
+>>>>      VirtQueueElement *elem;
+>>>>      unsigned int iov_cnt;
+>>>>      struct iovec *iov;
+>>>> -    size_t sz;
+>>>> +    void *buf = NULL;
+>>>>
+>>>>      for (;;) {
+>>>>          elem = virtqueue_pop(vq, sizeof(VirtQueueElement)); @@
+>>>> -452,6 +524,17 @@ static void virtio_iommu_handle_command(VirtIODevice
+>> *vdev, VirtQueue *vq)
+>>>>          case VIRTIO_IOMMU_T_UNMAP:
+>>>>              tail.status = virtio_iommu_handle_unmap(s, iov, iov_cnt);
+>>>>              break;
+>>>> +        case VIRTIO_IOMMU_T_PROBE:
 > 
-> > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> > index 85f062def7..f0c87e582e 100644
-> > --- a/hw/core/qdev.c
-> > +++ b/hw/core/qdev.c
-> > @@ -50,26 +50,37 @@ const VMStateDescription *qdev_get_vmsd(DeviceState *dev)
-> >      return dc->vmsd;
-> >  }
-> >  
-> > +static void bus_free_bus_child(BusChild *kid)
-> > +{
-> > +    object_unref(OBJECT(kid->child));
+> As per spec
+>   "
+>    If the device does not offer the VIRTIO_IOMMU_F_PROBE feature, and if the driver sends a VIRTIO_-
+>    IOMMU_T_PROBE request, then the device SHOULD NOT write the buffer and SHOULD set the used
+>    length to zero.
+>   "
+> So we should check if device supports "VIRTIO_IOMMU_F_PROBE" before proceed?
+But are the device and from that patch onwards we do support the
+VIRTIO_IOMMU_F_PROBE feature, right?
+
+Thanks
+
+Eric
 > 
-> Users like scsi_device_find() do not take a refcount on the child.  If
-> the device is removed then bus_free_bus_child may call object_unref()
-> while another thread is still accessing the child.
-
-I agree, however this is existing bug - bus_remove_child was dropping this
-reference immediatly and I delayed it to RCU callback it now sets.
-So I didn't made the situation worse.
-
-
+> Thanks
+> -Bharat
 > 
-> Maybe I'm missing something that prevents this scenario?
+>>>> +        {
+>>>> +            struct virtio_iommu_req_tail *ptail;
+>>>> +
+>>>> +            output_size = s->config.probe_size + sizeof(tail);
+>>>> +            buf = g_malloc0(output_size);
+>>>> +
+>>>> +            ptail = (struct virtio_iommu_req_tail *)
+>>>> +                        (buf + s->config.probe_size);
+>>>> +            ptail->status = virtio_iommu_handle_probe(s, iov, iov_cnt, buf);
+>>>> +        }
+>>>>          default:
+>>>>              tail.status = VIRTIO_IOMMU_S_UNSUPP;
+>>>>          }
+>>>> @@ -459,12 +542,13 @@ static void
+>>>> virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue *vq)
+>>>>
+>>>>  out:
+>>>>          sz = iov_from_buf(elem->in_sg, elem->in_num, 0,
+>>>> -                          &tail, sizeof(tail));
+>>>> -        assert(sz == sizeof(tail));
+>>>> +                          buf ? buf : &tail, output_size);
+>>>> +        assert(sz == output_size);
+>>>>
+>>>> -        virtqueue_push(vq, elem, sizeof(tail));
+>>>> +        virtqueue_push(vq, elem, sz);
+>>>>          virtio_notify(vdev, vq);
+>>>>          g_free(elem);
+>>>> +        g_free(buf);
+>>>>      }
+>>>>  }
+>>>>
+>>>> @@ -667,6 +751,7 @@ static void
+>>>> virtio_iommu_device_realize(DeviceState *dev, Error **errp)
+>>>>      s->config.page_size_mask = TARGET_PAGE_MASK;
+>>>>      s->config.input_range.end = -1UL;
+>>>>      s->config.domain_range.end = 32;
+>>>> +    s->config.probe_size = VIOMMU_PROBE_SIZE;
+>>>>
+>>>>      virtio_add_feature(&s->features, VIRTIO_RING_F_EVENT_IDX);
+>>>>      virtio_add_feature(&s->features, VIRTIO_RING_F_INDIRECT_DESC);
+>>>> @@ -676,6
+>>>> +761,7 @@ static void virtio_iommu_device_realize(DeviceState *dev,
+>>>> +Error
+>>>> **errp)
+>>>>      virtio_add_feature(&s->features, VIRTIO_IOMMU_F_MAP_UNMAP);
+>>>>      virtio_add_feature(&s->features, VIRTIO_IOMMU_F_BYPASS);
+>>>>      virtio_add_feature(&s->features, VIRTIO_IOMMU_F_MMIO);
+>>>> +    virtio_add_feature(&s->features, VIRTIO_IOMMU_F_PROBE);
+>>>>
+>>>>      qemu_mutex_init(&s->mutex);
+>>>>
+>>>> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events index
+>>>> e83500bee9..5550475691 100644
+>>>> --- a/hw/virtio/trace-events
+>>>> +++ b/hw/virtio/trace-events
+>>>> @@ -73,3 +73,4 @@ virtio_iommu_get_domain(uint32_t domain_id) "Alloc
+>>>> domain=%d"
+>>>>  virtio_iommu_put_domain(uint32_t domain_id) "Free domain=%d"
+>>>>  virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr,
+>>>> uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
+>>>>  virtio_iommu_report_fault(uint8_t reason, uint32_t flags, uint32_t
+>>>> endpoint, uint64_t addr) "FAULT reason=%d flags=%d endpoint=%d
+>>>> address =0x%"PRIx64
+>>>> +virtio_iommu_fill_resv_property(uint32_t devid, uint8_t subtype,
+>>>> +uint64_t start, uint64_t end) "dev= %d, type=%d start=0x%"PRIx64"
+>>>> +end=0x%"PRIx64
+>>>> --
+>>>> 2.20.1
+>>>
+>>>
 > 
-> If not, then another patch is necessary first that introduces stricter
-> refcount discipline across the codebase. This applies both to users who
-> directly access bus->children as well as to those who call walk() and
-> stash child pointers in their callback function.
-
-In scsi_device_find, as long as RCU read lock is held, no RCU reclaim should happen,
-thus this code shouldn't have the child disapper under it.
-However once scsi_device_find returns, indeed this can happen,
-
-so scsi_device_find should indeed take a reference to the scsi device and the caller should
-drop it when not needed. That should be done in a separate patch, and it
-might open yet another can of worms.
-While at it, it should be renamed scsi_device_get()
-Maybe keep both scsi_device_find and scsi_device_get(), and let the legacy drivers
-continue using the former one, while make virtio-scsi use the later? 
-
-
-> 
-> > +    g_free(kid);
-> > +}
-> > +
-> >  static void bus_remove_child(BusState *bus, DeviceState *child)
-> >  {
-> >      BusChild *kid;
-> >  
-> > -    QTAILQ_FOREACH(kid, &bus->children, sibling) {
-> > +    rcu_read_lock();
-> 
-> List write under rcu_read_lock().
-I removed the RCU read lock here, under assumption that
-bus_remove_child will be called with BQL held.
-I kept the _RCU version of the list removal, under assumption that
-writer still needs it to avoid race vs readers.
-
-
-> 
-> > @@ -82,7 +93,9 @@ static void bus_add_child(BusState *bus, DeviceState *child)
-> >      kid->child = child;
-> >      object_ref(OBJECT(kid->child));
-> >  
-> > -    QTAILQ_INSERT_HEAD(&bus->children, kid, sibling);
-> > +    rcu_read_lock();
-> > +    QTAILQ_INSERT_HEAD_RCU(&bus->children, kid, sibling);
-> > +    rcu_read_unlock();
-> 
-> List write under rcu_read_lock().
-Same as above.
-
-> 
-> > diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-> > index 472bbd233b..b0f4a35f81 100644
-> > --- a/hw/scsi/virtio-scsi.c
-> > +++ b/hw/scsi/virtio-scsi.c
-> > @@ -367,12 +367,16 @@ static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
-> >      case VIRTIO_SCSI_T_TMF_I_T_NEXUS_RESET:
-> >          target = req->req.tmf.lun[1];
-> >          s->resetting++;
-> > -        QTAILQ_FOREACH(kid, &s->bus.qbus.children, sibling) {
-> > +
-> > +        rcu_read_lock();
-> > +        QTAILQ_FOREACH_RCU(kid, &s->bus.qbus.children, sibling) {
-> 
-> We need a QTAILQ_FOREACH_WITH_RCU_READ_LOCK() macro that combines
-> WITH_RCU_READ_LOCK() and QTAILQ_FOREACH_RCU(). :-)
-Assuming that you are not joking here, I'll add this in the new version of the patches.
-
-> 
-> > diff --git a/include/hw/virtio/virtio-bus.h b/include/hw/virtio/virtio-bus.h
-> > index 38c9399cd4..58733f28e2 100644
-> > --- a/include/hw/virtio/virtio-bus.h
-> > +++ b/include/hw/virtio/virtio-bus.h
-> > @@ -128,8 +128,11 @@ void virtio_bus_set_vdev_config(VirtioBusState *bus, uint8_t *config);
-> >  static inline VirtIODevice *virtio_bus_get_device(VirtioBusState *bus)
-> >  {
-> >      BusState *qbus = &bus->parent_obj;
-> > -    BusChild *kid = QTAILQ_FIRST(&qbus->children);
-> > -    DeviceState *qdev = kid ? kid->child : NULL;
-> > +    BusChild *kid;
-> > +    DeviceState *qdev;
-> > +
-> > +    kid = QTAILQ_FIRST(&qbus->children);
-> 
-> QTAILQ_FIRST_RCU()
-
-This is on purpose - I didn't convert to RCU most of the drivers
-which don't have this race versus iothread after a discussion with Paulo,
-and this is one of them. Virtio bus has only one device
-and it is added right away on initialization and vise-versa of the parent
-(aka virtio-pci/virtio-mmio) bus device.
-
-I will revert the other cosmetic changes in this function which I did when
-I wasn't sure if to use _RCU version here.
-
-Best regards,
-	Maxim Levitsky
-
-
-
-
-
 
 
