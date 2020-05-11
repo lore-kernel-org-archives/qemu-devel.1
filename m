@@ -2,73 +2,87 @@ Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A0DBC47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 09:07:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67C89C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 09:12:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF5902075E
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 09:07:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF5902075E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2D4C62075E
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 09:12:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="fwu1MmCT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D4C62075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY4Pi-0004WA-Rz
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 05:07:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36364)
+	id 1jY4Tw-0007gw-Ab
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 05:12:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37212)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jY4P4-0003dS-Dh
- for qemu-devel@nongnu.org; Mon, 11 May 2020 05:07:14 -0400
-Received: from 20.mo6.mail-out.ovh.net ([178.32.124.17]:35778)
+ (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
+ id 1jY4TD-0006nN-QW; Mon, 11 May 2020 05:11:31 -0400
+Received: from forwardcorp1j.mail.yandex.net ([2a02:6b8:0:1619::183]:54924)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jY4P3-0007Ro-7e
- for qemu-devel@nongnu.org; Mon, 11 May 2020 05:07:14 -0400
-Received: from player728.ha.ovh.net (unknown [10.108.42.192])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id E222920BBEC
- for <qemu-devel@nongnu.org>; Mon, 11 May 2020 11:07:10 +0200 (CEST)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player728.ha.ovh.net (Postfix) with ESMTPSA id BCCFC12223515;
- Mon, 11 May 2020 09:07:06 +0000 (UTC)
-Subject: Re: [PATCH 3/6] target/ppc: Don't initialize some local variables in
- ppc_radix64_xlate()
-To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-References: <158887239173.1564424.16721638327458334129.stgit@bahia.lan>
- <158887241032.1564424.1335205982073200922.stgit@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <7aa5f210-6a03-7e66-ba3c-017704415989@kaod.org>
-Date: Mon, 11 May 2020 11:07:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
+ id 1jY4TA-0000eO-3D; Mon, 11 May 2020 05:11:29 -0400
+Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
+ [IPv6:2a02:6b8:0:1619::162])
+ by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 042FB2E0141;
+ Mon, 11 May 2020 12:11:23 +0300 (MSK)
+Received: from myt4-18a966dbd9be.qloud-c.yandex.net
+ (myt4-18a966dbd9be.qloud-c.yandex.net [2a02:6b8:c00:12ad:0:640:18a9:66db])
+ by mxbackcorp1j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ 8S0lqoiCHp-BJWardsD; Mon, 11 May 2020 12:11:22 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1589188282; bh=7kweTz0B17gGKB30stljIlEMQyqdxeoPLtkTRxZQM4Y=;
+ h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
+ b=fwu1MmCTqbzg4XVMRUVOYVeJMEngzukkqWKM0pr/mPbctY7TaYGYMUzM9wCRIxLSX
+ UsoxRWJaOs2aELBl+6Fp0XYBAOgpOM/2emr8ZwVp+GfFzFycZUyx9uzR7IFF3v7k8N
+ p+AoARMxzIEGEhkUPSG81eS6IGLCC+eTMy9jtEeo=
+Authentication-Results: mxbackcorp1j.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
+ [2a02:6b8:b080:7214::1:7])
+ by myt4-18a966dbd9be.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ 8XfFjgzoVf-BIWmmYJk; Mon, 11 May 2020 12:11:18 +0300
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Client certificate not present)
+Date: Mon, 11 May 2020 12:11:17 +0300
+From: Dima Stepanov <dimastep@yandex-team.ru>
+To: Jason Wang <jasowang@redhat.com>
+Subject: Re: [PATCH v2 4/5] vhost: check vring address before calling unmap
+Message-ID: <20200511091117.GB27319@dimastep-nix>
+References: <cover.1588252861.git.dimastep@yandex-team.ru>
+ <2d4952df2cc246f7421b4b9023a581b22210fc41.1588252862.git.dimastep@yandex-team.ru>
+ <4a03e4aa-3a21-d678-be98-13268343b674@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <158887241032.1564424.1335205982073200922.stgit@bahia.lan>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 1566689724416625491
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrledtgddtjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepfeffvddtudegieefudeugffhjefgieegieegleettdehgfeiieevueeihfegfefgnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjedvkedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-Received-SPF: pass client-ip=178.32.124.17; envelope-from=clg@kaod.org;
- helo=20.mo6.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 05:07:11
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+In-Reply-To: <4a03e4aa-3a21-d678-be98-13268343b674@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
+Received-SPF: pass client-ip=2a02:6b8:0:1619::183;
+ envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1j.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,56 +91,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: fam@euphon.net, kwolf@redhat.com, yc-core@yandex-team.ru,
+ qemu-block@nongnu.org, mst@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, arei.gonglei@huawei.com, raphael.norwitz@nutanix.com,
+ fengli@smartx.com, stefanha@redhat.com, marcandre.lureau@redhat.com,
+ pbonzini@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/7/20 7:26 PM, Greg Kurz wrote:
-> It is the job of the ppc_radix64_get_fully_qualified_addr() function
-> which is called at the beginning of ppc_radix64_xlate() to set both
-> lpid *and* pid. It doesn't buy us anything to initialize them first.
+On Mon, May 11, 2020 at 11:05:58AM +0800, Jason Wang wrote:
 > 
-> Worse, a bug in ppc_radix64_get_fully_qualified_addr(), eg. failing to
-> set either lpid or pid, would be undetectable by static analysis tools
-> like coverity.
+> On 2020/4/30 下午9:36, Dima Stepanov wrote:
+> >Since disconnect can happen at any time during initialization not all
+> >vring buffers (for instance used vring) can be intialized successfully.
+> >If the buffer was not initialized then vhost_memory_unmap call will lead
+> >to SIGSEGV. Add checks for the vring address value before calling unmap.
+> >Also add assert() in the vhost_memory_unmap() routine.
+> >
+> >Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+> >---
+> >  hw/virtio/vhost.c | 27 +++++++++++++++++++++------
+> >  1 file changed, 21 insertions(+), 6 deletions(-)
+> >
+> >diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> >index ddbdc53..3ee50c4 100644
+> >--- a/hw/virtio/vhost.c
+> >+++ b/hw/virtio/vhost.c
+> >@@ -314,6 +314,8 @@ static void vhost_memory_unmap(struct vhost_dev *dev, void *buffer,
+> >                                 hwaddr len, int is_write,
+> >                                 hwaddr access_len)
+> >  {
+> >+    assert(buffer);
+> >+
+> >      if (!vhost_dev_has_iommu(dev)) {
+> >          cpu_physical_memory_unmap(buffer, len, is_write, access_len);
+> >      }
+> >@@ -1132,12 +1134,25 @@ static void vhost_virtqueue_stop(struct vhost_dev *dev,
+> >                                                  vhost_vq_index);
+> >      }
+> >-    vhost_memory_unmap(dev, vq->used, virtio_queue_get_used_size(vdev, idx),
+> >-                       1, virtio_queue_get_used_size(vdev, idx));
+> >-    vhost_memory_unmap(dev, vq->avail, virtio_queue_get_avail_size(vdev, idx),
+> >-                       0, virtio_queue_get_avail_size(vdev, idx));
+> >-    vhost_memory_unmap(dev, vq->desc, virtio_queue_get_desc_size(vdev, idx),
+> >-                       0, virtio_queue_get_desc_size(vdev, idx));
+> >+    /*
+> >+     * Since the vhost-user disconnect can happen during initialization
+> >+     * check if vring was initialized, before making unmap.
+> >+     */
+> >+    if (vq->used) {
+> >+        vhost_memory_unmap(dev, vq->used,
+> >+                           virtio_queue_get_used_size(vdev, idx),
+> >+                           1, virtio_queue_get_used_size(vdev, idx));
+> >+    }
+> >+    if (vq->avail) {
+> >+        vhost_memory_unmap(dev, vq->avail,
+> >+                           virtio_queue_get_avail_size(vdev, idx),
+> >+                           0, virtio_queue_get_avail_size(vdev, idx));
+> >+    }
+> >+    if (vq->desc) {
+> >+        vhost_memory_unmap(dev, vq->desc,
+> >+                           virtio_queue_get_desc_size(vdev, idx),
+> >+                           0, virtio_queue_get_desc_size(vdev, idx));
+> >+    }
 > 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  target/ppc/mmu-radix64.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
-> index c76879f65b78..5e2d912ee346 100644
-> --- a/target/ppc/mmu-radix64.c
-> +++ b/target/ppc/mmu-radix64.c
-> @@ -433,7 +433,7 @@ static int ppc_radix64_xlate(PowerPCCPU *cpu, vaddr eaddr, int rwx,
->                               bool cause_excp)
->  {
->      CPUPPCState *env = &cpu->env;
-> -    uint64_t lpid = 0, pid = 0;
-> +    uint64_t lpid, pid;
->      ppc_v3_pate_t pate;
->      int psize, prot;
->      hwaddr g_raddr;
+> Any reason not checking hdev->started instead? vhost_dev_start() will set it
+> to true if virtqueues were correctly mapped.
 > 
+> Thanks
+Well i see it a little bit different:
+ - vhost_dev_start() sets hdev->started to true before starting
+   virtqueues
+ - vhost_virtqueue_start() maps all the memory
+If we hit the vhost disconnect at the start of the
+vhost_virtqueue_start(), for instance for this call:
+  r = dev->vhost_ops->vhost_set_vring_base(dev, &state);
+Then we will call vhost_user_blk_disconnect:
+  vhost_user_blk_disconnect()->
+    vhost_user_blk_stop()->
+      vhost_dev_stop()->
+        vhost_virtqueue_stop()
+As a result we will come in this routine with the hdev->started still
+set to true, but if used/avail/desc fields still uninitialized and set
+to 0.
 
-I am seeing this failure with gcc version 9.3.1 20200408 (Red Hat 9.3.1-2) (GCC) 
-
-target/ppc/mmu-radix64.c: In function ‘ppc_radix64_xlate’:
-target/ppc/mmu-radix64.c:314:12: error: ‘pid’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
-  314 |     offset = pid * sizeof(struct prtb_entry);
-      |     ~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-target/ppc/mmu-radix64.c:439:20: note: ‘pid’ was declared here
-  439 |     uint64_t lpid, pid;
-      |                    ^~~
-target/ppc/mmu-radix64.c:458:14: error: ‘lpid’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
-  458 |         if (!ppc64_v3_get_pate(cpu, lpid, &pate)) {
-      |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  CC      ppc64-softmmu/target/ppc/fpu_helper.o
-
-
-This seems like a compiler optimization issue.
-
-C.
+> 
+> 
+> >  }
+> >  static void vhost_eventfd_add(MemoryListener *listener,
+> 
 
