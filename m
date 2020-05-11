@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2A71C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 13:52:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 401AFC54E8D
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 13:54:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E728206F5
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 13:52:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 07BB4206D9
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 13:54:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gKlFOUqC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E728206F5
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CvMqB7Jq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07BB4206D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY8r9-0001li-PG
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 09:52:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49192)
+	id 1jY8sa-0004Dg-6e
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 09:54:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49106)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jY8a6-0002mg-AU
- for qemu-devel@nongnu.org; Mon, 11 May 2020 09:34:54 -0400
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:52644)
+ id 1jY8Zw-0002Ua-Fy
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 09:34:44 -0400
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:34985)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jY8a4-0007HD-DT
- for qemu-devel@nongnu.org; Mon, 11 May 2020 09:34:53 -0400
-Received: by mail-wm1-x334.google.com with SMTP id m24so8465520wml.2
- for <qemu-devel@nongnu.org>; Mon, 11 May 2020 06:34:51 -0700 (PDT)
+ id 1jY8Zu-0007CV-Uk
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 09:34:44 -0400
+Received: by mail-wr1-x433.google.com with SMTP id j5so11006254wrq.2
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 06:34:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=HJcUIwZpjvrR7bbXwOVeL69W3rBNs8Bm6fdH4rxWxc4=;
- b=gKlFOUqCMkSEqP4sZkRr1OJ9jiz8gI1iZOODUYhIbpBSPTMdS78iFdLUxepu83x72B
- 0zi4PVB+U9HNGCIO/oM/cgnxc6D9J3Xt/DkEX5guf9LC5IXHMNCyqW9YPSzePFECABUM
- PyZpkdsVW3sLsJaxetU12qgmM2d0pFgPFf4s54807MYBPHRIxIMrdN+F+qGTePmjwETU
- C20g8f1fK/ldCFADT0ogwSYRPhkyegJldYsRAxk1KHPS+ePXK4EXvIYL+o7mrEq2wQz0
- c8K8nPbi83tOq2zoaTFRerdlcVkJVkMDOKs3XsY2Jkk/PkvbYEJ4Mf9s2rRLJeelIG9k
- U7gQ==
+ bh=5udJ6NsXumn6EzqY46EHYT0fqNHGOGDE5W29huFq8fk=;
+ b=CvMqB7JqbkqUCzeBm0imbb4NlQ7R2W0OFtMDjNovHmi/AwZDJrspuNVxCDU6Mg+zJH
+ nJvT2BKhQdkqyCpby0Es10sFgJedmuMVY2ZmvoQKv3c0Inlm/VZhrDtOu9+NYbvm05Or
+ rn8e2OGTY73tXvs0grgZpivuijScaEidisD2okNxl1f8ZSU82xL8RROIllQ0EmNgXkaU
+ eykY89/So35ZYH0k9my6Qxbo447f73t6tQgCd0tWSHJVl3YrNAhgDJqG63SX8S+0Jh8T
+ ZXADDtzU03iOtrVna29KmP8rHGgILs0mqf8SploThMxeXGfyBJ2sRKH55b4gPZUGUhmA
+ VsFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=HJcUIwZpjvrR7bbXwOVeL69W3rBNs8Bm6fdH4rxWxc4=;
- b=LWCFuKlbezUfI5/14y48uSCyP8mp7FAgejJsfIehnBn7nuinkWnU3jwlf3bxyGJl4d
- Q5XSAGlPF7nrvhOR5JQXIkbwnpwmhzDpOzpDFFl+Xg29DNrrEU27dFn7yL9Wt+EyzOad
- DCTr7O4NotZPJQRBm+Asmd8DcnBOUMJpDavqMRvslvZGhAwzOp8gZ+8+XYyDSFy3U14E
- kpQNN3Z6H492a7700BW3RbqDP0MiFrhIAv8MIV8x4v+dGTtBf5C4yXJGcE7Kqn5FBe8g
- UvmDbXYgaVG9IfklqYMDQdfPIw9VrjalKfZY83cvV3IFfOcNOH2+35gPJURADVsOPCVI
- 5Pxg==
-X-Gm-Message-State: AGi0PuaSGmYDS0L2eHgji5aED4gtc/HPGYn+V/ap7wiC3WZa5NVVsYdq
- kn/+h6oJ4FKRVRmkY+uzM7356j5nxhIj5A==
-X-Google-Smtp-Source: APiQypK6ZFYnwh2URAvPS7Wg4zxLlnLAypRM7+2XEew++phF5WEOhYcdZzu9WyAkGz08OgWa6bMvcA==
-X-Received: by 2002:a7b:c4c9:: with SMTP id g9mr31457324wmk.171.1589204090468; 
- Mon, 11 May 2020 06:34:50 -0700 (PDT)
+ bh=5udJ6NsXumn6EzqY46EHYT0fqNHGOGDE5W29huFq8fk=;
+ b=ieqiJUWvD+RF2TG+R/c5Fii4dYIVkWvO4TwVgWQMenzkkJWnogH8/EsAu8va2B4OTp
+ 5f9Lj+hPx/glQbAbv93DOGWfySYHiNSr+nNd3xQySxRCTae3J9gpq+zJVR2MA4jNfXHJ
+ ABCTG5iiUBbJ/obP1jhhastVEd+RMmUno/y6g3TELPjlgcVwRgL+W7KBmqYUYTRfvMRI
+ z3Fck114iEvuxeUrsh3BmRVEiZFywFBEPoJ1dtDEDuXJZuwOWhiRmlYm15QC425MXXUZ
+ N5JkFDzMYwNYQJoe1Y99Z/YwR9hsxX7sPTYdIYYf4FfwLakazzxNhByQxH9HeVGR+JxS
+ KeDA==
+X-Gm-Message-State: AGi0PuYhZpaIZHQ+WdAAzWck3Mfkx0gpgc318viZWB1InmXiCzs7GU/t
+ tVtzyMRgWsGxp3vfGD6jaIW10YKSCSkTsQ==
+X-Google-Smtp-Source: APiQypK3OGk+nhW3h9m+7w0h4uAfwb6hl0byUry5zAsbD26qTd5nrCNjVTl0gAzcoLp/e7/mqQ+TmA==
+X-Received: by 2002:a5d:68cb:: with SMTP id p11mr18665544wrw.349.1589204080830; 
+ Mon, 11 May 2020 06:34:40 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id m3sm2154818wrn.96.2020.05.11.06.34.49
+ by smtp.gmail.com with ESMTPSA id m3sm2154818wrn.96.2020.05.11.06.34.39
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 11 May 2020 06:34:49 -0700 (PDT)
+ Mon, 11 May 2020 06:34:40 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 34/34] target/arm: Fix tcg_gen_gvec_dup_imm vs DUP (indexed)
-Date: Mon, 11 May 2020 14:34:05 +0100
-Message-Id: <20200511133405.5275-35-peter.maydell@linaro.org>
+Subject: [PULL 26/34] target/arm: Remove sve_memopidx
+Date: Mon, 11 May 2020 14:33:57 +0100
+Message-Id: <20200511133405.5275-27-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200511133405.5275-1-peter.maydell@linaro.org>
 References: <20200511133405.5275-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::334;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x334.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::433;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x433.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,37 +106,150 @@ Sender: "Qemu-devel"
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-DUP (indexed) can duplicate 128-bit elements, so using esz
-unconditionally can assert in tcg_gen_gvec_dup_imm.
+None of the sve helpers use TCGMemOpIdx any longer, so we can
+stop passing it.
 
-Fixes: 8711e71f9cbb
-Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Message-id: 20200507172352.15418-5-richard.henderson@linaro.org
+Message-id: 20200508154359.7494-20-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate-sve.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ target/arm/internals.h     |  5 -----
+ target/arm/sve_helper.c    | 14 +++++++-------
+ target/arm/translate-sve.c | 17 +++--------------
+ 3 files changed, 10 insertions(+), 26 deletions(-)
 
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index e633aff36ef..a833e3941d3 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -979,11 +979,6 @@ static inline int arm_num_ctx_cmps(ARMCPU *cpu)
+     }
+ }
+ 
+-/* Note make_memop_idx reserves 4 bits for mmu_idx, and MO_BSWAP is bit 3.
+- * Thus a TCGMemOpIdx, without any MO_ALIGN bits, fits in 8 bits.
+- */
+-#define MEMOPIDX_SHIFT  8
+-
+ /**
+  * v7m_using_psp: Return true if using process stack pointer
+  * Return true if the CPU is currently using the process stack
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index f1870aabc2f..116d535fa5f 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -4440,7 +4440,7 @@ void sve_ldN_r(CPUARMState *env, uint64_t *vg, const target_ulong addr,
+                sve_ldst1_host_fn *host_fn,
+                sve_ldst1_tlb_fn *tlb_fn)
+ {
+-    const unsigned rd = extract32(desc, SIMD_DATA_SHIFT + MEMOPIDX_SHIFT, 5);
++    const unsigned rd = simd_data(desc);
+     const intptr_t reg_max = simd_oprsz(desc);
+     intptr_t reg_off, reg_last, mem_off;
+     SVEContLdSt info;
+@@ -4696,7 +4696,7 @@ void sve_ldnfff1_r(CPUARMState *env, void *vg, const target_ulong addr,
+                    sve_ldst1_host_fn *host_fn,
+                    sve_ldst1_tlb_fn *tlb_fn)
+ {
+-    const unsigned rd = extract32(desc, SIMD_DATA_SHIFT + MEMOPIDX_SHIFT, 5);
++    const unsigned rd = simd_data(desc);
+     void *vd = &env->vfp.zregs[rd];
+     const intptr_t reg_max = simd_oprsz(desc);
+     intptr_t reg_off, mem_off, reg_last;
+@@ -4925,7 +4925,7 @@ void sve_stN_r(CPUARMState *env, uint64_t *vg, target_ulong addr, uint32_t desc,
+                sve_ldst1_host_fn *host_fn,
+                sve_ldst1_tlb_fn *tlb_fn)
+ {
+-    const unsigned rd = extract32(desc, SIMD_DATA_SHIFT + MEMOPIDX_SHIFT, 5);
++    const unsigned rd = simd_data(desc);
+     const intptr_t reg_max = simd_oprsz(desc);
+     intptr_t reg_off, reg_last, mem_off;
+     SVEContLdSt info;
+@@ -5131,9 +5131,9 @@ void sve_ld1_z(CPUARMState *env, void *vd, uint64_t *vg, void *vm,
+                sve_ldst1_host_fn *host_fn,
+                sve_ldst1_tlb_fn *tlb_fn)
+ {
+-    const int scale = extract32(desc, SIMD_DATA_SHIFT + MEMOPIDX_SHIFT, 2);
+     const int mmu_idx = cpu_mmu_index(env, false);
+     const intptr_t reg_max = simd_oprsz(desc);
++    const int scale = simd_data(desc);
+     ARMVectorReg scratch;
+     intptr_t reg_off;
+     SVEHostPage info, info2;
+@@ -5276,10 +5276,10 @@ void sve_ldff1_z(CPUARMState *env, void *vd, uint64_t *vg, void *vm,
+                  sve_ldst1_tlb_fn *tlb_fn)
+ {
+     const int mmu_idx = cpu_mmu_index(env, false);
+-    const int scale = extract32(desc, SIMD_DATA_SHIFT + MEMOPIDX_SHIFT, 2);
++    const intptr_t reg_max = simd_oprsz(desc);
++    const int scale = simd_data(desc);
+     const int esize = 1 << esz;
+     const int msize = 1 << msz;
+-    const intptr_t reg_max = simd_oprsz(desc);
+     intptr_t reg_off;
+     SVEHostPage info;
+     target_ulong addr, in_page;
+@@ -5430,9 +5430,9 @@ void sve_st1_z(CPUARMState *env, void *vd, uint64_t *vg, void *vm,
+                sve_ldst1_host_fn *host_fn,
+                sve_ldst1_tlb_fn *tlb_fn)
+ {
+-    const int scale = extract32(desc, SIMD_DATA_SHIFT + MEMOPIDX_SHIFT, 2);
+     const int mmu_idx = cpu_mmu_index(env, false);
+     const intptr_t reg_max = simd_oprsz(desc);
++    const int scale = simd_data(desc);
+     void *host[ARM_MAX_VQ * 4];
+     intptr_t reg_off, i;
+     SVEHostPage info, info2;
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 8398c323624..ac7b3119e5f 100644
+index 6c8bda4e4cc..36816aafaf6 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -2044,7 +2044,11 @@ static bool trans_DUP_x(DisasContext *s, arg_DUP_x *a)
-             unsigned nofs = vec_reg_offset(s, a->rn, index, esz);
-             tcg_gen_gvec_dup_mem(esz, dofs, nofs, vsz, vsz);
-         } else {
--            tcg_gen_gvec_dup_imm(esz, dofs, vsz, vsz, 0);
-+            /*
-+             * While dup_mem handles 128-bit elements, dup_imm does not.
-+             * Thankfully element size doesn't matter for splatting zero.
-+             */
-+            tcg_gen_gvec_dup_imm(MO_64, dofs, vsz, vsz, 0);
-         }
-     }
-     return true;
+@@ -4582,11 +4582,6 @@ static const uint8_t dtype_esz[16] = {
+     3, 2, 1, 3
+ };
+ 
+-static TCGMemOpIdx sve_memopidx(DisasContext *s, int dtype)
+-{
+-    return make_memop_idx(s->be_data | dtype_mop[dtype], get_mem_index(s));
+-}
+-
+ static void do_mem_zpa(DisasContext *s, int zt, int pg, TCGv_i64 addr,
+                        int dtype, gen_helper_gvec_mem *fn)
+ {
+@@ -4599,9 +4594,7 @@ static void do_mem_zpa(DisasContext *s, int zt, int pg, TCGv_i64 addr,
+      * registers as pointers, so encode the regno into the data field.
+      * For consistency, do this even for LD1.
+      */
+-    desc = sve_memopidx(s, dtype);
+-    desc |= zt << MEMOPIDX_SHIFT;
+-    desc = simd_desc(vsz, vsz, desc);
++    desc = simd_desc(vsz, vsz, zt);
+     t_desc = tcg_const_i32(desc);
+     t_pg = tcg_temp_new_ptr();
+ 
+@@ -4833,9 +4826,7 @@ static void do_ldrq(DisasContext *s, int zt, int pg, TCGv_i64 addr, int msz)
+     int desc, poff;
+ 
+     /* Load the first quadword using the normal predicated load helpers.  */
+-    desc = sve_memopidx(s, msz_dtype(s, msz));
+-    desc |= zt << MEMOPIDX_SHIFT;
+-    desc = simd_desc(16, 16, desc);
++    desc = simd_desc(16, 16, zt);
+     t_desc = tcg_const_i32(desc);
+ 
+     poff = pred_full_reg_offset(s, pg);
+@@ -5064,9 +5055,7 @@ static void do_mem_zpz(DisasContext *s, int zt, int pg, int zm,
+     TCGv_i32 t_desc;
+     int desc;
+ 
+-    desc = sve_memopidx(s, msz_dtype(s, msz));
+-    desc |= scale << MEMOPIDX_SHIFT;
+-    desc = simd_desc(vsz, vsz, desc);
++    desc = simd_desc(vsz, vsz, scale);
+     t_desc = tcg_const_i32(desc);
+ 
+     tcg_gen_addi_ptr(t_pg, cpu_env, pred_full_reg_offset(s, pg));
 -- 
 2.20.1
 
