@@ -7,59 +7,60 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 898F7C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 09:58:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CC4EC47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 09:59:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5525D207DD
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 09:58:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CB7BE207DD
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 09:59:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TsC5gwo5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5525D207DD
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bvbHyV8Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB7BE207DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jY5CG-0005x3-IH
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 05:58:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43858)
+	id 1jY5DC-0007HD-WE
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 05:59:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44006)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jY5BW-0004n6-2i
- for qemu-devel@nongnu.org; Mon, 11 May 2020 05:57:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55044
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jY5CN-0006Og-O2
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 05:58:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52982
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jY5BU-0005cv-Ae
- for qemu-devel@nongnu.org; Mon, 11 May 2020 05:57:17 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jY5CM-0005mK-9a
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 05:58:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589191035;
+ s=mimecast20190719; t=1589191089;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=LlhRH0nNaQzZoRjFY0ytvrJDl+/Gm/wchCeLvqa20lM=;
- b=TsC5gwo5BXtp80G9vu824/YepWwuDVHDIchj0xabdZV9RHlkEW33Lw+Ah+FZoR3jI1nJ+s
- T+c8BQLIBPqoDisAxJEh9FJExpYqm68Ayy2rC4kXJzpUbn724gppsBY6P98neRQblOO5YO
- Yk9j984SZbKJn0iFmswdk9TDpBuxySA=
+ bh=x7IQrlM7ZIF+AxSxY7HWWAWhV6jBh1zjj352IW9yPSQ=;
+ b=bvbHyV8Qc2t63jRi6eUzJPKsZu31IcZ7tWjNL6HIOYnyYeoSZLMKk6SmouJyOGQ4YqIGnL
+ GGZXniyH7mvmoHIIh6m1krRrccuD42gT15iE+wECE4GdO+rQPK+SYR59g4crPwq1z9CmBq
+ cbMRdvEC3P0nIkP/hJyIjMDYM3q2zIM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-339-SvP_IWOBMBadWHOtHNv79w-1; Mon, 11 May 2020 05:57:13 -0400
-X-MC-Unique: SvP_IWOBMBadWHOtHNv79w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-56-mDg1Anh1OsixdQvdhumxVg-1; Mon, 11 May 2020 05:58:07 -0400
+X-MC-Unique: mDg1Anh1OsixdQvdhumxVg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F8AB8014C0;
- Mon, 11 May 2020 09:57:12 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0557B805721;
+ Mon, 11 May 2020 09:58:07 +0000 (UTC)
 Received: from [10.36.114.224] (ovpn-114-224.ams2.redhat.com [10.36.114.224])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DAE3060C05;
- Mon, 11 May 2020 09:57:11 +0000 (UTC)
-Subject: Re: [PATCH 1/3] tcg/s390: Change FACILITY representation
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5380D6606E;
+ Mon, 11 May 2020 09:58:06 +0000 (UTC)
+Subject: Re: [PATCH 2/3] tcg/s390: Merge TCG_AREG0 and TCG_REG_CALL_STACK into
+ TCGReg
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20200508155745.8223-1-richard.henderson@linaro.org>
- <20200508155745.8223-2-richard.henderson@linaro.org>
+ <20200508155745.8223-3-richard.henderson@linaro.org>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -105,22 +106,22 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <149809ef-baee-b254-b228-39affba92373@redhat.com>
-Date: Mon, 11 May 2020 11:57:11 +0200
+Message-ID: <e305743f-1ee9-d739-cc41-26ce9b436344@redhat.com>
+Date: Mon, 11 May 2020 11:58:05 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200508155745.8223-2-richard.henderson@linaro.org>
+In-Reply-To: <20200508155745.8223-3-richard.henderson@linaro.org>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=david@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 02:55:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 00:05:06
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -145,49 +146,67 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 08.05.20 17:57, Richard Henderson wrote:
-> We will shortly need to be able to check facilities
-> beyond the first 64.  Instead of explicitly masking
-> against s390_facilities, create a FACILITY macro
-> that indexes an array.
+> They are rightly values in the same enumeration.
 > 
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  tcg/s390/tcg-target.h     | 29 ++++++++-------
->  tcg/s390/tcg-target.inc.c | 74 +++++++++++++++++++--------------------
->  2 files changed, 52 insertions(+), 51 deletions(-)
+>  tcg/s390/tcg-target.h | 28 +++++++---------------------
+>  1 file changed, 7 insertions(+), 21 deletions(-)
 > 
 > diff --git a/tcg/s390/tcg-target.h b/tcg/s390/tcg-target.h
-> index 07accabbd1..7ca48457ff 100644
+> index 7ca48457ff..1e67c90ed2 100644
 > --- a/tcg/s390/tcg-target.h
 > +++ b/tcg/s390/tcg-target.h
-> @@ -52,16 +52,19 @@ typedef enum TCGReg {
->  /* A list of relevant facilities used by this translator.  Some of these
->     are required for proper operation, and these are checked at startup.  */
+> @@ -29,22 +29,13 @@
+>  #define TCG_TARGET_TLB_DISPLACEMENT_BITS 19
 >  
-> -#define FACILITY_ZARCH_ACTIVE         (1ULL << (63 - 2))
-> -#define FACILITY_LONG_DISP            (1ULL << (63 - 18))
-> -#define FACILITY_EXT_IMM              (1ULL << (63 - 21))
-> -#define FACILITY_GEN_INST_EXT         (1ULL << (63 - 34))
-> -#define FACILITY_LOAD_ON_COND         (1ULL << (63 - 45))
-> +#define FACILITY_ZARCH_ACTIVE         2
-> +#define FACILITY_LONG_DISP            18
-> +#define FACILITY_EXT_IMM              21
-> +#define FACILITY_GEN_INST_EXT         34
-> +#define FACILITY_LOAD_ON_COND         45
->  #define FACILITY_FAST_BCR_SER         FACILITY_LOAD_ON_COND
->  #define FACILITY_DISTINCT_OPS         FACILITY_LOAD_ON_COND
-> -#define FACILITY_LOAD_ON_COND2        (1ULL << (63 - 53))
-> +#define FACILITY_LOAD_ON_COND2        53
->  
-> -extern uint64_t s390_facilities;
-> +extern uint64_t s390_facilities[1];
+>  typedef enum TCGReg {
+> -    TCG_REG_R0 = 0,
+> -    TCG_REG_R1,
+> -    TCG_REG_R2,
+> -    TCG_REG_R3,
+> -    TCG_REG_R4,
+> -    TCG_REG_R5,
+> -    TCG_REG_R6,
+> -    TCG_REG_R7,
+> -    TCG_REG_R8,
+> -    TCG_REG_R9,
+> -    TCG_REG_R10,
+> -    TCG_REG_R11,
+> -    TCG_REG_R12,
+> -    TCG_REG_R13,
+> -    TCG_REG_R14,
+> -    TCG_REG_R15
+> +    TCG_REG_R0,  TCG_REG_R1,  TCG_REG_R2,  TCG_REG_R3,
+> +    TCG_REG_R4,  TCG_REG_R5,  TCG_REG_R6,  TCG_REG_R7,
+> +    TCG_REG_R8,  TCG_REG_R9,  TCG_REG_R10, TCG_REG_R11,
+> +    TCG_REG_R12, TCG_REG_R13, TCG_REG_R14, TCG_REG_R15,
 > +
-> +#define FACILITY(X) \
-> +    ((s390_facilities[FACILITY_##X / 64] >> (63 - FACILITY_##X % 64)) & 1)
-
-I'd have named this "HAVE_FACILITY" or similar.
-
-Apart from that, looks good
+> +    TCG_AREG0 = TCG_REG_R10,
+> +    TCG_REG_CALL_STACK = TCG_REG_R15
+>  } TCGReg;
+>  
+>  #define TCG_TARGET_NB_REGS 16
+> @@ -135,7 +126,6 @@ extern uint64_t s390_facilities[1];
+>  #define TCG_TARGET_HAS_mulsh_i64      0
+>  
+>  /* used for function call generation */
+> -#define TCG_REG_CALL_STACK		TCG_REG_R15
+>  #define TCG_TARGET_STACK_ALIGN		8
+>  #define TCG_TARGET_CALL_STACK_OFFSET	160
+>  
+> @@ -144,10 +134,6 @@ extern uint64_t s390_facilities[1];
+>  
+>  #define TCG_TARGET_DEFAULT_MO (TCG_MO_ALL & ~TCG_MO_ST_LD)
+>  
+> -enum {
+> -    TCG_AREG0 = TCG_REG_R10,
+> -};
+> -
+>  static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
+>  {
+>  }
+> 
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
 
