@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54094C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 17:33:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B4C9C47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 17:42:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 238AB2070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 17:33:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 238AB2070B
+	by mail.kernel.org (Postfix) with ESMTPS id E502B2070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 17:42:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E502B2070B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYCIn-0008Ug-9g
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 13:33:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35530)
+	id 1jYCRL-0005cD-1C
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 13:42:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36520)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jYCGG-0006sa-Qm
- for qemu-devel@nongnu.org; Mon, 11 May 2020 13:30:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45308)
+ id 1jYCQ6-0004Zr-Vs
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 13:40:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47770)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jYCGF-0000xV-9Q
- for qemu-devel@nongnu.org; Mon, 11 May 2020 13:30:40 -0400
+ id 1jYCQ4-0005MD-Lf
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 13:40:50 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jYCGD-0002ew-5u
- for <qemu-devel@nongnu.org>; Mon, 11 May 2020 17:30:37 +0000
+ id 1jYCQ2-0003zz-FJ
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 17:40:46 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 27F272E8105
- for <qemu-devel@nongnu.org>; Mon, 11 May 2020 17:30:37 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 72E052E8105
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 17:40:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 11 May 2020 17:23:22 -0000
-From: Alexander Bulekov <1878054@bugs.launchpad.net>
+Date: Mon, 11 May 2020 17:32:25 -0000
+From: Alexander Bulekov <1878057@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
@@ -52,15 +52,15 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: a1xndr
 X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
 X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
-Message-Id: <158921780313.11557.11335648957795976711.malonedeb@wampee.canonical.com>
-Subject: [Bug 1878054] [NEW] Hang with high CPU usage in sdhci_data_transfer
+Message-Id: <158921834595.12757.16112597546001644574.malonedeb@wampee.canonical.com>
+Subject: [Bug 1878057] [NEW] null-ptr dereference in megasas_command_complete
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 5ab1ed8a6d417101c99e3d02ca9310c1a7201c84
+X-Launchpad-Hash: 0e97b70dccc25d6da0b0fa6f76f8387fd173415d
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 11:35:34
@@ -83,7 +83,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1878054 <1878054@bugs.launchpad.net>
+Reply-To: Bug 1878057 <1878057@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -91,85 +91,76 @@ Sender: "Qemu-devel"
 Public bug reported:
 
 Hello,
-While fuzzing, I found an input that causes QEMU to hang with 100% CPU usag=
-e.
-I have waited several minutes, and QEMU is still unresponsive. Using gdb, It
-appears that it is stuck in an sdhci_data_transfer:
+While fuzzing, I found an input that triggers a null-pointer dereference in
+megasas_command_complete:
 
-#0   memory_region_access_valid (mr=3D<optimized out>, addr=3D0x10284920, s=
-ize=3D<optimized out>, is_write=3D0xff, attrs=3D...) at /home/alxndr/Develo=
-pment/qemu/memory.c:1378
-#1   memory_region_dispatch_write (mr=3D<optimized out>, addr=3D<optimized =
-out>, data=3D<optimized out>, op=3DMO_32, attrs=3D...) at /home/alxndr/Deve=
-lopment/qemu/memory.c:1463
-#2   flatview_write_continue (fv=3D<optimized out>, addr=3D0x10284920, attr=
-s=3D..., ptr=3D<optimized out>, len=3D0xb7, addr1=3D0x5555582798e0, l=3D<op=
-timized out>, mr=3D0x5555582798e0 <io_mem_unassigned>) at /home/alxndr/Deve=
-lopment/qemu/exec.c:3137
-#3   flatview_write (fv=3D0x606000045da0, addr=3D<optimized out>, attrs=3D.=
-.., buf=3D<optimized out>, len=3D<optimized out>) at /home/alxndr/Developme=
-nt/qemu/exec.c:3177
-#4   address_space_write (as=3D<optimized out>, addr=3D<optimized out>, att=
-rs=3D..., buf=3D0xaaaab04f325, len=3D0x4) at /home/alxndr/Development/qemu/=
-exec.c:3268
-#5   address_space_rw (as=3D0x5555572509ac <unassigned_mem_ops+44>, addr=3D=
-0x5555582798e0, attrs=3D..., attrs@entry=3D..., buf=3D0xaaaab04f325, len=3D=
-0x4, is_write=3D0xb8, is_write@entry=3D0x1) at
-/home/alxndr/Development/qemu/exec.c:3278
-#6   dma_memory_rw_relaxed (as=3D0x5555572509ac <unassigned_mem_ops+44>, ad=
-dr=3D0x5555582798e0, buf=3D0xaaaab04f325, len=3D0x4, dir=3DDMA_DIRECTION_FR=
-OM_DEVICE) at /home/alxndr/Development/qemu/include/sysemu/dma.h:87
-#7   dma_memory_rw (as=3D0x5555572509ac <unassigned_mem_ops+44>, addr=3D0x5=
-555582798e0, buf=3D0xaaaab04f325, len=3D0x4, dir=3DDMA_DIRECTION_FROM_DEVIC=
-E) at /home/alxndr/Development/qemu/include/sysemu/dma.h:110
-#8   dma_memory_write (as=3D0x5555572509ac <unassigned_mem_ops+44>, addr=3D=
-0x5555582798e0, buf=3D0xaaaab04f325, len=3D0x4) at /home/alxndr/Development=
-/qemu/include/sysemu/dma.h:122
-#9   sdhci_sdma_transfer_multi_blocks (s=3D<optimized out>) at /home/alxndr=
-/Development/qemu/hw/sd/sdhci.c:618
-#10  sdhci_data_transfer (opaque=3D0x61e000021080) at /home/alxndr/Developm=
-ent/qemu/hw/sd/sdhci.c:891
-#11  sdhci_send_command (s=3D0x61e000021080) at /home/alxndr/Development/qe=
-mu/hw/sd/sdhci.c:364
-#12  sdhci_write (opaque=3D<optimized out>, offset=3D0xc, val=3D<optimized =
-out>, size=3D<optimized out>) at /home/alxndr/Development/qemu/hw/sd/sdhci.=
-c:1158
-#13  memory_region_write_accessor (mr=3D<optimized out>, addr=3D<optimized =
-out>, value=3D<optimized out>, size=3D<optimized out>, shift=3D<optimized o=
-ut>, mask=3D<optimized out>, attrs=3D...) at
-/home/alxndr/Development/qemu/memory.c:483
-#14  access_with_adjusted_size (addr=3D<optimized out>, value=3D<optimized =
-out>, size=3D<optimized out>, access_size_min=3D<optimized out>, access_siz=
-e_max=3D<optimized out>, access_fn=3D<optimized out>, mr=3D0x61e0000219f0, =
-attrs=3D...) at /home/alxndr/Development/qemu/memory.c:544
-#15  memory_region_dispatch_write (mr=3D<optimized out>, addr=3D<optimized =
-out>, data=3D0x1ffe0ff, op=3D<optimized out>, attrs=3D...) at /home/alxndr/=
-Development/qemu/memory.c:1476
-#16  flatview_write_continue (fv=3D<optimized out>, addr=3D0xe106800c, attr=
-s=3D..., ptr=3D<optimized out>, len=3D0xff3, addr1=3D0x5555582798e0, l=3D<o=
-ptimized out>, mr=3D0x61e0000219f0) at /home/alxndr/Development/qemu/exec.c=
-:3137
-#17  flatview_write (fv=3D0x606000045da0, addr=3D<optimized out>, attrs=3D.=
-.., buf=3D<optimized out>, len=3D<optimized out>) at /home/alxndr/Developme=
-nt/qemu/exec.c:3177
-#18  address_space_write (as=3D<optimized out>, addr=3D<optimized out>, att=
-rs=3D..., attrs@entry=3D..., buf=3D0xaaaab04f325, buf@entry=3D0x62100008ad0=
-0, len=3D0x4) at /home/alxndr/Development/qemu/exec.c:3268
-#19  qtest_process_command (chr=3D<optimized out>, chr@entry=3D0x55555827c0=
-40 <qtest_chr>, words=3D<optimized out>) at /home/alxndr/Development/qemu/q=
-test.c:567
-#20  qtest_process_inbuf (chr=3D0x55555827c040 <qtest_chr>, inbuf=3D0x61900=
-000f640) at /home/alxndr/Development/qemu/qtest.c:710
+=3D=3D14959=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x0000000=
+00003 (pc 0x55b1d11b4df1 bp 0x7ffeb55ca450 sp 0x7ffeb55ca1e0 T0)
+=3D=3D14959=3D=3DThe signal is caused by a WRITE memory access.
+=3D=3D14959=3D=3DHint: address points to the zero page.
+    #0 0x55b1d11b4df1 in megasas_command_complete /home/alxndr/Development/=
+qemu/hw/scsi/megasas.c:1877:40
+    #1 0x55b1d11759ec in scsi_req_complete /home/alxndr/Development/qemu/hw=
+/scsi/scsi-bus.c:1430:5
+    #2 0x55b1d115c98f in scsi_aio_complete /home/alxndr/Development/qemu/hw=
+/scsi/scsi-disk.c:216:5
+    #3 0x55b1d151c638 in blk_aio_complete /home/alxndr/Development/qemu/blo=
+ck/block-backend.c:1375:9
+    #4 0x55b1d151c638 in blk_aio_complete_bh /home/alxndr/Development/qemu/=
+block/block-backend.c:1385:5
+    #5 0x55b1d16f3a5b in aio_bh_call /home/alxndr/Development/qemu/util/asy=
+nc.c:136:5
+    #6 0x55b1d16f3a5b in aio_bh_poll /home/alxndr/Development/qemu/util/asy=
+nc.c:164:13
+    #7 0x55b1d16fe43e in aio_dispatch /home/alxndr/Development/qemu/util/ai=
+o-posix.c:380:5
+    #8 0x55b1d16f54fa in aio_ctx_dispatch /home/alxndr/Development/qemu/uti=
+l/async.c:306:5
+    #9 0x7f47937c89ed in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu=
+/libglib-2.0.so.0+0x4e9ed)
+    #10 0x55b1d16fbef4 in glib_pollfds_poll /home/alxndr/Development/qemu/u=
+til/main-loop.c:219:9
+    #11 0x55b1d16fbef4 in os_host_main_loop_wait /home/alxndr/Development/q=
+emu/util/main-loop.c:242:5
+    #12 0x55b1d16fbef4 in main_loop_wait /home/alxndr/Development/qemu/util=
+/main-loop.c:518:11
+    #13 0x55b1d0cd16a6 in qemu_main_loop /home/alxndr/Development/qemu/soft=
+mmu/vl.c:1664:9
+    #14 0x55b1d1608dca in main /home/alxndr/Development/qemu/softmmu/main.c=
+:49:5
+    #15 0x7f4792378e0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.30/=
+csu/../csu/libc-start.c:308:16
+    #16 0x55b1d091d7b9 in _start (/home/alxndr/Development/qemu/build/i386-=
+softmmu/qemu-system-i386+0x8f47b9)
 
+I can reproduce it in qemu 5.0 built with using:
+cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -M pc-q=
+35-5.0 -no-shutdown -M q35 -device megasas -device scsi-cd,drive=3Dnull0 -b=
+lockdev driver=3Dnull-co,read-zeroes=3Don,node-name=3Dnull0 -nographic -qte=
+st stdio -monitor none -serial none
+outl 0xcf8 0x80001814
+outl 0xcfc 0xc021
+outl 0xcf8 0x80001818
+outl 0xcf8 0x80001804
+outw 0xcfc 0x7
+outl 0xcf8 0x80001810
+outl 0xcfc 0xe10c0000
+outl 0xcf8 0x8000f810
+write 0x44b20 0x1 0x35
+write 0x44b00 0x1 0x03
+write 0xc021e10c0040 0x81 0x014b04000131000000014b04000138000000014b0400013=
+f000000014b04000146000000014b0400014d000000014b04000154000000014b0400015b00=
+0000014b04000162000000014b04000169000000014b04000170000000014b0400017700000=
+0014b0400017e000000014b04000185000000014b0400018c000000014b04
+EOF
 
-I am attaching the qtest commands for reproducing it.
-I can reproduce it in a qemu 5.0 build using:
+I also attached the trace to this launchpad report, in case the
+formatting is broken:
 
-qemu-system-i386 -M pc-q35-5.0 -qtest stdio -device sdhci-pci,sd-spec-
-version=3D3 -device sd-card,drive=3Dmydrive -drive if=3Dsd,index=3D0,file=
-=3Dnull-
-co://,format=3Draw,id=3Dmydrive -nographic -nographic -serial none -monitor
-none < attachment
+qemu-system-i386 -qtest stdio -monitor none -serial none -M pc-q35-5.0
+-no-shutdown -M q35 -device megasas -device scsi-cd,drive=3Dnull0
+-blockdev driver=3Dnull-co,read-zeroes=3Don,node-name=3Dnull0 -nographic <
+attachment
 
 Please let me know if I can provide any further info.
 -Alex
@@ -178,104 +169,99 @@ Please let me know if I can provide any further info.
      Importance: Undecided
          Status: New
 
+** Attachment added: "attachment"
+   https://bugs.launchpad.net/bugs/1878057/+attachment/5369968/+files/attac=
+hment
+
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1878054
+https://bugs.launchpad.net/bugs/1878057
 
 Title:
-  Hang with high CPU usage in sdhci_data_transfer
+  null-ptr dereference in megasas_command_complete
 
 Status in QEMU:
   New
 
 Bug description:
   Hello,
-  While fuzzing, I found an input that causes QEMU to hang with 100% CPU us=
-age.
-  I have waited several minutes, and QEMU is still unresponsive. Using gdb,=
- It
-  appears that it is stuck in an sdhci_data_transfer:
+  While fuzzing, I found an input that triggers a null-pointer dereference =
+in
+  megasas_command_complete:
 
-  #0   memory_region_access_valid (mr=3D<optimized out>, addr=3D0x10284920,=
- size=3D<optimized out>, is_write=3D0xff, attrs=3D...) at /home/alxndr/Deve=
-lopment/qemu/memory.c:1378
-  #1   memory_region_dispatch_write (mr=3D<optimized out>, addr=3D<optimize=
-d out>, data=3D<optimized out>, op=3DMO_32, attrs=3D...) at /home/alxndr/De=
-velopment/qemu/memory.c:1463
-  #2   flatview_write_continue (fv=3D<optimized out>, addr=3D0x10284920, at=
-trs=3D..., ptr=3D<optimized out>, len=3D0xb7, addr1=3D0x5555582798e0, l=3D<=
-optimized out>, mr=3D0x5555582798e0 <io_mem_unassigned>) at /home/alxndr/De=
-velopment/qemu/exec.c:3137
-  #3   flatview_write (fv=3D0x606000045da0, addr=3D<optimized out>, attrs=
-=3D..., buf=3D<optimized out>, len=3D<optimized out>) at /home/alxndr/Devel=
-opment/qemu/exec.c:3177
-  #4   address_space_write (as=3D<optimized out>, addr=3D<optimized out>, a=
-ttrs=3D..., buf=3D0xaaaab04f325, len=3D0x4) at /home/alxndr/Development/qem=
-u/exec.c:3268
-  #5   address_space_rw (as=3D0x5555572509ac <unassigned_mem_ops+44>, addr=
-=3D0x5555582798e0, attrs=3D..., attrs@entry=3D..., buf=3D0xaaaab04f325, len=
-=3D0x4, is_write=3D0xb8, is_write@entry=3D0x1) at
-  /home/alxndr/Development/qemu/exec.c:3278
-  #6   dma_memory_rw_relaxed (as=3D0x5555572509ac <unassigned_mem_ops+44>, =
-addr=3D0x5555582798e0, buf=3D0xaaaab04f325, len=3D0x4, dir=3DDMA_DIRECTION_=
-FROM_DEVICE) at /home/alxndr/Development/qemu/include/sysemu/dma.h:87
-  #7   dma_memory_rw (as=3D0x5555572509ac <unassigned_mem_ops+44>, addr=3D0=
-x5555582798e0, buf=3D0xaaaab04f325, len=3D0x4, dir=3DDMA_DIRECTION_FROM_DEV=
-ICE) at /home/alxndr/Development/qemu/include/sysemu/dma.h:110
-  #8   dma_memory_write (as=3D0x5555572509ac <unassigned_mem_ops+44>, addr=
-=3D0x5555582798e0, buf=3D0xaaaab04f325, len=3D0x4) at /home/alxndr/Developm=
-ent/qemu/include/sysemu/dma.h:122
-  #9   sdhci_sdma_transfer_multi_blocks (s=3D<optimized out>) at /home/alxn=
-dr/Development/qemu/hw/sd/sdhci.c:618
-  #10  sdhci_data_transfer (opaque=3D0x61e000021080) at /home/alxndr/Develo=
-pment/qemu/hw/sd/sdhci.c:891
-  #11  sdhci_send_command (s=3D0x61e000021080) at /home/alxndr/Development/=
-qemu/hw/sd/sdhci.c:364
-  #12  sdhci_write (opaque=3D<optimized out>, offset=3D0xc, val=3D<optimize=
-d out>, size=3D<optimized out>) at /home/alxndr/Development/qemu/hw/sd/sdhc=
-i.c:1158
-  #13  memory_region_write_accessor (mr=3D<optimized out>, addr=3D<optimize=
-d out>, value=3D<optimized out>, size=3D<optimized out>, shift=3D<optimized=
- out>, mask=3D<optimized out>, attrs=3D...) at
-  /home/alxndr/Development/qemu/memory.c:483
-  #14  access_with_adjusted_size (addr=3D<optimized out>, value=3D<optimize=
-d out>, size=3D<optimized out>, access_size_min=3D<optimized out>, access_s=
-ize_max=3D<optimized out>, access_fn=3D<optimized out>, mr=3D0x61e0000219f0=
-, attrs=3D...) at /home/alxndr/Development/qemu/memory.c:544
-  #15  memory_region_dispatch_write (mr=3D<optimized out>, addr=3D<optimize=
-d out>, data=3D0x1ffe0ff, op=3D<optimized out>, attrs=3D...) at /home/alxnd=
-r/Development/qemu/memory.c:1476
-  #16  flatview_write_continue (fv=3D<optimized out>, addr=3D0xe106800c, at=
-trs=3D..., ptr=3D<optimized out>, len=3D0xff3, addr1=3D0x5555582798e0, l=3D=
-<optimized out>, mr=3D0x61e0000219f0) at /home/alxndr/Development/qemu/exec=
-.c:3137
-  #17  flatview_write (fv=3D0x606000045da0, addr=3D<optimized out>, attrs=
-=3D..., buf=3D<optimized out>, len=3D<optimized out>) at /home/alxndr/Devel=
-opment/qemu/exec.c:3177
-  #18  address_space_write (as=3D<optimized out>, addr=3D<optimized out>, a=
-ttrs=3D..., attrs@entry=3D..., buf=3D0xaaaab04f325, buf@entry=3D0x62100008a=
-d00, len=3D0x4) at /home/alxndr/Development/qemu/exec.c:3268
-  #19  qtest_process_command (chr=3D<optimized out>, chr@entry=3D0x55555827=
-c040 <qtest_chr>, words=3D<optimized out>) at /home/alxndr/Development/qemu=
-/qtest.c:567
-  #20  qtest_process_inbuf (chr=3D0x55555827c040 <qtest_chr>, inbuf=3D0x619=
-00000f640) at /home/alxndr/Development/qemu/qtest.c:710
+  =3D=3D14959=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x00000=
+0000003 (pc 0x55b1d11b4df1 bp 0x7ffeb55ca450 sp 0x7ffeb55ca1e0 T0)
+  =3D=3D14959=3D=3DThe signal is caused by a WRITE memory access.
+  =3D=3D14959=3D=3DHint: address points to the zero page.
+      #0 0x55b1d11b4df1 in megasas_command_complete /home/alxndr/Developmen=
+t/qemu/hw/scsi/megasas.c:1877:40
+      #1 0x55b1d11759ec in scsi_req_complete /home/alxndr/Development/qemu/=
+hw/scsi/scsi-bus.c:1430:5
+      #2 0x55b1d115c98f in scsi_aio_complete /home/alxndr/Development/qemu/=
+hw/scsi/scsi-disk.c:216:5
+      #3 0x55b1d151c638 in blk_aio_complete /home/alxndr/Development/qemu/b=
+lock/block-backend.c:1375:9
+      #4 0x55b1d151c638 in blk_aio_complete_bh /home/alxndr/Development/qem=
+u/block/block-backend.c:1385:5
+      #5 0x55b1d16f3a5b in aio_bh_call /home/alxndr/Development/qemu/util/a=
+sync.c:136:5
+      #6 0x55b1d16f3a5b in aio_bh_poll /home/alxndr/Development/qemu/util/a=
+sync.c:164:13
+      #7 0x55b1d16fe43e in aio_dispatch /home/alxndr/Development/qemu/util/=
+aio-posix.c:380:5
+      #8 0x55b1d16f54fa in aio_ctx_dispatch /home/alxndr/Development/qemu/u=
+til/async.c:306:5
+      #9 0x7f47937c89ed in g_main_context_dispatch (/usr/lib/x86_64-linux-g=
+nu/libglib-2.0.so.0+0x4e9ed)
+      #10 0x55b1d16fbef4 in glib_pollfds_poll /home/alxndr/Development/qemu=
+/util/main-loop.c:219:9
+      #11 0x55b1d16fbef4 in os_host_main_loop_wait /home/alxndr/Development=
+/qemu/util/main-loop.c:242:5
+      #12 0x55b1d16fbef4 in main_loop_wait /home/alxndr/Development/qemu/ut=
+il/main-loop.c:518:11
+      #13 0x55b1d0cd16a6 in qemu_main_loop /home/alxndr/Development/qemu/so=
+ftmmu/vl.c:1664:9
+      #14 0x55b1d1608dca in main /home/alxndr/Development/qemu/softmmu/main=
+.c:49:5
+      #15 0x7f4792378e0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.3=
+0/csu/../csu/libc-start.c:308:16
+      #16 0x55b1d091d7b9 in _start (/home/alxndr/Development/qemu/build/i38=
+6-softmmu/qemu-system-i386+0x8f47b9)
 
-  =
+  I can reproduce it in qemu 5.0 built with using:
+  cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -M pc=
+-q35-5.0 -no-shutdown -M q35 -device megasas -device scsi-cd,drive=3Dnull0 =
+-blockdev driver=3Dnull-co,read-zeroes=3Don,node-name=3Dnull0 -nographic -q=
+test stdio -monitor none -serial none
+  outl 0xcf8 0x80001814
+  outl 0xcfc 0xc021
+  outl 0xcf8 0x80001818
+  outl 0xcf8 0x80001804
+  outw 0xcfc 0x7
+  outl 0xcf8 0x80001810
+  outl 0xcfc 0xe10c0000
+  outl 0xcf8 0x8000f810
+  write 0x44b20 0x1 0x35
+  write 0x44b00 0x1 0x03
+  write 0xc021e10c0040 0x81 0x014b04000131000000014b04000138000000014b04000=
+13f000000014b04000146000000014b0400014d000000014b04000154000000014b0400015b=
+000000014b04000162000000014b04000169000000014b04000170000000014b04000177000=
+000014b0400017e000000014b04000185000000014b0400018c000000014b04
+  EOF
 
-  I am attaching the qtest commands for reproducing it.
-  I can reproduce it in a qemu 5.0 build using:
+  I also attached the trace to this launchpad report, in case the
+  formatting is broken:
 
-  qemu-system-i386 -M pc-q35-5.0 -qtest stdio -device sdhci-pci,sd-spec-
-  version=3D3 -device sd-card,drive=3Dmydrive -drive if=3Dsd,index=3D0,file
-  =3Dnull-co://,format=3Draw,id=3Dmydrive -nographic -nographic -serial none
-  -monitor none < attachment
+  qemu-system-i386 -qtest stdio -monitor none -serial none -M pc-q35-5.0
+  -no-shutdown -M q35 -device megasas -device scsi-cd,drive=3Dnull0
+  -blockdev driver=3Dnull-co,read-zeroes=3Don,node-name=3Dnull0 -nographic <
+  attachment
 
   Please let me know if I can provide any further info.
   -Alex
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1878054/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1878057/+subscriptions
 
