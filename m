@@ -6,67 +6,67 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6DFCC47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 19:29:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6973FC47255
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 19:35:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE581206DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 19:29:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E7A8206DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 19:35:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XNN6ll5G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE581206DB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hpdGLg6f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E7A8206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYE7g-0005R8-MJ
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 15:29:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52754)
+	id 1jYEDP-0003b9-8e
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 15:35:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54230)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jYE5G-0003i0-C3
- for qemu-devel@nongnu.org; Mon, 11 May 2020 15:27:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39231
+ id 1jYEBq-0002I8-Ng
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 15:34:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24057
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jYE5F-0004FN-JC
- for qemu-devel@nongnu.org; Mon, 11 May 2020 15:27:26 -0400
+ id 1jYEBp-00067A-Am
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 15:34:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589225244;
+ s=mimecast20190719; t=1589225652;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wqigBBfPszxvGqm7eR5k+8fnxpcDQck5luyILOJeRPE=;
- b=XNN6ll5GtThJekzy/x+LFBI32e2co1xA+wbAxRQxniIHiBJN1rRM2gTcbuRiFtsLujVEs4
- AleWgeuv4py/UAZHNMGqzyAyqYt/4zW8XZR4XXZ2UKEGxfhYWHykgqwBhWt79DAM1E5ZFR
- JEOYiOzyo5kEommpdKNxUddXjUKkvhA=
+ bh=cFde+1YE9ngXEbf2YWxS762JAhaTIMlbOaHsRqLoZyY=;
+ b=hpdGLg6f4H54K2aaJ8kC/7D4HMZwXAcE+SoyzZlOVHIHs7sxDCF875uBvzZhDHMuc3D1JQ
+ wFpuFOCf5qDqPsqGiXPFOcjgAIL83t09hDeEhu3mXWYEG8Dp2iuzKtbLkq2rd/4TUyIvt7
+ A4X04Os05RKB3mO76iaVeRL3uvel07c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-203-matndBUxPIK7ve2VWTWXbQ-1; Mon, 11 May 2020 15:27:20 -0400
-X-MC-Unique: matndBUxPIK7ve2VWTWXbQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-217-2oJJBliwOTG59xEuth3TBw-1; Mon, 11 May 2020 15:34:08 -0400
+X-MC-Unique: 2oJJBliwOTG59xEuth3TBw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75D63107ACCA;
- Mon, 11 May 2020 19:27:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5667B19067E0;
+ Mon, 11 May 2020 19:34:07 +0000 (UTC)
 Received: from localhost (unknown [10.40.208.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4A56B6C76B;
- Mon, 11 May 2020 19:26:54 +0000 (UTC)
-Date: Mon, 11 May 2020 21:26:52 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F33497526E;
+ Mon, 11 May 2020 19:33:54 +0000 (UTC)
+Date: Mon, 11 May 2020 21:33:53 +0200
 From: Igor Mammedov <imammedo@redhat.com>
 To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH v5 03/15] acpi: rtc: use a single crs range
-Message-ID: <20200511212652.2dbc2fad@redhat.com>
-In-Reply-To: <20200507131640.14041-4-kraxel@redhat.com>
+Subject: Re: [PATCH v5 12/15] acpi: drop serial/parallel enable bits from dsdt
+Message-ID: <20200511213353.7a264424@redhat.com>
+In-Reply-To: <20200507131640.14041-13-kraxel@redhat.com>
 References: <20200507131640.14041-1-kraxel@redhat.com>
- <20200507131640.14041-4-kraxel@redhat.com>
+ <20200507131640.14041-13-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -105,41 +105,68 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu,  7 May 2020 15:16:28 +0200
+On Thu,  7 May 2020 15:16:37 +0200
 Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-> Use a single io range for _CRS instead of two,
-> following what real hardware does.
+> The _STA methods for COM+LPT used to reference them,
+> but that isn't the case any more.
 > 
 > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
+
 > ---
->  hw/rtc/mc146818rtc.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+>  hw/i386/acpi-build.c | 23 -----------------------
+>  1 file changed, 23 deletions(-)
 > 
-> diff --git a/hw/rtc/mc146818rtc.c b/hw/rtc/mc146818rtc.c
-> index 2104e0aa3b14..ab0cc59973b3 100644
-> --- a/hw/rtc/mc146818rtc.c
-> +++ b/hw/rtc/mc146818rtc.c
-> @@ -1013,12 +1013,14 @@ static void rtc_build_aml(ISADevice *isadev, Aml *scope)
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 1922868f3401..765409a90eb6 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -1437,15 +1437,6 @@ static void build_q35_isa_bridge(Aml *table)
+>      aml_append(field, aml_named_field("LPTD", 2));
+>      aml_append(dev, field);
+>  
+> -    aml_append(dev, aml_operation_region("LPCE", AML_PCI_CONFIG,
+> -                                         aml_int(0x82), 0x02));
+> -    /* enable bits */
+> -    field = aml_field("LPCE", AML_ANY_ACC, AML_NOLOCK, AML_PRESERVE);
+> -    aml_append(field, aml_named_field("CAEN", 1));
+> -    aml_append(field, aml_named_field("CBEN", 1));
+> -    aml_append(field, aml_named_field("LPEN", 1));
+> -    aml_append(dev, field);
+> -
+>      aml_append(scope, dev);
+>      aml_append(table, scope);
+>  }
+> @@ -1469,7 +1460,6 @@ static void build_piix4_isa_bridge(Aml *table)
+>  {
 >      Aml *dev;
->      Aml *crs;
+>      Aml *scope;
+> -    Aml *field;
 >  
-> +    /*
-> +     * Reserving 8 io ports here, following what physical hardware
-> +     * does, even though qemu only responds to the first two ports.
-> +     */
->      crs = aml_resource_template();
->      aml_append(crs, aml_io(AML_DECODE16, RTC_ISA_BASE, RTC_ISA_BASE,
-> -                           0x10, 0x02));
-> +                           0x01, 0x08));
->      aml_append(crs, aml_irq_no_flags(RTC_ISA_IRQ));
-> -    aml_append(crs, aml_io(AML_DECODE16, RTC_ISA_BASE + 2, RTC_ISA_BASE + 2,
-> -                           0x02, 0x06));
+>      scope =  aml_scope("_SB.PCI0");
+>      dev = aml_device("ISA");
+> @@ -1478,19 +1468,6 @@ static void build_piix4_isa_bridge(Aml *table)
+>      /* PIIX PCI to ISA irq remapping */
+>      aml_append(dev, aml_operation_region("P40C", AML_PCI_CONFIG,
+>                                           aml_int(0x60), 0x04));
+> -    /* enable bits */
+> -    field = aml_field("^PX13.P13C", AML_ANY_ACC, AML_NOLOCK, AML_PRESERVE);
+> -    /* Offset(0x5f),, 7, */
+> -    aml_append(field, aml_reserved_field(0x2f8));
+> -    aml_append(field, aml_reserved_field(7));
+> -    aml_append(field, aml_named_field("LPEN", 1));
+> -    /* Offset(0x67),, 3, */
+> -    aml_append(field, aml_reserved_field(0x38));
+> -    aml_append(field, aml_reserved_field(3));
+> -    aml_append(field, aml_named_field("CAEN", 1));
+> -    aml_append(field, aml_reserved_field(3));
+> -    aml_append(field, aml_named_field("CBEN", 1));
+> -    aml_append(dev, field);
 >  
->      dev = aml_device("RTC");
->      aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0B00")));
+>      aml_append(scope, dev);
+>      aml_append(table, scope);
 
 
