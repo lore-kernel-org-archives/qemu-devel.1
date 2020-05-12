@@ -6,38 +6,38 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41B83C54E8D
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 14:55:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33FB8C54E8D
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 14:55:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 099A6206B8
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 14:54:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 099A6206B8
+	by mail.kernel.org (Postfix) with ESMTPS id 07861206B8
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 14:55:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07861206B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYWJ9-0007rH-15
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 10:54:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60288)
+	id 1jYWJP-0008Io-2v
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 10:55:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60230)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYWHl-0004wf-Ng; Tue, 12 May 2020 10:53:33 -0400
-Received: from relay.sw.ru ([185.231.240.75]:45858)
+ id 1jYWHj-0004rX-N2; Tue, 12 May 2020 10:53:31 -0400
+Received: from relay.sw.ru ([185.231.240.75]:45878)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYWHh-0005ox-Hk; Tue, 12 May 2020 10:53:33 -0400
+ id 1jYWHh-0005ow-8Z; Tue, 12 May 2020 10:53:31 -0400
 Received: from dhcp-172-16-25-136.sw.ru ([172.16.25.136] helo=localhost.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYWHZ-0003c8-86; Tue, 12 May 2020 17:53:21 +0300
+ id 1jYWHY-0003c8-Kk; Tue, 12 May 2020 17:53:20 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v3 05/15] block: Include filters when freezing backing chain
-Date: Tue, 12 May 2020 17:53:06 +0300
-Message-Id: <1589295196-773454-6-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v3 02/15] copy-on-read: Support compressed writes
+Date: Tue, 12 May 2020 17:53:03 +0300
+Message-Id: <1589295196-773454-3-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1589295196-773454-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1589295196-773454-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -72,348 +72,41 @@ Sender: "Qemu-devel"
 
 From: Max Reitz <mreitz@redhat.com>
 
-In order to make filters work in backing chains, the associated
-functions must be able to deal with them and freeze all filter links, be
-they COW or R/W filter links.
-
-In the process, rename these functions to reflect that they now act on
-generalized chains of filter nodes instead of backing chains alone.
-
-While at it, add some comments that note which functions require their
-caller to ensure that a given child link is not frozen, and how the
-callers do so.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block.c               | 81 ++++++++++++++++++++++++++++++---------------------
- block/commit.c        |  8 ++---
- block/mirror.c        |  4 +--
- block/stream.c        |  8 ++---
- include/block/block.h |  6 ++--
- 5 files changed, 60 insertions(+), 47 deletions(-)
+ block/copy-on-read.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/block.c b/block.c
-index 5b4ebfe..459412e 100644
---- a/block.c
-+++ b/block.c
-@@ -2513,12 +2513,15 @@ static void bdrv_replace_child_noperm(BdrvChild *child,
-  * If @new_bs is not NULL, bdrv_check_perm() must be called beforehand, as this
-  * function uses bdrv_set_perm() to update the permissions according to the new
-  * reference that @new_bs gets.
-+ *
-+ * Callers must ensure that child->frozen is false.
-  */
- static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs)
- {
-     BlockDriverState *old_bs = child->bs;
-     uint64_t perm, shared_perm;
- 
-+    /* Asserts that child->frozen == false */
-     bdrv_replace_child_noperm(child, new_bs);
- 
-     /*
-@@ -2676,6 +2679,7 @@ static void bdrv_detach_child(BdrvChild *child)
-     g_free(child);
+diff --git a/block/copy-on-read.c b/block/copy-on-read.c
+index 242d3ff..c4fa468 100644
+--- a/block/copy-on-read.c
++++ b/block/copy-on-read.c
+@@ -106,6 +106,16 @@ static int coroutine_fn cor_co_pdiscard(BlockDriverState *bs,
  }
  
-+/* Callers must ensure that child->frozen is false. */
- void bdrv_root_unref_child(BdrvChild *child)
- {
-     BlockDriverState *child_bs;
-@@ -2685,10 +2689,6 @@ void bdrv_root_unref_child(BdrvChild *child)
-     bdrv_unref(child_bs);
- }
  
--/**
-- * Clear all inherits_from pointers from children and grandchildren of
-- * @root that point to @root, where necessary.
-- */
- static void bdrv_unset_inherits_from(BlockDriverState *root, BdrvChild *child)
- {
-     BdrvChild *c;
-@@ -2713,6 +2713,7 @@ static void bdrv_unset_inherits_from(BlockDriverState *root, BdrvChild *child)
-     }
- }
- 
-+/* Callers must ensure that child->frozen is false. */
- void bdrv_unref_child(BlockDriverState *parent, BdrvChild *child)
- {
-     if (child == NULL) {
-@@ -2756,7 +2757,7 @@ void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd,
-     bool update_inherits_from = bdrv_chain_contains(bs, backing_hd) &&
-         bdrv_inherits_from_recursive(backing_hd, bs);
- 
--    if (bdrv_is_backing_chain_frozen(bs, backing_bs(bs), errp)) {
-+    if (bdrv_is_chain_frozen(bs, child_bs(bs->backing), errp)) {
-         return;
-     }
- 
-@@ -2765,6 +2766,7 @@ void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd,
-     }
- 
-     if (bs->backing) {
-+        /* Cannot be frozen, we checked that above */
-         bdrv_unref_child(bs, bs->backing);
-         bs->backing = NULL;
-     }
-@@ -3912,8 +3914,7 @@ static int bdrv_reopen_parse_backing(BDRVReopenState *reopen_state,
-             return -EPERM;
-         }
-         /* Check if the backing link that we want to replace is frozen */
--        if (bdrv_is_backing_chain_frozen(overlay_bs, backing_bs(overlay_bs),
--                                         errp)) {
-+        if (bdrv_is_chain_frozen(overlay_bs, backing_bs(overlay_bs), errp)) {
-             return -EPERM;
-         }
-         reopen_state->replace_backing_bs = true;
-@@ -4248,6 +4249,7 @@ static void bdrv_close(BlockDriverState *bs)
- 
-     if (bs->drv) {
-         if (bs->drv->bdrv_close) {
-+            /* Must unfreeze all children, so bdrv_unref_child() works */
-             bs->drv->bdrv_close(bs);
-         }
-         bs->drv = NULL;
-@@ -4617,20 +4619,22 @@ BlockDriverState *bdrv_find_base(BlockDriverState *bs)
- }
- 
- /*
-- * Return true if at least one of the backing links between @bs and
-- * @base is frozen. @errp is set if that's the case.
-+ * Return true if at least one of the (COW and R/W) filter links
-+ * between @bs and @base is frozen. @errp is set if that's the case.
-  * @base must be reachable from @bs, or NULL.
-  */
--bool bdrv_is_backing_chain_frozen(BlockDriverState *bs, BlockDriverState *base,
--                                  Error **errp)
-+bool bdrv_is_chain_frozen(BlockDriverState *bs, BlockDriverState *base,
-+                          Error **errp)
- {
-     BlockDriverState *i;
-+    BdrvChild *child;
++static int coroutine_fn cor_co_pwritev_compressed(BlockDriverState *bs,
++                                                  uint64_t offset,
++                                                  uint64_t bytes,
++                                                  QEMUIOVector *qiov)
++{
++    return bdrv_co_pwritev(bs->file, offset, bytes, qiov,
++                           BDRV_REQ_WRITE_COMPRESSED);
++}
 +
-+    for (i = bs; i != base; i = child_bs(child)) {
-+        child = bdrv_filtered_child(i);
- 
--    for (i = bs; i != base; i = backing_bs(i)) {
--        if (i->backing && i->backing->frozen) {
-+        if (child && child->frozen) {
-             error_setg(errp, "Cannot change '%s' link from '%s' to '%s'",
--                       i->backing->name, i->node_name,
--                       backing_bs(i)->node_name);
-+                       child->name, i->node_name, child->bs->node_name);
-             return true;
-         }
-     }
-@@ -4639,32 +4643,35 @@ bool bdrv_is_backing_chain_frozen(BlockDriverState *bs, BlockDriverState *base,
- }
- 
- /*
-- * Freeze all backing links between @bs and @base.
-+ * Freeze all (COW and R/W) filter links between @bs and @base.
-  * If any of the links is already frozen the operation is aborted and
-  * none of the links are modified.
-  * @base must be reachable from @bs, or NULL.
-  * Returns 0 on success. On failure returns < 0 and sets @errp.
-  */
--int bdrv_freeze_backing_chain(BlockDriverState *bs, BlockDriverState *base,
--                              Error **errp)
-+int bdrv_freeze_chain(BlockDriverState *bs, BlockDriverState *base,
-+                      Error **errp)
++
+ static void cor_eject(BlockDriverState *bs, bool eject_flag)
  {
-     BlockDriverState *i;
-+    BdrvChild *child;
+     bdrv_eject(bs->file->bs, eject_flag);
+@@ -130,6 +140,7 @@ static BlockDriver bdrv_copy_on_read = {
+     .bdrv_co_pwritev                    = cor_co_pwritev,
+     .bdrv_co_pwrite_zeroes              = cor_co_pwrite_zeroes,
+     .bdrv_co_pdiscard                   = cor_co_pdiscard,
++    .bdrv_co_pwritev_compressed         = cor_co_pwritev_compressed,
  
--    if (bdrv_is_backing_chain_frozen(bs, base, errp)) {
-+    if (bdrv_is_chain_frozen(bs, base, errp)) {
-         return -EPERM;
-     }
- 
--    for (i = bs; i != base; i = backing_bs(i)) {
--        if (i->backing && backing_bs(i)->never_freeze) {
-+    for (i = bs; i != base; i = child_bs(child)) {
-+        child = bdrv_filtered_child(i);
-+        if (child && child->bs->never_freeze) {
-             error_setg(errp, "Cannot freeze '%s' link to '%s'",
--                       i->backing->name, backing_bs(i)->node_name);
-+                       child->name, child->bs->node_name);
-             return -EPERM;
-         }
-     }
- 
--    for (i = bs; i != base; i = backing_bs(i)) {
--        if (i->backing) {
--            i->backing->frozen = true;
-+    for (i = bs; i != base; i = child_bs(child)) {
-+        child = bdrv_filtered_child(i);
-+        if (child) {
-+            child->frozen = true;
-         }
-     }
- 
-@@ -4672,18 +4679,21 @@ int bdrv_freeze_backing_chain(BlockDriverState *bs, BlockDriverState *base,
- }
- 
- /*
-- * Unfreeze all backing links between @bs and @base. The caller must
-- * ensure that all links are frozen before using this function.
-+ * Unfreeze all (COW and R/W) filter links between @bs and @base. The
-+ * caller must ensure that all links are frozen before using this
-+ * function.
-  * @base must be reachable from @bs, or NULL.
-  */
--void bdrv_unfreeze_backing_chain(BlockDriverState *bs, BlockDriverState *base)
-+void bdrv_unfreeze_chain(BlockDriverState *bs, BlockDriverState *base)
- {
-     BlockDriverState *i;
-+    BdrvChild *child;
- 
--    for (i = bs; i != base; i = backing_bs(i)) {
--        if (i->backing) {
--            assert(i->backing->frozen);
--            i->backing->frozen = false;
-+    for (i = bs; i != base; i = child_bs(child)) {
-+        child = bdrv_filtered_child(i);
-+        if (child) {
-+            assert(child->frozen);
-+            child->frozen = false;
-         }
-     }
- }
-@@ -4786,8 +4796,11 @@ int bdrv_drop_intermediate(BlockDriverState *top, BlockDriverState *base,
-             }
-         }
- 
--        /* Do the actual switch in the in-memory graph.
--         * Completes bdrv_check_update_perm() transaction internally. */
-+        /*
-+         * Do the actual switch in the in-memory graph.
-+         * Completes bdrv_check_update_perm() transaction internally.
-+         * c->frozen is false, we have checked that above.
-+         */
-         bdrv_ref(base);
-         bdrv_replace_child(c, base);
-         bdrv_unref(top);
-diff --git a/block/commit.c b/block/commit.c
-index 445a280..e1f45a4 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -47,7 +47,7 @@ static int commit_prepare(Job *job)
- {
-     CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
- 
--    bdrv_unfreeze_backing_chain(s->commit_top_bs, s->base_bs);
-+    bdrv_unfreeze_chain(s->commit_top_bs, s->base_bs);
-     s->chain_frozen = false;
- 
-     /* Remove base node parent that still uses BLK_PERM_WRITE/RESIZE before
-@@ -67,7 +67,7 @@ static void commit_abort(Job *job)
-     BlockDriverState *top_bs = blk_bs(s->top);
- 
-     if (s->chain_frozen) {
--        bdrv_unfreeze_backing_chain(s->commit_top_bs, s->base_bs);
-+        bdrv_unfreeze_chain(s->commit_top_bs, s->base_bs);
-     }
- 
-     /* Make sure commit_top_bs and top stay around until bdrv_replace_node() */
-@@ -317,7 +317,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-         }
-     }
- 
--    if (bdrv_freeze_backing_chain(commit_top_bs, base, errp) < 0) {
-+    if (bdrv_freeze_chain(commit_top_bs, base, errp) < 0) {
-         goto fail;
-     }
-     s->chain_frozen = true;
-@@ -358,7 +358,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
- 
- fail:
-     if (s->chain_frozen) {
--        bdrv_unfreeze_backing_chain(commit_top_bs, base);
-+        bdrv_unfreeze_chain(commit_top_bs, base);
-     }
-     if (s->base) {
-         blk_unref(s->base);
-diff --git a/block/mirror.c b/block/mirror.c
-index b6de24b..4b187e6 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -648,7 +648,7 @@ static int mirror_exit_common(Job *job)
-     target_bs = blk_bs(s->target);
- 
-     if (bdrv_chain_contains(src, target_bs)) {
--        bdrv_unfreeze_backing_chain(mirror_top_bs, target_bs);
-+        bdrv_unfreeze_chain(mirror_top_bs, target_bs);
-     }
- 
-     bdrv_release_dirty_bitmap(s->dirty_bitmap);
-@@ -1713,7 +1713,7 @@ static BlockJob *mirror_start_job(
-             }
-         }
- 
--        if (bdrv_freeze_backing_chain(mirror_top_bs, target, errp) < 0) {
-+        if (bdrv_freeze_chain(mirror_top_bs, target, errp) < 0) {
-             goto fail;
-         }
-     }
-diff --git a/block/stream.c b/block/stream.c
-index aa2e7af..3cca1f9 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -53,7 +53,7 @@ static void stream_abort(Job *job)
- 
-     if (s->chain_frozen) {
-         BlockJob *bjob = &s->common;
--        bdrv_unfreeze_backing_chain(blk_bs(bjob->blk), s->bottom);
-+        bdrv_unfreeze_chain(blk_bs(bjob->blk), s->bottom);
-     }
- }
- 
-@@ -66,7 +66,7 @@ static int stream_prepare(Job *job)
-     Error *local_err = NULL;
-     int ret = 0;
- 
--    bdrv_unfreeze_backing_chain(bs, s->bottom);
-+    bdrv_unfreeze_chain(bs, s->bottom);
-     s->chain_frozen = false;
- 
-     if (bs->backing) {
-@@ -225,7 +225,7 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-     int basic_flags = BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED;
-     BlockDriverState *bottom = bdrv_find_overlay(bs, base);
- 
--    if (bdrv_freeze_backing_chain(bs, bottom, errp) < 0) {
-+    if (bdrv_freeze_chain(bs, bottom, errp) < 0) {
-         return;
-     }
- 
-@@ -276,5 +276,5 @@ fail:
-     if (bs_read_only) {
-         bdrv_reopen_set_read_only(bs, true, NULL);
-     }
--    bdrv_unfreeze_backing_chain(bs, bottom);
-+    bdrv_unfreeze_chain(bs, bottom);
- }
-diff --git a/include/block/block.h b/include/block/block.h
-index 4de8d8f..e55143d 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -360,11 +360,11 @@ int bdrv_drop_intermediate(BlockDriverState *top, BlockDriverState *base,
- BlockDriverState *bdrv_find_overlay(BlockDriverState *active,
-                                     BlockDriverState *bs);
- BlockDriverState *bdrv_find_base(BlockDriverState *bs);
--bool bdrv_is_backing_chain_frozen(BlockDriverState *bs, BlockDriverState *base,
-+bool bdrv_is_chain_frozen(BlockDriverState *bs, BlockDriverState *base,
-                                   Error **errp);
--int bdrv_freeze_backing_chain(BlockDriverState *bs, BlockDriverState *base,
-+int bdrv_freeze_chain(BlockDriverState *bs, BlockDriverState *base,
-                               Error **errp);
--void bdrv_unfreeze_backing_chain(BlockDriverState *bs, BlockDriverState *base);
-+void bdrv_unfreeze_chain(BlockDriverState *bs, BlockDriverState *base);
- int coroutine_fn bdrv_co_delete_file(BlockDriverState *bs, Error **errp);
- 
- 
+     .bdrv_eject                         = cor_eject,
+     .bdrv_lock_medium                   = cor_lock_medium,
 -- 
 1.8.3.1
 
