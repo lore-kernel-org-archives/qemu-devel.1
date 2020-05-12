@@ -2,80 +2,90 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26DAAC2D0F7
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 18:53:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D8E6CA90AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 18:53:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2BEE207BC
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 18:53:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2BEE207BC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 29DD4207BC
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 18:53:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vw/m7/Ni"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29DD4207BC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYa1r-0003L6-1G
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 14:53:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42632)
+	id 1jYa2M-00048L-B1
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 14:53:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42806)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jYZzE-0000u1-PQ
- for qemu-devel@nongnu.org; Tue, 12 May 2020 14:50:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55310)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jYa1R-0003C6-HH
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 14:52:57 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:40398)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jYZzC-0005uH-Pd
- for qemu-devel@nongnu.org; Tue, 12 May 2020 14:50:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jYZzA-0008P6-V5
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 18:50:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E8A8A2E80E7
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 18:50:36 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jYa1Q-0006Lu-47
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 14:52:56 -0400
+Received: by mail-oi1-x241.google.com with SMTP id v128so2344468oia.7
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 11:52:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=GI+dEDoYcRGx+2JzHn6knX+nowcYh7nwqE6VUXONGZw=;
+ b=Vw/m7/Nil35kSa5KV2++4YIODo3OrPNj77QjcbvztaFs7KZa5sngFD9WoNluS8kRQV
+ njsV4z9t//omy2PDw/kjAEqqE1HPtROBncKFqi6UsdiviMcNBs3cVGDVqRvA2f8who+W
+ 37NoSQS+eHagAulrseF1uAWBMiC1x4TDJAs89wJ2lurga8BV6p1lMH3/xuXrdurLnRv8
+ 9BAMop1le6dv1IkYSwjH1wfB8bSs9oh/oVqpTD63qPFnWB/ysgU9R7+tcsQtuiJzOtxZ
+ H+F3ZbBLcri5UvMvLX6wSEQDT6QqMCw98+SBTAoBzJ+6NHEPRle847lDPZSs7e7xuRl7
+ l2wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=GI+dEDoYcRGx+2JzHn6knX+nowcYh7nwqE6VUXONGZw=;
+ b=PyER/G8ovFT41li4yVZ5VGu01SRzegXKv41I7BFoC6itENtZGMVRayhTJoWNHJaXeN
+ GCb6bk9gFdURfvxUBHtmPG/y/jDSFSXNS0GbzxcIQnRw+8ZfXO91lp0a86VnrmT5vzAL
+ 9Krqq7O7y5S6FfE4MaLOU7Oe+wXL/FTN9b/tJ0UBVt+sDHcnE83fS0p2iuCH0hDyVtwD
+ sIVzFWYEewdP9iSvDwy+n6f4/apP8dk84R8Td2vxY+7LsdfXIqEv27hMAbYyYS+hBbQu
+ iaOrNByC36V5csQiLNjyJteOUier6UIzoAL0je/je3TROmyI6ad5J+ODVXLySwOJqRFb
+ r2Vg==
+X-Gm-Message-State: AGi0Pual9ShMTTzfIPk4ywAvCPFKospqq3EdQX6bsLZQIl3Do0DqRe2z
+ 6fJrq0ojzGGm1uo511Cw4dFzxVp0HbWvSvVWEIHuLA==
+X-Google-Smtp-Source: APiQypKeq5tkGX5p45P7sW7iwW/1P7aFEIsRBY7N2ZCRVXxcPPvUAg/yPK9tUNqr5XSIkS10fSJZ4dlJAJvRfZK3Gao=
+X-Received: by 2002:aca:895:: with SMTP id 143mr24508371oii.163.1589309574629; 
+ Tue, 12 May 2020 11:52:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 12 May 2020 18:41:47 -0000
-From: Alexander Bulekov <1878263@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
-X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
-Message-Id: <158930890733.12498.3041231636988541980.malonedeb@wampee.canonical.com>
-Subject: [Bug 1878263] [NEW] Assertion-failure in scsi_dma_complete,
- with megasas
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="013b6f2a3f3ba130b50b9eee1a89957ee38a5c15";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: b55568f46136c2f4d1c1f43d6a435cfc5c088cca
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 11:25:43
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+References: <20200507105718.1319187-1-ppandit@redhat.com>
+ <20200507105718.1319187-2-ppandit@redhat.com>
+In-Reply-To: <20200507105718.1319187-2-ppandit@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 12 May 2020 19:52:43 +0100
+Message-ID: <CAFEAcA8Y67h_Kc=M2i5xGz-sQpJwZ++n8wB8szdv0ziViUfmqw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] megasas: use unsigned type for reply_queue_head
+To: P J P <ppandit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x241.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,310 +94,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1878263 <1878263@bugs.launchpad.net>
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Ren Ding <rding@gatech.edu>,
+ Prasad J Pandit <pjp@fedoraproject.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On Thu, 7 May 2020 at 12:03, P J P <ppandit@redhat.com> wrote:
+>
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+>
+> A guest user may set 's->reply_queue_head' MegasasState field to
+> a negative value. Later in 'megasas_lookup_frame' it is used to
+> index into s->frames[] array. Use unsigned type to avoid OOB
+> access issue.
+>
+> Reported-by: Ren Ding <rding@gatech.edu>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> ---
+>  hw/scsi/megasas.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+> index af18c88b65..433353bad0 100644
+> --- a/hw/scsi/megasas.c
+> +++ b/hw/scsi/megasas.c
+> @@ -112,7 +112,7 @@ typedef struct MegasasState {
+>      uint64_t reply_queue_pa;
+>      void *reply_queue;
+>      int reply_queue_len;
+> -    int reply_queue_head;
+> +    uint16_t reply_queue_head;
+>      int reply_queue_tail;
+>      uint64_t consumer_pa;
+>      uint64_t producer_pa;
 
-Hello,
-While fuzzing, I found an input that triggers an assertion-failure in scsi_=
-dma_complete, with megasas:
+Using a 16-bit type here means that code like this:
 
-qemu-system-i386: /home/alxndr/Development/qemu/hw/scsi/scsi-disk.c:292:
-void scsi_dma_complete(void *, int): Assertion `r->req.aiocb !=3D NULL'
-failed.
+    s->reply_queue_head = ldl_le_pci_dma(pcid, s->producer_pa);
+    s->reply_queue_head %= MEGASAS_MAX_FRAMES;
 
-#3  0x00007ffff6866092 in __GI___assert_fail (assertion=3D0x555556efa460 <s=
-tr> "r->req.aiocb !=3D NULL", file=3D0x555556ef9b20 <str> "/home/alxndr/Dev=
-elopment/qemu/hw/scsi/scsi-disk.c", line=3D0x124, function=3D0x555556efa560=
- <__PRETTY_FUNCTION__.scsi_dma_complete> "void scsi_dma_complete(void *, in=
-t)") at assert.c:101
-#4  0x000055555669d473 in scsi_dma_complete (opaque=3D0x616000040280, ret=
-=3D<optimized out>) at /home/alxndr/Development/qemu/hw/scsi/scsi-disk.c:292
-#5  0x000055555639c89b in dma_complete (dbs=3D<optimized out>, ret=3D<optim=
-ized out>) at /home/alxndr/Development/qemu/dma-helpers.c:118
-#6  0x000055555639c89b in dma_blk_cb (opaque=3D<optimized out>, ret=3D<opti=
-mized out>) at /home/alxndr/Development/qemu/dma-helpers.c:136
-#7  0x000055555639bd58 in dma_blk_io (ctx=3D<optimized out>, sg=3D<optimize=
-d out>, offset=3D<optimized out>, align=3D<optimized out>, io_func=3D<optim=
-ized
-out>, io_func_opaque=3D<optimized out>, cb=3D<optimized out>, opaque=3D<opt=
-imized out>, dir=3D<optimized out>) at /home/alxndr/Development/qemu/dma-he=
-lpers.c:232
-#8  0x000055555669baa5 in scsi_write_data (req=3D0x616000040280) at /home/a=
-lxndr/Development/qemu/hw/scsi/scsi-disk.c:583
-#9  0x00005555566b5d93 in scsi_req_continue (req=3D0x616000040280) at /home=
-/alxndr/Development/qemu/hw/scsi/scsi-bus.c:1337
-#10 0x00005555566f52e3 in megasas_enqueue_req (cmd=3D<optimized out>, is_wr=
-ite=3D<optimized out>) at /home/alxndr/Development/qemu/hw/scsi/megasas.c:1=
-651
-#11 0x00005555566e276f in megasas_handle_io (s=3D<optimized out>, cmd=3D<op=
-timized out>, frame_cmd=3D<optimized out>) at /home/alxndr/Development/qemu=
-/hw/scsi/megasas.c:1790
-#12 0x00005555566e276f in megasas_handle_frame (s=3D<optimized out>, frame_=
-addr=3D<optimized out>, frame_count=3D<optimized out>) at /home/alxndr/Deve=
-lopment/qemu/hw/scsi/megasas.c:1969
-#13 0x00005555566e276f in megasas_mmio_write (opaque=3D<optimized out>, add=
-r=3D<optimized out>, val=3D<optimized out>, size=3D<optimized out>) at /hom=
-e/alxndr/Development/qemu/hw/scsi/megasas.c:2122
-#14 0x00005555560028d7 in memory_region_write_accessor (mr=3D<optimized out=
->, addr=3D<optimized out>, value=3D<optimized out>, size=3D<optimized out>,=
- shift=3D<optimized out>, mask=3D<optimized out>, attrs=3D...) at /home/alx=
-ndr/Development/qemu/memory.c:483
-#15 0x0000555556002280 in access_with_adjusted_size (addr=3D<optimized out>=
-, value=3D<optimized out>, size=3D<optimized out>, access_size_min=3D<optim=
-ized out>, access_size_max=3D<optimized out>, access_fn=3D<optimized out>, =
-mr=3D0x7fffeeb301e0, attrs=3D...) at /home/alxndr/Development/qemu/memory.c=
-:544
-#16 0x0000555556002280 in memory_region_dispatch_write (mr=3D<optimized out=
->, addr=3D<optimized out>, data=3D0x17, op=3D<optimized out>, attrs=3D...) =
-at /home/alxndr/Development/qemu/memory.c:1476
-#17 0x0000555555f171d4 in flatview_write_continue (fv=3D<optimized out>, ad=
-dr=3D0xc1c0, attrs=3D..., ptr=3D<optimized out>, len=3D0x1, addr1=3D0x7ffff=
-fffae00, l=3D<optimized out>, mr=3D0x7fffeeb301e0) at /home/alxndr/Developm=
-ent/qemu/exec.c:3137
-#18 0x0000555555f0fb98 in flatview_write (fv=3D0x606000038180, addr=3D<opti=
-mized out>, attrs=3D..., buf=3D<optimized out>, len=3D<optimized out>) at /=
-home/alxndr/Development/qemu/exec.c:3177
+suddenly does a truncation of the 32-bit loaded value before
+the modulus operation, which is a bit odd, though since
+MEGASAS_MAX_FRAMES happens to be a power of 2 the end
+result won't change.
 
-I can reproduce it in qemu 5.0 using:
+It's also a bit weird to change reply_queue_head's type
+but not reply_queue_tail or reply_queue_len.
 
-cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -qtest =
-stdio -nographic -monitor none -serial none -M q35 -device megasas -device =
-scsi-cd,drive=3Dnull0 -blockdev driver=3Dnull-co,read-zeroes=3Don,node-name=
-=3Dnull0
-outl 0xcf8 0x80001818
-outl 0xcfc 0xc101
-outl 0xcf8 0x8000181c
-outl 0xcf8 0x80001804
-outw 0xcfc 0x7
-outl 0xcf8 0x8000186a
-write 0x14 0x1 0xfe
-write 0x0 0x1 0x02
-outb 0xc1c0 0x17
-EOF
-
-I also attached the commands to this launchpad report, in case the
-formatting is broken:
-
-qemu-system-i386 -qtest stdio -nographic -monitor none -serial none -M
-q35 -device megasas -device scsi-cd,drive=3Dnull0 -blockdev driver=3Dnull-co
-,read-zeroes=3Don,node-name=3Dnull0 < attachment
-
-Please let me know if I can provide any further info.
--Alex
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "attachment"
-   https://bugs.launchpad.net/bugs/1878263/+attachment/5370508/+files/attac=
-hment
-
-** Description changed:
-
-  Hello,
-  While fuzzing, I found an input that triggers an assertion-failure in scs=
-i_dma_complete, with megasas:
-+ =
-
-+ qemu-system-i386: /home/alxndr/Development/qemu/hw/scsi/scsi-disk.c:292:
-+ void scsi_dma_complete(void *, int): Assertion `r->req.aiocb !=3D NULL'
-+ failed.
-  =
-
-  #3  0x00007ffff6866092 in __GI___assert_fail (assertion=3D0x555556efa460 =
-<str> "r->req.aiocb !=3D NULL", file=3D0x555556ef9b20 <str> "/home/alxndr/D=
-evelopment/qemu/hw/scsi/scsi-disk.c", line=3D0x124, function=3D0x555556efa5=
-60 <__PRETTY_FUNCTION__.scsi_dma_complete> "void scsi_dma_complete(void *, =
-int)") at assert.c:101
-  #4  0x000055555669d473 in scsi_dma_complete (opaque=3D0x616000040280, ret=
-=3D<optimized out>) at /home/alxndr/Development/qemu/hw/scsi/scsi-disk.c:292
-  #5  0x000055555639c89b in dma_complete (dbs=3D<optimized out>, ret=3D<opt=
-imized out>) at /home/alxndr/Development/qemu/dma-helpers.c:118
-  #6  0x000055555639c89b in dma_blk_cb (opaque=3D<optimized out>, ret=3D<op=
-timized out>) at /home/alxndr/Development/qemu/dma-helpers.c:136
-  #7  0x000055555639bd58 in dma_blk_io (ctx=3D<optimized out>, sg=3D<optimi=
-zed out>, offset=3D<optimized out>, align=3D<optimized out>, io_func=3D<opt=
-imized
-  out>, io_func_opaque=3D<optimized out>, cb=3D<optimized out>, opaque=3D<o=
-ptimized out>, dir=3D<optimized out>) at /home/alxndr/Development/qemu/dma-=
-helpers.c:232
-  #8  0x000055555669baa5 in scsi_write_data (req=3D0x616000040280) at /home=
-/alxndr/Development/qemu/hw/scsi/scsi-disk.c:583
-  #9  0x00005555566b5d93 in scsi_req_continue (req=3D0x616000040280) at /ho=
-me/alxndr/Development/qemu/hw/scsi/scsi-bus.c:1337
-  #10 0x00005555566f52e3 in megasas_enqueue_req (cmd=3D<optimized out>, is_=
-write=3D<optimized out>) at /home/alxndr/Development/qemu/hw/scsi/megasas.c=
-:1651
-  #11 0x00005555566e276f in megasas_handle_io (s=3D<optimized out>, cmd=3D<=
-optimized out>, frame_cmd=3D<optimized out>) at /home/alxndr/Development/qe=
-mu/hw/scsi/megasas.c:1790
-  #12 0x00005555566e276f in megasas_handle_frame (s=3D<optimized out>, fram=
-e_addr=3D<optimized out>, frame_count=3D<optimized out>) at /home/alxndr/De=
-velopment/qemu/hw/scsi/megasas.c:1969
-  #13 0x00005555566e276f in megasas_mmio_write (opaque=3D<optimized out>, a=
-ddr=3D<optimized out>, val=3D<optimized out>, size=3D<optimized out>) at /h=
-ome/alxndr/Development/qemu/hw/scsi/megasas.c:2122
-  #14 0x00005555560028d7 in memory_region_write_accessor (mr=3D<optimized o=
-ut>, addr=3D<optimized out>, value=3D<optimized out>, size=3D<optimized out=
->, shift=3D<optimized out>, mask=3D<optimized out>, attrs=3D...) at /home/a=
-lxndr/Development/qemu/memory.c:483
-  #15 0x0000555556002280 in access_with_adjusted_size (addr=3D<optimized ou=
-t>, value=3D<optimized out>, size=3D<optimized out>, access_size_min=3D<opt=
-imized out>, access_size_max=3D<optimized out>, access_fn=3D<optimized out>=
-, mr=3D0x7fffeeb301e0, attrs=3D...) at /home/alxndr/Development/qemu/memory=
-.c:544
-  #16 0x0000555556002280 in memory_region_dispatch_write (mr=3D<optimized o=
-ut>, addr=3D<optimized out>, data=3D0x17, op=3D<optimized out>, attrs=3D...=
-) at /home/alxndr/Development/qemu/memory.c:1476
-  #17 0x0000555555f171d4 in flatview_write_continue (fv=3D<optimized out>, =
-addr=3D0xc1c0, attrs=3D..., ptr=3D<optimized out>, len=3D0x1, addr1=3D0x7ff=
-fffffae00, l=3D<optimized out>, mr=3D0x7fffeeb301e0) at /home/alxndr/Develo=
-pment/qemu/exec.c:3137
-  #18 0x0000555555f0fb98 in flatview_write (fv=3D0x606000038180, addr=3D<op=
-timized out>, attrs=3D..., buf=3D<optimized out>, len=3D<optimized out>) at=
- /home/alxndr/Development/qemu/exec.c:3177
-- =
-
-  =
-
-  I can reproduce it in qemu 5.0 using:
-  =
-
-  cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -qtes=
-t stdio -nographic -monitor none -serial none -M q35 -device megasas -devic=
-e scsi-cd,drive=3Dnull0 -blockdev driver=3Dnull-co,read-zeroes=3Don,node-na=
-me=3Dnull0
-  outl 0xcf8 0x80001818
-  outl 0xcfc 0xc101
-  outl 0xcf8 0x8000181c
-  outl 0xcf8 0x80001804
-  outw 0xcfc 0x7
-  outl 0xcf8 0x8000186a
-  write 0x14 0x1 0xfe
-  write 0x0 0x1 0x02
-  outb 0xc1c0 0x17
-  EOF
-  =
-
-  I also attached the commands to this launchpad report, in case the
-  formatting is broken:
-  =
-
-  qemu-system-i386 -qtest stdio -nographic -monitor none -serial none -M
-  q35 -device megasas -device scsi-cd,drive=3Dnull0 -blockdev driver=3Dnull=
--co
-  ,read-zeroes=3Don,node-name=3Dnull0 < attachment
-  =
-
-  Please let me know if I can provide any further info.
-  -Alex
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1878263
-
-Title:
-  Assertion-failure in scsi_dma_complete, with megasas
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello,
-  While fuzzing, I found an input that triggers an assertion-failure in scs=
-i_dma_complete, with megasas:
-
-  qemu-system-i386: /home/alxndr/Development/qemu/hw/scsi/scsi-
-  disk.c:292: void scsi_dma_complete(void *, int): Assertion
-  `r->req.aiocb !=3D NULL' failed.
-
-  #3  0x00007ffff6866092 in __GI___assert_fail (assertion=3D0x555556efa460 =
-<str> "r->req.aiocb !=3D NULL", file=3D0x555556ef9b20 <str> "/home/alxndr/D=
-evelopment/qemu/hw/scsi/scsi-disk.c", line=3D0x124, function=3D0x555556efa5=
-60 <__PRETTY_FUNCTION__.scsi_dma_complete> "void scsi_dma_complete(void *, =
-int)") at assert.c:101
-  #4  0x000055555669d473 in scsi_dma_complete (opaque=3D0x616000040280, ret=
-=3D<optimized out>) at /home/alxndr/Development/qemu/hw/scsi/scsi-disk.c:292
-  #5  0x000055555639c89b in dma_complete (dbs=3D<optimized out>, ret=3D<opt=
-imized out>) at /home/alxndr/Development/qemu/dma-helpers.c:118
-  #6  0x000055555639c89b in dma_blk_cb (opaque=3D<optimized out>, ret=3D<op=
-timized out>) at /home/alxndr/Development/qemu/dma-helpers.c:136
-  #7  0x000055555639bd58 in dma_blk_io (ctx=3D<optimized out>, sg=3D<optimi=
-zed out>, offset=3D<optimized out>, align=3D<optimized out>, io_func=3D<opt=
-imized
-  out>, io_func_opaque=3D<optimized out>, cb=3D<optimized out>, opaque=3D<o=
-ptimized out>, dir=3D<optimized out>) at /home/alxndr/Development/qemu/dma-=
-helpers.c:232
-  #8  0x000055555669baa5 in scsi_write_data (req=3D0x616000040280) at /home=
-/alxndr/Development/qemu/hw/scsi/scsi-disk.c:583
-  #9  0x00005555566b5d93 in scsi_req_continue (req=3D0x616000040280) at /ho=
-me/alxndr/Development/qemu/hw/scsi/scsi-bus.c:1337
-  #10 0x00005555566f52e3 in megasas_enqueue_req (cmd=3D<optimized out>, is_=
-write=3D<optimized out>) at /home/alxndr/Development/qemu/hw/scsi/megasas.c=
-:1651
-  #11 0x00005555566e276f in megasas_handle_io (s=3D<optimized out>, cmd=3D<=
-optimized out>, frame_cmd=3D<optimized out>) at /home/alxndr/Development/qe=
-mu/hw/scsi/megasas.c:1790
-  #12 0x00005555566e276f in megasas_handle_frame (s=3D<optimized out>, fram=
-e_addr=3D<optimized out>, frame_count=3D<optimized out>) at /home/alxndr/De=
-velopment/qemu/hw/scsi/megasas.c:1969
-  #13 0x00005555566e276f in megasas_mmio_write (opaque=3D<optimized out>, a=
-ddr=3D<optimized out>, val=3D<optimized out>, size=3D<optimized out>) at /h=
-ome/alxndr/Development/qemu/hw/scsi/megasas.c:2122
-  #14 0x00005555560028d7 in memory_region_write_accessor (mr=3D<optimized o=
-ut>, addr=3D<optimized out>, value=3D<optimized out>, size=3D<optimized out=
->, shift=3D<optimized out>, mask=3D<optimized out>, attrs=3D...) at /home/a=
-lxndr/Development/qemu/memory.c:483
-  #15 0x0000555556002280 in access_with_adjusted_size (addr=3D<optimized ou=
-t>, value=3D<optimized out>, size=3D<optimized out>, access_size_min=3D<opt=
-imized out>, access_size_max=3D<optimized out>, access_fn=3D<optimized out>=
-, mr=3D0x7fffeeb301e0, attrs=3D...) at /home/alxndr/Development/qemu/memory=
-.c:544
-  #16 0x0000555556002280 in memory_region_dispatch_write (mr=3D<optimized o=
-ut>, addr=3D<optimized out>, data=3D0x17, op=3D<optimized out>, attrs=3D...=
-) at /home/alxndr/Development/qemu/memory.c:1476
-  #17 0x0000555555f171d4 in flatview_write_continue (fv=3D<optimized out>, =
-addr=3D0xc1c0, attrs=3D..., ptr=3D<optimized out>, len=3D0x1, addr1=3D0x7ff=
-fffffae00, l=3D<optimized out>, mr=3D0x7fffeeb301e0) at /home/alxndr/Develo=
-pment/qemu/exec.c:3137
-  #18 0x0000555555f0fb98 in flatview_write (fv=3D0x606000038180, addr=3D<op=
-timized out>, attrs=3D..., buf=3D<optimized out>, len=3D<optimized out>) at=
- /home/alxndr/Development/qemu/exec.c:3177
-
-  I can reproduce it in qemu 5.0 using:
-
-  cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -qtes=
-t stdio -nographic -monitor none -serial none -M q35 -device megasas -devic=
-e scsi-cd,drive=3Dnull0 -blockdev driver=3Dnull-co,read-zeroes=3Don,node-na=
-me=3Dnull0
-  outl 0xcf8 0x80001818
-  outl 0xcfc 0xc101
-  outl 0xcf8 0x8000181c
-  outl 0xcf8 0x80001804
-  outw 0xcfc 0x7
-  outl 0xcf8 0x8000186a
-  write 0x14 0x1 0xfe
-  write 0x0 0x1 0x02
-  outb 0xc1c0 0x17
-  EOF
-
-  I also attached the commands to this launchpad report, in case the
-  formatting is broken:
-
-  qemu-system-i386 -qtest stdio -nographic -monitor none -serial none -M
-  q35 -device megasas -device scsi-cd,drive=3Dnull0 -blockdev driver=3Dnull-
-  co,read-zeroes=3Don,node-name=3Dnull0 < attachment
-
-  Please let me know if I can provide any further info.
-  -Alex
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1878263/+subscriptions
+thanks
+-- PMM
 
