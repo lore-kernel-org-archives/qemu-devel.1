@@ -2,91 +2,84 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 634A4C54E8E
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 14:37:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3126CC54E4A
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 14:41:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32827206F5
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 14:37:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF729206A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 14:41:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qbRLi8I8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32827206F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yilVsukQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF729206A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYW2Q-0003lA-CO
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 10:37:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57178)
+	id 1jYW62-0008P2-75
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 10:41:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57778)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jYW1f-0002pV-FV
- for qemu-devel@nongnu.org; Tue, 12 May 2020 10:36:55 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:37470)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jYW5C-0007bG-Ns
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 10:40:35 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:40727)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jYW1e-0001JH-Sa
- for qemu-devel@nongnu.org; Tue, 12 May 2020 10:36:55 -0400
-Received: by mail-lj1-x243.google.com with SMTP id o14so12854496ljp.4
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 07:36:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=dzBtlKl4RMYdlW64mKwhHYF+72DhtBFqp3InSH+cs7o=;
- b=qbRLi8I82egX5mIxhD2Qe5VSN+1wUKvuzpMn8BsvrRGMrnsOIzlPIyz9Z68rpj4WjF
- Ot9pMpGeSIpmDOVPwitR5DKqmA+DxJ4s3ZQqwu0+KBHHLv7SHLzqLPbTU41Kh5QRIJTr
- /zQN7Mq1rzcuzoj1nWG3NJQIHvzCKnUjg4Fl7cIjVmz8yAq+oqDONVkStDdXxQHrokBP
- VntUcqz8t8+uBxwVs8MTm5auaCveRB1hDVN3uNzx4sb+U2m9oADmReeEUFRB8Bja4z/h
- HjEpPDHVcsH+MyHotl6WeXGadKwF4DMACaHzLvy928IL7QZd28hqxUwHcbyAWY3c+QJk
- gyKg==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jYW5A-0002DY-L7
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 10:40:34 -0400
+Received: by mail-oi1-x242.google.com with SMTP id v128so1579082oia.7
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 07:40:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=rhkfwuLotT9TAWS/iuSW4hth2gU7uKhrg+fKgp2fjK0=;
+ b=yilVsukQEAjFq+O6sxvc0oIi8Z8PjG6YtKxOWGDFhSBF4tUfqY71luW9VfP0DWrTFg
+ ecXknD2ahgxevAWIvu56k3F+cuWlK+Py/uP3C3Mgf5xNs70K30c0yxBRFjG5aTvnOH0E
+ MPXhFQumvSh3PvKFOX9k9fVSiKHE14zXSs7oT7e1NP1SuDHFxt++g42W0+PpZKHpqDqg
+ EwIx0o27KjiMTdQ6J0WlvJu5HVYFQkjeA+xOKrsTKOS9hK0xlOXrOy7cn+TCBsAmCqJW
+ 8PLjVCLBR0r5zRbKpxtMusjF2IZTmOQjQ7tIMiAM9a1r8/U1Q9FUrMI/kR4/vrqz6FE3
+ C/iQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=dzBtlKl4RMYdlW64mKwhHYF+72DhtBFqp3InSH+cs7o=;
- b=WBPogpqw22hMYWWvSgqbaBagDRVqDZ5Wxnv/750uiASeQFgeHl6oIJSQZ3T8pw0G/W
- +/AxvGSGXSM204ywZ4EKDq64B9ekh6w4TT21mFw1G1ug0fvlCctyaNTMAz5MwKNdW1Kx
- MOohJ1dyIfD7GpulN95TjWXOoH9hJMU3F2fUluJuClkfj0jQ+1/9pvNEIEbbWKDG1J84
- Hubd6Fjd51mwPKYl7PdYARr2ep5YwbY2feSwj8YGGBRFMAeeAuXZFNDJG71dCVITspFw
- IouPhmjG1o4p6/kyZulcKORszjFbPOachUH9sHTsrn7oW8moTTSHBQ5y25D+9PhFEMya
- Q2aw==
-X-Gm-Message-State: AOAM530l88iN3KbbdNlmx2RI6rts3YS8gMAkxeEyjg7dZeyb7b8bLO3s
- DP88mnilRo07O31+ntlpf0Zn/GYAU8E=
-X-Google-Smtp-Source: ABdhPJxV2p7JRMcw7bmwbESreavJ6IZ48yhc2NStpSSVvddUOulgP1qin+FU2lM3ZkdkNErKxGAGYA==
-X-Received: by 2002:a2e:97c3:: with SMTP id m3mr3683389ljj.23.1589294212476;
- Tue, 12 May 2020 07:36:52 -0700 (PDT)
-Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id f9sm14321380lfm.62.2020.05.12.07.36.51
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 12 May 2020 07:36:51 -0700 (PDT)
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v1 1/1] target/microblaze: Add MFS Rd,EDR translation
-Date: Tue, 12 May 2020 16:36:49 +0200
-Message-Id: <20200512143649.21655-2-edgar.iglesias@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200512143649.21655-1-edgar.iglesias@gmail.com>
-References: <20200512143649.21655-1-edgar.iglesias@gmail.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=rhkfwuLotT9TAWS/iuSW4hth2gU7uKhrg+fKgp2fjK0=;
+ b=GBBLbh3uSLz7eq2uGARN6dun7Z7xWUAsDaoCVCgOsv+cFa4+NPGtlB/IWbPbboI1ki
+ lw8lR20BV2ujuCeIDzPkCEBJ2+uwkliVcpIkdjHv+7HQeewGHdv4g6iHeVevm3BInETx
+ OKI/HUFzdrihny4ZaFSti3StJUpw9PoCY425YpK+OjPe+3MH5OCcw0O59YNhuCFqpmgp
+ l3WFE5ITm1Rr1LzB4GkWXZO7ku4YAYcNOMml7EATRhS0mFsNZy857DZx8hT4m0qmHG5G
+ MZppCyH9Ldg3KYr3wuPIO8jS0d0eSluLP7+r+V5T1AIVbX/q0VLCxWgcVk9sbsVvnHcj
+ EWXA==
+X-Gm-Message-State: AGi0PuZVqmTqZXWhRMtjn+8ef6FXmcOhp7KjTLxnd4UeEQzJ/h/r+tST
+ yadocuUUjvHhfR5OhiD+Se2BJfbkw+e39tOxYfYx+w==
+X-Google-Smtp-Source: APiQypJ2ki7UmKYvNv0SgB8+Tlq/79yN73aaw4JfxnNND8ZlM9AhGifaYfBOgpS427o5/4kAJqpjcEWq2Z/NTbhkJ1M=
+X-Received: by 2002:a54:400c:: with SMTP id x12mr22754913oie.146.1589294430987; 
+ Tue, 12 May 2020 07:40:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::243;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x243.google.com
+References: <20200508152200.6547-1-richard.henderson@linaro.org>
+ <20200508152200.6547-16-richard.henderson@linaro.org>
+In-Reply-To: <20200508152200.6547-16-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 12 May 2020 15:40:19 +0100
+Message-ID: <CAFEAcA_TvC3jxAq8yYKOT43i_+dB0XFyLcqQnAc7N0eXDuZuyA@mail.gmail.com>
+Subject: Re: [PATCH v3 15/16] target/arm: Vectorize SABD/UABD
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x242.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 13
-X-Spam_score: 1.3
-X-Spam_bar: +
-X-Spam_report: (1.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- FSL_HELO_FAKE=3.399, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,44 +93,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
- edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
- frasse.iglesias@gmail.com, alistair@alistair23.me, frederic.konrad@adacore.com,
- tong.ho@xilinx.com, philmd@redhat.com, luc.michel@greensocs.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Tong Ho <tong.ho@xilinx.com>
+On Fri, 8 May 2020 at 16:22, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Include 64-bit element size in preparation for SVE2.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-This is to fix cpu-abort with 'qemu: fatal: unknown mfs reg d'
-(in the default case) when microblaze guest issues 'MFS Rd,EDR'
-instruction.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Since embeddedsw release 2019.2, XPlm_ExceptionHandler() issues
-the instruction on exception, and microblaze model aborts when
-PLM firmware guest encounters an exception.
-
-Signed-off-by: Tong Ho <tong.ho@xilinx.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
----
- target/microblaze/translate.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 20b7427811..92b3630804 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -581,6 +581,7 @@ static void dec_msr(DisasContext *dc)
-             case SR_ESR:
-             case SR_FSR:
-             case SR_BTR:
-+            case SR_EDR:
-                 tcg_gen_extrl_i64_i32(cpu_R[dc->rd], cpu_SR[sr]);
-                 break;
-             case 0x800:
--- 
-2.20.1
-
+thanks
+-- PMM
 
