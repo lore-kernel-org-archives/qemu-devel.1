@@ -1,85 +1,94 @@
-Return-Path: <SRS0=xv4c=6Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D399C47255
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 23:02:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9288C47255
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 00:56:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 575D820714
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 May 2020 23:02:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B0410206F5
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 00:56:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bMojWTC9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 575D820714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=braap-org.20150623.gappssmtp.com header.i=@braap-org.20150623.gappssmtp.com header.b="XiRX/zQ+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0410206F5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=braap.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYHRA-0006zw-LV
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 19:02:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54036)
+	id 1jYJDf-0000Wv-Q4
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 20:56:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39118)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1jYHOd-0004MH-RR
- for qemu-devel@nongnu.org; Mon, 11 May 2020 18:59:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38119
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1jYHOb-00021L-EH
- for qemu-devel@nongnu.org; Mon, 11 May 2020 18:59:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589237974;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0RoETek6S0S6LH9/sMqViUHVcCuyps0KXjSVs46mQ2Y=;
- b=bMojWTC91EmGx9m3sc77O6eXNFbyIaONXC3Rfa473QWbWxy6yhe/Snrw8OX1hy80Bz+FR6
- ZUXGwZ8V86/FeTR3t+gtlNEWa204DqH68QGCjX/LQwbPZ9QzdkcWP2i9dBiucllvDq5Mqm
- 3AQMpbYVPFHx9+1nUtJzLrYWHVD05ag=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-442-eJRemzvXPU6hkdiTSl188w-1; Mon, 11 May 2020 18:59:30 -0400
-X-MC-Unique: eJRemzvXPU6hkdiTSl188w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16209460;
- Mon, 11 May 2020 22:59:29 +0000 (UTC)
-Received: from w520.home (ovpn-113-111.phx2.redhat.com [10.3.113.111])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 245415D782;
- Mon, 11 May 2020 22:59:28 +0000 (UTC)
-Date: Mon, 11 May 2020 16:59:27 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Jon Derrick <jonathan.derrick@intel.com>
-Subject: Re: [PATCH for QEMU v2] hw/vfio: Add VMD Passthrough Quirk
-Message-ID: <20200511165927.27b41d65@w520.home>
-In-Reply-To: <20200511190129.9313-2-jonathan.derrick@intel.com>
-References: <20200511190129.9313-1-jonathan.derrick@intel.com>
- <20200511190129.9313-2-jonathan.derrick@intel.com>
+ (Exim 4.90_1) (envelope-from <cota@braap.org>) id 1jYJCg-0008UN-MS
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 20:55:26 -0400
+Received: from mail-qv1-xf43.google.com ([2607:f8b0:4864:20::f43]:46069)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <cota@braap.org>) id 1jYJCf-0001ty-F4
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 20:55:26 -0400
+Received: by mail-qv1-xf43.google.com with SMTP id z9so3500610qvi.12
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 17:55:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=braap-org.20150623.gappssmtp.com; s=20150623;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=7UDeX33wDJ5aUCrbtiEMQoLEnh7OgkxLNDFtjXuqdeg=;
+ b=XiRX/zQ+4B4md7CF8JfwAOlmGeDAIHMagnJUhkjIvxReQWO24SrUM4hJQr1QXkippj
+ CVDsXN5y3yv1KSEZTff7t9sVG/rQyOk1UoKnFsR1Ki1E7SIEHe6+qe+lZzk8slfPm9IM
+ +vKaYLeDF+iMgpveJ5UG/VLozEZyHWA0IySCuinOmBMeXT2ujBNJXNHv8mOzEN2kaKqO
+ u38a90SpulX6phzLY2A0acMwW68Sl/A19o7AYPd784Avzf/8VMsDJm0TKCjNiXRvbESQ
+ R7dndPy92yvmEKhuDCJ9E+XMEHgTpel3GdPiEXjt8WrLZqhRoAGko4xDvc6uM71tPfhr
+ sBzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=7UDeX33wDJ5aUCrbtiEMQoLEnh7OgkxLNDFtjXuqdeg=;
+ b=M5v9YWGmFgI/yVbBf6tLCsuK6cbOA/kfHMkJdJqY0aZafDmB9Gx1vDbG5M6zv1iuqR
+ 3v/8kW2om6fk0Gwj16oSq2tH6YD/5aQXRPxLgQaO9edqHQhoSnJtW/OJODYIqbcjKnhn
+ 9e3slpUPLYsyIhKe/6Rh1pvAJNwi859YAEnkbqqk525Q7zWBV2nBR4lndl0y8k6Zndqx
+ htVrU9dFFxiUSb3EbgfPL8vzvL6tdXH2kTV+0s4Agg6/jSedcEGGEP5wK43jUAONXm3g
+ BJvqmZCt1Pjqxj3m9A7PsUqM0Dp9JFP5ddES2iP0jChCxEvA1fETIxQ9veN2qSKGQJIW
+ lMuQ==
+X-Gm-Message-State: AGi0PuaONEqwFXtnhzyy6gOogOxNwe9LBM+8WtWQ3j7oxSnIFDuYLajF
+ Ur87D74f2njKvAjwCE76B+F+uA==
+X-Google-Smtp-Source: APiQypK6mbakHlAkLhA+umodw8thLqtqeqMLBwuS9wPLbZpwOlkHne91zpEPCUSt7jj39RZoMbl51w==
+X-Received: by 2002:a05:6214:1427:: with SMTP id
+ o7mr7146511qvx.104.1589244922478; 
+ Mon, 11 May 2020 17:55:22 -0700 (PDT)
+Received: from localhost ([70.19.54.161])
+ by smtp.gmail.com with ESMTPSA id l24sm10458431qtp.8.2020.05.11.17.55.21
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 11 May 2020 17:55:21 -0700 (PDT)
+Date: Mon, 11 May 2020 20:55:21 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+To: Nikolay Igotti <igotti@gmail.com>
+Subject: Re: [PATCH 3/3] plugins: avoid failing plugin when CPU is inited
+ several times
+Message-ID: <20200512005521.GA198983@sff>
+References: <CAEme+7FPF+inSJSXQPmuv8Up3Eam0N7fT03zqM-RvcvKsxjfVQ@mail.gmail.com>
+ <f4feb648-7dc5-ac54-bc0b-db650dd176f1@vivier.eu>
+ <CAEme+7EtF6B2+2U_yF2dd-g2m+=S3P5=DL1oLmHfmWw2S7PYAw@mail.gmail.com>
+ <20200509230016.GA109593@sff>
+ <CAEme+7H82A2RNk5g09rmhThxW4=6sqWP5o65OCsJ8zf1L-nb+w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Received-SPF: pass client-ip=205.139.110.120;
- envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 00:05:06
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAEme+7H82A2RNk5g09rmhThxW4=6sqWP5o65OCsJ8zf1L-nb+w@mail.gmail.com>
+Received-SPF: softfail client-ip=2607:f8b0:4864:20::f43;
+ envelope-from=cota@braap.org; helo=mail-qv1-xf43.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -11
+X-Spam_score: -1.2
+X-Spam_bar: -
+X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_SOFTFAIL=0.665,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,237 +102,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, linux-pci@vger.kernel.org,
- qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
- Andrzej Jakowski <andrzej.jakowski@linux.intel.com>,
- Bjorn Helgaas <helgaas@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc: riku.voipio@iki.fi, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 11 May 2020 15:01:27 -0400
-Jon Derrick <jonathan.derrick@intel.com> wrote:
+On Mon, May 11, 2020 at 18:53:19 +0300, Nikolay Igotti wrote:
+> Attached to the mail counter.c when running with attached test.c compiled
+> to Linux standalone binary shows failing assert, unless the patch is
+> applied.
 
-> The VMD endpoint provides a real PCIe domain to the guest, including
+I didn't get the attachment. Can you paste the code at the end of your
+reply?
 
-Please define VMD.  I'm sure this is obvious to many, but I've had to
-do some research.  The best TL;DR summary I've found is Keith's
-original commit 185a383ada2e adding the controller to Linux.  If there's
-something better, please let me know.
-
-> bridges and endpoints. Because the VMD domain is enumerated by the guest
-> kernel, the guest kernel will assign Guest Physical Addresses to the
-> downstream endpoint BARs and bridge windows.
->
-> When the guest kernel performs MMIO to VMD sub-devices, IOMMU will
-> translate from the guest address space to the physical address space.
-> Because the bridges have been programmed with guest addresses, the
-> bridges will reject the transaction containing physical addresses.
-
-I'm lost, what IOMMU is involved in CPU access to MMIO space?  My guess
-is that since all MMIO of this domain is mapped behind the host
-endpoint BARs 2 & 4 that QEMU simply accesses it via mapping of those
-BARs into the VM, so it's the MMU, not the IOMMU performing those GPA
-to HPA translations.  But then presumably the bridges within the domain
-are scrambled because their apertures are programmed with ranges that
-don't map into the VMD endpoint BARs.  Is that remotely correct?  Some
-/proc/iomem output and/or lspci listing from the host to see how this
-works would be useful.
-
-> VMD device 28C0 natively assists passthrough by providing the Host
-> Physical Address in shadow registers accessible to the guest for bridge
-> window assignment. The shadow registers are valid if bit 1 is set in VMD
-> VMLOCK config register 0x70. Future VMDs will also support this feature.
-> Existing VMDs have config register 0x70 reserved, and will return 0 on
-> reads.
-
-So these shadow registers are simply exposing the host BAR2 & BAR4
-addresses into the guest, so the quirk is dependent on reading those
-values from the device before anyone has written to them and the BAR
-emulation in the kernel kicks in (not a problem, just an observation).
-
-Does the VMD controller code then use these bases addresses to program
-the bridges/endpoint within the domain?  What does the same /proc/iomem
-or lspci look like inside the guest then?  It seems like we'd see the
-VMD endpoint with GPA BARs, but the devices within the domain using
-HPAs.  If that's remotely true, and we're not forcing an identity
-mapping of this HPA range into the GPA, does the vmd controller driver
-impose a TRA function on these MMIO addresses in the guest?
-
-Sorry if I'm way off, I'm piecing things together from scant
-information here.  Please Cc me on future vfio related patches.  Thanks,
-
-Alex
-
- 
-> In order to support existing VMDs, this quirk emulates the VMLOCK and
-> HPA shadow registers for all VMD device ids which don't natively assist
-> with passthrough. The Linux VMD driver is updated to allow existing VMD
-> devices to query VMLOCK for passthrough support.
-> 
-> Signed-off-by: Jon Derrick <jonathan.derrick@intel.com>
-> ---
->  hw/vfio/pci-quirks.c | 103 +++++++++++++++++++++++++++++++++++++++++++
->  hw/vfio/pci.c        |   7 +++
->  hw/vfio/pci.h        |   2 +
->  hw/vfio/trace-events |   3 ++
->  4 files changed, 115 insertions(+)
-> 
-> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-> index 2d348f8237..4060a6a95d 100644
-> --- a/hw/vfio/pci-quirks.c
-> +++ b/hw/vfio/pci-quirks.c
-> @@ -1709,3 +1709,106 @@ free_exit:
->  
->      return ret;
->  }
-> +
-> +/*
-> + * The VMD endpoint provides a real PCIe domain to the guest and the guest
-> + * kernel performs enumeration of the VMD sub-device domain. Guest transactions
-> + * to VMD sub-devices go through IOMMU translation from guest addresses to
-> + * physical addresses. When MMIO goes to an endpoint after being translated to
-> + * physical addresses, the bridge rejects the transaction because the window
-> + * has been programmed with guest addresses.
-> + *
-> + * VMD can use the Host Physical Address in order to correctly program the
-> + * bridge windows in its PCIe domain. VMD device 28C0 has HPA shadow registers
-> + * located at offset 0x2000 in MEMBAR2 (BAR 4). The shadow registers are valid
-> + * if bit 1 is set in the VMD VMLOCK config register 0x70. VMD devices without
-> + * this native assistance can have these registers safely emulated as these
-> + * registers are reserved.
-> + */
-> +typedef struct VFIOVMDQuirk {
-> +    VFIOPCIDevice *vdev;
-> +    uint64_t membar_phys[2];
-> +} VFIOVMDQuirk;
-> +
-> +static uint64_t vfio_vmd_quirk_read(void *opaque, hwaddr addr, unsigned size)
-> +{
-> +    VFIOVMDQuirk *data = opaque;
-> +    uint64_t val = 0;
-> +
-> +    memcpy(&val, (void *)data->membar_phys + addr, size);
-> +    return val;
-> +}
-> +
-> +static const MemoryRegionOps vfio_vmd_quirk = {
-> +    .read = vfio_vmd_quirk_read,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +};
-> +
-> +#define VMD_VMLOCK  0x70
-> +#define VMD_SHADOW  0x2000
-> +#define VMD_MEMBAR2 4
-> +
-> +static int vfio_vmd_emulate_shadow_registers(VFIOPCIDevice *vdev)
-> +{
-> +    VFIOQuirk *quirk;
-> +    VFIOVMDQuirk *data;
-> +    PCIDevice *pdev = &vdev->pdev;
-> +    int ret;
-> +
-> +    data = g_malloc0(sizeof(*data));
-> +    ret = pread(vdev->vbasedev.fd, data->membar_phys, 16,
-> +                vdev->config_offset + PCI_BASE_ADDRESS_2);
-> +    if (ret != 16) {
-> +        error_report("VMD %s cannot read MEMBARs (%d)",
-> +                     vdev->vbasedev.name, ret);
-> +        g_free(data);
-> +        return -EFAULT;
-> +    }
-> +
-> +    quirk = vfio_quirk_alloc(1);
-> +    quirk->data = data;
-> +    data->vdev = vdev;
-> +
-> +    /* Emulate Shadow Registers */
-> +    memory_region_init_io(quirk->mem, OBJECT(vdev), &vfio_vmd_quirk, data,
-> +                          "vfio-vmd-quirk", sizeof(data->membar_phys));
-> +    memory_region_add_subregion_overlap(vdev->bars[VMD_MEMBAR2].region.mem,
-> +                                        VMD_SHADOW, quirk->mem, 1);
-> +    memory_region_set_readonly(quirk->mem, true);
-> +    memory_region_set_enabled(quirk->mem, true);
-> +
-> +    QLIST_INSERT_HEAD(&vdev->bars[VMD_MEMBAR2].quirks, quirk, next);
-> +
-> +    trace_vfio_pci_vmd_quirk_shadow_regs(vdev->vbasedev.name,
-> +                                         data->membar_phys[0],
-> +                                         data->membar_phys[1]);
-> +
-> +    /* Advertise Shadow Register support */
-> +    pci_byte_test_and_set_mask(pdev->config + VMD_VMLOCK, 0x2);
-> +    pci_set_byte(pdev->wmask + VMD_VMLOCK, 0);
-> +    pci_set_byte(vdev->emulated_config_bits + VMD_VMLOCK, 0x2);
-> +
-> +    trace_vfio_pci_vmd_quirk_vmlock(vdev->vbasedev.name,
-> +                                    pci_get_byte(pdev->config + VMD_VMLOCK));
-> +
-> +    return 0;
-> +}
-> +
-> +int vfio_pci_vmd_init(VFIOPCIDevice *vdev)
-> +{
-> +    int ret = 0;
-> +
-> +    switch (vdev->device_id) {
-> +    case 0x28C0: /* Native passthrough support */
-> +        break;
-> +    /* Emulates Native passthrough support */
-> +    case 0x201D:
-> +    case 0x467F:
-> +    case 0x4C3D:
-> +    case 0x9A0B:
-> +        ret = vfio_vmd_emulate_shadow_registers(vdev);
-> +        break;
-> +    }
-> +
-> +    return ret;
-> +}
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 5e75a95129..85425a1a6f 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -3024,6 +3024,13 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->          }
->      }
->  
-> +    if (vdev->vendor_id == PCI_VENDOR_ID_INTEL) {
-> +        ret = vfio_pci_vmd_init(vdev);
-> +        if (ret) {
-> +            error_report("Failed to setup VMD");
-> +        }
-> +    }
-> +
->      vfio_register_err_notifier(vdev);
->      vfio_register_req_notifier(vdev);
->      vfio_setup_resetfn_quirk(vdev);
-> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-> index 0da7a20a7e..e8632d806b 100644
-> --- a/hw/vfio/pci.h
-> +++ b/hw/vfio/pci.h
-> @@ -217,6 +217,8 @@ int vfio_pci_igd_opregion_init(VFIOPCIDevice *vdev,
->  int vfio_pci_nvidia_v100_ram_init(VFIOPCIDevice *vdev, Error **errp);
->  int vfio_pci_nvlink2_init(VFIOPCIDevice *vdev, Error **errp);
->  
-> +int vfio_pci_vmd_init(VFIOPCIDevice *vdev);
-> +
->  void vfio_display_reset(VFIOPCIDevice *vdev);
->  int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp);
->  void vfio_display_finalize(VFIOPCIDevice *vdev);
-> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> index b1ef55a33f..ed64e477db 100644
-> --- a/hw/vfio/trace-events
-> +++ b/hw/vfio/trace-events
-> @@ -90,6 +90,9 @@ vfio_pci_nvidia_gpu_setup_quirk(const char *name, uint64_t tgt, uint64_t size) "
->  vfio_pci_nvlink2_setup_quirk_ssatgt(const char *name, uint64_t tgt, uint64_t size) "%s tgt=0x%"PRIx64" size=0x%"PRIx64
->  vfio_pci_nvlink2_setup_quirk_lnkspd(const char *name, uint32_t link_speed) "%s link_speed=0x%x"
->  
-> +vfio_pci_vmd_quirk_shadow_regs(const char *name, uint64_t mb1, uint64_t mb2) "%s membar1_phys=0x%"PRIx64" membar2_phys=0x%"PRIx64
-> +vfio_pci_vmd_quirk_vmlock(const char *name, uint8_t vmlock) "%s vmlock=0x%x"
-> +
->  # common.c
->  vfio_region_write(const char *name, int index, uint64_t addr, uint64_t data, unsigned size) " (%s:region%d+0x%"PRIx64", 0x%"PRIx64 ", %d)"
->  vfio_region_read(char *name, int index, uint64_t addr, unsigned size, uint64_t data) " (%s:region%d+0x%"PRIx64", %d) = 0x%"PRIx64
-
+Thanks,
+		Emilio
 
