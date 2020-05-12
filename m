@@ -2,86 +2,97 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB314CA90AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 18:38:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB8C5CA90AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 18:39:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 894DD2064A
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 18:38:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D82E20740
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 18:39:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iowUVSae"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 894DD2064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Efj3qIJE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D82E20740
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYZnV-0004kz-OX
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 14:38:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40846)
+	id 1jYZoZ-0005wl-P6
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 14:39:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40916)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1jYZmS-0003ss-B2
- for qemu-devel@nongnu.org; Tue, 12 May 2020 14:37:28 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57085
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1jYZmP-0003FZ-Ld
- for qemu-devel@nongnu.org; Tue, 12 May 2020 14:37:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589308643;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=RBHa5Cuxad+m+bT1Szig6IiwRvnZWW/s/yP0tv/XhC8=;
- b=iowUVSaeYlRT93eH5C+L/XhhCNqZJV2fIvTyPoL3FINf7v+vepDpinYoORA4NWqPKMQK/+
- Fi+L85BbjZULqJcI8OuCMmOikRo+7Q/WYzYdDXLXT3VP/icACKSvFLF/hpxgAy1AZX/3ZU
- mJKSpTt1Mx0m4NjTc/8MOkJRtNgP9Qs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-oKZXa0InNieA3CkxYtir6g-1; Tue, 12 May 2020 14:37:17 -0400
-X-MC-Unique: oKZXa0InNieA3CkxYtir6g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5178107B768;
- Tue, 12 May 2020 18:37:16 +0000 (UTC)
-Received: from kaapi (unknown [10.40.193.76])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C8525D9DD;
- Tue, 12 May 2020 18:37:09 +0000 (UTC)
-Date: Wed, 13 May 2020 00:07:06 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-X-X-Sender: pjp@kaapi
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH 0/2] use unsigned type for MegasasState fields
-In-Reply-To: <26201c24-c483-85a7-2f4b-b3cc56d4b8b7@redhat.com>
-Message-ID: <nycvar.YSQ.7.76.2005122357030.1451610@xnncv>
-References: <20200507105718.1319187-1-ppandit@redhat.com>
- <26201c24-c483-85a7-2f4b-b3cc56d4b8b7@redhat.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jYZnQ-0004sI-DS
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 14:38:28 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37471)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jYZnO-0003Pb-GU
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 14:38:28 -0400
+Received: by mail-wm1-x343.google.com with SMTP id z72so15212959wmc.2
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 11:38:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=uIxiGN9mXSYGxmBdjXw3pxY7SgUErzPsd8MDQrUyD5I=;
+ b=Efj3qIJE5RL9S7oEQ0hR7sUXEsDumndx04AH5VgG7t22RFS5AJ1zBVUrs8rBmIH4OC
+ GrHJU5oF1GOEKkSeTp9ewMEeZxLB2NtDXGgG1O9AMS4v9EPss6UB6epdovKThQBvNZbv
+ EtK/gnvRshFoaB31mCflpodP1Bcz4qEdOe2YPR6Vb5PZCKzP/mFUk3U8ZOphrNqXHH3z
+ GuX4vInkKxooJYVoLlG56ikPPl0MOxsahI0iejnsgRTpIgV5l/bf8G4eaHuXan9+TAnx
+ pBX+bEz1hbGZMS+UY5mKjjzVOm4kO0xsZjoG9ZweiHeiRhlRsvVqRTKbWfZJyKI2KkmZ
+ AADA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=uIxiGN9mXSYGxmBdjXw3pxY7SgUErzPsd8MDQrUyD5I=;
+ b=ckZPDxRTT+XHfXVztxVOAqinKIInCdunYaYVnhNXuT1x8/cWUCoRFwrhpntQBiK/09
+ lzxhWsoelUFnFHCcublsF7cK9EvzYLHi+wbKlEj4MdEeQY28LvI5n/tGGdvlao+DYHav
+ Br75FbKObzZ48XtDX16c2WIvTUkH6+pb0f4NmaWOqRmyeztq/n7qliBevrbP4XK4WeAm
+ qCauV5imsWu+30PSS5W5SrQaZZVtf5yNvZKyvacryf1teZi1x1R29x6mFzqDawWZbfJ4
+ KLQHL0bEb+Cc5ANtIy10kFXIqr85IcReWW4fW1Khc1IKhqHFyvPc6u6xDI1ds1s7+HTq
+ JNlQ==
+X-Gm-Message-State: AGi0PuZm97y+DkZheTaYRnxSw9LIwY58LsANDfhWt/bEwHDb5OwodCMc
+ efjRrdpjcL/BQZiOrPIO6viJ8Q==
+X-Google-Smtp-Source: APiQypKljemAaKbxoOpo8YvD612QSVpf7piftnMfiAlbBc8MsL2JAPJ9zkFeSnnjIR/IgvtVq1fU8w==
+X-Received: by 2002:a05:600c:1:: with SMTP id
+ g1mr37888087wmc.142.1589308704880; 
+ Tue, 12 May 2020 11:38:24 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id q9sm8615865wmb.34.2020.05.12.11.38.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 12 May 2020 11:38:23 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id B5D4D1FF7E;
+ Tue, 12 May 2020 19:38:22 +0100 (BST)
+References: <20200326193156.4322-1-robert.foley@linaro.org>
+ <20200326193156.4322-75-robert.foley@linaro.org>
+User-agent: mu4e 1.4.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Robert Foley <robert.foley@linaro.org>
+Subject: Re: [PATCH v8 74/74] cputlb: queue async flush jobs without the BQL
+In-reply-to: <20200326193156.4322-75-robert.foley@linaro.org>
+Date: Tue, 12 May 2020 19:38:22 +0100
+Message-ID: <878shxf17l.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/mixed;
- boundary="-1463810047-489165051-1589308636=:1451610"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=ppandit@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 02:02:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,60 +105,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Ren Ding <rding@gatech.edu>,
- =?ISO-8859-15?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: peter.puhov@linaro.org, "Emilio G. Cota" <cota@braap.org>,
+ richard.henderson@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
----1463810047-489165051-1589308636=:1451610
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
 
-+-- On Tue, 12 May 2020, Philippe Mathieu-Daudé wrote --+
-| Cc'ing Marc-André our signed/unsigned conversion expert (with Paolo).
+Robert Foley <robert.foley@linaro.org> writes:
 
-  megasas_init_firmware
-    pa_lo = le32_to_cpu(initq->pi_addr_lo);
-    pa_hi = le32_to_cpu(initq->pi_addr_hi);
-    s->producer_pa = ((uint64_t) pa_hi << 32) | pa_lo;
-    s->reply_queue_head = ldl_le_pci_dma(pcid, s->producer_pa);
+> From: "Emilio G. Cota" <cota@braap.org>
+>
+> This yields sizable scalability improvements, as the below results show.
+>
+> Host: Two Intel E5-2683 v3 14-core CPUs at 2.00 GHz (Haswell)
+>
+> Workload: Ubuntu 18.04 ppc64 compiling the linux kernel with
+> "make -j N", where N is the number of cores in the guest.
+>
+<snip>
 
-IIUC, here ldl_le_pci_dma() returns an 'uint32_t' type, but since 
-'reply_queue_head' is a signed int, large 'uint32_t' value turns negative.
+So my numbers running a aarch64 guest running pigz with an x86_64 host
+the gains start to tail off past -smp 12 but still seem to be showing
+some gain up to -smp 16 (the host has 24 cores):
 
-| Do you have a reproducer?
+  ./aarch64-softmmu/qemu-system-aarch64 -machine virt,graphics=3Don,gic-ver=
+sion=3D3,virtualization=3Don -cpu cortex-a53 -serial mon:stdio -nic user,mo=
+del=3Dvirtio-net-pci,hostfwd=3Dtcp::2222-:22 -device virtio-scsi-pci -devic=
+e scsi-hd,drive=3Dhd0 -blockdev driver=3Draw,node-name=3Dhd0,discard=3Dunma=
+p,file.driver=3Dhost_device,file.filename=3D/dev/zvol/hackpool-0/debian-bus=
+ter-arm64 -kernel ../../../linux.git/builds/arm64.nopreempt/arch/arm64/boot=
+/Image -append "console=3DttyAMA0 root=3D/dev/sda2 systemd.unit=3Dbenchmark=
+-pigz.service" -display none -m 4096 -snapshot -smp $SMP
 
-  Yes, there is a reproducer with ASAN, though it did not work for me. 
-Ren(CC'd) had shared this trace:
+  | Command                     | Mean [s]         |    Min...Max [s] |
+  |-----------------------------+------------------+------------------|
+  | =3D$QEMU $QEMU_ARGS  -smp 4=3D  | 146.738 =C2=B1 62.272 | 43.861...246.=
+139 |
+  | =3D$QEMU $QEMU_ARGS  -smp 5=3D  | 33.984 =C2=B1 13.370  |  29.501...72.=
+032 |
+  | =3D$QEMU $QEMU_ARGS  -smp 6=3D  | 26.128 =C2=B1 0.189   |  25.837...26.=
+475 |
+  | =3D$QEMU $QEMU_ARGS  -smp 7=3D  | 23.459 =C2=B1 0.090   |  23.252...23.=
+560 |
+  | =3D$QEMU $QEMU_ARGS  -smp 8=3D  | 21.579 =C2=B1 0.117   |  21.418...21.=
+764 |
+  | =3D$QEMU $QEMU_ARGS  -smp 9=3D  | 20.163 =C2=B1 0.142   |  19.938...20.=
+387 |
+  | =3D$QEMU $QEMU_ARGS  -smp 10=3D | 19.028 =C2=B1 0.106   |  18.877...19.=
+183 |
+  | =3D$QEMU $QEMU_ARGS  -smp 11=3D | 18.166 =C2=B1 0.093   |  18.081...18.=
+386 |
+  | =3D$QEMU $QEMU_ARGS  -smp 12=3D | 17.464 =C2=B1 0.067   |  17.383...17.=
+614 |
+  | =3D$QEMU $QEMU_ARGS  -smp 13=3D | 16.928 =C2=B1 0.104   |  16.754...17.=
+158 |
+  | =3D$QEMU $QEMU_ARGS  -smp 14=3D | 16.615 =C2=B1 0.188   |  16.486...17.=
+105 |
+  | =3D$QEMU $QEMU_ARGS  -smp 15=3D | 16.344 =C2=B1 0.176   |  16.094...16.=
+680 |
+  | =3D$QEMU $QEMU_ARGS  -smp 16=3D | 16.085 =C2=B1 0.215   |  15.869...16.=
+623 |
 
-AddressSanitizer: heap-buffer-overflow on address 0x7f9159054058 at pc 0x55763514b5cd bp 0x7f9179bd6d90 sp 0x7f9179bd6d88
-READ of size 8 at 0x7f9159054058 thread T2
-  #0 0x55763514b5cc in megasas_lookup_frame /home/ren/tmp/redacted-dbg/qemu/hw/scsi/megasas.c:449:30
-  #1 0x55763513205c in megasas_handle_abort /home/ren/tmp/redacted-dbg/qemu/hw/scsi/megasas.c:1904:17
-  #2 0x55763512d0f8 in megasas_handle_frame /home/ren/tmp/redacted-dbg/qemu/hw/scsi/megasas.c:1961:24
-  #3 0x55763512ba7d in megasas_mmio_write /home/ren/tmp/redacted-dbg/qemu/hw/scsi/megasas.c:2122:9
-  #4 0x55763515247c in megasas_port_write /home/ren/tmp/redacted-dbg/qemu/hw/scsi/megasas.c:2173:5
-  #5 0x557634621b3b in memory_region_write_accessor /home/ren/tmp/redacted-dbg/qemu/memory.c:483:5
-  #6 0x557634621741 in access_with_adjusted_size /home/ren/tmp/redacted-dbg/qemu/memory.c:544:18
-  #7 0x557634620498 in memory_region_dispatch_write /home/ren/tmp/redacted-dbg/qemu/memory.c:1482:16
-  #8 0x5576344b6b6c in flatview_write_continue /home/ren/tmp/redacted-dbg/qemu/exec.c:3161:23
-  #9 0x5576344a87d9 in flatview_write /home/ren/tmp/redacted-dbg/qemu/exec.c:3201:14
-  #10 0x5576344a8376 in address_space_write /home/ren/tmp/redacted-dbg/qemu/exec.c:3291:18
-  #11 0x5576344a8af4 in address_space_rw /home/ren/tmp/redacted-dbg/qemu/exec.c:3301:16
-  #12 0x557634689e10 in kvm_handle_io /home/ren/tmp/redacted-dbg/qemu/accel/kvm/kvm-all.c:2086:9
-  #13 0x557634688a45 in kvm_cpu_exec /home/ren/tmp/redacted-dbg/qemu/accel/kvm/kvm-all.c:2332:13
-  #14 0x5576345ee7aa in qemu_kvm_cpu_thread_fn /home/ren/tmp/redacted-dbg/qemu/cpus.c:1299:17
-  #15 0x557635a11509 in qemu_thread_start /home/ren/tmp/redacted-dbg/qemu/util/qemu-thread-posix.c:519:9
-  #16 0x7f918cec26b9 in start_thread (/lib/x86_64-linux-gnu/libpthread.so.0+0x76b9)
-  #17 0x7f918c5d441c in clone /build/glibc-LK5gWL/glibc-2.23/misc/../sysdeps/unix/sysv/linux/x86_64/clone.S:109
-
-
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
----1463810047-489165051-1589308636=:1451610--
-
+--=20
+Alex Benn=C3=A9e
 
