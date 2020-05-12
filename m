@@ -2,83 +2,95 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96C21C54E8B
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 09:02:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 778D4C54E8F
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 09:05:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F7F52082E
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 09:02:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F7F52082E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 44E5120575
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 09:05:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jN3nT58z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44E5120575
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYQnk-0002gz-MV
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 05:02:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37816)
+	id 1jYQqT-0004Lz-Fl
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 05:05:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38214)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jYQma-0001x8-5u
- for qemu-devel@nongnu.org; Tue, 12 May 2020 05:01:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60060)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jYQmY-0005is-W0
- for qemu-devel@nongnu.org; Tue, 12 May 2020 05:00:59 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jYQmW-0002Eu-Pv
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 09:00:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 9E38A2E810B
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 09:00:56 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jYQpf-0003qU-TZ
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 05:04:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46345
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jYQpc-00075B-QL
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 05:04:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589274247;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=uP5OIdppnF9wjTNab8JL/hH5f9l2LHtV3MoWTuIc32w=;
+ b=jN3nT58z5rTxqAyzvyBfYV5EXGSUlmLB8e4EwmWvYhnc358GVFZdXphwUIsCYSbwFLpZPK
+ CYznbi6XRMtNAJ1qydDmorx9CoN0Hiv0Dz06zr2DnDt9edyPpN8tjfR2SOo01PpWiSFrae
+ xH1QBTndFd/lxfSJErWn0TrhYc//dzE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-19-LN8WoJXCP8Co7skOl2katA-1; Tue, 12 May 2020 05:04:03 -0400
+X-MC-Unique: LN8WoJXCP8Co7skOl2katA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2820835B40;
+ Tue, 12 May 2020 09:04:01 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.71])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B285C1059115;
+ Tue, 12 May 2020 09:03:55 +0000 (UTC)
+Date: Tue, 12 May 2020 10:03:52 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Lukas Straub <lukasstraub2@web.de>
+Subject: Re: [PATCH 0/5] Introduce 'yank' oob qmp command to recover from
+ hanging qemu
+Message-ID: <20200512090352.GG1191162@redhat.com>
+References: <cover.1589193717.git.lukasstraub2@web.de>
+ <20200511114947.GJ1135885@redhat.com>
+ <20200511201218.76f30e0b@luklap>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 12 May 2020 08:52:22 -0000
-From: Laurent Vivier <Laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: linux-user ppc64 tcg
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: laurent-vivier mptcultist
-X-Launchpad-Bug-Reporter: Catherine A. Frederick (mptcultist)
-X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
-References: <158906134520.4878.9001427424029475940.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158927354209.4303.16829238998500928223.malone@chaenomeles.canonical.com>
-Subject: [Bug 1877794] Re: Constant Folding on 64-bit Subtraction causes
- SIGILL on linux-user glxgears ppc64le to x86_64 by way of generating bad
- shift instruction with c=-1
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 0adba12466fc2fec222a0c72fd6e269e401d1726
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 05:00:57
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200511201218.76f30e0b@luklap>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 02:20:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -10
+X-Spam_score: -1.1
+X-Spam_bar: -
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FROM_EXCESS_BASE64=0.979, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,55 +99,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1877794 <1877794@bugs.launchpad.net>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QEMU has been selected to have a GSoC intern to work on new ioctl():
-https://wiki.qemu.org/Google_Summer_of_Code_2020#Extend_linux-user_syscalls=
-_and_ioctls
+On Mon, May 11, 2020 at 08:12:18PM +0200, Lukas Straub wrote:
+> On Mon, 11 May 2020 12:49:47 +0100
+> Daniel P. Berrangé <berrange@redhat.com> wrote:
+> 
+> > On Mon, May 11, 2020 at 01:14:34PM +0200, Lukas Straub wrote:
+> > > Hello Everyone,
+> > > In many cases, if qemu has a network connection (qmp, migration, chardev, etc.)
+> > > to some other server and that server dies or hangs, qemu hangs too.  
+> > 
+> > If qemu as a whole hangs due to a stalled network connection, that is a
+> > bug in QEMU that we should be fixing IMHO. QEMU should be doing non-blocking
+> > I/O in general, such that if the network connection or remote server stalls,
+> > we simply stop sending I/O - we shouldn't ever hang the QEMU process or main
+> > loop.
+> > 
+> > There are places in QEMU code which are not well behaved in this respect,
+> > but many are, and others are getting fixed where found to be important.
+> > 
+> > Arguably any place in QEMU code which can result in a hang of QEMU in the
+> > event of a stalled network should be considered a security flaw, because
+> > the network is untrusted in general.
+> 
+> The fact that out-of-band qmp commands exist at all shows that we have to make tradeoffs of developer time vs. doing things right. Sure, the migration code can be rewritten to use non-blocking i/o and finegrained locks. But as a hobbyist I don't have time to fix this.
+> 
+> > > These patches introduce the new 'yank' out-of-band qmp command to recover from
+> > > these kinds of hangs. The different subsystems register callbacks which get
+> > > executed with the yank command. For example the callback can shutdown() a
+> > > socket. This is intended for the colo use-case, but it can be used for other
+> > > things too of course.  
+> > 
+> > IIUC, invoking the "yank" command unconditionally kills every single
+> > network connection in QEMU that has registered with the "yank" subsystem.
+> > IMHO this is way too big of a hammer, even if we accept there are bugs in
+> > QEMU not handling stalled networking well.
+> > 
+> > eg if a chardev hangs QEMU, and we tear down everything, killing the NBD
+> > connection used for the guest disk, we needlessly break I/O.
+> 
+> Yeah, these patches are intended to solve the problems with the colo
+> use-case where all external connections (migration, chardevs, nbd)
+> are just for replication. In other use-cases you'd enable the yank
+> feature only on the non-essential connections.
 
-Perhaps he can help you by working on DRM ioctl()?
-Perhaps you can send an RFC series to the QEMU mailing list?
+That is a pretty inflexible design for other use cases though,
+as "non-essential" is not a black & white list in general. There
+are varying levels of importance to the different channels. We
+can afford to loose migration without any user visible effects.
+If that doesn't solve it, a serial device chardev, or VNC connection
+can be dropped at the inconvenience of loosing interactive console
+which is end user visible impact, so may only be want to be yanked
+if the migration yank didn't fix it. 
 
--- =
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1877794
-
-Title:
-  Constant Folding on 64-bit Subtraction causes SIGILL on linux-user
-  glxgears ppc64le to x86_64 by way of generating bad shift instruction
-  with c=3D-1
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello, I've been recently working on my own little branch of QEMU
-  implementing the drm IOCTLs, when I discovered that glxgears seems to
-  crash in GLXSwapBuffers(); with a SIGILL. I investigated this for
-  about 2 weeks, manually trying to trace the call stack, only to find
-  that we seemingly crash in a bad shift instruction. Originally
-  intended to be an shr_i64 generated to an RLDICL, we end up with an
-  all ones(-1) c value, which gets thrown to the macro for generating
-  the MB, and replaces the instruction with mostly ones. This new
-  instruction, FFFFFFE0 is invalid on ppc64le, and crashes in a host
-  SIGILL in codegen_buffer. I tried to see if the output of translate.c
-  had this bad instruction, but all I got were two (shr eax, cl)
-  instructions, and upon creating a test program with shr (eax, cl) in
-  it, nothing happened. Then figuring that there was nothing actually
-  wrong with the instruction in the first place, I turned my eye to the
-  optimizer, and completely disabled constant folding for arithmetic
-  instructions.  This seemed to actually resolve the issue, and then I
-  slowly enabled constant folding again on various instructions only to
-  find that enabling not on the shifts, but on subtraction seemed to
-  cause the bug to reappear. I am bewildered and frankly at this point
-  I'm not sure I have a chance in hell of figuring out what causes it,
-  so I'm throwing it here.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1877794/+subscriptions
 
