@@ -8,74 +8,75 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF803C54E4A
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 12:59:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43305C54E8B
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 13:03:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F11A206CC
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 12:59:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F16B1206CC
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 13:03:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QEMIAQc8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F11A206CC
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hvy6ISJV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F16B1206CC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYUVY-0004xi-JE
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 08:59:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43926)
+	id 1jYUYp-0007Xo-47
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 09:03:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44356)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jYUUA-0003PP-B2
- for qemu-devel@nongnu.org; Tue, 12 May 2020 08:58:14 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38235)
+ id 1jYUXR-0006FI-8L
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 09:01:37 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42311)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jYUU9-0005kX-Go
- for qemu-devel@nongnu.org; Tue, 12 May 2020 08:58:14 -0400
-Received: by mail-wm1-x342.google.com with SMTP id g12so23142378wmh.3
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 05:58:13 -0700 (PDT)
+ id 1jYUXP-0006jh-K3
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 09:01:36 -0400
+Received: by mail-wr1-x442.google.com with SMTP id s8so15260729wrt.9
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 06:01:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=UKwQtQFEKMdeQDcDu5410keHN8eT2IIs4GaOSIngBgc=;
- b=QEMIAQc8+uscNWMlPkiPiMugwoPOovFNh3paihydMY8Xb415cqGlhF5prsyOpUyej+
- jgk5wF0OzRvQWKun8rqDKTfKQZnBMmFrEFszag0FwrBH2N0p9hPPATYcUCNKREEeyu5K
- +1AOVlqxeQd9c1opVfEy4fDmGWDzbszpVvcuIXaV5drbUcSOGkVH7Fqy5+gwA50bY4do
- RMVlOIXddkiNKVNgmlYxw5DtfXvS35UE2jg6xQoTjYdP1FzEjndM3DJ3M2klV5cIBoKW
- 3+irFEIMO8MLUTeRqXFAN89BC9XOsUnMg+P78m3AOVuj5Z8vhAMmaFwQHW9m/tMZlc8Q
- 6Ajw==
+ bh=x/ZBG2z3qYqzX6ctTh0T2v5Fu3xpq7aqamgy4FJYMnQ=;
+ b=Hvy6ISJVRzK8AAJxurvDRfQ8vJI5vCkGUxxvbJvmTyxInyo5ahWUX+YaDFueEbdJzV
+ A1RY8bNoCOHpqWxDT4x3g2SIGAMAF+cRSSm0pEDGYL8KrshqABDPnlJqTVrVcT4QxHRH
+ J8XgQUhnRwa28byNUvJUkd04QQy2910A24HWHVFH+Kf3g4wRJMvV4LykOz3cqFYP3mnq
+ mLyK2Tp5V4dshrpNUGZO8XVEVnqXGLcJIGbivGC5Za3Py9oKSlQQsfm5DT9rQdXT14g3
+ bRf0EQWHhT9YVS4tlZkxD58mZPpMcyB/XC0yv1UNHEq7NSA0xaDGG1KcMv8RswND5kln
+ 19ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=UKwQtQFEKMdeQDcDu5410keHN8eT2IIs4GaOSIngBgc=;
- b=sr2uvBJNRzv/zTT1RoKS0LntQn2FFrdEarXi9xRYlCqhv7Io+oFiub9JO6vD0q+Uy7
- KCka1+yJt+EZAMM3U6ss8JdM6NY2201KTcVru2JezZlLbnt0wEP03fY9AaoPjxB0NLz0
- gS+iB6HL4s96bFef+h1w2F2Z93Y9zvMIf0Loz+QT9YqjVjVNrgQokz67ry/hLa45anet
- AZSvrp4ehpUBiB7ut3aJ0L2ywsFODHImW2gqBlkPkUkLKiV98oILyCsPNFq5UhV1YwJg
- czE9HWtyDG5IceEAZF5/PaffoIM/+Ic7vOieEyLRznMyEE8ZsnMb36Wff9iRn/9lk3LT
- a4qg==
-X-Gm-Message-State: AGi0PubTtRM1ed/afjrH3HMPLVWysy+5oU6+wIvyvI4EPce4dXpTMxjE
- Vj3Zu+mZgV8f26biqBQHNfdX+DEynWLQWp5RlcM=
-X-Google-Smtp-Source: APiQypLTqWzHjjQm7sRhp0w7vSKcbnjUw7fDQ1Fun9b9Mumv9IOOhC7wfEcb99c8ZLuOxpzgqr2Nqm6xFT6F4ntYJYg=
-X-Received: by 2002:a1c:f211:: with SMTP id s17mr40544027wmc.168.1589288291992; 
- Tue, 12 May 2020 05:58:11 -0700 (PDT)
+ bh=x/ZBG2z3qYqzX6ctTh0T2v5Fu3xpq7aqamgy4FJYMnQ=;
+ b=PUa+PShUrnCJaK71W8UB1D9chOcj7X1BjOX1e2lVqVUTPv3GhpTNuqgwR6CHSESGCO
+ hPAOpIJSG+LROMtBGUZHuIBBAOpqTO7i4UeHHeyfafPAMk7abGv4CN2sUSGNT8A70ihZ
+ QCeBZsQ3obfK/IxJ/bCNojIZR8ES5Z2gZ+IwDaVqHWeQplPztr/cnnkkKWEvQ0KxKFdF
+ wGM5RWPY/QTlT60flm8xAg0KiapRc+WGZnfAsyLWnYCp4b/V6BfKxXxL9RBXlJm2C/HZ
+ nifhCp9+jGGjfqH53Fj6LNLR4Jp8F3SxVHxL3xPdDYhwuafJA19+haZ7iKdjBr5gLC3H
+ Urhg==
+X-Gm-Message-State: AGi0PubenFGOOG60uN6T716KTEJIbVTzQ9LFORKzTJSoKqLjMI//4tEx
+ XcIAmikuDotXa2VkmD+T8x2uo2bwwm4n3u72cCM=
+X-Google-Smtp-Source: APiQypLqMlO7Uv9aa7xMwJShmyqs7N0k9obIp+9yOYsLa0memotmk5vmAsVuf+f13GtfE/pm4no3k/0ykZtRKsawA0k=
+X-Received: by 2002:a5d:5089:: with SMTP id a9mr17983294wrt.147.1589288493742; 
+ Tue, 12 May 2020 06:01:33 -0700 (PDT)
 MIME-Version: 1.0
 References: <1588501221-1205-1-git-send-email-chenhc@lemote.com>
- <1588501221-1205-4-git-send-email-chenhc@lemote.com>
-In-Reply-To: <1588501221-1205-4-git-send-email-chenhc@lemote.com>
+ <1588501221-1205-6-git-send-email-chenhc@lemote.com>
+In-Reply-To: <1588501221-1205-6-git-send-email-chenhc@lemote.com>
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Tue, 12 May 2020 14:57:55 +0200
-Message-ID: <CAHiYmc6W0o15RLjWRE4mi6+9OqRLLTh0N+rpC+yZLVX_UZW=HQ@mail.gmail.com>
-Subject: Re: [PATCH for-5.1 V3 3/7] hw/mips: Add CPU IRQ3 delivery for KVM
+Date: Tue, 12 May 2020 15:01:06 +0200
+Message-ID: <CAHiYmc5vL5nVvRT9BmRut2tuvYMjeWdz_JTH5VpPfYnVUAvS9Q@mail.gmail.com>
+Subject: Re: [PATCH for-5.1 V3 5/7] target/mips: Add more CP0 register for
+ save/restore
 To: Huacai Chen <zltjiangshi@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x342.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,13 +107,12 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=D0=BD=D0=B5=D0=B4, 3. =D0=BC=D0=B0=D1=98 2020. =D1=83 12:24 Huacai Chen <z=
+=D0=BD=D0=B5=D0=B4, 3. =D0=BC=D0=B0=D1=98 2020. =D1=83 12:25 Huacai Chen <z=
 ltjiangshi@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=
 =BE/=D0=BB=D0=B0:
 >
-> Currently, KVM/MIPS only deliver I/O interrupt via IP2, this patch add
-> IP3 delivery as well, because Loongson-3 based machine use both IRQ2
-> (CPU's IP2) and IRQ3 (CPU's IP3).
+> Add more CP0 register for save/restore, including: EBase, XContext,
+> PageGrain, PWBase, PWSize, PWField, PWCtl, Config*, KScratch1~KScratch6.
 >
 > Signed-off-by: Huacai Chen <chenhc@lemote.com>
 > Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
@@ -120,31 +120,398 @@ ltjiangshi@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=
 
 Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 
->  hw/mips/mips_int.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  target/mips/kvm.c     | 212 ++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  target/mips/machine.c |   6 +-
+>  2 files changed, 216 insertions(+), 2 deletions(-)
 >
-> diff --git a/hw/mips/mips_int.c b/hw/mips/mips_int.c
-> index 796730b..982ce34 100644
-> --- a/hw/mips/mips_int.c
-> +++ b/hw/mips/mips_int.c
-> @@ -48,14 +48,14 @@ static void cpu_mips_irq_request(void *opaque, int ir=
+> diff --git a/target/mips/kvm.c b/target/mips/kvm.c
+> index de3e26e..96cfa10 100644
+> --- a/target/mips/kvm.c
+> +++ b/target/mips/kvm.c
+> @@ -245,10 +245,16 @@ int kvm_mips_set_ipi_interrupt(MIPSCPU *cpu, int ir=
 q, int level)
->      if (level) {
->          env->CP0_Cause |=3D 1 << (irq + CP0Ca_IP);
+>      (KVM_REG_MIPS_CP0 | KVM_REG_SIZE_U64 | (8 * (_R) + (_S)))
 >
-> -        if (kvm_enabled() && irq =3D=3D 2) {
-> +        if (kvm_enabled() && (irq =3D=3D 2 || irq =3D=3D 3)) {
->              kvm_mips_set_interrupt(cpu, irq, level);
->          }
+>  #define KVM_REG_MIPS_CP0_INDEX          MIPS_CP0_32(0, 0)
+> +#define KVM_REG_MIPS_CP0_RANDOM         MIPS_CP0_32(1, 0)
+>  #define KVM_REG_MIPS_CP0_CONTEXT        MIPS_CP0_64(4, 0)
+>  #define KVM_REG_MIPS_CP0_USERLOCAL      MIPS_CP0_64(4, 2)
+>  #define KVM_REG_MIPS_CP0_PAGEMASK       MIPS_CP0_32(5, 0)
+> +#define KVM_REG_MIPS_CP0_PAGEGRAIN      MIPS_CP0_32(5, 1)
+> +#define KVM_REG_MIPS_CP0_PWBASE         MIPS_CP0_64(5, 5)
+> +#define KVM_REG_MIPS_CP0_PWFIELD        MIPS_CP0_64(5, 6)
+> +#define KVM_REG_MIPS_CP0_PWSIZE         MIPS_CP0_64(5, 7)
+>  #define KVM_REG_MIPS_CP0_WIRED          MIPS_CP0_32(6, 0)
+> +#define KVM_REG_MIPS_CP0_PWCTL          MIPS_CP0_32(6, 6)
+>  #define KVM_REG_MIPS_CP0_HWRENA         MIPS_CP0_32(7, 0)
+>  #define KVM_REG_MIPS_CP0_BADVADDR       MIPS_CP0_64(8, 0)
+>  #define KVM_REG_MIPS_CP0_COUNT          MIPS_CP0_32(9, 0)
+> @@ -258,13 +264,22 @@ int kvm_mips_set_ipi_interrupt(MIPSCPU *cpu, int ir=
+q, int level)
+>  #define KVM_REG_MIPS_CP0_CAUSE          MIPS_CP0_32(13, 0)
+>  #define KVM_REG_MIPS_CP0_EPC            MIPS_CP0_64(14, 0)
+>  #define KVM_REG_MIPS_CP0_PRID           MIPS_CP0_32(15, 0)
+> +#define KVM_REG_MIPS_CP0_EBASE          MIPS_CP0_64(15, 1)
+>  #define KVM_REG_MIPS_CP0_CONFIG         MIPS_CP0_32(16, 0)
+>  #define KVM_REG_MIPS_CP0_CONFIG1        MIPS_CP0_32(16, 1)
+>  #define KVM_REG_MIPS_CP0_CONFIG2        MIPS_CP0_32(16, 2)
+>  #define KVM_REG_MIPS_CP0_CONFIG3        MIPS_CP0_32(16, 3)
+>  #define KVM_REG_MIPS_CP0_CONFIG4        MIPS_CP0_32(16, 4)
+>  #define KVM_REG_MIPS_CP0_CONFIG5        MIPS_CP0_32(16, 5)
+> +#define KVM_REG_MIPS_CP0_CONFIG6        MIPS_CP0_32(16, 6)
+> +#define KVM_REG_MIPS_CP0_XCONTEXT       MIPS_CP0_64(20, 0)
+>  #define KVM_REG_MIPS_CP0_ERROREPC       MIPS_CP0_64(30, 0)
+> +#define KVM_REG_MIPS_CP0_KSCRATCH1      MIPS_CP0_64(31, 2)
+> +#define KVM_REG_MIPS_CP0_KSCRATCH2      MIPS_CP0_64(31, 3)
+> +#define KVM_REG_MIPS_CP0_KSCRATCH3      MIPS_CP0_64(31, 4)
+> +#define KVM_REG_MIPS_CP0_KSCRATCH4      MIPS_CP0_64(31, 5)
+> +#define KVM_REG_MIPS_CP0_KSCRATCH5      MIPS_CP0_64(31, 6)
+> +#define KVM_REG_MIPS_CP0_KSCRATCH6      MIPS_CP0_64(31, 7)
 >
->      } else {
->          env->CP0_Cause &=3D ~(1 << (irq + CP0Ca_IP));
+>  static inline int kvm_mips_put_one_reg(CPUState *cs, uint64_t reg_id,
+>                                         int32_t *addr)
+> @@ -394,6 +409,29 @@ static inline int kvm_mips_get_one_ureg64(CPUState *=
+cs, uint64_t reg_id,
+>                                           (1U << CP0C5_UFE) | \
+>                                           (1U << CP0C5_FRE) | \
+>                                           (1U << CP0C5_UFR))
+> +#define KVM_REG_MIPS_CP0_CONFIG6_MASK   ((1U << CP0C6_BPPASS) | \
+> +                                         (0x3fU << CP0C6_KPOS) | \
+> +                                         (1U << CP0C6_KE) | \
+> +                                         (1U << CP0C6_VTLBONLY) | \
+> +                                         (1U << CP0C6_LASX) | \
+> +                                         (1U << CP0C6_SSEN) | \
+> +                                         (1U << CP0C6_DISDRTIME) | \
+> +                                         (1U << CP0C6_PIXNUEN) | \
+> +                                         (1U << CP0C6_SCRAND) | \
+> +                                         (1U << CP0C6_LLEXCEN) | \
+> +                                         (1U << CP0C6_DISVC) | \
+> +                                         (1U << CP0C6_VCLRU) | \
+> +                                         (1U << CP0C6_DCLRU) | \
+> +                                         (1U << CP0C6_PIXUEN) | \
+> +                                         (1U << CP0C6_DISBLKLYEN) | \
+> +                                         (1U << CP0C6_UMEMUALEN) | \
+> +                                         (1U << CP0C6_SFBEN) | \
+> +                                         (1U << CP0C6_FLTINT) | \
+> +                                         (1U << CP0C6_VLTINT) | \
+> +                                         (1U << CP0C6_DISBTB) | \
+> +                                         (3U << CP0C6_STPREFCTL) | \
+> +                                         (1U << CP0C6_INSTPREF) | \
+> +                                         (1U << CP0C6_DATAPREF))
 >
-> -        if (kvm_enabled() && irq =3D=3D 2) {
-> +        if (kvm_enabled() && (irq =3D=3D 2 || irq =3D=3D 3)) {
->              kvm_mips_set_interrupt(cpu, irq, level);
->          }
+>  static inline int kvm_mips_change_one_reg(CPUState *cs, uint64_t reg_id,
+>                                            int32_t *addr, int32_t mask)
+> @@ -729,6 +767,11 @@ static int kvm_mips_put_cp0_registers(CPUState *cs, =
+int level)
+>          DPRINTF("%s: Failed to put CP0_INDEX (%d)\n", __func__, err);
+>          ret =3D err;
 >      }
+> +    err =3D kvm_mips_put_one_reg(cs, KVM_REG_MIPS_CP0_RANDOM, &env->CP0_=
+Random);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to put CP0_RANDOM (%d)\n", __func__, err);
+> +        ret =3D err;
+> +    }
+>      err =3D kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_CONTEXT,
+>                                   &env->CP0_Context);
+>      if (err < 0) {
+> @@ -747,11 +790,40 @@ static int kvm_mips_put_cp0_registers(CPUState *cs,=
+ int level)
+>          DPRINTF("%s: Failed to put CP0_PAGEMASK (%d)\n", __func__, err);
+>          ret =3D err;
+>      }
+> +    err =3D kvm_mips_put_one_reg(cs, KVM_REG_MIPS_CP0_PAGEGRAIN,
+> +                               &env->CP0_PageGrain);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to put CP0_PAGEGRAIN (%d)\n", __func__, err)=
+;
+> +        ret =3D err;
+> +    }
+> +    err =3D kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_PWBASE,
+> +                               &env->CP0_PWBase);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to put CP0_PWBASE (%d)\n", __func__, err);
+> +        ret =3D err;
+> +    }
+> +    err =3D kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_PWFIELD,
+> +                               &env->CP0_PWField);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to put CP0_PWField (%d)\n", __func__, err);
+> +        ret =3D err;
+> +    }
+> +    err =3D kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_PWSIZE,
+> +                               &env->CP0_PWSize);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to put CP0_PWSIZE (%d)\n", __func__, err);
+> +        ret =3D err;
+> +    }
+>      err =3D kvm_mips_put_one_reg(cs, KVM_REG_MIPS_CP0_WIRED, &env->CP0_W=
+ired);
+>      if (err < 0) {
+>          DPRINTF("%s: Failed to put CP0_WIRED (%d)\n", __func__, err);
+>          ret =3D err;
+>      }
+> +    err =3D kvm_mips_put_one_reg(cs, KVM_REG_MIPS_CP0_PWCTL, &env->CP0_P=
+WCtl);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to put CP0_PWCTL (%d)\n", __func__, err);
+> +        ret =3D err;
+> +    }
+>      err =3D kvm_mips_put_one_reg(cs, KVM_REG_MIPS_CP0_HWRENA, &env->CP0_=
+HWREna);
+>      if (err < 0) {
+>          DPRINTF("%s: Failed to put CP0_HWRENA (%d)\n", __func__, err);
+> @@ -799,6 +871,11 @@ static int kvm_mips_put_cp0_registers(CPUState *cs, =
+int level)
+>          DPRINTF("%s: Failed to put CP0_PRID (%d)\n", __func__, err);
+>          ret =3D err;
+>      }
+> +    err =3D kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_EBASE, &env->CP0=
+_EBase);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to put CP0_EBASE (%d)\n", __func__, err);
+> +        ret =3D err;
+> +    }
+>      err =3D kvm_mips_change_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG,
+>                                    &env->CP0_Config0,
+>                                    KVM_REG_MIPS_CP0_CONFIG_MASK);
+> @@ -841,12 +918,61 @@ static int kvm_mips_put_cp0_registers(CPUState *cs,=
+ int level)
+>          DPRINTF("%s: Failed to change CP0_CONFIG5 (%d)\n", __func__, err=
+);
+>          ret =3D err;
+>      }
+> +    err =3D kvm_mips_change_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG6,
+> +                                  &env->CP0_Config6,
+> +                                  KVM_REG_MIPS_CP0_CONFIG6_MASK);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to change CP0_CONFIG6 (%d)\n", __func__, err=
+);
+> +        ret =3D err;
+> +    }
+> +    err =3D kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_XCONTEXT,
+> +                                 &env->CP0_XContext);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to put CP0_XCONTEXT (%d)\n", __func__, err);
+> +        ret =3D err;
+> +    }
+>      err =3D kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_ERROREPC,
+>                                   &env->CP0_ErrorEPC);
+>      if (err < 0) {
+>          DPRINTF("%s: Failed to put CP0_ERROREPC (%d)\n", __func__, err);
+>          ret =3D err;
+>      }
+> +    err =3D kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH1,
+> +                                 &env->CP0_KScratch[0]);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to put CP0_KSCRATCH1 (%d)\n", __func__, err)=
+;
+> +        ret =3D err;
+> +    }
+> +    err =3D kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH2,
+> +                                 &env->CP0_KScratch[1]);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to put CP0_KSCRATCH2 (%d)\n", __func__, err)=
+;
+> +        ret =3D err;
+> +    }
+> +    err =3D kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH3,
+> +                                 &env->CP0_KScratch[2]);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to put CP0_KSCRATCH3 (%d)\n", __func__, err)=
+;
+> +        ret =3D err;
+> +    }
+> +    err =3D kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH4,
+> +                                 &env->CP0_KScratch[3]);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to put CP0_KSCRATCH4 (%d)\n", __func__, err)=
+;
+> +        ret =3D err;
+> +    }
+> +    err =3D kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH5,
+> +                                 &env->CP0_KScratch[4]);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to put CP0_KSCRATCH5 (%d)\n", __func__, err)=
+;
+> +        ret =3D err;
+> +    }
+> +    err =3D kvm_mips_put_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH6,
+> +                                 &env->CP0_KScratch[5]);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to put CP0_KSCRATCH6 (%d)\n", __func__, err)=
+;
+> +        ret =3D err;
+> +    }
+>
+>      return ret;
+>  }
+> @@ -862,6 +988,11 @@ static int kvm_mips_get_cp0_registers(CPUState *cs)
+>          DPRINTF("%s: Failed to get CP0_INDEX (%d)\n", __func__, err);
+>          ret =3D err;
+>      }
+> +    err =3D kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_RANDOM, &env->CP0_=
+Random);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to get CP0_RANDOM (%d)\n", __func__, err);
+> +        ret =3D err;
+> +    }
+>      err =3D kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_CONTEXT,
+>                                   &env->CP0_Context);
+>      if (err < 0) {
+> @@ -880,11 +1011,40 @@ static int kvm_mips_get_cp0_registers(CPUState *cs=
+)
+>          DPRINTF("%s: Failed to get CP0_PAGEMASK (%d)\n", __func__, err);
+>          ret =3D err;
+>      }
+> +    err =3D kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_PAGEGRAIN,
+> +                               &env->CP0_PageGrain);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to get CP0_PAGEGRAIN (%d)\n", __func__, err)=
+;
+> +        ret =3D err;
+> +    }
+> +    err =3D kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_PWBASE,
+> +                               &env->CP0_PWBase);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to get CP0_PWBASE (%d)\n", __func__, err);
+> +        ret =3D err;
+> +    }
+> +    err =3D kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_PWFIELD,
+> +                               &env->CP0_PWField);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to get CP0_PWFIELD (%d)\n", __func__, err);
+> +        ret =3D err;
+> +    }
+> +    err =3D kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_PWSIZE,
+> +                               &env->CP0_PWSize);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to get CP0_PWSIZE (%d)\n", __func__, err);
+> +        ret =3D err;
+> +    }
+>      err =3D kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_WIRED, &env->CP0_W=
+ired);
+>      if (err < 0) {
+>          DPRINTF("%s: Failed to get CP0_WIRED (%d)\n", __func__, err);
+>          ret =3D err;
+>      }
+> +    err =3D kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_PWCTL, &env->CP0_P=
+WCtl);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to get CP0_PWCtl (%d)\n", __func__, err);
+> +        ret =3D err;
+> +    }
+>      err =3D kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_HWRENA, &env->CP0_=
+HWREna);
+>      if (err < 0) {
+>          DPRINTF("%s: Failed to get CP0_HWRENA (%d)\n", __func__, err);
+> @@ -932,6 +1092,11 @@ static int kvm_mips_get_cp0_registers(CPUState *cs)
+>          DPRINTF("%s: Failed to get CP0_PRID (%d)\n", __func__, err);
+>          ret =3D err;
+>      }
+> +    err =3D kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_EBASE, &env->CP0=
+_EBase);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to get CP0_EBASE (%d)\n", __func__, err);
+> +        ret =3D err;
+> +    }
+>      err =3D kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG, &env->CP0_=
+Config0);
+>      if (err < 0) {
+>          DPRINTF("%s: Failed to get CP0_CONFIG (%d)\n", __func__, err);
+> @@ -962,12 +1127,59 @@ static int kvm_mips_get_cp0_registers(CPUState *cs=
+)
+>          DPRINTF("%s: Failed to get CP0_CONFIG5 (%d)\n", __func__, err);
+>          ret =3D err;
+>      }
+> +    err =3D kvm_mips_get_one_reg(cs, KVM_REG_MIPS_CP0_CONFIG6, &env->CP0=
+_Config6);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to get CP0_CONFIG6 (%d)\n", __func__, err);
+> +        ret =3D err;
+> +    }
+> +    err =3D kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_XCONTEXT,
+> +                                 &env->CP0_XContext);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to get CP0_XCONTEXT (%d)\n", __func__, err);
+> +        ret =3D err;
+> +    }
+>      err =3D kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_ERROREPC,
+>                                   &env->CP0_ErrorEPC);
+>      if (err < 0) {
+>          DPRINTF("%s: Failed to get CP0_ERROREPC (%d)\n", __func__, err);
+>          ret =3D err;
+>      }
+> +    err =3D kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH1,
+> +                                 &env->CP0_KScratch[0]);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to get CP0_KSCRATCH1 (%d)\n", __func__, err)=
+;
+> +        ret =3D err;
+> +    }
+> +    err =3D kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH2,
+> +                                 &env->CP0_KScratch[1]);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to get CP0_KSCRATCH2 (%d)\n", __func__, err)=
+;
+> +        ret =3D err;
+> +    }
+> +    err =3D kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH3,
+> +                                 &env->CP0_KScratch[2]);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to get CP0_KSCRATCH3 (%d)\n", __func__, err)=
+;
+> +        ret =3D err;
+> +    }
+> +    err =3D kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH4,
+> +                                 &env->CP0_KScratch[3]);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to get CP0_KSCRATCH4 (%d)\n", __func__, err)=
+;
+> +        ret =3D err;
+> +    }
+> +    err =3D kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH5,
+> +                                 &env->CP0_KScratch[4]);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to get CP0_KSCRATCH5 (%d)\n", __func__, err)=
+;
+> +        ret =3D err;
+> +    }
+> +    err =3D kvm_mips_get_one_ulreg(cs, KVM_REG_MIPS_CP0_KSCRATCH6,
+> +                                 &env->CP0_KScratch[5]);
+> +    if (err < 0) {
+> +        DPRINTF("%s: Failed to get CP0_KSCRATCH6 (%d)\n", __func__, err)=
+;
+> +        ret =3D err;
+> +    }
+>
+>      return ret;
+>  }
+> diff --git a/target/mips/machine.c b/target/mips/machine.c
+> index 8d5b18b..5b23e3e 100644
+> --- a/target/mips/machine.c
+> +++ b/target/mips/machine.c
+> @@ -212,8 +212,8 @@ const VMStateDescription vmstate_tlb =3D {
+>
+>  const VMStateDescription vmstate_mips_cpu =3D {
+>      .name =3D "cpu",
+> -    .version_id =3D 19,
+> -    .minimum_version_id =3D 19,
+> +    .version_id =3D 20,
+> +    .minimum_version_id =3D 20,
+>      .post_load =3D cpu_post_load,
+>      .fields =3D (VMStateField[]) {
+>          /* Active TC */
+> @@ -289,6 +289,8 @@ const VMStateDescription vmstate_mips_cpu =3D {
+>          VMSTATE_INT32(env.CP0_Config1, MIPSCPU),
+>          VMSTATE_INT32(env.CP0_Config2, MIPSCPU),
+>          VMSTATE_INT32(env.CP0_Config3, MIPSCPU),
+> +        VMSTATE_INT32(env.CP0_Config4, MIPSCPU),
+> +        VMSTATE_INT32(env.CP0_Config5, MIPSCPU),
+>          VMSTATE_INT32(env.CP0_Config6, MIPSCPU),
+>          VMSTATE_INT32(env.CP0_Config7, MIPSCPU),
+>          VMSTATE_UINT64(env.CP0_LLAddr, MIPSCPU),
 > --
 > 2.7.0
 >
