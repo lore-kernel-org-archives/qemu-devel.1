@@ -2,86 +2,87 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E903C54E4A
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 14:28:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62AEBC54E4A
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 14:29:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7ABA20673
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 14:28:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2BDDE20722
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 14:29:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M/tYTh43"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7ABA20673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SHWhCnWJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BDDE20722
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYVtX-0006HR-3j
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 10:28:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56054)
+	id 1jYVuO-0007Yj-Cz
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 10:29:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56204)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jYVsk-0005JR-GP
- for qemu-devel@nongnu.org; Tue, 12 May 2020 10:27:42 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50883
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jYVsj-0006Zb-Ix
- for qemu-devel@nongnu.org; Tue, 12 May 2020 10:27:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589293659;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JsYA3UfWWGLEWCH4BHP5aFK8ZXlS4/Nu+HPnchz77iQ=;
- b=M/tYTh43WLSrQ/L+L2VLOQ2voJPIGw7RBdeytza5JKI7rs0bm8sSOQPLJIOb4FKxsymS9d
- UalyYA5xBkIQOAFLtMJBfTYGByGB26tWEN+F9ElK+hSYKh5xDZdzJ8Wq+NG9G3Edf9IYuE
- vH4ySh0hYVNqLNL2pmOz9HCVHw+gun0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-JzmwzjHXMHub1n_O_7IQ_w-1; Tue, 12 May 2020 10:27:37 -0400
-X-MC-Unique: JzmwzjHXMHub1n_O_7IQ_w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 415268014D5;
- Tue, 12 May 2020 14:27:36 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 621AC7D92A;
- Tue, 12 May 2020 14:27:21 +0000 (UTC)
-Date: Tue, 12 May 2020 16:27:16 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v2 2/3] arm/acpi: TPM2 ACPI table support
-Message-ID: <20200512162716.7a4204dd@redhat.com>
-In-Reply-To: <20200505144419.29174-3-eric.auger@redhat.com>
-References: <20200505144419.29174-1-eric.auger@redhat.com>
- <20200505144419.29174-3-eric.auger@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jYVtb-0006YU-17
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 10:28:35 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40895)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jYVtZ-0006ox-TE
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 10:28:34 -0400
+Received: by mail-ot1-x344.google.com with SMTP id i27so10604031ota.7
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 07:28:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=H4Da6L3O2goxUvulLcusGZ7jcx6jhPhu1kVkaSvOW5M=;
+ b=SHWhCnWJP/cLf1Ja0nqqDBgOHkFzlgLpoOq5/yOElyK1CzPYb8s7QNZW2DUyH9xGer
+ Ad8o8X78nR+hyf1jhhBrUJfN4uttrYIOum1sJuIpyiKwQd+smB9RkHMlhZcmOqD7blh3
+ s74kq2znvW1rQ7J6aDmLQYQGn3sXNasUvQF8SZ+ev59beo0TpACZzLIs/uT0QtGMcL9h
+ /10TZCX0Cook+t1X/C2sO3shlWm0ml8w3xgKZm3+svm6zyVTnFWsZcnTtYfAe3zOhrhE
+ mNqBHQ/CtAIVwFUFjgKxketWraNk/6MKdyzSo7VU+c8eJV+idJzy5VnzljuOxixGQvmP
+ eBKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=H4Da6L3O2goxUvulLcusGZ7jcx6jhPhu1kVkaSvOW5M=;
+ b=YnKs1B+iW1Gw5erWDovc4RvLTeknDvVU1tBolOirE8pQF4IfOaU50NVwqoolF6fTEP
+ KVH79zhwlwV8LL5oAZVdcHqrpby+IocEaLRhMKBpFTjgfcHgiCVE2VCtl8pIowm1UXla
+ Nyxchaju/nOwnzSXmaJz9Doqjn69H2uHl+gvMQKXkqejBPdDAnc3yv59eA8NmUNetnLO
+ nU6H45HN3FcC5V5+qRH2+YOLh1x13DpK/YzQFpBjopb+b/PEeRNFG7ztv/spKamiWqx9
+ 0nokivp2CEdD2WlAdkyKpCupPnMVDWia5bIPUranuaGfvO7ayK3IX7LYMuOnl2+Uuf7Z
+ ZZHA==
+X-Gm-Message-State: AGi0PuYNklmo5C9fVF1fIkD8R8md3EqnAO1mF7IMh9yB1kdLPErXOs9h
+ BcDRcHKG/OEdQQO5Zn1mRh+4LerAqcZwJPE4/Z7/zw==
+X-Google-Smtp-Source: APiQypKleR88+KPMEIcVxj7Afakb7buyCLkrTMC3W8KAY8HMo9ljpOU+4kGC413Si6YUj/qJvn9Lj1+wgpNRV6S8HDE=
+X-Received: by 2002:a05:6830:22dc:: with SMTP id
+ q28mr16057106otc.221.1589293712048; 
+ Tue, 12 May 2020 07:28:32 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 01:41:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200508152200.6547-1-richard.henderson@linaro.org>
+ <20200508152200.6547-14-richard.henderson@linaro.org>
+In-Reply-To: <20200508152200.6547-14-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 12 May 2020 15:28:20 +0100
+Message-ID: <CAFEAcA9Ey-5827RSaPDeeRccdQTL6qJX=jT5ox9b977W2idGQA@mail.gmail.com>
+Subject: Re: [PATCH v3 13/16] target/arm: Pass pointer to qc to qrdmla/qrdmls
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,107 +95,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, gshan@redhat.com,
- mst@redhat.com, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com,
- qemu-arm@nongnu.org, marcandre.lureau@redhat.com, eric.auger.pro@gmail.com,
- lersek@redhat.com, ardb@kernel.org, stefanb@linux.ibm.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue,  5 May 2020 16:44:18 +0200
-Eric Auger <eric.auger@redhat.com> wrote:
-
-> Add a TPM2 ACPI table if a TPM2.0 sysbus device has been
-> dynamically instantiated.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
-on x86 we also do:
-
-  fw_cfg_add_file(x86ms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,                       
-                  tables.tcpalog->data, acpi_data_len(tables.tcpalog)); 
-
-question is why it's not necessary in case of ARM?
-
-> 
+On Fri, 8 May 2020 at 16:22, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Pass a pointer directly to env->vfp.qc[0], rather than env.
+> This will allow SVE2, which does not modify QC, to pass a
+> pointer to dummy storage.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
-> 
-> v1 -> v2:
-> - reuse generic build_tpm2() and alloc log area externally
-> - call tpm_find() once in build_tpm2()
-> ---
->  include/sysemu/tpm.h     |  2 ++
->  hw/acpi/aml-build.c      |  5 +++--
->  hw/arm/virt-acpi-build.c | 11 +++++++++++
->  3 files changed, 16 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
-> index f37851b1aa..03fb25941c 100644
-> --- a/include/sysemu/tpm.h
-> +++ b/include/sysemu/tpm.h
-> @@ -50,6 +50,8 @@ typedef struct TPMIfClass {
->  
->  #define TPM_IS_TIS_ISA(chr)                         \
->      object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS_ISA)
-> +#define TPM_IS_TIS_SYSBUS(chr)                      \
-> +    object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS_SYSBUS)
->  #define TPM_IS_CRB(chr)                             \
->      object_dynamic_cast(OBJECT(chr), TYPE_TPM_CRB)
->  #define TPM_IS_SPAPR(chr)                           \
-> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-> index 1f7fd09112..4224675cb2 100644
-> --- a/hw/acpi/aml-build.c
-> +++ b/hw/acpi/aml-build.c
-> @@ -1882,12 +1882,13 @@ void build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
->      unsigned log_addr_size = sizeof(tpm2_ptr->log_area_start_address);
->      unsigned log_addr_offset =
->          (char *)&tpm2_ptr->log_area_start_address - table_data->data;
-> +    TPMIf *tpmif = tpm_find();
->  
->      tpm2_ptr->platform_class = cpu_to_le16(TPM2_ACPI_CLASS_CLIENT);
-> -    if (TPM_IS_TIS_ISA(tpm_find())) {
-> +    if (TPM_IS_TIS_ISA(tpmif) || TPM_IS_TIS_SYSBUS(tpmif)) {
->          tpm2_ptr->control_area_address = cpu_to_le64(0);
->          tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_MMIO);
-> -    } else if (TPM_IS_CRB(tpm_find())) {
-> +    } else if (TPM_IS_CRB(tpmif)) {
->          tpm2_ptr->control_area_address = cpu_to_le64(TPM_CRB_ADDR_CTRL);
->          tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_CRB);
->      } else {
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 81d41a3990..1a2ec10c8f 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -41,11 +41,13 @@
->  #include "hw/acpi/pci.h"
->  #include "hw/acpi/memory_hotplug.h"
->  #include "hw/acpi/generic_event_device.h"
-> +#include "hw/acpi/tpm.h"
->  #include "hw/pci/pcie_host.h"
->  #include "hw/pci/pci.h"
->  #include "hw/arm/virt.h"
->  #include "sysemu/numa.h"
->  #include "sysemu/reset.h"
-> +#include "sysemu/tpm.h"
->  #include "kvm_arm.h"
->  #include "migration/vmstate.h"
->  
-> @@ -831,6 +833,15 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->          build_iort(tables_blob, tables->linker, vms);
->      }
->  
-> +    if (tpm_get_version(tpm_find()) == TPM_VERSION_2_0) {
-> +        acpi_data_push(tables->tcpalog, TPM_LOG_AREA_MINIMUM_SIZE);
-> +        bios_linker_loader_alloc(tables->linker, ACPI_BUILD_TPMLOG_FILE,
-> +                                 tables->tcpalog, 1, false);
-> +
-> +        acpi_add_table(table_offsets, tables_blob);
-> +        build_tpm2(tables_blob, tables->linker, tables->tcpalog);
-> +    }
-> +
->      /* XSDT is pointed to by RSDP */
->      xsdt = tables_blob->len;
->      build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
 
+>  /* Signed saturating rounding doubling multiply-accumulate high half, 16-bit */
+> -static uint16_t inl_qrdmlah_s16(CPUARMState *env, int16_t src1,
+> -                                int16_t src2, int16_t src3)
+> +static int16_t inl_qrdmlah_s16(int16_t src1, int16_t src2,
+> +                               int16_t src3, uint32_t *sat)
+
+Why has the return type changed here ? The new type does make
+more sense (there's no behaviour change since the return value
+is always assigned to either an int16_t or uint16_t lvalue),
+but it also doesn't seem related to the passing-of-QC that
+this patch is doing.
+
+>  {
+>      /* Simplify:
+>       * = ((a3 << 16) + ((e1 * e2) << 1) + (1 << 15)) >> 16
+
+>  /* Signed saturating rounding doubling multiply-subtract high half, 16-bit */
+> -static uint16_t inl_qrdmlsh_s16(CPUARMState *env, int16_t src1,
+> -                                int16_t src2, int16_t src3)
+> +static int16_t inl_qrdmlsh_s16(int16_t src1, int16_t src2,
+> +                               int16_t src3, uint32_t *sat)
+
+Ditto.
+
+
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
 
