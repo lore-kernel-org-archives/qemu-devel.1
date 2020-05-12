@@ -2,99 +2,113 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A43F2C54E8B
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 06:47:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C878FC54E4B
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 06:49:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FE3C20752
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 06:47:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 90C9220752
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 06:49:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mBfsew+F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FE3C20752
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H9p76H6M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90C9220752
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYOgy-0003Kn-Kg
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 02:47:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51452)
+	id 1jYOiu-0004gK-Rm
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 02:49:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51526)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jYOg6-0002dT-S3; Tue, 12 May 2020 02:46:10 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35218)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jYOg6-0001xK-2j; Tue, 12 May 2020 02:46:10 -0400
-Received: by mail-wr1-x442.google.com with SMTP id j5so13899494wrq.2;
- Mon, 11 May 2020 23:46:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=9LYOR0XMUBYmMWAVjdt6dLG9Izvx6Ex8hrztNbr5kDQ=;
- b=mBfsew+Fe4hKiuLmxBmUDrxLKNjHL0vq0W3f6vIYKKJEnGQFFiElLcsFqnAgHjpB9i
- s1K1oZzSmm+90hvXBY4WJKCRjnGnj3cCkp37adqYWc6S3AERt1qjSfjojUDd51s6X0nn
- Z0O+aCjFzk79lYU1oEBdoDT6fv1nCmAdCH70ra9z3opkZzj9Fp3E7AB6fPjZBYhTzN3M
- xGUiepZS1NLkNOYLR7JKisT+NuMm2CzcQWv+17rui+gtNdecBdCffeg/OOiDr5ybypUX
- Ae0wVg2ghHSyW5nt+DtsKOQiFEhTAiLH2kWccgT3VTUx65IO3+NZAVVls+Gxx0VHDECh
- JQsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=9LYOR0XMUBYmMWAVjdt6dLG9Izvx6Ex8hrztNbr5kDQ=;
- b=hzMloTgVJZ/DmxDKb8/zTqZNTQ6BmitBhZuNGC8RX2lPg/RhTXQhIoIUhnY7ESiIvj
- 0zaYQf/iVCwzgLuq9E0Qa1FtC1Qpks6ttcLl/iZ76foGOhwX9R1NXZNpMvKxtZG7LTFM
- vnSN9buK977mKYJTgIbmEDUqLolcHkx43z0wlAIGg/JLkOygdNe7u3rJaek3McCYNAjb
- 9P7PlbAIBY+11tQHuypHMa539mIFdpH2E/Q7G/wbe4uADAMyPMwgkpfvWKD9IgEWa6HR
- 2ZYK7mVV+Pk1BSD7Sf6Wr3wT2Z2Cd/jN1N6FdVdAucW0TBbfGBuueWDwNI2RpA50LEXg
- APFw==
-X-Gm-Message-State: AGi0PuZHphcjka5Khks3V4TlTi2JsWF+zty7MZCrIp0wpH5lJ5Fldpnn
- AMtmoKADHrDDz23WH4kIkdY=
-X-Google-Smtp-Source: APiQypI89CD0Rji3yc4LVlTDfa8LFZGqDz+s/MRNIKWoIEt8zmFyyhI0KKM4g3AfIbcJkiii76PGkg==
-X-Received: by 2002:adf:f907:: with SMTP id b7mr23768908wrr.203.1589265967247; 
- Mon, 11 May 2020 23:46:07 -0700 (PDT)
-Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id i6sm2723305wmb.41.2020.05.11.23.46.04
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 11 May 2020 23:46:06 -0700 (PDT)
-Subject: Re: [PATCH 08/11] target/s390x: Restrict system-mode declarations
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20200509130910.26335-1-f4bug@amsat.org>
- <20200509130910.26335-9-f4bug@amsat.org>
- <20200511124804.1a7a43aa.cohuck@redhat.com>
- <2bb91290-32c5-997d-c689-4d651836c7fc@amsat.org>
- <20200512080146.7d0f4ae2.cohuck@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <76077ce6-9981-35e0-89d2-3059438a139d@amsat.org>
-Date: Tue, 12 May 2020 08:46:03 +0200
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jYOgy-0003UQ-Gc
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 02:47:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42896
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jYOgw-0002uu-R0
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 02:47:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589266021;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=frumQvkebfr3tG/owWSE8VTdzB0eiXPRNmi/Q2zYypM=;
+ b=H9p76H6MXDZKzZQbhkDoGejLum3wN43x4khaROhwKAvIARGS/YsN/FlDnfTA6JbApFUSO5
+ kGY8uFgJx4GdgiL2uqTL3oHmhzsQ4Nyxr7103nttETRVfpMD/eje/1H0sHDttMW/amcuWI
+ cjk9oCih+hVwJtPWuAF0qQF/O7f74xM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-471-60SaPeiJNU63OB9t5nk_Ww-1; Tue, 12 May 2020 02:46:57 -0400
+X-MC-Unique: 60SaPeiJNU63OB9t5nk_Ww-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 539B4106B245;
+ Tue, 12 May 2020 06:46:56 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-112-248.ams2.redhat.com
+ [10.36.112.248])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 010C260CD1;
+ Tue, 12 May 2020 06:46:54 +0000 (UTC)
+Subject: Re: [PATCH v3 6/9] qemu-img: Add bitmap sub-command
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200508180340.675712-1-eblake@redhat.com>
+ <20200508180340.675712-7-eblake@redhat.com>
+ <ce9731fd-d137-f5d2-6dc4-071a0b9e0b97@redhat.com>
+ <bf472c11-e3b6-caee-7aa7-7803f762612d@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <e3bc88dc-08bd-c449-d5e6-15852370c948@redhat.com>
+Date: Tue, 12 May 2020 08:46:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200512080146.7d0f4ae2.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <bf472c11-e3b6-caee-7aa7-7803f762612d@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="m7mWvyGn93nZAC61K1Ca6miq8Q0kpQe6V"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 02:20:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,97 +121,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- David Hildenbrand <david@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Marek Vasut <marex@denx.de>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, qemu-ppc@nongnu.org,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-s390x@nongnu.org, qemu-arm@nongnu.org, Stafford Horne <shorne@gmail.com>,
- Richard Henderson <rth@twiddle.net>, qemu-riscv@nongnu.org,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Chris Wulff <crwulff@gmail.com>, Roman Bolshakov <r.bolshakov@yadro.com>,
- Laurent Vivier <laurent@vivier.eu>, Palmer Dabbelt <palmer@dabbelt.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/12/20 8:01 AM, Cornelia Huck wrote:
-> On Mon, 11 May 2020 14:21:27 +0200
-> Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
-> 
->> On 5/11/20 12:48 PM, Cornelia Huck wrote:
->>> On Sat,  9 May 2020 15:09:07 +0200
->>> Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->>>    
->>>> As these declarations are restricted to !CONFIG_USER_ONLY in
->>>> helper.c, only declare them when system-mode emulation is used.
->>>>
->>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>>> ---
->>>>    target/s390x/internal.h | 11 ++++++-----
->>>>    1 file changed, 6 insertions(+), 5 deletions(-)
->>>>
->>>> diff --git a/target/s390x/internal.h b/target/s390x/internal.h
->>>> index c1678dc6bc..ddc276cdf4 100644
->>>> --- a/target/s390x/internal.h
->>>> +++ b/target/s390x/internal.h
->>>> @@ -236,7 +236,6 @@ int s390_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
->>>>    
->>>>    /* cc_helper.c */
->>>>    const char *cc_name(enum cc_op cc_op);
->>>> -void load_psw(CPUS390XState *env, uint64_t mask, uint64_t addr);
->>>>    uint32_t calc_cc(CPUS390XState *env, uint32_t cc_op, uint64_t src, uint64_t dst,
->>>>                     uint64_t vr);
->>>>    
->>>> @@ -303,18 +302,20 @@ void s390_cpu_gdb_init(CPUState *cs);
->>>>    
->>>>    /* helper.c */
->>>>    void s390_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
->>>> -hwaddr s390_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
->>>> -hwaddr s390_cpu_get_phys_addr_debug(CPUState *cpu, vaddr addr);
->>>> +void do_restart_interrupt(CPUS390XState *env);
->>>> +
->>>> +#ifndef CONFIG_USER_ONLY
->>>> +void load_psw(CPUS390XState *env, uint64_t mask, uint64_t addr);
->>>
->>> load_psw() is in cc_helper.c (and not in helper.c). Rather add the
->>> #ifndef above, even if it is a bit awkward? Otherwise, the wrong
->>> comment makes it confusing.
->>
->> I've been tempted to remove the kinda outdated /* helper.c */ comment...
-> 
-> I don't think they're really outdated, but not sure how useful they are
-> to people. I'm not personally attached to them, other opinions?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--m7mWvyGn93nZAC61K1Ca6miq8Q0kpQe6V
+Content-Type: multipart/mixed; boundary="WM4PoqlJT1hfqTpzjFqB7QfEfUsl66Eev"
 
-Since the project switched to git, developers can now use git-grep :)
+--WM4PoqlJT1hfqTpzjFqB7QfEfUsl66Eev
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> 
+On 11.05.20 20:22, Eric Blake wrote:
+> On 5/11/20 6:10 AM, Max Reitz wrote:
+>> On 08.05.20 20:03, Eric Blake wrote:
+>>> Include actions for --add, --remove, --clear, --enable, --disable, and
+>>> --merge (note that --clear is a bit of fluff, because the same can be
+>>> accomplished by removing a bitmap and then adding a new one in its
+>>> place, but it matches what QMP commands exist).=C2=A0 Listing is omitte=
+d,
+>>> because it does not require a bitmap name and because it was already
+>>> possible with 'qemu-img info'.=C2=A0 A single command line can play one=
+ or
+>>> more bitmap commands in sequence on the same bitmap name (although all
+>>> added bitmaps share the same granularity, and and all merged bitmaps
+>>> come from the same source file).=C2=A0 Merge defaults to other bitmaps =
+in
+>>> the primary image, but can also be told to merge bitmaps from a
+>>> distinct image.
 >>
->>>    
->>>>    uint64_t get_psw_mask(CPUS390XState *env);
->>>>    void s390_cpu_recompute_watchpoints(CPUState *cs);
->>>>    void s390x_tod_timer(void *opaque);
->>>>    void s390x_cpu_timer(void *opaque);
->>>> -void do_restart_interrupt(CPUS390XState *env);
->>>>    void s390_handle_wait(S390CPU *cpu);
->>>> +hwaddr s390_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
->>>> +hwaddr s390_cpu_get_phys_addr_debug(CPUState *cpu, vaddr addr);
->>>>    #define S390_STORE_STATUS_DEF_ADDR offsetof(LowCore, floating_pt_save_area)
->>>>    int s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch);
->>>>    int s390_store_adtl_status(S390CPU *cpu, hwaddr addr, hwaddr len);
->>>> -#ifndef CONFIG_USER_ONLY
->>>>    LowCore *cpu_map_lowcore(CPUS390XState *env);
->>>>    void cpu_unmap_lowcore(LowCore *lowcore);
->>>>    #endif /* CONFIG_USER_ONLY */
->>>
->>>    
+>> For the record: Yes, my comment was mostly about my confusion around the
+>> {}.=C2=A0 So just replacing them by () would have pacified me.
 >>
-> 
-> 
+>> But this is more fun, of course.
+>>
+>=20
+>>> +++ b/docs/tools/qemu-img.rst
+>>> @@ -281,6 +281,29 @@ Command description:
+>>
+>> [...]
+>>
+>>> +=C2=A0 Additional options ``-g`` set a non-default *GRANULARITY* for
+>>
+>> sets?
+>=20
+> Or maybe:
+>=20
+> Additional options include ``-g`` which sets a non-default *GRANULARITY*
+> for ``--add``, and ``-b`` and ``-F`` which select an alternative source
+> file for all *SOURCE* bitmaps used by ``--merge``.
+
+Sounds good.
+
+> And in writing this, I just realized - even though you _can_ use --add
+> more than once in a command line, the command is still limited to
+> operating on a single bitmap name, so unless you write contortions like:
+>=20
+> qemu-img bitmap --add --remove --add -g 1024 file.qcow2 bitmapname
+>=20
+> there will normally be at most one --add operation for a -g to be used
+> with (because otherwise the second --add will fail when attempting to
+> create an already-existing bitmap name).
+
+Sure, but that=E2=80=99s a semantic problem, not a syntactic one. :)
+
+Max
+
+
+--WM4PoqlJT1hfqTpzjFqB7QfEfUsl66Eev--
+
+--m7mWvyGn93nZAC61K1Ca6miq8Q0kpQe6V
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl66Rl0ACgkQ9AfbAGHV
+z0C2eAf/TQvlix4CnezHt6Sb800IupSaL6gCDQcdXHbEy605ocK1tptROCjxB9PQ
+YNtAHGYg58Z+/YCGttBwOCPMDAvSql8vh9yPA/vrRzrVDeqSRJCd7NVqhC9tvI0J
+f3hlVEg/MrKeo3C/LBLDzS4TqB0cPs0ScSGZE6hICQ6OapBciCFJ4i7S6tTypmOM
+Obwb8iuS7/wa1zpPyg3/a5AKY94VdHcpOlPLZoHhSypj+OIIf2uAsC5RvCb+sqnE
+lNwhcdY1SixD34x/ogyJFvhXuZNx2qifkeFqv0Bgxp9FZqT1TEcgYjaDty6joUnE
+mNrmLILXDd6vbssp+py/LPwTvMSFLw==
+=Lv3R
+-----END PGP SIGNATURE-----
+
+--m7mWvyGn93nZAC61K1Ca6miq8Q0kpQe6V--
+
 
