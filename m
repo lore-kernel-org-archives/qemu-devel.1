@@ -2,100 +2,99 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E72B3C54E8E
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 11:57:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A379CC54E4A
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 12:10:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FE53206CC
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 11:57:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E4A920675
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 12:10:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="s/n3QEOs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FE53206CC
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="HfN1PI2G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E4A920675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYTXo-0008VQ-R1
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 07:57:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36268)
+	id 1jYTjq-0005xt-Gh
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 08:10:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38400)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jag.raman@oracle.com>)
- id 1jYTWr-0007v5-RE
- for qemu-devel@nongnu.org; Tue, 12 May 2020 07:56:57 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:43952)
+ id 1jYTj3-0004zb-9v
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 08:09:33 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:54704)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jag.raman@oracle.com>)
- id 1jYTWp-0002FS-OH
- for qemu-devel@nongnu.org; Tue, 12 May 2020 07:56:57 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04CBr2Li178428;
- Tue, 12 May 2020 11:56:41 GMT
+ id 1jYTj1-0001JO-Ka
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 08:09:32 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04CC343l144499;
+ Tue, 12 May 2020 12:09:23 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=content-type :
  mime-version : subject : from : in-reply-to : date : cc :
  content-transfer-encoding : message-id : references : to;
- s=corp-2020-01-29; bh=xgO5BI/QT2AiRR9aK6FLMkLqaKVDGY0keB+yOrQeGpU=;
- b=s/n3QEOsZWLDNQE2uU0xMgTnXknYkgxpsN19BGFE13roHi59rEaKtxomNZ/ZLtAkWHmK
- 0qLt5zMv4C37O6aVWXz/+Fx7hrV8Xax9IjrnGXVC/OA9XTTZYdz6W1LpT6GVrf/yGZRm
- T8ATrmBvT1Re1ynYmfvQHs93G9CZqayE1jgKm27jvnlavWqaxTpyeuUp4eWyVnn2Jzhb
- Gqztn+mO4XpLO511au0GngPYIYjKpQ+TLdYiOM4o9hOWVgJ4yZhcgjpQPzHXXCikUSDP
- 8C67mYwantntWSh5Nv+IpCv15KtMRH284153szOkmDvofMxphuzp1UygA8nsb5awPopD gw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by aserp2120.oracle.com with ESMTP id 30x3gsjfqq-1
+ s=corp-2020-01-29; bh=wGy1etcVnVyrfgRpTsbh55Lmr1h9ESAJyG1KeJ0LSas=;
+ b=HfN1PI2GlkJRLq1uW/ZdK9WiN95SPVaaROYJCW+A3ckNaIlrw4c8rWMktcEnPAtQCFz/
+ c1dF/bL7riGCP8GOUH97NPhkf6BDx6C54sIVNMz8XOyzyC4FasJnlME5q/v1o9fRqOUv
+ 2TN+FZGFxT8C/1vp2YMTbKIKQ6pE5uif/BFVdxtzUcJWgIoOvND3ibuBtc4j8aHripVv
+ pJKNu6blk9GU861p+GKMbwaGdJM6w41MToJxBN7QpLJINp6OPG/YQxnbBqj907whB1Wy
+ V3eh6xsWnho4igv7Wq6ueJADQ58riFiPM0/MtpCF0vZ6ivdFnxcMT4WBRmwqvaS3/zFa mg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by userp2120.oracle.com with ESMTP id 30x3mbthgu-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Tue, 12 May 2020 11:56:41 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04CBrwDp094842;
- Tue, 12 May 2020 11:56:40 GMT
+ Tue, 12 May 2020 12:09:22 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04CC8Woc164557;
+ Tue, 12 May 2020 12:09:22 GMT
 Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by userp3030.oracle.com with ESMTP id 30ydsqadj5-1
+ by aserp3020.oracle.com with ESMTP id 30xbgjc7sk-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 12 May 2020 11:56:40 +0000
-Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 04CBua6t011429;
- Tue, 12 May 2020 11:56:37 GMT
-Received: from jags-mac.fios-router.home (/98.118.8.56)
+ Tue, 12 May 2020 12:09:21 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 04CC9GY4018596;
+ Tue, 12 May 2020 12:09:16 GMT
+Received: from dhcp-10-39-202-98.vpn.oracle.com (/10.39.202.98)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Tue, 12 May 2020 04:56:36 -0700
+ with ESMTP ; Tue, 12 May 2020 05:09:16 -0700
 Content-Type: text/plain;
-	charset=utf-8
+	charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH RESEND v6 01/36] memory: alloc RAM from file at offset
+Subject: Re: [PATCH RESEND v6 11/36] multi-process: define mpqemu-link object
 From: Jag Raman <jag.raman@oracle.com>
-In-Reply-To: <20200512084855.GC1191162@redhat.com>
-Date: Tue, 12 May 2020 07:56:33 -0400
+In-Reply-To: <20200512085636.GB300009@stefanha-x1.localdomain>
+Date: Tue, 12 May 2020 08:09:13 -0400
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <B4DB4B9E-E7E3-4F1F-917C-898F9B150EFB@oracle.com>
+Message-Id: <700BF12A-8D49-46C7-BA7D-9ADA3BBBD979@oracle.com>
 References: <cover.1587614626.git.elena.ufimtseva@oracle.com>
- <cb792b8d6f93d00c10790de8698c468b6ff4ab69.1587614626.git.elena.ufimtseva@oracle.com>
- <20200512084855.GC1191162@redhat.com>
-To: =?utf-8?B?IkRhbmllbCBQLiBCZXJyYW5nw6ki?= <berrange@redhat.com>
+ <8ffca5a79b71ebe0f183707db34f59562faee71f.1587614626.git.elena.ufimtseva@oracle.com>
+ <20200512085636.GB300009@stefanha-x1.localdomain>
+To: Stefan Hajnoczi <stefanha@redhat.com>
 X-Mailer: Apple Mail (2.3608.80.23.2.2)
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9618
  signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- suspectscore=0 mlxscore=0
- adultscore=0 mlxlogscore=999 malwarescore=0 bulkscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2005120089
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ mlxlogscore=999
+ spamscore=0 suspectscore=3 phishscore=0 bulkscore=0 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2005120092
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9618
  signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
- mlxlogscore=999
- malwarescore=0 adultscore=0 mlxscore=0 priorityscore=1501
- lowpriorityscore=0 impostorscore=0 clxscore=1015 bulkscore=0 phishscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2005120089
-Received-SPF: pass client-ip=141.146.126.78; envelope-from=jag.raman@oracle.com;
- helo=aserp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 07:56:54
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 impostorscore=0
+ mlxscore=0 suspectscore=3 bulkscore=0 mlxlogscore=999 phishscore=0
+ malwarescore=0 lowpriorityscore=0 spamscore=0 adultscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2005120091
+Received-SPF: pass client-ip=156.151.31.85; envelope-from=jag.raman@oracle.com;
+ helo=userp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 08:09:29
 X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
 X-Spam_score_int: -43
 X-Spam_score: -4.4
@@ -118,231 +117,213 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>, fam@euphon.net,
- swapnil.ingle@nutanix.com, john.g.johnson@oracle.com, qemu-devel@nongnu.org,
- kraxel@redhat.com, quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
+ swapnil.ingle@nutanix.com, John G Johnson <john.g.johnson@oracle.com>,
+ qemu-devel@nongnu.org, kraxel@redhat.com, quintela@redhat.com,
+ "Michael S. Tsirkin" <mst@redhat.com>, armbru@redhat.com,
  kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
  ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
- liran.alon@oracle.com, stefanha@redhat.com, pbonzini@redhat.com,
- rth@twiddle.net, kwolf@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com,
- thanos.makatos@nutanix.com
+ liran.alon@oracle.com, thanos.makatos@nutanix.com, rth@twiddle.net,
+ kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-> On May 12, 2020, at 4:48 AM, Daniel P. Berrang=C3=A9 =
-<berrange@redhat.com> wrote:
+> On May 12, 2020, at 4:56 AM, Stefan Hajnoczi <stefanha@redhat.com> =
+wrote:
 >=20
-> On Wed, Apr 22, 2020 at 09:13:36PM -0700, elena.ufimtseva@oracle.com =
+> On Wed, Apr 22, 2020 at 09:13:46PM -0700, elena.ufimtseva@oracle.com =
 wrote:
 >> From: Jagannathan Raman <jag.raman@oracle.com>
 >>=20
->> Allow RAM MemoryRegion to be created from an offset in a file, =
-instead
->> of allocating at offset of 0 by default. This is needed to =
-synchronize
->> RAM between QEMU & remote process.
->=20
-> Can you elaborate on why remote processes require the RAM to be offset
-> from zero ?
-
-Hi Daniel,
-
-As it turns out, the RAM is scattered across the physical address space
-(system_memory) of QEMU. Therefore, the system memory is composed
-of multiple sections of RAM, and some sections start at a non-zero RAM
-offset.
-
-As a result, the remote process needs the ability to map these RAM
-sections into system_memory.
-
-Thank you!
---
-Jag
-
->=20
-> NB, I'm not objecting - I'm just curious to understand more.
->=20
+>> Defines mpqemu-link object which forms the communication link between
+>> QEMU & emulation program.
+>> Adds functions to configure members of mpqemu-link object instance.
+>> Adds functions to send and receive messages over the communication
+>> channel.
+>> Adds GMainLoop to handle events received on the communication =
+channel.
 >>=20
 >> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 >> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 >> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
->> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> ---
->> exec.c                    | 11 +++++++----
->> include/exec/ram_addr.h   |  2 +-
->> include/qemu/mmap-alloc.h |  3 ++-
->> memory.c                  |  2 +-
->> util/mmap-alloc.c         |  7 ++++---
->> util/oslib-posix.c        |  2 +-
->> 6 files changed, 16 insertions(+), 11 deletions(-)
->>=20
->> diff --git a/exec.c b/exec.c
->> index 2874bb5088..d0ac9545f4 100644
->> --- a/exec.c
->> +++ b/exec.c
->> @@ -1801,6 +1801,7 @@ static void *file_ram_alloc(RAMBlock *block,
->>                             ram_addr_t memory,
->>                             int fd,
->>                             bool truncate,
->> +                            off_t offset,
->>                             Error **errp)
->> {
->>     void *area;
->> @@ -1851,7 +1852,8 @@ static void *file_ram_alloc(RAMBlock *block,
->>     }
->>=20
->>     area =3D qemu_ram_mmap(fd, memory, block->mr->align,
->> -                         block->flags & RAM_SHARED, block->flags & =
-RAM_PMEM);
->> +                         block->flags & RAM_SHARED, block->flags & =
-RAM_PMEM,
->> +                         offset);
->>     if (area =3D=3D MAP_FAILED) {
->>         error_setg_errno(errp, errno,
->>                          "unable to map backing store for guest =
-RAM");
->> @@ -2283,7 +2285,7 @@ static void ram_block_add(RAMBlock *new_block, =
-Error **errp, bool shared)
->> #ifdef CONFIG_POSIX
->> RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
->>                                  uint32_t ram_flags, int fd,
->> -                                 Error **errp)
->> +                                 off_t offset, Error **errp)
->> {
->>     RAMBlock *new_block;
->>     Error *local_err =3D NULL;
->> @@ -2328,7 +2330,8 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t =
-size, MemoryRegion *mr,
->>     new_block->used_length =3D size;
->>     new_block->max_length =3D size;
->>     new_block->flags =3D ram_flags;
->> -    new_block->host =3D file_ram_alloc(new_block, size, fd, =
-!file_size, errp);
->> +    new_block->host =3D file_ram_alloc(new_block, size, fd, =
-!file_size, offset,
->> +                                     errp);
->>     if (!new_block->host) {
->>         g_free(new_block);
->>         return NULL;
->> @@ -2358,7 +2361,7 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t =
-size, MemoryRegion *mr,
->>         return NULL;
->>     }
->>=20
->> -    block =3D qemu_ram_alloc_from_fd(size, mr, ram_flags, fd, errp);
->> +    block =3D qemu_ram_alloc_from_fd(size, mr, ram_flags, fd, 0, =
-errp);
->>     if (!block) {
->>         if (created) {
->>             unlink(mem_path);
->> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
->> index 5e59a3d8d7..1b9f489ff0 100644
->> --- a/include/exec/ram_addr.h
->> +++ b/include/exec/ram_addr.h
->> @@ -121,7 +121,7 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t =
-size, MemoryRegion *mr,
->>                                    Error **errp);
->> RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
->>                                  uint32_t ram_flags, int fd,
->> -                                 Error **errp);
->> +                                 off_t offset, Error **errp);
->>=20
->> RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
->>                                   MemoryRegion *mr, Error **errp);
->> diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
->> index e786266b92..4f579858bc 100644
->> --- a/include/qemu/mmap-alloc.h
->> +++ b/include/qemu/mmap-alloc.h
->> @@ -25,7 +25,8 @@ void *qemu_ram_mmap(int fd,
->>                     size_t size,
->>                     size_t align,
->>                     bool shared,
->> -                    bool is_pmem);
->> +                    bool is_pmem,
->> +                    off_t start);
->>=20
->> void qemu_ram_munmap(int fd, void *ptr, size_t size);
->>=20
->> diff --git a/memory.c b/memory.c
->> index 601b749906..f5fec476b7 100644
->> --- a/memory.c
->> +++ b/memory.c
->> @@ -1596,7 +1596,7 @@ void =
-memory_region_init_ram_from_fd(MemoryRegion *mr,
->>     mr->destructor =3D memory_region_destructor_ram;
->>     mr->ram_block =3D qemu_ram_alloc_from_fd(size, mr,
->>                                            share ? RAM_SHARED : 0,
->> -                                           fd, &err);
->> +                                           fd, 0, &err);
->>     mr->dirty_log_mask =3D tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : =
-0;
->>     if (err) {
->>         mr->size =3D int128_zero();
->> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
->> index 27dcccd8ec..a28f7025f0 100644
->> --- a/util/mmap-alloc.c
->> +++ b/util/mmap-alloc.c
->> @@ -86,7 +86,8 @@ void *qemu_ram_mmap(int fd,
->>                     size_t size,
->>                     size_t align,
->>                     bool shared,
->> -                    bool is_pmem)
->> +                    bool is_pmem,
->> +                    off_t start)
->> {
->>     int flags;
->>     int map_sync_flags =3D 0;
->> @@ -147,7 +148,7 @@ void *qemu_ram_mmap(int fd,
->>     offset =3D QEMU_ALIGN_UP((uintptr_t)guardptr, align) - =
-(uintptr_t)guardptr;
->>=20
->>     ptr =3D mmap(guardptr + offset, size, PROT_READ | PROT_WRITE,
->> -               flags | map_sync_flags, fd, 0);
->> +               flags | map_sync_flags, fd, start);
->>=20
->>     if (ptr =3D=3D MAP_FAILED && map_sync_flags) {
->>         if (errno =3D=3D ENOTSUP) {
->> @@ -172,7 +173,7 @@ void *qemu_ram_mmap(int fd,
->>          * we will remove these flags to handle compatibility.
->>          */
->>         ptr =3D mmap(guardptr + offset, size, PROT_READ | PROT_WRITE,
->> -                   flags, fd, 0);
->> +                   flags, fd, start);
->>     }
->>=20
->>     if (ptr =3D=3D MAP_FAILED) {
->> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
->> index 062236a1ab..4c6b9e90c6 100644
->> --- a/util/oslib-posix.c
->> +++ b/util/oslib-posix.c
->> @@ -209,7 +209,7 @@ void *qemu_memalign(size_t alignment, size_t =
-size)
->> void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment, bool =
-shared)
->> {
->>     size_t align =3D QEMU_VMALLOC_ALIGN;
->> -    void *ptr =3D qemu_ram_mmap(-1, size, align, shared, false);
->> +    void *ptr =3D qemu_ram_mmap(-1, size, align, shared, false, 0);
->>=20
->>     if (ptr =3D=3D MAP_FAILED) {
->>         return NULL;
->> --=20
->> 2.25.GIT
->>=20
 >=20
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    =
-https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org         -o-            =
-https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    =
-https://www.instagram.com/dberrange :|
+> This will change a lot when integrated into the QEMU event loop so =
+I've
+> skipped a lot of the code.
 >=20
+> QIOChannel is probably the appropriate object to use instead of =
+directly
+> accessing a file descriptor.
+
+OK, got it. Thanks!
+
 >=20
+>> +/**
+>> + * mpqemu_cmd_t:
+>> + *
+>> + * proc_cmd_t enum type to specify the command to be executed on the =
+remote
+>> + * device.
+>> + */
+>> +typedef enum {
+>> +    INIT =3D 0,
+>> +    MAX,
+>> +} mpqemu_cmd_t;
+>> +
+>> +/**
+>> + * MPQemuMsg:
+>> + * @cmd: The remote command
+>> + * @bytestream: Indicates if the data to be shared is structured =
+(data1)
+>> + *              or unstructured (data2)
+>> + * @size: Size of the data to be shared
+>> + * @data1: Structured data
+>> + * @fds: File descriptors to be shared with remote device
+>> + * @data2: Unstructured data
+>> + *
+>> + * MPQemuMsg Format of the message sent to the remote device from =
+QEMU.
+>> + *
+>> + */
+>> +typedef struct {
+>> +    mpqemu_cmd_t cmd;
+>=20
+> Please use an int field on the wire because the C standard says:
+>=20
+>  Each enumerated type shall be compatible with char, a signed integer
+>  type, or an unsigned integer type. The choice of type is
+>  implementation-defined, but shall be capable of representing the
+>  values of all the members of the enumeration.
+>=20
+> So the compiler may make this a char field (which would introduce
+> padding before the bytestream field) but if a new enum constant FOO =3D
+> 0x100 is added then the compiler might change the size to 16-bit.
+>=20
+>> +int mpqemu_msg_recv(MPQemuMsg *msg, MPQemuChannel *chan)
+>> +{
+>> +    int rc;
+>> +    uint8_t *data;
+>> +    union {
+>> +        char control[CMSG_SPACE(REMOTE_MAX_FDS * sizeof(int))];
+>> +        struct cmsghdr align;
+>> +    } u;
+>> +    struct msghdr hdr;
+>> +    struct cmsghdr *chdr;
+>> +    size_t fdsize;
+>> +    int sock =3D chan->sock;
+>> +    QemuMutex *lock =3D &chan->recv_lock;
+>> +
+>> +    struct iovec iov =3D {
+>> +        .iov_base =3D (char *) msg,
+>> +        .iov_len =3D MPQEMU_MSG_HDR_SIZE,
+>> +    };
+>> +
+>> +    memset(&hdr, 0, sizeof(hdr));
+>> +    memset(&u, 0, sizeof(u));
+>> +
+>> +    hdr.msg_iov =3D &iov;
+>> +    hdr.msg_iovlen =3D 1;
+>> +    hdr.msg_control =3D &u;
+>> +    hdr.msg_controllen =3D sizeof(u);
+>> +
+>> +    WITH_QEMU_LOCK_GUARD(lock) {
+>> +        do {
+>> +            rc =3D recvmsg(sock, &hdr, 0);
+>> +        } while (rc < 0 && (errno =3D=3D EINTR || errno =3D=3D =
+EAGAIN));
+>> +
+>> +        if (rc < 0) {
+>=20
+> Missing rc !=3D MPQEMU_MSG_HDR_SIZE check. If this was a short read we
+> should not attempt to parse uninitialized bytes in msg.
+>=20
+> This is more defensive than relying on catching bogus input values =
+later
+> on and also protects against accidentally revealing uninitialized =
+memory
+> contents by observing our error handling response.
+>=20
+>> +            qemu_log_mask(LOG_REMOTE_DEBUG, "%s - recvmsg rc is %d, =
+"
+>> +                          "errno is %d, sock %d\n", __func__, rc, =
+errno, sock);
+>> +            return rc;
+>> +        }
+>> +
+>> +        msg->num_fds =3D 0;
+>> +        for (chdr =3D CMSG_FIRSTHDR(&hdr); chdr !=3D NULL;
+>> +             chdr =3D CMSG_NXTHDR(&hdr, chdr)) {
+>> +            if ((chdr->cmsg_level =3D=3D SOL_SOCKET) &&
+>> +                (chdr->cmsg_type =3D=3D SCM_RIGHTS)) {
+>> +                fdsize =3D chdr->cmsg_len - CMSG_LEN(0);
+>> +                msg->num_fds =3D fdsize / sizeof(int);
+>> +                if (msg->num_fds > REMOTE_MAX_FDS) {
+>> +                    qemu_log_mask(LOG_REMOTE_DEBUG,
+>> +                                  "%s: Max FDs exceeded\n", =
+__func__);
+>> +                    return -ERANGE;
+>> +                }
+>> +
+>> +                memcpy(msg->fds, CMSG_DATA(chdr), fdsize);
+>> +                break;
+>> +            }
+>> +        }
+>> +
+>> +        if (msg->bytestream) {
+>> +            if (!msg->size) {
+>> +                qemu_mutex_unlock(lock);
+>=20
+> Duplicate unlock, we're already inside WITH_QEMU_LOCK_GUARD().
+>=20
+>> +                return -EINVAL;
+>> +            }
+>> +
+>> +            msg->data2 =3D calloc(1, msg->size);
+>=20
+> What is the maximum message size? Please pick one and enforce it to
+> protect against huge allocations that cause us to run out of memory.
+>=20
+>> +            data =3D msg->data2;
+>> +        } else {
+>> +            data =3D (uint8_t *)&msg->data1;
+>=20
+> Adding a uint8_t member to the union eliminates the need for a cast:
+>=20
+>  union {
+>      uint64_t u64;
+>      uint8_t u8;
+>  } data1;
+>=20
+>  ...
+>=20
+>  data =3D &msg->data1.u8;
+>=20
+>> +        }
+>> +
+>> +        if (msg->size) {
+>> +            do {
+>> +                rc =3D read(sock, data, msg->size);
+>> +            } while (rc < 0 && (errno =3D=3D EINTR || errno =3D=3D =
+EAGAIN));
+>> +        }
+>=20
+> Short reads are an error. Please check that the sum of rc values is
+> equal to msg->size.
+>=20
+>> +    }
+>> +    return rc;
+>> +}
+> ...
+>> +bool mpqemu_msg_valid(MPQemuMsg *msg)
+>> +{
+>> +    if (msg->cmd >=3D MAX) {
+>> +        return false;
+>> +    }
+>=20
+> Checking msg->cmd < 0 is also useful here, especially when the field
+> type is changed to int.
 
 
