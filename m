@@ -2,84 +2,96 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DAF4C54E4A
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 09:32:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 443CCC54E4A
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 09:35:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19036206A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 09:32:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 09B41206A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 09:35:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x+rU9IAR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19036206A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="IIqCEBPc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09B41206A3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYRGz-0002qc-8m
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 05:32:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41696)
+	id 1jYRKC-0004oa-2M
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 05:35:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41780)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jYRGI-0002LM-N0
- for qemu-devel@nongnu.org; Tue, 12 May 2020 05:31:42 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:44934)
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1jYRH2-00036Q-7c; Tue, 12 May 2020 05:32:28 -0400
+Received: from mout.web.de ([212.227.15.14]:46887)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jYRGH-0005sM-FV
- for qemu-devel@nongnu.org; Tue, 12 May 2020 05:31:42 -0400
-Received: by mail-ot1-x341.google.com with SMTP id j4so9941423otr.11
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 02:31:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=jc+/lr9ycH0TTde7ttnjfwsSpQWYGiC6vAyoWOFGZ1U=;
- b=x+rU9IARl+aD1/e7luSeUHaK3P7WjOBq+Bnk9KV5slbuO1sFX3C5tWa40zJu31jbed
- aMKrimvWEqdpaENTIm+yfynw0jP2gquMnGUe8ng7SOWGlSQ+w7FcXoLfiCLZWdZ6S76y
- 8KTt2F8WBFM+4emPUnglr5d0JX3MxYu3HdOX1uaEWakOs290UJryWaLeb5seZ8HRzVOB
- gz6NQIE+GYA1A2K8Jetajh5PTGsjwOSD9E3t30FUcfaobAESwF2Xilr5wr1JdrQ4NSCU
- zerC87in9OENJVTMjrY0/2Ftlwswpwq3niK95PiMV82KFrAGLRJxqKC+lR5LV9ZfGlob
- qzMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=jc+/lr9ycH0TTde7ttnjfwsSpQWYGiC6vAyoWOFGZ1U=;
- b=JUeEw7OYtOIiv2dSBEwP2Bvgrgp+OzR2OH6ti+XzM9ezXtcRUn6KBv3xX74QD7YrP+
- H3syfAomY/2EXTr7nTUPbRN+MffAF/7BMcz0KCavrwUZG1QWlhPExkh+hPU+Ku9vt5K4
- 1ZGOdd/r4XJhqWlg9C7H4sDflW86onxI8Wfv39xu1EdusZX7Jt26bKJ2XIPkF1bO4oUj
- Pm0i04vdYDrHutZU4+mbboriu00XI571V+Ar5r1MkH2FjpV8ZwHDjVhlMeMoyS4o7z6h
- 4SLvoR0S2vNfc99hZUTDQ0aR+R38YdlrAtpGF3oGlMa3cYz9wpO4K4pCCG+x94yBfdKz
- d56Q==
-X-Gm-Message-State: AGi0PubUl1cDkbXLwWk3zWUqJYH9Ys7+RUdwPYi6PFm0XoLzR7lvf4xm
- QrTb0ez/8vx5d3u9qyLr6MN9peaMt6BPFLq6MSdjnQ==
-X-Google-Smtp-Source: APiQypLgnvLWjXetAi+H5hjekb+QLkK/pyr95RKdxnLIOyt1okGmaSvqKFpWkjFLWDpGOHFB1hkAvKuX/ig7fA7hlaw=
-X-Received: by 2002:a05:6830:22dc:: with SMTP id
- q28mr15177954otc.221.1589275899478; 
- Tue, 12 May 2020 02:31:39 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1jYRH0-0005ya-KW; Tue, 12 May 2020 05:32:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1589275936;
+ bh=1u/twbX/tN5Bqoao2y8JEDNL2tP55ni2eAN8Bz4FQNY=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=IIqCEBPc7ZZ3AHX1tyq18lCktd2zLA1OYgmwjpKCqwfrlqxoMPik7VSM77P7VTMRm
+ eultEZVgZSvRuouxMbHZdlpWPfbA7dd38hak7S4zdKsCPndQL4pVMsNJ7j4xbUwM4I
+ y60pVqraBww2kwIY/ugVb4jz8F+h7c4ckwIH421M=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([89.247.255.130]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MHVen-1jLUpt1UFV-00DZrF; Tue, 12
+ May 2020 11:32:16 +0200
+Date: Tue, 12 May 2020 11:32:06 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH 0/5] Introduce 'yank' oob qmp command to recover from
+ hanging qemu
+Message-ID: <20200512113206.62836e44@luklap>
+In-Reply-To: <20200511154645.GI2811@work-vm>
+References: <cover.1589193717.git.lukasstraub2@web.de>
+ <20200511114947.GJ1135885@redhat.com>
+ <20200511120718.GD2811@work-vm>
+ <20200511121714.GL1135885@redhat.com>
+ <20200511154645.GI2811@work-vm>
 MIME-Version: 1.0
-References: <tencent_A0D32CA7B0D4D56FF2B2182DAA3EB6BC6508@qq.com>
-In-Reply-To: <tencent_A0D32CA7B0D4D56FF2B2182DAA3EB6BC6508@qq.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 May 2020 10:31:28 +0100
-Message-ID: <CAFEAcA_qdnCfZa1aAH7U0D0yTwdJd=maKPWGnz12Fpq3TVw=qA@mail.gmail.com>
-Subject: Re: how to extend to load COFF executable image file
-To: xiaolei <1482995675@qq.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Type: multipart/signed; boundary="Sig_/GuR6uG8UsC8gR0s8Tz_Z1UG";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Provags-ID: V03:K1:mLvx5mJQV3TjJweVHuSJ23aeLgBt0WLgi04NbXuKk1EUpGdmGVt
+ QqGISkphbu+/BZ8Zkdw40bzPWqBf87tUPH1AfRjB3j3q4gdV+Mm0HSSHOBPzAJmu4CJSIc6
+ okXZE/+5i3DyEuBeQEgLp2zBgqTz9ceiGLrNL06ypciHgEr35l5Oqnj5eU9qc/mIqkUHtH1
+ 2dTSbXjfZ3nXcDV1DKt3Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:/X556IVTRUc=:p3V1q3OOubPOnwwxdmPH5K
+ dJA2s/2ndxXyeWqNRK9M0a+ZpUDXE0AzptA/ivYBv4tp3ooN45ki2gKdBAfK2sTpjI00O0Q/O
+ WJJ5WUZC4DBfoDq1uuyGBHBIhIZr+wHSgewpfpBiyDkl7mojVjDuWA6bqVETCOxpGFRkIfsFG
+ 8EUiujQ+KEDt34QMjBrBMk4qaECxWsdbljbN6O7y8RnuYkFwY6kxhHalszHyXSHPgDEr+sD62
+ +bdl3Is1dxWmuqLdZCbL6cEQmLPjxGzMgxJyyMDoZndU0Zf20O3yLG0C4JOPQPM/wrn7bqTRv
+ nbzBJC2j/bni8aLmlnRcKmPWdEhszD/hhMXiru1/gt3NNyJ6Q3Cv9wPgwZhVh/I4NRG3v930e
+ hGYMLB6e668wOQkOEV8AfE1q/gv6kM/O7MnijQOvVi7tNIRFkKgVkHYMNlH1gOPK2YbH4NWMP
+ TNzOCSXviz5RgMPlLIqmnuT2SCHU4ZE14sEUMVSV0rCMYtiftMmL50PdfC2DPC9KuT/xIRED4
+ hKSVxJYLq0W5tyaz/gB1ecM+9gCjspur+d3aEurUM+fxeE+6YISKqgdJqDtQ8M5FaMvVJX6jT
+ 3mxJClHr6G+gyQQP+K46suwbrorhG5Kfag1YTHL0H9VbGMaab2FzvqPY4R95nMvY+TgWj4tus
+ skAnKgiD0U+BhFISIlvecqyumHxgvGxYtp7rZZQ1otE9yr8Tkzqd++V/AzTGfOhC8KkjF6rnR
+ gcWTKaOTZdwFBPoiojWlvUx3/zAl62rOnPbLjoaj9thpXl4quNntT5qs4V6XNp4mbY5vSDP4Z
+ h/FpNLZtASp4xbkOm9fAf5EIlT9SRCeXlz24svZtZVqKQKavylnFYqD6fRfmp59001E5lNDGT
+ DCqQqpBVH1NOPA9oqucCHWD2lrSv5bwCcj4xXvEBiNeQmKlkKAE4Q85aqIjRF+UwUV0JON8Vd
+ ped2o7n+r2ouUl9NbRXUIDFssTVEYkNHdUzcwBGiekM1Zq17tIcnXZaQ1KATVdRaUcpFoBsO8
+ 7TdHQ8IM2oB6qwK7vAGYbLt3KMWRkUJ+oKGqGkXqeTXUUb6iBb0yna6O/Tl1Yu2LKSQjD0HBW
+ emUOQrvMQ8UXdS5wR24MoTVnJ31nSXSvo3x9Shk9jghRyEzv0TjPenmEhcNpi+qYU/kRYPvlE
+ 6PLfEXIBxPiF5PF9Gec7INkbkEoX087o60y5v26XzE+7mAkmTXxBraYimE+n8jFPrr00Dq3jd
+ /rSbXrj8W3utY4cVL
+Received-SPF: pass client-ip=212.227.15.14; envelope-from=lukasstraub2@web.de;
+ helo=mout.web.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 05:32:23
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -24
+X-Spam_score: -2.5
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,64 +105,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+ qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 12 May 2020 at 08:41, xiaolei <1482995675@qq.com> wrote:
->
-> Hi all,
->   I attempt to add DSP architecture support for some TI processor, based on QEMU 4.2.
+--Sig_/GuR6uG8UsC8gR0s8Tz_Z1UG
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Don't try to add new code to QEMU based on an old version.
-You should always work with the head-of-git. Otherwise you'll
-be dealing with stuff that's gradually drifting out of date
-and you'll end up with pain when you need to rebase.
+On Mon, 11 May 2020 16:46:45 +0100
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 
->   When I work on the executable file loading , I try to load COFF executable  file. Following the ELF file processing scheme, I thought I could write a function similar to :
->        rom_add_elf_program(label, mapped_file, data, file_size, mem_size, addr, as);
->   But I got lost when I track down the usage to the global variable  :static QTAILQ_HEAD(, Rom) roms;
->   I did not get where this 'roms'  is used for program loading, and how the loaded program get to run eventually.  Can someone give me some hints?
+> * Daniel P. Berrang=C3=83=C2=A9 (berrange@redhat.com) wrote:=20
+> > ...
+> > That way if QEMU does get stuck, you can start by tearing down the
+> > least distruptive channel. eg try tearing down the migration connection
+> > first (which shouldn't negatively impact the guest), and only if that
+> > doesn't work then, move on to tear down the NBD connection (which risks
+> > data loss) =20
+>=20
+> I wonder if a different way would be to make all network connections
+> register with yank, but then make yank take a list of connections to
+> shutdown(2).
 
-You've gone down too far into the internals of the implementation there.
-The way that QEMU's image loading code works is that all the data
-that must be loaded is put into a set of "ROM blobs", which we
-keep in a linked list. When the system is reset then the function
-rom_reset() runs through the list and copies the data in each
-blob into the right location in the guest memory. The simplest
-way to create a blob is to use rom_add_blob(); but you could
-also use rom_add_elf_program() if you wanted. That function is
-a bit misnamed: it's not ELF specific and it doesn't handle
-an entire program; it just has a couple of extra properties over
-rom_add_blob:
- * it lets the caller provide data which only partly fills
-   the blob, with the remainder to be zeroes
- * it can work with a GMappedFile so you don't need to copy
-   the data out of the mapped file to pass to it
+Good Idea. We could name the connections (/yank callbacks) in the form "nbd=
+:<node-name>", "chardev:<chardev-name>" and "migration" (and add "netdev:..=
+.", etc. in the future). Then make yank take a list of connection names as =
+you suggest and silently ignore connections that don't exist. And maybe eve=
+n add a 'query-yank' oob command returning a list of registered connections=
+ so the management application can do pattern matching if it wants.
 
->   Also, the COFF file format differs from the ELF, there is no program header. I wonder if I could reuse the 'rom' structure like loading a ELF. Or there is a better way to do it.
+Comments?
 
-Yes, you want to reuse the Rom struct, which isn't ELF specific
-(we also use it for loading raw files and uImages). You would
-need to write code which could read and parse a COFF file and
-identify what parts of the input file needed to go where in
-memory (and what parts of memory would need to be zeroed). Then
-for each of those parts of memory you create a rom blob
-(via rom_add_blob() or rom_add_elf_program()). That is, you
-want the equivalent of the function "static int glue(load_elf, SZ)"
-in include/hw/elf_ops.h. (That function is a bit odd because
-we use the C preprocessor to create a 32 bit and a 64 bit
-version of the function so we can load 32-bit ELF and 64-bit
-ELF files. COFF may not need that complication.)
+Regards,
+Lukas Straub
 
-Consider also taking the simpler approach of just using
-binutils objcopy to convert the COFF file into an ELF
-and then passing that ELF file to QEMU. In particular
-if you're also trying to implement an entire new architecture
-you might as well skip the pain of writing a COFF file
-loader for the moment.
+> Dave
+>=20
+> > Regards,
+> > Daniel
+> > --=20
+> > |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> > |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> > |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :| =20
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
 
-thanks
--- PMM
+
+--Sig_/GuR6uG8UsC8gR0s8Tz_Z1UG
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl66bRYACgkQNasLKJxd
+slgPzw//decvn0bNfRKIma9djL8UkWvqCEuOPaJIPJVJp6s9UBWPhIMbQq+jES9V
+AVzzp+x1Z50LfHH1Vq1bOpzM61MkJddPtLz6+f6QnNqipX9Kfx8Uix3fPaAwk3G8
+K4QfHmZoccKRXbtgbEwyPXS7TsOhiJu686F4QfFT6xsOilVcANbUrYRc1V2QC/Xc
+blQPnVMP2AsS6nslj5GuOjT09doDI3nCzY0Xw+QTQ3ngzHfCBQV9xMnEv66Iu8WL
+SNapm31kDWfGd2ifmCmINPz8/KbndXx5PuHancy4mDHagPdepzVysCiIyWpk/qhF
+lb/6/tWTF/4/bmAfM1pi7m9V/wITD/E3H+K4NqO+kc+4LJ8n/HkPMXj5ERjSj8MZ
+f5BnP9B5PkW4kVIZC82hVtBleTtadaF5uHf6Xw9TJvDL2Zrh7iQnKe8fAPM5WnJB
++Uyx2188kJ0/iiWugsVy8TpfPNy9Zb4OsxiRFgzNe/JvN97JraSqPEv+nAUrjsDn
+JSgyHMgqm0dXWxLevunFgYElbleAt4XxDLgO1fo36C8+jexrBseMryf6CBeMIiAD
+KZC2PpLEfhSvcdrr9/fthk8Uk3LSccpRCGfSbtoK5k/yx4XqKXGMl6DQ6ZNMz4nc
+Ej6vhXz6kj/vKSDVg4YLPBsZ4b+fu0nAVceqfdpXT2JaGoCEKks=
+=zWEr
+-----END PGP SIGNATURE-----
+
+--Sig_/GuR6uG8UsC8gR0s8Tz_Z1UG--
 
