@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5465CA90AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 16:43:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8112C2D0F7
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 16:43:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D662205C9
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 16:43:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 86A59205C9
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 16:43:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Gm2WNXkA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D662205C9
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xMMnD5DE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86A59205C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYY0b-0003rf-JH
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 12:43:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50538)
+	id 1jYY0c-0003uX-Ju
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 12:43:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50566)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jYXw1-0006E5-HQ
- for qemu-devel@nongnu.org; Tue, 12 May 2020 12:39:13 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:38604)
+ id 1jYXw4-0006Le-K4
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 12:39:16 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37780)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jYXw0-00062v-DM
- for qemu-devel@nongnu.org; Tue, 12 May 2020 12:39:13 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id e1so2364812wrt.5
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 09:39:12 -0700 (PDT)
+ id 1jYXw3-000661-KY
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 12:39:16 -0400
+Received: by mail-wr1-x441.google.com with SMTP id l17so2743943wrr.4
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 09:39:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=NRx9HxkT7GwADPC7+Ge+K4Hy5E9A9Z7xxkBA/YQUIh8=;
- b=Gm2WNXkArhuo0Vmrq9nTihLB4e6i4PkKuI3XcQPj3xwsL4dT7Y3wyMB+GnF0BJsuEq
- 0DAU6NPdP0IrmajDxc+trJA+dJDrrv/rPvBvoCexQDTHEDhbezHaf4zzCZPZC9W4gYn4
- IZAfLrfVrim+78o6FUkyBxQ7QcDVAHes5J1HqqnFw+MfXavLbjs0zzwQy4ltYg1RSx1a
- IjENSpa7QX+VDiyRv8wlUQYkjAPZ6rwxYjInevf9VCgWBQY9UXqyCUFMHmW0HBKPo3YN
- UE5L+2TLFa7j/lbkGM/b2NiF2mXQrDwN3KejH7SMuB72Qhmi+mjw19sGiE0l8TUOJJQW
- XqoQ==
+ bh=gZbv4QYcMc4ag+mpEYLSIdSn4AsHk1XrMWDwADXwYkg=;
+ b=xMMnD5DEWU3BaUbIVBPyfDy31d3E/yCJj/GqOcmztx/qiVjsvT+9dklvlkwReZs16h
+ pg/Ivm9Djal4nzGKl269LMqr/e6KZdxNpr80Jad3FEIaqjw6yk/KRTzxSxLmN7t/Kgsx
+ j0/p+RjW+/WB/B1qbuBJQx0twGdf7o0bAo23la1Beip881N0qU+4k7vxC34iALddmfCv
+ r30ixA/6EtZz2HHUAule/9kd4qN5oeoQBpUgDPoSFlIREW9cL1b2ykbbL23Fb2vv1EVe
+ M2NPASvUcNsHaEJho+fWP5skEmb/TmBz7dDz9Er1/rFSThJh/sn8kr9dLgZp5mMihBW2
+ WRGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=NRx9HxkT7GwADPC7+Ge+K4Hy5E9A9Z7xxkBA/YQUIh8=;
- b=I/fm51He/A67bE+bJfKHyDETj1c8rFuWaSY/M74kIHokV9/ej5XnvhN0fVUt2VmtiF
- aCfSoYTmhyyA9plhpTEc2gEH6NhBfOvyrzCIPPU1JfyCBiBG7CwRZbEJ9GDYFTQHTH5v
- +2kllh+PT0ACsmNiljtNeqUSH9lwU18u/qxUc0qHIYxmCS49O9EEQr1Iq9AYK/gI/jwj
- 2rA9/UUvJB64Y6Bm1A2hk3LlePbDqzL3138v6yJFDwVJz2psCe1Wn0ojcMgm1Lx+1Th5
- hTgYGZIAiCizdOEclxtbkNm/5oB2F7zTC7pLaPKFVWYSq4E1G2nNww15MhtGtPTnHbZy
- AdTA==
-X-Gm-Message-State: AGi0PuZSG6EYlat1FPqG55DGE2TC+Z6zMBmE9RvjUczro3Stb/qzo/yA
- AL61ikv8/FEC/lgxhA3rmeR6k8h9aF2kKw==
-X-Google-Smtp-Source: APiQypIJCkDM45ZCUnSF/H9zCtMm29HHyMB7AvDfb0C1fW49/0yECqXnGzWceNPFp9x0O3YfizwJVw==
-X-Received: by 2002:adf:e4d0:: with SMTP id v16mr25924554wrm.294.1589301550972; 
- Tue, 12 May 2020 09:39:10 -0700 (PDT)
+ bh=gZbv4QYcMc4ag+mpEYLSIdSn4AsHk1XrMWDwADXwYkg=;
+ b=t3wJ00WwuBKXUQobsySNlDS0ITMojjXTIiE0yMiMGgetX956viApYQbADbqQjrryY1
+ qdw7/lCz8AaiOBUwbF9vZj++2F7rGTVE1JDFuRYjXaSP/zHUncVD2mHUxa7NvmjmKCpp
+ Za5ZdngsUFRplwDIJzimDPW+VgOZmX7cfb5r0DO/38HPcdCqjRzoBqn3GZEiIn1Sfuzr
+ +XZC+BfbPcjxRggkOkJLa0KpozWoFXPCOTLO+H4snpX1LO1DCgpQxoO6P7x7j0CMEhTA
+ NooHKiP2URoDjwYUlwZJ9b6DlE3DfsQ4NizxrG61MRr5PW4cnHG3Oq+VTypLsP3R3+zi
+ Pq1w==
+X-Gm-Message-State: AGi0PuZPoobdPDMPDLK/mi8AXGbxkfo6WwFv8Nxb08Ydjek4spmaBjbs
+ uwkt+U1AlsSuSMGCtwarUyZMYA==
+X-Google-Smtp-Source: APiQypLpTKZ/Px02HZFsIQRf/Yr6ofKjxtIBqNbQXbqr90+nKUFnT/4rJUt7MbApk5cfdyDDGmNHLg==
+X-Received: by 2002:a5d:694d:: with SMTP id r13mr15447595wrw.238.1589301554341; 
+ Tue, 12 May 2020 09:39:14 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id o205sm18525981wmo.32.2020.05.12.09.39.09
+ by smtp.gmail.com with ESMTPSA id o205sm18525981wmo.32.2020.05.12.09.39.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 12 May 2020 09:39:10 -0700 (PDT)
+ Tue, 12 May 2020 09:39:13 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH v2 03/17] target/arm: Convert Neon 64-bit element 3-reg-same
- insns
-Date: Tue, 12 May 2020 17:38:50 +0100
-Message-Id: <20200512163904.10918-4-peter.maydell@linaro.org>
+Subject: [PATCH v2 05/17] target/arm: Convert Neon VABA/VABD 3-reg-same to
+ decodetree
+Date: Tue, 12 May 2020 17:38:52 +0100
+Message-Id: <20200512163904.10918-6-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200512163904.10918-1-peter.maydell@linaro.org>
 References: <20200512163904.10918-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42e.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,130 +106,88 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the 64-bit element insns in the 3-reg-same group
-to decodetree. This covers VQSHL, VRSHL and VQRSHL where
-size==0b11.
+Convert the Neon VABA and VABD insns in the 3-reg-same group to
+decodetree.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/neon-dp.decode       | 21 ++++++++++++++++++
- target/arm/translate-neon.inc.c | 24 +++++++++++++++++++++
- target/arm/translate.c          | 38 ++-------------------------------
- 3 files changed, 47 insertions(+), 36 deletions(-)
+ target/arm/neon-dp.decode       |  6 ++++++
+ target/arm/translate-neon.inc.c |  4 ++++
+ target/arm/translate.c          | 22 ++--------------------
+ 3 files changed, 12 insertions(+), 20 deletions(-)
 
 diff --git a/target/arm/neon-dp.decode b/target/arm/neon-dp.decode
-index 68b0a44793f..fe649038547 100644
+index 3432aacfe90..25c08a4170d 100644
 --- a/target/arm/neon-dp.decode
 +++ b/target/arm/neon-dp.decode
-@@ -73,6 +73,27 @@ VCGE_U_3s        1111 001 1 0 . .. .... .... 0011 . . . 1 .... @3same
- VSHL_S_3s        1111 001 0 0 . .. .... .... 0100 . . . 0 .... @3same_rev
- VSHL_U_3s        1111 001 1 0 . .. .... .... 0100 . . . 0 .... @3same_rev
- 
-+# Insns operating on 64-bit elements (size!=0b11 handled elsewhere)
-+# The _rev suffix indicates that Vn and Vm are reversed. This is
-+# the case for shifts. In the Arm ARM these insns are documented
-+# with the Vm and Vn fields in their usual places, but in the
-+# assembly the operands are listed "backwards", ie in the order
-+# Dd, Dm, Dn where other insns use Dd, Dn, Dm. For QEMU we choose
-+# to consider Vm and Vm as being in different fields in the insn,
-+# which allows us to avoid special-casing shifts in the trans_
-+# function code (where we would otherwise need to manually swap
-+# the operands over to call Neon helper functions that are shared
-+# with AArch64 which does not have this odd reversed-operand situation).
-+@3same_64_rev    .... ... . . . 11 .... .... .... . q:1 . . .... \
-+                 &3same vm=%vn_dp vn=%vm_dp vd=%vd_dp size=3
-+
-+VQSHL_S64_3s     1111 001 0 0 . .. .... .... 0100 . . . 1 .... @3same_64_rev
-+VQSHL_U64_3s     1111 001 1 0 . .. .... .... 0100 . . . 1 .... @3same_64_rev
-+VRSHL_S64_3s     1111 001 0 0 . .. .... .... 0101 . . . 0 .... @3same_64_rev
-+VRSHL_U64_3s     1111 001 1 0 . .. .... .... 0101 . . . 0 .... @3same_64_rev
-+VQRSHL_S64_3s    1111 001 0 0 . .. .... .... 0101 . . . 1 .... @3same_64_rev
-+VQRSHL_U64_3s    1111 001 1 0 . .. .... .... 0101 . . . 1 .... @3same_64_rev
-+
- VMAX_S_3s        1111 001 0 0 . .. .... .... 0110 . . . 0 .... @3same
- VMAX_U_3s        1111 001 1 0 . .. .... .... 0110 . . . 0 .... @3same
+@@ -101,6 +101,12 @@ VMAX_U_3s        1111 001 1 0 . .. .... .... 0110 . . . 0 .... @3same
  VMIN_S_3s        1111 001 0 0 . .. .... .... 0110 . . . 1 .... @3same
+ VMIN_U_3s        1111 001 1 0 . .. .... .... 0110 . . . 1 .... @3same
+ 
++VABD_S_3s        1111 001 0 0 . .. .... .... 0111 . . . 0 .... @3same
++VABD_U_3s        1111 001 1 0 . .. .... .... 0111 . . . 0 .... @3same
++
++VABA_S_3s        1111 001 0 0 . .. .... .... 0111 . . . 1 .... @3same
++VABA_U_3s        1111 001 1 0 . .. .... .... 0111 . . . 1 .... @3same
++
+ VADD_3s          1111 001 0 0 . .. .... .... 1000 . . . 0 .... @3same
+ VSUB_3s          1111 001 1 0 . .. .... .... 1000 . . . 0 .... @3same
+ 
 diff --git a/target/arm/translate-neon.inc.c b/target/arm/translate-neon.inc.c
-index 03b3337e460..05c6dcdc9b9 100644
+index 0418a84a7de..20f0f2c8d83 100644
 --- a/target/arm/translate-neon.inc.c
 +++ b/target/arm/translate-neon.inc.c
-@@ -825,3 +825,27 @@ static bool trans_SHA256SU1_3s(DisasContext *s, arg_SHA256SU1_3s *a)
+@@ -641,6 +641,10 @@ DO_3SAME_NO_SZ_3(VMUL, tcg_gen_gvec_mul)
+ DO_3SAME_NO_SZ_3(VMLA, gen_gvec_mla)
+ DO_3SAME_NO_SZ_3(VMLS, gen_gvec_mls)
+ DO_3SAME_NO_SZ_3(VTST, gen_gvec_cmtst)
++DO_3SAME_NO_SZ_3(VABD_S, gen_gvec_sabd)
++DO_3SAME_NO_SZ_3(VABA_S, gen_gvec_saba)
++DO_3SAME_NO_SZ_3(VABD_U, gen_gvec_uabd)
++DO_3SAME_NO_SZ_3(VABA_U, gen_gvec_uaba)
  
-     return true;
- }
-+
-+#define DO_3SAME_64(INSN, FUNC)                                         \
-+    static void gen_##INSN##_3s(unsigned vece, uint32_t rd_ofs,         \
-+                                uint32_t rn_ofs, uint32_t rm_ofs,       \
-+                                uint32_t oprsz, uint32_t maxsz)         \
-+    {                                                                   \
-+        static const GVecGen3 op = { .fni8 = FUNC };                    \
-+        tcg_gen_gvec_3(rd_ofs, rn_ofs, rm_ofs, oprsz, maxsz, &op);      \
-+    }                                                                   \
-+    DO_3SAME(INSN, gen_##INSN##_3s)
-+
-+#define DO_3SAME_64_ENV(INSN, FUNC)                                     \
-+    static void gen_##INSN##_elt(TCGv_i64 d, TCGv_i64 n, TCGv_i64 m)    \
-+    {                                                                   \
-+        FUNC(d, cpu_env, n, m);                                         \
-+    }                                                                   \
-+    DO_3SAME_64(INSN, gen_##INSN##_elt)
-+
-+DO_3SAME_64(VRSHL_S64, gen_helper_neon_rshl_s64)
-+DO_3SAME_64(VRSHL_U64, gen_helper_neon_rshl_u64)
-+DO_3SAME_64_ENV(VQSHL_S64, gen_helper_neon_qshl_s64)
-+DO_3SAME_64_ENV(VQSHL_U64, gen_helper_neon_qshl_u64)
-+DO_3SAME_64_ENV(VQRSHL_S64, gen_helper_neon_qrshl_s64)
-+DO_3SAME_64_ENV(VQRSHL_U64, gen_helper_neon_qrshl_u64)
+ #define DO_3SAME_CMP(INSN, COND)                                        \
+     static void gen_##INSN##_3s(unsigned vece, uint32_t rd_ofs,         \
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index ee2b8d6f6e3..1ce3e182867 100644
+index 8d856ccfe96..2c842df4451 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -5459,42 +5459,8 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-         }
+@@ -5421,26 +5421,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+             /* VQRDMLSH : handled by decodetree */
+             return 1;
  
-         if (size == 3) {
--            /* 64-bit element instructions. */
--            for (pass = 0; pass < (q ? 2 : 1); pass++) {
--                neon_load_reg64(cpu_V0, rn + pass);
--                neon_load_reg64(cpu_V1, rm + pass);
--                switch (op) {
--                case NEON_3R_VQSHL:
--                    if (u) {
--                        gen_helper_neon_qshl_u64(cpu_V0, cpu_env,
--                                                 cpu_V1, cpu_V0);
--                    } else {
--                        gen_helper_neon_qshl_s64(cpu_V0, cpu_env,
--                                                 cpu_V1, cpu_V0);
--                    }
--                    break;
--                case NEON_3R_VRSHL:
--                    if (u) {
--                        gen_helper_neon_rshl_u64(cpu_V0, cpu_V1, cpu_V0);
--                    } else {
--                        gen_helper_neon_rshl_s64(cpu_V0, cpu_V1, cpu_V0);
--                    }
--                    break;
--                case NEON_3R_VQRSHL:
--                    if (u) {
--                        gen_helper_neon_qrshl_u64(cpu_V0, cpu_env,
--                                                  cpu_V1, cpu_V0);
--                    } else {
--                        gen_helper_neon_qrshl_s64(cpu_V0, cpu_env,
--                                                  cpu_V1, cpu_V0);
--                    }
--                    break;
--                default:
--                    abort();
--                }
--                neon_store_reg64(cpu_V0, rd + pass);
+-        case NEON_3R_VABD:
+-            if (u) {
+-                gen_gvec_uabd(size, rd_ofs, rn_ofs, rm_ofs,
+-                              vec_size, vec_size);
+-            } else {
+-                gen_gvec_sabd(size, rd_ofs, rn_ofs, rm_ofs,
+-                              vec_size, vec_size);
 -            }
 -            return 0;
-+            /* 64-bit element instructions: handled by decodetree */
-+            return 1;
+-
+-        case NEON_3R_VABA:
+-            if (u) {
+-                gen_gvec_uaba(size, rd_ofs, rn_ofs, rm_ofs,
+-                              vec_size, vec_size);
+-            } else {
+-                gen_gvec_saba(size, rd_ofs, rn_ofs, rm_ofs,
+-                              vec_size, vec_size);
+-            }
+-            return 0;
+-
+         case NEON_3R_VADD_VSUB:
+         case NEON_3R_LOGIC:
+         case NEON_3R_VMAX:
+@@ -5455,6 +5435,8 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+         case NEON_3R_VSHL:
+         case NEON_3R_SHA:
+         case NEON_3R_VHADD:
++        case NEON_3R_VABD:
++        case NEON_3R_VABA:
+             /* Already handled by decodetree */
+             return 1;
          }
-         pairwise = 0;
-         switch (op) {
 -- 
 2.20.1
 
