@@ -6,72 +6,72 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3126CC54E4A
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 14:41:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B370C54E4A
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 14:42:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF729206A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 14:41:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30A73206A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 14:42:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yilVsukQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF729206A3
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bRDvQSu2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30A73206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYW62-0008P2-75
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 10:41:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57778)
+	id 1jYW76-0001az-Eq
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 10:42:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57934)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jYW5C-0007bG-Ns
- for qemu-devel@nongnu.org; Tue, 12 May 2020 10:40:35 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:40727)
+ id 1jYW6F-0000XK-Vl
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 10:41:40 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:44328)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jYW5A-0002DY-L7
- for qemu-devel@nongnu.org; Tue, 12 May 2020 10:40:34 -0400
-Received: by mail-oi1-x242.google.com with SMTP id v128so1579082oia.7
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 07:40:32 -0700 (PDT)
+ id 1jYW6E-0002Vd-QM
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 10:41:39 -0400
+Received: by mail-ot1-x344.google.com with SMTP id j4so10650490otr.11
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 07:41:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc; bh=rhkfwuLotT9TAWS/iuSW4hth2gU7uKhrg+fKgp2fjK0=;
- b=yilVsukQEAjFq+O6sxvc0oIi8Z8PjG6YtKxOWGDFhSBF4tUfqY71luW9VfP0DWrTFg
- ecXknD2ahgxevAWIvu56k3F+cuWlK+Py/uP3C3Mgf5xNs70K30c0yxBRFjG5aTvnOH0E
- MPXhFQumvSh3PvKFOX9k9fVSiKHE14zXSs7oT7e1NP1SuDHFxt++g42W0+PpZKHpqDqg
- EwIx0o27KjiMTdQ6J0WlvJu5HVYFQkjeA+xOKrsTKOS9hK0xlOXrOy7cn+TCBsAmCqJW
- 8PLjVCLBR0r5zRbKpxtMusjF2IZTmOQjQ7tIMiAM9a1r8/U1Q9FUrMI/kR4/vrqz6FE3
- C/iQ==
+ b=bRDvQSu2VWG00KvQwY2VA3FqngCQ8Ie/yl/X3yKRlmzh6WGkh1uPLrWOdDxnVnQfrp
+ OHbL8bt9TBBuTmOI1Je/Ou7SCrISKsoh1vG4vFhE1K7ZWrGaQbzo/TntFE7wq4BIOgQc
+ Sl1honl60m4uUXdKCUE1VMr9VrnqFf/k78D3jcq3P5N+HtNA6t3pg3v/8RF+HD3xNnYL
+ Db8W8sEp1sTT/ow+mJq5+1qEOYoAsoIa1wh/5w7deju3kJBpOwQTHMI77heULg4Ir94I
+ HEpdscYRvTity+bKBhXinqOtmVtLt95T6CXZrHKilrpZ9K6twgMMzJHnVC59hnjHeU7w
+ pSow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
  bh=rhkfwuLotT9TAWS/iuSW4hth2gU7uKhrg+fKgp2fjK0=;
- b=GBBLbh3uSLz7eq2uGARN6dun7Z7xWUAsDaoCVCgOsv+cFa4+NPGtlB/IWbPbboI1ki
- lw8lR20BV2ujuCeIDzPkCEBJ2+uwkliVcpIkdjHv+7HQeewGHdv4g6iHeVevm3BInETx
- OKI/HUFzdrihny4ZaFSti3StJUpw9PoCY425YpK+OjPe+3MH5OCcw0O59YNhuCFqpmgp
- l3WFE5ITm1Rr1LzB4GkWXZO7ku4YAYcNOMml7EATRhS0mFsNZy857DZx8hT4m0qmHG5G
- MZppCyH9Ldg3KYr3wuPIO8jS0d0eSluLP7+r+V5T1AIVbX/q0VLCxWgcVk9sbsVvnHcj
- EWXA==
-X-Gm-Message-State: AGi0PuZVqmTqZXWhRMtjn+8ef6FXmcOhp7KjTLxnd4UeEQzJ/h/r+tST
- yadocuUUjvHhfR5OhiD+Se2BJfbkw+e39tOxYfYx+w==
-X-Google-Smtp-Source: APiQypJ2ki7UmKYvNv0SgB8+Tlq/79yN73aaw4JfxnNND8ZlM9AhGifaYfBOgpS427o5/4kAJqpjcEWq2Z/NTbhkJ1M=
-X-Received: by 2002:a54:400c:: with SMTP id x12mr22754913oie.146.1589294430987; 
- Tue, 12 May 2020 07:40:30 -0700 (PDT)
+ b=NE3DAR8vLx+4lWMu/7EMfHlPeArJS6zwxk+ofnucduG906IdxtlZg9z3DdxxwaG0BH
+ nh/aT8+wOcKYjtJRTs+jSzl+AB2sotFKw2OnwbJdw8JPW7LnIctJoHFnrphQDtQvYNok
+ 3uyoxTBW7Q6J471P7i9Vmz2wt8gr8FleL92evv6DWsH0RVuQs0To7hT9LXWIfHyvK6RH
+ nUFDboRV40JhHe2dfH9Kkr0oP02+2PsMomW+eCFZYgufrnp4/rD7Ne8hcq+DC/LBjxNo
+ KdfFx39LmeSyvRP7jVaE2H9OWfPSlDP063gIXpi4TqLDBc7x+0e6uFEAGBo0Rl9EwZ/7
+ g9Og==
+X-Gm-Message-State: AGi0PuZ6YPpOWVepaK+TxknkqPlRDjGInQBC3099o1HIaxnRXSiB0DKo
+ 3SgBQIBjkkDoivzjvjesMMqWOyQVwFAEavcMTqAoqQ==
+X-Google-Smtp-Source: APiQypKBuAwuwwNVQPR8hZ2HU4Uw+pGiY5rbdPzVtErBuRgRA9IbDdRLWzEZPv+yuzQxgrLN8nSAZ7jgxL8yDPF467c=
+X-Received: by 2002:a9d:398b:: with SMTP id y11mr4935990otb.135.1589294497369; 
+ Tue, 12 May 2020 07:41:37 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200508152200.6547-1-richard.henderson@linaro.org>
- <20200508152200.6547-16-richard.henderson@linaro.org>
-In-Reply-To: <20200508152200.6547-16-richard.henderson@linaro.org>
+ <20200508152200.6547-17-richard.henderson@linaro.org>
+In-Reply-To: <20200508152200.6547-17-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 May 2020 15:40:19 +0100
-Message-ID: <CAFEAcA_TvC3jxAq8yYKOT43i_+dB0XFyLcqQnAc7N0eXDuZuyA@mail.gmail.com>
-Subject: Re: [PATCH v3 15/16] target/arm: Vectorize SABD/UABD
+Date: Tue, 12 May 2020 15:41:26 +0100
+Message-ID: <CAFEAcA_KpuT18fhaV3B3o+wcNeFu4MHdi=7Y1Au46BqYq2aTTQ@mail.gmail.com>
+Subject: Re: [PATCH v3 16/16] target/arm: Vectorize SABA/UABA
 To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x242.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
