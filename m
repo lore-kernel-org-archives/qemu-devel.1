@@ -2,140 +2,101 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AD73C54E8E
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 15:16:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A3B1C54E4A
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 15:17:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05A042054F
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 15:16:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F14742054F
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 15:17:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="AgxzgGS/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05A042054F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j9Qk8ECu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F14742054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYWdi-0002ho-3L
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 11:16:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35310)
+	id 1jYWfN-0004Ri-3C
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 11:17:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35378)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1jYWSa-0001bW-Rn; Tue, 12 May 2020 11:04:44 -0400
-Received: from mail-dm6nam11on2050.outbound.protection.outlook.com
- ([40.107.223.50]:24321 helo=NAM11-DM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1jYWSZ-0002jd-Qf; Tue, 12 May 2020 11:04:44 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LWWklXRyKgVqgySraCY6t70adMvTVGRGTacvnjWX2wA0eKJrBPMgDrgQw4CpIHUbzzv4pCUeN+jKWbgRM4dX9qYGsYCXQjmXsZCtzKw7E6+DoUMHFmIpfXGaUwwbKQu9RsV5vCQ1JWt37Zsl/sXoGIMcxJZEwnwoYwPxWCbtOIaCxio5go7ECpUVTkOzP8JyFjthvZUC/tsbhCqnilTGUBdiYPJiyidK8Q0WfkagntQKCKTGgqCtxpaHMA4VCUQT9oZCekCqOjWva5UOxbQN8k6ywjQahU7XJ2ZbI/3d5VhGrNbA/ip8dh/lEhkNp5oUmFnZZpyN0hNN1XihyIrjfA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RFVdyN2RnF2TKeIRiIzAdU14DDjKqB5V1aTWg1nGN6k=;
- b=GzxI3eLQ7n0NSizmiD1Ub1JBjT8KJIOLnRu9Ze/MK20Xn/Vi6BMKdlettfL8XLgjR2LiGl5hdtxrfsRGQq+P1Il7sUWgOsluhKpl7geh7jOeljUodwoB/wgarMIQcu9XemyGdNfp+CRFgzIJQlqF21V80l7BMJaSs+QoBjzdF7zeSAW0GhSGMaqh2HRxMr0DsqTXrAZYBxV2M5zCVfXzn9LmAVBYLHYYaZW+RMo/joP+NGBi0VD4A19CwsCXFQ3FhA4bEgdAfohRij3skztsuBPnfJsCXpdQ7P+IuEBdcN9kOqcNjLMaTyCqzufMMCxAc4fLJkAbRqDewXT2LUwztA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.60.83) smtp.rcpttodomain=gmail.com smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RFVdyN2RnF2TKeIRiIzAdU14DDjKqB5V1aTWg1nGN6k=;
- b=AgxzgGS/TZ0hvFHiJzqgsfyu29QKBUsxAB+/TpcwW4Tvh8ibu2LrNWOL5LrStlXR+5i0C5kChfubUs8J1vs63oyiqqvpQrnpmK1gkWOzIYGG+8BVcvGhmaLrv716e9DpY/jEH1iSoCsw+tERA/q4/FUkGBHt9uXbaklwiN2cA8w=
-Received: from BL0PR01CA0026.prod.exchangelabs.com (2603:10b6:208:71::39) by
- MWHPR0201MB3626.namprd02.prod.outlook.com (2603:10b6:301:77::39) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.26; Tue, 12 May
- 2020 15:04:35 +0000
-Received: from BL2NAM02FT011.eop-nam02.prod.protection.outlook.com
- (2603:10b6:208:71:cafe::eb) by BL0PR01CA0026.outlook.office365.com
- (2603:10b6:208:71::39) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.27 via Frontend
- Transport; Tue, 12 May 2020 15:04:35 +0000
-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
- smtp.mailfrom=xilinx.com; gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
-Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- BL2NAM02FT011.mail.protection.outlook.com (10.152.77.5) with Microsoft SMTP
- Server id 15.20.2979.29 via Frontend Transport; Tue, 12 May 2020 15:04:34
- +0000
-Received: from [149.199.38.66] (port=48850 helo=xsj-pvapsmtp01)
- by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
- (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1jYWSA-00045i-4S; Tue, 12 May 2020 08:04:18 -0700
-Received: from localhost ([127.0.0.1] helo=xsj-pvapsmtp01)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1jYWSQ-0003oj-Ez; Tue, 12 May 2020 08:04:34 -0700
-Received: from [10.140.6.35] (helo=xhdsaipava40.xilinx.com)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <saipava@xhdsaipava40.xilinx.com>)
- id 1jYWSP-0003oH-Qa; Tue, 12 May 2020 08:04:34 -0700
-Received: by xhdsaipava40.xilinx.com (Postfix, from userid 14131)
- id 7046113C019C; Tue, 12 May 2020 20:26:29 +0530 (IST)
-From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Tong Ho <tong.ho@xilinx.com>, Ramon Fried <rfried.dev@gmail.com>
-Subject: [PATCH v5 11/12] net: cadence_gem: TX_LAST bit should be set by guest
-Date: Tue, 12 May 2020 20:24:53 +0530
-Message-Id: <1589295294-26466-12-git-send-email-sai.pavan.boddu@xilinx.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1589295294-26466-1-git-send-email-sai.pavan.boddu@xilinx.com>
-References: <1589295294-26466-1-git-send-email-sai.pavan.boddu@xilinx.com>
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
- SFTY:;
- SFS:(39860400002)(396003)(136003)(376002)(346002)(46966005)(33430700001)(6266002)(47076004)(8676002)(82740400003)(33440700001)(8936002)(6666004)(5660300002)(26005)(70206006)(4326008)(478600001)(70586007)(186003)(36756003)(426003)(2616005)(82310400002)(316002)(110136005)(81166007)(42186006)(336012)(356005)(2906002);
- DIR:OUT; SFP:1101; 
+ (Exim 4.90_1) (envelope-from <arilou@gmail.com>) id 1jYWT6-0002UU-0t
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 11:05:16 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51743)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <arilou@gmail.com>) id 1jYWT4-0002xV-Sx
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 11:05:15 -0400
+Received: by mail-wm1-x344.google.com with SMTP id f134so9975837wmf.1
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 08:05:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=JiKMCkAz1U/iycP9Kf5GYdxP8RqoYzzFqEWx1kd6UNk=;
+ b=j9Qk8ECuQOw6qTJl3BYgAle2MuPQWsOy2eTp449ybGNjgiTk+lg5I11KRud+wfIkGG
+ sahoCEYNDGtNVNyJE/8kcy8qzmcPxYFo53+llUkPBhNDkdP/m3M1QD8B9ILt6Hm8eU7N
+ KWIMY+JxvkY8Myhj0IUoWOkJ7fHenkHyS77SDwvQ2OkC+inkizJUGDfGgo3tdkmpRi5w
+ 5eZiF3wGYYv1lVebFWXTjLvomfFmSdDxOh8pzk5JQYJQrKLC2lPpl00pXA0FezmJVE63
+ 1YKgRtPUB5MtrCIKFmLSuoRFtcD881jleJ2ZTDpdSCNdkY1Kje3hs/DQT0B1wlQsgYkK
+ vTZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=JiKMCkAz1U/iycP9Kf5GYdxP8RqoYzzFqEWx1kd6UNk=;
+ b=Fz4JnXAIe+gKpq5wvzN41T6iYLKpRVw2aFBlTD85ZihQYuBsCZcUHuqyDsMHCPv4zY
+ nNGpgkL+Yn03iV17XUcP+z14HaIK2UV+JAbCc+n08oRoYkNNa1nAmM2MfkKylPpYjx72
+ 124iby4AmoM1ceq9aYWE5tIRLQddgqn4ItDDo7kj7Ooxok5dRbC2b5jF6euWaTTl/ETP
+ L5vCUHQNPKXEy5SXjLuDBUI3DPvb3MIk6IByr8VPwZBdC7Dg6fATTcs3rlMXZ2VbITCV
+ hn95482K9RfNSeyqrAEXMEJPyXYDWXKPoaOnHX+XpwlPoWdzeJPs4Ny8y4glePt+uxZu
+ msaw==
+X-Gm-Message-State: AGi0PuaYs80TA/GBBPfZD++hvrJ/dB/ZedMDRuTj7wBM11NKm0kdi40w
+ oFMOhs+JPzxl1ooSe+J2EHk=
+X-Google-Smtp-Source: APiQypKgHC7AQBiYer4fEuDhbZKAkUMFal1g20qUXF8kLYdJjKZwDWAw2Fpgs9uRvRGa78us5gizoQ==
+X-Received: by 2002:a1c:98c9:: with SMTP id a192mr15811488wme.48.1589295913142; 
+ Tue, 12 May 2020 08:05:13 -0700 (PDT)
+Received: from jondnuc (IGLD-84-229-154-20.inter.net.il. [84.229.154.20])
+ by smtp.gmail.com with ESMTPSA id g15sm14783197wro.71.2020.05.12.08.05.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 12 May 2020 08:05:12 -0700 (PDT)
+Date: Tue, 12 May 2020 18:05:11 +0300
+From: Jon Doron <arilou@gmail.com>
+To: Roman Kagan <rvkagan@yandex-team.ru>,
+ "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
+ QEMU <qemu-devel@nongnu.org>,
+ Evgeny Yakovlev <eyakovlev@virtuozzo.com>, ehabkost@redhat.com,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, Liran Alon <liran.alon@oracle.com>
+Subject: Re: [PATCH v1 5/5] i386: Hyper-V VMBus ACPI DSDT entry
+Message-ID: <20200512150511.GJ2862@jondnuc>
+References: <472544e7-498a-4e28-06e9-83c102d6436b@maciej.szmigiero.name>
+ <20200406073246.GA7707@rvkaganb>
+ <CAP7QCojPsOYjw94k3rkH0A3rLFADLeVhgy502N=8X5wrUnoC6Q@mail.gmail.com>
+ <20200407185608.GA178651@rvkaganb>
+ <8c278ea8-81c5-7458-8979-c319470440d7@maciej.szmigiero.name>
+ <20200408041639.GA7606@jondnuc> <20200408204742.GA709224@rvkaganb>
+ <20200409033518.GC7606@jondnuc>
+ <20200512140542.GA9944@rvkaganb.lan>
+ <20200512150123.GI2862@jondnuc>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 13aa770b-539e-4ef5-7b36-08d7f685c866
-X-MS-TrafficTypeDiagnostic: MWHPR0201MB3626:
-X-Microsoft-Antispam-PRVS: <MWHPR0201MB3626B65D97361A63F7543213CABE0@MWHPR0201MB3626.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:255;
-X-Forefront-PRVS: 0401647B7F
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: SSmEx3pF+vFpox6pJrprlpmxvbVyfsGAKQfSfduUWihudmYtcYy70j3/OB0iew1ijiHw4XJ6MPGjip0MzYfzq8pC8q0KiYjBO5tJCg+tX8P02Jx8SJFWXQCtIOv4iLEwNit8MUeZqgmhpz+y6T6yIwTKWRtI56a08zZEBWEWQyMF6SMlicH7A2ikIHWDCdjKFwyMfI0FxG14FDj0C+i8LpFFlPNfe0nGdkIC343nsK4Ec5mOGjjZm0qqJXa3REsuMOZI6nXLKfQP5L1ffs6KNCVEDlS2EmykgGbQOAxOPAbQZuPc7/ZZ6wSyucLv/FZFztfiZxJAH6D4o1EOm8MdbVVaXermfuRb63wMvrc0rNkRsf13/BJCJI/rGNVFTmmMsZ+qTeAvuAyhqdyI1Pru79nKWPv7nJlMcY3invTJcrJHV+r8/9Cxo0udUvLBZ35wsg9NPcWen5vqF7pck02/H8u/44VdQFqWT/uYCZvEu8T6u/8fhSZGpL08ugYUHdzr1AUOgI5mXY8FI+flk3BdGk8bQt43Cp+CLBBIM+dKr/OrblI/d3HLYv56judaXDm8C2V9Uan8m4E3w9AHjQ5+Yw==
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2020 15:04:34.9307 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 13aa770b-539e-4ef5-7b36-08d7f685c866
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
- Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR0201MB3626
-Received-SPF: pass client-ip=40.107.223.50; envelope-from=saipava@xilinx.com;
- helo=NAM11-DM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 11:04:42
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20200512150123.GI2862@jondnuc>
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=arilou@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -149,46 +110,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-TX_LAST bit should not be set by hardware, its set by guest to inform
-the last bd of the frame.
+On 12/05/2020, Jon Doron wrote:
+>On 12/05/2020, Roman Kagan wrote:
+>>On Thu, Apr 09, 2020 at 06:35:18AM +0300, Jon Doron wrote:
+>>>On 08/04/2020, Roman Kagan wrote:
+>>>> On Wed, Apr 08, 2020 at 07:16:39AM +0300, Jon Doron wrote:
+>>>> > Well I have implemented the hyperv synthetic kernel debugger interface, but
+>>>> > on Windows 10 it requires to have a working VMBus (it's not really using it,
+>>>> > but without a function vmbus that will answer to the initiate contact then
+>>>> > the kdnet will simply be stuck in a loop.
+>>
+>>I tried to google for this interface but the only thing I managed to
+>>find was this
+>>
+>>https://withinrafael.com/2015/02/01/how-to-set-up-synthetic-kernel-debugging-for-hyper-v-virtual-machines/
+>>
+>>Is this what you're trying to implement?  Are there any more
+>>authoritative descriptions of the feature?
+>>
+>>The document doesn't quite explain the inner workings of the feature,
+>>but it looks like the regular network debugging interface, except that
+>>IP is forwarded by the hypervisor app, so that the debugger has to
+>>connect to the host and avoid setting up full-fledged network
+>>connectivity to the guest.  That would be essentially hv-net + slirp.
+>>OTOH you say it doesn't use VMBus so I'm confused...
+>>
+>>Thanks,
+>>Roman.
+>>
+>>>> > In addition to that Michael Kelley from Microsoft has informed us that
+>>>> > Microsoft might be dropped the synthetic kernel debugger interface sometime
+>>>> > in the future, and it seems like the new mode is simply to use hvnet device
+>>>> > for the communication (which is again much faster).
+>
+>Yes that's indeed the interface I have implemented this part of the 
+>patch it not full ready for commit, but I think we can keep going with 
+>the VMBUS.
+>
+>Based on your previous reply it sounds like there is not a real issue 
+>with the current patch of ACPI DSDT entry, right?
+>
+>Thanks,
+>-- Jon.
 
-Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
----
- hw/net/cadence_gem.c | 6 ------
- 1 file changed, 6 deletions(-)
-
-diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-index ddb8938..57d94a5 100644
---- a/hw/net/cadence_gem.c
-+++ b/hw/net/cadence_gem.c
-@@ -350,11 +350,6 @@ static inline unsigned tx_desc_get_last(uint32_t *desc)
-     return (desc[1] & DESC_1_TX_LAST) ? 1 : 0;
- }
- 
--static inline void tx_desc_set_last(uint32_t *desc)
--{
--    desc[1] |= DESC_1_TX_LAST;
--}
--
- static inline unsigned tx_desc_get_length(uint32_t *desc)
- {
-     return desc[1] & DESC_1_LENGTH;
-@@ -1298,7 +1293,6 @@ static void gem_transmit(CadenceGEMState *s)
- 
-             /* read next descriptor */
-             if (tx_desc_get_wrap(desc)) {
--                tx_desc_set_last(desc);
- 
-                 if (s->regs[GEM_DMACFG] & GEM_DMACFG_ADDR_64B) {
-                     packet_desc_addr = s->regs[GEM_TBQPH];
--- 
-2.7.4
-
+I suggest referring to the KVM patches I have already submitted that 
+Paolo said will probably get in soon.
+https://patchwork.kernel.org/patch/11507663/
 
