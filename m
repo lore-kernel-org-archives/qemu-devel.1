@@ -2,66 +2,93 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59F1EC54E4A
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 09:43:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E62C54E4A
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 09:44:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30BF020673
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 09:43:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30BF020673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D873020661
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 09:44:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OzYbU6t9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D873020661
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYRRx-0003HB-Ek
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 05:43:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43288)
+	id 1jYRT1-0005DE-V4
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 05:44:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43482)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <teawaterz@linux.alibaba.com>)
- id 1jYRQZ-0001gC-G9
- for qemu-devel@nongnu.org; Tue, 12 May 2020 05:42:19 -0400
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:17068)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <teawaterz@linux.alibaba.com>)
- id 1jYRQU-0008VT-J4
- for qemu-devel@nongnu.org; Tue, 12 May 2020 05:42:16 -0400
-X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R601e4; CH=green; DM=||false|;
- DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e04426; MF=teawaterz@linux.alibaba.com;
- NM=1; PH=DS; RN=16; SR=0; TI=SMTPD_---0TyKuOL0_1589276512; 
-Received: from localhost(mailfrom:teawaterz@linux.alibaba.com
- fp:SMTPD_---0TyKuOL0_1589276512) by smtp.aliyun-inc.com(127.0.0.1);
- Tue, 12 May 2020 17:41:58 +0800
-From: Hui Zhu <teawater@gmail.com>
-To: mst@redhat.com, jasowang@redhat.com, akpm@linux-foundation.org,
- xdeguillard@vmware.com, namit@vmware.com, gregkh@linuxfoundation.org,
- david@redhat.com, virtualization@lists.linux-foundation.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org, qemu-devel@nongnu.org,
- virtio-dev@lists.oasis-open.org
-Subject: [RFC v3 for QEMU] virtio-balloon: Add option cont-pages to set
- VIRTIO_BALLOON_VQ_INFLATE_CONT
-Date: Tue, 12 May 2020 17:41:40 +0800
-Message-Id: <1589276501-16026-1-git-send-email-teawater@gmail.com>
-X-Mailer: git-send-email 2.7.4
-Received-SPF: pass client-ip=47.88.44.36;
- envelope-from=teawaterz@linux.alibaba.com; helo=out4436.biz.mail.alibaba.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 05:42:07
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
-X-Spam_score_int: -78
-X-Spam_score: -7.9
-X-Spam_bar: -------
-X-Spam_report: (-7.9 / 5.0 requ) BAYES_00=-1.9, DKIM_ADSP_CUSTOM_MED=0.001,
- FORGED_GMAIL_RCVD=1, FREEMAIL_FORGED_FROMDOMAIN=0.001, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, NML_ADSP_CUSTOM_MED=0.9,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001,
- URIBL_BLOCKED=0.001, USER_IN_DEF_SPF_WL=-7.5 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jYRS7-0003s2-2v
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 05:43:55 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21975
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jYRS5-0000dO-95
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 05:43:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589276631;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cHonFnekkvmUcsU+mGPVBjYKsDNqrXQjZxn1di+Dyp0=;
+ b=OzYbU6t9M4mRng7iEQzl9Hen9GmP/Ul66Nz88RNpfw1Ywjb7PwC66M67gDqTsypeEA1clw
+ p1zOrY2nU9eoHq60EO32y8+Vu8UjGj29VcEQ3pElMCnFbUR7DEnIq59bLSvWH5rBQxfGrj
+ 2CHBXjopx0pso3xi5d9OaO9v+SIfCcU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-250-27zHcv4ZN82ZF766HT-Liw-1; Tue, 12 May 2020 05:43:47 -0400
+X-MC-Unique: 27zHcv4ZN82ZF766HT-Liw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B9BE918FE866;
+ Tue, 12 May 2020 09:43:46 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.71])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 250501001DC2;
+ Tue, 12 May 2020 09:43:40 +0000 (UTC)
+Date: Tue, 12 May 2020 10:43:37 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Lukas Straub <lukasstraub2@web.de>
+Subject: Re: [PATCH 0/5] Introduce 'yank' oob qmp command to recover from
+ hanging qemu
+Message-ID: <20200512094337.GK1191162@redhat.com>
+References: <cover.1589193717.git.lukasstraub2@web.de>
+ <20200511114947.GJ1135885@redhat.com>
+ <20200511120718.GD2811@work-vm>
+ <20200511121714.GL1135885@redhat.com>
+ <20200511154645.GI2811@work-vm> <20200512113206.62836e44@luklap>
+MIME-Version: 1.0
+In-Reply-To: <20200512113206.62836e44@luklap>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 02:02:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -10
+X-Spam_score: -1.1
+X-Spam_bar: -
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FROM_EXCESS_BASE64=0.979, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -74,223 +101,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wei.guo.simon@linux.alibaba.com, qixuan.wu@linux.alibaba.com,
- Hui Zhu <teawater@gmail.com>, Hui Zhu <teawaterz@linux.alibaba.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If the guest kernel has many fragmentation pages, use virtio_balloon
-will split THP of QEMU when it calls MADV_DONTNEED madvise to release
-the balloon pages.
-Set option cont-pages to on will open flags VIRTIO_BALLOON_VQ_INFLATE_CONT
-and set default continuous pages order to THP order.
-Then It will get continuous pages PFN that its order is current_pages_order
-from VQ ivq use use madvise MADV_DONTNEED release the page.
-This will handle the THP split issue.
+On Tue, May 12, 2020 at 11:32:06AM +0200, Lukas Straub wrote:
+> On Mon, 11 May 2020 16:46:45 +0100
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> 
+> > * Daniel P. BerrangÃ© (berrange@redhat.com) wrote: 
+> > > ...
+> > > That way if QEMU does get stuck, you can start by tearing down the
+> > > least distruptive channel. eg try tearing down the migration connection
+> > > first (which shouldn't negatively impact the guest), and only if that
+> > > doesn't work then, move on to tear down the NBD connection (which risks
+> > > data loss)  
+> > 
+> > I wonder if a different way would be to make all network connections
+> > register with yank, but then make yank take a list of connections to
+> > shutdown(2).
+> 
+> Good Idea. We could name the connections (/yank callbacks) in the
+> form "nbd:<node-name>", "chardev:<chardev-name>" and "migration"
+> (and add "netdev:...", etc. in the future). Then make yank take a
+> list of connection names as you suggest and silently ignore connections
+> that don't exist. And maybe even add a 'query-yank' oob command returning
+> a list of registered connections so the management application can do
+> pattern matching if it wants.
 
-Signed-off-by: Hui Zhu <teawaterz@linux.alibaba.com>
----
- hw/virtio/virtio-balloon.c                      | 77 +++++++++++++++++--------
- include/hw/virtio/virtio-balloon.h              |  2 +
- include/standard-headers/linux/virtio_balloon.h |  5 ++
- 3 files changed, 60 insertions(+), 24 deletions(-)
+Yes, that would make the yank command much more flexible in how it can
+be used.
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index a4729f7..84d47d3 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -34,6 +34,7 @@
- #include "hw/virtio/virtio-access.h"
- 
- #define BALLOON_PAGE_SIZE  (1 << VIRTIO_BALLOON_PFN_SHIFT)
-+#define CONT_PAGES_ORDER   9
- 
- typedef struct PartiallyBalloonedPage {
-     ram_addr_t base_gpa;
-@@ -72,6 +73,8 @@ static void balloon_inflate_page(VirtIOBalloon *balloon,
-     RAMBlock *rb;
-     size_t rb_page_size;
-     int subpages;
-+    size_t inflate_size = BALLOON_PAGE_SIZE << balloon->current_pages_order;
-+    int pages_num;
- 
-     /* XXX is there a better way to get to the RAMBlock than via a
-      * host address? */
-@@ -81,7 +84,7 @@ static void balloon_inflate_page(VirtIOBalloon *balloon,
-     if (rb_page_size == BALLOON_PAGE_SIZE) {
-         /* Easy case */
- 
--        ram_block_discard_range(rb, rb_offset, rb_page_size);
-+        ram_block_discard_range(rb, rb_offset, inflate_size);
-         /* We ignore errors from ram_block_discard_range(), because it
-          * has already reported them, and failing to discard a balloon
-          * page is not fatal */
-@@ -99,32 +102,38 @@ static void balloon_inflate_page(VirtIOBalloon *balloon,
- 
-     rb_aligned_offset = QEMU_ALIGN_DOWN(rb_offset, rb_page_size);
-     subpages = rb_page_size / BALLOON_PAGE_SIZE;
--    base_gpa = memory_region_get_ram_addr(mr) + mr_offset -
--               (rb_offset - rb_aligned_offset);
- 
--    if (pbp->bitmap && !virtio_balloon_pbp_matches(pbp, base_gpa)) {
--        /* We've partially ballooned part of a host page, but now
--         * we're trying to balloon part of a different one.  Too hard,
--         * give up on the old partial page */
--        virtio_balloon_pbp_free(pbp);
--    }
-+    for (pages_num = inflate_size / BALLOON_PAGE_SIZE;
-+         pages_num > 0; pages_num--) {
-+        base_gpa = memory_region_get_ram_addr(mr) + mr_offset -
-+                   (rb_offset - rb_aligned_offset);
- 
--    if (!pbp->bitmap) {
--        virtio_balloon_pbp_alloc(pbp, base_gpa, subpages);
--    }
-+        if (pbp->bitmap && !virtio_balloon_pbp_matches(pbp, base_gpa)) {
-+            /* We've partially ballooned part of a host page, but now
-+            * we're trying to balloon part of a different one.  Too hard,
-+            * give up on the old partial page */
-+            virtio_balloon_pbp_free(pbp);
-+        }
- 
--    set_bit((rb_offset - rb_aligned_offset) / BALLOON_PAGE_SIZE,
--            pbp->bitmap);
-+        if (!pbp->bitmap) {
-+            virtio_balloon_pbp_alloc(pbp, base_gpa, subpages);
-+        }
- 
--    if (bitmap_full(pbp->bitmap, subpages)) {
--        /* We've accumulated a full host page, we can actually discard
--         * it now */
-+        set_bit((rb_offset - rb_aligned_offset) / BALLOON_PAGE_SIZE,
-+                pbp->bitmap);
- 
--        ram_block_discard_range(rb, rb_aligned_offset, rb_page_size);
--        /* We ignore errors from ram_block_discard_range(), because it
--         * has already reported them, and failing to discard a balloon
--         * page is not fatal */
--        virtio_balloon_pbp_free(pbp);
-+        if (bitmap_full(pbp->bitmap, subpages)) {
-+            /* We've accumulated a full host page, we can actually discard
-+            * it now */
-+
-+            ram_block_discard_range(rb, rb_aligned_offset, rb_page_size);
-+            /* We ignore errors from ram_block_discard_range(), because it
-+            * has already reported them, and failing to discard a balloon
-+            * page is not fatal */
-+            virtio_balloon_pbp_free(pbp);
-+        }
-+
-+        mr_offset += BALLOON_PAGE_SIZE;
-     }
- }
- 
-@@ -345,7 +354,7 @@ static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-             offset += 4;
- 
-             section = memory_region_find(get_system_memory(), pa,
--                                         BALLOON_PAGE_SIZE);
-+                                BALLOON_PAGE_SIZE << s->current_pages_order);
-             if (!section.mr) {
-                 trace_virtio_balloon_bad_addr(pa);
-                 continue;
-@@ -618,9 +627,12 @@ static size_t virtio_balloon_config_size(VirtIOBalloon *s)
-     if (s->qemu_4_0_config_size) {
-         return sizeof(struct virtio_balloon_config);
-     }
--    if (virtio_has_feature(features, VIRTIO_BALLOON_F_PAGE_POISON)) {
-+    if (virtio_has_feature(s->host_features, VIRTIO_BALLOON_F_CONT_PAGES)) {
-         return sizeof(struct virtio_balloon_config);
-     }
-+    if (virtio_has_feature(features, VIRTIO_BALLOON_F_PAGE_POISON)) {
-+        return offsetof(struct virtio_balloon_config, current_pages_order);
-+    }
-     if (virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-         return offsetof(struct virtio_balloon_config, poison_val);
-     }
-@@ -646,6 +658,11 @@ static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
-                        cpu_to_le32(VIRTIO_BALLOON_CMD_ID_DONE);
-     }
- 
-+    if (virtio_has_feature(dev->host_features, VIRTIO_BALLOON_F_CONT_PAGES)) {
-+        config.max_pages_order = cpu_to_le32(CONT_PAGES_ORDER);
-+        config.current_pages_order = cpu_to_le32(dev->current_pages_order);
-+    }
-+
-     trace_virtio_balloon_get_config(config.num_pages, config.actual);
-     memcpy(config_data, &config, virtio_balloon_config_size(dev));
- }
-@@ -693,6 +710,9 @@ static void virtio_balloon_set_config(VirtIODevice *vdev,
- 
-     memcpy(&config, config_data, virtio_balloon_config_size(dev));
-     dev->actual = le32_to_cpu(config.actual);
-+    if (virtio_has_feature(dev->host_features, VIRTIO_BALLOON_F_CONT_PAGES)) {
-+        dev->current_pages_order = le32_to_cpu(config.current_pages_order);
-+    }
-     if (dev->actual != oldactual) {
-         qapi_event_send_balloon_change(vm_ram_size -
-                         ((ram_addr_t) dev->actual << VIRTIO_BALLOON_PFN_SHIFT));
-@@ -816,6 +836,13 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
-             virtio_error(vdev, "iothread is missing");
-         }
-     }
-+
-+    if (virtio_has_feature(s->host_features, VIRTIO_BALLOON_F_CONT_PAGES)) {
-+        s->current_pages_order = CONT_PAGES_ORDER;
-+    } else {
-+        s->current_pages_order = 0;
-+    }
-+
-     reset_stats(s);
- }
- 
-@@ -916,6 +943,8 @@ static Property virtio_balloon_properties[] = {
-                     VIRTIO_BALLOON_F_DEFLATE_ON_OOM, false),
-     DEFINE_PROP_BIT("free-page-hint", VirtIOBalloon, host_features,
-                     VIRTIO_BALLOON_F_FREE_PAGE_HINT, false),
-+    DEFINE_PROP_BIT("cont-pages", VirtIOBalloon, host_features,
-+                    VIRTIO_BALLOON_F_CONT_PAGES, false),
-     /* QEMU 4.0 accidentally changed the config size even when free-page-hint
-      * is disabled, resulting in QEMU 3.1 migration incompatibility.  This
-      * property retains this quirk for QEMU 4.1 machine types.
-diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
-index d1c968d..e0dce0d 100644
---- a/include/hw/virtio/virtio-balloon.h
-+++ b/include/hw/virtio/virtio-balloon.h
-@@ -70,6 +70,8 @@ typedef struct VirtIOBalloon {
-     uint32_t host_features;
- 
-     bool qemu_4_0_config_size;
-+
-+    uint32_t current_pages_order;
- } VirtIOBalloon;
- 
- #endif
-diff --git a/include/standard-headers/linux/virtio_balloon.h b/include/standard-headers/linux/virtio_balloon.h
-index 9375ca2..b5386ce 100644
---- a/include/standard-headers/linux/virtio_balloon.h
-+++ b/include/standard-headers/linux/virtio_balloon.h
-@@ -36,6 +36,7 @@
- #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
- #define VIRTIO_BALLOON_F_FREE_PAGE_HINT	3 /* VQ to report free pages */
- #define VIRTIO_BALLOON_F_PAGE_POISON	4 /* Guest is using page poisoning */
-+#define VIRTIO_BALLOON_F_CONT_PAGES	6 /* VQ to report continuous pages */
- 
- /* Size of a PFN in the balloon interface. */
- #define VIRTIO_BALLOON_PFN_SHIFT 12
-@@ -51,6 +52,10 @@ struct virtio_balloon_config {
- 	uint32_t free_page_report_cmd_id;
- 	/* Stores PAGE_POISON if page poisoning is in use */
- 	uint32_t poison_val;
-+	/* Max pages order if VIRTIO_BALLOON_F_CONT_PAGES is set */
-+	uint32_t max_pages_order;
-+	/* Current pages order if VIRTIO_BALLOON_F_CONT_PAGES is set */
-+	uint32_t current_pages_order;
- };
- 
- #define VIRTIO_BALLOON_S_SWAP_IN  0   /* Amount of memory swapped in */
+As an alternative to using formatted strings like this, it could be
+modelled more explicitly in QAPI
+
+  { 'struct':  'YankChannels',
+    'data': { 'chardev': [ 'string' ],
+              'nbd': ['string'],
+	      'migration': bool } }
+
+In this example, 'chardev' would accept a list of chardev IDs which
+have it enabled, 'nbd' would accept a list of block node IDs which
+have it enabled, and migration is a singleton on/off.
+
+The benefit of this modelling is that you can introspect QEMU
+to discover what classes of channels support being yanked by
+this QEMU build, as well as what instances are configured to
+be yanked. ie you can distinguish between a QEMU that doesn't
+support yanking network devices, from a QEMU that does support
+yanking network devices, but doesn't have it enabled for any
+network device instances.
+
+Regards,
+Daniel
 -- 
-1.8.3.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
