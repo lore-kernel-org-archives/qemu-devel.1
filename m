@@ -2,42 +2,42 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C807C54E93
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 15:04:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5B8FC54E4A
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 15:06:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2094120736
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 15:04:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2094120736
+	by mail.kernel.org (Postfix) with ESMTPS id 782A2206D3
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 15:06:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 782A2206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYWSl-0001NF-A1
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 11:04:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60572)
+	id 1jYWUa-0004Lu-GW
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 11:06:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60602)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYWI2-0005gM-M5; Tue, 12 May 2020 10:53:50 -0400
-Received: from relay.sw.ru ([185.231.240.75]:45862)
+ id 1jYWI3-0005jr-Tv; Tue, 12 May 2020 10:53:51 -0400
+Received: from relay.sw.ru ([185.231.240.75]:45842)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYWI0-0005ov-Kz; Tue, 12 May 2020 10:53:50 -0400
+ id 1jYWI0-0005ou-L8; Tue, 12 May 2020 10:53:51 -0400
 Received: from dhcp-172-16-25-136.sw.ru ([172.16.25.136] helo=localhost.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYWHY-0003c8-Ec; Tue, 12 May 2020 17:53:20 +0300
+ id 1jYWHZ-0003c8-DZ; Tue, 12 May 2020 17:53:21 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v3 01/15] block: Mark commit and mirror as filter drivers
-Date: Tue, 12 May 2020 17:53:02 +0300
-Message-Id: <1589295196-773454-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v3 06/15] block: Use CAFs in block status functions
+Date: Tue, 12 May 2020 17:53:07 +0300
+Message-Id: <1589295196-773454-7-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1589295196-773454-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1589295196-773454-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -72,47 +72,75 @@ Sender: "Qemu-devel"
 
 From: Max Reitz <mreitz@redhat.com>
 
-The commit and mirror block nodes are filters, so they should be marked
-as such.  (Strictly speaking, BDS.is_filter's documentation states that
-a filter's child must be bs->file.  The following patch will relax this
-restriction, however.)
+Use the child access functions in the block status inquiry functions as
+appropriate.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- block/commit.c | 2 ++
- block/mirror.c | 2 ++
- 2 files changed, 4 insertions(+)
+ block/io.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/block/commit.c b/block/commit.c
-index 87f6096..445a280 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -240,6 +240,8 @@ static BlockDriver bdrv_commit_top = {
-     .bdrv_co_block_status       = bdrv_co_block_status_from_backing,
-     .bdrv_refresh_filename      = bdrv_commit_top_refresh_filename,
-     .bdrv_child_perm            = bdrv_commit_top_child_perm,
+diff --git a/block/io.c b/block/io.c
+index 7d30e61..47d8096 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -2387,11 +2387,12 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+     if (ret & (BDRV_BLOCK_DATA | BDRV_BLOCK_ZERO)) {
+         ret |= BDRV_BLOCK_ALLOCATED;
+     } else if (want_zero) {
++        BlockDriverState *cow_bs = bdrv_filtered_cow_bs(bs);
 +
-+    .is_filter                  = true,
- };
+         if (bdrv_unallocated_blocks_are_zero(bs)) {
+             ret |= BDRV_BLOCK_ZERO;
+-        } else if (bs->backing) {
+-            BlockDriverState *bs2 = bs->backing->bs;
+-            int64_t size2 = bdrv_getlength(bs2);
++        } else if (cow_bs) {
++            int64_t size2 = bdrv_getlength(cow_bs);
  
- void commit_start(const char *job_id, BlockDriverState *bs,
-diff --git a/block/mirror.c b/block/mirror.c
-index aca95c9..b6de24b 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1527,6 +1527,8 @@ static BlockDriver bdrv_mirror_top = {
-     .bdrv_co_block_status       = bdrv_co_block_status_from_backing,
-     .bdrv_refresh_filename      = bdrv_mirror_top_refresh_filename,
-     .bdrv_child_perm            = bdrv_mirror_top_child_perm,
-+
-+    .is_filter                  = true,
- };
+             if (size2 >= 0 && offset >= size2) {
+                 ret |= BDRV_BLOCK_ZERO;
+@@ -2457,7 +2458,7 @@ static int coroutine_fn bdrv_co_block_status_above(BlockDriverState *bs,
+     bool first = true;
  
- static BlockJob *mirror_start_job(
+     assert(bs != base);
+-    for (p = bs; p != base; p = backing_bs(p)) {
++    for (p = bs; p != base; p = bdrv_filtered_bs(p)) {
+         ret = bdrv_co_block_status(p, want_zero, offset, bytes, pnum, map,
+                                    file);
+         if (ret < 0) {
+@@ -2543,7 +2544,7 @@ int bdrv_block_status_above(BlockDriverState *bs, BlockDriverState *base,
+ int bdrv_block_status(BlockDriverState *bs, int64_t offset, int64_t bytes,
+                       int64_t *pnum, int64_t *map, BlockDriverState **file)
+ {
+-    return bdrv_block_status_above(bs, backing_bs(bs),
++    return bdrv_block_status_above(bs, bdrv_filtered_bs(bs),
+                                    offset, bytes, pnum, map, file);
+ }
+ 
+@@ -2553,9 +2554,9 @@ int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t offset,
+     int ret;
+     int64_t dummy;
+ 
+-    ret = bdrv_common_block_status_above(bs, backing_bs(bs), false, offset,
+-                                         bytes, pnum ? pnum : &dummy, NULL,
+-                                         NULL);
++    ret = bdrv_common_block_status_above(bs, bdrv_filtered_bs(bs), false,
++                                         offset, bytes, pnum ? pnum : &dummy,
++                                         NULL, NULL);
+     if (ret < 0) {
+         return ret;
+     }
+@@ -2618,7 +2619,7 @@ int bdrv_is_allocated_above(BlockDriverState *top,
+             break;
+         }
+ 
+-        intermediate = backing_bs(intermediate);
++        intermediate = bdrv_filtered_bs(intermediate);
+     }
+ 
+     *pnum = n;
 -- 
 1.8.3.1
 
