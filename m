@@ -2,134 +2,79 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33576C54E4A
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 13:51:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAA43C54E8D
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 13:52:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE7F4206CC
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 13:51:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B4C68206F5
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 13:52:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="arKkCY+I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE7F4206CC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NuxJTARc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4C68206F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYVJL-0002Q3-4c
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 09:51:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50652)
+	id 1jYVKk-0004Ex-Vj
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 09:52:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50862)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1jYVIG-0001J5-HS
- for qemu-devel@nongnu.org; Tue, 12 May 2020 09:50:00 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:36583
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jYVJS-0002ra-OZ
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 09:51:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40945
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1jYVIE-0004jC-Iv
- for qemu-devel@nongnu.org; Tue, 12 May 2020 09:49:59 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jYVJR-0005KQ-O5
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 09:51:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589291396;
+ s=mimecast20190719; t=1589291472;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=FswiKed+YjcT9vCqTQ0+ehslP1k9kssDMf66+2P0OKo=;
- b=arKkCY+IG2zk3sk0WEE5wyan3xU+UePA3fVrM7B3hAB9RsU/cZCAMVX3eX7aZ5MQZ2+pnU
- hsZ6TU5jwFSSYzi0wksqUkeWoD7Cj2/dO1n03b5m0oktGcdrH8LJOA69CBKDJbl5YgP2z3
- 5sJw9Hou/Olq8J+qW39lCmg3cVfoRsw=
+ in-reply-to:in-reply-to:references:references;
+ bh=0ZhEFRCbpTP3nZuV+XBjBn1ZdjfqCI4q0BQ8G2sQtBw=;
+ b=NuxJTARc0utu2UDycpX+yc/fWioQOoZwdh/1UHI4XJ1eMVseCE2tWy7hPvMVCa2NI2ps+j
+ AxLn6ZFTdKQ1DHiWUzFAoFE0WHbXZdKS6E17eVMBVNFn7WI7zUZi5GFa6QFzPLOPwfKkwS
+ KWVEFWc0W/NWCNBZC6kWQ7rrsbDyiCM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-107-CRfju1WjOvKAy1MmQls_5w-1; Tue, 12 May 2020 09:49:49 -0400
-X-MC-Unique: CRfju1WjOvKAy1MmQls_5w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-73-WwWsbyXdNduuXRGERw5mLQ-1; Tue, 12 May 2020 09:51:09 -0400
+X-MC-Unique: WwWsbyXdNduuXRGERw5mLQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01F601899536;
- Tue, 12 May 2020 13:49:49 +0000 (UTC)
-Received: from [10.36.113.205] (ovpn-113-205.ams2.redhat.com [10.36.113.205])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2023D619A6;
- Tue, 12 May 2020 13:49:42 +0000 (UTC)
-Subject: Re: Assertion failure through vring_split_desc_read
-To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
-References: <20200511035124.v2ff4f5gyfh6xlgc@mozz.bu.edu>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <b67bd42d-b832-20ff-411e-dd3f4a40da1a@redhat.com>
-Date: Tue, 12 May 2020 15:49:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 089C0460;
+ Tue, 12 May 2020 13:51:07 +0000 (UTC)
+Received: from localhost (ovpn-112-75.ams2.redhat.com [10.36.112.75])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 903E26E6E9;
+ Tue, 12 May 2020 13:50:56 +0000 (UTC)
+Date: Tue, 12 May 2020 14:50:55 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: elena.ufimtseva@oracle.com
+Subject: Re: [PATCH RESEND v6 20/36] multi-process: Forward PCI config space
+ acceses to the remote process
+Message-ID: <20200512135055.GJ300009@stefanha-x1.localdomain>
+References: <cover.1587614626.git.elena.ufimtseva@oracle.com>
+ <901295bf44c731d232bb60579ffb48dce5b05cc4.1587614626.git.elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20200511035124.v2ff4f5gyfh6xlgc@mozz.bu.edu>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <901295bf44c731d232bb60579ffb48dce5b05cc4.1587614626.git.elena.ufimtseva@oracle.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=lvivier@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 01:41:59
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="pWOmaDnDlrCGjNh4"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 02:20:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -150,71 +95,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
+ mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, jag.raman@oracle.com,
+ quintela@redhat.com, armbru@redhat.com, kanth.ghatraju@oracle.com,
+ felipe@nutanix.com, thuth@redhat.com, ehabkost@redhat.com,
+ konrad.wilk@oracle.com, dgilbert@redhat.com, liran.alon@oracle.com,
+ thanos.makatos@nutanix.com, rth@twiddle.net, kwolf@redhat.com,
+ berrange@redhat.com, mreitz@redhat.com, ross.lagerwall@citrix.com,
+ marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/05/2020 05:51, Alexander Bulekov wrote:
-> Hello,
-> While fuzzing, I found an input that triggers an assertion failure
-> through virtio-rng -> vring_split_desc_read. Maybe this is related to:
-> Message-ID: <20200511033001.dzvtbdhl3oz5pgiy@mozz.bu.edu> 
-> Assertion failure through virtio_lduw_phys_cached
-> 
-> #8 0x7fe6a9acf091 in __assert_fail /build/glibc-GwnBeO/glibc-2.30/assert/assert.c:101:3
-> #9 0x564cbe7d96fd in address_space_read_cached include/exec/memory.h:2423:5
-> #10 0x564cbe7e79c5 in vring_split_desc_read hw/virtio/virtio.c:236:5
-> #11 0x564cbe7e84ce in virtqueue_split_read_next_desc hw/virtio/virtio.c:929:5
-> #12 0x564cbe78f86b in virtqueue_split_get_avail_bytes hw/virtio/virtio.c:1009:18
-> #13 0x564cbe78ab22 in virtqueue_get_avail_bytes hw/virtio/virtio.c:1208:9
-> #14 0x564cc08aade1 in get_request_size hw/virtio/virtio-rng.c:40:5
-> #15 0x564cc08aa20b in virtio_rng_process hw/virtio/virtio-rng.c:115:12
-> #16 0x564cc08a8c48 in virtio_rng_set_status hw/virtio/virtio-rng.c:172:5
-> #17 0x564cbe7a50be in virtio_set_status hw/virtio/virtio.c:1876:9
-> #18 0x564cc08d1b8f in virtio_pci_common_write hw/virtio/virtio-pci.c:1245:9
-> 
-> I can reproduce it in a qemu 5.0 build using these qtest commands:
-> https://paste.debian.net/plain/1146089
-> (not including them here, as some are quite long)
-> 
-> wget https://paste.debian.net/plain/1146089 -O qtest-trace; ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -M pc-q35-5.0  -device virtio-rng-pci,addr=04.0 -display none -nodefaults -nographic -qtest stdio < qtest-trace
+--pWOmaDnDlrCGjNh4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Nice work.
+On Wed, Apr 22, 2020 at 09:13:55PM -0700, elena.ufimtseva@oracle.com wrote:
+> +static int config_op_send(PCIProxyDev *dev, uint32_t addr, uint32_t *val=
+, int l,
+> +                          unsigned int op)
+> +{
+> +    MPQemuMsg msg;
+> +    struct conf_data_msg conf_data;
+> +    int wait;
+> +
+> +    memset(&msg, 0, sizeof(MPQemuMsg));
+> +    conf_data.addr =3D addr;
+> +    conf_data.val =3D (op =3D=3D PCI_CONFIG_WRITE) ? *val : 0;
+> +    conf_data.l =3D l;
+> +
+> +    msg.data2 =3D (uint8_t *)&conf_data;
+> +    if (!msg.data2) {
+> +        return -ENOMEM;
 
-If I use directly "curl https://paste.debian.net/plain/1146089 |
-qemu-system-i386 ..." I have only a warning:
+This can never happen since conf_data is on the stack.
 
-    qemu-system-i386: Guest moved used index from 0 to 496
+> +    }
+> +
+> +    msg.size =3D sizeof(conf_data);
+> +    msg.cmd =3D op;
+> +    msg.bytestream =3D 1;
+> +
+> +    if (op =3D=3D PCI_CONFIG_WRITE) {
+> +        msg.num_fds =3D 0;
+> +    } else {
+> +        /* TODO: Dont create fd each time for send. */
+> +        wait =3D GET_REMOTE_WAIT;
+> +        msg.num_fds =3D 1;
+> +        msg.fds[0] =3D wait;
+> +    }
+> +
+> +    mpqemu_msg_send(&msg, dev->mpqemu_link->dev);
+> +
+> +    if (op =3D=3D PCI_CONFIG_READ) {
 
-I've added some traces.
+Are you sure it's correct for writes to be posted instead of waiting for
+completion?
 
-The assert is triggered because addr (0xffff0) >= cache->len (0x11d0).
+> +        *val =3D (uint32_t)wait_for_remote(wait);
+> +        PUT_REMOTE_WAIT(wait);
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static uint32_t pci_proxy_read_config(PCIDevice *d, uint32_t addr, int l=
+en)
+> +{
+> +    uint32_t val;
+> +
+> +    (void)pci_default_read_config(d, addr, len);
 
-addr is 2nd argument of:
+Please add a comment explaining why this local read is necessary.
 
-    address_space_read_cached(cache, i * sizeof(VRingDesc),
-                              desc, sizeof(VRingDesc));
+> +
+> +    config_op_send(PCI_PROXY_DEV(d), addr, &val, len, PCI_CONFIG_READ);
+> +
+> +    return val;
+> +}
+> +
+> +static void pci_proxy_write_config(PCIDevice *d, uint32_t addr, uint32_t=
+ val,
+> +                                   int l)
+> +{
+> +    pci_default_write_config(d, addr, val, l);
 
-and "i" appears to be "65535".
+Please add a comment explaining why this local write is necessary.
 
-In virtqueue_split_read_next_desc(), the value is checked not to be
-greater than max.
+> +
+> +    config_op_send(PCI_PROXY_DEV(d), addr, &val, l, PCI_CONFIG_WRITE);
+> +}
+...
+> diff --git a/io/mpqemu-link.c b/io/mpqemu-link.c
+> index f780b65181..ef4a07b81a 100644
+> --- a/io/mpqemu-link.c
+> +++ b/io/mpqemu-link.c
+> @@ -381,6 +381,12 @@ bool mpqemu_msg_valid(MPQemuMsg *msg)
+>              return false;
+>          }
+>          break;
+> +    case PCI_CONFIG_WRITE:
+> +    case PCI_CONFIG_READ:
+> +        if (msg->size !=3D sizeof(struct conf_data_msg)) {
+> +            return false;
+> +        }
 
-But max is 268345360...
+conf_data_msg.l is not validated.
 
-"max" is provided by virtqueue_split_get_avail_bytes(), it's originally
-vq->vring.num (255), but in the case of VRING_DESC_F_INDIRECT max is
-updated to "desc.len / sizeof(VRingDesc)". desc.len is 4293525760.
+> +        break;
+>      default:
+>          break;
+>      }
+> diff --git a/remote/remote-main.c b/remote/remote-main.c
+> index f541baae6a..834574e172 100644
+> --- a/remote/remote-main.c
+> +++ b/remote/remote-main.c
+> @@ -53,6 +53,32 @@ gchar *print_pid_exec(gchar *str)
+> =20
+>  #define LINK_TO_DEV(link) ((PCIDevice *)link->opaque)
+> =20
+> +static void process_config_write(PCIDevice *dev, MPQemuMsg *msg)
+> +{
+> +    struct conf_data_msg *conf =3D (struct conf_data_msg *)msg->data2;
+> +
+> +    qemu_mutex_lock_iothread();
 
-It is set from max to cache->len by address_space_cache_init() but this
-value seems to be truncated in the next iteration of the loop (where we
-have the assert()).
+The qemu_mutex_lock_iothread() can be dropped once this is integrated in
+to QEMU's event loop.
 
-I'm investigating why we have that.
+> +    pci_default_write_config(dev, conf->addr, conf->val, conf->l);
 
-Thanks,
-Laurent
+It is not safe to call this function with arbitrary addr input values.
+
+> +    qemu_mutex_unlock_iothread();
+> +}
+> +
+> +static void process_config_read(PCIDevice *dev, MPQemuMsg *msg)
+> +{
+> +    struct conf_data_msg *conf =3D (struct conf_data_msg *)msg->data2;
+> +    uint32_t val;
+> +    int wait;
+> +
+> +    wait =3D msg->fds[0];
+> +
+> +    qemu_mutex_lock_iothread();
+> +    val =3D pci_default_read_config(dev, conf->addr, conf->l);
+
+It is not safe to call this function with arbitrary addr input values.
+
+--pWOmaDnDlrCGjNh4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl66qb8ACgkQnKSrs4Gr
+c8jRaAf/QNZpSvC5K4gCXTdR2WmeK7+a++ib6/B3hhJgTZDlBt5eHf+MBdTHDlFv
+ydtblUFfKpDeLQRhPj+8MZjxZlIiZ3ajSXuy+lNYqa6q0YvW8gp1UeEgE8lXgy//
+YUmaNHrx1Kt+rtk3fbYs97uD9G5R1ybSbEi+wrF3IGnhcb/mVRWAa2wqkMRAgrQd
+vRLoeYWhaNpMdOKbEgsn5q+nuAxC1r6j3Dsr0JMt9SzcZhdze70XFSr7K8vrcryb
+Hdj4++7ia9QES1C9cskG5MozPjBkmIfqHqTwvPT1qnCck5/KAneeRBXZSjHJB3Iv
+Wj6NhunyNGZsqv1J5CTpEgbyjqBwwA==
+=ka/A
+-----END PGP SIGNATURE-----
+
+--pWOmaDnDlrCGjNh4--
 
 
