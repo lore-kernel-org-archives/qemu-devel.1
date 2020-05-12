@@ -2,97 +2,89 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D72F2C54E4B
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 06:55:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8543AC54E4B
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:02:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 922F920752
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 06:55:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 498AA20733
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:02:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YBHzbIv1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 922F920752
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GgXgmFz8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 498AA20733
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYOpQ-00007N-Rb
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 02:55:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52196)
+	id 1jYOvu-0005oQ-FP
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 03:02:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53164)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jYOn8-00031M-79
- for qemu-devel@nongnu.org; Tue, 12 May 2020 02:53:26 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38907)
+ id 1jYOtw-0003w7-RI; Tue, 12 May 2020 03:00:28 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35108)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jYOn7-0003pv-Hu
- for qemu-devel@nongnu.org; Tue, 12 May 2020 02:53:25 -0400
-Received: by mail-wr1-x444.google.com with SMTP id x17so13924845wrt.5
- for <qemu-devel@nongnu.org>; Mon, 11 May 2020 23:53:24 -0700 (PDT)
+ id 1jYOtw-0005Y6-5X; Tue, 12 May 2020 03:00:28 -0400
+Received: by mail-wm1-x341.google.com with SMTP id n5so7077071wmd.0;
+ Tue, 12 May 2020 00:00:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=YUo5UMKHn6UCDXPR56CEsu5aymqY785YMnVFWOsKL5M=;
- b=YBHzbIv1lbmZVqgvd/JgrnbcLnnzZ8YePyX5PepalFAYw1b+PC4jUVzyE1d9+hCMlm
- TfKqeMluL576R/zl4AQC7OAhZr7F5yT75i47YbEUz4po3/70QOU0dCTR7SyZ4IlVN56f
- aPvzZKC5qkCbVjhzclEcC2xJAkfXBd0CTxDEUVXcJCRq3aJgxy0Gyw6vcEtipzkaBq84
- tDxULgdZVeJQF/kecDHW2Ge+2F10OL8fO5yAfOacNTF1j5AR4c6snU7zeg2iHGqu4hZv
- bnP4yskyi8/CztfLxLPvfkPZGXpcwPf8Fca9T8DZIabOFQBEbGo7/TZjTZhC2Jm9IzvX
- 51RA==
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=v6fg/mU4Bk/0q03fr2d5YzMbkGZ67G/czubLvjRut6E=;
+ b=GgXgmFz8IY+pa9ocN2/XvYf1Z5J3CRDjyV+8xqeFnikvU5jCbQLf+YGXawi1zXF1wK
+ nEp/GbVlzP17pUvUFZkuS9f2GXLimVNCaQnAurujidToXag6PvgDmn4tpcRFsH7reZQC
+ MoAWgBH6I6b5/OgmqJ3AEr4tBCEoxIuIHZKm9nLR6k5jqXT5QzsgTNJsm0Y8zTWC17ed
+ +8+skZr4g0xTxz1dfSh5eKksAqonVo7b7KGs47GDQFSxdg06PQdaimERZEF9qH0cDLZp
+ rciTN8f2otxSJeW3UBVU7QboWmu2WO1IudLXV7wEwGqOsGivDgP9LXihMZbbmnP7e08A
+ ViAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=YUo5UMKHn6UCDXPR56CEsu5aymqY785YMnVFWOsKL5M=;
- b=hHmU3QE4p8HFKoUgfp0Q17TWXn60ffzDOPbDhafflK6Ij9zqGDVn9EK1EVrbzqBxA/
- hQUmsiceaJYnlRNhNvPYQAODra6VoNSuKLJNhjZXM4zvBXG3hmQy8cNaaZr0Mj5vp7q7
- xy3Elawa/QkKxVAVzGC3HrBUimfLRlAT01mfNRJ3pnMYEinoC4gAMoFolaftQWt6Rz+u
- cXaRspvYrnB5LlpYW/fx4/3HHpDCz03Hi23lBcbIzTSxbFlgOtkUlbryM0BJbsW+dUf1
- 1AntAr4aS2VPFcBSG61T1pBKEOsMbx2IHLAxBgidW69tI7nzZSsZ+adoC+d9734jVJYo
- 5i7g==
-X-Gm-Message-State: AGi0PuaHXsFE1vKbT0lUQRjn4XrR2m7bulmHr0KYCFLBgd8l+PA8x6I7
- vX5gVEOncFvqm0OdoC28O6k=
-X-Google-Smtp-Source: APiQypLSSQt5KymKCK9Y2mXCwRM2zJx6EO/hARY14NdHvUQpwH8y/k/M7hVIbI/z46MrciTRLridmQ==
-X-Received: by 2002:a5d:65ce:: with SMTP id e14mr22986097wrw.314.1589266403357; 
- Mon, 11 May 2020 23:53:23 -0700 (PDT)
-Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=v6fg/mU4Bk/0q03fr2d5YzMbkGZ67G/czubLvjRut6E=;
+ b=hJCO80nb33pyatDiPOzZiVCNsZomSlu0myGizr+fcyChXCsB5Tmy9Q6/iZcGIynnsf
+ am7JgoimcRBJtkQ/xIeTTypEGPa26SkCGKkqjsBEYqXocuQhXsKroVdam7dY9RObzo4x
+ glxRkIJKE0Dqz0sHONRTgYnBBm+UtC7PHnYcP8BXdmSxZHAoTVVrWcuaZJ4m8Qg+6R1O
+ vuGZIJPjp+aS/i6bPPIgCqjdw+tFOX0OMs91iDY1T/z+bnBfE6ewR4Eq5Wej2yJZmiS1
+ OV40bQ338lVvzc06mNWPwMRfSjCpAI8LqIU5EcMbtYLf+rflIksY/I74pIKnOVGaD+ni
+ x43Q==
+X-Gm-Message-State: AGi0PuZIz3dvxjKcmxapbwJXAhYsmWNt+o5juDEVmsSBvahidiW2Nu4y
+ 9th3D0Nfl+pR76yPC7bi35byC6wwHwAhDw==
+X-Google-Smtp-Source: APiQypIT2HPCX3fabSDeTGNUfM5dRg5+16ERzkptJxDXeBDyVSY92wAyQPNH6JP5vKrTXy89Xka+RA==
+X-Received: by 2002:a1c:790b:: with SMTP id l11mr13129954wme.2.1589266824836; 
+ Tue, 12 May 2020 00:00:24 -0700 (PDT)
+Received: from localhost.localdomain (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id a8sm21479068wrg.85.2020.05.11.23.53.22
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 11 May 2020 23:53:22 -0700 (PDT)
-Subject: Re: [PATCH] hw/char/parallel: Convert reset handler to DeviceReset
+ by smtp.gmail.com with ESMTPSA id i17sm30322243wml.23.2020.05.12.00.00.21
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 12 May 2020 00:00:24 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-References: <20200504095623.7252-1-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <23cdfab9-2cbc-6c43-033b-21a23990131d@amsat.org>
-Date: Tue, 12 May 2020 08:53:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+Subject: [PATCH v3 0/3] various: Remove unnecessary casts
+Date: Tue, 12 May 2020 09:00:17 +0200
+Message-Id: <20200512070020.22782-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-In-Reply-To: <20200504095623.7252-1-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
+X-Spam_score_int: -17
+X-Spam_score: -1.8
 X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
  FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,57 +97,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paul Durrant <paul@xen.org>,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, qemu-block@nongnu.org,
+ qemu-trivial@nongnu.org, David Hildenbrand <david@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Joel Stanley <joel@jms.id.au>, Anthony Perard <anthony.perard@citrix.com>,
+ xen-devel@lists.xenproject.org, David Gibson <david@gibson.dropbear.id.au>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Andrew Jeffery <andrew@aj.id.au>, Cornelia Huck <cohuck@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ping?
+Remove unnecessary casts using coccinelle scripts.
 
-On 5/4/20 11:56 AM, Philippe Mathieu-Daudé wrote:
-> As TYPE_ISA_PARALLEL inherits from TYPE_ISA_DEVICE, it also
-> inherits from the DEVICE methods. Convert its reset handler
-> into a proper DeviceReset method.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->   hw/char/parallel.c | 9 ++++++++-
->   1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/char/parallel.c b/hw/char/parallel.c
-> index 8dd67d1375..f68a96da8e 100644
-> --- a/hw/char/parallel.c
-> +++ b/hw/char/parallel.c
-> @@ -523,6 +523,13 @@ static int parallel_can_receive(void *opaque)
->        return 1;
->   }
->   
-> +static void parallel_isa_reset(DeviceState *dev)
-> +{
-> +    ISAParallelState *isa = ISA_PARALLEL(dev);
-> +
-> +    parallel_reset(&isa->state);
-> +}
-> +
->   static void parallel_isa_realizefn(DeviceState *dev, Error **errp)
->   {
->       static int index;
-> @@ -552,7 +559,6 @@ static void parallel_isa_realizefn(DeviceState *dev, Error **errp)
->   
->       base = isa->iobase;
->       isa_init_irq(isadev, &s->irq, isa->isairq);
-> -    qemu_register_reset(parallel_reset, s);
->   
->       qemu_chr_fe_set_handlers(&s->chr, parallel_can_receive, NULL,
->                                NULL, NULL, s, NULL, true);
-> @@ -625,6 +631,7 @@ static void parallel_isa_class_initfn(ObjectClass *klass, void *data)
->   {
->       DeviceClass *dc = DEVICE_CLASS(klass);
->   
-> +    dc->reset = parallel_isa_reset;
->       dc->realize = parallel_isa_realizefn;
->       dc->vmsd = &vmstate_parallel_isa;
->       device_class_set_props(dc, parallel_isa_properties);
-> 
+The CPU()/OBJECT() patches don't introduce logical change,
+The DEVICE() one removes various OBJECT_CHECK() calls.
+
+Since v3:
+- Fixed patch #2 description (Markus)
+- Add A-b/R-b tags
+
+Since v2:
+- Reword description (Markus)
+- Add A-b/R-b tags
+
+Philippe Mathieu-Daudé (3):
+  target: Remove unnecessary CPU() cast
+  various: Remove unnecessary OBJECT() cast
+  hw: Remove unnecessary DEVICE() cast
+
+ hw/core/bus.c                       | 2 +-
+ hw/display/artist.c                 | 2 +-
+ hw/display/cg3.c                    | 2 +-
+ hw/display/sm501.c                  | 2 +-
+ hw/display/tcx.c                    | 4 ++--
+ hw/display/vga-isa.c                | 2 +-
+ hw/i2c/imx_i2c.c                    | 2 +-
+ hw/i2c/mpc_i2c.c                    | 2 +-
+ hw/ide/ahci-allwinner.c             | 2 +-
+ hw/ide/piix.c                       | 2 +-
+ hw/ipmi/smbus_ipmi.c                | 2 +-
+ hw/microblaze/petalogix_ml605_mmu.c | 8 ++++----
+ hw/misc/macio/pmu.c                 | 2 +-
+ hw/net/ftgmac100.c                  | 3 +--
+ hw/net/imx_fec.c                    | 2 +-
+ hw/nubus/nubus-device.c             | 2 +-
+ hw/pci-host/bonito.c                | 2 +-
+ hw/ppc/spapr.c                      | 2 +-
+ hw/s390x/sclp.c                     | 2 +-
+ hw/sh4/sh_pci.c                     | 2 +-
+ hw/xen/xen-legacy-backend.c         | 2 +-
+ monitor/misc.c                      | 3 +--
+ qom/object.c                        | 4 ++--
+ target/ppc/mmu_helper.c             | 2 +-
+ 24 files changed, 29 insertions(+), 31 deletions(-)
+
+-- 
+2.21.3
+
 
