@@ -7,95 +7,95 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3F21C54E4A
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 11:51:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68153C54E4A
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 11:52:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EA8F206CC
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 11:51:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 31414206CC
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 11:52:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f0gji6XX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EA8F206CC
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vhowr1z1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31414206CC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYTRJ-0005JN-Nr
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 07:51:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35296)
+	id 1jYTSb-0006Dk-DT
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 07:52:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35454)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jYTQc-0004pq-NV
- for qemu-devel@nongnu.org; Tue, 12 May 2020 07:50:30 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22874
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jYTRq-0005nX-9c
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 07:51:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27046
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jYTQb-0000vu-VB
- for qemu-devel@nongnu.org; Tue, 12 May 2020 07:50:30 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jYTRp-0001FT-Bg
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 07:51:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589284228;
+ s=mimecast20190719; t=1589284304;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=N4qk5cMFNaLkQ+ykHae6XHaQyCYiLj1hIgNduDy2ESI=;
- b=f0gji6XXmlh6qH8GKnYm270Es4aXyJ8EBZ6F6wayRJWldDAEzHgZ9W92V7pyyrk7NzcyUW
- JxGVhyyBTIyVcNBL/EjXzThPMtVlTq2K067MdYgLbdgVYNYQdzZTmVx3WPEofno7B/nrfu
- RIY3YMxKadL+Nlw8Auk4gdvKHHRXibs=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-3F2dKDbYOROs2JaKpGteag-1; Tue, 12 May 2020 07:50:26 -0400
-X-MC-Unique: 3F2dKDbYOROs2JaKpGteag-1
-Received: by mail-wm1-f69.google.com with SMTP id h6so9849719wmi.7
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 04:50:26 -0700 (PDT)
+ bh=I058l6lbS0+t65MAHtM1zhsFjBG9Hn2FVlVRTJN100Q=;
+ b=Vhowr1z1GxNsWF1EEPPEGfJXU2FDG9jvRiH9pyfbrAMY0Oj4BhkAafkMNMLWudEAZ/VG2P
+ G0nm42XrESdqBKdwOH8t8VsmGSprr1TLgyn4dpHTd+AVG/Y9Ny92Q96kd+lq6jUyRFtIST
+ 8uFTVaGcoNYiQJKnKr+Hipd1b5QCojk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-86-Ir5LqJrXO2CYVrywcHsVig-1; Tue, 12 May 2020 07:51:42 -0400
+X-MC-Unique: Ir5LqJrXO2CYVrywcHsVig-1
+Received: by mail-wm1-f71.google.com with SMTP id t23so1299126wmi.2
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 04:51:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=N4qk5cMFNaLkQ+ykHae6XHaQyCYiLj1hIgNduDy2ESI=;
- b=ZIG25Tc1v3lYGBGFFsy9EAt7Bv1DuxVjdNvlTwDfcj3dNcZJn2qEgBDCpcz4qS3qPt
- 5bdPuoSpXUiF1In+rQWYzV2eWtU+y/qa3NkQ5bT380Gran4dxjPu9a9B5tJjNIH897Nn
- TR2wmjDlLDcrJQHV5Rg4OZ+waZrUQAF/i2oSI2S/CpaFvLRgqs5u+TKFOX0Np5H0sBTn
- PMBv+rZtTG6/UXeCNv0EH/+SRdL1iD//Zt8L939IQQ6aL2AoV4V07VsG2pTFVjNorbjS
- 8WupjXY767xqF9vkXnIJI087UP9UwLqLlOw4gHxi8fAGNm+uwSIHnFoAN1uWoT407FA6
- q4ng==
-X-Gm-Message-State: AGi0PubrvDEDj1s84JF2DjKonMmSBSqKzm7QaBMMMuIuJIvx/W0tplTR
- 8sCYIrKoWoojS6uPB8TsNRDGyBUQ/ov2dPGGUl20pdnarfTGXOZkCCVJVB8Z+EuXPsUszBNufgZ
- 7K3n1QvN9mMEd1+U=
-X-Received: by 2002:adf:face:: with SMTP id a14mr24308558wrs.397.1589284225414; 
- Tue, 12 May 2020 04:50:25 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJ5wIS+OGMNUDdbqZDV9yJicSviQ59V8EpULFERXRwJYV6k8yEkSMJO+sQkl6EkFEqwtTVurA==
-X-Received: by 2002:adf:face:: with SMTP id a14mr24308543wrs.397.1589284225250; 
- Tue, 12 May 2020 04:50:25 -0700 (PDT)
+ bh=I058l6lbS0+t65MAHtM1zhsFjBG9Hn2FVlVRTJN100Q=;
+ b=PBW4spdaK4zF0J4Hh40yg4WlXv8MROa4wIAdE85hmMC87nhodivHKsBY9vgzwjXU9B
+ pf0/Obx3kp7+8tNeP9T2+QAqSj8zOyeitOMtw357fspSeRmrZ7ZV1p4FYDJSQ2mc61DK
+ T1h4xR5bkNM+EZqWqBcGgdftsr05ZRhZwi7vZdEcBVlLNHcrN440byqZ+uJEEkm+4V2W
+ 3QRmWscF91wsDEfWNylFupxsZE1z7OWmjRiNlTX+D7R2cS+awiHRRxRm+/MJL8z/Ha+7
+ BX3YLSww2MogIPGSdqu5MdNKHbwhjabzpKQyp4UOZbfPQgnpF0P1sXgWWI9ijIB8c4lj
+ 0Yeg==
+X-Gm-Message-State: AGi0PuYEpJCBlpMjJ/lFvMWtQL6F3NQOZPl1KnMkwnp5zoWTIUnbYKLO
+ hUMPKdnAjgJlemwDgSkXKoxGXy1WzL0XsH1AIfP4xe+PY8HibUZ1sqMsEMAgaMai4R0Bg49Jcqx
+ c69CqZVj0U3+IbYg=
+X-Received: by 2002:adf:ea44:: with SMTP id j4mr26298250wrn.38.1589284301077; 
+ Tue, 12 May 2020 04:51:41 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJo3mzZ6kvREet6NJH92mBo0JRbuMUMOyj6JJfoFn524dh++GH/n+fQJh8lGSe5dDBz+cEKew==
+X-Received: by 2002:adf:ea44:: with SMTP id j4mr26298224wrn.38.1589284300850; 
+ Tue, 12 May 2020 04:51:40 -0700 (PDT)
 Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id b14sm19358766wmb.18.2020.05.12.04.50.24
+ by smtp.gmail.com with ESMTPSA id n24sm14648005wmi.40.2020.05.12.04.51.39
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 12 May 2020 04:50:24 -0700 (PDT)
-Subject: Re: [PATCH 05/10] ui/gtk: remove unused variable ignore_keys
+ Tue, 12 May 2020 04:51:40 -0700 (PDT)
+Subject: Re: [PATCH 08/10] ui/sdl2-input: use trace-events to debug key events
 To: =?UTF-8?Q?Volker_R=c3=bcmelin?= <vr_qemu@t-online.de>,
  Gerd Hoffmann <kraxel@redhat.com>, Stefan Weil <sw@weilnetz.de>,
  =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
 References: <2393388c-86c3-4d7e-178e-2c7e6d14a8de@t-online.de>
- <20200510184304.9267-5-vr_qemu@t-online.de>
+ <20200510184304.9267-8-vr_qemu@t-online.de>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <3ce054cc-ec25-03f0-9d39-b0a525bc3b16@redhat.com>
-Date: Tue, 12 May 2020 13:50:23 +0200
+Message-ID: <ff7ac93e-a5d7-b18e-59eb-f02eb36f3572@redhat.com>
+Date: Tue, 12 May 2020 13:51:39 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200510184304.9267-5-vr_qemu@t-online.de>
+In-Reply-To: <20200510184304.9267-8-vr_qemu@t-online.de>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 01:41:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 02:02:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -120,60 +120,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/10/20 8:42 PM, Volker Rümelin wrote:
-> Since the removal of GTK2 code 
-
-"... in commit 89d85cde7 ..."
-
-> the code around ignore_keys is
-> unused. See commit 1a01716a30 "gtk: Avoid accel key leakage
-> into guest on console switch" why it was needed before.
-> 
+On 5/10/20 8:43 PM, Volker Rümelin wrote:
 > Signed-off-by: Volker Rümelin <vr_qemu@t-online.de>
-
-With description updated:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
 > ---
->   ui/gtk.c | 9 ---------
->   1 file changed, 9 deletions(-)
+>   ui/sdl2-input.c | 3 +++
+>   ui/trace-events | 3 +++
+>   2 files changed, 6 insertions(+)
 > 
-> diff --git a/ui/gtk.c b/ui/gtk.c
-> index c70bfc2be4..5a25e3fa4c 100644
-> --- a/ui/gtk.c
-> +++ b/ui/gtk.c
-> @@ -168,8 +168,6 @@ struct GtkDisplayState {
+> diff --git a/ui/sdl2-input.c b/ui/sdl2-input.c
+> index 1f9fe831b3..f068382209 100644
+> --- a/ui/sdl2-input.c
+> +++ b/ui/sdl2-input.c
+> @@ -27,6 +27,7 @@
+>   #include "ui/console.h"
+>   #include "ui/input.h"
+>   #include "ui/sdl2.h"
+> +#include "trace.h"
 >   
->       bool external_pause_update;
->   
-> -    bool ignore_keys;
-> -
->       DisplayOptions *opts;
->   };
->   
-> @@ -1085,14 +1083,8 @@ static gboolean gd_text_key_down(GtkWidget *widget,
->   static gboolean gd_key_event(GtkWidget *widget, GdkEventKey *key, void *opaque)
->   {
->       VirtualConsole *vc = opaque;
-> -    GtkDisplayState *s = vc->s;
->       int qcode;
->   
-> -    if (s->ignore_keys) {
-> -        s->ignore_keys = (key->type == GDK_KEY_PRESS);
-> -        return TRUE;
-> -    }
-> -
->   #ifdef WIN32
->       /* on windows, we ought to ignore the reserved key event? */
->       if (key->hardware_keycode == 0xff)
-> @@ -1189,7 +1181,6 @@ static void gd_menu_switch_vc(GtkMenuItem *item, void *opaque)
->           gtk_notebook_set_current_page(nb, page);
->           gtk_widget_grab_focus(vc->focus);
+>   void sdl2_process_key(struct sdl2_console *scon,
+>                         SDL_KeyboardEvent *ev)
+> @@ -38,6 +39,8 @@ void sdl2_process_key(struct sdl2_console *scon,
+>           return;
 >       }
-> -    s->ignore_keys = false;
->   }
+>       qcode = qemu_input_map_usb_to_qcode[ev->keysym.scancode];
+> +    trace_sdl2_process_key(ev->keysym.scancode, qcode,
+> +                           ev->type == SDL_KEYDOWN ? "down" : "up");
+>       qkbd_state_key_event(scon->kbd, qcode, ev->type == SDL_KEYDOWN);
 >   
->   static void gd_accel_switch_vc(void *opaque)
+>       if (!qemu_console_is_graphic(con)) {
+> diff --git a/ui/trace-events b/ui/trace-events
+> index 0dcda393c1..5367fd3f16 100644
+> --- a/ui/trace-events
+> +++ b/ui/trace-events
+> @@ -75,6 +75,9 @@ input_event_abs(int conidx, const char *axis, int value) "con %d, axis %s, value
+>   input_event_sync(void) ""
+>   input_mouse_mode(int absolute) "absolute %d"
+>   
+> +# sdl2-input.c
+> +sdl2_process_key(int sdl_scancode, int qcode, const char *action) "translated SDL scancode %d to QKeyCode %d (%s)"
+> +
+>   # spice-display.c
+>   qemu_spice_add_memslot(int qid, uint32_t slot_id, unsigned long virt_start, unsigned long virt_end, int async) "%d %u: host virt 0x%lx - 0x%lx async=%d"
+>   qemu_spice_del_memslot(int qid, uint32_t gid, uint32_t slot_id) "%d gid=%u sid=%u"
 > 
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 
