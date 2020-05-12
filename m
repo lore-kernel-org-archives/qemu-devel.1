@@ -2,74 +2,87 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A0A5CA90AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 17:32:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AA38CA90AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 17:57:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 323CC206B8
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 17:32:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28BF7206B9
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 17:57:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nifty.com header.i=@nifty.com header.b="DgDd0PnF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 323CC206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=pass (2048-bit key) header.d=semihalf-com.20150623.gappssmtp.com header.i=@semihalf-com.20150623.gappssmtp.com header.b="W3m7XaTA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28BF7206B9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=semihalf.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYYly-0006yD-DO
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 13:32:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58926)
+	id 1jYZ9x-00054S-An
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 13:57:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54936)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <masahiroy@kernel.org>)
- id 1jYYkm-0005tb-EK
- for qemu-devel@nongnu.org; Tue, 12 May 2020 13:31:40 -0400
-Received: from conuserg-12.nifty.com ([210.131.2.79]:38452)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <masahiroy@kernel.org>)
- id 1jYYkk-0003cR-9a
- for qemu-devel@nongnu.org; Tue, 12 May 2020 13:31:39 -0400
-Received: from oscar.flets-west.jp (softbank126090202047.bbtec.net
- [126.90.202.47]) (authenticated)
- by conuserg-12.nifty.com with ESMTP id 04CHV7t1032279;
- Wed, 13 May 2020 02:31:08 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com 04CHV7t1032279
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
- s=dec2015msa; t=1589304668;
- bh=+VU6zF5MPFCfDw07fM2SgeC3Z5I9vFK8O0un3ddqNT8=;
- h=From:To:Cc:Subject:Date:From;
- b=DgDd0PnFzzxPESjTdL9qg1PMOdd3kVob2rJEWifNAXxy/dCxZu0PNJBZ3TTryE8YO
- 1/obV7F9RhlfducrAMQX7T4S4SYHrJZu678akiEFpCWhBWsanUhI37aKo2tig/pPIV
- ZauZdhdN8usWQ/PvCBbWSd0iNz/wwMN6u/m6lqtnG33xnvA7GRd8TC7eJyWbT6KjJ1
- w4ExE0tAylwt6QcHRc2afGMjcf+8kr0ghn4knUTj/wjVFK/abg3pwsfEf41JHkHs38
- xnTYS2adn3cIbIE5si13UDp3OKjfXs0JML8F2LW8Kqoz8/txXj2sn4PexaOzQIQLbc
- rx8fqI5j2nbuw==
-X-Nifty-SrcIP: [126.90.202.47]
-From: Masahiro Yamada <masahiroy@kernel.org>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- "Daniel P . Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
-Subject: [PATCH] qom/object: pass (Object *) to object_initialize_with_type()
-Date: Wed, 13 May 2020 02:31:04 +0900
-Message-Id: <20200512173104.2293073-1-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.25.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: softfail client-ip=210.131.2.79;
- envelope-from=masahiroy@kernel.org; helo=conuserg-12.nifty.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 13:31:34
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -11
-X-Spam_score: -1.2
+ (Exim 4.90_1) (envelope-from <rad@semihalf.com>) id 1jYYN7-0007vl-Fg
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 13:07:13 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:44932)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <rad@semihalf.com>) id 1jYYN5-00071M-P3
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 13:07:13 -0400
+Received: by mail-lf1-x142.google.com with SMTP id d22so5159079lfm.11
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 10:07:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=semihalf-com.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id;
+ bh=avK/Z/6wqRuOjH2arcvxV3LyvE6xojjat6vnYZ0J980=;
+ b=W3m7XaTAzx2SnS6KIhm0qcuQjCKmTlTgsEys3eS5uLR4a92ZV3iXeqMGB/ED1Slo+q
+ Y7BPFmCHSBmS/xoOWHKuXIzJ2kLDz6zfJ1ux0z5rJ/kok0ZlGSsV3XgedL8K7dr5nPqw
+ RrHoIZC9f9r4yxlJ7FNcxRpUDi4M3gka8YFDwXIzxbB+v4qG1TfAxV1dqT+6mS8a4CiL
+ SanfpeiyJBdRU7XBm0UovBsipGlRas3PNoH+oe21JBMApUvqiy5kAVsQW/3m76J4EVBz
+ Y4yIWB1XWqCjqkDQfkaegXvaNxCm9IxWRh4yLwtySjb/q3TW8Gc9BYeDwTyYnh5X2AmA
+ JOqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=avK/Z/6wqRuOjH2arcvxV3LyvE6xojjat6vnYZ0J980=;
+ b=tFskVQJcp1wVVyk+erHVNZxiwErqzHLXLvM9XJ8UHQ9dE+lggy1Dq2JT+DN2ePQwZA
+ M9rlWWrv4dGghKAIWYnuucrxLsE4GLhMrQ2qgdO6boUNUX/V/7Ol73RDc9ygfncNwS2y
+ ExAH/NjgauljNSc9xixbWuJzHDkNEzJde2T1tJoRl/FTn/7RtnJ5a+iBBg7ZOL8aiIuX
+ 707ZTuABH3X+disPN4Zt6ps5kEwNx2ocIo4Cah/ric8nWpIXeISUgZkAF5Jr/W8OsBLo
+ VoIOnI1xCS4u7Bf+H+G7Eiaf7HYACkuupx54NrCgrBy6AWx0pB0cNjm3GCq+jfYi+qAT
+ rZyQ==
+X-Gm-Message-State: AOAM5301SPctvMV065Zw9yMYSStznh9Q+Z6je0qE8iIPnNW8gUKyWcJG
+ tRiZbV668/Wxj4peUm6zAQTtng==
+X-Google-Smtp-Source: ABdhPJxen0CtdcekiRq7qj8NHeniTpvC7nwwXqXpruWmJIiQIkMeFasUXJlgJnW0LtjcjKB1+4P5OA==
+X-Received: by 2002:a05:6512:1051:: with SMTP id
+ c17mr14582634lfb.206.1589303228751; 
+ Tue, 12 May 2020 10:07:08 -0700 (PDT)
+Received: from unknown.lan (ip-179-133.ists.pl. [93.180.179.133])
+ by smtp.gmail.com with ESMTPSA id w203sm14350355lff.38.2020.05.12.10.07.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 12 May 2020 10:07:08 -0700 (PDT)
+From: Radoslaw Biernacki <rad@semihalf.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Leif Lindholm <leif@nuviainc.com>, qemu-arm <qemu-arm@nongnu.org>
+Subject: [PATCH] MAINTAINERS: Update Radoslaw Biernacki email address
+Date: Tue, 12 May 2020 19:07:04 +0200
+Message-Id: <20200512170704.9290-1-rad@semihalf.com>
+X-Mailer: git-send-email 2.17.1
+Received-SPF: none client-ip=2a00:1450:4864:20::142;
+ envelope-from=rad@semihalf.com; helo=mail-lf1-x142.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_SOFTFAIL=0.665,
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
+X-Mailman-Approved-At: Tue, 12 May 2020 13:56:41 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,37 +94,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: philmd@redhat.com, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-object_new_with_type() already passes (Object *) pointer.
-Avoid casting back and forth.
+My Linaro account is no longer active and stop forwarding emails to me.
+Changing it to my current employer domain.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Signed-off-by: Radoslaw Biernacki <rad@semihalf.com>
 ---
+ .mailmap    | 1 +
+ MAINTAINERS | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
- qom/object.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/qom/object.c b/qom/object.c
-index e4085d8ae2..9d1a918e42 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -495,10 +495,8 @@ static void object_class_property_init_all(Object *obj)
-     }
- }
+diff --git a/.mailmap b/.mailmap
+index 6412067bde..668da447e3 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -46,6 +46,7 @@ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com> <arikalo@wavecomp.com>
+ Anthony Liguori <anthony@codemonkey.ws> Anthony Liguori <aliguori@us.ibm.com>
+ James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
+ Leif Lindholm <leif@nuviainc.com> <leif.lindholm@linaro.org>
++Radoslaw Biernacki <rad@semihalf.com> <radoslaw.biernacki@linaro.org>
+ Paul Burton <pburton@wavecomp.com> <paul.burton@mips.com>
+ Paul Burton <pburton@wavecomp.com> <paul.burton@imgtec.com>
+ Paul Burton <pburton@wavecomp.com> <paul@archlinuxmips.org>
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 1f84e3ae2c..a9d6893036 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -799,7 +799,7 @@ F: include/hw/misc/imx6_*.h
+ F: include/hw/ssi/imx_spi.h
  
--static void object_initialize_with_type(void *data, size_t size, TypeImpl *type)
-+static void object_initialize_with_type(Object *obj, size_t size, TypeImpl *type)
- {
--    Object *obj = data;
--
-     type_initialize(type);
- 
-     g_assert(type->instance_size >= sizeof(Object));
+ SBSA-REF
+-M: Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
++M: Radoslaw Biernacki <rad@semihalf.com>
+ M: Peter Maydell <peter.maydell@linaro.org>
+ R: Leif Lindholm <leif@nuviainc.com>
+ L: qemu-arm@nongnu.org
 -- 
-2.25.1
+2.17.1
 
 
