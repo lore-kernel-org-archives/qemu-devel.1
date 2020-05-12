@@ -2,53 +2,93 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F318C47076
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 17:06:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 953D6CA90AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 17:08:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3C43206B8
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 17:06:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3C43206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5A4A0206A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 17:08:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TbJmIQ9e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A4A0206A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYYMh-0006Ud-5p
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 13:06:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52412)
+	id 1jYYOd-0001hX-CW
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 13:08:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53002)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYY7U-0004qk-6G; Tue, 12 May 2020 12:51:04 -0400
-Received: from relay.sw.ru ([185.231.240.75]:50548)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYY7P-0001R7-5W; Tue, 12 May 2020 12:51:03 -0400
-Received: from dhcp-172-16-25-136.sw.ru ([172.16.25.136] helo=localhost.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYY7C-0004nT-Ps; Tue, 12 May 2020 19:50:46 +0300
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v4 05/15] block: Include filters when freezing backing chain
-Date: Tue, 12 May 2020 19:50:35 +0300
-Message-Id: <1589302245-893269-6-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1589302245-893269-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1589302245-893269-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Received-SPF: pass client-ip=185.231.240.75;
- envelope-from=andrey.shinkevich@virtuozzo.com; helo=relay.sw.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 10:53:25
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_PASS=-0.001,
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jYYBP-0001qG-E9
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 12:55:07 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40831)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jYYBN-0002Mb-7i
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 12:55:07 -0400
+Received: by mail-wm1-x344.google.com with SMTP id u16so24246710wmc.5
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 09:55:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=UXmarglZojfO1A8BU3EtiwEdWFl5N2qsjwk/zZKHK3U=;
+ b=TbJmIQ9eKX/0wyI8hZejozJkEERzQxSbSySNaj15+uvQnehWvt1w4emPnyjx72jxPt
+ WXp7Wnk/LGRWcMUgshC/ZZqZ09K781PMoCDZSQis+OOqrBGogLJS+JlHpWT7tuZhQJ7P
+ SyrSfB8JUrh+uzIW6js1tr8wLG1pCtRbDp+s731FBUDIS4krKNOgJ0uta3I59AVXX37V
+ 3KQYWzwW3/yM4S+7yb1nLjYn/HkmGuzZfBv7pGU7+A61qr5mLXfTJ8rJaegbIQb+6+Mi
+ 0jpQvenRoiZcnDKv5RX1VFE0dsPJxUSD289rxKbr6K4Jiv+hKZh11BzRC2frtqPJLFKa
+ NtEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=UXmarglZojfO1A8BU3EtiwEdWFl5N2qsjwk/zZKHK3U=;
+ b=ZRr99mOAi5AFSV2V3sSTj88B+YI+TTTnnOfV5gM9DF50DtDsamnksjr4KGz37Liay+
+ OjdR6VlHjJlh4shuUAG0VtGclSTb/8e+yPIk0gf+Bx5PP6mHG2KAHMn29OM1+L5NRRVI
+ oPSETjAIAVv8WPcTBxLMjozPurHNJPsvUofm8tt1Vg9agjLzBknk65mj9xU9ZfSxBd2x
+ r959CSkk14yOk1dMYkDQgX6nhwiUMXjj/6ujE8C03JajWfTB4uvCwBHFlsUhFLJYc+EA
+ ltLwMJdNhro+lg8sXXep2FCdm+6rojwwKa/H7lwCaHRXK881TbnzKW9KHxTak07lOXa4
+ DA7Q==
+X-Gm-Message-State: AOAM532+DS1QuOZC+8JvJ43EmbQXlmQFyYDLRj08D5/QnaZT7x5Z7hY0
+ kvvbKQN6DZFa7jS+9BhMDmKVHFb1Nxg=
+X-Google-Smtp-Source: ABdhPJxcqqHdlFDWQ48S3PtXxHTVj96TGLLmOjkgoyCYwD3Un+m26yRYS677aMntss5DJuaobX0aZQ==
+X-Received: by 2002:a7b:c201:: with SMTP id x1mr2872870wmi.14.1589302502110;
+ Tue, 12 May 2020 09:55:02 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id z11sm23164173wro.48.2020.05.12.09.55.00
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 12 May 2020 09:55:00 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 339F01FF7E;
+ Tue, 12 May 2020 17:55:00 +0100 (BST)
+References: <20200512133849.10624-1-thuth@redhat.com>
+User-agent: mu4e 1.4.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH] travis.yml: Improve the --disable-tcg test on s390x
+In-reply-to: <20200512133849.10624-1-thuth@redhat.com>
+Date: Tue, 12 May 2020 17:55:00 +0100
+Message-ID: <87d079f5zv.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -62,359 +102,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
- armbru@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
- andrey.shinkevich@virtuozzo.com, den@openvz.org, mreitz@redhat.com,
- jsnow@redhat.com
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+ Philippe =?utf-8?Q?Mathi?= =?utf-8?Q?eu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Max Reitz <mreitz@redhat.com>
 
-In order to make filters work in backing chains, the associated
-functions must be able to deal with them and freeze all filter links, be
-they COW or R/W filter links.
+Thomas Huth <thuth@redhat.com> writes:
 
-In the process, rename these functions to reflect that they now act on
-generalized chains of filter nodes instead of backing chains alone.
+> Since the s390x containers do not allow KVM, we only compile-test
+> the --disable-tcg build on s390x and do not run the qtests. Thus,
+> it does not make sense to install genisoimage here, and it also does
+> not make sense to build the s390-ccw.img here again - it is simply
+> not used without the qtests.
+> On the other hand, if we do not build the s390-ccw.img anymore, we
+> can also compile with Clang - so let's use that compiler here to
+> get some additional test coverage.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-While at it, add some comments that note which functions require their
-caller to ensure that a given child link is not frozen, and how the
-callers do so.
+Queued to testing/next, thanks.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- block.c               | 81 ++++++++++++++++++++++++++++++---------------------
- block/commit.c        |  8 ++---
- block/mirror.c        |  4 +--
- block/stream.c        |  8 ++---
- include/block/block.h |  6 ++--
- 5 files changed, 60 insertions(+), 47 deletions(-)
+> ---
+>  .travis.yml | 18 ++++--------------
+>  1 file changed, 4 insertions(+), 14 deletions(-)
+>
+> diff --git a/.travis.yml b/.travis.yml
+> index fe708792ca..1ec8a7b465 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -502,9 +502,10 @@ jobs:
+>                $(exit $BUILD_RC);
+>            fi
+>=20=20
+> -    - name: "[s390x] GCC check (KVM)"
+> +    - name: "[s390x] Clang (disable-tcg)"
+>        arch: s390x
+>        dist: bionic
+> +      compiler: clang
+>        addons:
+>          apt_packages:
+>            - libaio-dev
+> @@ -528,21 +529,10 @@ jobs:
+>            - libusb-1.0-0-dev
+>            - libvdeplug-dev
+>            - libvte-2.91-dev
+> -          # Tests dependencies
+> -          - genisoimage
+>        env:
+>          - TEST_CMD=3D"make check-unit"
+> -        - CONFIG=3D"--disable-containers --disable-tcg --enable-kvm --di=
+sable-tools"
+> -      script:
+> -        - ( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )
+> -        - BUILD_RC=3D0 && make -j${JOBS} || BUILD_RC=3D$?
+> -        - |
+> -          if [ "$BUILD_RC" -eq 0 ] ; then
+> -              mv pc-bios/s390-ccw/*.img pc-bios/ ;
+> -              ${TEST_CMD} ;
+> -          else
+> -              $(exit $BUILD_RC);
+> -          fi
+> +        - CONFIG=3D"--disable-containers --disable-tcg --enable-kvm
+> +                  --disable-tools --host-cc=3Dclang --cxx=3Dclang++"
+>=20=20
+>      # Release builds
+>      # The make-release script expect a QEMU version, so our tag must sta=
+rt with a 'v'.
 
-diff --git a/block.c b/block.c
-index 5b4ebfe..459412e 100644
---- a/block.c
-+++ b/block.c
-@@ -2513,12 +2513,15 @@ static void bdrv_replace_child_noperm(BdrvChild *child,
-  * If @new_bs is not NULL, bdrv_check_perm() must be called beforehand, as this
-  * function uses bdrv_set_perm() to update the permissions according to the new
-  * reference that @new_bs gets.
-+ *
-+ * Callers must ensure that child->frozen is false.
-  */
- static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs)
- {
-     BlockDriverState *old_bs = child->bs;
-     uint64_t perm, shared_perm;
- 
-+    /* Asserts that child->frozen == false */
-     bdrv_replace_child_noperm(child, new_bs);
- 
-     /*
-@@ -2676,6 +2679,7 @@ static void bdrv_detach_child(BdrvChild *child)
-     g_free(child);
- }
- 
-+/* Callers must ensure that child->frozen is false. */
- void bdrv_root_unref_child(BdrvChild *child)
- {
-     BlockDriverState *child_bs;
-@@ -2685,10 +2689,6 @@ void bdrv_root_unref_child(BdrvChild *child)
-     bdrv_unref(child_bs);
- }
- 
--/**
-- * Clear all inherits_from pointers from children and grandchildren of
-- * @root that point to @root, where necessary.
-- */
- static void bdrv_unset_inherits_from(BlockDriverState *root, BdrvChild *child)
- {
-     BdrvChild *c;
-@@ -2713,6 +2713,7 @@ static void bdrv_unset_inherits_from(BlockDriverState *root, BdrvChild *child)
-     }
- }
- 
-+/* Callers must ensure that child->frozen is false. */
- void bdrv_unref_child(BlockDriverState *parent, BdrvChild *child)
- {
-     if (child == NULL) {
-@@ -2756,7 +2757,7 @@ void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd,
-     bool update_inherits_from = bdrv_chain_contains(bs, backing_hd) &&
-         bdrv_inherits_from_recursive(backing_hd, bs);
- 
--    if (bdrv_is_backing_chain_frozen(bs, backing_bs(bs), errp)) {
-+    if (bdrv_is_chain_frozen(bs, child_bs(bs->backing), errp)) {
-         return;
-     }
- 
-@@ -2765,6 +2766,7 @@ void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd,
-     }
- 
-     if (bs->backing) {
-+        /* Cannot be frozen, we checked that above */
-         bdrv_unref_child(bs, bs->backing);
-         bs->backing = NULL;
-     }
-@@ -3912,8 +3914,7 @@ static int bdrv_reopen_parse_backing(BDRVReopenState *reopen_state,
-             return -EPERM;
-         }
-         /* Check if the backing link that we want to replace is frozen */
--        if (bdrv_is_backing_chain_frozen(overlay_bs, backing_bs(overlay_bs),
--                                         errp)) {
-+        if (bdrv_is_chain_frozen(overlay_bs, backing_bs(overlay_bs), errp)) {
-             return -EPERM;
-         }
-         reopen_state->replace_backing_bs = true;
-@@ -4248,6 +4249,7 @@ static void bdrv_close(BlockDriverState *bs)
- 
-     if (bs->drv) {
-         if (bs->drv->bdrv_close) {
-+            /* Must unfreeze all children, so bdrv_unref_child() works */
-             bs->drv->bdrv_close(bs);
-         }
-         bs->drv = NULL;
-@@ -4617,20 +4619,22 @@ BlockDriverState *bdrv_find_base(BlockDriverState *bs)
- }
- 
- /*
-- * Return true if at least one of the backing links between @bs and
-- * @base is frozen. @errp is set if that's the case.
-+ * Return true if at least one of the (COW and R/W) filter links
-+ * between @bs and @base is frozen. @errp is set if that's the case.
-  * @base must be reachable from @bs, or NULL.
-  */
--bool bdrv_is_backing_chain_frozen(BlockDriverState *bs, BlockDriverState *base,
--                                  Error **errp)
-+bool bdrv_is_chain_frozen(BlockDriverState *bs, BlockDriverState *base,
-+                          Error **errp)
- {
-     BlockDriverState *i;
-+    BdrvChild *child;
-+
-+    for (i = bs; i != base; i = child_bs(child)) {
-+        child = bdrv_filtered_child(i);
- 
--    for (i = bs; i != base; i = backing_bs(i)) {
--        if (i->backing && i->backing->frozen) {
-+        if (child && child->frozen) {
-             error_setg(errp, "Cannot change '%s' link from '%s' to '%s'",
--                       i->backing->name, i->node_name,
--                       backing_bs(i)->node_name);
-+                       child->name, i->node_name, child->bs->node_name);
-             return true;
-         }
-     }
-@@ -4639,32 +4643,35 @@ bool bdrv_is_backing_chain_frozen(BlockDriverState *bs, BlockDriverState *base,
- }
- 
- /*
-- * Freeze all backing links between @bs and @base.
-+ * Freeze all (COW and R/W) filter links between @bs and @base.
-  * If any of the links is already frozen the operation is aborted and
-  * none of the links are modified.
-  * @base must be reachable from @bs, or NULL.
-  * Returns 0 on success. On failure returns < 0 and sets @errp.
-  */
--int bdrv_freeze_backing_chain(BlockDriverState *bs, BlockDriverState *base,
--                              Error **errp)
-+int bdrv_freeze_chain(BlockDriverState *bs, BlockDriverState *base,
-+                      Error **errp)
- {
-     BlockDriverState *i;
-+    BdrvChild *child;
- 
--    if (bdrv_is_backing_chain_frozen(bs, base, errp)) {
-+    if (bdrv_is_chain_frozen(bs, base, errp)) {
-         return -EPERM;
-     }
- 
--    for (i = bs; i != base; i = backing_bs(i)) {
--        if (i->backing && backing_bs(i)->never_freeze) {
-+    for (i = bs; i != base; i = child_bs(child)) {
-+        child = bdrv_filtered_child(i);
-+        if (child && child->bs->never_freeze) {
-             error_setg(errp, "Cannot freeze '%s' link to '%s'",
--                       i->backing->name, backing_bs(i)->node_name);
-+                       child->name, child->bs->node_name);
-             return -EPERM;
-         }
-     }
- 
--    for (i = bs; i != base; i = backing_bs(i)) {
--        if (i->backing) {
--            i->backing->frozen = true;
-+    for (i = bs; i != base; i = child_bs(child)) {
-+        child = bdrv_filtered_child(i);
-+        if (child) {
-+            child->frozen = true;
-         }
-     }
- 
-@@ -4672,18 +4679,21 @@ int bdrv_freeze_backing_chain(BlockDriverState *bs, BlockDriverState *base,
- }
- 
- /*
-- * Unfreeze all backing links between @bs and @base. The caller must
-- * ensure that all links are frozen before using this function.
-+ * Unfreeze all (COW and R/W) filter links between @bs and @base. The
-+ * caller must ensure that all links are frozen before using this
-+ * function.
-  * @base must be reachable from @bs, or NULL.
-  */
--void bdrv_unfreeze_backing_chain(BlockDriverState *bs, BlockDriverState *base)
-+void bdrv_unfreeze_chain(BlockDriverState *bs, BlockDriverState *base)
- {
-     BlockDriverState *i;
-+    BdrvChild *child;
- 
--    for (i = bs; i != base; i = backing_bs(i)) {
--        if (i->backing) {
--            assert(i->backing->frozen);
--            i->backing->frozen = false;
-+    for (i = bs; i != base; i = child_bs(child)) {
-+        child = bdrv_filtered_child(i);
-+        if (child) {
-+            assert(child->frozen);
-+            child->frozen = false;
-         }
-     }
- }
-@@ -4786,8 +4796,11 @@ int bdrv_drop_intermediate(BlockDriverState *top, BlockDriverState *base,
-             }
-         }
- 
--        /* Do the actual switch in the in-memory graph.
--         * Completes bdrv_check_update_perm() transaction internally. */
-+        /*
-+         * Do the actual switch in the in-memory graph.
-+         * Completes bdrv_check_update_perm() transaction internally.
-+         * c->frozen is false, we have checked that above.
-+         */
-         bdrv_ref(base);
-         bdrv_replace_child(c, base);
-         bdrv_unref(top);
-diff --git a/block/commit.c b/block/commit.c
-index 445a280..e1f45a4 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -47,7 +47,7 @@ static int commit_prepare(Job *job)
- {
-     CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
- 
--    bdrv_unfreeze_backing_chain(s->commit_top_bs, s->base_bs);
-+    bdrv_unfreeze_chain(s->commit_top_bs, s->base_bs);
-     s->chain_frozen = false;
- 
-     /* Remove base node parent that still uses BLK_PERM_WRITE/RESIZE before
-@@ -67,7 +67,7 @@ static void commit_abort(Job *job)
-     BlockDriverState *top_bs = blk_bs(s->top);
- 
-     if (s->chain_frozen) {
--        bdrv_unfreeze_backing_chain(s->commit_top_bs, s->base_bs);
-+        bdrv_unfreeze_chain(s->commit_top_bs, s->base_bs);
-     }
- 
-     /* Make sure commit_top_bs and top stay around until bdrv_replace_node() */
-@@ -317,7 +317,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-         }
-     }
- 
--    if (bdrv_freeze_backing_chain(commit_top_bs, base, errp) < 0) {
-+    if (bdrv_freeze_chain(commit_top_bs, base, errp) < 0) {
-         goto fail;
-     }
-     s->chain_frozen = true;
-@@ -358,7 +358,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
- 
- fail:
-     if (s->chain_frozen) {
--        bdrv_unfreeze_backing_chain(commit_top_bs, base);
-+        bdrv_unfreeze_chain(commit_top_bs, base);
-     }
-     if (s->base) {
-         blk_unref(s->base);
-diff --git a/block/mirror.c b/block/mirror.c
-index b6de24b..4b187e6 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -648,7 +648,7 @@ static int mirror_exit_common(Job *job)
-     target_bs = blk_bs(s->target);
- 
-     if (bdrv_chain_contains(src, target_bs)) {
--        bdrv_unfreeze_backing_chain(mirror_top_bs, target_bs);
-+        bdrv_unfreeze_chain(mirror_top_bs, target_bs);
-     }
- 
-     bdrv_release_dirty_bitmap(s->dirty_bitmap);
-@@ -1713,7 +1713,7 @@ static BlockJob *mirror_start_job(
-             }
-         }
- 
--        if (bdrv_freeze_backing_chain(mirror_top_bs, target, errp) < 0) {
-+        if (bdrv_freeze_chain(mirror_top_bs, target, errp) < 0) {
-             goto fail;
-         }
-     }
-diff --git a/block/stream.c b/block/stream.c
-index aa2e7af..3cca1f9 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -53,7 +53,7 @@ static void stream_abort(Job *job)
- 
-     if (s->chain_frozen) {
-         BlockJob *bjob = &s->common;
--        bdrv_unfreeze_backing_chain(blk_bs(bjob->blk), s->bottom);
-+        bdrv_unfreeze_chain(blk_bs(bjob->blk), s->bottom);
-     }
- }
- 
-@@ -66,7 +66,7 @@ static int stream_prepare(Job *job)
-     Error *local_err = NULL;
-     int ret = 0;
- 
--    bdrv_unfreeze_backing_chain(bs, s->bottom);
-+    bdrv_unfreeze_chain(bs, s->bottom);
-     s->chain_frozen = false;
- 
-     if (bs->backing) {
-@@ -225,7 +225,7 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-     int basic_flags = BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED;
-     BlockDriverState *bottom = bdrv_find_overlay(bs, base);
- 
--    if (bdrv_freeze_backing_chain(bs, bottom, errp) < 0) {
-+    if (bdrv_freeze_chain(bs, bottom, errp) < 0) {
-         return;
-     }
- 
-@@ -276,5 +276,5 @@ fail:
-     if (bs_read_only) {
-         bdrv_reopen_set_read_only(bs, true, NULL);
-     }
--    bdrv_unfreeze_backing_chain(bs, bottom);
-+    bdrv_unfreeze_chain(bs, bottom);
- }
-diff --git a/include/block/block.h b/include/block/block.h
-index 4de8d8f..e55143d 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -360,11 +360,11 @@ int bdrv_drop_intermediate(BlockDriverState *top, BlockDriverState *base,
- BlockDriverState *bdrv_find_overlay(BlockDriverState *active,
-                                     BlockDriverState *bs);
- BlockDriverState *bdrv_find_base(BlockDriverState *bs);
--bool bdrv_is_backing_chain_frozen(BlockDriverState *bs, BlockDriverState *base,
-+bool bdrv_is_chain_frozen(BlockDriverState *bs, BlockDriverState *base,
-                                   Error **errp);
--int bdrv_freeze_backing_chain(BlockDriverState *bs, BlockDriverState *base,
-+int bdrv_freeze_chain(BlockDriverState *bs, BlockDriverState *base,
-                               Error **errp);
--void bdrv_unfreeze_backing_chain(BlockDriverState *bs, BlockDriverState *base);
-+void bdrv_unfreeze_chain(BlockDriverState *bs, BlockDriverState *base);
- int coroutine_fn bdrv_co_delete_file(BlockDriverState *bs, Error **errp);
- 
- 
--- 
-1.8.3.1
 
+--=20
+Alex Benn=C3=A9e
 
