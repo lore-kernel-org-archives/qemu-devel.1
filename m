@@ -2,84 +2,89 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C9EFC54E8B
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:09:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CABAC54E8F
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:09:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55C61206D6
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:09:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5B9B42082E
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:09:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lve2YfLx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55C61206D6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y8ovyKdm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B9B42082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYP2a-0007VK-Fq
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 03:09:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53924)
+	id 1jYP37-0000EP-KD
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 03:09:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54126)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jYP08-0004Ov-1E; Tue, 12 May 2020 03:06:52 -0400
-Received: from mail-ej1-x62d.google.com ([2a00:1450:4864:20::62d]:36822)
+ id 1jYP2G-0007Ub-AA
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 03:09:04 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38020)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jYP07-00085D-8R; Tue, 12 May 2020 03:06:51 -0400
-Received: by mail-ej1-x62d.google.com with SMTP id z5so9311112ejb.3;
- Tue, 12 May 2020 00:06:49 -0700 (PDT)
+ id 1jYP2F-0008RF-C2
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 03:09:04 -0400
+Received: by mail-wm1-x344.google.com with SMTP id g12so21994493wmh.3
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 00:09:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=6Uadd1ojRpaMx0mLMXfks6u0zzq06r1l8ClSFuRdt/0=;
- b=Lve2YfLxhhXeSgv5Krij9v7iClkHFU9IYLL1EMzOtur3IbsSeX5J2PhnP3ea5rcDow
- KCO/7Ix8CN9b+m8CsAIY0pmFSuliKq3InStM3c/YPkvHoUAI+y/XOstktewpaTglkXEe
- R029xn2fabGHuoCSfdrlWuPlCbDMHh8/rZPfQBZ3f/I/qECKUWyVOt/48IDcOiOJM+th
- Acida2utRJvngm7vbXkBRC04KtD2Tgqr7TWTLwHQjfEi/LDTgJaXwtDV0yg21iRrQduo
- cboOXzAuYYEkATvUfF2mEzCPhSE0PHvgXw6PKJkBHZ5g7KKbzBAPoFbjnYSPlwkrU4xY
- YR1g==
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=9F9VLmtxyUsPG0AZGPw1KPbx9L6outE5uljpchHOvvw=;
+ b=Y8ovyKdmwESylpn0dYVAWk9N7z+iA93gYKGoYThXCQ7Vmb50WkYfbw0ybk7nx8q5Jb
+ LV3Ha+84HjCZV8+ytdB//4RulsUZY6QdZmm13ENGoHlGZZHCJwc4RwFPvDwKLItoa06k
+ PyJzvVfIBfC0QkYO4LrVtug8S4AYTmekcFWEHwk4Y9elclElB+ZI/xhY5ZhdsJIB01b7
+ hAOziNPVpYOKnEDGpc/CGPMuI/Ns6fiLE4gZ//DVSGaHqrLOd5AFM7PCYTM6/XPXI0uE
+ bilZM/4OfQdmwIupQL66f0EdOQkS95KQzahVzGMLQSooSo2m4nHnQh37iegmxq1SuDis
+ OFIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=6Uadd1ojRpaMx0mLMXfks6u0zzq06r1l8ClSFuRdt/0=;
- b=jPS4w/Z1c5gNnxNPeqhU0I4ODDqG0MpsRHjptUu07lILvX6RekKCS0TbYheQVmias1
- AxaZtdUFVL8khZJmCfR1PEFgZOeJTzqA9vx9MxCz7e1ydYhFn/rEL2A5FYa4N6x6odbz
- Um0FgHTwjIvFCu8t7d3s9gJDsSXLIxpE2TAmGxx1n4FePXKqs1y1JiPp4UbuOFlUqtZl
- pXNcZ7i8kdw+4eR8YcQcaY7SAlzuQBKYhvL8HsPTJIm7rjhPqSguMm443EMPZZgAwle6
- q74d5ZlVVZmQrgShOFuYi5zdjAH8RRzQ2FYEYY8ujnVlOiX6BFrF2O4SHjGXE9ba7A+z
- 8ZYQ==
-X-Gm-Message-State: AOAM531M162Ntii+2R3vH0LRIKmMDID1JBoM2O5flRY+VuBHRq5DOlC9
- 9Dm8UKzrYMWd2u8W4GnHz9Waq6ZSpqM=
-X-Google-Smtp-Source: ABdhPJyuIeaK/oBHofNRayb58D3awM1asnahvw86j9vw44VhzMHZmbFRxKnXxl0x1VRgby9/5HHuoQ==
-X-Received: by 2002:a17:906:f84b:: with SMTP id
- ks11mr4649807ejb.114.1589267208486; 
- Tue, 12 May 2020 00:06:48 -0700 (PDT)
-Received: from localhost.localdomain (17.red-88-21-202.staticip.rima-tde.net.
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=9F9VLmtxyUsPG0AZGPw1KPbx9L6outE5uljpchHOvvw=;
+ b=Oj8GHVVdgpEgXtJUgfLE+nwXTu9lJHnU4maOR50hURW2E8y/ZzF7QTOGJK6Ve2tD0w
+ HI2xg69z8FdqZxmSonTP5yNOkCqwweQA0/NNDQYcUsdcV5xrnmlbp0vPNiLyXkP+/5c5
+ tyzFE58/FBe3xv562j4ZB58/WsJdarTsbV66OywVryR33acu0YlTsEJz/HwacAWlkSWX
+ /b6ExKvowfdlTWcNd1ir5i5bFwIjAoSH4iZdG1bkbZMBLiFXxwzB9D9nYvlcqZ6fqXPc
+ 4Gh6VGkrpJJiZyR29JdeA31vc2m1pj4yCKSVQ4Vx6f+aqyabXDa1eRsNrqwLkvzLO+V9
+ JZRA==
+X-Gm-Message-State: AGi0PuYirwFw62eknEQBBxxCsriuRNAF4P+x7LisyEkLHg1tMV819CLe
+ B9b3LAJjJ76yGrWEUTcFcVY=
+X-Google-Smtp-Source: APiQypKbA7GYrSnLEXgIFkKe78A1EP6EVEoBWLxtoSMIj9FB9Cdl0dL3Xh3GxX2TXT4DJhiikH8iXQ==
+X-Received: by 2002:a7b:c399:: with SMTP id s25mr34428758wmj.169.1589267341862; 
+ Tue, 12 May 2020 00:09:01 -0700 (PDT)
+Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id ch8sm247345ejb.53.2020.05.12.00.06.46
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 12 May 2020 00:06:47 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 2/2] scripts/qmp: Use Python 3 interpreter
-Date: Tue, 12 May 2020 09:06:42 +0200
-Message-Id: <20200512070642.23986-3-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200512070642.23986-1-f4bug@amsat.org>
-References: <20200512070642.23986-1-f4bug@amsat.org>
+ by smtp.gmail.com with ESMTPSA id t71sm31657524wmt.31.2020.05.12.00.09.00
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 12 May 2020 00:09:01 -0700 (PDT)
+Subject: Re: [PATCH 1/2] hw/mips/mips_int: De-duplicate KVM interrupt delivery
+To: chen huacai <zltjiangshi@gmail.com>
+References: <20200429082916.10669-1-f4bug@amsat.org>
+ <20200429082916.10669-2-f4bug@amsat.org>
+ <CABDp7VoyvX2vD6awEC-GwnEu8SW=pMPPR7mrfKCSzamrnomPKg@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <dc94a9f4-b6c9-97fa-4515-3e51ef9b816a@amsat.org>
+Date: Tue, 12 May 2020 09:08:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CABDp7VoyvX2vD6awEC-GwnEu8SW=pMPPR7mrfKCSzamrnomPKg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::62d;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x62d.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -102,67 +107,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, qemu-trivial@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Huacai Chen <chenhuacai@gmail.com>, qemu-level <qemu-devel@nongnu.org>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Huacai Chen <chenhc@lemote.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- scripts/qmp/qom-get  | 2 +-
- scripts/qmp/qom-list | 2 +-
- scripts/qmp/qom-set  | 2 +-
- scripts/qmp/qom-tree | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+On 4/29/20 10:48 AM, chen huacai wrote:
+> Hi, Philippe,
+> 
+> On Wed, Apr 29, 2020 at 4:30 PM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>
+>> Refactor duplicated code in a single place.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>   hw/mips/mips_int.c | 11 +++--------
+>>   1 file changed, 3 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/hw/mips/mips_int.c b/hw/mips/mips_int.c
+>> index 796730b11d..4a1bf846da 100644
+>> --- a/hw/mips/mips_int.c
+>> +++ b/hw/mips/mips_int.c
+>> @@ -47,17 +47,12 @@ static void cpu_mips_irq_request(void *opaque, int irq, int level)
+>>
+>>       if (level) {
+>>           env->CP0_Cause |= 1 << (irq + CP0Ca_IP);
+>> -
+>> -        if (kvm_enabled() && irq == 2) {
+>> -            kvm_mips_set_interrupt(cpu, irq, level);
+>> -        }
+>> -
+>>       } else {
+>>           env->CP0_Cause &= ~(1 << (irq + CP0Ca_IP));
+>> +    }
+> Since the if-else has become one line, so can we remove { and } here?
 
-diff --git a/scripts/qmp/qom-get b/scripts/qmp/qom-get
-index 007b4cd442..7c5ede91bb 100755
---- a/scripts/qmp/qom-get
-+++ b/scripts/qmp/qom-get
-@@ -1,4 +1,4 @@
--#!/usr/bin/python
-+#!/usr/bin/env python3
- ##
- # QEMU Object Model test tools
- #
-diff --git a/scripts/qmp/qom-list b/scripts/qmp/qom-list
-index 03bda3446b..bb68fd65d4 100755
---- a/scripts/qmp/qom-list
-+++ b/scripts/qmp/qom-list
-@@ -1,4 +1,4 @@
--#!/usr/bin/python
-+#!/usr/bin/env python3
- ##
- # QEMU Object Model test tools
- #
-diff --git a/scripts/qmp/qom-set b/scripts/qmp/qom-set
-index c37fe78b00..19881d85e9 100755
---- a/scripts/qmp/qom-set
-+++ b/scripts/qmp/qom-set
-@@ -1,4 +1,4 @@
--#!/usr/bin/python
-+#!/usr/bin/env python3
- ##
- # QEMU Object Model test tools
- #
-diff --git a/scripts/qmp/qom-tree b/scripts/qmp/qom-tree
-index 1c8acf61e7..fa91147a03 100755
---- a/scripts/qmp/qom-tree
-+++ b/scripts/qmp/qom-tree
-@@ -1,4 +1,4 @@
--#!/usr/bin/python
-+#!/usr/bin/env python3
- ##
- # QEMU Object Model test tools
- #
--- 
-2.21.3
+This is the QEMU coding style, see CODING_STYLE.rst:
 
+Block structure
+===============
+
+Every indented statement is braced; even if the block contains just one
+statement.  The opening brace is on the line that contains the control
+flow statement that introduces the new block; the closing brace is on the
+same line as the else keyword, or on a line by itself if there is no else
+keyword.  Example:
+
+.. code-block:: c
+
+     if (a == 5) {
+         printf("a was 5.\n");
+     } else if (a == 6) {
+         printf("a was 6.\n");
+     } else {
+         printf("a was something else entirely.\n");
+     }
+
+Rationale: a consistent (except for functions...) bracing style reduces
+ambiguity and avoids needless churn when lines are added or removed.
+Furthermore, it is the QEMU coding style.
+
+> 
+>>
+>> -        if (kvm_enabled() && irq == 2) {
+>> -            kvm_mips_set_interrupt(cpu, irq, level);
+>> -        }
+>> +    if (kvm_enabled() && irq == 2) {
+>> +        kvm_mips_set_interrupt(cpu, irq, level);
+>>       }
+>>
+>>       if (env->CP0_Cause & CP0Ca_IP_mask) {
+>> --
+>> 2.21.1
+>>
+>>
+> 
+> 
 
