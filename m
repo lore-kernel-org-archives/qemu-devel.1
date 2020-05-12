@@ -2,91 +2,135 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE36BC2D0F7
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 20:32:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34645C2D0F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 20:32:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7BF09206DD
+	by mail.kernel.org (Postfix) with ESMTPS id F3B30206DD
 	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 20:32:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="eNJvT0uK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BF09206DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="WPcpk4cm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3B30206DD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYbZJ-0006Eb-Ns
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 16:32:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54926)
+	id 1jYbZK-0006E4-2U
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 16:32:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54924)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jYbYU-0005Gf-3Y
- for qemu-devel@nongnu.org; Tue, 12 May 2020 16:31:10 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:16173)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jYbYR-0008Pi-VW
+ (Exim 4.90_1) (envelope-from <fnuv@xilinx.com>) id 1jYbYT-0005FR-KU
  for qemu-devel@nongnu.org; Tue, 12 May 2020 16:31:09 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5ebb077c0000>; Tue, 12 May 2020 13:30:52 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate102.nvidia.com (PGP Universal service);
- Tue, 12 May 2020 13:31:04 -0700
-X-PGP-Universal: processed;
- by hqpgpgate102.nvidia.com on Tue, 12 May 2020 13:31:04 -0700
-Received: from [10.40.103.94] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 12 May
- 2020 20:30:58 +0000
-Subject: Re: [PATCH Kernel v18 5/7] vfio iommu: Update UNMAP_DMA ioctl to get
- dirty bitmap before unmap
-To: Alex Williamson <alex.williamson@redhat.com>
-References: <1588607939-26441-1-git-send-email-kwankhede@nvidia.com>
- <1588607939-26441-6-git-send-email-kwankhede@nvidia.com>
- <20200506162511.032bb1e6@w520.home>
-X-Nvconfidentiality: public
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <e4a5cb87-3bc3-ff1b-9ffb-479a4d418922@nvidia.com>
-Date: Wed, 13 May 2020 02:00:54 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+Received: from mail-co1nam11on2044.outbound.protection.outlook.com
+ ([40.107.220.44]:58718 helo=NAM11-CO1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <fnuv@xilinx.com>) id 1jYbYR-0008Pm-N4
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 16:31:08 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=C4J0B0kYRVyc2bfE5Nyfre/PQU+sx9pwEbDKd8XU2+f989bjdXXLv450TZhCCMthF+trqltzIr/26LpmBGR+s+uv0MkLEyNM6hx5tzeUUiteIoB0dovrOwIxGJUTp1KFLgTCQDWxpVOP+OC4fNuAj0X+IB4SctQ+NvSgukL48bamkP0F8lk00uQ+EMHaZobn1LX9BJe1VFuxdbmJwzP6XooWmI6teNxGkP2J1xjX2PL3Uy4KIVMihdE8Nl6++TWexO8xPGyt8f86fCire3lED/f61UQinCWKcIJ3w9EY4d2mTHxdkdhJWU/3lAdNSkk4mFfyPNjERIyzxcueSNc3+A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AZwcxeIkB9n8lR/gdi/l8HrGAmtGem8GLJKNsQ+xD/0=;
+ b=J9+/MvAGsesyJY1543SHgesrvKVgym9jhtucNBWasSXYw5MIJQuPJexYX8i3ULpa1IqXyZyOJpGp/Jy+KgwRKEMVzLGPqse63uSJu7UC+/P3/HamjF3lxGUdSbr2cGTTR2L0nZATyQOCyaSA2/2pi4bXGGINem0dGHhyBgudQxey2wSw7t1hiD7+fKWuONuj5uoqZG5kOmVO29GYbr03RAt87C5iU1o7XU1oBnhC9FK+hRTwysZ6uiF8ymVVyUwKLsRJIERmdsRopsY3L379gfWMIE7uwczxOcwybEYCqpJBZThosWYHzmt1dNfkP7btW3552d0dDOQjv0ieGVCmBw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 149.199.60.83) smtp.rcpttodomain=nongnu.org smtp.mailfrom=xilinx.com;
+ dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
+ not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AZwcxeIkB9n8lR/gdi/l8HrGAmtGem8GLJKNsQ+xD/0=;
+ b=WPcpk4cmE8AxC/iQlmljiivDVn1PeoogZt6U7+VBULwm2Hcv7Jp2bsAmutubWZEvTMESioGvVkCCHurZznVRbJKYioLPs5cUuZZ1Ec3R78YXGKklqp5nY2+d9z5q3s5J+NMODgEkuhEx2B5+DXJf1dgEcpCWb1PaD/WdTMaHQl4=
+Received: from SN4PR0701CA0021.namprd07.prod.outlook.com
+ (2603:10b6:803:28::31) by SN6PR02MB5549.namprd02.prod.outlook.com
+ (2603:10b6:805:e4::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.35; Tue, 12 May
+ 2020 20:16:03 +0000
+Received: from SN1NAM02FT022.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:803:28:cafe::33) by SN4PR0701CA0021.outlook.office365.com
+ (2603:10b6:803:28::31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.20 via Frontend
+ Transport; Tue, 12 May 2020 20:16:03 +0000
+Authentication-Results: spf=pass (sender IP is 149.199.60.83)
+ smtp.mailfrom=xilinx.com; nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=bestguesspass action=none
+ header.from=xilinx.com;
+Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
+ 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
+ client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
+Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
+ SN1NAM02FT022.mail.protection.outlook.com (10.152.72.148) with Microsoft SMTP
+ Server id 15.20.2979.29 via Frontend Transport; Tue, 12 May 2020 20:16:02
+ +0000
+Received: from [149.199.38.66] (port=34761 helo=xsj-pvapsmtp01)
+ by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
+ (envelope-from <fnu.vikram@xilinx.com>) id 1jYbJZ-0000UN-HN
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 13:15:45 -0700
+Received: from [127.0.0.1] (helo=localhost)
+ by xsj-pvapsmtp01 with smtp (Exim 4.63)
+ (envelope-from <fnu.vikram@xilinx.com>) id 1jYbJq-00062i-5q
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 13:16:02 -0700
+Received: from xsj-pvapsmtp01 (mailhost.xilinx.com [149.199.38.66])
+ by xsj-smtp-dlp2.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 04CKFq8g021434; 
+ Tue, 12 May 2020 13:15:52 -0700
+Received: from [172.19.2.115] (helo=xsjfnuv50.xilinx.com)
+ by xsj-pvapsmtp01 with esmtp (Exim 4.63)
+ (envelope-from <fnu.vikram@xilinx.com>)
+ id 1jYbJg-0005zy-8y; Tue, 12 May 2020 13:15:52 -0700
+From: Vikram Garhwal <fnu.vikram@xilinx.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 0/4] Introduce Xilinx ZynqMP CAN controller
+Date: Tue, 12 May 2020 13:15:48 -0700
+Message-Id: <1589314552-1375-1-git-send-email-fnu.vikram@xilinx.com>
+X-Mailer: git-send-email 2.7.4
+X-RCIS-Action: ALLOW
+X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
+X-TM-AS-User-Approved-Sender: Yes;Yes
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
+ SFTY:;
+ SFS:(136003)(396003)(39860400002)(376002)(346002)(46966005)(33430700001)(9786002)(8936002)(316002)(2616005)(33440700001)(6666004)(7696005)(356005)(478600001)(82310400002)(81166007)(426003)(36756003)(26005)(186003)(8676002)(70586007)(70206006)(6916009)(4326008)(336012)(5660300002)(107886003)(47076004)(2906002)(82740400003);
+ DIR:OUT; SFP:1101; 
 MIME-Version: 1.0
-In-Reply-To: <20200506162511.032bb1e6@w520.home>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1589315452; bh=SQJfdynECYAMsVxHU87JBCN1XEH3W8wqr29LA9gwC/Q=;
- h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
- Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
- X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
- Content-Transfer-Encoding;
- b=eNJvT0uKj+2qTv91QGkttQ2w17yFaiVHIx2xiHNV0zs9WzwZ+6TQ8Uwer2EjsDliw
- Ge7WjsKkdXCeNTADsEqE4DNz+szD7wvzVBBc01kYlHot7Jah84yqw5e2m6O4XKtsCB
- cvgTwrbizTOqIcKKnY5NP9+ErSrrEBoj2Z8LtA3TZf+vMJxSZvm9IE1KGuC2vNMYV8
- 4cEw1gIjydr1RG1kZo8DvTJyuxH9Grx2+tIFrvk77gaQKivlo0gDbBcAzRDgNCs7Mr
- /WJo2kzIAL3tEj+6yZrm6KoWo5qXB+WalAKsED2OLdI/LpoDsWh2EFDAnMltsOqC4X
- l9xXE8VR1H/MA==
-Received-SPF: pass client-ip=216.228.121.65; envelope-from=kwankhede@nvidia.com;
- helo=hqnvemgate26.nvidia.com
+Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 14d9b7e6-9e3f-44c2-6053-08d7f6b14b0f
+X-MS-TrafficTypeDiagnostic: SN6PR02MB5549:
+X-Microsoft-Antispam-PRVS: <SN6PR02MB554927F3C1F0C82C005FC97ABCBE0@SN6PR02MB5549.namprd02.prod.outlook.com>
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
+X-Forefront-PRVS: 0401647B7F
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6uWfXZuKYCgLUgjPKR6jeJXUSkbhy/T4Twgad1T5usMooqsOVbCSw5WVXQJqeKgAlqBUjyOZDgWJHfqdRN8DBY7Ndy2oXkBF7LSg9oPSpezca6058WBHj0jaT+TeW+CHqlPTC5+FqnAieuGKqCVZuga/iIk4d0OdQoPKNfmlbdW1Wte4aa+82CxoGaqMfoOJmOBwnqyJLk0KYFJ521piL25DkwT/klqO/yUZfmhUdpsoNJjPAxnLzCYt7smu6RxEK+69LIxjOq4kyocGElzS7hJvbKzK+zyrqM+yMF/jKLryASqxF6+jr18f0IcvAU25izronlo0T/MKqImWMqJZzRUCYJnJHNme2cG2H5tbyZXmvY2RIvuVeYeX+NDw/IM+UlEPKIF+W6D28jF7RJkZIr1ql6D3C65xmpSl7SO7tYP4NxxnElzYyaojczrMP9AbxkYavBknaKbYhyvgePHtnq9Km+NOM6SzaCTmcwRQHWX+kHcjSLRxK3ENZyUgrmMYLp2Y+OGZo/T7BzS+zWoSrN36shrCIgyDVF4Zau0WK4X+0Q2Pdl94OSydkM0niXLKfiC3Bu7QftqLEPEMzYM8lw==
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2020 20:16:02.5037 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 14d9b7e6-9e3f-44c2-6053-08d7f6b14b0f
+X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
+ Helo=[xsj-pvapsmtpgw01]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR02MB5549
+Received-SPF: pass client-ip=40.107.220.44; envelope-from=fnuv@xilinx.com;
+ helo=NAM11-CO1-obe.outbound.protection.outlook.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 16:31:05
-X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
-X-Spam_score_int: -70
-X-Spam_score: -7.1
-X-Spam_bar: -------
-X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,174 +143,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
- dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Cc: francisco.iglesias@xilinx.com, Vikram Garhwal <fnu.vikram@xilinx.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+ Example for single CAN:
+      -object can-bus,id=canbus0 \
+      -global driver=xlnx.zynqmp-can,property=canbus0,value=canbus0 \
+      -object can-host-socketcan,id=socketcan0,if=vcan0,canbus=canbus0
 
+ Example for connecting both CAN:
+      -object can-bus,id=canbus0 -object can-bus,id=canbus1 \
+      -global driver=xlnx.zynqmp-can,property=canbus0,value=canbus0 \
+      -global driver=xlnx.zynqmp-can,property=canbus1,value=canbus1 \
+      -object can-host-socketcan,id=socketcan0,if=vcan0,canbus=canbus0 \
+      -object can-host-socketcan,id=socketcan1,if=vcan0,canbus=canbus1
 
-On 5/7/2020 3:55 AM, Alex Williamson wrote:
-> On Mon, 4 May 2020 21:28:57 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
->> DMA mapped pages, including those pinned by mdev vendor drivers, might
->> get unpinned and unmapped while migration is active and device is still
->> running. For example, in pre-copy phase while guest driver could access
->> those pages, host device or vendor driver can dirty these mapped pages.
->> Such pages should be marked dirty so as to maintain memory consistency
->> for a user making use of dirty page tracking.
->>
->> To get bitmap during unmap, user should allocate memory for bitmap, set
->> size of allocated memory, set page size to be considered for bitmap and
->> set flag VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP.
->>
->> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->> Reviewed-by: Neo Jia <cjia@nvidia.com>
->> ---
->>   drivers/vfio/vfio_iommu_type1.c | 84 +++++++++++++++++++++++++++++++++++++++--
->>   include/uapi/linux/vfio.h       | 10 +++++
->>   2 files changed, 90 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->> index 01dcb417836f..8b27faf1ec38 100644
->> --- a/drivers/vfio/vfio_iommu_type1.c
->> +++ b/drivers/vfio/vfio_iommu_type1.c
->> @@ -983,12 +983,14 @@ static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
->>   }
->>   
->>   static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->> -			     struct vfio_iommu_type1_dma_unmap *unmap)
->> +			     struct vfio_iommu_type1_dma_unmap *unmap,
->> +			     struct vfio_bitmap *bitmap)
->>   {
->>   	uint64_t mask;
->>   	struct vfio_dma *dma, *dma_last = NULL;
->>   	size_t unmapped = 0;
->>   	int ret = 0, retries = 0;
->> +	unsigned long *final_bitmap = NULL, *temp_bitmap = NULL;
->>   
->>   	mask = ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
->>   
->> @@ -1041,6 +1043,7 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->>   			ret = -EINVAL;
->>   			goto unlock;
->>   		}
->> +
->>   		dma = vfio_find_dma(iommu, unmap->iova + unmap->size - 1, 0);
->>   		if (dma && dma->iova + dma->size != unmap->iova + unmap->size) {
->>   			ret = -EINVAL;
->> @@ -1048,6 +1051,22 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->>   		}
->>   	}
->>   
->> +	if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
->> +	     iommu->dirty_page_tracking) {
-> 
-> Why do we even accept VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP when not
-> dirty page tracking rather than returning -EINVAL?  It would simplify
-> things here to reject it at the ioctl and silently ignoring a flag is
-> rarely if ever the right approach.
-> 
->> +		final_bitmap = kvzalloc(bitmap->size, GFP_KERNEL);
->> +		if (!final_bitmap) {
->> +			ret = -ENOMEM;
->> +			goto unlock;
->> +		}
->> +
->> +		temp_bitmap = kvzalloc(bitmap->size, GFP_KERNEL);
->> +		if (!temp_bitmap) {
->> +			ret = -ENOMEM;
->> +			kfree(final_bitmap);
->> +			goto unlock;
->> +		}
-> 
-> YIKES!  So the user can instantly trigger the kernel to internally
-> allocate 2 x 256MB, regardless of how much they can actually map.
-> 
+Changelog:
 
-That is worst case senario. I don't think ideally that will ever hit. 
-More comment below regarding this.
+v3 -> v4:
+    Correct formatting issues.
 
->> +	}
->> +
->>   	while ((dma = vfio_find_dma(iommu, unmap->iova, unmap->size))) {
->>   		if (!iommu->v2 && unmap->iova > dma->iova)
->>   			break;
->> @@ -1058,6 +1077,24 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->>   		if (dma->task->mm != current->mm)
->>   			break;
->>   
->> +		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
->> +		     iommu->dirty_page_tracking) {
->> +			unsigned long pgshift = __ffs(bitmap->pgsize);
->> +			unsigned int npages = dma->size >> pgshift;
->> +			unsigned int shift;
->> +
->> +			vfio_iova_dirty_bitmap(iommu, dma->iova, dma->size,
->> +					bitmap->pgsize, (u64 *)temp_bitmap);
-> 
-> vfio_iova_dirty_bitmap() takes a __user bitmap, we're doing
-> copy_to_user() on a kernel allocated buffer???
-> 
+v2 -> v3:
+    Rectify the build issue.
+    Rearrange the patch order.
 
-Actually, there is no need to call vfio_iova_dirty_bitmap(), dma pointer 
-is known here and since its getting unmapped, there is no need to 
-repopulate bitmap. Removing vfio_iova_dirty_bitmap() and changing it as 
-below:
+v1 -> v2:
+    Rename the CAN device state and address code style issues.
+    Connect the CAN device to Xlnx-ZCU102 board.
+    Add maintainer entry.
+    Add QTEST for the CAN device.
 
-if (unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
-     unsigned long pgshift = __ffs(bitmap->pgsize);
-     unsigned int npages = dma->size >> pgshift;
-     unsigned int bitmap_size = DIRTY_BITMAP_BYTES(npages);
-     unsigned int shift = (dma->iova - unmap->iova) >>
-                                             pgshift;
-     /*
-      * mark all pages dirty if all pages are pinned and
-      * mapped.
-      */
-     if (dma->iommu_mapped)
-         bitmap_set(temp_bitmap, 0, npages);
-     else
-         memcpy(temp_bitmap, dma->bitmap, bitmap_size);
+Vikram Garhwal (4):
+  hw/net/can: Introduce Xilinx ZynqMP CAN controller
+  xlnx-zynqmp: Connect Xilinx ZynqMP CAN controllers
+  tests/qtest: Introduce tests for Xilinx ZynqMP CAN controller
+  MAINTAINERS: Add maintainer entry for Xilinx ZynqMP CAN controller
 
-     if (shift)
-         bitmap_shift_left(temp_bitmap, temp_bitmap,
-                           shift, npages);
-     bitmap_or(final_bitmap, final_bitmap, temp_bitmap,
-               shift + npages);
-     memset(temp_bitmap, 0, bitmap->size);
-}
+ MAINTAINERS                      |    8 +
+ hw/arm/xlnx-zynqmp.c             |   26 +
+ hw/net/can/Makefile.objs         |    1 +
+ hw/net/can/xlnx-zynqmp-can.c     | 1111 ++++++++++++++++++++++++++++++++++++++
+ include/hw/arm/xlnx-zynqmp.h     |    3 +
+ include/hw/net/xlnx-zynqmp-can.h |   75 +++
+ tests/qtest/Makefile.include     |    2 +
+ tests/qtest/xlnx-can-test.c      |  367 +++++++++++++
+ 8 files changed, 1593 insertions(+)
+ create mode 100644 hw/net/can/xlnx-zynqmp-can.c
+ create mode 100644 include/hw/net/xlnx-zynqmp-can.h
+ create mode 100644 tests/qtest/xlnx-can-test.c
 
->> +
->> +			shift = (dma->iova - unmap->iova) >> pgshift;
->> +			if (shift)
->> +				bitmap_shift_left(temp_bitmap, temp_bitmap,
->> +						  shift, npages);
->> +			bitmap_or(final_bitmap, final_bitmap, temp_bitmap,
->> +				  shift + npages);
->> +			memset(temp_bitmap, 0, bitmap->size);
->> +		}
-> 
-> It seems like if the per vfio_dma dirty bitmap was oversized by a long
-> that we could shift it in place, then we'd only need one working bitmap
-> buffer and we could size that to fit the vfio_dma (or the largest
-> vfio_dma if we don't want to free and re-alloc for each vfio_dma).
-> We'd need to do more copy_to/from_user()s, but we'd also avoid copying
-> between sparse mappings (user zero'd bitmap required) and we'd have a
-> far more reasonable memory usage.  Thanks,
->
+--
+2.7.4
 
-I thought about it, but couldn't optimize to use one bitmap buffer.
-This case will only hit during migration with vIOMMU enabled.
-Can we keep these 2 bitmap buffers for now and optimize it later?
-
-Thanks,
-Kirti
 
