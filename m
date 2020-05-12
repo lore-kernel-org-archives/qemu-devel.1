@@ -2,105 +2,81 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CC46CA90AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 19:52:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22481C2D0F7
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 19:56:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8146206DD
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 19:52:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aG64mT1G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8146206DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E5C48206DD
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 19:56:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5C48206DD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYaxN-0000Q1-W0
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 15:52:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49688)
+	id 1jYb0m-00024q-39
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 15:56:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50480)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jYauA-0004Ne-8o
- for qemu-devel@nongnu.org; Tue, 12 May 2020 15:49:30 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:24546
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jYau5-00023n-Ui
- for qemu-devel@nongnu.org; Tue, 12 May 2020 15:49:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589312964;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=yGv3GMmE+g3aMbzkin35pFeW8TH7QWSRs77egYnH7RY=;
- b=aG64mT1G9c/RWWamppO7+rf0Jdskfguk+lqM/MNGRx/FTwj3wV9k2Rifbw3TtTNIgTDi1A
- 24D1B53nFNYDxeQ/YAPJq3/zggI7pwLjOeuTdw7rtA/7iwW+AD086v8V/vjkOHPuHy6Hif
- LMsGbJXLCEH2/R+kSWFQR5Ov1wwqAl4=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-265-zXgJuxTUOKWbGarUJwqM4g-1; Tue, 12 May 2020 15:49:22 -0400
-X-MC-Unique: zXgJuxTUOKWbGarUJwqM4g-1
-Received: by mail-wr1-f70.google.com with SMTP id 90so7352446wrg.23
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 12:49:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=yGv3GMmE+g3aMbzkin35pFeW8TH7QWSRs77egYnH7RY=;
- b=tKdY/BBNuJQ7LBsPepAbcSv/MnK0vXnAdPVOzneszW4328jGe4iA8ihQdxRBTyvEtv
- KIdsBr1IYXLxkhpOzmEDj1ohsGbjixLjgkvtJ0ztbWlBLVsnBm6nG+8mBmm8xm9WNezu
- 5axUPdbpydjtQqJfJYGZC7p47amel298Q3qhL3LHYtpU3gGNgNcnfoD8QfV8uNznJKvS
- 5wfiUwXdG/mwhfQZdGhsvV/tjVpmHCKAksfN/PPi58AhepKmXq7eNyN45Mm+taQPLNsX
- 36w5zYtqhnsICBeWeU/b8DdpdZ69LaDS5ZbuLnfMBLx+0zqqiSkEeSiAsWU4MSJ+JlZP
- wN2Q==
-X-Gm-Message-State: AGi0Puaj9zu1PuBKLrpx5L7rJZZwP1LKBKYehFE9/D4WdCW8MCY/iWK8
- 6H/8uAWYFOYw470QOVcfIsav4h+KBM7+NoyUChvgOeeUkXPkKotK2/Fsjnr5CHh9bMQFzGoxzsH
- ZsnIWHVEGnXiflkI=
-X-Received: by 2002:a1c:acc8:: with SMTP id
- v191mr33624988wme.128.1589312960877; 
- Tue, 12 May 2020 12:49:20 -0700 (PDT)
-X-Google-Smtp-Source: APiQypLPV5Hzvc/pJi8F9SfFATYOIWwd86c8hA8vfuJU2cSN+MThTLzXj0RiOAhfsmzbGQ9A235PDQ==
-X-Received: by 2002:a1c:acc8:: with SMTP id
- v191mr33624959wme.128.1589312960527; 
- Tue, 12 May 2020 12:49:20 -0700 (PDT)
-Received: from localhost.localdomain (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id 128sm27215506wme.39.2020.05.12.12.49.19
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 12 May 2020 12:49:19 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] hw/ide: Make IDEDMAOps handlers take a const IDEDMA pointer
-Date: Tue, 12 May 2020 21:49:17 +0200
-Message-Id: <20200512194917.15807-1-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jYb0A-0001R8-BG
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 15:55:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41140)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jYb08-0007Q1-Un
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 15:55:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jYb06-0008OK-Ua
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 19:55:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id E67422E8030
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 19:55:38 +0000 (UTC)
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 01:41:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 12 May 2020 19:45:58 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1878255@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: a1xndr philmd
+X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+References: <158930780033.13046.17639068194138488918.malonedeb@wampee.canonical.com>
+Message-Id: <158931275813.12860.10374861459999103547.malone@wampee.canonical.com>
+Subject: [Bug 1878255] Re: Assertion failure in bdrv_aio_cancel, through ide
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="013b6f2a3f3ba130b50b9eee1a89957ee38a5c15";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: b9a7e786153640278867c4fc107164891b926d26
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 11:25:43
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -109,240 +85,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Reply-To: Bug 1878255 <1878255@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Handlers don't need to modify the IDEDMA structure.
-Make it const.
+(gdb) fr 4
+#4  0x000056378b63e3aa in ide_reset (s=3D0x56378d64d730) at hw/ide/core.c:1=
+318
+1318            blk_aio_cancel(s->pio_aiocb);
+(gdb) p *s->pio_aiocb
+$1 =3D {aiocb_info =3D 0x56378bb55520 <blk_aio_em_aiocb_info>, bs =3D 0x0, =
+cb =3D 0x56378b63d9f8 <ide_flush_cb>, opaque =3D 0x56378d64d730, refcnt =3D=
+ 2}
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- include/hw/ide/internal.h | 12 ++++++------
- hw/ide/ahci.c             | 18 +++++++++---------
- hw/ide/core.c             |  6 +++---
- hw/ide/macio.c            |  6 +++---
- hw/ide/pci.c              | 12 ++++++------
- 5 files changed, 27 insertions(+), 27 deletions(-)
+void bdrv_aio_cancel(BlockAIOCB *acb)
+{
+    qemu_aio_ref(acb);
+    bdrv_aio_cancel_async(acb);
+    while (acb->refcnt > 1) {
+        if (acb->aiocb_info->get_aio_context) {
+            ...
+        } else if (acb->bs) {
+            ...
+        } else {
+            abort();
+        }
 
-diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
-index 55da35d768..1a7869e85d 100644
---- a/include/hw/ide/internal.h
-+++ b/include/hw/ide/internal.h
-@@ -322,12 +322,12 @@ typedef enum { IDE_HD, IDE_CD, IDE_CFATA } IDEDriveKind;
- 
- typedef void EndTransferFunc(IDEState *);
- 
--typedef void DMAStartFunc(IDEDMA *, IDEState *, BlockCompletionFunc *);
--typedef void DMAVoidFunc(IDEDMA *);
--typedef int DMAIntFunc(IDEDMA *, bool);
--typedef int32_t DMAInt32Func(IDEDMA *, int32_t len);
--typedef void DMAu32Func(IDEDMA *, uint32_t);
--typedef void DMAStopFunc(IDEDMA *, bool);
-+typedef void DMAStartFunc(const IDEDMA *, IDEState *, BlockCompletionFunc *);
-+typedef void DMAVoidFunc(const IDEDMA *);
-+typedef int DMAIntFunc(const IDEDMA *, bool);
-+typedef int32_t DMAInt32Func(const IDEDMA *, int32_t len);
-+typedef void DMAu32Func(const IDEDMA *, uint32_t);
-+typedef void DMAStopFunc(const IDEDMA *, bool);
- 
- struct unreported_events {
-     bool eject_request;
-diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-index 13d91e109a..168d34e9f2 100644
---- a/hw/ide/ahci.c
-+++ b/hw/ide/ahci.c
-@@ -44,7 +44,7 @@ static int handle_cmd(AHCIState *s, int port, uint8_t slot);
- static void ahci_reset_port(AHCIState *s, int port);
- static bool ahci_write_fis_d2h(AHCIDevice *ad);
- static void ahci_init_d2h(AHCIDevice *ad);
--static int ahci_dma_prepare_buf(IDEDMA *dma, int32_t limit);
-+static int ahci_dma_prepare_buf(const IDEDMA *dma, int32_t limit);
- static bool ahci_map_clb_address(AHCIDevice *ad);
- static bool ahci_map_fis_address(AHCIDevice *ad);
- static void ahci_unmap_clb_address(AHCIDevice *ad);
-@@ -1338,7 +1338,7 @@ out:
- }
- 
- /* Transfer PIO data between RAM and device */
--static void ahci_pio_transfer(IDEDMA *dma)
-+static void ahci_pio_transfer(const IDEDMA *dma)
- {
-     AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
-     IDEState *s = &ad->port.ifs[0];
-@@ -1397,7 +1397,7 @@ out:
-     }
- }
- 
--static void ahci_start_dma(IDEDMA *dma, IDEState *s,
-+static void ahci_start_dma(const IDEDMA *dma, IDEState *s,
-                            BlockCompletionFunc *dma_cb)
- {
-     AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
-@@ -1406,7 +1406,7 @@ static void ahci_start_dma(IDEDMA *dma, IDEState *s,
-     dma_cb(s, 0);
- }
- 
--static void ahci_restart_dma(IDEDMA *dma)
-+static void ahci_restart_dma(const IDEDMA *dma)
- {
-     /* Nothing to do, ahci_start_dma already resets s->io_buffer_offset.  */
- }
-@@ -1415,7 +1415,7 @@ static void ahci_restart_dma(IDEDMA *dma)
-  * IDE/PIO restarts are handled by the core layer, but NCQ commands
-  * need an extra kick from the AHCI HBA.
-  */
--static void ahci_restart(IDEDMA *dma)
-+static void ahci_restart(const IDEDMA *dma)
- {
-     AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
-     int i;
-@@ -1432,7 +1432,7 @@ static void ahci_restart(IDEDMA *dma)
-  * Called in DMA and PIO R/W chains to read the PRDT.
-  * Not shared with NCQ pathways.
-  */
--static int32_t ahci_dma_prepare_buf(IDEDMA *dma, int32_t limit)
-+static int32_t ahci_dma_prepare_buf(const IDEDMA *dma, int32_t limit)
- {
-     AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
-     IDEState *s = &ad->port.ifs[0];
-@@ -1453,7 +1453,7 @@ static int32_t ahci_dma_prepare_buf(IDEDMA *dma, int32_t limit)
-  * Called via dma_buf_commit, for both DMA and PIO paths.
-  * sglist destruction is handled within dma_buf_commit.
-  */
--static void ahci_commit_buf(IDEDMA *dma, uint32_t tx_bytes)
-+static void ahci_commit_buf(const IDEDMA *dma, uint32_t tx_bytes)
- {
-     AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
- 
-@@ -1461,7 +1461,7 @@ static void ahci_commit_buf(IDEDMA *dma, uint32_t tx_bytes)
-     ad->cur_cmd->status = cpu_to_le32(tx_bytes);
- }
- 
--static int ahci_dma_rw_buf(IDEDMA *dma, bool is_write)
-+static int ahci_dma_rw_buf(const IDEDMA *dma, bool is_write)
- {
-     AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
-     IDEState *s = &ad->port.ifs[0];
-@@ -1486,7 +1486,7 @@ static int ahci_dma_rw_buf(IDEDMA *dma, bool is_write)
-     return 1;
- }
- 
--static void ahci_cmd_done(IDEDMA *dma)
-+static void ahci_cmd_done(const IDEDMA *dma)
- {
-     AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
- 
-diff --git a/hw/ide/core.c b/hw/ide/core.c
-index 689bb36409..d997a78e47 100644
---- a/hw/ide/core.c
-+++ b/hw/ide/core.c
-@@ -2570,16 +2570,16 @@ static void ide_init1(IDEBus *bus, int unit)
-                                            ide_sector_write_timer_cb, s);
- }
- 
--static int ide_nop_int(IDEDMA *dma, bool is_write)
-+static int ide_nop_int(const IDEDMA *dma, bool is_write)
- {
-     return 0;
- }
- 
--static void ide_nop(IDEDMA *dma)
-+static void ide_nop(const IDEDMA *dma)
- {
- }
- 
--static int32_t ide_nop_int32(IDEDMA *dma, int32_t l)
-+static int32_t ide_nop_int32(const IDEDMA *dma, int32_t l)
- {
-     return 0;
- }
-diff --git a/hw/ide/macio.c b/hw/ide/macio.c
-index a9f25e5d02..5b8098268d 100644
---- a/hw/ide/macio.c
-+++ b/hw/ide/macio.c
-@@ -376,17 +376,17 @@ static void macio_ide_reset(DeviceState *dev)
-     ide_bus_reset(&d->bus);
- }
- 
--static int ide_nop_int(IDEDMA *dma, bool is_write)
-+static int ide_nop_int(const IDEDMA *dma, bool is_write)
- {
-     return 0;
- }
- 
--static int32_t ide_nop_int32(IDEDMA *dma, int32_t l)
-+static int32_t ide_nop_int32(const IDEDMA *dma, int32_t l)
- {
-     return 0;
- }
- 
--static void ide_dbdma_start(IDEDMA *dma, IDEState *s,
-+static void ide_dbdma_start(const IDEDMA *dma, IDEState *s,
-                             BlockCompletionFunc *cb)
- {
-     MACIOIDEState *m = container_of(dma, MACIOIDEState, dma);
-diff --git a/hw/ide/pci.c b/hw/ide/pci.c
-index 97347f07f1..5e85c4ad17 100644
---- a/hw/ide/pci.c
-+++ b/hw/ide/pci.c
-@@ -103,7 +103,7 @@ const MemoryRegionOps pci_ide_data_le_ops = {
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
- 
--static void bmdma_start_dma(IDEDMA *dma, IDEState *s,
-+static void bmdma_start_dma(const IDEDMA *dma, IDEState *s,
-                             BlockCompletionFunc *dma_cb)
- {
-     BMDMAState *bm = DO_UPCAST(BMDMAState, dma, dma);
-@@ -126,7 +126,7 @@ static void bmdma_start_dma(IDEDMA *dma, IDEState *s,
-  * IDEState.io_buffer_size will contain the number of bytes described
-  * by the PRDs, whether or not we added them to the sglist.
-  */
--static int32_t bmdma_prepare_buf(IDEDMA *dma, int32_t limit)
-+static int32_t bmdma_prepare_buf(const IDEDMA *dma, int32_t limit)
- {
-     BMDMAState *bm = DO_UPCAST(BMDMAState, dma, dma);
-     IDEState *s = bmdma_active_if(bm);
-@@ -181,7 +181,7 @@ static int32_t bmdma_prepare_buf(IDEDMA *dma, int32_t limit)
- }
- 
- /* return 0 if buffer completed */
--static int bmdma_rw_buf(IDEDMA *dma, bool is_write)
-+static int bmdma_rw_buf(const IDEDMA *dma, bool is_write)
- {
-     BMDMAState *bm = DO_UPCAST(BMDMAState, dma, dma);
-     IDEState *s = bmdma_active_if(bm);
-@@ -230,7 +230,7 @@ static int bmdma_rw_buf(IDEDMA *dma, bool is_write)
-     return 1;
- }
- 
--static void bmdma_set_inactive(IDEDMA *dma, bool more)
-+static void bmdma_set_inactive(const IDEDMA *dma, bool more)
- {
-     BMDMAState *bm = DO_UPCAST(BMDMAState, dma, dma);
- 
-@@ -242,7 +242,7 @@ static void bmdma_set_inactive(IDEDMA *dma, bool more)
-     }
- }
- 
--static void bmdma_restart_dma(IDEDMA *dma)
-+static void bmdma_restart_dma(const IDEDMA *dma)
- {
-     BMDMAState *bm = DO_UPCAST(BMDMAState, dma, dma);
- 
-@@ -257,7 +257,7 @@ static void bmdma_cancel(BMDMAState *bm)
-     }
- }
- 
--static void bmdma_reset(IDEDMA *dma)
-+static void bmdma_reset(const IDEDMA *dma)
- {
-     BMDMAState *bm = DO_UPCAST(BMDMAState, dma, dma);
- 
--- 
-2.21.3
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1878255
+
+Title:
+  Assertion failure in bdrv_aio_cancel, through ide
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+  While fuzzing, I found an input that triggers an assertion failure in bdr=
+v_aio_cancel, through ide:
+
+  #1  0x00007ffff685755b in __GI_abort () at abort.c:79
+  #2  0x0000555556a8d396 in bdrv_aio_cancel (acb=3D0x607000061290) at /home=
+/alxndr/Development/qemu/block/io.c:2746
+  #3  0x0000555556a58525 in blk_aio_cancel (acb=3D0x2) at /home/alxndr/Deve=
+lopment/qemu/block/block-backend.c:1540
+  #4  0x0000555556552f5b in ide_reset (s=3D<optimized out>) at /home/alxndr=
+/Development/qemu/hw/ide/core.c:1318
+  #5  0x0000555556552aeb in ide_bus_reset (bus=3D0x62d000017398) at /home/a=
+lxndr/Development/qemu/hw/ide/core.c:2422
+  #6  0x0000555556579ba5 in ahci_reset_port (s=3D<optimized out>, port=3D<o=
+ptimized out>) at /home/alxndr/Development/qemu/hw/ide/ahci.c:650
+  #7  0x000055555657bd8d in ahci_port_write (s=3D0x61e000014d70, port=3D0x2=
+, offset=3D<optimized out>, val=3D0x10) at /home/alxndr/Development/qemu/hw=
+/ide/ahci.c:360
+  #8  0x000055555657bd8d in ahci_mem_write (opaque=3D<optimized out>, addr=
+=3D<optimized out>, val=3D<optimized out>, size=3D<optimized out>) at /home=
+/alxndr/Development/qemu/hw/ide/ahci.c:513
+  #9  0x00005555560028d7 in memory_region_write_accessor (mr=3D<optimized o=
+ut>, addr=3D<optimized out>, value=3D<optimized out>, size=3D<optimized out=
+>, shift=3D<optimized out>, mask=3D<optimized out>, attrs=3D...) at /home/a=
+lxndr/Development/qemu/memory.c:483
+  #10 0x0000555556002280 in access_with_adjusted_size (addr=3D<optimized ou=
+t>, value=3D<optimized out>, size=3D<optimized out>, access_size_min=3D<opt=
+imized out>, access_size_max=3D<optimized out>, access_fn=3D<optimized out>=
+, mr=3D0x61e000014da0, attrs=3D...) at /home/alxndr/Development/qemu/memory=
+.c:544
+  #11 0x0000555556002280 in memory_region_dispatch_write (mr=3D<optimized o=
+ut>, addr=3D<optimized out>, data=3D0x10, op=3D<optimized out>, attrs=3D...=
+) at /home/alxndr/Development/qemu/memory.c:1476
+  #12 0x0000555555f171d4 in flatview_write_continue (fv=3D<optimized out>, =
+addr=3D0xe106c22c, attrs=3D..., ptr=3D<optimized out>, len=3D0x1, addr1=3D0=
+x7fffffffb8d0, l=3D<optimized out>, mr=3D0x61e000014da0) at /home/alxndr/De=
+velopment/qemu/exec.c:3137
+  #13 0x0000555555f0fb98 in flatview_write (fv=3D0x60600003b180, addr=3D<op=
+timized out>, attrs=3D..., buf=3D<optimized out>, len=3D<optimized out>) at=
+ /home/alxndr/Development/qemu/exec.c:3177
+
+  I can reproduce it in qemu 5.0 using:
+
+  cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -qtes=
+t stdio -monitor none -serial none -M pc-q35-5.0  -nographic
+  outl 0xcf8 0x8000fa24
+  outl 0xcfc 0xe106c000
+  outl 0xcf8 0x8000fa04
+  outw 0xcfc 0x7
+  outl 0xcf8 0x8000fb20
+  write 0x0 0x3 0x2780e7
+  write 0xe106c22c 0xd 0x1130c218021130c218021130c2
+  write 0xe106c218 0x15 0x110010110010110010110010110010110010110010
+  EOF
+
+  I also attached the commands to this launchpad report, in case the
+  formatting is broken:
+
+  qemu-system-i386 -qtest stdio -monitor none -serial none -M pc-q35-5.0
+  -nographic < attachment
+
+  Please let me know if I can provide any further info.
+  -Alex
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1878255/+subscriptions
 
