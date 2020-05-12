@@ -2,100 +2,63 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DATE_IN_FUTURE_06_12,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0814BC54E4B
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:14:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAD26C54E4B
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:16:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4BFB206D6
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:14:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UwnggoSX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4BFB206D6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id A3FFC206D6
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:16:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3FFC206D6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYP7A-0004p5-V4
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 03:14:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54610)
+	id 1jYP9q-0006sw-RE
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 03:16:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jYP6M-0003q5-Vh
- for qemu-devel@nongnu.org; Tue, 12 May 2020 03:13:18 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50552)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jYP6M-0001NI-7U
- for qemu-devel@nongnu.org; Tue, 12 May 2020 03:13:18 -0400
-Received: by mail-wm1-x343.google.com with SMTP id m12so15596890wmc.0
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 00:13:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=8Tpjpzqsyr0qnvQFIMx9eflKHn9l+Kxq50/tB7dHrTg=;
- b=UwnggoSXopm0slcQ66mn2rJHPdMVI542+9XGiQ4+guI3UzJKLpjNBGSXketXgfGecF
- K65u//awtkxzeqJBlrvecHLvvGQnQ3wGKFkueMyGY5tf9+3Pbw03a6SP4C/NkdGonBve
- lCXLtS11qtKuE2T7Buy3enCpGGQkNwBC08v6HdqLeaImV9VzzwVAmT21dsxeaWOTJ7Y0
- obfnq+Wy3K9kK67ydBO7nbpXkCmGZyaJT2MWPcnBuXFzlRpSRAgqmwJ9Hs9/J7kcyYS6
- pzq5ZNhdBQcPMyFtDIqROC3JCZlMxEYirV20Nfjdq958JMzhh8Nrv1RFaD+LTJ1DaYWl
- gHRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=8Tpjpzqsyr0qnvQFIMx9eflKHn9l+Kxq50/tB7dHrTg=;
- b=M6Tmghm0FaQNbEqjE9Quuo4uwoX6CM0lzbxu1nbfVAqARDuG2ah/jYR2CS7zjbvrXG
- 66QjGNnu+NoGqwKDwGGdSiu4n+EYin9GLW9qvm2VCcyToe8YW3Vb4V378Bgnnc57RArI
- T73xJmPggwGWGeF4hwZJOWiNhTJ4pbsn51t3PqeKYY9OSVZDjyLFQj8/Xq+V/DWFbtD/
- y8vQdsi8viEtbDORMIrFgR1cEigcjYkDVJpif4yvEzkRwUTLeuqdYMgClspX3S4KKJ9O
- PQuzl93vUAB27HPaBUXq9yz0dWbQr2fWGERHyUWrAvPqf/UGpr0E7STLjxEZ0uGbsi7F
- BxfQ==
-X-Gm-Message-State: AGi0PubUne/8MkGQblDoc6ywsosvHxnfx6LGie8P0S9hTuzP7MTN52ED
- ckwz00l3qpjJHcDomnlccCVSA+QONkg=
-X-Google-Smtp-Source: APiQypJ0R7LinfLKwQwZZUUHp3v5H+bSlrwxfHBah+/XXSy1n5eyKcWoHuGPCC5ENRjLN6wGDmbT1g==
-X-Received: by 2002:a05:600c:290d:: with SMTP id
- i13mr20435004wmd.81.1589267594422; 
- Tue, 12 May 2020 00:13:14 -0700 (PDT)
-Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id a24sm29999339wmb.24.2020.05.12.00.13.13
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 12 May 2020 00:13:13 -0700 (PDT)
-Subject: Re: [RFC PATCH 0/3] hw/net/tulip: Fix LP#1874539
-To: Jason Wang <jasowang@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-References: <20200423231644.15786-1-f4bug@amsat.org>
- <20200424152722.GA14573@ls3530.fritz.box>
- <1f04b513-eece-baa7-5556-4665afe1f637@redhat.com>
- <CAFEAcA-vJXRcjNPnyB5t4UOrmH5wnUoZsx-JAwDYNavQ_L64XQ@mail.gmail.com>
- <24b9c9a3-a0b6-2d9b-eade-dbc43bd71ff4@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ed40763d-93c7-643d-51aa-4b36396c7c58@amsat.org>
-Date: Tue, 12 May 2020 09:13:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
+ id 1jYP8u-0006PH-VB
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 03:15:56 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3763 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
+ id 1jYP8r-0001rj-Mw
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 03:15:56 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 3561BED1A72B48253AD3;
+ Tue, 12 May 2020 15:15:43 +0800 (CST)
+Received: from opensource.huawei.com (10.175.100.98) by
+ DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
+ 14.3.487.0; Tue, 12 May 2020 15:15:35 +0800
+From: Pan Nengyuan <pannengyuan@huawei.com>
+To: <pbonzini@redhat.com>, <rth@twiddle.net>, <ehabkost@redhat.com>,
+ <mtosatti@redhat.com>
+Subject: [PATCH] i386/kvm: fix a use-after-free when vcpu plug/unplug
+Date: Tue, 12 May 2020 09:39:33 -0400
+Message-ID: <20200512133933.8696-1-pannengyuan@huawei.com>
+X-Mailer: git-send-email 2.18.2
 MIME-Version: 1.0
-In-Reply-To: <24b9c9a3-a0b6-2d9b-eade-dbc43bd71ff4@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain
+X-Originating-IP: [10.175.100.98]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.191;
+ envelope-from=pannengyuan@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 03:15:43
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -22
+X-Spam_score: -2.3
+X-Spam_bar: --
+X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DATE_IN_FUTURE_06_12=1.947,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,43 +71,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Helge Deller <deller@gmx.de>, Sven Schnelle <svens@stackframe.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: euler.robot@huawei.com, Pan Nengyuan <pannengyuan@huawei.com>,
+ qemu-devel@nongnu.org, kvm@vger.kernel.org, zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Jason,
+When we hotplug vcpus, cpu_update_state is added to vm_change_state_head
+in kvm_arch_init_vcpu(). But it forgot to delete in kvm_arch_destroy_vcpu() after
+unplug. Then it will cause a use-after-free access. This patch delete it in
+kvm_arch_destroy_vcpu() to fix that.
 
-On 4/27/20 5:32 AM, Jason Wang wrote:
-> On 2020/4/26 下午3:57, Peter Maydell wrote:
->> On Sun, 26 Apr 2020 at 03:50, Jason Wang<jasowang@redhat.com>  wrote:
->>
->>> Looks good to me.
->>>
->>> Would you please send a formal patch and cc Peter.
->>>
->>> Consider we are about to release 5.0, it's better for him to apply the
->>> patch directly.
->> I am not applying any further patches for 5.0 unless they come
->> with an attached rock-solid justification for why we should
->> delay the release again for them.
->>
->> thanks
->> -- PMM
-> 
-> 
-> Ok.
-> 
-> I will queue that patch for 5.1.
+Reproducer:
+    virsh setvcpus vm1 4 --live
+    virsh setvcpus vm1 2 --live
+    virsh suspend vm1
+    virsh resume vm1
 
-Can you queue patches #1 and #2?
+The UAF stack:
+==qemu-system-x86_64==28233==ERROR: AddressSanitizer: heap-use-after-free on address 0x62e00002e798 at pc 0x5573c6917d9e bp 0x7fff07139e50 sp 0x7fff07139e40
+WRITE of size 1 at 0x62e00002e798 thread T0
+    #0 0x5573c6917d9d in cpu_update_state /mnt/sdb/qemu/target/i386/kvm.c:742
+    #1 0x5573c699121a in vm_state_notify /mnt/sdb/qemu/vl.c:1290
+    #2 0x5573c636287e in vm_prepare_start /mnt/sdb/qemu/cpus.c:2144
+    #3 0x5573c6362927 in vm_start /mnt/sdb/qemu/cpus.c:2150
+    #4 0x5573c71e8304 in qmp_cont /mnt/sdb/qemu/monitor/qmp-cmds.c:173
+    #5 0x5573c727cb1e in qmp_marshal_cont qapi/qapi-commands-misc.c:835
+    #6 0x5573c7694c7a in do_qmp_dispatch /mnt/sdb/qemu/qapi/qmp-dispatch.c:132
+    #7 0x5573c7694c7a in qmp_dispatch /mnt/sdb/qemu/qapi/qmp-dispatch.c:175
+    #8 0x5573c71d9110 in monitor_qmp_dispatch /mnt/sdb/qemu/monitor/qmp.c:145
+    #9 0x5573c71dad4f in monitor_qmp_bh_dispatcher /mnt/sdb/qemu/monitor/qmp.c:234
 
-> 
-> Thanks
-> 
-> 
->>
-> 
-> 
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+---
+ target/i386/cpu.h | 1 +
+ target/i386/kvm.c | 5 ++++-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index e818fc712a..afbd11b7a3 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1631,6 +1631,7 @@ struct X86CPU {
+ 
+     CPUNegativeOffsetState neg;
+     CPUX86State env;
++    VMChangeStateEntry *vmsentry;
+ 
+     uint64_t ucode_rev;
+ 
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 4901c6dd74..ff2848357e 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1770,7 +1770,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+         }
+     }
+ 
+-    qemu_add_vm_change_state_handler(cpu_update_state, env);
++    cpu->vmsentry = qemu_add_vm_change_state_handler(cpu_update_state, env);
+ 
+     c = cpuid_find_entry(&cpuid_data.cpuid, 1, 0);
+     if (c) {
+@@ -1883,6 +1883,9 @@ int kvm_arch_destroy_vcpu(CPUState *cs)
+         env->nested_state = NULL;
+     }
+ 
++    qemu_del_vm_change_state_handler(cpu->vmsentry);
++    cpu->vmsentry = NULL;
++
+     return 0;
+ }
+ 
+-- 
+2.18.2
+
 
