@@ -2,105 +2,88 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E2EC54E4A
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 13:42:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69D66C54E4A
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 13:47:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 975CC206D3
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 13:42:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30A70206CC
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 13:47:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JEYeKKrs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 975CC206D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KavdgEOT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30A70206CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYVBS-0005Ay-RX
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 09:42:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49878)
+	id 1jYVFX-0007MK-DS
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 09:47:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50398)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jYVAo-0004gI-6j
- for qemu-devel@nongnu.org; Tue, 12 May 2020 09:42:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47714
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jYVAn-0001MI-D7
- for qemu-devel@nongnu.org; Tue, 12 May 2020 09:42:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589290936;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jHDZ0dZUDN5xzAOYR2TX3jZY7ONTt7muSwuHPSyJsms=;
- b=JEYeKKrsJAA5Uf6nBxRd9SiHydRmrJSRX1JO3q0BPLXEIgOBBE/Gc6kI/8bqqTsWeUpafu
- /rxdSpq6gp1LxT22QdtIUJyUqopdHEMLgSIhHwWzKD3Zmqy6GO6bafOptaExqkGgNGvjZw
- 6IcDttWlr/0ULoGK214N8BLeHy8bvkY=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-506-63rlDJA1PTiuEH7wo6E0cw-1; Tue, 12 May 2020 09:42:14 -0400
-X-MC-Unique: 63rlDJA1PTiuEH7wo6E0cw-1
-Received: by mail-wr1-f69.google.com with SMTP id p2so5052222wrm.6
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 06:42:14 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jYVEh-0006cz-Dc
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 09:46:19 -0400
+Received: from mail-oo1-xc41.google.com ([2607:f8b0:4864:20::c41]:46403)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jYVEg-0002QQ-9k
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 09:46:18 -0400
+Received: by mail-oo1-xc41.google.com with SMTP id x16so2711858oop.13
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 06:46:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=nUJDNAQXQcaIWONQyykONY5kjqq//opk+gXJWcH43ys=;
+ b=KavdgEOTyXDFnkQn/dT24zNPNSOoAZM04whbOUWQlNMPOqo6kWDfnZW9W82muSf4Nc
+ 2Ehq+NPLGDNh/U/TYHouBltKMcFoUfaYeINZRo/U8gxB/XV9pMSjJ0PuqEiqn6fjnXLV
+ pGFnEZZWk+ZLZ25aDCbBvU9bSbc1KMXuT3oFZGeXnbpWwttmRGlpdazMEnoLctWqeqHm
+ hM3Po2ZHMWhPBVqecugStFSBbqZlQVt4KY4j93oPqHmjBt1rPKWb1ObF8zjHQ1/q9OPM
+ 5+YQBfSkRK9wuSIVM2xYP+K2aZi/GDRzM7pJuPtDyj4bkof06HXmf2PqWWiBv4xFhrVf
+ eVbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=jHDZ0dZUDN5xzAOYR2TX3jZY7ONTt7muSwuHPSyJsms=;
- b=ra+eqoy5nv/AfXXztnX7UOfV4EguESeyJjznu029GGqfpyQ7acbP1+m+Kc2OVvINSz
- 3lH7fiJPMitvRrLC5hdp9AJjSZGbH+nzCQf47n6qgBogo+nfpALV8hcFQfN8kllfDZyu
- BsEogK7rJKpLv7omULdOOFeo5RWN1jl/TcDPZ89f5Y1XmFqDHQNxeQYgpVwPMpUPWfsW
- Gk2qgnf9kII2z7RPPewiDBIiaYJvAGFk3RwuSEGuNm5KV5j2DmIbubW/Hfqid7XAJYEZ
- 2YOw0JGmpciTdeA3lYvhmHI4w1VmdfTQRufQk5hsfvCItUy/hKSoMr/xGNUAX7DvW9JM
- /r6w==
-X-Gm-Message-State: AGi0PuZcrLXcx/j7gUmI++PlXuovXvbgQ6np/BrfEET5cJkNnBVyyAbL
- dOv1XnnNl8kODo0SfZU3va+iLPPgqKDcwN2eXekK20pQON2eiP31T8gAe+AitL9rEXxU2mpGEmC
- GiT5VrRiOEqtm5Nk=
-X-Received: by 2002:a05:6000:1048:: with SMTP id
- c8mr25169614wrx.1.1589290933429; 
- Tue, 12 May 2020 06:42:13 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJnYy947JbrXNEqDxc5jmujq/e+Pgo8OsMW48uOCXmiBtgJtr+Lu5Az4Mqew4CpLPwFKobu+g==
-X-Received: by 2002:a05:6000:1048:: with SMTP id
- c8mr25169595wrx.1.1589290933189; 
- Tue, 12 May 2020 06:42:13 -0700 (PDT)
-Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id a67sm33861249wmc.30.2020.05.12.06.42.12
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 12 May 2020 06:42:12 -0700 (PDT)
-Subject: Re: [PATCH 0/2] use unsigned type for MegasasState fields
-To: P J P <ppandit@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
-References: <20200507105718.1319187-1-ppandit@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <26201c24-c483-85a7-2f4b-b3cc56d4b8b7@redhat.com>
-Date: Tue, 12 May 2020 15:42:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=nUJDNAQXQcaIWONQyykONY5kjqq//opk+gXJWcH43ys=;
+ b=hDDxD4oZqH3zy+WtyvTvxliRQRS5GSEQcIIQ4ba8IPlu8iV1kESEdAbbL60RKSLmxB
+ Gj5XNsEdrXoXPJqsSXhevM22OHeg73WgYqjx/+a3SC41gXMXY63r8nD4+T86sjcQoRqO
+ ripVsIGyuEZcYZEl2nVTRMfSR8ssFtaX0/9Qr0BkcGPV89/wpBoymv647fpg4HM174jU
+ NCyhiKHXPFeBLKxVxJF7N5WUP2ZFIVLVGFaWIvVG4uAPimYlztQJfGvAHowEHzQFVjpK
+ 1PKp/n9zGtaVpqK1tfn5UGG9QqWCHipreb6diR5D+zbL9otNIt7m7zQ7cbGo7DhLnV7P
+ gC5g==
+X-Gm-Message-State: AGi0PuaJy1h1cmBdHFcU7nNp+AoPQgOUZiOYQRAh9mTXC2cTgPhg1IIQ
+ UpMxEOHucvOoro/sC9i9o5qlqDH/soKS2sEF615xfQ==
+X-Google-Smtp-Source: APiQypI0pu/IrUCwNQStXj+6A3en+d+1fEXixgRK2vHypN3Ulcs2ybtDpIIaBB+kvI+Vsz+JjlNOHS7q/JkgtqSZZaE=
+X-Received: by 2002:a4a:3556:: with SMTP id w22mr12203220oog.20.1589291176827; 
+ Tue, 12 May 2020 06:46:16 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200507105718.1319187-1-ppandit@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 02:02:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+References: <20200508152200.6547-1-richard.henderson@linaro.org>
+ <20200508152200.6547-3-richard.henderson@linaro.org>
+ <CAFEAcA9q6ZJqEzgfSTgLiFp0a708yhGjrEGArqhCKUQDVp8XLg@mail.gmail.com>
+In-Reply-To: <CAFEAcA9q6ZJqEzgfSTgLiFp0a708yhGjrEGArqhCKUQDVp8XLg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 12 May 2020 14:46:05 +0100
+Message-ID: <CAFEAcA9=yrvEZGRW0rj_1UyRQd0VFYCq7OWtN8ePGvsBajkaFQ@mail.gmail.com>
+Subject: Re: [PATCH v3 02/16] target/arm: Create gen_gvec_{u,s}{rshr,rsra}
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c41;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc41.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -114,37 +97,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
- Prasad J Pandit <pjp@fedoraproject.org>, Ren Ding <rding@gatech.edu>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc'ing Marc-André our signed/unsigned conversion expert (with Paolo).
+On Tue, 12 May 2020 at 14:09, Peter Maydell <peter.maydell@linaro.org> wrot=
+e:
+>
+> On Fri, 8 May 2020 at 16:22, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+> >
+> > Create vectorized versions of handle_shri_with_rndacc
+> > for shift+round and shift+round+accumulate.  Add out-of-line
+> > helpers in preparation for longer vector lengths from SVE.
+> >
+> > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> > +    /* tszimm encoding produces immediates in the range [1..esize] */
+> > +    tcg_debug_assert(shift > 0);
+>
+> This assert can be triggered:
 
-On 5/7/20 12:57 PM, P J P wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
-> 
-> Hello,
-> 
-> * This series fixes an OOB access issue which may occur when a guest user
->    sets 's->reply_queue_head' field to a negative(or large positive) value,
->    via 'struct mfi_init_qinfo' object in megasas_init_firmware().
+(well, not this assert, but the equivalent one in gen_gvec_ursra)
 
-Do you have a reproducer?
+=EF=BB=BF=EF=BB=BF
+> > +static void gen_srshr_vec(unsigned vece, TCGv_vec d, TCGv_vec a, int64=
+_t sh)
+> > +{
+> > +    TCGv_vec t =3D tcg_temp_new_vec_matching(d);
+> > +    TCGv_vec ones =3D tcg_temp_new_vec_matching(d);
+> > +
+> > +    tcg_gen_shri_vec(vece, t, a, sh - 1);
+> > +    tcg_gen_dupi_vec(vece, ones, 1);
+> > +    tcg_gen_and_vec(vece, t, t, ones);
+> > +    tcg_gen_sari_vec(vece, d, a, sh);
+> > +    tcg_gen_add_vec(vece, d, d, t);
+> > +
+> > +    tcg_temp_free_vec(t);
+> > +    tcg_temp_free_vec(ones);
+> > +}
 
-> 
-> * Second patch updates other numeric fields of MegasasState to unsigned type.
-> 
-> Thank you.
-> ---
-> Prasad J Pandit (2):
->    megasas: use unsigned type for reply_queue_head
->    megasas: use unsigned type for positive numeric fields
-> 
->   hw/scsi/megasas.c | 40 ++++++++++++++++++++--------------------
->   1 file changed, 20 insertions(+), 20 deletions(-)
-> 
++void gen_gvec_srshr(unsigned vece, uint32_t rd_ofs, uint32_t rm_ofs,
++                    int64_t shift, uint32_t opr_sz, uint32_t max_sz)
++{
++    static const TCGOpcode vecop_list[] =3D {
++        INDEX_op_shri_vec, INDEX_op_sari_vec, INDEX_op_add_vec, 0
++    };
+=EF=BB=BF=EF=BB=BF=EF=BB=BF
+Is there documentation somewhere of which vector operations don't
+need to be listed in the vecop list? Here gen_srshr_vec() also
+uses 'dupi_vec' and 'and_vec', which aren't listed, presumably
+because we guarantee them to be implemented? (Hopefully we don't
+encounter a future host vector architecture which breaks that
+assumption :-))
 
+> > @@ -5269,6 +5685,28 @@ static int disas_neon_data_insn(DisasContext *s,=
+ uint32_t insn)
+> >                      }
+> >                      return 0;
+> >
+> > +                case 2: /* VRSHR */
+> > +                    /* Right shift comes here negative.  */
+> > +                    shift =3D -shift;
+> > +                    if (u) {
+> > +                        gen_gvec_urshr(size, rd_ofs, rm_ofs, shift,
+> > +                                       vec_size, vec_size);
+> > +                    } else {
+> > +                        gen_gvec_srshr(size, rd_ofs, rm_ofs, shift,
+> > +                                       vec_size, vec_size);
+> > +                    }
+> > +                    return 0;
+> > +
+> > +                case 3: /* VRSRA */
+> > +                    if (u) {
+> > +                        gen_gvec_ursra(size, rd_ofs, rm_ofs, shift,
+> > +                                       vec_size, vec_size);
+> > +                    } else {
+> > +                        gen_gvec_srsra(size, rd_ofs, rm_ofs, shift,
+> > +                                       vec_size, vec_size);
+> > +                    }
+> > +                    return 0;
+>
+> I think the VRSRA case needs the same "shift =3D -shift" as VRSHR.
+
+With this bug fixed,
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
 
