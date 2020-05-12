@@ -6,38 +6,38 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98DF6C2D0F7
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 17:02:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D17DCA90AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 17:03:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71D45206B8
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 17:02:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71D45206B8
+	by mail.kernel.org (Postfix) with ESMTPS id 31FB1206B8
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 17:03:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31FB1206B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYYIp-0007HM-J1
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 13:02:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52446)
+	id 1jYYJ8-00084g-AO
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 13:03:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52400)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYY7k-0005On-P7; Tue, 12 May 2020 12:51:20 -0400
-Received: from relay.sw.ru ([185.231.240.75]:50582)
+ id 1jYY7S-0004oj-Uz; Tue, 12 May 2020 12:51:02 -0400
+Received: from relay.sw.ru ([185.231.240.75]:50528)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYY7j-0001RD-3a; Tue, 12 May 2020 12:51:20 -0400
+ id 1jYY7P-0001R5-9P; Tue, 12 May 2020 12:51:02 -0400
 Received: from dhcp-172-16-25-136.sw.ru ([172.16.25.136] helo=localhost.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYY7D-0004nT-6W; Tue, 12 May 2020 19:50:47 +0300
+ id 1jYY7C-0004nT-Sg; Tue, 12 May 2020 19:50:46 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v4 09/15] block: prepare block-stream for using COR-filter
-Date: Tue, 12 May 2020 19:50:39 +0300
-Message-Id: <1589302245-893269-10-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v4 06/15] block: Use CAFs in block status functions
+Date: Tue, 12 May 2020 19:50:36 +0300
+Message-Id: <1589302245-893269-7-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1589302245-893269-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1589302245-893269-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -70,80 +70,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch is the first one in the series where the COR-filter node
-will be hard-coded for using in the block-stream job. The block jobs
-may be run in parallel. Exclude conflicts with filter nodes used for
-a concurrent job while checking for the blocked operations. It incurs
-changes in the iotests 030::test_overlapping_4 that now passes with no
-conflict because the stream job does not have a real dependency on its
-base and on a filter above it.
+From: Max Reitz <mreitz@redhat.com>
 
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Use the child access functions in the block status inquiry functions as
+appropriate.
+
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- blockdev.c             | 11 +++++++++--
- tests/qemu-iotests/030 |  9 ++++-----
- 2 files changed, 13 insertions(+), 7 deletions(-)
+ block/io.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index b3c840e..97c2ba2 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2763,6 +2763,7 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-     Error *local_err = NULL;
-     const char *base_name = NULL;
-     int job_flags = JOB_DEFAULT;
-+    BlockDriverState *bottom_cow_node;
+diff --git a/block/io.c b/block/io.c
+index 7d30e61..47d8096 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -2387,11 +2387,12 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+     if (ret & (BDRV_BLOCK_DATA | BDRV_BLOCK_ZERO)) {
+         ret |= BDRV_BLOCK_ALLOCATED;
+     } else if (want_zero) {
++        BlockDriverState *cow_bs = bdrv_filtered_cow_bs(bs);
++
+         if (bdrv_unallocated_blocks_are_zero(bs)) {
+             ret |= BDRV_BLOCK_ZERO;
+-        } else if (bs->backing) {
+-            BlockDriverState *bs2 = bs->backing->bs;
+-            int64_t size2 = bdrv_getlength(bs2);
++        } else if (cow_bs) {
++            int64_t size2 = bdrv_getlength(cow_bs);
  
-     if (!has_on_error) {
-         on_error = BLOCKDEV_ON_ERROR_REPORT;
-@@ -2807,8 +2808,14 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-         base_name = base_bs->filename;
+             if (size2 >= 0 && offset >= size2) {
+                 ret |= BDRV_BLOCK_ZERO;
+@@ -2457,7 +2458,7 @@ static int coroutine_fn bdrv_co_block_status_above(BlockDriverState *bs,
+     bool first = true;
+ 
+     assert(bs != base);
+-    for (p = bs; p != base; p = backing_bs(p)) {
++    for (p = bs; p != base; p = bdrv_filtered_bs(p)) {
+         ret = bdrv_co_block_status(p, want_zero, offset, bytes, pnum, map,
+                                    file);
+         if (ret < 0) {
+@@ -2543,7 +2544,7 @@ int bdrv_block_status_above(BlockDriverState *bs, BlockDriverState *base,
+ int bdrv_block_status(BlockDriverState *bs, int64_t offset, int64_t bytes,
+                       int64_t *pnum, int64_t *map, BlockDriverState **file)
+ {
+-    return bdrv_block_status_above(bs, backing_bs(bs),
++    return bdrv_block_status_above(bs, bdrv_filtered_bs(bs),
+                                    offset, bytes, pnum, map, file);
+ }
+ 
+@@ -2553,9 +2554,9 @@ int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t offset,
+     int ret;
+     int64_t dummy;
+ 
+-    ret = bdrv_common_block_status_above(bs, backing_bs(bs), false, offset,
+-                                         bytes, pnum ? pnum : &dummy, NULL,
+-                                         NULL);
++    ret = bdrv_common_block_status_above(bs, bdrv_filtered_bs(bs), false,
++                                         offset, bytes, pnum ? pnum : &dummy,
++                                         NULL, NULL);
+     if (ret < 0) {
+         return ret;
+     }
+@@ -2618,7 +2619,7 @@ int bdrv_is_allocated_above(BlockDriverState *top,
+             break;
+         }
+ 
+-        intermediate = backing_bs(intermediate);
++        intermediate = bdrv_filtered_bs(intermediate);
      }
  
--    /* Check for op blockers in the whole chain between bs and base */
--    for (iter = bs; iter && iter != base_bs; iter = backing_bs(iter)) {
-+    bottom_cow_node = bdrv_find_overlay(bs, base_bs);
-+    if (!bottom_cow_node) {
-+        error_setg(errp, "bottom node is not found, nothing to stream");
-+        goto out;
-+    }
-+    /* Check for op blockers in the whole chain between bs and bottom */
-+    for (iter = bs; iter && iter != bdrv_filtered_bs(bottom_cow_node);
-+         iter = bdrv_filtered_bs(iter)) {
-         if (bdrv_op_is_blocked(iter, BLOCK_OP_TYPE_STREAM, errp)) {
-             goto out;
-         }
-diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-index 104e3ce..d7638cd 100755
---- a/tests/qemu-iotests/030
-+++ b/tests/qemu-iotests/030
-@@ -368,8 +368,7 @@ class TestParallelOps(iotests.QMPTestCase):
-         self.wait_until_completed(drive='commit-drive0')
- 
-     # In this case the base node of the stream job is the same as the
--    # top node of commit job. Since this results in the commit filter
--    # node being part of the stream chain, this is not allowed.
-+    # top node of commit job.
-     def test_overlapping_4(self):
-         self.assert_no_active_block_jobs()
- 
-@@ -381,13 +380,13 @@ class TestParallelOps(iotests.QMPTestCase):
- 
-         # Stream from node2 into node4
-         result = self.vm.qmp('block-stream', device='node4', base_node='node2', job_id='node4')
--        self.assert_qmp(result, 'error/desc',
--            "Cannot freeze 'backing' link to 'commit-filter'")
-+        self.assert_qmp(result, 'return', {})
- 
-         result = self.vm.qmp('block-job-set-speed', device='drive0', speed=0)
-         self.assert_qmp(result, 'return', {})
- 
--        self.wait_until_completed()
-+        self.vm.run_job(job='drive0', auto_dismiss=True)
-+        self.vm.run_job(job='node4', auto_dismiss=True)
-         self.assert_no_active_block_jobs()
- 
-     # In this case the base node of the stream job is the commit job's
+     *pnum = n;
 -- 
 1.8.3.1
 
