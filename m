@@ -2,66 +2,91 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.5 required=3.0 tests=HK_RANDOM_FROM,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AD0BC2D0F7
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 21:02:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 989C6C2D0F7
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 21:07:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 102B520740
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 21:02:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 102B520740
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 5CBDD20769
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 21:07:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H9aYp186"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CBDD20769
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYc2k-0004dc-7K
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 17:02:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59232)
+	id 1jYc7Z-0003x7-Gw
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 17:07:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59706)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jYc1x-00044c-W6
- for qemu-devel@nongnu.org; Tue, 12 May 2020 17:01:38 -0400
-Received: from relay64.bu.edu ([128.197.228.104]:46483)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jYc1w-0000lY-HG
- for qemu-devel@nongnu.org; Tue, 12 May 2020 17:01:37 -0400
-X-Envelope-From: alxndr@bu.edu
-X-BU-AUTH: mozz.bu.edu [128.197.127.33]
-Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
- bits=0)
- by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 04CL0QDe017529
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
- Tue, 12 May 2020 17:00:30 -0400
-Date: Tue, 12 May 2020 17:00:26 -0400
-From: Alexander Bulekov <alxndr@bu.edu>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH 0/2] use unsigned type for MegasasState fields
-Message-ID: <20200512210025.zy4uvbskybilap3q@mozz.bu.edu>
-References: <20200507105718.1319187-1-ppandit@redhat.com>
- <26201c24-c483-85a7-2f4b-b3cc56d4b8b7@redhat.com>
- <nycvar.YSQ.7.76.2005122357030.1451610@xnncv>
- <20200512190803.o6vr2shjmhsplsjx@mozz.bu.edu>
- <20200512194759.nb42yurlnynr5yrw@mozz.bu.edu>
- <810b7ee0-e3eb-cd08-887a-df97a8576c9c@redhat.com>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jYc57-0007N1-MX
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 17:04:53 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44569
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jYc55-000198-L1
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 17:04:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589317490;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=P9B0sbw1X4GyXzJiRg7w3Q0mw8vV5uc72qRScrO7Jxw=;
+ b=H9aYp186kwZGrHr46qqRxX7GYV48F7CDsZqHYMzS51egLrlVDyW4Q8AaORMO8HUmM16woY
+ yeJmRikyQ7N7rZ4NllG5PleXYZ78vmWadzLwcNCWw0B9xs048SYddLcI2gGHgg6g4/VlJN
+ hq058mdSvHNN+J4tw3B9CeMvDw46PlI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-397-okk4afP3Ob2hR8yT9KPLoQ-1; Tue, 12 May 2020 17:04:46 -0400
+X-MC-Unique: okk4afP3Ob2hR8yT9KPLoQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FFDC18FF660;
+ Tue, 12 May 2020 21:04:45 +0000 (UTC)
+Received: from [10.3.116.145] (ovpn-116-145.phx2.redhat.com [10.3.116.145])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 494B310027A6;
+ Tue, 12 May 2020 21:04:36 +0000 (UTC)
+Subject: Re: [PATCH v3 7/9] qcow2: Expose bitmaps' size during measure
+To: Nir Soffer <nsoffer@redhat.com>
+References: <20200508180340.675712-1-eblake@redhat.com>
+ <20200508180340.675712-8-eblake@redhat.com>
+ <CAMRbyytP9LvMVJ1R1EEnjHJGKOXtOYg_=ywqn-yVDLBeqFff4g@mail.gmail.com>
+ <d0c62eef-acf6-0996-4928-1836940e2901@redhat.com>
+ <1a9f1d01-5b9a-ac35-334e-1fe090682621@redhat.com>
+ <CAMRbyyu=Q-EZoQcY8_JUQQOvMQ+K7W22wRf+BX+tGbShWweNYA@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <ec6180be-7f1b-d230-71c1-1d624e3008e7@redhat.com>
+Date: Tue, 12 May 2020 16:04:35 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <CAMRbyyu=Q-EZoQcY8_JUQQOvMQ+K7W22wRf+BX+tGbShWweNYA@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <810b7ee0-e3eb-cd08-887a-df97a8576c9c@redhat.com>
-User-Agent: NeoMutt/20180716
-Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
- helo=relay64.bu.edu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 17:01:35
-X-ACL-Warn: Detected OS   = Linux 2.6.x
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
- RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 17:04:50
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -75,148 +100,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, QEMU Developers <qemu-devel@nongnu.org>,
- P J P <ppandit@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Ren Ding <rding@gatech.edu>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 200512 2259, Philippe Mathieu-Daudé wrote:
-> On 5/12/20 9:48 PM, Alexander Bulekov wrote:
-> > Oops I realized I posted a bad stacktrace and a bad reproducer :)
-> > Fixed stacktrace:
-> > 
-> > ==20527==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x7f79f968a5e0 at pc 0x55b6bb84ce28 bp 0x7ffcbca04eb0 sp 0x7ffcbca04ea8
-> > READ of size 8 at 0x7f79f968a5e0 thread T0
-> > 
-> > #0 0x55fbeb2bdafc in megasas_lookup_frame /home/alxndr/Development/qemu-bugs/qemu2/qemu/hw/scsi/megasas.c:449:30
-> > #1 0x55fbeb27caa9 in megasas_handle_abort /home/alxndr/Development/qemu-bugs/qemu2/qemu/hw/scsi/megasas.c:1904:17
-> > #2 0x55fbeb26cb77 in megasas_handle_frame /home/alxndr/Development/qemu-bugs/qemu2/qemu/hw/scsi/megasas.c:1961:24
-> > #3 0x55fbeb267b78 in megasas_mmio_write /home/alxndr/Development/qemu-bugs/qemu2/qemu/hw/scsi/megasas.c:2122:9
-> > #4 0x55fbe90b117b in memory_region_write_accessor /home/alxndr/Development/qemu-bugs/qemu2/qemu/memory.c:496:5
-> > #5 0x55fbe90b05e4 in access_with_adjusted_size /home/alxndr/Development/qemu-bugs/qemu2/qemu/memory.c:557:18
-> > #6 0x55fbe90ae177 in memory_region_dispatch_write /home/alxndr/Development/qemu-bugs/qemu2/qemu/memory.c:1488:16
-> > #7 0x55fbe8d97325 in flatview_write_continue /home/alxndr/Development/qemu-bugs/qemu2/qemu/exec.c:3174:23
-> > 
-> > Fixed reproducer (tested on qemu 5.0 built with ASAN with these patches):
-> 
-> Is this the one reported as LP#1878259?
-> "Null-pointer dereference in megasas_handle_frame"
-> https://bugs.launchpad.net/qemu/+bug/1878259
+On 5/12/20 3:35 PM, Nir Soffer wrote:
 
-I don't think so, though they may be related, of course.
-
-> > 
-> > cat << EOF | qemu-system-i386 -qtest stdio -nographic -monitor none \
-> > -serial none -M q35 -device megasas -device scsi-cd,drive=null0 \
-> > -blockdev driver=null-co,read-zeroes=on,node-name=null0 -nographic
-> > outl 0xcf8 0x80001814
-> > outl 0xcfc 0xc021
-> > outl 0xcf8 0x80001818
-> > outl 0xcf8 0x80001804
-> > outw 0xcfc 0x7
-> > outl 0xcf8 0x80001810
-> > outl 0xcfc 0xe10c0000
-> > outl 0xcf8 0x8000f810
-> > write 0x0 0x18 0x060017e1ff00f8ffffffff60efffffffffffffffffffffff
-> > write 0xff00 0x1 0x06
-> > write 0xc021e10c0040 0x81 0x755e08ff0000845e08ff0000935e08ff0000a25e08ff0000b15e08ff0000c05e08ff0000cf5e08ff0000de5e08ff0000ed5e08ff0000fc5e08ff00000b5e08ff00001a5e08ff0000295e08ff0000385e08ff0000475e08ff0000565e08ff0000655e08ff0000745e08ff0000835e08ff0000925e08ff0000a15e08ff0000b05e08
-> > -M pc-q35-5.0 -no-shutdown -M q35 -device megasas -device scsi-cd,drive=null0 -blockdev driver=null-co,read-zeroes=on,node-name=null0 -nographic
-> > 
-> > EOF
-> > 
-> > On 200512 1508, Alexander Bulekov wrote:
-> > > Hello Prasad,
-> > > I noticed this since I found a similar issue recently, using a fuzzer.
-> > > I applied your patches, but I can still reproduce the heap-overflow,
-> > > unless I'm missing something:
-> > > 
-> > > ==20527==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x7f79f968a5e0 at pc 0x55b6bb84ce28 bp 0x7ffcbca04eb0 sp 0x7ffcbca04ea8
-> > > READ of size 8 at 0x7f79f968a5e0 thread T0
-> > >      #0 0x55fbeb2bdafc in megasas_lookup_frame /home/alxndr/Development/qemu-bugs/qemu2/qemu/hw/scsi/megasas.c:449:30
-> > >      #0 0x55b6bb84ce27 in megasas_lookup_frame (/home/alxndr/Development/qemu/build/i386-softmmu/qemu-system-i386+0x1c1fe27)
-> > >      #1 0x55b6bb82f3e4 in megasas_handle_abort (/home/alxndr/Development/qemu/build/i386-softmmu/qemu-system-i386+0x1c023e4)
-> > >      #2 0x55b6bb8293df in megasas_handle_frame (/home/alxndr/Development/qemu/build/i386-softmmu/qemu-system-i386+0x1bfc3df)
-> > >      #3 0x55b6bb8275eb in megasas_mmio_write (/home/alxndr/Development/qemu/build/i386-softmmu/qemu-system-i386+0x1bfa5eb)
-> > >      #4 0x55b6bab5c864 in memory_region_write_accessor (/home/alxndr/Development/qemu/build/i386-softmmu/qemu-system-i386+0xf2f864)
-> > >      #5 0x55b6bab5c239 in access_with_adjusted_size (/home/alxndr/Development/qemu/build/i386-softmmu/qemu-system-i386+0xf2f239)
-> > >      #6 0x55b6bab5ada5 in memory_region_dispatch_write (/home/alxndr/Development/qemu/build/i386-softmmu/qemu-system-i386+0xf2dda5)
-> > >      #7 0x55b6ba994bf3 in flatview_write_continue (/home/alxndr/Development/qemu/build/i386-softmmu/qemu-system-i386+0xd67bf3)
-> > >      #8 0x55b6ba984ad8 in flatview_write (/home/alxndr/Development/qemu/build/i386-softmmu/qemu-system-i386+0xd57ad8)
-> > >      #1 0x55fbeb27caa9 in megasas_handle_abort /home/alxndr/Development/qemu-bugs/qemu2/qemu/hw/scsi/megasas.c:1904:17
-> > >      #2 0x55fbeb26cb77 in megasas_handle_frame /home/alxndr/Development/qemu-bugs/qemu2/qemu/hw/scsi/megasas.c:1961:24
-> > >      #3 0x55fbeb267b78 in megasas_mmio_write /home/alxndr/Development/qemu-bugs/qemu2/qemu/hw/scsi/megasas.c:2122:9
-> > >      #4 0x55fbe90b117b in memory_region_write_accessor /home/alxndr/Development/qemu-bugs/qemu2/qemu/memory.c:496:5
-> > >      #5 0x55fbe90b05e4 in access_with_adjusted_size /home/alxndr/Development/qemu-bugs/qemu2/qemu/memory.c:557:18
-> > >      #6 0x55fbe90ae177 in memory_region_dispatch_write /home/alxndr/Development/qemu-bugs/qemu2/qemu/memory.c:1488:16
-> > >      #7 0x55fbe8d97325 in flatview_write_continue /home/alxndr/Development/qemu-bugs/qemu2/qemu/exec.c:3174:23
-> > > 
-> > > To reproduce:
-> > > cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -qtest stdio -nographic -monitor none -serial none  -M q35 -device megasas -device scsi-cd,drive=null0 -blockdev driver=null-co,read-zeroes=on,node-name=null0 -nographic
-> > > outl 0xcf8 0x80001814
-> > > outl 0xcfc 0xc021
-> > > outl 0xcf8 0x80001818
-> > > outl 0xcf8 0x80001804
-> > > outw 0xcfc 0x7
-> > > outl 0xcf8 0x80001810
-> > > outl 0xcfc 0xe10c0000
-> > > outl 0xcf8 0x8000f810
-> > > write 0x0 0x18 0x060017e1ff00f8ffffffff60efffffffffffffffffffffff
-> > > write 0xff00 0x1 0x06
-> > > write 0xc021e10c0040 0x81 0x755e08ff0000845e08ff0000935e08ff0000a25e08ff0000b15e08ff0000c05e08ff0000cf5e08ff0000de5e08ff0000ed5e08ff0000fc5e08ff00000b5e08ff00001a5e08ff0000295e08ff0000385e08ff0000475e08ff0000565e08ff0000655e08ff0000745e08ff0000835e08ff0000925e08ff0000a15e08ff0000b05e08
-> > > -M pc-q35-5.0 -no-shutdown -M q35 -device megasas -device scsi-cd,drive=null0 -blockdev driver=null-co,read-zeroes=on,node-name=null0 -nographic
-> > > EOF
-> > > 
-> > > -Alex
-> > > 
-> > > On 200513 0007, P J P wrote:
-> > > > +-- On Tue, 12 May 2020, Philippe Mathieu-Daudé wrote --+
-> > > > | Cc'ing Marc-André our signed/unsigned conversion expert (with Paolo).
-> > > > 
-> > > >    megasas_init_firmware
-> > > >      pa_lo = le32_to_cpu(initq->pi_addr_lo);
-> > > >      pa_hi = le32_to_cpu(initq->pi_addr_hi);
-> > > >      s->producer_pa = ((uint64_t) pa_hi << 32) | pa_lo;
-> > > >      s->reply_queue_head = ldl_le_pci_dma(pcid, s->producer_pa);
-> > > > 
-> > > > IIUC, here ldl_le_pci_dma() returns an 'uint32_t' type, but since
-> > > > 'reply_queue_head' is a signed int, large 'uint32_t' value turns negative.
-> > > > 
-> > > > | Do you have a reproducer?
-> > > > 
-> > > >    Yes, there is a reproducer with ASAN, though it did not work for me.
-> > > > Ren(CC'd) had shared this trace:
-> > > > 
-> > > > AddressSanitizer: heap-buffer-overflow on address 0x7f9159054058 at pc 0x55763514b5cd bp 0x7f9179bd6d90 sp 0x7f9179bd6d88
-> > > > READ of size 8 at 0x7f9159054058 thread T2
-> > > >    #0 0x55763514b5cc in megasas_lookup_frame /home/ren/tmp/redacted-dbg/qemu/hw/scsi/megasas.c:449:30
-> > > >    #1 0x55763513205c in megasas_handle_abort /home/ren/tmp/redacted-dbg/qemu/hw/scsi/megasas.c:1904:17
-> > > >    #2 0x55763512d0f8 in megasas_handle_frame /home/ren/tmp/redacted-dbg/qemu/hw/scsi/megasas.c:1961:24
-> > > >    #3 0x55763512ba7d in megasas_mmio_write /home/ren/tmp/redacted-dbg/qemu/hw/scsi/megasas.c:2122:9
-> > > >    #4 0x55763515247c in megasas_port_write /home/ren/tmp/redacted-dbg/qemu/hw/scsi/megasas.c:2173:5
-> > > >    #5 0x557634621b3b in memory_region_write_accessor /home/ren/tmp/redacted-dbg/qemu/memory.c:483:5
-> > > >    #6 0x557634621741 in access_with_adjusted_size /home/ren/tmp/redacted-dbg/qemu/memory.c:544:18
-> > > >    #7 0x557634620498 in memory_region_dispatch_write /home/ren/tmp/redacted-dbg/qemu/memory.c:1482:16
-> > > >    #8 0x5576344b6b6c in flatview_write_continue /home/ren/tmp/redacted-dbg/qemu/exec.c:3161:23
-> > > >    #9 0x5576344a87d9 in flatview_write /home/ren/tmp/redacted-dbg/qemu/exec.c:3201:14
-> > > >    #10 0x5576344a8376 in address_space_write /home/ren/tmp/redacted-dbg/qemu/exec.c:3291:18
-> > > >    #11 0x5576344a8af4 in address_space_rw /home/ren/tmp/redacted-dbg/qemu/exec.c:3301:16
-> > > >    #12 0x557634689e10 in kvm_handle_io /home/ren/tmp/redacted-dbg/qemu/accel/kvm/kvm-all.c:2086:9
-> > > >    #13 0x557634688a45 in kvm_cpu_exec /home/ren/tmp/redacted-dbg/qemu/accel/kvm/kvm-all.c:2332:13
-> > > >    #14 0x5576345ee7aa in qemu_kvm_cpu_thread_fn /home/ren/tmp/redacted-dbg/qemu/cpus.c:1299:17
-> > > >    #15 0x557635a11509 in qemu_thread_start /home/ren/tmp/redacted-dbg/qemu/util/qemu-thread-posix.c:519:9
-> > > >    #16 0x7f918cec26b9 in start_thread (/lib/x86_64-linux-gnu/libpthread.so.0+0x76b9)
-> > > >    #17 0x7f918c5d441c in clone /build/glibc-LK5gWL/glibc-2.23/misc/../sysdeps/unix/sysv/linux/x86_64/clone.S:109
-> > > > 
-> > > > 
-> > > > Thank you.
-> > > > --
-> > > > Prasad J Pandit / Red Hat Product Security Team
-> > > > 8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
-> > > 
-> > > 
-> > 
+>> First, a usage question: would you rather that 'qemu-img convert
+>> --bitmaps' silently succeeds even when the image being converted has no
+>> bitmaps, or would you rather that it fails loudly when there are no
+>> bitmaps to be copied over?
 > 
+> I think the meaning of --bitmaps should be "copy also bitmaps".
+> 
+> This request makes sense only for qcow2 images, since other images do
+> not have bitmaps, so failing loudly when the source format does not support
+> bitmaps seems right.
+> 
+> Same for the target format does not support bitmaps, this is invalid request
+> and it should fail loudly.
+> 
+> If the source and target are qcow2, and there are no bitmaps in source, I don't
+> see any reason to fail. We don't want to check if an image has bitmaps before
+> we copy the image, it does not help us.
+> 
+>> As implemented in this patch series, patch 8
+>> currently silently succeeds.
+> 
+> Sounds good for qcow2 format.
+
+So, to make sure I'm clear, you'll be happy with something like:
+
+- no source
+$ qemu-img measure --bitmaps -O qcow2 1G
+error: --bitmaps requires source file
+
+- src cannot support bitmaps
+$ qemu-img measure --bitmaps -f raw -O qcow2 file.raw
+error: raw source does not support bitmaps
+$ qemu-img measure -f raw -O qcow2 file.raw
+success, totals are unchanged (since there are no bitmaps)
+$ qemu-img convert --bitmaps -f raw -O qcow2 file.raw file.qcow2
+error: raw source does not support bitmaps
+
+- dest cannot support bitmaps
+$ qemu-img measure --bitmaps -f qcow2 -O raw file.qcow2
+error: raw destination does not support bitmaps
+$ qemu-img measure -f qcow2 -O raw file.qcow2
+success, totals are unchanged (since there are no bitmaps)
+$ qemu-img convert --bitmaps -f qcow2 -O raw file.qcow2 file.raw
+error: raw destination does not support bitmaps
+
+- another way dest cannot support bitmaps
+$ qemu-img convert --bitmaps -f qcow2 -O qcow2 -o compat=0.10 \
+   src.qcow2 dst.qcow2
+error: v2 qcow2 destination does not support bitmaps
+
+- src and dest support bitmaps, but there are none
+$ qemu-img measure --bitmaps -f qcow2 -O qcow2 file.qcow2
+success, no modification to totals since no bitmaps to copy
+$ qemu-img measure -f qcow2 -O qcow2 file.qcow2
+success, separate line item for 'bitmap size: 0'
+$ qemu-img convert --bitmaps -f qcow2 -O qcow2 src.qcow2 dst.qcow2
+success, even though no bitmaps to copy
+
+- src and dest support bitmaps, and there are some
+$ qemu-img measure --bitmaps -f qcow2 -O qcow2 file.qcow2
+success, totals modified in place to include bitmaps without separate line
+$ qemu-img measure -f qcow2 -O qcow2 file.qcow2
+success, separate line item added for 'bitmap size: NNN'
+$ qemu-img convert --bitmaps -f qcow2 -O qcow2 src.qcow2 dst.qcow2
+success, and bitmaps were copied
+
+> 
+>> But in order to make patch 7 and 8
+>> consistent with one another, I need to know which behavior is easier to
+>> use: failing convert if the source lacks bitmaps (and thus measure would
+>> suppress the bitmaps:0 output), or treating lack of bitmaps as nothing
+>> additional to copy and thereby succeeding (and thus measure should
+>> output bitmaps:0 to show that no additional space is needed because
+>> nothing else will be copied, successfully).
+> 
+> I don't think showing "bitmaps: 0" in measure is related to how --bitmaps
+> behave in convert. If we will have --bitmaps in measure, we don't need to
+> show "bitmaps" at all since "required" will include it.
+
+Showing 'bitmaps: 0' in the QMP is how the CLI will know whether it was 
+an error to request measuring with bitmaps.
+
+> 
+> If we want to show bitmaps in measure, I think using the same logic is fine:
+> - if format does not support bitmaps - fail
+> - if format suppots bitmaps, show what we have - zero is valid result when
+>    image does not have any bitmap.
+
+More precisely, fail in QMP if either the source being measured cannot 
+support bitmaps at all, or if the destination that determines the 
+measurements cannot support bitmaps. But if both support bitmaps, then 
+the QMP will output 0 if there happen to be no bitmaps to copy, and the 
+CLI can add 'measure --bitmaps' to silently fold in a present bitmaps 
+number (be it 0 or non-zero) into the other fields, or error if QMP did 
+not include a bitmaps field.
+
+>> And then back to my question: should 'measure --bitmaps' fail if there
+>> are no bitmaps to be measured, or silently succeed and not change the
+>> output size?
+> 
+> For raw file yes (invalid request), for qcow2 file no, it should just
+> add 0 since this is the actual
+> size required for bitmaps in this image.
+
+Okay, that is slightly different than what Max was describing (which was 
+to output 'bitmaps: 0' in QMP even if the source is raw), but easy 
+enough to be consistent on, and as this is your feature request, I can 
+make v4 along those lines.
+
+> 
+>>>> With the current way, to measure an image we need to do:
+>>>>
+>>>> qemu-img info --output json ...
+>>>> check if image contains bitmaps
+>>>> qemu-img measure --output json ...
+>>>> check if bitmaps are reported.
+>>
+>> Why do you have to check 'qemu-img info' first?  If measure reports
+>> bitmaps, then you know bitmaps can be copied;
+> 
+> This works only if qemu-img measure will report "bitmaps": 0 when there
+> are no bitmaps. Otherwise I don't know if this version does not report bitmaps
+> because it does not understand them, or because there are no bitmaps.
+> 
+> Using qemu-img info I can tell the difference if measure does not report 0.
+
+But similarly, with the above rules, 'qemu-img measure --bitmaps' will 
+either fail because qemu is too old, or fail because the source format 
+cannot support bitmaps to be copied; and succeed if 'qemu-img convert 
+--bitmaps' will also succeed.  All without having to check 'qemu-img 
+info' to see if there were bitmaps.
+
+> 
+>> if it doesn't, then you
+>> can check info as a fallback path to compute size yourself - but
+>> computing the size yourself doesn't help unless you also have fallbacks
+>> to copy the bitmaps via QMP commands, because that qemu-img will also
+>> lack 'qemu-img convert --bitmaps' or 'qemu-img bitmaps' to do it via
+>> qemu-img.
+> 
+> When we started to work on this it was not clear that we will have a
+> way to measure
+> bitmaps. If we are going to have support both in convert and measure,
+> we can check
+> capability only in convert or only in measure.
+
+Yes, the point of this series is that it is an all-or-none improvement 
+to qemu-img: all of the bitmap manipulations you are wanting will be 
+included at the same time in qemu 5.1, and likely backported at the same 
+time by whatever downstream distros that want backports included. 
+Existing qemu-img 5.0 cannot manipulate bitmaps in any reasonable 
+manner, at most it has 'qemu-img info' that tells you that bitmaps 
+exist, but you're still stuck with a non-qemu-img fallback if there is 
+no qemu-img support for manipulating bitmaps at all (including the 
+fallback of just declaring incremental backups unsupported, and using 
+full backups instead).
+
+
+>>> (We could also let img_measure() in qemu-img add @bitmaps to @required
+>>> if --bitmaps was given, so we wouldn’t have to pass the bool around; but
+>>> I think letting qemu-img fix up a QAPI object filled by the block driver
+>>> sounds wrong.  (Because that means the block driver didn’t fill it
+>>> correctly.))
+>>
+>> If we only touch it up in the CLI, then we would have two forms of CLI
+>> output:
+>>
+>> $ qemu-img measure -f qcow2 image.qcow2
+>> required size: 8716288
+>> fully allocated size: 8716288
+>> bitmaps size: 1024
+>> $ qemu-img measure -f qcow2 image.qcow2 --bitmaps
+>> required size: 8717312
+>> fully allocated size: 8717312
+> 
+> I hope we will not have 2 forms. qemu-img is complicated enough ;-)
+
+2 forms is the easiest way to add it.  And it is not that hard to 
+explain.  Either you pass --bitmaps up front (no extra lines, but 
+success only if measure saw bitmap support, even if the bitmaps occupy 0 
+spze), or you don't pass --bitmaps up front (an extra bitmaps: line if 
+bitmaps are supported, even if the size is 0, and no change to existing 
+lines).  Just because 2 forms exist does not mean you are required to 
+use both forms.
+
+>> I'm leaning towards making v4 try a CLI-only 'measure --bitmaps', to see
+>> if I can speed the discussion along with concrete patches for comparison.
+> 
+> Thanks, that would be useful.
+
+Okay, that's the 2-form approach.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
