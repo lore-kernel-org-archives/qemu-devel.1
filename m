@@ -2,85 +2,90 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E9E3CA90AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 19:30:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 006D2CA90AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 19:34:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 286EA20731
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 19:30:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC24220731
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 19:34:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HtcL2BsF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 286EA20731
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="S0rwvBar"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC24220731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYabo-0006jl-Nc
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 15:30:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46882)
+	id 1jYag3-0001aZ-Ts
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 15:34:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47200)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jYab8-0006IO-Py
- for qemu-devel@nongnu.org; Tue, 12 May 2020 15:29:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54168
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jYab7-0000Tq-9z
- for qemu-devel@nongnu.org; Tue, 12 May 2020 15:29:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589311787;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=gmNWDb62fuyfkGKWf0p60j1p/gC3dNJPII2irB8HB4U=;
- b=HtcL2BsFySsfC4Y8tdcRKcyaHsi0LeTaBIRFb5rAN0i/hv9L2+iNOeL9rFKZJD/ElIaXcA
- gpTBGrdmdkItlZBZMTXiiDlvDiqyV4Yus/ufFnHLt0Ss/fNLX+bV+26GZADTvQU/1A+psL
- hWw5MrXV2h30jDQwRiapJ+KwnzcCOSE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-iT1BZAoEMB-QZCzR2zPbdA-1; Tue, 12 May 2020 15:29:44 -0400
-X-MC-Unique: iT1BZAoEMB-QZCzR2zPbdA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7EC10800688;
- Tue, 12 May 2020 19:29:43 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-74.ams2.redhat.com [10.36.114.74])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A98DA1CC;
- Tue, 12 May 2020 19:29:38 +0000 (UTC)
-Date: Tue, 12 May 2020 21:29:36 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Thomas Lamprecht <t.lamprecht@proxmox.com>
-Subject: Re: [RFC PATCH 2/3] block: Allow bdrv_run_co() from different
- AioContext
-Message-ID: <20200512192936.GM5951@linux.fritz.box>
-References: <20200512144318.181049-1-kwolf@redhat.com>
- <20200512144318.181049-3-kwolf@redhat.com>
- <47293da5-b5e5-e61f-753d-4d16712f6d12@proxmox.com>
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jYaeU-00008m-EJ
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 15:33:18 -0400
+Received: from mail-qv1-xf42.google.com ([2607:f8b0:4864:20::f42]:45332)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jYaeT-0001lh-5Q
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 15:33:17 -0400
+Received: by mail-qv1-xf42.google.com with SMTP id z9so4914356qvi.12
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 12:33:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=7CaZpTWka1C8MJsj1GeNh6KCoNtsbN5Y01Jpprc1T4w=;
+ b=S0rwvBarPnNDzRix+kua2HM1NFKmJhogx0BjZTo5SqKTmJQUgaM15fx+SY67/6loDF
+ nWyw0kdjwrAmfE+HVDGEpt7caxC2F8SkuJriPfoWjcqxkY9YuZ8e+fgsgT2M9OOUuBJr
+ SbgnkChqhk1grRgtOh1I8vfGBeX5p0KaG21BvvF/oiI8xtVY8BX+DRpke2JJGoJllrb9
+ G5XMAU2IZ1GbebnRu9PUN7arhdXCg31Zn9w6RZRCB1pV0LE2KTeQn3Cibsa++vx5M1mY
+ HqyDNrhIuuKyBzv9KqmDYNiZ/j/MuH44+X89XtjVy9GRl9+U72dUVh5sfL5ZxBxB504k
+ t8Vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=7CaZpTWka1C8MJsj1GeNh6KCoNtsbN5Y01Jpprc1T4w=;
+ b=PEPgzhS8rCUlZK9PyaqFu815WfvgeMt58RgopZPlHQCayOrRwN8KBwD8e4Qm0MsRMw
+ trN7hJgNL4Ysy695FPvMthd+hJfRVquWsU6xObV5E4hx8LHhTZ/OqOcM9V4luUbw15wE
+ LKE2P0LUjz20lpegTjMeQoAQsg8bZ/9dPdk0KHtOy+GmvxV8jPuUEcPcla8eV8Iy971x
+ 8IllyEPQR1UGdARCZ0FHfscX1TnGXnSMeXBMKlpEqYXw0y1sviOe0ucof6l67QMP38+y
+ FtOMJlow6RgZfIATblFrkiqqHGbmXruNuW5k+LEFO7UwAw5ag6D2IrYfF1xj0nG/vwvq
+ K5cQ==
+X-Gm-Message-State: AGi0Pubp79SSJ5ox8ND8ZTIq582EP4zp9dFeTbVqbpDal0fXHUthCJA8
+ t9+824shshpTJ/PkA57zgo3RaKAQ4Y89hg==
+X-Google-Smtp-Source: APiQypIXaZfPqs6F+LsmZYTlZDczUlWjVsBM9GlPcAmJorO56zqBA+sEa0boRSajGeeLNX+aAiSJ+A==
+X-Received: by 2002:a0c:ef05:: with SMTP id t5mr21451189qvr.113.1589311995399; 
+ Tue, 12 May 2020 12:33:15 -0700 (PDT)
+Received: from Rfoley-MA01.hsd1.ma.comcast.net
+ ([2601:199:4480:60c0:d31:9f53:b3eb:9b53])
+ by smtp.gmail.com with ESMTPSA id j45sm2100998qtk.14.2020.05.12.12.33.14
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 12 May 2020 12:33:14 -0700 (PDT)
+From: Robert Foley <robert.foley@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 0/9] tests/vm: Add support for aarch64 VMs
+Date: Tue, 12 May 2020 15:33:31 -0400
+Message-Id: <20200512193340.265-1-robert.foley@linaro.org>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <47293da5-b5e5-e61f-753d-4d16712f6d12@proxmox.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 02:02:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::f42;
+ envelope-from=robert.foley@linaro.org; helo=mail-qv1-xf42.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,62 +98,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, s.reiter@proxmox.com, qemu-devel@nongnu.org,
- armbru@redhat.com, stefanha@redhat.com, mreitz@redhat.com
+Cc: philmd@redhat.com, alex.bennee@linaro.org, robert.foley@linaro.org,
+ peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 12.05.2020 um 18:02 hat Thomas Lamprecht geschrieben:
-> On 5/12/20 4:43 PM, Kevin Wolf wrote:
-> > Coroutine functions that are entered through bdrv_run_co() are already
-> > safe to call from synchronous code in a different AioContext because
-> > bdrv_coroutine_enter() will schedule them in the context of the node.
-> > 
-> > However, the coroutine fastpath still requires that we're already in the
-> > right AioContext when called in coroutine context.
-> > 
-> > In order to make the behaviour more consistent and to make life a bit
-> > easier for callers, let's check the AioContext and automatically move
-> > the current coroutine around if we're not in the right context yet.
-> > 
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  block/io.c | 15 ++++++++++++++-
-> >  1 file changed, 14 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/block/io.c b/block/io.c
-> > index c1badaadc9..7808e8bdc0 100644
-> > --- a/block/io.c
-> > +++ b/block/io.c
-> > @@ -895,8 +895,21 @@ static int bdrv_run_co(BlockDriverState *bs, CoroutineEntry *entry,
-> >                         void *opaque, int *ret)
-> >  {
-> >      if (qemu_in_coroutine()) {
-> > -        /* Fast-path if already in coroutine context */
-> > +        Coroutine *self = qemu_coroutine_self();
-> > +        AioContext *bs_ctx = bdrv_get_aio_context(bs);
-> > +        AioContext *co_ctx = qemu_coroutine_get_aio_context(self);
-> > +
-> > +        if (bs_ctx != co_ctx) {
-> > +            /* Move to the iothread of the node */
-> > +            aio_co_schedule(bs_ctx, self);
-> > +            qemu_coroutine_yield();
-> > +        }
-> >          entry(opaque);
-> > +        if (bs_ctx != co_ctx) {
-> > +            /* Move back to the original AioContext */
-> > +            aio_co_schedule(bs_ctx, self);
-> 
-> shouldn't it use co_ctx here, as else it's just scheduled again on the
-> one from bs?
+This is version 6 of the patch series to
+add support for aarch64 VMs in the vm-build infrastructure.
+ - Ubuntu 18.04 aarch64 VM
+ - CentOS 8 aarch64 VM
 
-Oops, you're right, of course.
+v5: https://lists.gnu.org/archive/html/qemu-devel/2020-04/msg05692.html
 
-> Looks OK for me besides that.
+Changes in v6
+- Removed the use of the BOOT_CONSOLE option.  We were thinking about moving
+  this under the DEBUG=1 option, but decided to remove this since
+  we already have support for logging to a file, which can be used instead.
+- Went back to Ubuntu 18.04.  Still working on 20.04 issues and will plan on
+  a later patch to enable 20.04.
 
-Thanks!
+Robert Foley (9):
+  tests/vm: Add configuration to basevm.py
+  tests/vm: Added configuration file support
+  tests/vm: Pass --debug through for vm-boot-ssh.
+  tests/vm: Add ability to select QEMU from current build.
+  tests/vm: allow wait_ssh() to specify command
+  tests/vm: Added a new script for ubuntu.aarch64.
+  tests/vm: Added a new script for centos.aarch64.
+  tests/vm: change scripts to use self._config
+  tests/vm: Add workaround to consume console
 
-Kevin
+ configure                         |  25 +++
+ python/qemu/console_socket.py     | 162 ++++++++++++++++++
+ python/qemu/machine.py            |  23 ++-
+ tests/vm/Makefile.include         |  24 +++
+ tests/vm/aarch64vm.py             | 105 ++++++++++++
+ tests/vm/basevm.py                | 276 ++++++++++++++++++++++++------
+ tests/vm/centos-8-aarch64.ks      |  51 ++++++
+ tests/vm/centos.aarch64           | 227 ++++++++++++++++++++++++
+ tests/vm/conf_example_aarch64.yml |  51 ++++++
+ tests/vm/conf_example_x86.yml     |  50 ++++++
+ tests/vm/fedora                   |  17 +-
+ tests/vm/freebsd                  |  16 +-
+ tests/vm/netbsd                   |  19 +-
+ tests/vm/openbsd                  |  17 +-
+ tests/vm/ubuntu.aarch64           | 117 +++++++++++++
+ 15 files changed, 1089 insertions(+), 91 deletions(-)
+ create mode 100644 python/qemu/console_socket.py
+ create mode 100644 tests/vm/aarch64vm.py
+ create mode 100644 tests/vm/centos-8-aarch64.ks
+ create mode 100755 tests/vm/centos.aarch64
+ create mode 100644 tests/vm/conf_example_aarch64.yml
+ create mode 100644 tests/vm/conf_example_x86.yml
+ create mode 100755 tests/vm/ubuntu.aarch64
 
+--
+2.17.1
 
