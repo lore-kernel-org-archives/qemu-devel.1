@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 971E9C54E4B
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 05:06:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 835D8C54E8B
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 05:06:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A77A2072B
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 05:06:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A77A2072B
+	by mail.kernel.org (Postfix) with ESMTPS id 54D9B2072B
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 05:06:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54D9B2072B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYN7z-0000r2-Iv
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 01:06:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41176)
+	id 1jYN80-0000rs-Eq
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 01:06:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41178)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jYN6l-0007Y7-Vy
+ id 1jYN6m-0007YB-5C
  for qemu-devel@nongnu.org; Tue, 12 May 2020 01:05:36 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48548)
+Received: from indium.canonical.com ([91.189.90.7]:48532)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jYN6k-0005hM-TY
+ id 1jYN6k-0005hI-OK
  for qemu-devel@nongnu.org; Tue, 12 May 2020 01:05:35 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jYN6i-00020D-Pi
+ id 1jYN6i-0001zN-3C
  for <qemu-devel@nongnu.org>; Tue, 12 May 2020 05:05:32 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id BC6C12E8105
+ by loganberry.canonical.com (Postfix) with ESMTP id 0FFC12E8105
  for <qemu-devel@nongnu.org>; Tue, 12 May 2020 05:05:32 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 12 May 2020 04:58:31 -0000
+Date: Tue, 12 May 2020 04:58:06 -0000
 From: Alexander Bulekov <1878136@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -52,9 +52,8 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: a1xndr
 X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
 X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
-References: <158925948674.4440.10313531925488089499.malonedeb@soybean.canonical.com>
-Message-Id: <158925951232.11082.4634980856362328659.malone@wampee.canonical.com>
-Subject: [Bug 1878136] Re: Assertion failures in
+Message-Id: <158925948674.4440.10313531925488089499.malonedeb@soybean.canonical.com>
+Subject: [Bug 1878136] [NEW] Assertion failures in
  ati_reg_read_offs/ati_reg_write_offs
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -62,7 +61,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: e84b9be1c164e558de52652b4fedcbf8e6b256c4
+X-Launchpad-Hash: 980db0f6ece21ee1aecc6320e16cdf33ea32dfc3
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 01:05:32
@@ -90,10 +89,80 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Attachment added: "The qtest commands for triggering the assertion in at=
-i_reg_read_offs"
-   https://bugs.launchpad.net/qemu/+bug/1878136/+attachment/5370129/+files/=
-attachment2
+Public bug reported:
+
+Hello,
+While fuzzing, I found inputs that trigger assertion failures in
+ati_reg_read_offs/ati_reg_write_offs
+
+uint32_t extract32(uint32_t, int, int): Assertion `start >=3D 0 && length
+> 0 && length <=3D 32 - start' failed
+
+#3 0x00007ffff6866092 in __GI___assert_fail (assertion=3D0x555556e760c0 <st=
+r> "start >=3D 0 && length > 0 && length <=3D 32 - start", file=3D0x555556e=
+76120 <str> "/home/alxndr/Development/qemu/include/qemu/bitops.h", line=3D0=
+x12c, function=3D0x555556e76180 <__PRETTY_FUNCTION__.extract32> "uint32_t e=
+xtract32(uint32_t, int, int)") at assert.c:101
+#4 0x000055555653d8a7 in ati_mm_read (opaque=3D<optimized out>, addr=3D0x1a=
+, size=3D<optimized out>) at /home/alxndr/Development/qemu/include/qemu/log=
+-for-trace.h:29
+#5 0x000055555653c825 in ati_mm_read (opaque=3D<optimized out>, addr=3D0x4,=
+ size=3D<optimized out>) at /home/alxndr/Development/qemu/hw/display/ati.c:=
+289
+#6 0x000055555601446e in memory_region_read_accessor (mr=3D0x63100004dc20, =
+addr=3D<optimized out>, value=3D<optimized out>, size=3D<optimized out>, sh=
+ift=3D<optimized out>, mask=3D<optimized out>, attrs=3D...) at /home/alxndr=
+/Development/qemu/memory.c:434
+#7 0x0000555556001a70 in access_with_adjusted_size (addr=3D<optimized out>,=
+ value=3D<optimized out>, size=3D<optimized out>, access_size_min=3D<optimi=
+zed out>, access_size_max=3D<optimized out>, access_fn=3D<optimized out>, m=
+r=3D0x63100004dc20, attrs=3D...) at /home/alxndr/Development/qemu/memory.c:=
+544
+#8 0x0000555556001a70 in memory_region_dispatch_read1 (mr=3D0x63100004dc20,=
+ addr=3D0x4, pval=3D<optimized out>, size=3D0x4, attrs=3D...) at /home/alxn=
+dr/Development/qemu/memory.c:1396
+
+I can reproduce it in qemu 5.0 built with using:
+cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -M pc-q=
+35-5.0 -device ati-vga -nographic -qtest stdio -monitor none -serial none
+outl 0xcf8 0x80001018
+outl 0xcfc 0xe2000000
+outl 0xcf8 0x8000101c
+outl 0xcf8 0x80001004
+outw 0xcfc 0x7
+outl 0xcf8 0x8000fa20
+write 0xe2000004 0x1 0x1a
+readq 0xe2000000
+EOF
+
+Similarly for ati_reg_write_offs:
+cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -M pc-q=
+35-5.0 -device ati-vga -nographic -qtest stdio -monitor none -serial none
+outl 0xcf8 0x80001018
+outl 0xcfc 0xe2000000
+outl 0xcf8 0x8000101c
+outl 0xcf8 0x80001004
+outw 0xcfc 0x7
+outl 0xcf8 0x8000fa20
+write 0xe2000000 0x8 0x6a00000000006a00
+EOF
+
+I also attached the traces to this launchpad report, in case the
+formatting is broken:
+
+qemu-system-i386 -M pc-q35-5.0 -device ati-vga -nographic -qtest stdio
+-monitor none -serial none < attachment
+
+Please let me know if I can provide any further info.
+-Alex
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Attachment added: "attachment"
+   https://bugs.launchpad.net/bugs/1878136/+attachment/5370128/+files/attac=
+hment
 
 -- =
 
