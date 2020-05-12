@@ -2,81 +2,91 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 653FDC54E4B
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 05:36:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65920C54E4B
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 06:02:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A6AE20736
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 05:36:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A6AE20736
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 2AAA42072B
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 06:02:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LY+s0qOF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AAA42072B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYNaO-00023E-BE
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 01:36:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44212)
+	id 1jYO0F-0002WS-Nv
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 02:02:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46826)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jYNZm-0001WM-Sk
- for qemu-devel@nongnu.org; Tue, 12 May 2020 01:35:34 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51366)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jYNZl-00054W-QL
- for qemu-devel@nongnu.org; Tue, 12 May 2020 01:35:34 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jYNZj-00046y-Uz
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 05:35:31 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E66C12E8107
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 05:35:31 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jYNzV-0001nP-IZ
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 02:02:09 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44010
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jYNzU-0006mo-Rc
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 02:02:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589263325;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=nugp8cv/l75vGPOWqJLtFmJBdhcRZ01YnyHn34TCwiE=;
+ b=LY+s0qOFuiL+OTrDA3zvXO+JnIl81fL5smiREvWXY6b0P1bsQlEMxukPYi+4uIQR1HCld9
+ uu8q6Xmgtt+a1j0YJDkTkncwWJiDGaMfP+/L11Ttig2lOfbbmtX3zkB1bDyQXt+RHvcytq
+ OetaqIbfcbHV17sFyYSJaxOY/SmdvjA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-226-9kTSJPCUNjuQd4HWHxIfhA-1; Tue, 12 May 2020 02:02:02 -0400
+X-MC-Unique: 9kTSJPCUNjuQd4HWHxIfhA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 26EA38015CE;
+ Tue, 12 May 2020 06:01:58 +0000 (UTC)
+Received: from gondolin (ovpn-112-176.ams2.redhat.com [10.36.112.176])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9FACB5D9DD;
+ Tue, 12 May 2020 06:01:48 +0000 (UTC)
+Date: Tue, 12 May 2020 08:01:46 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Subject: Re: [PATCH 08/11] target/s390x: Restrict system-mode declarations
+Message-ID: <20200512080146.7d0f4ae2.cohuck@redhat.com>
+In-Reply-To: <2bb91290-32c5-997d-c689-4d651836c7fc@amsat.org>
+References: <20200509130910.26335-1-f4bug@amsat.org>
+ <20200509130910.26335-9-f4bug@amsat.org>
+ <20200511124804.1a7a43aa.cohuck@redhat.com>
+ <2bb91290-32c5-997d-c689-4d651836c7fc@amsat.org>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 12 May 2020 05:27:49 -0000
-From: Thomas Huth <1844635@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public Security
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: yes
-X-Launchpad-Bug-Commenters: guangming1100 th-huth
-X-Launchpad-Bug-Reporter: guangming liu (guangming1100)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <156888216450.5144.14810121266968903921.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158926127020.5900.10563999453315283792.launchpad@soybean.canonical.com>
-Subject: [Bug 1844635] Re: qemu bug where load linux kernel
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 94d088d35335049b19d976379e904fa8aa12342e
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 01:05:32
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 02:02:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,79 +95,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1844635 <1844635@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ David Hildenbrand <david@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Laurent Vivier <laurent@vivier.eu>, Max Filippov <jcmvbkbc@gmail.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>, Marek Vasut <marex@denx.de>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-s390x@nongnu.org, qemu-arm@nongnu.org, Stafford Horne <shorne@gmail.com>,
+ Richard Henderson <rth@twiddle.net>, qemu-riscv@nongnu.org,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Chris Wulff <crwulff@gmail.com>, Roman Bolshakov <r.bolshakov@yadro.com>,
+ qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Information type changed from Private Security to Public Security
+On Mon, 11 May 2020 14:21:27 +0200
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
 
--- =
+> On 5/11/20 12:48 PM, Cornelia Huck wrote:
+> > On Sat,  9 May 2020 15:09:07 +0200
+> > Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+> >  =20
+> >> As these declarations are restricted to !CONFIG_USER_ONLY in
+> >> helper.c, only declare them when system-mode emulation is used.
+> >>
+> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> >> ---
+> >>   target/s390x/internal.h | 11 ++++++-----
+> >>   1 file changed, 6 insertions(+), 5 deletions(-)
+> >>
+> >> diff --git a/target/s390x/internal.h b/target/s390x/internal.h
+> >> index c1678dc6bc..ddc276cdf4 100644
+> >> --- a/target/s390x/internal.h
+> >> +++ b/target/s390x/internal.h
+> >> @@ -236,7 +236,6 @@ int s390_cpu_write_elf64_note(WriteCoreDumpFunctio=
+n f, CPUState *cs,
+> >>  =20
+> >>   /* cc_helper.c */
+> >>   const char *cc_name(enum cc_op cc_op);
+> >> -void load_psw(CPUS390XState *env, uint64_t mask, uint64_t addr);
+> >>   uint32_t calc_cc(CPUS390XState *env, uint32_t cc_op, uint64_t src, u=
+int64_t dst,
+> >>                    uint64_t vr);
+> >>  =20
+> >> @@ -303,18 +302,20 @@ void s390_cpu_gdb_init(CPUState *cs);
+> >>  =20
+> >>   /* helper.c */
+> >>   void s390_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
+> >> -hwaddr s390_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+> >> -hwaddr s390_cpu_get_phys_addr_debug(CPUState *cpu, vaddr addr);
+> >> +void do_restart_interrupt(CPUS390XState *env);
+> >> +
+> >> +#ifndef CONFIG_USER_ONLY
+> >> +void load_psw(CPUS390XState *env, uint64_t mask, uint64_t addr); =20
+> >=20
+> > load_psw() is in cc_helper.c (and not in helper.c). Rather add the
+> > #ifndef above, even if it is a bit awkward? Otherwise, the wrong
+> > comment makes it confusing. =20
+>=20
+> I've been tempted to remove the kinda outdated /* helper.c */ comment...
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1844635
+I don't think they're really outdated, but not sure how useful they are
+to people. I'm not personally attached to them, other opinions?
 
-Title:
-  qemu bug where load linux kernel
+>=20
+> >  =20
+> >>   uint64_t get_psw_mask(CPUS390XState *env);
+> >>   void s390_cpu_recompute_watchpoints(CPUState *cs);
+> >>   void s390x_tod_timer(void *opaque);
+> >>   void s390x_cpu_timer(void *opaque);
+> >> -void do_restart_interrupt(CPUS390XState *env);
+> >>   void s390_handle_wait(S390CPU *cpu);
+> >> +hwaddr s390_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+> >> +hwaddr s390_cpu_get_phys_addr_debug(CPUState *cpu, vaddr addr);
+> >>   #define S390_STORE_STATUS_DEF_ADDR offsetof(LowCore, floating_pt_sav=
+e_area)
+> >>   int s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch);
+> >>   int s390_store_adtl_status(S390CPU *cpu, hwaddr addr, hwaddr len);
+> >> -#ifndef CONFIG_USER_ONLY
+> >>   LowCore *cpu_map_lowcore(CPUS390XState *env);
+> >>   void cpu_unmap_lowcore(LowCore *lowcore);
+> >>   #endif /* CONFIG_USER_ONLY */ =20
+> >=20
+> >  =20
+>=20
 
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  i found a qemu bug ,when the qemu start and parse the kernel file .
-
-  This vulnerability can be exploited.
-
-  thanks
-
-  /****
-
-  =
-
-  (gdb) set args -nodefaults -device pc-testdev -device isa-debug-exit,ioba=
-se=3D0xf4,iosize=3D0x4 -vnc none -serial stdio -device pci-testdev -machine=
- accel=3Dkvm -m 2048  -smp 2 -cpu host -machine kernel_irqchip=3Dsplit -ker=
-nel poc1
-  (gdb) r
-  Starting program: /usr/bin/qemu-system-x86_64 -nodefaults -device pc-test=
-dev -device isa-debug-exit,iobase=3D0xf4,iosize=3D0x4 -vnc none -serial std=
-io -device pci-testdev -machine accel=3Dkvm -m 2048  -smp 2 -cpu host -mach=
-ine kernel_irqchip=3Dsplit -kernel ./poc/poc1
-  [Thread debugging using libthread_db enabled]
-  Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
-  [New Thread 0x7fffe9a03700 (LWP 30066)]
-  [New Thread 0x7fffe9202700 (LWP 30068)]
-  [New Thread 0x7fffe8a01700 (LWP 30069)]
-
-  Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
-  __memmove_avx_unaligned_erms () at ../sysdeps/x86_64/multiarch/memmove-ve=
-c-unaligned-erms.S:249
-  249	../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S: No such fil=
-e or directory.
-  (gdb) bt
-  #0  0x00007ffff2390b1f in __memmove_avx_unaligned_erms () at ../sysdeps/x=
-86_64/multiarch/memmove-vec-unaligned-erms.S:249
-  #1  0x00005555559ebdcf in rom_copy ()
-  #2  0x00005555558dd1b3 in load_multiboot ()
-  #3  0x00005555558de1c3 in  ()
-  #4  0x00005555558e19d1 in pc_memory_init ()
-  #5  0x00005555558e4ee3 in  ()
-  #6  0x00005555559e8500 in machine_run_board_init ()
-  #7  0x0000555555834959 in main ()
-  (gdb) c
-  Continuing.
-  Couldn't get registers: No such process.
-  Couldn't get registers: No such process.
-  (gdb) [Thread 0x7fffe8a01700 (LWP 30069) exited]
-  [Thread 0x7fffe9202700 (LWP 30068) exited]
-  [Thread 0x7fffe9a03700 (LWP 30066) exited]
-
-  Program terminated with signal SIGSEGV, Segmentation fault.
-  The program no longer exists.
-
-  ***/
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1844635/+subscriptions
 
