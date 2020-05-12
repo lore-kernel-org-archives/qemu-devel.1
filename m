@@ -2,84 +2,60 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 096DBC54E4A
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 12:22:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4A92C54E4A
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 12:23:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C678820661
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 12:22:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ez1OPulu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C678820661
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A152020661
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 12:23:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A152020661
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYTvx-0004Hj-UU
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 08:22:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39866)
+	id 1jYTwF-0004mO-S4
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 08:23:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39884)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1jYTvG-0003bu-NX
- for qemu-devel@nongnu.org; Tue, 12 May 2020 08:22:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60900
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1jYTvF-0003cp-Pi
- for qemu-devel@nongnu.org; Tue, 12 May 2020 08:22:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589286128;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=TVjh1fUqEHRpKtJHi5GiqdeGtGkJSiYif7/DKL042Cs=;
- b=ez1OPuluRFGrmzr0JNxV02DlehnVDwWSwp9v3NULV/Fo1cGwXoiETl8jR/Z0IAowze5MDq
- Ka1UMAwa75Gzsflg7IEEcP7uhci4QMzq9YVvLQTo9LpbDmEL4gV00x9cPQflBwahKvYG+w
- cfG7+gaWrGRjrplzqd4ckS3zJDwm4Lk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-469-iLieCZL7N2OlhmcSfjnFkA-1; Tue, 12 May 2020 08:22:06 -0400
-X-MC-Unique: iLieCZL7N2OlhmcSfjnFkA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64EA4107ACF2;
- Tue, 12 May 2020 12:22:05 +0000 (UTC)
-Received: from kaapi (unknown [10.40.193.76])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E0E93100034E;
- Tue, 12 May 2020 12:22:02 +0000 (UTC)
-Date: Tue, 12 May 2020 17:51:59 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-X-X-Sender: pjp@kaapi
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 0/2] use unsigned type for MegasasState fields
-In-Reply-To: <20200507105718.1319187-1-ppandit@redhat.com>
-Message-ID: <nycvar.YSQ.7.76.2005121750580.1451610@xnncv>
-References: <20200507105718.1319187-1-ppandit@redhat.com>
+ (Exim 4.90_1) (envelope-from <s.reiter@proxmox.com>)
+ id 1jYTvW-0003uh-Fk; Tue, 12 May 2020 08:22:26 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:45461)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <s.reiter@proxmox.com>)
+ id 1jYTvV-0003dH-1Z; Tue, 12 May 2020 08:22:25 -0400
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+ by proxmox-new.maurer-it.com (Proxmox) with ESMTP id CFAA542BF1;
+ Tue, 12 May 2020 14:22:16 +0200 (CEST)
+Subject: Re: [RFC] bdrv_flush: only use fast path when in owned AioContext
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200511165032.11384-1-s.reiter@proxmox.com>
+ <20200512105719.GI5951@linux.fritz.box>
+ <20200512113255.GK5951@linux.fritz.box>
+From: Stefan Reiter <s.reiter@proxmox.com>
+Message-ID: <c40bb7c6-2797-8e17-8cbd-4ecc75c3a7fb@proxmox.com>
+Date: Tue, 12 May 2020 14:22:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=ppandit@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 02:20:15
+In-Reply-To: <20200512113255.GK5951@linux.fritz.box>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=212.186.127.180;
+ envelope-from=s.reiter@proxmox.com; helo=proxmox-new.maurer-it.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 08:22:18
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,33 +68,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Ren Ding <rding@gatech.edu>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: fam@euphon.net, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ mreitz@redhat.com, stefanha@redhat.com, t.lamprecht@proxmox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-+-- On Thu, 7 May 2020, P J P wrote --+
-| Hello,
-| 
-| * This series fixes an OOB access issue which may occur when a guest user
-|   sets 's->reply_queue_head' field to a negative(or large positive) value,
-|   via 'struct mfi_init_qinfo' object in megasas_init_firmware().
-| 
-| * Second patch updates other numeric fields of MegasasState to unsigned type.
-| 
-| Thank you.
-| ---
-| Prasad J Pandit (2):
-|   megasas: use unsigned type for reply_queue_head
-|   megasas: use unsigned type for positive numeric fields
-| 
-|  hw/scsi/megasas.c | 40 ++++++++++++++++++++--------------------
-|  1 file changed, 20 insertions(+), 20 deletions(-)
+On 5/12/20 1:32 PM, Kevin Wolf wrote:
+> Am 12.05.2020 um 12:57 hat Kevin Wolf geschrieben:
+>> Am 11.05.2020 um 18:50 hat Stefan Reiter geschrieben:
+>>> Just because we're in a coroutine doesn't imply ownership of the context
+>>> of the flushed drive. In such a case use the slow path which explicitly
+>>> enters bdrv_flush_co_entry in the correct AioContext.
+>>>
+>>> Signed-off-by: Stefan Reiter <s.reiter@proxmox.com>
+>>> ---
+>>>
+>>> We've experienced some lockups in this codepath when taking snapshots of VMs
+>>> with drives that have IO-Threads enabled (we have an async 'savevm'
+>>> implementation running from a coroutine).
+>>>
+>>> Currently no reproducer for upstream versions I could find, but in testing this
+>>> patch fixes all issues we're seeing and I think the logic checks out.
+>>>
+>>> The fast path pattern is repeated a few times in this file, so if this change
+>>> makes sense, it's probably worth evaluating the other occurences as well.
+>>
+>> What do you mean by "owning" the context? If it's about taking the
+>> AioContext lock, isn't the problem more with calling bdrv_flush() from
+>> code that doesn't take the locks?
+>>
+>> Though I think we have some code that doesn't only rely on holding the
+>> AioContext locks, but that actually depends on running in the right
+>> thread, so the change looks right anyway.
 
-Ping...!
---
-Prasad J Pandit / Red Hat Product Security Team
-8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+"Owning" as in it only works (doesn't hang) when bdrv_flush_co_entry 
+runs on the same AioContext that the BlockDriverState it's flushing 
+belongs to.
+
+We hold the locks for all AioContexts we want to flush in our code (in 
+this case called from do_vm_stop/bdrv_flush_all so we're even in a 
+drained section).
+
+> 
+> Well, the idea is right, but the change itself isn't, of course. If
+> we're already in coroutine context, we must not busy wait with
+> BDRV_POLL_WHILE(). I'll see if I can put something together after lunch.
+> 
+> Kevin
+> 
+> 
+
+Thanks for taking a look!
 
 
