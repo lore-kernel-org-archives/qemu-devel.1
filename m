@@ -2,92 +2,124 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1942BCA90AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 15:52:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A92F1CA90AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 15:55:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D707E206DD
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 15:52:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 75807206DD
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 15:55:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LfRd2R6s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D707E206DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="cqg5F2TL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75807206DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYXCK-0001Cy-3A
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 11:52:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42460)
+	id 1jYXFK-0003QA-Ls
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 11:55:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42894)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jYXBc-0000kB-AL
- for qemu-devel@nongnu.org; Tue, 12 May 2020 11:51:16 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37409
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jYXBb-0000f2-HF
- for qemu-devel@nongnu.org; Tue, 12 May 2020 11:51:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589298674;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VHxyCy7qT6ko5GAjLjFTBZR4XbflvGbOs7Vbb2gUQ4I=;
- b=LfRd2R6sKzYfo0C+gbk3vFjhcHU2HWG5ExiehIK4Y1xKeUUlUxAQUchWaavZD2f4KBIL25
- 1xPNJPT0K8xt73NNCUx9tVht3OzYeelTMaGTKocheOCu+9Vf4nZPyrDt8gxIGkVWM+CUSq
- kq4gpv1ax41IKPHZe4mrD0ZLxlZbkHc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-153-xrYiWwVQPk2mZ5T6l5oTnQ-1; Tue, 12 May 2020 11:51:13 -0400
-X-MC-Unique: xrYiWwVQPk2mZ5T6l5oTnQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1A553872FE0
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 15:51:12 +0000 (UTC)
-Received: from [10.3.116.145] (ovpn-116-145.phx2.redhat.com [10.3.116.145])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BB7B05D9DD;
- Tue, 12 May 2020 15:51:11 +0000 (UTC)
-Subject: Re: [PATCH v2 2/2] net: Drop the NetLegacy structure, always use
- Netdev instead
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- Jason Wang <jasowang@redhat.com>
-References: <20200512123149.30207-1-thuth@redhat.com>
- <20200512123149.30207-3-thuth@redhat.com>
- <3a2bcb19-5ba3-0023-8733-d945ee40aeeb@redhat.com>
- <ef4bd3f7-c023-d4c8-b4b6-2b8abe9e1cdb@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <aaf3efdc-072f-4b55-8bff-402be55b604b@redhat.com>
-Date: Tue, 12 May 2020 10:51:11 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <ef4bd3f7-c023-d4c8-b4b6-2b8abe9e1cdb@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jYXEd-0002uW-Sl; Tue, 12 May 2020 11:54:23 -0400
+Received: from mail-db8eur05on2133.outbound.protection.outlook.com
+ ([40.107.20.133]:23616 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jYXEb-0001nN-0e; Tue, 12 May 2020 11:54:22 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gyfLxuZBaKF2QmdudBmA3somjPjX5QOwyxeoH0BOSLekqYeLKeZ4O30TGHTajg42bj+6+wBO+Zhna91u9noSQEyqwL00q+PumCIF5wDTiGV1MZc+cLJYdYhJyZu8pge3NDkpuF3OcM+VjyFc8NU4QCSJHjsNS4yStTc3/S3G8PIcrN6umbblmc7gU+hG04T3uQp0HGmNT1IbaBBVOJfnSRa+yyVJj/PUlI0B989V9poc+HpSg2lo6PYnqOHqi7LcFEy/0CPHkaFbpSYX89X+Oyz+fXG5Rca3PPSlDD888x3dSu1PYzAL3D1+AQCU0qiRK/gmrry4/X3Gv1dSuaFxBg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=M5fM0SFD0PxF9HACFUuk9BP8TYd0H87w2PJbKD2kQJI=;
+ b=Eerfsakj1hxFW/PFXFJ20nDgLBbIQWl8M9q8eXM9IagJZgK5HTu/lmitNGpWo1stHMJ3BijMz/wU/sKk5t+XqyW48aARJEi/QXLefCrXSB27D5RmIgQROn0Y72HVAIIjWj6NvTrkLxFToX4+fN485+oypIy9uo7sdMdZ+kv2FW8tiPIJ/YF1lklV8ySFNi8jwlfj1zkXoWDwlrmpEnw5Qe+t2tDPd+qFfWv3jgbc1TbVR1S0H2K+zE4pnIuBD8dNbA1/LoUvNd6wtiC6xlh+iIhr9+r4HkqB+11KZyXR1q6eLNWaJbtX/ap6yrksnfd955COn/M6FGG5Y2JzOWIZKA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=M5fM0SFD0PxF9HACFUuk9BP8TYd0H87w2PJbKD2kQJI=;
+ b=cqg5F2TLl7RdO7YVMGBYhy9s7smAB6NeJ/pQWtgpGTm5MJ1jOKr6FPBcC/PbcJJOnD3Q6h2udx+oB2zqc9lnSEms7TQV/e+JUghjA+Dtd21rDTsFW/NlrIFaJFn+fDjVUv0rMRDkpYfD/6Uq5aZZT6Eu7GlABzEEEjonCBQMa0w=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5397.eurprd08.prod.outlook.com (2603:10a6:20b:dd::17)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.29; Tue, 12 May
+ 2020 15:54:17 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2979.033; Tue, 12 May 2020
+ 15:54:17 +0000
+Subject: Re: [PATCH v2 2/4] iotests/229: Use blkdebug to inject an error
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200511135825.219437-1-kwolf@redhat.com>
+ <20200511135825.219437-3-kwolf@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200512185408860
+Message-ID: <43443e30-df14-b888-e11d-aa97967eff05@virtuozzo.com>
+Date: Tue, 12 May 2020 18:54:09 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <20200511135825.219437-3-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 01:41:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM4PR0202CA0012.eurprd02.prod.outlook.com
+ (2603:10a6:200:89::22) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.163) by
+ AM4PR0202CA0012.eurprd02.prod.outlook.com (2603:10a6:200:89::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.27 via Frontend
+ Transport; Tue, 12 May 2020 15:54:16 +0000
+X-Tagtoolbar-Keys: D20200512185408860
+X-Originating-IP: [185.215.60.163]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d705d400-6139-44e9-2bf9-08d7f68cb9e9
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5397:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5397DDFA0C8BEF789222B6A7C1BE0@AM7PR08MB5397.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
+X-Forefront-PRVS: 0401647B7F
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: uBJidTGDBTi8kklv0jvo0qbD4cvVrIxKNpfKZ05MeBy3ZpDh8d7BItKaXhPNBaWwoIj0TgsJ+R9p+/e1FPxUIxMYGTGWVDMECmB3JM2zY1uS5tb1JnRtz9s3BCa02dxyhRwp8vSoi89Dn87ddxTqg5w3h+J2XNr+LilbaKuDB14I2teAhV/ehrQhDr63gGcv6NRq/XxnGJWQNYyu5nMALlQsLtNFS3a9e0x6U1HVGZlmPGDN80qXZRjQvwwhshmV4USxFDi+3LzzmHhAeT1wwoeTCIXMAicsJVIjd/V9WY40639aSIDiioP5uas4fy4cR1WBjZY56m92c48mGZcKxuW4rqBKUqXu6ZhiDci51j27yl8XqF9RCnamHfRhTTdEfk69tDAMVUnehpfF5y0+g04KJrMR57IklHTYyPh+mbLeLlI7IcPzCEIvJ5z7mrq+MDiQfN1XXGiYAHwO2ZOY90uVvXDpW3Cnmbeu20POYpfKTJ2/gLRH7YcJ/WvMMrsyvhpi9k7AuS1Rnijs3Hx5c0RaQlTkiQ//bjm0pxfO0PIUidZW/Zvl3TW8THqrpGE+
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(366004)(396003)(39840400004)(376002)(136003)(346002)(33430700001)(316002)(478600001)(66476007)(6486002)(66556008)(8676002)(5660300002)(4744005)(86362001)(31696002)(8936002)(66946007)(31686004)(16576012)(52116002)(6666004)(16526019)(186003)(26005)(4326008)(36756003)(33440700001)(956004)(2616005)(2906002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: lqnCcjut/bUIuYby30nmlIwAgNYhoDDP1+c0kG8/tAM2/liLqeKxDn5IdQzZqjS0ZCqaj2dlwrm/BTHFYeujDscw4gWDO2PUTu+cYihAXlpiYbyhCQdLrUQfLQmjsnGBV5dYw2tWL2qDd6fzvWUwbAE1AXwnQpDXTcGKsdrI7vnFs6j3AowdV3lpUooR9eL3SQUt/sWdaF72vXA/gjWBTKaWIjEiNSomb56RcDnAmRKvNTlZ3OxkmykulOR4rahfwh7POsXf+BBYvKqkqAi3MRvcWEyQ6bsbdTw447DzHK0zS4IitPR+q9wJxdvYT9748DG9WrhKXYDmXy8ykTi13XyYb8oy3srz33CwTayFGjHVySLd1uOWG/CMlVIB3Q+IGaUpiHxXj/Af8txoF7Ok43vjgDISYa9vVVYzgwLCzGoo+S/iUt4QkwmkQMcJxvrNahoYQPMnAN6dvBbnKaTlN6DZBsbSc+wuT+xaPGgSAxAMmg7HhVt1vfeBYhNxQZUJ
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d705d400-6139-44e9-2bf9-08d7f68cb9e9
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2020 15:54:17.7322 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zIacN0T98BlGHiChbPivaiHEhkAQXsh9LhTNJxMDFU+y3R1aUMNQ4Wnw37EA2AmjJDXQV/f3z9PrURgMKn3ivvpjzOsegcrJT+Zs+3URrEc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5397
+Received-SPF: pass client-ip=40.107.20.133;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-DB8-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 11:54:18
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,33 +133,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>
+Cc: jsnow@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/12/20 10:13 AM, Thomas Huth wrote:
-
->>> +++ b/qapi/net.json
->>> @@ -453,7 +453,7 @@
->>>    #        'l2tpv3' - since 2.1
->>>    ##
->>>    { 'union': 'Netdev',
->>> -  'base': { 'id': 'str', 'type': 'NetClientDriver' },
->>> +  'base': { '*id': 'str', 'type': 'NetClientDriver' },
->>
->> I don't think we need to make 'id' optional.
+11.05.2020 16:58, Kevin Wolf wrote:
+> 229 relies on the mirror running into an I/O error when the target is
+> smaller than the source. After changing mirror to catch this condition
+> while starting the job, this test case won't get a job that is paused
+> for an I/O error any more. Use blkdebug instead to inject an error.
 > 
-> It's required for "-net" now.
+> Signed-off-by: Kevin Wolf<kwolf@redhat.com>
+> Message-Id:<20200507145228.323412-2-kwolf@redhat.com>
+> Reviewed-by: Eric Blake<eblake@redhat.com>
+> Signed-off-by: Kevin Wolf<kwolf@redhat.com>
 
-But does -net generate it's own id if one is not provided?  Can it still 
-be mandatory in the QAPI type, and just figure out how to guarantee that 
-the CLI parsing of -net provides a name early enough in the cycle to use 
-the QAPI type without making the member optional there?
+
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+Best regards,
+Vladimir
 
