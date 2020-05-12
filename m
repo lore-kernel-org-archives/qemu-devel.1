@@ -2,85 +2,87 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F06EAC54E8D
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 13:56:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9D53C54E8F
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 13:58:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9347206CC
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 13:56:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A77B3206F5
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 13:58:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mpfdlUal"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9347206CC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D4FZZXr7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A77B3206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34690 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYVOz-0002lk-U5
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 09:56:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51508)
+	id 1jYVQB-00045x-TG
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 09:58:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51642)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jYVOI-000229-E6
- for qemu-devel@nongnu.org; Tue, 12 May 2020 09:56:14 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43525)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jYVOH-0006By-MY
- for qemu-devel@nongnu.org; Tue, 12 May 2020 09:56:14 -0400
-Received: by mail-ot1-x341.google.com with SMTP id a68so2030894otb.10
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 06:56:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=RfalNbvMq8wOSnIr4yvFrtBszh8MUQgiZbNl4UOHkts=;
- b=mpfdlUaljVfsxm35WjdDLEtlK+uUpczztxj59dwepgVTJZOfKA0cM0gYSlZZg9bK3L
- YKv1VzOi17E8yRGAQ2ir+FVIDWsQPx8QByZVBVEfQQ9EbcaHk8SBN/d7fanLaUvwasGB
- wW5xQb/eP9Hr+FY+g3gWquUc0wo9NeL1DEn1OVg7UEykKsnKwgHyon+qULTeIOr/oqoJ
- zqrAhpwUU/Z/GrwT2iXsfeGiuR3dg+myv3JzIzR9KVdZJc+jZcVqm8D9qtlvC0j7Sn04
- 3mDOHzLDS0Yjr6BiQVoG7cAf4GUeJuTGImfEZ6EZdW+6AN/LHdrE5pcXT6Wyxrdq+jYt
- CnLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=RfalNbvMq8wOSnIr4yvFrtBszh8MUQgiZbNl4UOHkts=;
- b=FKMHBOSt3s3uxUyKZASKZnnHy9SVUPcrx5rWU6GMw92e0qfWkFvyac6ZiDdci2T7QT
- uvdThqU3zSMWNEDsJaISW3ho5dfDb7Xool7AqqOjTRFMgqWCtGO9fUpIX8EpHDTWpPvE
- hxiMUx/q97uB9dNkLTnYHaTjL1Jhu5Fo4uwgQWFXHpJoZtETpcpDMFdhqG1ao1Uh8kjY
- rr75GhFTbsbVI4h4GRmri6aZnwAwc0z1b58XG37D05snv89TmBmBk/vpc3l/mfj3zx5m
- C/6PgkxVzws4j1vtUmXBwYljjsm5StYcrW+NCHPdOJNBuVsB8bHueaJoj7L8aHmf49Ft
- Axvw==
-X-Gm-Message-State: AGi0PuaFWai+aCvi7PaJN1/xjKxkKTXCdbZ/dUvzBTA+sxjojmGXgOMA
- ubvGCebJApj3FJaZuCqrz4KLvYu2bIPg9FMAh0p4qg==
-X-Google-Smtp-Source: APiQypI/kF/yds36gp9ZcU00LKibJWat0FIL+rx/2MgockR3jkDdXvOkHhJ2Q8h+FNzqGaxhmveH83g9DRz5Fu5bQ+w=
-X-Received: by 2002:a05:6830:1e4e:: with SMTP id
- e14mr16526749otj.91.1589291772410; 
- Tue, 12 May 2020 06:56:12 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jYVPS-0003FC-G7
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 09:57:26 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60807
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jYVPP-0006Mr-Oc
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 09:57:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589291841;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Oi5lQuHUIkDUj75UpFsyn9APOPNHr+7pHnvO0dJ5m6k=;
+ b=D4FZZXr7Cjvzsgr/2MTaqLh59hnjDJ9W+8Y/4Crhf107eupKHSxrUWZScQJ6mMBAMv9Lqw
+ 6QpzwV7YXVV0YXx980WaJl+80HVSzC3MWHYbV7g33XjgmbB+dJeh45DZbLXzgkwdcayuJj
+ h0L8l/TaNIby7xDtsJdy1FNpFoNHbTY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-166-lLGJd508PNGYFVQSNOPlVQ-1; Tue, 12 May 2020 09:57:17 -0400
+X-MC-Unique: lLGJd508PNGYFVQSNOPlVQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64C5C1054F8B;
+ Tue, 12 May 2020 13:57:16 +0000 (UTC)
+Received: from [10.3.116.145] (ovpn-116-145.phx2.redhat.com [10.3.116.145])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CDED05EE11;
+ Tue, 12 May 2020 13:57:15 +0000 (UTC)
+Subject: Re: [PATCH] qemu-nbd: Close inherited stderr
+To: Raphael Pour <raphael.pour@hetzner.com>, qemu-devel@nongnu.org
+References: <ac17fad1-baf1-75ad-843d-cab8d17f1b2e@hetzner.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <26f7bcad-d058-712e-1663-21923da40f0f@redhat.com>
+Date: Tue, 12 May 2020 08:57:15 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-References: <20200508152200.6547-1-richard.henderson@linaro.org>
- <20200508152200.6547-6-richard.henderson@linaro.org>
-In-Reply-To: <20200508152200.6547-6-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 May 2020 14:56:01 +0100
-Message-ID: <CAFEAcA-3Hs9P-R8hQPDoh2z8=OMEgs=EaSpHCYBVH-1m1_jSLQ@mail.gmail.com>
-Subject: Re: [PATCH v3 05/16] target/arm: Tidy handle_vec_simd_shri
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <ac17fad1-baf1-75ad-843d-cab8d17f1b2e@hetzner.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 02:02:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,28 +96,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 8 May 2020 at 16:22, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Now that we've converted all cases to gvec, there is quite a bit
-> of dead code at the end of the function.  Remove it.
->
-> Sink the call to gen_gvec_fn2i to the end, loading a function
-> pointer within the switch statement.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On 5/12/20 3:56 AM, Raphael Pour wrote:
+> Hello,
+> 
+> after e6df58a5, the inherited stderr 'old_stderr' won't get closed
+> anymore if 'fork_process' is false. This causes other processes relying
+> on EOF to infinitely block or crash.
+> 
+>>From 47ab9b517038d13117876a8bb3ef45c53d7f2f9e Mon Sep 17 00:00:00 2001
+> From: "Raphael Pour" <raphael.pour@hetzner.com>
+> Date: Tue, 12 May 2020 10:18:44 +0200
+> Subject: [PATCH] qemu-nbd: Close inherited stderr
+> 
+> Close inherited stderr of the parent if fork_process is false.
+> Otherwise no one will close it. (introduced by e6df58a5)
+> 
+> Signed-off-by: Raphael Pour <raphael.pour@hetzner.com>
 > ---
->  target/arm/translate-a64.c | 56 ++++++++++----------------------------
->  1 file changed, 14 insertions(+), 42 deletions(-)
->
+>   qemu-nbd.c | 9 ++++++++-
+>   1 file changed, 8 insertions(+), 1 deletion(-)
+> 
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Wouldn't it just be simpler to not dup in the first place?
 
-thanks
--- PMM
+diff --git i/qemu-nbd.c w/qemu-nbd.c
+index 4aa005004ebd..6ba2544feb3a 100644
+--- i/qemu-nbd.c
++++ w/qemu-nbd.c
+@@ -916,7 +916,9 @@ int main(int argc, char **argv)
+          } else if (pid == 0) {
+              close(stderr_fd[0]);
+
+-            old_stderr = dup(STDERR_FILENO);
++            if (fork_process) {
++                old_stderr = dup(STDERR_FILENO);
++            }
+              ret = qemu_daemon(1, 0);
+
+              /* Temporarily redirect stderr to the parent's pipe...  */
+
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
