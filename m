@@ -2,93 +2,104 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2AD6C54E8B
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:50:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A0D4C54E4B
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:55:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF23620736
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:50:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3FDB520643
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:55:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NCH+FWx/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF23620736
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="elz05xO0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FDB520643
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYPgl-0003Mj-St
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 03:50:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58604)
+	id 1jYPlM-0006xR-DU
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 03:55:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59066)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jYPeK-00007r-Sw; Tue, 12 May 2020 03:48:24 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41960)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jYPeK-0002qv-1z; Tue, 12 May 2020 03:48:24 -0400
-Received: by mail-wr1-x441.google.com with SMTP id h17so5192807wrc.8;
- Tue, 12 May 2020 00:48:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=9+HPWfi6hB2pKPErn5CtXaV2y+G6fIj46U87L3EGk9I=;
- b=NCH+FWx/bgOA/G53S0IB6rTD2XBw3Od7DLlx/agjhBGCfL8N7pnZFXs/MvFEbIFZfC
- lIdbXSDZxlVpFLvo+yaMoM/cLbfbEeyPNfyT7zdcSEuQuYPzSh8gIrLIIVbgbou7RQQf
- OcLVcPMhO7xefC7Xa9ZPPVJLIebhYCTN2kkPLWtYTk7QmAHD7jqoNNZ5GJQ+wNnzo5xV
- KOyOZIKsSXm4VtOsT/ECatvujb7ut+RKfKtZyfzPBOx/Ky8dVOTHvc+Rn9QJG+MVucSB
- 4ctM/kanl2j/CY/jq+EgolQu2G8t4brmhclm0QFQhEMfs/EejRNA49pNwRITIjoFiob6
- GF3Q==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jYPkK-00062p-Ds
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 03:54:36 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37819
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jYPkI-0003Y5-Jt
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 03:54:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589270072;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=u/MYEE3LL026i32opmckGgknS6r7+NiLTdtsOAf25vo=;
+ b=elz05xO0cvXWiG0MJ1auB050RM5a2yT188uWFT+gQ0LAB5fl4exT2aa9cP7bJWSewARjZq
+ ZZpxL/st04nJdRqyPzdreY5fiHpVPIjsqQ3wYosmqEBgvYY227NaG5SDCkx7KGLl23Vujb
+ HuAknVAXI7qNdRvObR41fSvuBrmHRFw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-209-S25bY0OrNvS3z4oGoNQriw-1; Tue, 12 May 2020 03:54:30 -0400
+X-MC-Unique: S25bY0OrNvS3z4oGoNQriw-1
+Received: by mail-wm1-f71.google.com with SMTP id q5so9568026wmc.9
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 00:54:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=9+HPWfi6hB2pKPErn5CtXaV2y+G6fIj46U87L3EGk9I=;
- b=moRN58MwuKsGH3iYTfDvBt3UlJqPSO9vWUC16f4aEsdCPa8ieojGN9lgG0seSoAMob
- PKfu84CpD4Dg3f4DpkkaKroC1gWHw7nhjvJjvRyOf4rQrs2dIsvORJXOWQRSl53TBNIU
- +dLDWQdibarqIW+ee/TJTa3Eq33a1MRI8gVd6zECI35fqLzuwtWeiTStTG0stgyjyLsC
- SSQUqJc11H85NQ6LuJn1ewic8RZaPCYnWvBka2x40wgx2IOL14aQ5oPf4GtQQ6CkzGvj
- WFB44ztVkV+U/8E9xwNSwNf+oDKoGqtd+XRdVqPMH0aSWyqA2Y7lQByj0MF09L9JOQyo
- Lwkg==
-X-Gm-Message-State: AGi0PuanpByaI8GkAZrU73MgdwF0OVINg2WzGJ5yvBnbqiaWYbrZbrhq
- 1SkwG0fdVflSHk/KDl4uOkUjqsG90IE=
-X-Google-Smtp-Source: APiQypKkiNw8fkb0TPe0cxQGwb02CaORIWkDEN3FLgHhW8Pup6YHsTQk8RRrz3bviGdDv0C7yKVfqQ==
-X-Received: by 2002:a5d:4d46:: with SMTP id a6mr24475859wru.188.1589269701741; 
- Tue, 12 May 2020 00:48:21 -0700 (PDT)
-Received: from localhost.localdomain (17.red-88-21-202.staticip.rima-tde.net.
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=u/MYEE3LL026i32opmckGgknS6r7+NiLTdtsOAf25vo=;
+ b=Dc6UfqAizJFaP9gAuF+JzBQ6pXtOHy6QembmLzfMcGCFGXNl0YIwr+pm4t2Mi3WYPB
+ oqHqOzyw8gu1BTPcPickjuJR2yfRoqL2QDpGj/j2lXquW2CUqjE8CqVPGhkPdY56DHk4
+ dbydQWmyBG+12N6jS/SyBeq1Fsx9XVcM+Kzh+EKAvvlh469eSPOdlMk8Tit/jIw+wmYk
+ 9Yuxn5u4gsXscAatNG7qbHdqYRnuVWw2jIGXrYcmg/KVQk/suSqjtJr08u3RptDy9ADS
+ n9zj5aECZaxBC1zRcIM1L4e1w3BPVlC1j53wqLr8HzKVU0KKICnLyvt+Hbx45N2CdDYf
+ T09Q==
+X-Gm-Message-State: AGi0PuZNnJBVzW68MG9kk8KkItWaKvUxsp480VW9Xp5dNM0diOe3uJQ0
+ VYN7m6o29Cy2nNFnP0YGDGMQ8gu2LGHSc9eJhKuuVhC2e0iOt0mAPn/Mj011Qbdjhqkt0cjGZsV
+ M/BaSpvUvOicQQUk=
+X-Received: by 2002:a5d:684a:: with SMTP id o10mr23024028wrw.311.1589270069792; 
+ Tue, 12 May 2020 00:54:29 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJCzBgjMpK4yFwn071XfEIZdrnXGhYtv+pSlpt1rTWKIT49tzHYGX04nanxlWmWYnQp5xLxSg==
+X-Received: by 2002:a5d:684a:: with SMTP id o10mr23023997wrw.311.1589270069463; 
+ Tue, 12 May 2020 00:54:29 -0700 (PDT)
+Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id c7sm7783754wro.80.2020.05.12.00.48.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 12 May 2020 00:48:21 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 3/3] hw/openrisc/pic_cpu: Use qdev gpio rather than
- qemu_allocate_irqs()
-Date: Tue, 12 May 2020 09:48:13 +0200
-Message-Id: <20200512074813.29992-4-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200512074813.29992-1-f4bug@amsat.org>
-References: <20200512074813.29992-1-f4bug@amsat.org>
+ by smtp.gmail.com with ESMTPSA id p8sm21067366wre.11.2020.05.12.00.54.28
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 12 May 2020 00:54:28 -0700 (PDT)
+Subject: Re: [PATCH] i386/kvm: fix a use-after-free when vcpu plug/unplug
+To: Pan Nengyuan <pannengyuan@huawei.com>, pbonzini@redhat.com,
+ rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com
+References: <20200512133933.8696-1-pannengyuan@huawei.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <eab55b02-d51b-96c6-3c03-eb69964f162d@redhat.com>
+Date: Tue, 12 May 2020 09:54:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200512133933.8696-1-pannengyuan@huawei.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 01:41:59
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,65 +113,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Stafford Horne <shorne@gmail.com>, John Snow <jsnow@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ euler.robot@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Coverity points out (CID 1421934) that we are leaking the
-memory returned by qemu_allocate_irqs(). We can avoid this
-leak by switching to using qdev_init_gpio_in(); the base
-class finalize will free the irqs that this allocates under
-the hood.
+On 5/12/20 3:39 PM, Pan Nengyuan wrote:
+> When we hotplug vcpus, cpu_update_state is added to vm_change_state_head
+> in kvm_arch_init_vcpu(). But it forgot to delete in kvm_arch_destroy_vcpu() after
+> unplug. Then it will cause a use-after-free access. This patch delete it in
+> kvm_arch_destroy_vcpu() to fix that.
+> 
+> Reproducer:
+>      virsh setvcpus vm1 4 --live
+>      virsh setvcpus vm1 2 --live
+>      virsh suspend vm1
+>      virsh resume vm1
+> 
+> The UAF stack:
+> ==qemu-system-x86_64==28233==ERROR: AddressSanitizer: heap-use-after-free on address 0x62e00002e798 at pc 0x5573c6917d9e bp 0x7fff07139e50 sp 0x7fff07139e40
+> WRITE of size 1 at 0x62e00002e798 thread T0
+>      #0 0x5573c6917d9d in cpu_update_state /mnt/sdb/qemu/target/i386/kvm.c:742
+>      #1 0x5573c699121a in vm_state_notify /mnt/sdb/qemu/vl.c:1290
+>      #2 0x5573c636287e in vm_prepare_start /mnt/sdb/qemu/cpus.c:2144
+>      #3 0x5573c6362927 in vm_start /mnt/sdb/qemu/cpus.c:2150
+>      #4 0x5573c71e8304 in qmp_cont /mnt/sdb/qemu/monitor/qmp-cmds.c:173
+>      #5 0x5573c727cb1e in qmp_marshal_cont qapi/qapi-commands-misc.c:835
+>      #6 0x5573c7694c7a in do_qmp_dispatch /mnt/sdb/qemu/qapi/qmp-dispatch.c:132
+>      #7 0x5573c7694c7a in qmp_dispatch /mnt/sdb/qemu/qapi/qmp-dispatch.c:175
+>      #8 0x5573c71d9110 in monitor_qmp_dispatch /mnt/sdb/qemu/monitor/qmp.c:145
+>      #9 0x5573c71dad4f in monitor_qmp_bh_dispatcher /mnt/sdb/qemu/monitor/qmp.c:234
+> 
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+> ---
+>   target/i386/cpu.h | 1 +
+>   target/i386/kvm.c | 5 ++++-
+>   2 files changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index e818fc712a..afbd11b7a3 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1631,6 +1631,7 @@ struct X86CPU {
+>   
+>       CPUNegativeOffsetState neg;
+>       CPUX86State env;
+> +    VMChangeStateEntry *vmsentry;
+>   
+>       uint64_t ucode_rev;
+>   
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 4901c6dd74..ff2848357e 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -1770,7 +1770,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>           }
+>       }
+>   
+> -    qemu_add_vm_change_state_handler(cpu_update_state, env);
+> +    cpu->vmsentry = qemu_add_vm_change_state_handler(cpu_update_state, env);
+>   
+>       c = cpuid_find_entry(&cpuid_data.cpuid, 1, 0);
+>       if (c) {
+> @@ -1883,6 +1883,9 @@ int kvm_arch_destroy_vcpu(CPUState *cs)
+>           env->nested_state = NULL;
+>       }
+>   
+> +    qemu_del_vm_change_state_handler(cpu->vmsentry);
+> +    cpu->vmsentry = NULL;
 
-Patch created mechanically using spatch with this script
-inspired from commit d6ef883d9d7:
+Why set it to NULL? there is no non-NULL check.
 
-  @@
-  typedef qemu_irq;
-  identifier irqs, handler;
-  expression opaque, count, i;
-  @@
-  -   qemu_irq *irqs;
-      ...
-  -   irqs = qemu_allocate_irqs(handler, opaque, count);
-  +   qdev_init_gpio_in(DEVICE(opaque), handler, count);
-      <+...
-  -   irqs[i]
-  +   qdev_get_gpio_in(DEVICE(opaque), i)
-      ...+>
-  ?-  g_free(irqs);
+Anyway if it matters to you, why not do it in 
+qemu_del_vm_change_state_handler()?
 
-Fixes: Coverity CID 1421934 RESOURCE_LEAK
-Inspired-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/openrisc/pic_cpu.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Otherwise:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-diff --git a/hw/openrisc/pic_cpu.c b/hw/openrisc/pic_cpu.c
-index 36f9350830..4b0c92f842 100644
---- a/hw/openrisc/pic_cpu.c
-+++ b/hw/openrisc/pic_cpu.c
-@@ -52,10 +52,9 @@ static void openrisc_pic_cpu_handler(void *opaque, int irq, int level)
- void cpu_openrisc_pic_init(OpenRISCCPU *cpu)
- {
-     int i;
--    qemu_irq *qi;
--    qi = qemu_allocate_irqs(openrisc_pic_cpu_handler, cpu, NR_IRQS);
-+    qdev_init_gpio_in(DEVICE(cpu), openrisc_pic_cpu_handler, NR_IRQS);
- 
-     for (i = 0; i < NR_IRQS; i++) {
--        cpu->env.irq[i] = qi[i];
-+        cpu->env.irq[i] = qdev_get_gpio_in(DEVICE(cpu), i);
-     }
- }
--- 
-2.21.3
+> +
+>       return 0;
+>   }
+>   
+> 
 
 
