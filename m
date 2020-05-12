@@ -6,66 +6,63 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B68A4C2D0F8
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 22:21:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AFA2C2D0F8
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 22:32:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A4E420740
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 22:21:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A4E420740
+	by mail.kernel.org (Postfix) with ESMTPS id 3071C20731
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 22:32:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3071C20731
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYdHV-0004tL-Bi
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 18:21:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44996)
+	id 1jYdRc-0000mQ-DK
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 18:32:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46154)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jYdGu-0004PD-Oo
- for qemu-devel@nongnu.org; Tue, 12 May 2020 18:21:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36508)
+ id 1jYdQx-0000Lg-8t
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 18:31:31 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40704)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jYdGt-0005v7-3y
- for qemu-devel@nongnu.org; Tue, 12 May 2020 18:21:08 -0400
+ id 1jYdQw-0000YP-B3
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 18:31:30 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jYdGr-0006PC-3k
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 22:21:05 +0000
+ id 1jYdQq-0007Mq-Fl
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 22:31:24 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E28592E8115
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 22:21:04 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id A20E92E8160
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 22:31:19 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 12 May 2020 22:07:05 -0000
-From: Roman Bolshakov <1844946@bugs.launchpad.net>
+Date: Tue, 12 May 2020 22:23:54 -0000
+From: Roman Bolshakov <1872644@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
 X-Launchpad-Bug-Tags: hvf
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: nanoant
-X-Launchpad-Bug-Reporter: Adam Strzelecki (nanoant)
+X-Launchpad-Bug-Commenters: js1943
+X-Launchpad-Bug-Reporter: JS (js1943)
 X-Launchpad-Bug-Modifier: Roman Bolshakov (roolebo)
-X-Launchpad-Bug-Duplicate: 1823831
-References: <156918728216.32759.756692081712593785.malonedeb@wampee.canonical.com>
-Message-Id: <158932122613.29675.4568053267058634051.launchpad@soybean.canonical.com>
-Subject: [Bug 1844946] Re: macOS HVF broken with WinXP after Aug 21 2018
- 92d5f1a414
+References: <158684876015.5950.10208526082243977591.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158932223502.19030.9082950510001487943.launchpad@chaenomeles.canonical.com>
+Subject: [Bug 1872644] Re: MacOS host qemu-system-x86_64 -cpu host not working
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="013b6f2a3f3ba130b50b9eee1a89957ee38a5c15";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: d79bdc0be7e3d94d705030ddaf8f99ff47be09a2
+X-Launchpad-Hash: 0ddae8531766cae7146b9cd1da1719e3d987b075
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 18:06:09
@@ -88,76 +85,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1844946 <1844946@bugs.launchpad.net>
+Reply-To: Bug 1872644 <1872644@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-*** This bug is a duplicate of bug 1823831 ***
-    https://bugs.launchpad.net/bugs/1823831
-
 ** Tags added: hvf
-
-** Changed in: qemu
-       Status: New =3D> Fix Released
-
-** This bug has been marked a duplicate of bug 1823831
-   BSD bootloader halts with hypervisor.framework
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1844946
+https://bugs.launchpad.net/bugs/1872644
 
 Title:
-  macOS HVF broken with WinXP after Aug 21 2018 92d5f1a414
+  MacOS host qemu-system-x86_64 -cpu host not working
 
 Status in QEMU:
-  Fix Released
+  New
 
 Bug description:
-  I use macOS with own built Qemu to run old XP system that I have migrated=
- from physical machine. My setup is very simple qemu-system-x86_64 with arg=
-s:
-  -machine pc,accel=3Dhvf,usb=3Doff,vmport=3Doff
-  -cpu host
-  -vga std
-  -m 2048
-  -drive file=3D"$img",format=3Dqcow2,cache=3Dnone,detect-zeroes=3Don
-  -usb -device usb-tablet
+  MacOS: 10.15.4
+  uname -a: Linux door 4.15.0-96-generic #97-Ubuntu SMP Wed Apr 1 03:25:46 =
+UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
 
-  Unfortunately as soon I enable HVF with first 2 lines WinXP SP3 hangs
-  on boot (famous mup.sys). It works fine in TCG.
+  I am using qemu on mac host, with ubuntu client.
 
-  I dived into the code checking the differences between HVF, KVM and
-  HAXM and my analysis is:
+  I used to have "-cpu host" in my qemu command as follow:-
 
-  1. Sergio Andres Gomez Del Real b7394c8394 - replaces explicit
-  VMCS_GUEST_INTERRUPTIBILITY checks with hflags/hflags2.
+  qemu-system-x86_64 \
+  -no-user-config \
+  -nodefaults \
+  -name u64d01 \
+  -show-cursor \
+  -M q35,accel=3Dhvf,usb=3Doff,vmport=3Doff \
+  -cpu host \
+  -m 8192M \
+  -smp 4 \
+  -rtc base=3Dutc,clock=3Dhost \
+  -device virtio-blk-pci,drive=3Dssd1 \
+  -drive id=3Dssd1,file=3D/Users/js/code/vm/qemu/u64d01.qcow2,if=3Dnone,for=
+mat=3Dqcow2 \
+  -device virtio-net-pci,netdev=3Dnic1,mac=3D52:54:98:76:54:33 \
+  -netdev user,id=3Dnic1,ipv4=3Don,ipv6=3Don,hostname=3Du64d01,hostfwd=3Dtc=
+p::2222-:22 \
+  -device virtio-tablet-pci \
+  -device virtio-vga \
+  -device ich9-intel-hda,id=3Dsnd,msi=3Don \
+  -device hda-output,id=3Dsnd-codec0,bus=3Dsnd.0,cad=3D0,audiodev=3Dsnd0 \
+  -audiodev coreaudio,id=3Dsnd0
 
-  2. Paolo Bonzini 92d5f1a414 - changes hflags/hflags2 behavior which
-  breaks in the end HVF interrupt handling and makes WinXP unable to
-  boot. NOTE: This does not break I believe KVM and HAXM as they still
-  do explicit check instead what HVF does in 1. That's why it was
-  probably not reported and Qemu macOS users are rather niche ;)
+  Base on log of one of the vm, it was definitely working on
+  2020-01-17(base on journal inside vm), with qemu 4.2.0, which I
+  installed with brew.
 
-  Reverting 92d5f1a414 makes WinXP boot well and work flawlessly.
-  Unfortunately b7394c8394 is not easy anymore as too many changes on the w=
-ay, so it may be not an option.
+  The only way to make it work is to remove "-cpu host".
 
-  This can be reproduced simply by installing /Users/ono/VM/ISO/en_windows_=
-xp_professional_with_service_pack_3_x86_cd_vl_x14-73974.iso
-  with HAL as "Standard PC" selectable with F5 on first run.
+  Already tried with 4.1.1, 4.2 and 5.0rc2. Same result.
 
-  I can also provide fresh ~600MB qcow2 image (without activation key
-  entered yet) that is created before boot that fails. No need for full
-  XP installation to test that.
-
-  Nevertheless I would really appreciate Paolo looking into this.
-  Many thanks for great software,
-  Adam
+  To reproduce, try above with a Ubuntu 18.04 installation cd. Client
+  will crash during kernel loading.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1844946/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1872644/+subscriptions
 
