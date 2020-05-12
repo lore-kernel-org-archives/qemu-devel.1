@@ -2,105 +2,92 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0649C54E4A
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 15:08:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F857C54E4A
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 15:08:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4CE220673
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 15:08:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4CE220673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id DD98C20673
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 15:08:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cl+Nt/ul"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD98C20673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYWWN-0007g0-Si
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 11:08:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33384)
+	id 1jYWWZ-0007wm-4U
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 11:08:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33514)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1jYWKF-0001zM-N2; Tue, 12 May 2020 10:56:09 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:6208)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1jYWKC-0006qJ-RO; Tue, 12 May 2020 10:56:07 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 04CEmIqp195434; Tue, 12 May 2020 10:56:00 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 30ws5f5kck-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 12 May 2020 10:56:00 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04CEmV80196537;
- Tue, 12 May 2020 10:55:59 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
- [169.55.85.253])
- by mx0a-001b2d01.pphosted.com with ESMTP id 30ws5f5kbx-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 12 May 2020 10:55:59 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
- by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04CEoVrf013367;
- Tue, 12 May 2020 14:55:58 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
- [9.57.198.24]) by ppma01wdc.us.ibm.com with ESMTP id 30wm56j3r8-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 12 May 2020 14:55:58 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
- [9.57.199.111])
- by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 04CEtw8g54722894
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 12 May 2020 14:55:58 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id F07D6AC059;
- Tue, 12 May 2020 14:55:57 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 55F50AC05B;
- Tue, 12 May 2020 14:55:57 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.85.150.178])
- by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTPS;
- Tue, 12 May 2020 14:55:57 +0000 (GMT)
-Subject: Re: [PATCH v1 3/8] s390/sclp: rework sclp boundary and length checks
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org
-References: <20200508230823.22956-1-walling@linux.ibm.com>
- <20200508230823.22956-4-walling@linux.ibm.com>
- <d894a835-d0ea-2d61-0416-c4804a755dca@redhat.com>
-From: Collin Walling <walling@linux.ibm.com>
-Message-ID: <75157d93-2f4d-db25-4a0d-fdb4a7781135@linux.ibm.com>
-Date: Tue, 12 May 2020 10:55:56 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jYWKg-00032R-P4
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 10:56:34 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31022
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jYWKf-0006vp-Mu
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 10:56:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589295392;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vK+7X1PV3xcstDU/tt/jE/s3Cy00piksGfP3b+BWCVY=;
+ b=cl+Nt/ulzseIH18Bsc5lTrBZmBY9kd4RHd8rbv5dcW/2SGddRaXHFVVu9MeTJzhbZC5Ptw
+ d+tbJ+Rs1woc1TeEeuJNCwxv9Yq+pf4FWcts9MJjw+wSyCmuLD5ILgxKpQ01QlEFK/xexX
+ Xk/xgiXBOU4Q2WzruUIuPxVz+oeiM0c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-159-fiSw5kGKPEqyOCWspGO7lQ-1; Tue, 12 May 2020 10:56:30 -0400
+X-MC-Unique: fiSw5kGKPEqyOCWspGO7lQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38937801E63;
+ Tue, 12 May 2020 14:56:29 +0000 (UTC)
+Received: from [10.36.112.22] (ovpn-112-22.ams2.redhat.com [10.36.112.22])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2BBF71CC;
+ Tue, 12 May 2020 14:56:18 +0000 (UTC)
+Subject: Re: [PATCH v2 1/3] acpi: Move build_tpm2() in the generic part
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20200505144419.29174-1-eric.auger@redhat.com>
+ <20200505144419.29174-2-eric.auger@redhat.com>
+ <20200506063314.4qvnyfonjixcknuj@kamzik.brq.redhat.com>
+ <b8b64cf5-d730-20f0-c9e5-d290b8639e5a@redhat.com>
+ <20200512161029.35c77730@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <26885dc1-5b0e-9ebe-9da6-70cc0814c6bf@redhat.com>
+Date: Tue, 12 May 2020 16:56:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <d894a835-d0ea-2d61-0416-c4804a755dca@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200512161029.35c77730@redhat.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
- definitions=2020-05-12_04:2020-05-11,
- 2020-05-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 suspectscore=0
- phishscore=0 spamscore=0 impostorscore=0 malwarescore=0 mlxlogscore=999
- lowpriorityscore=0 bulkscore=0 adultscore=0 priorityscore=1501 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2005120110
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=walling@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 10:56:00
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eric.auger@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 01:41:59
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -114,137 +101,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: frankja@linux.ibm.com, mst@redhat.com, cohuck@redhat.com,
- pasic@linux.ibm.com, borntraeger@de.ibm.com, svens@linux.ibm.com,
- pbonzini@redhat.com, mihajlov@linux.ibm.com, rth@twiddle.net
+Cc: peter.maydell@linaro.org, Andrew Jones <drjones@redhat.com>,
+ gshan@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ shannon.zhaosl@gmail.com, qemu-arm@nongnu.org, marcandre.lureau@redhat.com,
+ eric.auger.pro@gmail.com, lersek@redhat.com, ardb@kernel.org,
+ stefanb@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/12/20 3:21 AM, David Hildenbrand wrote:
-> On 09.05.20 01:08, Collin Walling wrote:
->> Let's factor out the SCLP boundary and length checks
->> into separate functions.
+Hi Igor,
+On 5/12/20 4:10 PM, Igor Mammedov wrote:
+> On Wed, 6 May 2020 11:50:09 +0200
+> Auger Eric <eric.auger@redhat.com> wrote:
+> 
+>> Hi,
 >>
->> Signed-off-by: Collin Walling <walling@linux.ibm.com>
->> ---
->>   hw/s390x/sclp.c | 41 +++++++++++++++++++++++++++++++++++------
->>   1 file changed, 35 insertions(+), 6 deletions(-)
+>> On 5/6/20 8:33 AM, Andrew Jones wrote:
+>>> On Tue, May 05, 2020 at 04:44:17PM +0200, Eric Auger wrote:  
+>>>> We plan to build the tpm2 table on ARM too. In order to reuse the
+>>>> generation code, let's move build_tpm2() to aml-build.c.
+>>>>
+>>>> No change in the implementation.
+>>>>
+>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>> ---
+>>>>  include/hw/acpi/aml-build.h |  2 ++
+>>>>  hw/acpi/aml-build.c         | 30 ++++++++++++++++++++++++++++++
+>>>>  hw/i386/acpi-build.c        | 30 ------------------------------
+>>>>  3 files changed, 32 insertions(+), 30 deletions(-)
+>>>>
+>>>> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+>>>> index 0f4ed53d7f..a67ab4618a 100644
+>>>> --- a/include/hw/acpi/aml-build.h
+>>>> +++ b/include/hw/acpi/aml-build.h
+>>>> @@ -437,4 +437,6 @@ void build_slit(GArray *table_data, BIOSLinker *linker, MachineState *ms);
+>>>>  
+>>>>  void build_fadt(GArray *tbl, BIOSLinker *linker, const AcpiFadtData *f,
+>>>>                  const char *oem_id, const char *oem_table_id);
+>>>> +
+>>>> +void build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog);
+>>>>  #endif
+>>>> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+>>>> index 2c3702b882..1f7fd09112 100644
+>>>> --- a/hw/acpi/aml-build.c
+>>>> +++ b/hw/acpi/aml-build.c
+>>>> @@ -26,6 +26,7 @@
+>>>>  #include "qemu/bitops.h"
+>>>>  #include "sysemu/numa.h"
+>>>>  #include "hw/boards.h"
+>>>> +#include "hw/acpi/tpm.h"
+>>>>  
+>>>>  static GArray *build_alloc_array(void)
+>>>>  {
+>>>> @@ -1875,6 +1876,35 @@ build_hdr:
+>>>>                   "FACP", tbl->len - fadt_start, f->rev, oem_id, oem_table_id);
+>>>>  }
+>>>>  
+>>>> +void build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+>>>> +{
+>>>> +    Acpi20TPM2 *tpm2_ptr = acpi_data_push(table_data, sizeof *tpm2_ptr);
+>>>> +    unsigned log_addr_size = sizeof(tpm2_ptr->log_area_start_address);
+>>>> +    unsigned log_addr_offset =
+>>>> +        (char *)&tpm2_ptr->log_area_start_address - table_data->data;
+>>>> +
+>>>> +    tpm2_ptr->platform_class = cpu_to_le16(TPM2_ACPI_CLASS_CLIENT);
+>>>> +    if (TPM_IS_TIS_ISA(tpm_find())) {
+>>>> +        tpm2_ptr->control_area_address = cpu_to_le64(0);
+>>>> +        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_MMIO);
+>>>> +    } else if (TPM_IS_CRB(tpm_find())) {
+>>>> +        tpm2_ptr->control_area_address = cpu_to_le64(TPM_CRB_ADDR_CTRL);
+>>>> +        tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_CRB);
+>>>> +    } else {
+>>>> +        g_warn_if_reached();
+>>>> +    }
+>>>> +
+>>>> +    tpm2_ptr->log_area_minimum_length =
+>>>> +        cpu_to_le32(TPM_LOG_AREA_MINIMUM_SIZE);
+>>>> +
+>>>> +    /* log area start address to be filled by Guest linker */
+>>>> +    bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
+>>>> +                                   log_addr_offset, log_addr_size,
+>>>> +                                   ACPI_BUILD_TPMLOG_FILE, 0);
+>>>> +    build_header(linker, table_data,
+>>>> +                 (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NULL);
+>>>> +}
+>>>> +  
+>>>
+>>> I'll let Igor and mst confirm/deny this, but my understanding was that the
+>>> build_append* API was the preferred way to create the table. Indeed, I
+>>> don't see too many table.field = cpu_to_le(...) lines in aml-build.c
+>>>
+>>> I realize this function is just getting moved, but maybe it should get
+>>> converted to the build_append* API while being moved?  
 >>
->> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
->> index d08a291e40..470d5da7a2 100644
->> --- a/hw/s390x/sclp.c
->> +++ b/hw/s390x/sclp.c
->> @@ -49,6 +49,34 @@ static inline bool sclp_command_code_valid(uint32_t code)
->>       return false;
->>   }
->>   
->> +static bool check_sccb_boundary_valid(uint64_t sccb_addr, uint32_t code,
->> +                                      SCCB *sccb)
-> 
-> I suggest naming this
-> 
-> "has_valid_sccb_boundary", then the true/false response is clearer.
-> 
->> +{
->> +    uint64_t current_len = sccb_addr + be16_to_cpu(sccb->h.length);
->> +    uint64_t allowed_len = (sccb_addr & PAGE_MASK) + PAGE_SIZE;
->> +
->> +    switch (code & SCLP_CMD_CODE_MASK) {
->> +    default:
->> +        if (current_len <= allowed_len) {
->> +            return true;
->> +        }
->> +    }
->> +    sccb->h.response_code = cpu_to_be16(SCLP_RC_SCCB_BOUNDARY_VIOLATION);
->> +    return false;
->> +}
->> +
->> +static bool check_sufficient_sccb_len(SCCB *sccb, int size)
-> 
-> "has_sufficient_sccb_len" ?
-> 
->> +{
->> +    MachineState *ms = MACHINE(qdev_get_machine());
->> +    int required_len = size + ms->possible_cpus->len * sizeof(CPUEntry);
-> 
-> Rather pass in the number of cpus instead. Looking up the machine again
-> in here is ugly.
-
-prepare_cpu_entries also looks up the machine again. Should I squeeze
-in a cleanup where we pass the machine to that function too (perhaps
-in the "remove SCLPDevice" patch)?
-
-> 
->> +
->> +    if (be16_to_cpu(sccb->h.length) < required_len) {
->> +        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
->> +        return false;
->> +    }
->> +    return true;
->> +}
->> +
->>   static void prepare_cpu_entries(CPUEntry *entry, int *count)
->>   {
->>       MachineState *ms = MACHINE(qdev_get_machine());
->> @@ -76,8 +104,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
->>       int rnsize, rnmax;
->>       IplParameterBlock *ipib = s390_ipl_get_iplb();
->>   
->> -    if (be16_to_cpu(sccb->h.length) < (sizeof(ReadInfo) + cpu_count * sizeof(CPUEntry))) {
->> -        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
->> +    if (!check_sufficient_sccb_len(sccb, sizeof(ReadInfo))) {
->>           return;
->>       }
->>   
->> @@ -134,8 +161,7 @@ static void sclp_read_cpu_info(SCLPDevice *sclp, SCCB *sccb)
->>       ReadCpuInfo *cpu_info = (ReadCpuInfo *) sccb;
->>       int cpu_count;
->>   
->> -    if (be16_to_cpu(sccb->h.length) < (sizeof(ReadCpuInfo) + cpu_count * sizeof(CPUEntry))) {
->> -        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
->> +    if (!check_sufficient_sccb_len(sccb, sizeof(ReadCpuInfo))) {
->>           return;
->>       }
->>   
->> @@ -227,6 +253,10 @@ int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
->>           goto out_write;
->>       }
->>   
->> +    if (!check_sccb_boundary_valid(sccb, code, &work_sccb)) {
->> +        goto out_write;
->> +    }
-> 
-> This is not a "factor out". You're adding new code, this needs
-> justification in the patch description.
-
-True. I'll fix up the message.
-
-> 
->> +
->>       sclp_c->execute(sclp, &work_sccb, code);
->>   out_write:
->>       s390_cpu_pv_mem_write(env_archcpu(env), 0, &work_sccb,
->> @@ -272,8 +302,7 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
->>           goto out_write;
->>       }
->>   
->> -    if ((sccb + be16_to_cpu(work_sccb.h.length)) > ((sccb & PAGE_MASK) + PAGE_SIZE)) {
->> -        work_sccb.h.response_code = cpu_to_be16(SCLP_RC_SCCB_BOUNDARY_VIOLATION);
->> +    if (!check_sccb_boundary_valid(sccb, code, &work_sccb)) {
->>           goto out_write;
->>       }
->>   
+>> The reason I did not convert is that the struct is as follows
 >>
+>> struct Acpi20TPM2 {
+>>     ACPI_TABLE_HEADER_DEF
+>>     uint16_t platform_class;
+>>     uint16_t reserved;
+>>     uint64_t control_area_address;
+>>     uint32_t start_method;
+>>     uint8_t start_method_params[12];
+>>     uint32_t log_area_minimum_length;
+>>     uint64_t log_area_start_address;
+>> } QEMU_PACKED;
+>>
+>>
+>> If I understand correctly the build_append* adds the fields
+>> contiguously. It was not straightforward to me how to skip the
+>> start_method_params array.
+> 
+> you can use g_array_append_vals() for adding byte array (even is it's all zeros)
+
+OK I will do.
+
+Thank you for your input.
+
+Eric
+> 
+>> While we are at it the tcpalog arg is not used. Shall I remove it?
+>>
+>> Thanks
+>>
+>> Eric
+>>
+>>>
+>>> Thanks,
+>>> drew
+>>>
+>>>   
 > 
 > 
 
-Renamed functions. Thanks for the review!
-
--- 
---
-Regards,
-Collin
-
-Stay safe and stay healthy
 
