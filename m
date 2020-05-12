@@ -6,38 +6,39 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 345B0C2D0F6
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 17:00:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FB14CA90AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 17:02:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BA6B206B8
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 17:00:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BA6B206B8
+	by mail.kernel.org (Postfix) with ESMTPS id E6E36206B8
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 17:02:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6E36206B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46430 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYYGM-0004Gs-6M
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 13:00:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52388)
+	id 1jYYIo-0007BI-2R
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 13:02:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52414)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYY7R-0004mE-Sg; Tue, 12 May 2020 12:51:01 -0400
-Received: from relay.sw.ru ([185.231.240.75]:50546)
+ id 1jYY7U-0004r6-Cy; Tue, 12 May 2020 12:51:04 -0400
+Received: from relay.sw.ru ([185.231.240.75]:50530)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYY7P-0001R9-5j; Tue, 12 May 2020 12:51:01 -0400
+ id 1jYY7P-0001R4-3b; Tue, 12 May 2020 12:51:04 -0400
 Received: from dhcp-172-16-25-136.sw.ru ([172.16.25.136] helo=localhost.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYY7D-0004nT-MV; Tue, 12 May 2020 19:50:47 +0300
+ id 1jYY7C-0004nT-Vv; Tue, 12 May 2020 19:50:47 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v4 12/15] copy-on-read: add filter append/drop functions
-Date: Tue, 12 May 2020 19:50:42 +0300
-Message-Id: <1589302245-893269-13-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v4 07/15] commit: Deal with filters when blocking intermediate
+ nodes
+Date: Tue, 12 May 2020 19:50:37 +0300
+Message-Id: <1589302245-893269-8-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1589302245-893269-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1589302245-893269-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -70,159 +71,140 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Provide API for the COR-filter insertion/removal.
-Also, drop the filter child permissions for an inactive state when the
-filter node is being removed.
+From: Max Reitz <mreitz@redhat.com>
 
+This includes some permission limiting (for example, we only need to
+take the RESIZE permission if the base is smaller than the top).
+
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- block/copy-on-read.c | 102 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 102 insertions(+)
+ block/commit.c | 75 ++++++++++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 60 insertions(+), 15 deletions(-)
 
-diff --git a/block/copy-on-read.c b/block/copy-on-read.c
-index 4030d56..229a97c 100644
---- a/block/copy-on-read.c
-+++ b/block/copy-on-read.c
-@@ -24,11 +24,20 @@
- #include "qemu/cutils.h"
- #include "block/block_int.h"
- #include "qemu/module.h"
-+#include "qapi/error.h"
-+#include "qapi/qmp/qdict.h"
-+#include "block/copy-on-read.h"
+diff --git a/block/commit.c b/block/commit.c
+index e1f45a4..4df145d 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -37,6 +37,7 @@ typedef struct CommitBlockJob {
+     BlockBackend *top;
+     BlockBackend *base;
+     BlockDriverState *base_bs;
++    BlockDriverState *above_base;
+     BlockdevOnError on_error;
+     bool base_read_only;
+     bool chain_frozen;
+@@ -153,7 +154,7 @@ static int coroutine_fn commit_run(Job *job, Error **errp)
+             break;
+         }
+         /* Copy if allocated above the base */
+-        ret = bdrv_is_allocated_above(blk_bs(s->top), blk_bs(s->base), false,
++        ret = bdrv_is_allocated_above(blk_bs(s->top), s->above_base, true,
+                                       offset, COMMIT_BUFFER_SIZE, &n);
+         copy = (ret == 1);
+         trace_commit_one_iteration(s, offset, n, ret);
+@@ -253,15 +254,35 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+     CommitBlockJob *s;
+     BlockDriverState *iter;
+     BlockDriverState *commit_top_bs = NULL;
++    BlockDriverState *filtered_base;
+     Error *local_err = NULL;
++    int64_t base_size, top_size;
++    uint64_t perms, iter_shared_perms;
+     int ret;
  
+     assert(top != bs);
+-    if (top == base) {
++    if (bdrv_skip_rw_filters(top) == bdrv_skip_rw_filters(base)) {
+         error_setg(errp, "Invalid files for merge: top and base are the same");
+         return;
+     }
  
-+typedef struct BDRVStateCOR {
-+    bool active;
-+} BDRVStateCOR;
-+
- static int cor_open(BlockDriverState *bs, QDict *options, int flags,
-                     Error **errp)
- {
-+    BDRVStateCOR *state = bs->opaque;
-+
-     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file, false,
-                                errp);
-     if (!bs->file) {
-@@ -42,6 +51,8 @@ static int cor_open(BlockDriverState *bs, QDict *options, int flags,
-         ((BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_NO_FALLBACK) &
-             bs->file->bs->supported_zero_flags);
- 
-+    state->active = true;
-+
-     return 0;
- }
- 
-@@ -57,6 +68,17 @@ static void cor_child_perm(BlockDriverState *bs, BdrvChild *c,
-                            uint64_t perm, uint64_t shared,
-                            uint64_t *nperm, uint64_t *nshared)
- {
-+    BDRVStateCOR *s = bs->opaque;
-+
-+    if (!s->active) {
-+        /*
-+         * While the filter is being removed
-+         */
-+        *nperm = 0;
-+        *nshared = BLK_PERM_ALL;
++    base_size = bdrv_getlength(base);
++    if (base_size < 0) {
++        error_setg_errno(errp, -base_size, "Could not inquire base image size");
 +        return;
 +    }
 +
-     *nperm = perm & PERM_PASSTHROUGH;
-     *nshared = (shared & PERM_PASSTHROUGH) | PERM_UNCHANGED;
- 
-@@ -150,6 +172,7 @@ static int cor_change_backing_file(BlockDriverState *bs,
- 
- static BlockDriver bdrv_copy_on_read = {
-     .format_name                        = "copy-on-read",
-+    .instance_size                      = sizeof(BDRVStateCOR),
- 
-     .bdrv_open                          = cor_open,
-     .bdrv_child_perm                    = cor_child_perm,
-@@ -178,4 +201,83 @@ static void bdrv_copy_on_read_init(void)
-     bdrv_register(&bdrv_copy_on_read);
- }
- 
-+
-+static BlockDriverState *create_filter_node(BlockDriverState *bs,
-+                                            const char *filter_node_name,
-+                                            Error **errp)
-+{
-+    QDict *opts = qdict_new();
-+
-+    qdict_put_str(opts, "driver", "copy-on-read");
-+    qdict_put_str(opts, "file", bdrv_get_node_name(bs));
-+    if (filter_node_name) {
-+        qdict_put_str(opts, "node-name", filter_node_name);
-+    }
-+
-+    return bdrv_open(NULL, NULL, opts, BDRV_O_RDWR, errp);
-+}
-+
-+
-+BlockDriverState *bdrv_cor_filter_append(BlockDriverState *bs,
-+                                         const char *filter_node_name,
-+                                         Error **errp)
-+{
-+    BlockDriverState *cor_filter_bs;
-+    BDRVStateCOR *state;
-+    Error *local_err = NULL;
-+
-+    cor_filter_bs = create_filter_node(bs, filter_node_name, errp);
-+    if (cor_filter_bs == NULL) {
-+        error_prepend(errp, "Could not create filter node: ");
-+        return NULL;
-+    }
-+
-+    if (!filter_node_name) {
-+        cor_filter_bs->implicit = true;
-+    }
-+
-+    bdrv_drained_begin(bs);
-+    bdrv_replace_node(bs, cor_filter_bs, &local_err);
-+    bdrv_drained_end(bs);
-+
-+    if (local_err) {
-+        bdrv_unref(cor_filter_bs);
-+        error_propagate(errp, local_err);
-+        return NULL;
-+    }
-+
-+    state = cor_filter_bs->opaque;
-+    state->active = true;
-+
-+    return cor_filter_bs;
-+}
-+
-+
-+void bdrv_cor_filter_drop(BlockDriverState *cor_filter_bs)
-+{
-+    BdrvChild *child;
-+    BlockDriverState *bs;
-+    BDRVStateCOR *s = cor_filter_bs->opaque;
-+
-+    child = bdrv_filtered_rw_child(cor_filter_bs);
-+    if (!child) {
++    top_size = bdrv_getlength(top);
++    if (top_size < 0) {
++        error_setg_errno(errp, -top_size, "Could not inquire top image size");
 +        return;
 +    }
-+    bs = child->bs;
 +
-+    /* Retain the BDS until we complete the graph change. */
-+    bdrv_ref(bs);
-+    /* Hold a guest back from writing while permissions are being reset. */
-+    bdrv_drained_begin(bs);
-+    /* Drop permissions before the graph change. */
-+    s->active = false;
-+    bdrv_child_refresh_perms(cor_filter_bs, child, &error_abort);
-+    bdrv_replace_node(cor_filter_bs, bs, &error_abort);
++    perms = BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE;
++    if (base_size < top_size) {
++        perms |= BLK_PERM_RESIZE;
++    }
 +
-+    bdrv_drained_end(bs);
-+    bdrv_unref(bs);
-+    bdrv_unref(cor_filter_bs);
-+}
+     s = block_job_create(job_id, &commit_job_driver, NULL, bs, 0, BLK_PERM_ALL,
+                          speed, creation_flags, NULL, NULL, errp);
+     if (!s) {
+@@ -301,17 +322,43 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+ 
+     s->commit_top_bs = commit_top_bs;
+ 
+-    /* Block all nodes between top and base, because they will
+-     * disappear from the chain after this operation. */
+-    assert(bdrv_chain_contains(top, base));
+-    for (iter = top; iter != base; iter = backing_bs(iter)) {
+-        /* XXX BLK_PERM_WRITE needs to be allowed so we don't block ourselves
+-         * at s->base (if writes are blocked for a node, they are also blocked
+-         * for its backing file). The other options would be a second filter
+-         * driver above s->base. */
++    /*
++     * Block all nodes between top and base, because they will
++     * disappear from the chain after this operation.
++     * Note that this assumes that the user is fine with removing all
++     * nodes (including R/W filters) between top and base.  Assuring
++     * this is the responsibility of the interface (i.e. whoever calls
++     * commit_start()).
++     */
++    s->above_base = bdrv_find_overlay(top, base);
++    assert(s->above_base);
 +
++    /*
++     * The topmost node with
++     * bdrv_skip_rw_filters(filtered_base) == bdrv_skip_rw_filters(base)
++     */
++    filtered_base = bdrv_filtered_cow_bs(s->above_base);
++    assert(bdrv_skip_rw_filters(filtered_base) == bdrv_skip_rw_filters(base));
 +
- block_init(bdrv_copy_on_read_init);
++    /*
++     * XXX BLK_PERM_WRITE needs to be allowed so we don't block ourselves
++     * at s->base (if writes are blocked for a node, they are also blocked
++     * for its backing file). The other options would be a second filter
++     * driver above s->base.
++     */
++    iter_shared_perms = BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE;
++
++    for (iter = top; iter != base; iter = bdrv_filtered_bs(iter)) {
++        if (iter == filtered_base) {
++            /*
++             * From here on, all nodes are filters on the base.  This
++             * allows us to share BLK_PERM_CONSISTENT_READ.
++             */
++            iter_shared_perms |= BLK_PERM_CONSISTENT_READ;
++        }
++
+         ret = block_job_add_bdrv(&s->common, "intermediate node", iter, 0,
+-                                 BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE,
+-                                 errp);
++                                 iter_shared_perms, errp);
+         if (ret < 0) {
+             goto fail;
+         }
+@@ -328,9 +375,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+     }
+ 
+     s->base = blk_new(s->common.job.aio_context,
+-                      BLK_PERM_CONSISTENT_READ
+-                      | BLK_PERM_WRITE
+-                      | BLK_PERM_RESIZE,
++                      perms,
+                       BLK_PERM_CONSISTENT_READ
+                       | BLK_PERM_GRAPH_MOD
+                       | BLK_PERM_WRITE_UNCHANGED);
 -- 
 1.8.3.1
 
