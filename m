@@ -2,93 +2,121 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 953D6CA90AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 17:08:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97902CA90AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 17:16:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A4A0206A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 17:08:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C15D205ED
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 17:16:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TbJmIQ9e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A4A0206A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="jHWIRUMt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C15D205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYYOd-0001hX-CW
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 13:08:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53002)
+	id 1jYYVo-0000U0-He
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 13:16:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56306)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jYYBP-0001qG-E9
- for qemu-devel@nongnu.org; Tue, 12 May 2020 12:55:07 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40831)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jYYBN-0002Mb-7i
- for qemu-devel@nongnu.org; Tue, 12 May 2020 12:55:07 -0400
-Received: by mail-wm1-x344.google.com with SMTP id u16so24246710wmc.5
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 09:55:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=UXmarglZojfO1A8BU3EtiwEdWFl5N2qsjwk/zZKHK3U=;
- b=TbJmIQ9eKX/0wyI8hZejozJkEERzQxSbSySNaj15+uvQnehWvt1w4emPnyjx72jxPt
- WXp7Wnk/LGRWcMUgshC/ZZqZ09K781PMoCDZSQis+OOqrBGogLJS+JlHpWT7tuZhQJ7P
- SyrSfB8JUrh+uzIW6js1tr8wLG1pCtRbDp+s731FBUDIS4krKNOgJ0uta3I59AVXX37V
- 3KQYWzwW3/yM4S+7yb1nLjYn/HkmGuzZfBv7pGU7+A61qr5mLXfTJ8rJaegbIQb+6+Mi
- 0jpQvenRoiZcnDKv5RX1VFE0dsPJxUSD289rxKbr6K4Jiv+hKZh11BzRC2frtqPJLFKa
- NtEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=UXmarglZojfO1A8BU3EtiwEdWFl5N2qsjwk/zZKHK3U=;
- b=ZRr99mOAi5AFSV2V3sSTj88B+YI+TTTnnOfV5gM9DF50DtDsamnksjr4KGz37Liay+
- OjdR6VlHjJlh4shuUAG0VtGclSTb/8e+yPIk0gf+Bx5PP6mHG2KAHMn29OM1+L5NRRVI
- oPSETjAIAVv8WPcTBxLMjozPurHNJPsvUofm8tt1Vg9agjLzBknk65mj9xU9ZfSxBd2x
- r959CSkk14yOk1dMYkDQgX6nhwiUMXjj/6ujE8C03JajWfTB4uvCwBHFlsUhFLJYc+EA
- ltLwMJdNhro+lg8sXXep2FCdm+6rojwwKa/H7lwCaHRXK881TbnzKW9KHxTak07lOXa4
- DA7Q==
-X-Gm-Message-State: AOAM532+DS1QuOZC+8JvJ43EmbQXlmQFyYDLRj08D5/QnaZT7x5Z7hY0
- kvvbKQN6DZFa7jS+9BhMDmKVHFb1Nxg=
-X-Google-Smtp-Source: ABdhPJxcqqHdlFDWQ48S3PtXxHTVj96TGLLmOjkgoyCYwD3Un+m26yRYS677aMntss5DJuaobX0aZQ==
-X-Received: by 2002:a7b:c201:: with SMTP id x1mr2872870wmi.14.1589302502110;
- Tue, 12 May 2020 09:55:02 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z11sm23164173wro.48.2020.05.12.09.55.00
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 12 May 2020 09:55:00 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 339F01FF7E;
- Tue, 12 May 2020 17:55:00 +0100 (BST)
-References: <20200512133849.10624-1-thuth@redhat.com>
-User-agent: mu4e 1.4.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH] travis.yml: Improve the --disable-tcg test on s390x
-In-reply-to: <20200512133849.10624-1-thuth@redhat.com>
-Date: Tue, 12 May 2020 17:55:00 +0100
-Message-ID: <87d079f5zv.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jYYUo-0008Ig-Ka; Tue, 12 May 2020 13:15:10 -0400
+Received: from mail-eopbgr60125.outbound.protection.outlook.com
+ ([40.107.6.125]:55429 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jYYUl-0000eI-7d; Tue, 12 May 2020 13:15:08 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dqNCsghBAQ4tj8kGgPy7tgFQXJ1OXWdKrVCEdnUFFrsR3CiBrtmyhfOFpQe3DG/R7SemvYlJyEunfwYSs5h7bGCb4+O8eycriIe6sRUgUkdhNZRWSdoSLZCR0caHS9V9+xt1FwifmZOiPIomNq4NJ7LwjSoOavHFFBfQ/SNTjXVXN1cYxyJhubdfh/fNARFEDKOtzucTVMO6z3lGQWS8JULVaFDalTmXhVg9YfivAe20PUWJbdjak5aNPcF/i5pPO2+P7sUZgWUv/OhekbKqfdV5RgIeUQvkggERoM/wfnyqwk7MbCB2ItLZM/FkIoz4R2PMwRX7oJMsH+Gg9YEAjg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NkUmHUzvKDbPFEGKV6gOwiCLkt4TyYzqqw9VAss6ct4=;
+ b=TmxCIMM29ni2l++W9ZM+Fj2C6Cvtc5dtWFUgJQfjN9ps24HFpOZcTnUcJpKz3hdmFS2ALn6n0cF4fyswMQrUSoTtaDcLB5Q9krAAf+vUBEu4XRciQyQ1OLv9aFz5+rGD5w+q9B6Lv9g6n5eRTaoavj2g35HI0lBFuJEzYJVkQFTEVGgzVjXXHp0xpA0WVVCfJLLdRYhiOoPp9Bg/vIt08uhPeOxInySx4OMqeMDh8y4mwUHOIoCs3De+dWBSp9zKri3/+jD+CzSLOeS1sB9T4/PEf3O26adVw7mV2pLQUd1veZNV3uLIdcComGVEqzgV21nqVjLJqq/ENFqHBrGbAg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NkUmHUzvKDbPFEGKV6gOwiCLkt4TyYzqqw9VAss6ct4=;
+ b=jHWIRUMt8f1h/qxjlPBVN61ytGKvGC3yyCuJh3kzNt3hHk1btFEn0fxI3o5RuLzqMJv6grAAFHzsa+lNio9uQWE2jFSJIc5j6sq+7ReTcw/Fgjqshg9u30pp19NwBr3hhMpc4W6sGp7p378r5GiQs+jKDxtdbzguBn0FHaw2v6o=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5461.eurprd08.prod.outlook.com (2603:10a6:20b:10e::9)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.28; Tue, 12 May
+ 2020 17:15:03 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%3]) with mapi id 15.20.2979.033; Tue, 12 May 2020
+ 17:15:03 +0000
+Subject: Re: [PATCH v2 3/4] mirror: Make sure that source and target size match
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200511135825.219437-1-kwolf@redhat.com>
+ <20200511135825.219437-4-kwolf@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <cbeba850-5c46-e946-596a-c8f33140b898@virtuozzo.com>
+Date: Tue, 12 May 2020 20:15:01 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+In-Reply-To: <20200511135825.219437-4-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR06CA0091.eurprd06.prod.outlook.com
+ (2603:10a6:208:fa::32) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.163) by
+ AM0PR06CA0091.eurprd06.prod.outlook.com (2603:10a6:208:fa::32) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2979.28 via Frontend Transport; Tue, 12 May 2020 17:15:02 +0000
+X-Originating-IP: [185.215.60.163]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 476bd4e1-b702-4001-f6b0-08d7f6980279
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5461:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB546103986AA831843A3879B4C1BE0@AM7PR08MB5461.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:103;
+X-Forefront-PRVS: 0401647B7F
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: PGmEw9zJsmUd7aLMa9e8fiMbNIZN3p46nlOQ2vuFBC40M/j5aZmHYWMYYV1WKgcWHGlo/fdNvfuuuTbBvi0CM9mdhKWDX4Nk2GttZxMxX2UJtUGY7SJHOgfv6vaKOf+SgcbYaHk1g/gsAAIPXrTxauVxtHLKrzfcPGbzOREPcsvcbsaUab9VGOz9XejOCWvTNq4NkxIGiCelJbGY/7k/hzeW7fvcHZkL9c6ih80zodcB3bfoLV3RrCoAfH+tt5qfxVt0i9VFcwQ+EovIifoTk6kz6V5TzShxkz8OuwLtmZQ+1BpkM5FOsD3e0DGbjGlqKVJ5A0Ag6Qc4tUS53Nx2VMw47mc0rzQNgMy56wkPj7d+HavcKq8nOzpmvB59WJxxhjcsw3zcykbLQkrNJL2VKfv1fgJclfiElgLDraogi0TfejT0Mdo5N0Kk5SgmzRFhOMj9qg+EfEZqMw4fPlvVWZv5lG8hwL1jiahyYWNA6UcupbNhYeyfaqSVTJfgOLrjJA+BZ9t8PKSwieigw8svv7GPQZLxEAJSZRA7QW0cFHT9Q+/Qzkv/QW7S4MzNi22G
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(346002)(366004)(39840400004)(376002)(136003)(396003)(33430700001)(16526019)(86362001)(26005)(52116002)(16576012)(316002)(478600001)(33440700001)(6486002)(186003)(8936002)(8676002)(5660300002)(31696002)(66946007)(66556008)(36756003)(956004)(2906002)(2616005)(4326008)(66476007)(31686004)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: ZT/nF7ySV7dNibGOxFhvS/bTsZKrAuU4qP6gIkaR+8IZMR4tXXGdwA5IVj5BSBiYPeiVHmUVt6r8WXcdFdNY4gzKnY3rKoXNzeB7zcCfD7IJbYToHlBIK6xJPKcX16+gPIFMVaM+LHS88mpLyZNS52Crz5bnkLM/C01rnjV+0dmROMsD7ZmWQ6SXlnW4v0GsJPzVqgPNrXDwvm5LTcs6jEewXBh6XCxcu3CiFt9/THVWxU3eSOyGLNiy/htQdtHsuxLEeGO/hac2Fk71BvD1V2AVsRiZT+JZqYagPAwz49tYTKw4N5gh/laL/NiGqQltpl8Sr9zcoaWPggJdcRHHmTqiARQQKsQDxUwSIvd6boAlDkWBO3AaHq+XC298Nspq/dRsiTOZOl8+r91UOrdCo2XbyzgTYwV6kCw7hpyX23Ch/OZpm4HqNO8eBLZ14vpeFlejQOVZyJVbJEOjDe6jsdjbKJhdeGXslh8YQ4aeCcFqkFJ95rb1IIbMPm0/FShX
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 476bd4e1-b702-4001-f6b0-08d7f6980279
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2020 17:15:03.6011 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vhbzNEjal8G3c126xwKA5ZgF3hIwioAUyeTQKrEOTY6IPKCteUpKhnvYS4AfCdLXi66nOG/RUaN2BzUM1u99YsqKx8jHolIgGqt4wFOdZAs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5461
+Received-SPF: pass client-ip=40.107.6.125;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-DB3-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 13:15:04
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,77 +130,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
- Philippe =?utf-8?Q?Mathi?= =?utf-8?Q?eu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Thomas Huth <thuth@redhat.com> writes:
-
-> Since the s390x containers do not allow KVM, we only compile-test
-> the --disable-tcg build on s390x and do not run the qtests. Thus,
-> it does not make sense to install genisoimage here, and it also does
-> not make sense to build the s390-ccw.img here again - it is simply
-> not used without the qtests.
-> On the other hand, if we do not build the s390-ccw.img anymore, we
-> can also compile with Clang - so let's use that compiler here to
-> get some additional test coverage.
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Queued to testing/next, thanks.
-
+11.05.2020 16:58, Kevin Wolf wrote:
+> If the target is shorter than the source, mirror would copy data until
+> it reaches the end of the target and then fail with an I/O error when
+> trying to write past the end.
+> 
+> If the target is longer than the source, the mirror job would complete
+> successfully, but the target wouldn't actually be an accurate copy of
+> the source image (it would contain some additional garbage at the end).
+> 
+> Fix this by checking that both images have the same size when the job
+> starts.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Message-Id: <20200507145228.323412-3-kwolf@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  .travis.yml | 18 ++++--------------
->  1 file changed, 4 insertions(+), 14 deletions(-)
->
-> diff --git a/.travis.yml b/.travis.yml
-> index fe708792ca..1ec8a7b465 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -502,9 +502,10 @@ jobs:
->                $(exit $BUILD_RC);
->            fi
->=20=20
-> -    - name: "[s390x] GCC check (KVM)"
-> +    - name: "[s390x] Clang (disable-tcg)"
->        arch: s390x
->        dist: bionic
-> +      compiler: clang
->        addons:
->          apt_packages:
->            - libaio-dev
-> @@ -528,21 +529,10 @@ jobs:
->            - libusb-1.0-0-dev
->            - libvdeplug-dev
->            - libvte-2.91-dev
-> -          # Tests dependencies
-> -          - genisoimage
->        env:
->          - TEST_CMD=3D"make check-unit"
-> -        - CONFIG=3D"--disable-containers --disable-tcg --enable-kvm --di=
-sable-tools"
-> -      script:
-> -        - ( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )
-> -        - BUILD_RC=3D0 && make -j${JOBS} || BUILD_RC=3D$?
-> -        - |
-> -          if [ "$BUILD_RC" -eq 0 ] ; then
-> -              mv pc-bios/s390-ccw/*.img pc-bios/ ;
-> -              ${TEST_CMD} ;
-> -          else
-> -              $(exit $BUILD_RC);
-> -          fi
-> +        - CONFIG=3D"--disable-containers --disable-tcg --enable-kvm
-> +                  --disable-tools --host-cc=3Dclang --cxx=3Dclang++"
->=20=20
->      # Release builds
->      # The make-release script expect a QEMU version, so our tag must sta=
-rt with a 'v'.
+>   block/mirror.c | 21 ++++++++++++---------
+>   1 file changed, 12 insertions(+), 9 deletions(-)
+> 
+> diff --git a/block/mirror.c b/block/mirror.c
+> index aca95c9bc9..201ffa26f9 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -872,6 +872,7 @@ static int coroutine_fn mirror_run(Job *job, Error **errp)
+>       BlockDriverState *target_bs = blk_bs(s->target);
+>       bool need_drain = true;
+>       int64_t length;
+> +    int64_t target_length;
+>       BlockDriverInfo bdi;
+>       char backing_filename[2]; /* we only need 2 characters because we are only
+>                                    checking for a NULL string */
+> @@ -887,24 +888,26 @@ static int coroutine_fn mirror_run(Job *job, Error **errp)
+>           goto immediate_exit;
+>       }
+>   
+> +    target_length = blk_getlength(s->target);
+> +    if (target_length < 0) {
+> +        ret = target_length;
+> +        goto immediate_exit;
+> +    }
+> +
+>       /* Active commit must resize the base image if its size differs from the
+>        * active layer. */
+>       if (s->base == blk_bs(s->target)) {
+> -        int64_t base_length;
+> -
+> -        base_length = blk_getlength(s->target);
+> -        if (base_length < 0) {
+> -            ret = base_length;
+> -            goto immediate_exit;
+> -        }
+> -
+> -        if (s->bdev_length > base_length) {
+> +        if (s->bdev_length > target_length) {
+>               ret = blk_truncate(s->target, s->bdev_length, false,
+>                                  PREALLOC_MODE_OFF, 0, NULL);
+>               if (ret < 0) {
+>                   goto immediate_exit;
+>               }
+>           }
+
+Hmm, interesting, if base is larger, is our behavior correct? Blockdev becomes larger after commit and old data becomes available? I think we should zero the tail after old EOF or shrink the target..
+
+> +    } else if (s->bdev_length != target_length) {
+> +        error_setg(errp, "Source and target image have different sizes");
+> +        ret = -EINVAL;
+
+Seems, the only case, when mirror_run() sets errp. And, therefore, the only correct one..
+
+> +        goto immediate_exit;
+>       }
+>   
+>       if (s->bdev_length == 0) {
+> 
 
 
---=20
-Alex Benn=C3=A9e
+-- 
+Best regards,
+Vladimir
 
