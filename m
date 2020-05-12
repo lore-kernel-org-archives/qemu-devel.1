@@ -2,82 +2,85 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40ED0CA90AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 15:59:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E4BCA90AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 16:02:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F12C02054F
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 15:59:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 897CD2054F
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 16:02:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XZYPIrNC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F12C02054F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MPPB7PZE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 897CD2054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYXJj-0008I0-4w
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 11:59:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43486)
+	id 1jYXM9-0001tw-9l
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 12:02:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43622)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jYXIr-0007GQ-Qf
- for qemu-devel@nongnu.org; Tue, 12 May 2020 11:58:45 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42358
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jYXJt-00006Q-05
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 11:59:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31119
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jYXIq-0003aA-UC
- for qemu-devel@nongnu.org; Tue, 12 May 2020 11:58:45 -0400
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1jYXJs-0003fS-AY
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 11:59:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589299123;
+ s=mimecast20190719; t=1589299187;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=jvnz7FX33H6HQ6Cb1lKhjYigd52Yp7dFl7bV/HpbkeA=;
- b=XZYPIrNCYGAKX1yIMPlMursakIIs6bOCuV0nZfQ6nlvvJ0uUWFByNKhkwol6h/HYjLfJNs
- kjAovxkndCJO75I6vXw39MzW8VRDAyUCMTLx4CW8j2+m8ImH7BJQGo7lI2JlmTLQck4EAD
- xSOTWVA2ODHMGCGZAYeDHYjPEwlB5QI=
+ bh=wKY3yV0xMXu6/12g0KGd0Wn5A6HzJ5UBaU7Dic9E4wM=;
+ b=MPPB7PZE70uzyVMkZgngEKjUb7CPy+Oy4Xg0bSFnTTO9lAVjJWKXDFbxtckFU78QclRRbf
+ YZ57ITqunO4LXHNl2f+p77L6Na37vF8pFgyXHkkPM1YhQbG9MkCkcVobegmAEbBXldevrk
+ ntze8KwhKA8pUAjFNI3bHndWAQwAuTM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-427-SnIlkeh5Msmtrbxsj3yW1w-1; Tue, 12 May 2020 11:58:41 -0400
-X-MC-Unique: SnIlkeh5Msmtrbxsj3yW1w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-42-9I5uk8g9MxSeB2RXpclpGA-1; Tue, 12 May 2020 11:59:43 -0400
+X-MC-Unique: 9I5uk8g9MxSeB2RXpclpGA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F9148005B7
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 15:58:40 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6CD665C1B2;
- Tue, 12 May 2020 15:58:40 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id EFA4F11358BC; Tue, 12 May 2020 17:58:38 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: Infinite loop in bus_unparent(), qdev bug or qdev misuse?
-References: <87tv0vzrwj.fsf@dusky.pond.sub.org>
- <6fc8633a-6d91-b83a-e6cd-5f714ccaf9ea@redhat.com>
- <875zda8j3m.fsf@dusky.pond.sub.org>
- <a4df3ba3-4759-56ac-68f8-f75eea93e27e@redhat.com>
- <87zhal4lef.fsf@dusky.pond.sub.org>
-Date: Tue, 12 May 2020 17:58:38 +0200
-In-Reply-To: <87zhal4lef.fsf@dusky.pond.sub.org> (Markus Armbruster's message
- of "Wed, 06 May 2020 08:39:36 +0200")
-Message-ID: <87o8qttaa9.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E45B107ACF3;
+ Tue, 12 May 2020 15:59:42 +0000 (UTC)
+Received: from [10.36.112.22] (ovpn-112-22.ams2.redhat.com [10.36.112.22])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D1A37D94B;
+ Tue, 12 May 2020 15:59:27 +0000 (UTC)
+Subject: Re: [PATCH v2 1/3] acpi: Move build_tpm2() in the generic part
+To: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+References: <20200505144419.29174-1-eric.auger@redhat.com>
+ <20200505144419.29174-2-eric.auger@redhat.com>
+ <20200506063314.4qvnyfonjixcknuj@kamzik.brq.redhat.com>
+ <20200506055747-mutt-send-email-mst@kernel.org>
+ <20200512161447.07b76de2@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <3dfdf504-7fc2-40cf-8387-c4abb8133792@redhat.com>
+Date: Tue, 12 May 2020 17:59:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200512161447.07b76de2@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 01:41:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 02:02:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -97,84 +100,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: peter.maydell@linaro.org, Andrew Jones <drjones@redhat.com>,
+ gshan@redhat.com, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com,
+ qemu-arm@nongnu.org, marcandre.lureau@redhat.com, eric.auger.pro@gmail.com,
+ lersek@redhat.com, ardb@kernel.org, stefanb@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Markus Armbruster <armbru@redhat.com> writes:
+Hi Igor,
 
-> Paolo Bonzini <pbonzini@redhat.com> writes:
->
->> On 05/05/20 18:03, Markus Armbruster wrote:
->>>> That's a good one, and especially a safe one, since it matches
->>>> qdev_device_add.  It has the disadvantage of having to touch all
->>>> qdev_create() calls.
->>> 
->>> Also, it moves onboard devices from /machine/unattached/ to
->>> /machine/peripheral-anon/.
+On 5/12/20 4:14 PM, Igor Mammedov wrote:
+> On Wed, 6 May 2020 05:58:25 -0400
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+>> On Wed, May 06, 2020 at 08:33:14AM +0200, Andrew Jones wrote:
+>>> I realize this function is just getting moved, but maybe it should get
+>>> converted to the build_append* API while being moved?  
 >>
->> Uh indeed.  No that's too ugly.
->>
->>>> Even better however would be to move the bus argument (and thus
->>>> qdev_set_parent_bus) to qdev_init, and likewise in qdev_device_add move
->>>> qdev_set_id after qemu_opt_foreach.  I looked at the property setters
->>>> and couldn't find anything suspicious (somewhat to my surprise), but I
->>>> haven't honestly tried.
->>> 
->>> Thus, we satisfy bus_unparent()'s precondition "bus children have a QOM
->>> parent"[*] by moving "add to parent bus" next to the place where we
->>> ensure "has QOM parent" by putting orphans under /machine/unattached/.
->>> Makes sense.
->>> 
->>> If we add to the bus first, the precondition ceases to hold until we
->>> realize.  Ugly, but harmless unless we manage to actually call the
->>> function then.
->>
->> Shouldn't be a big deal, since users should call either qdev_set_id or
->> object_property_add_child before device_set_realized.
->
-> The issue isn't neglecting to set a QOM parent, it's destroying a device
-> before its bus children get their QOM parent.
->
-> Mostly harmless: by delaying "add to bus" until right before realize, we
-> narrow the window where the trap is armed, and keep it completely within
-> qdev_init_nofail(), qdev_device_add(), and possibly code that duplicates
-> their work.  Ensuring qdev_init_nofail() and qdev_device_add() don't
-> fail in this window should be easy enough (except for writing the
-> comment explaining it).  The duplicates, though... I guess we need to
-> double-check users of qdev_set_parent_bus().
->
-> Ugly: yes, compared to the pretty invariant "bus children all have QOM
-> parents".
->
->>> I suspect we can't realize first, because the realize method may want to
->>> use the parent bus.
->>
->> Right.
->>
->> Moving the bus to qdev_init would be quite large but hopefully scriptable.
->
-> Feels feasible.
+>> I'd rather refactoring was done in a separate patch -
+>> easier to review.
+> maybe first convert and then move
+> 
+> PS:
+> me wonders if we have test with TPM enabled, if not maybe it's time to add them
+> i.e. first goes testcase in bios-tables and then refactoring/moving
+> in that case review is simpler.
+Do you mean tests checking the ACPI table content when TPM is
+instantiated? I don't think so otherwise it would have failed I guess.
+Otherwise we have functional tests with TPM (MMIO access), ie qtest
+tests  tpm-tis-device-test and tpm-tis-device-swtpm-test.
 
-Look, a rabbit hole :)
+Thanks
 
-I got rough patches, with several more to do.
-
-There's one thing worth mentioning.  Unrealize is recursive: unrealizing
-a qdev recurses into its qbuses, and unrealizing a qbus recurses into
-its qdevs.  Realize, however, is TODO recursive :)  See your commit
-5942a19040 "qdev: recursively unrealize devices when unrealizing bus",
-2014-06-19.
-
-Moving "put on qbus" from qdev_create() (and its wrappers) to
-qdev_init_nofail() means we put on bus by realizing.  No use to
-recursive realization then,
-
-> [*] We might want to look into deduplicating: the string "realized"
-> occurs more than 450 times, and I figure almost always as property name.
-
-I wield a sharp hatchet.
+Eric
+> 
+> 
 
 
