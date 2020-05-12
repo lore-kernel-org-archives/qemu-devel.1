@@ -2,73 +2,72 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F25AC2D0F8
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 23:25:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5173AC2D0F8
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 23:45:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AFA020731
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 23:25:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="rLfF131Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AFA020731
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTPS id 120D020747
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 23:45:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 120D020747
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYeGn-00032c-4e
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 19:25:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53534)
+	id 1jYeag-00015n-6M
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 19:45:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54934)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sstabellini@kernel.org>)
- id 1jYeG8-0002dm-CG
- for qemu-devel@nongnu.org; Tue, 12 May 2020 19:24:24 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59234)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sstabellini@kernel.org>)
- id 1jYeG3-0004tz-76
- for qemu-devel@nongnu.org; Tue, 12 May 2020 19:24:23 -0400
-Received: from localhost (c-67-164-102-47.hsd1.ca.comcast.net [67.164.102.47])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
- bits)) (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id B8F0020731;
- Tue, 12 May 2020 23:24:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1589325857;
- bh=EbLEx7T5IHNXX+ZubYr3+gxJhjQ3YF1Iw46J3GtoBzg=;
- h=Date:From:To:cc:Subject:In-Reply-To:References:From;
- b=rLfF131YDaXGtqRggXxo+r+Kjxl+lqQTWnKrbgwqedo2m0bm2KRbJMBpGOuYUUOMo
- JAhkzAJx0sGXMUD3o1ISWGhKGJt5g7o3Fc8mcXmT1jBpk76rC3LiadTZfJvIbygRZg
- MSu2NO90KuAu++5U7gHb/O5yebv8ivSsDYpW83ww=
-Date: Tue, 12 May 2020 16:24:16 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-X-X-Sender: sstabellini@sstabellini-ThinkPad-T480s
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH 2/2] 9pfs: fix init_in_iov_from_pdu truncating size
-In-Reply-To: <3732481.xNstV0F5bx@silver>
-Message-ID: <alpine.DEB.2.21.2005121602520.26167@sstabellini-ThinkPad-T480s>
-References: <cover.1589132512.git.qemu_oss@crudebyte.com>
- <54f3b9c9f05a77ccdd6103bd46c828fcb675cbac.1589132512.git.qemu_oss@crudebyte.com>
- <alpine.DEB.2.21.2005111454160.26167@sstabellini-ThinkPad-T480s>
- <3732481.xNstV0F5bx@silver>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jYeZh-0000VJ-5u; Tue, 12 May 2020 19:44:37 -0400
+Resent-Date: Tue, 12 May 2020 19:44:37 -0400
+Resent-Message-Id: <E1jYeZh-0000VJ-5u@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21301)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jYeZf-0006wp-1g; Tue, 12 May 2020 19:44:36 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1589327067; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=TCdFYZdi4SZ6Qv9FZaSH5B5mHdoGhXPbdoqcEHkKF4pYKADKugoexCv4J6q1uyN7+sHCA0ork2Db3mUCK+aKyRf+udEtpPTtg4MLlhnAodzF+5pxJVmHb3asGxqF3FTOD8VQwF8RPEIJPCaV7v57fI70odhPFqU8NSRkHajhoew=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1589327067;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=X2NaOdWw3SdpI7PGgmVr5aaJtZFL28rQj8wFkKMcdzk=; 
+ b=dOO2NUXKz4myIQTLExuWjP3PWDGmx/79WM1xmG+vCt1+fV3eb0qXuSs2bQoErjaHGoa45ka+ZYG14AqPYORH96JXqKryHgEq5QBcZ6m2N7273CCy2uj19zhXAqUwrj/wgV19fcegWO2NwnLiyRwyJarEvCzT7TcgbiBGX+MLzbw=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1589327066131572.7243509226181;
+ Tue, 12 May 2020 16:44:26 -0700 (PDT)
+Message-ID: <158932706498.4397.7989253981206323530@45ef0f9c86ae>
+In-Reply-To: <20200512163904.10918-1-peter.maydell@linaro.org>
+Subject: Re: [PATCH v2 00/17] target/arm: Convert rest of Neon 3-reg-same to
+ decodetree
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=198.145.29.99;
- envelope-from=sstabellini@kernel.org; helo=mail.kernel.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 19:24:17
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -70
-X-Spam_score: -7.1
-X-Spam_bar: -------
-X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: peter.maydell@linaro.org
+Date: Tue, 12 May 2020 16:44:26 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 19:44:32
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,265 +80,256 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Anthony Perard <anthony.perard@citrix.com>, Greg Kurz <groug@kaod.org>,
- Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org,
- Paul Durrant <paul@xen.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, richard.henderson@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 12 May 2020, Christian Schoenebeck wrote:
-> On Dienstag, 12. Mai 2020 00:09:46 CEST Stefano Stabellini wrote:
-> > On Sun, 10 May 2020, Christian Schoenebeck wrote:
-> > > Commit SHA-1 16724a173049ac29c7b5ade741da93a0f46edff7 introduced
-> > > truncating the response to the currently available transport buffer
-> > > size, which was supposed to fix an 9pfs error on Xen boot where
-> > > transport buffer might still be smaller than required for response.
-> > > 
-> > > Unfortunately this change broke small reads (with less than 12
-> > > bytes).
-> > > 
-> > > To address both concerns, check the actual response type and only
-> > > truncate reply for Rreaddir responses,
-> > 
-> > I realize you mean "Rread" (not Rreaddir).
-> 
-> Yes, that's currently an unfortunate auto completion issue in my head due to 
-> having spent too much time on readdir() code lately. I'm working on it. ;-)
-
-ahahah
-
-
-> > Are we sure that truncation
-> > can only happen with Rread? I checked the spec it looks like Directories
-> > are pretty much like files from the spec point of view. So it seems to
-> > me that truncation might be possible there too.
-> 
-> That's the big question here: do we need to address this for other types than 
-> Rread? So far I only addressed this for Rread because from what you described 
-> you were encountering that Xen boot issue only with reads, right?
-
-That's right
-
-
-> What we cannot do is simply truncating any response arbitrarily without 
-> looking at the precise response type. With Rread (9p2000.L) it's quite simple, 
-> because it is Ok (i.e. from client & guest OS perspective) to return 
-> *arbitrarily* less data than originally requested by client.
-> 
-> A problem with Rread would be protocol variant 9p2000.u, because such clients 
-> would also use Rread on directories. In that case client would end up with 
-> trash data -> undefined behaviour.
-> 
-> Likewise for Rreaddir (9p2000.L) it would be much more complicated, we could 
-> truncate the response, but we may not truncate individual directory entries of 
-> that response. So not only the Rreaddir header must be preserved, we also 
-> would have to look at the individual entries (their sizes vary for each entry 
-> individually) returned and only truncate at the boundaries of individual 
-> entries inside the response, otherwise client would receive trash data -> 
-> undefined behaviour.
-
-Let me premise that this patch fixes an important bug, so I am not
-asking you to do any more work to get this patch committed right now :-)
-
-But I think it would be good to test what would happen if the client did
-a read on a directory with hundreds of entries, such as a maildir
-directory. There has to be point where the number of directory entries
-is larger than the shared buffer. What happens then?
-
-I am guessing that we'll have to implement the "truncate at the
-boundaries of individual entries" to get it right in all cases.
-
-Given that it doesn't look like truncation would work right with
-Rreaddir anyway today, I think it would be OK to fix it in a separate
-patch.
-
-
-> And that's it, for all other 9P types we can't truncate response at all. For 
-> those types we could probably just return EAGAIN, but would it help? Probably 
-> would require changes on client side as well then to handle this correctly.
-
-I think the critical ones are Rread and Rreaddir. I wonder if we could
-even reproduce a bug with any of the other 9p types. Probably not. So
-returning an error might be good enough. Returning an error is also way
-better than calling virtio_error or xen_9pfs_disconnect, more on this
-below.
-
-
-> > > and only if truncated reply would at least return one payload byte to
-> > > client. Use Rreaddir's precise header size (11) for this instead of
-> > > P9_IOHDRSZ.
-> > 
-> > Ah! That's the underlying error isn't it? That P9_IOHDRSZ is not really
-> > the size of the reply header, it is bigger. Hence the check:
-> > 
-> >   if (buf_size < P9_IOHDRSZ) {
-> > 
-> > can be wrong for very small sizes.
-> 
-> Exactly. We need to handle this according to the precise header size of the 
-> respective response type. But unfortunately that's not enough, like described 
-> above in detail.
-
-OK got it
-
-
-> > > Fixes: 16724a173049ac29c7b5ade741da93a0f46edff7
-> > > Fixes: https://bugs.launchpad.net/bugs/1877688
-> > > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> > > ---
-> > > 
-> > >  hw/9pfs/virtio-9p-device.c | 35 +++++++++++++++++++++++++++--------
-> > >  hw/9pfs/xen-9p-backend.c   | 38 +++++++++++++++++++++++++++++---------
-> > >  2 files changed, 56 insertions(+), 17 deletions(-)
-> > > 
-> > > diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
-> > > index 536447a355..57e4d92ecb 100644
-> > > --- a/hw/9pfs/virtio-9p-device.c
-> > > +++ b/hw/9pfs/virtio-9p-device.c
-> > > @@ -154,15 +154,34 @@ static void virtio_init_in_iov_from_pdu(V9fsPDU
-> > > *pdu, struct iovec **piov,> 
-> > >      VirtQueueElement *elem = v->elems[pdu->idx];
-> > >      size_t buf_size = iov_size(elem->in_sg, elem->in_num);
-> > > 
-> > > -    if (buf_size < P9_IOHDRSZ) {
-> > > -        VirtIODevice *vdev = VIRTIO_DEVICE(v);
-> > > +    if (pdu->id + 1 == P9_RREAD) {
-> > > +        /* size[4] Rread tag[2] count[4] data[count] */
-> > 
-> > 4+2+4 = 10
-> 
-> That's 4+1+2+4 = 11
-> 
-> You were missing "Rread" here which identifies the (numeric) 9P response type 
-> and which is always 1 byte in size.
-
-I thought so. Could you please update the comment in the code? As is it
-is a bit confusing.
-
- 
-> > > +        const size_t hdr_size = 11;
-> > 
-> > Are you adding 1 to account for "count"?
-> 
-> The idea was that from client perspective a successful read() call must at 
-> least return 1 byte. We must not return 0 bytes, because that would indicate 
-> EOF for POSIX systems. For that reason the minimum Rread response size would 
-> be:
-> 
-> 	header_size + 1 payload_byte
-> 
-> and hence
-> 
-> 	11 + 1 = 12
-
-Yes I think you are right
-
-
-> > > +        /*
-> > > +         * If current transport buffer size is smaller than actually
-> > > required +         * for this Rreaddir response, then truncate the
-> > > response to the +         * currently available transport buffer size,
-> > > however only if it would +         * at least allow to return 1 payload
-> > > byte to client.
-> > > +         */
-> > > +        if (buf_size < hdr_size + 1) {
-> > 
-> > If you have already added 1 before, why do we need to add 1 again here?
-> 
-> See desription above. Variable 'hdr_size' is the Rread header size (11 bytes) 
-> and +1 is added here for the minimum payload data returned.
-
-OK
-
-
-> > > +            VirtIODevice *vdev = VIRTIO_DEVICE(v);
-> > > 
-> > > -        virtio_error(vdev,
-> > > -                     "VirtFS reply type %d needs %zu bytes, buffer has
-> > > %zu, less than minimum", -                     pdu->id + 1, *size,
-> > > buf_size);
-> > > -    }
-> > > -    if (buf_size < *size) {
-> > > -        *size = buf_size;
-> > > +            virtio_error(vdev,
-> > > +                         "VirtFS reply type %d needs %zu bytes, buffer
-> > > has " +                         "%zu, less than minimum (%zu)",
-> > > +                         pdu->id + 1, *size, buf_size, hdr_size + 1);
-> > > +        }
-> > 
-> > I think we want to return here
-> 
-> I just preserved your structure as it was. If you tell me it should return 
-> here, I will add a return. NP.
-
-The point I was trying to make is that it doesn't make a lot of sense to
-try to do any operations after calling virtio_error. I am not a virtio
-expert but certainly in the case of Xen below we cannot continue after
-calling xen_9pfs_disconnect. The whole connection gets closed, more on
-this below.
-
-
-> > 
-> > > +        if (buf_size < *size) {
-> > > +            *size = buf_size;
-> > > +        }
-> > > +    } else {
-> > > +        if (buf_size < *size) {
-> > > +            VirtIODevice *vdev = VIRTIO_DEVICE(v);
-> > > +
-> > > +            virtio_error(vdev,
-> > > +                         "VirtFS reply type %d needs %zu bytes, buffer
-> > > has %zu", +                         pdu->id + 1, *size, buf_size);
-> > > +        }
-> > > 
-> > >      }
-> > >      
-> > >      *piov = elem->in_sg;
-> > > 
-> > > diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
-> > > index f04caabfe5..98f340d24b 100644
-> > > --- a/hw/9pfs/xen-9p-backend.c
-> > > +++ b/hw/9pfs/xen-9p-backend.c
-> > > @@ -201,15 +201,35 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU
-> > > *pdu,> 
-> > >      xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, *size);
-> > >      
-> > >      buf_size = iov_size(ring->sg, num);
-> > > 
-> > > -    if (buf_size  < P9_IOHDRSZ) {
-> > > -        xen_pv_printf(&xen_9pfs->xendev, 0, "Xen 9pfs reply type %d needs
-> > > " -                      "%zu bytes, buffer has %zu, less than
-> > > minimum\n", -                      pdu->id + 1, *size, buf_size);
-> > > -        xen_be_set_state(&xen_9pfs->xendev, XenbusStateClosing);
-> > > -        xen_9pfs_disconnect(&xen_9pfs->xendev);
-> > > -    }
-> > > -    if (buf_size  < *size) {
-> > > -        *size = buf_size;
-> > > +    if (pdu->id + 1 == P9_RREAD) {
-> > > +        /* size[4] Rread tag[2] count[4] data[count] */
-> > > +        const size_t hdr_size = 11;
-> > > +        /*
-> > > +         * If current transport buffer size is smaller than actually
-> > > required +         * for this Rreaddir response, then truncate the
-> > > response to the +         * currently available transport buffer size,
-> > > however only if it would +         * at least allow to return 1 payload
-> > > byte to client.
-> > > +         */
-> > > +        if (buf_size < hdr_size + 1) {
-> > > +            xen_pv_printf(&xen_9pfs->xendev, 0, "Xen 9pfs reply type %d "
-> > > +                          "needs %zu bytes, buffer has %zu, less than "
-> > > +                          "minimum (%zu)\n",
-> > > +                          pdu->id + 1, *size, buf_size, hdr_size + 1);
-> > > +            xen_be_set_state(&xen_9pfs->xendev, XenbusStateClosing);
-> > > +            xen_9pfs_disconnect(&xen_9pfs->xendev);
-> > 
-> > I htink we want to return here.
-> 
-> Same thing: if you want a return here, I will add it.
-
-I think we have to return here because the connection gets closed by
-xen_9pfs_disconnect. I wonder if we should return -EAGAIN like you
-suggested instead of calling xen_9pfs_disconnect() which is
-irrecoverable. But that could be done later in a separate patch.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUxMjE2MzkwNC4xMDkx
+OC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
+byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
+b3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAyMDA1MTIxNjM5MDQuMTA5MTgtMS1wZXRl
+ci5tYXlkZWxsQGxpbmFyby5vcmcKU3ViamVjdDogW1BBVENIIHYyIDAwLzE3XSB0YXJnZXQvYXJt
+OiBDb252ZXJ0IHJlc3Qgb2YgTmVvbiAzLXJlZy1zYW1lIHRvIGRlY29kZXRyZWUKVHlwZTogc2Vy
+aWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2Ug
+YmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
+bGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAt
+LWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAt
+LW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8gYSBu
+ZXcgYnJhbmNoICd0ZXN0JwpiYWE1NDY5IHRhcmdldC9hcm06IENvbnZlcnQgTkVPTiBWRk1BLCBW
+Rk1TIDMtcmVnLXNhbWUgaW5zbnMgdG8gZGVjb2RldHJlZQo1YjU0ODY1IHRhcmdldC9hcm06IENv
+bnZlcnQgTmVvbiBmcCBWTUFYL1ZNSU4vVk1BWE5NL1ZNSU5OTS9WUkVDUFMvVlJTUVJUUyB0byBk
+ZWNvZGV0cmVlCmQ3MmJmOTIgdGFyZ2V0L2FybTogTW92ZSAnZW52JyBhcmd1bWVudCBvZiByZWNw
+c19mMzIgYW5kIHJzcXJ0c19mMzIgaGVscGVycyB0byB1c3VhbCBwbGFjZQo4N2NlN2IyIHRhcmdl
+dC9hcm06IENvbnZlcnQgTmVvbiAzLXJlZy1zYW1lIGNvbXBhcmUgaW5zbnMgdG8gZGVjb2RldHJl
+ZQozNjEzYTg0IHRhcmdldC9hcm06IENvbnZlcnQgTmVvbiBmcCBWTVVMLCBWTUxBLCBWTUxTIDMt
+cmVnLXNhbWUgaW5zbnMgdG8gZGVjb2RldHJlZQoxYzU4OGU3IHRhcmdldC9hcm06IENvbnZlcnQg
+TmVvbiBWUE1JTi9WUE1BWC9WUEFERCBmbG9hdCAzLXJlZy1zYW1lIGluc25zIHRvIGRlY29kZXRy
+ZWUKMGNjMzliNyB0YXJnZXQvYXJtOiBDb252ZXJ0IE5lb24gVkFERCwgVlNVQiwgVkFCRCAzLXJl
+Zy1zYW1lIGluc25zIHRvIGRlY29kZXRyZWUKYjJmYTc4MSB0YXJnZXQvYXJtOiBDb252ZXJ0IE5l
+b24gVlFETVVMSC9WUVJETVVMSCAzLXJlZy1zYW1lIHRvIGRlY29kZXRyZWUKMzAxNWQ1OSB0YXJn
+ZXQvYXJtOiBDb252ZXJ0IE5lb24gVlBBREQgMy1yZWctc2FtZSBpbnNucyB0byBkZWNvZGV0cmVl
+CmE0NzQ3YWMgdGFyZ2V0L2FybTogQ29udmVydCBOZW9uIFZQTUFYL1ZQTUlOIDMtcmVnLXNhbWUg
+aW5zbnMgdG8gZGVjb2RldHJlZQo2ODg2ODI1IHRhcmdldC9hcm06IENvbnZlcnQgTmVvbiBWUVNI
+TCwgVlJTSEwsIFZRUlNITCAzLXJlZy1zYW1lIGluc25zIHRvIGRlY29kZXRyZWUKYTUyZGJlNyB0
+YXJnZXQvYXJtOiBDb252ZXJ0IE5lb24gVlJIQURELCBWSFNVQiAzLXJlZy1zYW1lIGluc25zIHRv
+IGRlY29kZXRyZWUKZjJmNmRkNiB0YXJnZXQvYXJtOiBDb252ZXJ0IE5lb24gVkFCQS9WQUJEIDMt
+cmVnLXNhbWUgdG8gZGVjb2RldHJlZQpkNDU1OWYwIHRhcmdldC9hcm06IENvbnZlcnQgTmVvbiBW
+SEFERCAzLXJlZy1zYW1lIGluc25zCjg3NmQ3YzkgdGFyZ2V0L2FybTogQ29udmVydCBOZW9uIDY0
+LWJpdCBlbGVtZW50IDMtcmVnLXNhbWUgaW5zbnMKYWNhYzc0NiB0YXJnZXQvYXJtOiBDb252ZXJ0
+IE5lb24gMy1yZWctc2FtZSBTSEEgdG8gZGVjb2RldHJlZQo3YzY5M2ZhIHRhcmdldC9hcm06IENv
+bnZlcnQgTmVvbiAzLXJlZy1zYW1lIFZRUkRNTEFIL1ZRUkRNTFNIIHRvIGRlY29kZXRyZWUKCj09
+PSBPVVRQVVQgQkVHSU4gPT09CjEvMTcgQ2hlY2tpbmcgY29tbWl0IDdjNjkzZmE3NWI3NyAodGFy
+Z2V0L2FybTogQ29udmVydCBOZW9uIDMtcmVnLXNhbWUgVlFSRE1MQUgvVlFSRE1MU0ggdG8gZGVj
+b2RldHJlZSkKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYp
+CiMzNzogRklMRTogdGFyZ2V0L2FybS90cmFuc2xhdGUtbmVvbi5pbmMuYzo2NzY6CisgICAgc3Rh
+dGljIGJvb2wgdHJhbnNfIyNJTlNOIyNfM3MoRGlzYXNDb250ZXh0ICpzLCBhcmdfM3NhbWUgKmEp
+ICAgICAgICBcCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA1MCBsaW5lcyBj
+aGVja2VkCgpQYXRjaCAxLzE3IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoyLzE3IENoZWNr
+aW5nIGNvbW1pdCBhY2FjNzQ2NWQ3YzQgKHRhcmdldC9hcm06IENvbnZlcnQgTmVvbiAzLXJlZy1z
+YW1lIFNIQSB0byBkZWNvZGV0cmVlKQpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0
+ICcqJyAoY3R4Old4VikKIzQzOiBGSUxFOiB0YXJnZXQvYXJtL3RyYW5zbGF0ZS1uZW9uLmluYy5j
+OjY5MDoKK3N0YXRpYyBib29sIHRyYW5zX1NIQTFfM3MoRGlzYXNDb250ZXh0ICpzLCBhcmdfU0hB
+MV8zcyAqYSkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBeCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDIyMCBsaW5lcyBjaGVja2Vk
+CgpQYXRjaCAyLzE3IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgozLzE3IENoZWNraW5nIGNv
+bW1pdCA4NzZkN2M5ZmVjODUgKHRhcmdldC9hcm06IENvbnZlcnQgTmVvbiA2NC1iaXQgZWxlbWVu
+dCAzLXJlZy1zYW1lIGluc25zKQo0LzE3IENoZWNraW5nIGNvbW1pdCBkNDU1OWYwYzIzNDkgKHRh
+cmdldC9hcm06IENvbnZlcnQgTmVvbiBWSEFERCAzLXJlZy1zYW1lIGluc25zKQpFUlJPUjogc3Bh
+Y2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikKIzQ4OiBGSUxFOiB0YXJnZXQv
+YXJtL3RyYW5zbGF0ZS1uZW9uLmluYy5jOjg2NjoKKyAgICBzdGF0aWMgYm9vbCB0cmFuc18jI0lO
+U04jI18zcyhEaXNhc0NvbnRleHQgKnMsIGFyZ18zc2FtZSAqYSkgICAgICAgIFwKICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0
+b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDUxIGxpbmVzIGNoZWNrZWQKClBhdGNoIDQvMTcg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjUvMTcgQ2hlY2tpbmcgY29tbWl0IGYyZjZkZDZi
+NWQ5YyAodGFyZ2V0L2FybTogQ29udmVydCBOZW9uIFZBQkEvVkFCRCAzLXJlZy1zYW1lIHRvIGRl
+Y29kZXRyZWUpCjYvMTcgQ2hlY2tpbmcgY29tbWl0IGE1MmRiZTc2NjJlNyAodGFyZ2V0L2FybTog
+Q29udmVydCBOZW9uIFZSSEFERCwgVkhTVUIgMy1yZWctc2FtZSBpbnNucyB0byBkZWNvZGV0cmVl
+KQo3LzE3IENoZWNraW5nIGNvbW1pdCA2ODg2ODI1YWEyYjUgKHRhcmdldC9hcm06IENvbnZlcnQg
+TmVvbiBWUVNITCwgVlJTSEwsIFZRUlNITCAzLXJlZy1zYW1lIGluc25zIHRvIGRlY29kZXRyZWUp
+CkVSUk9SOiBNYWNyb3Mgd2l0aCBtdWx0aXBsZSBzdGF0ZW1lbnRzIHNob3VsZCBiZSBlbmNsb3Nl
+ZCBpbiBhIGRvIC0gd2hpbGUgbG9vcAojMTAzOiBGSUxFOiB0YXJnZXQvYXJtL3RyYW5zbGF0ZS1u
+ZW9uLmluYy5jOjg5MDoKKyNkZWZpbmUgRE9fM1NBTUVfMzJfRU5WKElOU04sIEZVTkMpICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICBXUkFQX0VOVl9GTihnZW5fIyNJ
+TlNOIyNfdHJhbXA4LCBnZW5faGVscGVyX25lb25fIyNGVU5DIyM4KTsgICAgICAgIFwKKyAgICBX
+UkFQX0VOVl9GTihnZW5fIyNJTlNOIyNfdHJhbXAxNiwgZ2VuX2hlbHBlcl9uZW9uXyMjRlVOQyMj
+MTYpOyAgICAgIFwKKyAgICBXUkFQX0VOVl9GTihnZW5fIyNJTlNOIyNfdHJhbXAzMiwgZ2VuX2hl
+bHBlcl9uZW9uXyMjRlVOQyMjMzIpOyAgICAgIFwKKyAgICBzdGF0aWMgdm9pZCBnZW5fIyNJTlNO
+IyNfM3ModW5zaWduZWQgdmVjZSwgdWludDMyX3QgcmRfb2ZzLCAgICAgICAgIFwKKyAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgdWludDMyX3Qgcm5fb2ZzLCB1aW50MzJfdCBybV9vZnMs
+ICAgICAgIFwKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDMyX3Qgb3Byc3os
+IHVpbnQzMl90IG1heHN6KSAgICAgICAgIFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgc3Rh
+dGljIGNvbnN0IEdWZWNHZW4zIG9wc1s0XSA9IHsgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIFwKKyAgICAgICAgICAgIHsgLmZuaTQgPSBnZW5fIyNJTlNOIyNfdHJhbXA4IH0sICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgICAgIHsgLmZuaTQgPSBnZW5fIyNJTlNO
+IyNfdHJhbXAxNiB9LCAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgICAgIHsg
+LmZuaTQgPSBnZW5fIyNJTlNOIyNfdHJhbXAzMiB9LCAgICAgICAgICAgICAgICAgICAgICAgICAg
+IFwKKyAgICAgICAgICAgIHsgMCB9LCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgfTsgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgdGNnX2dlbl9n
+dmVjXzMocmRfb2ZzLCBybl9vZnMsIHJtX29mcywgb3Byc3osIG1heHN6LCAmb3BzW3ZlY2VdKTsg
+XAorICAgIH0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgXAorICAgIHN0YXRpYyBib29sIHRyYW5zXyMjSU5TTiMjXzNzKERp
+c2FzQ29udGV4dCAqcywgYXJnXzNzYW1lICphKSAgICAgICAgXAorICAgIHsgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAor
+ICAgICAgICBpZiAoYS0+c2l6ZSA+IDIpIHsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgXAorICAgICAgICAgICAgcmV0dXJuIGZhbHNlOyAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICB9ICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAg
+ICAgICByZXR1cm4gZG9fM3NhbWUocywgYSwgZ2VuXyMjSU5TTiMjXzNzKTsgICAgICAgICAgICAg
+ICAgICAgICAgICAgXAorICAgIH0KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQg
+JyonIChjdHg6V3hWKQojMTE5OiBGSUxFOiB0YXJnZXQvYXJtL3RyYW5zbGF0ZS1uZW9uLmluYy5j
+OjkwNjoKKyAgICBzdGF0aWMgYm9vbCB0cmFuc18jI0lOU04jI18zcyhEaXNhc0NvbnRleHQgKnMs
+IGFyZ18zc2FtZSAqYSkgICAgICAgIFwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMiBlcnJvcnMsIDAgd2Fybmlu
+Z3MsIDE1NCBsaW5lcyBjaGVja2VkCgpQYXRjaCA3LzE3IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCgo4LzE3IENoZWNraW5nIGNvbW1pdCBhNDc0N2FjNmNhZjYgKHRhcmdldC9hcm06IENvbnZl
+cnQgTmVvbiBWUE1BWC9WUE1JTiAzLXJlZy1zYW1lIGluc25zIHRvIGRlY29kZXRyZWUpCkVSUk9S
+OiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojNTE6IEZJTEU6IHRh
+cmdldC9hcm0vdHJhbnNsYXRlLW5lb24uaW5jLmM6OTI4Ogorc3RhdGljIGJvb2wgZG9fM3NhbWVf
+cGFpcihEaXNhc0NvbnRleHQgKnMsIGFyZ18zc2FtZSAqYSwgTmVvbkdlblR3b09wRm4gKmZuKQog
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpF
+UlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikKIzk4OiBGSUxF
+OiB0YXJnZXQvYXJtL3RyYW5zbGF0ZS1uZW9uLmluYy5jOjk3NToKKyAgICBzdGF0aWMgYm9vbCB0
+cmFuc18jI0lOU04jI18zcyhEaXNhc0NvbnRleHQgKnMsIGFyZ18zc2FtZSAqYSkgICAgICAgIFwK
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBeCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDEzNiBsaW5lcyBjaGVja2VkCgpQ
+YXRjaCA4LzE3IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
+aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
+aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo5LzE3IENoZWNraW5nIGNvbW1p
+dCAzMDE1ZDU5YTcxNzggKHRhcmdldC9hcm06IENvbnZlcnQgTmVvbiBWUEFERCAzLXJlZy1zYW1l
+IGluc25zIHRvIGRlY29kZXRyZWUpCjEwLzE3IENoZWNraW5nIGNvbW1pdCBiMmZhNzgxYzllNjAg
+KHRhcmdldC9hcm06IENvbnZlcnQgTmVvbiBWUURNVUxIL1ZRUkRNVUxIIDMtcmVnLXNhbWUgdG8g
+ZGVjb2RldHJlZSkKRVJST1I6IE1hY3JvcyB3aXRoIG11bHRpcGxlIHN0YXRlbWVudHMgc2hvdWxk
+IGJlIGVuY2xvc2VkIGluIGEgZG8gLSB3aGlsZSBsb29wCiMzODogRklMRTogdGFyZ2V0L2FybS90
+cmFuc2xhdGUtbmVvbi5pbmMuYzoxMDAxOgorI2RlZmluZSBET18zU0FNRV9WUURNVUxIKElOU04s
+IEZVTkMpICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIFdSQVBfRU5W
+X0ZOKGdlbl8jI0lOU04jI190cmFtcDE2LCBnZW5faGVscGVyX25lb25fIyNGVU5DIyNfczE2KTsg
+ICAgXAorICAgIFdSQVBfRU5WX0ZOKGdlbl8jI0lOU04jI190cmFtcDMyLCBnZW5faGVscGVyX25l
+b25fIyNGVU5DIyNfczMyKTsgICAgXAorICAgIHN0YXRpYyB2b2lkIGdlbl8jI0lOU04jI18zcyh1
+bnNpZ25lZCB2ZWNlLCB1aW50MzJfdCByZF9vZnMsICAgICAgICAgXAorICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICB1aW50MzJfdCBybl9vZnMsIHVpbnQzMl90IHJtX29mcywgICAgICAg
+XAorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50MzJfdCBvcHJzeiwgdWludDMy
+X3QgbWF4c3opICAgICAgICAgXAorICAgIHsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICBzdGF0aWMgY29u
+c3QgR1ZlY0dlbjMgb3BzWzJdID0geyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAor
+ICAgICAgICAgICAgeyAuZm5pNCA9IGdlbl8jI0lOU04jI190cmFtcDE2IH0sICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgXAorICAgICAgICAgICAgeyAuZm5pNCA9IGdlbl8jI0lOU04jI190cmFt
+cDMyIH0sICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICB9OyAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAg
+ICAgICB0Y2dfZ2VuX2d2ZWNfMyhyZF9vZnMsIHJuX29mcywgcm1fb2ZzLCBvcHJzeiwgbWF4c3os
+ICZvcHNbdmVjZSAtIDFdKTsgXAorICAgIH0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIHN0YXRpYyBib29sIHRy
+YW5zXyMjSU5TTiMjXzNzKERpc2FzQ29udGV4dCAqcywgYXJnXzNzYW1lICphKSAgICAgICAgXAor
+ICAgIHsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgXAorICAgICAgICBpZiAoYS0+c2l6ZSAhPSAxICYmIGEtPnNpemUgIT0g
+MikgeyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAgICAgcmV0dXJuIGZh
+bHNlOyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAg
+ICAgICB9ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgXAorICAgICAgICByZXR1cm4gZG9fM3NhbWUocywgYSwgZ2VuXyMjSU5TTiMj
+XzNzKTsgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIH0KCkVSUk9SOiBzcGFjZXMgcmVx
+dWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojNTE6IEZJTEU6IHRhcmdldC9hcm0vdHJh
+bnNsYXRlLW5lb24uaW5jLmM6MTAxNDoKKyAgICBzdGF0aWMgYm9vbCB0cmFuc18jI0lOU04jI18z
+cyhEaXNhc0NvbnRleHQgKnMsIGFyZ18zc2FtZSAqYSkgICAgICAgIFwKICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDog
+MiBlcnJvcnMsIDAgd2FybmluZ3MsIDcyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDEwLzE3IGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoxMS8xNyBDaGVja2luZyBjb21taXQgMGNjMzliNzk5YWQ3
+ICh0YXJnZXQvYXJtOiBDb252ZXJ0IE5lb24gVkFERCwgVlNVQiwgVkFCRCAzLXJlZy1zYW1lIGlu
+c25zIHRvIGRlY29kZXRyZWUpCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAo
+Y3R4OlZ4VikKIzkwOiBGSUxFOiB0YXJnZXQvYXJtL3RyYW5zbGF0ZS1uZW9uLmluYy5jOjEwMjk6
+CisjZGVmaW5lIERPXzNTX0ZQX0dWRUMoSU5TTixGVU5DKSAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBcCiAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBz
+cGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojMTAwOiBGSUxFOiB0YXJn
+ZXQvYXJtL3RyYW5zbGF0ZS1uZW9uLmluYy5jOjEwMzk6CisgICAgc3RhdGljIGJvb2wgdHJhbnNf
+IyNJTlNOIyNfZnBfM3MoRGlzYXNDb250ZXh0ICpzLCBhcmdfM3NhbWUgKmEpICAgICBcCiAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgXgoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFy
+YXRlIGxpbmUKIzEwMzogRklMRTogdGFyZ2V0L2FybS90cmFuc2xhdGUtbmVvbi5pbmMuYzoxMDQy
+OgorICAgICAgICAgICAgLyogVE9ETyBmcDE2IHN1cHBvcnQgKi8gICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgXAoKdG90YWw6IDIgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMjAgbGlu
+ZXMgY2hlY2tlZAoKUGF0Y2ggMTEvMTcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjEyLzE3
+IENoZWNraW5nIGNvbW1pdCAxYzU4OGU3MTEwZTYgKHRhcmdldC9hcm06IENvbnZlcnQgTmVvbiBW
+UE1JTi9WUE1BWC9WUEFERCBmbG9hdCAzLXJlZy1zYW1lIGluc25zIHRvIGRlY29kZXRyZWUpCkVS
+Uk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojNDc6IEZJTEU6
+IHRhcmdldC9hcm0vdHJhbnNsYXRlLW5lb24uaW5jLmM6MTA1MzoKK3N0YXRpYyBib29sIGRvXzNz
+YW1lX2ZwX3BhaXIoRGlzYXNDb250ZXh0ICpzLCBhcmdfM3NhbWUgKmEsIFZGUEdlbjNPcFNQRm4g
+KmZuKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiM5
+NjogRklMRTogdGFyZ2V0L2FybS90cmFuc2xhdGUtbmVvbi5pbmMuYzoxMTAyOgorI2RlZmluZSBE
+T18zU19GUF9QQUlSKElOU04sRlVOQykgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBcCiAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQg
+YXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojOTc6IEZJTEU6IHRhcmdldC9hcm0vdHJhbnNsYXRl
+LW5lb24uaW5jLmM6MTEwMzoKKyAgICBzdGF0aWMgYm9vbCB0cmFuc18jI0lOU04jI19mcF8zcyhE
+aXNhc0NvbnRleHQgKnMsIGFyZ18zc2FtZSAqYSkgXAogICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCldBUk5JTkc6IEJsb2Nr
+IGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMxMDA6IEZJTEU6
+IHRhcmdldC9hcm0vdHJhbnNsYXRlLW5lb24uaW5jLmM6MTEwNjoKKyAgICAgICAgICAgIC8qIFRP
+RE8gZnAxNiBzdXBwb3J0ICovICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAoKRVJS
+T1I6IHN1c3BlY3QgY29kZSBpbmRlbnQgZm9yIGNvbmRpdGlvbmFsIHN0YXRlbWVudHMgKDgsIDgp
+CiMxNTg6IEZJTEU6IHRhcmdldC9hcm0vdHJhbnNsYXRlLmM6NTQ3NjoKICAgICAgICAgZm9yIChw
+YXNzID0gMDsgcGFzcyA8IChxID8gNCA6IDIpOyBwYXNzKyspIHsKWy4uLl0KKyAgICAgICAgLyog
+RWxlbWVudHdpc2UuICAqLwoKdG90YWw6IDQgZXJyb3JzLCAxIHdhcm5pbmdzLCAxODEgbGluZXMg
+Y2hlY2tlZAoKUGF0Y2ggMTIvMTcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjEzLzE3IENo
+ZWNraW5nIGNvbW1pdCAzNjEzYTg0MGU0OGUgKHRhcmdldC9hcm06IENvbnZlcnQgTmVvbiBmcCBW
+TVVMLCBWTUxBLCBWTUxTIDMtcmVnLXNhbWUgaW5zbnMgdG8gZGVjb2RldHJlZSkKRVJST1I6IHNw
+YWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiM1NTogRklMRTogdGFyZ2V0
+L2FybS90cmFuc2xhdGUtbmVvbi5pbmMuYzoxMDI1Ogorc3RhdGljIGJvb2wgZG9fM3NhbWVfZnAo
+RGlzYXNDb250ZXh0ICpzLCBhcmdfM3NhbWUgKmEsIFZGUEdlbjNPcFNQRm4gKmZuLAogICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNw
+YWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojMTE3OiBGSUxFOiB0YXJnZXQv
+YXJtL3RyYW5zbGF0ZS1uZW9uLmluYy5jOjExMDc6CisjZGVmaW5lIERPXzNTX0ZQKElOU04sRlVO
+QyxSRUFEU19WRCkgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKICAgICAgICAgICAg
+ICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4
+VikKIzExNzogRklMRTogdGFyZ2V0L2FybS90cmFuc2xhdGUtbmVvbi5pbmMuYzoxMTA3OgorI2Rl
+ZmluZSBET18zU19GUChJTlNOLEZVTkMsUkVBRFNfVkQpICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBcCiAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVx
+dWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojMTE4OiBGSUxFOiB0YXJnZXQvYXJtL3Ry
+YW5zbGF0ZS1uZW9uLmluYy5jOjExMDg6CisgICAgc3RhdGljIGJvb2wgdHJhbnNfIyNJTlNOIyNf
+ZnBfM3MoRGlzYXNDb250ZXh0ICpzLCBhcmdfM3NhbWUgKmEpIFwKICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpXQVJOSU5H
+OiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMTIx
+OiBGSUxFOiB0YXJnZXQvYXJtL3RyYW5zbGF0ZS1uZW9uLmluYy5jOjExMTE6CisgICAgICAgICAg
+ICAvKiBUT0RPIGZwMTYgc3VwcG9ydCAqLyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IFwKCnRvdGFsOiA0IGVycm9ycywgMSB3YXJuaW5ncywgMTMwIGxpbmVzIGNoZWNrZWQKClBhdGNo
+IDEzLzE3IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
+ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
+ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoxNC8xNyBDaGVja2luZyBjb21taXQg
+ODdjZTdiMjk5MGEzICh0YXJnZXQvYXJtOiBDb252ZXJ0IE5lb24gMy1yZWctc2FtZSBjb21wYXJl
+IGluc25zIHRvIGRlY29kZXRyZWUpCjE1LzE3IENoZWNraW5nIGNvbW1pdCBkNzJiZjkyZjlmYmEg
+KHRhcmdldC9hcm06IE1vdmUgJ2VudicgYXJndW1lbnQgb2YgcmVjcHNfZjMyIGFuZCByc3FydHNf
+ZjMyIGhlbHBlcnMgdG8gdXN1YWwgcGxhY2UpCjE2LzE3IENoZWNraW5nIGNvbW1pdCA1YjU0ODY1
+ZDRhNDUgKHRhcmdldC9hcm06IENvbnZlcnQgTmVvbiBmcCBWTUFYL1ZNSU4vVk1BWE5NL1ZNSU5O
+TS9WUkVDUFMvVlJTUVJUUyB0byBkZWNvZGV0cmVlKQpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFy
+b3VuZCB0aGF0ICcqJyAoY3R4Old4VikKIzQ4OiBGSUxFOiB0YXJnZXQvYXJtL3RyYW5zbGF0ZS1u
+ZW9uLmluYy5jOjExNDI6CitzdGF0aWMgYm9vbCB0cmFuc19WTUFYTk1fZnBfM3MoRGlzYXNDb250
+ZXh0ICpzLCBhcmdfM3NhbWUgKmEpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAx
+NTMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTYvMTcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+CjE3LzE3IENoZWNraW5nIGNvbW1pdCBiYWE1NDY5ZDNlNmQgKHRhcmdldC9hcm06IENvbnZlcnQg
+TkVPTiBWRk1BLCBWRk1TIDMtcmVnLXNhbWUgaW5zbnMgdG8gZGVjb2RldHJlZSkKPT09IE9VVFBV
+VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxv
+ZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA1MTIxNjM5MDQu
+MTA5MTgtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBl
+PW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
+dHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
+dy1kZXZlbEByZWRoYXQuY29t
 
