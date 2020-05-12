@@ -2,90 +2,94 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91497C54E8E
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 10:34:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 373A2C54E4A
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 10:35:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5976120722
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 10:34:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F373D20722
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 10:35:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EsAhXWps"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5976120722
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TO33+Ctl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F373D20722
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYSEq-0008C6-CB
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 06:34:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53796)
+	id 1jYSFY-0000aM-VI
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 06:35:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53838)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jYSDN-0006IV-54
- for qemu-devel@nongnu.org; Tue, 12 May 2020 06:32:45 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42431
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jYSDU-0006VC-De
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 06:32:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46147
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jYSDM-0007Sd-CM
- for qemu-devel@nongnu.org; Tue, 12 May 2020 06:32:44 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jYSDT-0007Td-DA
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 06:32:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589279563;
+ s=mimecast20190719; t=1589279570;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=D3s9LSGcZEYro7u0ScBs6UfFzzI5QWTXiQteI6q/kVs=;
- b=EsAhXWpsze/ypPCspL9/dCdqWo/3o2fMcX/3iYvSaaUYf76252Nuo/4txUArxK4Ffp78in
- a73jpK9rbyjaZlEhSF7AvBwpgzTZEJUVd4+ZHEmRHdyaxG7fwgxveYpTQ4TvOnwpu6zyVy
- 6b5wM4y8ECddCTqPUbkfjh+5FiTitmI=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-442-DioBRlIoNuqMfsN3hvRVJA-1; Tue, 12 May 2020 06:32:41 -0400
-X-MC-Unique: DioBRlIoNuqMfsN3hvRVJA-1
-Received: by mail-wr1-f69.google.com with SMTP id z10so2723869wrs.2
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 03:32:41 -0700 (PDT)
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=o+SFxNiQTSKSfzcy81S2xitOyf6spOQEd9fCWLhnCeY=;
+ b=TO33+CtlErgSHZoB9Xur1+e9Xz63kbAEaji42f3v0pii09U8TdxDhN4KmgXwOZh7LobQ+P
+ 7PIAsMAPk+cEzYQDw6fXC6R639KdkTYZhDHFFLaFvptW5h4LbAQTBA3KAbFmHCEQsnyKGn
+ C95kf3s7iu2o8sa5tEbNjuDBMuBhp9U=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-142-7Tyv2hDcNxi8k2HVuAcz8A-1; Tue, 12 May 2020 06:32:49 -0400
+X-MC-Unique: 7Tyv2hDcNxi8k2HVuAcz8A-1
+Received: by mail-wm1-f69.google.com with SMTP id e15so935672wme.1
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 03:32:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=D3s9LSGcZEYro7u0ScBs6UfFzzI5QWTXiQteI6q/kVs=;
- b=nxCkS5btspXAl8/YCBWNLvxl0A/bhWoraKMN5IUo8Kw8Fk3gP37gGRuunE77GoVUOu
- eZpA9rUM+Via+q9wMvc2d4Vs1gIXnE7i3PF79PPdYkPFmgRqgD99LZM+5U++44F+aPQn
- oLazn4QtUXO3SiRMuWfGjQ3qYO9SFiH4wBf2vTZiW/iy8WEANE4/BLEgpIwW3GXtriSZ
- U+j0UzrVrXWs5vaWTEtqgnHsBXqjXviMGRLVX227HfnseENtDzqdrOb/fVRnM4A4GByL
- exeXnpvgBVpG3P6DYwAxQTofx25TPrh857ZpD4goLe0VhIXGw+6kQ22MCvJiA6hn5l3H
- 7/pg==
-X-Gm-Message-State: AGi0PuYYXT7LwFm3IdTaON/ii+r2pHFisjHCDogeypW7QCwUUbXyf0WT
- 1rmGTpQtF0YLRXQ/EhQtqaM73iwfyPZspQE/ueQnxNs0MrjXAt2Fr+Vc90KAsN893uTON4v0S1j
- F1LQdmlLV3nDWoew=
-X-Received: by 2002:a7b:c4da:: with SMTP id g26mr20748016wmk.3.1589279560456; 
- Tue, 12 May 2020 03:32:40 -0700 (PDT)
-X-Google-Smtp-Source: APiQypI7UX/2eCYXEuygt24GZ0cIrBaT7G/B+iwW2cYEEuIZJysOnDbHZJBLcIIaLOSrWhvw7mpSHA==
-X-Received: by 2002:a7b:c4da:: with SMTP id g26mr20747977wmk.3.1589279560089; 
- Tue, 12 May 2020 03:32:40 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=o+SFxNiQTSKSfzcy81S2xitOyf6spOQEd9fCWLhnCeY=;
+ b=kYmVfcmO6orCf9JfqfmwHgE1lfADbcjKaitY2klvxnA4M1cqSapaFLhedY4NZz0YdI
+ QOzDyS5EwSHdxVDOpz15Yn/5K31srp0+KgP3T9LIKKw75OOi6FCPdJKKFGwnbOWaYRwa
+ VYEYXKBTP+YNtj79UM2wcF/+qxob93JOLZdLtvXy+SIVXbUFiQNGA0EplLm5FHm06EV5
+ +/YzgwoBHqR/zxcEUP+v/L4BY0q9/tc6amkkAL330/ywxt+ApDW+8ioBI4caEiQxBpq6
+ 65ht+8ksVuYc2uYx7kD2Gzi7t18/76gHo4Sg3P+/4eIaXfyQy/NgbuwLVc0ivtCh1ilO
+ BvgQ==
+X-Gm-Message-State: AGi0PuaoiLk7GZqloyM36JEcZSL6a2ftmfzSfzliL0o5EBYiUBlM7jUT
+ K8oIRTOdD0fddayQhYfdxdR3AlhSKpxtPi7BUlWeFgUDQATbFAH98MY1DkSj8cjZk+YQ4uZ1I1V
+ +jn0CtmjCwQDiUzo=
+X-Received: by 2002:adf:cc81:: with SMTP id p1mr23275933wrj.192.1589279565457; 
+ Tue, 12 May 2020 03:32:45 -0700 (PDT)
+X-Google-Smtp-Source: APiQypIdq6xklNhE6zF2ex6riiZ2WEeaRBZwdbLSVo8fxAyW06Ghhyjcwp0kiKh5i+SK1pgUYQQIhQ==
+X-Received: by 2002:adf:cc81:: with SMTP id p1mr23275905wrj.192.1589279565172; 
+ Tue, 12 May 2020 03:32:45 -0700 (PDT)
 Received: from x1w.redhat.com (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id x5sm23249077wro.12.2020.05.12.03.32.38
+ by smtp.gmail.com with ESMTPSA id u16sm21863464wrq.17.2020.05.12.03.32.43
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 12 May 2020 03:32:39 -0700 (PDT)
+ Tue, 12 May 2020 03:32:44 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 0/6] scripts: More Python fixes
-Date: Tue, 12 May 2020 12:32:32 +0200
-Message-Id: <20200512103238.7078-1-philmd@redhat.com>
+Subject: [PATCH v4 1/6] scripts/qemugdb: Remove shebang header
+Date: Tue, 12 May 2020 12:32:33 +0200
+Message-Id: <20200512103238.7078-2-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200512103238.7078-1-philmd@redhat.com>
+References: <20200512103238.7078-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 02:02:05
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 02:02:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -110,6 +114,7 @@ Cc: Fam Zheng <fam@euphon.net>, kvm@vger.kernel.org, qemu-block@nongnu.org,
  qemu-trivial@nongnu.org,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Marcelo Tosatti <mtosatti@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
@@ -118,49 +123,89 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Trivial Python3 fixes, again...
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Since v3:
-- Fixed missing scripts/qemugdb/timers.py (kwolf)
-- Cover more scripts
-- Check for __main__ in few scripts
+These scripts are loaded as plugin by GDB (and they don't
+have any __main__ entry point). Remove the shebang header.
 
-Since v2:
-- Remove patch updating MAINTAINERS
+Acked-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ scripts/qemugdb/__init__.py  | 3 +--
+ scripts/qemugdb/aio.py       | 3 +--
+ scripts/qemugdb/coroutine.py | 3 +--
+ scripts/qemugdb/mtree.py     | 4 +---
+ scripts/qemugdb/tcg.py       | 1 -
+ scripts/qemugdb/timers.py    | 1 -
+ 6 files changed, 4 insertions(+), 11 deletions(-)
 
-Since v1:
-- Added Alex Bennée A-b tags
-- Addressed John Snow review comments
-  - Use /usr/bin/env
-  - Do not modify os.path (dropped last patch)
-
-Philippe Mathieu-Daudé (6):
-  scripts/qemugdb: Remove shebang header
-  scripts/qemu-gdb: Use Python 3 interpreter
-  scripts/qmp: Use Python 3 interpreter
-  scripts/kvm/vmxcap: Use Python 3 interpreter and add pseudo-main()
-  scripts/modules/module_block: Use Python 3 interpreter & add
-    pseudo-main
-  tests/migration/guestperf: Use Python 3 interpreter
-
- scripts/kvm/vmxcap                 |  7 ++++---
- scripts/modules/module_block.py    | 31 +++++++++++++++---------------
- scripts/qemu-gdb.py                |  4 ++--
- scripts/qemugdb/__init__.py        |  3 +--
- scripts/qemugdb/aio.py             |  3 +--
- scripts/qemugdb/coroutine.py       |  3 +--
- scripts/qemugdb/mtree.py           |  4 +---
- scripts/qemugdb/tcg.py             |  1 -
- scripts/qemugdb/timers.py          |  1 -
- scripts/qmp/qom-get                |  2 +-
- scripts/qmp/qom-list               |  2 +-
- scripts/qmp/qom-set                |  2 +-
- scripts/qmp/qom-tree               |  2 +-
- tests/migration/guestperf-batch.py |  2 +-
- tests/migration/guestperf-plot.py  |  2 +-
- tests/migration/guestperf.py       |  2 +-
- 16 files changed, 33 insertions(+), 38 deletions(-)
-
+diff --git a/scripts/qemugdb/__init__.py b/scripts/qemugdb/__init__.py
+index 969f552b26..da8ff612e5 100644
+--- a/scripts/qemugdb/__init__.py
++++ b/scripts/qemugdb/__init__.py
+@@ -1,5 +1,4 @@
+-#!/usr/bin/python
+-
++#
+ # GDB debugging support
+ #
+ # Copyright (c) 2015 Linaro Ltd
+diff --git a/scripts/qemugdb/aio.py b/scripts/qemugdb/aio.py
+index 2ba00c4444..d7c1ba0c28 100644
+--- a/scripts/qemugdb/aio.py
++++ b/scripts/qemugdb/aio.py
+@@ -1,5 +1,4 @@
+-#!/usr/bin/python
+-
++#
+ # GDB debugging support: aio/iohandler debug
+ #
+ # Copyright (c) 2015 Red Hat, Inc.
+diff --git a/scripts/qemugdb/coroutine.py b/scripts/qemugdb/coroutine.py
+index 41e079d0e2..db61389022 100644
+--- a/scripts/qemugdb/coroutine.py
++++ b/scripts/qemugdb/coroutine.py
+@@ -1,5 +1,4 @@
+-#!/usr/bin/python
+-
++#
+ # GDB debugging support
+ #
+ # Copyright 2012 Red Hat, Inc. and/or its affiliates
+diff --git a/scripts/qemugdb/mtree.py b/scripts/qemugdb/mtree.py
+index 3030a60d3f..8fe42c3c12 100644
+--- a/scripts/qemugdb/mtree.py
++++ b/scripts/qemugdb/mtree.py
+@@ -1,5 +1,4 @@
+-#!/usr/bin/python
+-
++#
+ # GDB debugging support
+ #
+ # Copyright 2012 Red Hat, Inc. and/or its affiliates
+@@ -84,4 +83,3 @@ def print_item(self, ptr, offset = gdb.Value(0), level = 0):
+         while not isnull(subregion):
+             self.print_item(subregion, addr, level)
+             subregion = subregion['subregions_link']['tqe_next']
+-
+diff --git a/scripts/qemugdb/tcg.py b/scripts/qemugdb/tcg.py
+index 18880fc9a7..16c03c06a9 100644
+--- a/scripts/qemugdb/tcg.py
++++ b/scripts/qemugdb/tcg.py
+@@ -1,4 +1,3 @@
+-#!/usr/bin/python
+ # -*- coding: utf-8 -*-
+ #
+ # GDB debugging support, TCG status
+diff --git a/scripts/qemugdb/timers.py b/scripts/qemugdb/timers.py
+index f0e132d27a..46537b27cf 100644
+--- a/scripts/qemugdb/timers.py
++++ b/scripts/qemugdb/timers.py
+@@ -1,4 +1,3 @@
+-#!/usr/bin/python
+ # -*- coding: utf-8 -*-
+ # GDB debugging support
+ #
 -- 
 2.21.3
 
