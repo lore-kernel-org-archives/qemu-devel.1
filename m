@@ -2,83 +2,108 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04375CA90AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 18:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0E57CA90AF
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 18:19:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C291C206B8
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 18:16:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 86BFF20720
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 18:19:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hzgvdPIQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C291C206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ie961t9V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86BFF20720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYZSY-0000VB-W7
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 14:16:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38180)
+	id 1jYZUg-0002In-Qv
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 14:19:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38478)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <michael.goffioul@gmail.com>)
- id 1jYZR2-0007Z4-9R
- for qemu-devel@nongnu.org; Tue, 12 May 2020 14:15:20 -0400
-Received: from mail-qk1-x72e.google.com ([2607:f8b0:4864:20::72e]:47000)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <michael.goffioul@gmail.com>)
- id 1jYZR1-0001vm-2N
- for qemu-devel@nongnu.org; Tue, 12 May 2020 14:15:19 -0400
-Received: by mail-qk1-x72e.google.com with SMTP id f83so14615382qke.13
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 11:15:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to;
- bh=icufpQkfVx54SdLk06P8ykURpU7I46kjHuzTIKhlG5c=;
- b=hzgvdPIQ0UK+k9PbQNzZlQo66c0AQoP8t9/0TtHmnYWerERq39zM8qeiS3y2GNBQ3+
- HByz6r+sRMUrCcamsKkSgUCwsjR1BlK8G1gbgHrFRTQDQw7xvb3rmXHjZkx6MWkCTEPm
- B8kIvP/z7gurtcrpY9MtmYkrxdKQ2SwEPL3nBtV9tY8GQ2RP/r2KrATjjDE+eAoO25WH
- kdh9qpnhJYPnaAob0skz00b9XXzIJuVwrheB3TLBe4g+4cL6Wcf8GXGcVWsZ96vjuvFH
- t0OhpADVehv/aEvpaQO3w7WpDnouyBJNEFzgK9ZPRrCqlxcS9eIvucrJMEYuy5pB5tNe
- GqiA==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jYZT6-00016n-Ow
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 14:17:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42004
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jYZT4-0003Hl-CC
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 14:17:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589307444;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=5v8ULgxae1jVRuxyE6GlVo+BzXMlq/2WlJuMyk3EleQ=;
+ b=Ie961t9V4CIByy2faQ5O3vddmOZBRh8rbRRn2ZDDXPSmTFRGwAsmlEDDZVUfZCW4RmeVf2
+ tZdbsmPkebJKdAmxvcQZJC+2XfuM0US5gTuMChqfdXz4OmMNSC7aEH7Uw+JrjY3capXvDq
+ mIgG57Ev6DajV8DCwhQzZ4yCt8V4q0M=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-363-rZAVZum1PmGqBsjR1VDbjw-1; Tue, 12 May 2020 14:17:22 -0400
+X-MC-Unique: rZAVZum1PmGqBsjR1VDbjw-1
+Received: by mail-wr1-f71.google.com with SMTP id u5so5441193wrt.22
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 11:17:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=icufpQkfVx54SdLk06P8ykURpU7I46kjHuzTIKhlG5c=;
- b=UiTmBUr7L55OT5aCeGuHnXlY689C/5g+o15uRJ9KfYIrLAHeUxLVYC9QhPTQRco0Wj
- fURjWuXg1pj4CKf0ocL27MteQbentd0qEOLqjvyGWc5/hYcxJIy5X8ZgmfC1OIISDkqw
- LfZlSUC/ampsh6PKJCs6b71B5dGd8v2XDyBFy9da6xOoNIx7E/kHCvQA+9Xdy89ys3UG
- 7451UXOLCeZjHrcOLP5IRtU77i1fMWfzm1iuGw2fc8a0iC8CrBrEGjC3lVmtc0vBY4gI
- 7kM4vmkSVf2QYfYVZ6VQgOYCNWVVMVLu8T3GdyziRETp75rxXCNa80ekyp/RWTwTDQx0
- 92Ew==
-X-Gm-Message-State: AGi0PuYvP14R/AbLpS6fqF28EKoanUQ+eR1+cfXFC5rW7kVGq2VbG+n/
- bCVuZlf9bCEgtw16skgPXpNM3DmTHaiFgfUtbUaY0mP4eio=
-X-Google-Smtp-Source: APiQypLnNIUvPm8C0UP4UcmToYHywNviatHJTnNZYF/UzN7fjLFVMb3DD6ChWFTFk9s6yUZkFZrMPc5qmJXVBcoQ3b8=
-X-Received: by 2002:a37:a917:: with SMTP id s23mr10523046qke.443.1589307315447; 
- Tue, 12 May 2020 11:15:15 -0700 (PDT)
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=5v8ULgxae1jVRuxyE6GlVo+BzXMlq/2WlJuMyk3EleQ=;
+ b=WH/g9qsr5ut+cYTj6e7k4ieVlrq+TmYJFDT3E49rQ2LpIasTDg0Wp6RyA7ISlWvGTI
+ mYhgEgQwoILUL6PCOBM/hvh7IwkHODEn5AUG6u8GilG5YIN1C+AXPS97mT6n6pRNU+cv
+ 3oZH32z2KW/7dz0uLT12nKLp++rlk3RPIwFj+oXwmZyPb5GF1vxq+w//KjX+Nu9IFpea
+ HV/RYtarDh6/8y1q4FmjyuHsvQ6kxtg6ZeLDNDRa1xu/zQTGSRt9/uRz1LUgHaTm93cG
+ ZTEmiZtdiQOg61k+PyvGhDm/9BweF3Wsu0sNZ0UrA3aq4Ybr7L+NSHAUFmK0iYA9xOhR
+ v7vw==
+X-Gm-Message-State: AGi0PuZ9JxkB2Lel5FJS/1+OKhC/deJaD5Cl8/nt1/xjYKzblNFo5uWy
+ 3R35zVmLpyKsXoLugWeCZkxhiwEjumU4HzCk7+tTmRSTrXafR3Jm2n4E73kSKNRvNLOKplWmM/I
+ Zrapx5V+sT1lYdLc=
+X-Received: by 2002:adf:a151:: with SMTP id r17mr25565355wrr.161.1589307441545; 
+ Tue, 12 May 2020 11:17:21 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJzVGHrzpYntJVw7niUjtUvLVoTjOMh8+qmZ9HCO9/FfKwH1WgDmYUJJ5BFlWjhQXPJwqmK1A==
+X-Received: by 2002:adf:a151:: with SMTP id r17mr25565334wrr.161.1589307441334; 
+ Tue, 12 May 2020 11:17:21 -0700 (PDT)
+Received: from [192.168.1.38] (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id q14sm24917195wrc.66.2020.05.12.11.17.19
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 12 May 2020 11:17:20 -0700 (PDT)
+Subject: Re: [PATCH] qom/object: pass (Object *) to
+ object_initialize_with_type()
+To: Masahiro Yamada <masahiroy@kernel.org>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P . Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
+References: <20200512173104.2293073-1-masahiroy@kernel.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <8f3abc47-30d0-612e-4d8a-9a861d5c2a48@redhat.com>
+Date: Tue, 12 May 2020 20:17:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-From: Michael Goffioul <michael.goffioul@gmail.com>
-Date: Tue, 12 May 2020 14:15:04 -0400
-Message-ID: <CAB-99Lsm1c6i45L2kQX6J6Wa+FJ+aRPhdVK=+zQC2M6K7RdXDg@mail.gmail.com>
-Subject: Problem with QEMU usermode + jemalloc
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: multipart/alternative; boundary="000000000000f9ece405a5777118"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::72e;
- envelope-from=michael.goffioul@gmail.com; helo=mail-qk1-x72e.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20200512173104.2293073-1-masahiroy@kernel.org>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 14:17:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,40 +120,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000f9ece405a5777118
-Content-Type: text/plain; charset="UTF-8"
+On 5/12/20 7:31 PM, Masahiro Yamada wrote:
+> object_new_with_type() already passes (Object *) pointer.
+> Avoid casting back and forth.
 
-Hi,
+But object_initialize() doesn't...
 
-I'm running into a problem using QEMU in usermode and jemalloc (this is in
-the context of an ARM-to-x86 translation layer for Android). The issue is
-discussed here:
+> 
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
+> 
+>   qom/object.c | 4 +---
+>   1 file changed, 1 insertion(+), 3 deletions(-)
+> 
+> diff --git a/qom/object.c b/qom/object.c
+> index e4085d8ae2..9d1a918e42 100644
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -495,10 +495,8 @@ static void object_class_property_init_all(Object *obj)
+>       }
+>   }
+>   
+> -static void object_initialize_with_type(void *data, size_t size, TypeImpl *type)
+> +static void object_initialize_with_type(Object *obj, size_t size, TypeImpl *type)
+>   {
+> -    Object *obj = data;
+> -
+>       type_initialize(type);
+>   
+>       g_assert(type->instance_size >= sizeof(Object));
+> 
 
-https://github.com/jemalloc/jemalloc/issues/1844
-
-In a nutshell, the lack of madvise implementation is making jemalloc return
-non-zeroed memory on calloc. This then creates various crashes in the
-emulated code.
-
-What would be the QEMU devs point of view on this?
-
-Thanks,
-Michael.
-
---000000000000f9ece405a5777118
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Hi,<div><br></div><div>I&#39;m running into a problem usin=
-g QEMU in usermode and jemalloc (this is in the context of an ARM-to-x86 tr=
-anslation layer for Android). The issue is discussed here:</div><div><br></=
-div><div><a href=3D"https://github.com/jemalloc/jemalloc/issues/1844">https=
-://github.com/jemalloc/jemalloc/issues/1844</a><br></div><div><br></div><di=
-v>In a nutshell, the lack of madvise implementation is making jemalloc retu=
-rn non-zeroed memory on calloc. This then creates various crashes in the em=
-ulated code.</div><div><br></div><div>What would be the QEMU devs point of =
-view on this?</div><div><br></div><div>Thanks,</div><div>Michael.</div><div=
-><br></div></div>
-
---000000000000f9ece405a5777118--
 
