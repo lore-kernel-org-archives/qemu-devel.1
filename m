@@ -2,85 +2,82 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E4BCA90AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 16:02:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 883B0C2D0F7
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 16:06:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 897CD2054F
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 16:02:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5195E20736
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 16:06:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MPPB7PZE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 897CD2054F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MD8NIFAO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5195E20736
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYXM9-0001tw-9l
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 12:02:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43622)
+	id 1jYXQe-0007iH-F3
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 12:06:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43850)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jYXJt-00006Q-05
- for qemu-devel@nongnu.org; Tue, 12 May 2020 11:59:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31119
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jYXM2-0002Bg-Sw
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 12:02:02 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37648
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1jYXJs-0003fS-AY
- for qemu-devel@nongnu.org; Tue, 12 May 2020 11:59:48 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jYXM2-00042b-5s
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 12:02:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589299187;
+ s=mimecast20190719; t=1589299321;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wKY3yV0xMXu6/12g0KGd0Wn5A6HzJ5UBaU7Dic9E4wM=;
- b=MPPB7PZE70uzyVMkZgngEKjUb7CPy+Oy4Xg0bSFnTTO9lAVjJWKXDFbxtckFU78QclRRbf
- YZ57ITqunO4LXHNl2f+p77L6Na37vF8pFgyXHkkPM1YhQbG9MkCkcVobegmAEbBXldevrk
- ntze8KwhKA8pUAjFNI3bHndWAQwAuTM=
+ bh=B/HfK/1p3woSs1jS9R6Yo/SO4WZfYrwj5AAotzzd/BA=;
+ b=MD8NIFAOqNMCEapUgWLJtRvUU1lEGA/PqCBhdpgYJ060w+2yEtawcXa2ej1tAQm+tMNyJg
+ mZ17GdrtrqENIKINb9U+serphNAxlFynw5SH9OG88ixUyEr9Z3z9D/e4lEAIQ/kEp+l8qH
+ cCmTuSIil6OWMD9VhA6tjsYs+6lRgE0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-42-9I5uk8g9MxSeB2RXpclpGA-1; Tue, 12 May 2020 11:59:43 -0400
-X-MC-Unique: 9I5uk8g9MxSeB2RXpclpGA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-25-89zTgJG3MZONUzFu75kqAQ-1; Tue, 12 May 2020 12:01:53 -0400
+X-MC-Unique: 89zTgJG3MZONUzFu75kqAQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E45B107ACF3;
- Tue, 12 May 2020 15:59:42 +0000 (UTC)
-Received: from [10.36.112.22] (ovpn-112-22.ams2.redhat.com [10.36.112.22])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D1A37D94B;
- Tue, 12 May 2020 15:59:27 +0000 (UTC)
-Subject: Re: [PATCH v2 1/3] acpi: Move build_tpm2() in the generic part
-To: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-References: <20200505144419.29174-1-eric.auger@redhat.com>
- <20200505144419.29174-2-eric.auger@redhat.com>
- <20200506063314.4qvnyfonjixcknuj@kamzik.brq.redhat.com>
- <20200506055747-mutt-send-email-mst@kernel.org>
- <20200512161447.07b76de2@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <3dfdf504-7fc2-40cf-8387-c4abb8133792@redhat.com>
-Date: Tue, 12 May 2020 17:59:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A8F0107B7C3;
+ Tue, 12 May 2020 16:01:51 +0000 (UTC)
+Received: from gondolin (ovpn-112-176.ams2.redhat.com [10.36.112.176])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5FEFA63F8F;
+ Tue, 12 May 2020 16:01:43 +0000 (UTC)
+Date: Tue, 12 May 2020 18:01:40 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v1 2/8] s390/sclp: check sccb len before filling in data
+Message-ID: <20200512180140.4be69d60.cohuck@redhat.com>
+In-Reply-To: <9a39a948-91a1-7cfe-f2a5-d30e5564f318@redhat.com>
+References: <20200508230823.22956-1-walling@linux.ibm.com>
+ <20200508230823.22956-3-walling@linux.ibm.com>
+ <58bc496c-28bb-26f8-ab46-aba6ad141717@linux.ibm.com>
+ <737869a8-13b2-1831-00c6-629d5a109d9c@redhat.com>
+ <05ab2e59-10c0-c7df-c014-b54883ddccd3@linux.ibm.com>
+ <9a39a948-91a1-7cfe-f2a5-d30e5564f318@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200512161447.07b76de2@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 02:02:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 01:41:59
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -100,41 +97,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Andrew Jones <drjones@redhat.com>,
- gshan@redhat.com, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com,
- qemu-arm@nongnu.org, marcandre.lureau@redhat.com, eric.auger.pro@gmail.com,
- lersek@redhat.com, ardb@kernel.org, stefanb@linux.ibm.com
+Cc: Collin Walling <walling@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, mst@redhat.com, qemu-devel@nongnu.org,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
+ svens@linux.ibm.com, pbonzini@redhat.com, mihajlov@linux.ibm.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Igor,
+On Mon, 11 May 2020 17:02:06 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-On 5/12/20 4:14 PM, Igor Mammedov wrote:
-> On Wed, 6 May 2020 05:58:25 -0400
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
->> On Wed, May 06, 2020 at 08:33:14AM +0200, Andrew Jones wrote:
->>> I realize this function is just getting moved, but maybe it should get
->>> converted to the build_append* API while being moved?  
->>
->> I'd rather refactoring was done in a separate patch -
->> easier to review.
-> maybe first convert and then move
-> 
-> PS:
-> me wonders if we have test with TPM enabled, if not maybe it's time to add them
-> i.e. first goes testcase in bios-tables and then refactoring/moving
-> in that case review is simpler.
-Do you mean tests checking the ACPI table content when TPM is
-instantiated? I don't think so otherwise it would have failed I guess.
-Otherwise we have functional tests with TPM (MMIO access), ie qtest
-tests  tpm-tis-device-test and tpm-tis-device-swtpm-test.
+> On 11.05.20 16:50, Janosch Frank wrote:
+> > On 5/11/20 4:44 PM, David Hildenbrand wrote:  
+> >> On 11.05.20 16:36, Janosch Frank wrote:  
+> >>> On 5/9/20 1:08 AM, Collin Walling wrote:  
+> >>>> The SCCB must be checked for a sufficient length before it is filled
+> >>>> with any data. If the length is insufficient, then the SCLP command
+> >>>> is suppressed and the proper response code is set in the SCCB header.
+> >>>>
+> >>>> Signed-off-by: Collin Walling <walling@linux.ibm.com>  
+> >>>
+> >>> Fixes tag?
 
-Thanks
+Probably
 
-Eric
+Fixes: 832be0d8a3bb ("s390x: sclp: Report insufficient SCCB length")
+
+?
+
+> >>> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>  
+> >>
+> >> This is not a fix AFAIKs.
+> >> sclp_service_call()/sclp_service_call_protected() always supplies a full
+> >> SCCB of exactly 4k size.
+> >>  
+> > 
+> > We don't check for QEMU's 4k buffer here, but for the length that was
+> > specified by the guest.
+> > 
+> > It's valid for the guest to request cpu info and state that its buffer
+> > is only 1k. We can't write everything in 1k if we have ~200 cpus, so
+> > we'll report the insufficient length rc.
+> > 
+> > What he fixes here is the time of the length check, it should be done
+> > before any changes are being done to the work_sccb.  
 > 
-> 
+> I don't have access to the spec, especially, if the guest can expect
+> nothing else in the sccb to change in case we report an error code. So
+> whatever you tell me, I have to trust you :)
+
+Same here. Sounds plausible, but I have to trust the folks with the
+documentation :)
 
 
