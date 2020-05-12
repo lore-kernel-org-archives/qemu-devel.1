@@ -7,61 +7,60 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B90ADC54E4B
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:18:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F3FFC54E8D
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:22:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84A0420675
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:18:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D0AD206D6
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:22:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L8/GB2AM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84A0420675
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ep+t7gsW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D0AD206D6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYPBV-0008AL-Q8
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 03:18:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55034)
+	id 1jYPF9-0001xw-Ft
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 03:22:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55406)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jYPAm-0007ao-Rl
- for qemu-devel@nongnu.org; Tue, 12 May 2020 03:17:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56109
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jYPEY-0001Pf-P8
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 03:21:46 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54964
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jYPAl-0002OL-BH
- for qemu-devel@nongnu.org; Tue, 12 May 2020 03:17:52 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jYPEX-0003H8-Us
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 03:21:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589267869;
+ s=mimecast20190719; t=1589268105;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=ct7hTi8810AVmL5I86Rqr5VY63aAH7eYQSr9qtMYPns=;
- b=L8/GB2AM+JPCO8PsG3TTuzi83LI+mda66Soy52QBr7xKJA2T1285RXVP9rHgmXaWtfGGsd
- K0E+40uFF9V0vSguLy+pA2tv8nkCS9WH3UqUQfejnjJZ2+IVz5L7DAupDVHcY4elaulTfQ
- fQkL+t83Ua4B/bqaeHl2FWQBvnC7XW0=
+ bh=pZRU7fTpRulgj8LDyejmAO/fgbHEi5SgtBNUJZWKmZg=;
+ b=ep+t7gsWOZt+/NlZmlfn3NAVeaGq2wY5M8wKmc3PpD9EvZg+26DxoBeY0asv+UyXdpw6R2
+ YpBfzs1bx+XLzg1C3p8pS3WDgfsVoCmId8iUIjZhhcz4YrZjG+Pd/Edrp0EbbUcba0dyiT
+ uw2pN77xsvii/OGLfJz60TE+nO0gJ3w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405-L9fdqKK0M6CUVHIQj0SLBA-1; Tue, 12 May 2020 03:17:48 -0400
-X-MC-Unique: L9fdqKK0M6CUVHIQj0SLBA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-197-stbzgN94OneKHzduaRM8xA-1; Tue, 12 May 2020 03:21:41 -0400
+X-MC-Unique: stbzgN94OneKHzduaRM8xA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9AD21107ACF3;
- Tue, 12 May 2020 07:17:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4290100A614;
+ Tue, 12 May 2020 07:21:39 +0000 (UTC)
 Received: from [10.36.113.77] (ovpn-113-77.ams2.redhat.com [10.36.113.77])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8F9AC1D4;
- Tue, 12 May 2020 07:17:41 +0000 (UTC)
-Subject: Re: [PATCH v1 1/8] s390/sclp: remove SCLPDevice param from
- prepare_cpu_entries
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3746E2E174;
+ Tue, 12 May 2020 07:21:18 +0000 (UTC)
+Subject: Re: [PATCH v1 3/8] s390/sclp: rework sclp boundary and length checks
 To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org,
  qemu-s390x@nongnu.org
 References: <20200508230823.22956-1-walling@linux.ibm.com>
- <20200508230823.22956-2-walling@linux.ibm.com>
+ <20200508230823.22956-4-walling@linux.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -107,21 +106,21 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <4b0762e1-9147-8b6d-a759-e1eef61eb7ba@redhat.com>
-Date: Tue, 12 May 2020 09:17:40 +0200
+Message-ID: <d894a835-d0ea-2d61-0416-c4804a755dca@redhat.com>
+Date: Tue, 12 May 2020 09:21:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200508230823.22956-2-walling@linux.ibm.com>
+In-Reply-To: <20200508230823.22956-4-walling@linux.ibm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 02:20:15
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 01:41:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -150,47 +149,112 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 09.05.20 01:08, Collin Walling wrote:
-> It was never used in this function, so let's remove it.
+> Let's factor out the SCLP boundary and length checks
+> into separate functions.
 > 
 > Signed-off-by: Collin Walling <walling@linux.ibm.com>
 > ---
->  hw/s390x/sclp.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  hw/s390x/sclp.c | 41 +++++++++++++++++++++++++++++++++++------
+>  1 file changed, 35 insertions(+), 6 deletions(-)
 > 
 > diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-> index ede056b3ef..156ffe3223 100644
+> index d08a291e40..470d5da7a2 100644
 > --- a/hw/s390x/sclp.c
 > +++ b/hw/s390x/sclp.c
-> @@ -49,7 +49,7 @@ static inline bool sclp_command_code_valid(uint32_t code)
+> @@ -49,6 +49,34 @@ static inline bool sclp_command_code_valid(uint32_t code)
 >      return false;
 >  }
 >  
-> -static void prepare_cpu_entries(SCLPDevice *sclp, CPUEntry *entry, int *count)
-> +static void prepare_cpu_entries(CPUEntry *entry, int *count)
+> +static bool check_sccb_boundary_valid(uint64_t sccb_addr, uint32_t code,
+> +                                      SCCB *sccb)
+
+I suggest naming this
+
+"has_valid_sccb_boundary", then the true/false response is clearer.
+
+> +{
+> +    uint64_t current_len = sccb_addr + be16_to_cpu(sccb->h.length);
+> +    uint64_t allowed_len = (sccb_addr & PAGE_MASK) + PAGE_SIZE;
+> +
+> +    switch (code & SCLP_CMD_CODE_MASK) {
+> +    default:
+> +        if (current_len <= allowed_len) {
+> +            return true;
+> +        }
+> +    }
+> +    sccb->h.response_code = cpu_to_be16(SCLP_RC_SCCB_BOUNDARY_VIOLATION);
+> +    return false;
+> +}
+> +
+> +static bool check_sufficient_sccb_len(SCCB *sccb, int size)
+
+"has_sufficient_sccb_len" ?
+
+> +{
+> +    MachineState *ms = MACHINE(qdev_get_machine());
+> +    int required_len = size + ms->possible_cpus->len * sizeof(CPUEntry);
+
+Rather pass in the number of cpus instead. Looking up the machine again
+in here is ugly.
+
+> +
+> +    if (be16_to_cpu(sccb->h.length) < required_len) {
+> +        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
+> +        return false;
+> +    }
+> +    return true;
+> +}
+> +
+>  static void prepare_cpu_entries(CPUEntry *entry, int *count)
 >  {
 >      MachineState *ms = MACHINE(qdev_get_machine());
->      uint8_t features[SCCB_CPU_FEATURE_LEN] = { 0 };
-> @@ -77,7 +77,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+> @@ -76,8 +104,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+>      int rnsize, rnmax;
 >      IplParameterBlock *ipib = s390_ipl_get_iplb();
 >  
->      /* CPU information */
-> -    prepare_cpu_entries(sclp, read_info->entries, &cpu_count);
-> +    prepare_cpu_entries(read_info->entries, &cpu_count);
->      read_info->entries_cpu = cpu_to_be16(cpu_count);
->      read_info->offset_cpu = cpu_to_be16(offsetof(ReadInfo, entries));
->      read_info->highest_cpu = cpu_to_be16(machine->smp.max_cpus - 1);
-> @@ -135,7 +135,7 @@ static void sclp_read_cpu_info(SCLPDevice *sclp, SCCB *sccb)
+> -    if (be16_to_cpu(sccb->h.length) < (sizeof(ReadInfo) + cpu_count * sizeof(CPUEntry))) {
+> -        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
+> +    if (!check_sufficient_sccb_len(sccb, sizeof(ReadInfo))) {
+>          return;
+>      }
+>  
+> @@ -134,8 +161,7 @@ static void sclp_read_cpu_info(SCLPDevice *sclp, SCCB *sccb)
 >      ReadCpuInfo *cpu_info = (ReadCpuInfo *) sccb;
 >      int cpu_count;
 >  
-> -    prepare_cpu_entries(sclp, cpu_info->entries, &cpu_count);
-> +    prepare_cpu_entries(cpu_info->entries, &cpu_count);
->      cpu_info->nr_configured = cpu_to_be16(cpu_count);
->      cpu_info->offset_configured = cpu_to_be16(offsetof(ReadCpuInfo, entries));
->      cpu_info->nr_standby = cpu_to_be16(0);
+> -    if (be16_to_cpu(sccb->h.length) < (sizeof(ReadCpuInfo) + cpu_count * sizeof(CPUEntry))) {
+> -        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
+> +    if (!check_sufficient_sccb_len(sccb, sizeof(ReadCpuInfo))) {
+>          return;
+>      }
+>  
+> @@ -227,6 +253,10 @@ int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
+>          goto out_write;
+>      }
+>  
+> +    if (!check_sccb_boundary_valid(sccb, code, &work_sccb)) {
+> +        goto out_write;
+> +    }
+
+This is not a "factor out". You're adding new code, this needs
+justification in the patch description.
+
+> +
+>      sclp_c->execute(sclp, &work_sccb, code);
+>  out_write:
+>      s390_cpu_pv_mem_write(env_archcpu(env), 0, &work_sccb,
+> @@ -272,8 +302,7 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
+>          goto out_write;
+>      }
+>  
+> -    if ((sccb + be16_to_cpu(work_sccb.h.length)) > ((sccb & PAGE_MASK) + PAGE_SIZE)) {
+> -        work_sccb.h.response_code = cpu_to_be16(SCLP_RC_SCCB_BOUNDARY_VIOLATION);
+> +    if (!check_sccb_boundary_valid(sccb, code, &work_sccb)) {
+>          goto out_write;
+>      }
+>  
 > 
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
 Thanks,
