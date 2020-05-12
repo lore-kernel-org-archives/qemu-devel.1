@@ -2,86 +2,86 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FCB0C54E4B
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 03:33:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2216C54E4B
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 03:35:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24159206D3
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 03:33:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A4C7206DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 03:35:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dGCgt1gK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24159206D3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iPUs5ejF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A4C7206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYLg6-0004Wt-99
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 23:33:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58422)
+	id 1jYLhC-0005rl-Ej
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 23:35:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58520)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jYLfP-0003oR-3p
- for qemu-devel@nongnu.org; Mon, 11 May 2020 23:33:15 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34499
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1jYLgN-0005CN-Lf
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 23:34:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38728
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jYLfO-0000s8-4j
- for qemu-devel@nongnu.org; Mon, 11 May 2020 23:33:14 -0400
+ id 1jYLgM-0001h1-E7
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 23:34:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589254392;
+ s=mimecast20190719; t=1589254453;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=KWmev34QIa4MWciuTXTvFJdKfdnyJ8lv9QcY8R2HrvY=;
- b=dGCgt1gKUovyoFaBVHjr6rYZHQLgru4BMvsVvEurKR3WVxXO3yOI5Kdx1qB7dXdOQPoBp2
- EJ0zdlGF0TBZjYJyIuowpiINecYPkZk/Dar3yEujomBfEXNZnJBu/pbSqufwhkaoJcKAYi
- HNOiWEQ2OquLONoFjtAkG5UyZ2j5Wfo=
+ bh=0ywAz4mxLcotE5cqpBnbqzSyVB/bG3cN8GlfgNmkNBM=;
+ b=iPUs5ejFz6K3zIaq+ZS0UPc4Kl8YAM0Z4ZyRkmic6iy+ZPWueyMGC2FM4AFitFQqnFN+vP
+ JqtH4fHqwvk0JpYx+XPEQ6z1NlWb9THV6KpNSnQx2UKiCJWXLicS4h/7tuUlWY66BTCC+x
+ pAv22Qv8qA0F/k3PUM8eOreSuQm2wbQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-351-kG1th5crM9Wsz0V9TDN7sQ-1; Mon, 11 May 2020 23:33:07 -0400
-X-MC-Unique: kG1th5crM9Wsz0V9TDN7sQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-510-IC0Qu31ePqyX9woCiAD0yw-1; Mon, 11 May 2020 23:34:09 -0400
+X-MC-Unique: IC0Qu31ePqyX9woCiAD0yw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E9AA107ACCA;
- Tue, 12 May 2020 03:33:05 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F3B4108C310;
+ Tue, 12 May 2020 03:34:08 +0000 (UTC)
 Received: from [10.72.13.96] (ovpn-13-96.pek2.redhat.com [10.72.13.96])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3B0505D9DC;
- Tue, 12 May 2020 03:32:51 +0000 (UTC)
-Subject: Re: [PATCH v2 5/5] vhost: add device started check in migration set
- log
-To: Dima Stepanov <dimastep@yandex-team.ru>
-References: <cover.1588252861.git.dimastep@yandex-team.ru>
- <d25241eb1fe7a55fc7dbe63ecedb4f1adf407837.1588252862.git.dimastep@yandex-team.ru>
- <ed805147-d87d-5ac2-3196-367981b0679c@redhat.com>
- <20200511092541.GA27558@dimastep-nix>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 19BAD60C87;
+ Tue, 12 May 2020 03:34:06 +0000 (UTC)
+Subject: Re: [PATCH v2] e1000e: Added ICR clearing by corresponding IMS bit.
+To: Andrew Melnichenko <andrew@daynix.com>
+References: <20200506212645.894533-1-andrew@daynix.com>
+ <b67e29f9-a904-242f-9df2-801410f07aba@redhat.com>
+ <CABcq3pEicPdvMDAC7v_ns_YasCBvc8o-3-6vOb=+mTfXzvTJeQ@mail.gmail.com>
+ <53be0d4e-214d-dc9c-58a4-0bbd9c46b78f@redhat.com>
+ <CABcq3pGvAdXazPs-91F=seUQxv3VUNVwbFOrQ42CBSLSwMw_Kg@mail.gmail.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <fd260f1f-75f3-46ac-8ca5-bbb7e41e712f@redhat.com>
-Date: Tue, 12 May 2020 11:32:50 +0800
+Message-ID: <910f7851-3876-2753-08e7-67adbf64fe21@redhat.com>
+Date: Tue, 12 May 2020 11:34:05 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200511092541.GA27558@dimastep-nix>
+In-Reply-To: <CABcq3pGvAdXazPs-91F=seUQxv3VUNVwbFOrQ42CBSLSwMw_Kg@mail.gmail.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 23:09:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 21:14:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -101,168 +101,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, stefanha@redhat.com,
- qemu-block@nongnu.org, mst@redhat.com, qemu-devel@nongnu.org,
- dgilbert@redhat.com, arei.gonglei@huawei.com, fengli@smartx.com,
- yc-core@yandex-team.ru, pbonzini@redhat.com, marcandre.lureau@redhat.com,
- raphael.norwitz@nutanix.com, mreitz@redhat.com
+Cc: dmitry.fleytman@gmail.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-On 2020/5/11 下午5:25, Dima Stepanov wrote:
-> On Mon, May 11, 2020 at 11:15:53AM +0800, Jason Wang wrote:
->> On 2020/4/30 下午9:36, Dima Stepanov wrote:
->>> If vhost-user daemon is used as a backend for the vhost device, then we
->>> should consider a possibility of disconnect at any moment. If such
->>> disconnect happened in the vhost_migration_log() routine the vhost
->>> device structure will be clean up.
->>> At the start of the vhost_migration_log() function there is a check:
->>>    if (!dev->started) {
->>>        dev->log_enabled = enable;
->>>        return 0;
->>>    }
->>> To be consistent with this check add the same check after calling the
->>> vhost_dev_set_log() routine. This in general help not to break a
->>> migration due the assert() message. But it looks like that this code
->>> should be revised to handle these errors more carefully.
->>>
->>> In case of vhost-user device backend the fail paths should consider the
->>> state of the device. In this case we should skip some function calls
->>> during rollback on the error paths, so not to get the NULL dereference
->>> errors.
->>>
->>> Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
->>> ---
->>>   hw/virtio/vhost.c | 39 +++++++++++++++++++++++++++++++++++----
->>>   1 file changed, 35 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
->>> index 3ee50c4..d5ab96d 100644
->>> --- a/hw/virtio/vhost.c
->>> +++ b/hw/virtio/vhost.c
->>> @@ -787,6 +787,17 @@ static int vhost_dev_set_features(struct vhost_dev *dev,
->>>   static int vhost_dev_set_log(struct vhost_dev *dev, bool enable_log)
->>>   {
->>>       int r, i, idx;
->>> +
->>> +    if (!dev->started) {
->>> +        /*
->>> +         * If vhost-user daemon is used as a backend for the
->>> +         * device and the connection is broken, then the vhost_dev
->>> +         * structure will be reset all its values to 0.
->>> +         * Add additional check for the device state.
->>> +         */
->>> +        return -1;
->>> +    }
->>> +
->>>       r = vhost_dev_set_features(dev, enable_log);
->>>       if (r < 0) {
->>>           goto err_features;
->>> @@ -801,12 +812,19 @@ static int vhost_dev_set_log(struct vhost_dev *dev, bool enable_log)
->>>       }
->>>       return 0;
->>>   err_vq:
->>> -    for (; i >= 0; --i) {
->>> +    /*
->>> +     * Disconnect with the vhost-user daemon can lead to the
->>> +     * vhost_dev_cleanup() call which will clean up vhost_dev
->>> +     * structure.
->>> +     */
->>> +    for (; dev->started && (i >= 0); --i) {
->>>           idx = dev->vhost_ops->vhost_get_vq_index(
->>
->> Why need the check of dev->started here, can started be modified outside
->> mainloop? If yes, I don't get the check of !dev->started in the beginning of
->> this function.
->>
-> No dev->started can't change outside the mainloop. The main problem is
-> only for the vhost_user_blk daemon. Consider the case when we
-> successfully pass the dev->started check at the beginning of the
-> function, but after it we hit the disconnect on the next call on the
-> second or third iteration:
->       r = vhost_virtqueue_set_addr(dev, dev->vqs + i, idx, enable_log);
-> The unix socket backend device will call the disconnect routine for this
-> device and reset the structure. So the structure will be reset (and
-> dev->started set to false) inside this set_addr() call.
-
-
-I still don't get here. I think the disconnect can not happen in the 
-middle of vhost_dev_set_log() since both of them were running in 
-mainloop. And even if it can, we probably need other synchronization 
-mechanism other than simple check here.
-
-
->   So
-> we shouldn't call the clean up calls because this virtqueues were clean
-> up in the disconnect call. But we should protect these calls somehow, so
-> it will not hit SIGSEGV and we will be able to pass migration.
+On 2020/5/11 下午6:08, Andrew Melnichenko wrote:
+> Yo,
 >
-> Just to summarize it:
-> For the vhost-user-blk devices we ca hit clean up calls twice in case of
-> vhost disconnect:
-> 1. The first time during the disconnect process. The clean up is called
-> inside it.
-> 2. The second time during roll back clean up.
-> So if it is the case we should skip p2.
+>     So I think we should implement the 82574l behavior?
 >
->>> dev, dev->vq_index + i);
->>>           vhost_virtqueue_set_addr(dev, dev->vqs + i, idx,
->>>                                    dev->log_enabled);
->>>       }
->>> -    vhost_dev_set_features(dev, dev->log_enabled);
->>> +    if (dev->started) {
->>> +        vhost_dev_set_features(dev, dev->log_enabled);
->>> +    }
->>>   err_features:
->>>       return r;
->>>   }
->>> @@ -832,7 +850,15 @@ static int vhost_migration_log(MemoryListener *listener, int enable)
->>>       } else {
->>>           vhost_dev_log_resize(dev, vhost_get_log_size(dev));
->>>           r = vhost_dev_set_log(dev, true);
->>> -        if (r < 0) {
->>> +        /*
->>> +         * The dev log resize can fail, because of disconnect
->>> +         * with the vhost-user-blk daemon. Check the device
->>> +         * state before calling the vhost_dev_set_log()
->>> +         * function.
->>> +         * Don't return error if device isn't started to be
->>> +         * consistent with the check above.
->>> +         */
->>> +        if (dev->started && r < 0) {
->>>               return r;
->>>           }
->>>       }
->>> @@ -1739,7 +1765,12 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
->>>   fail_log:
->>>       vhost_log_put(hdev, false);
->>>   fail_vq:
->>> -    while (--i >= 0) {
->>> +    /*
->>> +     * Disconnect with the vhost-user daemon can lead to the
->>> +     * vhost_dev_cleanup() call which will clean up vhost_dev
->>> +     * structure.
->>> +     */
->>> +    while ((--i >= 0) && (hdev->started)) {
->>>           vhost_virtqueue_stop(hdev,
->>>                                vdev,
->>>                                hdev->vqs + i,
->>
->> This should be a separate patch.
-> Do you mean i should split this patch to two patches?
+>  Well, as I understand it - its already implemented. I've added ICR 
+> clearance if ICR & IMS(also need to add ICR_ASSERTED check, my bad, 
+> I'll prepare new patch).
 
 
-Yes.
+Yes, but it behave more like e.g 82573 not what we claim to emulate like 
+82574l.
+
+
+>
+> At first, I had hacks to clear 'msi_causes_pending' at 
+> 'e1000e_core_set_link_status()' before link down. It works but it's 
+> not a solution.
+> Also, on Windows the bug doesn't reproduce. I've traced Windows and 
+> Linux - the difference that Windows driver clears pending by writing 
+> to ICR, where Linux tries to clear by reading it.
+> I had another possible fix - for Linux driver(writing to ICR at 
+> interrupt routine).
+> I've asked intel guys, does Linux driver works with a device(I don't 
+> have real one). Thay said that it works and suggested to check 8257x 
+> spec. I'll forward the message to you.
+
+
+Ok.
 
 Thanks
 
 
 >
-> Thanks.
+> On Sat, May 9, 2020 at 9:02 AM Jason Wang <jasowang@redhat.com 
+> <mailto:jasowang@redhat.com>> wrote:
 >
->> Thanks
->>
+>
+>     On 2020/5/9 上午2:13, Andrew Melnichenko wrote:
+>     > Yo, I've used OpenSDM_8257x-18.pdf specification.
+>     > This document was recommended by Intel guys(Also, they
+>     referenced to
+>     > that note).
+>     > I've made a fast fix and it works. Before that I had a fix for
+>     Linux
+>     > e1000e driver.
+>     > Overall, the issue was in pending interrupts that can't be
+>     cleared by
+>     > reading ICR in Linux(Windows driver clears by writing to ICR).
+>     >
+>     > You can download spec for example from:
+>     >
+>     http://iweb.dl.sourceforge.net/project/e1000/8257x%20Developer%20Manual/Revision%201.8/OpenSDM_8257x-18.pdf
+>
+>
+>     Interesting, this spec doesn't include 82574l which is what e1000e
+>     claims to emulate:
+>
+>          c->vendor_id = PCI_VENDOR_ID_INTEL;
+>          c->device_id = E1000_DEV_ID_82574L;
+>
+>     Looking at 82574l spec (using the link mentioned in
+>     e1000e_core.c), it
+>     said (7.4.3):
+>
+>     In MSI-X mode the bits in this register can be configured to
+>     auto-clear
+>     when the MSI-X
+>     interrupt message is sent, in order to minimize driver overhead, and
+>     when using MSI-X
+>     interrupt signaling.
+>     In systems that do not support MSI-X, reading the ICR register clears
+>     it's bits or writing
+>     1b's clears the corresponding bits in this register.
+>
+>     So the auto clear is under the control of EIAC (MSIX) or
+>     unconditionally
+>     (non MSI-X).
+>
+>     But what has been implemented in e1000e_mac_icr_read() is something
+>     similar to the behavior of non 82574l card.
+>
+>     So I think we should implement the 82574l behavior?
+>
+>     Thanks
+>
+>
+>     >
+>     > On Fri, May 8, 2020 at 5:21 AM Jason Wang <jasowang@redhat.com
+>     <mailto:jasowang@redhat.com>
+>     > <mailto:jasowang@redhat.com <mailto:jasowang@redhat.com>>> wrote:
+>     >
+>     >
+>     >     On 2020/5/7 上午5:26, andrew@daynix.com
+>     <mailto:andrew@daynix.com> <mailto:andrew@daynix.com
+>     <mailto:andrew@daynix.com>>
+>     >     wrote:
+>     >     > From: Andrew Melnychenko <andrew@daynix.com
+>     <mailto:andrew@daynix.com>
+>     >     <mailto:andrew@daynix.com <mailto:andrew@daynix.com>>>
+>     >     >
+>     >     > Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1707441
+>     >     > Added ICR clearing if there is IMS bit - according to the
+>     note by
+>     >     > section 13.3.27 of the 8257X developers manual.
+>     >     >
+>     >     > Signed-off-by: Andrew Melnychenko <andrew@daynix.com
+>     <mailto:andrew@daynix.com>
+>     >     <mailto:andrew@daynix.com <mailto:andrew@daynix.com>>>
+>     >     > ---
+>     >     >   hw/net/e1000e_core.c | 9 +++++++++
+>     >     >   hw/net/trace-events  | 1 +
+>     >     >   2 files changed, 10 insertions(+)
+>     >     >
+>     >     > diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+>     >     > index d5676871fa..302e99ff46 100644
+>     >     > --- a/hw/net/e1000e_core.c
+>     >     > +++ b/hw/net/e1000e_core.c
+>     >     > @@ -2624,6 +2624,15 @@ e1000e_mac_icr_read(E1000ECore
+>     *core, int
+>     >     index)
+>     >     >           e1000e_clear_ims_bits(core, core->mac[IAM]);
+>     >     >       }
+>     >     >
+>     >     > +    /*
+>     >     > +     * PCIe* GbE Controllers Open Source Software Developer's
+>     >     Manual
+>     >     > +     * 13.3.27 Interrupt Cause Read Register
+>     >     > +     */
+>     >
+>     >
+>     >     Hi Andrew:
+>     >
+>     >     Which version of the manual did you use? I try to use the one
+>     >     mentioned
+>     >     in e1000e.c which is
+>     >
+>     http://www.intel.com/content/dam/doc/datasheet/82574l-gbe-controller-datasheet.pdf.
+>     >
+>     >     But I couldn't find chapter 13.3.27.
+>     >
+>     >     Thanks
+>     >
+>     >
+>     >     > +    if (core->mac[ICR] & core->mac[IMS]) {
+>     >     > + trace_e1000e_irq_icr_clear_icr_bit_ims(core->mac[ICR],
+>     >     core->mac[IMS]);
+>     >     > +        core->mac[ICR] = 0;
+>     >     > +    }
+>     >     > +
+>     >     >  trace_e1000e_irq_icr_read_exit(core->mac[ICR]);
+>     >     >       e1000e_update_interrupt_state(core);
+>     >     >       return ret;
+>     >     > diff --git a/hw/net/trace-events b/hw/net/trace-events
+>     >     > index e18f883cfd..46e40fcfa9 100644
+>     >     > --- a/hw/net/trace-events
+>     >     > +++ b/hw/net/trace-events
+>     >     > @@ -237,6 +237,7 @@ e1000e_irq_icr_read_entry(uint32_t icr)
+>     >     "Starting ICR read. Current ICR: 0x%x"
+>     >     >   e1000e_irq_icr_read_exit(uint32_t icr) "Ending ICR read.
+>     >     Current ICR: 0x%x"
+>     >     >   e1000e_irq_icr_clear_zero_ims(void) "Clearing ICR on
+>     read due
+>     >     to zero IMS"
+>     >     >   e1000e_irq_icr_clear_iame(void) "Clearing ICR on read
+>     due to IAME"
+>     >     > +e1000e_irq_icr_clear_icr_bit_ims(uint32_t icr, uint32_t ims)
+>     >     "Clearing ICR on read due corresponding IMS bit: 0x%x & 0x%x"
+>     >     >   e1000e_irq_iam_clear_eiame(uint32_t iam, uint32_t cause)
+>     >     "Clearing IMS due to EIAME, IAM: 0x%X, cause: 0x%X"
+>     >     >   e1000e_irq_icr_clear_eiac(uint32_t icr, uint32_t eiac)
+>     >     "Clearing ICR bits due to EIAC, ICR: 0x%X, EIAC: 0x%X"
+>     >     >   e1000e_irq_ims_clear_set_imc(uint32_t val) "Clearing IMS
+>     bits
+>     >     due to IMC write 0x%x"
+>     >
+>
 
 
