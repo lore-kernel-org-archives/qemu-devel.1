@@ -2,92 +2,82 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96EFBC54E4A
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 10:44:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4097BC54E8B
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 10:58:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61DD3206DD
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 10:44:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0CD4E20675
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 10:58:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xPqyg1Y/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61DD3206DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WVXR71GA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CD4E20675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYSP8-0003QP-FB
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 06:44:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55454)
+	id 1jYSc1-0001dn-4F
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 06:58:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56968)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jYSO4-00028V-Dd
- for qemu-devel@nongnu.org; Tue, 12 May 2020 06:43:48 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40130)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jYSO3-0001Zv-3v
- for qemu-devel@nongnu.org; Tue, 12 May 2020 06:43:47 -0400
-Received: by mail-wm1-x344.google.com with SMTP id u16so22698518wmc.5
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 03:43:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=WSVYZz5m9bdJR5qh6kgTR7m9S6gKqrqojPkoGJzP6qY=;
- b=xPqyg1Y/+f2IO81ET2GErSa4uCjv5sGB1/SK67XuTWRjCTUCTuPEzGa4Hp3cuGaLla
- XTdikU4WNLEF1p5iCVcQmsuH9F+cvoxPRDaYbrc0uzmc8Q1Iwooj64ThMrG5m6tXa3jA
- KYPK4MDQa1TvZC+HI1A7FZFHo9myaK4KxNEdE19p6XtxLztuDvmMEnKeBwX76MI5g2AY
- MyvIAn1IgkWD6RpqVUN8Gbm9rxflNKBKXmIUihzwPaHWxJ06JUQHUwZRyj/zDouSeVaN
- hMDwVhO36Im2QQBk2/IswdRFo3AHDWTeOxZ0VTaw722B2C/1wR0wP+oZXTjP9T24G46u
- vwBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=WSVYZz5m9bdJR5qh6kgTR7m9S6gKqrqojPkoGJzP6qY=;
- b=aslfR7nv7KGHcG6atZIPhflrqSnumnQ5Vxt5o+a8w2wNk877RP8XOFWHUlw3wVCkg2
- G3oNN23EAHuTZ5Qsga/MBadCAqOwLPFjhmVNgwRbqyoLKXzSMkK3hZl5fK1S1hgIHo/o
- pNt0CnLs8rrrOr4SgG6FKGQxqxEasO7sGD5URJOsNbvbMsYVP44vdzvowrjX+L4JsVIe
- Wq0g4icQAgWxBpYQMFvdCKrlqL41gH9xYMcgGl9k7sfyhUSD8rt328Rv6isaDsFbaBvD
- b00IjhJkdoZ6JM4g768VQ63+eox8+eRZTX8pW6gJP0uQdmfRHUlluQeEXSzIuy2zmkS3
- pdJA==
-X-Gm-Message-State: AGi0PuaeOK6bxqygFZ784GWzSNAgcAJpMMM/kJgqmA3NFEliKex47vNq
- 0s0Oc1y7bbqBypCNUMWK1hPczw==
-X-Google-Smtp-Source: APiQypJH0y5tJFHaiGWWlD7m0xUKc9mk5j1OPeMld3nqq/VlkWds0mYoxwEs6ynhWwZP2895GO7+PQ==
-X-Received: by 2002:a1c:b104:: with SMTP id a4mr35564494wmf.24.1589280225029; 
- Tue, 12 May 2020 03:43:45 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id o203sm14559433wme.12.2020.05.12.03.43.43
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 12 May 2020 03:43:43 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 263531FF7E;
- Tue, 12 May 2020 11:43:43 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] tests/guest-debug: catch hanging guests
-Date: Tue, 12 May 2020 11:43:38 +0100
-Message-Id: <20200512104338.27365-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jYSbP-0000uf-9m
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 06:57:35 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38914
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jYSbO-0006K4-JR
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 06:57:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589281053;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=aZwLu5VbpWacXUxZiwAIC96KKWd15Nuw7MLmsS4aqIg=;
+ b=WVXR71GAFphjq3CST/FUHKCX3p5gjnvfT2HXNRwsjOx3SE/jPrMb9qREzGqJl+g5zdAnC6
+ 9JN4HO1jwuvup/dwU+VadiADOdt4f2VG7ayDI49y50BTv/gyhcv6qE4u5vi2vVVHS8s72y
+ WMO/0iOBzC13DDuEvdVk8MDk+DJ3yEA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-36-5OPy-nsnODiCBBSMf8RsVg-1; Tue, 12 May 2020 06:57:30 -0400
+X-MC-Unique: 5OPy-nsnODiCBBSMf8RsVg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8BFC1009618;
+ Tue, 12 May 2020 10:57:28 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-74.ams2.redhat.com [10.36.114.74])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7DFEE6C78B;
+ Tue, 12 May 2020 10:57:21 +0000 (UTC)
+Date: Tue, 12 May 2020 12:57:19 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Stefan Reiter <s.reiter@proxmox.com>
+Subject: Re: [RFC] bdrv_flush: only use fast path when in owned AioContext
+Message-ID: <20200512105719.GI5951@linux.fritz.box>
+References: <20200511165032.11384-1-s.reiter@proxmox.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20200511165032.11384-1-s.reiter@proxmox.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 02:02:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,35 +91,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: fam@euphon.net, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ mreitz@redhat.com, stefanha@redhat.com, t.lamprecht@proxmox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If gdb never actually connected with the guest we need to catch that
-and clean-up after ourselves.
+Am 11.05.2020 um 18:50 hat Stefan Reiter geschrieben:
+> Just because we're in a coroutine doesn't imply ownership of the context
+> of the flushed drive. In such a case use the slow path which explicitly
+> enters bdrv_flush_co_entry in the correct AioContext.
+> 
+> Signed-off-by: Stefan Reiter <s.reiter@proxmox.com>
+> ---
+> 
+> We've experienced some lockups in this codepath when taking snapshots of VMs
+> with drives that have IO-Threads enabled (we have an async 'savevm'
+> implementation running from a coroutine).
+> 
+> Currently no reproducer for upstream versions I could find, but in testing this
+> patch fixes all issues we're seeing and I think the logic checks out.
+> 
+> The fast path pattern is repeated a few times in this file, so if this change
+> makes sense, it's probably worth evaluating the other occurences as well.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/guest-debug/run-test.py | 6 ++++++
- 1 file changed, 6 insertions(+)
+What do you mean by "owning" the context? If it's about taking the
+AioContext lock, isn't the problem more with calling bdrv_flush() from
+code that doesn't take the locks?
 
-diff --git a/tests/guest-debug/run-test.py b/tests/guest-debug/run-test.py
-index d9af9573b9e..71c55690546 100755
---- a/tests/guest-debug/run-test.py
-+++ b/tests/guest-debug/run-test.py
-@@ -80,4 +80,10 @@ if __name__ == '__main__':
-         print("GDB crashed? SKIPPING")
-         exit(0)
- 
-+    try:
-+        inferior.wait(2)
-+    except subprocess.TimeoutExpired:
-+        print("GDB never connected? Killed guest")
-+        inferior.kill()
-+
-     exit(result)
--- 
-2.20.1
+Though I think we have some code that doesn't only rely on holding the
+AioContext locks, but that actually depends on running in the right
+thread, so the change looks right anyway.
+
+Kevin
+
+>  block/io.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/io.c b/block/io.c
+> index aba67f66b9..ee7310fa13 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -2895,8 +2895,9 @@ int bdrv_flush(BlockDriverState *bs)
+>          .ret = NOT_DONE,
+>      };
+>  
+> -    if (qemu_in_coroutine()) {
+> -        /* Fast-path if already in coroutine context */
+> +    if (qemu_in_coroutine() &&
+> +        bdrv_get_aio_context(bs) == qemu_get_current_aio_context()) {
+> +        /* Fast-path if already in coroutine and we own the drive's context */
+>          bdrv_flush_co_entry(&flush_co);
+>      } else {
+>          co = qemu_coroutine_create(bdrv_flush_co_entry, &flush_co);
+> -- 
+> 2.20.1
+> 
+> 
 
 
