@@ -2,67 +2,120 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 807DEC47255
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 03:05:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95004C47255
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 03:05:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 531AD206D7
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 03:05:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 531AD206D7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5DB13206D7
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 03:05:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="0EZfzm8N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DB13206D7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYLED-0003Ai-BZ
-	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 23:05:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52308)
+	id 1jYLES-0003ZS-E3
+	for qemu-devel@archiver.kernel.org; Mon, 11 May 2020 23:05:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52134)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <gengdongjiu@huawei.com>)
- id 1jYLCR-0000we-1q; Mon, 11 May 2020 23:03:19 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:40712 helo=huawei.com)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jYLBY-00086D-Ej
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 23:02:24 -0400
+Received: from mail-mw2nam10on2101.outbound.protection.outlook.com
+ ([40.107.94.101]:41921 helo=NAM10-MW2-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <gengdongjiu@huawei.com>)
- id 1jYLCP-00083k-A2; Mon, 11 May 2020 23:03:18 -0400
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 991D43B7C74E2B84C7B9;
- Tue, 12 May 2020 11:03:11 +0800 (CST)
-Received: from huawei.com (10.151.151.243) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Tue, 12 May 2020
- 11:03:05 +0800
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-To: <imammedo@redhat.com>, <mst@redhat.com>, <xiaoguangrong.eric@gmail.com>,
- <peter.maydell@linaro.org>, <shannon.zhaosl@gmail.com>, <fam@euphon.net>,
- <rth@twiddle.net>, <ehabkost@redhat.com>, <mtosatti@redhat.com>,
- <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, <qemu-arm@nongnu.org>,
- <pbonzini@redhat.com>, <philmd@redhat.com>
-Subject: [PATCH v27 03/10] docs: APEI GHES generation and CPER record
- description
-Date: Tue, 12 May 2020 11:06:02 +0800
-Message-ID: <20200512030609.19593-4-gengdongjiu@huawei.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200512030609.19593-1-gengdongjiu@huawei.com>
-References: <20200512030609.19593-1-gengdongjiu@huawei.com>
-MIME-Version: 1.0
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jYLBX-0007sd-NR
+ for qemu-devel@nongnu.org; Mon, 11 May 2020 23:02:24 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=diq/t5v+JcvsGQk5HTOvP8YgF4LNcyFBDEaQtwMQBa3qfe5YRPOA9IMD4Lb6NkPVcj7vTRiKQwlT7NV5fC5erIOkBTz91rhfFvKevHRq8fbVa3trBQ/S+HOEyj2oUKDXQT4bg898T/GBFjN9dsPhIfgTuHux8zjnMCI+GGTC/jYZCLN9vvjY4C7j17XTTlegLdRV6K5Eoiecf8+OdK47lfe4CaCwnpGPOUix/XZAeA8qLH/Ax1zt8judEdacpuBASyHn+NK5bxB5D/8HA/jQgX4jor09xPuI+1Dpg7EErYTGrrF5lhI/cnhiYgggzSoMsIdSGesAukbiDD5uLgVtRA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CMs317ntwg0y1MNYW8mN1xSGrmiHmRDMLN4ZdpFQ8a8=;
+ b=GBsaFYGFUoz80n4APEwjHet+TL292Kw93KX+1pVD0xnWRgTLD0b7AnBZRBHyjFksF45mLa32aBY02+iJpEYgF42fQzQwZ5W7CDIiSaRuhyQts8lWwe5k9LDYnzZC50qebc6VbPYw/IDGsoPEoMMfVoFwg8lsGq2HpVWvdPfn6mgLOELHhg6BfKesWE6e3k7yztBj+1dmtRGbbXWKDsfciQvruGDQKQGOFApn2eBraE50Baj4XG3SazuJ/iZwm2DjWUKh5TX1+Ij9lyo6HOr9Eu8dR/CTNm0icqxF+Mszkm2dbEkSq+4U7+6UQibZ17qeMKW+k7Jwn9PB2lzKpi7+mg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
+ header.d=bu.edu; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CMs317ntwg0y1MNYW8mN1xSGrmiHmRDMLN4ZdpFQ8a8=;
+ b=0EZfzm8N/QUDAflsVBdLO/qK35Ijr2xv1154bLUi84dN5dv9Rn4aKaMjhrfdhpH7gRIABD4q5hDkH6ww40tJq4jm7EiuyoU/ath+L08P26UH34m1xtbrsXpb/N4KA2zcLQc1ki2Hu/PCKc4D1WjUlt3rMpLKCDl/1OS1rY0lDNM=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=bu.edu;
+Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
+ by SN6PR03MB3520.namprd03.prod.outlook.com (2603:10b6:805:4d::27)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.34; Tue, 12 May
+ 2020 03:01:48 +0000
+Received: from SN6PR03MB3871.namprd03.prod.outlook.com
+ ([fe80::640a:1123:37c1:42db]) by SN6PR03MB3871.namprd03.prod.outlook.com
+ ([fe80::640a:1123:37c1:42db%3]) with mapi id 15.20.2979.033; Tue, 12 May 2020
+ 03:01:47 +0000
+From: Alexander Bulekov <alxndr@bu.edu>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 2/4] fuzz: fix typo in i440fx-qtest-reboot arguments
+Date: Mon, 11 May 2020 23:01:31 -0400
+Message-Id: <20200512030133.29896-3-alxndr@bu.edu>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200512030133.29896-1-alxndr@bu.edu>
+References: <20200512030133.29896-1-alxndr@bu.edu>
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [10.151.151.243]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32;
- envelope-from=gengdongjiu@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 23:03:12
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-ClientProxiedBy: MN2PR12CA0025.namprd12.prod.outlook.com
+ (2603:10b6:208:a8::38) To SN6PR03MB3871.namprd03.prod.outlook.com
+ (2603:10b6:805:6d::32)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mozz.bu.edu (128.197.127.33) by
+ MN2PR12CA0025.namprd12.prod.outlook.com (2603:10b6:208:a8::38) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2979.26 via Frontend Transport; Tue, 12 May 2020 03:01:47 +0000
+X-Mailer: git-send-email 2.26.2
+X-Originating-IP: [128.197.127.33]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 4d150d3f-c8ce-4765-8dc7-08d7f620cf61
+X-MS-TrafficTypeDiagnostic: SN6PR03MB3520:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SN6PR03MB35207D1662BC8F6BE3121152BABE0@SN6PR03MB3520.namprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:296;
+X-Forefront-PRVS: 0401647B7F
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 5RTUBy8aXyJ41IBCDcxb7bvY83CYXu8zdDTtCc1LCDDAAcRu9FaV0y6b56rAt37vuEAayXBf8wfXTkIlcNyAYmVF6XtrcFzrtuichtpVe1QQis+YAiSkB2HnSETeWflqvHL9V6xo0Plt5ld7j+fe3+n8K71rlAx1gzcJmHIiC9/MqiaI6dsFpJaZ1mrCY1/oea0JG7BGnnvUBW6TuHGXdjCX9mjLVPVGGweOfCMQ58lHRZXPpY3aHYKQtASw37k0jAogN0mO3kI17/Mpc+i+y/YtMNu554M4lVvoEh7RJM+DmyZ5/CyBlmKrBOy1GImZ5SyBib471ki30rh0RYyCHD+RqnqLUCx6yL3u2mXERCRor72zbalXTrS4NYLoQmKwwWaddvT1yTkdSu2FeAtURGPmH7nmZZthl+F8DGapJBc4C1jtzKzeWokFjw9WTK2q8ezmZeUjy5FrQnrPy9dgDFZp/vwHpizttO/8SFff1o7KKaCDF81TkknYWbOIzqjdWwDl4PvYPqkBtoq+86Ik2w==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(346002)(366004)(396003)(376002)(136003)(39860400002)(33430700001)(956004)(4326008)(6666004)(2616005)(8936002)(5660300002)(7696005)(316002)(786003)(66476007)(66946007)(52116002)(54906003)(66556008)(6916009)(26005)(75432002)(186003)(86362001)(16526019)(6486002)(4744005)(2906002)(33440700001)(478600001)(1076003)(36756003)(8676002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: tN1mghld81LX8exY+yUXTYiEMxLUfOMFy2F4PAZUbcRipBsxKXWVZbALebbJIKD4SvG/u/nt+XIqblfWUaT7sy/7hceVgmEims7t7d4JAkgsxyHERV9jdMFoOmajlIfBvIuvqoDT8yFgbq5a40E26mn2PYpd0DSxM4YRT0UfUsvcWA+FK00Cmn6UY8x1wVp7rrtjulU9858b01KRsnzj0cci/i4iFTuRXnMu8XJJESioiFdH2f9ZkpnzgJEkS41OHG1eF6yaQVm2mgXtg7pv1fcMNWtsb5gyOqVrHx5ukILDhFtqfCyRG6urHHsw8flWI11bbb/OOWqbpwldarebo2hBum48FbPZAFfwQhPGz8XcNeEsY/LTcCxgANypbzS16lBsUpocipFLFhLrAO9x5SYZurwP6SPl2Ql0BaHa4lYUvK6gECSW2xWWd4ciq85gIgvNcfTxE6/HyynUkEHyojIfJd1t4x753KEEBKeRfzo=
+X-OriginatorOrg: bu.edu
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4d150d3f-c8ce-4765-8dc7-08d7f620cf61
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2020 03:01:47.7876 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iAzOavYIK1A9D1gMiz8IqDk3ASKdpMokV7+cUkkPHXd/XLJhmS63sJfWj3BWVKJR
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR03MB3520
+Received-SPF: pass client-ip=40.107.94.101; envelope-from=alxndr@bu.edu;
+ helo=NAM10-MW2-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/11 23:02:21
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, HK_RANDOM_ENVFROM=0.001,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -75,150 +128,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhengxiang9@huawei.com, Jonathan.Cameron@huawei.com, linuxarm@huawei.com,
- gengdongjiu@huawei.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Alexander Bulekov <alxndr@bu.edu>, darren.kenny@oracle.com, bsd@redhat.com,
+ stefanha@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add APEI/GHES detailed design document
-
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
 ---
- docs/specs/acpi_hest_ghes.rst | 110 ++++++++++++++++++++++++++++++++++++++++++
- docs/specs/index.rst          |   1 +
- 2 files changed, 111 insertions(+)
- create mode 100644 docs/specs/acpi_hest_ghes.rst
+ tests/qtest/fuzz/i440fx_fuzz.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/docs/specs/acpi_hest_ghes.rst b/docs/specs/acpi_hest_ghes.rst
-new file mode 100644
-index 0000000..68f1fbe
---- /dev/null
-+++ b/docs/specs/acpi_hest_ghes.rst
-@@ -0,0 +1,110 @@
-+APEI tables generating and CPER record
-+======================================
-+
-+..
-+   Copyright (c) 2020 HUAWEI TECHNOLOGIES CO., LTD.
-+
-+   This work is licensed under the terms of the GNU GPL, version 2 or later.
-+   See the COPYING file in the top-level directory.
-+
-+Design Details
-+--------------
-+
-+::
-+
-+         etc/acpi/tables                           etc/hardware_errors
-+      ====================                   ===============================
-+  + +--------------------------+            +----------------------------+
-+  | | HEST                     | +--------->|    error_block_address1    |------+
-+  | +--------------------------+ |          +----------------------------+      |
-+  | | GHES1                    | | +------->|    error_block_address2    |------+-+
-+  | +--------------------------+ | |        +----------------------------+      | |
-+  | | .................        | | |        |      ..............        |      | |
-+  | | error_status_address-----+-+ |        -----------------------------+      | |
-+  | | .................        |   |   +--->|    error_block_addressN    |------+-+---+
-+  | | read_ack_register--------+-+ |   |    +----------------------------+      | |   |
-+  | | read_ack_preserve        | +-+---+--->|     read_ack_register1     |      | |   |
-+  | | read_ack_write           |   |   |    +----------------------------+      | |   |
-+  + +--------------------------+   | +-+--->|     read_ack_register2     |      | |   |
-+  | | GHES2                    |   | | |    +----------------------------+      | |   |
-+  + +--------------------------+   | | |    |       .............        |      | |   |
-+  | | .................        |   | | |    +----------------------------+      | |   |
-+  | | error_status_address-----+---+ | | +->|     read_ack_registerN     |      | |   |
-+  | | .................        |     | | |  +----------------------------+      | |   |
-+  | | read_ack_register--------+-----+ | |  |Generic Error Status Block 1|<-----+ |   |
-+  | | read_ack_preserve        |       | |  |-+------------------------+-+        |   |
-+  | | read_ack_write           |       | |  | |          CPER          | |        |   |
-+  + +--------------------------|       | |  | |          CPER          | |        |   |
-+  | | ...............          |       | |  | |          ....          | |        |   |
-+  + +--------------------------+       | |  | |          CPER          | |        |   |
-+  | | GHESN                    |       | |  |-+------------------------+-|        |   |
-+  + +--------------------------+       | |  |Generic Error Status Block 2|<-------+   |
-+  | | .................        |       | |  |-+------------------------+-+            |
-+  | | error_status_address-----+-------+ |  | |           CPER         | |            |
-+  | | .................        |         |  | |           CPER         | |            |
-+  | | read_ack_register--------+---------+  | |           ....         | |            |
-+  | | read_ack_preserve        |            | |           CPER         | |            |
-+  | | read_ack_write           |            +-+------------------------+-+            |
-+  + +--------------------------+            |         ..........         |            |
-+                                            |----------------------------+            |
-+                                            |Generic Error Status Block N |<----------+
-+                                            |-+-------------------------+-+
-+                                            | |          CPER           | |
-+                                            | |          CPER           | |
-+                                            | |          ....           | |
-+                                            | |          CPER           | |
-+                                            +-+-------------------------+-+
-+
-+
-+(1) QEMU generates the ACPI HEST table. This table goes in the current
-+    "etc/acpi/tables" fw_cfg blob. Each error source has different
-+    notification types.
-+
-+(2) A new fw_cfg blob called "etc/hardware_errors" is introduced. QEMU
-+    also needs to populate this blob. The "etc/hardware_errors" fw_cfg blob
-+    contains an address registers table and an Error Status Data Block table.
-+
-+(3) The address registers table contains N Error Block Address entries
-+    and N Read Ack Register entries. The size for each entry is 8-byte.
-+    The Error Status Data Block table contains N Error Status Data Block
-+    entries. The size for each entry is 4096(0x1000) bytes. The total size
-+    for the "etc/hardware_errors" fw_cfg blob is (N * 8 * 2 + N * 4096) bytes.
-+    N is the number of the kinds of hardware error sources.
-+
-+(4) QEMU generates the ACPI linker/loader script for the firmware. The
-+    firmware pre-allocates memory for "etc/acpi/tables", "etc/hardware_errors"
-+    and copies blob contents there.
-+
-+(5) QEMU generates N ADD_POINTER commands, which patch addresses in the
-+    "error_status_address" fields of the HEST table with a pointer to the
-+    corresponding "address registers" in the "etc/hardware_errors" blob.
-+
-+(6) QEMU generates N ADD_POINTER commands, which patch addresses in the
-+    "read_ack_register" fields of the HEST table with a pointer to the
-+    corresponding "read_ack_register" within the "etc/hardware_errors" blob.
-+
-+(7) QEMU generates N ADD_POINTER commands for the firmware, which patch
-+    addresses in the "error_block_address" fields with a pointer to the
-+    respective "Error Status Data Block" in the "etc/hardware_errors" blob.
-+
-+(8) QEMU defines a third and write-only fw_cfg blob which is called
-+    "etc/hardware_errors_addr". Through that blob, the firmware can send back
-+    the guest-side allocation addresses to QEMU. The "etc/hardware_errors_addr"
-+    blob contains a 8-byte entry. QEMU generates a single WRITE_POINTER command
-+    for the firmware. The firmware will write back the start address of
-+    "etc/hardware_errors" blob to the fw_cfg file "etc/hardware_errors_addr".
-+
-+(9) When QEMU gets a SIGBUS from the kernel, QEMU writes CPER into corresponding
-+    "Error Status Data Block", guest memory, and then injects platform specific
-+    interrupt (in case of arm/virt machine it's Synchronous External Abort) as a
-+    notification which is necessary for notifying the guest.
-+
-+(10) This notification (in virtual hardware) will be handled by the guest
-+     kernel, on receiving notification, guest APEI driver could read the CPER error
-+     and take appropriate action.
-+
-+(11) kvm_arch_on_sigbus_vcpu() uses source_id as index in "etc/hardware_errors" to
-+     find out "Error Status Data Block" entry corresponding to error source. So supported
-+     source_id values should be assigned here and not be changed afterwards to make sure
-+     that guest will write error into expected "Error Status Data Block" even if guest was
-+     migrated to a newer QEMU.
-diff --git a/docs/specs/index.rst b/docs/specs/index.rst
-index de46a8b..426632a 100644
---- a/docs/specs/index.rst
-+++ b/docs/specs/index.rst
-@@ -14,3 +14,4 @@ Contents:
-    ppc-spapr-xive
-    acpi_hw_reduced_hotplug
-    tpm
-+   acpi_hest_ghes
+diff --git a/tests/qtest/fuzz/i440fx_fuzz.c b/tests/qtest/fuzz/i440fx_fuzz.c
+index ab5f112584..90e75ffaea 100644
+--- a/tests/qtest/fuzz/i440fx_fuzz.c
++++ b/tests/qtest/fuzz/i440fx_fuzz.c
+@@ -143,7 +143,7 @@ static void i440fx_fuzz_qos_fork(QTestState *s,
+ }
+ 
+ static const char *i440fx_qtest_argv = TARGET_NAME " -machine accel=qtest"
+-                                       "-m 0 -display none";
++                                       " -m 0 -display none";
+ static const char *i440fx_argv(FuzzTarget *t)
+ {
+     return i440fx_qtest_argv;
 -- 
-1.8.3.1
+2.26.2
 
 
