@@ -2,113 +2,91 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C878FC54E4B
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 06:49:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D5C8C54E4B
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 06:51:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90C9220752
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 06:49:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0899D20752
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 06:51:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H9p76H6M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90C9220752
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GsYy3OYb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0899D20752
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYOiu-0004gK-Rm
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 02:49:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51526)
+	id 1jYOlP-0006zj-5Q
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 02:51:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51752)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jYOgy-0003UQ-Gc
- for qemu-devel@nongnu.org; Tue, 12 May 2020 02:47:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42896
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jYOgw-0002uu-R0
- for qemu-devel@nongnu.org; Tue, 12 May 2020 02:47:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589266021;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=frumQvkebfr3tG/owWSE8VTdzB0eiXPRNmi/Q2zYypM=;
- b=H9p76H6MXDZKzZQbhkDoGejLum3wN43x4khaROhwKAvIARGS/YsN/FlDnfTA6JbApFUSO5
- kGY8uFgJx4GdgiL2uqTL3oHmhzsQ4Nyxr7103nttETRVfpMD/eje/1H0sHDttMW/amcuWI
- cjk9oCih+hVwJtPWuAF0qQF/O7f74xM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-471-60SaPeiJNU63OB9t5nk_Ww-1; Tue, 12 May 2020 02:46:57 -0400
-X-MC-Unique: 60SaPeiJNU63OB9t5nk_Ww-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 539B4106B245;
- Tue, 12 May 2020 06:46:56 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-112-248.ams2.redhat.com
- [10.36.112.248])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 010C260CD1;
- Tue, 12 May 2020 06:46:54 +0000 (UTC)
-Subject: Re: [PATCH v3 6/9] qemu-img: Add bitmap sub-command
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200508180340.675712-1-eblake@redhat.com>
- <20200508180340.675712-7-eblake@redhat.com>
- <ce9731fd-d137-f5d2-6dc4-071a0b9e0b97@redhat.com>
- <bf472c11-e3b6-caee-7aa7-7803f762612d@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <e3bc88dc-08bd-c449-d5e6-15852370c948@redhat.com>
-Date: Tue, 12 May 2020 08:46:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <pauldzim@gmail.com>)
+ id 1jYOjN-0005EJ-Fi
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 02:49:33 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:44947)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <pauldzim@gmail.com>)
+ id 1jYOjL-00037g-Ur
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 02:49:33 -0400
+Received: by mail-pl1-x644.google.com with SMTP id b8so4978139plm.11
+ for <qemu-devel@nongnu.org>; Mon, 11 May 2020 23:49:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=xSGfiUw4uxd3urW8/kCDLQ8nWqmY4QhnNHDTudHnzmk=;
+ b=GsYy3OYbwtPmQMU7/y33Oj2dmP/ByzHA3rADvnlhHRC1M9b2KUqSLUXmildV6inRZv
+ xY7i8jlIONkrqQ6JUq0prxyKRiI/LfeKxMyY5oyLlwrJ98+c1nXFm8MdfDHx91SsPLmJ
+ a3UD3AH982in4ufld8sWY+otDE1T1GxnV1uofHNcF3R3ptN9CQBV99bvcMMR0ERd7Vii
+ 5axTAR26qR2eRIsKpHSOzXJa6LiODEUFjU2rJlYp8K7FIjJ2Y10FXy1qcjCS/nUep165
+ 42D6YS5AEYG1UFZLXzvz/iE7Zo5FlNd0p6WFgBEXbxTiHhndl00ERPKezm7uUJgdM3QA
+ IY+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=xSGfiUw4uxd3urW8/kCDLQ8nWqmY4QhnNHDTudHnzmk=;
+ b=rPwKnb9tsPM3AI3+9sQlKAZKwFSs35HVenEEGYgYRhFrb9Y45Evuc915bd/RjXj8L+
+ Pwy4beF0nJ/b+KUOffU7B69eJu4ZHfvzFhbLBO1+13g6sWEBIMkFZPGKQ86Vr/MTY0w3
+ 9DK79wN6qMLziAv8mBIHYstySkPrF2hjnyGOjM1J2ljk1z2lt5SpRpxSmrKiFIkROL0K
+ dlaOpQ+eZCyha8bepiUDcAGBNiH2e3AVSctPIpHp0j3YM0WVc07JoQbA5wyMQ97s1KL5
+ qq6tibbNHHv/X371p1WPDds3pBAMxrSd3fU7yyxPJ7l7l0Vp9cl3hZLIAzDzM9HtQ59l
+ BiUA==
+X-Gm-Message-State: AGi0PuZNkoX8AmgMKqZfeL+vN8X48iKhiM1V0M/j+jax0Gxm3iG24bua
+ vJCDLH0QNP+oe2dlS0+QZYg=
+X-Google-Smtp-Source: APiQypLhwcp9vnCatKjAZthF1zVm1ShmGp2VJRX7WjrqyDF58a7SrP++86Abx3Asu5IafcI7gHJr/w==
+X-Received: by 2002:a17:90b:198e:: with SMTP id
+ mv14mr26819693pjb.69.1589266169897; 
+ Mon, 11 May 2020 23:49:29 -0700 (PDT)
+Received: from localhost.localdomain ([75.167.104.59])
+ by smtp.gmail.com with ESMTPSA id j7sm11837286pjy.9.2020.05.11.23.49.28
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 11 May 2020 23:49:29 -0700 (PDT)
+From: Paul Zimmerman <pauldzim@gmail.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: [PATCH v5 0/7] dwc-hsotg (aka dwc2) USB host controller emulation
+Date: Mon, 11 May 2020 23:48:53 -0700
+Message-Id: <20200512064900.28554-1-pauldzim@gmail.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <bf472c11-e3b6-caee-7aa7-7803f762612d@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="m7mWvyGn93nZAC61K1Ca6miq8Q0kpQe6V"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 02:20:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=pauldzim@gmail.com; helo=mail-pl1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -121,95 +99,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Paul Zimmerman <pauldzim@gmail.com>, John Snow <jsnow@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---m7mWvyGn93nZAC61K1Ca6miq8Q0kpQe6V
-Content-Type: multipart/mixed; boundary="WM4PoqlJT1hfqTpzjFqB7QfEfUsl66Eev"
+Gerd, Peter, what do you think about accepting this patch series? The
+only possibly disruptive patch is #5, which modifies the dev-storage.c
+code a bit, the rest is all new code which shouldn't affect anything
+else. Felippe Mathieu-Daudé has done quite a bit of review of the
+patches, and has said he thinks it could be accepted now.
 
---WM4PoqlJT1hfqTpzjFqB7QfEfUsl66Eev
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+This patch series adds emulation for the dwc-hsotg USB controller,
+which is used on the Raspberry Pi 3 and earlier, as well as a number
+of other development boards. The main benefit for Raspberry Pi is that
+this enables networking on these boards, since the network adapter is
+attached via USB.
 
-On 11.05.20 20:22, Eric Blake wrote:
-> On 5/11/20 6:10 AM, Max Reitz wrote:
->> On 08.05.20 20:03, Eric Blake wrote:
->>> Include actions for --add, --remove, --clear, --enable, --disable, and
->>> --merge (note that --clear is a bit of fluff, because the same can be
->>> accomplished by removing a bitmap and then adding a new one in its
->>> place, but it matches what QMP commands exist).=C2=A0 Listing is omitte=
-d,
->>> because it does not require a bitmap name and because it was already
->>> possible with 'qemu-img info'.=C2=A0 A single command line can play one=
- or
->>> more bitmap commands in sequence on the same bitmap name (although all
->>> added bitmaps share the same granularity, and and all merged bitmaps
->>> come from the same source file).=C2=A0 Merge defaults to other bitmaps =
-in
->>> the primary image, but can also be told to merge bitmaps from a
->>> distinct image.
->>
->> For the record: Yes, my comment was mostly about my confusion around the
->> {}.=C2=A0 So just replacing them by () would have pacified me.
->>
->> But this is more fun, of course.
->>
->=20
->>> +++ b/docs/tools/qemu-img.rst
->>> @@ -281,6 +281,29 @@ Command description:
->>
->> [...]
->>
->>> +=C2=A0 Additional options ``-g`` set a non-default *GRANULARITY* for
->>
->> sets?
->=20
-> Or maybe:
->=20
-> Additional options include ``-g`` which sets a non-default *GRANULARITY*
-> for ``--add``, and ``-b`` and ``-F`` which select an alternative source
-> file for all *SOURCE* bitmaps used by ``--merge``.
+The emulation is working quite well, I have tested with USB network,
+mass storage, mouse, keyboard, and tablet. I have tested with the dwc2
+driver in the upstream Linux kernel, and with the dwc-otg driver in the
+Raspbian kernel.
 
-Sounds good.
+One remaining issue is that USB host passthrough does not work. I tried
+connecting to a USB stick on the host, but the device generates babble
+errors and does not work. This is because the dwc-hsotg controller only
+has one root port, so a full-speed dev-hub device is always connected
+to it, and high-speed USB devices on the host do not work at full-speed
+on the guest. (I have WIP code to add high-speed support to dev-hub to
+fix this.)
 
-> And in writing this, I just realized - even though you _can_ use --add
-> more than once in a command line, the command is still limited to
-> operating on a single bitmap name, so unless you write contortions like:
->=20
-> qemu-img bitmap --add --remove --add -g 1024 file.qcow2 bitmapname
->=20
-> there will normally be at most one --add operation for a -g to be used
-> with (because otherwise the second --add will fail when attempting to
-> create an already-existing bitmap name).
+The patch series also includes a very basic emulation of the MPHI
+device on the Raspberry Pi SOC, which provides the FIQ interrupt that
+is used by the dwc-otg driver in the Raspbian kernel. But that driver
+still does not work in full FIQ mode, so it is necessary to add a
+parameter to the kernel command line ("dwc_otg.fiq_fsm_enable=0") to
+make it work.
 
-Sure, but that=E2=80=99s a semantic problem, not a syntactic one. :)
+I have used some online sources of information while developing this
+emulation, including:
 
-Max
+http://www.capital-micro.com/PDF/CME-M7_Family_User_Guide_EN.pdf
+which has a pretty complete description of the controller starting
+on page 370.
 
+https://sourceforge.net/p/wive-ng/wive-ng-mt/ci/master/tree/docs/DataSheets/RT3050_5x_V2.0_081408_0902.pdf
+which has a description of the controller registers starting on
+page 130.
 
---WM4PoqlJT1hfqTpzjFqB7QfEfUsl66Eev--
+Changes v4-v5:
+  - Changed MemoryRegionOps to use '.impl.[min/max]_access_size' and
+    removed ANDing of memory values with 0xffffffff, per Felippe.
 
---m7mWvyGn93nZAC61K1Ca6miq8Q0kpQe6V
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  - hcd-dwc2.c: Changed NULL check of return from
+    object_property_get_link() call to an assertion, per Felippe.
 
------BEGIN PGP SIGNATURE-----
+  - bcm2835_mphi.c/h:
+    * Changed swirq_set/swirq_clr registers into a single register,
+      per Felippe.
+    * Simplified memory region code, per Felippe.
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl66Rl0ACgkQ9AfbAGHV
-z0C2eAf/TQvlix4CnezHt6Sb800IupSaL6gCDQcdXHbEy605ocK1tptROCjxB9PQ
-YNtAHGYg58Z+/YCGttBwOCPMDAvSql8vh9yPA/vrRzrVDeqSRJCd7NVqhC9tvI0J
-f3hlVEg/MrKeo3C/LBLDzS4TqB0cPs0ScSGZE6hICQ6OapBciCFJ4i7S6tTypmOM
-Obwb8iuS7/wa1zpPyg3/a5AKY94VdHcpOlPLZoHhSypj+OIIf2uAsC5RvCb+sqnE
-lNwhcdY1SixD34x/ogyJFvhXuZNx2qifkeFqv0Bgxp9FZqT1TEcgYjaDty6joUnE
-mNrmLILXDd6vbssp+py/LPwTvMSFLw==
-=Lv3R
------END PGP SIGNATURE-----
+Changes v3-v4:
+  - Reworked the memory region / register access code according to
+    an example patch from Felippe Mathieu-Daudé.
 
---m7mWvyGn93nZAC61K1Ca6miq8Q0kpQe6V--
+  - Moved the Makefile/Kconfig changes for this file into this
+    patch, per Felipe.
+
+  - Fixed a missing DEFINE_PROP_END_OF_LIST() in dwc2_usb_properties.
+
+Changes v2-v3:
+  - Fixed the high-speed frame time emulation so that high-speed
+    mouse/tablet will work correctly once we have high-speed hub
+    support.
+
+  - Added a "usb_version" property to the dwc-hsotg controller, to
+    allow choosing whether the controller emulates a USB 1 full-speed
+    host or a USB 2 high-speed host.
+
+  - Added a test for a working dwc-hsotg controller to the raspi2
+    acceptance test, requested by Philippe M.
+
+  - Added #defines for the register array sizes, instead of hard-
+    coding them in multiple places.
+
+  - Removed the NB_PORTS #define and the associated iteration code,
+    since the controller only supports a single root port.
+
+  - Removed some unused fields from the controller state struct.
+
+  - Added pointers to some online documentation to the top of
+    hcd-dwc2.c, requested by Peter M.
+
+  - Reworked the init/realize code to remove some confusing function
+    names, requested by Peter M.
+
+  - Added VMStateDescription structs for the controller and MPHI
+    state, requested by Peter M (untested).
+
+Changes v1-v2:
+  - Fixed checkpatch errors/warnings, except for dwc2-regs.h since
+    that is a direct import from the Linux kernel.
+
+  - Switched from debug printfs to tracepoints in hcd-dwc2.c, on the
+    advice of Gerd. I just dropped the debug prints in bcm2835_mphi.c,
+    since I didn't consider them very useful.
+
+  - Updated a couple of the commit messages with more info.
+
+Thanks for your time,
+Paul
+
+---
+
+Paul Zimmerman (7):
+  raspi: add BCM2835 SOC MPHI emulation
+  dwc-hsotg (dwc2) USB host controller register definitions
+  dwc-hsotg (dwc2) USB host controller state definitions
+  dwc-hsotg (dwc2) USB host controller emulation
+  usb: add short-packet handling to usb-storage driver
+  wire in the dwc-hsotg (dwc2) USB host controller emulation
+  raspi2 acceptance test: add test for dwc-hsotg (dwc2) USB host
+
+ hw/arm/bcm2835_peripherals.c           |   38 +-
+ hw/misc/Makefile.objs                  |    1 +
+ hw/misc/bcm2835_mphi.c                 |  184 ++++
+ hw/usb/Kconfig                         |    5 +
+ hw/usb/Makefile.objs                   |    1 +
+ hw/usb/dev-storage.c                   |   15 +-
+ hw/usb/hcd-dwc2.c                      | 1372 ++++++++++++++++++++++++
+ hw/usb/hcd-dwc2.h                      |  173 +++
+ hw/usb/trace-events                    |   47 +
+ include/hw/arm/bcm2835_peripherals.h   |    5 +-
+ include/hw/misc/bcm2835_mphi.h         |   44 +
+ include/hw/usb/dwc2-regs.h             |  895 ++++++++++++++++
+ tests/acceptance/boot_linux_console.py |    9 +-
+ 13 files changed, 2784 insertions(+), 5 deletions(-)
+ create mode 100644 hw/misc/bcm2835_mphi.c
+ create mode 100644 hw/usb/hcd-dwc2.c
+ create mode 100644 hw/usb/hcd-dwc2.h
+ create mode 100644 include/hw/misc/bcm2835_mphi.h
+ create mode 100644 include/hw/usb/dwc2-regs.h
+
+-- 
+2.17.1
 
 
