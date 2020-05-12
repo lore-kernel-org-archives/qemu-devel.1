@@ -2,81 +2,91 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7C7EC54E8B
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 10:21:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A119CC54E8E
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 10:22:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 808162075E
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 10:21:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 808162075E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 6B60120736
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 10:22:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OIexSalV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B60120736
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYS2f-0000C1-O8
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 06:21:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51678)
+	id 1jYS3q-0001As-HJ
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 06:22:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51760)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jYS20-0008CX-AX
- for qemu-devel@nongnu.org; Tue, 12 May 2020 06:21:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58138)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jYS1z-0003YR-6F
- for qemu-devel@nongnu.org; Tue, 12 May 2020 06:21:00 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jYS1w-0006xp-SS
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 10:20:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C324A2E8053
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 10:20:56 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jYS2Z-0000G1-Om
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 06:21:35 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25557
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jYS2Y-0003ek-MF
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 06:21:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589278893;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=yUI3MlH0FkHX0P1T/HMA3w8UgqL4KXG3R/8t0MQ0Gzk=;
+ b=OIexSalV2C5aJQUOJfazw0735UNzsC1JZ8q0aL2NsmBcyQzX1TrUQJ/+XFsMpqJXgFY8Jp
+ cI4JVdymW5CHLnb4gWK19HVmKMIIuz/KeKH2Fzz2V7WwVzfydq2KnyxL3OiaJOm6gEEZut
+ ayymBtu/WH/3HXjyzgCauakz8Ugf4W8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-128-QLCGZlRqPS-NTWfKxKpB9Q-1; Tue, 12 May 2020 06:21:29 -0400
+X-MC-Unique: QLCGZlRqPS-NTWfKxKpB9Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54B1D18FF66C;
+ Tue, 12 May 2020 10:21:27 +0000 (UTC)
+Received: from localhost (ovpn-112-75.ams2.redhat.com [10.36.112.75])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 699745D9DD;
+ Tue, 12 May 2020 10:21:21 +0000 (UTC)
+Date: Tue, 12 May 2020 11:21:20 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: elena.ufimtseva@oracle.com
+Subject: Re: [PATCH RESEND v6 12/36] multi-process: add functions to
+ synchronize proxy and remote endpoints
+Message-ID: <20200512102120.GC300009@stefanha-x1.localdomain>
+References: <cover.1587614626.git.elena.ufimtseva@oracle.com>
+ <7542e59e646421515051902fcd05fbb69fa4d866.1587614626.git.elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 12 May 2020 10:06:33 -0000
-From: Thomas Huth <1657538@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: c-kaiser intermediadc th-huth
-X-Launchpad-Bug-Reporter: luigiburdo (intermediadc)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20170118175149.27340.89188.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158927799342.3557.7346333611451043273.launchpad@chaenomeles.canonical.com>
-Subject: [Bug 1657538] Re: qemu 2.7.x 2.8 softmmu dont work on BE machine 
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="fbdff7602bd10fb883bf7e2ddcc7fd5a16f60398";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: f7e4c3f8a4f6155e2f9d3ca90b99a235a118c1a8
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 05:00:57
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+In-Reply-To: <7542e59e646421515051902fcd05fbb69fa4d866.1587614626.git.elena.ufimtseva@oracle.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="w7PDEPdKQumQfZlR"
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 02:02:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,69 +95,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1657538 <1657538@bugs.launchpad.net>
+Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
+ mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, jag.raman@oracle.com,
+ quintela@redhat.com, armbru@redhat.com, kanth.ghatraju@oracle.com,
+ felipe@nutanix.com, thuth@redhat.com, ehabkost@redhat.com,
+ konrad.wilk@oracle.com, dgilbert@redhat.com, liran.alon@oracle.com,
+ thanos.makatos@nutanix.com, rth@twiddle.net, kwolf@redhat.com,
+ berrange@redhat.com, mreitz@redhat.com, ross.lagerwall@citrix.com,
+ marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Bug watch removed: Red Hat Bugzilla #1332449
-   https://bugzilla.redhat.com/show_bug.cgi?id=3D1332449
+--w7PDEPdKQumQfZlR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On Wed, Apr 22, 2020 at 09:13:47PM -0700, elena.ufimtseva@oracle.com wrote:
+> From: Jagannathan Raman <jag.raman@oracle.com>
+>=20
+> In some cases, for example MMIO read, QEMU has to wait for the remote to
+> complete a command before proceeding. An eventfd based mechanism is
+> added to synchronize QEMU & remote process.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1657538
+Why are temporary eventfds used instead of sending a reply message from
+the remote device program back to QEMU?
 
-Title:
-  qemu 2.7.x 2.8 softmmu dont work on BE machine
+> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> ---
+>  include/io/mpqemu-link.h |  7 +++++
+>  io/mpqemu-link.c         | 61 ++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 68 insertions(+)
+>=20
+> diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
+> index af401e640c..ef95599bca 100644
+> --- a/include/io/mpqemu-link.h
+> +++ b/include/io/mpqemu-link.h
+> @@ -124,4 +124,11 @@ void mpqemu_link_set_callback(MPQemuLinkState *s,
+>  void mpqemu_start_coms(MPQemuLinkState *s, MPQemuChannel* chan);
+>  bool mpqemu_msg_valid(MPQemuMsg *msg);
+> =20
+> +#define GET_REMOTE_WAIT eventfd(0, EFD_CLOEXEC)
+> +#define PUT_REMOTE_WAIT(wait) close(wait)
 
-Status in QEMU:
-  Incomplete
+Hiding this in macros makes the code harder to understand.
 
-Bug description:
-  Build on Be machine qemu 2.7.1 and 2.8 in pure softmmu (tgc) dont work on=
- big endian hardware .
-  tested with ppc-softmmu,i386-softmmu,arm-softmmu same result:
+Why is an eventfd necessary instead of a reply message? It's simpler and
+probably faster to use a reply message instead of creating and passing
+temporary eventfds.
 
-  with :
-   ./qemu-system-i386 =
+> +#define PROXY_LINK_WAIT_DONE 1
+> +
+> +uint64_t wait_for_remote(int efd);
+> +void notify_proxy(int fd, uint64_t val);
+> +
+>  #endif
+> diff --git a/io/mpqemu-link.c b/io/mpqemu-link.c
+> index 48f53a8928..cc0a7aecd4 100644
+> --- a/io/mpqemu-link.c
+> +++ b/io/mpqemu-link.c
+> @@ -10,6 +10,7 @@
+> =20
+>  #include "qemu/osdep.h"
+>  #include "qemu-common.h"
+> +#include <poll.h>
+> =20
+>  #include "qemu/module.h"
+>  #include "io/mpqemu-link.h"
+> @@ -204,6 +205,66 @@ int mpqemu_msg_recv(MPQemuMsg *msg, MPQemuChannel *c=
+han)
+>      return rc;
+>  }
+> =20
+> +/*
+> + * wait_for_remote() Synchronizes QEMU and the remote process. The maxim=
+um
+> + *                   wait time is 1s, after which the wait times out.
+> + *                   The function alse returns a 64 bit return value aft=
+er
+> + *                   the wait. The function uses eventfd() to do the wai=
+t
+> + *                   and pass the return values. eventfd() can't return =
+a
+> + *                   value of '0'. Therefore, all return values are offs=
+et
+> + *                   by '1' at the sending end, and corrected at the
+> + *                   receiving end.
+> + */
+> +
+> +uint64_t wait_for_remote(int efd)
+> +{
+> +    struct pollfd pfd =3D { .fd =3D efd, .events =3D POLLIN };
+> +    uint64_t val;
+> +    int ret;
+> +
+> +    ret =3D poll(&pfd, 1, 1000);
 
-  Gtk-Message: Failed to load module "overlay-scrollbar"
-  qemu-system-i386: Trying to execute code outside RAM or ROM at 0x000a0000
-  This usually means one of the following happened:
+This 1 second blocking operation is not allowed in an event loop since
+it will stall any other event loop activity. If locks are held then
+other threads may also be stalled.
 
-  (1) You told QEMU to execute a kernel for the wrong machine type, and it =
-crashed on startup (eg trying to run a raspberry pi kernel on a versatilepb=
- QEMU machine)
-  (2) You didn't give QEMU a kernel or BIOS filename at all, and QEMU execu=
-ted a ROM full of no-op instructions until it fell off the end
-  (3) Your guest kernel has a bug and crashed by jumping off into nowhere
+It's likely that this will need to change as part of the QEMU event loop
+integration. Caller code can be kept mostly unchanged if you use
+coroutines.
 
-  This is almost always one of the first two, so check your command line an=
-d that you are using the right type of kernel for this machine.
-  If you think option (3) is likely then you can try debugging your guest w=
-ith the -d debug options; in particular -d guest_errors will cause the log =
-to include a dump of the guest register state at this point.
+> +
+> +    switch (ret) {
+> +    case 0:
+> +        qemu_log_mask(LOG_REMOTE_DEBUG, "Error wait_for_remote: Timed ou=
+t\n");
+> +        /* TODO: Kick-off error recovery */
+> +        return UINT64_MAX;
+> +    case -1:
+> +        qemu_log_mask(LOG_REMOTE_DEBUG, "Poll error wait_for_remote: %s\=
+n",
+> +                      strerror(errno));
+> +        return UINT64_MAX;
+> +    default:
+> +        if (read(efd, &val, sizeof(val)) =3D=3D -1) {
+> +            qemu_log_mask(LOG_REMOTE_DEBUG, "Error wait_for_remote: %s\n=
+",
+> +                          strerror(errno));
+> +            return UINT64_MAX;
+> +        }
+> +    }
+> +
+> +    /*
+> +     * The remote process could write a non-zero value
+> +     * to the eventfd to wake QEMU up. However, the drawback of using ev=
+entfd
+> +     * for this purpose is that a return value of zero wouldn't wake QEM=
+U up.
+> +     * Therefore, we offset the return value by one at the remote proces=
+s and
+> +     * correct it in the QEMU end.
+> +     */
+> +    val =3D (val =3D=3D UINT64_MAX) ? val : (val - 1);
+> +
+> +    return val;
+> +}
+> +
+> +void notify_proxy(int efd, uint64_t val)
+> +{
+> +    val =3D (val =3D=3D UINT64_MAX) ? val : (val + 1);
+> +    ssize_t len =3D -1;
+> +
+> +    len =3D write(efd, &val, sizeof(val));
+> +    if (len =3D=3D -1 || len !=3D sizeof(val)) {
+> +        qemu_log_mask(LOG_REMOTE_DEBUG, "Error notify_proxy: %s\n",
+> +                      strerror(errno));
+> +    }
+> +}
+> +
+>  static gboolean mpqemu_link_handler_prepare(GSource *gsrc, gint *timeout=
+)
+>  {
+>      g_assert(timeout);
+> --=20
+> 2.25.GIT
+>=20
 
-  Execution cannot continue; stopping here.
+--w7PDEPdKQumQfZlR
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  =
+-----BEGIN PGP SIGNATURE-----
 
-  I try to add the -L option with ../pc-bios/bios.bin =
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl66eKAACgkQnKSrs4Gr
+c8hzwQf/fHA6OJUFLZQSL8OKO3EjYSLl5rpNm4eNN4rRNSHCN9QJrYdYKu9OnsCY
+cxnOudGx0DIE5OfwD0Lafq6jWiypomXMRtwnVObikuInmwdYFzr0h+HnFhqSPZ9F
+4XfrmyS50C+9tRbfTg6i7rl7gc/CcbuQyb7F5KnVjexxIiP7if01L/1Di0QraNaB
+EnN6ZqB9aw5WpHrL/B8rSo63YZZsFBxYORKioWXGEerLntzU/RASYGHWuTOtpKK9
+lLKVJIPaeuSBmIcWWPdj+CbCBH3/x/D5Eilz3JZAvl5URQfFK3kbvVHvPHFCsJCR
+yFbF3GmxvhwcZVmnhj9sABibBE66cw==
+=j+S0
+-----END PGP SIGNATURE-----
 
-  and have the same result.
+--w7PDEPdKQumQfZlR--
 
-  note the ppc-softmmu and ppc64-softmmu work in kvm mode only emulated
-  mode have issue.
-
-  =
-
-  tested on my hardware a  Qriq P5040 and G5 4x970MP with Ubuntu Mate 16.10 =
-
-  thanks
-  Luigi
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1657538/+subscriptions
 
