@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A95E4C54E4B
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:50:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2AD6C54E8B
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:50:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6ECB52078E
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:50:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BF23620736
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 07:50:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xo0nu1MJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ECB52078E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NCH+FWx/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF23620736
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYPgk-0003KQ-IV
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 03:50:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58598)
+	id 1jYPgl-0003Mj-St
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 03:50:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58604)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jYPeI-0008Vf-TL; Tue, 12 May 2020 03:48:22 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50836)
+ id 1jYPeK-00007r-Sw; Tue, 12 May 2020 03:48:24 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41960)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jYPeI-0002qk-61; Tue, 12 May 2020 03:48:22 -0400
-Received: by mail-wm1-x343.google.com with SMTP id m12so15699524wmc.0;
- Tue, 12 May 2020 00:48:21 -0700 (PDT)
+ id 1jYPeK-0002qv-1z; Tue, 12 May 2020 03:48:24 -0400
+Received: by mail-wr1-x441.google.com with SMTP id h17so5192807wrc.8;
+ Tue, 12 May 2020 00:48:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=gVc4pPl94gT2dO6tZ3Upozb9mh/UUaA4ooVvMaypxfs=;
- b=Xo0nu1MJaLKnDIdmvK/OW5erxX8uoJJL+tEBRaKeV6iXhd2EnBWY1fPVe9o4Ck8u4p
- ByRNW/A/fY4/AiCupJQT5gYoiiM90QkaHeKjfSNDpQTgKv+oaJxdFAQTO2VJZWMMAP5L
- pn/EBpTVCuqgwPVzjqnu1Ndq7NR7Z29sxkS4V9hWEv0DfQAACTB+5wkVTZ6iL6nbHLwV
- u51A3Td2x2gq2Z+lxHNUayxr/skDtNvq76BlH3OL6MVhsdp8ET2um1cEp7Oi40ApimXu
- RrQAbDtCoTEaBjIOtqVv9Ib0EYLFOxljifXnfYRbAlYzZkYBLtbXNiE5KAbFtOSl8u+O
- b3/g==
+ bh=9+HPWfi6hB2pKPErn5CtXaV2y+G6fIj46U87L3EGk9I=;
+ b=NCH+FWx/bgOA/G53S0IB6rTD2XBw3Od7DLlx/agjhBGCfL8N7pnZFXs/MvFEbIFZfC
+ lIdbXSDZxlVpFLvo+yaMoM/cLbfbEeyPNfyT7zdcSEuQuYPzSh8gIrLIIVbgbou7RQQf
+ OcLVcPMhO7xefC7Xa9ZPPVJLIebhYCTN2kkPLWtYTk7QmAHD7jqoNNZ5GJQ+wNnzo5xV
+ KOyOZIKsSXm4VtOsT/ECatvujb7ut+RKfKtZyfzPBOx/Ky8dVOTHvc+Rn9QJG+MVucSB
+ 4ctM/kanl2j/CY/jq+EgolQu2G8t4brmhclm0QFQhEMfs/EejRNA49pNwRITIjoFiob6
+ GF3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=gVc4pPl94gT2dO6tZ3Upozb9mh/UUaA4ooVvMaypxfs=;
- b=fCV1qLIG7FoMVRFAmOeuxcYx/5DAMU4Q0h4lbH1uVdAzRBPFuo+K56d3eVRwZgUpeu
- 57qvihASVB0rBQwIVmszvD8RFxziH3qsxrYWmxKKCiaI/jV3wVYI0R7bzoWzB20DPa4g
- e+THI+9lAzA7cUF1fZM3rupv6L1MPw2SpgQQvIOdqrKQQ/NJFsV0Bv3CB7jbLeMgB3Gy
- 0YkdLgp2OXatlO5cQdDZtEcv1cFxWgvftZDjTb7dxqi73kMcAh63TWNimISZKiqnvCJw
- j9BvNH8cUoU3yW6R1X6lGa9SVVas4W5bz/VpxRcMw2uXk++ZWfaki2pytUfkD+K4w9Vs
- IgmQ==
-X-Gm-Message-State: AOAM53091UuAXMsb+W2N2OkQwRCcxexVLQ/lRB+zfP62k5oZH9czuRjz
- X4YG+Kt1EP3IJfbhkrXRhutDKEQtUwA=
-X-Google-Smtp-Source: ABdhPJxLr5qNckLQg1Evt9/7U45R9Jha6HyOniJv25pW9cRDJUr0XFySq20WtYHunaISp+RD1uUZEg==
-X-Received: by 2002:a1c:81d0:: with SMTP id c199mr1963426wmd.125.1589269700216; 
- Tue, 12 May 2020 00:48:20 -0700 (PDT)
+ bh=9+HPWfi6hB2pKPErn5CtXaV2y+G6fIj46U87L3EGk9I=;
+ b=moRN58MwuKsGH3iYTfDvBt3UlJqPSO9vWUC16f4aEsdCPa8ieojGN9lgG0seSoAMob
+ PKfu84CpD4Dg3f4DpkkaKroC1gWHw7nhjvJjvRyOf4rQrs2dIsvORJXOWQRSl53TBNIU
+ +dLDWQdibarqIW+ee/TJTa3Eq33a1MRI8gVd6zECI35fqLzuwtWeiTStTG0stgyjyLsC
+ SSQUqJc11H85NQ6LuJn1ewic8RZaPCYnWvBka2x40wgx2IOL14aQ5oPf4GtQQ6CkzGvj
+ WFB44ztVkV+U/8E9xwNSwNf+oDKoGqtd+XRdVqPMH0aSWyqA2Y7lQByj0MF09L9JOQyo
+ Lwkg==
+X-Gm-Message-State: AGi0PuanpByaI8GkAZrU73MgdwF0OVINg2WzGJ5yvBnbqiaWYbrZbrhq
+ 1SkwG0fdVflSHk/KDl4uOkUjqsG90IE=
+X-Google-Smtp-Source: APiQypKkiNw8fkb0TPe0cxQGwb02CaORIWkDEN3FLgHhW8Pup6YHsTQk8RRrz3bviGdDv0C7yKVfqQ==
+X-Received: by 2002:a5d:4d46:: with SMTP id a6mr24475859wru.188.1589269701741; 
+ Tue, 12 May 2020 00:48:21 -0700 (PDT)
 Received: from localhost.localdomain (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id c7sm7783754wro.80.2020.05.12.00.48.18
+ by smtp.gmail.com with ESMTPSA id c7sm7783754wro.80.2020.05.12.00.48.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 12 May 2020 00:48:19 -0700 (PDT)
+ Tue, 12 May 2020 00:48:21 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/3] hw/mips/mips_int: Use qdev gpio rather than
+Subject: [PATCH v2 3/3] hw/openrisc/pic_cpu: Use qdev gpio rather than
  qemu_allocate_irqs()
-Date: Tue, 12 May 2020 09:48:12 +0200
-Message-Id: <20200512074813.29992-3-f4bug@amsat.org>
+Date: Tue, 12 May 2020 09:48:13 +0200
+Message-Id: <20200512074813.29992-4-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200512074813.29992-1-f4bug@amsat.org>
 References: <20200512074813.29992-1-f4bug@amsat.org>
@@ -78,8 +78,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -112,9 +112,11 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Switch to using the qdev gpio API which is preferred over
-qemu_allocate_irqs(). One step to eventually deprecate and
-remove qemu_allocate_irqs() one day.
+Coverity points out (CID 1421934) that we are leaking the
+memory returned by qemu_allocate_irqs(). We can avoid this
+leak by switching to using qdev_init_gpio_in(); the base
+class finalize will free the irqs that this allocates under
+the hood.
 
 Patch created mechanically using spatch with this script
 inspired from commit d6ef883d9d7:
@@ -138,30 +140,26 @@ Fixes: Coverity CID 1421934 RESOURCE_LEAK
 Inspired-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/mips/mips_int.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ hw/openrisc/pic_cpu.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/hw/mips/mips_int.c b/hw/mips/mips_int.c
-index 796730b11d..91788c51a9 100644
---- a/hw/mips/mips_int.c
-+++ b/hw/mips/mips_int.c
-@@ -74,14 +74,12 @@ static void cpu_mips_irq_request(void *opaque, int irq, int level)
- void cpu_mips_irq_init_cpu(MIPSCPU *cpu)
+diff --git a/hw/openrisc/pic_cpu.c b/hw/openrisc/pic_cpu.c
+index 36f9350830..4b0c92f842 100644
+--- a/hw/openrisc/pic_cpu.c
++++ b/hw/openrisc/pic_cpu.c
+@@ -52,10 +52,9 @@ static void openrisc_pic_cpu_handler(void *opaque, int irq, int level)
+ void cpu_openrisc_pic_init(OpenRISCCPU *cpu)
  {
-     CPUMIPSState *env = &cpu->env;
--    qemu_irq *qi;
      int i;
+-    qemu_irq *qi;
+-    qi = qemu_allocate_irqs(openrisc_pic_cpu_handler, cpu, NR_IRQS);
++    qdev_init_gpio_in(DEVICE(cpu), openrisc_pic_cpu_handler, NR_IRQS);
  
--    qi = qemu_allocate_irqs(cpu_mips_irq_request, cpu, 8);
-+    qdev_init_gpio_in(DEVICE(cpu), cpu_mips_irq_request, 8);
-     for (i = 0; i < 8; i++) {
--        env->irq[i] = qi[i];
-+        env->irq[i] = qdev_get_gpio_in(DEVICE(cpu), i);
+     for (i = 0; i < NR_IRQS; i++) {
+-        cpu->env.irq[i] = qi[i];
++        cpu->env.irq[i] = qdev_get_gpio_in(DEVICE(cpu), i);
      }
--    g_free(qi);
  }
- 
- void cpu_mips_soft_irq(CPUMIPSState *env, int irq, int level)
 -- 
 2.21.3
 
