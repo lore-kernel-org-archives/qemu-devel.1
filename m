@@ -2,90 +2,82 @@ Return-Path: <SRS0=ZOtl=62=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C357DC54E4B
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 06:53:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5332EC54E4B
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 06:54:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 847B720752
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 06:53:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1779220752
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 May 2020 06:54:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aLJN5kry"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 847B720752
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="MCqTB01l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1779220752
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYOnU-00030a-Ok
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 02:53:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51922)
+	id 1jYOoC-0005BP-9x
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 02:54:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52148)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pauldzim@gmail.com>)
- id 1jYOkp-0006Vz-PV
- for qemu-devel@nongnu.org; Tue, 12 May 2020 02:51:05 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:41763)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <pauldzim@gmail.com>)
- id 1jYOko-0003WI-RC
- for qemu-devel@nongnu.org; Tue, 12 May 2020 02:51:03 -0400
-Received: by mail-pf1-x443.google.com with SMTP id 18so5921295pfv.8
- for <qemu-devel@nongnu.org>; Mon, 11 May 2020 23:51:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=n1YMwf+t1T5UgegU3i8L9NnD54cq03Rj2vu5lbPV+/E=;
- b=aLJN5kry9pPgPC/ax2xGSDghg3mbseTy09Q76ZGjtwt1QOO/qCejRU1OZHdcJln4w4
- ep11kPrc/ljMXulCYKFVJbfEbNMQBGIO8VCnA75uxc7X5u241JPhd0DopSrSo7EQsSg2
- clWp255m39llK2IyLWm4N69wV8Ph30qNXak+3xAYegV7TvV7BwfVwh/r4sDLYfIZ9U5D
- yUH78ASx52fRiH3l/HoxAIa+mTQCw+ZXQ1CvfxGk1dPSKHRRTZVyi/uMmY3X7G0/4yMK
- wnmL0whfNTouK5xA7/oKnSy6L5jX84Sjs6vs7JhjxIpOoBD/8HA/W3b00tqjP0Bygy3B
- Wvfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=n1YMwf+t1T5UgegU3i8L9NnD54cq03Rj2vu5lbPV+/E=;
- b=QYoyeSl6af4f88LteEmjYTMGKjaKFeCN4z4TNNvKbBzPbTzeHtrbn/e0nwG0h5TfnV
- a2fYye5EvwMlH7fuMwOjm1o1KCNjPH3X2GNAh0YCe/RmV24HWCOpWERlFRy4JJGHtwX3
- fTVcmVxPihwVZQfMIuqDjR9bsKvKauf6W6wKFS162OGTxtq3ZSdYJgfrzz6g0ys/0vmE
- BUsVdOuLbASA9F12lRBCxHsmYytRYQyDXrx1XVlq1XpwFKEZgu3QKUnEHLgU9EsJbwd7
- Bn88JrFjjHKkhw/eBllmM1Pu5LOPWmdnUq2dCmqrDiZq3v/PQhGzx0Lgl+k1BQ2/coZL
- K4Lg==
-X-Gm-Message-State: AGi0PuYkpDVw/4S7mPW+i6eUmGTn+FAmE22ycUJh0hSSdEFMahbYBrWB
- oeprVZ7HK5CEVnbtX23lVFE=
-X-Google-Smtp-Source: APiQypILBxi68u3U4HOHs3OK8clSj+5l6mFqBlxTCNFl59zhR/WSwevyBq86bKFUDuryDvvreWDcMw==
-X-Received: by 2002:aa7:951b:: with SMTP id b27mr19858573pfp.2.1589266261715; 
- Mon, 11 May 2020 23:51:01 -0700 (PDT)
-Received: from localhost.localdomain ([75.167.104.59])
- by smtp.gmail.com with ESMTPSA id j7sm11837286pjy.9.2020.05.11.23.51.00
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 11 May 2020 23:51:01 -0700 (PDT)
-From: Paul Zimmerman <pauldzim@gmail.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: [PATCH v5 7/7] raspi2 acceptance test: add test for dwc-hsotg (dwc2)
- USB host
-Date: Mon, 11 May 2020 23:49:00 -0700
-Message-Id: <20200512064900.28554-8-pauldzim@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200512064900.28554-1-pauldzim@gmail.com>
-References: <20200512064900.28554-1-pauldzim@gmail.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=pauldzim@gmail.com; helo=mail-pf1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ (Exim 4.90_1) (envelope-from <zxq_yx_007@163.com>)
+ id 1jYOms-0002Uj-I6
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 02:53:10 -0400
+Received: from m12-15.163.com ([220.181.12.15]:54388)
+ by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <zxq_yx_007@163.com>)
+ id 1jYOmo-0003hn-Ea
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 02:53:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+ s=s110527; h=Subject:From:Message-ID:Date:MIME-Version; bh=0Plmu
+ mm+zQXK5AMhdQ7eYLBwbMpoEI5NJg1tCPeU1u4=; b=MCqTB01le/7sy+DhxBo7r
+ /+LdnsjxPjEbP5rye6p4noDmLW3R/IivzNPdtUOIN08TggiIuL6TQtW6PMKzviRk
+ KofPLAiJfkYi4mrtvR0FiriIbgFvrfwejrjPz9q7cxUyQowIvQhwoZVX2niLct9B
+ Ik0rO+hdbf6IhPmzde/LbU=
+Received: from [10.11.32.40] (unknown [39.155.168.46])
+ by smtp11 (Coremail) with SMTP id D8CowABXdkakR7peQKiqCA--.7543S2;
+ Tue, 12 May 2020 14:52:20 +0800 (CST)
+Subject: Re: [PATCH v3 1/3] qemu-sockets: add abstract UNIX domain socket
+ support
+To: Eric Blake <eblake@redhat.com>, berrange@redhat.com,
+ marcandre.lureau@redhat.com, kwolf@redhat.com, armbru@redhat.com
+References: <20200510061422.24841-1-zxq_yx_007@163.com>
+ <20200510061422.24841-2-zxq_yx_007@163.com>
+ <0ead3ac4-efa3-b773-f5c3-7aa055e2af18@redhat.com>
+From: "xiaoqiang.zhao" <zxq_yx_007@163.com>
+Message-ID: <d9600083-303f-2e55-a0f0-86548774d55b@163.com>
+Date: Tue, 12 May 2020 14:52:20 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
+MIME-Version: 1.0
+In-Reply-To: <0ead3ac4-efa3-b773-f5c3-7aa055e2af18@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID: D8CowABXdkakR7peQKiqCA--.7543S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxJF18WrW3KF47Wr1xZrWrXwb_yoW8XF4Up3
+ s8KayUK3Z5A3y8Wrs8ua15Jryrtan0q3Wjq3s5J3s0ka9093WSkFW2ka4FqF18Gr1fW3y7
+ AFZ09rWSvF1qy37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+ 9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jheOJUUUUU=
+X-Originating-IP: [39.155.168.46]
+X-CM-SenderInfo: 520ts5t0bqili6rwjhhfrp/1tbiqAQixlc7PH4i-AAAs4
+Received-SPF: pass client-ip=220.181.12.15; envelope-from=zxq_yx_007@163.com;
+ helo=m12-15.163.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 02:52:48
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,49 +90,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Paul Zimmerman <pauldzim@gmail.com>, John Snow <jsnow@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, kraxel@redhat.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a check for functional dwc-hsotg (dwc2) USB host emulation to
-the Raspi 2 acceptance test
-
-Reviewed-by: Philippe Mathieu-Daude <f4bug@amsat.org>
-Signed-off-by: Paul Zimmerman <pauldzim@gmail.com>
----
- tests/acceptance/boot_linux_console.py | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index c6b06a1a13..abb5ca3dd4 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -378,13 +378,18 @@ class BootLinuxConsole(Test):
- 
-         self.vm.set_console()
-         kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
--                               serial_kernel_cmdline[uart_id])
-+                               serial_kernel_cmdline[uart_id] +
-+                               ' root=/dev/mmcblk0p2 rootwait ' +
-+                               'dwc_otg.fiq_fsm_enable=0')
-         self.vm.add_args('-kernel', kernel_path,
-                          '-dtb', dtb_path,
--                         '-append', kernel_command_line)
-+                         '-append', kernel_command_line,
-+                         '-device', 'usb-kbd')
-         self.vm.launch()
-         console_pattern = 'Kernel command line: %s' % kernel_command_line
-         self.wait_for_console_pattern(console_pattern)
-+        console_pattern = 'Product: QEMU USB Keyboard'
-+        self.wait_for_console_pattern(console_pattern)
- 
-     def test_arm_raspi2_uart0(self):
-         """
--- 
-2.17.1
+在 2020/5/12 上午2:01, Eric Blake 写道:
+> On 5/10/20 1:14 AM, xiaoqiang zhao wrote:
+>> unix_listen/connect_saddr now support abstract address types
+>>
+>> two aditional BOOL switches are introduced:
+>> tight: whether to set @addrlen to the minimal string length,
+>>         or the maximum sun_path length. default is TRUE
+>> abstract: whether we use abstract address. default is FALSE
+>>
+>> cli example:
+>> -monitor unix:/tmp/unix.socket,abstract,tight=off
+>> OR
+>> -chardev socket,path=/tmp/unix.socket,id=unix1,abstract,tight=on
+>>
+>> Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
+>> ---
+>
+>> +++ b/qapi/sockets.json
+>> @@ -73,12 +73,19 @@
+>>   # Captures a socket address in the local ("Unix socket") namespace.
+>>   #
+>>   # @path: filesystem path to use
+>> +# @tight: pass a socket address length that does not include the whole
+>> +#         struct sockaddr_un record but (besides other components) only
+>> +#         the relevant part of the filename or abstract string.
+>> +#         default value is 'true'
+>
+> Perhaps:
+>
+> pass a socket address length confined to the minimum length of the 
+> abstract string, rather than the full sockaddr_un record length (only 
+> matters for abstract sockets, default true)
+>
+Sounds better
+>> +# @abstract: whether this is a abstract address, default is 'false'
+>
+> Both new fields should have a '(since 5.1)' tag, to make it obvious 
+> that they did not exist in earlier releases with the rest of the struct.
+>
+> s/a abstract/an abstract/
+>
+Will fix in the next version,  thanks Eric.
 
 
