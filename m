@@ -2,120 +2,84 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79340C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 18:23:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65B21C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 18:28:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B0E2205ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 18:23:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED877205ED
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 18:28:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="cLFfrEmJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B0E2205ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qGr3W9iH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED877205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYw2T-00013S-Fg
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 14:23:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36770)
+	id 1jYw76-0004wz-Bo
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 14:28:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38858)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <komlodi@xilinx.com>)
- id 1jYvr4-0006mW-AW
- for qemu-devel@nongnu.org; Wed, 13 May 2020 14:11:42 -0400
-Received: from mail-eopbgr680082.outbound.protection.outlook.com
- ([40.107.68.82]:3429 helo=NAM04-BN3-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <komlodi@xilinx.com>)
- id 1jYvr2-0000nk-MD
- for qemu-devel@nongnu.org; Wed, 13 May 2020 14:11:41 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RDR0BHLWX+N963BN9l3pDUma0k134VxA1KZm2KfoCfGWSLQo39sl2AuYaG8cM5gN5RNE+igmG3nEyBMdriXF1FKJSgNVnMIPjHl4Tn0TweB1ldjPV4IFK39FOdFA5U/cHJ0e9nkIJk8nxwbSYuHHHJxEqo7qXlb43BPxtVsM9dNpLKV2jYGkmEbLQzZjh4gxRUMGi3cSjowA0tmsq5YqeKseaEnS/mhnsBVDywGTZ/7ug/pbhSriyRmAi0jgVrbzUP4IfJtVtykO6xVBeN7ZNFj+bZ+byhK8/B18I3h8cYPgmotxiQ1uUB6qLF1rYsahEk0zf5gn9/GRKdY0y1XPQw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pPXSKqUHub+d7gUzRWKyYEQLoTGpM5vfsXITvIjxvCc=;
- b=SDhe9LxW3A78SovqAXm1i32HLFyXz+7JvU5pWq/ZIq9p46DaFpKmkJL7vAZ3Fhrqff9syKKvK+4a6yeP3lNyDWWBwuZ24TsPor6muE5aZDZBhkHP0Lu3d+8ZfUt83lQ0DBMrRd6IQoatBZrTs8DiBh7OuNph4x1hdTnixsaE0M5Ye4wsUeBPcKIPRZAK3HMyuL8DzU4kmCBgsPse/WFiWjYoUJ6nbtEL71COA/LuZKgyVpGK+LT1Xs7tVD8cLJ9kVFRknVbr5ppr5C599RRasfPHwENF1Kww6Op4fokp9Dt/lZ/AWWmLCCTDnT6u79dxfWZB9tekYFsIiUzPfc7QOQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=xilinx.com; dmarc=pass action=none header.from=xilinx.com;
- dkim=pass header.d=xilinx.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pPXSKqUHub+d7gUzRWKyYEQLoTGpM5vfsXITvIjxvCc=;
- b=cLFfrEmJKE5CMGR6pn1YEoQS384R9yO2nSQYEbS3XH93bkt7qvEpoAKJDtax0CsSUdFZypEhGwvUP+5QDymjaNY6fKX3x1yq4nJn9oLgoqJ5RGIAWVkkxiumGIpRjPYYpeEB+HyN9RqgNjLsKddezfEtdOlh4E1NQXBov3g70rY=
-Received: from BY5PR02MB6033.namprd02.prod.outlook.com (2603:10b6:a03:1ff::10)
- by BY5PR02MB6866.namprd02.prod.outlook.com (2603:10b6:a03:237::13)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.24; Wed, 13 May
- 2020 17:56:37 +0000
-Received: from BY5PR02MB6033.namprd02.prod.outlook.com
- ([fe80::f824:4502:4930:8144]) by BY5PR02MB6033.namprd02.prod.outlook.com
- ([fe80::f824:4502:4930:8144%5]) with mapi id 15.20.3000.022; Wed, 13 May 2020
- 17:56:37 +0000
-From: Joe Komlodi <komlodi@xilinx.com>
-To: Edgar Iglesias <edgari@xilinx.com>
-Subject: RE: [PATCH v1 0/4] target/microblaze: Add dynamic GDB XML and correct
- SReg reporting
-Thread-Topic: [PATCH v1 0/4] target/microblaze: Add dynamic GDB XML and
- correct SReg reporting
-Thread-Index: AQHWJ7c2C6tNs7z8hUWjQjeVEgsbUKimSIkAgAAFbgA=
-Date: Wed, 13 May 2020 17:56:36 +0000
-Message-ID: <BY5PR02MB6033EA92D22B76522643E0B0D0BF0@BY5PR02MB6033.namprd02.prod.outlook.com>
-References: <1589216751-106038-1-git-send-email-komlodi@xilinx.com>
- <20200513172858.GN2945@toto>
-In-Reply-To: <20200513172858.GN2945@toto>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-TNEF-Correlator: 
-authentication-results: xilinx.com; dkim=none (message not signed)
- header.d=none;xilinx.com; dmarc=none action=none header.from=xilinx.com;
-x-originating-ip: [149.199.62.133]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: a8e8f6cf-997f-4bde-5391-08d7f766fb6a
-x-ms-traffictypediagnostic: BY5PR02MB6866:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BY5PR02MB6866A2FA75BACAE740E7E1D6D0BF0@BY5PR02MB6866.namprd02.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-forefront-prvs: 0402872DA1
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: kh5/sGzJWVxFQm7teUoai2d98smzOpFJKERiH1IyTW4NZwmU2Uh/xOfRot7g05ZkyL1Ix4I1d/x77tQlieOZFOZjIH1LH+0+QSXeFAAVGrrz2L5T2TgJXk9z124gZSKKUohmt5j6P1yoyPbZOFkhx+OnJsn60rEMfXjiPMWIB8M2/78BP3O9UmNqIC0IC+HvKohGUEflDKCuRJMfJTQ5+n2GoHkJIvCZwIewQcOZMrZAUYfa0yQB4MZyf41l3o+8qd9rQDNqlqSMMlUKI5Z2l6rgMPp3fuAh15EElp8N0aNP3sDrw8f2LvxEn5RK9bgpGXR66OM4BsQqYM+ynlRXFJ5vR/qIixE5eY8xJqcX0dOVnDUruVCzh09mybB1/8d5+dEDknVxdJYf17hiLEMlaYCZvYsispTb06DWKiCSl7gfSVxi3E6kpgDtXOsbWtbn2xjtR75d2PeyMn7oh586yZyqe1l3DoSz7o7UezrF+NuHo3laizy5dix2tP00p1TKoHTEh2OSZ7ytMgw8fcIJlg==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:BY5PR02MB6033.namprd02.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(136003)(39860400002)(396003)(346002)(366004)(376002)(33430700001)(71200400001)(2906002)(4326008)(5660300002)(316002)(33440700001)(6636002)(6862004)(52536014)(8676002)(7696005)(53546011)(6506007)(33656002)(76116006)(86362001)(64756008)(478600001)(8936002)(66556008)(66476007)(9686003)(55016002)(26005)(186003)(66446008)(66946007);
- DIR:OUT; SFP:1101; 
-x-ms-exchange-antispam-messagedata: kvL7NhvuYZ+hHLADpvBMyfACUEgbjB/JJiam4Xm5r75wtvJXRrun/2EThtf1w0NEtwUcXZY4JlrPEKmv2BMsI8PyR9GIXC4SCv+9mQk1PkC+zfDFAbQkIsVO6KzF1ND2OXt0lcmMToq7hppFnHSPUW0cOezfL1MhzP2hBstr8u3uLLeXn2dSb58yH7NfdeFvx1JYOx/wbM5U/JbEZ8sCS5HVZS6LU3sRBQSq3LsNZLXIP1eHDHBcG89Nn/I02R4VU0ZOlQhjHF4SombLOrTW2NDkggFGR5Qo/yVj6V4YHmFTlRimy5KjlZW7YUHUn6KMjOVDAyftMyZHNnAWA50JTfCuMhQQNJPyDKlKW4mw8cTA6oM2Tt2fi7qGDScG3iOtZPuD7o+67Nlio6l1N8kwvr58TniJgQ6uutf483SKHI/WLIARsFi7ZpONDjsrWLtBLZHTp5DS6UMsLuJlQqBed8WElHD/QLlbBKZvELwgqIOHGxmQc/vHsfdSA1BcJCLi
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jYw6M-0004W2-Hx; Wed, 13 May 2020 14:27:30 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:37239)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jYw6L-0004BU-Id; Wed, 13 May 2020 14:27:30 -0400
+Received: by mail-io1-xd42.google.com with SMTP id u11so116639iow.4;
+ Wed, 13 May 2020 11:27:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=nR7TRlGZlczMjxePx9kVhUNZSjisCs5/kvp3RzWY+WE=;
+ b=qGr3W9iHugFcL+p3nQS4eGtU/ql5PNU1rdIE32oyCofdJYuAAXPcxXsUExIMFBGunn
+ uniavoczhTnEg75am9NmwSMKHh11UU7LGkOPpndv9PnD06Kz7QCgYz9RmCMPxQ7YaIp/
+ h6AtPj9ABdg6VpGEkFGD4fsyuuIgxMdw2mlLNaHWMyBO8AJPewC+U8H7CYZXmWuMeOsV
+ JkOcxnfV38HQajpygwl3t0VmJ8oALAJoivlwBxJr8VV53SwiKLmi9LbuC1MB4oawl3yD
+ JoPyO9iJMznaj6we9FmLUeECCEXt8CuWBaiT5vkV1kMhb2TLS9aYNmBIS+X2BOT13F2/
+ NNIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=nR7TRlGZlczMjxePx9kVhUNZSjisCs5/kvp3RzWY+WE=;
+ b=NHrBc8fpEWetB0WCLzGZamTGVFSHFALiPbhNdagetZyvzbplYPUaSuXkB+6CFObyYe
+ UvCMwh1bK6sAMYxWQLciVJqoXfiNm9gOqWSReLpxlpVuVZhh53CHcX2fOCai3FmhZI0H
+ jdjxd3fGXvnOhqVHSwG3AZLTFohfbXkYh1qBdbcbTfP7kch/XU4KQ8FeewLC5Jm/iJ/j
+ bkhhI4BFMBxqutyLFau4j2513+/zy4YBJCYSXllLYoUpx/95A+rQeUX/MHRaBbQIxJEv
+ fnRNCkLT4RbdJcZWUQqBgip4IjizEYXbHDQO9Q1PszAv2uMdIV/j709GO2trXlXGHbDt
+ hV4g==
+X-Gm-Message-State: AGi0PuY0/1BLu7a4NGVEqB4HPpUzqR5IbDyZDDPPti7cZxIhLX9CWs/t
+ FEEdGt46UQ9QaQGRYzdFkASiWgJVgNr1LOmPufg=
+X-Google-Smtp-Source: APiQypKVjBczwQNkp2UndcF5QIZapeVDIunMaBx8KEupdg3trjJkKbjzibAYd6ksv2gwkoWaHO7xor/Zsw+p01ttEz8=
+X-Received: by 2002:a02:a887:: with SMTP id l7mr786093jam.91.1589394447638;
+ Wed, 13 May 2020 11:27:27 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a8e8f6cf-997f-4bde-5391-08d7f766fb6a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 May 2020 17:56:37.1439 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: HJ3nj5GGBOs88qyyKFtZ2Bpech8Bt4X3Wbkwy8p5bo3sW57qMvUYnVALpARC0oaNx0Z6opZQKKssdx5b93a4kA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR02MB6866
-Received-SPF: pass client-ip=40.107.68.82; envelope-from=komlodi@xilinx.com;
- helo=NAM04-BN3-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 14:11:39
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+References: <cover.1588878756.git.alistair.francis@wdc.com>
+In-Reply-To: <cover.1588878756.git.alistair.francis@wdc.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 13 May 2020 11:18:41 -0700
+Message-ID: <CAKmqyKNaVRi3u6qe4Obui5NktjemZYHFEbNz6PmsYk+Kf=hOfw@mail.gmail.com>
+Subject: Re: [PATCH v2 0/9] RISC-V Add the OpenTitan Machine
+To: Alistair Francis <alistair.francis@wdc.com>, Bin Meng <bmeng.cn@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d42;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd42.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -129,74 +93,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Edgar,
+On Thu, May 7, 2020 at 12:21 PM Alistair Francis
+<alistair.francis@wdc.com> wrote:
+>
+> OpenTitan is an open source silicon Root of Trust (RoT) project. This
+> series adds initial support for the OpenTitan machine to QEMU.
+>
+> This series add the Ibex CPU to the QEMU RISC-V target. It then adds the
+> OpenTitan machine, the Ibex UART and the Ibex PLIC.
+>
+> The UART has been tested sending and receiving data.
+>
+> With this series QEMU can boot the OpenTitan ROM, Tock OS and a Tock
+> userspace app.
+>
+> The Ibex PLIC is similar to the RISC-V PLIC (and is based on the QEMU
+> implementation) with some differences. The hope is that the Ibex PLIC
+> will converge to follow the RISC-V spec. As that happens I want to
+> update the QEMU Ibex PLIC and hopefully eventually replace the current
+> PLIC as the implementation is a little overlay complex.
+>
+> For more details on OpenTitan, see here: https://docs.opentitan.org/
 
-Ah, I did.  It was in my directory but didn't get added to git.
-It should have been part of the first patch.
+Ping!
 
-I'll add it to the first patch and send up a v2.
++ Some people who might be able to review this series (or at least ack).
 
-Thanks!
-Joe
+I'll give it another week and if I don't hear anything I'll merge it.
 
------Original Message-----=09
-From: Edgar E. Iglesias <edgar.iglesias@xilinx.com>=20
-Sent: Wednesday, May 13, 2020 10:29 AM
-To: Joe Komlodi <komlodi@xilinx.com>
-Cc: qemu-devel@nongnu.org
-Subject: Re: [PATCH v1 0/4] target/microblaze: Add dynamic GDB XML and corr=
-ect SReg reporting
+Alistair
 
-On Mon, May 11, 2020 at 10:05:47AM -0700, Joe Komlodi wrote:
-> Hi all,
->=20
-> This series adds dynamic GDB XML support for Micraoblaze CPUs, and=20
-> fixes an issue when reporting Microblaze SRegs through GDB.
->=20
-> The SRegs used to be printed out by iterating over the SReg array, but=20
-> the SReg array isn't laid out in memory in the same order that GDB expect=
-s them.
->=20
-> When reporting register to GDB, note that even though 32-bit=20
-> Microblaze supports having certain registers wider than 32-bits, we're=20
-> repoting all of them as being 32-bits wide right now to maintain compatib=
-ility with GDB.
->=20
-> Thanks!
-> Joe
-
-Hi Joe,
-
-Looks like you forgot the patch that adds the xml file?
-
-Thanks,
-Edgar
-
-
-
->=20
-> Joe Komlodi (4):
->   target/microblaze: gdb: Add dynamic GDB XML register support
->   target/microblaze: gdb: Extend the number of registers presented to
->     GDB
->   target/microblaze: gdb: Fix incorrect SReg reporting
->   target/microblaze: monitor: Increase the number of registers=20
-> reported
->=20
->  configure                     |   1 +
->  target/microblaze/cpu.c       |   6 +-
->  target/microblaze/cpu.h       |   9 ++
->  target/microblaze/gdbstub.c   | 214 ++++++++++++++++++++++++++++++++++++=
-+++++-
->  target/microblaze/translate.c |  16 +++-
->  5 files changed, 240 insertions(+), 6 deletions(-)
->=20
+>
+> v2:
+>  - Rebase on master
+>  - Get uart receive working
+>
+> Alistair Francis (9):
+>   riscv/boot: Add a missing header include
+>   target/riscv: Don't overwrite the reset vector
+>   target/riscv: Add the lowRISC Ibex CPU
+>   riscv: Initial commit of OpenTitan machine
+>   hw/char: Initial commit of Ibex UART
+>   hw/intc: Initial commit of lowRISC Ibex PLIC
+>   riscv/opentitan: Connect the PLIC device
+>   riscv/opentitan: Connect the UART device
+>   target/riscv: Use a smaller guess size for no-MMU PMP
+>
+>  MAINTAINERS                         |  14 +
+>  default-configs/riscv32-softmmu.mak |   1 +
+>  default-configs/riscv64-softmmu.mak |  11 +-
+>  hw/char/Makefile.objs               |   1 +
+>  hw/char/ibex_uart.c                 | 490 ++++++++++++++++++++++++++++
+>  hw/intc/Makefile.objs               |   1 +
+>  hw/intc/ibex_plic.c                 | 261 +++++++++++++++
+>  hw/riscv/Kconfig                    |   9 +
+>  hw/riscv/Makefile.objs              |   1 +
+>  hw/riscv/opentitan.c                | 204 ++++++++++++
+>  include/hw/char/ibex_uart.h         | 110 +++++++
+>  include/hw/intc/ibex_plic.h         |  63 ++++
+>  include/hw/riscv/boot.h             |   1 +
+>  include/hw/riscv/opentitan.h        |  79 +++++
+>  target/riscv/cpu.c                  |  30 +-
+>  target/riscv/cpu.h                  |   1 +
+>  target/riscv/pmp.c                  |  19 +-
+>  17 files changed, 1281 insertions(+), 15 deletions(-)
+>  create mode 100644 hw/char/ibex_uart.c
+>  create mode 100644 hw/intc/ibex_plic.c
+>  create mode 100644 hw/riscv/opentitan.c
+>  create mode 100644 include/hw/char/ibex_uart.h
+>  create mode 100644 include/hw/intc/ibex_plic.h
+>  create mode 100644 include/hw/riscv/opentitan.h
+>
 > --
-> 2.7.4
->=20
+> 2.26.2
+>
 
