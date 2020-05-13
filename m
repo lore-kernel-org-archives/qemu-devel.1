@@ -2,90 +2,88 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C63ECC2D0F6
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 02:05:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE822C2D0F6
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 02:07:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EA26206CC
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 02:05:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B677E206CC
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 02:07:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iAzgZcBY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EA26206CC
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QUl2tVwH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B677E206CC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYgmH-00089Y-Ni
-	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 22:05:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45612)
+	id 1jYgng-0001o1-Tn
+	for qemu-devel@archiver.kernel.org; Tue, 12 May 2020 22:07:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45822)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jYgle-0007TW-Jm
- for qemu-devel@nongnu.org; Tue, 12 May 2020 22:05:06 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:36961)
+ id 1jYgn9-0001MV-0F
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 22:06:39 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:54900)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jYgld-00069b-GC
- for qemu-devel@nongnu.org; Tue, 12 May 2020 22:05:06 -0400
-Received: by mail-pl1-x642.google.com with SMTP id x10so6205624plr.4
- for <qemu-devel@nongnu.org>; Tue, 12 May 2020 19:05:04 -0700 (PDT)
+ id 1jYgn8-0006vb-2G
+ for qemu-devel@nongnu.org; Tue, 12 May 2020 22:06:38 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id s69so2129660pjb.4
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 19:06:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=I2UU26+f+ZXjuS9qDowqzQXS4x4IEq1aNJA0q7Alt08=;
- b=iAzgZcBYy3CEoidbNqt0fPPxDCPhAY+rbkAFe03yWVfaeWfBW5LeIz1booCv8OMqv3
- VVCanuV0VyfcYIbrYdRfQBXXy63hrWhFb+a1Z/5ibQfwX3cw9nC5Lf0uCpfd1DBNS+lt
- ryh9jcItXPZLp99i/IM3t+VKO7u+Lmg4CSV33mhRGDICXKOe2WW96GGi3bzTLb4QI5Z5
- KLwAm73CryzsSV1/wtmjy708O6TH+ffqOiGOciP61UxkRWYIZ1mW6gmlutmQ9uwpd/AG
- JP2bqk8kUImz9KWKtMKz62blobf+yG66TMp5Y+Uzs/ldms3KkO6z/NkFSBCXppL/41ID
- 8DDg==
+ bh=8b9fpcuJ6oVaoHTbgJD2FTGlfEUYk/UcMkckrsvWnOk=;
+ b=QUl2tVwHeI4tPxNOUjhZu6UzRP6hz/2IL1r3wj1eKtnWYNuxNtp4gj9BvEoaoWHFkX
+ 1+B9b2psFgd5WOu/r98zWnpCn21gxpe4fgtdv1qnS0gZlLJSqygP93Tc+EVfWwz567pL
+ HGVn66FEArXHmcYhe8mGScSB0wywWjCGOqd142k1IH9+TQ0pNJH7JFr0oI4zdyEueurF
+ 2UJhYdSWxNPgpcx3EXkGk38dpHNerAO5GKQAR3ZmZYP1+JyxL3ESxlP77aBMnM5hpQOX
+ uFI4Izv6ByPnRM9FXowsfOYcYYwubYgGonZk0YIqg228s7rgaNeYRpGnDGIe/6H0Bq7K
+ W9fQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=I2UU26+f+ZXjuS9qDowqzQXS4x4IEq1aNJA0q7Alt08=;
- b=a/FYjHIO4DQmesVkij2Ri6i60tbaCajsAvVBBUQCiDuDdRL5pAAwm1TL9jqIeKt1fV
- NjldfwkRAlCl16zST6tktFRTGOot2qXkDZEsHOgNqaEszbzGHLwYtUPhvG+AsVXJr4wO
- 2ZmSD9B+GKzfBgPs/y/VZqY+ENY52WE+5IioQxxuustxmywy1Y9/eXmwWFghrG78qXH2
- YxgGjlWsjGMtCVLU9EZI50yBZDdXZUeFxX9I3lqKAiLAWtGROVogUc9vyftM2/SPE2xa
- nCufk7TAVHOqxDldPFLKpeP1BvajJGIqfM9s1GHq+XeNwUzOoARAPnYkP63y7U7Qm/w7
- 2abQ==
-X-Gm-Message-State: AGi0PuYgXaDi3/J0GEZqmsKlui+/TFBqTGUuUb/OiAA7ZQTk921VR7sS
- M3ube3m7otjSKYKbEWnkDrY9p5lYB9I=
-X-Google-Smtp-Source: APiQypJ5uzBjYiSlmK+qZcnbtHNnYJL5IH3p3kOap8Oej/zHjLIH2ZkXdJVtCcVkvLbE+Ud6zMU2yw==
-X-Received: by 2002:a17:902:aa4b:: with SMTP id
- c11mr22990746plr.211.1589335502945; 
- Tue, 12 May 2020 19:05:02 -0700 (PDT)
+ bh=8b9fpcuJ6oVaoHTbgJD2FTGlfEUYk/UcMkckrsvWnOk=;
+ b=C0BGpYY74PRpOThZiBw/sh1F3Y4AQQMA8z2q41qf7P7CGNwJIn3pSnrafS1GKM56NR
+ HgQW/rrQH+UQzQR1g1ym1Vcy5lxxIDsbsPFHoLKZFiefkCqEBSNZpZODgmqK/dwnjcXL
+ dYLxFZk8bXRYsPeGb1i1L4xm5eDbcbAELL5nr5FLJJZh8S+E0eBtKxUHfMWlQSNcnZPb
+ wyANelZa+nlXZ7gwhxTYtk4aYPHtt7QAQPRGZ0U0pCvwFNxr/bh6OqtICMZvqeH7wr/Y
+ WzuBAseuyDIZCwrWv8adZNm4U2PhRoRk28YnQJgkmsL2yykcyP1LEv29Nw73fOXtFvw8
+ 0zlQ==
+X-Gm-Message-State: AGi0PuYlK3ZAiauPQR7begm6vsKZU3SD7GilrPjoQJfI9p5poRuor3DR
+ 0jlQ54eoCQwEeM7O0KWrTA1zS9ysdwg=
+X-Google-Smtp-Source: APiQypLI3U0LjWsti44jRYuDUOd3RzDndYtud3rmw6fJbYKeTvpVe3B7c21Vc9c9O/Uauc+cJ7r1dA==
+X-Received: by 2002:a17:90a:8a14:: with SMTP id
+ w20mr32809499pjn.176.1589335596154; 
+ Tue, 12 May 2020 19:06:36 -0700 (PDT)
 Received: from [192.168.1.11] (174-21-149-226.tukw.qwest.net. [174.21.149.226])
- by smtp.gmail.com with ESMTPSA id i11sm1885810pjs.44.2020.05.12.19.05.01
+ by smtp.gmail.com with ESMTPSA id p5sm3519484pgk.28.2020.05.12.19.06.35
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 12 May 2020 19:05:01 -0700 (PDT)
+ Tue, 12 May 2020 19:06:35 -0700 (PDT)
 Subject: Re: [PATCH v3 02/16] target/arm: Create gen_gvec_{u,s}{rshr,rsra}
 To: Peter Maydell <peter.maydell@linaro.org>
 References: <20200508152200.6547-1-richard.henderson@linaro.org>
  <20200508152200.6547-3-richard.henderson@linaro.org>
- <CAFEAcA9q6ZJqEzgfSTgLiFp0a708yhGjrEGArqhCKUQDVp8XLg@mail.gmail.com>
- <CAFEAcA9=yrvEZGRW0rj_1UyRQd0VFYCq7OWtN8ePGvsBajkaFQ@mail.gmail.com>
+ <CAFEAcA-JOwTRz1ZHEBrH5iLG3Qwf-7FvWUFvWvhP769aK-iEiQ@mail.gmail.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <bc85862d-bdce-3531-3776-3cdd65fc9e70@linaro.org>
-Date: Tue, 12 May 2020 19:04:59 -0700
+Message-ID: <c19aaaff-1add-6aae-bee2-6d1dcd54927e@linaro.org>
+Date: Tue, 12 May 2020 19:06:33 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9=yrvEZGRW0rj_1UyRQd0VFYCq7OWtN8ePGvsBajkaFQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA-JOwTRz1ZHEBrH5iLG3Qwf-7FvWUFvWvhP769aK-iEiQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -112,36 +110,15 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/12/20 6:46 AM, Peter Maydell wrote:
-> +void gen_gvec_srshr(unsigned vece, uint32_t rd_ofs, uint32_t rm_ofs,
-> +                    int64_t shift, uint32_t opr_sz, uint32_t max_sz)
-> +{
-> +    static const TCGOpcode vecop_list[] = {
-> +        INDEX_op_shri_vec, INDEX_op_sari_vec, INDEX_op_add_vec, 0
-> +    };
-> ﻿﻿﻿
-> Is there documentation somewhere of which vector operations don't
-> need to be listed in the vecop list? Here gen_srshr_vec() also
-> uses 'dupi_vec' and 'and_vec', which aren't listed, presumably
-> because we guarantee them to be implemented? (Hopefully we don't
-> encounter a future host vector architecture which breaks that
-> assumption :-))
-
-Yes, though perhaps not perfectly easy to find: it's at the top of tcg-op-vec.c.
-
-Correct, that the logicals and mov/dupi etc are mandatory and should not be
-listed.  Moreover, I assert that they are *not* listed, so we get a
-CONFIG_DEBUG_TCG check of this list both positive and negative.
-
-I'm going to hope that no future architecture is so irregular as to not
-implement logicals.  ;-)  Or even be as irregular as Intel.
-
->> I think the VRSRA case needs the same "shift = -shift" as VRSHR.
+On 5/12/20 6:51 AM, Peter Maydell wrote:
+>> +        tcg_gen_gvec_dup_imm(vece, rd_ofs, opr_sz, max_sz, 0);
 > 
-> With this bug fixed,
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Knew I'd forgotten a review comment -- should this "dup_imm to clear
+> to zeroes" be using a fixed element size rather than 'vece' to avoid
+> the "dup_imm doesn't handle 128 bits" issue? (Similarly elsewhere.)
 
-Thanks, fixed.
+
+No, because here we cannot have 128-bit elements (not 128-bit vectors).
 
 
 r~
