@@ -2,56 +2,106 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLACK,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55EDDC2D0F8
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 04:00:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23DC7C2D0F8
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 04:17:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05A9720673
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 04:00:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05A9720673
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	by mail.kernel.org (Postfix) with ESMTPS id CD7E8206F5
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 04:17:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BlbXhbl7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD7E8206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYiZ3-0001DD-1c
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 00:00:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57942)
+	id 1jYipJ-0000PD-0X
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 00:17:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33666)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aik@ozlabs.ru>)
- id 1jYiY6-0008GX-UD; Tue, 12 May 2020 23:59:14 -0400
-Received: from [107.174.27.60] (port=32932 helo=ozlabs.ru)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>)
- id 1jYiY2-0007u5-Cn; Tue, 12 May 2020 23:59:13 -0400
-Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
- by ozlabs.ru (Postfix) with ESMTP id 30F62AE80026;
- Tue, 12 May 2020 23:56:23 -0400 (EDT)
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-To: qemu-devel@nongnu.org
-Subject: [PATCH qemu v9] spapr: Implement Open Firmware client interface
-Date: Wed, 13 May 2020 13:58:26 +1000
-Message-Id: <20200513035826.14205-1-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.17.1
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jYioN-0008Cn-0L
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 00:16:03 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25740
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jYioK-0004I6-Up
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 00:16:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589343359;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=TuNECcjy5niF0eADzNigepKgC/Y/IudIVW60VDoQvN0=;
+ b=BlbXhbl7WMbhAIMkbYO/fqOo521MYXVAHFMSQGWx8JtztfYE+f2YQ9cmZvOp0BHAnkdUwK
+ PdntifHyJkjLuL2BBiV7gIdzcKACdRiQPUAvJZsjTpFeNBVQ+dUt3U4TAN2IO+4NDhmqoK
+ RjEkPRB+Z382+60+6GDPn2gCqgTY7rg=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-375-LeKN-xCXNVW49D0bR8wnMw-1; Wed, 13 May 2020 00:15:57 -0400
+X-MC-Unique: LeKN-xCXNVW49D0bR8wnMw-1
+Received: by mail-wm1-f70.google.com with SMTP id k17so2076255wmi.4
+ for <qemu-devel@nongnu.org>; Tue, 12 May 2020 21:15:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=TuNECcjy5niF0eADzNigepKgC/Y/IudIVW60VDoQvN0=;
+ b=Cy1SPjQSrGxs0w62+fkoorlP3lQmypRnHC6G+pMEGhcn3vR75/qVuicPmsh9LcHSKA
+ BC/8ilqOmR5foJTjTHSXjebkXXAPIdG7qvpB5AQIsPldy8S9pOfw/YCSLjGxcvY0xUcL
+ lL2jvmfDrYrRvKCgZdOIo7dYQd+E438mVm53qzEgt5X+Kcu+f0N//+G+ZyWhlkNHWMcw
+ FuFdSxN2l+YlJRe0LmAzuSeNhAo3FD6iuiH8y3/7bpSozB8yHJMWuSsAFGujF/Yh91Tf
+ wSH0cXy4fXgoVY0++pOh/F4AkJYa52hMEBD9+sMKfmvrOePwte9BmxuxSaoM5/eQqgab
+ 9keA==
+X-Gm-Message-State: AGi0PuZ2dyFXljt4fm9v/t4MbWTSdb0LzyLZTD8nDPtKoODYaOYLlYYz
+ FqcxDcPRpCAZdtomzOeBHvHm21IDMnzuzD7wTfY4LETCSIRQrGzjooAzeuu+L5HndFshlo6m0/+
+ a5cvy5Qxoo1x3d4k=
+X-Received: by 2002:a5d:54c4:: with SMTP id x4mr30369525wrv.73.1589343355797; 
+ Tue, 12 May 2020 21:15:55 -0700 (PDT)
+X-Google-Smtp-Source: APiQypK/m3Dr7rT85Iul/eWi/WZoLQ2tg4UxIhvT+Oi3jHBVa9ufdEYm92sw3Uzi+Fjz/CKA1cg6rg==
+X-Received: by 2002:a5d:54c4:: with SMTP id x4mr30369489wrv.73.1589343355503; 
+ Tue, 12 May 2020 21:15:55 -0700 (PDT)
+Received: from redhat.com (bzq-79-179-68-225.red.bezeqint.net. [79.179.68.225])
+ by smtp.gmail.com with ESMTPSA id w15sm24517011wrl.73.2020.05.12.21.15.53
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 12 May 2020 21:15:54 -0700 (PDT)
+Date: Wed, 13 May 2020 00:15:51 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Dima Stepanov <dimastep@yandex-team.ru>
+Subject: Re: [PATCH v2 5/5] vhost: add device started check in migration set
+ log
+Message-ID: <20200512235934-mutt-send-email-mst@kernel.org>
+References: <cover.1588252861.git.dimastep@yandex-team.ru>
+ <d25241eb1fe7a55fc7dbe63ecedb4f1adf407837.1588252862.git.dimastep@yandex-team.ru>
+ <ed805147-d87d-5ac2-3196-367981b0679c@redhat.com>
+ <20200511092541.GA27558@dimastep-nix>
+ <fd260f1f-75f3-46ac-8ca5-bbb7e41e712f@redhat.com>
+ <20200512093521.GA5363@dimastep-nix>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20200512093521.GA5363@dimastep-nix>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-X-Host-Lookup-Failed: Reverse DNS lookup failed for 107.174.27.60 (failed)
-Received-SPF: pass client-ip=107.174.27.60; envelope-from=aik@ozlabs.ru;
- helo=ozlabs.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 22:44:02
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, RDNS_NONE=0.793,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/12 21:16:59
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -65,1925 +115,258 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: fam@euphon.net, kwolf@redhat.com, stefanha@redhat.com,
+ qemu-block@nongnu.org, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, arei.gonglei@huawei.com, fengli@smartx.com,
+ yc-core@yandex-team.ru, pbonzini@redhat.com, marcandre.lureau@redhat.com,
+ raphael.norwitz@nutanix.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The PAPR platform which describes an OS environment that's presented by
-a combination of a hypervisor and firmware. The features it specifies
-require collaboration between the firmware and the hypervisor.
+On Tue, May 12, 2020 at 12:35:30PM +0300, Dima Stepanov wrote:
+> On Tue, May 12, 2020 at 11:32:50AM +0800, Jason Wang wrote:
+> > 
+> > On 2020/5/11 下午5:25, Dima Stepanov wrote:
+> > >On Mon, May 11, 2020 at 11:15:53AM +0800, Jason Wang wrote:
+> > >>On 2020/4/30 下午9:36, Dima Stepanov wrote:
+> > >>>If vhost-user daemon is used as a backend for the vhost device, then we
+> > >>>should consider a possibility of disconnect at any moment. If such
+> > >>>disconnect happened in the vhost_migration_log() routine the vhost
+> > >>>device structure will be clean up.
+> > >>>At the start of the vhost_migration_log() function there is a check:
+> > >>>   if (!dev->started) {
+> > >>>       dev->log_enabled = enable;
+> > >>>       return 0;
+> > >>>   }
+> > >>>To be consistent with this check add the same check after calling the
+> > >>>vhost_dev_set_log() routine. This in general help not to break a
+> > >>>migration due the assert() message. But it looks like that this code
+> > >>>should be revised to handle these errors more carefully.
+> > >>>
+> > >>>In case of vhost-user device backend the fail paths should consider the
+> > >>>state of the device. In this case we should skip some function calls
+> > >>>during rollback on the error paths, so not to get the NULL dereference
+> > >>>errors.
+> > >>>
+> > >>>Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+> > >>>---
+> > >>>  hw/virtio/vhost.c | 39 +++++++++++++++++++++++++++++++++++----
+> > >>>  1 file changed, 35 insertions(+), 4 deletions(-)
+> > >>>
+> > >>>diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> > >>>index 3ee50c4..d5ab96d 100644
+> > >>>--- a/hw/virtio/vhost.c
+> > >>>+++ b/hw/virtio/vhost.c
+> > >>>@@ -787,6 +787,17 @@ static int vhost_dev_set_features(struct vhost_dev *dev,
+> > >>>  static int vhost_dev_set_log(struct vhost_dev *dev, bool enable_log)
+> > >>>  {
+> > >>>      int r, i, idx;
+> > >>>+
+> > >>>+    if (!dev->started) {
+> > >>>+        /*
+> > >>>+         * If vhost-user daemon is used as a backend for the
+> > >>>+         * device and the connection is broken, then the vhost_dev
+> > >>>+         * structure will be reset all its values to 0.
+> > >>>+         * Add additional check for the device state.
+> > >>>+         */
+> > >>>+        return -1;
+> > >>>+    }
+> > >>>+
+> > >>>      r = vhost_dev_set_features(dev, enable_log);
+> > >>>      if (r < 0) {
+> > >>>          goto err_features;
+> > >>>@@ -801,12 +812,19 @@ static int vhost_dev_set_log(struct vhost_dev *dev, bool enable_log)
+> > >>>      }
+> > >>>      return 0;
+> > >>>  err_vq:
+> > >>>-    for (; i >= 0; --i) {
+> > >>>+    /*
+> > >>>+     * Disconnect with the vhost-user daemon can lead to the
+> > >>>+     * vhost_dev_cleanup() call which will clean up vhost_dev
+> > >>>+     * structure.
+> > >>>+     */
+> > >>>+    for (; dev->started && (i >= 0); --i) {
+> > >>>          idx = dev->vhost_ops->vhost_get_vq_index(
+> > >>
+> > >>Why need the check of dev->started here, can started be modified outside
+> > >>mainloop? If yes, I don't get the check of !dev->started in the beginning of
+> > >>this function.
+> > >>
+> > >No dev->started can't change outside the mainloop. The main problem is
+> > >only for the vhost_user_blk daemon. Consider the case when we
+> > >successfully pass the dev->started check at the beginning of the
+> > >function, but after it we hit the disconnect on the next call on the
+> > >second or third iteration:
+> > >      r = vhost_virtqueue_set_addr(dev, dev->vqs + i, idx, enable_log);
+> > >The unix socket backend device will call the disconnect routine for this
+> > >device and reset the structure. So the structure will be reset (and
+> > >dev->started set to false) inside this set_addr() call.
+> > 
+> > 
+> > I still don't get here. I think the disconnect can not happen in the middle
+> > of vhost_dev_set_log() since both of them were running in mainloop. And even
+> > if it can, we probably need other synchronization mechanism other than
+> > simple check here.
+> Disconnect isn't happened in the separate thread it is happened in this
+> routine inside vhost_dev_set_log. When for instance vhost_user_write()
+> call failed:
+>   vhost_user_set_log_base()
+>     vhost_user_write()
+>       vhost_user_blk_disconnect()
+>         vhost_dev_cleanup()
+>           vhost_user_backend_cleanup()
+> So the point is that if we somehow got a disconnect with the
+> vhost-user-blk daemon before the vhost_user_write() call then it will
+> continue clean up by running vhost_user_blk_disconnect() function. I
+> wrote a more detailed backtrace stack in the separate thread, which is
+> pretty similar to what we have here:
+>   Re: [PATCH v2 4/5] vhost: check vring address before calling unmap
+> The places are different but the problem is pretty similar.
+> 
+> So if vhost-user commands handshake then everything is fine and
+> reconnect will work as expected. The only problem is how to handle
+> reconnect properly between vhost-user command send/receive.
 
-Since the beginning, the runtime component of the firmware (RTAS) has
-been implemented as a 20 byte shim which simply forwards it to
-a hypercall implemented in qemu. The boot time firmware component is
-SLOF - but a build that's specific to qemu, and has always needed to be
-updated in sync with it. Even though we've managed to limit the amount
-of runtime communication we need between qemu and SLOF, there's some,
-and it has become increasingly awkward to handle as we've implemented
-new features.
 
-This implements a boot time OF client interface (CI) which is
-enabled by a new "x-vof" pseries machine option (stands for "Virtual Open
-Firmware). When enabled, QEMU implements the custom H_OF_CLIENT hcall
-which implements Open Firmware Client Interface (OF CI). This allows
-using a smaller stateless firmware which does not have to manage
-the device tree.
 
-The new "vof.bin" firmware image is included with source code under
-pc-bios/. It also includes RTAS blob.
+So vhost net had this problem too.
 
-This implements a handful of CI methods just to get -kernel/-initrd
-working. In particular, this implements the device tree fetching and
-simple memory allocator - "claim" (an OF CI memory allocator) and updates
-"/memory@0/available" to report the client about available memory.
+commit e7c83a885f865128ae3cf1946f8cb538b63cbfba
+Author: Marc-André Lureau <marcandre.lureau@redhat.com>
+Date:   Mon Feb 27 14:49:56 2017 +0400
 
-This implements changing some device tree properties which we know how
-to deal with, the rest is ignored. To allow changes, this skips
-fdt_pack() when x-vof=on as not packing the blob leaves some room for
-appending.
+    vhost-user: delay vhost_user_stop
+    
+    Since commit b0a335e351103bf92f3f9d0bd5759311be8156ac, a socket write
+    may trigger a disconnect events, calling vhost_user_stop() and clearing
+    all the vhost_dev strutures holding data that vhost.c functions expect
+    to remain valid. Delay the cleanup to keep the vhost_dev structure
+    valid during the vhost.c functions.
+    
+    Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+    Message-id: 20170227104956.24729-1-marcandre.lureau@redhat.com
+    Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-In absence of SLOF, this assigns phandles to device tree nodes to make
-device tree traversing work.
+it now has this code to address this:
 
-When x-vof=on, this adds "/chosen" every time QEMU (re)builds a tree.
 
-This adds basic instances support which are managed by a hash map
-ihandle -> [phandle].
+    case CHR_EVENT_CLOSED:
+        /* a close event may happen during a read/write, but vhost
+         * code assumes the vhost_dev remains setup, so delay the
+         * stop & clear to idle.
+         * FIXME: better handle failure in vhost code, remove bh
+         */
+        if (s->watch) {
+            AioContext *ctx = qemu_get_current_aio_context();
 
-Before the guest started, the used memory is:
-0..4000 - the initial firmware
-10000..180000 - stack
+            g_source_remove(s->watch);
+            s->watch = 0;
+            qemu_chr_fe_set_handlers(&s->chr, NULL, NULL, NULL, NULL,
+                                     NULL, NULL, false);
 
-This OF CI does not implement "interpret".
+            aio_bh_schedule_oneshot(ctx, chr_closed_bh, opaque);
+        }
+        break;
 
-With this basic support, this can only boot into kernel directly.
-However this is just enough for the petitboot kernel and initradmdisk to
-boot from any possible source. Note this requires reasonably recent guest
-kernel with:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=df5be5be8735
+I think it's time we dropped the FIXME and moved the handling to common
+code. Jason? Marc-André?
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
 
-The example command line is:
 
-pbuild/qemu-killslof-localhost-ppc64/ppc64-softmmu/qemu-system-ppc64 \
--nodefaults \
--chardev stdio,id=STDIO0,signal=off,mux=on \
--device spapr-vty,id=svty0,reg=0x71000110,chardev=STDIO0 \
--mon id=MON0,chardev=STDIO0,mode=readline \
--nographic \
--vga none \
--machine pseries,x-vof=on,cap-cfpc=broken,cap-sbbc=broken,cap-ibs=broken,cap-ccf-assist=off \
--m 16G \
--kernel pbuild/kernel-le-guest/vmlinux \
--initrd pb/rootfs.cpio.xz \
--device virtio-scsi-pci,id=vscsi0 \
--drive id=DRIVE0,if=none,file=img/f30le.qcow2,format=qcow2 \
--device scsi-hd,id=scsi-hd0,drive=DRIVE0 \
--enable-kvm \
--bios p/qemu-killslof/pc-bios/vof.bin \
--snapshot \
--smp 1 \
--L /home/aik/t/qemu-ppc64-bios/ \
--trace events=qemu_trace_events \
--d guest_errors \
--chardev socket,id=SOCKET0,server,nowait,path=qemu.mon.ssh55056 \
--mon chardev=SOCKET0,mode=control
 
----
-Changes:
-v9:
-* remove special handling of /rtas/rtas-size as now we always add it in QEMU
-* removed leftovers from scsi/grub/stdout/stdin/...
 
-v8:
-* no read/write/seek
-* no @dev in instances
-* the machine flag is "x-vof" for now
-
-v7:
-* now we have a small firmware which loads at 0 as SLOF and starts from
-0x100 as SLOF
-* no MBR/ELF/GRUB business in QEMU anymore
-* blockdev is a separate patch
-* networking is a separate patch
-
-v6:
-* borrowed a big chunk of commit log introduction from David
-* fixed initial stack pointer (points to the highest address of stack)
-* traces for "interpret" and others
-* disabled  translate_kernel_address() hack so grub can load (work in
-progress)
-* added "milliseconds" for grub
-* fixed "claim" allocator again
-* moved FDT_MAX_SIZE to spapr.h as spapr_of_client.c wants it too for CAS
-* moved the most code possible from spapr.c to spapr_of_client.c, such as
-RTAS, prom entry and FDT build/finalize
-* separated blobs
-* GRUB now proceeds to its console prompt (there are still other issues)
-* parse MBR/GPT to find PReP and load GRUB
-
-v5:
-* made instances keep device and chardev pointers
-* removed VIO dependencies
-* print error if RTAS memory is not claimed as it should have been
-* pack FDT as "quiesce"
-
-v4:
-* fixed open
-* validate ihandles in "call-method"
-
-v3:
-* fixed phandles allocation
-* s/__be32/uint32_t/ as we do not normally have __be32 type in qemu
-* fixed size of /chosen/stdout
-* bunch of renames
-* do not create rtas properties at all, let the client deal with it;
-instead setprop allows changing these in the FDT
-* no more packing FDT when bios=off - nobody needs it and getprop does not
-work otherwise
-* allow updating initramdisk device tree properties (for zImage)
-* added instances
-* fixed stdout on OF's "write"
-* removed special handling for stdout in OF client, spapr-vty handles it
-instead
-
-v2:
-* fixed claim()
-* added "setprop"
-* cleaner client interface and RTAS blobs management
-* boots to petitboot and further to the target system
-* more trace points
----
- hw/ppc/Makefile.objs     |    1 +
- pc-bios/vof/Makefile     |   18 +
- include/hw/ppc/spapr.h   |   14 +-
- pc-bios/vof/vof.h        |   44 ++
- hw/ppc/spapr.c           |   59 ++-
- hw/ppc/spapr_hcall.c     |    6 +-
- hw/ppc/spapr_of_client.c | 1011 ++++++++++++++++++++++++++++++++++++++
- pc-bios/vof/bootmem.c    |   13 +
- pc-bios/vof/ci.c         |  108 ++++
- pc-bios/vof/libc.c       |   91 ++++
- pc-bios/vof/main.c       |   22 +
- hw/ppc/trace-events      |   21 +
- pc-bios/README           |    2 +
- pc-bios/vof.bin          |  Bin 0 -> 3680 bytes
- pc-bios/vof/entry.S      |   51 ++
- pc-bios/vof/l.lds        |   48 ++
- 16 files changed, 1498 insertions(+), 11 deletions(-)
- create mode 100644 pc-bios/vof/Makefile
- create mode 100644 pc-bios/vof/vof.h
- create mode 100644 hw/ppc/spapr_of_client.c
- create mode 100644 pc-bios/vof/bootmem.c
- create mode 100644 pc-bios/vof/ci.c
- create mode 100644 pc-bios/vof/libc.c
- create mode 100644 pc-bios/vof/main.c
- create mode 100755 pc-bios/vof.bin
- create mode 100644 pc-bios/vof/entry.S
- create mode 100644 pc-bios/vof/l.lds
-
-diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-index c3d3cc56eb51..70aa7918ba8a 100644
---- a/hw/ppc/Makefile.objs
-+++ b/hw/ppc/Makefile.objs
-@@ -8,6 +8,7 @@ obj-$(CONFIG_PSERIES) += spapr_hcall.o spapr_iommu.o spapr_rtas.o
- obj-$(CONFIG_PSERIES) += spapr_pci.o spapr_rtc.o spapr_drc.o
- obj-$(CONFIG_PSERIES) += spapr_cpu_core.o spapr_ovec.o spapr_irq.o
- obj-$(CONFIG_PSERIES) += spapr_tpm_proxy.o spapr_nvdimm.o
-+obj-$(CONFIG_PSERIES) += spapr_of_client.o
- obj-$(CONFIG_SPAPR_RNG) +=  spapr_rng.o
- obj-$(call land,$(CONFIG_PSERIES),$(CONFIG_LINUX)) += spapr_pci_vfio.o spapr_pci_nvlink2.o
- # IBM PowerNV
-diff --git a/pc-bios/vof/Makefile b/pc-bios/vof/Makefile
-new file mode 100644
-index 000000000000..49f7e240eeff
---- /dev/null
-+++ b/pc-bios/vof/Makefile
-@@ -0,0 +1,18 @@
-+all: build-all
-+
-+build-all: vof.bin
-+
-+%.o: %.S
-+	cc -m32 -mbig-endian -c -o $@ $<
-+
-+%.o: %.c
-+	cc -m32 -mbig-endian -c -fno-stack-protector -Wno-builtin-declaration-mismatch -o $@ $<
-+
-+vof.elf: entry.o main.o libc.o ci.o bootmem.o
-+	ld -nostdlib -e_start -Tl.lds -EB -o $@ $^
-+
-+%.bin: %.elf
-+	objcopy -O binary -j .text -j .data -j .toc -j .got2 $^ $@
-+
-+clean:
-+	rm -f *.o *.bin *.elf *~
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index e579eaf28c05..1f03b86ec355 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -165,6 +165,13 @@ struct SpaprMachineState {
-     long kernel_size;
-     bool kernel_le;
-     uint64_t kernel_addr;
-+    bool vof; /* Virtual Open Firmware */
-+    uint32_t rtas_base;
-+    GArray *claimed; /* array of SpaprOfClaimed */
-+    uint64_t claimed_base;
-+    GHashTable *of_instances; /* ihandle -> SpaprOfInstance */
-+    uint32_t of_instance_last;
-+    char *bootargs;
-     uint32_t initrd_base;
-     long initrd_size;
-     uint64_t rtc_offset; /* Now used only during incoming migration */
-@@ -539,7 +546,8 @@ struct SpaprMachineState {
- /* Client Architecture support */
- #define KVMPPC_H_CAS            (KVMPPC_HCALL_BASE + 0x2)
- #define KVMPPC_H_UPDATE_DT      (KVMPPC_HCALL_BASE + 0x3)
--#define KVMPPC_HCALL_MAX        KVMPPC_H_UPDATE_DT
-+#define KVMPPC_H_OF_CLIENT      (KVMPPC_HCALL_BASE + 0x5)
-+#define KVMPPC_HCALL_MAX        KVMPPC_H_OF_CLIENT
- 
- /*
-  * The hcall range 0xEF00 to 0xEF80 is reserved for use in facilitating
-@@ -809,6 +817,10 @@ struct SpaprEventLogEntry {
- void *spapr_build_fdt(SpaprMachineState *spapr, bool reset, size_t space);
- void spapr_events_init(SpaprMachineState *sm);
- void spapr_dt_events(SpaprMachineState *sm, void *fdt);
-+void spapr_setup_of_client(SpaprMachineState *spapr, target_ulong *stack_ptr);
-+void spapr_of_client_dt(SpaprMachineState *spapr, void *fdt);
-+void spapr_of_client_dt_finalize(SpaprMachineState *spapr);
-+void spapr_of_client_machine_init(SpaprMachineState *spapr);
- void close_htab_fd(SpaprMachineState *spapr);
- void spapr_setup_hpt(SpaprMachineState *spapr);
- void spapr_free_hpt(SpaprMachineState *spapr);
-diff --git a/pc-bios/vof/vof.h b/pc-bios/vof/vof.h
-new file mode 100644
-index 000000000000..cd5989952a98
---- /dev/null
-+++ b/pc-bios/vof/vof.h
-@@ -0,0 +1,44 @@
-+#include <stdarg.h>
-+
-+typedef unsigned char uint8_t;
-+typedef unsigned short uint16_t;
-+typedef unsigned long uint32_t;
-+typedef unsigned long long uint64_t;
-+#define NULL (0)
-+#define PROM_ERROR (-1u)
-+typedef unsigned char bool;
-+typedef unsigned long ihandle;
-+typedef unsigned long phandle;
-+#define false ((bool)0)
-+#define true ((bool)1)
-+typedef int size_t;
-+typedef void client(void);
-+
-+/* globals */
-+extern void _prom_entry(void); /* OF CI entry point (i.e. this firmware) */
-+
-+void do_boot(unsigned long addr, unsigned long r3, unsigned long r4);
-+
-+/* libc */
-+int strlen(const char *s);
-+int strcmp(const char *s1, const char *s2);
-+void *memcpy(void *dest, const void *src, size_t n);
-+int memcmp(const void *ptr1, const void *ptr2, size_t n);
-+void *memmove(void *dest, const void *src, size_t n);
-+void *memset(void *dest, int c, size_t size);
-+
-+/* Prom */
-+typedef unsigned long prom_arg_t;
-+int call_prom(const char *service, int nargs, int nret, ...);
-+
-+/* CI wrappers */
-+void ci_panic(const char *str);
-+phandle ci_finddevice(const char *path);
-+uint32_t ci_getprop(phandle ph, const char *propname, void *prop, int len);
-+ihandle ci_open(const char *path);
-+void ci_close(ihandle ih);
-+void *ci_claim(void *virt, uint32_t size, uint32_t align);
-+uint32_t ci_release(void *virt, uint32_t size);
-+
-+/* booting from -kernel */
-+void boot_from_memory(uint64_t initrd, uint64_t initrdsize);
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index c18eab0a2305..c5ba684db3c2 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -99,6 +99,7 @@
- #define RTAS_MAX_ADDR           0x80000000 /* RTAS must stay below that */
- #define FW_MAX_SIZE             0x400000
- #define FW_FILE_NAME            "slof.bin"
-+#define FW_FILE_NAME_VOF        "vof.bin"
- #define FW_OVERHEAD             0x2800000
- #define KERNEL_LOAD_ADDR        FW_MAX_SIZE
- 
-@@ -1286,6 +1287,9 @@ void *spapr_build_fdt(SpaprMachineState *spapr, bool reset, size_t space)
-     if (mc->nvdimm_supported) {
-         spapr_dt_persistent_memory(fdt);
-     }
-+    if (spapr->vof) {
-+        spapr_of_client_dt(spapr, fdt);
-+    }
- 
-     return fdt;
- }
-@@ -1682,22 +1686,36 @@ static void spapr_machine_reset(MachineState *machine)
- 
-     fdt = spapr_build_fdt(spapr, true, FDT_MAX_SIZE);
- 
--    rc = fdt_pack(fdt);
--
--    /* Should only fail if we've built a corrupted tree */
--    assert(rc == 0);
--
--    /* Load the fdt */
-     qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
--    cpu_physical_memory_write(fdt_addr, fdt, fdt_totalsize(fdt));
-+
-     g_free(spapr->fdt_blob);
-     spapr->fdt_size = fdt_totalsize(fdt);
-     spapr->fdt_initial_size = spapr->fdt_size;
-     spapr->fdt_blob = fdt;
- 
-     /* Set up the entry state */
--    spapr_cpu_set_entry_state(first_ppc_cpu, SPAPR_ENTRY_POINT, 0, fdt_addr, 0);
-     first_ppc_cpu->env.gpr[5] = 0;
-+    if (spapr->vof) {
-+        target_ulong stack_ptr = 0;
-+
-+        spapr_setup_of_client(spapr, &stack_ptr);
-+        spapr_of_client_dt_finalize(spapr);
-+        spapr_cpu_set_entry_state(first_ppc_cpu, SPAPR_ENTRY_POINT,
-+                                  stack_ptr, spapr->initrd_base,
-+                                  spapr->initrd_size);
-+    } else {
-+        /* Load the fdt */
-+        rc = fdt_pack(spapr->fdt_blob);
-+        /* Should only fail if we've built a corrupted tree */
-+        assert(rc == 0);
-+
-+        spapr->fdt_size = fdt_totalsize(spapr->fdt_blob);
-+        spapr->fdt_initial_size = spapr->fdt_size;
-+        cpu_physical_memory_write(fdt_addr, spapr->fdt_blob, spapr->fdt_size);
-+
-+        spapr_cpu_set_entry_state(first_ppc_cpu, SPAPR_ENTRY_POINT,
-+                                  0, fdt_addr, 0);
-+    }
- 
-     spapr->fwnmi_system_reset_addr = -1;
-     spapr->fwnmi_machine_check_addr = -1;
-@@ -3011,7 +3029,7 @@ static void spapr_machine_init(MachineState *machine)
-     }
- 
-     if (bios_name == NULL) {
--        bios_name = FW_FILE_NAME;
-+        bios_name = spapr->vof ? FW_FILE_NAME_VOF : FW_FILE_NAME;
-     }
-     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
-     if (!filename) {
-@@ -3025,6 +3043,10 @@ static void spapr_machine_init(MachineState *machine)
-     }
-     g_free(filename);
- 
-+    if (spapr->vof) {
-+        spapr_of_client_machine_init(spapr);
-+    }
-+
-     /* FIXME: Should register things through the MachineState's qdev
-      * interface, this is a legacy from the sPAPREnvironment structure
-      * which predated MachineState but had a similar function */
-@@ -3230,6 +3252,20 @@ static void spapr_set_resize_hpt(Object *obj, const char *value, Error **errp)
-     }
- }
- 
-+static bool spapr_get_vof(Object *obj, Error **errp)
-+{
-+    SpaprMachineState *spapr = SPAPR_MACHINE(obj);
-+
-+    return spapr->vof;
-+}
-+
-+static void spapr_set_vof(Object *obj, bool value, Error **errp)
-+{
-+    SpaprMachineState *spapr = SPAPR_MACHINE(obj);
-+
-+    spapr->vof = value;
-+}
-+
- static char *spapr_get_ic_mode(Object *obj, Error **errp)
- {
-     SpaprMachineState *spapr = SPAPR_MACHINE(obj);
-@@ -3345,6 +3381,11 @@ static void spapr_instance_init(Object *obj)
-                                     " for -kernel is the default",
-                                     NULL);
-     spapr->kernel_addr = KERNEL_LOAD_ADDR;
-+    object_property_add_bool(obj, "x-vof", spapr_get_vof, spapr_set_vof, NULL);
-+    object_property_set_description(obj, "x-vof",
-+                                    "Enable Virtual Open Firmware", NULL);
-+    spapr->vof = false;
-+
-     /* The machine class defines the default interrupt controller mode */
-     spapr->irq = smc->irq;
-     object_property_add_str(obj, "ic-mode", spapr_get_ic_mode,
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 0f54988f2e28..27cadc5683b3 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1828,13 +1828,17 @@ target_ulong do_client_architecture_support(PowerPCCPU *cpu,
-         spapr_setup_hpt(spapr);
-     }
- 
--    fdt = spapr_build_fdt(spapr, false, fdt_bufsize);
-+    fdt = spapr_build_fdt(spapr, spapr->vof, fdt_bufsize);
- 
-     g_free(spapr->fdt_blob);
-     spapr->fdt_size = fdt_totalsize(fdt);
-     spapr->fdt_initial_size = spapr->fdt_size;
-     spapr->fdt_blob = fdt;
- 
-+    if (spapr->vof) {
-+        spapr_of_client_dt_finalize(spapr);
-+    }
-+
-     return H_SUCCESS;
- }
- 
-diff --git a/hw/ppc/spapr_of_client.c b/hw/ppc/spapr_of_client.c
-new file mode 100644
-index 000000000000..82824501aa9c
---- /dev/null
-+++ b/hw/ppc/spapr_of_client.c
-@@ -0,0 +1,1011 @@
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include <sys/ioctl.h>
-+#include "qapi/error.h"
-+#include "hw/ppc/spapr.h"
-+#include "hw/ppc/spapr_vio.h"
-+#include "hw/ppc/fdt.h"
-+#include "sysemu/sysemu.h"
-+#include "qom/qom-qobject.h"
-+#include "trace.h"
-+
-+/*
-+ * OF 1275 "nextprop" description suggests is it 32 bytes max but
-+ * LoPAPR defines "ibm,query-interrupt-source-number" which is 33 chars long.
-+ */
-+#define OF_PROPNAME_LEN_MAX 64
-+
-+/* Copied from SLOF, and 4K is definitely not enough for GRUB */
-+#define OF_STACK_SIZE       0x8000
-+
-+/* 0..10000 is reserved for the VOF fw */
-+#define OF_STACK_ADDR       0x10000
-+
-+#define ALIGN(x, a) (((x) + (a) - 1) & ~((a) - 1))
-+
-+typedef struct {
-+    uint64_t start;
-+    uint64_t size;
-+} SpaprOfClaimed;
-+
-+typedef struct {
-+    char *params;
-+    char *path; /* the path used to open the instance */
-+    uint32_t phandle;
-+} SpaprOfInstance;
-+
-+/* Defined as Big Endian */
-+struct prom_args {
-+    uint32_t service;
-+    uint32_t nargs;
-+    uint32_t nret;
-+    uint32_t args[10];
-+};
-+
-+static void readstr(hwaddr pa, char *buf, int size)
-+{
-+    cpu_physical_memory_read(pa, buf, size);
-+    if (buf[size - 1] != '\0') {
-+        buf[size - 1] = '\0';
-+        if (strlen(buf) == size - 1) {
-+            trace_spapr_of_client_error_str_truncated(buf, size);
-+        }
-+    }
-+}
-+
-+static bool cmpservice(const char *s, size_t len,
-+                       unsigned nargs, unsigned nret,
-+                       const char *s1, size_t len1,
-+                       unsigned nargscheck, unsigned nretcheck)
-+{
-+    if (strcmp(s, s1)) {
-+        return false;
-+    }
-+    if ((nargscheck && (nargs != nargscheck)) ||
-+        (nretcheck && (nret != nretcheck))) {
-+        trace_spapr_of_client_error_param(s, nargscheck, nretcheck, nargs,
-+                                          nret);
-+        return false;
-+    }
-+
-+    return true;
-+}
-+
-+static void split_path(const char *fullpath, char **node, char **unit,
-+                       char **part)
-+{
-+    const char *c, *p = NULL, *u = NULL;
-+
-+    *node = *unit = *part = NULL;
-+
-+    if (fullpath[0] == '\0') {
-+        *node = g_strdup(fullpath);
-+        return;
-+    }
-+
-+    for (c = fullpath + strlen(fullpath) - 1; c > fullpath; --c) {
-+        if (*c == '/') {
-+            break;
-+        }
-+        if (*c == ':') {
-+            p = c + 1;
-+            continue;
-+        }
-+        if (*c == '@') {
-+            u = c + 1;
-+            continue;
-+        }
-+    }
-+
-+    if (p && u && p < u) {
-+        p = NULL;
-+    }
-+
-+    if (u && p) {
-+        *node = g_strndup(fullpath, u - fullpath - 1);
-+        *unit = g_strndup(u, p - u - 1);
-+        *part = g_strdup(p);
-+    } else if (!u && p) {
-+        *node = g_strndup(fullpath, p - fullpath - 1);
-+        *part = g_strdup(p);
-+    } else if (!p && u) {
-+        *node = g_strndup(fullpath, u - fullpath - 1);
-+        *unit = g_strdup(u);
-+    } else {
-+        *node = g_strdup(fullpath);
-+    }
-+}
-+
-+static void prop_format(char *tval, int tlen, const void *prop, int len)
-+{
-+    int i;
-+    const char *c;
-+    char *t;
-+    const char bin[] = "...";
-+
-+    for (i = 0, c = prop; i < len; ++i, ++c) {
-+        if (*c == '\0' && i == len - 1) {
-+            strncpy(tval, prop, tlen - 1);
-+            return;
-+        }
-+        if (*c < 0x20 || *c >= 0x80) {
-+            break;
-+        }
-+    }
-+
-+    for (i = 0, c = prop, t = tval; i < len; ++i, ++c) {
-+        if (t >= tval + tlen - sizeof(bin) - 1 - 2 - 1) {
-+            strcpy(t, bin);
-+            return;
-+        }
-+        if (i && i % 4 == 0 && i != len - 1) {
-+            strcat(t, " ");
-+            ++t;
-+        }
-+        t += sprintf(t, "%02X", *c & 0xFF);
-+    }
-+}
-+
-+static int of_client_fdt_path_offset(const void *fdt, const char *node,
-+                                     const char *unit)
-+{
-+    int offset;
-+
-+    offset = fdt_path_offset(fdt, node);
-+
-+    if (offset < 0 && unit) {
-+        char *tmp = g_strdup_printf("%s@%s", node, unit);
-+
-+        offset = fdt_path_offset(fdt, tmp);
-+        g_free(tmp);
-+    }
-+
-+    return offset;
-+}
-+
-+static uint32_t of_client_finddevice(const void *fdt, uint32_t nodeaddr)
-+{
-+    char *node, *unit, *part;
-+    char fullnode[1024];
-+    uint32_t ret = -1;
-+    int offset;
-+
-+    readstr(nodeaddr, fullnode, sizeof(fullnode));
-+
-+    split_path(fullnode, &node, &unit, &part);
-+    offset = of_client_fdt_path_offset(fdt, node, unit);
-+    if (offset >= 0) {
-+        ret = fdt_get_phandle(fdt, offset);
-+    }
-+    trace_spapr_of_client_finddevice(fullnode, ret);
-+    g_free(node);
-+    g_free(unit);
-+    g_free(part);
-+    return (uint32_t) ret;
-+}
-+
-+static uint32_t of_client_getprop(const void *fdt, uint32_t nodeph,
-+                                  uint32_t pname, uint32_t valaddr,
-+                                  uint32_t vallen)
-+{
-+    char propname[OF_PROPNAME_LEN_MAX + 1];
-+    uint32_t ret = 0;
-+    int proplen = 0;
-+    const void *prop;
-+    char trval[64] = "";
-+    int nodeoff = fdt_node_offset_by_phandle(fdt, nodeph);
-+
-+    readstr(pname, propname, sizeof(propname));
-+    if (strcmp(propname, "name") == 0) {
-+        prop = fdt_get_name(fdt, nodeoff, &proplen);
-+        proplen += 1;
-+    } else {
-+        prop = fdt_getprop(fdt, nodeoff, propname, &proplen);
-+    }
-+
-+    if (prop) {
-+        int cb = MIN(proplen, vallen);
-+
-+        cpu_physical_memory_write(valaddr, prop, cb);
-+        /*
-+         * OF1275 says:
-+         * "Size is either the actual size of the property, or –1 if name
-+         * does not exist", hence returning proplen instead of cb.
-+         */
-+        ret = proplen;
-+        prop_format(trval, sizeof(trval), prop, ret);
-+    } else {
-+        ret = -1;
-+    }
-+    trace_spapr_of_client_getprop(nodeph, propname, ret, trval);
-+
-+    return ret;
-+}
-+
-+static uint32_t of_client_getproplen(const void *fdt, uint32_t nodeph,
-+                                     uint32_t pname)
-+{
-+    char propname[OF_PROPNAME_LEN_MAX + 1];
-+    uint32_t ret = 0;
-+    int proplen = 0;
-+    const void *prop;
-+    int nodeoff = fdt_node_offset_by_phandle(fdt, nodeph);
-+
-+    readstr(pname, propname, sizeof(propname));
-+    if (strcmp(propname, "name") == 0) {
-+        prop = fdt_get_name(fdt, nodeoff, &proplen);
-+        proplen += 1;
-+    } else {
-+        prop = fdt_getprop(fdt, nodeoff, propname, &proplen);
-+    }
-+
-+    if (prop) {
-+        ret = proplen;
-+    } else {
-+        ret = -1;
-+    }
-+    trace_spapr_of_client_getproplen(nodeph, propname, ret);
-+
-+    return ret;
-+}
-+
-+static uint32_t of_client_setprop(SpaprMachineState *spapr,
-+                                  uint32_t nodeph, uint32_t pname,
-+                                  uint32_t valaddr, uint32_t vallen)
-+{
-+    char propname[OF_PROPNAME_LEN_MAX + 1];
-+    uint32_t ret = -1;
-+    int offset;
-+    char trval[64] = "";
-+
-+    readstr(pname, propname, sizeof(propname));
-+    /*
-+     * We only allow changing properties which we know how to update on
-+     * the QEMU side.
-+     */
-+    if (vallen == sizeof(uint32_t)) {
-+        uint32_t val32 = ldl_be_phys(first_cpu->as, valaddr);
-+
-+        if ((strcmp(propname, "linux,rtas-base") == 0) ||
-+            (strcmp(propname, "linux,rtas-entry") == 0)) {
-+            spapr->rtas_base = val32;
-+        } else if (strcmp(propname, "linux,initrd-start") == 0) {
-+            spapr->initrd_base = val32;
-+        } else if (strcmp(propname, "linux,initrd-end") == 0) {
-+            spapr->initrd_size = val32 - spapr->initrd_base;
-+        } else {
-+            goto trace_exit;
-+        }
-+    } else if (vallen == sizeof(uint64_t)) {
-+        uint64_t val64 = ldq_be_phys(first_cpu->as, valaddr);
-+
-+        if (strcmp(propname, "linux,initrd-start") == 0) {
-+            spapr->initrd_base = val64;
-+        } else if (strcmp(propname, "linux,initrd-end") == 0) {
-+            spapr->initrd_size = val64 - spapr->initrd_base;
-+        } else {
-+            goto trace_exit;
-+        }
-+    } else if (strcmp(propname, "bootargs") == 0) {
-+        char val[1024];
-+
-+        readstr(valaddr, val, sizeof(val));
-+        g_free(spapr->bootargs);
-+        spapr->bootargs = g_strdup(val);
-+    } else {
-+        goto trace_exit;
-+    }
-+
-+    offset = fdt_node_offset_by_phandle(spapr->fdt_blob, nodeph);
-+    if (offset >= 0) {
-+        uint8_t data[vallen];
-+
-+        cpu_physical_memory_read(valaddr, data, vallen);
-+        if (!fdt_setprop(spapr->fdt_blob, offset, propname, data, vallen)) {
-+            ret = vallen;
-+            prop_format(trval, sizeof(trval), data, ret);
-+        }
-+    }
-+
-+trace_exit:
-+    trace_spapr_of_client_setprop(nodeph, propname, trval, ret);
-+
-+    return ret;
-+}
-+
-+static uint32_t of_client_nextprop(const void *fdt, uint32_t phandle,
-+                                   uint32_t prevaddr, uint32_t nameaddr)
-+{
-+    int offset = fdt_node_offset_by_phandle(fdt, phandle);
-+    char prev[OF_PROPNAME_LEN_MAX + 1];
-+    const char *tmp;
-+
-+    readstr(prevaddr, prev, sizeof(prev));
-+    for (offset = fdt_first_property_offset(fdt, offset);
-+         offset >= 0;
-+         offset = fdt_next_property_offset(fdt, offset)) {
-+
-+        if (!fdt_getprop_by_offset(fdt, offset, &tmp, NULL)) {
-+            return 0;
-+        }
-+        if (prev[0] == '\0' || strcmp(prev, tmp) == 0) {
-+            if (prev[0] != '\0') {
-+                offset = fdt_next_property_offset(fdt, offset);
-+                if (offset < 0) {
-+                    return 0;
-+                }
-+            }
-+            if (!fdt_getprop_by_offset(fdt, offset, &tmp, NULL)) {
-+                return 0;
-+            }
-+
-+            cpu_physical_memory_write(nameaddr, tmp, strlen(tmp) + 1);
-+            return 1;
-+        }
-+    }
-+
-+    return 0;
-+}
-+
-+static uint32_t of_client_peer(const void *fdt, uint32_t phandle)
-+{
-+    int ret;
-+
-+    if (phandle == 0) {
-+        ret = fdt_path_offset(fdt, "/");
-+    } else {
-+        ret = fdt_next_subnode(fdt, fdt_node_offset_by_phandle(fdt, phandle));
-+    }
-+
-+    if (ret < 0) {
-+        ret = 0;
-+    } else {
-+        ret = fdt_get_phandle(fdt, ret);
-+    }
-+
-+    return ret;
-+}
-+
-+static uint32_t of_client_child(const void *fdt, uint32_t phandle)
-+{
-+    int ret = fdt_first_subnode(fdt, fdt_node_offset_by_phandle(fdt, phandle));
-+
-+    if (ret < 0) {
-+        ret = 0;
-+    } else {
-+        ret = fdt_get_phandle(fdt, ret);
-+    }
-+
-+    return ret;
-+}
-+
-+static uint32_t of_client_parent(const void *fdt, uint32_t phandle)
-+{
-+    int ret = fdt_parent_offset(fdt, fdt_node_offset_by_phandle(fdt, phandle));
-+
-+    if (ret < 0) {
-+        ret = 0;
-+    } else {
-+        ret = fdt_get_phandle(fdt, ret);
-+    }
-+
-+    return ret;
-+}
-+
-+static uint32_t spapr_of_client_open(SpaprMachineState *spapr, const char *path)
-+{
-+    int offset;
-+    uint32_t ret = 0;
-+    SpaprOfInstance *inst = NULL;
-+    char *node, *unit, *part;
-+
-+    if (spapr->of_instance_last == 0xFFFFFFFF) {
-+        /* We do not recycle ihandles yet */
-+        goto trace_exit;
-+    }
-+
-+    split_path(path, &node, &unit, &part);
-+
-+    offset = of_client_fdt_path_offset(spapr->fdt_blob, node, unit);
-+    if (offset < 0) {
-+        trace_spapr_of_client_error_unknown_path(path);
-+        goto trace_exit;
-+    }
-+
-+    inst = g_new0(SpaprOfInstance, 1);
-+    inst->phandle = fdt_get_phandle(spapr->fdt_blob, offset);
-+    g_assert(inst->phandle);
-+    ++spapr->of_instance_last;
-+
-+    inst->path = g_strdup(path);
-+    inst->params = part;
-+    g_hash_table_insert(spapr->of_instances,
-+                        GINT_TO_POINTER(spapr->of_instance_last),
-+                        inst);
-+    ret = spapr->of_instance_last;
-+
-+trace_exit:
-+    trace_spapr_of_client_open(path, inst ? inst->phandle : 0, ret);
-+    g_free(node);
-+    g_free(unit);
-+
-+    return ret;
-+}
-+
-+static uint32_t of_client_open(SpaprMachineState *spapr, uint32_t pathaddr)
-+{
-+    char path[256];
-+
-+    readstr(pathaddr, path, sizeof(path));
-+
-+    return spapr_of_client_open(spapr, path);
-+}
-+
-+static void of_client_close(SpaprMachineState *spapr, uint32_t ihandle)
-+{
-+    if (!g_hash_table_remove(spapr->of_instances, GINT_TO_POINTER(ihandle))) {
-+        trace_spapr_of_client_error_unknown_ihandle_close(ihandle);
-+    }
-+}
-+
-+static uint32_t of_client_instance_to_package(SpaprMachineState *spapr,
-+                                              uint32_t ihandle)
-+{
-+    gpointer instp = g_hash_table_lookup(spapr->of_instances,
-+                                         GINT_TO_POINTER(ihandle));
-+    uint32_t ret = -1;
-+
-+    if (instp) {
-+        ret = ((SpaprOfInstance *)instp)->phandle;
-+    }
-+    trace_spapr_of_client_instance_to_package(ihandle, ret);
-+
-+    return ret;
-+}
-+
-+static uint32_t of_client_package_to_path(const void *fdt, uint32_t phandle,
-+                                          uint32_t buf, uint32_t len)
-+{
-+    uint32_t ret = -1;
-+    char tmp[256] = "";
-+
-+    if (0 == fdt_get_path(fdt, fdt_node_offset_by_phandle(fdt, phandle), tmp,
-+                          sizeof(tmp))) {
-+        tmp[sizeof(tmp) - 1] = 0;
-+        ret = MIN(len, strlen(tmp) + 1);
-+        cpu_physical_memory_write(buf, tmp, ret);
-+    }
-+
-+    trace_spapr_of_client_package_to_path(phandle, tmp, ret);
-+
-+    return ret;
-+}
-+
-+static uint32_t of_client_instance_to_path(SpaprMachineState *spapr,
-+                                           uint32_t ihandle, uint32_t buf,
-+                                           uint32_t len)
-+{
-+    uint32_t ret = -1;
-+    uint32_t phandle = of_client_instance_to_package(spapr, ihandle);
-+    char tmp[256] = "";
-+
-+    if (phandle != -1) {
-+        if (0 == fdt_get_path(spapr->fdt_blob,
-+                              fdt_node_offset_by_phandle(spapr->fdt_blob,
-+                                                         phandle),
-+                              tmp, sizeof(tmp))) {
-+            tmp[sizeof(tmp) - 1] = 0;
-+            ret = MIN(len, strlen(tmp) + 1);
-+            cpu_physical_memory_write(buf, tmp, ret);
-+        }
-+    }
-+    trace_spapr_of_client_instance_to_path(ihandle, phandle, tmp, ret);
-+
-+    return ret;
-+}
-+
-+static void of_client_clamed_dump(GArray *claimed)
-+{
-+#ifdef DEBUG
-+    int i;
-+    SpaprOfClaimed c;
-+
-+    for (i = 0; i < claimed->len; ++i) {
-+        c = g_array_index(claimed, SpaprOfClaimed, i);
-+        error_printf("CLAIMED %lx..%lx size=%ld\n", c.start, c.start + c.size,
-+                     c.size);
-+    }
-+#endif
-+}
-+
-+static bool of_client_claim_avail(GArray *claimed, uint64_t virt, uint64_t size)
-+{
-+    int i;
-+    SpaprOfClaimed c;
-+
-+    for (i = 0; i < claimed->len; ++i) {
-+        c = g_array_index(claimed, SpaprOfClaimed, i);
-+        if ((c.start <= virt && virt < c.start + c.size) ||
-+            (virt <= c.start && c.start < virt + size)) {
-+            return false;
-+        }
-+    }
-+
-+    return true;
-+}
-+
-+static void of_client_claim_add(GArray *claimed, uint64_t virt, uint64_t size)
-+{
-+    SpaprOfClaimed newclaim;
-+
-+    newclaim.start = virt;
-+    newclaim.size = size;
-+    g_array_append_val(claimed, newclaim);
-+}
-+
-+/*
-+ * "claim" claims memory at @virt if @align==0; otherwise it allocates
-+ * memory at the requested alignment.
-+ */
-+static void of_client_dt_memory_available(void *fdt, GArray *claimed,
-+                                          uint64_t base);
-+
-+static uint64_t of_client_claim(SpaprMachineState *spapr, uint64_t virt,
-+                                uint64_t size, uint64_t align)
-+{
-+    uint64_t ret;
-+
-+    if (size == 0) {
-+        ret = -1;
-+    } else if (align == 0) {
-+        if (!of_client_claim_avail(spapr->claimed, virt, size)) {
-+            ret = -1;
-+        } else {
-+            ret = virt;
-+        }
-+    } else {
-+        spapr->claimed_base = ALIGN(spapr->claimed_base, align);
-+        while (1) {
-+            if (spapr->claimed_base >= spapr->rma_size) {
-+                error_report("Out of RMA memory for the OF client");
-+                return -1;
-+            }
-+            if (of_client_claim_avail(spapr->claimed, spapr->claimed_base,
-+                                      size)) {
-+                break;
-+            }
-+            spapr->claimed_base += size;
-+        }
-+        ret = spapr->claimed_base;
-+    }
-+
-+    if (ret != -1) {
-+        spapr->claimed_base = MAX(spapr->claimed_base, ret + size);
-+        of_client_claim_add(spapr->claimed, ret, size);
-+        /* The client reads "/memory@0/available" to know where it can claim */
-+        of_client_dt_memory_available(spapr->fdt_blob, spapr->claimed,
-+                                      spapr->claimed_base);
-+    }
-+    trace_spapr_of_client_claim(virt, size, align, ret);
-+
-+    return ret;
-+}
-+
-+static uint32_t of_client_release(SpaprMachineState *spapr, uint64_t virt,
-+                                  uint64_t size)
-+{
-+    uint32_t ret = -1;
-+    int i;
-+    GArray *claimed = spapr->claimed;
-+    SpaprOfClaimed c;
-+
-+    for (i = 0; i < claimed->len; ++i) {
-+        c = g_array_index(claimed, SpaprOfClaimed, i);
-+        if (c.start == virt && c.size == size) {
-+            g_array_remove_index(claimed, i);
-+            ret = 0;
-+            break;
-+        }
-+    }
-+
-+    trace_spapr_of_client_release(virt, size, ret);
-+
-+    return ret;
-+}
-+
-+static void of_client_instantiate_rtas(SpaprMachineState *spapr, uint32_t base)
-+{
-+    error_report("The firmware should have instantiated RTAS");
-+    exit(1);
-+}
-+
-+static uint32_t of_client_call_method(SpaprMachineState *spapr,
-+                                      uint32_t methodaddr, uint32_t ihandle,
-+                                      uint32_t param1, uint32_t param2,
-+                                      uint32_t param3, uint32_t param4,
-+                                      uint32_t *ret2)
-+{
-+    uint32_t ret = -1;
-+    char method[256] = "";
-+    SpaprOfInstance *inst = NULL;
-+
-+    if (!ihandle) {
-+        goto trace_exit;
-+    }
-+
-+    inst = (SpaprOfInstance *) g_hash_table_lookup(spapr->of_instances,
-+                                                   GINT_TO_POINTER(ihandle));
-+    if (!inst) {
-+        goto trace_exit;
-+    }
-+
-+    readstr(methodaddr, method, sizeof(method));
-+
-+    if (strcmp(inst->path, "/") == 0) {
-+        if (strcmp(method, "ibm,client-architecture-support") == 0) {
-+            ret = do_client_architecture_support(POWERPC_CPU(first_cpu), spapr,
-+                                                 param1, FDT_MAX_SIZE);
-+            *ret2 = 0;
-+        }
-+    } else if (strcmp(inst->path, "/rtas") == 0) {
-+        if (strcmp(method, "instantiate-rtas") == 0) {
-+            of_client_instantiate_rtas(spapr, param1);
-+            ret = 0;
-+            *ret2 = param1; /* rtasbase */
-+        }
-+    } else {
-+        trace_spapr_of_client_error_unknown_method(method);
-+    }
-+
-+trace_exit:
-+    trace_spapr_of_client_method(ihandle, method, param1, ret, *ret2);
-+
-+    return ret;
-+}
-+
-+static uint32_t of_client_call_interpret(SpaprMachineState *spapr,
-+                                         uint32_t cmdaddr, uint32_t param1,
-+                                         uint32_t param2, uint32_t *ret2)
-+{
-+    uint32_t ret = -1;
-+    char cmd[256] = "";
-+
-+    readstr(cmdaddr, cmd, sizeof(cmd));
-+    trace_spapr_of_client_interpret(cmd, param1, param2, ret, *ret2);
-+
-+    return ret;
-+}
-+
-+static void of_client_quiesce(SpaprMachineState *spapr)
-+{
-+    int rc = fdt_pack(spapr->fdt_blob);
-+
-+    assert(rc == 0);
-+
-+    spapr->fdt_size = fdt_totalsize(spapr->fdt_blob);
-+    spapr->fdt_initial_size = spapr->fdt_size;
-+    of_client_clamed_dump(spapr->claimed);
-+}
-+
-+static target_ulong spapr_h_of_client(PowerPCCPU *cpu, SpaprMachineState *spapr,
-+                                      target_ulong opcode, target_ulong *args)
-+{
-+    target_ulong of_client_args = ppc64_phys_to_real(args[0]);
-+    struct prom_args pargs = { 0 };
-+    char service[64];
-+    unsigned nargs, nret;
-+    int i, servicelen;
-+
-+    cpu_physical_memory_read(of_client_args, &pargs, sizeof(pargs));
-+    nargs = be32_to_cpu(pargs.nargs);
-+    nret = be32_to_cpu(pargs.nret);
-+    readstr(be32_to_cpu(pargs.service), service, sizeof(service));
-+    servicelen = strlen(service);
-+
-+    if (nargs >= ARRAY_SIZE(pargs.args)) {
-+        return H_PARAMETER;
-+    }
-+
-+#define cmpserv(s, a, r) \
-+    cmpservice(service, servicelen, nargs, nret, (s), sizeof(s), (a), (r))
-+
-+    if (cmpserv("finddevice", 1, 1)) {
-+        pargs.args[nargs] =
-+            of_client_finddevice(spapr->fdt_blob,
-+                                 be32_to_cpu(pargs.args[0]));
-+    } else if (cmpserv("getprop", 4, 1)) {
-+        pargs.args[nargs] =
-+            of_client_getprop(spapr->fdt_blob,
-+                              be32_to_cpu(pargs.args[0]),
-+                              be32_to_cpu(pargs.args[1]),
-+                              be32_to_cpu(pargs.args[2]),
-+                              be32_to_cpu(pargs.args[3]));
-+    } else if (cmpserv("getproplen", 2, 1)) {
-+        pargs.args[nargs] =
-+            of_client_getproplen(spapr->fdt_blob,
-+                                 be32_to_cpu(pargs.args[0]),
-+                                 be32_to_cpu(pargs.args[1]));
-+    } else if (cmpserv("setprop", 4, 1)) {
-+        pargs.args[nargs] =
-+            of_client_setprop(spapr,
-+                              be32_to_cpu(pargs.args[0]),
-+                              be32_to_cpu(pargs.args[1]),
-+                              be32_to_cpu(pargs.args[2]),
-+                              be32_to_cpu(pargs.args[3]));
-+    } else if (cmpserv("nextprop", 3, 1)) {
-+        pargs.args[nargs] =
-+            of_client_nextprop(spapr->fdt_blob,
-+                               be32_to_cpu(pargs.args[0]),
-+                               be32_to_cpu(pargs.args[1]),
-+                               be32_to_cpu(pargs.args[2]));
-+    } else if (cmpserv("peer", 1, 1)) {
-+        pargs.args[nargs] =
-+            of_client_peer(spapr->fdt_blob,
-+                           be32_to_cpu(pargs.args[0]));
-+    } else if (cmpserv("child", 1, 1)) {
-+        pargs.args[nargs] =
-+            of_client_child(spapr->fdt_blob,
-+                            be32_to_cpu(pargs.args[0]));
-+    } else if (cmpserv("parent", 1, 1)) {
-+        pargs.args[nargs] =
-+            of_client_parent(spapr->fdt_blob,
-+                             be32_to_cpu(pargs.args[0]));
-+    } else if (cmpserv("open", 1, 1)) {
-+        pargs.args[nargs] = of_client_open(spapr, be32_to_cpu(pargs.args[0]));
-+    } else if (cmpserv("close", 1, 0)) {
-+        of_client_close(spapr, be32_to_cpu(pargs.args[0]));
-+    } else if (cmpserv("instance-to-package", 1, 1)) {
-+        pargs.args[nargs] =
-+            of_client_instance_to_package(spapr,
-+                                          be32_to_cpu(pargs.args[0]));
-+    } else if (cmpserv("package-to-path", 3, 1)) {
-+        pargs.args[nargs] =
-+            of_client_package_to_path(spapr->fdt_blob,
-+                                      be32_to_cpu(pargs.args[0]),
-+                                      be32_to_cpu(pargs.args[1]),
-+                                      be32_to_cpu(pargs.args[2]));
-+    } else if (cmpserv("instance-to-path", 3, 1)) {
-+        pargs.args[nargs] =
-+            of_client_instance_to_path(spapr,
-+                                       be32_to_cpu(pargs.args[0]),
-+                                       be32_to_cpu(pargs.args[1]),
-+                                       be32_to_cpu(pargs.args[2]));
-+    } else if (cmpserv("claim", 3, 1)) {
-+        pargs.args[nargs] =
-+            of_client_claim(spapr,
-+                            be32_to_cpu(pargs.args[0]),
-+                            be32_to_cpu(pargs.args[1]),
-+                            be32_to_cpu(pargs.args[2]));
-+    } else if (cmpserv("release", 2, 0)) {
-+        pargs.args[nargs] =
-+            of_client_release(spapr,
-+                              be32_to_cpu(pargs.args[0]),
-+                              be32_to_cpu(pargs.args[1]));
-+    } else if (cmpserv("call-method", 0, 0)) {
-+        pargs.args[nargs] =
-+            of_client_call_method(spapr,
-+                                  be32_to_cpu(pargs.args[0]),
-+                                  be32_to_cpu(pargs.args[1]),
-+                                  be32_to_cpu(pargs.args[2]),
-+                                  be32_to_cpu(pargs.args[3]),
-+                                  be32_to_cpu(pargs.args[4]),
-+                                  be32_to_cpu(pargs.args[5]),
-+                                  &pargs.args[nargs + 1]);
-+    } else if (cmpserv("interpret", 0, 0)) {
-+        pargs.args[nargs] =
-+            of_client_call_interpret(spapr,
-+                                     be32_to_cpu(pargs.args[0]),
-+                                     be32_to_cpu(pargs.args[1]),
-+                                     be32_to_cpu(pargs.args[2]),
-+                                     &pargs.args[nargs + 1]);
-+    } else if (cmpserv("milliseconds", 0, 1)) {
-+        pargs.args[nargs] = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
-+    } else if (cmpserv("quiesce", 0, 0)) {
-+        of_client_quiesce(spapr);
-+    } else if (cmpserv("exit", 0, 0)) {
-+        error_report("Stopped as the VM requested \"exit\"");
-+        vm_stop(RUN_STATE_PAUSED); /* Or qemu_system_guest_panicked(NULL); ? */
-+    } else {
-+        trace_spapr_of_client_error_unknown_service(service, nargs, nret);
-+        pargs.args[nargs] = -1;
-+    }
-+
-+    for (i = 0; i < nret; ++i) {
-+        pargs.args[nargs + i] = be32_to_cpu(pargs.args[nargs + i]);
-+    }
-+
-+    cpu_physical_memory_write(of_client_args, &pargs,
-+                              sizeof(uint32_t) * (3 + nargs + nret));
-+
-+    return H_SUCCESS;
-+}
-+
-+static void of_instance_free(gpointer data)
-+{
-+    SpaprOfInstance *inst = (SpaprOfInstance *) data;
-+
-+    g_free(inst->params);
-+    g_free(inst->path);
-+    g_free(inst);
-+}
-+
-+void spapr_setup_of_client(SpaprMachineState *spapr, target_ulong *stack_ptr)
-+{
-+    if (spapr->claimed) {
-+        g_array_unref(spapr->claimed);
-+    }
-+    if (spapr->of_instances) {
-+        g_hash_table_unref(spapr->of_instances);
-+    }
-+
-+    spapr->claimed = g_array_new(false, false, sizeof(SpaprOfClaimed));
-+    spapr->of_instances = g_hash_table_new_full(g_direct_hash, g_direct_equal,
-+                                                NULL, of_instance_free);
-+
-+    *stack_ptr = of_client_claim(spapr, OF_STACK_ADDR, OF_STACK_SIZE,
-+                                 OF_STACK_SIZE);
-+    if (*stack_ptr == -1) {
-+        error_report("Memory allocation for stack failed");
-+        exit(1);
-+    }
-+    /*
-+     * Stack grows downwards and we also reserve here space for
-+     * the minimum stack frame.
-+     */
-+    *stack_ptr += OF_STACK_SIZE - 0x20;
-+
-+    if (spapr->kernel_size &&
-+        of_client_claim(spapr, spapr->kernel_addr,
-+                        spapr->kernel_size, 0) == -1) {
-+        error_report("Memory for kernel is in use");
-+        exit(1);
-+    }
-+
-+    if (spapr->initrd_size &&
-+        of_client_claim(spapr, spapr->initrd_base,
-+                        spapr->initrd_size, 0) == -1) {
-+        error_report("Memory for initramdisk is in use");
-+        exit(1);
-+    }
-+
-+    /*
-+     * We skip writing FDT as nothing expects it; OF client interface is
-+     * going to be used for reading the device tree.
-+     */
-+}
-+
-+static gint of_claimed_compare_func(gconstpointer a, gconstpointer b)
-+{
-+    return ((SpaprOfClaimed *)a)->start - ((SpaprOfClaimed *)b)->start;
-+}
-+
-+static void of_client_dt_memory_available(void *fdt, GArray *claimed,
-+                                          uint64_t base)
-+{
-+    int i, n, offset, proplen = 0;
-+    uint64_t *mem0_reg;
-+    struct { uint64_t start, size; } *avail;
-+
-+    if (!fdt || !claimed) {
-+        return;
-+    }
-+
-+    offset = fdt_path_offset(fdt, "/memory@0");
-+    _FDT(offset);
-+
-+    mem0_reg = (uint64_t *) fdt_getprop(fdt, offset, "reg", &proplen);
-+    if (!mem0_reg || proplen != 2 * sizeof(uint64_t)) {
-+        return;
-+    }
-+
-+    g_array_sort(claimed, of_claimed_compare_func);
-+    of_client_clamed_dump(claimed);
-+
-+    avail = g_malloc0(sizeof(uint64_t) * 2 * claimed->len);
-+    for (i = 0, n = 0; i < claimed->len; ++i) {
-+        SpaprOfClaimed c = g_array_index(claimed, SpaprOfClaimed, i);
-+
-+        avail[n].start = c.start + c.size;
-+        if (i < claimed->len - 1) {
-+            SpaprOfClaimed cn = g_array_index(claimed, SpaprOfClaimed, i + 1);
-+
-+            avail[n].size = cn.start - avail[n].start;
-+        } else {
-+            avail[n].size = be64_to_cpu(mem0_reg[1]) - avail[n].start;
-+        }
-+
-+        if (avail[n].size) {
-+#ifdef DEBUG
-+            error_printf("AVAIL %lx..%lx size=%ld\n", avail[n].start,
-+                         avail[n].start + avail[n].size, avail[n].size);
-+#endif
-+            avail[n].start = cpu_to_be64(avail[n].start);
-+            avail[n].size = cpu_to_be64(avail[n].size);
-+            ++n;
-+        }
-+    }
-+    _FDT((fdt_setprop(fdt, offset, "available", avail,
-+                      sizeof(uint64_t) * 2 * n)));
-+    g_free(avail);
-+}
-+
-+void spapr_of_client_dt(SpaprMachineState *spapr, void *fdt)
-+{
-+    uint32_t phandle;
-+    int i, offset, proplen = 0;
-+    const void *prop;
-+    bool found = false;
-+    GArray *phandles = g_array_new(false, false, sizeof(uint32_t));
-+
-+    /* Add options now, doing it at the end of this __func__ breaks it :-/ */
-+    offset = fdt_add_subnode(fdt, 0, "options");
-+    if (offset > 0) {
-+        struct winsize ws;
-+
-+        if (ioctl(1, TIOCGWINSZ, &ws) != -1) {
-+            _FDT(fdt_setprop_cell(fdt, offset, "screen-#columns", ws.ws_col));
-+            _FDT(fdt_setprop_cell(fdt, offset, "screen-#rows", ws.ws_row));
-+        }
-+        _FDT(fdt_setprop_cell(fdt, offset, "real-mode?", 1));
-+    }
-+
-+    /* Find all predefined phandles */
-+    for (offset = fdt_next_node(fdt, -1, NULL);
-+         offset >= 0;
-+         offset = fdt_next_node(fdt, offset, NULL)) {
-+        prop = fdt_getprop(fdt, offset, "phandle", &proplen);
-+        if (prop && proplen == sizeof(uint32_t)) {
-+            phandle = fdt32_ld(prop);
-+            g_array_append_val(phandles, phandle);
-+        }
-+    }
-+
-+    /* Assign phandles skipping the predefined ones */
-+    for (offset = fdt_next_node(fdt, -1, NULL), phandle = 1;
-+         offset >= 0;
-+         offset = fdt_next_node(fdt, offset, NULL), ++phandle) {
-+
-+        prop = fdt_getprop(fdt, offset, "phandle", &proplen);
-+        if (prop) {
-+            continue;
-+        }
-+        /* Check if the current phandle is not allocated already */
-+        for ( ; ; ++phandle) {
-+            for (i = 0, found = false; i < phandles->len; ++i) {
-+                if (phandle == g_array_index(phandles, uint32_t, i)) {
-+                    found = true;
-+                    break;
-+                }
-+            }
-+            if (!found) {
-+                break;
-+            }
-+        }
-+        _FDT(fdt_setprop_cell(fdt, offset, "phandle", phandle));
-+    }
-+    g_array_unref(phandles);
-+
-+    of_client_dt_memory_available(fdt, spapr->claimed, spapr->claimed_base);
-+}
-+
-+void spapr_of_client_dt_finalize(SpaprMachineState *spapr)
-+{
-+    void *fdt = spapr->fdt_blob;
-+    char *stdout_path = spapr_vio_stdout_path(spapr->vio_bus);
-+    int chosen = fdt_path_offset(fdt, "/chosen");
-+
-+    /*
-+     * SLOF-less setup requires an open instance of stdout for early
-+     * kernel printk. By now all phandles are settled so we can open
-+     * the default serial console.
-+     */
-+    if (stdout_path) {
-+        _FDT(fdt_setprop_cell(fdt, chosen, "stdout",
-+                              spapr_of_client_open(spapr, stdout_path)));
-+    }
-+}
-+
-+void spapr_of_client_machine_init(SpaprMachineState *spapr)
-+{
-+    spapr_register_hypercall(KVMPPC_H_OF_CLIENT, spapr_h_of_client);
-+}
-diff --git a/pc-bios/vof/bootmem.c b/pc-bios/vof/bootmem.c
-new file mode 100644
-index 000000000000..de7d5fc76431
---- /dev/null
-+++ b/pc-bios/vof/bootmem.c
-@@ -0,0 +1,13 @@
-+#include "vof.h"
-+
-+void boot_from_memory(uint64_t initrd, uint64_t initrdsize)
-+{
-+	uint64_t kern[2];
-+	phandle chosen = ci_finddevice("/chosen");
-+
-+	if (ci_getprop(chosen, "qemu,boot-kernel", kern, sizeof(kern)) !=
-+			sizeof(kern))
-+		return;
-+
-+	do_boot(kern[0], initrd, initrdsize);
-+}
-diff --git a/pc-bios/vof/ci.c b/pc-bios/vof/ci.c
-new file mode 100644
-index 000000000000..4880b3d2047c
---- /dev/null
-+++ b/pc-bios/vof/ci.c
-@@ -0,0 +1,108 @@
-+#include "vof.h"
-+
-+struct prom_args {
-+        uint32_t service;
-+        uint32_t nargs;
-+        uint32_t nret;
-+        uint32_t args[10];
-+};
-+
-+#define ADDR(x) (uint32_t)(x)
-+
-+extern uint32_t ci_entry(uint32_t params);
-+
-+extern unsigned long hv_rtas(unsigned long params);
-+extern unsigned int hv_rtas_size;
-+
-+bool prom_handle(struct prom_args *pargs)
-+{
-+	void *rtasbase;
-+	uint32_t rtassize = 0;
-+	phandle rtas;
-+
-+	if (strcmp("call-method", (void *)(unsigned long) pargs->service))
-+		return false;
-+
-+	if (strcmp("instantiate-rtas", (void *)(unsigned long) pargs->args[0]))
-+		return false;
-+
-+	rtas = ci_finddevice("/rtas");
-+	ci_getprop(rtas, "rtas-size", &rtassize, sizeof(rtassize));
-+	if (rtassize < hv_rtas_size)
-+		return false;
-+
-+	rtasbase = (void *)(unsigned long) pargs->args[2];
-+
-+	memcpy(rtasbase, hv_rtas, hv_rtas_size);
-+	pargs->args[pargs->nargs] = 0;
-+	pargs->args[pargs->nargs + 1] = pargs->args[2];
-+
-+	return true;
-+}
-+
-+void prom_entry(uint32_t args)
-+{
-+	if (!prom_handle((void *)(unsigned long) args))
-+		ci_entry(args);
-+}
-+
-+int call_prom(const char *service, int nargs, int nret, ...)
-+{
-+        int i;
-+        struct prom_args args;
-+        va_list list;
-+
-+        args.service = ADDR(service);
-+        args.nargs = nargs;
-+        args.nret = nret;
-+
-+        va_start(list, nret);
-+        for (i = 0; i < nargs; i++)
-+                args.args[i] = va_arg(list, prom_arg_t);
-+        va_end(list);
-+
-+        for (i = 0; i < nret; i++)
-+                args.args[nargs+i] = 0;
-+
-+        if (ci_entry((uint32_t)(&args)) < 0)
-+                return PROM_ERROR;
-+
-+        return (nret > 0) ? args.args[nargs] : 0;
-+}
-+
-+void ci_panic(const char *str)
-+{
-+	call_prom("exit", 0, 0);
-+}
-+
-+phandle ci_finddevice(const char *path)
-+{
-+	return call_prom("finddevice", 1, 1, path);
-+}
-+
-+uint32_t ci_getprop(phandle ph, const char *propname, void *prop, int len)
-+{
-+	return call_prom("getprop", 4, 1, ph, propname, prop, len);
-+}
-+
-+ihandle ci_open(const char *path)
-+{
-+	return call_prom("open", 1, 1, path);
-+}
-+
-+void ci_close(ihandle ih)
-+{
-+	call_prom("close", 1, 0, ih);
-+}
-+
-+void *ci_claim(void *virt, uint32_t size, uint32_t align)
-+{
-+	uint32_t ret = call_prom("claim", 3, 1, ADDR(virt), size, align);
-+
-+	return (void *) (unsigned long) ret;
-+}
-+
-+uint32_t ci_release(void *virt, uint32_t size)
-+{
-+	return call_prom("release", 2, 1, ADDR(virt), size);
-+}
-diff --git a/pc-bios/vof/libc.c b/pc-bios/vof/libc.c
-new file mode 100644
-index 000000000000..8603aedcb32c
---- /dev/null
-+++ b/pc-bios/vof/libc.c
-@@ -0,0 +1,91 @@
-+#include "vof.h"
-+
-+int strlen(const char *s)
-+{
-+	int len = 0;
-+
-+	while (*s != 0) {
-+		len += 1;
-+		s += 1;
-+	}
-+
-+	return len;
-+}
-+
-+int strcmp(const char *s1, const char *s2)
-+{
-+        while (*s1 != 0 && *s2 != 0) {
-+                if (*s1 != *s2)
-+                        break;
-+                s1 += 1;
-+                s2 += 1;
-+        }
-+
-+        return *s1 - *s2;
-+}
-+
-+void *memcpy(void *dest, const void *src, size_t n)
-+{
-+        char *cdest;
-+        const char *csrc = src;
-+
-+        cdest = dest;
-+        while (n-- > 0) {
-+                *cdest++ = *csrc++;
-+        }
-+
-+        return dest;
-+}
-+
-+int memcmp(const void *ptr1, const void *ptr2, size_t n)
-+{
-+        const unsigned char *p1 = ptr1;
-+        const unsigned char *p2 = ptr2;
-+
-+        while (n-- > 0) {
-+                if (*p1 != *p2)
-+                        return (*p1 - *p2);
-+                p1 += 1;
-+                p2 += 1;
-+        }
-+
-+        return 0;
-+}
-+
-+void *memmove(void *dest, const void *src, size_t n)
-+{
-+        char *cdest;
-+        const char *csrc;
-+        int i;
-+
-+        /* Do the buffers overlap in a bad way? */
-+        if (src < dest && src + n >= dest) {
-+                /* Copy from end to start */
-+                cdest = dest + n - 1;
-+                csrc = src + n - 1;
-+                for (i = 0; i < n; i++) {
-+                        *cdest-- = *csrc--;
-+                }
-+        }
-+        else {
-+                /* Normal copy is possible */
-+                cdest = dest;
-+                csrc = src;
-+                for (i = 0; i < n; i++) {
-+                        *cdest++ = *csrc++;
-+                }
-+        }
-+
-+        return dest;
-+}
-+
-+void *memset(void *dest, int c, size_t size)
-+{
-+        unsigned char *d = (unsigned char *)dest;
-+
-+        while (size-- > 0) {
-+                *d++ = (unsigned char)c;
-+        }
-+
-+        return dest;
-+}
-diff --git a/pc-bios/vof/main.c b/pc-bios/vof/main.c
-new file mode 100644
-index 000000000000..34299a9cc5ad
---- /dev/null
-+++ b/pc-bios/vof/main.c
-@@ -0,0 +1,22 @@
-+#include "vof.h"
-+
-+
-+void do_boot(unsigned long addr, unsigned long _r3, unsigned long _r4)
-+{
-+	register unsigned long r3 __asm__("r3") = _r3;
-+	register unsigned long r4 __asm__("r4") = _r4;
-+	register unsigned long r5 __asm__("r5") = (unsigned long) _prom_entry;
-+
-+	((client *)(uint32_t)addr)();
-+}
-+
-+void entry_c(void)
-+{
-+	register unsigned long r3 __asm__("r3");
-+	register unsigned long r4 __asm__("r4");
-+	register unsigned long r5 __asm__("r5");
-+	uint64_t initrd = r3, initrdsize = r4;
-+
-+	boot_from_memory(initrd, initrdsize);
-+	ci_panic("*** No boot target ***\n");
-+}
-diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
-index 9ea620f23c85..f45cfdf57056 100644
---- a/hw/ppc/trace-events
-+++ b/hw/ppc/trace-events
-@@ -21,6 +21,27 @@ spapr_update_dt(unsigned cb) "New blob %u bytes"
- spapr_update_dt_failed_size(unsigned cbold, unsigned cbnew, unsigned magic) "Old blob %u bytes, new blob %u bytes, magic 0x%x"
- spapr_update_dt_failed_check(unsigned cbold, unsigned cbnew, unsigned magic) "Old blob %u bytes, new blob %u bytes, magic 0x%x"
- 
-+# spapr_of_client.c
-+spapr_of_client_error_str_truncated(const char *s, int len) "%s truncated to %d"
-+spapr_of_client_error_param(const char *method, int nargscheck, int nretcheck, int nargs, int nret) "%s takes/returns %d/%d, not %d/%d"
-+spapr_of_client_error_unknown_service(const char *service, int nargs, int nret) "\"%s\" args=%d rets=%d"
-+spapr_of_client_error_unknown_method(const char *method) "\"%s\""
-+spapr_of_client_error_unknown_ihandle_close(uint32_t ih) "ih=0x%x"
-+spapr_of_client_error_unknown_path(const char *path) "\"%s\""
-+spapr_of_client_finddevice(const char *path, uint32_t ph) "\"%s\" => ph=0x%x"
-+spapr_of_client_canon(const char *path) "\"%s\""
-+spapr_of_client_claim(uint32_t virt, uint32_t size, uint32_t align, uint32_t ret) "virt=0x%x size=0x%x align=0x%x => 0x%x"
-+spapr_of_client_release(uint32_t virt, uint32_t size, uint32_t ret) "virt=0x%x size=0x%x => 0x%x"
-+spapr_of_client_method(uint32_t ihandle, const char *method, uint32_t param, uint32_t ret, uint32_t ret2) "ih=0x%x \"%s\"(0x%x) => 0x%x 0x%x"
-+spapr_of_client_getprop(uint32_t ph, const char *prop, uint32_t ret, const char *val) "ph=0x%x \"%s\" => len=%d [%s]"
-+spapr_of_client_getproplen(uint32_t ph, const char *prop, uint32_t ret) "ph=0x%x \"%s\" => len=%d"
-+spapr_of_client_setprop(uint32_t ph, const char *prop, const char *val, uint32_t ret) "ph=0x%x \"%s\" [%s] => len=%d"
-+spapr_of_client_open(const char *path, uint32_t ph, uint32_t ih) "%s ph=0x%x => ih=0x%x"
-+spapr_of_client_interpret(const char *cmd, uint32_t param1, uint32_t param2, uint32_t ret, uint32_t ret2) "[%s] 0x%x 0x%x => 0x%x 0x%x"
-+spapr_of_client_package_to_path(uint32_t ph, const char *tmp, uint32_t ret) "ph=0x%x => %s len=%d"
-+spapr_of_client_instance_to_path(uint32_t ih, uint32_t ph, const char *tmp, uint32_t ret) "ih=0x%x ph=0x%x => %s len=%d"
-+spapr_of_client_instance_to_package(uint32_t ih, uint32_t ph) "ih=0x%x => ph=0x%x"
-+
- # spapr_hcall_tpm.c
- spapr_h_tpm_comm(const char *device_path, uint64_t operation) "tpm_device_path=%s operation=0x%"PRIu64
- spapr_tpm_execute(uint64_t data_in, uint64_t data_in_sz, uint64_t data_out, uint64_t data_out_sz) "data_in=0x%"PRIx64", data_in_sz=%"PRIu64", data_out=0x%"PRIx64", data_out_sz=%"PRIu64
-diff --git a/pc-bios/README b/pc-bios/README
-index a5a770f06643..d77e62245ccb 100644
---- a/pc-bios/README
-+++ b/pc-bios/README
-@@ -16,6 +16,8 @@
-   https://github.com/aik/SLOF, and the image currently in qemu is
-   built from git tag qemu-slof-20200327.
- 
-+- vof is a minimalistic firmware to work with -machine pseries,x-vof=on.
-+
- - sgabios (the Serial Graphics Adapter option ROM) provides a means for
-   legacy x86 software to communicate with an attached serial console as
-   if a video card were attached.  The master sources reside in a subversion
-diff --git a/pc-bios/vof.bin b/pc-bios/vof.bin
-new file mode 100755
-index 0000000000000000000000000000000000000000..0606d9451c6bff39b32879c2a3369406a6a0d07d
-GIT binary patch
-literal 3680
-zcmd^BUuauZ82{2_+ue2@_aP6FMSANxX==+V^r6wxq_aZW%u<<!iXBNzt}d80wap}x
-z#N4z}S8<TCJvivU2Pyj2hY5XKg&_s^u!ji|bnD&*d)b3vWu4dGckj6_{g=h<(ZJ!H
-zob#RU_kF+b&$&eZ?_Xe@C~goH)*Xq?AW`(>B?=MUwAULA#>}I8bhdE6ZYf0j&qP62
-z;l6X}0rol?XtZA^HJ3P=?ZiPe{%~Ip(aYQR$lk+M_mu|YR!*v0DmkeA@{iPX`5v|8
-z0*A9F7ieE$t!^oBha7L*`MOjpkW^YAxpbWry+E?QKuWPor~L77wiqBO?{hBo>#hd2
-z$6uf}{V=(5l5=VDXJcdXfw7s7y`N<}YQ$4>$)nks0Lgxp2(y%%KF0su;=iJ^9e2qM
-zTO`;bhv?8H{d3(Fq5~Idv7ype_~x;3z_pkC@%zZZxLA9{+QaK<AJK_vqTsyoo9Xwl
-zaF+eu#m{wMc)+KZ`Ly|i{&v1M-Aja7W_^XPLc!oX1$n;$R~Bp8loz<&^QL{~Jz>W+
-z=#<!JTQ1*h#>AA#`vwN`mW}EzHm<_P4%pZ!Z1f<;Uc^|1E-&+s*~2^lqp=u4Jeo~j
-zOq=`%v95<NeMDC+e^h_3Va!BGW!t*vj9YwP;0OOBzKLtw0sH~1ckl*2*j9;o-0ru{
-z^&XsVxAj}jfoHNcV#dT{#&MQPutx<~-h6YP8?(9JJx5$8s^4cAyvJuEzwA9zo;kO3
-z9QL<aoP$#<7LxxU)>}DOgntTT6~=%a)IDpg;r=lGZ{cyL?yB+JQ#b2<Ca#1%u+6Ho
-zUf@SiXW(nFZ-3Vwc~pK1UJX6$%i9%o&OCXFoHLE#Ecyn8jm>ws=a_jrZ^ZyMa*eZ`
-zEaY5}^X(#c4LVRG&NE!+{s1W*tK{O|sL$)Njy;@xZ^oxfR~T31iWzI*WCRZ9gp9sw
-z%82{i<7D6t3K<vlcm{pS>zqS~z3dO7NA{Za&$hZaA6TZ?NA6<1kZrPLSq?ei5V5P)
-zr`N^1&{)~Ww!RBfI{OQ|B-R%;{=Q&ygMMcE9X9?t&%FsfQmyhPv<a-+z*<8;y1DZW
-znsNhc2>odo{V7_yOR17Uqo{=pILppNC>NZf#&Ur4a)d6H3sfpE&^P7lv{=4N-<1to
-z{<WS~VC#^mrD4pR2T{!Yt~jp-D9H7Jxf?MoW4{M8pNB-<a34%eL+;gSI)Iwyo*3f)
-z+zSUK<ZnF%?btw;_4oLD$p!m*idKvyKKIvyGb<*Fh~1OkA2B%{7Il230=pe}T+<TA
-z-qZtGkq1ge9&FbY6}oP~AK8l4pTD#3<{L6+_R!(&`Z!PFgT(kEUv5>2VGa56#Q^6^
-z$0AXOPK28Aocigt3FM6<N>9y^8uU*-Wc~OqU<?N^9Ki5e7?0;TH-#V7a<PV9GI^14
-z?C&Auq8nUtttq;Jynll40=_EnU#h@=&bphFcJZ^(!rA<x0;igvHSjsHSb@VaV?LV%
-z&f7J_Y*o~CPvv*U)*dp^35?3`4i9)#!J{|-N;oUx=mc(yh5P6i_764rZ{I<02|iz5
-z7FX<ea&2)8E3oT;-6pW#tC8Df;rF}nJA{6AYG*$y@;6}<a;OFUtPMHT4jjBgk6&b4
-zP^bKcDB=xp>Da@W#`x$x3i@jcY~?rKoe!PnZ;KYJ+w*Uo&hlH8cfN^!{Ks*wUlFH)
-zy*NVYQFC*%+MiZGNT)MuCN}nwmQk^Fh~lwSs`Z?fIh#&Ua%4Oc8_6VN8Lf3J6C3Ay
-zC&YrM*74+L8uqkoGQ(#dCPxwp?bBo&n@~79mL8?_s5Zi9@l<-8W#g$>@*L(dEv3b<
-zb0U5g2P5=}cJ6!&ThscnHa4QA_zsc7L-axxql7Vwv5c{TeVjXnu)cwD6Qhi=j&UF3
-NA;t#L5!^o_{R4q+IM@IH
-
-literal 0
-HcmV?d00001
-
-diff --git a/pc-bios/vof/entry.S b/pc-bios/vof/entry.S
-new file mode 100644
-index 000000000000..39b333779514
---- /dev/null
-+++ b/pc-bios/vof/entry.S
-@@ -0,0 +1,51 @@
-+#define LOAD32(rn, name)    \
-+	lis     rn,name##@h;    \
-+	ori     rn,rn,name##@l
-+
-+#define ENTRY(func_name)    \
-+	.text;                  \
-+	.align  2;              \
-+	.globl  .func_name;     \
-+	.func_name:             \
-+	.globl  func_name;      \
-+	func_name:
-+
-+#define KVMPPC_HCALL_BASE       0xf000
-+#define KVMPPC_H_RTAS           (KVMPPC_HCALL_BASE + 0x0)
-+#define KVMPPC_H_OF_CLIENT      (KVMPPC_HCALL_BASE + 0x5)
-+
-+	. = 0x100 /* Do exactly as SLOF does */
-+
-+ENTRY(_start)
-+	LOAD32(%r31, 0) /* Go 32bit mode */
-+	mtmsrd %r31,0
-+	LOAD32(2, __toc_start)
-+	b entry_c
-+
-+ENTRY(_prom_entry)
-+	LOAD32(2, __toc_start)
-+	stdu    %r1,-112(%r1)
-+	std     %r31,104(%r1)
-+	mflr    %r31
-+	bl prom_entry
-+	nop
-+	mtlr    %r31
-+	ld      %r31,104(%r1)
-+	addi    %r1,%r1,112
-+	blr
-+
-+ENTRY(ci_entry)
-+	mr	4,3
-+	LOAD32(3,KVMPPC_H_OF_CLIENT)
-+	sc	1
-+	blr
-+
-+/* This is the actual RTAS blob copied to the OS at instantiate-rtas */
-+ENTRY(hv_rtas)
-+	mr      %r4,%r3
-+	LOAD32(3,KVMPPC_H_RTAS)
-+	sc	1
-+	blr
-+	.globl hv_rtas_size
-+hv_rtas_size:
-+	.long . - hv_rtas;
-diff --git a/pc-bios/vof/l.lds b/pc-bios/vof/l.lds
-new file mode 100644
-index 000000000000..10b557a81f78
---- /dev/null
-+++ b/pc-bios/vof/l.lds
-@@ -0,0 +1,48 @@
-+OUTPUT_FORMAT("elf32-powerpc", "elf32-powerpc", "elf32-powerpc")
-+OUTPUT_ARCH(powerpc:common)
-+
-+/* set the entry point */
-+ENTRY ( __start )
-+
-+SECTIONS {
-+	__executable_start = .;
-+
-+	.text : {
-+		*(.text)
-+	}
-+
-+	__etext = .;
-+
-+	. = ALIGN(8);
-+
-+	.data : {
-+		*(.data)
-+		*(.rodata .rodata.*)
-+		*(.got1)
-+		*(.sdata)
-+		*(.opd)
-+	}
-+
-+	/* FIXME bss at end ??? */
-+
-+	. = ALIGN(8);
-+	__bss_start = .;
-+	.bss : {
-+		*(.sbss) *(.scommon)
-+		*(.dynbss)
-+		*(.bss)
-+	}
-+
-+	. = ALIGN(8);
-+	__bss_end = .;
-+	__bss_size = (__bss_end - __bss_start);
-+
-+	. = ALIGN(256);
-+	__toc_start = DEFINED (.TOC.) ? .TOC. : ADDR (.got) + 0x8000;
-+	.got :
-+	{
-+		 *(.toc .got)
-+	}
-+	. = ALIGN(8);
-+	__toc_end = .;
-+}
--- 
-2.17.1
+> As i wrote we have a test:
+>   - run src VM with vhost-usr-blk daemon used
+>   - run fio inside it
+>   - perform reconnect every X seconds (just kill and restart daemon),
+>     X is random
+>   - run dst VM
+>   - perform migration
+>   - fio should complete in dst VM
+> And we cycle this test like forever.
+> So it fails once per ~25 iteration. By adding some delays inside qemu we
+> were able to make the race window larger.
+> 
+> > 
+> > 
+> > >  So
+> > >we shouldn't call the clean up calls because this virtqueues were clean
+> > >up in the disconnect call. But we should protect these calls somehow, so
+> > >it will not hit SIGSEGV and we will be able to pass migration.
+> > >
+> > >Just to summarize it:
+> > >For the vhost-user-blk devices we ca hit clean up calls twice in case of
+> > >vhost disconnect:
+> > >1. The first time during the disconnect process. The clean up is called
+> > >inside it.
+> > >2. The second time during roll back clean up.
+> > >So if it is the case we should skip p2.
+> > >
+> > >>>dev, dev->vq_index + i);
+> > >>>          vhost_virtqueue_set_addr(dev, dev->vqs + i, idx,
+> > >>>                                   dev->log_enabled);
+> > >>>      }
+> > >>>-    vhost_dev_set_features(dev, dev->log_enabled);
+> > >>>+    if (dev->started) {
+> > >>>+        vhost_dev_set_features(dev, dev->log_enabled);
+> > >>>+    }
+> > >>>  err_features:
+> > >>>      return r;
+> > >>>  }
+> > >>>@@ -832,7 +850,15 @@ static int vhost_migration_log(MemoryListener *listener, int enable)
+> > >>>      } else {
+> > >>>          vhost_dev_log_resize(dev, vhost_get_log_size(dev));
+> > >>>          r = vhost_dev_set_log(dev, true);
+> > >>>-        if (r < 0) {
+> > >>>+        /*
+> > >>>+         * The dev log resize can fail, because of disconnect
+> > >>>+         * with the vhost-user-blk daemon. Check the device
+> > >>>+         * state before calling the vhost_dev_set_log()
+> > >>>+         * function.
+> > >>>+         * Don't return error if device isn't started to be
+> > >>>+         * consistent with the check above.
+> > >>>+         */
+> > >>>+        if (dev->started && r < 0) {
+> > >>>              return r;
+> > >>>          }
+> > >>>      }
+> > >>>@@ -1739,7 +1765,12 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
+> > >>>  fail_log:
+> > >>>      vhost_log_put(hdev, false);
+> > >>>  fail_vq:
+> > >>>-    while (--i >= 0) {
+> > >>>+    /*
+> > >>>+     * Disconnect with the vhost-user daemon can lead to the
+> > >>>+     * vhost_dev_cleanup() call which will clean up vhost_dev
+> > >>>+     * structure.
+> > >>>+     */
+> > >>>+    while ((--i >= 0) && (hdev->started)) {
+> > >>>          vhost_virtqueue_stop(hdev,
+> > >>>                               vdev,
+> > >>>                               hdev->vqs + i,
+> > >>
+> > >>This should be a separate patch.
+> > >Do you mean i should split this patch to two patches?
+> > 
+> > 
+> > Yes.
+> > 
+> > Thanks
+> 
+> Got it. Will do it in v3.
+> 
+> No other comments mixed in below.
+> 
+> Thanks.
+> 
+> > 
+> > 
+> > >
+> > >Thanks.
+> > >
+> > >>Thanks
+> > >>
+> > 
 
 
