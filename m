@@ -2,66 +2,65 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48DFAC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 21:06:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A51DC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 21:09:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EB9C20575
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 21:06:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 76F6A20575
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 21:09:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oo3X1jxu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EB9C20575
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CD4h8nny"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76F6A20575
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYyaD-0003lT-8u
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 17:06:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58038)
+	id 1jYycw-00007z-Gs
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 17:09:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58530)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jYyZ4-0001qc-PP
- for qemu-devel@nongnu.org; Wed, 13 May 2020 17:05:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42110
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jYyc1-0006FI-CX
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 17:08:21 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33828
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jYyZ3-0004mf-EY
- for qemu-devel@nongnu.org; Wed, 13 May 2020 17:05:18 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jYyc0-0005S5-De
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 17:08:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589403916;
+ s=mimecast20190719; t=1589404099;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=q3W2xP0844oCj8zSGxKzca5TJrXDwMbrvAADeOVg3Gg=;
- b=Oo3X1jxuTl1YS2SMBRM1Ba3a7x6kb3tt/J1Q9FHdjYNkDNvOqkqLoXI592pAt8pVKsVmG6
- h1ES2t0q2pulIoTYYv9YChRC1aqLtVVlI7HBOzTaZT2sF/odTC6SLWbO4urK79UqTN9rXD
- lJrGbvAqXnI9orm/++JXBkPY6oLrA/A=
+ bh=ShBP/Z7jGdDS1kQfRqIASFiZoZfgzW/WISo8yBmqpGw=;
+ b=CD4h8nny4MD+uUW3DCnyKub2RkBEMsC3yykTWLEZwsPWxluR71ipV5YvU08ZTxvHMng02m
+ 5BkLJEoXrMIQdGxQ+RVMm4bGKPwfkEKrEjR9duUnakNc89HcjgkYBj/3uFbMyZzQQF+Foz
+ t7ADUUZbTbGJZdMlRSJs34eTsgnQnsg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-179-fjUU9vT7MLuJxUl2h18TZg-1; Wed, 13 May 2020 17:05:14 -0400
-X-MC-Unique: fjUU9vT7MLuJxUl2h18TZg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-424-AD7wQgT3PpiqeoS0zSy93Q-1; Wed, 13 May 2020 17:08:14 -0400
+X-MC-Unique: AD7wQgT3PpiqeoS0zSy93Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 755428014D7;
- Wed, 13 May 2020 21:05:13 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6738B835B40;
+ Wed, 13 May 2020 21:08:13 +0000 (UTC)
 Received: from [10.10.113.80] (ovpn-113-80.rdu2.redhat.com [10.10.113.80])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 31ECD60CD3;
- Wed, 13 May 2020 21:05:00 +0000 (UTC)
-Subject: Re: [PATCH v4 5/6] scripts/modules/module_block: Use Python 3
- interpreter & add pseudo-main
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BB8F85C1D3;
+ Wed, 13 May 2020 21:08:08 +0000 (UTC)
+Subject: Re: [PATCH v4 6/6] tests/migration/guestperf: Use Python 3 interpreter
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 References: <20200512103238.7078-1-philmd@redhat.com>
- <20200512103238.7078-6-philmd@redhat.com>
+ <20200512103238.7078-7-philmd@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -137,27 +136,27 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <fdae1c32-5f22-543d-6bef-412cde4d0b8a@redhat.com>
-Date: Wed, 13 May 2020 17:04:59 -0400
+Message-ID: <bb98c0b5-f9a4-f0f3-2fd3-31b6c3eca271@redhat.com>
+Date: Wed, 13 May 2020 17:08:08 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200512103238.7078-6-philmd@redhat.com>
+In-Reply-To: <20200512103238.7078-7-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jsnow@redhat.com;
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=jsnow@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 03:05:18
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 01:56:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -184,78 +183,6 @@ Sender: "Qemu-devel"
 
 On 5/12/20 6:32 AM, Philippe Mathieu-Daudé wrote:
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  scripts/modules/module_block.py | 31 ++++++++++++++++---------------
->  1 file changed, 16 insertions(+), 15 deletions(-)
-> 
-> diff --git a/scripts/modules/module_block.py b/scripts/modules/module_block.py
-> index f23191fac1..2e7021b952 100644
-> --- a/scripts/modules/module_block.py
-> +++ b/scripts/modules/module_block.py
-> @@ -1,4 +1,4 @@
-> -#!/usr/bin/python
-> +#!/usr/bin/env python3
->  #
->  # Module information generator
->  #
-> @@ -10,7 +10,6 @@
->  # This work is licensed under the terms of the GNU GPL, version 2.
->  # See the COPYING file in the top-level directory.
->  
-> -import sys
->  import os
->  
->  def get_string_struct(line):
-> @@ -80,19 +79,21 @@ def print_bottom(fheader):
->  #endif
->  ''')
->  
-> -# First argument: output file
-> -# All other arguments: modules source files (.c)
-> -output_file = sys.argv[1]
-> -with open(output_file, 'w') as fheader:
-> -    print_top(fheader)
-> +if __name__ == '__main__':
-> +    import sys
-
-You can keep the imports at the top of the file.
-
-If you want to split apart the code such that the core import doesn't
-import it, you can create a "core module" containing the classes and
-routines, and a separate script entrypoint, which imports arg parsers,
-sys.argv, etc.
-
-For this, for now, it's okay to just leave it at the top of the file.
-
-> +    # First argument: output file
-> +    # All other arguments: modules source files (.c)
-> +    output_file = sys.argv[1]
-> +    with open(output_file, 'w') as fheader:
-> +        print_top(fheader)
->  
-> -    for filename in sys.argv[2:]:
-> -        if os.path.isfile(filename):
-> -            process_file(fheader, filename)
-> -        else:
-> -            print("File " + filename + " does not exist.", file=sys.stderr)
-> -            sys.exit(1)
-> +        for filename in sys.argv[2:]:
-> +            if os.path.isfile(filename):
-> +                process_file(fheader, filename)
-> +            else:
-> +                print("File " + filename + " does not exist.", file=sys.stderr)
-> +                sys.exit(1)
->  
-> -    print_bottom(fheader)
-> +        print_bottom(fheader)
->  
-> -sys.exit(0)
-> +    sys.exit(0)
-> 
-
-But, well. It's nitpicky and I'm not sure it matters just yet. It might,
-as we start to expand pylint to more places, but we're not being
-rigorous about that just yet. So either way, I know this works:
 
 Reviewed-by: John Snow <jsnow@redhat.com>
 
