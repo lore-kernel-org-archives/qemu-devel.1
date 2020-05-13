@@ -2,88 +2,62 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=HK_RANDOM_FROM,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1F34C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 20:31:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 050D9C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 20:32:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDF9C20575
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 20:31:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="edSXI9Y4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDF9C20575
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4EB6620575
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 20:32:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EB6620575
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYy2P-0007PG-LO
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 16:31:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53440)
+	id 1jYy3m-00010e-0m
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 16:32:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53892)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jYxz3-0002Aw-F0
- for qemu-devel@nongnu.org; Wed, 13 May 2020 16:28:05 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53904
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jYxz2-0005Rd-IH
- for qemu-devel@nongnu.org; Wed, 13 May 2020 16:28:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589401683;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=sE0MKQAyJeKJqPlfvS88tWFFYcHSManKYN93vGacqQM=;
- b=edSXI9Y4rMwkd1l+x5NnkzhUO/TEqRsCz7a0iZL/4wJNY5Jcwgesr9CYTLNlip8WfD9X1K
- yq3CepV4loafKXaj80KjBU/A1pfkEEzvvOEwSmj/482djIbn1vjLh2w1CGRlndRVN0f2mx
- bOpaRP7+uQZtsRV7Jx3yrfzFg1ljYo4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-273-ZBs4cmGPOL6D9gMdwP5mDw-1; Wed, 13 May 2020 16:28:00 -0400
-X-MC-Unique: ZBs4cmGPOL6D9gMdwP5mDw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 391A3805726;
- Wed, 13 May 2020 20:27:59 +0000 (UTC)
-Received: from [10.3.116.145] (ovpn-116-145.phx2.redhat.com [10.3.116.145])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D90DC1A925;
- Wed, 13 May 2020 20:27:58 +0000 (UTC)
-Subject: Re: [PATCH v4 13/34] block: Unify bdrv_child_cb_detach()
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200513110544.176672-1-mreitz@redhat.com>
- <20200513110544.176672-14-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <c06c8933-4327-e57d-6b62-db5e1aab86b3@redhat.com>
-Date: Wed, 13 May 2020 15:27:58 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jYy2r-0008Cc-Pc
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 16:32:01 -0400
+Received: from relay64.bu.edu ([128.197.228.104]:44785)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jYy2q-0006Bj-9o
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 16:32:00 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 04DKV5pN029101
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Wed, 13 May 2020 16:31:06 -0400
+Date: Wed, 13 May 2020 16:31:05 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: P J P <ppandit@redhat.com>
+Subject: Re: [PATCH v2 1/3] megasas: use unsigned type for reply_queue_head
+ and check index
+Message-ID: <20200513203105.qjdby3s55kt6c7li@mozz.bu.edu>
+References: <20200513192540.1583887-1-ppandit@redhat.com>
+ <20200513192540.1583887-2-ppandit@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200513110544.176672-14-mreitz@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 04:17:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200513192540.1583887-2-ppandit@redhat.com>
+User-Agent: NeoMutt/20180716
+Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
+ helo=relay64.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 16:31:59
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,34 +71,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Prasad J Pandit <pjp@fedoraproject.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Ding Ren <rding@gatech.edu>, Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Hanqing Zhao <hanqing@gatech.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/13/20 6:05 AM, Max Reitz wrote:
-> Make bdrv_child_cb_detach() call bdrv_backing_detach() for children with
-> a COW role (and drop the reverse call from bdrv_backing_detach()), so it
-> can be used for any child (with a proper role set).
+Hi Prasad,
+On 200514 0055, P J P wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
 > 
-> Because so far no child has a proper role set, we need a temporary new
-> callback for child_backing.detach that ensures bdrv_backing_detach() is
-> called for all COW children that do not have their role set yet.
+> A guest user may set 'reply_queue_head' field of MegasasState to
+> a negative value. Later in 'megasas_lookup_frame' it is used to
+> index into s->frames[] array. Use unsigned type to avoid OOB
+> access issue.
 > 
-> (Also, move bdrv_child_cb_detach() down to group it with
-> bdrv_inherited_options() and bdrv_child_cb_attach().)
+> Also check that 'index' value stays within s->frames[] bounds
+> through the while() loop in 'megasas_lookup_frame' to avoid OOB
+> access.
 > 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Reported-by: Ren Ding <rding@gatech.edu>
+> Reported-by: Hanqing Zhao <hanqing@gatech.edu>
+> Reported-by: Alexander Bulekov <alxndr@bu.edu>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 > ---
->   block.c | 27 ++++++++++++++++++++-------
->   1 file changed, 20 insertions(+), 7 deletions(-)
+
+Acked-by: Alexander Bulekov <alxndr@bu.edu>
+
+I applied these patches and could not reproduce the heap-overflow, or
+LP1878259
+
+Thanks
+-Alex
+
+>  hw/scsi/megasas.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+> Update v1 -> v2: fix OOB access when index > MEGASAS_MAX_FRAMES(=2048)
+>  -> https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg03131.html
+> 
+> diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+> index af18c88b65..6ce598cd69 100644
+> --- a/hw/scsi/megasas.c
+> +++ b/hw/scsi/megasas.c
+> @@ -112,7 +112,7 @@ typedef struct MegasasState {
+>      uint64_t reply_queue_pa;
+>      void *reply_queue;
+>      int reply_queue_len;
+> -    int reply_queue_head;
+> +    uint16_t reply_queue_head;
+>      int reply_queue_tail;
+>      uint64_t consumer_pa;
+>      uint64_t producer_pa;
+> @@ -445,7 +445,7 @@ static MegasasCmd *megasas_lookup_frame(MegasasState *s,
+>  
+>      index = s->reply_queue_head;
+>  
+> -    while (num < s->fw_cmds) {
+> +    while (num < s->fw_cmds && index < MEGASAS_MAX_FRAMES) {
+>          if (s->frames[index].pa && s->frames[index].pa == frame) {
+>              cmd = &s->frames[index];
+>              break;
+> -- 
+> 2.25.4
+> 
 
