@@ -6,62 +6,62 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26809C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:50:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6614BC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:51:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C1DD2053B
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:50:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C1DD2053B
+	by mail.kernel.org (Postfix) with ESMTPS id 7100720659
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:51:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7100720659
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codesourcery.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ18o-0000EL-Uk
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 19:50:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50954)
+	id 1jZ1AC-0002Vw-Ak
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 19:51:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51098)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <joseph_myers@mentor.com>)
- id 1jZ185-0007zo-2S
- for qemu-devel@nongnu.org; Wed, 13 May 2020 19:49:37 -0400
-Received: from esa3.mentor.iphmx.com ([68.232.137.180]:57185)
+ id 1jZ18w-0000XK-Ev
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 19:50:31 -0400
+Received: from esa4.mentor.iphmx.com ([68.232.137.252]:33527)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <joseph_myers@mentor.com>)
- id 1jZ183-0001nb-Ma
- for qemu-devel@nongnu.org; Wed, 13 May 2020 19:49:36 -0400
-IronPort-SDR: RFcFTjgM5CyrE+T+tNxVvScx2f+vR9dJzuMB9FuLgBCBwCxBRyIdEpURwZXrWwoLkvR43s8F3V
- lBPlLpWbNTZVuKDUf6nOnW/++3AFmGZ9EKt4fCjzQQPbKU1ikR8Sb+qqYbvfUAa3ZUxd80OlTj
- 2NqAlkFN8ZgNAitSNKsM6OQo/gXTwjyEFH265d/OvP8UzVmWEv5gDKp4/YC4NUqNhI9A3HjxEY
- 1eRH9AW226Elxy287R88vWAoFud8xoqB4llLAUt0FNIZNdqhf/vQcFEyvj1Sc+5zQPvi0XJtPA
- hm8=
-X-IronPort-AV: E=Sophos;i="5.73,389,1583222400"; d="scan'208";a="48823184"
+ id 1jZ18u-0002Dd-8N
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 19:50:30 -0400
+IronPort-SDR: sr+sogIJb3AScauu8Jvdc5p66eZYbHCT4jQdVYvrmrX0PCZ5XqxkZ+bVabrci/4WoW/3ddtQd8
+ +e/eyyOR8kdp2oUfAYkUkGBmOjFeHDjPcCjQcYbXZiWUXGQz+D6LFqjw1obBZatE3P1mG7hKKO
+ SO4pT1neqwvTj8IY9HZA5ft0z8zi8d8ptEIZYrHxr0bYA+YeAJe7UHWxsQkfAAhjcjnAuZx5PO
+ D67X3+jqpPwuf5japWlVHiGeNfNKp1AdXTYSAz6YKb09PGy80fUOpnw/nxRxAHf6XTZR65iUZC
+ Zr8=
+X-IronPort-AV: E=Sophos;i="5.73,389,1583222400"; d="scan'208";a="48881470"
 Received: from orw-gwy-01-in.mentorg.com ([192.94.38.165])
- by esa3.mentor.iphmx.com with ESMTP; 13 May 2020 15:49:33 -0800
-IronPort-SDR: bzphfi7peCmMi8TXG2X/RmTB++nbU4ff5bQuU/baxOMosWKOiP6r/tjjjP1x6PHwlwfctStyCz
- vUsFkAWf1r76WBnUaZbaUEpbWZg4OjV0OMFNPZT1M/t1yXWj7XrppYres4UPcMYXw0VghbGr61
- UDgEoWhNmVnF4hKzx+rz7eBzlsHYTgmVuQx0j9jwqyBvjYHVVpT+oorDmSdi2KtmtkYDojbWNo
- bQQ+1tb0ZB3mUKams6rSrwbkAMkeDFgGTLjl5uCIyCw8wURqDzODmq3g6WOEUMcfp2j5/W6CST
- L2o=
-Date: Wed, 13 May 2020 23:49:27 +0000
+ by esa4.mentor.iphmx.com with ESMTP; 13 May 2020 15:50:25 -0800
+IronPort-SDR: LQAqwsLc4016YQ+jGIoBGs9Ak+1jGZdZcT591EXgne5645yH1WtslJexXN+/EYOvgmF8uOQ4DS
+ X8dhfMOtErWLN7jlhcJBkWubO1apbwoydC4IpMNfd/GRfIUz6utAUtU4gdp6Le7TkfTSkmveb7
+ TG9VvNPD/Zh4VFCurgtuFqusxRFoEExDQeNh1BiNY9sS5SUzfX39OLiXCwRfEdUaZIKNp00HGc
+ B1jQc1smojsgvds7z++WQcIQIFXSktHEKaYkJEYVB0SL9zLTCpD6S2ytx1qTnsm+gDskuyg94Y
+ 2zg=
+Date: Wed, 13 May 2020 23:50:19 +0000
 From: Joseph Myers <joseph@codesourcery.com>
 X-X-Sender: jsm28@digraph.polyomino.org.uk
 To: <qemu-devel@nongnu.org>, <pbonzini@redhat.com>, <rth@twiddle.net>,
  <ehabkost@redhat.com>
-Subject: [PATCH 1/4] target/i386: fix floating-point load-constant rounding
+Subject: [PATCH 2/4] target/i386: fix fxam handling of invalid encodings
 In-Reply-To: <alpine.DEB.2.21.2005132345100.11687@digraph.polyomino.org.uk>
-Message-ID: <alpine.DEB.2.21.2005132348310.11687@digraph.polyomino.org.uk>
+Message-ID: <alpine.DEB.2.21.2005132349311.11687@digraph.polyomino.org.uk>
 References: <alpine.DEB.2.21.2005132345100.11687@digraph.polyomino.org.uk>
 User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="US-ASCII"
 X-Originating-IP: [137.202.0.90]
-X-ClientProxiedBy: SVR-IES-MBX-04.mgc.mentorg.com (139.181.222.4) To
+X-ClientProxiedBy: svr-ies-mbx-06.mgc.mentorg.com (139.181.222.6) To
  svr-ies-mbx-01.mgc.mentorg.com (139.181.222.1)
-Received-SPF: pass client-ip=68.232.137.180;
- envelope-from=joseph_myers@mentor.com; helo=esa3.mentor.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 19:49:34
+Received-SPF: pass client-ip=68.232.137.252;
+ envelope-from=joseph_myers@mentor.com; helo=esa4.mentor.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 19:48:30
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
 X-Spam_score_int: -39
 X-Spam_score: -4.0
@@ -85,312 +85,188 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The implementations of the fldl2t, fldl2e, fldpi, fldlg2 and fldln2
-instructions load fixed constants independent of the rounding mode.
-Fix them to load a value correctly rounded for the current rounding
-mode (but always rounded to 64-bit precision independent of the
-precision control, and without setting "inexact") as specified.
+The fxam implementation does not check for invalid encodings, instead
+treating them like NaN or normal numbers depending on the exponent.
+Fix it to check that the high bit of the significand is set before
+treating an encoding as NaN or normal, thus resulting in correct
+handling (all of C0, C2 and C3 cleared) for invalid encodings.
 
 Signed-off-by: Joseph Myers <joseph@codesourcery.com>
 ---
- target/i386/fpu_helper.c          |  54 +++++++-
- tests/tcg/i386/test-i386-fldcst.c | 199 ++++++++++++++++++++++++++++++
- 2 files changed, 248 insertions(+), 5 deletions(-)
- create mode 100644 tests/tcg/i386/test-i386-fldcst.c
+ target/i386/fpu_helper.c        |   4 +-
+ tests/tcg/i386/test-i386-fxam.c | 143 ++++++++++++++++++++++++++++++++
+ 2 files changed, 145 insertions(+), 2 deletions(-)
+ create mode 100644 tests/tcg/i386/test-i386-fxam.c
 
 diff --git a/target/i386/fpu_helper.c b/target/i386/fpu_helper.c
-index 0c3fce933c..38968b2ec7 100644
+index 38968b2ec7..51372c371b 100644
 --- a/target/i386/fpu_helper.c
 +++ b/target/i386/fpu_helper.c
-@@ -59,8 +59,13 @@
- #define FPUC_EM 0x3f
- 
- #define floatx80_lg2 make_floatx80(0x3ffd, 0x9a209a84fbcff799LL)
-+#define floatx80_lg2_d make_floatx80(0x3ffd, 0x9a209a84fbcff798LL)
- #define floatx80_l2e make_floatx80(0x3fff, 0xb8aa3b295c17f0bcLL)
-+#define floatx80_l2e_d make_floatx80(0x3fff, 0xb8aa3b295c17f0bbLL)
- #define floatx80_l2t make_floatx80(0x4000, 0xd49a784bcd1b8afeLL)
-+#define floatx80_l2t_u make_floatx80(0x4000, 0xd49a784bcd1b8affLL)
-+#define floatx80_ln2_d make_floatx80(0x3ffe, 0xb17217f7d1cf79abLL)
-+#define floatx80_pi_d make_floatx80(0x4000, 0xc90fdaa22168c234LL)
- 
- #if !defined(CONFIG_USER_ONLY)
- static qemu_irq ferr_irq;
-@@ -544,27 +549,66 @@ void helper_fld1_ST0(CPUX86State *env)
- 
- void helper_fldl2t_ST0(CPUX86State *env)
- {
--    ST0 = floatx80_l2t;
-+    switch (env->fpuc & FPU_RC_MASK) {
-+    case FPU_RC_UP:
-+        ST0 = floatx80_l2t_u;
-+        break;
-+    default:
-+        ST0 = floatx80_l2t;
-+        break;
-+    }
+@@ -1099,7 +1099,7 @@ void helper_fxam_ST0(CPUX86State *env)
+     if (expdif == MAXEXPD) {
+         if (MANTD(temp) == 0x8000000000000000ULL) {
+             env->fpus |= 0x500; /* Infinity */
+-        } else {
++        } else if (MANTD(temp) & 0x8000000000000000ULL) {
+             env->fpus |= 0x100; /* NaN */
+         }
+     } else if (expdif == 0) {
+@@ -1108,7 +1108,7 @@ void helper_fxam_ST0(CPUX86State *env)
+         } else {
+             env->fpus |= 0x4400; /* Denormal */
+         }
+-    } else {
++    } else if (MANTD(temp) & 0x8000000000000000ULL) {
+         env->fpus |= 0x400;
+     }
  }
- 
- void helper_fldl2e_ST0(CPUX86State *env)
- {
--    ST0 = floatx80_l2e;
-+    switch (env->fpuc & FPU_RC_MASK) {
-+    case FPU_RC_DOWN:
-+    case FPU_RC_CHOP:
-+        ST0 = floatx80_l2e_d;
-+        break;
-+    default:
-+        ST0 = floatx80_l2e;
-+        break;
-+    }
- }
- 
- void helper_fldpi_ST0(CPUX86State *env)
- {
--    ST0 = floatx80_pi;
-+    switch (env->fpuc & FPU_RC_MASK) {
-+    case FPU_RC_DOWN:
-+    case FPU_RC_CHOP:
-+        ST0 = floatx80_pi_d;
-+        break;
-+    default:
-+        ST0 = floatx80_pi;
-+        break;
-+    }
- }
- 
- void helper_fldlg2_ST0(CPUX86State *env)
- {
--    ST0 = floatx80_lg2;
-+    switch (env->fpuc & FPU_RC_MASK) {
-+    case FPU_RC_DOWN:
-+    case FPU_RC_CHOP:
-+        ST0 = floatx80_lg2_d;
-+        break;
-+    default:
-+        ST0 = floatx80_lg2;
-+        break;
-+    }
- }
- 
- void helper_fldln2_ST0(CPUX86State *env)
- {
--    ST0 = floatx80_ln2;
-+    switch (env->fpuc & FPU_RC_MASK) {
-+    case FPU_RC_DOWN:
-+    case FPU_RC_CHOP:
-+        ST0 = floatx80_ln2_d;
-+        break;
-+    default:
-+        ST0 = floatx80_ln2;
-+        break;
-+    }
- }
- 
- void helper_fldz_ST0(CPUX86State *env)
-diff --git a/tests/tcg/i386/test-i386-fldcst.c b/tests/tcg/i386/test-i386-fldcst.c
+diff --git a/tests/tcg/i386/test-i386-fxam.c b/tests/tcg/i386/test-i386-fxam.c
 new file mode 100644
-index 0000000000..e635432ccf
+index 0000000000..ddd76ca42d
 --- /dev/null
-+++ b/tests/tcg/i386/test-i386-fldcst.c
-@@ -0,0 +1,199 @@
-+/* Test instructions loading floating-point constants.  */
++++ b/tests/tcg/i386/test-i386-fxam.c
+@@ -0,0 +1,143 @@
++/* Test fxam instruction.  */
 +
 +#include <stdint.h>
 +#include <stdio.h>
 +
-+volatile long double ld_res;
++union u {
++    struct { uint64_t sig; uint16_t sign_exp; } s;
++    long double ld;
++};
++
++volatile union u ld_pseudo_m16382 = { .s = { UINT64_C(1) << 63, 0 } };
++volatile union u ld_pseudo_nm16382 = { .s = { UINT64_C(1) << 63, 0x8000 } };
++volatile union u ld_invalid_1 = { .s = { 1, 1234 } };
++volatile union u ld_invalid_2 = { .s = { 0, 1234 } };
++volatile union u ld_invalid_3 = { .s = { 0, 0x7fff } };
++volatile union u ld_invalid_4 = { .s = { (UINT64_C(1) << 63) - 1, 0x7fff } };
++volatile union u ld_invalid_n1 = { .s = { 1, 0x8123 } };
++volatile union u ld_invalid_n2 = { .s = { 0, 0x8123 } };
++volatile union u ld_invalid_n3 = { .s = { 0, 0xffff } };
++volatile union u ld_invalid_n4 = { .s = { (UINT64_C(1) << 63) - 1, 0xffff } };
++
++#define C0 (1 << 8)
++#define C1 (1 << 9)
++#define C2 (1 << 10)
++#define C3 (1 << 14)
++#define FLAGS (C0 | C1 | C2 | C3)
 +
 +int main(void)
 +{
-+    short cw;
++    short sw;
 +    int ret = 0;
-+
-+    /* Round to nearest.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0x000;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fldl2t" : "=t" (ld_res));
-+    if (ld_res != 0x3.5269e12f346e2bf8p+0L) {
-+        printf("FAIL: fldl2t N\n");
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (0.0L));
++    if ((sw & FLAGS) != C3) {
++        printf("FAIL: +0\n");
 +        ret = 1;
 +    }
-+    /* Round downward.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0x400;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fldl2t" : "=t" (ld_res));
-+    if (ld_res != 0x3.5269e12f346e2bf8p+0L) {
-+        printf("FAIL: fldl2t D\n");
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (-0.0L));
++    if ((sw & FLAGS) != (C3 | C1)) {
++        printf("FAIL: -0\n");
 +        ret = 1;
 +    }
-+    /* Round toward zero.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0xc00;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fldl2t" : "=t" (ld_res));
-+    if (ld_res != 0x3.5269e12f346e2bf8p+0L) {
-+        printf("FAIL: fldl2t Z\n");
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (1.0L));
++    if ((sw & FLAGS) != C2) {
++        printf("FAIL: +normal\n");
 +        ret = 1;
 +    }
-+    /* Round upward.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0x800;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fldl2t" : "=t" (ld_res));
-+    if (ld_res != 0x3.5269e12f346e2bfcp+0L) {
-+        printf("FAIL: fldl2t U\n");
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (-1.0L));
++    if ((sw & FLAGS) != (C2 | C1)) {
++        printf("FAIL: -normal\n");
 +        ret = 1;
 +    }
-+
-+    /* Round to nearest.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0x000;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fldl2e" : "=t" (ld_res));
-+    if (ld_res != 0x1.71547652b82fe178p+0L) {
-+        printf("FAIL: fldl2e N\n");
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (__builtin_infl()));
++    if ((sw & FLAGS) != (C2 | C0)) {
++        printf("FAIL: +inf\n");
 +        ret = 1;
 +    }
-+    /* Round downward.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0x400;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fldl2e" : "=t" (ld_res));
-+    if (ld_res != 0x1.71547652b82fe176p+0L) {
-+        printf("FAIL: fldl2e D\n");
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (-__builtin_infl()));
++    if ((sw & FLAGS) != (C2 | C1 | C0)) {
++        printf("FAIL: -inf\n");
 +        ret = 1;
 +    }
-+    /* Round toward zero.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0xc00;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fldl2e" : "=t" (ld_res));
-+    if (ld_res != 0x1.71547652b82fe176p+0L) {
-+        printf("FAIL: fldl2e Z\n");
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (__builtin_nanl("")));
++    if ((sw & FLAGS) != C0) {
++        printf("FAIL: +nan\n");
 +        ret = 1;
 +    }
-+    /* Round upward.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0x800;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fldl2e" : "=t" (ld_res));
-+    if (ld_res != 0x1.71547652b82fe178p+0L) {
-+        printf("FAIL: fldl2e U\n");
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (-__builtin_nanl("")));
++    if ((sw & FLAGS) != (C1 | C0)) {
++        printf("FAIL: -nan\n");
 +        ret = 1;
 +    }
-+
-+    /* Round to nearest.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0x000;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fldpi" : "=t" (ld_res));
-+    if (ld_res != 0x3.243f6a8885a308d4p+0L) {
-+        printf("FAIL: fldpi N\n");
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (__builtin_nansl("")));
++    if ((sw & FLAGS) != C0) {
++        printf("FAIL: +snan\n");
 +        ret = 1;
 +    }
-+    /* Round downward.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0x400;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fldpi" : "=t" (ld_res));
-+    if (ld_res != 0x3.243f6a8885a308dp+0L) {
-+        printf("FAIL: fldpi D\n");
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (-__builtin_nansl("")));
++    if ((sw & FLAGS) != (C1 | C0)) {
++        printf("FAIL: -snan\n");
 +        ret = 1;
 +    }
-+    /* Round toward zero.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0xc00;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fldpi" : "=t" (ld_res));
-+    if (ld_res != 0x3.243f6a8885a308dp+0L) {
-+        printf("FAIL: fldpi Z\n");
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (0x1p-16445L));
++    if ((sw & FLAGS) != (C3 | C2)) {
++        printf("FAIL: +denormal\n");
 +        ret = 1;
 +    }
-+    /* Round upward.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0x800;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fldpi" : "=t" (ld_res));
-+    if (ld_res != 0x3.243f6a8885a308d4p+0L) {
-+        printf("FAIL: fldpi U\n");
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (-0x1p-16445L));
++    if ((sw & FLAGS) != (C3 | C2 | C1)) {
++        printf("FAIL: -denormal\n");
 +        ret = 1;
 +    }
-+
-+    /* Round to nearest.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0x000;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fldlg2" : "=t" (ld_res));
-+    if (ld_res != 0x4.d104d427de7fbcc8p-4L) {
-+        printf("FAIL: fldlg2 N\n");
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (ld_pseudo_m16382.ld));
++    if ((sw & FLAGS) != (C3 | C2)) {
++        printf("FAIL: +pseudo-denormal\n");
 +        ret = 1;
 +    }
-+    /* Round downward.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0x400;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fldlg2" : "=t" (ld_res));
-+    if (ld_res != 0x4.d104d427de7fbccp-4L) {
-+        printf("FAIL: fldlg2 D\n");
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (ld_pseudo_nm16382.ld));
++    if ((sw & FLAGS) != (C3 | C2 | C1)) {
++        printf("FAIL: -pseudo-denormal\n");
 +        ret = 1;
 +    }
-+    /* Round toward zero.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0xc00;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fldlg2" : "=t" (ld_res));
-+    if (ld_res != 0x4.d104d427de7fbccp-4L) {
-+        printf("FAIL: fldlg2 Z\n");
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (ld_invalid_1.ld));
++    if ((sw & FLAGS) != 0) {
++        printf("FAIL: +invalid 1\n");
 +        ret = 1;
 +    }
-+    /* Round upward.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0x800;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fldlg2" : "=t" (ld_res));
-+    if (ld_res != 0x4.d104d427de7fbcc8p-4L) {
-+        printf("FAIL: fldlg2 U\n");
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (ld_invalid_n1.ld));
++    if ((sw & FLAGS) != C1) {
++        printf("FAIL: -invalid 1\n");
 +        ret = 1;
 +    }
-+
-+    /* Round to nearest.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0x000;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fldln2" : "=t" (ld_res));
-+    if (ld_res != 0xb.17217f7d1cf79acp-4L) {
-+        printf("FAIL: fldln2 N\n");
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (ld_invalid_2.ld));
++    if ((sw & FLAGS) != 0) {
++        printf("FAIL: +invalid 2\n");
 +        ret = 1;
 +    }
-+    /* Round downward.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0x400;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fldln2" : "=t" (ld_res));
-+    if (ld_res != 0xb.17217f7d1cf79abp-4L) {
-+        printf("FAIL: fldln2 D\n");
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (ld_invalid_n2.ld));
++    if ((sw & FLAGS) != C1) {
++        printf("FAIL: -invalid 2\n");
 +        ret = 1;
 +    }
-+    /* Round toward zero.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0xc00;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fldln2" : "=t" (ld_res));
-+    if (ld_res != 0xb.17217f7d1cf79abp-4L) {
-+        printf("FAIL: fldln2 Z\n");
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (ld_invalid_3.ld));
++    if ((sw & FLAGS) != 0) {
++        printf("FAIL: +invalid 3\n");
 +        ret = 1;
 +    }
-+    /* Round upward.  */
-+    __asm__ volatile ("fnstcw %0" : "=m" (cw));
-+    cw = (cw & ~0xc00) | 0x800;
-+    __asm__ volatile ("fldcw %0" : : "m" (cw));
-+    __asm__ volatile ("fldln2" : "=t" (ld_res));
-+    if (ld_res != 0xb.17217f7d1cf79acp-4L) {
-+        printf("FAIL: fldln2 U\n");
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (ld_invalid_n3.ld));
++    if ((sw & FLAGS) != C1) {
++        printf("FAIL: -invalid 3\n");
 +        ret = 1;
 +    }
-+
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (ld_invalid_4.ld));
++    if ((sw & FLAGS) != 0) {
++        printf("FAIL: +invalid 4\n");
++        ret = 1;
++    }
++    __asm__ volatile ("fxam\nfnstsw" : "=a" (sw) : "t" (ld_invalid_n4.ld));
++    if ((sw & FLAGS) != C1) {
++        printf("FAIL: -invalid 4\n");
++        ret = 1;
++    }
 +    return ret;
 +}
 -- 
