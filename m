@@ -2,77 +2,80 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E14B1C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:52:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19FD9C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:52:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D24FF2053B
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:52:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D24FF2053B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codesourcery.com
+	by mail.kernel.org (Postfix) with ESMTPS id 25DB22053B
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:52:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25DB22053B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ1AT-00037x-JE
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 19:52:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51276)
+	id 1jZ1Ai-0003jO-4A
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 19:52:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51124)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <joseph_myers@mentor.com>)
- id 1jZ19i-0001sL-EG
- for qemu-devel@nongnu.org; Wed, 13 May 2020 19:51:18 -0400
-Received: from esa2.mentor.iphmx.com ([68.232.141.98]:62985)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <joseph_myers@mentor.com>)
- id 1jZ19h-0002RL-9d
- for qemu-devel@nongnu.org; Wed, 13 May 2020 19:51:18 -0400
-IronPort-SDR: GV2QDaaxGtPX+rus/4DwNvqmWrDrWz/K/3lyc76KOXKx20VotUqHHbizKjxux5mkcGOr9ztx7b
- 4SkI5JUyHWXINa2DL1Q5b8xoUfoijXlpfQx+upXFLXGUzurOn/wfY0YKb8wtjVpZ3f3XJX+cFH
- i9ELBMu2ypnFbcx4MJxE7urdlIqhhigeu4x5Sz4fZ3vjvu1Q4Vqy+jBrRVSFxhAwmjs9fEHir6
- QaPLLNl39T/Ov43sMoj9N0+hQMoyMSQIT7xqNg84KfPuSQC7g4tAivG+fzseRoVXjQtNP7pF2n
- 1gc=
-X-IronPort-AV: E=Sophos;i="5.73,389,1583222400"; d="scan'208";a="48761597"
-Received: from orw-gwy-01-in.mentorg.com ([192.94.38.165])
- by esa2.mentor.iphmx.com with ESMTP; 13 May 2020 15:51:14 -0800
-IronPort-SDR: sZrkrfRRXT+HpjaJ/WnrolmPGH3vAO+4jzWccM4+xG5lEn1ZfXOGpfSfdP9P++ovTKUfpu/uBZ
- UWso7jMJXWBkM9WyO+vVb5WOQyQ3J1eSUx5uBNVQHX+B/4sJjeha4Zh8YlvuvgJpRh+P8gqkvu
- FQ5ty12w28YeAj6nEIwKa2vBowcSxl28B2QX7jXLLvFpIuwvxp0tE/WxY2mMHwU1GCbCZr9cV9
- lUIpb/Ykw9mmi3Q3NvmxbcP0gEG6d24E+kJKVQh0XJZb8Q0XlYic4YxAF5tlOaEkthV2YHq5KM
- GGQ=
-Date: Wed, 13 May 2020 23:51:09 +0000
-From: Joseph Myers <joseph@codesourcery.com>
-X-X-Sender: jsm28@digraph.polyomino.org.uk
-To: <qemu-devel@nongnu.org>, <pbonzini@redhat.com>, <rth@twiddle.net>,
- <ehabkost@redhat.com>
-Subject: [PATCH 3/4] target/i386: fix fbstp handling of negative zero
-In-Reply-To: <alpine.DEB.2.21.2005132345100.11687@digraph.polyomino.org.uk>
-Message-ID: <alpine.DEB.2.21.2005132350230.11687@digraph.polyomino.org.uk>
-References: <alpine.DEB.2.21.2005132345100.11687@digraph.polyomino.org.uk>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jZ195-0000jq-HY
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 19:50:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42218)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jZ194-0002Fj-6z
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 19:50:39 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jZ192-0000Fe-7U
+ for <qemu-devel@nongnu.org>; Wed, 13 May 2020 23:50:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 35ACC2E80E7
+ for <qemu-devel@nongnu.org>; Wed, 13 May 2020 23:50:36 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-X-Originating-IP: [137.202.0.90]
-X-ClientProxiedBy: SVR-IES-MBX-03.mgc.mentorg.com (139.181.222.3) To
- svr-ies-mbx-01.mgc.mentorg.com (139.181.222.1)
-Received-SPF: pass client-ip=68.232.141.98;
- envelope-from=joseph_myers@mentor.com; helo=esa2.mentor.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 19:51:15
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -39
-X-Spam_score: -4.0
-X-Spam_bar: ----
-X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 13 May 2020 23:44:07 -0000
+From: easyaspi314 <1878501@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: i386 linux-user
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: husseydevin
+X-Launchpad-Bug-Reporter: easyaspi314 (husseydevin)
+X-Launchpad-Bug-Modifier: easyaspi314 (husseydevin)
+Message-Id: <158941344748.31408.6066832909673515633.malonedeb@chaenomeles.canonical.com>
+Subject: [Bug 1878501] [NEW] qemu-i386 does not define AT_SYSINFO
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="0385b538081bc4718df6fb844a3afc89729c94ce";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 8153661d407e4d6477520e1906968f92c2580907
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 19:50:36
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -81,77 +84,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1878501 <1878501@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The fbstp implementation stores +0 when the rounded result should be
--0 because it compares an integer value with 0 to determine the sign.
-Fix this by checking the sign bit of the operand instead.
+Public bug reported:
 
-Signed-off-by: Joseph Myers <joseph@codesourcery.com>
----
- target/i386/fpu_helper.c         |  5 ++++-
- tests/tcg/i386/test-i386-fbstp.c | 25 +++++++++++++++++++++++++
- 2 files changed, 29 insertions(+), 1 deletion(-)
- create mode 100644 tests/tcg/i386/test-i386-fbstp.c
+qemu-i386 does not define the AT_SYSINFO auxval when running i386 Linux
+binaries.
 
-diff --git a/target/i386/fpu_helper.c b/target/i386/fpu_helper.c
-index 51372c371b..e1872b3fc0 100644
---- a/target/i386/fpu_helper.c
-+++ b/target/i386/fpu_helper.c
-@@ -726,11 +726,14 @@ void helper_fbst_ST0(CPUX86State *env, target_ulong ptr)
-     int v;
-     target_ulong mem_ref, mem_end;
-     int64_t val;
-+    CPU_LDoubleU temp;
-+
-+    temp.d = ST0;
- 
-     val = floatx80_to_int64(ST0, &env->fp_status);
-     mem_ref = ptr;
-     mem_end = mem_ref + 9;
--    if (val < 0) {
-+    if (SIGND(temp)) {
-         cpu_stb_data_ra(env, mem_end, 0x80, GETPC());
-         val = -val;
-     } else {
-diff --git a/tests/tcg/i386/test-i386-fbstp.c b/tests/tcg/i386/test-i386-fbstp.c
-new file mode 100644
-index 0000000000..d368949188
---- /dev/null
-+++ b/tests/tcg/i386/test-i386-fbstp.c
-@@ -0,0 +1,25 @@
-+/* Test fbstp instruction.  */
-+
-+#include <stdio.h>
-+#include <string.h>
-+
-+int main(void)
-+{
-+    int ret = 0;
-+    unsigned char out[10];
-+    memset(out, 0xfe, sizeof out);
-+    __asm__ volatile ("fbstp %0" : "=m" (out) : "t" (-0.0L) : "st");
-+    out[9] &= 0x80;
-+    if (memcmp(out, "\0\0\0\0\0\0\0\0\0\x80", sizeof out) != 0) {
-+        printf("FAIL: fbstp -0\n");
-+        ret = 1;
-+    }
-+    memset(out, 0x12, sizeof out);
-+    __asm__ volatile ("fbstp %0" : "=m" (out) : "t" (-0.1L) : "st");
-+    out[9] &= 0x80;
-+    if (memcmp(out, "\0\0\0\0\0\0\0\0\0\x80", sizeof out) != 0) {
-+        printf("FAIL: fbstp -0.1\n");
-+        ret = 1;
-+    }
-+    return ret;
-+}
--- 
-2.17.1
+On most libcs, this is properly handled, but this is mandatory for the
+i686 Bionic (Android) libc or it will segfault.
+
+This is due to a blind assumption that getauxval(AT_SYSINFO) will return
+a valid function pointer:
+
+The code varies from version to version, but it looks like this:
+
+void *__libc_sysinfo;
+// mangled as _Z19__libc_init_sysinfov
+void __libc_init_sysinfo() {
+  bool dummy;
+  // __bionic_getauxval =3D getauxval
+  __libc_sysinfo =3D reinterpret_cast<void *>(__bionic_getauxval(AT_SYSINFO=
+, dummy));
+}
+
+A simple way to reproduce is to compile a basic C program against the
+NDK:
+
+int main(void) { return 0; }
+
+$ i686-linux-android-clang -static empty.c -o empty
+$ qemu-i386 -cpu max ./empty
+qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+Segmentation fault
+
+The place where it segfaults is misleading: It will, at least on the
+current NDK, crash on __set_thread_area, this is due to it calling a
+function pointer to __libc_sysinfo returned by __kernel_syscall.
+
+QEMU 4.1.1 (aarch64)
+Pixel 2 XL via Termux
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
 
--- 
-Joseph S. Myers
-joseph@codesourcery.com
+** Tags: i386 linux-user
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1878501
+
+Title:
+  qemu-i386 does not define AT_SYSINFO
+
+Status in QEMU:
+  New
+
+Bug description:
+  qemu-i386 does not define the AT_SYSINFO auxval when running i386
+  Linux binaries.
+
+  On most libcs, this is properly handled, but this is mandatory for the
+  i686 Bionic (Android) libc or it will segfault.
+
+  This is due to a blind assumption that getauxval(AT_SYSINFO) will
+  return a valid function pointer:
+
+  The code varies from version to version, but it looks like this:
+
+  void *__libc_sysinfo;
+  // mangled as _Z19__libc_init_sysinfov
+  void __libc_init_sysinfo() {
+    bool dummy;
+    // __bionic_getauxval =3D getauxval
+    __libc_sysinfo =3D reinterpret_cast<void *>(__bionic_getauxval(AT_SYSIN=
+FO, dummy));
+  }
+
+  A simple way to reproduce is to compile a basic C program against the
+  NDK:
+
+  int main(void) { return 0; }
+
+  $ i686-linux-android-clang -static empty.c -o empty
+  $ qemu-i386 -cpu max ./empty
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  Segmentation fault
+
+  The place where it segfaults is misleading: It will, at least on the
+  current NDK, crash on __set_thread_area, this is due to it calling a
+  function pointer to __libc_sysinfo returned by __kernel_syscall.
+
+  QEMU 4.1.1 (aarch64)
+  Pixel 2 XL via Termux
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1878501/+subscriptions
 
