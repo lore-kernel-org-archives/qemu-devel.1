@@ -8,73 +8,74 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97AFEC2D0F8
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 07:46:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 030EFC2D0F8
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 07:57:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F552206F5
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 07:46:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C2E1B23127
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 07:57:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ScDdYgia"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F552206F5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iZdfL8Ag"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2E1B23127
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYm67-0006iJ-Io
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 03:46:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55832)
+	id 1jYmGe-0004MF-V2
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 03:57:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57370)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jYm5R-0006AO-UA
- for qemu-devel@nongnu.org; Wed, 13 May 2020 03:45:53 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37310)
+ id 1jYmG3-0003jg-A0
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 03:56:51 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50339)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jYm5Q-0006xZ-Nh
- for qemu-devel@nongnu.org; Wed, 13 May 2020 03:45:53 -0400
-Received: by mail-wr1-x442.google.com with SMTP id l17so6005165wrr.4
- for <qemu-devel@nongnu.org>; Wed, 13 May 2020 00:45:52 -0700 (PDT)
+ id 1jYmG2-0001Ft-9z
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 03:56:50 -0400
+Received: by mail-wm1-x344.google.com with SMTP id m12so20544118wmc.0
+ for <qemu-devel@nongnu.org>; Wed, 13 May 2020 00:56:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=81+O2PYnyn4ylymuf/Tw1K3inQmvYap14gljoCeFtKU=;
- b=ScDdYgiaa7+bQ+NAchhbpAmDwLyzr/Z+1ORj8hdA/gEehghF9p6LbPOjK1CbyCfJ2i
- RVmWgmss7FlOVTA6Nldzi9lRCzIhVaTFJn2CvTsWI4tnElv3H+6a0jhEaVfIxMCiLgyx
- nR2Oj6Hs3IVGnJ11Y2TunzUWWsydpNifC6eHQ6IIrF9maQJnoMB8GrUUaQgP94YjfknY
- mG0ZwbUffgBKL3fyQbHC1ESk758Z6VIINSx03YsHwbDS7lbrAPCA7wHdJOHD4po0YNCU
- oDQwHCr2T/xMlAYF0ZN/9sfGNPUT5pIXVqWACUloUE6emxn01j1AkvdFpQVUy608t9CM
- 2WRA==
+ bh=/U6VqwfH9e9YdiPn1eD/b3mLjRRHfJDk4CRzGqFAntA=;
+ b=iZdfL8AgkHfaU4mmaxSdSn9yzkOzXKxITsUXjN3ikXyEDDOvt7Y0WU34p30FiIbZdY
+ sDoR2n0GreUrmiYO1t146KXgIM2LvryAILcR8G/DkVYXUTzzCV5XOQw3yEFMLrGtS2H3
+ rNb4xxPi/H2WVEBn2Hzbmu8MjQ2A/PP0wi+DfsZQJb0a4OenM0RP8NfBTveeBSc2RBCB
+ TOEjjAyF5qtpwELiT5rtxsZFt1VNhR081udA9MxgQ+jFMSc4EBKtLUKHejf5/cJ2onaf
+ oBYdw9YiIoMyLAh4Q1Um5QMX8oLe6PhJCLiCpkMCPUvNH4NKvz4jd7vBId7tzkkvIn/J
+ swPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=81+O2PYnyn4ylymuf/Tw1K3inQmvYap14gljoCeFtKU=;
- b=S4gDABWu5tTgkLgb5ZklFM9quX5XVd258f2nQj2n4eJAj7dBRyw3sJACF2RH5chF18
- TykHH+cOQ9do2NFK2jRl/AlcOe4EgZoKZvRJfdeVh47RspDVpXW/jbEA6NZ3npuA3QYc
- 6EYEuGNe3MTGWc3YXAXw3D9RAyZJx+hFXOyVkyIzOshuTiWXe3rS1VIURRARSkSifCHK
- 9Zsu8g2osL6R8Vk2Ap/isz949J40R9vaP6EGpRGqRskPYHGqXGEop9VFxWtrq5fmfFLN
- OigsdkByFnG+1SpELMVUm4r61sf2QscxOtCJ1He+UVYLr5zYpSJbJYM1uztD/fB2MXgh
- ZJbw==
-X-Gm-Message-State: AGi0PubpuiTVksYwS8s5CJSZyICmqa2qs3WiD6pXEb2/DZsHJHSpF+h/
- 2bEgtoj879u6yMvg9acAopfzQtna3LIfxNLP7aI=
-X-Google-Smtp-Source: APiQypJLRS0lfsAilabNkj+XfbqqT4Mo3jioosJ9l8ohIYzRK5qRsXG+UxKfW3DaQlKUSOXKR1WhXp9r1j9Keh+6mDI=
-X-Received: by 2002:a5d:4b0f:: with SMTP id v15mr19850778wrq.162.1589355951312; 
- Wed, 13 May 2020 00:45:51 -0700 (PDT)
+ bh=/U6VqwfH9e9YdiPn1eD/b3mLjRRHfJDk4CRzGqFAntA=;
+ b=Zq7JDS6+bvc+4vcUtKtaVPgj3FzAH7Dq7sbMmmmm0gjHHbOb2eV+1YWUA+IGHsF2Zb
+ 4iA+YYmdro3rKHuYKMPyPBnIze28meTiJbglHlojjf2fd8WQ69/mXwRq2ad7fpRTGQNm
+ iqCa8kbA9+4kabOEoC2pNFra1YzieLxOCbfSLbX5Juo9dTMQjqluJdZNyef2Vpy5RgjV
+ ockR+qiXc5e6wlMrrDAe72eMh7BBbLonTiGhhL8y2+rNI8ghAtZWkcyadL/pnuxayNAn
+ vX1sKXerVoai0D5NP9/koXY7hlGL2bMwqNYsfmwcF1upnSRLlRZKdH0ojjftynk3f3ov
+ 0veQ==
+X-Gm-Message-State: AGi0Pub/39cBP5wvs/ibaEJoHZh7cKVCst9W2CobrpY3wSJmGoj7+myL
+ 8pThJfGASGGiqh5vyASkZjCpBP2BsPzqV7mvNqA=
+X-Google-Smtp-Source: APiQypKzweMf2SuzIbVEOndFOMeYgxxv+j5a7v0xW9z+tzDcnWdVTdjM7C+tx3anKaiG+DduWfoXHJkHASGJQPHtAhM=
+X-Received: by 2002:a1c:5685:: with SMTP id k127mr11907141wmb.50.1589356608909; 
+ Wed, 13 May 2020 00:56:48 -0700 (PDT)
 MIME-Version: 1.0
 References: <1586337380-25217-1-git-send-email-chenhc@lemote.com>
-In-Reply-To: <1586337380-25217-1-git-send-email-chenhc@lemote.com>
+ <1586337380-25217-2-git-send-email-chenhc@lemote.com>
+In-Reply-To: <1586337380-25217-2-git-send-email-chenhc@lemote.com>
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Wed, 13 May 2020 09:45:18 +0200
-Message-ID: <CAHiYmc647DO5Y7Cezkv5tXB-PNcA=yyTsLY+Wwrp2va7wq9_dQ@mail.gmail.com>
-Subject: Re: [PATCH 1/3] target/mips: Support variable page size
+Date: Wed, 13 May 2020 09:56:26 +0200
+Message-ID: <CAHiYmc5zPT97Zxr6JTXY8dHTSU7aFC3EY6ODgULuex-xRYWCQA@mail.gmail.com>
+Subject: Re: [PATCH 2/3] mips/mips_fulong2e: Set preferred page size to 16KB
 To: Huacai Chen <chenhc@lemote.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,40 +104,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=D1=81=D1=80=D0=B5, 8. =D0=B0=D0=BF=D1=80 2020. =D1=83 11:07 Huacai Chen <c=
+=D1=81=D1=80=D0=B5, 8. =D0=B0=D0=BF=D1=80 2020. =D1=83 11:08 Huacai Chen <c=
 henhc@lemote.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=
 =D0=BB=D0=B0:
 >
-> Traditionally, MIPS use 4KB page size, but Loongson prefer 16KB page
-> size in system emulator. So, let's define TARGET_PAGE_BITS_VARY and
-> TARGET_PAGE_BITS_MIN to support variable page size.
+> Loongson processor prefers 16KB page size in system emulator, so let's
+> define mc->minimum_page_bits to 14.
 >
 > Cc: Jiaxun Yang <jiaxun.yang@flygoat.com>
 > Signed-off-by: Huacai Chen <chenhc@lemote.com>
 > ---
->  target/mips/cpu-param.h | 5 +++++
->  1 file changed, 5 insertions(+)
->
+
+Huacai, thanks for the efforts regarding this series! I will very
+likely accept patches 1/3 and 2/3 from this series in my next MIPS
+queue, but the possible problem is that I somehow can't find patch 3/3
+from my series in my mailbox. (I think it also the case with the cover
+letter.) Could you perhaps resend the whole series? I'm concerned that
+patch 3/3 contains something important, and it would be a shame that
+it is omitted, and 1/3 and 2/3 are accepted.
+
+For this patch:
 
 Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 
-> diff --git a/target/mips/cpu-param.h b/target/mips/cpu-param.h
-> index 308660d..9c4a6ea 100644
-> --- a/target/mips/cpu-param.h
-> +++ b/target/mips/cpu-param.h
-> @@ -23,7 +23,12 @@
->  #  define TARGET_VIRT_ADDR_SPACE_BITS 32
->  #endif
->  #endif
-> +#ifdef CONFIG_USER_ONLY
->  #define TARGET_PAGE_BITS 12
-> +#else
-> +#define TARGET_PAGE_BITS_VARY
-> +#define TARGET_PAGE_BITS_MIN 12
-> +#endif
->  #define NB_MMU_MODES 4
+>  hw/mips/mips_fulong2e.c | 1 +
+>  1 file changed, 1 insertion(+)
 >
->  #endif
+> diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+> index 5040afd..23897d7 100644
+> --- a/hw/mips/mips_fulong2e.c
+> +++ b/hw/mips/mips_fulong2e.c
+> @@ -399,6 +399,7 @@ static void mips_fulong2e_machine_init(MachineClass *=
+mc)
+>      mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("Loongson-2E");
+>      mc->default_ram_size =3D 256 * MiB;
+>      mc->default_ram_id =3D "fulong2e.ram";
+> +    mc->minimum_page_bits =3D 14;
+>  }
+>
+>  DEFINE_MACHINE("fulong2e", mips_fulong2e_machine_init)
 > --
 > 2.7.0
 >
