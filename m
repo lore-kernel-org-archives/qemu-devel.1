@@ -6,38 +6,38 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9360FC2D0F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 09:59:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13F22CA90AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 10:00:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66F6223129
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 09:59:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66F6223129
+	by mail.kernel.org (Postfix) with ESMTPS id DC3AE20575
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 10:00:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC3AE20575
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYoAG-0003wJ-LM
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 05:59:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44716)
+	id 1jYoBZ-0005Ve-4n
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 06:00:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44720)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYo30-0006j4-5x; Wed, 13 May 2020 05:51:30 -0400
-Received: from relay.sw.ru ([185.231.240.75]:54018)
+ id 1jYo30-0006ka-QB; Wed, 13 May 2020 05:51:30 -0400
+Received: from relay.sw.ru ([185.231.240.75]:54032)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYo2z-0003ZG-2l; Wed, 13 May 2020 05:51:29 -0400
+ id 1jYo2z-0003ZK-5A; Wed, 13 May 2020 05:51:30 -0400
 Received: from dhcp-172-16-25-136.sw.ru ([172.16.25.136] helo=localhost.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYo2W-0001e4-8J; Wed, 13 May 2020 12:51:00 +0300
+ id 1jYo2W-0001e4-DS; Wed, 13 May 2020 12:51:00 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v5 12/15] copy-on-read: add filter append/drop functions
-Date: Wed, 13 May 2020 12:50:53 +0300
-Message-Id: <1589363456-1035571-13-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v5 14/15] iotests: prepare 245 for using filter in block-stream
+Date: Wed, 13 May 2020 12:50:55 +0300
+Message-Id: <1589363456-1035571-15-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1589363456-1035571-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1589363456-1035571-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -70,203 +70,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Provide API for the COR-filter insertion/removal.
-Also, drop the filter child permissions for an inactive state when the
-filter node is being removed.
+The preliminary patch modifies the test 245 to prepare the block-stream
+job for using COR-filter. The filter breaks the backing chain being
+connected to the underlying node by file child link.
 
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- block/copy-on-read.c | 102 +++++++++++++++++++++++++++++++++++++++++++++++++++
- block/copy-on-read.h |  36 ++++++++++++++++++
- 2 files changed, 138 insertions(+)
- create mode 100644 block/copy-on-read.h
+ tests/qemu-iotests/245 | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/block/copy-on-read.c b/block/copy-on-read.c
-index 4030d56..229a97c 100644
---- a/block/copy-on-read.c
-+++ b/block/copy-on-read.c
-@@ -24,11 +24,20 @@
- #include "qemu/cutils.h"
- #include "block/block_int.h"
- #include "qemu/module.h"
-+#include "qapi/error.h"
-+#include "qapi/qmp/qdict.h"
-+#include "block/copy-on-read.h"
+diff --git a/tests/qemu-iotests/245 b/tests/qemu-iotests/245
+index 4f5f0bb..5bcddc4 100755
+--- a/tests/qemu-iotests/245
++++ b/tests/qemu-iotests/245
+@@ -896,15 +896,19 @@ class TestBlockdevReopen(iotests.QMPTestCase):
+         # make hd1 read-only and block-stream requires it to be read-write
+         # (Which error message appears depends on whether the stream job is
+         # already done with copying at this point.)
+-        self.reopen(opts, {},
++        opts = hd_opts(1)
++        opts['backing'] = hd_opts(2)
++        opts['backing']['backing'] = None
++        self.reopen(opts, {'read-only': True},
+             ["Can't set node 'hd1' to r/o with copy-on-read enabled",
+              "Cannot make block node read-only, there is a writer on it"])
  
+         # We can't remove hd2 while the stream job is ongoing
+-        opts['backing']['backing'] = None
+-        self.reopen(opts, {'backing.read-only': False}, "Cannot change 'backing' link from 'hd1' to 'hd2'")
++        opts['backing'] = None
++        self.reopen(opts, {'read-only': False}, "Cannot change 'backing' link from 'hd1' to 'hd2'")
  
-+typedef struct BDRVStateCOR {
-+    bool active;
-+} BDRVStateCOR;
-+
- static int cor_open(BlockDriverState *bs, QDict *options, int flags,
-                     Error **errp)
- {
-+    BDRVStateCOR *state = bs->opaque;
-+
-     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file, false,
-                                errp);
-     if (!bs->file) {
-@@ -42,6 +51,8 @@ static int cor_open(BlockDriverState *bs, QDict *options, int flags,
-         ((BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_NO_FALLBACK) &
-             bs->file->bs->supported_zero_flags);
+         # We can detach hd1 from hd0 because it doesn't affect the stream job
++        opts = hd_opts(0)
+         opts['backing'] = None
+         self.reopen(opts)
  
-+    state->active = true;
-+
-     return 0;
- }
- 
-@@ -57,6 +68,17 @@ static void cor_child_perm(BlockDriverState *bs, BdrvChild *c,
-                            uint64_t perm, uint64_t shared,
-                            uint64_t *nperm, uint64_t *nshared)
- {
-+    BDRVStateCOR *s = bs->opaque;
-+
-+    if (!s->active) {
-+        /*
-+         * While the filter is being removed
-+         */
-+        *nperm = 0;
-+        *nshared = BLK_PERM_ALL;
-+        return;
-+    }
-+
-     *nperm = perm & PERM_PASSTHROUGH;
-     *nshared = (shared & PERM_PASSTHROUGH) | PERM_UNCHANGED;
- 
-@@ -150,6 +172,7 @@ static int cor_change_backing_file(BlockDriverState *bs,
- 
- static BlockDriver bdrv_copy_on_read = {
-     .format_name                        = "copy-on-read",
-+    .instance_size                      = sizeof(BDRVStateCOR),
- 
-     .bdrv_open                          = cor_open,
-     .bdrv_child_perm                    = cor_child_perm,
-@@ -178,4 +201,83 @@ static void bdrv_copy_on_read_init(void)
-     bdrv_register(&bdrv_copy_on_read);
- }
- 
-+
-+static BlockDriverState *create_filter_node(BlockDriverState *bs,
-+                                            const char *filter_node_name,
-+                                            Error **errp)
-+{
-+    QDict *opts = qdict_new();
-+
-+    qdict_put_str(opts, "driver", "copy-on-read");
-+    qdict_put_str(opts, "file", bdrv_get_node_name(bs));
-+    if (filter_node_name) {
-+        qdict_put_str(opts, "node-name", filter_node_name);
-+    }
-+
-+    return bdrv_open(NULL, NULL, opts, BDRV_O_RDWR, errp);
-+}
-+
-+
-+BlockDriverState *bdrv_cor_filter_append(BlockDriverState *bs,
-+                                         const char *filter_node_name,
-+                                         Error **errp)
-+{
-+    BlockDriverState *cor_filter_bs;
-+    BDRVStateCOR *state;
-+    Error *local_err = NULL;
-+
-+    cor_filter_bs = create_filter_node(bs, filter_node_name, errp);
-+    if (cor_filter_bs == NULL) {
-+        error_prepend(errp, "Could not create filter node: ");
-+        return NULL;
-+    }
-+
-+    if (!filter_node_name) {
-+        cor_filter_bs->implicit = true;
-+    }
-+
-+    bdrv_drained_begin(bs);
-+    bdrv_replace_node(bs, cor_filter_bs, &local_err);
-+    bdrv_drained_end(bs);
-+
-+    if (local_err) {
-+        bdrv_unref(cor_filter_bs);
-+        error_propagate(errp, local_err);
-+        return NULL;
-+    }
-+
-+    state = cor_filter_bs->opaque;
-+    state->active = true;
-+
-+    return cor_filter_bs;
-+}
-+
-+
-+void bdrv_cor_filter_drop(BlockDriverState *cor_filter_bs)
-+{
-+    BdrvChild *child;
-+    BlockDriverState *bs;
-+    BDRVStateCOR *s = cor_filter_bs->opaque;
-+
-+    child = bdrv_filtered_rw_child(cor_filter_bs);
-+    if (!child) {
-+        return;
-+    }
-+    bs = child->bs;
-+
-+    /* Retain the BDS until we complete the graph change. */
-+    bdrv_ref(bs);
-+    /* Hold a guest back from writing while permissions are being reset. */
-+    bdrv_drained_begin(bs);
-+    /* Drop permissions before the graph change. */
-+    s->active = false;
-+    bdrv_child_refresh_perms(cor_filter_bs, child, &error_abort);
-+    bdrv_replace_node(cor_filter_bs, bs, &error_abort);
-+
-+    bdrv_drained_end(bs);
-+    bdrv_unref(bs);
-+    bdrv_unref(cor_filter_bs);
-+}
-+
-+
- block_init(bdrv_copy_on_read_init);
-diff --git a/block/copy-on-read.h b/block/copy-on-read.h
-new file mode 100644
-index 0000000..db03c6c
---- /dev/null
-+++ b/block/copy-on-read.h
-@@ -0,0 +1,36 @@
-+/*
-+ * Copy-on-read filter block driver
-+ *
-+ * The filter driver performs Copy-On-Read (COR) operations
-+ *
-+ * Copyright (c) 2018-2020 Virtuozzo International GmbH.
-+ *
-+ * Author:
-+ *   Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef COPY_ON_READ_FILTER
-+#define COPY_ON_READ_FILTER
-+
-+#include "block/block_int.h"
-+#include "block/block-copy.h"
-+
-+BlockDriverState *bdrv_cor_filter_append(BlockDriverState *bs,
-+                                         const char *filter_node_name,
-+                                         Error **errp);
-+void bdrv_cor_filter_drop(BlockDriverState *cor_filter_bs);
-+
-+#endif /* COPY_ON_READ_FILTER */
 -- 
 1.8.3.1
 
