@@ -2,81 +2,52 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E967AC2D0F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 10:02:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CAB4C47076
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 10:02:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2A00206B8
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 10:02:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M5AcTR7W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2A00206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 15018206D6
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 10:02:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15018206D6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYoDF-0006pZ-Q3
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 06:02:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46118)
+	id 1jYoDs-0007CL-8f
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 06:02:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44724)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jYoBq-0005sI-BR
- for qemu-devel@nongnu.org; Wed, 13 May 2020 06:00:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23352
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jYoBo-0005yd-M6
- for qemu-devel@nongnu.org; Wed, 13 May 2020 06:00:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589364034;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=MBbbuQmSha7HuqHhMw/cbHVEutv5u70jDJFlxtNil64=;
- b=M5AcTR7WQ3NtGG1PPxbQfcwRhMlnWysksDDvtEDqeP8VYp3c6mQUGvSQGIqy9fFHgoBBRq
- 9T0ucfgINw/5/mfEhaE0wT6W+iqzWGFBi7sf2v2JC+PqCTLorP5L/iBdZw13ep7w54sMpm
- iqkabIXjyq6oz19txGligeRV+u5dig0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-404-QiHCmHcEMbG_VeCncbAvcA-1; Wed, 13 May 2020 06:00:30 -0400
-X-MC-Unique: QiHCmHcEMbG_VeCncbAvcA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 044F7835B69;
- Wed, 13 May 2020 10:00:30 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-114-80.ams2.redhat.com [10.36.114.80])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3155B60C05;
- Wed, 13 May 2020 10:00:28 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jYo31-0006lL-3d; Wed, 13 May 2020 05:51:31 -0400
+Received: from relay.sw.ru ([185.231.240.75]:53986)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jYo2z-0003Z5-6N; Wed, 13 May 2020 05:51:30 -0400
+Received: from dhcp-172-16-25-136.sw.ru ([172.16.25.136] helo=localhost.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jYo2U-0001e4-4y; Wed, 13 May 2020 12:50:58 +0300
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH] iotests/030: Reduce run time by unthrottling job earlier
-Date: Wed, 13 May 2020 12:00:25 +0200
-Message-Id: <20200513100025.33543-1-kwolf@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 01:56:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Subject: [PATCH v5 00/15] Apply COR-filter to the block-stream permanently
+Date: Wed, 13 May 2020 12:50:41 +0300
+Message-Id: <1589363456-1035571-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-Mailer: git-send-email 1.8.3.1
+Received-SPF: pass client-ip=185.231.240.75;
+ envelope-from=andrey.shinkevich@virtuozzo.com; helo=relay.sw.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 05:51:06
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,48 +60,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
+ armbru@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
+ andrey.shinkevich@virtuozzo.com, den@openvz.org, mreitz@redhat.com,
+ jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-test_overlapping_3() throttles its active commit job so it can be sure
-the job is still busy when it checks that you can't start a conflicting
-streaming job.
+With this series, all the block-stream COR operations pass through
+the COR-filter. The patches 01-08/15 are taken from the series
+"block: Deal with filters" by Max Reitz, the full version of that
+can be found in the branches:
 
-However, it only sets the commit job back to full speed when it is
-ready, which takes a few seconds while it's throttled. We can already
-reset the limit after having checked that block-stream returns an error
-and save these seconds.
+      https://git.xanclic.moe/XanClic/qemu child-access-functions-v6
+      https://github.com/XanClic/qemu child-access-functions-v6
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- tests/qemu-iotests/030 | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+      When running iotests, apply "char-socket: Fix race condition"
+      to avoid sporadic segmentation faults.
 
-diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-index 104e3cee1b..1cdd7e2999 100755
---- a/tests/qemu-iotests/030
-+++ b/tests/qemu-iotests/030
-@@ -354,14 +354,14 @@ class TestParallelOps(iotests.QMPTestCase):
-         self.assert_qmp(result, 'error/desc',
-             "Node 'node5' is busy: block device is in use by block job: commit")
- 
-+        result = self.vm.qmp('block-job-set-speed', device='commit-drive0', speed=0)
-+        self.assert_qmp(result, 'return', {})
-+
-         event = self.vm.event_wait(name='BLOCK_JOB_READY')
-         self.assert_qmp(event, 'data/device', 'commit-drive0')
-         self.assert_qmp(event, 'data/type', 'commit')
-         self.assert_qmp_absent(event, 'data/error')
- 
--        result = self.vm.qmp('block-job-set-speed', device='commit-drive0', speed=0)
--        self.assert_qmp(result, 'return', {})
--
-         result = self.vm.qmp('block-job-complete', device='commit-drive0')
-         self.assert_qmp(result, 'return', {})
- 
+v5:
+  01: Included forgotten file block/copy-on-read.h
+
+v4:
+  01: Initialization of the COR-filter BDRVStateCOR member.
+
+v3:
+  01: The COR filter insert/remove functions moved to block/copy-on-read.c
+      to be a part of API.
+  02: block/stream.c code refactoring.
+  03: The separate call to block_job_add_bdrv() is used to block operations
+      on the active node after the filter inserted and the job created.
+  04: The iotests case 030::test_overlapping_4 was modified to unbound
+      the block-stream job from the base node.
+  05: The COR driver functions preadv/pwritev replaced with their analogous
+      preadv/pwritev_part.
+
+v2:
+  01: No more skipping filters while checking for operation blockers.
+      However, we exclude filters between the bottom node and base
+      because we do not set the operation blockers for filters anymore.
+  02: As stated above, we do not set the operation blockers for filters
+      anymore. So, skip filters when we block operations for the target
+      node.
+  03: The comment added for the patch 4/7.
+  04: The QAPI target version changed to 5.1.
+  05: The 'filter-node-name' now excluded from using in the test #030.
+      If we need it no more in a final version of the series, the patch
+      5/7 may be removed.
+  06: The COR-filter included into the frozen chain of a block-stream job.
+      The 'above_base' node pointer is left because it is essential for
+      finding the base node in case of filters above.
+
+
+Andrey Shinkevich (7):
+  block: prepare block-stream for using COR-filter
+  copy-on-read: Support change filename functions
+  copy-on-read: Support preadv/pwritev_part functions
+  copy-on-read: add filter append/drop functions
+  qapi: add filter-node-name to block-stream
+  iotests: prepare 245 for using filter in block-stream
+  block: apply COR-filter to block-stream jobs
+
+Max Reitz (8):
+  block: Mark commit and mirror as filter drivers
+  copy-on-read: Support compressed writes
+  block: Add child access functions
+  block: Add chain helper functions
+  block: Include filters when freezing backing chain
+  block: Use CAFs in block status functions
+  commit: Deal with filters when blocking intermediate nodes
+  block: Use CAFs when working with backing chains
+
+ block.c                        | 275 ++++++++++++++++++++++++++++++++++-------
+ block/commit.c                 |  85 ++++++++++---
+ block/copy-on-read.c           | 159 ++++++++++++++++++++++--
+ block/copy-on-read.h           |  36 ++++++
+ block/io.c                     |  19 +--
+ block/mirror.c                 |   6 +-
+ block/monitor/block-hmp-cmds.c |   4 +-
+ block/stream.c                 |  89 +++++++++----
+ blockdev.c                     |  19 ++-
+ include/block/block.h          |   6 +-
+ include/block/block_int.h      |  67 +++++++++-
+ qapi/block-core.json           |   6 +
+ tests/qemu-iotests/030         |  17 +--
+ tests/qemu-iotests/141.out     |   2 +-
+ tests/qemu-iotests/245         |  10 +-
+ 15 files changed, 661 insertions(+), 139 deletions(-)
+ create mode 100644 block/copy-on-read.h
+
 -- 
-2.25.3
+1.8.3.1
 
 
