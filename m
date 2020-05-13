@@ -2,87 +2,94 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CDEEC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 16:13:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3654C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 16:26:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70149204EC
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 16:13:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 12CB92064E
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 16:26:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GclDdcwP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70149204EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g/DmlcF1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12CB92064E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYu0B-0008Js-A4
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 12:12:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44842)
+	id 1jYuCx-0000SZ-Rw
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 12:26:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46794)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jYtyb-0005xR-Ly
- for qemu-devel@nongnu.org; Wed, 13 May 2020 12:11:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20469
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jYtyZ-0004oE-Gc
- for qemu-devel@nongnu.org; Wed, 13 May 2020 12:11:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589386277;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=x3ta2Cc+RLR7oyKiUv06YfgE2Yyg5qIhsWsI+b+KJ8Q=;
- b=GclDdcwP/nK1thvNGog0sMgyFSNwXTBRlf+5XBSxwCnSC+KQA4hc7ioW/jdFKiXbj3Y58Y
- w7FU7pybeBI5KauSSeENu/RugJFlLG+1Mazjq7uljNu2JD/qpFl5eVemqcS2bsd2aMB7HV
- n4868cUGpnUZbB4UcmA5dKemdzBLneQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-478--Xci6wEjMaCB3dPjuSOKvQ-1; Wed, 13 May 2020 12:11:14 -0400
-X-MC-Unique: -Xci6wEjMaCB3dPjuSOKvQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2EC3461;
- Wed, 13 May 2020 16:11:13 +0000 (UTC)
-Received: from [10.3.116.145] (ovpn-116-145.phx2.redhat.com [10.3.116.145])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4CC3E605FC;
- Wed, 13 May 2020 16:11:13 +0000 (UTC)
-Subject: Re: [RFC v2] migration: Add migrate-set-bitmap-node-mapping
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200513145610.1484567-1-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <0270abbd-3fa7-dcca-bbf5-80dd0fad1733@redhat.com>
-Date: Wed, 13 May 2020 11:11:12 -0500
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jYuBv-0007u1-Vw
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 12:25:08 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:33015)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jYuBu-00007t-0z
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 12:25:07 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id z15so1984898pjb.0
+ for <qemu-devel@nongnu.org>; Wed, 13 May 2020 09:25:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=jALpiG9Xg0nLBFUsBAx+25LmHsLE8s16daADM3OrSvI=;
+ b=g/DmlcF1AtYt5nb513Vcip4bgcmY1ALoJRus6D1ZKh6/y+UEcMrxNb5HB9u2DkLD7q
+ Gep6UTyosO2RgjqgoMm9YvYBrKyZybKw6UsbKmPp0Y54P3aZfHqyA9lP1aPJu0ygxL5S
+ 9vKX2nEKzUJixNr8oKByT9cRaD+Xm/XxgM1DExBtT28fnV0oc/nmEXLgLWe+G6Da+uEI
+ LFsIzg9zVqWXnmSOsi0dnf3eaWxRVQCoPJrsR7Q8jW6S1EdxL09Emd5UOqPZZwP/06Ee
+ OUAhLiJqMSVtsRJBeYEsuyr2NJXQWU/86zvzURspxKwNTB/lsJwaKqedsOomm0xHvSxW
+ yafQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=jALpiG9Xg0nLBFUsBAx+25LmHsLE8s16daADM3OrSvI=;
+ b=NSBUTPl8DNb3AgPqT3WfoH/XmQ2XZZWagd1cKg6yVbHPm5J/cNiCwtF0eR2EfIokMe
+ Pl0BIdNVU5t5Qg4MoIVS0Af6kEIcaJIO6UUGeJu3Itq7kKcW+QMUJywwUtgFKFuLmtby
+ UONG8kQKDc5IH6Sda+ZW5SkLVQ5Dq0KcvOzh7Vs8J+5/up7GqoLLxPbu8h5U5D9xBKD0
+ k078alLOXtT/Cnv6lk3qnIxajJTCBj/QL+I8oa8oCtAcbEQRa8Rq3VELkBzvQ/fmjiHM
+ 8jC8EaqsuJSDzEMjBbGUwof4q+DHBrSLSes2JUSEfHIbhpImH+RUAUYrfBb0FlxoNJA2
+ 0usg==
+X-Gm-Message-State: AOAM531DoBlEdb0Eq3KKdWjoqIPRUWiIeboCqvukMeEuvzfma5rXenM8
+ l09eshVqOwVbrH8+69P5nymTLw==
+X-Google-Smtp-Source: ABdhPJzzyE6UccOQbVB9n2yGsUmcTVsMlxKLulju2ya7pchKz1+bFvNOSUVBW/ossKlMcvcLfSMLNg==
+X-Received: by 2002:a17:902:7c16:: with SMTP id
+ x22mr14549pll.244.1589387103663; 
+ Wed, 13 May 2020 09:25:03 -0700 (PDT)
+Received: from [192.168.1.11] (174-21-143-238.tukw.qwest.net. [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id u3sm40216pfb.105.2020.05.13.09.25.02
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 13 May 2020 09:25:02 -0700 (PDT)
+Subject: Re: [PATCH 1/1] NetBSD/arm build fix
+To: Nick Hudson <skrll@netbsd.org>, qemu-devel@nongnu.org
+References: <20200512064823.13025-1-skrll@netbsd.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a6b6cedd-7e6b-642e-e441-63f68f005582@linaro.org>
+Date: Wed, 13 May 2020 09:25:00 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200513145610.1484567-1-mreitz@redhat.com>
+In-Reply-To: <20200512064823.13025-1-skrll@netbsd.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 01:56:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1044.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,58 +103,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, Peter Krempa <pkrempa@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>,
+ Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/13/20 9:56 AM, Max Reitz wrote:
-> This command allows mapping block node names to aliases for the purpose
-> of block dirty bitmap migration.
-> 
-> This way, management tools can use different node names on the source
-> and destination and pass the mapping of how bitmaps are to be
-> transferred to qemu (on the source, the destination, or even both with
-> arbitrary aliases in the migration stream).
-> 
-> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
+On 5/11/20 11:48 PM, Nick Hudson wrote:
+>  
+> +#if defined(__NetBSD__)
+> +    /* siginfo_t::si_trap is the FSR value, in which bit 11 is WnR
+> +     * (assuming a v6 or later processor; on v5 we will always report
+> +     * this as a read).
+> +     */
+> +    is_write = extract32(si->si_trap, 11, 1);
+> +#else
+>      /* error_code is the FSR value, in which bit 11 is WnR (assuming a v6 or
+>       * later processor; on v5 we will always report this as a read).
+>       */
+>      is_write = extract32(uc->uc_mcontext.error_code, 11, 1);
+> +#endif
 
-> @@ -713,6 +731,44 @@ static bool dirty_bitmap_has_postcopy(void *opaque)
->       return true;
->   }
->   
-> +void qmp_migrate_set_bitmap_node_mapping(MigrationBlockNodeMappingList *mapping,
-> +                                         Error **errp)
-> +{
-> +    QDict *in_mapping = qdict_new();
-> +    QDict *out_mapping = qdict_new();
-> +
-> +    for (; mapping; mapping = mapping->next) {
-> +        MigrationBlockNodeMapping *entry = mapping->value;
-> +
-> +        if (qdict_haskey(out_mapping, entry->node_name)) {
-> +            error_setg(errp, "Cannot map node name '%s' twice",
-> +                       entry->node_name);
-> +            goto fail;
-> +        }
+While this works, I think it might be a bit clearer as
 
-Can we call this command more than once?  Is it cumulative (call it once 
-to set mapping for "a", second time to also set mapping for "b"), or 
-should it reset (second call wipes out all mappings from first call, any 
-mappings that must exist must be passed in the final call)?
 
-The idea makes sense, and the interface seems usable.  It's nice that 
-either source, destination, or both sides of migration can use it (which 
-helps in upgrade vs. downgrade scenarios).
+    uint32_t fsr;
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+#ifdef __NetBSD__
+    fsr = si->si_trap;
+#else
+    fsr = uc->uc_mcontext.error_code;
+#endif
+    /*
+     * In the FSR, bit 11 is WnR, assuming a v6 or
+     * later processor.  On v5 we will always report
+     * this as a read, which will fail later.
+     */
+    is_write = extract32(fsr, 11, 1);
 
+
+r~
 
