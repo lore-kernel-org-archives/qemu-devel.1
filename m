@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E522C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 21:44:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA8E3C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 21:46:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAE562054F
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 21:44:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A883A2054F
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 21:46:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ha2NWr6V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAE562054F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jS+y/iFw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A883A2054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYzBA-0001HV-15
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 17:44:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34086)
+	id 1jYzCu-0003Ha-O2
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 17:46:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34102)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jYz8K-0006vV-0e
- for qemu-devel@nongnu.org; Wed, 13 May 2020 17:41:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38340
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jYz8M-0006zz-9f
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 17:41:46 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33414
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jYz8I-0005bg-GE
- for qemu-devel@nongnu.org; Wed, 13 May 2020 17:41:43 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jYz8L-0005cS-9F
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 17:41:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589406101;
+ s=mimecast20190719; t=1589406104;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=11EItyxhwah0ZNUqpJ6iomtdgWv2ScwwGFBOkvnqQcU=;
- b=Ha2NWr6VvJFv32ee5/0Q0VrQMh3/nOFSTakMkWQfclq/YZbiy+6RZMI3HFvpjXauBdeE6s
- DmVE0HlxQ/Nu9kwXS21s3rldO/1R2K74Px4y5KiM1sXShqR9nnGD9qA2WDUOkDI3CpstWk
- VJNdyf3zVI6m7gp7t3OmRqzrL/C1mjM=
+ bh=mADFPjG4NsDPQUvoHbp1gHPK/gjpmZfpYfEuvG6grrA=;
+ b=jS+y/iFw0GVQnnhByxnHk2PI/NSTuu8z32l/Y4TpzBxgUfwS6oazJEbEgXMSe2WbGcQdTc
+ codHxk59Rbc8l8UYr+FchmRVPpjR2aFNGRbNXnF2toSW33QA3rkYhmC1sn9PaQ1O+R/4Ky
+ orCEg+LCHDexZ5H62ExnXPGr/yX2nRI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-312-5l-ljKviPSWO6g3F3fTmvA-1; Wed, 13 May 2020 17:41:38 -0400
-X-MC-Unique: 5l-ljKviPSWO6g3F3fTmvA-1
+ us-mta-305-Dz6Hj7TWM3uAr18L59AzaA-1; Wed, 13 May 2020 17:41:36 -0400
+X-MC-Unique: Dz6Hj7TWM3uAr18L59AzaA-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8058F100CCCC;
- Wed, 13 May 2020 21:41:37 +0000 (UTC)
-Received: from probe.redhat.com (ovpn-113-80.rdu2.redhat.com [10.10.113.80])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B7D4C2E055;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 954EC84638F;
  Wed, 13 May 2020 21:41:35 +0000 (UTC)
+Received: from probe.redhat.com (ovpn-113-80.rdu2.redhat.com [10.10.113.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D312B1C94D;
+ Wed, 13 May 2020 21:41:34 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RFC WIP 5/6] qcow2.py: delint
-Date: Wed, 13 May 2020 17:41:29 -0400
-Message-Id: <20200513214130.15375-6-jsnow@redhat.com>
+Subject: [PATCH RFC WIP 4/6] qed.py: delint
+Date: Wed, 13 May 2020 17:41:28 -0400
+Message-Id: <20200513214130.15375-5-jsnow@redhat.com>
 In-Reply-To: <20200513214130.15375-1-jsnow@redhat.com>
 References: <20200513214130.15375-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -69,10 +69,10 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=jsnow@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 01:56:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 04:17:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -100,323 +100,148 @@ Sender: "Qemu-devel"
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- tests/qemu-iotests/Makefile |   5 +-
- tests/qemu-iotests/pylintrc |   1 +
- tests/qemu-iotests/qcow2.py | 156 +++++++++++++++++++++++-------------
- 3 files changed, 104 insertions(+), 58 deletions(-)
+ tests/qemu-iotests/Makefile |  2 +-
+ tests/qemu-iotests/qed.py   | 46 ++++++++++++++++++++++++-------------
+ 2 files changed, 31 insertions(+), 17 deletions(-)
 
 diff --git a/tests/qemu-iotests/Makefile b/tests/qemu-iotests/Makefile
-index 5a3a1e8092..77da9fd96d 100644
+index 64db48342f..5a3a1e8092 100644
 --- a/tests/qemu-iotests/Makefile
 +++ b/tests/qemu-iotests/Makefile
-@@ -1,7 +1,5 @@
+@@ -1,6 +1,6 @@
  PYMODULES = $(wildcard *.py)
  
--KNOWN_GOOD = iotests.py nbd-fault-injector.py qed.py
--
+-KNOWN_GOOD = iotests.py nbd-fault-injector.py
++KNOWN_GOOD = iotests.py nbd-fault-injector.py qed.py
+ 
  CLEANFILES= *.out.bad *.notrun check.log check.time*
  
- # no default target
-@@ -11,5 +9,4 @@ clean:
- 	rm -f $(CLEANFILES)
+diff --git a/tests/qemu-iotests/qed.py b/tests/qemu-iotests/qed.py
+index d6bec96069..9e016cc2a2 100755
+--- a/tests/qemu-iotests/qed.py
++++ b/tests/qemu-iotests/qed.py
+@@ -13,7 +13,6 @@
+ import sys
+ import struct
+ import random
+-import optparse
  
- delint:
--	pylint $(KNOWN_GOOD)
--	pylint --disable=R,C,W $(filter-out $(KNOWN_GOOD), $(PYMODULES))
-+	pylint $(PYMODULES)
-diff --git a/tests/qemu-iotests/pylintrc b/tests/qemu-iotests/pylintrc
-index 5481afe528..a334e242b6 100644
---- a/tests/qemu-iotests/pylintrc
-+++ b/tests/qemu-iotests/pylintrc
-@@ -17,6 +17,7 @@ disable=invalid-name,
-         too-many-lines,
-         too-many-locals,
-         too-many-public-methods,
-+        too-many-instance-attributes,
-         # These are temporary, and should be removed:
-         missing-docstring,
+ # This can be used as a module
+ __all__ = ['QED_F_NEED_CHECK', 'QED']
+@@ -47,7 +46,7 @@ def unpack_table_elem(s):
+ def pack_table_elem(elem):
+     return struct.pack(table_elem_fmt, elem)
  
-diff --git a/tests/qemu-iotests/qcow2.py b/tests/qemu-iotests/qcow2.py
-index 94a07b2f6f..2840f4b661 100755
---- a/tests/qemu-iotests/qcow2.py
-+++ b/tests/qemu-iotests/qcow2.py
-@@ -11,14 +11,15 @@ def __init__(self, magic, length, data):
-             padding = 8 - (length % 8)
-             data += b"\0" * padding
+-class QED(object):
++class QED:
+     def __init__(self, f):
+         self.f = f
  
--        self.magic  = magic
-+        self.magic = magic
-         self.length = length
--        self.data   = data
-+        self.data = data
+@@ -74,19 +73,22 @@ def store_header(self):
+     def read_table(self, offset):
+         size = self.header['table_size'] * self.header['cluster_size']
+         s = self.raw_pread(offset, size)
+-        table = [unpack_table_elem(s[i:i + table_elem_size]) for i in xrange(0, size, table_elem_size)]
++        table = [unpack_table_elem(s[i:i + table_elem_size])
++                 for i in range(0, size, table_elem_size)]
+         return table
  
-     @classmethod
-     def create(cls, magic, data):
-         return QcowHeaderExtension(magic, len(data), data)
+     def load_l1_table(self):
+         self.l1_table = self.read_table(self.header['l1_table_offset'])
+-        self.table_nelems = self.header['table_size'] * self.header['cluster_size'] // table_elem_size
++        self.table_nelems = (self.header['table_size']
++                             * self.header['cluster_size'] // table_elem_size)
  
+     def write_table(self, offset, table):
+         s = ''.join(pack_table_elem(x) for x in table)
+         self.raw_pwrite(offset, s)
+ 
+ def random_table_item(table):
+-    vals = [(index, offset) for index, offset in enumerate(table) if offset != 0]
++    vals = [(index, offset) for index, offset
++            in enumerate(table) if offset != 0]
+     if not vals:
+         err('cannot pick random item because table is empty')
+     return random.choice(vals)
+@@ -103,7 +105,8 @@ def corrupt_table_duplicate(table):
+ def corrupt_table_invalidate(qed, table):
+     '''Corrupt a table by introducing an invalid offset'''
+     index, _ = random_table_item(table)
+-    table[index] = qed.filesize + random.randint(0, 100 * 1024 * 1024 * 1024 * 1024)
++    table[index] = (qed.filesize
++                    + random.randint(0, 100 * 1024 * 1024 * 1024 * 1024))
+ 
+ def cmd_show(qed, *args):
+     '''show [header|l1|l2 <offset>]- Show header or l1/l2 tables'''
+@@ -144,7 +147,11 @@ def cmd_invalidate(qed, table_level):
+     qed.write_table(offset, table)
+ 
+ def cmd_need_check(qed, *args):
+-    '''need-check [on|off] - Test, set, or clear the QED_F_NEED_CHECK header bit'''
++    """
++    need-check [on|off]
 +
- class QcowHeader:
++    Test, set, or clear the QED_F_NEED_CHECK header bit
++    """
+     if not args:
+         print(bool(qed.header['features'] & QED_F_NEED_CHECK))
+         return
+@@ -165,7 +172,7 @@ def cmd_zero_cluster(qed, pos, *args):
+             err('expected one argument')
+         n = int(args[0])
  
-     uint32_t = 'I'
-@@ -26,30 +27,41 @@ class QcowHeader:
+-    for i in xrange(n):
++    for _ in range(n):
+         l1_index = pos // qed.header['cluster_size'] // len(qed.l1_table)
+         if qed.l1_table[l1_index] == 0:
+             err('no l2 table allocated')
+@@ -179,7 +186,11 @@ def cmd_zero_cluster(qed, pos, *args):
+         pos += qed.header['cluster_size']
  
-     fields = [
-         # Version 2 header fields
--        [ uint32_t, '%#x',  'magic' ],
--        [ uint32_t, '%d',   'version' ],
--        [ uint64_t, '%#x',  'backing_file_offset' ],
--        [ uint32_t, '%#x',  'backing_file_size' ],
--        [ uint32_t, '%d',   'cluster_bits' ],
--        [ uint64_t, '%d',   'size' ],
--        [ uint32_t, '%d',   'crypt_method' ],
--        [ uint32_t, '%d',   'l1_size' ],
--        [ uint64_t, '%#x',  'l1_table_offset' ],
--        [ uint64_t, '%#x',  'refcount_table_offset' ],
--        [ uint32_t, '%d',   'refcount_table_clusters' ],
--        [ uint32_t, '%d',   'nb_snapshots' ],
--        [ uint64_t, '%#x',  'snapshot_offset' ],
-+        # pylint: disable=bad-whitespace
-+        [uint32_t, '%#x',  'magic'],
-+        [uint32_t, '%d',   'version'],
-+        [uint64_t, '%#x',  'backing_file_offset'],
-+        [uint32_t, '%#x',  'backing_file_size'],
-+        [uint32_t, '%d',   'cluster_bits'],
-+        [uint64_t, '%d',   'size'],
-+        [uint32_t, '%d',   'crypt_method'],
-+        [uint32_t, '%d',   'l1_size'],
-+        [uint64_t, '%#x',  'l1_table_offset'],
-+        [uint64_t, '%#x',  'refcount_table_offset'],
-+        [uint32_t, '%d',   'refcount_table_clusters'],
-+        [uint32_t, '%d',   'nb_snapshots'],
-+        [uint64_t, '%#x',  'snapshot_offset'],
- 
-         # Version 3 header fields
--        [ uint64_t, 'mask', 'incompatible_features' ],
--        [ uint64_t, 'mask', 'compatible_features' ],
--        [ uint64_t, 'mask', 'autoclear_features' ],
--        [ uint32_t, '%d',   'refcount_order' ],
--        [ uint32_t, '%d',   'header_length' ],
--    ];
-+        [uint64_t, 'mask', 'incompatible_features'],
-+        [uint64_t, 'mask', 'compatible_features'],
-+        [uint64_t, 'mask', 'autoclear_features'],
-+        [uint32_t, '%d',   'refcount_order'],
-+        [uint32_t, '%d',   'header_length'],
-+    ]
- 
-     fmt = '>' + ''.join(field[0] for field in fields)
- 
-+    @property
-+    def backing_file_offset(self):
-+        # Pylint struggles to verify dynamic properties.
-+        # Dataclasses in 3.7 would make this easy.
-+        return self.__dict__['backing_file_offset']
+ def cmd_copy_metadata(qed, outfile):
+-    '''copy-metadata <outfile> - Copy metadata only (for scrubbing corrupted images)'''
++    """
++    copy-metadata <outfile>
 +
-+    @backing_file_offset.setter
-+    def backing_file_offset(self, val):
-+        self.__dict__['backing_file_offset'] = val
++    Copy metadata only (for scrubbing corrupted images)
++    """
+     out = open(outfile, 'wb')
+ 
+     # Match file size
+@@ -213,23 +224,26 @@ def usage():
+     print('Supported commands:')
+     for cmd in sorted(x for x in globals() if x.startswith('cmd_')):
+         print(globals()[cmd].__doc__)
+-    sys.exit(1)
++    return 1
+ 
+ def main():
+     if len(sys.argv) < 3:
+-        usage()
+-    filename, cmd = sys.argv[1:3]
++        return usage()
++    filename = sys.argv[1]
++    cmd = sys.argv[2]
+ 
+     cmd = 'cmd_' + cmd.replace('-', '_')
+     if cmd not in globals():
+-        usage()
++        return usage()
+ 
+     qed = QED(open(filename, 'r+b'))
+     try:
+         globals()[cmd](qed, *sys.argv[3:])
+-    except TypeError as e:
++    except TypeError:
+         sys.stderr.write(globals()[cmd].__doc__ + '\n')
+-        sys.exit(1)
++        return 1
 +
-     def __init__(self, fd):
- 
-         buf_size = struct.calcsize(QcowHeader.fmt)
-@@ -59,22 +71,22 @@ def __init__(self, fd):
- 
-         header = struct.unpack(QcowHeader.fmt, buf)
-         self.__dict__ = dict((field[2], header[i])
--            for i, field in enumerate(QcowHeader.fields))
-+                             for i, field in enumerate(QcowHeader.fields))
- 
-         self.set_defaults()
--        self.cluster_size = 1 << self.cluster_bits
-+        self.cluster_size = 1 << self.__dict__['cluster_bits']
- 
-         fd.seek(self.header_length)
-         self.load_extensions(fd)
- 
-         if self.backing_file_offset:
-             fd.seek(self.backing_file_offset)
--            self.backing_file = fd.read(self.backing_file_size)
-+            self.backing_file = fd.read(self.__dict__['backing_file_size'])
-         else:
-             self.backing_file = None
- 
-     def set_defaults(self):
--        if self.version == 2:
-+        if self.__dict__['version'] == 2:
-             self.incompatible_features = 0
-             self.compatible_features = 0
-             self.autoclear_features = 0
-@@ -93,10 +105,10 @@ def load_extensions(self, fd):
-             (magic, length) = struct.unpack('>II', fd.read(8))
-             if magic == 0:
-                 break
--            else:
--                padded = (length + 7) & ~7
--                data = fd.read(padded)
--                self.extensions.append(QcowHeaderExtension(magic, length, data))
-+            padded = (length + 7) & ~7
-+            data = fd.read(padded)
-+            extension = QcowHeaderExtension(magic, length, data)
-+            self.extensions.append(extension)
- 
-     def update_extensions(self, fd):
- 
-@@ -108,7 +120,7 @@ def update_extensions(self, fd):
-             fd.write(buf)
-             fd.write(ex.data)
- 
--        if self.backing_file != None:
-+        if self.backing_file is None:
-             self.backing_file_offset = fd.tell()
-             fd.write(self.backing_file)
- 
-@@ -170,13 +182,13 @@ def cmd_dump_header_exts(fd):
- def cmd_set_header(fd, name, value):
-     try:
-         value = int(value, 0)
--    except:
--        print("'%s' is not a valid number" % value)
-+    except ValueError:
-+        print(f"'{value}' is not a valid number")
-         sys.exit(1)
- 
-     fields = (field[2] for field in QcowHeader.fields)
-     if not name in fields:
--        print("'%s' is not a known header field" % name)
-+        print("'{name}' is not a known header field")
-         sys.exit(1)
- 
-     h = QcowHeader(fd)
-@@ -186,12 +198,13 @@ def cmd_set_header(fd, name, value):
- def cmd_add_header_ext(fd, magic, data):
-     try:
-         magic = int(magic, 0)
--    except:
--        print("'%s' is not a valid magic number" % magic)
-+    except ValueError:
-+        print(f"'{magic}' is not a valid magic number")
-         sys.exit(1)
- 
-     h = QcowHeader(fd)
--    h.extensions.append(QcowHeaderExtension.create(magic, data.encode('ascii')))
-+    ext = QcowHeaderExtension.create(magic, data.encode('ascii'))
-+    h.extensions.append(ext)
-     h.update(fd)
- 
- def cmd_add_header_ext_stdio(fd, magic):
-@@ -201,8 +214,8 @@ def cmd_add_header_ext_stdio(fd, magic):
- def cmd_del_header_ext(fd, magic):
-     try:
-         magic = int(magic, 0)
--    except:
--        print("'%s' is not a valid magic number" % magic)
-+    except ValueError:
-+        print(f"'{magic}' is not a valid magic number")
-         sys.exit(1)
- 
-     h = QcowHeader(fd)
-@@ -224,8 +237,8 @@ def cmd_set_feature_bit(fd, group, bit):
-         bit = int(bit, 0)
-         if bit < 0 or bit >= 64:
-             raise ValueError
--    except:
--        print("'%s' is not a valid bit number in range [0, 64)" % bit)
-+    except ValueError:
-+        print(f"'{bit}' is not a valid bit number in range [0, 64)")
-         sys.exit(1)
- 
-     h = QcowHeader(fd)
-@@ -236,33 +249,68 @@ def cmd_set_feature_bit(fd, group, bit):
-     elif group == 'autoclear':
-         h.autoclear_features |= 1 << bit
-     else:
--        print("'%s' is not a valid group, try 'incompatible', 'compatible', or 'autoclear'" % group)
-+        print(f"'{group}' is not a valid group, "
-+              "try 'incompatible', 'compatible', or 'autoclear'")
-         sys.exit(1)
- 
-     h.update(fd)
- 
- cmds = [
--    [ 'dump-header',          cmd_dump_header,          0, 'Dump image header and header extensions' ],
--    [ 'dump-header-exts',     cmd_dump_header_exts,     0, 'Dump image header extensions' ],
--    [ 'set-header',           cmd_set_header,           2, 'Set a field in the header'],
--    [ 'add-header-ext',       cmd_add_header_ext,       2, 'Add a header extension' ],
--    [ 'add-header-ext-stdio', cmd_add_header_ext_stdio, 1, 'Add a header extension, data from stdin' ],
--    [ 'del-header-ext',       cmd_del_header_ext,       1, 'Delete a header extension' ],
--    [ 'set-feature-bit',      cmd_set_feature_bit,      2, 'Set a feature bit'],
-+    [
-+        'dump-header',
-+        cmd_dump_header,
-+        0,
-+        'Dump image header and header extensions'
-+    ],
-+    [
-+        'dump-header-exts',
-+        cmd_dump_header_exts,
-+        0,
-+        'Dump image header extensions'
-+    ],
-+    [
-+        'set-header',
-+        cmd_set_header,
-+        2,
-+        'Set a field in the header'
-+    ],
-+    [
-+        'add-header-ext',
-+        cmd_add_header_ext,
-+        2,
-+        'Add a header extension'
-+    ],
-+    [
-+        'add-header-ext-stdio',
-+        cmd_add_header_ext_stdio,
-+        1,
-+        'Add a header extension, data from stdin'
-+    ],
-+    [
-+        'del-header-ext',
-+        cmd_del_header_ext,
-+        1,
-+        'Delete a header extension'
-+    ],
-+    [
-+        'set-feature-bit',
-+        cmd_set_feature_bit,
-+        2,
-+        'Set a feature bit'
-+    ],
- ]
- 
- def main(filename, cmd, args):
-     fd = open(filename, "r+b")
-     try:
--        for name, handler, num_args, desc in cmds:
-+        for name, handler, num_args, _desc in cmds:
-             if name != cmd:
-                 continue
--            elif len(args) != num_args:
-+            if len(args) != num_args:
-                 usage()
-                 return
--            else:
--                handler(fd, *args)
--                return
-+            handler(fd, *args)
-+            return
-         print("Unknown command '%s'" % cmd)
-     finally:
-         fd.close()
-@@ -271,7 +319,7 @@ def usage():
-     print("Usage: %s <file> <cmd> [<arg>, ...]" % sys.argv[0])
-     print("")
-     print("Supported commands:")
--    for name, handler, num_args, desc in cmds:
-+    for name, _handler, _num_args, desc in cmds:
-         print("    %-20s - %s" % (name, desc))
++    return 0
  
  if __name__ == '__main__':
+-    main()
++    sys.exit(main())
 -- 
 2.21.1
 
