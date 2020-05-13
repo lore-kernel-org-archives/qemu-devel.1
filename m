@@ -6,38 +6,38 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E438CA90AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 09:52:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B922DC2D0FA
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 09:52:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50326206D6
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 09:52:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50326206D6
+	by mail.kernel.org (Postfix) with ESMTPS id 908B820575
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 09:52:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 908B820575
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYo3b-0007e8-7P
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 05:52:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44628)
+	id 1jYo3n-0007ij-7E
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 05:52:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44632)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYo2h-0005xO-0L; Wed, 13 May 2020 05:51:11 -0400
-Received: from relay.sw.ru ([185.231.240.75]:54034)
+ id 1jYo2g-0005xQ-Vb; Wed, 13 May 2020 05:51:10 -0400
+Received: from relay.sw.ru ([185.231.240.75]:54000)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYo2f-0003ZJ-2J; Wed, 13 May 2020 05:51:10 -0400
+ id 1jYo2f-0003ZD-2f; Wed, 13 May 2020 05:51:10 -0400
 Received: from dhcp-172-16-25-136.sw.ru ([172.16.25.136] helo=localhost.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYo2W-0001e4-3j; Wed, 13 May 2020 12:51:00 +0300
+ id 1jYo2W-0001e4-56; Wed, 13 May 2020 12:51:00 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v5 10/15] copy-on-read: Support change filename functions
-Date: Wed, 13 May 2020 12:50:51 +0300
-Message-Id: <1589363456-1035571-11-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v5 11/15] copy-on-read: Support preadv/pwritev_part functions
+Date: Wed, 13 May 2020 12:50:52 +0300
+Message-Id: <1589363456-1035571-12-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1589363456-1035571-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1589363456-1035571-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -70,59 +70,68 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The COR-filter driver should support a redirecting function to refresh
-filenames. Otherwise, a file name of the filter will be copied
-instead of the one of a data node. It is also true for the function
-bdrv_change_backing_file().
+Add support for the recently introduced functions
+bdrv_co_preadv_part()
+and
+bdrv_co_pwritev_part()
+to the COR-filter driver.
 
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- block/copy-on-read.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ block/copy-on-read.c | 28 ++++++++++++++++------------
+ 1 file changed, 16 insertions(+), 12 deletions(-)
 
 diff --git a/block/copy-on-read.c b/block/copy-on-read.c
-index c4fa468..74e01ee 100644
+index 74e01ee..4030d56 100644
 --- a/block/copy-on-read.c
 +++ b/block/copy-on-read.c
-@@ -21,6 +21,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/cutils.h"
- #include "block/block_int.h"
- #include "qemu/module.h"
- 
-@@ -128,6 +129,21 @@ static void cor_lock_medium(BlockDriverState *bs, bool locked)
+@@ -74,21 +74,25 @@ static int64_t cor_getlength(BlockDriverState *bs)
  }
  
  
-+static void cor_refresh_filename(BlockDriverState *bs)
-+{
-+    pstrcpy(bs->exact_filename, sizeof(bs->exact_filename),
-+            bs->file->bs->filename);
-+}
-+
-+
-+static int cor_change_backing_file(BlockDriverState *bs,
-+                                   const char *backing_file,
-+                                   const char *backing_fmt)
-+{
-+    return bdrv_change_backing_file(bs->file->bs, backing_file, backing_fmt);
-+}
-+
-+
- static BlockDriver bdrv_copy_on_read = {
-     .format_name                        = "copy-on-read",
+-static int coroutine_fn cor_co_preadv(BlockDriverState *bs,
+-                                      uint64_t offset, uint64_t bytes,
+-                                      QEMUIOVector *qiov, int flags)
++static int coroutine_fn cor_co_preadv_part(BlockDriverState *bs,
++                                           uint64_t offset, uint64_t bytes,
++                                           QEMUIOVector *qiov,
++                                           size_t qiov_offset,
++                                           int flags)
+ {
+-    return bdrv_co_preadv(bs->file, offset, bytes, qiov,
+-                          flags | BDRV_REQ_COPY_ON_READ);
++    return bdrv_co_preadv_part(bs->file, offset, bytes, qiov, qiov_offset,
++                               flags | BDRV_REQ_COPY_ON_READ);
+ }
  
-@@ -146,6 +162,8 @@ static BlockDriver bdrv_copy_on_read = {
-     .bdrv_lock_medium                   = cor_lock_medium,
  
-     .bdrv_co_block_status               = bdrv_co_block_status_from_file,
-+    .bdrv_refresh_filename              = cor_refresh_filename,
-+    .bdrv_change_backing_file           = cor_change_backing_file,
+-static int coroutine_fn cor_co_pwritev(BlockDriverState *bs,
+-                                       uint64_t offset, uint64_t bytes,
+-                                       QEMUIOVector *qiov, int flags)
++static int coroutine_fn cor_co_pwritev_part(BlockDriverState *bs,
++                                            uint64_t offset,
++                                            uint64_t bytes,
++                                            QEMUIOVector *qiov,
++                                            size_t qiov_offset, int flags)
+ {
+-
+-    return bdrv_co_pwritev(bs->file, offset, bytes, qiov, flags);
++    return bdrv_co_pwritev_part(bs->file, offset, bytes, qiov, qiov_offset,
++                                flags);
+ }
  
-     .has_variable_length                = true,
-     .is_filter                          = true,
+ 
+@@ -152,8 +156,8 @@ static BlockDriver bdrv_copy_on_read = {
+ 
+     .bdrv_getlength                     = cor_getlength,
+ 
+-    .bdrv_co_preadv                     = cor_co_preadv,
+-    .bdrv_co_pwritev                    = cor_co_pwritev,
++    .bdrv_co_preadv_part                = cor_co_preadv_part,
++    .bdrv_co_pwritev_part               = cor_co_pwritev_part,
+     .bdrv_co_pwrite_zeroes              = cor_co_pwrite_zeroes,
+     .bdrv_co_pdiscard                   = cor_co_pdiscard,
+     .bdrv_co_pwritev_compressed         = cor_co_pwritev_compressed,
 -- 
 1.8.3.1
 
