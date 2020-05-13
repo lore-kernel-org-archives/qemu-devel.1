@@ -2,91 +2,133 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D08A8C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 16:40:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0499C433E3
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 16:41:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0054B2065D
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 16:40:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D24FE20708
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 16:41:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X2N1z92H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0054B2065D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EOllfu/L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D24FE20708
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYuRB-0007hK-Er
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 12:40:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48054)
+	id 1jYuS9-0000IN-GR
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 12:41:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48584)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jYuJk-0003oq-EE
- for qemu-devel@nongnu.org; Wed, 13 May 2020 12:33:12 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:51783)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jYuJi-00024N-0K
- for qemu-devel@nongnu.org; Wed, 13 May 2020 12:33:12 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id mq3so11344061pjb.1
- for <qemu-devel@nongnu.org>; Wed, 13 May 2020 09:33:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=hVHTEirUzJ20bAilpSh5nRxHdFXu/fWlu+BQCZdG8wI=;
- b=X2N1z92Hh3WJ7vtCRPIyz5OW5ZQqXBvZcJuxOr1p03Ok1f3zjOOOhcm3QhtN9pf2n8
- sJdYPuG8bPGGfm4MDawILYEODVnGPcyuOjT6Vj7gypDXPbBVCBRexH0A76ro2ttMtSjV
- NnOqtt/Qrq9LCW51kfQOpixKJrng2rjFZvsoHr3+z+OJabLvpBnlUA0agR66mZaDh+Ad
- GN9twoZhaL5SblFPpVUBznhhkvDVjJ8H3NYsfCKjaXct+Ya5yR6sZwAal5ECsuVNAYLq
- jHfEsJCYmTqMI8VTXzKJ7tO8kX00FhOPjzPtRDsHzGRZfAA7IAyIgFD3z5rOzoatNQhG
- 6Ibg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=hVHTEirUzJ20bAilpSh5nRxHdFXu/fWlu+BQCZdG8wI=;
- b=PaxZLCjG6d9OHOoYXVSzFOBUQ1Qz6pSFJvOBevG1VFcXkXfVR3vypaJE4DHLGPyB3i
- N6/Sd6HUrc29ZqqApzPIMaWINqUn1IEbC7p46/JyL0Fc9vmo+0t+HADF/y/ZRd/vM6kB
- 6oBykdeQysKVlD+KYzNbkZHncMRvPk7atNIOKHAxkNux3AnmXzABfsQLYzKP32lqg9OW
- kAuT+eKpIZSGKV1SCXMgBESPB8bsmWGalKG71VWHf3sZU7kt8/EhCpuEzoinLU7MrtuN
- uDJtEUwO4zYAia8zTJWMQR/XLtD8z/41WdcqvESFxXFlsXglQJCaHoSdcdy8pr/jLz7k
- Gteg==
-X-Gm-Message-State: AOAM531XF7LIlewgEt+B9MVr+71/0TxOfl1VSEMbjUe/XtXA+E7dOWgT
- xkoSyv0jX+QoHsInsrpMk5ZLcmUQrFY=
-X-Google-Smtp-Source: ABdhPJzY1mxRiT/M4Nihykdno47qUhipVo75UvqvEVQ2aC6ZYkwwQa0Jyukc5ziXlXadHfEjaYrgXA==
-X-Received: by 2002:a17:902:8494:: with SMTP id c20mr2897plo.305.1589387588187; 
- Wed, 13 May 2020 09:33:08 -0700 (PDT)
-Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
- [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id b11sm158025pgq.50.2020.05.13.09.33.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 13 May 2020 09:33:07 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 16/16] target/arm: Vectorize SABA/UABA
-Date: Wed, 13 May 2020 09:32:45 -0700
-Message-Id: <20200513163245.17915-17-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200513163245.17915-1-richard.henderson@linaro.org>
-References: <20200513163245.17915-1-richard.henderson@linaro.org>
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jYuNq-0001Gx-8y
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 12:37:27 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47564
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jYuNo-00049T-UG
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 12:37:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589387843;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=I8lzKK8Jo0TQLW03XcH79VW77ealySF8rgICQY7WKtg=;
+ b=EOllfu/Ljv7UmQLbp0EovJ+neAgB74fvi816pHFNTNc2pgSPQYVZafgQQw1AOAicWdOi+W
+ Igyahx2oX8E0LVZqT3cjTbFr13eqEral3CBakj7WtTwTcY6Z/G5RblSukxxpIUTU599tXZ
+ DEGpiAm7yoQE+vY+Hg/eh5WQ8w9KL2s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-388-q4pa4wchPsSYxCQOKRQGEA-1; Wed, 13 May 2020 12:37:18 -0400
+X-MC-Unique: q4pa4wchPsSYxCQOKRQGEA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2FCB835B5A;
+ Wed, 13 May 2020 16:37:16 +0000 (UTC)
+Received: from [10.36.114.88] (ovpn-114-88.ams2.redhat.com [10.36.114.88])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BD29D605FC;
+ Wed, 13 May 2020 16:37:10 +0000 (UTC)
+Subject: Re: [RFC v3 for QEMU] virtio-balloon: Add option cont-pages to set
+ VIRTIO_BALLOON_VQ_INFLATE_CONT
+To: Hui Zhu <teawater@gmail.com>, mst@redhat.com, jasowang@redhat.com,
+ akpm@linux-foundation.org, xdeguillard@vmware.com, namit@vmware.com,
+ gregkh@linuxfoundation.org, virtualization@lists.linux-foundation.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, qemu-devel@nongnu.org,
+ virtio-dev@lists.oasis-open.org
+References: <1589276501-16026-1-git-send-email-teawater@gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <0e7c29be-dd2c-dd95-6f2e-a009c530ffb1@redhat.com>
+Date: Wed, 13 May 2020 18:37:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
+In-Reply-To: <1589276501-16026-1-git-send-email-teawater@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=david@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 01:56:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,323 +142,267 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: wei.guo.simon@linux.alibaba.com, qixuan.wu@linux.alibaba.com,
+ Hui Zhu <teawaterz@linux.alibaba.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Include 64-bit element size in preparation for SVE2.
+On 12.05.20 11:41, Hui Zhu wrote:
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/helper.h        |  17 +++--
- target/arm/translate.h     |   5 ++
- target/arm/neon_helper.c   |  10 ---
- target/arm/translate-a64.c |  17 ++---
- target/arm/translate.c     | 134 +++++++++++++++++++++++++++++++++++--
- target/arm/vec_helper.c    |  24 +++++++
- 6 files changed, 174 insertions(+), 33 deletions(-)
+This description needs an overhaul, it's hard to parse.
 
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 4678d3a6f4..1857f4ee46 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -284,13 +284,6 @@ DEF_HELPER_2(neon_pmax_s8, i32, i32, i32)
- DEF_HELPER_2(neon_pmax_u16, i32, i32, i32)
- DEF_HELPER_2(neon_pmax_s16, i32, i32, i32)
- 
--DEF_HELPER_2(neon_abd_u8, i32, i32, i32)
--DEF_HELPER_2(neon_abd_s8, i32, i32, i32)
--DEF_HELPER_2(neon_abd_u16, i32, i32, i32)
--DEF_HELPER_2(neon_abd_s16, i32, i32, i32)
--DEF_HELPER_2(neon_abd_u32, i32, i32, i32)
--DEF_HELPER_2(neon_abd_s32, i32, i32, i32)
--
- DEF_HELPER_2(neon_shl_u16, i32, i32, i32)
- DEF_HELPER_2(neon_shl_s16, i32, i32, i32)
- DEF_HELPER_2(neon_rshl_u8, i32, i32, i32)
-@@ -741,6 +734,16 @@ DEF_HELPER_FLAGS_4(gvec_uabd_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(gvec_uabd_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(gvec_uabd_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- 
-+DEF_HELPER_FLAGS_4(gvec_saba_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_saba_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_saba_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_saba_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_4(gvec_uaba_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_uaba_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_uaba_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_uaba_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+
- #ifdef TARGET_AARCH64
- #include "helper-a64.h"
- #include "helper-sve.h"
-diff --git a/target/arm/translate.h b/target/arm/translate.h
-index bbfe3d1393..c937dfe9bf 100644
---- a/target/arm/translate.h
-+++ b/target/arm/translate.h
-@@ -342,6 +342,11 @@ void gen_gvec_sabd(unsigned vece, uint32_t rd_ofs, uint32_t rn_ofs,
- void gen_gvec_uabd(unsigned vece, uint32_t rd_ofs, uint32_t rn_ofs,
-                    uint32_t rm_ofs, uint32_t opr_sz, uint32_t max_sz);
- 
-+void gen_gvec_saba(unsigned vece, uint32_t rd_ofs, uint32_t rn_ofs,
-+                   uint32_t rm_ofs, uint32_t opr_sz, uint32_t max_sz);
-+void gen_gvec_uaba(unsigned vece, uint32_t rd_ofs, uint32_t rn_ofs,
-+                   uint32_t rm_ofs, uint32_t opr_sz, uint32_t max_sz);
-+
- /*
-  * Forward to the isar_feature_* tests given a DisasContext pointer.
-  */
-diff --git a/target/arm/neon_helper.c b/target/arm/neon_helper.c
-index 448be93fa1..2ef75e04c8 100644
---- a/target/arm/neon_helper.c
-+++ b/target/arm/neon_helper.c
-@@ -576,16 +576,6 @@ NEON_POP(pmax_s16, neon_s16, 2)
- NEON_POP(pmax_u16, neon_u16, 2)
- #undef NEON_FN
- 
--#define NEON_FN(dest, src1, src2) \
--    dest = (src1 > src2) ? (src1 - src2) : (src2 - src1)
--NEON_VOP(abd_s8, neon_s8, 4)
--NEON_VOP(abd_u8, neon_u8, 4)
--NEON_VOP(abd_s16, neon_s16, 2)
--NEON_VOP(abd_u16, neon_u16, 2)
--NEON_VOP(abd_s32, neon_s32, 1)
--NEON_VOP(abd_u32, neon_u32, 1)
--#undef NEON_FN
--
- #define NEON_FN(dest, src1, src2) do { \
-     int8_t tmp; \
-     tmp = (int8_t)src2; \
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 54b06553a6..991e451644 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -11197,6 +11197,13 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
-             gen_gvec_fn3(s, is_q, rd, rn, rm, gen_gvec_sabd, size);
-         }
-         return;
-+    case 0xf: /* SABA, UABA */
-+        if (u) {
-+            gen_gvec_fn3(s, is_q, rd, rn, rm, gen_gvec_uaba, size);
-+        } else {
-+            gen_gvec_fn3(s, is_q, rd, rn, rm, gen_gvec_saba, size);
-+        }
-+        return;
-     case 0x10: /* ADD, SUB */
-         if (u) {
-             gen_gvec_fn3(s, is_q, rd, rn, rm, tcg_gen_gvec_sub, size);
-@@ -11329,16 +11336,6 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
-                 genenvfn = fns[size][u];
-                 break;
-             }
--            case 0xf: /* SABA, UABA */
--            {
--                static NeonGenTwoOpFn * const fns[3][2] = {
--                    { gen_helper_neon_abd_s8, gen_helper_neon_abd_u8 },
--                    { gen_helper_neon_abd_s16, gen_helper_neon_abd_u16 },
--                    { gen_helper_neon_abd_s32, gen_helper_neon_abd_u32 },
--                };
--                genfn = fns[size][u];
--                break;
--            }
-             case 0x16: /* SQDMULH, SQRDMULH */
-             {
-                 static NeonGenTwoOpEnvFn * const fns[2][2] = {
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index d288721c23..e3d37ef2e9 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -5222,6 +5222,124 @@ void gen_gvec_uabd(unsigned vece, uint32_t rd_ofs, uint32_t rn_ofs,
-     tcg_gen_gvec_3(rd_ofs, rn_ofs, rm_ofs, opr_sz, max_sz, &ops[vece]);
- }
- 
-+static void gen_saba_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
-+{
-+    TCGv_i32 t = tcg_temp_new_i32();
-+    gen_sabd_i32(t, a, b);
-+    tcg_gen_add_i32(d, d, t);
-+    tcg_temp_free_i32(t);
-+}
-+
-+static void gen_saba_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
-+{
-+    TCGv_i64 t = tcg_temp_new_i64();
-+    gen_sabd_i64(t, a, b);
-+    tcg_gen_add_i64(d, d, t);
-+    tcg_temp_free_i64(t);
-+}
-+
-+static void gen_saba_vec(unsigned vece, TCGv_vec d, TCGv_vec a, TCGv_vec b)
-+{
-+    TCGv_vec t = tcg_temp_new_vec_matching(d);
-+    gen_sabd_vec(vece, t, a, b);
-+    tcg_gen_add_vec(vece, d, d, t);
-+    tcg_temp_free_vec(t);
-+}
-+
-+void gen_gvec_saba(unsigned vece, uint32_t rd_ofs, uint32_t rn_ofs,
-+                   uint32_t rm_ofs, uint32_t opr_sz, uint32_t max_sz)
-+{
-+    static const TCGOpcode vecop_list[] = {
-+        INDEX_op_sub_vec, INDEX_op_add_vec,
-+        INDEX_op_smin_vec, INDEX_op_smax_vec, 0
-+    };
-+    static const GVecGen3 ops[4] = {
-+        { .fniv = gen_saba_vec,
-+          .fno = gen_helper_gvec_saba_b,
-+          .opt_opc = vecop_list,
-+          .load_dest = true,
-+          .vece = MO_8 },
-+        { .fniv = gen_saba_vec,
-+          .fno = gen_helper_gvec_saba_h,
-+          .opt_opc = vecop_list,
-+          .load_dest = true,
-+          .vece = MO_16 },
-+        { .fni4 = gen_saba_i32,
-+          .fniv = gen_saba_vec,
-+          .fno = gen_helper_gvec_saba_s,
-+          .opt_opc = vecop_list,
-+          .load_dest = true,
-+          .vece = MO_32 },
-+        { .fni8 = gen_saba_i64,
-+          .fniv = gen_saba_vec,
-+          .fno = gen_helper_gvec_saba_d,
-+          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
-+          .opt_opc = vecop_list,
-+          .load_dest = true,
-+          .vece = MO_64 },
-+    };
-+    tcg_gen_gvec_3(rd_ofs, rn_ofs, rm_ofs, opr_sz, max_sz, &ops[vece]);
-+}
-+
-+static void gen_uaba_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
-+{
-+    TCGv_i32 t = tcg_temp_new_i32();
-+    gen_uabd_i32(t, a, b);
-+    tcg_gen_add_i32(d, d, t);
-+    tcg_temp_free_i32(t);
-+}
-+
-+static void gen_uaba_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
-+{
-+    TCGv_i64 t = tcg_temp_new_i64();
-+    gen_uabd_i64(t, a, b);
-+    tcg_gen_add_i64(d, d, t);
-+    tcg_temp_free_i64(t);
-+}
-+
-+static void gen_uaba_vec(unsigned vece, TCGv_vec d, TCGv_vec a, TCGv_vec b)
-+{
-+    TCGv_vec t = tcg_temp_new_vec_matching(d);
-+    gen_uabd_vec(vece, t, a, b);
-+    tcg_gen_add_vec(vece, d, d, t);
-+    tcg_temp_free_vec(t);
-+}
-+
-+void gen_gvec_uaba(unsigned vece, uint32_t rd_ofs, uint32_t rn_ofs,
-+                   uint32_t rm_ofs, uint32_t opr_sz, uint32_t max_sz)
-+{
-+    static const TCGOpcode vecop_list[] = {
-+        INDEX_op_sub_vec, INDEX_op_add_vec,
-+        INDEX_op_umin_vec, INDEX_op_umax_vec, 0
-+    };
-+    static const GVecGen3 ops[4] = {
-+        { .fniv = gen_uaba_vec,
-+          .fno = gen_helper_gvec_uaba_b,
-+          .opt_opc = vecop_list,
-+          .load_dest = true,
-+          .vece = MO_8 },
-+        { .fniv = gen_uaba_vec,
-+          .fno = gen_helper_gvec_uaba_h,
-+          .opt_opc = vecop_list,
-+          .load_dest = true,
-+          .vece = MO_16 },
-+        { .fni4 = gen_uaba_i32,
-+          .fniv = gen_uaba_vec,
-+          .fno = gen_helper_gvec_uaba_s,
-+          .opt_opc = vecop_list,
-+          .load_dest = true,
-+          .vece = MO_32 },
-+        { .fni8 = gen_uaba_i64,
-+          .fniv = gen_uaba_vec,
-+          .fno = gen_helper_gvec_uaba_d,
-+          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
-+          .opt_opc = vecop_list,
-+          .load_dest = true,
-+          .vece = MO_64 },
-+    };
-+    tcg_gen_gvec_3(rd_ofs, rn_ofs, rm_ofs, opr_sz, max_sz, &ops[vece]);
-+}
-+
- /* Translate a NEON data processing instruction.  Return nonzero if the
-    instruction is invalid.
-    We process data in a mixture of 32-bit and 64-bit chunks.
-@@ -5366,6 +5484,16 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-             }
-             return 0;
- 
-+        case NEON_3R_VABA:
-+            if (u) {
-+                gen_gvec_uaba(size, rd_ofs, rn_ofs, rm_ofs,
-+                              vec_size, vec_size);
-+            } else {
-+                gen_gvec_saba(size, rd_ofs, rn_ofs, rm_ofs,
-+                              vec_size, vec_size);
-+            }
-+            return 0;
-+
-         case NEON_3R_VADD_VSUB:
-         case NEON_3R_LOGIC:
-         case NEON_3R_VMAX:
-@@ -5510,12 +5638,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-         case NEON_3R_VQRSHL:
-             GEN_NEON_INTEGER_OP_ENV(qrshl);
-             break;
--        case NEON_3R_VABA:
--            GEN_NEON_INTEGER_OP(abd);
--            tcg_temp_free_i32(tmp2);
--            tmp2 = neon_load_reg(rd, pass);
--            gen_neon_add(size, tmp, tmp2);
--            break;
-         case NEON_3R_VPMAX:
-             GEN_NEON_INTEGER_OP(pmax);
-             break;
-diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
-index a4972d02fc..fa33df859e 100644
---- a/target/arm/vec_helper.c
-+++ b/target/arm/vec_helper.c
-@@ -1431,3 +1431,27 @@ DO_ABD(gvec_uabd_s, uint32_t)
- DO_ABD(gvec_uabd_d, uint64_t)
- 
- #undef DO_ABD
-+
-+#define DO_ABA(NAME, TYPE)                                      \
-+void HELPER(NAME)(void *vd, void *vn, void *vm, uint32_t desc)  \
-+{                                                               \
-+    intptr_t i, opr_sz = simd_oprsz(desc);                      \
-+    TYPE *d = vd, *n = vn, *m = vm;                             \
-+                                                                \
-+    for (i = 0; i < opr_sz / sizeof(TYPE); ++i) {               \
-+        d[i] += n[i] < m[i] ? m[i] - n[i] : n[i] - m[i];        \
-+    }                                                           \
-+    clear_tail(d, opr_sz, simd_maxsz(desc));                    \
-+}
-+
-+DO_ABA(gvec_saba_b, int8_t)
-+DO_ABA(gvec_saba_h, int16_t)
-+DO_ABA(gvec_saba_s, int32_t)
-+DO_ABA(gvec_saba_d, int64_t)
-+
-+DO_ABA(gvec_uaba_b, uint8_t)
-+DO_ABA(gvec_uaba_h, uint16_t)
-+DO_ABA(gvec_uaba_s, uint32_t)
-+DO_ABA(gvec_uaba_d, uint64_t)
-+
-+#undef DO_ABA
+> If the guest kernel has many fragmentation pages, use virtio_balloon
+> will split THP of QEMU when it calls MADV_DONTNEED madvise to release
+> the balloon pages.
+
+This is very unclear and confusing. You will *always* split THPs when
+inflating 4k pages and there are THPs around. This is completely
+independent of any fragmentation in the guest. The thing you are trying
+to achieve here is trying to *minimize* the number of split THPs in the
+hypervisor *after* the balloon was completely inflated.
+
+> Set option cont-pages to on will open flags VIRTIO_BALLOON_VQ_INFLATE_CONT
+> and set default continuous pages order to THP order.
+
+... and what you implement here is very x86 specific, hard-coding the
+"9" as THP order.
+
+"Set option cont-pages to on" -> 'Once the feature is enabled via
+"cont-pages=on"'
+"open flags" -> "unlock VIRTIO_BALLOON_VQ_INFLATE_CONT".
+
+
+> Then It will get continuous pages PFN that its order is current_pages_order
+> from VQ ivq use use madvise MADV_DONTNEED release the page.
+
+I fail to parse this sentence. I assume something like
+
+"current_pages_order is set by the guest and configures the size of the
+pages communicated via the inflate/deflate queue by the guest. It
+defaults to 0, which corresponds to the legacy handling without
+VIRTIO_BALLOON_VQ_INFLATE_CONT - 4k pages."
+
+Why is "max_pages_order" necessary *at all*? You never check against that.
+
+I have to say, I really dislike that interface. I would much rather
+prefer new inflate/deflate queues that eat variable sizes (not orders!)
+- similar to the free page reporting interface - and skip things like
+the pbp. Not sure if this interface is really what MST asked for.
+
+> This will handle the THP split issue.
+> 
+> Signed-off-by: Hui Zhu <teawaterz@linux.alibaba.com>
+> ---
+>  hw/virtio/virtio-balloon.c                      | 77 +++++++++++++++++--------
+>  include/hw/virtio/virtio-balloon.h              |  2 +
+>  include/standard-headers/linux/virtio_balloon.h |  5 ++
+>  3 files changed, 60 insertions(+), 24 deletions(-)
+> 
+> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> index a4729f7..84d47d3 100644
+> --- a/hw/virtio/virtio-balloon.c
+> +++ b/hw/virtio/virtio-balloon.c
+> @@ -34,6 +34,7 @@
+>  #include "hw/virtio/virtio-access.h"
+>  
+>  #define BALLOON_PAGE_SIZE  (1 << VIRTIO_BALLOON_PFN_SHIFT)
+> +#define CONT_PAGES_ORDER   9
+>  
+>  typedef struct PartiallyBalloonedPage {
+>      ram_addr_t base_gpa;
+> @@ -72,6 +73,8 @@ static void balloon_inflate_page(VirtIOBalloon *balloon,
+>      RAMBlock *rb;
+>      size_t rb_page_size;
+>      int subpages;
+> +    size_t inflate_size = BALLOON_PAGE_SIZE << balloon->current_pages_order;
+> +    int pages_num;
+
+reverse christmas tree please. squash same types into a single line if
+possible.
+
+>  
+>      /* XXX is there a better way to get to the RAMBlock than via a
+>       * host address? */
+> @@ -81,7 +84,7 @@ static void balloon_inflate_page(VirtIOBalloon *balloon,
+>      if (rb_page_size == BALLOON_PAGE_SIZE) {
+>          /* Easy case */
+>  
+> -        ram_block_discard_range(rb, rb_offset, rb_page_size);
+> +        ram_block_discard_range(rb, rb_offset, inflate_size);
+>          /* We ignore errors from ram_block_discard_range(), because it
+>           * has already reported them, and failing to discard a balloon
+>           * page is not fatal */
+> @@ -99,32 +102,38 @@ static void balloon_inflate_page(VirtIOBalloon *balloon,
+>  
+>      rb_aligned_offset = QEMU_ALIGN_DOWN(rb_offset, rb_page_size);
+>      subpages = rb_page_size / BALLOON_PAGE_SIZE;
+> -    base_gpa = memory_region_get_ram_addr(mr) + mr_offset -
+> -               (rb_offset - rb_aligned_offset);
+>  
+> -    if (pbp->bitmap && !virtio_balloon_pbp_matches(pbp, base_gpa)) {
+> -        /* We've partially ballooned part of a host page, but now
+> -         * we're trying to balloon part of a different one.  Too hard,
+> -         * give up on the old partial page */
+> -        virtio_balloon_pbp_free(pbp);
+> -    }
+> +    for (pages_num = inflate_size / BALLOON_PAGE_SIZE;
+> +         pages_num > 0; pages_num--) {
+> +        base_gpa = memory_region_get_ram_addr(mr) + mr_offset -
+> +                   (rb_offset - rb_aligned_offset);
+>  
+> -    if (!pbp->bitmap) {
+> -        virtio_balloon_pbp_alloc(pbp, base_gpa, subpages);
+> -    }
+> +        if (pbp->bitmap && !virtio_balloon_pbp_matches(pbp, base_gpa)) {
+> +            /* We've partially ballooned part of a host page, but now
+> +            * we're trying to balloon part of a different one.  Too hard,
+> +            * give up on the old partial page */
+> +            virtio_balloon_pbp_free(pbp);
+> +        }
+>  
+> -    set_bit((rb_offset - rb_aligned_offset) / BALLOON_PAGE_SIZE,
+> -            pbp->bitmap);
+> +        if (!pbp->bitmap) {
+> +            virtio_balloon_pbp_alloc(pbp, base_gpa, subpages);
+> +        }
+>  
+> -    if (bitmap_full(pbp->bitmap, subpages)) {
+> -        /* We've accumulated a full host page, we can actually discard
+> -         * it now */
+> +        set_bit((rb_offset - rb_aligned_offset) / BALLOON_PAGE_SIZE,
+> +                pbp->bitmap);
+>  
+> -        ram_block_discard_range(rb, rb_aligned_offset, rb_page_size);
+> -        /* We ignore errors from ram_block_discard_range(), because it
+> -         * has already reported them, and failing to discard a balloon
+> -         * page is not fatal */
+> -        virtio_balloon_pbp_free(pbp);
+> +        if (bitmap_full(pbp->bitmap, subpages)) {
+> +            /* We've accumulated a full host page, we can actually discard
+> +            * it now */
+> +
+> +            ram_block_discard_range(rb, rb_aligned_offset, rb_page_size);
+> +            /* We ignore errors from ram_block_discard_range(), because it
+> +            * has already reported them, and failing to discard a balloon
+> +            * page is not fatal */
+> +            virtio_balloon_pbp_free(pbp);
+> +        }
+> +
+> +        mr_offset += BALLOON_PAGE_SIZE;
+>      }
+>  }
+>  
+> @@ -345,7 +354,7 @@ static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+>              offset += 4;
+>  
+>              section = memory_region_find(get_system_memory(), pa,
+> -                                         BALLOON_PAGE_SIZE);
+> +                                BALLOON_PAGE_SIZE << s->current_pages_order);
+>              if (!section.mr) {
+>                  trace_virtio_balloon_bad_addr(pa);
+>                  continue;
+> @@ -618,9 +627,12 @@ static size_t virtio_balloon_config_size(VirtIOBalloon *s)
+>      if (s->qemu_4_0_config_size) {
+>          return sizeof(struct virtio_balloon_config);
+>      }
+> -    if (virtio_has_feature(features, VIRTIO_BALLOON_F_PAGE_POISON)) {
+> +    if (virtio_has_feature(s->host_features, VIRTIO_BALLOON_F_CONT_PAGES)) {
+>          return sizeof(struct virtio_balloon_config);
+>      }
+> +    if (virtio_has_feature(features, VIRTIO_BALLOON_F_PAGE_POISON)) {
+> +        return offsetof(struct virtio_balloon_config, current_pages_order);
+> +    }
+>      if (virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
+>          return offsetof(struct virtio_balloon_config, poison_val);
+>      }
+> @@ -646,6 +658,11 @@ static void virtio_balloon_get_config(VirtIODevice *vdev, uint8_t *config_data)
+>                         cpu_to_le32(VIRTIO_BALLOON_CMD_ID_DONE);
+>      }
+>  
+> +    if (virtio_has_feature(dev->host_features, VIRTIO_BALLOON_F_CONT_PAGES)) {
+> +        config.max_pages_order = cpu_to_le32(CONT_PAGES_ORDER);
+> +        config.current_pages_order = cpu_to_le32(dev->current_pages_order);
+> +    }
+> +
+>      trace_virtio_balloon_get_config(config.num_pages, config.actual);
+>      memcpy(config_data, &config, virtio_balloon_config_size(dev));
+>  }
+> @@ -693,6 +710,9 @@ static void virtio_balloon_set_config(VirtIODevice *vdev,
+>  
+>      memcpy(&config, config_data, virtio_balloon_config_size(dev));
+>      dev->actual = le32_to_cpu(config.actual);
+> +    if (virtio_has_feature(dev->host_features, VIRTIO_BALLOON_F_CONT_PAGES)) {
+> +        dev->current_pages_order = le32_to_cpu(config.current_pages_order);
+> +    }
+>      if (dev->actual != oldactual) {
+>          qapi_event_send_balloon_change(vm_ram_size -
+>                          ((ram_addr_t) dev->actual << VIRTIO_BALLOON_PFN_SHIFT));
+> @@ -816,6 +836,13 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
+>              virtio_error(vdev, "iothread is missing");
+>          }
+>      }
+> +
+> +    if (virtio_has_feature(s->host_features, VIRTIO_BALLOON_F_CONT_PAGES)) {
+> +        s->current_pages_order = CONT_PAGES_ORDER;
+> +    } else {
+> +        s->current_pages_order = 0;
+> +    }
+> +
+>      reset_stats(s);
+>  }
+>  
+> @@ -916,6 +943,8 @@ static Property virtio_balloon_properties[] = {
+>                      VIRTIO_BALLOON_F_DEFLATE_ON_OOM, false),
+>      DEFINE_PROP_BIT("free-page-hint", VirtIOBalloon, host_features,
+>                      VIRTIO_BALLOON_F_FREE_PAGE_HINT, false),
+> +    DEFINE_PROP_BIT("cont-pages", VirtIOBalloon, host_features,
+> +                    VIRTIO_BALLOON_F_CONT_PAGES, false),
+>      /* QEMU 4.0 accidentally changed the config size even when free-page-hint
+>       * is disabled, resulting in QEMU 3.1 migration incompatibility.  This
+>       * property retains this quirk for QEMU 4.1 machine types.
+> diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
+> index d1c968d..e0dce0d 100644
+> --- a/include/hw/virtio/virtio-balloon.h
+> +++ b/include/hw/virtio/virtio-balloon.h
+> @@ -70,6 +70,8 @@ typedef struct VirtIOBalloon {
+>      uint32_t host_features;
+>  
+>      bool qemu_4_0_config_size;
+> +
+> +    uint32_t current_pages_order;
+>  } VirtIOBalloon;
+>  
+>  #endif
+> diff --git a/include/standard-headers/linux/virtio_balloon.h b/include/standard-headers/linux/virtio_balloon.h
+> index 9375ca2..b5386ce 100644
+> --- a/include/standard-headers/linux/virtio_balloon.h
+> +++ b/include/standard-headers/linux/virtio_balloon.h
+> @@ -36,6 +36,7 @@
+>  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
+>  #define VIRTIO_BALLOON_F_FREE_PAGE_HINT	3 /* VQ to report free pages */
+>  #define VIRTIO_BALLOON_F_PAGE_POISON	4 /* Guest is using page poisoning */
+> +#define VIRTIO_BALLOON_F_CONT_PAGES	6 /* VQ to report continuous pages */
+>  
+>  /* Size of a PFN in the balloon interface. */
+>  #define VIRTIO_BALLOON_PFN_SHIFT 12
+> @@ -51,6 +52,10 @@ struct virtio_balloon_config {
+>  	uint32_t free_page_report_cmd_id;
+>  	/* Stores PAGE_POISON if page poisoning is in use */
+>  	uint32_t poison_val;
+> +	/* Max pages order if VIRTIO_BALLOON_F_CONT_PAGES is set */
+> +	uint32_t max_pages_order;
+> +	/* Current pages order if VIRTIO_BALLOON_F_CONT_PAGES is set */
+> +	uint32_t current_pages_order;
+>  };
+>  
+>  #define VIRTIO_BALLOON_S_SWAP_IN  0   /* Amount of memory swapped in */
+> 
+
+
 -- 
-2.20.1
+Thanks,
+
+David / dhildenb
 
 
