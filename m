@@ -2,93 +2,110 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAE48CA90AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 12:02:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DBB1CA90AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 12:20:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8527206CC
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 12:02:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3426920769
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 12:20:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f8sPyTdU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8527206CC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HbbLUp17"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3426920769
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYq6C-0005ts-Tc
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 08:02:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33984)
+	id 1jYqN3-0007vm-A8
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 08:20:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35626)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jYq5E-0004yT-FJ
- for qemu-devel@nongnu.org; Wed, 13 May 2020 08:01:56 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36984)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jYq5D-0007H7-Hk
- for qemu-devel@nongnu.org; Wed, 13 May 2020 08:01:56 -0400
-Received: by mail-wr1-x442.google.com with SMTP id l17so6996384wrr.4
- for <qemu-devel@nongnu.org>; Wed, 13 May 2020 05:01:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=kKzZHo4L5dfpej90+SdUvjInT8zjdkjYewCTH4sZNAU=;
- b=f8sPyTdUZqB1Eb1kTbppFVWgmQ7TOTYt9b3qEtCAdx3Fi4VNOM4HZNHIMWiF/P2xCq
- WPIvFgbGIA3g7srzNChpRo/Y8JNbSXOIl2xmgsPR7X3FHup3bliV8oxGxujPbeUX58ou
- yt2kEL7fQZPoEfMxBjFZZLcHhqv8dNYtEvkDl0AeVbcgKJ3bq55JNSoWTMKUnZEnEXDQ
- KNR8XD6fWDkWr53X6Yusab6xKNjZCRB6icJ/r3o/SC9QYxQ4Ll+p9xSlaGiHpto8jUOl
- TIS7Gdyd3Nz2kbo7aJPltYhIV7UBTB02lgIF3Ubg3ojA5m8s7EnxhJAxPzXuSwbRpOpH
- RyIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=kKzZHo4L5dfpej90+SdUvjInT8zjdkjYewCTH4sZNAU=;
- b=dENJGmWiRFSaIaK65249w0FCcabcoLe8wDevlvTLytLm1zE9191sHBkUvM03N+zQNt
- EQwIp4QnFRBkvtdProJWT8Fo3omQzp3/Zccve+djGSTg08T3uTNBWErJJ8LtkCsxMWQ1
- xEAZSyThNAo2DbyW4GhWPO89oVMPL+svmHQ5Mc5hKuiGdjWoJKvO9NcIoWZ5LXli9XUH
- SMlj0JFS408UoRm5DWifzVANs9Vl3pAMhTSdqUGPqXu/YvWjUXGNc8hXcAqBhU/RJ4Dm
- 0t0N5zqGHdPVX1ny451N9AZE90mDatq/X6EmMbjMG7PrJGHin6kZ8vK93nLpXhforzsE
- 5Lwg==
-X-Gm-Message-State: AOAM530D6yK7f6eXeTWQbZb6aE3+fqUuBqT/sKLEcxRa5LF1CRjZ7ZU9
- xt3Ng9rlONZ1m+si+G2dTGEXHFaalIY=
-X-Google-Smtp-Source: ABdhPJzeke5ChPbPNgi+BDAm3Oxov0ZEX6RQ/kqWQcceQniRVxiLYgk9gi181uZBiq+fEes3cFLX3A==
-X-Received: by 2002:a5d:504b:: with SMTP id h11mr1086542wrt.85.1589371310380; 
- Wed, 13 May 2020 05:01:50 -0700 (PDT)
-Received: from x1w.redhat.com (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id g135sm18220095wme.22.2020.05.13.05.01.48
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 13 May 2020 05:01:48 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] tests/docker: Kludge <linux/swab.h> breakage by pinning
- linux-libc-dev
-Date: Wed, 13 May 2020 14:01:47 +0200
-Message-Id: <20200513120147.21443-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jYqHJ-0004iw-6O
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 08:14:25 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20057
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jYqHH-0001GQ-Iy
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 08:14:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589372061;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=a60t2++1erjwPY7X5QLmKQ29d+3fMFkawizGvmkYpMQ=;
+ b=HbbLUp17dgcNX1gbTi8p4HRx2nAn/HyFQyqHkQcJBlo4UE+b6yUvqJb4IoU4tGFJKa62o8
+ TZyuBU/9NU8ryG57oRyiYKDNQtuFEfbTFUX+TGGw3Z6JN2sY4WTIP4P0GHzhEQcutw6zfx
+ kTixHdqMDye97ekGx8jGh1dHv84vobE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-255-CBhi_S1HP-KaalDp_ln2vQ-1; Wed, 13 May 2020 08:14:19 -0400
+X-MC-Unique: CBhi_S1HP-KaalDp_ln2vQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A2AB580B724;
+ Wed, 13 May 2020 12:14:18 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.193.218])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 993E21000079;
+ Wed, 13 May 2020 12:14:17 +0000 (UTC)
+Subject: Re: [PATCH 2/2] iotests: Run pylint and mypy in a testcase
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200511163529.349329-1-kwolf@redhat.com>
+ <20200511163529.349329-3-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <c2292ce0-6885-216e-b23f-26a341a5afd3@redhat.com>
+Date: Wed, 13 May 2020 14:14:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+In-Reply-To: <20200511163529.349329-3-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="0fZc8NekEVVxhQsdkNEO0EXdmeNqCTDcx"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 04:17:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,113 +119,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Salvatore Bonaccorso <carnil@debian.org>
+Cc: jsnow@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Linux kernel commit d5767057c9a [1] aimed to fix an issue with the
-swab() declaration, but doing so it introduced the BITS_PER_LONG
-definition, without using the kernel __ prefix, leading to odd
-failures in userland code using kernel uapi headers, such:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--0fZc8NekEVVxhQsdkNEO0EXdmeNqCTDcx
+Content-Type: multipart/mixed; boundary="s2YoBVCXorb2tQkTONhxGRdVNW1XZpWOm"
 
-      CC      block/file-posix.o
-    In file included from include/qemu/timer.h:4,
-                     from include/qemu/timed-average.h:29,
-                     from include/block/accounting.h:28,
-                     from include/block/block_int.h:27,
-                     from block/file-posix.c:30:
-    /usr/include/linux/swab.h: In function `__swab':
-    include/qemu/bitops.h:20:34: error: "sizeof" is not defined, evaluates to 0 [-Werror=undef]
-       20 | #define BITS_PER_LONG           (sizeof (unsigned long) * BITS_PER_BYTE)
-          |                                  ^~~~~~
-    include/qemu/bitops.h:20:41: error: missing binary operator before token "("
-       20 | #define BITS_PER_LONG           (sizeof (unsigned long) * BITS_PER_BYTE)
-          |                                         ^
-    cc1: all warnings being treated as errors
-    make: *** [rules.mak:69: block/file-posix.o] Error 1
+--s2YoBVCXorb2tQkTONhxGRdVNW1XZpWOm
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-The issue has been fixed in Linux kernel commit 467d12f5c78 [2].
-Some distributions already backported the first commit, but still
-lack the second one.
+On 11.05.20 18:35, Kevin Wolf wrote:
+> We made sure that iotests.py passes pylint. It would be a shame if we
+> allowed new patches in that break this again, so let's just add a
+> meta-test case that runs pylint on it.
+>=20
+> While we don't pass mypy --strict yet, we can already run it with a few
+> options that would be part of --strict to make sure that we won't
+> regress on these aspects at least until we can enable the full thing.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  tests/qemu-iotests/297     | 44 ++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/297.out |  3 +++
+>  tests/qemu-iotests/group   |  1 +
+>  3 files changed, 48 insertions(+)
+>  create mode 100755 tests/qemu-iotests/297
+>  create mode 100644 tests/qemu-iotests/297.out
 
-This is the case for Debian Buster.
-The linux-libc-dev package contains the Linux kernel headers.
-Kernel commit d5767057c9a has been backported in package
-commit 1fb0eb7956 "Update to 4.19.116" [3], see debian/changelog:
+Bit of a shame that this takes 8 s (on my machine at least) and will run
+with every format/protocol combination unless I explictly exclude it
+with -x meta...  But I suppose the actual problem here is the fact that
+tests still can=E2=80=99t just define a =E2=80=9CThis is the format/protoco=
+l combination
+I require=E2=80=9D and then you can just let all tests run once with that
+default combination.  (And maybe afterwards run all tests again with
+some custom combinations, but only when that makes sense.)
 
-  +linux (4.19.116-1) UNRELEASED; urgency=medium
-  ...
-  +    - uapi: rename ext2_swab() to swab() and share globally in swab.h
+Well.  Not a new problem.
 
-The previous released update before it is debian/4.19.98-1,
-released as debian/4.19.98-1+deb10u1.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-We can find this package in the Debian snapshot archives,
-luckily archived on 2020-04-28 21:20:54 (see [4]).
 
-QEMU use Debian based Docker images for most of its cross-builds,
-which are tested by our Shippable CI jobs. The current broken
-package makes most of our CI red. We can kludge this by using the
-latest package released before the breakage. Do so by pinning
-the package version (apt hold), and using the snapshot archives,
-similar to commit b4048a7cd1.
-We'll revert once the fix is backported on Debian.
+--s2YoBVCXorb2tQkTONhxGRdVNW1XZpWOm--
 
-Reference to commits:
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d5767057c9a
-[2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=467d12f5c78
-[3] https://salsa.debian.org/kernel-team/linux/-/commit/1fb0eb7956
-[4] http://snapshot.debian.org/package/linux/4.19.98-1%2Bdeb10u1/#linux-libc-dev_4.19.98-1:2b:deb10u1
+--0fZc8NekEVVxhQsdkNEO0EXdmeNqCTDcx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Cc: Salvatore Bonaccorso <carnil@debian.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-Shippable green again:
-https://app.shippable.com/github/philmd/qemu/runs/759/summary/console
----
- tests/docker/dockerfiles/debian10.docker | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+-----BEGIN PGP SIGNATURE-----
 
-diff --git a/tests/docker/dockerfiles/debian10.docker b/tests/docker/dockerfiles/debian10.docker
-index 0769700a41..d7084ac283 100644
---- a/tests/docker/dockerfiles/debian10.docker
-+++ b/tests/docker/dockerfiles/debian10.docker
-@@ -9,6 +9,15 @@
- #
- FROM debian:buster-slim
- 
-+ # Use a snapshot known to work (see http://snapshot.debian.org/#Usage)
-+ENV DEBIAN_SNAPSHOT_DATE "20200428T212054Z"
-+RUN sed -i \
-+    "s%^deb \(https\?://\)deb.debian.org/debian/\? \(.*\)%deb [check-valid-until=no] \1snapshot.debian.org/archive/debian/${DEBIAN_SNAPSHOT_DATE} \2%" \
-+    /etc/apt/sources.list
-+RUN sed -i \
-+    "s%^deb \(https\?://\)security.debian.org/debian-security/\? \(.*\)%deb [check-valid-until=no] \1snapshot.debian.org/archive/debian-security/${DEBIAN_SNAPSHOT_DATE} \2%" \
-+    /etc/apt/sources.list
-+
- # Duplicate deb line as deb-src
- RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
- 
-@@ -35,4 +44,11 @@ RUN apt update && \
-         texinfo \
-         $(apt-get -s build-dep qemu | egrep ^Inst | fgrep '[all]' | cut -d\  -f2)
- 
-+# Install common build utilities
-+RUN apt update && \
-+    DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt install -y --allow-downgrades \
-+        linux-libc-dev=4.19.98-1+deb10u1 && \
-+    apt-mark hold linux-libc-dev
-+
- ENV FEATURES docs
--- 
-2.21.3
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl675JcACgkQ9AfbAGHV
+z0AkYAgAqQRpWStpKXpmIbeBezHBuTjiNLTI4hWd4IGI44NQ/l4uvicPFh1Znknx
+j0WUyk5EjJNBXzxrYHOrXPBLCLNHGdT93o6bFPrOKET1gSgMio6KYVZf6WtyFj4I
+UTBfl/8mtyl5VFb3a+4V4WHLvd/5Wx/Uq0pKUiNbpRqPdOZ29P5GVyl5+Zi0rsyh
+YqzyD76Gxtbtdi9YUNL9n9UZrNcHCqfi7E2lUHviWsv+z5qO+bURB/Ce2NSe1QF/
+0zSPvMh5nlNgppaAsEYz7e0yuBSnghy73Ao4vtgNmUmHLxCDcGujfNOE+NkFhpkT
+Fyufa7hgXg/Lc6N+BTLBeDk1yfnwvQ==
+=WHaq
+-----END PGP SIGNATURE-----
+
+--0fZc8NekEVVxhQsdkNEO0EXdmeNqCTDcx--
 
 
