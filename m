@@ -2,78 +2,88 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2488ECA90AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 08:26:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29131CA90AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 08:39:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA18D206CC
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 08:26:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA18D206CC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lemote.com
+	by mail.kernel.org (Postfix) with ESMTPS id E264C20740
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 08:39:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=argosnet.com header.i=@argosnet.com header.b="LviBjDdM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E264C20740
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=argosnet.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYmid-0007Mo-5k
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 04:26:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32924)
+	id 1jYmvZ-0004rR-2p
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 04:39:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34582)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
- id 1jYmhs-0006bi-Qv
- for qemu-devel@nongnu.org; Wed, 13 May 2020 04:25:36 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:44403)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
- id 1jYmho-0008P9-U3
- for qemu-devel@nongnu.org; Wed, 13 May 2020 04:25:36 -0400
-Received: by mail-io1-f67.google.com with SMTP id f4so10731167iov.11
- for <qemu-devel@nongnu.org>; Wed, 13 May 2020 01:25:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=PWwUC0oYscwmWMCLjx5x2I4apKdnGNIbDeY2uI7/eo4=;
- b=qVSKf0PIzgMtCve3WDVK974dDwfVlgwCklmJCMydSDfwttV3c+1yaq98NVH0h0Ks5z
- 1vWpo2NOzqmqVYNADG38gSn5tIoilvdChw6/wxTRv53o1DIpsSdXZrz2rkfr/H3fnnip
- y4lHdzE6OU1pdLCHG5USplkoKmGL9xxeEoIthdXFCaIMyLG8PV4H4uRJ6FNPO3aoI9o8
- TIBW3iXm0Jaoo5cn3oatnlRUPBCvPqzHDu5qF/dYWkA4a0DaTtb1ZmByc6Euqg0CHtkn
- Ccfrj/9Y+189OC4L0bj+AkbxWD4GpC4l9n6k8SnNPtCCvi077KkvUNUbEPShMnxSTeSj
- Xh3A==
-X-Gm-Message-State: AGi0PuZmrCd9m/jhh0BouGCXoUDx99N5qHTbUXamSq3ukz63CFbE1KTA
- GF9wOpWRH3fU2buKBVBKh3n61HFRs0cfIiOKFSo=
-X-Google-Smtp-Source: APiQypL5Wd22r/eO0Wd2UxNIUAGIUU0KDXQMz+d6nUDz3NlXjicskihKbXiH+aFpItX7dE/UpwtKrWp2pGK9En55xGI=
-X-Received: by 2002:a02:ac1:: with SMTP id 184mr23829794jaw.137.1589358330770; 
- Wed, 13 May 2020 01:25:30 -0700 (PDT)
-MIME-Version: 1.0
-References: <1586337380-25217-1-git-send-email-chenhc@lemote.com>
- <1586337380-25217-2-git-send-email-chenhc@lemote.com>
- <CAHiYmc5zPT97Zxr6JTXY8dHTSU7aFC3EY6ODgULuex-xRYWCQA@mail.gmail.com>
-In-Reply-To: <CAHiYmc5zPT97Zxr6JTXY8dHTSU7aFC3EY6ODgULuex-xRYWCQA@mail.gmail.com>
-From: Huacai Chen <chenhc@lemote.com>
-Date: Wed, 13 May 2020 16:25:18 +0800
-Message-ID: <CAAhV-H6bgF8McE7yR5JxXH=xSoGB3=wWJayym38WFCi=5XrNhg@mail.gmail.com>
-Subject: Re: [PATCH 2/3] mips/mips_fulong2e: Set preferred page size to 16KB
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+ (Exim 4.90_1) (envelope-from <B3r3n@argosnet.com>)
+ id 1jYmun-0003jN-Jq; Wed, 13 May 2020 04:38:57 -0400
+Received: from mx.argosnet.com ([51.255.124.196]:16607)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <B3r3n@argosnet.com>)
+ id 1jYmul-0003PD-Oe; Wed, 13 May 2020 04:38:57 -0400
+Received: from mx.argosnet.com (Argosnet [51.255.124.196])
+ by mx.argosnet.com (Postfix) with ESMTP id BA33A4769F;
+ Wed, 13 May 2020 10:38:50 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=argosnet.com; h=date:to
+ :from:subject:cc:in-reply-to:references:mime-version
+ :content-type:content-transfer-encoding; s=mx; bh=mnaGne3jQy8oBx
+ C4lu0+KflVJnM=; b=LviBjDdMukzt0WU5WA84nh93qzkZnNRQqwQSkNSYH6diNE
+ HoNaMu81sVTyz61XZCj97yDg0k9qmXVMtBu5P3FDBCTbFFjE6j/XxyJdD7oVJbxb
+ sZy9Nn3+mWu9VdkYacze6EG29NuoN+jhU0hcjn+Z/9rUDELvEVQKBEGqeYWbQ=
+DomainKey-Signature: a=rsa-sha1; c=nofws; d=argosnet.com; h=date:to:from
+ :subject:cc:in-reply-to:references:mime-version:content-type
+ :content-transfer-encoding; q=dns; s=mx; b=MaUeplUCvsawXMnX9imCy
+ 8SZ5lQbn6XGgp0uurUlR1aPR9PL8r4DQd1A0qM19XjR6KlYfGIWC3qRhC81/XTLD
+ LM/RAjRy4Zq9gRRgWvZffTm/xUVJpBfZXZHa6dnN3Q9JSSzre4gkeAfPjC/9YhVB
+ /4lqK6MpY0i7WjeMHudFzs=
+Received: from Osgiliath.argosnet.com
+ (lfbn-nic-1-419-246.w90-116.abo.wanadoo.fr [90.116.244.246])
+ (Authenticated sender: llevier@pop.argosnet.com)
+ by mx.argosnet.com (Postfix) with ESMTPSA id 905134769E;
+ Wed, 13 May 2020 10:38:50 +0200 (CEST)
+X-Mailer: QUALCOMM Windows Eudora Version 7.1.0.9
+Date: Wed, 13 May 2020 10:38:52 +0200
+To: Daniel P. =?iso-8859-1?Q?Berrang=C3=A9?= <berrange@redhat.com>
+From: B3r3n <B3r3n@argosnet.com>
+Subject: Re: Qemu, VNC and non-US keymaps
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=C3=83?= ?
+ =?iso-8859-1?Q?=C3=82=C2=A9?= <philmd@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ qemu-discuss@nongnu.org
+In-Reply-To: <20200512091106.GH1191162@redhat.com>
+References: <E1jY9FF-0000Po-2c@lists.gnu.org>
+ <af732fbf-fd70-97bc-3ea8-25d66f5895de@redhat.com>
+ <20200511151155.GO1135885@redhat.com>
+ <20200511152957.6CFA8D1826@zmta04.collab.prod.int.phx2.redhat.com>
+ <20200511171930.GS1135885@redhat.com>
+ <20200512074530.8729D1892D3@zmta01.collab.prod.int.phx2.redhat.com>
+ <20200512091106.GH1191162@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=209.85.166.67; envelope-from=chenhuacai@gmail.com;
- helo=mail-io1-f67.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 04:25:31
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=51.255.124.196; envelope-from=B3r3n@argosnet.com;
+ helo=mx.argosnet.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 04:38:53
+X-ACL-Warn: Detected OS   = FreeBSD  [generic] [fuzzy]
 X-Spam_score_int: -15
 X-Spam_score: -1.6
 X-Spam_bar: -
-X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9,
- FREEMAIL_FORGED_FROMDOMAIN=0.001, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FORGED_MUA_EUDORA=0.001, MISSING_MID=0.497, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
+Message-Id: <E1jYmun-0003jN-Jq@lists.gnu.org>
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,63 +95,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jiaxun Yang <jiaxun.yang@flygoat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Aurelien Jarno <aurelien@aurel32.net>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, Aleksandar,
+Hello Daniel,
 
-On Wed, May 13, 2020 at 3:56 PM Aleksandar Markovic
-<aleksandar.qemu.devel@gmail.com> wrote:
->
-> =D1=81=D1=80=D0=B5, 8. =D0=B0=D0=BF=D1=80 2020. =D1=83 11:08 Huacai Chen =
-<chenhc@lemote.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE=
-/=D0=BB=D0=B0:
-> >
-> > Loongson processor prefers 16KB page size in system emulator, so let's
-> > define mc->minimum_page_bits to 14.
-> >
-> > Cc: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> > Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> > ---
->
-> Huacai, thanks for the efforts regarding this series! I will very
-> likely accept patches 1/3 and 2/3 from this series in my next MIPS
-> queue, but the possible problem is that I somehow can't find patch 3/3
-> from my series in my mailbox. (I think it also the case with the cover
-> letter.) Could you perhaps resend the whole series? I'm concerned that
-> patch 3/3 contains something important, and it would be a shame that
-> it is omitted, and 1/3 and 2/3 are accepted.
-Patch 3/3 is "Add myself as fulong2e co-maintainer", this is already
-done in your series, so maybe I needn't resend?
+Ok, TigerVNC, added -shared=3D1 to behave the same=20
+as TightVNC, works greatly, Thanks !
 
-Regards,
-Huacai
->
-> For this patch:
->
-> Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
->
-> >  hw/mips/mips_fulong2e.c | 1 +
-> >  1 file changed, 1 insertion(+)
+But funny thing, I saw you were part of exchanges=20
+on that topic, noVNC totally fails now.
+Despite my keyboard isnt changed, debian VM is=20
+just in QWERTY as if noVNC only send keysyms.
+
+If you know how to force noVNC keycodes instead, digging to find the trick=
+ :-(
+
+Thanks
+
+Brgrds
+
+At 11:11 12/05/2020, Daniel P. Berrang=C3=A9 wrote:
+>On Tue, May 12, 2020 at 09:45:20AM +0200, B3r3n wrote:
+> > Hello Daniel, all,
 > >
-> > diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-> > index 5040afd..23897d7 100644
-> > --- a/hw/mips/mips_fulong2e.c
-> > +++ b/hw/mips/mips_fulong2e.c
-> > @@ -399,6 +399,7 @@ static void mips_fulong2e_machine_init(MachineClass=
- *mc)
-> >      mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("Loongson-2E");
-> >      mc->default_ram_size =3D 256 * MiB;
-> >      mc->default_ram_id =3D "fulong2e.ram";
-> > +    mc->minimum_page_bits =3D 14;
-> >  }
+> > I am a bit confused.
 > >
-> >  DEFINE_MACHINE("fulong2e", mips_fulong2e_machine_init)
-> > --
-> > 2.7.0
+> > Ok, RFB protocol should be the solution that solves all, sending=
+ scancodes
+> > rather than doing keysyms stuff. No pb for me.
+> > So I removed my '-k fr' to my Qemu VM start as it was before.
 > >
+> > However, reading TightVNC & noVNC docs, both are able to perform RFB.
+>
+>VNC =3D=3D RFB - they're two different terms of the same thing.
+>
+>The core RFB/VNC protocol only knows about keysyms.
+>
+>Hardware scancodes is an extension defined by QEMU, and GTK-VNC, and since
+>implemented by TigerVNC.
+>
+>Removing the "-k" arg, merely enables use of the scancode extension.
+>This requires a compatible client app that knows the scancode extension.
+>If the client doesn't support scancodes, it will continue using keysyms,
+>which will then be treated as plain us keymap.
+>
+>AFAIK,  TightVNC doesn't support the scancode extension, only TigerVNC.
+>
+> > Since these explanations, I replayed a bit:
+> >
+> > Under my testing Debian 10, I redefined keyboard to French + No compose=
+ key
+> > + AltGr as CTRL_R
+>
+>This is a key example of the problems of VNC's traditional key handling.
+>
+>QEMU has a single keymap "fr". It has no way of selecting compose key
+>on/off, or overriding AltGr to be CtrlR.  So as soon as you do that on
+>your local desktop, you make it impossible to QEMU VNC serve to work
+>correctly.
+>
+> >
+> > Under noVNC: Ctrl_R works well as alternative but when using AltGr, I
+> > received 29+100+7 (AltGr + 6) and keep displaying a minus as with AltGr=
+ was
+> > not pressed.
+> >
+> > Under TightVNC (2.7.10) : Ctrl_R displays characters, I am still in=
+ QWERTY
+> > for letters, weird mapping for other characters, did not checked if
+> > compliant with whatever definition.
+> > Under TightVNC (last 2.8.27, supposed to be able to RFB): Ctrl_R=
+ displays
+> > nothing, keys are QWERTY. Seems the same as TightVNC 2.7.10.
+> >
+> > With the keyboard defining AltGr as AltGr, no change.
+> >
+> > I realize that AltGr is sending 29+100 (seen via showkey), when CTRL_R=
+ only
+> > sends 97.
+> > When using a remote console (iLo and iDRAC), AltGr only sends 100.
+> >
+> > I wonder if the issue would not also be the fact AltGr sends 2 codes,=
+ still
+> > another one to select the character key (6 for example).
+> >
+> > Is that normal Qemu is transforming AltGr (100) in 29+100 ?
+>
+>It is hard to say without seeing debuging to see what QEMU received.
+>
+>Regards,
+>Daniel
+>--
+>|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+>|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+>|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
+
 
