@@ -6,38 +6,39 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B92ADCA90AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 09:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7B5EC2D0FA
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 09:56:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92A4020575
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 09:56:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92A4020575
+	by mail.kernel.org (Postfix) with ESMTPS id B112A20575
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 09:56:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B112A20575
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYo89-0000go-Ow
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 05:56:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44728)
+	id 1jYo8A-0000ka-RB
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 05:56:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44646)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYo31-0006mv-N4; Wed, 13 May 2020 05:51:31 -0400
-Received: from relay.sw.ru ([185.231.240.75]:54016)
+ id 1jYo2i-0005zw-VA; Wed, 13 May 2020 05:51:12 -0400
+Received: from relay.sw.ru ([185.231.240.75]:53992)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYo2z-0003ZI-43; Wed, 13 May 2020 05:51:31 -0400
+ id 1jYo2f-0003Z9-8M; Wed, 13 May 2020 05:51:12 -0400
 Received: from dhcp-172-16-25-136.sw.ru ([172.16.25.136] helo=localhost.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYo2W-0001e4-GA; Wed, 13 May 2020 12:51:00 +0300
+ id 1jYo2V-0001e4-SO; Wed, 13 May 2020 12:50:59 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v5 15/15] block: apply COR-filter to block-stream jobs
-Date: Wed, 13 May 2020 12:50:56 +0300
-Message-Id: <1589363456-1035571-16-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v5 07/15] commit: Deal with filters when blocking intermediate
+ nodes
+Date: Wed, 13 May 2020 12:50:48 +0300
+Message-Id: <1589363456-1035571-8-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1589363456-1035571-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1589363456-1035571-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -70,249 +71,140 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The patch completes the series with the COR-filter insertion to any
-block-stream operation. It also makes changes to the iotests 030 and
-141.out.
+From: Max Reitz <mreitz@redhat.com>
 
+This includes some permission limiting (for example, we only need to
+take the RESIZE permission if the base is smaller than the top).
+
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- block/stream.c             | 83 ++++++++++++++++++++++++++++++++--------------
- tests/qemu-iotests/030     |  8 +++--
- tests/qemu-iotests/141.out |  2 +-
- 3 files changed, 64 insertions(+), 29 deletions(-)
+ block/commit.c | 75 ++++++++++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 60 insertions(+), 15 deletions(-)
 
-diff --git a/block/stream.c b/block/stream.c
-index e0b35f8..a74a07b 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -19,6 +19,7 @@
- #include "qapi/qmp/qerror.h"
- #include "qemu/ratelimit.h"
- #include "sysemu/block-backend.h"
-+#include "block/copy-on-read.h"
- 
- enum {
-     /*
-@@ -32,8 +33,11 @@ enum {
- typedef struct StreamBlockJob {
-     BlockJob common;
-     BlockDriverState *bottom;
-+    BlockDriverState *cor_filter_bs;
-+    BlockDriverState *target_bs;
+diff --git a/block/commit.c b/block/commit.c
+index e1f45a4..4df145d 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -37,6 +37,7 @@ typedef struct CommitBlockJob {
+     BlockBackend *top;
+     BlockBackend *base;
+     BlockDriverState *base_bs;
++    BlockDriverState *above_base;
      BlockdevOnError on_error;
-     char *backing_file_str;
-+    char *base_fmt;
-     bool bs_read_only;
+     bool base_read_only;
      bool chain_frozen;
- } StreamBlockJob;
-@@ -52,33 +56,25 @@ static void stream_abort(Job *job)
-     StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
- 
-     if (s->chain_frozen) {
--        BlockJob *bjob = &s->common;
--        bdrv_unfreeze_chain(blk_bs(bjob->blk), s->bottom);
-+        bdrv_unfreeze_chain(s->cor_filter_bs, s->bottom);
-     }
- }
- 
- static int stream_prepare(Job *job)
- {
-     StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
--    BlockJob *bjob = &s->common;
--    BlockDriverState *bs = blk_bs(bjob->blk);
-+    BlockDriverState *bs = s->target_bs;
-     BlockDriverState *base = backing_bs(s->bottom);
-     Error *local_err = NULL;
-     int ret = 0;
- 
--    bdrv_unfreeze_chain(bs, s->bottom);
-+    bdrv_unfreeze_chain(s->cor_filter_bs, s->bottom);
-     s->chain_frozen = false;
- 
-     if (bs->backing) {
--        const char *base_id = NULL, *base_fmt = NULL;
--        if (base) {
--            base_id = s->backing_file_str;
--            if (base->drv) {
--                base_fmt = base->drv->format_name;
--            }
--        }
-         bdrv_set_backing_hd(bs, base, &local_err);
--        ret = bdrv_change_backing_file(bs, base_id, base_fmt);
-+        ret = bdrv_change_backing_file(bs, s->backing_file_str,
-+                                       s->base_fmt);
-         if (local_err) {
-             error_report_err(local_err);
-             return -EPERM;
-@@ -92,7 +88,9 @@ static void stream_clean(Job *job)
- {
-     StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
-     BlockJob *bjob = &s->common;
--    BlockDriverState *bs = blk_bs(bjob->blk);
-+    BlockDriverState *bs = s->target_bs;
-+
-+    bdrv_cor_filter_drop(s->cor_filter_bs);
- 
-     /* Reopen the image back in read-only mode if necessary */
-     if (s->bs_read_only) {
-@@ -102,13 +100,14 @@ static void stream_clean(Job *job)
-     }
- 
-     g_free(s->backing_file_str);
-+    g_free(s->base_fmt);
- }
- 
- static int coroutine_fn stream_run(Job *job, Error **errp)
- {
-     StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
-     BlockBackend *blk = s->common.blk;
--    BlockDriverState *bs = blk_bs(blk);
-+    BlockDriverState *bs = s->target_bs;
-     bool enable_cor = !backing_bs(s->bottom);
-     int64_t len;
-     int64_t offset = 0;
-@@ -156,8 +155,8 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
-         } else if (ret >= 0) {
-             /* Copy if allocated in the intermediate images.  Limit to the
-              * known-unallocated area [offset, offset+n*BDRV_SECTOR_SIZE).  */
--            ret = bdrv_is_allocated_above(backing_bs(bs), s->bottom, true,
--                                          offset, n, &n);
-+            ret = bdrv_is_allocated_above(bdrv_filtered_cow_bs(bs), s->bottom,
-+                                          true, offset, n, &n);
-             /* Finish early if end of backing file has been reached */
-             if (ret == 0 && n == 0) {
-                 n = len - offset;
-@@ -225,7 +224,13 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-     BlockDriverState *iter;
-     bool bs_read_only;
-     int basic_flags = BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED;
-+    BlockDriverState *cor_filter_bs = NULL;
-     BlockDriverState *bottom = bdrv_find_overlay(bs, base);
-+    char *base_fmt = NULL;
-+
-+    if (base && base->drv) {
-+        base_fmt = g_strdup(base->drv->format_name);
-+    }
- 
-     if (bdrv_freeze_chain(bs, bottom, errp) < 0) {
-         return;
-@@ -240,17 +245,35 @@ void stream_start(const char *job_id, BlockDriverState *bs,
+@@ -153,7 +154,7 @@ static int coroutine_fn commit_run(Job *job, Error **errp)
+             break;
          }
+         /* Copy if allocated above the base */
+-        ret = bdrv_is_allocated_above(blk_bs(s->top), blk_bs(s->base), false,
++        ret = bdrv_is_allocated_above(blk_bs(s->top), s->above_base, true,
+                                       offset, COMMIT_BUFFER_SIZE, &n);
+         copy = (ret == 1);
+         trace_commit_one_iteration(s, offset, n, ret);
+@@ -253,15 +254,35 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+     CommitBlockJob *s;
+     BlockDriverState *iter;
+     BlockDriverState *commit_top_bs = NULL;
++    BlockDriverState *filtered_base;
+     Error *local_err = NULL;
++    int64_t base_size, top_size;
++    uint64_t perms, iter_shared_perms;
+     int ret;
+ 
+     assert(top != bs);
+-    if (top == base) {
++    if (bdrv_skip_rw_filters(top) == bdrv_skip_rw_filters(base)) {
+         error_setg(errp, "Invalid files for merge: top and base are the same");
+         return;
      }
  
--    /* Prevent concurrent jobs trying to modify the graph structure here, we
--     * already have our own plans. Also don't allow resize as the image size is
--     * queried only at the job start and then cached. */
--    s = block_job_create(job_id, &stream_job_driver, NULL, bs,
--                         basic_flags | BLK_PERM_GRAPH_MOD,
--                         basic_flags | BLK_PERM_WRITE,
-+    cor_filter_bs = bdrv_cor_filter_append(bs, filter_node_name, errp);
-+    if (cor_filter_bs == NULL) {
-+        goto fail;
++    base_size = bdrv_getlength(base);
++    if (base_size < 0) {
++        error_setg_errno(errp, -base_size, "Could not inquire base image size");
++        return;
 +    }
 +
-+    if (bdrv_freeze_chain(cor_filter_bs, bs, errp) < 0) {
-+        bdrv_cor_filter_drop(cor_filter_bs);
-+        cor_filter_bs = NULL;
-+        goto fail;
++    top_size = bdrv_getlength(top);
++    if (top_size < 0) {
++        error_setg_errno(errp, -top_size, "Could not inquire top image size");
++        return;
 +    }
 +
-+    s = block_job_create(job_id, &stream_job_driver, NULL, cor_filter_bs,
-+                         BLK_PERM_CONSISTENT_READ,
-+                         basic_flags | BLK_PERM_WRITE | BLK_PERM_GRAPH_MOD,
++    perms = BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE;
++    if (base_size < top_size) {
++        perms |= BLK_PERM_RESIZE;
++    }
++
+     s = block_job_create(job_id, &commit_job_driver, NULL, bs, 0, BLK_PERM_ALL,
                           speed, creation_flags, NULL, NULL, errp);
      if (!s) {
-         goto fail;
-     }
+@@ -301,17 +322,43 @@ void commit_start(const char *job_id, BlockDriverState *bs,
  
+     s->commit_top_bs = commit_top_bs;
+ 
+-    /* Block all nodes between top and base, because they will
+-     * disappear from the chain after this operation. */
+-    assert(bdrv_chain_contains(top, base));
+-    for (iter = top; iter != base; iter = backing_bs(iter)) {
+-        /* XXX BLK_PERM_WRITE needs to be allowed so we don't block ourselves
+-         * at s->base (if writes are blocked for a node, they are also blocked
+-         * for its backing file). The other options would be a second filter
+-         * driver above s->base. */
 +    /*
-+     * Prevent concurrent jobs trying to modify the graph structure here, we
-+     * already have our own plans. Also don't allow resize as the image size is
-+     * queried only at the job start and then cached.
++     * Block all nodes between top and base, because they will
++     * disappear from the chain after this operation.
++     * Note that this assumes that the user is fine with removing all
++     * nodes (including R/W filters) between top and base.  Assuring
++     * this is the responsibility of the interface (i.e. whoever calls
++     * commit_start()).
 +     */
-+    if (block_job_add_bdrv(&s->common, "active node", bs,
-+                           basic_flags | BLK_PERM_GRAPH_MOD,
-+                           basic_flags | BLK_PERM_WRITE, &error_abort)) {
-+        goto fail;
-+    }
-     /* Block all intermediate nodes between bs and base, because they will
-      * disappear from the chain after this operation. The streaming job reads
-      * every block only once, assuming that it doesn't change, so forbid writes
-@@ -259,13 +282,17 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-      * due to parallel block jobs running.
-      */
-     base = backing_bs(bottom);
--    for (iter = backing_bs(bs); iter && iter != base; iter = backing_bs(iter)) {
-+    for (iter = bdrv_filtered_bs(bs); iter && iter != base;
-+         iter = bdrv_filtered_bs(iter)) {
-         block_job_add_bdrv(&s->common, "intermediate node", iter, 0,
-                            basic_flags, &error_abort);
-     }
- 
-+    s->cor_filter_bs = cor_filter_bs;
-+    s->target_bs = bs;
-     s->bottom = bottom;
-     s->backing_file_str = g_strdup(backing_file_str);
-+    s->base_fmt = base_fmt;
-     s->bs_read_only = bs_read_only;
-     s->chain_frozen = true;
- 
-@@ -278,5 +305,11 @@ fail:
-     if (bs_read_only) {
-         bdrv_reopen_set_read_only(bs, true, NULL);
-     }
--    bdrv_unfreeze_chain(bs, bottom);
++    s->above_base = bdrv_find_overlay(top, base);
++    assert(s->above_base);
 +
-+    if (cor_filter_bs) {
-+        bdrv_unfreeze_chain(cor_filter_bs, bottom);
-+        bdrv_cor_filter_drop(cor_filter_bs);
-+    } else {
-+        bdrv_unfreeze_chain(bs, bottom);
-+    }
- }
-diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-index d7638cd..9856a08 100755
---- a/tests/qemu-iotests/030
-+++ b/tests/qemu-iotests/030
-@@ -269,12 +269,14 @@ class TestParallelOps(iotests.QMPTestCase):
-         self.assert_no_active_block_jobs()
++    /*
++     * The topmost node with
++     * bdrv_skip_rw_filters(filtered_base) == bdrv_skip_rw_filters(base)
++     */
++    filtered_base = bdrv_filtered_cow_bs(s->above_base);
++    assert(bdrv_skip_rw_filters(filtered_base) == bdrv_skip_rw_filters(base));
++
++    /*
++     * XXX BLK_PERM_WRITE needs to be allowed so we don't block ourselves
++     * at s->base (if writes are blocked for a node, they are also blocked
++     * for its backing file). The other options would be a second filter
++     * driver above s->base.
++     */
++    iter_shared_perms = BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE;
++
++    for (iter = top; iter != base; iter = bdrv_filtered_bs(iter)) {
++        if (iter == filtered_base) {
++            /*
++             * From here on, all nodes are filters on the base.  This
++             * allows us to share BLK_PERM_CONSISTENT_READ.
++             */
++            iter_shared_perms |= BLK_PERM_CONSISTENT_READ;
++        }
++
+         ret = block_job_add_bdrv(&s->common, "intermediate node", iter, 0,
+-                                 BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE,
+-                                 errp);
++                                 iter_shared_perms, errp);
+         if (ret < 0) {
+             goto fail;
+         }
+@@ -328,9 +375,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+     }
  
-         # Set a speed limit to make sure that this job blocks the rest
--        result = self.vm.qmp('block-stream', device='node4', job_id='stream-node4', base=self.imgs[1], speed=1024*1024)
-+        result = self.vm.qmp('block-stream', device='node4',
-+                job_id='stream-node4', base=self.imgs[1],
-+                filter_node_name='stream-filter', speed=1024*1024)
-         self.assert_qmp(result, 'return', {})
- 
-         result = self.vm.qmp('block-stream', device='node5', job_id='stream-node5', base=self.imgs[2])
-         self.assert_qmp(result, 'error/desc',
--            "Node 'node4' is busy: block device is in use by block job: stream")
-+            "Node 'stream-filter' is busy: block device is in use by block job: stream")
- 
-         result = self.vm.qmp('block-stream', device='node3', job_id='stream-node3', base=self.imgs[2])
-         self.assert_qmp(result, 'error/desc',
-@@ -287,7 +289,7 @@ class TestParallelOps(iotests.QMPTestCase):
-         # block-commit should also fail if it touches nodes used by the stream job
-         result = self.vm.qmp('block-commit', device='drive0', base=self.imgs[4], job_id='commit-node4')
-         self.assert_qmp(result, 'error/desc',
--            "Node 'node4' is busy: block device is in use by block job: stream")
-+            "Node 'stream-filter' is busy: block device is in use by block job: stream")
- 
-         result = self.vm.qmp('block-commit', device='drive0', base=self.imgs[1], top=self.imgs[3], job_id='commit-node1')
-         self.assert_qmp(result, 'error/desc',
-diff --git a/tests/qemu-iotests/141.out b/tests/qemu-iotests/141.out
-index 263b680..cf18558 100644
---- a/tests/qemu-iotests/141.out
-+++ b/tests/qemu-iotests/141.out
-@@ -99,7 +99,7 @@ wrote 1048576/1048576 bytes at offset 0
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "job0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "job0"}}
- {'execute': 'blockdev-del', 'arguments': {'node-name': 'drv0'}}
--{"error": {"class": "GenericError", "desc": "Node drv0 is in use"}}
-+{"error": {"class": "GenericError", "desc": "Node 'drv0' is busy: block device is in use by block job: stream"}}
- {'execute': 'block-job-cancel', 'arguments': {'device': 'job0'}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "job0"}}
+     s->base = blk_new(s->common.job.aio_context,
+-                      BLK_PERM_CONSISTENT_READ
+-                      | BLK_PERM_WRITE
+-                      | BLK_PERM_RESIZE,
++                      perms,
+                       BLK_PERM_CONSISTENT_READ
+                       | BLK_PERM_GRAPH_MOD
+                       | BLK_PERM_WRITE_UNCHANGED);
 -- 
 1.8.3.1
 
