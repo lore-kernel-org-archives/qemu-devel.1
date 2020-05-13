@@ -2,84 +2,86 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C9FAC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 17:35:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7C26C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 17:36:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97CF5205ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 17:35:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5BC3A205ED
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 17:36:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F9Zc0kLn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97CF5205ED
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NOSgJ89B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BC3A205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYvHf-0000vn-7I
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 13:35:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56736)
+	id 1jYvJ7-00038F-Un
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 13:36:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56712)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jYvEw-0004x4-08
- for qemu-devel@nongnu.org; Wed, 13 May 2020 13:32:18 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54012)
+ id 1jYvEt-0004pu-6C
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 13:32:15 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33180)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jYvEv-0007ny-23
- for qemu-devel@nongnu.org; Wed, 13 May 2020 13:32:17 -0400
-Received: by mail-wm1-x343.google.com with SMTP id k12so27420938wmj.3
- for <qemu-devel@nongnu.org>; Wed, 13 May 2020 10:32:16 -0700 (PDT)
+ id 1jYvEs-0007nB-7s
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 13:32:14 -0400
+Received: by mail-wr1-x443.google.com with SMTP id l11so496533wru.0
+ for <qemu-devel@nongnu.org>; Wed, 13 May 2020 10:32:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=HR4jMOF852+AiagIFivRxvoRxaO2U/uZiy0Wy938QuE=;
- b=F9Zc0kLnz+STQJWNl5ZwJBq7YwwWOywcBrwjvBrrzZzzVoeA4LM+PDjwPlnWkgOCmf
- 3YAIsr4mb60IcSRfLP1IuNA89Me1yvY2Vxr5qON+EFu9lxtpN+6L62BDMfH1JZUYdVh1
- zTvCMXbMejlgkcZZXtTgiVUgIvUq7dWdktCuaJ/xLsAbipHuB+dn2kgvgBFkd61OwjH0
- XMR7DpObxqXb8d6K0BoEBoVS5gb6RsUWqmy7ZcZN7uPoILKrk/sf0N6sR1kRMBV32HlJ
- iZ1EFWrMIgXL0zj6ncvIIrsBf2sui5yImANSbzILbBaroaebX0uC0GzFmgQwzmLAzoPE
- G0XQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=AurL0SAZRHpkVWbSIjSJmyFw3W3Or7KduKRq6WmTvNA=;
+ b=NOSgJ89BSMgdetJsU+IaXENbLCZyAC8NzNSwJDcpivO8AkDsH2Spgd5q6zhAIrTF0f
+ VQloZO6Pq+h7VPfuzZjMRf/55WoM9Cmm6DV6NHEN84c6PC5qBx5K/1itP4bqYycqg1Le
+ wvAjioxDwCbrhraHXdt1yx+Lq60wCRYi2xxP2e0dqb/UUx9A7LDhRt465dTktF4V+KYq
+ 1P1iHSPCJZah1zVh48pbseJuEb5/FMD9HI56mwBMTs+AzmDcR9vI+c63YJ+Bc5Ho5lsc
+ 4vXVvI4KLBbYkEqK7j/eJz3iZGKfmt0QvzTFh9+rPkwcVsCKHGjN8qbyj7xRi0fXyczr
+ kzJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=HR4jMOF852+AiagIFivRxvoRxaO2U/uZiy0Wy938QuE=;
- b=FuR4LcCKycVKqZ5Q2HuXBUtGI7AECq6ojhR/PJyjpbf/Aaw1GYaauI18IiT0deWZnC
- TjDhH+2cammMhHn24iH3tZxfBdSidgAwY9IbOeJQguPq51aNk8NMjn+NWvJfyA2ySNav
- SKjg0aIMzKe2dQTqwKgsSS35KXtjfek8hf4bXXAaT/HK/aS5TSIS/FzfjHqv3h7w6Mgc
- hGB/uJPBvqUdrJvDmWnEF3IFEi73hXYteXf/QaBIJi8Ee9LRLCzSISzEI7x+uiMFdjZ4
- YVWD5E9FhjkcXL5zsz2xpd8Ev0wAG/b/rwj2fHydUhosO0EJ234ATOJD+GlJH1UFDd0+
- 52fw==
-X-Gm-Message-State: AGi0PuaglHzELgkn1tazObi7aHr6OeztbEVLVaWQkaBN0E4lleQTjTx9
- 1078odnINdCeYASP8qLZHlFk9Q==
-X-Google-Smtp-Source: APiQypL26KAZo56m5lj0oAw9IV9BUioo7BfdmSQawKuxxhsp7Vxln2DjbRA9JwUYOX5BPKteHnc01Q==
-X-Received: by 2002:a1c:acc8:: with SMTP id
- v191mr39029728wme.128.1589391135718; 
- Wed, 13 May 2020 10:32:15 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=AurL0SAZRHpkVWbSIjSJmyFw3W3Or7KduKRq6WmTvNA=;
+ b=o5Yh/OPPR8zeim4p/1T+10clCGU3C6wjDV8hZj9nOgd2M5SkkvRlEXSMPtrW7D2LEC
+ GmvyAiClWVrUTyywVSzmVAm2ZF41HX/SzZ5tw2TpzpJeXD9v6fXRzVtjBjUzb/wtNV7o
+ qlShszes7ztgR7kydUsqhr88LHYXM+vd9ySflwzrn5SbqCrFuhriwzDX4xUwTFGmCGpu
+ HA9JgGtgQpIMP9Bssuq9GMPtTAa9fXQ6wf8DZt2Sxukxkm4cQHBVQE0HRuuJY5B1GgaN
+ gjs179DCWyZjxb/kQekfpHyfgAcAk9FPFeEWNuMbeouJ7FcQIqbDpFuzCd0ggCv3rOt2
+ Z/jw==
+X-Gm-Message-State: AOAM533Lob9kNe/Nr8AhrscDe4iWZApYKvnX9uZk42WT21utPxJ6WTtU
+ zP/5CW6HCbv8aQrAXpNoWQrqUQ==
+X-Google-Smtp-Source: ABdhPJyUHp4evpHBWv8Wc8iM9jFH7MZkmLJDCDtUbVy7y+mQKvoCrFRhgR5+0VKWKpAM9PLlGzD2pg==
+X-Received: by 2002:a5d:460d:: with SMTP id t13mr469692wrq.280.1589391132861; 
+ Wed, 13 May 2020 10:32:12 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 1sm37544685wmi.0.2020.05.13.10.32.06
+ by smtp.gmail.com with ESMTPSA id y3sm210170wrm.64.2020.05.13.10.32.07
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Wed, 13 May 2020 10:32:09 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id DDB711FF7E;
- Wed, 13 May 2020 18:32:00 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 6DA8E1FF92;
+ Wed, 13 May 2020 18:32:01 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 0/8] plugins/next (cleanup, cpu_index and lockstep)
-Date: Wed, 13 May 2020 18:31:52 +0100
-Message-Id: <20200513173200.11830-1-alex.bennee@linaro.org>
+Subject: [PATCH  v1 6/8] linux-user: properly "unrealize" vCPU object
+Date: Wed, 13 May 2020 18:31:58 +0100
+Message-Id: <20200513173200.11830-7-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200513173200.11830-1-alex.bennee@linaro.org>
+References: <20200513173200.11830-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,63 +103,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Riku Voipio <riku.voipio@iki.fi>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>, Nikolay Igotti <igotti@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+We shouldn't be messing around with the CPU list in linux-user save
+for the very special case of do_fork(). When threads end we need to
+properly follow QOM object lifetime handling and allow the eventual
+cpu_common_unrealizefn to both remove the CPU and ensure any clean-up
+actions are taken place, for example calling plugin exit hooks.
 
-This is the current state of my plugins/next tree. It contains 3 bits
-of work. 
+There is still a race condition to avoid so use the linux-user
+specific clone_lock instead of the cpu_list_lock to avoid it.
 
-First some minor clean-ups from Phillipe to help with his other
-re-factoring work.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: Nikolay Igotti <igotti@gmail.com>
+---
+ linux-user/syscall.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
 
-Next are some fixes for a crash reported by Nikolay on the list. The
-root cause was a re-use of cpu_index although I've also tried to clean
-up the handling of pthread termination.
-
-Finally there is another iteration of my lockstep plugin which has had
-a little more tinkering to better detect divergence between two
-QEMU's. It's no Rehoboam but it will hopefully be helpful.
-
-The following patches need review:
-
- - plugins: new lockstep plugin for debugging TCG changes
- - tests/tcg: add new threadcount test
- - linux-user: properly "unrealize" vCPU object
- - cpus-common: ensure auto-assigned cpu_indexes don't clash
- - MAINTAINERS: update the orphaned cpus-common.c file
-
-Alex Bennée (5):
-  MAINTAINERS: update the orphaned cpus-common.c file
-  cpus-common: ensure auto-assigned cpu_indexes don't clash
-  linux-user: properly "unrealize" vCPU object
-  tests/tcg: add new threadcount test
-  plugins: new lockstep plugin for debugging TCG changes
-
-Philippe Mathieu-Daudé (3):
-  qemu/plugin: Trivial code movement
-  qemu/plugin: Move !CONFIG_PLUGIN stubs altogether
-  qemu/qemu-plugin: Make qemu_plugin_hwaddr_is_io() hwaddr argument
-    const
-
- include/qemu/plugin.h               |  65 +++---
- include/qemu/qemu-plugin.h          |   2 +-
- cpus-common.c                       |   9 +-
- linux-user/syscall.c                |  19 +-
- plugins/api.c                       |   4 +-
- tests/plugin/lockstep.c             | 345 ++++++++++++++++++++++++++++
- tests/tcg/multiarch/threadcount.c   |  62 +++++
- MAINTAINERS                         |   1 +
- tests/plugin/Makefile               |   1 +
- tests/tcg/Makefile.target           |   2 +-
- tests/tcg/multiarch/Makefile.target |   2 +
- 11 files changed, 461 insertions(+), 51 deletions(-)
- create mode 100644 tests/plugin/lockstep.c
- create mode 100644 tests/tcg/multiarch/threadcount.c
-
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 05f03919ff0..7f6700c54e3 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -7635,30 +7635,33 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+             return -TARGET_ERESTARTSYS;
+         }
+ 
+-        cpu_list_lock();
++        pthread_mutex_lock(&clone_lock);
+ 
+         if (CPU_NEXT(first_cpu)) {
+-            TaskState *ts;
++            TaskState *ts = cpu->opaque;
+ 
+-            /* Remove the CPU from the list.  */
+-            QTAILQ_REMOVE_RCU(&cpus, cpu, node);
++            object_property_set_bool(OBJECT(cpu), false, "realized", NULL);
++            object_unref(OBJECT(cpu));
++            /*
++             * At this point the CPU should be unrealized and removed
++             * from cpu lists. We can clean-up the rest of the thread
++             * data without the lock held.
++             */
+ 
+-            cpu_list_unlock();
++            pthread_mutex_unlock(&clone_lock);
+ 
+-            ts = cpu->opaque;
+             if (ts->child_tidptr) {
+                 put_user_u32(0, ts->child_tidptr);
+                 do_sys_futex(g2h(ts->child_tidptr), FUTEX_WAKE, INT_MAX,
+                           NULL, NULL, 0);
+             }
+             thread_cpu = NULL;
+-            object_unref(OBJECT(cpu));
+             g_free(ts);
+             rcu_unregister_thread();
+             pthread_exit(NULL);
+         }
+ 
+-        cpu_list_unlock();
++        pthread_mutex_unlock(&clone_lock);
+         preexit_cleanup(cpu_env, arg1);
+         _exit(arg1);
+         return 0; /* avoid warning */
 -- 
 2.20.1
 
