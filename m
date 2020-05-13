@@ -6,71 +6,71 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E4C6CA90AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 11:19:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58664CA90AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 11:19:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0103F206E5
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 11:19:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E30120753
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 11:19:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jma2N/vd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0103F206E5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h/oFMOaO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E30120753
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYpQ6-0007E0-Vb
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 07:19:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54902)
+	id 1jYpQb-0008Hm-3V
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 07:19:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54726)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jYpDy-0002f7-W9
- for qemu-devel@nongnu.org; Wed, 13 May 2020 07:06:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54526
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jYpDW-0001am-OL
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 07:06:26 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56298
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jYpDx-0003Wf-TS
- for qemu-devel@nongnu.org; Wed, 13 May 2020 07:06:54 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jYpDV-0003QW-OO
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 07:06:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589368013;
+ s=mimecast20190719; t=1589367982;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=y4oIOOpzY0QP6g3ztpf4qjImiVu29vT8DWLV9l9bbvM=;
- b=Jma2N/vdQFMBSJfY543PO3jDmrvPlsqxw5JCNJPlK9yi/tndo8UDjECZYvQyEMCq7aIIOL
- bRERoxk5sYB4bxbN6RLz3bQNKwd5+cqD6h9SLMi4wF5hdPlaLuOZaNqw/yc54r5BB3YuJq
- PlFsu0A1f+XnU4uzTQyXQZyBs9fgpv8=
+ bh=v5WNtmHOMdyZtbQeumzDr9tvsp9J88i78XbEMFrEX5M=;
+ b=h/oFMOaO94d1J25G1ckvd5CrJ6tJIPVemqUUrm+dMTqoOwp0WuP5/pO6FPd6LdwX8SFPHC
+ fExCIB4wSrUrChDz/e0BvCV3of4uoKskjrPI7PlyZGiq47SmExmFpkcf55GWHRBJ/nbtev
+ GXkroEDwJw4bzCcyQgt/UwD5AXydySo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-103-nDXb2nRyPiaQHlb6VbgLcA-1; Wed, 13 May 2020 07:06:51 -0400
-X-MC-Unique: nDXb2nRyPiaQHlb6VbgLcA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-455-blDQpC8JPaKruqlLnJfMAA-1; Wed, 13 May 2020 07:06:19 -0400
+X-MC-Unique: blDQpC8JPaKruqlLnJfMAA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E69A53;
- Wed, 13 May 2020 11:06:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1362819200C0;
+ Wed, 13 May 2020 11:06:18 +0000 (UTC)
 Received: from localhost (unknown [10.40.193.218])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 24B0D5D9E8;
- Wed, 13 May 2020 11:06:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9A9431002382;
+ Wed, 13 May 2020 11:06:17 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v4 24/34] block: Drop child_backing
-Date: Wed, 13 May 2020 13:05:34 +0200
-Message-Id: <20200513110544.176672-25-mreitz@redhat.com>
+Subject: [PATCH v4 11/34] block: Use bdrv_inherited_options()
+Date: Wed, 13 May 2020 13:05:21 +0200
+Message-Id: <20200513110544.176672-12-mreitz@redhat.com>
 In-Reply-To: <20200513110544.176672-1-mreitz@redhat.com>
 References: <20200513110544.176672-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 03:05:18
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 04:17:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -97,131 +97,152 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Let child_file's, child_format's, and child_backing's .inherit_options()
+implementations fall back to bdrv_inherited_options() to show that it
+would really work for all of these cases, if only the parents passed the
+appropriate BdrvChildRole and parent_is_format values.
+
+(Also, make bdrv_open_inherit(), the only place to explicitly call
+bdrv_backing_options(), call bdrv_inherited_options() instead.)
+
+This patch should incur only two visible changes, both for child_format
+children, both of which are effectively bug fixes:
+
+First, they no longer have discard=unmap set by default.  This reason it
+was set is because bdrv_inherited_fmt_options() fell through to
+bdrv_protocol_options(), and that set it because "format drivers take
+care to send flushes and respect unmap policy".  None of the drivers
+that use child_format for their children (quorum and blkverify) are
+format drivers, though, so this reasoning does not apply here.
+
+Second, they no longer have BDRV_O_NO_IO force-cleared.  child_format
+was used solely for children that do not store any metadata and as such
+will not be accessed by their parents as long as those parents do not
+receive I/O themselves.  Thus, such children should inherit
+BDRV_O_NO_IO.
+
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/block_int.h |  1 -
- block.c                   | 60 ++-------------------------------------
- 2 files changed, 3 insertions(+), 58 deletions(-)
+ block.c | 71 +++++++++++++++------------------------------------------
+ 1 file changed, 19 insertions(+), 52 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 4b09fa1124..0781d43af5 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -742,7 +742,6 @@ struct BdrvChildClass {
- 
- extern const BdrvChildClass child_of_bds;
- extern const BdrvChildClass child_file;
--extern const BdrvChildClass child_backing;
- 
- struct BdrvChild {
-     BlockDriverState *bs;
 diff --git a/block.c b/block.c
-index 131ae20ffc..d138a3c261 100644
+index 9b0e13d537..b3b978a092 100644
 --- a/block.c
 +++ b/block.c
-@@ -1215,15 +1215,6 @@ static void bdrv_backing_attach(BdrvChild *c)
-                     parent->backing_blocker);
- }
+@@ -80,6 +80,11 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+                                            BdrvChildRole child_role,
+                                            Error **errp);
  
--/* XXX: Will be removed along with child_backing */
--static void bdrv_child_cb_attach_backing(BdrvChild *c)
--{
--    if (!(c->role & BDRV_CHILD_COW)) {
--        bdrv_backing_attach(c);
--    }
--    bdrv_child_cb_attach(c);
--}
--
- static void bdrv_backing_detach(BdrvChild *c)
++/* TODO: Remove when no longer needed */
++static void bdrv_inherited_options(BdrvChildRole role, bool parent_is_format,
++                                   int *child_flags, QDict *child_options,
++                                   int parent_flags, QDict *parent_options);
++
+ /* If non-zero, use only whitelisted block drivers */
+ static int use_bdrv_whitelist;
+ 
+@@ -1158,31 +1163,9 @@ static void bdrv_protocol_options(BdrvChildRole role, bool parent_is_format,
+                                   int *child_flags, QDict *child_options,
+                                   int parent_flags, QDict *parent_options)
  {
-     BlockDriverState *parent = c->opaque;
-@@ -1234,28 +1225,6 @@ static void bdrv_backing_detach(BdrvChild *c)
-     parent->backing_blocker = NULL;
+-    int flags = parent_flags;
+-
+-    /* Enable protocol handling, disable format probing for bs->file */
+-    flags |= BDRV_O_PROTOCOL;
+-
+-    /* If the cache mode isn't explicitly set, inherit direct and no-flush from
+-     * the parent. */
+-    qdict_copy_default(child_options, parent_options, BDRV_OPT_CACHE_DIRECT);
+-    qdict_copy_default(child_options, parent_options, BDRV_OPT_CACHE_NO_FLUSH);
+-    qdict_copy_default(child_options, parent_options, BDRV_OPT_FORCE_SHARE);
+-
+-    /* Inherit the read-only option from the parent if it's not set */
+-    qdict_copy_default(child_options, parent_options, BDRV_OPT_READ_ONLY);
+-    qdict_copy_default(child_options, parent_options, BDRV_OPT_AUTO_READ_ONLY);
+-
+-    /* Our block drivers take care to send flushes and respect unmap policy,
+-     * so we can default to enable both on lower layers regardless of the
+-     * corresponding parent options. */
+-    qdict_set_default_str(child_options, BDRV_OPT_DISCARD, "unmap");
+-
+-    /* Clear flags that only apply to the top layer */
+-    flags &= ~(BDRV_O_SNAPSHOT | BDRV_O_NO_BACKING | BDRV_O_COPY_ON_READ |
+-               BDRV_O_NO_IO);
+-
+-    *child_flags = flags;
++    bdrv_inherited_options(BDRV_CHILD_IMAGE, true,
++                           child_flags, child_options,
++                           parent_flags, parent_options);
  }
  
--/* XXX: Will be removed along with child_backing */
--static void bdrv_child_cb_detach_backing(BdrvChild *c)
--{
--    if (!(c->role & BDRV_CHILD_COW)) {
--        bdrv_backing_detach(c);
--    }
--    bdrv_child_cb_detach(c);
--}
+ const BdrvChildClass child_file = {
+@@ -1209,11 +1192,9 @@ static void bdrv_inherited_fmt_options(BdrvChildRole role,
+                                        int *child_flags, QDict *child_options,
+                                        int parent_flags, QDict *parent_options)
+ {
+-    child_file.inherit_options(role, parent_is_format,
+-                               child_flags, child_options,
+-                               parent_flags, parent_options);
 -
--/*
-- * Returns the options and flags that bs->backing should get, based on the
-- * given options and flags for the parent BDS
-- */
--static void bdrv_backing_options(BdrvChildRole role, bool parent_is_format,
--                                 int *child_flags, QDict *child_options,
--                                 int parent_flags, QDict *parent_options)
--{
--    bdrv_inherited_options(BDRV_CHILD_COW, true,
--                           child_flags, child_options,
--                           parent_flags, parent_options);
--}
+-    *child_flags &= ~(BDRV_O_PROTOCOL | BDRV_O_NO_IO);
++    bdrv_inherited_options(BDRV_CHILD_DATA, false,
++                           child_flags, child_options,
++                           parent_flags, parent_options);
+ }
+ 
+ const BdrvChildClass child_format = {
+@@ -1295,23 +1276,9 @@ static void bdrv_backing_options(BdrvChildRole role, bool parent_is_format,
+                                  int *child_flags, QDict *child_options,
+                                  int parent_flags, QDict *parent_options)
+ {
+-    int flags = parent_flags;
 -
+-    /* The cache mode is inherited unmodified for backing files; except WCE,
+-     * which is only applied on the top level (BlockBackend) */
+-    qdict_copy_default(child_options, parent_options, BDRV_OPT_CACHE_DIRECT);
+-    qdict_copy_default(child_options, parent_options, BDRV_OPT_CACHE_NO_FLUSH);
+-    qdict_copy_default(child_options, parent_options, BDRV_OPT_FORCE_SHARE);
+-
+-    /* backing files always opened read-only */
+-    qdict_set_default_str(child_options, BDRV_OPT_READ_ONLY, "on");
+-    qdict_set_default_str(child_options, BDRV_OPT_AUTO_READ_ONLY, "off");
+-    flags &= ~BDRV_O_COPY_ON_READ;
+-
+-    /* snapshot=on is handled on the top layer */
+-    flags &= ~(BDRV_O_SNAPSHOT | BDRV_O_TEMPORARY);
+-
+-    *child_flags = flags;
++    bdrv_inherited_options(BDRV_CHILD_COW, true,
++                           child_flags, child_options,
++                           parent_flags, parent_options);
+ }
+ 
  static int bdrv_backing_update_filename(BdrvChild *c, BlockDriverState *base,
-                                         const char *filename, Error **errp)
- {
-@@ -1283,21 +1252,6 @@ static int bdrv_backing_update_filename(BdrvChild *c, BlockDriverState *base,
-     return ret;
- }
- 
--const BdrvChildClass child_backing = {
--    .parent_is_bds   = true,
--    .get_parent_desc = bdrv_child_get_parent_desc,
--    .attach          = bdrv_child_cb_attach_backing,
--    .detach          = bdrv_child_cb_detach_backing,
--    .inherit_options = bdrv_backing_options,
--    .drained_begin   = bdrv_child_cb_drained_begin,
--    .drained_poll    = bdrv_child_cb_drained_poll,
--    .drained_end     = bdrv_child_cb_drained_end,
--    .inactivate      = bdrv_child_cb_inactivate,
--    .update_filename = bdrv_backing_update_filename,
--    .can_set_aio_ctx = bdrv_child_cb_can_set_aio_ctx,
--    .set_aio_ctx     = bdrv_child_cb_set_aio_ctx,
--};
--
- /*
+@@ -1360,10 +1327,9 @@ const BdrvChildClass child_backing = {
   * Returns the options and flags that a generic child of a BDS should
   * get, based on the given options and flags for the parent BDS.
-@@ -2446,8 +2400,7 @@ static void bdrv_default_perms_for_cow(BlockDriverState *bs, BdrvChild *c,
-                                        uint64_t perm, uint64_t shared,
-                                        uint64_t *nperm, uint64_t *nshared)
+  */
+-static void __attribute__((unused))
+-    bdrv_inherited_options(BdrvChildRole role, bool parent_is_format,
+-                           int *child_flags, QDict *child_options,
+-                           int parent_flags, QDict *parent_options)
++static void bdrv_inherited_options(BdrvChildRole role, bool parent_is_format,
++                                   int *child_flags, QDict *child_options,
++                                   int parent_flags, QDict *parent_options)
  {
--    assert(child_class == &child_backing ||
--           (child_class == &child_of_bds && (role & BDRV_CHILD_COW)));
-+    assert(child_class == &child_of_bds && (role & BDRV_CHILD_COW));
+     int flags = parent_flags;
  
-     /*
-      * We want consistent read from backing files if the parent needs it.
-@@ -2566,23 +2519,16 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
-                                uint64_t perm, uint64_t shared,
-                                uint64_t *nperm, uint64_t *nshared)
- {
--    bool backing = (child_class == &child_backing);
--
-     if (child_class == &child_of_bds) {
-         bdrv_default_perms(bs, c, child_class, role, reopen_queue,
-                            perm, shared, nperm, nshared);
-         return;
+@@ -3300,7 +3266,8 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+                                    flags, options);
+         /* Let bdrv_backing_options() override "read-only" */
+         qdict_del(options, BDRV_OPT_READ_ONLY);
+-        bdrv_backing_options(0, true, &flags, options, flags, options);
++        bdrv_inherited_options(BDRV_CHILD_COW, true,
++                               &flags, options, flags, options);
      }
  
--    assert(child_class == &child_backing || child_class == &child_file);
-+    assert(child_class == &child_file);
- 
--    if (!backing) {
--        bdrv_default_perms_for_storage(bs, c, child_class, role, reopen_queue,
--                                       perm, shared, nperm, nshared);
--    } else {
--        bdrv_default_perms_for_cow(bs, c, child_class, role, reopen_queue,
-+    bdrv_default_perms_for_storage(bs, c, child_class, role, reopen_queue,
-                                    perm, shared, nperm, nshared);
--    }
- }
- 
- void bdrv_default_perms(BlockDriverState *bs, BdrvChild *c,
+     bs->open_flags = flags;
 -- 
 2.26.2
 
