@@ -6,67 +6,66 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 773D4C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 22:59:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 472DAC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:00:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73EDC2053B
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 22:59:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73EDC2053B
+	by mail.kernel.org (Postfix) with ESMTPS id 496FD20659
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:00:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 496FD20659
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ0M2-00011T-FH
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 18:59:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45350)
+	id 1jZ0MA-0001Mb-96
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 19:00:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45372)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1jZ0JR-0004N9-8T; Wed, 13 May 2020 18:57:17 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34334
- helo=mx0a-001b2d01.pphosted.com)
+ id 1jZ0JZ-0004gu-2m; Wed, 13 May 2020 18:57:26 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53940)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1jZ0JQ-00079d-H3; Wed, 13 May 2020 18:57:16 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 04DMVZIR155406; Wed, 13 May 2020 18:57:06 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.98])
- by mx0b-001b2d01.pphosted.com with ESMTP id 3101kybs98-1
+ id 1jZ0JY-0007AO-Az; Wed, 13 May 2020 18:57:24 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 04DMX8Lo121641; Wed, 13 May 2020 18:57:12 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com
+ [159.122.73.71])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31016mwhhb-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 13 May 2020 18:57:05 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
- by ppma03ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04DMtlAB016678;
- Wed, 13 May 2020 22:57:04 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com
- (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
- by ppma03ams.nl.ibm.com with ESMTP id 3100ubaecc-1
+ Wed, 13 May 2020 18:57:12 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+ by ppma02fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04DMtWX0031577;
+ Wed, 13 May 2020 22:57:10 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com
+ (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+ by ppma02fra.de.ibm.com with ESMTP id 3100ub90fm-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 13 May 2020 22:57:03 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 04DMv1dM59244712
+ Wed, 13 May 2020 22:57:10 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 04DMv7fQ46989550
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 13 May 2020 22:57:01 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 9BC044C04A;
- Wed, 13 May 2020 22:57:01 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 630B34C044;
- Wed, 13 May 2020 22:57:01 +0000 (GMT)
+ Wed, 13 May 2020 22:57:07 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C3909A404D;
+ Wed, 13 May 2020 22:57:07 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8B76DA4040;
+ Wed, 13 May 2020 22:57:07 +0000 (GMT)
 Received: from bahia.lan (unknown [9.145.63.64])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 13 May 2020 22:57:01 +0000 (GMT)
-Subject: [PATCH v2 3/6] target/ppc: Don't initialize some local variables in
- ppc_radix64_xlate()
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 13 May 2020 22:57:07 +0000 (GMT)
+Subject: [PATCH v2 4/6] target/ppc: Add missing braces in
+ ppc_radix64_partition_scoped_xlate()
 From: Greg Kurz <groug@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 14 May 2020 00:57:00 +0200
-Message-ID: <158941062048.240484.9693581559252337111.stgit@bahia.lan>
+Date: Thu, 14 May 2020 00:57:07 +0200
+Message-ID: <158941062665.240484.2663106458734800894.stgit@bahia.lan>
 In-Reply-To: <158941060199.240484.5620994992064687533.stgit@bahia.lan>
 References: <158941060199.240484.5620994992064687533.stgit@bahia.lan>
 User-Agent: StGit/unknown-version
@@ -78,14 +77,15 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
  definitions=2020-05-13_09:2020-05-13,
  2020-05-13 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 mlxscore=0
- priorityscore=1501 adultscore=0 clxscore=1034 malwarescore=0 spamscore=0
- cotscore=-2147483648 phishscore=0 mlxlogscore=999 suspectscore=0
- impostorscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2005130188
-Received-SPF: softfail client-ip=148.163.158.5; envelope-from=groug@kaod.org;
+ bulkscore=0 clxscore=1034
+ priorityscore=1501 mlxlogscore=798 suspectscore=0 adultscore=0
+ impostorscore=0 lowpriorityscore=0 spamscore=0 mlxscore=0
+ cotscore=-2147483648 phishscore=0 malwarescore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005130193
+Received-SPF: softfail client-ip=148.163.156.1; envelope-from=groug@kaod.org;
  helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 18:57:00
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 18:45:01
 X-ACL-Warn: Detected OS   = Linux 3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -111,54 +111,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It is the job of the ppc_radix64_get_fully_qualified_addr() function
-which is called at the beginning of ppc_radix64_xlate() to set both
-lpid *and* pid. It doesn't buy us anything to initialize them first.
+As per CODING_STYLE.
 
-Worse, a bug in ppc_radix64_get_fully_qualified_addr(), eg. failing to
-set either lpid or pid, would be undetectable by static analysis tools
-like coverity.
-
-Some recent versions of gcc (eg. gcc-9.3.1-2.fc30) may still think
-that lpid or pid is used uninitialized though, so this also adds
-default cases in the switch statements to make it clear this cannot
-happen.
-
+Fixes: d04ea940c597 "target/ppc: Add support for Radix partition-scoped translation"
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- target/ppc/mmu-radix64.c |    6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ target/ppc/mmu-radix64.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
-index c76879f65b78..07f956c9864f 100644
+index 07f956c9864f..fb7dfe25ba6f 100644
 --- a/target/ppc/mmu-radix64.c
 +++ b/target/ppc/mmu-radix64.c
-@@ -50,6 +50,8 @@ static bool ppc_radix64_get_fully_qualified_addr(const CPUPPCState *env,
-             *lpid = 0;
-             *pid = 0;
-             break;
-+        default:
-+            g_assert_not_reached();
+@@ -286,8 +286,9 @@ static int ppc_radix64_partition_scoped_xlate(PowerPCCPU *cpu, int rwx,
+                               pate.dw0 & PRTBE_R_RPDS, h_raddr, h_page_size,
+                               &pte, &fault_cause, &pte_addr) ||
+         ppc_radix64_check_prot(cpu, rwx, pte, &fault_cause, h_prot, true)) {
+-        if (pde_addr) /* address being translated was that of a guest pde */
++        if (pde_addr) { /* address being translated was that of a guest pde */
+             fault_cause |= DSISR_PRTABLE_FAULT;
++        }
+         if (cause_excp) {
+             ppc_radix64_raise_hsi(cpu, rwx, eaddr, g_raddr, fault_cause);
          }
-     } else {  /* !MSR[HV] -> Guest */
-         switch (eaddr & R_EADDR_QUADRANT) {
-@@ -64,6 +66,8 @@ static bool ppc_radix64_get_fully_qualified_addr(const CPUPPCState *env,
-             *lpid = env->spr[SPR_LPIDR];
-             *pid = 0; /* pid set to 0 -> addresses guest operating system */
-             break;
-+        default:
-+            g_assert_not_reached();
-         }
-     }
- 
-@@ -433,7 +437,7 @@ static int ppc_radix64_xlate(PowerPCCPU *cpu, vaddr eaddr, int rwx,
-                              bool cause_excp)
- {
-     CPUPPCState *env = &cpu->env;
--    uint64_t lpid = 0, pid = 0;
-+    uint64_t lpid, pid;
-     ppc_v3_pate_t pate;
-     int psize, prot;
-     hwaddr g_raddr;
 
 
