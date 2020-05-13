@@ -6,84 +6,81 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A1AECA90AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 08:42:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B04AC2D0FA
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 08:44:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2595A20740
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 08:42:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A2D220643
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 08:44:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eipLxt/o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2595A20740
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZVwc7thm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A2D220643
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYmyf-0008EW-Bx
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 04:42:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34992)
+	id 1jYmzg-0001MC-9W
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 04:44:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35122)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jYmxy-0007bJ-Th
- for qemu-devel@nongnu.org; Wed, 13 May 2020 04:42:14 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32138
+ id 1jYmyr-0000DJ-Mm
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 04:43:09 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56834
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jYmxy-0004LC-2y
- for qemu-devel@nongnu.org; Wed, 13 May 2020 04:42:14 -0400
+ id 1jYmyq-0004jD-R7
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 04:43:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589359332;
+ s=mimecast20190719; t=1589359388;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=MJ0AdB1rhj663vCSOeEwUpOqKn0Kz20NlgN0Abc88Xw=;
- b=eipLxt/oXztnGygq67kcyFLNCr4GiXuZWaQ2Z4XYrVzFaUF1nQxX8XIxoxHHDMLXo72YCL
- WQVjlzf5yvwNOv/LmPj3j+JvcNH6SJHYTwPtp1HqzDEXE4uXsYv+skWoN9SCJ4fPhX3MAT
- H5Us+vQzpGBIv4OSmg3JR2DwMQfZ9dY=
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=YeGZ+VQgUihLT50dsLsDui2A/tAvgWf1GmftbcVJqAY=;
+ b=ZVwc7thmiIDPOL2MSPLJ60xqFW3+SCRs8Hw0dhxo/9476Hzyqp/0+ANk4O4fsOCEGTm2Zf
+ D3AgU7ecUEsn7lMdqohEo7Cqg9BRTZFR70JsCF/O8HvT6hpdO0fHYTzNXGzWZeDDAIjW4Z
+ kawefF0OPEIfdPDm6yVNNzv8h3F8ikU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-261-eo0nlJBmNBO8y_XO3M7KzA-1; Wed, 13 May 2020 04:41:57 -0400
-X-MC-Unique: eo0nlJBmNBO8y_XO3M7KzA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-248-j0GJrx23OBKlQy1YmH52ZQ-1; Wed, 13 May 2020 04:43:06 -0400
+X-MC-Unique: j0GJrx23OBKlQy1YmH52ZQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 12745107ACF8;
- Wed, 13 May 2020 08:41:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5C8E80183C;
+ Wed, 13 May 2020 08:43:04 +0000 (UTC)
 Received: from redhat.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B58831057FD5;
- Wed, 13 May 2020 08:41:48 +0000 (UTC)
-Date: Wed, 13 May 2020 09:41:45 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6231112A4D;
+ Wed, 13 May 2020 08:43:00 +0000 (UTC)
+Date: Wed, 13 May 2020 09:42:57 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH 0/5] Introduce 'yank' oob qmp command to recover from
- hanging qemu
-Message-ID: <20200513084145.GB1215285@redhat.com>
-References: <cover.1589193717.git.lukasstraub2@web.de>
- <20200511114947.GJ1135885@redhat.com>
- <20200511120718.GD2811@work-vm>
- <20200511121714.GL1135885@redhat.com>
- <20200511154645.GI2811@work-vm> <20200512113206.62836e44@luklap>
- <20200512094337.GK1191162@redhat.com>
- <20200512185817.GJ2802@work-vm>
+To: B3r3n <B3r3n@argosnet.com>
+Subject: Re: Qemu, VNC and non-US keymaps
+Message-ID: <20200513084257.GC1215285@redhat.com>
+References: <E1jY9FF-0000Po-2c@lists.gnu.org>
+ <af732fbf-fd70-97bc-3ea8-25d66f5895de@redhat.com>
+ <20200511151155.GO1135885@redhat.com>
+ <20200511152957.6CFA8D1826@zmta04.collab.prod.int.phx2.redhat.com>
+ <20200511171930.GS1135885@redhat.com>
+ <20200512074530.8729D1892D3@zmta01.collab.prod.int.phx2.redhat.com>
+ <20200512091106.GH1191162@redhat.com>
+ <E1jYmun-0003jN-Jq@lists.gnu.org>
 MIME-Version: 1.0
-In-Reply-To: <20200512185817.GJ2802@work-vm>
+In-Reply-To: <E1jYmun-0003jN-Jq@lists.gnu.org>
 User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 04:17:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 01:56:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -10
 X-Spam_score: -1.1
 X-Spam_bar: -
@@ -104,73 +101,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Lukas Straub <lukasstraub2@web.de>,
- qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-discuss@nongnu.org,
+ Philippe =?utf-8?B?TWF0aGlldS1EYXVkw4M/ID8gw4M/w4LCqQ==?=
+ <philmd@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 12, 2020 at 07:58:17PM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. BerrangÃÂ© (berrange@redhat.com) wrote:
-> > On Tue, May 12, 2020 at 11:32:06AM +0200, Lukas Straub wrote:
-> > > On Mon, 11 May 2020 16:46:45 +0100
-> > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > > 
-> > > > * Daniel P. BerrangÃÆÃÂ© (berrange@redhat.com) wrote: 
-> > > > > ...
-> > > > > That way if QEMU does get stuck, you can start by tearing down the
-> > > > > least distruptive channel. eg try tearing down the migration connection
-> > > > > first (which shouldn't negatively impact the guest), and only if that
-> > > > > doesn't work then, move on to tear down the NBD connection (which risks
-> > > > > data loss)  
-> > > > 
-> > > > I wonder if a different way would be to make all network connections
-> > > > register with yank, but then make yank take a list of connections to
-> > > > shutdown(2).
-> > > 
-> > > Good Idea. We could name the connections (/yank callbacks) in the
-> > > form "nbd:<node-name>", "chardev:<chardev-name>" and "migration"
-> > > (and add "netdev:...", etc. in the future). Then make yank take a
-> > > list of connection names as you suggest and silently ignore connections
-> > > that don't exist. And maybe even add a 'query-yank' oob command returning
-> > > a list of registered connections so the management application can do
-> > > pattern matching if it wants.
-> > 
-> > Yes, that would make the yank command much more flexible in how it can
-> > be used.
-> > 
-> > As an alternative to using formatted strings like this, it could be
-> > modelled more explicitly in QAPI
-> > 
-> >   { 'struct':  'YankChannels',
-> >     'data': { 'chardev': [ 'string' ],
-> >               'nbd': ['string'],
-> > 	      'migration': bool } }
-> > 
-> > In this example, 'chardev' would accept a list of chardev IDs which
-> > have it enabled, 'nbd' would accept a list of block node IDs which
-> > have it enabled, and migration is a singleton on/off.
+On Wed, May 13, 2020 at 10:38:52AM +0200, B3r3n wrote:
+> Hello Daniel,
 > 
-> Do we already have a QOM object name for each of these things?
-> Is that nbd/blockdevice unique - i.e. can you have multiple nbd clients
-> on the same node?
+> Ok, TigerVNC, added -shared=1 to behave the same as TightVNC, works greatly,
+> Thanks !
 > 
-> > The benefit of this modelling is that you can introspect QEMU
-> > to discover what classes of channels support being yanked by
-> > this QEMU build, as well as what instances are configured to
-> > be yanked. ie you can distinguish between a QEMU that doesn't
-> > support yanking network devices, from a QEMU that does support
-> > yanking network devices, but doesn't have it enabled for any
-> > network device instances.
+> But funny thing, I saw you were part of exchanges on that topic, noVNC
+> totally fails now.
+> Despite my keyboard isnt changed, debian VM is just in QWERTY as if noVNC
+> only send keysyms.
 > 
-> What do we need to make it introspectable like that?
+> If you know how to force noVNC keycodes instead, digging to find the trick :-(
 
-The model I describe above would work, because you can introspect the
-QAPI schema to see what fields are in the "YankChannels" struct. So
-if we added a "nic" field later, apps can discover it.
+Looking at the current git master code AFAICT it should "just work"
+unless you have an older version of it perhaps
+
 
 Regards,
 Daniel
