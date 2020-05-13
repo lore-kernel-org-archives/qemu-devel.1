@@ -7,59 +7,58 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E69AFC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:23:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DED1C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:25:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD134205ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:23:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 79CF1205ED
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:25:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZuCnipwH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD134205ED
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EZP++SJP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79CF1205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ0iO-0006K0-RJ
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 19:23:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48438)
+	id 1jZ0kn-0007xl-Bs
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 19:25:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48932)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ0hi-0005tY-0z
- for qemu-devel@nongnu.org; Wed, 13 May 2020 19:22:22 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51444
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ0k7-0007F0-D2
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 19:24:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42535
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ0hg-0004OU-4D
- for qemu-devel@nongnu.org; Wed, 13 May 2020 19:22:21 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ0k5-0004vv-QO
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 19:24:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589412138;
+ s=mimecast20190719; t=1589412288;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=5/YDiLAeWBQZmUJjOp7p9iY5mJMz3rKdLy8e8CZUDAc=;
- b=ZuCnipwHoJKq7WSjxdYQfnOylJyHILig4jKZt4Uqv88cUNnjdM89sZz1v0hI1DaX6Ukesd
- 3dMCgGrcuFPGRtFDch2TagegVx/1WNV1R+NKIt7xIDXzaBbjjAPIZKTAafPqGhsynnAJGF
- Y9aeqzOu/ORAiRYNetRQis0p+53pGY0=
+ bh=I+wVTYlW8tFngIaaC5TmP5Wddl9t+JACxrHp4p8NK/A=;
+ b=EZP++SJP9upH14A14+7MDxkXonK0oryN8tyede+BAecSm5be9APRAhgtE2dmPsV322S68w
+ cNntTvg5+dqN7cwPbfINEktjwyHPmNO1T+LaA6yq4HRNCPHkLniTzbnRo2DMkUajmZj/iM
+ FwuOpWpfMCpao+ZPZTOLb3xOgUMHC+Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-466-7vsyDlq4MYGQd5uaNNaY5w-1; Wed, 13 May 2020 19:22:14 -0400
-X-MC-Unique: 7vsyDlq4MYGQd5uaNNaY5w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-15-KjuM4fZaMG-8aW_962Kj6g-1; Wed, 13 May 2020 19:24:42 -0400
+X-MC-Unique: KjuM4fZaMG-8aW_962Kj6g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3D75100CCC1;
- Wed, 13 May 2020 23:22:13 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0DC761005510;
+ Wed, 13 May 2020 23:24:41 +0000 (UTC)
 Received: from [10.10.113.80] (ovpn-113-80.rdu2.redhat.com [10.10.113.80])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 812267D928;
- Wed, 13 May 2020 23:22:13 +0000 (UTC)
-Subject: Re: Is qemu could be a "FSM" state machine if running on a "quiet and
- clean" host pc without random event input?
-To: tugouxp <13824125580@163.com>, qemu-devel@nongnu.org
-References: <7da014ca.86ed.172040ff509.Coremail.13824125580@163.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 98B22600DB;
+ Wed, 13 May 2020 23:24:34 +0000 (UTC)
+Subject: Re: Assertion failure through vring_split_desc_read
+To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
+References: <20200511035124.v2ff4f5gyfh6xlgc@mozz.bu.edu>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -135,29 +134,29 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <314a82f2-6ceb-e5ee-c3c6-6d2c2c4730e4@redhat.com>
-Date: Wed, 13 May 2020 19:22:12 -0400
+Message-ID: <c4066d16-81ef-a052-a689-160bfc36baa3@redhat.com>
+Date: Wed, 13 May 2020 19:24:34 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <7da014ca.86ed.172040ff509.Coremail.13824125580@163.com>
+In-Reply-To: <20200511035124.v2ff4f5gyfh6xlgc@mozz.bu.edu>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 01:56:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 03:05:18
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -170,52 +169,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: lvivier@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 5/11/20 10:07 AM, tugouxp wrote:
-> Hi folks:
->   i want to know about whether therr are limitations during qemu
-> emulation systems, for exampe, did the regular bugs corener case cant be
-> duplicated on qeme but exist on real boads?
+On 5/10/20 11:51 PM, Alexander Bulekov wrote:
+> Hello,
+> While fuzzing, I found an input that triggers an assertion failure
+> through virtio-rng -> vring_split_desc_read. Maybe this is related to:
+> Message-ID: <20200511033001.dzvtbdhl3oz5pgiy@mozz.bu.edu> 
+> Assertion failure through virtio_lduw_phys_cached
+> 
+> #8 0x7fe6a9acf091 in __assert_fail /build/glibc-GwnBeO/glibc-2.30/assert/assert.c:101:3
+> #9 0x564cbe7d96fd in address_space_read_cached include/exec/memory.h:2423:5
+> #10 0x564cbe7e79c5 in vring_split_desc_read hw/virtio/virtio.c:236:5
+> #11 0x564cbe7e84ce in virtqueue_split_read_next_desc hw/virtio/virtio.c:929:5
+> #12 0x564cbe78f86b in virtqueue_split_get_avail_bytes hw/virtio/virtio.c:1009:18
+> #13 0x564cbe78ab22 in virtqueue_get_avail_bytes hw/virtio/virtio.c:1208:9
+> #14 0x564cc08aade1 in get_request_size hw/virtio/virtio-rng.c:40:5
+> #15 0x564cc08aa20b in virtio_rng_process hw/virtio/virtio-rng.c:115:12
+> #16 0x564cc08a8c48 in virtio_rng_set_status hw/virtio/virtio-rng.c:172:5
+> #17 0x564cbe7a50be in virtio_set_status hw/virtio/virtio.c:1876:9
+> #18 0x564cc08d1b8f in virtio_pci_common_write hw/virtio/virtio-pci.c:1245:9
+> 
+> I can reproduce it in a qemu 5.0 build using these qtest commands:
+> https://paste.debian.net/plain/1146089
+> (not including them here, as some are quite long)
+> 
+> wget https://paste.debian.net/plain/1146089 -O qtest-trace; ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -M pc-q35-5.0  -device virtio-rng-pci,addr=04.0 -display none -nodefaults -nographic -qtest stdio < qtest-trace
+> 
+> Please let me know if I can provide any further info.
+> -Alex
 > 
 
-It's possible, yes. QEMU emulates instead of simulates. We do not try to
-reproduce accurate cycle timings. There may be bugs that exist in real
-hardware but don't reproduce with QEMU, or, of course, the other way around.
+Do you have a writeup somewhere of how you are approaching fuzzing and
+how you've found this pile of bugs so far?
 
-> why thing this is that , i have ever use hdl simulator (modsim and
-> iverilog) and openrisc processor to emulate the linux and ucos running,
-> and see the waveform of the simulateion process of the operations systems.
-> i found an interesting things, if i take just the tick interrupt as the
-> only testbech event source,the  kernel simulation waveform is identical
-> duplicated again and again, which means i can predicate future behavior.
-> 
+Might make for a good blog post.
 
-Yeah, we are not operating on the verilog level for any of the hardware
-we emulate.
-
-> i think this something like qemu work principle and so want to know,
-> whether the qemu has this limitation? is the simulation proces a "FSM" 
-> that with definition output if the input event are all regular and
-> without random?
-> 
-
-Well, if you only want determinism and not accuracy, it might be
-possible, but I have to admit to you that I've never tried to instrument
-or measure this. I assume there are many places where cycle
-indeterminancy comes in from the host system.
-
-And I trust x86 about as far as I can throw it.
-
-I assume there are many barriers to this, but maybe folks who worked on
-the replay debugger could give some more authoritative idea.
-
-
-> thank you
-> 
+--js
 
 
