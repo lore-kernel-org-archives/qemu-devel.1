@@ -2,89 +2,90 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 030EFC2D0F8
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 07:57:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81665CA90AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 08:18:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2E1B23127
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 07:57:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D0D820673
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 08:18:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iZdfL8Ag"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2E1B23127
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CSZbo1FJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D0D820673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYmGe-0004MF-V2
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 03:57:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57370)
+	id 1jYmar-0004G4-DI
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 04:18:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59868)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jYmG3-0003jg-A0
- for qemu-devel@nongnu.org; Wed, 13 May 2020 03:56:51 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50339)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1jYmG2-0001Ft-9z
- for qemu-devel@nongnu.org; Wed, 13 May 2020 03:56:50 -0400
-Received: by mail-wm1-x344.google.com with SMTP id m12so20544118wmc.0
- for <qemu-devel@nongnu.org>; Wed, 13 May 2020 00:56:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=/U6VqwfH9e9YdiPn1eD/b3mLjRRHfJDk4CRzGqFAntA=;
- b=iZdfL8AgkHfaU4mmaxSdSn9yzkOzXKxITsUXjN3ikXyEDDOvt7Y0WU34p30FiIbZdY
- sDoR2n0GreUrmiYO1t146KXgIM2LvryAILcR8G/DkVYXUTzzCV5XOQw3yEFMLrGtS2H3
- rNb4xxPi/H2WVEBn2Hzbmu8MjQ2A/PP0wi+DfsZQJb0a4OenM0RP8NfBTveeBSc2RBCB
- TOEjjAyF5qtpwELiT5rtxsZFt1VNhR081udA9MxgQ+jFMSc4EBKtLUKHejf5/cJ2onaf
- oBYdw9YiIoMyLAh4Q1Um5QMX8oLe6PhJCLiCpkMCPUvNH4NKvz4jd7vBId7tzkkvIn/J
- swPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=/U6VqwfH9e9YdiPn1eD/b3mLjRRHfJDk4CRzGqFAntA=;
- b=Zq7JDS6+bvc+4vcUtKtaVPgj3FzAH7Dq7sbMmmmm0gjHHbOb2eV+1YWUA+IGHsF2Zb
- 4iA+YYmdro3rKHuYKMPyPBnIze28meTiJbglHlojjf2fd8WQ69/mXwRq2ad7fpRTGQNm
- iqCa8kbA9+4kabOEoC2pNFra1YzieLxOCbfSLbX5Juo9dTMQjqluJdZNyef2Vpy5RgjV
- ockR+qiXc5e6wlMrrDAe72eMh7BBbLonTiGhhL8y2+rNI8ghAtZWkcyadL/pnuxayNAn
- vX1sKXerVoai0D5NP9/koXY7hlGL2bMwqNYsfmwcF1upnSRLlRZKdH0ojjftynk3f3ov
- 0veQ==
-X-Gm-Message-State: AGi0Pub/39cBP5wvs/ibaEJoHZh7cKVCst9W2CobrpY3wSJmGoj7+myL
- 8pThJfGASGGiqh5vyASkZjCpBP2BsPzqV7mvNqA=
-X-Google-Smtp-Source: APiQypKzweMf2SuzIbVEOndFOMeYgxxv+j5a7v0xW9z+tzDcnWdVTdjM7C+tx3anKaiG+DduWfoXHJkHASGJQPHtAhM=
-X-Received: by 2002:a1c:5685:: with SMTP id k127mr11907141wmb.50.1589356608909; 
- Wed, 13 May 2020 00:56:48 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jYmaH-0003kG-5l
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 04:17:45 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43100
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jYmaF-0006Fr-MR
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 04:17:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589357862;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=n/9ndjq8pAL5FqGXhewL1HdHqCbbdY+ZXc+oe+r4I44=;
+ b=CSZbo1FJcR+nqOP3/l8nhDSuJdp2bnBO+tCaVo/CH5/toRfwizzveS3TlIm87yBohbKOXR
+ gTG+jCbY1Tp8SCk3PuuTWnQSXAtEr/dY7ScrGeLIGrS7+QbwbZNVt8LksOfj4FFVh/uFuo
+ o7vfV27vCbUlhN+xoS9AVSi29bUo9fo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-489-TSKn9gn8PgCioJ1Jl-9HLA-1; Wed, 13 May 2020 04:17:00 -0400
+X-MC-Unique: TSKn9gn8PgCioJ1Jl-9HLA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 599DF8005B7;
+ Wed, 13 May 2020 08:16:58 +0000 (UTC)
+Received: from gondolin (ovpn-113-93.ams2.redhat.com [10.36.113.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4A1D8391;
+ Wed, 13 May 2020 08:16:50 +0000 (UTC)
+Date: Wed, 13 May 2020 10:16:37 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v1 2/8] s390/sclp: check sccb len before filling in data
+Message-ID: <20200513101637.2f325838.cohuck@redhat.com>
+In-Reply-To: <5ed5bc04-e4e3-21ca-057f-a978ef411ad8@linux.ibm.com>
+References: <20200508230823.22956-1-walling@linux.ibm.com>
+ <20200508230823.22956-3-walling@linux.ibm.com>
+ <58bc496c-28bb-26f8-ab46-aba6ad141717@linux.ibm.com>
+ <737869a8-13b2-1831-00c6-629d5a109d9c@redhat.com>
+ <05ab2e59-10c0-c7df-c014-b54883ddccd3@linux.ibm.com>
+ <9a39a948-91a1-7cfe-f2a5-d30e5564f318@redhat.com>
+ <20200512180140.4be69d60.cohuck@redhat.com>
+ <5ed5bc04-e4e3-21ca-057f-a978ef411ad8@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <1586337380-25217-1-git-send-email-chenhc@lemote.com>
- <1586337380-25217-2-git-send-email-chenhc@lemote.com>
-In-Reply-To: <1586337380-25217-2-git-send-email-chenhc@lemote.com>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Wed, 13 May 2020 09:56:26 +0200
-Message-ID: <CAHiYmc5zPT97Zxr6JTXY8dHTSU7aFC3EY6ODgULuex-xRYWCQA@mail.gmail.com>
-Subject: Re: [PATCH 2/3] mips/mips_fulong2e: Set preferred page size to 16KB
-To: Huacai Chen <chenhc@lemote.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; boundary="Sig_/QY_q6TYpcDHvMVu7kDcSeMB";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 04:17:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,53 +98,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <chenhuacai@gmail.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Aurelien Jarno <aurelien@aurel32.net>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Collin Walling <walling@linux.ibm.com>, mst@redhat.com,
+ David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
+ svens@linux.ibm.com, pbonzini@redhat.com, mihajlov@linux.ibm.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=D1=81=D1=80=D0=B5, 8. =D0=B0=D0=BF=D1=80 2020. =D1=83 11:08 Huacai Chen <c=
-henhc@lemote.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=
-=D0=BB=D0=B0:
->
-> Loongson processor prefers 16KB page size in system emulator, so let's
-> define mc->minimum_page_bits to 14.
->
-> Cc: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> ---
+--Sig_/QY_q6TYpcDHvMVu7kDcSeMB
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Huacai, thanks for the efforts regarding this series! I will very
-likely accept patches 1/3 and 2/3 from this series in my next MIPS
-queue, but the possible problem is that I somehow can't find patch 3/3
-from my series in my mailbox. (I think it also the case with the cover
-letter.) Could you perhaps resend the whole series? I'm concerned that
-patch 3/3 contains something important, and it would be a shame that
-it is omitted, and 1/3 and 2/3 are accepted.
+On Wed, 13 May 2020 09:43:37 +0200
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-For this patch:
+> On 5/12/20 6:01 PM, Cornelia Huck wrote:
+> > On Mon, 11 May 2020 17:02:06 +0200
+> > David Hildenbrand <david@redhat.com> wrote:
+> >  =20
+> >> On 11.05.20 16:50, Janosch Frank wrote: =20
+> >>> On 5/11/20 4:44 PM, David Hildenbrand wrote:   =20
+> >>>> On 11.05.20 16:36, Janosch Frank wrote:   =20
+> >>>>> On 5/9/20 1:08 AM, Collin Walling wrote:   =20
+> >>>>>> The SCCB must be checked for a sufficient length before it is fill=
+ed
+> >>>>>> with any data. If the length is insufficient, then the SCLP comman=
+d
+> >>>>>> is suppressed and the proper response code is set in the SCCB head=
+er.
+> >>>>>>
+> >>>>>> Signed-off-by: Collin Walling <walling@linux.ibm.com>   =20
+> >>>>>
+> >>>>> Fixes tag? =20
+> >=20
+> > Probably
+> >=20
+> > Fixes: 832be0d8a3bb ("s390x: sclp: Report insufficient SCCB length")
+> >=20
+> > ?
+> >  =20
+> >>>>> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>   =20
+> >>>>
+> >>>> This is not a fix AFAIKs.
+> >>>> sclp_service_call()/sclp_service_call_protected() always supplies a =
+full
+> >>>> SCCB of exactly 4k size.
+> >>>>   =20
+> >>>
+> >>> We don't check for QEMU's 4k buffer here, but for the length that was
+> >>> specified by the guest.
+> >>>
+> >>> It's valid for the guest to request cpu info and state that its buffe=
+r
+> >>> is only 1k. We can't write everything in 1k if we have ~200 cpus, so
+> >>> we'll report the insufficient length rc.
+> >>>
+> >>> What he fixes here is the time of the length check, it should be done
+> >>> before any changes are being done to the work_sccb.   =20
+> >>
+> >> I don't have access to the spec, especially, if the guest can expect
+> >> nothing else in the sccb to change in case we report an error code. So
+> >> whatever you tell me, I have to trust you :) =20
+> >=20
+> > Same here. Sounds plausible, but I have to trust the folks with the
+> > documentation :)
+> >  =20
+>=20
+> The AR states that:
+> * Command validity check (has prio over length, as length is dependent
+> on command)
+> * boundary (if extended-length is not available)
+> * Sufficient length check
+>=20
+> are done before "any other command action is taken".
+> If a test fails the command is suppressed.
 
-Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Thanks, makes sense.
 
->  hw/mips/mips_fulong2e.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-> index 5040afd..23897d7 100644
-> --- a/hw/mips/mips_fulong2e.c
-> +++ b/hw/mips/mips_fulong2e.c
-> @@ -399,6 +399,7 @@ static void mips_fulong2e_machine_init(MachineClass *=
-mc)
->      mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("Loongson-2E");
->      mc->default_ram_size =3D 256 * MiB;
->      mc->default_ram_id =3D "fulong2e.ram";
-> +    mc->minimum_page_bits =3D 14;
->  }
->
->  DEFINE_MACHINE("fulong2e", mips_fulong2e_machine_init)
-> --
-> 2.7.0
->
+--Sig_/QY_q6TYpcDHvMVu7kDcSeMB
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl67rOUACgkQ3s9rk8bw
+L6+FxA//VydvDVgsY2Xc/4I6BhhDCEiK/DjMXltMbw1P0Tzkewoi+nhZqwD2e3Tj
+qwVP1G80LtqSTHDUYl7MLexWwQFWQ57AbU+JbalLAZzgdT5n4xJOji2c8ViZhw9t
+lNxtZafssxh8vyw3/UZlGwZcz72KcwBF3pzKM++ue7TqgGreDxVBvecqKDVetVEX
+LUCjlqjbzMw82SEFkfdqlFIRs6gYaH0QPfDAbvr6uME2NwNnvsgg2RkUEQnW25of
+Q9EQNSB4hJd/lv6SLBy6q0CouE7TEY70mKxG93N/mdRRL0PR88qMFZyZyuKSKRMN
+BEm/hiHqu0ti/ynheiKIzJk7l660g0qVKZBX21gH8nwPwxy99/bpEZyyHTNTx6mX
+2AJftzEmD3vFNiRcBaKPzt+eEbIzTKEkngBOx5lFcOZXjpyKoGsd+K+tHQNbl9LS
+LUgdD3eZwMCtg3FQBzVtpJLGQHfdjLjo47VdC3TSEJHK+EQ8ho7lgn0EJfYm9CWt
+YjbSnJnFU0jnbbEckrKa+ZXC3pc8lLEiX+gwyUVVaXSX+2vC2JMEmgJNBJCJNCNw
+9/LOi5l79XHE/063HnrbDw+FNpzaDlc2k60fT9x6rOeZrAsD9hc0Egn7NBffY0Ar
+89H2NrkTEymH0riT5iY3baeo4Ctz10ejl07YSS4xNbX9dSDDcrw=
+=FcdX
+-----END PGP SIGNATURE-----
+
+--Sig_/QY_q6TYpcDHvMVu7kDcSeMB--
+
 
