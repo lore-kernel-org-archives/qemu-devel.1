@@ -2,70 +2,92 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E53DAC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 19:35:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A083C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 19:36:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 872F020659
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 19:35:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 872F020659
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id D95F520659
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 19:36:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AvJuwuaq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D95F520659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYx9r-00075g-QO
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 15:35:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46460)
+	id 1jYxB6-00088V-5Q
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 15:36:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46500)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jYx99-0006HI-HY; Wed, 13 May 2020 15:34:27 -0400
-Resent-Date: Wed, 13 May 2020 15:34:27 -0400
-Resent-Message-Id: <E1jYx99-0006HI-HY@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21383)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jYx9W-0006om-JF
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 15:34:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33292
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jYx96-0001b6-Vi; Wed, 13 May 2020 15:34:27 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1589398451; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=mvkJCSNednbCiO/Pua78RE3X0BWQAuIDHbXzeaeINTHgiKY054HgL0pJmxzX0qTcGAUkhfYC4MIU2iiVRZolu8FTMbBYlkZzFaOtuvM0SjI4kUGIchCVW5pB2MA7t2F4oR+a6gBDyqUsiVtm3CPAPMfQIzEHY5/ZlzNhLa6zyvc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1589398451;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=zo0wZFSO9zdfWsdRoyhWzlexWLTETS5zVYS44F8Ir5k=; 
- b=V3s6jFp9p8LHJSs0ZM0B0uxfVm6Rjz8xKfsvnktYVs1YUlXMKilt1xc75n3dqf51tZDBsE5fvQabnWg5SSttl5/WjZHkjKB/rK17mT63r7E1FeMtxAA/rC7COI7+mzAyuIAy/3ERyH5DbNooh4377x1ePLbvdRWG+N7PWdooKbY=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1589398449738945.8910621867452;
- Wed, 13 May 2020 12:34:09 -0700 (PDT)
-Message-ID: <158939844798.13639.8458339451819308484@45ef0f9c86ae>
-In-Reply-To: <20200513144941.1469447-1-mreitz@redhat.com>
-Subject: Re: [RFC] migration: Add migrate-set-bitmap-node-mapping
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jYx9U-0001dI-SL
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 15:34:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589398487;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=Kev0EluC/vB1M89Gqno6mpH6Lo6Lkng/GKwXhpzecDM=;
+ b=AvJuwuaqt2SVxiVGoPPj56fVf4ecSwhfWy/ILz2W/KVz7kBl/S0+UYeLLrkk+aZI+M4t8I
+ tojcMbsFuOrHT2Ge+w8M+N/xTHl8eLl/rteBYsV4qfZIKTeeRzAjFqgd1P468jW5dosviH
+ xncHCB4VCqCi1EUBrITzYFFhyYY/Uno=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-141-pqsC7G97NmGWcBt0p91b8g-1; Wed, 13 May 2020 15:34:45 -0400
+X-MC-Unique: pqsC7G97NmGWcBt0p91b8g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9591C19067E5;
+ Wed, 13 May 2020 19:34:44 +0000 (UTC)
+Received: from kaapi (unknown [10.74.9.109])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5330275286;
+ Wed, 13 May 2020 19:34:36 +0000 (UTC)
+Date: Thu, 14 May 2020 01:04:33 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+X-X-Sender: pjp@kaapi
+To: "Ding, Ren" <rding@gatech.edu>, Alexander Bulekov <alxndr@bu.edu>
+Subject: Re: [PATCH 0/2] use unsigned type for MegasasState fields
+In-Reply-To: <1F5C89FF-377C-48F4-B873-B1E88274566B@gatech.edu>
+Message-ID: <nycvar.YSQ.7.76.2005140056040.1451610@xnncv>
+References: <20200507105718.1319187-1-ppandit@redhat.com>
+ <26201c24-c483-85a7-2f4b-b3cc56d4b8b7@redhat.com>
+ <nycvar.YSQ.7.76.2005122357030.1451610@xnncv>
+ <20200512190803.o6vr2shjmhsplsjx@mozz.bu.edu>
+ <20200512194759.nb42yurlnynr5yrw@mozz.bu.edu>
+ <nycvar.YSQ.7.76.2005131905010.1451610@xnncv>
+ <20200513142043.lfcamp5j43ke5md4@mozz.bu.edu>
+ <nycvar.YSQ.7.76.2005132016550.1451610@xnncv>
+ <1F5C89FF-377C-48F4-B873-B1E88274566B@gatech.edu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: mreitz@redhat.com
-Date: Wed, 13 May 2020 12:34:09 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 15:34:21
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/mixed;
+ boundary="-1463810047-864374864-1589398483=:1451610"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=ppandit@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 03:05:18
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -79,47 +101,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: vsementsov@virtuozzo.com, qemu-block@nongnu.org, quintela@redhat.com,
- armbru@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
- pkrempa@redhat.com, mreitz@redhat.com
+Cc: Fam Zheng <fam@euphon.net>,
+ =?ISO-8859-15?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@redhat.com>,
+ =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUxMzE0NDk0MS4xNDY5
-NDQ3LTEtbXJlaXR6QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBk
-b2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBj
-b21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFs
-bGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NS
-SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBO
-RVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBK
-PTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKL3RtcC9xZW11LXRlc3Qvc3Jj
-L3FhcGkvbWlncmF0aW9uLmpzb246MTYzNzogZG9jdW1lbnRhdGlvbiBjb21tZW50IGlzIGZvciAn
-TWlncmF0aW9uQmxvY2tOb2RlTWFwcGluZycKICBHRU4gICAgIGh3L2kzODYveGVuL3RyYWNlLmgK
-ICBHRU4gICAgIGh3L2lkZS90cmFjZS5oCm1ha2U6ICoqKiBbcWFwaS1nZW4tdGltZXN0YW1wXSBF
-cnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uClRyYWNlYmFj
-ayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIu
-cHkiLCBsaW5lIDY2NCwgaW4gPG1vZHVsZT4KLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJy
-b3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAn
-WydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0
-YW5jZS51dWlkPTRhZWI1NzgwMzgzYjQxYjM5MzZlYmQyODc2NzQ1ZTYwJywgJy11JywgJzEwMDMn
-LCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAn
-VEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScs
-ICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywg
-J0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcyLy5jYWNo
-ZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAv
-cGF0Y2hldy10ZXN0ZXItdG1wLXR4bXoxY2gxL3NyYy9kb2NrZXItc3JjLjIwMjAtMDUtMTMtMTUu
-MzIuMDYuMjczOTQ6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6Y2VudG9zNycsICcvdmFyL3Rt
-cC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVz
-IDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPTRhZWI1Nzgw
-MzgzYjQxYjM5MzZlYmQyODc2NzQ1ZTYwCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3Ig
-MQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1w
-LXR4bXoxY2gxL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zN10g
-RXJyb3IgMgoKcmVhbCAgICAybTIuNjkxcwp1c2VyICAgIDBtNy44NzZzCgoKVGhlIGZ1bGwgbG9n
-IGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDUxMzE0NDk0MS4x
-NDY5NDQ3LTEtbXJlaXR6QHJlZGhhdC5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/
-dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
-dyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
-dGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+---1463810047-864374864-1589398483=:1451610
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+
+  Hello Ren, Alex,
+
++-- On Wed, 13 May 2020, Ding, Ren wrote --+
+| We couldn’t reproduce the bug with the patch provided by our reproducer 
+| earlier, though we did not dig into the details of it. Meanwhile, we do also 
+| see the null pointer dereference crash with the current upstream 
+| (https://bugs.launchpad.net/qemu/+bug/1878259).
+
+* Yes, I was able to reproduce both OOB access and NULL dereference issues 
+  with Alex's reproducers.
+
+* I have sent revised patches v2 with you in CC. I've tested the patches, 
+  still please kindly confirm if they work for you OR if you see anything 
+  amiss.
+
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+---1463810047-864374864-1589398483=:1451610--
+
 
