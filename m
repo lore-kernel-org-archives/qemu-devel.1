@@ -2,161 +2,73 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DED1C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:25:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79400C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:32:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79CF1205ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:25:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 617C1205ED
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:32:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EZP++SJP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79CF1205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="00jzpV5M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 617C1205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ0kn-0007xl-Bs
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 19:25:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48932)
+	id 1jZ0rX-000201-Ar
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 19:32:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49424)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ0k7-0007F0-D2
- for qemu-devel@nongnu.org; Wed, 13 May 2020 19:24:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42535
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ0k5-0004vv-QO
- for qemu-devel@nongnu.org; Wed, 13 May 2020 19:24:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589412288;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=I+wVTYlW8tFngIaaC5TmP5Wddl9t+JACxrHp4p8NK/A=;
- b=EZP++SJP9upH14A14+7MDxkXonK0oryN8tyede+BAecSm5be9APRAhgtE2dmPsV322S68w
- cNntTvg5+dqN7cwPbfINEktjwyHPmNO1T+LaA6yq4HRNCPHkLniTzbnRo2DMkUajmZj/iM
- FwuOpWpfMCpao+ZPZTOLb3xOgUMHC+Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-15-KjuM4fZaMG-8aW_962Kj6g-1; Wed, 13 May 2020 19:24:42 -0400
-X-MC-Unique: KjuM4fZaMG-8aW_962Kj6g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0DC761005510;
- Wed, 13 May 2020 23:24:41 +0000 (UTC)
-Received: from [10.10.113.80] (ovpn-113-80.rdu2.redhat.com [10.10.113.80])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 98B22600DB;
- Wed, 13 May 2020 23:24:34 +0000 (UTC)
-Subject: Re: Assertion failure through vring_split_desc_read
-To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
-References: <20200511035124.v2ff4f5gyfh6xlgc@mozz.bu.edu>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <c4066d16-81ef-a052-a689-160bfc36baa3@redhat.com>
-Date: Wed, 13 May 2020 19:24:34 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <sstabellini@kernel.org>)
+ id 1jZ0qf-0001Z8-Jw
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 19:31:37 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60708)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <sstabellini@kernel.org>)
+ id 1jZ0qc-0005uj-UK
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 19:31:37 -0400
+Received: from localhost (c-67-164-102-47.hsd1.ca.comcast.net [67.164.102.47])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
+ bits)) (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 0543D205ED;
+ Wed, 13 May 2020 23:31:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1589412691;
+ bh=ar21ty5LSENLSjCiFBp2poJI4AR2+QysXgKL7s3wjcg=;
+ h=Date:From:To:cc:Subject:In-Reply-To:References:From;
+ b=00jzpV5M/YbyHa/ejfZuaMpsOYSt5oio1coqIsxNBMsLEkrvRdh7EZpsMKIOvXxlp
+ VNRfmd58PrBFH7Gam4f29Bo20Fhl/3p6J89fN41PC6axFZtmgh9bIRXj6xcBWrzv8i
+ nAqn4JzI/OJqohbh1/cwQE/OUvp5buE5cu30C26s=
+Date: Wed, 13 May 2020 16:31:30 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+X-X-Sender: sstabellini@sstabellini-ThinkPad-T480s
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH 2/2] 9pfs: fix init_in_iov_from_pdu truncating size
+In-Reply-To: <6359442.q4qrkmKcdg@silver>
+Message-ID: <alpine.DEB.2.21.2005131531400.26167@sstabellini-ThinkPad-T480s>
+References: <cover.1589132512.git.qemu_oss@crudebyte.com>
+ <3732481.xNstV0F5bx@silver>
+ <alpine.DEB.2.21.2005121602520.26167@sstabellini-ThinkPad-T480s>
+ <6359442.q4qrkmKcdg@silver>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-In-Reply-To: <20200511035124.v2ff4f5gyfh6xlgc@mozz.bu.edu>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jsnow@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 03:05:18
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=198.145.29.99;
+ envelope-from=sstabellini@kernel.org; helo=mail.kernel.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 19:31:31
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -70
+X-Spam_score: -7.1
+X-Spam_bar: -------
+X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_HI=-5, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -169,48 +81,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Anthony Perard <anthony.perard@citrix.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, Paul Durrant <paul@xen.org>,
+ qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 5/10/20 11:51 PM, Alexander Bulekov wrote:
-> Hello,
-> While fuzzing, I found an input that triggers an assertion failure
-> through virtio-rng -> vring_split_desc_read. Maybe this is related to:
-> Message-ID: <20200511033001.dzvtbdhl3oz5pgiy@mozz.bu.edu> 
-> Assertion failure through virtio_lduw_phys_cached
+On Wed, 13 May 2020, Christian Schoenebeck wrote:
+> On Mittwoch, 13. Mai 2020 01:24:16 CEST Stefano Stabellini wrote:
+> > Let me premise that this patch fixes an important bug, so I am not
+> > asking you to do any more work to get this patch committed right now :-)
 > 
-> #8 0x7fe6a9acf091 in __assert_fail /build/glibc-GwnBeO/glibc-2.30/assert/assert.c:101:3
-> #9 0x564cbe7d96fd in address_space_read_cached include/exec/memory.h:2423:5
-> #10 0x564cbe7e79c5 in vring_split_desc_read hw/virtio/virtio.c:236:5
-> #11 0x564cbe7e84ce in virtqueue_split_read_next_desc hw/virtio/virtio.c:929:5
-> #12 0x564cbe78f86b in virtqueue_split_get_avail_bytes hw/virtio/virtio.c:1009:18
-> #13 0x564cbe78ab22 in virtqueue_get_avail_bytes hw/virtio/virtio.c:1208:9
-> #14 0x564cc08aade1 in get_request_size hw/virtio/virtio-rng.c:40:5
-> #15 0x564cc08aa20b in virtio_rng_process hw/virtio/virtio-rng.c:115:12
-> #16 0x564cc08a8c48 in virtio_rng_set_status hw/virtio/virtio-rng.c:172:5
-> #17 0x564cbe7a50be in virtio_set_status hw/virtio/virtio.c:1876:9
-> #18 0x564cc08d1b8f in virtio_pci_common_write hw/virtio/virtio-pci.c:1245:9
+> Actually, I realized that this overall issue is much more delicate to handle 
+> than I thought. My patch would still miss other important things, like e.g. it 
+> does not roll back the read / readdir streaming positions of the respective 
+> FID on 9P server side. -> data loss / undefined behaviour on subsequent read / 
+> readdir
 > 
-> I can reproduce it in a qemu 5.0 build using these qtest commands:
-> https://paste.debian.net/plain/1146089
-> (not including them here, as some are quite long)
+> Also the 'count' parameter in the Rread response would need to be updated as 
+> well. -> undefined behaviour
 > 
-> wget https://paste.debian.net/plain/1146089 -O qtest-trace; ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -M pc-q35-5.0  -device virtio-rng-pci,addr=04.0 -display none -nodefaults -nographic -qtest stdio < qtest-trace
+> For these and other reasons already described, I start to think that it is 
+> actually not a good idea to truncate the response at all, at least not at that 
+> final transport stage (as my or your patch do).
 > 
-> Please let me know if I can provide any further info.
-> -Alex
+> Question: is there really no way to handle this overall issue exlusively on 
+> Xen side, i.e. delaying response delivery until large enough transport buffer 
+> would be available or acquiring on-demand the required buffer size? Or by 
+> looking ahead at msize in advance (see below)?
 > 
+> >From what I see now, I would recommend completely reverting response 
+> truncation on virtio transport side at least. Because so far I have not seen a 
+> single case with virtio where the transport buffer was too small for 
+> delivering any response. And as you can see, response truncation at late 
+> transport level opens all kinds of severe issues on other ends. It is not easy 
+> to do and requires a lot of code!
+> 
+> > But I think it would be good to test what would happen if the client did
+> > a read on a directory with hundreds of entries, such as a maildir
+> > directory. There has to be point where the number of directory entries
+> > is larger than the shared buffer. What happens then?
+> 
+> I'm talking about virtio only now: that scenario does not happen. When client 
+> opens a 9P session, client transmits 'msize' as parameter for the 9P sesssion 
+> which is the "maximum message size" ever to be assumed on both sides for  
+> client requests and server responses. By default msize is 4 kiB (4096 bytes) 
+> with Linux clients, and our server would immediately error out if any client 
+> tries to open a session with 'msize' < 4 kiB (for similar reasons discussed; 
+> because some 9P response types cannot be truncated at all):
+> 
+> https://github.com/qemu/qemu/commit/
+> e16453a31a00c1c0a199cab0617e8aa888f6419a#diff-f3e98ed0a65e27743b14785fa85b7d79
+> 
+> The Rread and Rreaddir responses are already truncated (in a sane and correct 
+> way) in 9p.c by server's request handler in case the response would exceed 
+> 'msize'. For that reason it is actually unexpected that transport would not be 
+> able to provide the required transport buffer size for any response.
+>
+> > I am guessing that we'll have to implement the "truncate at the
+> > boundaries of individual entries" to get it right in all cases.
+> > 
+> > Given that it doesn't look like truncation would work right with
+> > Rreaddir anyway today, I think it would be OK to fix it in a separate
+> > patch.
+> 
+> If there is really no way with Xen to ensure there's always a buffer size 
+> according to msize, 
 
-Do you have a writeup somewhere of how you are approaching fuzzing and
-how you've found this pile of bugs so far?
+Thank you for the long writeup. Let's see if we can come up with a
+good plan.
 
-Might make for a good blog post.
+The Xen transport
+(https://xenbits.xenproject.org/docs/4.13-testing/misc/9pfs.html) has a
+shared memory area with 64 pages, so 256KB. It is split in half: 128KB
+for requests and 128KB for responses. 
 
---js
+The original error message is the following:
 
+  xen be: 9pfs-0: xen be: 9pfs-0: Xen 9pfs request type 116 needs 126987 bytes, buffer has 126965
+  Xen 9pfs request type 116needs 126987 bytes, buffer has 126965
+
+and msize was set to 131072 in the Linux client.
+
+
+So transport_size == msize. However, there can be multiple requests and
+responses inflight at any given time. It means that even with
+transport_size=128KB and msize=4KB we could still have so many outstanding
+requests that the available memory is less then 4KB.
+
+I admit that with transport_size=128KB and msize=4KB it would be so
+unlikely to happen that it would be close to impossible to reproduce the
+error. But theoretically it is possible.
+
+If we can't come up with any better ideas, we could simply limit the
+msize in the Linux client to something like transport_size/2 or
+transport_size/4, but it doesn't feel right.
+
+
+> > I think we have to return here because the connection gets closed by
+> > xen_9pfs_disconnect. I wonder if we should return -EAGAIN like you
+> > suggested instead of calling xen_9pfs_disconnect() which is
+> > irrecoverable. But that could be done later in a separate patch.
+> 
+> Even -EAGAIN would require a bunch of code, since the precise error response 
+> type depends a) on the protocol dialect (9p2000.L vs. 9p2000.u) and b) even 
+> depending on the precise request type. For some 9P request types it is not 
+> even allowed to return an error response at all.
+> 
+> As you can see it all boils down to one thing: better look for a solution for 
+> Xen to deliver the required buffer size, or in worst case: yield the 
+> coroutine, i.e. delay delivery of response until that can be assured by Xen.
+
+That's might be the best option. But it would have to be
+xen_9pfs_init_in_iov_from_pdu to call qemu_coroutine_yield() in a loop?
+Like:
+
+
+diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+index 18fe5b7c92..ef1db47d0c 100644
+--- a/hw/9pfs/xen-9p-backend.c
++++ b/hw/9pfs/xen-9p-backend.c
+@@ -197,18 +197,13 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
+     g_free(ring->sg);
+ 
+     ring->sg = g_new0(struct iovec, 2);
+-    xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, *size);
+ 
++again:
++    xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, *size);
+     buf_size = iov_size(ring->sg, num);
+-    if (buf_size  < P9_IOHDRSZ) {
+-        xen_pv_printf(&xen_9pfs->xendev, 0, "Xen 9pfs request type %d"
+-                "needs %zu bytes, buffer has %zu, less than minimum\n",
+-                pdu->id, *size, buf_size);
+-        xen_be_set_state(&xen_9pfs->xendev, XenbusStateClosing);
+-        xen_9pfs_disconnect(&xen_9pfs->xendev);
+-    }
+     if (buf_size  < *size) {
+-        *size = buf_size;
++        qemu_coroutine_yield();
++        goto again;
+     }
+ 
+     *piov = ring->sg;
+
+
+How is the coroutine going to get scheduled again? Is it automatic or do
+we need to call it again explicitly when we get the next notification
+from the client, which should arrive as soon as the client finishes
+reading the responses?
 
