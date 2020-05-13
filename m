@@ -2,62 +2,65 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA5BFC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 20:57:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3678CC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 20:59:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8D272054F
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 20:57:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 31E012054F
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 20:59:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OOVSYE1N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8D272054F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cCnyZ7Zt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31E012054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYyRA-0002ES-MH
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 16:57:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56724)
+	id 1jYyTO-0003x6-6t
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 16:59:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57030)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jYyQQ-0001cG-DY
- for qemu-devel@nongnu.org; Wed, 13 May 2020 16:56:22 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57101
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jYySR-000385-2g
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 16:58:27 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54058
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jYyQO-00031w-FA
- for qemu-devel@nongnu.org; Wed, 13 May 2020 16:56:21 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jYySP-0003HZ-F9
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 16:58:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589403378;
+ s=mimecast20190719; t=1589403504;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=4LY88kRIS2IZvrGGyKTJZ1l2buJikK7m1BTzp7U6iqE=;
- b=OOVSYE1NaALGotCYEXw5j1WNn4Zxd1OvJjc2k9QA+FJFavTkVLZra+AlCAcVLYnJ2+sP/g
- ZYaeyiHDup984NWQYuVqeiTnIcnUvcSDgcr6mTSVzC6KgWyhGcwfVbAvdi0uD7WieFsdx2
- xndxkf2b6tfCaRv8ke7xu0w6mseEKZ0=
+ bh=8wLUdnFT09GDL04b6CqFzsLR99c0+umfo+U+BpFvMQk=;
+ b=cCnyZ7Zt9yrMejnT51f4kVtkjMEpEyw23Bx/JglKHTmE7ST9w2+e2WsEAkDH26/PA1q2vm
+ LgRMiGIxyXl4Qe24SjWrot0SWVds4/ZiNoMPzrujruxMBLUkQI3E/bfq2Pp3gT23NvWqvB
+ RL9vLDPyZcIqsRXwG9di4eSvq4MZ9dc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-381-FzA-2qzGOdSOGC2Go2dnWw-1; Wed, 13 May 2020 16:56:16 -0400
-X-MC-Unique: FzA-2qzGOdSOGC2Go2dnWw-1
+ us-mta-506-YZBuYDFdNvmjWrusuW7G8Q-1; Wed, 13 May 2020 16:58:19 -0400
+X-MC-Unique: YZBuYDFdNvmjWrusuW7G8Q-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A3EBA8735C4;
- Wed, 13 May 2020 20:56:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD9ED1009443;
+ Wed, 13 May 2020 20:58:17 +0000 (UTC)
 Received: from [10.10.113.80] (ovpn-113-80.rdu2.redhat.com [10.10.113.80])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1968E7D8F6;
- Wed, 13 May 2020 20:56:14 +0000 (UTC)
-Subject: Re: [PATCH 0/2] iotests: Run pylint and mypy in a testcase
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200511163529.349329-1-kwolf@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 92ADA6A94A;
+ Wed, 13 May 2020 20:58:13 +0000 (UTC)
+Subject: Re: [PATCH v4 1/6] scripts/qemugdb: Remove shebang header
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200512103238.7078-1-philmd@redhat.com>
+ <20200512103238.7078-2-philmd@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -133,22 +136,20 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <e7d938ba-1862-ee88-cc74-8a1f0ea17d1c@redhat.com>
-Date: Wed, 13 May 2020 16:56:14 -0400
+Message-ID: <2178978e-5d14-3a94-d65c-f4d849e153ba@redhat.com>
+Date: Wed, 13 May 2020 16:58:13 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200511163529.349329-1-kwolf@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200512103238.7078-2-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=jsnow@redhat.com;
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 04:17:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 01:56:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -168,34 +169,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org, kvm@vger.kernel.org,
+ qemu-trivial@nongnu.org, Marcelo Tosatti <mtosatti@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 5/11/20 12:35 PM, Kevin Wolf wrote:
-> Kevin Wolf (2):
->   iotests: Fix incomplete type declarations
->   iotests: Run pylint and mypy in a testcase
+On 5/12/20 6:32 AM, Philippe Mathieu-Daudé wrote:
+> From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > 
->  tests/qemu-iotests/iotests.py |  8 +++----
->  tests/qemu-iotests/297        | 44 +++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/297.out    |  3 +++
->  tests/qemu-iotests/group      |  1 +
->  4 files changed, 52 insertions(+), 4 deletions(-)
->  create mode 100755 tests/qemu-iotests/297
->  create mode 100644 tests/qemu-iotests/297.out
+> These scripts are loaded as plugin by GDB (and they don't
+> have any __main__ entry point). Remove the shebang header.
 > 
-
-Cool!
-
-Maybe the approach of putting this in 'make check' somewhere can
-alleviate that expensive test being performed in iotests directly (as
-Max notes), but, uhm. whatever.
-
-For now, this will help prevent the backslide.
+> Acked-by: Alex Bennée <alex.bennee@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org
+(The A-B should come below the S-O-B unless you do mean to indicate
+you've since made changes that AB didn't acknowledge, I think.)
 
 Reviewed-by: John Snow <jsnow@redhat.com>
 
