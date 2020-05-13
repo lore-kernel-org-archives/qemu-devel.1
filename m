@@ -2,94 +2,88 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B0C9C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 17:36:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7637FC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 17:38:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A45F205ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 17:36:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E571A205ED
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 17:38:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iIg+pXvH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A45F205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TqdhEPpB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E571A205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYvJC-0003JG-2a
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 13:36:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56766)
+	id 1jYvKd-0006Zl-Fm
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 13:38:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57914)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jYvEz-00054H-84
- for qemu-devel@nongnu.org; Wed, 13 May 2020 13:32:21 -0400
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:40594)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jYvEx-0007oU-Kq
- for qemu-devel@nongnu.org; Wed, 13 May 2020 13:32:20 -0400
-Received: by mail-wm1-x331.google.com with SMTP id u16so29456450wmc.5
- for <qemu-devel@nongnu.org>; Wed, 13 May 2020 10:32:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=qrjRWWkfvfrzIarb2T2Snq5Ul6a8M/IZ5P4/vErDudE=;
- b=iIg+pXvH64/b6g0op07SrkLfEluWAaLsSaclTIYgy+XKUDScoHaDCAAVcLMcBWVnST
- m51d63dN8zdv9qAx31OeB+cosfnxXD39U4W9kh5EED3UF3POprhDXBiL/K2wUNm/cwtt
- 1fhTjy+t2c4VahiTxqQFey0gPyo0RNzbP8zEnECI6w9Zerx8lkS7E+166iNWryPncy+C
- 5cOPnDDnrCSCrjUCKRdwidznxYNzL0EsGJZOUuZLT9xCDjlcvLR+2pllpk+iHehaFxWi
- pJBwi8DkaHYQzXAB7HjTQkYyzWjQUqNw8ZEgW/dAWHpsmzM4q0iKstwk3bZBz1ncaSz2
- 72cw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=qrjRWWkfvfrzIarb2T2Snq5Ul6a8M/IZ5P4/vErDudE=;
- b=BMtnD3GMFBIjDPz5egCP/omhrp0/BevABRRVdNyTVa8+yKRl/b9yLVwr700CdE2OLz
- na9LL8mqwgfi8gENmNMSWfwt686NqKQIcY/9FvNaTQd9jBuQsQf6QOL2D2O4p79xFnFu
- IxGRHg2A9lOZW+en9B61pQr8fBMK91xRxJ56b/RAJ77ZarXUqtwOA6E7z98V9VUA9vII
- XAc41rmL2hejQ0ttsLse4Usp3opR5rzTRIb+jDM0EufOTD58qn50giktEKyTSHDawr3d
- kl22ASDHecARfWf+4OWZ160hrvCjufCisL6nvmo5xbzE7y64kqXbI/jSAWB0jbEuNEyi
- DpXQ==
-X-Gm-Message-State: AOAM532f7zMCTaJqs3TFB/ldRjyCEERQigBJJhNxsBisHkoJ/gc3g1RA
- q11epBsp/QaaOl/of6+OT6bjVoSjwqY=
-X-Google-Smtp-Source: ABdhPJylWXRXYEg1N0mUEM9D0EkCb+IEL3ieTuKu6uEXvT40ieRdJ6ak/I+sMm1JacepSRrP0SLfSg==
-X-Received: by 2002:a7b:c385:: with SMTP id s5mr9698483wmj.189.1589391138051; 
- Wed, 13 May 2020 10:32:18 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 1sm37544937wmi.0.2020.05.13.10.32.11
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 13 May 2020 10:32:16 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 9F04B1FF96;
- Wed, 13 May 2020 18:32:01 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v1 8/8] plugins: new lockstep plugin for debugging TCG changes
-Date: Wed, 13 May 2020 18:32:00 +0100
-Message-Id: <20200513173200.11830-9-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200513173200.11830-1-alex.bennee@linaro.org>
-References: <20200513173200.11830-1-alex.bennee@linaro.org>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jYvJD-0003jt-Fb
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 13:36:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47323
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jYvJC-0000Hj-1B
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 13:36:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589391400;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=29xR7eSFsft47+HmIv3IYFkHCr2E5RuYKsnBau8upZ8=;
+ b=TqdhEPpBWUc9FiK62why9PS8OrX1G6Gds3bG20kPJQjVcXOIWAdljoJJt5ZAA3kkMaUP3f
+ 63V4+nPLX6ZZuVXTi3eIfNg340OeOdACrYy0vB+6ZnpPVAxFJVHENNutp1ch68b9qWUkzW
+ 5n9Pso/H6ehtNWBLShZyTYE+jNBYt5Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-385-4EWYO0XuOcujTMossIegkw-1; Wed, 13 May 2020 13:36:28 -0400
+X-MC-Unique: 4EWYO0XuOcujTMossIegkw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7D5C1902EA0;
+ Wed, 13 May 2020 17:36:26 +0000 (UTC)
+Received: from [10.3.116.145] (ovpn-116-145.phx2.redhat.com [10.3.116.145])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5C6B438D;
+ Wed, 13 May 2020 17:36:26 +0000 (UTC)
+Subject: Re: [PATCH v4 04/34] block: Add BdrvChildRole and BdrvChildRoleBits
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200513110544.176672-1-mreitz@redhat.com>
+ <20200513110544.176672-5-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <ac5c9ffc-2399-7b0c-0aaf-accf6c0d377a@redhat.com>
+Date: Wed, 13 May 2020 12:36:25 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::331;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x331.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20200513110544.176672-5-mreitz@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 03:05:18
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,435 +97,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When we make changes to the TCG we sometimes cause regressions that
-are deep into the execution cycle of the guest. Debugging this often
-requires comparing large volumes of trace information to figure out
-where behaviour has diverged.
+On 5/13/20 6:05 AM, Max Reitz wrote:
+> This mask will supplement BdrvChildClass when it comes to what role (or
+> combination of roles) a child takes for its parent.  It consists of
+> BdrvChildRoleBits values (which is an enum).
+> 
+> Because empty enums are not allowed, let us just start with it filled.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>   include/block/block.h | 56 +++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 56 insertions(+)
+> 
+> diff --git a/include/block/block.h b/include/block/block.h
+> index bc42e507bb..86cffa9ffd 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -268,6 +268,62 @@ enum {
+>       DEFAULT_PERM_UNCHANGED      = BLK_PERM_ALL & ~DEFAULT_PERM_PASSTHROUGH,
+>   };
+>   
+> +/*
+> + * Flags parent nodes give for the child nodes to specify what kind of
+> + * role(s) they take.
 
-The lockstep plugin utilises a shared socket so two QEMU's running
-with the plugin will write their current execution position and wait
-to receive the position of their partner process. When execution
-diverges the plugins output where they were and the previous few
-blocks before unloading themselves and letting execution continue.
+Reads a bit awkwardly. Maybe:
 
-Originally I planned for this to be most useful with -icount but it
-turns out you can get divergence pretty quickly due to asynchronous
-qemu_cpu_kick_rr_cpus() events causing one side to eventually run into
-a short block a few cycles before the other side. For this reason I've
-added a bit of tracking and I think the divergence reporting could be
-finessed to report only if we really start to diverge in execution.
+Flags that parent nodes assign to child nodes to specify what kind of 
+role(s) they take.
 
-An example run would be:
+Touching up grammar doesn't affect code correctness, so:
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-  qemu-system-sparc -monitor none -parallel none -net none \
-    -M SS-20 -m 256 -kernel day11/zImage.elf \
-    -plugin ./tests/plugin/liblockstep.so,arg=lockstep-sparc.sock \
-    -d plugin,nochain
-
-with an identical command in another window in the same working
-directory.
-
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-Id: <20200429200754.18327-1-alex.bennee@linaro.org>
-
----
-v3
-  - added verbose flag
-  - basic heuristics to detect "real" divergence
----
- tests/plugin/lockstep.c   | 345 ++++++++++++++++++++++++++++++++++++++
- tests/plugin/Makefile     |   1 +
- tests/tcg/Makefile.target |   2 +-
- 3 files changed, 347 insertions(+), 1 deletion(-)
- create mode 100644 tests/plugin/lockstep.c
-
-diff --git a/tests/plugin/lockstep.c b/tests/plugin/lockstep.c
-new file mode 100644
-index 00000000000..4d1a5c3264e
---- /dev/null
-+++ b/tests/plugin/lockstep.c
-@@ -0,0 +1,345 @@
-+/*
-+ * Lockstep Execution Plugin
-+ *
-+ * Allows you to execute two QEMU instances in lockstep and report
-+ * when their execution diverges. This is mainly useful for developers
-+ * who want to see where a change to TCG code generation has
-+ * introduced a subtle and hard to find bug.
-+ *
-+ * Caveats:
-+ *   - single-threaded linux-user apps only with non-deterministic syscalls
-+ *   - no MTTCG enabled system emulation (icount may help)
-+ *
-+ * While icount makes things more deterministic it doesn't mean a
-+ * particular run may execute the exact same sequence of blocks. An
-+ * asynchronous event (for example X11 graphics update) may cause a
-+ * block to end early and a new partial block to start. This means
-+ * serial only test cases are a better bet. -d nochain may also help.
-+ *
-+ * This code is not thread safe!
-+ *
-+ * Copyright (c) 2020 Linaro Ltd
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#include <glib.h>
-+#include <inttypes.h>
-+#include <unistd.h>
-+#include <sys/socket.h>
-+#include <sys/un.h>
-+#include <stdio.h>
-+#include <errno.h>
-+
-+#include <qemu-plugin.h>
-+
-+QEMU_PLUGIN_EXPORT int qemu_plugin_version = QEMU_PLUGIN_VERSION;
-+
-+/* saved so we can uninstall later */
-+static qemu_plugin_id_t our_id;
-+
-+static unsigned long bb_count;
-+static unsigned long insn_count;
-+
-+/* Information about a translated block */
-+typedef struct {
-+    uint64_t pc;
-+    uint64_t insns;
-+} BlockInfo;
-+
-+/* Information about an execution state in the log */
-+typedef struct {
-+    BlockInfo *block;
-+    unsigned long insn_count;
-+    unsigned long block_count;
-+} ExecInfo;
-+
-+/* The execution state we compare */
-+typedef struct {
-+    uint64_t pc;
-+    unsigned long insn_count;
-+} ExecState;
-+
-+typedef struct {
-+    GSList *log_pos;
-+    int distance;
-+} DivergeState;
-+
-+/* list of translated block info */
-+static GSList *blocks;
-+
-+/* execution log and points of divergence */
-+static GSList *log, *divergence_log;
-+
-+static int socket_fd;
-+static char *path_to_unlink;
-+
-+static bool verbose;
-+
-+static void plugin_cleanup(qemu_plugin_id_t id)
-+{
-+    /* Free our block data */
-+    g_slist_free_full(blocks, &g_free);
-+    g_slist_free_full(log, &g_free);
-+    g_slist_free(divergence_log);
-+
-+    close(socket_fd);
-+    if (path_to_unlink) {
-+        unlink(path_to_unlink);
-+    }
-+}
-+
-+static void plugin_exit(qemu_plugin_id_t id, void *p)
-+{
-+    g_autoptr(GString) out = g_string_new("No divergence :-)\n");
-+    g_string_append_printf(out, "Executed %ld/%d blocks\n",
-+                           bb_count, g_slist_length(log));
-+    g_string_append_printf(out, "Executed ~%ld instructions\n", insn_count);
-+    qemu_plugin_outs(out->str);
-+
-+    plugin_cleanup(id);
-+}
-+
-+static inline const char * ord_ind(int n) {
-+    return  n > 3 ? "th" :
-+        n == 3 ? "rd" :
-+        n == 2 ? "nd" : "st";
-+}
-+
-+static void report_divergance(ExecState *us, ExecState *them)
-+{
-+    DivergeState divrec = { log, 0 };
-+    g_autoptr(GString) out = g_string_new("");
-+    bool diverged = false;
-+
-+    /*
-+     * If we have diverged before did we get back on track or are we
-+     * totally loosing it?
-+     */
-+    if (divergence_log) {
-+        DivergeState *last = (DivergeState *) divergence_log->data;
-+        GSList *entry;
-+
-+        for (entry = log; g_slist_next(entry); entry = g_slist_next(entry)) {
-+            if (entry == last->log_pos) {
-+                break;
-+            }
-+            divrec.distance++;
-+        }
-+
-+        /*
-+         * If the last two records are so close it is likely we will
-+         * not recover synchronisation with the other end.
-+         */
-+        if (divrec.distance == 1 && last->distance == 1) {
-+            diverged = true;
-+        }
-+    }
-+    divergence_log = g_slist_prepend(divergence_log,
-+                                     g_memdup(&divrec, sizeof(divrec)));
-+
-+    /* Output short log entry of going out of sync... */
-+    if (verbose || divrec.distance == 1 || diverged) {
-+        g_string_printf(out, "@ %#016lx vs %#016lx (%d/%d since last)\n",
-+                        us->pc, them->pc, g_slist_length(divergence_log),
-+                        divrec.distance);
-+        qemu_plugin_outs(out->str);
-+    }
-+
-+    if (diverged) {
-+        int i;
-+        GSList *entry;
-+
-+        g_string_printf(out, "Δ insn_count @ %#016lx (%ld) vs %#016lx (%ld)\n",
-+                        us->pc, us->insn_count, them->pc, them->insn_count);
-+
-+        for (entry = log, i = 0;
-+             g_slist_next(entry) && i < 5;
-+             entry = g_slist_next(entry), i++) {
-+            ExecInfo *prev = (ExecInfo *) entry->data;
-+            g_string_append_printf(out, "  previously @ %#016lx/%ld (%ld insns)\n",
-+                                   prev->block->pc, prev->block->insns,
-+                                   prev->insn_count);
-+        }
-+        qemu_plugin_outs(out->str);
-+        qemu_plugin_outs("too much divergence... giving up.");
-+        qemu_plugin_uninstall(our_id, plugin_cleanup);
-+    }
-+}
-+
-+static void vcpu_tb_exec(unsigned int cpu_index, void *udata)
-+{
-+    BlockInfo *bi = (BlockInfo *) udata;
-+    ExecState us, them;
-+    ssize_t bytes;
-+    ExecInfo *exec;
-+
-+    us.pc = bi->pc;
-+    us.insn_count = insn_count;
-+
-+    /*
-+     * Write our current position to the other end. If we fail the
-+     * other end has probably died and we should shut down gracefully.
-+     */
-+    bytes = write(socket_fd, &us, sizeof(ExecState));
-+    if (bytes < sizeof(ExecState)) {
-+        qemu_plugin_outs(bytes < 0 ?
-+                         "problem writing to socket" :
-+                         "wrote less than expected to socket");
-+        qemu_plugin_uninstall(our_id, plugin_cleanup);
-+        return;
-+    }
-+
-+    /*
-+     * Now read where our peer has reached. Again a failure probably
-+     * indicates the other end died and we should close down cleanly.
-+     */
-+    bytes = read(socket_fd, &them, sizeof(ExecState));
-+    if (bytes < sizeof(ExecState)) {
-+        qemu_plugin_outs(bytes < 0 ?
-+                         "problem reading from socket" :
-+                         "read less than expected");
-+        qemu_plugin_uninstall(our_id, plugin_cleanup);
-+        return;
-+    }
-+
-+    /*
-+     * Compare and report if we have diverged.
-+     */
-+    if (us.pc != them.pc) {
-+        report_divergance(&us, &them);
-+    }
-+
-+    /*
-+     * Assume this block will execute fully and record it
-+     * in the execution log.
-+     */
-+    insn_count += bi->insns;
-+    bb_count++;
-+    exec = g_new0(ExecInfo, 1);
-+    exec->block = bi;
-+    exec->insn_count = insn_count;
-+    exec->block_count = bb_count;
-+    log = g_slist_prepend(log, exec);
-+}
-+
-+static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
-+{
-+    BlockInfo *bi = g_new0(BlockInfo, 1);
-+    bi->pc = qemu_plugin_tb_vaddr(tb);
-+    bi->insns = qemu_plugin_tb_n_insns(tb);
-+
-+    // save a reference so we can free later
-+    blocks = g_slist_prepend(blocks, bi);
-+    qemu_plugin_register_vcpu_tb_exec_cb(tb, vcpu_tb_exec,
-+                                         QEMU_PLUGIN_CB_NO_REGS, (void *)bi);
-+}
-+
-+
-+/*
-+ * Instead of encoding master/slave status into what is essentially
-+ * two peers we shall just take the simple approach of checking for
-+ * the existence of the pipe and assuming if it's not there we are the
-+ * first process.
-+ */
-+static bool setup_socket(const char *path)
-+{
-+    struct sockaddr_un sockaddr;
-+    int fd;
-+
-+    fd = socket(AF_UNIX, SOCK_STREAM, 0);
-+    if (fd < 0) {
-+        perror("create socket");
-+        return false;
-+    }
-+
-+    sockaddr.sun_family = AF_UNIX;
-+    g_strlcpy(sockaddr.sun_path, path, sizeof(sockaddr.sun_path) - 1);
-+    if (bind(fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) < 0) {
-+        perror("bind socket");
-+        close(fd);
-+        return false;
-+    }
-+
-+    /* remember to clean-up */
-+    path_to_unlink = g_strdup(path);
-+
-+    if (listen(fd, 1) < 0) {
-+        perror("listen socket");
-+        close(fd);
-+        return false;
-+    }
-+
-+    socket_fd = accept(fd, NULL, NULL);
-+    if (socket_fd < 0 && errno != EINTR) {
-+        perror("accept socket");
-+        return false;
-+    }
-+
-+    qemu_plugin_outs("setup_socket::ready\n");
-+
-+    return true;
-+}
-+
-+static bool connect_socket(const char *path)
-+{
-+    int fd;
-+    struct sockaddr_un sockaddr;
-+
-+    fd = socket(AF_UNIX, SOCK_STREAM, 0);
-+    if (fd < 0) {
-+        perror("create socket");
-+        return false;
-+    }
-+
-+    sockaddr.sun_family = AF_UNIX;
-+    g_strlcpy(sockaddr.sun_path, path, sizeof(sockaddr.sun_path) - 1);
-+
-+    if (connect(fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) < 0) {
-+        perror("failed to connect");
-+        return false;
-+    }
-+
-+    qemu_plugin_outs("connect_socket::ready\n");
-+
-+    socket_fd = fd;
-+    return true;
-+}
-+
-+static bool setup_unix_socket(const char *path)
-+{
-+    if (g_file_test(path, G_FILE_TEST_EXISTS)) {
-+        return connect_socket(path);
-+    } else {
-+        return setup_socket(path);
-+    }
-+}
-+
-+
-+QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id,
-+                                           const qemu_info_t *info,
-+                                           int argc, char **argv)
-+{
-+    int i;
-+
-+    if (!argc || !argv[0]) {
-+        qemu_plugin_outs("Need a socket path to talk to other instance.");
-+        return -1;
-+    }
-+
-+    for (i = 0; i < argc; i++) {
-+        char *p = argv[i];
-+        if (strcmp(p, "verbose") == 0) {
-+            verbose = true;
-+        } else if (!setup_unix_socket(argv[0])) {
-+            qemu_plugin_outs("Failed to setup socket for communications.");
-+            return -1;
-+        }
-+    }
-+
-+    our_id = id;
-+
-+    qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
-+    qemu_plugin_register_atexit_cb(id, plugin_exit, NULL);
-+    return 0;
-+}
-diff --git a/tests/plugin/Makefile b/tests/plugin/Makefile
-index 75467b6db85..b3250e2504c 100644
---- a/tests/plugin/Makefile
-+++ b/tests/plugin/Makefile
-@@ -13,6 +13,7 @@ NAMES += mem
- NAMES += hotblocks
- NAMES += howvec
- NAMES += hotpages
-+NAMES += lockstep
- 
- SONAMES := $(addsuffix .so,$(addprefix lib,$(NAMES)))
- 
-diff --git a/tests/tcg/Makefile.target b/tests/tcg/Makefile.target
-index b3cff3cad1a..075daf3d22d 100644
---- a/tests/tcg/Makefile.target
-+++ b/tests/tcg/Makefile.target
-@@ -128,7 +128,7 @@ RUN_TESTS=$(patsubst %,run-%, $(TESTS))
- ifeq ($(CONFIG_PLUGIN),y)
- PLUGIN_DIR=../../plugin
- VPATH+=$(PLUGIN_DIR)
--PLUGINS=$(notdir $(wildcard $(PLUGIN_DIR)/*.so))
-+PLUGINS=$(filter-out liblockstep.so,$(notdir $(wildcard $(PLUGIN_DIR)/*.so)))
- 
- # We need to ensure expand the run-plugin-TEST-with-PLUGIN
- # pre-requistes manually here as we can't use stems to handle it. We
 -- 
-2.20.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
