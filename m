@@ -2,71 +2,71 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 944D0C433E5
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:34:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B9DAC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:49:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 947B2205ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:34:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="PhRAfSxq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 947B2205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTPS id 575D020575
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 23:49:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 575D020575
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codesourcery.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ0tH-0003pR-Io
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 19:34:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49658)
+	id 1jZ182-0007o6-72
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 19:49:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50896)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sstabellini@kernel.org>)
- id 1jZ0sl-0003J0-6T
- for qemu-devel@nongnu.org; Wed, 13 May 2020 19:33:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:32954)
+ (Exim 4.90_1) (envelope-from <joseph_myers@mentor.com>)
+ id 1jZ177-00073H-97
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 19:48:37 -0400
+Received: from esa4.mentor.iphmx.com ([68.232.137.252]:33443)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sstabellini@kernel.org>)
- id 1jZ0sk-0006E1-9w
- for qemu-devel@nongnu.org; Wed, 13 May 2020 19:33:46 -0400
-Received: from localhost (c-67-164-102-47.hsd1.ca.comcast.net [67.164.102.47])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
- bits)) (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id F35BB205ED;
- Wed, 13 May 2020 23:33:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1589412825;
- bh=TcJ3zY0gPufgFjam3YpGCUkqpNC2j+10Ko2ZjTOb6gs=;
- h=Date:From:To:cc:Subject:In-Reply-To:References:From;
- b=PhRAfSxqRy9oT4YlpFdFx5y8P3uhDFE45miKpr200BZ0PqDkEMdThs01c1dQ5j0uU
- 883M+Pc9XAAq2iOs/Z8VKXLBuINna2SmUU04V++4dmWtQ+qICNAnoWXarlDDL4KUpk
- IKjwJVo6mzs7iF68V9dQcZX0MkypG07jPAM/N7Ho=
-Date: Wed, 13 May 2020 16:33:44 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-X-X-Sender: sstabellini@sstabellini-ThinkPad-T480s
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH 0/2] 9pfs: regression init_in_iov_from_pdu truncating size
-In-Reply-To: <20200514010713.492e0c82@bahia.lan>
-Message-ID: <alpine.DEB.2.21.2005131633150.26167@sstabellini-ThinkPad-T480s>
-References: <cover.1589132512.git.qemu_oss@crudebyte.com>
- <20200512113823.3c292c27@bahia.lan> <20200514010713.492e0c82@bahia.lan>
+ (Exim 4.90_1) (envelope-from <joseph_myers@mentor.com>)
+ id 1jZ174-0001XY-R7
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 19:48:36 -0400
+IronPort-SDR: tAHN9PLLLLDqA296LNHzl1IX8fYEFXh0KqZVsvX6q1S6y8Fj/97IWii8oGJkidiDG9SO4XPjZ1
+ bM9VvtRA+uigW4eT/sioqx3XmX4wPWM6i/0jtEkvXwY79E+Gyzz0lRR+5QwrcbwOkgL0wOh5ee
+ XrbihtuHTZS1QM93N2NZI2a26bU65yPEnF9itoDP2ugaZJhxkJz5KS1z3+6jHchw+I5M+cP+d5
+ VaOGsfiAf95ppWIi6B1YMgqhxGdKbr8+2HBStr+cf2qEKWXHrPqEgnlE+yT9uruuYRujmR9lNg
+ 8Vc=
+X-IronPort-AV: E=Sophos;i="5.73,389,1583222400"; d="scan'208";a="48881433"
+Received: from orw-gwy-01-in.mentorg.com ([192.94.38.165])
+ by esa4.mentor.iphmx.com with ESMTP; 13 May 2020 15:48:30 -0800
+IronPort-SDR: 5K25mymgb8RBecWCKebYrqhGB5C4vGfguDh5mOetzjigPcAGcq24sPWnJCJ/u5gbH/dPbL4INv
+ HLEyJYTWMD3F2WHk0ULZZpERj0AVIBhdsNfgD3LXycJs7exG7EJmSyjXhAyopZMfUyhVMLYjeY
+ vtOzUqOulXW30JvZfCyTl6AySY6L/ZDfWWNP91pTIWaWP2UIjxUg1zamUF8ezMKxqPu+QRVo2S
+ WOGb4La/Tx2RJlzXnr11AP98ZdvUwGls3GwT9NGG/f+G/y5JpGSz08MLzVAYsCf1Mbm+F+Z+vM
+ C5w=
+Date: Wed, 13 May 2020 23:48:24 +0000
+From: Joseph Myers <joseph@codesourcery.com>
+X-X-Sender: jsm28@digraph.polyomino.org.uk
+To: <qemu-devel@nongnu.org>, <pbonzini@redhat.com>, <rth@twiddle.net>,
+ <ehabkost@redhat.com>
+Subject: [PATCH 0/4] target/i386: miscellaneous x87 fixes
+Message-ID: <alpine.DEB.2.21.2005132345100.11687@digraph.polyomino.org.uk>
 User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=198.145.29.99;
- envelope-from=sstabellini@kernel.org; helo=mail.kernel.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 19:31:31
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -70
-X-Spam_score: -7.1
-X-Spam_bar: -------
-X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="US-ASCII"
+X-Originating-IP: [137.202.0.90]
+X-ClientProxiedBy: svr-ies-mbx-06.mgc.mentorg.com (139.181.222.6) To
+ svr-ies-mbx-01.mgc.mentorg.com (139.181.222.1)
+Received-SPF: pass client-ip=68.232.137.252;
+ envelope-from=joseph_myers@mentor.com; helo=esa4.mentor.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 19:48:30
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -39
+X-Spam_score: -4.0
+X-Spam_bar: ----
+X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,46 +79,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Anthony Perard <anthony.perard@citrix.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org,
- Paul Durrant <paul@xen.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 14 May 2020, Greg Kurz wrote:
-> On Tue, 12 May 2020 11:38:23 +0200
-> Greg Kurz <groug@kaod.org> wrote:
-> 
-> > On Sun, 10 May 2020 19:41:52 +0200
-> > Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-> > 
-> > > Stefano, looks like your original patch needs some more fine tuning:
-> > > 
-> > > https://bugs.launchpad.net/bugs/1877688
-> > > 
-> > > Please check if the assumptions I made about Xen are correct, and please
-> > > also test whether these changes still work for you with Xen as intended by
-> > > you.
-> > > 
-> > > Christian Schoenebeck (2):
-> > >   xen-9pfs: Fix log messages of reply errors
-> > >   9pfs: fix init_in_iov_from_pdu truncating size
-> > > 
-> > >  hw/9pfs/virtio-9p-device.c | 35 ++++++++++++++++++++++++--------
-> > >  hw/9pfs/xen-9p-backend.c   | 41 ++++++++++++++++++++++++++++----------
-> > >  2 files changed, 58 insertions(+), 18 deletions(-)
-> > > 
-> > 
-> > Sorry, I'm off this week, not sure I'll have time to review.
-> > So I've only applied patch 1 for now and I'll let Stefano
-> > and you sort out what should be done for patch 2.
-> > 
-> 
-> IIUC this requires more thinking and may end up in a complete rewrite of
-> the truncating logic. I intend to send a PR soon : is it worth keeping
-> patch 1 anyway ? 
+Following my previous patch series
+<https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg00781.html>
+and
+<https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg01465.html>
+for problems found in the x87 floating-point emulation, this patch
+series fixes further miscellaneous bugs in that emulation.
 
-Patch 1 is fine. For patch 2 we might need a little more time.
+There are further problems with x87 emulation that I am aware of and
+intend to address in future patch series.  Those other problems, not
+addressed by the first three patch series, generally relate to
+exceptions, flag setting and those instructions for which the
+emulation currently converts to host double (so losing range and
+precision) and then works on host double for the rest of the emulation
+process before converting back to floatx80 at the end.  Thus, the same
+comments as for the previous patch series apply about this patch
+series not fixing missing propagation of exceptions even when it adds
+code to set exceptions in the softfloat state.
+
+Joseph Myers (4):
+  target/i386: fix floating-point load-constant rounding
+  target/i386: fix fxam handling of invalid encodings
+  target/i386: fix fbstp handling of negative zero
+  target/i386: fix fbstp handling of out-of-range values
+
+ target/i386/fpu_helper.c          |  73 +++++++++--
+ tests/tcg/i386/test-i386-fbstp.c  | 140 +++++++++++++++++++++
+ tests/tcg/i386/test-i386-fldcst.c | 199 ++++++++++++++++++++++++++++++
+ tests/tcg/i386/test-i386-fxam.c   | 143 +++++++++++++++++++++
+ 4 files changed, 547 insertions(+), 8 deletions(-)
+ create mode 100644 tests/tcg/i386/test-i386-fbstp.c
+ create mode 100644 tests/tcg/i386/test-i386-fldcst.c
+ create mode 100644 tests/tcg/i386/test-i386-fxam.c
+
+-- 
+2.17.1
+
+
+-- 
+Joseph S. Myers
+joseph@codesourcery.com
 
