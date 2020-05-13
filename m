@@ -2,43 +2,42 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7B5EC2D0FA
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 09:56:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAA55C2D0F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 09:57:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B112A20575
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 09:56:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B112A20575
+	by mail.kernel.org (Postfix) with ESMTPS id 83FFC205ED
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 09:57:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83FFC205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYo8A-0000ka-RB
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 05:56:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44646)
+	id 1jYo98-0002k4-Ns
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 05:57:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44648)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYo2i-0005zw-VA; Wed, 13 May 2020 05:51:12 -0400
-Received: from relay.sw.ru ([185.231.240.75]:53992)
+ id 1jYo2j-00061J-FV; Wed, 13 May 2020 05:51:13 -0400
+Received: from relay.sw.ru ([185.231.240.75]:54002)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYo2f-0003Z9-8M; Wed, 13 May 2020 05:51:12 -0400
+ id 1jYo2f-0003ZA-7F; Wed, 13 May 2020 05:51:13 -0400
 Received: from dhcp-172-16-25-136.sw.ru ([172.16.25.136] helo=localhost.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jYo2V-0001e4-SO; Wed, 13 May 2020 12:50:59 +0300
+ id 1jYo2W-0001e4-0k; Wed, 13 May 2020 12:51:00 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v5 07/15] commit: Deal with filters when blocking intermediate
- nodes
-Date: Wed, 13 May 2020 12:50:48 +0300
-Message-Id: <1589363456-1035571-8-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v5 09/15] block: prepare block-stream for using COR-filter
+Date: Wed, 13 May 2020 12:50:50 +0300
+Message-Id: <1589363456-1035571-10-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1589363456-1035571-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1589363456-1035571-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -71,140 +70,80 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Max Reitz <mreitz@redhat.com>
+This patch is the first one in the series where the COR-filter node
+will be hard-coded for using in the block-stream job. The block jobs
+may be run in parallel. Exclude conflicts with filter nodes used for
+a concurrent job while checking for the blocked operations. It incurs
+changes in the iotests 030::test_overlapping_4 that now passes with no
+conflict because the stream job does not have a real dependency on its
+base and on a filter above it.
 
-This includes some permission limiting (for example, we only need to
-take the RESIZE permission if the base is smaller than the top).
-
-Signed-off-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- block/commit.c | 75 ++++++++++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 60 insertions(+), 15 deletions(-)
+ blockdev.c             | 11 +++++++++--
+ tests/qemu-iotests/030 |  9 ++++-----
+ 2 files changed, 13 insertions(+), 7 deletions(-)
 
-diff --git a/block/commit.c b/block/commit.c
-index e1f45a4..4df145d 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -37,6 +37,7 @@ typedef struct CommitBlockJob {
-     BlockBackend *top;
-     BlockBackend *base;
-     BlockDriverState *base_bs;
-+    BlockDriverState *above_base;
-     BlockdevOnError on_error;
-     bool base_read_only;
-     bool chain_frozen;
-@@ -153,7 +154,7 @@ static int coroutine_fn commit_run(Job *job, Error **errp)
-             break;
-         }
-         /* Copy if allocated above the base */
--        ret = bdrv_is_allocated_above(blk_bs(s->top), blk_bs(s->base), false,
-+        ret = bdrv_is_allocated_above(blk_bs(s->top), s->above_base, true,
-                                       offset, COMMIT_BUFFER_SIZE, &n);
-         copy = (ret == 1);
-         trace_commit_one_iteration(s, offset, n, ret);
-@@ -253,15 +254,35 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-     CommitBlockJob *s;
-     BlockDriverState *iter;
-     BlockDriverState *commit_top_bs = NULL;
-+    BlockDriverState *filtered_base;
+diff --git a/blockdev.c b/blockdev.c
+index b3c840e..97c2ba2 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -2763,6 +2763,7 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
      Error *local_err = NULL;
-+    int64_t base_size, top_size;
-+    uint64_t perms, iter_shared_perms;
-     int ret;
+     const char *base_name = NULL;
+     int job_flags = JOB_DEFAULT;
++    BlockDriverState *bottom_cow_node;
  
-     assert(top != bs);
--    if (top == base) {
-+    if (bdrv_skip_rw_filters(top) == bdrv_skip_rw_filters(base)) {
-         error_setg(errp, "Invalid files for merge: top and base are the same");
-         return;
+     if (!has_on_error) {
+         on_error = BLOCKDEV_ON_ERROR_REPORT;
+@@ -2807,8 +2808,14 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
+         base_name = base_bs->filename;
      }
  
-+    base_size = bdrv_getlength(base);
-+    if (base_size < 0) {
-+        error_setg_errno(errp, -base_size, "Could not inquire base image size");
-+        return;
+-    /* Check for op blockers in the whole chain between bs and base */
+-    for (iter = bs; iter && iter != base_bs; iter = backing_bs(iter)) {
++    bottom_cow_node = bdrv_find_overlay(bs, base_bs);
++    if (!bottom_cow_node) {
++        error_setg(errp, "bottom node is not found, nothing to stream");
++        goto out;
 +    }
-+
-+    top_size = bdrv_getlength(top);
-+    if (top_size < 0) {
-+        error_setg_errno(errp, -top_size, "Could not inquire top image size");
-+        return;
-+    }
-+
-+    perms = BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE;
-+    if (base_size < top_size) {
-+        perms |= BLK_PERM_RESIZE;
-+    }
-+
-     s = block_job_create(job_id, &commit_job_driver, NULL, bs, 0, BLK_PERM_ALL,
-                          speed, creation_flags, NULL, NULL, errp);
-     if (!s) {
-@@ -301,17 +322,43 @@ void commit_start(const char *job_id, BlockDriverState *bs,
- 
-     s->commit_top_bs = commit_top_bs;
- 
--    /* Block all nodes between top and base, because they will
--     * disappear from the chain after this operation. */
--    assert(bdrv_chain_contains(top, base));
--    for (iter = top; iter != base; iter = backing_bs(iter)) {
--        /* XXX BLK_PERM_WRITE needs to be allowed so we don't block ourselves
--         * at s->base (if writes are blocked for a node, they are also blocked
--         * for its backing file). The other options would be a second filter
--         * driver above s->base. */
-+    /*
-+     * Block all nodes between top and base, because they will
-+     * disappear from the chain after this operation.
-+     * Note that this assumes that the user is fine with removing all
-+     * nodes (including R/W filters) between top and base.  Assuring
-+     * this is the responsibility of the interface (i.e. whoever calls
-+     * commit_start()).
-+     */
-+    s->above_base = bdrv_find_overlay(top, base);
-+    assert(s->above_base);
-+
-+    /*
-+     * The topmost node with
-+     * bdrv_skip_rw_filters(filtered_base) == bdrv_skip_rw_filters(base)
-+     */
-+    filtered_base = bdrv_filtered_cow_bs(s->above_base);
-+    assert(bdrv_skip_rw_filters(filtered_base) == bdrv_skip_rw_filters(base));
-+
-+    /*
-+     * XXX BLK_PERM_WRITE needs to be allowed so we don't block ourselves
-+     * at s->base (if writes are blocked for a node, they are also blocked
-+     * for its backing file). The other options would be a second filter
-+     * driver above s->base.
-+     */
-+    iter_shared_perms = BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE;
-+
-+    for (iter = top; iter != base; iter = bdrv_filtered_bs(iter)) {
-+        if (iter == filtered_base) {
-+            /*
-+             * From here on, all nodes are filters on the base.  This
-+             * allows us to share BLK_PERM_CONSISTENT_READ.
-+             */
-+            iter_shared_perms |= BLK_PERM_CONSISTENT_READ;
-+        }
-+
-         ret = block_job_add_bdrv(&s->common, "intermediate node", iter, 0,
--                                 BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE,
--                                 errp);
-+                                 iter_shared_perms, errp);
-         if (ret < 0) {
-             goto fail;
++    /* Check for op blockers in the whole chain between bs and bottom */
++    for (iter = bs; iter && iter != bdrv_filtered_bs(bottom_cow_node);
++         iter = bdrv_filtered_bs(iter)) {
+         if (bdrv_op_is_blocked(iter, BLOCK_OP_TYPE_STREAM, errp)) {
+             goto out;
          }
-@@ -328,9 +375,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-     }
+diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+index 104e3ce..d7638cd 100755
+--- a/tests/qemu-iotests/030
++++ b/tests/qemu-iotests/030
+@@ -368,8 +368,7 @@ class TestParallelOps(iotests.QMPTestCase):
+         self.wait_until_completed(drive='commit-drive0')
  
-     s->base = blk_new(s->common.job.aio_context,
--                      BLK_PERM_CONSISTENT_READ
--                      | BLK_PERM_WRITE
--                      | BLK_PERM_RESIZE,
-+                      perms,
-                       BLK_PERM_CONSISTENT_READ
-                       | BLK_PERM_GRAPH_MOD
-                       | BLK_PERM_WRITE_UNCHANGED);
+     # In this case the base node of the stream job is the same as the
+-    # top node of commit job. Since this results in the commit filter
+-    # node being part of the stream chain, this is not allowed.
++    # top node of commit job.
+     def test_overlapping_4(self):
+         self.assert_no_active_block_jobs()
+ 
+@@ -381,13 +380,13 @@ class TestParallelOps(iotests.QMPTestCase):
+ 
+         # Stream from node2 into node4
+         result = self.vm.qmp('block-stream', device='node4', base_node='node2', job_id='node4')
+-        self.assert_qmp(result, 'error/desc',
+-            "Cannot freeze 'backing' link to 'commit-filter'")
++        self.assert_qmp(result, 'return', {})
+ 
+         result = self.vm.qmp('block-job-set-speed', device='drive0', speed=0)
+         self.assert_qmp(result, 'return', {})
+ 
+-        self.wait_until_completed()
++        self.vm.run_job(job='drive0', auto_dismiss=True)
++        self.vm.run_job(job='node4', auto_dismiss=True)
+         self.assert_no_active_block_jobs()
+ 
+     # In this case the base node of the stream job is the commit job's
 -- 
 1.8.3.1
 
