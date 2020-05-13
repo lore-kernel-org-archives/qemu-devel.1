@@ -2,70 +2,105 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D77FFC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 22:14:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7CFAC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 22:45:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCB79205ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 22:14:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCB79205ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id CC0EE2065C
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 22:45:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC0EE2065C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYzeA-0001dh-Nt
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 18:14:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37346)
+	id 1jZ08T-00012S-Qa
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 18:45:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43596)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jYzdB-0000Ta-27; Wed, 13 May 2020 18:13:37 -0400
-Resent-Date: Wed, 13 May 2020 18:13:37 -0400
-Resent-Message-Id: <E1jYzdB-0000Ta-27@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21356)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jYzd9-0003XC-EA; Wed, 13 May 2020 18:13:36 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1589408004; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=JeFbrgMNxztG2NTDXYJkH4USlBZpPcmqgZsKXC8/jPeqatMCu0arGsePC4kRGXUDJr60SpWB1nBKD0q9AHLSm5uMjTXl4v9ZdsJzXFuxJFjZ8+fFM8RHqjTfml8QzoO+kjJ14SYvy2+p4dnjq3O/SSs0f4uOX0LaOurGn8T9cqM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1589408004;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=JGDiE5VDngc4w2ITS2EpidQqDYH37drK9gRWpiBsm/0=; 
- b=XusdZB5Bg1nbHbhjj0103iD0SPfM93TGpYLBwkOJrrGf/mqJ/yPOnupgNofZlqOsExEuItFW4AAbIHiWaPoh0aOY/GtbzXx1MHQPqqrWlW0xrpWnsM6z86prp7C3zYB8sR6UrqFLIxlX78YGEowSkL+OP0lXs3gyCAAHfmG7K38=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1589408001985146.68004995467618;
- Wed, 13 May 2020 15:13:21 -0700 (PDT)
-Message-ID: <158940800045.13639.7060966543907777257@45ef0f9c86ae>
-In-Reply-To: <20200513133629.18508-1-eyal.moscovici@oracle.com>
-Subject: Re: [PATCH v3 0/4] Additional parameters for qemu_img map
+ (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
+ id 1jZ07d-0000Sz-1Z; Wed, 13 May 2020 18:45:05 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37962)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
+ id 1jZ07b-00031r-Uk; Wed, 13 May 2020 18:45:04 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 04DMXs5M116617; Wed, 13 May 2020 18:45:00 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31016sw1yb-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 13 May 2020 18:45:00 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04DMgDF9136005;
+ Wed, 13 May 2020 18:45:00 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
+ [169.55.91.170])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 31016sw1y1-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 13 May 2020 18:45:00 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+ by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04DMZ00n032574;
+ Wed, 13 May 2020 22:44:59 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com
+ (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+ by ppma02wdc.us.ibm.com with ESMTP id 3100ubj5a4-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 13 May 2020 22:44:59 +0000
+Received: from b03ledav004.gho.boulder.ibm.com
+ (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+ by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 04DMivwU13566368
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 13 May 2020 22:44:57 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id D24E178063;
+ Wed, 13 May 2020 22:44:57 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id E25DF78066;
+ Wed, 13 May 2020 22:44:56 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.196.213])
+ by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTPS;
+ Wed, 13 May 2020 22:44:56 +0000 (GMT)
+Subject: Re: [PATCH v1 7/8] s390/kvm: header sync for diag318
+To: Cornelia Huck <cohuck@redhat.com>
+References: <20200508230823.22956-1-walling@linux.ibm.com>
+ <20200508230823.22956-8-walling@linux.ibm.com>
+ <20200513090508.79b7fc54.cohuck@redhat.com>
+From: Collin Walling <walling@linux.ibm.com>
+Message-ID: <65c903c6-b076-94e0-badc-472e25e248a9@linux.ibm.com>
+Date: Wed, 13 May 2020 18:44:56 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: eyal.moscovici@oracle.com
-Date: Wed, 13 May 2020 15:13:21 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 18:13:31
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+In-Reply-To: <20200513090508.79b7fc54.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
+ definitions=2020-05-13_09:2020-05-13,
+ 2020-05-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 bulkscore=0
+ adultscore=0 clxscore=1015 priorityscore=1501 lowpriorityscore=0
+ mlxlogscore=999 cotscore=-2147483648 impostorscore=0 phishscore=0
+ suspectscore=0 spamscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2005130193
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=walling@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 18:45:01
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
+X-Spam_bar: --
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -79,63 +114,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, eyal.moscovici@oracle.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, mreitz@redhat.com, liran.alon@oracle.com
+Cc: frankja@linux.ibm.com, mst@redhat.com, david@redhat.com,
+ qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ qemu-s390x@nongnu.org, svens@linux.ibm.com, pbonzini@redhat.com,
+ mihajlov@linux.ibm.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUxMzEzMzYyOS4xODUw
-OC0xLWV5YWwubW9zY292aWNpQG9yYWNsZS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVk
-IHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0
-aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBp
-bnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVT
-VCBTQ1JJUFQgQkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBk
-b2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1p
-bmd3QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBDQyAg
-ICAgIHg4Nl82NC1zb2Z0bW11L2lvcG9ydC5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9xdGVz
-dC5vCi90bXAvcWVtdS10ZXN0L3NyYy9xZW11LWltZy5jOiBJbiBmdW5jdGlvbiAnY3Z0bnVtX2Z1
-bGwnOgovdG1wL3FlbXUtdGVzdC9zcmMvcWVtdS1pbWcuYzo0ODg6NjM6IGVycm9yOiBmb3JtYXQg
-JyVsZCcgZXhwZWN0cyBhcmd1bWVudCBvZiB0eXBlICdsb25nIGludCcsIGJ1dCBhcmd1bWVudCAz
-IGhhcyB0eXBlICdpbnQ2NF90JyB7YWthICdsb25nIGxvbmcgaW50J30gWy1XZXJyb3I9Zm9ybWF0
-PV0KICAgICAgICAgZXJyb3JfcmVwb3J0KCJJbnZhbGlkICVzIHNwZWNpZmllZC4gTXVzdCBiZSBi
-ZXR3ZWVuICVsZCBieXRlcyAiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICB+fl4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICVsbGQKICAgICAgICAgICAgICAgICAgICAg
-ICJ0byAlbGQgYnl0ZXMuIiwgbmFtZSwgbWluLCBtYXgpOwogICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICB+fn4gICAgICAgICAgICAgICAgCi90bXAvcWVtdS10ZXN0
-L3NyYy9xZW11LWltZy5jOjQ4ODoyMjogZXJyb3I6IGZvcm1hdCAnJWxkJyBleHBlY3RzIGFyZ3Vt
-ZW50IG9mIHR5cGUgJ2xvbmcgaW50JywgYnV0IGFyZ3VtZW50IDQgaGFzIHR5cGUgJ2ludDY0X3Qn
-IHtha2EgJ2xvbmcgbG9uZyBpbnQnfSBbLVdlcnJvcj1mb3JtYXQ9XQogICAgICAgICBlcnJvcl9y
-ZXBvcnQoIkludmFsaWQgJXMgc3BlY2lmaWVkLiBNdXN0IGJlIGJldHdlZW4gJWxkIGJ5dGVzICIK
-ICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+CiAgICAgICAgICAgICAgICAgICAgICAidG8gJWxkIGJ5dGVzLiIsIG5h
-bWUsIG1pbiwgbWF4KTsKLS0tCiAgICAgICAgICAgICAgICAgICAgICAgICAgfn5eCiAgICAgICAg
-ICAgICAgICAgICAgICAgICAgJWxsZApjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFz
-IGVycm9ycwptYWtlOiAqKiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IHFlbXUt
-aW1nLm9dIEVycm9yIDEKbWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4K
-ICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9kdW1wL2R1bXAubwogIENDICAgICAgeDg2XzY0LXNv
-ZnRtbXUvbWVtb3J5Lm8KLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwg
-Y21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1u
-JywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTMz
-ZjgzYjdkNjEyMjRhZDc5MzU1ZmVlMDIzMTJlZTljJywgJy11JywgJzEwMDMnLCAnLS1zZWN1cml0
-eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9
-JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0
-JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0nLCAnLWUnLCAnQ0NBQ0hFX0RJUj0v
-dmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldzIvLmNhY2hlL3FlbXUtZG9ja2Vy
-LWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rl
-ci10bXAtejRmdmNiaXEvc3JjL2RvY2tlci1zcmMuMjAyMC0wNS0xMy0xOC4xMC40My4zMjQ6L3Zh
-ci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rl
-c3QtbWluZ3cnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmls
-dGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9MzNmODNiN2Q2MTIyNGFkNzkzNTVmZWUw
-MjMxMmVlOWMKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZp
-bmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtejRmdmNiaXEvc3JjJwpt
-YWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1taW5nd0BmZWRvcmFdIEVycm9yIDIKCnJlYWwgICAg
-Mm0zNi42MzhzCnVzZXIgICAgMG03LjcyMHMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0
-Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwNTEzMTMzNjI5LjE4NTA4LTEtZXlhbC5tb3Nj
-b3ZpY2lAb3JhY2xlLmNvbS90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2Fn
-ZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8v
-cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
-QHJlZGhhdC5jb20=
+On 5/13/20 3:05 AM, Cornelia Huck wrote:
+> On Fri,  8 May 2020 19:08:22 -0400
+> Collin Walling <walling@linux.ibm.com> wrote:
+> 
+>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+>> ---
+>>  linux-headers/asm-s390/kvm.h | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>>
+>> diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
+>> index 0138ccb0d8..b661feafdc 100644
+>> --- a/linux-headers/asm-s390/kvm.h
+>> +++ b/linux-headers/asm-s390/kvm.h
+>> @@ -74,6 +74,7 @@ struct kvm_s390_io_adapter_req {
+>>  #define KVM_S390_VM_CRYPTO		2
+>>  #define KVM_S390_VM_CPU_MODEL		3
+>>  #define KVM_S390_VM_MIGRATION		4
+>> +#define KVM_S390_VM_MISC		5
+>>  
+>>  /* kvm attributes for mem_ctrl */
+>>  #define KVM_S390_VM_MEM_ENABLE_CMMA	0
+>> @@ -171,6 +172,10 @@ struct kvm_s390_vm_cpu_subfunc {
+>>  #define KVM_S390_VM_MIGRATION_START	1
+>>  #define KVM_S390_VM_MIGRATION_STATUS	2
+>>  
+>> +/* kvm attributes for KVM_S390_VM_MISC */
+>> +#define KVM_S390_VM_MISC_ENABLE_DIAG318		0
+>> +#define KVM_S390_VM_MISC_DIAG318			1
+>> +
+>>  /* for KVM_GET_REGS and KVM_SET_REGS */
+>>  struct kvm_regs {
+>>  	/* general purpose regs for s390 */
+> 
+> Hm... remind me what the state of the kernel part is?
+> 
+
+Kernel code to execute the instruction is in place today. A kernel
+running on real hardware (or at least LPAR) can successfully execute the
+instruction if the hardware supports it.
+
+The Linux commit is: 4ad78b8651aacf26b3ab6d1e784952eb70469c43
+
+The KVM code is still under review, since most of it needs to align with
+the QEMU changes as well. Guest kernels executing the instruction rely
+on both QEMU and KVM support. KVM handles the execution and interception
+of the instruction, while QEMU handles enabling the instruction (by
+negotiating with KVM to allow it and then setting the appropriate SCLP
+bit) and migration of the data.
+
+The latest changes to the KVM code is a new IOCTL that allows QEMU to
+negotiate with KVM to actually enable the diag318 feature. By default,
+KVM treats the feature as "disabled" unless userspace explicitly asks
+for it.
+
+The KVM discussion is: https://www.spinics.net/lists/kvm/msg215758.html
+
+-- 
+--
+Regards,
+Collin
+
+Stay safe and stay healthy
 
