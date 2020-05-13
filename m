@@ -2,86 +2,86 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47D86C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 17:54:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C295C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 17:54:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9433205CB
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 17:54:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20221205CB
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 17:54:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Hewj1P5T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9433205CB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="InmqEqad"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20221205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYvaa-0005WD-8c
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 13:54:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33386)
+	id 1jYvac-0005ZX-Jp
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 13:54:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33414)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jYvXh-0000jS-H4
- for qemu-devel@nongnu.org; Wed, 13 May 2020 13:51:41 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:34151)
+ id 1jYvXm-0000rI-5L
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 13:51:46 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41018)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jYvXg-0004xc-Ci
- for qemu-devel@nongnu.org; Wed, 13 May 2020 13:51:41 -0400
-Received: by mail-wr1-x442.google.com with SMTP id y3so567639wrt.1
- for <qemu-devel@nongnu.org>; Wed, 13 May 2020 10:51:39 -0700 (PDT)
+ id 1jYvXl-0004yU-9W
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 13:51:45 -0400
+Received: by mail-wr1-x443.google.com with SMTP id h17so512344wrc.8
+ for <qemu-devel@nongnu.org>; Wed, 13 May 2020 10:51:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=yZ7Kz7mTKR6F85RFkM8gYJqayYGL/UEHlzggZx2/D6I=;
- b=Hewj1P5TdhhgUKPudvdnzaBTw1wD+rS6hItKNQ+o/MlUR1xpwEtapYYZvzP2ha2udC
- P8GGrL7w6Iulx4T42llediNkBOWnWn0S3HBHBCJuGS+QeLWQef5e0x0xUVbjk5mfmwEA
- xGJ196Hizcgsw2QldS34Et1VGioPsW/VuoYn9r6JmeSLwiiZymeNEenykwfOkunEyGnP
- 4PS9gvoLMiIcvo3+lBbWBCW5gHi/RQStGJ3tgvJ2wHPt5WCqlwQv0xx5oOinppV7288g
- 3aLRK6lPrggMTrtadLk5v7Put1Boy75RE8qI0hWkch9r8qvdMnIfMBxITBdw0BZm6Zwq
- Eb4w==
+ bh=DRD2Oc+28edn4pGWZOmfAbES32+12APNylpSTMMls1g=;
+ b=InmqEqadv4fWc0UnVha5DVjkWZAY4cxuqXGO4upPEenVBpYAX82j3E9FoXNQ2HzNOj
+ MqAG6Pw5+nJkbh2w+MVTH+m9mqyF/rO/RMfUdQxwCp6AYl1HZMFkfHeVrRurDHs5a+rE
+ oPFeYF0jj1hxkWFIMIvhHp4pYSSInlIPm6q05oS6P8iq8HEMoALE2WOKhaq8FO3gBUff
+ NaLD8jub6iozDi+ATPTpQgomNHntfryh9Goqe1sqITmKDAYqNQvuRY/htct5lmYu3hqF
+ wbzsHijjEzuxN+MjOQSX8DVKBP0viLVfvB1VnOtCDqNQiXoYWywwHSwa8Y3HuWLwvaVQ
+ P8og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=yZ7Kz7mTKR6F85RFkM8gYJqayYGL/UEHlzggZx2/D6I=;
- b=CpnmXl2cBCQb7RqXUX5YCqAI+7LFCH2XLmEbVtQ7KbhDCqwiK8cHffAEnrcxgGXCO+
- 6PB4mIWI45qF5xWBWWOPuKbEsYo39TQhwWnGxD3IPxAKHwk1pe5PnLNLxtrhgA2CI9/Y
- HZsDfvnx8mMeT3UUtOJUlaiJ/jYka0k6aREqCBHkUlmK35HOtWmEdm5l4mCJcq7TNG8u
- 76svRZew6dEgYoZNBYKVXD+cBfR2ISuXAETJPGZFKtnEfmbwH424XHE91vjFqIex6ORd
- 36TWIM1IIjicxinjKm404D4kmlsA5l/tB/1bA+03xaynXZHpemf3GQOPgJ/9C/uLGqpO
- NDug==
-X-Gm-Message-State: AOAM5300fVovLcGFrUicBHTadJKeor5k8PqitmA9UwzpAmps8hBevqKB
- STXzBcf7wYx7vNZmomhH2uV/NQ==
-X-Google-Smtp-Source: ABdhPJzo0F2eCpzJaZ7q/lTE5hd09h5NPTqtvEMUYNOIUfvROrhN7TNDy9ksN8hdlCCI/+bGC8AmOw==
-X-Received: by 2002:adf:dfcf:: with SMTP id q15mr482206wrn.137.1589392299029; 
- Wed, 13 May 2020 10:51:39 -0700 (PDT)
+ bh=DRD2Oc+28edn4pGWZOmfAbES32+12APNylpSTMMls1g=;
+ b=fGK2oxBXxQw6MILsdQipvfVB86E6bl2zJNHJzDr85PUrYUiXBpj8Ph4LexBEjuYCj+
+ rT1en4bOG/aaGLuPmARfE4K2ij5iIUsTFvbOOvbJbZlucih4WwGUAcvJJ7Dt6Rf0edSG
+ xI/eZc20+6KGR2ieclXO+2Q7jEiZ1YpRWQLNapNpvglRL6QBwvbDj/P88vpuYjZF6cqn
+ qeRZl7q6m3QWbP1oYHDhiTj+SfKE+w2GMZUztj+hP678AuzrdrTsFcfNG0mk/MAt9tvg
+ 5ABJCQ8TrZKnOYUoSyFG3D7prBxNRmrXgSF5+7AE7jGq9dHuBTYjFUqjE9o2Km0CadxN
+ OjLg==
+X-Gm-Message-State: AOAM530QcLkEGrKlpOUew4XSFjFfvCjP+YVYFM+TsQ9FJT0cxuVGnyeN
+ JR0Oitll1HLWfJAca+gRDqSOBcoHe5I=
+X-Google-Smtp-Source: ABdhPJxBw5cApTJxruh6P0AH74umhM5DmrvNzzAfzYU1cnNqcQdtSmGpJHn/MfWa4x8kAzol9LSmig==
+X-Received: by 2002:adf:ca0e:: with SMTP id o14mr559591wrh.254.1589392303678; 
+ Wed, 13 May 2020 10:51:43 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id q17sm19462878wmk.36.2020.05.13.10.51.35
+ by smtp.gmail.com with ESMTPSA id u67sm24162531wmu.3.2020.05.13.10.51.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 13 May 2020 10:51:35 -0700 (PDT)
+ Wed, 13 May 2020 10:51:39 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E21DB1FF87;
- Wed, 13 May 2020 18:51:34 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 8101E1FF93;
+ Wed, 13 May 2020 18:51:35 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 01/10] tests/guest-debug: catch hanging guests
-Date: Wed, 13 May 2020 18:51:25 +0100
-Message-Id: <20200513175134.19619-2-alex.bennee@linaro.org>
+Subject: [PATCH  v1 07/10] accel/tcg: don't disable exec_tb trace events
+Date: Wed, 13 May 2020 18:51:31 +0100
+Message-Id: <20200513175134.19619-8-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200513175134.19619-1-alex.bennee@linaro.org>
 References: <20200513175134.19619-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,35 +103,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If gdb never actually connected with the guest we need to catch that
-and clean-up after ourselves.
+I doubt the well predicted trace event check is particularly special in
+the grand context of TCG code execution.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200512104338.27365-1-alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- tests/guest-debug/run-test.py | 6 ++++++
- 1 file changed, 6 insertions(+)
+ accel/tcg/trace-events | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/tests/guest-debug/run-test.py b/tests/guest-debug/run-test.py
-index d9af9573b9e..71c55690546 100755
---- a/tests/guest-debug/run-test.py
-+++ b/tests/guest-debug/run-test.py
-@@ -80,4 +80,10 @@ if __name__ == '__main__':
-         print("GDB crashed? SKIPPING")
-         exit(0)
+diff --git a/accel/tcg/trace-events b/accel/tcg/trace-events
+index 01852217a66..385b9f749b8 100644
+--- a/accel/tcg/trace-events
++++ b/accel/tcg/trace-events
+@@ -1,10 +1,10 @@
+ # See docs/devel/tracing.txt for syntax documentation.
  
-+    try:
-+        inferior.wait(2)
-+    except subprocess.TimeoutExpired:
-+        print("GDB never connected? Killed guest")
-+        inferior.kill()
-+
-     exit(result)
+-# TCG related tracing (mostly disabled by default)
++# TCG related tracing
+ # cpu-exec.c
+-disable exec_tb(void *tb, uintptr_t pc) "tb:%p pc=0x%"PRIxPTR
+-disable exec_tb_nocache(void *tb, uintptr_t pc) "tb:%p pc=0x%"PRIxPTR
+-disable exec_tb_exit(void *last_tb, unsigned int flags) "tb:%p flags=0x%x"
++exec_tb(void *tb, uintptr_t pc) "tb:%p pc=0x%"PRIxPTR
++exec_tb_nocache(void *tb, uintptr_t pc) "tb:%p pc=0x%"PRIxPTR
++exec_tb_exit(void *last_tb, unsigned int flags) "tb:%p flags=0x%x"
+ 
+ # translate-all.c
+ translate_block(void *tb, uintptr_t pc, uint8_t *tb_code) "tb:%p, pc:0x%"PRIxPTR", tb_code:%p"
 -- 
 2.20.1
 
