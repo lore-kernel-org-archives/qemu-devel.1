@@ -2,93 +2,81 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF4D7CA90AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 14:07:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7586CA90AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 14:14:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C017204EF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 14:07:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 725C120659
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 14:14:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FHrtNCQ9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C017204EF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K1+vv3ip"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 725C120659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYs39-0005ss-QS
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 10:07:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52378)
+	id 1jYs9u-00034J-Pe
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 10:14:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53214)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jYs2O-0004b7-7o
- for qemu-devel@nongnu.org; Wed, 13 May 2020 10:07:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44487
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jYs9L-00020Q-Q4
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 10:14:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47972
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jYs2M-0004XD-HK
- for qemu-devel@nongnu.org; Wed, 13 May 2020 10:07:07 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jYs9J-0005hK-Rt
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 10:14:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589378824;
+ s=mimecast20190719; t=1589379256;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=cWNnZZ+pJ3iXnWhZcXVUnPOA0wyg0BUkNnNSeveLbN8=;
- b=FHrtNCQ9hInuCM4/IduDK41NWUXV6V8t6rTrU/T5rTXRbLymcoGIh+wsOUuBhC1RVc4TBB
- AnxYd4D59waeVXmu6r+RTAmOIY0ZWbsqQDoblQy75hnYVhtfy5a2CdsnXxFdV7d8j43UFw
- ryWySnkAnTIG+pkP4Z1IGyrfw/b6OAM=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=Nftte3U2PQ4cw+ehd01BD2KVk9z7+pAxNHx3nP6h2nk=;
+ b=K1+vv3ip8RHvu5kuD+oP7QTsbg+HE86wPL26gwXw/mzaf9TBYJ+0UYPUeUqiSVFxyIseYN
+ WeVaTKO4YVQTif9Fu8/joDgSS8/R+WOWycSnCW/B38mtufGU4jXymD2OD7bJ8VtK2iTBPS
+ TNZ8lZdCPu6QrNIamqJLA4ZrFDAhgKk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-354-qMH-H5d_NtSm040c023zXA-1; Wed, 13 May 2020 10:07:03 -0400
-X-MC-Unique: qMH-H5d_NtSm040c023zXA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-335-2cfHrQL5O_S8tw14Ja7q6w-1; Wed, 13 May 2020 10:14:12 -0400
+X-MC-Unique: 2cfHrQL5O_S8tw14Ja7q6w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C573A83DC0F;
- Wed, 13 May 2020 14:07:01 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-80.ams2.redhat.com [10.36.114.80])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 95F696A979;
- Wed, 13 May 2020 14:06:51 +0000 (UTC)
-Date: Wed, 13 May 2020 16:06:50 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH 0/5] Introduce 'yank' oob qmp command to recover from
- hanging qemu
-Message-ID: <20200513140650.GH6202@linux.fritz.box>
-References: <20200511121714.GL1135885@redhat.com>
- <20200511154645.GI2811@work-vm> <20200512113206.62836e44@luklap>
- <20200512094337.GK1191162@redhat.com>
- <20200513103245.GD6202@linux.fritz.box>
- <20200513105359.GF3225@work-vm>
- <20200513111320.GE6202@linux.fritz.box>
- <20200513125624.GJ3225@work-vm>
- <20200513130849.GD1253949@redhat.com>
- <20200513134856.GK3225@work-vm>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E26101005510;
+ Wed, 13 May 2020 14:14:10 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-116-145.phx2.redhat.com [10.3.116.145])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6C23B6E6E8;
+ Wed, 13 May 2020 14:14:10 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] bitmaps: Add myself as maintainer
+Date: Wed, 13 May 2020 09:14:07 -0500
+Message-Id: <20200513141407.185198-1-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200513134856.GK3225@work-vm>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 01:56:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 03:05:18
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,54 +89,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Lukas Straub <lukasstraub2@web.de>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: vsementsov@virtuozzo.com, jsnow@redhat.com, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 13.05.2020 um 15:48 hat Dr. David Alan Gilbert geschrieben:
-> * Daniel P. Berrangé (berrange@redhat.com) wrote:
-> > On Wed, May 13, 2020 at 01:56:24PM +0100, Dr. David Alan Gilbert wrote:
-> > > * Kevin Wolf (kwolf@redhat.com) wrote:
-> > > > I guess it would be nice to have a single namespace for everything in
-> > > > QEMU, but the reality is that we have a few separate ones. As long as we
-> > > > consistently add a prefix that identifies the namespace in question, I
-> > > > think that would work.
-> > > 
-> > > > This means that if we're using node-name to identify the NBD connection,
-> > > > the namespace should be 'block' rather than 'nbd'.
-> > > > 
-> > > > One more thing to consider is, what if a single object has multiple
-> > > > connections? In the case of node-names, we have a limited set of allowed
-> > > > characters, so we can use one of the remaining characters as a separator
-> > > > and then suffix a counter. In other places, the identifier isn't
-> > > > restricted, so suffixing doesn't work. Maybe prefixing does, but it
-> > > > would have to be there from the beginning then.
-> > > 
-> > > Yeh I worry about whether on nbd if you can have multiple nbd
-> > > connections to one block device.
-> > 
-> > The kernel NBD driver now supports multiple parallel connections.
-> > QEMU hasn't implemented this in its NBD code yet, but I certainly
-> > see that being in scope for future.
-> 
-> It's not parallel for performance that worries me, it's more about
-> separateq connections for separate uses - e.g. if we're serving the same
-> read-only disk to multiple separate things.
+Dirty bitmaps are important to incremental backups, including exposure
+over NBD where I'm already maintainer.  Also, I'm aware that lately I
+have been doing as much code/review on bitmaps as John Snow, who is
+hoping to scale back on this front.
 
-That would be a concern for the NBD server. I'm not sure if anything in
-QEMU ever waits for NBD servers (except for the client on the other side
-of the connection, of course), so there might be no use case for yanking
-their connections.
+Signed-off-by: Eric Blake <eblake@redhat.com>
 
-Anyway, here we were talking about the NBD client, which always accesses
-one disk. If you access a second disk, you have a second NBD block node.
+---
+This still leaves John as maintainer for: IDE, Floppy, and Block Jobs,
+which I did not feel comfortable taking on at this time.
 
-Kevin
+If this patch makes sense, I'm happy to take on my recent 'qemu-img
+bitmap' series as my first bitmap-related pull request, once it has
+sufficient review.
+---
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6a8dc1e69d42..f7caf7c0cc7f 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2002,6 +2002,7 @@ T: git https://repo.or.cz/qemu/armbru.git block-next
+
+ Dirty Bitmaps
+ M: John Snow <jsnow@redhat.com>
++M: Eric Blake <eblake@redhat.com>
+ R: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+ L: qemu-block@nongnu.org
+ S: Supported
+-- 
+2.26.2
 
 
