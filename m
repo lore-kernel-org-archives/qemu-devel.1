@@ -2,83 +2,88 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BA0BCA90AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 11:07:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49AF9C2D0FA
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 11:07:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5891020740
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 11:07:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 17E8D20740
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 11:07:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hubvxu8m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5891020740
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="ZdCui0vU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17E8D20740
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYpEc-00039r-Ff
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 07:07:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54556)
+	id 1jYpEe-0003CY-8E
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 07:07:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54194)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jYpD5-000160-SJ
- for qemu-devel@nongnu.org; Wed, 13 May 2020 07:06:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51801
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jYpD3-0003Je-Np
- for qemu-devel@nongnu.org; Wed, 13 May 2020 07:05:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589367956;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ay6QqyJ4L/SYmaE1ujctUPN0/n4jygTLgXaQ547hoNc=;
- b=hubvxu8mAdrrcj2G+Cdtx2vZxTMrIfvAl6eMXdVGvkxpbjoplH1T6LrcGhp1XhWPe44k1i
- Tlob2RGcNMC1mpqcmq4ioJfH00WpcJW1via0Zgg73rsYXzeLc8Nd9GneGXyVt4IL/8r1kl
- YTYlwGPSU0bVuHt7FzbvUUswRHY7NQ8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-326-ZzOGBb8XMK-MXjQeA8Taqg-1; Wed, 13 May 2020 07:05:55 -0400
-X-MC-Unique: ZzOGBb8XMK-MXjQeA8Taqg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED09E2BED;
- Wed, 13 May 2020 11:05:53 +0000 (UTC)
-Received: from localhost (unknown [10.40.193.218])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F16995C1C3;
- Wed, 13 May 2020 11:05:50 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v4 02/34] block: Add BlockDriver.is_format
-Date: Wed, 13 May 2020 13:05:12 +0200
-Message-Id: <20200513110544.176672-3-mreitz@redhat.com>
-In-Reply-To: <20200513110544.176672-1-mreitz@redhat.com>
-References: <20200513110544.176672-1-mreitz@redhat.com>
+ (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1jYpAk-0006cv-42
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 07:03:34 -0400
+Received: from mail-lj1-x22b.google.com ([2a00:1450:4864:20::22b]:41355)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <andrew@daynix.com>) id 1jYpAh-0002Uy-TP
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 07:03:33 -0400
+Received: by mail-lj1-x22b.google.com with SMTP id j3so17250885ljg.8
+ for <qemu-devel@nongnu.org>; Wed, 13 May 2020 04:03:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=daynix-com.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=2j5Ly7B4QEkKhIFgs8Zvw/iU8lv07rrrXczgDV4BzvY=;
+ b=ZdCui0vUwWpZ/z3j8fuPlk79W5KHlweyi/tZ+xapLNt2JA+GLAhV60vUF/picQgREE
+ JowfmdDAEscwXJjos0profgJvpSZHMQCiE+o+k9DLP9C6m/aoFqk2K01u6VZ/wXc+iKq
+ WFh5yAStT55FH8YkLYMTPkEohWe1WHtyzfNMp4XVHcsu2E+jyDb8WxqMUsC0DjblsY18
+ kcVJXb9tt8/1c10rPnfjVMsyzWXB2Xno13VnFYwPsZStRmHBlkIL3ZRiwqxNH/2thI8M
+ IKHqO63Ob71MXKCmRdni6OfBF1ck14B071SQ5qfzd/3BpUhj2Wu+0Ds0NyR+RqTZQV6J
+ Unhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=2j5Ly7B4QEkKhIFgs8Zvw/iU8lv07rrrXczgDV4BzvY=;
+ b=q1lLFTDYSL+oHIzqu+AQkVuN6FHxSlZLkUn+RrjKdlyiULC4LCSnc/rpmH0AotUvv1
+ l7ijWJWBXB1pgbziRCtU9kIKwl2zj9HEz3BiBkF6QtKiIm6R2EmA0ZjAbbQzMYSbv64C
+ F4tvVO32CjXXDMqxxBxLiDVdeu9pR+yHFU1KC4erGPk99McNUCRMVH1NExXJXWRCchGs
+ eqE2erwLkJX0MKdOR32/O+5HmWugSWLcKRX06Jvgnr+REahJDoAA4Em0XFoa13Stx3vi
+ 9o3RSrqDh7lLg6mdfajeWbKelaYcRlRQND8GOHnUdDogStp9LlXGCRvPH+Y1iAiQgwsT
+ 9mPw==
+X-Gm-Message-State: AOAM530MaYeuzcb8SBkobuwA8RbTjlzW167r41YPl2zrkjLMN0pVKPXi
+ D/34mCtb25OMRQVjTqnXEKHt+nEaVxDieQ==
+X-Google-Smtp-Source: ABdhPJyPMClqem9jUToFXHTYDV1qO3aPCECH3I0Crkp+5gLkSoGBB709Lu6D1ZScCPXJplAEhFyB9Q==
+X-Received: by 2002:a2e:740f:: with SMTP id p15mr16975590ljc.151.1589367809782; 
+ Wed, 13 May 2020 04:03:29 -0700 (PDT)
+Received: from navi.cosmonova.net.ua ([95.67.24.131])
+ by smtp.gmail.com with ESMTPSA id s4sm12045991lja.14.2020.05.13.04.03.28
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 13 May 2020 04:03:29 -0700 (PDT)
+From: andrew@daynix.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/1] e1000e: Added ICR clearing by corresponding IMS bit.
+Date: Wed, 13 May 2020 14:31:25 +0300
+Message-Id: <20200513113125.1465650-2-andrew@daynix.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200513113125.1465650-1-andrew@daynix.com>
+References: <20200513113125.1465650-1-andrew@daynix.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 01:56:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+Received-SPF: none client-ip=2a00:1450:4864:20::22b;
+ envelope-from=andrew@daynix.com; helo=mail-lj1-x22b.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -92,214 +97,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: jasowang@redhat.com, dmitry.fleytman@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We want to unify child_format and child_file at some point.  One of the
-important things that set format drivers apart from other drivers is
-that they do not expect other format nodes under them (except in the
-backing chain), i.e. we must not probe formats inside of formats.  That
-means we need something on which to distinguish format drivers from
-others, and hence this flag.
+From: Andrew Melnychenko <andrew@daynix.com>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1707441
+Added ICR clearing if there is IMS bit - according to the note by
+section 13.3.27 of the 8257X developers manual.
+
+Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
 ---
- include/block/block_int.h | 7 +++++++
- block/bochs.c             | 1 +
- block/cloop.c             | 1 +
- block/crypto.c            | 2 ++
- block/dmg.c               | 1 +
- block/parallels.c         | 1 +
- block/qcow.c              | 1 +
- block/qcow2.c             | 1 +
- block/qed.c               | 1 +
- block/raw-format.c        | 1 +
- block/vdi.c               | 1 +
- block/vhdx.c              | 1 +
- block/vmdk.c              | 1 +
- block/vpc.c               | 1 +
- 14 files changed, 21 insertions(+)
+ hw/net/e1000e_core.c | 10 ++++++++++
+ hw/net/trace-events  |  1 +
+ 2 files changed, 11 insertions(+)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 7ba8c89036..1c24df53fd 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -95,6 +95,13 @@ struct BlockDriver {
-      * must implement them and return -ENOTSUP.
-      */
-     bool is_filter;
+diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+index d5676871fa..10212d7932 100644
+--- a/hw/net/e1000e_core.c
++++ b/hw/net/e1000e_core.c
+@@ -2624,6 +2624,16 @@ e1000e_mac_icr_read(E1000ECore *core, int index)
+         e1000e_clear_ims_bits(core, core->mac[IAM]);
+     }
+ 
 +    /*
-+     * Set to true if the BlockDriver is a format driver.  Format nodes
-+     * generally do not expect their children to be other format nodes
-+     * (except for backing files), and so format probing is disabled
-+     * on those children.
++     * PCIe* GbE Controllers Open Source Software Developer's Manual
++     * 13.3.27 Interrupt Cause Read Register
 +     */
-+    bool is_format;
-     /*
-      * Return true if @to_replace can be replaced by a BDS with the
-      * same data as @bs without it affecting @bs's behavior (that is,
-diff --git a/block/bochs.c b/block/bochs.c
-index 32bb83b268..e7bbeaa1c4 100644
---- a/block/bochs.c
-+++ b/block/bochs.c
-@@ -301,6 +301,7 @@ static BlockDriver bdrv_bochs = {
-     .bdrv_refresh_limits = bochs_refresh_limits,
-     .bdrv_co_preadv = bochs_co_preadv,
-     .bdrv_close		= bochs_close,
-+    .is_format          = true,
- };
- 
- static void bdrv_bochs_init(void)
-diff --git a/block/cloop.c b/block/cloop.c
-index 4de94876d4..f90f1a4b4c 100644
---- a/block/cloop.c
-+++ b/block/cloop.c
-@@ -297,6 +297,7 @@ static BlockDriver bdrv_cloop = {
-     .bdrv_refresh_limits = cloop_refresh_limits,
-     .bdrv_co_preadv = cloop_co_preadv,
-     .bdrv_close     = cloop_close,
-+    .is_format      = true,
- };
- 
- static void bdrv_cloop_init(void)
-diff --git a/block/crypto.c b/block/crypto.c
-index 6b21d6bf6c..bdb2b27475 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -771,6 +771,8 @@ static BlockDriver bdrv_crypto_luks = {
-     .bdrv_get_info      = block_crypto_get_info_luks,
-     .bdrv_get_specific_info = block_crypto_get_specific_info_luks,
- 
-+    .is_format          = true,
++    if ((core->mac[ICR] & E1000_ICR_ASSERTED) &&
++        (core->mac[ICR] & core->mac[IMS])) {
++        trace_e1000e_irq_icr_clear_icr_bit_ims(core->mac[ICR], core->mac[IMS]);
++        core->mac[ICR] = 0;
++    }
 +
-     .strong_runtime_opts = block_crypto_strong_runtime_opts,
- };
- 
-diff --git a/block/dmg.c b/block/dmg.c
-index 4a045f2b3e..ef3c6e771d 100644
---- a/block/dmg.c
-+++ b/block/dmg.c
-@@ -753,6 +753,7 @@ static BlockDriver bdrv_dmg = {
-     .bdrv_child_perm     = bdrv_format_default_perms,
-     .bdrv_co_preadv = dmg_co_preadv,
-     .bdrv_close     = dmg_close,
-+    .is_format      = true,
- };
- 
- static void bdrv_dmg_init(void)
-diff --git a/block/parallels.c b/block/parallels.c
-index e7717c508e..bd5f6ffa09 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -918,6 +918,7 @@ static BlockDriver bdrv_parallels = {
-     .bdrv_co_flush_to_os      = parallels_co_flush_to_os,
-     .bdrv_co_readv  = parallels_co_readv,
-     .bdrv_co_writev = parallels_co_writev,
-+    .is_format      = true,
-     .supports_backing = true,
-     .bdrv_co_create      = parallels_co_create,
-     .bdrv_co_create_opts = parallels_co_create_opts,
-diff --git a/block/qcow.c b/block/qcow.c
-index b0475b73a5..6a72dea049 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -1185,6 +1185,7 @@ static BlockDriver bdrv_qcow = {
-     .bdrv_co_create         = qcow_co_create,
-     .bdrv_co_create_opts    = qcow_co_create_opts,
-     .bdrv_has_zero_init     = bdrv_has_zero_init_1,
-+    .is_format              = true,
-     .supports_backing       = true,
-     .bdrv_refresh_limits    = qcow_refresh_limits,
- 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index ad9ab4fafa..76bec61ee9 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -5767,6 +5767,7 @@ BlockDriver bdrv_qcow2 = {
-     .bdrv_save_vmstate    = qcow2_save_vmstate,
-     .bdrv_load_vmstate    = qcow2_load_vmstate,
- 
-+    .is_format                  = true,
-     .supports_backing           = true,
-     .bdrv_change_backing_file   = qcow2_change_backing_file,
- 
-diff --git a/block/qed.c b/block/qed.c
-index 5da9726518..337eb6dbb6 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -1665,6 +1665,7 @@ static BlockDriver bdrv_qed = {
-     .format_name              = "qed",
-     .instance_size            = sizeof(BDRVQEDState),
-     .create_opts              = &qed_create_opts,
-+    .is_format                = true,
-     .supports_backing         = true,
- 
-     .bdrv_probe               = bdrv_qed_probe,
-diff --git a/block/raw-format.c b/block/raw-format.c
-index 9108e43696..00e13bb41e 100644
---- a/block/raw-format.c
-+++ b/block/raw-format.c
-@@ -566,6 +566,7 @@ BlockDriver bdrv_raw = {
-     .bdrv_co_copy_range_to  = &raw_co_copy_range_to,
-     .bdrv_co_truncate     = &raw_co_truncate,
-     .bdrv_getlength       = &raw_getlength,
-+    .is_format            = true,
-     .has_variable_length  = true,
-     .bdrv_measure         = &raw_measure,
-     .bdrv_get_info        = &raw_get_info,
-diff --git a/block/vdi.c b/block/vdi.c
-index 2d28046615..0ef733ae19 100644
---- a/block/vdi.c
-+++ b/block/vdi.c
-@@ -1053,6 +1053,7 @@ static BlockDriver bdrv_vdi = {
- 
-     .bdrv_get_info = vdi_get_info,
- 
-+    .is_format = true,
-     .create_opts = &vdi_create_opts,
-     .bdrv_co_check = vdi_co_check,
- };
-diff --git a/block/vhdx.c b/block/vhdx.c
-index 53e756438a..e692cf80cc 100644
---- a/block/vhdx.c
-+++ b/block/vhdx.c
-@@ -2254,6 +2254,7 @@ static BlockDriver bdrv_vhdx = {
-     .bdrv_co_check          = vhdx_co_check,
-     .bdrv_has_zero_init     = vhdx_has_zero_init,
- 
-+    .is_format              = true,
-     .create_opts            = &vhdx_create_opts,
- };
- 
-diff --git a/block/vmdk.c b/block/vmdk.c
-index b18f128816..56e85689f3 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -3070,6 +3070,7 @@ static BlockDriver bdrv_vmdk = {
-     .bdrv_get_info                = vmdk_get_info,
-     .bdrv_gather_child_options    = vmdk_gather_child_options,
- 
-+    .is_format                    = true,
-     .supports_backing             = true,
-     .create_opts                  = &vmdk_create_opts,
- };
-diff --git a/block/vpc.c b/block/vpc.c
-index 5e31dd1e47..46a2d48659 100644
---- a/block/vpc.c
-+++ b/block/vpc.c
-@@ -1250,6 +1250,7 @@ static BlockDriver bdrv_vpc = {
- 
-     .bdrv_get_info          = vpc_get_info,
- 
-+    .is_format              = true,
-     .create_opts            = &vpc_create_opts,
-     .bdrv_has_zero_init     = vpc_has_zero_init,
-     .strong_runtime_opts    = vpc_strong_runtime_opts,
+     trace_e1000e_irq_icr_read_exit(core->mac[ICR]);
+     e1000e_update_interrupt_state(core);
+     return ret;
+diff --git a/hw/net/trace-events b/hw/net/trace-events
+index e18f883cfd..46e40fcfa9 100644
+--- a/hw/net/trace-events
++++ b/hw/net/trace-events
+@@ -237,6 +237,7 @@ e1000e_irq_icr_read_entry(uint32_t icr) "Starting ICR read. Current ICR: 0x%x"
+ e1000e_irq_icr_read_exit(uint32_t icr) "Ending ICR read. Current ICR: 0x%x"
+ e1000e_irq_icr_clear_zero_ims(void) "Clearing ICR on read due to zero IMS"
+ e1000e_irq_icr_clear_iame(void) "Clearing ICR on read due to IAME"
++e1000e_irq_icr_clear_icr_bit_ims(uint32_t icr, uint32_t ims) "Clearing ICR on read due corresponding IMS bit: 0x%x & 0x%x"
+ e1000e_irq_iam_clear_eiame(uint32_t iam, uint32_t cause) "Clearing IMS due to EIAME, IAM: 0x%X, cause: 0x%X"
+ e1000e_irq_icr_clear_eiac(uint32_t icr, uint32_t eiac) "Clearing ICR bits due to EIAC, ICR: 0x%X, EIAC: 0x%X"
+ e1000e_irq_ims_clear_set_imc(uint32_t val) "Clearing IMS bits due to IMC write 0x%x"
 -- 
 2.26.2
 
