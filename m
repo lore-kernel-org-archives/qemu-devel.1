@@ -2,80 +2,109 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F603C4345F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EA79C43467
 	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 15:05:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47E7B221F2
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 14:57:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S3/XjuOr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47E7B221F2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E6D0920897
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 14:49:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6D0920897
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYsoq-00036W-AX
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 10:57:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59966)
+	id 1jYshO-00074c-1T
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 10:49:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58602)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jYso0-0001WO-47
- for qemu-devel@nongnu.org; Wed, 13 May 2020 10:56:20 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29975
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jYsnz-00019L-3P
- for qemu-devel@nongnu.org; Wed, 13 May 2020 10:56:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589381777;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=V7RZyYrEUJJY2VYJNHhLuuLbpUpTWiLd5zfqEmZQ7js=;
- b=S3/XjuOrNqI/1vQYQF6acY5I1U7aYZWdyv+6Y0BEo7i5VOZh/in5OgQ/jlWkAhWsTqyCCu
- lS1Wgx0yYeNAFKKBxXwXZmPZXSqBQBJEW/RtQ7iPoqrtGMPYmoPOQi2H+3NiJ/xQpJrZ4/
- LkhEtR2+n6cWVpPguzVIa67SxI4lEMs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-RyNdcyiFPCm25V7NOaaZVQ-1; Wed, 13 May 2020 10:56:14 -0400
-X-MC-Unique: RyNdcyiFPCm25V7NOaaZVQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F02B835BB7;
- Wed, 13 May 2020 14:56:13 +0000 (UTC)
-Received: from localhost (unknown [10.40.193.218])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 61AAC10013D9;
- Wed, 13 May 2020 14:56:12 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [RFC v2] migration: Add migrate-set-bitmap-node-mapping
-Date: Wed, 13 May 2020 16:56:10 +0200
-Message-Id: <20200513145610.1484567-1-mreitz@redhat.com>
+ (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
+ id 1jYsgC-0006O6-RQ
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 10:48:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:25094)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
+ id 1jYsgB-00070y-5H
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 10:48:16 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 04DEWKEQ009170; Wed, 13 May 2020 10:48:10 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 3101maet5m-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 13 May 2020 10:48:10 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04DEYsxJ027295;
+ Wed, 13 May 2020 10:48:10 -0400
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
+ [169.63.121.186])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 3101maet4n-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 13 May 2020 10:48:10 -0400
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+ by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04DEl8OU025719;
+ Wed, 13 May 2020 14:48:08 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com
+ (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+ by ppma03wdc.us.ibm.com with ESMTP id 3100ub79bh-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 13 May 2020 14:48:08 +0000
+Received: from b03ledav003.gho.boulder.ibm.com
+ (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+ by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 04DEm7pd25559398
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 13 May 2020 14:48:07 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A9BCE6A051;
+ Wed, 13 May 2020 14:48:07 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C47C66A047;
+ Wed, 13 May 2020 14:48:06 +0000 (GMT)
+Received: from [9.160.50.49] (unknown [9.160.50.49])
+ by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Wed, 13 May 2020 14:48:06 +0000 (GMT)
+Subject: Re: [PATCH 0/4] Add support for SafeStack
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20200429194420.21147-1-dbuono@linux.vnet.ibm.com>
+ <51f28cf2-0f34-508f-96f8-02c02b3c8a85@redhat.com>
+ <20200505133111.GM764268@redhat.com>
+ <c6ac2d0e-34bf-9927-f2fe-2ef0408dcbfb@redhat.com>
+From: Daniele Buono <dbuono@linux.vnet.ibm.com>
+Message-ID: <7f6916f8-c559-ebae-e6b2-75083f3ff2e5@linux.vnet.ibm.com>
+Date: Wed, 13 May 2020 10:48:04 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <c6ac2d0e-34bf-9927-f2fe-2ef0408dcbfb@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 04:17:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
+ definitions=2020-05-13_06:2020-05-13,
+ 2020-05-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 adultscore=0
+ cotscore=-2147483648 clxscore=1011 malwarescore=0 impostorscore=0
+ suspectscore=0 lowpriorityscore=0 priorityscore=1501 mlxlogscore=999
+ spamscore=0 phishscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2004280000 definitions=main-2005130126
+Received-SPF: none client-ip=148.163.156.1;
+ envelope-from=dbuono@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 10:48:11
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -89,208 +118,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Peter Krempa <pkrempa@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Tobin Feldman-Fitzthum <tobin@ibm.com>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This command allows mapping block node names to aliases for the purpose
-of block dirty bitmap migration.
+Hello everybody, just pinging since it it's been a few days.
 
-This way, management tools can use different node names on the source
-and destination and pass the mapping of how bitmaps are to be
-transferred to qemu (on the source, the destination, or even both with
-arbitrary aliases in the migration stream).
-
-Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
-Branch: https://github.com/XanClic/qemu.git migration-bitmap-mapping-rfc-v2
-Branch: https://git.xanclic.moe/XanClic/qemu.git migration-bitmap-mapping-rfc-v2
-
-(Sorry, v1 was just broken.  This one should work better.)
-
-Vladimir has proposed something like this in April:
-https://lists.nongnu.org/archive/html/qemu-block/2020-04/msg00171.html
-
-Now I’ve been asked by my manager to look at this, so I decided to just
-write a patch to see how it’d play out.
-
-This is an RFC, because I’d like to tack on tests to the final version,
-but I’m not sure whether I can come up with something before the end of
-the week (and I’ll be on PTO for the next two weeks).
-
-Also, I don’t know whether migration/block-dirty-bitmap.c is the best
-place to put qmp_migrate_set_bitmap_mapping(), but it appears we already
-have some QMP handlers in migration/, so I suppose it isn’t too bad.
----
- qapi/migration.json            | 36 ++++++++++++++++++++
- migration/block-dirty-bitmap.c | 60 ++++++++++++++++++++++++++++++++--
- 2 files changed, 94 insertions(+), 2 deletions(-)
-
-diff --git a/qapi/migration.json b/qapi/migration.json
-index d5000558c6..97037ea635 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -1621,3 +1621,39 @@
- ##
- { 'event': 'UNPLUG_PRIMARY',
-   'data': { 'device-id': 'str' } }
-+
-+##
-+# @MigrationBlockNodeMapping:
-+#
-+# Maps a block node name to an alias for migration.
-+#
-+# @node-name: A block node name.
-+#
-+# @alias: An alias name for migration (for example the node name on
-+#         the opposite site).
-+#
-+# Since: 5.1
-+##
-+{ 'struct': 'MigrationBlockNodeMapping',
-+  'data': {
-+      'node-name': 'str',
-+      'alias': 'str'
-+  } }
-+
-+##
-+# @migrate-set-bitmap-node-mapping:
-+#
-+# Maps block node names to arbitrary aliases for the purpose of dirty
-+# bitmap migration.  Such aliases may for example be the corresponding
-+# node names on the opposite site.
-+#
-+# By default, every node name is mapped to itself.
-+#
-+# @mapping: The mapping; must be one-to-one, but not necessarily
-+#           complete.  Any mapping not given will be reset to the
-+#           default (i.e. the identity mapping).
-+#
-+# Since: 5.1
-+##
-+{ 'command': 'migrate-set-bitmap-node-mapping',
-+  'data': { 'mapping': ['MigrationBlockNodeMapping'] } }
-diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
-index 7eafface61..73f400e7ea 100644
---- a/migration/block-dirty-bitmap.c
-+++ b/migration/block-dirty-bitmap.c
-@@ -73,6 +73,8 @@
- #include "qemu/hbitmap.h"
- #include "qemu/cutils.h"
- #include "qapi/error.h"
-+#include "qapi/qapi-commands-migration.h"
-+#include "qapi/qmp/qdict.h"
- #include "trace.h"
- 
- #define CHUNK_SIZE     (1 << 10)
-@@ -121,6 +123,9 @@ typedef struct DirtyBitmapMigState {
-     bool bulk_completed;
-     bool no_bitmaps;
- 
-+    QDict *node_in_mapping;
-+    QDict *node_out_mapping;
-+
-     /* for send_bitmap_bits() */
-     BlockDriverState *prev_bs;
-     BdrvDirtyBitmap *prev_bitmap;
-@@ -281,8 +286,13 @@ static int init_dirty_bitmap_migration(void)
-     dirty_bitmap_mig_state.no_bitmaps = false;
- 
-     for (bs = bdrv_next_all_states(NULL); bs; bs = bdrv_next_all_states(bs)) {
-+        const QDict *map = dirty_bitmap_mig_state.node_out_mapping;
-         const char *name = bdrv_get_device_or_node_name(bs);
- 
-+        if (map) {
-+            name = qdict_get_try_str(map, name) ?: name;
-+        }
-+
-         FOR_EACH_DIRTY_BITMAP(bs, bitmap) {
-             if (!bdrv_dirty_bitmap_name(bitmap)) {
-                 continue;
-@@ -600,6 +610,8 @@ static int dirty_bitmap_load_bits(QEMUFile *f, DirtyBitmapLoadState *s)
- 
- static int dirty_bitmap_load_header(QEMUFile *f, DirtyBitmapLoadState *s)
- {
-+    const QDict *map = dirty_bitmap_mig_state.node_in_mapping;
-+    const char *mapped_node = "(none)";
-     Error *local_err = NULL;
-     bool nothing;
-     s->flags = qemu_get_bitmap_flags(f);
-@@ -612,7 +624,13 @@ static int dirty_bitmap_load_header(QEMUFile *f, DirtyBitmapLoadState *s)
-             error_report("Unable to read node name string");
-             return -EINVAL;
-         }
--        s->bs = bdrv_lookup_bs(s->node_name, s->node_name, &local_err);
-+
-+        mapped_node = s->node_name;
-+        if (map) {
-+            mapped_node = qdict_get_try_str(map, mapped_node) ?: mapped_node;
-+        }
-+
-+        s->bs = bdrv_lookup_bs(mapped_node, mapped_node, &local_err);
-         if (!s->bs) {
-             error_report_err(local_err);
-             return -EINVAL;
-@@ -634,7 +652,7 @@ static int dirty_bitmap_load_header(QEMUFile *f, DirtyBitmapLoadState *s)
-         if (!s->bitmap && !(s->flags & DIRTY_BITMAP_MIG_FLAG_START)) {
-             error_report("Error: unknown dirty bitmap "
-                          "'%s' for block device '%s'",
--                         s->bitmap_name, s->node_name);
-+                         s->bitmap_name, mapped_node);
-             return -EINVAL;
-         }
-     } else if (!s->bitmap && !nothing) {
-@@ -713,6 +731,44 @@ static bool dirty_bitmap_has_postcopy(void *opaque)
-     return true;
- }
- 
-+void qmp_migrate_set_bitmap_node_mapping(MigrationBlockNodeMappingList *mapping,
-+                                         Error **errp)
-+{
-+    QDict *in_mapping = qdict_new();
-+    QDict *out_mapping = qdict_new();
-+
-+    for (; mapping; mapping = mapping->next) {
-+        MigrationBlockNodeMapping *entry = mapping->value;
-+
-+        if (qdict_haskey(out_mapping, entry->node_name)) {
-+            error_setg(errp, "Cannot map node name '%s' twice",
-+                       entry->node_name);
-+            goto fail;
-+        }
-+
-+        if (qdict_haskey(in_mapping, entry->alias)) {
-+            error_setg(errp, "Cannot use alias '%s' twice",
-+                       entry->alias);
-+            goto fail;
-+        }
-+
-+        qdict_put_str(in_mapping, entry->alias, entry->node_name);
-+        qdict_put_str(out_mapping, entry->node_name, entry->alias);
-+    }
-+
-+    qobject_unref(dirty_bitmap_mig_state.node_in_mapping);
-+    qobject_unref(dirty_bitmap_mig_state.node_out_mapping);
-+
-+    dirty_bitmap_mig_state.node_in_mapping = in_mapping;
-+    dirty_bitmap_mig_state.node_out_mapping = out_mapping;
-+
-+    return;
-+
-+fail:
-+    qobject_unref(in_mapping);
-+    qobject_unref(out_mapping);
-+}
-+
- static SaveVMHandlers savevm_dirty_bitmap_handlers = {
-     .save_setup = dirty_bitmap_save_setup,
-     .save_live_complete_postcopy = dirty_bitmap_save_complete,
--- 
-2.26.2
-
+On 5/5/2020 9:56 AM, Philippe Mathieu-Daudé wrote:
+> On 5/5/20 3:31 PM, Daniel P. Berrangé wrote:
+>> On Tue, May 05, 2020 at 03:15:18PM +0200, Philippe Mathieu-Daudé wrote:
+>>> +Alex & Daniel who keep track on CI stuff.
+>>>
+>>> On 4/29/20 9:44 PM, Daniele Buono wrote:
+>>>> LLVM supports SafeStack instrumentation to protect against stack buffer
+>>>> overflows, since version 3.7
+>>>>
+>>>>   From https://clang.llvm.org/docs/SafeStack.html:
+>>>> "It works by separating the program stack into two distinct regions: 
+>>>> the
+>>>> safe stack and the unsafe stack. The safe stack stores return 
+>>>> addresses,
+>>>> register spills, and local variables that are always accessed in a safe
+>>>> way, while the unsafe stack stores everything else. This separation
+>>>> ensures that buffer overflows on the unsafe stack cannot be used to
+>>>> overwrite anything on the safe stack."
+>>>>
+>>>> Unfortunately, the use of two stack regions does not cope well with
+>>>> QEMU's coroutines. The second stack region is not properly set up with
+>>>> both ucontext and sigaltstack, so multiple coroutines end up sharing 
+>>>> the
+>>>> same memory area for the unsafe stack, causing undefined behaviors at
+>>>> runtime (and most iochecks to fail).
+>>>>
+>>>> This patch series fixes the implementation of the ucontext backend and
+>>>> make sure that sigaltstack is never used if the compiler is applying
+>>>> the SafeStack instrumentation. It also adds a configure flag to enable
+>>>> SafeStack, and enables iotests when SafeStack is used.
+>>>>
+>>>> This is an RFC mainly because of the low-level use of the SafeStack
+>>>> runtime.
+>>>> When running swapcontext(), we have to manually set the unsafe stack
+>>>> pointer to the new area allocated for the coroutine. LLVM does not 
+>>>> allow
+>>>> this by using builtin, so we have to use implementation details that 
+>>>> may
+>>>> change in the future.
+>>>> This patch has been tested briefly ( make check on an x86 system ) with
+>>>> clang v3.9, v4.0, v5.0, v6.0
+>>>> Heavier testing, with make check-acceptance has been performed with
+>>>> clang v7.0
+>>>
+>>> I noticed building using SafeStack is slower, and running with it is 
+>>> even
+>>> sloooower. It makes sense to have this integrated if we use it 
+>>> regularly. Do
+>>> you have plan for this? Using public CI doesn't seem reasonable.
+>>
+>> The runtime behaviour is rather odd, given the docs they provide:
+>>
+>> "The performance overhead of the SafeStack instrumentation is
+>>   less than 0.1% on average across a variety of benchmarks
+>>   This is mainly because most small functions do not have any
+>>   variables that require the unsafe stack and, hence, do not
+>>   need unsafe stack frames to be created. The cost of creating
+>>   unsafe stack frames for large functions is amortized by the
+>>   cost of executing the function.
+>>
+>>    In some cases, SafeStack actually improves the performance"
+> 
+> I'm sorry I was testing this with a single core instead of all of 
+> them... Thanks for looking at the doc.
+> 
+>>
+>> Regards,
+>> Daniel
+>>
+> 
+> 
 
