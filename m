@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 455C2C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 15:52:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1559C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 15:53:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6234D205CB
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 15:52:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E75C8205CB
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 15:53:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XZ0cixEI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6234D205CB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ph2MfRon"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E75C8205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYtft-0006aL-Aw
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 11:52:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41310)
+	id 1jYtgt-0007ZN-Nc
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 11:53:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41696)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jYteS-0005aR-H1
- for qemu-devel@nongnu.org; Wed, 13 May 2020 11:50:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49194
- helo=us-smtp-1.mimecast.com)
+ id 1jYtgK-0007A5-7A
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 11:52:28 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25843
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jYteR-0006l7-2A
- for qemu-devel@nongnu.org; Wed, 13 May 2020 11:50:32 -0400
+ id 1jYtgJ-00075k-5t
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 11:52:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589385029;
+ s=mimecast20190719; t=1589385146;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7d1yHaBFiSM3QsKaplg+B3gz6BaTK/td5+wajKdejKY=;
- b=XZ0cixEIv7sK+o87Wud1aeTp2aXmLflhnqbolqC4TZ0HDiUza24BHl0QFJMjg2b/Jh/0Yd
- MlTjaaKY7NcPIM5AOLGwPuVB4nnvgc7v8PzUsWaXgzHuK+CL/VHcz4T3zb30XysycPl+vf
- KWggVdqZVBoORN0JaFIi6njjGzcLF5U=
+ bh=9jV5m4gv+7D5YGDD0W8RPM7y0xwxz7W5aYTLSO33TKk=;
+ b=Ph2MfRonduzaHhm/h7hou8QXJAn9vfRQxGKzmpi+N5UPch986LpZ0B60ZVDi+AhyBC2B1G
+ aUA89OotUOWvGv2VbDVsN/v2t7hx13oU5Qoq1hzjEYQ4TePUWrKzDOv/GFyROOVYIFdLA5
+ 4TKMxQVo4Nl0ldrsArGKtrQV5epoAQI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-323-qhULpBMPOZ-HZA5qR4etnQ-1; Wed, 13 May 2020 11:50:27 -0400
-X-MC-Unique: qhULpBMPOZ-HZA5qR4etnQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-513-uWNx8_KkO2OqDHV75wVr0w-1; Wed, 13 May 2020 11:52:24 -0400
+X-MC-Unique: uWNx8_KkO2OqDHV75wVr0w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CCDA3460;
- Wed, 13 May 2020 15:50:26 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9000C1083E88;
+ Wed, 13 May 2020 15:52:23 +0000 (UTC)
 Received: from redhat.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CC9D95C1BB;
- Wed, 13 May 2020 15:50:18 +0000 (UTC)
-Date: Wed, 13 May 2020 16:50:15 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6451F783B3;
+ Wed, 13 May 2020 15:52:15 +0000 (UTC)
+Date: Wed, 13 May 2020 16:52:12 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: xiaoqiang zhao <zxq_yx_007@163.com>
-Subject: Re: [PATCH v3 3/3] qemu-options: updates for abstract unix sockets
-Message-ID: <20200513155015.GJ1253949@redhat.com>
+Subject: Re: [PATCH v3 1/3] qemu-sockets: add abstract UNIX domain socket
+ support
+Message-ID: <20200513155212.GK1253949@redhat.com>
 References: <20200510061422.24841-1-zxq_yx_007@163.com>
- <20200510061422.24841-4-zxq_yx_007@163.com>
+ <20200510061422.24841-2-zxq_yx_007@163.com>
 MIME-Version: 1.0
-In-Reply-To: <20200510061422.24841-4-zxq_yx_007@163.com>
+In-Reply-To: <20200510061422.24841-2-zxq_yx_007@163.com>
 User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 03:05:18
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 04:17:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -10
 X-Spam_score: -1.1
@@ -106,13 +107,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, May 10, 2020 at 02:14:22PM +0800, xiaoqiang zhao wrote:
-> add options documents changes for -chardev
+On Sun, May 10, 2020 at 02:14:20PM +0800, xiaoqiang zhao wrote:
+> unix_listen/connect_saddr now support abstract address types
+> 
+> two aditional BOOL switches are introduced:
+> tight: whether to set @addrlen to the minimal string length,
+>        or the maximum sun_path length. default is TRUE
+> abstract: whether we use abstract address. default is FALSE
+> 
+> cli example:
+> -monitor unix:/tmp/unix.socket,abstract,tight=off
+> OR
+> -chardev socket,path=/tmp/unix.socket,id=unix1,abstract,tight=on
 > 
 > Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
 > ---
->  qemu-options.hx | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
+>  chardev/char-socket.c |  4 ++++
+>  chardev/char.c        |  7 +++++++
+>  qapi/sockets.json     |  9 ++++++++-
+>  util/qemu-sockets.c   | 39 ++++++++++++++++++++++++++++++++-------
+>  4 files changed, 51 insertions(+), 8 deletions(-)
+
+With the changes Eric suggests, then
 
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 
