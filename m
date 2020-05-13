@@ -2,100 +2,96 @@ Return-Path: <SRS0=Qw6D=63=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02674CA90AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 13:42:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCB02CA90AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 13:49:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F24D320671
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 13:42:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F32C5204EA
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 13:49:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="zNYO7tM/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F24D320671
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="begXuP0W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F32C5204EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYreZ-000534-J7
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 09:42:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48290)
+	id 1jYrle-0001MF-Nq
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 09:49:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49690)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eyal.moscovici@oracle.com>)
- id 1jYrb9-0000zP-4G; Wed, 13 May 2020 09:38:59 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:35194)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eyal.moscovici@oracle.com>)
- id 1jYrb8-0005DR-2m; Wed, 13 May 2020 09:38:58 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04DDX9Wq023635;
- Wed, 13 May 2020 13:38:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
- bh=2YvLZRapzNNUWA58DYlojtp/pTZjH7rlMhyMwFTHNVw=;
- b=zNYO7tM/zwQWfWtL5iKkxKIidz4BDoCKByTwGSkKQdbC1IM2apYV6Su9CluZO5gEb4Ys
- DpiDVHeKvtK3R1vVY7haWYsGLdWn4sXNPtcIbMBm/mVynDeRAgJcaM7HXdbXwqFjC7wy
- CAcMLclr3BtQkqF2L+SN4n0jrxvGdGlbIZavptKSRhOXFW37h4ROyVJTdVy/s0lekSUl
- OcsISgg7homzyjOr+X1NIUIONvtcrzUO/UuRbK82Im/nsjY5PH/pGdBJHEFq4QPMgSRl
- lXerZ8H1XpD6uInPc7x5ke4BfHLla17DW+Wx+UpOvg9ImeHiGD68KRlPONAl+Ark7Jh2 nA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by aserp2120.oracle.com with ESMTP id 3100xwc816-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Wed, 13 May 2020 13:38:56 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04DDY2W9113567;
- Wed, 13 May 2020 13:36:55 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by userp3030.oracle.com with ESMTP id 3100yek9nv-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 13 May 2020 13:36:55 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 04DDaswg015458;
- Wed, 13 May 2020 13:36:54 GMT
-Received: from localhost.localdomain (/10.74.123.68)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 13 May 2020 06:36:53 -0700
-From: Eyal Moscovici <eyal.moscovici@oracle.com>
-To: 
-Subject: [PATCH v3 4/4] qemu-img: Add --start-offset and --max-length to map
-Date: Wed, 13 May 2020 16:36:29 +0300
-Message-Id: <20200513133629.18508-5-eyal.moscovici@oracle.com>
-X-Mailer: git-send-email 2.17.2 (Apple Git-113)
-In-Reply-To: <20200513133629.18508-1-eyal.moscovici@oracle.com>
-References: <20200513133629.18508-1-eyal.moscovici@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9619
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
- malwarescore=0 bulkscore=0
- phishscore=0 suspectscore=0 adultscore=0 mlxscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005130121
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9619
- signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
- lowpriorityscore=0
- suspectscore=0 mlxlogscore=999 clxscore=1015 cotscore=-2147483648
- mlxscore=0 phishscore=0 adultscore=0 impostorscore=0 bulkscore=0
- malwarescore=0 priorityscore=1501 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2005130121
-Received-SPF: pass client-ip=141.146.126.78;
- envelope-from=eyal.moscovici@oracle.com; helo=aserp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 08:03:36
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jYrl0-0000sa-9Y
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 09:49:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36688
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jYrkz-0007vg-Io
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 09:49:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589377749;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=fhabiHQnR+Xoo1WTYRfeg4rc8ntf/XQkOb0vYEvHbbA=;
+ b=begXuP0WeWYsuPi/tdWRMSBxDyJnTsCQ63dU2VLficdn6m7g2Tf7ExwffLyN1OY5eRiZYj
+ 8jNCMH27zHTle0b1D/5FB6JkRRjUH/AgZa4KpqI0Rlp0urGd+cptHMbxHJ5rVFhjP+kWr8
+ zvFymoIanqInc5FPNR8QaUmUVxpdHMI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-477-eU-buXiON9qhKPK1kQeY8A-1; Wed, 13 May 2020 09:49:05 -0400
+X-MC-Unique: eU-buXiON9qhKPK1kQeY8A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08C931841926;
+ Wed, 13 May 2020 13:49:04 +0000 (UTC)
+Received: from work-vm (ovpn-115-30.ams2.redhat.com [10.36.115.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 50613610F2;
+ Wed, 13 May 2020 13:48:59 +0000 (UTC)
+Date: Wed, 13 May 2020 14:48:56 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [PATCH 0/5] Introduce 'yank' oob qmp command to recover from
+ hanging qemu
+Message-ID: <20200513134856.GK3225@work-vm>
+References: <20200511120718.GD2811@work-vm>
+ <20200511121714.GL1135885@redhat.com>
+ <20200511154645.GI2811@work-vm> <20200512113206.62836e44@luklap>
+ <20200512094337.GK1191162@redhat.com>
+ <20200513103245.GD6202@linux.fritz.box>
+ <20200513105359.GF3225@work-vm>
+ <20200513111320.GE6202@linux.fritz.box>
+ <20200513125624.GJ3225@work-vm>
+ <20200513130849.GD1253949@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <20200513130849.GD1253949@redhat.com>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 03:05:18
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ T_HK_NAME_DR=0.01, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,119 +104,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Eyal Moscovici <eyal.moscovici@oracle.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- liran.alon@oracle.com, Yoav Elnekave <yoav.elnekave@oracle.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Lukas Straub <lukasstraub2@web.de>,
+ qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The mapping operation of large disks especially ones stored over a
-long chain of QCOW2 files can take a long time to finish.
-Additionally when mapping fails there was no way recover by
-restarting the mapping from the failed location.
+* Daniel P. Berrangé (berrange@redhat.com) wrote:
+> On Wed, May 13, 2020 at 01:56:24PM +0100, Dr. David Alan Gilbert wrote:
+> > * Kevin Wolf (kwolf@redhat.com) wrote:
+> > > I guess it would be nice to have a single namespace for everything in
+> > > QEMU, but the reality is that we have a few separate ones. As long as we
+> > > consistently add a prefix that identifies the namespace in question, I
+> > > think that would work.
+> > 
+> > > This means that if we're using node-name to identify the NBD connection,
+> > > the namespace should be 'block' rather than 'nbd'.
+> > > 
+> > > One more thing to consider is, what if a single object has multiple
+> > > connections? In the case of node-names, we have a limited set of allowed
+> > > characters, so we can use one of the remaining characters as a separator
+> > > and then suffix a counter. In other places, the identifier isn't
+> > > restricted, so suffixing doesn't work. Maybe prefixing does, but it
+> > > would have to be there from the beginning then.
+> > 
+> > Yeh I worry about whether on nbd if you can have multiple nbd
+> > connections to one block device.
+> 
+> The kernel NBD driver now supports multiple parallel connections.
+> QEMU hasn't implemented this in its NBD code yet, but I certainly
+> see that being in scope for future.
 
-The new options, --start-offset and --max-length allows the user to
-divide these type of map operations into shorter independent tasks.
+It's not parallel for performance that worries me, it's more about
+separateq connections for separate uses - e.g. if we're serving the same
+read-only disk to multiple separate things.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Acked-by: Mark Kanda <mark.kanda@oracle.com>
-Co-developed-by: Yoav Elnekave <yoav.elnekave@oracle.com>
-Signed-off-by: Yoav Elnekave <yoav.elnekave@oracle.com>
-Signed-off-by: Eyal Moscovici <eyal.moscovici@oracle.com>
----
- docs/tools/qemu-img.rst |  2 +-
- qemu-img-cmds.hx        |  4 ++--
- qemu-img.c              | 22 +++++++++++++++++++++-
- 3 files changed, 24 insertions(+), 4 deletions(-)
-
-diff --git a/docs/tools/qemu-img.rst b/docs/tools/qemu-img.rst
-index 0080f83a76..f4ffe528ea 100644
---- a/docs/tools/qemu-img.rst
-+++ b/docs/tools/qemu-img.rst
-@@ -519,7 +519,7 @@ Command description:
-     ``ImageInfoSpecific*`` QAPI object (e.g. ``ImageInfoSpecificQCow2``
-     for qcow2 images).
+Dave
  
--.. option:: map [--object OBJECTDEF] [--image-opts] [-f FMT] [--output=OFMT] [-U] FILENAME
-+.. option:: map [--object OBJECTDEF] [--image-opts] [-f FMT] [--start-offset=OFFSET] [--max-length=LEN] [--output=OFMT] [-U] FILENAME
- 
-   Dump the metadata of image *FILENAME* and its backing file chain.
-   In particular, this commands dumps the allocation state of every sector
-diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-index c9c54de1df..35f832816f 100644
---- a/qemu-img-cmds.hx
-+++ b/qemu-img-cmds.hx
-@@ -63,9 +63,9 @@ SRST
- ERST
- 
- DEF("map", img_map,
--    "map [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] [-U] filename")
-+    "map [--object objectdef] [--image-opts] [-f fmt] [--start-offset=offset] [--max-length=len] [--output=ofmt] [-U] filename")
- SRST
--.. option:: map [--object OBJECTDEF] [--image-opts] [-f FMT] [--output=OFMT] [-U] FILENAME
-+.. option:: map [--object OBJECTDEF] [--image-opts] [-f FMT] [--start-offset=OFFSET] [--max-length=LEN] [--output=OFMT] [-U] FILENAME
- ERST
- 
- DEF("measure", img_measure,
-diff --git a/qemu-img.c b/qemu-img.c
-index 80340cb218..bce7b49799 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -3008,6 +3008,8 @@ static int img_map(int argc, char **argv)
-     int ret = 0;
-     bool image_opts = false;
-     bool force_share = false;
-+    int64_t start_offset = 0;
-+    int64_t max_length = -1;
- 
-     fmt = NULL;
-     output = NULL;
-@@ -3020,9 +3022,11 @@ static int img_map(int argc, char **argv)
-             {"object", required_argument, 0, OPTION_OBJECT},
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-             {"force-share", no_argument, 0, 'U'},
-+            {"start-offset", required_argument, 0, 's'},
-+            {"max-length", required_argument, 0, 'l'},
-             {0, 0, 0, 0}
-         };
--        c = getopt_long(argc, argv, ":f:hU",
-+        c = getopt_long(argc, argv, ":f:s:l:hU",
-                         long_options, &option_index);
-         if (c == -1) {
-             break;
-@@ -3046,6 +3050,18 @@ static int img_map(int argc, char **argv)
-         case OPTION_OUTPUT:
-             output = optarg;
-             break;
-+        case 's':
-+            start_offset = cvtnum("start offset", optarg);
-+            if (start_offset < 0) {
-+                return 1;
-+            }
-+            break;
-+        case 'l':
-+            max_length = cvtnum("max length", optarg);
-+            if (max_length < 0) {
-+                return 1;
-+            }
-+            break;
-         case OPTION_OBJECT: {
-             QemuOpts *opts;
-             opts = qemu_opts_parse_noisily(&qemu_object_opts,
-@@ -3096,7 +3112,11 @@ static int img_map(int argc, char **argv)
-         error_report("Failed to get size for '%s'", filename);
-         return 1;
-     }
-+    if (max_length != -1) {
-+        length = MIN(start_offset + max_length, length);
-+    }
- 
-+    curr.start = start_offset;
-     while (curr.start + curr.length < length) {
-         int64_t offset = curr.start + curr.length;
-         int64_t n;
--- 
-2.17.2 (Apple Git-113)
+> 
+> Regards,
+> Daniel
+> -- 
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
