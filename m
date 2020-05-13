@@ -6,72 +6,72 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 226B2CA90AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 11:17:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5554FCA90AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 11:17:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8D38206E5
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 11:17:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 22BFD20769
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 May 2020 11:17:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UHe3rj/V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8D38206E5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e1aQpsqe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22BFD20769
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jYpNx-00035q-T5
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 07:17:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54820)
+	id 1jYpO7-0003SM-8k
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 07:17:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54892)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jYpDj-00026E-4W
- for qemu-devel@nongnu.org; Wed, 13 May 2020 07:06:41 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20817
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jYpDx-0002ba-EA
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 07:06:53 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56996
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jYpDi-0003Tm-DC
- for qemu-devel@nongnu.org; Wed, 13 May 2020 07:06:38 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jYpDv-0003W6-LQ
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 07:06:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589367997;
+ s=mimecast20190719; t=1589368010;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=yLzC5M9cTE0CCCYwgChhXPorwz3KLz4Dc2cCbM7qYDE=;
- b=UHe3rj/V098OnUfEX/DZ1yqFPBMhUAx1KPvLWEVbg5SGN9hM7WRFO7g1OCPymsgwxf9oWj
- oKhnrJgFvembBXOSHZIjU8/9OgyrNddaihVnUOyV+TbPytE5gKl2bisUbhpb/iSle9EFQT
- 4Un2LunLdOrhS3A45lAckTw6RczdPJw=
+ bh=dMQaVbjJX5uhHdiLqp9dJtd4RxOpfJa8+fJcAuWWp54=;
+ b=e1aQpsqeGjc1x564Y7LMf9DPIw/VANOWFYgxYDHUfn4Pz+t0pXiePb5wkrDgVEDtSanHUn
+ cJP6KnSLWxe+n9hZopxpiQb7oFtyCoM/yqm3TWMGDkTPgcTSK2pYMtkFLXIEiBBSfZMqfB
+ Eipk1xo2a3z32pPIelvdFBG4whUMYQQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-216-74yB_mysMQS3vL_SdYd0Zw-1; Wed, 13 May 2020 07:06:33 -0400
-X-MC-Unique: 74yB_mysMQS3vL_SdYd0Zw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-97-pOmQiHPvNmSQIOs8iTlerQ-1; Wed, 13 May 2020 07:06:46 -0400
+X-MC-Unique: pOmQiHPvNmSQIOs8iTlerQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06015107ACCD;
- Wed, 13 May 2020 11:06:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FA50106B243;
+ Wed, 13 May 2020 11:06:45 +0000 (UTC)
 Received: from localhost (unknown [10.40.193.218])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8F15A2E035;
- Wed, 13 May 2020 11:06:32 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 175E45D9E8;
+ Wed, 13 May 2020 11:06:44 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v4 17/34] block: Pull out bdrv_default_perms_for_storage()
-Date: Wed, 13 May 2020 13:05:27 +0200
-Message-Id: <20200513110544.176672-18-mreitz@redhat.com>
+Subject: [PATCH v4 22/34] block: Drop child_format
+Date: Wed, 13 May 2020 13:05:32 +0200
+Message-Id: <20200513110544.176672-23-mreitz@redhat.com>
 In-Reply-To: <20200513110544.176672-1-mreitz@redhat.com>
 References: <20200513110544.176672-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 01:56:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 04:17:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -97,111 +97,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Right now, bdrv_format_default_perms() is used by format parents
-(generally). We want to switch to a model where most parents use a
-single BdrvChildClass, which then decides the permissions based on the
-child role. To do so, we have to split bdrv_format_default_perms() into
-separate functions for each such role.
-
-Note that bdrv_default_perms_for_storage() currently handles all DATA |
-METADATA children.  A follow-up patch is going to split it further into
-one function for each case.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block.c | 71 +++++++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 46 insertions(+), 25 deletions(-)
+ include/block/block_int.h |  1 -
+ block.c                   | 29 -----------------------------
+ 2 files changed, 30 deletions(-)
 
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 3a9dda9be7..4b09fa1124 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -742,7 +742,6 @@ struct BdrvChildClass {
+ 
+ extern const BdrvChildClass child_of_bds;
+ extern const BdrvChildClass child_file;
+-extern const BdrvChildClass child_format;
+ extern const BdrvChildClass child_backing;
+ 
+ struct BdrvChild {
 diff --git a/block.c b/block.c
-index b12222a471..5d17aa1cc3 100644
+index 088727fdbe..85b4f947ba 100644
 --- a/block.c
 +++ b/block.c
-@@ -2506,6 +2506,50 @@ static void bdrv_default_perms_for_cow(BlockDriverState *bs, BdrvChild *c,
-     *nshared = shared;
- }
+@@ -1172,35 +1172,6 @@ const BdrvChildClass child_file = {
+     .set_aio_ctx     = bdrv_child_cb_set_aio_ctx,
+ };
  
-+static void bdrv_default_perms_for_storage(BlockDriverState *bs, BdrvChild *c,
-+                                           const BdrvChildClass *child_class,
-+                                           BdrvChildRole role,
-+                                           BlockReopenQueue *reopen_queue,
-+                                           uint64_t perm, uint64_t shared,
-+                                           uint64_t *nperm, uint64_t *nshared)
-+{
-+    int flags;
-+
-+    assert(child_class == &child_file ||
-+           (child_class == &child_of_bds &&
-+            (role & (BDRV_CHILD_METADATA | BDRV_CHILD_DATA))));
-+
-+    flags = bdrv_reopen_get_flags(reopen_queue, bs);
-+
-+    /*
-+     * Apart from the modifications below, the same permissions are
-+     * forwarded and left alone as for filters
-+     */
-+    bdrv_filter_default_perms(bs, c, child_class, role, reopen_queue,
-+                              perm, shared, &perm, &shared);
-+
-+    /* Format drivers may touch metadata even if the guest doesn't write */
-+    if (bdrv_is_writable_after_reopen(bs, reopen_queue)) {
-+        perm |= BLK_PERM_WRITE | BLK_PERM_RESIZE;
-+    }
-+
-+    /*
-+     * bs->file always needs to be consistent because of the metadata. We
-+     * can never allow other users to resize or write to it.
-+     */
-+    if (!(flags & BDRV_O_NO_IO)) {
-+        perm |= BLK_PERM_CONSISTENT_READ;
-+    }
-+    shared &= ~(BLK_PERM_WRITE | BLK_PERM_RESIZE);
-+
-+    if (bs->open_flags & BDRV_O_INACTIVE) {
-+        shared |= BLK_PERM_WRITE | BLK_PERM_RESIZE;
-+    }
-+
-+    *nperm = perm;
-+    *nshared = shared;
-+}
-+
- void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
-                                const BdrvChildClass *child_class,
-                                BdrvChildRole role,
-@@ -2517,31 +2561,8 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
-     assert(child_class == &child_backing || child_class == &child_file);
- 
-     if (!backing) {
--        int flags = bdrv_reopen_get_flags(reopen_queue, bs);
+-/*
+- * Returns the options and flags that bs->file should get if the use of formats
+- * (and not only protocols) is permitted for it, based on the given options and
+- * flags for the parent BDS
+- */
+-static void bdrv_inherited_fmt_options(BdrvChildRole role,
+-                                       bool parent_is_format,
+-                                       int *child_flags, QDict *child_options,
+-                                       int parent_flags, QDict *parent_options)
+-{
+-    bdrv_inherited_options(BDRV_CHILD_DATA, false,
+-                           child_flags, child_options,
+-                           parent_flags, parent_options);
+-}
 -
--        /* Apart from the modifications below, the same permissions are
--         * forwarded and left alone as for filters */
--        bdrv_filter_default_perms(bs, c, child_class, role, reopen_queue,
--                                  perm, shared, &perm, &shared);
+-const BdrvChildClass child_format = {
+-    .parent_is_bds   = true,
+-    .get_parent_desc = bdrv_child_get_parent_desc,
+-    .inherit_options = bdrv_inherited_fmt_options,
+-    .drained_begin   = bdrv_child_cb_drained_begin,
+-    .drained_poll    = bdrv_child_cb_drained_poll,
+-    .drained_end     = bdrv_child_cb_drained_end,
+-    .attach          = bdrv_child_cb_attach,
+-    .detach          = bdrv_child_cb_detach,
+-    .inactivate      = bdrv_child_cb_inactivate,
+-    .can_set_aio_ctx = bdrv_child_cb_can_set_aio_ctx,
+-    .set_aio_ctx     = bdrv_child_cb_set_aio_ctx,
+-};
 -
--        /* Format drivers may touch metadata even if the guest doesn't write */
--        if (bdrv_is_writable_after_reopen(bs, reopen_queue)) {
--            perm |= BLK_PERM_WRITE | BLK_PERM_RESIZE;
--        }
--
--        /* bs->file always needs to be consistent because of the metadata. We
--         * can never allow other users to resize or write to it. */
--        if (!(flags & BDRV_O_NO_IO)) {
--            perm |= BLK_PERM_CONSISTENT_READ;
--        }
--        shared &= ~(BLK_PERM_WRITE | BLK_PERM_RESIZE);
--
--        if (bs->open_flags & BDRV_O_INACTIVE) {
--            shared |= BLK_PERM_WRITE | BLK_PERM_RESIZE;
--        }
--
--        *nperm = perm;
--        *nshared = shared;
-+        bdrv_default_perms_for_storage(bs, c, child_class, role, reopen_queue,
-+                                       perm, shared, nperm, nshared);
-     } else {
-         bdrv_default_perms_for_cow(bs, c, child_class, role, reopen_queue,
-                                    perm, shared, nperm, nshared);
+ static void bdrv_backing_attach(BdrvChild *c)
+ {
+     BlockDriverState *parent = c->opaque;
 -- 
 2.26.2
 
