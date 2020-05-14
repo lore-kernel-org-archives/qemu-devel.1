@@ -6,72 +6,73 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5178C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 12:39:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E1BBC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 12:39:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98F752074A
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 12:39:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98F752074A
+	by mail.kernel.org (Postfix) with ESMTPS id DA88C2065D
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 12:39:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA88C2065D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZD8h-0004x6-Ki
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 08:39:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53054)
+	id 1jZD8j-00051Q-TB
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 08:39:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53064)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
- id 1jZD7O-0003Dm-Mq; Thu, 14 May 2020 08:37:42 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53110)
+ id 1jZD7P-0003Du-Gy; Thu, 14 May 2020 08:37:44 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64590
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
- id 1jZD7N-0006UU-CA; Thu, 14 May 2020 08:37:42 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 04ECW3GX065832; Thu, 14 May 2020 08:37:39 -0400
+ id 1jZD7O-0006Ui-Mf; Thu, 14 May 2020 08:37:43 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 04ECX8mh109791; Thu, 14 May 2020 08:37:40 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 310syx24t7-1
+ by mx0b-001b2d01.pphosted.com with ESMTP id 310uautqsa-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 14 May 2020 08:37:39 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04ECWo50072201;
- Thu, 14 May 2020 08:37:38 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 310syx24sd-1
+ Thu, 14 May 2020 08:37:40 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04ECXba1113240;
+ Thu, 14 May 2020 08:37:40 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.99])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 310uautqrf-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 14 May 2020 08:37:38 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
- by ppma03ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04ECZN5R007631;
- Thu, 14 May 2020 12:37:36 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com
- (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
- by ppma03ams.nl.ibm.com with ESMTP id 3100ubbn7s-1
+ Thu, 14 May 2020 08:37:40 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+ by ppma04ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04ECZPuj011979;
+ Thu, 14 May 2020 12:37:38 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com
+ (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+ by ppma04ams.nl.ibm.com with ESMTP id 3100ub3mqg-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 14 May 2020 12:37:36 +0000
+ Thu, 14 May 2020 12:37:38 +0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com
  (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 04ECaM5b58720522
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 04ECbaLv60883168
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 14 May 2020 12:36:22 GMT
+ Thu, 14 May 2020 12:37:36 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EFA2BA4054;
- Thu, 14 May 2020 12:37:33 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 3D483A405F;
+ Thu, 14 May 2020 12:37:36 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 5DAD3A4060;
- Thu, 14 May 2020 12:37:33 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 9F545A405B;
+ Thu, 14 May 2020 12:37:35 +0000 (GMT)
 Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
  by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 14 May 2020 12:37:33 +0000 (GMT)
+ Thu, 14 May 2020 12:37:35 +0000 (GMT)
 From: Janosch Frank <frankja@linux.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/9] pc-bios: s390x: cio.c cleanup and compile fix
-Date: Thu, 14 May 2020 08:37:21 -0400
-Message-Id: <20200514123729.156283-2-frankja@linux.ibm.com>
+Subject: [PATCH v2 4/9] pc-bios: s390x: Rename and use PSW_MASK_ZMODE constant
+Date: Thu, 14 May 2020 08:37:24 -0400
+Message-Id: <20200514123729.156283-5-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200514123729.156283-1-frankja@linux.ibm.com>
 References: <20200514123729.156283-1-frankja@linux.ibm.com>
@@ -82,15 +83,16 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
  definitions=2020-05-14_02:2020-05-14,
  2020-05-14 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 suspectscore=1
- spamscore=0 bulkscore=0 impostorscore=0 cotscore=-2147483648 phishscore=0
- lowpriorityscore=0 adultscore=0 mlxlogscore=602 malwarescore=0
- clxscore=1015 priorityscore=1501 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2005140109
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=frankja@linux.ibm.com;
+ spamscore=0 adultscore=0
+ cotscore=-2147483648 mlxscore=0 phishscore=0 suspectscore=1
+ lowpriorityscore=0 malwarescore=0 impostorscore=0 mlxlogscore=999
+ priorityscore=1501 bulkscore=0 clxscore=1015 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005140109
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=frankja@linux.ibm.com;
  helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 07:20:14
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 08:37:37
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
 X-Spam_score_int: -25
 X-Spam_score: -2.6
 X-Spam_bar: --
@@ -115,88 +117,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let's initialize the structs at the beginning to ease reading and also
-zeroing all other fields. This also makes the compiler stop
-compalining about sense_id_ccw.flags being ored into when it's not
-initialized.
+ZMODE has a lot of ambiguity with the ESAME architecture mode, but is
+actually 64 bit addressing.
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 ---
- pc-bios/s390-ccw/cio.c | 36 ++++++++++++++++++------------------
- 1 file changed, 18 insertions(+), 18 deletions(-)
+ pc-bios/s390-ccw/dasd-ipl.c  | 3 +--
+ pc-bios/s390-ccw/s390-arch.h | 2 +-
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/cio.c b/pc-bios/s390-ccw/cio.c
-index 339ec5fbe7..63301ebb58 100644
---- a/pc-bios/s390-ccw/cio.c
-+++ b/pc-bios/s390-ccw/cio.c
-@@ -49,13 +49,13 @@ void enable_subchannel(SubChannelId schid)
+diff --git a/pc-bios/s390-ccw/dasd-ipl.c b/pc-bios/s390-ccw/dasd-ipl.c
+index 0fc879bb8e..b932531e6f 100644
+--- a/pc-bios/s390-ccw/dasd-ipl.c
++++ b/pc-bios/s390-ccw/dasd-ipl.c
+@@ -229,7 +229,6 @@ void dasd_ipl(SubChannelId schid, uint16_t cutype)
+     run_ipl2(schid, cutype, ipl2_addr);
  
- uint16_t cu_type(SubChannelId schid)
- {
--    Ccw1 sense_id_ccw;
-     SenseId sense_data;
--
--    sense_id_ccw.cmd_code = CCW_CMD_SENSE_ID;
--    sense_id_ccw.cda = ptr2u32(&sense_data);
--    sense_id_ccw.count = sizeof(sense_data);
--    sense_id_ccw.flags |= CCW_FLAG_SLI;
-+    Ccw1 sense_id_ccw = {
-+        .cmd_code = CCW_CMD_SENSE_ID,
-+        .count = sizeof(sense_data),
-+        .flags = CCW_FLAG_SLI,
-+        .cda = ptr2u32(&sense_data),
-+    };
- 
-     if (do_cio(schid, CU_TYPE_UNKNOWN, ptr2u32(&sense_id_ccw), CCW_FMT1)) {
-         panic("Failed to run SenseID CCw\n");
-@@ -67,13 +67,13 @@ uint16_t cu_type(SubChannelId schid)
- int basic_sense(SubChannelId schid, uint16_t cutype, void *sense_data,
-                  uint16_t data_size)
- {
--    Ccw1 senseCcw;
-+    Ccw1 senseCcw = {
-+        .cmd_code = CCW_CMD_BASIC_SENSE,
-+        .count = data_size,
-+        .cda = ptr2u32(sense_data),
-+    };
-     Irb irb;
- 
--    senseCcw.cmd_code = CCW_CMD_BASIC_SENSE;
--    senseCcw.cda = ptr2u32(sense_data);
--    senseCcw.count = data_size;
--
-     return __do_cio(schid, ptr2u32(&senseCcw), CCW_FMT1, &irb);
+     /* Transfer control to the guest operating system */
+-    pswl->mask |= PSW_MASK_EAMODE;   /* Force z-mode */
+-    pswl->addr |= PSW_MASK_BAMODE;   /* ...          */
++    pswl->mask |= PSW_MASK_64;   /* Force 64 bit addressing */
+     jump_to_low_kernel();
  }
+diff --git a/pc-bios/s390-ccw/s390-arch.h b/pc-bios/s390-ccw/s390-arch.h
+index 5f36361c02..73852029d4 100644
+--- a/pc-bios/s390-ccw/s390-arch.h
++++ b/pc-bios/s390-ccw/s390-arch.h
+@@ -29,7 +29,7 @@ _Static_assert(sizeof(struct PSWLegacy) == 8, "PSWLegacy size incorrect");
+ #define PSW_MASK_WAIT       0x0002000000000000ULL
+ #define PSW_MASK_EAMODE     0x0000000100000000ULL
+ #define PSW_MASK_BAMODE     0x0000000080000000ULL
+-#define PSW_MASK_ZMODE      (PSW_MASK_EAMODE | PSW_MASK_BAMODE)
++#define PSW_MASK_64         (PSW_MASK_EAMODE | PSW_MASK_BAMODE)
  
-@@ -314,7 +314,13 @@ static void print_irb_err(Irb *irb)
-  */
- static int __do_cio(SubChannelId schid, uint32_t ccw_addr, int fmt, Irb *irb)
- {
--    CmdOrb orb = {};
-+    CmdOrb orb = {
-+        .fmt = fmt,
-+        .pfch = 1,	/* QEMU's cio implementation requires prefetch */
-+        .c64 = 1,	/* QEMU's cio implementation requires 64-bit idaws */
-+        .lpm = 0xFF,	/* All paths allowed */
-+        .cpa = ccw_addr,
-+    };
-     int rc;
- 
-     IPL_assert(fmt == 0 || fmt == 1, "Invalid ccw format");
-@@ -324,12 +330,6 @@ static int __do_cio(SubChannelId schid, uint32_t ccw_addr, int fmt, Irb *irb)
-         IPL_assert(ccw_addr <= 0xFFFFFF - 8, "Invalid ccw address");
-     }
- 
--    orb.fmt = fmt;
--    orb.pfch = 1;  /* QEMU's cio implementation requires prefetch */
--    orb.c64 = 1;   /* QEMU's cio implementation requires 64-bit idaws */
--    orb.lpm = 0xFF; /* All paths allowed */
--    orb.cpa = ccw_addr;
--
-     rc = ssch(schid, &orb);
-     if (rc == 1 || rc == 2) {
-         /* Subchannel status pending or busy. Eat status and ask for retry. */
+ /* Low core mapping */
+ typedef struct LowCore {
 -- 
 2.25.1
 
