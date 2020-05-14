@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D549C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:03:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC5C6C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:04:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3870C205CB
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:03:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 73FE1205CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:04:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QHIlKe6/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3870C205CB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WZBUF+h9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73FE1205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ6xj-0007X2-B4
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 02:03:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36554)
+	id 1jZ6ye-0000i3-Ju
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 02:04:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36534)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ6pT-0005YM-SO
- for qemu-devel@nongnu.org; Thu, 14 May 2020 01:54:47 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27978
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ6pR-0005S1-Em
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 01:54:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47339
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ6pS-0001gH-VI
- for qemu-devel@nongnu.org; Thu, 14 May 2020 01:54:47 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ6pQ-0001ff-E1
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 01:54:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589435686;
+ s=mimecast20190719; t=1589435683;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3E++9MHe5bimFNuj9ypg0xKkcNAm0KbyJmDUib9cNmo=;
- b=QHIlKe6/gzPz4Jzsc6kPjFb75iOhq2MUK/hchsFjQEJSo8clIiEwzsUgPkrgFh6d3nnyYk
- hMRp0xGYL0vkT5o4B0c0+vJWL9h/0lT5Mu9UH5GQgFSZ2vDugayOnPrip7rno/Y11XAHud
- h7noU3iHORRGJdTufBclgs1FGnF3H50=
+ bh=elYehREd0a/oOvrSyCX6VUdw8yTEwHtHM2XKJOrHQzQ=;
+ b=WZBUF+h9UyaYcnRW4tPs4zSyQ8XeXGVGopBr8PxUj0JDz2nsIF+jOUTJse4H4QHTLLL5Gj
+ ug1fwZ9NJgJy47Z4SNZQR1bWB/aLozGZIHMAJfy+qm5TIvdlOGYuOL5d8MZ04meTtRDwjc
+ c7f8PtJ0uoGFyX0fk1kySzagmmOZhdY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-86-rAUj0_IrP0KtGygylZKPrg-1; Thu, 14 May 2020 01:54:44 -0400
-X-MC-Unique: rAUj0_IrP0KtGygylZKPrg-1
+ us-mta-358-5oNYb_-TPKCA1EUKeFWrmA-1; Thu, 14 May 2020 01:54:40 -0400
+X-MC-Unique: 5oNYb_-TPKCA1EUKeFWrmA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A72B1107ACCA;
- Thu, 14 May 2020 05:54:42 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E46B184194F;
+ Thu, 14 May 2020 05:54:39 +0000 (UTC)
 Received: from probe.redhat.com (ovpn-113-9.rdu2.redhat.com [10.10.113.9])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 20AF66A977;
- Thu, 14 May 2020 05:54:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0106D6A977;
+ Thu, 14 May 2020 05:54:37 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RFC 18/32] python//qmp.py: add casts to JSON deserialization
-Date: Thu, 14 May 2020 01:53:49 -0400
-Message-Id: <20200514055403.18902-19-jsnow@redhat.com>
+Subject: [PATCH RFC 16/32] python//qmp.py: re-absorb MonitorResponseError
+Date: Thu, 14 May 2020 01:53:47 -0400
+Message-Id: <20200514055403.18902-17-jsnow@redhat.com>
 In-Reply-To: <20200514055403.18902-1-jsnow@redhat.com>
 References: <20200514055403.18902-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -69,8 +69,8 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
@@ -103,59 +103,109 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-mypy and python type hints are not powerful enough to properly describe
-JSON messages in Python 3.6. The best we can do, generally, is describe
-them as Dict[str, Any].
+When I initially split this out, I considered this more of a machine
+error than a QMP protocol error, but I think that's misguided.
 
-Add casts to coerce this type for static analysis; but do NOT enforce
-this type at runtime in any way.
-
-Note: Python 3.8 adds a TypedDict construct which allows for the
-description of more arbitrary Dictionary shapes. There is a third-party
-module, "Pydantic", which is compatible with 3.6 that can be used
-instead of the JSON library that parses JSON messages to fully-typed
-Python objects, and may be preferable in some cases.
-
-(That is well beyond the scope of this commit or series.)
+Move this back to qmp.py and name it QMPResponseError. Convert
+qmp.command() to use this exception type.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- python/qemu/lib/qmp.py | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ python/qemu/lib/machine.py    | 15 +--------------
+ python/qemu/lib/qmp.py        | 17 +++++++++++++++--
+ scripts/render_block_graph.py |  4 ++--
+ 3 files changed, 18 insertions(+), 18 deletions(-)
 
+diff --git a/python/qemu/lib/machine.py b/python/qemu/lib/machine.py
+index 2f94c851ed..c31bf7cabb 100644
+--- a/python/qemu/lib/machine.py
++++ b/python/qemu/lib/machine.py
+@@ -48,19 +48,6 @@ class QEMUMachineAddDeviceError(QEMUMachineError):
+     """
+ 
+ 
+-class MonitorResponseError(qmp.QMPError):
+-    """
+-    Represents erroneous QMP monitor reply
+-    """
+-    def __init__(self, reply):
+-        try:
+-            desc = reply["error"]["desc"]
+-        except KeyError:
+-            desc = reply
+-        super().__init__(desc)
+-        self.reply = reply
+-
+-
+ class QEMUMachine:
+     """
+     A QEMU VM
+@@ -433,7 +420,7 @@ def command(self, cmd, conv_keys=True, **args):
+         if reply is None:
+             raise qmp.QMPError("Monitor is closed")
+         if "error" in reply:
+-            raise MonitorResponseError(reply)
++            raise qmp.QMPResponseError(reply)
+         return reply["return"]
+ 
+     def get_qmp_event(self, wait=False):
 diff --git a/python/qemu/lib/qmp.py b/python/qemu/lib/qmp.py
-index 0036204218..e460234f2e 100644
+index 911da59888..82f86b4e45 100644
 --- a/python/qemu/lib/qmp.py
 +++ b/python/qemu/lib/qmp.py
-@@ -13,6 +13,7 @@
- import logging
- from typing import (
-     Any,
-+    cast,
-     Dict,
-     Optional,
-     TextIO,
-@@ -129,7 +130,10 @@ def __json_read(self, only_event=False):
-             data = self.__sockfile.readline()
-             if not data:
-                 return None
--            resp = json.loads(data)
-+            # By definition, any JSON received from QMP is a QMPMessage,
-+            # and we are asserting only at static analysis time that it
-+            # has a particular shape.
-+            resp = cast(QMPMessage, json.loads(data))
-             if 'event' in resp:
-                 self.logger.debug("<<< %s", resp)
-                 self.__events.append(resp)
-@@ -261,7 +265,7 @@ def command(self, cmd, **kwds):
+@@ -61,6 +61,19 @@ class QMPTimeoutError(QMPError):
+     """
+ 
+ 
++class QMPResponseError(QMPError):
++    """
++    Represents erroneous QMP monitor reply
++    """
++    def __init__(self, reply: QMPMessage):
++        try:
++            desc = reply['error']['desc']
++        except KeyError:
++            desc = reply
++        super().__init__(desc)
++        self.reply = reply
++
++
+ class QEMUMonitorProtocol:
+     """
+     Provide an API to connect to QEMU via QEMU Monitor Protocol (QMP) and then
+@@ -250,8 +263,8 @@ def command(self, cmd, **kwds):
+         Build and send a QMP command to the monitor, report errors if any
+         """
          ret = self.cmd(cmd, kwds)
-         if 'error' in ret:
-             raise QMPResponseError(ret)
--        return ret['return']
-+        return cast(QMPReturnValue, ret['return'])
+-        if "error" in ret:
+-            raise Exception(ret['error']['desc'])
++        if 'error' in ret:
++            raise QMPResponseError(ret)
+         return ret['return']
  
      def pull_event(self, wait=False):
-         """
+diff --git a/scripts/render_block_graph.py b/scripts/render_block_graph.py
+index 8048d9fbbe..332ab49a91 100755
+--- a/scripts/render_block_graph.py
++++ b/scripts/render_block_graph.py
+@@ -26,7 +26,7 @@
+ 
+ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'python'))
+ from qemu.lib import QEMUMonitorProtocol
+-from qemu.lib.machine import MonitorResponseError
++from qemu.lib.qmp import QMPResponseError
+ 
+ 
+ def perm(arr):
+@@ -103,7 +103,7 @@ def command(self, cmd):
+         reply = json.loads(subprocess.check_output(ar))
+ 
+         if 'error' in reply:
+-            raise MonitorResponseError(reply)
++            raise QEMUResponseError(reply)
+ 
+         return reply['return']
+ 
 -- 
 2.21.1
 
