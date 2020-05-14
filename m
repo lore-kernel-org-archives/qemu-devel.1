@@ -5,81 +5,81 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46466C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:20:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45AE4C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:20:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03F5D2065D
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:20:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 10DD72065D
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:20:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WbIPQQg9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03F5D2065D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k+Uk4GTq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10DD72065D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZEib-0007hw-2p
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:20:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38510)
+	id 1jZEig-0007vn-0k
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:20:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38458)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jZEcx-0007k2-Sf
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:14:23 -0400
-Received: from mail-lf1-x136.google.com ([2a00:1450:4864:20::136]:44199)
+ id 1jZEcp-0007VZ-LT
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:14:15 -0400
+Received: from mail-lj1-x22a.google.com ([2a00:1450:4864:20::22a]:41682)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jZEcw-0003oB-77
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:14:22 -0400
-Received: by mail-lf1-x136.google.com with SMTP id d22so2744332lfm.11
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:14:21 -0700 (PDT)
+ id 1jZEco-0003mO-O2
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:14:15 -0400
+Received: by mail-lj1-x22a.google.com with SMTP id j3so3671238ljg.8
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:14:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=KBuh5XtT3vvpSuwwP/oXkh8fEbk4QnxLl6WMFlm593E=;
- b=WbIPQQg9BH7E4IXWsisbm0S36p6JyMe15G06iAuUYCYGJ/KYm6GK7CVRDhiEHIWJMa
- QrzzVF+uzK/7p/hhUr30o7lKmsPi/DeLZMDAl5oiryzsa9jmnFS0tiyRK/AoVbNRlSjP
- +1uN/7OJGzOaIH5OiVWmpG9f71uMZVEwe45uSxMZ8/vkPd2DthnohGbBClXO+c1xn0Cw
- XylAocg99frX+xnrpRbT2DZxBCHkA/X4tuR/oXApfAVCvuot8WN9/VBrvAaLT31GU7kd
- rNjydQ9cFDqjroRTp/6FY6jN1jg7gBxYXFGtCcZUn7MEY9+x7yt9assI0m56TD3t6aAL
- O4eA==
+ bh=nuSqTkHruAB6ZwGLl1uZPF5Wx8t7d9jxfBh8w6c0fhA=;
+ b=k+Uk4GTqBmbJK8Px+HokUq3zcYwpbC4CZDjECYmrBYeixAIPJ+4xgeEA5Iwq2Ka5kW
+ rKDT0A2OgwgVcXQGSdpsiAYarpHeMQUt5oTQUIGnjU5n+D1naxSZ+TNWzymoSMfEjubu
+ MyuZMJ7vK2M48TkNMKyNHLDKubyHZEoLudAp+NGquhRPgpYA2a4L/GxbSZTnZUjLsVmk
+ 1RiKspZYRySXmtJfp7BkatXT/zJl24g5dTVO+hr6+zi4z62Z5+th87F+ZrMaj0P7fOet
+ vfUYQ/THKMFKVRRkMDKtalZAnKDltcfFUhi2DlZlnBCCpyOrkBDxJ3NTKf9aoGj49c8k
+ bW/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=KBuh5XtT3vvpSuwwP/oXkh8fEbk4QnxLl6WMFlm593E=;
- b=sCQUZszu+eY8LxJ4JbZkxxUl6RFz2Q77Tdz+/Q/VlqU1mT+b6ZUow3lKpXxD9/YGJ5
- +2FexlrLC7wd0yDSI68KmOlKtTW+8Gn77uf7k7foUKrMW8/EuK7hFTLUtKy2tCCEoV32
- fCons0TjUGMG0HGcpxUqAbbOBo02xayuvKLUNETV0wzWtfdwQMAUYLrjQogTreXUua2q
- TZjO8Llw2B2D0bpHhBFef897ZJgagnxL4XaQcuZmB1uxhYkMnPdNPeinhayUO/+pJjOn
- UOy7pazQ6MFwBKbtPy1/g9GEeg0MinoEzJrZEVI9bXqn7pkIrIFFEEjiOUhtrC4BjwUC
- O86g==
-X-Gm-Message-State: AOAM533C+tnsrZPJh7HsNmTUTNtMD+S3klUEolKnHgH8j0fzeSCv5qMw
- djTsq3nEUnJBH0QCOlQaqk2VakLoqH0=
-X-Google-Smtp-Source: ABdhPJx4rNxQSn/ladKfvChx1xMenPQS6RTfV1KFDhwxWqGwM4wavhU2UwOEcz94kLa052gsw+6FIA==
-X-Received: by 2002:a19:d:: with SMTP id 13mr3491868lfa.167.1589465660321;
- Thu, 14 May 2020 07:14:20 -0700 (PDT)
+ bh=nuSqTkHruAB6ZwGLl1uZPF5Wx8t7d9jxfBh8w6c0fhA=;
+ b=IYI4Le24CKdiDM3w2XVHj7KJxrCiUIBP89vW7Di+pyyWGCuIC1NlU7LVK6qPHblwaj
+ /qLadAFutBxXR0KA4nEFQGBifqarliw8BIhArId+1JKKRP9kg87pC+aFPk5cz8mCyc66
+ RgFpTKISit9dt28Quhi0Tfyt6Q6M1xc2GoN2z1oAmXetyg7aP7qmsLhcjpnZL+8p7YPp
+ A1BZQzN5HVBuciXVJSGo+fbkIhf68Rq/s9B/GbK6b/2q81cG8Zm9Nj/8n9cScP45v2A0
+ omQ9AlfYFDURINZDKkuIsjnt3cOGRQmvcUJ4/IrlEFyoZkXIjNc80L9KRS3ckCev2CPg
+ U0Nw==
+X-Gm-Message-State: AOAM532XMUi82cDDm0DbUGvshBQi5CoRH8ChKKC8A1gLsk1DdsSxwTSG
+ RlxlJwHl4TviJQnxvY8S75I3PiNP1qE=
+X-Google-Smtp-Source: ABdhPJzvWRYgnbhK4J7x2YwMD4brBMTP3BiFqi3eB1VNZlyoiXsVgoxQ9UycvpILoH8sNkVQM/jHSQ==
+X-Received: by 2002:a2e:1451:: with SMTP id 17mr178470lju.30.1589465649112;
+ Thu, 14 May 2020 07:14:09 -0700 (PDT)
 Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id w29sm1963622lfc.4.2020.05.14.07.14.19
+ by smtp.gmail.com with ESMTPSA id r2sm1602843ljm.8.2020.05.14.07.14.07
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 14 May 2020 07:14:19 -0700 (PDT)
+ Thu, 14 May 2020 07:14:08 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v1 12/14] target/microblaze: gdb: Extend the number of
- registers presented to GDB
-Date: Thu, 14 May 2020 16:14:00 +0200
-Message-Id: <20200514141402.12498-13-edgar.iglesias@gmail.com>
+Subject: [PULL v1 04/14] hw/dma/xilinx_axidma: Add DMA memory-region property
+Date: Thu, 14 May 2020 16:13:52 +0200
+Message-Id: <20200514141402.12498-5-edgar.iglesias@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200514141402.12498-1-edgar.iglesias@gmail.com>
 References: <20200514141402.12498-1-edgar.iglesias@gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::136;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lf1-x136.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::22a;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x22a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 13
@@ -106,107 +106,133 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Joe Komlodi <joe.komlodi@xilinx.com>
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Increase the number of Microblaze registers QEMU will report when
-talking to GDB.
+Add DMA memory-region property to externally control what
+address-space this DMA operates on.
 
-Signed-off-by: Joe Komlodi <komlodi@xilinx.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Message-Id: <1589393329-223076-2-git-send-email-komlodi@xilinx.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20200506082513.18751-5-edgar.iglesias@gmail.com>
 ---
- target/microblaze/cpu.c     |  2 +-
- target/microblaze/gdbstub.c | 52 ++++++++++++++++++++++++++++++++++---
- 2 files changed, 50 insertions(+), 4 deletions(-)
+ hw/dma/xilinx_axidma.c | 30 +++++++++++++++++++++++-------
+ 1 file changed, 23 insertions(+), 7 deletions(-)
 
-diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-index aa9983069a..51e5c85b10 100644
---- a/target/microblaze/cpu.c
-+++ b/target/microblaze/cpu.c
-@@ -329,7 +329,7 @@ static void mb_cpu_class_init(ObjectClass *oc, void *data)
- #endif
-     dc->vmsd = &vmstate_mb_cpu;
-     device_class_set_props(dc, mb_properties);
--    cc->gdb_num_core_regs = 32 + 5;
-+    cc->gdb_num_core_regs = 32 + 27;
+diff --git a/hw/dma/xilinx_axidma.c b/hw/dma/xilinx_axidma.c
+index 018f36991b..4540051448 100644
+--- a/hw/dma/xilinx_axidma.c
++++ b/hw/dma/xilinx_axidma.c
+@@ -33,6 +33,7 @@
+ #include "qemu/log.h"
+ #include "qemu/module.h"
  
-     cc->disas_set_info = mb_disas_set_info;
-     cc->tcg_initialize = mb_tcg_init;
-diff --git a/target/microblaze/gdbstub.c b/target/microblaze/gdbstub.c
-index f41ebf1f33..54cc7857d1 100644
---- a/target/microblaze/gdbstub.c
-+++ b/target/microblaze/gdbstub.c
-@@ -26,12 +26,37 @@ int mb_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
-     MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
-     CPUMBState *env = &cpu->env;
++#include "sysemu/dma.h"
+ #include "hw/stream.h"
  
-+    /*
-+     * GDB expects registers to be reported in this order:
-+     * R0-R31
-+     * PC-BTR
-+     * PVR0-PVR11
-+     * EDR-TLBHI
-+     * SLR-SHR
-+     */
-     if (n < 32) {
-         return gdb_get_reg32(mem_buf, env->regs[n]);
-     } else {
--        return gdb_get_reg32(mem_buf, env->sregs[n - 32]);
-+        n -= 32;
-+        switch (n) {
-+        case 0 ... 5:
-+            return gdb_get_reg32(mem_buf, env->sregs[n]);
-+        /* PVR12 is intentionally skipped */
-+        case 6 ... 17:
-+            n -= 6;
-+            return gdb_get_reg32(mem_buf, env->pvr.regs[n]);
-+        case 18 ... 24:
-+            /* Add an offset of 6 to resume where we left off with SRegs */
-+            n = n - 18 + 6;
-+            return gdb_get_reg32(mem_buf, env->sregs[n]);
-+        case 25:
-+            return gdb_get_reg32(mem_buf, env->slr);
-+        case 26:
-+            return gdb_get_reg32(mem_buf, env->shr);
-+        default:
-+            return 0;
-+        }
-     }
--    return 0;
+ #define D(x)
+@@ -103,6 +104,7 @@ enum {
+ };
+ 
+ struct Stream {
++    struct XilinxAXIDMA *dma;
+     ptimer_state *ptimer;
+     qemu_irq irq;
+ 
+@@ -125,6 +127,9 @@ struct XilinxAXIDMAStreamSlave {
+ struct XilinxAXIDMA {
+     SysBusDevice busdev;
+     MemoryRegion iomem;
++    MemoryRegion *dma_mr;
++    AddressSpace as;
++
+     uint32_t freqhz;
+     StreamSlave *tx_data_dev;
+     StreamSlave *tx_control_dev;
+@@ -186,7 +191,7 @@ static void stream_desc_load(struct Stream *s, hwaddr addr)
+ {
+     struct SDesc *d = &s->desc;
+ 
+-    cpu_physical_memory_read(addr, d, sizeof *d);
++    address_space_read(&s->dma->as, addr, MEMTXATTRS_UNSPECIFIED, d, sizeof *d);
+ 
+     /* Convert from LE into host endianness.  */
+     d->buffer_address = le64_to_cpu(d->buffer_address);
+@@ -204,7 +209,8 @@ static void stream_desc_store(struct Stream *s, hwaddr addr)
+     d->nxtdesc = cpu_to_le64(d->nxtdesc);
+     d->control = cpu_to_le32(d->control);
+     d->status = cpu_to_le32(d->status);
+-    cpu_physical_memory_write(addr, d, sizeof *d);
++    address_space_write(&s->dma->as, addr, MEMTXATTRS_UNSPECIFIED,
++                        d, sizeof *d);
  }
  
- int mb_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
-@@ -50,7 +75,28 @@ int mb_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
-     if (n < 32) {
-         env->regs[n] = tmp;
-     } else {
--        env->sregs[n - 32] = tmp;
-+        n -= 32;
-+        switch (n) {
-+        case 0 ... 5:
-+            env->sregs[n] = tmp;
-+            break;
-+        /* PVR12 is intentionally skipped */
-+        case 6 ... 17:
-+            n -= 6;
-+            env->pvr.regs[n] = tmp;
-+            break;
-+        case 18 ... 24:
-+            /* Add an offset of 6 to resume where we left off with SRegs */
-+            n = n - 18 + 6;
-+            env->sregs[n] = tmp;
-+            break;
-+        case 25:
-+            env->slr = tmp;
-+            break;
-+        case 26:
-+            env->shr = tmp;
-+            break;
-+        }
+ static void stream_update_irq(struct Stream *s)
+@@ -286,8 +292,9 @@ static void stream_process_mem2s(struct Stream *s, StreamSlave *tx_data_dev,
+                      txlen + s->pos);
+         }
+ 
+-        cpu_physical_memory_read(s->desc.buffer_address,
+-                                 s->txbuf + s->pos, txlen);
++        address_space_read(&s->dma->as, s->desc.buffer_address,
++                           MEMTXATTRS_UNSPECIFIED,
++                           s->txbuf + s->pos, txlen);
+         s->pos += txlen;
+ 
+         if (stream_desc_eof(&s->desc)) {
+@@ -336,7 +343,8 @@ static size_t stream_process_s2mem(struct Stream *s, unsigned char *buf,
+             rxlen = len;
+         }
+ 
+-        cpu_physical_memory_write(s->desc.buffer_address, buf + pos, rxlen);
++        address_space_write(&s->dma->as, s->desc.buffer_address,
++                            MEMTXATTRS_UNSPECIFIED, buf + pos, rxlen);
+         len -= rxlen;
+         pos += rxlen;
+ 
+@@ -525,6 +533,7 @@ static void xilinx_axidma_realize(DeviceState *dev, Error **errp)
+     XilinxAXIDMAStreamSlave *cs = XILINX_AXI_DMA_CONTROL_STREAM(
+                                                             &s->rx_control_dev);
+     Error *local_err = NULL;
++    int i;
+ 
+     object_property_add_link(OBJECT(ds), "dma", TYPE_XILINX_AXI_DMA,
+                              (Object **)&ds->dma,
+@@ -545,17 +554,19 @@ static void xilinx_axidma_realize(DeviceState *dev, Error **errp)
+         goto xilinx_axidma_realize_fail;
      }
-     return 4;
- }
+ 
+-    int i;
+-
+     for (i = 0; i < 2; i++) {
+         struct Stream *st = &s->streams[i];
+ 
++        st->dma = s;
+         st->nr = i;
+         st->ptimer = ptimer_init(timer_hit, st, PTIMER_POLICY_DEFAULT);
+         ptimer_transaction_begin(st->ptimer);
+         ptimer_set_freq(st->ptimer, s->freqhz);
+         ptimer_transaction_commit(st->ptimer);
+     }
++
++    address_space_init(&s->as,
++                       s->dma_mr ? s->dma_mr : get_system_memory(), "dma");
+     return;
+ 
+ xilinx_axidma_realize_fail:
+@@ -575,6 +586,11 @@ static void xilinx_axidma_init(Object *obj)
+                             &s->rx_control_dev, sizeof(s->rx_control_dev),
+                             TYPE_XILINX_AXI_DMA_CONTROL_STREAM, &error_abort,
+                             NULL);
++    object_property_add_link(obj, "dma", TYPE_MEMORY_REGION,
++                             (Object **)&s->dma_mr,
++                             qdev_prop_allow_set_link_before_realize,
++                             OBJ_PROP_LINK_STRONG,
++                             &error_abort);
+ 
+     sysbus_init_irq(sbd, &s->streams[0].irq);
+     sysbus_init_irq(sbd, &s->streams[1].irq);
 -- 
 2.20.1
 
