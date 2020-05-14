@@ -2,128 +2,91 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4071C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 05:32:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5837AC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 05:33:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72B5E20575
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 05:32:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C01820575
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 05:33:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="qYhLsvbx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72B5E20575
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="lWhz7mAp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C01820575
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38892 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ6Tl-0002cR-HU
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 01:32:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34980)
+	id 1jZ6Up-00046s-8c
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 01:33:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35066)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jZ6T2-0001zP-MZ; Thu, 14 May 2020 01:31:36 -0400
-Received: from mail-am6eur05on2120.outbound.protection.outlook.com
- ([40.107.22.120]:39137 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1jZ6UE-0003LJ-6j
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 01:32:50 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:14921)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jZ6Sz-0005q3-Rd; Thu, 14 May 2020 01:31:35 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=St3zGBkwjvK7vwpLmrJ7xwOXakF6HhErsIGk9AKmLxUyVRHvlyVz3G8Vh9zjBjMjqXtqkz7/6Z4I7PD4ji0EQifNh8i8zefpOZTCEDuJBY9ryXAmPuS7/frfd7/RZ8T6C5b52rG3kLJzVLfQpdFcTHmTnQKqAbJvUhqZwBWsOsuu6DsAlR/4FcrgG5Ha8cvtUXYxatpjq2cEfDWhV5jZ5AAPFXJO37EFcI8OSDuLTneW8VSEfSFIxWCVcvCVqGxDhDLiALR2phfRkFijOc4MEWfbqWa6Siwo1jRCmVQVX0bXz+grHjTb1xVpItVOodHETtcN0snzC0+sRZUcRQIhVw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C49BoqpjaqFde/DaCpCWEgah7no66H15MtpHe5tvTNo=;
- b=e2jphS/I1Am/aHvk/1/FdcNpcKpE2PPKnCe6hfcnJVbY811cTrqfIU1F6xrVxWa/zT9wYcxszJKyMtnZHwFw7IC7mRcazM49OJAmiu1a6gRr/qx90E5IfZY4tbpeOPuVOkgptU1HPofgs7W7qdT4h7vZI6iCT2XZbwpUf7TYMDYXlW+yTU/ukh1DrpTvx2cveioSKtJAHspD75qt98xKw6MM18KF6AMbgoyNLREy7UBjKhX5B8SR0YL32t50FWe3BzXfA9H0s3Yd3uy8OJQIurMYAa8mY+n5RlQd8fmBLLzVKzpFwhb6FZe7eQ1+ky0KdEsEYpvXbAIMsCQZzJWyIw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C49BoqpjaqFde/DaCpCWEgah7no66H15MtpHe5tvTNo=;
- b=qYhLsvbxRDnNi4hQDnPXVgUve948nDl29pXuE3foxSjLFHEmZIOHTHILeVIpP0RghpKl1hB8nJmdYSczV+mH4Ji9sVOyOP07SDZ4xAUvWFnRU2brxiqTNT694UcxMUnZvq9mAwHogguhW93hTXzfsEqPQfWbeQq8rHKCFvW4mCo=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5399.eurprd08.prod.outlook.com (2603:10a6:20b:104::22)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.20; Thu, 14 May
- 2020 05:31:29 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.3000.016; Thu, 14 May 2020
- 05:31:29 +0000
-Subject: Re: [PATCH v3 06/10] iotests: add testfinder.py
-To: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-References: <20200421073601.28710-1-vsementsov@virtuozzo.com>
- <20200421073601.28710-7-vsementsov@virtuozzo.com>
- <20200421165647.GE22440@linux.fritz.box>
- <5a185a4e-1c5d-9887-c88c-6ca71ebeeee1@virtuozzo.com>
- <d0c4728e-99e4-568d-473e-952f57f3f07e@redhat.com>
- <2a62c728-1607-1375-6126-713bd047d5b1@virtuozzo.com>
- <47de3b0c-c07c-ad4e-25ab-1353d9710d10@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <f0310def-c10f-4b4e-c03e-2e85ef9bcf0d@virtuozzo.com>
-Date: Thu, 14 May 2020 08:31:28 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-In-Reply-To: <47de3b0c-c07c-ad4e-25ab-1353d9710d10@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM0PR02CA0021.eurprd02.prod.outlook.com
- (2603:10a6:208:3e::34) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1jZ6UC-0006BK-Cp
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 01:32:49 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5ebcd7b30000>; Wed, 13 May 2020 22:31:31 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Wed, 13 May 2020 22:32:46 -0700
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Wed, 13 May 2020 22:32:46 -0700
+Received: from [10.40.103.94] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 14 May
+ 2020 05:32:38 +0000
+Subject: Re: [PATCH Kernel v19 6/8] vfio iommu: Update UNMAP_DMA ioctl to get
+ dirty bitmap before unmap
+To: Alex Williamson <alex.williamson@redhat.com>
+References: <1589400279-28522-1-git-send-email-kwankhede@nvidia.com>
+ <1589400279-28522-7-git-send-email-kwankhede@nvidia.com>
+ <20200513230747.0d2f3bc3@x1.home>
+X-Nvconfidentiality: public
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <65a90392-a140-6862-b7f2-2bddc6e71ba9@nvidia.com>
+Date: Thu, 14 May 2020 11:02:33 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.186) by
- AM0PR02CA0021.eurprd02.prod.outlook.com (2603:10a6:208:3e::34) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3000.25 via Frontend Transport; Thu, 14 May 2020 05:31:29 +0000
-X-Originating-IP: [185.215.60.186]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: efa13f0b-cc29-4510-7a82-08d7f7c80e0f
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5399:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5399F55F019D7C9A652A1E61C1BC0@AM7PR08MB5399.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-Forefront-PRVS: 040359335D
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jvz3uI5ppxa/4gU9knWiqIXfPuXFhVdeksCBJj/hIleejxVND+hqY5M1leTyVVVVo4BuJKp5QlyZ0bS/0JfaXdHz4YMuE94x0UWYpPFdaXYN6D0D+GS3WyyIgs+PMqv5Kugi/A75owuK6m07BmRlbkFGnDtOTeHoCq363nETIllrYGefpgIIMHeiPJVcDFBYsLI8M66BG76QH8aCCH3t72T9QpMv9oX+m/8tHHj4b1yoYCg8muGEIp/WCMtzU8Eqg2nOt7J9YeesBi+BErmrlHsB7tyMOw/fhy/XgTDvqR/SaY/OuHniTDlWVC+5GE3i3jvE+xe8b9HhIhE3yzX9wxcZ+hNdWs6x91ExqC9DhdbDk1aIV3WohrqLP5AbnBGex11FmjA9dNJePtUGW991CJ0I3NpYiFI7j37OEODEDUUGBBcEVnfnRYW3Auqkp1vLy/2pBwvwicAn2L7o3Hi0D+fwj5wu6fdzHdW3dLM9OWTC8+SuCSFAuhwfR0qgFngX
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(346002)(376002)(39840400004)(136003)(396003)(366004)(186003)(16526019)(2906002)(316002)(6486002)(8936002)(26005)(31696002)(36756003)(110136005)(52116002)(53546011)(16576012)(86362001)(66946007)(956004)(66476007)(5660300002)(8676002)(478600001)(4326008)(66556008)(2616005)(31686004)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: h/ko2VlzM/4OWHetteBTeOXjb19L6lfiroVwPBQJEsMWvo9tuUKo5ef1PiWvoGTvmhRoNi0dbZ5MHE8/qFtsg82jbVY3qqPFOUK4tPK5o/Ek/s43qDmWcCH5RZf+7RsCkGehLQe6FJo2KPJWvQ6sk9pqRvXJyjpFD64qfsdoG1YM3YO72iHtRU6wfGuPsZTP+8DCHso5JMnK4XlxsagfcfvRH2Kei8DFFtwZgd2Qr1OLf2VF6CmCAjxS74SQIXBBvEVeVSmLzZ8rZ9bG1eDot/4GFBg2NwwzBNWLs4+zaZtlHmcgpLMy3Y+jkFIe8NP15iQDKhGOoVXDVNHIFhXXO/vns545wzmyRXabscFJXJegdWvfRs/yLF9FTOIKfXZLaGAvw+yS++Kl+w+7Zwev97HR+gg5P6TMiSqa1IDt6ASwyrsxyqT09gfKO1kyAVjyefRWKIe5h+qGtF+t7VqpHwVWZMtnVSy+82R2QssC+zNVftj/BLyUmsYSM7ATO/1j
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: efa13f0b-cc29-4510-7a82-08d7f7c80e0f
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2020 05:31:29.8804 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AGCixXvSZcqxWjU2YGga41/2DCtE1LwjiSk3taf8kUxz39rvE+dtJyvno+sJQO3GnD1UKj8Rehztjl9TAzy3EnR8qPKLZmlrOvgh6aCun7w=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5399
-Received-SPF: pass client-ip=40.107.22.120;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-AM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 01:31:30
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200513230747.0d2f3bc3@x1.home>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1589434291; bh=sK8rPCmJuaL+HKpbTXNFyeWb5uWnk1KuDtH9md7ufc0=;
+ h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+ Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+ X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+ Content-Transfer-Encoding;
+ b=lWhz7mApEwTEzcKBRL9kkHGf2Av+Akr6OaB5kSVmARJh4l8xvCV5z6I5E94kenalH
+ lJxaevCjB3mJmMgr0k73j0jKYepu5sEcJYfnfuBMW/tPYNmeubeaLO7T3S7R1yeWIq
+ XI/o+T3/IgnYaUhGaLL++ofHzM9OS1n/DANxXJnBnvaxWL7zA5slx2WqGw2+fpEwV3
+ QWEnPHkyFh1Q8NpHhg6FKXaAOQtPlXrQSOfL9RWsVWkC0DbLNcNIXRiN0PCIJq0JFU
+ d5xiSsl8HCgkFMeypLw6piRMZBr40vWXyl/ZC3hl0wUVHKxa8dU4dlkfznQXNYfnma
+ WyX1ZQ40/BjtQ==
+Received-SPF: pass client-ip=216.228.121.64; envelope-from=kwankhede@nvidia.com;
+ helo=hqnvemgate25.nvidia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 01:32:47
+X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
+X-Spam_score_int: -70
+X-Spam_score: -7.1
+X-Spam_bar: -------
+X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_HI=-5, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -136,111 +99,343 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: den@openvz.org, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- mreitz@redhat.com
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-14.05.2020 08:06, John Snow wrote:
+
+
+On 5/14/2020 10:37 AM, Alex Williamson wrote:
+> On Thu, 14 May 2020 01:34:37 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
 > 
-> 
-> On 5/14/20 12:54 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 14.05.2020 00:58, John Snow wrote:
->>>
->>>
->>> On 5/7/20 1:43 PM, Vladimir Sementsov-Ogievskiy wrote:
->>>> 21.04.2020 19:56, Kevin Wolf wrote:
->>>>> Am 21.04.2020 um 09:35 hat Vladimir Sementsov-Ogievskiy geschrieben:
->>>>>> Add python script with new logic of searching for tests:
->>>>>>
->>>>>> Current ./check behavior:
->>>>>>     - tests are named [0-9][0-9][0-9]
->>>>>>     - tests must be registered in group file (even if test doesn't
->>>>>> belong
->>>>>>       to any group, like 142)
->>>>>>
->>>>>> Behavior of new test:
->>>>>>     - group file is dropped
->>>>>>     - tests are searched by file-name instead of group file, so it's
->>>>>> not
->>>>>>       needed more to "register the test", just create it with name
->>>>>>       *-test. Old names like [0-9][0-9][0-9] are supported too, but not
->>>>>>       recommended for new tests
->>>>>
->>>>> I wonder if a tests/ subdirectory instead of the -test suffix would
->>>>> organise things a bit better.
->>>>>
->>>>
->>>> It will make more difficult to import iotests.py.. Calling common.rc
->>>> from
->>>> bash tests will need to be modified too.
->>>>
->>>> So, we'll need additional line in all python tests:
->>>>
->>>> sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
->>>>
->>>> which doesn't seem to be good practice.. So, instead we'd better call
->>>> tests with PYTHONPATH set appropriately..
->>>>
->>>
->>> Just chiming in to say that it's largely bad practice because it
->>> confuses pylint, mypy and friends -- if we want to keep pushing our CI
->>> code analysis for python in that direction, this will be a barrier.
->>>
->>> Using PYTHONPATH is better, because it isolates the script itself from
->>> the environment, but requires you to now always set PYTHONPATH to
->>> execute any of the individual iotests.
->>>
->>> Not actually a big deal, because iotests already expect a large number
->>> of environment variables to be set. It's not really a huge net loss in
->>> convenience, I think.
->>>
->>> looks like that's the direction you're headed in anyway based on
->>> discussion, so that's good.
->>>
+>> DMA mapped pages, including those pinned by mdev vendor drivers, might
+>> get unpinned and unmapped while migration is active and device is still
+>> running. For example, in pre-copy phase while guest driver could access
+>> those pages, host device or vendor driver can dirty these mapped pages.
+>> Such pages should be marked dirty so as to maintain memory consistency
+>> for a user making use of dirty page tracking.
 >>
->> Hm, does PYTHONPATH-way works good with mypy and friends? Probably, it
->> should
->> be set when checking the code? So, actually developers will have to set
->> PYTHONPATH by hand to always contain some directories within qemu source
->> tree?
+>> To get bitmap during unmap, user should allocate memory for bitmap, set
+>> size of allocated memory, set page size to be considered for bitmap and
+>> set flag VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP.
 >>
+>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+>> ---
+>>   drivers/vfio/vfio_iommu_type1.c | 102 +++++++++++++++++++++++++++++++++++-----
+>>   include/uapi/linux/vfio.h       |  10 ++++
+>>   2 files changed, 99 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>> index 469b09185b83..4358be26ff80 100644
+>> --- a/drivers/vfio/vfio_iommu_type1.c
+>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>> @@ -195,11 +195,15 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
+>>   static int vfio_dma_bitmap_alloc(struct vfio_dma *dma, size_t pgsize)
+>>   {
+>>   	uint64_t npages = dma->size / pgsize;
+>> +	size_t bitmap_size;
+>>   
+>>   	if (npages > DIRTY_BITMAP_PAGES_MAX)
+>>   		return -EINVAL;
+>>   
+>> -	dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages), GFP_KERNEL);
+>> +	/* Allocate extra 64 bits which are used for bitmap manipulation */
+>> +	bitmap_size = DIRTY_BITMAP_BYTES(npages) + sizeof(u64);
+>> +
+>> +	dma->bitmap = kvzalloc(bitmap_size, GFP_KERNEL);
+>>   	if (!dma->bitmap)
+>>   		return -ENOMEM;
+>>   
+>> @@ -979,23 +983,25 @@ static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
+>>   }
+>>   
+>>   static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+>> -			     struct vfio_iommu_type1_dma_unmap *unmap)
+>> +			     struct vfio_iommu_type1_dma_unmap *unmap,
+>> +			     struct vfio_bitmap *bitmap)
+>>   {
+>> -	uint64_t mask;
+>>   	struct vfio_dma *dma, *dma_last = NULL;
+>> -	size_t unmapped = 0;
+>> -	int ret = 0, retries = 0;
+>> +	size_t unmapped = 0, pgsize;
+>> +	int ret = 0, retries = 0, cnt = 0;
+>> +	unsigned long pgshift, shift = 0, leftover;
+>>   
+>>   	mutex_lock(&iommu->lock);
+>>   
+>> -	mask = ((uint64_t)1 << __ffs(iommu->pgsize_bitmap)) - 1;
+>> +	pgshift = __ffs(iommu->pgsize_bitmap);
+>> +	pgsize = (size_t)1 << pgshift;
+>>   
+>> -	if (unmap->iova & mask) {
+>> +	if (unmap->iova & (pgsize - 1)) {
+>>   		ret = -EINVAL;
+>>   		goto unlock;
+>>   	}
+>>   
+>> -	if (!unmap->size || unmap->size & mask) {
+>> +	if (!unmap->size || unmap->size & (pgsize - 1)) {
+>>   		ret = -EINVAL;
+>>   		goto unlock;
+>>   	}
+>> @@ -1006,9 +1012,15 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+>>   		goto unlock;
+>>   	}
+>>   
+>> -	WARN_ON(mask & PAGE_MASK);
+>> -again:
+>> +	/* When dirty tracking is enabled, allow only min supported pgsize */
+>> +	if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
+>> +	    (!iommu->dirty_page_tracking || (bitmap->pgsize != pgsize))) {
+>> +		ret = -EINVAL;
+>> +		goto unlock;
+>> +	}
+>>   
+>> +	WARN_ON((pgsize - 1) & PAGE_MASK);
+>> +again:
+>>   	/*
+>>   	 * vfio-iommu-type1 (v1) - User mappings were coalesced together to
+>>   	 * avoid tracking individual mappings.  This means that the granularity
+>> @@ -1046,6 +1058,7 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+>>   			ret = -EINVAL;
+>>   			goto unlock;
+>>   		}
+>> +
+>>   		dma = vfio_find_dma(iommu, unmap->iova + unmap->size - 1, 0);
+>>   		if (dma && dma->iova + dma->size != unmap->iova + unmap->size) {
+>>   			ret = -EINVAL;
+>> @@ -1063,6 +1076,39 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+>>   		if (dma->task->mm != current->mm)
+>>   			break;
+>>   
+>> +		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
+>> +		    (dma_last != dma)) {
+>> +			unsigned int nbits = dma->size >> pgshift;
+>> +			int curr_lcnt = nbits / BITS_PER_LONG;
+>> +
+>> +			/*
+>> +			 * mark all pages dirty if all pages are pinned and
+>> +			 * mapped.
+>> +			 */
+>> +			if (dma->iommu_mapped)
+>> +				bitmap_set(dma->bitmap, 0, nbits);
+>> +
+>> +			if (shift) {
+>> +				bitmap_shift_left(dma->bitmap, dma->bitmap,
+>> +						  shift, nbits + shift);
+>> +				bitmap_or(dma->bitmap, dma->bitmap, &leftover,
+>> +					  shift);
+>> +				nbits += shift;
+>> +				curr_lcnt = nbits / BITS_PER_LONG;
+>> +			}
+>> +
+>> +			if (copy_to_user((void __user *)bitmap->data + cnt,
+>> +				       dma->bitmap, curr_lcnt * sizeof(u64))) {
+>> +				ret = -EFAULT;
+>> +				break;
+>> +			}
+>> +
+>> +			shift = nbits % BITS_PER_LONG;
+>> +			if (shift)
+>> +				leftover = *(u64 *)(dma->bitmap + curr_lcnt);
+>> +			cnt += curr_lcnt;
+>> +		}
 > 
-> pylint respects PYTHONPATH but mypy doesn't. mypy uses MYPYPATH, but I
-> wouldn't worry about accommodating it. It's a fussy tool and we're only
-> ever going to run it from very specific environments.
-> 
+> I don't think this works.  Let's say for example we have separate
+> single page mappings at 4K and 12K (both dirty) and the user asked to
+> unmap the range 0 - 16K. 
 
-Hmm, recently I installed dense-analysis/ale plugin into my vim which does mypy checking (among other things).. And most probably, I'll have to set these variables to keep it working. But it's not a big problem.
+Unmap range should include adjacent mapped ranges, right?
+In your example, if user asks for range 0-16k but mapping at 0 wasn't 
+done, then this unmap would fail before even reaching control here.
 
-> You don't need to worry too much about what environment variables these
-> tools take; it's only worth noting that "sys.path" hacks tend to make
-> these tools harder to use.
-> 
-> 
-> As for setting PYTHONPATH by hand ... There are a few places in the QEMU
-> tree where we set PYTHONPATH already, and the individual iotests already
-> don't work if they're not launched by `check`, because they're missing a
-> ton of environment variables.
-> 
-> It's not going to be too bad to set PYTHONPATH in the launcher script,
-> is it?
-> 
-> (Or are we replacing the top-level script with a python one?)
+There is a check which makes sure that mapping for start of range exist:
 
-Yes we do, bright future is near:) But it's not a problem to set PYTHONPATH in it. Anyway, we run all tests as executables, so passing PYTHONPATH is a valid thing to do.
+         dma = vfio_find_dma(iommu, unmap->iova, 1);
+         if (dma && dma->iova != unmap->iova) {
+                 ret = -EINVAL;
+                 goto unlock;
+         }
 
-> 
-> 
-> 
-> 
-> Really, the same is true of pylint, too. It's only annoying to deal with
-> sys.path hacking because it can't be worked around in those CQA tools.
-> 
+There is a check which makes sure that mapping for last address of range 
+exist:
+         dma = vfio_find_dma(iommu, unmap->iova + unmap->size - 1, 0);
+         if (dma && dma->iova + dma->size != unmap->iova + unmap->size) {
+                ret = -EINVAL;
+                goto unlock;
+         }
+Then current implementation should work.
 
+Thanks,
+Kirti
 
--- 
-Best regards,
-Vladimir
+> We find the mapping at 4K, shift is zero, cnt
+> is zero, so we copy the bitmap with the zero bit set to the user
+> buffer.  We're already wrong because we've just indicated the page at
+> zero is dirty and there isn't a page at zero.  shift now becomes 1 and
+> leftover is a bitmap with bit zero set.
+> 
+> We move on to the next page @12K.  We shift this bitmap by 1.  We OR in
+> our leftover and again copy out to the user buffer.  We end up with a
+> user bitmap with bits zero and one set, when we should have had bits 1
+> and 3 set, we're essentially coalescing the mappings.
+> 
+> As I see it, shift needs to be calculated as the offset from the start
+> of the user requested unmap buffer and I think an easier approach to
+> handle the leftover bits preceding the shift is to copy it back out of
+> the user buffer.
+> 
+> For example, shift should be:
+> 
+> ((dma->iova - unmap->iova) >> pgshift) % BITS_PER_LONG
+> 
+> This would give us a shift of 1 and 3 respectively for our mappings,
+> which is correct.
+> 
+> Since our shifts are non-zero, we then need to collect the preceding
+> leftovers, which is always going to be:
+> 
+> copy_from_user(&leftover, bitmap->data +
+> 		((dma->iova - unmap->iova) >> pgshift) / BITS_PER_LONG,
+> 		sizeof(leftover));
+> 
+> I don't think the curr_lcnt calculation for the copy-out is correct
+> either, mappings are not required to be a multiple of BITS_PER_LONG
+> pages, so we're truncating the size.
+> 
+> So we have:
+> 
+> bit_offset = (dma->iova - unmap->iova) >> pgshift;
+> copy_offset = bit_offset / BITS_PER_LONG;
+> shift = bit_offset % BITS_PER_LONG;
+> 
+> if (shift) {
+> 	bitmap_shift_left(dma->bitmap, dma->bitmap, shift, nbits + shift);
+> 	if (copy_from_user(&leftover, bitmap->data + copy_offset, sizeof(leftover))) {
+> 		ret = -EFAULT;
+> 		break;
+> 	}
+> 	bitmap_or(dma->bitmap, dma->bitmap, &leftover, shift);
+> }
+> 
+> if (copy_to_user(bitmap->data + copy_offset, dma->bitmap,
+> 		roundup(nbits + shift, BITS_PER_LONG)/BITS_PER_BYTE)) {
+> 	ret = -EFAULT;
+> 	break;
+> }
+> 
+> Also this all needs to come after the below check of the pfn_list and
+> call to the blocking notifier or else we're just wasting time because
+> we'll need to do it all again anyway.
+> 
+> 
+>> +
+>>   		if (!RB_EMPTY_ROOT(&dma->pfn_list)) {
+>>   			struct vfio_iommu_type1_dma_unmap nb_unmap;
+>>   
+>> @@ -1093,6 +1139,13 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+>>   		vfio_remove_dma(iommu, dma);
+>>   	}
+>>   
+>> +	if (!ret && (unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
+>> +	    shift) {
+>> +		if (copy_to_user((void __user *)bitmap->data + cnt, &leftover,
+>> +				 sizeof(leftover)))
+>> +			ret = -EFAULT;
+>> +	}
+> 
+> This is unnecessary with the algorithm I propose.
+> 
+>> +
+>>   unlock:
+>>   	mutex_unlock(&iommu->lock);
+>>   
+>> @@ -2426,17 +2479,40 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>>   
+>>   	} else if (cmd == VFIO_IOMMU_UNMAP_DMA) {
+>>   		struct vfio_iommu_type1_dma_unmap unmap;
+>> -		long ret;
+>> +		struct vfio_bitmap bitmap = { 0 };
+>> +		int ret;
+>>   
+>>   		minsz = offsetofend(struct vfio_iommu_type1_dma_unmap, size);
+>>   
+>>   		if (copy_from_user(&unmap, (void __user *)arg, minsz))
+>>   			return -EFAULT;
+>>   
+>> -		if (unmap.argsz < minsz || unmap.flags)
+>> +		if (unmap.argsz < minsz ||
+>> +		    unmap.flags & ~VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP)
+>>   			return -EINVAL;
+>>   
+>> -		ret = vfio_dma_do_unmap(iommu, &unmap);
+>> +		if (unmap.flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
+>> +			unsigned long pgshift;
+>> +
+>> +			if (unmap.argsz < (minsz + sizeof(bitmap)))
+>> +				return -EINVAL;
+>> +
+>> +			if (copy_from_user(&bitmap,
+>> +					   (void __user *)(arg + minsz),
+>> +					   sizeof(bitmap)))
+>> +				return -EFAULT;
+>> +
+>> +			if (!access_ok((void __user *)bitmap.data, bitmap.size))
+>> +				return -EINVAL;
+>> +
+>> +			pgshift = __ffs(bitmap.pgsize);
+>> +			ret = verify_bitmap_size(unmap.size >> pgshift,
+>> +						 bitmap.size);
+>> +			if (ret)
+>> +				return ret;
+>> +		}
+>> +
+>> +		ret = vfio_dma_do_unmap(iommu, &unmap, &bitmap);
+>>   		if (ret)
+>>   			return ret;
+>>   
+>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+>> index 5f359c63f5ef..e3cbf8b78623 100644
+>> --- a/include/uapi/linux/vfio.h
+>> +++ b/include/uapi/linux/vfio.h
+>> @@ -1048,12 +1048,22 @@ struct vfio_bitmap {
+>>    * field.  No guarantee is made to the user that arbitrary unmaps of iova
+>>    * or size different from those used in the original mapping call will
+>>    * succeed.
+>> + * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP should be set to get dirty bitmap
+>> + * before unmapping IO virtual addresses. When this flag is set, user must
+>> + * provide data[] as structure vfio_bitmap. User must allocate memory to get
+>> + * bitmap and must set size of allocated memory in vfio_bitmap.size field.
+>> + * A bit in bitmap represents one page of user provided page size in 'pgsize',
+>> + * consecutively starting from iova offset. Bit set indicates page at that
+>> + * offset from iova is dirty. Bitmap of pages in the range of unmapped size is
+>> + * returned in vfio_bitmap.data
+> 
+> This needs to specify a user zero'd bitmap if we're only going to fill
+> it sparsely.  Thanks,
+> 
+> Alex
+> 
+>>    */
+>>   struct vfio_iommu_type1_dma_unmap {
+>>   	__u32	argsz;
+>>   	__u32	flags;
+>> +#define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
+>>   	__u64	iova;				/* IO virtual address */
+>>   	__u64	size;				/* Size of mapping (bytes) */
+>> +	__u8    data[];
+>>   };
+>>   
+>>   #define VFIO_IOMMU_UNMAP_DMA _IO(VFIO_TYPE, VFIO_BASE + 14)
+> 
 
