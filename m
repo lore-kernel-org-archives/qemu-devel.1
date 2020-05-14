@@ -2,109 +2,82 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25E0CC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:20:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83422C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:22:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4B07206B6
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:20:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fB+d01/Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4B07206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 55C8D206B6
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:22:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55C8D206B6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ7Eb-00023q-5A
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 02:20:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37694)
+	id 1jZ7Fw-0003oo-Bu
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 02:22:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38348)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZ6zn-00043M-PR
- for qemu-devel@nongnu.org; Thu, 14 May 2020 02:05:28 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:36802
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZ6zn-0003jt-4F
- for qemu-devel@nongnu.org; Thu, 14 May 2020 02:05:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589436326;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=nBn8uweOTimmlNufc4N5jzEMTUTFTEdBAb6MvjRVGrI=;
- b=fB+d01/Y8nyDlySLnEh8M8vEJjqv/FNNv1cs73WPZLH+YgVT/AAzgUSHgMYYwg0CBwX71N
- oL0j3jWTCpw9y9aF+rmvrEByfQlg0D/RTtXWXOt7JO2JHGuc4LAt1fMCHFYWTvUoCKyxj7
- BdgM0HAmzQkRk9kgRiiDqfoEMe9WZbo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-327-uir_FcDCMOqsQa5TbJn0jA-1; Thu, 14 May 2020 02:05:22 -0400
-X-MC-Unique: uir_FcDCMOqsQa5TbJn0jA-1
-Received: by mail-wr1-f69.google.com with SMTP id h12so998362wrr.19
- for <qemu-devel@nongnu.org>; Wed, 13 May 2020 23:05:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=nBn8uweOTimmlNufc4N5jzEMTUTFTEdBAb6MvjRVGrI=;
- b=UJXrO9Qif2JX9rwAhiO3wWob8GerkLY1tYHYf+pywt6/asW614yV/5SDDsavLQ0zxU
- N2SCbGNhQDd8qMsjR0Ju6EdLEPVlBV7fTiPKvjeRzMZA0kmNc4h+oIh2DgXvYrPO4GvX
- WMZjBfyLON4zHhUJlsOp8oCYQwfwwXB/b4P5R2uLibV/6X9XA0RfJqifHe0Fo/APkq/L
- XjEylXHBoRoVJaah8y+6lT4Eyh8mL6YwPk/ueV8jLZIC4+cXdntHy7c1aB2EtnBxKW7U
- qSIpkUnY5dhwir2/tDq6bgQC5OsDvgWu1lGivqnLDVl8jyh8WGDGVBQZCJiGlSaYZC2u
- aRSA==
-X-Gm-Message-State: AOAM532fK4U5hXbkvEZUqh+mqXJ1VSFJV0/DL2Wg+9xqNSpzPRuPIRBr
- QtY37LOsB1V5lF1BSyu3bTskGot/4xCDrvyxpCkmKC4uu1QGOC7eqKyFbn70uZWBFnsh2Mvhnj/
- 7gVFpbkKvGllZBY0=
-X-Received: by 2002:a5d:4b0a:: with SMTP id v10mr3115742wrq.33.1589436321824; 
- Wed, 13 May 2020 23:05:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxoyDwJo/Ve37MHPFfNl91b+0Rg7DxiCTXi1dyxsyUpCPc7Ki2U1Jw207aUZBKZAHoIRYQppA==
-X-Received: by 2002:a5d:4b0a:: with SMTP id v10mr3115722wrq.33.1589436321652; 
- Wed, 13 May 2020 23:05:21 -0700 (PDT)
-Received: from [192.168.1.39] (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id 128sm33567403wme.39.2020.05.13.23.05.20
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 13 May 2020 23:05:21 -0700 (PDT)
-Subject: Re: [PATCH RFC 19/32] python//qmp.py: add QMPProtocolError
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-References: <20200514055403.18902-1-jsnow@redhat.com>
- <20200514055403.18902-20-jsnow@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <78f19125-5e6c-611f-3e6e-97a5dcfe62de@redhat.com>
-Date: Thu, 14 May 2020 08:05:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jZ75L-0006AX-Mu
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 02:11:13 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43558)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jZ75K-0004pe-Hh
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 02:11:11 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jZ75I-0005b2-Ue
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 06:11:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id E25DD2E802D
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 06:11:08 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200514055403.18902-20-jsnow@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 14 May 2020 05:56:13 -0000
+From: Thomas Huth <1686980@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange rjones-redhat th-huth
+X-Launchpad-Bug-Reporter: Richard Jones (rjones-redhat)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <20170428101422.23122.24568.malonedeb@wampee.canonical.com>
+Message-Id: <158943577312.17798.2238707141887153796.malone@soybean.canonical.com>
+Subject: [Bug 1686980] Re: qemu is very slow when adding 16,
+ 384 virtio-scsi drives
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="0385b538081bc4718df6fb844a3afc89729c94ce";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 1afce39f71f7349f52349d583ed7b1d7637a0457
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 02:11:09
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -113,55 +86,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Reply-To: Bug 1686980 <1686980@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/14/20 7:53 AM, John Snow wrote:
-> In the case that we receive a reply but are unable to understand it, use
-> this exception name to indicate that case.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->   python/qemu/lib/qmp.py | 10 ++++++++++
->   1 file changed, 10 insertions(+)
-> 
-> diff --git a/python/qemu/lib/qmp.py b/python/qemu/lib/qmp.py
-> index e460234f2e..5fb16f4b42 100644
-> --- a/python/qemu/lib/qmp.py
-> +++ b/python/qemu/lib/qmp.py
-> @@ -62,6 +62,12 @@ class QMPTimeoutError(QMPError):
->       """
->   
->   
-> +class QMPProtocolError(QMPError):
-> +    """
-> +    QMP protocol error; unexpected response
-> +    """
-> +
-> +
->   class QMPResponseError(QMPError):
->       """
->       Represents erroneous QMP monitor reply
-> @@ -265,6 +271,10 @@ def command(self, cmd, **kwds):
->           ret = self.cmd(cmd, kwds)
->           if 'error' in ret:
->               raise QMPResponseError(ret)
-> +        if 'return' not in ret:
-> +            raise QMPProtocolError(
-> +                "'return' key not found in QMP response '{}'".format(str(ret))
-> +            )
->           return cast(QMPReturnValue, ret['return'])
->   
->       def pull_event(self, wait=False):
-> 
+Is this faster nowadays if you use the new -blockdev parameter instead
+of -drive?
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1686980
+
+Title:
+  qemu is very slow when adding 16,384 virtio-scsi drives
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  qemu runs very slowly when adding many virtio-scsi drives.  I have
+  attached a small reproducer shell script which demonstrates this.
+
+  Using perf shows the following stack trace taking all the time:
+
+      72.42%    71.15%  qemu-system-x86  qemu-system-x86_64       [.] drive=
+_get
+              |          =
+
+               --72.32%--drive_get
+                         |          =
+
+                          --1.24%--__irqentry_text_start
+                                    |          =
+
+                                     --1.22%--smp_apic_timer_interrupt
+                                               |          =
+
+                                                --1.00%--local_apic_timer_i=
+nterrupt
+                                                          |          =
+
+                                                           --1.00%--hrtimer=
+_interrupt
+                                                                     |     =
+     =
+
+                                                                      --0.8=
+3%--__hrtimer_run_queues
+                                                                           =
+     |          =
+
+                                                                           =
+      --0.64%--tick_sched_timer
+
+      21.70%    21.34%  qemu-system-x86  qemu-system-x86_64       [.] blk_l=
+egacy_dinfo
+              |
+              ---blk_legacy_dinfo
+
+       3.65%     3.59%  qemu-system-x86  qemu-system-x86_64       [.] blk_n=
+ext
+              |
+              ---blk_next
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1686980/+subscriptions
 
