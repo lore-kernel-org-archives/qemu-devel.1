@@ -2,122 +2,86 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E9C9C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 05:00:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97490C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 05:02:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B059205CB
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 05:00:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 616FA205CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 05:02:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="sIj/T9Ec"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B059205CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AhHBCjCB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 616FA205CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ5yv-0008KR-9L
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 01:00:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56920)
+	id 1jZ61F-00031w-7y
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 01:02:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58060)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jZ5oT-0007Wj-Ef; Thu, 14 May 2020 00:49:41 -0400
-Received: from mail-db8eur05on2114.outbound.protection.outlook.com
- ([40.107.20.114]:25409 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jZ5oQ-00046d-Uo; Thu, 14 May 2020 00:49:40 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=k4kiK79AnkG/nC4OSmcqINgljRyA+9lNguf5stJTB0n+gBXqZqT4fbUUXZqn317laqHQfep+PX5gZKv48TaiBM3r4nPXxdtnWQI/bKHBZlReuhxJaQWC1KPFB+TkGNvHilj4+xeXd6AfmJf6rb0BBH6t/M9z57H0B0P/f+OWyd/zP40K9rh8mbI57vq6Rt9qM8Y2OycwZyMqwmXBFv6TTpFNOgMYY2lPfBgMHSsbM04nmyoqWohH0nWS9AcqiqXXFz8ZDRIIEsf92ve+TFMfswrKUll296gU7DwzzOthXu5Q49QEiJcfcbAibHCO8dwWvkgnQwGs4XDH9mkLiNoz0w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VIUa+BJgMIKjZFiQ9QlDMY+mJhaiX2/leaO818TXCAc=;
- b=Gj/ejY/m/kI9OrpVW9nPlgFjeEY3SgloXWH5z53z2w73L0patpoPJ8NLX/1hHGdBuBXtvyojD0ApymxdW1KDzm1QUpMmmeEjC+h1PVR5DzD8fhie840oUskdmFULdFg/I8nXAA/9btqhzEqpH8AfXlm2MfAlTWBn9B+dqyxTnc690BoO9O4fgBpta1OZwXMM/gfbJEIpFCnkyJ9+rcuYLckhED0pwucpDL364hlTgXZqolqnVbJR2UM9T2scQh9E2RKQqCuWsviWCD1m6isHlXms8ODLBIbvATM8Sd2j7ISW1T1DNch/odIunyPGxIujbivpGyvlBdiXbmb0B9H0ag==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VIUa+BJgMIKjZFiQ9QlDMY+mJhaiX2/leaO818TXCAc=;
- b=sIj/T9EcpSnYegdXkcbtncDYvMteE0AJeuCr88SJwDPm0yYXDpT3jKE9qFM1mifXHevSrcPiq7ccsJxLA3qzaPvpxehLsD13D5HVGosi8dkMTsFQML7l5B/cQWkLxuI6a63mVh07l98Z3+uPJYo5fn6vLVHmpUl5IQdRXgAODX0=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5349.eurprd08.prod.outlook.com (2603:10a6:20b:107::22)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.20; Thu, 14 May
- 2020 04:49:35 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.3000.016; Thu, 14 May 2020
- 04:49:35 +0000
-Subject: Re: [PATCH] bitmaps: Add myself as maintainer
-To: John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200513141407.185198-1-eblake@redhat.com>
- <55059458-923c-505c-d16b-89ff3334c3c5@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <30070988-e0da-00f2-3780-d4fae816b589@virtuozzo.com>
-Date: Thu, 14 May 2020 07:49:34 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-In-Reply-To: <55059458-923c-505c-d16b-89ff3334c3c5@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR10CA0088.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:15::41) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jZ60W-0002cD-SC
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 01:02:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52012
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1jZ60V-0006rK-1k
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 01:02:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589432524;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=LGl3hQ6jGEPFYk2qkojWn52Vuj/W0QDDdOeJbURBeJE=;
+ b=AhHBCjCBsrHr+6jlfsQU/aW0ODWw8S8BN5FK7/6xuPxS2mHlwzfKl6sKSh/6z3l6rdoTuh
+ fP/+RCme/DMA2BCbcOTLHwSLS9u8w4ciToM5t8FV60zbzlUZ13RWyyVWVaBKchgUKDWh/Q
+ JTzvS5CvZR5EaqAS/QLBCZE8Ug8xIog=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-418-tdxmD7RlMoaXV6xooKYw7Q-1; Thu, 14 May 2020 01:02:00 -0400
+X-MC-Unique: tdxmD7RlMoaXV6xooKYw7Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2200E106B207;
+ Thu, 14 May 2020 05:01:58 +0000 (UTC)
+Received: from x1.home (ovpn-113-111.phx2.redhat.com [10.3.113.111])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E2EC55D9C5;
+ Thu, 14 May 2020 05:01:53 +0000 (UTC)
+Date: Wed, 13 May 2020 23:01:53 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH Kernel v19 7/8] vfio iommu: Add migration capability to
+ report supported features
+Message-ID: <20200513230153.0b5f3729@x1.home>
+In-Reply-To: <1589400279-28522-8-git-send-email-kwankhede@nvidia.com>
+References: <1589400279-28522-1-git-send-email-kwankhede@nvidia.com>
+ <1589400279-28522-8-git-send-email-kwankhede@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.186) by
- AM0PR10CA0088.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:15::41) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3000.20 via Frontend Transport; Thu, 14 May 2020 04:49:35 +0000
-X-Originating-IP: [185.215.60.186]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ab2cf703-c9e9-400c-eb03-08d7f7c23351
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5349:
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5349A27A94EF8AB6DE092B85C1BC0@AM7PR08MB5349.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-Forefront-PRVS: 040359335D
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: QcZtkIQZNilILZ/l0yvbb/NBfXfnO4NsO8+FD9elMzAUaWb1Y6dARA2SQx32anG40ZKY065/cpFVbQaGeisdx0UvLcJrDS40AxjxvVn9Xw0XiH4NBIVyiT7opqEi9O2M8jsVd221hFbV7DVzgkNjXu+Tjy0Q/3rYTyKBFly6hoMnakyIM/sW7DOiytmxQvFNp6I0lsIWN4QFWEA98nqZKYHYGvvmBFJcYSzWMAp2dnk3vUvwU6D03D/jj54pAmXaw9jLgKaZpshxYPpgKtF4NV9zoZJct112KhyAtSZx4ALBgWjisa0N1QCqmCFR+qgq/LorCinYwSefwxQUEXlOX+fDl3HmfKT68qL6pfmGA6/8mu4D8dvjQMsKo/F6c+mNw1EL/DGk8rT2AcH+TFkIinLGhabYoXbLPlbaltZDjx9KgXlkXwdOTi+lIKbBqveGJWYqSIh2N8+JLDZoNQy4z8qSZOeNpr+MYWcfxQLO+npGgmmDbwmSv1avU3//74OhJpTZahASG1Z1C5Ol/R5QVsbfiJmGe4gfstWCTT1ZUQ+mnHvOJ/l396oPPy2dvrqy+DYTGWbAO8zbil6FLdPqdQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(376002)(366004)(346002)(39840400004)(136003)(396003)(52116002)(66946007)(31696002)(66476007)(66556008)(110136005)(956004)(8936002)(53546011)(2616005)(16576012)(8676002)(4326008)(316002)(16526019)(6486002)(2906002)(186003)(966005)(36756003)(31686004)(478600001)(5660300002)(26005)(86362001)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: +Y/jCiHmFu7z7/cLSJ0mE10v2eUkvT91c4edxtJmeh43uVFTmnS9vSMOQc+Ym6327jLvVeRwKh6+EsGYuNF09mMo0W5+701DV2KRno0xVSn22dzK3C5DwT/tByFmyji2sUe1J6e6CZ4/J8v1Puata4g1s8I/qed8ZKbH7XHjX+D4VkVvN1afNPxzfr/ZDivms6LdctzDth6SRnPqbEJPKoH3peAjIskRYJQX9WZJSsNg4WQdAHv0Pvp/5OXON+mGOpZwWNl5Ej7MVXaFYjPGWrrQHzS/g7z9vEmxxoTIZ2a1uNKY/APbAONYxDhIwA/XSJhSGJknyZ3GKRvy/ozNcCCPyLGVc/XSSD39+E7Oq4PdYOAa7TF28cPq+kh5x7V1PtGat3egaBD0z3dyjmRLl4wU7o2Nww6wSlqL4rSBAmQ3uazTb41+ZLZfqpR7bA/KSW+9Mg90QSBI8wOxL+I8iWULbC2Q2izkui4CP+J2fLjSEO9tCZ+Hnz9YVcxvjN78
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ab2cf703-c9e9-400c-eb03-08d7f7c23351
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2020 04:49:35.4769 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gG7oS2cjRQEWyUzM1tLJqQxFH2YojUSzxcQ4iV2U6Z1C0N2fGAzF5VswL1iaOoKpvCbBNzsWaaKEUlS6nSjkE1Ym/C/396xqA/XEIjzPAkI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5349
-Received-SPF: pass client-ip=40.107.20.114;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-DB8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 00:49:36
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Received-SPF: pass client-ip=205.139.110.120;
+ envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -131,63 +95,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-13.05.2020 23:24, John Snow wrote:
-> 
-> 
-> On 5/13/20 10:14 AM, Eric Blake wrote:
->> Dirty bitmaps are important to incremental backups, including exposure
->> over NBD where I'm already maintainer.  Also, I'm aware that lately I
->> have been doing as much code/review on bitmaps as John Snow, who is
->> hoping to scale back on this front.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->>
->> ---
->> This still leaves John as maintainer for: IDE, Floppy, and Block Jobs,
->> which I did not feel comfortable taking on at this time.
->>
->> If this patch makes sense, I'm happy to take on my recent 'qemu-img
->> bitmap' series as my first bitmap-related pull request, once it has
->> sufficient review.
->> ---
->>   MAINTAINERS | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 6a8dc1e69d42..f7caf7c0cc7f 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -2002,6 +2002,7 @@ T: git https://repo.or.cz/qemu/armbru.git block-next
->>
->>   Dirty Bitmaps
->>   M: John Snow <jsnow@redhat.com>
->> +M: Eric Blake <eblake@redhat.com>
->>   R: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>   L: qemu-block@nongnu.org
->>   S: Supported
->>
-> 
-> I'd also like to point out that I wouldn't mind if Vladimir became an
-> official maintainer, but I can't remember if he wanted the title when we
-> last spoke at KVM Forum.
+On Thu, 14 May 2020 01:34:38 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-Actually, it would be nice, I'd glad to get it, thanks :)
-I can send a separate patch, or we may s/R/M/ in this one?
-
+> Added migration capability in IOMMU info chain.
+> User application should check IOMMU info chain for migration capability
+> to use dirty page tracking feature provided by kernel module.
+> User application must check page sizes supported and maximum dirty
+> bitmap size returned by this capability structure for ioctls used to get
+> dirty bitmap.
 > 
-> Regardless; I am clearly not keeping up with reviews right now as my
-> attention has been pulled elsewhere, so:
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 24 +++++++++++++++++++++++-
+>  include/uapi/linux/vfio.h       | 21 +++++++++++++++++++++
+>  2 files changed, 44 insertions(+), 1 deletion(-)
 > 
-> Reviewed-by: John Snow <jsnow@redhat.com>
-> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 4358be26ff80..77351497a9c2 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -2389,6 +2389,22 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
+>  	return ret;
+>  }
+>  
+> +static int vfio_iommu_migration_build_caps(struct vfio_iommu *iommu,
+> +					   struct vfio_info_cap *caps)
+> +{
+> +	struct vfio_iommu_type1_info_cap_migration cap_mig;
+> +
+> +	cap_mig.header.id = VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION;
+> +	cap_mig.header.version = 1;
+> +	cap_mig.flags = VFIO_IOMMU_INFO_CAPS_MIGRATION_DIRTY_PAGE_TRACK;
+> +
+> +	/* support minimum pgsize */
+> +	cap_mig.pgsize_bitmap = (size_t)1 << __ffs(iommu->pgsize_bitmap);
+> +	cap_mig.max_dirty_bitmap_size = DIRTY_BITMAP_SIZE_MAX;
+> +
+> +	return vfio_info_add_capability(caps, &cap_mig.header, sizeof(cap_mig));
+> +}
+> +
+>  static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  				   unsigned int cmd, unsigned long arg)
+>  {
+> @@ -2433,10 +2449,16 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  		mutex_lock(&iommu->lock);
+>  		info.flags = VFIO_IOMMU_INFO_PGSIZES;
+>  
+> +		vfio_pgsize_bitmap(iommu);
 
 
--- 
-Best regards,
-Vladimir
+Why is it necessary to rebuild the bitmap here?  The user can't get to
+this ioctl until they've added a group to the container and set the
+IOMMU model.
+
+
+>  		info.iova_pgsizes = iommu->pgsize_bitmap;
+>  
+> -		ret = vfio_iommu_iova_build_caps(iommu, &caps);
+> +		ret = vfio_iommu_migration_build_caps(iommu, &caps);
+> +
+> +		if (!ret)
+> +			ret = vfio_iommu_iova_build_caps(iommu, &caps);
+> +
+>  		mutex_unlock(&iommu->lock);
+> +
+>  		if (ret)
+>  			return ret;
+>  
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index e3cbf8b78623..c90604322798 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -1013,6 +1013,27 @@ struct vfio_iommu_type1_info_cap_iova_range {
+>  	struct	vfio_iova_range iova_ranges[];
+>  };
+>  
+> +/*
+> + * The migration capability allows to report supported features for migration.
+> + *
+> + * The structures below define version 1 of this capability.
+> + *
+> + * pgsize_bitmap: Kernel driver returns supported page sizes bitmap for dirty
+> + * page tracking.
+> + * max_dirty_bitmap_size: Kernel driver returns maximum supported dirty bitmap
+> + * size in bytes to be used by user application for ioctls to get dirty bitmap.
+> + */
+> +#define VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION  1
+> +
+> +struct vfio_iommu_type1_info_cap_migration {
+> +	struct	vfio_info_cap_header header;
+> +	__u32	flags;
+> +	/* supports dirty page tracking */
+> +#define VFIO_IOMMU_INFO_CAPS_MIGRATION_DIRTY_PAGE_TRACK	(1 << 0)
+
+This flag is a bit redundant to the purpose of this capability, isn't
+it?  I think exposing the capability itself is indicating support for
+dirty page tracking.  We should probably be explicit in the comment
+about exactly what interface this capability implies.  Thanks,
+
+Alex
+
+> +	__u64	pgsize_bitmap;
+> +	__u64	max_dirty_bitmap_size;		/* in bytes */
+> +};
+> +
+>  #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
+>  
+>  /**
+
 
