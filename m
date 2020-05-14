@@ -2,76 +2,88 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FCE5C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 10:42:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6907CC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 10:45:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C1AD2053B
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 10:42:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 315F02053B
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 10:45:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b3ypcRCC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C1AD2053B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ns4mlita"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 315F02053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZBK2-0004xT-AG
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 06:42:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38924)
+	id 1jZBN8-00005x-83
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 06:45:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39950)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZBIo-0003tu-9R
- for qemu-devel@nongnu.org; Thu, 14 May 2020 06:41:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33669
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jZBMJ-0007Dr-KS
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 06:45:00 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54713
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZBIl-0004UN-PA
- for qemu-devel@nongnu.org; Thu, 14 May 2020 06:41:21 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jZBMI-0005vp-B5
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 06:44:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589452877;
+ s=mimecast20190719; t=1589453096;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=yyFhILTqNfLhJllHfzm6x/MBmO7/BIsAKVopUr5QcEc=;
- b=b3ypcRCC/sfNupOLbyqmATAnR8mnawRmiigcvKj8mJqWJ40NzLvYHZ8iY29rS/fazeBI0L
- UcxJuKhWaInvw4GFvV7DvxzNkexMIac1GG2+YrUtavtSRzas7bOUVgRyU1kFEz0mJe2Pau
- HF2Z2vJ+flYY7Kiem4En1vnnis+kPYA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-jO6a9zd0P1u6ckovCSZSDw-1; Thu, 14 May 2020 06:41:15 -0400
-X-MC-Unique: jO6a9zd0P1u6ckovCSZSDw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9D00461;
- Thu, 14 May 2020 10:41:14 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-9.ams2.redhat.com [10.36.114.9])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BCDAA1000320;
- Thu, 14 May 2020 10:41:06 +0000 (UTC)
-Date: Thu, 14 May 2020 12:41:05 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Lukas Straub <lukasstraub2@web.de>
-Subject: Re: [PATCH 0/5] Introduce 'yank' oob qmp command to recover from
- hanging qemu
-Message-ID: <20200514104105.GC5518@linux.fritz.box>
-References: <cover.1589193717.git.lukasstraub2@web.de>
- <20200513211235.4d0711d1@luklap>
+ bh=7pT5nTW7n2WcTR2f9gsD4VoEQG7ZR8xKGLdWojo7Bng=;
+ b=Ns4mlitaZGDNp7fzlUHqY3gCN2qX7NlwqZPjU/w/OPR8L2Kd3yTzHnTPfg/eSqlCkA0i4O
+ i3Yc79t2GhsLJwtracqVRyUI7KeWuLyVt9zQnSiuw02/ns7wLgZor95zfFApVHVO6TnMfN
+ d2hudDxmP3WgnaV64Q7EtoVu1mHGWqA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-420-amJKmJ8uNl23W1Y8C06ngQ-1; Thu, 14 May 2020 06:44:54 -0400
+X-MC-Unique: amJKmJ8uNl23W1Y8C06ngQ-1
+Received: by mail-wm1-f71.google.com with SMTP id k17so3954826wmi.4
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 03:44:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=7pT5nTW7n2WcTR2f9gsD4VoEQG7ZR8xKGLdWojo7Bng=;
+ b=RU7iEnUBzvm6rjbk8k6fa0XFffeZW6ScvK4pvrz4cgr8/Wo+5d4jxFEhpA/anQ3wWb
+ k573Z4LKYT6yBDn+1QnXE/Y2h7+1DzKx4oZgzssGLUXruWKPgON37YMF0f53+I3AQnJc
+ C0kyU7Gv8+i2GQEDjnYa9dLzs76QmAZqjsxhaNRnGJM+YsfEWcREFKEgPtX1E3P10gSD
+ oMznAPLYdyUuOQJ+N2Y96RFw0D3TK1hS3Bm0h16/PfXas33Hm/IoMJNq/oUqnKLIJSOh
+ tliuLm7poDxfkY00g016S1nnaFUbY3S0fl2zIC5A619Kre0BQsFR21MgQUY9dKqAvvjz
+ vnlQ==
+X-Gm-Message-State: AGi0Puaofea/RLr9npIsfzAQOQnEkp9CyzPKnnmSir+IlYjiMYMKAhmf
+ rKisKuB9/D3NCCgzqB52n44D9Lf1hHzJsLd59fxG8YZiyqQBemlXIJEH6ZK0xemnkUWBOkP1zKF
+ JLKnfMygbZqdrwYY=
+X-Received: by 2002:a1c:a74a:: with SMTP id q71mr34648768wme.23.1589453092729; 
+ Thu, 14 May 2020 03:44:52 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJvf3nrnMw0Zfx03lS18D2hj2bQlLAHwGQFvAgZ2DSYqOJoawDxBuWdGMFJfzvxAAonT851cw==
+X-Received: by 2002:a1c:a74a:: with SMTP id q71mr34648743wme.23.1589453092431; 
+ Thu, 14 May 2020 03:44:52 -0700 (PDT)
+Received: from redhat.com (bzq-79-179-68-225.red.bezeqint.net. [79.179.68.225])
+ by smtp.gmail.com with ESMTPSA id t6sm15386884wma.4.2020.05.14.03.44.51
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 14 May 2020 03:44:51 -0700 (PDT)
+Date: Thu, 14 May 2020 06:44:43 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Maxime Coquelin <maxime.coquelin@redhat.com>
+Subject: Re: [PATCH] vhost-user: add support for VHOST_USER_SET_STATUS
+Message-ID: <20200514064306-mutt-send-email-mst@kernel.org>
+References: <20200514073332.1434576-1-maxime.coquelin@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200513211235.4d0711d1@luklap>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200514073332.1434576-1-maxime.coquelin@redhat.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Q68bSM7Ycu6FN28Q"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
@@ -93,108 +105,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: shahafs@mellanox.com, lulu@redhat.com, jasowang@redhat.com,
+ qemu-devel@nongnu.org, amorenoz@redhat.com, matan@mellanox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Q68bSM7Ycu6FN28Q
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Thu, May 14, 2020 at 09:33:32AM +0200, Maxime Coquelin wrote:
+> It is usefull for the Vhost-user backend to know
+> about about the Virtio device status updates,
+> especially when the driver sets the DRIVER_OK bit.
+> 
+> With that information, no more need to do hazardous
+> assumptions on when the driver is done with the
+> device configuration.
+> 
+> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+> ---
+> 
+> This patch applies on top of Cindy's "vDPA support in qemu"
+> series, which introduces the .vhost_set_state vhost-backend
+> ops.
+> 
+>  docs/interop/vhost-user.rst | 12 ++++++++++++
+>  hw/net/vhost_net.c          | 10 +++++-----
+>  hw/virtio/vhost-user.c      | 35 +++++++++++++++++++++++++++++++++++
+>  3 files changed, 52 insertions(+), 5 deletions(-)
+> 
+> diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
+> index 3b1b6602c7..f108de7458 100644
+> --- a/docs/interop/vhost-user.rst
+> +++ b/docs/interop/vhost-user.rst
+> @@ -815,6 +815,7 @@ Protocol features
+>    #define VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD       12
+>    #define VHOST_USER_PROTOCOL_F_RESET_DEVICE         13
+>    #define VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS 14
+> +  #define VHOST_USER_PROTOCOL_F_STATUS               15
+>  
+>  Master message types
+>  --------------------
+> @@ -1263,6 +1264,17 @@ Master message types
+>  
+>    The state.num field is currently reserved and must be set to 0.
+>  
+> +``VHOST_USER_SET_STATUS``
+> +  :id: 36
+> +  :equivalent ioctl: VHOST_VDPA_SET_STATUS
+> +  :slave payload: N/A
+> +  :master payload: ``u64``
+> +
+> +  When the ``VHOST_USER_PROTOCOL_F_STATUS`` protocol feature has been
+> +  successfully negotiated, this message is submitted by the master to
+> +  notify the backend with updated device status as defined in the Virtio
+> +  specification.
+> +
+>  Slave message types
+>  -------------------
+>  
+> diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+> index 463e333531..37f3156dbc 100644
+> --- a/hw/net/vhost_net.c
+> +++ b/hw/net/vhost_net.c
+> @@ -517,10 +517,10 @@ int vhost_set_state(NetClientState *nc, int state)
+>  {
+>      struct vhost_net *net = get_vhost_net(nc);
+>      struct vhost_dev *hdev = &net->dev;
+> -    if (nc->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
+> -        if (hdev->vhost_ops->vhost_set_state) {
+> -                return hdev->vhost_ops->vhost_set_state(hdev, state);
+> -             }
+> -        }
+> +
+> +    if (hdev->vhost_ops->vhost_set_state) {
+> +        return hdev->vhost_ops->vhost_set_state(hdev, state);
+> +    }
+> +
+>      return 0;
+>  }
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index ec21e8fbe8..b7e52d97fc 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -59,6 +59,7 @@ enum VhostUserProtocolFeature {
+>      VHOST_USER_PROTOCOL_F_HOST_NOTIFIER = 11,
+>      VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD = 12,
+>      VHOST_USER_PROTOCOL_F_RESET_DEVICE = 13,
+> +    VHOST_USER_PROTOCOL_F_STATUS = 15,
+>      VHOST_USER_PROTOCOL_F_MAX
+>  };
+>  
+> @@ -100,6 +101,7 @@ typedef enum VhostUserRequest {
+>      VHOST_USER_SET_INFLIGHT_FD = 32,
+>      VHOST_USER_GPU_SET_SOCKET = 33,
+>      VHOST_USER_RESET_DEVICE = 34,
+> +    VHOST_USER_SET_STATUS = 36,
+>      VHOST_USER_MAX
+>  } VhostUserRequest;
+>  
+> @@ -1886,6 +1888,38 @@ static int vhost_user_set_inflight_fd(struct vhost_dev *dev,
+>      return 0;
+>  }
+>  
+> +static int vhost_user_set_state(struct vhost_dev *dev, int state)
+> +{
+> +    bool reply_supported = virtio_has_feature(dev->protocol_features,
+> +                                              VHOST_USER_PROTOCOL_F_REPLY_ACK);
+> +
+> +    VhostUserMsg msg = {
+> +        .hdr.request = VHOST_USER_SET_STATUS,
+> +        .hdr.flags = VHOST_USER_VERSION,
+> +        .hdr.size = sizeof(msg.payload.u64),
+> +        .payload.u64 = (uint64_t)state,
+> +    };
+> +
+> +    if (!virtio_has_feature(dev->protocol_features,
+> +                VHOST_USER_PROTOCOL_F_STATUS)) {
+> +        return -1;
+> +    }
+> +
+> +    if (reply_supported) {
+> +        msg.hdr.flags |= VHOST_USER_NEED_REPLY_MASK;
+> +    }
+> +
+> +    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
+> +        return -1;
+> +    }
+> +
+> +    if (reply_supported) {
+> +        return process_message_reply(dev, &msg);
+> +    }
 
-Am 13.05.2020 um 21:12 hat Lukas Straub geschrieben:
-> Terminology:
-> instance =3D one (nbd) blockdev/one chardev/the single migrationstate
-> connection =3D one TCP connection
->=20
-> Hello Everyone,
-> Having read all the comments, here is proposal v2:
+So since we are doing this anyway, let's give backend the
+opportunity to validate features and fail FEATURES_OK?
 
-Looks quite good to me.
 
-> Every instance registers itself with a unique name in the form
-> "blockdev:<node-name>", "chardev:<chardev-name>" and "migration" using
-> yank_register_instance which will do some sanity checks like checking
-> if the same name exists already. Then (multiple) yank functions can be
-> registered as needed with that single name. When the instance exits/is
-> removed, it unregisters all yank functions and unregisters it's name
-> with yank_unregister_instance which will check if all yank functions
-> where unregistered.
 
-Feels like nitpicking, but you say that functions are registered with a
-name that you have previously registered. If you mean literally passing
-a string, could this lead to callers forgetting to register it first?
-
-Maybe yank_register_instance() should return something like a
-YankInstance object that must be passed to yank_register_function().
-Then you would probably also have a list of all functions registered for
-a single instance so that yank_unregister_instance() could automatically
-remove all of them instead of requiring the instance to do so.
-
-> Every instance that supports the yank feature will register itself and
-> the yank functions unconditionally (No extra 'yank' option per
-> instance).
-> The 'query-yank' oob qmp command lists the names of all registered
-> instances.
-> The 'yank' oob qmp command takes a list of names and for every name
-> calls all yank functions registered with that name. Before doing
-> anything, it will check that all names exist.
->=20
-> If the instance has multiple connections (say, migration with
-> multifd), i don't think it makes much sense to just shutdown one
-> connection. Calling 'yank' on a instance will always shutdown all
-> connections of that instance.
-
-I think it depends. If shutting down one connection basically kills the
-functionality of the whole instance, there is no reason not to kill all
-connections. But if the instance could continue working on the second
-connection, maybe it shouldn't be killed.
-
-Anyway, we can extend things as needed later. I already mentioned
-elsewhere in this thread that block node-names have a restricted set of
-allowed character, so having a suffix to distinguish multiple yankable
-things is possible. I just checked chardev and it also restricts the
-allowed set of characters, so the same applies. 'migration' is only a
-fixed string, so it's trivially extensible.
-
-So we know a path forward if we ever need to yank individual
-connections, which is good enough for me.
-
-> Yank functions are generic and in no way limited to connections. Say,
-> if migration is started to an 'exec:' address, migration could
-> register a yank function to kill that external command on yank (Won't
-> be implemented yet though).
-
-Yes, this makes sense as a potential future use case.
-
-Kevin
-
---Q68bSM7Ycu6FN28Q
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEE3D3rFZqa+V09dFb+fwmycsiPL9YFAl69IEEACgkQfwmycsiP
-L9Y0Xw/+JoK/scMwhlZ99A26X5iAm6R1UTwayN5qHLRlEkcLY0iCpQ1TmHtptbeV
-63PoSYiRB/G8nrRoVHwX66ButG/Pi2la7JZFK1Lvs7GQDZO89z7tVk+XUpgyiEaM
-cYAV4BYHT9fF7wqQys8ekliTsPSJspfz6Dh6y+yKeCtQl4rDOxpmuNcUgQgVKLHm
-UD2n6B7ZosdOWcaIaPn5SlfxT4tadqja8mPKOw2l/g9N3v4X3x47+XPvdhBxzhV5
-MYFWGYb2HOWbNEz4ZS+JbZ9lIOojnvmrRYUw0+L7/vBoMSmzwd2uMHJwS4c3MMUF
-DyMhz9sT83M2NLGgQHzAXgLedKc6R7uozXniv+kVQoOAYh3lnsMJzHIAvvcS7tQC
-puIJtvzfnQ/5QZUA1hPKRrNhQemDErbR41bJQHIgtOAejx4RfwrZ21Mx66Tnudi2
-HFRmoPvETyuxS4llcpMXAQqDlpTJBbrLN9aFWA2dozVtKy8dkwxS3+dEHqdgCtfS
-yU+U6I1wVItTZ4w609GKrbAtI921NmtLd191ZiEH9UI5ya35XQELYyqowOJUFAl8
-Vn6ioLchGrr05LXa1VXsKgggbuZ84HNvch59dJa7sozwf80faXeJJ0fdr4VJgIDP
-2hOszhhGYHo/8IjH/g36neoMFHKf570o3q2uKbuBUshiBjCDiq0=
-=kE26
------END PGP SIGNATURE-----
-
---Q68bSM7Ycu6FN28Q--
+> +
+> +    return 0;
+> +}
+> +
+>  bool vhost_user_init(VhostUserState *user, CharBackend *chr, Error **errp)
+>  {
+>      if (user->chr) {
+> @@ -1947,4 +1981,5 @@ const VhostOps user_ops = {
+>          .vhost_backend_mem_section_filter = vhost_user_mem_section_filter,
+>          .vhost_get_inflight_fd = vhost_user_get_inflight_fd,
+>          .vhost_set_inflight_fd = vhost_user_set_inflight_fd,
+> +        .vhost_set_state = vhost_user_set_state,
+>  };
+> -- 
+> 2.25.4
 
 
