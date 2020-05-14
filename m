@@ -2,104 +2,124 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72004C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 15:09:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43FDEC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 15:10:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 288D420657
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 15:09:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0818D205CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 15:10:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KH6wA6bb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 288D420657
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="c1H8JeVi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0818D205CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZFUA-0008U5-5y
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 11:09:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43186)
+	id 1jZFVS-0002j7-3z
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 11:10:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46362)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jZFA8-000271-1c
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:48:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49568
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jZFA6-0003gX-LW
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:48:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589467717;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=imtP1xe7M/PDqZTnyzKNtYEVsK1ctI2D/xE0IoyipfU=;
- b=KH6wA6bbKaS1a3fk8yHk1H1797hNxsSEF35wwSh7Lfjza2IzzBG8bInChaEoNPfvAwEynQ
- aMUCahyYKeIbHzX8zI9ruDE2HbkaKFSitNkyN2YFMyzAwlyPUmTV0dMwmZebyWMTcgy43+
- Tlm4K+1Ri2WoQJV2ZFZxHDvFRtrEIms=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-464-slrPq8U-OEufVkHGkSCVxg-1; Thu, 14 May 2020 10:48:36 -0400
-X-MC-Unique: slrPq8U-OEufVkHGkSCVxg-1
-Received: by mail-wm1-f69.google.com with SMTP id t23so3993833wmi.2
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:48:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=imtP1xe7M/PDqZTnyzKNtYEVsK1ctI2D/xE0IoyipfU=;
- b=NwHIvqWQIu5ic1r1/gCFAxPlXQCmQq/nz9K3oB/2KKao9wpcQ4Vs/26NPq84vFjLNP
- sWwQj6yVRIV19U2HyZLhoHcZduBbpi/7BmSHLEtU7nPZRiESoHHj346gfsUxgqbD8qxg
- Wwry5QNzQ8Y0+w37yeeacUciTlHvFoWi8/q2mL/FK06K0r+RKKxSMCdPZ1Bt8RVM99Ij
- jyri4rhy05Y1YtFc62gNKLjkXTGxlcA07VntXNdBAEub5yO4HJLhRcze7zZtwvC3evi4
- vNBWX2HSC+wvjNtb8rh76wlL9ls9iSP0Qz17JkAtS+in+zf6HnNC83oy+r1aKp6qwvQP
- OHCQ==
-X-Gm-Message-State: AOAM533e6y/25iSE3Zu7CkQ9FTsadADy/P/iwM0aYp2RibGVfMtbCraa
- +1vsCDhrJL6HXqgMkTgUZnP/Df8MJIZyTyqmvcqI7vi6UOS9mu7Qm4nrQtLb1lxOQMzN8B8tDk7
- 1Y0kCBLP5pKaVwAQ=
-X-Received: by 2002:adf:f512:: with SMTP id q18mr6301836wro.38.1589467714537; 
- Thu, 14 May 2020 07:48:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz7pcoFIEEtwpC0CLEwQyShMThHMJmrqRBG72uvE/j8+N02OMarGRZee+Vj7ATx9g56MwZpRQ==
-X-Received: by 2002:adf:f512:: with SMTP id q18mr6301807wro.38.1589467714222; 
- Thu, 14 May 2020 07:48:34 -0700 (PDT)
-Received: from redhat.com (bzq-79-179-68-225.red.bezeqint.net. [79.179.68.225])
- by smtp.gmail.com with ESMTPSA id l19sm40956159wmj.14.2020.05.14.07.48.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 14 May 2020 07:48:33 -0700 (PDT)
-Date: Thu, 14 May 2020 10:48:31 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Subject: Re: [PATCH] vhost-user: add support for VHOST_USER_SET_STATUS
-Message-ID: <20200514104455-mutt-send-email-mst@kernel.org>
-References: <20200514073332.1434576-1-maxime.coquelin@redhat.com>
- <33dae8af-a7ee-e005-f8d5-2b4a038b8211@redhat.com>
- <670d4623-fba9-dba6-8eea-2f1c16f2ad4b@redhat.com>
- <20200514064721-mutt-send-email-mst@kernel.org>
- <b915c324-2e07-9149-e527-2be8087f8b06@redhat.com>
-MIME-Version: 1.0
-In-Reply-To: <b915c324-2e07-9149-e527-2be8087f8b06@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jZFUK-0000jg-UB; Thu, 14 May 2020 11:09:32 -0400
+Received: from mail-vi1eur05on2126.outbound.protection.outlook.com
+ ([40.107.21.126]:65120 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jZFUI-0000oY-EV; Thu, 14 May 2020 11:09:31 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UpqJMbeFwexHNFgGvWQvtMsi7HPPrhtza65LGKJV7TJC8vb6RrphqHOrhqHZiiwTi3eUZZQtLQI+dqVldYWLAufYQvBGQLwBfIrlk3X9zeBPRJUprnEZvGX+I0yQHMNb1iPFEdEOZb/LiPGo2UjSFCekctHn0ssKIP/6Xn63kOWblzyIYLTk7nkSGDAB3+HF0pdkGvsWW1/dL0vhU7is6e3XTVPTwldPwc7gVmE2u36wtJ5Yci/Y5hUrqq9CCUs+KlIX3qEHte2hsLG3woqwprl0ZAFoqF7H9QZvM4i6HuEwa8qflFwy/YJESyLDRkFOstnwDk8lcbbEA8YVa4L8gQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HQFTmFhLrDfZMp/XbSGKfN7AZM6IKdnastP5OnCXi7s=;
+ b=HVIP1+xz6ECq934Z50AVxUcGBZvbu39DjCdX4WB0noTQiieYcASAxuoZEbRgvayLQjAwFtk+6h+L+FPd7wYvY3Miph6AoQo6lEL9NsTQy4NhvGVMIUUhydTqEHFH5IFRHGanChM8inp4ilWnvZI1tlvfhVCtOVyPbR9d1PsvITC3OK9vDJxUnoZgI9kZatLr/9KJMwcWfdFhy0fWET+HuY9D+OwhrndsYFOjs2WMyY6ALELFIXWe91UDGSjMPXN6j3P3NQpVeOyfkbrhThrVwMni1249sZWJyOsfltzKTSBkMY3wtzzIZfvjLJ73PVbU+ERXCk8tAKyySDiA8iO60w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HQFTmFhLrDfZMp/XbSGKfN7AZM6IKdnastP5OnCXi7s=;
+ b=c1H8JeVi8+ERvI173LgOdtpQj3ZzZRuhUZ8MeqWn1fVRfGmsJhM8P1nCpPkiVvNmW8JXoQ30ZVCP9lmAAd6ZCihPDRPpnYNGvm9wLntXLJ9p4Q4CNTIOmDGWEc0nBc/csv9Bs5jBjZ70qQN3HJ2BBfSKJFeHHGfmxURqVY5M/NQ=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5512.eurprd08.prod.outlook.com (2603:10a6:20b:de::19)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.28; Thu, 14 May
+ 2020 15:09:25 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.3000.016; Thu, 14 May 2020
+ 15:09:25 +0000
+Subject: Re: [PATCH v4 6/9] qemu-img: Add bitmap sub-command
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200513011648.166876-1-eblake@redhat.com>
+ <20200513011648.166876-7-eblake@redhat.com>
+ <ef44c5c0-1032-76e3-a3ce-ad0cc43d297c@virtuozzo.com>
+ <0542a587-424c-a596-1778-e7aaf494298c@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <a76362b3-b237-6b40-7ce9-3935649c7609@virtuozzo.com>
+Date: Thu, 14 May 2020 18:09:22 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+In-Reply-To: <0542a587-424c-a596-1778-e7aaf494298c@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-ClientProxiedBy: AM0PR10CA0065.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:208:15::18) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.186) by
+ AM0PR10CA0065.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:15::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3000.20 via Frontend Transport; Thu, 14 May 2020 15:09:24 +0000
+X-Originating-IP: [185.215.60.186]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a52dffe8-aeee-44b2-faf0-08d7f818ca21
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5512:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5512BD0D5F03B844698EFFECC1BC0@AM7PR08MB5512.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 040359335D
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Lg7MtA7fu6KNRq3NUB8ia9ty7M5NXaYJYPEWA7Pbl7SDtBaWBWn22PkCwExGpeTZITQxoicy4tpzZASVZ5OvtuSn2VuIiTAVzQqLHnKuT4sGo1kp3iLqsntJ9YIY5gb7lQUkvEvIFCN+F94ifv0B+tej+BnJ2VMhQknkJyxqcq2v2ShVXwHU7o5cOR2epo7+22l5SDwV341WwYenv6u1NhsRMK6I45X2+itHEYrtsU7ebuqxmR0FLSArzUSfLkgZsyTP2dOJ1Taj82Yt9H1hg0x6Jq9Q0OQzeY3F2sN0qy0A5gSMNhgjqwv/9rBQRv6uTKAcUMOceV7X9NQShZ2h36bgTPfeOWAh5M8/R56m+KSGoq2PlZbELHBlDQLn7j2jtCX9W2kUqDE/6xuP1/U0zgAABL28CjGpa4EMWsDbxzBj1eZ59UxGjNn9/Mm+Fkm2CIVIRlBY7T96Y9GI56AKMoClcxFUyLZMMeRxSwLx7W5SHJ3hdIL8JHTq5sIPZZw+
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(396003)(136003)(346002)(376002)(366004)(39840400004)(478600001)(36756003)(2906002)(16526019)(8676002)(186003)(53546011)(6486002)(4326008)(5660300002)(26005)(8936002)(31686004)(66476007)(66556008)(316002)(956004)(16576012)(52116002)(2616005)(66946007)(31696002)(86362001)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: UzjQ8SD5RDoRRUcfKQoQ/p00Y3ooEOL5cZlnDVuRyXO4avzPzPNEgf7S6tovavUcGbrPGEfz62ys4H1KLvvUt1o76oefEuAmlNQD8y2pYraWejRxyELvrkMY2uHIIQ2/1GY9eE89J2Jt4ydB8SU/JwTtE/gpZpcu5nuhuKFfIVmKHdorg4fyiC8CUBenbHdE59zyLpB5IWgAfITJDEvaeXp8JNKS+xnatowNLZr9Fneq4EgEoukhYjwlujHfSIF2Q9yfLpu9FuVcmXdOKwxJirpX9rbMN0bY0e2kVOEmJdRVmlxpx8eyiCHbkqyj0LPBE07l4NJ3dawsiSOHi5gq3gzM4KEwUZECuQryi3Mb8wzFIoJjWvPHgdnLAVkJ9zeJ/kdTZvvZzYkckwQLbmvhuV4JtupOEigD3JhhM3hNWHghIj4Q+MZLRfJFjHUPwWJ4sFxZvQVYAGllf0og+xYcitbr7/E2EUvdVgsZ3Ov1ELPh1cB15xaMWhU9VrHVDCQF
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a52dffe8-aeee-44b2-faf0-08d7f818ca21
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2020 15:09:25.1696 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: D/YGKjmpjO9Y4K3RIaxvJn9WBWmh9O7cIKZTJ0JNMoK9YcNIKedy76G3tYQ+6khJ9+JKtBiOwaGIX6z/aoT0etBDOUj+ZcXc/wtt8WVq+3g=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5512
+Received-SPF: pass client-ip=40.107.21.126;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 11:09:26
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,284 +132,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: shahafs@mellanox.com, lulu@redhat.com, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org, amorenoz@redhat.com, matan@mellanox.com
+Cc: kwolf@redhat.com, nsoffer@redhat.com, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 14, 2020 at 04:39:26PM +0200, Maxime Coquelin wrote:
+14.05.2020 17:20, Eric Blake wrote:
+> On 5/14/20 1:45 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> 13.05.2020 04:16, Eric Blake wrote:
+>>> Include actions for --add, --remove, --clear, --enable, --disable, and
+>>> --merge (note that --clear is a bit of fluff, because the same can be
+>>> accomplished by removing a bitmap and then adding a new one in its
+>>> place, but it matches what QMP commands exist).  Listing is omitted,
+>>> because it does not require a bitmap name and because it was already
+>>> possible with 'qemu-img info'.  A single command line can play one or
+>>> more bitmap commands in sequence on the same bitmap name (although all
+>>> added bitmaps share the same granularity, and and all merged bitmaps
+>>> come from the same source file).  Merge defaults to other bitmaps in
+>>> the primary image, but can also be told to merge bitmaps from a
+>>> distinct image.
+>>>
 > 
+>>
+>> I'm sorry for asking it only now on v4.. But still. Why do we need it? 
 > 
-> On 5/14/20 12:51 PM, Michael S. Tsirkin wrote:
-> > On Thu, May 14, 2020 at 12:14:32PM +0200, Maxime Coquelin wrote:
-> >>
-> >>
-> >> On 5/14/20 9:53 AM, Jason Wang wrote:
-> >>>
-> >>> On 2020/5/14 下午3:33, Maxime Coquelin wrote:
-> >>>> It is usefull for the Vhost-user backend to know
-> >>>> about about the Virtio device status updates,
-> >>>> especially when the driver sets the DRIVER_OK bit.
-> >>>>
-> >>>> With that information, no more need to do hazardous
-> >>>> assumptions on when the driver is done with the
-> >>>> device configuration.
-> >>>>
-> >>>> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
-> >>>> ---
-> >>>>
-> >>>> This patch applies on top of Cindy's "vDPA support in qemu"
-> >>>> series, which introduces the .vhost_set_state vhost-backend
-> >>>> ops.
-> >>>>
-> >>>>   docs/interop/vhost-user.rst | 12 ++++++++++++
-> >>>>   hw/net/vhost_net.c          | 10 +++++-----
-> >>>>   hw/virtio/vhost-user.c      | 35 +++++++++++++++++++++++++++++++++++
-> >>>>   3 files changed, 52 insertions(+), 5 deletions(-)
-> >>>>
-> >>>> diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
-> >>>> index 3b1b6602c7..f108de7458 100644
-> >>>> --- a/docs/interop/vhost-user.rst
-> >>>> +++ b/docs/interop/vhost-user.rst
-> >>>> @@ -815,6 +815,7 @@ Protocol features
-> >>>>     #define VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD       12
-> >>>>     #define VHOST_USER_PROTOCOL_F_RESET_DEVICE         13
-> >>>>     #define VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS 14
-> >>>> +  #define VHOST_USER_PROTOCOL_F_STATUS               15
-> >>>>     Master message types
-> >>>>   --------------------
-> >>>> @@ -1263,6 +1264,17 @@ Master message types
-> >>>>       The state.num field is currently reserved and must be set to 0.
-> >>>>   +``VHOST_USER_SET_STATUS``
-> >>>> +  :id: 36
-> >>>> +  :equivalent ioctl: VHOST_VDPA_SET_STATUS
-> >>>> +  :slave payload: N/A
-> >>>> +  :master payload: ``u64``
-> >>>> +
-> >>>> +  When the ``VHOST_USER_PROTOCOL_F_STATUS`` protocol feature has been
-> >>>> +  successfully negotiated, this message is submitted by the master to
-> >>>> +  notify the backend with updated device status as defined in the Virtio
-> >>>> +  specification.
-> >>>> +
-> >>>>   Slave message types
-> >>>>   -------------------
-> >>>>   diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-> >>>> index 463e333531..37f3156dbc 100644
-> >>>> --- a/hw/net/vhost_net.c
-> >>>> +++ b/hw/net/vhost_net.c
-> >>>> @@ -517,10 +517,10 @@ int vhost_set_state(NetClientState *nc, int state)
-> >>>>   {
-> >>>>       struct vhost_net *net = get_vhost_net(nc);
-> >>>>       struct vhost_dev *hdev = &net->dev;
-> >>>> -    if (nc->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
-> >>>> -        if (hdev->vhost_ops->vhost_set_state) {
-> >>>> -                return hdev->vhost_ops->vhost_set_state(hdev, state);
-> >>>> -             }
-> >>>> -        }
-> >>>> +
-> >>>> +    if (hdev->vhost_ops->vhost_set_state) {
-> >>>> +        return hdev->vhost_ops->vhost_set_state(hdev, state);
-> >>>> +    }
-> >>>> +
-> >>>>       return 0;
-> >>>>   }
-> >>>> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> >>>> index ec21e8fbe8..b7e52d97fc 100644
-> >>>> --- a/hw/virtio/vhost-user.c
-> >>>> +++ b/hw/virtio/vhost-user.c
-> >>>> @@ -59,6 +59,7 @@ enum VhostUserProtocolFeature {
-> >>>>       VHOST_USER_PROTOCOL_F_HOST_NOTIFIER = 11,
-> >>>>       VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD = 12,
-> >>>>       VHOST_USER_PROTOCOL_F_RESET_DEVICE = 13,
-> >>>> +    VHOST_USER_PROTOCOL_F_STATUS = 15,
-> >>>>       VHOST_USER_PROTOCOL_F_MAX
-> >>>>   };
-> >>>>   @@ -100,6 +101,7 @@ typedef enum VhostUserRequest {
-> >>>>       VHOST_USER_SET_INFLIGHT_FD = 32,
-> >>>>       VHOST_USER_GPU_SET_SOCKET = 33,
-> >>>>       VHOST_USER_RESET_DEVICE = 34,
-> >>>> +    VHOST_USER_SET_STATUS = 36,
-> >>>>       VHOST_USER_MAX
-> >>>>   } VhostUserRequest;
-> >>>>   @@ -1886,6 +1888,38 @@ static int vhost_user_set_inflight_fd(struct
-> >>>> vhost_dev *dev,
-> >>>>       return 0;
-> >>>>   }
-> >>>>   +static int vhost_user_set_state(struct vhost_dev *dev, int state)
-> >>>> +{
-> >>>> +    bool reply_supported = virtio_has_feature(dev->protocol_features,
-> >>>> +                                             
-> >>>> VHOST_USER_PROTOCOL_F_REPLY_ACK);
-> >>>> +
-> >>>> +    VhostUserMsg msg = {
-> >>>> +        .hdr.request = VHOST_USER_SET_STATUS,
-> >>>> +        .hdr.flags = VHOST_USER_VERSION,
-> >>>> +        .hdr.size = sizeof(msg.payload.u64),
-> >>>> +        .payload.u64 = (uint64_t)state,
-> >>>> +    };
-> >>>> +
-> >>>> +    if (!virtio_has_feature(dev->protocol_features,
-> >>>> +                VHOST_USER_PROTOCOL_F_STATUS)) {
-> >>>> +        return -1;
-> >>>> +    }
-> >>>> +
-> >>>> +    if (reply_supported) {
-> >>>> +        msg.hdr.flags |= VHOST_USER_NEED_REPLY_MASK;
-> >>>> +    }
-> >>>> +
-> >>>> +    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-> >>>> +        return -1;
-> >>>> +    }
-> >>>> +
-> >>>> +    if (reply_supported) {
-> >>>> +        return process_message_reply(dev, &msg);
-> >>>> +    }
-> >>>> +
-> >>>> +    return 0;
-> >>>> +}
-> >>>
-> >>>
-> >>> Interesting, I wonder how vm stop will be handled in this case.
-> >>
-> >> For now, my DPDK series only use DRIVER_OK to help determine when the
-> >> driver is done with the initialization. For VM stop, it still relies on
-> >> GET_VRING_BASE.
-> > 
-> > Sounds like a good fit.
-> > GET_VRING_BASE is transparent to guest, as is vmstop.
-> > This is more for driver 
-> > 
-> > 
-> >>
-> >> GET_VRING_BASE arrives before DRIVER_OK bit is cleared is the tests I've
-> >> done (logs from backend side):
-> > 
-> > 
-> > One problem is with legacy guests, for these you can't rely
-> > on DRIVER_OK, they often kick before that, and sometimes
-> > expect buffers to be used too (e.g. for scsi).
+> Ease of use.
 > 
-> Ok, I remember this case now.
-> Any idea on how the backend would detect such legacy guests?
+>> We can instead run qemu binary (or even new qemu-storage-daemon) and just use existing qmp commands. Is there a real benefit in developing qemu-img, maintaining two interfaces for the same thing?
+> 
+> If it makes someone's life easier, and is not hard to maintain, then yes.  A command line interface that calls into QMP is not hard to maintain.  And _I_ certainly found it easier to write iotests with this patch in place, so it already has at least one client.
+> 
+>> Of-course, just run qmp commands from terminal is a lot less comfortable than just a qemu img command.. But may be we need some wrapper, which make it simple to run one qmp command on an image?
+>>
+>> It's simple to make a python wrapper working like
+>>
+>> qemu-qmp block-dirty-bitmap-add '{node: self, name: bitmap0, persistent: true}' /path/to/x.qcow2
+> 
+> This _IS_ such a wrapper.  The whole point of this patch is that it is now simpler to run one (or more) QMP command on an offline image from the command line.  Just because I wrote it in C instead of python, and attached it to an existing tool instead of writing a new tool, doesn't change the fact that it is just a wrapper around the existing QMP commands.
+> 
 
-It's mostly safe to assume that it's only the case for pre-1.0 since 1.0
-spec says you must not.  A small window after 1.0 has the bug too but I
-think it's safe to just ask that these guests are fixed.
+OK, that's right.
+
+The thing that I didn't like is that we have to make cli-to-qapi interface mapping by hand. But I see now that interface you implementing is prepared to make several actions with same bitmap-name, which can't be achieved with some kind of automatic interface matching anyway, so my proposal don't match your needs, sorry for my haste)
 
 
-> If I'm not mistaken, we discussed the idea to poll on the kick to detect
-> the rings are ready to be processed. But the problem is that Qemu writes
-> a kick at eventfd creation time:
-> 
-> vhost_user_backend_start():
-> -> vhost_dev_enable_notifiers()
-> 	->virtio_bus_set_host_notifier()
-> 		->event_notifier_init(, 1); //1 means active
-> ->vhost_dev_start();
-> 
-> We could change the behavior in Qemu, but the backend won't know if
-> Qemu has the fix or not, so won't know if it can rely on the kick.
-
-eventfd counts kicks. So you can read the counter and check whether
-there was another kick or not. The difficulty is around migration, we
-should migrate the "ring kicked" state but we don't. We really should
-just fix that, it's an old bug affecting not just vhost-user but
-vhost too.
-
-
-> >>
-> >> VHOST_CONFIG: read message VHOST_USER_GET_VRING_BASE
-> >>
-> >> destroy port /tmp/vhost-user1, did: 0
-> >> VHOST_CONFIG: vring base idx:0 file:41
-> >> VHOST_CONFIG: read message VHOST_USER_GET_VRING_BASE
-> >> VHOST_CONFIG: vring base idx:1 file:0
-> >> VHOST_CONFIG: read message VHOST_USER_SET_STATUS
-> >> VHOST_CONFIG: New device status(0x0000000b):
-> >> 	-ACKNOWLEDGE: 1
-> >> 	-DRIVER: 1
-> >> 	-FEATURES_OK: 1
-> >> 	-DRIVER_OK: 0
-> >> 	-DEVICE_NEED_RESET: 0
-> >> 	-FAILED: 0
-> >>
-> >>> In the case of vDPA kernel, we probable don't want to mirror the virtio
-> >>> device status to vdpa device status directly.
-> >>
-> >> In vDPA DPDK, we don't mirror the Virtio device status either. It could
-> >> make sense to do that, but would require some API changes.
-> >>
-> >>> Since qemu may stop
-> >>> vhost-vdpa device through e.g resting vdpa device, but in the mean time,
-> >>> guest should not detect such condition in virtio device status.
-> >>
-> >>
-> >>
-> >>> So in the new version of vDPA support, we probably need to do:
-> >>>
-> >>> static int vhost_vdpa_set_state(struct vhost_dev *dev, bool started)
-> >>> {
-> >>>     if (started) {
-> >>>         uint8_t status = 0;
-> >>>
-> >>>         vhost_vdpa_add_status(dev, VIRTIO_CONFIG_S_DRIVER_OK);
-> >>>         vhost_vdpa_call(dev, VHOST_VDPA_GET_STATUS, &status);
-> >>>
-> >>>         return !(status & VIRTIO_CONFIG_S_DRIVER_OK);
-> >>>     } else {
-> >>>         vhost_vdpa_reset_device(dev);
-> >>>         vhost_vdpa_add_status(dev, VIRTIO_CONFIG_S_ACKNOWLEDGE |
-> >>>                                    VIRTIO_CONFIG_S_DRIVER);
-> >>>         return 0;
-> >>>     }
-> >>> }
-> >>
-> >> IIUC, you have another copy of the status register not matching 1:1 what
-> >> the guest sets/sees.
-> >>
-> >> Is vhost_vdpa_add_status() sending VHOST_VDPA_SET_STATUS to the backend?
-> >>
-> >> And why reading back the status from the backend? Just to confirm the
-> >> change is taken into account?
-> > 
-> > Making sure features have been acked makes sense IMHO.
-> > 
-> > 
-> >>> And vhost_set_state() will be called from vhost_dev_start()/stop().
-> >>>
-> >>> Does this work for vhost-user as well?
-> >>
-> >> IIUC what you did above, I think it would work. And we won't need
-> >> GET_STATUS request, but just rely on the REPLY_ACK.
-> > 
-> > Right. Need to document that though.
-> 
-> Ok, will do in v2.
-> 
-> Thanks,
-> Maxime
-> 
-> > 
-> >>
-> >> Thanks,
-> >> Maxime
-> >>
-> >>> Thanks
-> >>>
-> >>>
-> >>>> +
-> >>>>   bool vhost_user_init(VhostUserState *user, CharBackend *chr, Error
-> >>>> **errp)
-> >>>>   {
-> >>>>       if (user->chr) {
-> >>>> @@ -1947,4 +1981,5 @@ const VhostOps user_ops = {
-> >>>>           .vhost_backend_mem_section_filter =
-> >>>> vhost_user_mem_section_filter,
-> >>>>           .vhost_get_inflight_fd = vhost_user_get_inflight_fd,
-> >>>>           .vhost_set_inflight_fd = vhost_user_set_inflight_fd,
-> >>>> +        .vhost_set_state = vhost_user_set_state,
-> >>>>   };
-> > 
-
+-- 
+Best regards,
+Vladimir
 
