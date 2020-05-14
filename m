@@ -2,43 +2,45 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA1BAC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 04:47:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57456C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 04:47:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BAAA20575
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 04:47:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BAAA20575
+	by mail.kernel.org (Postfix) with ESMTPS id 42B4320575
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 04:47:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42B4320575
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ5mX-0002YC-21
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 00:47:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56670)
+	id 1jZ5ma-0002ZL-C0
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 00:47:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56672)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jZ5lU-0000S2-0z; Thu, 14 May 2020 00:46:36 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:43710)
+ id 1jZ5lU-0000SA-6h; Thu, 14 May 2020 00:46:36 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:43736)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jZ5lS-0003jg-1f; Thu, 14 May 2020 00:46:35 -0400
+ id 1jZ5lR-0003jq-VR; Thu, 14 May 2020 00:46:35 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 6381EBF647;
- Thu, 14 May 2020 04:46:29 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 3B93ABFDAE;
+ Thu, 14 May 2020 04:46:31 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v6 00/20] nvme: small fixes, refactoring and cleanups
-Date: Thu, 14 May 2020 06:45:51 +0200
-Message-Id: <20200514044611.734782-1-its@irrelevant.dk>
+Subject: [PATCH v6 03/20] hw/block/nvme: remove superfluous breaks
+Date: Thu, 14 May 2020 06:45:54 +0200
+Message-Id: <20200514044611.734782-4-its@irrelevant.dk>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200514044611.734782-1-its@irrelevant.dk>
+References: <20200514044611.734782-1-its@irrelevant.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -75,51 +77,41 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Changes since v5
-~~~~~~~~~~~~~~~~
-* Prefixed all patches with "hw/block/nvme" to avoid confusion with the
-  nvme block driver.
+These break statements was left over when commit 3036a626e9ef ("nvme:
+add Get/Set Feature Timestamp support") was merged.
 
-* Added patch two patches:
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Keith Busch <kbusch@kernel.org>
+---
+ hw/block/nvme.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-    hw/block/nvme: fix pin-based interrupt behavior
-    hw/block/nvme: allow use of any valid msix vector
-
-  These were previously posted separately, but I'm including them in this
-  series since I didnt get any response on the separate series anyway.
-
-* Fixed Maxim's email in the R-b on "hw/block/nvme: refactor
-  nvme_addr_read"
-
-
-Klaus Jensen (20):
-  hw/block/nvme: fix pci doorbell size calculation
-  hw/block/nvme: rename trace events to pci_nvme
-  hw/block/nvme: remove superfluous breaks
-  hw/block/nvme: move device parameters to separate struct
-  hw/block/nvme: use constants in identify
-  hw/block/nvme: refactor nvme_addr_read
-  hw/block/nvme: fix pin-based interrupt behavior
-  hw/block/nvme: allow use of any valid msix vector
-  hw/block/nvme: add max_ioqpairs device parameter
-  hw/block/nvme: remove redundant cmbloc/cmbsz members
-  hw/block/nvme: factor out property/constraint checks
-  hw/block/nvme: factor out device state setup
-  hw/block/nvme: factor out block backend setup
-  hw/block/nvme: add namespace helpers
-  hw/block/nvme: factor out namespace setup
-  hw/block/nvme: factor out pci setup
-  hw/block/nvme: factor out cmb setup
-  hw/block/nvme: factor out pmr setup
-  hw/block/nvme: do cmb/pmr init as part of pci init
-  hw/block/nvme: factor out controller identify setup
-
- hw/block/nvme.c       | 555 ++++++++++++++++++++++++------------------
- hw/block/nvme.h       |  33 ++-
- hw/block/trace-events | 180 +++++++-------
- include/block/nvme.h  |   8 +
- 4 files changed, 438 insertions(+), 338 deletions(-)
-
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 6702812ecdd1..f67499d85f3a 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -802,7 +802,6 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+         break;
+     case NVME_TIMESTAMP:
+         return nvme_get_feature_timestamp(n, cmd);
+-        break;
+     default:
+         trace_pci_nvme_err_invalid_getfeat(dw10);
+         return NVME_INVALID_FIELD | NVME_DNR;
+@@ -846,11 +845,8 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+         req->cqe.result =
+             cpu_to_le32((n->num_queues - 2) | ((n->num_queues - 2) << 16));
+         break;
+-
+     case NVME_TIMESTAMP:
+         return nvme_set_feature_timestamp(n, cmd);
+-        break;
+-
+     default:
+         trace_pci_nvme_err_invalid_setfeat(dw10);
+         return NVME_INVALID_FIELD | NVME_DNR;
 -- 
 2.26.2
 
