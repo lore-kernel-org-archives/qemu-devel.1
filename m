@@ -2,92 +2,100 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1415C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:00:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB129C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:08:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7447205CB
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:00:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B4B822070A
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:08:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aOPsa59W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7447205CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ixgie09C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4B822070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZEPW-0007SM-QO
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:00:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35394)
+	id 1jZEXH-00083c-Ov
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:08:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37138)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jZELS-0007eb-0h; Thu, 14 May 2020 09:56:18 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:33198)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jZELO-0000Iq-4D; Thu, 14 May 2020 09:56:17 -0400
-Received: by mail-lj1-x241.google.com with SMTP id w10so3658237ljo.0;
- Thu, 14 May 2020 06:56:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=vPFG14ZLoXv6rUK5NBabMwsr/zCnN6MHR7a2QHzSP9Y=;
- b=aOPsa59Wi8V1QefR9qm+VCgcp6gaXjIQ6ahZzuGRlOUyOTapT4Bvhe6mRCyfgcfeac
- L71HRzvfT133/t8PK6e1y5rMxyDnG/UcziaQK4FEsCaERO8QZRPh/TMGJ7wbTZbjIC8h
- OV/rC3G4kUaqG+i8tI42LazQbC1r7UFY0G9Fs0CjrwA5iSbJ13D0o0SpujR/yk/I8C2i
- /OmPRGDtW7ybPTBBBpgy8Kolr8rUWEpgbZcVaVHyF23U8i5Su+m1IPdbOcYbtOnppZ7Q
- uNgt2LV2tbgFFDlJJkx4cI3lE0ZSYtPNgrdZUugzzKR/qW0H9BkUlhCU/4XHg15OUxZV
- hoKA==
+ (Exim 4.90_1) (envelope-from <mszeredi@redhat.com>)
+ id 1jZEWa-0007Qe-Ef
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:07:48 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53876
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mszeredi@redhat.com>)
+ id 1jZEWY-0002Y5-NZ
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:07:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589465264;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=DJc/Eh1GRMibHqyNiQbbS2zafiI4eBtzplB0oGtbJ8s=;
+ b=ixgie09CmFzerqb9291GGsNQUabwEOycuRYZvKcbcrJ2Gcw1B4l6/C5HVdwUazgTIXCwCa
+ boXRy7xywMo/OYr2LoMNZN2awM7zEMqU8u8cNVIaa9MxywhbPI6jKFnLKmKj0LYW6vFahY
+ t8Q4hdpBY0V1Ox4MKMm0yPZqyLKa/bw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-150-4p6aHcl3O4eS6wAMIf-mNQ-1; Thu, 14 May 2020 10:07:41 -0400
+X-MC-Unique: 4p6aHcl3O4eS6wAMIf-mNQ-1
+Received: by mail-wr1-f70.google.com with SMTP id g10so1634208wrr.10
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:07:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=vPFG14ZLoXv6rUK5NBabMwsr/zCnN6MHR7a2QHzSP9Y=;
- b=MDUow8sy+lYLZLLSAXNBJXJvRIah6yfg2tJ76T0gPREyW49qabXsxp0HH6ibj5Yd+X
- CWXHZFf+dwuxUV6aI487J+QLSwUrxU6823bppcWM4thQ6s7lNahzS8olIJJfokXPXbeM
- yrukmMDjg3ywlKGo3anvY7bpINkUIY37UUg+KWS/x/V5Kpl+3dr2SvhGAoWPjStX4G9Z
- l5l7fXgT7ed6O9jm3gLA+8M0yiU5LZZKgf/KWsGw3W0DJqdSXWUQYUg4/uQ7k2rZAsf7
- nQnWNLUTRG1SgXiaufg0RvIAQUEcKkdg/AxFtSImNjAVDrz+UPlc1q3i4yclcMeH4ozr
- /Lsw==
-X-Gm-Message-State: AOAM531keim0FZ7gzrtrJQ9OEbygv5Z7gVQXGWHrN8I889haHzY78MRU
- XP9PbKBm5OBaz630+kb3uImg9Pe8EHI=
-X-Google-Smtp-Source: ABdhPJwijHoBqpKbeYZfcOT4OZKIE6szqquOaNzuZmxZs9f9OA555knRpjFAdSy/GX0XoWqKRp+8YQ==
-X-Received: by 2002:a2e:720b:: with SMTP id n11mr2725889ljc.142.1589464571603; 
- Thu, 14 May 2020 06:56:11 -0700 (PDT)
-Received: from localhost (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id x2sm1536060ljc.106.2020.05.14.06.56.10
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=DJc/Eh1GRMibHqyNiQbbS2zafiI4eBtzplB0oGtbJ8s=;
+ b=SkV3A4T+CiigfKHGIBL6ep6sihUNhAxxU3ZoeBwd2Pq0FfglBm7O042kzsJGVtJ4Jg
+ fevHZf3XP7GRQZr1ZQRGEPc3YKoxsQ+xXmDjemCtuXVw3K4xA0xTAQgf8U+mF+CTw5G2
+ FK/hxrvQMyNt21p8YR9KCE8zNkZW2oY19/UiPVh1xKmlkEdWLAAo3B/aUiUh6tD/BqVx
+ ECq/IisZ+w1nEbGB/u8MLIQSP9FmMoJBFuNsoES4LfRsYWxxw0jjw6f+SzAukLeLi8mZ
+ KY4TZsSqbTLE3FYvRhgwKHk+fhi6KxXEccW9YHOSEhUqHvU0DQwgM5nyViTAWgeIU+YM
+ fD8A==
+X-Gm-Message-State: AGi0PuZG1mw1YQQNnaG9QAMwor3h/vHi3FRD/oYQQwoWHQ78qhEOFG3z
+ eQJbulKCa3D+LOhT/6OUPlF8cPCpfRMqIfhLoelCOssN7jCbkDG63l3wYR4ejSpIE+3jjV7lzxf
+ vIMiWAf8Qr169Fz4=
+X-Received: by 2002:a1c:4b02:: with SMTP id y2mr26439832wma.115.1589465259660; 
+ Thu, 14 May 2020 07:07:39 -0700 (PDT)
+X-Google-Smtp-Source: APiQypKNMgl3aoXdDczWjLw1g1UTxulcWVk4utD60nhqr2J7RCiMm8BPHCAqWdJ+Fwh0XyIcku96vw==
+X-Received: by 2002:a1c:4b02:: with SMTP id y2mr26439798wma.115.1589465259245; 
+ Thu, 14 May 2020 07:07:39 -0700 (PDT)
+Received: from miu.piliscsaba.redhat.com
+ (catv-212-96-48-140.catv.broadband.hu. [212.96.48.140])
+ by smtp.gmail.com with ESMTPSA id c25sm39135828wmb.44.2020.05.14.07.07.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 14 May 2020 06:56:11 -0700 (PDT)
-Date: Thu, 14 May 2020 15:55:54 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 3/5] docs/system: Document Arm Versatile Express boards
-Message-ID: <20200514135554.GY5519@toto>
-References: <20200507151819.28444-1-peter.maydell@linaro.org>
- <20200507151819.28444-4-peter.maydell@linaro.org>
+ Thu, 14 May 2020 07:07:38 -0700 (PDT)
+From: Miklos Szeredi <mszeredi@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] virtiofsd: remove symlink fallbacks
+Date: Thu, 14 May 2020 16:07:36 +0200
+Message-Id: <20200514140736.20561-1-mszeredi@redhat.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200507151819.28444-4-peter.maydell@linaro.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Received-SPF: pass client-ip=2a00:1450:4864:20::241;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x241.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mszeredi@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,119 +108,262 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: virtio-fs@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 07, 2020 at 04:18:17PM +0100, Peter Maydell wrote:
-> Provide a minimal documentation of the Versatile Express boards
-> (vexpress-a9, vexpress-a15).
+Path lookup in the kernel has special rules for looking up magic symlinks
+under /proc.  If a filesystem operation is instructed to follow symlinks
+(e.g. via AT_SYMLINK_FOLLOW or lack of AT_SYMLINK_NOFOLLOW), and the final
+component is such a proc symlink, then the target of the magic symlink is
+used for the operation, even if the target itself is a symlink.  I.e. path
+lookup is always terminated after following a final magic symlink.
 
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+I was erronously assuming that in the above case the target symlink would
+also be followed, and so workarounds were added for a couple of operations
+to handle the symlink case.  Since the symlink can be handled simply by
+following the proc symlink, these workardouds are not needed.
 
+Also remove the "norace" option, which disabled the workarounds.
 
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  docs/system/arm/vexpress.rst | 60 ++++++++++++++++++++++++++++++++++++
->  docs/system/target-arm.rst   |  1 +
->  MAINTAINERS                  |  1 +
->  3 files changed, 62 insertions(+)
->  create mode 100644 docs/system/arm/vexpress.rst
-> 
-> diff --git a/docs/system/arm/vexpress.rst b/docs/system/arm/vexpress.rst
-> new file mode 100644
-> index 00000000000..7f1bcbef078
-> --- /dev/null
-> +++ b/docs/system/arm/vexpress.rst
-> @@ -0,0 +1,60 @@
-> +Arm Versatile Express boards (``vexpress-a9``, ``vexpress-a15``)
-> +================================================================
-> +
-> +QEMU models two variants of the Arm Versatile Express development
-> +board family:
-> +
-> +- ``vexpress-a9`` models the combination of the Versatile Express
-> +  motherboard and the CoreTile Express A9x4 daughterboard
-> +- ``vexpress-a15`` models the combination of the Versatile Express
-> +  motherboard and the CoreTile Express A15x2 daughterboard
-> +
-> +Note that as this hardware does not have PCI, IDE or SCSI,
-> +the only available storage option is emulated SD card.
-> +
-> +Implemented devices:
-> +
-> +- PL041 audio
-> +- PL181 SD controller
-> +- PL050 keyboard and mouse
-> +- PL011 UARTs
-> +- SP804 timers
-> +- I2C controller
-> +- PL031 RTC
-> +- PL111 LCD display controller
-> +- Flash memory
-> +- LAN9118 ethernet
-> +
-> +Unimplemented devices:
-> +
-> +- SP810 system control block
-> +- PCI-express
-> +- USB controller (Philips ISP1761)
-> +- Local DAP ROM
-> +- CoreSight interfaces
-> +- PL301 AXI interconnect
-> +- SCC
-> +- System counter
-> +- HDLCD controller (``vexpress-a15``)
-> +- SP805 watchdog
-> +- PL341 dynamic memory controller
-> +- DMA330 DMA controller
-> +- PL354 static memory controller
-> +- BP147 TrustZone Protection Controller
-> +- TrustZone Address Space Controller
-> +
-> +Other differences between the hardware and the QEMU model:
-> +
-> +- QEMU will default to creating one CPU unless you pass a different
-> +  ``-smp`` argument
-> +- QEMU allows the amount of RAM provided to be specified with the
-> +  ``-m`` argument
-> +- QEMU defaults to providing a CPU which does not provide either
-> +  TrustZone or the Virtualization Extensions: if you want these you
-> +  must enable them with ``-machine secure=on`` and ``-machine
-> +  virtualization=on``
-> +- QEMU provides 4 virtio-mmio virtio transports; these start at
-> +  address ``0x10013000`` for ``vexpress-a9`` and at ``0x1c130000`` for
-> +  ``vexpress-a15``, and have IRQs from 40 upwards. If a dtb is
-> +  provided on the command line then QEMU will edit it to include
-> +  suitable entries describing these transports for the guest.
-> diff --git a/docs/system/target-arm.rst b/docs/system/target-arm.rst
-> index d1196cbe01c..4779293d731 100644
-> --- a/docs/system/target-arm.rst
-> +++ b/docs/system/target-arm.rst
-> @@ -73,6 +73,7 @@ undocumented; you can get a complete list by running
->     arm/integratorcp
->     arm/realview
->     arm/versatile
-> +   arm/vexpress
->     arm/musicpal
->     arm/nseries
->     arm/orangepi
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 1f84e3ae2c6..74cff1c3818 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -826,6 +826,7 @@ M: Peter Maydell <peter.maydell@linaro.org>
->  L: qemu-arm@nongnu.org
->  S: Maintained
->  F: hw/arm/vexpress.c
-> +F: docs/system/arm/vexpress.rst
->  
->  Versatile PB
->  M: Peter Maydell <peter.maydell@linaro.org>
-> -- 
-> 2.20.1
-> 
-> 
+Commit bdfd66788349 ("virtiofsd: Fix xattr operations") already dealt with
+the same issue for xattr operations.
+
+Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
+---
+ tools/virtiofsd/passthrough_ll.c | 175 ++-----------------------------
+ 1 file changed, 6 insertions(+), 169 deletions(-)
+
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+index 3ba1d9098460..2ce7c96085bf 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -140,7 +140,6 @@ enum {
+ struct lo_data {
+     pthread_mutex_t mutex;
+     int debug;
+-    int norace;
+     int writeback;
+     int flock;
+     int posix_lock;
+@@ -176,7 +175,6 @@ static const struct fuse_opt lo_opts[] = {
+     { "cache=none", offsetof(struct lo_data, cache), CACHE_NONE },
+     { "cache=auto", offsetof(struct lo_data, cache), CACHE_AUTO },
+     { "cache=always", offsetof(struct lo_data, cache), CACHE_ALWAYS },
+-    { "norace", offsetof(struct lo_data, norace), 1 },
+     { "readdirplus", offsetof(struct lo_data, readdirplus_set), 1 },
+     { "no_readdirplus", offsetof(struct lo_data, readdirplus_clear), 1 },
+     FUSE_OPT_END
+@@ -592,136 +590,6 @@ static void lo_getattr(fuse_req_t req, fuse_ino_t ino,
+     fuse_reply_attr(req, &buf, lo->timeout);
+ }
+ 
+-/*
+- * Increments parent->nlookup and caller must release refcount using
+- * lo_inode_put(&parent).
+- */
+-static int lo_parent_and_name(struct lo_data *lo, struct lo_inode *inode,
+-                              char path[PATH_MAX], struct lo_inode **parent)
+-{
+-    char procname[64];
+-    char *last;
+-    struct stat stat;
+-    struct lo_inode *p;
+-    int retries = 2;
+-    int res;
+-
+-retry:
+-    sprintf(procname, "%i", inode->fd);
+-
+-    res = readlinkat(lo->proc_self_fd, procname, path, PATH_MAX);
+-    if (res < 0) {
+-        fuse_log(FUSE_LOG_WARNING, "%s: readlink failed: %m\n", __func__);
+-        goto fail_noretry;
+-    }
+-
+-    if (res >= PATH_MAX) {
+-        fuse_log(FUSE_LOG_WARNING, "%s: readlink overflowed\n", __func__);
+-        goto fail_noretry;
+-    }
+-    path[res] = '\0';
+-
+-    last = strrchr(path, '/');
+-    if (last == NULL) {
+-        /* Shouldn't happen */
+-        fuse_log(
+-            FUSE_LOG_WARNING,
+-            "%s: INTERNAL ERROR: bad path read from proc\n", __func__);
+-        goto fail_noretry;
+-    }
+-    if (last == path) {
+-        p = &lo->root;
+-        pthread_mutex_lock(&lo->mutex);
+-        p->nlookup++;
+-        g_atomic_int_inc(&p->refcount);
+-        pthread_mutex_unlock(&lo->mutex);
+-    } else {
+-        *last = '\0';
+-        res = fstatat(AT_FDCWD, last == path ? "/" : path, &stat, 0);
+-        if (res == -1) {
+-            if (!retries) {
+-                fuse_log(FUSE_LOG_WARNING,
+-                         "%s: failed to stat parent: %m\n", __func__);
+-            }
+-            goto fail;
+-        }
+-        p = lo_find(lo, &stat);
+-        if (p == NULL) {
+-            if (!retries) {
+-                fuse_log(FUSE_LOG_WARNING,
+-                         "%s: failed to find parent\n", __func__);
+-            }
+-            goto fail;
+-        }
+-    }
+-    last++;
+-    res = fstatat(p->fd, last, &stat, AT_SYMLINK_NOFOLLOW);
+-    if (res == -1) {
+-        if (!retries) {
+-            fuse_log(FUSE_LOG_WARNING,
+-                     "%s: failed to stat last\n", __func__);
+-        }
+-        goto fail_unref;
+-    }
+-    if (stat.st_dev != inode->key.dev || stat.st_ino != inode->key.ino) {
+-        if (!retries) {
+-            fuse_log(FUSE_LOG_WARNING,
+-                     "%s: failed to match last\n", __func__);
+-        }
+-        goto fail_unref;
+-    }
+-    *parent = p;
+-    memmove(path, last, strlen(last) + 1);
+-
+-    return 0;
+-
+-fail_unref:
+-    unref_inode_lolocked(lo, p, 1);
+-    lo_inode_put(lo, &p);
+-fail:
+-    if (retries) {
+-        retries--;
+-        goto retry;
+-    }
+-fail_noretry:
+-    errno = EIO;
+-    return -1;
+-}
+-
+-static int utimensat_empty(struct lo_data *lo, struct lo_inode *inode,
+-                           const struct timespec *tv)
+-{
+-    int res;
+-    struct lo_inode *parent;
+-    char path[PATH_MAX];
+-
+-    if (S_ISLNK(inode->filetype)) {
+-        res = utimensat(inode->fd, "", tv, AT_EMPTY_PATH);
+-        if (res == -1 && errno == EINVAL) {
+-            /* Sorry, no race free way to set times on symlink. */
+-            if (lo->norace) {
+-                errno = EPERM;
+-            } else {
+-                goto fallback;
+-            }
+-        }
+-        return res;
+-    }
+-    sprintf(path, "%i", inode->fd);
+-
+-    return utimensat(lo->proc_self_fd, path, tv, 0);
+-
+-fallback:
+-    res = lo_parent_and_name(lo, inode, path, &parent);
+-    if (res != -1) {
+-        res = utimensat(parent->fd, path, tv, AT_SYMLINK_NOFOLLOW);
+-        unref_inode_lolocked(lo, parent, 1);
+-        lo_inode_put(lo, &parent);
+-    }
+-
+-    return res;
+-}
+-
+ static int lo_fi_fd(fuse_req_t req, struct fuse_file_info *fi)
+ {
+     struct lo_data *lo = lo_data(req);
+@@ -828,7 +696,8 @@ static void lo_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *attr,
+         if (fi) {
+             res = futimens(fd, tv);
+         } else {
+-            res = utimensat_empty(lo, inode, tv);
++            sprintf(procname, "%i", inode->fd);
++            res = utimensat(lo->proc_self_fd, procname, tv, 0);
+         }
+         if (res == -1) {
+             goto out_err;
+@@ -1129,41 +998,6 @@ static void lo_symlink(fuse_req_t req, const char *link, fuse_ino_t parent,
+     lo_mknod_symlink(req, parent, name, S_IFLNK, 0, link);
+ }
+ 
+-static int linkat_empty_nofollow(struct lo_data *lo, struct lo_inode *inode,
+-                                 int dfd, const char *name)
+-{
+-    int res;
+-    struct lo_inode *parent;
+-    char path[PATH_MAX];
+-
+-    if (S_ISLNK(inode->filetype)) {
+-        res = linkat(inode->fd, "", dfd, name, AT_EMPTY_PATH);
+-        if (res == -1 && (errno == ENOENT || errno == EINVAL)) {
+-            /* Sorry, no race free way to hard-link a symlink. */
+-            if (lo->norace) {
+-                errno = EPERM;
+-            } else {
+-                goto fallback;
+-            }
+-        }
+-        return res;
+-    }
+-
+-    sprintf(path, "%i", inode->fd);
+-
+-    return linkat(lo->proc_self_fd, path, dfd, name, AT_SYMLINK_FOLLOW);
+-
+-fallback:
+-    res = lo_parent_and_name(lo, inode, path, &parent);
+-    if (res != -1) {
+-        res = linkat(parent->fd, path, dfd, name, 0);
+-        unref_inode_lolocked(lo, parent, 1);
+-        lo_inode_put(lo, &parent);
+-    }
+-
+-    return res;
+-}
+-
+ static void lo_link(fuse_req_t req, fuse_ino_t ino, fuse_ino_t parent,
+                     const char *name)
+ {
+@@ -1172,6 +1006,7 @@ static void lo_link(fuse_req_t req, fuse_ino_t ino, fuse_ino_t parent,
+     struct lo_inode *parent_inode;
+     struct lo_inode *inode;
+     struct fuse_entry_param e;
++    char procname[64];
+     int saverr;
+ 
+     if (!is_safe_path_component(name)) {
+@@ -1190,7 +1025,9 @@ static void lo_link(fuse_req_t req, fuse_ino_t ino, fuse_ino_t parent,
+     e.attr_timeout = lo->timeout;
+     e.entry_timeout = lo->timeout;
+ 
+-    res = linkat_empty_nofollow(lo, inode, parent_inode->fd, name);
++    sprintf(procname, "%i", inode->fd);
++    res = linkat(lo->proc_self_fd, procname, parent_inode->fd, name,
++                 AT_SYMLINK_FOLLOW);
+     if (res == -1) {
+         goto out_err;
+     }
+-- 
+2.21.1
+
 
