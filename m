@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70302C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:07:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E3CCC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:09:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4465C20575
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:07:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F5B2206D4
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:09:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EV6JOPg3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4465C20575
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ELcyRkPp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F5B2206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57268 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ71y-0008A6-6H
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 02:07:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36624)
+	id 1jZ73y-0002zX-Ck
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 02:09:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36668)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ6pf-0005o7-2C
- for qemu-devel@nongnu.org; Thu, 14 May 2020 01:54:59 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53114
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ6pk-00063e-Ri
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 01:55:04 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49398
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ6pe-0001iv-8X
- for qemu-devel@nongnu.org; Thu, 14 May 2020 01:54:58 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ6pj-0001oE-Tl
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 01:55:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589435697;
+ s=mimecast20190719; t=1589435703;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=r78YIUi5EF3+10yAnst7esoBjnzAwGVfqgCglUH45E4=;
- b=EV6JOPg31MTS4xvojjAX6T6vQXDvJq3d+4eB09LvtRIS4Oe37hv/0vAWLiH67txfSfCwgn
- s/brRdiZFNJpiDc1QQloHVVZ9CFQl1goKYb6Wbh1oH3DeRDkbOBlSZV9hB0jr+VoskwFRx
- XkyDJ0KcclrUShF14FdMwN8btj4SrUA=
+ bh=w/Aq4olAOOh/84KeoJb1PCtrN9Rk+oFeQNlT6Jw1j3s=;
+ b=ELcyRkPpb+EUoR/3N7b+FxQ4sHS5HnDOvbMqa+CiKcLNLlzvW0JU0zsNZkQPjQ2POyzIaq
+ 6jFEKhWKslGf6yJUPNeb/hwNK8lUSFYaENNDpo2WGULcKDi0UQF4Z8GCqS36LXmFxwh+Bh
+ JWIkKhwAHKn1CfII5IVJPB25RXkxaHs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-332-0KkirazrNSCimaZB9Sv-6w-1; Thu, 14 May 2020 01:54:54 -0400
-X-MC-Unique: 0KkirazrNSCimaZB9Sv-6w-1
+ us-mta-40-Z0D9B03VM4WytFAP8s4ALg-1; Thu, 14 May 2020 01:55:01 -0400
+X-MC-Unique: Z0D9B03VM4WytFAP8s4ALg-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2F76107ACF5;
- Thu, 14 May 2020 05:54:53 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 128ACBFC0;
+ Thu, 14 May 2020 05:55:00 +0000 (UTC)
 Received: from probe.redhat.com (ovpn-113-9.rdu2.redhat.com [10.10.113.9])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5189B6A977;
- Thu, 14 May 2020 05:54:52 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A50BE6A977;
+ Thu, 14 May 2020 05:54:58 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RFC 25/32] python//machine.py: Handle None events in event_wait
-Date: Thu, 14 May 2020 01:53:56 -0400
-Message-Id: <20200514055403.18902-26-jsnow@redhat.com>
+Subject: [PATCH RFC 29/32] python//qtest.py: Check before accessing _qtest
+Date: Thu, 14 May 2020 01:54:00 -0400
+Message-Id: <20200514055403.18902-30-jsnow@redhat.com>
 In-Reply-To: <20200514055403.18902-1-jsnow@redhat.com>
 References: <20200514055403.18902-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -103,44 +103,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If the timeout is 0, we can get None back. Handle this explicitly.
+It can be None; so add assertions or exceptions where appropriate to
+guard the access accordingly.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- python/qemu/lib/machine.py | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ python/qemu/lib/qtest.py | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/python/qemu/lib/machine.py b/python/qemu/lib/machine.py
-index 8548c7c32d..61ee3a0e81 100644
---- a/python/qemu/lib/machine.py
-+++ b/python/qemu/lib/machine.py
-@@ -32,7 +32,7 @@
- from types import TracebackType
+diff --git a/python/qemu/lib/qtest.py b/python/qemu/lib/qtest.py
+index a8be0c782f..05c63a1d58 100644
+--- a/python/qemu/lib/qtest.py
++++ b/python/qemu/lib/qtest.py
+@@ -126,7 +126,8 @@ def _pre_launch(self):
+         super()._pre_launch()
+         self._qtest = QEMUQtestProtocol(self._qtest_path, server=True)
  
- from . import qmp
--from .qmp import SocketAddrT
-+from .qmp import SocketAddrT, QMPMessage
+-    def _post_launch(self):
++    def _post_launch(self) -> None:
++        assert self._qtest is not None
+         super()._post_launch()
+         self._qtest.accept()
  
- LOG = logging.getLogger(__name__)
+@@ -134,6 +135,13 @@ def _post_shutdown(self):
+         super()._post_shutdown()
+         self._remove_if_exists(self._qtest_path)
  
-@@ -519,6 +519,8 @@ def _match(event):
-                     return True
-             return False
- 
-+        event: Optional[QMPMessage]
+-    def qtest(self, cmd):
+-        '''Send a qtest command to guest'''
++    def qtest(self, cmd: str) -> str:
++        """
++        Send a qtest command to the guest.
 +
-         # Search cached events
-         for event in self._events:
-             if _match(event):
-@@ -528,6 +530,8 @@ def _match(event):
-         # Poll for new events
-         while True:
-             event = self._qmp.pull_event(wait=timeout)
-+            if event is None:
-+                break
-             if _match(event):
-                 return event
-             self._events.append(event)
++        :param cmd: qtest command to send
++        :return: qtest server response
++        """
++        if self._qtest is None:
++            raise RuntimeError("qtest socket not available")
+         return self._qtest.cmd(cmd)
 -- 
 2.21.1
 
