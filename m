@@ -4,82 +4,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23444C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:29:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B118C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:29:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3490206A5
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:29:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D332A206A5
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:29:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dGtlLJX7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3490206A5
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LQWUadJo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D332A206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZErI-0000G2-0Y
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:29:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39400)
+	id 1jZErZ-00013m-1q
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:29:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39418)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZEk5-0002iL-H3
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:21:45 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:43320)
+ id 1jZEk9-0002rK-1T
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:21:49 -0400
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:38659)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZEk4-0005O6-9c
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:21:45 -0400
-Received: by mail-wr1-x436.google.com with SMTP id i15so4311335wrx.10
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:21:43 -0700 (PDT)
+ id 1jZEk7-0005Oe-9R
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:21:48 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id e1so4369449wrt.5
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:21:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=jQ5ROymPXM1FOLeh2Cx6fwb6C2RBNoLv4XYhme6BRJ4=;
- b=dGtlLJX7qQst05sF5xzTHdFu6bkDiMcH3hNlsw2JdNqQ0KNREZZfY93jjXG32OuArI
- lsmuulVzbFQzUIcXTYlmU2yKzFuoAgRfpNWQSY8f4dc64MRcTdwvXayJwPwT6c08OElM
- J/HJ7BcDMw3vEVvhltsSLrVpBnI4qT+Qlv7KdrrC88ABDr8Cv/EVRCL1jFbu17ZCTEQy
- N7wOm/ll9UqT+y7cpxcWco1MJ4+MTBTjnldVnN5h/P/cr7/hVKN2ug1eZC8CIzmh69rT
- Yu/Atmd0LK/v+uCa6dpD6/g1lwB6Z7my4ikWX5RsXCfanGu8nBR7uU9gKb6A/X7vXdNm
- dtfQ==
+ bh=2KCp1uG/ffB1kmMrSCwFbDmOf/ZZNxB0ZHbmnQKL4zw=;
+ b=LQWUadJokIj4V5ELeBYMUMBX9voCS5Mx4lBb5CZmCh+h9ui4ZHD+wMn0EScTo7wDTU
+ Z5rPXwbblCB3zR/rJgwY0y0L8kXHJSeQ9uIc3IOy4n2z0kJqgbrXtWeY2y2mxD4CR9Qv
+ jtddBIhGQOwCCt1OU/w44UFMUkt9mNRKFpvk379+dSJeoe4fjO8lcJvvRKVPgnscyJ1V
+ Y+BwRFwZDRlEUV95EY2NugIBIkMWalPwNq3gs5+q3wNK0o6tgA4Sl9J5GTGNiugJope6
+ dE138+H/WC6c+KmbXegxoe5cSKOtb8CkOdAbz61mtS8lI8nU1mOiRoLVyokvVKeQlruP
+ f0kQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=jQ5ROymPXM1FOLeh2Cx6fwb6C2RBNoLv4XYhme6BRJ4=;
- b=PBsEqfLrPZPpoDvoGt4ANZMaHyNIFALH7zhVpPJA0B1Qi7wNZaxR5ZdI6i2xN6FacO
- m38NKyHlkc1YfCvbkLpf70Kg9bULvhWEIR6WxFX6OS2KA43wNNKamGsHoIPrrTpFLJ9H
- imNZ/U4pqUrpfGF/1MFSRJznBA5Bt8ltu2nEuDEK/9s6igs0ShPEGPbOgjkm+7pr3KwA
- H2moA9Q6Mcq8kfx6XDKNFW3D6Hz7XRRS6y1IL20BxLk1y6bCRtPDBoBY9Ye02kM/qIX6
- P/OLgcYfUW7EUpSMXBc8wx12vve1iqox/4zI9Z+Z7YhySTISgqVdZ6lhwrDzsxG5wuFu
- yDsQ==
-X-Gm-Message-State: AOAM5321zhPPXXehvGieWyHUXZf7Cyqu1h0OGetLygQ9NVX1lXGFS8Ui
- +cRIjbAKNimdntQqiLUlTuYkXo8xbmhrTg==
-X-Google-Smtp-Source: ABdhPJyrfMbgnVZwk8MHxKiszVZFrPslVDIDmI/auA9EOLo7aN86LNFtBZIoRkGce2piv3huOwWD5g==
-X-Received: by 2002:adf:fdc5:: with SMTP id i5mr2410247wrs.176.1589466102308; 
- Thu, 14 May 2020 07:21:42 -0700 (PDT)
+ bh=2KCp1uG/ffB1kmMrSCwFbDmOf/ZZNxB0ZHbmnQKL4zw=;
+ b=tS7ZwsqZRUpTw2y6Ky6MyrAX2Dcw35hsXhg/ziBR0oE/PDOFTgIDxR+0ShlQrVo+nE
+ 2lAcuJcttUZJF7Anqq6bnJj/A+9pZcIfS37qCGJkXQzLk3HreVc7dhZ8dZv5asZuEsg1
+ 3LgVar7z2QfUX2DiVpF2E0hyFMGPrJjipN/akRhxKsgJFylfFHkAyzOplSLkqmFP8OPA
+ J2ph01xvWg/SUS0AC3cAcwtKj7SaGiEO4x5kuSlSTE6VRgPOFJma4uSEKmaEcP+vQR2i
+ 8FzB5YWr/cg5WR73m3PJs6zEDScHNgrrYpqWUimV5mh/TQlXokd9yHxnEIoeRbX4X7EH
+ XgpQ==
+X-Gm-Message-State: AOAM530bKKP+6m1yRoaPDWEKL+ZFnOtOBQzW2yZAQ4XcaFgZqTfQWyfi
+ oB3sB1F6h7rGx4M26xCQ4IqoIStRbnT4JA==
+X-Google-Smtp-Source: ABdhPJxswQXmUIGfgWudZDUv1eaeopFZT2+4fmziV22Hfb4WBuleaVOAhESCrRloVCKu5auceOQZXA==
+X-Received: by 2002:adf:fa92:: with SMTP id h18mr5859453wrr.260.1589466104966; 
+ Thu, 14 May 2020 07:21:44 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 88sm4077443wrq.77.2020.05.14.07.21.40
+ by smtp.gmail.com with ESMTPSA id 88sm4077443wrq.77.2020.05.14.07.21.43
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 14 May 2020 07:21:41 -0700 (PDT)
+ Thu, 14 May 2020 07:21:44 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 01/45] target/arm: Use correct GDB XML for M-profile cores
-Date: Thu, 14 May 2020 15:20:54 +0100
-Message-Id: <20200514142138.20875-2-peter.maydell@linaro.org>
+Subject: [PULL 03/45] target/arm: Create gen_gvec_{u,s}{rshr,rsra}
+Date: Thu, 14 May 2020 15:20:56 +0100
+Message-Id: <20200514142138.20875-4-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200514142138.20875-1-peter.maydell@linaro.org>
 References: <20200514142138.20875-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::436;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x436.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,137 +104,668 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-GDB's remote protocol requires M-profile cores to use the feature
-name 'org.gnu.gdb.arm.m-profile' instead of the 'org.gnu.gdb.arm.core'
-feature used for A- and R-profile cores. We weren't doing this, which
-meant GDB treated our M-profile cores like A-profile ones. This mostly
-doesn't matter, but for instance means that it doesn't correctly
-handle backtraces where an M-profile exception frame is involved.
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Ship a copy of GDB's arm-m-profile.xml and use it on the M-profile
-cores.  The integer registers have the same offsets as the
-arm-core.xml, but register 25 is the M-profile XPSR rather than the
-A-profile CPSR, so we need to update arm_cpu_gdb_read_register() and
-arm_cpu_gdb_write_register() to handle XSPR reads and writes.
+Create vectorized versions of handle_shri_with_rndacc
+for shift+round and shift+round+accumulate.  Add out-of-line
+helpers in preparation for longer vector lengths from SVE.
 
-Fixes: https://bugs.launchpad.net/qemu/+bug/1877136
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200513163245.17915-3-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20200507134755.13997-1-peter.maydell@linaro.org
 ---
- configure                 |  4 ++--
- target/arm/cpu_tcg.c      |  1 +
- target/arm/gdbstub.c      | 22 ++++++++++++++++++----
- gdb-xml/arm-m-profile.xml | 27 +++++++++++++++++++++++++++
- 4 files changed, 48 insertions(+), 6 deletions(-)
- create mode 100644 gdb-xml/arm-m-profile.xml
+ target/arm/helper.h        |  20 ++
+ target/arm/translate.h     |   9 +
+ target/arm/translate-a64.c |  11 +-
+ target/arm/translate.c     | 463 +++++++++++++++++++++++++++++++++++--
+ target/arm/vec_helper.c    |  50 ++++
+ 5 files changed, 527 insertions(+), 26 deletions(-)
 
-diff --git a/configure b/configure
-index c50c006b864..26084fc53ad 100755
---- a/configure
-+++ b/configure
-@@ -7806,14 +7806,14 @@ case "$target_name" in
-     TARGET_SYSTBL_ABI=common,oabi
-     bflt="yes"
-     mttcg="yes"
--    gdb_xml_files="arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
-+    gdb_xml_files="arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml arm-m-profile.xml"
-   ;;
-   aarch64|aarch64_be)
-     TARGET_ARCH=aarch64
-     TARGET_BASE_ARCH=arm
-     bflt="yes"
-     mttcg="yes"
--    gdb_xml_files="aarch64-core.xml aarch64-fpu.xml arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
-+    gdb_xml_files="aarch64-core.xml aarch64-fpu.xml arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml arm-m-profile.xml"
-   ;;
-   cris)
-   ;;
-diff --git a/target/arm/cpu_tcg.c b/target/arm/cpu_tcg.c
-index 591baef5351..00b0e08f33e 100644
---- a/target/arm/cpu_tcg.c
-+++ b/target/arm/cpu_tcg.c
-@@ -605,6 +605,7 @@ static void arm_v7m_class_init(ObjectClass *oc, void *data)
- #endif
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index 9bc162345ca..aeb1f524553 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -701,6 +701,26 @@ DEF_HELPER_FLAGS_3(gvec_usra_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_3(gvec_usra_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_3(gvec_usra_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
  
-     cc->cpu_exec_interrupt = arm_v7m_cpu_exec_interrupt;
-+    cc->gdb_core_xml_file = "arm-m-profile.xml";
++DEF_HELPER_FLAGS_3(gvec_srshr_b, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_srshr_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_srshr_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_srshr_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_3(gvec_urshr_b, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_urshr_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_urshr_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_urshr_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_3(gvec_srsra_b, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_srsra_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_srsra_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_srsra_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_3(gvec_ursra_b, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_ursra_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_ursra_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(gvec_ursra_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++
+ #ifdef TARGET_AARCH64
+ #include "helper-a64.h"
+ #include "helper-sve.h"
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index 1839a59a8ea..1db3b43a614 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -302,6 +302,15 @@ void gen_gvec_ssra(unsigned vece, uint32_t rd_ofs, uint32_t rm_ofs,
+ void gen_gvec_usra(unsigned vece, uint32_t rd_ofs, uint32_t rm_ofs,
+                    int64_t shift, uint32_t opr_sz, uint32_t max_sz);
+ 
++void gen_gvec_srshr(unsigned vece, uint32_t rd_ofs, uint32_t rm_ofs,
++                    int64_t shift, uint32_t opr_sz, uint32_t max_sz);
++void gen_gvec_urshr(unsigned vece, uint32_t rd_ofs, uint32_t rm_ofs,
++                    int64_t shift, uint32_t opr_sz, uint32_t max_sz);
++void gen_gvec_srsra(unsigned vece, uint32_t rd_ofs, uint32_t rm_ofs,
++                    int64_t shift, uint32_t opr_sz, uint32_t max_sz);
++void gen_gvec_ursra(unsigned vece, uint32_t rd_ofs, uint32_t rm_ofs,
++                    int64_t shift, uint32_t opr_sz, uint32_t max_sz);
++
+ /*
+  * Forward to the isar_feature_* tests given a DisasContext pointer.
+  */
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 315de9a9b68..50949d306bf 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -10218,10 +10218,15 @@ static void handle_vec_simd_shri(DisasContext *s, bool is_q, bool is_u,
+         return;
+ 
+     case 0x04: /* SRSHR / URSHR (rounding) */
+-        break;
++        gen_gvec_fn2i(s, is_q, rd, rn, shift,
++                      is_u ? gen_gvec_urshr : gen_gvec_srshr, size);
++        return;
++
+     case 0x06: /* SRSRA / URSRA (accum + rounding) */
+-        accumulate = true;
+-        break;
++        gen_gvec_fn2i(s, is_q, rd, rn, shift,
++                      is_u ? gen_gvec_ursra : gen_gvec_srsra, size);
++        return;
++
+     default:
+         g_assert_not_reached();
+     }
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index c18140f2e65..aa03dc236bc 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -4000,6 +4000,422 @@ void gen_gvec_usra(unsigned vece, uint32_t rd_ofs, uint32_t rm_ofs,
+     }
  }
  
- static const ARMCPUInfo arm_tcg_cpus[] = {
-diff --git a/target/arm/gdbstub.c b/target/arm/gdbstub.c
-index 063551df234..ecfa88f8e60 100644
---- a/target/arm/gdbstub.c
-+++ b/target/arm/gdbstub.c
-@@ -57,8 +57,12 @@ int arm_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
-         }
-         return gdb_get_reg32(mem_buf, 0);
-     case 25:
--        /* CPSR */
--        return gdb_get_reg32(mem_buf, cpsr_read(env));
-+        /* CPSR, or XPSR for M-profile */
-+        if (arm_feature(env, ARM_FEATURE_M)) {
-+            return gdb_get_reg32(mem_buf, xpsr_read(env));
-+        } else {
-+            return gdb_get_reg32(mem_buf, cpsr_read(env));
-+        }
-     }
-     /* Unknown register.  */
-     return 0;
-@@ -98,8 +102,18 @@ int arm_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
-         }
-         return 4;
-     case 25:
--        /* CPSR */
--        cpsr_write(env, tmp, 0xffffffff, CPSRWriteByGDBStub);
-+        /* CPSR, or XPSR for M-profile */
-+        if (arm_feature(env, ARM_FEATURE_M)) {
-+            /*
-+             * Don't allow writing to XPSR.Exception as it can cause
-+             * a transition into or out of handler mode (it's not
-+             * writeable via the MSR insn so this is a reasonable
-+             * restriction). Other fields are safe to update.
-+             */
-+            xpsr_write(env, tmp, ~XPSR_EXCP);
-+        } else {
-+            cpsr_write(env, tmp, 0xffffffff, CPSRWriteByGDBStub);
-+        }
-         return 4;
-     }
-     /* Unknown register.  */
-diff --git a/gdb-xml/arm-m-profile.xml b/gdb-xml/arm-m-profile.xml
-new file mode 100644
-index 00000000000..5319d764eeb
---- /dev/null
-+++ b/gdb-xml/arm-m-profile.xml
-@@ -0,0 +1,27 @@
-+<?xml version="1.0"?>
-+<!-- Copyright (C) 2010-2020 Free Software Foundation, Inc.
++/*
++ * Shift one less than the requested amount, and the low bit is
++ * the rounding bit.  For the 8 and 16-bit operations, because we
++ * mask the low bit, we can perform a normal integer shift instead
++ * of a vector shift.
++ */
++static void gen_srshr8_i64(TCGv_i64 d, TCGv_i64 a, int64_t sh)
++{
++    TCGv_i64 t = tcg_temp_new_i64();
 +
-+     Copying and distribution of this file, with or without modification,
-+     are permitted in any medium without royalty provided the copyright
-+     notice and this notice are preserved.  -->
++    tcg_gen_shri_i64(t, a, sh - 1);
++    tcg_gen_andi_i64(t, t, dup_const(MO_8, 1));
++    tcg_gen_vec_sar8i_i64(d, a, sh);
++    tcg_gen_vec_add8_i64(d, d, t);
++    tcg_temp_free_i64(t);
++}
 +
-+<!DOCTYPE feature SYSTEM "gdb-target.dtd">
-+<feature name="org.gnu.gdb.arm.m-profile">
-+  <reg name="r0" bitsize="32"/>
-+  <reg name="r1" bitsize="32"/>
-+  <reg name="r2" bitsize="32"/>
-+  <reg name="r3" bitsize="32"/>
-+  <reg name="r4" bitsize="32"/>
-+  <reg name="r5" bitsize="32"/>
-+  <reg name="r6" bitsize="32"/>
-+  <reg name="r7" bitsize="32"/>
-+  <reg name="r8" bitsize="32"/>
-+  <reg name="r9" bitsize="32"/>
-+  <reg name="r10" bitsize="32"/>
-+  <reg name="r11" bitsize="32"/>
-+  <reg name="r12" bitsize="32"/>
-+  <reg name="sp" bitsize="32" type="data_ptr"/>
-+  <reg name="lr" bitsize="32"/>
-+  <reg name="pc" bitsize="32" type="code_ptr"/>
-+  <reg name="xpsr" bitsize="32" regnum="25"/>
-+</feature>
++static void gen_srshr16_i64(TCGv_i64 d, TCGv_i64 a, int64_t sh)
++{
++    TCGv_i64 t = tcg_temp_new_i64();
++
++    tcg_gen_shri_i64(t, a, sh - 1);
++    tcg_gen_andi_i64(t, t, dup_const(MO_16, 1));
++    tcg_gen_vec_sar16i_i64(d, a, sh);
++    tcg_gen_vec_add16_i64(d, d, t);
++    tcg_temp_free_i64(t);
++}
++
++static void gen_srshr32_i32(TCGv_i32 d, TCGv_i32 a, int32_t sh)
++{
++    TCGv_i32 t = tcg_temp_new_i32();
++
++    tcg_gen_extract_i32(t, a, sh - 1, 1);
++    tcg_gen_sari_i32(d, a, sh);
++    tcg_gen_add_i32(d, d, t);
++    tcg_temp_free_i32(t);
++}
++
++static void gen_srshr64_i64(TCGv_i64 d, TCGv_i64 a, int64_t sh)
++{
++    TCGv_i64 t = tcg_temp_new_i64();
++
++    tcg_gen_extract_i64(t, a, sh - 1, 1);
++    tcg_gen_sari_i64(d, a, sh);
++    tcg_gen_add_i64(d, d, t);
++    tcg_temp_free_i64(t);
++}
++
++static void gen_srshr_vec(unsigned vece, TCGv_vec d, TCGv_vec a, int64_t sh)
++{
++    TCGv_vec t = tcg_temp_new_vec_matching(d);
++    TCGv_vec ones = tcg_temp_new_vec_matching(d);
++
++    tcg_gen_shri_vec(vece, t, a, sh - 1);
++    tcg_gen_dupi_vec(vece, ones, 1);
++    tcg_gen_and_vec(vece, t, t, ones);
++    tcg_gen_sari_vec(vece, d, a, sh);
++    tcg_gen_add_vec(vece, d, d, t);
++
++    tcg_temp_free_vec(t);
++    tcg_temp_free_vec(ones);
++}
++
++void gen_gvec_srshr(unsigned vece, uint32_t rd_ofs, uint32_t rm_ofs,
++                    int64_t shift, uint32_t opr_sz, uint32_t max_sz)
++{
++    static const TCGOpcode vecop_list[] = {
++        INDEX_op_shri_vec, INDEX_op_sari_vec, INDEX_op_add_vec, 0
++    };
++    static const GVecGen2i ops[4] = {
++        { .fni8 = gen_srshr8_i64,
++          .fniv = gen_srshr_vec,
++          .fno = gen_helper_gvec_srshr_b,
++          .opt_opc = vecop_list,
++          .vece = MO_8 },
++        { .fni8 = gen_srshr16_i64,
++          .fniv = gen_srshr_vec,
++          .fno = gen_helper_gvec_srshr_h,
++          .opt_opc = vecop_list,
++          .vece = MO_16 },
++        { .fni4 = gen_srshr32_i32,
++          .fniv = gen_srshr_vec,
++          .fno = gen_helper_gvec_srshr_s,
++          .opt_opc = vecop_list,
++          .vece = MO_32 },
++        { .fni8 = gen_srshr64_i64,
++          .fniv = gen_srshr_vec,
++          .fno = gen_helper_gvec_srshr_d,
++          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++          .opt_opc = vecop_list,
++          .vece = MO_64 },
++    };
++
++    /* tszimm encoding produces immediates in the range [1..esize] */
++    tcg_debug_assert(shift > 0);
++    tcg_debug_assert(shift <= (8 << vece));
++
++    if (shift == (8 << vece)) {
++        /*
++         * Shifts larger than the element size are architecturally valid.
++         * Signed results in all sign bits.  With rounding, this produces
++         *   (-1 + 1) >> 1 == 0, or (0 + 1) >> 1 == 0.
++         * I.e. always zero.
++         */
++        tcg_gen_gvec_dup_imm(vece, rd_ofs, opr_sz, max_sz, 0);
++    } else {
++        tcg_gen_gvec_2i(rd_ofs, rm_ofs, opr_sz, max_sz, shift, &ops[vece]);
++    }
++}
++
++static void gen_srsra8_i64(TCGv_i64 d, TCGv_i64 a, int64_t sh)
++{
++    TCGv_i64 t = tcg_temp_new_i64();
++
++    gen_srshr8_i64(t, a, sh);
++    tcg_gen_vec_add8_i64(d, d, t);
++    tcg_temp_free_i64(t);
++}
++
++static void gen_srsra16_i64(TCGv_i64 d, TCGv_i64 a, int64_t sh)
++{
++    TCGv_i64 t = tcg_temp_new_i64();
++
++    gen_srshr16_i64(t, a, sh);
++    tcg_gen_vec_add16_i64(d, d, t);
++    tcg_temp_free_i64(t);
++}
++
++static void gen_srsra32_i32(TCGv_i32 d, TCGv_i32 a, int32_t sh)
++{
++    TCGv_i32 t = tcg_temp_new_i32();
++
++    gen_srshr32_i32(t, a, sh);
++    tcg_gen_add_i32(d, d, t);
++    tcg_temp_free_i32(t);
++}
++
++static void gen_srsra64_i64(TCGv_i64 d, TCGv_i64 a, int64_t sh)
++{
++    TCGv_i64 t = tcg_temp_new_i64();
++
++    gen_srshr64_i64(t, a, sh);
++    tcg_gen_add_i64(d, d, t);
++    tcg_temp_free_i64(t);
++}
++
++static void gen_srsra_vec(unsigned vece, TCGv_vec d, TCGv_vec a, int64_t sh)
++{
++    TCGv_vec t = tcg_temp_new_vec_matching(d);
++
++    gen_srshr_vec(vece, t, a, sh);
++    tcg_gen_add_vec(vece, d, d, t);
++    tcg_temp_free_vec(t);
++}
++
++void gen_gvec_srsra(unsigned vece, uint32_t rd_ofs, uint32_t rm_ofs,
++                    int64_t shift, uint32_t opr_sz, uint32_t max_sz)
++{
++    static const TCGOpcode vecop_list[] = {
++        INDEX_op_shri_vec, INDEX_op_sari_vec, INDEX_op_add_vec, 0
++    };
++    static const GVecGen2i ops[4] = {
++        { .fni8 = gen_srsra8_i64,
++          .fniv = gen_srsra_vec,
++          .fno = gen_helper_gvec_srsra_b,
++          .opt_opc = vecop_list,
++          .load_dest = true,
++          .vece = MO_8 },
++        { .fni8 = gen_srsra16_i64,
++          .fniv = gen_srsra_vec,
++          .fno = gen_helper_gvec_srsra_h,
++          .opt_opc = vecop_list,
++          .load_dest = true,
++          .vece = MO_16 },
++        { .fni4 = gen_srsra32_i32,
++          .fniv = gen_srsra_vec,
++          .fno = gen_helper_gvec_srsra_s,
++          .opt_opc = vecop_list,
++          .load_dest = true,
++          .vece = MO_32 },
++        { .fni8 = gen_srsra64_i64,
++          .fniv = gen_srsra_vec,
++          .fno = gen_helper_gvec_srsra_d,
++          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++          .opt_opc = vecop_list,
++          .load_dest = true,
++          .vece = MO_64 },
++    };
++
++    /* tszimm encoding produces immediates in the range [1..esize] */
++    tcg_debug_assert(shift > 0);
++    tcg_debug_assert(shift <= (8 << vece));
++
++    /*
++     * Shifts larger than the element size are architecturally valid.
++     * Signed results in all sign bits.  With rounding, this produces
++     *   (-1 + 1) >> 1 == 0, or (0 + 1) >> 1 == 0.
++     * I.e. always zero.  With accumulation, this leaves D unchanged.
++     */
++    if (shift == (8 << vece)) {
++        /* Nop, but we do need to clear the tail. */
++        tcg_gen_gvec_mov(vece, rd_ofs, rd_ofs, opr_sz, max_sz);
++    } else {
++        tcg_gen_gvec_2i(rd_ofs, rm_ofs, opr_sz, max_sz, shift, &ops[vece]);
++    }
++}
++
++static void gen_urshr8_i64(TCGv_i64 d, TCGv_i64 a, int64_t sh)
++{
++    TCGv_i64 t = tcg_temp_new_i64();
++
++    tcg_gen_shri_i64(t, a, sh - 1);
++    tcg_gen_andi_i64(t, t, dup_const(MO_8, 1));
++    tcg_gen_vec_shr8i_i64(d, a, sh);
++    tcg_gen_vec_add8_i64(d, d, t);
++    tcg_temp_free_i64(t);
++}
++
++static void gen_urshr16_i64(TCGv_i64 d, TCGv_i64 a, int64_t sh)
++{
++    TCGv_i64 t = tcg_temp_new_i64();
++
++    tcg_gen_shri_i64(t, a, sh - 1);
++    tcg_gen_andi_i64(t, t, dup_const(MO_16, 1));
++    tcg_gen_vec_shr16i_i64(d, a, sh);
++    tcg_gen_vec_add16_i64(d, d, t);
++    tcg_temp_free_i64(t);
++}
++
++static void gen_urshr32_i32(TCGv_i32 d, TCGv_i32 a, int32_t sh)
++{
++    TCGv_i32 t = tcg_temp_new_i32();
++
++    tcg_gen_extract_i32(t, a, sh - 1, 1);
++    tcg_gen_shri_i32(d, a, sh);
++    tcg_gen_add_i32(d, d, t);
++    tcg_temp_free_i32(t);
++}
++
++static void gen_urshr64_i64(TCGv_i64 d, TCGv_i64 a, int64_t sh)
++{
++    TCGv_i64 t = tcg_temp_new_i64();
++
++    tcg_gen_extract_i64(t, a, sh - 1, 1);
++    tcg_gen_shri_i64(d, a, sh);
++    tcg_gen_add_i64(d, d, t);
++    tcg_temp_free_i64(t);
++}
++
++static void gen_urshr_vec(unsigned vece, TCGv_vec d, TCGv_vec a, int64_t shift)
++{
++    TCGv_vec t = tcg_temp_new_vec_matching(d);
++    TCGv_vec ones = tcg_temp_new_vec_matching(d);
++
++    tcg_gen_shri_vec(vece, t, a, shift - 1);
++    tcg_gen_dupi_vec(vece, ones, 1);
++    tcg_gen_and_vec(vece, t, t, ones);
++    tcg_gen_shri_vec(vece, d, a, shift);
++    tcg_gen_add_vec(vece, d, d, t);
++
++    tcg_temp_free_vec(t);
++    tcg_temp_free_vec(ones);
++}
++
++void gen_gvec_urshr(unsigned vece, uint32_t rd_ofs, uint32_t rm_ofs,
++                    int64_t shift, uint32_t opr_sz, uint32_t max_sz)
++{
++    static const TCGOpcode vecop_list[] = {
++        INDEX_op_shri_vec, INDEX_op_add_vec, 0
++    };
++    static const GVecGen2i ops[4] = {
++        { .fni8 = gen_urshr8_i64,
++          .fniv = gen_urshr_vec,
++          .fno = gen_helper_gvec_urshr_b,
++          .opt_opc = vecop_list,
++          .vece = MO_8 },
++        { .fni8 = gen_urshr16_i64,
++          .fniv = gen_urshr_vec,
++          .fno = gen_helper_gvec_urshr_h,
++          .opt_opc = vecop_list,
++          .vece = MO_16 },
++        { .fni4 = gen_urshr32_i32,
++          .fniv = gen_urshr_vec,
++          .fno = gen_helper_gvec_urshr_s,
++          .opt_opc = vecop_list,
++          .vece = MO_32 },
++        { .fni8 = gen_urshr64_i64,
++          .fniv = gen_urshr_vec,
++          .fno = gen_helper_gvec_urshr_d,
++          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++          .opt_opc = vecop_list,
++          .vece = MO_64 },
++    };
++
++    /* tszimm encoding produces immediates in the range [1..esize] */
++    tcg_debug_assert(shift > 0);
++    tcg_debug_assert(shift <= (8 << vece));
++
++    if (shift == (8 << vece)) {
++        /*
++         * Shifts larger than the element size are architecturally valid.
++         * Unsigned results in zero.  With rounding, this produces a
++         * copy of the most significant bit.
++         */
++        tcg_gen_gvec_shri(vece, rd_ofs, rm_ofs, shift - 1, opr_sz, max_sz);
++    } else {
++        tcg_gen_gvec_2i(rd_ofs, rm_ofs, opr_sz, max_sz, shift, &ops[vece]);
++    }
++}
++
++static void gen_ursra8_i64(TCGv_i64 d, TCGv_i64 a, int64_t sh)
++{
++    TCGv_i64 t = tcg_temp_new_i64();
++
++    if (sh == 8) {
++        tcg_gen_vec_shr8i_i64(t, a, 7);
++    } else {
++        gen_urshr8_i64(t, a, sh);
++    }
++    tcg_gen_vec_add8_i64(d, d, t);
++    tcg_temp_free_i64(t);
++}
++
++static void gen_ursra16_i64(TCGv_i64 d, TCGv_i64 a, int64_t sh)
++{
++    TCGv_i64 t = tcg_temp_new_i64();
++
++    if (sh == 16) {
++        tcg_gen_vec_shr16i_i64(t, a, 15);
++    } else {
++        gen_urshr16_i64(t, a, sh);
++    }
++    tcg_gen_vec_add16_i64(d, d, t);
++    tcg_temp_free_i64(t);
++}
++
++static void gen_ursra32_i32(TCGv_i32 d, TCGv_i32 a, int32_t sh)
++{
++    TCGv_i32 t = tcg_temp_new_i32();
++
++    if (sh == 32) {
++        tcg_gen_shri_i32(t, a, 31);
++    } else {
++        gen_urshr32_i32(t, a, sh);
++    }
++    tcg_gen_add_i32(d, d, t);
++    tcg_temp_free_i32(t);
++}
++
++static void gen_ursra64_i64(TCGv_i64 d, TCGv_i64 a, int64_t sh)
++{
++    TCGv_i64 t = tcg_temp_new_i64();
++
++    if (sh == 64) {
++        tcg_gen_shri_i64(t, a, 63);
++    } else {
++        gen_urshr64_i64(t, a, sh);
++    }
++    tcg_gen_add_i64(d, d, t);
++    tcg_temp_free_i64(t);
++}
++
++static void gen_ursra_vec(unsigned vece, TCGv_vec d, TCGv_vec a, int64_t sh)
++{
++    TCGv_vec t = tcg_temp_new_vec_matching(d);
++
++    if (sh == (8 << vece)) {
++        tcg_gen_shri_vec(vece, t, a, sh - 1);
++    } else {
++        gen_urshr_vec(vece, t, a, sh);
++    }
++    tcg_gen_add_vec(vece, d, d, t);
++    tcg_temp_free_vec(t);
++}
++
++void gen_gvec_ursra(unsigned vece, uint32_t rd_ofs, uint32_t rm_ofs,
++                    int64_t shift, uint32_t opr_sz, uint32_t max_sz)
++{
++    static const TCGOpcode vecop_list[] = {
++        INDEX_op_shri_vec, INDEX_op_add_vec, 0
++    };
++    static const GVecGen2i ops[4] = {
++        { .fni8 = gen_ursra8_i64,
++          .fniv = gen_ursra_vec,
++          .fno = gen_helper_gvec_ursra_b,
++          .opt_opc = vecop_list,
++          .load_dest = true,
++          .vece = MO_8 },
++        { .fni8 = gen_ursra16_i64,
++          .fniv = gen_ursra_vec,
++          .fno = gen_helper_gvec_ursra_h,
++          .opt_opc = vecop_list,
++          .load_dest = true,
++          .vece = MO_16 },
++        { .fni4 = gen_ursra32_i32,
++          .fniv = gen_ursra_vec,
++          .fno = gen_helper_gvec_ursra_s,
++          .opt_opc = vecop_list,
++          .load_dest = true,
++          .vece = MO_32 },
++        { .fni8 = gen_ursra64_i64,
++          .fniv = gen_ursra_vec,
++          .fno = gen_helper_gvec_ursra_d,
++          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++          .opt_opc = vecop_list,
++          .load_dest = true,
++          .vece = MO_64 },
++    };
++
++    /* tszimm encoding produces immediates in the range [1..esize] */
++    tcg_debug_assert(shift > 0);
++    tcg_debug_assert(shift <= (8 << vece));
++
++    tcg_gen_gvec_2i(rd_ofs, rm_ofs, opr_sz, max_sz, shift, &ops[vece]);
++}
++
+ static void gen_shr8_ins_i64(TCGv_i64 d, TCGv_i64 a, int64_t shift)
+ {
+     uint64_t mask = dup_const(MO_8, 0xff >> shift);
+@@ -5269,6 +5685,30 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                     }
+                     return 0;
+ 
++                case 2: /* VRSHR */
++                    /* Right shift comes here negative.  */
++                    shift = -shift;
++                    if (u) {
++                        gen_gvec_urshr(size, rd_ofs, rm_ofs, shift,
++                                       vec_size, vec_size);
++                    } else {
++                        gen_gvec_srshr(size, rd_ofs, rm_ofs, shift,
++                                       vec_size, vec_size);
++                    }
++                    return 0;
++
++                case 3: /* VRSRA */
++                    /* Right shift comes here negative.  */
++                    shift = -shift;
++                    if (u) {
++                        gen_gvec_ursra(size, rd_ofs, rm_ofs, shift,
++                                       vec_size, vec_size);
++                    } else {
++                        gen_gvec_srsra(size, rd_ofs, rm_ofs, shift,
++                                       vec_size, vec_size);
++                    }
++                    return 0;
++
+                 case 4: /* VSRI */
+                     if (!u) {
+                         return 1;
+@@ -5320,13 +5760,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                         neon_load_reg64(cpu_V0, rm + pass);
+                         tcg_gen_movi_i64(cpu_V1, imm);
+                         switch (op) {
+-                        case 2: /* VRSHR */
+-                        case 3: /* VRSRA */
+-                            if (u)
+-                                gen_helper_neon_rshl_u64(cpu_V0, cpu_V0, cpu_V1);
+-                            else
+-                                gen_helper_neon_rshl_s64(cpu_V0, cpu_V0, cpu_V1);
+-                            break;
+                         case 6: /* VQSHLU */
+                             gen_helper_neon_qshlu_s64(cpu_V0, cpu_env,
+                                                       cpu_V0, cpu_V1);
+@@ -5343,11 +5776,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                         default:
+                             g_assert_not_reached();
+                         }
+-                        if (op == 3) {
+-                            /* Accumulate.  */
+-                            neon_load_reg64(cpu_V1, rd + pass);
+-                            tcg_gen_add_i64(cpu_V0, cpu_V0, cpu_V1);
+-                        }
+                         neon_store_reg64(cpu_V0, rd + pass);
+                     } else { /* size < 3 */
+                         /* Operands in T0 and T1.  */
+@@ -5355,10 +5783,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                         tmp2 = tcg_temp_new_i32();
+                         tcg_gen_movi_i32(tmp2, imm);
+                         switch (op) {
+-                        case 2: /* VRSHR */
+-                        case 3: /* VRSRA */
+-                            GEN_NEON_INTEGER_OP(rshl);
+-                            break;
+                         case 6: /* VQSHLU */
+                             switch (size) {
+                             case 0:
+@@ -5384,13 +5808,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                             g_assert_not_reached();
+                         }
+                         tcg_temp_free_i32(tmp2);
+-
+-                        if (op == 3) {
+-                            /* Accumulate.  */
+-                            tmp2 = neon_load_reg(rd, pass);
+-                            gen_neon_add(size, tmp, tmp2);
+-                            tcg_temp_free_i32(tmp2);
+-                        }
+                         neon_store_reg(rd, pass, tmp);
+                     }
+                 } /* for pass */
+diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
+index 230085b35ed..fd8b2bff493 100644
+--- a/target/arm/vec_helper.c
++++ b/target/arm/vec_helper.c
+@@ -924,6 +924,56 @@ DO_SRA(gvec_usra_d, uint64_t)
+ 
+ #undef DO_SRA
+ 
++#define DO_RSHR(NAME, TYPE)                             \
++void HELPER(NAME)(void *vd, void *vn, uint32_t desc)    \
++{                                                       \
++    intptr_t i, oprsz = simd_oprsz(desc);               \
++    int shift = simd_data(desc);                        \
++    TYPE *d = vd, *n = vn;                              \
++    for (i = 0; i < oprsz / sizeof(TYPE); i++) {        \
++        TYPE tmp = n[i] >> (shift - 1);                 \
++        d[i] = (tmp >> 1) + (tmp & 1);                  \
++    }                                                   \
++    clear_tail(d, oprsz, simd_maxsz(desc));             \
++}
++
++DO_RSHR(gvec_srshr_b, int8_t)
++DO_RSHR(gvec_srshr_h, int16_t)
++DO_RSHR(gvec_srshr_s, int32_t)
++DO_RSHR(gvec_srshr_d, int64_t)
++
++DO_RSHR(gvec_urshr_b, uint8_t)
++DO_RSHR(gvec_urshr_h, uint16_t)
++DO_RSHR(gvec_urshr_s, uint32_t)
++DO_RSHR(gvec_urshr_d, uint64_t)
++
++#undef DO_RSHR
++
++#define DO_RSRA(NAME, TYPE)                             \
++void HELPER(NAME)(void *vd, void *vn, uint32_t desc)    \
++{                                                       \
++    intptr_t i, oprsz = simd_oprsz(desc);               \
++    int shift = simd_data(desc);                        \
++    TYPE *d = vd, *n = vn;                              \
++    for (i = 0; i < oprsz / sizeof(TYPE); i++) {        \
++        TYPE tmp = n[i] >> (shift - 1);                 \
++        d[i] += (tmp >> 1) + (tmp & 1);                 \
++    }                                                   \
++    clear_tail(d, oprsz, simd_maxsz(desc));             \
++}
++
++DO_RSRA(gvec_srsra_b, int8_t)
++DO_RSRA(gvec_srsra_h, int16_t)
++DO_RSRA(gvec_srsra_s, int32_t)
++DO_RSRA(gvec_srsra_d, int64_t)
++
++DO_RSRA(gvec_ursra_b, uint8_t)
++DO_RSRA(gvec_ursra_h, uint16_t)
++DO_RSRA(gvec_ursra_s, uint32_t)
++DO_RSRA(gvec_ursra_d, uint64_t)
++
++#undef DO_RSRA
++
+ /*
+  * Convert float16 to float32, raising no exceptions and
+  * preserving exceptional values, including SNaN.
 -- 
 2.20.1
 
