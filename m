@@ -6,60 +6,60 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 063AEC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 20:17:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0470C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 20:19:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE4E82065F
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 20:17:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 566582065F
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 20:19:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eh7oCJnt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE4E82065F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MLnh9u5D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 566582065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZKIi-0002jC-28
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 16:17:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37472)
+	id 1jZKKL-0004ym-IT
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 16:19:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37484)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZKHH-00005t-Od
- for qemu-devel@nongnu.org; Thu, 14 May 2020 16:16:23 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22923
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZKHL-0000FQ-26
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 16:16:27 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54696
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZKHH-0003Q1-1N
- for qemu-devel@nongnu.org; Thu, 14 May 2020 16:16:23 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZKHK-0003QZ-9U
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 16:16:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589487382;
+ s=mimecast20190719; t=1589487385;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=nVukJV+4xGJoj7qVA4WNmR82aGr/vcZpYP525uF32Ek=;
- b=eh7oCJntGNTGyT1N31xoYoYeIIy5uxZ4ZgcPsfi7DjasDvmFVYBZ932AgagA+rXSKwYadj
- be16hFzlu1WNw9X9fhY/tVhlJrxyqypyaxc7S3152RZYD+tMlgl4MXXoFeb24O39tWoY7T
- nV0eEXR8xpIGEoVwnGzTiBhhBHuHgew=
+ bh=pa+gphkJVsxxFRWfByYRBAzYttwxgekUxJSz6/TtAx8=;
+ b=MLnh9u5DNg1KaQ6Zu0bbmaKAUMZ/LbaJfrdOgjNyK5DKiFAd5c9wsXw1FepKyML4dvCbwT
+ vJH4bYMdOF45lwV8wJaKzf1IJW8CcsXTAXdP6lSZUiVMs1zMBSctypwQHurSN+cy9R56Mc
+ eo95sk72HFcY9sPpgY0c9sFbHyBEbKw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-118-ACk-1le_N5ywFOB5LXB1ug-1; Thu, 14 May 2020 16:16:20 -0400
-X-MC-Unique: ACk-1le_N5ywFOB5LXB1ug-1
+ us-mta-247-w0-_pLYqPhKhu0IKOCmrHA-1; Thu, 14 May 2020 16:16:22 -0400
+X-MC-Unique: w0-_pLYqPhKhu0IKOCmrHA-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44A0C107ACCA;
- Thu, 14 May 2020 20:16:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A12B11005512;
+ Thu, 14 May 2020 20:16:21 +0000 (UTC)
 Received: from probe.redhat.com (ovpn-119-184.rdu2.redhat.com [10.10.119.184])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 97D9C10013D9;
- Thu, 14 May 2020 20:16:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6D8AC10013D9;
+ Thu, 14 May 2020 20:16:19 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/3] iotests: log to stderr instead of stdout
-Date: Thu, 14 May 2020 16:16:13 -0400
-Message-Id: <20200514201614.19941-3-jsnow@redhat.com>
+Subject: [PATCH 3/3] iotests: Categorize NOTRUN messages as INFO, not WARNING
+Date: Thu, 14 May 2020 16:16:14 -0400
+Message-Id: <20200514201614.19941-4-jsnow@redhat.com>
 In-Reply-To: <20200514201614.19941-1-jsnow@redhat.com>
 References: <20200514201614.19941-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -68,10 +68,10 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 11:41:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 12:05:55
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -97,35 +97,27 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Separate the streams; stdout is for test diff output, stderr is for
-control messages and things for the human to look at.
-
-(Cough, unfortunately, I didn't realize that ./check actually just
-always redirects both, so even on STDERR, you can't see warnings.
-Oh well...)
+It's not really a warning; we don't want to see it if we're not running
+in at least a verbose mode. We can see it on the test summary just fine.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/iotests.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 1caa7812de..9231767acf 100644
+index 9231767acf..8e479e1c6f 100644
 --- a/tests/qemu-iotests/iotests.py
 +++ b/tests/qemu-iotests/iotests.py
-@@ -1171,7 +1171,11 @@ def execute_setup_common(supported_fmts: Sequence[str] = (),
-     debug = '-d' in sys.argv
-     if debug:
-         sys.argv.remove('-d')
--    logging.basicConfig(level=(logging.DEBUG if debug else logging.WARN))
-+
-+    logging.basicConfig(
-+        level=logging.DEBUG if debug else logging.WARN,
-+        stream=sys.stderr,
-+    )
+@@ -986,7 +986,7 @@ def notrun(reason):
+     seq = os.path.basename(sys.argv[0])
  
-     _verify_image_format(supported_fmts, unsupported_fmts)
-     _verify_protocol(supported_protocols, unsupported_protocols)
+     open('%s/%s.notrun' % (output_dir, seq), 'w').write(reason + '\n')
+-    logger.warning("%s not run: %s", seq, reason)
++    logger.info("%s not run: %s", seq, reason)
+     sys.exit(0)
+ 
+ def case_notrun(reason):
 -- 
 2.21.1
 
