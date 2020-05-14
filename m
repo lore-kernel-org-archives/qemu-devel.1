@@ -2,91 +2,91 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB811C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:24:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 237DDC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:24:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B6E42065D
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:24:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D68132065D
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:24:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JTsK1dyX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B6E42065D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z1rvc4d+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D68132065D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZEmO-0006DX-MQ
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:24:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39466)
+	id 1jZEmo-0006tw-0V
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:24:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38516)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZEkG-00038q-AG
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:21:56 -0400
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:44173)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jZEcy-0007l0-Jl
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:14:25 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:36632)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZEkE-0005Tr-KA
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:21:55 -0400
-Received: by mail-wr1-x42b.google.com with SMTP id 50so4329266wrc.11
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:21:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=IzyO8U/Vt27hwDrgZ4KQ9+8AH5suUqMiUHLnwA1A03I=;
- b=JTsK1dyXsXZkrT3ic4hAE24m0wrwGUiQGj1cq55NPG3k+LNsxopz+gimp5wauAOSDj
- RLN8aNW0LFSOnejGzvFhxeJSZemDrAXJwOqNNbQEMm7LuAkrxTrU/O6wvb0k8RoNC40X
- cd2at6CrLRpo/bHyENKYtktWEMLpAtDLYs4v6UNCVBJtgRgNZcu7FKYJNjT9JNeN+d4F
- 4C9HYoNScUczt02/U/Clb+03yhTAfF0oxqFW8aR4+Q1l6NivJP8yGa3k+KvdebL4T19p
- y6b2IlENq3CKzsdW9VgYveZZ9njwCvwYr7a9oWMX5lcycmngrAJuYsibwgFKhhKkPm0C
- YxpA==
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1jZEcx-0003oV-SG
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:14:24 -0400
+Received: by mail-lj1-x241.google.com with SMTP id u15so3717717ljd.3
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:14:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=7FoM1+aW2rkN6WZGeGZa1NdTwyvt1XBX/M5a6guzNPc=;
+ b=Z1rvc4d+iouPEPJFEGxRF7k5GZfcOjA7SOTurgq6CnZ39swZ8ibRCNr09ZmL9pywrz
+ r+ne+HSrzZ1FKmp9ctJzlQoawp27d+fZgaRlOUSKtrxBEVmnnz0JGthzaMwztldS/6dA
+ FFHOVnt4P8OJIZN1AM6EAaww2KR+b5cL1hsNhSdo77Eh1GD9dtm8X2dpSiX5eJk70wLt
+ 6hOlpRS6NGe/9S/yCSjsrsA6a2FAkhO11XTnDjQ0oX3OTJ5uhOWSIIZjtSbWuZd09llU
+ Eq8p3NyoAd62QQ2HbatVirjm4mB/7grbqRUCIYdPgRdKQ/CBIa/6i9IruxtejwGN/LUf
+ 8l9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=IzyO8U/Vt27hwDrgZ4KQ9+8AH5suUqMiUHLnwA1A03I=;
- b=RwllRqTqfnanU+9h1YllyVYEb5Xs4rs4TqS7l+wS79PXSF9p+29OKPJKQg/Ahkd6SS
- kdfjeLYaHO644702xuEyNJl8eDL/pZQLOCXYwOfDDn3hhJq/QOJ9XlPZywg45QJjVwX1
- zySjCHtYdyL8FUO0SMOgwhH10jhyp7B3l68icmLU/eosfG2FMiU6WI7oiwksZL0MTm1F
- yFV8Nj0kdFa0FMS8nrF8p+zN7Pn/0l3870GkSJjY6jhzEgsXhM2AWrz6oSjNRaVue4G/
- NHyLfjK6Z6nWg2eSOduHBC/Pij3t39SfJDPAXW1YJx44TDfZW8bR+pezfxXVXqJtdN98
- aEjQ==
-X-Gm-Message-State: AOAM533DpUOuTZ+9Rs9qbh0vb04Hvg/LUiODP5HZBX7YNKEfqFC9ptnx
- Mpsy79XyYYzcIQ++ps2/sEDX9UZpWYmmOw==
-X-Google-Smtp-Source: ABdhPJwG6uEJ7JuvaDyTRcIlXI4ixkKd6JXPSu/a56NQmrwowO3D7EMJ8vtlwcJWahBFyuLbz39Dbw==
-X-Received: by 2002:adf:8483:: with SMTP id 3mr5823080wrg.206.1589466112943;
- Thu, 14 May 2020 07:21:52 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 88sm4077443wrq.77.2020.05.14.07.21.51
- for <qemu-devel@nongnu.org>
+ bh=7FoM1+aW2rkN6WZGeGZa1NdTwyvt1XBX/M5a6guzNPc=;
+ b=m6doRPhgHmW2PR734eKiwwWqR7pnnirVtjDuw6BqSWKxTiFRZD2DLUBhJiEE0+wg3p
+ C0XSIleGCcOiyzg0SltW8iHOHLA7eMU37fXmzXsCcAaGlDcoNxcrUax98rxnwXnYRLP/
+ PPZLOCbPbHbPk6A3kwiZNT2KRbC+efRLOK2FocH+jbG0gfQ/maszdOwSrDOzy+Qtpw20
+ sIb+zQehiTBAU041Svm7oTEFHs+TDP/2CPY+1SQDrIs0XxpJpoNPs3RS2174fGkp1tEB
+ LJo20CFAnU7HDEkk430f7vUBHXoRH60mCUxBQ2WcUvg5Vf6gN2H7agMvv8NuYMb4fSO8
+ xBgA==
+X-Gm-Message-State: AOAM532J1V12aGP5L6zw6EZg5WdwzhYovW2VJqWlA41PLTl25ERUAzZB
+ 9R3cIZ3ztOgTbLHtAouNhcCXVVrdTGg=
+X-Google-Smtp-Source: ABdhPJwsVWycX4KYMrtnKmcyEfJjqyfbHirrVzs42xxW0oi48lPv8r7u7QNtREKle+NbFidKbZu1GA==
+X-Received: by 2002:a2e:9a54:: with SMTP id k20mr3092933ljj.265.1589465661589; 
+ Thu, 14 May 2020 07:14:21 -0700 (PDT)
+Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id z17sm1365436ljc.81.2020.05.14.07.14.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 14 May 2020 07:21:52 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
+ Thu, 14 May 2020 07:14:20 -0700 (PDT)
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 09/45] target/arm: Swap argument order for VSHL during decode
-Date: Thu, 14 May 2020 15:21:02 +0100
-Message-Id: <20200514142138.20875-10-peter.maydell@linaro.org>
+Subject: [PULL v1 13/14] target/microblaze: gdb: Fix incorrect SReg reporting
+Date: Thu, 14 May 2020 16:14:01 +0200
+Message-Id: <20200514141402.12498-14-edgar.iglesias@gmail.com>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200514142138.20875-1-peter.maydell@linaro.org>
-References: <20200514142138.20875-1-peter.maydell@linaro.org>
+In-Reply-To: <20200514141402.12498-1-edgar.iglesias@gmail.com>
+References: <20200514141402.12498-1-edgar.iglesias@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42b;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42b.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::241;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x241.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_score_int: 13
+X-Spam_score: 1.3
+X-Spam_bar: +
+X-Spam_report: (1.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ FSL_HELO_FAKE=3.399, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,69 +100,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Joe Komlodi <joe.komlodi@xilinx.com>
 
-Rather than perform the argument swap during code generation,
-perform it during decode.  This means it doesn't have to be
-special cased later, and we can share code with aarch64 code
-generation.  Hopefully the decode comment addresses any confusion
-that might arise in between.
+SRegs used to be reported to GDB by iterating over the SRegs array,
+however we do not store them in an order that allows them to be
+reported to GDB in that way.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200513163245.17915-9-richard.henderson@linaro.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+To fix this, a simple map is used to map the register GDB wants to its
+location in the SRegs array.
+
+Signed-off-by: Joe Komlodi <komlodi@xilinx.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Message-Id: <1589393329-223076-3-git-send-email-komlodi@xilinx.com>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/arm/neon-dp.decode       | 17 +++++++++++++++--
- target/arm/translate-neon.inc.c |  3 +--
- 2 files changed, 16 insertions(+), 4 deletions(-)
+ target/microblaze/gdbstub.c | 59 ++++++++++++++++++++++++++++++-------
+ 1 file changed, 49 insertions(+), 10 deletions(-)
 
-diff --git a/target/arm/neon-dp.decode b/target/arm/neon-dp.decode
-index ec3a92fe753..593f7fff03d 100644
---- a/target/arm/neon-dp.decode
-+++ b/target/arm/neon-dp.decode
-@@ -65,8 +65,21 @@ VCGT_U_3s        1111 001 1 0 . .. .... .... 0011 . . . 0 .... @3same
- VCGE_S_3s        1111 001 0 0 . .. .... .... 0011 . . . 1 .... @3same
- VCGE_U_3s        1111 001 1 0 . .. .... .... 0011 . . . 1 .... @3same
+diff --git a/target/microblaze/gdbstub.c b/target/microblaze/gdbstub.c
+index 54cc7857d1..73e8973597 100644
+--- a/target/microblaze/gdbstub.c
++++ b/target/microblaze/gdbstub.c
+@@ -25,6 +25,21 @@ int mb_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
+ {
+     MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
+     CPUMBState *env = &cpu->env;
++    /*
++     * GDB expects SREGs in the following order:
++     * PC, MSR, EAR, ESR, FSR, BTR, EDR, PID, ZPR, TLBX, TLBSX, TLBLO, TLBHI.
++     * They aren't stored in this order, so make a map.
++     * PID, ZPR, TLBx, TLBsx, TLBLO, and TLBHI aren't modeled, so we don't
++     * map them to anything and return a value of 0 instead.
++     */
++    static const uint8_t sreg_map[6] = {
++        SR_PC,
++        SR_MSR,
++        SR_EAR,
++        SR_ESR,
++        SR_FSR,
++        SR_BTR
++    };
  
--VSHL_S_3s        1111 001 0 0 . .. .... .... 0100 . . . 0 .... @3same
--VSHL_U_3s        1111 001 1 0 . .. .... .... 0100 . . . 0 .... @3same
-+# The _rev suffix indicates that Vn and Vm are reversed. This is
-+# the case for shifts. In the Arm ARM these insns are documented
-+# with the Vm and Vn fields in their usual places, but in the
-+# assembly the operands are listed "backwards", ie in the order
-+# Dd, Dm, Dn where other insns use Dd, Dn, Dm. For QEMU we choose
-+# to consider Vm and Vn as being in different fields in the insn,
-+# which allows us to avoid special-casing shifts in the trans_
-+# function code. We would otherwise need to manually swap the operands
-+# over to call Neon helper functions that are shared with AArch64,
-+# which does not have this odd reversed-operand situation.
-+@3same_rev       .... ... . . . size:2 .... .... .... . q:1 . . .... \
-+                 &3same vn=%vm_dp vm=%vn_dp vd=%vd_dp
+     /*
+      * GDB expects registers to be reported in this order:
+@@ -40,15 +55,16 @@ int mb_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
+         n -= 32;
+         switch (n) {
+         case 0 ... 5:
+-            return gdb_get_reg32(mem_buf, env->sregs[n]);
++            return gdb_get_reg32(mem_buf, env->sregs[sreg_map[n]]);
+         /* PVR12 is intentionally skipped */
+         case 6 ... 17:
+             n -= 6;
+             return gdb_get_reg32(mem_buf, env->pvr.regs[n]);
+-        case 18 ... 24:
+-            /* Add an offset of 6 to resume where we left off with SRegs */
+-            n = n - 18 + 6;
+-            return gdb_get_reg32(mem_buf, env->sregs[n]);
++        case 18:
++            return gdb_get_reg32(mem_buf, env->sregs[SR_EDR]);
++        /* Other SRegs aren't modeled, so report a value of 0 */
++        case 19 ... 24:
++            return gdb_get_reg32(mem_buf, 0);
+         case 25:
+             return gdb_get_reg32(mem_buf, env->slr);
+         case 26:
+@@ -66,29 +82,52 @@ int mb_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+     CPUMBState *env = &cpu->env;
+     uint32_t tmp;
+ 
++    /*
++     * GDB expects SREGs in the following order:
++     * PC, MSR, EAR, ESR, FSR, BTR, EDR, PID, ZPR, TLBX, TLBSX, TLBLO, TLBHI.
++     * They aren't stored in this order, so make a map.
++     * PID, ZPR, TLBx, TLBsx, TLBLO, and TLBHI aren't modeled, so we don't
++     * map them to anything.
++     */
++    static const uint8_t sreg_map[6] = {
++        SR_PC,
++        SR_MSR,
++        SR_EAR,
++        SR_ESR,
++        SR_FSR,
++        SR_BTR
++    };
 +
-+VSHL_S_3s        1111 001 0 0 . .. .... .... 0100 . . . 0 .... @3same_rev
-+VSHL_U_3s        1111 001 1 0 . .. .... .... 0100 . . . 0 .... @3same_rev
+     if (n > cc->gdb_num_core_regs) {
+         return 0;
+     }
  
- VMAX_S_3s        1111 001 0 0 . .. .... .... 0110 . . . 0 .... @3same
- VMAX_U_3s        1111 001 1 0 . .. .... .... 0110 . . . 0 .... @3same
-diff --git a/target/arm/translate-neon.inc.c b/target/arm/translate-neon.inc.c
-index aefeff498a6..416302bcc78 100644
---- a/target/arm/translate-neon.inc.c
-+++ b/target/arm/translate-neon.inc.c
-@@ -692,8 +692,7 @@ static bool trans_VMUL_p_3s(DisasContext *s, arg_3same *a)
-                                 uint32_t rn_ofs, uint32_t rm_ofs,       \
-                                 uint32_t oprsz, uint32_t maxsz)         \
-     {                                                                   \
--        /* Note the operation is vshl vd,vm,vn */                       \
--        tcg_gen_gvec_3(rd_ofs, rm_ofs, rn_ofs,                          \
-+        tcg_gen_gvec_3(rd_ofs, rn_ofs, rm_ofs,                          \
-                        oprsz, maxsz, &OPARRAY[vece]);                   \
-     }                                                                   \
-     DO_3SAME(INSN, gen_##INSN##_3s)
+     tmp = ldl_p(mem_buf);
+ 
++    /*
++     * GDB expects registers to be reported in this order:
++     * R0-R31
++     * PC-BTR
++     * PVR0-PVR11
++     * EDR-TLBHI
++     * SLR-SHR
++     */
+     if (n < 32) {
+         env->regs[n] = tmp;
+     } else {
+         n -= 32;
+         switch (n) {
+         case 0 ... 5:
+-            env->sregs[n] = tmp;
++            env->sregs[sreg_map[n]] = tmp;
+             break;
+         /* PVR12 is intentionally skipped */
+         case 6 ... 17:
+             n -= 6;
+             env->pvr.regs[n] = tmp;
+             break;
+-        case 18 ... 24:
+-            /* Add an offset of 6 to resume where we left off with SRegs */
+-            n = n - 18 + 6;
+-            env->sregs[n] = tmp;
++        /* Only EDR is modeled in these indeces, so ignore the rest */
++        case 18:
++            env->sregs[SR_EDR] = tmp;
+             break;
+         case 25:
+             env->slr = tmp;
 -- 
 2.20.1
 
