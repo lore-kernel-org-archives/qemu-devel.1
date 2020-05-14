@@ -2,84 +2,79 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B76DC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 16:11:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69134C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 16:11:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7C5F2065D
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 16:11:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E27882065D
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 16:11:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="guNyncBG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7C5F2065D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aHZsQoeR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E27882065D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZGRw-0001nj-UN
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 12:11:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57002)
+	id 1jZGSX-0002aW-N3
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 12:11:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57052)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jZGR4-0000mr-9z
- for qemu-devel@nongnu.org; Thu, 14 May 2020 12:10:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60985
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jZGRZ-0001YX-2w
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 12:10:45 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49611
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jZGR3-0003ao-1N
- for qemu-devel@nongnu.org; Thu, 14 May 2020 12:10:13 -0400
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jZGRY-0003na-9n
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 12:10:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589472610;
+ s=mimecast20190719; t=1589472643;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=v1TmkoMKvA+iFj6D38uXaDMSCDoLrUosH2djQ5PHBXI=;
- b=guNyncBGWXzi5PPbERAdYyzMBuV1Kfu7QsbGKbs/malk4jg3Kvg7gUvFZnVgF7mgjBRSQW
- vrmYG3a59CYJeIhwdv0czBX9fROzfQ5I89sE3kYUaboRqVjgfjazaROM4NucDrc9vltDyl
- 6IxVRoepms4z7yAx/ocoV5+oeR+MtHg=
+ bh=4kY3B7Y4f7ZgtNy9BtOWuYzWsA38hoYleVF0FcgWdWs=;
+ b=aHZsQoeRpa93T6D+869Z92PPzESwdk8jC7jje5oIb+QmfIWyLOAHzb11oeqIdHoDS9fpV2
+ Jyhqw+xxhhjIQj5FSY4pw3eQZYQvofmb4efTXMzc4m0Q6VcjLbrYRGjlfhbLskwZJ87w9p
+ /hww0YxHEa1UGmPSEtp/rOrKZEx0VSM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-157-h9Mkg50ZNayg451O6A9OSw-1; Thu, 14 May 2020 12:10:04 -0400
-X-MC-Unique: h9Mkg50ZNayg451O6A9OSw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-426-YBg5EdNONZ6gTn-xUZUZkQ-1; Thu, 14 May 2020 12:10:25 -0400
+X-MC-Unique: YBg5EdNONZ6gTn-xUZUZkQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B3D2A461;
- Thu, 14 May 2020 16:10:03 +0000 (UTC)
-Received: from [10.3.116.145] (ovpn-116-145.phx2.redhat.com [10.3.116.145])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1311960BF1;
- Thu, 14 May 2020 16:10:02 +0000 (UTC)
-Subject: Re: [PATCH v6 04/14] block/amend: separate amend and create options
- for qemu-img
-To: Max Reitz <mreitz@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200510134037.18487-1-mlevitsk@redhat.com>
- <20200510134037.18487-5-mlevitsk@redhat.com>
- <5b389390-eadb-e1d6-48f8-be99c2dfad99@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <52231bba-4ef1-2e96-1e82-9e350a68b106@redhat.com>
-Date: Thu, 14 May 2020 11:10:02 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BC70474;
+ Thu, 14 May 2020 16:10:24 +0000 (UTC)
+Received: from kaapi (unknown [10.40.192.26])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EB6085D9CA;
+ Thu, 14 May 2020 16:10:16 +0000 (UTC)
+Date: Thu, 14 May 2020 21:40:13 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+X-X-Sender: pjp@kaapi
+To: Darren Kenny <darren.kenny@oracle.com>
+Subject: Re: [PATCH v2 1/3] megasas: use unsigned type for reply_queue_head
+ and check index
+In-Reply-To: <m2k11ek62b.fsf@oracle.com>
+Message-ID: <nycvar.YSQ.7.76.2005142121420.1451610@xnncv>
+References: <20200513192540.1583887-1-ppandit@redhat.com>
+ <20200513192540.1583887-2-ppandit@redhat.com> <m2k11ek62b.fsf@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <5b389390-eadb-e1d6-48f8-be99c2dfad99@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 11:35:35
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=ppandit@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 11:41:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -99,61 +94,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-block@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, QEMU Developers <qemu-devel@nongnu.org>,
+ Alexander Bulekov <alxndr@bu.edu>,
+ =?ISO-8859-15?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@redhat.com>,
+ Ding Ren <rding@gatech.edu>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Hanqing Zhao <hanqing@gatech.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/14/20 7:28 AM, Max Reitz wrote:
-> On 10.05.20 15:40, Maxim Levitsky wrote:
->> Some options are only useful for creation
->> (or hard to be amended, like cluster size for qcow2), while some other
->> options are only useful for amend, like upcoming keyslot management
->> options for luks
->>
+  Hello Darren,
 
->>   
->> +#define QCOW_COMMON_OPTIONS                                         \
->> +    {                                                               \
++-- On Thu, 14 May 2020, Darren Kenny wrote --+
+| > Update v1 -> v2: fix OOB access when index > MEGASAS_MAX_FRAMES(=2048)
+| >  -> https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg03131.html
+| >
+| > diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+| > -    int reply_queue_head;
+| > +    uint16_t reply_queue_head;
+| > @@ -445,7 +445,7 @@ static MegasasCmd *megasas_lookup_frame(MegasasState *s,
+| >  
+| >      index = s->reply_queue_head;
+| 
+| While it is probably unlikely that it would cause an integer underflow
+| here,
 
->> +        .help = "Width of a reference count entry in bits",         \
->> +        .def_value_str = "16"                                       \
->> +    }                                                               \
-> 
-> I think the last line should have a comma in it (otherwise the final
-> backslash doesn’t make much sense, because whenever we’d add a new
-> option, we would need to modify the line anyway to insert a comma).
+Yes, integer overflow is unlikely going from uint16_t -> to -> int type.
 
-Except that...
+  s->reply_queue_head = ldl_le_pci_dma(pcid, s->producer_pa);
+  s->reply_queue_head %= MEGASAS_MAX_FRAMES;
 
-> 
-> Speaking of adding option, this requires a rebase due to the
-> compression_type option added (not trivial in the strict sense, but
-> still straightforward to handle).
-> 
->> +
->>   static QemuOptsList qcow2_create_opts = {
->>       .name = "qcow2-create-opts",
->>       .head = QTAILQ_HEAD_INITIALIZER(qcow2_create_opts.head),
->>       .desc = {
->>
-> 
-> [...]
-> 
->> +        QCOW_COMMON_OPTIONS,
->> +        { /* end of list */ }
+Also here 's->reply_queue_head' is restricted between 0...MEGASAS_MAX_FRAMES=2048
 
-...the intended usage is to use the macro name followed by a comma, so 
-including a trailing comma in the macro itself would lead to a syntax 
-error.  I think the better fix is to eliminate the trailing \ on the 
-final line, and have '}' without a trailing comma in the macro.
+| -    while (num < s->fw_cmds) {
+| +    while (num < s->fw_cmds && index < MEGASAS_MAX_FRAMES) {
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+And this patch would help keep 'index' within the same 0..MEGASAS_MAX_FRAMES 
+range.
+
+| for consistency, index probably should also be declared as unsigned, but 
+| from what I can tell it is still an 'int'.
+
+It did cross my mind, but it's generally advised to keep these fixes to 
+minimum possible changes and specific to the issue they fix. Index being a 
+local variable, changing it to an unsigned type wouldn't help much to fix the 
+issue or otherwise I think.
+
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
 
 
