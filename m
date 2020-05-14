@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B794BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:33:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8824CC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:34:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 684E12070A
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:33:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3EE412070A
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:34:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xUROHBJL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 684E12070A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CkWRF+/c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EE412070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZEvl-0000Ul-CL
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:33:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39446)
+	id 1jZEwS-0002Fm-CI
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:34:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39616)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZEkD-00034J-Uh
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:21:53 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:43316)
+ id 1jZEkZ-0003Vr-JK
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:16 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41252)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZEkC-0005SK-Jl
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:21:53 -0400
-Received: by mail-wr1-x430.google.com with SMTP id i15so4311956wrx.10
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:21:52 -0700 (PDT)
+ id 1jZEkV-0005r6-H6
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:15 -0400
+Received: by mail-wr1-x442.google.com with SMTP id h17so4345402wrc.8
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:22:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=7t/S3jgVo6mBZ1+ru7bXNvY462zbAy/5ahkw4fshZNI=;
- b=xUROHBJLci/4qvSFIiWphFn9vJJDecEJ56ltrla9iHNvxtaovkPHfgsuL1pvYseXq0
- jCclTeYHyxl30i9fOi2LWF/+vRL4B+LtkFRh30qTgpoMkxeb6MavhNEuX0p6aZaq5Mas
- d78FtsAHOoWFzGnWvy/ZoQLPUoJ78cgFMaKEx6c6xwSPtlsyJ67VhqBev8e23Hmogrn0
- L5885fGuB/cJkIUfZv9E2FsQVdQLRBT3ohVkz9qOxI0uojwMb7tPwYNw7SqTlF+mSOOg
- UmJoKtQDddaGVh3APTs+BTPzZtq+e9WStA6/BG1t7dsoJwiAZDrH4POJTo/R1FPuszRs
- Fp1w==
+ bh=HRStBj2KdNqO3b0sZtzQPcUBRHTt2G+LUu/l85hoZ6g=;
+ b=CkWRF+/cxCoGjTws+5S488Mwqj4XlUk3hlx/MoInRSH1whfJVqoPlv4ENLhbcQWY3T
+ Pfnhi+6bW1hM0GGkSUrsSpCMOpCmTlmKWCaWQH+NkqsnMQIWIdimUuRoMgJNBwkVKwvm
+ lRDAPnMU3P0XWFh56P2ux+zqbVUi0xfw7jUgiEfyVCVEhfmtSZ/+d4g7A2RziTHTU/1f
+ Dp2AuNbXQheKmV37fnLPZVwYKGlQZ6ZfCn+laQeduKxTMi6/td/qsoB4bD7znj9tVec0
+ kr9lhUpNhLXMlHndFyX4n/wa0l1msR5Z+WvK4EC7A1+Bo+XjdJnmX/uroYDq4vAzxKnx
+ bl4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=7t/S3jgVo6mBZ1+ru7bXNvY462zbAy/5ahkw4fshZNI=;
- b=H8zSyO5l2N2Bp46mpFlclxUewDNGpIZYoi6evrsLpfi9JdzW4jSZ0ADGUIBPNtRWqq
- rQHq7HnxEu7Jw91NIoQVBwAkpA6ibCAf3Y4rPl7D/AO4yGERTt9igzfwK4rqdijy2deR
- 1PcZ4faG403BkpggpudbMaURg3zqm4A6dqt60GvEFCthce5q7wL2CnGH1BaXN/ikmr7A
- qB2GkxsS4PgA/5hiFwzJNzC0DLrSYt6kB++1wwSg8iLlZ+TNOyg5/aW7U3SR48tlIRxl
- 7vA/INQdfQUYM4XYuiU3os/a5WzbxH5WIAprnQ+QQ3hQC2QYZEpL+/kstj00ukS9Rlex
- nliw==
-X-Gm-Message-State: AOAM531CVSDt9c/fYMa+DOW/RuHtGmlAUSWXBHPNkATDqSTud8tBxjC2
- 2JOzUXQQt3Tag7QhEKR8ZpE0UVC91B4DOQ==
-X-Google-Smtp-Source: ABdhPJzBJrpioA71mEs/JB2DaKbgTJSCMmqblubVPhywrmHTb0Lfp8iP/i3U4WP1J8G44ADOhhgV2g==
-X-Received: by 2002:a5d:68cd:: with SMTP id p13mr5675384wrw.325.1589466110705; 
- Thu, 14 May 2020 07:21:50 -0700 (PDT)
+ bh=HRStBj2KdNqO3b0sZtzQPcUBRHTt2G+LUu/l85hoZ6g=;
+ b=k46oKknSpTIvMwfa+4ySR17dO/0hyb8JIzoxWW3iFgK9gGyGy3dzmBaLJN0AyWcGNx
+ GwKxjtYKv2Odn6xrc5IVDt7gxj6DXkkzf8GhEZuWLQKhDjOxMIWrkpPHWx54MTkKUJg9
+ moLasp6lIgGRz8h99ZpiT3n4w91RfUxhadgC3H58k2B9ysQbhMxmVQyNg5KmgGji/MA1
+ f91Xzz9d19Z039G/g1ze60oEC7lOuLS6961GEHPI/W8Ar3T6UDqopiZI4UCt2JJSw275
+ TFqJ0tybAjRuhTx5m+Wj+QNsdP7d1C1NZMnk5e8r8jJ5+Y0Hl4gexPn0RN1b2BZI08Gk
+ IrZw==
+X-Gm-Message-State: AOAM531BEqi+IbMVcwZOHuSjkMignxQY0kbgX3YJ/TJ+TEBIdBXrsHCW
+ IVxcMXKybIMLUHwvHUAqW8G/VghMxICM8A==
+X-Google-Smtp-Source: ABdhPJys0bS8lZcn7AXINz97iWK+oVXoddseXubUCikcRHodVbAeMi3TVYSWFmsgqNIn/yZ4HXvy5g==
+X-Received: by 2002:adf:e784:: with SMTP id n4mr6106967wrm.170.1589466129613; 
+ Thu, 14 May 2020 07:22:09 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 88sm4077443wrq.77.2020.05.14.07.21.49
+ by smtp.gmail.com with ESMTPSA id 88sm4077443wrq.77.2020.05.14.07.22.08
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 14 May 2020 07:21:49 -0700 (PDT)
+ Thu, 14 May 2020 07:22:09 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 07/45] target/arm: Create gen_gvec_{ceq,clt,cle,cgt,cge}0
-Date: Thu, 14 May 2020 15:21:00 +0100
-Message-Id: <20200514142138.20875-8-peter.maydell@linaro.org>
+Subject: [PULL 22/45] ACPI: Build related register address fields via hardware
+ error fw_cfg blob
+Date: Thu, 14 May 2020 15:21:15 +0100
+Message-Id: <20200514142138.20875-23-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200514142138.20875-1-peter.maydell@linaro.org>
 References: <20200514142138.20875-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::430;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x430.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,381 +105,258 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Dongjiu Geng <gengdongjiu@huawei.com>
 
-Provide a functional interface for the vector expansion.
-This fits better with the existing set of helpers that
-we provide for other operations.
+This patch builds error_block_address and read_ack_register fields
+in hardware errors table , the error_block_address points to Generic
+Error Status Block(GESB) via bios_linker. The max size for one GESB
+is 1kb, For more detailed information, please refer to
+document: docs/specs/acpi_hest_ghes.rst
 
-Macro-ize the 5 nearly identical comparisons.
+Now we only support one Error source, if necessary, we can extend to
+support more.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200513163245.17915-7-richard.henderson@linaro.org
+Suggested-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Message-id: 20200512030609.19593-5-gengdongjiu@huawei.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate.h     |  16 ++-
- target/arm/translate-a64.c |  22 ++--
- target/arm/translate.c     | 254 ++++++++-----------------------------
- 3 files changed, 74 insertions(+), 218 deletions(-)
+ default-configs/arm-softmmu.mak |  1 +
+ include/hw/acpi/aml-build.h     |  1 +
+ include/hw/acpi/ghes.h          | 28 +++++++++++
+ hw/acpi/aml-build.c             |  2 +
+ hw/acpi/ghes.c                  | 89 +++++++++++++++++++++++++++++++++
+ hw/arm/virt-acpi-build.c        |  5 ++
+ hw/acpi/Kconfig                 |  4 ++
+ hw/acpi/Makefile.objs           |  1 +
+ 8 files changed, 131 insertions(+)
+ create mode 100644 include/hw/acpi/ghes.h
+ create mode 100644 hw/acpi/ghes.c
 
-diff --git a/target/arm/translate.h b/target/arm/translate.h
-index fa5c3f12b96..e35c812cc5e 100644
---- a/target/arm/translate.h
-+++ b/target/arm/translate.h
-@@ -275,11 +275,17 @@ static inline void gen_swstep_exception(DisasContext *s, int isv, int ex)
- uint64_t vfp_expand_imm(int size, uint8_t imm8);
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 36a0e89daae..8fc09a4a510 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -42,3 +42,4 @@ CONFIG_FSL_IMX7=y
+ CONFIG_FSL_IMX6UL=y
+ CONFIG_SEMIHOSTING=y
+ CONFIG_ALLWINNER_H3=y
++CONFIG_ACPI_APEI=y
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index 1539fe06671..ed7c89309ef 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -220,6 +220,7 @@ struct AcpiBuildTables {
+     GArray *rsdp;
+     GArray *tcpalog;
+     GArray *vmgenid;
++    GArray *hardware_errors;
+     BIOSLinker *linker;
+ } AcpiBuildTables;
  
- /* Vector operations shared between ARM and AArch64.  */
--extern const GVecGen2 ceq0_op[4];
--extern const GVecGen2 clt0_op[4];
--extern const GVecGen2 cgt0_op[4];
--extern const GVecGen2 cle0_op[4];
--extern const GVecGen2 cge0_op[4];
-+void gen_gvec_ceq0(unsigned vece, uint32_t rd_ofs, uint32_t rm_ofs,
-+                   uint32_t opr_sz, uint32_t max_sz);
-+void gen_gvec_clt0(unsigned vece, uint32_t rd_ofs, uint32_t rm_ofs,
-+                   uint32_t opr_sz, uint32_t max_sz);
-+void gen_gvec_cgt0(unsigned vece, uint32_t rd_ofs, uint32_t rm_ofs,
-+                   uint32_t opr_sz, uint32_t max_sz);
-+void gen_gvec_cle0(unsigned vece, uint32_t rd_ofs, uint32_t rm_ofs,
-+                   uint32_t opr_sz, uint32_t max_sz);
-+void gen_gvec_cge0(unsigned vece, uint32_t rd_ofs, uint32_t rm_ofs,
-+                   uint32_t opr_sz, uint32_t max_sz);
+diff --git a/include/hw/acpi/ghes.h b/include/hw/acpi/ghes.h
+new file mode 100644
+index 00000000000..50379b0d0ad
+--- /dev/null
++++ b/include/hw/acpi/ghes.h
+@@ -0,0 +1,28 @@
++/*
++ * Support for generating APEI tables and recording CPER for Guests
++ *
++ * Copyright (c) 2020 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * Author: Dongjiu Geng <gengdongjiu@huawei.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
 +
- extern const GVecGen3 mla_op[4];
- extern const GVecGen3 mls_op[4];
- extern const GVecGen3 cmtst_op[4];
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index d5e77f34a7c..fef93dc27af 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -577,14 +577,6 @@ static void gen_gvec_fn4(DisasContext *s, bool is_q, int rd, int rn, int rm,
-             is_q ? 16 : 8, vec_full_reg_size(s));
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef ACPI_GHES_H
++#define ACPI_GHES_H
++
++#include "hw/acpi/bios-linker-loader.h"
++
++void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker);
++#endif
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 2c3702b8825..3681ec6e3d8 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -1578,6 +1578,7 @@ void acpi_build_tables_init(AcpiBuildTables *tables)
+     tables->table_data = g_array_new(false, true /* clear */, 1);
+     tables->tcpalog = g_array_new(false, true /* clear */, 1);
+     tables->vmgenid = g_array_new(false, true /* clear */, 1);
++    tables->hardware_errors = g_array_new(false, true /* clear */, 1);
+     tables->linker = bios_linker_loader_init();
  }
  
--/* Expand a 2-operand AdvSIMD vector operation using an op descriptor. */
--static void gen_gvec_op2(DisasContext *s, bool is_q, int rd,
--                         int rn, const GVecGen2 *gvec_op)
--{
--    tcg_gen_gvec_2(vec_full_reg_offset(s, rd), vec_full_reg_offset(s, rn),
--                   is_q ? 16 : 8, vec_full_reg_size(s), gvec_op);
--}
--
- /* Expand a 3-operand AdvSIMD vector operation using an op descriptor.  */
- static void gen_gvec_op3(DisasContext *s, bool is_q, int rd,
-                          int rn, int rm, const GVecGen3 *gvec_op)
-@@ -12310,13 +12302,21 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
-         }
-         break;
-     case 0x8: /* CMGT, CMGE */
--        gen_gvec_op2(s, is_q, rd, rn, u ? &cge0_op[size] : &cgt0_op[size]);
-+        if (u) {
-+            gen_gvec_fn2(s, is_q, rd, rn, gen_gvec_cge0, size);
-+        } else {
-+            gen_gvec_fn2(s, is_q, rd, rn, gen_gvec_cgt0, size);
-+        }
-         return;
-     case 0x9: /* CMEQ, CMLE */
--        gen_gvec_op2(s, is_q, rd, rn, u ? &cle0_op[size] : &ceq0_op[size]);
-+        if (u) {
-+            gen_gvec_fn2(s, is_q, rd, rn, gen_gvec_cle0, size);
-+        } else {
-+            gen_gvec_fn2(s, is_q, rd, rn, gen_gvec_ceq0, size);
-+        }
-         return;
-     case 0xa: /* CMLT */
--        gen_gvec_op2(s, is_q, rd, rn, &clt0_op[size]);
-+        gen_gvec_fn2(s, is_q, rd, rn, gen_gvec_clt0, size);
-         return;
-     case 0xb:
-         if (u) { /* ABS, NEG */
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 2eec689c5ed..010a158e632 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -3645,204 +3645,59 @@ static int do_v81_helper(DisasContext *s, gen_helper_gvec_3_ptr *fn,
-     return 1;
+@@ -1588,6 +1589,7 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre)
+     g_array_free(tables->table_data, true);
+     g_array_free(tables->tcpalog, mfre);
+     g_array_free(tables->vmgenid, mfre);
++    g_array_free(tables->hardware_errors, mfre);
  }
  
--static void gen_ceq0_i32(TCGv_i32 d, TCGv_i32 a)
--{
--    tcg_gen_setcondi_i32(TCG_COND_EQ, d, a, 0);
--    tcg_gen_neg_i32(d, d);
--}
--
--static void gen_ceq0_i64(TCGv_i64 d, TCGv_i64 a)
--{
--    tcg_gen_setcondi_i64(TCG_COND_EQ, d, a, 0);
--    tcg_gen_neg_i64(d, d);
--}
--
--static void gen_ceq0_vec(unsigned vece, TCGv_vec d, TCGv_vec a)
--{
--    TCGv_vec zero = tcg_const_zeros_vec_matching(d);
--    tcg_gen_cmp_vec(TCG_COND_EQ, vece, d, a, zero);
--    tcg_temp_free_vec(zero);
--}
-+#define GEN_CMP0(NAME, COND)                                            \
-+    static void gen_##NAME##0_i32(TCGv_i32 d, TCGv_i32 a)               \
-+    {                                                                   \
-+        tcg_gen_setcondi_i32(COND, d, a, 0);                            \
-+        tcg_gen_neg_i32(d, d);                                          \
-+    }                                                                   \
-+    static void gen_##NAME##0_i64(TCGv_i64 d, TCGv_i64 a)               \
-+    {                                                                   \
-+        tcg_gen_setcondi_i64(COND, d, a, 0);                            \
-+        tcg_gen_neg_i64(d, d);                                          \
-+    }                                                                   \
-+    static void gen_##NAME##0_vec(unsigned vece, TCGv_vec d, TCGv_vec a) \
-+    {                                                                   \
-+        TCGv_vec zero = tcg_const_zeros_vec_matching(d);                \
-+        tcg_gen_cmp_vec(COND, vece, d, a, zero);                        \
-+        tcg_temp_free_vec(zero);                                        \
-+    }                                                                   \
-+    void gen_gvec_##NAME##0(unsigned vece, uint32_t d, uint32_t m,      \
-+                            uint32_t opr_sz, uint32_t max_sz)           \
-+    {                                                                   \
-+        const GVecGen2 op[4] = {                                        \
-+            { .fno = gen_helper_gvec_##NAME##0_b,                       \
-+              .fniv = gen_##NAME##0_vec,                                \
-+              .opt_opc = vecop_list_cmp,                                \
-+              .vece = MO_8 },                                           \
-+            { .fno = gen_helper_gvec_##NAME##0_h,                       \
-+              .fniv = gen_##NAME##0_vec,                                \
-+              .opt_opc = vecop_list_cmp,                                \
-+              .vece = MO_16 },                                          \
-+            { .fni4 = gen_##NAME##0_i32,                                \
-+              .fniv = gen_##NAME##0_vec,                                \
-+              .opt_opc = vecop_list_cmp,                                \
-+              .vece = MO_32 },                                          \
-+            { .fni8 = gen_##NAME##0_i64,                                \
-+              .fniv = gen_##NAME##0_vec,                                \
-+              .opt_opc = vecop_list_cmp,                                \
-+              .prefer_i64 = TCG_TARGET_REG_BITS == 64,                  \
-+              .vece = MO_64 },                                          \
-+        };                                                              \
-+        tcg_gen_gvec_2(d, m, opr_sz, max_sz, &op[vece]);                \
+ /*
+diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
+new file mode 100644
+index 00000000000..e1b3f8fcaa4
+--- /dev/null
++++ b/hw/acpi/ghes.c
+@@ -0,0 +1,89 @@
++/*
++ * Support for generating APEI tables and recording CPER for Guests
++ *
++ * Copyright (c) 2020 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * Author: Dongjiu Geng <gengdongjiu@huawei.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/units.h"
++#include "hw/acpi/ghes.h"
++#include "hw/acpi/aml-build.h"
++
++#define ACPI_GHES_ERRORS_FW_CFG_FILE        "etc/hardware_errors"
++#define ACPI_GHES_DATA_ADDR_FW_CFG_FILE     "etc/hardware_errors_addr"
++
++/* The max size in bytes for one error block */
++#define ACPI_GHES_MAX_RAW_DATA_LENGTH   (1 * KiB)
++
++/* Now only support ARMv8 SEA notification type error source */
++#define ACPI_GHES_ERROR_SOURCE_COUNT        1
++
++/*
++ * Build table for the hardware error fw_cfg blob.
++ * Initialize "etc/hardware_errors" and "etc/hardware_errors_addr" fw_cfg blobs.
++ * See docs/specs/acpi_hest_ghes.rst for blobs format.
++ */
++void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker)
++{
++    int i, error_status_block_offset;
++
++    /* Build error_block_address */
++    for (i = 0; i < ACPI_GHES_ERROR_SOURCE_COUNT; i++) {
++        build_append_int_noprefix(hardware_errors, 0, sizeof(uint64_t));
 +    }
++
++    /* Build read_ack_register */
++    for (i = 0; i < ACPI_GHES_ERROR_SOURCE_COUNT; i++) {
++        /*
++         * Initialize the value of read_ack_register to 1, so GHES can be
++         * writeable after (re)boot.
++         * ACPI 6.2: 18.3.2.8 Generic Hardware Error Source version 2
++         * (GHESv2 - Type 10)
++         */
++        build_append_int_noprefix(hardware_errors, 1, sizeof(uint64_t));
++    }
++
++    /* Generic Error Status Block offset in the hardware error fw_cfg blob */
++    error_status_block_offset = hardware_errors->len;
++
++    /* Reserve space for Error Status Data Block */
++    acpi_data_push(hardware_errors,
++        ACPI_GHES_MAX_RAW_DATA_LENGTH * ACPI_GHES_ERROR_SOURCE_COUNT);
++
++    /* Tell guest firmware to place hardware_errors blob into RAM */
++    bios_linker_loader_alloc(linker, ACPI_GHES_ERRORS_FW_CFG_FILE,
++                             hardware_errors, sizeof(uint64_t), false);
++
++    for (i = 0; i < ACPI_GHES_ERROR_SOURCE_COUNT; i++) {
++        /*
++         * Tell firmware to patch error_block_address entries to point to
++         * corresponding "Generic Error Status Block"
++         */
++        bios_linker_loader_add_pointer(linker,
++            ACPI_GHES_ERRORS_FW_CFG_FILE, sizeof(uint64_t) * i,
++            sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE,
++            error_status_block_offset + i * ACPI_GHES_MAX_RAW_DATA_LENGTH);
++    }
++
++    /*
++     * tell firmware to write hardware_errors GPA into
++     * hardware_errors_addr fw_cfg, once the former has been initialized.
++     */
++    bios_linker_loader_write_pointer(linker, ACPI_GHES_DATA_ADDR_FW_CFG_FILE,
++        0, sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE, 0);
++}
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index f22b1e60977..8397bda4248 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -49,6 +49,7 @@
+ #include "sysemu/reset.h"
+ #include "kvm_arm.h"
+ #include "migration/vmstate.h"
++#include "hw/acpi/ghes.h"
  
- static const TCGOpcode vecop_list_cmp[] = {
-     INDEX_op_cmp_vec, 0
- };
+ #define ARM_SPI_BASE 32
  
--const GVecGen2 ceq0_op[4] = {
--    { .fno = gen_helper_gvec_ceq0_b,
--      .fniv = gen_ceq0_vec,
--      .opt_opc = vecop_list_cmp,
--      .vece = MO_8 },
--    { .fno = gen_helper_gvec_ceq0_h,
--      .fniv = gen_ceq0_vec,
--      .opt_opc = vecop_list_cmp,
--      .vece = MO_16 },
--    { .fni4 = gen_ceq0_i32,
--      .fniv = gen_ceq0_vec,
--      .opt_opc = vecop_list_cmp,
--      .vece = MO_32 },
--    { .fni8 = gen_ceq0_i64,
--      .fniv = gen_ceq0_vec,
--      .opt_opc = vecop_list_cmp,
--      .prefer_i64 = TCG_TARGET_REG_BITS == 64,
--      .vece = MO_64 },
--};
-+GEN_CMP0(ceq, TCG_COND_EQ)
-+GEN_CMP0(cle, TCG_COND_LE)
-+GEN_CMP0(cge, TCG_COND_GE)
-+GEN_CMP0(clt, TCG_COND_LT)
-+GEN_CMP0(cgt, TCG_COND_GT)
+@@ -818,6 +819,10 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+     acpi_add_table(table_offsets, tables_blob);
+     build_spcr(tables_blob, tables->linker, vms);
  
--static void gen_cle0_i32(TCGv_i32 d, TCGv_i32 a)
--{
--    tcg_gen_setcondi_i32(TCG_COND_LE, d, a, 0);
--    tcg_gen_neg_i32(d, d);
--}
--
--static void gen_cle0_i64(TCGv_i64 d, TCGv_i64 a)
--{
--    tcg_gen_setcondi_i64(TCG_COND_LE, d, a, 0);
--    tcg_gen_neg_i64(d, d);
--}
--
--static void gen_cle0_vec(unsigned vece, TCGv_vec d, TCGv_vec a)
--{
--    TCGv_vec zero = tcg_const_zeros_vec_matching(d);
--    tcg_gen_cmp_vec(TCG_COND_LE, vece, d, a, zero);
--    tcg_temp_free_vec(zero);
--}
--
--const GVecGen2 cle0_op[4] = {
--    { .fno = gen_helper_gvec_cle0_b,
--      .fniv = gen_cle0_vec,
--      .opt_opc = vecop_list_cmp,
--      .vece = MO_8 },
--    { .fno = gen_helper_gvec_cle0_h,
--      .fniv = gen_cle0_vec,
--      .opt_opc = vecop_list_cmp,
--      .vece = MO_16 },
--    { .fni4 = gen_cle0_i32,
--      .fniv = gen_cle0_vec,
--      .opt_opc = vecop_list_cmp,
--      .vece = MO_32 },
--    { .fni8 = gen_cle0_i64,
--      .fniv = gen_cle0_vec,
--      .opt_opc = vecop_list_cmp,
--      .prefer_i64 = TCG_TARGET_REG_BITS == 64,
--      .vece = MO_64 },
--};
--
--static void gen_cge0_i32(TCGv_i32 d, TCGv_i32 a)
--{
--    tcg_gen_setcondi_i32(TCG_COND_GE, d, a, 0);
--    tcg_gen_neg_i32(d, d);
--}
--
--static void gen_cge0_i64(TCGv_i64 d, TCGv_i64 a)
--{
--    tcg_gen_setcondi_i64(TCG_COND_GE, d, a, 0);
--    tcg_gen_neg_i64(d, d);
--}
--
--static void gen_cge0_vec(unsigned vece, TCGv_vec d, TCGv_vec a)
--{
--    TCGv_vec zero = tcg_const_zeros_vec_matching(d);
--    tcg_gen_cmp_vec(TCG_COND_GE, vece, d, a, zero);
--    tcg_temp_free_vec(zero);
--}
--
--const GVecGen2 cge0_op[4] = {
--    { .fno = gen_helper_gvec_cge0_b,
--      .fniv = gen_cge0_vec,
--      .opt_opc = vecop_list_cmp,
--      .vece = MO_8 },
--    { .fno = gen_helper_gvec_cge0_h,
--      .fniv = gen_cge0_vec,
--      .opt_opc = vecop_list_cmp,
--      .vece = MO_16 },
--    { .fni4 = gen_cge0_i32,
--      .fniv = gen_cge0_vec,
--      .opt_opc = vecop_list_cmp,
--      .vece = MO_32 },
--    { .fni8 = gen_cge0_i64,
--      .fniv = gen_cge0_vec,
--      .opt_opc = vecop_list_cmp,
--      .prefer_i64 = TCG_TARGET_REG_BITS == 64,
--      .vece = MO_64 },
--};
--
--static void gen_clt0_i32(TCGv_i32 d, TCGv_i32 a)
--{
--    tcg_gen_setcondi_i32(TCG_COND_LT, d, a, 0);
--    tcg_gen_neg_i32(d, d);
--}
--
--static void gen_clt0_i64(TCGv_i64 d, TCGv_i64 a)
--{
--    tcg_gen_setcondi_i64(TCG_COND_LT, d, a, 0);
--    tcg_gen_neg_i64(d, d);
--}
--
--static void gen_clt0_vec(unsigned vece, TCGv_vec d, TCGv_vec a)
--{
--    TCGv_vec zero = tcg_const_zeros_vec_matching(d);
--    tcg_gen_cmp_vec(TCG_COND_LT, vece, d, a, zero);
--    tcg_temp_free_vec(zero);
--}
--
--const GVecGen2 clt0_op[4] = {
--    { .fno = gen_helper_gvec_clt0_b,
--      .fniv = gen_clt0_vec,
--      .opt_opc = vecop_list_cmp,
--      .vece = MO_8 },
--    { .fno = gen_helper_gvec_clt0_h,
--      .fniv = gen_clt0_vec,
--      .opt_opc = vecop_list_cmp,
--      .vece = MO_16 },
--    { .fni4 = gen_clt0_i32,
--      .fniv = gen_clt0_vec,
--      .opt_opc = vecop_list_cmp,
--      .vece = MO_32 },
--    { .fni8 = gen_clt0_i64,
--      .fniv = gen_clt0_vec,
--      .opt_opc = vecop_list_cmp,
--      .prefer_i64 = TCG_TARGET_REG_BITS == 64,
--      .vece = MO_64 },
--};
--
--static void gen_cgt0_i32(TCGv_i32 d, TCGv_i32 a)
--{
--    tcg_gen_setcondi_i32(TCG_COND_GT, d, a, 0);
--    tcg_gen_neg_i32(d, d);
--}
--
--static void gen_cgt0_i64(TCGv_i64 d, TCGv_i64 a)
--{
--    tcg_gen_setcondi_i64(TCG_COND_GT, d, a, 0);
--    tcg_gen_neg_i64(d, d);
--}
--
--static void gen_cgt0_vec(unsigned vece, TCGv_vec d, TCGv_vec a)
--{
--    TCGv_vec zero = tcg_const_zeros_vec_matching(d);
--    tcg_gen_cmp_vec(TCG_COND_GT, vece, d, a, zero);
--    tcg_temp_free_vec(zero);
--}
--
--const GVecGen2 cgt0_op[4] = {
--    { .fno = gen_helper_gvec_cgt0_b,
--      .fniv = gen_cgt0_vec,
--      .opt_opc = vecop_list_cmp,
--      .vece = MO_8 },
--    { .fno = gen_helper_gvec_cgt0_h,
--      .fniv = gen_cgt0_vec,
--      .opt_opc = vecop_list_cmp,
--      .vece = MO_16 },
--    { .fni4 = gen_cgt0_i32,
--      .fniv = gen_cgt0_vec,
--      .opt_opc = vecop_list_cmp,
--      .vece = MO_32 },
--    { .fni8 = gen_cgt0_i64,
--      .fniv = gen_cgt0_vec,
--      .opt_opc = vecop_list_cmp,
--      .prefer_i64 = TCG_TARGET_REG_BITS == 64,
--      .vece = MO_64 },
--};
-+#undef GEN_CMP0
++    if (vms->ras) {
++        build_ghes_error_table(tables->hardware_errors, tables->linker);
++    }
++
+     if (ms->numa_state->num_nodes > 0) {
+         acpi_add_table(table_offsets, tables_blob);
+         build_srat(tables_blob, tables->linker, vms);
+diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
+index 54209c6f2f1..1932f66af8d 100644
+--- a/hw/acpi/Kconfig
++++ b/hw/acpi/Kconfig
+@@ -28,6 +28,10 @@ config ACPI_HMAT
+     bool
+     depends on ACPI
  
- static void gen_ssra8_i64(TCGv_i64 d, TCGv_i64 a, int64_t shift)
- {
-@@ -6772,24 +6627,19 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                     break;
++config ACPI_APEI
++    bool
++    depends on ACPI
++
+ config ACPI_PCI
+     bool
+     depends on ACPI && PCI
+diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
+index cab9bcd457d..72886c79657 100644
+--- a/hw/acpi/Makefile.objs
++++ b/hw/acpi/Makefile.objs
+@@ -8,6 +8,7 @@ common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
+ common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
+ common-obj-$(CONFIG_ACPI_HW_REDUCED) += generic_event_device.o
+ common-obj-$(CONFIG_ACPI_HMAT) += hmat.o
++common-obj-$(CONFIG_ACPI_APEI) += ghes.o
+ common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
+ common-obj-$(call lnot,$(CONFIG_PC)) += acpi-x86-stub.o
  
-                 case NEON_2RM_VCEQ0:
--                    tcg_gen_gvec_2(rd_ofs, rm_ofs, vec_size,
--                                   vec_size, &ceq0_op[size]);
-+                    gen_gvec_ceq0(size, rd_ofs, rm_ofs, vec_size, vec_size);
-                     break;
-                 case NEON_2RM_VCGT0:
--                    tcg_gen_gvec_2(rd_ofs, rm_ofs, vec_size,
--                                   vec_size, &cgt0_op[size]);
-+                    gen_gvec_cgt0(size, rd_ofs, rm_ofs, vec_size, vec_size);
-                     break;
-                 case NEON_2RM_VCLE0:
--                    tcg_gen_gvec_2(rd_ofs, rm_ofs, vec_size,
--                                   vec_size, &cle0_op[size]);
-+                    gen_gvec_cle0(size, rd_ofs, rm_ofs, vec_size, vec_size);
-                     break;
-                 case NEON_2RM_VCGE0:
--                    tcg_gen_gvec_2(rd_ofs, rm_ofs, vec_size,
--                                   vec_size, &cge0_op[size]);
-+                    gen_gvec_cge0(size, rd_ofs, rm_ofs, vec_size, vec_size);
-                     break;
-                 case NEON_2RM_VCLT0:
--                    tcg_gen_gvec_2(rd_ofs, rm_ofs, vec_size,
--                                   vec_size, &clt0_op[size]);
-+                    gen_gvec_clt0(size, rd_ofs, rm_ofs, vec_size, vec_size);
-                     break;
- 
-                 default:
 -- 
 2.20.1
 
