@@ -2,71 +2,122 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF53AC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:38:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AE53C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:46:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAF60205CB
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:38:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAF60205CB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 64C4E205CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:46:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="hOdzvMav"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64C4E205CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ7VW-0005cH-Uu
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 02:38:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41174)
+	id 1jZ7dX-00015t-JO
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 02:46:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42046)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jZ7ST-0001Q1-Bd
- for qemu-devel@nongnu.org; Thu, 14 May 2020 02:35:05 -0400
-Received: from 15.mo7.mail-out.ovh.net ([87.98.180.21]:46957)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jZ7ci-0000Ka-TV; Thu, 14 May 2020 02:45:40 -0400
+Received: from mail-eopbgr30101.outbound.protection.outlook.com
+ ([40.107.3.101]:47940 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jZ7SR-0002HC-1M
- for qemu-devel@nongnu.org; Thu, 14 May 2020 02:35:05 -0400
-Received: from player734.ha.ovh.net (unknown [10.108.42.196])
- by mo7.mail-out.ovh.net (Postfix) with ESMTP id 078F6160E86
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 08:35:01 +0200 (CEST)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player734.ha.ovh.net (Postfix) with ESMTPSA id 8A5F91232B139;
- Thu, 14 May 2020 06:34:57 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-96R001b52fda9c-6d62-4f12-b561-81b15c564397,92317E36A8DCBCCD86D4D3FC09BF80838F08FB4C)
- smtp.auth=clg@kaod.org
-Subject: Re: [PATCH v2 6/6] target/ppc: Don't update radix PTE R/C bits with
- gdbstub
-To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-References: <158941060199.240484.5620994992064687533.stgit@bahia.lan>
- <158941063899.240484.2778628492106387793.stgit@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <083fee97-e40c-8cfa-cf3d-166ed2a67395@kaod.org>
-Date: Thu, 14 May 2020 08:34:56 +0200
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jZ7cg-0004Rv-GC; Thu, 14 May 2020 02:45:39 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dhlsU2nc500XKr4T/kQe47MQr1aE3WVUELiRdp2BCTV7gRI91Wcif6SSCERzpWRElFLXKeo9UKVqCxIYjNX9jXPNjky437CeIYI6euQcmt3A0VCzae223nkFi9cKFxBWt9lPwQN/8o605FE8ZhQJP6fts4PZAePeATDOHoctdd15A/etO1s2QHqAWH2ql67PhodxGnjKGZea8g+GMSjJ72Dgy5/XCrg0PFWomjD9qtWfRng0wxJ2uy1KPl+WUiGzUhbgkmPbhr5OnProYqdGwrLSYTJhhw9UqjE28dJUwjctSeCk68e6XcLGH91WwtiAp4DilDAWyd75NdpZ7ZNNIA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hlVCG+Q2eMMuJ9A4FN+6UOkTV/wASmLxLLq7O13kuX8=;
+ b=VOPINbD9/1ZfFayv7v12af6LssEGQeR1mPTDIxgOAcmevqSryzkGKVm5fU5+VFuq2vklLi9ILrjylRNQv6L7C3LULsZ8hynSmVI1AlTKpD0FCkxdmFZ6XdDSR5L70v7DwQvIGE6r+PmCpwxcyuvM1qGqscpSd8l4D/jpM6JcyQ5SVcBOcjq4LeuCROPE0tU+h3Up5ivwbTDU2Xxr0bVpgRoXp3zj0NwVPlpt6IBMfQr36OxuC8kv0cJvgdDRYFIP616ZE95Zexa32dCxc9VtIpnI6OTDzdv4XJYWEpJ2zVFSXmeMSB+k+z9FX9NoZmxKHCw0wgK9XTXyusSFkEP46g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hlVCG+Q2eMMuJ9A4FN+6UOkTV/wASmLxLLq7O13kuX8=;
+ b=hOdzvMavbIUjXhVNo2XhHdkg88ShyxZDCLSOedtkwdHL2K+AtOuI9cl+C4z22qv0zavE58Pq0xXDTlSNDemAkjxoyV6JHgO4IYG4yKAGqbi1XyRQyvIrStczXZOYLiP5KtTk6lUdCWGhWm47d3Pffx5HNZ9ffvPtUzw9eSm8HXY=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5320.eurprd08.prod.outlook.com (2603:10a6:20b:103::24)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.25; Thu, 14 May
+ 2020 06:45:34 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.3000.016; Thu, 14 May 2020
+ 06:45:34 +0000
+Subject: Re: [PATCH v4 6/9] qemu-img: Add bitmap sub-command
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200513011648.166876-1-eblake@redhat.com>
+ <20200513011648.166876-7-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <ef44c5c0-1032-76e3-a3ce-ad0cc43d297c@virtuozzo.com>
+Date: Thu, 14 May 2020 09:45:32 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
-MIME-Version: 1.0
-In-Reply-To: <158941063899.240484.2778628492106387793.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
+ Thunderbird/68.8.0
+In-Reply-To: <20200513011648.166876-7-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 16614904925954214739
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduhedrleehgddutdejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefffdvtddugeeifeduuefghfejgfeigeeigeeltedthefgieeiveeuiefhgeefgfenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedunecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfeegrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Received-SPF: pass client-ip=87.98.180.21; envelope-from=clg@kaod.org;
- helo=15.mo7.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 02:35:01
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR01CA0141.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:168::46) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.186) by
+ AM0PR01CA0141.eurprd01.prod.exchangelabs.com (2603:10a6:208:168::46) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.24 via Frontend
+ Transport; Thu, 14 May 2020 06:45:33 +0000
+X-Originating-IP: [185.215.60.186]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: f9c10eac-5163-4870-9a1f-08d7f7d266ef
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5320:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB532098B42F0D626D281B5026C1BC0@AM7PR08MB5320.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 040359335D
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /1mX0AK5X7n0A2BlcgiPacqws6XdLJODWpZJ0uCoDQPlVbO6JGe6Q4cF4eTwR4Y2qp4h9Ema+BPImSI17ENEI6+6D1Aj0tFRMuMro6eQOKZT5ZMGXGDDLR0hCJ8Bzznro76heda+Q7AV7cjJOeeHTsWPN3knXxZ1mL2drPYDgdb9URxN1Ev5SZtE+Cs6fMtMD3B+0hN8twotJlpY8xCg8OjFXhBEi8e+nmtRq2ucVXq6PPtsrIdG9aiAilCccbmKzUiO8dM3S0BnpiYvshTSO/dforNbbAjvzGhtFBUMufZCC83qe0/Kbm5PB4DjOALiqNu2QaSOhv2VxPaFsWUTJ1TCb8kXx+V/aUBBJh1SlUIS2qySfw7ukq1+kqO4cBdhsVZe62ocbdIGJPPk2r7rpLC1CUFNWAZCL9ziT673RNItt4PxsyK8qJkr5HEt0lDoHgSgg6VaTtmz/suB/suwnYRnGcgUziczDGpXPGp369uEzpiiQ2SE7b/YEmV8jWxt
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(346002)(39840400004)(136003)(396003)(376002)(366004)(2616005)(8936002)(956004)(316002)(16576012)(6486002)(478600001)(86362001)(31696002)(4326008)(8676002)(66946007)(66556008)(31686004)(66476007)(36756003)(2906002)(5660300002)(186003)(16526019)(52116002)(26005)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: fi9rp2wHsAbrM/TkCB7mn+Ra1gG0N+KCXNTqrLLM4s58UW2ewjMHeFVz2Cj+w0EBVIO05LFYDOE3RrIe91MkW4pY25gc3/hiBXF6NcDlVLod6UvRB/DBj28GxYt9pH1ctYT6BrbIjIIME2CqevmjLsZ4ewYVv7VbLMF1H2aCpjma4DOcBdcZ21/F4TE+GcROISRCaYLSWkDvxd0H2prqNOFkx/eq7KrHDVc3peMMBp3ylaqHLMlu1kYsbdp/leFfuDzCinFO39LThatQKT2XiQ2/6upHNDoITP/VtKSTu81+5HzDQRLvhUJxf5J+8+cHMw5XSB1bPncXSnLoZxNCHIpnvECJm8qbAoD9vd1xKxtXY3EaS0M5QammIjYFmaUVXdG8vmoEH3yzRYQc5+U7nbvJk8/W589UPrLqyeD6LUOh9xTQXK+COmMutOJ0sFl3kohDc5kD05i2k9iOXhsk9L2gsdFvIiXB/lSuJWIoyGscKIgh+WkW5wnVwuJl5ro4
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f9c10eac-5163-4870-9a1f-08d7f7d266ef
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2020 06:45:33.9978 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HUWGwlO/UP/PNNwQ28+qyxxF9w3r7WV6zCmeyySYqlm4w4VU8L+cJqhxQQOYcQ/9YYmjoyHPLxFdV4r067onxtt0DF4ekg1U0vm0oOTGWsw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5320
+Received-SPF: pass client-ip=40.107.3.101;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR03-AM5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 02:45:36
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -80,185 +131,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, nsoffer@redhat.com, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/14/20 12:57 AM, Greg Kurz wrote:
-> gdbstub shouldn't silently change guest visible state when doing address
-> translation. Since the R/C bits can only be updated when handling a MMU
-> fault, let's reuse the cause_excp flag and rename it to guest_visible.
-> While here drop a not very useful comment.
+13.05.2020 04:16, Eric Blake wrote:
+> Include actions for --add, --remove, --clear, --enable, --disable, and
+> --merge (note that --clear is a bit of fluff, because the same can be
+> accomplished by removing a bitmap and then adding a new one in its
+> place, but it matches what QMP commands exist).  Listing is omitted,
+> because it does not require a bitmap name and because it was already
+> possible with 'qemu-img info'.  A single command line can play one or
+> more bitmap commands in sequence on the same bitmap name (although all
+> added bitmaps share the same granularity, and and all merged bitmaps
+> come from the same source file).  Merge defaults to other bitmaps in
+> the primary image, but can also be told to merge bitmaps from a
+> distinct image.
 > 
-> This was found while reading the code. I could verify that this affects
-> both powernv and pseries, but I failed to observe any actual bug.
+> While this supports --image-opts for the file being modified, I did
+> not think it worth the extra complexity to support that for the source
+> file in a cross-file merges.  Likewise, I chose to have --merge only
+> take a single source rather than following the QMP support for
+> multiple merges in one go (although you can still use more than one
+> --merge in the command line); in part because qemu-img is offline and
+> therefore atomicity is not an issue.
 > 
-> Fixes: d04ea940c597 "target/ppc: Add support for Radix partition-scoped translation"
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Upcoming patches will add iotest coverage of these commands while
+> also testing other features.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
+I'm sorry for asking it only now on v4.. But still. Why do we need it? We can instead run qemu binary (or even new qemu-storage-daemon) and just use existing qmp commands. Is there a real benefit in developing qemu-img, maintaining two interfaces for the same thing? Of-course, just run qmp commands from terminal is a lot less comfortable than just a qemu img command.. But may be we need some wrapper, which make it simple to run one qmp command on an image?
 
-> ---
->  target/ppc/mmu-radix64.c |   39 +++++++++++++++++++++------------------
->  1 file changed, 21 insertions(+), 18 deletions(-)
-> 
-> diff --git a/target/ppc/mmu-radix64.c b/target/ppc/mmu-radix64.c
-> index 7ce37cb778db..0d3922537c4c 100644
-> --- a/target/ppc/mmu-radix64.c
-> +++ b/target/ppc/mmu-radix64.c
-> @@ -274,7 +274,7 @@ static int ppc_radix64_partition_scoped_xlate(PowerPCCPU *cpu, int rwx,
->                                                ppc_v3_pate_t pate,
->                                                hwaddr *h_raddr, int *h_prot,
->                                                int *h_page_size, bool pde_addr,
-> -                                              bool cause_excp)
-> +                                              bool guest_visible)
->  {
->      int fault_cause = 0;
->      hwaddr pte_addr;
-> @@ -289,14 +289,15 @@ static int ppc_radix64_partition_scoped_xlate(PowerPCCPU *cpu, int rwx,
->          if (pde_addr) { /* address being translated was that of a guest pde */
->              fault_cause |= DSISR_PRTABLE_FAULT;
->          }
-> -        if (cause_excp) {
-> +        if (guest_visible) {
->              ppc_radix64_raise_hsi(cpu, rwx, eaddr, g_raddr, fault_cause);
->          }
->          return 1;
->      }
->  
-> -    /* Update Reference and Change Bits */
-> -    ppc_radix64_set_rc(cpu, rwx, pte, pte_addr, h_prot);
-> +    if (guest_visible) {
-> +        ppc_radix64_set_rc(cpu, rwx, pte, pte_addr, h_prot);
-> +    }
->  
->      return 0;
->  }
-> @@ -305,7 +306,7 @@ static int ppc_radix64_process_scoped_xlate(PowerPCCPU *cpu, int rwx,
->                                              vaddr eaddr, uint64_t pid,
->                                              ppc_v3_pate_t pate, hwaddr *g_raddr,
->                                              int *g_prot, int *g_page_size,
-> -                                            bool cause_excp)
-> +                                            bool guest_visible)
->  {
->      CPUState *cs = CPU(cpu);
->      CPUPPCState *env = &cpu->env;
-> @@ -319,7 +320,7 @@ static int ppc_radix64_process_scoped_xlate(PowerPCCPU *cpu, int rwx,
->      size = 1ULL << ((pate.dw1 & PATE1_R_PRTS) + 12);
->      if (offset >= size) {
->          /* offset exceeds size of the process table */
-> -        if (cause_excp) {
-> +        if (guest_visible) {
->              ppc_radix64_raise_si(cpu, rwx, eaddr, DSISR_NOPTE);
->          }
->          return 1;
-> @@ -340,7 +341,7 @@ static int ppc_radix64_process_scoped_xlate(PowerPCCPU *cpu, int rwx,
->          ret = ppc_radix64_partition_scoped_xlate(cpu, 0, eaddr, prtbe_addr,
->                                                   pate, &h_raddr, &h_prot,
->                                                   &h_page_size, true,
-> -                                                 cause_excp);
-> +                                                 guest_visible);
->          if (ret) {
->              return ret;
->          }
-> @@ -360,7 +361,7 @@ static int ppc_radix64_process_scoped_xlate(PowerPCCPU *cpu, int rwx,
->                                      &fault_cause, &pte_addr);
->          if (ret) {
->              /* No valid PTE */
-> -            if (cause_excp) {
-> +            if (guest_visible) {
->                  ppc_radix64_raise_si(cpu, rwx, eaddr, fault_cause);
->              }
->              return ret;
-> @@ -380,7 +381,7 @@ static int ppc_radix64_process_scoped_xlate(PowerPCCPU *cpu, int rwx,
->              ret = ppc_radix64_partition_scoped_xlate(cpu, 0, eaddr, pte_addr,
->                                                       pate, &h_raddr, &h_prot,
->                                                       &h_page_size, true,
-> -                                                     cause_excp);
-> +                                                     guest_visible);
->              if (ret) {
->                  return ret;
->              }
-> @@ -389,7 +390,7 @@ static int ppc_radix64_process_scoped_xlate(PowerPCCPU *cpu, int rwx,
->                                           &nls, g_page_size, &pte, &fault_cause);
->              if (ret) {
->                  /* No valid pte */
-> -                if (cause_excp) {
-> +                if (guest_visible) {
->                      ppc_radix64_raise_si(cpu, rwx, eaddr, fault_cause);
->                  }
->                  return ret;
-> @@ -406,13 +407,15 @@ static int ppc_radix64_process_scoped_xlate(PowerPCCPU *cpu, int rwx,
->  
->      if (ppc_radix64_check_prot(cpu, rwx, pte, &fault_cause, g_prot, false)) {
->          /* Access denied due to protection */
-> -        if (cause_excp) {
-> +        if (guest_visible) {
->              ppc_radix64_raise_si(cpu, rwx, eaddr, fault_cause);
->          }
->          return 1;
->      }
->  
-> -    ppc_radix64_set_rc(cpu, rwx, pte, pte_addr, g_prot);
-> +    if (guest_visible) {
-> +        ppc_radix64_set_rc(cpu, rwx, pte, pte_addr, g_prot);
-> +    }
->  
->      return 0;
->  }
-> @@ -437,7 +440,7 @@ static int ppc_radix64_process_scoped_xlate(PowerPCCPU *cpu, int rwx,
->  static int ppc_radix64_xlate(PowerPCCPU *cpu, vaddr eaddr, int rwx,
->                               bool relocation,
->                               hwaddr *raddr, int *psizep, int *protp,
-> -                             bool cause_excp)
-> +                             bool guest_visible)
->  {
->      CPUPPCState *env = &cpu->env;
->      uint64_t lpid, pid;
-> @@ -447,7 +450,7 @@ static int ppc_radix64_xlate(PowerPCCPU *cpu, vaddr eaddr, int rwx,
->  
->      /* Virtual Mode Access - get the fully qualified address */
->      if (!ppc_radix64_get_fully_qualified_addr(&cpu->env, eaddr, &lpid, &pid)) {
-> -        if (cause_excp) {
-> +        if (guest_visible) {
->              ppc_radix64_raise_segi(cpu, rwx, eaddr);
->          }
->          return 1;
-> @@ -460,13 +463,13 @@ static int ppc_radix64_xlate(PowerPCCPU *cpu, vaddr eaddr, int rwx,
->          vhc->get_pate(cpu->vhyp, &pate);
->      } else {
->          if (!ppc64_v3_get_pate(cpu, lpid, &pate)) {
-> -            if (cause_excp) {
-> +            if (guest_visible) {
->                  ppc_radix64_raise_si(cpu, rwx, eaddr, DSISR_NOPTE);
->              }
->              return 1;
->          }
->          if (!validate_pate(cpu, lpid, &pate)) {
-> -            if (cause_excp) {
-> +            if (guest_visible) {
->                  ppc_radix64_raise_si(cpu, rwx, eaddr, DSISR_R_BADCONFIG);
->              }
->              return 1;
-> @@ -487,7 +490,7 @@ static int ppc_radix64_xlate(PowerPCCPU *cpu, vaddr eaddr, int rwx,
->      if (relocation) {
->          int ret = ppc_radix64_process_scoped_xlate(cpu, rwx, eaddr, pid,
->                                                     pate, &g_raddr, &prot,
-> -                                                   &psize, cause_excp);
-> +                                                   &psize, guest_visible);
->          if (ret) {
->              return ret;
->          }
-> @@ -510,7 +513,7 @@ static int ppc_radix64_xlate(PowerPCCPU *cpu, vaddr eaddr, int rwx,
->  
->              ret = ppc_radix64_partition_scoped_xlate(cpu, rwx, eaddr, g_raddr,
->                                                       pate, raddr, &prot, &psize,
-> -                                                     0, cause_excp);
-> +                                                     0, guest_visible);
->              if (ret) {
->                  return ret;
->              }
-> 
+It's simple to make a python wrapper working like
 
+qemu-qmp block-dirty-bitmap-add '{node: self, name: bitmap0, persistent: true}' /path/to/x.qcow2
+
+
+-- 
+Best regards,
+Vladimir
 
