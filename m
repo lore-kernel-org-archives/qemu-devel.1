@@ -2,81 +2,93 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE565C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 21:56:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1753C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 22:02:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F2E020727
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 21:56:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F2E020727
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ubuntu.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9D89E2065C
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 22:02:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fgHM3vep"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D89E2065C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZLqB-00056V-TH
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 17:56:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52118)
+	id 1jZLwD-0002Ky-Qp
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 18:02:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59436)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jZLpT-0004fR-JJ
- for qemu-devel@nongnu.org; Thu, 14 May 2020 17:55:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60460)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jZLvR-0001kQ-Kj; Thu, 14 May 2020 18:01:57 -0400
+Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:36742)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jZLpS-0001nO-Di
- for qemu-devel@nongnu.org; Thu, 14 May 2020 17:55:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jZLpQ-0008Oa-7N
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 21:55:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 2C2BD2E810B
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 21:55:44 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jZLvQ-0006V5-Iy; Thu, 14 May 2020 18:01:57 -0400
+Received: by mail-il1-x142.google.com with SMTP id 17so449617ilj.3;
+ Thu, 14 May 2020 15:01:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Ya1IodZ6PLMHH//lThMrCWMkmCqVM1gzMGaR4JqPxDI=;
+ b=fgHM3vepvc7aicVDbbLglqs3bbGYjx5bCmDCwtFfoKV6g/09wgdxlftuqvrS+ZFxhg
+ Ld+E9SUF8oPa4weoQ0TY/pSG2p/uhGPXdZdMqysX6w+F2Uew73BzgDImJpJaKGEa3xbI
+ FzsC9A7WgPM6IzxaAuaQltVhhOPChFR01zaIVkwP8H0fiq2xv9f4wAwEwDMePU6XoryR
+ KULoMFJ/oYY5n0kUeQK3T1OCXfBFwMOC5Cb7L+KAM/rnJGYg2iK/mH/yu0bbQtqCtlPd
+ FzRuBMqygOx2jI1YwhD69CxO6QNE6GjpLYExjcebz1I3LQgM6gahpDcUqlC+giicmhRK
+ FXNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Ya1IodZ6PLMHH//lThMrCWMkmCqVM1gzMGaR4JqPxDI=;
+ b=HTQ+yA9UuUt9S0nJLlDJfzEMhBG0QE6rOsejw65rR8AvTakt6TvffZLyPBY2p/5+sN
+ QnBEe4sjlwFzUYPtTg4Bq82J3XqWXw0xOR+nXF6TvrTdvedsAhlnfmHHIsbMTs0iPNK8
+ DK2WTPwnFg0Q954edgKVnG5Lt27kPqR00bJgLgjK2qrnY9o6ywl3DvjpkBel8i4uMvvq
+ 0pLuAy+GLze7j37py9V4tePn82rgGjkC4wJUh19vI5Ka6VCNVPxFEoL74JMjC6dfCy7+
+ QyQo55X8pzp8oVq8uEIgJZG8DeG3bxNdxU40xh9Yv7J7gxQP7+09RgNCNIZEFYGayOEC
+ ehPg==
+X-Gm-Message-State: AOAM530PqtpufvbSslDRLgry1FC1vDFfGqpxmum6jBKb90tf96v/+DCC
+ A0K4WvNwCLccRVvrX46K3eaj6jeglKOwT1raYQA=
+X-Google-Smtp-Source: ABdhPJxjrXnuXNhSab8CzX3TPK/0pBiS4F6Oc0wodh547OzZRGRGpNWOHU1kRjiv/YUVdBt+JSTqD+QprSbRk98cP+U=
+X-Received: by 2002:a92:ad09:: with SMTP id w9mr305515ilh.177.1589493715046;
+ Thu, 14 May 2020 15:01:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <cover.1588878756.git.alistair.francis@wdc.com>
+ <27436e8864997f4d67d9562f1db41da2db05f4cf.1588878756.git.alistair.francis@wdc.com>
+ <50effad3-3f41-2d36-e4dd-d14c05e6ea8c@redhat.com>
+In-Reply-To: <50effad3-3f41-2d36-e4dd-d14c05e6ea8c@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 14 May 2020 14:53:07 -0700
+Message-ID: <CAKmqyKOhoMG+Gc1FwJBRJe1DC5TEHFBDN1pdtR-YtHLEEc3EEw@mail.gmail.com>
+Subject: Re: [PATCH v2 6/9] hw/intc: Initial commit of lowRISC Ibex PLIC
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 14 May 2020 21:45:48 -0000
-From: Rafael David Tinoco <rafaeldtinoco@ubuntu.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr rafaeldtinoco
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
-X-Launchpad-Bug-Modifier: Rafael David Tinoco (rafaeldtinoco)
-References: <158925637015.6343.182119641060008506.malonedeb@soybean.canonical.com>
-Message-Id: <158949274895.18017.10814675017383054287.malone@soybean.canonical.com>
-Subject: [Bug 1878134] Re: Assertion failures in
- ati_reg_read_offs/ati_reg_write_offs
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="0385b538081bc4718df6fb844a3afc89729c94ce";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: c2625d055f7889e7002fd3a264c821a3cd2721d6
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 17:55:45
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+Received-SPF: pass client-ip=2607:f8b0:4864:20::142;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x142.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,104 +97,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1878134 <1878134@bugs.launchpad.net>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello Alexander,
+On Thu, May 14, 2020 at 11:40 AM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> On 5/7/20 9:13 PM, Alistair Francis wrote:
+> > The Ibex core contains a PLIC that although similar to the RISC-V spec
+> > is not RISC-V spec compliant.
+> >
+> > This patch implements a Ibex PLIC in a somewhat generic way.
+> >
+> > As the current RISC-V PLIC needs tidying up, my hope is that as the Ibe=
+x
+> > PLIC move towards spec compliance this PLIC implementation can be
+> > updated until it can replace the current PLIC.
+> >
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > ---
+> >   MAINTAINERS                 |   2 +
+> >   hw/intc/Makefile.objs       |   1 +
+> >   hw/intc/ibex_plic.c         | 261 +++++++++++++++++++++++++++++++++++=
++
+> >   include/hw/intc/ibex_plic.h |  63 +++++++++
+> >   4 files changed, 327 insertions(+)
+> >   create mode 100644 hw/intc/ibex_plic.c
+> >   create mode 100644 include/hw/intc/ibex_plic.h
+> >
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index d3d47564ce..f8c3cf6182 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -1237,8 +1237,10 @@ L: qemu-riscv@nongnu.org
+> >   S: Supported
+> >   F: hw/riscv/opentitan.c
+> >   F: hw/char/ibex_uart.c
+> > +F: hw/intc/ibex_plic.c
+> >   F: include/hw/riscv/opentitan.h
+> >   F: include/hw/char/ibex_uart.h
+> > +F: include/hw/intc/ibex_plic.h
+> >
+> >
+> >   SH4 Machines
+> > diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
+> > index f726d87532..a61e6728fe 100644
+> > --- a/hw/intc/Makefile.objs
+> > +++ b/hw/intc/Makefile.objs
+> > @@ -49,3 +49,4 @@ obj-$(CONFIG_ARM_GIC) +=3D arm_gicv3_cpuif.o
+> >   obj-$(CONFIG_MIPS_CPS) +=3D mips_gic.o
+> >   obj-$(CONFIG_NIOS2) +=3D nios2_iic.o
+> >   obj-$(CONFIG_OMPIC) +=3D ompic.o
+> > +obj-$(CONFIG_IBEX) +=3D ibex_plic.o
+> > diff --git a/hw/intc/ibex_plic.c b/hw/intc/ibex_plic.c
+> > new file mode 100644
+> > index 0000000000..35c52d9d16
+> > --- /dev/null
+> > +++ b/hw/intc/ibex_plic.c
+> > @@ -0,0 +1,261 @@
+> > +/*
+> > + * QEMU RISC-V lowRISC Ibex PLIC
+> > + *
+> > + * Copyright (c) 2020 Western Digital
+> > + *
+> > + * Documentation avaliable: https://docs.opentitan.org/hw/ip/rv_plic/d=
+oc/
+> > + *
+> > + * This program is free software; you can redistribute it and/or modif=
+y it
+> > + * under the terms and conditions of the GNU General Public License,
+> > + * version 2 or later, as published by the Free Software Foundation.
+> > + *
+> > + * This program is distributed in the hope it will be useful, but WITH=
+OUT
+> > + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY =
+or
+> > + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public Licen=
+se for
+> > + * more details.
+> > + *
+> > + * You should have received a copy of the GNU General Public License a=
+long with
+> > + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +#include "qemu/log.h"
+> > +#include "hw/qdev-properties.h"
+> > +#include "hw/core/cpu.h"
+> > +#include "hw/boards.h"
+> > +#include "hw/pci/msi.h"
+> > +#include "target/riscv/cpu_bits.h"
+> > +#include "target/riscv/cpu.h"
+> > +#include "hw/intc/ibex_plic.h"
+> > +
+> > +static bool addr_between(uint32_t addr, uint32_t base, uint32_t num)
+> > +{
+> > +    uint32_t end =3D base + (num * 0x04);
+> > +
+> > +    if (addr >=3D base && addr < end) {
+> > +        return true;
+> > +    }
+> > +
+> > +    return false;
+> > +}
+> > +
+> > +static void ibex_plic_irqs_set_pending(IbexPlicState *s, int irq, bool=
+ level)
+> > +{
+> > +    int pending_num =3D irq / 32;
+> > +
+> > +    s->pending[pending_num] |=3D level << (irq % 32);
+> > +}
+> > +
+> > +static bool ibex_plic_irqs_pending(IbexPlicState *s, uint32_t context)
+> > +{
+> > +    int i;
+> > +
+> > +    for (i =3D 0; i < s->pending_num; i++) {
+> > +        uint32_t irq_num =3D ctz64(s->pending[i]) + (i * 32);
+> > +
+> > +        if (!(s->pending[i] & s->enable[i])) {
+> > +            /* No pending and enabled IRQ */
+> > +            continue;
+> > +        }
+> > +
+> > +        if (s->priority[irq_num] > s->threshold) {
+> > +            if (!s->claim) {
+> > +                s->claim =3D irq_num;
+> > +            }
+> > +            return true;
+> > +        }
+> > +    }
+> > +
+> > +    return 0;
+>
+> return 'false'.
 
-I believe your fuzz test result was meant to the upstream project so I
-moved it.
+Fixed.
 
-o/
+>
+> > +}
+> > +
+> > +static void ibex_plic_update(IbexPlicState *s)
+> > +{
+> > +    CPUState *cpu;
+> > +    int level, i;
+> > +
+> > +    for (i =3D 0; i < s->num_cpus; i++) {
+> > +        cpu =3D qemu_get_cpu(i);
+> > +
+> > +        if (!cpu) {
+> > +            continue;
+> > +        }
+> > +
+> > +        level =3D ibex_plic_irqs_pending(s, 0);
+> > +
+> > +        riscv_cpu_update_mip(RISCV_CPU(cpu), MIP_MEIP, BOOL_TO_MASK(le=
+vel));
+> > +    }
+> > +}
+> > +
+> > +static void ibex_plic_reset(DeviceState *dev)
+> > +{
+> > +    IbexPlicState *s =3D IBEX_PLIC(dev);
+> > +
+> > +    s->threshold =3D 0x00000000;
+> > +    s->claim =3D 0x00000000;
+>
+> I haven't check the datasheet reset values, for the rest:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-** Also affects: qemu
-   Importance: Undecided
-       Status: New
+Thanks for reviewing these :)
 
-** No longer affects: qemu-kvm (Ubuntu)
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1878134
-
-Title:
-  Assertion failures in ati_reg_read_offs/ati_reg_write_offs
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello,
-  While fuzzing, I found inputs that trigger assertion failures in
-  ati_reg_read_offs/ati_reg_write_offs
-
-  uint32_t extract32(uint32_t, int, int): Assertion `start >=3D 0 &&
-  length > 0 && length <=3D 32 - start' failed
-
-  #3  0x00007ffff6866092 in __GI___assert_fail (assertion=3D0x555556e760c0 =
-<str> "start >=3D 0 && length > 0 && length <=3D 32 - start", file=3D0x5555=
-56e76120 <str> "/home/alxndr/Development/qemu/include/qemu/bitops.h", line=
-=3D0x12c, function=3D0x555556e76180 <__PRETTY_FUNCTION__.extract32> "uint32=
-_t extract32(uint32_t, int, int)") at assert.c:101
-  #4  0x000055555653d8a7 in ati_mm_read (opaque=3D<optimized out>, addr=3D0=
-x1a, size=3D<optimized out>) at /home/alxndr/Development/qemu/include/qemu/=
-log-for-trace.h:29
-  #5  0x000055555653c825 in ati_mm_read (opaque=3D<optimized out>, addr=3D0=
-x4, size=3D<optimized out>) at /home/alxndr/Development/qemu/hw/display/ati=
-.c:289
-  #6  0x000055555601446e in memory_region_read_accessor (mr=3D0x63100004dc2=
-0, addr=3D<optimized out>, value=3D<optimized out>, size=3D<optimized out>,=
- shift=3D<optimized out>, mask=3D<optimized out>, attrs=3D...) at /home/alx=
-ndr/Development/qemu/memory.c:434
-  #7  0x0000555556001a70 in access_with_adjusted_size (addr=3D<optimized ou=
-t>, value=3D<optimized out>, size=3D<optimized out>, access_size_min=3D<opt=
-imized out>, access_size_max=3D<optimized out>, access_fn=3D<optimized out>=
-, mr=3D0x63100004dc20, attrs=3D...) at /home/alxndr/Development/qemu/memory=
-.c:544
-  #8  0x0000555556001a70 in memory_region_dispatch_read1 (mr=3D0x63100004dc=
-20, addr=3D0x4, pval=3D<optimized out>, size=3D0x4, attrs=3D...) at /home/a=
-lxndr/Development/qemu/memory.c:1396
-
-  =
-
-  I can reproduce it in qemu 5.0 built with using:
-  cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -M pc=
--q35-5.0 -device ati-vga -nographic -qtest stdio -monitor none -serial none
-  outl 0xcf8 0x80001018
-  outl 0xcfc 0xe2000000
-  outl 0xcf8 0x8000101c
-  outl 0xcf8 0x80001004
-  outw 0xcfc 0x7
-  outl 0xcf8 0x8000fa20
-  write 0xe2000004 0x1 0x1a
-  readq 0xe2000000
-  EOF
-
-  Similarly for ati_reg_write_offs:
-  cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -M pc=
--q35-5.0 -device ati-vga -nographic -qtest stdio -monitor none -serial none
-  outl 0xcf8 0x80001018
-  outl 0xcfc 0xe2000000
-  outl 0xcf8 0x8000101c
-  outl 0xcf8 0x80001004
-  outw 0xcfc 0x7
-  outl 0xcf8 0x8000fa20
-  write 0xe2000000 0x8 0x6a00000000006a00
-  EOF
-
-  I also attached the traces to this launchpad report, in case the
-  formatting is broken:
-
-  qemu-system-i386 -M pc-q35-5.0 -device ati-vga -nographic -qtest stdio
-  -monitor none -serial none < attachment
-
-  Please let me know if I can provide any further info.
-  -Alex
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1878134/+subscriptions
+Alistair
 
