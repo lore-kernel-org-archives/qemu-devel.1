@@ -2,81 +2,89 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69F77C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 08:42:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 490AEC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 08:43:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D87F206B6
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 08:42:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D87F206B6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 13967206B6
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 08:43:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K7XligPt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13967206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ9RL-0007Rc-BI
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 04:42:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53698)
+	id 1jZ9Sg-0008Rd-8p
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 04:43:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53782)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jZ9Ql-00070W-Mh
- for qemu-devel@nongnu.org; Thu, 14 May 2020 04:41:27 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60208)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jZ9Qk-0003xh-Gy
- for qemu-devel@nongnu.org; Thu, 14 May 2020 04:41:27 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jZ9Qi-0006vn-46
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 08:41:24 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 1B1942E810B
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 08:41:24 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jZ9S8-0007wg-CO
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 04:42:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51678
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jZ9S7-00044u-33
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 04:42:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589445769;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=41hCNC0zKhFhQIr7dbPjm2Wc0AOVgS1xf7yXchCS628=;
+ b=K7XligPtyXAS8MwmN/A7LRi6eqB//M8YOCozYfblR5ydGIn9qVZFb6+ztFgmqFawiqszmm
+ zdAUus2nWYpOtFjlWd57SGI9O7s+EzvPCrwFdExzQjsiuwAc1rEvzkw1Cj7gnkb+PWbkf3
+ XsAehcdvNnCoXMwYAT56blKZOqMI1SY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-327-Na7NUB-fN1G837pF0p0PTA-1; Thu, 14 May 2020 04:42:47 -0400
+X-MC-Unique: Na7NUB-fN1G837pF0p0PTA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB19D80058A;
+ Thu, 14 May 2020 08:42:46 +0000 (UTC)
+Received: from work-vm (ovpn-114-247.ams2.redhat.com [10.36.114.247])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1DB5C60C05;
+ Thu, 14 May 2020 08:42:44 +0000 (UTC)
+Date: Thu, 14 May 2020 09:42:42 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Subject: Re: [RFC v2] migration: Add migrate-set-bitmap-node-mapping
+Message-ID: <20200514084242.GB2787@work-vm>
+References: <20200513145610.1484567-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 14 May 2020 08:27:02 -0000
-From: Laurent Vivier <Laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: christophe-lyon laurent-vivier
-X-Launchpad-Bug-Reporter: Christophe Lyon (christophe-lyon)
-X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
-References: <158935359452.19393.4863679569975227091.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158944482214.31033.4028387759031576833.malone@chaenomeles.canonical.com>
-Subject: [Bug 1878348] Re: --static build fails in v5.0 (since
- 5010cec2bc87dafab39b3913c8ca91f88df9c540)
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="0385b538081bc4718df6fb844a3afc89729c94ce";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 18c646ca4897892f1a4ea1ac79cff77cd60feec3
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 02:11:09
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <20200513145610.1484567-1-mreitz@redhat.com>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ T_HK_NAME_DR=0.01 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,57 +93,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1878348 <1878348@bugs.launchpad.net>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Peter Krempa <pkrempa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I'm not able to reproduce your problem.
+* Max Reitz (mreitz@redhat.com) wrote:
 
-Are you able to reproduce the problem if you cleanup your build
-directory (make distclean)?
+<snip>
 
--- =
+> +void qmp_migrate_set_bitmap_node_mapping(MigrationBlockNodeMappingList *mapping,
+> +                                         Error **errp)
+> +{
+> +    QDict *in_mapping = qdict_new();
+> +    QDict *out_mapping = qdict_new();
+> +
+> +    for (; mapping; mapping = mapping->next) {
+> +        MigrationBlockNodeMapping *entry = mapping->value;
+> +
+> +        if (qdict_haskey(out_mapping, entry->node_name)) {
+> +            error_setg(errp, "Cannot map node name '%s' twice",
+> +                       entry->node_name);
+> +            goto fail;
+> +        }
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1878348
+I'm not too clear exactly which case this is protecting against;
+I think that's protecting against mapping
 
-Title:
-  --static build fails in v5.0 (since
-  5010cec2bc87dafab39b3913c8ca91f88df9c540)
+  'src1'->'dst1' and 'src1'->'dst2'
+which is a good check.s (or maybe it's checking against dst2 twice?)
 
-Status in QEMU:
-  New
+What about cases where there is no mapping - e.g. imagine
+that we have b1/b2 on the source and b2/b3 on the dest; now
+if we add just a mapping:
 
-Bug description:
-  Hi,
+  b1->b2
 
-  Since commit 5010cec2bc87dafab39b3913c8ca91f88df9c540, building qemu
-  fails when configured with --static (eg ../configure --target-
-  list=3Dx86_64-softmmu,x86_64-linux-user --enable-debug --static).
+then we end up with:
 
-  On ubuntu 16.04, it fails to find -lffi and -lselinux.
+  b1 -> b2
+  b2 -> b2  (non-mapped)
+        b3
 
-  After I apt-get install libffi-dev libselinux1-dev, the build still fails:
-  ../backends/dbus-vmstate.o: In function `_nocheck__trace_dbus_vmstate_pre=
-_save':
-  /home/christophe.lyon/src/qemu/build-static/backends/trace.h:29: undefine=
-d reference to `_TRACE_DBUS_VMSTATE_PRE_SAVE_DSTATE'
-  ../backends/dbus-vmstate.o: In function `_nocheck__trace_dbus_vmstate_pos=
-t_load':
-  /home/christophe.lyon/src/qemu/build-static/backends/trace.h:52: undefine=
-d reference to `_TRACE_DBUS_VMSTATE_POST_LOAD_DSTATE'
-  ../backends/dbus-vmstate.o: In function `_nocheck__trace_dbus_vmstate_loa=
-ding':
-  /home/christophe.lyon/src/qemu/build-static/backends/trace.h:75: undefine=
-d reference to `_TRACE_DBUS_VMSTATE_LOADING_DSTATE'
-  ../backends/dbus-vmstate.o: In function `_nocheck__trace_dbus_vmstate_sav=
-ing':
-  /home/christophe.lyon/src/qemu/build-static/backends/trace.h:98: undefine=
-d reference to `_TRACE_DBUS_VMSTATE_SAVING_DSTATE'
-  collect2: error: ld returned 1 exit status
+so we have a clash there - are we protected against that?
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1878348/+subscriptions
+Dave
+
+> +        if (qdict_haskey(in_mapping, entry->alias)) {
+> +            error_setg(errp, "Cannot use alias '%s' twice",
+> +                       entry->alias);
+> +            goto fail;
+> +        }
+> +
+> +        qdict_put_str(in_mapping, entry->alias, entry->node_name);
+> +        qdict_put_str(out_mapping, entry->node_name, entry->alias);
+> +    }
+> +
+> +    qobject_unref(dirty_bitmap_mig_state.node_in_mapping);
+> +    qobject_unref(dirty_bitmap_mig_state.node_out_mapping);
+> +
+> +    dirty_bitmap_mig_state.node_in_mapping = in_mapping;
+> +    dirty_bitmap_mig_state.node_out_mapping = out_mapping;
+> +
+> +    return;
+> +
+> +fail:
+> +    qobject_unref(in_mapping);
+> +    qobject_unref(out_mapping);
+> +}
+> +
+>  static SaveVMHandlers savevm_dirty_bitmap_handlers = {
+>      .save_setup = dirty_bitmap_save_setup,
+>      .save_live_complete_postcopy = dirty_bitmap_save_complete,
+> -- 
+> 2.26.2
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
