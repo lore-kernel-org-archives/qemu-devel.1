@@ -2,85 +2,75 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69134C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 16:11:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34FF5C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 16:12:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E27882065D
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 16:11:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 01D9E2065D
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 16:12:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aHZsQoeR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E27882065D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="vC4b0pIG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01D9E2065D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZGSX-0002aW-N3
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 12:11:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57052)
+	id 1jZGTF-0003ni-43
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 12:12:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57024)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1jZGRZ-0001YX-2w
- for qemu-devel@nongnu.org; Thu, 14 May 2020 12:10:45 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49611
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1jZGRY-0003na-9n
- for qemu-devel@nongnu.org; Thu, 14 May 2020 12:10:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589472643;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=4kY3B7Y4f7ZgtNy9BtOWuYzWsA38hoYleVF0FcgWdWs=;
- b=aHZsQoeRpa93T6D+869Z92PPzESwdk8jC7jje5oIb+QmfIWyLOAHzb11oeqIdHoDS9fpV2
- Jyhqw+xxhhjIQj5FSY4pw3eQZYQvofmb4efTXMzc4m0Q6VcjLbrYRGjlfhbLskwZJ87w9p
- /hww0YxHEa1UGmPSEtp/rOrKZEx0VSM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-YBg5EdNONZ6gTn-xUZUZkQ-1; Thu, 14 May 2020 12:10:25 -0400
-X-MC-Unique: YBg5EdNONZ6gTn-xUZUZkQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BC70474;
- Thu, 14 May 2020 16:10:24 +0000 (UTC)
-Received: from kaapi (unknown [10.40.192.26])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EB6085D9CA;
- Thu, 14 May 2020 16:10:16 +0000 (UTC)
-Date: Thu, 14 May 2020 21:40:13 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-X-X-Sender: pjp@kaapi
-To: Darren Kenny <darren.kenny@oracle.com>
-Subject: Re: [PATCH v2 1/3] megasas: use unsigned type for reply_queue_head
- and check index
-In-Reply-To: <m2k11ek62b.fsf@oracle.com>
-Message-ID: <nycvar.YSQ.7.76.2005142121420.1451610@xnncv>
-References: <20200513192540.1583887-1-ppandit@redhat.com>
- <20200513192540.1583887-2-ppandit@redhat.com> <m2k11ek62b.fsf@oracle.com>
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1jZGRF-00019E-BM
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 12:10:25 -0400
+Received: from kylie.crudebyte.com ([5.189.157.229]:40387)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1jZGRE-0003dP-1R
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 12:10:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=Wdugl2i5oFNVcLwzxNnowffl27F7rDS9ksvKBJXsQgQ=; b=vC4b0pIGPco/4/q+/Qil7SOsbj
+ CsNQQe2fn0cFZ7R82IXCnBBKtz9ZgxvRZto6O46iE5sdV7M0fdw5hrMCfuzqthtZscIIkJafWdX/F
+ nki4BrBY/+tg2T3U9Vq2+PqxxzwM6+yRMaZPjdBrHzejrKYAhgxjfxbhGsuI44JnBjwEupKaleAC0
+ OJ+winktQWY8T9Edt2MHtVOCJj9UPT24kVmazpu/sBjCE4m8h43SB7E8WdJcNmAvxpDhU86Y1yKSn
+ 78v4uWjep2k/uKZRd39LaqD7vZZDU90FX9ZsNt7sp3O2U+RXzPxiAPW/i7YpJTVXr2kefe7RTv+vZ
+ oWD8eqMAA6U2VwO1y9CpaGhqAVt+6H7KcS95WnV4LXPXa5g+ylYFiO0Y2bvvngWFVszHxMKvAUbs2
+ Atqx+t8pdRJJWd2EEjeU91PaPBgnJxFu1mSpNLcPOhagw9lBMgrWRYzRdnIfGWq2PYmm4n2/MMwzY
+ FggRamSK2c3HsJoJZxiWfivcWPXTUczKcsaDNgRmzuT6hW6YPofSl6MXacwgtzJoDPaelTYdacASw
+ yQv6aABim7d/yvP/Tn845bVMH0h4efo4QrPM7CBVpGqa0xge9UwWLQA7l00FFFBiqfctLDxyNBQD4
+ HafOcxwAH9d/GAjBFDElkHobAUCsNb5mcAgA8nzEw=;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Stefano Stabellini <sstabellini@kernel.org>,
+ Anthony Perard <anthony.perard@citrix.com>, Greg Kurz <groug@kaod.org>,
+ Paul Durrant <paul@xen.org>
+Subject: Re: [PATCH 2/2] 9pfs: fix init_in_iov_from_pdu truncating size
+Date: Thu, 14 May 2020 18:10:20 +0200
+Message-ID: <2330066.V6eqdYP2KO@silver>
+In-Reply-To: <alpine.DEB.2.21.2005140846460.26167@sstabellini-ThinkPad-T480s>
+References: <cover.1589132512.git.qemu_oss@crudebyte.com>
+ <3966630.RI2PehbzW4@silver>
+ <alpine.DEB.2.21.2005140846460.26167@sstabellini-ThinkPad-T480s>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=ppandit@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 11:41:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+Received-SPF: pass client-ip=5.189.157.229;
+ envelope-from=qemu_oss@crudebyte.com; helo=kylie.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 12:10:22
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,56 +84,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, QEMU Developers <qemu-devel@nongnu.org>,
- Alexander Bulekov <alxndr@bu.edu>,
- =?ISO-8859-15?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@redhat.com>,
- Ding Ren <rding@gatech.edu>, Paolo Bonzini <pbonzini@redhat.com>,
- =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
- Hanqing Zhao <hanqing@gatech.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hello Darren,
+On Donnerstag, 14. Mai 2020 17:51:27 CEST Stefano Stabellini wrote:
+> On Thu, 14 May 2020, Christian Schoenebeck wrote:
+> > Looks like this issue will still take quite some time to be fixed with
+> > Xen. If you don't mind I'll send out a patch to revert truncation on
+> > virtio side, so that at least this bug is fixed with virtio ASAP.
+> 
+> Let me answer to this quickly so that if you want to get the patch out
+> today you can.
+> 
+> 
+> Yes, I think it is OK to revert truncation in virtio now. 
 
-+-- On Thu, 14 May 2020, Darren Kenny wrote --+
-| > Update v1 -> v2: fix OOB access when index > MEGASAS_MAX_FRAMES(=2048)
-| >  -> https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg03131.html
-| >
-| > diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
-| > -    int reply_queue_head;
-| > +    uint16_t reply_queue_head;
-| > @@ -445,7 +445,7 @@ static MegasasCmd *megasas_lookup_frame(MegasasState *s,
-| >  
-| >      index = s->reply_queue_head;
-| 
-| While it is probably unlikely that it would cause an integer underflow
-| here,
+Good
 
-Yes, integer overflow is unlikely going from uint16_t -> to -> int type.
+> Only one
+> thing: would there still be any value in doing for Xen:
+> 
+> +    if (pdu->id + 1 == P9_RREAD) {
+> +        /* size[4] Rread tag[2] count[4] data[count] */
+> +        const size_t hdr_size = 11;
+> +        /*
+> +         * If current transport buffer size is smaller than actually
+> required +         * for this Rreaddir response, then truncate the response
+> to the +         * currently available transport buffer size, however only
+> if it would +         * at least allow to return 1 payload byte to client.
+> +         */
+> +        if (buf_size < hdr_size + 1) {
+> 
+> 
+> like your patch here does? Although not a complete solution it looks
+> like it would still be a good improvement over the current situation for
+> Xen.
 
-  s->reply_queue_head = ldl_le_pci_dma(pcid, s->producer_pa);
-  s->reply_queue_head %= MEGASAS_MAX_FRAMES;
+IMO in its current form, no. It would just move the problematic from a clearly 
+visible 9pfs server termination with error, towards a silent data loss 
+(without any error) on client side. Remember: this patch does not roll back 
+the filesystem driver's read position.
 
-Also here 's->reply_queue_head' is restricted between 0...MEGASAS_MAX_FRAMES=2048
+Best regards,
+Christian Schoenebeck
 
-| -    while (num < s->fw_cmds) {
-| +    while (num < s->fw_cmds && index < MEGASAS_MAX_FRAMES) {
-
-And this patch would help keep 'index' within the same 0..MEGASAS_MAX_FRAMES 
-range.
-
-| for consistency, index probably should also be declared as unsigned, but 
-| from what I can tell it is still an 'int'.
-
-It did cross my mind, but it's generally advised to keep these fixes to 
-minimum possible changes and specific to the issue they fix. Index being a 
-local variable, changing it to an unsigned type wouldn't help much to fix the 
-issue or otherwise I think.
-
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
 
 
