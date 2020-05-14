@@ -2,93 +2,95 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5801EC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:57:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1C22C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:57:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2352E205CB
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:57:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A94DD205CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:57:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CpXsLBKn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2352E205CB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bs6cLFRk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A94DD205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZFIh-0004Yp-7g
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:57:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41568)
+	id 1jZFIo-0004mr-Ng
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:57:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41598)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZEwZ-00037F-FL
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:34:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23991
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZEwi-0003TH-Vq
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:34:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50986
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZEwY-0000qy-Hk
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:34:39 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZEwh-0000tF-QC
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:34:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589466877;
+ s=mimecast20190719; t=1589466887;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=oHcjS/gDSvJi5JV1G/ZxayYlfSvkuPGEpEPtZBkMcI0=;
- b=CpXsLBKnBX4oTIpZh8UJd31R0KVS1UjfTF/+T8vuwVBzR7QRTVXNiPrmMnS3mntmzQKvSf
- W3U4RN6jwPEe65En5wv37+jqQmgtwDer3btIRVaKae2RSO/tVbuwN3ZZe0aa9qK8K1uRZW
- 3RXfUjqPQtTYKEqX0mHrjIS9u5AeyO4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-53-dhxElA4LNpS6NCuniscG2Q-1; Thu, 14 May 2020 10:34:36 -0400
-X-MC-Unique: dhxElA4LNpS6NCuniscG2Q-1
-Received: by mail-wr1-f71.google.com with SMTP id r7so1673294wrc.13
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:34:36 -0700 (PDT)
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7wMp/XuOBwT8pOPQVaxGqTdCRCcjqyuE5pzfypPMZ2U=;
+ b=bs6cLFRkfj7Bune6ns/LgYLcaQbWav1UkdD5sWnX9x8NqKKOVpW6k++BBOucG7iENIVlSz
+ h4FIPNUKyUw0CxPQBBRe8jWv3bKyV1TtkhZRF3uS4lxNnZfwgbNBxhRZKe2QU2IXeMIk4G
+ 2NLqz6xRUTgF3HUo2YdQI5Sky44xr6E=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-506-7Yrlo0N2Mr2-1KpsFrzAgQ-1; Thu, 14 May 2020 10:34:45 -0400
+X-MC-Unique: 7Yrlo0N2Mr2-1KpsFrzAgQ-1
+Received: by mail-wr1-f69.google.com with SMTP id g10so1670132wrr.10
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:34:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=oHcjS/gDSvJi5JV1G/ZxayYlfSvkuPGEpEPtZBkMcI0=;
- b=DNXsi7FmOgBG3qVRQu8+axAxWGXYZ8XKK4WfMdKtiyzwSFiP90BXqdfg2Mhhnc5tDC
- ogSt2UDe4I1MGWfntypnIoHrl/7jMBMIgNLN110CgWocYRPQ210BIO2uBeKRBMSPqk+d
- oyuOmm1a5mcmNZHk4r41KJ5hTyICuXSHj7J7bpTF5+N5cVSA+jms3VWAjafaZfAYDkfy
- OCR3aubaD5thLvBMqd/gsXmxbEVtxdKwny8DAjPmaHYhbvli+H0+3lfLHtU2b9iSsudU
- xnfjin7uvGZkrNFpj/FI21xV4VNeWmrLLaiE6Zhx7aDx35MDlX0CqJwCRn0ZQb8Xxl7F
- WLxA==
-X-Gm-Message-State: AGi0PubuXRHozpGH4bFd+6xx600feghExbFm8qiz5hs23oBnKF2gBzqo
- eyeumGFMGNY9x5vo4JgxRmA1KLnd/ncl17+/0rBzvVPn3OxEOVLox4lsoZOlsc4rtjYOA0PZwcy
- 7nPCEJMgZ4gGCXH0=
-X-Received: by 2002:a05:600c:230e:: with SMTP id
- 14mr21660366wmo.45.1589466875048; 
- Thu, 14 May 2020 07:34:35 -0700 (PDT)
-X-Google-Smtp-Source: APiQypJ5AviXNwcgzxFDFwewltqdpAsnylScSQa3zE0apVgXT6sJqjXl8Ttuv6dmUeD36XtKuPWJcA==
-X-Received: by 2002:a05:600c:230e:: with SMTP id
- 14mr21660341wmo.45.1589466874797; 
- Thu, 14 May 2020 07:34:34 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=7wMp/XuOBwT8pOPQVaxGqTdCRCcjqyuE5pzfypPMZ2U=;
+ b=A2lNT4TyKebbm68Dese7vAr0QCLzi2uuJ3WTcPueco8O0/Pp0iv7rbt1PCI4Fr3GI3
+ FAgRjxf2EbUnJKVET6e2EV5/c5UGdNYjt7i7s5ZbokaDDqoeo1c/nzxeCO/Zsuj28IN0
+ o9AZZJ+0/Z4krDiH9x3qjZPwu3WUQ/mBMrJd6ObKb4v/5dyYEa1qtNg1npF23siq0gHf
+ fxImr6XAAKwDnfTtqHwRpp2F1+4r0PwB9D3Q007F9oIYzP/qSb8SPcypfQURfKNLuN/9
+ cgo8EUhKok0nwY2b6D/muAX9k2zUQ4db54QXKYS0J9J4W2ZBl/w0ilRLMeLQgFeOHV5a
+ fu2g==
+X-Gm-Message-State: AOAM531e+D0vqNiJh9PuLMo8Q+GevI8CkpX9D4NSFIc9JwgAMESH3wMq
+ RXU01CHSFPyO/MDGNvi1EI90GGVtGLFJV+mHRv2t2AzYoDxKS8ZXJEjFvA6oKcvriEVO7HCHz+J
+ CiLmhPqvb/0NqlVM=
+X-Received: by 2002:a5d:614b:: with SMTP id y11mr6175874wrt.77.1589466884269; 
+ Thu, 14 May 2020 07:34:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx0HLo6T+C3GXvIMYkzIEsH9/8M7eocEEV031RX83rgxNeAAkwQTaYu0mnxQVUxzzcpWtmqMg==
+X-Received: by 2002:a5d:614b:: with SMTP id y11mr6175852wrt.77.1589466884075; 
+ Thu, 14 May 2020 07:34:44 -0700 (PDT)
 Received: from x1w.redhat.com (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id y10sm4529626wrd.95.2020.05.14.07.34.33
+ by smtp.gmail.com with ESMTPSA id h1sm40860124wme.42.2020.05.14.07.34.43
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 14 May 2020 07:34:34 -0700 (PDT)
+ Thu, 14 May 2020 07:34:43 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/6] tests/fuzz: Review notes
-Date: Thu, 14 May 2020 16:34:27 +0200
-Message-Id: <20200514143433.18569-1-philmd@redhat.com>
+Subject: [PATCH 2/6] Makefile: List fuzz targets in 'make help'
+Date: Thu, 14 May 2020 16:34:29 +0200
+Message-Id: <20200514143433.18569-3-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200514143433.18569-1-philmd@redhat.com>
+References: <20200514143433.18569-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -116,62 +118,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I took some code notes while testing Alex's toy.
-Sending them as patches.
+List softmmu fuzz targets in 'make help' output:
 
-Alex, I had theses issues while building following
-docs/devel/fuzzing.txt:
-
-    CC      nbd/server.o
-  nbd/server.c:1937:1: error: unused function 'glib_listautoptr_cleanup_NBDExtentArray' [-Werror,-Wunused-function]
-  G_DEFINE_AUTOPTR_CLEANUP_FUNC(NBDExtentArray, nbd_extent_array_free);
-  ^
-  /usr/include/glib-2.0/glib/gmacros.h:462:22: note: expanded from macro 'G_DEFINE_AUTOPTR_CLEANUP_FUNC'
-    static inline void _GLIB_AUTOPTR_LIST_FUNC_NAME(TypeName) (GList **_l) { g_list_free_full (*_l, (GDestroyNotify) func); } \
-                       ^
-  /usr/include/glib-2.0/glib/gmacros.h:443:48: note: expanded from macro '_GLIB_AUTOPTR_LIST_FUNC_NAME'
-  #define _GLIB_AUTOPTR_LIST_FUNC_NAME(TypeName) glib_listautoptr_cleanup_##TypeName
-                                                 ^
-Solved by using './configure ... --extra-cflags=-Wno-unused-function'
-
-    LINK    i386-softmmu/qemu-fuzz-i386
-  /usr/lib64/clang/9.0.1/lib/linux/libclang_rt.asan-aarch64.a(asan_interceptors_vfork.S.o): warning: common of `__interception::real_vfork' overridden by definition
-  /usr/lib64/clang/9.0.1/lib/linux/libclang_rt.asan-aarch64.a(asan_interceptors.cc.o): warning: defined here
-
-I simply ignore this warning.
-
-Alex, could you provide few more examples (in particular about
-instantiating devices, or useful libfuzzer arguments)?
-
-Also, I suppose you are using a script to generate the bug reports:
-
-  I can reproduce it in qemu 5.0 using:
-
-  cat << EOF | qemu-system ...
-  outl 0xcf8 ...
-  outl 0xcfc ...
+  $ make help
   ...
-  EOF
+  Architecture specific targets:
+  aarch64-softmmu/all            - Build for aarch64-softmmu
+  aarch64-softmmu/fuzz           - Build fuzzer for aarch64-softmmu
+  alpha-softmmu/all              - Build for alpha-softmmu
+  alpha-softmmu/fuzz             - Build fuzzer for alpha-softmmu
+  arm-softmmu/all                - Build for arm-softmmu
+  arm-softmmu/fuzz               - Build fuzzer for arm-softmmu
+  ...
 
-Is this script available in the QEMU repository? I couldn't find it.
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ Makefile | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Regards,
-
-Phil.
-
-Philippe Mathieu-Daudé (6):
-  tests/fuzz/Makefile: Do not link code using unavailable devices
-  Makefile: List fuzz targets in 'make help'
-  tests/fuzz: Add missing space in test description
-  tests/fuzz: Remove unuseful/unused typedefs
-  tests/fuzz: Extract pciconfig_fuzz_qos() method
-  tests/fuzz: Extract ioport_fuzz_qtest() method
-
- Makefile                          |  6 +++-
- tests/qtest/fuzz/i440fx_fuzz.c    | 47 ++++++++++++++++++++-----------
- tests/qtest/fuzz/Makefile.include |  6 ++--
- 3 files changed, 38 insertions(+), 21 deletions(-)
-
+diff --git a/Makefile b/Makefile
+index 34275f57c9..40e4f7677b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1252,7 +1252,11 @@ endif
+ 	@$(if $(TARGET_DIRS), \
+ 		echo 'Architecture specific targets:'; \
+ 		$(foreach t, $(TARGET_DIRS), \
+-		$(call print-help-run,$(t)/all,Build for $(t));) \
++		$(call print-help-run,$(t)/all,Build for $(t)); \
++		$(if $(CONFIG_FUZZ), \
++			$(if $(findstring softmmu,$(t)), \
++				$(call print-help-run,$(t)/fuzz,Build fuzzer for $(t)); \
++		))) \
+ 		echo '')
+ 	@$(if $(TOOLS), \
+ 		echo 'Tools targets:'; \
 -- 
 2.21.3
 
