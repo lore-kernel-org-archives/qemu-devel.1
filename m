@@ -2,78 +2,79 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9136C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 10:07:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10FA8C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 10:10:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 801C62065D
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 10:07:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D027E2065D
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 10:10:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LxzWLW0m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 801C62065D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EXAHiBvI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D027E2065D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZAlu-0006Bc-Fp
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 06:07:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34696)
+	id 1jZApE-0001No-VI
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 06:10:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35194)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZAlC-00051w-S3
- for qemu-devel@nongnu.org; Thu, 14 May 2020 06:06:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31651
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jZAoY-0000aO-0N
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 06:10:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46835
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZAlB-0005YG-9R
- for qemu-devel@nongnu.org; Thu, 14 May 2020 06:06:38 -0400
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1jZAoW-00066F-AK
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 06:10:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589450795;
+ s=mimecast20190719; t=1589451002;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Zh1eourHcSUlN1PgQxstmLVVfQd5CfUjGEOn8Z+2gBc=;
- b=LxzWLW0maCUWXdZVGWM9ClWASLvXxgVxMQn1zZanEpB0pfrfYlwhI4MEfF2rJ5izhnWdzX
- E2fOP+72/e4/9RZXbA+GZEpOVeh4nlHOTrjMXV/VIBnprT6ihBobI57+7qC0TZ3Z3kYMW1
- YCG2CEFw5TXOgJdHzHLz+ehrEMjvgZo=
+ bh=woRh2SCd1YPw+IJtDcF/TfeSCpzS1Y8sZCa9gsE4sDg=;
+ b=EXAHiBvIxKiHkx8sMRmRA406rtQcoi7h1m8GNTXmeR70DYcWI45ddJmtkarLkBqohY9fmT
+ ljPIf3msnlxp4zVUHAyY94SbV36hfhTWC8oKmH+BrrludReC+uk/zvkhYvWOzNmXLk6Sat
+ e7ne50JUyIf5Ozqip21+4GJ9dUS8q9I=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-38-WKDVwSHwOpWgbZ_sqvj6Og-1; Thu, 14 May 2020 06:06:32 -0400
-X-MC-Unique: WKDVwSHwOpWgbZ_sqvj6Og-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-123-Qw2A831ZN1GTOwAj0_5Cwg-1; Thu, 14 May 2020 06:09:58 -0400
+X-MC-Unique: Qw2A831ZN1GTOwAj0_5Cwg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A9AE835B7B;
- Thu, 14 May 2020 10:06:31 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-9.ams2.redhat.com [10.36.114.9])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E6757D96D;
- Thu, 14 May 2020 10:06:25 +0000 (UTC)
-Date: Thu, 14 May 2020 12:06:23 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v10 14/14] iotests: use python logging for iotests.log()
-Message-ID: <20200514100623.GB5518@linux.fritz.box>
-References: <20200331000014.11581-1-jsnow@redhat.com>
- <20200331000014.11581-15-jsnow@redhat.com>
- <20200331134446.GF7030@linux.fritz.box>
- <1a38728b-aa4b-f3e4-c3ad-1a2b8d2e9269@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2750C107ACCD;
+ Thu, 14 May 2020 10:09:57 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.57])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 962256E712;
+ Thu, 14 May 2020 10:09:55 +0000 (UTC)
+Date: Thu, 14 May 2020 12:09:51 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Subject: Re: [RFC PATCH] hw/sparc/sun4m: Use memdev backend for main RAM
+Message-ID: <20200514120951.3588bc30@redhat.com>
+In-Reply-To: <20200510113505.10500-1-f4bug@amsat.org>
+References: <20200510113505.10500-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <1a38728b-aa4b-f3e4-c3ad-1a2b8d2e9269@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=imammedo@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -93,92 +94,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, qemu-block@nongnu.org, armbru@redhat.com,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, philmd@redhat.com
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 14.05.2020 um 08:24 hat John Snow geschrieben:
-> On 3/31/20 9:44 AM, Kevin Wolf wrote:
-> > Am 31.03.2020 um 02:00 hat John Snow geschrieben:
-> >> We can turn logging on/off globally instead of per-function.
-> >>
-> >> Remove use_log from run_job, and use python logging to turn on
-> >> diffable output when we run through a script entry point.
-> >>
-> >> iotest 245 changes output order due to buffering reasons.
-> >>
-> >>
-> >> An extended note on python logging:
-> >>
-> >> A NullHandler is added to `qemu.iotests` to stop output from being
-> >> generated if this code is used as a library without configuring logging.
-> >> A NullHandler is only needed at the root, so a duplicate handler is not
-> >> needed for `qemu.iotests.diff_io`.
-> >>
-> >> When logging is not configured, messages at the 'WARNING' levels or
-> >> above are printed with default settings. The NullHandler stops this from
-> >> occurring, which is considered good hygiene for code used as a library.
-> >>
-> >> See https://docs.python.org/3/howto/logging.html#library-config
-> >>
-> >> When logging is actually enabled (always at the behest of an explicit
-> >> call by a client script), a root logger is implicitly created at the
-> >> root, which allows messages to propagate upwards and be handled/emitted
-> >> from the root logger with default settings.
-> >>
-> >> When we want iotest logging, we attach a handler to the
-> >> qemu.iotests.diff_io logger and disable propagation to avoid possible
-> >> double-printing.
-> >>
-> >> For more information on python logging infrastructure, I highly
-> >> recommend downloading the pip package `logging_tree`, which provides
-> >> convenient visualizations of the hierarchical logging configuration
-> >> under different circumstances.
-> >>
-> >> See https://pypi.org/project/logging_tree/ for more information.
-> >>
-> >> Signed-off-by: John Snow <jsnow@redhat.com>
-> >> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> > 
-> > Should we enable logger if -d is given?
-> > 
-> > Previously we had:
-> > 
-> > $ ./check -d -T -raw 281
-> > [...]
-> > 281 not run: not suitable for this image format: raw
-> > 281      not run    [15:39:03] [15:39:04]                    not suitable for this image format: raw
-> > Not run: 281
-> > 
-> > After this series, the first line of output from notrun() is missing.
-> > Not that I think it's important to have the line, but as long as we
-> > bother to call logger.warning(), I thought that maybe we want to be able
-> > to actually see the effect of it somehwere?
-> > 
-> > Kevin
-> > 
-> 
-> Uh, okay. So this is weirder than I thought it was going to be!
-> 
-> So, if you move the debug configuration up above the _verify calls,
-> you'll see the message printed out to the debug stream:
-> 
-> DEBUG:qemu.iotests:iotests debugging messages active
-> WARNING:qemu.iotests:281 not run: not suitable for this image format: raw
-> 
-> ...but if you omit the `-d` flag, the message vanishes into a black
-> hole. Did it always work like that ...?
+On Sun, 10 May 2020 13:35:05 +0200
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
 
-Yes, this is how it used to work. It's a result of ./check only printing
-the test output with -d, and such log messages are basically just test
-output.
+> Since commit 82b911aaff3, machine_run_board_init() checks for
+> ram_memdev_id and consume it. As TYPE_SUN4M_MEMORY is no more
+> needed, replace it by the generic memdev allocated MemoryRegion
+> and remove it. This completes commit b2554752b1da7c8f.
 
-And I think it's exactly what we want: Without -d, you want only the
-summary, i.e. a single line that says "pass", "fail" or "notrun",
-potentially with a small note at the end of the line, but that's it.
+I don't get justification here.
+You are removing 'frontend' device model that has little/nothing
+to do with how backend is instantiated.
 
-Kevin
+TYPE_SUN4M_MEMORY is analog to pc-dimm, only for builtin RAM
+(not really useful but could serve as an example).
+It's fine to drop it as it doesn't accually do much
+and map memory region directly like we do elsewhere for builtin RAM
+and get rid of TYPE_SUN4M_MEMORY boiler-plate code.
+
+with such reasoning, I'd Ack it, but the final say belongs to board maintai=
+ners
+
+
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/sparc/sun4m.c | 54 ++----------------------------------------------
+>  1 file changed, 2 insertions(+), 52 deletions(-)
+>=20
+> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+> index 36ee1a0a3d..9838c5a183 100644
+> --- a/hw/sparc/sun4m.c
+> +++ b/hw/sparc/sun4m.c
+> @@ -772,50 +772,6 @@ static const TypeInfo prom_info =3D {
+>      .class_init    =3D prom_class_init,
+>  };
+> =20
+> -#define TYPE_SUN4M_MEMORY "memory"
+> -#define SUN4M_RAM(obj) OBJECT_CHECK(RamDevice, (obj), TYPE_SUN4M_MEMORY)
+> -
+> -typedef struct RamDevice {
+> -    SysBusDevice parent_obj;
+> -    HostMemoryBackend *memdev;
+> -} RamDevice;
+> -
+> -/* System RAM */
+> -static void ram_realize(DeviceState *dev, Error **errp)
+> -{
+> -    RamDevice *d =3D SUN4M_RAM(dev);
+> -    MemoryRegion *ram =3D host_memory_backend_get_memory(d->memdev);
+> -
+> -    sysbus_init_mmio(SYS_BUS_DEVICE(dev), ram);
+> -}
+> -
+> -static void ram_initfn(Object *obj)
+> -{
+> -    RamDevice *d =3D SUN4M_RAM(obj);
+> -    object_property_add_link(obj, "memdev", TYPE_MEMORY_BACKEND,
+> -                             (Object **)&d->memdev,
+> -                             object_property_allow_set_link,
+> -                             OBJ_PROP_LINK_STRONG, &error_abort);
+> -    object_property_set_description(obj, "memdev", "Set RAM backend"
+> -                                    "Valid value is ID of a hostmem back=
+end",
+> -                                     &error_abort);
+> -}
+> -
+> -static void ram_class_init(ObjectClass *klass, void *data)
+> -{
+> -    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> -
+> -    dc->realize =3D ram_realize;
+> -}
+> -
+> -static const TypeInfo ram_info =3D {
+> -    .name          =3D TYPE_SUN4M_MEMORY,
+> -    .parent        =3D TYPE_SYS_BUS_DEVICE,
+> -    .instance_size =3D sizeof(RamDevice),
+> -    .instance_init =3D ram_initfn,
+> -    .class_init    =3D ram_class_init,
+> -};
+> -
+>  static void cpu_devinit(const char *cpu_type, unsigned int id,
+>                          uint64_t prom_addr, qemu_irq **cpu_irqs)
+>  {
+> @@ -858,8 +814,6 @@ static void sun4m_hw_init(const struct sun4m_hwdef *h=
+wdef,
+>      SysBusDevice *s;
+>      unsigned int smp_cpus =3D machine->smp.cpus;
+>      unsigned int max_cpus =3D machine->smp.max_cpus;
+> -    Object *ram_memdev =3D object_resolve_path_type(machine->ram_memdev_=
+id,
+> -                                                  TYPE_MEMORY_BACKEND, N=
+ULL);
+> =20
+>      if (machine->ram_size > hwdef->max_mem) {
+>          error_report("Too much memory for this machine: %" PRId64 ","
+> @@ -876,11 +830,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef *=
+hwdef,
+>      for (i =3D smp_cpus; i < MAX_CPUS; i++)
+>          cpu_irqs[i] =3D qemu_allocate_irqs(dummy_cpu_set_irq, NULL, MAX_=
+PILS);
+> =20
+> -    /* Create and map RAM frontend */
+> -    dev =3D qdev_create(NULL, "memory");
+> -    object_property_set_link(OBJECT(dev), ram_memdev, "memdev", &error_f=
+atal);
+> -    qdev_init_nofail(dev);
+> -    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0);
+> +    /* RAM */
+> +    memory_region_add_subregion(get_system_memory(), 0, machine->ram);
+> =20
+>      /* models without ECC don't trap when missing ram is accessed */
+>      if (!hwdef->ecc_base) {
+> @@ -1575,7 +1526,6 @@ static void sun4m_register_types(void)
+>      type_register_static(&idreg_info);
+>      type_register_static(&afx_info);
+>      type_register_static(&prom_info);
+> -    type_register_static(&ram_info);
+> =20
+>      type_register_static(&ss5_type);
+>      type_register_static(&ss10_type);
 
 
