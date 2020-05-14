@@ -2,124 +2,92 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEB8CC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 05:46:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE95EC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 05:52:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9AE28206B6
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 05:46:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC46B205CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 05:52:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ILqPy757"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AE28206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Heq+IN4P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC46B205CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ6hc-0001Dw-Kt
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 01:46:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35792)
+	id 1jZ6nJ-0003C5-QK
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 01:52:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36230)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jZ6go-0000hc-HT; Thu, 14 May 2020 01:45:50 -0400
-Received: from mail-eopbgr140115.outbound.protection.outlook.com
- ([40.107.14.115]:5188 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jZ6gm-00086X-4O; Thu, 14 May 2020 01:45:49 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fpIbxdKNu9BL0jFK35R5ajP9iChLLVPjDDEF/TIC+u5QfzfGkI02KKNibErfh0jSKY4XLthXMfmdSax1aL6VcZpnVcCFCNN5xvdFmKarbRYoEveKmhFJMT59VKH9CUtFqpmSpnbtorFdgcsGhq7kk7BC09GxieU94YWNMb6T3vki7y7QwOTWk0WWBxs1x+mp1Nbm9L3WJ2y54mF8HE/nBe7IEsJUqWqYPCalX/EZHb4Y3PbU7qZjuM1yDb4IzmIQZ9dQLtQqfrxlInzPTqOgpZGzRDcDB32j21OsyH6yT7Al/Tfb9fZBjejesr+d4ZG2t8SHH5sHVJw9k3JnPL7r5g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sAZ6BYRi4lsitnsugaRtGIL3RZmzPN4rdCwcAERt/b4=;
- b=GBLBZPRhVGXD8VKvDPQP+qg8PIA9Grp8GL7qaGc199kHLPomuqae89aUD2W79nArPk504IqXa3UNff3qGq7G4QY70DWAl6Spj742xZz7Rpg6/3i9jC1MnkgzK1gWZo/FXSgMTCpiW7K3DpJKBgb56kHCIItcvfUh/C0+mOixUr5FqqUexHJIyfO/OTvb0V9wljZwr7zkx5gOzPknFJPzfS1pDspk6R1FP20Uk8mNRDdUCvIdBZrmQRuocKhU+Y7YQkeSS23ladIU+oXOvPghoya4d0+9alfN6eGR/NFrxSvSrth18+yQnCZe3r53hRLooHzVTPH87ywzNxguHhsGGw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sAZ6BYRi4lsitnsugaRtGIL3RZmzPN4rdCwcAERt/b4=;
- b=ILqPy757urLsfRsoZQXYUVl5gCG1eEgmIEXX9XKRhEh4ZRL/M/atMuDSAcqdDDku3wmyZK5U/F1Fx/L6u+v+EmQZldaUyrhDLCdmiEnM4M23nmGlWEfKIYEcYxsWB/GO07JhPqYghDzClRWGfFp5LrybB5n2Q0GszKEBVwBrLRs=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5447.eurprd08.prod.outlook.com (2603:10a6:20b:10b::18)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.34; Thu, 14 May
- 2020 05:45:44 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.3000.016; Thu, 14 May 2020
- 05:45:44 +0000
-Subject: Re: [PATCH v4 4/9] blockdev: Promote several bitmap functions to
- non-static
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200513011648.166876-1-eblake@redhat.com>
- <20200513011648.166876-5-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <4d41794a-5cb9-0333-01e2-82c8e1a69218@virtuozzo.com>
-Date: Thu, 14 May 2020 08:45:43 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-In-Reply-To: <20200513011648.166876-5-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM4PR0202CA0006.eurprd02.prod.outlook.com
- (2603:10a6:200:89::16) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jZ6mc-0002fN-S0
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 01:51:50 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35108
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jZ6mZ-0001C9-U1
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 01:51:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589435506;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=f+1fgBg8t0GFK3u6tRmd8XDnrGJZ2cvKtu1R9XwEfu4=;
+ b=Heq+IN4PBuc14f1QQ703PJXymeUh6n8d9sJSbFRXuFHReSWRH/V86gKvLFwlL5w2dp4u8o
+ Hzvf3O32yFZAqBnr6gD8tw9FZgXncUYcZmT4KI8vuud/lwxbNHeJ4aZxPhAIX5MJBJ8utO
+ ZNEcrn4AaOHRPMEdefwksAmB8PDc81w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-238-lcrhdvX4PJ2IfyfhDPUotA-1; Thu, 14 May 2020 01:51:44 -0400
+X-MC-Unique: lcrhdvX4PJ2IfyfhDPUotA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52E0380183C;
+ Thu, 14 May 2020 05:51:43 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-132.ams2.redhat.com [10.36.112.132])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 74A7E1000320;
+ Thu, 14 May 2020 05:51:29 +0000 (UTC)
+Subject: Re: [PATCH v5 08/15] acpi: move aml builder code for floppy device
+To: John Snow <jsnow@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <philmd@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20200507131640.14041-1-kraxel@redhat.com>
+ <20200507131640.14041-9-kraxel@redhat.com>
+ <2f7a76fe-9c38-1441-70cf-919dce82e4fe@redhat.com>
+ <77355745-5c13-6579-871d-4a2c02fb7049@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <466f2ed8-2379-0259-9b33-4e1d2c5ced4c@redhat.com>
+Date: Thu, 14 May 2020 07:51:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.186) by
- AM4PR0202CA0006.eurprd02.prod.outlook.com (2603:10a6:200:89::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.20 via Frontend
- Transport; Thu, 14 May 2020 05:45:44 +0000
-X-Originating-IP: [185.215.60.186]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 87674c5c-cbeb-4e8a-f596-08d7f7ca0b8a
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5447:
-X-Microsoft-Antispam-PRVS: <AM7PR08MB54470984E50B453EFC2342F6C1BC0@AM7PR08MB5447.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2201;
-X-Forefront-PRVS: 040359335D
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: RwFVmhaaIff1GqlHIuj8oUOEvqPxYJ4+8LHs///pOmD3N4P6bxl4LhWn6oikP23Y9e5tAuo8876uMIaqsFbPZeE/P3tBwTIlwj899I7jf+7o5hatnyuVQp1+FwtXfmLtPUehw7rSMB4nLkMLXxRSjoMBBYlqSA1xDH5xDORueLA5zTo3jenmNhDqnJpXr0IW47GEVhleO/0XbJkkKyMaFvGNOvnyx5Y7nnv118XxvmitwrOp4PTg54attdAhsP1Gi20/G8sXvmuwBe8rfj4wKC7jdOmqHkn2J3LlLmdXEh6T8CosookjdykN9cJymOp4VbQU2VcBhPDwSbRpa3IFDYNdEwgaV3h4wNWrLyMcmOBTpFdWqqHIW9+UGyrzrSLzW8LkbIPGDNkzCZ5KPiTzXaGjJeLmVLeBK8LedpP2NGa8+BYzkXgQ6X/bFwXXsBHvYjCWOGOjneUnlcTWCRZwMvbdZ9vEa74Abv8/GFse8Mr0rem4z4WBxvJ9KQeEKHK2
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(366004)(136003)(396003)(39840400004)(376002)(346002)(316002)(66476007)(2906002)(4326008)(2616005)(26005)(52116002)(31696002)(66946007)(478600001)(8676002)(86362001)(8936002)(5660300002)(66556008)(36756003)(16576012)(31686004)(6486002)(16526019)(956004)(4744005)(186003)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: kraGjyxr9fElfGhFh7o0WHE8PQ9M2RC/SRIrM7TBTnawlYSe/YpjNdNAh7MeTjSkyH+nHgg5dsLC21Xftvc9Oyy/FaPDLSHNA/VBb/hgaC/ovOHeogJno87BfrNQ35fbW/hUlhPcadmaj/z1ttXtKUM6Edzkb+rwT0sxHcMSczL9aQJ5ZcA0Tk6JJEMrBRxNcumtVRpQymYfe/ndks516f3urOJLuKeSFbXk6i4MMskBQsUa19xdUGh394qmVj9IA1Kz6FVJ/lz53wh8WW26jMdo3o9rEl2Ko0GuKm9/jqoXA/fuQjeYDspQaQj6UnKKJcldEJcT6V6QDJRReEod4f2j4BM2IJk8Gmvhrxe6nP+BWP5WH6yq8jrq6xAOQCAJKKecOPCsZD3khvH0sau421yhQ5oGRrBBg1wXTBntZWhDbt/i74S9NptNe2zlX/2tXy542Swib2/JVz+syCdNf1zx5VSnSJjiSyUm9/UWRL3UhFkEWQaqY8PZgHco8gf1
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 87674c5c-cbeb-4e8a-f596-08d7f7ca0b8a
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2020 05:45:44.7077 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rfEMMJl+6etJvgxi0JdUl2tVC5vbAuVP2HCYAeWJxxtVV/5mVqVu8QOl5N1MGi6LbrV3SAYT45ry3l+/nD3oSuXonEzKhbXoeNqprawW3gw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5447
-Received-SPF: pass client-ip=40.107.14.115;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR01-VE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 01:45:45
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+In-Reply-To: <77355745-5c13-6579-871d-4a2c02fb7049@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -132,27 +100,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, nsoffer@redhat.com, Markus Armbruster <armbru@redhat.com>,
- qemu-block@nongnu.org, mreitz@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-13.05.2020 04:16, Eric Blake wrote:
-> The next patch will split blockdev.c, which will require accessing
-> some previously-static functions from more than one .c file.  But part
-> of promoting a function to public is picking a naming scheme that does
-> not reek of exposing too many internals (two of the three functions
-> were named starting with 'do_').  To make future code motion easier,
-> perform the function rename and non-static promotion into its own
-> patch.
+On 13/05/2020 22.43, John Snow wrote:
 > 
-> Signed-off-by: Eric Blake<eblake@redhat.com>
-> Reviewed-by: Max Reitz<mreitz@redhat.com>
+> 
+> On 5/7/20 10:05 AM, Philippe Mathieu-Daudé wrote:
+>> +Hervé
+>>
+>> On 5/7/20 3:16 PM, Gerd Hoffmann wrote:
+>>> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+>>> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>>> ---
+>>>   hw/block/fdc.c       | 83 ++++++++++++++++++++++++++++++++++++++++++++
+> 
+> oh no...
+> 
+>>>   hw/i386/acpi-build.c | 83 --------------------------------------------
+>>>   stubs/cmos.c         |  7 ++++
+>>>   stubs/Makefile.objs  |  1 +
+>>>   4 files changed, 91 insertions(+), 83 deletions(-)
+>>>   create mode 100644 stubs/cmos.c
+>>>
+>>> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+>>> index 9628cc171ef8..40faa088b5f7 100644
+>>> --- a/hw/block/fdc.c
+>>> +++ b/hw/block/fdc.c
+>>> @@ -32,6 +32,8 @@
+>>>   #include "qapi/error.h"
+>>>   #include "qemu/error-report.h"
+>>>   #include "qemu/timer.h"
+>>> +#include "hw/i386/pc.h"
+>>
+>> I'd rather not see this target-specific header used in the generic
+>> device model... The culprit seems cmos_get_fd_drive_type(). Is the value
+>> really PC specific?
+>>
+>> Hervé, do you know if such info & RTC nvram layout is used in other arch?
+>>
+> 
+> do we need pc-only floppy code somewhere to keep the makefile pure?
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Yes, please put this into a separate file that only gets build if the
+corresponding CONFIG switches are set. That way you should also get
+along without that new stubs/cmos.c file.
 
--- 
-Best regards,
-Vladimir
+ Thomas
+
 
