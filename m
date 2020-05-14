@@ -6,80 +6,81 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E20E8C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 10:42:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FCE5C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 10:42:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC72D2053B
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 10:42:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C1AD2053B
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 10:42:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wqUfxbMD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC72D2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b3ypcRCC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C1AD2053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZBJV-0004KD-QE
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 06:42:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38662)
+	id 1jZBK2-0004xT-AG
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 06:42:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38924)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZBI4-0002ol-HF
- for qemu-devel@nongnu.org; Thu, 14 May 2020 06:40:36 -0400
-Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:40224)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZBI3-0003z7-CM
- for qemu-devel@nongnu.org; Thu, 14 May 2020 06:40:36 -0400
-Received: by mail-ot1-x334.google.com with SMTP id d26so1949149otc.7
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 03:40:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=sNtx7kYPFLyLSIjcFgDZxU900Ae2zpbYEzzzAvIigx0=;
- b=wqUfxbMDcw5Fe2ORcMnNyaBLEImntOIyWTXml2O70HxVod/k5T1xzZgRFo/pxwqyNm
- xl1XeSqyPyvkkMHWetKFQyBhRTkf7dfzgWIYtr5H9h8cXIDvg05niOVDNEDmmACeKoFU
- HN6eVHTs5I4KSmMmI80i7RY08inuXV0HDqU6es8lY5ZuSlCxaLVpnI4IhrQYzinlK2XB
- Lt0xNWsjpzOvx/e1odULwmeUJmqgqtHyWG0jLj1uelue5oYwRBmcxmhKyJssjNGf9uKg
- kCkWm4Nv3EwV4LIaRdq5Req/Z+DmhGlpIU+3ZeOEH1qCAfILeWCE8t++DS7OgqHahUL6
- P2yQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=sNtx7kYPFLyLSIjcFgDZxU900Ae2zpbYEzzzAvIigx0=;
- b=sPwst809kes++NpaK8VyWJvFkObgnPark1022Kz4eIO6xwXJR8Dp2QRhJ3XqnMpci6
- ebXWT6OArY/aBD/4JTkh7j/BEuymPwBUaWzpbN3gewnWYqQjxiEeJIheIH0gc5W58YX8
- NyEU/kA4f81j3iYuX5wXLjkFKpe4Y5GbBvVP5UI42DwWX48XDxgvMiKhDBqbtbTxoKCZ
- aO4Gs+k+JxwaBWTCNuMsrLfMrgWRByzctv08VEcIjfmVcKptB9yLLpTUAyzj1kCazDck
- mQ4un310Gsykfisyj7x9+t/2Wg/Yggbs9/voubxlAVSmT/QVM9irm/rS2Tp6GsH7o10w
- 2D/A==
-X-Gm-Message-State: AOAM5336/Lfgj+wzR/MuGLF7zJ9gJ4dTht3kBn2X1TcZQV/RQhoXs+zu
- Va/KPBilHQnhf6s5AlgKj6uiOts9/lhO/0uYthxImg==
-X-Google-Smtp-Source: ABdhPJxtNkn7o0CdN3yxAfNx5Z+Sq7gydlWFNZ1gq0MerzrEqgv87ToqJvJKcNQaqczwNAOZs4JqIl/bXBg5AXeChiw=
-X-Received: by 2002:a9d:398b:: with SMTP id y11mr3019836otb.135.1589452834197; 
- Thu, 14 May 2020 03:40:34 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZBIo-0003tu-9R
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 06:41:22 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33669
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZBIl-0004UN-PA
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 06:41:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589452877;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=yyFhILTqNfLhJllHfzm6x/MBmO7/BIsAKVopUr5QcEc=;
+ b=b3ypcRCC/sfNupOLbyqmATAnR8mnawRmiigcvKj8mJqWJ40NzLvYHZ8iY29rS/fazeBI0L
+ UcxJuKhWaInvw4GFvV7DvxzNkexMIac1GG2+YrUtavtSRzas7bOUVgRyU1kFEz0mJe2Pau
+ HF2Z2vJ+flYY7Kiem4En1vnnis+kPYA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-438-jO6a9zd0P1u6ckovCSZSDw-1; Thu, 14 May 2020 06:41:15 -0400
+X-MC-Unique: jO6a9zd0P1u6ckovCSZSDw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9D00461;
+ Thu, 14 May 2020 10:41:14 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-9.ams2.redhat.com [10.36.114.9])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BCDAA1000320;
+ Thu, 14 May 2020 10:41:06 +0000 (UTC)
+Date: Thu, 14 May 2020 12:41:05 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Lukas Straub <lukasstraub2@web.de>
+Subject: Re: [PATCH 0/5] Introduce 'yank' oob qmp command to recover from
+ hanging qemu
+Message-ID: <20200514104105.GC5518@linux.fritz.box>
+References: <cover.1589193717.git.lukasstraub2@web.de>
+ <20200513211235.4d0711d1@luklap>
 MIME-Version: 1.0
-References: <20200513215211.17341-1-jsnow@redhat.com>
-In-Reply-To: <20200513215211.17341-1-jsnow@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 May 2020 11:40:23 +0100
-Message-ID: <CAFEAcA_8oE2qoDrRgTw72=u+4H1DEu0LJ+cnkVaBgjM7bkkcUQ@mail.gmail.com>
-Subject: Re: [PATCH v2] configure: prefer sphinx-build to sphinx-build-3
-To: John Snow <jsnow@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::334;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x334.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20200513211235.4d0711d1@luklap>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="Q68bSM7Ycu6FN28Q"
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,67 +93,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 13 May 2020 at 22:52, John Snow <jsnow@redhat.com> wrote:
+--Q68bSM7Ycu6FN28Q
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> +# We require the python3 version of sphinx, but sphinx-build-3 is a
-> +# distro package. prefer 'sphinx-build' to find the venv version, if
-> +# any, but ensure it is a suitable version.
->  sphinx_build=
-> -for binary in sphinx-build-3 sphinx-build
-> +sphinx_ok=
-> +for binary in sphinx-build sphinx-build-3
->  do
->      if has "$binary"
->      then
-> -        sphinx_build=$(command -v "$binary")
-> -        break
-> +        sphinx_candidate=$(command -v "$binary")
-> +        if test_sphinx_build "$sphinx_candidate"
-> +        then
-> +            sphinx_build=$sphinx_candidate
-> +            sphinx_ok=yes
-> +            break
-> +        fi
->      fi
->  done
+Am 13.05.2020 um 21:12 hat Lukas Straub geschrieben:
+> Terminology:
+> instance =3D one (nbd) blockdev/one chardev/the single migrationstate
+> connection =3D one TCP connection
+>=20
+> Hello Everyone,
+> Having read all the comments, here is proposal v2:
 
-Here we look for a sphinx binary that works, and if
-we find one then we set sphinx_build to that binary and
-set sphinx_ok to 'yes'.
+Looks quite good to me.
 
-But then (in the part of configure between these two patch hunks)
-if the user uses the command line --sphinx-build=foo option we
-will reset sphinx_build but don't reset sphinx_ok...
+> Every instance registers itself with a unique name in the form
+> "blockdev:<node-name>", "chardev:<chardev-name>" and "migration" using
+> yank_register_instance which will do some sanity checks like checking
+> if the same name exists already. Then (multiple) yank functions can be
+> registered as needed with that single name. When the instance exits/is
+> removed, it unregisters all yank functions and unregisters it's name
+> with yank_unregister_instance which will check if all yank functions
+> where unregistered.
 
->  # Check if tools are available to build documentation.
->  if test "$docs" != "no" ; then
-> -  if has_sphinx_build; then
-> -    sphinx_ok=yes
-> -  else
-> -    sphinx_ok=no
-> +
-> +  if [ "$sphinx_ok" != "yes" ]; then
-> +    if test_sphinx_build "$sphinx_build"; then
-> +      sphinx_ok=yes
-> +    else
-> +      sphinx_ok=no
-> +    fi
->    fi
+Feels like nitpicking, but you say that functions are registered with a
+name that you have previously registered. If you mean literally passing
+a string, could this lead to callers forgetting to register it first?
 
-...which means we'll skip this check entirely and won't
-test to see whether the user-specified sphinx-build binary works.
+Maybe yank_register_instance() should return something like a
+YankInstance object that must be passed to yank_register_function().
+Then you would probably also have a list of all functions registered for
+a single instance so that yank_unregister_instance() could automatically
+remove all of them instead of requiring the instance to do so.
 
-> +
->    if has makeinfo && has pod2man && test "$sphinx_ok" = "yes"; then
->      docs=yes
->    else
+> Every instance that supports the yank feature will register itself and
+> the yank functions unconditionally (No extra 'yank' option per
+> instance).
+> The 'query-yank' oob qmp command lists the names of all registered
+> instances.
+> The 'yank' oob qmp command takes a list of names and for every name
+> calls all yank functions registered with that name. Before doing
+> anything, it will check that all names exist.
+>=20
+> If the instance has multiple connections (say, migration with
+> multifd), i don't think it makes much sense to just shutdown one
+> connection. Calling 'yank' on a instance will always shutdown all
+> connections of that instance.
 
-thanks
--- PMM
+I think it depends. If shutting down one connection basically kills the
+functionality of the whole instance, there is no reason not to kill all
+connections. But if the instance could continue working on the second
+connection, maybe it shouldn't be killed.
+
+Anyway, we can extend things as needed later. I already mentioned
+elsewhere in this thread that block node-names have a restricted set of
+allowed character, so having a suffix to distinguish multiple yankable
+things is possible. I just checked chardev and it also restricts the
+allowed set of characters, so the same applies. 'migration' is only a
+fixed string, so it's trivially extensible.
+
+So we know a path forward if we ever need to yank individual
+connections, which is good enough for me.
+
+> Yank functions are generic and in no way limited to connections. Say,
+> if migration is started to an 'exec:' address, migration could
+> register a yank function to kill that external command on yank (Won't
+> be implemented yet though).
+
+Yes, this makes sense as a potential future use case.
+
+Kevin
+
+--Q68bSM7Ycu6FN28Q
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEE3D3rFZqa+V09dFb+fwmycsiPL9YFAl69IEEACgkQfwmycsiP
+L9Y0Xw/+JoK/scMwhlZ99A26X5iAm6R1UTwayN5qHLRlEkcLY0iCpQ1TmHtptbeV
+63PoSYiRB/G8nrRoVHwX66ButG/Pi2la7JZFK1Lvs7GQDZO89z7tVk+XUpgyiEaM
+cYAV4BYHT9fF7wqQys8ekliTsPSJspfz6Dh6y+yKeCtQl4rDOxpmuNcUgQgVKLHm
+UD2n6B7ZosdOWcaIaPn5SlfxT4tadqja8mPKOw2l/g9N3v4X3x47+XPvdhBxzhV5
+MYFWGYb2HOWbNEz4ZS+JbZ9lIOojnvmrRYUw0+L7/vBoMSmzwd2uMHJwS4c3MMUF
+DyMhz9sT83M2NLGgQHzAXgLedKc6R7uozXniv+kVQoOAYh3lnsMJzHIAvvcS7tQC
+puIJtvzfnQ/5QZUA1hPKRrNhQemDErbR41bJQHIgtOAejx4RfwrZ21Mx66Tnudi2
+HFRmoPvETyuxS4llcpMXAQqDlpTJBbrLN9aFWA2dozVtKy8dkwxS3+dEHqdgCtfS
+yU+U6I1wVItTZ4w609GKrbAtI921NmtLd191ZiEH9UI5ya35XQELYyqowOJUFAl8
+Vn6ioLchGrr05LXa1VXsKgggbuZ84HNvch59dJa7sozwf80faXeJJ0fdr4VJgIDP
+2hOszhhGYHo/8IjH/g36neoMFHKf570o3q2uKbuBUshiBjCDiq0=
+=kE26
+-----END PGP SIGNATURE-----
+
+--Q68bSM7Ycu6FN28Q--
+
 
