@@ -2,87 +2,88 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9B8CC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 21:20:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BEC5C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 21:29:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D2042065D
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 21:20:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5D3F62065D
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 21:29:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SxIqcNXL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D2042065D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O7vsK8Iw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D3F62065D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZLH0-0006uD-Qe
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 17:20:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48416)
+	id 1jZLQ0-0005W4-FA
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 17:29:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49138)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jZLGO-0006QS-GE
- for qemu-devel@nongnu.org; Thu, 14 May 2020 17:19:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42580
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jZLGM-0002Kz-9Z
- for qemu-devel@nongnu.org; Thu, 14 May 2020 17:19:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589491168;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BGM05Y78Z30fISXdPMoMuScYcVlzUPIQT3qO3FOQRCk=;
- b=SxIqcNXLkhN0gPOXJFrsX0YRk3XFsRkJ40MQ4U2rE16pfLOLw3c/PWqdPnCxwN+PRPwirC
- 3rMGmHjW0oXp/TlPxjlLa82WuNpF6HwV0fKTAfz1Vp4Jp6jqxFYeJmhcczyzBrF7AUNR6W
- 3mZ7v4G8iBqcoTXDr5HwDH7nPss31wU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-487-_FKCZ3TvO_eGGFDgHso61w-1; Thu, 14 May 2020 17:19:24 -0400
-X-MC-Unique: _FKCZ3TvO_eGGFDgHso61w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 917791005512;
- Thu, 14 May 2020 21:19:23 +0000 (UTC)
-Received: from [10.3.116.145] (ovpn-116-145.phx2.redhat.com [10.3.116.145])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D73575D714;
- Thu, 14 May 2020 21:19:22 +0000 (UTC)
-Subject: Re: [PATCH v3 1/1] qemu_img: add cvtnum_full to print error reports
-To: Eyal Moscovici <eyal.moscovici@oracle.com>
-References: <20200513133629.18508-1-eyal.moscovici@oracle.com>
- <20200513133629.18508-2-eyal.moscovici@oracle.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <facc883f-08b7-1b7e-bf9b-0b582b734eaf@redhat.com>
-Date: Thu, 14 May 2020 16:19:20 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jZLPA-0003zz-Nz
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 17:28:36 -0400
+Received: from mail-pg1-x52f.google.com ([2607:f8b0:4864:20::52f]:39484)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jZLP9-0004bI-QK
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 17:28:36 -0400
+Received: by mail-pg1-x52f.google.com with SMTP id u35so1823332pgk.6
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 14:28:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=4hK64SaAIyCA4e+qcZ4V/7FFwWXibh8/hVGB6NZ+ilU=;
+ b=O7vsK8IwJyp3bYGkcGCOd8AgYpVxk5fQJvE7VvjPpyqRH7rhWA1u+hJOPF6S6h95DL
+ vrkMX7Wg64Bdo3mvASFBSyfTQ1V8HrQUYjIO42ge1+1Y7j+uxnF78oiyS4b5wf8Nfzbn
+ hkyPHEwz1yRTmY3ZjfBK2H2Brgiu98ya32+Wkk8lFrEOamwIYxou2fIOXTLvNa9a1ysn
+ rZbr9mpKOBLhpx9Ub4wlKLj1KVJS3jBpAPHx/JmvngSDOYntFFsYYujiNqNw4rIDazii
+ /d1CuJmInAU/QN62y4CiPtjJXqE3zxNFV+Ja02VFhGaaJztWKmwj9BQAxGHuyGVb6G8E
+ 9GUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=4hK64SaAIyCA4e+qcZ4V/7FFwWXibh8/hVGB6NZ+ilU=;
+ b=dIlnRyB+6GAjLN9OmsBHKRJFdkguFiCvU4yGsAsGRYviSrxwr/96+CYVnKkOudgVZf
+ aAoPX5MEIeHe6lixhQnL3/fXnokq3SynnYhWRkabDSQ914ErSex/3uNbtvPPan0x1him
+ +Nctr3x8SDxPrmoVm4qRScLwhkXU8PCyxGt5ZftSuWcJmjxjgT3SFCej7PwUJg9wUsBJ
+ Cm3KIOqgkkwHGMUUCftk6IH7KWqJkK0DyFw5HU6FFah7s1OWGq979W2UDQAaRpoqb/O4
+ tjV1ZF+z6pDZ3XzbCU9JTCsRkgKMJPaAzTNdRxEH0DALmBALJUFWY5M/T596YWLr6pbz
+ z36Q==
+X-Gm-Message-State: AOAM530gw6NLpxMIgwL/R/+Z92LwSWfC2HBYY7kIe1gXIQn8dmArexvo
+ jMstBqxVhn6GV4XjBg2EJlYys14dm3c=
+X-Google-Smtp-Source: ABdhPJwTKClaIcG/IG/Bm+I8ijUW4kX+1GPTTc8skFwKk0TwNONyIBIummZ4V8UH3dMvkDRNiaT0sA==
+X-Received: by 2002:a62:3644:: with SMTP id d65mr537458pfa.186.1589491713374; 
+ Thu, 14 May 2020 14:28:33 -0700 (PDT)
+Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
+ [174.21.143.238])
+ by smtp.gmail.com with ESMTPSA id i7sm4986pjj.33.2020.05.14.14.28.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 14 May 2020 14:28:32 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/6] target/arm: Convert crypto to gvec
+Date: Thu, 14 May 2020 14:28:25 -0700
+Message-Id: <20200514212831.31248-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200513133629.18508-2-eyal.moscovici@oracle.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 11:35:35
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52f;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x52f.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,78 +97,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, liran.alon@oracle.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/13/20 8:36 AM, Eyal Moscovici wrote:
-> All calls to cvtnum check the return value and print the same error message more
-> or less. And so error reporting moved to cvtnum_full to reduce code
-> duplication and provide a single error message. Additionally, cvtnum now wraps
-> cvtnum_full with the existing default range of 0 to MAX_INT64.
-> 
-> Acked-by: Mark Kanda <mark.kanda@oracle.com>
-> Signed-off-by: Eyal Moscovici <eyal.moscovici@oracle.com>
-> ---
+In addition, this fixes the missing tail clearing for SVE.
 
-> -static int64_t cvtnum(const char *s)
-> +static int64_t cvtnum_full(const char *name, const char *value, int64_t min,
-> +                           int64_t max)
->   {
->       int err;
-> -    uint64_t value;
-> -
-> -    err = qemu_strtosz(s, NULL, &value);
-> -    if (err < 0) {
-> +    uint64_t res;
-> +
-> +    err = qemu_strtosz(value, NULL, &res);
-> +    if (err < 0 && err != -ERANGE) {
-> +        error_report("Invalid %s specified. You may use "
-> +                     "k, M, G, T, P or E suffixes for ", name);
-> +        error_report("kilobytes, megabytes, gigabytes, terabytes, "
-> +                     "petabytes and exabytes.");
+The sha1, sha256, sm3 routines that are not fully generalized
+are not used by sve -- it only supports the newer algorithms.
 
-Consecutive error_report() calls each output a newline, which means your 
-new output includes a trailing space.
+I'm not sure that this:
 
-> @@ -572,16 +584,8 @@ static int img_create(int argc, char **argv)
->       if (optind < argc) {
->           int64_t sval;
->   
-> -        sval = cvtnum(argv[optind++]);
-> +        sval = cvtnum("image size", argv[optind++]);
->           if (sval < 0) {
-> -            if (sval == -ERANGE) {
-> -                error_report("Image size must be less than 8 EiB!");
-> -            } else {
-> -                error_report("Invalid image size specified! You may use k, M, "
-> -                      "G, T, P or E suffixes for ");
-> -                error_report("kilobytes, megabytes, gigabytes, terabytes, "
-> -                             "petabytes and exabytes.");
-> -            }
+Based-on: <20200508151055.5832-1-richard.henderson@linaro.org>
+("tcg vector rotate operations")
 
-True, that's what some of the old code was doing, but...
+will be sufficient for patchew, because it also relies on
+today's target-arm.next merge to master.  But you get the idea.
 
-> +++ b/tests/qemu-iotests/049.out
 
->   
->   qemu-img create -f qcow2 TEST_DIR/t.qcow2 -- 1kilobyte
-> -qemu-img: Invalid image size specified! You may use k, M, G, T, P or E suffixes for
-> +qemu-img: Invalid image size specified. You may use k, M, G, T, P or E suffixes for
+r~
 
-where it gets hairy is that our iotests _intentionally_ strip trailing 
-space before comparing to expected output, because it is such a pain to 
-commit files with trailing spaces into the repository.  We're better off 
-making the expected output precisely match what qemu-img actually 
-outputs, which means using this as an opportunity to fix qemu-img to not 
-output trailing space in the first place.
+
+Richard Henderson (6):
+  target/arm: Convert aes and sm4 to gvec helpers
+  target/arm: Convert rax1 to gvec helpers
+  target/arm: Convert sha512 and sm3 to gvec helpers
+  target/arm: Convert sha1 and sha256 to gvec helpers
+  target/arm: Split helper_crypto_sha1_3reg
+  target/arm: Split helper_crypto_sm3tt
+
+ target/arm/helper.h             |  45 ++++--
+ target/arm/translate-a64.h      |   3 +
+ target/arm/vec_internal.h       |  33 ++++
+ target/arm/neon-dp.decode       |  18 ++-
+ target/arm/crypto_helper.c      | 267 +++++++++++++++++++++++---------
+ target/arm/translate-a64.c      | 198 ++++++++++-------------
+ target/arm/translate-neon.inc.c | 172 ++++----------------
+ target/arm/translate.c          |  51 +++---
+ target/arm/vec_helper.c         |  12 +-
+ 9 files changed, 403 insertions(+), 396 deletions(-)
+ create mode 100644 target/arm/vec_internal.h
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.20.1
 
 
