@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5D36C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:43:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C05EDC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:45:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC1D5205CB
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:43:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7859D20727
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:45:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Gr+CpkfD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC1D5205CB
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HOmT8Ard"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7859D20727
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZF5P-0001gM-Sz
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:43:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39656)
+	id 1jZF6e-0003A7-IB
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:45:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39650)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZEkg-0003bG-OF
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:22 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:37162)
+ id 1jZEkf-0003ZC-R6
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:21 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51900)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZEkf-0005zS-Iq
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:22 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id l17so4380197wrr.4
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:22:21 -0700 (PDT)
+ id 1jZEka-0005ys-SK
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:21 -0400
+Received: by mail-wm1-x343.google.com with SMTP id f134so18445724wmf.1
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:22:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=TdPpeoTHitQZeq3EKviTzp7kPEV6WJt0TBSu0NetBw4=;
- b=Gr+CpkfD2e7+KLhQ72I+nJ2a+DxVPC3py2Kg2W6OSq1tPWV5VOmp/nfADHWbLX1EHI
- UD+DMOb4tbHOrLj4H3O4AYLFV+UqgvlceitFlOw84YtQoCiSReMnrVrJiCUdKk8PA8EF
- cOFsXCNAmgC3zYiGu3c6WcA3d9G50t29abXA0ShFxgn8FSXFwNijSfkmI2yqSLJ3J/d7
- oM7i+NWTjy+PoN2kQEYMVxYbWykJurauWPasIMu7Wyva9wrfieykN54HSIPynYC/Ycbo
- ZIkt4ttGsdqAnnzFLRHmhjBW0IzdzUDZ+4Mc3oCkHi8MSsdUgqZKs5loJXPmN7/F5iL9
- v2jg==
+ bh=wEzsimw+4xExhwElEjk0WOJqUoP/6/R+dEWYuhotYv4=;
+ b=HOmT8ArdBlpw4lyG2cCzveiE9FAOQvfgdZx3G+kqQIvxL5nEkN9WkorymArLJttoCz
+ maZEBSwQQ3/JOYFeKG5NcBYiNR9IdLwlb2ybYZ7kT0/fWHPxRXYYZj95PRDOnL8fYHON
+ vesO9WkbbIiy0nUmG9uZLc8PF54EaxCQUJx+SpCTu7w743LLMzIso71NIqB9GD2kfkwj
+ T0abYMZssRt+fmnPc0fPCBIS6zShNqXHI643w6hWiJVIxykXEQKlyvTHEPaq77prXTve
+ qkuBNUKFYQiT0cM0s9His/aFQJQIUc4AxvTw7fenK2GEj7DpFrdFhrp4jOLW4xu8JsUa
+ xsiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=TdPpeoTHitQZeq3EKviTzp7kPEV6WJt0TBSu0NetBw4=;
- b=Um/JKmG9vIgSyCTHW96j+HSimz81mkZ8Cg4HoKl7yW5LVbyQj6xww7BvACvJeb0MDD
- pZHuubrCwY7Mjp9lwJBPWLnBbbErd+Q/9X8Q0tT453G9ppbS67witA4WsajBYr7ne45z
- nqIASp/a4NZH1+KCdqwAbn9RfSTPlxUWZz6jRfvloTJXWIjf0+92ZvxUeh2iI/VzWV1p
- TKYmMkKVApeu7yXlaRJZp66nCYu5HVb2RdriIXBKHSAWy5K7ogGc29BNW+plx0ZEXTnw
- rPwYR1jzkkbC4hd9OytC16EXStJC1pY58BOk9fSj921gIUF6shUtujDEFd9styprmB6s
- M7Dg==
-X-Gm-Message-State: AOAM532XTMYmBiohTAmk9Bu/FciUcAiP5Va8znMvHRmtS3xtxf1ACzVX
- TCe45mDc6XcQ1Wde4Iy62w8PTa+wgx6AOw==
-X-Google-Smtp-Source: ABdhPJzkeRE9ItIc1aeuD3Cb4LpMWW21itq7NVXDn4MYTVpVX6M49xKkcUHSHxN7s9NobU0lZELYJQ==
-X-Received: by 2002:a5d:53c7:: with SMTP id a7mr6012754wrw.334.1589466139837; 
- Thu, 14 May 2020 07:22:19 -0700 (PDT)
+ bh=wEzsimw+4xExhwElEjk0WOJqUoP/6/R+dEWYuhotYv4=;
+ b=Bp1RJeoqJ4jlESIWGyjfPhjjv0aoAlA+Rly13oT2wLUVXCH8AtRuLiksCgqUHkZs5C
+ wo+ywVqu255aHSKLTAUhwVPLdWaDw9P4rAPGDpWs8oz3ms8nIxiODWIEAN6tVbLl8O3+
+ roiRbww6vaZEDs0Jb8BsxO6WliDizmnTU0k1R4i5oTMa4GlhwyJOF6A5xqw/+UuoLcL1
+ j4EoTasbXhWPBp0UuGAQVpbvo1r2x+GGFmB7broMMZYlWgogQJFcDUsGdBHEvDba2in0
+ qDSpl2VvlTm0D2QjRccbPXFu9L1xIQYpCACx5DeP54ts8UWb+VXyyFnFUC5pQ0Rm/Bla
+ KEOQ==
+X-Gm-Message-State: AGi0PuYBhMjBS3z2O7hx8fQ7CkUjdd4N7CVBvO/WXowlTIZ+XLjtqVGk
+ TfGSXuMeJkUCdHgTEaU4DqkLNv6ylowKww==
+X-Google-Smtp-Source: APiQypJgTGX0dGzLBWst9exyOfiin/m4fn8NCP4bbFfJ6guBXYZZZSrnlXl4jWk7D7Z/AxnOVmX7Hw==
+X-Received: by 2002:a1c:a3c1:: with SMTP id m184mr32058367wme.91.1589466134542; 
+ Thu, 14 May 2020 07:22:14 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 88sm4077443wrq.77.2020.05.14.07.22.18
+ by smtp.gmail.com with ESMTPSA id 88sm4077443wrq.77.2020.05.14.07.22.13
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 14 May 2020 07:22:19 -0700 (PDT)
+ Thu, 14 May 2020 07:22:13 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 30/45] target/arm: Convert Neon 3-reg-same SHA to decodetree
-Date: Thu, 14 May 2020 15:21:23 +0100
-Message-Id: <20200514142138.20875-31-peter.maydell@linaro.org>
+Subject: [PULL 26/45] ACPI: Record Generic Error Status Block(GESB) table
+Date: Thu, 14 May 2020 15:21:19 +0100
+Message-Id: <20200514142138.20875-27-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200514142138.20875-1-peter.maydell@linaro.org>
 References: <20200514142138.20875-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42c.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,255 +104,289 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the Neon SHA instructions in the 3-reg-same group
-to decodetree.
+From: Dongjiu Geng <gengdongjiu@huawei.com>
 
+kvm_arch_on_sigbus_vcpu() error injection uses source_id as
+index in etc/hardware_errors to find out Error Status Data
+Block entry corresponding to error source. So supported source_id
+values should be assigned here and not be changed afterwards to
+make sure that guest will write error into expected Error Status
+Data Block.
+
+Before QEMU writes a new error to ACPI table, it will check whether
+previous error has been acknowledged. If not acknowledged, the new
+errors will be ignored and not be recorded. For the errors section
+type, QEMU simulate it to memory section error.
+
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Message-id: 20200512030609.19593-9-gengdongjiu@huawei.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200512163904.10918-3-peter.maydell@linaro.org
 ---
- target/arm/neon-dp.decode       |  10 +++
- target/arm/translate-neon.inc.c | 139 ++++++++++++++++++++++++++++++++
- target/arm/translate.c          |  46 +----------
- 3 files changed, 151 insertions(+), 44 deletions(-)
+ include/hw/acpi/ghes.h |   1 +
+ hw/acpi/ghes.c         | 219 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 220 insertions(+)
 
-diff --git a/target/arm/neon-dp.decode b/target/arm/neon-dp.decode
-index 82503c582ef..72eae12b265 100644
---- a/target/arm/neon-dp.decode
-+++ b/target/arm/neon-dp.decode
-@@ -99,4 +99,14 @@ VMUL_3s          1111 001 0 0 . .. .... .... 1001 . . . 1 .... @3same
- VMUL_p_3s        1111 001 1 0 . .. .... .... 1001 . . . 1 .... @3same
+diff --git a/include/hw/acpi/ghes.h b/include/hw/acpi/ghes.h
+index a3420fc9be8..4ad025e09ae 100644
+--- a/include/hw/acpi/ghes.h
++++ b/include/hw/acpi/ghes.h
+@@ -70,4 +70,5 @@ void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker);
+ void acpi_build_hest(GArray *table_data, BIOSLinker *linker);
+ void acpi_ghes_add_fw_cfg(AcpiGhesState *vms, FWCfgState *s,
+                           GArray *hardware_errors);
++int acpi_ghes_record_errors(uint8_t notify, uint64_t error_physical_addr);
+ #endif
+diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
+index e74af23c366..b363bc331d0 100644
+--- a/hw/acpi/ghes.c
++++ b/hw/acpi/ghes.c
+@@ -26,6 +26,7 @@
+ #include "qemu/error-report.h"
+ #include "hw/acpi/generic_event_device.h"
+ #include "hw/nvram/fw_cfg.h"
++#include "qemu/uuid.h"
  
- VQRDMLAH_3s      1111 001 1 0 . .. .... .... 1011 ... 1 .... @3same
-+
-+SHA1_3s          1111 001 0 0 . optype:2 .... .... 1100 . 1 . 0 .... \
-+                 vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+SHA256H_3s       1111 001 1 0 . 00 .... .... 1100 . 1 . 0 .... \
-+                 vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+SHA256H2_3s      1111 001 1 0 . 01 .... .... 1100 . 1 . 0 .... \
-+                 vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+SHA256SU1_3s     1111 001 1 0 . 10 .... .... 1100 . 1 . 0 .... \
-+                 vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+
- VQRDMLSH_3s      1111 001 1 0 . .. .... .... 1100 ... 1 .... @3same
-diff --git a/target/arm/translate-neon.inc.c b/target/arm/translate-neon.inc.c
-index 661b5fc4cf2..03b3337e460 100644
---- a/target/arm/translate-neon.inc.c
-+++ b/target/arm/translate-neon.inc.c
-@@ -686,3 +686,142 @@ static bool trans_VMUL_p_3s(DisasContext *s, arg_3same *a)
+ #define ACPI_GHES_ERRORS_FW_CFG_FILE        "etc/hardware_errors"
+ #define ACPI_GHES_DATA_ADDR_FW_CFG_FILE     "etc/hardware_errors_addr"
+@@ -42,6 +43,36 @@
+ /* Address offset in Generic Address Structure(GAS) */
+ #define GAS_ADDR_OFFSET 4
  
- DO_VQRDMLAH(VQRDMLAH, gen_gvec_sqrdmlah_qc)
- DO_VQRDMLAH(VQRDMLSH, gen_gvec_sqrdmlsh_qc)
++/*
++ * The total size of Generic Error Data Entry
++ * ACPI 6.1/6.2: 18.3.2.7.1 Generic Error Data,
++ * Table 18-343 Generic Error Data Entry
++ */
++#define ACPI_GHES_DATA_LENGTH               72
 +
-+static bool trans_SHA1_3s(DisasContext *s, arg_SHA1_3s *a)
-+{
-+    TCGv_ptr ptr1, ptr2, ptr3;
-+    TCGv_i32 tmp;
++/* The memory section CPER size, UEFI 2.6: N.2.5 Memory Error Section */
++#define ACPI_GHES_MEM_CPER_LENGTH           80
 +
-+    if (!arm_dc_feature(s, ARM_FEATURE_NEON) ||
-+        !dc_isar_feature(aa32_sha1, s)) {
-+        return false;
-+    }
++/* Masks for block_status flags */
++#define ACPI_GEBS_UNCORRECTABLE         1
 +
-+    /* UNDEF accesses to D16-D31 if they don't exist. */
-+    if (!dc_isar_feature(aa32_simd_r32, s) &&
-+        ((a->vd | a->vn | a->vm) & 0x10)) {
-+        return false;
-+    }
++/*
++ * Total size for Generic Error Status Block except Generic Error Data Entries
++ * ACPI 6.2: 18.3.2.7.1 Generic Error Data,
++ * Table 18-380 Generic Error Status Block
++ */
++#define ACPI_GHES_GESB_SIZE                 20
 +
-+    if ((a->vn | a->vm | a->vd) & 1) {
-+        return false;
-+    }
++/*
++ * Values for error_severity field
++ */
++enum AcpiGenericErrorSeverity {
++    ACPI_CPER_SEV_RECOVERABLE = 0,
++    ACPI_CPER_SEV_FATAL = 1,
++    ACPI_CPER_SEV_CORRECTED = 2,
++    ACPI_CPER_SEV_NONE = 3,
++};
 +
-+    if (!vfp_access_check(s)) {
-+        return true;
-+    }
-+
-+    ptr1 = vfp_reg_ptr(true, a->vd);
-+    ptr2 = vfp_reg_ptr(true, a->vn);
-+    ptr3 = vfp_reg_ptr(true, a->vm);
-+    tmp = tcg_const_i32(a->optype);
-+    gen_helper_crypto_sha1_3reg(ptr1, ptr2, ptr3, tmp);
-+    tcg_temp_free_i32(tmp);
-+    tcg_temp_free_ptr(ptr1);
-+    tcg_temp_free_ptr(ptr2);
-+    tcg_temp_free_ptr(ptr3);
-+
-+    return true;
-+}
-+
-+static bool trans_SHA256H_3s(DisasContext *s, arg_SHA256H_3s *a)
-+{
-+    TCGv_ptr ptr1, ptr2, ptr3;
-+
-+    if (!arm_dc_feature(s, ARM_FEATURE_NEON) ||
-+        !dc_isar_feature(aa32_sha2, s)) {
-+        return false;
-+    }
-+
-+    /* UNDEF accesses to D16-D31 if they don't exist. */
-+    if (!dc_isar_feature(aa32_simd_r32, s) &&
-+        ((a->vd | a->vn | a->vm) & 0x10)) {
-+        return false;
-+    }
-+
-+    if ((a->vn | a->vm | a->vd) & 1) {
-+        return false;
-+    }
-+
-+    if (!vfp_access_check(s)) {
-+        return true;
-+    }
-+
-+    ptr1 = vfp_reg_ptr(true, a->vd);
-+    ptr2 = vfp_reg_ptr(true, a->vn);
-+    ptr3 = vfp_reg_ptr(true, a->vm);
-+    gen_helper_crypto_sha256h(ptr1, ptr2, ptr3);
-+    tcg_temp_free_ptr(ptr1);
-+    tcg_temp_free_ptr(ptr2);
-+    tcg_temp_free_ptr(ptr3);
-+
-+    return true;
-+}
-+
-+static bool trans_SHA256H2_3s(DisasContext *s, arg_SHA256H2_3s *a)
-+{
-+    TCGv_ptr ptr1, ptr2, ptr3;
-+
-+    if (!arm_dc_feature(s, ARM_FEATURE_NEON) ||
-+        !dc_isar_feature(aa32_sha2, s)) {
-+        return false;
-+    }
-+
-+    /* UNDEF accesses to D16-D31 if they don't exist. */
-+    if (!dc_isar_feature(aa32_simd_r32, s) &&
-+        ((a->vd | a->vn | a->vm) & 0x10)) {
-+        return false;
-+    }
-+
-+    if ((a->vn | a->vm | a->vd) & 1) {
-+        return false;
-+    }
-+
-+    if (!vfp_access_check(s)) {
-+        return true;
-+    }
-+
-+    ptr1 = vfp_reg_ptr(true, a->vd);
-+    ptr2 = vfp_reg_ptr(true, a->vn);
-+    ptr3 = vfp_reg_ptr(true, a->vm);
-+    gen_helper_crypto_sha256h2(ptr1, ptr2, ptr3);
-+    tcg_temp_free_ptr(ptr1);
-+    tcg_temp_free_ptr(ptr2);
-+    tcg_temp_free_ptr(ptr3);
-+
-+    return true;
-+}
-+
-+static bool trans_SHA256SU1_3s(DisasContext *s, arg_SHA256SU1_3s *a)
-+{
-+    TCGv_ptr ptr1, ptr2, ptr3;
-+
-+    if (!arm_dc_feature(s, ARM_FEATURE_NEON) ||
-+        !dc_isar_feature(aa32_sha2, s)) {
-+        return false;
-+    }
-+
-+    /* UNDEF accesses to D16-D31 if they don't exist. */
-+    if (!dc_isar_feature(aa32_simd_r32, s) &&
-+        ((a->vd | a->vn | a->vm) & 0x10)) {
-+        return false;
-+    }
-+
-+    if ((a->vn | a->vm | a->vd) & 1) {
-+        return false;
-+    }
-+
-+    if (!vfp_access_check(s)) {
-+        return true;
-+    }
-+
-+    ptr1 = vfp_reg_ptr(true, a->vd);
-+    ptr2 = vfp_reg_ptr(true, a->vn);
-+    ptr3 = vfp_reg_ptr(true, a->vm);
-+    gen_helper_crypto_sha256su1(ptr1, ptr2, ptr3);
-+    tcg_temp_free_ptr(ptr1);
-+    tcg_temp_free_ptr(ptr2);
-+    tcg_temp_free_ptr(ptr3);
-+
-+    return true;
-+}
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 1f06cb5a87f..ee2b8d6f6e3 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -5359,7 +5359,7 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-     int vec_size;
-     uint32_t imm;
-     TCGv_i32 tmp, tmp2, tmp3, tmp4, tmp5;
--    TCGv_ptr ptr1, ptr2, ptr3;
-+    TCGv_ptr ptr1, ptr2;
-     TCGv_i64 tmp64;
+ /*
+  * Hardware Error Notification
+  * ACPI 4.0: 17.3.2.7 Hardware Error Notification
+@@ -72,6 +103,138 @@ static void build_ghes_hw_error_notification(GArray *table, const uint8_t type)
+     build_append_int_noprefix(table, 0, 4);
+ }
  
-     if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
-@@ -5403,49 +5403,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-             return 1;
-         }
-         switch (op) {
--        case NEON_3R_SHA:
--            /* The SHA-1/SHA-256 3-register instructions require special
--             * treatment here, as their size field is overloaded as an
--             * op type selector, and they all consume their input in a
--             * single pass.
--             */
--            if (!q) {
--                return 1;
--            }
--            if (!u) { /* SHA-1 */
--                if (!dc_isar_feature(aa32_sha1, s)) {
--                    return 1;
--                }
--                ptr1 = vfp_reg_ptr(true, rd);
--                ptr2 = vfp_reg_ptr(true, rn);
--                ptr3 = vfp_reg_ptr(true, rm);
--                tmp4 = tcg_const_i32(size);
--                gen_helper_crypto_sha1_3reg(ptr1, ptr2, ptr3, tmp4);
--                tcg_temp_free_i32(tmp4);
--            } else { /* SHA-256 */
--                if (!dc_isar_feature(aa32_sha2, s) || size == 3) {
--                    return 1;
--                }
--                ptr1 = vfp_reg_ptr(true, rd);
--                ptr2 = vfp_reg_ptr(true, rn);
--                ptr3 = vfp_reg_ptr(true, rm);
--                switch (size) {
--                case 0:
--                    gen_helper_crypto_sha256h(ptr1, ptr2, ptr3);
--                    break;
--                case 1:
--                    gen_helper_crypto_sha256h2(ptr1, ptr2, ptr3);
--                    break;
--                case 2:
--                    gen_helper_crypto_sha256su1(ptr1, ptr2, ptr3);
--                    break;
--                }
--            }
--            tcg_temp_free_ptr(ptr1);
--            tcg_temp_free_ptr(ptr2);
--            tcg_temp_free_ptr(ptr3);
--            return 0;
--
-         case NEON_3R_VPADD_VQRDMLAH:
-             if (!u) {
-                 break;  /* VPADD */
-@@ -5496,6 +5453,7 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-         case NEON_3R_VMUL:
-         case NEON_3R_VML:
-         case NEON_3R_VSHL:
-+        case NEON_3R_SHA:
-             /* Already handled by decodetree */
-             return 1;
-         }
++/*
++ * Generic Error Data Entry
++ * ACPI 6.1: 18.3.2.7.1 Generic Error Data
++ */
++static void acpi_ghes_generic_error_data(GArray *table,
++                const uint8_t *section_type, uint32_t error_severity,
++                uint8_t validation_bits, uint8_t flags,
++                uint32_t error_data_length, QemuUUID fru_id,
++                uint64_t time_stamp)
++{
++    const uint8_t fru_text[20] = {0};
++
++    /* Section Type */
++    g_array_append_vals(table, section_type, 16);
++
++    /* Error Severity */
++    build_append_int_noprefix(table, error_severity, 4);
++    /* Revision */
++    build_append_int_noprefix(table, 0x300, 2);
++    /* Validation Bits */
++    build_append_int_noprefix(table, validation_bits, 1);
++    /* Flags */
++    build_append_int_noprefix(table, flags, 1);
++    /* Error Data Length */
++    build_append_int_noprefix(table, error_data_length, 4);
++
++    /* FRU Id */
++    g_array_append_vals(table, fru_id.data, ARRAY_SIZE(fru_id.data));
++
++    /* FRU Text */
++    g_array_append_vals(table, fru_text, sizeof(fru_text));
++
++    /* Timestamp */
++    build_append_int_noprefix(table, time_stamp, 8);
++}
++
++/*
++ * Generic Error Status Block
++ * ACPI 6.1: 18.3.2.7.1 Generic Error Data
++ */
++static void acpi_ghes_generic_error_status(GArray *table, uint32_t block_status,
++                uint32_t raw_data_offset, uint32_t raw_data_length,
++                uint32_t data_length, uint32_t error_severity)
++{
++    /* Block Status */
++    build_append_int_noprefix(table, block_status, 4);
++    /* Raw Data Offset */
++    build_append_int_noprefix(table, raw_data_offset, 4);
++    /* Raw Data Length */
++    build_append_int_noprefix(table, raw_data_length, 4);
++    /* Data Length */
++    build_append_int_noprefix(table, data_length, 4);
++    /* Error Severity */
++    build_append_int_noprefix(table, error_severity, 4);
++}
++
++/* UEFI 2.6: N.2.5 Memory Error Section */
++static void acpi_ghes_build_append_mem_cper(GArray *table,
++                                            uint64_t error_physical_addr)
++{
++    /*
++     * Memory Error Record
++     */
++
++    /* Validation Bits */
++    build_append_int_noprefix(table,
++                              (1ULL << 14) | /* Type Valid */
++                              (1ULL << 1) /* Physical Address Valid */,
++                              8);
++    /* Error Status */
++    build_append_int_noprefix(table, 0, 8);
++    /* Physical Address */
++    build_append_int_noprefix(table, error_physical_addr, 8);
++    /* Skip all the detailed information normally found in such a record */
++    build_append_int_noprefix(table, 0, 48);
++    /* Memory Error Type */
++    build_append_int_noprefix(table, 0 /* Unknown error */, 1);
++    /* Skip all the detailed information normally found in such a record */
++    build_append_int_noprefix(table, 0, 7);
++}
++
++static int acpi_ghes_record_mem_error(uint64_t error_block_address,
++                                      uint64_t error_physical_addr)
++{
++    GArray *block;
++
++    /* Memory Error Section Type */
++    const uint8_t uefi_cper_mem_sec[] =
++          UUID_LE(0xA5BC1114, 0x6F64, 0x4EDE, 0xB8, 0x63, 0x3E, 0x83, \
++                  0xED, 0x7C, 0x83, 0xB1);
++
++    /* invalid fru id: ACPI 4.0: 17.3.2.6.1 Generic Error Data,
++     * Table 17-13 Generic Error Data Entry
++     */
++    QemuUUID fru_id = {};
++    uint32_t data_length;
++
++    block = g_array_new(false, true /* clear */, 1);
++
++    /* This is the length if adding a new generic error data entry*/
++    data_length = ACPI_GHES_DATA_LENGTH + ACPI_GHES_MEM_CPER_LENGTH;
++
++    /*
++     * Check whether it will run out of the preallocated memory if adding a new
++     * generic error data entry
++     */
++    if ((data_length + ACPI_GHES_GESB_SIZE) > ACPI_GHES_MAX_RAW_DATA_LENGTH) {
++        error_report("Not enough memory to record new CPER!!!");
++        g_array_free(block, true);
++        return -1;
++    }
++
++    /* Build the new generic error status block header */
++    acpi_ghes_generic_error_status(block, ACPI_GEBS_UNCORRECTABLE,
++        0, 0, data_length, ACPI_CPER_SEV_RECOVERABLE);
++
++    /* Build this new generic error data entry header */
++    acpi_ghes_generic_error_data(block, uefi_cper_mem_sec,
++        ACPI_CPER_SEV_RECOVERABLE, 0, 0,
++        ACPI_GHES_MEM_CPER_LENGTH, fru_id, 0);
++
++    /* Build the memory section CPER for above new generic error data entry */
++    acpi_ghes_build_append_mem_cper(block, error_physical_addr);
++
++    /* Write the generic error data entry into guest memory */
++    cpu_physical_memory_write(error_block_address, block->data, block->len);
++
++    g_array_free(block, true);
++
++    return 0;
++}
++
+ /*
+  * Build table for the hardware error fw_cfg blob.
+  * Initialize "etc/hardware_errors" and "etc/hardware_errors_addr" fw_cfg blobs.
+@@ -227,3 +390,59 @@ void acpi_ghes_add_fw_cfg(AcpiGhesState *ags, FWCfgState *s,
+     fw_cfg_add_file_callback(s, ACPI_GHES_DATA_ADDR_FW_CFG_FILE, NULL, NULL,
+         NULL, &(ags->ghes_addr_le), sizeof(ags->ghes_addr_le), false);
+ }
++
++int acpi_ghes_record_errors(uint8_t source_id, uint64_t physical_address)
++{
++    uint64_t error_block_addr, read_ack_register_addr, read_ack_register = 0;
++    uint64_t start_addr;
++    bool ret = -1;
++    AcpiGedState *acpi_ged_state;
++    AcpiGhesState *ags;
++
++    assert(source_id < ACPI_HEST_SRC_ID_RESERVED);
++
++    acpi_ged_state = ACPI_GED(object_resolve_path_type("", TYPE_ACPI_GED,
++                                                       NULL));
++    g_assert(acpi_ged_state);
++    ags = &acpi_ged_state->ghes_state;
++
++    start_addr = le64_to_cpu(ags->ghes_addr_le);
++
++    if (physical_address) {
++
++        if (source_id < ACPI_HEST_SRC_ID_RESERVED) {
++            start_addr += source_id * sizeof(uint64_t);
++        }
++
++        cpu_physical_memory_read(start_addr, &error_block_addr,
++                                 sizeof(error_block_addr));
++
++        error_block_addr = le64_to_cpu(error_block_addr);
++
++        read_ack_register_addr = start_addr +
++            ACPI_GHES_ERROR_SOURCE_COUNT * sizeof(uint64_t);
++
++        cpu_physical_memory_read(read_ack_register_addr,
++                                 &read_ack_register, sizeof(read_ack_register));
++
++        /* zero means OSPM does not acknowledge the error */
++        if (!read_ack_register) {
++            error_report("OSPM does not acknowledge previous error,"
++                " so can not record CPER for current error anymore");
++        } else if (error_block_addr) {
++            read_ack_register = cpu_to_le64(0);
++            /*
++             * Clear the Read Ack Register, OSPM will write it to 1 when
++             * it acknowledges this error.
++             */
++            cpu_physical_memory_write(read_ack_register_addr,
++                &read_ack_register, sizeof(uint64_t));
++
++            ret = acpi_ghes_record_mem_error(error_block_addr,
++                                             physical_address);
++        } else
++            error_report("can not find Generic Error Status Block");
++    }
++
++    return ret;
++}
 -- 
 2.20.1
 
