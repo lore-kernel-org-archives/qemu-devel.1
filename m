@@ -2,67 +2,64 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EB47C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 19:36:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DCBFC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 19:40:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 081A12065C
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 19:36:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EDA8A2065C
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 19:40:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HBxW2kCK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 081A12065C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b57NgULk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDA8A2065C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZJf6-0004Zx-7W
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 15:36:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59272)
+	id 1jZJin-0001X6-47
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 15:40:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59316)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZJaM-00070Q-Nb
- for qemu-devel@nongnu.org; Thu, 14 May 2020 15:32:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23167
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZJas-0007Mg-LZ
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 15:32:36 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53585
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZJaK-00019V-Re
- for qemu-devel@nongnu.org; Thu, 14 May 2020 15:32:01 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZJar-0001GP-EE
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 15:32:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589484720;
+ s=mimecast20190719; t=1589484752;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=n2QUdrADBKjcI7kRXuoN81HU3oCBkyJI/5WNlxx5b54=;
- b=HBxW2kCK0a9ZO0b0LeOwWrQ4/ye4QOaGT09pm67WaItPzF+0wyyMxnUKTUxjNRitSxE8ou
- 1OiecSNXoG9fEb19okrd5T4mK42YWeGlfcxSA4THAmXaLbZ/ZQHUZ5aqMbcI4ArWziDwQ8
- 7q+6Uqs/e/nqXPyklcxw39LLhF1XeMw=
+ bh=Fvhdp8e1noEjZWQN8I9b80oxqOClG14Pjz289B2BM4Y=;
+ b=b57NgULk+1t+DawgQC4UzNwsDjrflifB1tsAkncd5jTYocWTh3+/3naV5B/mBFN7a8EQYl
+ bUhF8Ry84frxt1BkUMHrF0lKY+SXHl1rkqY1Pp51TrWTBjepfoH4RbOqp0Uv+omEGUalso
+ 1jjropwX5stBZRMj9iZClHtgK2e8zkw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-259-_AUU8EEkNHy0J0pPZ8ii8g-1; Thu, 14 May 2020 15:31:56 -0400
-X-MC-Unique: _AUU8EEkNHy0J0pPZ8ii8g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-277-qWeMy_XKN0aG7pu0TgdSZA-1; Thu, 14 May 2020 15:32:30 -0400
+X-MC-Unique: qWeMy_XKN0aG7pu0TgdSZA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B23B8730BD;
- Thu, 14 May 2020 19:31:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ADBFD85B677;
+ Thu, 14 May 2020 19:32:28 +0000 (UTC)
 Received: from [10.10.119.184] (ovpn-119-184.rdu2.redhat.com [10.10.119.184])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 204375D9F1;
- Thu, 14 May 2020 19:31:51 +0000 (UTC)
-Subject: Re: [PATCH v4 1/3] qmp.py: change event_wait to use a dict
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BDF7676C38;
+ Thu, 14 May 2020 19:32:25 +0000 (UTC)
+Subject: Re: [PATCH v4 2/3] iotests: add JobRunner class
 To: Kevin Wolf <kwolf@redhat.com>
 References: <20200514022536.2568-1-jsnow@redhat.com>
- <20200514022536.2568-2-jsnow@redhat.com>
- <20200514144732.GJ5518@linux.fritz.box>
- <de1026e4-9815-f89c-4cfd-6da35ac23197@redhat.com>
- <20200514155952.GM5518@linux.fritz.box>
+ <20200514022536.2568-3-jsnow@redhat.com>
+ <20200514154059.GK5518@linux.fritz.box>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -138,29 +135,29 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <3fda28e5-2049-1667-4da7-bbabac1fee15@redhat.com>
-Date: Thu, 14 May 2020 15:31:51 -0400
+Message-ID: <4c54f13d-d8db-ee00-798d-bbda7a05a99c@redhat.com>
+Date: Thu, 14 May 2020 15:32:25 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200514155952.GM5518@linux.fritz.box>
+In-Reply-To: <20200514154059.GK5518@linux.fritz.box>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jsnow@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 11:35:35
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 12:05:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -181,258 +178,39 @@ Sender: "Qemu-devel"
 
 
 
-On 5/14/20 11:59 AM, Kevin Wolf wrote:
-> Am 14.05.2020 um 17:07 hat John Snow geschrieben:
+On 5/14/20 11:40 AM, Kevin Wolf wrote:
+> Am 14.05.2020 um 04:25 hat John Snow geschrieben:
+>> The idea is that instead of increasing the arguments to job_run all the
+>> time, create a more general-purpose job runner that can be subclassed to
+>> do interesting things with.
 >>
+>> pylint note: the 'callbacks' option guards against unused warning
+>> arguments in functions designated as callbacks. It does not currently
+>> guard against "no-self-use" though; hence a once-off ignore.
 >>
->> On 5/14/20 10:47 AM, Kevin Wolf wrote:
->>> Am 14.05.2020 um 04:25 hat John Snow geschrieben:
->>>> It's easier to work with than a list of tuples, because we can check the
->>>> keys for membership.
->>>>
->>>> Signed-off-by: John Snow <jsnow@redhat.com>
->>>> ---
->>>>  python/qemu/machine.py        | 10 +++++-----
->>>>  tests/qemu-iotests/040        | 12 ++++++------
->>>>  tests/qemu-iotests/260        |  5 +++--
->>>>  tests/qemu-iotests/iotests.py | 16 ++++++++--------
->>>>  4 files changed, 22 insertions(+), 21 deletions(-)
->>>
->>> I think you need to convert scripts/simplebench/bench_block_job.py, too.
+>> mypy note: QapiEvent is only a weak alias; it's fully interchangable
+>> with the type it's declared as. In the future, we may wish to tighten
+>> these types. For now, this communicates the rough shape of the type and
+>> (more importantly) the intent.
 >>
->> Oh, right -- that one is new since I did this. A lot of these scripts
->> need to be moved over into the python/ directory and managed under the
->> same pylint/mypy regime as everything else.
->>
->> A *ton* of our scripts are in various states of disrepair.
+>> Signed-off-by: John Snow <jsnow@redhat.com>
 > 
-> Is python/ actually supposed to have executable files in it? I thought
-> it was more for libraries.
+>> +        # Listen for these events with these parameters:
+>> +        self._events = {
+>> +            'BLOCK_JOB_COMPLETED': match_device,
+>> +            'BLOCK_JOB_CANCELLED': match_device,
+>> +            'BLOCK_JOB_ERROR': match_device,
+>> +            'BLOCK_JOB_READY': match_device,
+>> +            'BLOCK_JOB_PENDING': match_id,
+>> +            'JOB_STATUS_CHANGE': match_id
+>> +        }
 > 
-
-Welllllllllllllll. At the moment it's library only. but one of the
-things you can do with a library is define executable entry-points into
-that library.
-
-If you haven't cast an eye at that 32 patch series yet, it basically
-creates a structure like this:
-
-> ./python/qemu/lib/[qmp|machine|qtest|accel].py
-
-qemu/ forms a PEP420 namespace; the idea is to be able to modularly
-create and independently package subpackages.
-
-qemu/lib forms a proper python package in which there are no
-executables, just a library, as you say.
-
-My idea is that anything under python/*/ ought to form a properly
-formatted package. So we could, for instance, have a
-python/qemu/devtools namespace which packages and collects a bunch of
-our little scripts.
-
-Then we could make sure we hit them with the same
-mypy/pylint/flake8/whatever as the core libraries those scripts are
-using to keep them in sync better.
-
-And, ideally, if they are all using the same kind of paradigms for
-import and dependency management it will be easier to use them and keep
-them up to date, etc.
-
-For using them as a developer, you could, say,
-cd  ~/src/qemu/python
-pip3 install --user -e .
-
-and install the source packages to your local environment and then have
-access to e.g.
-
-> qmp-shell
-
-right on your CLI, without having to fuss with PYTHONPATH or anything
-else. As you update the source repo, you'll get the new versions of the
-package living in your python environment automatically.
-
-Of course, this maybe has downsides too; so you can always use a virtual
-environment to adopt a context in which you have these tools. For that,
-
-> pip3 install --user pipenv  # or use dnf, or apt, w/e.
-> cd ~/src/qemu/python
-> pipenv shell
-> pip install -e .
-
-And from here you'll have the dev package installed to a development
-venv that you can use.
-
-*cough* anyway, that's wildly off-topic.
-
-Generally, you want to format a library such that you have a callable
-entry point, maybe named main(). So you'd have some qmp-shell module and
-it has a main() function.
-
-Then, in the setup.py script, you'd define qemu.lib.qmp_shell:main() as
-an entry point and give it a name like 'qmp-shell'. When pip/setuptools
-processes your package installation, it'll create a shim for you in e.g.
-~/.local/bin/qmp-shell that will just load the library and execute that
-entrypoint for you.
-
-I was thinking I'd do this for all of our python scripts so I could
-spend my energy on a pylint/mypy test infrastructure *once* and *in one
-place* and then it would be easier to detect regressions for scripts
-that don't actually run as part of the test suite.
-
->>>
->>>> diff --git a/python/qemu/machine.py b/python/qemu/machine.py
->>>> index b9a98e2c86..eaedc25172 100644
->>>> --- a/python/qemu/machine.py
->>>> +++ b/python/qemu/machine.py
->>>> @@ -478,21 +478,21 @@ def event_wait(self, name, timeout=60.0, match=None):
->>>>          timeout: QEMUMonitorProtocol.pull_event timeout parameter.
->>>>          match: Optional match criteria. See event_match for details.
->>>>          """
->>>> -        return self.events_wait([(name, match)], timeout)
->>>> +        return self.events_wait({name: match}, timeout)
->>>>  
->>>>      def events_wait(self, events, timeout=60.0):
->>>>          """
->>>>          events_wait waits for and returns a named event from QMP with a timeout.
->>>>  
->>>> -        events: a sequence of (name, match_criteria) tuples.
->>>> +        events: a mapping containing {name: match_criteria}.
->>>>                  The match criteria are optional and may be None.
->>>>                  See event_match for details.  timeout:
->>>>                  QEMUMonitorProtocol.pull_event timeout parameter.
->>>>                  """
->>>>          def _match(event):
->>>> -            for name, match in events:
->>>> -                if event['event'] == name and self.event_match(event, match):
->>>> -                    return True
->>>> +            name = event['event']
->>>> +            if name in events:
->>>> +                return self.event_match(event, events[name])
->>>
->>> This part confused me a bit for a second. Of course, that's probably
->>> mostly just me, but I feel 'events' isn't a good name any more when the
->>> values of the dict are match strings rather than events.
->>>
->>
->> This is honestly a really bad function. When I was trying to type
->> everything, this one was at the bottom of the pile and it was the worst.
->>
->> It needs an overhaul.
->>
->> In my 32 patch series, I left the "match" types as "Any" pretty much
->> everywhere, because it's such a laissez-faire series of functions.
+> The old code had a trailing comma here in case we need to add more
+> events later. Anyway:
 > 
-> It would require recursive types, which aren't supported yet. So I guess
-> Any is the best we can do at the moment.
+> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 > 
 
-It would also do well with a fully schema-validated API if we actually
-knew exactly what a "QMP Message" was and had some guarantee about
-exactly what fields and types it had.
-
-This is where a generated validator would really help for type-safe SDK
-tooling.
-
-... We of course do not have that right now, and might not ever, so
-yeah, 'Any' type is fine -- but I really want to rewrite this function
-because it does stick out as ugly and hard to read, I admit :(
-
-Anything that's hard to type -- by the person who wrote most of it -- is
-going to be hard to use or understand. Time for a rework.
-
->> I'll keep the feedback in mind.
->>
->>>>              return False
->>>>  
->>>>          # Search cached events
->>>> diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
->>>> index 32c82b4ec6..90b59081ff 100755
->>>> --- a/tests/qemu-iotests/040
->>>> +++ b/tests/qemu-iotests/040
->>>> @@ -485,12 +485,12 @@ class TestErrorHandling(iotests.QMPTestCase):
->>>>  
->>>>      def run_job(self, expected_events, error_pauses_job=False):
->>>>          match_device = {'data': {'device': 'job0'}}
->>>> -        events = [
->>>> -            ('BLOCK_JOB_COMPLETED', match_device),
->>>> -            ('BLOCK_JOB_CANCELLED', match_device),
->>>> -            ('BLOCK_JOB_ERROR', match_device),
->>>> -            ('BLOCK_JOB_READY', match_device),
->>>> -        ]
->>>> +        events = {
->>>> +            'BLOCK_JOB_COMPLETED': match_device,
->>>> +            'BLOCK_JOB_CANCELLED': match_device,
->>>> +            'BLOCK_JOB_ERROR': match_device,
->>>> +            'BLOCK_JOB_READY': match_device,
->>>> +        }
->>>>  
->>>>          completed = False
->>>>          log = []
->>>> diff --git a/tests/qemu-iotests/260 b/tests/qemu-iotests/260
->>>> index 804a7addb9..729f031122 100755
->>>> --- a/tests/qemu-iotests/260
->>>> +++ b/tests/qemu-iotests/260
->>>> @@ -67,8 +67,9 @@ def test(persistent, restart):
->>>>  
->>>>      vm.qmp_log('block-commit', device='drive0', top=top,
->>>>                 filters=[iotests.filter_qmp_testfiles])
->>>> -    ev = vm.events_wait((('BLOCK_JOB_READY', None),
->>>> -                         ('BLOCK_JOB_COMPLETED', None)))
->>>> +    ev = vm.events_wait({
->>>> +        'BLOCK_JOB_READY': None,
->>>> +        'BLOCK_JOB_COMPLETED': None })
->>>
->>> So, I'm not sure if this is nitpicking or rather bikeshedding, but
->>> having the closing brackets on the next line would be more consistent
->>> with the other instances in this patch.
->>>
->>
->> Nah, it's fine. I'll clean it up. This is pretty close to an RFC series
->> anyway, so I didn't really polish it.
->>
->> (Or, I will try to clean it up. I probably won't work on it again in the
->> near term. I think I just wanted to see if this seemed useful in general
->> to people.
-> 
-> Ah, there isn't much missing for this series, though. We don't have to
-> wait for a fix-the-world series when we can incrementally improve
-> things.
-> 
-
-Alright, I'll try to hit it halfway -- I spent some time thinking about
-a "full" job running framework but ran into some dead-ends I wasn't too
-happy with, and wasn't convinced this was a simplification of any kind.
-
-Still, seeing part of the job running code get duplicated in 040 was a
-motivation to try and provide some universal job-running monster that
-would be extensible for nearly any task.
-
-Unfortunately that complexity does generally make the calling sites look
-worse, so I cooled off on the idea since.
-
-So I did intend this as an RFC, because I'm not really 100% happy with
-the design.
-
->> As part of maybe moving the python library onto a package, I thought
->> that maybe developing a JobRunner tool would be useful to have in that
->> library. As you can see, I nestled it into iotests.py, though.)
-> 
-> Let's just do that now, we can always move it somewhere else later.
-> 
-
-I assume you mean "Let's just put it in iotests.py for now."
-
-If we do decide to take that 32 patch series to formalize a qemu lib, it
-will not be hard to start moving things from here to there.
-
-I will probably take an eye to our iotests and see what functionality
-gets duplicated or used a lot and try to push more things down into the
-stack where possible.
-
-The QMP event handling stuff in particular seems needlessly split
-between qmp.py, machine.py, iotests.py, etc.
-
-> Kevin
-> 
+Whoops. I favor those too, so I'll put it back.
 
 
