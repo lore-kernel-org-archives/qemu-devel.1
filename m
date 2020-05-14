@@ -2,90 +2,88 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FF77C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 20:56:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 672E0C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 20:58:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B21F207E8
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 20:56:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F42F207E8
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 20:58:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="UzqeHHtL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B21F207E8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jcExE9jF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F42F207E8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48228 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZKuE-0002oO-E2
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 16:56:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45370)
+	id 1jZKvp-0005op-Do
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 16:58:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45764)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=396c018a7=alistair.francis@wdc.com>)
- id 1jZKtE-0001t5-PQ; Thu, 14 May 2020 16:55:36 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:19382)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=396c018a7=alistair.francis@wdc.com>)
- id 1jZKtC-0005pz-Ub; Thu, 14 May 2020 16:55:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1589489746; x=1621025746;
- h=from:to:cc:subject:date:message-id:mime-version:
- content-transfer-encoding;
- bh=Xom2HChFLJ89UsWldjTfWChAxQHA6X3MY/cLxNR/uYk=;
- b=UzqeHHtLu7mh08mylESV8DLrSw4Wi3y2XpZW0dVJnFHVfm8PhSqTe21i
- qdEfAYyha3HCSCmYxnMd01lw5tBibotTMSVFmRvSgvDDnPjVla6hpOR7V
- KQtZPyxTJCiPTvJ6jlgNkTCWZdpDMDNEpxK3NzLISSY1adj2tOgoo50Lj
- xDhcmAgBmCRkADcITuK/A7rNvnsY80aRWubxekxZvVxYwKt/B3oiHFCgp
- nW3U1A1a5unZvlmLvCwz/OSEh2NiUmy06dKZ986W+sFnZPoMz9d2m6EAD
- 9OBMcVJO5MzbDjgLNkOVHdg9kDmy3LErNf6O3ff79x5Tx5Xa2AbSnxQJZ w==;
-IronPort-SDR: 7Rd+KCSg314htA9VlW/doxZZD9uZipe9SrKzM7l6+f2hxUUKKHJUHKD7/n20JiR5YJT43669If
- Oow+7P18bjA2qSBoZf0lmFV2F+zKy558ooYcruenGlocHKtO+A3U00FO1k91JY0VVqqDridzt9
- z7rP2wfgvKxlxgUcnDimYmkR2lpyAD8hy6RqFYLwApIpZ9tsn7zbll9yrq+1IM/pipvhyom1Mn
- Iy+HKcmk1NiyUnQF7EvICXRZDgERCLxnbyH8d43lQN9UfWwcRWa6H0cQhV1QENaeJXZ2jLXpZ7
- kME=
-X-IronPort-AV: E=Sophos;i="5.73,392,1583164800"; d="scan'208";a="240427614"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 15 May 2020 04:55:39 +0800
-IronPort-SDR: jO5RPaWuDaP/24IaFDdy9x6wIxpGoZJiXs5UUh3SAWZOoHgN7yvGnB617glzcFbYuJ9vLc856A
- z8LdI+Va5AB+/+5IhLsFyFwFZNqKbQ160=
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 14 May 2020 13:45:08 -0700
-IronPort-SDR: J0DgQ/0JTQrxW683D6D89uuxSVhLyItBESuHFNpRLsqDWYrybB6pYVoH6mDanr6s8IRvKpBRh4
- 0mu3xD/Apu2Q==
-WDCIronportException: Internal
-Received: from 327gvz1.ad.shared (HELO risc6-mainframe.hgst.com)
- ([10.86.56.233])
- by uls-op-cesaip01.wdc.com with ESMTP; 14 May 2020 13:55:29 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v1 1/2] riscv: sifive_e: Manually define the machine
-Date: Thu, 14 May 2020 13:47:07 -0700
-Message-Id: <da77b1e0a31f2f8fb18117b20a1493ab1ec0471f.1589489213.git.alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.26.2
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jZKuS-0003an-Ce
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 16:56:52 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44509)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jZKuQ-0006Dp-Cg
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 16:56:51 -0400
+Received: by mail-wr1-x444.google.com with SMTP id 50so459300wrc.11
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 13:56:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=OR84j6vTyfY0H84yMrQ/BQLUOCn2Mr0ZLuCBdy/+wkU=;
+ b=jcExE9jFCtbRYJC6qZ7b8EPpVu4yznotAiz7dnnW/tiywdgWC7hl97WVbyRGdzpydj
+ GSlXAeAnk5KjPc8ciYk0SXLGLjVULRDl13zhBsLBL3dLhSWRnLj2h8WPMsRWqB0mB5IY
+ NTKKzrLVDN9DcQrs/76g674KtOyLmoHzpO72Adb2l7Uwu52N/mANHxDObv4GFKJh8Nt1
+ 4sVULU2XQXwalqhG7EnZsXPKyyDeBlgGHwi7JIvZk40uObozYH6SFFVsQkYHNobnwZfF
+ O/v8zCllCmYunNoBcCast0OQb3tlMHp9JhxnXSUAPeLWUpUDBxFt1oiD8DVQ+MoAZL5o
+ OE+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=OR84j6vTyfY0H84yMrQ/BQLUOCn2Mr0ZLuCBdy/+wkU=;
+ b=Obz/xdeyDgsVxtv2bRB9df/iGy56/ssqanI6mxPfaSwI4/Nb1VJ1n02TX1rj5idTJz
+ jq9WKSLL3EBzVUDODiTE3q4f0y2OCORejjZJAtLNQCzrovV1ZOxQ/7Tfiio9zNrmk0uH
+ s+aiXSB2CjU4QzweraH2zcemRPHVonrBTiik92oAMFyDyDzcUnryCY6on0Lagwmsm5fI
+ 1AdJqxmGUfYuucDZd7dCQV+boBg9uJxt6IvKu179CLmSFz3B3HGthkxZltApL4mVjvuq
+ P5lplc63vXR916aeRzYqjbj/hEM2+pdc7XBP894FL05HG5OCmP3Ab9d9pYPuM0whYUaM
+ T6vA==
+X-Gm-Message-State: AOAM531vlo7RuZWqDy9xFCMxYCbrBQuuTy4Jsj3s0HREf8X8Mx2DOvfW
+ aeW5D3KCYMWr5kDqIVznUhKRg4ESjYruri19IAU=
+X-Google-Smtp-Source: ABdhPJymALh2Qe+BygbWKRX8T/Yy1hWYZxN89nutE7k9pvqZFG6Ch0vXrTLdE18vLZIr8b3xZ0nOrEGoba1WyZW8W1o=
+X-Received: by 2002:a5d:4b0f:: with SMTP id v15mr341480wrq.162.1589489808578; 
+ Thu, 14 May 2020 13:56:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=68.232.143.124;
- envelope-from=prvs=396c018a7=alistair.francis@wdc.com;
- helo=esa2.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 16:55:30
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
+References: <1586337380-25217-1-git-send-email-chenhc@lemote.com>
+ <1586337380-25217-3-git-send-email-chenhc@lemote.com>
+In-Reply-To: <1586337380-25217-3-git-send-email-chenhc@lemote.com>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Thu, 14 May 2020 22:56:33 +0200
+Message-ID: <CAHiYmc6=e8Ad+stdx4vFfZ5vkysiYo5Zkdiq3reLL=McvwDt3w@mail.gmail.com>
+Subject: Re: [PATCH 3/3] MAINTAINERS: Add myself as fulong2e co-maintainer
+To: Huacai Chen <chenhc@lemote.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,99 +97,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair.francis@wdc.com, palmer@dabbelt.com, alistair23@gmail.com
+Cc: Huacai Chen <chenhuacai@gmail.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ Aurelien Jarno <aurelien@aurel32.net>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- hw/riscv/sifive_e.c         | 41 +++++++++++++++++++++++++++----------
- include/hw/riscv/sifive_e.h |  4 ++++
- 2 files changed, 34 insertions(+), 11 deletions(-)
+=D1=81=D1=80=D0=B5, 8. =D0=B0=D0=BF=D1=80 2020. =D1=83 11:08 Huacai Chen <c=
+henhc@lemote.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=
+=D0=BB=D0=B0:
+>
+> I submitted the MIPS/fulong2e support about ten years ago, and after
+> that I became a MIPS kernel developer. Last year, Philippe Mathieu-
+> Daud=C3=A9 asked me that whether I can be a reviewer of MIPS/fulong2e, an=
+d I
+> promised that I will do some QEMU work in the next year (i.e., 2020 and
+> later). I think now (and also in future) I can have some spare time, so
+> I can finally do some real work on QEMU/MIPS. And if possible, I hope I
+> can be a co-maintainer of MIPS/fulong2e.
+>
+> Cc: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> ---
 
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index b53109521e..472a98970b 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -79,7 +79,7 @@ static void riscv_sifive_e_init(MachineState *machine)
- {
-     const struct MemmapEntry *memmap = sifive_e_memmap;
- 
--    SiFiveEState *s = g_new0(SiFiveEState, 1);
-+    SiFiveEState *s = RISCV_E_MACHINE(machine);
-     MemoryRegion *sys_mem = get_system_memory();
-     MemoryRegion *main_mem = g_new(MemoryRegion, 1);
-     int i;
-@@ -115,6 +115,35 @@ static void riscv_sifive_e_init(MachineState *machine)
-     }
- }
- 
-+static void sifive_e_machine_instance_init(Object *obj)
-+{
-+}
-+
-+static void sifive_e_machine_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+
-+    mc->desc = "RISC-V Board compatible with SiFive E SDK";
-+    mc->init = riscv_sifive_e_init;
-+    mc->max_cpus = 1;
-+    mc->default_cpu_type = SIFIVE_E_CPU;
-+}
-+
-+static const TypeInfo sifive_e_machine_typeinfo = {
-+    .name       = MACHINE_TYPE_NAME("sifive_e"),
-+    .parent     = TYPE_MACHINE,
-+    .class_init = sifive_e_machine_class_init,
-+    .instance_init = sifive_e_machine_instance_init,
-+    .instance_size = sizeof(SiFiveEState),
-+};
-+
-+static void sifive_e_machine_init_register_types(void)
-+{
-+    type_register_static(&sifive_e_machine_typeinfo);
-+}
-+
-+type_init(sifive_e_machine_init_register_types)
-+
- static void riscv_sifive_e_soc_init(Object *obj)
- {
-     MachineState *ms = MACHINE(qdev_get_machine());
-@@ -214,16 +243,6 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
-         &s->xip_mem);
- }
- 
--static void riscv_sifive_e_machine_init(MachineClass *mc)
--{
--    mc->desc = "RISC-V Board compatible with SiFive E SDK";
--    mc->init = riscv_sifive_e_init;
--    mc->max_cpus = 1;
--    mc->default_cpu_type = SIFIVE_E_CPU;
--}
--
--DEFINE_MACHINE("sifive_e", riscv_sifive_e_machine_init)
--
- static void riscv_sifive_e_soc_class_init(ObjectClass *oc, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(oc);
-diff --git a/include/hw/riscv/sifive_e.h b/include/hw/riscv/sifive_e.h
-index 25ce7aa9d5..414992119e 100644
---- a/include/hw/riscv/sifive_e.h
-+++ b/include/hw/riscv/sifive_e.h
-@@ -47,6 +47,10 @@ typedef struct SiFiveEState {
-     SiFiveESoCState soc;
- } SiFiveEState;
- 
-+#define TYPE_RISCV_E_MACHINE MACHINE_TYPE_NAME("sifive_e")
-+#define RISCV_E_MACHINE(obj) \
-+    OBJECT_CHECK(SiFiveEState, (obj), TYPE_RISCV_E_MACHINE)
-+
- enum {
-     SIFIVE_E_DEBUG,
-     SIFIVE_E_MROM,
--- 
-2.26.2
+Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 
+
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 642c8e0..3281ff2 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1073,6 +1073,7 @@ F: hw/mips/mips_r4k.c
+>  Fulong 2E
+>  M: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>  M: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> +M: Huacai Chen <chenhc@lemote.com>
+>  S: Odd Fixes
+>  F: hw/mips/mips_fulong2e.c
+>  F: hw/isa/vt82c686.c
+> --
+> 2.7.0
+>
 
