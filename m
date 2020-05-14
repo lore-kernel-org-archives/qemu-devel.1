@@ -2,101 +2,86 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24792C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 07:14:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E95A1C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 07:30:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1A4E206B6
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 07:14:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A4FEB205CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 07:30:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dz1roIAQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1A4E206B6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Neh9gaSn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4FEB205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ84z-00058m-Vu
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 03:14:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44344)
+	id 1jZ8K8-000230-PR
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 03:30:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jZ846-0004e0-O3
- for qemu-devel@nongnu.org; Thu, 14 May 2020 03:13:58 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54512
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jZ8J5-0000we-D6
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 03:29:27 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55748
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jZ845-0001Px-AZ
- for qemu-devel@nongnu.org; Thu, 14 May 2020 03:13:58 -0400
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jZ8J3-0004zf-P4
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 03:29:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589440435;
+ s=mimecast20190719; t=1589441364;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=smq3M7sjLr2KmKYlVkZ3HgBvLPmL85WDjU2eGgNfRRU=;
- b=dz1roIAQxEd64cHti8Si3iW5mid76I7MKkl4Q7WmSWwpbBKbe2zbpXBWqW0HJLs1Sjc1Qv
- U069TVtQjvftPffNRW7o0wsib0Rk8/Jr155EAnoxfodE3DHrPSuOpYQINb2FuChihtcGaG
- WnWrj/R6yQfHfSxNfsValQfygp1tiFU=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ermw2RXzyPVmnDtX2OJRHDGlkSNnyfBSqMDXYz4fNVE=;
+ b=Neh9gaSnJRouL+E7nEmPEmodADothNS7lf8+M9TDHA/i2G+0yyx73GMORpHy5CCHmc/pWd
+ 4DFL5o8TlOQKdlR514Szz+RXr44QfCyzVteqk2TQ722lV0UwkKMkRJyeKFNOnyo0Ek3vpf
+ wv07VBJM6JLMzJbTDzjvBwxPRboJXQc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-343-38Z-tahdP161XBRNhH-czA-1; Thu, 14 May 2020 03:13:53 -0400
-X-MC-Unique: 38Z-tahdP161XBRNhH-czA-1
+ us-mta-419-uDALD9utOP25819dUg8XSg-1; Thu, 14 May 2020 03:29:20 -0400
+X-MC-Unique: uDALD9utOP25819dUg8XSg-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 962AB6EAF7;
- Thu, 14 May 2020 07:13:52 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-212.ams2.redhat.com
- [10.36.113.212])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B5106579AD;
- Thu, 14 May 2020 07:13:50 +0000 (UTC)
-Subject: Re: [RFC v2] migration: Add migrate-set-bitmap-node-mapping
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-References: <20200513145610.1484567-1-mreitz@redhat.com>
- <0270abbd-3fa7-dcca-bbf5-80dd0fad1733@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <5454a628-0c6c-086c-c398-b5b3a8c6ec5b@redhat.com>
-Date: Thu, 14 May 2020 09:13:48 +0200
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF2E98AB380;
+ Thu, 14 May 2020 07:29:17 +0000 (UTC)
+Received: from [10.72.12.133] (ovpn-12-133.pek2.redhat.com [10.72.12.133])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D60926B8C5;
+ Thu, 14 May 2020 07:29:01 +0000 (UTC)
+Subject: Re: [PATCH v2 4/5] vhost: check vring address before calling unmap
+To: Dima Stepanov <dimastep@yandex-team.ru>
+References: <cover.1588252861.git.dimastep@yandex-team.ru>
+ <2d4952df2cc246f7421b4b9023a581b22210fc41.1588252862.git.dimastep@yandex-team.ru>
+ <4a03e4aa-3a21-d678-be98-13268343b674@redhat.com>
+ <20200511091117.GB27319@dimastep-nix>
+ <aea84690-3809-bf8f-a918-08fc74394a19@redhat.com>
+ <20200512090803.GA4983@dimastep-nix>
+ <561037cb-763f-53fe-6b2c-9e1b90893175@redhat.com>
+ <20200513093648.GA15630@dimastep-nix>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <12c12a75-f029-caa2-f504-174192bab1d5@redhat.com>
+Date: Thu, 14 May 2020 15:28:59 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <0270abbd-3fa7-dcca-bbf5-80dd0fad1733@redhat.com>
+In-Reply-To: <20200513093648.GA15630@dimastep-nix>
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="0PQK3dyfVeSsHH0egWg41C775G97rg6Ub"
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=jasowang@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:46
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -119,112 +104,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, Peter Krempa <pkrempa@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: fam@euphon.net, kwolf@redhat.com, stefanha@redhat.com,
+ qemu-block@nongnu.org, mst@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, arei.gonglei@huawei.com, fengli@smartx.com,
+ yc-core@yandex-team.ru, pbonzini@redhat.com, marcandre.lureau@redhat.com,
+ raphael.norwitz@nutanix.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0PQK3dyfVeSsHH0egWg41C775G97rg6Ub
-Content-Type: multipart/mixed; boundary="6XJhTwclVFPl9IpksZhybt4pYUgtT8rqD"
 
---6XJhTwclVFPl9IpksZhybt4pYUgtT8rqD
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 13.05.20 18:11, Eric Blake wrote:
-> On 5/13/20 9:56 AM, Max Reitz wrote:
->> This command allows mapping block node names to aliases for the purpose
->> of block dirty bitmap migration.
+On 2020/5/13 下午5:36, Dima Stepanov wrote:
+> On Wed, May 13, 2020 at 11:00:38AM +0800, Jason Wang wrote:
+>> On 2020/5/12 下午5:08, Dima Stepanov wrote:
+>>> On Tue, May 12, 2020 at 11:26:11AM +0800, Jason Wang wrote:
+>>>> On 2020/5/11 下午5:11, Dima Stepanov wrote:
+>>>>> On Mon, May 11, 2020 at 11:05:58AM +0800, Jason Wang wrote:
+>>>>>> On 2020/4/30 下午9:36, Dima Stepanov wrote:
+>>>>>>> Since disconnect can happen at any time during initialization not all
+>>>>>>> vring buffers (for instance used vring) can be intialized successfully.
+>>>>>>> If the buffer was not initialized then vhost_memory_unmap call will lead
+>>>>>>> to SIGSEGV. Add checks for the vring address value before calling unmap.
+>>>>>>> Also add assert() in the vhost_memory_unmap() routine.
+>>>>>>>
+>>>>>>> Signed-off-by: Dima Stepanov<dimastep@yandex-team.ru>
+>>>>>>> ---
+>>>>>>>   hw/virtio/vhost.c | 27 +++++++++++++++++++++------
+>>>>>>>   1 file changed, 21 insertions(+), 6 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+>>>>>>> index ddbdc53..3ee50c4 100644
+>>>>>>> --- a/hw/virtio/vhost.c
+>>>>>>> +++ b/hw/virtio/vhost.c
+>>>>>>> @@ -314,6 +314,8 @@ static void vhost_memory_unmap(struct vhost_dev *dev, void *buffer,
+>>>>>>>                                  hwaddr len, int is_write,
+>>>>>>>                                  hwaddr access_len)
+>>>>>>>   {
+>>>>>>> +    assert(buffer);
+>>>>>>> +
+>>>>>>>       if (!vhost_dev_has_iommu(dev)) {
+>>>>>>>           cpu_physical_memory_unmap(buffer, len, is_write, access_len);
+>>>>>>>       }
+>>>>>>> @@ -1132,12 +1134,25 @@ static void vhost_virtqueue_stop(struct vhost_dev *dev,
+>>>>>>>                                                   vhost_vq_index);
+>>>>>>>       }
+>>>>>>> -    vhost_memory_unmap(dev, vq->used, virtio_queue_get_used_size(vdev, idx),
+>>>>>>> -                       1, virtio_queue_get_used_size(vdev, idx));
+>>>>>>> -    vhost_memory_unmap(dev, vq->avail, virtio_queue_get_avail_size(vdev, idx),
+>>>>>>> -                       0, virtio_queue_get_avail_size(vdev, idx));
+>>>>>>> -    vhost_memory_unmap(dev, vq->desc, virtio_queue_get_desc_size(vdev, idx),
+>>>>>>> -                       0, virtio_queue_get_desc_size(vdev, idx));
+>>>>>>> +    /*
+>>>>>>> +     * Since the vhost-user disconnect can happen during initialization
+>>>>>>> +     * check if vring was initialized, before making unmap.
+>>>>>>> +     */
+>>>>>>> +    if (vq->used) {
+>>>>>>> +        vhost_memory_unmap(dev, vq->used,
+>>>>>>> +                           virtio_queue_get_used_size(vdev, idx),
+>>>>>>> +                           1, virtio_queue_get_used_size(vdev, idx));
+>>>>>>> +    }
+>>>>>>> +    if (vq->avail) {
+>>>>>>> +        vhost_memory_unmap(dev, vq->avail,
+>>>>>>> +                           virtio_queue_get_avail_size(vdev, idx),
+>>>>>>> +                           0, virtio_queue_get_avail_size(vdev, idx));
+>>>>>>> +    }
+>>>>>>> +    if (vq->desc) {
+>>>>>>> +        vhost_memory_unmap(dev, vq->desc,
+>>>>>>> +                           virtio_queue_get_desc_size(vdev, idx),
+>>>>>>> +                           0, virtio_queue_get_desc_size(vdev, idx));
+>>>>>>> +    }
+>>>>>> Any reason not checking hdev->started instead? vhost_dev_start() will set it
+>>>>>> to true if virtqueues were correctly mapped.
+>>>>>>
+>>>>>> Thanks
+>>>>> Well i see it a little bit different:
+>>>>>   - vhost_dev_start() sets hdev->started to true before starting
+>>>>>     virtqueues
+>>>>>   - vhost_virtqueue_start() maps all the memory
+>>>>> If we hit the vhost disconnect at the start of the
+>>>>> vhost_virtqueue_start(), for instance for this call:
+>>>>>    r = dev->vhost_ops->vhost_set_vring_base(dev, &state);
+>>>>> Then we will call vhost_user_blk_disconnect:
+>>>>>    vhost_user_blk_disconnect()->
+>>>>>      vhost_user_blk_stop()->
+>>>>>        vhost_dev_stop()->
+>>>>>          vhost_virtqueue_stop()
+>>>>> As a result we will come in this routine with the hdev->started still
+>>>>> set to true, but if used/avail/desc fields still uninitialized and set
+>>>>> to 0.
+>>>> I may miss something, but consider both vhost_dev_start() and
+>>>> vhost_user_blk_disconnect() were serialized in main loop. Can this really
+>>>> happen?
+>>> Yes, consider the case when we start the vhost-user-blk device:
+>>>    vhost_dev_start->
+>>>      vhost_virtqueue_start
+>>> And we got a disconnect in the middle of vhost_virtqueue_start()
+>>> routine, for instance:
+>>>    1000     vq->num = state.num = virtio_queue_get_num(vdev, idx);
+>>>    1001     r = dev->vhost_ops->vhost_set_vring_num(dev, &state);
+>>>    1002     if (r) {
+>>>    1003         VHOST_OPS_DEBUG("vhost_set_vring_num failed");
+>>>    1004         return -errno;
+>>>    1005     }
+>>>    --> Here we got a disconnect <--
+>>>    1006
+>>>    1007     state.num = virtio_queue_get_last_avail_idx(vdev, idx);
+>>>    1008     r = dev->vhost_ops->vhost_set_vring_base(dev, &state);
+>>>    1009     if (r) {
+>>>    1010         VHOST_OPS_DEBUG("vhost_set_vring_base failed");
+>>>    1011         return -errno;
+>>>    1012     }
+>>> As a result call to vhost_set_vring_base will call the disconnect
+>>> routine. The backtrace log for SIGSEGV is as follows:
+>>>    Thread 4 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
+>>>    [Switching to Thread 0x7ffff2ea9700 (LWP 183150)]
+>>>    0x00007ffff4d60840 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+>>>    (gdb) bt
+>>>    #0  0x00007ffff4d60840 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+>>>    #1  0x000055555590fd90 in flatview_write_continue (fv=0x7fffec4a2600,
+>>>        addr=0, attrs=..., ptr=0x0, len=1028, addr1=0,
+>>>        l=1028, mr=0x555556b1b310) at ./exec.c:3142
+>>>    #2  0x000055555590fe98 in flatview_write (fv=0x7fffec4a2600, addr=0,
+>>>        attrs=..., buf=0x0, len=1028) at ./exec.c:3177
+>>>    #3  0x00005555559101ed in address_space_write (as=0x555556893940
+>>>        <address_space_memory>, addr=0, attrs=..., buf=0x0,
+>>>        len=1028) at ./exec.c:3268
+>>>    #4  0x0000555555910caf in address_space_unmap (as=0x555556893940
+>>>        <address_space_memory>, buffer=0x0, len=1028,
+>>>        is_write=true, access_len=1028) at ./exec.c:3592
+>>>    #5  0x0000555555910d82 in cpu_physical_memory_unmap (buffer=0x0,
+>>>        len=1028, is_write=true, access_len=1028) at ./exec.c:3613
+>>>    #6  0x0000555555a16fa1 in vhost_memory_unmap (dev=0x7ffff22723e8,
+>>>        buffer=0x0, len=1028, is_write=1, access_len=1028)
+>>>        at ./hw/virtio/vhost.c:318
+>>>    #7  0x0000555555a192a2 in vhost_virtqueue_stop (dev=0x7ffff22723e8,
+>>>        vdev=0x7ffff22721a0, vq=0x55555770abf0, idx=0) at ./hw/virtio/vhost.c:1136
+>>>    #8  0x0000555555a1acc0 in vhost_dev_stop (hdev=0x7ffff22723e8,
+>>>        vdev=0x7ffff22721a0) at ./hw/virtio/vhost.c:1702
+>>>    #9  0x00005555559b6532 in vhost_user_blk_stop (vdev=0x7ffff22721a0)
+>>>        at ./hw/block/vhost-user-blk.c:196
+>>>    #10 0x00005555559b6b73 in vhost_user_blk_disconnect (dev=0x7ffff22721a0)
+>>>        at ./hw/block/vhost-user-blk.c:365
+>>>    #11 0x00005555559b6c4f in vhost_user_blk_event (opaque=0x7ffff22721a0,
+>>>        event=CHR_EVENT_CLOSED) at ./hw/block/vhost-user-blk.c:384
+>>>    #12 0x0000555555e65f7e in chr_be_event (s=0x555556b182e0, event=CHR_EVENT_CLOSED)
+>>>        at chardev/char.c:60
+>>>    #13 0x0000555555e6601a in qemu_chr_be_event (s=0x555556b182e0,
+>>>        event=CHR_EVENT_CLOSED) at chardev/char.c:80
+>>>    #14 0x0000555555e6eef3 in tcp_chr_disconnect_locked (chr=0x555556b182e0)
+>>>        at chardev/char-socket.c:488
+>>>    #15 0x0000555555e6e23f in tcp_chr_write (chr=0x555556b182e0,
+>>>        buf=0x7ffff2ea8220 "\n", len=20) at chardev/char-socket.c:178
+>>>    #16 0x0000555555e6616c in qemu_chr_write_buffer (s=0x555556b182e0,
+>>>        buf=0x7ffff2ea8220 "\n", len=20, offset=0x7ffff2ea8150, write_all=true)
+>>>        at chardev/char.c:120
+>>>    #17 0x0000555555e662d9 in qemu_chr_write (s=0x555556b182e0, buf=0x7ffff2ea8220 "\n",
+>>>        len=20, write_all=true) at chardev/char.c:155
+>>>    #18 0x0000555555e693cc in qemu_chr_fe_write_all (be=0x7ffff2272360,
+>>>        buf=0x7ffff2ea8220 "\n", len=20) at chardev/char-fe.c:53
+>>>    #19 0x0000555555a1c489 in vhost_user_write (dev=0x7ffff22723e8,
+>>>        msg=0x7ffff2ea8220, fds=0x0, fd_num=0) at ./hw/virtio/vhost-user.c:350
+>>>    #20 0x0000555555a1d325 in vhost_set_vring (dev=0x7ffff22723e8,
+>>>        request=10, ring=0x7ffff2ea8520) at ./hw/virtio/vhost-user.c:660
+>>>    #21 0x0000555555a1d4c6 in vhost_user_set_vring_base (dev=0x7ffff22723e8,
+>>>        ring=0x7ffff2ea8520) at ./hw/virtio/vhost-user.c:704
+>>>    #22 0x0000555555a18c1b in vhost_virtqueue_start (dev=0x7ffff22723e8,
+>>>        vdev=0x7ffff22721a0, vq=0x55555770abf0, idx=0) at ./hw/virtio/vhost.c:1009
+>>>    #23 0x0000555555a1a9f5 in vhost_dev_start (hdev=0x7ffff22723e8, vdev=0x7ffff22721a0)
+>>>        at ./hw/virtio/vhost.c:1639
+>>>    #24 0x00005555559b6367 in vhost_user_blk_start (vdev=0x7ffff22721a0)
+>>>        at ./hw/block/vhost-user-blk.c:150
+>>>    #25 0x00005555559b6653 in vhost_user_blk_set_status (vdev=0x7ffff22721a0, status=15 '\017')
+>>>        at ./hw/block/vhost-user-blk.c:233
+>>>    #26 0x0000555555a1072d in virtio_set_status (vdev=0x7ffff22721a0, val=15 '\017')
+>>>        at ./hw/virtio/virtio.c:1956
+>>> ---Type <return> to continue, or q <return> to quit---
+>>>
+>>> So while we inside vhost_user_blk_start() (frame#24) we are calling
+>>> vhost_user_blk_disconnect() (frame#10). And for this call the
+>>> dev->started field will be set to true.
+>>>    (gdb) frame 8
+>>>    #8  0x0000555555a1acc0 in vhost_dev_stop (hdev=0x7ffff22723e8, vdev=0x7ffff22721a0)
+>>>        at ./hw/virtio/vhost.c:1702
+>>>    1702            vhost_virtqueue_stop(hdev,
+>>>    (gdb) p hdev->started
+>>>    $1 = true
+>>>
+>>> It isn't an easy race to reproduce: to hit a disconnect at this window.
+>>> We were able to hit it during long testing on one of the reconnect
+>>> iteration. After it we were able to reproduce it with 100% by adding a
+>>> sleep() call inside qemu to make the race window bigger.
+>> Thanks for the patience.
 >>
->> This way, management tools can use different node names on the source
->> and destination and pass the mapping of how bitmaps are to be
->> transferred to qemu (on the source, the destination, or even both with
->> arbitrary aliases in the migration stream).
+>> I miss the fact that the disconnection routine could be triggered from
+>> chardev write.
 >>
->> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->=20
->> @@ -713,6 +731,44 @@ static bool dirty_bitmap_has_postcopy(void *opaque)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return true;
->> =C2=A0 }
->> =C2=A0 +void
->> qmp_migrate_set_bitmap_node_mapping(MigrationBlockNodeMappingList
->> *mapping,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 Error **errp)
->> +{
->> +=C2=A0=C2=A0=C2=A0 QDict *in_mapping =3D qdict_new();
->> +=C2=A0=C2=A0=C2=A0 QDict *out_mapping =3D qdict_new();
->> +
->> +=C2=A0=C2=A0=C2=A0 for (; mapping; mapping =3D mapping->next) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 MigrationBlockNodeMapping *e=
-ntry =3D mapping->value;
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (qdict_haskey(out_mapping=
-, entry->node_name)) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 erro=
-r_setg(errp, "Cannot map node name '%s' twice",
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 entry->node=
-_name);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto=
- fail;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->=20
-> Can we call this command more than once?=C2=A0 Is it cumulative (call it =
-once
-> to set mapping for "a", second time to also set mapping for "b"), or
-> should it reset (second call wipes out all mappings from first call, any
-> mappings that must exist must be passed in the final call)?
-
-I tried to make it clear in the documentation:
-
-> +# @mapping: The mapping; must be one-to-one, but not necessarily
-> +#           complete.  Any mapping not given will be reset to the
-> +#           default (i.e. the identity mapping).
-
-So everything that isn=E2=80=99t set in the second call is reset.  I though=
-t
-about what you proposed (because I guess that=E2=80=99s the most intuitive
-idea), but after consideration I didn=E2=80=99t see why we=E2=80=99d need d=
-ifferent
-behavior, so it would only serve to make the code more complicated.
-
-Max
-
-> The idea makes sense, and the interface seems usable.=C2=A0 It's nice tha=
-t
-> either source, destination, or both sides of migration can use it (which
-> helps in upgrade vs. downgrade scenarios).
+>> But the codes turns out to be very tricky and hard to debug since the code
+>> was wrote to deal with the error returned from vhost_ops directly, it
+>> doesn't expect vhost_dev_cleanup() was call silently for each
+>> vhost_user_write(). It would introduce troubles if we want to add new
+>> codes/operations to vhost.
+>>
+>> More questions:
+>>
+> Well these are good questions.
+>
+>> - Do we need to have some checking against hdev->started in each vhost user
+>> ops?
+> I can miss smth but it looks like that no. The vhost_dev_set_log()
+> routine has some additional logic with the vhost_virtqueue_set_addr()
+> and vhost_dev_set_features() this why we need those additional checks in
+> the migration code. For the vhost-user devices initialization or
+> deinitalization code we don't need those checks. Even more we couldn't
+> add this check to the vhost user ops, since it ops itself will be reset.
+> And i agree that even if we have no issues right now, by adding new code
+> and missing these cases we could break smth. Because review process
+> becomes harder.
 
 
---6XJhTwclVFPl9IpksZhybt4pYUgtT8rqD--
+Yes, such codes would be very hard to maintain.
 
---0PQK3dyfVeSsHH0egWg41C775G97rg6Ub
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+>
+> Maybe the good idea is postphone clean up, if we are in the middle of the
+> initialization. So it could be smth like:
+>    - Put ourself in the INITIALIZATION state
+>    - Start these vhost-user "handshake" commands
+>    - If we got a disconnect error, perform disconnect, but don't clean up
+>      device (it will be clean up on the roll back). I can be done by
+>      checking the state in vhost_user_..._disconnect routine or smth like
+>      it
+>    - vhost-user command returns error back to the _start() routine
+>    - Rollback in one place in the start() routine, by calling this
+>      postphoned clean up for the disconnect
+>
+> Michael wrote that there was similar fix for vhost-net. Can't say for
+> now, could it help or not, but need to take a look on it also.
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl6876wACgkQ9AfbAGHV
-z0AZbQgAm2NUhBiZG4jIMxUb/phBvkF/xhlZIMcSPC3gY0bf22hysIMBNDA8IlIY
-TvIGodVbddBeO+k71MjXx9kBU7kBoeUxBP/H1CRe8GnIx29e/tuNYgABOUYcxbiA
-//mUJQl5t7tSXlxcYDWOxEWgK2Z8NUrr9e+/9vHUefCQObdUVTHoSfUKvaFKShRu
-C3VMh24F15swr9djTn/YU45auDoiEeBxtoSvI9z9kChpoNnL3aKOUkXA/vjR36ZE
-OF2a4Ha3gRBiUp1g0LwFqTDjYfh7qHBjL3jYeu+87z7yIqybFyq8kZeqyRQCMv6N
-clIxHc3k4dONvCJWk7GXhkTs/nCtBQ==
-=S88W
------END PGP SIGNATURE-----
 
---0PQK3dyfVeSsHH0egWg41C775G97rg6Ub--
+Right.
+
+Thanks
+
+
+>
 
 
