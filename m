@@ -2,84 +2,78 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=CHARSET_FARAWAY_HEADER,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C031C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 12:55:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24653C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 13:05:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56160206A5
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 12:55:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dggdq2I5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56160206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E8708206DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 13:05:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8708206DA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZDOx-00089X-GW
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 08:55:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55570)
+	id 1jZDYi-0004yr-1W
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 09:05:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56842)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZDOG-0007d5-0n
- for qemu-devel@nongnu.org; Thu, 14 May 2020 08:55:08 -0400
-Received: from mail-oo1-xc41.google.com ([2607:f8b0:4864:20::c41]:45163)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZDOE-0002Rx-OV
- for qemu-devel@nongnu.org; Thu, 14 May 2020 08:55:07 -0400
-Received: by mail-oo1-xc41.google.com with SMTP id p123so676675oop.12
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 05:55:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=pgtt5Vf9zWMqvz7dLR73SNJzPhJc8IatImZjfB7FsGU=;
- b=dggdq2I5kB1qHEbRhH2y9FUFYmA+BcYOSxAv16sQgM+lRq4O3JlNWCeSnTddckGwwE
- yEDtiE9UluJTDFoixXn2SdrNmfMmAIULxwH32X7pNSLbbfTBIV6oeOkQchO+ofon9WO/
- zr9FSOej+NjMsr3VaLJP5wBrbH5nyxH6LBwWmkeTf5AxSc6rfPluyFKBqqtT+A0Z7Fb1
- C+1vu9hM5aBRZYmMcwDF/OkzUMfkhcv9UEXD/YYu9as+fTDejbQN8YIkTMG4C3mRBBjn
- JX3P7h3vgte08GxfIcc4ZtZEyKKUvGEJ63bpm2O/yIi2WtCyCiHcrM0hEiZ1y0VK/PEw
- BeFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=pgtt5Vf9zWMqvz7dLR73SNJzPhJc8IatImZjfB7FsGU=;
- b=QLwEG+pXY4NAY4RcmF9I4o/X4seNzQSSnrf0N/YyCBx5zTUg9Z4tc3zu6FbHnhVlTy
- 6uRT9dacoXXFDcHRTVvqakrI+dccROo04dcVrAkSsUOqjWfYXEClgTC07iVsFtoa7vMl
- om5s6BG5s53qJNEuyBrGwcEk6x1LB2FWO1blJW6Jslg+Ychu09c4xP4HN0nya4LvjV6f
- b52Gz4sF7fdwXsZn2hzD2Txa4agvXbwKtS9I1ynYkW8e39mFnG5HBI7xBYr520jUsXEr
- h79j3VeGTe61QkPVNNjExU9sKu/emPAir2VeIw1u8S6dqbTIXhpVlyv3k3xiqf7jlAqi
- 70MQ==
-X-Gm-Message-State: AOAM532pRHX8IkJEEdukYUzNQ8+j5R05b++bj6QIIOrn6Va431FPEBwp
- dbCSUtrXQ/Cx/xUVepXlO00gYwZVhH5FS2IyPHRpOA==
-X-Google-Smtp-Source: ABdhPJxfg97fMhIoChgFSU3gDahfzlhN0H+q+D4mK6npyKHUqsWmCzAT2+06SICQ6kodfA+es7/T0Roz7A1Gj/YhzB0=
-X-Received: by 2002:a4a:d136:: with SMTP id n22mr3413007oor.85.1589460905312; 
- Thu, 14 May 2020 05:55:05 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <zhang.zhanghailiang@huawei.com>)
+ id 1jZDXx-00043M-8D
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 09:05:09 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2089 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhang.zhanghailiang@huawei.com>)
+ id 1jZDXv-0005UH-T8
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 09:05:08 -0400
+Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.55])
+ by Forcepoint Email with ESMTP id 1C28C341606CB50D7B44;
+ Thu, 14 May 2020 21:05:01 +0800 (CST)
+Received: from dggeme758-chm.china.huawei.com (10.3.19.104) by
+ DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Thu, 14 May 2020 21:05:01 +0800
+Received: from dggeme756-chm.china.huawei.com (10.3.19.102) by
+ dggeme758-chm.china.huawei.com (10.3.19.104) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Thu, 14 May 2020 21:05:00 +0800
+Received: from dggeme756-chm.china.huawei.com ([10.6.80.68]) by
+ dggeme756-chm.china.huawei.com ([10.6.80.68]) with mapi id 15.01.1913.007;
+ Thu, 14 May 2020 21:05:00 +0800
+From: Zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: Lukas Straub <lukasstraub2@web.de>, qemu-devel <qemu-devel@nongnu.org>
+Subject: =?gb2312?B?tPC4tDogW1BBVENIIDUvNl0gbWlncmF0aW9uL3FlbXUtZmlsZS5jOiBEb24n?=
+ =?gb2312?Q?t_ratelimit_a_shutdown_fd?=
+Thread-Topic: [PATCH 5/6] migration/qemu-file.c: Don't ratelimit a shutdown fd
+Thread-Index: AQHWJ4TfIeof1kb0t0KOJInWn/6h5ainj6bg
+Date: Thu, 14 May 2020 13:05:00 +0000
+Message-ID: <1dc261c8dce6421b80071c0eb3528afd@huawei.com>
+References: <cover.1589193382.git.lukasstraub2@web.de>
+ <f3ea4250e6982598ffffc73924a6917dbc823c87.1589193382.git.lukasstraub2@web.de>
+In-Reply-To: <f3ea4250e6982598ffffc73924a6917dbc823c87.1589193382.git.lukasstraub2@web.de>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.173.220.30]
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20200512030609.19593-1-gengdongjiu@huawei.com>
-In-Reply-To: <20200512030609.19593-1-gengdongjiu@huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 May 2020 13:54:54 +0100
-Message-ID: <CAFEAcA-=pVwNXR0mqCBX1MRkzTOzxOFF_caxYSsCbiA_bq4OQA@mail.gmail.com>
-Subject: Re: [PATCH v27 00/10] Add ARMv8 RAS virtualization support in QEMU
-To: Dongjiu Geng <gengdongjiu@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c41;
- envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc41.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.189;
+ envelope-from=zhang.zhanghailiang@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 08:45:22
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: 14
+X-Spam_score: 1.4
+X-Spam_bar: +
+X-Spam_report: (1.4 / 5.0 requ) BAYES_00=-1.9, CHARSET_FARAWAY_HEADER=3.2,
+ MIME_CHARSET_FARAWAY=2.45, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,38 +86,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- kvm-devel <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Linuxarm <linuxarm@huawei.com>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, Zheng Xiang <zhengxiang9@huawei.com>,
- qemu-arm <qemu-arm@nongnu.org>, Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 12 May 2020 at 04:03, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
->
-> In the ARMv8 platform, the CPU error types includes synchronous external abort(SEA)
-> and SError Interrupt (SEI). If exception happens in guest, host does not know the detailed
-> information of guest, so it is expected that guest can do the recovery. For example, if an
-> exception happens in a guest user-space application, host does not know which application
-> encounters errors, only guest knows it.
->
-> For the ARMv8 SEA/SEI, KVM or host kernel delivers SIGBUS to notify userspace.
-> After user space gets the notification, it will record the CPER into guest GHES
-> buffer and inject an exception or IRQ to guest.
->
-> In the current implementation, if the type of SIGBUS is BUS_MCEERR_AR, we will
-> treat it as a synchronous exception, and notify guest with ARMv8 SEA
-> notification type after recording CPER into guest.
-
-
-
-Applied to target-arm.next, thanks.
-
--- PMM
+PiBUaGlzIGNhdXNlcyB0aGUgbWlncmF0aW9uIHRocmVhZCB0byBoYW5nIGlmIHdlIGZhaWxvdmVy
+IGR1cmluZyBjaGVja3BvaW50LiBBDQo+IHNodXRkb3duIGZkIHdvbid0IGNhdXNlIG5ldHdvcmsg
+dHJhZmZpYyBhbnl3YXkuDQo+IA0KDQpJJ20gbm90IHF1aXRlIHN1cmUgaWYgdGhpcyBtb2RpZmlj
+YXRpb24gY2FuIHRha2Ugc2lkZSBlZmZlY3Qgb24gbm9ybWFsIG1pZ3JhdGlvbiBwcm9jZXNzIG9y
+IG5vdCwNClRoZXJlIGFyZSBzZXZlcmFsIHBsYWNlcyBjYWxsaW5nIGl0Lg0KDQpNYXliZSBKdWFu
+IGFuZCBEYXZlIGNhbiBoZWxwIDspDQoNCj4gU2lnbmVkLW9mZi1ieTogTHVrYXMgU3RyYXViIDxs
+dWthc3N0cmF1YjJAd2ViLmRlPg0KPiAtLS0NCj4gIG1pZ3JhdGlvbi9xZW11LWZpbGUuYyB8IDIg
+Ky0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQ0KPiAN
+Cj4gZGlmZiAtLWdpdCBhL21pZ3JhdGlvbi9xZW11LWZpbGUuYyBiL21pZ3JhdGlvbi9xZW11LWZp
+bGUuYyBpbmRleA0KPiAxYzNhMzU4YTE0Li4wNzQ4YjU4MTBmIDEwMDY0NA0KPiAtLS0gYS9taWdy
+YXRpb24vcWVtdS1maWxlLmMNCj4gKysrIGIvbWlncmF0aW9uL3FlbXUtZmlsZS5jDQo+IEBAIC02
+NjAsNyArNjYwLDcgQEAgaW50NjRfdCBxZW11X2Z0ZWxsKFFFTVVGaWxlICpmKSAgaW50DQo+IHFl
+bXVfZmlsZV9yYXRlX2xpbWl0KFFFTVVGaWxlICpmKSAgew0KPiAgICAgIGlmIChmLT5zaHV0ZG93
+bikgew0KPiAtICAgICAgICByZXR1cm4gMTsNCj4gKyAgICAgICAgcmV0dXJuIDA7DQo+ICAgICAg
+fQ0KPiAgICAgIGlmIChxZW11X2ZpbGVfZ2V0X2Vycm9yKGYpKSB7DQo+ICAgICAgICAgIHJldHVy
+biAxOw0KPiAtLQ0KPiAyLjIwLjENCg0K
 
