@@ -2,93 +2,100 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C1EDC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5801EC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:57:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31C2D205CB
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:56:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2352E205CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:57:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pKcVzjRd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31C2D205CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CpXsLBKn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2352E205CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZFI1-00036d-Du
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:56:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39742)
+	id 1jZFIh-0004Yp-7g
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:57:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41568)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZEkv-00047v-Pz
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:37 -0400
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:38671)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZEku-00061V-Q0
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:37 -0400
-Received: by mail-wr1-x433.google.com with SMTP id e1so4373044wrt.5
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:22:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=Y5Eu2fOXO+eWchn2baPnHmqP/C+vDVXQhtqqQOOoM5I=;
- b=pKcVzjRdLI0pFaZnicDkLOKelDgoO2YR4C9UvtRyO2Tn5BQUQ4CMXBWtw8wriMb349
- 7TsyV0jLtdaDJkBBfKDqaI0N2p3q8c27SHuYLYWzFL7kieMAyUygvuzjkt3l8NyURJvi
- +8UDCypN00cQOIYScFYcZ/lFnDwihMq6cE3g13GsmT10Zz/eU1TYeGrMWwQVojB48lQU
- V+et9wLOQ1b9uqtMZP900kCtsSFqOCbJACRK8IbAH0SZTf5kG4Ie7/4sYUKjvffMlIks
- j9I/yw9WW8C6EklV4CUJ6NZ44DKCwrZDGZQarEpZDXSI5/hJ+RBYwpQix+ux7i30cV6J
- Z4KA==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZEwZ-00037F-FL
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:34:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23991
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZEwY-0000qy-Hk
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:34:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589466877;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=oHcjS/gDSvJi5JV1G/ZxayYlfSvkuPGEpEPtZBkMcI0=;
+ b=CpXsLBKnBX4oTIpZh8UJd31R0KVS1UjfTF/+T8vuwVBzR7QRTVXNiPrmMnS3mntmzQKvSf
+ W3U4RN6jwPEe65En5wv37+jqQmgtwDer3btIRVaKae2RSO/tVbuwN3ZZe0aa9qK8K1uRZW
+ 3RXfUjqPQtTYKEqX0mHrjIS9u5AeyO4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-53-dhxElA4LNpS6NCuniscG2Q-1; Thu, 14 May 2020 10:34:36 -0400
+X-MC-Unique: dhxElA4LNpS6NCuniscG2Q-1
+Received: by mail-wr1-f71.google.com with SMTP id r7so1673294wrc.13
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:34:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Y5Eu2fOXO+eWchn2baPnHmqP/C+vDVXQhtqqQOOoM5I=;
- b=jFGlPCZp9wiI8QiPUi3kEchQ7PwcSj7D2iXWDpEo1z2YhhcApbsWH63iaViAleuRv2
- qfWJocBaF7jTsALKGWEEen14kO2HHbpyeUzDOQHjdIaSPhPpkHvCfNuX5dn+1vrYilnz
- B6Dpvfn34JxeIKC3H6zQlSNDschh6+NbZcAxq+SvL4AqnldT5nc2eNbFcM8tedP5j73T
- 09fkwuRO/QPiSQFxlbsgCGjkFgEUQQoiS7p2C22Kkq5sD9fF2PZlnLS4ZAC7v547870O
- Hws/a9mNaWZ2t2HhQDGsIpNyVTBoZTRjwPyYQiYtlD4T2KBEQglonqF/1DYdyCwROmld
- hlfw==
-X-Gm-Message-State: AOAM5333m9xApdklGRfUTZpkfVEovNirW7qwXPFtS70icUrEoEbEkPAQ
- 8AXq6zIhPaIlceF4kNAqmiuOTHR6qoVP8A==
-X-Google-Smtp-Source: ABdhPJznDXy+LyJ6ppDXr/VpCXXLf4VCK0b/FawO1Sn2937gxnBKxv34suBzS8GSWnRy/0YDPPM3Pg==
-X-Received: by 2002:adf:e784:: with SMTP id n4mr6109054wrm.170.1589466155068; 
- Thu, 14 May 2020 07:22:35 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 88sm4077443wrq.77.2020.05.14.07.22.34
- for <qemu-devel@nongnu.org>
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=oHcjS/gDSvJi5JV1G/ZxayYlfSvkuPGEpEPtZBkMcI0=;
+ b=DNXsi7FmOgBG3qVRQu8+axAxWGXYZ8XKK4WfMdKtiyzwSFiP90BXqdfg2Mhhnc5tDC
+ ogSt2UDe4I1MGWfntypnIoHrl/7jMBMIgNLN110CgWocYRPQ210BIO2uBeKRBMSPqk+d
+ oyuOmm1a5mcmNZHk4r41KJ5hTyICuXSHj7J7bpTF5+N5cVSA+jms3VWAjafaZfAYDkfy
+ OCR3aubaD5thLvBMqd/gsXmxbEVtxdKwny8DAjPmaHYhbvli+H0+3lfLHtU2b9iSsudU
+ xnfjin7uvGZkrNFpj/FI21xV4VNeWmrLLaiE6Zhx7aDx35MDlX0CqJwCRn0ZQb8Xxl7F
+ WLxA==
+X-Gm-Message-State: AGi0PubuXRHozpGH4bFd+6xx600feghExbFm8qiz5hs23oBnKF2gBzqo
+ eyeumGFMGNY9x5vo4JgxRmA1KLnd/ncl17+/0rBzvVPn3OxEOVLox4lsoZOlsc4rtjYOA0PZwcy
+ 7nPCEJMgZ4gGCXH0=
+X-Received: by 2002:a05:600c:230e:: with SMTP id
+ 14mr21660366wmo.45.1589466875048; 
+ Thu, 14 May 2020 07:34:35 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJ5AviXNwcgzxFDFwewltqdpAsnylScSQa3zE0apVgXT6sJqjXl8Ttuv6dmUeD36XtKuPWJcA==
+X-Received: by 2002:a05:600c:230e:: with SMTP id
+ 14mr21660341wmo.45.1589466874797; 
+ Thu, 14 May 2020 07:34:34 -0700 (PDT)
+Received: from x1w.redhat.com (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id y10sm4529626wrd.95.2020.05.14.07.34.33
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 14 May 2020 07:22:34 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
+ Thu, 14 May 2020 07:34:34 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 43/45] target/arm: Move 'env' argument of recps_f32 and
- rsqrts_f32 helpers to usual place
-Date: Thu, 14 May 2020 15:21:36 +0100
-Message-Id: <20200514142138.20875-44-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200514142138.20875-1-peter.maydell@linaro.org>
-References: <20200514142138.20875-1-peter.maydell@linaro.org>
+Subject: [PATCH 0/6] tests/fuzz: Review notes
+Date: Thu, 14 May 2020 16:34:27 +0200
+Message-Id: <20200514143433.18569-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::433;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x433.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,80 +108,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Alexander Bulekov <alxndr@bu.edu>, Bandan Das <bsd@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The usual location for the env argument in the argument list of a TCG helper
-is immediately after the return-value argument. recps_f32 and rsqrts_f32
-differ in that they put it at the end.
+I took some code notes while testing Alex's toy.
+Sending them as patches.
 
-Move the env argument to its usual place; this will allow us to
-more easily use these helper functions with the gvec APIs.
+Alex, I had theses issues while building following
+docs/devel/fuzzing.txt:
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200512163904.10918-16-peter.maydell@linaro.org
----
- target/arm/helper.h     | 4 ++--
- target/arm/translate.c  | 4 ++--
- target/arm/vfp_helper.c | 4 ++--
- 3 files changed, 6 insertions(+), 6 deletions(-)
+    CC      nbd/server.o
+  nbd/server.c:1937:1: error: unused function 'glib_listautoptr_cleanup_NBDExtentArray' [-Werror,-Wunused-function]
+  G_DEFINE_AUTOPTR_CLEANUP_FUNC(NBDExtentArray, nbd_extent_array_free);
+  ^
+  /usr/include/glib-2.0/glib/gmacros.h:462:22: note: expanded from macro 'G_DEFINE_AUTOPTR_CLEANUP_FUNC'
+    static inline void _GLIB_AUTOPTR_LIST_FUNC_NAME(TypeName) (GList **_l) { g_list_free_full (*_l, (GDestroyNotify) func); } \
+                       ^
+  /usr/include/glib-2.0/glib/gmacros.h:443:48: note: expanded from macro '_GLIB_AUTOPTR_LIST_FUNC_NAME'
+  #define _GLIB_AUTOPTR_LIST_FUNC_NAME(TypeName) glib_listautoptr_cleanup_##TypeName
+                                                 ^
+Solved by using './configure ... --extra-cflags=-Wno-unused-function'
 
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 6e9629c87b0..49336dc432c 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -203,8 +203,8 @@ DEF_HELPER_FLAGS_3(vfp_fcvt_f64_to_f16, TCG_CALL_NO_RWG, f16, f64, ptr, i32)
- DEF_HELPER_4(vfp_muladdd, f64, f64, f64, f64, ptr)
- DEF_HELPER_4(vfp_muladds, f32, f32, f32, f32, ptr)
- 
--DEF_HELPER_3(recps_f32, f32, f32, f32, env)
--DEF_HELPER_3(rsqrts_f32, f32, f32, f32, env)
-+DEF_HELPER_3(recps_f32, f32, env, f32, f32)
-+DEF_HELPER_3(rsqrts_f32, f32, env, f32, f32)
- DEF_HELPER_FLAGS_2(recpe_f16, TCG_CALL_NO_RWG, f16, f16, ptr)
- DEF_HELPER_FLAGS_2(recpe_f32, TCG_CALL_NO_RWG, f32, f32, ptr)
- DEF_HELPER_FLAGS_2(recpe_f64, TCG_CALL_NO_RWG, f64, f64, ptr)
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index b9fcbbcbcb5..23e3705172b 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -5494,9 +5494,9 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                 tcg_temp_free_ptr(fpstatus);
-             } else {
-                 if (size == 0) {
--                    gen_helper_recps_f32(tmp, tmp, tmp2, cpu_env);
-+                    gen_helper_recps_f32(tmp, cpu_env, tmp, tmp2);
-                 } else {
--                    gen_helper_rsqrts_f32(tmp, tmp, tmp2, cpu_env);
-+                    gen_helper_rsqrts_f32(tmp, cpu_env, tmp, tmp2);
-               }
-             }
-             break;
-diff --git a/target/arm/vfp_helper.c b/target/arm/vfp_helper.c
-index ec007fce255..88483d4066d 100644
---- a/target/arm/vfp_helper.c
-+++ b/target/arm/vfp_helper.c
-@@ -581,7 +581,7 @@ uint32_t HELPER(vfp_fcvt_f64_to_f16)(float64 a, void *fpstp, uint32_t ahp_mode)
- #define float32_three make_float32(0x40400000)
- #define float32_one_point_five make_float32(0x3fc00000)
- 
--float32 HELPER(recps_f32)(float32 a, float32 b, CPUARMState *env)
-+float32 HELPER(recps_f32)(CPUARMState *env, float32 a, float32 b)
- {
-     float_status *s = &env->vfp.standard_fp_status;
-     if ((float32_is_infinity(a) && float32_is_zero_or_denormal(b)) ||
-@@ -594,7 +594,7 @@ float32 HELPER(recps_f32)(float32 a, float32 b, CPUARMState *env)
-     return float32_sub(float32_two, float32_mul(a, b, s), s);
- }
- 
--float32 HELPER(rsqrts_f32)(float32 a, float32 b, CPUARMState *env)
-+float32 HELPER(rsqrts_f32)(CPUARMState *env, float32 a, float32 b)
- {
-     float_status *s = &env->vfp.standard_fp_status;
-     float32 product;
+    LINK    i386-softmmu/qemu-fuzz-i386
+  /usr/lib64/clang/9.0.1/lib/linux/libclang_rt.asan-aarch64.a(asan_interceptors_vfork.S.o): warning: common of `__interception::real_vfork' overridden by definition
+  /usr/lib64/clang/9.0.1/lib/linux/libclang_rt.asan-aarch64.a(asan_interceptors.cc.o): warning: defined here
+
+I simply ignore this warning.
+
+Alex, could you provide few more examples (in particular about
+instantiating devices, or useful libfuzzer arguments)?
+
+Also, I suppose you are using a script to generate the bug reports:
+
+  I can reproduce it in qemu 5.0 using:
+
+  cat << EOF | qemu-system ...
+  outl 0xcf8 ...
+  outl 0xcfc ...
+  ...
+  EOF
+
+Is this script available in the QEMU repository? I couldn't find it.
+
+Regards,
+
+Phil.
+
+Philippe Mathieu-Daudé (6):
+  tests/fuzz/Makefile: Do not link code using unavailable devices
+  Makefile: List fuzz targets in 'make help'
+  tests/fuzz: Add missing space in test description
+  tests/fuzz: Remove unuseful/unused typedefs
+  tests/fuzz: Extract pciconfig_fuzz_qos() method
+  tests/fuzz: Extract ioport_fuzz_qtest() method
+
+ Makefile                          |  6 +++-
+ tests/qtest/fuzz/i440fx_fuzz.c    | 47 ++++++++++++++++++++-----------
+ tests/qtest/fuzz/Makefile.include |  6 ++--
+ 3 files changed, 38 insertions(+), 21 deletions(-)
+
 -- 
-2.20.1
+2.21.3
 
 
