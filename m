@@ -2,96 +2,91 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42206C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:56:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C1EDC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:56:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AFC1205CB
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:56:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 31C2D205CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:56:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dQivoLTJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AFC1205CB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pKcVzjRd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31C2D205CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZFHV-00020v-2g
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:56:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41220)
+	id 1jZFI1-00036d-Du
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:56:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39742)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jZEtq-0005bO-UU; Thu, 14 May 2020 10:31:51 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36178)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jZEkv-00047v-Pz
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:37 -0400
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:38671)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jZEtq-0000R9-0n; Thu, 14 May 2020 10:31:50 -0400
-Received: by mail-wr1-x444.google.com with SMTP id y16so4440760wrs.3;
- Thu, 14 May 2020 07:31:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=6dEkqGwX3ANiGV0kFl51uDv7FKXAb9zRqWwSMJvEoTc=;
- b=dQivoLTJThr14z4DFgsJBFZDylXDppKgeeQKPqE1myU5UyFFXYJbdX9SC7XGswhPNF
- 0uSdSTxFnrY8rO5SBFbKbaNPGJ2XK+qMVNlEK8Rk2gSl3JIRIgW5Wn6RoFUboltsarqY
- K7X5ZPGdkqL89nrPOHWdDCN+3FoFu73xCvPgutzv+lFgxtC0AlETPhCzLuGhYf9TNkf1
- 25zMqxNaUMkPz1RWqYuMQJSVE+vvXUQaepiBeGnD5F/o66IwUAXcDktSPIXV0SZXyJww
- 5FLqvwF+YhR1hi7u1Z6YTwoxjyXXnWQja/FEWpxyp0mPFBdo6tO2Az1pXS1HLnQLVM3l
- jU/A==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jZEku-00061V-Q0
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:37 -0400
+Received: by mail-wr1-x433.google.com with SMTP id e1so4373044wrt.5
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:22:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=Y5Eu2fOXO+eWchn2baPnHmqP/C+vDVXQhtqqQOOoM5I=;
+ b=pKcVzjRdLI0pFaZnicDkLOKelDgoO2YR4C9UvtRyO2Tn5BQUQ4CMXBWtw8wriMb349
+ 7TsyV0jLtdaDJkBBfKDqaI0N2p3q8c27SHuYLYWzFL7kieMAyUygvuzjkt3l8NyURJvi
+ +8UDCypN00cQOIYScFYcZ/lFnDwihMq6cE3g13GsmT10Zz/eU1TYeGrMWwQVojB48lQU
+ V+et9wLOQ1b9uqtMZP900kCtsSFqOCbJACRK8IbAH0SZTf5kG4Ie7/4sYUKjvffMlIks
+ j9I/yw9WW8C6EklV4CUJ6NZ44DKCwrZDGZQarEpZDXSI5/hJ+RBYwpQix+ux7i30cV6J
+ Z4KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=6dEkqGwX3ANiGV0kFl51uDv7FKXAb9zRqWwSMJvEoTc=;
- b=eDd+Opc+s8MrPGU+YPjz3b3KkIScH2W2k+k10GlFnnckCDwI7ne4T59l8HAWazlBow
- 7WvhuOnTUPxfMTHk0m5UwgK64VMVn7Rk2aZNHc/mOFbh/efmHkXtUXI1hScTFdPLt+5h
- WOKrcryvnEW99YYU1YnFNVHkYXoD8aL3COuyV24sNZIlx6E24bAMo0DWRkN0wF5ZBgLG
- qc8cuUbDK1S/pgCBvUqM/VY6w+Nh69zn1dwRVrZijOiV3eaTeGlVTJltWIAdMx5EPlkI
- sjKvpetIz6AvAK+5ukpefvkoJvCp5j1IFJvyXqdUgHc++Fe81iMdRTn5/eTReNKXvwN2
- G5uw==
-X-Gm-Message-State: AOAM532atCycFKq5vA8Pyi84Q4ZwCbwp21dZ/KE2nQmJEoEkzZFIgcSB
- fmEMniKfvmiesdzJqvKCfQs=
-X-Google-Smtp-Source: ABdhPJxJavPDYtGhOEhciVB1KQYpDWlf49rUYRHKn0BsDyGa0j0f3eTwj/1EsJf2hcpSZj73zxWnsQ==
-X-Received: by 2002:a5d:61c5:: with SMTP id q5mr5976974wrv.398.1589466708076; 
- Thu, 14 May 2020 07:31:48 -0700 (PDT)
-Received: from [192.168.1.39] (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id v126sm11915814wmb.4.2020.05.14.07.31.46
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 14 May 2020 07:31:47 -0700 (PDT)
-Subject: Re: [PATCH v2 2/3] hw/mips/mips_int: Use qdev gpio rather than
- qemu_allocate_irqs()
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200512074813.29992-1-f4bug@amsat.org>
- <20200512074813.29992-3-f4bug@amsat.org>
- <CAFEAcA9=OkWR5mo=6K_YhraSUhQhzV3_G7cKQ9S5mPWhFZVfdw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <d5e3b0a0-83f7-06ff-04be-a5dae669e654@amsat.org>
-Date: Thu, 14 May 2020 16:31:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=Y5Eu2fOXO+eWchn2baPnHmqP/C+vDVXQhtqqQOOoM5I=;
+ b=jFGlPCZp9wiI8QiPUi3kEchQ7PwcSj7D2iXWDpEo1z2YhhcApbsWH63iaViAleuRv2
+ qfWJocBaF7jTsALKGWEEen14kO2HHbpyeUzDOQHjdIaSPhPpkHvCfNuX5dn+1vrYilnz
+ B6Dpvfn34JxeIKC3H6zQlSNDschh6+NbZcAxq+SvL4AqnldT5nc2eNbFcM8tedP5j73T
+ 09fkwuRO/QPiSQFxlbsgCGjkFgEUQQoiS7p2C22Kkq5sD9fF2PZlnLS4ZAC7v547870O
+ Hws/a9mNaWZ2t2HhQDGsIpNyVTBoZTRjwPyYQiYtlD4T2KBEQglonqF/1DYdyCwROmld
+ hlfw==
+X-Gm-Message-State: AOAM5333m9xApdklGRfUTZpkfVEovNirW7qwXPFtS70icUrEoEbEkPAQ
+ 8AXq6zIhPaIlceF4kNAqmiuOTHR6qoVP8A==
+X-Google-Smtp-Source: ABdhPJznDXy+LyJ6ppDXr/VpCXXLf4VCK0b/FawO1Sn2937gxnBKxv34suBzS8GSWnRy/0YDPPM3Pg==
+X-Received: by 2002:adf:e784:: with SMTP id n4mr6109054wrm.170.1589466155068; 
+ Thu, 14 May 2020 07:22:35 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id 88sm4077443wrq.77.2020.05.14.07.22.34
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 14 May 2020 07:22:34 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 43/45] target/arm: Move 'env' argument of recps_f32 and
+ rsqrts_f32 helpers to usual place
+Date: Thu, 14 May 2020 15:21:36 +0100
+Message-Id: <20200514142138.20875-44-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200514142138.20875-1-peter.maydell@linaro.org>
+References: <20200514142138.20875-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9=OkWR5mo=6K_YhraSUhQhzV3_G7cKQ9S5mPWhFZVfdw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::433;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x433.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.001,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
@@ -106,74 +101,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Stafford Horne <shorne@gmail.com>, John Snow <jsnow@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/14/20 3:24 PM, Peter Maydell wrote:
-> On Tue, 12 May 2020 at 08:48, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->>
->> Switch to using the qdev gpio API which is preferred over
->> qemu_allocate_irqs(). One step to eventually deprecate and
->> remove qemu_allocate_irqs() one day.
-> 
->> diff --git a/hw/mips/mips_int.c b/hw/mips/mips_int.c
->> index 796730b11d..91788c51a9 100644
->> --- a/hw/mips/mips_int.c
->> +++ b/hw/mips/mips_int.c
->> @@ -74,14 +74,12 @@ static void cpu_mips_irq_request(void *opaque, int irq, int level)
->>   void cpu_mips_irq_init_cpu(MIPSCPU *cpu)
->>   {
->>       CPUMIPSState *env = &cpu->env;
->> -    qemu_irq *qi;
->>       int i;
->>
->> -    qi = qemu_allocate_irqs(cpu_mips_irq_request, cpu, 8);
->> +    qdev_init_gpio_in(DEVICE(cpu), cpu_mips_irq_request, 8);
->>       for (i = 0; i < 8; i++) {
->> -        env->irq[i] = qi[i];
->> +        env->irq[i] = qdev_get_gpio_in(DEVICE(cpu), i);
->>       }
->> -    g_free(qi);
->>   }
-> 
-> Similar comments as with the openrisc patch apply here:
->   * ideally this code should be in target/mips/, not in hw/mips
->   * board code should call qdev_get_gpio_in() to get the IRQ
->     line, rather than fishing env->irq[] out of the CPU object
->     directly
-> This is a bit more complicated than with openrisc, because there's
-> more than just a single board model, and not all MIPS boards call
-> cpu_mips_irq_init_cpu() so figuring out whether MIPS CPUs should
-> always provide inbound CPU lines, or only those with some
-> particular feature, or something else, would need some
-> investigation or MIPS knowledge.
+The usual location for the env argument in the argument list of a TCG helper
+is immediately after the return-value argument. recps_f32 and rsqrts_f32
+differ in that they put it at the end.
 
-Yes, I'm aware of at least 3 different to map interrupts to a MIPS core.
-QEMU models at least 2.
+Move the env argument to its usual place; this will allow us to
+more easily use these helper functions with the gvec APIs.
 
-As X86, MIPS code use old QEMU API, I don't see the codebase being 
-upgraded anytime soon.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200512163904.10918-16-peter.maydell@linaro.org
+---
+ target/arm/helper.h     | 4 ++--
+ target/arm/translate.c  | 4 ++--
+ target/arm/vfp_helper.c | 4 ++--
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
-This is another borderline case between architecture and hardware, as 
-the cache units, or the ARM NVIC. Ideally we should keep target/* free 
-of references to hw/* code. In my experience it often give troubles.
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index 6e9629c87b0..49336dc432c 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -203,8 +203,8 @@ DEF_HELPER_FLAGS_3(vfp_fcvt_f64_to_f16, TCG_CALL_NO_RWG, f16, f64, ptr, i32)
+ DEF_HELPER_4(vfp_muladdd, f64, f64, f64, f64, ptr)
+ DEF_HELPER_4(vfp_muladds, f32, f32, f32, f32, ptr)
+ 
+-DEF_HELPER_3(recps_f32, f32, f32, f32, env)
+-DEF_HELPER_3(rsqrts_f32, f32, f32, f32, env)
++DEF_HELPER_3(recps_f32, f32, env, f32, f32)
++DEF_HELPER_3(rsqrts_f32, f32, env, f32, f32)
+ DEF_HELPER_FLAGS_2(recpe_f16, TCG_CALL_NO_RWG, f16, f16, ptr)
+ DEF_HELPER_FLAGS_2(recpe_f32, TCG_CALL_NO_RWG, f32, f32, ptr)
+ DEF_HELPER_FLAGS_2(recpe_f64, TCG_CALL_NO_RWG, f64, f64, ptr)
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index b9fcbbcbcb5..23e3705172b 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -5494,9 +5494,9 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                 tcg_temp_free_ptr(fpstatus);
+             } else {
+                 if (size == 0) {
+-                    gen_helper_recps_f32(tmp, tmp, tmp2, cpu_env);
++                    gen_helper_recps_f32(tmp, cpu_env, tmp, tmp2);
+                 } else {
+-                    gen_helper_rsqrts_f32(tmp, tmp, tmp2, cpu_env);
++                    gen_helper_rsqrts_f32(tmp, cpu_env, tmp, tmp2);
+               }
+             }
+             break;
+diff --git a/target/arm/vfp_helper.c b/target/arm/vfp_helper.c
+index ec007fce255..88483d4066d 100644
+--- a/target/arm/vfp_helper.c
++++ b/target/arm/vfp_helper.c
+@@ -581,7 +581,7 @@ uint32_t HELPER(vfp_fcvt_f64_to_f16)(float64 a, void *fpstp, uint32_t ahp_mode)
+ #define float32_three make_float32(0x40400000)
+ #define float32_one_point_five make_float32(0x3fc00000)
+ 
+-float32 HELPER(recps_f32)(float32 a, float32 b, CPUARMState *env)
++float32 HELPER(recps_f32)(CPUARMState *env, float32 a, float32 b)
+ {
+     float_status *s = &env->vfp.standard_fp_status;
+     if ((float32_is_infinity(a) && float32_is_zero_or_denormal(b)) ||
+@@ -594,7 +594,7 @@ float32 HELPER(recps_f32)(float32 a, float32 b, CPUARMState *env)
+     return float32_sub(float32_two, float32_mul(a, b, s), s);
+ }
+ 
+-float32 HELPER(rsqrts_f32)(float32 a, float32 b, CPUARMState *env)
++float32 HELPER(rsqrts_f32)(CPUARMState *env, float32 a, float32 b)
+ {
+     float_status *s = &env->vfp.standard_fp_status;
+     float32 product;
+-- 
+2.20.1
 
-> But this is an OK first
-> step anyway, so
-> 
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-Thanks. The idea to keep qemu_allocate_irqs() as internal as possible, 
-and have devices use the qdev GPIO API.
-
-> 
-> thanks
-> -- PMM
-> 
 
