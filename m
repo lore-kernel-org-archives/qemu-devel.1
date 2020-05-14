@@ -2,126 +2,154 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37AAAC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 15:12:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C9DBC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 15:12:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC07820657
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 15:12:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CE54F20657
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 15:12:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GaXIsk7f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC07820657
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YZZmVdFU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE54F20657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZFWv-0005hQ-5J
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 11:12:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42232)
+	id 1jZFXH-0006V8-2L
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 11:12:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46080)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <maxime.coquelin@redhat.com>)
- id 1jZF1Z-0003xE-Nd
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:39:49 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42178
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZFSm-0006UR-55
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 11:07:56 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:24018
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <maxime.coquelin@redhat.com>)
- id 1jZF1Y-00024N-A9
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:39:49 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZFSk-0000Xu-02
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 11:07:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589467187;
+ s=mimecast20190719; t=1589468872;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=PY6X2TMC6Yg/dKBKgy52aCDMdRRZO1wcxRhTuuiSbnE=;
- b=GaXIsk7fS9usNlB4eHaOlJ9L2CX9NaxOkEzCvZhsq7G/0o6YtcqdvLHVL0EuaQKzSzIRpS
- aLq76GQeDRTt1aqq/+j0FQks1CZn+ubZlBJqFdKKhuO3gE+rd9N209o75Oufu3ayqNqzLO
- IOxkTB0a/Rftmk4TSmGjMkTh4e4UQQQ=
+ bh=OxfKMeNak/g0s9oH965lYtb/LkG3//9UjlWh905/HxY=;
+ b=YZZmVdFUadoFnhhGHzvj9DnbPjB8RvyCzhZbJkcXt0O6QztryvdR5Njchc6j8T4llxj1T1
+ LaDAk4pOE/RocCUA2eqprwVQKjc9ULDphb9Sp6s2UpCLiyu+OTuoxVW10Nw2+OzR/+v97z
+ QxqiRYUfXnBknbZYvjOy/sDxwuuroM8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-33-1WTYsljMPxe-uud5t6VivA-1; Thu, 14 May 2020 10:39:44 -0400
-X-MC-Unique: 1WTYsljMPxe-uud5t6VivA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-337-HLf3GH2NPaC7UZKXypzq1Q-1; Thu, 14 May 2020 11:07:42 -0400
+X-MC-Unique: HLf3GH2NPaC7UZKXypzq1Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C67419200C4;
- Thu, 14 May 2020 14:39:43 +0000 (UTC)
-Received: from [10.36.110.30] (unknown [10.36.110.30])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3D75E5C1BE;
- Thu, 14 May 2020 14:39:28 +0000 (UTC)
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20200514073332.1434576-1-maxime.coquelin@redhat.com>
- <33dae8af-a7ee-e005-f8d5-2b4a038b8211@redhat.com>
- <670d4623-fba9-dba6-8eea-2f1c16f2ad4b@redhat.com>
- <20200514064721-mutt-send-email-mst@kernel.org>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Autocrypt: addr=maxime.coquelin@redhat.com; keydata=
- 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
- Mwqu3GQ=
-Subject: Re: [PATCH] vhost-user: add support for VHOST_USER_SET_STATUS
-Message-ID: <b915c324-2e07-9149-e527-2be8087f8b06@redhat.com>
-Date: Thu, 14 May 2020 16:39:26 +0200
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44A49835B41;
+ Thu, 14 May 2020 15:07:41 +0000 (UTC)
+Received: from [10.10.113.9] (ovpn-113-9.rdu2.redhat.com [10.10.113.9])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8BD015D714;
+ Thu, 14 May 2020 15:07:39 +0000 (UTC)
+Subject: Re: [PATCH v4 1/3] qmp.py: change event_wait to use a dict
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200514022536.2568-1-jsnow@redhat.com>
+ <20200514022536.2568-2-jsnow@redhat.com>
+ <20200514144732.GJ5518@linux.fritz.box>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <de1026e4-9815-f89c-4cfd-6da35ac23197@redhat.com>
+Date: Thu, 14 May 2020 11:07:38 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200514064721-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200514144732.GJ5518@linux.fritz.box>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81;
- envelope-from=maxime.coquelin@redhat.com; helo=us-smtp-delivery-1.mimecast.com
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:46
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
@@ -129,8 +157,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -143,271 +171,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: shahafs@mellanox.com, lulu@redhat.com, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org, amorenoz@redhat.com, matan@mellanox.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 5/14/20 12:51 PM, Michael S. Tsirkin wrote:
-> On Thu, May 14, 2020 at 12:14:32PM +0200, Maxime Coquelin wrote:
+On 5/14/20 10:47 AM, Kevin Wolf wrote:
+> Am 14.05.2020 um 04:25 hat John Snow geschrieben:
+>> It's easier to work with than a list of tuples, because we can check the
+>> keys for membership.
 >>
->>
->> On 5/14/20 9:53 AM, Jason Wang wrote:
->>>
->>> On 2020/5/14 下午3:33, Maxime Coquelin wrote:
->>>> It is usefull for the Vhost-user backend to know
->>>> about about the Virtio device status updates,
->>>> especially when the driver sets the DRIVER_OK bit.
->>>>
->>>> With that information, no more need to do hazardous
->>>> assumptions on when the driver is done with the
->>>> device configuration.
->>>>
->>>> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
->>>> ---
->>>>
->>>> This patch applies on top of Cindy's "vDPA support in qemu"
->>>> series, which introduces the .vhost_set_state vhost-backend
->>>> ops.
->>>>
->>>>   docs/interop/vhost-user.rst | 12 ++++++++++++
->>>>   hw/net/vhost_net.c          | 10 +++++-----
->>>>   hw/virtio/vhost-user.c      | 35 +++++++++++++++++++++++++++++++++++
->>>>   3 files changed, 52 insertions(+), 5 deletions(-)
->>>>
->>>> diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
->>>> index 3b1b6602c7..f108de7458 100644
->>>> --- a/docs/interop/vhost-user.rst
->>>> +++ b/docs/interop/vhost-user.rst
->>>> @@ -815,6 +815,7 @@ Protocol features
->>>>     #define VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD       12
->>>>     #define VHOST_USER_PROTOCOL_F_RESET_DEVICE         13
->>>>     #define VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS 14
->>>> +  #define VHOST_USER_PROTOCOL_F_STATUS               15
->>>>     Master message types
->>>>   --------------------
->>>> @@ -1263,6 +1264,17 @@ Master message types
->>>>       The state.num field is currently reserved and must be set to 0.
->>>>   +``VHOST_USER_SET_STATUS``
->>>> +  :id: 36
->>>> +  :equivalent ioctl: VHOST_VDPA_SET_STATUS
->>>> +  :slave payload: N/A
->>>> +  :master payload: ``u64``
->>>> +
->>>> +  When the ``VHOST_USER_PROTOCOL_F_STATUS`` protocol feature has been
->>>> +  successfully negotiated, this message is submitted by the master to
->>>> +  notify the backend with updated device status as defined in the Virtio
->>>> +  specification.
->>>> +
->>>>   Slave message types
->>>>   -------------------
->>>>   diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
->>>> index 463e333531..37f3156dbc 100644
->>>> --- a/hw/net/vhost_net.c
->>>> +++ b/hw/net/vhost_net.c
->>>> @@ -517,10 +517,10 @@ int vhost_set_state(NetClientState *nc, int state)
->>>>   {
->>>>       struct vhost_net *net = get_vhost_net(nc);
->>>>       struct vhost_dev *hdev = &net->dev;
->>>> -    if (nc->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
->>>> -        if (hdev->vhost_ops->vhost_set_state) {
->>>> -                return hdev->vhost_ops->vhost_set_state(hdev, state);
->>>> -             }
->>>> -        }
->>>> +
->>>> +    if (hdev->vhost_ops->vhost_set_state) {
->>>> +        return hdev->vhost_ops->vhost_set_state(hdev, state);
->>>> +    }
->>>> +
->>>>       return 0;
->>>>   }
->>>> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
->>>> index ec21e8fbe8..b7e52d97fc 100644
->>>> --- a/hw/virtio/vhost-user.c
->>>> +++ b/hw/virtio/vhost-user.c
->>>> @@ -59,6 +59,7 @@ enum VhostUserProtocolFeature {
->>>>       VHOST_USER_PROTOCOL_F_HOST_NOTIFIER = 11,
->>>>       VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD = 12,
->>>>       VHOST_USER_PROTOCOL_F_RESET_DEVICE = 13,
->>>> +    VHOST_USER_PROTOCOL_F_STATUS = 15,
->>>>       VHOST_USER_PROTOCOL_F_MAX
->>>>   };
->>>>   @@ -100,6 +101,7 @@ typedef enum VhostUserRequest {
->>>>       VHOST_USER_SET_INFLIGHT_FD = 32,
->>>>       VHOST_USER_GPU_SET_SOCKET = 33,
->>>>       VHOST_USER_RESET_DEVICE = 34,
->>>> +    VHOST_USER_SET_STATUS = 36,
->>>>       VHOST_USER_MAX
->>>>   } VhostUserRequest;
->>>>   @@ -1886,6 +1888,38 @@ static int vhost_user_set_inflight_fd(struct
->>>> vhost_dev *dev,
->>>>       return 0;
->>>>   }
->>>>   +static int vhost_user_set_state(struct vhost_dev *dev, int state)
->>>> +{
->>>> +    bool reply_supported = virtio_has_feature(dev->protocol_features,
->>>> +                                             
->>>> VHOST_USER_PROTOCOL_F_REPLY_ACK);
->>>> +
->>>> +    VhostUserMsg msg = {
->>>> +        .hdr.request = VHOST_USER_SET_STATUS,
->>>> +        .hdr.flags = VHOST_USER_VERSION,
->>>> +        .hdr.size = sizeof(msg.payload.u64),
->>>> +        .payload.u64 = (uint64_t)state,
->>>> +    };
->>>> +
->>>> +    if (!virtio_has_feature(dev->protocol_features,
->>>> +                VHOST_USER_PROTOCOL_F_STATUS)) {
->>>> +        return -1;
->>>> +    }
->>>> +
->>>> +    if (reply_supported) {
->>>> +        msg.hdr.flags |= VHOST_USER_NEED_REPLY_MASK;
->>>> +    }
->>>> +
->>>> +    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
->>>> +        return -1;
->>>> +    }
->>>> +
->>>> +    if (reply_supported) {
->>>> +        return process_message_reply(dev, &msg);
->>>> +    }
->>>> +
->>>> +    return 0;
->>>> +}
->>>
->>>
->>> Interesting, I wonder how vm stop will be handled in this case.
->>
->> For now, my DPDK series only use DRIVER_OK to help determine when the
->> driver is done with the initialization. For VM stop, it still relies on
->> GET_VRING_BASE.
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  python/qemu/machine.py        | 10 +++++-----
+>>  tests/qemu-iotests/040        | 12 ++++++------
+>>  tests/qemu-iotests/260        |  5 +++--
+>>  tests/qemu-iotests/iotests.py | 16 ++++++++--------
+>>  4 files changed, 22 insertions(+), 21 deletions(-)
 > 
-> Sounds like a good fit.
-> GET_VRING_BASE is transparent to guest, as is vmstop.
-> This is more for driver 
-> 
-> 
->>
->> GET_VRING_BASE arrives before DRIVER_OK bit is cleared is the tests I've
->> done (logs from backend side):
-> 
-> 
-> One problem is with legacy guests, for these you can't rely
-> on DRIVER_OK, they often kick before that, and sometimes
-> expect buffers to be used too (e.g. for scsi).
+> I think you need to convert scripts/simplebench/bench_block_job.py, too.
 
-Ok, I remember this case now.
-Any idea on how the backend would detect such legacy guests?
+Oh, right -- that one is new since I did this. A lot of these scripts
+need to be moved over into the python/ directory and managed under the
+same pylint/mypy regime as everything else.
 
-If I'm not mistaken, we discussed the idea to poll on the kick to detect
-the rings are ready to be processed. But the problem is that Qemu writes
-a kick at eventfd creation time:
-
-vhost_user_backend_start():
--> vhost_dev_enable_notifiers()
-	->virtio_bus_set_host_notifier()
-		->event_notifier_init(, 1); //1 means active
-->vhost_dev_start();
-
-We could change the behavior in Qemu, but the backend won't know if
-Qemu has the fix or not, so won't know if it can rely on the kick.
-
->>
->> VHOST_CONFIG: read message VHOST_USER_GET_VRING_BASE
->>
->> destroy port /tmp/vhost-user1, did: 0
->> VHOST_CONFIG: vring base idx:0 file:41
->> VHOST_CONFIG: read message VHOST_USER_GET_VRING_BASE
->> VHOST_CONFIG: vring base idx:1 file:0
->> VHOST_CONFIG: read message VHOST_USER_SET_STATUS
->> VHOST_CONFIG: New device status(0x0000000b):
->> 	-ACKNOWLEDGE: 1
->> 	-DRIVER: 1
->> 	-FEATURES_OK: 1
->> 	-DRIVER_OK: 0
->> 	-DEVICE_NEED_RESET: 0
->> 	-FAILED: 0
->>
->>> In the case of vDPA kernel, we probable don't want to mirror the virtio
->>> device status to vdpa device status directly.
->>
->> In vDPA DPDK, we don't mirror the Virtio device status either. It could
->> make sense to do that, but would require some API changes.
->>
->>> Since qemu may stop
->>> vhost-vdpa device through e.g resting vdpa device, but in the mean time,
->>> guest should not detect such condition in virtio device status.
->>
->>
->>
->>> So in the new version of vDPA support, we probably need to do:
->>>
->>> static int vhost_vdpa_set_state(struct vhost_dev *dev, bool started)
->>> {
->>>     if (started) {
->>>         uint8_t status = 0;
->>>
->>>         vhost_vdpa_add_status(dev, VIRTIO_CONFIG_S_DRIVER_OK);
->>>         vhost_vdpa_call(dev, VHOST_VDPA_GET_STATUS, &status);
->>>
->>>         return !(status & VIRTIO_CONFIG_S_DRIVER_OK);
->>>     } else {
->>>         vhost_vdpa_reset_device(dev);
->>>         vhost_vdpa_add_status(dev, VIRTIO_CONFIG_S_ACKNOWLEDGE |
->>>                                    VIRTIO_CONFIG_S_DRIVER);
->>>         return 0;
->>>     }
->>> }
->>
->> IIUC, you have another copy of the status register not matching 1:1 what
->> the guest sets/sees.
->>
->> Is vhost_vdpa_add_status() sending VHOST_VDPA_SET_STATUS to the backend?
->>
->> And why reading back the status from the backend? Just to confirm the
->> change is taken into account?
-> 
-> Making sure features have been acked makes sense IMHO.
-> 
-> 
->>> And vhost_set_state() will be called from vhost_dev_start()/stop().
->>>
->>> Does this work for vhost-user as well?
->>
->> IIUC what you did above, I think it would work. And we won't need
->> GET_STATUS request, but just rely on the REPLY_ACK.
-> 
-> Right. Need to document that though.
-
-Ok, will do in v2.
-
-Thanks,
-Maxime
+A *ton* of our scripts are in various states of disrepair.
 
 > 
->>
->> Thanks,
->> Maxime
->>
->>> Thanks
->>>
->>>
->>>> +
->>>>   bool vhost_user_init(VhostUserState *user, CharBackend *chr, Error
->>>> **errp)
->>>>   {
->>>>       if (user->chr) {
->>>> @@ -1947,4 +1981,5 @@ const VhostOps user_ops = {
->>>>           .vhost_backend_mem_section_filter =
->>>> vhost_user_mem_section_filter,
->>>>           .vhost_get_inflight_fd = vhost_user_get_inflight_fd,
->>>>           .vhost_set_inflight_fd = vhost_user_set_inflight_fd,
->>>> +        .vhost_set_state = vhost_user_set_state,
->>>>   };
+>> diff --git a/python/qemu/machine.py b/python/qemu/machine.py
+>> index b9a98e2c86..eaedc25172 100644
+>> --- a/python/qemu/machine.py
+>> +++ b/python/qemu/machine.py
+>> @@ -478,21 +478,21 @@ def event_wait(self, name, timeout=60.0, match=None):
+>>          timeout: QEMUMonitorProtocol.pull_event timeout parameter.
+>>          match: Optional match criteria. See event_match for details.
+>>          """
+>> -        return self.events_wait([(name, match)], timeout)
+>> +        return self.events_wait({name: match}, timeout)
+>>  
+>>      def events_wait(self, events, timeout=60.0):
+>>          """
+>>          events_wait waits for and returns a named event from QMP with a timeout.
+>>  
+>> -        events: a sequence of (name, match_criteria) tuples.
+>> +        events: a mapping containing {name: match_criteria}.
+>>                  The match criteria are optional and may be None.
+>>                  See event_match for details.  timeout:
+>>                  QEMUMonitorProtocol.pull_event timeout parameter.
+>>                  """
+>>          def _match(event):
+>> -            for name, match in events:
+>> -                if event['event'] == name and self.event_match(event, match):
+>> -                    return True
+>> +            name = event['event']
+>> +            if name in events:
+>> +                return self.event_match(event, events[name])
 > 
+> This part confused me a bit for a second. Of course, that's probably
+> mostly just me, but I feel 'events' isn't a good name any more when the
+> values of the dict are match strings rather than events.
+> 
+
+This is honestly a really bad function. When I was trying to type
+everything, this one was at the bottom of the pile and it was the worst.
+
+It needs an overhaul.
+
+In my 32 patch series, I left the "match" types as "Any" pretty much
+everywhere, because it's such a laissez-faire series of functions.
+
+I'll keep the feedback in mind.
+
+>>              return False
+>>  
+>>          # Search cached events
+>> diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
+>> index 32c82b4ec6..90b59081ff 100755
+>> --- a/tests/qemu-iotests/040
+>> +++ b/tests/qemu-iotests/040
+>> @@ -485,12 +485,12 @@ class TestErrorHandling(iotests.QMPTestCase):
+>>  
+>>      def run_job(self, expected_events, error_pauses_job=False):
+>>          match_device = {'data': {'device': 'job0'}}
+>> -        events = [
+>> -            ('BLOCK_JOB_COMPLETED', match_device),
+>> -            ('BLOCK_JOB_CANCELLED', match_device),
+>> -            ('BLOCK_JOB_ERROR', match_device),
+>> -            ('BLOCK_JOB_READY', match_device),
+>> -        ]
+>> +        events = {
+>> +            'BLOCK_JOB_COMPLETED': match_device,
+>> +            'BLOCK_JOB_CANCELLED': match_device,
+>> +            'BLOCK_JOB_ERROR': match_device,
+>> +            'BLOCK_JOB_READY': match_device,
+>> +        }
+>>  
+>>          completed = False
+>>          log = []
+>> diff --git a/tests/qemu-iotests/260 b/tests/qemu-iotests/260
+>> index 804a7addb9..729f031122 100755
+>> --- a/tests/qemu-iotests/260
+>> +++ b/tests/qemu-iotests/260
+>> @@ -67,8 +67,9 @@ def test(persistent, restart):
+>>  
+>>      vm.qmp_log('block-commit', device='drive0', top=top,
+>>                 filters=[iotests.filter_qmp_testfiles])
+>> -    ev = vm.events_wait((('BLOCK_JOB_READY', None),
+>> -                         ('BLOCK_JOB_COMPLETED', None)))
+>> +    ev = vm.events_wait({
+>> +        'BLOCK_JOB_READY': None,
+>> +        'BLOCK_JOB_COMPLETED': None })
+> 
+> So, I'm not sure if this is nitpicking or rather bikeshedding, but
+> having the closing brackets on the next line would be more consistent
+> with the other instances in this patch.
+> 
+
+Nah, it's fine. I'll clean it up. This is pretty close to an RFC series
+anyway, so I didn't really polish it.
+
+(Or, I will try to clean it up. I probably won't work on it again in the
+near term. I think I just wanted to see if this seemed useful in general
+to people.
+
+As part of maybe moving the python library onto a package, I thought
+that maybe developing a JobRunner tool would be useful to have in that
+library. As you can see, I nestled it into iotests.py, though.)
+
+>>      log(filter_qmp_event(ev))
+>>      if (ev['event'] == 'BLOCK_JOB_COMPLETED'):
+>>          vm.shutdown()
+> 
+> Kevin
+> 
+
+-- 
+—js
 
 
