@@ -2,104 +2,125 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E75DC433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 08:00:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E4D6C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 08:02:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6359820575
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 08:00:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5285A2065D
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 08:02:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fk3a5iuC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6359820575
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="rtiUchVO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5285A2065D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ8nB-0003QN-Ei
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 04:00:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49262)
+	id 1jZ8ob-0005Lj-H7
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 04:02:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49314)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZ8mJ-0002iW-2u
- for qemu-devel@nongnu.org; Thu, 14 May 2020 03:59:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36274
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZ8mH-0003Nr-KX
- for qemu-devel@nongnu.org; Thu, 14 May 2020 03:59:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589443176;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iGhQrYam6VIb5mcwoXCy3TWu/7CiTDFnBBkllt9pb7c=;
- b=fk3a5iuCFQ524GaWSgDAfP0QEWnFVZ8DGgzf/yvzey9IQbE95NAJpi4Omv6ayjqtuNpQuz
- gMzvjFWRoKxcK4XlFF2SWogw8oLaiWjncY1CMpuk/Q44ULUVEShxs/q8sUqJhQDEOBkYQc
- 9qb63t5Dxc1aezF8P8Rdrj6DtmMScrc=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-400-h_5W_DDBML-BhVcny4EKRA-1; Thu, 14 May 2020 03:59:35 -0400
-X-MC-Unique: h_5W_DDBML-BhVcny4EKRA-1
-Received: by mail-wr1-f72.google.com with SMTP id 37so1165879wrc.4
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 00:59:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=iGhQrYam6VIb5mcwoXCy3TWu/7CiTDFnBBkllt9pb7c=;
- b=OHrIpCqUQVSu5E3vOKOtACuy5AAQPbfo3vRaLpE5xVpXvbtc7bdS4ROlbcdap73pXR
- H1Q8PSmGsO1d/SIaCQNErDqPHgmb69mFpciKJqAjWGjFPdVH2xVWNPeV/E7VYLAk/t9f
- 5ViyaiyaYUdX0cZhStJ4BMgmCXsIbAkXmu9m3lVRShTZduorhEDb5RXLBjEuas5lH46y
- XmG8hLXWeCmT34wFLwyQU0AGRaZN9twQc7GXtZDXBrHdbslZcQVQgS0kmojO3Ahm6h9y
- HYaUKK9hufE1h9Fn6xpigUtMzgUxq5+32APTYmgdCCncy8Y39S7bPVVv/zJZ1FZIyYwe
- rBxw==
-X-Gm-Message-State: AOAM53213LNxwjlMdlM/ipbfo8yxuy8D9EqK3EyhOe13eRmanAedxAD6
- MsWIN7eILCPNHlbbieiCHo+v6sfhSK+KY300EaZJ10cFXD3iypnDxiuFrgyGU/KWeYE9SrSmp/A
- 3URXLBKPTqTknbKk=
-X-Received: by 2002:adf:ef48:: with SMTP id c8mr3786154wrp.140.1589443173784; 
- Thu, 14 May 2020 00:59:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxkqR/ciRfTFx0R7MDPmvAmrVq1mRL19vMnmxpuJ03zhFBtVh/mzIDq1GNQ5lgqex1GxNCKOQ==
-X-Received: by 2002:adf:ef48:: with SMTP id c8mr3786128wrp.140.1589443173536; 
- Thu, 14 May 2020 00:59:33 -0700 (PDT)
-Received: from [192.168.1.39] (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id s8sm2699999wrt.69.2020.05.14.00.59.31
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 14 May 2020 00:59:32 -0700 (PDT)
-Subject: Re: [PATCH v6 18/20] hw/block/nvme: factor out pmr setup
-To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
-References: <20200514044611.734782-1-its@irrelevant.dk>
- <20200514044611.734782-19-its@irrelevant.dk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0c528722-0117-4842-cb5c-d37090ac71f2@redhat.com>
-Date: Thu, 14 May 2020 09:59:30 +0200
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jZ8mb-000309-Gs
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 03:59:57 -0400
+Received: from mail-eopbgr00106.outbound.protection.outlook.com
+ ([40.107.0.106]:4566 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jZ8mW-0003PN-It
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 03:59:56 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FF78L4fkGBxGveL3tzRa7LyoOvE58aoS5UAJuY7XZkAd8vABaC2FHGrIentmYjDsxTAqqeoMoB6IOMFP+T8PE3w9/PyknjmeTHAG6VW4+mvPyo7kwJQNh4VPXOFNS5NFlhPXmxoLBdNaZJo7SlNZYiYbcG9M4zznacefthb02Fu1ZfMe+TXef77hFsw7evnkeXeTZqNe18Ol0F2pLF0fqaO4hnJ4fKeePUCRIS9hYxMZRHFtEk34xl8JOSg/N8bSSluh0+eKDuM2wsEO7ul6AA+o0nqyNnsAo40hfkURdcIIb1deXXvO8XXIUVU2wqltE/euOz+FmsA1LUfRopeBMQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZtdEX1qlm82sRFrHQ9X0HAoEtAenB5QcQHmLMPAJGJw=;
+ b=RQbwWE1r1A+dlnUkjzGcX0zKeRKQrJ81fBpoDWQ0HCH4mD4Nx8LABevqRj077YZ82TR3qlAf46EAo2/8R63NOiKhM73ConpWyxelBH1i6xB8BqD7jYOZCwJ0Lo86ZZibe+EHPa4segRh8xic7jerMb6c5nFqjFBWadUJdLInGlFqMrkOBDUkigVxR1unygzFRciKIPvW6fJJLlKEl2POGaqS0O0n5N8t7LZ2ZVrzhihRUNWqCODwEGeWx3tWCnppZCTdzCBjfzYKjKZ2/iR8Y8qJIagzrsmrYmRpLa6ZwQRWe4xOyMcXdka5YCVuHfnc1biOBTBsHIvLF+BW6+TZig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZtdEX1qlm82sRFrHQ9X0HAoEtAenB5QcQHmLMPAJGJw=;
+ b=rtiUchVOiJCrU+HC3DsSDJv6d5E+bvSSoOB9uJ3wHI5aupHDB/1cxDCH/Lz5/pP6SwKQCiGAKD3FCGs3fUvp6L07mYGAP1vJCZgZiVSqbceC+H1ihErzXUblekEzK1xnhrqPQx+x1FS/wBi6Ln0qSCcJdBsLX220KMYttHTD6ag=
+Authentication-Results: linaro.org; dkim=none (message not signed)
+ header.d=none;linaro.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5447.eurprd08.prod.outlook.com (2603:10a6:20b:10b::18)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.34; Thu, 14 May
+ 2020 07:59:49 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.3000.016; Thu, 14 May 2020
+ 07:59:49 +0000
+Subject: Re: Questionable aspects of QEMU Error's design
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <87o8sblgto.fsf@dusky.pond.sub.org>
+ <87blo7heag.fsf@dusky.pond.sub.org> <87blndey9c.fsf@dusky.pond.sub.org>
+ <3b9d53fd-bdd0-c15b-292c-c4952fa24dfd@virtuozzo.com>
+Message-ID: <923ceeeb-1fc8-489e-a32d-4cebfa6eadae@virtuozzo.com>
+Date: Thu, 14 May 2020 10:59:47 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200514044611.734782-19-its@irrelevant.dk>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+ Thunderbird/68.8.0
+In-Reply-To: <3b9d53fd-bdd0-c15b-292c-c4952fa24dfd@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-ClientProxiedBy: AM0PR01CA0109.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:168::14) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.186) by
+ AM0PR01CA0109.eurprd01.prod.exchangelabs.com (2603:10a6:208:168::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.20 via Frontend
+ Transport; Thu, 14 May 2020 07:59:49 +0000
+X-Originating-IP: [185.215.60.186]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ea11dc1f-7e5c-468f-49aa-08d7f7dcc6c0
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5447:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB54474301B07F1B46BAE0C99CC1BC0@AM7PR08MB5447.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Forefront-PRVS: 040359335D
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 41xgHW5ysov4JOCuxnJdS2s0+evykEKha3yihI5XZpdvcw/1oDyRvP0CysPTTSHKDYSRBEWHjqm4QPCtpUMpg/QlF+I0qCyFwmg90hTRufr4LK2GF2zKal1YO9cCmDthR0Lc6Pdf0xJUO8ok4v2uSqg8jOaMqSvpWXRUjpVk9NUXBc02bU6xNZKOrEOSZAAEJUh95/w+JDZDf6IAZEPsbvPdY4emMROUX11/apcSVaR2JqGDZ/VjHY80AHsmpSJN/iAYxwIVX/w5bKb2FMz2g5ltz/MSCF5svZ+xVzV0rlC1XozmFfhQNtLslCKBoYU+PqCElUYOoV/pV6YpipPoWHWoVeDIih7C8Yz2WVWW6Ysf4nxzUKq41lEdKfRPbKqgyLBLmZfTa2EWqcW+64Kp4yCBcXjubFhubX/HntUuU6ElPeZ+oofF90Z6EO28DQDYAVwozobCyAahkrUbGTBROYNp5wsXI2kZZsw/oAk22+utgg4FWlWjabWR89k5eOj6
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(376002)(39840400004)(346002)(366004)(396003)(136003)(5660300002)(86362001)(8936002)(36756003)(16576012)(66556008)(66946007)(8676002)(478600001)(16526019)(31686004)(186003)(956004)(6486002)(54906003)(2906002)(316002)(66476007)(31696002)(2616005)(4326008)(52116002)(26005)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: VvxnlQHD40LGyBsWSaTlEMNdCBz5mU1b4yek1gHOQAEI3QugdqkvEATpRdMFVOVrvmB52NA6gernshvv/FsI/Fuyj9Eh/WPboh25IuqwqSLDWJLBZPCXh5qL0yGB7g9ZxOmJ0wv47vdQWa9i5cBO5IhjA/FO/rGZHDedriv4WY1qkZVGZfPGJC8NqMTmhmMet79ETEXs31UvmlAsfjYxWMmiixDVtsgtYbBEAWt2+G/XMvCvFQJyvP+pe1gHB+76O5odk4hRbtux7Hx5IRBkOz/IbLtFWrh/VJINapA5vAQTyr88So5NzwMxWuga7WEbaUapO55MnN5pYZWsBHWG3DfB+YN61PQAmuaqAGesTfGSyoBstLWWvy8sKeLBZ/f4bmUEyVCUdNf2NzaQxngcl7qmzBcwgGtkYolR9U5uyyEo123JF6xewy4LqlKpxK9QLtnStgQ+l8jtge5Mrewk58ftAP1HLbNSBaNqNmxxCm00sXHqNAMPwbuntD/oKw8Q
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ea11dc1f-7e5c-468f-49aa-08d7f7dcc6c0
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2020 07:59:49.7641 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6Y0Ubh0+yFUOzqrRfmz1xxPhYfgO3/GHnU3wy+u3BaVjbVFl1lAMR2KAR4U+NQ+pzQxgAjakpFm15nSoxZjy8e/ZhsHi/s8kbeWEO+Wrml8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5447
+Received-SPF: pass client-ip=40.107.0.106;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR02-AM5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 03:59:50
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -113,145 +134,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Klaus Jensen <k.jensen@samsung.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/14/20 6:46 AM, Klaus Jensen wrote:
-> From: Klaus Jensen <k.jensen@samsung.com>
+28.04.2020 08:20, Vladimir Sementsov-Ogievskiy wrote:
+> 27.04.2020 18:36, Markus Armbruster wrote:
+>> Markus Armbruster <armbru@redhat.com> writes:
+>>
+>>> Markus Armbruster <armbru@redhat.com> writes:
+>>>
+>>>> QEMU's Error was patterned after GLib's GError.  Differences include:
+>>> [...]
+>>>> * Return value conventions
+>>>>
+>>>>    Common: non-void functions return a distinct error value on failure
+>>>>    when such a value can be defined.  Patterns:
+>>>>
+>>>>    - Functions returning non-null pointers on success return null pointer
+>>>>      on failure.
+>>>>
+>>>>    - Functions returning non-negative integers on success return a
+>>>>      negative error code on failure.
+>>>>
+>>>>    Different: GLib discourages void functions, because these lead to
+>>>>    awkward error checking code.  We have tons of them, and tons of
+>>>>    awkward error checking code:
+>>>>
+>>>>      Error *err = NULL;
+>>>>      frobnicate(arg, &err);
+>>>>      if (err) {
+>>>>          ... recover ...
+>>>>          error_propagate(errp, err);
+>>>>      }
+>>>>
+>>>>    instead of
+>>>>
+>>>>      if (!frobnicate(arg, errp))
+>>>>          ... recover ...
+>>>>      }
+>>>>
+>>>>    Can also lead to pointless creation of Error objects.
+>>>>
+>>>>    I consider this a design mistake.  Can we still fix it?  We have more
+>>>>    than 2000 void functions taking an Error ** parameter...
+>>>>
+>>>>    Transforming code that receives and checks for errors with Coccinelle
+>>>>    shouldn't be hard.  Transforming code that returns errors seems more
+>>>>    difficult.  We need to transform explicit and implicit return to
+>>>>    either return true or return false, depending on what we did to the
+>>>>    @errp parameter on the way to the return.  Hmm.
+>>> [...]
+>>>
+>>> To figure out what functions with an Error ** parameter return, I used
+>>> Coccinelle to find such function definitions and print the return types.
+>>> Summary of results:
+>>>
+>>>     2155 void
+>>>      873 signed integer
+>>>      494 pointer
+>>>      153 bool
+>>>       33 unsigned integer
+>>>        6 enum
+>>>     ---------------------
+>>>     3714 total
+>>>
+>>> I then used Coccinelle to find checked calls of void functions (passing
+>>> &error_fatal or &error_abort is not considered "checking" here).  These
+>>> calls become simpler if we make the functions return a useful value.  I
+>>> found a bit under 600 direct calls, and some 50 indirect calls.
+>>>
+>>> Most frequent direct calls:
+>>>
+>>>      127 object_property_set_bool
+>>>       27 qemu_opts_absorb_qdict
+>>>       16 visit_type_str
+>>>       14 visit_type_int
+>>>       10 visit_type_uint32
+>>>
+>>> Let's have a closer look at object_property_set() & friends.  Out of
+>>> almost 1000 calls, some 150 are checked.  While I'm sure many of the
+>>> unchecked calls can't actually fail, I am concerned some unchecked calls
+>>> can.
+>>>
+>>> If we adopt the convention to return a value that indicates success /
+>>> failure, we should consider converting object.h to it sooner rather than
+>>> later.
+>>>
+>>> Please understand these are rough numbers from quick & dirty scripts.
+>>
+>> FYI, I'm working on converting QemuOpts, QAPI visitors and QOM.  I keep
+>> running into bugs.  So far:
+>>
+>>      [PATCH v2 for-5.1 0/9] qemu-option: Fix corner cases and clean up
+>>      [PATCH for-5.1 0/5] qobject: Minor spring cleaning
+>>      [PATCH v2 00/14] Miscellaneous error handling fixes
+>>      [PATCH 0/4] Subject: [PATCH 0/4] smbus: SPD fixes
+>>      [PATCH 0/3] fuzz: Probably there is a better way to do this
+>>      [PATCH v2 00/15] qapi: Spring cleaning
+>>      [PATCH 00/11] More miscellaneous error handling fixes
+>>
+>> I got another one coming for QOM and qdev before I can post the
+>> conversion.
+>>
+>> Vladimir, since the conversion will mess with error_propagate(), I'd
+>> like to get it in before your auto-propagation work.
+>>
 > 
-> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->   hw/block/nvme.c | 95 ++++++++++++++++++++++++++-----------------------
->   1 file changed, 51 insertions(+), 44 deletions(-)
-> 
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index d71a5f142d51..7254b66ae199 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -58,6 +58,7 @@
->   #define NVME_REG_SIZE 0x1000
->   #define NVME_DB_SIZE  4
->   #define NVME_CMB_BIR 2
-> +#define NVME_PMR_BIR 2
->   
->   #define NVME_GUEST_ERR(trace, fmt, ...) \
->       do { \
-> @@ -1463,6 +1464,55 @@ static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
->                        PCI_BASE_ADDRESS_MEM_PREFETCH, &n->ctrl_mem);
->   }
->   
-> +static void nvme_init_pmr(NvmeCtrl *n, PCIDevice *pci_dev)
-> +{
-> +    /* Controller Capabilities register */
-> +    NVME_CAP_SET_PMRS(n->bar.cap, 1);
-> +
-> +    /* PMR Capabities register */
-> +    n->bar.pmrcap = 0;
-> +    NVME_PMRCAP_SET_RDS(n->bar.pmrcap, 0);
-> +    NVME_PMRCAP_SET_WDS(n->bar.pmrcap, 0);
-> +    NVME_PMRCAP_SET_BIR(n->bar.pmrcap, NVME_PMR_BIR);
-> +    NVME_PMRCAP_SET_PMRTU(n->bar.pmrcap, 0);
-> +    /* Turn on bit 1 support */
-> +    NVME_PMRCAP_SET_PMRWBM(n->bar.pmrcap, 0x02);
-> +    NVME_PMRCAP_SET_PMRTO(n->bar.pmrcap, 0);
-> +    NVME_PMRCAP_SET_CMSS(n->bar.pmrcap, 0);
-> +
-> +    /* PMR Control register */
-> +    n->bar.pmrctl = 0;
-> +    NVME_PMRCTL_SET_EN(n->bar.pmrctl, 0);
-> +
-> +    /* PMR Status register */
-> +    n->bar.pmrsts = 0;
-> +    NVME_PMRSTS_SET_ERR(n->bar.pmrsts, 0);
-> +    NVME_PMRSTS_SET_NRDY(n->bar.pmrsts, 0);
-> +    NVME_PMRSTS_SET_HSTS(n->bar.pmrsts, 0);
-> +    NVME_PMRSTS_SET_CBAI(n->bar.pmrsts, 0);
-> +
-> +    /* PMR Elasticity Buffer Size register */
-> +    n->bar.pmrebs = 0;
-> +    NVME_PMREBS_SET_PMRSZU(n->bar.pmrebs, 0);
-> +    NVME_PMREBS_SET_RBB(n->bar.pmrebs, 0);
-> +    NVME_PMREBS_SET_PMRWBZ(n->bar.pmrebs, 0);
-> +
-> +    /* PMR Sustained Write Throughput register */
-> +    n->bar.pmrswtp = 0;
-> +    NVME_PMRSWTP_SET_PMRSWTU(n->bar.pmrswtp, 0);
-> +    NVME_PMRSWTP_SET_PMRSWTV(n->bar.pmrswtp, 0);
-> +
-> +    /* PMR Memory Space Control register */
-> +    n->bar.pmrmsc = 0;
-> +    NVME_PMRMSC_SET_CMSE(n->bar.pmrmsc, 0);
-> +    NVME_PMRMSC_SET_CBA(n->bar.pmrmsc, 0);
-> +
-> +    pci_register_bar(pci_dev, NVME_PMRCAP_BIR(n->bar.pmrcap),
-> +                     PCI_BASE_ADDRESS_SPACE_MEMORY |
-> +                     PCI_BASE_ADDRESS_MEM_TYPE_64 |
-> +                     PCI_BASE_ADDRESS_MEM_PREFETCH, &n->pmrdev->mr);
-> +}
-> +
->   static void nvme_init_pci(NvmeCtrl *n, PCIDevice *pci_dev)
->   {
->       uint8_t *pci_conf = pci_dev->config;
-> @@ -1541,50 +1591,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
->       if (n->params.cmb_size_mb) {
->           nvme_init_cmb(n, pci_dev);
->       } else if (n->pmrdev) {
-> -        /* Controller Capabilities register */
-> -        NVME_CAP_SET_PMRS(n->bar.cap, 1);
-> -
-> -        /* PMR Capabities register */
-> -        n->bar.pmrcap = 0;
-> -        NVME_PMRCAP_SET_RDS(n->bar.pmrcap, 0);
-> -        NVME_PMRCAP_SET_WDS(n->bar.pmrcap, 0);
-> -        NVME_PMRCAP_SET_BIR(n->bar.pmrcap, 2);
-> -        NVME_PMRCAP_SET_PMRTU(n->bar.pmrcap, 0);
-> -        /* Turn on bit 1 support */
-> -        NVME_PMRCAP_SET_PMRWBM(n->bar.pmrcap, 0x02);
-> -        NVME_PMRCAP_SET_PMRTO(n->bar.pmrcap, 0);
-> -        NVME_PMRCAP_SET_CMSS(n->bar.pmrcap, 0);
-> -
-> -        /* PMR Control register */
-> -        n->bar.pmrctl = 0;
-> -        NVME_PMRCTL_SET_EN(n->bar.pmrctl, 0);
-> -
-> -        /* PMR Status register */
-> -        n->bar.pmrsts = 0;
-> -        NVME_PMRSTS_SET_ERR(n->bar.pmrsts, 0);
-> -        NVME_PMRSTS_SET_NRDY(n->bar.pmrsts, 0);
-> -        NVME_PMRSTS_SET_HSTS(n->bar.pmrsts, 0);
-> -        NVME_PMRSTS_SET_CBAI(n->bar.pmrsts, 0);
-> -
-> -        /* PMR Elasticity Buffer Size register */
-> -        n->bar.pmrebs = 0;
-> -        NVME_PMREBS_SET_PMRSZU(n->bar.pmrebs, 0);
-> -        NVME_PMREBS_SET_RBB(n->bar.pmrebs, 0);
-> -        NVME_PMREBS_SET_PMRWBZ(n->bar.pmrebs, 0);
-> -
-> -        /* PMR Sustained Write Throughput register */
-> -        n->bar.pmrswtp = 0;
-> -        NVME_PMRSWTP_SET_PMRSWTU(n->bar.pmrswtp, 0);
-> -        NVME_PMRSWTP_SET_PMRSWTV(n->bar.pmrswtp, 0);
-> -
-> -        /* PMR Memory Space Control register */
-> -        n->bar.pmrmsc = 0;
-> -        NVME_PMRMSC_SET_CMSE(n->bar.pmrmsc, 0);
-> -        NVME_PMRMSC_SET_CBA(n->bar.pmrmsc, 0);
-> -
-> -        pci_register_bar(pci_dev, NVME_PMRCAP_BIR(n->bar.pmrcap),
-> -            PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64 |
-> -            PCI_BASE_ADDRESS_MEM_PREFETCH, &n->pmrdev->mr);
-> +        nvme_init_pmr(n, pci_dev);
->       }
->   
->       for (i = 0; i < n->num_namespaces; i++) {
+> OK, just let me know when to regenerate the series, it's not hard.
 > 
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Hi! Is all that merged? Should I resend now?
 
+-- 
+Best regards,
+Vladimir
 
