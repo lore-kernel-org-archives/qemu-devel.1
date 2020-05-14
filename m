@@ -6,73 +6,72 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04FA0C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 11:29:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CE1EC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 11:33:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC7D9206A5
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 11:29:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC7D9206A5
+	by mail.kernel.org (Postfix) with ESMTPS id 5C1D020722
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 11:33:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C1D020722
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40690 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZC33-0002gj-UC
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 07:29:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44634)
+	id 1jZC75-0004ge-Hg
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 07:33:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45016)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
- id 1jZC1R-0000Af-CR; Thu, 14 May 2020 07:27:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21920)
+ id 1jZC62-0003jk-Tf; Thu, 14 May 2020 07:32:15 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:29748)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
- id 1jZC1Q-0006oI-8Q; Thu, 14 May 2020 07:27:28 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ id 1jZC60-0007q9-Bz; Thu, 14 May 2020 07:32:14 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 04EB295T195086; Thu, 14 May 2020 07:27:26 -0400
+ 04EB3LOK113662; Thu, 14 May 2020 07:32:10 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 310v92qd7k-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 310tjp276p-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 14 May 2020 07:27:26 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04EB3alj013685;
- Thu, 14 May 2020 07:27:25 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com
- [159.122.73.70])
- by mx0a-001b2d01.pphosted.com with ESMTP id 310v92qd6m-1
+ Thu, 14 May 2020 07:32:10 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04EBG2l8150821;
+ Thu, 14 May 2020 07:32:09 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 310tjp275d-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 14 May 2020 07:27:25 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
- by ppma01fra.de.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04EBPUHm031189;
- Thu, 14 May 2020 11:27:23 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com
- (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
- by ppma01fra.de.ibm.com with ESMTP id 3100ubhee4-1
+ Thu, 14 May 2020 07:32:09 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+ by ppma03ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04EBPUhC022721;
+ Thu, 14 May 2020 11:32:07 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com
+ (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+ by ppma03ams.nl.ibm.com with ESMTP id 3100ubbhh7-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 14 May 2020 11:27:23 +0000
+ Thu, 14 May 2020 11:32:07 +0000
 Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
  [9.149.105.59])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 04EBQ9vC63373750
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 04EBW4ap62062786
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 14 May 2020 11:26:09 GMT
+ Thu, 14 May 2020 11:32:04 GMT
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D0D58A4059;
- Thu, 14 May 2020 11:27:20 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id D2F3EA404D;
+ Thu, 14 May 2020 11:32:04 +0000 (GMT)
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 878FEA4057;
- Thu, 14 May 2020 11:27:20 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 7EC43A4053;
+ Thu, 14 May 2020 11:32:04 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.183.194])
  by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 14 May 2020 11:27:20 +0000 (GMT)
-Subject: Re: [PATCH 5/8] pc-bios: s390x: Move panic() into header and add
- infinite loop
-To: Cornelia Huck <cohuck@redhat.com>
+ Thu, 14 May 2020 11:32:04 +0000 (GMT)
+Subject: Re: [PATCH 7/8] pc-bios: s390x: Replace 0x00 with 0x0 or 0
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 References: <20200324150847.10476-1-frankja@linux.ibm.com>
- <20200324150847.10476-6-frankja@linux.ibm.com>
- <20200407092534.2edb0276.cohuck@redhat.com>
+ <20200324150847.10476-8-frankja@linux.ibm.com>
+ <d15ab683-b1eb-22b8-fb77-fcaf1d1f318e@redhat.com>
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -116,25 +115,26 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Message-ID: <099848cc-afd1-c5ad-8b8d-e2e2703ada4a@linux.ibm.com>
-Date: Thu, 14 May 2020 13:27:20 +0200
+Message-ID: <bf072c40-2a37-a587-297a-c2a1109498e1@linux.ibm.com>
+Date: Thu, 14 May 2020 13:32:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200407092534.2edb0276.cohuck@redhat.com>
+In-Reply-To: <d15ab683-b1eb-22b8-fb77-fcaf1d1f318e@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="mbudEdg6sm2SAJRLTtQJmbwrkmyYaD555"
+ boundary="TjCBNvkwWXNX1Kx5HQbYyGRQQcB66HOgq"
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
- definitions=2020-05-14_02:2020-05-13,
+ definitions=2020-05-14_02:2020-05-14,
  2020-05-14 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- cotscore=-2147483648
- impostorscore=0 suspectscore=0 phishscore=0 adultscore=0 mlxscore=0
- mlxlogscore=999 spamscore=0 clxscore=1015 bulkscore=0 priorityscore=1501
- lowpriorityscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2004280000 definitions=main-2005140095
+ bulkscore=0
+ lowpriorityscore=0 mlxlogscore=880 spamscore=0 clxscore=1015
+ suspectscore=0 phishscore=0 adultscore=0 priorityscore=1501
+ cotscore=-2147483648 malwarescore=0 mlxscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005140100
 Received-SPF: pass client-ip=148.163.156.1; envelope-from=frankja@linux.ibm.com;
  helo=mx0a-001b2d01.pphosted.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 07:20:14
@@ -157,107 +157,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
- david@redhat.com
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mbudEdg6sm2SAJRLTtQJmbwrkmyYaD555
-Content-Type: multipart/mixed; boundary="NnlGfX3k8zQnFQnjBT8zq47foOzX0Bo6u"
+--TjCBNvkwWXNX1Kx5HQbYyGRQQcB66HOgq
+Content-Type: multipart/mixed; boundary="52YKfomd4LeFskzUd795Wg10cup4M2o5G"
 
---NnlGfX3k8zQnFQnjBT8zq47foOzX0Bo6u
-Content-Type: text/plain; charset=utf-8
+--52YKfomd4LeFskzUd795Wg10cup4M2o5G
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 4/7/20 9:25 AM, Cornelia Huck wrote:
-> On Tue, 24 Mar 2020 11:08:44 -0400
-> Janosch Frank <frankja@linux.ibm.com> wrote:
+On 4/30/20 5:36 PM, David Hildenbrand wrote:
+> On 24.03.20 16:08, Janosch Frank wrote:
+>> 0x00 looks odd, time to replace it with 0 or 0x0 (for pointers).
 >=20
->> panic() was defined for the ccw and net bios, i.e. twice, so it's
->> cleaner to rather put it into the header.
+> s/0x0/NULL/ ?
+
+I'd like to avoid NULL if I refer to offset 0 of the memory and only use
+it to indicate that I purposely do not assign any specific value to a
+pointer.
+
+
 >=20
-> They were also slightly different, so unifying them makes sense.
->=20
->>
->> Also let's add an infinite loop into the assembly of disabled_wait() s=
-o
->> the caller doesn't need to take care of it.
 >>
 >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
 >> ---
->>  pc-bios/s390-ccw/main.c     | 7 -------
->>  pc-bios/s390-ccw/netmain.c  | 8 --------
->>  pc-bios/s390-ccw/s390-ccw.h | 7 ++++++-
->>  pc-bios/s390-ccw/start.S    | 5 +++--
->>  4 files changed, 9 insertions(+), 18 deletions(-)
+>>  pc-bios/s390-ccw/dasd-ipl.c | 14 +++++++-------
+>>  1 file changed, 7 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/pc-bios/s390-ccw/dasd-ipl.c b/pc-bios/s390-ccw/dasd-ipl.c=
+
+>> index b932531e6f838405..764ee89e92e3ae8d 100644
+>> --- a/pc-bios/s390-ccw/dasd-ipl.c
+>> +++ b/pc-bios/s390-ccw/dasd-ipl.c
+>> @@ -98,18 +98,18 @@ static int run_dynamic_ccw_program(SubChannelId sc=
+hid, uint16_t cutype,
+>> =20
+>>  static void make_readipl(void)
+>>  {
+>> -    Ccw0 *ccwIplRead =3D (Ccw0 *)0x00;
+>> +    Ccw0 *ccwIplRead =3D (Ccw0 *)0x0;
+>> =20
+>>      /* Create Read IPL ccw at address 0 */
+>>      ccwIplRead->cmd_code =3D CCW_CMD_READ_IPL;
+>> -    ccwIplRead->cda =3D 0x00; /* Read into address 0x00 in main memor=
+y */
+>> +    ccwIplRead->cda =3D 0x0; /* Read into address 0x00 in main memory=
+ */
+>>      ccwIplRead->chain =3D 0; /* Chain flag */
+>>      ccwIplRead->count =3D 0x18; /* Read 0x18 bytes of data */
+>>  }
+>> =20
+>>  static void run_readipl(SubChannelId schid, uint16_t cutype)
+>>  {
+>> -    if (do_cio(schid, cutype, 0x00, CCW_FMT0)) {
+>> +    if (do_cio(schid, cutype, 0x0, CCW_FMT0)) {
+>>          panic("dasd-ipl: Failed to run Read IPL channel program\n");
+>>      }
+>>  }
+>> @@ -133,10 +133,10 @@ static void check_ipl2(uint32_t ipl2_addr)
+>>  {
+>>      Ccw0 *ccw =3D u32toptr(ipl2_addr);
+>> =20
+>> -    if (ipl2_addr =3D=3D 0x00) {
+>> +    if (ipl2_addr =3D=3D 0) {
+>>          panic("IPL2 address invalid. Is this disk really bootable?\n"=
+);
+>>      }
+>> -    if (ccw->cmd_code =3D=3D 0x00) {
+>> +    if (ccw->cmd_code =3D=3D 0) {
+>>          panic("IPL2 ccw data invalid. Is this disk really bootable?\n=
+");
+>>      }
+>>  }
+>> @@ -161,7 +161,7 @@ static void ipl1_fixup(void)
+>>      memcpy(ccwRead, (void *)0x08, 16);
+>> =20
+>>      /* Disable chaining so we don't TIC to IPL2 channel program */
+>> -    ccwRead->chain =3D 0x00;
+>> +    ccwRead->chain =3D 0;
+>> =20
+>>      ccwSeek->cmd_code =3D CCW_CMD_DASD_SEEK;
+>>      ccwSeek->cda =3D ptr2u32(seekData);
+>> @@ -206,7 +206,7 @@ static void run_ipl2(SubChannelId schid, uint16_t =
+cutype, uint32_t addr)
+>>   */
+>>  void dasd_ipl(SubChannelId schid, uint16_t cutype)
+>>  {
+>> -    PSWLegacy *pswl =3D (PSWLegacy *) 0x00;
+>> +    PSWLegacy *pswl =3D (PSWLegacy *) 0x0;
+>>      uint32_t ipl2_addr;
+>> =20
+>>      /* Construct Read IPL CCW and run it to read IPL1 from boot disk =
+*/
 >>
 >=20
->> @@ -91,6 +90,12 @@ bool menu_is_enabled_enum(void);
->> =20
->>  #define MAX_BOOT_ENTRIES  31
->> =20
->> +static inline void panic(const char *string)
->> +{
->> +    sclp_print(string);
->> +    disabled_wait();
->> +}
->> +
->>  static inline void fill_hex(char *out, unsigned char val)
->>  {
->>      const char hex[] =3D "0123456789abcdef";
->> diff --git a/pc-bios/s390-ccw/start.S b/pc-bios/s390-ccw/start.S
->> index aa8fceb19da2164a..35be141d8da38d07 100644
->> --- a/pc-bios/s390-ccw/start.S
->> +++ b/pc-bios/s390-ccw/start.S
->> @@ -47,8 +47,9 @@ memsetxc:
->>   */
->>  	.globl disabled_wait
->>  disabled_wait:
->> -        larl %r1,disabled_wait_psw
->> -        lpswe   0(%r1)
->> +        larl	%r1,disabled_wait_psw
->> +        lpswe	0(%r1)
->> +1:	j	1b
->> =20
->> =20
->>  /*
->=20
-> Possibly dumb question: Does checking code now figure out correctly
-> that code flow does not continue after disabled_wait()?
 >=20
 
-Which checking code?
-I could certainly add "__attribute__ ((__noreturn__))" if needed.
 
 
---NnlGfX3k8zQnFQnjBT8zq47foOzX0Bo6u--
+--52YKfomd4LeFskzUd795Wg10cup4M2o5G--
 
---mbudEdg6sm2SAJRLTtQJmbwrkmyYaD555
+--TjCBNvkwWXNX1Kx5HQbYyGRQQcB66HOgq
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl69KxgACgkQ41TmuOI4
-ufisZQ/6A98FC0luazAEdhfPNTRepxuXRsfseNc8T8Mw3nSK3D14CH4RKJ75HOwe
-8fZx83BmtrWS+ElwenWYy4gx3i9LLKXS3sZsXi65MTgWD2MWvzOkXFI4PNOyoMNl
-YMcMrqZGyWReP/caiy/LApYPnboYOKuqPMHVRQ5SPKYqPAOzTTcZCBaRl8UByhTb
-Mdc8/3swAKzOZOt6rIO88T6K13FI5coeS8KJ6LOcGFw1Mrr/VcmVCuWmsGZYKfRW
-dXwT7LqaJ1S65ti2URT/W00S7fc8N51ZfQi3EIJ1DVeqdnk/0i6Nrnw42qA+h09l
-3L/nyYbSTms2K91Icnbh8gutUpHarI1DdKfCoRhiNvz9tw5/neL5GAVQg2hzYG/h
-kOzL4wvJI8yv0vn/8Sc3zklsh94Kox/o+F7ymVxa4rPtwrCwF02A37mbfJlAhwGe
-HfxLc7o30TjafKHiYAp6yl7pI9glNfjOv7e0QGAIyhprcSMULUgA1u6oLDC8i4Ip
-IjSQ8LcKmEvHq7CtYJbeaKEyfhHlF7Hh9Ez1aUsY2cu1hPkW4kuOVK6lsvKqRvL2
-PASsnnEgUQOaooBxzH7zUwNtfUdy3PE5UCIbbOkQvPVYqsGm8lWWq42V7Xe4u+1A
-INqI1j3INLBxG/bHeI7PH9LJhXCAZOOvSsTE4KNhZ76EaW9TUo0=
-=dbjz
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl69LDQACgkQ41TmuOI4
+ufiOhxAAn4bz3QPMl+T+wK6btvllC6VGRA5RIlnaMdUSbmPKoeOGwvXzdUb55lGn
+RlvksbSuE8yuBgPR1zQ6ipwaM9UwxmQRm11rrV/q+hTKiOuIg0Uttrb0zv6HN8ay
+KexaY92VhVXP2Q7wa9Xb3BEOSMqeC8PvSgMKfVXm9H8F+rMBzVZ3w3qydc2P7lhb
+P0zuIV4+f/BBEUsQWwRGSS6vA4yO1uA6ma7KYUfrW+jpSYWwjvSdXWS001nTRcQG
+gmqwC640snIh1JRbaMzONjyPHD6fYF1y+ZkAUKONRZ4Yu2mylJbOC/C8bK5q9YhO
+gTixWHiHDrbyM5U/VVVZnk/8OwF9UePijD0MT3ezJRlVa91XrLMU/MffYh5k6Jiq
+GGiMsobj1aCiUBZMp9GgzVfca+Isff8pyGtf0CKn7FZge8xX/dT0ZasX7MqSZmX/
+CfB+OlOVTjeSCBo6XHA82nxCjDVoJ54xTzVkwOUIJI3FI2DtGHtb/CIXSSSddWCL
+XHGZrTsNOXVwj2uS6yttqaHn8OrvHx65OUTpzDttJUFbWQI9me3D/MIdKYVhshRE
+d3ntMd53muVAwVSlQiQ0+z0X4iUdANkbwKAGhoV4pkf6wHr3zHpyDHVhvln4Qylo
+NRn//IUgUmC2ewurQDtRT2w4F2c8dwLHAe7Xaw9bIhyBRcPsS8Y=
+=PVjs
 -----END PGP SIGNATURE-----
 
---mbudEdg6sm2SAJRLTtQJmbwrkmyYaD555--
+--TjCBNvkwWXNX1Kx5HQbYyGRQQcB66HOgq--
 
 
