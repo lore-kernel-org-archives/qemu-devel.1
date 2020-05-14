@@ -6,43 +6,42 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6F6CC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 04:51:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AFF4C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 04:51:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9907E205CB
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 04:51:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9907E205CB
+	by mail.kernel.org (Postfix) with ESMTPS id 3B289205CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 04:51:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B289205CB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ5qN-000266-My
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 00:51:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56746)
+	id 1jZ5qc-0002Vt-8B
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 00:51:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56750)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jZ5ls-0001bS-Si; Thu, 14 May 2020 00:47:00 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:43872)
+ id 1jZ5lt-0001dA-Cq; Thu, 14 May 2020 00:47:01 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:43882)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jZ5lr-0003lW-MS; Thu, 14 May 2020 00:47:00 -0400
+ id 1jZ5ls-0003lp-8l; Thu, 14 May 2020 00:47:01 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 8D76EBFDAE;
- Thu, 14 May 2020 04:46:36 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id B042EBFE5B;
+ Thu, 14 May 2020 04:46:37 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v6 16/20] hw/block/nvme: factor out pci setup
-Date: Thu, 14 May 2020 06:46:07 +0200
-Message-Id: <20200514044611.734782-17-its@irrelevant.dk>
+Subject: [PATCH v6 19/20] hw/block/nvme: do cmb/pmr init as part of pci init
+Date: Thu, 14 May 2020 06:46:10 +0200
+Message-Id: <20200514044611.734782-20-its@irrelevant.dk>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200514044611.734782-1-its@irrelevant.dk>
 References: <20200514044611.734782-1-its@irrelevant.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
  helo=charlie.dont.surf
@@ -78,62 +77,41 @@ Sender: "Qemu-devel"
 From: Klaus Jensen <k.jensen@samsung.com>
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Keith Busch <kbusch@kernel.org>
 ---
- hw/block/nvme.c | 30 ++++++++++++++++++------------
- 1 file changed, 18 insertions(+), 12 deletions(-)
+ hw/block/nvme.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 8e9312534fcd..2fcab706c759 100644
+index 7254b66ae199..2addcc86034a 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -1440,6 +1440,22 @@ static void nvme_init_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
-     id_ns->nuse = id_ns->ncap;
+@@ -1527,6 +1527,12 @@ static void nvme_init_pci(NvmeCtrl *n, PCIDevice *pci_dev)
+     pci_register_bar(pci_dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
+                      PCI_BASE_ADDRESS_MEM_TYPE_64, &n->iomem);
+     msix_init_exclusive_bar(pci_dev, n->params.max_ioqpairs + 1, 4, NULL);
++
++    if (n->params.cmb_size_mb) {
++        nvme_init_cmb(n, pci_dev);
++    } else if (n->pmrdev) {
++        nvme_init_pmr(n, pci_dev);
++    }
  }
  
-+static void nvme_init_pci(NvmeCtrl *n, PCIDevice *pci_dev)
-+{
-+    uint8_t *pci_conf = pci_dev->config;
-+
-+    pci_conf[PCI_INTERRUPT_PIN] = 1;
-+    pci_config_set_prog_interface(pci_conf, 0x2);
-+    pci_config_set_class(pci_conf, PCI_CLASS_STORAGE_EXPRESS);
-+    pcie_endpoint_cap_init(pci_dev, 0x80);
-+
-+    memory_region_init_io(&n->iomem, OBJECT(n), &nvme_mmio_ops, n, "nvme",
-+                          n->reg_size);
-+    pci_register_bar(pci_dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
-+                     PCI_BASE_ADDRESS_MEM_TYPE_64, &n->iomem);
-+    msix_init_exclusive_bar(pci_dev, n->params.max_ioqpairs + 1, 4, NULL);
-+}
-+
  static void nvme_realize(PCIDevice *pci_dev, Error **errp)
- {
-     NvmeCtrl *n = NVME(pci_dev);
-@@ -1463,19 +1479,9 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-         return;
-     }
+@@ -1588,12 +1594,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+     n->bar.vs = 0x00010200;
+     n->bar.intmc = n->bar.intms = 0;
  
-+    nvme_init_pci(n, pci_dev);
-+
-     pci_conf = pci_dev->config;
--    pci_conf[PCI_INTERRUPT_PIN] = 1;
--    pci_config_set_prog_interface(pci_dev->config, 0x2);
--    pci_config_set_class(pci_dev->config, PCI_CLASS_STORAGE_EXPRESS);
--    pcie_endpoint_cap_init(pci_dev, 0x80);
+-    if (n->params.cmb_size_mb) {
+-        nvme_init_cmb(n, pci_dev);
+-    } else if (n->pmrdev) {
+-        nvme_init_pmr(n, pci_dev);
+-    }
 -
--    memory_region_init_io(&n->iomem, OBJECT(n), &nvme_mmio_ops, n,
--                          "nvme", n->reg_size);
--    pci_register_bar(pci_dev, 0,
--        PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64,
--        &n->iomem);
--    msix_init_exclusive_bar(pci_dev, n->params.max_ioqpairs + 1, 4, NULL);
--
-     id->vid = cpu_to_le16(pci_get_word(pci_conf + PCI_VENDOR_ID));
-     id->ssvid = cpu_to_le16(pci_get_word(pci_conf + PCI_SUBSYSTEM_VENDOR_ID));
-     strpadcpy((char *)id->mn, sizeof(id->mn), "QEMU NVMe Ctrl", ' ');
+     for (i = 0; i < n->num_namespaces; i++) {
+         nvme_init_namespace(n, &n->namespaces[i], &local_err);
+         if (local_err) {
 -- 
 2.26.2
 
