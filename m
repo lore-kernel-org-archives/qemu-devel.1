@@ -2,93 +2,113 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AEF9C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:53:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 385D0C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:53:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8D09205CB
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:53:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 00F80205CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:53:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="S+C1TcS9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8D09205CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JvJtgTVm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00F80205CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZFEx-0004es-12
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:53:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39704)
+	id 1jZFF3-0004wK-4m
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:53:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40990)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZEko-0003tE-Pz
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:30 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:34100)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZEkn-00060c-PW
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:30 -0400
-Received: by mail-wr1-x434.google.com with SMTP id y3so4399240wrt.1
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:22:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=gjbVHc2/Yfi0L0CZNHhwdyHWC0bXOSnoFP1EIBL00CI=;
- b=S+C1TcS9VBDUw7Ckz8ooyTDTM5kGkLuGRM39GdGGt6YOpObpCVXENngOIElSBJjo8a
- ZOvrSlP364RcKdTenPb5mzwdgnCUUcUm4MzW6h+DwlowfGKGMGR9ifAP4lV9SfXPdOZt
- crEAjLY4MyWSDubjAzcoskgLvL9M3Q6fxYkNZoVdqdntPhJGaiqRCitWas/UuCiwzB0z
- QoWho/1S9/u7MmizAIwjJqwJefsSY8O0jHmm5WAfmBv+UuheCljQi7kTMGHPBRXgxkTr
- B/7g22OFKzwwG2gHd3TFYYNOlQ2BegHq4g+hyxx+Tq4i82T5dL6B4sIiOKBM1jhKBaRA
- c1uA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=gjbVHc2/Yfi0L0CZNHhwdyHWC0bXOSnoFP1EIBL00CI=;
- b=FzB46gDta2gxcDZrracGse4UBgHwuVU2mY6DK/U1SFcvHCFYgNB6Bj7UWKoeLk7uYX
- feNrVUkGOwrBdEcvbSccJvL719ASQiuRBNdeQq0FfDj4k46hfSERVBlB7Ge56tInX5GE
- AxDxR7IPVCG/+hJOVAAjFpj6iYdDisqpWOCdmtq6St1ZorlcQK3KifcVO1RgnDzJ5gxQ
- tMiu4b4yXkzBDKWK6uItBqXU/J+AoujtOnuNkWTvGVqZpWWObbKGSFsO41pFE5JtvtxO
- LaT3yS4K4fm+tAdRw/0JDufQLxTin/vzppu0Rvwko8yMUOlA50zglxFHnVOXo58pP+qH
- kWHQ==
-X-Gm-Message-State: AOAM531hHUdqI5isOvQlrBJ4lUBsAiYj2eDC8b3TvmDJsQniD5Hk92QS
- scklmgYjqrkwDQsSVSY9deik0vMrRi3c2A==
-X-Google-Smtp-Source: ABdhPJx1w1KfWqp2QSt9USGYOpxNorNrUg9zv0viNSxugZIl1Kc8f+al4GFMSJq+TKLJCEzlI4W57Q==
-X-Received: by 2002:adf:9447:: with SMTP id 65mr5803516wrq.331.1589466148118; 
- Thu, 14 May 2020 07:22:28 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 88sm4077443wrq.77.2020.05.14.07.22.27
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 14 May 2020 07:22:27 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 37/45] target/arm: Convert Neon VPADD 3-reg-same insns to
- decodetree
-Date: Thu, 14 May 2020 15:21:30 +0100
-Message-Id: <20200514142138.20875-38-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200514142138.20875-1-peter.maydell@linaro.org>
-References: <20200514142138.20875-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jZEsU-0003iG-6P
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:30:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42063
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jZEsS-0008Kp-7F
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:30:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589466621;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=/TSYecf9tCKoTNwZlfBDYF5K/mywxkb8Owsfs6lcgCI=;
+ b=JvJtgTVmPW6FeBOGINwLhEPstKKVui31sEMToAt4Qb6kIQLPxGW4L6E6PUztdoLRt45Q41
+ 2zMSZArMLg11wAQkA4KWIoxLfz17kH5PMaRpILrRK5mVzbQHvmAdyDJNA9GWnFbWVo4ZsK
+ 1drzvNHrGJicw5V5/VDGfd/v8l6bwa4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-167-CQGTHRJjO9yhGfl8_1HhZg-1; Thu, 14 May 2020 10:30:19 -0400
+X-MC-Unique: CQGTHRJjO9yhGfl8_1HhZg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5771180058A;
+ Thu, 14 May 2020 14:30:18 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-212.ams2.redhat.com
+ [10.36.113.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AED9A7D928;
+ Thu, 14 May 2020 14:30:16 +0000 (UTC)
+Subject: Re: [PATCH v6 08/14] block/qcow2: extend qemu-img amend interface
+ with crypto options
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
+References: <20200510134037.18487-1-mlevitsk@redhat.com>
+ <20200510134037.18487-9-mlevitsk@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <2ed2c0fc-7b47-a46c-1603-b1c25bd1b0ae@redhat.com>
+Date: Thu, 14 May 2020 16:30:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::434;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x434.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20200510134037.18487-9-mlevitsk@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="P4DBve8KDB8L5ORTVWu2Iprdk19CS8IAo"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,103 +121,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, John Snow <jsnow@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the Neon integer VPADD 3-reg-same insns to decodetree.  These
-are 'pairwise' operations.  (Note that VQRDMLAH, which shares the
-same primary opcode but has U=1, has already been converted.)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--P4DBve8KDB8L5ORTVWu2Iprdk19CS8IAo
+Content-Type: multipart/mixed; boundary="1Zxk49IWmT1Liw4s51xCPNUVxQhNhH74W"
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200512163904.10918-10-peter.maydell@linaro.org
----
- target/arm/neon-dp.decode       |  2 ++
- target/arm/translate-neon.inc.c |  2 ++
- target/arm/translate.c          | 19 +------------------
- 3 files changed, 5 insertions(+), 18 deletions(-)
+--1Zxk49IWmT1Liw4s51xCPNUVxQhNhH74W
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/arm/neon-dp.decode b/target/arm/neon-dp.decode
-index 2edcaba9f85..3659fb036c7 100644
---- a/target/arm/neon-dp.decode
-+++ b/target/arm/neon-dp.decode
-@@ -152,6 +152,8 @@ VPMAX_U_3s       1111 001 1 0 . .. .... .... 1010 . . . 0 .... @3same_q0
- VPMIN_S_3s       1111 001 0 0 . .. .... .... 1010 . . . 1 .... @3same_q0
- VPMIN_U_3s       1111 001 1 0 . .. .... .... 1010 . . . 1 .... @3same_q0
- 
-+VPADD_3s         1111 001 0 0 . .. .... .... 1011 . . . 1 .... @3same_q0
-+
- VQRDMLAH_3s      1111 001 1 0 . .. .... .... 1011 ... 1 .... @3same
- 
- SHA1_3s          1111 001 0 0 . optype:2 .... .... 1100 . 1 . 0 .... \
-diff --git a/target/arm/translate-neon.inc.c b/target/arm/translate-neon.inc.c
-index 7db6b856598..e0137364075 100644
---- a/target/arm/translate-neon.inc.c
-+++ b/target/arm/translate-neon.inc.c
-@@ -990,8 +990,10 @@ static bool do_3same_pair(DisasContext *s, arg_3same *a, NeonGenTwoOpFn *fn)
- #define gen_helper_neon_pmax_u32  tcg_gen_umax_i32
- #define gen_helper_neon_pmin_s32  tcg_gen_smin_i32
- #define gen_helper_neon_pmin_u32  tcg_gen_umin_i32
-+#define gen_helper_neon_padd_u32  tcg_gen_add_i32
- 
- DO_3SAME_PAIR(VPMAX_S, pmax_s)
- DO_3SAME_PAIR(VPMIN_S, pmin_s)
- DO_3SAME_PAIR(VPMAX_U, pmax_u)
- DO_3SAME_PAIR(VPMIN_U, pmin_u)
-+DO_3SAME_PAIR(VPADD, padd_u)
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 82be4d40282..ce30417014d 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -5397,13 +5397,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-             return 1;
-         }
-         switch (op) {
--        case NEON_3R_VPADD_VQRDMLAH:
--            if (!u) {
--                break;  /* VPADD */
--            }
--            /* VQRDMLAH : handled by decodetree */
--            return 1;
--
-         case NEON_3R_VFM_VQRDMLSH:
-             if (!u) {
-                 /* VFM, VFMS */
-@@ -5438,6 +5431,7 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-         case NEON_3R_VQRSHL:
-         case NEON_3R_VPMAX:
-         case NEON_3R_VPMIN:
-+        case NEON_3R_VPADD_VQRDMLAH:
-             /* Already handled by decodetree */
-             return 1;
-         }
-@@ -5448,9 +5442,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-         }
-         pairwise = 0;
-         switch (op) {
--        case NEON_3R_VPADD_VQRDMLAH:
--            pairwise = 1;
--            break;
-         case NEON_3R_FLOAT_ARITH:
-             pairwise = (u && size < 2); /* if VPADD (float) */
-             break;
-@@ -5528,14 +5519,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                 }
-             }
-             break;
--        case NEON_3R_VPADD_VQRDMLAH:
--            switch (size) {
--            case 0: gen_helper_neon_padd_u8(tmp, tmp, tmp2); break;
--            case 1: gen_helper_neon_padd_u16(tmp, tmp, tmp2); break;
--            case 2: tcg_gen_add_i32(tmp, tmp, tmp2); break;
--            default: abort();
--            }
--            break;
-         case NEON_3R_FLOAT_ARITH: /* Floating point arithmetic. */
-         {
-             TCGv_ptr fpstatus = get_fpstatus_ptr(1);
--- 
-2.20.1
+On 10.05.20 15:40, Maxim Levitsky wrote:
+> Now that we have all the infrastructure in place,
+> wire it in the qcow2 driver and expose this to the user.
+>=20
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>  block/qcow2.c              | 72 +++++++++++++++++++++++++++++++++-----
+>  tests/qemu-iotests/082.out | 45 ++++++++++++++++++++++++
+
+Again, some rebasing required because of compression_type.
+
+>  2 files changed, 108 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index db86500839..4bb6e3fc8f 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+
+[...]
+
+> @@ -4744,17 +4757,11 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *=
+opts, BlockDriverState *in_bs,
+>      g_free(optstr);
+> =20
+>      if (has_luks) {
+> +
+
+Why?
+
+With this line dropped, and 082.out fixed up:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--1Zxk49IWmT1Liw4s51xCPNUVxQhNhH74W--
+
+--P4DBve8KDB8L5ORTVWu2Iprdk19CS8IAo
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl69VfcACgkQ9AfbAGHV
+z0AeLwf/V5zgw6kIeoZ8Txjtf5jVg3WKaR6xV6X6OkQG8CLpWmXUiiIIKV0UcP1D
+P2qO/rdWE3rjzVYy3ktWmu914okIcg48PO9WY8WVSoCXTCH92Rym+EWT3QxlnAbR
+TCDFArdwtJtofFFgbOvJGQEnQIQidlUfjbKkg2UMUSJU5hWJ7pVIZdUwUww2luV8
+7FGT/j8FjapmLTIPCoXgMoacvbNWfHrIaqJH58BxwL9qlR32IadHv2aF8NULU4TE
+ISCBFr8M02pC0mk+z7eZvdcq0a24REML8YkYJnsXSoicLF8+BsoE1qum+a9Y/I2y
+Qo943YWYa/3dsx2gU+wh5zwaBQtoJw==
+=h+/a
+-----END PGP SIGNATURE-----
+
+--P4DBve8KDB8L5ORTVWu2Iprdk19CS8IAo--
 
 
