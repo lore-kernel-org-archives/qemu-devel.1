@@ -2,113 +2,91 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FF61C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 12:33:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D1C9C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 12:34:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AE96206DA
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 12:33:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 08335206DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 12:34:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YCoG8Y+m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AE96206DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="qroyB9Oi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08335206DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZD3Q-0007Zy-8n
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 08:33:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52068)
+	id 1jZD4W-0000rL-6q
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 08:34:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52630)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jZCyp-00024A-Kq
- for qemu-devel@nongnu.org; Thu, 14 May 2020 08:28:51 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41986
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jZCyo-0004q5-LZ
- for qemu-devel@nongnu.org; Thu, 14 May 2020 08:28:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589459329;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=3mmQ/CNN8DBONTLFVMwYKkm2g3/YzkaRMN3p/1JjmKk=;
- b=YCoG8Y+mnMzemaE08iNZ5Xrv+N/YzyCfAVKuCLlNjXtyPA1Cu55hNFKDO+aXhoLeuyhLM3
- dnYTwK1FbCFt3ahWlgD0kgIPiNS2YEw5zpUM4HSYu2wJiLhJ1ms461THQZrbWC8R3B7XPf
- /WfIfWGUTvJeiPWCb74qm6pIxprpB20=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-182-qCJKmc4AM_Ows1fRX9yGrw-1; Thu, 14 May 2020 08:28:45 -0400
-X-MC-Unique: qCJKmc4AM_Ows1fRX9yGrw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C25FE9116E;
- Thu, 14 May 2020 12:28:44 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-212.ams2.redhat.com
- [10.36.113.212])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C929476E64;
- Thu, 14 May 2020 12:28:42 +0000 (UTC)
-Subject: Re: [PATCH v6 04/14] block/amend: separate amend and create options
- for qemu-img
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-References: <20200510134037.18487-1-mlevitsk@redhat.com>
- <20200510134037.18487-5-mlevitsk@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <5b389390-eadb-e1d6-48f8-be99c2dfad99@redhat.com>
-Date: Thu, 14 May 2020 14:28:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1jZD3a-0008GL-TD
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 08:33:46 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:5504)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1jZD3Y-0005da-Je
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 08:33:46 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5ebd3a5b0000>; Thu, 14 May 2020 05:32:27 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate102.nvidia.com (PGP Universal service);
+ Thu, 14 May 2020 05:33:42 -0700
+X-PGP-Universal: processed;
+ by hqpgpgate102.nvidia.com on Thu, 14 May 2020 05:33:42 -0700
+Received: from [10.40.103.94] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 14 May
+ 2020 12:33:33 +0000
+Subject: Re: [PATCH Kernel v19 5/8] vfio iommu: Implementation of ioctl for
+ dirty pages tracking
+To: Alex Williamson <alex.williamson@redhat.com>
+References: <1589400279-28522-1-git-send-email-kwankhede@nvidia.com>
+ <1589400279-28522-6-git-send-email-kwankhede@nvidia.com>
+ <20200513230224.195b97e8@x1.home>
+X-Nvconfidentiality: public
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <e85c4f71-89e6-1d74-1d6d-f617b3a56db4@nvidia.com>
+Date: Thu, 14 May 2020 18:03:29 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200510134037.18487-5-mlevitsk@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="UnF82G6PhjA5bBlEpBD7sT2TMo5oLmH9n"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+In-Reply-To: <20200513230224.195b97e8@x1.home>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1589459547; bh=hXLqQN/hNI+HK7y5v4JF2tzRkEClai5OPNcoypzAew8=;
+ h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+ Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+ X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+ Content-Transfer-Encoding;
+ b=qroyB9OiYopgps8T+7exeVyIIdZvpz5Hzvl7BVFuXYCTlPTCecMdKT5yN3tKxGra/
+ hrM0tJSv0vUCXIEWzr8Aw/0RWscwikLqVbJ3/GP3hvIXwc7JX9kn6K4jIFwGINyJK6
+ W6f45oZ/fivSmJhwpihoTNXvzFS2yIklAW2mf7hiSFdtU6rhRssYH6BvXt/E+H+V4J
+ proLcJs0TqbRU2OcbOVeoYZQhFiYMrpaEseB1F9TO3P+p3HjC/jdxTw1BaOdwnxjDu
+ dCLxY5JCWQ6TkRHHU80KzgGrrXrDNQGNDJE0xuzuUByhYKJ52XoecNXIiukRSIIVXW
+ fQ8AczGcS4YwA==
+Received-SPF: pass client-ip=216.228.121.64; envelope-from=kwankhede@nvidia.com;
+ helo=hqnvemgate25.nvidia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 08:33:42
+X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
+X-Spam_score_int: -70
+X-Spam_score: -7.1
+X-Spam_bar: -------
+X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_HI=-5, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -121,210 +99,468 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, John Snow <jsnow@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---UnF82G6PhjA5bBlEpBD7sT2TMo5oLmH9n
-Content-Type: multipart/mixed; boundary="mB1gQNLQDrfwjdukDV7MR1s9tKdSTZh5f"
-
---mB1gQNLQDrfwjdukDV7MR1s9tKdSTZh5f
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 10.05.20 15:40, Maxim Levitsky wrote:
-> Some options are only useful for creation
-> (or hard to be amended, like cluster size for qcow2), while some other
-> options are only useful for amend, like upcoming keyslot management
-> options for luks
->=20
-> Since currently only qcow2 supports amend, move all its options
-> to a common macro and then include it in each action option list.
->=20
-> In future it might be useful to remove some options which are
-> not supported anyway from amend list, which currently
-> cause an error message if amended.
->=20
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
->  block/qcow2.c             | 160 +++++++++++++++++++++-----------------
->  include/block/block_int.h |   4 +
->  qemu-img.c                |  18 ++---
->  3 files changed, 100 insertions(+), 82 deletions(-)
->=20
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 79fbad9d76..fc494c7591 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -5520,83 +5520,96 @@ void qcow2_signal_corruption(BlockDriverState *bs=
-, bool fatal, int64_t offset,
->      s->signaled_corruption =3D true;
->  }
-> =20
-> +#define QCOW_COMMON_OPTIONS                                         \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_SIZE,                                     \
-> +        .type =3D QEMU_OPT_SIZE,                                      \
-> +        .help =3D "Virtual disk size"                                 \
-> +    },                                                              \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_COMPAT_LEVEL,                             \
-> +        .type =3D QEMU_OPT_STRING,                                    \
-> +        .help =3D "Compatibility level (v2 [0.10] or v3 [1.1])"       \
-> +    },                                                              \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_BACKING_FILE,                             \
-> +        .type =3D QEMU_OPT_STRING,                                    \
-> +        .help =3D "File name of a base image"                         \
-> +    },                                                              \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_BACKING_FMT,                              \
-> +        .type =3D QEMU_OPT_STRING,                                    \
-> +        .help =3D "Image format of the base image"                    \
-> +    },                                                              \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_DATA_FILE,                                \
-> +        .type =3D QEMU_OPT_STRING,                                    \
-> +        .help =3D "File name of an external data file"                \
-> +    },                                                              \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_DATA_FILE_RAW,                            \
-> +        .type =3D QEMU_OPT_BOOL,                                      \
-> +        .help =3D "The external data file must stay valid "           \
-> +                "as a raw image"                                    \
-> +    },                                                              \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_ENCRYPT,                                  \
-> +        .type =3D QEMU_OPT_BOOL,                                      \
-> +        .help =3D "Encrypt the image with format 'aes'. (Deprecated " \
-> +                "in favor of " BLOCK_OPT_ENCRYPT_FORMAT "=3Daes)",    \
-> +    },                                                              \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_ENCRYPT_FORMAT,                           \
-> +        .type =3D QEMU_OPT_STRING,                                    \
-> +        .help =3D "Encrypt the image, format choices: 'aes', 'luks'", \
-> +    },                                                              \
-> +    BLOCK_CRYPTO_OPT_DEF_KEY_SECRET("encrypt.",                     \
-> +        "ID of secret providing qcow AES key or LUKS passphrase"),  \
-> +    BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_ALG("encrypt."),               \
-> +    BLOCK_CRYPTO_OPT_DEF_LUKS_CIPHER_MODE("encrypt."),              \
-> +    BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_ALG("encrypt."),                \
-> +    BLOCK_CRYPTO_OPT_DEF_LUKS_IVGEN_HASH_ALG("encrypt."),           \
-> +    BLOCK_CRYPTO_OPT_DEF_LUKS_HASH_ALG("encrypt."),                 \
-> +    BLOCK_CRYPTO_OPT_DEF_LUKS_ITER_TIME("encrypt."),                \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_CLUSTER_SIZE,                             \
-> +        .type =3D QEMU_OPT_SIZE,                                      \
-> +        .help =3D "qcow2 cluster size",                               \
-> +        .def_value_str =3D stringify(DEFAULT_CLUSTER_SIZE)            \
-> +    },                                                              \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_PREALLOC,                                 \
-> +        .type =3D QEMU_OPT_STRING,                                    \
-> +        .help =3D "Preallocation mode (allowed values: off, "         \
-> +                "metadata, falloc, full)"                           \
-> +    },                                                              \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_LAZY_REFCOUNTS,                           \
-> +        .type =3D QEMU_OPT_BOOL,                                      \
-> +        .help =3D "Postpone refcount updates",                        \
-> +        .def_value_str =3D "off"                                      \
-> +    },                                                              \
-> +    {                                                               \
-> +        .name =3D BLOCK_OPT_REFCOUNT_BITS,                            \
-> +        .type =3D QEMU_OPT_NUMBER,                                    \
-> +        .help =3D "Width of a reference count entry in bits",         \
-> +        .def_value_str =3D "16"                                       \
-> +    }                                                               \
-
-I think the last line should have a comma in it (otherwise the final
-backslash doesn=E2=80=99t make much sense, because whenever we=E2=80=99d ad=
-d a new
-option, we would need to modify the line anyway to insert a comma).
-
-Speaking of adding option, this requires a rebase due to the
-compression_type option added (not trivial in the strict sense, but
-still straightforward to handle).
-
-> +
->  static QemuOptsList qcow2_create_opts =3D {
->      .name =3D "qcow2-create-opts",
->      .head =3D QTAILQ_HEAD_INITIALIZER(qcow2_create_opts.head),
->      .desc =3D {
->
-
-[...]
-
-> +        QCOW_COMMON_OPTIONS,
-> +        { /* end of list */ }
-> +    }
-> +};
-> +
-> +static QemuOptsList qcow2_amend_opts =3D {
-> +    .name =3D "qcow2-amend-opts",
-> +    .head =3D QTAILQ_HEAD_INITIALIZER(qcow2_amend_opts.head),
-> +    .desc =3D {
-> +        QCOW_COMMON_OPTIONS,
->          { /* end of list */ }
-
-If QCOW_COMMON_OPTIONS were to already end in a comma (which I think it
-should), then it would become superfluous here.
-
->      }
->  };
-
-[...]
-
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index 952b2f033a..0a71357b50 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -412,6 +412,10 @@ struct BlockDriver {
-> =20
->      /* List of options for creating images, terminated by name =3D=3D NU=
-LL */
->      QemuOptsList *create_opts;
-> +
-> +    /* List of options for image amend*/
-
-I don=E2=80=99t suppose we have a coding style requirement for this, but I =
-still
-think there should be a space before the closing asterisk.
-
-With those things fixed:
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-> +    QemuOptsList *amend_opts;
-> +
 
 
---mB1gQNLQDrfwjdukDV7MR1s9tKdSTZh5f--
+On 5/14/2020 10:32 AM, Alex Williamson wrote:
+> On Thu, 14 May 2020 01:34:36 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> 
+>> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
+>> - Start dirty pages tracking while migration is active
+>> - Stop dirty pages tracking.
+>> - Get dirty pages bitmap. Its user space application's responsibility to
+>>    copy content of dirty pages from source to destination during migration.
+>>
+>> To prevent DoS attack, memory for bitmap is allocated per vfio_dma
+>> structure. Bitmap size is calculated considering smallest supported page
+>> size. Bitmap is allocated for all vfio_dmas when dirty logging is enabled
+>>
+>> Bitmap is populated for already pinned pages when bitmap is allocated for
+>> a vfio_dma with the smallest supported page size. Update bitmap from
+>> pinning functions when tracking is enabled. When user application queries
+>> bitmap, check if requested page size is same as page size used to
+>> populated bitmap. If it is equal, copy bitmap, but if not equal, return
+>> error.
+>>
+>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+>>
+>> Fixed error reported by build bot by changing pgsize type from uint64_t
+>> to size_t.
+>> Reported-by: kbuild test robot <lkp@intel.com>
+>> ---
+>>   drivers/vfio/vfio_iommu_type1.c | 274 +++++++++++++++++++++++++++++++++++++++-
+>>   1 file changed, 268 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>> index 6f09fbabed12..469b09185b83 100644
+>> --- a/drivers/vfio/vfio_iommu_type1.c
+>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>> @@ -72,6 +72,7 @@ struct vfio_iommu {
+>>   	uint64_t		pgsize_bitmap;
+>>   	bool			v2;
+>>   	bool			nesting;
+>> +	bool			dirty_page_tracking;
+>>   };
+>>   
+>>   struct vfio_domain {
+>> @@ -92,6 +93,7 @@ struct vfio_dma {
+>>   	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
+>>   	struct task_struct	*task;
+>>   	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
+>> +	unsigned long		*bitmap;
+>>   };
+>>   
+>>   struct vfio_group {
+>> @@ -126,6 +128,19 @@ struct vfio_regions {
+>>   #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
+>>   					(!list_empty(&iommu->domain_list))
+>>   
+>> +#define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
+>> +
+>> +/*
+>> + * Input argument of number of bits to bitmap_set() is unsigned integer, which
+>> + * further casts to signed integer for unaligned multi-bit operation,
+>> + * __bitmap_set().
+>> + * Then maximum bitmap size supported is 2^31 bits divided by 2^3 bits/byte,
+>> + * that is 2^28 (256 MB) which maps to 2^31 * 2^12 = 2^43 (8TB) on 4K page
+>> + * system.
+>> + */
+>> +#define DIRTY_BITMAP_PAGES_MAX	 ((u64)INT_MAX)
+>> +#define DIRTY_BITMAP_SIZE_MAX	 DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
+>> +
+>>   static int put_pfn(unsigned long pfn, int prot);
+>>   
+>>   /*
+>> @@ -176,6 +191,77 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
+>>   	rb_erase(&old->node, &iommu->dma_list);
+>>   }
+>>   
+>> +
+>> +static int vfio_dma_bitmap_alloc(struct vfio_dma *dma, size_t pgsize)
+>> +{
+>> +	uint64_t npages = dma->size / pgsize;
+>> +
+>> +	if (npages > DIRTY_BITMAP_PAGES_MAX)
+>> +		return -EINVAL;
+>> +
+>> +	dma->bitmap = kvzalloc(DIRTY_BITMAP_BYTES(npages), GFP_KERNEL);
+>> +	if (!dma->bitmap)
+>> +		return -ENOMEM;
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static void vfio_dma_bitmap_free(struct vfio_dma *dma)
+>> +{
+>> +	kfree(dma->bitmap);
+>> +	dma->bitmap = NULL;
+>> +}
+>> +
+>> +static void vfio_dma_populate_bitmap(struct vfio_dma *dma, size_t pgsize)
+>> +{
+>> +	struct rb_node *p;
+>> +
+>> +	if (RB_EMPTY_ROOT(&dma->pfn_list))
+>> +		return;
+> 
+> I don't think this is optimizing anything:
+> 
+> #define RB_EMPTY_ROOT(root)  (READ_ONCE((root)->rb_node) == NULL)
+> 
+> struct rb_node *rb_first(const struct rb_root *root)
+> {
+>          struct rb_node  *n;
+> 
+>          n = root->rb_node;
+>          if (!n)
+>                  return NULL;
+> 
+> So the loop below won't be entered if the tree is empty.
+> 
 
---UnF82G6PhjA5bBlEpBD7sT2TMo5oLmH9n
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Removing empty check.
 
------BEGIN PGP SIGNATURE-----
+>> +
+>> +	for (p = rb_first(&dma->pfn_list); p; p = rb_next(p)) {
+>> +		struct vfio_pfn *vpfn = rb_entry(p, struct vfio_pfn, node);
+>> +
+>> +		bitmap_set(dma->bitmap, (vpfn->iova - dma->iova) / pgsize, 1);
+>> +	}
+>> +}
+>> +
+>> +static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu, size_t pgsize)
+>> +{
+>> +	struct rb_node *n = rb_first(&iommu->dma_list);
+>> +
+>> +	for (; n; n = rb_next(n)) {
+>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
+>> +		int ret;
+>> +
+>> +		ret = vfio_dma_bitmap_alloc(dma, pgsize);
+>> +		if (ret) {
+>> +			struct rb_node *p = rb_prev(n);
+>> +
+>> +			for (; p; p = rb_prev(p)) {
+>> +				struct vfio_dma *dma = rb_entry(n,
+>> +							struct vfio_dma, node);
+>> +
+>> +				vfio_dma_bitmap_free(dma);
+>> +			}
+>> +			return ret;
+>> +		}
+>> +		vfio_dma_populate_bitmap(dma, pgsize);
+>> +	}
+>> +	return 0;
+>> +}
+>> +
+>> +static void vfio_dma_bitmap_free_all(struct vfio_iommu *iommu)
+>> +{
+>> +	struct rb_node *n = rb_first(&iommu->dma_list);
+>> +
+>> +	for (; n; n = rb_next(n)) {
+>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
+>> +
+>> +		vfio_dma_bitmap_free(dma);
+>> +	}
+>> +}
+>> +
+>>   /*
+>>    * Helper Functions for host iova-pfn list
+>>    */
+>> @@ -568,6 +654,17 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>>   			vfio_unpin_page_external(dma, iova, do_accounting);
+>>   			goto pin_unwind;
+>>   		}
+>> +
+>> +		if (iommu->dirty_page_tracking) {
+>> +			unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
+>> +
+>> +			/*
+>> +			 * Bitmap populated with the smallest supported page
+>> +			 * size
+>> +			 */
+>> +			bitmap_set(dma->bitmap,
+>> +				   (vpfn->iova - dma->iova) >> pgshift, 1);
+>> +		}
+>>   	}
+>>   
+>>   	ret = i;
+>> @@ -802,6 +899,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+>>   	vfio_unmap_unpin(iommu, dma, true);
+>>   	vfio_unlink_dma(iommu, dma);
+>>   	put_task_struct(dma->task);
+>> +	vfio_dma_bitmap_free(dma);
+>>   	kfree(dma);
+>>   	iommu->dma_avail++;
+>>   }
+>> @@ -829,6 +927,57 @@ static void vfio_pgsize_bitmap(struct vfio_iommu *iommu)
+>>   	}
+>>   }
+>>   
+>> +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
+>> +				  size_t size, size_t pgsize,
+>> +				  u64 __user *bitmap)
+>> +{
+>> +	struct vfio_dma *dma;
+>> +	unsigned long pgshift = __ffs(pgsize);
+>> +	unsigned int npages, bitmap_size;
+>> +
+>> +	dma = vfio_find_dma(iommu, iova, 1);
+>> +
+>> +	if (!dma)
+>> +		return -EINVAL;
+>> +
+>> +	if (dma->iova != iova || dma->size != size)
+>> +		return -EINVAL;
+> 
+> Minor cleanup:
+> 
+> 	if (!dma || dma->iova != iova || dma->size != size)
+> 		return -EINVAL;
+> 
+>> +
+>> +	npages = dma->size >> pgshift;
+>> +	bitmap_size = DIRTY_BITMAP_BYTES(npages);
+>> +
+>> +	/* mark all pages dirty if all pages are pinned and mapped. */
+>> +	if (dma->iommu_mapped)
+>> +		bitmap_set(dma->bitmap, 0, npages);
+>> +
+>> +	if (copy_to_user((void __user *)bitmap, dma->bitmap, bitmap_size))
+>> +		return -EFAULT;
+>> +
+>> +	/*
+>> +	 * Re-populate bitmap to include all pinned pages which are considered
+>> +	 * as dirty but exclude pages which are unpinned and pages which are
+>> +	 * marked dirty by vfio_dma_rw()
+>> +	 */
+>> +	bitmap_clear(dma->bitmap, 0, npages);
+>> +	vfio_dma_populate_bitmap(dma, pgsize);
+>> +	return 0;
+>> +}
+>> +
+>> +static int verify_bitmap_size(uint64_t npages, uint64_t bitmap_size)
+>> +{
+>> +	uint64_t bsize;
+>> +
+>> +	if (!npages || !bitmap_size || (bitmap_size > DIRTY_BITMAP_SIZE_MAX))
+>> +		return -EINVAL;
+>> +
+>> +	bsize = DIRTY_BITMAP_BYTES(npages);
+>> +
+>> +	if (bitmap_size < bsize)
+>> +		return -EINVAL;
+> 
+> Another minor cleanup:
+> 
+> 	if (!npages || !bitmap_size || bitmap_size > DIRTY_BITMAP_SIZE_MAX ||
+> 	    bitmap_size < DIRTY_BITMAP_BYTES(npages))
+> 		return -EINVAL;
+> 
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>   static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+>>   			     struct vfio_iommu_type1_dma_unmap *unmap)
+>>   {
+>> @@ -1046,7 +1195,7 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+>>   	unsigned long vaddr = map->vaddr;
+>>   	size_t size = map->size;
+>>   	int ret = 0, prot = 0;
+>> -	uint64_t mask;
+>> +	size_t pgsize;
+>>   	struct vfio_dma *dma;
+>>   
+>>   	/* Verify that none of our __u64 fields overflow */
+>> @@ -1061,11 +1210,11 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+>>   
+>>   	mutex_lock(&iommu->lock);
+>>   
+>> -	mask = ((uint64_t)1 << __ffs(iommu->pgsize_bitmap)) - 1;
+>> +	pgsize = (size_t)1 << __ffs(iommu->pgsize_bitmap);
+>>   
+>> -	WARN_ON(mask & PAGE_MASK);
+>> +	WARN_ON((pgsize - 1) & PAGE_MASK);
+>>   
+>> -	if (!prot || !size || (size | iova | vaddr) & mask) {
+>> +	if (!prot || !size || (size | iova | vaddr) & (pgsize - 1)) {
+>>   		ret = -EINVAL;
+>>   		goto out_unlock;
+>>   	}
+>> @@ -1142,6 +1291,12 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+>>   	else
+>>   		ret = vfio_pin_map_dma(iommu, dma, size);
+>>   
+>> +	if (!ret && iommu->dirty_page_tracking) {
+>> +		ret = vfio_dma_bitmap_alloc(dma, pgsize);
+>> +		if (ret)
+>> +			vfio_remove_dma(iommu, dma);
+>> +	}
+>> +
+>>   out_unlock:
+>>   	mutex_unlock(&iommu->lock);
+>>   	return ret;
+>> @@ -2287,6 +2442,104 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>>   
+>>   		return copy_to_user((void __user *)arg, &unmap, minsz) ?
+>>   			-EFAULT : 0;
+>> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
+>> +		struct vfio_iommu_type1_dirty_bitmap dirty;
+>> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
+>> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
+>> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
+>> +		int ret = 0;
+>> +
+>> +		if (!iommu->v2)
+>> +			return -EACCES;
+>> +
+>> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
+>> +				    flags);
+>> +
+>> +		if (copy_from_user(&dirty, (void __user *)arg, minsz))
+>> +			return -EFAULT;
+>> +
+>> +		if (dirty.argsz < minsz || dirty.flags & ~mask)
+>> +			return -EINVAL;
+>> +
+>> +		/* only one flag should be set at a time */
+>> +		if (__ffs(dirty.flags) != __fls(dirty.flags))
+>> +			return -EINVAL;
+>> +
+>> +		if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
+>> +			size_t pgsize;
+>> +
+>> +			mutex_lock(&iommu->lock);
+>> +			pgsize = 1 << __ffs(iommu->pgsize_bitmap);
+>> +			if (!iommu->dirty_page_tracking) {
+>> +				ret = vfio_dma_bitmap_alloc_all(iommu, pgsize);
+>> +				if (!ret)
+>> +					iommu->dirty_page_tracking = true;
+>> +			}
+>> +			mutex_unlock(&iommu->lock);
+>> +			return ret;
+>> +		} else if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
+>> +			mutex_lock(&iommu->lock);
+>> +			if (iommu->dirty_page_tracking) {
+>> +				iommu->dirty_page_tracking = false;
+>> +				vfio_dma_bitmap_free_all(iommu);
+>> +			}
+>> +			mutex_unlock(&iommu->lock);
+>> +			return 0;
+>> +		} else if (dirty.flags &
+>> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
+>> +			struct vfio_iommu_type1_dirty_bitmap_get range;
+>> +			unsigned long pgshift;
+>> +			size_t data_size = dirty.argsz - minsz;
+>> +			size_t iommu_pgsize;
+>> +
+>> +			if (!data_size || data_size < sizeof(range))
+>> +				return -EINVAL;
+>> +
+>> +			if (copy_from_user(&range, (void __user *)(arg + minsz),
+>> +					   sizeof(range)))
+>> +				return -EFAULT;
+>> +
+>> +			if (range.iova + range.size < range.iova)
+>> +				return -EINVAL;
+>> +			if (!access_ok((void __user *)range.bitmap.data,
+>> +				       range.bitmap.size))
+>> +				return -EINVAL;
+>> +
+>> +			pgshift = __ffs(range.bitmap.pgsize);
+>> +			ret = verify_bitmap_size(range.size >> pgshift,
+>> +						 range.bitmap.size);
+>> +			if (ret)
+>> +				return ret;
+>> +
+>> +			mutex_lock(&iommu->lock);
+>> +
+>> +			iommu_pgsize = (size_t)1 << __ffs(iommu->pgsize_bitmap);
+>> +
+>> +			/* allow only smallest supported pgsize */
+>> +			if (range.bitmap.pgsize != iommu_pgsize) {
+>> +				ret = -EINVAL;
+>> +				goto out_unlock;
+>> +			}
+>> +			if (range.iova & (iommu_pgsize - 1)) {
+>> +				ret = -EINVAL;
+>> +				goto out_unlock;
+>> +			}
+>> +			if (!range.size || range.size & (iommu_pgsize - 1)) {
+>> +				ret = -EINVAL;
+>> +				goto out_unlock;
+>> +			}
+>> +
+>> +			if (iommu->dirty_page_tracking)
+>> +				ret = vfio_iova_dirty_bitmap(iommu, range.iova,
+>> +						range.size, range.bitmap.pgsize,
+>> +						range.bitmap.data);
+> 
+> 
+> Why does the unmap with dirty bitmap collection now support ranges
+> covering multiple vfio_dmas, but this interface does not?  Thanks,
+> 
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl69OXkACgkQ9AfbAGHV
-z0DXNgf/X4zLaCdsB4kE8jO0+h3flI3vDZ/KOSBxvDxwHkJ/tbg4RMcDPg5RMZiM
-zNGgL/UYsJqHrQKgdC6uBuMWwXFi8Guj41PeF3LUbC/A6ii2Oojd6rSInYnTDrfA
-cITqRfovPXuIrDlgzd5QUHywj1CpDWHv5Svufo+QFYD9MqigSV5EZljA6T3HgmbE
-4EvSwn5niHwoZK9eGvvkKvuuL9UnGFJq1LPxeBGkAK1af59Pb/jM+0orstVi7+U6
-PUIMyAQUXQHBPiAD4uXtJx6XjgPS6S+Y05PjvC9CHnM4GBDnhAW6FKQ5Er63vvWA
-hayPCxv3Mymi7Sw6KswcbPGmTjQ8zQ==
-=hCn8
------END PGP SIGNATURE-----
+I tried that in v12 version with get_user()-put_user() combination.
+After lots of back and forth and brainstroming we finally reached to the 
+conclusion of keeping this interface to cover single vfio_dma. I would 
+like to stick to that for now. As optimization we can think of doing it 
+in future.
 
---UnF82G6PhjA5bBlEpBD7sT2TMo5oLmH9n--
+Infact looking at the complication in unmap ioctl, I'm rethinking of 
+backing off that change for this patch-set. We can definitely add it 
+later, but atleast for now get basic working framework ready.
 
+Thanks,
+Kirti
+
+> Alex
+> 
+> 
+>> +			else
+>> +				ret = -EINVAL;
+>> +out_unlock:
+>> +			mutex_unlock(&iommu->lock);
+>> +
+>> +			return ret;
+>> +		}
+>>   	}
+>>   
+>>   	return -ENOTTY;
+>> @@ -2354,10 +2607,19 @@ static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
+>>   
+>>   	vaddr = dma->vaddr + offset;
+>>   
+>> -	if (write)
+>> +	if (write) {
+>>   		*copied = copy_to_user((void __user *)vaddr, data,
+>>   					 count) ? 0 : count;
+>> -	else
+>> +		if (*copied && iommu->dirty_page_tracking) {
+>> +			unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
+>> +			/*
+>> +			 * Bitmap populated with the smallest supported page
+>> +			 * size
+>> +			 */
+>> +			bitmap_set(dma->bitmap, offset >> pgshift,
+>> +				   *copied >> pgshift);
+>> +		}
+>> +	} else
+>>   		*copied = copy_from_user(data, (void __user *)vaddr,
+>>   					   count) ? 0 : count;
+>>   	if (kthread)
+> 
 
