@@ -8,79 +8,77 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99325C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:21:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2963CC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:22:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F0942065D
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:21:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E30032065D
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:22:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uutq3RVH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F0942065D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e8rt/9YY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E30032065D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZEkD-0002Xv-GG
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:21:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38478)
+	id 1jZEkr-0003I5-0y
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:22:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38504)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jZEct-0007bp-2y
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:14:19 -0400
-Received: from mail-lf1-x133.google.com ([2a00:1450:4864:20::133]:35406)
+ id 1jZEcv-0007il-TF
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:14:21 -0400
+Received: from mail-lf1-x12b.google.com ([2a00:1450:4864:20::12b]:37004)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jZEcr-0003nB-VS
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:14:18 -0400
-Received: by mail-lf1-x133.google.com with SMTP id 82so1260364lfh.2
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:14:17 -0700 (PDT)
+ id 1jZEcu-0003nq-VR
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:14:21 -0400
+Received: by mail-lf1-x12b.google.com with SMTP id 8so2785383lfp.4
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:14:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=33o9ClpGyupXXLqwHgoHcaDQTUDIPIIMyTSVPvtJZEc=;
- b=uutq3RVH7zPbqHB6ai50O8n6vm0E4YiQuOFrZ015Z7ZsW0dRpxB0Qkwx6i6btwOoz/
- dohUpNvBgD0IJJVsmW5BS0yefyhRpx3vdASr0ZPPJUBuWLQ9W1KOJ2Uu/ORSZyeQPa8z
- hDQxeKWDH+Uq61I7Nx+I0PR32zRYQdM8TmWCBvpLvFvaIa8AqFk8616ZH5LmXpi7unkB
- 0CGp/zXE+TTfud90p9L3Eqh60wi8D0qWBEWP5vedAym+n2Ub1k00JSy1vmKa5REh3Wan
- gNsZhDSbsJQbte3cPKXgjqtAX1FVWaSu3JXwTGPD7GaDwoqUUC237rvWP4r4VfEGQ/3o
- 0SQQ==
+ bh=Cdqb6YfEnUEOZ9+1iE9YYK31lx3pNnIUCeb18hsJxJs=;
+ b=e8rt/9YY/PiTZBRxClnOBelZoDeKUflQn/FM+2u7lhwn4vTAJcoqC2gROKM+PvBxLI
+ cszU/9/iErG54X15q//gmh4EvtS5Hw4EeuV7Z5BOZa+NmSRxEOdDstPo7t+Y2l+HJZ1v
+ 3VdwfkjaMh6uHzieUg9qzxx5l7lCe1jn5dfR2ge4Lp9zjwYtqiX4abfY8S8Z0fHJo3TY
+ VXn69BEJRLcUla9gu+aDDICS5hvlLYPPB0O8+whtSP622FSACTT5NiFUS4TyOFtJeT/n
+ PzxxOIm8xIZ/54tmFHg2GI9y9hcIX6b9/8hEzSv0+NytITlwwLSSvdp9rZI/a3hFJsrG
+ kobg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=33o9ClpGyupXXLqwHgoHcaDQTUDIPIIMyTSVPvtJZEc=;
- b=ivZMx6h8PHVmx0DaUqj/HEvdtKQ7D/nLdgjBaDaC3QoVUysYVxsGrDlzw3FA+uwItC
- QVQbhzxUbR+jxZGHDl8uLGLUMWAm1zfxZPruPkgX9cdYnrN/1xOhRkSjT9n1/wgA/T75
- pSFYhTMlhfudLNzv+Sze66BusfopEqrntSG+BD8nKTCjwtxg/07ykcojIHqM2sIOyK9h
- 2J6cKKx7EPAvg6TtnOHgu8XXoUHebW5v2novkXZqkT4gv+LrLlxTcwbCXaM5EZtVSNZp
- IWv9Yxy6qGZPkgROWG7MRmGeaoknEjqq+j2qf0KF7lNYWRO2g0peT/eyN9Iq+mnSitCR
- GtAA==
-X-Gm-Message-State: AOAM531kN4PuCE9fjGKFJcwp6D2lBIEbdCyIWLAT7ski61sx7UnzfLea
- 3Ow+z89L+JgqXXre+1+poKeAaN49Ni0=
-X-Google-Smtp-Source: ABdhPJzWf6900RpaZYQX05hB8+caMK794sMDo5X5rbFODM2Road1BHheEK/FtJ7pvRYxrn4YE6GABw==
-X-Received: by 2002:a05:6512:1051:: with SMTP id
- c17mr3488951lfb.206.1589465656105; 
- Thu, 14 May 2020 07:14:16 -0700 (PDT)
+ bh=Cdqb6YfEnUEOZ9+1iE9YYK31lx3pNnIUCeb18hsJxJs=;
+ b=nDS/dJjUkTbWf8WhkKpBr7boW9e/Y/4vhde0vGIXucVBVUJeYWq5V+v8aas4oJTLs7
+ 5lGku0h+PdY6Czl8QItLL987Oj/R1fNOTzTVsYllRHE1g07KAyXZj1GcyQGyu1yd91lB
+ OJf5FPAkJ5up0sS9O9MCENgYz+4UYfo/MGKcqfsud5HHlxDkyg+WKC+orEqXHtXpbW4f
+ jtkYRoa9ojBEgt5BYQ2PImu/ljMWUbv+7S0cBg9aR/xmY4F2bWsBqIzP3QnRBLc5MvJA
+ FYMVLu3cvZPs7VuI06BdQYyXTelxe+qqIOhs0a6lhP6+mqrSoEUJur7Lg79elKHxEKtH
+ td8g==
+X-Gm-Message-State: AOAM532jOKz3ebrXSu4TBA08OebKuR1pLLnxnXjGJxoJ1Euax1yvsyba
+ QdmGgUzUpt60uD/iIfkyMYqyhsGuSs0=
+X-Google-Smtp-Source: ABdhPJwOedG4C5dNUh6HlP0ISJXczYVAmAnAz2CnIiq8H9JKQ8CHZO3ryT9cqSau7iYsBtsk42h6Vw==
+X-Received: by 2002:ac2:558e:: with SMTP id v14mr3507672lfg.138.1589465659126; 
+ Thu, 14 May 2020 07:14:19 -0700 (PDT)
 Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id f24sm1878522lfc.43.2020.05.14.07.14.15
+ by smtp.gmail.com with ESMTPSA id 26sm1619235ljp.22.2020.05.14.07.14.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 14 May 2020 07:14:15 -0700 (PDT)
+ Thu, 14 May 2020 07:14:18 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v1 09/14] MAINTAINERS: Add myself as streams maintainer
-Date: Thu, 14 May 2020 16:13:57 +0200
-Message-Id: <20200514141402.12498-10-edgar.iglesias@gmail.com>
+Subject: [PULL v1 11/14] target/microblaze: Fix FPU2 instruction check
+Date: Thu, 14 May 2020 16:13:59 +0200
+Message-Id: <20200514141402.12498-12-edgar.iglesias@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200514141402.12498-1-edgar.iglesias@gmail.com>
 References: <20200514141402.12498-1-edgar.iglesias@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::133;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lf1-x133.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::12b;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lf1-x12b.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 13
@@ -107,35 +105,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+From: Joe Komlodi <joe.komlodi@xilinx.com>
 
-Since we're missing a maintainer, add myself.
+The check to see if we can use FPU2 instructions would return 0 if
+cfg.use_fpu == 2, rather than returning the PVR2_USE_FPU2_MASK.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+This would cause all FPU2 instructions (fsqrt, flt, fint) to not be used.
+
+Signed-off-by: Joe Komlodi <komlodi@xilinx.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Message-Id: <1589219346-106769-2-git-send-email-komlodi@xilinx.com>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20200506082513.18751-10-edgar.iglesias@gmail.com>
 ---
- MAINTAINERS | 6 ++++++
- 1 file changed, 6 insertions(+)
+ target/microblaze/translate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 005ee98a59..d11f3cb976 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2315,6 +2315,12 @@ F: net/slirp.c
- F: include/net/slirp.h
- T: git https://people.debian.org/~sthibault/qemu.git slirp
+diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+index 92b3630804..8079724f32 100644
+--- a/target/microblaze/translate.c
++++ b/target/microblaze/translate.c
+@@ -1392,7 +1392,7 @@ static int dec_check_fpuv2(DisasContext *dc)
+         tcg_gen_movi_i64(cpu_SR[SR_ESR], ESR_EC_FPU);
+         t_gen_raise_exception(dc, EXCP_HW_EXCP);
+     }
+-    return (dc->cpu->cfg.use_fpu == 2) ? 0 : PVR2_USE_FPU2_MASK;
++    return (dc->cpu->cfg.use_fpu == 2) ? PVR2_USE_FPU2_MASK : 0;
+ }
  
-+Streams
-+M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
-+S: Maintained
-+F: hw/core/stream.c
-+F: include/hw/stream.h
-+
- Stubs
- M: Paolo Bonzini <pbonzini@redhat.com>
- S: Maintained
+ static void dec_fpu(DisasContext *dc)
 -- 
 2.20.1
 
