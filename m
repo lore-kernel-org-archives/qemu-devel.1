@@ -2,108 +2,104 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2F1BC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 08:05:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 839DEC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 08:10:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 628B12065D
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 08:05:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 550802065D
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 08:10:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qqwy+4P5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 628B12065D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WU/hsFOp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 550802065D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ8sJ-0007TC-Hb
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 04:05:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49888)
+	id 1jZ8wO-0001d9-I1
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 04:10:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50428)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZ8rc-0006Xn-BN
- for qemu-devel@nongnu.org; Thu, 14 May 2020 04:05:08 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59053
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jZ8vo-0000td-5A
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 04:09:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20290
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZ8rb-0004IO-Iy
- for qemu-devel@nongnu.org; Thu, 14 May 2020 04:05:08 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1jZ8vn-0004v3-FE
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 04:09:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589443505;
+ s=mimecast20190719; t=1589443766;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=MuFg2sBb2NJ7d2r9HQUEO5VfESPgctovDySONJwcf64=;
- b=Qqwy+4P5u6ZxdzZ8HIwjJtY/8elvvTKht2wGWRfeG1wVAjQGKrnrf1iLB9HDNZS4+fdq8v
- Z+vRa6Ynyvehaic1ZWzmzbSwu0La3Yhz2cpkXwbdV8abc72aBPTIp8daM6ep9qRpeJuSj5
- iD8h+X1jaI3VM7gPKXW2WJVvv+7ezxw=
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=SezwFbuGKZlpzcwUrZZhE7vov5K+d6pTCEXg1UOF2uA=;
+ b=WU/hsFOpmRi912QtDaKzLqRtfimYmcZoMFb9IBqegHTL8PLqzPuZXJGkZ7uwueJuJwoKIP
+ gr3SL031b5rV5Nwyd03yaB0dWDgIHlMgf9uSNqlOX0msmEC7ytBHUyhOhYezmrTs/Hwfgp
+ ut7VNyPYDwFQ18LXZLCuWRki6XHX3hU=
 Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
  [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-7--RNGPPsXOtuwN8iqA4V7Aw-1; Thu, 14 May 2020 04:05:02 -0400
-X-MC-Unique: -RNGPPsXOtuwN8iqA4V7Aw-1
-Received: by mail-wm1-f69.google.com with SMTP id a206so5884740wmh.6
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 01:05:01 -0700 (PDT)
+ us-mta-192-cj9hyYnXMDO3i6bPSQPg5g-1; Thu, 14 May 2020 04:09:24 -0400
+X-MC-Unique: cj9hyYnXMDO3i6bPSQPg5g-1
+Received: by mail-wm1-f69.google.com with SMTP id w2so13101538wmc.3
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 01:09:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=MuFg2sBb2NJ7d2r9HQUEO5VfESPgctovDySONJwcf64=;
- b=CPCpssktgq+QW2pcKFtHHcFiLnvARUCuft5aVurgyjEbMFe6Rdw1n0yuEbT6y8lKiG
- VD8POSSZkawR1GU46qK8AwAdKR+HUWgsnoBUx+fzEW74g3ibEC43+vy5hgMIyXhYC91k
- VfqoCLy7wWyUeNdQr4x4UnZJhHzGHdZXhhuX0ImdP/aiHn2bRcrDtrOg9LEDJDnO9Rkz
- dt5uqjF3nObk0g/aN1AAT1rjHhTaV7CzAzblAoHkyeHvX+JQcB4QKoKbHUFYomQCVWGL
- D0sl2AZX72xs7fLJ3r1uOW6gJoSIP3JkSl5dVRHl5HHgEFk3gmg0I5varITC/UiAQWzo
- 79dA==
-X-Gm-Message-State: AOAM530HBudqxfs8iNy0tP+zpvQyHM5wgsVWrnk6El2kamG1QP9U52Mj
- oeSwYd8nFTE4BbHryQmPC4pxvfUfBWQJ8GnurdaijLeiuHzcg5/GyXf/7J10uP0MioD4uqJaqyo
- UvErm+cexw4k6nUo=
-X-Received: by 2002:a05:600c:206:: with SMTP id
- 6mr13034754wmi.170.1589443501014; 
- Thu, 14 May 2020 01:05:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyLP0E7wgKkGI38OyfVRi00Fwky9c6ldCWmt9vfAnZtrq8LVRxvzMDXXKegwaSdptQtFZia7Q==
-X-Received: by 2002:a05:600c:206:: with SMTP id
- 6mr13034718wmi.170.1589443500744; 
- Thu, 14 May 2020 01:05:00 -0700 (PDT)
-Received: from [192.168.1.39] (17.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id v11sm2779793wrv.53.2020.05.14.01.04.59
+ h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+ :mime-version:content-language:content-transfer-encoding;
+ bh=SezwFbuGKZlpzcwUrZZhE7vov5K+d6pTCEXg1UOF2uA=;
+ b=ReSsLv7Hg0UFdrIlf5mrXM5XP0QGw7T98EBYDj5Vf7GziPGJpbyLk3ZaBLeQT0U6rv
+ WcKozQX7ibcAU9lS8EMeULltLzR3hdGG51CJVsC2HPDlpmbhO+IxWfShSdQQLQh27Tgw
+ s76QX1dGXiYq+i1YcSIj+9i+0YE5K4pTqOaZyVQFU6FwT5Gvu2w6Zx1rhGC9lvo+YEJV
+ A7CEwF+nUXAZ2sBHVo7Dgouoqb3HCSMJYxpLJvMSAO8fXb+s3eWwMDKX5r4Vno8Xlazb
+ onGpqSSjnx7MtKvQ/6akoOv1Owtz0TMw8+AM9pWYFq/GkwS+YB4g0n3s9LwS3vrj2lYM
+ EB7A==
+X-Gm-Message-State: AGi0Pua2WyLaCKQ1xakHOjZwcEyKe3dAcg68h7yvdYmUBrbYgKh9io9L
+ IJaH2pOSrJ0KYaujrfxu+FWirPbdJoTrO59yLrT7cIazy5dmuXgwQ9gNpcCV15+VYGWNmB+Ffn0
+ kaDpOKAAoNA5nVHs=
+X-Received: by 2002:a7b:cd04:: with SMTP id f4mr45349695wmj.3.1589443763536;
+ Thu, 14 May 2020 01:09:23 -0700 (PDT)
+X-Google-Smtp-Source: APiQypK4qSyYAuxFcCZpHipcvpkqoAtt3FSSx+MP0WBsJUzjm4WMiZuiIG5DR7Gfuhu4Fw8LUWadkw==
+X-Received: by 2002:a7b:cd04:: with SMTP id f4mr45349676wmj.3.1589443763332;
+ Thu, 14 May 2020 01:09:23 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:bdd8:ac77:1ff4:62c6?
+ ([2001:b07:6468:f312:bdd8:ac77:1ff4:62c6])
+ by smtp.gmail.com with ESMTPSA id n9sm2941024wru.90.2020.05.14.01.09.22
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 14 May 2020 01:04:59 -0700 (PDT)
-Subject: Re: [PATCH v6 19/20] hw/block/nvme: do cmb/pmr init as part of pci
- init
-To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
-References: <20200514044611.734782-1-its@irrelevant.dk>
- <20200514044611.734782-20-its@irrelevant.dk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0cecef81-5df2-6bdf-b7da-b910e2d5714b@redhat.com>
-Date: Thu, 14 May 2020 10:04:57 +0200
+ Thu, 14 May 2020 01:09:22 -0700 (PDT)
+To: qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster
+ <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ John Snow <jsnow@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: proposal: deprecate -readconfig/-writeconfig
+Message-ID: <7599153e-89a2-9a86-16ad-4a3c6a107b18@redhat.com>
+Date: Thu, 14 May 2020 10:09:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200514044611.734782-20-its@irrelevant.dk>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -116,61 +112,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Klaus Jensen <k.jensen@samsung.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/14/20 6:46 AM, Klaus Jensen wrote:
-> From: Klaus Jensen <k.jensen@samsung.com>
+IMHO configuration files are in general a failed experiment.  In
+practice, they do not add much value over just a shell script because
+they don't allow configuring all QEMU options, they are very much fixed
+(by their nature).  I think it's more or less agreed that they are not
+solving any problem for higher-level management stacks as well; those
+would prefer to configure the VM via QMP or another API.
 
-Having the patch subject duplicated ease review (not all email client 
-display email subject close to email content):
+So, any objections to deprecating -readconfig and -writeconfig?
 
-"Do cmb/pmr init as part of pci init."
+Thanks,
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> 
-> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->   hw/block/nvme.c | 12 ++++++------
->   1 file changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 7254b66ae199..2addcc86034a 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -1527,6 +1527,12 @@ static void nvme_init_pci(NvmeCtrl *n, PCIDevice *pci_dev)
->       pci_register_bar(pci_dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
->                        PCI_BASE_ADDRESS_MEM_TYPE_64, &n->iomem);
->       msix_init_exclusive_bar(pci_dev, n->params.max_ioqpairs + 1, 4, NULL);
-> +
-> +    if (n->params.cmb_size_mb) {
-> +        nvme_init_cmb(n, pci_dev);
-> +    } else if (n->pmrdev) {
-> +        nvme_init_pmr(n, pci_dev);
-> +    }
->   }
->   
->   static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-> @@ -1588,12 +1594,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
->       n->bar.vs = 0x00010200;
->       n->bar.intmc = n->bar.intms = 0;
->   
-> -    if (n->params.cmb_size_mb) {
-> -        nvme_init_cmb(n, pci_dev);
-> -    } else if (n->pmrdev) {
-> -        nvme_init_pmr(n, pci_dev);
-> -    }
-> -
->       for (i = 0; i < n->num_namespaces; i++) {
->           nvme_init_namespace(n, &n->namespaces[i], &local_err);
->           if (local_err) {
-> 
+Paolo
 
 
