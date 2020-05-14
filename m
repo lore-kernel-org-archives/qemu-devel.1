@@ -2,162 +2,90 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DCBFC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 19:40:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAAFAC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 19:42:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDA8A2065C
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 19:40:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 92DAC2065F
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 19:42:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b57NgULk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDA8A2065C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PuwMJ960"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92DAC2065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZJin-0001X6-47
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 15:40:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59316)
+	id 1jZJk8-0003Su-Q3
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 15:42:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59924)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZJas-0007Mg-LZ
- for qemu-devel@nongnu.org; Thu, 14 May 2020 15:32:36 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53585
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZJar-0001GP-EE
- for qemu-devel@nongnu.org; Thu, 14 May 2020 15:32:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589484752;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=Fvhdp8e1noEjZWQN8I9b80oxqOClG14Pjz289B2BM4Y=;
- b=b57NgULk+1t+DawgQC4UzNwsDjrflifB1tsAkncd5jTYocWTh3+/3naV5B/mBFN7a8EQYl
- bUhF8Ry84frxt1BkUMHrF0lKY+SXHl1rkqY1Pp51TrWTBjepfoH4RbOqp0Uv+omEGUalso
- 1jjropwX5stBZRMj9iZClHtgK2e8zkw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-277-qWeMy_XKN0aG7pu0TgdSZA-1; Thu, 14 May 2020 15:32:30 -0400
-X-MC-Unique: qWeMy_XKN0aG7pu0TgdSZA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ADBFD85B677;
- Thu, 14 May 2020 19:32:28 +0000 (UTC)
-Received: from [10.10.119.184] (ovpn-119-184.rdu2.redhat.com [10.10.119.184])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BDF7676C38;
- Thu, 14 May 2020 19:32:25 +0000 (UTC)
-Subject: Re: [PATCH v4 2/3] iotests: add JobRunner class
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200514022536.2568-1-jsnow@redhat.com>
- <20200514022536.2568-3-jsnow@redhat.com>
- <20200514154059.GK5518@linux.fritz.box>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <4c54f13d-d8db-ee00-798d-bbda7a05a99c@redhat.com>
-Date: Thu, 14 May 2020 15:32:25 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jZJgC-0007uk-Ch
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 15:38:04 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46128)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jZJgB-0002ZC-8u
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 15:38:04 -0400
+Received: by mail-wr1-x444.google.com with SMTP id w7so78613wre.13
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 12:38:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=uIzpfsaMLCdcTdGvBBe7DnWUlBcHSwIaq6HpGg/y9lU=;
+ b=PuwMJ960CnCUqyHQBXydI+Ps405H8vVXUK4HQQgwYcId7zJv+V2yGI35hPjrZD1VrN
+ G6d+D8iFrEJSNx5r+/cIuJ8n6yOPq5bg0cwtz/x5/7VF/GP7mv0vegiXlerTYxWzBxDI
+ 4koyYBKJoSrwL6nkQkrpDD/tmy9Bq+FeIhjtWIR3jGnhJVFFAK0jMqJ1pjj7n1xQakOD
+ 9zw66jlCoclN5zgYh22+2BjlQp89WKBPSGfH2Pv5C9yDXmOycGhtuke3h8j5Pp7h2DF4
+ 6FP37DYrLetRZkc3EiSrcZeQoYd5aRVapOd4uQzjegyq6QgRqTzId5gEx5J7dETx/2Sl
+ Ca+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=uIzpfsaMLCdcTdGvBBe7DnWUlBcHSwIaq6HpGg/y9lU=;
+ b=BgrRyq4tQtpwAjfogwq8dXUALDsAZmoj9x2wacpeTooJS4Sr+GC0SZSST2GfJvgMzT
+ g0dLyieTG7Wvb6LHsgZibINNIvgW7lZI8QXdy0E3QitOVu6SV4B+8SImeZO5jgF4rJBh
+ QB5CcGDxCvVBD25pWa+w9SNEr0Hg5IZWIjBhX9JvQjPaxcJPOzqcc2cMpxY5q3ZmueEX
+ uD/lZvv4B8WJmSbpFAejzr0KLFL98c/mGgc+fjXK3836fffSCVevhouPLYDiN2VkqRsy
+ xiEGEffP6Au6KpaNcYnMIpZ4luFlF06YFzM1kjerbIqlTI1xX6sCGkq9g8IlqXH9rk1l
+ VT/g==
+X-Gm-Message-State: AOAM533p5CVipCANotEwqWqMvUPqujKMWvvKcyfesqEE30LlFafZSVJF
+ OpTZ6Ny3bgd5PhXf9jltnnRhAZcjZxADcIWHtrY=
+X-Google-Smtp-Source: ABdhPJxmUmVP1hJTnKRo5rRG4vhcscYMxlg70la2bPD1e3p0fM5kvXEf3eN+jJyyM8fCBy9cipGTU1btFpGHNqKJmM8=
+X-Received: by 2002:a5d:55c5:: with SMTP id i5mr27008wrw.402.1589485079966;
+ Thu, 14 May 2020 12:37:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200514154059.GK5518@linux.fritz.box>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 12:05:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <1588501221-1205-1-git-send-email-chenhc@lemote.com>
+ <1588501221-1205-3-git-send-email-chenhc@lemote.com>
+In-Reply-To: <1588501221-1205-3-git-send-email-chenhc@lemote.com>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Date: Thu, 14 May 2020 21:37:46 +0200
+Message-ID: <CAHiYmc5b-R50VOd+EnRCxrG=ih=R6C_4203rzpiVwh0Xr5aKsA@mail.gmail.com>
+Subject: Re: [PATCH for-5.1 V3 2/7] hw/mips: Implement the kvm_type() hook in
+ MachineClass
+To: Huacai Chen <zltjiangshi@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -170,47 +98,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Max Reitz <mreitz@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, Cleber Rosa <crosa@redhat.com>
+Cc: Huacai Chen <chenhuacai@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Huacai Chen <chenhc@lemote.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+=D0=BD=D0=B5=D0=B4, 3. =D0=BC=D0=B0=D1=98 2020. =D1=83 12:24 Huacai Chen <z=
+ltjiangshi@gmail.com> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=
+=BE/=D0=BB=D0=B0:
+>
+> MIPS has two types of KVM: TE & VZ, and TE is the default type. Now we
+> can't create a VZ guest in QEMU because it lacks the kvm_type() hook in
+> MachineClass. Besides, libvirt uses a null-machine to detect the kvm
+> capability, so by default it will return "KVM not supported" on a VZ
+> platform. Thus, null-machine also need the kvm_type() hook.
+>
+> Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> ---
 
+Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 
-On 5/14/20 11:40 AM, Kevin Wolf wrote:
-> Am 14.05.2020 um 04:25 hat John Snow geschrieben:
->> The idea is that instead of increasing the arguments to job_run all the
->> time, create a more general-purpose job runner that can be subclassed to
->> do interesting things with.
->>
->> pylint note: the 'callbacks' option guards against unused warning
->> arguments in functions designated as callbacks. It does not currently
->> guard against "no-self-use" though; hence a once-off ignore.
->>
->> mypy note: QapiEvent is only a weak alias; it's fully interchangable
->> with the type it's declared as. In the future, we may wish to tighten
->> these types. For now, this communicates the rough shape of the type and
->> (more importantly) the intent.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
-> 
->> +        # Listen for these events with these parameters:
->> +        self._events = {
->> +            'BLOCK_JOB_COMPLETED': match_device,
->> +            'BLOCK_JOB_CANCELLED': match_device,
->> +            'BLOCK_JOB_ERROR': match_device,
->> +            'BLOCK_JOB_READY': match_device,
->> +            'BLOCK_JOB_PENDING': match_id,
->> +            'JOB_STATUS_CHANGE': match_id
->> +        }
-> 
-> The old code had a trailing comma here in case we need to add more
-> events later. Anyway:
-> 
-> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-> 
-
-Whoops. I favor those too, so I'll put it back.
-
+>  hw/core/Makefile.objs  |  2 +-
+>  hw/core/null-machine.c |  4 ++++
+>  hw/mips/Makefile.objs  |  2 +-
+>  hw/mips/common.c       | 31 +++++++++++++++++++++++++++++++
+>  include/hw/mips/mips.h |  3 +++
+>  5 files changed, 40 insertions(+), 2 deletions(-)
+>  create mode 100644 hw/mips/common.c
+>
+> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+> index 1d540ed..b5672f4 100644
+> --- a/hw/core/Makefile.objs
+> +++ b/hw/core/Makefile.objs
+> @@ -17,11 +17,11 @@ common-obj-$(CONFIG_SOFTMMU) +=3D vm-change-state-han=
+dler.o
+>  common-obj-$(CONFIG_SOFTMMU) +=3D qdev-properties-system.o
+>  common-obj-$(CONFIG_SOFTMMU) +=3D sysbus.o
+>  common-obj-$(CONFIG_SOFTMMU) +=3D machine.o
+> -common-obj-$(CONFIG_SOFTMMU) +=3D null-machine.o
+>  common-obj-$(CONFIG_SOFTMMU) +=3D loader.o
+>  common-obj-$(CONFIG_SOFTMMU) +=3D machine-hmp-cmds.o
+>  common-obj-$(CONFIG_SOFTMMU) +=3D numa.o
+>  common-obj-$(CONFIG_SOFTMMU) +=3D clock-vmstate.o
+> +obj-$(CONFIG_SOFTMMU) +=3D null-machine.o
+>  obj-$(CONFIG_SOFTMMU) +=3D machine-qmp-cmds.o
+>
+>  common-obj-$(CONFIG_EMPTY_SLOT) +=3D empty_slot.o
+> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+> index cb47d9d..94a36f9 100644
+> --- a/hw/core/null-machine.c
+> +++ b/hw/core/null-machine.c
+> @@ -17,6 +17,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "exec/address-spaces.h"
+>  #include "hw/core/cpu.h"
+> +#include "hw/mips/mips.h"
+>
+>  static void machine_none_init(MachineState *mch)
+>  {
+> @@ -50,6 +51,9 @@ static void machine_none_machine_init(MachineClass *mc)
+>      mc->max_cpus =3D 1;
+>      mc->default_ram_size =3D 0;
+>      mc->default_ram_id =3D "ram";
+> +#ifdef TARGET_MIPS
+> +    mc->kvm_type =3D mips_kvm_type;
+> +#endif
+>  }
+>
+>  DEFINE_MACHINE("none", machine_none_machine_init)
+> diff --git a/hw/mips/Makefile.objs b/hw/mips/Makefile.objs
+> index 525809a..2f7795b 100644
+> --- a/hw/mips/Makefile.objs
+> +++ b/hw/mips/Makefile.objs
+> @@ -1,4 +1,4 @@
+> -obj-y +=3D addr.o mips_int.o
+> +obj-y +=3D addr.o common.o mips_int.o
+>  obj-$(CONFIG_R4K) +=3D mips_r4k.o
+>  obj-$(CONFIG_MALTA) +=3D gt64xxx_pci.o mips_malta.o
+>  obj-$(CONFIG_MIPSSIM) +=3D mips_mipssim.o
+> diff --git a/hw/mips/common.c b/hw/mips/common.c
+> new file mode 100644
+> index 0000000..0e33bd0
+> --- /dev/null
+> +++ b/hw/mips/common.c
+> @@ -0,0 +1,31 @@
+> +/*
+> + * Common MIPS routines
+> + *
+> + * Copyright (c) 2020 Huacai Chen (chenhc@lemote.com)
+> + * This code is licensed under the GNU GPL v2.
+> + */
+> +
+> +#include <linux/kvm.h>
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "hw/boards.h"
+> +#include "hw/mips/mips.h"
+> +#include "sysemu/kvm_int.h"
+> +
+> +int mips_kvm_type(MachineState *machine, const char *vm_type)
+> +{
+> +    int r;
+> +    KVMState *s =3D KVM_STATE(machine->accelerator);
+> +
+> +    r =3D kvm_check_extension(s, KVM_CAP_MIPS_VZ);
+> +    if (r > 0) {
+> +        return KVM_VM_MIPS_VZ;
+> +    }
+> +
+> +    r =3D kvm_check_extension(s, KVM_CAP_MIPS_TE);
+> +    if (r > 0) {
+> +        return KVM_VM_MIPS_TE;
+> +    }
+> +
+> +    return -1;
+> +}
+> diff --git a/include/hw/mips/mips.h b/include/hw/mips/mips.h
+> index 0af4c3d..2ac0580 100644
+> --- a/include/hw/mips/mips.h
+> +++ b/include/hw/mips/mips.h
+> @@ -20,4 +20,7 @@ void rc4030_dma_write(void *dma, uint8_t *buf, int len)=
+;
+>
+>  DeviceState *rc4030_init(rc4030_dma **dmas, IOMMUMemoryRegion **dma_mr);
+>
+> +/* common.c */
+> +int mips_kvm_type(MachineState *machine, const char *vm_type);
+> +
+>  #endif
+> --
+> 2.7.0
+>
 
