@@ -2,90 +2,105 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E412C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 07:54:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E75DC433E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 08:00:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCFEE20575
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 07:54:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6359820575
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 08:00:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="STsRUqGl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCFEE20575
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fk3a5iuC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6359820575
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ8h3-0000be-Tf
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 03:54:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48734)
+	id 1jZ8nB-0003QN-Ei
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 04:00:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49262)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jZ8gI-00009s-Oc
- for qemu-devel@nongnu.org; Thu, 14 May 2020 03:53:26 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23735
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZ8mJ-0002iW-2u
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 03:59:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36274
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jZ8gH-00028m-9T
- for qemu-devel@nongnu.org; Thu, 14 May 2020 03:53:25 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZ8mH-0003Nr-KX
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 03:59:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589442804;
+ s=mimecast20190719; t=1589443176;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GEuik+Q2Mg96PFn0Yr999LJgW8lg2tiEUCLKJwNdQSU=;
- b=STsRUqGlchTiSzUS/IXy+eAJOu3lTOQzWhzBq9wt8QKiQfwB7qdjreC1qhOqABTdtay7ir
- cBFQ0MYnj067zvcorNo9m8hzvKysJmV6LLySu15b6OsO/LfFgp7TFwuYNVHgxs6EwCdSvC
- MFGN11Ct/e+HrUZLwIvjBljiLsVkIwk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-505-rCG-GbkiMBGBlRJ4qjULGA-1; Thu, 14 May 2020 03:53:20 -0400
-X-MC-Unique: rCG-GbkiMBGBlRJ4qjULGA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 731E718A0760;
- Thu, 14 May 2020 07:53:19 +0000 (UTC)
-Received: from [10.72.12.133] (ovpn-12-133.pek2.redhat.com [10.72.12.133])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6B1926E715;
- Thu, 14 May 2020 07:53:09 +0000 (UTC)
-Subject: Re: [PATCH] vhost-user: add support for VHOST_USER_SET_STATUS
-To: Maxime Coquelin <maxime.coquelin@redhat.com>, mst@redhat.com,
- lulu@redhat.com, amorenoz@redhat.com, qemu-devel@nongnu.org
-References: <20200514073332.1434576-1-maxime.coquelin@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <33dae8af-a7ee-e005-f8d5-2b4a038b8211@redhat.com>
-Date: Thu, 14 May 2020 15:53:07 +0800
+ bh=iGhQrYam6VIb5mcwoXCy3TWu/7CiTDFnBBkllt9pb7c=;
+ b=fk3a5iuCFQ524GaWSgDAfP0QEWnFVZ8DGgzf/yvzey9IQbE95NAJpi4Omv6ayjqtuNpQuz
+ gMzvjFWRoKxcK4XlFF2SWogw8oLaiWjncY1CMpuk/Q44ULUVEShxs/q8sUqJhQDEOBkYQc
+ 9qb63t5Dxc1aezF8P8Rdrj6DtmMScrc=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-400-h_5W_DDBML-BhVcny4EKRA-1; Thu, 14 May 2020 03:59:35 -0400
+X-MC-Unique: h_5W_DDBML-BhVcny4EKRA-1
+Received: by mail-wr1-f72.google.com with SMTP id 37so1165879wrc.4
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 00:59:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=iGhQrYam6VIb5mcwoXCy3TWu/7CiTDFnBBkllt9pb7c=;
+ b=OHrIpCqUQVSu5E3vOKOtACuy5AAQPbfo3vRaLpE5xVpXvbtc7bdS4ROlbcdap73pXR
+ H1Q8PSmGsO1d/SIaCQNErDqPHgmb69mFpciKJqAjWGjFPdVH2xVWNPeV/E7VYLAk/t9f
+ 5ViyaiyaYUdX0cZhStJ4BMgmCXsIbAkXmu9m3lVRShTZduorhEDb5RXLBjEuas5lH46y
+ XmG8hLXWeCmT34wFLwyQU0AGRaZN9twQc7GXtZDXBrHdbslZcQVQgS0kmojO3Ahm6h9y
+ HYaUKK9hufE1h9Fn6xpigUtMzgUxq5+32APTYmgdCCncy8Y39S7bPVVv/zJZ1FZIyYwe
+ rBxw==
+X-Gm-Message-State: AOAM53213LNxwjlMdlM/ipbfo8yxuy8D9EqK3EyhOe13eRmanAedxAD6
+ MsWIN7eILCPNHlbbieiCHo+v6sfhSK+KY300EaZJ10cFXD3iypnDxiuFrgyGU/KWeYE9SrSmp/A
+ 3URXLBKPTqTknbKk=
+X-Received: by 2002:adf:ef48:: with SMTP id c8mr3786154wrp.140.1589443173784; 
+ Thu, 14 May 2020 00:59:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxkqR/ciRfTFx0R7MDPmvAmrVq1mRL19vMnmxpuJ03zhFBtVh/mzIDq1GNQ5lgqex1GxNCKOQ==
+X-Received: by 2002:adf:ef48:: with SMTP id c8mr3786128wrp.140.1589443173536; 
+ Thu, 14 May 2020 00:59:33 -0700 (PDT)
+Received: from [192.168.1.39] (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id s8sm2699999wrt.69.2020.05.14.00.59.31
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 14 May 2020 00:59:32 -0700 (PDT)
+Subject: Re: [PATCH v6 18/20] hw/block/nvme: factor out pmr setup
+To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
+References: <20200514044611.734782-1-its@irrelevant.dk>
+ <20200514044611.734782-19-its@irrelevant.dk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <0c528722-0117-4842-cb5c-d37090ac71f2@redhat.com>
+Date: Thu, 14 May 2020 09:59:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200514073332.1434576-1-maxime.coquelin@redhat.com>
+In-Reply-To: <20200514044611.734782-19-its@irrelevant.dk>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,182 +113,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: shahafs@mellanox.com, matan@mellanox.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Klaus Jensen <k.jensen@samsung.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 2020/5/14 下午3:33, Maxime Coquelin wrote:
-> It is usefull for the Vhost-user backend to know
-> about about the Virtio device status updates,
-> especially when the driver sets the DRIVER_OK bit.
->
-> With that information, no more need to do hazardous
-> assumptions on when the driver is done with the
-> device configuration.
->
-> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+On 5/14/20 6:46 AM, Klaus Jensen wrote:
+> From: Klaus Jensen <k.jensen@samsung.com>
+> 
+> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 > ---
->
-> This patch applies on top of Cindy's "vDPA support in qemu"
-> series, which introduces the .vhost_set_state vhost-backend
-> ops.
->
->   docs/interop/vhost-user.rst | 12 ++++++++++++
->   hw/net/vhost_net.c          | 10 +++++-----
->   hw/virtio/vhost-user.c      | 35 +++++++++++++++++++++++++++++++++++
->   3 files changed, 52 insertions(+), 5 deletions(-)
->
-> diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
-> index 3b1b6602c7..f108de7458 100644
-> --- a/docs/interop/vhost-user.rst
-> +++ b/docs/interop/vhost-user.rst
-> @@ -815,6 +815,7 @@ Protocol features
->     #define VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD       12
->     #define VHOST_USER_PROTOCOL_F_RESET_DEVICE         13
->     #define VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS 14
-> +  #define VHOST_USER_PROTOCOL_F_STATUS               15
+>   hw/block/nvme.c | 95 ++++++++++++++++++++++++++-----------------------
+>   1 file changed, 51 insertions(+), 44 deletions(-)
+> 
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index d71a5f142d51..7254b66ae199 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -58,6 +58,7 @@
+>   #define NVME_REG_SIZE 0x1000
+>   #define NVME_DB_SIZE  4
+>   #define NVME_CMB_BIR 2
+> +#define NVME_PMR_BIR 2
 >   
->   Master message types
->   --------------------
-> @@ -1263,6 +1264,17 @@ Master message types
->   
->     The state.num field is currently reserved and must be set to 0.
->   
-> +``VHOST_USER_SET_STATUS``
-> +  :id: 36
-> +  :equivalent ioctl: VHOST_VDPA_SET_STATUS
-> +  :slave payload: N/A
-> +  :master payload: ``u64``
-> +
-> +  When the ``VHOST_USER_PROTOCOL_F_STATUS`` protocol feature has been
-> +  successfully negotiated, this message is submitted by the master to
-> +  notify the backend with updated device status as defined in the Virtio
-> +  specification.
-> +
->   Slave message types
->   -------------------
->   
-> diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-> index 463e333531..37f3156dbc 100644
-> --- a/hw/net/vhost_net.c
-> +++ b/hw/net/vhost_net.c
-> @@ -517,10 +517,10 @@ int vhost_set_state(NetClientState *nc, int state)
->   {
->       struct vhost_net *net = get_vhost_net(nc);
->       struct vhost_dev *hdev = &net->dev;
-> -    if (nc->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
-> -        if (hdev->vhost_ops->vhost_set_state) {
-> -                return hdev->vhost_ops->vhost_set_state(hdev, state);
-> -             }
-> -        }
-> +
-> +    if (hdev->vhost_ops->vhost_set_state) {
-> +        return hdev->vhost_ops->vhost_set_state(hdev, state);
-> +    }
-> +
->       return 0;
->   }
-> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> index ec21e8fbe8..b7e52d97fc 100644
-> --- a/hw/virtio/vhost-user.c
-> +++ b/hw/virtio/vhost-user.c
-> @@ -59,6 +59,7 @@ enum VhostUserProtocolFeature {
->       VHOST_USER_PROTOCOL_F_HOST_NOTIFIER = 11,
->       VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD = 12,
->       VHOST_USER_PROTOCOL_F_RESET_DEVICE = 13,
-> +    VHOST_USER_PROTOCOL_F_STATUS = 15,
->       VHOST_USER_PROTOCOL_F_MAX
->   };
->   
-> @@ -100,6 +101,7 @@ typedef enum VhostUserRequest {
->       VHOST_USER_SET_INFLIGHT_FD = 32,
->       VHOST_USER_GPU_SET_SOCKET = 33,
->       VHOST_USER_RESET_DEVICE = 34,
-> +    VHOST_USER_SET_STATUS = 36,
->       VHOST_USER_MAX
->   } VhostUserRequest;
->   
-> @@ -1886,6 +1888,38 @@ static int vhost_user_set_inflight_fd(struct vhost_dev *dev,
->       return 0;
+>   #define NVME_GUEST_ERR(trace, fmt, ...) \
+>       do { \
+> @@ -1463,6 +1464,55 @@ static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
+>                        PCI_BASE_ADDRESS_MEM_PREFETCH, &n->ctrl_mem);
 >   }
 >   
-> +static int vhost_user_set_state(struct vhost_dev *dev, int state)
+> +static void nvme_init_pmr(NvmeCtrl *n, PCIDevice *pci_dev)
 > +{
-> +    bool reply_supported = virtio_has_feature(dev->protocol_features,
-> +                                              VHOST_USER_PROTOCOL_F_REPLY_ACK);
+> +    /* Controller Capabilities register */
+> +    NVME_CAP_SET_PMRS(n->bar.cap, 1);
 > +
-> +    VhostUserMsg msg = {
-> +        .hdr.request = VHOST_USER_SET_STATUS,
-> +        .hdr.flags = VHOST_USER_VERSION,
-> +        .hdr.size = sizeof(msg.payload.u64),
-> +        .payload.u64 = (uint64_t)state,
-> +    };
+> +    /* PMR Capabities register */
+> +    n->bar.pmrcap = 0;
+> +    NVME_PMRCAP_SET_RDS(n->bar.pmrcap, 0);
+> +    NVME_PMRCAP_SET_WDS(n->bar.pmrcap, 0);
+> +    NVME_PMRCAP_SET_BIR(n->bar.pmrcap, NVME_PMR_BIR);
+> +    NVME_PMRCAP_SET_PMRTU(n->bar.pmrcap, 0);
+> +    /* Turn on bit 1 support */
+> +    NVME_PMRCAP_SET_PMRWBM(n->bar.pmrcap, 0x02);
+> +    NVME_PMRCAP_SET_PMRTO(n->bar.pmrcap, 0);
+> +    NVME_PMRCAP_SET_CMSS(n->bar.pmrcap, 0);
 > +
-> +    if (!virtio_has_feature(dev->protocol_features,
-> +                VHOST_USER_PROTOCOL_F_STATUS)) {
-> +        return -1;
-> +    }
+> +    /* PMR Control register */
+> +    n->bar.pmrctl = 0;
+> +    NVME_PMRCTL_SET_EN(n->bar.pmrctl, 0);
 > +
-> +    if (reply_supported) {
-> +        msg.hdr.flags |= VHOST_USER_NEED_REPLY_MASK;
-> +    }
+> +    /* PMR Status register */
+> +    n->bar.pmrsts = 0;
+> +    NVME_PMRSTS_SET_ERR(n->bar.pmrsts, 0);
+> +    NVME_PMRSTS_SET_NRDY(n->bar.pmrsts, 0);
+> +    NVME_PMRSTS_SET_HSTS(n->bar.pmrsts, 0);
+> +    NVME_PMRSTS_SET_CBAI(n->bar.pmrsts, 0);
 > +
-> +    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-> +        return -1;
-> +    }
+> +    /* PMR Elasticity Buffer Size register */
+> +    n->bar.pmrebs = 0;
+> +    NVME_PMREBS_SET_PMRSZU(n->bar.pmrebs, 0);
+> +    NVME_PMREBS_SET_RBB(n->bar.pmrebs, 0);
+> +    NVME_PMREBS_SET_PMRWBZ(n->bar.pmrebs, 0);
 > +
-> +    if (reply_supported) {
-> +        return process_message_reply(dev, &msg);
-> +    }
+> +    /* PMR Sustained Write Throughput register */
+> +    n->bar.pmrswtp = 0;
+> +    NVME_PMRSWTP_SET_PMRSWTU(n->bar.pmrswtp, 0);
+> +    NVME_PMRSWTP_SET_PMRSWTV(n->bar.pmrswtp, 0);
 > +
-> +    return 0;
+> +    /* PMR Memory Space Control register */
+> +    n->bar.pmrmsc = 0;
+> +    NVME_PMRMSC_SET_CMSE(n->bar.pmrmsc, 0);
+> +    NVME_PMRMSC_SET_CBA(n->bar.pmrmsc, 0);
+> +
+> +    pci_register_bar(pci_dev, NVME_PMRCAP_BIR(n->bar.pmrcap),
+> +                     PCI_BASE_ADDRESS_SPACE_MEMORY |
+> +                     PCI_BASE_ADDRESS_MEM_TYPE_64 |
+> +                     PCI_BASE_ADDRESS_MEM_PREFETCH, &n->pmrdev->mr);
 > +}
-
-
-Interesting, I wonder how vm stop will be handled in this case.
-
-In the case of vDPA kernel, we probable don't want to mirror the virtio 
-device status to vdpa device status directly. Since qemu may stop 
-vhost-vdpa device through e.g resting vdpa device, but in the mean time, 
-guest should not detect such condition in virtio device status.
-
-So in the new version of vDPA support, we probably need to do:
-
-static int vhost_vdpa_set_state(struct vhost_dev *dev, bool started)
-{
-     if (started) {
-         uint8_t status = 0;
-
-         vhost_vdpa_add_status(dev, VIRTIO_CONFIG_S_DRIVER_OK);
-         vhost_vdpa_call(dev, VHOST_VDPA_GET_STATUS, &status);
-
-         return !(status & VIRTIO_CONFIG_S_DRIVER_OK);
-     } else {
-         vhost_vdpa_reset_device(dev);
-         vhost_vdpa_add_status(dev, VIRTIO_CONFIG_S_ACKNOWLEDGE |
-                                    VIRTIO_CONFIG_S_DRIVER);
-         return 0;
-     }
-}
-
-And vhost_set_state() will be called from vhost_dev_start()/stop().
-
-Does this work for vhost-user as well?
-
-Thanks
-
-
 > +
->   bool vhost_user_init(VhostUserState *user, CharBackend *chr, Error **errp)
+>   static void nvme_init_pci(NvmeCtrl *n, PCIDevice *pci_dev)
 >   {
->       if (user->chr) {
-> @@ -1947,4 +1981,5 @@ const VhostOps user_ops = {
->           .vhost_backend_mem_section_filter = vhost_user_mem_section_filter,
->           .vhost_get_inflight_fd = vhost_user_get_inflight_fd,
->           .vhost_set_inflight_fd = vhost_user_set_inflight_fd,
-> +        .vhost_set_state = vhost_user_set_state,
->   };
+>       uint8_t *pci_conf = pci_dev->config;
+> @@ -1541,50 +1591,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+>       if (n->params.cmb_size_mb) {
+>           nvme_init_cmb(n, pci_dev);
+>       } else if (n->pmrdev) {
+> -        /* Controller Capabilities register */
+> -        NVME_CAP_SET_PMRS(n->bar.cap, 1);
+> -
+> -        /* PMR Capabities register */
+> -        n->bar.pmrcap = 0;
+> -        NVME_PMRCAP_SET_RDS(n->bar.pmrcap, 0);
+> -        NVME_PMRCAP_SET_WDS(n->bar.pmrcap, 0);
+> -        NVME_PMRCAP_SET_BIR(n->bar.pmrcap, 2);
+> -        NVME_PMRCAP_SET_PMRTU(n->bar.pmrcap, 0);
+> -        /* Turn on bit 1 support */
+> -        NVME_PMRCAP_SET_PMRWBM(n->bar.pmrcap, 0x02);
+> -        NVME_PMRCAP_SET_PMRTO(n->bar.pmrcap, 0);
+> -        NVME_PMRCAP_SET_CMSS(n->bar.pmrcap, 0);
+> -
+> -        /* PMR Control register */
+> -        n->bar.pmrctl = 0;
+> -        NVME_PMRCTL_SET_EN(n->bar.pmrctl, 0);
+> -
+> -        /* PMR Status register */
+> -        n->bar.pmrsts = 0;
+> -        NVME_PMRSTS_SET_ERR(n->bar.pmrsts, 0);
+> -        NVME_PMRSTS_SET_NRDY(n->bar.pmrsts, 0);
+> -        NVME_PMRSTS_SET_HSTS(n->bar.pmrsts, 0);
+> -        NVME_PMRSTS_SET_CBAI(n->bar.pmrsts, 0);
+> -
+> -        /* PMR Elasticity Buffer Size register */
+> -        n->bar.pmrebs = 0;
+> -        NVME_PMREBS_SET_PMRSZU(n->bar.pmrebs, 0);
+> -        NVME_PMREBS_SET_RBB(n->bar.pmrebs, 0);
+> -        NVME_PMREBS_SET_PMRWBZ(n->bar.pmrebs, 0);
+> -
+> -        /* PMR Sustained Write Throughput register */
+> -        n->bar.pmrswtp = 0;
+> -        NVME_PMRSWTP_SET_PMRSWTU(n->bar.pmrswtp, 0);
+> -        NVME_PMRSWTP_SET_PMRSWTV(n->bar.pmrswtp, 0);
+> -
+> -        /* PMR Memory Space Control register */
+> -        n->bar.pmrmsc = 0;
+> -        NVME_PMRMSC_SET_CMSE(n->bar.pmrmsc, 0);
+> -        NVME_PMRMSC_SET_CBA(n->bar.pmrmsc, 0);
+> -
+> -        pci_register_bar(pci_dev, NVME_PMRCAP_BIR(n->bar.pmrcap),
+> -            PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64 |
+> -            PCI_BASE_ADDRESS_MEM_PREFETCH, &n->pmrdev->mr);
+> +        nvme_init_pmr(n, pci_dev);
+>       }
+>   
+>       for (i = 0; i < n->num_namespaces; i++) {
+> 
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 
