@@ -2,92 +2,166 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6F27C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:51:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04CFBC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:51:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A3DF205CB
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:51:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C7A59205CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:51:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uosSERFf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A3DF205CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VQplMIhr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7A59205CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZFCQ-0007Yp-FQ
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:51:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39754)
+	id 1jZFCj-0008AD-UM
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:51:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40230)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZEkx-0004Au-5B
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:39 -0400
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:34100)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZEkv-00061g-WE
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:38 -0400
-Received: by mail-wr1-x432.google.com with SMTP id y3so4399869wrt.1
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:22:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=e6cgW2MC3cIx02BNuA5zMpLm8/tIJhuVDzZD2EIoPTU=;
- b=uosSERFfYREgOaGrhl7QsE8opUOYh7pw8vCP0ieD8zYDG/+S7sfrBI6uhslP3yWEhj
- fuHPVjROQclXiGaijk/PsnB+0ost4+3hbz4DIYJ36xkNrs+g3Uoion9EzTUlYGN3yYNR
- Z91AiFT3K2aFIPF/lVhUd+OJMKWi47iXMGm7zsICzoLtaY6v6HlKWeHYAoFpoBwhzvHQ
- R4Lu7MYo6P6yLzNmHNAQKGCgz56I7O5IorRRv8xn0s7cSFPJmhx8phSEqUD10cXlNDsS
- 0O1l3sK8S0nGQJhGAo5mCQksFIcFspePztZATMWq8Ov0QnxRZX892PBTy6YW0ASOVdzn
- A+2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=e6cgW2MC3cIx02BNuA5zMpLm8/tIJhuVDzZD2EIoPTU=;
- b=rwTe5dzzL08YTSUWnC2xvzkWaDO+zSRTdAK4tbAsIjtZxoVZitYCP6UmfDQ9o3fqOl
- 3pwL+mJlYDdQxyDBoT/hd3Fwyivnu9+xv2N/sH0xDICLDyoBx3fhz/Uejp8HeunWoRaC
- mMfLJhbyHkLAfPUXk2nZxgdcQvUz/YF4I5rxgv45ED7f1Q8ODqYJ8bxl/JjzsuJDnkKR
- V4oFTLJeyvwLoZ9WCuuQrqswucO/m3PDbUlXVbqVWhzZhMeJNJv/GkeH6JsMrnvHHYsr
- hR5Q6fDn2t0c4qC8FskKhc3xnIBdPH1kgVmanksqPabvwQcyb6yT1OgYu6HD1SZDWXUj
- xtYQ==
-X-Gm-Message-State: AOAM532TBjtNedYzAJQXpwr8ac3tX80Vw6//2XedeIb2mR/VkuJ1BolU
- +vr3LahXPhkk/wIb/4w4TSaOjU9VYqRTCw==
-X-Google-Smtp-Source: ABdhPJzYc971s33ue5P4qJjaHievbn5gyzRq/O2tgvNVOHhPBHp48c6EEa3Z58RZOtf6WBiohwkGEQ==
-X-Received: by 2002:adf:e408:: with SMTP id g8mr6167414wrm.363.1589466156239; 
- Thu, 14 May 2020 07:22:36 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 88sm4077443wrq.77.2020.05.14.07.22.35
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 14 May 2020 07:22:35 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 44/45] target/arm: Convert Neon fp
- VMAX/VMIN/VMAXNM/VMINNM/VRECPS/VRSQRTS to decodetree
-Date: Thu, 14 May 2020 15:21:37 +0100
-Message-Id: <20200514142138.20875-45-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200514142138.20875-1-peter.maydell@linaro.org>
-References: <20200514142138.20875-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZEnw-00015r-Ee
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:25:44 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31287
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZEnv-0007Cm-Kv
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:25:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589466342;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=zHyArUDUMaYUyhOzau658falwE780WFAKXAqtdHcbcI=;
+ b=VQplMIhrGi7IFeaj7u/eGaIlPH6TZszZqsw7piDGdnkukOJgY8N8Es0THEr5oMMkAI7n9X
+ 70I7U06cK6cktIPQJvg69mQtX9r5SpHpBR0mIcRivv7TpMyu8ViFvHGmFeudC21PJrS0wA
+ NyMUPDEetUpXCY9DsrXibquEPjIQjuM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-191-CBfxJHfENQ-aMrdiYVBOEg-1; Thu, 14 May 2020 10:25:35 -0400
+X-MC-Unique: CBfxJHfENQ-aMrdiYVBOEg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B3D2A107ACF5;
+ Thu, 14 May 2020 14:25:34 +0000 (UTC)
+Received: from [10.10.113.9] (ovpn-113-9.rdu2.redhat.com [10.10.113.9])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 033CD60C05;
+ Thu, 14 May 2020 14:25:33 +0000 (UTC)
+Subject: Re: [PATCH] bitmaps: Add myself as maintainer
+To: Eric Blake <eblake@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20200513141407.185198-1-eblake@redhat.com>
+ <55059458-923c-505c-d16b-89ff3334c3c5@redhat.com>
+ <30070988-e0da-00f2-3780-d4fae816b589@virtuozzo.com>
+ <ad142f8d-8d10-1909-c1d4-7ca8441ab3ba@redhat.com>
+ <962f8c29-6b42-ea7c-cdf9-ad63288da955@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <7ba5c8af-f2cd-9e13-ba3e-f40f6ff6122b@redhat.com>
+Date: Thu, 14 May 2020 10:25:33 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <962f8c29-6b42-ea7c-cdf9-ad63288da955@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::432;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x432.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,195 +175,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the Neon fp VMAX/VMIN/VMAXNM/VMINNM/VRECPS/VRSQRTS 3-reg-same
-insns to decodetree. (These are all the remaining non-accumulation
-instructions in this group.)
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200512163904.10918-17-peter.maydell@linaro.org
----
- target/arm/neon-dp.decode       |  6 +++
- target/arm/translate-neon.inc.c | 70 +++++++++++++++++++++++++++++++++
- target/arm/translate.c          | 42 +-------------------
- 3 files changed, 78 insertions(+), 40 deletions(-)
 
-diff --git a/target/arm/neon-dp.decode b/target/arm/neon-dp.decode
-index 29cf54c217c..9c288865070 100644
---- a/target/arm/neon-dp.decode
-+++ b/target/arm/neon-dp.decode
-@@ -188,5 +188,11 @@ VCGE_fp_3s       1111 001 1 0 . 0 . .... .... 1110 ... 0 .... @3same_fp
- VACGE_fp_3s      1111 001 1 0 . 0 . .... .... 1110 ... 1 .... @3same_fp
- VCGT_fp_3s       1111 001 1 0 . 1 . .... .... 1110 ... 0 .... @3same_fp
- VACGT_fp_3s      1111 001 1 0 . 1 . .... .... 1110 ... 1 .... @3same_fp
-+VMAX_fp_3s       1111 001 0 0 . 0 . .... .... 1111 ... 0 .... @3same_fp
-+VMIN_fp_3s       1111 001 0 0 . 1 . .... .... 1111 ... 0 .... @3same_fp
- VPMAX_fp_3s      1111 001 1 0 . 0 . .... .... 1111 ... 0 .... @3same_fp_q0
- VPMIN_fp_3s      1111 001 1 0 . 1 . .... .... 1111 ... 0 .... @3same_fp_q0
-+VRECPS_fp_3s     1111 001 0 0 . 0 . .... .... 1111 ... 1 .... @3same_fp
-+VRSQRTS_fp_3s    1111 001 0 0 . 1 . .... .... 1111 ... 1 .... @3same_fp
-+VMAXNM_fp_3s     1111 001 1 0 . 0 . .... .... 1111 ... 1 .... @3same_fp
-+VMINNM_fp_3s     1111 001 1 0 . 1 . .... .... 1111 ... 1 .... @3same_fp
-diff --git a/target/arm/translate-neon.inc.c b/target/arm/translate-neon.inc.c
-index eeea71e3bec..5e9e53c5c32 100644
---- a/target/arm/translate-neon.inc.c
-+++ b/target/arm/translate-neon.inc.c
-@@ -1119,6 +1119,8 @@ DO_3S_FP(VCGE, gen_helper_neon_cge_f32, false)
- DO_3S_FP(VCGT, gen_helper_neon_cgt_f32, false)
- DO_3S_FP(VACGE, gen_helper_neon_acge_f32, false)
- DO_3S_FP(VACGT, gen_helper_neon_acgt_f32, false)
-+DO_3S_FP(VMAX, gen_helper_vfp_maxs, false)
-+DO_3S_FP(VMIN, gen_helper_vfp_mins, false)
- 
- static void gen_VMLA_fp_3s(TCGv_i32 vd, TCGv_i32 vn, TCGv_i32 vm,
-                             TCGv_ptr fpstatus)
-@@ -1137,6 +1139,74 @@ static void gen_VMLS_fp_3s(TCGv_i32 vd, TCGv_i32 vn, TCGv_i32 vm,
- DO_3S_FP(VMLA, gen_VMLA_fp_3s, true)
- DO_3S_FP(VMLS, gen_VMLS_fp_3s, true)
- 
-+static bool trans_VMAXNM_fp_3s(DisasContext *s, arg_3same *a)
-+{
-+    if (!arm_dc_feature(s, ARM_FEATURE_V8)) {
-+        return false;
-+    }
-+
-+    if (a->size != 0) {
-+        /* TODO fp16 support */
-+        return false;
-+    }
-+
-+    return do_3same_fp(s, a, gen_helper_vfp_maxnums, false);
-+}
-+
-+static bool trans_VMINNM_fp_3s(DisasContext *s, arg_3same *a)
-+{
-+    if (!arm_dc_feature(s, ARM_FEATURE_V8)) {
-+        return false;
-+    }
-+
-+    if (a->size != 0) {
-+        /* TODO fp16 support */
-+        return false;
-+    }
-+
-+    return do_3same_fp(s, a, gen_helper_vfp_minnums, false);
-+}
-+
-+WRAP_ENV_FN(gen_VRECPS_tramp, gen_helper_recps_f32)
-+
-+static void gen_VRECPS_fp_3s(unsigned vece, uint32_t rd_ofs,
-+                             uint32_t rn_ofs, uint32_t rm_ofs,
-+                             uint32_t oprsz, uint32_t maxsz)
-+{
-+    static const GVecGen3 ops = { .fni4 = gen_VRECPS_tramp };
-+    tcg_gen_gvec_3(rd_ofs, rn_ofs, rm_ofs, oprsz, maxsz, &ops);
-+}
-+
-+static bool trans_VRECPS_fp_3s(DisasContext *s, arg_3same *a)
-+{
-+    if (a->size != 0) {
-+        /* TODO fp16 support */
-+        return false;
-+    }
-+
-+    return do_3same(s, a, gen_VRECPS_fp_3s);
-+}
-+
-+WRAP_ENV_FN(gen_VRSQRTS_tramp, gen_helper_rsqrts_f32)
-+
-+static void gen_VRSQRTS_fp_3s(unsigned vece, uint32_t rd_ofs,
-+                              uint32_t rn_ofs, uint32_t rm_ofs,
-+                              uint32_t oprsz, uint32_t maxsz)
-+{
-+    static const GVecGen3 ops = { .fni4 = gen_VRSQRTS_tramp };
-+    tcg_gen_gvec_3(rd_ofs, rn_ofs, rm_ofs, oprsz, maxsz, &ops);
-+}
-+
-+static bool trans_VRSQRTS_fp_3s(DisasContext *s, arg_3same *a)
-+{
-+    if (a->size != 0) {
-+        /* TODO fp16 support */
-+        return false;
-+    }
-+
-+    return do_3same(s, a, gen_VRSQRTS_fp_3s);
-+}
-+
- static bool do_3same_fp_pair(DisasContext *s, arg_3same *a, VFPGen3OpSPFn *fn)
- {
-     /* FP operations handled pairwise 32 bits at a time */
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 23e3705172b..c1d4fab8e80 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -5436,6 +5436,8 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-         case NEON_3R_FLOAT_MULTIPLY:
-         case NEON_3R_FLOAT_CMP:
-         case NEON_3R_FLOAT_ACMP:
-+        case NEON_3R_FLOAT_MINMAX:
-+        case NEON_3R_FLOAT_MISC:
-             /* Already handled by decodetree */
-             return 1;
-         }
-@@ -5445,17 +5447,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-             return 1;
-         }
-         switch (op) {
--        case NEON_3R_FLOAT_MINMAX:
--            if (u) {
--                return 1; /* VPMIN/VPMAX handled by decodetree */
--            }
--            break;
--        case NEON_3R_FLOAT_MISC:
--            /* VMAXNM/VMINNM in ARMv8 */
--            if (u && !arm_dc_feature(s, ARM_FEATURE_V8)) {
--                return 1;
--            }
--            break;
-         case NEON_3R_VFM_VQRDMLSH:
-             if (!dc_isar_feature(aa32_simdfmac, s)) {
-                 return 1;
-@@ -5471,35 +5462,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-         tmp = neon_load_reg(rn, pass);
-         tmp2 = neon_load_reg(rm, pass);
-         switch (op) {
--        case NEON_3R_FLOAT_MINMAX:
--        {
--            TCGv_ptr fpstatus = get_fpstatus_ptr(1);
--            if (size == 0) {
--                gen_helper_vfp_maxs(tmp, tmp, tmp2, fpstatus);
--            } else {
--                gen_helper_vfp_mins(tmp, tmp, tmp2, fpstatus);
--            }
--            tcg_temp_free_ptr(fpstatus);
--            break;
--        }
--        case NEON_3R_FLOAT_MISC:
--            if (u) {
--                /* VMAXNM/VMINNM */
--                TCGv_ptr fpstatus = get_fpstatus_ptr(1);
--                if (size == 0) {
--                    gen_helper_vfp_maxnums(tmp, tmp, tmp2, fpstatus);
--                } else {
--                    gen_helper_vfp_minnums(tmp, tmp, tmp2, fpstatus);
--                }
--                tcg_temp_free_ptr(fpstatus);
--            } else {
--                if (size == 0) {
--                    gen_helper_recps_f32(tmp, cpu_env, tmp, tmp2);
--                } else {
--                    gen_helper_rsqrts_f32(tmp, cpu_env, tmp, tmp2);
--              }
--            }
--            break;
-         case NEON_3R_VFM_VQRDMLSH:
-         {
-             /* VFMA, VFMS: fused multiply-add */
--- 
-2.20.1
+On 5/14/20 9:52 AM, Eric Blake wrote:
+> On 5/14/20 12:08 AM, John Snow wrote:
+>>
+>>
+>> On 5/14/20 12:49 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> 13.05.2020 23:24, John Snow wrote:
+>>>>
+>>>>
+>>>> On 5/13/20 10:14 AM, Eric Blake wrote:
+>>>>> Dirty bitmaps are important to incremental backups, including exposure
+>>>>> over NBD where I'm already maintainer.  Also, I'm aware that lately I
+>>>>> have been doing as much code/review on bitmaps as John Snow, who is
+>>>>> hoping to scale back on this front.
+>>>>>
+>>>>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>>>>
+>>>>> ---
+> 
+>>>>>    Dirty Bitmaps
+>>>>>    M: John Snow <jsnow@redhat.com>
+>>>>> +M: Eric Blake <eblake@redhat.com>
+>>>>>    R: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>>>    L: qemu-block@nongnu.org
+>>>>>    S: Supported
+>>>>>
+>>>>
+>>>> I'd also like to point out that I wouldn't mind if Vladimir became an
+>>>> official maintainer, but I can't remember if he wanted the title
+>>>> when we
+>>>> last spoke at KVM Forum.
+>>>
+>>> Actually, it would be nice, I'd glad to get it, thanks :)
+>>> I can send a separate patch, or we may s/R/M/ in this one?
+>>>
+>>
+>> That would be very good!
+>>
+>> I'd be quite happy to be demoted to reviewer; it's about all the time
+>> I've been truthfully able to give lately.
+>>
+>> (I won't speak for Eric!)
+> 
+> I can post a v2 that produces the following results:
+> 
+> M: Vladimir
+> M: Eric
+> R: John
+> 
+> Does that sound reasonable?
+> 
+> 
+
+Yeah, I will approve it. I want to help as much as I can, but I don't
+want to artificially limit the rate of development here as I fear I have
+been.
+
+--js
 
 
