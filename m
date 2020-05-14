@@ -2,96 +2,92 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72F68C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:53:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AEF9C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:53:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D601205CB
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:53:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D8D09205CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:53:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="XyviM7x7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D601205CB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="S+C1TcS9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8D09205CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZFEc-0001j2-7m
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:53:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41198)
+	id 1jZFEx-0004es-12
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:53:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39704)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jZEtg-0005VO-Dv
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:31:40 -0400
-Received: from mout.web.de ([217.72.192.78]:32841)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jZEko-0003tE-Pz
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:30 -0400
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:34100)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jZEte-0000Pt-Hf
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:31:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1589466675;
- bh=k6BwiqNVkyaaVhHBVXOjGsv9ADTyjkH5GRGyAHrc1AE=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=XyviM7x7HpsXbF21a/ZmzkGSl/GujOs06I4DfRT5wmXv8e63TZxGXgVdrSsfbH0Ec
- cKqgnXZa/WRrWA2JMlY+epkBIdeXWCceljB7RSRdjcJ9YGiCdoyumJa6wZ0ww3B+N4
- NgLnbCxtWhAOO1b1NlnljBMFKJ8NfKyUSjQVfaaQ=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([87.123.206.68]) by smtp.web.de (mrweb101
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0LsyZi-1j7Ijo3Fz0-012Zra; Thu, 14
- May 2020 16:31:14 +0200
-Date: Thu, 14 May 2020 16:31:05 +0200
-From: Lukas Straub <lukasstraub2@web.de>
-To: Zhanghailiang <zhang.zhanghailiang@huawei.com>
-Subject: Re: [PATCH 6/6] migration/colo.c: Move colo_notify_compares_event
- to the right place
-Message-ID: <20200514163105.14d7b97d@luklap>
-In-Reply-To: <f2ea9b8ff1824a09ae8837625d6ac3f5@huawei.com>
-References: <cover.1589193382.git.lukasstraub2@web.de>
- <d4555dd5146a54518c4d9d4efd996b7c745c6687.1589193382.git.lukasstraub2@web.de>
- <f2ea9b8ff1824a09ae8837625d6ac3f5@huawei.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jZEkn-00060c-PW
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:30 -0400
+Received: by mail-wr1-x434.google.com with SMTP id y3so4399240wrt.1
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:22:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=gjbVHc2/Yfi0L0CZNHhwdyHWC0bXOSnoFP1EIBL00CI=;
+ b=S+C1TcS9VBDUw7Ckz8ooyTDTM5kGkLuGRM39GdGGt6YOpObpCVXENngOIElSBJjo8a
+ ZOvrSlP364RcKdTenPb5mzwdgnCUUcUm4MzW6h+DwlowfGKGMGR9ifAP4lV9SfXPdOZt
+ crEAjLY4MyWSDubjAzcoskgLvL9M3Q6fxYkNZoVdqdntPhJGaiqRCitWas/UuCiwzB0z
+ QoWho/1S9/u7MmizAIwjJqwJefsSY8O0jHmm5WAfmBv+UuheCljQi7kTMGHPBRXgxkTr
+ B/7g22OFKzwwG2gHd3TFYYNOlQ2BegHq4g+hyxx+Tq4i82T5dL6B4sIiOKBM1jhKBaRA
+ c1uA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=gjbVHc2/Yfi0L0CZNHhwdyHWC0bXOSnoFP1EIBL00CI=;
+ b=FzB46gDta2gxcDZrracGse4UBgHwuVU2mY6DK/U1SFcvHCFYgNB6Bj7UWKoeLk7uYX
+ feNrVUkGOwrBdEcvbSccJvL719ASQiuRBNdeQq0FfDj4k46hfSERVBlB7Ge56tInX5GE
+ AxDxR7IPVCG/+hJOVAAjFpj6iYdDisqpWOCdmtq6St1ZorlcQK3KifcVO1RgnDzJ5gxQ
+ tMiu4b4yXkzBDKWK6uItBqXU/J+AoujtOnuNkWTvGVqZpWWObbKGSFsO41pFE5JtvtxO
+ LaT3yS4K4fm+tAdRw/0JDufQLxTin/vzppu0Rvwko8yMUOlA50zglxFHnVOXo58pP+qH
+ kWHQ==
+X-Gm-Message-State: AOAM531hHUdqI5isOvQlrBJ4lUBsAiYj2eDC8b3TvmDJsQniD5Hk92QS
+ scklmgYjqrkwDQsSVSY9deik0vMrRi3c2A==
+X-Google-Smtp-Source: ABdhPJx1w1KfWqp2QSt9USGYOpxNorNrUg9zv0viNSxugZIl1Kc8f+al4GFMSJq+TKLJCEzlI4W57Q==
+X-Received: by 2002:adf:9447:: with SMTP id 65mr5803516wrq.331.1589466148118; 
+ Thu, 14 May 2020 07:22:28 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id 88sm4077443wrq.77.2020.05.14.07.22.27
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 14 May 2020 07:22:27 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 37/45] target/arm: Convert Neon VPADD 3-reg-same insns to
+ decodetree
+Date: Thu, 14 May 2020 15:21:30 +0100
+Message-Id: <20200514142138.20875-38-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200514142138.20875-1-peter.maydell@linaro.org>
+References: <20200514142138.20875-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/HXnf3nXgZ5xa./Cjr+Lz79N";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:EqREIUxXx6IFCSnTExE/O9AcKEpUm7qABGYXFPwLHBnveHQjvUA
- 8J3GoSIPBJqCxmw7TAczy2uyYse+bBssJLelZ917LUkpS1oL/FRcqJJgatCjEiKuB9hp+Fy
- 63oHxpVUtefHqAS+ye+AAXtrv5d3DFO/44q8WYU+UKJingwr6dOXwmgS4Gmexgtz0SLSd4r
- 5S+xQZa2Y6CB0jWbMOs7Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:9ahI8z8JtLc=:FgsX9rAl9NdjmfBM7J6SDA
- aAWGqYQ3bfz56zY+QB8uriG5HnbTl0wlCcdTKQByH+gVS1AfYrLPU8oXXa8N6Jmzmx1uuYjAF
- ks73wGFJtGkzKiVQPUWifpGNDGluLVfbLnJRd8dtbmwPeMKLhj+yQFn85A0X7EqMWiFbJgj/A
- i3y5Qul/0WTP8wJkly2Cbic8fk4uVmO9/6eyq0ugcj+9jNxqrY4+ZybQD7A5elL+rVe4bo8gG
- JFH+Sn2sVeJZIQT2IpUJynXji6h+1qBhYsbi0HlSJiKu5bsJV9N8pkd2aygVwcAjbjASMfsPg
- CynVkFkGacyfYa8EnOKvj0sH0FTZW1u/7m0zdKtVPMHKLlSINWLVNvxWvrG+6qoB1vbczYtKE
- Mb6DTx9T5DhbHSiEqiVFJmPKVyOKt8RYEpeTzUg3wWBjWeAT4mH7eoN9NjFmvkEhBnhW17RN8
- mnaraIu2fMtfVDigknSQVGuDvkOLFY/94R7nfrp8qBY/DN55Wj1HZzHUiqwVl9VsXLGIg3MFn
- /Gd6/0Pt9WbMiYUe5SIHmXVAEhOIbzLTvkaN2pXfdbmlzxfkcFx5SbDvxOpV//7Y+1iCcvSTy
- JRGVp6aOpr/RoJp9iJdA0S5LcTLLmSaxSCebrXsQMqH+Aht2JYHX2rLFMy1oRk9Lo2cX8K+uj
- FLjjCsdLZLh1n36XItARQEOAAJxvRPH83APPXrnJopBMaiWXzWqJ5N/vwrw+xIIyfmXLaTU4S
- B/XkK5tkQFe2LaWZW+cspaE3unKjJH6LzV80xg4hqXfbO4nbgEDN0e0zKnvR5NpQSZyRnrVEC
- EP/aATRtNaBTHY5TuWwTcxoZVinQNnB7Y1SqIEKZCEfxXO9HMCLFrmYsRMXyqdtmVwwVrWmyt
- jZRvpalFXughF5BMcIZSvnMFHACJp/tYvZY3n0JW58et3VAoVJEVBm9kLpKgjkP3bD1HRyZGC
- Upoen++U8q+JC2pNx1SEi3RoNjEQLFti0EvkQWzyTN+E+KJ8dtH0eNGOySB9I4UMQKnD+rQ4N
- 5Eks+PLFGf/RQ7iwuAdBZQUl62eA64msgXDeslJaJI6FgI/vvD10Gy5327qylabJDHqBQzx5D
- jb3L2mwWa7+Tzil0AtQpVam8Zd+69B6xaXUCxK9qOdug6+Jx/6S8a8ni883O39jNaI0y45Ua+
- AOrPAUYQgkA7wxxBx4onIizEvdzG8nbYA7MUdDv59lv4GnsGHkIIxsKG5F6SXcJMhArZzt0oK
- bGgoSzuQ1aSKh5syG
-Received-SPF: pass client-ip=217.72.192.78; envelope-from=lukasstraub2@web.de;
- helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 10:31:36
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -24
-X-Spam_score: -2.5
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::434;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x434.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,121 +101,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <chen.zhang@intel.com>, qemu-devel <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/HXnf3nXgZ5xa./Cjr+Lz79N
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Convert the Neon integer VPADD 3-reg-same insns to decodetree.  These
+are 'pairwise' operations.  (Note that VQRDMLAH, which shares the
+same primary opcode but has U=1, has already been converted.)
 
-On Thu, 14 May 2020 13:27:30 +0000
-Zhanghailiang <zhang.zhanghailiang@huawei.com> wrote:
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200512163904.10918-10-peter.maydell@linaro.org
+---
+ target/arm/neon-dp.decode       |  2 ++
+ target/arm/translate-neon.inc.c |  2 ++
+ target/arm/translate.c          | 19 +------------------
+ 3 files changed, 5 insertions(+), 18 deletions(-)
 
-> Cc: Zhang Chen <chen.zhang@intel.com>
->=20
-> >=20
-> > If the secondary has to failover during checkpointing, it still is in t=
-he old state
-> > (i.e. different state than primary). Thus we can't expose the primary s=
-tate
-> > until after the checkpoint is sent.
-> >  =20
->=20
-> Hmm, do you mean we should not flush the net packages to client connectio=
-n until checkpointing
-> Process almost success because it may fail during checkpointing ?
+diff --git a/target/arm/neon-dp.decode b/target/arm/neon-dp.decode
+index 2edcaba9f85..3659fb036c7 100644
+--- a/target/arm/neon-dp.decode
++++ b/target/arm/neon-dp.decode
+@@ -152,6 +152,8 @@ VPMAX_U_3s       1111 001 1 0 . .. .... .... 1010 . . . 0 .... @3same_q0
+ VPMIN_S_3s       1111 001 0 0 . .. .... .... 1010 . . . 1 .... @3same_q0
+ VPMIN_U_3s       1111 001 1 0 . .. .... .... 1010 . . . 1 .... @3same_q0
+ 
++VPADD_3s         1111 001 0 0 . .. .... .... 1011 . . . 1 .... @3same_q0
++
+ VQRDMLAH_3s      1111 001 1 0 . .. .... .... 1011 ... 1 .... @3same
+ 
+ SHA1_3s          1111 001 0 0 . optype:2 .... .... 1100 . 1 . 0 .... \
+diff --git a/target/arm/translate-neon.inc.c b/target/arm/translate-neon.inc.c
+index 7db6b856598..e0137364075 100644
+--- a/target/arm/translate-neon.inc.c
++++ b/target/arm/translate-neon.inc.c
+@@ -990,8 +990,10 @@ static bool do_3same_pair(DisasContext *s, arg_3same *a, NeonGenTwoOpFn *fn)
+ #define gen_helper_neon_pmax_u32  tcg_gen_umax_i32
+ #define gen_helper_neon_pmin_s32  tcg_gen_smin_i32
+ #define gen_helper_neon_pmin_u32  tcg_gen_umin_i32
++#define gen_helper_neon_padd_u32  tcg_gen_add_i32
+ 
+ DO_3SAME_PAIR(VPMAX_S, pmax_s)
+ DO_3SAME_PAIR(VPMIN_S, pmin_s)
+ DO_3SAME_PAIR(VPMAX_U, pmax_u)
+ DO_3SAME_PAIR(VPMIN_U, pmin_u)
++DO_3SAME_PAIR(VPADD, padd_u)
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 82be4d40282..ce30417014d 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -5397,13 +5397,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+             return 1;
+         }
+         switch (op) {
+-        case NEON_3R_VPADD_VQRDMLAH:
+-            if (!u) {
+-                break;  /* VPADD */
+-            }
+-            /* VQRDMLAH : handled by decodetree */
+-            return 1;
+-
+         case NEON_3R_VFM_VQRDMLSH:
+             if (!u) {
+                 /* VFM, VFMS */
+@@ -5438,6 +5431,7 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+         case NEON_3R_VQRSHL:
+         case NEON_3R_VPMAX:
+         case NEON_3R_VPMIN:
++        case NEON_3R_VPADD_VQRDMLAH:
+             /* Already handled by decodetree */
+             return 1;
+         }
+@@ -5448,9 +5442,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+         }
+         pairwise = 0;
+         switch (op) {
+-        case NEON_3R_VPADD_VQRDMLAH:
+-            pairwise = 1;
+-            break;
+         case NEON_3R_FLOAT_ARITH:
+             pairwise = (u && size < 2); /* if VPADD (float) */
+             break;
+@@ -5528,14 +5519,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                 }
+             }
+             break;
+-        case NEON_3R_VPADD_VQRDMLAH:
+-            switch (size) {
+-            case 0: gen_helper_neon_padd_u8(tmp, tmp, tmp2); break;
+-            case 1: gen_helper_neon_padd_u16(tmp, tmp, tmp2); break;
+-            case 2: tcg_gen_add_i32(tmp, tmp, tmp2); break;
+-            default: abort();
+-            }
+-            break;
+         case NEON_3R_FLOAT_ARITH: /* Floating point arithmetic. */
+         {
+             TCGv_ptr fpstatus = get_fpstatus_ptr(1);
+-- 
+2.20.1
 
-No.
-If the primary fails/crashes during checkpointing, the secondary is still i=
-n different state than the primary because it didn't receive the full check=
-point. We can release the miscompared packets only after both primary and s=
-econdary are in the same state.
-
-Example:
-1. Client opens a TCP connection, sends SYN.
-2. Primary accepts the connection with SYN-ACK, but due to nondeterministic=
- execution the secondary is delayed.
-3. Checkpoint happens, primary releases the SYN-ACK packet but then crashes=
- while sending the checkpoint.
-4. The Secondary fails over. At this point it is still in the old state whe=
-re it hasn't sent the SYN-ACK packet.
-5. The client responds with ACK to the SYN-ACK packet.
-6. Because it doesn't know the connection, the secondary responds with RST,=
- connection reset.
-
-Regards,
-Lukas Straub
-
-> > This fixes sporadic connection reset of client connections during failo=
-ver.
-> >=20
-> > Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-> > ---
-> >  migration/colo.c | 12 ++++++------
-> >  1 file changed, 6 insertions(+), 6 deletions(-)
-> >=20
-> > diff --git a/migration/colo.c b/migration/colo.c index
-> > a69782efc5..a3fc21e86e 100644
-> > --- a/migration/colo.c
-> > +++ b/migration/colo.c
-> > @@ -430,12 +430,6 @@ static int
-> > colo_do_checkpoint_transaction(MigrationState *s,
-> >          goto out;
-> >      }
-> >=20
-> > -    qemu_event_reset(&s->colo_checkpoint_event);
-> > -    colo_notify_compares_event(NULL, COLO_EVENT_CHECKPOINT,
-> > &local_err);
-> > -    if (local_err) {
-> > -        goto out;
-> > -    }
-> > -
-> >      /* Disable block migration */
-> >      migrate_set_block_enabled(false, &local_err);
-> >      qemu_mutex_lock_iothread();
-> > @@ -494,6 +488,12 @@ static int
-> > colo_do_checkpoint_transaction(MigrationState *s,
-> >          goto out;
-> >      }
-> >=20
-> > +    qemu_event_reset(&s->colo_checkpoint_event);
-> > +    colo_notify_compares_event(NULL, COLO_EVENT_CHECKPOINT,
-> > &local_err);
-> > +    if (local_err) {
-> > +        goto out;
-> > +    }
-> > +
-> >      colo_receive_check_message(s->rp_state.from_dst_file,
-> >                         COLO_MESSAGE_VMSTATE_LOADED, &local_err);
-> >      if (local_err) {
-> > --
-> > 2.20.1 =20
-
-
---Sig_/HXnf3nXgZ5xa./Cjr+Lz79N
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl69VikACgkQNasLKJxd
-slgPMg//cr558I4PHTTC4FB0fxhKh8PjTphHrLy/OcqtJMK9SD3Df3+v8ARAjuus
-x+Cev3r1/FlMGWvWorWjnL0SIuVtoIqYx6rfUfeJyCIOY6B9fjTYs7G3fwmb4U9u
-6VkLYoXCB1ljkNpMxCZjFfj0WUrd+7B2PAJ78FcyH86RAOB9Hb2ykYROXrDjQK7o
-NpnTldb5KSkIbZaVWkhDN4yq6VD6k2OqWOmCJ8A98Atuqm/y2d7jzgWCeK51vr1c
-51fAtmL6MfxS4OpwcA6XzIiGj0QsxA9IYPp26Canu9Iebh5V61fZnuLJhnE/9FaM
-S+y4SIjDxr2TH+YQtdZSesPl3Mg1KfjMYfNbUup8BoduZ7RsLiBc7DlWTNfydEcv
-TGUWr1l2EKlzlz5A1sFzjTXXokqNl39zRGaD8QuFCLIlnZs58v6/a1Zg8ce3wOV9
-qHBu1gxl88nFl8xBFNwButz+GjedyVhpSKyYKasBICyR27yYNefmVEAQphaR7Qaw
-sXY10JiBGPWZviDTBjGl3BrEFmt856IkNCngaIjJQKIP+LVZ1J31MqJfhT29u7BU
-5JhBMwVbuU2KrBf+/8Vboy+zLfEgZ6DMaP7148I47cMVS02Tgk9fgmLES1wOKnW3
-PWTStcf3SOYT2hMyaS3itMj8n0AEzyvBMKjuoqApfQWV2YuoAFU=
-=uv6Q
------END PGP SIGNATURE-----
-
---Sig_/HXnf3nXgZ5xa./Cjr+Lz79N--
 
