@@ -2,105 +2,102 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DB41C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 11:58:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E7FEC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 12:10:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37EB020722
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 11:58:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5531E206A5
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 12:10:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="STAR01ZD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37EB020722
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MAui3grH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5531E206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZCV6-00018H-Bs
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 07:58:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47432)
+	id 1jZCh4-0000Yo-Cy
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 08:10:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49462)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jZCU4-0008GN-2R
- for qemu-devel@nongnu.org; Thu, 14 May 2020 07:57:04 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35080
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZCg7-0007wR-5X
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 08:09:32 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31323
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jZCU3-0004YQ-6q
- for qemu-devel@nongnu.org; Thu, 14 May 2020 07:57:03 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZCg4-0008Rd-2K
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 08:09:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589457421;
+ s=mimecast20190719; t=1589458166;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=tRd78uKeUApUZZ40K/dH7afnZkI4Z4oh15cb5Bfm/eA=;
- b=STAR01ZD8+mrrCiKqy4D41NRNCzAtbvYO1YJnhnB4PyzyM4h0IH1Ujcoa6cpiOzQE4xPQ1
- htgNaKCUhklLE+Zc6AXQhj0ckvfFa0Un6hWgMJKVJMBGiZpmV0wK+LkkzSX/7RhI58U1fS
- 2aLM9SuERIyBVEaEa1wcHnuzKJ2JIoo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-MFvSV5ZIOpy3_pthQHKfYg-1; Thu, 14 May 2020 07:56:57 -0400
-X-MC-Unique: MFvSV5ZIOpy3_pthQHKfYg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86E6B18FF660;
- Thu, 14 May 2020 11:56:56 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-212.ams2.redhat.com
- [10.36.113.212])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DDC3725262;
- Thu, 14 May 2020 11:56:51 +0000 (UTC)
-Subject: Re: [PATCH v6 02/14] qcrypto/luks: implement encryption key management
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-References: <20200510134037.18487-1-mlevitsk@redhat.com>
- <20200510134037.18487-3-mlevitsk@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <48813eda-4fa9-6988-296d-58793e8b812f@redhat.com>
-Date: Thu, 14 May 2020 13:56:50 +0200
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gH+nLTfI748xYpanaWsMtl6uRK0WmDGX9pG2oo13/nQ=;
+ b=MAui3grHG+P1YK2XXbPmBT/IEWNODvzf9eQS3YJOOR22XcbdR5Gqxum7uhAsU6C3y+bs/g
+ UJKP2qZcBrA6z2HkVKwc81i+iWbueK3J4waCE2q7e/0KJd+ubHOsZrswIW3UHSNpRC7EkD
+ dLXsgOFjPi5VmNI27KSzmfkphGPZBS0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-405-TuzLV6VXMUWBxnmhYq6XBQ-1; Thu, 14 May 2020 08:09:23 -0400
+X-MC-Unique: TuzLV6VXMUWBxnmhYq6XBQ-1
+Received: by mail-wr1-f72.google.com with SMTP id w9so1490543wrr.3
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 05:09:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=gH+nLTfI748xYpanaWsMtl6uRK0WmDGX9pG2oo13/nQ=;
+ b=pxloOfVJsbLzi4Yn4/lUZc1q/hEGTG5ptPWBL4WcoSVnaJ3xmrVYVfn4uICVnduByZ
+ ClhBP5M4q7agRUpiOBU8LxtSty4DDK6TwpeOxHd12SMMWBmhpKMsmvq/o0eHvqJUyjZ3
+ 0QItRyk3rkQCyg7wI/Vo/ka0luFkyTmDLeKU0BOV8NyS0jLiCB8iXu+f6dLTid5STagg
+ DlkfyWqJZi2lx+ZAxUfZHv5GBJTBlW7SniweQlkR3njmTJTk7RtUvgBAXX4ECvYAec3a
+ vXdkiATBrPN0c1goWVP7MRW2HWR5ifC1UZP/Ot2VBs73DEbPmS1svViGAN4c27h8jAAr
+ TP4w==
+X-Gm-Message-State: AGi0PuaQGmhGjyNrBSBUqEpeLFiY+ofMwuhOv1aAzWCxSQxLgYibKsUQ
+ lAi3m5YV7FBclSJ3LbqhxnbwainaTFDIwPbnKllBm6yqI45F9yxr1rTbOgN0/ys8fLInIYmPsQR
+ pq+eH6iyTCgJHTdg=
+X-Received: by 2002:a7b:c399:: with SMTP id s25mr46677620wmj.169.1589458161800; 
+ Thu, 14 May 2020 05:09:21 -0700 (PDT)
+X-Google-Smtp-Source: APiQypJxtmLA0JxT79Oh5FIDBYasd2/6AQnV3V7XsDvN1Kh1vdB7IiYQsjq1Pg1CcLWC4ArGXzre4w==
+X-Received: by 2002:a7b:c399:: with SMTP id s25mr46677601wmj.169.1589458161526; 
+ Thu, 14 May 2020 05:09:21 -0700 (PDT)
+Received: from [192.168.1.39] (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id v11sm3672877wrv.53.2020.05.14.05.09.20
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 14 May 2020 05:09:20 -0700 (PDT)
+Subject: Re: kvm_buf_set_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs'
+ failed.
+To: Li Feng <fengli@smartx.com>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+References: <CAHckoCymFfuVd=tKV-hk+PHn2fk6ydWjSxwKVorj9Qe5KV6nGQ@mail.gmail.com>
+ <CAHckoCzWmN4oedOHMvR_TbbBcbYqSjg1fUr2RjJkh-iuZO-Jng@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <55b6466c-0769-6652-a237-c6bc18704064@redhat.com>
+Date: Thu, 14 May 2020 14:09:20 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200510134037.18487-3-mlevitsk@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <CAHckoCzWmN4oedOHMvR_TbbBcbYqSjg1fUr2RjJkh-iuZO-Jng@mail.gmail.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="ZFTR1sPdKbp0IBeCpWDc1lA1gY9qNEQM3"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -120,240 +117,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, John Snow <jsnow@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ZFTR1sPdKbp0IBeCpWDc1lA1gY9qNEQM3
-Content-Type: multipart/mixed; boundary="bY7VA3Y9wJI7oLWIRSoW7aVamfyeTD2Ma"
+Cc'ing David/Paolo in case they have a clue...
 
---bY7VA3Y9wJI7oLWIRSoW7aVamfyeTD2Ma
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 10.05.20 15:40, Maxim Levitsky wrote:
-> Next few patches will expose that functionality to the user.
->=20
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
->  crypto/block-luks.c | 395 +++++++++++++++++++++++++++++++++++++++++++-
->  qapi/crypto.json    |  61 ++++++-
->  2 files changed, 452 insertions(+), 4 deletions(-)
->=20
-> diff --git a/crypto/block-luks.c b/crypto/block-luks.c
-> index 4861db810c..967d382882 100644
-> --- a/crypto/block-luks.c
-> +++ b/crypto/block-luks.c
-
-[...]
-
-> @@ -1069,6 +1076,119 @@ qcrypto_block_luks_find_key(QCryptoBlock *block,
->      return -1;
->  }
-> =20
-> +/*
-> + * Returns true if a slot i is marked as active
-> + * (contains encrypted copy of the master key)
-> + */
-> +static bool
-> +qcrypto_block_luks_slot_active(const QCryptoBlockLUKS *luks,
-> +                               unsigned int slot_idx)
-> +{
-> +    uint32_t val =3D luks->header.key_slots[slot_idx].active;
-> +    return val =3D=3D  QCRYPTO_BLOCK_LUKS_KEY_SLOT_ENABLED;
-
-One space too many after the =3D=3D.
-
-[...]
-
-> +/*
-> + * Erases an keyslot given its index
-> + * Returns:
-> + *    0 if the keyslot was erased successfully
-> + *   -1 if a error occurred while erasing the keyslot
-> + *
-> + */
-> +static int
-> +qcrypto_block_luks_erase_key(QCryptoBlock *block,
-> +                             unsigned int slot_idx,
-> +                             QCryptoBlockWriteFunc writefunc,
-> +                             void *opaque,
-> +                             Error **errp)
-> +{
-> +    QCryptoBlockLUKS *luks =3D block->opaque;
-> +    QCryptoBlockLUKSKeySlot *slot =3D &luks->header.key_slots[slot_idx];
-> +    g_autofree uint8_t *garbagesplitkey =3D NULL;
-> +    size_t splitkeylen =3D luks->header.master_key_len * slot->stripes;
-
-This accesses header.key_slots[slot_idx] before...
-
-> +    size_t i;
-> +    Error *local_err =3D NULL;
-> +    int ret;
-> +
-> +    assert(slot_idx < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS);
-
-...we assert that slot_idx is in bounds.
-
-I suppose that=E2=80=99s kind of fine, because assertions aren=E2=80=99t me=
-ant to fire
-either, but this basically makes the assertion useless.
-
-> +    assert(splitkeylen > 0);
-> +    garbagesplitkey =3D g_new0(uint8_t, splitkeylen);
-> +
-> +    /* Reset the key slot header */
-> +    memset(slot->salt, 0, QCRYPTO_BLOCK_LUKS_SALT_LEN);
-> +    slot->iterations =3D 0;
-> +    slot->active =3D QCRYPTO_BLOCK_LUKS_KEY_SLOT_DISABLED;
-> +
-> +    ret =3D qcrypto_block_luks_store_header(block,  writefunc,
-
-Superfluous space after the comma.
-
-> +                                          opaque, &local_err);
-> +
-> +    if (ret < 0) {
-> +        error_propagate(errp, local_err);
-> +    }
-
-error_propagate() is a no-op with local_err =3D=3D NULL, so you could do
-without checking @ret (just calling error_propagate() unconditionally).
-
-(But who cares, we need to set @ret anyway, so we might as well check it.)
-
-[...]
-
-> +static int
-> +qcrypto_block_luks_amend_add_keyslot(QCryptoBlock *block,
-> +                                     QCryptoBlockReadFunc readfunc,
-> +                                     QCryptoBlockWriteFunc writefunc,
-> +                                     void *opaque,
-> +                                     QCryptoBlockAmendOptionsLUKS *opts_=
-luks,
-> +                                     bool force,
-> +                                     Error **errp)
-> +{
-> +    QCryptoBlockLUKS *luks =3D block->opaque;
-> +    uint64_t iter_time =3D opts_luks->has_iter_time ?
-> +                         opts_luks->iter_time :
-> +                         QCRYPTO_BLOCK_LUKS_DEFAULT_ITER_TIME_MS;
-> +    int keyslot;
-> +    g_autofree char *old_password =3D NULL;
-> +    g_autofree char *new_password =3D NULL;
-> +    g_autofree uint8_t *master_key =3D NULL;
-
-(I assume we don=E2=80=99t really care about purging secrets from memory af=
-ter use)
-
-[...]
-
-> +static int
-> +qcrypto_block_luks_amend_erase_keyslots(QCryptoBlock *block,
-> +                                        QCryptoBlockReadFunc readfunc,
-> +                                        QCryptoBlockWriteFunc writefunc,
-> +                                        void *opaque,
-> +                                        QCryptoBlockAmendOptionsLUKS *op=
-ts_luks,
-> +                                        bool force,
-> +                                        Error **errp)
-> +{
-
-[...]
-
-> +        for (i =3D 0; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS; i++) {
-> +            int rv =3D qcrypto_block_luks_load_key(block,
-> +                                                 i,
-> +                                                 old_password,
-> +                                                 tmpkey,
-> +                                                 readfunc,
-> +                                                 opaque,
-> +                                                 errp);
-> +            if (rv =3D=3D -1) {
-> +                return -1;
-> +            } else if (rv =3D=3D 1) {
-> +                bitmap_set(&slots_to_erase_bitmap, i, 1);
-
-We should assert that QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS <=3D
-sizeof(slots_to_erase_bitmap) * 8.  As it is, this looks like a possible
-out-of-bounds access on first glance.
-
-[...]
-
-> +static int
-> +qcrypto_block_luks_amend_options(QCryptoBlock *block,
-> +                                 QCryptoBlockReadFunc readfunc,
-> +                                 QCryptoBlockWriteFunc writefunc,
-> +                                 void *opaque,
-> +                                 QCryptoBlockAmendOptions *options,
-> +                                 bool force,
-> +                                 Error **errp)
-> +{
-> +    QCryptoBlockAmendOptionsLUKS *opts_luks =3D &options->u.luks;
-> +
-> +    if (opts_luks->state =3D=3D Q_CRYPTO_BLOCKLUKS_KEYSLOT_STATE_ACTIVE)=
- {
-
-switch { case } might be nicer to catch unhandled cases.  Or else if +
-else { g_assert_not_reached() }.
-
-> +        return qcrypto_block_luks_amend_add_keyslot(block, readfunc,
-> +                                                    writefunc, opaque,
-> +                                                    opts_luks, force, er=
-rp);
-> +    } else {
-> +        return qcrypto_block_luks_amend_erase_keyslots(block, readfunc,
-> +                                                       writefunc, opaque=
-,
-> +                                                       opts_luks, force,=
- errp);
-> +    }
-> +}
-
-[...]
-
-> diff --git a/qapi/crypto.json b/qapi/crypto.json
-> index aeb6c7ef7b..29276e5e5e 100644
-> --- a/qapi/crypto.json
-> +++ b/qapi/crypto.json
-> @@ -1,6 +1,8 @@
->  # -*- Mode: Python -*-
->  #
-> =20
-> +{ 'include': 'common.json' }
-> +
-
-Why?  Seems to compile without it just fine.
-
-Max
-
-
---bY7VA3Y9wJI7oLWIRSoW7aVamfyeTD2Ma--
-
---ZFTR1sPdKbp0IBeCpWDc1lA1gY9qNEQM3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl69MgIACgkQ9AfbAGHV
-z0B0BQf+JkXvO4MXKpOXtFk3GgQkogvzcCtfNtoCm0K/VBSYcD0CuUtawcp1HpHn
-zbbRovYoCOMGoD9twMPV8/NIh1pdmfn0rSCmHZAAfXiNiukTPBPiSrSTcI8XX9Ct
-u+YN7A4eL10u2EcPT4f7p4XOoxXPzbSZpebinBq7GqkxWmvXnfzzQkaQ+/FaQY5T
-EBmLeh3xEP+Eo6jXY/fvX1O2dppmnerSWtTlYlnr3b/uLn6O66P5Yl6v4hIb/QFB
-OqIiPybS58zp8Kjb9invVIdxp75LpQZ7sZKRyv803uyQvMiuoFIRKKXoPpruGpEG
-ySJeVOqB9g7XxlNrm45TYrL9srbSyA==
-=atZn
------END PGP SIGNATURE-----
-
---ZFTR1sPdKbp0IBeCpWDc1lA1gY9qNEQM3--
+On 5/14/20 1:27 PM, Li Feng wrote:
+> Dear all,
+> 
+> I have encountered a weird crash.
+> I remember before a few days it works well and I rebase my code from upstream.
+> 
+> This is the command:
+> /root/qemu-master/x86_64-softmmu/qemu-system-x86_64 -enable-kvm
+> -device virtio-balloon -cpu host -smp 4 -m 2G -drive
+> file=/root/html/fedora-10g.img,format=raw,cache=none,aio=native,if=none,id=drive-virtio-disk1
+> -device virtio-blk-pci,scsi=off,drive=drive-virtio-disk1,id=virtio-disk1,bootindex=1
+> -device virtio-net,netdev=nw1,mac=00:11:22:EE:EE:10 -netdev
+> tap,id=nw1,script=no,downscript=no,ifname=tap0 -serial mon:stdio
+> -nographic -object
+> memory-backend-file,id=mem0,size=2G,mem-path=/dev/hugepages,share=on
+> -numa node,memdev=mem0 -vnc 0.0.0.0:100 -machine usb=on,nvdimm -device
+> usb-tablet -monitor unix:///tmp/a.socket,server,nowait -device
+> virtio-serial-pci,id=virtio-serial0,max_ports=16 -chardev
+> socket,id=channel1,path=/tmp/helloworld1,server,nowait -device
+> virtserialport,chardev=channel1,name=com.redhat.rhevm.vdsm1,bus=virtio-serial0.0,id=port1
+> -qmp tcp:0.0.0.0:2234,server,nowait
+> qemu-system-x86_64: error: failed to set MSR 0x48f to 0x7fefff00036dfb
+> qemu-system-x86_64: /root/qemu-master/target/i386/kvm.c:2695:
+> kvm_buf_set_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed.
+> 
+> This is the commit record:
+> *   c88f1ffc19 - (origin/master, origin/HEAD) Merge remote-tracking
+> branch 'remotes/kevin/tags/for-upstream' into staging (3 days ago)
+> <Peter Maydell>
+> |\
+> | * 47e0b38a13 - block: Drop unused .bdrv_has_zero_init_truncate (3
+> days ago) <Eric Blake>
+> | * dbc636e791 - vhdx: Rework truncation logic (3 days ago) <Eric Blake>
+> | * bda4cdcbb9 - parallels: Rework truncation logic (3 days ago) <Eric Blake>
+> | * be9c9404db - ssh: Support BDRV_REQ_ZERO_WRITE for truncate (3 days
+> ago) <Eric Blake>
+> | * fec00559e7 - sheepdog: Support BDRV_REQ_ZERO_WRITE for truncate (3
+> days ago) <Eric Blake>
+> | * 2f98910d5b - rbd: Support BDRV_REQ_ZERO_WRITE for truncate (3 days
+> ago) <Eric Blake>
+> 
+> I run this qemu in a VM base on EXSi.
+> 
+> Does anyone have the same issue?
+> 
+> Thanks,
+> 
+> Feng Li
+> 
 
 
