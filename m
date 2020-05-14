@@ -2,83 +2,84 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-14.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 035E7C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:36:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF98FC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:37:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE6482074A
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:36:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B3F10205CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:37:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="shm73zUr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE6482074A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eSSNpvet"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3F10205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZEya-0006Za-QF
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:36:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39582)
+	id 1jZEzJ-0007yj-Mx
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:37:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39576)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZEkU-0003UX-3S
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:11 -0400
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:55895)
+ id 1jZEkS-0003Tn-7t
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:09 -0400
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:38662)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZEkP-0005j0-87
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:09 -0400
-Received: by mail-wm1-x32c.google.com with SMTP id f13so2231197wmc.5
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:22:04 -0700 (PDT)
+ id 1jZEkQ-0005kR-7I
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:07 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id e1so4370931wrt.5
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:22:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=MdcTI/rl5C0T34P66Bf2339mKZikYaOI25Vw6yFmsUU=;
- b=shm73zUrM5UwewE1y40RNlF0PYJVF0CCDx52kg4+TIeTC0XVrVcV3gnigKB0p0bdu/
- 1ODB4nIxHPfXIaIgwiZzZSMk7h0ZZ+D9emSZGDJp5rZbQhIHwvSE7VANTFCvNZEIn8hF
- hWop6q1AFt32pcVnvtWD1oWwHtfN49GW7HkcmzE+k84b+Q7pu/rCQSPdXnk3IlBe7ugb
- i1vHYUIjEUKQzfHbqhv2tp/lAINrZ9LmohZqYbkulzS1fjgYu9niVMgas14bZvP8HOwV
- ks8pHOjbQAAyl0O8EvUz6i9+szLycptNH9g7zOZi+pVPsDVRWWaUA0xHKnmVTzNQemOp
- 3VDA==
+ bh=m1cXMEf819ei0U9NxDaXvIBey1vkQdupb4YJ8Nj4HNU=;
+ b=eSSNpvethVRCEgZs+uB9BPymtY73p09YTrQKlPQOMfmXOz18IyTfxTDVHg7Q2yLFHD
+ oBThL9DjJMQm+qhXHGVdZ2tW8zMOJ4zVPY31X9wbC1w6lC8JjY0xsjLtg/B3vqYsE+MK
+ j45riPNYUZ9LNE3d+Cz55ITZXSOs243bVIOdB7e3YyAmijrS9zJsmkLJYiXecI0uvK6L
+ Apmy1pymft2wUeU3J7lc35hvjWF80HbSxYSczD4nxhrC0wN9dm4MV8pGDNPGY6LkXLEN
+ lrN+yyd2ijdfFkK4gAamtUKXUUkGoZ9WDexezVW7hWJ9xAdw+9GY8odOAnJ80SXfM9dA
+ N22A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=MdcTI/rl5C0T34P66Bf2339mKZikYaOI25Vw6yFmsUU=;
- b=uYWkjzKGFJig+URYTuQjSHV3hECYa1NGEHsQ+mSJPALPzFXDl0sdPSwWD17ijmZN+V
- tcikuaeYaiN0uUuf7Ags3n4M7gkuyOZjELBJWwIDnvlN8hbbdV3a09wO9Ya3i0FXQvqS
- HusX9Daa2g60W87LC803aF/r9oV9hubIHKM5x6UVgyUOIccASmdL0oBxk4t8/nDdRHxk
- +og/S9wOF7XMv/1UVjboUjFyG3DPV/UNC41pElvdr/NqXa559FhQ0SQ8eHpysTUc1NJD
- BOY5TTniZkpDuXkK+dtdP+OkrxbOE39CJ48EVytEA5KlqC5UW1Npi043rlizcGjLOGnP
- 6zug==
-X-Gm-Message-State: AGi0PuYZ09H3gHNQxWW9SIACf6YUn8OMEpZ7PGH9LYrXp8t6CONZ++JE
- HQ22AwPF5oqijaM/UxPw60+sjm6Cu+LTdA==
-X-Google-Smtp-Source: APiQypI2DlPuv/zjsyYmSweEXvf+fDBroFEBhdki8b9CYusM/Eylv5KA0+2OrhrxD1WaR91DTrjV/Q==
-X-Received: by 2002:a7b:c3d2:: with SMTP id t18mr40757362wmj.100.1589466123326; 
- Thu, 14 May 2020 07:22:03 -0700 (PDT)
+ bh=m1cXMEf819ei0U9NxDaXvIBey1vkQdupb4YJ8Nj4HNU=;
+ b=E0/VH0kDzdQR9Pxf8Uf1Z5GqDq6QZeNYF0UBxIyuGA1XVSCX6Pst1qtBX9MwhR3D2m
+ W4w3Z7WmCelsXhcxh7wIX/+natw7jme84QGuXbkU8c+XioQUYBPR0TEyK9OgQqkacWpd
+ 1NMrQABPEFW3KWoNxuACQUcb2C7mg+oeQ3YBwe6ZmJI3z0SVAfe0yb6kYoCJA+L2rw90
+ O6t7JRNcBRjX6mO7GsdbfBB0MOiF9GuSLNmORAcPZ2fD5v1wl7teOWwzXrlWUcLQ5Vlm
+ 8o8zdxzaCKjsacOwmnJUlIx/KrsVagn15bGKX0C3O8X6eYm4LodEF7Eo2f9q9Rx2c56b
+ /JEQ==
+X-Gm-Message-State: AOAM532PCmh6CegDRPs7dXqwMI4Ox25T0PEvYcXmequidX7sjdoPAxuk
+ eqkmhESW3qmTXpy2yuC9gn2uF+wSN01EKQ==
+X-Google-Smtp-Source: ABdhPJwwzfCkgNFM8/IMo2RPngAGbfCnphc12XKSfT2gCQK+errDeqMqFX7Zb23O8sQIjzuNAqn/jA==
+X-Received: by 2002:a5d:5189:: with SMTP id k9mr5666294wrv.3.1589466124576;
+ Thu, 14 May 2020 07:22:04 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 88sm4077443wrq.77.2020.05.14.07.22.01
+ by smtp.gmail.com with ESMTPSA id 88sm4077443wrq.77.2020.05.14.07.22.03
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 14 May 2020 07:22:02 -0700 (PDT)
+ Thu, 14 May 2020 07:22:03 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 17/45] target/arm: Vectorize SABA/UABA
-Date: Thu, 14 May 2020 15:21:10 +0100
-Message-Id: <20200514142138.20875-18-peter.maydell@linaro.org>
+Subject: [PULL 18/45] aspeed: Add support for the sonorapass-bmc board
+Date: Thu, 14 May 2020 15:21:11 +0100
+Message-Id: <20200514142138.20875-19-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200514142138.20875-1-peter.maydell@linaro.org>
 References: <20200514142138.20875-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32c.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,321 +105,136 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Patrick Williams <patrick@stwcx.xyz>
 
-Include 64-bit element size in preparation for SVE2.
+Sonora Pass is a 2 socket x86 motherboard designed by Facebook
+and supported by OpenBMC.  Strapping configuration was obtained
+from hardware and i2c configuration is based on dts found at:
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200513163245.17915-17-richard.henderson@linaro.org
+https://github.com/facebook/openbmc-linux/blob/1633c87b8ba7c162095787c988979b748ba65dc8/arch/arm/boot/dts/aspeed-bmc-facebook-sonorapass.dts
+
+Booted a test image of http://github.com/facebook/openbmc to login
+prompt.
+
+Signed-off-by: Patrick Williams <patrick@stwcx.xyz>
+Reviewed-by: Amithash Prasad <amithash@fb.com>
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+[PMM: fixed block comment style nit]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.h        |  17 +++--
- target/arm/translate.h     |   5 ++
- target/arm/neon_helper.c   |  10 ---
- target/arm/translate-a64.c |  17 ++---
- target/arm/translate.c     | 134 +++++++++++++++++++++++++++++++++++--
- target/arm/vec_helper.c    |  24 +++++++
- 6 files changed, 174 insertions(+), 33 deletions(-)
+ hw/arm/aspeed.c | 78 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 78 insertions(+)
 
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 4678d3a6f4e..1857f4ee46a 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -284,13 +284,6 @@ DEF_HELPER_2(neon_pmax_s8, i32, i32, i32)
- DEF_HELPER_2(neon_pmax_u16, i32, i32, i32)
- DEF_HELPER_2(neon_pmax_s16, i32, i32, i32)
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index 1eacb2fc172..4d57d1e4363 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -73,6 +73,21 @@ struct AspeedBoardState {
+         SCU_AST2500_HW_STRAP_ACPI_ENABLE |                              \
+         SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER))
  
--DEF_HELPER_2(neon_abd_u8, i32, i32, i32)
--DEF_HELPER_2(neon_abd_s8, i32, i32, i32)
--DEF_HELPER_2(neon_abd_u16, i32, i32, i32)
--DEF_HELPER_2(neon_abd_s16, i32, i32, i32)
--DEF_HELPER_2(neon_abd_u32, i32, i32, i32)
--DEF_HELPER_2(neon_abd_s32, i32, i32, i32)
--
- DEF_HELPER_2(neon_shl_u16, i32, i32, i32)
- DEF_HELPER_2(neon_shl_s16, i32, i32, i32)
- DEF_HELPER_2(neon_rshl_u8, i32, i32, i32)
-@@ -741,6 +734,16 @@ DEF_HELPER_FLAGS_4(gvec_uabd_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(gvec_uabd_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(gvec_uabd_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- 
-+DEF_HELPER_FLAGS_4(gvec_saba_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_saba_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_saba_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_saba_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++/* Sonorapass hardware value: 0xF100D216 */
++#define SONORAPASS_BMC_HW_STRAP1 (                                      \
++        SCU_AST2500_HW_STRAP_SPI_AUTOFETCH_ENABLE |                     \
++        SCU_AST2500_HW_STRAP_GPIO_STRAP_ENABLE |                        \
++        SCU_AST2500_HW_STRAP_UART_DEBUG |                               \
++        SCU_AST2500_HW_STRAP_RESERVED28 |                               \
++        SCU_AST2500_HW_STRAP_DDR4_ENABLE |                              \
++        SCU_HW_STRAP_VGA_CLASS_CODE |                                   \
++        SCU_HW_STRAP_LPC_RESET_PIN |                                    \
++        SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER) |                \
++        SCU_AST2500_HW_STRAP_SET_AXI_AHB_RATIO(AXI_AHB_RATIO_2_1) |     \
++        SCU_HW_STRAP_VGA_BIOS_ROM |                                     \
++        SCU_HW_STRAP_VGA_SIZE_SET(VGA_16M_DRAM) |                       \
++        SCU_AST2500_HW_STRAP_RESERVED1)
 +
-+DEF_HELPER_FLAGS_4(gvec_uaba_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_uaba_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_uaba_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_uaba_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+
- #ifdef TARGET_AARCH64
- #include "helper-a64.h"
- #include "helper-sve.h"
-diff --git a/target/arm/translate.h b/target/arm/translate.h
-index bbfe3d13930..c937dfe9bf0 100644
---- a/target/arm/translate.h
-+++ b/target/arm/translate.h
-@@ -342,6 +342,11 @@ void gen_gvec_sabd(unsigned vece, uint32_t rd_ofs, uint32_t rn_ofs,
- void gen_gvec_uabd(unsigned vece, uint32_t rd_ofs, uint32_t rn_ofs,
-                    uint32_t rm_ofs, uint32_t opr_sz, uint32_t max_sz);
- 
-+void gen_gvec_saba(unsigned vece, uint32_t rd_ofs, uint32_t rn_ofs,
-+                   uint32_t rm_ofs, uint32_t opr_sz, uint32_t max_sz);
-+void gen_gvec_uaba(unsigned vece, uint32_t rd_ofs, uint32_t rn_ofs,
-+                   uint32_t rm_ofs, uint32_t opr_sz, uint32_t max_sz);
-+
- /*
-  * Forward to the isar_feature_* tests given a DisasContext pointer.
-  */
-diff --git a/target/arm/neon_helper.c b/target/arm/neon_helper.c
-index 448be93fa12..2ef75e04c83 100644
---- a/target/arm/neon_helper.c
-+++ b/target/arm/neon_helper.c
-@@ -576,16 +576,6 @@ NEON_POP(pmax_s16, neon_s16, 2)
- NEON_POP(pmax_u16, neon_u16, 2)
- #undef NEON_FN
- 
--#define NEON_FN(dest, src1, src2) \
--    dest = (src1 > src2) ? (src1 - src2) : (src2 - src1)
--NEON_VOP(abd_s8, neon_s8, 4)
--NEON_VOP(abd_u8, neon_u8, 4)
--NEON_VOP(abd_s16, neon_s16, 2)
--NEON_VOP(abd_u16, neon_u16, 2)
--NEON_VOP(abd_s32, neon_s32, 1)
--NEON_VOP(abd_u32, neon_u32, 1)
--#undef NEON_FN
--
- #define NEON_FN(dest, src1, src2) do { \
-     int8_t tmp; \
-     tmp = (int8_t)src2; \
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 54b06553a65..991e451644c 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -11197,6 +11197,13 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
-             gen_gvec_fn3(s, is_q, rd, rn, rm, gen_gvec_sabd, size);
-         }
-         return;
-+    case 0xf: /* SABA, UABA */
-+        if (u) {
-+            gen_gvec_fn3(s, is_q, rd, rn, rm, gen_gvec_uaba, size);
-+        } else {
-+            gen_gvec_fn3(s, is_q, rd, rn, rm, gen_gvec_saba, size);
-+        }
-+        return;
-     case 0x10: /* ADD, SUB */
-         if (u) {
-             gen_gvec_fn3(s, is_q, rd, rn, rm, tcg_gen_gvec_sub, size);
-@@ -11329,16 +11336,6 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
-                 genenvfn = fns[size][u];
-                 break;
-             }
--            case 0xf: /* SABA, UABA */
--            {
--                static NeonGenTwoOpFn * const fns[3][2] = {
--                    { gen_helper_neon_abd_s8, gen_helper_neon_abd_u8 },
--                    { gen_helper_neon_abd_s16, gen_helper_neon_abd_u16 },
--                    { gen_helper_neon_abd_s32, gen_helper_neon_abd_u32 },
--                };
--                genfn = fns[size][u];
--                break;
--            }
-             case 0x16: /* SQDMULH, SQRDMULH */
-             {
-                 static NeonGenTwoOpEnvFn * const fns[2][2] = {
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index d288721c230..e3d37ef2e99 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -5222,6 +5222,124 @@ void gen_gvec_uabd(unsigned vece, uint32_t rd_ofs, uint32_t rn_ofs,
-     tcg_gen_gvec_3(rd_ofs, rn_ofs, rm_ofs, opr_sz, max_sz, &ops[vece]);
+ /* Swift hardware value: 0xF11AD206 */
+ #define SWIFT_BMC_HW_STRAP1 (                                           \
+         AST2500_HW_STRAP1_DEFAULTS |                                    \
+@@ -437,6 +452,50 @@ static void swift_bmc_i2c_init(AspeedBoardState *bmc)
+     i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 12), "tmp105", 0x4a);
  }
  
-+static void gen_saba_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
++static void sonorapass_bmc_i2c_init(AspeedBoardState *bmc)
 +{
-+    TCGv_i32 t = tcg_temp_new_i32();
-+    gen_sabd_i32(t, a, b);
-+    tcg_gen_add_i32(d, d, t);
-+    tcg_temp_free_i32(t);
++    AspeedSoCState *soc = &bmc->soc;
++
++    /* bus 2 : */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 2), "tmp105", 0x48);
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 2), "tmp105", 0x49);
++    /* bus 2 : pca9546 @ 0x73 */
++
++    /* bus 3 : pca9548 @ 0x70 */
++
++    /* bus 4 : */
++    uint8_t *eeprom4_54 = g_malloc0(8 * 1024);
++    smbus_eeprom_init_one(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), 0x54,
++                          eeprom4_54);
++    /* PCA9539 @ 0x76, but PCA9552 is compatible */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), "pca9552", 0x76);
++    /* PCA9539 @ 0x77, but PCA9552 is compatible */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), "pca9552", 0x77);
++
++    /* bus 6 : */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 6), "tmp105", 0x48);
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 6), "tmp105", 0x49);
++    /* bus 6 : pca9546 @ 0x73 */
++
++    /* bus 8 : */
++    uint8_t *eeprom8_56 = g_malloc0(8 * 1024);
++    smbus_eeprom_init_one(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 8), 0x56,
++                          eeprom8_56);
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 8), "pca9552", 0x60);
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 8), "pca9552", 0x61);
++    /* bus 8 : adc128d818 @ 0x1d */
++    /* bus 8 : adc128d818 @ 0x1f */
++
++    /*
++     * bus 13 : pca9548 @ 0x71
++     *      - channel 3:
++     *          - tmm421 @ 0x4c
++     *          - tmp421 @ 0x4e
++     *          - tmp421 @ 0x4f
++     */
++
 +}
 +
-+static void gen_saba_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
-+{
-+    TCGv_i64 t = tcg_temp_new_i64();
-+    gen_sabd_i64(t, a, b);
-+    tcg_gen_add_i64(d, d, t);
-+    tcg_temp_free_i64(t);
-+}
-+
-+static void gen_saba_vec(unsigned vece, TCGv_vec d, TCGv_vec a, TCGv_vec b)
-+{
-+    TCGv_vec t = tcg_temp_new_vec_matching(d);
-+    gen_sabd_vec(vece, t, a, b);
-+    tcg_gen_add_vec(vece, d, d, t);
-+    tcg_temp_free_vec(t);
-+}
-+
-+void gen_gvec_saba(unsigned vece, uint32_t rd_ofs, uint32_t rn_ofs,
-+                   uint32_t rm_ofs, uint32_t opr_sz, uint32_t max_sz)
-+{
-+    static const TCGOpcode vecop_list[] = {
-+        INDEX_op_sub_vec, INDEX_op_add_vec,
-+        INDEX_op_smin_vec, INDEX_op_smax_vec, 0
-+    };
-+    static const GVecGen3 ops[4] = {
-+        { .fniv = gen_saba_vec,
-+          .fno = gen_helper_gvec_saba_b,
-+          .opt_opc = vecop_list,
-+          .load_dest = true,
-+          .vece = MO_8 },
-+        { .fniv = gen_saba_vec,
-+          .fno = gen_helper_gvec_saba_h,
-+          .opt_opc = vecop_list,
-+          .load_dest = true,
-+          .vece = MO_16 },
-+        { .fni4 = gen_saba_i32,
-+          .fniv = gen_saba_vec,
-+          .fno = gen_helper_gvec_saba_s,
-+          .opt_opc = vecop_list,
-+          .load_dest = true,
-+          .vece = MO_32 },
-+        { .fni8 = gen_saba_i64,
-+          .fniv = gen_saba_vec,
-+          .fno = gen_helper_gvec_saba_d,
-+          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
-+          .opt_opc = vecop_list,
-+          .load_dest = true,
-+          .vece = MO_64 },
-+    };
-+    tcg_gen_gvec_3(rd_ofs, rn_ofs, rm_ofs, opr_sz, max_sz, &ops[vece]);
-+}
-+
-+static void gen_uaba_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
-+{
-+    TCGv_i32 t = tcg_temp_new_i32();
-+    gen_uabd_i32(t, a, b);
-+    tcg_gen_add_i32(d, d, t);
-+    tcg_temp_free_i32(t);
-+}
-+
-+static void gen_uaba_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
-+{
-+    TCGv_i64 t = tcg_temp_new_i64();
-+    gen_uabd_i64(t, a, b);
-+    tcg_gen_add_i64(d, d, t);
-+    tcg_temp_free_i64(t);
-+}
-+
-+static void gen_uaba_vec(unsigned vece, TCGv_vec d, TCGv_vec a, TCGv_vec b)
-+{
-+    TCGv_vec t = tcg_temp_new_vec_matching(d);
-+    gen_uabd_vec(vece, t, a, b);
-+    tcg_gen_add_vec(vece, d, d, t);
-+    tcg_temp_free_vec(t);
-+}
-+
-+void gen_gvec_uaba(unsigned vece, uint32_t rd_ofs, uint32_t rn_ofs,
-+                   uint32_t rm_ofs, uint32_t opr_sz, uint32_t max_sz)
-+{
-+    static const TCGOpcode vecop_list[] = {
-+        INDEX_op_sub_vec, INDEX_op_add_vec,
-+        INDEX_op_umin_vec, INDEX_op_umax_vec, 0
-+    };
-+    static const GVecGen3 ops[4] = {
-+        { .fniv = gen_uaba_vec,
-+          .fno = gen_helper_gvec_uaba_b,
-+          .opt_opc = vecop_list,
-+          .load_dest = true,
-+          .vece = MO_8 },
-+        { .fniv = gen_uaba_vec,
-+          .fno = gen_helper_gvec_uaba_h,
-+          .opt_opc = vecop_list,
-+          .load_dest = true,
-+          .vece = MO_16 },
-+        { .fni4 = gen_uaba_i32,
-+          .fniv = gen_uaba_vec,
-+          .fno = gen_helper_gvec_uaba_s,
-+          .opt_opc = vecop_list,
-+          .load_dest = true,
-+          .vece = MO_32 },
-+        { .fni8 = gen_uaba_i64,
-+          .fniv = gen_uaba_vec,
-+          .fno = gen_helper_gvec_uaba_d,
-+          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
-+          .opt_opc = vecop_list,
-+          .load_dest = true,
-+          .vece = MO_64 },
-+    };
-+    tcg_gen_gvec_3(rd_ofs, rn_ofs, rm_ofs, opr_sz, max_sz, &ops[vece]);
-+}
-+
- /* Translate a NEON data processing instruction.  Return nonzero if the
-    instruction is invalid.
-    We process data in a mixture of 32-bit and 64-bit chunks.
-@@ -5366,6 +5484,16 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-             }
-             return 0;
+ static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
+ {
+     AspeedSoCState *soc = &bmc->soc;
+@@ -549,6 +608,21 @@ static void aspeed_machine_romulus_class_init(ObjectClass *oc, void *data)
+     mc->default_ram_size       = 512 * MiB;
+ };
  
-+        case NEON_3R_VABA:
-+            if (u) {
-+                gen_gvec_uaba(size, rd_ofs, rn_ofs, rm_ofs,
-+                              vec_size, vec_size);
-+            } else {
-+                gen_gvec_saba(size, rd_ofs, rn_ofs, rm_ofs,
-+                              vec_size, vec_size);
-+            }
-+            return 0;
++static void aspeed_machine_sonorapass_class_init(ObjectClass *oc, void *data)
++{
++    MachineClass *mc = MACHINE_CLASS(oc);
++    AspeedMachineClass *amc = ASPEED_MACHINE_CLASS(oc);
 +
-         case NEON_3R_VADD_VSUB:
-         case NEON_3R_LOGIC:
-         case NEON_3R_VMAX:
-@@ -5510,12 +5638,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-         case NEON_3R_VQRSHL:
-             GEN_NEON_INTEGER_OP_ENV(qrshl);
-             break;
--        case NEON_3R_VABA:
--            GEN_NEON_INTEGER_OP(abd);
--            tcg_temp_free_i32(tmp2);
--            tmp2 = neon_load_reg(rd, pass);
--            gen_neon_add(size, tmp, tmp2);
--            break;
-         case NEON_3R_VPMAX:
-             GEN_NEON_INTEGER_OP(pmax);
-             break;
-diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
-index a4972d02fc9..fa33df859e5 100644
---- a/target/arm/vec_helper.c
-+++ b/target/arm/vec_helper.c
-@@ -1431,3 +1431,27 @@ DO_ABD(gvec_uabd_s, uint32_t)
- DO_ABD(gvec_uabd_d, uint64_t)
- 
- #undef DO_ABD
++    mc->desc       = "OCP SonoraPass BMC (ARM1176)";
++    amc->soc_name  = "ast2500-a1";
++    amc->hw_strap1 = SONORAPASS_BMC_HW_STRAP1;
++    amc->fmc_model = "mx66l1g45g";
++    amc->spi_model = "mx66l1g45g";
++    amc->num_cs    = 2;
++    amc->i2c_init  = sonorapass_bmc_i2c_init;
++    mc->default_ram_size       = 512 * MiB;
++};
 +
-+#define DO_ABA(NAME, TYPE)                                      \
-+void HELPER(NAME)(void *vd, void *vn, void *vm, uint32_t desc)  \
-+{                                                               \
-+    intptr_t i, opr_sz = simd_oprsz(desc);                      \
-+    TYPE *d = vd, *n = vn, *m = vm;                             \
-+                                                                \
-+    for (i = 0; i < opr_sz / sizeof(TYPE); ++i) {               \
-+        d[i] += n[i] < m[i] ? m[i] - n[i] : n[i] - m[i];        \
-+    }                                                           \
-+    clear_tail(d, opr_sz, simd_maxsz(desc));                    \
-+}
-+
-+DO_ABA(gvec_saba_b, int8_t)
-+DO_ABA(gvec_saba_h, int16_t)
-+DO_ABA(gvec_saba_s, int32_t)
-+DO_ABA(gvec_saba_d, int64_t)
-+
-+DO_ABA(gvec_uaba_b, uint8_t)
-+DO_ABA(gvec_uaba_h, uint16_t)
-+DO_ABA(gvec_uaba_s, uint32_t)
-+DO_ABA(gvec_uaba_d, uint64_t)
-+
-+#undef DO_ABA
+ static void aspeed_machine_swift_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -628,6 +702,10 @@ static const TypeInfo aspeed_machine_types[] = {
+         .name          = MACHINE_TYPE_NAME("swift-bmc"),
+         .parent        = TYPE_ASPEED_MACHINE,
+         .class_init    = aspeed_machine_swift_class_init,
++    }, {
++        .name          = MACHINE_TYPE_NAME("sonorapass-bmc"),
++        .parent        = TYPE_ASPEED_MACHINE,
++        .class_init    = aspeed_machine_sonorapass_class_init,
+     }, {
+         .name          = MACHINE_TYPE_NAME("witherspoon-bmc"),
+         .parent        = TYPE_ASPEED_MACHINE,
 -- 
 2.20.1
 
