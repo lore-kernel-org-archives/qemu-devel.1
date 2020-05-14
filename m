@@ -6,42 +6,43 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7E15C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 04:56:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BC25C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 04:56:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8326206C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 04:56:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8326206C0
+	by mail.kernel.org (Postfix) with ESMTPS id 749A1205CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 04:56:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 749A1205CB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ5v2-00022o-QX
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 00:56:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56756)
+	id 1jZ5v5-00025p-KO
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 00:56:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56720)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jZ5lu-0001fj-4X; Thu, 14 May 2020 00:47:02 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:43880)
+ id 1jZ5lr-0001X7-FJ; Thu, 14 May 2020 00:46:59 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:43830)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jZ5lr-0003le-Vy; Thu, 14 May 2020 00:47:01 -0400
+ id 1jZ5lq-0003l9-GC; Thu, 14 May 2020 00:46:59 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 52562BFE52;
- Thu, 14 May 2020 04:46:37 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 8D6B5BFE3B;
+ Thu, 14 May 2020 04:46:34 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v6 18/20] hw/block/nvme: factor out pmr setup
-Date: Thu, 14 May 2020 06:46:09 +0200
-Message-Id: <20200514044611.734782-19-its@irrelevant.dk>
+Subject: [PATCH v6 11/20] hw/block/nvme: factor out property/constraint checks
+Date: Thu, 14 May 2020 06:46:02 +0200
+Message-Id: <20200514044611.734782-12-its@irrelevant.dk>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200514044611.734782-1-its@irrelevant.dk>
 References: <20200514044611.734782-1-its@irrelevant.dk>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
  helo=charlie.dont.surf
@@ -77,131 +78,93 @@ Sender: "Qemu-devel"
 From: Klaus Jensen <k.jensen@samsung.com>
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Keith Busch <kbusch@kernel.org>
 ---
- hw/block/nvme.c | 95 ++++++++++++++++++++++++++-----------------------
- 1 file changed, 51 insertions(+), 44 deletions(-)
+ hw/block/nvme.c | 48 ++++++++++++++++++++++++++++++------------------
+ 1 file changed, 30 insertions(+), 18 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index d71a5f142d51..7254b66ae199 100644
+index e93ed729aef5..1d4fbba9c5da 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -58,6 +58,7 @@
- #define NVME_REG_SIZE 0x1000
- #define NVME_DB_SIZE  4
- #define NVME_CMB_BIR 2
-+#define NVME_PMR_BIR 2
+@@ -1356,24 +1356,19 @@ static const MemoryRegionOps nvme_cmb_ops = {
+     },
+ };
  
- #define NVME_GUEST_ERR(trace, fmt, ...) \
-     do { \
-@@ -1463,6 +1464,55 @@ static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
-                      PCI_BASE_ADDRESS_MEM_PREFETCH, &n->ctrl_mem);
- }
- 
-+static void nvme_init_pmr(NvmeCtrl *n, PCIDevice *pci_dev)
-+{
-+    /* Controller Capabilities register */
-+    NVME_CAP_SET_PMRS(n->bar.cap, 1);
-+
-+    /* PMR Capabities register */
-+    n->bar.pmrcap = 0;
-+    NVME_PMRCAP_SET_RDS(n->bar.pmrcap, 0);
-+    NVME_PMRCAP_SET_WDS(n->bar.pmrcap, 0);
-+    NVME_PMRCAP_SET_BIR(n->bar.pmrcap, NVME_PMR_BIR);
-+    NVME_PMRCAP_SET_PMRTU(n->bar.pmrcap, 0);
-+    /* Turn on bit 1 support */
-+    NVME_PMRCAP_SET_PMRWBM(n->bar.pmrcap, 0x02);
-+    NVME_PMRCAP_SET_PMRTO(n->bar.pmrcap, 0);
-+    NVME_PMRCAP_SET_CMSS(n->bar.pmrcap, 0);
-+
-+    /* PMR Control register */
-+    n->bar.pmrctl = 0;
-+    NVME_PMRCTL_SET_EN(n->bar.pmrctl, 0);
-+
-+    /* PMR Status register */
-+    n->bar.pmrsts = 0;
-+    NVME_PMRSTS_SET_ERR(n->bar.pmrsts, 0);
-+    NVME_PMRSTS_SET_NRDY(n->bar.pmrsts, 0);
-+    NVME_PMRSTS_SET_HSTS(n->bar.pmrsts, 0);
-+    NVME_PMRSTS_SET_CBAI(n->bar.pmrsts, 0);
-+
-+    /* PMR Elasticity Buffer Size register */
-+    n->bar.pmrebs = 0;
-+    NVME_PMREBS_SET_PMRSZU(n->bar.pmrebs, 0);
-+    NVME_PMREBS_SET_RBB(n->bar.pmrebs, 0);
-+    NVME_PMREBS_SET_PMRWBZ(n->bar.pmrebs, 0);
-+
-+    /* PMR Sustained Write Throughput register */
-+    n->bar.pmrswtp = 0;
-+    NVME_PMRSWTP_SET_PMRSWTU(n->bar.pmrswtp, 0);
-+    NVME_PMRSWTP_SET_PMRSWTV(n->bar.pmrswtp, 0);
-+
-+    /* PMR Memory Space Control register */
-+    n->bar.pmrmsc = 0;
-+    NVME_PMRMSC_SET_CMSE(n->bar.pmrmsc, 0);
-+    NVME_PMRMSC_SET_CBA(n->bar.pmrmsc, 0);
-+
-+    pci_register_bar(pci_dev, NVME_PMRCAP_BIR(n->bar.pmrcap),
-+                     PCI_BASE_ADDRESS_SPACE_MEMORY |
-+                     PCI_BASE_ADDRESS_MEM_TYPE_64 |
-+                     PCI_BASE_ADDRESS_MEM_PREFETCH, &n->pmrdev->mr);
-+}
-+
- static void nvme_init_pci(NvmeCtrl *n, PCIDevice *pci_dev)
+-static void nvme_realize(PCIDevice *pci_dev, Error **errp)
++static void nvme_check_constraints(NvmeCtrl *n, Error **errp)
  {
-     uint8_t *pci_conf = pci_dev->config;
-@@ -1541,50 +1591,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-     if (n->params.cmb_size_mb) {
-         nvme_init_cmb(n, pci_dev);
-     } else if (n->pmrdev) {
--        /* Controller Capabilities register */
--        NVME_CAP_SET_PMRS(n->bar.cap, 1);
+-    NvmeCtrl *n = NVME(pci_dev);
+-    NvmeIdCtrl *id = &n->id_ctrl;
++    NvmeParams *params = &n->params;
+ 
+-    int i;
+-    int64_t bs_size;
+-    uint8_t *pci_conf;
 -
--        /* PMR Capabities register */
--        n->bar.pmrcap = 0;
--        NVME_PMRCAP_SET_RDS(n->bar.pmrcap, 0);
--        NVME_PMRCAP_SET_WDS(n->bar.pmrcap, 0);
--        NVME_PMRCAP_SET_BIR(n->bar.pmrcap, 2);
--        NVME_PMRCAP_SET_PMRTU(n->bar.pmrcap, 0);
--        /* Turn on bit 1 support */
--        NVME_PMRCAP_SET_PMRWBM(n->bar.pmrcap, 0x02);
--        NVME_PMRCAP_SET_PMRTO(n->bar.pmrcap, 0);
--        NVME_PMRCAP_SET_CMSS(n->bar.pmrcap, 0);
--
--        /* PMR Control register */
--        n->bar.pmrctl = 0;
--        NVME_PMRCTL_SET_EN(n->bar.pmrctl, 0);
--
--        /* PMR Status register */
--        n->bar.pmrsts = 0;
--        NVME_PMRSTS_SET_ERR(n->bar.pmrsts, 0);
--        NVME_PMRSTS_SET_NRDY(n->bar.pmrsts, 0);
--        NVME_PMRSTS_SET_HSTS(n->bar.pmrsts, 0);
--        NVME_PMRSTS_SET_CBAI(n->bar.pmrsts, 0);
--
--        /* PMR Elasticity Buffer Size register */
--        n->bar.pmrebs = 0;
--        NVME_PMREBS_SET_PMRSZU(n->bar.pmrebs, 0);
--        NVME_PMREBS_SET_RBB(n->bar.pmrebs, 0);
--        NVME_PMREBS_SET_PMRWBZ(n->bar.pmrebs, 0);
--
--        /* PMR Sustained Write Throughput register */
--        n->bar.pmrswtp = 0;
--        NVME_PMRSWTP_SET_PMRSWTU(n->bar.pmrswtp, 0);
--        NVME_PMRSWTP_SET_PMRSWTV(n->bar.pmrswtp, 0);
--
--        /* PMR Memory Space Control register */
--        n->bar.pmrmsc = 0;
--        NVME_PMRMSC_SET_CMSE(n->bar.pmrmsc, 0);
--        NVME_PMRMSC_SET_CBA(n->bar.pmrmsc, 0);
--
--        pci_register_bar(pci_dev, NVME_PMRCAP_BIR(n->bar.pmrcap),
--            PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64 |
--            PCI_BASE_ADDRESS_MEM_PREFETCH, &n->pmrdev->mr);
-+        nvme_init_pmr(n, pci_dev);
+-    if (n->params.num_queues) {
++    if (params->num_queues) {
+         warn_report("num_queues is deprecated; please use max_ioqpairs "
+                     "instead");
+ 
+-        n->params.max_ioqpairs = n->params.num_queues - 1;
++        params->max_ioqpairs = params->num_queues - 1;
      }
  
-     for (i = 0; i < n->num_namespaces; i++) {
+-    if (n->params.max_ioqpairs < 1 ||
+-        n->params.max_ioqpairs > PCI_MSIX_FLAGS_QSIZE) {
++    if (params->max_ioqpairs < 1 ||
++        params->max_ioqpairs > PCI_MSIX_FLAGS_QSIZE) {
+         error_setg(errp, "max_ioqpairs must be between 1 and %d",
+                    PCI_MSIX_FLAGS_QSIZE);
+         return;
+@@ -1384,13 +1379,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+         return;
+     }
+ 
+-    bs_size = blk_getlength(n->conf.blk);
+-    if (bs_size < 0) {
+-        error_setg(errp, "could not get backing file size");
+-        return;
+-    }
+-
+-    if (!n->params.serial) {
++    if (!params->serial) {
+         error_setg(errp, "serial property not set");
+         return;
+     }
+@@ -1410,6 +1399,29 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+ 
+         host_memory_backend_set_mapped(n->pmrdev, true);
+     }
++}
++
++static void nvme_realize(PCIDevice *pci_dev, Error **errp)
++{
++    NvmeCtrl *n = NVME(pci_dev);
++    NvmeIdCtrl *id = &n->id_ctrl;
++    Error *local_err = NULL;
++
++    int i;
++    int64_t bs_size;
++    uint8_t *pci_conf;
++
++    nvme_check_constraints(n, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    bs_size = blk_getlength(n->conf.blk);
++    if (bs_size < 0) {
++        error_setg(errp, "could not get backing file size");
++        return;
++    }
+ 
+     blkconf_blocksizes(&n->conf);
+     if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->conf.blk),
 -- 
 2.26.2
 
