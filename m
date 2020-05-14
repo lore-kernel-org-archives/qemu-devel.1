@@ -2,74 +2,95 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1A47C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:11:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1BC4C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:12:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD38E206D8
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:11:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8DD7C206D4
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:12:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gA5qrAYF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD38E206D8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WZ5NtuIW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DD7C206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ75q-0006ae-SO
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 02:11:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36666)
+	id 1jZ76B-0007IZ-PE
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 02:12:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ6pk-00063V-T4
- for qemu-devel@nongnu.org; Thu, 14 May 2020 01:55:04 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51630
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZ70y-0006SA-5N
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 02:06:40 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36862
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ6pi-0001mj-Rl
- for qemu-devel@nongnu.org; Thu, 14 May 2020 01:55:04 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZ70x-0003ux-Ck
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 02:06:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589435702;
+ s=mimecast20190719; t=1589436398;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lQgTC1NAlLzyKabzDAvHVB05mAI15cmOJ+EmihX/nkQ=;
- b=gA5qrAYFr8Y60qdQXh+Pi4EkK1O9sdDKY/wVXl84UhS7bFCgK27Qor2787JeiW/HA3tOgm
- v2cYduC5nwrHTmvb75wrBchUNc0DDIP4LwJ6IdxEEwzH6voSBBrEEGMlh/Si8GEL6y5hnx
- 0Cge3tivohBQ1dvhEBUg4e/deBrXtIQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-496-BEoKkuYpMfaWbFsVQezdLg-1; Thu, 14 May 2020 01:54:58 -0400
-X-MC-Unique: BEoKkuYpMfaWbFsVQezdLg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E59401841958;
- Thu, 14 May 2020 05:54:56 +0000 (UTC)
-Received: from probe.redhat.com (ovpn-113-9.rdu2.redhat.com [10.10.113.9])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 890C06A977;
- Thu, 14 May 2020 05:54:55 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH RFC 27/32] python//machine.py: Add _qmp access shim
-Date: Thu, 14 May 2020 01:53:58 -0400
-Message-Id: <20200514055403.18902-28-jsnow@redhat.com>
-In-Reply-To: <20200514055403.18902-1-jsnow@redhat.com>
+ bh=33ditrsyO39HI9CujDx1q5QCELt6a7U8fW17A+zaTeg=;
+ b=WZ5NtuIWQM6h/pRmPVUWb7z8r32PUpiuRQ/INfZR1ePYBVLTKJ5wqHdN/jCKTL3wKWjLqG
+ 7h4zLO7RYT0EdLCoEfNjllw8dkIqkAP+mym318PiYYTNMz2hj8Ef04Dt1qOrBs4nUz7Nqa
+ LIMriFZiA+tU+IknaYRKGQLsDWXQt68=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-138-BBxH2EaMMte2qq_2aOssmA-1; Thu, 14 May 2020 02:06:37 -0400
+X-MC-Unique: BBxH2EaMMte2qq_2aOssmA-1
+Received: by mail-wr1-f70.google.com with SMTP id z10so1023120wrs.2
+ for <qemu-devel@nongnu.org>; Wed, 13 May 2020 23:06:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=33ditrsyO39HI9CujDx1q5QCELt6a7U8fW17A+zaTeg=;
+ b=Oi9t8R4Jnbk7T/530LToHRLbu14ewfA2NfJbpEd2zjtgBfME5knEtuFvBVqYyGiz+4
+ rKvSyZgHbWergYsqb5W4HcePCV+Gs9htviorcfl1cTduxKn90SQhOwZCn+SssBx8Vvxs
+ fn0JWuCtirFknr0QRj5gLmFWasLqz1RYCGg2osfQP8Dvtq1SMRkGIKjOmqPHOAcS5UOZ
+ Zst0HncpBVKBSm0vHauAuAmH4P62l2fLbdsw2vei2NLZ1MR+oI3njwm8Rjgn00eIjIuk
+ p5kGJAkC4V5f8oHOWZnvFdEmXwYsXFN5hO/TuXLbCDt/Uub9wYF02W0QFQkqLGpwU/c7
+ rrEg==
+X-Gm-Message-State: AOAM530rQERIZcB4+fb+jaN5Pd1TefPe084BKFXyZmt+AeDgEtUhEQcm
+ xVI6kY+ard9Tep5ymjlakrHyCUZmQXP1aPUBEYtnt8RAALjQlwZCyQSaSj2q0P4zXLixiXirFI5
+ kvzuVYKMWlCcR6mc=
+X-Received: by 2002:adf:de05:: with SMTP id b5mr3318232wrm.299.1589436396101; 
+ Wed, 13 May 2020 23:06:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxy6O1sWAsJzVVbFpUQaImjd4jp9TnGmIlf5uwiE5Fq5CCfGPXYRhoLRrUwvi8uxRKlfNxd/g==
+X-Received: by 2002:adf:de05:: with SMTP id b5mr3318213wrm.299.1589436395868; 
+ Wed, 13 May 2020 23:06:35 -0700 (PDT)
+Received: from [192.168.1.39] (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id v5sm2324179wrr.93.2020.05.13.23.06.34
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 13 May 2020 23:06:35 -0700 (PDT)
+Subject: Re: [PATCH RFC 21/32] python//machine.py: remove logging configuration
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 References: <20200514055403.18902-1-jsnow@redhat.com>
+ <20200514055403.18902-22-jsnow@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <134b3341-4791-7a26-808a-36eddaf6a7d7@redhat.com>
+Date: Thu, 14 May 2020 08:06:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200514055403.18902-22-jsnow@redhat.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
@@ -95,61 +116,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Like many other Optional[] types, it's not always a given that this
-object will be set. Wrap it in a type-shim that raises a meaningful
-error and will always return a concrete type.
+On 5/14/20 7:53 AM, John Snow wrote:
+> Python 3.5 and above do not print a warning when logging is not
+> configured. As a library, it's best practice to leave logging
+> configuration to the client executable.
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>   python/qemu/lib/machine.py | 3 ---
+>   1 file changed, 3 deletions(-)
+> 
+> diff --git a/python/qemu/lib/machine.py b/python/qemu/lib/machine.py
+> index c31bf7cabb..e92afe8649 100644
+> --- a/python/qemu/lib/machine.py
+> +++ b/python/qemu/lib/machine.py
+> @@ -110,9 +110,6 @@ def __init__(self, binary, args=None, wrapper=None, name=None,
+>           self._console_socket = None
+>           self._remove_files = []
+>   
+> -        # just in case logging wasn't configured by the main script:
+> -        logging.basicConfig()
+> -
+>       def __enter__(self):
+>           return self
+>   
+> 
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- python/qemu/lib/machine.py | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/python/qemu/lib/machine.py b/python/qemu/lib/machine.py
-index 34e6b6f9e9..dfa8449b62 100644
---- a/python/qemu/lib/machine.py
-+++ b/python/qemu/lib/machine.py
-@@ -117,7 +117,7 @@ def __init__(self, binary, args=None, wrapper=None, name=None,
-         self._events = []
-         self._iolog = None
-         self._qmp_set = True   # Enable QMP monitor by default.
--        self._qmp = None
-+        self._qmp_connection: Optional[qmp.QEMUMonitorProtocol] = None
-         self._qemu_full_args = None
-         self._temp_dir = None
-         self._launched = False
-@@ -283,7 +283,7 @@ def _pre_launch(self):
-             if self._remove_monitor_sockfile:
-                 assert isinstance(self._monitor_address, str)
-                 self._remove_files.append(self._monitor_address)
--            self._qmp = qmp.QEMUMonitorProtocol(
-+            self._qmp_connection = qmp.QEMUMonitorProtocol(
-                 self._monitor_address,
-                 server=True,
-                 nickname=self._name
-@@ -416,7 +416,13 @@ def set_qmp_monitor(self, enabled=True):
-             self._qmp_set = True
-         else:
-             self._qmp_set = False
--            self._qmp = None
-+            self._qmp_connection = None
-+
-+    @property
-+    def _qmp(self) -> qmp.QEMUMonitorProtocol:
-+        if self._qmp_connection is None:
-+            raise QEMUMachineError("Attempt to access QMP with no connection")
-+        return self._qmp_connection
- 
-     @classmethod
-     def _qmp_args(cls, _conv_keys: bool = True, **args: Any) -> Dict[str, Any]:
--- 
-2.21.1
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 
