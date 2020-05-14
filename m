@@ -2,71 +2,88 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA70DC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 19:22:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A39A7C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 19:23:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4F2720643
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 19:22:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7067420643
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 19:23:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="gOnnuBmG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4F2720643
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yh69AKjp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7067420643
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZJRK-0008O6-AH
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 15:22:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57758)
+	id 1jZJRh-0000XV-Fk
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 15:23:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58072)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sstabellini@kernel.org>)
- id 1jZJOI-00046a-E5
- for qemu-devel@nongnu.org; Thu, 14 May 2020 15:19:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40072)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sstabellini@kernel.org>)
- id 1jZJOG-0006u0-OB
- for qemu-devel@nongnu.org; Thu, 14 May 2020 15:19:34 -0400
-Received: from localhost (c-67-164-102-47.hsd1.ca.comcast.net [67.164.102.47])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
- bits)) (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 3971220675;
- Thu, 14 May 2020 19:19:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1589483971;
- bh=kYeCBG5fCIh5Nhv5V9vc+cg3mRAQ2NDoWh6I0xC6Rtg=;
- h=Date:From:To:cc:Subject:In-Reply-To:References:From;
- b=gOnnuBmG+QLIs+qk3fZuu25R3PKx5t8WNs2WYNsaOyB+kZMhO03/T+zih2++xZgL/
- G51CKi7vLLfRFBJMYOg4gM55QKNDGPVexE1BFFHt1lfT2R/UuRE0MQ/QXiFk5TOWT4
- XVXTNgLyYuvCa/W7/6RveX30gBhEY7nZf6oTD8IY=
-Date: Thu, 14 May 2020 12:19:30 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-X-X-Sender: sstabellini@sstabellini-ThinkPad-T480s
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH 1/1] virtio-9pfs: don't truncate response
-In-Reply-To: <2cc8d6c4ae9fa8210c48c349b207dfb68cb15290.1589481482.git.qemu_oss@crudebyte.com>
-Message-ID: <alpine.DEB.2.21.2005141219170.26167@sstabellini-ThinkPad-T480s>
-References: <cover.1589481482.git.qemu_oss@crudebyte.com>
- <2cc8d6c4ae9fa8210c48c349b207dfb68cb15290.1589481482.git.qemu_oss@crudebyte.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jZJPp-0006nH-Ef
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 15:21:09 -0400
+Received: from mail-lj1-x22d.google.com ([2a00:1450:4864:20::22d]:39426)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
+ id 1jZJPo-0007Kc-MP
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 15:21:09 -0400
+Received: by mail-lj1-x22d.google.com with SMTP id u6so4787915ljl.6
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 12:21:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=nslBjmjjb5KYVHFB1WwajBujV0mgFXW5eqYEf7sSWeY=;
+ b=Yh69AKjp6AAhgOAvICC+xbVlN6k8ND1rRSsDIQ4iAispG9gyMvSTcqffj5N635G2mS
+ zJ+5dRl2Z3ZVll9gDNsWA4JvDo/xmlKk9QYYY8vboYAQRF7lTm3ClIxNduG6wyPO+vY+
+ Tr1w97iiWh2X3eqVmhK9uFD81SvaJGjFOXSfzhveP6KJIYo/cXvcTlrB8fTAZdnNFwqt
+ lmUJA/MdqqKS5RZxIpg3+Gy6iTHTKB3pA0WP4onkb2v9xlFofAtE2pWasKBinxnvyydT
+ Gk2F7h7rz2NBExsWGY4085F8fFGxlsqSAtTs+TCFIhKD+UxFIgM3uCADNwDTzRAxSGOl
+ IZxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=nslBjmjjb5KYVHFB1WwajBujV0mgFXW5eqYEf7sSWeY=;
+ b=BTzE/ag41EpAXqhAtwLt3Loe0QHY06e2UxqTCiQB/8MWyz18ckwCI/DSzILhn5x1J/
+ 5+2rdez80Fs5lk4s1iz91yHtOd9cFeDPHJzfuv19TPdmTRw/teHbIjfceRVbIzx64mrN
+ 1l1F1JZe9M6POx18Yfy92k4E53vwYk1d5Qmkfugghp8z1x/pueDnoEasHB1zVQ6aImKx
+ 2UupKxHwbUs1FM2oyx5KZx/2SPFKUZwCNDHg9S2tRmBw2HEQx25uLBnUX40pv+NrQ/eU
+ xTTSMPdwi+2naqy9UkXlXTjOuIUbZegqMxV8dMrNq8lWT4TO5QwwpwZYbUmX4cUGcW+N
+ TpXg==
+X-Gm-Message-State: AOAM531dCzjSMdcd9rTj/mcGscWSwsjPBbeBEdVhKr7MoCVqS/rnAeBP
+ hz9zNavqsn+M5T+NlnUddWSfzeh60zA=
+X-Google-Smtp-Source: ABdhPJyMGHEKaUhvKZHLCc1EAu+dxKa2240jX1KYIKTHWiQFb2GM3Iq3boRE2I62phfdE8clR9aW+w==
+X-Received: by 2002:a2e:b0d6:: with SMTP id g22mr3933360ljl.232.1589484066259; 
+ Thu, 14 May 2020 12:21:06 -0700 (PDT)
+Received: from localhost.localdomain ([109.245.227.98])
+ by smtp.gmail.com with ESMTPSA id h3sm2427257lfk.3.2020.05.14.12.21.04
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 14 May 2020 12:21:05 -0700 (PDT)
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 00/17] target/mips: FPU and other cleanups and improvements
+Date: Thu, 14 May 2020 21:20:30 +0200
+Message-Id: <20200514192047.5297-1-aleksandar.qemu.devel@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=198.145.29.99;
- envelope-from=sstabellini@kernel.org; helo=mail.kernel.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 15:19:31
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -70
-X-Spam_score: -7.1
-X-Spam_bar: -------
-X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::22d;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-lj1-x22d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,64 +96,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Anthony Perard <anthony.perard@citrix.com>,
- Stefano Stabellini <sstabellini@kernel.org>, Paul Durrant <paul@xen.org>,
- qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: aleksandar.rikalo@rt-rk.com,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 14 May 2020, Christian Schoenebeck wrote:
-> Commit SHA-1 16724a173049ac29c7b5ade741da93a0f46edff7 introduced
-> truncating the response to the currently available transport buffer size,
-> which was supposed to fix an 9pfs error on Xen boot where transport buffer
-> might still be smaller than required for response.
-> 
-> Unfortunately this change broke small reads (with less than 12 bytes).
-> 
-> To fix this introduced bug for virtio at least, let's revert this change
-> for the virtio transport. Unlike with Xen, we should never come into
-> this situation with virtio that the available transport buffer would be
-> too small for delivering any response to client. So truncating the buffer
-> is not necessary with virtio in the first place.
-> 
-> This bug still needs to be addressed for Xen appropriately though.
-> 
-> Fixes: 16724a173049ac29c7b5ade741da93a0f46edff7 (for virtio only)
-> Fixes: https://bugs.launchpad.net/bugs/1877688 (for virtio only)
-> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+This series contains mostly cosmetic FPU cleanups aimed to
+make source code recognition easier for tools like gdb, gcov,
+calgrind, and others.
 
-Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+There is also a patch that refactors conversion from ieee to
+mips fp exception flags. This refactoring will improve the
+performance of almost all fp-related mips instructions, albait
+very modestly (less that one percent).
 
+Finally, there is a patch that frees mips_malta.c from
+checkpatch warnings.
 
-> ---
->  hw/9pfs/virtio-9p-device.c | 7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
-> index 536447a355..bb6154945a 100644
-> --- a/hw/9pfs/virtio-9p-device.c
-> +++ b/hw/9pfs/virtio-9p-device.c
-> @@ -154,16 +154,13 @@ static void virtio_init_in_iov_from_pdu(V9fsPDU *pdu, struct iovec **piov,
->      VirtQueueElement *elem = v->elems[pdu->idx];
->      size_t buf_size = iov_size(elem->in_sg, elem->in_num);
->  
-> -    if (buf_size < P9_IOHDRSZ) {
-> +    if (buf_size < *size) {
->          VirtIODevice *vdev = VIRTIO_DEVICE(v);
->  
->          virtio_error(vdev,
-> -                     "VirtFS reply type %d needs %zu bytes, buffer has %zu, less than minimum",
-> +                     "VirtFS reply type %d needs %zu bytes, buffer has %zu",
->                       pdu->id + 1, *size, buf_size);
->      }
-> -    if (buf_size < *size) {
-> -        *size = buf_size;
-> -    }
->  
->      *piov = elem->in_sg;
->      *pniov = elem->in_num;
-> -- 
-> 2.20.1
-> 
+v1->v2:
+
+  - added more demacroing
+
+Aleksandar Markovic (17):
+  target/mips: fpu: Demacro ADD.<D|S|PS>
+  target/mips: fpu: Demacro SUB.<D|S|PS>
+  target/mips: fpu: Demacro MUL.<D|S|PS>
+  target/mips: fpu: Demacro DIV.<D|S|PS>
+  target/mips: fpu: Remove now unused macro FLOAT_BINOP
+  target/mips: fpu: Demacro MADD.<D|S|PS>
+  target/mips: fpu: Demacro MSUB.<D|S|PS>
+  target/mips: fpu: Demacro NMADD.<D|S|PS>
+  target/mips: fpu: Demacro NMSUB.<D|S|PS>
+  target/mips: fpu: Remove now unused UNFUSED_FMA and FLOAT_FMA macros
+  target/mips: fpu: Demacro CLASS.<D|S>
+  target/mips: fpu: Remove now unused FLOAT_CLASS macro
+  target/mips: fpu: Demacro RINT.<D|S>
+  target/mips: fpu: Remove now unused FLOAT_RINT macro
+  target/mips: fpu: Name better paired-single variables
+  target/mips: fpu: Refactor conversion from ieee to mips exception
+    flags
+  hw/mips: Convert Malta "ifdef 0"-ed code to comments
+
+ hw/mips/mips_malta.c     |  20 +-
+ target/mips/fpu_helper.c | 658 +++++++++++++++++++++++++++------------
+ target/mips/internal.h   |   1 -
+ target/mips/msa_helper.c |  77 +++--
+ 4 files changed, 517 insertions(+), 239 deletions(-)
+
+-- 
+2.20.1
+
 
