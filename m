@@ -2,84 +2,84 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF98FC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:37:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71E16C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:37:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3F10205CB
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:37:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1EF75205CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:37:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eSSNpvet"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3F10205CB
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uK8dFgCW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EF75205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZEzJ-0007yj-Mx
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:37:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39576)
+	id 1jZEzO-00087B-2U
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:37:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39546)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZEkS-0003Tn-7t
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:09 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:38662)
+ id 1jZEkO-0003PP-GP
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:04 -0400
+Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:38915)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZEkQ-0005kR-7I
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:07 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id e1so4370931wrt.5
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:22:05 -0700 (PDT)
+ id 1jZEkM-0005Zj-5C
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:22:04 -0400
+Received: by mail-wm1-x329.google.com with SMTP id w64so627531wmg.4
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:22:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=m1cXMEf819ei0U9NxDaXvIBey1vkQdupb4YJ8Nj4HNU=;
- b=eSSNpvethVRCEgZs+uB9BPymtY73p09YTrQKlPQOMfmXOz18IyTfxTDVHg7Q2yLFHD
- oBThL9DjJMQm+qhXHGVdZ2tW8zMOJ4zVPY31X9wbC1w6lC8JjY0xsjLtg/B3vqYsE+MK
- j45riPNYUZ9LNE3d+Cz55ITZXSOs243bVIOdB7e3YyAmijrS9zJsmkLJYiXecI0uvK6L
- Apmy1pymft2wUeU3J7lc35hvjWF80HbSxYSczD4nxhrC0wN9dm4MV8pGDNPGY6LkXLEN
- lrN+yyd2ijdfFkK4gAamtUKXUUkGoZ9WDexezVW7hWJ9xAdw+9GY8odOAnJ80SXfM9dA
- N22A==
+ bh=hzzAiO3Vub/o43zP20wgPt9TvxEC3lFhdZWB6wzCbkU=;
+ b=uK8dFgCWvfmLyy8q0bYzOS2apNuc6e1EfUaiZRrzAijkhzdTV4nQ8lhJGhzMEK7WpU
+ Q/4+YybQ0EsKE4YTVGUmATF/pjRuAFCw8os8pDT1GITB41+vv7Kn20CxZRR6M4mV8lAq
+ 4uLnGEH3NqkdXcIaVu3Ymgfiat+YF7PaxuvRlpKWTZoqd++eCqp8Du7zHBcWbTwH0Dxv
+ p+Z9Q67r/mR4DyUQR3q3YhJgYpUID5/dDuWJZwMtSn2w9Krc8z9NGZhQlpeX/+F91BMr
+ /eGEiszHQt2Kfcv0q1x7RBKq8bod1hGdNZteLIHxoZ5FX4INCZpF7wL8hzxaZPuAoO+4
+ Eyrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=m1cXMEf819ei0U9NxDaXvIBey1vkQdupb4YJ8Nj4HNU=;
- b=E0/VH0kDzdQR9Pxf8Uf1Z5GqDq6QZeNYF0UBxIyuGA1XVSCX6Pst1qtBX9MwhR3D2m
- W4w3Z7WmCelsXhcxh7wIX/+natw7jme84QGuXbkU8c+XioQUYBPR0TEyK9OgQqkacWpd
- 1NMrQABPEFW3KWoNxuACQUcb2C7mg+oeQ3YBwe6ZmJI3z0SVAfe0yb6kYoCJA+L2rw90
- O6t7JRNcBRjX6mO7GsdbfBB0MOiF9GuSLNmORAcPZ2fD5v1wl7teOWwzXrlWUcLQ5Vlm
- 8o8zdxzaCKjsacOwmnJUlIx/KrsVagn15bGKX0C3O8X6eYm4LodEF7Eo2f9q9Rx2c56b
- /JEQ==
-X-Gm-Message-State: AOAM532PCmh6CegDRPs7dXqwMI4Ox25T0PEvYcXmequidX7sjdoPAxuk
- eqkmhESW3qmTXpy2yuC9gn2uF+wSN01EKQ==
-X-Google-Smtp-Source: ABdhPJwwzfCkgNFM8/IMo2RPngAGbfCnphc12XKSfT2gCQK+errDeqMqFX7Zb23O8sQIjzuNAqn/jA==
-X-Received: by 2002:a5d:5189:: with SMTP id k9mr5666294wrv.3.1589466124576;
- Thu, 14 May 2020 07:22:04 -0700 (PDT)
+ bh=hzzAiO3Vub/o43zP20wgPt9TvxEC3lFhdZWB6wzCbkU=;
+ b=YqvBG+sZHBNgRBtkV2hUFOzLM2M5ajf4nxgH4hED4Q5Vo8dYdwP2TMlZKhefY8yyyr
+ b1nMviX9k0feROBWO8pjMwzbE3ZtYW6VzxvGUqvX3WbVtLaC/fkR7NspTXAU5Tts5H3g
+ RCoPHEtsQPLlz4/xoHUBUOEbo8bzFnS++yF/sPyLYnKSUO7bSUS4DGxhp6JpYDetcJVj
+ +jg3ta3f0NLDO9xYYIEIiLb28T4sHUUTScxi5o4/oG0gz318qlT+FG3HDu7OKlg2W479
+ M7l9yu5kS3EIityfaCMFprZsy5erUO5/R34jQgL+F8ffIfo2NwvUQopI2Macy5Z0WIRF
+ NIUw==
+X-Gm-Message-State: AOAM530GgCrYshapYmuTaaTPV/1BmErLvpBhU6c3/mY6aNwdoAvSPFIs
+ qVvW5aPmp/mdyqAphSLnjE1nPcPWEatFSg==
+X-Google-Smtp-Source: ABdhPJyG+BMLDqAl49T0O4yKw/9FQX3l6+CxMrK7sx3I2Dx03OxY2FvmDEv3ARziALl9awWkSetv9Q==
+X-Received: by 2002:a1c:31d6:: with SMTP id
+ x205mr15818991wmx.105.1589466119146; 
+ Thu, 14 May 2020 07:21:59 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 88sm4077443wrq.77.2020.05.14.07.22.03
+ by smtp.gmail.com with ESMTPSA id 88sm4077443wrq.77.2020.05.14.07.21.57
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 14 May 2020 07:22:03 -0700 (PDT)
+ Thu, 14 May 2020 07:21:58 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 18/45] aspeed: Add support for the sonorapass-bmc board
-Date: Thu, 14 May 2020 15:21:11 +0100
-Message-Id: <20200514142138.20875-19-peter.maydell@linaro.org>
+Subject: [PULL 14/45] target/arm: Pass pointer to qc to qrdmla/qrdmls
+Date: Thu, 14 May 2020 15:21:07 +0100
+Message-Id: <20200514142138.20875-15-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200514142138.20875-1-peter.maydell@linaro.org>
 References: <20200514142138.20875-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42e.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::329;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x329.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,136 +105,262 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Patrick Williams <patrick@stwcx.xyz>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Sonora Pass is a 2 socket x86 motherboard designed by Facebook
-and supported by OpenBMC.  Strapping configuration was obtained
-from hardware and i2c configuration is based on dts found at:
+Pass a pointer directly to env->vfp.qc[0], rather than env.
+This will allow SVE2, which does not modify QC, to pass a
+pointer to dummy storage.
 
-https://github.com/facebook/openbmc-linux/blob/1633c87b8ba7c162095787c988979b748ba65dc8/arch/arm/boot/dts/aspeed-bmc-facebook-sonorapass.dts
+Change the return type of inl_qrdml.h_s16 to match the
+sense of the operation: signed.
 
-Booted a test image of http://github.com/facebook/openbmc to login
-prompt.
-
-Signed-off-by: Patrick Williams <patrick@stwcx.xyz>
-Reviewed-by: Amithash Prasad <amithash@fb.com>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-[PMM: fixed block comment style nit]
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200513163245.17915-14-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/aspeed.c | 78 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 78 insertions(+)
+ target/arm/translate.c  | 18 ++++++++---
+ target/arm/vec_helper.c | 70 +++++++++++++++++++++++------------------
+ 2 files changed, 54 insertions(+), 34 deletions(-)
 
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 1eacb2fc172..4d57d1e4363 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -73,6 +73,21 @@ struct AspeedBoardState {
-         SCU_AST2500_HW_STRAP_ACPI_ENABLE |                              \
-         SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER))
- 
-+/* Sonorapass hardware value: 0xF100D216 */
-+#define SONORAPASS_BMC_HW_STRAP1 (                                      \
-+        SCU_AST2500_HW_STRAP_SPI_AUTOFETCH_ENABLE |                     \
-+        SCU_AST2500_HW_STRAP_GPIO_STRAP_ENABLE |                        \
-+        SCU_AST2500_HW_STRAP_UART_DEBUG |                               \
-+        SCU_AST2500_HW_STRAP_RESERVED28 |                               \
-+        SCU_AST2500_HW_STRAP_DDR4_ENABLE |                              \
-+        SCU_HW_STRAP_VGA_CLASS_CODE |                                   \
-+        SCU_HW_STRAP_LPC_RESET_PIN |                                    \
-+        SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER) |                \
-+        SCU_AST2500_HW_STRAP_SET_AXI_AHB_RATIO(AXI_AHB_RATIO_2_1) |     \
-+        SCU_HW_STRAP_VGA_BIOS_ROM |                                     \
-+        SCU_HW_STRAP_VGA_SIZE_SET(VGA_16M_DRAM) |                       \
-+        SCU_AST2500_HW_STRAP_RESERVED1)
-+
- /* Swift hardware value: 0xF11AD206 */
- #define SWIFT_BMC_HW_STRAP1 (                                           \
-         AST2500_HW_STRAP1_DEFAULTS |                                    \
-@@ -437,6 +452,50 @@ static void swift_bmc_i2c_init(AspeedBoardState *bmc)
-     i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 12), "tmp105", 0x4a);
- }
- 
-+static void sonorapass_bmc_i2c_init(AspeedBoardState *bmc)
-+{
-+    AspeedSoCState *soc = &bmc->soc;
-+
-+    /* bus 2 : */
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 2), "tmp105", 0x48);
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 2), "tmp105", 0x49);
-+    /* bus 2 : pca9546 @ 0x73 */
-+
-+    /* bus 3 : pca9548 @ 0x70 */
-+
-+    /* bus 4 : */
-+    uint8_t *eeprom4_54 = g_malloc0(8 * 1024);
-+    smbus_eeprom_init_one(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), 0x54,
-+                          eeprom4_54);
-+    /* PCA9539 @ 0x76, but PCA9552 is compatible */
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), "pca9552", 0x76);
-+    /* PCA9539 @ 0x77, but PCA9552 is compatible */
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), "pca9552", 0x77);
-+
-+    /* bus 6 : */
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 6), "tmp105", 0x48);
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 6), "tmp105", 0x49);
-+    /* bus 6 : pca9546 @ 0x73 */
-+
-+    /* bus 8 : */
-+    uint8_t *eeprom8_56 = g_malloc0(8 * 1024);
-+    smbus_eeprom_init_one(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 8), 0x56,
-+                          eeprom8_56);
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 8), "pca9552", 0x60);
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 8), "pca9552", 0x61);
-+    /* bus 8 : adc128d818 @ 0x1d */
-+    /* bus 8 : adc128d818 @ 0x1f */
-+
-+    /*
-+     * bus 13 : pca9548 @ 0x71
-+     *      - channel 3:
-+     *          - tmm421 @ 0x4c
-+     *          - tmp421 @ 0x4e
-+     *          - tmp421 @ 0x4f
-+     */
-+
-+}
-+
- static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
- {
-     AspeedSoCState *soc = &bmc->soc;
-@@ -549,6 +608,21 @@ static void aspeed_machine_romulus_class_init(ObjectClass *oc, void *data)
-     mc->default_ram_size       = 512 * MiB;
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 39626e0df91..21529a9b8f6 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -3629,6 +3629,18 @@ static const uint8_t neon_2rm_sizes[] = {
+     [NEON_2RM_VCVT_UF] = 0x4,
  };
  
-+static void aspeed_machine_sonorapass_class_init(ObjectClass *oc, void *data)
++static void gen_gvec_fn3_qc(uint32_t rd_ofs, uint32_t rn_ofs, uint32_t rm_ofs,
++                            uint32_t opr_sz, uint32_t max_sz,
++                            gen_helper_gvec_3_ptr *fn)
 +{
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+    AspeedMachineClass *amc = ASPEED_MACHINE_CLASS(oc);
++    TCGv_ptr qc_ptr = tcg_temp_new_ptr();
 +
-+    mc->desc       = "OCP SonoraPass BMC (ARM1176)";
-+    amc->soc_name  = "ast2500-a1";
-+    amc->hw_strap1 = SONORAPASS_BMC_HW_STRAP1;
-+    amc->fmc_model = "mx66l1g45g";
-+    amc->spi_model = "mx66l1g45g";
-+    amc->num_cs    = 2;
-+    amc->i2c_init  = sonorapass_bmc_i2c_init;
-+    mc->default_ram_size       = 512 * MiB;
-+};
++    tcg_gen_addi_ptr(qc_ptr, cpu_env, offsetof(CPUARMState, vfp.qc));
++    tcg_gen_gvec_3_ptr(rd_ofs, rn_ofs, rm_ofs, qc_ptr,
++                       opr_sz, max_sz, 0, fn);
++    tcg_temp_free_ptr(qc_ptr);
++}
 +
- static void aspeed_machine_swift_class_init(ObjectClass *oc, void *data)
+ void gen_gvec_sqrdmlah_qc(unsigned vece, uint32_t rd_ofs, uint32_t rn_ofs,
+                           uint32_t rm_ofs, uint32_t opr_sz, uint32_t max_sz)
  {
-     MachineClass *mc = MACHINE_CLASS(oc);
-@@ -628,6 +702,10 @@ static const TypeInfo aspeed_machine_types[] = {
-         .name          = MACHINE_TYPE_NAME("swift-bmc"),
-         .parent        = TYPE_ASPEED_MACHINE,
-         .class_init    = aspeed_machine_swift_class_init,
-+    }, {
-+        .name          = MACHINE_TYPE_NAME("sonorapass-bmc"),
-+        .parent        = TYPE_ASPEED_MACHINE,
-+        .class_init    = aspeed_machine_sonorapass_class_init,
-     }, {
-         .name          = MACHINE_TYPE_NAME("witherspoon-bmc"),
-         .parent        = TYPE_ASPEED_MACHINE,
+@@ -3636,8 +3648,7 @@ void gen_gvec_sqrdmlah_qc(unsigned vece, uint32_t rd_ofs, uint32_t rn_ofs,
+         gen_helper_gvec_qrdmlah_s16, gen_helper_gvec_qrdmlah_s32
+     };
+     tcg_debug_assert(vece >= 1 && vece <= 2);
+-    tcg_gen_gvec_3_ptr(rd_ofs, rn_ofs, rm_ofs, cpu_env,
+-                       opr_sz, max_sz, 0, fns[vece - 1]);
++    gen_gvec_fn3_qc(rd_ofs, rn_ofs, rm_ofs, opr_sz, max_sz, fns[vece - 1]);
+ }
+ 
+ void gen_gvec_sqrdmlsh_qc(unsigned vece, uint32_t rd_ofs, uint32_t rn_ofs,
+@@ -3647,8 +3658,7 @@ void gen_gvec_sqrdmlsh_qc(unsigned vece, uint32_t rd_ofs, uint32_t rn_ofs,
+         gen_helper_gvec_qrdmlsh_s16, gen_helper_gvec_qrdmlsh_s32
+     };
+     tcg_debug_assert(vece >= 1 && vece <= 2);
+-    tcg_gen_gvec_3_ptr(rd_ofs, rn_ofs, rm_ofs, cpu_env,
+-                       opr_sz, max_sz, 0, fns[vece - 1]);
++    gen_gvec_fn3_qc(rd_ofs, rn_ofs, rm_ofs, opr_sz, max_sz, fns[vece - 1]);
+ }
+ 
+ #define GEN_CMP0(NAME, COND)                                            \
+diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
+index 096fea67efc..6aa2ca08271 100644
+--- a/target/arm/vec_helper.c
++++ b/target/arm/vec_helper.c
+@@ -36,8 +36,6 @@
+ #define H4(x)  (x)
+ #endif
+ 
+-#define SET_QC() env->vfp.qc[0] = 1
+-
+ static void clear_tail(void *vd, uintptr_t opr_sz, uintptr_t max_sz)
+ {
+     uint64_t *d = vd + opr_sz;
+@@ -49,8 +47,8 @@ static void clear_tail(void *vd, uintptr_t opr_sz, uintptr_t max_sz)
+ }
+ 
+ /* Signed saturating rounding doubling multiply-accumulate high half, 16-bit */
+-static uint16_t inl_qrdmlah_s16(CPUARMState *env, int16_t src1,
+-                                int16_t src2, int16_t src3)
++static int16_t inl_qrdmlah_s16(int16_t src1, int16_t src2,
++                               int16_t src3, uint32_t *sat)
+ {
+     /* Simplify:
+      * = ((a3 << 16) + ((e1 * e2) << 1) + (1 << 15)) >> 16
+@@ -60,7 +58,7 @@ static uint16_t inl_qrdmlah_s16(CPUARMState *env, int16_t src1,
+     ret = ((int32_t)src3 << 15) + ret + (1 << 14);
+     ret >>= 15;
+     if (ret != (int16_t)ret) {
+-        SET_QC();
++        *sat = 1;
+         ret = (ret < 0 ? -0x8000 : 0x7fff);
+     }
+     return ret;
+@@ -69,30 +67,30 @@ static uint16_t inl_qrdmlah_s16(CPUARMState *env, int16_t src1,
+ uint32_t HELPER(neon_qrdmlah_s16)(CPUARMState *env, uint32_t src1,
+                                   uint32_t src2, uint32_t src3)
+ {
+-    uint16_t e1 = inl_qrdmlah_s16(env, src1, src2, src3);
+-    uint16_t e2 = inl_qrdmlah_s16(env, src1 >> 16, src2 >> 16, src3 >> 16);
++    uint32_t *sat = &env->vfp.qc[0];
++    uint16_t e1 = inl_qrdmlah_s16(src1, src2, src3, sat);
++    uint16_t e2 = inl_qrdmlah_s16(src1 >> 16, src2 >> 16, src3 >> 16, sat);
+     return deposit32(e1, 16, 16, e2);
+ }
+ 
+ void HELPER(gvec_qrdmlah_s16)(void *vd, void *vn, void *vm,
+-                              void *ve, uint32_t desc)
++                              void *vq, uint32_t desc)
+ {
+     uintptr_t opr_sz = simd_oprsz(desc);
+     int16_t *d = vd;
+     int16_t *n = vn;
+     int16_t *m = vm;
+-    CPUARMState *env = ve;
+     uintptr_t i;
+ 
+     for (i = 0; i < opr_sz / 2; ++i) {
+-        d[i] = inl_qrdmlah_s16(env, n[i], m[i], d[i]);
++        d[i] = inl_qrdmlah_s16(n[i], m[i], d[i], vq);
+     }
+     clear_tail(d, opr_sz, simd_maxsz(desc));
+ }
+ 
+ /* Signed saturating rounding doubling multiply-subtract high half, 16-bit */
+-static uint16_t inl_qrdmlsh_s16(CPUARMState *env, int16_t src1,
+-                                int16_t src2, int16_t src3)
++static int16_t inl_qrdmlsh_s16(int16_t src1, int16_t src2,
++                               int16_t src3, uint32_t *sat)
+ {
+     /* Similarly, using subtraction:
+      * = ((a3 << 16) - ((e1 * e2) << 1) + (1 << 15)) >> 16
+@@ -102,7 +100,7 @@ static uint16_t inl_qrdmlsh_s16(CPUARMState *env, int16_t src1,
+     ret = ((int32_t)src3 << 15) - ret + (1 << 14);
+     ret >>= 15;
+     if (ret != (int16_t)ret) {
+-        SET_QC();
++        *sat = 1;
+         ret = (ret < 0 ? -0x8000 : 0x7fff);
+     }
+     return ret;
+@@ -111,85 +109,97 @@ static uint16_t inl_qrdmlsh_s16(CPUARMState *env, int16_t src1,
+ uint32_t HELPER(neon_qrdmlsh_s16)(CPUARMState *env, uint32_t src1,
+                                   uint32_t src2, uint32_t src3)
+ {
+-    uint16_t e1 = inl_qrdmlsh_s16(env, src1, src2, src3);
+-    uint16_t e2 = inl_qrdmlsh_s16(env, src1 >> 16, src2 >> 16, src3 >> 16);
++    uint32_t *sat = &env->vfp.qc[0];
++    uint16_t e1 = inl_qrdmlsh_s16(src1, src2, src3, sat);
++    uint16_t e2 = inl_qrdmlsh_s16(src1 >> 16, src2 >> 16, src3 >> 16, sat);
+     return deposit32(e1, 16, 16, e2);
+ }
+ 
+ void HELPER(gvec_qrdmlsh_s16)(void *vd, void *vn, void *vm,
+-                              void *ve, uint32_t desc)
++                              void *vq, uint32_t desc)
+ {
+     uintptr_t opr_sz = simd_oprsz(desc);
+     int16_t *d = vd;
+     int16_t *n = vn;
+     int16_t *m = vm;
+-    CPUARMState *env = ve;
+     uintptr_t i;
+ 
+     for (i = 0; i < opr_sz / 2; ++i) {
+-        d[i] = inl_qrdmlsh_s16(env, n[i], m[i], d[i]);
++        d[i] = inl_qrdmlsh_s16(n[i], m[i], d[i], vq);
+     }
+     clear_tail(d, opr_sz, simd_maxsz(desc));
+ }
+ 
+ /* Signed saturating rounding doubling multiply-accumulate high half, 32-bit */
+-uint32_t HELPER(neon_qrdmlah_s32)(CPUARMState *env, int32_t src1,
+-                                  int32_t src2, int32_t src3)
++static int32_t inl_qrdmlah_s32(int32_t src1, int32_t src2,
++                               int32_t src3, uint32_t *sat)
+ {
+     /* Simplify similarly to int_qrdmlah_s16 above.  */
+     int64_t ret = (int64_t)src1 * src2;
+     ret = ((int64_t)src3 << 31) + ret + (1 << 30);
+     ret >>= 31;
+     if (ret != (int32_t)ret) {
+-        SET_QC();
++        *sat = 1;
+         ret = (ret < 0 ? INT32_MIN : INT32_MAX);
+     }
+     return ret;
+ }
+ 
++uint32_t HELPER(neon_qrdmlah_s32)(CPUARMState *env, int32_t src1,
++                                  int32_t src2, int32_t src3)
++{
++    uint32_t *sat = &env->vfp.qc[0];
++    return inl_qrdmlah_s32(src1, src2, src3, sat);
++}
++
+ void HELPER(gvec_qrdmlah_s32)(void *vd, void *vn, void *vm,
+-                              void *ve, uint32_t desc)
++                              void *vq, uint32_t desc)
+ {
+     uintptr_t opr_sz = simd_oprsz(desc);
+     int32_t *d = vd;
+     int32_t *n = vn;
+     int32_t *m = vm;
+-    CPUARMState *env = ve;
+     uintptr_t i;
+ 
+     for (i = 0; i < opr_sz / 4; ++i) {
+-        d[i] = helper_neon_qrdmlah_s32(env, n[i], m[i], d[i]);
++        d[i] = inl_qrdmlah_s32(n[i], m[i], d[i], vq);
+     }
+     clear_tail(d, opr_sz, simd_maxsz(desc));
+ }
+ 
+ /* Signed saturating rounding doubling multiply-subtract high half, 32-bit */
+-uint32_t HELPER(neon_qrdmlsh_s32)(CPUARMState *env, int32_t src1,
+-                                  int32_t src2, int32_t src3)
++static int32_t inl_qrdmlsh_s32(int32_t src1, int32_t src2,
++                               int32_t src3, uint32_t *sat)
+ {
+     /* Simplify similarly to int_qrdmlsh_s16 above.  */
+     int64_t ret = (int64_t)src1 * src2;
+     ret = ((int64_t)src3 << 31) - ret + (1 << 30);
+     ret >>= 31;
+     if (ret != (int32_t)ret) {
+-        SET_QC();
++        *sat = 1;
+         ret = (ret < 0 ? INT32_MIN : INT32_MAX);
+     }
+     return ret;
+ }
+ 
++uint32_t HELPER(neon_qrdmlsh_s32)(CPUARMState *env, int32_t src1,
++                                  int32_t src2, int32_t src3)
++{
++    uint32_t *sat = &env->vfp.qc[0];
++    return inl_qrdmlsh_s32(src1, src2, src3, sat);
++}
++
+ void HELPER(gvec_qrdmlsh_s32)(void *vd, void *vn, void *vm,
+-                              void *ve, uint32_t desc)
++                              void *vq, uint32_t desc)
+ {
+     uintptr_t opr_sz = simd_oprsz(desc);
+     int32_t *d = vd;
+     int32_t *n = vn;
+     int32_t *m = vm;
+-    CPUARMState *env = ve;
+     uintptr_t i;
+ 
+     for (i = 0; i < opr_sz / 4; ++i) {
+-        d[i] = helper_neon_qrdmlsh_s32(env, n[i], m[i], d[i]);
++        d[i] = inl_qrdmlsh_s32(n[i], m[i], d[i], vq);
+     }
+     clear_tail(d, opr_sz, simd_maxsz(desc));
+ }
 -- 
 2.20.1
 
