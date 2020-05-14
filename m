@@ -2,94 +2,92 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A98CC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:20:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 852A2C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:21:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D4FE2065D
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:20:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4DC8F2065D
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:21:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ge4N30UK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D4FE2065D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Atu7ZVg3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DC8F2065D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZEj5-0000BV-7d
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:20:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38468)
+	id 1jZEk9-0002Pg-E2
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:21:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38540)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jZEcq-0007XM-9f
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:14:16 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:40394)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jZEcp-0003ma-BO
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:14:15 -0400
-Received: by mail-lf1-x141.google.com with SMTP id h188so2022410lfd.7
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:14:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=r7a5kGEyzosESTdmEwVGGd/q63HdJiXWSrEI6m5XxK4=;
- b=Ge4N30UKYfgXdi3mmq031ONleaEHuug4sPQzs7eiPuPiYmR5U5hlzmuAS1yDYDXaor
- 77phzA8mSbhZkAhL3B2fzlVfx6zgT+D05SdCIGLAtr+/1y5soRF1VyFf9rxqZ4syOdCM
- Wl8RaT/GZ8uPpIwqS0/qjU8u7ob+tmAeWJt6lHYaHFUreuig0zjS6yxGrRhP4nT736i0
- C6wrK6F51atOAoeE5Tto+VpCne81YsgolvenVq+7XyNL8pE8w4946sHmZBNk2WZCSWSB
- IGwbMkrDafxDYOHc1lJeXUoeCr/XOkBf3JkxzDPH3sIRdclYIjSD3n6+zTcCAQJYphxy
- Jkhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=r7a5kGEyzosESTdmEwVGGd/q63HdJiXWSrEI6m5XxK4=;
- b=jB3riGZb0VCyyo9gpQF5DIvVXOrzj1dTAx66vLYC2z7AV9r3SEGY9U1hhItw+sWoRM
- 4i1q+1gYy2j5Wtr+oHo2U+86zh2Cetuyzh3+z6wW/FjDup9OY9PKM/QUrb6WAKIrD8Tb
- SrkgAo+gy2M2Y7SausxuGvCPAE9f10BFgByJG2rIzz9Q8gtQ8KUq3ruzwQ5OhCy/fICo
- sjVXLX53T8M+krOP5es6n6zAzuIHRRDXigrBFj0lfKDwcc2BdiiL+OsLR72hKZEi9TMH
- EJBrtEFyxPHzDVgNATu0F10q/5DsZM+ftSkjksLzKKxKXhmXaH32bauRRO0kQS1lIxMZ
- Hb6w==
-X-Gm-Message-State: AOAM532FMlE2yhVPgcWBppKeAqAadxa6wFrL+ZuhA0iN8FTvkeHzcxX8
- +rED4kiqziyOWdeL5yjmREBYLIxw7PQ=
-X-Google-Smtp-Source: ABdhPJxhcdOP9vo1zJNV7XfYgDKgChzM4BUUzRNmEVggJ9A0pPyPuFuTFW0N63qhAaiPShKcNqBp1g==
-X-Received: by 2002:a05:6512:691:: with SMTP id
- t17mr3650080lfe.85.1589465653567; 
- Thu, 14 May 2020 07:14:13 -0700 (PDT)
-Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id r9sm1582242ljg.69.2020.05.14.07.14.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 14 May 2020 07:14:12 -0700 (PDT)
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v1 07/14] hw/dma/xilinx_axidma: mm2s: Stream descriptor by
- descriptor
-Date: Thu, 14 May 2020 16:13:55 +0200
-Message-Id: <20200514141402.12498-8-edgar.iglesias@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200514141402.12498-1-edgar.iglesias@gmail.com>
-References: <20200514141402.12498-1-edgar.iglesias@gmail.com>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jZEd3-0007pB-H6
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:14:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45572
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jZEd1-0003pC-UG
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:14:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589465666;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kddAf0OUGIL+GWNN2CM1uGVSiQ/lYcCZ4WkqHaU4dpU=;
+ b=Atu7ZVg3nRZstRRDJj+vGnt1G6w7NUvJ8b2jJCtoU6UV+po7cUnytArE+ARaEF5dOEfp5m
+ ZUbk3fRxlemHbJ0Y4jFA6EncUer9/pdJVHB9rrt+IfpTzLxydDXw4Lf2buamYU5SVxLvVs
+ BCuUWkbM5xX8vybsHMT0owvP/aSPF8M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-121-Jn2WUKHyP1G8LbnBkVgUCg-1; Thu, 14 May 2020 10:14:25 -0400
+X-MC-Unique: Jn2WUKHyP1G8LbnBkVgUCg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 194421899528;
+ Thu, 14 May 2020 14:14:24 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 151461001B07;
+ Thu, 14 May 2020 14:14:21 +0000 (UTC)
+Date: Thu, 14 May 2020 15:14:18 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Subject: Re: [PATCH v6 07/14] block/crypto: implement the encryption key
+ management
+Message-ID: <20200514141418.GJ1280939@redhat.com>
+References: <20200510134037.18487-1-mlevitsk@redhat.com>
+ <20200510134037.18487-8-mlevitsk@redhat.com>
+ <1413abb3-f226-5ecc-3ea9-3dd945a134ed@redhat.com>
 MIME-Version: 1.0
+In-Reply-To: <1413abb3-f226-5ecc-3ea9-3dd945a134ed@redhat.com>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::141;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lf1-x141.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 13
-X-Spam_score: 1.3
-X-Spam_bar: +
-X-Spam_report: (1.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- FSL_HELO_FAKE=3.399, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -10
+X-Spam_score: -1.1
+X-Spam_bar: -
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FROM_EXCESS_BASE64=0.979, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,89 +100,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+On Thu, May 14, 2020 at 04:09:59PM +0200, Max Reitz wrote:
+> On 10.05.20 15:40, Maxim Levitsky wrote:
+> > This implements the encryption key management using the generic code in
+> > qcrypto layer and exposes it to the user via qemu-img
+> > 
+> > This code adds another 'write_func' because the initialization
+> > write_func works directly on the underlying file, and amend
+> > works on instance of luks device.
+> > 
+> > This commit also adds a 'hack/workaround' I and Kevin Wolf (thanks)
+> > made to make the driver both support write sharing (to avoid breaking the users),
+> > and be safe against concurrent  metadata update (the keyslots)
+> > 
+> > Eventually the write sharing for luks driver will be deprecated
+> > and removed together with this hack.
+> > 
+> > The hack is that we ask (as a format driver) for BLK_PERM_CONSISTENT_READ
+> > and then when we want to update the keys, we unshare that permission.
+> > So if someone else has the image open, even readonly, encryption
+> > key update will fail gracefully.
+> > 
+> > Also thanks to Daniel Berrange for the idea of
+> > unsharing read, rather that write permission which allows
+> > to avoid cases when the other user had opened the image read-only.
+> > 
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+> > ---
+> >  block/crypto.c | 127 +++++++++++++++++++++++++++++++++++++++++++++++--
+> >  block/crypto.h |  34 +++++++++++++
+> >  2 files changed, 158 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/block/crypto.c b/block/crypto.c
+> > index 2e16b62bdc..b14cb0ff06 100644
+> > --- a/block/crypto.c
+> > +++ b/block/crypto.c
+> 
+> [...]
+> 
+> > +static void
+> > +block_crypto_child_perms(BlockDriverState *bs, BdrvChild *c,
+> > +                         const BdrvChildRole *role,
+> > +                         BlockReopenQueue *reopen_queue,
+> > +                         uint64_t perm, uint64_t shared,
+> > +                         uint64_t *nperm, uint64_t *nshared)
+> > +{
+> > +
+> > +    BlockCrypto *crypto = bs->opaque;
+> > +
+> > +    bdrv_filter_default_perms(bs, c, role, reopen_queue,
+> > +            perm, shared, nperm, nshared);
+> > +    /*
+> > +     * Ask for consistent read permission so that if
+> > +     * someone else tries to open this image with this permission
+> > +     * neither will be able to edit encryption keys, since
+> > +     * we will unshare that permission while trying to
+> > +     * update the encryption keys
+> > +     */
+> > +    if (!(bs->open_flags & BDRV_O_NO_IO)) {
+> > +        *nperm |= BLK_PERM_CONSISTENT_READ;
+> > +    }
+> 
+> I’m not sure this is important, because this really means we won’t do
+> I/O.  Its only relevant use in this case is for qemu-img info.  Do we
+> really care if someone edits the key slots while qemu-img info is
+> processing?
 
-Stream descriptor by descriptor from memory instead of
-buffering entire packets before pushing. This enables
-non-packet streaming clients to work and also lifts the
-limitation that our internal DMA buffer needs to be able
-to hold entire packets.
+FWIW, OpenStack runs  qemu-img info in a periodic background job, so
+it can be concurrent with anything else they are running. Having said
+that due to previous QEMU bugs, they unconditonally pass the arg to
+qemu-img to explicitly disable locking
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Message-Id: <20200506082513.18751-8-edgar.iglesias@gmail.com>
----
- hw/dma/xilinx_axidma.c | 31 +++++++++++++++++--------------
- 1 file changed, 17 insertions(+), 14 deletions(-)
 
-diff --git a/hw/dma/xilinx_axidma.c b/hw/dma/xilinx_axidma.c
-index a770e12c96..101d32a965 100644
---- a/hw/dma/xilinx_axidma.c
-+++ b/hw/dma/xilinx_axidma.c
-@@ -111,7 +111,6 @@ struct Stream {
-     int nr;
- 
-     struct SDesc desc;
--    int pos;
-     unsigned int complete_cnt;
-     uint32_t regs[R_MAX];
-     uint8_t app[20];
-@@ -267,7 +266,9 @@ static void stream_process_mem2s(struct Stream *s, StreamSlave *tx_data_dev,
-                                  StreamSlave *tx_control_dev)
- {
-     uint32_t prev_d;
--    unsigned int txlen;
-+    uint32_t txlen;
-+    uint64_t addr;
-+    bool eop;
- 
-     if (!stream_running(s) || stream_idle(s)) {
-         return;
-@@ -282,24 +283,26 @@ static void stream_process_mem2s(struct Stream *s, StreamSlave *tx_data_dev,
-         }
- 
-         if (stream_desc_sof(&s->desc)) {
--            s->pos = 0;
-             stream_push(tx_control_dev, s->desc.app, sizeof(s->desc.app), true);
-         }
- 
-         txlen = s->desc.control & SDESC_CTRL_LEN_MASK;
--        if ((txlen + s->pos) > sizeof s->txbuf) {
--            hw_error("%s: too small internal txbuf! %d\n", __func__,
--                     txlen + s->pos);
--        }
- 
--        address_space_read(&s->dma->as, s->desc.buffer_address,
--                           MEMTXATTRS_UNSPECIFIED,
--                           s->txbuf + s->pos, txlen);
--        s->pos += txlen;
-+        eop = stream_desc_eof(&s->desc);
-+        addr = s->desc.buffer_address;
-+        while (txlen) {
-+            unsigned int len;
-+
-+            len = txlen > sizeof s->txbuf ? sizeof s->txbuf : txlen;
-+            address_space_read(&s->dma->as, addr,
-+                               MEMTXATTRS_UNSPECIFIED,
-+                               s->txbuf, len);
-+            stream_push(tx_data_dev, s->txbuf, len, eop && len == txlen);
-+            txlen -= len;
-+            addr += len;
-+        }
- 
--        if (stream_desc_eof(&s->desc)) {
--            stream_push(tx_data_dev, s->txbuf, s->pos, true);
--            s->pos = 0;
-+        if (eop) {
-             stream_complete(s);
-         }
- 
+Regards,
+Daniel
 -- 
-2.20.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
