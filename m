@@ -2,99 +2,81 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D161C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 00:19:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCB7EC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 00:27:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BD6120693
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 00:19:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BD6120693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id D1ADE205ED
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 00:27:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="l+oqivWb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1ADE205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ1bQ-0000QA-35
-	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 20:19:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54588)
+	id 1jZ1iw-0003Bf-Q3
+	for qemu-devel@archiver.kernel.org; Wed, 13 May 2020 20:27:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55224)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <arbab@linux.ibm.com>)
- id 1jZ1am-0008LI-Ia; Wed, 13 May 2020 20:19:16 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14444)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <arbab@linux.ibm.com>)
- id 1jZ1al-0000bi-C4; Wed, 13 May 2020 20:19:16 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 04E0IAHL169617; Wed, 13 May 2020 20:19:07 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0a-001b2d01.pphosted.com with ESMTP id 310uayg0h1-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 13 May 2020 20:19:07 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04E0GcMR001096;
- Thu, 14 May 2020 00:19:06 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com
- [9.57.198.27]) by ppma02dal.us.ibm.com with ESMTP id 3100uc5au1-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 14 May 2020 00:19:06 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
- [9.57.199.110])
- by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 04E0J6m853019080
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 14 May 2020 00:19:06 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EAE42AE05C;
- Thu, 14 May 2020 00:19:05 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 77CEFAE05F;
- Thu, 14 May 2020 00:19:05 +0000 (GMT)
-Received: from arbab-vm.localdomain (unknown [9.160.124.64])
- by b01ledav005.gho.pok.ibm.com (Postfix) with SMTP;
- Thu, 14 May 2020 00:19:05 +0000 (GMT)
-Received: from arbab-vm (localhost [IPv6:::1])
- by arbab-vm.localdomain (Postfix) with ESMTP id 1219910038C;
- Wed, 13 May 2020 19:19:03 -0500 (CDT)
-Date: Wed, 13 May 2020 19:19:02 -0500
-From: Reza Arbab <arbab@linux.ibm.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH] spapr: Add a new level of NUMA for GPUs
-Message-ID: <20200514001902.ohz5y7djovvablpn@arbab-vm>
-Organization: IBM Linux Technology Center
-References: <20200508175927.21791-1-arbab@linux.ibm.com>
- <20200511061745.GP2183@umbus.fritz.box>
+ (Exim 4.90_1) (envelope-from <zxq_yx_007@163.com>)
+ id 1jZ1iP-0002ln-L9
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 20:27:09 -0400
+Received: from mail-m973.mail.163.com ([123.126.97.3]:47480)
+ by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <zxq_yx_007@163.com>)
+ id 1jZ1iI-0001q0-KX
+ for qemu-devel@nongnu.org; Wed, 13 May 2020 20:27:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+ s=s110527; h=Subject:From:Message-ID:Date:MIME-Version; bh=aexkb
+ 2I2hH1HTu3sDoOGxH+NkooalP2YflHVJyYZxLE=; b=l+oqivWbod+gDQk+ZIizM
+ Jm9DsqvoQi3MBKJFP+OD954gyXJRqDZtirqXqnluxDqOOILNJv0KQbRNUTjzhJTh
+ RSni34LfgNZMVLAjnDaz6XGkCCn3NTdI3NTUfpsK2AEXOPdGstqFQc6a9bhKRAWx
+ nknlCPmytToDLue59eK/q8=
+Received: from [192.168.0.123] (unknown [114.240.93.195])
+ by smtp3 (Coremail) with SMTP id G9xpCgD3zdAwkLxeV+OQBA--.40S2;
+ Thu, 14 May 2020 08:26:25 +0800 (CST)
+Subject: Re: [PATCH v3 2/3] tests/util-sockets: add abstract unix socket cases
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20200510061422.24841-1-zxq_yx_007@163.com>
+ <20200510061422.24841-3-zxq_yx_007@163.com>
+ <20200513154931.GI1253949@redhat.com>
+From: xiaoqiang zhao <zxq_yx_007@163.com>
+Message-ID: <0b5b8953-a9b8-71e6-0f40-6ec2c464b211@163.com>
+Date: Thu, 14 May 2020 08:26:24 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20200511061745.GP2183@umbus.fritz.box>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
- definitions=2020-05-13_09:2020-05-13,
- 2020-05-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0
- impostorscore=0 mlxscore=0 phishscore=0 adultscore=0 suspectscore=1
- lowpriorityscore=0 spamscore=0 clxscore=1015 cotscore=-2147483648
- mlxlogscore=999 bulkscore=0 priorityscore=1501 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005130207
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=arbab@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 18:45:01
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+In-Reply-To: <20200513154931.GI1253949@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID: G9xpCgD3zdAwkLxeV+OQBA--.40S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWrtFWkKr4DKrWxAw47Xr4xZwb_yoW8JrWDpr
+ y5GF4FkF48JFZ7WrnIg3WUZFyrCF1xWr4j9r97u3WYvF4Duryayr10qryUKr1kJrWrXw4S
+ vFsYgrn09w4YyFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+ 9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jNrcfUUUUU=
+X-Originating-IP: [114.240.93.195]
+X-CM-SenderInfo: 520ts5t0bqili6rwjhhfrp/xtbBEAAkxlUMRC6WEQAAsG
+Received-SPF: pass client-ip=123.126.97.3; envelope-from=zxq_yx_007@163.com;
+ helo=mail-m973.mail.163.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 20:26:49
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,99 +90,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
- Daniel Henrique Barboza <danielhb@linux.ibm.com>,
- Leonardo Augusto Guimaraes Garcia <lagarcia@linux.ibm.com>,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, armbru@redhat.com,
+ qemu-devel@nongnu.org, kraxel@redhat.com, pbonzini@redhat.com,
+ marcandre.lureau@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi David,
-
-Thanks for your quick response!
-
-On Mon, May 11, 2020 at 04:17:45PM +1000, David Gibson wrote:
->1)
+在 2020/5/13 下午11:49, Daniel P. Berrangé 写道:
+> On Sun, May 10, 2020 at 02:14:21PM +0800, xiaoqiang zhao wrote:
+>> add cases to test tight and non-tight for abstract address type
+>>
+>> Signed-off-by: xiaoqiang zhao<zxq_yx_007@163.com>
+>> ---
+>>   tests/test-util-sockets.c | 83 +++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 83 insertions(+)
+>>
+>> diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
+>> index 5fd947c7bf..8042fb9276 100644
+>> --- a/tests/test-util-sockets.c
+>> +++ b/tests/test-util-sockets.c
+>> @@ -227,6 +227,84 @@ static void test_socket_fd_pass_num_nocli(void)
+>>       g_free(addr.u.fd.str);
+>>   }
+>>   
+>> +static gpointer unix_server_thread_func(gpointer user_data)
+>> +{
+>> +    SocketAddress addr;
+>> +    Error *err = NULL;
+>> +    int fd = -1;
+>> +    int connfd = -1;
+>> +    struct sockaddr_un un;
+>> +    socklen_t len = sizeof(un);
+>> +    char name[] = "/tmp/unix-test.sock";
+> Fixed filenames are bad, as even though this is the abstract
+> namespace and thus safe from on-disk clashes, the abstract
+> namespace is still OS global. We should append both the PID
+> and a sequence of random bytes to get something which doesnt
+> clash if two copies of the unit test run concurrently.
 >
->This would all be much simpler, if PAPR's representation of NUMA
->distances weren't so awful.  Somehow it manages to be both so complex
->that it's very hard to understand, and yet very limited in that it
->has no way to represent distances in any absolute units, or even
->specific ratios between distances.
->
->Both qemu and the guest kernel can have an arbitrary set of nodes,
->with an arbitrary matrix of distances between each pair, which we then
->have to lossily encode into this PAPR nonsense.
+agree.
 
-Completely agree. I've revisited that section many times now and still=20
-find the descriptions of these properties almost incomprehensible.
-
-The only way I've been able to make sense of it comes from reading the=20
-implementation, or experimentally tweaking the code/device tree to see=20
-if distances behave the way I expect.
-
->2)
->
->Alas, I don't think we can simply change this information.  We'll have
->to do it conditionally on a new machine type.  This is guest visible
->information, which shouldn't change under a running guest across
->migration between different qemu versions.  At least for Linux guests
->we'd probably get away with it, since I think it only reads this info
->at boot, and across a migration we'd at worst get non-optimal
->behaviour, not actual breakage.
-
-Sure, that makes sense. I'll try making the change conditional on a flag=20
-that can be set on new machine types.
-
->3)
->
->I'm not sure that this version is totally correct w.r.t. PAPR.  But
->then, I'm also not really sure of that for the existing version.
->Specifically it's not at all clear from PAPR if the IDs used at each
->level of the ibm,associativity need to be:
->   a) globally unique
->   b) unique only within the associativity level they appear at
->or c) unique only within the "node" at the next higher level they
->      belong to
-
-Again, I'm no authority but it seems to be (b):
-
-   "To determine the associativity between any two resources, the OS
-scans down the two resources associativity lists in all pair wise=20
-combinations counting how many domains are the same until the first=20
-domain where the two list do not agree."
-
-FWIW, using the same number for id at multiple levels has been working=20
-in practice.
-
->4)
->
->I'm not totally clear on the rationale for using the individual gpu's
->numa ID at all levels, rather than just one.  I'm guessing this is so
->that the gpu memory blocks are distant from each other as well as
->distant from main memory.  Is that right?
-
-It's not necessary to use it at all levels--that was me trying to=20
-completely replicate that old firmware change. Strictly speaking, since=20
-only reference-points 4 (and now 2) are significant, that part could=20
-just be:
-
-@@ -362,7 +362,7 @@ void spapr_phb_nvgpu_ram_populate_dt(SpaprPhbState *sph=
-b, void *fdt)
-          uint32_t associativity[] =3D {
-              cpu_to_be32(0x4),
-              SPAPR_GPU_NUMA_ID,
--            SPAPR_GPU_NUMA_ID,
-+            cpu_to_be32(nvslot->numa_id),
-              SPAPR_GPU_NUMA_ID,
-              cpu_to_be32(nvslot->numa_id)
-          };
-
-I think the rationale is that if those other levels got added to=20
-reference-points in the future, you'd likely want the GPU to be distinct=20
-there too.
-
---=20
-Reza Arbab
 
