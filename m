@@ -2,91 +2,90 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 237DDC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:24:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3068EC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:25:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D68132065D
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:24:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EBD86206A5
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 14:25:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z1rvc4d+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D68132065D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bPzzTm6P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBD86206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZEmo-0006tw-0V
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:24:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38516)
+	id 1jZEnm-00007A-0z
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 10:25:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39280)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jZEcy-0007l0-Jl
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:14:25 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:36632)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1jZEcx-0003oV-SG
- for qemu-devel@nongnu.org; Thu, 14 May 2020 10:14:24 -0400
-Received: by mail-lj1-x241.google.com with SMTP id u15so3717717ljd.3
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 07:14:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=7FoM1+aW2rkN6WZGeGZa1NdTwyvt1XBX/M5a6guzNPc=;
- b=Z1rvc4d+iouPEPJFEGxRF7k5GZfcOjA7SOTurgq6CnZ39swZ8ibRCNr09ZmL9pywrz
- r+ne+HSrzZ1FKmp9ctJzlQoawp27d+fZgaRlOUSKtrxBEVmnnz0JGthzaMwztldS/6dA
- FFHOVnt4P8OJIZN1AM6EAaww2KR+b5cL1hsNhSdo77Eh1GD9dtm8X2dpSiX5eJk70wLt
- 6hOlpRS6NGe/9S/yCSjsrsA6a2FAkhO11XTnDjQ0oX3OTJ5uhOWSIIZjtSbWuZd09llU
- Eq8p3NyoAd62QQ2HbatVirjm4mB/7grbqRUCIYdPgRdKQ/CBIa/6i9IruxtejwGN/LUf
- 8l9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=7FoM1+aW2rkN6WZGeGZa1NdTwyvt1XBX/M5a6guzNPc=;
- b=m6doRPhgHmW2PR734eKiwwWqR7pnnirVtjDuw6BqSWKxTiFRZD2DLUBhJiEE0+wg3p
- C0XSIleGCcOiyzg0SltW8iHOHLA7eMU37fXmzXsCcAaGlDcoNxcrUax98rxnwXnYRLP/
- PPZLOCbPbHbPk6A3kwiZNT2KRbC+efRLOK2FocH+jbG0gfQ/maszdOwSrDOzy+Qtpw20
- sIb+zQehiTBAU041Svm7oTEFHs+TDP/2CPY+1SQDrIs0XxpJpoNPs3RS2174fGkp1tEB
- LJo20CFAnU7HDEkk430f7vUBHXoRH60mCUxBQ2WcUvg5Vf6gN2H7agMvv8NuYMb4fSO8
- xBgA==
-X-Gm-Message-State: AOAM532J1V12aGP5L6zw6EZg5WdwzhYovW2VJqWlA41PLTl25ERUAzZB
- 9R3cIZ3ztOgTbLHtAouNhcCXVVrdTGg=
-X-Google-Smtp-Source: ABdhPJwsVWycX4KYMrtnKmcyEfJjqyfbHirrVzs42xxW0oi48lPv8r7u7QNtREKle+NbFidKbZu1GA==
-X-Received: by 2002:a2e:9a54:: with SMTP id k20mr3092933ljj.265.1589465661589; 
- Thu, 14 May 2020 07:14:21 -0700 (PDT)
-Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id z17sm1365436ljc.81.2020.05.14.07.14.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 14 May 2020 07:14:20 -0700 (PDT)
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v1 13/14] target/microblaze: gdb: Fix incorrect SReg reporting
-Date: Thu, 14 May 2020 16:14:01 +0200
-Message-Id: <20200514141402.12498-14-edgar.iglesias@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200514141402.12498-1-edgar.iglesias@gmail.com>
-References: <20200514141402.12498-1-edgar.iglesias@gmail.com>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jZEiw-0000S6-BC
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:20:34 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26890
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jZEiu-00058G-Qx
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 10:20:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589466031;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ojG+ubwH30+tQj377iUQceXxuhYLTEPDXDGrFOO5g30=;
+ b=bPzzTm6P3D8ufJmnblA0r6xCBPYdyuDOD538hhCEBaVxHhUv41n5+VGRmujMBJEijWg3LY
+ 65u2cOXLk12F1+th5UmVTAUN6Hy/1m5dkLsllPFun1rQoBvOsyDsRUXgPOQsZ2XngE9n1h
+ KHoFdv402Zq3dfOI2G+tu4ca3LruCJ8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-326-Sq2qO54-MeeiQNLqBkzFKA-1; Thu, 14 May 2020 10:20:29 -0400
+X-MC-Unique: Sq2qO54-MeeiQNLqBkzFKA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CBD2A0BDC;
+ Thu, 14 May 2020 14:20:28 +0000 (UTC)
+Received: from [10.3.116.145] (ovpn-116-145.phx2.redhat.com [10.3.116.145])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7CAF95D714;
+ Thu, 14 May 2020 14:20:27 +0000 (UTC)
+Subject: Re: [PATCH v4 6/9] qemu-img: Add bitmap sub-command
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20200513011648.166876-1-eblake@redhat.com>
+ <20200513011648.166876-7-eblake@redhat.com>
+ <ef44c5c0-1032-76e3-a3ce-ad0cc43d297c@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <0542a587-424c-a596-1778-e7aaf494298c@redhat.com>
+Date: Thu, 14 May 2020 09:20:24 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
+In-Reply-To: <ef44c5c0-1032-76e3-a3ce-ad0cc43d297c@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::241;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x241.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 13
-X-Spam_score: 1.3
-X-Spam_bar: +
-X-Spam_report: (1.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- FSL_HELO_FAKE=3.399, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,135 +99,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org
+Cc: kwolf@redhat.com, nsoffer@redhat.com, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Joe Komlodi <joe.komlodi@xilinx.com>
+On 5/14/20 1:45 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 13.05.2020 04:16, Eric Blake wrote:
+>> Include actions for --add, --remove, --clear, --enable, --disable, and
+>> --merge (note that --clear is a bit of fluff, because the same can be
+>> accomplished by removing a bitmap and then adding a new one in its
+>> place, but it matches what QMP commands exist).  Listing is omitted,
+>> because it does not require a bitmap name and because it was already
+>> possible with 'qemu-img info'.  A single command line can play one or
+>> more bitmap commands in sequence on the same bitmap name (although all
+>> added bitmaps share the same granularity, and and all merged bitmaps
+>> come from the same source file).  Merge defaults to other bitmaps in
+>> the primary image, but can also be told to merge bitmaps from a
+>> distinct image.
+>>
 
-SRegs used to be reported to GDB by iterating over the SRegs array,
-however we do not store them in an order that allows them to be
-reported to GDB in that way.
+> 
+> I'm sorry for asking it only now on v4.. But still. Why do we need it? 
 
-To fix this, a simple map is used to map the register GDB wants to its
-location in the SRegs array.
+Ease of use.
 
-Signed-off-by: Joe Komlodi <komlodi@xilinx.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Message-Id: <1589393329-223076-3-git-send-email-komlodi@xilinx.com>
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
----
- target/microblaze/gdbstub.c | 59 ++++++++++++++++++++++++++++++-------
- 1 file changed, 49 insertions(+), 10 deletions(-)
+> We can instead run qemu binary (or even new qemu-storage-daemon) and 
+> just use existing qmp commands. Is there a real benefit in developing 
+> qemu-img, maintaining two interfaces for the same thing?
 
-diff --git a/target/microblaze/gdbstub.c b/target/microblaze/gdbstub.c
-index 54cc7857d1..73e8973597 100644
---- a/target/microblaze/gdbstub.c
-+++ b/target/microblaze/gdbstub.c
-@@ -25,6 +25,21 @@ int mb_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
- {
-     MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
-     CPUMBState *env = &cpu->env;
-+    /*
-+     * GDB expects SREGs in the following order:
-+     * PC, MSR, EAR, ESR, FSR, BTR, EDR, PID, ZPR, TLBX, TLBSX, TLBLO, TLBHI.
-+     * They aren't stored in this order, so make a map.
-+     * PID, ZPR, TLBx, TLBsx, TLBLO, and TLBHI aren't modeled, so we don't
-+     * map them to anything and return a value of 0 instead.
-+     */
-+    static const uint8_t sreg_map[6] = {
-+        SR_PC,
-+        SR_MSR,
-+        SR_EAR,
-+        SR_ESR,
-+        SR_FSR,
-+        SR_BTR
-+    };
- 
-     /*
-      * GDB expects registers to be reported in this order:
-@@ -40,15 +55,16 @@ int mb_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
-         n -= 32;
-         switch (n) {
-         case 0 ... 5:
--            return gdb_get_reg32(mem_buf, env->sregs[n]);
-+            return gdb_get_reg32(mem_buf, env->sregs[sreg_map[n]]);
-         /* PVR12 is intentionally skipped */
-         case 6 ... 17:
-             n -= 6;
-             return gdb_get_reg32(mem_buf, env->pvr.regs[n]);
--        case 18 ... 24:
--            /* Add an offset of 6 to resume where we left off with SRegs */
--            n = n - 18 + 6;
--            return gdb_get_reg32(mem_buf, env->sregs[n]);
-+        case 18:
-+            return gdb_get_reg32(mem_buf, env->sregs[SR_EDR]);
-+        /* Other SRegs aren't modeled, so report a value of 0 */
-+        case 19 ... 24:
-+            return gdb_get_reg32(mem_buf, 0);
-         case 25:
-             return gdb_get_reg32(mem_buf, env->slr);
-         case 26:
-@@ -66,29 +82,52 @@ int mb_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
-     CPUMBState *env = &cpu->env;
-     uint32_t tmp;
- 
-+    /*
-+     * GDB expects SREGs in the following order:
-+     * PC, MSR, EAR, ESR, FSR, BTR, EDR, PID, ZPR, TLBX, TLBSX, TLBLO, TLBHI.
-+     * They aren't stored in this order, so make a map.
-+     * PID, ZPR, TLBx, TLBsx, TLBLO, and TLBHI aren't modeled, so we don't
-+     * map them to anything.
-+     */
-+    static const uint8_t sreg_map[6] = {
-+        SR_PC,
-+        SR_MSR,
-+        SR_EAR,
-+        SR_ESR,
-+        SR_FSR,
-+        SR_BTR
-+    };
-+
-     if (n > cc->gdb_num_core_regs) {
-         return 0;
-     }
- 
-     tmp = ldl_p(mem_buf);
- 
-+    /*
-+     * GDB expects registers to be reported in this order:
-+     * R0-R31
-+     * PC-BTR
-+     * PVR0-PVR11
-+     * EDR-TLBHI
-+     * SLR-SHR
-+     */
-     if (n < 32) {
-         env->regs[n] = tmp;
-     } else {
-         n -= 32;
-         switch (n) {
-         case 0 ... 5:
--            env->sregs[n] = tmp;
-+            env->sregs[sreg_map[n]] = tmp;
-             break;
-         /* PVR12 is intentionally skipped */
-         case 6 ... 17:
-             n -= 6;
-             env->pvr.regs[n] = tmp;
-             break;
--        case 18 ... 24:
--            /* Add an offset of 6 to resume where we left off with SRegs */
--            n = n - 18 + 6;
--            env->sregs[n] = tmp;
-+        /* Only EDR is modeled in these indeces, so ignore the rest */
-+        case 18:
-+            env->sregs[SR_EDR] = tmp;
-             break;
-         case 25:
-             env->slr = tmp;
+If it makes someone's life easier, and is not hard to maintain, then 
+yes.  A command line interface that calls into QMP is not hard to 
+maintain.  And _I_ certainly found it easier to write iotests with this 
+patch in place, so it already has at least one client.
+
+> Of-course, just 
+> run qmp commands from terminal is a lot less comfortable than just a 
+> qemu img command.. But may be we need some wrapper, which make it simple 
+> to run one qmp command on an image?
+> 
+> It's simple to make a python wrapper working like
+> 
+> qemu-qmp block-dirty-bitmap-add '{node: self, name: bitmap0, persistent: 
+> true}' /path/to/x.qcow2
+
+This _IS_ such a wrapper.  The whole point of this patch is that it is 
+now simpler to run one (or more) QMP command on an offline image from 
+the command line.  Just because I wrote it in C instead of python, and 
+attached it to an existing tool instead of writing a new tool, doesn't 
+change the fact that it is just a wrapper around the existing QMP commands.
+
 -- 
-2.20.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
