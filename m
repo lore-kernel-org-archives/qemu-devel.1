@@ -7,83 +7,85 @@ X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EE5CC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:17:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4D43C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:18:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AB9120575
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:17:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A6CC320575
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 06:18:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JsmKe+51"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AB9120575
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C/qE3Z2V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6CC320575
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ7BC-0006pv-7Q
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 02:17:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36896)
+	id 1jZ7CU-0008Ax-TT
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 02:18:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37292)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZ6qx-000163-3l
- for qemu-devel@nongnu.org; Thu, 14 May 2020 01:56:19 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59706
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZ6vm-0003qE-5E
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 02:01:18 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40930
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZ6qw-0002GG-1t
- for qemu-devel@nongnu.org; Thu, 14 May 2020 01:56:18 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZ6vk-00036C-G6
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 02:01:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589435777;
+ s=mimecast20190719; t=1589436075;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=68jLqOJB/BM2cWHsomEjtXhy2xP7EBKU5fvCrHn51ys=;
- b=JsmKe+51XCvwkMq4jd0n9/NTdk+OW3f47DdBqjR/Cc/5R1z0l5H5RmG+EdOfD/vUEo56Ue
- sxUbBOwPqWJcHhzVuCT0HPC7c+PXzJ7OUBaQyro20kaxr/3ExYCitgUcIgoFONMsf2RpwJ
- gO7Aev/5Lh6sqO3eFdGSoqSF6Ob7kHw=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-498-PNfZYxiDM66ofE1RnxErdA-1; Thu, 14 May 2020 01:56:15 -0400
-X-MC-Unique: PNfZYxiDM66ofE1RnxErdA-1
-Received: by mail-wm1-f70.google.com with SMTP id w2so12932657wmc.3
- for <qemu-devel@nongnu.org>; Wed, 13 May 2020 22:56:15 -0700 (PDT)
+ bh=BeDwlGWx3ZqhE8D/gGBgtPLp37FytOeHufMEx63Pq9Y=;
+ b=C/qE3Z2Vvv9M2k1dvsPk8nS1Ttw4UJseHemJDPpNyToixdKglEkMDIo8lZMGOSo+Cg22CL
+ yw51Z9WMXz9ODNfML86c51b7GI9YLxMzvYacxEVAlxYErwL+nCOz8gwDCfwWVXKlXlrhED
+ vK2rQ/bHKYMeOktujhDyIEqFw25nr8s=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-328-UbFz24cyMxW_oTRIgA0Eeg-1; Thu, 14 May 2020 02:01:07 -0400
+X-MC-Unique: UbFz24cyMxW_oTRIgA0Eeg-1
+Received: by mail-wr1-f71.google.com with SMTP id z10so1015722wrs.2
+ for <qemu-devel@nongnu.org>; Wed, 13 May 2020 23:01:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=68jLqOJB/BM2cWHsomEjtXhy2xP7EBKU5fvCrHn51ys=;
- b=CpIXK9p3rRp0s7Wv8/n7uuNm11keFHeyYa8pOQd6vbyet5SP3hR2mfm/p+vpTjh1j+
- P/lby/Ky+xHIHoHfROo8gJSDPJgPxmZV72S3A3g6Y2iiwQzY2E4SVaXq7nIoWynWL9+i
- udtcv71jQ/25iOvJcS8Bp4OA6YynUpLrUVTULnkCvwyvr/6kkGuYTh/4IePDIjK2KPiZ
- QTbkJ2NCjhqCPYZ9ItUoPnVRfIR+Ee5u1lauXF1jLVxdAz6TDXXG3FOJPz7Vl47Ih5Fz
- ICiiIoEwKs1BiUptK3GAxTZkQrrJ/podWRZ/F1LMhTyE6ogCsWMVBoySQexaDdXlPjGd
- i9yg==
-X-Gm-Message-State: AOAM533Eu3GfJ6vFerUy5pi5ia+sOZpl69nKp3xHBig9KPD5mKnXO8RL
- Sjyva6xJJ8Qy4IamzyvEVEPOGdM0PEOjCvatznGShEUL/9V7W9VF+7l+CrAXkjguaCxA7UcbKjD
- JPSzQXKGNqdKt1Gg=
-X-Received: by 2002:adf:fdd0:: with SMTP id i16mr3296622wrs.389.1589435774530; 
- Wed, 13 May 2020 22:56:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwzEoSiYV8JjE7oiEdWPeqWa4FTFpc6GtdM5q+TMKAaGECgfn79ugz2bB++hSUq2RhyXfNZyg==
-X-Received: by 2002:adf:fdd0:: with SMTP id i16mr3296595wrs.389.1589435774223; 
- Wed, 13 May 2020 22:56:14 -0700 (PDT)
+ bh=BeDwlGWx3ZqhE8D/gGBgtPLp37FytOeHufMEx63Pq9Y=;
+ b=ZXrphdDPVIhnaOXwLL+9mZwwYQM4mOitXWpyBQeS61/cia1cMoK9iFvEQLrPxjMi5r
+ DyHFuYEuseMZCEcQrT11HbJ4MZnRatnAYtglQh6lQHCBrBubail8CePsjL9LWBIfdIXX
+ E4w8/c3ufbADeUEbpPo2z5GXc7FIb9UrcQVKA2lhcewH//fVH9wfm1RIyTzt03WH9jT8
+ 0oNUw8vnghZH12RxEsG2lB4CyRyBy4w+8XzqwH7xLoLKMdLqV7k13ayLI83hPxseNWDt
+ /eCGIe8roPZBSbpoRKTws9j/uFRVxaPNzsxZJBDBusK/He4Nyt3TOXr2LcqqwlkPnUvv
+ MsFQ==
+X-Gm-Message-State: AOAM532ou0dgVBKiZQc001MyhgJoBldCAGHAPfkrN5/aloZFFor+Wlem
+ 9zTta/R774vwHBTFkndqPqMi4t76vqZ3ETd8v27ujtAJ6kJbyId/XoCLX9l+IbMb8VfUPaNmgN0
+ cv66ZJf6AsOt4u4I=
+X-Received: by 2002:a5d:6443:: with SMTP id d3mr3445831wrw.5.1589436065261;
+ Wed, 13 May 2020 23:01:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyZbfmabApQtCK4F/NHKEvGC+BQU4tfiPPFb869OY+EWmXR59MvZzFEzgsjblHgk/5cDt+4Pw==
+X-Received: by 2002:a5d:6443:: with SMTP id d3mr3445802wrw.5.1589436064996;
+ Wed, 13 May 2020 23:01:04 -0700 (PDT)
 Received: from [192.168.1.39] (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id v20sm2628071wrd.9.2020.05.13.22.56.12
+ by smtp.gmail.com with ESMTPSA id t6sm14418940wma.4.2020.05.13.23.01.03
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 13 May 2020 22:56:13 -0700 (PDT)
-Subject: Re: [PATCH] python: remove more instances of sys.version_info
+ Wed, 13 May 2020 23:01:04 -0700 (PDT)
+Subject: Re: [PATCH RFC 11/32] python/qemu/lib: remove Python2 style super()
+ calls
 To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-References: <20200514035230.25756-1-jsnow@redhat.com>
+References: <20200514055403.18902-1-jsnow@redhat.com>
+ <20200514055403.18902-12-jsnow@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <960e3cfa-73ea-c5bf-7fba-0007acc0d6e7@redhat.com>
-Date: Thu, 14 May 2020 07:56:11 +0200
+Message-ID: <05a73825-eef9-57b5-c782-746388f5a27f@redhat.com>
+Date: Thu, 14 May 2020 08:01:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200514035230.25756-1-jsnow@redhat.com>
+In-Reply-To: <20200514055403.18902-12-jsnow@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -112,189 +114,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
  Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/14/20 5:52 AM, John Snow wrote:
-> We guarantee 3.5+ everywhere; remove more dead checks. In general, try
-> to avoid using version checks and instead prefer to attempt behavior
-> when possible.
+On 5/14/20 7:53 AM, John Snow wrote:
+> Use the Python3 style instead.
 > 
 > Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->   scripts/analyze-migration.py             |  5 -----
->   scripts/decodetree.py                    | 25 +++++++++---------------
->   scripts/qmp/qmp-shell                    |  3 ---
->   tests/docker/docker.py                   |  5 +++--
->   tests/qemu-iotests/nbd-fault-injector.py |  5 +----
->   5 files changed, 13 insertions(+), 30 deletions(-)
-> 
-> diff --git a/scripts/analyze-migration.py b/scripts/analyze-migration.py
-> index 96a31d3974..95838cbff3 100755
-> --- a/scripts/analyze-migration.py
-> +++ b/scripts/analyze-migration.py
-> @@ -25,11 +25,6 @@
->   import sys
->   
->   
-> -MIN_PYTHON = (3, 2)
-> -if sys.version_info < MIN_PYTHON:
-> -    sys.exit("Python %s.%s or later is required.\n" % MIN_PYTHON)
-> -
-> -
->   def mkdir_p(path):
->       try:
->           os.makedirs(path)
-> diff --git a/scripts/decodetree.py b/scripts/decodetree.py
-> index 46ab917807..f9d204aa36 100755
-> --- a/scripts/decodetree.py
-> +++ b/scripts/decodetree.py
-> @@ -75,13 +75,6 @@ def output(*args):
->           output_fd.write(a)
->   
->   
-> -if sys.version_info >= (3, 4):
-> -    re_fullmatch = re.fullmatch
-> -else:
-> -    def re_fullmatch(pat, str):
-> -        return re.match('^' + pat + '$', str)
-> -
-> -
->   def output_autogen():
->       output('/* This file is autogenerated by scripts/decodetree.py.  */\n\n')
->   
-> @@ -428,18 +421,18 @@ def parse_field(lineno, name, toks):
->       width = 0
->       func = None
->       for t in toks:
-> -        if re_fullmatch('!function=' + re_ident, t):
-> +        if re.fullmatch('!function=' + re_ident, t):
->               if func:
->                   error(lineno, 'duplicate function')
->               func = t.split('=')
->               func = func[1]
->               continue
->   
-> -        if re_fullmatch('[0-9]+:s[0-9]+', t):
-> +        if re.fullmatch('[0-9]+:s[0-9]+', t):
->               # Signed field extract
->               subtoks = t.split(':s')
->               sign = True
-> -        elif re_fullmatch('[0-9]+:[0-9]+', t):
-> +        elif re.fullmatch('[0-9]+:[0-9]+', t):
->               # Unsigned field extract
->               subtoks = t.split(':')
->               sign = False
-> @@ -488,11 +481,11 @@ def parse_arguments(lineno, name, toks):
->       flds = []
->       extern = False
->       for t in toks:
-> -        if re_fullmatch('!extern', t):
-> +        if re.fullmatch('!extern', t):
->               extern = True
->               anyextern = True
->               continue
-> -        if not re_fullmatch(re_ident, t):
-> +        if not re.fullmatch(re_ident, t):
->               error(lineno, 'invalid argument set token "{0}"'.format(t))
->           if t in flds:
->               error(lineno, 'duplicate argument "{0}"'.format(t))
-> @@ -621,13 +614,13 @@ def parse_generic(lineno, is_format, name, toks):
->               continue
->   
->           # 'Foo=%Bar' imports a field with a different name.
-> -        if re_fullmatch(re_ident + '=%' + re_ident, t):
-> +        if re.fullmatch(re_ident + '=%' + re_ident, t):
->               (fname, iname) = t.split('=%')
->               flds = add_field_byname(lineno, flds, fname, iname)
->               continue
->   
->           # 'Foo=number' sets an argument field to a constant value
-> -        if re_fullmatch(re_ident + '=[+-]?[0-9]+', t):
-> +        if re.fullmatch(re_ident + '=[+-]?[0-9]+', t):
->               (fname, value) = t.split('=')
->               value = int(value)
->               flds = add_field(lineno, flds, fname, ConstField(value))
-> @@ -635,7 +628,7 @@ def parse_generic(lineno, is_format, name, toks):
->   
->           # Pattern of 0s, 1s, dots and dashes indicate required zeros,
->           # required ones, or dont-cares.
-> -        if re_fullmatch('[01.-]+', t):
-> +        if re.fullmatch('[01.-]+', t):
->               shift = len(t)
->               fms = t.replace('0', '1')
->               fms = fms.replace('.', '0')
-> @@ -652,7 +645,7 @@ def parse_generic(lineno, is_format, name, toks):
->               fixedmask = (fixedmask << shift) | fms
->               undefmask = (undefmask << shift) | ubm
->           # Otherwise, fieldname:fieldwidth
-> -        elif re_fullmatch(re_ident + ':s?[0-9]+', t):
-> +        elif re.fullmatch(re_ident + ':s?[0-9]+', t):
->               (fname, flen) = t.split(':')
->               sign = False
->               if flen[0] == 's':
-> diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
-> index a01d31de1e..c5eef06f3f 100755
-> --- a/scripts/qmp/qmp-shell
-> +++ b/scripts/qmp/qmp-shell
-> @@ -77,9 +77,6 @@ import re
->   sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
->   from qemu import qmp
->   
-> -if sys.version_info[0] == 2:
-
-:)
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> -    input = raw_input
-> -
->   class QMPCompleter(list):
->       def complete(self, text, state):
->           for cmd in self:
-> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-> index d8268c1111..5a9735db78 100755
-> --- a/tests/docker/docker.py
-> +++ b/tests/docker/docker.py
-> @@ -258,12 +258,13 @@ def _kill_instances(self, *args, **kwargs):
->           return self._do_kill_instances(True)
+> ---
+>   python/qemu/lib/machine.py |  2 +-
+>   python/qemu/lib/qtest.py   | 15 +++++++--------
+>   2 files changed, 8 insertions(+), 9 deletions(-)
+> 
+> diff --git a/python/qemu/lib/machine.py b/python/qemu/lib/machine.py
+> index 4b260fa2cb..b2f0412197 100644
+> --- a/python/qemu/lib/machine.py
+> +++ b/python/qemu/lib/machine.py
+> @@ -55,7 +55,7 @@ def __init__(self, reply):
+>               desc = reply["error"]["desc"]
+>           except KeyError:
+>               desc = reply
+> -        super(MonitorResponseError, self).__init__(desc)
+> +        super().__init__(desc)
+>           self.reply = reply
 >   
->       def _output(self, cmd, **kwargs):
-> -        if sys.version_info[1] >= 6:
-> +        try:
->               return subprocess.check_output(self._command + cmd,
->                                              stderr=subprocess.STDOUT,
->                                              encoding='utf-8',
->                                              **kwargs)
-> -        else:
-> +        except TypeError:
-> +            # 'encoding' argument was added in 3.6+
->               return subprocess.check_output(self._command + cmd,
->                                              stderr=subprocess.STDOUT,
->                                              **kwargs).decode('utf-8')
-> diff --git a/tests/qemu-iotests/nbd-fault-injector.py b/tests/qemu-iotests/nbd-fault-injector.py
-> index 588d62aebf..78f42c4214 100755
-> --- a/tests/qemu-iotests/nbd-fault-injector.py
-> +++ b/tests/qemu-iotests/nbd-fault-injector.py
-> @@ -47,10 +47,7 @@
->   import socket
->   import struct
->   import collections
-> -if sys.version_info.major >= 3:
-> -    import configparser
-> -else:
-> -    import ConfigParser as configparser
-> +import configparser
 >   
->   FAKE_DISK_SIZE = 8 * 1024 * 1024 * 1024 # 8 GB
+> diff --git a/python/qemu/lib/qtest.py b/python/qemu/lib/qtest.py
+> index 53d814c064..7943487c2b 100644
+> --- a/python/qemu/lib/qtest.py
+> +++ b/python/qemu/lib/qtest.py
+> @@ -101,29 +101,28 @@ def __init__(self, binary, args=None, name=None, test_dir="/var/tmp",
+>               name = "qemu-%d" % os.getpid()
+>           if sock_dir is None:
+>               sock_dir = test_dir
+> -        super(QEMUQtestMachine,
+> -              self).__init__(binary, args, name=name, test_dir=test_dir,
+> -                             socket_scm_helper=socket_scm_helper,
+> -                             sock_dir=sock_dir)
+> +        super().__init__(binary, args, name=name, test_dir=test_dir,
+> +                         socket_scm_helper=socket_scm_helper,
+> +                         sock_dir=sock_dir)
+>           self._qtest = None
+>           self._qtest_path = os.path.join(sock_dir, name + "-qtest.sock")
 >   
+>       def _base_args(self):
+> -        args = super(QEMUQtestMachine, self)._base_args()
+> +        args = super()._base_args()
+>           args.extend(['-qtest', 'unix:path=' + self._qtest_path,
+>                        '-accel', 'qtest'])
+>           return args
+>   
+>       def _pre_launch(self):
+> -        super(QEMUQtestMachine, self)._pre_launch()
+> +        super()._pre_launch()
+>           self._qtest = QEMUQtestProtocol(self._qtest_path, server=True)
+>   
+>       def _post_launch(self):
+> -        super(QEMUQtestMachine, self)._post_launch()
+> +        super()._post_launch()
+>           self._qtest.accept()
+>   
+>       def _post_shutdown(self):
+> -        super(QEMUQtestMachine, self)._post_shutdown()
+> +        super()._post_shutdown()
+>           self._remove_if_exists(self._qtest_path)
+>   
+>       def qtest(self, cmd):
 > 
 
 
