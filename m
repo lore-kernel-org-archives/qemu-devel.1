@@ -2,165 +2,121 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76FB7C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 05:08:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FDF8C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 05:08:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52C8B206D8
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 05:08:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 03538206D4
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 05:08:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QEaW2huV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52C8B206D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="pFXntO7J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03538206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ66E-0002SU-9e
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 01:08:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58992)
+	id 1jZ66o-0003hU-0q
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 01:08:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58904)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ656-00013E-QN
- for qemu-devel@nongnu.org; Thu, 14 May 2020 01:06:52 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29418
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ655-0007rz-JI
- for qemu-devel@nongnu.org; Thu, 14 May 2020 01:06:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589432810;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=1qxAZe1CzL7s3jdvFOEfLUv8HmJ75Pd1jz3w2CySI/k=;
- b=QEaW2huVGx5g3aXG9b9dzvT+iwDXkn4SaLIgqZm122fWF8ISPuZelmC6A9Jm55LLagM6VJ
- cA6V2xf3PIkQRFulDa5s9S4CCoK6P+kmBiZPKPHBdIir9pOVUTpeOzVeUzbWLZP2RDd5o+
- VTkGawXtKl7QYd0HUYBQIKLl3ShewAY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-387-M_sPLpBXM7KcJL3htJK7kA-1; Thu, 14 May 2020 01:06:47 -0400
-X-MC-Unique: M_sPLpBXM7KcJL3htJK7kA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A2EC8107ACCD;
- Thu, 14 May 2020 05:06:45 +0000 (UTC)
-Received: from [10.10.113.9] (ovpn-113-9.rdu2.redhat.com [10.10.113.9])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E64306E70D;
- Thu, 14 May 2020 05:06:43 +0000 (UTC)
-Subject: Re: [PATCH v3 06/10] iotests: add testfinder.py
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Kevin Wolf <kwolf@redhat.com>
-References: <20200421073601.28710-1-vsementsov@virtuozzo.com>
- <20200421073601.28710-7-vsementsov@virtuozzo.com>
- <20200421165647.GE22440@linux.fritz.box>
- <5a185a4e-1c5d-9887-c88c-6ca71ebeeee1@virtuozzo.com>
- <d0c4728e-99e4-568d-473e-952f57f3f07e@redhat.com>
- <2a62c728-1607-1375-6126-713bd047d5b1@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <47de3b0c-c07c-ad4e-25ab-1353d9710d10@redhat.com>
-Date: Thu, 14 May 2020 01:06:43 -0400
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jZ64d-00008C-HI; Thu, 14 May 2020 01:06:23 -0400
+Received: from mail-eopbgr70121.outbound.protection.outlook.com
+ ([40.107.7.121]:3136 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jZ64c-0007oX-5o; Thu, 14 May 2020 01:06:22 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=avMCFv7VMWQI6g6Zu4cv1AfRqCfmWqWj9I+ZV0GHLoxt29cHLfJ2CjLsJnTcE660DmL2iGJhzZCcnydSMm+uJ7+OxR0W49dSuNbnwlEIbAKU2T00+cAV2R5RY3bn4RhwZkwRV0KnTR4I26QIS/yqqTio/v6MyEeI2yp/r3vJoyLqk2ilY1JDxFJyUeTZfHLFUmQ8vEulWODWcBto6PUaNz7jXaBDF6ErtPcENyAC4BVMnjX46xVc8LfN3vXDt4AfE/eHmYy0GVPn9XOvz/5CdHdyz504qXmicfzZqOc1IfKNdC1JSxVnhToj1s00PKnxOkmps71jC1fgGXY/G5phZA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jJxbB7E5JjCcDQXP9lq/rtFkUsxgWXVXgx2WT3Y6Q3U=;
+ b=fDbm6uwb1A7wU+LhXT4cYUTi6hJ6b3fo2wlyHhCZmJeKcS0178G0wEh+OY+xWX1S1xwnY00BNFNSeqjDsp+8i3DrfkeA7HvH7t6ifpKJu4vczQC7+ParlukauQ/TPtFznRuZ+u/jBf4Ko9svV6raFtflr7XN0zre+XNaSAJbLkzfdFOYuI9fTvMygxG6Xx+butGi5Tu2zbYz5LiIMKPUbJJ2u/lxyS7j/uEXvYvxOMsjjua92ESLEoLOJNIGm2i1DH0TrTfFr8eJb/AWCsoWqv3J19eTIuQHXLgdwXdFEpd/R407JsfwBkjjFmBnkrIDfFMtXRYFwwc9wj46MY63IA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jJxbB7E5JjCcDQXP9lq/rtFkUsxgWXVXgx2WT3Y6Q3U=;
+ b=pFXntO7JtWtc9f9IQ7EHbwew8DqaRzhcmIFAJQwABDvPf50N00QNWEKB3ovlbW0U18pTFQsviKGbpEU+5MKEZImA8wf2iH6m3UClsGKAkzTHj7qBw/4b4w00UZAgR2CNJoHuOwM1Wbv30cdlkMq/DN2gwmxRluwFvyF02IhWnhY=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5368.eurprd08.prod.outlook.com (2603:10a6:20b:103::17)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.33; Thu, 14 May
+ 2020 05:06:18 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.3000.016; Thu, 14 May 2020
+ 05:06:18 +0000
+Subject: Re: [PATCH v4 2/9] qemu-img: Fix stale comments on doc location
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200513011648.166876-1-eblake@redhat.com>
+ <20200513011648.166876-3-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <6fafa9ae-b9de-3446-2fee-9b2bbd5809aa@virtuozzo.com>
+Date: Thu, 14 May 2020 08:06:16 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <2a62c728-1607-1375-6126-713bd047d5b1@virtuozzo.com>
+ Thunderbird/68.8.0
+In-Reply-To: <20200513011648.166876-3-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/13 22:25:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR2P281CA0018.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a::28) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.186) by
+ FR2P281CA0018.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:a::28) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3000.20 via Frontend Transport; Thu, 14 May 2020 05:06:17 +0000
+X-Originating-IP: [185.215.60.186]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 9269dbf1-fb53-4829-05bf-08d7f7c4892c
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5368:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5368FE40DB71A23F849A9505C1BC0@AM7PR08MB5368.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:161;
+X-Forefront-PRVS: 040359335D
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: r6JbrTpLRjlRSZ0e5YvZ5bmhFSVQa57a1fLXB30oC9KcEoaAHMk4++BrtHMQokDWFLWwUHRRQGoqUEoZq3fICeiaI94mxnAHz4PGoNXC59l6BsiWTM1uzAFMvpvIZhyM7eVfyQqXGLHX/YTV+ytHzGlSwBG19zMob/tkSUiA2ZEtjRHKVZHVPdWsBVAe6FQQxUm/nTTryX12lA507kbi1SQDXGZK1pZoJwKIkgQ002ebOKQzWvA4MbJAKKC8Nnx8keFGUrIj6aqVXrQenKSxrPMXT7SE/hDfOgVk/cUD0YX/JHgADFjTT8k5I+ahsaGvtl5IoivLEpWHXK9Bw2K4NCiqs+aDtk3gWulNlSyV9v7W5zhKtUFZiXekpc5EQuE8FWHNXK1UhhiP8/772EAJMncPqcmw3YHW85P02QtPW7Ecy3Iqoh5VF8iMmNR01WZg8Bye9S9aUk5vu3IK/VhpQtnlS1Oc2usSfraWMiooUbnN25c4ndK+wXj8YiNbc+yt
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(376002)(39840400004)(366004)(346002)(396003)(136003)(558084003)(31686004)(5660300002)(31696002)(86362001)(8936002)(8676002)(36756003)(956004)(2616005)(4326008)(26005)(2906002)(316002)(52116002)(16526019)(478600001)(66946007)(16576012)(66476007)(66556008)(6486002)(186003)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: 9lZ1RGH2zZiEz0E6ubP4TfTlMZUtKchATJMjfEbEfWGZB02WzeaQU2ggAjGoTSagKCEK59nKv8uf+Cs+zYKT1+GhxCrCS70HVY3hrI/nxy+M9nrREoaoEuKk0Kyv5eXudjihcvjAZ98DPQf1QWf/pxRnkkF7ZBm1RHvvfr1dcT7HMmAL6g/3HOz/lO2Rk4lb/w297YMdUapNyAETFgHpAo3uDS9P9bDhZUaZ82zDj3EZqMibjsgB1CYd/JCt/vlaozCjA141OyPoAF+k2wlnLOzJlMujohlYQK9HB1xXXRULkKec0Y5oxS8iaeYzcxBTAP3AfV4Fll3o0+SJTch5KCVdhcABLlmXlBV1D870IrvmP3zRm01KUZ2tRBKuMaybwPJ0k8HuQUEVvOAY3tPlu4gHk0bgQidK3ahG5EXs+SGc7OOFQ65ZyKOCA5IukZvBkdQDBvCC1aHXggl0e1299CXGN0bJA4CT/yAKCBUN3hejA+J/jSk1jsmWpZnrgckW
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9269dbf1-fb53-4829-05bf-08d7f7c4892c
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2020 05:06:18.7121 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: V92748gWSup09rSQ1as3Pn1tX7FO4b6UzagO8swVEr5jjgOEP5Gh5NYks2JSOcbIU+M74+zJHGlSF7/MWAc+09m5n1Z7laEnjgnsjUczAhc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5368
+Received-SPF: pass client-ip=40.107.7.121;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 01:06:19
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -174,99 +130,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: den@openvz.org, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+Cc: kwolf@redhat.com, nsoffer@redhat.com, qemu-block@nongnu.org,
  mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 5/14/20 12:54 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 14.05.2020 00:58, John Snow wrote:
->>
->>
->> On 5/7/20 1:43 PM, Vladimir Sementsov-Ogievskiy wrote:
->>> 21.04.2020 19:56, Kevin Wolf wrote:
->>>> Am 21.04.2020 um 09:35 hat Vladimir Sementsov-Ogievskiy geschrieben:
->>>>> Add python script with new logic of searching for tests:
->>>>>
->>>>> Current ./check behavior:
->>>>>    - tests are named [0-9][0-9][0-9]
->>>>>    - tests must be registered in group file (even if test doesn't
->>>>> belong
->>>>>      to any group, like 142)
->>>>>
->>>>> Behavior of new test:
->>>>>    - group file is dropped
->>>>>    - tests are searched by file-name instead of group file, so it's
->>>>> not
->>>>>      needed more to "register the test", just create it with name
->>>>>      *-test. Old names like [0-9][0-9][0-9] are supported too, but not
->>>>>      recommended for new tests
->>>>
->>>> I wonder if a tests/ subdirectory instead of the -test suffix would
->>>> organise things a bit better.
->>>>
->>>
->>> It will make more difficult to import iotests.py.. Calling common.rc
->>> from
->>> bash tests will need to be modified too.
->>>
->>> So, we'll need additional line in all python tests:
->>>
->>> sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
->>>
->>> which doesn't seem to be good practice.. So, instead we'd better call
->>> tests with PYTHONPATH set appropriately..
->>>
->>
->> Just chiming in to say that it's largely bad practice because it
->> confuses pylint, mypy and friends -- if we want to keep pushing our CI
->> code analysis for python in that direction, this will be a barrier.
->>
->> Using PYTHONPATH is better, because it isolates the script itself from
->> the environment, but requires you to now always set PYTHONPATH to
->> execute any of the individual iotests.
->>
->> Not actually a big deal, because iotests already expect a large number
->> of environment variables to be set. It's not really a huge net loss in
->> convenience, I think.
->>
->> looks like that's the direction you're headed in anyway based on
->> discussion, so that's good.
->>
+13.05.2020 04:16, Eric Blake wrote:
+> Missed in commit e13c59fa.
 > 
-> Hm, does PYTHONPATH-way works good with mypy and friends? Probably, it
-> should
-> be set when checking the code? So, actually developers will have to set
-> PYTHONPATH by hand to always contain some directories within qemu source
-> tree?
-> 
+> Signed-off-by: Eric Blake<eblake@redhat.com>
+> Reviewed-by: Max Reitz<mreitz@redhat.com>
 
-pylint respects PYTHONPATH but mypy doesn't. mypy uses MYPYPATH, but I
-wouldn't worry about accommodating it. It's a fussy tool and we're only
-ever going to run it from very specific environments.
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-You don't need to worry too much about what environment variables these
-tools take; it's only worth noting that "sys.path" hacks tend to make
-these tools harder to use.
-
-
-As for setting PYTHONPATH by hand ... There are a few places in the QEMU
-tree where we set PYTHONPATH already, and the individual iotests already
-don't work if they're not launched by `check`, because they're missing a
-ton of environment variables.
-
-It's not going to be too bad to set PYTHONPATH in the launcher script,
-is it?
-
-(Or are we replacing the top-level script with a python one?)
-
-
-
-
-Really, the same is true of pylint, too. It's only annoying to deal with
-sys.path hacking because it can't be worked around in those CQA tools.
-
+-- 
+Best regards,
+Vladimir
 
