@@ -2,102 +2,85 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0B89C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 12:45:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85583C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 12:45:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71D282065D
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 12:45:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71D282065D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 479512065D
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 12:45:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ypVTyL7c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 479512065D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZDEx-0006uS-KI
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 08:45:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53086)
+	id 1jZDFE-0007WH-Dt
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 08:45:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53974)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
- id 1jZD7T-0003Fq-2K; Thu, 14 May 2020 08:37:47 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24606)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
- id 1jZD7S-0006Vh-4J; Thu, 14 May 2020 08:37:46 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 04ECX1cV129248; Thu, 14 May 2020 08:37:44 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 310ub02pue-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 14 May 2020 08:37:44 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 04ECX7ri129909;
- Thu, 14 May 2020 08:37:44 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 310ub02pt7-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 14 May 2020 08:37:43 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
- by ppma04ams.nl.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 04ECZMAZ011971;
- Thu, 14 May 2020 12:37:41 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com
- (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
- by ppma04ams.nl.ibm.com with ESMTP id 3100ub3mqk-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 14 May 2020 12:37:41 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 04ECbdGA57868304
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 14 May 2020 12:37:39 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4CF39A4065;
- Thu, 14 May 2020 12:37:39 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id AF9A1A4060;
- Thu, 14 May 2020 12:37:38 +0000 (GMT)
-Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 14 May 2020 12:37:38 +0000 (GMT)
-From: Janosch Frank <frankja@linux.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 8/9] pc-bios: s390x: Replace 0x00 with 0x0 or 0
-Date: Thu, 14 May 2020 08:37:28 -0400
-Message-Id: <20200514123729.156283-9-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200514123729.156283-1-frankja@linux.ibm.com>
-References: <20200514123729.156283-1-frankja@linux.ibm.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jZDDE-0003k2-Ig
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 08:43:44 -0400
+Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:35998)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jZDDC-0007s6-V2
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 08:43:44 -0400
+Received: by mail-ot1-x336.google.com with SMTP id t3so2221890otp.3
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 05:43:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=1oyf3cwa4ysv0F+1gus4rSNb6qxm3CMa4cO5H6tMf2I=;
+ b=ypVTyL7cDMoH7l0+bEz1PvWvRoTGnmzkwEhJMemYlViCP3ME+po2WXRtzCrH32ibpl
+ Ms1yBFDXmSRlg2HsqN3ggloNRmZX4sDaqv+xAxgUqSM2vy1YLHlp4SotmgxRIgTfY9DK
+ fUADazs7u19X1vHtN60EuwZXjpXIu0967bUwxdxWeS5JqLMUMqEQ/rcDPQaKGCRlHoEW
+ MwLACr1ieJwkDjSJ6KCi/S2fsjhrTTDHj+0t7Ok+BOnI6+kp6CxAIyLdKw3Zo0/gKqtg
+ HMYrOxcfSIR7MoHdK6lIzPzr515j5C1m1i1jHJ9oIKz85OTsEnofgAqDAcPWsRv67Kvk
+ iZkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=1oyf3cwa4ysv0F+1gus4rSNb6qxm3CMa4cO5H6tMf2I=;
+ b=UkVlAas0eqWZMENL9Nj/DVvhxoP0GeM/itBIIaKVTb8r8iMlt5y8cOik3VBRrm13TT
+ t5lRxE+ubr5Q26lmQo+LfEQDTB2l67ykDtsbj9xcGY8evuPPf0xS8v2NKnnwvtBedWB/
+ Cr0KxxECNoEi9vHvlbU4cdnelGKBHk17ycLU6A6+LNknCfa0pUtXvulM5y5v8adH8G82
+ Ovu+piN4+vP3kOGk0ybL4+KtPCvdPDX/tcKzL0a9BKV+y9SP8vwodwGr2KlbZkeEigEM
+ jXLwot/rfiZgGJ9cFfkshQTVZucl4zmiSvZnooSzy15ePw2X2fpLm/M+eJCOlIC/At9m
+ ljNA==
+X-Gm-Message-State: AOAM530yDW/gm0G8n/Tiz0+PNu/25oJtjJn49KipsjAPmlSRsMpAvZ9J
+ 4ShYyP72Dwy71j4vMEGmvJIGS3bkOR83BxDX44RlSA==
+X-Google-Smtp-Source: ABdhPJzsGeeWbjUJG9PoslK7o66IiZMjfHK16DUSK/odnSdg1A2Ox7po60O/De7mg3D9WmiN52KawZNa3lVmWXgJEPg=
+X-Received: by 2002:a9d:398b:: with SMTP id y11mr3378687otb.135.1589460221598; 
+ Thu, 14 May 2020 05:43:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
- definitions=2020-05-14_02:2020-05-14,
- 2020-05-14 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0
- impostorscore=0 mlxscore=0 phishscore=0 adultscore=0 suspectscore=1
- lowpriorityscore=0 spamscore=0 clxscore=1015 cotscore=-2147483648
- mlxlogscore=513 bulkscore=0 priorityscore=1501 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.12.0-2004280000
- definitions=main-2005140112
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=frankja@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 07:20:14
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+References: <20200514122334.25089-1-kraxel@redhat.com>
+In-Reply-To: <20200514122334.25089-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 May 2020 13:43:30 +0100
+Message-ID: <CAFEAcA-Hmh+SygS7eWfYWsHSYnTFWFccz1GrXDbX=UHqOH38mA@mail.gmail.com>
+Subject: Re: [PULL 0/7] Usb 20200514 patches
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::336;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x336.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, KHOP_DYNAMIC=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,77 +93,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
- david@redhat.com
+Cc: qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-0x00 looks odd, time to replace it with 0 or 0x0 (for pointers).
+On Thu, 14 May 2020 at 13:23, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> The following changes since commit d5c75ec500d96f1d93447f990cd5a4ef5ba27fae:
+>
+>   Merge remote-tracking branch 'remotes/stefanberger/tags/pull-tpm-2020-05-08-1' into staging (2020-05-12 17:00:10 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://git.kraxel.org/qemu tags/usb-20200514-pull-request
+>
+> for you to fetch changes up to 8b2b45c506f4d71b831473d8de93b3cedaea4844:
+>
+>   raspi2 acceptance test: add test for dwc-hsotg (dwc2) USB host (2020-05-13 11:06:37 +0200)
+>
+> ----------------------------------------------------------------
+> usb: add dwc2 emulation for raspi machines.
+>
+> ----------------------------------------------------------------
+>
+> Paul Zimmerman (7):
+>   raspi: add BCM2835 SOC MPHI emulation
+>   dwc-hsotg (dwc2) USB host controller register definitions
+>   dwc-hsotg (dwc2) USB host controller state definitions
+>   dwc-hsotg (dwc2) USB host controller emulation
+>   usb: add short-packet handling to usb-storage driver
+>   wire in the dwc-hsotg (dwc2) USB host controller emulation
+>   raspi2 acceptance test: add test for dwc-hsotg (dwc2) USB host
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- pc-bios/s390-ccw/dasd-ipl.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+Could we wait til we've had the patches reviewed first, please?
 
-diff --git a/pc-bios/s390-ccw/dasd-ipl.c b/pc-bios/s390-ccw/dasd-ipl.c
-index b932531e6f..764ee89e92 100644
---- a/pc-bios/s390-ccw/dasd-ipl.c
-+++ b/pc-bios/s390-ccw/dasd-ipl.c
-@@ -98,18 +98,18 @@ static int run_dynamic_ccw_program(SubChannelId schid, uint16_t cutype,
- 
- static void make_readipl(void)
- {
--    Ccw0 *ccwIplRead = (Ccw0 *)0x00;
-+    Ccw0 *ccwIplRead = (Ccw0 *)0x0;
- 
-     /* Create Read IPL ccw at address 0 */
-     ccwIplRead->cmd_code = CCW_CMD_READ_IPL;
--    ccwIplRead->cda = 0x00; /* Read into address 0x00 in main memory */
-+    ccwIplRead->cda = 0x0; /* Read into address 0x00 in main memory */
-     ccwIplRead->chain = 0; /* Chain flag */
-     ccwIplRead->count = 0x18; /* Read 0x18 bytes of data */
- }
- 
- static void run_readipl(SubChannelId schid, uint16_t cutype)
- {
--    if (do_cio(schid, cutype, 0x00, CCW_FMT0)) {
-+    if (do_cio(schid, cutype, 0x0, CCW_FMT0)) {
-         panic("dasd-ipl: Failed to run Read IPL channel program\n");
-     }
- }
-@@ -133,10 +133,10 @@ static void check_ipl2(uint32_t ipl2_addr)
- {
-     Ccw0 *ccw = u32toptr(ipl2_addr);
- 
--    if (ipl2_addr == 0x00) {
-+    if (ipl2_addr == 0) {
-         panic("IPL2 address invalid. Is this disk really bootable?\n");
-     }
--    if (ccw->cmd_code == 0x00) {
-+    if (ccw->cmd_code == 0) {
-         panic("IPL2 ccw data invalid. Is this disk really bootable?\n");
-     }
- }
-@@ -161,7 +161,7 @@ static void ipl1_fixup(void)
-     memcpy(ccwRead, (void *)0x08, 16);
- 
-     /* Disable chaining so we don't TIC to IPL2 channel program */
--    ccwRead->chain = 0x00;
-+    ccwRead->chain = 0;
- 
-     ccwSeek->cmd_code = CCW_CMD_DASD_SEEK;
-     ccwSeek->cda = ptr2u32(seekData);
-@@ -206,7 +206,7 @@ static void run_ipl2(SubChannelId schid, uint16_t cutype, uint32_t addr)
-  */
- void dasd_ipl(SubChannelId schid, uint16_t cutype)
- {
--    PSWLegacy *pswl = (PSWLegacy *) 0x00;
-+    PSWLegacy *pswl = (PSWLegacy *) 0x0;
-     uint32_t ipl2_addr;
- 
-     /* Construct Read IPL CCW and run it to read IPL1 from boot disk */
--- 
-2.25.1
-
+thanks
+-- PMM
 
