@@ -2,65 +2,65 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86BFFC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 05:58:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F4C2C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 05:59:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5421A205CB
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 05:58:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 08DC8205CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 05:59:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P+uVGgvc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5421A205CB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DS+Ymwwh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08DC8205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZ6tA-0006XT-Em
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 01:58:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36442)
+	id 1jZ6tX-0007V3-6F
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 01:58:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36530)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ6p2-0004Z9-QQ
- for qemu-devel@nongnu.org; Thu, 14 May 2020 01:54:20 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48472
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ6pQ-0005QZ-Mf
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 01:54:44 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24155
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ6p2-0001b3-0Y
- for qemu-devel@nongnu.org; Thu, 14 May 2020 01:54:20 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jZ6pM-0001f4-3C
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 01:54:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589435658;
+ s=mimecast20190719; t=1589435679;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=eIVREeXd6nvTZkOSZ5iRHZDJSFp7tIw6PyIaTwCOjGQ=;
- b=P+uVGgvcgQRG7udCDuGzc3gJUhF24JVM5tzTnJ6Pscfs43mtzo3eJDT2y/vICbl2Z8uV1l
- r6s8gWTjxd80CdZ5WmJ8nlS8PXHJg2/VvMh0qPKxb557i3yIm0dgvuS1/nAdMMdID0KiNb
- xI05HwwknNItJs/TuTcmvetnBUESZy0=
+ bh=v+ohm4XYXFRwTcdD2vs9B3hxYnBxrDcx8T9ob43s9gU=;
+ b=DS+YmwwhjGXY3+j5dRdtObQxYY9uifSYf1240jdZBPnnSUabwga9sTdSfGZdx7jjr4aHhy
+ e4HpE/V0KO7ggFhMnRV1vKH62e+0+TsXqEESGgVfMtnyiEjMBXW//hehQmZjE4LTLVzDHh
+ tjKresxVECwceKvwmSOp8Z8WzAJDSMs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-503-aBVQFwdkNA2zDIkkVPt0qA-1; Thu, 14 May 2020 01:54:15 -0400
-X-MC-Unique: aBVQFwdkNA2zDIkkVPt0qA-1
+ us-mta-253-tOe9s-0ZNleE0_prcAC5XA-1; Thu, 14 May 2020 01:54:35 -0400
+X-MC-Unique: tOe9s-0ZNleE0_prcAC5XA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EEC341054F8F;
- Thu, 14 May 2020 05:54:13 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7293C1054F8B;
+ Thu, 14 May 2020 05:54:34 +0000 (UTC)
 Received: from probe.redhat.com (ovpn-113-9.rdu2.redhat.com [10.10.113.9])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 85D067D952;
- Thu, 14 May 2020 05:54:12 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 140986A977;
+ Thu, 14 May 2020 05:54:32 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RFC 05/32] python/qemu/lib: delint; add flake8 config
-Date: Thu, 14 May 2020 01:53:36 -0400
-Message-Id: <20200514055403.18902-6-jsnow@redhat.com>
+Subject: [PATCH RFC 13/32] python/qemu/lib: Adjust traceback typing
+Date: Thu, 14 May 2020 01:53:44 -0400
+Message-Id: <20200514055403.18902-14-jsnow@redhat.com>
 In-Reply-To: <20200514055403.18902-1-jsnow@redhat.com>
 References: <20200514055403.18902-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -103,124 +103,80 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Mostly, ignore the "no bare except" rule, because flake8 is not
-contextual and cannot determine if we re-raise. Pylint can, though, so
-always prefer pylint for that.
+mypy considers it incorrect to use `bool` to statically return false,
+because it will assume that it could conceivably return True, and gives
+different analysis in that case. Use a None return to achieve the same
+effect, but make mypy happy.
+
+Note: Pylint considers function signatures as code that might trip the
+duplicate-code checker. I'd rather not disable this as it does not
+trigger often in practice, so I'm disabling it as a one-off and filed a
+change request; see https://github.com/PyCQA/pylint/issues/3619
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- python/qemu/lib/.flake8    |  2 ++
- python/qemu/lib/accel.py   |  9 ++++++---
- python/qemu/lib/machine.py | 13 +++++++++----
- python/qemu/lib/qmp.py     |  4 ++--
- 4 files changed, 19 insertions(+), 9 deletions(-)
- create mode 100644 python/qemu/lib/.flake8
+ python/qemu/lib/machine.py |  8 ++++++--
+ python/qemu/lib/qmp.py     | 10 ++++++++--
+ 2 files changed, 14 insertions(+), 4 deletions(-)
 
-diff --git a/python/qemu/lib/.flake8 b/python/qemu/lib/.flake8
-new file mode 100644
-index 0000000000..45d8146f3f
---- /dev/null
-+++ b/python/qemu/lib/.flake8
-@@ -0,0 +1,2 @@
-+[flake8]
-+extend-ignore = E722  # Pylint handles this, but smarter.
-\ No newline at end of file
-diff --git a/python/qemu/lib/accel.py b/python/qemu/lib/accel.py
-index 36ae85791e..7fabe62920 100644
---- a/python/qemu/lib/accel.py
-+++ b/python/qemu/lib/accel.py
-@@ -23,11 +23,12 @@
- # Mapping host architecture to any additional architectures it can
- # support which often includes its 32 bit cousin.
- ADDITIONAL_ARCHES = {
--    "x86_64" : "i386",
--    "aarch64" : "armhf",
--    "ppc64le" : "ppc64",
-+    "x86_64": "i386",
-+    "aarch64": "armhf",
-+    "ppc64le": "ppc64",
- }
- 
-+
- def list_accel(qemu_bin):
-     """
-     List accelerators enabled in the QEMU binary.
-@@ -47,6 +48,7 @@ def list_accel(qemu_bin):
-     # Skip the first line which is the header.
-     return [acc.strip() for acc in out.splitlines()[1:]]
- 
-+
- def kvm_available(target_arch=None, qemu_bin=None):
-     """
-     Check if KVM is available using the following heuristic:
-@@ -69,6 +71,7 @@ def kvm_available(target_arch=None, qemu_bin=None):
-         return False
-     return True
- 
-+
- def tcg_available(qemu_bin):
-     """
-     Check if TCG is available.
 diff --git a/python/qemu/lib/machine.py b/python/qemu/lib/machine.py
-index c79fc8fb89..4b260fa2cb 100644
+index b2f0412197..2f94c851ed 100644
 --- a/python/qemu/lib/machine.py
 +++ b/python/qemu/lib/machine.py
-@@ -29,6 +29,7 @@
+@@ -24,6 +24,8 @@
+ import shutil
+ import socket
+ import tempfile
++from typing import Optional, Type
++from types import TracebackType
  
- LOG = logging.getLogger(__name__)
+ from . import qmp
  
-+
- class QEMUMachineError(Exception):
-     """
-     Exception called when an error in QEMUMachine happens.
-@@ -62,7 +63,8 @@ class QEMUMachine:
-     """
-     A QEMU VM
+@@ -127,9 +129,11 @@ def __init__(self, binary, args=None, wrapper=None, name=None,
+     def __enter__(self):
+         return self
  
--    Use this object as a context manager to ensure the QEMU process terminates::
-+    Use this object as a context manager to ensure
-+    the QEMU process terminates::
+-    def __exit__(self, exc_type, exc_val, exc_tb):
++    def __exit__(self,
++                 exc_type: Optional[Type[BaseException]],
++                 exc_val: Optional[BaseException],
++                 exc_tb: Optional[TracebackType]) -> None:
+         self.shutdown()
+-        return False
  
-         with VM(binary) as vm:
-             ...
-@@ -188,8 +190,10 @@ def send_fd_scm(self, fd=None, file_path=None):
-             fd_param.append(str(fd))
- 
-         devnull = open(os.path.devnull, 'rb')
--        proc = subprocess.Popen(fd_param, stdin=devnull, stdout=subprocess.PIPE,
--                                stderr=subprocess.STDOUT, close_fds=False)
-+        proc = subprocess.Popen(
-+            fd_param, stdin=devnull, stdout=subprocess.PIPE,
-+            stderr=subprocess.STDOUT, close_fds=False
-+        )
-         output = proc.communicate()[0]
-         if output:
-             LOG.debug(output)
-@@ -491,7 +495,8 @@ def event_wait(self, name, timeout=60.0, match=None):
- 
-     def events_wait(self, events, timeout=60.0):
+     def add_monitor_null(self):
          """
--        events_wait waits for and returns a named event from QMP with a timeout.
-+        events_wait waits for and returns a named event
-+        from QMP with a timeout.
- 
-         events: a sequence of (name, match_criteria) tuples.
-                 The match criteria are optional and may be None.
 diff --git a/python/qemu/lib/qmp.py b/python/qemu/lib/qmp.py
-index d6c9b2f4b1..6ae7693965 100644
+index 73d49050ed..b91c9d5c1c 100644
 --- a/python/qemu/lib/qmp.py
 +++ b/python/qemu/lib/qmp.py
-@@ -168,8 +168,8 @@ def accept(self, timeout=15.0):
+@@ -14,7 +14,9 @@
+ from typing import (
+     Optional,
+     TextIO,
++    Type,
+ )
++from types import TracebackType
  
-         @param timeout: timeout in seconds (nonnegative float number, or
-                         None). The value passed will set the behavior of the
--                        underneath QMP socket as described in [1]. Default value
--                        is set to 15.0.
-+                        underneath QMP socket as described in [1].
-+                        Default value is set to 15.0.
-         @return QMP greeting dict
-         @raise OSError on socket connection errors
-         @raise QMPConnectError if the greeting is not received
+ 
+ class QMPError(Exception):
+@@ -146,10 +148,14 @@ def __enter__(self):
+         # Implement context manager enter function.
+         return self
+ 
+-    def __exit__(self, exc_type, exc_value, exc_traceback):
++    def __exit__(self,
++                 # pylint: disable=duplicate-code
++                 # see https://github.com/PyCQA/pylint/issues/3619
++                 exc_type: Optional[Type[BaseException]],
++                 exc_val: Optional[BaseException],
++                 exc_tb: Optional[TracebackType]) -> None:
+         # Implement context manager exit function.
+         self.close()
+-        return False
+ 
+     def connect(self, negotiate=True):
+         """
 -- 
 2.21.1
 
