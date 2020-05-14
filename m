@@ -2,110 +2,73 @@ Return-Path: <SRS0=rzeH=64=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78F68C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 15:51:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B41D0C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 15:52:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 448072065F
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 15:51:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 796332065F
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 15:52:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LWtw3YRG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 448072065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="g4qJpCQG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 796332065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZG9I-00073n-Dj
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 11:51:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54724)
+	id 1jZG9d-0007ar-LC
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 11:52:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54772)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jZG8d-0006TY-JD
- for qemu-devel@nongnu.org; Thu, 14 May 2020 11:51:11 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31558
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1jZG8c-0007nn-R3
- for qemu-devel@nongnu.org; Thu, 14 May 2020 11:51:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589471469;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6AVroI4fpUHqkJtGVIGseM05A418SO7q/b4oI637ObA=;
- b=LWtw3YRGRkvjbq3pAl8OxE5WMPjy6XDYWuZunVmBecfrlbZv3eXxhYO7zDWi7Zy4xP3TzD
- 8cuVAPK106KMTjmIfG4QRliUUKDjamO3hFAhMfCup5Qh0XFHE4VPpACKJ2BEh0Q70xlCNE
- ERrC+foBs0Bf5Set2JW5s2Kh2IPzc04=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-444-yPA3-cUNMKuCkrA4R1p-gw-1; Thu, 14 May 2020 11:51:05 -0400
-X-MC-Unique: yPA3-cUNMKuCkrA4R1p-gw-1
-Received: by mail-wm1-f72.google.com with SMTP id o141so3248236wme.0
- for <qemu-devel@nongnu.org>; Thu, 14 May 2020 08:51:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=6AVroI4fpUHqkJtGVIGseM05A418SO7q/b4oI637ObA=;
- b=DFXp/o7t01kV8FnuqbE7s8Mo05Cejdxw7aXNURg26rwJ1z2k3hViw4ghYPxJLaRPMp
- n/3jqSirV3mA+OhPBTLg5Sh4s4VSNx+1PyZoJPHpHPzKyt8o2A2OUm1U3ekrWM98ONRf
- 5RMpiFwZNJTYW6eCSUau1Othu0yxjxH7KgxbQZWcQXwdA0BWc9fbRvRfEWmFewSrTNBR
- ls32p2+uX44/L+oElaXWZisToZHTWyFOf0iWAH3GYZDXSOB9eUEfjExSB8NyujQvx7+1
- nCG0s4DU+R0s/NQd65RtxVrXpucZwROzu2ilUm0WsAjW1JgVfi2CUAzRW+t0VQ9lmziu
- HPDg==
-X-Gm-Message-State: AOAM532r4GyBCxthDR9LT7+0ox+dxph9AXBeYN40ldcWEcJ29Yn0QWCz
- tzRNWPZGwxJX0BT7ajwJM7Date3LFrQV165j+K5j5NLj+CJTR2IwbNV03RzJXYougT9s7od8TGh
- IkF5SCZrZwhR9eAY=
-X-Received: by 2002:a05:6000:1045:: with SMTP id
- c5mr5940273wrx.31.1589471463800; 
- Thu, 14 May 2020 08:51:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxCGCLqAoOrOk518sVXyNCjcgkkZXf3S73eVpE2DEU4mdpSn/mp+utGPCQrIfYVUNpopTA5Sw==
-X-Received: by 2002:a05:6000:1045:: with SMTP id
- c5mr5940242wrx.31.1589471463526; 
- Thu, 14 May 2020 08:51:03 -0700 (PDT)
-Received: from [192.168.178.58] ([151.30.85.171])
- by smtp.gmail.com with ESMTPSA id t7sm4566121wrq.39.2020.05.14.08.51.02
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 14 May 2020 08:51:02 -0700 (PDT)
-Subject: Re: proposal: deprecate -readconfig/-writeconfig
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- John Snow <jsnow@redhat.com>
-References: <7599153e-89a2-9a86-16ad-4a3c6a107b18@redhat.com>
- <20200514085622.GB1280939@redhat.com>
- <56379563-c1f3-3270-f9ac-5bdd49b324aa@redhat.com>
- <20200514153456.GL1280939@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <93bda646-6f5f-69b6-57ec-36ec9485e84c@redhat.com>
-Date: Thu, 14 May 2020 17:51:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <sstabellini@kernel.org>)
+ id 1jZG8w-0006lq-G4
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 11:51:30 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36046)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <sstabellini@kernel.org>)
+ id 1jZG8v-0007pK-Ja
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 11:51:30 -0400
+Received: from localhost (c-67-164-102-47.hsd1.ca.comcast.net [67.164.102.47])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
+ bits)) (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 065B020675;
+ Thu, 14 May 2020 15:51:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1589471488;
+ bh=MWWezRE9X+vK6NleGVGLQUTNjVfEhwHqa1sh6i5nn0U=;
+ h=Date:From:To:cc:Subject:In-Reply-To:References:From;
+ b=g4qJpCQGpQQaSleI8+PVp4wzZt/QO9Tb0gB7xgqqijfnCR66lJrWkX1Gzr2gG1VK0
+ N9ogvKz57YNZU1J1AFRvp+lZabG200+xb+aNSlvmOIjNNe7ZVEjftuCB61g6rA8ANj
+ CMkrLcgrRrHels9frfs24ZsJC1gwt3quw6TX3oO4=
+Date: Thu, 14 May 2020 08:51:27 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+X-X-Sender: sstabellini@sstabellini-ThinkPad-T480s
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH 2/2] 9pfs: fix init_in_iov_from_pdu truncating size
+In-Reply-To: <3966630.RI2PehbzW4@silver>
+Message-ID: <alpine.DEB.2.21.2005140846460.26167@sstabellini-ThinkPad-T480s>
+References: <cover.1589132512.git.qemu_oss@crudebyte.com>
+ <6359442.q4qrkmKcdg@silver>
+ <alpine.DEB.2.21.2005131531400.26167@sstabellini-ThinkPad-T480s>
+ <3966630.RI2PehbzW4@silver>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-In-Reply-To: <20200514153456.GL1280939@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 11:41:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=198.145.29.99;
+ envelope-from=sstabellini@kernel.org; helo=mail.kernel.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 11:51:28
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -70
+X-Spam_score: -7.1
+X-Spam_bar: -------
+X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_HI=-5, SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,45 +81,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+Cc: Anthony Perard <anthony.perard@citrix.com>, Greg Kurz <groug@kaod.org>,
+ Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org,
+ Paul Durrant <paul@xen.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 14/05/20 17:34, Daniel P. Berrangé wrote:
-> Yeah, the key thing is that you really want to be able to provide the
-> whole initial config in one go as an atomic action. I don't want to
-> issue 100 individual QMP commands to load each initial device.
+On Thu, 14 May 2020, Christian Schoenebeck wrote:
+> Looks like this issue will still take quite some time to be fixed with Xen. If 
+> you don't mind I'll send out a patch to revert truncation on virtio side, so 
+> that at least this bug is fixed with virtio ASAP.
 
-Why?  I think if we do something like the qemu-vm-$TARGET that you
-propose below, there's absolutely no difference between the two.
+Let me answer to this quickly so that if you want to get the patch out
+today you can.
 
-Then you'd have a
 
-qemu-run /some/file.yaml
+Yes, I think it is OK to revert truncation in virtio now. Only one
+thing: would there still be any value in doing for Xen:
 
-(notice the lack of $TARGET) that takes care of starting the VM.
++    if (pdu->id + 1 == P9_RREAD) {
++        /* size[4] Rread tag[2] count[4] data[count] */
++        const size_t hdr_size = 11;
++        /*
++         * If current transport buffer size is smaller than actually required
++         * for this Rreaddir response, then truncate the response to the
++         * currently available transport buffer size, however only if it would
++         * at least allow to return 1 payload byte to client.
++         */
++        if (buf_size < hdr_size + 1) {
 
-> I tend to think we'd be better served by focusing on introducing a new set
-> of binaries,  qemu-vm-$TARGET, which exclusively use a new config syntax,
-> free of any legacy baggage present in qemu-system-$TARGET.
-> 
-> Work on qemu-vm-$TARGET will involve refactoring, and that will certainly
-> risk causing bugs in qemu-system-$TARGET. The premise though is that this
-> risk is lower, than if we tried to retrofit a new config syuntax directly
-> into qemu-system-$TARGET.
-> 
-> In particular I think it is basically impossible to do any meaningful
-> changes in the main() method of softmmu/vl.c, due to the fragile ordering
-> for creation of various different devices/backends, and its interaction
-> with the argv parsing. By using a new qemu-vm-$TARGET we can have a new
-> softmmu/vm.c, instead of vl.c. We'll still likely need to modify parts of
-> vl.c to use new/changed API calls, but that's less distruptive, as we
-> can leave the crazy logic for ordering of device creation untouched.
 
-Agreed.
-
-Paolo
-
+like your patch here does? Although not a complete solution it looks
+like it would still be a good improvement over the current situation for
+Xen.
 
