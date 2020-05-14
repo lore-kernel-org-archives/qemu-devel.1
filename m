@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B5E0C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 21:13:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5C42C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 21:14:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B8222065C
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 21:13:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 697712065F
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 May 2020 21:14:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="qskyBTjj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B8222065C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="bq6NXs/a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 697712065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZLA5-0006we-Bj
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 17:13:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47674)
+	id 1jZLB5-0000qy-MP
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 17:14:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47572)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jZL90-00054o-C9
- for qemu-devel@nongnu.org; Thu, 14 May 2020 17:11:54 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:5591)
+ id 1jZL8Q-0004H2-5k
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 17:11:18 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:11322)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1jZL8y-0000sy-1X
- for qemu-devel@nongnu.org; Thu, 14 May 2020 17:11:53 -0400
+ id 1jZL8P-0000lJ-8x
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 17:11:17 -0400
 Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5ebdb40a0000>; Thu, 14 May 2020 14:11:38 -0700
+ hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5ebdb3a80000>; Thu, 14 May 2020 14:10:00 -0700
 Received: from hqmail.nvidia.com ([172.20.161.6])
  by hqpgpgate101.nvidia.com (PGP Universal service);
- Thu, 14 May 2020 14:11:50 -0700
+ Thu, 14 May 2020 14:11:16 -0700
 X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Thu, 14 May 2020 14:11:50 -0700
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL111.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 14 May
- 2020 21:11:50 +0000
+ by hqpgpgate101.nvidia.com on Thu, 14 May 2020 14:11:16 -0700
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 14 May
+ 2020 21:11:15 +0000
 Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL105.nvidia.com
  (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Thu, 14 May 2020 21:11:44 +0000
+ Transport; Thu, 14 May 2020 21:11:09 +0000
 From: Kirti Wankhede <kwankhede@nvidia.com>
 To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Subject: [PATCH Kernel v20 7/8] vfio iommu: Add migration capability to report
- supported features
-Date: Fri, 15 May 2020 02:07:46 +0530
-Message-ID: <1589488667-9683-8-git-send-email-kwankhede@nvidia.com>
+Subject: [PATCH Kernel v20 2/8] vfio iommu: Remove atomicity of ref_count of
+ pinned pages
+Date: Fri, 15 May 2020 02:07:41 +0530
+Message-ID: <1589488667-9683-3-git-send-email-kwankhede@nvidia.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1589488667-9683-1-git-send-email-kwankhede@nvidia.com>
 References: <1589488667-9683-1-git-send-email-kwankhede@nvidia.com>
@@ -61,19 +61,19 @@ X-NVConfidentiality: public
 MIME-Version: 1.0
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1589490698; bh=7/FHdy4SAIGMgoLkaA5oW8uu18Kdw+ZqC1L5LJHsD+8=;
+ t=1589490600; bh=uUgKJVCFdD4Zp7du3o0u/sQDLu1K2BjFd3xLP7hSugs=;
  h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
  In-Reply-To:References:X-NVConfidentiality:MIME-Version:
  Content-Type;
- b=qskyBTjj/xsk77LFTmyE6HqCbb9PSWwGs0/KuXSskJB3oZ9XrvA9O3+rTU6OBcRiL
- nufYmdIbzZL69LOzZ0TmH/ZcxFeVFmBDnogdcnI1B+AiZoriJSD9UR9EYkiBdrGGZ+
- QFcUgcq/lazeuOBehLDRxUnEOZi6UFPCLVHBMH4r4RGO0SPh5gYoZ/1l5Lg3IHhg7+
- dTyM2/YpngcB9EF4MermvheI7UgAAppef1v4yNawWqkpic4Q3SKaXBAUhMsTS8w99t
- ZPmHmnpEWOWiMWXyy48gbcZaqZHSHzf9H0jNopQn2EGs1Vl51AfgRp+mIBb9BTvcO3
- sX9OEoWuRTCKA==
-Received-SPF: pass client-ip=216.228.121.65; envelope-from=kwankhede@nvidia.com;
- helo=hqnvemgate26.nvidia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 17:11:44
+ b=bq6NXs/abB/KJs/+KBqao9cgajn+SQEpaHKhwfEPJA1BB/F32gDfS7AeDPv0A6aZA
+ DaUWBysBR0ADVX0WFRKFeLmWzp1TlRMF+lfm1YwViYbo5+NjGtC/oweFLlCNNb1BQt
+ +IFAS/01/4djyX5g+5hTL61eqYCFf4FaGE6yQo3gZ7+pif17ZlP73/fDicQZaBVYp9
+ L88g+ec3cZ4l9kfD8jc1YHtDkNv05LeONRPf+4waDij/CnvxMEJE4AjYgIzz01GN3A
+ OlVA9dFOoMP+FV4XR1VGI2FSPCOU03DhH9Ya8Sh26aeY6zYywkzqXiCMZ39zJfQNKT
+ m6UB0dFmH2mIQ==
+Received-SPF: pass client-ip=216.228.121.64; envelope-from=kwankhede@nvidia.com;
+ helo=hqnvemgate25.nvidia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 17:11:09
 X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
 X-Spam_score_int: -70
 X-Spam_score: -7.1
@@ -104,94 +104,58 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Added migration capability in IOMMU info chain.
-User application should check IOMMU info chain for migration capability
-to use dirty page tracking feature provided by kernel module.
-User application must check page sizes supported and maximum dirty
-bitmap size returned by this capability structure for ioctls used to get
-dirty bitmap.
+vfio_pfn.ref_count is always updated while holding iommu->lock, using
+atomic variable is overkill.
 
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+Reviewed-by: Neo Jia <cjia@nvidia.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 23 ++++++++++++++++++++++-
- include/uapi/linux/vfio.h       | 22 ++++++++++++++++++++++
- 2 files changed, 44 insertions(+), 1 deletion(-)
+ drivers/vfio/vfio_iommu_type1.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index a1dc57bcece5..3edb3c3e6170 100644
+index a0c60f895b24..fa735047b04d 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -2387,6 +2387,22 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
- 	return ret;
- }
- 
-+static int vfio_iommu_migration_build_caps(struct vfio_iommu *iommu,
-+					   struct vfio_info_cap *caps)
-+{
-+	struct vfio_iommu_type1_info_cap_migration cap_mig;
-+
-+	cap_mig.header.id = VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION;
-+	cap_mig.header.version = 1;
-+
-+	cap_mig.flags = 0;
-+	/* support minimum pgsize */
-+	cap_mig.pgsize_bitmap = (size_t)1 << __ffs(iommu->pgsize_bitmap);
-+	cap_mig.max_dirty_bitmap_size = DIRTY_BITMAP_SIZE_MAX;
-+
-+	return vfio_info_add_capability(caps, &cap_mig.header, sizeof(cap_mig));
-+}
-+
- static long vfio_iommu_type1_ioctl(void *iommu_data,
- 				   unsigned int cmd, unsigned long arg)
- {
-@@ -2433,8 +2449,13 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
- 
- 		info.iova_pgsizes = iommu->pgsize_bitmap;
- 
--		ret = vfio_iommu_iova_build_caps(iommu, &caps);
-+		ret = vfio_iommu_migration_build_caps(iommu, &caps);
-+
-+		if (!ret)
-+			ret = vfio_iommu_iova_build_caps(iommu, &caps);
-+
- 		mutex_unlock(&iommu->lock);
-+
- 		if (ret)
- 			return ret;
- 
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 0a0c7315ddd6..ab1d0150bbd3 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -1013,6 +1013,28 @@ struct vfio_iommu_type1_info_cap_iova_range {
- 	struct	vfio_iova_range iova_ranges[];
+@@ -112,7 +112,7 @@ struct vfio_pfn {
+ 	struct rb_node		node;
+ 	dma_addr_t		iova;		/* Device address */
+ 	unsigned long		pfn;		/* Host pfn */
+-	atomic_t		ref_count;
++	unsigned int		ref_count;
  };
  
-+/*
-+ * The migration capability allows to report supported features for migration.
-+ *
-+ * The structures below define version 1 of this capability.
-+ *
-+ * The existence of this capability indicates IOMMU kernel driver supports
-+ * dirty page tracking.
-+ *
-+ * pgsize_bitmap: Kernel driver returns supported page sizes bitmap for dirty
-+ * page tracking.
-+ * max_dirty_bitmap_size: Kernel driver returns maximum supported dirty bitmap
-+ * size in bytes to be used by user application for ioctls to get dirty bitmap.
-+ */
-+#define VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION  1
-+
-+struct vfio_iommu_type1_info_cap_migration {
-+	struct	vfio_info_cap_header header;
-+	__u32	flags;
-+	__u64	pgsize_bitmap;
-+	__u64	max_dirty_bitmap_size;		/* in bytes */
-+};
-+
- #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
+ struct vfio_regions {
+@@ -233,7 +233,7 @@ static int vfio_add_to_pfn_list(struct vfio_dma *dma, dma_addr_t iova,
  
- /**
+ 	vpfn->iova = iova;
+ 	vpfn->pfn = pfn;
+-	atomic_set(&vpfn->ref_count, 1);
++	vpfn->ref_count = 1;
+ 	vfio_link_pfn(dma, vpfn);
+ 	return 0;
+ }
+@@ -251,7 +251,7 @@ static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
+ 	struct vfio_pfn *vpfn = vfio_find_vpfn(dma, iova);
+ 
+ 	if (vpfn)
+-		atomic_inc(&vpfn->ref_count);
++		vpfn->ref_count++;
+ 	return vpfn;
+ }
+ 
+@@ -259,7 +259,8 @@ static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn)
+ {
+ 	int ret = 0;
+ 
+-	if (atomic_dec_and_test(&vpfn->ref_count)) {
++	vpfn->ref_count--;
++	if (!vpfn->ref_count) {
+ 		ret = put_pfn(vpfn->pfn, dma->prot);
+ 		vfio_remove_from_pfn_list(dma, vpfn);
+ 	}
 -- 
 2.7.0
 
