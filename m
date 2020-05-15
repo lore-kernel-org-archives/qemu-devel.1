@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2ACAC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 19:03:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BECC2C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 19:03:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E65C206D8
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 19:03:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80E572073E
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 19:03:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yS+tR7sz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E65C206D8
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Y96EAWm8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80E572073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZfcY-0003Vb-Jz
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 15:03:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55832)
+	id 1jZfcc-0003jJ-LN
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 15:03:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55850)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jZfar-0001ay-F9
- for qemu-devel@nongnu.org; Fri, 15 May 2020 15:02:01 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:44994)
+ id 1jZfau-0001dn-AO
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 15:02:04 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:36730)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jZfap-0001op-1b
- for qemu-devel@nongnu.org; Fri, 15 May 2020 15:02:01 -0400
-Received: by mail-pf1-x443.google.com with SMTP id x13so1390639pfn.11
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 12:01:58 -0700 (PDT)
+ id 1jZfar-0001pB-PK
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 15:02:03 -0400
+Received: by mail-pg1-x541.google.com with SMTP id c75so409012pga.3
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 12:02:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=FdTEJwk8OCj2gJ6qdZ/T9ggcqt2MBWuYzVMhJvyQfZQ=;
- b=yS+tR7szv1YtRbv33TWYSDAG9Gj3FC/9Xd7OCxVB1WNu3YExPBy1bi1GGqo0SncHZw
- /MvQVwmTF0F9bbAKsIuN/VwaG91nmssbQkCAy+Hn2kb7CkmOUIF/3McyMIyto64PaHiL
- 0cK+WjOfRjslXCx2rpR1pdoQ7pOKVmjt/qlY6DJW0FjACI+dMIp1oWrw99YlrnnU0vsx
- VCsiqoyd30xy750kgPuxBNI276zRmB0TgNklBnJb00Lg3BcaHvzhV4Gtj+IQ8Ghz2swr
- 54SMIb7VzIOb0r21uma96Itw9p7/WVRHH/YIrDWSdPeAainjivHkN4YjZMome8ffhn5T
- DatA==
+ bh=24kHxcfGrQlNd1H83dAyevlj6srFCPQIje3jn2Z8nKE=;
+ b=Y96EAWm8ms/pCeAzNJLYTZfUilM9NY4ozOs30vnoWMR58mVabmlNXF5tWuc9PYueZm
+ aBkpvRgLIm/cfz3S4nL7M1lq3FjppPJR7WBm3eBz62pVGnNoPUqXhJSnXpQboPaf2znx
+ WmrtEYH4Rutgyb3FFG5uVLLwNeewmyfvnvkdbFzS7jP5qj6KuhKeKfUYekdkYD4J9EFj
+ IkaUj0HCZXXJhXVh4UvjAu5NGBIun0MAKlO2LiXXZRDw263uaYT1Q8UHcnpOeSGsRJSA
+ uJpkqdVxSzp7kP+BLndFY3RY0GemXmVN5PMGyVjZP0+dZ+EC75Ee0H5oopiTJPuVGxYE
+ PRDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=FdTEJwk8OCj2gJ6qdZ/T9ggcqt2MBWuYzVMhJvyQfZQ=;
- b=lLabvCmUHxx0N5RobIfUx5jfQHUwBobVSc5WBXlKcn0Fgt+oHa5btvvUzI2HrsBNWq
- hiXUuwUSe5GyaxbaVsM8ZbgFm1CT/hBAtCqd3udM1xbdhp3uc1trKyCPB/2og20OninL
- D1Puht0pXUDpTK6m/gSOPwnf2h1gB7n2b19HuSarNKjZzDuwTI4dwaRpqVGIc3qqLCAL
- LLwTIgVEuSnuU0P/NDlmzNAZo9SkEA5V+CmmNd+I9tLKaDl6oMYFGUM4G175D3ESK1Oq
- X+Rrw+yEPiSF0aWoCUDapKLk2N73z2Vo6kU2SCuzq2nnkCh3y9xKdZASPCSQgKlHaqGN
- 6Mng==
-X-Gm-Message-State: AOAM531YKtG/fwV3DlheqKxEMBSdE2WaaB5X7iQs05kfmcl1FImN+18w
- IwkD05dEg07fealUu1quQyZ7OpN2qUY=
-X-Google-Smtp-Source: ABdhPJxKCq+j3LEbs47QzAdQBQsRfnxa5RI8Z52n3e6qcsbhcH9nE2WN60+UHkhVWtzVIgeDCfvQ6A==
-X-Received: by 2002:a63:d556:: with SMTP id v22mr4604310pgi.263.1589569316901; 
- Fri, 15 May 2020 12:01:56 -0700 (PDT)
+ bh=24kHxcfGrQlNd1H83dAyevlj6srFCPQIje3jn2Z8nKE=;
+ b=C2XdE0nTVUslMmAuxHvBuJeZ1DzkpSwJHnehajQ8ekTaen1cmmzvFK4eC3IMQ7SIoL
+ LaJXUdPnOhCLAGNilOX/KI8HkbavhfGKgL+PjL9Umts7snU4zkgOPoWLv3yOY0zUz3gR
+ FrHJgRtraths/0OAzrHefFi+a3l3OBgqGDw9qRuJurgeinmHhuCz/uXZSWOHYolbh7+2
+ ypLYSCe6mqkxWMdinl+ryUjMunI6QNCk/n+iOl8WeK5N4BEAoAh6SlbWvrMv/jPHej03
+ U9WZlHHDT3JkYiR+olbRpMH7OzB185rcVh314d4bQbXcOLzlCDqrs1dtiNRAdFsAARf2
+ sl5Q==
+X-Gm-Message-State: AOAM530QiLiXdTyqZAO1qU0RKTkd+uNkLe6lHHdcoLvrhsrnS28jdgeM
+ XleqYfiIUZNAMT2CHAf9q0f6knSKEaY=
+X-Google-Smtp-Source: ABdhPJwHWrMsRxZv6f1BduS9o8nrKStP2QXEy/FJh03VUqgb98Qu1xNTp+//p7jwIBiTgrn/LEXERw==
+X-Received: by 2002:aa7:8603:: with SMTP id p3mr4733449pfn.116.1589569319676; 
+ Fri, 15 May 2020 12:01:59 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id q21sm2485719pfg.131.2020.05.15.12.01.55
+ by smtp.gmail.com with ESMTPSA id q21sm2485719pfg.131.2020.05.15.12.01.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 15 May 2020 12:01:56 -0700 (PDT)
+ Fri, 15 May 2020 12:01:59 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 01/10] softfloat: Use post test for floatN_mul
-Date: Fri, 15 May 2020 12:01:44 -0700
-Message-Id: <20200515190153.6017-2-richard.henderson@linaro.org>
+Subject: [PATCH 03/10] softfloat: Change tininess_before_rounding to bool
+Date: Fri, 15 May 2020 12:01:46 -0700
+Message-Id: <20200515190153.6017-4-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200515190153.6017-1-richard.henderson@linaro.org>
 References: <20200515190153.6017-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x541.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,183 +105,187 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The existing f{32,64}_addsub_post test, which checks for zero
-inputs, is identical to f{32,64}_mul_fast_test.  Which means
-we can eliminate the fast_test/fast_op hooks in favor of
-reusing the same post hook.
-
-This means we have one fewer test along the fast path for multiply.
+Slightly tidies the usage within softfloat.c and the
+representation in float_status.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- fpu/softfloat.c | 65 +++++++++++--------------------------------------
- 1 file changed, 14 insertions(+), 51 deletions(-)
+ include/fpu/softfloat-helpers.h |  8 ++---
+ include/fpu/softfloat-types.h   |  8 ++---
+ fpu/softfloat.c                 | 54 ++++++++++++---------------------
+ tests/fp/fp-test.c              |  2 +-
+ 4 files changed, 28 insertions(+), 44 deletions(-)
 
+diff --git a/include/fpu/softfloat-helpers.h b/include/fpu/softfloat-helpers.h
+index 528d7ebd9f..40d32a6d5d 100644
+--- a/include/fpu/softfloat-helpers.h
++++ b/include/fpu/softfloat-helpers.h
+@@ -53,9 +53,9 @@ this code that are retained.
+ 
+ #include "fpu/softfloat-types.h"
+ 
+-static inline void set_float_detect_tininess(int val, float_status *status)
++static inline void set_float_detect_tininess(bool val, float_status *status)
+ {
+-    status->float_detect_tininess = val;
++    status->tininess_before_rounding = val;
+ }
+ 
+ static inline void set_float_rounding_mode(int val, float_status *status)
+@@ -94,9 +94,9 @@ static inline void set_snan_bit_is_one(bool val, float_status *status)
+     status->snan_bit_is_one = val;
+ }
+ 
+-static inline int get_float_detect_tininess(float_status *status)
++static inline bool get_float_detect_tininess(float_status *status)
+ {
+-    return status->float_detect_tininess;
++    return status->tininess_before_rounding;
+ }
+ 
+ static inline int get_float_rounding_mode(float_status *status)
+diff --git a/include/fpu/softfloat-types.h b/include/fpu/softfloat-types.h
+index 619b875df6..874ddd9f93 100644
+--- a/include/fpu/softfloat-types.h
++++ b/include/fpu/softfloat-types.h
+@@ -116,10 +116,8 @@ typedef struct {
+  * Software IEC/IEEE floating-point underflow tininess-detection mode.
+  */
+ 
+-enum {
+-    float_tininess_after_rounding  = 0,
+-    float_tininess_before_rounding = 1
+-};
++#define float_tininess_after_rounding  false
++#define float_tininess_before_rounding true
+ 
+ /*
+  *Software IEC/IEEE floating-point rounding mode.
+@@ -158,10 +156,10 @@ enum {
+  */
+ 
+ typedef struct float_status {
+-    signed char float_detect_tininess;
+     signed char float_rounding_mode;
+     uint8_t     float_exception_flags;
+     signed char floatx80_rounding_precision;
++    bool tininess_before_rounding;
+     /* should denormalised results go to zero and set the inexact flag? */
+     bool flush_to_zero;
+     /* should denormalised inputs go to zero and set the input_denormal flag? */
 diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index a362bf89ca..5fb4ef75bb 100644
+index b741cf5bc3..65d457a548 100644
 --- a/fpu/softfloat.c
 +++ b/fpu/softfloat.c
-@@ -339,12 +339,10 @@ static inline bool f64_is_inf(union_float64 a)
-     return float64_is_infinity(a.s);
- }
+@@ -744,8 +744,7 @@ static FloatParts round_canonical(FloatParts p, float_status *s,
+             p.cls = float_class_zero;
+             goto do_zero;
+         } else {
+-            bool is_tiny = (s->float_detect_tininess
+-                            == float_tininess_before_rounding)
++            bool is_tiny = s->tininess_before_rounding
+                         || (exp < 0)
+                         || !((frac + inc) & DECOMPOSED_OVERFLOW_BIT);
  
--/* Note: @fast_test and @post can be NULL */
- static inline float32
- float32_gen2(float32 xa, float32 xb, float_status *s,
-              hard_f32_op2_fn hard, soft_f32_op2_fn soft,
--             f32_check_fn pre, f32_check_fn post,
--             f32_check_fn fast_test, soft_f32_op2_fn fast_op)
-+             f32_check_fn pre, f32_check_fn post)
- {
-     union_float32 ua, ub, ur;
+@@ -3579,11 +3578,9 @@ static float32 roundAndPackFloat32(bool zSign, int zExp, uint32_t zSig,
+                 float_raise(float_flag_output_denormal, status);
+                 return packFloat32(zSign, 0, 0);
+             }
+-            isTiny =
+-                (status->float_detect_tininess
+-                 == float_tininess_before_rounding)
+-                || ( zExp < -1 )
+-                || ( zSig + roundIncrement < 0x80000000 );
++            isTiny = status->tininess_before_rounding
++                  || (zExp < -1)
++                  || (zSig + roundIncrement < 0x80000000);
+             shift32RightJamming( zSig, - zExp, &zSig );
+             zExp = 0;
+             roundBits = zSig & 0x7F;
+@@ -3735,11 +3732,9 @@ static float64 roundAndPackFloat64(bool zSign, int zExp, uint64_t zSig,
+                 float_raise(float_flag_output_denormal, status);
+                 return packFloat64(zSign, 0, 0);
+             }
+-            isTiny =
+-                   (status->float_detect_tininess
+-                    == float_tininess_before_rounding)
+-                || ( zExp < -1 )
+-                || ( zSig + roundIncrement < UINT64_C(0x8000000000000000) );
++            isTiny = status->tininess_before_rounding
++                  || (zExp < -1)
++                  || (zSig + roundIncrement < UINT64_C(0x8000000000000000));
+             shift64RightJamming( zSig, - zExp, &zSig );
+             zExp = 0;
+             roundBits = zSig & 0x3FF;
+@@ -3878,11 +3873,9 @@ floatx80 roundAndPackFloatx80(int8_t roundingPrecision, bool zSign,
+                 float_raise(float_flag_output_denormal, status);
+                 return packFloatx80(zSign, 0, 0);
+             }
+-            isTiny =
+-                   (status->float_detect_tininess
+-                    == float_tininess_before_rounding)
+-                || ( zExp < 0 )
+-                || ( zSig0 <= zSig0 + roundIncrement );
++            isTiny = status->tininess_before_rounding
++                  || (zExp < 0 )
++                  || (zSig0 <= zSig0 + roundIncrement);
+             shift64RightJamming( zSig0, 1 - zExp, &zSig0 );
+             zExp = 0;
+             roundBits = zSig0 & roundMask;
+@@ -3956,12 +3949,10 @@ floatx80 roundAndPackFloatx80(int8_t roundingPrecision, bool zSign,
+                                 floatx80_infinity_low);
+         }
+         if ( zExp <= 0 ) {
+-            isTiny =
+-                   (status->float_detect_tininess
+-                    == float_tininess_before_rounding)
+-                || ( zExp < 0 )
+-                || ! increment
+-                || ( zSig0 < UINT64_C(0xFFFFFFFFFFFFFFFF) );
++            isTiny = status->tininess_before_rounding
++                  || (zExp < 0)
++                  || !increment
++                  || (zSig0 < UINT64_C(0xFFFFFFFFFFFFFFFF));
+             shift64ExtraRightJamming( zSig0, zSig1, 1 - zExp, &zSig0, &zSig1 );
+             zExp = 0;
+             if (isTiny && zSig1) {
+@@ -4237,17 +4228,12 @@ static float128 roundAndPackFloat128(bool zSign, int32_t zExp,
+                 float_raise(float_flag_output_denormal, status);
+                 return packFloat128(zSign, 0, 0, 0);
+             }
+-            isTiny =
+-                   (status->float_detect_tininess
+-                    == float_tininess_before_rounding)
+-                || ( zExp < -1 )
+-                || ! increment
+-                || lt128(
+-                       zSig0,
+-                       zSig1,
+-                       UINT64_C(0x0001FFFFFFFFFFFF),
+-                       UINT64_C(0xFFFFFFFFFFFFFFFF)
+-                   );
++            isTiny = status->tininess_before_rounding
++                  || (zExp < -1)
++                  || !increment
++                  || lt128(zSig0, zSig1,
++                           UINT64_C(0x0001FFFFFFFFFFFF),
++                           UINT64_C(0xFFFFFFFFFFFFFFFF));
+             shift128ExtraRightJamming(
+                 zSig0, zSig1, zSig2, - zExp, &zSig0, &zSig1, &zSig2 );
+             zExp = 0;
+diff --git a/tests/fp/fp-test.c b/tests/fp/fp-test.c
+index 7d0faf2b47..43ef9628c4 100644
+--- a/tests/fp/fp-test.c
++++ b/tests/fp/fp-test.c
+@@ -989,7 +989,7 @@ static void QEMU_NORETURN run_test(void)
  
-@@ -359,17 +357,12 @@ float32_gen2(float32 xa, float32 xb, float_status *s,
-     if (unlikely(!pre(ua, ub))) {
-         goto soft;
-     }
--    if (fast_test && fast_test(ua, ub)) {
--        return fast_op(ua.s, ub.s, s);
--    }
+                     verCases_tininessCode = 0;
+                     slowfloat_detectTininess = tmode;
+-                    qsf.float_detect_tininess = sf_tininess_to_qemu(tmode);
++                    qsf.tininess_before_rounding = sf_tininess_to_qemu(tmode);
  
-     ur.h = hard(ua.h, ub.h);
-     if (unlikely(f32_is_inf(ur))) {
-         s->float_exception_flags |= float_flag_overflow;
--    } else if (unlikely(fabsf(ur.h) <= FLT_MIN)) {
--        if (post == NULL || post(ua, ub)) {
--            goto soft;
--        }
-+    } else if (unlikely(fabsf(ur.h) <= FLT_MIN) && post(ua, ub)) {
-+        goto soft;
-     }
-     return ur.s;
- 
-@@ -380,8 +373,7 @@ float32_gen2(float32 xa, float32 xb, float_status *s,
- static inline float64
- float64_gen2(float64 xa, float64 xb, float_status *s,
-              hard_f64_op2_fn hard, soft_f64_op2_fn soft,
--             f64_check_fn pre, f64_check_fn post,
--             f64_check_fn fast_test, soft_f64_op2_fn fast_op)
-+             f64_check_fn pre, f64_check_fn post)
- {
-     union_float64 ua, ub, ur;
- 
-@@ -396,17 +388,12 @@ float64_gen2(float64 xa, float64 xb, float_status *s,
-     if (unlikely(!pre(ua, ub))) {
-         goto soft;
-     }
--    if (fast_test && fast_test(ua, ub)) {
--        return fast_op(ua.s, ub.s, s);
--    }
- 
-     ur.h = hard(ua.h, ub.h);
-     if (unlikely(f64_is_inf(ur))) {
-         s->float_exception_flags |= float_flag_overflow;
--    } else if (unlikely(fabs(ur.h) <= DBL_MIN)) {
--        if (post == NULL || post(ua, ub)) {
--            goto soft;
--        }
-+    } else if (unlikely(fabs(ur.h) <= DBL_MIN) && post(ua, ub)) {
-+        goto soft;
-     }
-     return ur.s;
- 
-@@ -1115,7 +1102,7 @@ static double hard_f64_sub(double a, double b)
-     return a - b;
- }
- 
--static bool f32_addsub_post(union_float32 a, union_float32 b)
-+static bool f32_addsubmul_post(union_float32 a, union_float32 b)
- {
-     if (QEMU_HARDFLOAT_2F32_USE_FP) {
-         return !(fpclassify(a.h) == FP_ZERO && fpclassify(b.h) == FP_ZERO);
-@@ -1123,7 +1110,7 @@ static bool f32_addsub_post(union_float32 a, union_float32 b)
-     return !(float32_is_zero(a.s) && float32_is_zero(b.s));
- }
- 
--static bool f64_addsub_post(union_float64 a, union_float64 b)
-+static bool f64_addsubmul_post(union_float64 a, union_float64 b)
- {
-     if (QEMU_HARDFLOAT_2F64_USE_FP) {
-         return !(fpclassify(a.h) == FP_ZERO && fpclassify(b.h) == FP_ZERO);
-@@ -1136,14 +1123,14 @@ static float32 float32_addsub(float32 a, float32 b, float_status *s,
-                               hard_f32_op2_fn hard, soft_f32_op2_fn soft)
- {
-     return float32_gen2(a, b, s, hard, soft,
--                        f32_is_zon2, f32_addsub_post, NULL, NULL);
-+                        f32_is_zon2, f32_addsubmul_post);
- }
- 
- static float64 float64_addsub(float64 a, float64 b, float_status *s,
-                               hard_f64_op2_fn hard, soft_f64_op2_fn soft)
- {
-     return float64_gen2(a, b, s, hard, soft,
--                        f64_is_zon2, f64_addsub_post, NULL, NULL);
-+                        f64_is_zon2, f64_addsubmul_post);
- }
- 
- float32 QEMU_FLATTEN
-@@ -1258,42 +1245,18 @@ static double hard_f64_mul(double a, double b)
-     return a * b;
- }
- 
--static bool f32_mul_fast_test(union_float32 a, union_float32 b)
--{
--    return float32_is_zero(a.s) || float32_is_zero(b.s);
--}
--
--static bool f64_mul_fast_test(union_float64 a, union_float64 b)
--{
--    return float64_is_zero(a.s) || float64_is_zero(b.s);
--}
--
--static float32 f32_mul_fast_op(float32 a, float32 b, float_status *s)
--{
--    bool signbit = float32_is_neg(a) ^ float32_is_neg(b);
--
--    return float32_set_sign(float32_zero, signbit);
--}
--
--static float64 f64_mul_fast_op(float64 a, float64 b, float_status *s)
--{
--    bool signbit = float64_is_neg(a) ^ float64_is_neg(b);
--
--    return float64_set_sign(float64_zero, signbit);
--}
--
- float32 QEMU_FLATTEN
- float32_mul(float32 a, float32 b, float_status *s)
- {
-     return float32_gen2(a, b, s, hard_f32_mul, soft_f32_mul,
--                        f32_is_zon2, NULL, f32_mul_fast_test, f32_mul_fast_op);
-+                        f32_is_zon2, f32_addsubmul_post);
- }
- 
- float64 QEMU_FLATTEN
- float64_mul(float64 a, float64 b, float_status *s)
- {
-     return float64_gen2(a, b, s, hard_f64_mul, soft_f64_mul,
--                        f64_is_zon2, NULL, f64_mul_fast_test, f64_mul_fast_op);
-+                        f64_is_zon2, f64_addsubmul_post);
- }
- 
- /*
-@@ -1834,14 +1797,14 @@ float32 QEMU_FLATTEN
- float32_div(float32 a, float32 b, float_status *s)
- {
-     return float32_gen2(a, b, s, hard_f32_div, soft_f32_div,
--                        f32_div_pre, f32_div_post, NULL, NULL);
-+                        f32_div_pre, f32_div_post);
- }
- 
- float64 QEMU_FLATTEN
- float64_div(float64 a, float64 b, float_status *s)
- {
-     return float64_gen2(a, b, s, hard_f64_div, soft_f64_div,
--                        f64_div_pre, f64_div_post, NULL, NULL);
-+                        f64_div_pre, f64_div_post);
- }
- 
- /*
+                     if (attrs & FUNC_EFF_TININESSMODE ||
+                         ((attrs & FUNC_EFF_TININESSMODE_REDUCEDPREC) &&
 -- 
 2.20.1
 
