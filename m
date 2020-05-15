@@ -2,91 +2,90 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97FEAC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 10:24:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64177C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 10:25:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DE4F206B6
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 10:24:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 26240206B6
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 10:25:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CwKN1W3q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DE4F206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MR5vD7dr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26240206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZXW3-0007Dx-H1
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 06:24:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47384)
+	id 1jZXX3-0000IX-AX
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 06:25:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47450)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZXV4-00061C-II
- for qemu-devel@nongnu.org; Fri, 15 May 2020 06:23:30 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:44489)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZXV3-0005As-Js
- for qemu-devel@nongnu.org; Fri, 15 May 2020 06:23:30 -0400
-Received: by mail-ot1-x344.google.com with SMTP id j4so1470041otr.11
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 03:23:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=I+CVRVNoW6KiRzqyNKlO+Y9DXrgjEYbM8n9WCNzSQAw=;
- b=CwKN1W3qrJJ2mYq9rICOdl3QWYXeLY4i6/AfG+ggRxMMe2m9TkqIhR/Q25pUViYBF5
- 82VdByNWZlUSgx+xZ5Lru3NVIE7q9ZZkYK5T2FbM1Ah7Eqp8FU2NSxNRrcQ+5T6/w95H
- R7egQcI44zNHLo1ou8h4cxX6SeiA+RYyi1iyjeR7WMtlMykZ0f0xo1hvLZ3gFAosiC9i
- z46l/cIHnMWr/G/m0SG7vPX4jwysS1Zf9bA4JIEobjvofWUFDVbMm4e4DNepvfh18/ZS
- F4igSp9NQR/akkRye5ZbIhmrMgoeroj7P2Mbwb6HuloSGCKvOlfVV0+YdgEQT8SCsBQI
- r2Hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=I+CVRVNoW6KiRzqyNKlO+Y9DXrgjEYbM8n9WCNzSQAw=;
- b=MvydghrKe7Aw8ln1p/1ZI7Fzk2sAMf06eaoIpB6eJZ8nykON83fBqPbSfCXOle4vHd
- U7MAjuUJIybq0uMbTdqugDCE8SMT96KnzKbV9Zt2n6HsNFPBZ5PmU9Vf9gDxCsDizMih
- rac+jwMUGp5VxSWpvuDn8Z1Ggn3AxtaGcuSodKYHcsfHouY0FXPxNGOctibBJyplRwyv
- twz6fyK9xxdOTlGyi54ShCYCZ/pIY28NJvjnh1dVtQhQ6tabeEMcN0TQMP3fqDnnTHF7
- 7EV2NghqBxX+N7iD/A9FG+jmfSorI7mAkLYiKe+TLOv6bx1VkQTClp9CBMNXvGK9tJbs
- 0a+A==
-X-Gm-Message-State: AOAM531ltEJqk0yOJVLimKkMSQT0HK0GssKZ0XpIoFKo9r41hzTbNTbZ
- 9P6je/gMTZwbhuI9L6DO6EZUoHK2DJv+1FJjV0KtIA==
-X-Google-Smtp-Source: ABdhPJy5feyswCTvztcIA+bGuGLgQrA4p37xfYKzEza1d/mIkXkQcQkN4UrS2p1bSvCRjcP3+gNsVWoXR587z5v62pA=
-X-Received: by 2002:a05:6830:1e4e:: with SMTP id
- e14mr1677156otj.91.1589538208134; 
- Fri, 15 May 2020 03:23:28 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jZXVM-0006cz-LG
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 06:23:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37439
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jZXVL-0005L2-3f
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 06:23:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589538226;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ptqfW/dI+y0Ty24LReYiuYZ4d2+CTDcjSi2JoSfnAYE=;
+ b=MR5vD7drANkRSbX51ZzLgO8NWGkMcc6uDahpyjb8cpg03zGEMCbzTUWbLlRjCy4A0/WVSI
+ vONcLcCMR7CRU9HLDpIo484pv+lJtSjPzP0EpMpFM94Z2pbpdI1SSuihNA2UeqF770mDA0
+ FAMTGPCKuOj6lULq2ZdFz5TpuoD0b5k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-401-Tn_bDupHMgK7iLM9iOT_5Q-1; Fri, 15 May 2020 06:23:32 -0400
+X-MC-Unique: Tn_bDupHMgK7iLM9iOT_5Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C75180183C;
+ Fri, 15 May 2020 10:23:31 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.64])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4091C341E3;
+ Fri, 15 May 2020 10:23:25 +0000 (UTC)
+Date: Fri, 15 May 2020 11:23:21 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: QEMU 5.1: Can we require each new device/machine to provided a
+ test?
+Message-ID: <20200515102321.GH1300305@redhat.com>
+References: <CAAdtpL7gSqz+R5LfbvsuxeeCzf1K-omHSeYo2eTOFYaMS1bp6A@mail.gmail.com>
+ <96440c8b-7f38-8fc4-0e9c-07ad878211e2@redhat.com>
 MIME-Version: 1.0
-References: <20200507151819.28444-1-peter.maydell@linaro.org>
- <CAFEAcA_p1x6S10yswHgOkMd=KrxcTGh9TD47+k1LRKM0xy5x+Q@mail.gmail.com>
- <567755c6-3bb1-b16e-af26-431dec4616ba@redhat.com>
- <CAFEAcA-67uGcwSu7mJ+w26xYqpTm4C0t3Yrr8gWCsA1VtHeaLg@mail.gmail.com>
- <49f4fc6f-329b-9afc-92db-c59dd1ce67ea@redhat.com>
-In-Reply-To: <49f4fc6f-329b-9afc-92db-c59dd1ce67ea@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 15 May 2020 11:23:17 +0100
-Message-ID: <CAFEAcA93bQOh12CPS8xp9Qc45YrPTVSLo6yQ6raQ0WitHR184A@mail.gmail.com>
-Subject: Re: [PATCH 0/5] docs/system: Document some arm board models
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+In-Reply-To: <96440c8b-7f38-8fc4-0e9c-07ad878211e2@redhat.com>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 22:56:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -10
+X-Spam_score: -1.1
+X-Spam_bar: -
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FROM_EXCESS_BASE64=0.979, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,32 +98,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-discuss@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 15 May 2020 at 10:05, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
-> Sphinx consumes docs/system/$arch/$machine.rst files committed to the
-> repository, and we don't need to build various qemu-system-arch to
-> generate the documentation.
->
-> If you work on a particular board, you might end up only building its
-> corresponding qemu-system-ARCH. Maybe we can add an extra-pass once a
-> binary is linked, and re-generate the docs/system/ARCH/$machine.rst
-> files, so if you modified a board and its documentation placeholder in
-> the code, when commiting your code change, you also have to commit the
-> rst changes.
+On Fri, May 15, 2020 at 12:11:17PM +0200, Thomas Huth wrote:
+> On 07/04/2020 12.59, Philippe Mathieu-Daudé wrote:
+> > Hello,
+> > 
+> > Following Markus thread on deprecating unmaintained (untested) code
+> > (machines) [1] and the effort done to gather the information shared in
+> > the replies [2], and the various acceptance tests added, is it
+> > feasible to require for the next release that each new device/machine
+> > is provided a test covering it?
+> > 
+> > If no, what is missing?
+> 
+> If a qtest is feasible, yes, I think we should require one for new
+> devices. But what about machines - you normally need a test image for
+> this. In that case, there is still the question where testing images
+> could be hosted. Not every developer has a web space where they could
+> put their test images onto. And what about images that contain non-free
+> code?
 
-I'm not a huge fan of committing generated files to source control...
-I think I'd prefer an approach that worked via some kind of
-kerneldoc comments that we pull out and parse using the Sphinx
-plugin we have for that. (There's more complication than that
-but roughly I think that would be the kind of approach I'd like
-to see.)
+Yep, it isn't feasible to make this a hard rule.
 
-thanks
--- PMM
+IMHO this is where a support tier classification comes into play
+
+ - Tier 1: actively maintained, qtest coverage available. Expected
+           to work reliably at all times since every commit is CI
+	   tested
+
+  - Tier 2: actively maintained, no qtest coverage. Should usually
+           work but regression may creep in due to reliance on the
+	   maintainer to manually test on adhoc basis
+
+  - Tier 3: not actively maintained, unknown state but liable to
+            be broken indefinitely
+
+Tier 1 is obviously the most desirable state we would like everthing to
+be at. Contributors will have to fix problems their patches cause as
+they will be blocked by CI.
+
+Tier 2 is an admission that reality gets in the way. Ideally stuff in
+this tier will graduate to Tier 1 at some point. Even if it doesn't
+though, it is still valid to keep it in QEMU long term. Contributors
+shouldn't gratuitously break stuff in these board, but if they do,
+then the maintainer is ultimately responsible for fixing it, as the
+contributors don't have a test rig for it.
+
+Tier 3 is abandonware. If a maintainer doesn't appear, users should
+not expect it to continue to exist long term. Contributors are free
+to send patches which break this, and are under no obligation to
+fix problems in these boards. We may deprecate & delete it after a
+while
+
+
+Over time we'll likely add more criteria to stuff in Tier 1. This
+could lead to some things dropping from Tier 1 to Tier 2. This is
+OK, as it doesn't make those things worse than they already were.
+We're just saying that Tier 2 isn't as thoroughly tested as we
+would like it to be in an ideal world.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
 
