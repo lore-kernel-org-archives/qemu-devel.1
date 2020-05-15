@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=FROM_WSP_TRAIL,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59B0CC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 04:41:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7115EC433E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 04:41:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26E0C20760
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 04:41:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26E0C20760
+	by mail.kernel.org (Postfix) with ESMTPS id 451F02065F
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 04:41:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 451F02065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZSAI-0003dH-Bb
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 00:41:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41056)
+	id 1jZSAK-0003fo-GT
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 00:41:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41066)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1jZS7Y-0007gy-Gl
- for qemu-devel@nongnu.org; Fri, 15 May 2020 00:38:52 -0400
+ id 1jZS7Z-0007hG-Lk
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 00:38:53 -0400
 Received: from mga12.intel.com ([192.55.52.136]:45615)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1jZS7X-0007ba-DN
- for qemu-devel@nongnu.org; Fri, 15 May 2020 00:38:52 -0400
-IronPort-SDR: QlPBh03/Qp70aLKij7AL8yCJ9x2XRSoxhg6uXzEYVU/4RzUIwrQNByfm0bL/0LVzSo/hgSaoUd
- t5wSDG/qB/pg==
+ id 1jZS7Y-0007ba-SZ
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 00:38:53 -0400
+IronPort-SDR: 6uJ4RuuYXP6EPxfjVprHDOrraQl8bTfLtTcGM5oxp3syS+AifWobZeY3Rv3iZy8uXT1zHzdy81
+ cIlEneFBf+iQ==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 14 May 2020 21:38:50 -0700
-IronPort-SDR: Vjl0r2p4InwZqaLfztA0ibOkH4hZhmOeSJ50BOla12qOSjznZqRJ8f/fPk11QMPJ6FesE03AR3
- 6+s4oQxcFlZg==
+ 14 May 2020 21:38:52 -0700
+IronPort-SDR: n09WbtQhRsoBAEGUiaJLXbb9LWzPvf/OHs/d38ePO15mz9yhF3tTgM0/OokPHh0Qijtteg8Gq1
+ aOgFKGbRWlmQ==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.73,394,1583222400"; d="scan'208";a="263069541"
+X-IronPort-AV: E=Sophos;i="5.73,394,1583222400"; d="scan'208";a="263069548"
 Received: from unknown (HELO localhost.localdomain) ([10.239.13.19])
- by orsmga003.jf.intel.com with ESMTP; 14 May 2020 21:38:48 -0700
+ by orsmga003.jf.intel.com with ESMTP; 14 May 2020 21:38:50 -0700
 From: Zhang Chen <chen.zhang@intel.com >
 To: "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
  Juan Quintela <quintela@redhat.com>,
  Zhanghailiang <zhang.zhanghailiang@huawei.com>,
  qemu-dev <qemu-devel@nongnu.org>
-Subject: [PATCH  2/3] migration/colo: Update checkpoint time lately
-Date: Fri, 15 May 2020 12:28:17 +0800
-Message-Id: <20200515042818.17908-3-chen.zhang@intel.com>
+Subject: [PATCH 3/3] migration/colo: Merge multi checkpoint request into one.
+Date: Fri, 15 May 2020 12:28:18 +0800
+Message-Id: <20200515042818.17908-4-chen.zhang@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200515042818.17908-1-chen.zhang@intel.com>
 References: <20200515042818.17908-1-chen.zhang@intel.com>
@@ -87,37 +87,57 @@ Sender: "Qemu-devel"
 
 From: Zhang Chen <chen.zhang@intel.com>
 
-Previous operation(like vm_start and replication_start_all) will consume
-extra time for first forced synchronization, so reduce it in this patch.
+When COLO guest occur issues, COLO-compare will catch lots of
+different network packet and trigger notification multi times,
+force periodic may happen at the same time. So this can be
+efficient merge checkpoint request within COLO_CHECKPOINT_INTERVAL.
 
 Signed-off-by: Zhang Chen <chen.zhang@intel.com>
 ---
- migration/colo.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ migration/colo.c | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
 
 diff --git a/migration/colo.c b/migration/colo.c
-index 5ef69b885d..d5bced22cb 100644
+index d5bced22cb..e6a7d8c6e2 100644
 --- a/migration/colo.c
 +++ b/migration/colo.c
-@@ -531,7 +531,6 @@ static void colo_process_checkpoint(MigrationState *s)
+@@ -47,6 +47,9 @@ static COLOMode last_colo_mode;
+ 
+ #define COLO_BUFFER_BASE_SIZE (4 * 1024 * 1024)
+ 
++/* Default COLO_CHECKPOINT_INTERVAL is 1000 ms */
++#define COLO_CHECKPOINT_INTERVAL 1000
++
+ bool migration_in_colo_state(void)
  {
-     QIOChannelBuffer *bioc;
-     QEMUFile *fb = NULL;
--    int64_t current_time = qemu_clock_get_ms(QEMU_CLOCK_HOST);
-     Error *local_err = NULL;
-     int ret;
+     MigrationState *s = migrate_get_current();
+@@ -651,13 +654,20 @@ out:
+ void colo_checkpoint_notify(void *opaque)
+ {
+     MigrationState *s = opaque;
+-    int64_t next_notify_time;
++    int64_t now = qemu_clock_get_ms(QEMU_CLOCK_HOST);
  
-@@ -580,8 +579,8 @@ static void colo_process_checkpoint(MigrationState *s)
-     qemu_mutex_unlock_iothread();
-     trace_colo_vm_state_change("stop", "run");
+-    qemu_sem_post(&s->colo_checkpoint_sem);
+-    s->colo_checkpoint_time = qemu_clock_get_ms(QEMU_CLOCK_HOST);
+-    next_notify_time = s->colo_checkpoint_time +
+-                    s->parameters.x_checkpoint_delay;
+-    timer_mod(s->colo_delay_timer, next_notify_time);
++    /*
++     * When COLO guest occur issues, COLO-compare will catch lots of
++     * different network packet and trigger notification multi times,
++     * force periodic may happen at the same time. So this can be
++     * efficient merge checkpoint request within COLO_CHECKPOINT_INTERVAL.
++     */
++    if (now > s->colo_checkpoint_time + COLO_CHECKPOINT_INTERVAL) {
++        qemu_sem_post(&s->colo_checkpoint_sem);
++        timer_mod(s->colo_delay_timer, now +
++                  s->parameters.x_checkpoint_delay);
++        s->colo_checkpoint_time = now;
++    }
+ }
  
--    timer_mod(s->colo_delay_timer,
--            current_time + s->parameters.x_checkpoint_delay);
-+    timer_mod(s->colo_delay_timer, qemu_clock_get_ms(QEMU_CLOCK_HOST) +
-+              s->parameters.x_checkpoint_delay);
- 
-     while (s->state == MIGRATION_STATUS_COLO) {
-         if (failover_get_state() != FAILOVER_STATUS_NONE) {
+ void migrate_start_colo_process(MigrationState *s)
 -- 
 2.17.1
 
