@@ -2,94 +2,118 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15453C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:36:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C9C3C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:42:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBE122074D
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:36:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 441E42074D
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:42:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="01BzQG+U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBE122074D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="npKH6t1w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 441E42074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZZZz-0007Sz-Uy
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 08:36:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44360)
+	id 1jZZfR-00044H-AQ
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 08:42:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44882)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <rvkagan@yandex-team.ru>)
- id 1jZZZ8-0006wN-Rn
- for qemu-devel@nongnu.org; Fri, 15 May 2020 08:35:50 -0400
-Received: from forwardcorp1o.mail.yandex.net ([2a02:6b8:0:1a2d::193]:35324)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jZZe4-00028Z-Hx; Fri, 15 May 2020 08:40:56 -0400
+Received: from mail-eopbgr150102.outbound.protection.outlook.com
+ ([40.107.15.102]:11310 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <rvkagan@yandex-team.ru>)
- id 1jZZZ5-0006Xl-A4
- for qemu-devel@nongnu.org; Fri, 15 May 2020 08:35:49 -0400
-Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net
- [IPv6:2a02:6b8:0:1402::301])
- by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 00EBD2E15EC;
- Fri, 15 May 2020 15:35:40 +0300 (MSK)
-Received: from iva4-7c3d9abce76c.qloud-c.yandex.net
- (iva4-7c3d9abce76c.qloud-c.yandex.net [2a02:6b8:c0c:4e8e:0:640:7c3d:9abc])
- by mxbackcorp1g.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- OGWjJb71yy-ZcrmLdE5; Fri, 15 May 2020 15:35:39 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1589546139; bh=Q9jFzaev3lq9TkuTq/i00/QKNOl8R0xszKIuZTqHRt0=;
- h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
- b=01BzQG+UDh+pe/m/sdrYkm75Y0a4eE65VJo/GmFtiOhkCu26aEHN+0BSsTrJBcqCd
- nZQMYJmwzMwvbmdb7RVcylP/fsnoLjjMtWtlfplOHnRatfsFVBz/2gUTmwUXEnqJGS
- E96We3l3irKZ9RK49ONiq6MzEgre7c4rKYho66eo=
-Authentication-Results: mxbackcorp1g.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
- [2a02:6b8:b081:220::1:7])
- by iva4-7c3d9abce76c.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- mADdXfnKz8-ZbWSseSF; Fri, 15 May 2020 15:35:37 +0300
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
- (Client certificate not present)
-Date: Fri, 15 May 2020 15:35:35 +0300
-From: Roman Kagan <rvkagan@yandex-team.ru>
-To: Jon Doron <arilou@gmail.com>
-Subject: Re: [PATCH v4 5/6] i386: Hyper-V VMBus ACPI DSDT entry
-Message-ID: <20200515123535.GF85336@rvkaganb.lan>
-Mail-Followup-To: Roman Kagan <rvkagan@yandex-team.ru>,
- Jon Doron <arilou@gmail.com>, Igor Mammedov <imammedo@redhat.com>,
- "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
- eyakovlev@virtuozzo.com, ehabkost@redhat.com, qemu-devel@nongnu.org,
- liran.alon@oracle.com, Roman Kagan <rkagan@virtuozzo.com>,
- pbonzini@redhat.com, vkuznets@redhat.com
-References: <20200424123444.3481728-1-arilou@gmail.com>
- <20200424123444.3481728-6-arilou@gmail.com>
- <20200505150637.7131e79b@redhat.com>
- <20200505153838.GC2862@jondnuc>
- <30fea22b-ef36-04d9-17ef-d13e3f93a3c5@maciej.szmigiero.name>
- <20200507031425.GG2862@jondnuc>
- <20200511201106.GB1307176@rvkaganb.lan>
- <20200513173725.277b0e16@redhat.com>
- <20200515085636.GN2862@jondnuc>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jZZe2-0008VJ-8h; Fri, 15 May 2020 08:40:55 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NjeByZFf7VKPe9IKiTIJrtnolm4EeMpQeFIPGE+GJAITGzPMj7l90j48V/nJga6vIQW++PLrRjcLtszkur+YWjnKWKncoaurkIBHQOpCGyCbz5AqSQ8gbZPrcpzh/Q1Gb52DpzGk2TlaA2g+lLq0zxXCNODDE18RFGzSYJFW+jjSpmeVzbeHh0NkwEOjpzXV+813WseGAAdL+xS+q+ZJnXcYtnacABKP5Rz6tSdlX3QBWCSK6qGSfWBZVHdtY8ec3+zMhdf9JMwr+mAMPmErRm6vADQ2yRV94Fu3YV8R1o6VzX0w6AOHASZhFgFRws2BSN126zX8uLWI6h7LnSQJ3w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MUaN9DoZA2ANuBSVz7UkfInKucGNe8SSEpGGDhFeThU=;
+ b=lc5nu+8cpl6T3NLKs6jGzWbkASB8Swzr6qZGOwbCFJb3y1i+0cGi9ei0uCiZWQHIHaI6uLsQXHHZKJkPY3ppcBk5qdh5e2j4nhy21X6Q0rX3XBymjIr/7Rqmz7z4I8ASKtLjJ3AD1pvJDlB+a30std/BWsL9nNbQZBRBijDPcHkKSC+VEQjCC5NGgI3FE0EbNZz/KneVkqrRGIT+9jSdx+0OJhwA5D6VmF1qvAJ0jVTFyfIkQUJ7eOaZB4QznhHqoizNc/chQAUtRSLyThaJLlnAoGvHWvSJHtxmcpt0uAm2uiR+2FDHV8uJHoPdUDjyaXgTcOhramOWPdF4tvu5TQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MUaN9DoZA2ANuBSVz7UkfInKucGNe8SSEpGGDhFeThU=;
+ b=npKH6t1wfvMKqwFydub70h+5TxMQK+UDyH4hT1uY2W4K0ZUtI6cqXhqsBN1UFjJ8u3pVGR1AYw8dOcy+LJ8rW6nUz1OjbuJHppu/UqDclEDl0Vq5tBY9Y9CI+pOAH+KmEf9zIBIYF1IJn/deyOK+53342/W3WMowkpJHBYmMmcg=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5381.eurprd08.prod.outlook.com (2603:10a6:20b:105::23)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.26; Fri, 15 May
+ 2020 12:40:50 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.3000.016; Fri, 15 May 2020
+ 12:40:50 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v3 0/7] fix migration with bitmaps and mirror
+Date: Fri, 15 May 2020 15:40:17 +0300
+Message-Id: <20200515124024.3491-1-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200515085636.GN2862@jondnuc>
-Received-SPF: pass client-ip=2a02:6b8:0:1a2d::193;
- envelope-from=rvkagan@yandex-team.ru; helo=forwardcorp1o.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Type: text/plain
+X-ClientProxiedBy: AM0PR03CA0039.eurprd03.prod.outlook.com (2603:10a6:208::16)
+ To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from kvm.sw.ru (185.215.60.184) by
+ AM0PR03CA0039.eurprd03.prod.outlook.com (2603:10a6:208::16) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3000.20 via Frontend Transport; Fri, 15 May 2020 12:40:49 +0000
+X-Mailer: git-send-email 2.21.0
+X-Originating-IP: [185.215.60.184]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a75674fa-6a12-48f3-ecad-08d7f8cd32bb
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5381:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5381F971E36070EA643D63A0C1BD0@AM7PR08MB5381.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:23;
+X-Forefront-PRVS: 04041A2886
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Iu5+A97wXshr/crYkkvIngzNyRnIhEyO+2Gib0YTczzV0Kh/uq45mlcyj5rJYHLjRfgIhJrixHN5uZpCRqE88TLe1180r+G3KNbmyG10W7Hb1S6j8PIMBn+8M5G9aGCTsedyzFurLiBGeS0ZbdRXBYqxY/C1JtJjRwoltlI2MjOIX/+2hkU5AcqbmhFzYPVyZXGUM3ehhVYxJd2QBGQ1ShnTZfoBP+IkdMmX/61SRkXW/WAV7OnaRQspwxsmrED5RL6ihkBb4DLSe8sM4+MgHb9UcAvYBnI1o8Ty4G7EaK5v34Q8fnx1gvApyxnOFcm1UGpM9IjhVSR3kHXWTBIyCyf9/5mUAxzWkVBjbz39mpScxk+e9/wmusG1puyJmzys7rAwOxWxDCWuK3qdxvafzSGfwc+NmZjw20I6aZ6abSjrmn+J2BFZWfzphNDNqjfP
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(366004)(376002)(136003)(346002)(396003)(39840400004)(52116002)(6486002)(36756003)(8676002)(7416002)(8936002)(6916009)(478600001)(6666004)(86362001)(6512007)(4326008)(316002)(26005)(5660300002)(16526019)(186003)(6506007)(2616005)(2906002)(1076003)(956004)(66556008)(66946007)(66476007);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: 164VGg8Uz2pq/U9lVxJ9JmFjdy+ZQJuF3FbUEjFuqdmMUnq3Rml05TpQLPVb+U25Ihm+sYs0D6diQHXm8C4uIRW07LzNt74pM+FMKp2MrlUm4dXO+Kcg/U5So2pvfV0s/oabAKMc0m9YMtyxe+kad60w+GRwjbuyuXOWmsW0nSKOuS8nmIg+wvQFx5eEkGLfnyotLw7mF+k7l1jT+B7tFdDlSiy1ekIMPwe2uc4e5UEVVBULgki2jTt/q8p8Gx3CmQM/tdE6qxN2kwmBQ3jtPdDZLPKbNF2iv5zam1avHYcL0eOqf+bgVLaAEffhgRCXuswaFiW+9zQ+MX8bwcog9sEd7+bg/+MFmlBScjTtZzr8BZHDamUHXbfbSUcoix0LBYgjWeqfrAHKQpMxt3APklcdDQqAmY9xNwIsLS23Td/F3FdbiwMsd4frOjJTMs7lfHCbgBJVrxJFY0reelZN/TLZoetOyL0m34JjjItogucw6ZdemhJMMpziA+TL8ASC
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a75674fa-6a12-48f3-ecad-08d7f8cd32bb
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 May 2020 12:40:50.0838 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ab2TcjurwXQ+wMsvOFCkIL4vB36M5oBBbkbWPWBAx2fP+gM4m9wOJ+5EOhgEltdDWSjul/haQlDswKPAAx7BxOXPQvH+gSmm8/hYHTsXbCU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5381
+Received-SPF: pass client-ip=40.107.15.102;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR01-DB5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 08:40:51
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_PASS=-0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,151 +127,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>, eyakovlev@virtuozzo.com,
- ehabkost@redhat.com, qemu-devel@nongnu.org, liran.alon@oracle.com,
- Roman Kagan <rkagan@virtuozzo.com>, pbonzini@redhat.com,
- Igor Mammedov <imammedo@redhat.com>, vkuznets@redhat.com
+Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
+ stefanha@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, mreitz@redhat.com, pavel.dovgaluk@ispras.ru,
+ den@openvz.org, pbonzini@redhat.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 15, 2020 at 11:56:36AM +0300, Jon Doron wrote:
-> On 13/05/2020, Igor Mammedov wrote:
-> 
-> Do you guys know perhaps which module is reading the ACPI configuration for
-> VMBus? vmbus.sys / vmbkmcl.sys / winhv.sys? is it the kernel or HAL?
+v3:
+01: updated, just taken from Kevin's block-tree
+02: fix grammar, add Eric's r-b
+03: add Eric's and Andrey's r-bs (Andrey's one comes from downstrem)
+04: update commit message a bit
+06-07: new
 
-No idea...
+Max Reitz (1):
+  block: Mark commit, mirror, blkreplay as filters
 
-> I dont have any real HyperV Windows to play with...
-> 
-> Roman, do you remember when is this information being used? Do we need a
-> full emulation setup (aka your hv-scsi / hv-net) patches in order to see
-> Windows working this ACPI entry?
+Vladimir Sementsov-Ogievskiy (6):
+  migration/block-dirty-bitmap: refactor init_dirty_bitmap_migration
+  block/dirty-bitmap: add bdrv_has_named_bitmaps helper
+  migration/block-dirty-bitmap: fix bitmaps pre-blockdev migration
+    during mirror job
+  iotests: 194: test also migration of dirty bitmap
+  migration/block-dirty-bitmap: add_bitmaps_to_list: check disk name
+    once
+  migration/block-dirty-bitmap: forbid migration by generated node-name
 
-I think the series you've posted should be enough to see VMBus in the
-DeviceManager.  hv-scsi and hv-net should not further depend on ACPI.
-hv-pci does: it (at least in its Linux driver implementation) wants the
-VMBus entry or any of its ancestors to define range(s) where mmio
-windows can be placed.  This may be worth considering when deciding
-where to stick the VMBus entry to.
+ include/block/dirty-bitmap.h   |   1 +
+ block/blkreplay.c              |   1 +
+ block/commit.c                 |   2 +
+ block/dirty-bitmap.c           |  13 ++++
+ block/mirror.c                 |   2 +
+ migration/block-dirty-bitmap.c | 126 ++++++++++++++++++++++++---------
+ tests/qemu-iotests/194         |  14 ++--
+ tests/qemu-iotests/194.out     |   6 ++
+ 8 files changed, 127 insertions(+), 38 deletions(-)
 
-Thanks,
-Roman.
+-- 
+2.21.0
 
-> Thanks,
-> -- Jon.
-> 
-> > On Mon, 11 May 2020 23:11:23 +0300
-> > Roman Kagan <rvkagan@yandex-team.ru> wrote:
-> > 
-> > > On Thu, May 07, 2020 at 06:14:25AM +0300, Jon Doron wrote:
-> > > > Igor it seems like the IRQ being used is 5 and not 7 & 13 like in the
-> > > > current patch.
-> > > 
-> > > HyperV using irq 5 doesn't mean QEMU has to too.  Especially so as no
-> > > guest was noticed to use the irqs in ACPI.  I'd rather try and test if
-> > > the guest requires any those at all.
-> > > 
-> > > > Seems like it needs to reside in the _CRS like you said.
-> > > 
-> > > They already are there.
-> > > 
-> > > > Seems like it has all those _STA/_DIS/_PS0 just like the way it's currently
-> > > > in the patch (unless I'm missing something).
-> > > 
-> > > Right, but, as you can see, they are pretty dumb, so the question is
-> > > whether they are necessary or the guests can do without (Linux
-> > > apparently can).
-> > 
-> > Agreed with all of above,
-> > Instead of blind copying dubious AML, we should try to figure out what's
-> > really necessary of it and throw away the rest.
-> > 
-> > > 
-> > > Thanks,
-> > > Roman.
-> > > 
-> > > > Notice _PS3 is not a Method.
-> > > >
-> > > > So just to summarize the changes i need to do:
-> > > > 1. Change from 2 IRQs to single one (and use 5 as the default)
-> > > > 2. IRQs needs to be under _CRS.
-> > > > 3. You mentioned you want under a different location than the ISA bug where
-> > > > would you want it to be?
-> > > >
-> > > > Please let me know if there is anything else.
-> > > >
-> > > > Thanks,
-> > > > -- Jon.
-> > > >
-> > > > On 06/05/2020, Maciej S. Szmigiero wrote:
-> > > > > On 05.05.2020 17:38, Jon Doron wrote:
-> > > > > > On 05/05/2020, Igor Mammedov wrote:
-> > > > > >
-> > > > > > I dont know what were the original intentions of the original patch authors (at this point I simply rebased it, and to be honest I did not need this patch to get where I was going to, but it was part of the original patchset).
-> > > > > >
-> > > > > > But I'm willing to do any changes so we can keep going forward with this.
-> > > > > >
-> > > > > > > On Fri, 24 Apr 2020 15:34:43 +0300
-> > > > > > > Jon Doron <arilou@gmail.com> wrote:
-> > > > > > >
-> > > > > > > > Guest OS uses ACPI to discover VMBus presence.  Add a corresponding
-> > > > > > > > entry to DSDT in case VMBus has been enabled.
-> > > > > > > >
-> > > > > > > > Experimentally Windows guests were found to require this entry to
-> > > > > > > > include two IRQ resources. They seem to never be used but they still
-> > > > > > > > have to be there.
-> > > > > > > >
-> > > > > > > > Make IRQ numbers user-configurable via corresponding properties; use 7
-> > > > > > > > and 13 by default.
-> > > > > > > well, it seems that at least linux guest driver uses one IRQ,
-> > > > > > > abeit not from ACPI descriptior
-> > > > > > >
-> > > > > > > perhaps it's what hyperv host puts into _CRS.
-> > > > > > > Could you dump ACPI tables and check how hyperv describes vmbus in acpi?
-> > > > > > >
-> > > > > > >
-> > > > > >
-> > > > > > I can no longer get to the HyperV computer I had (in the office so hopefully if someone else has access to HyperV machine and willing to reply here with the dumped ACPI tables that would be great).
-> > > > > >
-> > > > >
-> > > > > Here is a VMBus ACPI device description from Hyper-V in Windows Server 2019:
-> > > > >
-> > > > > Device (\_SB.VMOD.VMBS)
-> > > > > {
-> > > > >    Name (STA, 0x0F)
-> > > > >    Name (_ADR, Zero)  // _ADR: Address
-> > > > >    Name (_DDN, "VMBUS")  // _DDN: DOS Device Name
-> > > > >    Name (_HID, "VMBus")  // _HID: Hardware ID
-> > > > >    Name (_UID, Zero)  // _UID: Unique ID
-> > > > >    Method (_DIS, 0, NotSerialized)  // _DIS: Disable Device
-> > > > >    {
-> > > > > 	STA &= 0x0D
-> > > > >    }
-> > > > >
-> > > > >    Method (_PS0, 0, NotSerialized)  // _PS0: Power State 0
-> > > > >    {
-> > > > > 	STA |= 0x0F
-> > > > >    }
-> > > > >
-> > > > >    Method (_STA, 0, NotSerialized)  // _STA: Status
-> > > > >    {
-> > > > > 	Return (STA) /* \_SB_.VMOD.VMBS.STA_ */
-> > > > >    }
-> > > > >
-> > > > >    Name (_PS3, Zero)  // _PS3: Power State 3
-> > > > >    Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
-> > > > >    {
-> > > > > 	IRQ (Edge, ActiveHigh, Exclusive, )
-> > > > > 	    {5}
-> > > > >    })
-> > > > > }
-> > > > >
-> > > > > It seems to use just IRQ 5.
-> > > > >
-> > > > > Maciej
-> > > >
-> > > 
-> > 
 
