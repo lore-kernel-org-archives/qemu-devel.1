@@ -2,57 +2,134 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8D58C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 10:07:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0755C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 10:11:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7B7E20709
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 10:07:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7B7E20709
+	by mail.kernel.org (Postfix) with ESMTPS id 9893D20709
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 10:11:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="abXzFscg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9893D20709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZXFd-0008Hv-UR
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 06:07:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44380)
+	id 1jZXJb-0001fx-N6
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 06:11:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45158)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani.sinha@ani-sinha1.localdomain>)
- id 1jZXEr-0007YI-B0
- for qemu-devel@nongnu.org; Fri, 15 May 2020 06:06:46 -0400
-Received: from [192.146.154.243] (port=3515 helo=mcp01.nutanix.com)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ani.sinha@ani-sinha1.localdomain>)
- id 1jZXEq-0007js-Bt
- for qemu-devel@nongnu.org; Fri, 15 May 2020 06:06:45 -0400
-Received: from ani-sinha1.localdomain (ani-sinha1.dev.nutanix.com
- [10.41.71.199])
- by mcp01.nutanix.com (Postfix) with ESMTP id 540681026470;
- Fri, 15 May 2020 10:06:43 +0000 (UTC)
-Received: by ani-sinha1.localdomain (Postfix, from userid 16671)
- id 462156BCD; Fri, 15 May 2020 10:06:43 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <ani.sinha@nutanix.com>)
+ id 1jZXIo-00017r-Ui
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 06:10:50 -0400
+Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:15070)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <ani.sinha@nutanix.com>)
+ id 1jZXIm-0008PU-Sj
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 06:10:49 -0400
+Received: from pps.filterd (m0127844.ppops.net [127.0.0.1])
+ by mx0b-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 04FA8VIU006169; Fri, 15 May 2020 03:10:25 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version;
+ s=proofpoint20171006; bh=hhieFovNqOkfTr7/q3koX3jqi8JN+qj3sUMfOWYvRBo=;
+ b=abXzFscgxGBYJDyT1ziMAhJCeWzJvUOBfMdt1fon/LzSRTJlo2yYgyg8G76zt8mc6JFp
+ I4bmY1sY4XTy4HVce63z5rz3Vk2ksWBRSvzWLXPfQOhFA59R6bsmbh26JNjAVirxWjMy
+ 4zg4asaWLVXuGxmswdpO7t0q7/OMeh8jKV3dnjnDESoQkbVSrogizI84+TLdhHE91QqS
+ 1s89MtDGC8Lj+Is+NYDRUwO1SeDmM2sYyhx3gbBdzcCcIXDXnN+XFdFEGnN+yzKe6QS0
+ ZyNsePUza0Cjv6xPUC0eBd7+YXL4bjEhDkuRkUaR2CUCPV6KAR9YbBl2uRlc5Yuce9Ci Iw== 
+Received: from nam11-co1-obe.outbound.protection.outlook.com
+ (mail-co1nam11lp2169.outbound.protection.outlook.com [104.47.56.169])
+ by mx0b-002c1b01.pphosted.com with ESMTP id 311aacsusu-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 15 May 2020 03:10:25 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lqgzfWzYdTr9otvPkAc3cGZ9brrdeNEwstdCgneUckWQl5MPKinKaUL0fJZOW+KGSlTETUoFYkRU975tNsn0RUJR698dIlc+yfT0jyO4E6Y7okouAm/k8OfHVfRhuqpLUxltH+yDpyIMiyp66yCDaCrxjQt37MHPVL0OgFhMNMcWLp+lsxrvzTsM0b7wdxrXjuN1CQOHQjaGYOOOywnc+XVcHSj8J/WGBgPnGTdILIEALYS3h4ERMPzHu8Yz5lguIt/GZF3VUkuXSg3UPaAKmxXUBxnIQXO8lPsT0LrKEWWyNgBBjzwYkjQApZWDzuHN7Gc/PJKfnz5el8InmHV4Og==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hhieFovNqOkfTr7/q3koX3jqi8JN+qj3sUMfOWYvRBo=;
+ b=dyl+Vlgu4aOFR2ASjOleYfBXn5Bo+8DUEwhSTqoDx4qJU4DAQ57QKwV4qsvMQP0VFbbx2QSiwwyvj+i2sRCdc7EFagjs8d0eNEmUCcjEfyIMbl5RnyuVDDhr2fcf3rJW+MyslZ5Guo4u4JRLcQr9RSYuEyKOek0UD2N2ps/FEshSUEerjYtyK/ywM7xIqqqiX5UehTM1cBrdwmq0E7YvzWMZNhUWb1GhwZJk5VG/eQNBPgMUoIzA5VmMNhgRnyMJaHQ29XECOnxxiNaCtJ6HFl4nzuwlrm2mqEQrzWb4SQqeT9vGL3FImrNN2OwN6FM+BwI8fvHzs27x94Pe6Yj7uw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from MN2PR02MB5742.namprd02.prod.outlook.com (2603:10b6:208:10d::27)
+ by MN2PR02MB6046.namprd02.prod.outlook.com (2603:10b6:208:1be::14)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.25; Fri, 15 May
+ 2020 10:10:22 +0000
+Received: from MN2PR02MB5742.namprd02.prod.outlook.com
+ ([fe80::317d:683f:b2:fa01]) by MN2PR02MB5742.namprd02.prod.outlook.com
+ ([fe80::317d:683f:b2:fa01%7]) with mapi id 15.20.2979.033; Fri, 15 May 2020
+ 10:10:22 +0000
 From: Ani Sinha <ani.sinha@nutanix.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] Add a new PIIX option to control global PCI hot-plugging
-Date: Fri, 15 May 2020 10:06:35 +0000
-Message-Id: <1589537195-31392-1-git-send-email-ani.sinha@nutanix.com>
-X-Mailer: git-send-email 1.8.3.1
-X-Host-Lookup-Failed: Reverse DNS lookup failed for 192.146.154.243 (failed)
-Received-SPF: none client-ip=192.146.154.243;
- envelope-from=ani.sinha@ani-sinha1.localdomain; helo=mcp01.nutanix.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 06:06:43
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -8
-X-Spam_score: -0.9
-X-Spam_bar: /
-X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, NO_DNS_FOR_FROM=0.001, RDNS_NONE=0.793,
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: Re: [PATCH] Add a new PIIX option to control global PCI hot-plugging
+Thread-Topic: [PATCH] Add a new PIIX option to control global PCI hot-plugging
+Thread-Index: AQHWKqCK/gLcBFPnz0+35YUNgu+zrqio7M+A
+Date: Fri, 15 May 2020 10:10:22 +0000
+Message-ID: <251FFF5D-B792-4215-A2C3-839922ED732F@nutanix.com>
+References: <1589537195-31392-1-git-send-email-ani.sinha@nutanix.com>
+In-Reply-To: <1589537195-31392-1-git-send-email-ani.sinha@nutanix.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=nutanix.com;
+x-originating-ip: [192.146.154.3]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 843d1137-178b-4444-e80d-08d7f8b82e02
+x-ms-traffictypediagnostic: MN2PR02MB6046:
+x-microsoft-antispam-prvs: <MN2PR02MB60467DE4F8384312CAADB7F4F1BD0@MN2PR02MB6046.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+x-ms-oob-tlc-oobclassifiers: OLM:4125;
+x-forefront-prvs: 04041A2886
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: FKAnAMGuX8AdCtZBgCOfeiH1V+SfgwAiWwkKqSEendBICPvN21PAeZMyyztepQPUF5Iyiepbuy9Hs7A2Hl5fmmpbbIg2dozGzg3QY7abIUpJ6QYm942mA95abMSHicL+rphi9JMJGeWcdN+JeKVQXvoMf6dLtyq2VxYjD2H4QcTWdrCKSPRD+dGF6NaSiNdgQ5QNMJ5cIBrLTLnJVHyHPkaQ9XhMIVsAs2XAn7q+Gr0n3eS5Kc1WyAjlkrTnWvRJdoPWzcRoT6Ppiz5WcVqKTh9b+SOxU+60/AnbTVqItCumZ1N7UXFOHHj4yUchtfKZnshG2viwNs2CARHnypB3EcL/zr7o38fdupoHyIHFHNiupCTu3anDG64PMqxvuIA2LqW+Hi0TSouIWAqWvs3JEglUfSvipvMZEYVsQYcO4xwiteH7xkR5kKzfq5T6QewT
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:MN2PR02MB5742.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(376002)(39860400002)(366004)(396003)(346002)(136003)(86362001)(33656002)(2906002)(6486002)(6512007)(71200400001)(4326008)(2616005)(6916009)(8676002)(8936002)(478600001)(5660300002)(53546011)(7416002)(66946007)(64756008)(6506007)(54906003)(186003)(36756003)(91956017)(76116006)(26005)(66476007)(66446008)(66556008)(316002)(44832011);
+ DIR:OUT; SFP:1102; 
+x-ms-exchange-antispam-messagedata: C1PI+6emPRu1nriLEu336GELgxgBql9i3sCbLHwKS4ds9b0wQBA5LKbARpDjSdb1ryl0qIMCVJqFYwJBZ7cEGrW9HBJIu3XJgfjk7nP8q6chpOdkT5ULx4PncgrzuhmANtmlWA8p2Z3csPU5HIlaNs+8RzzYj3YG1+oX6ly7DLIA09UuHOk/xxwzQnZN15mBRthdAGLY7vmVrqAimu5DJkNPaUid0rS10xbCO/NAAo2fBSgyohhxGSeYVbdalwdHdzwqc9W3RYF6ZjkU9e6Nz6yShyqBBaggIF+5oT31ZtVckfEMBdPCZtAbdEYNLOgO8HyIH2tZHhcDI6fm/8t2qTgOeh+2C0CMmHXN/c0GFUxyUf5tQMke3Z+XcUw8GdyAC2+RLr7fJiZdNi8YwweMIArvXcaSpktb9Q7o/r83z2Ae4ebtEml1jAUw4O7hDQv4ei9ggylyoKKPKzqPH9rXVIH3t73BgT8oFRDk9YGiN0s=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <4AB9D0E8EE80524AAB73CEF726302494@namprd02.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 843d1137-178b-4444-e80d-08d7f8b82e02
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 May 2020 10:10:22.3998 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: sfJwYCNYB9f9HoObupP6nQuAJLc0Zzhtz7zf7mTljyVnuXXMVg9+MpLQEdEwJG+HNwecSUVyvQ/ac2sCdI+UAw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR02MB6046
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216, 18.0.676
+ definitions=2020-05-15_03:2020-05-14,
+ 2020-05-15 signatures=0
+X-Proofpoint-Spam-Reason: safe
+Received-SPF: pass client-ip=148.163.155.12;
+ envelope-from=ani.sinha@nutanix.com; helo=mx0b-002c1b01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 06:10:45
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ KHOP_DYNAMIC=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -66,204 +143,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ani Sinha <ani.sinha@nutanix.com>, Eduardo Habkost <ehabkost@redhat.com>,
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
  "Michael S. Tsirkin" <mst@redhat.com>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, ani@anisinha.ca,
+ Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <ani@anisinha.ca>,
  Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
  Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A new option "acpi-pci-hotplug" is introduced for PIIX which will
-globally disable hot-plugging of both hot plugged and
-cold plugged PCI devices. This will prevent
-hot-plugging and hot un-plugging of devices from within Windows based
-guests using system tray.
-
-The patch has been tested on Windows 2016.
-
-Change-Id: I6a79f5c69dab2c06fc3578b098bf085fb8741ce6
-Signed-off-by: Ani Sinha <ani.sinha@nutanix.com>
----
- hw/acpi/piix4.c      | 19 ++++++++++++-------
- hw/i386/acpi-build.c | 46 ++++++++++++++++++++++++++++++----------------
- 2 files changed, 42 insertions(+), 23 deletions(-)
-
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index 964d6f5..1f86dd9 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -78,6 +78,7 @@ typedef struct PIIX4PMState {
- 
-     AcpiPciHpState acpi_pci_hotplug;
-     bool use_acpi_pci_hotplug;
-+    bool use_acpi_hotplug_bridge;
- 
-     uint8_t disable_s3;
-     uint8_t disable_s4;
-@@ -207,13 +208,13 @@ static const VMStateDescription vmstate_pci_status = {
- static bool vmstate_test_use_acpi_pci_hotplug(void *opaque, int version_id)
- {
-     PIIX4PMState *s = opaque;
--    return s->use_acpi_pci_hotplug;
-+    return s->use_acpi_hotplug_bridge;
- }
- 
- static bool vmstate_test_no_use_acpi_pci_hotplug(void *opaque, int version_id)
- {
-     PIIX4PMState *s = opaque;
--    return !s->use_acpi_pci_hotplug;
-+    return !s->use_acpi_hotplug_bridge;
- }
- 
- static bool vmstate_test_use_memhp(void *opaque)
-@@ -505,8 +506,6 @@ static void piix4_pm_realize(PCIDevice *dev, Error **errp)
- 
-     piix4_acpi_system_hot_add_init(pci_address_space_io(dev),
-                                    pci_get_bus(dev), s);
--    qbus_set_hotplug_handler(BUS(pci_get_bus(dev)), OBJECT(s), &error_abort);
--
-     piix4_pm_add_propeties(s);
- }
- 
-@@ -528,7 +527,7 @@ I2CBus *piix4_pm_init(PCIBus *bus, int devfn, uint32_t smb_io_base,
-     s->smi_irq = smi_irq;
-     s->smm_enabled = smm_enabled;
-     if (xen_enabled()) {
--        s->use_acpi_pci_hotplug = false;
-+        s->use_acpi_hotplug_bridge = false;
-     }
- 
-     qdev_init_nofail(dev);
-@@ -593,8 +592,12 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
-     memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
- 
-     acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
--                    s->use_acpi_pci_hotplug);
-+                    s->use_acpi_hotplug_bridge);
- 
-+    if (s->use_acpi_pci_hotplug) {
-+        qbus_set_hotplug_handler(BUS(pci_get_bus(dev)),
-+                                 OBJECT(s), &error_abort);
-+    }
-     s->cpu_hotplug_legacy = true;
-     object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
-                              piix4_get_cpu_hotplug_legacy,
-@@ -631,8 +634,10 @@ static Property piix4_pm_properties[] = {
-     DEFINE_PROP_UINT8(ACPI_PM_PROP_S3_DISABLED, PIIX4PMState, disable_s3, 0),
-     DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_DISABLED, PIIX4PMState, disable_s4, 0),
-     DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_VAL, PIIX4PMState, s4_val, 2),
--    DEFINE_PROP_BOOL("acpi-pci-hotplug-with-bridge-support", PIIX4PMState,
-+    DEFINE_PROP_BOOL("acpi-pci-hotplug", PIIX4PMState,
-                      use_acpi_pci_hotplug, true),
-+    DEFINE_PROP_BOOL("acpi-pci-hotplug-with-bridge-support", PIIX4PMState,
-+                     use_acpi_hotplug_bridge, true),
-     DEFINE_PROP_BOOL("memory-hotplug-support", PIIX4PMState,
-                      acpi_memory_hotplug.is_enabled, true),
-     DEFINE_PROP_END_OF_LIST(),
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 2e15f68..1737378 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -96,6 +96,7 @@ typedef struct AcpiPmInfo {
-     bool s3_disabled;
-     bool s4_disabled;
-     bool pcihp_bridge_en;
-+    bool acpi_pcihp_en;
-     uint8_t s4_val;
-     AcpiFadtData fadt;
-     uint16_t cpu_hp_io_base;
-@@ -246,6 +247,9 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
-     pm->pcihp_bridge_en =
-         object_property_get_bool(obj, "acpi-pci-hotplug-with-bridge-support",
-                                  NULL);
-+    pm->acpi_pcihp_en =
-+        object_property_get_bool(obj, "acpi-pci-hotplug",
-+                                 NULL);
- }
- 
- static void acpi_get_misc_info(AcpiMiscInfo *info)
-@@ -457,7 +461,8 @@ static void build_append_pcihp_notify_entry(Aml *method, int slot)
- }
- 
- static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
--                                         bool pcihp_bridge_en)
-+                                         bool pcihp_bridge_en,
-+                                         bool acpi_pcihp_en)
- {
-     Aml *dev, *notify_method = NULL, *method;
-     QObject *bsel;
-@@ -481,18 +486,25 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
-         bool bridge_in_acpi;
- 
-         if (!pdev) {
--            if (bsel) { /* add hotplug slots for non present devices */
--                dev = aml_device("S%.02X", PCI_DEVFN(slot, 0));
--                aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
--                aml_append(dev, aml_name_decl("_ADR", aml_int(slot << 16)));
--                method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
--                aml_append(method,
--                    aml_call2("PCEJ", aml_name("BSEL"), aml_name("_SUN"))
--                );
--                aml_append(dev, method);
--                aml_append(parent_scope, dev);
--
--                build_append_pcihp_notify_entry(notify_method, slot);
-+            if (bsel) {
-+                /*
-+                 * add hotplug slots for non present devices when
-+                 * acpi hotplug is enabled.
-+                 */
-+                if (acpi_pcihp_en) {
-+                    dev = aml_device("S%.02X", PCI_DEVFN(slot, 0));
-+                    aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
-+                    aml_append(dev, aml_name_decl("_ADR", aml_int(slot << 16)));
-+                    method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
-+                    aml_append(method,
-+                               aml_call2("PCEJ", aml_name("BSEL"),
-+                                         aml_name("_SUN"))
-+                        );
-+                    aml_append(dev, method);
-+                    aml_append(parent_scope, dev);
-+
-+                    build_append_pcihp_notify_entry(notify_method, slot);
-+                }
-             }
-             continue;
-         }
-@@ -539,7 +551,7 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
-             method = aml_method("_S3D", 0, AML_NOTSERIALIZED);
-             aml_append(method, aml_return(aml_int(s3d)));
-             aml_append(dev, method);
--        } else if (hotplug_enabled_dev) {
-+        } else if (hotplug_enabled_dev && acpi_pcihp_en) {
-             /* add _SUN/_EJ0 to make slot hotpluggable  */
-             aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
- 
-@@ -559,7 +571,8 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
-              */
-             PCIBus *sec_bus = pci_bridge_get_sec_bus(PCI_BRIDGE(pdev));
- 
--            build_append_pci_bus_devices(dev, sec_bus, pcihp_bridge_en);
-+            build_append_pci_bus_devices(dev, sec_bus, pcihp_bridge_en,
-+                                         acpi_pcihp_en);
-         }
-         /* slot descriptor has been composed, add it into parent context */
-         aml_append(parent_scope, dev);
-@@ -2197,7 +2210,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         if (bus) {
-             Aml *scope = aml_scope("PCI0");
-             /* Scan all PCI buses. Generate tables to support hotplug. */
--            build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
-+            build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en,
-+                                         pm->acpi_pcihp_en);
- 
-             if (TPM_IS_TIS_ISA(tpm)) {
-                 if (misc->tpm_version == TPM_VERSION_2_0) {
--- 
-1.9.4
-
+SWdvciwgaGVyZeKAmXMgbXkgYXR0ZW1wdCBpbiBjb29raW5nIHVwIGEgcGF0Y2ggd2hpY2ggZGlz
+YWJsZWQgZ2xvYmFsIEFDUEkgaG90IHBsdWcuDQpZb3Ugc2FpZCBzb21ldGhpbmcgYWJvdXQgU0hQ
+QyBhbHNvIGFkZGluZyBBTUxzIHdoZW4gZW5hYmxlZCBidXQgSSBjb3VsZCBub3QgZmlndXJlIG91
+dCB3aGVyZSB0aGF0IGlzIGJlaW5nIGRvbmUuDQoNClBsZWFzZSBwcm92aWRlIHN1Z2dlc3Rpb25z
+Lg0KDQo+IE9uIE1heSAxNSwgMjAyMCwgYXQgMzozNiBQTSwgQW5pIFNpbmhhIDxhbmkuc2luaGFA
+bnV0YW5peC5jb20+IHdyb3RlOg0KPiANCj4gQSBuZXcgb3B0aW9uICJhY3BpLXBjaS1ob3RwbHVn
+IiBpcyBpbnRyb2R1Y2VkIGZvciBQSUlYIHdoaWNoIHdpbGwNCj4gZ2xvYmFsbHkgZGlzYWJsZSBo
+b3QtcGx1Z2dpbmcgb2YgYm90aCBob3QgcGx1Z2dlZCBhbmQNCj4gY29sZCBwbHVnZ2VkIFBDSSBk
+ZXZpY2VzLiBUaGlzIHdpbGwgcHJldmVudA0KPiBob3QtcGx1Z2dpbmcgYW5kIGhvdCB1bi1wbHVn
+Z2luZyBvZiBkZXZpY2VzIGZyb20gd2l0aGluIFdpbmRvd3MgYmFzZWQNCj4gZ3Vlc3RzIHVzaW5n
+IHN5c3RlbSB0cmF5Lg0KPiANCj4gVGhlIHBhdGNoIGhhcyBiZWVuIHRlc3RlZCBvbiBXaW5kb3dz
+IDIwMTYuDQo+IA0KPiBDaGFuZ2UtSWQ6IEk2YTc5ZjVjNjlkYWIyYzA2ZmMzNTc4YjA5OGJmMDg1
+ZmI4NzQxY2U2DQo+IFNpZ25lZC1vZmYtYnk6IEFuaSBTaW5oYSA8YW5pLnNpbmhhQG51dGFuaXgu
+Y29tPg0KPiAtLS0NCj4gaHcvYWNwaS9waWl4NC5jICAgICAgfCAxOSArKysrKysrKysrKystLS0t
+LS0tDQo+IGh3L2kzODYvYWNwaS1idWlsZC5jIHwgNDYgKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrLS0tLS0tLS0tLS0tLS0tLQ0KPiAyIGZpbGVzIGNoYW5nZWQsIDQyIGluc2VydGlvbnMo
+KyksIDIzIGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2h3L2FjcGkvcGlpeDQuYyBi
+L2h3L2FjcGkvcGlpeDQuYw0KPiBpbmRleCA5NjRkNmY1Li4xZjg2ZGQ5IDEwMDY0NA0KPiAtLS0g
+YS9ody9hY3BpL3BpaXg0LmMNCj4gKysrIGIvaHcvYWNwaS9waWl4NC5jDQo+IEBAIC03OCw2ICs3
+OCw3IEBAIHR5cGVkZWYgc3RydWN0IFBJSVg0UE1TdGF0ZSB7DQo+IA0KPiAgICAgQWNwaVBjaUhw
+U3RhdGUgYWNwaV9wY2lfaG90cGx1ZzsNCj4gICAgIGJvb2wgdXNlX2FjcGlfcGNpX2hvdHBsdWc7
+DQo+ICsgICAgYm9vbCB1c2VfYWNwaV9ob3RwbHVnX2JyaWRnZTsNCj4gDQo+ICAgICB1aW50OF90
+IGRpc2FibGVfczM7DQo+ICAgICB1aW50OF90IGRpc2FibGVfczQ7DQo+IEBAIC0yMDcsMTMgKzIw
+OCwxMyBAQCBzdGF0aWMgY29uc3QgVk1TdGF0ZURlc2NyaXB0aW9uIHZtc3RhdGVfcGNpX3N0YXR1
+cyA9IHsNCj4gc3RhdGljIGJvb2wgdm1zdGF0ZV90ZXN0X3VzZV9hY3BpX3BjaV9ob3RwbHVnKHZv
+aWQgKm9wYXF1ZSwgaW50IHZlcnNpb25faWQpDQo+IHsNCj4gICAgIFBJSVg0UE1TdGF0ZSAqcyA9
+IG9wYXF1ZTsNCj4gLSAgICByZXR1cm4gcy0+dXNlX2FjcGlfcGNpX2hvdHBsdWc7DQo+ICsgICAg
+cmV0dXJuIHMtPnVzZV9hY3BpX2hvdHBsdWdfYnJpZGdlOw0KPiB9DQo+IA0KPiBzdGF0aWMgYm9v
+bCB2bXN0YXRlX3Rlc3Rfbm9fdXNlX2FjcGlfcGNpX2hvdHBsdWcodm9pZCAqb3BhcXVlLCBpbnQg
+dmVyc2lvbl9pZCkNCj4gew0KPiAgICAgUElJWDRQTVN0YXRlICpzID0gb3BhcXVlOw0KPiAtICAg
+IHJldHVybiAhcy0+dXNlX2FjcGlfcGNpX2hvdHBsdWc7DQo+ICsgICAgcmV0dXJuICFzLT51c2Vf
+YWNwaV9ob3RwbHVnX2JyaWRnZTsNCj4gfQ0KPiANCj4gc3RhdGljIGJvb2wgdm1zdGF0ZV90ZXN0
+X3VzZV9tZW1ocCh2b2lkICpvcGFxdWUpDQo+IEBAIC01MDUsOCArNTA2LDYgQEAgc3RhdGljIHZv
+aWQgcGlpeDRfcG1fcmVhbGl6ZShQQ0lEZXZpY2UgKmRldiwgRXJyb3IgKiplcnJwKQ0KPiANCj4g
+ICAgIHBpaXg0X2FjcGlfc3lzdGVtX2hvdF9hZGRfaW5pdChwY2lfYWRkcmVzc19zcGFjZV9pbyhk
+ZXYpLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHBjaV9nZXRfYnVzKGRl
+diksIHMpOw0KPiAtICAgIHFidXNfc2V0X2hvdHBsdWdfaGFuZGxlcihCVVMocGNpX2dldF9idXMo
+ZGV2KSksIE9CSkVDVChzKSwgJmVycm9yX2Fib3J0KTsNCj4gLQ0KDQpJIGxlZnQgdGhpcyBhcyBw
+ZXIgeW91ciBzdWdnZXN0aW9uIGJ1dCB0aGlzIHdhcyBqdXN0IGFuIG9wdGltaXphdGlvbiB0byBt
+b3ZlIHRoaXMgaW50byB0aGUgaW5pdCByb3V0aW5lIGNvcnJlY3Q/DQoNCj4gICAgIHBpaXg0X3Bt
+X2FkZF9wcm9wZXRpZXMocyk7DQo+IH0NCj4gDQo+IEBAIC01MjgsNyArNTI3LDcgQEAgSTJDQnVz
+ICpwaWl4NF9wbV9pbml0KFBDSUJ1cyAqYnVzLCBpbnQgZGV2Zm4sIHVpbnQzMl90IHNtYl9pb19i
+YXNlLA0KPiAgICAgcy0+c21pX2lycSA9IHNtaV9pcnE7DQo+ICAgICBzLT5zbW1fZW5hYmxlZCA9
+IHNtbV9lbmFibGVkOw0KPiAgICAgaWYgKHhlbl9lbmFibGVkKCkpIHsNCj4gLSAgICAgICAgcy0+
+dXNlX2FjcGlfcGNpX2hvdHBsdWcgPSBmYWxzZTsNCj4gKyAgICAgICAgcy0+dXNlX2FjcGlfaG90
+cGx1Z19icmlkZ2UgPSBmYWxzZTsNCj4gICAgIH0NCj4gDQo+ICAgICBxZGV2X2luaXRfbm9mYWls
+KGRldik7DQo+IEBAIC01OTMsOCArNTkyLDEyIEBAIHN0YXRpYyB2b2lkIHBpaXg0X2FjcGlfc3lz
+dGVtX2hvdF9hZGRfaW5pdChNZW1vcnlSZWdpb24gKnBhcmVudCwNCj4gICAgIG1lbW9yeV9yZWdp
+b25fYWRkX3N1YnJlZ2lvbihwYXJlbnQsIEdQRV9CQVNFLCAmcy0+aW9fZ3BlKTsNCj4gDQo+ICAg
+ICBhY3BpX3BjaWhwX2luaXQoT0JKRUNUKHMpLCAmcy0+YWNwaV9wY2lfaG90cGx1ZywgYnVzLCBw
+YXJlbnQsDQo+IC0gICAgICAgICAgICAgICAgICAgIHMtPnVzZV9hY3BpX3BjaV9ob3RwbHVnKTsN
+Cj4gKyAgICAgICAgICAgICAgICAgICAgcy0+dXNlX2FjcGlfaG90cGx1Z19icmlkZ2UpOw0KPiAN
+Cj4gKyAgICBpZiAocy0+dXNlX2FjcGlfcGNpX2hvdHBsdWcpIHsNCj4gKyAgICAgICAgcWJ1c19z
+ZXRfaG90cGx1Z19oYW5kbGVyKEJVUyhwY2lfZ2V0X2J1cyhkZXYpKSwNCj4gKyAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIE9CSkVDVChzKSwgJmVycm9yX2Fib3J0KTsNCj4gKyAgICB9
+DQoNCk1vdmVkIHRoaXMgb25lIGZyb20gdGhlIGFib3ZlLiBTZWVtcyB3ZSBjb3VsZCBoYXZlIHVz
+ZWQgdGhpcyBjaGVjayBpbiBwaWl4NF9wbV9yZWFsaXplKCkgYXMgd2VsbC4NCg0KPiAgICAgcy0+
+Y3B1X2hvdHBsdWdfbGVnYWN5ID0gdHJ1ZTsNCj4gICAgIG9iamVjdF9wcm9wZXJ0eV9hZGRfYm9v
+bChPQkpFQ1QocyksICJjcHUtaG90cGx1Zy1sZWdhY3kiLA0KPiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIHBpaXg0X2dldF9jcHVfaG90cGx1Z19sZWdhY3ksDQo+IEBAIC02MzEsOCArNjM0
+LDEwIEBAIHN0YXRpYyBQcm9wZXJ0eSBwaWl4NF9wbV9wcm9wZXJ0aWVzW10gPSB7DQo+ICAgICBE
+RUZJTkVfUFJPUF9VSU5UOChBQ1BJX1BNX1BST1BfUzNfRElTQUJMRUQsIFBJSVg0UE1TdGF0ZSwg
+ZGlzYWJsZV9zMywgMCksDQo+ICAgICBERUZJTkVfUFJPUF9VSU5UOChBQ1BJX1BNX1BST1BfUzRf
+RElTQUJMRUQsIFBJSVg0UE1TdGF0ZSwgZGlzYWJsZV9zNCwgMCksDQo+ICAgICBERUZJTkVfUFJP
+UF9VSU5UOChBQ1BJX1BNX1BST1BfUzRfVkFMLCBQSUlYNFBNU3RhdGUsIHM0X3ZhbCwgMiksDQo+
+IC0gICAgREVGSU5FX1BST1BfQk9PTCgiYWNwaS1wY2ktaG90cGx1Zy13aXRoLWJyaWRnZS1zdXBw
+b3J0IiwgUElJWDRQTVN0YXRlLA0KPiArICAgIERFRklORV9QUk9QX0JPT0woImFjcGktcGNpLWhv
+dHBsdWciLCBQSUlYNFBNU3RhdGUsDQo+ICAgICAgICAgICAgICAgICAgICAgIHVzZV9hY3BpX3Bj
+aV9ob3RwbHVnLCB0cnVlKSwNCj4gKyAgICBERUZJTkVfUFJPUF9CT09MKCJhY3BpLXBjaS1ob3Rw
+bHVnLXdpdGgtYnJpZGdlLXN1cHBvcnQiLCBQSUlYNFBNU3RhdGUsDQo+ICsgICAgICAgICAgICAg
+ICAgICAgICB1c2VfYWNwaV9ob3RwbHVnX2JyaWRnZSwgdHJ1ZSksDQo+ICAgICBERUZJTkVfUFJP
+UF9CT09MKCJtZW1vcnktaG90cGx1Zy1zdXBwb3J0IiwgUElJWDRQTVN0YXRlLA0KPiAgICAgICAg
+ICAgICAgICAgICAgICBhY3BpX21lbW9yeV9ob3RwbHVnLmlzX2VuYWJsZWQsIHRydWUpLA0KPiAg
+ICAgREVGSU5FX1BST1BfRU5EX09GX0xJU1QoKSwNCj4gZGlmZiAtLWdpdCBhL2h3L2kzODYvYWNw
+aS1idWlsZC5jIGIvaHcvaTM4Ni9hY3BpLWJ1aWxkLmMNCj4gaW5kZXggMmUxNWY2OC4uMTczNzM3
+OCAxMDA2NDQNCj4gLS0tIGEvaHcvaTM4Ni9hY3BpLWJ1aWxkLmMNCj4gKysrIGIvaHcvaTM4Ni9h
+Y3BpLWJ1aWxkLmMNCj4gQEAgLTk2LDYgKzk2LDcgQEAgdHlwZWRlZiBzdHJ1Y3QgQWNwaVBtSW5m
+byB7DQo+ICAgICBib29sIHMzX2Rpc2FibGVkOw0KPiAgICAgYm9vbCBzNF9kaXNhYmxlZDsNCj4g
+ICAgIGJvb2wgcGNpaHBfYnJpZGdlX2VuOw0KPiArICAgIGJvb2wgYWNwaV9wY2locF9lbjsNCj4g
+ICAgIHVpbnQ4X3QgczRfdmFsOw0KPiAgICAgQWNwaUZhZHREYXRhIGZhZHQ7DQo+ICAgICB1aW50
+MTZfdCBjcHVfaHBfaW9fYmFzZTsNCj4gQEAgLTI0Niw2ICsyNDcsOSBAQCBzdGF0aWMgdm9pZCBh
+Y3BpX2dldF9wbV9pbmZvKE1hY2hpbmVTdGF0ZSAqbWFjaGluZSwgQWNwaVBtSW5mbyAqcG0pDQo+
+ICAgICBwbS0+cGNpaHBfYnJpZGdlX2VuID0NCj4gICAgICAgICBvYmplY3RfcHJvcGVydHlfZ2V0
+X2Jvb2wob2JqLCAiYWNwaS1wY2ktaG90cGx1Zy13aXRoLWJyaWRnZS1zdXBwb3J0IiwNCj4gICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgTlVMTCk7DQo+ICsgICAgcG0tPmFjcGlfcGNp
+aHBfZW4gPQ0KPiArICAgICAgICBvYmplY3RfcHJvcGVydHlfZ2V0X2Jvb2wob2JqLCAiYWNwaS1w
+Y2ktaG90cGx1ZyIsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBOVUxMKTsN
+Cj4gfQ0KPiANCj4gc3RhdGljIHZvaWQgYWNwaV9nZXRfbWlzY19pbmZvKEFjcGlNaXNjSW5mbyAq
+aW5mbykNCj4gQEAgLTQ1Nyw3ICs0NjEsOCBAQCBzdGF0aWMgdm9pZCBidWlsZF9hcHBlbmRfcGNp
+aHBfbm90aWZ5X2VudHJ5KEFtbCAqbWV0aG9kLCBpbnQgc2xvdCkNCj4gfQ0KPiANCj4gc3RhdGlj
+IHZvaWQgYnVpbGRfYXBwZW5kX3BjaV9idXNfZGV2aWNlcyhBbWwgKnBhcmVudF9zY29wZSwgUENJ
+QnVzICpidXMsDQo+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJv
+b2wgcGNpaHBfYnJpZGdlX2VuKQ0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBib29sIHBjaWhwX2JyaWRnZV9lbiwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgYm9vbCBhY3BpX3BjaWhwX2VuKQ0KPiB7DQo+ICAgICBBbWwgKmRl
+diwgKm5vdGlmeV9tZXRob2QgPSBOVUxMLCAqbWV0aG9kOw0KPiAgICAgUU9iamVjdCAqYnNlbDsN
+Cj4gQEAgLTQ4MSwxOCArNDg2LDI1IEBAIHN0YXRpYyB2b2lkIGJ1aWxkX2FwcGVuZF9wY2lfYnVz
+X2RldmljZXMoQW1sICpwYXJlbnRfc2NvcGUsIFBDSUJ1cyAqYnVzLA0KPiAgICAgICAgIGJvb2wg
+YnJpZGdlX2luX2FjcGk7DQo+IA0KPiAgICAgICAgIGlmICghcGRldikgew0KPiAtICAgICAgICAg
+ICAgaWYgKGJzZWwpIHsgLyogYWRkIGhvdHBsdWcgc2xvdHMgZm9yIG5vbiBwcmVzZW50IGRldmlj
+ZXMgKi8NCj4gLSAgICAgICAgICAgICAgICBkZXYgPSBhbWxfZGV2aWNlKCJTJS4wMlgiLCBQQ0lf
+REVWRk4oc2xvdCwgMCkpOw0KPiAtICAgICAgICAgICAgICAgIGFtbF9hcHBlbmQoZGV2LCBhbWxf
+bmFtZV9kZWNsKCJfU1VOIiwgYW1sX2ludChzbG90KSkpOw0KPiAtICAgICAgICAgICAgICAgIGFt
+bF9hcHBlbmQoZGV2LCBhbWxfbmFtZV9kZWNsKCJfQURSIiwgYW1sX2ludChzbG90IDw8IDE2KSkp
+Ow0KPiAtICAgICAgICAgICAgICAgIG1ldGhvZCA9IGFtbF9tZXRob2QoIl9FSjAiLCAxLCBBTUxf
+Tk9UU0VSSUFMSVpFRCk7DQo+IC0gICAgICAgICAgICAgICAgYW1sX2FwcGVuZChtZXRob2QsDQo+
+IC0gICAgICAgICAgICAgICAgICAgIGFtbF9jYWxsMigiUENFSiIsIGFtbF9uYW1lKCJCU0VMIiks
+IGFtbF9uYW1lKCJfU1VOIikpDQo+IC0gICAgICAgICAgICAgICAgKTsNCj4gLSAgICAgICAgICAg
+ICAgICBhbWxfYXBwZW5kKGRldiwgbWV0aG9kKTsNCj4gLSAgICAgICAgICAgICAgICBhbWxfYXBw
+ZW5kKHBhcmVudF9zY29wZSwgZGV2KTsNCj4gLQ0KPiAtICAgICAgICAgICAgICAgIGJ1aWxkX2Fw
+cGVuZF9wY2locF9ub3RpZnlfZW50cnkobm90aWZ5X21ldGhvZCwgc2xvdCk7DQo+ICsgICAgICAg
+ICAgICBpZiAoYnNlbCkgew0KPiArICAgICAgICAgICAgICAgIC8qDQo+ICsgICAgICAgICAgICAg
+ICAgICogYWRkIGhvdHBsdWcgc2xvdHMgZm9yIG5vbiBwcmVzZW50IGRldmljZXMgd2hlbg0KPiAr
+ICAgICAgICAgICAgICAgICAqIGFjcGkgaG90cGx1ZyBpcyBlbmFibGVkLg0KPiArICAgICAgICAg
+ICAgICAgICAqLw0KPiArICAgICAgICAgICAgICAgIGlmIChhY3BpX3BjaWhwX2VuKSB7DQo+ICsg
+ICAgICAgICAgICAgICAgICAgIGRldiA9IGFtbF9kZXZpY2UoIlMlLjAyWCIsIFBDSV9ERVZGTihz
+bG90LCAwKSk7DQo+ICsgICAgICAgICAgICAgICAgICAgIGFtbF9hcHBlbmQoZGV2LCBhbWxfbmFt
+ZV9kZWNsKCJfU1VOIiwgYW1sX2ludChzbG90KSkpOw0KPiArICAgICAgICAgICAgICAgICAgICBh
+bWxfYXBwZW5kKGRldiwgYW1sX25hbWVfZGVjbCgiX0FEUiIsIGFtbF9pbnQoc2xvdCA8PCAxNikp
+KTsNCj4gKyAgICAgICAgICAgICAgICAgICAgbWV0aG9kID0gYW1sX21ldGhvZCgiX0VKMCIsIDEs
+IEFNTF9OT1RTRVJJQUxJWkVEKTsNCj4gKyAgICAgICAgICAgICAgICAgICAgYW1sX2FwcGVuZCht
+ZXRob2QsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYW1sX2NhbGwyKCJQQ0VK
+IiwgYW1sX25hbWUoIkJTRUwiKSwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgYW1sX25hbWUoIl9TVU4iKSkNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICk7
+DQo+ICsgICAgICAgICAgICAgICAgICAgIGFtbF9hcHBlbmQoZGV2LCBtZXRob2QpOw0KPiArICAg
+ICAgICAgICAgICAgICAgICBhbWxfYXBwZW5kKHBhcmVudF9zY29wZSwgZGV2KTsNCj4gKw0KPiAr
+ICAgICAgICAgICAgICAgICAgICBidWlsZF9hcHBlbmRfcGNpaHBfbm90aWZ5X2VudHJ5KG5vdGlm
+eV9tZXRob2QsIHNsb3QpOw0KPiArICAgICAgICAgICAgICAgIH0NCj4gICAgICAgICAgICAgfQ0K
+PiAgICAgICAgICAgICBjb250aW51ZTsNCj4gICAgICAgICB9DQo+IEBAIC01MzksNyArNTUxLDcg
+QEAgc3RhdGljIHZvaWQgYnVpbGRfYXBwZW5kX3BjaV9idXNfZGV2aWNlcyhBbWwgKnBhcmVudF9z
+Y29wZSwgUENJQnVzICpidXMsDQo+ICAgICAgICAgICAgIG1ldGhvZCA9IGFtbF9tZXRob2QoIl9T
+M0QiLCAwLCBBTUxfTk9UU0VSSUFMSVpFRCk7DQo+ICAgICAgICAgICAgIGFtbF9hcHBlbmQobWV0
+aG9kLCBhbWxfcmV0dXJuKGFtbF9pbnQoczNkKSkpOw0KPiAgICAgICAgICAgICBhbWxfYXBwZW5k
+KGRldiwgbWV0aG9kKTsNCj4gLSAgICAgICAgfSBlbHNlIGlmIChob3RwbHVnX2VuYWJsZWRfZGV2
+KSB7DQo+ICsgICAgICAgIH0gZWxzZSBpZiAoaG90cGx1Z19lbmFibGVkX2RldiAmJiBhY3BpX3Bj
+aWhwX2VuKSB7DQo+ICAgICAgICAgICAgIC8qIGFkZCBfU1VOL19FSjAgdG8gbWFrZSBzbG90IGhv
+dHBsdWdnYWJsZSAgKi8NCj4gICAgICAgICAgICAgYW1sX2FwcGVuZChkZXYsIGFtbF9uYW1lX2Rl
+Y2woIl9TVU4iLCBhbWxfaW50KHNsb3QpKSk7DQo+IA0KPiBAQCAtNTU5LDcgKzU3MSw4IEBAIHN0
+YXRpYyB2b2lkIGJ1aWxkX2FwcGVuZF9wY2lfYnVzX2RldmljZXMoQW1sICpwYXJlbnRfc2NvcGUs
+IFBDSUJ1cyAqYnVzLA0KPiAgICAgICAgICAgICAgKi8NCj4gICAgICAgICAgICAgUENJQnVzICpz
+ZWNfYnVzID0gcGNpX2JyaWRnZV9nZXRfc2VjX2J1cyhQQ0lfQlJJREdFKHBkZXYpKTsNCj4gDQo+
+IC0gICAgICAgICAgICBidWlsZF9hcHBlbmRfcGNpX2J1c19kZXZpY2VzKGRldiwgc2VjX2J1cywg
+cGNpaHBfYnJpZGdlX2VuKTsNCj4gKyAgICAgICAgICAgIGJ1aWxkX2FwcGVuZF9wY2lfYnVzX2Rl
+dmljZXMoZGV2LCBzZWNfYnVzLCBwY2locF9icmlkZ2VfZW4sDQo+ICsgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIGFjcGlfcGNpaHBfZW4pOw0KPiAgICAgICAgIH0NCj4g
+ICAgICAgICAvKiBzbG90IGRlc2NyaXB0b3IgaGFzIGJlZW4gY29tcG9zZWQsIGFkZCBpdCBpbnRv
+IHBhcmVudCBjb250ZXh0ICovDQo+ICAgICAgICAgYW1sX2FwcGVuZChwYXJlbnRfc2NvcGUsIGRl
+dik7DQo+IEBAIC0yMTk3LDcgKzIyMTAsOCBAQCBidWlsZF9kc2R0KEdBcnJheSAqdGFibGVfZGF0
+YSwgQklPU0xpbmtlciAqbGlua2VyLA0KPiAgICAgICAgIGlmIChidXMpIHsNCj4gICAgICAgICAg
+ICAgQW1sICpzY29wZSA9IGFtbF9zY29wZSgiUENJMCIpOw0KPiAgICAgICAgICAgICAvKiBTY2Fu
+IGFsbCBQQ0kgYnVzZXMuIEdlbmVyYXRlIHRhYmxlcyB0byBzdXBwb3J0IGhvdHBsdWcuICovDQo+
+IC0gICAgICAgICAgICBidWlsZF9hcHBlbmRfcGNpX2J1c19kZXZpY2VzKHNjb3BlLCBidXMsIHBt
+LT5wY2locF9icmlkZ2VfZW4pOw0KPiArICAgICAgICAgICAgYnVpbGRfYXBwZW5kX3BjaV9idXNf
+ZGV2aWNlcyhzY29wZSwgYnVzLCBwbS0+cGNpaHBfYnJpZGdlX2VuLA0KPiArICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBwbS0+YWNwaV9wY2locF9lbik7DQo+IA0KPiAg
+ICAgICAgICAgICBpZiAoVFBNX0lTX1RJU19JU0EodHBtKSkgew0KPiAgICAgICAgICAgICAgICAg
+aWYgKG1pc2MtPnRwbV92ZXJzaW9uID09IFRQTV9WRVJTSU9OXzJfMCkgew0KPiAtLSANCj4gMS45
+LjQNCj4gDQoNCg==
 
