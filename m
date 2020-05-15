@@ -3,79 +3,92 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	HTML_MESSAGE,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D910BC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 02:51:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A359C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 03:17:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3D2F2065F
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 02:51:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3D2F2065F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 30FB52054F
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 03:17:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30FB52054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZQRX-0000sB-RU
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 22:51:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36068)
+	id 1jZQql-00057H-Dq
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 23:17:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45386)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jZQQq-0000Q8-AH
- for qemu-devel@nongnu.org; Thu, 14 May 2020 22:50:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40656)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jZQQp-0002Tu-6X
- for qemu-devel@nongnu.org; Thu, 14 May 2020 22:50:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jZQQn-0007Aq-6q
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 02:50:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 1A95A2E810D
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 02:50:37 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1jZQpp-0003pw-Fj
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 23:16:29 -0400
+Received: from mga09.intel.com ([134.134.136.24]:8787)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1jZQpm-0006cL-TY
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 23:16:28 -0400
+IronPort-SDR: /fRF7LmriesGQTPbWe9P1bU456Han1lA1qoN04c73Uh1iqnsWj3r8rt5UPQGENUoA+QkW15Lbb
+ nAbpkHLTOmjA==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 14 May 2020 20:16:21 -0700
+IronPort-SDR: naaBlX9Iz0pBghTl3Fa3l/jxFwJhAtZDwq6xbrBMXyXXYBF7TTy+mLaNHgb7qPKtJOrdZbj1EH
+ Fp6mBHW++tQQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,393,1583222400"; 
+ d="scan'208,217";a="410311654"
+Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
+ by orsmga004.jf.intel.com with ESMTP; 14 May 2020 20:16:20 -0700
+Received: from shsmsx601.ccr.corp.intel.com (10.109.6.141) by
+ FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 14 May 2020 20:16:20 -0700
+Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
+ SHSMSX601.ccr.corp.intel.com (10.109.6.141) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Fri, 15 May 2020 11:16:18 +0800
+Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
+ SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
+ Fri, 15 May 2020 11:16:18 +0800
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>, "Dr . David Alan Gilbert"
+ <dgilbert@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Li Zhijian
+ <lizhijian@cn.fujitsu.com>
+Subject: About migration/colo issue
+Thread-Topic: About migration/colo issue
+Thread-Index: AdYqZjudkmlVb8B9TvKOADpJ4VTuWA==
+Date: Fri, 15 May 2020 03:16:18 +0000
+Message-ID: <7a26ed7efed94d2dbff591521d31076a@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.36]
+Content-Type: multipart/alternative;
+ boundary="_000_7a26ed7efed94d2dbff591521d31076aintelcom_"
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 May 2020 02:41:36 -0000
-From: Jan Klos <1856335@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: babumoger djdatte h-sieger janklos
-X-Launchpad-Bug-Reporter: Damir (djdatte)
-X-Launchpad-Bug-Modifier: Jan Klos (janklos)
-References: <157625616239.22064.10423897892496347105.malonedeb@gac.canonical.com>
-Message-Id: <158951049653.17462.15527065171132761620.malone@soybean.canonical.com>
-Subject: [Bug 1856335] Re: Cache Layout wrong on many Zen Arch CPUs
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="0385b538081bc4718df6fb844a3afc89729c94ce";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: ac1c21abb1871a32e0bb9f2796b9a185e6e7ff0a
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 22:50:37
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -65
-X-Spam_score: -6.6
+Received-SPF: pass client-ip=134.134.136.24; envelope-from=chen.zhang@intel.com;
+ helo=mga09.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 23:16:21
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
 X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,78 +97,321 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1856335 <1856335@bugs.launchpad.net>
+Cc: Jason Wang <jasowang@redhat.com>, Lukas Straub <lukasstraub2@web.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The problem is that disabled cores are not taken into account.. ALL Zen2
-CPUs have L3 cache group per CCX and every CCX has 4 cores, the problem
-is that some cores in each CCX (1 for 6 and 12-core CPUs, 2 for 3100)
-are disabled for some models, but they still use their core ids (as can
-be seen in virsh capabilities | grep "cpu id" output in above comments).
-Looking at target/i386/cpu.c:5529, this is not taken into account.
+--_000_7a26ed7efed94d2dbff591521d31076aintelcom_
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-Maybe the cleanest way to fix this is to emulate the host topology by
-also skipping disabled core ids in the VM? That way, die offset will
-actually match the real host CPU topology...
+Hi Hailiang/Dave.
 
--- =
+I found a urgent problem in current upstream code, COLO will stuck on secon=
+dary checkpoint and later.
+The guest will stuck by this issue.
+I have bisect upstream code, this issue caused by Hailiang's optimize patch=
+:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1856335
+From 0393031a16735835a441b6d6e0495a1bd14adb90 Mon Sep 17 00:00:00 2001
+From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Date: Mon, 24 Feb 2020 14:54:10 +0800
+Subject: [PATCH] COLO: Optimize memory back-up process
 
-Title:
-  Cache Layout wrong on many Zen Arch CPUs
+This patch will reduce the downtime of VM for the initial process,
+Previously, we copied all these memory in preparing stage of COLO
+while we need to stop VM, which is a time-consuming process.
+Here we optimize it by a trick, back-up every page while in migration
+process while COLO is enabled, though it affects the speed of the
+migration, but it obviously reduce the downtime of back-up all SVM'S
+memory in COLO preparing stage.
 
-Status in QEMU:
-  New
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Message-Id: <20200224065414.36524-5-zhang.zhanghailiang@huawei.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+  minor typo fixes
 
-Bug description:
-  AMD CPUs have L3 cache per 2, 3 or 4 cores. Currently, TOPOEXT seems
-  to always map Cache ass if it was an 4-Core per CCX CPU, which is
-  incorrect, and costs upwards 30% performance (more realistically 10%)
-  in L3 Cache Layout aware applications.
+Hailiang, do you have time to look into it?
 
-  Example on a 4-CCX CPU (1950X /w 8 Cores and no SMT):
 
-  =C2=A0=C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
-  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
-  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
-  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'8' threads=3D'1'=
-/>
+The detail log:
+Primary node:
+13322@1589511271.917346:colo_receive_message Receive 'checkpoint-ready' mes=
+sage
+{"timestamp": {"seconds": 1589511271, "microseconds": 917406}, "event": "RE=
+SUME"}
+13322@1589511271.917842:colo_vm_state_change Change 'stop' =3D> 'run'
+13322@1589511291.243346:colo_send_message Send 'checkpoint-request' message
+13322@1589511291.243978:colo_receive_message Receive 'checkpoint-reply' mes=
+sage
+{"timestamp": {"seconds": 1589511291, "microseconds": 244096}, "event": "ST=
+OP"}
+13322@1589511291.244444:colo_vm_state_change Change 'run' =3D> 'stop'
+13322@1589511291.244561:colo_send_message Send 'vmstate-send' message
+13322@1589511291.258594:colo_send_message Send 'vmstate-size' message
+13322@1589511305.412479:colo_receive_message Receive 'vmstate-received' mes=
+sage
+13322@1589511309.031826:colo_receive_message Receive 'vmstate-loaded' messa=
+ge
+{"timestamp": {"seconds": 1589511309, "microseconds": 31862}, "event": "RES=
+UME"}
+13322@1589511309.033075:colo_vm_state_change Change 'stop' =3D> 'run'
+{"timestamp": {"seconds": 1589511311, "microseconds": 111617}, "event": "VN=
+C_CONNECTED", "data": {"server": {"auth": "none", "family": "ipv4", "servic=
+e": "5907", "host": "0.0.0.0", "websocket": false}, "client": {"family": "i=
+pv4", "service": "51564", "host": "10.239.13.19", "websocket": false}}}
+{"timestamp": {"seconds": 1589511311, "microseconds": 116197}, "event": "VN=
+C_INITIALIZED", "data": {"server": {"auth": "none", "family": "ipv4", "serv=
+ice": "5907", "host": "0.0.0.0", "websocket": false}, "client": {"family": =
+"ipv4", "service": "51564", "host": "10.239.13.19", "websocket": false}}}
+13322@1589511311.243271:colo_send_message Send 'checkpoint-request' message
+13322@1589511311.351361:colo_receive_message Receive 'checkpoint-reply' mes=
+sage
+{"timestamp": {"seconds": 1589511311, "microseconds": 351439}, "event": "ST=
+OP"}
+13322@1589511311.415779:colo_vm_state_change Change 'run' =3D> 'stop'
+13322@1589511311.416001:colo_send_message Send 'vmstate-send' message
+13322@1589511311.418620:colo_send_message Send 'vmstate-size' message
 
-  In windows, coreinfo reports correctly:
+Secondary node:
+{"timestamp": {"seconds": 1589510920, "microseconds": 778207}, "event": "RE=
+SUME"}
+23619@1589510920.778835:colo_vm_state_change Change 'stop' =3D> 'run'
+23619@1589510920.778891:colo_send_message Send 'checkpoint-ready' message
+23619@1589510940.105539:colo_receive_message Receive 'checkpoint-request' m=
+essage
+{"timestamp": {"seconds": 1589510940, "microseconds": 105712}, "event": "ST=
+OP"}
+23619@1589510940.105917:colo_vm_state_change Change 'run' =3D> 'stop'
+23619@1589510940.105971:colo_send_message Send 'checkpoint-reply' message
+23619@1589510940.106767:colo_receive_message Receive 'vmstate-send' message
+23619@1589510940.122808:colo_flush_ram_cache_begin dirty_pages 2456
+23619@1589510953.618672:colo_flush_ram_cache_end
+23619@1589510953.945083:colo_receive_message Receive 'vmstate-size' message
+23619@1589510954.274816:colo_send_message Send 'vmstate-received' message
+qemu-system-x86_64: warning: TSC frequency mismatch between VM (2792980 kHz=
+) and host (2925999 kHz), and TSC scaling unavailable
+{"timestamp": {"seconds": 1589510957, "microseconds": 754184}, "event": "RE=
+SUME"}
+23619@1589510957.894113:colo_vm_state_change Change 'stop' =3D> 'run'
+23619@1589510957.894162:colo_send_message Send 'vmstate-loaded' message
+23619@1589510960.105977:colo_receive_message Receive 'checkpoint-request' m=
+essage
+{"timestamp": {"seconds": 1589510960, "microseconds": 106148}, "event": "ST=
+OP"}
+23619@1589510960.213773:colo_vm_state_change Change 'run' =3D> 'stop'
+23619@1589510960.213797:colo_send_message Send 'checkpoint-reply' message
+23619@1589510960.278771:colo_receive_message Receive 'vmstate-send' message
+23619@1589510960.423268:colo_flush_ram_cache_begin dirty_pages 25
 
-  ****----  Unified Cache 1, Level 3,    8 MB, Assoc  16, LineSize  64
-  ----****  Unified Cache 6, Level 3,    8 MB, Assoc  16, LineSize  64
 
-  On a 3-CCX CPU (3960X /w 6 cores and no SMT):
 
-  =C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
-  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
-  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
-  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'6' threads=3D'1'=
-/>
 
-  in windows, coreinfo reports incorrectly:
 
-  ****--  Unified Cache  1, Level 3,    8 MB, Assoc  16, LineSize  64
-  ----**  Unified Cache  6, Level 3,    8 MB, Assoc  16, LineSize  64
 
-  Validated against 3.0, 3.1, 4.1 and 4.2 versions of qemu-kvm.
 
-  With newer Qemu there is a fix (that does behave correctly) in using the =
-dies parameter:
-  =C2=A0<qemu:arg value=3D'cores=3D3,threads=3D1,dies=3D2,sockets=3D1'/>
 
-  The problem is that the dies are exposed differently than how AMD does
-  it natively, they are exposed to Windows as sockets, which means, that
-  if you are nto a business user, you can't ever have a machine with
-  more than two CCX (6 cores) as consumer versions of Windows only
-  supports two sockets. (Should this be reported as a separate bug?)
+--_000_7a26ed7efed94d2dbff591521d31076aintelcom_
+Content-Type: text/html; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1856335/+subscriptions
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
+osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" xmlns=3D"http:=
+//www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dus-ascii"=
+>
+<meta name=3D"Generator" content=3D"Microsoft Word 15 (filtered medium)">
+<style><!--
+/* Font Definitions */
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:DengXian;
+	panose-1:2 1 6 0 3 1 1 1 1 1;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+@font-face
+	{font-family:"\@DengXian";
+	panose-1:2 1 6 0 3 1 1 1 1 1;}
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	margin-bottom:.0001pt;
+	font-size:11.0pt;
+	font-family:"Calibri",sans-serif;}
+a:link, span.MsoHyperlink
+	{mso-style-priority:99;
+	color:#0563C1;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{mso-style-priority:99;
+	color:#954F72;
+	text-decoration:underline;}
+span.EmailStyle17
+	{mso-style-type:personal-compose;
+	font-family:"Calibri",sans-serif;
+	color:windowtext;}
+.MsoChpDefault
+	{mso-style-type:export-only;
+	font-family:"Calibri",sans-serif;}
+@page WordSection1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.0in 1.0in 1.0in;}
+div.WordSection1
+	{page:WordSection1;}
+--></style><!--[if gte mso 9]><xml>
+<o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
+</xml><![endif]--><!--[if gte mso 9]><xml>
+<o:shapelayout v:ext=3D"edit">
+<o:idmap v:ext=3D"edit" data=3D"1" />
+</o:shapelayout></xml><![endif]-->
+</head>
+<body lang=3D"EN-US" link=3D"#0563C1" vlink=3D"#954F72">
+<div class=3D"WordSection1">
+<p class=3D"MsoNormal">Hi Hailiang/Dave.<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">I found a urgent problem in current upstream code, C=
+OLO will stuck on secondary checkpoint and later.<o:p></o:p></p>
+<p class=3D"MsoNormal">The guest will stuck by this issue.<o:p></o:p></p>
+<p class=3D"MsoNormal">I have bisect upstream code, this issue caused by Ha=
+iliang&#8217;s optimize patch:<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">From 0393031a16735835a441b6d6e0495a1bd14adb90 Mon Se=
+p 17 00:00:00 2001<br>
+From: zhanghailiang &lt;zhang.zhanghailiang@huawei.com&gt;<br>
+Date: Mon, 24 Feb 2020 14:54:10 &#43;0800<br>
+Subject: [PATCH] COLO: Optimize memory back-up process<br>
+<br>
+This patch will reduce the downtime of VM for the initial process,<br>
+Previously, we copied all these memory in preparing stage of COLO<br>
+while we need to stop VM, which is a time-consuming process.<br>
+Here we optimize it by a trick, back-up every page while in migration<br>
+process while COLO is enabled, though it affects the speed of the<br>
+migration, but it obviously reduce the downtime of back-up all SVM'S<br>
+memory in COLO preparing stage.<br>
+<br>
+Signed-off-by: zhanghailiang &lt;zhang.zhanghailiang@huawei.com&gt;<br>
+Message-Id: &lt;20200224065414.36524-5-zhang.zhanghailiang@huawei.com&gt;<b=
+r>
+Signed-off-by: Dr. David Alan Gilbert &lt;dgilbert@redhat.com&gt;<br>
+&nbsp; minor typo fixes<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Hailiang, do you have time to look into it?<o:p></o:=
+p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">The detail log:<o:p></o:p></p>
+<p class=3D"MsoNormal">Primary node:<o:p></o:p></p>
+<p class=3D"MsoNormal">13322@1589511271.917346:colo_receive_message Receive=
+ 'checkpoint-ready' message<br>
+{&quot;timestamp&quot;: {&quot;seconds&quot;: 1589511271, &quot;microsecond=
+s&quot;: 917406}, &quot;event&quot;: &quot;RESUME&quot;}<br>
+13322@1589511271.917842:colo_vm_state_change Change 'stop' =3D&gt; 'run'<br=
+>
+13322@1589511291.243346:colo_send_message Send 'checkpoint-request' message=
+<br>
+13322@1589511291.243978:colo_receive_message Receive 'checkpoint-reply' mes=
+sage<br>
+{&quot;timestamp&quot;: {&quot;seconds&quot;: 1589511291, &quot;microsecond=
+s&quot;: 244096}, &quot;event&quot;: &quot;STOP&quot;}<br>
+13322@1589511291.244444:colo_vm_state_change Change 'run' =3D&gt; 'stop'<br=
+>
+13322@1589511291.244561:colo_send_message Send 'vmstate-send' message<br>
+13322@1589511291.258594:colo_send_message Send 'vmstate-size' message<br>
+13322@1589511305.412479:colo_receive_message Receive 'vmstate-received' mes=
+sage<br>
+13322@1589511309.031826:colo_receive_message Receive 'vmstate-loaded' messa=
+ge<br>
+{&quot;timestamp&quot;: {&quot;seconds&quot;: 1589511309, &quot;microsecond=
+s&quot;: 31862}, &quot;event&quot;: &quot;RESUME&quot;}<br>
+13322@1589511309.033075:colo_vm_state_change Change 'stop' =3D&gt; 'run'<br=
+>
+{&quot;timestamp&quot;: {&quot;seconds&quot;: 1589511311, &quot;microsecond=
+s&quot;: 111617}, &quot;event&quot;: &quot;VNC_CONNECTED&quot;, &quot;data&=
+quot;: {&quot;server&quot;: {&quot;auth&quot;: &quot;none&quot;, &quot;fami=
+ly&quot;: &quot;ipv4&quot;, &quot;service&quot;: &quot;5907&quot;, &quot;ho=
+st&quot;: &quot;0.0.0.0&quot;, &quot;websocket&quot;: false}, &quot;client&=
+quot;: {&quot;family&quot;: &quot;ipv4&quot;, &quot;service&quot;: &quot;51=
+564&quot;, &quot;host&quot;:
+ &quot;10.239.13.19&quot;, &quot;websocket&quot;: false}}}<br>
+{&quot;timestamp&quot;: {&quot;seconds&quot;: 1589511311, &quot;microsecond=
+s&quot;: 116197}, &quot;event&quot;: &quot;VNC_INITIALIZED&quot;, &quot;dat=
+a&quot;: {&quot;server&quot;: {&quot;auth&quot;: &quot;none&quot;, &quot;fa=
+mily&quot;: &quot;ipv4&quot;, &quot;service&quot;: &quot;5907&quot;, &quot;=
+host&quot;: &quot;0.0.0.0&quot;, &quot;websocket&quot;: false}, &quot;clien=
+t&quot;: {&quot;family&quot;: &quot;ipv4&quot;, &quot;service&quot;: &quot;=
+51564&quot;, &quot;host&quot;:
+ &quot;10.239.13.19&quot;, &quot;websocket&quot;: false}}}<br>
+13322@1589511311.243271:colo_send_message Send 'checkpoint-request' message=
+<br>
+13322@1589511311.351361:colo_receive_message Receive 'checkpoint-reply' mes=
+sage<br>
+{&quot;timestamp&quot;: {&quot;seconds&quot;: 1589511311, &quot;microsecond=
+s&quot;: 351439}, &quot;event&quot;: &quot;STOP&quot;}<br>
+13322@1589511311.415779:colo_vm_state_change Change 'run' =3D&gt; 'stop'<br=
+>
+13322@1589511311.416001:colo_send_message Send 'vmstate-send' message<br>
+13322@1589511311.418620:colo_send_message Send 'vmstate-size' message<o:p><=
+/o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Secondary node:<o:p></o:p></p>
+<p class=3D"MsoNormal">{&quot;timestamp&quot;: {&quot;seconds&quot;: 158951=
+0920, &quot;microseconds&quot;: 778207}, &quot;event&quot;: &quot;RESUME&qu=
+ot;}<br>
+23619@1589510920.778835:colo_vm_state_change Change 'stop' =3D&gt; 'run'<br=
+>
+23619@1589510920.778891:colo_send_message Send 'checkpoint-ready' message<b=
+r>
+23619@1589510940.105539:colo_receive_message Receive 'checkpoint-request' m=
+essage<br>
+{&quot;timestamp&quot;: {&quot;seconds&quot;: 1589510940, &quot;microsecond=
+s&quot;: 105712}, &quot;event&quot;: &quot;STOP&quot;}<br>
+23619@1589510940.105917:colo_vm_state_change Change 'run' =3D&gt; 'stop'<br=
+>
+23619@1589510940.105971:colo_send_message Send 'checkpoint-reply' message<b=
+r>
+23619@1589510940.106767:colo_receive_message Receive 'vmstate-send' message=
+<br>
+23619@1589510940.122808:colo_flush_ram_cache_begin dirty_pages 2456<br>
+23619@1589510953.618672:colo_flush_ram_cache_end<br>
+23619@1589510953.945083:colo_receive_message Receive 'vmstate-size' message=
+<br>
+23619@1589510954.274816:colo_send_message Send 'vmstate-received' message<b=
+r>
+qemu-system-x86_64: warning: TSC frequency mismatch between VM (2792980 kHz=
+) and host (2925999 kHz), and TSC scaling unavailable<br>
+{&quot;timestamp&quot;: {&quot;seconds&quot;: 1589510957, &quot;microsecond=
+s&quot;: 754184}, &quot;event&quot;: &quot;RESUME&quot;}<br>
+23619@1589510957.894113:colo_vm_state_change Change 'stop' =3D&gt; 'run'<br=
+>
+23619@1589510957.894162:colo_send_message Send 'vmstate-loaded' message<br>
+23619@1589510960.105977:colo_receive_message Receive 'checkpoint-request' m=
+essage<br>
+{&quot;timestamp&quot;: {&quot;seconds&quot;: 1589510960, &quot;microsecond=
+s&quot;: 106148}, &quot;event&quot;: &quot;STOP&quot;}<br>
+23619@1589510960.213773:colo_vm_state_change Change 'run' =3D&gt; 'stop'<br=
+>
+23619@1589510960.213797:colo_send_message Send 'checkpoint-reply' message<b=
+r>
+23619@1589510960.278771:colo_receive_message Receive 'vmstate-send' message=
+<br>
+23619@1589510960.423268:colo_flush_ram_cache_begin dirty_pages 25<o:p></o:p=
+></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+</div>
+</body>
+</html>
+
+--_000_7a26ed7efed94d2dbff591521d31076aintelcom_--
 
