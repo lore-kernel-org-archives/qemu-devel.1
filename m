@@ -4,78 +4,73 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84CF8C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 16:45:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A97FC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 16:49:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49CA7207F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 16:45:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D9812207F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 16:49:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ESlfug2M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49CA7207F9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P9IrdxPZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9812207F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZdSw-0007F3-Hc
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 12:45:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38222)
+	id 1jZdW7-0002Rc-Vz
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 12:49:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38740)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jZdSH-0006cB-RU
- for qemu-devel@nongnu.org; Fri, 15 May 2020 12:45:01 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55330
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jZdUc-0000UJ-DL
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 12:47:26 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35456
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jZdSH-0006xA-1y
- for qemu-devel@nongnu.org; Fri, 15 May 2020 12:45:01 -0400
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jZdUb-0007bU-FS
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 12:47:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589561100;
+ s=mimecast20190719; t=1589561244;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=OAVRKhCKvuhqCwpF4H0vwd5LZqawvdkM4SaPvGsQzrQ=;
- b=ESlfug2MqC7FPa4Eeq91HUITT5ZDipHMkfkxF17RGbmwS36a/Y2pNOozMK32ReS7O6biT2
- 856wD8nnKh6ZyMLdg7AVW6a/UhhqudyX+N/TUdClg8OmNxmnChsk+/bzfE9IOxgXHXb98l
- hdBk8e/W4Z/Timz9jTFAlkTNs9trwLw=
+ in-reply-to:in-reply-to:references:references;
+ bh=+vDoS6rtXmiEsFGa8fr+cErcnWf910dF9m0oUPGIPlo=;
+ b=P9IrdxPZrMUBNu7gs2673I2DlgJTWeL0tw42iPOIo58+mYEpG9aSyNkTbNSutd/AOEp8nX
+ gA9CJ0s+azGTC8QL4AZ83uSNU105I86I3QLylhuT0UlyyVhRdegD5wWsQIit0WPEmuiAoj
+ hzRy1e8W8QpaG9ocHMlNs6pXbFqnb1s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-412-bHFw2AUmOfemiKcBNZXZkw-1; Fri, 15 May 2020 12:44:48 -0400
-X-MC-Unique: bHFw2AUmOfemiKcBNZXZkw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-106-EOXWEmFjMLOHXnoe0r3qXA-1; Fri, 15 May 2020 12:47:23 -0400
+X-MC-Unique: EOXWEmFjMLOHXnoe0r3qXA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68329100A8FC;
- Fri, 15 May 2020 16:44:46 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-113-42.ams2.redhat.com [10.36.113.42])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BA2D7619F4;
- Fri, 15 May 2020 16:44:41 +0000 (UTC)
-Subject: Re: [PATCH v2 3/5] gitlab-ci: Remove flex/bison packages
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200515163029.12917-1-philmd@redhat.com>
- <20200515163029.12917-4-philmd@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <7e818ab2-a811-7b33-89b2-695a3241eee4@redhat.com>
-Date: Fri, 15 May 2020 18:44:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5807107AFC6;
+ Fri, 15 May 2020 16:47:21 +0000 (UTC)
+Received: from work-vm (ovpn-114-149.ams2.redhat.com [10.36.114.149])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id ED72C5D9F1;
+ Fri, 15 May 2020 16:47:02 +0000 (UTC)
+Date: Fri, 15 May 2020 17:46:59 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v1 16/17] virtio-mem: Allow notifiers for size changes
+Message-ID: <20200515164659.GK2954@work-vm>
+References: <20200506094948.76388-1-david@redhat.com>
+ <20200506094948.76388-17-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200515163029.12917-4-philmd@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200506094948.76388-17-david@redhat.com>
+User-Agent: Mutt/1.13.4 (2020-02-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 00:07:24
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
@@ -84,8 +79,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ T_HK_NAME_DR=0.01 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,37 +93,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Ed Maste <emaste@freebsd.org>, Claudio Fontana <cfontana@suse.de>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Li-Wen Hsu <lwhsu@freebsd.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/05/2020 18.30, Philippe Mathieu-Daudé wrote:
-> QEMU does not use flex/bison packages.
+* David Hildenbrand (david@redhat.com) wrote:
+> We want to send qapi events in case the size of a virtio-mem device
+> changes. This allows upper layers to always know how much memory is
+> actually currently consumed via a virtio-mem device.
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  .gitlab-ci.yml | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Unfortuantely, we have to report the id of our proxy device. Let's provide
+> an easy way for our proxy device to register, so it can send the qapi
+> events. Piggy-backing on the notifier infrastructure (although we'll
+> only ever have one notifier registered) seems to be an easy way.
 > 
-> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-> index b889fb96b6..994774250f 100644
-> --- a/.gitlab-ci.yml
-> +++ b/.gitlab-ci.yml
-> @@ -4,7 +4,7 @@ include:
->  
->  before_script:
->   - apt-get update -qq
-> - - apt-get install -y -qq flex bison libglib2.0-dev libpixman-1-dev genisoimage
-> + - apt-get install -y -qq libglib2.0-dev libpixman-1-dev genisoimage
->  
->  build-system1:
->   script:
-> 
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  hw/virtio/virtio-mem.c         | 21 ++++++++++++++++++++-
+>  include/hw/virtio/virtio-mem.h |  5 +++++
+>  2 files changed, 25 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
+> index e25b2c74f2..88a99a0d90 100644
+> --- a/hw/virtio/virtio-mem.c
+> +++ b/hw/virtio/virtio-mem.c
+> @@ -198,6 +198,7 @@ static int virtio_mem_state_change_request(VirtIOMEM *vmem, uint64_t gpa,
+>      } else {
+>          vmem->size -= size;
+>      }
+> +    notifier_list_notify(&vmem->size_change_notifiers, &vmem->size);
+>      return VIRTIO_MEM_RESP_ACK;
+>  }
+>  
+> @@ -253,7 +254,10 @@ static int virtio_mem_unplug_all(VirtIOMEM *vmem)
+>          return -EBUSY;
+>      }
+>      bitmap_clear(vmem->bitmap, 0, vmem->bitmap_size);
+> -    vmem->size = 0;
+> +    if (vmem->size != 0) {
+> +        vmem->size = 0;
+> +        notifier_list_notify(&vmem->size_change_notifiers, &vmem->size);
+> +    }
+>  
+>      virtio_mem_resize_usable_region(vmem, vmem->requested_size, true);
+>      return 0;
+> @@ -594,6 +598,18 @@ static MemoryRegion *virtio_mem_get_memory_region(VirtIOMEM *vmem, Error **errp)
+>      return &vmem->memdev->mr;
+>  }
+>  
+> +static void virtio_mem_add_size_change_notifier(VirtIOMEM *vmem,
+> +                                                Notifier *notifier)
+> +{
+> +    notifier_list_add(&vmem->size_change_notifiers, notifier);
+> +}
+> +
+> +static void virtio_mem_remove_size_change_notifier(VirtIOMEM *vmem,
+> +                                                   Notifier *notifier)
+> +{
+> +    notifier_remove(notifier);
+> +}
+> +
+>  static void virtio_mem_get_size(Object *obj, Visitor *v, const char *name,
+>                                  void *opaque, Error **errp)
+>  {
+> @@ -705,6 +721,7 @@ static void virtio_mem_instance_init(Object *obj)
+>      VirtIOMEM *vmem = VIRTIO_MEM(obj);
+>  
+>      vmem->block_size = VIRTIO_MEM_MIN_BLOCK_SIZE;
+> +    notifier_list_init(&vmem->size_change_notifiers);
+>  
+>      object_property_add(obj, VIRTIO_MEM_SIZE_PROP, "size", virtio_mem_get_size,
+>                          NULL, NULL, NULL, &error_abort);
+> @@ -743,6 +760,8 @@ static void virtio_mem_class_init(ObjectClass *klass, void *data)
+>  
+>      vmc->fill_device_info = virtio_mem_fill_device_info;
+>      vmc->get_memory_region = virtio_mem_get_memory_region;
+> +    vmc->add_size_change_notifier = virtio_mem_add_size_change_notifier;
+> +    vmc->remove_size_change_notifier = virtio_mem_remove_size_change_notifier;
+>  }
+>  
+>  static const TypeInfo virtio_mem_info = {
+> diff --git a/include/hw/virtio/virtio-mem.h b/include/hw/virtio/virtio-mem.h
+> index 27158cb611..5820b5c23e 100644
+> --- a/include/hw/virtio/virtio-mem.h
+> +++ b/include/hw/virtio/virtio-mem.h
+> @@ -66,6 +66,9 @@ typedef struct VirtIOMEM {
+>      /* block size and alignment */
+>      uint32_t block_size;
+>      uint32_t migration_block_size;
+> +
+> +    /* notifiers to notify when "size" changes */
+> +    NotifierList size_change_notifiers;
+>  } VirtIOMEM;
+>  
+>  typedef struct VirtIOMEMClass {
+> @@ -75,6 +78,8 @@ typedef struct VirtIOMEMClass {
+>      /* public */
+>      void (*fill_device_info)(const VirtIOMEM *vmen, VirtioMEMDeviceInfo *vi);
+>      MemoryRegion *(*get_memory_region)(VirtIOMEM *vmem, Error **errp);
+> +    void (*add_size_change_notifier)(VirtIOMEM *vmem, Notifier *notifier);
+> +    void (*remove_size_change_notifier)(VirtIOMEM *vmem, Notifier *notifier);
+>  } VirtIOMEMClass;
+>  
+>  #endif
+> -- 
+> 2.25.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
