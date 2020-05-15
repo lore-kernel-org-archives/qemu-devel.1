@@ -2,80 +2,89 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3900DC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 13:11:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3336FC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 13:12:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C53E20657
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 13:11:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C53E20657
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id F3BB020657
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 13:12:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OyH/YsYQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3BB020657
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZa86-0000oC-2v
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 09:11:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49198)
+	id 1jZa8B-00012A-4T
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 09:12:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45868)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jZa77-0007Z1-Jq
- for qemu-devel@nongnu.org; Fri, 15 May 2020 09:10:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56308)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jZa72-0008WR-AS
- for qemu-devel@nongnu.org; Fri, 15 May 2020 09:10:56 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jZa6z-00012j-Si
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 13:10:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D83E52E8106
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 13:10:49 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZjR-0003UE-HS
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 08:46:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22192
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZjP-0002R0-Fn
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 08:46:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589546786;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=WO1RmzvUGN7QwMZ7IB3cZAT2Hj4r6SJ5n0/HFJEnUmk=;
+ b=OyH/YsYQEB9epxlNbybcqf2nGXfzG0VmqfexQ8H0vspAhjv3irB1oMl9j3UcxhuInMJaxP
+ tacxPMsD7FUFESrQa0ldMwqneJElWhKNkYFPZc4GAi5lcpFmcHuxy1/v0XXNXxHSreZw4T
+ 3+huvI2Ab9/FlAl0e2pctrVAeb8aYl4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-12-YVdfH5uNPgCr0TYvt1k2qg-1; Fri, 15 May 2020 08:46:22 -0400
+X-MC-Unique: YVdfH5uNPgCr0TYvt1k2qg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D2408835B5E;
+ Fri, 15 May 2020 12:46:21 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-113-110.ams2.redhat.com
+ [10.36.113.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D70422E024;
+ Fri, 15 May 2020 12:46:20 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PULL 36/51] block: Drop child_backing
+Date: Fri, 15 May 2020 14:45:06 +0200
+Message-Id: <20200515124521.335403-37-kwolf@redhat.com>
+In-Reply-To: <20200515124521.335403-1-kwolf@redhat.com>
+References: <20200515124521.335403-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 May 2020 13:04:06 -0000
-From: Jan Klos <1856335@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: babumoger djdatte h-sieger janklos
-X-Launchpad-Bug-Reporter: Damir (djdatte)
-X-Launchpad-Bug-Modifier: Jan Klos (janklos)
-References: <157625616239.22064.10423897892496347105.malonedeb@gac.canonical.com>
-Message-Id: <158954784628.22688.13180815967368048776.malone@gac.canonical.com>
-Subject: [Bug 1856335] Re: Cache Layout wrong on many Zen Arch CPUs
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="0385b538081bc4718df6fb844a3afc89729c94ce";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 1f5d26f7d35f0eb7adfb1fe0799e6b326aa471c5
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 09:10:50
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 23:27:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,77 +93,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1856335 <1856335@bugs.launchpad.net>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A workaround for Linux VMs is to disable CPUs (and setting their
-number/pinnings accordingly, e.g. every 4th (and 3rd for 3100) core is
-going to be 'dummy' and disabled system-wide) by e.g. echo 0 >
-/sys/devices/system/cpu/cpu3/online
+From: Max Reitz <mreitz@redhat.com>
 
-No good workaround for Windows VMs exists, as far as I know - the best
-you can do is setting affinity to specific process(es) and avoid the
-'dummy' CPUs, but I am not aware of any possibility to disable specific
-CPUs (only limiting the overall number).
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-Id: <20200513110544.176672-25-mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ include/block/block_int.h |  1 -
+ block.c                   | 60 ++-------------------------------------
+ 2 files changed, 3 insertions(+), 58 deletions(-)
 
--- =
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 4b09fa1124..0781d43af5 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -742,7 +742,6 @@ struct BdrvChildClass {
+ 
+ extern const BdrvChildClass child_of_bds;
+ extern const BdrvChildClass child_file;
+-extern const BdrvChildClass child_backing;
+ 
+ struct BdrvChild {
+     BlockDriverState *bs;
+diff --git a/block.c b/block.c
+index 131ae20ffc..d138a3c261 100644
+--- a/block.c
++++ b/block.c
+@@ -1215,15 +1215,6 @@ static void bdrv_backing_attach(BdrvChild *c)
+                     parent->backing_blocker);
+ }
+ 
+-/* XXX: Will be removed along with child_backing */
+-static void bdrv_child_cb_attach_backing(BdrvChild *c)
+-{
+-    if (!(c->role & BDRV_CHILD_COW)) {
+-        bdrv_backing_attach(c);
+-    }
+-    bdrv_child_cb_attach(c);
+-}
+-
+ static void bdrv_backing_detach(BdrvChild *c)
+ {
+     BlockDriverState *parent = c->opaque;
+@@ -1234,28 +1225,6 @@ static void bdrv_backing_detach(BdrvChild *c)
+     parent->backing_blocker = NULL;
+ }
+ 
+-/* XXX: Will be removed along with child_backing */
+-static void bdrv_child_cb_detach_backing(BdrvChild *c)
+-{
+-    if (!(c->role & BDRV_CHILD_COW)) {
+-        bdrv_backing_detach(c);
+-    }
+-    bdrv_child_cb_detach(c);
+-}
+-
+-/*
+- * Returns the options and flags that bs->backing should get, based on the
+- * given options and flags for the parent BDS
+- */
+-static void bdrv_backing_options(BdrvChildRole role, bool parent_is_format,
+-                                 int *child_flags, QDict *child_options,
+-                                 int parent_flags, QDict *parent_options)
+-{
+-    bdrv_inherited_options(BDRV_CHILD_COW, true,
+-                           child_flags, child_options,
+-                           parent_flags, parent_options);
+-}
+-
+ static int bdrv_backing_update_filename(BdrvChild *c, BlockDriverState *base,
+                                         const char *filename, Error **errp)
+ {
+@@ -1283,21 +1252,6 @@ static int bdrv_backing_update_filename(BdrvChild *c, BlockDriverState *base,
+     return ret;
+ }
+ 
+-const BdrvChildClass child_backing = {
+-    .parent_is_bds   = true,
+-    .get_parent_desc = bdrv_child_get_parent_desc,
+-    .attach          = bdrv_child_cb_attach_backing,
+-    .detach          = bdrv_child_cb_detach_backing,
+-    .inherit_options = bdrv_backing_options,
+-    .drained_begin   = bdrv_child_cb_drained_begin,
+-    .drained_poll    = bdrv_child_cb_drained_poll,
+-    .drained_end     = bdrv_child_cb_drained_end,
+-    .inactivate      = bdrv_child_cb_inactivate,
+-    .update_filename = bdrv_backing_update_filename,
+-    .can_set_aio_ctx = bdrv_child_cb_can_set_aio_ctx,
+-    .set_aio_ctx     = bdrv_child_cb_set_aio_ctx,
+-};
+-
+ /*
+  * Returns the options and flags that a generic child of a BDS should
+  * get, based on the given options and flags for the parent BDS.
+@@ -2446,8 +2400,7 @@ static void bdrv_default_perms_for_cow(BlockDriverState *bs, BdrvChild *c,
+                                        uint64_t perm, uint64_t shared,
+                                        uint64_t *nperm, uint64_t *nshared)
+ {
+-    assert(child_class == &child_backing ||
+-           (child_class == &child_of_bds && (role & BDRV_CHILD_COW)));
++    assert(child_class == &child_of_bds && (role & BDRV_CHILD_COW));
+ 
+     /*
+      * We want consistent read from backing files if the parent needs it.
+@@ -2566,23 +2519,16 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
+                                uint64_t perm, uint64_t shared,
+                                uint64_t *nperm, uint64_t *nshared)
+ {
+-    bool backing = (child_class == &child_backing);
+-
+     if (child_class == &child_of_bds) {
+         bdrv_default_perms(bs, c, child_class, role, reopen_queue,
+                            perm, shared, nperm, nshared);
+         return;
+     }
+ 
+-    assert(child_class == &child_backing || child_class == &child_file);
++    assert(child_class == &child_file);
+ 
+-    if (!backing) {
+-        bdrv_default_perms_for_storage(bs, c, child_class, role, reopen_queue,
+-                                       perm, shared, nperm, nshared);
+-    } else {
+-        bdrv_default_perms_for_cow(bs, c, child_class, role, reopen_queue,
++    bdrv_default_perms_for_storage(bs, c, child_class, role, reopen_queue,
+                                    perm, shared, nperm, nshared);
+-    }
+ }
+ 
+ void bdrv_default_perms(BlockDriverState *bs, BdrvChild *c,
+-- 
+2.25.4
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1856335
-
-Title:
-  Cache Layout wrong on many Zen Arch CPUs
-
-Status in QEMU:
-  New
-
-Bug description:
-  AMD CPUs have L3 cache per 2, 3 or 4 cores. Currently, TOPOEXT seems
-  to always map Cache ass if it was an 4-Core per CCX CPU, which is
-  incorrect, and costs upwards 30% performance (more realistically 10%)
-  in L3 Cache Layout aware applications.
-
-  Example on a 4-CCX CPU (1950X /w 8 Cores and no SMT):
-
-  =C2=A0=C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
-  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
-  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
-  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'8' threads=3D'1'=
-/>
-
-  In windows, coreinfo reports correctly:
-
-  ****----  Unified Cache 1, Level 3,    8 MB, Assoc  16, LineSize  64
-  ----****  Unified Cache 6, Level 3,    8 MB, Assoc  16, LineSize  64
-
-  On a 3-CCX CPU (3960X /w 6 cores and no SMT):
-
-  =C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
-  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
-  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
-  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'6' threads=3D'1'=
-/>
-
-  in windows, coreinfo reports incorrectly:
-
-  ****--  Unified Cache  1, Level 3,    8 MB, Assoc  16, LineSize  64
-  ----**  Unified Cache  6, Level 3,    8 MB, Assoc  16, LineSize  64
-
-  Validated against 3.0, 3.1, 4.1 and 4.2 versions of qemu-kvm.
-
-  With newer Qemu there is a fix (that does behave correctly) in using the =
-dies parameter:
-  =C2=A0<qemu:arg value=3D'cores=3D3,threads=3D1,dies=3D2,sockets=3D1'/>
-
-  The problem is that the dies are exposed differently than how AMD does
-  it natively, they are exposed to Windows as sockets, which means, that
-  if you are nto a business user, you can't ever have a machine with
-  more than two CCX (6 cores) as consumer versions of Windows only
-  supports two sockets. (Should this be reported as a separate bug?)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1856335/+subscriptions
 
