@@ -2,91 +2,93 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1047AC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 11:15:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7573BC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 11:15:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCC7B204EF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 11:15:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 37F19204EF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 11:15:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="n0a9+qe+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCC7B204EF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="irTauzjl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37F19204EF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZYJ9-0004kc-RW
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 07:15:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55814)
+	id 1jZYJH-0004o0-8E
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 07:15:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55838)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jZYFs-0001iP-E4
- for qemu-devel@nongnu.org; Fri, 15 May 2020 07:11:52 -0400
-Received: from mout.web.de ([212.227.15.14]:54817)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ id 1jZYFx-0001jn-Lv
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 07:11:57 -0400
+Received: from mout.web.de ([212.227.15.3]:51545)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jZYFr-0008Dy-75
- for qemu-devel@nongnu.org; Fri, 15 May 2020 07:11:52 -0400
+ id 1jZYFw-0008ES-2F
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 07:11:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1589541095;
- bh=6wKFvILC/i7tZeoYXB6gsC5xpQEL7/lU5BhuowIrN0o=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
- b=n0a9+qe+0pZhUG0e8+W9gk2Z8/uSU53a03tSEJ3WDY9QZ/T2blGshkGTeEQ5i1U2a
- AuY71Zs4RoklFy11LMNFIi1QY4mRo1+QtD/Ik10T7NizOiJgsFP0795OaZstJMG0cx
- sihrxLZvHHp092ATpeW+5LoU/VftIvJA1dDBp4e8=
+ s=dbaedf251592; t=1589541104;
+ bh=pWY/L7DWs+7R8NUfCp6QCm9+JZ2p1vUInbQcNyL3ZCA=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=irTauzjl8FVe6d7AuecgybIhvkC1i8tY78hm0lvrZipusXvW31Q2ZApWTHNEq8B//
+ nBNMQcoHxCUXiGAsWm36mS1VkcwhzqvzfdCuXXYOj3YY+Ig+sZrjg1oIyaIMDzNNC3
+ XWk706uekyjZuJBJSvMnYjDnvvtVwtL2UTUAWlDA=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([94.134.180.164]) by smtp.web.de (mrweb002
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0MeBZO-1jioRN1K0M-00Ps3z; Fri, 15
- May 2020 13:11:35 +0200
-Date: Fri, 15 May 2020 13:11:18 +0200
+Received: from luklap ([94.134.180.164]) by smtp.web.de (mrweb004
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0LqoAk-1ivWft3RkQ-00eJUM; Fri, 15
+ May 2020 13:11:43 +0200
+Date: Fri, 15 May 2020 13:11:41 +0200
 From: Lukas Straub <lukasstraub2@web.de>
 To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH v5 0/6] colo-compare bugfixes
-Message-ID: <cover.1589540787.git.lukasstraub2@web.de>
+Subject: [PATCH v5 2/6] chardev/char.c: Use qemu_co_sleep_ns if in coroutine
+Message-ID: <4a0a27a167669dec734a37f0d3d3826ac131db4d.1589540787.git.lukasstraub2@web.de>
+In-Reply-To: <cover.1589540787.git.lukasstraub2@web.de>
+References: <cover.1589540787.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/f4EwakdEjLo+1jmxXnUr6TA";
+Content-Type: multipart/signed; boundary="Sig_/__QCEQPc=wBcBl+1KmXIssA";
  protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:53y1AI+ODEegrAfskT3B5l18/EuawRnGSqI0mYjHNAYUKT6fkYF
- tTCzDxFyisyJ7FFbrh+Lqi6FCbinBujh2R7ZC0o9E/1Qt2Qy0GLEDqrrCxSkyKjJOIN/Bei
- R0WQSAmvFamjchvG+hralA2HLodqHNmnIEnaz+B3CyS02MOqiSoVZSFgPXPPYeoIajek3BU
- KzYKLGmCxIBWZK+1q24Tg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:7CdXT/oRDVg=:Ae99K1ylYWNzXssUHvKKyf
- kWSLbyUskXmEWLyWyMQG8wVqUNs+g2kOTsdXWHXzIE3QXd28ZfG9tkx4QwVPmLKMpLJ16Q5Vk
- cjJXuDVnUL+btzSAJIlHTRlfKh6fSRscnrp7i5S72SvdyCuqb7ekUNCYEr0da97WZP+oJyChC
- G6zCrR6zCvfi51I5/XFzDzWiLt64CV6B4bLL5fxt5N6cqcIwQJrO9sWQ8xosqNHaLfYoK+8ns
- xaqY54Fn1BaJbKoQ+V9DOUZJ7CWA83H3XoRfYqKvtyKQ3I4RWocJESY9auJjBfAs+y5eH+sJX
- UK1/UK+FVZngbtx5+RGu5k2Wwhu2iz0ocGktU7oPKryXzEfzZvr/P+Nq2PyjA8zflhpN4KkgL
- 4EcK9AUAQyhxnSjJ8bbJXiIajYPcD7+dcE1BRVBY32VeblxhPbWUDSCrvnn33Z2ZeSR6nKI39
- stvTsYiKaOyYMZP3CbFUtATkJg5lHyqv0vV+EUf/Uej8axa7Pn203HsurLEvGZ12CpHxUZUcw
- DDnorG6PlyObcsPRiq/IWROvy8EHz5mvj9MZ+j+913kWO68QVeNNTVYN6DTvWoGqYAosb5DWl
- hADukRB4TeWtj55tXlgQ59r4FtpNXIpS3cvPMp7qY2LGK3iaSlg9VSmd2KgUfcAwTC+om+Zte
- ND67Yf0QGN8TBAWnnXjtljMQ/JtOck6LAWYfoRliNFkeDUHNJZNjtoRh3KTC2Y2XzCPRPz7TY
- TDHHoPCso8lqSaO6inigF1JL6Cw60k9j7nCe9934i6WNVT1vKqz1yvBfJ9wzvXpF4nibo5AUd
- nn0l8YJBu1a2uNkirqY3iqtTgoDfCASus48+xPEu5V4+EMWMFoyp3R0/9cjKGJk0UhU56tTRt
- QqBsMawD+19MHRAg8s3BbW5NJyD6YWdwMFoqq24aLOVekz4u+Jbs+xglnOELLG/rGQWlHrwcV
- rjKlvdUOIpIZe75Lwkd+wDLQZJe3ZLGcIJRZEi9GKJtoqHGnIKwY2lAmdDqFez3lA/0Loj4sq
- CMjvGnlcbH7ssIMn6U52M6f9EN/iTUC2Fv3B62otHQkBMw2oOckqKNNkY8z8vfkRCwtZrrpz5
- I0nIKE3kTrUMDZig0uXa0uKsbhkhjJHQ9ezslq46hAVv8Bk0tI+aPDB7y/wNRTNaRI3UoZWch
- 7C1pk0WDmOWd1THphYCQwEr0CYOT0k50Y67hxo4muHJx6sqXVz/L3igY0YMOzyWSVATTp8mQn
- MLp0r43oZ8JSzcuOO
-Received-SPF: pass client-ip=212.227.15.14; envelope-from=lukasstraub2@web.de;
+X-Provags-ID: V03:K1:McYHL0e9SZlZmB06/zuVSjXLkTIiftNtRSumu5NPSErgCBw3gJI
+ fczeYLPlCkvsjDwhyY4Dls0LjCzW/6RQixmhbHCfcgmEiUKxgN9pdqVuDfyiIGqh+19REUx
+ wPyyH602ih2qHdIde6s7WkAwsl+kWYz8eqQU5d2qX+XD0MAJ/RX0BVTqpfgGxa1BSh1Sj61
+ w0GWJwvcY4enG92hwoDbw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:sFo7pLeLXTw=:SkVirIzxt4fIfb/e+CKxa+
+ Nij9uXxeUVlDiZnLlj55C37lLcl/DDboPTNJH3gN/gJjSBhKhLbf8/IPIcbl/t1LsJfJPWf1G
+ 2VkH1gDzq+XBobKlSadYMmaD0CBFiThhFTKTsGxm9o1bwseU5d/rLWsKUojzZffsgUFDrXvyf
+ dRNeQKBmkxHso/VTu674qY5VGpG0BXVMMfCa4CbeTHInXPGi3Lv1TglyVQx1BkzEe6SSwag9F
+ sz8yWL4XvORsKdU1A7dJrVCCufeaVSyC5OoJz7RzUDcgCSl/99+Dl46WSzKnF26ZfBvjFpV3p
+ g8qTqBkxTteeymeP1i+/LSUD1V0GJlTS5jtEBfk45Q39gHhrtjNwPGRI26V0iS9NS0fkgIDkQ
+ 6DnepMdyuFOdd16nJiOFM3UrqZkvUAZotRsf8+7raVpww3i3T2E1heZqTP2B46tVNuE8ZNhLU
+ 7DVB9kyvMaI8MLO25wH66vrt8WfAfOb+BeOXU1rkIYGrN21Ge/OV4sALjDYB8h56AHTbkxrKG
+ PxUjpDaTqWqM3f9GrO44brK00Av/ykcoKwW14Z1tFcwJP/lVp50rROsYjVDA5gM0YbzAsMMDY
+ LLPToR3IyWTtHWub3re8zUFMBlIms8wWSS7KZBVbjdhDIljnyOStFcp/vlILQGKFIApqq0T8c
+ B4rP6Aej2pmBZ/NKDjrBKlRJQKohKXFMfshNIp607g4aXcRWHlPeinHhbEoYDOggTJQC9n5iN
+ x8V9bTk2uj+yyGs0FDKF7Q8IxpRWfbu+ZJ9BNCVfXTRIKlR2M3ComeiCeXDHO9/8JY+QpAOCF
+ /Lcgowv3PbZOEvyIL3IhBk+LrFmRS6qa7cKRQ5quLzSuo8j/eBZYxFF2ntRTPDP8uEN28046/
+ jk1AliSurfp6ycTU3JH0VpbSYkgkbLDl5B/VMlghtBu6D5C274BWRnnRsYcUqeFa5nQbNqw9n
+ 7IAeTnNjtM+31weC0aYAh/UojbPlfJV5bdvBY7N4pVhc2O8JH7wYl5bl3ek4VE+q5k9V8EmpN
+ YswrDv0qbJ9H58WbKNHlPEsjxMKILQIrS6dKDVoaNuFAEF/keU8k5iQHfVqzFEwyQpOSMSxpt
+ hJQtoGMmI5aAunHoYGLz8IK3gVYHCT5sZrifew/GURJvHfc7gE6lQP/g1W7k6y4HajeZhroNe
+ 62PTiMGOIdmspiHpUkrhN4U9bd9JgE0NL2vU88QSr+UALoxBYfA0DWIJKjj68Kh13hqfHE2qz
+ GCkXa8HhaZIufMQjc
+Received-SPF: pass client-ip=212.227.15.3; envelope-from=lukasstraub2@web.de;
  helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 07:11:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 05:48:32
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -24
 X-Spam_score: -2.5
 X-Spam_bar: --
 X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -107,73 +109,68 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/f4EwakdEjLo+1jmxXnUr6TA
-Content-Type: text/plain; charset=US-ASCII
+--Sig_/__QCEQPc=wBcBl+1KmXIssA
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-Hello Everyone,
-Here are fixes for bugs that I found in my tests.
+This will be needed in the next patch.
 
-Regards,
-Lukas Straub
+Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Zhang Chen <chen.zhang@intel.com>
+---
+ chardev/char.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Version changes:
-v5:
- -initialize and use notify_sendco only if notify_dev is set
-
-v4:
- -fix potential deadlock with notify_remote_frame
- -avoid malloc and memcpy in many cases
-
-v3:
- -fix checkpatch.pl error
-
-v2:
- -better wording
- -fix performance-regression in patch 3 "net/colo-compare.c: Fix deadlock i=
-n compare_chr_send"
- -add more bugfixes
-
-
-Lukas Straub (6):
-  net/colo-compare.c: Create event_bh with the right AioContext
-  chardev/char.c: Use qemu_co_sleep_ns if in coroutine
-  net/colo-compare.c: Fix deadlock in compare_chr_send
-  net/colo-compare.c: Only hexdump packets if tracing is enabled
-  net/colo-compare.c, softmmu/vl.c: Check that colo-compare is active
-  net/colo-compare.c: Correct ordering in complete and finalize
-
- chardev/char.c     |   7 +-
- net/colo-compare.c | 254 ++++++++++++++++++++++++++++++++++-----------
- net/colo-compare.h |   1 +
- net/colo.c         |   7 ++
- net/colo.h         |   1 +
- softmmu/vl.c       |   2 +
- 6 files changed, 209 insertions(+), 63 deletions(-)
-
+diff --git a/chardev/char.c b/chardev/char.c
+index e77564060d..5c8014199f 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -38,6 +38,7 @@
+ #include "qemu/module.h"
+ #include "qemu/option.h"
+ #include "qemu/id.h"
++#include "qemu/coroutine.h"
+=20
+ #include "chardev/char-mux.h"
+=20
+@@ -119,7 +120,11 @@ static int qemu_chr_write_buffer(Chardev *s,
+     retry:
+         res =3D cc->chr_write(s, buf + *offset, len - *offset);
+         if (res < 0 && errno =3D=3D EAGAIN && write_all) {
+-            g_usleep(100);
++            if (qemu_in_coroutine()) {
++                qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, 100000);
++            } else {
++                g_usleep(100);
++            }
+             goto retry;
+         }
+=20
 --=20
 2.20.1
 
---Sig_/f4EwakdEjLo+1jmxXnUr6TA
+
+--Sig_/__QCEQPc=wBcBl+1KmXIssA
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl6+eNYACgkQNasLKJxd
-slisyRAAlJfYH0VOAgX3gc2ddiYlS29PZOjxYUTew6yx8qKbq9021xtpHH9c0Ugl
-243pC66bOEF3vJTphJvfL/ggl80x9wA3EVFbFZ7/23OU5uiX1a4njftr+Y4Ey2s5
-qn84HrlX8yVewmeumR5NDDPsNKFirSrvEh1eOpZffVrGRSWTv0OjfaOhdumAz/bU
-6XccIU0GQmMvu7WlonJ6UARkj1W7vN69fWNmMeKhu2ejA1R7aPGTbxg6RwjVI2ie
-KLRDQ9YjEmyoR4/waSs2XLJpahaua534Es396oGjxh2cf67Hv96TZDGgxu6niqMF
-bCv1CifmaoPPAVqZDMDkC4VwI4iOMyXRLPzNiqXZQ1KFpJNLwsUiPKlrV20GJN/+
-n5ign5CPIsCtOKboT1ugl1rdt571gd0rPgGG5my1IBaDNmzRC9nq5QPLulFmH/nZ
-ygbrobTrEhNmMfqq5MVa2cGaINUg7cgmAJNyXFsEpo6wQXwDKbdFcty3Uy5BYOwX
-wI41OpvN+81NN0fDaus+71jaOdcEKZJv/FEydg1d9Nn0/BkIoHI+HtoMpfTK2nMy
-85YdcUgGlELDY2HpYRPfp8jvzvvu0QZDmblrHhDLVsz9mV7jtJOr45gLWgl3H+/U
-KHfc+aLlthkdlh4LPjLJUfEvVeR6TSyVd7HmR7MSc80Yb5EndM4=
-=miHH
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl6+eO0ACgkQNasLKJxd
+slg/Tg//dfMTVBTxNvTDUtKBHLIBSwGfkXZkV6wnEsIHYT0wLDv2zPrEaMfk7NqK
+PWbDnqi0S+zLe5C+QtD50eDPbMAupTXYCr3aqZjnntdZIzgW0gLwcow4Q5FIrRmL
+nOmiByJ5cQTQ9cK1acPBNX/DKhlpJlC8Eyak5fRGvos7BoFneeLhCwx2LP5GnSYg
+ZujYLgdHwYo8npgK2vTVBDrFrIWVARXUyXXwpX0Xq/RJf1hpME38ELw5cMfzJw6K
+OMZgkq04DpwUQKPzhcMPgn9dqn7uikoM1IytUzZ1JIzFcVLe7g0iViLQnA8iGk1m
+o8BG+skPq7wsxuURmujx2fvNcG2er19fL2FCiaihQma8Ozu1idf3c+8VHqmOZW9T
+VsAv5fNIsDlQWKbj7p62q5woK+0TgfGQOTxaExhtuff/uyTIzzNCeeB6Ke1cHxwg
+uawoN8Wkqepr0tX3xJP9LGjK8Hn1UQrR2uH6fTtJaJW5LvEmpQGP3e8knyTpF6po
+9JGt3rIWvATfHxVRD43iX1ZG9ysiFZZhCLiwtbqpPCeJq/of2MrBO7j4SFTuYWJK
+c8hHvB6Shsq2E4Kgi7OhJj9is90E2dDcajL2XvA3HtKppR/WcfXe1at0FAwrYli+
+W3CvaQ4ullbHsZdeLD3O8c3JPmFVQ29bnEriXyFbF6yjHOVZDTM=
+=r4qb
 -----END PGP SIGNATURE-----
 
---Sig_/f4EwakdEjLo+1jmxXnUr6TA--
+--Sig_/__QCEQPc=wBcBl+1KmXIssA--
 
