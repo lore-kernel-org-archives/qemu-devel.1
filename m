@@ -7,61 +7,60 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDADDC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 13:09:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FBD6C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 13:10:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A148B20657
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 13:09:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6735A20657
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 13:10:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fk2nGxxD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A148B20657
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bjwhYjYj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6735A20657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZa5z-0004uY-Rr
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 09:09:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45744)
+	id 1jZa6N-0005iE-JD
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 09:10:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45856)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZjD-0002vW-O8
- for qemu-devel@nongnu.org; Fri, 15 May 2020 08:46:15 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41867
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZjP-0003NK-6J
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 08:46:27 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60570)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZjB-0002Li-4m
- for qemu-devel@nongnu.org; Fri, 15 May 2020 08:46:15 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZjO-0002Qk-9r
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 08:46:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589546772;
+ s=mimecast20190719; t=1589546785;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=exmpVgQdn1BPIsIvyOs3f+hoWImPMi+7oYKNGj+Heao=;
- b=Fk2nGxxDi5Jh2HWXhE3lOK3I1yCXSjE3EWI9E/9J1gsgWQnjhb+1p+m7mmhU/+MkyjMQOX
- LrBgUWHYARw5r946Rn/LaaY+DXDDF6QhZO8hjrWu7jmlnWv4xmhxZOI8L8aNPRWi2N+eLW
- HGIGOvZSLE63WOMhoM/fk0jwNYF1ZoY=
+ bh=3sxjdEzqm+O4BxjKrJ83R2UCaj3HoODFTniC+AiCCFw=;
+ b=bjwhYjYjFNqGb5UCN4ZFjPh+1GHMxOBgxStZAmGlHWEDbmgGLjGO/yeL2/tqFm1zt6kl+F
+ 63PUZobqH1fxRkm5oLld3HQ+bbtplH5FjM6K1izF7KL6bINc3E5ub4CyUHsUkS2bfOSwzL
+ bN+dKbfvnGVc0trwuyL4V0fNEkXH8+Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-106-wHxyvcgvMFedikEP6aL6_w-1; Fri, 15 May 2020 08:46:10 -0400
-X-MC-Unique: wHxyvcgvMFedikEP6aL6_w-1
+ us-mta-2-Q-2sDPN3NROImFef7siOpw-1; Fri, 15 May 2020 08:46:21 -0400
+X-MC-Unique: Q-2sDPN3NROImFef7siOpw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 170AC8005AD;
- Fri, 15 May 2020 12:46:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8AEC319200C0;
+ Fri, 15 May 2020 12:46:20 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-113-110.ams2.redhat.com
  [10.36.113.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1E8EB2E024;
- Fri, 15 May 2020 12:46:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 92F492E024;
+ Fri, 15 May 2020 12:46:19 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 26/51] block: Add child_of_bds
-Date: Fri, 15 May 2020 14:44:56 +0200
-Message-Id: <20200515124521.335403-27-kwolf@redhat.com>
+Subject: [PULL 35/51] block: Make backing files child_of_bds children
+Date: Fri, 15 May 2020 14:45:05 +0200
+Message-Id: <20200515124521.335403-36-kwolf@redhat.com>
 In-Reply-To: <20200515124521.335403-1-kwolf@redhat.com>
 References: <20200515124521.335403-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -71,7 +70,7 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
+ helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 00:07:24
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
@@ -100,68 +99,166 @@ Sender: "Qemu-devel"
 
 From: Max Reitz <mreitz@redhat.com>
 
-Any current user of child_file, child_format, and child_backing can and
-should use this generic BdrvChildClass instead, as it can handle all of
-these cases.  However, to be able to do so, the users must pass the
-appropriate BdrvChildRole when the child is created/attached.  (The
-following commits will take care of that.)
+Make all parents of backing files pass the appropriate BdrvChildRole.
+By doing so, we can switch their BdrvChildClass over to the generic
+child_of_bds, which will do the right thing when given a correct
+BdrvChildRole.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20200513110544.176672-15-mreitz@redhat.com>
+Message-Id: <20200513110544.176672-24-mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/block_int.h |  1 +
- block.c                   | 24 ++++++++++++++++++++++++
- 2 files changed, 25 insertions(+)
+ block.c                 | 26 ++++++++++++++++++++------
+ block/backup-top.c      |  2 +-
+ block/vvfat.c           |  3 ++-
+ tests/test-bdrv-drain.c | 13 +++++++------
+ 4 files changed, 30 insertions(+), 14 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 6245d8a18d..54df821d61 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -740,6 +740,7 @@ struct BdrvChildClass {
-     void (*set_aio_ctx)(BdrvChild *child, AioContext *ctx, GSList **ignore);
- };
- 
-+extern const BdrvChildClass child_of_bds;
- extern const BdrvChildClass child_file;
- extern const BdrvChildClass child_format;
- extern const BdrvChildClass child_backing;
 diff --git a/block.c b/block.c
-index f63417c06d..be9bfa9d46 100644
+index 85b4f947ba..131ae20ffc 100644
 --- a/block.c
 +++ b/block.c
-@@ -1429,6 +1429,30 @@ static void bdrv_child_cb_detach(BdrvChild *child)
-     bdrv_unapply_subtree_drain(child, bs);
+@@ -2941,6 +2941,20 @@ static bool bdrv_inherits_from_recursive(BlockDriverState *child,
+     return child != NULL;
  }
  
-+static int bdrv_child_cb_update_filename(BdrvChild *c, BlockDriverState *base,
-+                                         const char *filename, Error **errp)
++/*
++ * Return the BdrvChildRole for @bs's backing child.  bs->backing is
++ * mostly used for COW backing children (role = COW), but also for
++ * filtered children (role = FILTERED | PRIMARY).
++ */
++static BdrvChildRole bdrv_backing_role(BlockDriverState *bs)
 +{
-+    if (c->role & BDRV_CHILD_COW) {
-+        return bdrv_backing_update_filename(c, base, filename, errp);
++    if (bs->drv && bs->drv->is_filter) {
++        return BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY;
++    } else {
++        return BDRV_CHILD_COW;
 +    }
-+    return 0;
 +}
 +
-+const BdrvChildClass child_of_bds = {
-+    .parent_is_bds   = true,
-+    .get_parent_desc = bdrv_child_get_parent_desc,
-+    .inherit_options = bdrv_inherited_options,
-+    .drained_begin   = bdrv_child_cb_drained_begin,
-+    .drained_poll    = bdrv_child_cb_drained_poll,
-+    .drained_end     = bdrv_child_cb_drained_end,
-+    .attach          = bdrv_child_cb_attach,
-+    .detach          = bdrv_child_cb_detach,
-+    .inactivate      = bdrv_child_cb_inactivate,
-+    .can_set_aio_ctx = bdrv_child_cb_can_set_aio_ctx,
-+    .set_aio_ctx     = bdrv_child_cb_set_aio_ctx,
-+    .update_filename = bdrv_child_cb_update_filename,
-+};
-+
- static int bdrv_open_flags(BlockDriverState *bs, int flags)
+ /*
+  * Sets the backing file link of a BDS. A new reference is created; callers
+  * which don't need their own reference any more must call bdrv_unref().
+@@ -2968,8 +2982,8 @@ void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd,
+         goto out;
+     }
+ 
+-    bs->backing = bdrv_attach_child(bs, backing_hd, "backing", &child_backing,
+-                                    0, errp);
++    bs->backing = bdrv_attach_child(bs, backing_hd, "backing", &child_of_bds,
++                                    bdrv_backing_role(bs), errp);
+     /* If backing_hd was already part of bs's backing chain, and
+      * inherits_from pointed recursively to bs then let's update it to
+      * point directly to bs (else it will become NULL). */
+@@ -3066,7 +3080,7 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
+     }
+ 
+     backing_hd = bdrv_open_inherit(backing_filename, reference, options, 0, bs,
+-                                   &child_backing, 0, errp);
++                                   &child_of_bds, bdrv_backing_role(bs), errp);
+     if (!backing_hd) {
+         bs->open_flags |= BDRV_O_NO_BACKING;
+         error_prepend(errp, "Could not open backing file: ");
+@@ -3895,8 +3909,8 @@ int bdrv_reopen_multiple(BlockReopenQueue *bs_queue, Error **errp)
+         if (state->replace_backing_bs && state->new_backing_bs) {
+             uint64_t nperm, nshared;
+             bdrv_child_perm(state->bs, state->new_backing_bs,
+-                            NULL, &child_backing, 0, bs_queue,
+-                            state->perm, state->shared_perm,
++                            NULL, &child_of_bds, bdrv_backing_role(state->bs),
++                            bs_queue, state->perm, state->shared_perm,
+                             &nperm, &nshared);
+             ret = bdrv_check_update_perm(state->new_backing_bs, NULL,
+                                          nperm, nshared, NULL, NULL, errp);
+@@ -6852,7 +6866,7 @@ void bdrv_refresh_filename(BlockDriverState *bs)
+         drv->bdrv_gather_child_options(bs, opts, backing_overridden);
+     } else {
+         QLIST_FOREACH(child, &bs->children, next) {
+-            if (child->klass == &child_backing && !backing_overridden) {
++            if (child == bs->backing && !backing_overridden) {
+                 /* We can skip the backing BDS if it has not been overridden */
+                 continue;
+             }
+diff --git a/block/backup-top.c b/block/backup-top.c
+index e2b4d2acd3..f059617095 100644
+--- a/block/backup-top.c
++++ b/block/backup-top.c
+@@ -143,7 +143,7 @@ static void backup_top_child_perm(BlockDriverState *bs, BdrvChild *c,
+         return;
+     }
+ 
+-    if (child_class == &child_file) {
++    if (!(role & BDRV_CHILD_FILTERED)) {
+         /*
+          * Target child
+          *
+diff --git a/block/vvfat.c b/block/vvfat.c
+index b4c8417dbd..e8848a0497 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -3219,7 +3219,8 @@ static void vvfat_child_perm(BlockDriverState *bs, BdrvChild *c,
  {
-     int open_flags = flags;
+     BDRVVVFATState *s = bs->opaque;
+ 
+-    assert(c == s->qcow || child_class == &child_backing);
++    assert(c == s->qcow ||
++           (child_class == &child_of_bds && (role & BDRV_CHILD_COW)));
+ 
+     if (c == s->qcow) {
+         /* This is a private node, nobody should try to attach to it */
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index b3d7960bd0..15393a0140 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -96,7 +96,7 @@ static void bdrv_test_child_perm(BlockDriverState *bs, BdrvChild *c,
+      * bdrv_format_default_perms() accepts only these two, so disguise
+      * detach_by_driver_cb_parent as one of them.
+      */
+-    if (child_class != &child_file && child_class != &child_backing) {
++    if (child_class != &child_file && child_class != &child_of_bds) {
+         child_class = &child_file;
+     }
+ 
+@@ -1399,8 +1399,8 @@ static void test_detach_indirect(bool by_parent_cb)
+     bdrv_ref(a);
+     child_b = bdrv_attach_child(parent_b, b, "PB-B", &child_file, 0,
+                                 &error_abort);
+-    child_a = bdrv_attach_child(parent_b, a, "PB-A", &child_backing, 0,
+-                                &error_abort);
++    child_a = bdrv_attach_child(parent_b, a, "PB-A", &child_of_bds,
++                                BDRV_CHILD_COW, &error_abort);
+ 
+     bdrv_ref(a);
+     bdrv_attach_child(parent_a, a, "PA-A",
+@@ -1793,7 +1793,7 @@ static void test_drop_intermediate_poll(void)
+     int i;
+     int ret;
+ 
+-    chain_child_class = child_backing;
++    chain_child_class = child_of_bds;
+     chain_child_class.update_filename = drop_intermediate_poll_update_filename;
+ 
+     for (i = 0; i < 3; i++) {
+@@ -1816,7 +1816,7 @@ static void test_drop_intermediate_poll(void)
+             /* Takes the reference to chain[i - 1] */
+             chain[i]->backing = bdrv_attach_child(chain[i], chain[i - 1],
+                                                   "chain", &chain_child_class,
+-                                                  0, &error_abort);
++                                                  BDRV_CHILD_COW, &error_abort);
+         }
+     }
+ 
+@@ -2034,7 +2034,8 @@ static void do_test_replace_child_mid_drain(int old_drain_count,
+ 
+     bdrv_ref(old_child_bs);
+     parent_bs->backing = bdrv_attach_child(parent_bs, old_child_bs, "child",
+-                                           &child_backing, 0, &error_abort);
++                                           &child_of_bds, BDRV_CHILD_COW,
++                                           &error_abort);
+ 
+     for (i = 0; i < old_drain_count; i++) {
+         bdrv_drained_begin(old_child_bs);
 -- 
 2.25.4
 
