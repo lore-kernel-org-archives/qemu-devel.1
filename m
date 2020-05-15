@@ -6,70 +6,70 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9EC5C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:36:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0330C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:36:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8566620671
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:36:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BE94520728
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:36:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X292NWz9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8566620671
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h4On6/KE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE94520728
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZbSE-00062w-MY
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 10:36:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42022)
+	id 1jZbSI-0006FC-NE
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 10:36:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42008)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jZbRC-0004HZ-7K
- for qemu-devel@nongnu.org; Fri, 15 May 2020 10:35:47 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47166
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jZbRB-0004GS-Eb
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 10:35:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35754
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jZbR9-0007vm-NJ
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jZbRA-0007w8-GR
  for qemu-devel@nongnu.org; Fri, 15 May 2020 10:35:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589553342;
+ s=mimecast20190719; t=1589553343;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=03QHXNWGVGD1C4wx+MDVX+yQ3BCHvmKbLpHmsbNssOc=;
- b=X292NWz98vwxMHGISlXRKYwzB8Aba9r9/p9/fwCR+MkT/sajHQzaGi1VL95KTOjx5l1wzR
- U3618BTHnYJL+SVaqymCUvHef5yZeE1RU+HczV2SGnMf5CEQsi43Bj3EUh7cg3c5UZm8CF
- 3ElD2A2CG8x7G6FUaCL+PKWhsegefk0=
+ references:references; bh=NmdaC9JHs/YHm3neHDthQeJiGoa6Z8QbY6Dv0VNSyec=;
+ b=h4On6/KEaOCuIH3MCeWbOcGf273VieFKZDPkfzdCYNQcXSrlUt2gRZLT7rJ7fnWE9yqJBM
+ 2dMrrberzJDReVFa+82RrvklR5CeYy3BlwQn+btUETZPytuiYIrYbQVu5dRp+62Q3Q+Q1K
+ N9qzfDshobfaSKr9p/drFW5bph5lSzs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-59-WKWMqqGWMOaOZRxj8RAHig-1; Fri, 15 May 2020 10:35:40 -0400
-X-MC-Unique: WKWMqqGWMOaOZRxj8RAHig-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-251-QPZZY0L7MSq5ggmKsWv8jA-1; Fri, 15 May 2020 10:35:42 -0400
+X-MC-Unique: QPZZY0L7MSq5ggmKsWv8jA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0D4D18FF660
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 14:35:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 414D28018AB
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 14:35:41 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-115-145.ams2.redhat.com
  [10.36.115.145])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8A0625C241;
- Fri, 15 May 2020 14:35:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E6ED22E16D;
+ Fri, 15 May 2020 14:35:40 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 16A399D54; Fri, 15 May 2020 16:35:29 +0200 (CEST)
+ id 43B349D59; Fri, 15 May 2020 16:35:29 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 08/13] audio: deprecate -soundhw gus
-Date: Fri, 15 May 2020 16:35:23 +0200
-Message-Id: <20200515143528.13591-9-kraxel@redhat.com>
+Subject: [PATCH v2 13/13] [RFC] audio: try use onboard audiodev for pcspk
+Date: Fri, 15 May 2020 16:35:28 +0200
+Message-Id: <20200515143528.13591-14-kraxel@redhat.com>
 In-Reply-To: <20200515143528.13591-1-kraxel@redhat.com>
 References: <20200515143528.13591-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 00:39:12
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 22:56:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -97,40 +97,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Switch to deprecated_register_soundhw().
-Remove the now obsolete init function.
+New naming convention:  Use "onboard" audiodev for onboard audio
+devices, using "-audiodev pa,id=onboard" for example.
+
+This patchs implements it for pcspk, it will try to use "onboard" by
+default.  Setting another name using "-global pcspk.audiodev=<name>"
+continues to work.
+
+If we want go this route we should do the same for other onboard
+audio devices too (arm boards, ...).
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/audio/gus.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ hw/audio/pcspk.c           | 3 +++
+ docs/system/deprecated.rst | 4 ++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/hw/audio/gus.c b/hw/audio/gus.c
-index eb4a803fb53b..61d16fad9ffb 100644
---- a/hw/audio/gus.c
-+++ b/hw/audio/gus.c
-@@ -292,12 +292,6 @@ static void gus_realizefn (DeviceState *dev, Error **errp)
-     AUD_set_active_out (s->voice, 1);
- }
+diff --git a/hw/audio/pcspk.c b/hw/audio/pcspk.c
+index ab290e686783..9a08e9d8e05b 100644
+--- a/hw/audio/pcspk.c
++++ b/hw/audio/pcspk.c
+@@ -190,6 +190,9 @@ static void pcspk_realizefn(DeviceState *dev, Error **errp)
  
--static int GUS_init (ISABus *bus)
--{
--    isa_create_simple (bus, TYPE_GUS);
--    return 0;
--}
--
- static Property gus_properties[] = {
-     DEFINE_AUDIO_PROPERTIES(GUSState, card),
-     DEFINE_PROP_UINT32 ("freq",    GUSState, freq,        44100),
-@@ -328,7 +322,7 @@ static const TypeInfo gus_info = {
- static void gus_register_types (void)
- {
-     type_register_static (&gus_info);
--    isa_register_soundhw("gus", "Gravis Ultrasound GF1", GUS_init);
-+    deprecated_register_soundhw("gus", "Gravis Ultrasound GF1", 1, TYPE_GUS);
- }
+     isa_register_ioport(isadev, &s->ioport, s->iobase);
  
- type_init (gus_register_types)
++    if (!s->card.state) {
++        s->card.state = audio_state_by_name("onboard");
++    }
+     if (s->card.state) {
+         pcspk_audio_init(s);
+     }
+diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
+index 7de1045b7e27..34312fc0a963 100644
+--- a/docs/system/deprecated.rst
++++ b/docs/system/deprecated.rst
+@@ -94,8 +94,8 @@ Creating sound card devices using ``-soundhw`` (since 5.1)
+ Sound card devices should be created using ``-device`` instead.  The
+ names are the same for most devices.  The exceptions are ``hda`` which
+ needs two devices (``-device intel-hda --device hda-duplex``) and
+-``pcspk`` which can be activated using ``-global
+-pcspk.audiodev=<name>``.
++``pcspk`` which can be activated by creating an audiodev named
++``onboard``.
+ 
+ ``-mon ...,control=readline,pretty=on|off`` (since 4.1)
+ '''''''''''''''''''''''''''''''''''''''''''''''''''''''
 -- 
 2.18.4
 
