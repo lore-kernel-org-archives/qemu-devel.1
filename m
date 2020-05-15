@@ -2,82 +2,87 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84F2AC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 18:10:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29256C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 18:11:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50FE820657
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 18:10:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DDC6A20657
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 18:11:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K4zfF0V/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50FE820657
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="enUc0PUz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDC6A20657
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZemw-0000EF-GT
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 14:10:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50372)
+	id 1jZenu-0001YY-3D
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 14:11:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50512)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <michael.goffioul@gmail.com>)
- id 1jZem1-00082R-A0
- for qemu-devel@nongnu.org; Fri, 15 May 2020 14:09:29 -0400
-Received: from mail-qt1-x82c.google.com ([2607:f8b0:4864:20::82c]:40805)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jZenA-0000hD-Vh
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 14:10:40 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:40367)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <michael.goffioul@gmail.com>)
- id 1jZem0-0003NX-EO
- for qemu-devel@nongnu.org; Fri, 15 May 2020 14:09:28 -0400
-Received: by mail-qt1-x82c.google.com with SMTP id c24so2725951qtw.7
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 11:09:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to;
- bh=jGuN+94YU3NotJwJngKzXUj6RtmqRZFDgnOOOY2x5ek=;
- b=K4zfF0V/x2O/EK8z8jyyhwETIUQ1Eg5XERMNvYaBCAY2fhu7iGSfPnluqkunAbTpik
- PdIS2sJp5JiYs15OncVAaIUZd/c9+bYrgEFLU5bWqex1RepGp6c7OhI7DZOhfst5saGZ
- ygX8ng7rywh/hclhmR+7pqezu//lzwYLZo3E/Yi1TJDR1pXPBZjAissDNyj8jLKARfbz
- X/SeZ4DI7DVlFcypoFocdRt7+In/DqFZeNtR25K4702bE8LyrGSVSdEqFxHX/rqc5z7e
- ct4LZuXw3l+1WE9/c6XuSHHVi75DnCnX3zHSzZS1SrxdFAYWrgaq+1SFz+FD1mMf16WJ
- N2Rw==
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jZen9-0003kA-R4
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 14:10:40 -0400
+Received: by mail-lj1-x241.google.com with SMTP id g1so3214201ljk.7
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 11:10:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=UQKT10OmCp49GaESvWKY1wkPwLk2MU4JtXw6/W7KlR4=;
+ b=enUc0PUzPSeAoEBw+NWA5SPQPTxQw5TX0rK72aLacLZJbIQwE5eoJ93cQSugL+f0IT
+ Q6MQm8iQHPghrfutB9cy129wlA3ZbRLUp1G64sz30e56RbDKVofQkDjjOIsfPiqX2t0e
+ lJjZMaZAWTqC7R4E2mXWcjoQaQ5wGM+NqElk1osf5KVZtG3Lo3o+ikSvS4XRiaybygCu
+ dVn2TycSE0pqCK7/S+HIj7Bf22N0NgjItxo/Q+qW7OsyNNYzZhAG6S1FwjFIYuzUI0XQ
+ D+HOrna8WAFwzDxidPm76bxBjscYBva/ZxlSQjvQxC10cySNsKvmmV29FDO6+odYl8dQ
+ ydRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=jGuN+94YU3NotJwJngKzXUj6RtmqRZFDgnOOOY2x5ek=;
- b=Q2FA5GVTIak4nMIA6PSNK3f1ywQ3jUBEGJA5nnF037p6HkDJck7HuxExyCtVsgPwI4
- kB0AWekPzQjjAbbDfGEhUpiBzG5+uzc/a+zHmi3gGSI2mmUePJDXHBRLVvdHPdnbStpT
- ukZw5qAyDpsQ2okaRfq23XYFXfuSu0ABCa+Z/7vl0cO19hVITCyxapmUz8pxKg7EEOEw
- IC5RIHeLZ/tZVkcPZF8BT6ohZRw1Zp4Goev/exjGJPjOBWRPFlFiPwoDR72/mx6W6gOq
- VxHBLo8AoOd1ENBNeyWF50caK7FBTRHuLlPpL6Kl2e4nqmRGCIE16fiAjzFyE4+F5aGD
- QHAQ==
-X-Gm-Message-State: AOAM532hKrR8H5/zHzt+TfkUmvvwXajK9MMZBBiOqThmpuj3gL4CoyZF
- Z2YhQFr2W869uOTHNfAg3J3qSKp4pfNGKMQJ19eevCM1tJE=
-X-Google-Smtp-Source: ABdhPJwLS/rqccYs2yBa6RGgq3N8Mi0w92l9gi2bnbBmZEl8+3kbnpf78prVymb87ypYo9ZJEAIOMSTHuSVh6jBJLXc=
-X-Received: by 2002:aed:2d23:: with SMTP id h32mr4778562qtd.389.1589566166625; 
- Fri, 15 May 2020 11:09:26 -0700 (PDT)
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=UQKT10OmCp49GaESvWKY1wkPwLk2MU4JtXw6/W7KlR4=;
+ b=hs+LqRDvniM5KHjwXM3FT4sWXpjA+1bYrbWnStlzZT1STkXxPUevpep2k7dSsry/y9
+ mZCTMnznFxQwortiBPcJ6HHnV220gH9avPCsDDrAAcFJtRmhtlhqVTtnW7obFRYiTdkt
+ VfE3+l4gpJX1ss5951WJVMNHCL3Go0Nf7wUjWb2T1t8DkZ92qp+g96aRzhKHio52xqjh
+ +GyjT1x6AK4EPzD+GltPeLte1bIeiINiZRtW/+tK9i0MJ64myDRD9jew83bOkH759Oad
+ labDUKBfMlRq0ROm6u9TU78cgWVxAt7U+tJqE+Cwd1KxJsaehkGCs6wLoyjIiUNQhvAE
+ KcpA==
+X-Gm-Message-State: AOAM530ZzCSMGvE/2/fAn2TjhwQPpC7qSx4/7YEFuQZCSmK+CdqSQG1v
+ UsGBr2tLvlKJBqaEFYu57BSaM64M2ih+tNBGK2SYiQ==
+X-Google-Smtp-Source: ABdhPJyj2IqscjvABU5StUGNC7OwBFC0B0I7KlyPE//f9CyX4/Y8dGX/p5M8skaF/3lA1/o7oiJdXBoMmVPwTcRB3EE=
+X-Received: by 2002:a2e:b6d3:: with SMTP id m19mr2894844ljo.43.1589566238013; 
+ Fri, 15 May 2020 11:10:38 -0700 (PDT)
 MIME-Version: 1.0
-From: Michael Goffioul <michael.goffioul@gmail.com>
-Date: Fri, 15 May 2020 14:09:14 -0400
-Message-ID: <CAB-99Lu3eOQ2asfubOKyO8wLgPhyNvOHy9mgi=MDdR43S0M1Gg@mail.gmail.com>
-Subject: Crash when detached thread exits with bionic and QEMU usermode
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: multipart/alternative; boundary="000000000000b5745705a5b3b60d"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::82c;
- envelope-from=michael.goffioul@gmail.com; helo=mail-qt1-x82c.google.com
+References: <20200512193340.265-1-robert.foley@linaro.org>
+ <20200512193340.265-2-robert.foley@linaro.org>
+ <87zha9az9h.fsf@linaro.org>
+In-Reply-To: <87zha9az9h.fsf@linaro.org>
+From: Robert Foley <robert.foley@linaro.org>
+Date: Fri, 15 May 2020 14:10:31 -0400
+Message-ID: <CAEyhzFuXCL4ZpA1uSdifAYUzVf-ntSe68uW7wkhqhf+6Cv5Ubw@mail.gmail.com>
+Subject: Re: [PATCH v6 1/9] tests/vm: Add configuration to basevm.py
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::241;
+ envelope-from=robert.foley@linaro.org; helo=mail-lj1-x241.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -91,54 +96,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Puhov <peter.puhov@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000b5745705a5b3b60d
-Content-Type: text/plain; charset="UTF-8"
+On Fri, 15 May 2020 at 13:23, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+>
+> Robert Foley <robert.foley@linaro.org> writes:
+>
+> > Added use of a configuration to tests/vm/basevm.py.
+> > The configuration provides parameters used to configure a VM.
+> > This allows for providing alternate configurations to the VM being
+> > created/launched. cpu, machine, memory, and NUMA configuration are all
+> > examples of configuration which we might want to vary on the VM being c=
+reated
+> > or launched.
+> > This will for example allow for creating an aarch64 vm.
+> >
+> > Signed-off-by: Robert Foley <robert.foley@linaro.org>
+> > Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
+> <snip>
+> > @@ -61,19 +86,30 @@ class BaseVM(object):
+> >      # 4 is arbitrary, but greater than 2,
+> >      # since we found we need to wait more than twice as long.
+> >      tcg_ssh_timeout_multiplier =3D 4
+> > -    def __init__(self, debug=3DFalse, vcpus=3DNone):
+> > +    def __init__(self, debug=3DFalse, vcpus=3DNone, config=3DNone):
+> >          self._guest =3D None
+> <snip>
+> >                                     else logging.WARN))
+> > -        vm =3D vmcls(debug=3Dargs.debug, vcpus=3Dargs.jobs)
+> > +        vm =3D vmcls(debug=3Dargs.debug, vcpus=3Dargs.jobs, config=3Dc=
+onfig)
+>
+> Given the number of times I've just had to fix merge failures with the
+> patches I've just sent I wonder if we should just pass args as a while
+> to vmcls and be done with it?
 
-Not sure this is a bug in QEMU usermode, but I've tracked a crash that
-happens when running ARM guest code linked against bionic (from Android).
-More specifically when a detached thread exits.
+Great point !
+I have also noticed the tendency for merge conflicts when changing the
+vmcls params.
+It makes good sense to pass the args through to vmcls.
 
-In bionic, threads are created with the flag CLONE_CHILD_CLEARTID [1]. When
-a detached thread exits normally, bionic calls set_tid_address with nullptr
-to reset the address, before unmapping the thread memory [2] and exiting.
+Will add this change.
 
-The problem seems to be that the handling of TARGET_NR_set_tid_address does
-not reset TaskState->child_tidptr, and this lead to a SIGSEGV during
-handling of TARGET_NR_exit [3]
-
-[1]
-https://github.com/aosp-mirror/platform_bionic/blob/android-10.0.0_r33/libc/bionic/pthread_create.cpp#L390
-[2]
-https://github.com/aosp-mirror/platform_bionic/blob/android-10.0.0_r33/libc/bionic/pthread_exit.cpp#L123
-[3] https://github.com/qemu/qemu/blob/master/linux-user/syscall.c#L7650
-
---000000000000b5745705a5b3b60d
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Not sure this is a bug in QEMU usermode, but I&#39;ve trac=
-ked a crash that happens when running ARM guest code linked against bionic =
-(from Android). More specifically when a detached thread exits.<div><br></d=
-iv><div>In bionic, threads are created with the flag=C2=A0CLONE_CHILD_CLEAR=
-TID [1]. When a detached=C2=A0thread exits normally, bionic calls set_tid_a=
-ddress with nullptr to reset the address, before unmapping the thread memor=
-y [2] and exiting.</div><div><br></div><div>The problem seems to be that th=
-e handling of TARGET_NR_set_tid_address does not reset TaskState-&gt;child_=
-tidptr, and this lead to a SIGSEGV during handling of TARGET_NR_exit [3]</d=
-iv><div><br></div><div>[1]=C2=A0<a href=3D"https://github.com/aosp-mirror/p=
-latform_bionic/blob/android-10.0.0_r33/libc/bionic/pthread_create.cpp#L390"=
->https://github.com/aosp-mirror/platform_bionic/blob/android-10.0.0_r33/lib=
-c/bionic/pthread_create.cpp#L390</a></div><div>[2]=C2=A0<a href=3D"https://=
-github.com/aosp-mirror/platform_bionic/blob/android-10.0.0_r33/libc/bionic/=
-pthread_exit.cpp#L123">https://github.com/aosp-mirror/platform_bionic/blob/=
-android-10.0.0_r33/libc/bionic/pthread_exit.cpp#L123</a></div><div>[3]=C2=
-=A0<a href=3D"https://github.com/qemu/qemu/blob/master/linux-user/syscall.c=
-#L7650">https://github.com/qemu/qemu/blob/master/linux-user/syscall.c#L7650=
-</a></div><div><br></div></div>
-
---000000000000b5745705a5b3b60d--
+Thanks & Regards,
+-Rob
+>
+> >          if args.build_image:
+> >              if os.path.exists(args.image) and not args.force:
+> >                  sys.stderr.writelines(["Image file exists: %s\n" % arg=
+s.image,
+>
+>
+> --
+> Alex Benn=C3=A9e
 
