@@ -2,132 +2,89 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3780AC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 18:00:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 581E9C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 18:06:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02639206D8
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 18:00:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1A21720657
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 18:06:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iya36My3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02639206D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aVGYFjf3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A21720657
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZed6-0002XT-1m
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 14:00:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49170)
+	id 1jZeik-0006FY-9I
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 14:06:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49836)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jZecU-00026J-Fn
- for qemu-devel@nongnu.org; Fri, 15 May 2020 13:59:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52392
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jZecT-0001Tv-Ju
- for qemu-devel@nongnu.org; Fri, 15 May 2020 13:59:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589565576;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=a3H3DsBEwG8Gzwv7FgxO5iw0q4syKlJkaddnf3ptjZI=;
- b=Iya36My3i9ahLQYTk62et7j+Z2FBO3YaLYj1rnFPp7vDU15I6wxfLmcoD0rszJ8S2Vr3uJ
- xKgUpA7wxDs3QphP+33dWhKC+S84ntslqypIu5/z3K0gnpWHBSnwVKWRhyO3H0PSIMK28f
- DFm7ATCiMGDhpyugAcFKOJzZK3WCpxg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-128-M_yFcQtuNW29CTGtQYMpuA-1; Fri, 15 May 2020 13:59:35 -0400
-X-MC-Unique: M_yFcQtuNW29CTGtQYMpuA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 77F3318A0760;
- Fri, 15 May 2020 17:59:33 +0000 (UTC)
-Received: from [10.36.114.77] (ovpn-114-77.ams2.redhat.com [10.36.114.77])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B85805C241;
- Fri, 15 May 2020 17:59:27 +0000 (UTC)
-Subject: Re: [PATCH v1 07/17] migration/rdma: Use
- ram_block_discard_set_broken()
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <20200506094948.76388-1-david@redhat.com>
- <20200506094948.76388-8-david@redhat.com> <20200515124501.GE2954@work-vm>
- <96a58e88-2629-f2ee-5884-38d11e571548@redhat.com>
- <20200515175105.GL2954@work-vm>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <1cac6cb0-7804-bab2-4ecf-044c369c1135@redhat.com>
-Date: Fri, 15 May 2020 19:59:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jZehy-0005TD-Jb
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 14:05:18 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:35934)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1jZehw-0002VS-UI
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 14:05:17 -0400
+Received: by mail-lj1-x241.google.com with SMTP id u15so3218855ljd.3
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 11:05:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=ayGdfgOFftiXTLtBHQBT4WHs8Wd8Y25/NfLF3aAbGZM=;
+ b=aVGYFjf3eY7lQsYrcBC7U1epMoWAEy5R/8K8f01ljircfA/1EICkgQwlTdiprPKGDN
+ rI2NHgJTNeUDXBBh3UsjgJoKD35JF/mJUUgWXqtd7Vb2KTMqbOGx6X3lHg1tT5cSX2Ob
+ DK9EWOFLcVC3am86lbUD8NUQ53XIK/IqAhvUeKHpfuOENgDbg+JlxNuEoSmHa+xFyP3P
+ Pxtp/lNx4m3ayfcvrUz4hYEvFrkpCCWdVmWTqsUvRSLs2eAnrsaFdOP9QgydLdqlIbng
+ 3miaeaEd50M7LIZ7lcjrmt0qJPI14cPJjoBpQLn4ZOy5ealv8D8aR14GajGJcsa7nY0P
+ cZiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=ayGdfgOFftiXTLtBHQBT4WHs8Wd8Y25/NfLF3aAbGZM=;
+ b=rHpKE76UiZ7AWV7KpzN66jibI1zQ5orrRMqIYWafqvxb9eTvaSh45FiT0r4+0NxaFB
+ Vu3NMb0uf5bKX+mSa1udS9hnB4VsI88BR0OMMd9XQ/Cb+FGBc2ry5uNMTMFC552RdrmD
+ t8vGfm7yyP4GUMLQ6woGU0em2U7E41sLjBuyZDKV6wji25NXd6ZQvO+tUmq/5H7usTQt
+ MawQaJ27Jto9tPxF6a/dTwuk/CbFstOYwKpaD4QYPtGyBNegJ0z4MbhtnUMe6kemT+/4
+ U3N2MpllwvIVz2nBZl47pGARrV+5KY9gtY/FPPXvBHE77h1kUdwD5GEroSZEMO80Dg8+
+ arhA==
+X-Gm-Message-State: AOAM531c4jqqmoXDZXEH54kKi7+TtA7UUnVcBi1XDzV9LdTNvLDPueYN
+ xAIInvRzDNlKbWkCPi6CAdgyhqqVnnolhaVpBKdEow==
+X-Google-Smtp-Source: ABdhPJzrxbuspDNB2uPI+8ezjD2JyJDdiknkoknTRKCioI9giTfHN2vT3bygP+uY6YntA5wkc9nzdI4qvL+5cH8nITw=
+X-Received: by 2002:a2e:8884:: with SMTP id k4mr3116043lji.267.1589565914823; 
+ Fri, 15 May 2020 11:05:14 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200515175105.GL2954@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=david@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 23:27:07
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+References: <20200512193340.265-1-robert.foley@linaro.org>
+ <20200512193340.265-7-robert.foley@linaro.org>
+ <875zcxcii5.fsf@linaro.org>
+In-Reply-To: <875zcxcii5.fsf@linaro.org>
+From: Robert Foley <robert.foley@linaro.org>
+Date: Fri, 15 May 2020 14:05:08 -0400
+Message-ID: <CAEyhzFtfAg3Sf2X6ChRz4sS=C5bDa+PAMZ7X=wLv1mpAUKtHsw@mail.gmail.com>
+Subject: Re: [PATCH v6 6/9] tests/vm: Added a new script for ubuntu.aarch64.
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::241;
+ envelope-from=robert.foley@linaro.org; helo=mail-lj1-x241.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -140,55 +97,238 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- "Michael S . Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>,
- qemu-devel@nongnu.org, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Peter Puhov <peter.puhov@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15.05.20 19:51, Dr. David Alan Gilbert wrote:
-> * David Hildenbrand (david@redhat.com) wrote:
->> On 15.05.20 14:45, Dr. David Alan Gilbert wrote:
->>> * David Hildenbrand (david@redhat.com) wrote:
->>>> RDMA will pin all guest memory (as documented in docs/rdma.txt). We want
->>>> to mark RAM block discards to be broken - however, to keep it simple
->>>> use ram_block_discard_is_required() instead of inhibiting.
->>>
->>> Should this be dependent on whether rdma->pin_all is set?
->>> Even with !pin_all some will be pinned at any given time
->>> (when it's registered with the rdma stack).
->>
->> Do you know how much memory this is? Is such memory only temporarily pinned?
-> 
-> With pin_all not set, only a subset of memory, I think multiple 1MB
-> chunks, are pinned at any one time.
-> 
->> At least with special-cases of vfio, it's acceptable if some memory is
->> temporarily pinned - we assume it's only the working set of the driver,
->> which guests will not inflate as long as they don't want to shoot
->> themselves in the foot.
->>
->> This here sounds like the guest does not know the pinned memory is
->> special, right?
-> 
-> Right - for RDMA it's all of memory that's being transferred, and the
-> guest doesn't see when each part is transferred.
+Hi Alex,
 
+These are all good points.  I will make these changes.
 
-Okay, so all memory will eventually be pinned, just not at the same
-time, correct?
+Thanks & Regards,
+-Rob
 
-I think this implies that any memory that was previously discarded will
-be backed my new pages, meaning we will consume more memory than intended.
-
-If so, always disabling discarding of RAM seems to be the right thing to do.
-
-
--- 
-Thanks,
-
-David / dhildenb
-
+On Fri, 15 May 2020 at 11:42, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+>
+> Robert Foley <robert.foley@linaro.org> writes:
+>
+> > ubuntu.aarch64 provides a script to create an Ubuntu 18.04 VM.
+> > Another new file is also added aarch64vm.py, which is a module with
+> > common methods used by aarch64 VMs, such as how to create the
+> > flash images.
+> >
+> > Signed-off-by: Robert Foley <robert.foley@linaro.org>
+> > Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
+> > ---
+> >  configure                 |  16 ++++++
+> >  tests/vm/Makefile.include |   8 +++
+> >  tests/vm/aarch64vm.py     | 105 ++++++++++++++++++++++++++++++++++
+> >  tests/vm/basevm.py        |   8 +++
+> >  tests/vm/ubuntu.aarch64   | 117 ++++++++++++++++++++++++++++++++++++++
+> >  5 files changed, 254 insertions(+)
+> >  create mode 100644 tests/vm/aarch64vm.py
+> >  create mode 100755 tests/vm/ubuntu.aarch64
+> >
+> > diff --git a/configure b/configure
+> > index b3cf32f556..26f8561557 100755
+> > --- a/configure
+> > +++ b/configure
+> > @@ -950,6 +950,20 @@ do
+> >      fi
+> >  done
+> >
+> > +# Check for files needed by aarch64 VMs.
+> > +# Allow user to override the path for efi also.
+> > +qemu_efi_aarch64=3D
+> > +for fd in $QEMU_EFI_PATH /usr/share/qemu-efi-aarch64/QEMU_EFI.fd
+> > +do
+>
+> I don't think we should be using an unset QEMU_EFI_PATH here - we only
+> really preserve the environment for compiler related things. Everything
+> else we pass with an --option so in this case we need to wire in a
+> --efi-aarch64.
+>
+> Also we now have a copy of an EFI bios in the pc-bios blobs directory so
+> we could fall back to that. The minor wrinkle is something in the build
+> process bunzip2's the pc-bios/edk2-aarch64-code.fd.bz2 into the build
+> directory. I guess we can assume it will be there if we fail to find
+> another copy with the above.
+>
+> > +    if has $fd
+>
+> The "has" test fails to fire for me as that only cares if the thing is
+> executable. We can just do a -f test.
+>
+> > +    then
+> > +        if [ -f  $fd ]; then
+>
+> test -f without the []'s
+>
+> > +            qemu_efi_aarch64=3D$fd
+> > +        fi
+> > +        break
+>
+> break the loop if we find what we are looking for.
+>
+> > +    fi
+> > +done
+> > +
+> >  # Check for existence of python3 yaml, needed to
+> >  # import yaml config files into vm-build.
+> >  python_yaml=3D"no"
+> > @@ -6588,6 +6602,7 @@ if test "$docs" !=3D "no"; then
+> >      echo "sphinx-build      $sphinx_build"
+> >  fi
+> >  echo "genisoimage       $genisoimage"
+> > +echo "qemu_efi_aarch64  $qemu_efi_aarch64"
+> >  echo "python_yaml       $python_yaml"
+> >  echo "slirp support     $slirp $(echo_version $slirp $slirp_version)"
+> >  if test "$slirp" !=3D "no" ; then
+> > @@ -7650,6 +7665,7 @@ echo "PYTHON=3D$python" >> $config_host_mak
+> >  echo "SPHINX_BUILD=3D$sphinx_build" >> $config_host_mak
+> >  echo "SPHINX_WERROR=3D$sphinx_werror" >> $config_host_mak
+> >  echo "GENISOIMAGE=3D$genisoimage" >> $config_host_mak
+> > +echo "QEMU_EFI_AARCH64=3D$qemu_efi_aarch64" >> $config_host_mak
+> >  echo "PYTHON_YAML=3D$python_yaml" >> $config_host_mak
+> >  echo "CC=3D$cc" >> $config_host_mak
+> >  if $iasl -h > /dev/null 2>&1; then
+> > diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+> > index 99c06832ac..d918d13f50 100644
+> > --- a/tests/vm/Makefile.include
+> > +++ b/tests/vm/Makefile.include
+> > @@ -5,6 +5,9 @@
+> >  IMAGES :=3D freebsd netbsd openbsd centos fedora
+> >  ifneq ($(GENISOIMAGE),)
+> >  IMAGES +=3D ubuntu.i386 centos
+> > +ifneq ($(QEMU_EFI_AARCH64),)
+> > +IMAGES +=3D ubuntu.aarch64
+> > +endif
+> >  endif
+> >
+> >  IMAGES_DIR :=3D $(HOME)/.cache/qemu-vm/images
+> > @@ -23,6 +26,11 @@ vm-help vm-test:
+> >  ifneq ($(GENISOIMAGE),)
+> >       @echo "  vm-build-centos                 - Build QEMU in CentOS V=
+M, with Docker"
+> >       @echo "  vm-build-ubuntu.i386            - Build QEMU in ubuntu i=
+386 VM"
+> > +ifneq ($(QEMU_EFI_AARCH64),)
+> > +     @echo "  vm-build-ubuntu.aarch64         - Build QEMU in ubuntu a=
+arch64 VM"
+> > +else
+> > +     @echo "  (install qemu-efi-aarch64 to build centos/ubuntu aarch64=
+ images.)"
+> > +endif
+> >  else
+> >       @echo "  (install genisoimage to build centos/ubuntu images)"
+> >  endif
+> > diff --git a/tests/vm/aarch64vm.py b/tests/vm/aarch64vm.py
+> > new file mode 100644
+> > index 0000000000..3a9807cd43
+> > --- /dev/null
+> > +++ b/tests/vm/aarch64vm.py
+> > @@ -0,0 +1,105 @@
+> > +#!/usr/bin/env python3
+> > +#
+> > +# VM testing aarch64 library
+> > +#
+> > +# Copyright 2020 Linaro
+> > +#
+> > +# Authors:
+> > +#  Robert Foley <robert.foley@linaro.org>
+> > +#
+> > +# This code is licensed under the GPL version 2 or later.  See
+> > +# the COPYING file in the top-level directory.
+> > +#
+> > +import os
+> > +import sys
+> > +import subprocess
+> > +import basevm
+> > +from qemu.accel import kvm_available
+> > +
+> > +# This is the config needed for current version of QEMU.
+> > +# This works for both kvm and tcg.
+> > +CURRENT_CONFIG =3D {
+> > +    'cpu'          : "max",
+> > +    'machine'      : "virt,gic-version=3Dmax",
+> > +}
+> > +
+> > +# The minimum minor version of QEMU we will support with aarch64 VMs i=
+s 3.
+> > +# QEMU versions less than 3 have various issues running these VMs.
+> > +QEMU_AARCH64_MIN_VERSION =3D 3
+> > +
+> > +# The DEFAULT_CONFIG will default to a version of
+> > +# parameters that works for backwards compatibility.
+> > +DEFAULT_CONFIG =3D {'kvm' : {'cpu'          : "host",
+> > +                           'machine'      : "virt,gic-version=3Dhost"}=
+,
+> > +                  'tcg' : {'cpu'          : "cortex-a57",
+> > +                           'machine'      : "virt"},
+> > +}
+> > +
+> > +def get_config_defaults(vmcls, default_config):
+> > +    """Fetch the configuration defaults for this VM,
+> > +       taking into consideration the defaults for
+> > +       aarch64 first, followed by the defaults for this VM."""
+> > +    config =3D default_config
+> > +    config.update(aarch_get_config_defaults(vmcls))
+> > +    return config
+> > +
+> > +def aarch_get_config_defaults(vmcls):
+> > +    """Set the defaults for current version of QEMU."""
+> > +    config =3D CURRENT_CONFIG
+> > +    args, argv =3D basevm.parse_args(vmcls)
+> > +    qemu_path =3D basevm.get_qemu_path(vmcls.arch, args.build_path)
+> > +    qemu_version =3D basevm.get_qemu_version(qemu_path)
+> > +    if qemu_version < QEMU_AARCH64_MIN_VERSION:
+> > +        error =3D "\nThis major version of QEMU {} is to old for aarch=
+64 VMs.\n"\
+> > +                "The major version must be at least {}.\n"\
+> > +                "To continue with the current build of QEMU, "\
+> > +                "please restart with QEMU_LOCAL=3D1 .\n"
+> > +        print(error.format(qemu_version, QEMU_AARCH64_MIN_VERSION))
+> > +        exit(1)
+> > +    if qemu_version =3D=3D QEMU_AARCH64_MIN_VERSION:
+> > +        # We have an older version of QEMU,
+> > +        # set the config values for backwards compatibility.
+> > +        if kvm_available('aarch64'):
+> > +            config.update(DEFAULT_CONFIG['kvm'])
+> > +        else:
+> > +            config.update(DEFAULT_CONFIG['tcg'])
+> > +    return config
+> > +
+> > +def create_flash_images(flash_dir=3D"./"):
+> > +    """Creates the appropriate pflash files
+> > +       for an aarch64 VM."""
+> > +    flash0_path =3D get_flash_path(flash_dir, "flash0")
+> > +    flash1_path =3D get_flash_path(flash_dir, "flash1")
+> > +    fd_null =3D open(os.devnull, 'w')
+> > +    subprocess.check_call(["dd", "if=3D/dev/zero", "of=3D{}".format(fl=
+ash0_path),
+> > +                           "bs=3D1M", "count=3D64"],
+> > +                           stdout=3Dfd_null, stderr=3Dsubprocess.STDOU=
+T)
+> > +    # A reliable way to get the QEMU EFI image is via an installed pac=
+kage.
+> > +    efi_img =3D "/usr/share/qemu-efi-aarch64/QEMU_EFI.fd"
+> > +    if not os.path.exists(efi_img):
+> > +        sys.stderr.write("*** {} is missing\n".format(efi_img))
+> > +        sys.stderr.write("*** please install qemu-efi-aarch64 package\=
+n")
+> > +        exit(3)
+>
+> This is hardcoded when we have just probed for it.
+>
+> <snip>
+>
+> Otherwise it looks ok to me.
+>
+> --
+> Alex Benn=C3=A9e
 
