@@ -2,96 +2,89 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 836BFC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:51:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E08A0C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:52:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D5EE2076A
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:51:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A04772076A
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:52:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZfqpQNvN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D5EE2076A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PmtL+Ctu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A04772076A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZbgd-0004xB-GP
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 10:51:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44530)
+	id 1jZbhL-0005w5-RP
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 10:52:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45124)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jZbZU-0002Qj-6c
- for qemu-devel@nongnu.org; Fri, 15 May 2020 10:44:22 -0400
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:40624)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jZbZR-0000z2-Lo
- for qemu-devel@nongnu.org; Fri, 15 May 2020 10:44:19 -0400
-Received: by mail-wm1-x332.google.com with SMTP id u16so2943717wmc.5
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 07:44:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=KIk6ooatV8XnS7vaKVLS3g3ZtQSw6C7qVIF3uAG+cLk=;
- b=ZfqpQNvNQ7UCoebosaHhnei3f3jwIMNf/xuQw6RgHEhcAoIZQZztgWjD5yS1Zq7opp
- KJsVT7UHaC2tcsbCdJy73LodPZc1WTqsio9vmrku6AYzrzjDzs/8VdpRN8eu9LSl4KSG
- 6Ctes9U4WKMOP8pyh8WSPQmFfr0XOq7iWkD/6Fydva9195SFMPy22IU4NVm/6IuwBJIU
- 5FZa3BubkzHsnzuES0n0eYDaL75zyAazRoSED7GPafkGR5cDlPe8ODTR6aD5vaGMhk5z
- WvLzoLF4mOvrmussYy62dNAxF9xevD85l0U1mvgJahJlfHNVzxx/gZe6TmzCiuOo+sTv
- YLMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=KIk6ooatV8XnS7vaKVLS3g3ZtQSw6C7qVIF3uAG+cLk=;
- b=H5QUJRJcdBeQpDrvlnV3Y1vtY/E17ecATZ4DpTObF+ndkgehS/9Gcx6XtoVJlVdJ8A
- 1xbegx0uztAbqGlKAosV6Cb8nCoQruv0qXUVCiHmHvqYjMLR1HxNvXrfHoH4/FNDkeY7
- 4pVPjaDGEIadU1w8U/v1SuwWOTKN0W0pFmZ0A5avINTsYvvFXEP7uXZfQO0uH02Ktg2B
- 49L7Swa68hCA++5RXAEHidHeF8KF6XPctqjoAqSAJBFwnNVOz3dv+dGw+VfXnCvUbt1G
- 0Sch7Doi2NqQlP+7E2J/cFG7IK0TjP24puUoDD8BVR0W4KTxz7zygVvUtXTBGh+rpmxN
- IPKg==
-X-Gm-Message-State: AOAM5327pYLysFENLrC2hISggYwoqSzfnsZoqhCayKBnsNmsQnEU6GLf
- SXkclAFUp2kY47md5iLFPc6YIA==
-X-Google-Smtp-Source: ABdhPJzZDaEmCrekrr60OpFq0lc8iLixBisQK0dixcyGMKs41f7mz8jAaD8CdVbX+Dem09sls8LxMQ==
-X-Received: by 2002:a1c:4b02:: with SMTP id y2mr4154073wma.115.1589553856262; 
- Fri, 15 May 2020 07:44:16 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id d6sm4583930wra.63.2020.05.15.07.44.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 15 May 2020 07:44:12 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D0EC51FF93;
- Fri, 15 May 2020 15:44:05 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Subject: [PULL v2 07/13] disas: include an optional note for the start of
- disassembly
-Date: Fri, 15 May 2020 15:43:59 +0100
-Message-Id: <20200515144405.20580-8-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200515144405.20580-1-alex.bennee@linaro.org>
-References: <20200515144405.20580-1-alex.bennee@linaro.org>
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jZbca-0007zW-B5
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 10:47:32 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:33471
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jZbcZ-0001Yc-8I
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 10:47:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589554050;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=d3Qv84ZWmqRvwTBDXZ7C35cLjZDqrtNRUlv0KJPkTFw=;
+ b=PmtL+CtuTtdm7WKVRrChxck0o61QdPoZKpjfEPJYS8vz+JVZB9XFtnr8XHHNLO18sXbevz
+ kJQjijuU5R/bMKYzfxqJLYvrv5NAX3compta+VZeBL+ixnI7ufjxNUAKOddwaqfv+7e6Dy
+ 7C6TnU1bEPF/8LMvj7MFgATk/orR38g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-252-wuCw1eoRNkey7QYD2HKkSA-1; Fri, 15 May 2020 10:47:26 -0400
+X-MC-Unique: wuCw1eoRNkey7QYD2HKkSA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F41FDC26;
+ Fri, 15 May 2020 14:47:25 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-115-145.ams2.redhat.com
+ [10.36.115.145])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 46D755C6BD;
+ Fri, 15 May 2020 14:47:19 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 85A2B9D54; Fri, 15 May 2020 16:47:18 +0200 (CEST)
+Date: Fri, 15 May 2020 16:47:18 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH v5 08/15] acpi: move aml builder code for floppy device
+Message-ID: <20200515144718.3m3b4onutdazpaah@sirius.home.kraxel.org>
+References: <20200507131640.14041-1-kraxel@redhat.com>
+ <20200507131640.14041-9-kraxel@redhat.com>
+ <2f7a76fe-9c38-1441-70cf-919dce82e4fe@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <2f7a76fe-9c38-1441-70cf-919dce82e4fe@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::332;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x332.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 00:07:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,134 +97,263 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+Cc: Laurent Vivier <lvivier@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+ =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This will become useful shortly for providing more information about
-output assembly inline. While there fix up the indenting and code
-formatting in disas().
+> > +#include "hw/i386/pc.h"
+> 
+> I'd rather not see this target-specific header used in the generic device
+> model... The culprit seems cmos_get_fd_drive_type(). Is the value really PC
+> specific?
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Given that the same value is used in acpi tables probably not really.
+cmos_get_fd_drive_type() hasn't any dependency on pc or cmos btw, we
+can simply move over the function to floppy.
 
-Message-Id: <20200513175134.19619-9-alex.bennee@linaro.org>
-
-diff --git a/include/disas/disas.h b/include/disas/disas.h
-index 36c33f6f194..1b6e035e32d 100644
---- a/include/disas/disas.h
-+++ b/include/disas/disas.h
-@@ -7,7 +7,7 @@
- #include "cpu.h"
- 
- /* Disassemble this for me please... (debugging). */
--void disas(FILE *out, void *code, unsigned long size);
-+void disas(FILE *out, void *code, unsigned long size, const char *note);
- void target_disas(FILE *out, CPUState *cpu, target_ulong code,
-                   target_ulong size);
- 
-diff --git a/include/exec/log.h b/include/exec/log.h
-index fcc7b9e00ba..3ed797c1c8c 100644
---- a/include/exec/log.h
-+++ b/include/exec/log.h
-@@ -56,13 +56,13 @@ static inline void log_target_disas(CPUState *cpu, target_ulong start,
-     rcu_read_unlock();
- }
- 
--static inline void log_disas(void *code, unsigned long size)
-+static inline void log_disas(void *code, unsigned long size, const char *note)
- {
-     QemuLogFile *logfile;
-     rcu_read_lock();
-     logfile = atomic_rcu_read(&qemu_logfile);
-     if (logfile) {
--        disas(logfile->fd, code, size);
-+        disas(logfile->fd, code, size, note);
-     }
-     rcu_read_unlock();
- }
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index e4f703a7e6d..cdf58bb420e 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1800,7 +1800,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-             size_t data_size = gen_code_size - code_size;
-             size_t i;
- 
--            log_disas(tb->tc.ptr, code_size);
-+            log_disas(tb->tc.ptr, code_size, NULL);
- 
-             for (i = 0; i < data_size; i += sizeof(tcg_target_ulong)) {
-                 if (sizeof(tcg_target_ulong) == 8) {
-@@ -1814,7 +1814,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-                 }
-             }
-         } else {
--            log_disas(tb->tc.ptr, gen_code_size);
-+            log_disas(tb->tc.ptr, gen_code_size, NULL);
-         }
-         qemu_log("\n");
-         qemu_log_flush();
-diff --git a/disas.c b/disas.c
-index 3937da61571..7e8692de301 100644
---- a/disas.c
-+++ b/disas.c
-@@ -586,7 +586,7 @@ char *plugin_disas(CPUState *cpu, uint64_t addr, size_t size)
- }
- 
- /* Disassemble this for me please... (debugging). */
--void disas(FILE *out, void *code, unsigned long size)
-+void disas(FILE *out, void *code, unsigned long size, const char *note)
- {
-     uintptr_t pc;
-     int count;
-@@ -674,10 +674,16 @@ void disas(FILE *out, void *code, unsigned long size)
-     for (pc = (uintptr_t)code; size > 0; pc += count, size -= count) {
-         fprintf(out, "0x%08" PRIxPTR ":  ", pc);
-         count = print_insn(pc, &s.info);
--	fprintf(out, "\n");
--	if (count < 0)
--	    break;
-+        if (note) {
-+            fprintf(out, "\t\t%s", note);
-+            note = NULL;
-+        }
-+        fprintf(out, "\n");
-+        if (count < 0) {
-+            break;
-+        }
-     }
-+
- }
- 
- /* Look up symbol for debugging purpose.  Returns "" if unknown. */
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index dd4b3d76844..a2268d9db0a 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -1092,7 +1092,7 @@ void tcg_prologue_init(TCGContext *s)
-             size_t data_size = prologue_size - code_size;
-             size_t i;
- 
--            log_disas(buf0, code_size);
-+            log_disas(buf0, code_size, NULL);
- 
-             for (i = 0; i < data_size; i += sizeof(tcg_target_ulong)) {
-                 if (sizeof(tcg_target_ulong) == 8) {
-@@ -1106,7 +1106,7 @@ void tcg_prologue_init(TCGContext *s)
-                 }
-             }
-         } else {
--            log_disas(buf0, prologue_size);
-+            log_disas(buf0, prologue_size, NULL);
-         }
-         qemu_log("\n");
-         qemu_log_flush();
--- 
-2.20.1
+> 
+> Hervé, do you know if such info & RTC nvram layout is used in other arch?
+> 
+> > +#include "hw/acpi/aml-build.h"
+> >   #include "hw/irq.h"
+> >   #include "hw/isa/isa.h"
+> >   #include "hw/qdev-properties.h"
+> > @@ -2765,6 +2767,85 @@ void isa_fdc_get_drive_max_chs(FloppyDriveType type,
+> >       (*maxc)--;
+> >   }
+> > +static Aml *build_fdinfo_aml(int idx, FloppyDriveType type)
+> > +{
+> > +    Aml *dev, *fdi;
+> > +    uint8_t maxc, maxh, maxs;
+> > +
+> > +    isa_fdc_get_drive_max_chs(type, &maxc, &maxh, &maxs);
+> > +
+> > +    dev = aml_device("FLP%c", 'A' + idx);
+> > +
+> > +    aml_append(dev, aml_name_decl("_ADR", aml_int(idx)));
+> > +
+> > +    fdi = aml_package(16);
+> > +    aml_append(fdi, aml_int(idx));  /* Drive Number */
+> > +    aml_append(fdi,
+> > +        aml_int(cmos_get_fd_drive_type(type)));  /* Device Type */
+> > +    /*
+> > +     * the values below are the limits of the drive, and are thus independent
+> > +     * of the inserted media
+> > +     */
+> > +    aml_append(fdi, aml_int(maxc));  /* Maximum Cylinder Number */
+> > +    aml_append(fdi, aml_int(maxs));  /* Maximum Sector Number */
+> > +    aml_append(fdi, aml_int(maxh));  /* Maximum Head Number */
+> > +    /*
+> > +     * SeaBIOS returns the below values for int 0x13 func 0x08 regardless of
+> > +     * the drive type, so shall we
+> > +     */
+> > +    aml_append(fdi, aml_int(0xAF));  /* disk_specify_1 */
+> > +    aml_append(fdi, aml_int(0x02));  /* disk_specify_2 */
+> > +    aml_append(fdi, aml_int(0x25));  /* disk_motor_wait */
+> > +    aml_append(fdi, aml_int(0x02));  /* disk_sector_siz */
+> > +    aml_append(fdi, aml_int(0x12));  /* disk_eot */
+> > +    aml_append(fdi, aml_int(0x1B));  /* disk_rw_gap */
+> > +    aml_append(fdi, aml_int(0xFF));  /* disk_dtl */
+> > +    aml_append(fdi, aml_int(0x6C));  /* disk_formt_gap */
+> > +    aml_append(fdi, aml_int(0xF6));  /* disk_fill */
+> > +    aml_append(fdi, aml_int(0x0F));  /* disk_head_sttl */
+> > +    aml_append(fdi, aml_int(0x08));  /* disk_motor_strt */
+> > +
+> > +    aml_append(dev, aml_name_decl("_FDI", fdi));
+> > +    return dev;
+> > +}
+> > +
+> > +static void fdc_isa_build_aml(ISADevice *isadev, Aml *scope)
+> > +{
+> > +    Aml *dev;
+> > +    Aml *crs;
+> > +    int i;
+> > +
+> > +#define ACPI_FDE_MAX_FD 4
+> > +    uint32_t fde_buf[5] = {
+> > +        0, 0, 0, 0,     /* presence of floppy drives #0 - #3 */
+> > +        cpu_to_le32(2)  /* tape presence (2 == never present) */
+> > +    };
+> > +
+> > +    crs = aml_resource_template();
+> > +    aml_append(crs, aml_io(AML_DECODE16, 0x03F2, 0x03F2, 0x00, 0x04));
+> > +    aml_append(crs, aml_io(AML_DECODE16, 0x03F7, 0x03F7, 0x00, 0x01));
+> > +    aml_append(crs, aml_irq_no_flags(6));
+> > +    aml_append(crs,
+> > +        aml_dma(AML_COMPATIBILITY, AML_NOTBUSMASTER, AML_TRANSFER8, 2));
+> > +
+> > +    dev = aml_device("FDC0");
+> > +    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0700")));
+> > +    aml_append(dev, aml_name_decl("_CRS", crs));
+> > +
+> > +    for (i = 0; i < MIN(MAX_FD, ACPI_FDE_MAX_FD); i++) {
+> > +        FloppyDriveType type = isa_fdc_get_drive_type(isadev, i);
+> > +
+> > +        if (type < FLOPPY_DRIVE_TYPE_NONE) {
+> > +            fde_buf[i] = cpu_to_le32(1);  /* drive present */
+> > +            aml_append(dev, build_fdinfo_aml(i, type));
+> > +        }
+> > +    }
+> > +    aml_append(dev, aml_name_decl("_FDE",
+> > +               aml_buffer(sizeof(fde_buf), (uint8_t *)fde_buf)));
+> > +
+> > +    aml_append(scope, dev);
+> > +}
+> > +
+> >   static const VMStateDescription vmstate_isa_fdc ={
+> >       .name = "fdc",
+> >       .version_id = 2,
+> > @@ -2798,11 +2879,13 @@ static Property isa_fdc_properties[] = {
+> >   static void isabus_fdc_class_init(ObjectClass *klass, void *data)
+> >   {
+> >       DeviceClass *dc = DEVICE_CLASS(klass);
+> > +    ISADeviceClass *isa = ISA_DEVICE_CLASS(klass);
+> >       dc->realize = isabus_fdc_realize;
+> >       dc->fw_name = "fdc";
+> >       dc->reset = fdctrl_external_reset_isa;
+> >       dc->vmsd = &vmstate_isa_fdc;
+> > +    isa->build_aml = fdc_isa_build_aml;
+> >       device_class_set_props(dc, isa_fdc_properties);
+> >       set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+> >   }
+> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > index 443db94deb5b..775936e28b9a 100644
+> > --- a/hw/i386/acpi-build.c
+> > +++ b/hw/i386/acpi-build.c
+> > @@ -1058,85 +1058,6 @@ static void build_hpet_aml(Aml *table)
+> >       aml_append(table, scope);
+> >   }
+> > -static Aml *build_fdinfo_aml(int idx, FloppyDriveType type)
+> > -{
+> > -    Aml *dev, *fdi;
+> > -    uint8_t maxc, maxh, maxs;
+> > -
+> > -    isa_fdc_get_drive_max_chs(type, &maxc, &maxh, &maxs);
+> > -
+> > -    dev = aml_device("FLP%c", 'A' + idx);
+> > -
+> > -    aml_append(dev, aml_name_decl("_ADR", aml_int(idx)));
+> > -
+> > -    fdi = aml_package(16);
+> > -    aml_append(fdi, aml_int(idx));  /* Drive Number */
+> > -    aml_append(fdi,
+> > -        aml_int(cmos_get_fd_drive_type(type)));  /* Device Type */
+> > -    /*
+> > -     * the values below are the limits of the drive, and are thus independent
+> > -     * of the inserted media
+> > -     */
+> > -    aml_append(fdi, aml_int(maxc));  /* Maximum Cylinder Number */
+> > -    aml_append(fdi, aml_int(maxs));  /* Maximum Sector Number */
+> > -    aml_append(fdi, aml_int(maxh));  /* Maximum Head Number */
+> > -    /*
+> > -     * SeaBIOS returns the below values for int 0x13 func 0x08 regardless of
+> > -     * the drive type, so shall we
+> > -     */
+> > -    aml_append(fdi, aml_int(0xAF));  /* disk_specify_1 */
+> > -    aml_append(fdi, aml_int(0x02));  /* disk_specify_2 */
+> > -    aml_append(fdi, aml_int(0x25));  /* disk_motor_wait */
+> > -    aml_append(fdi, aml_int(0x02));  /* disk_sector_siz */
+> > -    aml_append(fdi, aml_int(0x12));  /* disk_eot */
+> > -    aml_append(fdi, aml_int(0x1B));  /* disk_rw_gap */
+> > -    aml_append(fdi, aml_int(0xFF));  /* disk_dtl */
+> > -    aml_append(fdi, aml_int(0x6C));  /* disk_formt_gap */
+> > -    aml_append(fdi, aml_int(0xF6));  /* disk_fill */
+> > -    aml_append(fdi, aml_int(0x0F));  /* disk_head_sttl */
+> > -    aml_append(fdi, aml_int(0x08));  /* disk_motor_strt */
+> > -
+> > -    aml_append(dev, aml_name_decl("_FDI", fdi));
+> > -    return dev;
+> > -}
+> > -
+> > -static Aml *build_fdc_device_aml(ISADevice *fdc)
+> > -{
+> > -    int i;
+> > -    Aml *dev;
+> > -    Aml *crs;
+> > -
+> > -#define ACPI_FDE_MAX_FD 4
+> > -    uint32_t fde_buf[5] = {
+> > -        0, 0, 0, 0,     /* presence of floppy drives #0 - #3 */
+> > -        cpu_to_le32(2)  /* tape presence (2 == never present) */
+> > -    };
+> > -
+> > -    dev = aml_device("FDC0");
+> > -    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0700")));
+> > -
+> > -    crs = aml_resource_template();
+> > -    aml_append(crs, aml_io(AML_DECODE16, 0x03F2, 0x03F2, 0x00, 0x04));
+> > -    aml_append(crs, aml_io(AML_DECODE16, 0x03F7, 0x03F7, 0x00, 0x01));
+> > -    aml_append(crs, aml_irq_no_flags(6));
+> > -    aml_append(crs,
+> > -        aml_dma(AML_COMPATIBILITY, AML_NOTBUSMASTER, AML_TRANSFER8, 2));
+> > -    aml_append(dev, aml_name_decl("_CRS", crs));
+> > -
+> > -    for (i = 0; i < MIN(MAX_FD, ACPI_FDE_MAX_FD); i++) {
+> > -        FloppyDriveType type = isa_fdc_get_drive_type(fdc, i);
+> > -
+> > -        if (type < FLOPPY_DRIVE_TYPE_NONE) {
+> > -            fde_buf[i] = cpu_to_le32(1);  /* drive present */
+> > -            aml_append(dev, build_fdinfo_aml(i, type));
+> > -        }
+> > -    }
+> > -    aml_append(dev, aml_name_decl("_FDE",
+> > -               aml_buffer(sizeof(fde_buf), (uint8_t *)fde_buf)));
+> > -
+> > -    return dev;
+> > -}
+> > -
+> >   static Aml *build_kbd_device_aml(void)
+> >   {
+> >       Aml *dev;
+> > @@ -1175,7 +1096,6 @@ static Aml *build_mouse_device_aml(void)
+> >   static void build_isa_devices_aml(Aml *table)
+> >   {
+> > -    ISADevice *fdc = pc_find_fdc0();
+> >       bool ambiguous;
+> >       Aml *scope = aml_scope("_SB.PCI0.ISA");
+> > @@ -1183,9 +1103,6 @@ static void build_isa_devices_aml(Aml *table)
+> >       aml_append(scope, build_kbd_device_aml());
+> >       aml_append(scope, build_mouse_device_aml());
+> > -    if (fdc) {
+> > -        aml_append(scope, build_fdc_device_aml(fdc));
+> > -    }
+> >       if (ambiguous) {
+> >           error_report("Multiple ISA busses, unable to define IPMI ACPI data");
+> > diff --git a/stubs/cmos.c b/stubs/cmos.c
+> > new file mode 100644
+> > index 000000000000..416cbe4055ff
+> > --- /dev/null
+> > +++ b/stubs/cmos.c
+> > @@ -0,0 +1,7 @@
+> > +#include "qemu/osdep.h"
+> > +#include "hw/i386/pc.h"
+> > +
+> > +int cmos_get_fd_drive_type(FloppyDriveType fd0)
+> > +{
+> > +    return 0;
+> > +}
+> > diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+> > index 45be5dc0ed78..3cbe472d1c6c 100644
+> > --- a/stubs/Makefile.objs
+> > +++ b/stubs/Makefile.objs
+> > @@ -3,6 +3,7 @@ stub-obj-y += bdrv-next-monitor-owned.o
+> >   stub-obj-y += blk-commit-all.o
+> >   stub-obj-y += blockdev-close-all-bdrv-states.o
+> >   stub-obj-y += clock-warp.o
+> > +stub-obj-y += cmos.o
+> >   stub-obj-y += cpu-get-clock.o
+> >   stub-obj-y += cpu-get-icount.o
+> >   stub-obj-y += dump.o
+> > 
+> 
 
 
