@@ -2,77 +2,83 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FF6DC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 07:01:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55387C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 07:02:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60830206F1
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 07:01:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60830206F1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1DDB9206F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 07:02:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QWSqR+Dt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DDB9206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZULW-0000i6-Hj
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 03:01:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37884)
+	id 1jZUMS-0001lQ-Ao
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 03:02:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37888)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jZUKe-00080q-GF; Fri, 15 May 2020 03:00:32 -0400
-Received: from mail-ej1-f66.google.com ([209.85.218.66]:37063)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jZUKc-0003IQ-E8; Fri, 15 May 2020 03:00:31 -0400
-Received: by mail-ej1-f66.google.com with SMTP id l21so1367169eji.4;
- Fri, 15 May 2020 00:00:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=paM8N59x/1u1Pc1lakMLHVTYb3X1cVpISIuyc1pkY5E=;
- b=blQ7VbfmfUKdbQ/RStMbTjL1RB88ANf/kVUaAVsdrIzRf/UByI9Vp7K+LsqW5cJiEa
- ZgJ4edbduygVGGYb/2id5//eJsA7vHmxMeXlknV7ic8rkWSUz/fyiH70GBIXRp/OREFJ
- hAiBRjMI8Oex/cvE2lxB3/PX0jSFAvAlgnJS2qahLDSH+hJSO8yuufzUlNIHNBUc/U1m
- hV8FCSdurfjf/JRX3wXzHEwqJ2Q5hTzFZ7UoU9kVe8GAyF/oHOQa5V7EO+SnRJBLJ+y/
- t+g/xFA9E5rd3yyAj+Igj++On+V43JCsTBvAICdqzFiNCeVfjoF/jVHSALX+atzTJBcU
- lHZw==
-X-Gm-Message-State: AOAM531+KnJS9T2EEeOHOGptqn50qRS/Bq72eg5xESES/vpYJBP4arCA
- 25UoSPRspB/QtTrYhq8SD/qoWb3AN1lNvSq6G0A=
-X-Google-Smtp-Source: ABdhPJw0Mx3A+BG3xC5h0Lfmuuu8NPGmLj7QFQ0Afgw3FGp/vwDzLxD8DQr73eenJB/Bi9NKbQK0XgXvF2yNODsadXM=
-X-Received: by 2002:a17:906:5e50:: with SMTP id
- b16mr1459147eju.331.1589526028556; 
- Fri, 15 May 2020 00:00:28 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jZUKg-00082G-44
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 03:00:34 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37059
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jZUKc-0003IP-KM
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 03:00:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589526028;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=aC8pWJBY6ijAmmCp4CjAAiCuwem6djCmzySsAduGvbE=;
+ b=QWSqR+Dtvd2nWYTSusGI7SU8YVs5oU6ozgIyO1Cb5TH48qqV/qtcIGhQkYTtqiYuWpkssk
+ A5tR76LMcKtZ+cLSF+Req0qbEzaNJRNF/pVPzBI4IpKxNiYhkQEmc1XaCOc/o2/TKFH4zG
+ ZUdJxY5uPozwD/MDEozU2fHv8WGY1qA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-401--Yh1VvTFPum-tLa4pnvYtQ-1; Fri, 15 May 2020 03:00:27 -0400
+X-MC-Unique: -Yh1VvTFPum-tLa4pnvYtQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F13FBFC6
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 07:00:26 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3BF342E16C;
+ Fri, 15 May 2020 07:00:23 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id BAF9111358BC; Fri, 15 May 2020 09:00:21 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] trace/simple: Fix unauthorized enable
+Date: Fri, 15 May 2020 09:00:21 +0200
+Message-Id: <20200515070021.20811-1-armbru@redhat.com>
 MIME-Version: 1.0
-References: <20200504115656.6045-1-f4bug@amsat.org>
- <20200504115656.6045-2-f4bug@amsat.org>
- <87wo5drasi.fsf@dusky.pond.sub.org>
-In-Reply-To: <87wo5drasi.fsf@dusky.pond.sub.org>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 15 May 2020 09:00:17 +0200
-Message-ID: <CAAdtpL4wpqv8vMOFgRubghr53fJyoXJ+DcGwi84wp0PiczyUpg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] qom/object: Move Object typedef to
- 'qemu/typedefs.h'
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=209.85.218.66;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-f66.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 03:00:28
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 00:39:12
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -15
-X-Spam_score: -1.6
-X-Spam_bar: -
-X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9,
- FREEMAIL_FORGED_FROMDOMAIN=0.001, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -85,116 +91,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>,
- Michael Tokarev <mjt@tls.msk.ru>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 15, 2020 at 8:07 AM Markus Armbruster <armbru@redhat.com> wrote=
-:
->
-> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
->
-> > We use the Object type all over the place.
-> > Forward declare it in "qemu/typedefs.h".
-> >
-> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > ---
-> >  include/qemu/typedefs.h   | 1 +
-> >  include/qom/object.h      | 2 --
-> >  include/qom/qom-qobject.h | 2 --
-> >  include/sysemu/sysemu.h   | 1 -
-> >  4 files changed, 1 insertion(+), 5 deletions(-)
-> >
-> > diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-> > index 375770a80f..b03ec9f40a 100644
-> > --- a/include/qemu/typedefs.h
-> > +++ b/include/qemu/typedefs.h
-> > @@ -75,6 +75,7 @@ typedef struct NetFilterState NetFilterState;
-> >  typedef struct NICInfo NICInfo;
-> >  typedef struct NodeInfo NodeInfo;
-> >  typedef struct NumaNodeMem NumaNodeMem;
-> > +typedef struct Object Object;
-> >  typedef struct ObjectClass ObjectClass;
-> >  typedef struct PCIBridge PCIBridge;
-> >  typedef struct PCIBus PCIBus;
-> > diff --git a/include/qom/object.h b/include/qom/object.h
-> > index 784c97c0e1..1edc12e64c 100644
-> > --- a/include/qom/object.h
-> > +++ b/include/qom/object.h
-> > @@ -20,8 +20,6 @@
-> >  struct TypeImpl;
-> >  typedef struct TypeImpl *Type;
-> >
-> > -typedef struct Object Object;
-> > -
-> >  typedef struct TypeInfo TypeInfo;
-> >
-> >  typedef struct InterfaceClass InterfaceClass;
-> > diff --git a/include/qom/qom-qobject.h b/include/qom/qom-qobject.h
-> > index 77cd717e3f..82136e6e80 100644
-> > --- a/include/qom/qom-qobject.h
-> > +++ b/include/qom/qom-qobject.h
-> > @@ -13,8 +13,6 @@
-> >  #ifndef QEMU_QOM_QOBJECT_H
-> >  #define QEMU_QOM_QOBJECT_H
-> >
-> > -#include "qom/object.h"
-> > -
-> >  /*
-> >   * object_property_get_qobject:
-> >   * @obj: the object
-> > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> > index ef81302e1a..ca4458e451 100644
-> > --- a/include/sysemu/sysemu.h
-> > +++ b/include/sysemu/sysemu.h
-> > @@ -5,7 +5,6 @@
-> >  #include "qemu/timer.h"
-> >  #include "qemu/notify.h"
-> >  #include "qemu/uuid.h"
-> > -#include "qom/object.h"
-> >
-> >  /* vl.c */
->
-> How did you identify the inclusions to drop?
+st_set_trace_file() accidentally enables tracing.  It's called
+unconditionally during startup, which is why QEMU built with the
+simple trace backend always writes a trace file "trace-$PID".
 
-Nothing very strict I'm afraid. I suppose I had the files opened in my edit=
-or.
+This has been broken for quite a while.  I didn't track down the exact
+commit.
 
-The output of
-$ git grep -L -E '(OBJECT_|INTERFACE_)' $(git grep -l qom/object include)
-suggests I missed those:
+Fix st_set_trace_file() to restore the state.
 
--- >8 --
-diff --git a/include/hw/display/edid.h b/include/hw/display/edid.h
-index ff99dc0a05..5b1de57f24 100644
---- a/include/hw/display/edid.h
-+++ b/include/hw/display/edid.h
-@@ -1,8 +1,6 @@
- #ifndef EDID_H
- #define EDID_H
-
--#include "qom/object.h"
--
- typedef struct qemu_edid_info {
-     const char *vendor; /* http://www.uefi.org/pnp_id_list */
-     const char *name;
-diff --git a/include/io/task.h b/include/io/task.h
-index 1abbfb8b65..6818dfedd0 100644
---- a/include/io/task.h
-+++ b/include/io/task.h
-@@ -21,8 +21,6 @@
- #ifndef QIO_TASK_H
- #define QIO_TASK_H
-
--#include "qom/object.h"
--
- typedef struct QIOTask QIOTask;
-
- typedef void (*QIOTaskFunc)(QIOTask *task,
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
+ trace/simple.h |  2 +-
+ trace/simple.c | 13 +++++++------
+ 2 files changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/trace/simple.h b/trace/simple.h
+index 5771a0634f..26ccbc8b8a 100644
+--- a/trace/simple.h
++++ b/trace/simple.h
+@@ -12,7 +12,7 @@
+ #define TRACE_SIMPLE_H
+ 
+ void st_print_trace_file_status(void);
+-void st_set_trace_file_enabled(bool enable);
++bool st_set_trace_file_enabled(bool enable);
+ void st_set_trace_file(const char *file);
+ bool st_init(void);
+ void st_flush_trace_buffer(void);
+diff --git a/trace/simple.c b/trace/simple.c
+index fc7106ec49..906391538f 100644
+--- a/trace/simple.c
++++ b/trace/simple.c
+@@ -302,10 +302,10 @@ static int st_write_event_mapping(void)
+     return 0;
+ }
+ 
+-void st_set_trace_file_enabled(bool enable)
++bool st_set_trace_file_enabled(bool enable)
+ {
+     if (enable == !!trace_fp) {
+-        return; /* no change */
++        return enable;          /* no change */
+     }
+ 
+     /* Halt trace writeout */
+@@ -323,14 +323,14 @@ void st_set_trace_file_enabled(bool enable)
+ 
+         trace_fp = fopen(trace_file_name, "wb");
+         if (!trace_fp) {
+-            return;
++            return !enable;
+         }
+ 
+         if (fwrite(&header, sizeof header, 1, trace_fp) != 1 ||
+             st_write_event_mapping() < 0) {
+             fclose(trace_fp);
+             trace_fp = NULL;
+-            return;
++            return !enable;
+         }
+ 
+         /* Resume trace writeout */
+@@ -340,6 +340,7 @@ void st_set_trace_file_enabled(bool enable)
+         fclose(trace_fp);
+         trace_fp = NULL;
+     }
++    return !enable;
+ }
+ 
+ /**
+@@ -350,7 +351,7 @@ void st_set_trace_file_enabled(bool enable)
+  */
+ void st_set_trace_file(const char *file)
+ {
+-    st_set_trace_file_enabled(false);
++    bool saved_enable = st_set_trace_file_enabled(false);
+ 
+     g_free(trace_file_name);
+ 
+@@ -361,7 +362,7 @@ void st_set_trace_file(const char *file)
+         trace_file_name = g_strdup_printf("%s", file);
+     }
+ 
+-    st_set_trace_file_enabled(true);
++    st_set_trace_file_enabled(saved_enable);
+ }
+ 
+ void st_print_trace_file_status(void)
+-- 
+2.21.1
+
 
