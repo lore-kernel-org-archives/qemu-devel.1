@@ -4,84 +4,84 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEDD6C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:45:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF2F0C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:47:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADA0B20671
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:45:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A8CBB20671
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:47:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h3YvXUce"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADA0B20671
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zICfkdDS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8CBB20671
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZbat-0004Tb-Ss
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 10:45:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44582)
+	id 1jZbc6-0006eO-RA
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 10:47:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jZbZZ-0002TS-0Y
- for qemu-devel@nongnu.org; Fri, 15 May 2020 10:44:25 -0400
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:36296)
+ id 1jZbZQ-0002Jq-3O
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 10:44:16 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:43781)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jZbZW-0000zt-8l
- for qemu-devel@nongnu.org; Fri, 15 May 2020 10:44:24 -0400
-Received: by mail-wr1-x42f.google.com with SMTP id k13so1752012wrx.3
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 07:44:20 -0700 (PDT)
+ id 1jZbZP-0000yh-0A
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 10:44:15 -0400
+Received: by mail-wr1-x42c.google.com with SMTP id i15so3810089wrx.10
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 07:44:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=tQttWf6rj7Sr02MvNzPrzDKjaidbgt9rChCOOlqQ7tY=;
- b=h3YvXUcey3SwVJH3uSvxflWNCFYtighn8umzhlgeM3Ygr38zm0QgbfA1BGEJ3syD3f
- kVPGwNuKD/68h0A1g/tUyYIJaRJ1AooXFvTJ1GydvZqC8ijDm03Qa/Bj/5owMUxS2OD8
- 7je+2tv+dwFbp+DG4Z+57+rH3KRYPnnxJHxLHmpatEQ3xUfKitX2bLMRyynof1Yec7Bo
- VFbXDx9XFEmt2/Z+Itqz1VFcCyV/36SIulZa5X50WDwAwBNgPcs6/Y8jYMVP0qbC/EIA
- Tss28nl0E3yKCTiYHJV8AeC58Ui7xVHd+Ks11+ygdr+O2F66rZjrZM/5jtj4htnPGgbc
- xgwg==
+ bh=NBIpR/SKBX2U0msLKof2GONE3NjLw6IkuS84AThlKu8=;
+ b=zICfkdDS8h09FVj3XSxst0oeWEiM3esfVa4ePQdWih8m+D3xVmc2IETlhzrKvSnoUi
+ UUmEZ9pR+XJado5715qwNQTNt3EVcYobKaLlRRTUu3srNd4m+9JsVrKbk8kU71WI/UEk
+ 6iPpufEJxpkFjjb4tB6f3IYClcHD67LF2WpLCkWn9WPf2tklrdo1tIrMFzz+qEzxqA69
+ oHDbD/vOOvn9+MVllMJf4D9kq6WHicZCWZO7Xn4YrOmo9t5KhoT8r0JSNAePQCkTRp8W
+ I2ybuKBS4ar7AgFHNgGE4itDz+Qb1PnEXFA2QeAWYxKPhl4YRrykY7Pc2rqHCobqnF6B
+ cbLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=tQttWf6rj7Sr02MvNzPrzDKjaidbgt9rChCOOlqQ7tY=;
- b=eh19SkChZ2rDIuU7egGOQ8IMU1oll2mrRqeBbnlRoXmKuEzpKYcl4UIZygJoAxjvau
- dGftoBX5C/8iJvrq/GGT5glGi1/K4s/Nj1EdokKHOuF7lVvrVrqFMCQI+ZxMfBN9x4eU
- wbk5B75s0VytaSPDgCsPXW2worHMRKgVC2a8B0JtvNVLf4lY0cPUiN/bRdSem5b5z5v1
- gN/JDO5cGvmMqc5ag35LoQOhOd5uzXKEYXjDL4aIPDe1BXkorV4C4rRJ037BPKxEX5aK
- fxj1vQfVxdUorldAbRPxBdu3B3+lIfm8ylNcG0AhAHi4zDQoDEsn87zmZXQCgCzL4JOy
- PetA==
-X-Gm-Message-State: AOAM531tnITXCBbngRCsQL1gy6Knx1/exUVCQMEvDWHMd8J2xdYRIODm
- Fkby5itvu5Rfc8rKOVkJfoGQcw==
-X-Google-Smtp-Source: ABdhPJyVhmEc2Q/Tzfh2spg3zVIWM7JglrPXz/y/+wZaI9lH9TVyADaJowLVIoe5eo3VJND+5TXnRA==
-X-Received: by 2002:adf:c414:: with SMTP id v20mr4447467wrf.379.1589553859815; 
- Fri, 15 May 2020 07:44:19 -0700 (PDT)
+ bh=NBIpR/SKBX2U0msLKof2GONE3NjLw6IkuS84AThlKu8=;
+ b=F6ScnKNUFONkbghE4xCAlZH9RO2vzGvWQ1y2jTfco7cFeHzrGEgnhZt4NY7pncU6FW
+ KMCrlcs0mes0EjzV1KyAOwBoIc2Oymmc/SoT5bZDAdKpXDJav74uxswn1fRgfi604ilK
+ YWcLA7guVvo6+tIYC2uyPwRq8NkeZIlR/JRTiM+dJvxTUMZvggpuUDBWsu2WTA7914Yz
+ jyndUE9FRVe6NV3gQaPclaziEn0/d0Bwv5JMSXP768QcawQq/4khBy/bdh3eTxBeKumq
+ WL3K8si0MVlwgcT0LXu8hkAJmZ7IQJhTdfVE3ZDuc0F3u9UrviZPZb1nIQ7+1McUuPzQ
+ tfNQ==
+X-Gm-Message-State: AOAM532QVgERgbG3M+zaBMsci5gfZWdDzfZd0+OovOTMGYlomCpAThOD
+ yyJgQ/G9ApTXsOc1NfQYccuK/g==
+X-Google-Smtp-Source: ABdhPJwWvIRr4eXlO7cTZh3vf4TUZ/VbsXrZ7CU4RuHJPytVnq8TGbYZYrlPVdtRMA5gmpfkhevUHQ==
+X-Received: by 2002:a5d:480a:: with SMTP id l10mr4557713wrq.318.1589553853590; 
+ Fri, 15 May 2020 07:44:13 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id m23sm3950760wmg.45.2020.05.15.07.44.11
+ by smtp.gmail.com with ESMTPSA id n7sm3929502wro.94.2020.05.15.07.44.08
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Fri, 15 May 2020 07:44:12 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 326A91FF9A;
- Fri, 15 May 2020 15:44:06 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id A055F1FF91;
+ Fri, 15 May 2020 15:44:05 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL v2 11/13] qemu/plugin: Move !CONFIG_PLUGIN stubs altogether
-Date: Fri, 15 May 2020 15:44:03 +0100
-Message-Id: <20200515144405.20580-12-alex.bennee@linaro.org>
+Subject: [PULL v2 05/13] accel/tcg: Relax va restrictions on 64-bit guests
+Date: Fri, 15 May 2020 15:43:57 +0100
+Message-Id: <20200515144405.20580-6-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200515144405.20580-1-alex.bennee@linaro.org>
 References: <20200515144405.20580-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42f;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42f.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42c.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,80 +103,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Emilio G . Cota" <cota@braap.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Simplify the ifdef'ry by moving all stubs together.
+We cannot at present limit a 64-bit guest to a virtual address
+space smaller than the host.  It will mostly work to ignore this
+limitation, except if the guest uses high bits of the address
+space for tags.  But it will certainly work better, as presently
+we can wind up failing to allocate the guest stack.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Emilio G. Cota <cota@braap.org>
+Widen our user-only page tree to the host or abi pointer width.
+Remove the workaround for this problem from target/alpha.
+Always validate guest addresses vs reserved_va, as there we
+control allocation ourselves.
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200510171119.20827-3-f4bug@amsat.org>
-Message-Id: <20200513173200.11830-3-alex.bennee@linaro.org>
 
-diff --git a/include/qemu/plugin.h b/include/qemu/plugin.h
-index e45f950fe36..ab790ad105c 100644
---- a/include/qemu/plugin.h
-+++ b/include/qemu/plugin.h
-@@ -46,22 +46,6 @@ static inline void qemu_plugin_add_opts(void)
+Message-Id: <20200513175134.19619-7-alex.bennee@linaro.org>
+
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index 0895a57881a..d14374bdd49 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -162,12 +162,27 @@ extern unsigned long guest_base;
+ extern bool have_guest_base;
+ extern unsigned long reserved_va;
  
- void qemu_plugin_opt_parse(const char *optarg, QemuPluginList *head);
- int qemu_plugin_load_list(QemuPluginList *head);
--#else /* !CONFIG_PLUGIN */
--static inline void qemu_plugin_add_opts(void)
--{ }
--
--static inline void qemu_plugin_opt_parse(const char *optarg,
--                                         QemuPluginList *head)
--{
--    error_report("plugin interface not enabled in this build");
--    exit(1);
--}
--
--static inline int qemu_plugin_load_list(QemuPluginList *head)
--{
--    return 0;
--}
--#endif /* !CONFIG_PLUGIN */
- 
- union qemu_plugin_cb_sig {
-     qemu_plugin_simple_cb_t          simple;
-@@ -182,8 +166,6 @@ struct qemu_plugin_insn *qemu_plugin_tb_insn_get(struct qemu_plugin_tb *tb)
-     return insn;
- }
- 
--#ifdef CONFIG_PLUGIN
--
- void qemu_plugin_vcpu_init_hook(CPUState *cpu);
- void qemu_plugin_vcpu_exit_hook(CPUState *cpu);
- void qemu_plugin_tb_trans_cb(CPUState *cpu, struct qemu_plugin_tb *tb);
-@@ -207,6 +189,21 @@ void qemu_plugin_disable_mem_helpers(CPUState *cpu);
- 
- #else /* !CONFIG_PLUGIN */
- 
-+static inline void qemu_plugin_add_opts(void)
-+{ }
+-#if HOST_LONG_BITS <= TARGET_VIRT_ADDR_SPACE_BITS
+-#define GUEST_ADDR_MAX (~0ul)
++/*
++ * Limit the guest addresses as best we can.
++ *
++ * When not using -R reserved_va, we cannot really limit the guest
++ * to less address space than the host.  For 32-bit guests, this
++ * acts as a sanity check that we're not giving the guest an address
++ * that it cannot even represent.  For 64-bit guests... the address
++ * might not be what the real kernel would give, but it is at least
++ * representable in the guest.
++ *
++ * TODO: Improve address allocation to avoid this problem, and to
++ * avoid setting bits at the top of guest addresses that might need
++ * to be used for tags.
++ */
++#if MIN(TARGET_VIRT_ADDR_SPACE_BITS, TARGET_ABI_BITS) <= 32
++# define GUEST_ADDR_MAX_  UINT32_MAX
+ #else
+-#define GUEST_ADDR_MAX (reserved_va ? reserved_va - 1 : \
+-                                    (1ul << TARGET_VIRT_ADDR_SPACE_BITS) - 1)
++# define GUEST_ADDR_MAX_  (~0ul)
+ #endif
++#define GUEST_ADDR_MAX    (reserved_va ? reserved_va - 1 : GUEST_ADDR_MAX_)
 +
-+static inline void qemu_plugin_opt_parse(const char *optarg,
-+                                         QemuPluginList *head)
-+{
-+    error_report("plugin interface not enabled in this build");
-+    exit(1);
-+}
+ #else
+ 
+ #include "exec/hwaddr.h"
+diff --git a/target/alpha/cpu-param.h b/target/alpha/cpu-param.h
+index 692aee27ca9..1153992e42a 100644
+--- a/target/alpha/cpu-param.h
++++ b/target/alpha/cpu-param.h
+@@ -10,22 +10,11 @@
+ 
+ #define TARGET_LONG_BITS 64
+ #define TARGET_PAGE_BITS 13
+-#ifdef CONFIG_USER_ONLY
+-/*
+- * ??? The kernel likes to give addresses in high memory.  If the host has
+- * more virtual address space than the guest, this can lead to impossible
+- * allocations.  Honor the long-standing assumption that only kernel addrs
+- * are negative, but otherwise allow allocations anywhere.  This could lead
+- * to tricky emulation problems for programs doing tagged addressing, but
+- * that's far fewer than encounter the impossible allocation problem.
+- */
+-#define TARGET_PHYS_ADDR_SPACE_BITS  63
+-#define TARGET_VIRT_ADDR_SPACE_BITS  63
+-#else
 +
-+static inline int qemu_plugin_load_list(QemuPluginList *head)
-+{
-+    return 0;
-+}
+ /* ??? EV4 has 34 phys addr bits, EV5 has 40, EV6 has 44.  */
+ #define TARGET_PHYS_ADDR_SPACE_BITS  44
+ #define TARGET_VIRT_ADDR_SPACE_BITS  (30 + TARGET_PAGE_BITS)
+-#endif
 +
- static inline void qemu_plugin_vcpu_init_hook(CPUState *cpu)
- { }
+ #define NB_MMU_MODES 3
+ 
+ #endif
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 9924e66d1f7..e4f703a7e6d 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -173,8 +173,13 @@ struct page_collection {
+ #define TB_FOR_EACH_JMP(head_tb, tb, n)                                 \
+     TB_FOR_EACH_TAGGED((head_tb)->jmp_list_head, tb, n, jmp_list_next)
+ 
+-/* In system mode we want L1_MAP to be based on ram offsets,
+-   while in user mode we want it to be based on virtual addresses.  */
++/*
++ * In system mode we want L1_MAP to be based on ram offsets,
++ * while in user mode we want it to be based on virtual addresses.
++ *
++ * TODO: For user mode, see the caveat re host vs guest virtual
++ * address spaces near GUEST_ADDR_MAX.
++ */
+ #if !defined(CONFIG_USER_ONLY)
+ #if HOST_LONG_BITS < TARGET_PHYS_ADDR_SPACE_BITS
+ # define L1_MAP_ADDR_SPACE_BITS  HOST_LONG_BITS
+@@ -182,7 +187,7 @@ struct page_collection {
+ # define L1_MAP_ADDR_SPACE_BITS  TARGET_PHYS_ADDR_SPACE_BITS
+ #endif
+ #else
+-# define L1_MAP_ADDR_SPACE_BITS  TARGET_VIRT_ADDR_SPACE_BITS
++# define L1_MAP_ADDR_SPACE_BITS  MIN(HOST_LONG_BITS, TARGET_ABI_BITS)
+ #endif
+ 
+ /* Size of the L2 (and L3, etc) page tables.  */
+@@ -2497,9 +2502,7 @@ void page_set_flags(target_ulong start, target_ulong end, int flags)
+     /* This function should never be called with addresses outside the
+        guest address space.  If this assert fires, it probably indicates
+        a missing call to h2g_valid.  */
+-#if TARGET_ABI_BITS > L1_MAP_ADDR_SPACE_BITS
+-    assert(end <= ((target_ulong)1 << L1_MAP_ADDR_SPACE_BITS));
+-#endif
++    assert(end - 1 <= GUEST_ADDR_MAX);
+     assert(start < end);
+     assert_memory_lock();
  
 -- 
 2.20.1
