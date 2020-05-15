@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22DFAC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 19:10:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC994C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 19:11:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCFF020727
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 19:10:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 62CE520727
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 19:11:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jb5ku57g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCFF020727
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O5lH1nBk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62CE520727
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZfiy-0005rn-0N
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 15:10:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55882)
+	id 1jZfjh-0006u4-BX
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 15:11:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55904)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jZfaz-0001nK-QE
- for qemu-devel@nongnu.org; Fri, 15 May 2020 15:02:09 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:50621)
+ id 1jZfb2-0001t7-F3
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 15:02:12 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:45492)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jZfay-0001q2-Cf
- for qemu-devel@nongnu.org; Fri, 15 May 2020 15:02:09 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id t9so1315398pjw.0
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 12:02:07 -0700 (PDT)
+ id 1jZfb0-0001qb-EN
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 15:02:12 -0400
+Received: by mail-pf1-x443.google.com with SMTP id z26so1278030pfk.12
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 12:02:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=uqPX34Y2xYCeaTCM4tOC/EtcK+8f3Xuhtp9sJmjWnMU=;
- b=jb5ku57gR8/Yjp+yY8uLApUIyGNzX95m8V58Ohakr3lGKSQRNNNbQp8rJfbVDsQWo/
- RQYL1YNu5Skymruqzql+oNooX18kGtp3CEyQsl1/K28n5CRMz/gDk3rVoG7wK/LLp34K
- C3CZprmJlCCr5z9pXNF4x2SVbe+qq2QH3Qa2KLMHlqU5bOrHsQRtp5CAyLvn/L7uJyMW
- QSX0W2p19ysb+TaVLWRmCJj8I4YgClq5QcwmOosFTSS2iZRUpzRJUAO9sbEzZtxJd1Wy
- RXp52+1F638U08CP+kKRdVh1kqSPwyPM3MckZH5YicXT+bzs44HqKQlttm7zsl37I3tc
- uuRg==
+ bh=2mkOApOfyovlkCqZcQYL+u8RzltlLvSt3FtUuezPUhI=;
+ b=O5lH1nBkVtOJYEIyNRjztqyF3fWvtE1dWrHocclWOAJgF12s5fQb3+33mhtX8lbMwY
+ /WtEuj8TnQ5tT5oZ3dIb3bNL5pVWoSvavi80FwzfDNOm65Gf7hK/aaBJfVKdfGL1adFI
+ DahGUQKRVO3hPhISUK0PlPjSxQ7iuJWuHCq6dA06tE3EN6q7Dq6elwYMOR5mGDr8xeMs
+ YpouBLsmPrUuTf5CvA+N8B7JRj64C60GIIzjkRV1EisecMRUzINk2IqWpHvJ3pB0SO+V
+ 6KxUkkxMNrj2otVP7sMVqcNy2S2oNy4aj06ZmqLbE2Mnxl4fDgb+9dZSXPSPH4vEpI2b
+ VoLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=uqPX34Y2xYCeaTCM4tOC/EtcK+8f3Xuhtp9sJmjWnMU=;
- b=iEfCowuP178c/0Yaq7LILrcu1GC217AKMcy81OzxdTjbu4VJy2NKX8Fcei5jZh9bZp
- +WAI0bB2OWiqNf2tUSbFfuC5YdPhTKGphsWq1uMmEOfMmIgQIx4dDlER5pACWaMsyXfu
- kpXBaIqZe7eIJP6qz1w4ofkw5Z51CTNQAOVFtvyilubqM/B3iyrRioyMns4tva4NNl64
- OC+MsaKBeBRunoEtQWuqvmoC1Jk0Rr/Quo86I+f++K3ctQyLyY9/BduJUvuuksS/65BE
- mmu/HSvIIE16jFfWUNZ52P7gAwI516Rv7uT8yIpFUC7HhBppolCKcc+knoAbj/A8ctNl
- q8Ew==
-X-Gm-Message-State: AOAM532y1TTzjeS1/oYhxbKUiRUqO3GoSd8vPf9O/vB4tq1F2pAzuzKG
- v0y0R5tKU6hf267EldAR9uX+D8voiO4=
-X-Google-Smtp-Source: ABdhPJzQaTGEfJYiDSIybFfDwEr4xu88+wATxL1/RbRY77axge3Z09F6O99+FQbltof22RKfts1WTQ==
-X-Received: by 2002:a17:902:8b88:: with SMTP id
- ay8mr4933419plb.235.1589569326087; 
- Fri, 15 May 2020 12:02:06 -0700 (PDT)
+ bh=2mkOApOfyovlkCqZcQYL+u8RzltlLvSt3FtUuezPUhI=;
+ b=MCorgNRERtOewIGrc8/LvqYHZrizFLbe4pebMITK0i/6PpM4JpEW+GcSBoXb/xALap
+ 1SNp1TrEA2aNIkOGzrRZ8azFneiX4oMN9bUsUJ0FO8q/cdGYeIJOD6ZRUmuvTU2Ynrta
+ 9W/EHfpNk/cBECE/TIYiFuDz4SZGu8UH2gfJC04kmRFwvx3ExeCxXFo71WXAJHkS2Kff
+ j0SZY4X9CKFGCydapkslIUx5Ii8DcLJKc2fSFeXdgQ+EM5WJvF5zEC2fo6kJ6US94QUj
+ 1o7iW+KNgUEG0f4RYBIali6gz5poeeO0vhf27Lp9B8xPiqTRj/roQoBTsJDODFFgP8ys
+ zVxA==
+X-Gm-Message-State: AOAM530r2kP0g8GpJhbMcPK1IGd+dhI+Yj4VbK24/tEg3/jzJQPe5jSy
+ jbq4IRc5/5HbIhRIMlj3fyXoy7UO16s=
+X-Google-Smtp-Source: ABdhPJyqvY8sLyijzRDQW2mVem7l5Z2U6wgE4BDMYl9ZTR+MhNGpteyn4Xpj5lFAyWfQzeDquwzMuw==
+X-Received: by 2002:a62:68c1:: with SMTP id d184mr5307519pfc.138.1589569328261; 
+ Fri, 15 May 2020 12:02:08 -0700 (PDT)
 Received: from localhost.localdomain (174-21-143-238.tukw.qwest.net.
  [174.21.143.238])
- by smtp.gmail.com with ESMTPSA id q21sm2485719pfg.131.2020.05.15.12.02.04
+ by smtp.gmail.com with ESMTPSA id q21sm2485719pfg.131.2020.05.15.12.02.07
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 15 May 2020 12:02:05 -0700 (PDT)
+ Fri, 15 May 2020 12:02:07 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 08/10] softfloat: Inline float128 compare specializations
-Date: Fri, 15 May 2020 12:01:51 -0700
-Message-Id: <20200515190153.6017-9-richard.henderson@linaro.org>
+Subject: [PATCH 10/10] softfloat: Return bool from all classification
+ predicates
+Date: Fri, 15 May 2020 12:01:53 -0700
+Message-Id: <20200515190153.6017-11-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200515190153.6017-1-richard.henderson@linaro.org>
 References: <20200515190153.6017-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,332 +106,304 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace the float128 compare specializations with inline functions
-that call the standard float128_compare{,_quiet} functions.
-Use bool as the return type.
+This includes *_is_any_nan, *_is_neg, *_is_inf, etc.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/fpu/softfloat.h |  49 +++++++--
- fpu/softfloat.c         | 238 ----------------------------------------
- 2 files changed, 41 insertions(+), 246 deletions(-)
+ include/fpu/softfloat.h        | 66 +++++++++++++++++-----------------
+ fpu/softfloat-specialize.inc.c | 16 ++++-----
+ 2 files changed, 41 insertions(+), 41 deletions(-)
 
 diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 281f0fd971..cfb3cda46b 100644
+index 37217d9b9b..16ca697a73 100644
 --- a/include/fpu/softfloat.h
 +++ b/include/fpu/softfloat.h
-@@ -901,14 +901,6 @@ float128 float128_mul(float128, float128, float_status *status);
- float128 float128_div(float128, float128, float_status *status);
- float128 float128_rem(float128, float128, float_status *status);
+@@ -235,31 +235,31 @@ float16 float16_sqrt(float16, float_status *status);
+ FloatRelation float16_compare(float16, float16, float_status *status);
+ FloatRelation float16_compare_quiet(float16, float16, float_status *status);
+ 
+-int float16_is_quiet_nan(float16, float_status *status);
+-int float16_is_signaling_nan(float16, float_status *status);
++bool float16_is_quiet_nan(float16, float_status *status);
++bool float16_is_signaling_nan(float16, float_status *status);
+ float16 float16_silence_nan(float16, float_status *status);
+ 
+-static inline int float16_is_any_nan(float16 a)
++static inline bool float16_is_any_nan(float16 a)
+ {
+     return ((float16_val(a) & ~0x8000) > 0x7c00);
+ }
+ 
+-static inline int float16_is_neg(float16 a)
++static inline bool float16_is_neg(float16 a)
+ {
+     return float16_val(a) >> 15;
+ }
+ 
+-static inline int float16_is_infinity(float16 a)
++static inline bool float16_is_infinity(float16 a)
+ {
+     return (float16_val(a) & 0x7fff) == 0x7c00;
+ }
+ 
+-static inline int float16_is_zero(float16 a)
++static inline bool float16_is_zero(float16 a)
+ {
+     return (float16_val(a) & 0x7fff) == 0;
+ }
+ 
+-static inline int float16_is_zero_or_denormal(float16 a)
++static inline bool float16_is_zero_or_denormal(float16 a)
+ {
+     return (float16_val(a) & 0x7c00) == 0;
+ }
+@@ -351,8 +351,8 @@ float32 float32_minnum(float32, float32, float_status *status);
+ float32 float32_maxnum(float32, float32, float_status *status);
+ float32 float32_minnummag(float32, float32, float_status *status);
+ float32 float32_maxnummag(float32, float32, float_status *status);
+-int float32_is_quiet_nan(float32, float_status *status);
+-int float32_is_signaling_nan(float32, float_status *status);
++bool float32_is_quiet_nan(float32, float_status *status);
++bool float32_is_signaling_nan(float32, float_status *status);
+ float32 float32_silence_nan(float32, float_status *status);
+ float32 float32_scalbn(float32, int, float_status *status);
+ 
+@@ -372,27 +372,27 @@ static inline float32 float32_chs(float32 a)
+     return make_float32(float32_val(a) ^ 0x80000000);
+ }
+ 
+-static inline int float32_is_infinity(float32 a)
++static inline bool float32_is_infinity(float32 a)
+ {
+     return (float32_val(a) & 0x7fffffff) == 0x7f800000;
+ }
+ 
+-static inline int float32_is_neg(float32 a)
++static inline bool float32_is_neg(float32 a)
+ {
+     return float32_val(a) >> 31;
+ }
+ 
+-static inline int float32_is_zero(float32 a)
++static inline bool float32_is_zero(float32 a)
+ {
+     return (float32_val(a) & 0x7fffffff) == 0;
+ }
+ 
+-static inline int float32_is_any_nan(float32 a)
++static inline bool float32_is_any_nan(float32 a)
+ {
+     return ((float32_val(a) & ~(1 << 31)) > 0x7f800000UL);
+ }
+ 
+-static inline int float32_is_zero_or_denormal(float32 a)
++static inline bool float32_is_zero_or_denormal(float32 a)
+ {
+     return (float32_val(a) & 0x7f800000) == 0;
+ }
+@@ -540,8 +540,8 @@ float64 float64_minnum(float64, float64, float_status *status);
+ float64 float64_maxnum(float64, float64, float_status *status);
+ float64 float64_minnummag(float64, float64, float_status *status);
+ float64 float64_maxnummag(float64, float64, float_status *status);
+-int float64_is_quiet_nan(float64 a, float_status *status);
+-int float64_is_signaling_nan(float64, float_status *status);
++bool float64_is_quiet_nan(float64 a, float_status *status);
++bool float64_is_signaling_nan(float64, float_status *status);
+ float64 float64_silence_nan(float64, float_status *status);
+ float64 float64_scalbn(float64, int, float_status *status);
+ 
+@@ -561,27 +561,27 @@ static inline float64 float64_chs(float64 a)
+     return make_float64(float64_val(a) ^ 0x8000000000000000LL);
+ }
+ 
+-static inline int float64_is_infinity(float64 a)
++static inline bool float64_is_infinity(float64 a)
+ {
+     return (float64_val(a) & 0x7fffffffffffffffLL ) == 0x7ff0000000000000LL;
+ }
+ 
+-static inline int float64_is_neg(float64 a)
++static inline bool float64_is_neg(float64 a)
+ {
+     return float64_val(a) >> 63;
+ }
+ 
+-static inline int float64_is_zero(float64 a)
++static inline bool float64_is_zero(float64 a)
+ {
+     return (float64_val(a) & 0x7fffffffffffffffLL) == 0;
+ }
+ 
+-static inline int float64_is_any_nan(float64 a)
++static inline bool float64_is_any_nan(float64 a)
+ {
+     return ((float64_val(a) & ~(1ULL << 63)) > 0x7ff0000000000000ULL);
+ }
+ 
+-static inline int float64_is_zero_or_denormal(float64 a)
++static inline bool float64_is_zero_or_denormal(float64 a)
+ {
+     return (float64_val(a) & 0x7ff0000000000000LL) == 0;
+ }
+@@ -708,7 +708,7 @@ static inline floatx80 floatx80_chs(floatx80 a)
+     return a;
+ }
+ 
+-static inline int floatx80_is_infinity(floatx80 a)
++static inline bool floatx80_is_infinity(floatx80 a)
+ {
+ #if defined(TARGET_M68K)
+     return (a.high & 0x7fff) == floatx80_infinity.high && !(a.low << 1);
+@@ -718,22 +718,22 @@ static inline int floatx80_is_infinity(floatx80 a)
+ #endif
+ }
+ 
+-static inline int floatx80_is_neg(floatx80 a)
++static inline bool floatx80_is_neg(floatx80 a)
+ {
+     return a.high >> 15;
+ }
+ 
+-static inline int floatx80_is_zero(floatx80 a)
++static inline bool floatx80_is_zero(floatx80 a)
+ {
+     return (a.high & 0x7fff) == 0 && a.low == 0;
+ }
+ 
+-static inline int floatx80_is_zero_or_denormal(floatx80 a)
++static inline bool floatx80_is_zero_or_denormal(floatx80 a)
+ {
+     return (a.high & 0x7fff) == 0;
+ }
+ 
+-static inline int floatx80_is_any_nan(floatx80 a)
++static inline bool floatx80_is_any_nan(floatx80 a)
+ {
+     return ((a.high & 0x7fff) == 0x7fff) && (a.low<<1);
+ }
+@@ -936,8 +936,8 @@ float128 float128_rem(float128, float128, float_status *status);
  float128 float128_sqrt(float128, float_status *status);
--int float128_eq(float128, float128, float_status *status);
--int float128_le(float128, float128, float_status *status);
--int float128_lt(float128, float128, float_status *status);
--int float128_unordered(float128, float128, float_status *status);
--int float128_eq_quiet(float128, float128, float_status *status);
--int float128_le_quiet(float128, float128, float_status *status);
--int float128_lt_quiet(float128, float128, float_status *status);
--int float128_unordered_quiet(float128, float128, float_status *status);
  FloatRelation float128_compare(float128, float128, float_status *status);
  FloatRelation float128_compare_quiet(float128, float128, float_status *status);
- int float128_is_quiet_nan(float128, float_status *status);
-@@ -964,6 +956,47 @@ static inline int float128_is_any_nan(float128 a)
+-int float128_is_quiet_nan(float128, float_status *status);
+-int float128_is_signaling_nan(float128, float_status *status);
++bool float128_is_quiet_nan(float128, float_status *status);
++bool float128_is_signaling_nan(float128, float_status *status);
+ float128 float128_silence_nan(float128, float_status *status);
+ float128 float128_scalbn(float128, int, float_status *status);
+ 
+@@ -953,22 +953,22 @@ static inline float128 float128_chs(float128 a)
+     return a;
+ }
+ 
+-static inline int float128_is_infinity(float128 a)
++static inline bool float128_is_infinity(float128 a)
+ {
+     return (a.high & 0x7fffffffffffffffLL) == 0x7fff000000000000LL && a.low == 0;
+ }
+ 
+-static inline int float128_is_neg(float128 a)
++static inline bool float128_is_neg(float128 a)
+ {
+     return a.high >> 63;
+ }
+ 
+-static inline int float128_is_zero(float128 a)
++static inline bool float128_is_zero(float128 a)
+ {
+     return (a.high & 0x7fffffffffffffffLL) == 0 && a.low == 0;
+ }
+ 
+-static inline int float128_is_zero_or_denormal(float128 a)
++static inline bool float128_is_zero_or_denormal(float128 a)
+ {
+     return (a.high & 0x7fff000000000000LL) == 0;
+ }
+@@ -983,7 +983,7 @@ static inline bool float128_is_denormal(float128 a)
+     return float128_is_zero_or_denormal(a) && !float128_is_zero(a);
+ }
+ 
+-static inline int float128_is_any_nan(float128 a)
++static inline bool float128_is_any_nan(float128 a)
+ {
+     return ((a.high >> 48) & 0x7fff) == 0x7fff &&
          ((a.low != 0) || ((a.high & 0xffffffffffffLL) != 0));
- }
+diff --git a/fpu/softfloat-specialize.inc.c b/fpu/softfloat-specialize.inc.c
+index 025ee4f991..44f5b661f8 100644
+--- a/fpu/softfloat-specialize.inc.c
++++ b/fpu/softfloat-specialize.inc.c
+@@ -245,7 +245,7 @@ typedef struct {
+ | NaN; otherwise returns 0.
+ *----------------------------------------------------------------------------*/
  
-+static inline bool float128_eq(float128 a, float128 b, float_status *s)
-+{
-+    return float128_compare(a, b, s) == float_relation_equal;
-+}
-+
-+static inline bool float128_le(float128 a, float128 b, float_status *s)
-+{
-+    return float128_compare(a, b, s) <= float_relation_equal;
-+}
-+
-+static inline bool float128_lt(float128 a, float128 b, float_status *s)
-+{
-+    return float128_compare(a, b, s) < float_relation_equal;
-+}
-+
-+static inline bool float128_unordered(float128 a, float128 b, float_status *s)
-+{
-+    return float128_compare(a, b, s) == float_relation_unordered;
-+}
-+
-+static inline bool float128_eq_quiet(float128 a, float128 b, float_status *s)
-+{
-+    return float128_compare_quiet(a, b, s) == float_relation_equal;
-+}
-+
-+static inline bool float128_le_quiet(float128 a, float128 b, float_status *s)
-+{
-+    return float128_compare_quiet(a, b, s) <= float_relation_equal;
-+}
-+
-+static inline bool float128_lt_quiet(float128 a, float128 b, float_status *s)
-+{
-+    return float128_compare_quiet(a, b, s) < float_relation_equal;
-+}
-+
-+static inline bool float128_unordered_quiet(float128 a, float128 b,
-+                                           float_status *s)
-+{
-+    return float128_compare_quiet(a, b, s) == float_relation_unordered;
-+}
-+
- #define float128_zero make_float128(0, 0)
+-int float16_is_quiet_nan(float16 a_, float_status *status)
++bool float16_is_quiet_nan(float16 a_, float_status *status)
+ {
+ #ifdef NO_SIGNALING_NANS
+     return float16_is_any_nan(a_);
+@@ -264,7 +264,7 @@ int float16_is_quiet_nan(float16 a_, float_status *status)
+ | NaN; otherwise returns 0.
+ *----------------------------------------------------------------------------*/
  
- /*----------------------------------------------------------------------------
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 5d7fc2c17a..4567dda112 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -7218,244 +7218,6 @@ float128 float128_sqrt(float128 a, float_status *status)
+-int float16_is_signaling_nan(float16 a_, float_status *status)
++bool float16_is_signaling_nan(float16 a_, float_status *status)
+ {
+ #ifdef NO_SIGNALING_NANS
+     return 0;
+@@ -283,7 +283,7 @@ int float16_is_signaling_nan(float16 a_, float_status *status)
+ | NaN; otherwise returns 0.
+ *----------------------------------------------------------------------------*/
  
- }
+-int float32_is_quiet_nan(float32 a_, float_status *status)
++bool float32_is_quiet_nan(float32 a_, float_status *status)
+ {
+ #ifdef NO_SIGNALING_NANS
+     return float32_is_any_nan(a_);
+@@ -302,7 +302,7 @@ int float32_is_quiet_nan(float32 a_, float_status *status)
+ | NaN; otherwise returns 0.
+ *----------------------------------------------------------------------------*/
  
--/*----------------------------------------------------------------------------
--| Returns 1 if the quadruple-precision floating-point value `a' is equal to
--| the corresponding value `b', and 0 otherwise.  The invalid exception is
--| raised if either operand is a NaN.  Otherwise, the comparison is performed
--| according to the IEC/IEEE Standard for Binary Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--int float128_eq(float128 a, float128 b, float_status *status)
--{
--
--    if (    (    ( extractFloat128Exp( a ) == 0x7FFF )
--              && ( extractFloat128Frac0( a ) | extractFloat128Frac1( a ) ) )
--         || (    ( extractFloat128Exp( b ) == 0x7FFF )
--              && ( extractFloat128Frac0( b ) | extractFloat128Frac1( b ) ) )
--       ) {
--        float_raise(float_flag_invalid, status);
--        return 0;
--    }
--    return
--           ( a.low == b.low )
--        && (    ( a.high == b.high )
--             || (    ( a.low == 0 )
--                  && ( (uint64_t) ( ( a.high | b.high )<<1 ) == 0 ) )
--           );
--
--}
--
--/*----------------------------------------------------------------------------
--| Returns 1 if the quadruple-precision floating-point value `a' is less than
--| or equal to the corresponding value `b', and 0 otherwise.  The invalid
--| exception is raised if either operand is a NaN.  The comparison is performed
--| according to the IEC/IEEE Standard for Binary Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--int float128_le(float128 a, float128 b, float_status *status)
--{
--    bool aSign, bSign;
--
--    if (    (    ( extractFloat128Exp( a ) == 0x7FFF )
--              && ( extractFloat128Frac0( a ) | extractFloat128Frac1( a ) ) )
--         || (    ( extractFloat128Exp( b ) == 0x7FFF )
--              && ( extractFloat128Frac0( b ) | extractFloat128Frac1( b ) ) )
--       ) {
--        float_raise(float_flag_invalid, status);
--        return 0;
--    }
--    aSign = extractFloat128Sign( a );
--    bSign = extractFloat128Sign( b );
--    if ( aSign != bSign ) {
--        return
--               aSign
--            || (    ( ( (uint64_t) ( ( a.high | b.high )<<1 ) ) | a.low | b.low )
--                 == 0 );
--    }
--    return
--          aSign ? le128( b.high, b.low, a.high, a.low )
--        : le128( a.high, a.low, b.high, b.low );
--
--}
--
--/*----------------------------------------------------------------------------
--| Returns 1 if the quadruple-precision floating-point value `a' is less than
--| the corresponding value `b', and 0 otherwise.  The invalid exception is
--| raised if either operand is a NaN.  The comparison is performed according
--| to the IEC/IEEE Standard for Binary Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--int float128_lt(float128 a, float128 b, float_status *status)
--{
--    bool aSign, bSign;
--
--    if (    (    ( extractFloat128Exp( a ) == 0x7FFF )
--              && ( extractFloat128Frac0( a ) | extractFloat128Frac1( a ) ) )
--         || (    ( extractFloat128Exp( b ) == 0x7FFF )
--              && ( extractFloat128Frac0( b ) | extractFloat128Frac1( b ) ) )
--       ) {
--        float_raise(float_flag_invalid, status);
--        return 0;
--    }
--    aSign = extractFloat128Sign( a );
--    bSign = extractFloat128Sign( b );
--    if ( aSign != bSign ) {
--        return
--               aSign
--            && (    ( ( (uint64_t) ( ( a.high | b.high )<<1 ) ) | a.low | b.low )
--                 != 0 );
--    }
--    return
--          aSign ? lt128( b.high, b.low, a.high, a.low )
--        : lt128( a.high, a.low, b.high, b.low );
--
--}
--
--/*----------------------------------------------------------------------------
--| Returns 1 if the quadruple-precision floating-point values `a' and `b' cannot
--| be compared, and 0 otherwise.  The invalid exception is raised if either
--| operand is a NaN. The comparison is performed according to the IEC/IEEE
--| Standard for Binary Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--int float128_unordered(float128 a, float128 b, float_status *status)
--{
--    if (    (    ( extractFloat128Exp( a ) == 0x7FFF )
--              && ( extractFloat128Frac0( a ) | extractFloat128Frac1( a ) ) )
--         || (    ( extractFloat128Exp( b ) == 0x7FFF )
--              && ( extractFloat128Frac0( b ) | extractFloat128Frac1( b ) ) )
--       ) {
--        float_raise(float_flag_invalid, status);
--        return 1;
--    }
--    return 0;
--}
--
--/*----------------------------------------------------------------------------
--| Returns 1 if the quadruple-precision floating-point value `a' is equal to
--| the corresponding value `b', and 0 otherwise.  Quiet NaNs do not cause an
--| exception.  The comparison is performed according to the IEC/IEEE Standard
--| for Binary Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--int float128_eq_quiet(float128 a, float128 b, float_status *status)
--{
--
--    if (    (    ( extractFloat128Exp( a ) == 0x7FFF )
--              && ( extractFloat128Frac0( a ) | extractFloat128Frac1( a ) ) )
--         || (    ( extractFloat128Exp( b ) == 0x7FFF )
--              && ( extractFloat128Frac0( b ) | extractFloat128Frac1( b ) ) )
--       ) {
--        if (float128_is_signaling_nan(a, status)
--         || float128_is_signaling_nan(b, status)) {
--            float_raise(float_flag_invalid, status);
--        }
--        return 0;
--    }
--    return
--           ( a.low == b.low )
--        && (    ( a.high == b.high )
--             || (    ( a.low == 0 )
--                  && ( (uint64_t) ( ( a.high | b.high )<<1 ) == 0 ) )
--           );
--
--}
--
--/*----------------------------------------------------------------------------
--| Returns 1 if the quadruple-precision floating-point value `a' is less than
--| or equal to the corresponding value `b', and 0 otherwise.  Quiet NaNs do not
--| cause an exception.  Otherwise, the comparison is performed according to the
--| IEC/IEEE Standard for Binary Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--int float128_le_quiet(float128 a, float128 b, float_status *status)
--{
--    bool aSign, bSign;
--
--    if (    (    ( extractFloat128Exp( a ) == 0x7FFF )
--              && ( extractFloat128Frac0( a ) | extractFloat128Frac1( a ) ) )
--         || (    ( extractFloat128Exp( b ) == 0x7FFF )
--              && ( extractFloat128Frac0( b ) | extractFloat128Frac1( b ) ) )
--       ) {
--        if (float128_is_signaling_nan(a, status)
--         || float128_is_signaling_nan(b, status)) {
--            float_raise(float_flag_invalid, status);
--        }
--        return 0;
--    }
--    aSign = extractFloat128Sign( a );
--    bSign = extractFloat128Sign( b );
--    if ( aSign != bSign ) {
--        return
--               aSign
--            || (    ( ( (uint64_t) ( ( a.high | b.high )<<1 ) ) | a.low | b.low )
--                 == 0 );
--    }
--    return
--          aSign ? le128( b.high, b.low, a.high, a.low )
--        : le128( a.high, a.low, b.high, b.low );
--
--}
--
--/*----------------------------------------------------------------------------
--| Returns 1 if the quadruple-precision floating-point value `a' is less than
--| the corresponding value `b', and 0 otherwise.  Quiet NaNs do not cause an
--| exception.  Otherwise, the comparison is performed according to the IEC/IEEE
--| Standard for Binary Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--int float128_lt_quiet(float128 a, float128 b, float_status *status)
--{
--    bool aSign, bSign;
--
--    if (    (    ( extractFloat128Exp( a ) == 0x7FFF )
--              && ( extractFloat128Frac0( a ) | extractFloat128Frac1( a ) ) )
--         || (    ( extractFloat128Exp( b ) == 0x7FFF )
--              && ( extractFloat128Frac0( b ) | extractFloat128Frac1( b ) ) )
--       ) {
--        if (float128_is_signaling_nan(a, status)
--         || float128_is_signaling_nan(b, status)) {
--            float_raise(float_flag_invalid, status);
--        }
--        return 0;
--    }
--    aSign = extractFloat128Sign( a );
--    bSign = extractFloat128Sign( b );
--    if ( aSign != bSign ) {
--        return
--               aSign
--            && (    ( ( (uint64_t) ( ( a.high | b.high )<<1 ) ) | a.low | b.low )
--                 != 0 );
--    }
--    return
--          aSign ? lt128( b.high, b.low, a.high, a.low )
--        : lt128( a.high, a.low, b.high, b.low );
--
--}
--
--/*----------------------------------------------------------------------------
--| Returns 1 if the quadruple-precision floating-point values `a' and `b' cannot
--| be compared, and 0 otherwise.  Quiet NaNs do not cause an exception.  The
--| comparison is performed according to the IEC/IEEE Standard for Binary
--| Floating-Point Arithmetic.
--*----------------------------------------------------------------------------*/
--
--int float128_unordered_quiet(float128 a, float128 b, float_status *status)
--{
--    if (    (    ( extractFloat128Exp( a ) == 0x7FFF )
--              && ( extractFloat128Frac0( a ) | extractFloat128Frac1( a ) ) )
--         || (    ( extractFloat128Exp( b ) == 0x7FFF )
--              && ( extractFloat128Frac0( b ) | extractFloat128Frac1( b ) ) )
--       ) {
--        if (float128_is_signaling_nan(a, status)
--         || float128_is_signaling_nan(b, status)) {
--            float_raise(float_flag_invalid, status);
--        }
--        return 1;
--    }
--    return 0;
--}
--
- static inline FloatRelation
- floatx80_compare_internal(floatx80 a, floatx80 b, bool is_quiet,
-                           float_status *status)
+-int float32_is_signaling_nan(float32 a_, float_status *status)
++bool float32_is_signaling_nan(float32 a_, float_status *status)
+ {
+ #ifdef NO_SIGNALING_NANS
+     return 0;
+@@ -637,7 +637,7 @@ static float32 propagateFloat32NaN(float32 a, float32 b, float_status *status)
+ | NaN; otherwise returns 0.
+ *----------------------------------------------------------------------------*/
+ 
+-int float64_is_quiet_nan(float64 a_, float_status *status)
++bool float64_is_quiet_nan(float64 a_, float_status *status)
+ {
+ #ifdef NO_SIGNALING_NANS
+     return float64_is_any_nan(a_);
+@@ -657,7 +657,7 @@ int float64_is_quiet_nan(float64 a_, float_status *status)
+ | NaN; otherwise returns 0.
+ *----------------------------------------------------------------------------*/
+ 
+-int float64_is_signaling_nan(float64 a_, float_status *status)
++bool float64_is_signaling_nan(float64 a_, float_status *status)
+ {
+ #ifdef NO_SIGNALING_NANS
+     return 0;
+@@ -939,7 +939,7 @@ floatx80 propagateFloatx80NaN(floatx80 a, floatx80 b, float_status *status)
+ | NaN; otherwise returns 0.
+ *----------------------------------------------------------------------------*/
+ 
+-int float128_is_quiet_nan(float128 a, float_status *status)
++bool float128_is_quiet_nan(float128 a, float_status *status)
+ {
+ #ifdef NO_SIGNALING_NANS
+     return float128_is_any_nan(a);
+@@ -959,7 +959,7 @@ int float128_is_quiet_nan(float128 a, float_status *status)
+ | signaling NaN; otherwise returns 0.
+ *----------------------------------------------------------------------------*/
+ 
+-int float128_is_signaling_nan(float128 a, float_status *status)
++bool float128_is_signaling_nan(float128 a, float_status *status)
+ {
+ #ifdef NO_SIGNALING_NANS
+     return 0;
 -- 
 2.20.1
 
