@@ -2,95 +2,77 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF23FC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 16:56:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3F9CC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 17:02:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B71F206C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 16:56:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="koGGR1SK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B71F206C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	by mail.kernel.org (Postfix) with ESMTPS id BDF1120727
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 17:02:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDF1120727
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZdcv-00011v-N3
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 12:56:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39632)
+	id 1jZdjI-0004S5-1A
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 13:02:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41244)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1jZdcA-0000Rj-Dt; Fri, 15 May 2020 12:55:14 -0400
-Received: from forwardcorp1o.mail.yandex.net ([95.108.205.193]:54502)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1jZdc6-0008T0-JB; Fri, 15 May 2020 12:55:12 -0400
-Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
- [IPv6:2a02:6b8:0:1619::119])
- by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 7F64D2E1601;
- Fri, 15 May 2020 19:55:03 +0300 (MSK)
-Received: from vla5-58875c36c028.qloud-c.yandex.net
- (vla5-58875c36c028.qloud-c.yandex.net [2a02:6b8:c18:340b:0:640:5887:5c36])
- by mxbackcorp2j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- cinVDSHVo7-sxp0jiQ4; Fri, 15 May 2020 19:55:03 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1589561703; bh=3CGiU4Gj12+ohYxtA8wNze8x9w6+K4D4Kp4PKfczGqQ=;
- h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
- b=koGGR1SKgQcri5SFt2f94E/HJe5M5sI9pd/yLehmrFUQAIA/dMEKcA5GEBQg/PaQ4
- vh3ZCX2KSbaz0n5Eh4PJcvqZWPAJ4d4B7PZ7R3bwLzL7nqZwTiAn48Aqm3tjsyMuu7
- CO4IO2PigZJv/yww6iqGHJ+qiSnN3yAt2hDYKZlo=
-Authentication-Results: mxbackcorp2j.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
- [2a02:6b8:b081:313::1:5])
- by vla5-58875c36c028.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- cUtBCfJT05-sxXup6jc; Fri, 15 May 2020 19:54:59 +0300
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (Client certificate not present)
-Date: Fri, 15 May 2020 19:54:57 +0300
-From: Dima Stepanov <dimastep@yandex-team.ru>
-To: Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH v2 5/5] vhost: add device started check in migration set
- log
-Message-ID: <20200515165449.GA1627@dimastep-nix>
-References: <cover.1588252861.git.dimastep@yandex-team.ru>
- <d25241eb1fe7a55fc7dbe63ecedb4f1adf407837.1588252862.git.dimastep@yandex-team.ru>
- <ed805147-d87d-5ac2-3196-367981b0679c@redhat.com>
- <20200511092541.GA27558@dimastep-nix>
- <fd260f1f-75f3-46ac-8ca5-bbb7e41e712f@redhat.com>
- <20200512093521.GA5363@dimastep-nix>
- <20200512235934-mutt-send-email-mst@kernel.org>
- <b9cd40fd-53fb-e1e1-7cb7-ec437bc60ff2@redhat.com>
- <20200513094703.GA15906@dimastep-nix>
- <722839b2-9412-b768-3ce6-d1b697d6d5dd@redhat.com>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jZdii-00041H-1L
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 13:02:00 -0400
+Resent-Date: Fri, 15 May 2020 13:02:00 -0400
+Resent-Message-Id: <E1jZdii-00041H-1L@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21351)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1jZdig-0001K9-4k
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 13:01:59 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1589562084; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=KmmghsuqWq/XmiHaba9/euJy6tqmkqSB0igGl7XkBAGSwRM9H9VGAFlQY0FQxA+WtDfIajFiKhcpLiivhVSj15TKQILGadqAY9Q3kY1YxjRkql0sp48otaOSlyWVpkhSFWfqKotKVWvJUMVWZgpU+1OgACjiCvXWUeqfOplGvNE=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1589562084;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=pUCGvPKezvEOM3uNICo/9QQVRUZEl/QjrvEi9tnkAjU=; 
+ b=ZSMjHZFjt+PBegR3ljZsKtBCTG1JwI7XLiI7OQAaRB/Hrl5JdtB5rOBg3RtgkdcMfwkvUtkEu3wUvLUT0KhAHNM2nfE4SJl3JrxJn6dMQK3kioXz7/IvW0CD2xz9vDxA1iG75SHBP1hCJpwD3PFbzNL7W62OdJXJwW215MEWB+E=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1589562081025439.4915072153816;
+ Fri, 15 May 2020 10:01:21 -0700 (PDT)
+Message-ID: <158956207915.7125.11210004730708195080@45ef0f9c86ae>
+In-Reply-To: <1589537195-31392-1-git-send-email-ani.sinha@nutanix.com>
+Subject: Re: [PATCH] Add a new PIIX option to control global PCI hot-plugging
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <722839b2-9412-b768-3ce6-d1b697d6d5dd@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-Received-SPF: pass client-ip=95.108.205.193;
- envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1o.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 12:55:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: ani.sinha@nutanix.com
+Date: Fri, 15 May 2020 10:01:21 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 10:35:12
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -99,123 +81,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, yc-core@yandex-team.ru,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, dgilbert@redhat.com, arei.gonglei@huawei.com,
- fengli@smartx.com, stefanha@redhat.com, marcandre.lureau@redhat.com,
- pbonzini@redhat.com, raphael.norwitz@nutanix.com, mreitz@redhat.com
+Reply-To: qemu-devel@nongnu.org
+Cc: ani.sinha@nutanix.com, ehabkost@redhat.com, mst@redhat.com,
+ qemu-devel@nongnu.org, aleksandar.qemu.devel@gmail.com, imammedo@redhat.com,
+ ani@anisinha.ca, pbonzini@redhat.com, philmd@redhat.com, aurelien@aurel32.net,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 14, 2020 at 03:34:24PM +0800, Jason Wang wrote:
-> 
-> On 2020/5/13 下午5:47, Dima Stepanov wrote:
-> >>>     case CHR_EVENT_CLOSED:
-> >>>         /* a close event may happen during a read/write, but vhost
-> >>>          * code assumes the vhost_dev remains setup, so delay the
-> >>>          * stop & clear to idle.
-> >>>          * FIXME: better handle failure in vhost code, remove bh
-> >>>          */
-> >>>         if (s->watch) {
-> >>>             AioContext *ctx = qemu_get_current_aio_context();
-> >>>
-> >>>             g_source_remove(s->watch);
-> >>>             s->watch = 0;
-> >>>             qemu_chr_fe_set_handlers(&s->chr, NULL, NULL, NULL, NULL,
-> >>>                                      NULL, NULL, false);
-> >>>
-> >>>             aio_bh_schedule_oneshot(ctx, chr_closed_bh, opaque);
-> >>>         }
-> >>>         break;
-> >>>
-> >>>I think it's time we dropped the FIXME and moved the handling to common
-> >>>code. Jason? Marc-André?
-> >>I agree. Just to confirm, do you prefer bh or doing changes like what is
-> >>done in this series? It looks to me bh can have more easier codes.
-> >Could it be a good idea just to make disconnect in the char device but
-> >postphone clean up in the vhost-user-blk (or any other vhost-user
-> >device) itself? So we are moving the postphone logic and decision from
-> >the char device to vhost-user device. One of the idea i have is as
-> >follows:
-> >   - Put ourself in the INITIALIZATION state
-> >   - Start these vhost-user "handshake" commands
-> >   - If we got a disconnect error, perform disconnect, but don't clean up
-> >     device (it will be clean up on the roll back). I can be done by
-> >     checking the state in vhost_user_..._disconnect routine or smth like it
-> 
-> 
-> Any issue you saw just using the aio bh as Michael posted above.
-> 
-> Then we don't need to deal with the silent vhost_dev_stop() and we will have
-> codes that is much more easier to understand.
-I've implemented this solution inside
-hw/block/vhost-user-blk.c:vhost_user_blk_event() in the similar way by
-using the s->connected field. Looks good and more correct fix ). I have
-two questions here before i'll rework the fixes:
-1. Is it okay to make the similar fix inside vhost_user_blk_event() or
-we are looking for more generic vhost-user solution? What do you think?
-2. For migration we require an additional information that for the
-vhost-user device it isn't an error, because i'm trigerring the
-following assert error:
-  Core was generated by `x86_64-softmmu/qemu-system-x86_64 -nodefaults -no-user-config -M q35,sata=false'.
-  Program terminated with signal SIGABRT, Aborted.
-  #0  0x00007fb56e729428 in raise () from /lib/x86_64-linux-gnu/libc.so.6
-  [Current thread is 1 (Thread 0x7fb486ef5700 (LWP 527734))]
-
-  (gdb) bt
-  #0  0x00007fb56e729428 in raise () from /lib/x86_64-linux-gnu/libc.so.6
-  #1  0x00007fb56e72b02a in abort () from /lib/x86_64-linux-gnu/libc.so.6
-  #2  0x00005648ea376ee6 in vhost_log_global_start
-      (listener=0x5648ece4eb08) at ./hw/virtio/vhost.c:857
-  #3  0x00005648ea2dde7e in memory_global_dirty_log_start ()
-      at ./memory.c:2611
-  #4  0x00005648ea2e68e7 in ram_init_bitmaps (rs=0x7fb4740008c0)
-      at ./migration/ram.c:2305
-  #5  0x00005648ea2e698b in ram_init_all (rsp=0x5648eb1f0f20 <ram_state>)
-      at ./migration/ram.c:2323
-  #6  0x00005648ea2e6cc5 in ram_save_setup (f=0x5648ec609e00,
-      opaque=0x5648eb1f0f20 <ram_state>)
-      at ./migration/ram.c:2436
-  #7  0x00005648ea67b7d3 in qemu_savevm_state_setup (f=0x5648ec609e00) at
-      migration/savevm.c:1176
-  #8  0x00005648ea674511 in migration_thread (opaque=0x5648ec031ff0) at
-      migration/migration.c:3416
-  #9  0x00005648ea85d65d in qemu_thread_start (args=0x5648ec6057f0) at
-      util/qemu-thread-posix.c:519
-  #10 0x00007fb56eac56ba in start_thread () from
-      /lib/x86_64-linux-gnu/libpthread.so.0
-  #11 0x00007fb56e7fb41d in clone () from /lib/x86_64-linux-gnu/libc.so.6
-  (gdb) frame 2
-  #2  0x00005648ea376ee6 in vhost_log_global_start
-     (listener=0x5648ece4eb08) at ./hw/virtio/vhost.c:857
-  857             abort();
-  (gdb) list
-  852     {
-  853         int r;
-  854
-  855         r = vhost_migration_log(listener, true);
-  856         if (r < 0) {
-  857             abort();
-  858         }
-  859     }
-  860
-  861     static void vhost_log_global_stop(MemoryListener *listener)
-Since bh postphone the clean up, we can't use the ->started field.
-Do we have any mechanism to get the device type/state in the common
-vhost_migration_log() routine? So for example for the vhost-user/disconnect
-device we will be able to return 0. Or should we implement it and introduce
-it in this patch set?
-
-Thanks, Dima.
-
-> 
-> Thank
-> 
-> 
-> >   - vhost-user command returns error back to the _start() routine
-> >   - Rollback in one place in the start() routine, by calling this
-> >     postphoned clean up for the disconnect
-> >
-> 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTg5NTM3MTk1LTMxMzkyLTEt
+Z2l0LXNlbmQtZW1haWwtYW5pLnNpbmhhQG51dGFuaXguY29tLwoKCgpIaSwKClRoaXMgc2VyaWVz
+IGZhaWxlZCB0aGUgYXNhbiBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
+YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
+LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBkb2NrZXItaW1h
+Z2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9y
+YSBUQVJHRVRfTElTVD14ODZfNjQtc29mdG1tdSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJ
+UFQgRU5EID09PQoKICBDQyAgICAgIGh3L2lwYWNrL3RwY2kyMDAubwogIENDICAgICAgaHcvaXBt
+aS9pcG1pLm8KICBDQyAgICAgIGh3L2lwbWkvaXBtaV9rY3MubwovdG1wL3FlbXUtdGVzdC9zcmMv
+aHcvYWNwaS9waWl4NC5jOjU5ODo1MDogZXJyb3I6IHVzZSBvZiB1bmRlY2xhcmVkIGlkZW50aWZp
+ZXIgJ2Rldic7IGRpZCB5b3UgbWVhbiAnZGl2Jz8KICAgICAgICBxYnVzX3NldF9ob3RwbHVnX2hh
+bmRsZXIoQlVTKHBjaV9nZXRfYnVzKGRldikpLAogICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgXn5+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBkaXYKLS0tCmV4dGVybiBkaXZfdCBkaXYgKGludCBfX251bWVyLCBp
+bnQgX19kZW5vbSkKICAgICAgICAgICAgIF4KMSBlcnJvciBnZW5lcmF0ZWQuCm1ha2U6ICoqKiBb
+L3RtcC9xZW11LXRlc3Qvc3JjL3J1bGVzLm1hazo2OTogaHcvYWNwaS9waWl4NC5vXSBFcnJvciAx
+Cm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uClRyYWNlYmFjayAobW9z
+dCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBs
+aW5lIDY2NCwgaW4gPG1vZHVsZT4KLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0
+Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRv
+JywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51
+dWlkPTBiYjVlNjU1YThmYzRjYzc4NDE1ZTAxNzU2ZDk5N2YzJywgJy11JywgJzEwMDMnLCAnLS1z
+ZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VU
+X0xJU1Q9eDg2XzY0LXNvZnRtbXUnLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1l
+JywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPScs
+ICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3
+Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92
+YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0yanNjc3QxYS9zcmMvZG9ja2VyLXNyYy4yMDIwLTA1
+LTE1LTEyLjU4LjA4LjMxODgzOi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmZlZG9yYScsICcv
+dmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LWRlYnVnJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQg
+c3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPTBi
+YjVlNjU1YThmYzRjYzc4NDE1ZTAxNzU2ZDk5N2YzCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0g
+RXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0
+ZXItdG1wLTJqc2NzdDFhL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtZGVidWdAZmVk
+b3JhXSBFcnJvciAyCgpyZWFsICAgIDNtMTEuNjY4cwp1c2VyICAgIDBtOC4yOTFzCgoKVGhlIGZ1
+bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTg5NTM3MTk1
+LTMxMzkyLTEtZ2l0LXNlbmQtZW1haWwtYW5pLnNpbmhhQG51dGFuaXguY29tL3Rlc3RpbmcuYXNh
+bi8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
+Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
+IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
