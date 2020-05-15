@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62125C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:54:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45E3DC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:54:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BC9420759
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:54:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 127E620758
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:54:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OtYjOoXX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BC9420759
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OS+4hVug"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 127E620758
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZZrS-0001sp-9k
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 08:54:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45628)
+	id 1jZZrV-00020K-8A
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 08:54:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45514)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZj2-0002fV-0X
- for qemu-devel@nongnu.org; Fri, 15 May 2020 08:46:04 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55473
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZil-0002QP-0z
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 08:45:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23510
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZiy-0002HZ-Se
- for qemu-devel@nongnu.org; Fri, 15 May 2020 08:46:03 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZij-00027z-EV
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 08:45:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589546759;
+ s=mimecast20190719; t=1589546744;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=E6lTg6a3QM18al2S3+S2XLqdZEbQ4UGskqMO+IKKf34=;
- b=OtYjOoXXz4R5u5IxW88NrAfUBKL3RP0Jhv2JNBbzYwWPbTa1qEVUqiiKzuKoubN7ZkZqFm
- lwTAGaJQsiOyYTFUq4ciTTXpXOgNlUs3TtxK6zL9naHRATijgZ60T6fzNLndssy7/X2v6h
- LuSxMLTYF/mTsHOXBrsIhcK9vY4bLoA=
+ bh=oBF7fCfMe5jbzsXW//h34ma+BN+TM4yPDi0NoZ45ZdM=;
+ b=OS+4hVugmsi4wnTx+hbQUj589kHlzSIDwVFJhJWeUlWX+0jZQSArVoELFPzbH2seeD9RnY
+ rAuwlil93jtNCYN9mGXxMKEzqnrY4f5DJzSG1ZknAJGTddpsZCyoh1aZJtOCdumABBENGB
+ ++jDWrSYPZQY4CL6yRxwAH5gh7DWX0U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-IaqU17rrO2agvILcRLZY5Q-1; Fri, 15 May 2020 08:45:54 -0400
-X-MC-Unique: IaqU17rrO2agvILcRLZY5Q-1
+ us-mta-506-Wpcmy6lTOZOXnvqqbKhAAw-1; Fri, 15 May 2020 08:45:42 -0400
+X-MC-Unique: Wpcmy6lTOZOXnvqqbKhAAw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 197EF460;
- Fri, 15 May 2020 12:45:53 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 69030835B41;
+ Fri, 15 May 2020 12:45:41 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-113-110.ams2.redhat.com
  [10.36.113.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8D70A2E047;
- Fri, 15 May 2020 12:45:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7005F2E024;
+ Fri, 15 May 2020 12:45:40 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 16/51] block: Add BdrvChildRole and BdrvChildRoleBits
-Date: Fri, 15 May 2020 14:44:46 +0200
-Message-Id: <20200515124521.335403-17-kwolf@redhat.com>
+Subject: [PULL 09/51] block: Add blk_make_empty()
+Date: Fri, 15 May 2020 14:44:39 +0200
+Message-Id: <20200515124521.335403-10-kwolf@redhat.com>
 In-Reply-To: <20200515124521.335403-1-kwolf@redhat.com>
 References: <20200515124521.335403-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 00:07:24
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 23:27:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -100,87 +100,48 @@ Sender: "Qemu-devel"
 
 From: Max Reitz <mreitz@redhat.com>
 
-This mask will supplement BdrvChildClass when it comes to what role (or
-combination of roles) a child takes for its parent.  It consists of
-BdrvChildRoleBits values (which is an enum).
-
-Because empty enums are not allowed, let us just start with it filled.
+Two callers of BlockDriver.bdrv_make_empty() remain that should not call
+this method directly.  Both do not have access to a BdrvChild, but they
+can use a BlockBackend, so we add this function that lets them use it.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20200513110544.176672-5-mreitz@redhat.com>
+Message-Id: <20200429141126.85159-4-mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/block.h | 56 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 56 insertions(+)
+ include/sysemu/block-backend.h |  2 ++
+ block/block-backend.c          | 10 ++++++++++
+ 2 files changed, 12 insertions(+)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index bc42e507bb..35f1a1cecf 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -268,6 +268,62 @@ enum {
-     DEFAULT_PERM_UNCHANGED      = BLK_PERM_ALL & ~DEFAULT_PERM_PASSTHROUGH,
- };
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index 0917663d89..8203d7f6f9 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -266,4 +266,6 @@ int coroutine_fn blk_co_copy_range(BlockBackend *blk_in, int64_t off_in,
  
-+/*
-+ * Flags that parent nodes assign to child nodes to specify what kind of
-+ * role(s) they take.
-+ *
-+ * At least one of DATA, METADATA, FILTERED, or COW must be set for
-+ * every child.
-+ */
-+enum BdrvChildRoleBits {
-+    /*
-+     * This child stores data.
-+     * Any node may have an arbitrary number of such children.
-+     */
-+    BDRV_CHILD_DATA         = (1 << 0),
-+
-+    /*
-+     * This child stores metadata.
-+     * Any node may have an arbitrary number of metadata-storing
-+     * children.
-+     */
-+    BDRV_CHILD_METADATA     = (1 << 1),
-+
-+    /*
-+     * A child that always presents exactly the same visible data as
-+     * the parent, e.g. by virtue of the parent forwarding all reads
-+     * and writes.
-+     * This flag is mutually exclusive with DATA, METADATA, and COW.
-+     * Any node may have at most one filtered child at a time.
-+     */
-+    BDRV_CHILD_FILTERED     = (1 << 2),
-+
-+    /*
-+     * Child from which to read all data that isn’t allocated in the
-+     * parent (i.e., the backing child); such data is copied to the
-+     * parent through COW (and optionally COR).
-+     * This field is mutually exclusive with DATA, METADATA, and
-+     * FILTERED.
-+     * Any node may have at most one such backing child at a time.
-+     */
-+    BDRV_CHILD_COW          = (1 << 3),
-+
-+    /*
-+     * The primary child.  For most drivers, this is the child whose
-+     * filename applies best to the parent node.
-+     * Any node may have at most one primary child at a time.
-+     */
-+    BDRV_CHILD_PRIMARY      = (1 << 4),
-+
-+    /* Useful combination of flags */
-+    BDRV_CHILD_IMAGE        = BDRV_CHILD_DATA
-+                              | BDRV_CHILD_METADATA
-+                              | BDRV_CHILD_PRIMARY,
-+};
-+
-+/* Mask of BdrvChildRoleBits values */
-+typedef unsigned int BdrvChildRole;
-+
- char *bdrv_perm_names(uint64_t perm);
- uint64_t bdrv_qapi_perm_to_blk_perm(BlockPermission qapi_perm);
+ const BdrvChild *blk_root(BlockBackend *blk);
  
++int blk_make_empty(BlockBackend *blk, Error **errp);
++
+ #endif
+diff --git a/block/block-backend.c b/block/block-backend.c
+index f4944861fa..47bd56244d 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -2402,3 +2402,13 @@ const BdrvChild *blk_root(BlockBackend *blk)
+ {
+     return blk->root;
+ }
++
++int blk_make_empty(BlockBackend *blk, Error **errp)
++{
++    if (!blk_is_available(blk)) {
++        error_setg(errp, "No medium inserted");
++        return -ENOMEDIUM;
++    }
++
++    return bdrv_make_empty(blk->root, errp);
++}
 -- 
 2.25.4
 
