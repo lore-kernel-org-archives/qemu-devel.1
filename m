@@ -2,88 +2,70 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=FROM_WSP_TRAIL,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C791C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 04:40:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59B0CC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 04:41:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 130642065F
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 04:40:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XvMj7qjb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 130642065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 26E0C20760
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 04:41:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26E0C20760
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZS9W-0001fc-9W
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 00:40:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41238)
+	id 1jZSAI-0003dH-Bb
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 00:41:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41056)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jZS7z-0008If-PR
- for qemu-devel@nongnu.org; Fri, 15 May 2020 00:39:19 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50263
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jZS7y-0007it-UG
- for qemu-devel@nongnu.org; Fri, 15 May 2020 00:39:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589517554;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=OKJR3XWl1FD5yBYTcoQ2dBjNcY31o5w0McSpi+jkOug=;
- b=XvMj7qjbsdMLyUITpJNmPh/3qiusP+q3OWLjYbI/QcMRwSWgmiFfybZYgaoB7OUWh8EAH6
- cjcrl42zgBTpoK01KVVvUBteCKdhLhEfCwRn2W/n4agGla7+s4HG4hG2FI6vFeS55C0D52
- p0Pd7wdj5lcGdKCTsw0He5O+ueek/6Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-107-4tGOUR7dN4mlE7aK9dqnnQ-1; Fri, 15 May 2020 00:39:10 -0400
-X-MC-Unique: 4tGOUR7dN4mlE7aK9dqnnQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C3776460;
- Fri, 15 May 2020 04:39:06 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7AD5360BE2;
- Fri, 15 May 2020 04:38:59 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 082E611358BC; Fri, 15 May 2020 06:38:58 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v3 2/3] various: Remove unnecessary OBJECT() cast
-References: <20200512070020.22782-1-f4bug@amsat.org>
- <20200512070020.22782-3-f4bug@amsat.org>
-Date: Fri, 15 May 2020 06:38:57 +0200
-In-Reply-To: <20200512070020.22782-3-f4bug@amsat.org> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue, 12 May 2020 09:00:19
- +0200")
-Message-ID: <87r1vlstge.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 00:39:12
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1jZS7Y-0007gy-Gl
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 00:38:52 -0400
+Received: from mga12.intel.com ([192.55.52.136]:45615)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1jZS7X-0007ba-DN
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 00:38:52 -0400
+IronPort-SDR: QlPBh03/Qp70aLKij7AL8yCJ9x2XRSoxhg6uXzEYVU/4RzUIwrQNByfm0bL/0LVzSo/hgSaoUd
+ t5wSDG/qB/pg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 14 May 2020 21:38:50 -0700
+IronPort-SDR: Vjl0r2p4InwZqaLfztA0ibOkH4hZhmOeSJ50BOla12qOSjznZqRJ8f/fPk11QMPJ6FesE03AR3
+ 6+s4oQxcFlZg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,394,1583222400"; d="scan'208";a="263069541"
+Received: from unknown (HELO localhost.localdomain) ([10.239.13.19])
+ by orsmga003.jf.intel.com with ESMTP; 14 May 2020 21:38:48 -0700
+From: Zhang Chen <chen.zhang@intel.com >
+To: "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>,
+ Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ qemu-dev <qemu-devel@nongnu.org>
+Subject: [PATCH  2/3] migration/colo: Update checkpoint time lately
+Date: Fri, 15 May 2020 12:28:17 +0800
+Message-Id: <20200515042818.17908-3-chen.zhang@intel.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200515042818.17908-1-chen.zhang@intel.com>
+References: <20200515042818.17908-1-chen.zhang@intel.com>
+Received-SPF: pass client-ip=192.55.52.136; envelope-from=chen.zhang@intel.com;
+ helo=mga12.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 00:38:46
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -9
+X-Spam_score: -1.0
+X-Spam_bar: -
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, FROM_ADDR_WS=2.999,
+ FROM_WSP_TRAIL=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,57 +79,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paul Durrant <paul@xen.org>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Stefano Stabellini <sstabellini@kernel.org>, qemu-block@nongnu.org,
- qemu-trivial@nongnu.org, David Hildenbrand <david@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Joel Stanley <joel@jms.id.au>, Anthony Perard <anthony.perard@citrix.com>,
- xen-devel@lists.xenproject.org, Richard Henderson <rth@twiddle.net>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>,
- =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org,
- John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- Andrew Jeffery <andrew@aj.id.au>, Cornelia Huck <cohuck@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>, Corey Minyard <cminyard@mvista.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
+ Zhang Chen <zhangckid@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+From: Zhang Chen <chen.zhang@intel.com>
 
-> The OBJECT() macro is defined as:
->
->   #define OBJECT(obj) ((Object *)(obj))
->
-> Remove the unnecessary OBJECT() casts when we already know the
-> pointer is of Object type.
->
-> Patch created mechanically using spatch with this script:
->
->   @@
->   typedef Object;
->   Object *o;
->   @@
->   -   OBJECT(o)
->   +   o
->
-> Acked-by: Cornelia Huck <cohuck@redhat.com>
-> Acked-by: Corey Minyard <cminyard@mvista.com>
-> Acked-by: John Snow <jsnow@redhat.com>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Previous operation(like vm_start and replication_start_all) will consume
+extra time for first forced synchronization, so reduce it in this patch.
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+---
+ migration/colo.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/migration/colo.c b/migration/colo.c
+index 5ef69b885d..d5bced22cb 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -531,7 +531,6 @@ static void colo_process_checkpoint(MigrationState *s)
+ {
+     QIOChannelBuffer *bioc;
+     QEMUFile *fb = NULL;
+-    int64_t current_time = qemu_clock_get_ms(QEMU_CLOCK_HOST);
+     Error *local_err = NULL;
+     int ret;
+ 
+@@ -580,8 +579,8 @@ static void colo_process_checkpoint(MigrationState *s)
+     qemu_mutex_unlock_iothread();
+     trace_colo_vm_state_change("stop", "run");
+ 
+-    timer_mod(s->colo_delay_timer,
+-            current_time + s->parameters.x_checkpoint_delay);
++    timer_mod(s->colo_delay_timer, qemu_clock_get_ms(QEMU_CLOCK_HOST) +
++              s->parameters.x_checkpoint_delay);
+ 
+     while (s->state == MIGRATION_STATUS_COLO) {
+         if (failover_get_state() != FAILOVER_STATUS_NONE) {
+-- 
+2.17.1
 
 
