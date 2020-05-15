@@ -2,93 +2,93 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BA7DC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 10:05:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87DD8C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 10:06:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1796A20709
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 10:05:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4747820709
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 10:06:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jMDadn6y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1796A20709
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J9Q+0oT5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4747820709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZXDJ-0004Xx-5v
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 06:05:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43986)
+	id 1jZXEG-0006Ih-Hc
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 06:06:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jZXCc-0003gK-OE
- for qemu-devel@nongnu.org; Fri, 15 May 2020 06:04:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24172
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jZXA9-0001KG-8X
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 06:01:53 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54757
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jZXCb-0007CA-Po
- for qemu-devel@nongnu.org; Fri, 15 May 2020 06:04:26 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jZXA6-0006l6-O6
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 06:01:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589537065;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1589536908;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Yk1drrKUPdP+/s5oZImaqxNNy9reJiPKMkK/TaA3mHA=;
- b=jMDadn6ypv4zesPDHaSkLHlIPfiChNH6wL0OiyY98dcXEJ9oQv+XjQpwjDJssN9jWb/Gt/
- 5rxNr1Id0Q4tGvxp8a7/4CE4sIyQgO4SCwmM8TeiAQSOtbf4rIQvpW5i6s8lNC8s+sHdug
- MiLuVlY3KYd7m+WsTF8rDzJPEOJzDqk=
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=bTeCTGlmh/Dp4Gi8hbaNwFnuBpD45q2MR6XmJ7j/PRQ=;
+ b=J9Q+0oT5sfLbuQx2u2UF1sRo97yOc/EoNRh6vyhzy8f5YH0hkt/Kuc9tUpGwLd2hGD4Geq
+ j2xr8oJ339lSMp6MexikD4G85Zn2xvnhF7oH9BpVXSBHvyvJ2NZoN4166WZfwAd6RQsJxW
+ 9OEHLCtEX+yr3vkqvP1dtZvcT2Y+IuM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-395-SlWHVpUwMZC5xg1UCm0GoQ-1; Fri, 15 May 2020 06:04:23 -0400
-X-MC-Unique: SlWHVpUwMZC5xg1UCm0GoQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-268-qtWwUGgZP2y-22zpaw9nvg-1; Fri, 15 May 2020 06:01:46 -0400
+X-MC-Unique: qtWwUGgZP2y-22zpaw9nvg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F242100A8E7;
- Fri, 15 May 2020 10:04:22 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.64])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B93B878B26;
- Fri, 15 May 2020 10:04:16 +0000 (UTC)
-Date: Fri, 15 May 2020 11:04:13 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Lukas Straub <lukasstraub2@web.de>
-Subject: Re: [PATCH 3/5] block/nbd.c: Add yank feature
-Message-ID: <20200515100413.GG1300305@redhat.com>
-References: <cover.1589193717.git.lukasstraub2@web.de>
- <1e712fa7f08e4772c2a68197a851161bee51610f.1589193717.git.lukasstraub2@web.de>
- <20200511161909.GJ2811@work-vm> <20200511190524.3681e58c@luklap>
- <20200512085458.GE1191162@redhat.com>
- <20200515114818.25d9eb9c@luklap>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8AE58015CE;
+ Fri, 15 May 2020 10:01:45 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-113-42.ams2.redhat.com [10.36.113.42])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D2CE1059583;
+ Fri, 15 May 2020 10:01:43 +0000 (UTC)
+Subject: Re: [PATCH 2/3] docs/s390x: document 3270
+To: Cornelia Huck <cohuck@redhat.com>
+References: <20200505135025.14614-1-cohuck@redhat.com>
+ <20200505135025.14614-3-cohuck@redhat.com>
+ <4ea47ea1-04d5-3073-fef6-5af07f06a4d6@redhat.com>
+ <20200515110007.1676b17d.cohuck@redhat.com>
+ <b6acb966-16f2-605d-6d01-70f6085bfa79@redhat.com>
+ <20200515114511.2ac852f3.cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <d266a6a4-09c6-ee70-2d7c-f01dc0468cf5@redhat.com>
+Date: Fri, 15 May 2020 12:01:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200515114818.25d9eb9c@luklap>
-User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200515114511.2ac852f3.cohuck@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 22:56:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 23:27:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FROM_EXCESS_BASE64=0.979, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,82 +101,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
- Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 15, 2020 at 11:48:18AM +0200, Lukas Straub wrote:
-> On Tue, 12 May 2020 09:54:58 +0100
-> Daniel P. Berrangé <berrange@redhat.com> wrote:
+On 15/05/2020 11.45, Cornelia Huck wrote:
+> On Fri, 15 May 2020 11:14:40 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
 > 
-> > On Mon, May 11, 2020 at 07:05:24PM +0200, Lukas Straub wrote:
-> > > On Mon, 11 May 2020 17:19:09 +0100
-> > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > >   
-> > > > * Lukas Straub (lukasstraub2@web.de) wrote:  
-> > > > > Add yank option, pass it to the socket-channel and register a yank
-> > > > > function which sets s->state = NBD_CLIENT_QUIT. This is the same
-> > > > > behaviour as if an error occured.
-> > > > > 
-> > > > > Signed-off-by: Lukas Straub <lukasstraub2@web.de>    
-> > > >   
-> > > > > +static void nbd_yank(void *opaque)
-> > > > > +{
-> > > > > +    BlockDriverState *bs = opaque;
-> > > > > +    BDRVNBDState *s = (BDRVNBDState *)bs->opaque;
-> > > > > +
-> > > > > +    atomic_set(&s->state, NBD_CLIENT_QUIT);    
-> > > > 
-> > > > I think I was expecting a shutdown on the socket here - why doesn't it
-> > > > have one?  
-> > > 
-> > > For nbd, we register two yank functions: This one and we enable
-> > > the yank feature on the qio channel (see function
-> > > nbd_establish_connection below).  
-> > 
-> > As mentioned on the earlier patch, I don't want to see any yank
-> > code in the QIOChannel object directly. This nbd_yank function
-> > can simply call the qio_channel_shutdown() function directly
-> > and avoid need for modifying the QIOChannel object with yank
-> > support.
+>> On 15/05/2020 11.00, Cornelia Huck wrote:
+>>> On Fri, 15 May 2020 09:29:42 +0200
+>>> Thomas Huth <thuth@redhat.com> wrote:
+>>>   
+>>>> On 05/05/2020 15.50, Cornelia Huck wrote:  
+>>>>> Add some basic info how to use 3270 devices.
+>>>>>
+>>>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>>>>> ---
+>>>>>  docs/system/s390x/3270.rst   | 32 ++++++++++++++++++++++++++++++++
+>>>>>  docs/system/target-s390x.rst |  1 +
+>>>>>  2 files changed, 33 insertions(+)
+>>>>>  create mode 100644 docs/system/s390x/3270.rst
+>>>>>
+>>>>> diff --git a/docs/system/s390x/3270.rst b/docs/system/s390x/3270.rst
+>>>>> new file mode 100644
+>>>>> index 000000000000..e367a457e001
+>>>>> --- /dev/null
+>>>>> +++ b/docs/system/s390x/3270.rst
+>>>>> @@ -0,0 +1,32 @@
+>>>>> +3270 devices
+>>>>> +============
+>>>>> +
+>>>>> +With the aid of the ``x3270`` emulator, QEMU provides limited support
+>>>>> +for making a single 3270 device available to a guest. Note that this
+>>>>> +supports basic features only.    
+>>>>
+>>>> The first sentence sounds somewhat confusing. Maybe rather something like:
+>>>>
+>>>> QEMU can emulate a 3270 device attached to a guest, which then can be
+>>>> used with a program like ``x3270`` to get a traditional 3270 terminal
+>>>> for your guest.  
+>>>
+>>> But QEMU actually relies on x3270 (or a comparable program). It only
+>>> emulates the basic ccw plumbing; for the actual protocol (beyond
+>>> negotiating tn3270), it relies on the emulation done by x3270.  
+>>
+>> Ok, makes sense now. Maybe something like:
+>>
+>> QEMU provides the possibility to connect an external 3270 terminal
+>> emulator (like ``x3270``) to a guest?
 > 
-> Hi,
-> Looking at it again, the problem is not with registering the yank functions, but with tracking the lifetime of it. Suppose we add qio_channel_shutdown to the yank_nbd function. Then we need to unregister it whenever the QIOChannel object is freed.
+> Hm...
 > 
-> In the code that would lead to the following constructs in a lot of places:
->      if (local_err) {
->          yank_unregister_function(s->yank_name, yank_nbd, bs);
->          object_unref(OBJECT(sioc));
->          error_propagate(errp, local_err);
->          return NULL;
->      }
+> "QEMU supports connecting an external 3270 terminal emulator (such as
+> ``x3270``) to make a single 3270 device available to a guest. Note that
+> this supports basic features only."
+> 
+> ?
 
-The nbd patch here already has a yank_unregister_function() so I'm
-not seeing anything changes in that respect. The "yank_nbd" function
-should check that the I/O channel is non-NULL before calling the
-qio_channel_shutdown method.
+Yes, that sounds good!
 
-> If you don't want the code in QIOChannel I guess I can create a
-> subclass (YankableChannelSocket?) of QIOChannelSocket. What do
-> you think?
+ Thanks,
+  Thomas
 
-That's no better, and I don't see any compelling need for it as calling
-yank_unregister_function is something nbd already does in its nbd_close
-function. It isn't a burden for the other backends to do similarly.
-
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
