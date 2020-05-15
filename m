@@ -2,120 +2,74 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAF58C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:10:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F8E6C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:11:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 89E71206B6
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:10:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3951B2075F
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:11:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fnMPrHpA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89E71206B6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Poy2XC8j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3951B2075F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZb2r-0004mZ-N3
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 10:10:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32898)
+	id 1jZb3x-0005lP-D6
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 10:11:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33100)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jZb27-0004He-Jl
- for qemu-devel@nongnu.org; Fri, 15 May 2020 10:09:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42224
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1jZb3M-0005JT-1v
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 10:11:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46345
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jZb26-0000uq-Q8
- for qemu-devel@nongnu.org; Fri, 15 May 2020 10:09:51 -0400
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1jZb3L-0001Jx-0L
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 10:11:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589551789;
+ s=mimecast20190719; t=1589551865;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=KNmE/tIhTo2+OsvIBTtoffxhEzZgSD52Yrczlq+RTnw=;
- b=fnMPrHpAJXs757mzTPX4i9u9ZE/FT71YKfersiFPYfD//HqhD9QyQGW+zFnZvfslYPM+HJ
- kgF0V98Wa7rC1fDm9anOlyMa/40rHGPBjCzq1mYokj1u8OHIxb02ImNQvEEGSV2a2QpTQM
- uyK+ot1rAVq/DvFeyFNqVIPO6lFwd/Y=
+ in-reply-to:in-reply-to:references:references;
+ bh=5ypat35HJiZdr6QubaMI7QE5CF0ac3OiJ+WUL1mSSV0=;
+ b=Poy2XC8jv/jpEHqrI5rDMUL8vNdFkZIDPHsAew3YTIfU8utuF9T2jwF8YZHVauaVyjtOtv
+ dUo75LC/NQJ6VPnfw3vsNXdnUg4wcWiriEW98jrgHsaam7bpwWFZUI/qjHavgsd8X8GG2n
+ m9Qbo9Y3mEUE/qusG8AEsKnVUC3Cvhw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-47-3oe0uVQxMM-Ucm79GBEmtA-1; Fri, 15 May 2020 10:09:45 -0400
-X-MC-Unique: 3oe0uVQxMM-Ucm79GBEmtA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-21-N1NiQMlTNUyqBHRDSKq_yg-1; Fri, 15 May 2020 10:11:02 -0400
+X-MC-Unique: N1NiQMlTNUyqBHRDSKq_yg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A90118730B1;
- Fri, 15 May 2020 14:09:44 +0000 (UTC)
-Received: from [10.36.114.77] (ovpn-114-77.ams2.redhat.com [10.36.114.77])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3A76162474;
- Fri, 15 May 2020 14:09:40 +0000 (UTC)
-Subject: Re: [PATCH v1 07/17] migration/rdma: Use
- ram_block_discard_set_broken()
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <20200506094948.76388-1-david@redhat.com>
- <20200506094948.76388-8-david@redhat.com> <20200515124501.GE2954@work-vm>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <96a58e88-2629-f2ee-5884-38d11e571548@redhat.com>
-Date: Fri, 15 May 2020 16:09:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D21B28005AD
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 14:11:01 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-114-113.rdu2.redhat.com [10.10.114.113])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A53F312A4D;
+ Fri, 15 May 2020 14:10:58 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+ id 0B85B220206; Fri, 15 May 2020 10:10:58 -0400 (EDT)
+Date: Fri, 15 May 2020 10:10:57 -0400
+From: Vivek Goyal <vgoyal@redhat.com>
+To: Miklos Szeredi <mszeredi@redhat.com>
+Subject: Re: [Virtio-fs] [PATCH] virtiofsd: remove symlink fallbacks
+Message-ID: <20200515141057.GB235744@redhat.com>
+References: <20200514140736.20561-1-mszeredi@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200515124501.GE2954@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
+In-Reply-To: <20200514140736.20561-1-mszeredi@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=vgoyal@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 22:56:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -138,37 +92,275 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- "Michael S . Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>,
- qemu-devel@nongnu.org, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15.05.20 14:45, Dr. David Alan Gilbert wrote:
-> * David Hildenbrand (david@redhat.com) wrote:
->> RDMA will pin all guest memory (as documented in docs/rdma.txt). We want
->> to mark RAM block discards to be broken - however, to keep it simple
->> use ram_block_discard_is_required() instead of inhibiting.
+On Thu, May 14, 2020 at 04:07:36PM +0200, Miklos Szeredi wrote:
+> Path lookup in the kernel has special rules for looking up magic symlinks
+> under /proc.  If a filesystem operation is instructed to follow symlinks
+> (e.g. via AT_SYMLINK_FOLLOW or lack of AT_SYMLINK_NOFOLLOW), and the final
+> component is such a proc symlink, then the target of the magic symlink is
+> used for the operation, even if the target itself is a symlink.  I.e. path
+> lookup is always terminated after following a final magic symlink.
 > 
-> Should this be dependent on whether rdma->pin_all is set?
-> Even with !pin_all some will be pinned at any given time
-> (when it's registered with the rdma stack).
+> I was erronously assuming that in the above case the target symlink would
+> also be followed, and so workarounds were added for a couple of operations
+> to handle the symlink case.  Since the symlink can be handled simply by
+> following the proc symlink, these workardouds are not needed.
+> 
+> Also remove the "norace" option, which disabled the workarounds.
+> 
+> Commit bdfd66788349 ("virtiofsd: Fix xattr operations") already dealt with
+> the same issue for xattr operations.
+> 
+> Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
 
-Do you know how much memory this is? Is such memory only temporarily pinned?
+Good to have this cleanup.
 
-At least with special-cases of vfio, it's acceptable if some memory is
-temporarily pinned - we assume it's only the working set of the driver,
-which guests will not inflate as long as they don't want to shoot
-themselves in the foot.
+Acked-by: Vivek Goyal <vgoyal@redhat.com>
 
-This here sounds like the guest does not know the pinned memory is
-special, right?
+Vivek
 
--- 
-Thanks,
-
-David / dhildenb
+> ---
+>  tools/virtiofsd/passthrough_ll.c | 175 ++-----------------------------
+>  1 file changed, 6 insertions(+), 169 deletions(-)
+> 
+> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+> index 3ba1d9098460..2ce7c96085bf 100644
+> --- a/tools/virtiofsd/passthrough_ll.c
+> +++ b/tools/virtiofsd/passthrough_ll.c
+> @@ -140,7 +140,6 @@ enum {
+>  struct lo_data {
+>      pthread_mutex_t mutex;
+>      int debug;
+> -    int norace;
+>      int writeback;
+>      int flock;
+>      int posix_lock;
+> @@ -176,7 +175,6 @@ static const struct fuse_opt lo_opts[] = {
+>      { "cache=none", offsetof(struct lo_data, cache), CACHE_NONE },
+>      { "cache=auto", offsetof(struct lo_data, cache), CACHE_AUTO },
+>      { "cache=always", offsetof(struct lo_data, cache), CACHE_ALWAYS },
+> -    { "norace", offsetof(struct lo_data, norace), 1 },
+>      { "readdirplus", offsetof(struct lo_data, readdirplus_set), 1 },
+>      { "no_readdirplus", offsetof(struct lo_data, readdirplus_clear), 1 },
+>      FUSE_OPT_END
+> @@ -592,136 +590,6 @@ static void lo_getattr(fuse_req_t req, fuse_ino_t ino,
+>      fuse_reply_attr(req, &buf, lo->timeout);
+>  }
+>  
+> -/*
+> - * Increments parent->nlookup and caller must release refcount using
+> - * lo_inode_put(&parent).
+> - */
+> -static int lo_parent_and_name(struct lo_data *lo, struct lo_inode *inode,
+> -                              char path[PATH_MAX], struct lo_inode **parent)
+> -{
+> -    char procname[64];
+> -    char *last;
+> -    struct stat stat;
+> -    struct lo_inode *p;
+> -    int retries = 2;
+> -    int res;
+> -
+> -retry:
+> -    sprintf(procname, "%i", inode->fd);
+> -
+> -    res = readlinkat(lo->proc_self_fd, procname, path, PATH_MAX);
+> -    if (res < 0) {
+> -        fuse_log(FUSE_LOG_WARNING, "%s: readlink failed: %m\n", __func__);
+> -        goto fail_noretry;
+> -    }
+> -
+> -    if (res >= PATH_MAX) {
+> -        fuse_log(FUSE_LOG_WARNING, "%s: readlink overflowed\n", __func__);
+> -        goto fail_noretry;
+> -    }
+> -    path[res] = '\0';
+> -
+> -    last = strrchr(path, '/');
+> -    if (last == NULL) {
+> -        /* Shouldn't happen */
+> -        fuse_log(
+> -            FUSE_LOG_WARNING,
+> -            "%s: INTERNAL ERROR: bad path read from proc\n", __func__);
+> -        goto fail_noretry;
+> -    }
+> -    if (last == path) {
+> -        p = &lo->root;
+> -        pthread_mutex_lock(&lo->mutex);
+> -        p->nlookup++;
+> -        g_atomic_int_inc(&p->refcount);
+> -        pthread_mutex_unlock(&lo->mutex);
+> -    } else {
+> -        *last = '\0';
+> -        res = fstatat(AT_FDCWD, last == path ? "/" : path, &stat, 0);
+> -        if (res == -1) {
+> -            if (!retries) {
+> -                fuse_log(FUSE_LOG_WARNING,
+> -                         "%s: failed to stat parent: %m\n", __func__);
+> -            }
+> -            goto fail;
+> -        }
+> -        p = lo_find(lo, &stat);
+> -        if (p == NULL) {
+> -            if (!retries) {
+> -                fuse_log(FUSE_LOG_WARNING,
+> -                         "%s: failed to find parent\n", __func__);
+> -            }
+> -            goto fail;
+> -        }
+> -    }
+> -    last++;
+> -    res = fstatat(p->fd, last, &stat, AT_SYMLINK_NOFOLLOW);
+> -    if (res == -1) {
+> -        if (!retries) {
+> -            fuse_log(FUSE_LOG_WARNING,
+> -                     "%s: failed to stat last\n", __func__);
+> -        }
+> -        goto fail_unref;
+> -    }
+> -    if (stat.st_dev != inode->key.dev || stat.st_ino != inode->key.ino) {
+> -        if (!retries) {
+> -            fuse_log(FUSE_LOG_WARNING,
+> -                     "%s: failed to match last\n", __func__);
+> -        }
+> -        goto fail_unref;
+> -    }
+> -    *parent = p;
+> -    memmove(path, last, strlen(last) + 1);
+> -
+> -    return 0;
+> -
+> -fail_unref:
+> -    unref_inode_lolocked(lo, p, 1);
+> -    lo_inode_put(lo, &p);
+> -fail:
+> -    if (retries) {
+> -        retries--;
+> -        goto retry;
+> -    }
+> -fail_noretry:
+> -    errno = EIO;
+> -    return -1;
+> -}
+> -
+> -static int utimensat_empty(struct lo_data *lo, struct lo_inode *inode,
+> -                           const struct timespec *tv)
+> -{
+> -    int res;
+> -    struct lo_inode *parent;
+> -    char path[PATH_MAX];
+> -
+> -    if (S_ISLNK(inode->filetype)) {
+> -        res = utimensat(inode->fd, "", tv, AT_EMPTY_PATH);
+> -        if (res == -1 && errno == EINVAL) {
+> -            /* Sorry, no race free way to set times on symlink. */
+> -            if (lo->norace) {
+> -                errno = EPERM;
+> -            } else {
+> -                goto fallback;
+> -            }
+> -        }
+> -        return res;
+> -    }
+> -    sprintf(path, "%i", inode->fd);
+> -
+> -    return utimensat(lo->proc_self_fd, path, tv, 0);
+> -
+> -fallback:
+> -    res = lo_parent_and_name(lo, inode, path, &parent);
+> -    if (res != -1) {
+> -        res = utimensat(parent->fd, path, tv, AT_SYMLINK_NOFOLLOW);
+> -        unref_inode_lolocked(lo, parent, 1);
+> -        lo_inode_put(lo, &parent);
+> -    }
+> -
+> -    return res;
+> -}
+> -
+>  static int lo_fi_fd(fuse_req_t req, struct fuse_file_info *fi)
+>  {
+>      struct lo_data *lo = lo_data(req);
+> @@ -828,7 +696,8 @@ static void lo_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *attr,
+>          if (fi) {
+>              res = futimens(fd, tv);
+>          } else {
+> -            res = utimensat_empty(lo, inode, tv);
+> +            sprintf(procname, "%i", inode->fd);
+> +            res = utimensat(lo->proc_self_fd, procname, tv, 0);
+>          }
+>          if (res == -1) {
+>              goto out_err;
+> @@ -1129,41 +998,6 @@ static void lo_symlink(fuse_req_t req, const char *link, fuse_ino_t parent,
+>      lo_mknod_symlink(req, parent, name, S_IFLNK, 0, link);
+>  }
+>  
+> -static int linkat_empty_nofollow(struct lo_data *lo, struct lo_inode *inode,
+> -                                 int dfd, const char *name)
+> -{
+> -    int res;
+> -    struct lo_inode *parent;
+> -    char path[PATH_MAX];
+> -
+> -    if (S_ISLNK(inode->filetype)) {
+> -        res = linkat(inode->fd, "", dfd, name, AT_EMPTY_PATH);
+> -        if (res == -1 && (errno == ENOENT || errno == EINVAL)) {
+> -            /* Sorry, no race free way to hard-link a symlink. */
+> -            if (lo->norace) {
+> -                errno = EPERM;
+> -            } else {
+> -                goto fallback;
+> -            }
+> -        }
+> -        return res;
+> -    }
+> -
+> -    sprintf(path, "%i", inode->fd);
+> -
+> -    return linkat(lo->proc_self_fd, path, dfd, name, AT_SYMLINK_FOLLOW);
+> -
+> -fallback:
+> -    res = lo_parent_and_name(lo, inode, path, &parent);
+> -    if (res != -1) {
+> -        res = linkat(parent->fd, path, dfd, name, 0);
+> -        unref_inode_lolocked(lo, parent, 1);
+> -        lo_inode_put(lo, &parent);
+> -    }
+> -
+> -    return res;
+> -}
+> -
+>  static void lo_link(fuse_req_t req, fuse_ino_t ino, fuse_ino_t parent,
+>                      const char *name)
+>  {
+> @@ -1172,6 +1006,7 @@ static void lo_link(fuse_req_t req, fuse_ino_t ino, fuse_ino_t parent,
+>      struct lo_inode *parent_inode;
+>      struct lo_inode *inode;
+>      struct fuse_entry_param e;
+> +    char procname[64];
+>      int saverr;
+>  
+>      if (!is_safe_path_component(name)) {
+> @@ -1190,7 +1025,9 @@ static void lo_link(fuse_req_t req, fuse_ino_t ino, fuse_ino_t parent,
+>      e.attr_timeout = lo->timeout;
+>      e.entry_timeout = lo->timeout;
+>  
+> -    res = linkat_empty_nofollow(lo, inode, parent_inode->fd, name);
+> +    sprintf(procname, "%i", inode->fd);
+> +    res = linkat(lo->proc_self_fd, procname, parent_inode->fd, name,
+> +                 AT_SYMLINK_FOLLOW);
+>      if (res == -1) {
+>          goto out_err;
+>      }
+> -- 
+> 2.21.1
+> 
+> _______________________________________________
+> Virtio-fs mailing list
+> Virtio-fs@redhat.com
+> https://www.redhat.com/mailman/listinfo/virtio-fs
 
 
