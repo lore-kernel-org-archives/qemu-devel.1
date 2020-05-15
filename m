@@ -2,72 +2,105 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B0D2C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 07:18:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA719C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 07:20:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C44D2065C
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 07:18:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C44D2065C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8FE102065F
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 07:20:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gPMnjUlh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FE102065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZUbt-0004N0-B4
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 03:18:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40128)
+	id 1jZUeN-0007I8-QT
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 03:20:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40504)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jZUbC-0003kv-0D
- for qemu-devel@nongnu.org; Fri, 15 May 2020 03:17:38 -0400
-Resent-Date: Fri, 15 May 2020 03:17:38 -0400
-Resent-Message-Id: <E1jZUbC-0003kv-0D@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21389)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZUdf-0006TI-HA
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 03:20:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48920
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jZUbA-0007iH-3d
- for qemu-devel@nongnu.org; Fri, 15 May 2020 03:17:37 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1589527046; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=fmn/RW+TTlJs1A4R45rvtksHWsmT32iIbu41OrvsV/C1xmaBW60GVIG1Zwf3nHwEGXo9YZ4Vr/ChwvCQLhWohVix2kTmLThugN+zs1CmcU0BL1u9Xrn3wJbDEfz8XgQJ01zbv40FJ9b3X1JtBJF01tAvBnShngFojz+/ewsFCjI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1589527046;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=2iP2yoGdxz6GIFAPnvnR2BX9QAUGzvNPxu7SNBswBQQ=; 
- b=Zt7Wn55n66733M+w5zBsoM+avbeFQrhk+yrGEUMGheMNi+VrSalz+JWDGporOhSuFioe9Ur0ELsQ2z8xMsePpDd7gamsp0h+io4Ca9GLiGWJZaGjnvaBp2LxeTyesBD/tJUNPbeZE5hfmrp4frCjiL8IhV8gwjnrJTJxDjIbEEo=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1589527044615560.4037645729971;
- Fri, 15 May 2020 00:17:24 -0700 (PDT)
-Message-ID: <158952704358.2564.237218707324017184@45ef0f9c86ae>
-In-Reply-To: <20200515060424.18993-1-armbru@redhat.com>
-Subject: Re: [PULL 00/21] QOM patches for 2020-05-15
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZUdd-0008Fy-QQ
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 03:20:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589527208;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=XMk1o0OEy/p0nRIzOdSeYPWb9G28VVR5RnbYWbz2KUA=;
+ b=gPMnjUlhyV4Ot8oMKmvt9BZ/u0B6xLOBfPL/TGpSmDzwjT8CvH9Hj+9Pd9wsVj6YMebTey
+ BGlvR1RbI+P+AyitHk978j2CyuihKuuV0sCCDSvyLsX94IaaKaGRAyhVPfcwkiYAUoRRtV
+ 7Vi2UZ0/s0ZjNqaWaSC7uFI1Xm7TFpk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-47-wuVu4RQ4NVySXHfQ-ptIQQ-1; Fri, 15 May 2020 03:20:04 -0400
+X-MC-Unique: wuVu4RQ4NVySXHfQ-ptIQQ-1
+Received: by mail-wm1-f71.google.com with SMTP id l26so565460wmh.3
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 00:20:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=XMk1o0OEy/p0nRIzOdSeYPWb9G28VVR5RnbYWbz2KUA=;
+ b=OUEpq8t+WDG1yUNbKIDp11tuhAKhyqIFDfxPIiX6UQq3QA1wxjKqOEASJTcLNsfDxJ
+ UVN4xOo1PupcViX7WIrwGB/Z5RX/vCdS5EFKArFw9sfoXqmqIayakNVceRm0XRLR2842
+ gM6GZ4gIPGlT0y0dnzRCwXWxkss40KGVjnbkw6B3iLGtPhWQV9yipoew63U2FWvLEAjm
+ sFpeqEAjbN8M7Ui2ZmEq6Nr/8FPJMzn2oFkOQjxrrFnBpgjm692hdLdfDnJDpiIdgVeP
+ s/rToO8WD562k1Xg4E5IbWzaqQOiuA5X8m+s3fU3PXMJVa0ZD6VGrg5gXjZj3NMx2ouk
+ SEng==
+X-Gm-Message-State: AOAM533ggwGmNC3XwL8ICdi4/GkdUBZeHcIgfkjfN7ztr/3SKeTxiDxx
+ GBlIxTvh2CXC6IP7+DI+oZ85W+xQF5rwLEK9EMkrIDUu1VI6DLkM7STwvwtPe+w3OYVAwhlvqG0
+ kCeGUYPGJm3/7wI8=
+X-Received: by 2002:adf:f605:: with SMTP id t5mr2609426wrp.354.1589527203653; 
+ Fri, 15 May 2020 00:20:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy2D18lQUdKKgtdOBzQEi/bdAgUxK6JviQmaIGYB7SKkqzeFW112hf6f89MbAShKCXJst6mag==
+X-Received: by 2002:adf:f605:: with SMTP id t5mr2609398wrp.354.1589527203288; 
+ Fri, 15 May 2020 00:20:03 -0700 (PDT)
+Received: from [192.168.1.39] (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id t7sm2224019wrq.39.2020.05.15.00.20.02
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 15 May 2020 00:20:02 -0700 (PDT)
+Subject: Re: [PATCH] hw/ide: Make IDEDMAOps handlers take a const IDEDMA
+ pointer
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20200512194917.15807-1-philmd@redhat.com>
+ <01f5f413-d1d0-43cb-65cc-9f7bd1e59893@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <7482643e-f547-5d2c-7314-3a0ec91c047e@redhat.com>
+Date: Fri, 15 May 2020 09:20:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: armbru@redhat.com
-Date: Fri, 15 May 2020 00:17:24 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 03:17:32
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+In-Reply-To: <01f5f413-d1d0-43cb-65cc-9f7bd1e59893@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 22:56:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,107 +114,269 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUxNTA2MDQyNC4xODk5
-My0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDIwMDUxNTA2MDQyNC4xODk5My0xLWFybWJydUByZWRo
-YXQuY29tClN1YmplY3Q6IFtQVUxMIDAwLzIxXSBRT00gcGF0Y2hlcyBmb3IgMjAyMC0wNS0xNQpU
-eXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJl
-di1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3Bh
-dGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGlu
-ZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9n
-aXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNo
-ZXcvMjAyMDA1MTUwNDIyMzEuMTgyMDEtMS1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIw
-MjAwNTE1MDQyMjMxLjE4MjAxLTEtYXJtYnJ1QHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAg
-ICAgcGF0Y2hldy8yMDIwMDUxNTA3MDAyMS4yMDgxMS0xLWFybWJydUByZWRoYXQuY29tIC0+IHBh
-dGNoZXcvMjAyMDA1MTUwNzAwMjEuMjA4MTEtMS1hcm1icnVAcmVkaGF0LmNvbQogLSBbdGFnIHVw
-ZGF0ZV0gICAgICBwYXRjaGV3L2NvdmVyLjE1ODg4Nzg3NTYuZ2l0LmFsaXN0YWlyLmZyYW5jaXNA
-d2RjLmNvbSAtPiBwYXRjaGV3L2NvdmVyLjE1ODg4Nzg3NTYuZ2l0LmFsaXN0YWlyLmZyYW5jaXNA
-d2RjLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmZiYmVhNWEgaHc6IFJlbW92
-ZSB1bm5lY2Vzc2FyeSBERVZJQ0UoKSBjYXN0CjllYmE5ZjkgdmFyaW91czogUmVtb3ZlIHVubmVj
-ZXNzYXJ5IE9CSkVDVCgpIGNhc3QKN2NiOTk3ZiB0YXJnZXQ6IFJlbW92ZSB1bm5lY2Vzc2FyeSBD
-UFUoKSBjYXN0CjJjN2I1NTUgcW9tOiBEcm9wIEBlcnJwIHBhcmFtZXRlciBvZiBvYmplY3RfcHJv
-cGVydHlfZGVsKCkKM2M4ZWFlNCBzcGFwcl9wY2k6IERyb3Agc29tZSBkZWFkIGVycm9yIGhhbmRs
-aW5nCmJlNmFhOGEgcWRldjogVW5yZWFsaXplIG11c3Qgbm90IGZhaWwKOWIxNjg2YiBEcm9wIG1v
-cmUgQGVycnAgcGFyYW1ldGVycyBhZnRlciBwcmV2aW91cyBjb21taXQKYjE0MmVmNiBxb206IERy
-b3AgcGFyYW1ldGVyIEBlcnJwIG9mIG9iamVjdF9wcm9wZXJ0eV9hZGQoKSAmIGZyaWVuZHMKNjU5
-ZWY4NCBxZGV2OiBDbGVhbiB1cCBxZGV2X2Nvbm5lY3RfZ3Bpb19vdXRfbmFtZWQoKQo3ODdjMjkx
-IGh3L2FybS9iY20yODM1OiBEcm9wIGZ1dGlsZSBhdHRlbXB0cyBhdCBRT00tYWRvcHRpbmcgbWVt
-b3J5CmEyOTQwNmYgZTEwMDA6IERvbid0IHJ1biBlMTAwMF9pbnN0YW5jZV9pbml0KCkgdHdpY2UK
-MmFkMjc2NSBody9pc2Evc3VwZXJpbzogTWFrZSB0aGUgY29tcG9uZW50cyBRT00gY2hpbGRyZW4K
-ZGIxYmNlNCBzMzkweC9jcHVtb2RlbDogRml4IFVJIHRvIENQVSBmZWF0dXJlcyBwY2MtY21hYy17
-YWVzLCBlYWVzfS0yNTYKZTg3MTIwOSB0ZXN0cy9jaGVjay1xb20tcHJvcGxpc3Q6IEltcHJvdmUg
-aXRlcmF0b3IgY292ZXJhZ2UKZDk2ZDY3ZiBxb206IERyb3Agb2JqZWN0X3Byb3BlcnR5X3NldF9k
-ZXNjcmlwdGlvbigpIHBhcmFtZXRlciBAZXJycAo0MzFmODNkIHFvbTogTWFrZSBhbGwgdGhlIG9i
-amVjdF9wcm9wZXJ0eV9hZGRfRk9PKCkgcmV0dXJuIHRoZSBwcm9wZXJ0eQoxNTM1YzA5IHFvbTog
-RHJvcCBjb252ZW5pZW5jZSBtZXRob2Qgb2JqZWN0X3Byb3BlcnR5X2dldF91aW50MTZMaXN0KCkK
-NjVmNDhlMCBxb206IFNpbXBsaWZ5IG9iamVjdF9wcm9wZXJ0eV9nZXRfZW51bSgpCjlmOWI0Yzcg
-cW9tOiBEcm9wIG9iamVjdF9wcm9wZXJ0eV9kZWxfY2hpbGQoKSdzIHVudXNlZCBwYXJhbWV0ZXIg
-QGVycnAKOWQyMzg0MyBxb206IENsZWFuIHVwIGluY29uc2lzdGVudCB1c2Ugb2YgZ2NoYXIgKiB2
-cy4gY2hhciAqCjFjNDE2OTYgcW9tOiBDbGVhcmVyIHJlZmVyZW5jZSBjb3VudGluZyBpbiBvYmpl
-Y3RfaW5pdGlhbGl6ZV9jaGlsZHYoKQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8yMSBDaGVja2lu
-ZyBjb21taXQgMWM0MTY5NjlkNGRmIChxb206IENsZWFyZXIgcmVmZXJlbmNlIGNvdW50aW5nIGlu
-IG9iamVjdF9pbml0aWFsaXplX2NoaWxkdigpKQoyLzIxIENoZWNraW5nIGNvbW1pdCA5ZDIzODQz
-MzBjZjAgKHFvbTogQ2xlYW4gdXAgaW5jb25zaXN0ZW50IHVzZSBvZiBnY2hhciAqIHZzLiBjaGFy
-ICopCjMvMjEgQ2hlY2tpbmcgY29tbWl0IDlmOWI0YzdkNTNhMyAocW9tOiBEcm9wIG9iamVjdF9w
-cm9wZXJ0eV9kZWxfY2hpbGQoKSdzIHVudXNlZCBwYXJhbWV0ZXIgQGVycnApCjQvMjEgQ2hlY2tp
-bmcgY29tbWl0IDY1ZjQ4ZTA5N2YyMyAocW9tOiBTaW1wbGlmeSBvYmplY3RfcHJvcGVydHlfZ2V0
-X2VudW0oKSkKNS8yMSBDaGVja2luZyBjb21taXQgMTUzNWMwOTYyMjY0IChxb206IERyb3AgY29u
-dmVuaWVuY2UgbWV0aG9kIG9iamVjdF9wcm9wZXJ0eV9nZXRfdWludDE2TGlzdCgpKQo2LzIxIENo
-ZWNraW5nIGNvbW1pdCA0MzFmODNkNmM4YjcgKHFvbTogTWFrZSBhbGwgdGhlIG9iamVjdF9wcm9w
-ZXJ0eV9hZGRfRk9PKCkgcmV0dXJuIHRoZSBwcm9wZXJ0eSkKNy8yMSBDaGVja2luZyBjb21taXQg
-ZDk2ZDY3ZmZiZjVkIChxb206IERyb3Agb2JqZWN0X3Byb3BlcnR5X3NldF9kZXNjcmlwdGlvbigp
-IHBhcmFtZXRlciBAZXJycCkKOC8yMSBDaGVja2luZyBjb21taXQgZTg3MTIwOTA3ZWZhICh0ZXN0
-cy9jaGVjay1xb20tcHJvcGxpc3Q6IEltcHJvdmUgaXRlcmF0b3IgY292ZXJhZ2UpCjkvMjEgQ2hl
-Y2tpbmcgY29tbWl0IGRiMWJjZTRiMmFjMSAoczM5MHgvY3B1bW9kZWw6IEZpeCBVSSB0byBDUFUg
-ZmVhdHVyZXMgcGNjLWNtYWMte2FlcywgZWFlc30tMjU2KQpFUlJPUjogbGluZSBvdmVyIDkwIGNo
-YXJhY3RlcnMKIzU5OiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzX2RlZi5pbmMuaDoz
-MTQ6CitERUZfRkVBVChQQ0NfQ01BQ19BRVNfMjU2LCAicGNjLWNtYWMtYWVzLTI1NiIsIFBDQywg
-MjAsICJQQ0MgQ29tcHV0ZS1MYXN0LUJsb2NrLUNNQUMtVXNpbmctQUVTLTI1NiIpCgp0b3RhbDog
-MSBlcnJvcnMsIDAgd2FybmluZ3MsIDggbGluZXMgY2hlY2tlZAoKUGF0Y2ggOS8yMSBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgoKMTAvMjEgQ2hlY2tpbmcgY29tbWl0IDJhZDI3NjVkZjM1MyAo
-aHcvaXNhL3N1cGVyaW86IE1ha2UgdGhlIGNvbXBvbmVudHMgUU9NIGNoaWxkcmVuKQoxMS8yMSBD
-aGVja2luZyBjb21taXQgYTI5NDA2ZmJkMGRjIChlMTAwMDogRG9uJ3QgcnVuIGUxMDAwX2luc3Rh
-bmNlX2luaXQoKSB0d2ljZSkKMTIvMjEgQ2hlY2tpbmcgY29tbWl0IDc4N2MyOTE2NWYxZiAoaHcv
-YXJtL2JjbTI4MzU6IERyb3AgZnV0aWxlIGF0dGVtcHRzIGF0IFFPTS1hZG9wdGluZyBtZW1vcnkp
-CjEzLzIxIENoZWNraW5nIGNvbW1pdCA2NTllZjg0MTI3NDYgKHFkZXY6IENsZWFuIHVwIHFkZXZf
-Y29ubmVjdF9ncGlvX291dF9uYW1lZCgpKQoxNC8yMSBDaGVja2luZyBjb21taXQgYjE0MmVmNjhm
-YjdhIChxb206IERyb3AgcGFyYW1ldGVyIEBlcnJwIG9mIG9iamVjdF9wcm9wZXJ0eV9hZGQoKSAm
-IGZyaWVuZHMpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMTE6IEZJTEU6IGJh
-Y2tlbmRzL2hvc3RtZW0tZmlsZS5jOjE4NzoKKyAgICAgICAgZmlsZV9tZW1vcnlfYmFja2VuZF9n
-ZXRfZGlzY2FyZF9kYXRhLCBmaWxlX21lbW9yeV9iYWNrZW5kX3NldF9kaXNjYXJkX2RhdGEpOwoK
-V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEwODI6IEZJTEU6IGh3L2FybS9yYXNw
-aS5jOjI4NzoKKyAgICBvYmplY3RfcHJvcGVydHlfYWRkX2NvbnN0X2xpbmsoT0JKRUNUKCZzLT5z
-b2MpLCAicmFtIiwgT0JKRUNUKG1hY2hpbmUtPnJhbSkpOwoKV0FSTklORzogbGluZSBvdmVyIDgw
-IGNoYXJhY3RlcnMKIzMxMTY6IEZJTEU6IGh3L3BwYy9zcGFwci5jOjMzMzY6CisgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICZzcGFwci0+a2VybmVsX2FkZHIsIE9CSl9QUk9QX0ZM
-QUdfUkVBRFdSSVRFKTsKCnRvdGFsOiAwIGVycm9ycywgMyB3YXJuaW5ncywgNDQ4OCBsaW5lcyBj
-aGVja2VkCgpQYXRjaCAxNC8yMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNS8yMSBDaGVj
-a2luZyBjb21taXQgOWIxNjg2YmE0MDIxIChEcm9wIG1vcmUgQGVycnAgcGFyYW1ldGVycyBhZnRl
-ciBwcmV2aW91cyBjb21taXQpCjE2LzIxIENoZWNraW5nIGNvbW1pdCBiZTZhYThhYmRmZGEgKHFk
-ZXY6IFVucmVhbGl6ZSBtdXN0IG5vdCBmYWlsKQoxNy8yMSBDaGVja2luZyBjb21taXQgM2M4ZWFl
-NDM3MzRhIChzcGFwcl9wY2k6IERyb3Agc29tZSBkZWFkIGVycm9yIGhhbmRsaW5nKQoxOC8yMSBD
-aGVja2luZyBjb21taXQgMmM3YjU1NWIxN2VhIChxb206IERyb3AgQGVycnAgcGFyYW1ldGVyIG9m
-IG9iamVjdF9wcm9wZXJ0eV9kZWwoKSkKMTkvMjEgQ2hlY2tpbmcgY29tbWl0IDdjYjk5N2ZjYmJi
-YyAodGFyZ2V0OiBSZW1vdmUgdW5uZWNlc3NhcnkgQ1BVKCkgY2FzdCkKMjAvMjEgQ2hlY2tpbmcg
-Y29tbWl0IDllYmE5ZjllN2RhNCAodmFyaW91czogUmVtb3ZlIHVubmVjZXNzYXJ5IE9CSkVDVCgp
-IGNhc3QpCjIxLzIxIENoZWNraW5nIGNvbW1pdCBmYmJlYTVhOWIxZjkgKGh3OiBSZW1vdmUgdW5u
-ZWNlc3NhcnkgREVWSUNFKCkgY2FzdCkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
-ZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDov
-L3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA1MTUwNjA0MjQuMTg5OTMtMS1hcm1icnVAcmVkaGF0LmNv
-bS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
-dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
-bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 5/14/20 10:21 PM, John Snow wrote:
+> 
+> 
+> On 5/12/20 3:49 PM, Philippe Mathieu-Daudé wrote:
+>> Handlers don't need to modify the IDEDMA structure.
+>> Make it const.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> 
+> I'll trust your judgment. As long as it still compiles and passes
+> qtests, I'm happy if you're happy.
+
+I guess "all data is modifyable until proven otherwise" is one of the 
+'defensive programming' rules.
+
+https://wiki.sei.cmu.edu/confluence/display/c/DCL00-C.+Const-qualify+immutable+objects
+
+"Immutable objects should be const-qualified. Enforcing object 
+immutability using const qualification helps ensure the correctness and 
+security of applications."
+
+It is also a hint to static analyzer and compilers for optimization.
+
+https://en.wikipedia.org/wiki/Const_(computer_programming)#Consequences
+
+"A const parameter in pass-by-reference means that the referenced value 
+is not modified – it is part of the contract –"
+
+> 
+> Acked-by: John Snow <jsnow@redhat.com>
+
+Thanks!
+
+> 
+>> ---
+>>   include/hw/ide/internal.h | 12 ++++++------
+>>   hw/ide/ahci.c             | 18 +++++++++---------
+>>   hw/ide/core.c             |  6 +++---
+>>   hw/ide/macio.c            |  6 +++---
+>>   hw/ide/pci.c              | 12 ++++++------
+>>   5 files changed, 27 insertions(+), 27 deletions(-)
+>>
+>> diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
+>> index 55da35d768..1a7869e85d 100644
+>> --- a/include/hw/ide/internal.h
+>> +++ b/include/hw/ide/internal.h
+>> @@ -322,12 +322,12 @@ typedef enum { IDE_HD, IDE_CD, IDE_CFATA } IDEDriveKind;
+>>   
+>>   typedef void EndTransferFunc(IDEState *);
+>>   
+>> -typedef void DMAStartFunc(IDEDMA *, IDEState *, BlockCompletionFunc *);
+>> -typedef void DMAVoidFunc(IDEDMA *);
+>> -typedef int DMAIntFunc(IDEDMA *, bool);
+>> -typedef int32_t DMAInt32Func(IDEDMA *, int32_t len);
+>> -typedef void DMAu32Func(IDEDMA *, uint32_t);
+>> -typedef void DMAStopFunc(IDEDMA *, bool);
+>> +typedef void DMAStartFunc(const IDEDMA *, IDEState *, BlockCompletionFunc *);
+>> +typedef void DMAVoidFunc(const IDEDMA *);
+>> +typedef int DMAIntFunc(const IDEDMA *, bool);
+>> +typedef int32_t DMAInt32Func(const IDEDMA *, int32_t len);
+>> +typedef void DMAu32Func(const IDEDMA *, uint32_t);
+>> +typedef void DMAStopFunc(const IDEDMA *, bool);
+>>   
+>>   struct unreported_events {
+>>       bool eject_request;
+>> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+>> index 13d91e109a..168d34e9f2 100644
+>> --- a/hw/ide/ahci.c
+>> +++ b/hw/ide/ahci.c
+>> @@ -44,7 +44,7 @@ static int handle_cmd(AHCIState *s, int port, uint8_t slot);
+>>   static void ahci_reset_port(AHCIState *s, int port);
+>>   static bool ahci_write_fis_d2h(AHCIDevice *ad);
+>>   static void ahci_init_d2h(AHCIDevice *ad);
+>> -static int ahci_dma_prepare_buf(IDEDMA *dma, int32_t limit);
+>> +static int ahci_dma_prepare_buf(const IDEDMA *dma, int32_t limit);
+>>   static bool ahci_map_clb_address(AHCIDevice *ad);
+>>   static bool ahci_map_fis_address(AHCIDevice *ad);
+>>   static void ahci_unmap_clb_address(AHCIDevice *ad);
+>> @@ -1338,7 +1338,7 @@ out:
+>>   }
+>>   
+>>   /* Transfer PIO data between RAM and device */
+>> -static void ahci_pio_transfer(IDEDMA *dma)
+>> +static void ahci_pio_transfer(const IDEDMA *dma)
+>>   {
+>>       AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
+>>       IDEState *s = &ad->port.ifs[0];
+>> @@ -1397,7 +1397,7 @@ out:
+>>       }
+>>   }
+>>   
+>> -static void ahci_start_dma(IDEDMA *dma, IDEState *s,
+>> +static void ahci_start_dma(const IDEDMA *dma, IDEState *s,
+>>                              BlockCompletionFunc *dma_cb)
+>>   {
+>>       AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
+>> @@ -1406,7 +1406,7 @@ static void ahci_start_dma(IDEDMA *dma, IDEState *s,
+>>       dma_cb(s, 0);
+>>   }
+>>   
+>> -static void ahci_restart_dma(IDEDMA *dma)
+>> +static void ahci_restart_dma(const IDEDMA *dma)
+>>   {
+>>       /* Nothing to do, ahci_start_dma already resets s->io_buffer_offset.  */
+>>   }
+>> @@ -1415,7 +1415,7 @@ static void ahci_restart_dma(IDEDMA *dma)
+>>    * IDE/PIO restarts are handled by the core layer, but NCQ commands
+>>    * need an extra kick from the AHCI HBA.
+>>    */
+>> -static void ahci_restart(IDEDMA *dma)
+>> +static void ahci_restart(const IDEDMA *dma)
+>>   {
+>>       AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
+>>       int i;
+>> @@ -1432,7 +1432,7 @@ static void ahci_restart(IDEDMA *dma)
+>>    * Called in DMA and PIO R/W chains to read the PRDT.
+>>    * Not shared with NCQ pathways.
+>>    */
+>> -static int32_t ahci_dma_prepare_buf(IDEDMA *dma, int32_t limit)
+>> +static int32_t ahci_dma_prepare_buf(const IDEDMA *dma, int32_t limit)
+>>   {
+>>       AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
+>>       IDEState *s = &ad->port.ifs[0];
+>> @@ -1453,7 +1453,7 @@ static int32_t ahci_dma_prepare_buf(IDEDMA *dma, int32_t limit)
+>>    * Called via dma_buf_commit, for both DMA and PIO paths.
+>>    * sglist destruction is handled within dma_buf_commit.
+>>    */
+>> -static void ahci_commit_buf(IDEDMA *dma, uint32_t tx_bytes)
+>> +static void ahci_commit_buf(const IDEDMA *dma, uint32_t tx_bytes)
+>>   {
+>>       AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
+>>   
+>> @@ -1461,7 +1461,7 @@ static void ahci_commit_buf(IDEDMA *dma, uint32_t tx_bytes)
+>>       ad->cur_cmd->status = cpu_to_le32(tx_bytes);
+>>   }
+>>   
+>> -static int ahci_dma_rw_buf(IDEDMA *dma, bool is_write)
+>> +static int ahci_dma_rw_buf(const IDEDMA *dma, bool is_write)
+>>   {
+>>       AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
+>>       IDEState *s = &ad->port.ifs[0];
+>> @@ -1486,7 +1486,7 @@ static int ahci_dma_rw_buf(IDEDMA *dma, bool is_write)
+>>       return 1;
+>>   }
+>>   
+>> -static void ahci_cmd_done(IDEDMA *dma)
+>> +static void ahci_cmd_done(const IDEDMA *dma)
+>>   {
+>>       AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
+>>   
+>> diff --git a/hw/ide/core.c b/hw/ide/core.c
+>> index 689bb36409..d997a78e47 100644
+>> --- a/hw/ide/core.c
+>> +++ b/hw/ide/core.c
+>> @@ -2570,16 +2570,16 @@ static void ide_init1(IDEBus *bus, int unit)
+>>                                              ide_sector_write_timer_cb, s);
+>>   }
+>>   
+>> -static int ide_nop_int(IDEDMA *dma, bool is_write)
+>> +static int ide_nop_int(const IDEDMA *dma, bool is_write)
+>>   {
+>>       return 0;
+>>   }
+>>   
+>> -static void ide_nop(IDEDMA *dma)
+>> +static void ide_nop(const IDEDMA *dma)
+>>   {
+>>   }
+>>   
+>> -static int32_t ide_nop_int32(IDEDMA *dma, int32_t l)
+>> +static int32_t ide_nop_int32(const IDEDMA *dma, int32_t l)
+>>   {
+>>       return 0;
+>>   }
+>> diff --git a/hw/ide/macio.c b/hw/ide/macio.c
+>> index a9f25e5d02..5b8098268d 100644
+>> --- a/hw/ide/macio.c
+>> +++ b/hw/ide/macio.c
+>> @@ -376,17 +376,17 @@ static void macio_ide_reset(DeviceState *dev)
+>>       ide_bus_reset(&d->bus);
+>>   }
+>>   
+>> -static int ide_nop_int(IDEDMA *dma, bool is_write)
+>> +static int ide_nop_int(const IDEDMA *dma, bool is_write)
+>>   {
+>>       return 0;
+>>   }
+>>   
+>> -static int32_t ide_nop_int32(IDEDMA *dma, int32_t l)
+>> +static int32_t ide_nop_int32(const IDEDMA *dma, int32_t l)
+>>   {
+>>       return 0;
+>>   }
+>>   
+>> -static void ide_dbdma_start(IDEDMA *dma, IDEState *s,
+>> +static void ide_dbdma_start(const IDEDMA *dma, IDEState *s,
+>>                               BlockCompletionFunc *cb)
+>>   {
+>>       MACIOIDEState *m = container_of(dma, MACIOIDEState, dma);
+>> diff --git a/hw/ide/pci.c b/hw/ide/pci.c
+>> index 97347f07f1..5e85c4ad17 100644
+>> --- a/hw/ide/pci.c
+>> +++ b/hw/ide/pci.c
+>> @@ -103,7 +103,7 @@ const MemoryRegionOps pci_ide_data_le_ops = {
+>>       .endianness = DEVICE_LITTLE_ENDIAN,
+>>   };
+>>   
+>> -static void bmdma_start_dma(IDEDMA *dma, IDEState *s,
+>> +static void bmdma_start_dma(const IDEDMA *dma, IDEState *s,
+>>                               BlockCompletionFunc *dma_cb)
+>>   {
+>>       BMDMAState *bm = DO_UPCAST(BMDMAState, dma, dma);
+>> @@ -126,7 +126,7 @@ static void bmdma_start_dma(IDEDMA *dma, IDEState *s,
+>>    * IDEState.io_buffer_size will contain the number of bytes described
+>>    * by the PRDs, whether or not we added them to the sglist.
+>>    */
+>> -static int32_t bmdma_prepare_buf(IDEDMA *dma, int32_t limit)
+>> +static int32_t bmdma_prepare_buf(const IDEDMA *dma, int32_t limit)
+>>   {
+>>       BMDMAState *bm = DO_UPCAST(BMDMAState, dma, dma);
+>>       IDEState *s = bmdma_active_if(bm);
+>> @@ -181,7 +181,7 @@ static int32_t bmdma_prepare_buf(IDEDMA *dma, int32_t limit)
+>>   }
+>>   
+>>   /* return 0 if buffer completed */
+>> -static int bmdma_rw_buf(IDEDMA *dma, bool is_write)
+>> +static int bmdma_rw_buf(const IDEDMA *dma, bool is_write)
+>>   {
+>>       BMDMAState *bm = DO_UPCAST(BMDMAState, dma, dma);
+>>       IDEState *s = bmdma_active_if(bm);
+>> @@ -230,7 +230,7 @@ static int bmdma_rw_buf(IDEDMA *dma, bool is_write)
+>>       return 1;
+>>   }
+>>   
+>> -static void bmdma_set_inactive(IDEDMA *dma, bool more)
+>> +static void bmdma_set_inactive(const IDEDMA *dma, bool more)
+>>   {
+>>       BMDMAState *bm = DO_UPCAST(BMDMAState, dma, dma);
+>>   
+>> @@ -242,7 +242,7 @@ static void bmdma_set_inactive(IDEDMA *dma, bool more)
+>>       }
+>>   }
+>>   
+>> -static void bmdma_restart_dma(IDEDMA *dma)
+>> +static void bmdma_restart_dma(const IDEDMA *dma)
+>>   {
+>>       BMDMAState *bm = DO_UPCAST(BMDMAState, dma, dma);
+>>   
+>> @@ -257,7 +257,7 @@ static void bmdma_cancel(BMDMAState *bm)
+>>       }
+>>   }
+>>   
+>> -static void bmdma_reset(IDEDMA *dma)
+>> +static void bmdma_reset(const IDEDMA *dma)
+>>   {
+>>       BMDMAState *bm = DO_UPCAST(BMDMAState, dma, dma);
+>>   
+>>
+> 
+
 
