@@ -2,75 +2,76 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A328C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 06:30:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2C8DC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 06:30:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2A622065F
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 06:30:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 995722065F
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 06:30:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fkAvkm33"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2A622065F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uvAvMhXr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 995722065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZTrU-0005MF-TY
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 02:30:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60398)
+	id 1jZTrw-0005hR-MG
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 02:30:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60312)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jZTqY-0003gC-Jg; Fri, 15 May 2020 02:29:26 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:43685)
+ id 1jZTqL-0003In-Jx; Fri, 15 May 2020 02:29:13 -0400
+Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:35958)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jZTqX-0000ny-PF; Fri, 15 May 2020 02:29:26 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id x15so564945ybr.10;
- Thu, 14 May 2020 23:29:25 -0700 (PDT)
+ id 1jZTqK-0000iF-L1; Fri, 15 May 2020 02:29:13 -0400
+Received: by mail-yb1-xb42.google.com with SMTP id a10so581971ybc.3;
+ Thu, 14 May 2020 23:29:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=xczrdqwIAlrjpMR2PqQaM5/RVhHQoJnWbvY7Au9+RnQ=;
- b=fkAvkm33WY79kgWkyQ7iK6EB+MHg/IT6SC8nNz1vCfXS15+TGPV2P84eulYb+PoQ1G
- panJcdtGtsVQUgqKGeA2/ZQ2sPeaL78eW9amr1CvnvIAx5yg4KB3feUaMFRZCXtdA4jz
- JUcFCdp6cMFIgi2m0a2CvyYJ7+s+98po/7vm2m8O5oz++Y1yRCDpLvo2IbVselsryrCA
- MMNhprB7dx8wkbXnbMubqXNDM8NATn8BIl4sv2V9YuYEdD6DcQOUorw6Xj51IbIJydDG
- o4G8RzXQe8nEr6ZXAcxPXhbgCmrzHsOEqtJLF5JRpRx2M0mbAOx6U0kLUtksYzB9ACQO
- 5q0g==
+ :cc; bh=zndiXgow/8skrx8wFzYmYDP1ckh6o/SGj7ttunerlk4=;
+ b=uvAvMhXrZSpvvfr8p7dXKx0nsUmmHzURe8rDtd0bSn725vWiZWJb+M5e5BxVB2NrVG
+ UtiR1Cv6+T3V0otbax5rj0n5HdHDcYFdt1cmjD5CRsXisgbeWE4K/Qam9CtUmuqINr8s
+ uaChfbMzIMs3he3R/kX1WzcrPZXNoRJetcLn4rcdDXsO2xLfFvowbR+c0hLQw8hIU1Ja
+ klJImxFOrlFr6HnTYZzPzvqf/0F8Tmb69jG+Da8jyO0RTe86nF3i2DwgYu8HUy5REIny
+ b2UCKfprlCoq24xjQWcl5V4AixCJ52X1sxKwneTCaBYhqRAU677lPZNBKCM5FgAL07AH
+ uLxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=xczrdqwIAlrjpMR2PqQaM5/RVhHQoJnWbvY7Au9+RnQ=;
- b=lD5o6hxnsl377MDaaWv4rme53bpbTzVJTcie7lM2+NbejZcjWemMbTudgSmz0ZG5P5
- pj8LB5Ps6qxHwhBf0Dy6hNAzGnqJFHfE6yBTVdLgrUVflG54duxbRB7D6mTcSekIcag7
- 057gAeFfA8Mf6Ly/DWCwWmjj2NogX852R/YPnmYTOvqEIHnT7tN+XL2qpcuXHXQ9YDJl
- 97SvAdiMFLOVzY/pULLbeHKQVOKlN9a3G+ocXl/dCf/Co6Xgr7DcExYbpt7qa/MIe0BN
- zsX9WqgQXBWlNA9yf0oN4TtW5rM4J7LKOgI2UqBFkHKkGSAN43qx74WTekWB+um6Z2uT
- Sz3g==
-X-Gm-Message-State: AOAM530G3+5DbsRHizruFqzCMWT9oUHbvUbD3J9UXNPXiwWx8hszxeDD
- 9masCbne0pGJY1puFxO+gHxJdBR/+2fs8jTl/zs=
-X-Google-Smtp-Source: ABdhPJwvV4NOyCUkWPdB0acVyI3ryS5jEFz23OrjCkogAz25FpouFYEtifz67XJ7NG8eqYwcqKgwHCWJNzLd1EWzMZs=
-X-Received: by 2002:a25:bdc8:: with SMTP id g8mr3051045ybk.122.1589524164506; 
- Thu, 14 May 2020 23:29:24 -0700 (PDT)
+ bh=zndiXgow/8skrx8wFzYmYDP1ckh6o/SGj7ttunerlk4=;
+ b=iWLudIWtQiR5zm1YzyjPo9IT6nJEjZbRt3YqatZti88ASIULaJiHgc77GjoIf/3T81
+ mLsNvlxQBaB93QGgQ4bWP/LgVeZ0/jjIxnCoi1AiheDY/NbasPpQHMDNT6IPzaGLcF4d
+ Z9/5gN52/g4oxUFCHKkvu+9c7IPEZYrRv6VZdpZLZ0lrbTNzX/fDJ78h77PMGdtPzkWc
+ +79/yLNubHqtJUzy2RlsA3s0LajIjG1ZT4HduzgITrYw35SkY6g56KjM0WgM0bnNmuRl
+ 5LDtVr0nxEtsPFE6Oz1WZN/aQwIoodAqGfslmAGm1VPnNt9dKTcS9Md7aN7aA2Ruybq3
+ 4oQQ==
+X-Gm-Message-State: AOAM533ogx8RrXJaRRlyac+w3WbR5lYAD9D67fBlvM+RfIorI80iSLPS
+ I/iSZ2AI/ysmgIi5eQFII66EbxGY1OQyeMzruUo=
+X-Google-Smtp-Source: ABdhPJzZJvmnuHFQbd5RI60VqnLNVOWG59GsyClT214BDEVlfez8xoYHykhhDvTjlVxFNJrff2BrYbCTsBpEvzKGowc=
+X-Received: by 2002:a25:9206:: with SMTP id b6mr3301036ybo.387.1589524150687; 
+ Thu, 14 May 2020 23:29:10 -0700 (PDT)
 MIME-Version: 1.0
 References: <cover.1588878756.git.alistair.francis@wdc.com>
- <12f00eacda584976c310b55f426b2960969231a6.1588878756.git.alistair.francis@wdc.com>
-In-Reply-To: <12f00eacda584976c310b55f426b2960969231a6.1588878756.git.alistair.francis@wdc.com>
+ <246b1d1fa8d1ad334152ace0cad21e8f40d53e7f.1588878756.git.alistair.francis@wdc.com>
+In-Reply-To: <246b1d1fa8d1ad334152ace0cad21e8f40d53e7f.1588878756.git.alistair.francis@wdc.com>
 From: Bin Meng <bmeng.cn@gmail.com>
-Date: Fri, 15 May 2020 14:29:13 +0800
-Message-ID: <CAEUhbmVboOM+PSsAuddM=CxcHfkOBA-bbUp1pRTrRdi5eS4ypA@mail.gmail.com>
-Subject: Re: [PATCH v2 7/9] riscv/opentitan: Connect the PLIC device
+Date: Fri, 15 May 2020 14:28:59 +0800
+Message-ID: <CAEUhbmXnAcXPsa90JuHaqCu0HHot+dScx+mH8rR=SetxJx-ajA@mail.gmail.com>
+Subject: Re: [PATCH v2 9/9] target/riscv: Use a smaller guess size for no-MMU
+ PMP
 To: Alistair Francis <alistair.francis@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b41;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb41.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b42;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb42.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -100,15 +101,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 8, 2020 at 3:22 AM Alistair Francis
+On Fri, May 8, 2020 at 3:29 AM Alistair Francis
 <alistair.francis@wdc.com> wrote:
 >
 > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  hw/riscv/opentitan.c         | 19 +++++++++++++++++--
->  include/hw/riscv/opentitan.h |  3 +++
->  2 files changed, 20 insertions(+), 2 deletions(-)
+>  target/riscv/pmp.c | 19 ++++++++++++++-----
+>  1 file changed, 14 insertions(+), 5 deletions(-)
 >
+> diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
+> index 0e6b640fbd..5aba4d13ea 100644
+> --- a/target/riscv/pmp.c
+> +++ b/target/riscv/pmp.c
+> @@ -233,12 +233,21 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
+>          return true;
+>      }
+>
+> -    /*
+> -     * if size is unknown (0), assume that all bytes
+> -     * from addr to the end of the page will be accessed.
+> -     */
+>      if (size == 0) {
+> -        pmp_size = -(addr | TARGET_PAGE_MASK);
+> +        if (!riscv_feature(env, RISCV_FEATURE_MMU)) {
+> +            /*
+> +             * if size is unknown (0), assume that all bytes
+> +             * from addr to the end of the page will be accessed.
+> +             */
+> +            pmp_size = -(addr | TARGET_PAGE_MASK);
+> +        } else {
+> +            /*
+> +             * If size is unknown (0) and we don't have an MMU,
+> +             * just guess the size as the xlen as we don't want to
+> +             * access an entire page worth.
+> +             */
 
-Reviewed-by: Bin Meng <bin.meng@windriver.com>
+It looks the comment does not match the code logic. This else branch
+is the MMU branch.
+
+> +            pmp_size = sizeof(target_ulong);
+> +        }
+>      } else {
+>          pmp_size = size;
+>      }
+> --
+
+Regards,
+Bin
 
