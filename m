@@ -2,94 +2,126 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32BE1C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 11:15:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2709C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 11:16:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F4199204EF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 11:15:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7AD06204EF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 11:16:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="brbWciR+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F4199204EF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="GPGhl67A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AD06204EF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZYJK-0004pD-07
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 07:15:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55842)
+	id 1jZYKd-0006R6-NU
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 07:16:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56774)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jZYFx-0001k0-Ug
- for qemu-devel@nongnu.org; Fri, 15 May 2020 07:11:57 -0400
-Received: from mout.web.de ([212.227.17.12]:45535)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1jZYFw-0008EZ-TU
- for qemu-devel@nongnu.org; Fri, 15 May 2020 07:11:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1589541100;
- bh=V8Ro8PCn+awct1ifQ7K17SdfEaWVDnw4fl1+hJCAEU0=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=brbWciR+gwN+EtGsRqLvfv+KYpyupVDNlJAn5fWby/RuZwefC1ciUiZ1YfF26mf93
- NPl72WGnnOgJS+4pVGMyksdSw5/q5fLHjP5gc1WZnWu/15AYNTcEjtiC+mABREG4kt
- 2lpWyiLelLJSzfozjQI8xAElmtq024voOMKpvy/0=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([94.134.180.164]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1M59jC-1jYSK73Nqe-001DJe; Fri, 15
- May 2020 13:11:39 +0200
-Date: Fri, 15 May 2020 13:11:38 +0200
-From: Lukas Straub <lukasstraub2@web.de>
-To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH v5 1/6] net/colo-compare.c: Create event_bh with the right
- AioContext
-Message-ID: <b5be719bf9c438ad4dafdc2fdb4ed87159065e6b.1589540787.git.lukasstraub2@web.de>
-In-Reply-To: <cover.1589540787.git.lukasstraub2@web.de>
-References: <cover.1589540787.git.lukasstraub2@web.de>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jZYJQ-0005RY-HL; Fri, 15 May 2020 07:15:32 -0400
+Received: from mail-eopbgr60114.outbound.protection.outlook.com
+ ([40.107.6.114]:22498 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jZYJN-0000OM-HA; Fri, 15 May 2020 07:15:31 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TEB/KGvFwTQAYr0HHZDX/SooRwiwoMFbUgNrXAegUOnaXXFiUx/C1YFQRqq3sEbEEyhSFfCF/tdHoJtGhgnccrp5EmOCVspRrqjE93mdvVzDgB//tWASZlKWjlzVnSMiIfCEEH2FDt+Yjz32/mWt1MvLJOvBBz43Tv73gqy5fk5UQLoJyha4GS0zf87aJ8ePMFmXxLjGFVJ5LypdkSmuab0XZNZWeABpAHpFaMnISFdG/ilAMqeahhn0GmITNFGKXXGThROmJ31pxjiguZgTT5SrkLFf9n3npl5O5RaVSqEzNr2ojnIn+aOSY1R8ggzZCHiw2xpHsr0i9KPKZ5nMNA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BmYbSHmZKZPTSj+L3lPjYdHvVSsY7+2rHYJrA31A5mM=;
+ b=D2ic8kw2Ibnmi6mL6H+15H0UUzKyWr51reo9DqOPWy4nZ+odr334Y4HN6xuzvo9ShdQTkvAFa5vDaw0k8TRTW7UobXMdPJWGQWriQxuyf/s9afqbz8MHqAO2Rrj+Wiq5gMhkc12oQX9nWUy0OgQSp7H4urN4QsvHDSe9J7c+/+2qBf8P9YsYOh2YDsJ06kTPjKXEqT58D6peBeDDgxnp6LG65XX9/PuIKqHwnOraXyNRQ0mCmkYFh0Ht9pp1vS9CwpKzrUqpn0if8Vb+D9xxqdAHgPfZoda84O5fYs/1aCPWs4CFmxLEvn8/hcqtjcVPLyVAf8QNncEtKqINLeTyFg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BmYbSHmZKZPTSj+L3lPjYdHvVSsY7+2rHYJrA31A5mM=;
+ b=GPGhl67At2v/aJ0kLvmHbnIlUFeWTVX5R753ReIV916wn2H1xWDuvKxRLHamv9EZeIo7AqKZVlT4H/zv+GjlE9k8TJzDFpLtsEtOgrAAvUZL2peStQac9P6SDutdrR1xaag9WN7EikIYf8ocVhh+5wzn2vwq3B1EPZHK2019wGE=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5479.eurprd08.prod.outlook.com (2603:10a6:20b:104::12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.26; Fri, 15 May
+ 2020 11:15:25 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::acfa:5:88c8:b7b9%4]) with mapi id 15.20.3000.016; Fri, 15 May 2020
+ 11:15:25 +0000
+Subject: Re: [PATCH v2 0/5] fix migration with bitmaps and mirror
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, Peter Krempa <pkrempa@redhat.com>
+References: <20191219085106.22309-1-vsementsov@virtuozzo.com>
+ <20191219103638.GJ4914@andariel.pipo.sk>
+ <a5015250-46f4-c6ed-92b9-779f885e8a4a@virtuozzo.com>
+ <20200403112358.GV578401@andariel.pipo.sk>
+ <c25fb60b-9072-294f-847b-9b650292171b@redhat.com>
+ <738cbfd7-9ec8-7043-923a-0510929e73e2@virtuozzo.com>
+Message-ID: <acecd801-9486-6dea-d06c-19b7ce6d77b3@virtuozzo.com>
+Date: Fri, 15 May 2020 14:15:22 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
+In-Reply-To: <738cbfd7-9ec8-7043-923a-0510929e73e2@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR2P281CA0015.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a::25) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/0VZdIhnMt.95UK.BCFwRk63";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:UaxdX+O290qLgsa8UWIDFt/lMcbTzHlpvbL0edd/IFhzpw4v/1d
- SORb9A9UL/KTQ6rxE6Go7XXpKFjtk1aOm/oxsQN/jP89JkqzETx9/OwOaq7WJwlxhQ8IEQZ
- Lmh59fHCpzjijH/dUet0pKhVyOB7JVduIA5/A/NrbdlyGy8zhwnusKh0AQ7NP7+VZ+jKmpt
- dUxQ8Ks1l/YnEuTyHtfVg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:TAbGL+UbG44=:OtnPRtzapNhuLA15sfnaxC
- /O3tv15JhxB8Rb5pVnthvS22YQH8fmzkNGSwTphdq2TCRn257NwMkhdpSDrm8FQP27mGrj3sL
- PV02w0novpyyyb9qLixgmYQYemZHf/W0GavCLIc1IZKb/oC0uoYX3MB4KeyJYkrWn5zjtDDKW
- 32++zTAPHBaaqDPXFYqZTMrK2f2MvpaV89wEPa4DAl2IF9nnbqteIZgf1p0JKIQH7KLRyFpSh
- 4zPuAVrHVw6WcyHyFXLyiP/vGsqFNSRGSjU3aA7/RjGv7XwzXzB7U/49UzCrnPCiOJjlTcFDx
- F1FQgTZHzwJWq6u/RZvc07V+pLEA4lR8bGSShUu6qoE9HMh/h1mBNJMsHE2y0S8W/elgrW6Rq
- 4vmgF4qx7Wafh2rCdybT7c3FCQ7Gpg5VV/DkK2vx8R4/9uZ8njGqVcu+JPCuageJTvEE5nQnG
- T2+qjVumFT20RywgsJAt9QzsY2ZE6A6taB/ELc/CV8scRBcSqDKIzdfVEQxBRxiWczCjXHmgc
- vm/mxScoqF0WLsNcsic2e289EfpAYCEcTzLu+fUvfstBo9bTKZU6e1ezzh8bCEindQbo+nAps
- O1qrU5KLJXPaA3MTM7du3/YAIHqJvKT1yJhdtDlTKEUDn2uHNEeb52h9Mcyykyo8NXjHQXgfn
- mzJd5mWjIY540ycJlHt43op4KgiXYhRhrKUcRlbILAjk6JJzAoKdG/EyPW2/VIS/JRfai/fS6
- 0hh1wWun0oK1w7KOZzNA4oaC4z8qw7/1ctEwxdDNMqY1wu2TSvC/O/mTkGAN4kakaKFphX8Bh
- qjZscL+TXC+pxAq/3j5CWBPF2P2kybFghu4VC0z9uJuUJ9puXcCFlmkXGdd4UkTg1joD2sPnI
- BD5n8fS+u/XI5zhjxo4+WnRDKKL23EbWb3Eo9PAHQujBJs0wTK41RideqYFPuTLu6jY6jeCzn
- 6GEi60ALhcIh62pO7Eol5vQQCnyIqLCqa8aS8Ciqupxpk9EKn/4+AR0oa+gEKlx3iguaHp60o
- ZUvcnEQP1jVsBTY/MoI921S7IInBvltqrX/3hSmWGhuhS9Zqi0z5tvm1Vz8uo4Lf0FOzAESdz
- HD5Tu9iUckEvpmu3IPPlEEq5LmuuX60GJ8OKxNaBmVNUMndaXlYTpya08oYh6e898oW33YNct
- R3RAu76TXYawB6FHbIRreUk9T5BLlqNtgsqyRZRvIoMzFyI7GVLr564w0VD9oJnd7nINhQoHn
- f42cL/CLZyyttMVIf
-Received-SPF: pass client-ip=212.227.17.12; envelope-from=lukasstraub2@web.de;
- helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 07:11:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -24
-X-Spam_score: -2.5
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.184) by
+ FR2P281CA0015.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:a::25) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3000.25 via Frontend Transport; Fri, 15 May 2020 11:15:24 +0000
+X-Originating-IP: [185.215.60.184]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a5e8ee05-efda-468e-b70a-08d7f8c14457
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5479:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5479A749E3945519C1BE4000C1BD0@AM7PR08MB5479.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-Forefront-PRVS: 04041A2886
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ySACiKd81PRrd9qAXjMYE613nrNoKs8G9VpogJyjP/2IH7XV5jXCjBh9UuLzxGrojWpvkjktWp3GxqOe+urDqLiQgbQZXOlsg9jjy9dDjbKDWq7DEnp6RrPdp+qnWbs5leUw2UzjZLoeDvJABR3YOg/tmn1xpRUohRkWcnJkK9H7j2dDW86UVg2Htr+TqXyleLxudOzp9xhu9o7JSpoZhJgarJUvIfJpOZUVOwGh+HY76MFSlzpxC4/9/KI2X8u0t6txct7yQYNAj8aMhUdkz76qoCJ3GgXPYmYYqGdgexfdc15y02oUvoRoF4Nq0KIVoscjNmLezfN/76i93gigoj1vTlE84fN4ebM6fNEZJrZrNok5emFzuZf0FfrGSnaTWfK/PVSTazZWF5H5PSpYj5pytMLLHbU0jJusXrvGWk3UDJ289WiqcL+WUInMv0AkSvdkF+LQxy98kQMYHtUDl+XRIrQ5eLQBHnFWoxsFH0NDCFSUYgYHbxG43ozvCbi5Yc5IrnmpNwhfANiK4GD6xzNnTXz3WVVrU4rldU0+7Et7Zr7iFDdBT+aPFiyh+oC3N8q4e2BPFJ/UgXCI2kHUVg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(376002)(366004)(396003)(346002)(39840400004)(136003)(53546011)(8936002)(86362001)(8676002)(6486002)(110136005)(966005)(26005)(31686004)(316002)(5660300002)(31696002)(478600001)(2906002)(36756003)(4326008)(7416002)(66556008)(52116002)(16526019)(2616005)(66476007)(16576012)(956004)(186003)(66946007)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: 062zOw4lM49Oa8jWbBVr2Hf+CJGNZRvgDwXbx1WZ58JAjOKi3FwxId5vdWd/mn8rbl7xNVhz/ebLZQqs0F8Sio5oqpBLI8ho92OqAlrnPEETHS5PFpE58ybQlXRDDm+PtivnhB0CrAehwMtrQ/HLs+lVRnjARsVBAKkn9jKC5HHTAWIfwXvZwhMVlFOhHJXRcFlKnE7DQSmjTqSh4N3c/jmoyOfBE1EeswGEboVpxDOqKTfa7CfrvAMqOWx/vZ9L1HJwhEFp/U/bWiPOjlicppOjMukLMbrJyq2PVpz6cUctcDX4NFXyu2w/CvHlmGGQEohnK5uIs+/6ZYv9GbAFSN+TI3vsCPokv2VGyVq+zjQHaH8rKv3nNW7na3CSR5lNbRqEiacUmqJ/+330v5a56DmQWLigdmZ7tIEG/bXTr2Sd4duvC6AoFZsiJLXBOZzlrlo4i186N019Hgoi3vPdEImBZzGueEk44du1drT5qA+Jidrzjo1XfHrsBUcOif9J
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a5e8ee05-efda-468e-b70a-08d7f8c14457
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 May 2020 11:15:25.7012 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iYzg8TTGmvieA7HB55AUaC7DFytT9PbAJ2+8TcGkKZ0HMCeir942TT45m/MZsdDkJo/aD24RxFbvHXJewR7wYwpeGrRSobOwEIz6Vlfqoag=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5479
+Received-SPF: pass client-ip=40.107.6.114;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-DB3-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 07:15:26
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,79 +135,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: fam@euphon.net, kwolf@redhat.com, qemu-block@nongnu.org,
+ quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
+ stefanha@redhat.com, den@openvz.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/0VZdIhnMt.95UK.BCFwRk63
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+15.05.2020 08:52, Vladimir Sementsov-Ogievskiy wrote:
+> 14.05.2020 21:29, Eric Blake wrote:
+>> reviving this thread...
+>>
+>> On 4/3/20 6:23 AM, Peter Krempa wrote:
+>>> On Fri, Apr 03, 2020 at 14:02:47 +0300, Vladimir Sementsov-Ogievskiy wrote:
+>>>> 19.12.2019 13:36, Peter Krempa wrote:
+>>>>> On Thu, Dec 19, 2019 at 11:51:01 +0300, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>> Hi all!
+>>>>>>
+>>>>>> It's a continuation for
+>>>>>> "bitmap migration bug with -drive while block mirror runs"
+>>>>>> <315cff78-dcdb-a3ce-2742-da3cc9f0ca97@redhat.com>
+>>>>>> https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg07241.html
+>>>>>>
+>>>>>> The problem is that bitmaps migrated to node with same node-name or
+>>>>>> blk-parent name. And currently only the latter actually work in libvirt.
+>>>>>> And with mirror-top filter it doesn't work, because
+>>>>>> bdrv_get_device_or_node_name don't go through filters.
+>>>>>
+>>>>> I want to point out that since libvirt-5.10 we use -blockdev to
+>>>>> configure the backend of storage devices with qemu-4.2 and later. This
+>>>>> means unfortunately that the BlockBackend of the drive does not have a
+>>>>> name any more and thus the above will not work even if you make the
+>>>>> lookup code to see through filters.
+>>>>
+>>>> Not that this series doesn't make things worse, as it loops through named
+>>>> block backends when trying to use their name for migration. So with these
+>>>> patches applied, qemu will just work in more possible scenarios.
+>>>
+>>> Okay, if that's so it's fair enough in this case.
+>>>
+>>> I'm just very firmly against baking in the assumption that
+>>> node names mean the same thing accross migration, because that will
+>>> create a precedent situation and more stuff may be baked in on top of
+>>> this in the future. It seems that it has already happened though and
+>>> it's wrong. And the worst part is that it's never mentioned that this
+>>> might occur. But again, don't do that and preferrably remove the
+>>> matching of node names for bitmaps altogether until we can control it
+>>> arbitrarily.
+>>>
+>>> We've also seen this already before with the backend name of memory
+>>> devices being baked in to the migration stream which creates an unwanted
+>>> dependancy.
+>>
+>> Max is trying to tackle the node-name issue:
+>> https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg03358.html
+>>
+>> And trying to apply that patch after staging this series hits a conflict in mnigration/block-dirty-bitmap.c.  Which one should go in first?
+>>
+> 
+> My patches are needed to fix migration for the pre-blockdev configuration with mirror-top filter.
+> 
+> We ofcrouse need them in Virtuozzo, but it's not hard to keep the in downstream-only.. And it will be not simple to use new command from Max in pre-blockdev libvirt configuration, with auto-generated node-names.
+> 
+> How much we care about pre-blockdev libvirt now in upstream Qemu?
+> 
+> If we don't care, than these series are only for downstreams, and we don't need to apply them upstream..
+> 
+> On the other hand, Max have to resend anyway, to handle old code, which uses device name instead of node-name. And if we don't want to drop now the code which can use device name (needed for old libvirt), why not to apply the series, which just make old code better?
+> 
+> ====
+> 
+> In other words: do we still support pre-blockdev libvirt (and any other pre-blockdev users)?
+> 
+> If we support, than, as I said somewhere, I need to resend these series as I have updated version in our downstream. And I think, I can rebase Max's patch by myself and send together with this all, if no objections.
+> 
 
-qemu_bh_new will set the bh to be executed in the main
-loop. This causes crashes as colo_compare_handle_event assumes
-that it has exclusive access the queues, which are also
-concurrently accessed in the iothread.
+I'm going to resend the series today, let's look at it.
 
-Create the bh with the AioContext of the iothread to fulfill
-these assumptions and fix the crashes. This is safe, because
-the bh already takes the appropriate locks.
-
-Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-Reviewed-by: Zhang Chen <chen.zhang@intel.com>
-Reviewed-by: Derek Su <dereksu@qnap.com>
-Tested-by: Derek Su <dereksu@qnap.com>
----
- net/colo-compare.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 10c0239f9d..1de4220fe2 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -890,6 +890,7 @@ static void colo_compare_handle_event(void *opaque)
-=20
- static void colo_compare_iothread(CompareState *s)
- {
-+    AioContext *ctx =3D iothread_get_aio_context(s->iothread);
-     object_ref(OBJECT(s->iothread));
-     s->worker_context =3D iothread_get_g_main_context(s->iothread);
-=20
-@@ -906,7 +907,7 @@ static void colo_compare_iothread(CompareState *s)
-     }
-=20
-     colo_compare_timer_init(s);
--    s->event_bh =3D qemu_bh_new(colo_compare_handle_event, s);
-+    s->event_bh =3D aio_bh_new(ctx, colo_compare_handle_event, s);
- }
-=20
- static char *compare_get_pri_indev(Object *obj, Error **errp)
---=20
-2.20.1
-
-
---Sig_/0VZdIhnMt.95UK.BCFwRk63
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl6+eOoACgkQNasLKJxd
-slgFKw/+LM70aV3IsdsopQgCnEbEVoeE0BwDRLBOwCs6u2JiQLo81KDQcc6cxWgS
-LSQD3SSDis9YpSwgAdtpmMykFuuDgfXfonNbHdX2G3F4NScnaozORCmHBj8eoc9N
-0xgNgwm306hx3AUtv8mdupyDqcNLWng1mO3oNiUs3042xyCNpzXPIFjRkmWJmE2S
-WfalMeLGl124Vi//cifPpyJwbqq3X5SUoJXLt68ICh8VAvDLQG1xeS4vhIGQfTOW
-/H+UwLXci7bY675hZXJbiowZyvjxXX8d0VRra+0P8z5QlbV1QtxbOQ6yDTVo0cdv
-BMYd8F2Rdokqzqc4CjZJr0Zu0LT3NmEZ4qaZost2y0g2DfFYzq/eyGGgS+7I1P7R
-PAsE8LkRD39xx7OaWgvDTItK7ZStquvhOJ2KMaAST2VVfp9rlylFrJgUJdGs5YeI
-IptpgwiNilk78WCLx/fJkBizNbCKc39cMPHShLNo0JricbnPKeiUj2oS900334Qa
-oB6BRnv00ar1PuUpmkno5fT7FY0vOQt0RoNwMUNC1ofRmeEYNWrfPFR0gKeI76hF
-AhXMaWiwHBCrkUqqaVZbeNoLKEABWOUBbXQZxkhrG4KZuoSBNC1N9Z6mfFBCbCnt
-Lqxqp6JhIZprLjVusGaZrJ0x3N0waPECKGqqhb+WwxA0cusXZE8=
-=OwRi
------END PGP SIGNATURE-----
-
---Sig_/0VZdIhnMt.95UK.BCFwRk63--
+-- 
+Best regards,
+Vladimir
 
