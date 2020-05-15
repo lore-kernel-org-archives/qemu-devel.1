@@ -2,85 +2,83 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7CBFC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 06:27:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A328C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 06:30:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADE8420728
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 06:27:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C2A622065F
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 06:30:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="POrOgs8n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADE8420728
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fkAvkm33"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2A622065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZTou-00019V-Vj
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 02:27:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56014)
+	id 1jZTrU-0005MF-TY
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 02:30:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60398)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jZTT7-00043O-E3
- for qemu-devel@nongnu.org; Fri, 15 May 2020 02:05:13 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58241
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jZTT6-0004iV-9a
- for qemu-devel@nongnu.org; Fri, 15 May 2020 02:05:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589522711;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7kERk/dXhJN9vNk9qwSgiMCA6BVRWsVmpiMACBsXf6Q=;
- b=POrOgs8nF3QZH40AAhqzEL87/nGEybXRQVHVCBDP+KAC742HyZL7lwBD+kiHRPeRexgFIh
- ImqfQT96h11XNEc9D2sSv8/VWO+eXjeqSigA8pwI2kGpHQ1L34SFfusTR2HfzH9/43Mbxx
- vclxryvv/NZ+YaHau+Gze8A+UhUvLrc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-50-yONVjNS3PtKQGgf9lj_U1g-1; Fri, 15 May 2020 02:04:29 -0400
-X-MC-Unique: yONVjNS3PtKQGgf9lj_U1g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF8C618FE864;
- Fri, 15 May 2020 06:04:27 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-6.ams2.redhat.com [10.36.113.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8179F6FDD1;
- Fri, 15 May 2020 06:04:27 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 50CCF11358C8; Fri, 15 May 2020 08:04:24 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 12/21] hw/arm/bcm2835: Drop futile attempts at QOM-adopting
- memory
-Date: Fri, 15 May 2020 08:04:15 +0200
-Message-Id: <20200515060424.18993-13-armbru@redhat.com>
-In-Reply-To: <20200515060424.18993-1-armbru@redhat.com>
-References: <20200515060424.18993-1-armbru@redhat.com>
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jZTqY-0003gC-Jg; Fri, 15 May 2020 02:29:26 -0400
+Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:43685)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jZTqX-0000ny-PF; Fri, 15 May 2020 02:29:26 -0400
+Received: by mail-yb1-xb41.google.com with SMTP id x15so564945ybr.10;
+ Thu, 14 May 2020 23:29:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=xczrdqwIAlrjpMR2PqQaM5/RVhHQoJnWbvY7Au9+RnQ=;
+ b=fkAvkm33WY79kgWkyQ7iK6EB+MHg/IT6SC8nNz1vCfXS15+TGPV2P84eulYb+PoQ1G
+ panJcdtGtsVQUgqKGeA2/ZQ2sPeaL78eW9amr1CvnvIAx5yg4KB3feUaMFRZCXtdA4jz
+ JUcFCdp6cMFIgi2m0a2CvyYJ7+s+98po/7vm2m8O5oz++Y1yRCDpLvo2IbVselsryrCA
+ MMNhprB7dx8wkbXnbMubqXNDM8NATn8BIl4sv2V9YuYEdD6DcQOUorw6Xj51IbIJydDG
+ o4G8RzXQe8nEr6ZXAcxPXhbgCmrzHsOEqtJLF5JRpRx2M0mbAOx6U0kLUtksYzB9ACQO
+ 5q0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=xczrdqwIAlrjpMR2PqQaM5/RVhHQoJnWbvY7Au9+RnQ=;
+ b=lD5o6hxnsl377MDaaWv4rme53bpbTzVJTcie7lM2+NbejZcjWemMbTudgSmz0ZG5P5
+ pj8LB5Ps6qxHwhBf0Dy6hNAzGnqJFHfE6yBTVdLgrUVflG54duxbRB7D6mTcSekIcag7
+ 057gAeFfA8Mf6Ly/DWCwWmjj2NogX852R/YPnmYTOvqEIHnT7tN+XL2qpcuXHXQ9YDJl
+ 97SvAdiMFLOVzY/pULLbeHKQVOKlN9a3G+ocXl/dCf/Co6Xgr7DcExYbpt7qa/MIe0BN
+ zsX9WqgQXBWlNA9yf0oN4TtW5rM4J7LKOgI2UqBFkHKkGSAN43qx74WTekWB+um6Z2uT
+ Sz3g==
+X-Gm-Message-State: AOAM530G3+5DbsRHizruFqzCMWT9oUHbvUbD3J9UXNPXiwWx8hszxeDD
+ 9masCbne0pGJY1puFxO+gHxJdBR/+2fs8jTl/zs=
+X-Google-Smtp-Source: ABdhPJwvV4NOyCUkWPdB0acVyI3ryS5jEFz23OrjCkogAz25FpouFYEtifz67XJ7NG8eqYwcqKgwHCWJNzLd1EWzMZs=
+X-Received: by 2002:a25:bdc8:: with SMTP id g8mr3051045ybk.122.1589524164506; 
+ Thu, 14 May 2020 23:29:24 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 23:27:07
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+References: <cover.1588878756.git.alistair.francis@wdc.com>
+ <12f00eacda584976c310b55f426b2960969231a6.1588878756.git.alistair.francis@wdc.com>
+In-Reply-To: <12f00eacda584976c310b55f426b2960969231a6.1588878756.git.alistair.francis@wdc.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Fri, 15 May 2020 14:29:13 +0800
+Message-ID: <CAEUhbmVboOM+PSsAuddM=CxcHfkOBA-bbUp1pRTrRdi5eS4ypA@mail.gmail.com>
+Subject: Re: [PATCH v2 7/9] riscv/opentitan: Connect the PLIC device
+To: Alistair Francis <alistair.francis@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b41;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb41.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,51 +92,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-arm@nongnu.org,
- pbonzini@redhat.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <alistair23@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The "bcm2835-peripherals" device's .instance_init() method
-bcm2835_peripherals_init() attempts to make two memory regions QOM
-children of the device.  This is futile, because memory_region_init()
-already did.  The errors are ignored (a later commit will change
-that).  Drop the useless calls.
+On Fri, May 8, 2020 at 3:22 AM Alistair Francis
+<alistair.francis@wdc.com> wrote:
+>
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  hw/riscv/opentitan.c         | 19 +++++++++++++++++--
+>  include/hw/riscv/opentitan.h |  3 +++
+>  2 files changed, 20 insertions(+), 2 deletions(-)
+>
 
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Cc: "Philippe Mathieu-Daudé" <philmd@redhat.com>
-Cc: qemu-arm@nongnu.org
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20200505152926.18877-13-armbru@redhat.com>
----
- hw/arm/bcm2835_peripherals.c | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-index edcaa4916d..8b399d67ff 100644
---- a/hw/arm/bcm2835_peripherals.c
-+++ b/hw/arm/bcm2835_peripherals.c
-@@ -43,12 +43,10 @@ static void bcm2835_peripherals_init(Object *obj)
- 
-     /* Memory region for peripheral devices, which we export to our parent */
-     memory_region_init(&s->peri_mr, obj,"bcm2835-peripherals", 0x1000000);
--    object_property_add_child(obj, "peripheral-io", OBJECT(&s->peri_mr), NULL);
-     sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->peri_mr);
- 
-     /* Internal memory region for peripheral bus addresses (not exported) */
-     memory_region_init(&s->gpu_bus_mr, obj, "bcm2835-gpu", (uint64_t)1 << 32);
--    object_property_add_child(obj, "gpu-bus", OBJECT(&s->gpu_bus_mr), NULL);
- 
-     /* Internal memory region for request/response communication with
-      * mailbox-addressable peripherals (not exported)
--- 
-2.21.1
-
+Reviewed-by: Bin Meng <bin.meng@windriver.com>
 
