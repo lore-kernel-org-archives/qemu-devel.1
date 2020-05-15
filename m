@@ -2,89 +2,80 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE09DC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 13:11:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3900DC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 13:11:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8987320657
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 13:11:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B1m/GfmV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8987320657
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0C53E20657
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 13:11:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C53E20657
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60268 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZa7e-00084w-Mv
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 09:11:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45798)
+	id 1jZa86-0000oC-2v
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 09:11:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49198)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZjJ-0003AE-HZ
- for qemu-devel@nongnu.org; Fri, 15 May 2020 08:46:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45533
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZjI-0002OT-6c
- for qemu-devel@nongnu.org; Fri, 15 May 2020 08:46:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589546779;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+fNuQV4hGWz58pDqojWEjpoo53PoevCTwyj+pmS+U2g=;
- b=B1m/GfmVR79sAM1rZPNK9rGv0dgi0hRRJyfNCWZQhDT62DDFFpeaX2H705cU7qMN6fw02/
- dt8pDl7Y+b1yi3udQS0ayeK0PHV/ypGrgy4JPQvr8hfICRMXbFio5qc279pePg0b3iDS36
- Tr7Zpi0d428ugw/9Hj7Zdc/mtDNkJXs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-507--jzLnZAzPMiBV09CwPGKSw-1; Fri, 15 May 2020 08:46:17 -0400
-X-MC-Unique: -jzLnZAzPMiBV09CwPGKSw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B815D460;
- Fri, 15 May 2020 12:46:16 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-113-110.ams2.redhat.com
- [10.36.113.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BEC1F2E166;
- Fri, 15 May 2020 12:46:15 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 32/51] raw-format: Split raw_read_options()
-Date: Fri, 15 May 2020 14:45:02 +0200
-Message-Id: <20200515124521.335403-33-kwolf@redhat.com>
-In-Reply-To: <20200515124521.335403-1-kwolf@redhat.com>
-References: <20200515124521.335403-1-kwolf@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jZa77-0007Z1-Jq
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 09:10:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56308)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jZa72-0008WR-AS
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 09:10:56 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jZa6z-00012j-Si
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 13:10:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id D83E52E8106
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 13:10:49 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 22:56:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001 autolearn=_AUTOLEARN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 15 May 2020 13:04:06 -0000
+From: Jan Klos <1856335@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: babumoger djdatte h-sieger janklos
+X-Launchpad-Bug-Reporter: Damir (djdatte)
+X-Launchpad-Bug-Modifier: Jan Klos (janklos)
+References: <157625616239.22064.10423897892496347105.malonedeb@gac.canonical.com>
+Message-Id: <158954784628.22688.13180815967368048776.malone@gac.canonical.com>
+Subject: [Bug 1856335] Re: Cache Layout wrong on many Zen Arch CPUs
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="0385b538081bc4718df6fb844a3afc89729c94ce";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 1f5d26f7d35f0eb7adfb1fe0799e6b326aa471c5
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 09:10:50
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -93,199 +84,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+Reply-To: Bug 1856335 <1856335@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Max Reitz <mreitz@redhat.com>
+A workaround for Linux VMs is to disable CPUs (and setting their
+number/pinnings accordingly, e.g. every 4th (and 3rd for 3100) core is
+going to be 'dummy' and disabled system-wide) by e.g. echo 0 >
+/sys/devices/system/cpu/cpu3/online
 
-Split raw_read_options() into one function that actually just reads the
-options, and another that applies them.  This will allow us to detect
-whether the user has specified any options before attaching the file
-child (so we can decide on its role based on the options).
+No good workaround for Windows VMs exists, as far as I know - the best
+you can do is setting affinity to specific process(es) and avoid the
+'dummy' CPUs, but I am not aware of any possibility to disable specific
+CPUs (only limiting the overall number).
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20200513110544.176672-21-mreitz@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/raw-format.c | 110 ++++++++++++++++++++++++++-------------------
- 1 file changed, 65 insertions(+), 45 deletions(-)
+-- =
 
-diff --git a/block/raw-format.c b/block/raw-format.c
-index 4b8d4ce8be..824fe70686 100644
---- a/block/raw-format.c
-+++ b/block/raw-format.c
-@@ -71,20 +71,13 @@ static QemuOptsList raw_create_opts = {
-     }
- };
- 
--static int raw_read_options(QDict *options, BlockDriverState *bs,
--    BDRVRawState *s, Error **errp)
-+static int raw_read_options(QDict *options, uint64_t *offset, bool *has_size,
-+                            uint64_t *size, Error **errp)
- {
-     Error *local_err = NULL;
-     QemuOpts *opts = NULL;
--    int64_t real_size = 0;
-     int ret;
- 
--    real_size = bdrv_getlength(bs->file->bs);
--    if (real_size < 0) {
--        error_setg_errno(errp, -real_size, "Could not get image size");
--        return real_size;
--    }
--
-     opts = qemu_opts_create(&raw_runtime_opts, NULL, 0, &error_abort);
-     qemu_opts_absorb_qdict(opts, options, &local_err);
-     if (local_err) {
-@@ -93,64 +86,84 @@ static int raw_read_options(QDict *options, BlockDriverState *bs,
-         goto end;
-     }
- 
--    s->offset = qemu_opt_get_size(opts, "offset", 0);
--    if (s->offset > real_size) {
--        error_setg(errp, "Offset (%" PRIu64 ") cannot be greater than "
--            "size of the containing file (%" PRId64 ")",
--            s->offset, real_size);
--        ret = -EINVAL;
--        goto end;
--    }
-+    *offset = qemu_opt_get_size(opts, "offset", 0);
-+    *has_size = qemu_opt_find(opts, "size");
-+    *size = qemu_opt_get_size(opts, "size", 0);
- 
--    if (qemu_opt_find(opts, "size") != NULL) {
--        s->size = qemu_opt_get_size(opts, "size", 0);
--        s->has_size = true;
--    } else {
--        s->has_size = false;
--        s->size = real_size - s->offset;
-+    ret = 0;
-+end:
-+    qemu_opts_del(opts);
-+    return ret;
-+}
-+
-+static int raw_apply_options(BlockDriverState *bs, BDRVRawState *s,
-+                             uint64_t offset, bool has_size, uint64_t size,
-+                             Error **errp)
-+{
-+    int64_t real_size = 0;
-+
-+    real_size = bdrv_getlength(bs->file->bs);
-+    if (real_size < 0) {
-+        error_setg_errno(errp, -real_size, "Could not get image size");
-+        return real_size;
-     }
- 
-     /* Check size and offset */
--    if ((real_size - s->offset) < s->size) {
-+    if (offset > real_size) {
-+        error_setg(errp, "Offset (%" PRIu64 ") cannot be greater than "
-+                   "size of the containing file (%" PRId64 ")",
-+                   s->offset, real_size);
-+        return -EINVAL;
-+    }
-+
-+    if (has_size && (real_size - offset) < size) {
-         error_setg(errp, "The sum of offset (%" PRIu64 ") and size "
--            "(%" PRIu64 ") has to be smaller or equal to the "
--            " actual size of the containing file (%" PRId64 ")",
--            s->offset, s->size, real_size);
--        ret = -EINVAL;
--        goto end;
-+                   "(%" PRIu64 ") has to be smaller or equal to the "
-+                   " actual size of the containing file (%" PRId64 ")",
-+                   s->offset, s->size, real_size);
-+        return -EINVAL;
-     }
- 
-     /* Make sure size is multiple of BDRV_SECTOR_SIZE to prevent rounding
-      * up and leaking out of the specified area. */
--    if (s->has_size && !QEMU_IS_ALIGNED(s->size, BDRV_SECTOR_SIZE)) {
-+    if (has_size && !QEMU_IS_ALIGNED(size, BDRV_SECTOR_SIZE)) {
-         error_setg(errp, "Specified size is not multiple of %llu",
--            BDRV_SECTOR_SIZE);
--        ret = -EINVAL;
--        goto end;
-+                   BDRV_SECTOR_SIZE);
-+        return -EINVAL;
-     }
- 
--    ret = 0;
--
--end:
-+    s->offset = offset;
-+    s->has_size = has_size;
-+    s->size = has_size ? size : real_size - offset;
- 
--    qemu_opts_del(opts);
--
--    return ret;
-+    return 0;
- }
- 
- static int raw_reopen_prepare(BDRVReopenState *reopen_state,
-                               BlockReopenQueue *queue, Error **errp)
- {
-+    bool has_size;
-+    uint64_t offset, size;
-+    int ret;
-+
-     assert(reopen_state != NULL);
-     assert(reopen_state->bs != NULL);
- 
-     reopen_state->opaque = g_new0(BDRVRawState, 1);
- 
--    return raw_read_options(
--        reopen_state->options,
--        reopen_state->bs,
--        reopen_state->opaque,
--        errp);
-+    ret = raw_read_options(reopen_state->options, &offset, &has_size, &size,
-+                           errp);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    ret = raw_apply_options(reopen_state->bs, reopen_state->opaque,
-+                            offset, has_size, size, errp);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    return 0;
- }
- 
- static void raw_reopen_commit(BDRVReopenState *state)
-@@ -426,8 +439,15 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
-                     Error **errp)
- {
-     BDRVRawState *s = bs->opaque;
-+    bool has_size;
-+    uint64_t offset, size;
-     int ret;
- 
-+    ret = raw_read_options(options, &offset, &has_size, &size, errp);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file, 0,
-                                false, errp);
-     if (!bs->file) {
-@@ -455,7 +475,7 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
-                 bs->file->bs->filename);
-     }
- 
--    ret = raw_read_options(options, bs, s, errp);
-+    ret = raw_apply_options(bs, s, offset, has_size, size, errp);
-     if (ret < 0) {
-         return ret;
-     }
--- 
-2.25.4
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1856335
 
+Title:
+  Cache Layout wrong on many Zen Arch CPUs
+
+Status in QEMU:
+  New
+
+Bug description:
+  AMD CPUs have L3 cache per 2, 3 or 4 cores. Currently, TOPOEXT seems
+  to always map Cache ass if it was an 4-Core per CCX CPU, which is
+  incorrect, and costs upwards 30% performance (more realistically 10%)
+  in L3 Cache Layout aware applications.
+
+  Example on a 4-CCX CPU (1950X /w 8 Cores and no SMT):
+
+  =C2=A0=C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
+  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
+  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
+  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'8' threads=3D'1'=
+/>
+
+  In windows, coreinfo reports correctly:
+
+  ****----  Unified Cache 1, Level 3,    8 MB, Assoc  16, LineSize  64
+  ----****  Unified Cache 6, Level 3,    8 MB, Assoc  16, LineSize  64
+
+  On a 3-CCX CPU (3960X /w 6 cores and no SMT):
+
+  =C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
+  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
+  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
+  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'6' threads=3D'1'=
+/>
+
+  in windows, coreinfo reports incorrectly:
+
+  ****--  Unified Cache  1, Level 3,    8 MB, Assoc  16, LineSize  64
+  ----**  Unified Cache  6, Level 3,    8 MB, Assoc  16, LineSize  64
+
+  Validated against 3.0, 3.1, 4.1 and 4.2 versions of qemu-kvm.
+
+  With newer Qemu there is a fix (that does behave correctly) in using the =
+dies parameter:
+  =C2=A0<qemu:arg value=3D'cores=3D3,threads=3D1,dies=3D2,sockets=3D1'/>
+
+  The problem is that the dies are exposed differently than how AMD does
+  it natively, they are exposed to Windows as sockets, which means, that
+  if you are nto a business user, you can't ever have a machine with
+  more than two CCX (6 cores) as consumer versions of Windows only
+  supports two sockets. (Should this be reported as a separate bug?)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1856335/+subscriptions
 
