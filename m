@@ -4,77 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A488FC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 15:52:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5169EC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 15:56:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EDE1206C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 15:52:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 17D28206C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 15:56:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jss+Ewzx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EDE1206C0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mc25anHr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17D28206C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZcdE-0007XB-Kv
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 11:52:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58128)
+	id 1jZchP-0002D8-7W
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 11:56:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59414)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jZcce-000772-6k
- for qemu-devel@nongnu.org; Fri, 15 May 2020 11:51:40 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21685
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1jZcgc-0001PO-1x
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 11:55:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55599
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jZccb-0004TV-7N
- for qemu-devel@nongnu.org; Fri, 15 May 2020 11:51:39 -0400
+ id 1jZcga-0005vr-Pl
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 11:55:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589557896;
+ s=mimecast20190719; t=1589558143;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=Pi0amNDgyXo1Ofz3SsZJ+aPmt+MZQ7l5w4BtP+olYNs=;
- b=Jss+Ewzx1qusHs+NAbJqhzQafgQ6m41wRwJf6xAA+NIjXhlpyAJ1l9oHbODoyPup0QbN+B
- ikIdXhZ2kSH80jgMffcvY/QexLSfV2UtyS7z7xldmgBiAcNeKJ5cEsKLl1AxC/qcP98HC9
- VEB+QrAdgmBVx2qRtyhZ9YgKXs/2jk8=
+ bh=mtXWoNOchQkg/jrYnv0O2uMYTDRYqqetz96/9IJRxak=;
+ b=Mc25anHrDK3QunuzV0Q6DAyCeA8Psrtyy8EX2bwBQPyn9k3GV+BKOj3fTCg3CIayMnvYwx
+ jeaQcSGPGtLCC5H2DEOFKSxyAfYB67eJIbIGbO9+UqVxWGbFVzLPRembZ3YYJGs+p1s+Sj
+ Ryolklh8pP/VRpavwhrqq/fww6QX75s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-484-lxwwfqDINsC6A0xLU84p6g-1; Fri, 15 May 2020 11:51:34 -0400
-X-MC-Unique: lxwwfqDINsC6A0xLU84p6g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-295-DJgiDMZDPeGYHt7r-fkmZg-1; Fri, 15 May 2020 11:55:39 -0400
+X-MC-Unique: DJgiDMZDPeGYHt7r-fkmZg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71A1B474;
- Fri, 15 May 2020 15:51:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3114E107ACF4;
+ Fri, 15 May 2020 15:55:38 +0000 (UTC)
 Received: from work-vm (ovpn-114-149.ams2.redhat.com [10.36.114.149])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E37B66062;
- Fri, 15 May 2020 15:51:26 +0000 (UTC)
-Date: Fri, 15 May 2020 16:51:24 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E08A5C5FA;
+ Fri, 15 May 2020 15:55:22 +0000 (UTC)
+Date: Fri, 15 May 2020 16:55:20 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v1 06/17] target/i386: sev: Use
- ram_block_discard_set_broken()
-Message-ID: <20200515155124.GH2954@work-vm>
+Subject: Re: [PATCH v1 12/17] MAINTAINERS: Add myself as virtio-mem maintainer
+Message-ID: <20200515155520.GI2954@work-vm>
 References: <20200506094948.76388-1-david@redhat.com>
- <20200506094948.76388-7-david@redhat.com>
+ <20200506094948.76388-13-david@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200506094948.76388-7-david@redhat.com>
+In-Reply-To: <20200506094948.76388-13-david@redhat.com>
 User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 00:07:24
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 22:56:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -94,43 +93,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
  "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+ Markus Armbruster <armbru@redhat.com>, qemu-s390x@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 * David Hildenbrand (david@redhat.com) wrote:
-> AMD SEV will pin all guest memory, mark discarding of RAM broken. At the
-> time this is called, we cannot have anyone active that relies on discards
-> to work properly.
+> Let's make sure patches/bug reports find the right person.
+> 
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-> 
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  target/i386/sev.c | 1 +
->  1 file changed, 1 insertion(+)
+>  MAINTAINERS | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 > 
-> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> index 846018a12d..608225f9ba 100644
-> --- a/target/i386/sev.c
-> +++ b/target/i386/sev.c
-> @@ -722,6 +722,7 @@ sev_guest_init(const char *id)
->      ram_block_notifier_add(&sev_ram_notifier);
->      qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
->      qemu_add_vm_change_state_handler(sev_vm_state_change, s);
-> +    g_assert(!ram_block_discard_set_broken(true));
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 1f84e3ae2c..09fff9e1bd 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1734,6 +1734,14 @@ F: hw/virtio/virtio-crypto.c
+>  F: hw/virtio/virtio-crypto-pci.c
+>  F: include/hw/virtio/virtio-crypto.h
 >  
->      return s;
->  err:
+> +virtio-mem
+> +M: David Hildenbrand <david@redhat.com>
+> +S: Supported
+> +F: hw/virtio/virtio-mem.c
+> +F: hw/virtio/virtio-mem-pci.h
+> +F: hw/virtio/virtio-mem-pci.c
+> +F: include/hw/virtio/virtio-mem.h
+> +
+>  nvme
+>  M: Keith Busch <kbusch@kernel.org>
+>  L: qemu-block@nongnu.org
 > -- 
 > 2.25.3
 > 
