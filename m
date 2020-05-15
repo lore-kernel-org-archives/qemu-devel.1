@@ -2,99 +2,102 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA719C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 07:20:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FBF6C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 07:26:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FE102065F
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 07:20:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 11DAB2065C
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 07:26:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gPMnjUlh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FE102065F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E/YioOWO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11DAB2065C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZUeN-0007I8-QT
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 03:20:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40504)
+	id 1jZUk4-0002H9-9a
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 03:26:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41232)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZUdf-0006TI-HA
- for qemu-devel@nongnu.org; Fri, 15 May 2020 03:20:11 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48920
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZUjM-0001pU-VX
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 03:26:05 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34601
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZUdd-0008Fy-QQ
- for qemu-devel@nongnu.org; Fri, 15 May 2020 03:20:10 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZUjL-0001Hi-6I
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 03:26:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589527208;
+ s=mimecast20190719; t=1589527562;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XMk1o0OEy/p0nRIzOdSeYPWb9G28VVR5RnbYWbz2KUA=;
- b=gPMnjUlhyV4Ot8oMKmvt9BZ/u0B6xLOBfPL/TGpSmDzwjT8CvH9Hj+9Pd9wsVj6YMebTey
- BGlvR1RbI+P+AyitHk978j2CyuihKuuV0sCCDSvyLsX94IaaKaGRAyhVPfcwkiYAUoRRtV
- 7Vi2UZ0/s0ZjNqaWaSC7uFI1Xm7TFpk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-47-wuVu4RQ4NVySXHfQ-ptIQQ-1; Fri, 15 May 2020 03:20:04 -0400
-X-MC-Unique: wuVu4RQ4NVySXHfQ-ptIQQ-1
-Received: by mail-wm1-f71.google.com with SMTP id l26so565460wmh.3
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 00:20:04 -0700 (PDT)
+ bh=UDYzldhojeL3etjgUCh0zGSDgjteeUn7rV+aPmdj3y4=;
+ b=E/YioOWOeyxRfVErFLag0sr+AxAIbNopww1fAKIj2AHgEVQ6e2mwJCIzDsl5UALhct1Ysk
+ V3KMaDMrVEd971vMG4/kwhAFbqwecHlpJetVtCR0VSLyOTQ8al5HNwatpc3+498cTa4pnf
+ o86g9wIricG/zmrqX6Z292GSj+lnix0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-312-zThJt-rAPpySR1kJJvK0WA-1; Fri, 15 May 2020 03:25:58 -0400
+X-MC-Unique: zThJt-rAPpySR1kJJvK0WA-1
+Received: by mail-wm1-f69.google.com with SMTP id x11so563152wmc.9
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 00:25:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=XMk1o0OEy/p0nRIzOdSeYPWb9G28VVR5RnbYWbz2KUA=;
- b=OUEpq8t+WDG1yUNbKIDp11tuhAKhyqIFDfxPIiX6UQq3QA1wxjKqOEASJTcLNsfDxJ
- UVN4xOo1PupcViX7WIrwGB/Z5RX/vCdS5EFKArFw9sfoXqmqIayakNVceRm0XRLR2842
- gM6GZ4gIPGlT0y0dnzRCwXWxkss40KGVjnbkw6B3iLGtPhWQV9yipoew63U2FWvLEAjm
- sFpeqEAjbN8M7Ui2ZmEq6Nr/8FPJMzn2oFkOQjxrrFnBpgjm692hdLdfDnJDpiIdgVeP
- s/rToO8WD562k1Xg4E5IbWzaqQOiuA5X8m+s3fU3PXMJVa0ZD6VGrg5gXjZj3NMx2ouk
- SEng==
-X-Gm-Message-State: AOAM533ggwGmNC3XwL8ICdi4/GkdUBZeHcIgfkjfN7ztr/3SKeTxiDxx
- GBlIxTvh2CXC6IP7+DI+oZ85W+xQF5rwLEK9EMkrIDUu1VI6DLkM7STwvwtPe+w3OYVAwhlvqG0
- kCeGUYPGJm3/7wI8=
-X-Received: by 2002:adf:f605:: with SMTP id t5mr2609426wrp.354.1589527203653; 
- Fri, 15 May 2020 00:20:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy2D18lQUdKKgtdOBzQEi/bdAgUxK6JviQmaIGYB7SKkqzeFW112hf6f89MbAShKCXJst6mag==
-X-Received: by 2002:adf:f605:: with SMTP id t5mr2609398wrp.354.1589527203288; 
- Fri, 15 May 2020 00:20:03 -0700 (PDT)
+ bh=UDYzldhojeL3etjgUCh0zGSDgjteeUn7rV+aPmdj3y4=;
+ b=VQzygxh17YaPJjC1/L471Khym621/6nNDvxTD2+vwhR4W/Mjshen+8PpzkDyDA2wL6
+ 2iWM2gCC1GooDLmlYvRn1wzBu9iTYzzZjUwWu6BN5lZbao7zWBK35PoGWAa794kI5L5m
+ pMi9ULV0JdT/NmqcVcH3aTlQl9FCXvNO4yOHWNLo0A1ORX2BS3KFEn6j7bgIfzTqkLqt
+ rpAycGL3AxK3qH6ULfBrY7Bsw7C3Wr3+W19DG5kAVs7jo7yRA84ysOeR5o9LMmoDG4sO
+ Tc59rb8NVmZ1pP43qpuN02AZB66ek8D4Yqx9IQbCxWwcX10tuxnHRm94Zfojn8LWx7YE
+ 5A9A==
+X-Gm-Message-State: AOAM53154BGe0Cmt5zlLSR6VDobpCkgktPeOVFwKep29Wo2SaXb20YfX
+ FpbPClaVmUP1fiOQIUNF7vOOErHmEk7p4L7nHSu2GcOjh2VQSMCAaGlGZuXuxw62abJqMIJvXL3
+ kUu84OxIJuZNhPVY=
+X-Received: by 2002:a05:600c:1006:: with SMTP id
+ c6mr2570685wmc.133.1589527557495; 
+ Fri, 15 May 2020 00:25:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzOS8UM5U3pvYZZHFcRmQ/kOE4dr3JdGEhrCYO9Lq81zE7Zfxa6BhAYwUBqJ7fH9Xq7xv5HOQ==
+X-Received: by 2002:a05:600c:1006:: with SMTP id
+ c6mr2570637wmc.133.1589527557025; 
+ Fri, 15 May 2020 00:25:57 -0700 (PDT)
 Received: from [192.168.1.39] (17.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.17])
- by smtp.gmail.com with ESMTPSA id t7sm2224019wrq.39.2020.05.15.00.20.02
+ by smtp.gmail.com with ESMTPSA id 10sm2244447wmw.26.2020.05.15.00.25.55
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 15 May 2020 00:20:02 -0700 (PDT)
-Subject: Re: [PATCH] hw/ide: Make IDEDMAOps handlers take a const IDEDMA
- pointer
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-References: <20200512194917.15807-1-philmd@redhat.com>
- <01f5f413-d1d0-43cb-65cc-9f7bd1e59893@redhat.com>
+ Fri, 15 May 2020 00:25:56 -0700 (PDT)
+Subject: Re: [PATCH v2 5/9] hw/char: Initial commit of Ibex UART
+To: Alistair Francis <alistair23@gmail.com>
+References: <cover.1588878756.git.alistair.francis@wdc.com>
+ <11b8f3cd28fd52b10caefe21a7b70444b85792f8.1588878756.git.alistair.francis@wdc.com>
+ <44285916-1542-5ba3-eb39-48f9728c1e8d@redhat.com>
+ <CAKmqyKPuv=jFOfO-Vgub1x1ddoLkmkZTgd2ZbSxNKMv7ySMBFQ@mail.gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <7482643e-f547-5d2c-7314-3a0ec91c047e@redhat.com>
-Date: Fri, 15 May 2020 09:20:01 +0200
+Message-ID: <cbf21ed0-3b2d-8af0-9c1f-c18efe81b713@redhat.com>
+Date: Fri, 15 May 2020 09:25:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <01f5f413-d1d0-43cb-65cc-9f7bd1e59893@redhat.com>
+In-Reply-To: <CAKmqyKPuv=jFOfO-Vgub1x1ddoLkmkZTgd2ZbSxNKMv7ySMBFQ@mail.gmail.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 22:56:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 00:07:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -114,268 +117,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/14/20 10:21 PM, John Snow wrote:
-> 
-> 
-> On 5/12/20 3:49 PM, Philippe Mathieu-Daudé wrote:
->> Handlers don't need to modify the IDEDMA structure.
->> Make it const.
+On 5/14/20 11:59 PM, Alistair Francis wrote:
+> On Thu, May 14, 2020 at 11:00 AM Philippe Mathieu-Daudé
+> <philmd@redhat.com> wrote:
 >>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
-> I'll trust your judgment. As long as it still compiles and passes
-> qtests, I'm happy if you're happy.
-
-I guess "all data is modifyable until proven otherwise" is one of the 
-'defensive programming' rules.
-
-https://wiki.sei.cmu.edu/confluence/display/c/DCL00-C.+Const-qualify+immutable+objects
-
-"Immutable objects should be const-qualified. Enforcing object 
-immutability using const qualification helps ensure the correctness and 
-security of applications."
-
-It is also a hint to static analyzer and compilers for optimization.
-
-https://en.wikipedia.org/wiki/Const_(computer_programming)#Consequences
-
-"A const parameter in pass-by-reference means that the referenced value 
-is not modified – it is part of the contract –"
-
-> 
-> Acked-by: John Snow <jsnow@redhat.com>
-
-Thanks!
-
-> 
->> ---
->>   include/hw/ide/internal.h | 12 ++++++------
->>   hw/ide/ahci.c             | 18 +++++++++---------
->>   hw/ide/core.c             |  6 +++---
->>   hw/ide/macio.c            |  6 +++---
->>   hw/ide/pci.c              | 12 ++++++------
->>   5 files changed, 27 insertions(+), 27 deletions(-)
+>> Hi Alistair,
 >>
->> diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
->> index 55da35d768..1a7869e85d 100644
->> --- a/include/hw/ide/internal.h
->> +++ b/include/hw/ide/internal.h
->> @@ -322,12 +322,12 @@ typedef enum { IDE_HD, IDE_CD, IDE_CFATA } IDEDriveKind;
->>   
->>   typedef void EndTransferFunc(IDEState *);
->>   
->> -typedef void DMAStartFunc(IDEDMA *, IDEState *, BlockCompletionFunc *);
->> -typedef void DMAVoidFunc(IDEDMA *);
->> -typedef int DMAIntFunc(IDEDMA *, bool);
->> -typedef int32_t DMAInt32Func(IDEDMA *, int32_t len);
->> -typedef void DMAu32Func(IDEDMA *, uint32_t);
->> -typedef void DMAStopFunc(IDEDMA *, bool);
->> +typedef void DMAStartFunc(const IDEDMA *, IDEState *, BlockCompletionFunc *);
->> +typedef void DMAVoidFunc(const IDEDMA *);
->> +typedef int DMAIntFunc(const IDEDMA *, bool);
->> +typedef int32_t DMAInt32Func(const IDEDMA *, int32_t len);
->> +typedef void DMAu32Func(const IDEDMA *, uint32_t);
->> +typedef void DMAStopFunc(const IDEDMA *, bool);
->>   
->>   struct unreported_events {
->>       bool eject_request;
->> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
->> index 13d91e109a..168d34e9f2 100644
->> --- a/hw/ide/ahci.c
->> +++ b/hw/ide/ahci.c
->> @@ -44,7 +44,7 @@ static int handle_cmd(AHCIState *s, int port, uint8_t slot);
->>   static void ahci_reset_port(AHCIState *s, int port);
->>   static bool ahci_write_fis_d2h(AHCIDevice *ad);
->>   static void ahci_init_d2h(AHCIDevice *ad);
->> -static int ahci_dma_prepare_buf(IDEDMA *dma, int32_t limit);
->> +static int ahci_dma_prepare_buf(const IDEDMA *dma, int32_t limit);
->>   static bool ahci_map_clb_address(AHCIDevice *ad);
->>   static bool ahci_map_fis_address(AHCIDevice *ad);
->>   static void ahci_unmap_clb_address(AHCIDevice *ad);
->> @@ -1338,7 +1338,7 @@ out:
->>   }
->>   
->>   /* Transfer PIO data between RAM and device */
->> -static void ahci_pio_transfer(IDEDMA *dma)
->> +static void ahci_pio_transfer(const IDEDMA *dma)
->>   {
->>       AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
->>       IDEState *s = &ad->port.ifs[0];
->> @@ -1397,7 +1397,7 @@ out:
->>       }
->>   }
->>   
->> -static void ahci_start_dma(IDEDMA *dma, IDEState *s,
->> +static void ahci_start_dma(const IDEDMA *dma, IDEState *s,
->>                              BlockCompletionFunc *dma_cb)
->>   {
->>       AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
->> @@ -1406,7 +1406,7 @@ static void ahci_start_dma(IDEDMA *dma, IDEState *s,
->>       dma_cb(s, 0);
->>   }
->>   
->> -static void ahci_restart_dma(IDEDMA *dma)
->> +static void ahci_restart_dma(const IDEDMA *dma)
->>   {
->>       /* Nothing to do, ahci_start_dma already resets s->io_buffer_offset.  */
->>   }
->> @@ -1415,7 +1415,7 @@ static void ahci_restart_dma(IDEDMA *dma)
->>    * IDE/PIO restarts are handled by the core layer, but NCQ commands
->>    * need an extra kick from the AHCI HBA.
->>    */
->> -static void ahci_restart(IDEDMA *dma)
->> +static void ahci_restart(const IDEDMA *dma)
->>   {
->>       AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
->>       int i;
->> @@ -1432,7 +1432,7 @@ static void ahci_restart(IDEDMA *dma)
->>    * Called in DMA and PIO R/W chains to read the PRDT.
->>    * Not shared with NCQ pathways.
->>    */
->> -static int32_t ahci_dma_prepare_buf(IDEDMA *dma, int32_t limit)
->> +static int32_t ahci_dma_prepare_buf(const IDEDMA *dma, int32_t limit)
->>   {
->>       AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
->>       IDEState *s = &ad->port.ifs[0];
->> @@ -1453,7 +1453,7 @@ static int32_t ahci_dma_prepare_buf(IDEDMA *dma, int32_t limit)
->>    * Called via dma_buf_commit, for both DMA and PIO paths.
->>    * sglist destruction is handled within dma_buf_commit.
->>    */
->> -static void ahci_commit_buf(IDEDMA *dma, uint32_t tx_bytes)
->> +static void ahci_commit_buf(const IDEDMA *dma, uint32_t tx_bytes)
->>   {
->>       AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
->>   
->> @@ -1461,7 +1461,7 @@ static void ahci_commit_buf(IDEDMA *dma, uint32_t tx_bytes)
->>       ad->cur_cmd->status = cpu_to_le32(tx_bytes);
->>   }
->>   
->> -static int ahci_dma_rw_buf(IDEDMA *dma, bool is_write)
->> +static int ahci_dma_rw_buf(const IDEDMA *dma, bool is_write)
->>   {
->>       AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
->>       IDEState *s = &ad->port.ifs[0];
->> @@ -1486,7 +1486,7 @@ static int ahci_dma_rw_buf(IDEDMA *dma, bool is_write)
->>       return 1;
->>   }
->>   
->> -static void ahci_cmd_done(IDEDMA *dma)
->> +static void ahci_cmd_done(const IDEDMA *dma)
->>   {
->>       AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
->>   
->> diff --git a/hw/ide/core.c b/hw/ide/core.c
->> index 689bb36409..d997a78e47 100644
->> --- a/hw/ide/core.c
->> +++ b/hw/ide/core.c
->> @@ -2570,16 +2570,16 @@ static void ide_init1(IDEBus *bus, int unit)
->>                                              ide_sector_write_timer_cb, s);
->>   }
->>   
->> -static int ide_nop_int(IDEDMA *dma, bool is_write)
->> +static int ide_nop_int(const IDEDMA *dma, bool is_write)
->>   {
->>       return 0;
->>   }
->>   
->> -static void ide_nop(IDEDMA *dma)
->> +static void ide_nop(const IDEDMA *dma)
->>   {
->>   }
->>   
->> -static int32_t ide_nop_int32(IDEDMA *dma, int32_t l)
->> +static int32_t ide_nop_int32(const IDEDMA *dma, int32_t l)
->>   {
->>       return 0;
->>   }
->> diff --git a/hw/ide/macio.c b/hw/ide/macio.c
->> index a9f25e5d02..5b8098268d 100644
->> --- a/hw/ide/macio.c
->> +++ b/hw/ide/macio.c
->> @@ -376,17 +376,17 @@ static void macio_ide_reset(DeviceState *dev)
->>       ide_bus_reset(&d->bus);
->>   }
->>   
->> -static int ide_nop_int(IDEDMA *dma, bool is_write)
->> +static int ide_nop_int(const IDEDMA *dma, bool is_write)
->>   {
->>       return 0;
->>   }
->>   
->> -static int32_t ide_nop_int32(IDEDMA *dma, int32_t l)
->> +static int32_t ide_nop_int32(const IDEDMA *dma, int32_t l)
->>   {
->>       return 0;
->>   }
->>   
->> -static void ide_dbdma_start(IDEDMA *dma, IDEState *s,
->> +static void ide_dbdma_start(const IDEDMA *dma, IDEState *s,
->>                               BlockCompletionFunc *cb)
->>   {
->>       MACIOIDEState *m = container_of(dma, MACIOIDEState, dma);
->> diff --git a/hw/ide/pci.c b/hw/ide/pci.c
->> index 97347f07f1..5e85c4ad17 100644
->> --- a/hw/ide/pci.c
->> +++ b/hw/ide/pci.c
->> @@ -103,7 +103,7 @@ const MemoryRegionOps pci_ide_data_le_ops = {
->>       .endianness = DEVICE_LITTLE_ENDIAN,
->>   };
->>   
->> -static void bmdma_start_dma(IDEDMA *dma, IDEState *s,
->> +static void bmdma_start_dma(const IDEDMA *dma, IDEState *s,
->>                               BlockCompletionFunc *dma_cb)
->>   {
->>       BMDMAState *bm = DO_UPCAST(BMDMAState, dma, dma);
->> @@ -126,7 +126,7 @@ static void bmdma_start_dma(IDEDMA *dma, IDEState *s,
->>    * IDEState.io_buffer_size will contain the number of bytes described
->>    * by the PRDs, whether or not we added them to the sglist.
->>    */
->> -static int32_t bmdma_prepare_buf(IDEDMA *dma, int32_t limit)
->> +static int32_t bmdma_prepare_buf(const IDEDMA *dma, int32_t limit)
->>   {
->>       BMDMAState *bm = DO_UPCAST(BMDMAState, dma, dma);
->>       IDEState *s = bmdma_active_if(bm);
->> @@ -181,7 +181,7 @@ static int32_t bmdma_prepare_buf(IDEDMA *dma, int32_t limit)
->>   }
->>   
->>   /* return 0 if buffer completed */
->> -static int bmdma_rw_buf(IDEDMA *dma, bool is_write)
->> +static int bmdma_rw_buf(const IDEDMA *dma, bool is_write)
->>   {
->>       BMDMAState *bm = DO_UPCAST(BMDMAState, dma, dma);
->>       IDEState *s = bmdma_active_if(bm);
->> @@ -230,7 +230,7 @@ static int bmdma_rw_buf(IDEDMA *dma, bool is_write)
->>       return 1;
->>   }
->>   
->> -static void bmdma_set_inactive(IDEDMA *dma, bool more)
->> +static void bmdma_set_inactive(const IDEDMA *dma, bool more)
->>   {
->>       BMDMAState *bm = DO_UPCAST(BMDMAState, dma, dma);
->>   
->> @@ -242,7 +242,7 @@ static void bmdma_set_inactive(IDEDMA *dma, bool more)
->>       }
->>   }
->>   
->> -static void bmdma_restart_dma(IDEDMA *dma)
->> +static void bmdma_restart_dma(const IDEDMA *dma)
->>   {
->>       BMDMAState *bm = DO_UPCAST(BMDMAState, dma, dma);
->>   
->> @@ -257,7 +257,7 @@ static void bmdma_cancel(BMDMAState *bm)
->>       }
->>   }
->>   
->> -static void bmdma_reset(IDEDMA *dma)
->> +static void bmdma_reset(const IDEDMA *dma)
->>   {
->>       BMDMAState *bm = DO_UPCAST(BMDMAState, dma, dma);
->>   
+>> On 5/7/20 9:13 PM, Alistair Francis wrote:
+>>> This is the initial commit of the Ibex UART device. Serial TX is
+>>> working, while RX has been implemeneted but untested.
+>>>
+>>> This is based on the documentation from:
+>>> https://docs.opentitan.org/hw/ip/uart/doc/
+>>>
+>>> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+>>> ---
+>>>    MAINTAINERS                 |   2 +
+>>>    hw/char/Makefile.objs       |   1 +
+>>>    hw/char/ibex_uart.c         | 490 ++++++++++++++++++++++++++++++++++++
+>>>    hw/riscv/Kconfig            |   4 +
+>>>    include/hw/char/ibex_uart.h | 110 ++++++++
+>>>    5 files changed, 607 insertions(+)
+>>>    create mode 100644 hw/char/ibex_uart.c
+>>>    create mode 100644 include/hw/char/ibex_uart.h
+>>>
+>>> diff --git a/MAINTAINERS b/MAINTAINERS
+>>> index c3d77f0861..d3d47564ce 100644
+>>> --- a/MAINTAINERS
+>>> +++ b/MAINTAINERS
+>>> @@ -1236,7 +1236,9 @@ M: Alistair Francis <Alistair.Francis@wdc.com>
+>>>    L: qemu-riscv@nongnu.org
+>>>    S: Supported
+>>>    F: hw/riscv/opentitan.c
+>>> +F: hw/char/ibex_uart.c
+>>>    F: include/hw/riscv/opentitan.h
+>>> +F: include/hw/char/ibex_uart.h
+>>>
+>>>
+>>>    SH4 Machines
+>>> diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+>>> index 9e9a6c1aff..633996be5b 100644
+>>> --- a/hw/char/Makefile.objs
+>>> +++ b/hw/char/Makefile.objs
+>>> @@ -12,6 +12,7 @@ common-obj-$(CONFIG_VIRTIO_SERIAL) += virtio-console.o
+>>>    common-obj-$(CONFIG_XILINX) += xilinx_uartlite.o
+>>>    common-obj-$(CONFIG_XEN) += xen_console.o
+>>>    common-obj-$(CONFIG_CADENCE) += cadence_uart.o
+>>> +common-obj-$(CONFIG_IBEX) += ibex_uart.o
+>>>
+>>>    common-obj-$(CONFIG_EXYNOS4) += exynos4210_uart.o
+>>>    common-obj-$(CONFIG_COLDFIRE) += mcf_uart.o
+>>> diff --git a/hw/char/ibex_uart.c b/hw/char/ibex_uart.c
+>>> new file mode 100644
+>>> index 0000000000..f6215ae23d
+>>> --- /dev/null
+>>> +++ b/hw/char/ibex_uart.c
+>>> @@ -0,0 +1,490 @@
+>>> +/*
+>>> + * QEMU lowRISC Ibex UART device
+>>> + *
+>>> + * Copyright (c) 2020 Western Digital
+>>> + *
+>>> + * For details check the documentation here:
+>>> + *    https://docs.opentitan.org/hw/ip/uart/doc/
+>>> + *
+>>> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+>>> + * of this software and associated documentation files (the "Software"), to deal
+>>> + * in the Software without restriction, including without limitation the rights
+>>> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+>>> + * copies of the Software, and to permit persons to whom the Software is
+>>> + * furnished to do so, subject to the following conditions:
+>>> + *
+>>> + * The above copyright notice and this permission notice shall be included in
+>>> + * all copies or substantial portions of the Software.
+>>> + *
+>>> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+>>> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+>>> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+>>> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+>>> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+>>> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+>>> + * THE SOFTWARE.
+>>> + */
+>>> +
+>>> +#include "qemu/osdep.h"
+>>> +#include "hw/char/ibex_uart.h"
+>>> +#include "hw/irq.h"
+>>> +#include "hw/qdev-properties.h"
+>>> +#include "migration/vmstate.h"
+>>> +#include "qemu/log.h"
+>>> +#include "qemu/module.h"
+>>> +
+>>> +static void ibex_uart_update_irqs(IbexUartState *s)
+>>> +{
+>>> +    if (s->uart_intr_state & s->uart_intr_enable & INTR_STATE_TX_WATERMARK) {
+>>> +        qemu_set_irq(s->tx_watermark, 1);
+>>> +    } else {
+>>> +        qemu_set_irq(s->tx_watermark, 0);
+>>> +    }
+>>> +
+>>> +    if (s->uart_intr_state & s->uart_intr_enable & INTR_STATE_RX_WATERMARK) {
+>>> +        qemu_set_irq(s->rx_watermark, 1);
+>>> +    } else {
+>>> +        qemu_set_irq(s->rx_watermark, 0);
+>>
+>> I wonder if having both bit separate can't lead to odd pulse behavior
+>> (this function should have the same result if you invert the RX/TX
+>> processing here). I'd be safer using a local 'raise_watermark' boolean
+>> variable, then call qemu_set_irq() once.
+> 
+> I'm not sure what you mean. Are you worried that TX and RX will both
+> go high/low at the same time?
+
+Disregard my comment, it was late and I misread that rx/tx are different 
+outgoing IRQs (I read this as a single watermark IRQ).
+
+> 
+> Alistair
+> 
+>>
+>>> +    }
+>>> +
+>>> +    if (s->uart_intr_state & s->uart_intr_enable & INTR_STATE_TX_EMPTY) {
+>>> +        qemu_set_irq(s->tx_empty, 1);
+>>> +    } else {
+>>> +        qemu_set_irq(s->tx_empty, 0);
+>>> +    }
+>>> +
+>>> +    if (s->uart_intr_state & s->uart_intr_enable & INTR_STATE_RX_OVERFLOW) {
+>>> +        qemu_set_irq(s->rx_overflow, 1);
+>>> +    } else {
+>>> +        qemu_set_irq(s->rx_overflow, 0);
+>>> +    }
+>>> +}
+>> [...]
 >>
 > 
 
