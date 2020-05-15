@@ -2,70 +2,105 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BADCC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 06:37:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80BA4C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 06:45:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E6142065F
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 06:37:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E6142065F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner.com
+	by mail.kernel.org (Postfix) with ESMTPS id 463C32065F
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 06:45:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WCydeOaI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 463C32065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZTyJ-0002fq-LN
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 02:37:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33886)
+	id 1jZU5e-00071p-FK
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 02:45:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35346)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <raphael.pour@hetzner.com>)
- id 1jZTxX-00028s-HA; Fri, 15 May 2020 02:36:39 -0400
-Received: from mail.hetzner.company ([2a01:4f8:d0a:203a::1]:60178)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <raphael.pour@hetzner.com>)
- id 1jZTxU-0002uE-9E; Fri, 15 May 2020 02:36:38 -0400
-Received: from [88.198.139.25] (helo=[10.17.32.77])
- by mail.hetzner.company with esmtpsa (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
- (Exim 4.89) (envelope-from <raphael.pour@hetzner.com>)
- id 1jZTxL-0000zT-0o; Fri, 15 May 2020 08:36:27 +0200
-Subject: Re: [PATCH v2 0/1] qemu-nbd: Close inherited stderr
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <158946069407.13639.5714365663552293557@45ef0f9c86ae>
- <ece77427-d918-d766-b2bc-08cf7d4660bc@redhat.com>
-From: Raphael Pour <raphael.pour@hetzner.com>
-Autocrypt: addr=raphael.pour@hetzner.com; keydata=
- mDMEXmXjyxYJKwYBBAHaRw8BAQdAtiEYnlLIuIUjvvqOH//nEbhrxSa54ZyAl7Iel403QaW0
- J1JhcGhhZWwgUG91ciA8cmFwaGFlbC5wb3VyQGhldHpuZXIuY29tPoiWBBMWCAA+FiEEvj4O
- DnHb6pxm/uWJzbHrt4XF634FAl5l48sCGwMFCQlmAYAFCwkIBwIGFQoJCAsCBBYCAwECHgEC
- F4AACgkQzbHrt4XF635TcwD+NEMqL1HZPHP/WRsYujCDtqt0p+7uxGcpvzv//AjqMZ0A+wUh
- 0bOYYNdlXWNMMNLA88SsAT2mxAfD+F/paVmLpdoLuDgEXmXjyxIKKwYBBAGXVQEFAQEHQB0z
- JYP6jtTj989IJL1vguinsiIxia5fkW83OB1+Bb4QAwEIB4h+BBgWCAAmFiEEvj4ODnHb6pxm
- /uWJzbHrt4XF634FAl5l48sCGwwFCQlmAYAACgkQzbHrt4XF6372LgEAi3qfceU+R53Ehg/Y
- SSHV4wg+zfPwrD6ylEg/xKabYDcBALrD0E3YX458RPjLIOC8H0u0rcFIvBqNYx/kGaMEmbEG
-Message-ID: <d8ddc993-9816-836e-a3de-c6edab9d9c49@hetzner.com>
-Date: Fri, 15 May 2020 08:36:07 +0200
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZU54-0006Li-P9
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 02:44:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39656
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jZU53-0005u1-Ih
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 02:44:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589525064;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=qtwa+XnVoncOJDcsCJRU5ECSZTg7y7dBMLin873wIc4=;
+ b=WCydeOaILNIlm0KZ0eLeWKz2heRgN9URdihAOZVk/Grsf8WgRoXv+F6kVJSz9wFg3J40hK
+ o468bqdHYkLvzL1V0KyaCaqDgOFpLlShfpwql3MDPNQwuZcQZOeXX1zPA9O62uaUXAsdGm
+ IVfJqctUiKyiuWOMj+GWfXWtuQovEGs=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-90-NqVbY5Q-NJKLPT3lSvzGow-1; Fri, 15 May 2020 02:44:19 -0400
+X-MC-Unique: NqVbY5Q-NJKLPT3lSvzGow-1
+Received: by mail-wr1-f72.google.com with SMTP id z8so681380wrp.7
+ for <qemu-devel@nongnu.org>; Thu, 14 May 2020 23:44:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=qtwa+XnVoncOJDcsCJRU5ECSZTg7y7dBMLin873wIc4=;
+ b=ewxRPm7+YHLvxH67A8xzz3cBlVJH2uaaEoaTeldOHCzV20vC1E2bOGJbv81vyOEXuP
+ 7pr0AI/xLERy9Vg5hZ3Pqax+Cp4qMgwk+H1FgXr8G9PBcs9gG4aHwUkjRzjU1ARbhmpU
+ l62fLMCeAcD/x+qNXsj6HbFy6aK4eBk6iM9c64KxJX/UT26nLooBMNDBCaAAQbxWCBWR
+ L8uKEisXtTuZwkGa0hLGvLUnrN4M9G4MZH1gFfu8HeP2E67MorR1req/yGWlTFjo6vII
+ oan7FD7W5/j8y9XXn4rcWV8tCY2s9RvbJsnoPX6YgPW72r7oeEtREVUpGyybpcRwqw8x
+ FCWg==
+X-Gm-Message-State: AOAM531Je1dZxrV8vm/Op3kyT5xF1YuhYitHe+WRrcVWJ16bSDZhN9Wy
+ rxd8+pEooQquXQhECjxshmnJiOCDY/t4EpnWqTX8wZH4zA6AmEbXzyjCV8kuz9stMRMBjAlfOX5
+ XL9s8cqhu759tjhA=
+X-Received: by 2002:a1c:2b46:: with SMTP id r67mr2395802wmr.160.1589525058310; 
+ Thu, 14 May 2020 23:44:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwX9OpAI81gv7v2O6YnyY8Adh7agUhjbAN/zTufRlI9td9IwUfcBNiV8M4+Hh7+blS9eYRxtg==
+X-Received: by 2002:a1c:2b46:: with SMTP id r67mr2395782wmr.160.1589525058036; 
+ Thu, 14 May 2020 23:44:18 -0700 (PDT)
+Received: from [192.168.1.39] (17.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.17])
+ by smtp.gmail.com with ESMTPSA id 37sm2082348wrk.61.2020.05.14.23.44.17
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 14 May 2020 23:44:17 -0700 (PDT)
+Subject: Re: [PATCH v2] cpus: Fix botched configure_icount() error API
+ violation fix
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200515042231.18201-1-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <2d87501c-4b59-3b89-8281-70f96e8cd989@redhat.com>
+Date: Fri, 15 May 2020 08:44:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <ece77427-d918-d766-b2bc-08cf7d4660bc@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha512;
- protocol="application/pgp-signature";
- boundary="zGkHSIjRG6WNEV6icPiFNXiXUqtnV8K4n"
-X-Authenticated-Sender: raphael.pour@hetzner.com
-Received-SPF: pass client-ip=2a01:4f8:d0a:203a::1;
- envelope-from=raphael.pour@hetzner.com; helo=mail.hetzner.company
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+In-Reply-To: <20200515042231.18201-1-armbru@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 23:27:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,106 +113,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org, qemu-block@nongnu.org
+Cc: pbonzini@redhat.com, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---zGkHSIjRG6WNEV6icPiFNXiXUqtnV8K4n
-Content-Type: multipart/mixed; boundary="17xzHILRh5wACaveqi266PaI3oan2SY14"
+On 5/15/20 6:22 AM, Markus Armbruster wrote:
+> Before recent commit abc9bf69a66, configure_icount() returned early
+> when option "shift" was absent: succeed when option "align" was also
+> absent, else fail.
+> 
+> Since then, it still errors out when only "align" is present, but
+> continues when both are absent.  Crashes when examining the value of
+> "shift" further.  Reproducer: -icount "".
+> 
+> Revert this erroneous part of the commit.
+> 
+> Fixes: abc9bf69a66a11499a801ff545b8fe7adbb3a04c
+> Fixes: Coverity CID 1428754
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   cpus.c | 6 ++++--
+>   1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/cpus.c b/cpus.c
+> index 5670c96bcf..ee906dd08f 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -803,8 +803,10 @@ void configure_icount(QemuOpts *opts, Error **errp)
+>       bool align = qemu_opt_get_bool(opts, "align", false);
+>       long time_shift = -1;
+>   
+> -    if (!option && qemu_opt_get(opts, "align")) {
+> -        error_setg(errp, "Please specify shift option when using align");
+> +    if (!option) {
+> +        if (qemu_opt_get(opts, "align") != NULL) {
 
---17xzHILRh5wACaveqi266PaI3oan2SY14
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-On 5/14/20 4:55 PM, Eric Blake wrote:
-> On 5/14/20 9:29 AM, Eric Blake wrote:
->=20
->>> WARNING: Block comments use a leading /* on a separate line
->>> #20: FILE: qemu-nbd.c:919:
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /=
-* Remember parents stderr only if the fork option is set.
->>>
->=20
->> The comment could use some grammar help (s/parents/parent's/), and in
->> truth, I don't think it adds much beyond what the code itself is
->> already doing, so rather than adding another line to silence patchew,
->> you could instead just eliminate the comment and life would still be
->> fine.=C2=A0 Or if you want a one-line comment, I might suggest:
->>
->> /* Remember parent's stderr if we will restoring it. */
->=20
-> It helps if I don't hit 'send' too early.
->=20
-> /* Remember parent's stderr if we will be restoring it. */
->=20
+> +            error_setg(errp, "Please specify shift option when using align");
+> +        }
+>           return;
+>       }
+>   
+> 
 
-=46rom e5749541494abcdcaa37d752172741e1bc38e984 Mon Sep 17 00:00:00 2001
-From: Raphael Pour <raphael.pour@hetzner.com>
-Date: Fri, 15 May 2020 08:30:50 +0200
-Subject: [PATCH] qemu-nbd: Close inherited stderr
-
-Close inherited stderr of the parent if fork_process is false.
-Otherwise no one will close it. (introduced by e6df58a5)
-
-Signed-off-by: Raphael Pour <raphael.pour@hetzner.com>
----
- qemu-nbd.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index 4aa005004e..306e44fb0a 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -916,7 +916,11 @@ int main(int argc, char **argv)
-         } else if (pid =3D=3D 0) {
-             close(stderr_fd[0]);
-
--            old_stderr =3D dup(STDERR_FILENO);
-+            /* Remember parent's stderr if we will be restoring it. */
-+            if (fork_process) {
-+                old_stderr =3D dup(STDERR_FILENO);
-+            }
-+
-             ret =3D qemu_daemon(1, 0);
-
-             /* Temporarily redirect stderr to the parent's pipe...  */
---=20
-2.25.4
-
-
-I fixed the issues and checkpatch gave me a 'ready for submission'.
-Is this the right way to submit a fixed patch or should it be a v3?
-
-
---=20
-Hetzner Online GmbH
-Am Datacenter-Park 1
-08223 Falkenstein/Vogtland
-raphael.pour@hetzner.com
-www.hetzner.com
-
-Registergericht Ansbach, HRB 6089
-Gesch=C3=A4ftsf=C3=BChrer: Martin Hetzner, Stephan Konvickova, G=C3=BCnth=
-er M=C3=BCller
-
-
---17xzHILRh5wACaveqi266PaI3oan2SY14--
-
---zGkHSIjRG6WNEV6icPiFNXiXUqtnV8K4n
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEARYKAB0WIQS+Pg4OcdvqnGb+5YnNseu3hcXrfgUCXr44ZwAKCRDNseu3hcXr
-fscRAQD0Cpa0HjT/Uo/FjsrNjcd7eiq/YQLVElC5tD2WeYLtHQD+N44kqvzaRreO
-h0TkjgBDW6muiH9gxk2mDx+684+hAQ8=
-=mglE
------END PGP SIGNATURE-----
-
---zGkHSIjRG6WNEV6icPiFNXiXUqtnV8K4n--
 
