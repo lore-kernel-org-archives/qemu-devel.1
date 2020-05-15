@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41E75C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:59:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10EEFC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 13:00:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0919E2074D
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 12:59:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA1062074D
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 13:00:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZFnWykYe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0919E2074D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cs7REZ66"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA1062074D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39340 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZZvy-00035t-7O
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 08:59:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45886)
+	id 1jZZwY-0004FK-Ut
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 09:00:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45678)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZjV-0003ev-9Y
- for qemu-devel@nongnu.org; Fri, 15 May 2020 08:46:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36702
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZj9-0002m9-DL
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 08:46:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54425
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZjS-0002RN-Rf
- for qemu-devel@nongnu.org; Fri, 15 May 2020 08:46:32 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZj6-0002Iq-Q6
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 08:46:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589546790;
+ s=mimecast20190719; t=1589546767;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rXkWQF7zMNe9vRQ/O61J0ZGPPFhfb43UNePE/k2sSJA=;
- b=ZFnWykYeK/LpGfJCJ/zu8pxa1ZoXBz1C5Bptria+zFxAqYmM5SYnzx/Uvj6yLY7GrFqRxI
- 3jEv4B2l76C8V0sG05RBzAcW3XJsSJzxKaEZSGIosrZAwwRcH8cfpUtBNdBq0IdFxd6emv
- 1VCGa430+lxiQjlH1MwfDKWwc/lru68=
+ bh=LI8hWiVUlR+qR8sXUC4GxrhVDHxiB8nQBBhLhbUSF4M=;
+ b=cs7REZ66ruZQ0VkAom78fEF/8IwKza2tKApwDLviaAqQLoQDcOTfD34yWjUy4JFfiJQmjd
+ RlSiZ7CtcWGqYuMdzpUiNcAYvtqakyZ1lPg6fUdYowc79HB+rU6e7dQ6InttIJLexO21zK
+ Abu/ioeiRWYqwvUQkGVa1/VV4mluQvs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-87-se6z8eABMwGuutAc9L_vZg-1; Fri, 15 May 2020 08:46:25 -0400
-X-MC-Unique: se6z8eABMwGuutAc9L_vZg-1
+ us-mta-60-GSt4jjX3NUKeGUyNFOXrtQ-1; Fri, 15 May 2020 08:46:03 -0400
+X-MC-Unique: GSt4jjX3NUKeGUyNFOXrtQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 625AE460;
- Fri, 15 May 2020 12:46:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4711107ACCA;
+ Fri, 15 May 2020 12:46:02 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-113-110.ams2.redhat.com
  [10.36.113.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6A0BB2E024;
- Fri, 15 May 2020 12:46:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BC2C62E047;
+ Fri, 15 May 2020 12:46:01 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 38/51] block: Make filter drivers use child_of_bds
-Date: Fri, 15 May 2020 14:45:08 +0200
-Message-Id: <20200515124521.335403-39-kwolf@redhat.com>
+Subject: [PULL 21/51] block: Rename bdrv_inherited_options()
+Date: Fri, 15 May 2020 14:44:51 +0200
+Message-Id: <20200515124521.335403-22-kwolf@redhat.com>
 In-Reply-To: <20200515124521.335403-1-kwolf@redhat.com>
 References: <20200515124521.335403-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -70,10 +70,10 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 22:56:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 23:27:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -100,159 +100,46 @@ Sender: "Qemu-devel"
 
 From: Max Reitz <mreitz@redhat.com>
 
-Note that some filters have secondary children, namely blkverify (the
-image to be verified) and blklogwrites (the log).  This patch does not
-touch those children.
+The other two .inherit_options implementations specify exactly for what
+case they are used in their name, so do it for this one as well.
 
-Note that for blkverify, the filtered child should not be format-probed.
-While there is nothing enforcing this here, in practice, it will not be:
-blkverify implements .bdrv_file_open.  The block layer ensures (and in
-fact, asserts) that BDRV_O_PROTOCOL is set for every BDS whose driver
-implements .bdrv_file_open.  This flag will then be bequeathed to
-blkverify's children, and they will thus (by default) not be probed
-either.
-
-("By default" refers to the fact that blkverify's other child (the
-non-filtered one) will have BDRV_O_PROTOCOL force-unset, because that is
-what happens for all non-filtered children of non-format drivers.)
+(The actual intention behind this patch is to follow it up with a
+generic bdrv_inherited_options() that works for all three cases.)
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20200513110544.176672-27-mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20200513110544.176672-10-mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/blkdebug.c        | 4 +++-
- block/blklogwrites.c    | 3 ++-
- block/blkreplay.c       | 5 +++--
- block/blkverify.c       | 4 +++-
- block/copy-on-read.c    | 5 +++--
- block/filter-compress.c | 5 +++--
- block/replication.c     | 3 ++-
- block/throttle.c        | 5 +++--
- 8 files changed, 22 insertions(+), 12 deletions(-)
+ block.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 8dd8ed6055..b31fa40b0e 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -497,7 +497,9 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
- 
-     /* Open the image file */
-     bs->file = bdrv_open_child(qemu_opt_get(opts, "x-image"), options, "image",
--                               bs, &child_file, 0, false, &local_err);
-+                               bs, &child_of_bds,
-+                               BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY,
-+                               false, &local_err);
-     if (local_err) {
-         ret = -EINVAL;
-         error_propagate(errp, local_err);
-diff --git a/block/blklogwrites.c b/block/blklogwrites.c
-index 4faf912ef1..78b0c49460 100644
---- a/block/blklogwrites.c
-+++ b/block/blklogwrites.c
-@@ -157,7 +157,8 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
-     }
- 
-     /* Open the file */
--    bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file, 0, false,
-+    bs->file = bdrv_open_child(NULL, options, "file", bs, &child_of_bds,
-+                               BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY, false,
-                                &local_err);
-     if (local_err) {
-         ret = -EINVAL;
-diff --git a/block/blkreplay.c b/block/blkreplay.c
-index 9b2814fc58..20d6139baa 100644
---- a/block/blkreplay.c
-+++ b/block/blkreplay.c
-@@ -27,8 +27,9 @@ static int blkreplay_open(BlockDriverState *bs, QDict *options, int flags,
-     int ret;
- 
-     /* Open the image file */
--    bs->file = bdrv_open_child(NULL, options, "image",
--                               bs, &child_file, 0, false, &local_err);
-+    bs->file = bdrv_open_child(NULL, options, "image", bs, &child_of_bds,
-+                               BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY,
-+                               false, &local_err);
-     if (local_err) {
-         ret = -EINVAL;
-         error_propagate(errp, local_err);
-diff --git a/block/blkverify.c b/block/blkverify.c
-index 1684b7aa2e..5c3b29244a 100644
---- a/block/blkverify.c
-+++ b/block/blkverify.c
-@@ -125,7 +125,9 @@ static int blkverify_open(BlockDriverState *bs, QDict *options, int flags,
- 
-     /* Open the raw file */
-     bs->file = bdrv_open_child(qemu_opt_get(opts, "x-raw"), options, "raw",
--                               bs, &child_file, 0, false, &local_err);
-+                               bs, &child_of_bds,
-+                               BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY,
-+                               false, &local_err);
-     if (local_err) {
-         ret = -EINVAL;
-         error_propagate(errp, local_err);
-diff --git a/block/copy-on-read.c b/block/copy-on-read.c
-index a2d92ac394..c857ea0da7 100644
---- a/block/copy-on-read.c
-+++ b/block/copy-on-read.c
-@@ -28,8 +28,9 @@
- static int cor_open(BlockDriverState *bs, QDict *options, int flags,
-                     Error **errp)
+diff --git a/block.c b/block.c
+index b78e2dc141..a17c29f54b 100644
+--- a/block.c
++++ b/block.c
+@@ -1154,9 +1154,9 @@ static void bdrv_temp_snapshot_options(int *child_flags, QDict *child_options,
+  * Returns the options and flags that bs->file should get if a protocol driver
+  * is expected, based on the given options and flags for the parent BDS
+  */
+-static void bdrv_inherited_options(BdrvChildRole role, bool parent_is_format,
+-                                   int *child_flags, QDict *child_options,
+-                                   int parent_flags, QDict *parent_options)
++static void bdrv_protocol_options(BdrvChildRole role, bool parent_is_format,
++                                  int *child_flags, QDict *child_options,
++                                  int parent_flags, QDict *parent_options)
  {
--    bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file, 0, false,
--                               errp);
-+    bs->file = bdrv_open_child(NULL, options, "file", bs, &child_of_bds,
-+                               BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY,
-+                               false, errp);
-     if (!bs->file) {
-         return -EINVAL;
-     }
-diff --git a/block/filter-compress.c b/block/filter-compress.c
-index 4dc5f9fb8c..9edd937645 100644
---- a/block/filter-compress.c
-+++ b/block/filter-compress.c
-@@ -30,8 +30,9 @@
- static int compress_open(BlockDriverState *bs, QDict *options, int flags,
-                          Error **errp)
- {
--    bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file, 0, false,
--                               errp);
-+    bs->file = bdrv_open_child(NULL, options, "file", bs, &child_of_bds,
-+                               BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY,
-+                               false, errp);
-     if (!bs->file) {
-         return -EINVAL;
-     }
-diff --git a/block/replication.c b/block/replication.c
-index ea87b1a4f0..cc9c473ad1 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -90,7 +90,8 @@ static int replication_open(BlockDriverState *bs, QDict *options,
-     const char *mode;
-     const char *top_id;
+     int flags = parent_flags;
  
--    bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file, 0,
-+    bs->file = bdrv_open_child(NULL, options, "file", bs, &child_of_bds,
-+                               BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY,
-                                false, errp);
-     if (!bs->file) {
-         return -EINVAL;
-diff --git a/block/throttle.c b/block/throttle.c
-index 2dea913be7..47b0a3522d 100644
---- a/block/throttle.c
-+++ b/block/throttle.c
-@@ -81,8 +81,9 @@ static int throttle_open(BlockDriverState *bs, QDict *options,
-     char *group;
-     int ret;
- 
--    bs->file = bdrv_open_child(NULL, options, "file", bs,
--                               &child_file, 0, false, errp);
-+    bs->file = bdrv_open_child(NULL, options, "file", bs, &child_of_bds,
-+                               BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY,
-+                               false, errp);
-     if (!bs->file) {
-         return -EINVAL;
-     }
+@@ -1188,7 +1188,7 @@ static void bdrv_inherited_options(BdrvChildRole role, bool parent_is_format,
+ const BdrvChildClass child_file = {
+     .parent_is_bds   = true,
+     .get_parent_desc = bdrv_child_get_parent_desc,
+-    .inherit_options = bdrv_inherited_options,
++    .inherit_options = bdrv_protocol_options,
+     .drained_begin   = bdrv_child_cb_drained_begin,
+     .drained_poll    = bdrv_child_cb_drained_poll,
+     .drained_end     = bdrv_child_cb_drained_end,
 -- 
 2.25.4
 
