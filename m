@@ -2,94 +2,92 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F7E5C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 17:23:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A6C6C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 17:25:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08D4720727
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 17:23:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4017320727
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 17:25:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I4qUKqOc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08D4720727
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qns2uHK/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4017320727
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZe3u-0007nh-6B
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 13:23:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44574)
+	id 1jZe4z-0000VG-GI
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 13:25:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44650)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jZe3G-0007O9-RT
- for qemu-devel@nongnu.org; Fri, 15 May 2020 13:23:14 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37302)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jZe3F-0008O9-OZ
- for qemu-devel@nongnu.org; Fri, 15 May 2020 13:23:14 -0400
-Received: by mail-wr1-x444.google.com with SMTP id l17so4444888wrr.4
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 10:23:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=qqXDdCQ3ckyXSmG8R13rlRlNYQGZftPGPxDnAFlaEeA=;
- b=I4qUKqOchqkv+e9VkXpedu5dfyxpUqC3nlitGjfA/E5FQnTqWQisQ4PXWQaNSX5n8S
- ue+GPlwLFVCn+Pifm1ZdVSNUl9uSrDqY6OYQEDu7M6HFYR9UY/xL6Jg0/CJcrjj6vZD1
- 5VZxrIQ4oSAwiLjhUMGTlHBtlgFEr5eRURdHtxQzw+Tt9Vv3UnCGBALNMkZJqFgDRiWM
- MvO+okJwRXw/5k8hkcK3+xj3Xqr780dCqB8pm7wW/A+bbVv+0VU1iNickT7R3idky5ve
- MoIVzZo+2k4qS1dMsHqquchkLzt6O1HxkKoAfzAIFlPQ8O/VqVnX7Et9pB+9SE02uvAQ
- ukMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=qqXDdCQ3ckyXSmG8R13rlRlNYQGZftPGPxDnAFlaEeA=;
- b=G72dWd5nPBCcDxg7FpzMismeXS3OsKjSOuzP/V2mhEavNiouEOYz+cNGNylhOOj2a3
- YmcSAH0TLjyUTaRhMlSBiQ/yjGoEtVGeQqxdtbJNkx1t8zvtBio6NDGxKnldK4G07uxA
- q7oDiwm5YAiRhwE4v4YZaGtv3aXHfnkrroXXgJc2aTFhH4jjqVNygAOVbDXAxrALrsK5
- GHhP8MUUaP9ITphZGBWTCoTnhJ02EZ/n+YCBD893WJTYU85Y7qJjmcN6u8nucgftsNQs
- Ml3fcz6NmwNvQtchZdgckXg7S6li5k9lIGO38AceMyWIsjH9iJaQ2/MqmBnAowzro6X8
- uMCA==
-X-Gm-Message-State: AOAM531IH1qnmUGbNszx1TKR8MQDt/sGYC0jgc9tDIUKExDjIAHbWERP
- bNchP6VZZk4OltQb4h0PtNIFZA==
-X-Google-Smtp-Source: ABdhPJxcJ0VVEI7gbr2eaPpdST6WVk+EP+cBovwNiuOwlpmuBec6kF+oJJXkfy/Ypz7rm9buPdHYTA==
-X-Received: by 2002:a5d:6283:: with SMTP id k3mr5289267wru.62.1589563389208;
- Fri, 15 May 2020 10:23:09 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id x184sm4510607wmg.38.2020.05.15.10.23.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 15 May 2020 10:23:07 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id EE6D71FF7E;
- Fri, 15 May 2020 18:23:06 +0100 (BST)
-References: <20200512193340.265-1-robert.foley@linaro.org>
- <20200512193340.265-2-robert.foley@linaro.org>
-User-agent: mu4e 1.4.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Robert Foley <robert.foley@linaro.org>
-Subject: Re: [PATCH v6 1/9] tests/vm: Add configuration to basevm.py
-In-reply-to: <20200512193340.265-2-robert.foley@linaro.org>
-Date: Fri, 15 May 2020 18:23:06 +0100
-Message-ID: <87zha9az9h.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jZe4N-0008Iy-V2
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 13:24:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34373
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jZe4M-0008Ub-HO
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 13:24:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1589563461;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=6Pl4HzJVB7uTMJhbVdf+AY/dRX81/aJsae0WIaMydEk=;
+ b=Qns2uHK/bgobY/kuL+/hfQoaPXTOi9DqBeRn0wj2KmaTP710J0r7DQDX+F00ZufSFU7ipx
+ aP2zfUyE05Yr5LMB+wx5pL2ji68bnSS5yvkrWlv4tLYe8/AZYVXjxCZ4BTEha6eBSlPqEw
+ XtpNqUxkPHy+1rJXr9/RKNepmzZoL6E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-125-NwlDlk_GM4CWLzL692xePg-1; Fri, 15 May 2020 13:24:16 -0400
+X-MC-Unique: NwlDlk_GM4CWLzL692xePg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E90A8015D1;
+ Fri, 15 May 2020 17:24:15 +0000 (UTC)
+Received: from [10.3.114.84] (ovpn-114-84.phx2.redhat.com [10.3.114.84])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D63306E9E9;
+ Fri, 15 May 2020 17:24:14 +0000 (UTC)
+Subject: Re: [PATCH v6 04/14] block/amend: separate amend and create options
+ for qemu-img
+To: Max Reitz <mreitz@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200510134037.18487-1-mlevitsk@redhat.com>
+ <20200510134037.18487-5-mlevitsk@redhat.com>
+ <5b389390-eadb-e1d6-48f8-be99c2dfad99@redhat.com>
+ <52231bba-4ef1-2e96-1e82-9e350a68b106@redhat.com>
+ <c93d9e92-94dc-9965-e291-2aef8724385a@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <3a2238b4-e040-e327-a7dd-831e3f24c808@redhat.com>
+Date: Fri, 15 May 2020 12:24:14 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <c93d9e92-94dc-9965-e291-2aef8724385a@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 22:56:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,49 +101,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.puhov@linaro.org, philmd@redhat.com, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 5/15/20 1:22 AM, Max Reitz wrote:
 
-Robert Foley <robert.foley@linaro.org> writes:
+>>>
+>>>> +        QCOW_COMMON_OPTIONS,
+>>>> +        { /* end of list */ }
+>>
+>> ...the intended usage is to use the macro name followed by a comma, so
+>> including a trailing comma in the macro itself would lead to a syntax
+>> error.
+> 
+> But why is that the indended usage?  Is there something in our coding
+> style that forbids macros that don’t allow a separator to be placed
+> after them?
 
-> Added use of a configuration to tests/vm/basevm.py.
-> The configuration provides parameters used to configure a VM.
-> This allows for providing alternate configurations to the VM being
-> created/launched. cpu, machine, memory, and NUMA configuration are all
-> examples of configuration which we might want to vary on the VM being cre=
-ated
-> or launched.
-> This will for example allow for creating an aarch64 vm.
->
-> Signed-off-by: Robert Foley <robert.foley@linaro.org>
-> Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
-<snip>
-> @@ -61,19 +86,30 @@ class BaseVM(object):
->      # 4 is arbitrary, but greater than 2,
->      # since we found we need to wait more than twice as long.
->      tcg_ssh_timeout_multiplier =3D 4
-> -    def __init__(self, debug=3DFalse, vcpus=3DNone):
-> +    def __init__(self, debug=3DFalse, vcpus=3DNone, config=3DNone):
->          self._guest =3D None
-<snip>
->                                     else logging.WARN))
-> -        vm =3D vmcls(debug=3Dargs.debug, vcpus=3Dargs.jobs)
-> +        vm =3D vmcls(debug=3Dargs.debug, vcpus=3Dargs.jobs, config=3Dcon=
-fig)
+If we have more than one such macro, it is easier to write and indent 
+(especially when using your editor's ability to decipher enough syntax 
+to suggest how to indent):
 
-Given the number of times I've just had to fix merge failures with the
-patches I've just sent I wonder if we should just pass args as a while
-to vmcls and be done with it?
+myarray = {
+   COMMON_ELEMENTS,
+   MORE_ELEMENTS,
+   { /* end of list */ }
+};
 
->          if args.build_image:
->              if os.path.exists(args.image) and not args.force:
->                  sys.stderr.writelines(["Image file exists: %s\n" % args.=
-image,
+than it is:
 
+myarray = {
+   COMMON_ELEMENTS
+   MORE_ELEMENTS
+   { /* end of list */ }
+};
 
---=20
-Alex Benn=C3=A9e
+which in turn implies that it is better to NOT stick a trailing comma in 
+the macro itself.  Similarly, for macros intended to replace statements, 
+we tend to avoid the trailing ; in the macro itself, because it is 
+easier to read:
+
+{
+   code;
+   MACRO();
+   more code;
+}
+
+than it is:
+
+{
+   code;
+   MACRO()
+   more code;
+}
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
