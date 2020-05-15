@@ -2,87 +2,60 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4489C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 09:41:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CE1DC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 09:42:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C551206B6
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 09:41:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ULeDc2i3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C551206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 23ECC206B6
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 09:42:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23ECC206B6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZWpw-0005v1-Kj
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 05:41:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37830)
+	id 1jZWrM-0007GI-CP
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 05:42:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38074)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jZWpM-0005M0-H3
- for qemu-devel@nongnu.org; Fri, 15 May 2020 05:40:24 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36987
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jZWpL-0002nY-6R
- for qemu-devel@nongnu.org; Fri, 15 May 2020 05:40:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589535621;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Flm1Z5RsTh6ql1i8cJJj6I9tbFoxve2ly7hP7fuj9p8=;
- b=ULeDc2i3r1GoPhtWQ3r2NEzqgfG74KjWwKr5HVf+QqMAkc6V2Xjkhuee82X6om+nLXMeDi
- sWMhn3CpjGRgjE7tbTactPSWr9DKP4Bf5q8dCshk8RAdw5yTUeZeh1d8+xOtFHq4SinwrG
- qCTWTrq8g2m9DH+/gOFiQWAOZ8xzRdI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-495-zuv1wyIvN9imy1FxqduCpw-1; Fri, 15 May 2020 05:40:20 -0400
-X-MC-Unique: zuv1wyIvN9imy1FxqduCpw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1AE748015D1;
- Fri, 15 May 2020 09:40:19 +0000 (UTC)
-Received: from gondolin (ovpn-112-229.ams2.redhat.com [10.36.112.229])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 05DCA60CD3;
- Fri, 15 May 2020 09:40:17 +0000 (UTC)
-Date: Fri, 15 May 2020 11:40:15 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH 1/3] docs/s390x: document the virtual css
-Message-ID: <20200515114015.6190668b.cohuck@redhat.com>
-In-Reply-To: <8c2abd64-39e8-8150-c4ee-546ee55ddb42@redhat.com>
-References: <20200505135025.14614-1-cohuck@redhat.com>
- <20200505135025.14614-2-cohuck@redhat.com>
- <7876d0f3-7bb9-38b9-6675-94ba6bd47a1a@redhat.com>
- <20200515105133.12ffb2be.cohuck@redhat.com>
- <8c2abd64-39e8-8150-c4ee-546ee55ddb42@redhat.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jZWqj-0006TD-Hj
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 05:41:49 -0400
+Received: from mx2.suse.de ([195.135.220.15]:33588)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jZWqi-00030J-Jz
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 05:41:49 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+ by mx2.suse.de (Postfix) with ESMTP id 048E8B112;
+ Fri, 15 May 2020 09:41:49 +0000 (UTC)
+Subject: Re: [PATCH 2/2] tests/vm: Remove flex/bison packages
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <20200515083124.5536-1-philmd@redhat.com>
+ <20200515083124.5536-3-philmd@redhat.com>
+From: Claudio Fontana <cfontana@suse.de>
+Message-ID: <37196f3d-1251-6b6b-2bc8-741c8ec999ba@suse.de>
+Date: Fri, 15 May 2020 11:41:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 00:39:12
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+In-Reply-To: <20200515083124.5536-3-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 00:48:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,37 +69,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 15 May 2020 10:57:26 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> On 15/05/2020 10.51, Cornelia Huck wrote:
-> > On Fri, 15 May 2020 09:04:13 +0200
-> > Thomas Huth <thuth@redhat.com> wrote:
-> >   
-> >> On 05/05/2020 15.50, Cornelia Huck wrote:  
-> [...]
-> >>> +
-> >>> +  This would not show up in a standard Linux guest.    
-> >>
-> >> Ok ... and what happens if you use devno=0.0.1234 ? Will that then show
-> >> up under fe.0.1234 in the guest??  
-> > 
-> > That won't show up in the guest, either -- do you think I should add an
-> > example for that as well?  
+On 5/15/20 10:31 AM, Philippe Mathieu-Daudé wrote:
+> QEMU does use flex/bison packages.
 > 
-> It could help to clarify the question that came to my mind here. And
-> what would happen if the guest supported MCSS-E ? Would it then show up
-> as fe.0.1234 indeed?
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  tests/vm/fedora      | 1 -
+>  tests/vm/freebsd     | 1 -
+>  tests/vm/netbsd      | 1 -
+>  tests/vm/ubuntu.i386 | 2 +-
+>  4 files changed, 1 insertion(+), 4 deletions(-)
 
-No, it would show up as 0.0.1234, and the devices in the default css
-(0xfe) would show up as fe.x.yyyy.
 
-But I have not seen a Linux kernel with support for MCSS-E in the wild
-:) (nor any other OS, for that matter)
+Hi, does openbsd need a correction as well? Or is it needed there?
+
+diff --git a/tests/vm/openbsd b/tests/vm/openbsd
+index 0b705f4945..13e7f9a6d5 100755
+--- a/tests/vm/openbsd
++++ b/tests/vm/openbsd
+@@ -35,7 +35,6 @@ class OpenBSDVM(basevm.BaseVM):
+         "bash",
+         "gmake",
+         "gsed",
+-        "bison",
+ 
+         # libs: usb
+         "libusb1",
+
+Ciao,
+
+Claudio
+
+
+> 
+> diff --git a/tests/vm/fedora b/tests/vm/fedora
+> index bd9c6cf295..a9195670f4 100755
+> --- a/tests/vm/fedora
+> +++ b/tests/vm/fedora
+> @@ -32,7 +32,6 @@ class FedoraVM(basevm.BaseVM):
+>      pkgs = [
+>          # tools
+>          'git-core',
+> -        'flex', 'bison',
+>          'gcc', 'binutils', 'make',
+>  
+>          # perl
+> diff --git a/tests/vm/freebsd b/tests/vm/freebsd
+> index 298967fe9c..f87db2b126 100755
+> --- a/tests/vm/freebsd
+> +++ b/tests/vm/freebsd
+> @@ -38,7 +38,6 @@ class FreeBSDVM(basevm.BaseVM):
+>          "bash",
+>          "gmake",
+>          "gsed",
+> -        "flex", "bison",
+>  
+>          # libs: crypto
+>          "gnutls",
+> diff --git a/tests/vm/netbsd b/tests/vm/netbsd
+> index b10c9d429d..cdac502dad 100755
+> --- a/tests/vm/netbsd
+> +++ b/tests/vm/netbsd
+> @@ -36,7 +36,6 @@ class NetBSDVM(basevm.BaseVM):
+>          "bash",
+>          "gmake",
+>          "gsed",
+> -        "flex", "bison",
+>  
+>          # libs: crypto
+>          "gnutls",
+> diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
+> index 1570775335..24527cc78c 100755
+> --- a/tests/vm/ubuntu.i386
+> +++ b/tests/vm/ubuntu.i386
+> @@ -52,7 +52,7 @@ class UbuntuX86VM(basevm.BaseVM):
+>          self.ssh_root_check("sed -ie s/^#\ deb-src/deb-src/g /etc/apt/sources.list")
+>          self.ssh_root_check("apt-get update")
+>          self.ssh_root_check("apt-get build-dep -y qemu")
+> -        self.ssh_root_check("apt-get install -y libfdt-dev flex bison language-pack-en")
+> +        self.ssh_root_check("apt-get install -y libfdt-dev language-pack-en")
+>          self.ssh_root("poweroff")
+>          self.wait()
+>          os.rename(img_tmp, img)
+> 
 
 
