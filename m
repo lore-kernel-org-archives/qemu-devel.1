@@ -2,90 +2,91 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2EBAC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 09:11:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EE84C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 09:16:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BA7C2065C
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 09:11:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2647B2065C
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 09:16:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AzRDZqrG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BA7C2065C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H5QdNBgM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2647B2065C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZWMz-0006lr-QN
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 05:11:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33242)
+	id 1jZWRw-000297-2v
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 05:16:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34258)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jZWJt-0001sp-Dd
- for qemu-devel@nongnu.org; Fri, 15 May 2020 05:07:53 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:51458
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jZWQb-00017m-75
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 05:14:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37613
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jZWJs-0002bH-6C
- for qemu-devel@nongnu.org; Fri, 15 May 2020 05:07:53 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jZWQZ-0004G8-N7
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 05:14:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589533671;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1589534086;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=toinD8APpyYyt8XHgVoPf2uYY850fQma58DTX381JZ0=;
- b=AzRDZqrGwuOpZLiB1OT1uKLopnDuPNlNu56N7UdGOq/Oa6iGMKqm+8Dmmqtvaan5wKEyCS
- yqAO9XoP5unlnzWRyOqSIbCcvWmA2P25Ex54rBMMKvCvpduovRnFlipa/OPKkcLtnphJZw
- 327YwC17DFDff9o+bZ5yYLVfWE0enhI=
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=L6JJ54lBAMFIBTxj6OBPaunM/XZT/7oojEh9zbAMP2Q=;
+ b=H5QdNBgMxGi+L7v29y2kptBlAioDpdp7SCmcN+vjl8l7dfD/NPNctPupQY3RVvMXtnDQE3
+ r9LWat54l4cu2ZiQHr2MqwK2coSzsnXjhV0LteTp0bkhVB0roo1gC2R2r2LOQx9dO7+i55
+ 2NDPjxf5a9LETk6a2p70z07Zxc49d1A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-USqnez2SPYuRTT4qBYlpJg-1; Fri, 15 May 2020 05:07:49 -0400
-X-MC-Unique: USqnez2SPYuRTT4qBYlpJg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-475-Teyrg5DzP_mQ2e9luVhILQ-1; Fri, 15 May 2020 05:14:44 -0400
+X-MC-Unique: Teyrg5DzP_mQ2e9luVhILQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8EB111906802;
- Fri, 15 May 2020 09:07:48 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.64])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 97ECB46;
- Fri, 15 May 2020 09:07:39 +0000 (UTC)
-Date: Fri, 15 May 2020 10:07:36 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: xiaoqiang zhao <zxq_yx_007@163.com>
-Subject: Re: [PATCH v5 2/3] tests/util-sockets: add abstract unix socket cases
-Message-ID: <20200515090736.GD1300305@redhat.com>
-References: <20200515090608.5373-1-zxq_yx_007@163.com>
- <20200515090608.5373-3-zxq_yx_007@163.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE51B100CCD2;
+ Fri, 15 May 2020 09:14:43 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-113-42.ams2.redhat.com [10.36.113.42])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 83A407D973;
+ Fri, 15 May 2020 09:14:42 +0000 (UTC)
+Subject: Re: [PATCH 2/3] docs/s390x: document 3270
+To: Cornelia Huck <cohuck@redhat.com>
+References: <20200505135025.14614-1-cohuck@redhat.com>
+ <20200505135025.14614-3-cohuck@redhat.com>
+ <4ea47ea1-04d5-3073-fef6-5af07f06a4d6@redhat.com>
+ <20200515110007.1676b17d.cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <b6acb966-16f2-605d-6d01-70f6085bfa79@redhat.com>
+Date: Fri, 15 May 2020 11:14:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200515090608.5373-3-zxq_yx_007@163.com>
-User-Agent: Mutt/1.13.4 (2020-02-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200515110007.1676b17d.cohuck@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 00:39:12
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 22:56:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FROM_EXCESS_BASE64=0.979, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,30 +99,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org,
- armbru@redhat.com, kraxel@redhat.com, pbonzini@redhat.com,
- marcandre.lureau@redhat.com
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 15, 2020 at 05:06:07PM +0800, xiaoqiang zhao wrote:
-> add cases to test tight and non-tight for abstract address type
+On 15/05/2020 11.00, Cornelia Huck wrote:
+> On Fri, 15 May 2020 09:29:42 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
 > 
-> Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
-> ---
->  tests/test-util-sockets.c | 92 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 92 insertions(+)
+>> On 05/05/2020 15.50, Cornelia Huck wrote:
+>>> Add some basic info how to use 3270 devices.
+>>>
+>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>>> ---
+>>>  docs/system/s390x/3270.rst   | 32 ++++++++++++++++++++++++++++++++
+>>>  docs/system/target-s390x.rst |  1 +
+>>>  2 files changed, 33 insertions(+)
+>>>  create mode 100644 docs/system/s390x/3270.rst
+>>>
+>>> diff --git a/docs/system/s390x/3270.rst b/docs/system/s390x/3270.rst
+>>> new file mode 100644
+>>> index 000000000000..e367a457e001
+>>> --- /dev/null
+>>> +++ b/docs/system/s390x/3270.rst
+>>> @@ -0,0 +1,32 @@
+>>> +3270 devices
+>>> +============
+>>> +
+>>> +With the aid of the ``x3270`` emulator, QEMU provides limited support
+>>> +for making a single 3270 device available to a guest. Note that this
+>>> +supports basic features only.  
+>>
+>> The first sentence sounds somewhat confusing. Maybe rather something like:
+>>
+>> QEMU can emulate a 3270 device attached to a guest, which then can be
+>> used with a program like ``x3270`` to get a traditional 3270 terminal
+>> for your guest.
+> 
+> But QEMU actually relies on x3270 (or a comparable program). It only
+> emulates the basic ccw plumbing; for the actual protocol (beyond
+> negotiating tn3270), it relies on the emulation done by x3270.
 
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Ok, makes sense now. Maybe something like:
 
+QEMU provides the possibility to connect an external 3270 terminal
+emulator (like ``x3270``) to a guest?
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+ Thomas
 
 
