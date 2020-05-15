@@ -2,46 +2,44 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACCF9C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 16:36:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60C78C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 16:36:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7125C206C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 16:36:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 09487206C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 16:36:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="NwLvfw0Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7125C206C0
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="n3cET2Pa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09487206C0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZdJd-0005b5-IV
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 12:36:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45234)
+	id 1jZdJu-0005yY-5g
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 12:36:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44834)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <figlesia@xilinx.com>)
- id 1jZbdS-0000Xs-OR
- for qemu-devel@nongnu.org; Fri, 15 May 2020 10:48:26 -0400
-Received: from mail-mw2nam10on2047.outbound.protection.outlook.com
- ([40.107.94.47]:14560 helo=NAM10-MW2-obe.outbound.protection.outlook.com)
+ id 1jZbae-0004bT-WA; Fri, 15 May 2020 10:45:33 -0400
+Received: from mail-co1nam11on2070.outbound.protection.outlook.com
+ ([40.107.220.70]:6262 helo=NAM11-CO1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <figlesia@xilinx.com>)
- id 1jZbdR-0001ci-HD
- for qemu-devel@nongnu.org; Fri, 15 May 2020 10:48:26 -0400
+ id 1jZbaa-0001H6-6U; Fri, 15 May 2020 10:45:32 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YqgJpe8xB72rvTtKv3l628g2Xl35PNJb5dCpcZLWuSh+EO+9zegKRygj3a9riosmmPBLJqD0LaOEFUHEL81dPowimAiNAY/msS2s7zw9eARBvlGj0ez66sNsMu20oyuoXFkJdWDbMofUEFveP1pAneD6U86/Pjwu5mfUl1AcEHpSeZSicKlwHUHgNwcDIcbEsDf6SWwxy6EPIN+QRMslq2Kcc83VYc4E/442u+Hs8J6qwVnDS3AUXoW4b5tu6EenRZPb9ZmXFlX2ZshJ5LB1EODRKTQxIFbNw+um4yqGvJF3QTX3aFuGlnXyts7vdEoUVLhacF5WMAZrCXwYktE3eA==
+ b=IDnjEB+7U8vq0KNOQEjresCjCXjUcYvocifR3JqhgHSkhiDNjGP3W28wQlL7yYxITv/zs3oY8u827NC88dIxIFgj7aJMUYKwPZBZK7mkfrYFVVFjPe+njC6syloWipF3Znt7raZsS8hSyO6HNFQaZeMFzTn9ZDh3Wc1GvNwTzPnYnlHYljBN4jL2EcYCgJV5xZt492AAgwbvsq2Q17/k34RVIIO4T2TZ+JO6ANdy0h9J/n8b6c/SRQ4C+C7tZWKXwSrJ6gnEzdmBKlnnOtQgvrjh/yhMwzrdzjylRpcvMhDe0MtufleEhBAKJNfaW5pGwCal/N84bnCVO81rPyIlFg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+IJYBlu/hGOiwWcwUOuMDnfvyRXPb8U+6PLLqLfqYY4=;
- b=iIHl0BfhVRXqdI236yrei7Swko3A3+C9HOonJAuVornyHzZf/4q1t3Jn10Px/N/O6c6nanHwOUn7XF12a/BEykTsC5tOinL/wf2flIzCNGhk/auQUQ+rgG8OiC+aUuGCfJQCp+5aF3puCiWfwxSavltObysPkW8QpwcLEZag4JhNzei89HDovrj/LV6ioAMY5WOz5VZwZXsHMURRUqlZkeBqShBB1IMoOJnAQ/hTZsboKjvUlhUnE1AboBmKMpLOZe6ssqqQyS7WiGsy3WnEPbeGi5ej8dFu6TreXz+hob2bxpdXGRD8Bi/r2oHd9ceOz4zvfeetjE8n2qCBHXY2MQ==
+ bh=KkI5Vb4G6akgDROLZSwZcCtezSvxVByFihNmzLLjS9A=;
+ b=nEWWt/lGuLMagETpqFhAIj8DMfYXKZ5LloemE1r73raW85i7Ud/z6SpIA0DbUuIwzNXdbeZO0atJv07IkF+rI/dBLr/X846RQzzftpoP7W1Y0N9SZbtOWKKHexXMuYiu0Rq0TdmYP5+aiPcYkK/iurdT6UdozNO2c9Ak/8/sKFrkQYzv/MQD05ARQYJWul7nq2HYg1XqvWYwQF+5xCHFAE5eNXMBbj2fAX+DuVA3p75hfLmaa4G0QGQai8SjvihehRDoWGYxmQFKD/QSPTalDh7u3+sJpfd/+scQluualNTTtF1pxFo2uhpwamkIDu81ttzYsr93rNJaTiwu72u0XQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  149.199.60.83) smtp.rcpttodomain=nongnu.org smtp.mailfrom=xilinx.com;
  dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
@@ -49,19 +47,19 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+IJYBlu/hGOiwWcwUOuMDnfvyRXPb8U+6PLLqLfqYY4=;
- b=NwLvfw0ZvBFngVk+CPKlOaDd5UD4CNFI3PIQDnUoiFhBwx8RQBhLRc7pChpEkqMIUzDbf28b63FxcmlQisHWdLzR4WW0i4/nWkMmetI/I1gJ9Ty1dsn6S85gww+R092el9q6YsDYXVBHOa/4Y//okYpve0iMriR+SQhuhwPHVAk=
-Received: from SN4PR0201CA0046.namprd02.prod.outlook.com
- (2603:10b6:803:2e::32) by BYAPR02MB4775.namprd02.prod.outlook.com
- (2603:10b6:a03:41::16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.34; Fri, 15 May
- 2020 14:48:23 +0000
-Received: from SN1NAM02FT023.eop-nam02.prod.protection.outlook.com
- (2603:10b6:803:2e:cafe::60) by SN4PR0201CA0046.outlook.office365.com
- (2603:10b6:803:2e::32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.25 via Frontend
- Transport; Fri, 15 May 2020 14:48:22 +0000
-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
+ bh=KkI5Vb4G6akgDROLZSwZcCtezSvxVByFihNmzLLjS9A=;
+ b=n3cET2Park4HC0pUfYowbdi5RH0IRRRKhHJkwCGWS22Vr+5kIZeVhki6ol/iCiKij7kZiuhbtwjKbRJkBqUTAYs00TplhJP/WzqryBvFyFPPPMwSXXjDje8C7HAhppXW85kyLdjzXTGPU31KBs19stgYBcDxPEC5j/P3l1VQhYE=
+Received: from BL0PR0102CA0061.prod.exchangelabs.com (2603:10b6:208:25::38) by
+ MN2PR02MB6384.namprd02.prod.outlook.com (2603:10b6:208:1b8::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.26; Fri, 15 May
+ 2020 14:45:22 +0000
+Received: from BL2NAM02FT041.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:208:25:cafe::1c) by BL0PR0102CA0061.outlook.office365.com
+ (2603:10b6:208:25::38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.24 via Frontend
+ Transport; Fri, 15 May 2020 14:45:21 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
  smtp.mailfrom=xilinx.com; nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=bestguesspass action=none
  header.from=xilinx.com;
@@ -69,36 +67,35 @@ Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
  149.199.60.83 as permitted sender) receiver=protection.outlook.com;
  client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
 Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- SN1NAM02FT023.mail.protection.outlook.com (10.152.72.156) with Microsoft SMTP
- Server id 15.20.3000.19 via Frontend Transport; Fri, 15 May 2020 14:48:22
+ BL2NAM02FT041.mail.protection.outlook.com (10.152.77.122) with Microsoft SMTP
+ Server id 15.20.3000.19 via Frontend Transport; Fri, 15 May 2020 14:45:21
  +0000
-Received: from [149.199.38.66] (port=53865 helo=xsj-pvapsmtp01)
+Received: from [149.199.38.66] (port=51699 helo=xsj-pvapsmtp01)
  by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
- (envelope-from <francisco.iglesias@xilinx.com>) id 1jZbd3-0005C4-Gl
- for qemu-devel@nongnu.org; Fri, 15 May 2020 07:48:01 -0700
+ (envelope-from <francisco.iglesias@xilinx.com>)
+ id 1jZba8-000523-OD; Fri, 15 May 2020 07:45:00 -0700
 Received: from [127.0.0.1] (helo=localhost)
  by xsj-pvapsmtp01 with smtp (Exim 4.63)
- (envelope-from <francisco.iglesias@xilinx.com>) id 1jZbdN-00081k-Rh
- for qemu-devel@nongnu.org; Fri, 15 May 2020 07:48:21 -0700
-Received: from xsj-pvapsmtp01 (mailman.xilinx.com [149.199.38.66])
- by xsj-smtp-dlp2.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 04FEmK8P019077; 
- Fri, 15 May 2020 07:48:20 -0700
+ (envelope-from <francisco.iglesias@xilinx.com>)
+ id 1jZbaT-0007bb-3x; Fri, 15 May 2020 07:45:21 -0700
+Received: from xsj-pvapsmtp01 (smtp2.xilinx.com [149.199.38.66])
+ by xsj-smtp-dlp1.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 04FEjEXI029244; 
+ Fri, 15 May 2020 07:45:14 -0700
 Received: from [10.23.123.155] (helo=debian)
  by xsj-pvapsmtp01 with esmtp (Exim 4.63)
  (envelope-from <francisco.iglesias@xilinx.com>)
- id 1jZbdM-00081d-Bf; Fri, 15 May 2020 07:48:20 -0700
-Date: Fri, 15 May 2020 15:48:18 +0100
+ id 1jZbaL-0007YG-ES; Fri, 15 May 2020 07:45:14 -0700
+Date: Fri, 15 May 2020 15:45:10 +0100
 From: Francisco Iglesias <francisco.iglesias@xilinx.com>
 To: Vikram Garhwal <fnu.vikram@xilinx.com>
-Subject: Re: [PATCH v4 4/4] MAINTAINERS: Add maintainer entry for Xilinx
- ZynqMP CAN controller
-Message-ID: <20200515144817.autpx5nibkmqmsqr@debian>
+Subject: Re: [PATCH v4 1/4] hw/net/can: Introduce Xilinx ZynqMP CAN controller
+Message-ID: <20200515144509.kvidcio6o4u74sry@debian>
 References: <1589314552-1375-1-git-send-email-fnu.vikram@xilinx.com>
- <1589314552-1375-5-git-send-email-fnu.vikram@xilinx.com>
+ <1589314552-1375-2-git-send-email-fnu.vikram@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1589314552-1375-5-git-send-email-fnu.vikram@xilinx.com>
+In-Reply-To: <1589314552-1375-2-git-send-email-fnu.vikram@xilinx.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 X-RCIS-Action: ALLOW
 X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
@@ -108,29 +105,29 @@ X-MS-Office365-Filtering-HT: Tenant
 X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
  SFTY:;
- SFS:(136003)(376002)(346002)(39850400004)(396003)(46966005)(186003)(82740400003)(316002)(44832011)(26005)(9576002)(4744005)(8936002)(478600001)(33716001)(82310400002)(9786002)(2906002)(6862004)(426003)(356005)(70586007)(70206006)(81166007)(9686003)(47076004)(8676002)(1076003)(6636002)(5660300002)(4326008)(336012);
+ SFS:(39860400002)(396003)(346002)(136003)(376002)(46966005)(33716001)(336012)(9786002)(426003)(4326008)(316002)(8676002)(9686003)(8936002)(44832011)(478600001)(9576002)(6862004)(2906002)(1076003)(186003)(30864003)(6636002)(6666004)(81166007)(356005)(5660300002)(70206006)(47076004)(54906003)(82310400002)(70586007)(82740400003)(26005)(579004)(6606295002);
  DIR:OUT; SFP:1101; 
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: fd65510b-dbb6-4e0c-e3ae-08d7f8df03cf
-X-MS-TrafficTypeDiagnostic: BYAPR02MB4775:
-X-Microsoft-Antispam-PRVS: <BYAPR02MB4775BCC6265ED3F1CD72597CADBD0@BYAPR02MB4775.namprd02.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 21210073-8cce-4255-b91b-08d7f8de981e
+X-MS-TrafficTypeDiagnostic: MN2PR02MB6384:
+X-Microsoft-Antispam-PRVS: <MN2PR02MB6384447759F15419F9505A6CADBD0@MN2PR02MB6384.namprd02.prod.outlook.com>
 X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:513;
+X-MS-Oob-TLC-OOBClassifiers: OLM:3513;
 X-Forefront-PRVS: 04041A2886
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8K5JLCj5YnEzulNV6QzlKRVFUfn6yHJDhjxk3DXQdito/QjwrXLd4dBhnCnz6+7SnLphTfzUNNfEwOYGf11QPeIs94ZKHXRG1zkWim5qhrM66dcW2gLCdc/sIqhXsv1GIgDg/KhUOpnjrHEHRa/c24IFH+b21DLydJTML/V+uxCV20kAzyLeA9UMdZdnNHOXakxuZapW641aKYlSogPv2S4LFURZd3SB0sPjcXGRN/AIc2gkW/gBxeJVgLXTLtUQSsjyb2Rl8bqO4MJM/48tJ8b5pfVdEIuua78REV0DXzCpZM4Y1lcfPBFlZZ/Az5qgBTasxaJdq/gd6EuBEdflXZ6onqaUytRHMIbSzTdiUaB+fvIeRLuPD1HElxm6zVkAUofKVddVDV2UxWzxoVUmTe3Da3/4wD1ia/jQglYCZM5I/qgUS6YvKIoLnxWAArrEtbNYidxuGHug4pMNA176QJcK6aD/jZMWu2sftJX1uPgpzBUn1vY/EwcFAxf8wtl/A678uaxola/gnBLnosR5zA==
+X-Microsoft-Antispam-Message-Info: Fl11oPBarzbCciVyHXzlGaDDrw7Y/kADPubK6vXspLsdWc43eWB2pGpfOzVdDWr3h576/YCWFGZvc4wY/7hpp5n7JV8Qo7w7QP4CiWZOCsbvBr6dESM0nbqZ1hRqcxzTRGQv1GtRNBfT9+ubl6Big7+kIWp5ei/oBjTHPijHVPW41loBqcdv4MKPmpOktGvRRcmW1prirrIuCnkFbYkAIsLNNkp4NnAE0qdFWxGoum/PmiDNSvCoWoyiw0RRxeRhR/CfCxJX+LZRV1PEjezuqyGoYhH8G11DC3XMCM0IK01Z+mAJVPgWtouf5cPlfArtiQpV/SmSOqGaOzsge7iniceNP+WYNEkkVYFWR3EQYWLaBK4wGfybw4ckMDLoqpw/R9tIjhnCW/9aWMq5xHHhi97FHtq12itIsOfC5UY1Y/fvc1BIAkc6B4sSRKWLdiQhw2wxHT/7sCJJdlWloWL19KKTC/JExOvrwRQGdFAxr5trZsEzOrgo9L9nhFDNJrhbvUOEDJ9Wpf2HVXwUhvigHSpC4gkMR9Y4M4LxJrvQKSY=
 X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 May 2020 14:48:22.1535 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: fd65510b-dbb6-4e0c-e3ae-08d7f8df03cf
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 May 2020 14:45:21.4693 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 21210073-8cce-4255-b91b-08d7f8de981e
 X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
  Helo=[xsj-pvapsmtpgw01]
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR02MB4775
-Received-SPF: pass client-ip=40.107.94.47; envelope-from=figlesia@xilinx.com;
- helo=NAM10-MW2-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 10:48:24
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR02MB6384
+Received-SPF: pass client-ip=40.107.220.70; envelope-from=figlesia@xilinx.com;
+ helo=NAM11-CO1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 10:45:25
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -152,40 +149,1283 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
+ "open list:Xilinx ZynqMP" <qemu-arm@nongnu.org>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 12, 2020 at 01:15:52PM -0700, Vikram Garhwal wrote:
-> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> Signed-off-by: Vikram Garhwal <fnu.vikram@xilinx.com>
+Hi Vikram,
 
-Reviewed-by: Francisco Iglesias <francisco.iglesias@xilinx.com>
+On Tue, May 12, 2020 at 01:15:49PM -0700, Vikram Garhwal wrote:
+> XlnxCAN is developed based on SocketCAN, QEMU CAN bus implementation.
 
-> ---
->  MAINTAINERS | 8 ++++++++
->  1 file changed, 8 insertions(+)
+s/XlnxCAN/XlnxZynqMPCAN/
+
+(or 'The Xilinx ZynqMP CAN controller model' perhaps)
+
+> Bus connection and socketCAN connection for each CAN module can be set
+> through command lines.
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 8cbc1fa..b53d75e 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1433,6 +1433,14 @@ F: hw/net/opencores_eth.c
->  
->  Devices
->  -------
-> +Xilinx CAN
-> +M: Vikram Garhwal <fnu.vikram@xilinx.com>
-> +M: Francisco Iglesias <francisco.iglesias@xilinx.com>
-> +S: Maintained
-> +F: hw/net/can/xlnx-*
-> +F: include/hw/net/xlnx-*
-> +F: tests/qtest/xlnx-can-test*
+> Signed-off-by: Vikram Garhwal <fnu.vikram@xilinx.com>
+> ---
+>  hw/net/can/Makefile.objs         |    1 +
+>  hw/net/can/xlnx-zynqmp-can.c     | 1111 ++++++++++++++++++++++++++++++++++++++
+>  include/hw/net/xlnx-zynqmp-can.h |   75 +++
+>  3 files changed, 1187 insertions(+)
+>  create mode 100644 hw/net/can/xlnx-zynqmp-can.c
+>  create mode 100644 include/hw/net/xlnx-zynqmp-can.h
+> 
+> diff --git a/hw/net/can/Makefile.objs b/hw/net/can/Makefile.objs
+> index 9f0c4ee..0fe87dd 100644
+> --- a/hw/net/can/Makefile.objs
+> +++ b/hw/net/can/Makefile.objs
+> @@ -2,3 +2,4 @@ common-obj-$(CONFIG_CAN_SJA1000) += can_sja1000.o
+>  common-obj-$(CONFIG_CAN_PCI) += can_kvaser_pci.o
+>  common-obj-$(CONFIG_CAN_PCI) += can_pcm3680_pci.o
+>  common-obj-$(CONFIG_CAN_PCI) += can_mioe3680_pci.o
+> +common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-zynqmp-can.o
+> diff --git a/hw/net/can/xlnx-zynqmp-can.c b/hw/net/can/xlnx-zynqmp-can.c
+> new file mode 100644
+> index 0000000..2b3f633
+> --- /dev/null
+> +++ b/hw/net/can/xlnx-zynqmp-can.c
+> @@ -0,0 +1,1111 @@
+> +/*
+> + * QEMU model of the Xilinx CAN device.
+
+s/Xilinx CAN/Xilinx ZynqMP CAN/
+
+> + *
+> + * Copyright (c) 2020 Xilinx Inc.
+> + *
+> + * Written-by: Vikram Garhwal<fnu.vikram@xilinx.com>
+> + *
+> + * Based on QEMU CAN Device emulation implemented by Jin Yang, Deniz Eren and
+> + * Pavel Pisa
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
 > +
->  EDU
->  M: Jiri Slaby <jslaby@suse.cz>
->  S: Maintained
+> +#include "qemu/osdep.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/register.h"
+> +#include "hw/irq.h"
+> +#include "qapi/error.h"
+> +#include "qemu/bitops.h"
+> +#include "qemu/log.h"
+> +#include "qemu/cutils.h"
+> +#include "sysemu/sysemu.h"
+> +#include "migration/vmstate.h"
+> +#include "hw/qdev-properties.h"
+> +#include "net/can_emu.h"
+> +#include "net/can_host.h"
+> +#include "qemu/event_notifier.h"
+> +#include "qom/object_interfaces.h"
+> +#include "hw/net/xlnx-zynqmp-can.h"
+> +
+> +#ifndef XLNX_ZYNQMP_CAN_ERR_DEBUG
+> +#define XLNX_ZYNQMP_CAN_ERR_DEBUG 0
+> +#endif
+> +
+> +#define DB_PRINT(...) do { \
+> +    if (XLNX_ZYNQMP_CAN_ERR_DEBUG) { \
+> +        qemu_log(__VA_ARGS__); \
+> +    } \
+> +} while (0)
+> +
+> +#define MAX_DLC            8
+> +#undef ERROR
+> +
+> +REG32(SOFTWARE_RESET_REGISTER, 0x0)
+> +    FIELD(SOFTWARE_RESET_REGISTER, CEN, 1, 1)
+> +    FIELD(SOFTWARE_RESET_REGISTER, SRST, 0, 1)
+> +REG32(MODE_SELECT_REGISTER, 0x4)
+> +    FIELD(MODE_SELECT_REGISTER, SNOOP, 2, 1)
+> +    FIELD(MODE_SELECT_REGISTER, LBACK, 1, 1)
+> +    FIELD(MODE_SELECT_REGISTER, SLEEP, 0, 1)
+> +REG32(ARBITRATION_PHASE_BAUD_RATE_PRESCALER_REGISTER, 0x8)
+> +    FIELD(ARBITRATION_PHASE_BAUD_RATE_PRESCALER_REGISTER, BRP, 0, 8)
+> +REG32(ARBITRATION_PHASE_BIT_TIMING_REGISTER, 0xc)
+> +    FIELD(ARBITRATION_PHASE_BIT_TIMING_REGISTER, SJW, 7, 2)
+> +    FIELD(ARBITRATION_PHASE_BIT_TIMING_REGISTER, TS2, 4, 3)
+> +    FIELD(ARBITRATION_PHASE_BIT_TIMING_REGISTER, TS1, 0, 4)
+> +REG32(ERROR_COUNTER_REGISTER, 0x10)
+> +    FIELD(ERROR_COUNTER_REGISTER, REC, 8, 8)
+> +    FIELD(ERROR_COUNTER_REGISTER, TEC, 0, 8)
+> +REG32(ERROR_STATUS_REGISTER, 0x14)
+> +    FIELD(ERROR_STATUS_REGISTER, ACKER, 4, 1)
+> +    FIELD(ERROR_STATUS_REGISTER, BERR, 3, 1)
+> +    FIELD(ERROR_STATUS_REGISTER, STER, 2, 1)
+> +    FIELD(ERROR_STATUS_REGISTER, FMER, 1, 1)
+> +    FIELD(ERROR_STATUS_REGISTER, CRCER, 0, 1)
+> +REG32(STATUS_REGISTER, 0x18)
+> +    FIELD(STATUS_REGISTER, SNOOP, 12, 1)
+> +    FIELD(STATUS_REGISTER, ACFBSY, 11, 1)
+> +    FIELD(STATUS_REGISTER, TXFLL, 10, 1)
+> +    FIELD(STATUS_REGISTER, TXBFLL, 9, 1)
+> +    FIELD(STATUS_REGISTER, ESTAT, 7, 2)
+> +    FIELD(STATUS_REGISTER, ERRWRN, 6, 1)
+> +    FIELD(STATUS_REGISTER, BBSY, 5, 1)
+> +    FIELD(STATUS_REGISTER, BIDLE, 4, 1)
+> +    FIELD(STATUS_REGISTER, NORMAL, 3, 1)
+> +    FIELD(STATUS_REGISTER, SLEEP, 2, 1)
+> +    FIELD(STATUS_REGISTER, LBACK, 1, 1)
+> +    FIELD(STATUS_REGISTER, CONFIG, 0, 1)
+> +REG32(INTERRUPT_STATUS_REGISTER, 0x1c)
+> +    FIELD(INTERRUPT_STATUS_REGISTER, TXFEMP, 14, 1)
+> +    FIELD(INTERRUPT_STATUS_REGISTER, TXFWMEMP, 13, 1)
+> +    FIELD(INTERRUPT_STATUS_REGISTER, RXFWMFLL, 12, 1)
+> +    FIELD(INTERRUPT_STATUS_REGISTER, WKUP, 11, 1)
+> +    FIELD(INTERRUPT_STATUS_REGISTER, SLP, 10, 1)
+> +    FIELD(INTERRUPT_STATUS_REGISTER, BSOFF, 9, 1)
+> +    FIELD(INTERRUPT_STATUS_REGISTER, ERROR, 8, 1)
+> +    FIELD(INTERRUPT_STATUS_REGISTER, RXNEMP, 7, 1)
+> +    FIELD(INTERRUPT_STATUS_REGISTER, RXOFLW, 6, 1)
+> +    FIELD(INTERRUPT_STATUS_REGISTER, RXUFLW, 5, 1)
+> +    FIELD(INTERRUPT_STATUS_REGISTER, RXOK, 4, 1)
+> +    FIELD(INTERRUPT_STATUS_REGISTER, TXBFLL, 3, 1)
+> +    FIELD(INTERRUPT_STATUS_REGISTER, TXFLL, 2, 1)
+> +    FIELD(INTERRUPT_STATUS_REGISTER, TXOK, 1, 1)
+> +    FIELD(INTERRUPT_STATUS_REGISTER, ARBLST, 0, 1)
+> +REG32(INTERRUPT_ENABLE_REGISTER, 0x20)
+> +    FIELD(INTERRUPT_ENABLE_REGISTER, ETXFEMP, 14, 1)
+> +    FIELD(INTERRUPT_ENABLE_REGISTER, ETXFWMEMP, 13, 1)
+> +    FIELD(INTERRUPT_ENABLE_REGISTER, ERXFWMFLL, 12, 1)
+> +    FIELD(INTERRUPT_ENABLE_REGISTER, EWKUP, 11, 1)
+> +    FIELD(INTERRUPT_ENABLE_REGISTER, ESLP, 10, 1)
+> +    FIELD(INTERRUPT_ENABLE_REGISTER, EBSOFF, 9, 1)
+> +    FIELD(INTERRUPT_ENABLE_REGISTER, EERROR, 8, 1)
+> +    FIELD(INTERRUPT_ENABLE_REGISTER, ERXNEMP, 7, 1)
+> +    FIELD(INTERRUPT_ENABLE_REGISTER, ERXOFLW, 6, 1)
+> +    FIELD(INTERRUPT_ENABLE_REGISTER, ERXUFLW, 5, 1)
+> +    FIELD(INTERRUPT_ENABLE_REGISTER, ERXOK, 4, 1)
+> +    FIELD(INTERRUPT_ENABLE_REGISTER, ETXBFLL, 3, 1)
+> +    FIELD(INTERRUPT_ENABLE_REGISTER, ETXFLL, 2, 1)
+> +    FIELD(INTERRUPT_ENABLE_REGISTER, ETXOK, 1, 1)
+> +    FIELD(INTERRUPT_ENABLE_REGISTER, EARBLST, 0, 1)
+> +REG32(INTERRUPT_CLEAR_REGISTER, 0x24)
+> +    FIELD(INTERRUPT_CLEAR_REGISTER, CTXFEMP, 14, 1)
+> +    FIELD(INTERRUPT_CLEAR_REGISTER, CTXFWMEMP, 13, 1)
+> +    FIELD(INTERRUPT_CLEAR_REGISTER, CRXFWMFLL, 12, 1)
+> +    FIELD(INTERRUPT_CLEAR_REGISTER, CWKUP, 11, 1)
+> +    FIELD(INTERRUPT_CLEAR_REGISTER, CSLP, 10, 1)
+> +    FIELD(INTERRUPT_CLEAR_REGISTER, CBSOFF, 9, 1)
+> +    FIELD(INTERRUPT_CLEAR_REGISTER, CERROR, 8, 1)
+> +    FIELD(INTERRUPT_CLEAR_REGISTER, CRXNEMP, 7, 1)
+> +    FIELD(INTERRUPT_CLEAR_REGISTER, CRXOFLW, 6, 1)
+> +    FIELD(INTERRUPT_CLEAR_REGISTER, CRXUFLW, 5, 1)
+> +    FIELD(INTERRUPT_CLEAR_REGISTER, CRXOK, 4, 1)
+> +    FIELD(INTERRUPT_CLEAR_REGISTER, CTXBFLL, 3, 1)
+> +    FIELD(INTERRUPT_CLEAR_REGISTER, CTXFLL, 2, 1)
+> +    FIELD(INTERRUPT_CLEAR_REGISTER, CTXOK, 1, 1)
+> +    FIELD(INTERRUPT_CLEAR_REGISTER, CARBLST, 0, 1)
+> +REG32(TIMESTAMP_REGISTER, 0x28)
+> +    FIELD(TIMESTAMP_REGISTER, CTS, 0, 1)
+> +REG32(WIR, 0x2c)
+> +    FIELD(WIR, EW, 8, 8)
+> +    FIELD(WIR, FW, 0, 8)
+> +REG32(TXFIFO_ID, 0x30)
+> +    FIELD(TXFIFO_ID, IDH, 21, 11)
+> +    FIELD(TXFIFO_ID, SRRRTR, 20, 1)
+> +    FIELD(TXFIFO_ID, IDE, 19, 1)
+> +    FIELD(TXFIFO_ID, IDL, 1, 18)
+> +    FIELD(TXFIFO_ID, RTR, 0, 1)
+> +REG32(TXFIFO_DLC, 0x34)
+> +    FIELD(TXFIFO_DLC, DLC, 28, 4)
+> +REG32(TXFIFO_DATA1, 0x38)
+> +    FIELD(TXFIFO_DATA1, DB0, 24, 8)
+> +    FIELD(TXFIFO_DATA1, DB1, 16, 8)
+> +    FIELD(TXFIFO_DATA1, DB2, 8, 8)
+> +    FIELD(TXFIFO_DATA1, DB3, 0, 8)
+> +REG32(TXFIFO_DATA2, 0x3c)
+> +    FIELD(TXFIFO_DATA2, DB4, 24, 8)
+> +    FIELD(TXFIFO_DATA2, DB5, 16, 8)
+> +    FIELD(TXFIFO_DATA2, DB6, 8, 8)
+> +    FIELD(TXFIFO_DATA2, DB7, 0, 8)
+> +REG32(TXHPB_ID, 0x40)
+> +    FIELD(TXHPB_ID, IDH, 21, 11)
+> +    FIELD(TXHPB_ID, SRRRTR, 20, 1)
+> +    FIELD(TXHPB_ID, IDE, 19, 1)
+> +    FIELD(TXHPB_ID, IDL, 1, 18)
+> +    FIELD(TXHPB_ID, RTR, 0, 1)
+> +REG32(TXHPB_DLC, 0x44)
+> +    FIELD(TXHPB_DLC, DLC, 28, 4)
+> +REG32(TXHPB_DATA1, 0x48)
+> +    FIELD(TXHPB_DATA1, DB0, 24, 8)
+> +    FIELD(TXHPB_DATA1, DB1, 16, 8)
+> +    FIELD(TXHPB_DATA1, DB2, 8, 8)
+> +    FIELD(TXHPB_DATA1, DB3, 0, 8)
+> +REG32(TXHPB_DATA2, 0x4c)
+> +    FIELD(TXHPB_DATA2, DB4, 24, 8)
+> +    FIELD(TXHPB_DATA2, DB5, 16, 8)
+> +    FIELD(TXHPB_DATA2, DB6, 8, 8)
+> +    FIELD(TXHPB_DATA2, DB7, 0, 8)
+> +REG32(RXFIFO_ID, 0x50)
+> +    FIELD(RXFIFO_ID, IDH, 21, 11)
+> +    FIELD(RXFIFO_ID, SRRRTR, 20, 1)
+> +    FIELD(RXFIFO_ID, IDE, 19, 1)
+> +    FIELD(RXFIFO_ID, IDL, 1, 18)
+> +    FIELD(RXFIFO_ID, RTR, 0, 1)
+> +REG32(RXFIFO_DLC, 0x54)
+> +    FIELD(RXFIFO_DLC, DLC, 28, 4)
+> +    FIELD(RXFIFO_DLC, RXT, 0, 16)
+> +REG32(RXFIFO_DATA1, 0x58)
+> +    FIELD(RXFIFO_DATA1, DB0, 24, 8)
+> +    FIELD(RXFIFO_DATA1, DB1, 16, 8)
+> +    FIELD(RXFIFO_DATA1, DB2, 8, 8)
+> +    FIELD(RXFIFO_DATA1, DB3, 0, 8)
+> +REG32(RXFIFO_DATA2, 0x5c)
+> +    FIELD(RXFIFO_DATA2, DB4, 24, 8)
+> +    FIELD(RXFIFO_DATA2, DB5, 16, 8)
+> +    FIELD(RXFIFO_DATA2, DB6, 8, 8)
+> +    FIELD(RXFIFO_DATA2, DB7, 0, 8)
+> +REG32(AFR, 0x60)
+> +    FIELD(AFR, UAF4, 3, 1)
+> +    FIELD(AFR, UAF3, 2, 1)
+> +    FIELD(AFR, UAF2, 1, 1)
+> +    FIELD(AFR, UAF1, 0, 1)
+> +REG32(AFMR1, 0x64)
+> +    FIELD(AFMR1, AMIDH, 21, 11)
+> +    FIELD(AFMR1, AMSRR, 20, 1)
+> +    FIELD(AFMR1, AMIDE, 19, 1)
+> +    FIELD(AFMR1, AMIDL, 1, 18)
+> +    FIELD(AFMR1, AMRTR, 0, 1)
+> +REG32(AFIR1, 0x68)
+> +    FIELD(AFIR1, AIIDH, 21, 11)
+> +    FIELD(AFIR1, AISRR, 20, 1)
+> +    FIELD(AFIR1, AIIDE, 19, 1)
+> +    FIELD(AFIR1, AIIDL, 1, 18)
+> +    FIELD(AFIR1, AIRTR, 0, 1)
+> +REG32(AFMR2, 0x6c)
+> +    FIELD(AFMR2, AMIDH, 21, 11)
+> +    FIELD(AFMR2, AMSRR, 20, 1)
+> +    FIELD(AFMR2, AMIDE, 19, 1)
+> +    FIELD(AFMR2, AMIDL, 1, 18)
+> +    FIELD(AFMR2, AMRTR, 0, 1)
+> +REG32(AFIR2, 0x70)
+> +    FIELD(AFIR2, AIIDH, 21, 11)
+> +    FIELD(AFIR2, AISRR, 20, 1)
+> +    FIELD(AFIR2, AIIDE, 19, 1)
+> +    FIELD(AFIR2, AIIDL, 1, 18)
+> +    FIELD(AFIR2, AIRTR, 0, 1)
+> +REG32(AFMR3, 0x74)
+> +    FIELD(AFMR3, AMIDH, 21, 11)
+> +    FIELD(AFMR3, AMSRR, 20, 1)
+> +    FIELD(AFMR3, AMIDE, 19, 1)
+> +    FIELD(AFMR3, AMIDL, 1, 18)
+> +    FIELD(AFMR3, AMRTR, 0, 1)
+> +REG32(AFIR3, 0x78)
+> +    FIELD(AFIR3, AIIDH, 21, 11)
+> +    FIELD(AFIR3, AISRR, 20, 1)
+> +    FIELD(AFIR3, AIIDE, 19, 1)
+> +    FIELD(AFIR3, AIIDL, 1, 18)
+> +    FIELD(AFIR3, AIRTR, 0, 1)
+> +REG32(AFMR4, 0x7c)
+> +    FIELD(AFMR4, AMIDH, 21, 11)
+> +    FIELD(AFMR4, AMSRR, 20, 1)
+> +    FIELD(AFMR4, AMIDE, 19, 1)
+> +    FIELD(AFMR4, AMIDL, 1, 18)
+> +    FIELD(AFMR4, AMRTR, 0, 1)
+> +REG32(AFIR4, 0x80)
+> +    FIELD(AFIR4, AIIDH, 21, 11)
+> +    FIELD(AFIR4, AISRR, 20, 1)
+> +    FIELD(AFIR4, AIIDE, 19, 1)
+> +    FIELD(AFIR4, AIIDL, 1, 18)
+> +    FIELD(AFIR4, AIRTR, 0, 1)
+> +
+> +static void can_update_irq(XlnxZynqMPCANState *s)
+> +{
+> +    uint32_t irq;
+> +
+> +    /* Watermark register interrupts. */
+> +    if ((fifo32_num_free(&s->tx_fifo) / CAN_FRAME_SIZE) >
+> +            ARRAY_FIELD_EX32(s->regs, WIR, EW)) {
+> +        ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, TXFWMEMP, 1);
+> +    }
+> +
+> +    if ((fifo32_num_used(&s->rx_fifo) / CAN_FRAME_SIZE) >
+> +            ARRAY_FIELD_EX32(s->regs, WIR, FW)) {
+> +        ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, RXFWMFLL, 1);
+> +    }
+> +
+> +    /* RX Interrupts. */
+> +    if (fifo32_num_used(&s->rx_fifo) >= CAN_FRAME_SIZE) {
+> +        ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, RXNEMP, 1);
+> +    }
+> +
+> +    /* TX interrupts. */
+> +    if (fifo32_is_empty(&s->tx_fifo)) {
+> +        ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, TXFEMP, 1);
+> +    }
+> +
+> +    if (fifo32_is_full(&s->tx_fifo)) {
+> +        ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, TXFLL, 1);
+> +    }
+> +
+> +    if (fifo32_is_full(&s->txhpb_fifo)) {
+> +        ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, TXBFLL, 1);
+> +    }
+> +
+> +    irq = s->regs[R_INTERRUPT_STATUS_REGISTER];
+> +    irq &= s->regs[R_INTERRUPT_ENABLE_REGISTER];
+> +
+> +    qemu_set_irq(s->irq, irq);
+> +}
+> +
+> +static void can_ier_post_write(RegisterInfo *reg, uint64_t val64)
+> +{
+> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
+> +
+> +    can_update_irq(s);
+> +}
+> +
+> +static uint64_t can_icr_pre_write(RegisterInfo *reg, uint64_t val64)
+> +{
+> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
+> +    uint32_t val = val64;
+> +
+> +    s->regs[R_INTERRUPT_STATUS_REGISTER] &= ~val;
+> +    can_update_irq(s);
+> +
+> +    return 0;
+> +}
+> +
+> +static void can_config_reset(XlnxZynqMPCANState *s)
+> +{
+> +    /* Reset all the configuration registers. */
+> +    register_reset(&s->reg_info[R_SOFTWARE_RESET_REGISTER]);
+> +    register_reset(&s->reg_info[R_MODE_SELECT_REGISTER]);
+> +    register_reset(
+> +              &s->reg_info[R_ARBITRATION_PHASE_BAUD_RATE_PRESCALER_REGISTER]);
+> +    register_reset(&s->reg_info[R_ARBITRATION_PHASE_BIT_TIMING_REGISTER]);
+> +    register_reset(&s->reg_info[R_STATUS_REGISTER]);
+> +    register_reset(&s->reg_info[R_INTERRUPT_STATUS_REGISTER]);
+> +    register_reset(&s->reg_info[R_INTERRUPT_ENABLE_REGISTER]);
+> +    register_reset(&s->reg_info[R_INTERRUPT_CLEAR_REGISTER]);
+> +    register_reset(&s->reg_info[R_WIR]);
+> +}
+> +
+> +static void can_config_mode(XlnxZynqMPCANState *s)
+> +{
+> +    register_reset(&s->reg_info[R_ERROR_COUNTER_REGISTER]);
+> +    register_reset(&s->reg_info[R_ERROR_STATUS_REGISTER]);
+> +
+> +    /* Put XlnxZynqMPCANState in configuration mode. */
+> +    ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, CONFIG, 1);
+> +    ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, WKUP, 0);
+> +    ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, SLP, 0);
+> +    ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, BSOFF, 0);
+> +    ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, ERROR, 0);
+> +    ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, RXOFLW, 0);
+> +    ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, RXOK, 0);
+> +    ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, TXOK, 0);
+> +    ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, ARBLST, 0);
+> +
+> +    can_update_irq(s);
+> +}
+> +
+> +static void update_status_register_mode_bits(XlnxZynqMPCANState *s)
+> +{
+> +    bool sleep_status = ARRAY_FIELD_EX32(s->regs, STATUS_REGISTER, SLEEP);
+> +    bool sleep_mode = ARRAY_FIELD_EX32(s->regs, MODE_SELECT_REGISTER, SLEEP);
+> +    /* Wake up interrupt bit. */
+> +    bool wakeup_irq_val = sleep_status && (sleep_mode == 0);
+> +    /* Sleep interrupt bit. */
+> +    bool sleep_irq_val = sleep_mode && (sleep_status == 0);
+> +
+> +    /* Clear previous core mode status bits. */
+> +    ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, LBACK, 0);
+> +    ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, SLEEP, 0);
+> +    ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, SNOOP, 0);
+> +    ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, NORMAL, 0);
+> +
+> +    /* set current mode bit and generate irqs accordingly. */
+> +    if (ARRAY_FIELD_EX32(s->regs, MODE_SELECT_REGISTER, LBACK)) {
+> +        ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, LBACK, 1);
+> +    } else if (ARRAY_FIELD_EX32(s->regs, MODE_SELECT_REGISTER, SLEEP)) {
+> +        ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, SLEEP, 1);
+> +        ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, SLP,
+> +                            sleep_irq_val);
+> +    } else if (ARRAY_FIELD_EX32(s->regs, MODE_SELECT_REGISTER, SNOOP)) {
+> +        ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, SNOOP, 1);
+> +    } else {
+> +        /*
+> +         * If all bits are zero then XlnxZynqMPCANState is set in normal mode.
+> +         */
+> +        ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, NORMAL, 1);
+> +        /* Set wakeup interrupt bit. */
+> +        ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, WKUP,
+> +                            wakeup_irq_val);
+> +    }
+> +
+> +    can_update_irq(s);
+> +}
+> +
+> +static void can_exit_sleep_mode(XlnxZynqMPCANState *s)
+> +{
+> +    ARRAY_FIELD_DP32(s->regs, MODE_SELECT_REGISTER, SLEEP, 0);
+> +    update_status_register_mode_bits(s);
+> +}
+> +
+> +static void generate_frame(qemu_can_frame *frame, uint32_t *data)
+> +{
+> +    frame->can_id = data[0];
+> +    frame->can_dlc = FIELD_EX32(data[1], TXFIFO_DLC, DLC);
+> +
+> +    frame->data[0] = FIELD_EX32(data[2], TXFIFO_DATA1, DB3);
+> +    frame->data[1] = FIELD_EX32(data[2], TXFIFO_DATA1, DB2);
+> +    frame->data[2] = FIELD_EX32(data[2], TXFIFO_DATA1, DB1);
+> +    frame->data[3] = FIELD_EX32(data[2], TXFIFO_DATA1, DB0);
+> +
+> +    frame->data[4] = FIELD_EX32(data[3], TXFIFO_DATA2, DB7);
+> +    frame->data[5] = FIELD_EX32(data[3], TXFIFO_DATA2, DB6);
+> +    frame->data[6] = FIELD_EX32(data[3], TXFIFO_DATA2, DB5);
+> +    frame->data[7] = FIELD_EX32(data[3], TXFIFO_DATA2, DB4);
+> +}
+> +
+> +static bool tx_ready_check(XlnxZynqMPCANState *s)
+> +{
+> +    if (ARRAY_FIELD_EX32(s->regs, SOFTWARE_RESET_REGISTER, SRST)) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "Attempting to transfer data while"
+> +                      " XlnxZynqMPCANState%d is in reset mode\n",
+
+
+What do you think about removing 'State' in the messages? (I think it looks
+more clear to me without: '... while XlnxZynqMPCAN0 is in reset mode').
+
+
+> +                      s->cfg.ctrl_idx);
+> +        return false;
+> +    }
+> +
+> +    if (ARRAY_FIELD_EX32(s->regs, SOFTWARE_RESET_REGISTER, CEN) == 0) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "Attempting to transfer data while"
+> +                      " XlnxZynqMPCANState%d is in configuration mode. Reset"
+> +                      " the core so operations can start fresh\n",
+> +                      s->cfg.ctrl_idx);
+> +        return false;
+> +    }
+> +
+> +    if (ARRAY_FIELD_EX32(s->regs, STATUS_REGISTER, SNOOP)) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "Attempting to transfer data while"
+> +                        " XlnxZynqMPCANState%d is in SNOOP MODE\n",
+> +                         s->cfg.ctrl_idx);
+> +        return false;
+> +    }
+> +
+> +    return true;
+> +}
+> +
+> +static void transfer_fifo(XlnxZynqMPCANState *s, Fifo32 *fifo)
+> +{
+> +    qemu_can_frame frame;
+> +    uint32_t data[CAN_FRAME_SIZE];
+> +    int i;
+> +    bool can_tx = tx_ready_check(s);
+> +
+> +    if (can_tx) {
+> +        while (!fifo32_is_empty(fifo)) {
+> +            for (i = 0; i < CAN_FRAME_SIZE; i++) {
+> +                data[i] = fifo32_pop(fifo);
+> +            }
+> +
+> +            if (ARRAY_FIELD_EX32(s->regs, STATUS_REGISTER, LBACK)) {
+> +                /*
+> +                 * Controller is in loopback. In Loopback mode, the CAN core
+> +                 * transmits a recessive bitstream on to the XlnxZynqMPCANState
+> +                 * Bus. Any message transmitted is looped back to the RX line
+> +                 * and acknowledged. The XlnxZynqMPCANState core receives any
+> +                 * message that it transmits.
+> +                 */
+> +                if (fifo32_is_full(&s->rx_fifo)) {
+> +                    DB_PRINT("Loopback: RX FIFO is full."
+> +                             "TX FIFO will be flushed.\n");
+> +
+> +                    ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER,
+> +                                      RXOFLW, 1);
+> +                } else {
+> +                    for (i = 0; i < CAN_FRAME_SIZE; i++) {
+> +                        fifo32_push(&s->rx_fifo, data[i]);
+> +                    }
+> +
+> +                    ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER,
+> +                                      RXOK, 1);
+> +                }
+> +            } else {
+> +                /* Normal mode Tx. */
+> +                generate_frame(&frame, data);
+> +
+> +                can_bus_client_send(&s->bus_client, &frame, 1);
+> +            }
+> +        }
+> +
+> +        ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, TXOK, 1);
+> +        ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, TXBFLL, 0);
+> +
+> +        if (ARRAY_FIELD_EX32(s->regs, STATUS_REGISTER, SLEEP)) {
+> +            can_exit_sleep_mode(s);
+> +        }
+> +    } else {
+> +        DB_PRINT("CAN is not enabled for data transfer.\n");
+> +    }
+> +
+> +    can_update_irq(s);
+> +}
+> +
+> +static uint64_t can_srr_pre_write(RegisterInfo *reg, uint64_t val64)
+> +{
+> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
+> +    uint32_t val = val64;
+> +
+> +    ARRAY_FIELD_DP32(s->regs, SOFTWARE_RESET_REGISTER, CEN,
+> +                        FIELD_EX32(val, SOFTWARE_RESET_REGISTER, CEN));
+> +
+> +    if (FIELD_EX32(val, SOFTWARE_RESET_REGISTER, SRST)) {
+> +        DB_PRINT("Resetting XlnxZynqMPCANState%d\n", s->cfg.ctrl_idx);
+> +
+> +        /* First, core will do software reset then will enter in config mode. */
+> +        can_config_reset(s);
+> +    }
+> +
+> +    if (ARRAY_FIELD_EX32(s->regs, SOFTWARE_RESET_REGISTER, CEN) == 0) {
+> +        can_config_mode(s);
+> +    } else {
+> +        /*
+> +         * Leave config mode. Now XlnxZynqMPCANState core will enter Normal,
+> +         * Sleep, snoop or Loopback mode depending upon LBACK, SLEEP, SNOOP
+> +         * register states.
+> +         */
+> +        ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, CONFIG, 0);
+> +
+> +        /* XlnxZynqMP CAN is out of config mode. it will send pending data. */
+> +        transfer_fifo(s, &s->txhpb_fifo);
+> +        transfer_fifo(s, &s->tx_fifo);
+> +    }
+> +
+> +    update_status_register_mode_bits(s);
+> +
+> +    return s->regs[R_SOFTWARE_RESET_REGISTER];
+> +}
+> +
+> +static uint64_t can_msr_pre_write(RegisterInfo *reg, uint64_t val64)
+> +{
+> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
+> +    uint32_t val = val64;
+> +    uint8_t multi_mode;
+> +
+> +    /*
+> +     * Multiple mode set check. This is done to make sure user doesn't set
+> +     * multiple modes.
+> +     */
+> +    multi_mode = FIELD_EX32(val, MODE_SELECT_REGISTER, LBACK) +
+> +                 FIELD_EX32(val, MODE_SELECT_REGISTER, SLEEP) +
+> +                 FIELD_EX32(val, MODE_SELECT_REGISTER, SNOOP);
+> +
+> +    if (multi_mode > 1) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "Attempting to configure several modes "
+> +                     "simultaneously. One mode will be selected according to "
+> +                     "their priority: LBACK > SLEEP > SNOOP.\n ");
+
+There is an extra whitespace above after '\n'.
+
+Should we add in the controller id on the qemu_log_mask messages that are
+missing it aswell? ("XlnxZynqMPCAN%d")
+
+> +    }
+> +
+> +    if (ARRAY_FIELD_EX32(s->regs, SOFTWARE_RESET_REGISTER, CEN) == 0) {
+> +        /* We are in configuration mode, any mode can be selected. */
+> +        s->regs[R_MODE_SELECT_REGISTER] = val;
+> +    } else {
+> +        bool sleep_mode_bit = FIELD_EX32(val, MODE_SELECT_REGISTER, SLEEP);
+> +
+> +        ARRAY_FIELD_DP32(s->regs, MODE_SELECT_REGISTER, SLEEP, sleep_mode_bit);
+> +
+> +        if (FIELD_EX32(val, MODE_SELECT_REGISTER, LBACK)) {
+> +            qemu_log_mask(LOG_GUEST_ERROR, "Attempting to set LBACK mode "
+> +                          "without setting CEN bit as 0\n");
+> +        } else if (FIELD_EX32(val, MODE_SELECT_REGISTER, SNOOP)) {
+> +            qemu_log_mask(LOG_GUEST_ERROR, "Attempting to set SNOOP mode "
+> +                              "without setting CEN bit as 0\n");
+> +        }
+> +
+> +        update_status_register_mode_bits(s);
+> +    }
+> +    return s->regs[R_MODE_SELECT_REGISTER];
+> +}
+> +
+> +static uint64_t can_brpr_pre_write(RegisterInfo  *reg, uint64_t val64)
+> +{
+> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
+> +    uint32_t val = val64;
+> +
+> +    /* Only allow writes when in config mode. */
+> +    if (ARRAY_FIELD_EX32(s->regs, SOFTWARE_RESET_REGISTER, CEN)) {
+> +        val = s->regs[R_ARBITRATION_PHASE_BAUD_RATE_PRESCALER_REGISTER];
+> +    }
+> +
+> +    return val;
+> +}
+> +
+> +static uint64_t can_btr_pre_write(RegisterInfo  *reg, uint64_t val64)
+> +{
+> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
+> +    uint32_t val = val64;
+> +
+> +    /* Only allow writes when in config mode. */
+> +    if (ARRAY_FIELD_EX32(s->regs, SOFTWARE_RESET_REGISTER, CEN)) {
+> +        val = s->regs[R_ARBITRATION_PHASE_BIT_TIMING_REGISTER];
+> +    }
+> +
+> +    return val;
+> +}
+> +
+> +static uint64_t can_tcr_pre_write(RegisterInfo  *reg, uint64_t val64)
+> +{
+> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
+> +    uint32_t val = val64;
+> +
+> +    if (FIELD_EX32(val, TIMESTAMP_REGISTER, CTS)) {
+> +        s->rx_time_stamp = 0;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static void update_rx_fifo(XlnxZynqMPCANState *s, const qemu_can_frame *frame)
+> +{
+> +    bool filter_pass = false;
+> +
+> +    /* If no filter is enabled. Message will be stored in FIFO. */
+> +    if (!((ARRAY_FIELD_EX32(s->regs, AFR, UAF1)) |
+> +       (ARRAY_FIELD_EX32(s->regs, AFR, UAF2)) |
+> +       (ARRAY_FIELD_EX32(s->regs, AFR, UAF3)) |
+> +       (ARRAY_FIELD_EX32(s->regs, AFR, UAF4)))) {
+> +        filter_pass = 1;
+
+Since we are using a bool now we can change above (and below ones) to:
+
+filter_pass = true;
+
+> +    }
+> +
+> +    /*
+> +     * Messages that pass any of the acceptance filters will be stored in
+> +     * the RX FIFO.
+> +     */
+> +    if (ARRAY_FIELD_EX32(s->regs, AFR, UAF1)) {
+> +        uint32_t id_masked = s->regs[R_AFMR1] & frame->can_id;
+> +        uint32_t filter_id_masked = s->regs[R_AFMR1] & s->regs[R_AFIR1];
+> +
+> +        if (filter_id_masked == id_masked) {
+> +            filter_pass = 1;
+> +        }
+> +    }
+> +
+> +    if (ARRAY_FIELD_EX32(s->regs, AFR, UAF2)) {
+> +        uint32_t id_masked = s->regs[R_AFMR2] & frame->can_id;
+> +        uint32_t filter_id_masked = s->regs[R_AFMR2] & s->regs[R_AFIR2];
+> +
+> +        if (filter_id_masked == id_masked) {
+> +            filter_pass = 1;
+> +        }
+> +    }
+> +
+> +    if (ARRAY_FIELD_EX32(s->regs, AFR, UAF3)) {
+> +        uint32_t id_masked = s->regs[R_AFMR3] & frame->can_id;
+> +        uint32_t filter_id_masked = s->regs[R_AFMR3] & s->regs[R_AFIR3];
+> +
+> +        if (filter_id_masked == id_masked) {
+> +            filter_pass = 1;
+> +        }
+> +    }
+> +
+> +    if (ARRAY_FIELD_EX32(s->regs, AFR, UAF4)) {
+> +        uint32_t id_masked = s->regs[R_AFMR4] & frame->can_id;
+> +        uint32_t filter_id_masked = s->regs[R_AFMR4] & s->regs[R_AFIR4];
+> +
+> +        if (filter_id_masked == id_masked) {
+> +            filter_pass = 1;
+> +        }
+> +    }
+> +
+> +    /* Store the message in fifo if it passed through any of the filters. */
+> +    if (filter_pass && frame->can_dlc <= MAX_DLC) {
+> +
+> +        if (fifo32_is_full(&s->rx_fifo)) {
+> +            DB_PRINT("RX FIFO is full.\n");
+> +
+> +            ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, RXOFLW, 1);
+> +        } else {
+> +            s->rx_time_stamp += 1;
+> +
+> +            fifo32_push(&s->rx_fifo, frame->can_id);
+> +
+> +            fifo32_push(&s->rx_fifo, (deposit32(0, R_RXFIFO_DLC_DLC_SHIFT,
+> +                                                R_RXFIFO_DLC_DLC_LENGTH,
+> +                                                frame->can_dlc) |
+> +                                      deposit32(0, R_RXFIFO_DLC_RXT_SHIFT,
+> +                                                R_RXFIFO_DLC_RXT_LENGTH,
+> +                                                s->rx_time_stamp)));
+> +
+> +            /* First 32 bit of the data. */
+> +            fifo32_push(&s->rx_fifo, (deposit32(0, R_TXFIFO_DATA1_DB3_SHIFT,
+> +                                        R_TXFIFO_DATA1_DB3_LENGTH,
+> +                                        frame->data[0]) |
+> +                                      deposit32(0, R_TXFIFO_DATA1_DB2_SHIFT,
+> +                                        R_TXFIFO_DATA1_DB2_LENGTH,
+> +                                        frame->data[1]) |
+> +                                      deposit32(0, R_TXFIFO_DATA1_DB1_SHIFT,
+> +                                        R_TXFIFO_DATA1_DB1_LENGTH,
+> +                                        frame->data[2]) |
+> +                                      deposit32(0, R_TXFIFO_DATA1_DB0_SHIFT,
+> +                                        R_TXFIFO_DATA1_DB0_LENGTH,
+> +                                        frame->data[3])));
+> +            /* Last 32 bit of the data. */
+> +            fifo32_push(&s->rx_fifo, (deposit32(0, R_TXFIFO_DATA2_DB7_SHIFT,
+> +                                         R_TXFIFO_DATA2_DB7_LENGTH,
+> +                                         frame->data[4]) |
+> +                                      deposit32(0, R_TXFIFO_DATA2_DB6_SHIFT,
+> +                                         R_TXFIFO_DATA2_DB6_LENGTH,
+> +                                         frame->data[5]) |
+> +                                      deposit32(0, R_TXFIFO_DATA2_DB5_SHIFT,
+> +                                         R_TXFIFO_DATA2_DB5_LENGTH,
+> +                                         frame->data[6]) |
+> +                                      deposit32(0, R_TXFIFO_DATA2_DB4_SHIFT,
+> +                                          R_TXFIFO_DATA2_DB4_LENGTH,
+> +                                          frame->data[7])));
+> +
+> +            ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, RXOK, 1);
+> +        }
+> +
+> +        can_update_irq(s);
+> +    } else {
+> +        DB_PRINT("Message didn't pass through any filter"
+> +                  "or dlc is not in range\n");
+> +    }
+> +}
+> +
+> +static uint64_t can_rxfifo_pre_read(RegisterInfo *reg, uint64_t val64)
+> +{
+> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
+> +    uint32_t r = 0;
+> +
+> +    if (!fifo32_is_empty(&s->rx_fifo)) {
+> +        r = fifo32_pop(&s->rx_fifo);
+> +    } else {
+> +        DB_PRINT("No message in RXFIFO\n");
+> +
+> +        ARRAY_FIELD_DP32(s->regs, INTERRUPT_STATUS_REGISTER, RXUFLW, 1);
+> +    }
+> +
+> +    can_update_irq(s);
+> +    return r;
+> +}
+> +
+> +static void can_filter_enable_post_write(RegisterInfo *reg, uint64_t val64)
+> +{
+> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
+> +
+> +    if (ARRAY_FIELD_EX32(s->regs, AFR, UAF1) &&
+> +        ARRAY_FIELD_EX32(s->regs, AFR, UAF2) &&
+> +        ARRAY_FIELD_EX32(s->regs, AFR, UAF3) &&
+> +        ARRAY_FIELD_EX32(s->regs, AFR, UAF4)) {
+> +        ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, ACFBSY, 1);
+> +    } else {
+> +        ARRAY_FIELD_DP32(s->regs, STATUS_REGISTER, ACFBSY, 0);
+> +    }
+> +}
+> +
+> +static uint64_t can_filter_mask_pre_write(RegisterInfo *reg, uint64_t val64)
+> +{
+> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
+> +    uint32_t reg_idx = (reg->access->addr) / 4;
+> +    uint32_t val = val64;
+> +    uint32_t filter_number = (reg_idx - R_AFMR1) / 2;
+> +
+> +    /* modify an acceptance filter, the corresponding UAF bit should be '0.' */
+> +    if (!(s->regs[R_AFR] & (1 << filter_number))) {
+> +        s->regs[reg_idx] = val;
+> +    } else {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "%s:Acceptance filter %d mask is not set"
+> +                 " as corresponding UAF bit is not set to 0\n", __func__,
+> +                 filter_number + 1);
+> +    }
+> +
+> +    return s->regs[reg_idx];
+> +}
+> +
+> +static uint64_t can_filter_id_pre_write(RegisterInfo *reg, uint64_t val64)
+> +{
+> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
+> +    uint32_t reg_idx = (reg->access->addr) / 4;
+> +    uint32_t val = val64;
+> +    uint32_t filter_number = (reg_idx - R_AFIR1) / 2;
+> +
+> +    if (!(s->regs[R_AFR] & (1 << filter_number))) {
+> +        s->regs[reg_idx] = val;
+> +    } else {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Acceptance filter %d id is not set"
+> +                 " as corresponding UAF bit is not set to 0\n", __func__,
+> +                 filter_number + 1);
+> +    }
+> +
+> +    return s->regs[reg_idx];
+> +}
+> +
+> +static void can_tx_post_write(RegisterInfo *reg, uint64_t val64)
+> +{
+> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(reg->opaque);
+> +    uint32_t val = val64;
+> +
+> +    bool is_txhpb = reg->access->addr > A_TXFIFO_DATA2;
+> +
+> +    bool initiate_transfer = (reg->access->addr == A_TXFIFO_DATA2) ||
+> +                             (reg->access->addr == A_TXHPB_DATA2);
+> +
+> +    Fifo32 *f = is_txhpb ? &s->txhpb_fifo : &s->tx_fifo;
+> +
+> +    DB_PRINT("TX FIFO write for CAN%d\n", s->cfg.ctrl_idx);
+> +
+> +    if (!fifo32_is_full(f)) {
+> +        fifo32_push(f, val);
+> +    } else {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: TX FIFO is full.\n", __func__);
+> +    }
+> +
+> +    /* Initiate the message send if TX register is written. */
+> +    if (initiate_transfer &&
+> +            ARRAY_FIELD_EX32(s->regs, SOFTWARE_RESET_REGISTER, CEN)) {
+> +        transfer_fifo(s, f);
+> +    }
+> +
+> +    can_update_irq(s);
+> +}
+> +
+> +static const RegisterAccessInfo can_regs_info[] = {
+> +    {   .name = "SOFTWARE_RESET_REGISTER",
+> +        .addr = A_SOFTWARE_RESET_REGISTER,
+> +        .rsvd = 0xfffffffc,
+> +        .pre_write = can_srr_pre_write,
+> +    },{ .name = "MODE_SELECT_REGISTER",
+> +        .addr = A_MODE_SELECT_REGISTER,
+> +        .rsvd = 0xfffffff8,
+> +        .pre_write = can_msr_pre_write,
+> +    },{ .name = "ARBITRATION_PHASE_BAUD_RATE_PRESCALER_REGISTER",
+> +        .addr = A_ARBITRATION_PHASE_BAUD_RATE_PRESCALER_REGISTER,
+> +        .rsvd = 0xffffff00,
+> +        .pre_write = can_brpr_pre_write,
+> +    },{ .name = "ARBITRATION_PHASE_BIT_TIMING_REGISTER",
+> +        .addr = A_ARBITRATION_PHASE_BIT_TIMING_REGISTER,
+> +        .rsvd = 0xfffffe00,
+> +        .pre_write = can_btr_pre_write,
+> +    },{ .name = "ERROR_COUNTER_REGISTER",
+> +        .addr = A_ERROR_COUNTER_REGISTER,
+> +        .rsvd = 0xffff0000,
+> +        .ro = 0xffffffff,
+> +    },{ .name = "ERROR_STATUS_REGISTER",
+> +        .addr = A_ERROR_STATUS_REGISTER,
+> +        .rsvd = 0xffffffe0,
+> +        .w1c = 0x1f,
+> +    },{ .name = "STATUS_REGISTER",  .addr = A_STATUS_REGISTER,
+> +        .reset = 0x1,
+> +        .rsvd = 0xffffe000,
+> +        .ro = 0x1fff,
+> +    },{ .name = "INTERRUPT_STATUS_REGISTER",
+> +        .addr = A_INTERRUPT_STATUS_REGISTER,
+> +        .reset = 0x6000,
+> +        .rsvd = 0xffff8000,
+> +        .ro = 0x7fff,
+> +    },{ .name = "INTERRUPT_ENABLE_REGISTER",
+> +        .addr = A_INTERRUPT_ENABLE_REGISTER,
+> +        .rsvd = 0xffff8000,
+> +        .post_write = can_ier_post_write,
+> +    },{ .name = "INTERRUPT_CLEAR_REGISTER",
+> +        .addr = A_INTERRUPT_CLEAR_REGISTER,
+> +        .rsvd = 0xffff8000,
+> +        .pre_write = can_icr_pre_write,
+> +    },{ .name = "TIMESTAMP_REGISTER",
+> +        .addr = A_TIMESTAMP_REGISTER,
+> +        .rsvd = 0xfffffffe,
+> +        .pre_write = can_tcr_pre_write,
+> +    },{ .name = "WIR",  .addr = A_WIR,
+> +        .reset = 0x3f3f,
+> +        .rsvd = 0xffff0000,
+> +    },{ .name = "TXFIFO_ID",  .addr = A_TXFIFO_ID,
+> +        .post_write = can_tx_post_write,
+> +    },{ .name = "TXFIFO_DLC",  .addr = A_TXFIFO_DLC,
+> +        .rsvd = 0xfffffff,
+> +        .post_write = can_tx_post_write,
+> +    },{ .name = "TXFIFO_DATA1",  .addr = A_TXFIFO_DATA1,
+> +        .post_write = can_tx_post_write,
+> +    },{ .name = "TXFIFO_DATA2",  .addr = A_TXFIFO_DATA2,
+> +        .post_write = can_tx_post_write,
+> +    },{ .name = "TXHPB_ID",  .addr = A_TXHPB_ID,
+> +        .post_write = can_tx_post_write,
+> +    },{ .name = "TXHPB_DLC",  .addr = A_TXHPB_DLC,
+> +        .rsvd = 0xfffffff,
+> +        .post_write = can_tx_post_write,
+> +    },{ .name = "TXHPB_DATA1",  .addr = A_TXHPB_DATA1,
+> +        .post_write = can_tx_post_write,
+> +    },{ .name = "TXHPB_DATA2",  .addr = A_TXHPB_DATA2,
+> +        .post_write = can_tx_post_write,
+> +    },{ .name = "RXFIFO_ID",  .addr = A_RXFIFO_ID,
+> +        .ro = 0xffffffff,
+> +        .post_read = can_rxfifo_pre_read,
+> +    },{ .name = "RXFIFO_DLC",  .addr = A_RXFIFO_DLC,
+> +        .rsvd = 0xfff0000,
+> +        .post_read = can_rxfifo_pre_read,
+> +    },{ .name = "RXFIFO_DATA1",  .addr = A_RXFIFO_DATA1,
+> +        .post_read = can_rxfifo_pre_read,
+> +    },{ .name = "RXFIFO_DATA2",  .addr = A_RXFIFO_DATA2,
+> +        .post_read = can_rxfifo_pre_read,
+> +    },{ .name = "AFR",  .addr = A_AFR,
+> +        .rsvd = 0xfffffff0,
+> +        .post_write = can_filter_enable_post_write,
+> +    },{ .name = "AFMR1",  .addr = A_AFMR1,
+> +        .pre_write = can_filter_mask_pre_write,
+> +    },{ .name = "AFIR1",  .addr = A_AFIR1,
+> +        .pre_write = can_filter_id_pre_write,
+> +    },{ .name = "AFMR2",  .addr = A_AFMR2,
+> +        .pre_write = can_filter_mask_pre_write,
+> +    },{ .name = "AFIR2",  .addr = A_AFIR2,
+> +        .pre_write = can_filter_id_pre_write,
+> +    },{ .name = "AFMR3",  .addr = A_AFMR3,
+> +        .pre_write = can_filter_mask_pre_write,
+> +    },{ .name = "AFIR3",  .addr = A_AFIR3,
+> +        .pre_write = can_filter_id_pre_write,
+> +    },{ .name = "AFMR4",  .addr = A_AFMR4,
+> +        .pre_write = can_filter_mask_pre_write,
+> +    },{ .name = "AFIR4",  .addr = A_AFIR4,
+> +        .pre_write = can_filter_id_pre_write,
+> +    }
+> +};
+> +
+> +static const MemoryRegionOps can_ops = {
+> +    .read = register_read_memory,
+> +    .write = register_write_memory,
+> +    .endianness = DEVICE_LITTLE_ENDIAN,
+> +    .valid = {
+> +        .min_access_size = 4,
+> +        .max_access_size = 4,
+> +    },
+> +};
+> +
+> +static void xlnx_zynqmp_can_reset(DeviceState *dev)
+> +{
+> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(dev);
+> +    unsigned int i;
+> +
+> +    for (i = 0; i < ARRAY_SIZE(s->reg_info); ++i) {
+> +        register_reset(&s->reg_info[i]);
+> +    }
+> +
+> +    /*
+> +     * Reset FIFOs when CAN model is reset. This will clear the fifo writes
+> +     * done by post_write which gets called from register_reset function,
+> +     * post_write handle will not be able to trigger tx because CAN will be
+> +     * disabled when software_reset_register is cleared first.
+> +     */
+> +    fifo32_reset(&s->rx_fifo);
+> +    fifo32_reset(&s->tx_fifo);
+> +    fifo32_reset(&s->txhpb_fifo);
+> +}
+> +
+> +static bool xlnx_zynqmp_can_can_receive(CanBusClientState *client)
+> +{
+> +    XlnxZynqMPCANState *s = container_of(client, XlnxZynqMPCANState,
+> +                                         bus_client);
+> +
+> +    if (ARRAY_FIELD_EX32(s->regs, SOFTWARE_RESET_REGISTER, SRST)) {
+> +        DB_PRINT("XlnxZynqMPCANState%d Controller is reset\n", s->cfg.ctrl_idx);
+> +        return false;
+> +    } else if ((ARRAY_FIELD_EX32(s->regs, SOFTWARE_RESET_REGISTER, CEN)) == 0) {
+> +        DB_PRINT("XlnxZynqMPCANState%d is disabled. Incoming messages will be"
+> +                 "discarded\n", s->cfg.ctrl_idx);
+> +        return false;
+> +    } else {
+> +        return true;
+> +    }
+> +}
+> +
+> +static ssize_t xlnx_zynqmp_can_receive(CanBusClientState *client,
+> +                               const qemu_can_frame *buf, size_t buf_size) {
+> +    XlnxZynqMPCANState *s = container_of(client, XlnxZynqMPCANState,
+> +                                        bus_client);
+> +    const qemu_can_frame *frame = buf;
+> +
+> +    DB_PRINT("Incoming data for CAN%d\n", s->cfg.ctrl_idx);
+> +
+> +    if (buf_size <= 0) {
+> +        DB_PRINT("junk data received on XlnxZynqMPCANState bus\n");
+> +        return 0;
+> +    }
+> +    if (ARRAY_FIELD_EX32(s->regs, STATUS_REGISTER, LBACK)) {
+> +        /*
+> +         * XlnxZynqMPCANState will not participate in normal bus communication
+> +         *  and does not receive any messages transmitted by other CAN nodes.
+> +         */
+> +        DB_PRINT("XlnxZynqMPCANState is in loopback mode."
+> +                 " It will not receive data.\n");
+> +
+> +    } else if (ARRAY_FIELD_EX32(s->regs, STATUS_REGISTER, SNOOP)) {
+> +        /* Snoop Mode: Just keep the data. no response back. */
+> +        update_rx_fifo(s, frame);
+> +    } else if ((ARRAY_FIELD_EX32(s->regs, STATUS_REGISTER, SLEEP))) {
+> +        /*
+> +         * XlnxZynqMPCANState is in sleep mode. Any data on bus will bring it
+> +         * to wake up state.
+> +         */
+> +        can_exit_sleep_mode(s);
+> +        update_rx_fifo(s, frame);
+> +    } else if ((ARRAY_FIELD_EX32(s->regs, STATUS_REGISTER, SLEEP)) == 0) {
+> +        update_rx_fifo(s, frame);
+> +    } else {
+> +        DB_PRINT("Can't receive data as XlnxZynqMPCANState is not configured"
+> +                  " correctly.\n");
+> +    }
+> +
+> +    return 1;
+> +}
+> +
+> +static CanBusClientInfo can_xilinx_bus_client_info = {
+> +    .can_receive = xlnx_zynqmp_can_can_receive,
+> +    .receive = xlnx_zynqmp_can_receive,
+> +};
+> +
+> +static int xlnx_zynqmp_can_connect_to_bus(XlnxZynqMPCANState *s,
+> +                                          CanBusState *bus)
+> +{
+> +    s->bus_client.info = &can_xilinx_bus_client_info;
+> +
+> +    if (can_bus_insert_client(bus, &s->bus_client) < 0) {
+> +        return -1;
+> +    }
+> +    return 0;
+> +}
+> +
+> +static void xlnx_zynqmp_can_realize(DeviceState *dev, Error **errp)
+> +{
+> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(dev);
+> +
+> +    if (s->cfg.ctrl_idx > MAX_CAN_CTRLS) {
+
+Above should be:
+
+if (s->cfg.ctrl_idx >= MAX_CAN_CTRLS) {
+
+
+> +        error_setg(errp, "ctrl-idx: %d exceeds max XlnxZynqMPCANState"
+> +                   " controller index", s->cfg.ctrl_idx);
+> +
+
+I think we can remove above blank line and also the blank line after the
+'error_setg' below.
+
+> +        return;
+> +    }
+> +
+> +    if (s->canbus[s->cfg.ctrl_idx]) {
+> +        if (xlnx_zynqmp_can_connect_to_bus(s, s->canbus[s->cfg.ctrl_idx]) < 0) {
+> +            error_setg(errp, "xlnx_zynqmp_can_connect_to_bus failed");
+> +
+> +            return;
+> +        }
+> +
+> +    } else {
+> +        /* If no bus is set. */
+> +        DB_PRINT("Canbus%d property is not set for xlnxCAN%d\n",
+> +                 s->cfg.ctrl_idx, s->cfg.ctrl_idx);
+> +    }
+> +
+> +    /* Create RX FIFO, TXFIFO, TXHPB storage. */
+> +    fifo32_create(&s->rx_fifo, RXFIFO_SIZE);
+> +    fifo32_create(&s->tx_fifo, RXFIFO_SIZE);
+> +    fifo32_create(&s->txhpb_fifo, CAN_FRAME_SIZE);
+> +}
+> +
+> +static void xlnx_zynqmp_can_init(Object *obj)
+> +{
+> +    XlnxZynqMPCANState *s = XLNX_ZYNQMP_CAN(obj);
+> +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+> +
+> +    RegisterInfoArray *reg_array;
+> +
+> +    memory_region_init(&s->iomem, obj, TYPE_XLNX_ZYNQMP_CAN,
+> +                        XLNX_ZYNQMP_CAN_R_MAX * 4);
+> +    reg_array = register_init_block32(DEVICE(obj), can_regs_info,
+> +                               ARRAY_SIZE(can_regs_info),
+> +                               s->reg_info, s->regs,
+> +                               &can_ops,
+> +                               XLNX_ZYNQMP_CAN_ERR_DEBUG,
+> +                               XLNX_ZYNQMP_CAN_R_MAX * 4);
+> +
+> +    memory_region_add_subregion(&s->iomem, 0x00, &reg_array->mem);
+> +    sysbus_init_mmio(sbd, &s->iomem);
+> +    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
+> +
+> +    object_property_add_link(obj, "canbus0", TYPE_CAN_BUS,
+> +                             (Object **)&s->canbus[0],
+> +                             qdev_prop_allow_set_link_before_realize,
+> +                             0, &error_abort);
+> +
+> +    object_property_add_link(obj, "canbus1", TYPE_CAN_BUS,
+> +                             (Object **)&s->canbus[1],
+> +                             qdev_prop_allow_set_link_before_realize,
+> +                             0, &error_abort);
+> +}
+> +
+> +static const VMStateDescription vmstate_can = {
+> +    .name = TYPE_XLNX_ZYNQMP_CAN,
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_FIFO32(rx_fifo, XlnxZynqMPCANState),
+> +        VMSTATE_UINT32_ARRAY(regs, XlnxZynqMPCANState, XLNX_ZYNQMP_CAN_R_MAX),
+> +        VMSTATE_UINT8(cfg.ctrl_idx, XlnxZynqMPCANState),
+> +        VMSTATE_END_OF_LIST(),
+> +    }
+> +};
+> +
+> +static Property xlnx_zynqmp_can_properties[] = {
+> +    DEFINE_PROP_UINT8("ctrl-idx", XlnxZynqMPCANState, cfg.ctrl_idx, 0),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void xlnx_zynqmp_can_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+
+I think a blank line here would be good.
+
+> +    dc->reset = xlnx_zynqmp_can_reset;
+> +    dc->realize = xlnx_zynqmp_can_realize;
+> +    device_class_set_props(dc, xlnx_zynqmp_can_properties);
+> +    dc->vmsd = &vmstate_can;
+> +}
+> +
+> +static const TypeInfo can_info = {
+> +    .name          = TYPE_XLNX_ZYNQMP_CAN,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(XlnxZynqMPCANState),
+> +    .class_init    = xlnx_zynqmp_can_class_init,
+> +    .instance_init = xlnx_zynqmp_can_init,
+> +};
+> +
+> +static void can_register_types(void)
+> +{
+> +    type_register_static(&can_info);
+> +}
+> +
+> +type_init(can_register_types)
+> diff --git a/include/hw/net/xlnx-zynqmp-can.h b/include/hw/net/xlnx-zynqmp-can.h
+> new file mode 100644
+> index 0000000..6e3015a
+> --- /dev/null
+> +++ b/include/hw/net/xlnx-zynqmp-can.h
+> @@ -0,0 +1,75 @@
+> +/*
+> + * QEMU model of the Xilinx CAN device.
+
+Here also:
+
+s/Xilinx CAN/Xilinx ZynqMP CAN/
+
+Best regards,
+Francisco Iglesias
+
+> + *
+> + * Copyright (c) 2020 Xilinx Inc.
+> + *
+> + * Written-by: Vikram Garhwal<fnu.vikram@xilinx.com>
+> + *
+> + * Based on QEMU CAN Device emulation implemented by Jin Yang, Deniz Eren and
+> + * Pavel Pisa.
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#ifndef XLNX_ZYNQMP_CAN_H
+> +#define XLNX_ZYNQMP_CAN_H
+> +
+> +#include "hw/register.h"
+> +#include "net/can_emu.h"
+> +#include "net/can_host.h"
+> +#include "qemu/fifo32.h"
+> +
+> +#define TYPE_XLNX_ZYNQMP_CAN "xlnx.zynqmp-can"
+> +
+> +#define XLNX_ZYNQMP_CAN(obj) \
+> +     OBJECT_CHECK(XlnxZynqMPCANState, (obj), TYPE_XLNX_ZYNQMP_CAN)
+> +
+> +#define MAX_CAN_CTRLS      2
+> +#define XLNX_ZYNQMP_CAN_R_MAX     (0x84 / 4)
+> +#define MAILBOX_CAPACITY   64
+> +
+> +/* Each CAN_FRAME will have 4 * 32bit size. */
+> +#define CAN_FRAME_SIZE     4
+> +#define RXFIFO_SIZE        (MAILBOX_CAPACITY * CAN_FRAME_SIZE)
+> +
+> +typedef struct XlnxZynqMPCANState {
+> +    SysBusDevice        parent_obj;
+> +    MemoryRegion        iomem;
+> +
+> +    qemu_irq            irq;
+> +
+> +    CanBusClientState   bus_client;
+> +    CanBusState         *canbus[MAX_CAN_CTRLS];
+> +
+> +    struct {
+> +        uint8_t         ctrl_idx;
+> +    } cfg;
+> +
+> +    RegisterInfo        reg_info[XLNX_ZYNQMP_CAN_R_MAX];
+> +    uint32_t            regs[XLNX_ZYNQMP_CAN_R_MAX];
+> +
+> +    uint16_t            rx_time_stamp;
+> +
+> +    Fifo32              rx_fifo;
+> +    Fifo32              tx_fifo;
+> +    Fifo32              txhpb_fifo;
+> +
+> +} XlnxZynqMPCANState;
+> +
+> +#endif
 > -- 
 > 2.7.4
 > 
