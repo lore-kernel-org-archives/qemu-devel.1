@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E62CAC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 22:57:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D11BFC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 22:58:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC40C20657
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 22:57:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC40C20657
+	by mail.kernel.org (Postfix) with ESMTPS id A813620657
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 22:58:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A813620657
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZjGo-0001T0-Qe
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 18:57:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55242)
+	id 1jZjHv-0002P4-ST
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 18:58:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55380)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jZjG7-0000nO-9w
- for qemu-devel@nongnu.org; Fri, 15 May 2020 18:56:51 -0400
-Received: from mx2.suse.de ([195.135.220.15]:47640)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jZjHM-0001yl-EP
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 18:58:08 -0400
+Received: from mx2.suse.de ([195.135.220.15]:47784)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jZjG6-0007sd-Cd
- for qemu-devel@nongnu.org; Fri, 15 May 2020 18:56:50 -0400
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jZjHL-00080S-EQ
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 18:58:08 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
- by mx2.suse.de (Postfix) with ESMTP id A9E75ABC2;
- Fri, 15 May 2020 22:56:49 +0000 (UTC)
-Subject: Re: [PATCH v2 2/5] tests/vm: Remove flex/bison packages
+ by mx2.suse.de (Postfix) with ESMTP id D6113ACCC;
+ Fri, 15 May 2020 22:58:08 +0000 (UTC)
+Subject: Re: [PATCH v2 1/5] tests/docker: Remove flex/bison packages
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 References: <20200515163029.12917-1-philmd@redhat.com>
- <20200515163029.12917-3-philmd@redhat.com>
+ <20200515163029.12917-2-philmd@redhat.com>
 From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <7f1d8f52-0612-c608-8f91-b4fb3c39c4c7@suse.de>
-Date: Sat, 16 May 2020 00:56:44 +0200
+Message-ID: <a31a0a52-94dd-c073-7cc9-9d1b9578e52d@suse.de>
+Date: Sat, 16 May 2020 00:58:05 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200515163029.12917-3-philmd@redhat.com>
+In-Reply-To: <20200515163029.12917-2-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -83,76 +83,147 @@ On 5/15/20 6:30 PM, Philippe Mathieu-Daudé wrote:
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
-> v2: use 'does not', removed bison in OpenBSD VM (Claudio)
+> v2: use 'does not' (Claudio)
 > ---
->  tests/vm/fedora      | 1 -
->  tests/vm/freebsd     | 1 -
->  tests/vm/netbsd      | 1 -
->  tests/vm/openbsd     | 1 -
->  tests/vm/ubuntu.i386 | 2 +-
->  5 files changed, 1 insertion(+), 5 deletions(-)
+>  tests/docker/dockerfiles/centos7.docker             | 2 --
+>  tests/docker/dockerfiles/centos8.docker             | 2 --
+>  tests/docker/dockerfiles/debian-xtensa-cross.docker | 2 --
+>  tests/docker/dockerfiles/debian10.docker            | 2 --
+>  tests/docker/dockerfiles/debian9.docker             | 2 --
+>  tests/docker/dockerfiles/fedora.docker              | 2 --
+>  tests/docker/dockerfiles/ubuntu.docker              | 2 +-
+>  tests/docker/dockerfiles/ubuntu1804.docker          | 2 +-
+>  8 files changed, 2 insertions(+), 14 deletions(-)
 > 
-> diff --git a/tests/vm/fedora b/tests/vm/fedora
-> index bd9c6cf295..a9195670f4 100755
-> --- a/tests/vm/fedora
-> +++ b/tests/vm/fedora
-> @@ -32,7 +32,6 @@ class FedoraVM(basevm.BaseVM):
->      pkgs = [
->          # tools
->          'git-core',
-> -        'flex', 'bison',
->          'gcc', 'binutils', 'make',
+> diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/dockerfiles/centos7.docker
+> index 9a2a2e515d..e197acdc3c 100644
+> --- a/tests/docker/dockerfiles/centos7.docker
+> +++ b/tests/docker/dockerfiles/centos7.docker
+> @@ -5,13 +5,11 @@ RUN yum -y update
 >  
->          # perl
-> diff --git a/tests/vm/freebsd b/tests/vm/freebsd
-> index 298967fe9c..f87db2b126 100755
-> --- a/tests/vm/freebsd
-> +++ b/tests/vm/freebsd
-> @@ -38,7 +38,6 @@ class FreeBSDVM(basevm.BaseVM):
->          "bash",
->          "gmake",
->          "gsed",
-> -        "flex", "bison",
+>  # Please keep this list sorted alphabetically
+>  ENV PACKAGES \
+> -    bison \
+>      bzip2 \
+>      bzip2-devel \
+>      ccache \
+>      csnappy-devel \
+>      dbus-daemon \
+> -    flex \
+>      gcc-c++ \
+>      gcc \
+>      gettext \
+> diff --git a/tests/docker/dockerfiles/centos8.docker b/tests/docker/dockerfiles/centos8.docker
+> index bfa0d33c9c..9852c5b9ee 100644
+> --- a/tests/docker/dockerfiles/centos8.docker
+> +++ b/tests/docker/dockerfiles/centos8.docker
+> @@ -3,11 +3,9 @@ FROM centos:8.1.1911
+>  RUN dnf -y update
+>  ENV PACKAGES \
+>      SDL-devel \
+> -    bison \
+>      bzip2 \
+>      bzip2-devel \
+>      dbus-daemon \
+> -    flex \
+>      gcc \
+>      gcc-c++ \
+>      gettext \
+> diff --git a/tests/docker/dockerfiles/debian-xtensa-cross.docker b/tests/docker/dockerfiles/debian-xtensa-cross.docker
+> index e6f93f65ee..beb73f46ba 100644
+> --- a/tests/docker/dockerfiles/debian-xtensa-cross.docker
+> +++ b/tests/docker/dockerfiles/debian-xtensa-cross.docker
+> @@ -11,11 +11,9 @@ RUN apt-get update && \
+>      DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata && \
+>      DEBIAN_FRONTEND=noninteractive eatmydata \
+>      apt-get install -y --no-install-recommends \
+> -        bison \
+>          build-essential \
+>          ca-certificates \
+>          curl \
+> -        flex \
+>          gettext \
+>          git \
+>          python3-minimal
+> diff --git a/tests/docker/dockerfiles/debian10.docker b/tests/docker/dockerfiles/debian10.docker
+> index 0769700a41..bcdff04ddf 100644
+> --- a/tests/docker/dockerfiles/debian10.docker
+> +++ b/tests/docker/dockerfiles/debian10.docker
+> @@ -18,12 +18,10 @@ RUN apt update && \
+>      DEBIAN_FRONTEND=noninteractive eatmydata \
+>      apt install -y --no-install-recommends \
+>          bc \
+> -        bison \
+>          build-essential \
+>          ca-certificates \
+>          clang \
+>          dbus \
+> -        flex \
+>          gdb-multiarch \
+>          gettext \
+>          git \
+> diff --git a/tests/docker/dockerfiles/debian9.docker b/tests/docker/dockerfiles/debian9.docker
+> index 08cc970feb..0f0ebe530a 100644
+> --- a/tests/docker/dockerfiles/debian9.docker
+> +++ b/tests/docker/dockerfiles/debian9.docker
+> @@ -18,11 +18,9 @@ RUN apt update && \
+>      DEBIAN_FRONTEND=noninteractive eatmydata \
+>      apt install -y --no-install-recommends \
+>          bc \
+> -        bison \
+>          build-essential \
+>          ca-certificates \
+>          clang \
+> -        flex \
+>          gdb-multiarch \
+>          gettext \
+>          git \
+> diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
+> index 179575ecaa..92b6e11c8a 100644
+> --- a/tests/docker/dockerfiles/fedora.docker
+> +++ b/tests/docker/dockerfiles/fedora.docker
+> @@ -3,7 +3,6 @@ FROM fedora:30
+>  # Please keep this list sorted alphabetically
+>  ENV PACKAGES \
+>      bc \
+> -    bison \
+>      brlapi-devel \
+>      bzip2 \
+>      bzip2-devel \
+> @@ -13,7 +12,6 @@ ENV PACKAGES \
+>      dbus-daemon \
+>      device-mapper-multipath-devel \
+>      findutils \
+> -    flex \
+>      gcc \
+>      gcc-c++ \
+>      gettext \
+> diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/dockerfiles/ubuntu.docker
+> index eeb3b22bf2..90ea6311c6 100644
+> --- a/tests/docker/dockerfiles/ubuntu.docker
+> +++ b/tests/docker/dockerfiles/ubuntu.docker
+> @@ -10,7 +10,7 @@
+>  #
 >  
->          # libs: crypto
->          "gnutls",
-> diff --git a/tests/vm/netbsd b/tests/vm/netbsd
-> index b10c9d429d..cdac502dad 100755
-> --- a/tests/vm/netbsd
-> +++ b/tests/vm/netbsd
-> @@ -36,7 +36,6 @@ class NetBSDVM(basevm.BaseVM):
->          "bash",
->          "gmake",
->          "gsed",
-> -        "flex", "bison",
->  
->          # libs: crypto
->          "gnutls",
-> diff --git a/tests/vm/openbsd b/tests/vm/openbsd
-> index 0b705f4945..13e7f9a6d5 100755
-> --- a/tests/vm/openbsd
-> +++ b/tests/vm/openbsd
-> @@ -35,7 +35,6 @@ class OpenBSDVM(basevm.BaseVM):
->          "bash",
->          "gmake",
->          "gsed",
-> -        "bison",
->  
->          # libs: usb
->          "libusb1",
-> diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
-> index 1570775335..24527cc78c 100755
-> --- a/tests/vm/ubuntu.i386
-> +++ b/tests/vm/ubuntu.i386
-> @@ -52,7 +52,7 @@ class UbuntuX86VM(basevm.BaseVM):
->          self.ssh_root_check("sed -ie s/^#\ deb-src/deb-src/g /etc/apt/sources.list")
->          self.ssh_root_check("apt-get update")
->          self.ssh_root_check("apt-get build-dep -y qemu")
-> -        self.ssh_root_check("apt-get install -y libfdt-dev flex bison language-pack-en")
-> +        self.ssh_root_check("apt-get install -y libfdt-dev language-pack-en")
->          self.ssh_root("poweroff")
->          self.wait()
->          os.rename(img_tmp, img)
+>  FROM ubuntu:19.04
+> -ENV PACKAGES flex bison \
+> +ENV PACKAGES \
+>      ccache \
+>      clang \
+>      dbus \
+> diff --git a/tests/docker/dockerfiles/ubuntu1804.docker b/tests/docker/dockerfiles/ubuntu1804.docker
+> index f66b06f4cf..a10ea2850b 100644
+> --- a/tests/docker/dockerfiles/ubuntu1804.docker
+> +++ b/tests/docker/dockerfiles/ubuntu1804.docker
+> @@ -1,5 +1,5 @@
+>  FROM ubuntu:18.04
+> -ENV PACKAGES flex bison \
+> +ENV PACKAGES \
+>      ccache \
+>      clang \
+>      gcc \
 > 
+
+
 Reviewed-by: Claudio Fontana <cfontana@suse.de>
 
