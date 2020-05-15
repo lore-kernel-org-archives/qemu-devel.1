@@ -2,84 +2,91 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HTML_MESSAGE,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08710C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 03:33:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CDD4C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 03:33:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1A84206F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 03:33:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cUCe2pN6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1A84206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2D925206F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 03:33:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D925206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZR5w-0001og-Om
-	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 23:33:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50662)
+	id 1jZR6V-0003Pm-E0
+	for qemu-devel@archiver.kernel.org; Thu, 14 May 2020 23:33:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50862)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1jZR5A-000156-5t
- for qemu-devel@nongnu.org; Thu, 14 May 2020 23:32:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39775
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1jZR56-0003rr-Q1
- for qemu-devel@nongnu.org; Thu, 14 May 2020 23:32:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589513535;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=rYNQXOjSR4Gr+U+iEvYLwAd2Z/xq9iFNCyEZDPMm3Gs=;
- b=cUCe2pN6zI3+Vy11ecjftNyZllG/Nf+kmaIkejnsq5SY0xU64G/If097z5IxMQlx86SX0L
- F4dMxvH0mXsaksTBmqjNVtuDBX+cDE96GzpZTKJPB10M654GlPVUX2vE/L9A9UkpY+RbDx
- lzXso9ii37lD4pSTecbzMQyxUTvgOQE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-105-yjBjN1IAONqMChA_vDFaWw-1; Thu, 14 May 2020 23:32:11 -0400
-X-MC-Unique: yjBjN1IAONqMChA_vDFaWw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F40DE18FE888;
- Fri, 15 May 2020 03:32:08 +0000 (UTC)
-Received: from x1.home (ovpn-113-111.phx2.redhat.com [10.3.113.111])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3899F1001B07;
- Fri, 15 May 2020 03:32:07 +0000 (UTC)
-Date: Thu, 14 May 2020 21:32:06 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>, <yan.y.zhao@intel.com>
-Subject: Re: [PATCH Kernel v20 0/8] Add UAPIs to support migration for VFIO
- devices
-Message-ID: <20200514213206.271fa661@x1.home>
-In-Reply-To: <1589488667-9683-1-git-send-email-kwankhede@nvidia.com>
-References: <1589488667-9683-1-git-send-email-kwankhede@nvidia.com>
-Organization: Red Hat
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1jZR5g-0001iD-Lk
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 23:32:52 -0400
+Received: from mga17.intel.com ([192.55.52.151]:57419)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1jZR5d-0003wy-M6
+ for qemu-devel@nongnu.org; Thu, 14 May 2020 23:32:51 -0400
+IronPort-SDR: yRwmu/pKOhxUxc/FRC8igJesUnR+j7mBLz0I8vb8+zR1ZCY+xqZPQtDP4vmnzbBEKPb+CvkWRt
+ zRm7LwNDQ9jw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 14 May 2020 20:32:46 -0700
+IronPort-SDR: +F6UbiJnv043+WgLVyq8NmIbXT2JUWEMcAm9RT7WKBUMg14PXmSAXPcxoHHrX5d4QzmdVeFRZf
+ Q+ZSEHDcOxVQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.73,393,1583222400"; 
+ d="scan'208,217";a="253677329"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+ by fmsmga008.fm.intel.com with ESMTP; 14 May 2020 20:32:46 -0700
+Received: from shsmsx602.ccr.corp.intel.com (10.109.6.142) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 14 May 2020 20:32:45 -0700
+Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
+ SHSMSX602.ccr.corp.intel.com (10.109.6.142) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Fri, 15 May 2020 11:32:43 +0800
+Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
+ SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
+ Fri, 15 May 2020 11:32:43 +0800
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: Zhanghailiang <zhang.zhanghailiang@huawei.com>, "Dr . David Alan Gilbert"
+ <dgilbert@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Li Zhijian
+ <lizhijian@cn.fujitsu.com>
+Subject: RE: About migration/colo issue
+Thread-Topic: About migration/colo issue
+Thread-Index: AdYqZjudkmlVb8B9TvKOADpJ4VTuWAAAYZqAAABgXfA=
+Date: Fri, 15 May 2020 03:32:42 +0000
+Message-ID: <0c74f952a56442309cca6d0c7d2dde60@intel.com>
+References: <7a26ed7efed94d2dbff591521d31076a@intel.com>
+ <02d979c3d0004d07abed10bb6ddeba26@huawei.com>
+In-Reply-To: <02d979c3d0004d07abed10bb6ddeba26@huawei.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.36]
+Content-Type: multipart/alternative;
+ boundary="_000_0c74f952a56442309cca6d0c7d2dde60intelcom_"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Received-SPF: pass client-ip=207.211.31.120;
- envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 22:56:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
+Received-SPF: pass client-ip=192.55.52.151; envelope-from=chen.zhang@intel.com;
+ helo=mga17.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 23:32:46
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,221 +100,487 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
- dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, changpeng.liu@intel.com, Ken.Xue@amd.com
+Cc: Jason Wang <jasowang@redhat.com>, Lukas Straub <lukasstraub2@web.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Yan & Intel folks,
-
-I'm starting to run out of comments on this series, where are you with
-porting GVT-g migration to this API?  Are there remaining blocking
-issues?  Are we satisfied that the API is sufficient to support vIOMMU
-now?  Thanks,
-
-Alex
+--_000_0c74f952a56442309cca6d0c7d2dde60intelcom_
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
 
-On Fri, 15 May 2020 02:07:39 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-> Hi,
-> 
-> This patch set adds:
-> * IOCTL VFIO_IOMMU_DIRTY_PAGES to get dirty pages bitmap with
->   respect to IOMMU container rather than per device. All pages pinned by
->   vendor driver through vfio_pin_pages external API has to be marked as
->   dirty during  migration. When IOMMU capable device is present in the
->   container and all pages are pinned and mapped, then all pages are marked
->   dirty.
->   When there are CPU writes, CPU dirty page tracking can identify dirtied
->   pages, but any page pinned by vendor driver can also be written by
->   device. As of now there is no device which has hardware support for
->   dirty page tracking. So all pages which are pinned should be considered
->   as dirty.
->   This ioctl is also used to start/stop dirty pages tracking for pinned and
->   unpinned pages while migration is active.
-> 
-> * Updated IOCTL VFIO_IOMMU_UNMAP_DMA to get dirty pages bitmap before
->   unmapping IO virtual address range.
->   With vIOMMU, during pre-copy phase of migration, while CPUs are still
->   running, IO virtual address unmap can happen while device still keeping
->   reference of guest pfns. Those pages should be reported as dirty before
->   unmap, so that VFIO user space application can copy content of those
->   pages from source to destination.
-> 
-> * Patch 8 detect if IOMMU capable device driver is smart to report pages
->   to be marked dirty by pinning pages using vfio_pin_pages() API.
-> 
-> 
-> Yet TODO:
-> Since there is no device which has hardware support for system memmory
-> dirty bitmap tracking, right now there is no other API from vendor driver
-> to VFIO IOMMU module to report dirty pages. In future, when such hardware
-> support will be implemented, an API will be required such that vendor
-> driver could report dirty pages to VFIO module during migration phases.
-> 
-> Adding revision history from previous QEMU patch set to understand KABI
-> changes done till now
-> 
-> v19 -> v20
-> - Fixed ioctl to get dirty bitmap to get bitmap of multiple vfio_dmas
-> - Fixed unmap ioctl to get dirty bitmap of multiple vfio_dmas.
-> - Removed flag definition from migration capability.
-> 
-> v18 -> v19
-> - Updated migration capability with supported page sizes bitmap for dirty
->   page tracking and  maximum bitmap size supported by kernel module.
-> - Added patch to calculate and cache pgsize_bitmap when iommu->domain_list
->   is updated.
-> - Removed extra buffers added in previous version for bitmap manipulation
->   and optimised the code.
-> 
-> v17 -> v18
-> - Add migration capability to the capability chain for VFIO_IOMMU_GET_INFO
->   ioctl
-> - Updated UMAP_DMA ioctl to return bitmap of multiple vfio_dma
-> 
-> v16 -> v17
-> - Fixed errors reported by kbuild test robot <lkp@intel.com> on i386
-> 
-> v15 -> v16
-> - Minor edits and nit picks (Auger Eric)
-> - On copying bitmap to user, re-populated bitmap only for pinned pages,
->   excluding unmapped pages and CPU dirtied pages.
-> - Patches are on tag: next-20200318 and 1-3 patches from Yan's series
->   https://lkml.org/lkml/2020/3/12/1255
-> 
-> v14 -> v15
-> - Minor edits and nit picks.
-> - In the verification of user allocated bitmap memory, added check of
->    maximum size.
-> - Patches are on tag: next-20200318 and 1-3 patches from Yan's series
->   https://lkml.org/lkml/2020/3/12/1255
-> 
-> v13 -> v14
-> - Added struct vfio_bitmap to kabi. updated structure
->   vfio_iommu_type1_dirty_bitmap_get and vfio_iommu_type1_dma_unmap.
-> - All small changes suggested by Alex.
-> - Patches are on tag: next-20200318 and 1-3 patches from Yan's series
->   https://lkml.org/lkml/2020/3/12/1255
-> 
-> v12 -> v13
-> - Changed bitmap allocation in vfio_iommu_type1 to per vfio_dma
-> - Changed VFIO_IOMMU_DIRTY_PAGES ioctl behaviour to be per vfio_dma range.
-> - Changed vfio_iommu_type1_dirty_bitmap structure to have separate data
->   field.
-> 
-> v11 -> v12
-> - Changed bitmap allocation in vfio_iommu_type1.
-> - Remove atomicity of ref_count.
-> - Updated comments for migration device state structure about error
->   reporting.
-> - Nit picks from v11 reviews
-> 
-> v10 -> v11
-> - Fix pin pages API to free vpfn if it is marked as unpinned tracking page.
-> - Added proposal to detect if IOMMU capable device calls external pin pages
->   API to mark pages dirty.
-> - Nit picks from v10 reviews
-> 
-> v9 -> v10:
-> - Updated existing VFIO_IOMMU_UNMAP_DMA ioctl to get dirty pages bitmap
->   during unmap while migration is active
-> - Added flag in VFIO_IOMMU_GET_INFO to indicate driver support dirty page
->   tracking.
-> - If iommu_mapped, mark all pages dirty.
-> - Added unpinned pages tracking while migration is active.
-> - Updated comments for migration device state structure with bit
->   combination table and state transition details.
-> 
-> v8 -> v9:
-> - Split patch set in 2 sets, Kernel and QEMU.
-> - Dirty pages bitmap is queried from IOMMU container rather than from
->   vendor driver for per device. Added 2 ioctls to achieve this.
-> 
-> v7 -> v8:
-> - Updated comments for KABI
-> - Added BAR address validation check during PCI device's config space load
->   as suggested by Dr. David Alan Gilbert.
-> - Changed vfio_migration_set_state() to set or clear device state flags.
-> - Some nit fixes.
-> 
-> v6 -> v7:
-> - Fix build failures.
-> 
-> v5 -> v6:
-> - Fix build failure.
-> 
-> v4 -> v5:
-> - Added decriptive comment about the sequence of access of members of
->   structure vfio_device_migration_info to be followed based on Alex's
->   suggestion
-> - Updated get dirty pages sequence.
-> - As per Cornelia Huck's suggestion, added callbacks to VFIODeviceOps to
->   get_object, save_config and load_config.
-> - Fixed multiple nit picks.
-> - Tested live migration with multiple vfio device assigned to a VM.
-> 
-> v3 -> v4:
-> - Added one more bit for _RESUMING flag to be set explicitly.
-> - data_offset field is read-only for user space application.
-> - data_size is read for every iteration before reading data from migration,
->   that is removed assumption that data will be till end of migration
->   region.
-> - If vendor driver supports mappable sparsed region, map those region
->   during setup state of save/load, similarly unmap those from cleanup
->   routines.
-> - Handles race condition that causes data corruption in migration region
->   during save device state by adding mutex and serialiaing save_buffer and
->   get_dirty_pages routines.
-> - Skip called get_dirty_pages routine for mapped MMIO region of device.
-> - Added trace events.
-> - Split into multiple functional patches.
-> 
-> v2 -> v3:
-> - Removed enum of VFIO device states. Defined VFIO device state with 2
->   bits.
-> - Re-structured vfio_device_migration_info to keep it minimal and defined
->   action on read and write access on its members.
-> 
-> v1 -> v2:
-> - Defined MIGRATION region type and sub-type which should be used with
->   region type capability.
-> - Re-structured vfio_device_migration_info. This structure will be placed
->   at 0th offset of migration region.
-> - Replaced ioctl with read/write for trapped part of migration region.
-> - Added both type of access support, trapped or mmapped, for data section
->   of the region.
-> - Moved PCI device functions to pci file.
-> - Added iteration to get dirty page bitmap until bitmap for all requested
->   pages are copied.
-> 
-> Thanks,
-> Kirti
-> 
-> 
-> 
-> Kirti Wankhede (8):
->   vfio: UAPI for migration interface for device state
->   vfio iommu: Remove atomicity of ref_count of pinned pages
->   vfio iommu: Cache pgsize_bitmap in struct vfio_iommu
->   vfio iommu: Add ioctl definition for dirty pages tracking
->   vfio iommu: Implementation of ioctl for dirty pages tracking
->   vfio iommu: Update UNMAP_DMA ioctl to get dirty bitmap before unmap
->   vfio iommu: Add migration capability to report supported features
->   vfio: Selective dirty page tracking if IOMMU backed device pins pages
-> 
->  drivers/vfio/vfio.c             |  13 +-
->  drivers/vfio/vfio_iommu_type1.c | 565 ++++++++++++++++++++++++++++++++++++----
->  include/linux/vfio.h            |   4 +-
->  include/uapi/linux/vfio.h       | 315 ++++++++++++++++++++++
->  4 files changed, 838 insertions(+), 59 deletions(-)
-> 
+From: Zhanghailiang <zhang.zhanghailiang@huawei.com>
+Sent: Friday, May 15, 2020 11:29 AM
+To: Zhang, Chen <chen.zhang@intel.com>; Dr . David Alan Gilbert <dgilbert@r=
+edhat.com>; qemu-devel <qemu-devel@nongnu.org>; Li Zhijian <lizhijian@cn.fu=
+jitsu.com>
+Cc: Jason Wang <jasowang@redhat.com>; Lukas Straub <lukasstraub2@web.de>
+Subject: RE: About migration/colo issue
 
+Hi Zhang Chen,
+
+From your tracing log, it seems to be hanged in colo_flush_ram_cache()?
+Does it come across a dead loop there ?
+
+Maybe, I haven't looked in depth.
+
+I'll test it by using the new qemu.
+
+Thanks
+
+Thanks,
+Hailiang
+
+From: Zhang, Chen [mailto:chen.zhang@intel.com]
+Sent: Friday, May 15, 2020 11:16 AM
+To: Zhanghailiang <zhang.zhanghailiang@huawei.com<mailto:zhang.zhanghailian=
+g@huawei.com>>; Dr . David Alan Gilbert <dgilbert@redhat.com<mailto:dgilber=
+t@redhat.com>>; qemu-devel <qemu-devel@nongnu.org<mailto:qemu-devel@nongnu.=
+org>>; Li Zhijian <lizhijian@cn.fujitsu.com<mailto:lizhijian@cn.fujitsu.com=
+>>
+Cc: Jason Wang <jasowang@redhat.com<mailto:jasowang@redhat.com>>; Lukas Str=
+aub <lukasstraub2@web.de<mailto:lukasstraub2@web.de>>
+Subject: About migration/colo issue
+
+Hi Hailiang/Dave.
+
+I found a urgent problem in current upstream code, COLO will stuck on secon=
+dary checkpoint and later.
+The guest will stuck by this issue.
+I have bisect upstream code, this issue caused by Hailiang's optimize patch=
+:
+
+From 0393031a16735835a441b6d6e0495a1bd14adb90 Mon Sep 17 00:00:00 2001
+From: zhanghailiang <zhang.zhanghailiang@huawei.com<mailto:zhang.zhanghaili=
+ang@huawei.com>>
+Date: Mon, 24 Feb 2020 14:54:10 +0800
+Subject: [PATCH] COLO: Optimize memory back-up process
+
+This patch will reduce the downtime of VM for the initial process,
+Previously, we copied all these memory in preparing stage of COLO
+while we need to stop VM, which is a time-consuming process.
+Here we optimize it by a trick, back-up every page while in migration
+process while COLO is enabled, though it affects the speed of the
+migration, but it obviously reduce the downtime of back-up all SVM'S
+memory in COLO preparing stage.
+
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com<mailto:zhang.z=
+hanghailiang@huawei.com>>
+Message-Id: <20200224065414.36524-5-zhang.zhanghailiang@huawei.com<mailto:2=
+0200224065414.36524-5-zhang.zhanghailiang@huawei.com>>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com<mailto:dgilbert@=
+redhat.com>>
+  minor typo fixes
+
+Hailiang, do you have time to look into it?
+
+
+The detail log:
+Primary node:
+13322@1589511271.917346:colo_receive_message<mailto:13322@1589511271.917346=
+:colo_receive_message> Receive 'checkpoint-ready' message
+{"timestamp": {"seconds": 1589511271, "microseconds": 917406}, "event": "RE=
+SUME"}
+13322@1589511271.917842:colo_vm_state_change<mailto:13322@1589511271.917842=
+:colo_vm_state_change> Change 'stop' =3D> 'run'
+13322@1589511291.243346:colo_send_message<mailto:13322@1589511291.243346:co=
+lo_send_message> Send 'checkpoint-request' message
+13322@1589511291.243978:colo_receive_message<mailto:13322@1589511291.243978=
+:colo_receive_message> Receive 'checkpoint-reply' message
+{"timestamp": {"seconds": 1589511291, "microseconds": 244096}, "event": "ST=
+OP"}
+13322@1589511291.244444:colo_vm_state_change<mailto:13322@1589511291.244444=
+:colo_vm_state_change> Change 'run' =3D> 'stop'
+13322@1589511291.244561:colo_send_message<mailto:13322@1589511291.244561:co=
+lo_send_message> Send 'vmstate-send' message
+13322@1589511291.258594:colo_send_message<mailto:13322@1589511291.258594:co=
+lo_send_message> Send 'vmstate-size' message
+13322@1589511305.412479:colo_receive_message<mailto:13322@1589511305.412479=
+:colo_receive_message> Receive 'vmstate-received' message
+13322@1589511309.031826:colo_receive_message<mailto:13322@1589511309.031826=
+:colo_receive_message> Receive 'vmstate-loaded' message
+{"timestamp": {"seconds": 1589511309, "microseconds": 31862}, "event": "RES=
+UME"}
+13322@1589511309.033075:colo_vm_state_change<mailto:13322@1589511309.033075=
+:colo_vm_state_change> Change 'stop' =3D> 'run'
+{"timestamp": {"seconds": 1589511311, "microseconds": 111617}, "event": "VN=
+C_CONNECTED", "data": {"server": {"auth": "none", "family": "ipv4", "servic=
+e": "5907", "host": "0.0.0.0", "websocket": false}, "client": {"family": "i=
+pv4", "service": "51564", "host": "10.239.13.19", "websocket": false}}}
+{"timestamp": {"seconds": 1589511311, "microseconds": 116197}, "event": "VN=
+C_INITIALIZED", "data": {"server": {"auth": "none", "family": "ipv4", "serv=
+ice": "5907", "host": "0.0.0.0", "websocket": false}, "client": {"family": =
+"ipv4", "service": "51564", "host": "10.239.13.19", "websocket": false}}}
+13322@1589511311.243271:colo_send_message<mailto:13322@1589511311.243271:co=
+lo_send_message> Send 'checkpoint-request' message
+13322@1589511311.351361:colo_receive_message<mailto:13322@1589511311.351361=
+:colo_receive_message> Receive 'checkpoint-reply' message
+{"timestamp": {"seconds": 1589511311, "microseconds": 351439}, "event": "ST=
+OP"}
+13322@1589511311.415779:colo_vm_state_change<mailto:13322@1589511311.415779=
+:colo_vm_state_change> Change 'run' =3D> 'stop'
+13322@1589511311.416001:colo_send_message<mailto:13322@1589511311.416001:co=
+lo_send_message> Send 'vmstate-send' message
+13322@1589511311.418620:colo_send_message<mailto:13322@1589511311.418620:co=
+lo_send_message> Send 'vmstate-size' message
+
+Secondary node:
+{"timestamp": {"seconds": 1589510920, "microseconds": 778207}, "event": "RE=
+SUME"}
+23619@1589510920.778835:colo_vm_state_change<mailto:23619@1589510920.778835=
+:colo_vm_state_change> Change 'stop' =3D> 'run'
+23619@1589510920.778891:colo_send_message<mailto:23619@1589510920.778891:co=
+lo_send_message> Send 'checkpoint-ready' message
+23619@1589510940.105539:colo_receive_message<mailto:23619@1589510940.105539=
+:colo_receive_message> Receive 'checkpoint-request' message
+{"timestamp": {"seconds": 1589510940, "microseconds": 105712}, "event": "ST=
+OP"}
+23619@1589510940.105917:colo_vm_state_change<mailto:23619@1589510940.105917=
+:colo_vm_state_change> Change 'run' =3D> 'stop'
+23619@1589510940.105971:colo_send_message<mailto:23619@1589510940.105971:co=
+lo_send_message> Send 'checkpoint-reply' message
+23619@1589510940.106767:colo_receive_message<mailto:23619@1589510940.106767=
+:colo_receive_message> Receive 'vmstate-send' message
+23619@1589510940.122808:colo_flush_ram_cache_begin<mailto:23619@1589510940.=
+122808:colo_flush_ram_cache_begin> dirty_pages 2456
+23619@1589510953.618672:colo_flush_ram_cache_end<mailto:23619@1589510953.61=
+8672:colo_flush_ram_cache_end>
+23619@1589510953.945083:colo_receive_message<mailto:23619@1589510953.945083=
+:colo_receive_message> Receive 'vmstate-size' message
+23619@1589510954.274816:colo_send_message<mailto:23619@1589510954.274816:co=
+lo_send_message> Send 'vmstate-received' message
+qemu-system-x86_64: warning: TSC frequency mismatch between VM (2792980 kHz=
+) and host (2925999 kHz), and TSC scaling unavailable
+{"timestamp": {"seconds": 1589510957, "microseconds": 754184}, "event": "RE=
+SUME"}
+23619@1589510957.894113:colo_vm_state_change<mailto:23619@1589510957.894113=
+:colo_vm_state_change> Change 'stop' =3D> 'run'
+23619@1589510957.894162:colo_send_message<mailto:23619@1589510957.894162:co=
+lo_send_message> Send 'vmstate-loaded' message
+23619@1589510960.105977:colo_receive_message<mailto:23619@1589510960.105977=
+:colo_receive_message> Receive 'checkpoint-request' message
+{"timestamp": {"seconds": 1589510960, "microseconds": 106148}, "event": "ST=
+OP"}
+23619@1589510960.213773:colo_vm_state_change<mailto:23619@1589510960.213773=
+:colo_vm_state_change> Change 'run' =3D> 'stop'
+23619@1589510960.213797:colo_send_message<mailto:23619@1589510960.213797:co=
+lo_send_message> Send 'checkpoint-reply' message
+23619@1589510960.278771:colo_receive_message<mailto:23619@1589510960.278771=
+:colo_receive_message> Receive 'vmstate-send' message
+23619@1589510960.423268:colo_flush_ram_cache_begin<mailto:23619@1589510960.=
+423268:colo_flush_ram_cache_begin> dirty_pages 25
+
+
+
+
+
+
+
+
+--_000_0c74f952a56442309cca6d0c7d2dde60intelcom_
+Content-Type: text/html; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
+osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" xmlns=3D"http:=
+//www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dus-ascii"=
+>
+<meta name=3D"Generator" content=3D"Microsoft Word 15 (filtered medium)">
+<style><!--
+/* Font Definitions */
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:DengXian;
+	panose-1:2 1 6 0 3 1 1 1 1 1;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+@font-face
+	{font-family:"\@DengXian";
+	panose-1:2 1 6 0 3 1 1 1 1 1;}
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	margin-bottom:.0001pt;
+	font-size:11.0pt;
+	font-family:"Calibri",sans-serif;}
+a:link, span.MsoHyperlink
+	{mso-style-priority:99;
+	color:#0563C1;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{mso-style-priority:99;
+	color:#954F72;
+	text-decoration:underline;}
+p.msonormal0, li.msonormal0, div.msonormal0
+	{mso-style-name:msonormal;
+	mso-margin-top-alt:auto;
+	margin-right:0in;
+	mso-margin-bottom-alt:auto;
+	margin-left:0in;
+	font-size:11.0pt;
+	font-family:"Calibri",sans-serif;}
+span.EmailStyle18
+	{mso-style-type:personal;
+	font-family:"Calibri",sans-serif;
+	color:windowtext;}
+span.EmailStyle19
+	{mso-style-type:personal;
+	font-family:"Calibri",sans-serif;
+	color:#1F497D;}
+span.EmailStyle21
+	{mso-style-type:personal-reply;
+	font-family:"Calibri",sans-serif;
+	color:windowtext;}
+.MsoChpDefault
+	{mso-style-type:export-only;
+	font-size:10.0pt;}
+@page WordSection1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.0in 1.0in 1.0in;}
+div.WordSection1
+	{page:WordSection1;}
+--></style><!--[if gte mso 9]><xml>
+<o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
+</xml><![endif]--><!--[if gte mso 9]><xml>
+<o:shapelayout v:ext=3D"edit">
+<o:idmap v:ext=3D"edit" data=3D"1" />
+</o:shapelayout></xml><![endif]-->
+</head>
+<body lang=3D"EN-US" link=3D"#0563C1" vlink=3D"#954F72">
+<div class=3D"WordSection1">
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<div style=3D"border:none;border-left:solid blue 1.5pt;padding:0in 0in 0in =
+4.0pt">
+<div>
+<div style=3D"border:none;border-top:solid #E1E1E1 1.0pt;padding:3.0pt 0in =
+0in 0in">
+<p class=3D"MsoNormal"><b>From:</b> Zhanghailiang &lt;zhang.zhanghailiang@h=
+uawei.com&gt; <br>
+<b>Sent:</b> Friday, May 15, 2020 11:29 AM<br>
+<b>To:</b> Zhang, Chen &lt;chen.zhang@intel.com&gt;; Dr . David Alan Gilber=
+t &lt;dgilbert@redhat.com&gt;; qemu-devel &lt;qemu-devel@nongnu.org&gt;; Li=
+ Zhijian &lt;lizhijian@cn.fujitsu.com&gt;<br>
+<b>Cc:</b> Jason Wang &lt;jasowang@redhat.com&gt;; Lukas Straub &lt;lukasst=
+raub2@web.de&gt;<br>
+<b>Subject:</b> RE: About migration/colo issue<o:p></o:p></p>
+</div>
+</div>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.5pt;color:#1F497D">Hi Zh=
+ang Chen,<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.5pt;color:#1F497D"><o:p>=
+&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.5pt;color:#1F497D">From =
+your tracing log, it seems to be hanged in colo_flush_ram_cache()?<o:p></o:=
+p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.5pt;color:#1F497D">Does =
+it come across a dead loop there ?<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Maybe, I haven&#8217;t looked in depth.<o:p></o:p></=
+p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.5pt;color:#1F497D">I&#82=
+17;ll test it by using the new qemu.<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Thanks<o:p></o:p></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.5pt;color:#1F497D"><o:p>=
+&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.5pt;color:#1F497D">Thank=
+s,<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.5pt;color:#1F497D">Haili=
+ang<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.5pt;color:#1F497D"><o:p>=
+&nbsp;</o:p></span></p>
+<div style=3D"border:none;border-left:solid blue 1.5pt;padding:0in 0in 0in =
+4.0pt">
+<div>
+<div style=3D"border:none;border-top:solid #E1E1E1 1.0pt;padding:3.0pt 0in =
+0in 0in">
+<p class=3D"MsoNormal"><b>From:</b> Zhang, Chen [<a href=3D"mailto:chen.zha=
+ng@intel.com">mailto:chen.zhang@intel.com</a>]
+<br>
+<b>Sent:</b> Friday, May 15, 2020 11:16 AM<br>
+<b>To:</b> Zhanghailiang &lt;<a href=3D"mailto:zhang.zhanghailiang@huawei.c=
+om">zhang.zhanghailiang@huawei.com</a>&gt;; Dr . David Alan Gilbert &lt;<a =
+href=3D"mailto:dgilbert@redhat.com">dgilbert@redhat.com</a>&gt;; qemu-devel=
+ &lt;<a href=3D"mailto:qemu-devel@nongnu.org">qemu-devel@nongnu.org</a>&gt;=
+;
+ Li Zhijian &lt;<a href=3D"mailto:lizhijian@cn.fujitsu.com">lizhijian@cn.fu=
+jitsu.com</a>&gt;<br>
+<b>Cc:</b> Jason Wang &lt;<a href=3D"mailto:jasowang@redhat.com">jasowang@r=
+edhat.com</a>&gt;; Lukas Straub &lt;<a href=3D"mailto:lukasstraub2@web.de">=
+lukasstraub2@web.de</a>&gt;<br>
+<b>Subject:</b> About migration/colo issue<o:p></o:p></p>
+</div>
+</div>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Hi Hailiang/Dave.<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">I found a urgent problem in current upstream code, C=
+OLO will stuck on secondary checkpoint and later.<o:p></o:p></p>
+<p class=3D"MsoNormal">The guest will stuck by this issue.<o:p></o:p></p>
+<p class=3D"MsoNormal">I have bisect upstream code, this issue caused by Ha=
+iliang&#8217;s optimize patch:<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">From 0393031a16735835a441b6d6e0495a1bd14adb90 Mon Se=
+p 17 00:00:00 2001<br>
+From: zhanghailiang &lt;<a href=3D"mailto:zhang.zhanghailiang@huawei.com">z=
+hang.zhanghailiang@huawei.com</a>&gt;<br>
+Date: Mon, 24 Feb 2020 14:54:10 &#43;0800<br>
+Subject: [PATCH] COLO: Optimize memory back-up process<br>
+<br>
+This patch will reduce the downtime of VM for the initial process,<br>
+Previously, we copied all these memory in preparing stage of COLO<br>
+while we need to stop VM, which is a time-consuming process.<br>
+Here we optimize it by a trick, back-up every page while in migration<br>
+process while COLO is enabled, though it affects the speed of the<br>
+migration, but it obviously reduce the downtime of back-up all SVM'S<br>
+memory in COLO preparing stage.<br>
+<br>
+Signed-off-by: zhanghailiang &lt;<a href=3D"mailto:zhang.zhanghailiang@huaw=
+ei.com">zhang.zhanghailiang@huawei.com</a>&gt;<br>
+Message-Id: &lt;<a href=3D"mailto:20200224065414.36524-5-zhang.zhanghailian=
+g@huawei.com">20200224065414.36524-5-zhang.zhanghailiang@huawei.com</a>&gt;=
+<br>
+Signed-off-by: Dr. David Alan Gilbert &lt;<a href=3D"mailto:dgilbert@redhat=
+.com">dgilbert@redhat.com</a>&gt;<br>
+&nbsp; minor typo fixes<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Hailiang, do you have time to look into it?<o:p></o:=
+p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">The detail log:<o:p></o:p></p>
+<p class=3D"MsoNormal">Primary node:<o:p></o:p></p>
+<p class=3D"MsoNormal"><a href=3D"mailto:13322@1589511271.917346:colo_recei=
+ve_message">13322@1589511271.917346:colo_receive_message</a> Receive 'check=
+point-ready' message<br>
+{&quot;timestamp&quot;: {&quot;seconds&quot;: 1589511271, &quot;microsecond=
+s&quot;: 917406}, &quot;event&quot;: &quot;RESUME&quot;}<br>
+<a href=3D"mailto:13322@1589511271.917842:colo_vm_state_change">13322@15895=
+11271.917842:colo_vm_state_change</a> Change 'stop' =3D&gt; 'run'<br>
+<a href=3D"mailto:13322@1589511291.243346:colo_send_message">13322@15895112=
+91.243346:colo_send_message</a> Send 'checkpoint-request' message<br>
+<a href=3D"mailto:13322@1589511291.243978:colo_receive_message">13322@15895=
+11291.243978:colo_receive_message</a> Receive 'checkpoint-reply' message<br=
+>
+{&quot;timestamp&quot;: {&quot;seconds&quot;: 1589511291, &quot;microsecond=
+s&quot;: 244096}, &quot;event&quot;: &quot;STOP&quot;}<br>
+<a href=3D"mailto:13322@1589511291.244444:colo_vm_state_change">13322@15895=
+11291.244444:colo_vm_state_change</a> Change 'run' =3D&gt; 'stop'<br>
+<a href=3D"mailto:13322@1589511291.244561:colo_send_message">13322@15895112=
+91.244561:colo_send_message</a> Send 'vmstate-send' message<br>
+<a href=3D"mailto:13322@1589511291.258594:colo_send_message">13322@15895112=
+91.258594:colo_send_message</a> Send 'vmstate-size' message<br>
+<a href=3D"mailto:13322@1589511305.412479:colo_receive_message">13322@15895=
+11305.412479:colo_receive_message</a> Receive 'vmstate-received' message<br=
+>
+<a href=3D"mailto:13322@1589511309.031826:colo_receive_message">13322@15895=
+11309.031826:colo_receive_message</a> Receive 'vmstate-loaded' message<br>
+{&quot;timestamp&quot;: {&quot;seconds&quot;: 1589511309, &quot;microsecond=
+s&quot;: 31862}, &quot;event&quot;: &quot;RESUME&quot;}<br>
+<a href=3D"mailto:13322@1589511309.033075:colo_vm_state_change">13322@15895=
+11309.033075:colo_vm_state_change</a> Change 'stop' =3D&gt; 'run'<br>
+{&quot;timestamp&quot;: {&quot;seconds&quot;: 1589511311, &quot;microsecond=
+s&quot;: 111617}, &quot;event&quot;: &quot;VNC_CONNECTED&quot;, &quot;data&=
+quot;: {&quot;server&quot;: {&quot;auth&quot;: &quot;none&quot;, &quot;fami=
+ly&quot;: &quot;ipv4&quot;, &quot;service&quot;: &quot;5907&quot;, &quot;ho=
+st&quot;: &quot;0.0.0.0&quot;, &quot;websocket&quot;: false}, &quot;client&=
+quot;: {&quot;family&quot;: &quot;ipv4&quot;, &quot;service&quot;: &quot;51=
+564&quot;, &quot;host&quot;:
+ &quot;10.239.13.19&quot;, &quot;websocket&quot;: false}}}<br>
+{&quot;timestamp&quot;: {&quot;seconds&quot;: 1589511311, &quot;microsecond=
+s&quot;: 116197}, &quot;event&quot;: &quot;VNC_INITIALIZED&quot;, &quot;dat=
+a&quot;: {&quot;server&quot;: {&quot;auth&quot;: &quot;none&quot;, &quot;fa=
+mily&quot;: &quot;ipv4&quot;, &quot;service&quot;: &quot;5907&quot;, &quot;=
+host&quot;: &quot;0.0.0.0&quot;, &quot;websocket&quot;: false}, &quot;clien=
+t&quot;: {&quot;family&quot;: &quot;ipv4&quot;, &quot;service&quot;: &quot;=
+51564&quot;, &quot;host&quot;:
+ &quot;10.239.13.19&quot;, &quot;websocket&quot;: false}}}<br>
+<a href=3D"mailto:13322@1589511311.243271:colo_send_message">13322@15895113=
+11.243271:colo_send_message</a> Send 'checkpoint-request' message<br>
+<a href=3D"mailto:13322@1589511311.351361:colo_receive_message">13322@15895=
+11311.351361:colo_receive_message</a> Receive 'checkpoint-reply' message<br=
+>
+{&quot;timestamp&quot;: {&quot;seconds&quot;: 1589511311, &quot;microsecond=
+s&quot;: 351439}, &quot;event&quot;: &quot;STOP&quot;}<br>
+<a href=3D"mailto:13322@1589511311.415779:colo_vm_state_change">13322@15895=
+11311.415779:colo_vm_state_change</a> Change 'run' =3D&gt; 'stop'<br>
+<a href=3D"mailto:13322@1589511311.416001:colo_send_message">13322@15895113=
+11.416001:colo_send_message</a> Send 'vmstate-send' message<br>
+<a href=3D"mailto:13322@1589511311.418620:colo_send_message">13322@15895113=
+11.418620:colo_send_message</a> Send 'vmstate-size' message<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Secondary node:<o:p></o:p></p>
+<p class=3D"MsoNormal">{&quot;timestamp&quot;: {&quot;seconds&quot;: 158951=
+0920, &quot;microseconds&quot;: 778207}, &quot;event&quot;: &quot;RESUME&qu=
+ot;}<br>
+<a href=3D"mailto:23619@1589510920.778835:colo_vm_state_change">23619@15895=
+10920.778835:colo_vm_state_change</a> Change 'stop' =3D&gt; 'run'<br>
+<a href=3D"mailto:23619@1589510920.778891:colo_send_message">23619@15895109=
+20.778891:colo_send_message</a> Send 'checkpoint-ready' message<br>
+<a href=3D"mailto:23619@1589510940.105539:colo_receive_message">23619@15895=
+10940.105539:colo_receive_message</a> Receive 'checkpoint-request' message<=
+br>
+{&quot;timestamp&quot;: {&quot;seconds&quot;: 1589510940, &quot;microsecond=
+s&quot;: 105712}, &quot;event&quot;: &quot;STOP&quot;}<br>
+<a href=3D"mailto:23619@1589510940.105917:colo_vm_state_change">23619@15895=
+10940.105917:colo_vm_state_change</a> Change 'run' =3D&gt; 'stop'<br>
+<a href=3D"mailto:23619@1589510940.105971:colo_send_message">23619@15895109=
+40.105971:colo_send_message</a> Send 'checkpoint-reply' message<br>
+<a href=3D"mailto:23619@1589510940.106767:colo_receive_message">23619@15895=
+10940.106767:colo_receive_message</a> Receive 'vmstate-send' message<br>
+<a href=3D"mailto:23619@1589510940.122808:colo_flush_ram_cache_begin">23619=
+@1589510940.122808:colo_flush_ram_cache_begin</a> dirty_pages 2456<br>
+<a href=3D"mailto:23619@1589510953.618672:colo_flush_ram_cache_end">23619@1=
+589510953.618672:colo_flush_ram_cache_end</a><br>
+<a href=3D"mailto:23619@1589510953.945083:colo_receive_message">23619@15895=
+10953.945083:colo_receive_message</a> Receive 'vmstate-size' message<br>
+<a href=3D"mailto:23619@1589510954.274816:colo_send_message">23619@15895109=
+54.274816:colo_send_message</a> Send 'vmstate-received' message<br>
+qemu-system-x86_64: warning: TSC frequency mismatch between VM (2792980 kHz=
+) and host (2925999 kHz), and TSC scaling unavailable<br>
+{&quot;timestamp&quot;: {&quot;seconds&quot;: 1589510957, &quot;microsecond=
+s&quot;: 754184}, &quot;event&quot;: &quot;RESUME&quot;}<br>
+<a href=3D"mailto:23619@1589510957.894113:colo_vm_state_change">23619@15895=
+10957.894113:colo_vm_state_change</a> Change 'stop' =3D&gt; 'run'<br>
+<a href=3D"mailto:23619@1589510957.894162:colo_send_message">23619@15895109=
+57.894162:colo_send_message</a> Send 'vmstate-loaded' message<br>
+<a href=3D"mailto:23619@1589510960.105977:colo_receive_message">23619@15895=
+10960.105977:colo_receive_message</a> Receive 'checkpoint-request' message<=
+br>
+{&quot;timestamp&quot;: {&quot;seconds&quot;: 1589510960, &quot;microsecond=
+s&quot;: 106148}, &quot;event&quot;: &quot;STOP&quot;}<br>
+<a href=3D"mailto:23619@1589510960.213773:colo_vm_state_change">23619@15895=
+10960.213773:colo_vm_state_change</a> Change 'run' =3D&gt; 'stop'<br>
+<a href=3D"mailto:23619@1589510960.213797:colo_send_message">23619@15895109=
+60.213797:colo_send_message</a> Send 'checkpoint-reply' message<br>
+<a href=3D"mailto:23619@1589510960.278771:colo_receive_message">23619@15895=
+10960.278771:colo_receive_message</a> Receive 'vmstate-send' message<br>
+<a href=3D"mailto:23619@1589510960.423268:colo_flush_ram_cache_begin">23619=
+@1589510960.423268:colo_flush_ram_cache_begin</a> dirty_pages 25<o:p></o:p>=
+</p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+</div>
+</div>
+</div>
+</body>
+</html>
+
+--_000_0c74f952a56442309cca6d0c7d2dde60intelcom_--
 
