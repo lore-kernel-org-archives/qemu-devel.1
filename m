@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8517AC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:22:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFF0AC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:22:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F2A02075F
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:22:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 97CDA20671
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:22:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="D0deTJfL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F2A02075F
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GX+Cpsnh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97CDA20671
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34268 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZbDx-0002aP-Fs
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 10:22:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34762)
+	id 1jZbEU-0003Q7-Ps
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 10:22:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34776)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZbCx-0000eE-Mz
- for qemu-devel@nongnu.org; Fri, 15 May 2020 10:21:03 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33781)
+ id 1jZbCy-0000gO-RX
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 10:21:04 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53906)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jZbCw-0003rm-NT
- for qemu-devel@nongnu.org; Fri, 15 May 2020 10:21:03 -0400
-Received: by mail-wr1-x442.google.com with SMTP id l11so3824882wru.0
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 07:21:02 -0700 (PDT)
+ id 1jZbCx-0003s4-NU
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 10:21:04 -0400
+Received: by mail-wm1-x341.google.com with SMTP id k12so2506959wmj.3
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 07:21:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=17miaZnAVR6c8E+5NalM9aupFX47F8Zsgz/tNLlnYGE=;
- b=D0deTJfLmgHltI/6u5Nua2Vfio85SFd+D8DvqxMP5X0NmioFo/1fy4SUyj3hCOZALO
- nsBC0yFREmmff7lkOcY3z8LqrUzHTuiCvsSZtDd+DJ9aRLoub+VdocB9wAWk24mrghtG
- 8+h+KBBj5Scm7ti6za1YZAiANvLIyTkrUV5MK3fzRBm92yJuwXkU8ysCOIFYZASEto7j
- a3MaJCEijnBgwFF7HhwzyYcFPTd1lkamyE1a1lwVuMyMTHfK+QFCMWC0xDuHPUaxiiEL
- 8UAZ3byOKvn5wR/Jte15lnyPhN/a8lD3cWgSyrP5Us4a9J5s8soP4yjtKxB8/qWFdCmj
- lAxw==
+ bh=hKEL7z4LxXMw8xsvvZqstECIgOw6TAEOPxp9PR9rpGE=;
+ b=GX+CpsnhbSVEVmKZ18h/6DwQfYUec0YIsWsoUXMn60OwTssJZJD0ObsjurPS9THSqI
+ Ew668yFwCSigE4OUt8a/oL0/qJKvbAaqLdw9Gr2ncXbu7+QpKtyemXMV8yEhLETXEPe7
+ KezTYlismGvSo7mgdquj5fRM2gvrDgGeyUFG7IRSu76Ds9IIJEWPyv5iokK2MISo5CrU
+ GLRLAYevukem7yBF6SuqzxTFpg/YlPsQzqHfxQrYLrH/ISeQrd+zW1JomJaGnsYqQ9VO
+ 1HSFSaeJRJeftUuxLsSrJVsYyHnhUy4D86w37wkR0IW6ZKz6OEBs8v3CLchef2orARy2
+ 8tXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=17miaZnAVR6c8E+5NalM9aupFX47F8Zsgz/tNLlnYGE=;
- b=itgrkBdi4QnYighq/e3y49uh538cwT5zJZk6g/7SK5KkWlMZU0/DqcnNHWh7JBQ+Im
- cxvwDHrrouGGHJace5KgY+X/3ENmmnQxB0D5JnOpha3G/5ADlWvAjm/PncbHaS3sSUuI
- P9375klQdNCRZ/wB4mCoQLAYa1ZNUeS0SJaRgHiA9KoL4zPnDGlarDqyCPArYDQqwdNe
- 3ZIBIkdQYdlPcJeyAck54Tt5vBkRNoi7mUV6QYE5FtECXzXoT5M3AYxKqoJpAJp1HjzI
- POtmOtLWkbrsc866zmNyMTi7s9vsN3hqc/X3TEE63pEJC7XlDMa54h9Z1nUnPYQtDyxa
- jiTw==
-X-Gm-Message-State: AOAM531A6K7Fz2D1y26ubGpFljQ+9twAivlfRQ43ZIDgcgcZUFoI8Z1f
- 5m6k8J+qvXJPPB6C5W713U4Ghcs/Ak37yw==
-X-Google-Smtp-Source: ABdhPJypDy2vplkeqU1l0s0iAbzKU5HJoOQeRW4ohDFHcSywPPxzictJYLN9tlRyD5FPwdR1QY1r5A==
-X-Received: by 2002:a5d:522d:: with SMTP id i13mr4642896wra.306.1589552460990; 
- Fri, 15 May 2020 07:21:00 -0700 (PDT)
+ bh=hKEL7z4LxXMw8xsvvZqstECIgOw6TAEOPxp9PR9rpGE=;
+ b=CrC30ZiY990DnkQBwR/AGlYHIh5ZlppjKICLSLesRdjJLSjYFTKs33MoFm+lxEB9n+
+ bYsHNyt6K6Cd1u6EiOUO0NH8b90aFPxYp/413SBuSSfXpmgIveOz+KyYTELMXZY5M2Nd
+ RcfJbzZByhF/LEDJlKlLSCU972Q/fcu5/6Hf+tkjD9nVUz77CSWXjgDE1dstUqDudwx0
+ ZjHa4YUraA6MzGX1s6w5ztbVDal72bXlMxR7BSgi+PHXZrqw6JEtNyHFnSNysg1C5yGa
+ vd73PYn6tVYigbw/lhKbHtR5piqSgX2ELlRm6sobN25WWluI9XFovSN2xtWkfbGirpyh
+ PGPQ==
+X-Gm-Message-State: AOAM532hK/HduAIXbHuOkEig4mqJB2fQ6SUsdMkhB7c4xShfQbNWTcUm
+ Qt4pIb2EOeTOADNLxoVjecuQNg==
+X-Google-Smtp-Source: ABdhPJxvrcXNTizysTpb0HNQBgQBP2kkWN98+gM0Om0kJ5L+Ls8CihYVUPg9ctF2xhD4Vl2nzo12bQ==
+X-Received: by 2002:a7b:c413:: with SMTP id k19mr4284214wmi.124.1589552462175; 
+ Fri, 15 May 2020 07:21:02 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id s14sm3738327wmh.18.2020.05.15.07.20.59
+ by smtp.gmail.com with ESMTPSA id s14sm3738327wmh.18.2020.05.15.07.21.01
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 15 May 2020 07:21:00 -0700 (PDT)
+ Fri, 15 May 2020 07:21:01 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH 02/10] target/arm: Convert Neon VSHL and VSLI 2-reg-shift insn
- to decodetree
-Date: Fri, 15 May 2020 15:20:48 +0100
-Message-Id: <20200515142056.21346-3-peter.maydell@linaro.org>
+Subject: [PATCH 03/10] target/arm: Convert Neon VSHR 2-reg-shift insns to
+ decodetree
+Date: Fri, 15 May 2020 15:20:49 +0100
+Message-Id: <20200515142056.21346-4-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200515142056.21346-1-peter.maydell@linaro.org>
 References: <20200515142056.21346-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,133 +106,148 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the VSHL and VSLI insns from the Neon 2-registers-and-a-shift
-group to decodetree.
+Convert the VSHR 2-reg-shift insns to decodetree.
+
+Note that unlike the legacy decoder, we present the right shift
+amount to the trans_ function as a positive integer.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/neon-dp.decode       | 27 +++++++++++++++++++++++
- target/arm/translate-neon.inc.c | 38 +++++++++++++++++++++++++++++++++
- target/arm/translate.c          | 18 +++++++---------
- 3 files changed, 73 insertions(+), 10 deletions(-)
+ target/arm/neon-dp.decode       | 24 +++++++++++++++++++
+ target/arm/translate-neon.inc.c | 41 +++++++++++++++++++++++++++++++++
+ target/arm/translate.c          | 21 +----------------
+ 3 files changed, 66 insertions(+), 20 deletions(-)
 
 diff --git a/target/arm/neon-dp.decode b/target/arm/neon-dp.decode
-index 8beb1db768b..df7b4798a5a 100644
+index df7b4798a5a..648812395f1 100644
 --- a/target/arm/neon-dp.decode
 +++ b/target/arm/neon-dp.decode
-@@ -199,3 +199,30 @@ VRECPS_fp_3s     1111 001 0 0 . 0 . .... .... 1111 ... 1 .... @3same_fp
- VRSQRTS_fp_3s    1111 001 0 0 . 1 . .... .... 1111 ... 1 .... @3same_fp
- VMAXNM_fp_3s     1111 001 1 0 . 0 . .... .... 1111 ... 1 .... @3same_fp
- VMINNM_fp_3s     1111 001 1 0 . 1 . .... .... 1111 ... 1 .... @3same_fp
+@@ -209,6 +209,30 @@ VMINNM_fp_3s     1111 001 1 0 . 1 . .... .... 1111 ... 1 .... @3same_fp
+ @2reg_shift      .... ... . . . ...... .... .... . q:1 . . .... \
+                  &2reg_shift vm=%vm_dp vd=%vd_dp
+ 
++# Right shifts are encoded as N - shift, where N is the element size in bits.
++%neon_rshift_i6  16:6 !function=rsub_64
++%neon_rshift_i5  16:5 !function=rsub_32
++%neon_rshift_i4  16:4 !function=rsub_16
++%neon_rshift_i3  16:3 !function=rsub_8
 +
-+######################################################################
-+# 2-reg-and-shift grouping:
-+# 1111 001 U 1 D immH:3 immL:3 Vd:4 opc:4 L Q M 1 Vm:4
-+######################################################################
-+&2reg_shift vm vd q shift size
++VSHR_S_2sh       1111 001 0 1 .  ......     .... 0000 1 . . 1 .... \
++                 @2reg_shift size=3 shift=%neon_rshift_i6
++VSHR_S_2sh       1111 001 0 1 . 1 .....     .... 0000 0 . . 1 .... \
++                 @2reg_shift size=2 shift=%neon_rshift_i5
++VSHR_S_2sh       1111 001 0 1 . 01 ....     .... 0000 0 . . 1 .... \
++                 @2reg_shift size=1 shift=%neon_rshift_i4
++VSHR_S_2sh       1111 001 0 1 . 001 ...     .... 0000 0 . . 1 .... \
++                 @2reg_shift size=0 shift=%neon_rshift_i3
 +
-+@2reg_shift      .... ... . . . ...... .... .... . q:1 . . .... \
-+                 &2reg_shift vm=%vm_dp vd=%vd_dp
++VSHR_U_2sh       1111 001 1 1 .  ......     .... 0000 1 . . 1 .... \
++                 @2reg_shift size=3 shift=%neon_rshift_i6
++VSHR_U_2sh       1111 001 1 1 . 1 .....     .... 0000 0 . . 1 .... \
++                 @2reg_shift size=2 shift=%neon_rshift_i5
++VSHR_U_2sh       1111 001 1 1 . 01 ....     .... 0000 0 . . 1 .... \
++                 @2reg_shift size=1 shift=%neon_rshift_i4
++VSHR_U_2sh       1111 001 1 1 . 001 ...     .... 0000 0 . . 1 .... \
++                 @2reg_shift size=0 shift=%neon_rshift_i3
 +
-+VSHL_2sh         1111 001 0 1 . shift:6     .... 0101 1 . . 1 .... \
-+                 @2reg_shift size=3
-+VSHL_2sh         1111 001 0 1 . 1 shift:5   .... 0101 0 . . 1 .... \
-+                 @2reg_shift size=2
-+VSHL_2sh         1111 001 0 1 . 01 shift:4  .... 0101 0 . . 1 .... \
-+                 @2reg_shift size=1
-+VSHL_2sh         1111 001 0 1 . 001 shift:3 .... 0101 0 . . 1 .... \
-+                 @2reg_shift size=0
-+
-+VSLI_2sh         1111 001 1 1 . shift:6     .... 0101 1 . . 1 .... \
-+                 @2reg_shift size=3
-+VSLI_2sh         1111 001 1 1 . 1 shift:5   .... 0101 0 . . 1 .... \
-+                 @2reg_shift size=2
-+VSLI_2sh         1111 001 1 1 . 01 shift:4  .... 0101 0 . . 1 .... \
-+                 @2reg_shift size=1
-+VSLI_2sh         1111 001 1 1 . 001 shift:3 .... 0101 0 . . 1 .... \
-+                 @2reg_shift size=0
+ VSHL_2sh         1111 001 0 1 . shift:6     .... 0101 1 . . 1 .... \
+                  @2reg_shift size=3
+ VSHL_2sh         1111 001 0 1 . 1 shift:5   .... 0101 0 . . 1 .... \
 diff --git a/target/arm/translate-neon.inc.c b/target/arm/translate-neon.inc.c
-index 3fe65a0b080..305213fe6d9 100644
+index 305213fe6d9..0475696835f 100644
 --- a/target/arm/translate-neon.inc.c
 +++ b/target/arm/translate-neon.inc.c
-@@ -1310,3 +1310,41 @@ static bool do_3same_fp_pair(DisasContext *s, arg_3same *a, VFPGen3OpSPFn *fn)
- DO_3S_FP_PAIR(VPADD, gen_helper_vfp_adds)
- DO_3S_FP_PAIR(VPMAX, gen_helper_vfp_maxs)
- DO_3S_FP_PAIR(VPMIN, gen_helper_vfp_mins)
-+
-+static bool do_vector_2sh(DisasContext *s, arg_2reg_shift *a, GVecGen2iFn *fn)
+@@ -31,6 +31,24 @@ static inline int plus1(DisasContext *s, int x)
+     return x + 1;
+ }
+ 
++static inline int rsub_64(DisasContext *s, int x)
 +{
-+    /* Handle a 2-reg-shift insn which can be vectorized. */
-+    int vec_size = a->q ? 16 : 8;
-+    int rd_ofs = neon_reg_offset(a->vd, 0);
-+    int rm_ofs = neon_reg_offset(a->vm, 0);
-+
-+    if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
-+        return false;
-+    }
-+
-+    /* UNDEF accesses to D16-D31 if they don't exist. */
-+    if (!dc_isar_feature(aa32_simd_r32, s) &&
-+        ((a->vd | a->vm) & 0x10)) {
-+        return false;
-+    }
-+
-+    if ((a->vm | a->vd) & a->q) {
-+        return false;
-+    }
-+
-+    if (!vfp_access_check(s)) {
-+        return true;
-+    }
-+
-+    fn(a->size, rd_ofs, rm_ofs, a->shift, vec_size, vec_size);
-+    return true;
++    return 64 - x;
 +}
 +
-+#define DO_2SH(INSN, FUNC)                                              \
-+    static bool trans_##INSN##_2sh(DisasContext *s, arg_2reg_shift *a)  \
-+    {                                                                   \
-+        return do_vector_2sh(s, a, FUNC);                               \
-+    }                                                                   \
++static inline int rsub_32(DisasContext *s, int x)
++{
++    return 32 - x;
++}
++static inline int rsub_16(DisasContext *s, int x)
++{
++    return 16 - x;
++}
++static inline int rsub_8(DisasContext *s, int x)
++{
++    return 8 - x;
++}
 +
-+DO_2SH(VSHL, tcg_gen_gvec_shli)
-+DO_2SH(VSLI, gen_gvec_sli)
+ /* Include the generated Neon decoder */
+ #include "decode-neon-dp.inc.c"
+ #include "decode-neon-ls.inc.c"
+@@ -1348,3 +1366,26 @@ static bool do_vector_2sh(DisasContext *s, arg_2reg_shift *a, GVecGen2iFn *fn)
+ 
+ DO_2SH(VSHL, tcg_gen_gvec_shli)
+ DO_2SH(VSLI, gen_gvec_sli)
++
++static bool trans_VSHR_S_2sh(DisasContext *s, arg_2reg_shift *a)
++{
++    /* Signed shift out of range results in all-sign-bits */
++    a->shift = MIN(a->shift, (8 << a->size) - 1);
++    return do_vector_2sh(s, a, tcg_gen_gvec_sari);
++}
++
++static void gen_zero_rd_2sh(unsigned vece, uint32_t rd_ofs, uint32_t rm_ofs,
++                            int64_t shift, uint32_t oprsz, uint32_t maxsz)
++{
++    tcg_gen_gvec_dup_imm(vece, rd_ofs, oprsz, maxsz, 0);
++}
++
++static bool trans_VSHR_U_2sh(DisasContext *s, arg_2reg_shift *a)
++{
++    /* Shift out of range is architecturally valid and results in zero. */
++    if (a->shift >= (8 << a->size)) {
++        return do_vector_2sh(s, a, gen_zero_rd_2sh);
++    } else {
++        return do_vector_2sh(s, a, tcg_gen_gvec_shri);
++    }
++}
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index c8296116d4b..d0a4a08f6d9 100644
+index d0a4a08f6d9..f2ccab1b21c 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -5294,6 +5294,14 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-         if ((insn & 0x00380080) != 0) {
-             /* Two registers and shift.  */
+@@ -5296,6 +5296,7 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
              op = (insn >> 8) & 0xf;
-+
-+            switch (op) {
-+            case 5: /* VSHL, VSLI */
-+                return 1; /* handled by decodetree */
-+            default:
-+                break;
-+            }
-+
-             if (insn & (1 << 7)) {
-                 /* 64-bit shift. */
-                 if (op > 7) {
-@@ -5387,16 +5395,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                     gen_gvec_sri(size, rd_ofs, rm_ofs, shift,
-                                  vec_size, vec_size);
-                     return 0;
--
--                case 5: /* VSHL, VSLI */
--                    if (u) { /* VSLI */
--                        gen_gvec_sli(size, rd_ofs, rm_ofs, shift,
--                                     vec_size, vec_size);
--                    } else { /* VSHL */
--                        tcg_gen_gvec_shli(size, rd_ofs, rm_ofs, shift,
+ 
+             switch (op) {
++            case 0: /* VSHR */
+             case 5: /* VSHL, VSLI */
+                 return 1; /* handled by decodetree */
+             default:
+@@ -5330,26 +5331,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                 }
+ 
+                 switch (op) {
+-                case 0:  /* VSHR */
+-                    /* Right shift comes here negative.  */
+-                    shift = -shift;
+-                    /* Shifts larger than the element size are architecturally
+-                     * valid.  Unsigned results in all zeros; signed results
+-                     * in all sign bits.
+-                     */
+-                    if (!u) {
+-                        tcg_gen_gvec_sari(size, rd_ofs, rm_ofs,
+-                                          MIN(shift, (8 << size) - 1),
+-                                          vec_size, vec_size);
+-                    } else if (shift >= 8 << size) {
+-                        tcg_gen_gvec_dup_imm(MO_8, rd_ofs, vec_size,
+-                                             vec_size, 0);
+-                    } else {
+-                        tcg_gen_gvec_shri(size, rd_ofs, rm_ofs, shift,
 -                                          vec_size, vec_size);
 -                    }
 -                    return 0;
-                 }
- 
-                 if (size == 3) {
+-
+                 case 1:  /* VSRA */
+                     /* Right shift comes here negative.  */
+                     shift = -shift;
 -- 
 2.20.1
 
