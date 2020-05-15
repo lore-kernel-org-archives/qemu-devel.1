@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3640C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 13:00:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3F34C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 13:01:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 773802074D
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 13:00:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F2FE20758
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 13:01:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GJPKRaqp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 773802074D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dwWzEQlR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F2FE20758
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZZx4-0004pW-AO
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 09:00:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45562)
+	id 1jZZy0-0006rg-3N
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 09:01:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45756)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZip-0002Xd-Vz
- for qemu-devel@nongnu.org; Fri, 15 May 2020 08:45:52 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44964
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZjE-0002xF-GI
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 08:46:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41518
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZin-00029V-5H
- for qemu-devel@nongnu.org; Fri, 15 May 2020 08:45:50 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jZZjC-0002MD-8x
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 08:46:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589546748;
+ s=mimecast20190719; t=1589546773;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=LhnJGFzeKaIi/ojLCCBmmi5M+k7UnDjT4Eviqdn7LQE=;
- b=GJPKRaqphQ8rg1w5pJ/R7SMV1g910f7dSyahgJRM/uV3APJcPhyOj6Ns0ReUOCnosduE8D
- XbQnQqjTCTGH85exExILOen0pIHAMy6YtGIvyCIHSo08EvQg6aeJyBZLK+N41wWhnj9/VS
- WF6IHBoNreY7Jvtz0Gs0bLRlYYO7GTE=
+ bh=sm/qRcwDPq4vdnCh5mJncEVjAOLyTL0JGlAiJzBzdqA=;
+ b=dwWzEQlRyjexaduquJ2+ji1W+SamMKewmChvTuCj+BXF+MZjZ/02TtlsC04+ChS2262Fsv
+ pCQDXh8RDJAoB7G0yIOMteUQ4zKgXMmbJt2/enS0Yr3fpat9b7Bf3lgiEudml7tM5I7kHX
+ qZ8VO+uCTwnARJISQY9MgW/ugQnSR0Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-357-xAZZdpBGOsSg9_eGUYCcug-1; Fri, 15 May 2020 08:45:46 -0400
-X-MC-Unique: xAZZdpBGOsSg9_eGUYCcug-1
+ us-mta-474-WyGEG8dIOZ-be9N8EBvE8A-1; Fri, 15 May 2020 08:46:11 -0400
+X-MC-Unique: WyGEG8dIOZ-be9N8EBvE8A-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 419C3107ACF2;
- Fri, 15 May 2020 12:45:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5936C108BD15;
+ Fri, 15 May 2020 12:46:10 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-113-110.ams2.redhat.com
  [10.36.113.110])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4A1752E024;
- Fri, 15 May 2020 12:45:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 60AE42E16D;
+ Fri, 15 May 2020 12:46:09 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 12/51] block: Use bdrv_make_empty() where possible
-Date: Fri, 15 May 2020 14:44:42 +0200
-Message-Id: <20200515124521.335403-13-kwolf@redhat.com>
+Subject: [PULL 27/51] block: Distinguish paths in *_format_default_perms
+Date: Fri, 15 May 2020 14:44:57 +0200
+Message-Id: <20200515124521.335403-28-kwolf@redhat.com>
 In-Reply-To: <20200515124521.335403-1-kwolf@redhat.com>
 References: <20200515124521.335403-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -70,10 +70,10 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 00:39:12
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 23:27:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -100,46 +100,58 @@ Sender: "Qemu-devel"
 
 From: Max Reitz <mreitz@redhat.com>
 
+bdrv_format_default_perms() has one code path for backing files, and one
+for storage files.  We want to pull them out into their own functions,
+so make sure they are completely distinct before so the next patches
+will be a bit cleaner.
+
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Message-Id: <20200429141126.85159-3-mreitz@redhat.com>
+Message-Id: <20200513110544.176672-16-mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/replication.c | 3 +--
- block/vvfat.c       | 4 +---
- 2 files changed, 2 insertions(+), 5 deletions(-)
+ block.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
-diff --git a/block/replication.c b/block/replication.c
-index eb480a8e08..9a9f36e524 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -331,9 +331,8 @@ static void secondary_do_checkpoint(BDRVReplicationState *s, Error **errp)
-         return;
-     }
+diff --git a/block.c b/block.c
+index be9bfa9d46..b3e7ae70c7 100644
+--- a/block.c
++++ b/block.c
+@@ -2497,6 +2497,13 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
+             perm |= BLK_PERM_CONSISTENT_READ;
+         }
+         shared &= ~(BLK_PERM_WRITE | BLK_PERM_RESIZE);
++
++        if (bs->open_flags & BDRV_O_INACTIVE) {
++            shared |= BLK_PERM_WRITE | BLK_PERM_RESIZE;
++        }
++
++        *nperm = perm;
++        *nshared = shared;
+     } else {
+         /* We want consistent read from backing files if the parent needs it.
+          * No other operations are performed on backing files. */
+@@ -2513,14 +2520,14 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
  
--    ret = s->active_disk->bs->drv->bdrv_make_empty(s->active_disk->bs);
-+    ret = bdrv_make_empty(s->active_disk, errp);
-     if (ret < 0) {
--        error_setg(errp, "Cannot make active disk empty");
-         return;
-     }
- 
-diff --git a/block/vvfat.c b/block/vvfat.c
-index 6d5c090dec..34c121c07a 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -2960,9 +2960,7 @@ static int do_commit(BDRVVVFATState* s)
-         return ret;
-     }
- 
--    if (s->qcow->bs->drv && s->qcow->bs->drv->bdrv_make_empty) {
--        s->qcow->bs->drv->bdrv_make_empty(s->qcow->bs);
+         shared |= BLK_PERM_CONSISTENT_READ | BLK_PERM_GRAPH_MOD |
+                   BLK_PERM_WRITE_UNCHANGED;
 -    }
-+    bdrv_make_empty(s->qcow, NULL);
  
-     memset(s->used_clusters, 0, sector2cluster(s, s->sector_count));
+-    if (bs->open_flags & BDRV_O_INACTIVE) {
+-        shared |= BLK_PERM_WRITE | BLK_PERM_RESIZE;
+-    }
++        if (bs->open_flags & BDRV_O_INACTIVE) {
++            shared |= BLK_PERM_WRITE | BLK_PERM_RESIZE;
++        }
  
+-    *nperm = perm;
+-    *nshared = shared;
++        *nperm = perm;
++        *nshared = shared;
++    }
+ }
+ 
+ uint64_t bdrv_qapi_perm_to_blk_perm(BlockPermission qapi_perm)
 -- 
 2.25.4
 
