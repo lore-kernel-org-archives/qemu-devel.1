@@ -2,94 +2,132 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63128C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 17:52:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3780AC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 18:00:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34984206D8
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 17:52:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 02639206D8
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 18:00:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YkCNKdm1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34984206D8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iya36My3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02639206D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZeVR-0007ZZ-BC
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 13:52:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48266)
+	id 1jZed6-0002XT-1m
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 14:00:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49170)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jZeUf-0006dY-Kx
- for qemu-devel@nongnu.org; Fri, 15 May 2020 13:51:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21090
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jZecU-00026J-Fn
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 13:59:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52392
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jZeUe-0007ul-V1
- for qemu-devel@nongnu.org; Fri, 15 May 2020 13:51:33 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jZecT-0001Tv-Ju
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 13:59:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589565092;
+ s=mimecast20190719; t=1589565576;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=geh9uD9wS6WIiJl/ZAJXka1NMUWOLj7YSfxNLu3JX3E=;
- b=YkCNKdm1u1XYOAt6pGMlR4JCoK7g3hVhL+nAoZjnsMlBthIIA2j7UC9RlnN8nPxoca8iFm
- Tcu2BbaAP5UJwzg+E7/UM+EDNnWVyUWKWOi7shV3ssSQMH2STw5Fzq5voiyfjQLbiZUw1E
- VBDxD/TcziZJX72p/qcsIh/zCAi5rrA=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=a3H3DsBEwG8Gzwv7FgxO5iw0q4syKlJkaddnf3ptjZI=;
+ b=Iya36My3i9ahLQYTk62et7j+Z2FBO3YaLYj1rnFPp7vDU15I6wxfLmcoD0rszJ8S2Vr3uJ
+ xKgUpA7wxDs3QphP+33dWhKC+S84ntslqypIu5/z3K0gnpWHBSnwVKWRhyO3H0PSIMK28f
+ DFm7ATCiMGDhpyugAcFKOJzZK3WCpxg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-285-QE8fN7YeMlecd-P-O5Tfqw-1; Fri, 15 May 2020 13:51:14 -0400
-X-MC-Unique: QE8fN7YeMlecd-P-O5Tfqw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-128-M_yFcQtuNW29CTGtQYMpuA-1; Fri, 15 May 2020 13:59:35 -0400
+X-MC-Unique: M_yFcQtuNW29CTGtQYMpuA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A54A2100A8EE;
- Fri, 15 May 2020 17:51:13 +0000 (UTC)
-Received: from [10.3.114.84] (ovpn-114-84.phx2.redhat.com [10.3.114.84])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C23496E9E2;
- Fri, 15 May 2020 17:51:09 +0000 (UTC)
-Subject: Re: [PATCH v2 0/5] fix migration with bitmaps and mirror
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Peter Krempa <pkrempa@redhat.com>
-References: <20191219085106.22309-1-vsementsov@virtuozzo.com>
- <20191219103638.GJ4914@andariel.pipo.sk>
- <a5015250-46f4-c6ed-92b9-779f885e8a4a@virtuozzo.com>
- <20200403112358.GV578401@andariel.pipo.sk>
- <c25fb60b-9072-294f-847b-9b650292171b@redhat.com>
- <738cbfd7-9ec8-7043-923a-0510929e73e2@virtuozzo.com>
- <acecd801-9486-6dea-d06c-19b7ce6d77b3@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <5dfecf7a-0da8-d9da-dc7f-cd684710353b@redhat.com>
-Date: Fri, 15 May 2020 12:51:09 -0500
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 77F3318A0760;
+ Fri, 15 May 2020 17:59:33 +0000 (UTC)
+Received: from [10.36.114.77] (ovpn-114-77.ams2.redhat.com [10.36.114.77])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B85805C241;
+ Fri, 15 May 2020 17:59:27 +0000 (UTC)
+Subject: Re: [PATCH v1 07/17] migration/rdma: Use
+ ram_block_discard_set_broken()
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <20200506094948.76388-1-david@redhat.com>
+ <20200506094948.76388-8-david@redhat.com> <20200515124501.GE2954@work-vm>
+ <96a58e88-2629-f2ee-5884-38d11e571548@redhat.com>
+ <20200515175105.GL2954@work-vm>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <1cac6cb0-7804-bab2-4ecf-044c369c1135@redhat.com>
+Date: Fri, 15 May 2020 19:59:26 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <acecd801-9486-6dea-d06c-19b7ce6d77b3@virtuozzo.com>
+In-Reply-To: <20200515175105.GL2954@work-vm>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=david@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 22:56:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 23:27:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,72 +140,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, qemu-block@nongnu.org,
- quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
- stefanha@redhat.com, den@openvz.org, mreitz@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ "Michael S . Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ qemu-devel@nongnu.org, qemu-s390x@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/15/20 6:15 AM, Vladimir Sementsov-Ogievskiy wrote:
-
->>> Max is trying to tackle the node-name issue:
->>> https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg03358.html
+On 15.05.20 19:51, Dr. David Alan Gilbert wrote:
+> * David Hildenbrand (david@redhat.com) wrote:
+>> On 15.05.20 14:45, Dr. David Alan Gilbert wrote:
+>>> * David Hildenbrand (david@redhat.com) wrote:
+>>>> RDMA will pin all guest memory (as documented in docs/rdma.txt). We want
+>>>> to mark RAM block discards to be broken - however, to keep it simple
+>>>> use ram_block_discard_is_required() instead of inhibiting.
 >>>
->>> And trying to apply that patch after staging this series hits a 
->>> conflict in mnigration/block-dirty-bitmap.c.  Which one should go in 
->>> first?
->>>
+>>> Should this be dependent on whether rdma->pin_all is set?
+>>> Even with !pin_all some will be pinned at any given time
+>>> (when it's registered with the rdma stack).
 >>
->> My patches are needed to fix migration for the pre-blockdev 
->> configuration with mirror-top filter.
->>
->> We ofcrouse need them in Virtuozzo, but it's not hard to keep the in 
->> downstream-only.. And it will be not simple to use new command from 
->> Max in pre-blockdev libvirt configuration, with auto-generated 
->> node-names.
-
-Carrying a downstream fork forever is more work on you.  If the patch is 
-easy enough to maintain, incorporating it upstream is best all around, 
-even if libvirt has moved on to the point of no longer caring since it 
-no longer uses pre-blockdev.
-
->>
->> How much we care about pre-blockdev libvirt now in upstream Qemu?
->>
->> If we don't care, than these series are only for downstreams, and we 
->> don't need to apply them upstream..
-
-Eventually, we may want to deprecate pre-blockdev, but I don't think we 
-are there yet, and even when it does happen, it will be two more 
-releases with it being deprecated before it is gone, so we might as well 
-make it work correctly in the meantime.
-
->>
->> On the other hand, Max have to resend anyway, to handle old code, 
->> which uses device name instead of node-name. And if we don't want to 
->> drop now the code which can use device name (needed for old libvirt), 
->> why not to apply the series, which just make old code better?
->>
->> ====
->>
->> In other words: do we still support pre-blockdev libvirt (and any 
->> other pre-blockdev users)?
->>
->> If we support, than, as I said somewhere, I need to resend these 
->> series as I have updated version in our downstream. And I think, I can 
->> rebase Max's patch by myself and send together with this all, if no 
->> objections.
->>
+>> Do you know how much memory this is? Is such memory only temporarily pinned?
 > 
-> I'm going to resend the series today, let's look at it.
+> With pin_all not set, only a subset of memory, I think multiple 1MB
+> chunks, are pinned at any one time.
 > 
+>> At least with special-cases of vfio, it's acceptable if some memory is
+>> temporarily pinned - we assume it's only the working set of the driver,
+>> which guests will not inflate as long as they don't want to shoot
+>> themselves in the foot.
+>>
+>> This here sounds like the guest does not know the pinned memory is
+>> special, right?
+> 
+> Right - for RDMA it's all of memory that's being transferred, and the
+> guest doesn't see when each part is transferred.
 
-Sounds reasonable.
+
+Okay, so all memory will eventually be pinned, just not at the same
+time, correct?
+
+I think this implies that any memory that was previously discarded will
+be backed my new pages, meaning we will consume more memory than intended.
+
+If so, always disabling discarding of RAM seems to be the right thing to do.
+
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Thanks,
+
+David / dhildenb
 
 
