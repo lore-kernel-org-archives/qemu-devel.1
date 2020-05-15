@@ -6,64 +6,64 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 012D3C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:40:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BB69C433E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:41:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C064C2075F
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:40:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4B8920671
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:41:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dloRE1NW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C064C2075F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SsM8dQmv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4B8920671
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZbVk-0004lZ-Sg
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 10:40:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42026)
+	id 1jZbWH-0005mE-14
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 10:41:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42036)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jZbRD-0004I4-Kw
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jZbRE-0004IF-0n
  for qemu-devel@nongnu.org; Fri, 15 May 2020 10:35:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29766
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42872
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jZbRB-0007wW-MP
- for qemu-devel@nongnu.org; Fri, 15 May 2020 10:35:46 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jZbR9-0007vs-QI
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 10:35:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589553344;
+ s=mimecast20190719; t=1589553343;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=d/a9Ntks1qykABzxoA+2KUfIStVfCwWOvIGdJEEdgOA=;
- b=dloRE1NWKPgQEkpYO1o+95/V6s+Orj/ILlxqSuDT/ua1wEtHWOl3zjJCF0SFflsZ7gWGfD
- +FAIBKmK9wyeYBnhqBKZngsaV874KLK5Cf1+Y8quYGZgF8UPtx//CA4mjzKtRblYIv8J6Y
- vzRtiFmWhiCjwhSLgHqjYRuFCHpk4yE=
+ references:references; bh=SZuSiCccpxvkEMZkm3itcaBsSfjj3wvWaBlQOWBH6+k=;
+ b=SsM8dQmvZ3zANQmbVm+aNlfzpvjyzOvKJFmaVnHGo5VNNeRKMSFxqdjQ2ld7Dukaa79fm0
+ SSACVPxGouk795AgaYyRdXzS4W03v2WfpTPCbpxeUgsDSCcItjms9OVEyUBohQ8WYAROwu
+ y/Qd2EVgea51jqbAGqTNRTREe+pwWIk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-236-4IcOXBFXNUajr1_OQUnkqw-1; Fri, 15 May 2020 10:35:42 -0400
-X-MC-Unique: 4IcOXBFXNUajr1_OQUnkqw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-408-H5f9elkWMNKuM7vwbczMyA-1; Fri, 15 May 2020 10:35:41 -0400
+X-MC-Unique: H5f9elkWMNKuM7vwbczMyA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0825A18FF678
- for <qemu-devel@nongnu.org>; Fri, 15 May 2020 14:35:42 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 550A31800D4A
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 14:35:40 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-115-145.ams2.redhat.com
  [10.36.115.145])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 604271024873;
- Fri, 15 May 2020 14:35:40 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 033FC2E186;
+ Fri, 15 May 2020 14:35:29 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 1F8D89D55; Fri, 15 May 2020 16:35:29 +0200 (CEST)
+ id E68A99DAD; Fri, 15 May 2020 16:35:28 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 09/13] audio: deprecate -soundhw sb16
-Date: Fri, 15 May 2020 16:35:24 +0200
-Message-Id: <20200515143528.13591-10-kraxel@redhat.com>
+Subject: [PATCH v2 04/13] audio: deprecate -soundhw ac97
+Date: Fri, 15 May 2020 16:35:19 +0200
+Message-Id: <20200515143528.13591-5-kraxel@redhat.com>
 In-Reply-To: <20200515143528.13591-1-kraxel@redhat.com>
 References: <20200515143528.13591-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -97,41 +97,54 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Switch to deprecated_register_soundhw().
-Remove the now obsolete init function.
+Switch to deprecated_register_soundhw().  Remove the now obsolete init
+function.  Add an alias so both ac97 and AC97 are working with -device.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/audio/sb16.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+ hw/audio/ac97.c | 9 ++-------
+ qdev-monitor.c  | 1 +
+ 2 files changed, 3 insertions(+), 7 deletions(-)
 
-diff --git a/hw/audio/sb16.c b/hw/audio/sb16.c
-index df6f755a37f8..2d9e50f99b5d 100644
---- a/hw/audio/sb16.c
-+++ b/hw/audio/sb16.c
-@@ -1415,12 +1415,6 @@ static void sb16_realizefn (DeviceState *dev, Error **errp)
-     AUD_register_card ("sb16", &s->card);
+diff --git a/hw/audio/ac97.c b/hw/audio/ac97.c
+index 8a9b9924c495..38522cf0ba44 100644
+--- a/hw/audio/ac97.c
++++ b/hw/audio/ac97.c
+@@ -1393,12 +1393,6 @@ static void ac97_exit(PCIDevice *dev)
+     AUD_remove_card(&s->card);
  }
  
--static int SB16_init (ISABus *bus)
+-static int ac97_init (PCIBus *bus)
 -{
--    isa_create_simple (bus, TYPE_SB16);
+-    pci_create_simple(bus, -1, TYPE_AC97);
 -    return 0;
 -}
 -
- static Property sb16_properties[] = {
-     DEFINE_AUDIO_PROPERTIES(SB16State, card),
-     DEFINE_PROP_UINT32 ("version", SB16State, ver,  0x0405), /* 4.5 */
-@@ -1453,7 +1447,8 @@ static const TypeInfo sb16_info = {
- static void sb16_register_types (void)
+ static Property ac97_properties[] = {
+     DEFINE_AUDIO_PROPERTIES(AC97LinkState, card),
+     DEFINE_PROP_END_OF_LIST (),
+@@ -1436,7 +1430,8 @@ static const TypeInfo ac97_info = {
+ static void ac97_register_types (void)
  {
-     type_register_static (&sb16_info);
--    isa_register_soundhw("sb16", "Creative Sound Blaster 16", SB16_init);
-+    deprecated_register_soundhw("sb16", "Creative Sound Blaster 16",
-+                                1, TYPE_SB16);
+     type_register_static (&ac97_info);
+-    pci_register_soundhw("ac97", "Intel 82801AA AC97 Audio", ac97_init);
++    deprecated_register_soundhw("ac97", "Intel 82801AA AC97 Audio",
++                                0, TYPE_AC97);
  }
  
- type_init (sb16_register_types)
+ type_init (ac97_register_types)
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index a4735d3bb190..9c3cb89473c6 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -53,6 +53,7 @@ typedef struct QDevAlias
+ 
+ /* Please keep this table sorted by typename. */
+ static const QDevAlias qdev_alias_table[] = {
++    { "AC97", "ac97" }, /* -soundhw name */
+     { "e1000", "e1000-82540em" },
+     { "ich9-ahci", "ahci" },
+     { "lsi53c895a", "lsi" },
 -- 
 2.18.4
 
