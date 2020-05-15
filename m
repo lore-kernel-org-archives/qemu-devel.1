@@ -2,65 +2,64 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1330C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:06:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAF58C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:10:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 975AA20657
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:06:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 89E71206B6
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 14:10:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ElL304x5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 975AA20657
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fnMPrHpA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89E71206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZays-0002YF-Op
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 10:06:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60786)
+	id 1jZb2r-0004mZ-N3
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 10:10:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32898)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jZayJ-00026P-Co
- for qemu-devel@nongnu.org; Fri, 15 May 2020 10:05:55 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50784
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jZb27-0004He-Jl
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 10:09:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42224
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jZayI-0000Og-AZ
- for qemu-devel@nongnu.org; Fri, 15 May 2020 10:05:55 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jZb26-0000uq-Q8
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 10:09:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1589551553;
+ s=mimecast20190719; t=1589551789;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=91p8Drd0kFpbtxKFOwPVtDo82KBQZkt5SLipVlwY5PM=;
- b=ElL304x5aeXj4rDeSWTlGV9i4+sNF7a39cIM6GoxBKGbTVUeqBjxusZuJBHykGHgcd3QCt
- IgzL+qWq3HHG8WxRn5scOXMB6NcKOMnQR8uSButQ2aIZL+aiGFcI/iinn3Cx7nkUDvgMMX
- F+vYcjxgCa0XjGmG+kFdU6cCICvrHXg=
+ bh=KNmE/tIhTo2+OsvIBTtoffxhEzZgSD52Yrczlq+RTnw=;
+ b=fnMPrHpAJXs757mzTPX4i9u9ZE/FT71YKfersiFPYfD//HqhD9QyQGW+zFnZvfslYPM+HJ
+ kgF0V98Wa7rC1fDm9anOlyMa/40rHGPBjCzq1mYokj1u8OHIxb02ImNQvEEGSV2a2QpTQM
+ uyK+ot1rAVq/DvFeyFNqVIPO6lFwd/Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-43-hnMU9pWrPn6l1oD8WHgaOA-1; Fri, 15 May 2020 10:05:48 -0400
-X-MC-Unique: hnMU9pWrPn6l1oD8WHgaOA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-47-3oe0uVQxMM-Ucm79GBEmtA-1; Fri, 15 May 2020 10:09:45 -0400
+X-MC-Unique: 3oe0uVQxMM-Ucm79GBEmtA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 170C31800D4A;
- Fri, 15 May 2020 14:05:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A90118730B1;
+ Fri, 15 May 2020 14:09:44 +0000 (UTC)
 Received: from [10.36.114.77] (ovpn-114-77.ams2.redhat.com [10.36.114.77])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1923E3A2;
- Fri, 15 May 2020 14:05:41 +0000 (UTC)
-Subject: Re: [PATCH v1 08/17] migration/colo: Use
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3A76162474;
+ Fri, 15 May 2020 14:09:40 +0000 (UTC)
+Subject: Re: [PATCH v1 07/17] migration/rdma: Use
  ram_block_discard_set_broken()
 To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 References: <20200506094948.76388-1-david@redhat.com>
- <20200506094948.76388-9-david@redhat.com> <20200515135841.GF2954@work-vm>
+ <20200506094948.76388-8-david@redhat.com> <20200515124501.GE2954@work-vm>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -106,27 +105,27 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <fee1f122-a7df-3101-7a94-b88d123bedb8@redhat.com>
-Date: Fri, 15 May 2020 16:05:41 +0200
+Message-ID: <96a58e88-2629-f2ee-5884-38d11e571548@redhat.com>
+Date: Fri, 15 May 2020 16:09:39 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20200515135841.GF2954@work-vm>
+In-Reply-To: <20200515124501.GE2954@work-vm>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 00:39:12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/14 22:56:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_PASS=-0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -142,73 +141,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
  "Michael S . Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>,
  qemu-devel@nongnu.org, qemu-s390x@nongnu.org,
- Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15.05.20 15:58, Dr. David Alan Gilbert wrote:
+On 15.05.20 14:45, Dr. David Alan Gilbert wrote:
 > * David Hildenbrand (david@redhat.com) wrote:
->> COLO will copy all memory in a RAM block, mark discarding of RAM broken.
->>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Cc: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
->> Cc: Juan Quintela <quintela@redhat.com>
->> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  include/migration/colo.h |  2 +-
->>  migration/migration.c    |  8 +++++++-
->>  migration/savevm.c       | 11 +++++++++--
->>  3 files changed, 17 insertions(+), 4 deletions(-)
->>
->> diff --git a/include/migration/colo.h b/include/migration/colo.h
->> index 1636e6f907..768e1f04c3 100644
->> --- a/include/migration/colo.h
->> +++ b/include/migration/colo.h
->> @@ -25,7 +25,7 @@ void migrate_start_colo_process(MigrationState *s);
->>  bool migration_in_colo_state(void);
->>  
->>  /* loadvm */
->> -void migration_incoming_enable_colo(void);
->> +int migration_incoming_enable_colo(void);
->>  void migration_incoming_disable_colo(void);
->>  bool migration_incoming_colo_enabled(void);
->>  void *colo_process_incoming_thread(void *opaque);
->> diff --git a/migration/migration.c b/migration/migration.c
->> index 177cce9e95..f6830e4620 100644
->> --- a/migration/migration.c
->> +++ b/migration/migration.c
->> @@ -338,12 +338,18 @@ bool migration_incoming_colo_enabled(void)
->>  
->>  void migration_incoming_disable_colo(void)
->>  {
->> +    ram_block_discard_set_broken(false);
->>      migration_colo_enabled = false;
->>  }
->>  
->> -void migration_incoming_enable_colo(void)
->> +int migration_incoming_enable_colo(void)
->>  {
->> +    if (ram_block_discard_set_broken(true)) {
->> +        error_report("COLO: cannot set discarding of RAM broken");
+>> RDMA will pin all guest memory (as documented in docs/rdma.txt). We want
+>> to mark RAM block discards to be broken - however, to keep it simple
+>> use ram_block_discard_is_required() instead of inhibiting.
 > 
-> I'd prefer 'COLO: cannot disable RAM discard'
-> 
-> 'broken' suggests the user has to go and fix something or report a bug
-> or something.
+> Should this be dependent on whether rdma->pin_all is set?
+> Even with !pin_all some will be pinned at any given time
+> (when it's registered with the rdma stack).
 
-Sounds better, I'll adjust similar messages in the other patches. Thanks!
+Do you know how much memory this is? Is such memory only temporarily pinned?
 
-> 
-> Other than that:
-> 
-> 
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> 
-> Dave
+At least with special-cases of vfio, it's acceptable if some memory is
+temporarily pinned - we assume it's only the working set of the driver,
+which guests will not inflate as long as they don't want to shoot
+themselves in the foot.
 
+This here sounds like the guest does not know the pinned memory is
+special, right?
 
 -- 
 Thanks,
