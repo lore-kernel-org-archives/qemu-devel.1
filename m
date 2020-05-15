@@ -8,70 +8,72 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C475C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 04:58:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23873C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 05:01:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 273C6206F1
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 04:58:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D1C90206F1
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 05:01:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dPkxk81c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 273C6206F1
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NfXbeT2i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1C90206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZSQR-0003I5-B0
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 00:58:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44652)
+	id 1jZST1-0004LS-UK
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 01:01:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44850)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jZSPk-0002oc-Ul; Fri, 15 May 2020 00:57:40 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:43096)
+ id 1jZSSM-0003qX-Ga; Fri, 15 May 2020 01:00:22 -0400
+Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:42096)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1jZSPj-000527-M0; Fri, 15 May 2020 00:57:40 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id x15so473287ybr.10;
- Thu, 14 May 2020 21:57:39 -0700 (PDT)
+ id 1jZSSL-0005KB-Lx; Fri, 15 May 2020 01:00:22 -0400
+Received: by mail-yb1-xb42.google.com with SMTP id i16so478283ybq.9;
+ Thu, 14 May 2020 22:00:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=bKn+wsq4po6gMpjcAIXmJcXZFiNqYGm/uNedUncYflw=;
- b=dPkxk81c30hkMGKe1eswxMbx16wCzglb6kDuDiqSPHDgZx4V/VAuKf5JuA9gVcQ9qx
- WN0WqPlrhLkYJRCs8qPdxBPdyvuQUjSbzl4o0TSQcDLSEtyhwJuQUARGVWkAq9oXmuHq
- dmCH6IUkQ/AIJjga6/AnPvkV6jEe+QfYr6i25Ny98Ep70pQ3jb1AVWeJTk2ob88RoktH
- S8PVAGzJPHKUZkG7PfKg1YoCAU5nhVgpvbAL8OFdB065xKbyTHIZh8IWtWT63kOmz8wj
- iJ3Tj4gnUDXhadcAMTzOsLxCygvwoWb7bEMv8sqtui0oPQzQW9oOCXH/1DDeCdNrKOvY
- 4u2A==
+ :cc; bh=p830e/W+LGiBLlUHSSPNRdhNho276/CPRt0muQvm3Es=;
+ b=NfXbeT2iUuDKCCi/7x4XyEFfvUzOZ9Pf4DME5oa3b5ssdweLvOvNpt2Cvf/PkusBKn
+ hTKEJldlAiFMHL/HdPasuHxv+GlKxkpembvkMHp/ehp1vf5OAhXGRzErGBg4bWH/q2kE
+ QsSPpo9esYY9ceGPASOnYocMQBZ+64GQb0c0X2GfRlJmc5oqvlKgjtWwqH0vuDxZ8ukE
+ B9j7gI3Opla3C2LOKwFhPWl3yif5AexAaq4sYJYLjJG7CxZkzyrM2ynMTY52++x66iAS
+ riag5Mjwv3zL+XdFFD+DKe4ZSnilxC1LrTWVgoX00xrWmae/B0TOku1jZk8mNm4SKKuT
+ GTRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=bKn+wsq4po6gMpjcAIXmJcXZFiNqYGm/uNedUncYflw=;
- b=TGc94OPesNKIDZoDxkjfYKuE46ruX0ClKzBCsTqrRHEouptVJWr1+1m0dv8O8kZ5p5
- QWOu0qFiaypk/TgaZkOSPOMS/XGcRtpLey3PeLN/v9evO15Gs7OTpFH6CbPMEzZUyqlQ
- K4gVU0+pCZLNU0y3G1zHNcgXthDAtMQm+S09X7uGfD1Zofca55xDOAnUP650e8egtoYV
- lrocKJMmy5CJIJ/mvYCczA3bpSPIOAu9QVOvdXtv7l2sf2fewKaYqyV2TRufI2OpolYc
- 6DVgl4AYpzdW2RW973WXMplX99rTNGXAQCz1OLgviiu1BktCGOZxQgDpFZd+Fkkxgjm/
- HXNQ==
-X-Gm-Message-State: AOAM532loWgkr/37BVFFukiHaiohJqt7XzHinSj6D7sCGu1wS8PQ5i9U
- t9lMegYqYdGOqjCjpRCbaFiVs+Wh45EHefUAYqE=
-X-Google-Smtp-Source: ABdhPJxIJFABeitB6m65hsBkSmq09HnNvl4GF7bHt5rkA+x9+j16p+JwnUVrqrIapHoxjIB1zbw30q0MmTlEquvz7iQ=
-X-Received: by 2002:a25:7a06:: with SMTP id v6mr2775157ybc.152.1589518658590; 
- Thu, 14 May 2020 21:57:38 -0700 (PDT)
+ bh=p830e/W+LGiBLlUHSSPNRdhNho276/CPRt0muQvm3Es=;
+ b=rNBeFjtwIsJsM0D5BNAaqy5BtFW/rrrMRNRy04Sc7Oa23FpYYeY3Euo7UR9kWvLYmq
+ +epw8/Q1pP8oSMqZZbDGr40iKlGpi1o2UzCfWBydkmKXPRLCd0pBh3N2v1fjif1nujbK
+ 2BxUVCkcLcQX7F3UjX1lUlklIPSpaac4k5aVrqGSIaAjmQ+zHPuuyDYDaycoEZIrQoiF
+ Z7koM1AeVS5/LprFGhqUBcVLpMF3oCFghmdwdoTUsYQ45WxUNwMXjaK6LJhlkAm/ndDZ
+ qxA7XN3czs0evq0rML669JHSm4eH84ycq5pCJMEj8OAypfeYaQiLsJJ3Xd6vbXOblC4G
+ xjHg==
+X-Gm-Message-State: AOAM530bX6nlGu8K7VhAHfxTImqh5dzn9JMyDfUjPSMJLxcLnsVOoMgp
+ MoXXKQZ9DLW+A5Gv5pEdgsprZoRGBB+wKaraBAk=
+X-Google-Smtp-Source: ABdhPJwJFxOIah1tmiNU5mxIoPz4Gbo4fKotXv3r2BH1sibXUdKWo7vbA/OR+Buh3AO+p9IKsvXU0ZrVpgjTJh8pFC0=
+X-Received: by 2002:a25:9206:: with SMTP id b6mr2870099ybo.387.1589518819921; 
+ Thu, 14 May 2020 22:00:19 -0700 (PDT)
 MIME-Version: 1.0
 References: <cover.1588878756.git.alistair.francis@wdc.com>
- <698e2a1723bbf04ffa941450f7a351397bcec789.1588878756.git.alistair.francis@wdc.com>
-In-Reply-To: <698e2a1723bbf04ffa941450f7a351397bcec789.1588878756.git.alistair.francis@wdc.com>
+ <dc10c6b220154fd448630ef7a790e5d7e59ab45a.1588878756.git.alistair.francis@wdc.com>
+ <CAEUhbmVMu4hov1WxafL9+8kET_Q_Q2hMi8JTnbKE78EhU4kaHQ@mail.gmail.com>
+ <CAKmqyKP6khvkjPbYuth3cXgyS6Zed8S29tfwW1Yv_x1MmxG4sw@mail.gmail.com>
+In-Reply-To: <CAKmqyKP6khvkjPbYuth3cXgyS6Zed8S29tfwW1Yv_x1MmxG4sw@mail.gmail.com>
 From: Bin Meng <bmeng.cn@gmail.com>
-Date: Fri, 15 May 2020 12:57:27 +0800
-Message-ID: <CAEUhbmWJ0TsPnCUtawfpXm=N=qX+X=Fby0r9WeufN8TD31=3_Q@mail.gmail.com>
-Subject: Re: [PATCH v2 3/9] target/riscv: Add the lowRISC Ibex CPU
-To: Alistair Francis <alistair.francis@wdc.com>
+Date: Fri, 15 May 2020 13:00:08 +0800
+Message-ID: <CAEUhbmU1ZFuB1cVS9EizoaZmWiG0pzPmPFjHQh8nJVk_nZuAwA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/9] riscv/boot: Add a missing header include
+To: Alistair Francis <alistair23@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b41;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb41.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b42;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb42.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -93,69 +95,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <alistair23@gmail.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 8, 2020 at 3:23 AM Alistair Francis
-<alistair.francis@wdc.com> wrote:
+Hi Alistair,
+
+On Thu, May 14, 2020 at 11:38 PM Alistair Francis <alistair23@gmail.com> wrote:
+>
+> On Thu, May 14, 2020 at 8:34 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+> >
+> > On Fri, May 8, 2020 at 3:24 AM Alistair Francis
+> > <alistair.francis@wdc.com> wrote:
+> > >
+> > > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > > ---
+> > >  include/hw/riscv/boot.h | 1 +
+> > >  1 file changed, 1 insertion(+)
+> > >
+> > > diff --git a/include/hw/riscv/boot.h b/include/hw/riscv/boot.h
+> > > index 474a940ad5..9daa98da08 100644
+> > > --- a/include/hw/riscv/boot.h
+> > > +++ b/include/hw/riscv/boot.h
+> > > @@ -21,6 +21,7 @@
+> > >  #define RISCV_BOOT_H
+> > >
+> > >  #include "exec/cpu-defs.h"
+> > > +#include "hw/loader.h"
+> >
+> > Why is this needed? Currently this does not break build.
+>
+> Currently every c file that includes boot.h also includes loader.h
+> before it. Which is why the build works fine. We should be able to
+> include just boot.h though so this is a small fixup to allow that.
 >
 
-Please include some commit message to have a brief introduction of this new CPU.
+Please include such in the commit message to help people understand.
 
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->  target/riscv/cpu.c | 10 ++++++++++
->  target/riscv/cpu.h |  1 +
->  2 files changed, 11 insertions(+)
->
-> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-> index 8f837edf8d..235101f685 100644
-> --- a/target/riscv/cpu.c
-> +++ b/target/riscv/cpu.c
-> @@ -160,6 +160,15 @@ static void rv32gcsu_priv1_10_0_cpu_init(Object *obj)
->      set_feature(env, RISCV_FEATURE_PMP);
->  }
->
-> +static void rv32imcu_nommu_cpu_init(Object *obj)
-> +{
-> +    CPURISCVState *env = &RISCV_CPU(obj)->env;
-> +    set_misa(env, RV32 | RVI | RVM | RVC | RVU);
-> +    set_priv_version(env, PRIV_VERSION_1_10_0);
-> +    set_resetvec(env, 0x8088);
-> +    set_feature(env, RISCV_FEATURE_PMP);
-> +}
-> +
->  static void rv32imacu_nommu_cpu_init(Object *obj)
->  {
->      CPURISCVState *env = &RISCV_CPU(obj)->env;
-> @@ -620,6 +629,7 @@ static const TypeInfo riscv_cpu_type_infos[] = {
->      DEFINE_CPU(TYPE_RISCV_CPU_ANY,              riscv_any_cpu_init),
->  #if defined(TARGET_RISCV32)
->      DEFINE_CPU(TYPE_RISCV_CPU_BASE32,           riscv_base32_cpu_init),
-> +    DEFINE_CPU(TYPE_RISCV_CPU_IBEX,             rv32imcu_nommu_cpu_init),
->      DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31,       rv32imacu_nommu_cpu_init),
->      DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E34,       rv32imafcu_nommu_cpu_init),
->      DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rv32gcsu_priv1_10_0_cpu_init),
-> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> index d0e7f5b9c5..8733d7467f 100644
-> --- a/target/riscv/cpu.h
-> +++ b/target/riscv/cpu.h
-> @@ -35,6 +35,7 @@
->  #define TYPE_RISCV_CPU_ANY              RISCV_CPU_TYPE_NAME("any")
->  #define TYPE_RISCV_CPU_BASE32           RISCV_CPU_TYPE_NAME("rv32")
->  #define TYPE_RISCV_CPU_BASE64           RISCV_CPU_TYPE_NAME("rv64")
-> +#define TYPE_RISCV_CPU_IBEX             RISCV_CPU_TYPE_NAME("lowrisc-ibex")
->  #define TYPE_RISCV_CPU_SIFIVE_E31       RISCV_CPU_TYPE_NAME("sifive-e31")
->  #define TYPE_RISCV_CPU_SIFIVE_E34       RISCV_CPU_TYPE_NAME("sifive-e34")
->  #define TYPE_RISCV_CPU_SIFIVE_E51       RISCV_CPU_TYPE_NAME("sifive-e51")
-> --
-
-Otherwise, looks good to me.
 Reviewed-by: Bin Meng <bin.meng@windriver.com>
 
 Regards,
