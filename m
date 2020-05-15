@@ -2,72 +2,97 @@ Return-Path: <SRS0=sZ1e=65=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BABC1C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 08:55:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30B9EC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 08:57:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86735206B6
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 08:55:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86735206B6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id E6A78206B6
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 May 2020 08:57:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ax1Z+2C9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6A78206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jZW7d-0002Ay-QH
-	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 04:55:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57888)
+	id 1jZW9u-0005MT-4g
+	for qemu-devel@archiver.kernel.org; Fri, 15 May 2020 04:57:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58866)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jZW6u-0001Xr-5g
- for qemu-devel@nongnu.org; Fri, 15 May 2020 04:54:28 -0400
-Resent-Date: Fri, 15 May 2020 04:54:28 -0400
-Resent-Message-Id: <E1jZW6u-0001Xr-5g@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21385)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jZW6r-0005XH-4C
- for qemu-devel@nongnu.org; Fri, 15 May 2020 04:54:27 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1589532858; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=kUEcX3wFZu26mxCGJg4/4Iny6VV92YqVN+M5dq3GHyezt/RDeB/guKth1606C5YsOaIWfG7Qbn3nLuvsrC/ObXigt/h99iPKr7LkmecCzN17t76aC+JFN04Vk0slx9cgvcRuIwW79bYPaiQ4y0HyGH9QwXSeZhMj0KyfTvqwoYM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1589532858;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=aWeK0gGM3G5cbOSECnl25a2njKe/VxGoZy9cBctupqQ=; 
- b=LLPysVBbInaihEC60CdKE16CNMpwzwY9YEFWRPT8rrrRqGXHZ6BtbjfdLQJ6wWhn/X1qyFVtGT3+gVm6S/4twhs392RyQ3sNYArEGTup1VETAB1tHi3aEsKQaGmPEPmIb4vF1Ic9Doj7ojFnu8h6DI6EzJZIGXt6zQFNk7OTG/c=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1589532856425815.6572579174723;
- Fri, 15 May 2020 01:54:16 -0700 (PDT)
-Message-ID: <158953285537.2564.11704585665809336979@45ef0f9c86ae>
-In-Reply-To: <20200515060424.18993-1-armbru@redhat.com>
-Subject: Re: [PULL 00/21] QOM patches for 2020-05-15
+ (Exim 4.90_1) (envelope-from <arilou@gmail.com>) id 1jZW94-00040y-O4
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 04:56:42 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40402)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <arilou@gmail.com>) id 1jZW93-0006nH-LH
+ for qemu-devel@nongnu.org; Fri, 15 May 2020 04:56:42 -0400
+Received: by mail-wm1-x342.google.com with SMTP id u16so1738145wmc.5
+ for <qemu-devel@nongnu.org>; Fri, 15 May 2020 01:56:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to;
+ bh=Yz533la2Uoo7DomaE8kxRmv2gaoFr5wBiUEX8eW1fQY=;
+ b=ax1Z+2C9wuTQRnHckhtLfpMuZDwn3qYC5AuBZq0xMAnPEVy1JXwJjOv7CpeR14hFx0
+ gajyMED3Cmark8yZTwBN93D4Ff7ESmIMp8E64sckozV2KQtU0MBP/5KzhyMCA4OkpZX8
+ dS02BQDBGf2klGJTGpnqe2jNXRJAhNssRuU/xT17zXXN1fC1CXejAdflQfRdC4uy5FuM
+ 10aFy+2yyF52Vb9XqrYATQv1LYgE6FJt6ofnHfqzrsMa/4io9LkmRiBED7X94TMPVwCN
+ iD/yVM1Xq6mME+KrWslhOg+dzY9QF3+ztvafiAahd2ypPK24Fw9xXwYsM0umYlTJyjIA
+ 91YQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=Yz533la2Uoo7DomaE8kxRmv2gaoFr5wBiUEX8eW1fQY=;
+ b=tfXTRiAdJr9g9VzD0Uxrm6QqHSfIFDgzwHUJ8Kif0JHiweIYfYYNqUjI98bW4UtQ6U
+ 5S19Pi7CAtLA3vrkn4NVbq5XK5UJtQDwFr/8TccQoiOdBIa1CaIB8AZVufrhEC7IKHzx
+ s0FAdsm8v1Mqptw2sidFPqZ7/+RoQPxpoeNVGxNrXsiMFX65nnHtgH+mIaUPScwdy/mw
+ e5e07jf0L6NGxs+6DL0d4FM6NO7VJzZxbFO72mXRaSnnvlapSjC+Di9h5SFuglEjGgd1
+ w33M5/rWxSxJnp6DG/gYtEWCT60k9WWqczL0jTP/As3pVqM5JLWtRwPofSrR42lmbTw4
+ W9xA==
+X-Gm-Message-State: AOAM533fz0Md1T+AjYSKz0fwhb8D2jJszXKuRFC6X+xeI2eqSrjgARfy
+ sZNLNN9v+DNdM4m3AlR5Q4c=
+X-Google-Smtp-Source: ABdhPJyFxpeSyx25PKO2bfrB349XgwIdiNEjXZabqS1q742L6n9nUSpVKAv2pS3VtVuP6WjOwqGx1Q==
+X-Received: by 2002:a1c:6182:: with SMTP id v124mr2912017wmb.30.1589532999583; 
+ Fri, 15 May 2020 01:56:39 -0700 (PDT)
+Received: from jondnuc (IGLD-84-229-154-20.inter.net.il. [84.229.154.20])
+ by smtp.gmail.com with ESMTPSA id y185sm2573102wmy.11.2020.05.15.01.56.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 15 May 2020 01:56:38 -0700 (PDT)
+Date: Fri, 15 May 2020 11:56:36 +0300
+From: Jon Doron <arilou@gmail.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH v4 5/6] i386: Hyper-V VMBus ACPI DSDT entry
+Message-ID: <20200515085636.GN2862@jondnuc>
+References: <20200424123444.3481728-1-arilou@gmail.com>
+ <20200424123444.3481728-6-arilou@gmail.com>
+ <20200505150637.7131e79b@redhat.com>
+ <20200505153838.GC2862@jondnuc>
+ <30fea22b-ef36-04d9-17ef-d13e3f93a3c5@maciej.szmigiero.name>
+ <20200507031425.GG2862@jondnuc>
+ <20200511201106.GB1307176@rvkaganb.lan>
+ <20200513173725.277b0e16@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: armbru@redhat.com
-Date: Fri, 15 May 2020 01:54:16 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/05/15 03:17:32
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200513173725.277b0e16@redhat.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=arilou@gmail.com; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=_AUTOLEARN
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,99 +106,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org
+Cc: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>, eyakovlev@virtuozzo.com,
+ ehabkost@redhat.com, qemu-devel@nongnu.org,
+ Roman Kagan <rvkagan@yandex-team.ru>, liran.alon@oracle.com,
+ Roman Kagan <rkagan@virtuozzo.com>, pbonzini@redhat.com, vkuznets@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDUxNTA2MDQyNC4xODk5
-My0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDIwMDUxNTA2MDQyNC4xODk5My0xLWFybWJydUByZWRo
-YXQuY29tClN1YmplY3Q6IFtQVUxMIDAwLzIxXSBRT00gcGF0Y2hlcyBmb3IgMjAyMC0wNS0xNQpU
-eXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJl
-di1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3Bh
-dGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpTd2l0Y2hl
-ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjUwNDA4MjQgaHc6IFJlbW92ZSB1bm5lY2Vzc2FyeSBE
-RVZJQ0UoKSBjYXN0CmQ0MTQ1YTIgdmFyaW91czogUmVtb3ZlIHVubmVjZXNzYXJ5IE9CSkVDVCgp
-IGNhc3QKNzNlZGRmOSB0YXJnZXQ6IFJlbW92ZSB1bm5lY2Vzc2FyeSBDUFUoKSBjYXN0CmU0ZTNh
-N2EgcW9tOiBEcm9wIEBlcnJwIHBhcmFtZXRlciBvZiBvYmplY3RfcHJvcGVydHlfZGVsKCkKM2I5
-NTMyZiBzcGFwcl9wY2k6IERyb3Agc29tZSBkZWFkIGVycm9yIGhhbmRsaW5nCjkwMmRkZTUgcWRl
-djogVW5yZWFsaXplIG11c3Qgbm90IGZhaWwKNzAyOTYxNSBEcm9wIG1vcmUgQGVycnAgcGFyYW1l
-dGVycyBhZnRlciBwcmV2aW91cyBjb21taXQKZmY3OTMzNSBxb206IERyb3AgcGFyYW1ldGVyIEBl
-cnJwIG9mIG9iamVjdF9wcm9wZXJ0eV9hZGQoKSAmIGZyaWVuZHMKOThmY2Y3YiBxZGV2OiBDbGVh
-biB1cCBxZGV2X2Nvbm5lY3RfZ3Bpb19vdXRfbmFtZWQoKQoxMzllYWRmIGh3L2FybS9iY20yODM1
-OiBEcm9wIGZ1dGlsZSBhdHRlbXB0cyBhdCBRT00tYWRvcHRpbmcgbWVtb3J5CjJlODJmOTMgZTEw
-MDA6IERvbid0IHJ1biBlMTAwMF9pbnN0YW5jZV9pbml0KCkgdHdpY2UKNGJmMzU1YSBody9pc2Ev
-c3VwZXJpbzogTWFrZSB0aGUgY29tcG9uZW50cyBRT00gY2hpbGRyZW4KMDQ3MTBiMSBzMzkweC9j
-cHVtb2RlbDogRml4IFVJIHRvIENQVSBmZWF0dXJlcyBwY2MtY21hYy17YWVzLCBlYWVzfS0yNTYK
-YmM2YWE4NyB0ZXN0cy9jaGVjay1xb20tcHJvcGxpc3Q6IEltcHJvdmUgaXRlcmF0b3IgY292ZXJh
-Z2UKNjFiMTcwNiBxb206IERyb3Agb2JqZWN0X3Byb3BlcnR5X3NldF9kZXNjcmlwdGlvbigpIHBh
-cmFtZXRlciBAZXJycAowMjFhZTM5IHFvbTogTWFrZSBhbGwgdGhlIG9iamVjdF9wcm9wZXJ0eV9h
-ZGRfRk9PKCkgcmV0dXJuIHRoZSBwcm9wZXJ0eQoyZjA5YzUxIHFvbTogRHJvcCBjb252ZW5pZW5j
-ZSBtZXRob2Qgb2JqZWN0X3Byb3BlcnR5X2dldF91aW50MTZMaXN0KCkKYjBhZjJhNyBxb206IFNp
-bXBsaWZ5IG9iamVjdF9wcm9wZXJ0eV9nZXRfZW51bSgpCmU0ZGFjYmQgcW9tOiBEcm9wIG9iamVj
-dF9wcm9wZXJ0eV9kZWxfY2hpbGQoKSdzIHVudXNlZCBwYXJhbWV0ZXIgQGVycnAKMmNiZmIyOSBx
-b206IENsZWFuIHVwIGluY29uc2lzdGVudCB1c2Ugb2YgZ2NoYXIgKiB2cy4gY2hhciAqCjg4NzMw
-NDggcW9tOiBDbGVhcmVyIHJlZmVyZW5jZSBjb3VudGluZyBpbiBvYmplY3RfaW5pdGlhbGl6ZV9j
-aGlsZHYoKQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8yMSBDaGVja2luZyBjb21taXQgODg3MzA0
-ODAzMmY3IChxb206IENsZWFyZXIgcmVmZXJlbmNlIGNvdW50aW5nIGluIG9iamVjdF9pbml0aWFs
-aXplX2NoaWxkdigpKQoyLzIxIENoZWNraW5nIGNvbW1pdCAyY2JmYjI5M2Q3OGYgKHFvbTogQ2xl
-YW4gdXAgaW5jb25zaXN0ZW50IHVzZSBvZiBnY2hhciAqIHZzLiBjaGFyICopCjMvMjEgQ2hlY2tp
-bmcgY29tbWl0IGU0ZGFjYmRiNmFiMiAocW9tOiBEcm9wIG9iamVjdF9wcm9wZXJ0eV9kZWxfY2hp
-bGQoKSdzIHVudXNlZCBwYXJhbWV0ZXIgQGVycnApCjQvMjEgQ2hlY2tpbmcgY29tbWl0IGIwYWYy
-YTc1MDM1YyAocW9tOiBTaW1wbGlmeSBvYmplY3RfcHJvcGVydHlfZ2V0X2VudW0oKSkKNS8yMSBD
-aGVja2luZyBjb21taXQgMmYwOWM1MWU0NGI0IChxb206IERyb3AgY29udmVuaWVuY2UgbWV0aG9k
-IG9iamVjdF9wcm9wZXJ0eV9nZXRfdWludDE2TGlzdCgpKQo2LzIxIENoZWNraW5nIGNvbW1pdCAw
-MjFhZTM5MWUzZWYgKHFvbTogTWFrZSBhbGwgdGhlIG9iamVjdF9wcm9wZXJ0eV9hZGRfRk9PKCkg
-cmV0dXJuIHRoZSBwcm9wZXJ0eSkKNy8yMSBDaGVja2luZyBjb21taXQgNjFiMTcwNjczYzBmIChx
-b206IERyb3Agb2JqZWN0X3Byb3BlcnR5X3NldF9kZXNjcmlwdGlvbigpIHBhcmFtZXRlciBAZXJy
-cCkKOC8yMSBDaGVja2luZyBjb21taXQgYmM2YWE4NzhmZjBmICh0ZXN0cy9jaGVjay1xb20tcHJv
-cGxpc3Q6IEltcHJvdmUgaXRlcmF0b3IgY292ZXJhZ2UpCjkvMjEgQ2hlY2tpbmcgY29tbWl0IDA0
-NzEwYjE4ZjcwZSAoczM5MHgvY3B1bW9kZWw6IEZpeCBVSSB0byBDUFUgZmVhdHVyZXMgcGNjLWNt
-YWMte2FlcywgZWFlc30tMjU2KQpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzU5OiBG
-SUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzX2RlZi5pbmMuaDozMTQ6CitERUZfRkVBVChQ
-Q0NfQ01BQ19BRVNfMjU2LCAicGNjLWNtYWMtYWVzLTI1NiIsIFBDQywgMjAsICJQQ0MgQ29tcHV0
-ZS1MYXN0LUJsb2NrLUNNQUMtVXNpbmctQUVTLTI1NiIpCgp0b3RhbDogMSBlcnJvcnMsIDAgd2Fy
-bmluZ3MsIDggbGluZXMgY2hlY2tlZAoKUGF0Y2ggOS8yMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
-ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
-cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
-RVJTLgoKMTAvMjEgQ2hlY2tpbmcgY29tbWl0IDRiZjM1NWE5Y2JjNyAoaHcvaXNhL3N1cGVyaW86
-IE1ha2UgdGhlIGNvbXBvbmVudHMgUU9NIGNoaWxkcmVuKQoxMS8yMSBDaGVja2luZyBjb21taXQg
-MmU4MmY5MzE3OTVmIChlMTAwMDogRG9uJ3QgcnVuIGUxMDAwX2luc3RhbmNlX2luaXQoKSB0d2lj
-ZSkKMTIvMjEgQ2hlY2tpbmcgY29tbWl0IDEzOWVhZGY0ZTU5OSAoaHcvYXJtL2JjbTI4MzU6IERy
-b3AgZnV0aWxlIGF0dGVtcHRzIGF0IFFPTS1hZG9wdGluZyBtZW1vcnkpCjEzLzIxIENoZWNraW5n
-IGNvbW1pdCA5OGZjZjdiY2ZiN2QgKHFkZXY6IENsZWFuIHVwIHFkZXZfY29ubmVjdF9ncGlvX291
-dF9uYW1lZCgpKQoxNC8yMSBDaGVja2luZyBjb21taXQgZmY3OTMzNWFmNzcwIChxb206IERyb3Ag
-cGFyYW1ldGVyIEBlcnJwIG9mIG9iamVjdF9wcm9wZXJ0eV9hZGQoKSAmIGZyaWVuZHMpCldBUk5J
-Tkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMTE6IEZJTEU6IGJhY2tlbmRzL2hvc3RtZW0t
-ZmlsZS5jOjE4NzoKKyAgICAgICAgZmlsZV9tZW1vcnlfYmFja2VuZF9nZXRfZGlzY2FyZF9kYXRh
-LCBmaWxlX21lbW9yeV9iYWNrZW5kX3NldF9kaXNjYXJkX2RhdGEpOwoKV0FSTklORzogbGluZSBv
-dmVyIDgwIGNoYXJhY3RlcnMKIzEwODI6IEZJTEU6IGh3L2FybS9yYXNwaS5jOjI4NzoKKyAgICBv
-YmplY3RfcHJvcGVydHlfYWRkX2NvbnN0X2xpbmsoT0JKRUNUKCZzLT5zb2MpLCAicmFtIiwgT0JK
-RUNUKG1hY2hpbmUtPnJhbSkpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzMx
-MTY6IEZJTEU6IGh3L3BwYy9zcGFwci5jOjMzMzY6CisgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICZzcGFwci0+a2VybmVsX2FkZHIsIE9CSl9QUk9QX0ZMQUdfUkVBRFdSSVRFKTsK
-CnRvdGFsOiAwIGVycm9ycywgMyB3YXJuaW5ncywgNDQ4OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAx
-NC8yMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNS8yMSBDaGVja2luZyBjb21taXQgNzAy
-OTYxNTE4YjA5IChEcm9wIG1vcmUgQGVycnAgcGFyYW1ldGVycyBhZnRlciBwcmV2aW91cyBjb21t
-aXQpCjE2LzIxIENoZWNraW5nIGNvbW1pdCA5MDJkZGU1Nzc2ZDIgKHFkZXY6IFVucmVhbGl6ZSBt
-dXN0IG5vdCBmYWlsKQoxNy8yMSBDaGVja2luZyBjb21taXQgM2I5NTMyZjIxZDBiIChzcGFwcl9w
-Y2k6IERyb3Agc29tZSBkZWFkIGVycm9yIGhhbmRsaW5nKQoxOC8yMSBDaGVja2luZyBjb21taXQg
-ZTRlM2E3YTk0NzEyIChxb206IERyb3AgQGVycnAgcGFyYW1ldGVyIG9mIG9iamVjdF9wcm9wZXJ0
-eV9kZWwoKSkKMTkvMjEgQ2hlY2tpbmcgY29tbWl0IDczZWRkZjllNzdhYyAodGFyZ2V0OiBSZW1v
-dmUgdW5uZWNlc3NhcnkgQ1BVKCkgY2FzdCkKMjAvMjEgQ2hlY2tpbmcgY29tbWl0IGQ0MTQ1YTI0
-ZWVmMyAodmFyaW91czogUmVtb3ZlIHVubmVjZXNzYXJ5IE9CSkVDVCgpIGNhc3QpCjIxLzIxIENo
-ZWNraW5nIGNvbW1pdCA1MDQwODI0ZmU0NzIgKGh3OiBSZW1vdmUgdW5uZWNlc3NhcnkgREVWSUNF
-KCkgY2FzdCkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29k
-ZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xv
-Z3MvMjAyMDA1MTUwNjA0MjQuMTg5OTMtMS1hcm1icnVAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNr
-cGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
-IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
-ayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 13/05/2020, Igor Mammedov wrote:
+
+Do you guys know perhaps which module is reading the ACPI configuration 
+for VMBus? vmbus.sys / vmbkmcl.sys / winhv.sys? is it the kernel or HAL?
+
+I dont have any real HyperV Windows to play with...
+
+Roman, do you remember when is this information being used? Do we need a 
+full emulation setup (aka your hv-scsi / hv-net) patches in order to see 
+Windows working this ACPI entry?
+
+Thanks,
+-- Jon.
+
+>On Mon, 11 May 2020 23:11:23 +0300
+>Roman Kagan <rvkagan@yandex-team.ru> wrote:
+>
+>> On Thu, May 07, 2020 at 06:14:25AM +0300, Jon Doron wrote:
+>> > Igor it seems like the IRQ being used is 5 and not 7 & 13 like in the
+>> > current patch.
+>>
+>> HyperV using irq 5 doesn't mean QEMU has to too.  Especially so as no
+>> guest was noticed to use the irqs in ACPI.  I'd rather try and test if
+>> the guest requires any those at all.
+>>
+>> > Seems like it needs to reside in the _CRS like you said.
+>>
+>> They already are there.
+>>
+>> > Seems like it has all those _STA/_DIS/_PS0 just like the way it's currently
+>> > in the patch (unless I'm missing something).
+>>
+>> Right, but, as you can see, they are pretty dumb, so the question is
+>> whether they are necessary or the guests can do without (Linux
+>> apparently can).
+>
+>Agreed with all of above,
+>Instead of blind copying dubious AML, we should try to figure out what's
+>really necessary of it and throw away the rest.
+>
+>>
+>> Thanks,
+>> Roman.
+>>
+>> > Notice _PS3 is not a Method.
+>> >
+>> > So just to summarize the changes i need to do:
+>> > 1. Change from 2 IRQs to single one (and use 5 as the default)
+>> > 2. IRQs needs to be under _CRS.
+>> > 3. You mentioned you want under a different location than the ISA bug where
+>> > would you want it to be?
+>> >
+>> > Please let me know if there is anything else.
+>> >
+>> > Thanks,
+>> > -- Jon.
+>> >
+>> > On 06/05/2020, Maciej S. Szmigiero wrote:
+>> > > On 05.05.2020 17:38, Jon Doron wrote:
+>> > > > On 05/05/2020, Igor Mammedov wrote:
+>> > > >
+>> > > > I dont know what were the original intentions of the original patch authors (at this point I simply rebased it, and to be honest I did not need this patch to get where I was going to, but it was part of the original patchset).
+>> > > >
+>> > > > But I'm willing to do any changes so we can keep going forward with this.
+>> > > >
+>> > > > > On Fri, 24 Apr 2020 15:34:43 +0300
+>> > > > > Jon Doron <arilou@gmail.com> wrote:
+>> > > > >
+>> > > > > > Guest OS uses ACPI to discover VMBus presence.  Add a corresponding
+>> > > > > > entry to DSDT in case VMBus has been enabled.
+>> > > > > >
+>> > > > > > Experimentally Windows guests were found to require this entry to
+>> > > > > > include two IRQ resources. They seem to never be used but they still
+>> > > > > > have to be there.
+>> > > > > >
+>> > > > > > Make IRQ numbers user-configurable via corresponding properties; use 7
+>> > > > > > and 13 by default.
+>> > > > > well, it seems that at least linux guest driver uses one IRQ,
+>> > > > > abeit not from ACPI descriptior
+>> > > > >
+>> > > > > perhaps it's what hyperv host puts into _CRS.
+>> > > > > Could you dump ACPI tables and check how hyperv describes vmbus in acpi?
+>> > > > >
+>> > > > >
+>> > > >
+>> > > > I can no longer get to the HyperV computer I had (in the office so hopefully if someone else has access to HyperV machine and willing to reply here with the dumped ACPI tables that would be great).
+>> > > >
+>> > >
+>> > > Here is a VMBus ACPI device description from Hyper-V in Windows Server 2019:
+>> > >
+>> > > Device (\_SB.VMOD.VMBS)
+>> > > {
+>> > >    Name (STA, 0x0F)
+>> > >    Name (_ADR, Zero)  // _ADR: Address
+>> > >    Name (_DDN, "VMBUS")  // _DDN: DOS Device Name
+>> > >    Name (_HID, "VMBus")  // _HID: Hardware ID
+>> > >    Name (_UID, Zero)  // _UID: Unique ID
+>> > >    Method (_DIS, 0, NotSerialized)  // _DIS: Disable Device
+>> > >    {
+>> > > 	STA &= 0x0D
+>> > >    }
+>> > >
+>> > >    Method (_PS0, 0, NotSerialized)  // _PS0: Power State 0
+>> > >    {
+>> > > 	STA |= 0x0F
+>> > >    }
+>> > >
+>> > >    Method (_STA, 0, NotSerialized)  // _STA: Status
+>> > >    {
+>> > > 	Return (STA) /* \_SB_.VMOD.VMBS.STA_ */
+>> > >    }
+>> > >
+>> > >    Name (_PS3, Zero)  // _PS3: Power State 3
+>> > >    Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+>> > >    {
+>> > > 	IRQ (Edge, ActiveHigh, Exclusive, )
+>> > > 	    {5}
+>> > >    })
+>> > > }
+>> > >
+>> > > It seems to use just IRQ 5.
+>> > >
+>> > > Maciej
+>> >
+>>
+>
 
